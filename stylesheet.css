@@ -53,9 +53,13 @@ margin-bottom:8px;
 padding:5px;
 cursor:pointer;
 text-align:center;
+min-width:220px;
 }
 .progressBar {
 width:90%;
 height:15px;
-margin-top:5px;
+}
+.number {
+    color:black;
+	font-weight:bold;
 }
