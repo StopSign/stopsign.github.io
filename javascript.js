@@ -57,6 +57,8 @@ function countUp(x) {
 	$("#cost"+x).html(skills[x].cost);
 }
 
+
+
 function timerTick() {
 	skills[selected].curProg += baseRate / 100;
 	if(skills[selected].curProg > skills[selected].cost) {
@@ -64,18 +66,11 @@ function timerTick() {
 	}
 	$("#progress"+selected).val(skills[selected].curProg);
 }
-setInterval(timerTick, 10);
 
-
-//alert(skillArray.toString().replace(/,/g," "));
-//arrays for skill values
-
-/*unique things about skills:
-placement
-cost
-name
-count - times progressed
-current progress
-
-level - 0 for off, 1 for first stage, 2 for second stage, etc.
-*/
+var doWork = new Worker('interval.js');
+doWork.onmessage = function(event) {
+    if ( event.data === 'interval.start' ) {
+		timerTick();
+    }
+};
+doWork.postMessage({start:true,ms:100});
