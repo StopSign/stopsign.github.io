@@ -73,4 +73,4 @@ doWork.onmessage = function(event) {
 		timerTick();
     }
 };
-doWork.postMessage({start:true,ms:100});
+doWork.postMessage({start:true,ms:10});
