@@ -14,8 +14,9 @@ if(!skills[num] || skills[num].level==0)
 return;
 skillToAdd = "<div class='skill' id='skill"+num+"' onclick='selectSkill("+num+")'>" +
 "<h3 style='float:left;'>"+skills[num].name+"</h3>"+
-"<div style='float:right;'>Cost <h4 id='cost"+num+"' class='number'>"+skills[num].cost+"</h4></div>"+
+"<div style='float:right;'>Cost: <h4 id='cost"+num+"' class='number'>"+skills[num].cost+"</h4></div>"+
 "<progress id='progress"+num+"' class='progressBar' max='"+skills[num].cost+"' value='"+skills[num].curProg+"' ></progress>"+
+"<div style='float:right;'>Count: <div id='count"+num+"' class='number'>"+skills[num].count+"</div></div>"+
 "</div><br>";
 skillArray[num] = skillToAdd;
 $("#skills").empty().append(skillArray.toString().replace(/,/g," "));
@@ -55,6 +56,7 @@ function countUp(x) {
 		$("#progress"+x).attr("max", skills[x].cost);
 	}
 	$("#cost"+x).html(skills[x].cost);
+	$("#count"+x).html(skills[x].count);
 }
 
 
@@ -66,11 +68,14 @@ function timerTick() {
 	}
 	$("#progress"+selected).val(skills[selected].curProg);
 }
+setInterval(timerTick, 10);
 
+/* //uncomment this before checkin
 var doWork = new Worker('interval.js');
 doWork.onmessage = function(event) {
     if ( event.data === 'interval.start' ) {
 		timerTick();
     }
 };
-doWork.postMessage({start:true,ms:10});
+doWork.postMessage({start:true,ms:100});
+*/
