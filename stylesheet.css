@@ -1,8 +1,12 @@
+* {
+margin:0
+}
+
 .hideForHover {
     margin-top:4px;
     display:none;
 }
-.buyButton:hover .hideForHover {
+.buyButton:hover .tooltipcontainer {
     display:block;
 }
 .guidanceOption {
@@ -91,7 +95,7 @@ div {
     font-size:12px;
 }
 .tab {
-    height:4%;
+    height:24px;
     border:2px solid #000;
     border-bottom:0px;
     border-top-left-radius:10px;
@@ -119,18 +123,18 @@ div {
     line-height:14px;
     display:block;
 }
-#clickMe {
+#clickMe, #clickMeWalk {
     text-align:center;
     display:inline-block;
-    margin-top:20px;
-    padding:20px 0px;
+    padding:30px 0px;
     background:#293B99;
     color:#2CFFFF;
     font-size:24px;
     cursor:pointer;
-    width:98%;
+    width:135px;
     border:5px solid green;
     border-radius:5px;
+	height:75px;
 }
 #outerBar {
     width:100%;
@@ -164,8 +168,8 @@ div {
     margin-bottom:10px;
     padding:2px 15px;
 }
-.boxWithTabs {
-    height:38%;
+.halfBox {
+    height:46%;
     margin:0;
     border:1px solid;
     width:100%;
@@ -184,3 +188,39 @@ div {
     margin-right:5%;
     margin-top:5px;
 }
+.tooltipcontainer {
+position:relative;
+}
+.tooltip{
+position:absolute;
+display:none;
+}
+
+
+.staminaBar {
+    width: 24px;
+    height: 200px;
+      margin: 10px auto;
+    background-color: rgba(0, 0, 0, 0.25);
+    box-shadow: 0 0 3px #000000 inset, 0 0 2px rgba(255,255,255,0.1);
+    border-radius: 10px;
+    padding: 4px;
+    transform: rotate(180deg);
+    display: inline-block;
+}
+
+#innerStamina {
+     background: linear-gradient(#FFCC33, #F2E2B2);
+     border-radius: 12px;
+     position: absolute;
+     box-shadow: 0 1px 0 rgba(255, 255, 255, 0.3) inset, 0 -1px 3px rgba(0, 0, 0, 0.4) inset, 0 1px 1px #000000;
+     height: 97%;
+     width: 24px;
+ }
+ .color1_2 {
+ color:#AF6EEA;
+ }
+ 
+ .color1_1 {
+ color:#7D36BE;
+ }
