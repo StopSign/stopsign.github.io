@@ -224,14 +224,14 @@ function handleNewOptions() {
 	else {
 		document.getElementById("buyOptions1").style.display="none";
 	}
-	if(resource1_1 >= 1500 || shown[1]) {
+	/*if(resource1_1 >= 1500 || shown[1]) {
 		shown[1] = true;
 		document.getElementById("buyOptions1").style.display="inline-block";
 		updateButtons()
 	}
 	else {
 		document.getElementById("buyOptions1").style.display="none";
-	}
+	}*/
 }
 
 function updateResources() {
