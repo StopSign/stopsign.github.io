@@ -19,7 +19,7 @@ function loadDefaults() {
 }
 
 function saveIntoStorage() {
-    localStorage.allVariables = "";
+    localStorage.allVariables1 = "";
     theCookie = curStamina+","+staminaRate+","+exhaustedStaminaRate+","+isExhausted+","+resource1_1+","+resource1_2+","+isWalking;
 	for(index = 0; index < buycounts.length; index++) {
         theCookie += ","+buycounts[index]+","+costbuy[index]+","+valuebuy[index];
@@ -30,14 +30,14 @@ function saveIntoStorage() {
 	for(index = 0; index < shown.length; index++) {
         theCookie += ","+shown[index];
 	}
-    localStorage.allVariables = theCookie;
+    localStorage.allVariables1 = theCookie;
 }
 
 function loadFromStorage() {
 	document.getElementById("mainBox").style.display="inline-block";
-    if(localStorage.allVariables) {
+    if(localStorage.allVariables1) {
 		showingGif = 0; //false
-        expandedCookie = (','+localStorage.allVariables).split(',');
+        expandedCookie = (','+localStorage.allVariables1).split(',');
         x = 1;
 		curStamina = parseFloat(expandedCookie[x++]);
 		staminaRate = parseFloat(expandedCookie[x++]);
@@ -71,7 +71,7 @@ loadDefaults();
 loadFromStorage();
 
 function clearStorage() {
-    localStorage.allVariables="";
+    localStorage.allVariables1="";
     loadDefaults();
 }
 
@@ -102,7 +102,7 @@ function startTheClickSpree(divId) {
 //	tick();
 //},50);
 
- //uncomment this before checkin
+//uncomment this before checkin
 var doWork = new Worker('interval.js');
 doWork.onmessage = function(event) {
     if ( event.data === 'interval.start' ) {
