@@ -314,7 +314,9 @@ function updateStaminaSpenderVisuals() {
 		$("#clickGif2").hide();
 	}
 	else {
-		$("#clickMe1").show()
+		$("#clickMe1").show();
+		$("#clickGif1").hide();
+		$("#clickGif2").hide();
 	}
 }
 
