@@ -1,7 +1,7 @@
 function loadDefaults() {
 	curStamina = 100;
 	staminaRate=5;
-	exhaustedStaminaRate=20; //.2
+	exhaustedStaminaRate=.2; //.2
 	isExhausted=0; //bool
 	resource1_1 = 0;
 	resource1_2 = 0;
@@ -10,8 +10,8 @@ function loadDefaults() {
 	costbuy =   [0, 500, 1500, 15000, 15000, 1000000, 1000000, 0, 0, 0, 0, 0];
 	valuebuy =  [0,   1,  100,     1,     1,       1,       1, 0, 0, 0, 0, 0];
 	shown = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]; //always all 0s by default
-	upgradeCounts = [0,    0,     0,      0,         0,        0, 0, 0, 0, 0, 0, 0];
-	costUpgrade =   [0, 2000, 25000, 3000000, 10000000, 25000000, 0, 0, 0, 0, 0, 0];
+	upgradeCounts = [0,    0,     0,       0,       0,        0, 0, 0, 0, 0, 0, 0];
+	costUpgrade =   [0, 2000, 25000, 2000000, 5000000, 15000000, 0, 0, 0, 0, 0, 0];
 	showingGif = 0; //false
 	toResume = 0;
 	resource2_2 = 1;
@@ -21,12 +21,13 @@ function loadDefaults() {
 	firstVarForDist = 10;
 	totalGains = 0;
 	sleepRate = 1;
+	sleepMax = 2;
 	handleNewOptions();
 	updateResources();
 }
 
 function saveIntoStorage() {
-    localStorage.allVariables1 = "";
+    localStorage.allVariables2 = "";
     theCookie = curStamina+","+staminaRate+","+exhaustedStaminaRate+","+isExhausted+","+resource1_1+","+resource1_2+","+isWalking;
 	for(index = 0; index < buycounts.length; index++) {
         theCookie += ","+buycounts[index]+","+costbuy[index]+","+valuebuy[index];
@@ -38,14 +39,15 @@ function saveIntoStorage() {
         theCookie += ","+shown[index];
 	}
 	theCookie += ","+showingGif;
-	theCookie += ","+toResume+","+resource2_2+","+resource2_3+","+curDist+","+maxDist+","+firstVarForDist+","+totalGains+","+sleepRate;
-    localStorage.allVariables1 = theCookie;
+	theCookie += ","+toResume+","+resource2_2+","+resource2_3+","+curDist+","+maxDist+","+firstVarForDist+","+totalGains+","+sleepRate
+					+","+sleepMax;
+    localStorage.allVariables2 = theCookie;
 }
 
 function loadFromStorage() {
 	document.getElementById("mainBox").style.display="inline-block";
-    if(localStorage.allVariables1) {
-        expandedCookie = (','+localStorage.allVariables1).split(',');
+    if(localStorage.allVariables2) {
+        expandedCookie = (','+localStorage.allVariables2).split(',');
         x = 1;
 		curStamina = parseFloat(expandedCookie[x++]);
 		staminaRate = parseFloat(expandedCookie[x++]);
@@ -76,11 +78,12 @@ function loadFromStorage() {
 		firstVarForDist=parseFloat(expandedCookie[x++]);
 		totalGains=parseFloat(expandedCookie[x++]);
 		sleepRate=parseFloat(expandedCookie[x++]);
+		sleepMax=parseFloat(expandedCookie[x++]);
 		updateResources();
 		handleNewOptions();
 		updateStaminaSpenderVisuals();
 		updatePassiveVisuals()
-		updateStaminaMult();
+		updateSleepVisuals()
     }
 	else {
 		loadDefaults();
@@ -89,6 +92,6 @@ function loadFromStorage() {
 }
 
 function clearStorage() {
-    localStorage.allVariables1="";
+    localStorage.allVariables2="";
     loadDefaults();
 }

@@ -10,8 +10,8 @@
 <div style="text-align:right;width:100%"><div id="mainTitle" style="font-size:40px;margin:10px;margin-right:15%;">Incremental Quest v.2</div></div>
 <div id='mainBox' style='border:3px solid;padding:20px;height:800px;text-align:left;width:1400px;display:none;'>
 <div id='actionSpace' style="width:38%;vertical-align:top;text-align:left;">
-	<div style="width:100%;margin-top:20px;">
-		<div style="width:79%;height:250px;vertical-align:top">
+	<div style="width:100%;margin-top:20px;overflow-auto">
+		<div style="width:75%;height:250px;vertical-align:top">
 			<div id='DistanceArea' style="width:100%;overflow:auto;line-height:18px;margin-top:50px">
 				<h3 style='margin-bottom:10px'>3% upgrade price reduction</h3>
 				<div style='margin-left:20px;'>
@@ -34,12 +34,12 @@
 			</div>
 			<div id='staminaCur' class='number' style="clear:left;float:left;"></div>
 		</div>
-		<div id="sleepBar" style="height:250px;">
-			<div id='sleepMax' class='number' style="vertical-align:top;clear:left;float:left;">200%</div>
+		<div id="sleepBar" style="height:250px;vertical-align:top;">
+			<div id='sleepMax' class='number' style="vertical-align:top;clear:left;float:left;">200</div>
 			<div class="staminaBar" style="clear:left;float:left;">
-				<div id="innerStamina"></div>
+				<div id="innersleep"></div>
 			</div>
-			<div id='sleepCur' class='number' style="clear:left;float:left;">100%</div>
+			<div id='sleepCur' class='number' style="clear:left;float:left;">100</div>
 		</div>
 	</div>
 	<div style="width:100%;margin-top:20px;">
@@ -69,10 +69,9 @@
 			<div id="walkClick2" class="halfClickHorizontal"></div>
 		</div>
 	</div>
-	<div id="staminaMultOptions" style="width:100%;margin-top:5px">
-		<button id="staRateAdd5" onclick="staRateChange(5)" >+</button>
-		<button id="staRateSub5" onclick="staRateChange(-5)">-</button>
-		<div>Use <div id="staminaRate" class="number">5</div> stamina per tick for <div id="staminaBuff" class="number">100</div>% gain. <div id="secondsToGo" class="number"></div> seconds until exhausted</div>
+	<div id="staminaMultOptions" style="width:50%;margin-top:5px;text-align:center">
+		<button onclick="stopStaminaSpender()" >Stop</button><br>
+		<div style="margin-top:5px;"><div id="secondsToGo" class="number"></div> seconds until exhausted</div>
 	</div>
 	<!--Clicks per Second: <div id="CPS" class="number">0</div> -->
 </div>

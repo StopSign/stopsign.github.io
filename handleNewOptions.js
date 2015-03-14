@@ -50,12 +50,26 @@ function handleNewOptions() {
 	if(upgradeCounts[3]) { //unlock walk with purpose and run
 		$("#buyOptions5").show();
 		$("#buyOptions6").show();
-		$("#buyupgrade4").show();
+		if(!upgradeCounts[4])
+			$("#buyupgrade4").show();
 	}
 	else {
 		$("#buyOptions5").hide();
 		$("#buyOptions6").hide();
 		$("#buyupgrade4").hide();
 	}
+	if(upgradeCounts[4]) {
+		$("#sleepBar").show()
+	}
+	else {
+		$("#sleepBar").hide()
+	}
 	
+	
+	if(buycounts[2] > 5 && (showingGif === 1 || showingGif === 3)) {
+		document.getElementById("staminaMultOptions").style.display="inline-block"
+	}
+	else {
+		document.getElementById("staminaMultOptions").style.display="none";
+	}
 }

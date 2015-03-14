@@ -1,17 +1,17 @@
 
 
-setInterval(function() {
-	tick();
-},50);
+//setInterval(function() {
+//	tick();
+//},50);
 
 //uncomment this before checkin
-/*var doWork = new Worker('interval.js');
+var doWork = new Worker('interval.js');
 doWork.onmessage = function(event) {
     if ( event.data === 'interval.start' ) {
 		tick();
     }
 };
-doWork.postMessage({start:true,ms:50});*/
+doWork.postMessage({start:true,ms:50});
 
 loadDefaults();
 loadFromStorage();
@@ -73,11 +73,28 @@ totalSeconds = 0;
 function second() {
 	totalSeconds++;
 	//handleClicksPerSecond();
-	if(isWalking === 1 && totalSeconds % 2 === 0) {
-		resource1_1+=resource1_2;
+	if(totalSeconds % 2 === 0) {
+		if(isWalking === 1) {
+			resource1_1+=resource1_2;
+		}
+		if(isWalking === 2) {
+			resource2_2+=resource2_3;
+		}
 	}
-	if(isWalking === 2 && totalSeconds % 2 === 0) {
-		resource2_2+=resource2_3;
+	else if(totalSeconds % 5 === 0) {
+		if(isWalking) {
+			sleepRate += .0003
+			if(sleepRate > sleepMax) {
+				sleepMax += .00003
+				sleepRate = sleepMax
+			}
+		}
+		else {
+			sleepRate -= .00004
+			if(sleepRate < 1)
+				sleepRate = 1
+		}
+		updateSleepVisuals()
 	}
 	updateResources()
 	handleNewOptions()
@@ -86,7 +103,7 @@ function second() {
 
 function handleExertYourself() {
 	curStamina-=staminaRate;
-	resource1_1+=resource1_2*(valuebuy[4])*sleepRate*(staminaBuff/100);
+	resource1_1+=resource1_2*(valuebuy[4])*sleepRate;
 	if(curStamina < 0) {
 		resource1_2++;
 	}
@@ -105,8 +122,7 @@ function handlePowerLift() {
 
 function handleWalkWithPurpose() {
 	curStamina-=staminaRate;
-	resource2_2+=resource2_3*valuebuy[6]*(staminaBuff/100);
-	console.log(staminaBuff+"asdf");
+	resource2_2+=resource2_3*valuebuy[6];
 	if(curStamina < 0) {
 		resource2_3++;
 	}
@@ -244,6 +260,12 @@ function updateResources() {
 	document.getElementById("resource2_2").innerHTML=round(resource2_2);
 }
 
+function updateSleepVisuals() { //run every 5 seconds
+	document.getElementById("innersleep").style.height = ((sleepRate - 1) === 0 ? 0 : (sleepRate - 1) / (sleepMax - 1))*100 + "%"
+	document.getElementById("sleepCur").innerHTML = round3(sleepRate*100) + "%"
+	document.getElementById("sleepMax").innerHTML = round3(sleepMax*100) + "%"
+}
+
 function updateButtons() {
 	for(index = 1; index < buycounts.length; index++) {
 		if(document.getElementById("buycounts"+index) != null) {
@@ -320,26 +342,20 @@ function hideAllStaminaClicks() {
 	}
 }
 
-function staRateChange(change) {
-	staminaRate += change
-	if(staminaRate <= 5)
-		staminaRate = 5;
-	updateStaminaMult()
-
-}
-
-function updateStaminaMult() {
-	document.getElementById("staminaRate").innerHTML = staminaRate;
-	staminaBuff = 100;
-	for(x = 0; x < (staminaRate/5-1); x++) {
-		staminaBuff += 20*Math.pow(.99, x)+5
-	}
-	console.log(staminaBuff);
-	document.getElementById("staminaBuff").innerHTML = round(staminaBuff)
+function stopStaminaSpender() {
+	isExhausted = 1; //true
+	document.getElementById("clickGif"+showingGif).style.display="none";
+	showingGif = 0; //false
+	toResume = 0;
+	handleNewOptions()
+	updateStaminaSpenderVisuals()
+	updateResources()
+	updateSecondsToGo()
 }
 
 function updateStaminaSpenderVisuals() {
 	if(showingGif) {
+		document.getElementById("clickMe1").style.display="none";
 		document.getElementById("clickGif"+showingGif).style.display = "inline-block";
 		document.getElementById("staminaClick"+showingGif).style.display = "none";
 		document.getElementById("clickMe"+showingGif).style.display = "none";
@@ -422,6 +438,10 @@ function upgrade(divId) {
 		resource1_1 -= costUpgrade[id]
 		updateStaminaSpenderVisuals() //handles 1,3
 		updatePassiveVisuals() //handles 2
+		if(id == 4) {
+			sleepRate = 1.1
+			updateSleepVisuals()
+		}
 	}
 	updateButtons()
 	updateResources()

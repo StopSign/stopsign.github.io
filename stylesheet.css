@@ -297,6 +297,16 @@ display:none;
 	height: 97%;
 	width: 24px;
  }
+ 
+ #innersleep {
+	background: linear-gradient(#F4FDFF, #06F6FF);
+	border-radius: 12px;
+	position: absolute;
+	box-shadow: 0 1px 0 rgba(255, 255, 255, 0.3) inset, 0 -1px 3px rgba(0, 0, 0, 0.4) inset, 0 1px 1px #000000;
+	height: 97%;
+	width: 24px;
+
+ }
 .color1_2 {
 	color:#AF6EEA;
 }
