@@ -1,86 +1,29 @@
 
-function loadDefaults() {
-	curStamina = 100;
-	staminaRate=1;
-	exhaustedStaminaRate=.2; //.2
-	isExhausted=0; //bool
-	resource1_1 = 0;
-	resource1_2 = 0;
-	isWalking = 0; //bool
-	buycounts = [0,   0,    0,     0,     0,      0,      0, 0, 0, 0, 0, 0]; //always all 0s by default
-	costbuy =   [0, 500, 1500, 15000, 15000, 100000, 100000, 0, 0, 0, 0, 0];
-	valuebuy =  [0,   1,  100,     1,     1,      1,      1, 0, 0, 0, 0, 0];
-	upgradeCounts = [0,    0,     0,      0,      0, 0, 0, 0, 0, 0, 0, 0];
-	costUpgrade =   [0, 2000, 25000, 100000, 300000, 0, 0, 0, 0, 0, 0, 0];
-	shown = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]; //always all 0s by default
-	handleNewOptions();
-	updateResources();
-	showingGif = 0; //false
-}
 
-function saveIntoStorage() {
-    localStorage.allVariables1 = "";
-    theCookie = curStamina+","+staminaRate+","+exhaustedStaminaRate+","+isExhausted+","+resource1_1+","+resource1_2+","+isWalking;
-	for(index = 0; index < buycounts.length; index++) {
-        theCookie += ","+buycounts[index]+","+costbuy[index]+","+valuebuy[index];
-    }
-	for(index = 0; index < upgradeCounts.length; index++) {
-        theCookie += ","+upgradeCounts[index]+","+costUpgrade[index];
-	}
-	for(index = 0; index < shown.length; index++) {
-        theCookie += ","+shown[index];
-	}
-    localStorage.allVariables1 = theCookie;
-}
+setInterval(function() {
+	tick();
+},50);
 
-function loadFromStorage() {
-	document.getElementById("mainBox").style.display="inline-block";
-    if(localStorage.allVariables1) {
-		showingGif = 0; //false
-        expandedCookie = (','+localStorage.allVariables1).split(',');
-        x = 1;
-		curStamina = parseFloat(expandedCookie[x++]);
-		staminaRate = parseFloat(expandedCookie[x++]);
-		exhaustedStaminaRate = parseFloat(expandedCookie[x++]);
-		isExhausted = parseFloat(expandedCookie[x++]);
-		resource1_1 = parseFloat(expandedCookie[x++]);
-		resource1_2 = parseFloat(expandedCookie[x++]);
-		isWalking = parseFloat(expandedCookie[x++]);
-		for(index = 0; index < buycounts.length; index++) {
-			buycounts[index]=parseFloat(expandedCookie[x++]);
-			costbuy[index]=parseFloat(expandedCookie[x++]);
-			valuebuy[index]=parseFloat(expandedCookie[x++]);
-        }
-		for(index = 0; index < upgradeCounts.length; index++) {
-			upgradeCounts[index]=parseFloat(expandedCookie[x++]);
-			costUpgrade[index]=parseFloat(expandedCookie[x++]);
-        }
-		for(index = 0; index < shown.length; index++) {
-			shown[index]=parseFloat(expandedCookie[x++]);
-		}
-		updateResources();
-		handleNewOptions();
-		updateStaminaSpenderVisuals();
+//uncomment this before checkin
+/*var doWork = new Worker('interval.js');
+doWork.onmessage = function(event) {
+    if ( event.data === 'interval.start' ) {
+		tick();
     }
-	else {
-		loadDefaults();
-	}
-    saveIntoStorage();
-}
+};
+doWork.postMessage({start:true,ms:50});*/
+
 loadDefaults();
 loadFromStorage();
 
-function clearStorage() {
-    localStorage.allVariables1="";
-    loadDefaults();
-}
-
-function startWalking() {
-	isWalking = 1; //true
+function startWalking(divId) {
+    id = parseInt(divId.substring(11));
+	if(!toResume)
+		toResume = showingGif;
+	isWalking = id; //true
 	showingGif = 0; //false
-	document.getElementById("clickMeWalk").style.display="none";
-	document.getElementById("walkGif").style.display="inline-block";
 	updateStaminaSpenderVisuals()
+	updatePassiveVisuals()
 }
 
 clicks = 0;
@@ -88,28 +31,14 @@ function startTheClickSpree(divId) {
     id = parseInt(divId.substring(7));
     clicks++;
 	if(!showingGif && !isExhausted) {
-		document.getElementById("walkGif").style.display="none";
-		document.getElementById("clickMeWalk").style.display="inline-block";
 		isWalking = 0; //false
 		showingGif = id; //1 - exert, 2 - powerlift
+		updatePassiveVisuals()
 		updateStaminaSpenderVisuals()
 	}
 	curTicks = ticksTotal;
 }
 
-
-//setInterval(function() {
-//	tick();
-//},50);
-
-//uncomment this before checkin
-var doWork = new Worker('interval.js');
-doWork.onmessage = function(event) {
-    if ( event.data === 'interval.start' ) {
-		tick();
-    }
-};
-doWork.postMessage({start:true,ms:50});
 
 
 ticksTotal = 0;
@@ -126,7 +55,7 @@ function tick() {
 		timer = 0;
 	}
 	handleStaminaBar()
-	
+	handleDistGain()
 }
 
 function halfSecond() {
@@ -134,14 +63,21 @@ if(showingGif === 1)
 	handleExertYourself()
 if(showingGif === 2)
 	handlePowerLift()
+if(showingGif === 3)
+	handleWalkWithPurpose()
+if(showingGif === 4)
+	handleRun()
 }
 
 totalSeconds = 0;
 function second() {
 	totalSeconds++;
 	//handleClicksPerSecond();
-	if(isWalking && totalSeconds % 2 === 0) {
+	if(isWalking === 1 && totalSeconds % 2 === 0) {
 		resource1_1+=resource1_2;
+	}
+	if(isWalking === 2 && totalSeconds % 2 === 0) {
+		resource2_2+=resource2_3;
 	}
 	updateResources()
 	handleNewOptions()
@@ -149,19 +85,40 @@ function second() {
 }
 
 function handleExertYourself() {
-	curStamina-=5;
-	resource1_1+=resource1_2*(valuebuy[4]);
+	curStamina-=staminaRate;
+	resource1_1+=resource1_2*(valuebuy[4])*sleepRate*(staminaBuff/100);
 	if(curStamina < 0) {
 		resource1_2++;
 	}
+	updateSecondsToGo()
 	commonStaminaUse();
 }
 
 function handlePowerLift() {
-	curStamina-=valuebuy[2]/20;
+	curStamina-=valuebuy[2]/10;
 	resource1_1+=resource1_2;
 	if(curStamina < 0) {
 		resource1_2+=valuebuy[3];
+	}
+	commonStaminaUse();
+}
+
+function handleWalkWithPurpose() {
+	curStamina-=staminaRate;
+	resource2_2+=resource2_3*valuebuy[6]*(staminaBuff/100);
+	console.log(staminaBuff+"asdf");
+	if(curStamina < 0) {
+		resource2_3++;
+	}
+	updateSecondsToGo()
+	commonStaminaUse();
+}
+
+function handleRun() {
+	curStamina-=valuebuy[2]/10;
+	resource2_2+=resource2_3;
+	if(curStamina < 0) {
+		resource2_3+=valuebuy[5];
 	}
 	commonStaminaUse();
 }
@@ -171,6 +128,7 @@ function commonStaminaUse() {
 		isExhausted = 1; //true
 		document.getElementById("clickGif"+showingGif).style.display="none";
 		showingGif = 0; //false
+		toResume = 0;
 		handleNewOptions()
 		updateStaminaSpenderVisuals()
 	}
@@ -189,8 +147,6 @@ function handleStaminaBar() {
 	}
 	else {
 		innerStamina.style.background="linear-gradient(#FFCC33, #F2E2B2)";
-		if(!showingGif)
-			curStamina += staminaRate;
 	}
 	if(curStamina > valuebuy[2]) {
 		isExhausted = 0; //false
@@ -207,6 +163,40 @@ function handleStaminaBar() {
 		document.getElementById("staminaCur").innerHTML = round(curStamina);
 		document.getElementById("staminaMax").innerHTML = round(valuebuy[2]);
 	}
+}
+
+function handleDistGain() {
+	
+	innerDist = document.getElementById('innerDistance');
+	if(upgradeCounts[2])
+		curDist+=resource2_2*sleepRate;
+	if(curDist >= maxDist) {
+		totalGains++;
+		curDist = 0;
+		innerDist.style.width=0;
+		document.getElementById("distanceCur").innerHTML = round(curDist);
+		reducePrices()
+		updateButtons()
+		/**********************************************************************************/
+		/*						dist formula											  */
+		/**********************************************************************************/
+		maxDist += 20;
+		if(maxDist > 500)
+		{
+			maxDist += firstVarForDist;
+			firstVarForDist *= 1.07;
+		}
+	}
+	else {
+		innerDist.style.width= (curDist / maxDist * 98) + "%";
+		document.getElementById("distanceCur").innerHTML = round(curDist);
+		document.getElementById("distanceMax").innerHTML = round(maxDist);
+	}
+}
+
+function updateSecondsToGo() {
+	temp = round3(curStamina / staminaRate / 2)
+	document.getElementById("secondsToGo").innerHTML = temp <= 0 ? 0 : temp;
 }
 
 
@@ -250,13 +240,15 @@ function round(num) {
 function updateResources() {
 	document.getElementById("resource1_1").innerHTML=round(resource1_1);
 	document.getElementById("resource1_2").innerHTML=round(resource1_2);
+	document.getElementById("resource2_3").innerHTML=round(resource2_3);
+	document.getElementById("resource2_2").innerHTML=round(resource2_2);
 }
 
 function updateButtons() {
 	for(index = 1; index < buycounts.length; index++) {
 		if(document.getElementById("buycounts"+index) != null) {
 			document.getElementById("buycounts"+index).innerHTML = buycounts[index]
-			document.getElementById("costbuy"+index).innerHTML = round3(costbuy[index])
+			document.getElementById("costbuy"+index).innerHTML = round(Math.ceil(costbuy[index]))
 			document.getElementById("valuebuy"+index).innerHTML = round3(valuebuy[index])
 		}
 	}
@@ -280,12 +272,44 @@ $(document).ready(function(){
 		$("#clickMe2").show();
 		hideAllStaminaClicks();
     });
+    $("#staminaClick3").hover(function(){
+		$("#clickMe3").show();
+		hideAllStaminaClicks();
+    });
+    $("#staminaClick4").hover(function(){
+		$("#clickMe4").show();
+		hideAllStaminaClicks();
+    });
     $("#clickMe1").mouseout(function(){
 		updateStaminaSpenderVisuals()
     });
     $("#clickMe2").mouseout(function(){
 		updateStaminaSpenderVisuals()
     });
+    $("#clickMe3").mouseout(function(){
+		updateStaminaSpenderVisuals()
+    });
+    $("#clickMe4").mouseout(function(){
+		updateStaminaSpenderVisuals()
+    });
+	
+    $("#walkClick1").hover(function(){
+		$("#clickMeWalk1").show();
+		$("#walkClick1").hide();
+		$("#walkClick2").hide();
+    });
+    $("#walkClick2").hover(function(){
+		$("#clickMeWalk2").show();
+		$("#walkClick1").hide();
+		$("#walkClick2").hide();
+    });
+    $("#clickMeWalk1").mouseout(function(){
+		updatePassiveVisuals()
+    });
+    $("#clickMeWalk2").mouseout(function(){
+		updatePassiveVisuals()
+    });
+	
 });
 
 function hideAllStaminaClicks() {
@@ -296,22 +320,65 @@ function hideAllStaminaClicks() {
 	}
 }
 
+function staRateChange(change) {
+	staminaRate += change
+	if(staminaRate <= 5)
+		staminaRate = 5;
+	updateStaminaMult()
+
+}
+
+function updateStaminaMult() {
+	document.getElementById("staminaRate").innerHTML = staminaRate;
+	staminaBuff = 100;
+	for(x = 0; x < (staminaRate/5-1); x++) {
+		staminaBuff += 20*Math.pow(.99, x)+5
+	}
+	console.log(staminaBuff);
+	document.getElementById("staminaBuff").innerHTML = round(staminaBuff)
+}
+
 function updateStaminaSpenderVisuals() {
 	if(showingGif) {
-		temp = "#clickGif"+showingGif;
-		$(temp).show();
-		temp = "#staminaClick"+showingGif;
-		$(temp).hide()
-		temp = "#clickMe"+showingGif;
-		$(temp).hide()
+		document.getElementById("clickGif"+showingGif).style.display = "inline-block";
+		document.getElementById("staminaClick"+showingGif).style.display = "none";
+		document.getElementById("clickMe"+showingGif).style.display = "none";
+	}
+	else if(upgradeCounts[3]) { //unlocked all 4
+		for(x = 1; x < 5; x++) {
+			document.getElementById("clickMe"+x).style.display="none";
+			document.getElementById("clickGif"+x).style.display="none";
+			if(toResume) {
+				document.getElementById("staminaClick"+x).style.display="none";
+			}
+			else {
+				document.getElementById("staminaClick"+x).style.display="inline-block";
+			}
+		}
+		if(toResume) {
+			theId = "#clickMe"+toResume;
+			$(theId).show();
+		}
+		document.getElementById("staminaClick1").style.height="62px";
+		document.getElementById("staminaClick2").style.height="62px";
 	}
 	else if(upgradeCounts[1]) { //unlocked power lifting
-		$("#staminaClick1").show()
-		$("#staminaClick2").show()
-		$("#clickMe1").hide()
-		$("#clickMe2").hide();
-		$("#clickGif1").hide();
-		$("#clickGif2").hide();
+		for(x = 1; x < 3; x++) {
+			document.getElementById("clickMe"+x).style.display="none";
+			document.getElementById("clickGif"+x).style.display="none";
+			if(toResume) {
+				document.getElementById("staminaClick"+x).style.display="none";
+			}
+			else {
+				document.getElementById("staminaClick"+x).style.display="inline-block";
+			}
+		}
+		if(toResume) {
+			theId = "#clickMe"+toResume;
+			$(theId).show();
+		}
+		document.getElementById("staminaClick1").style.height="135px";
+		document.getElementById("staminaClick2").style.height="135px";
 	}
 	else {
 		$("#clickMe1").show();
@@ -320,8 +387,32 @@ function updateStaminaSpenderVisuals() {
 	}
 }
 
-function updateJourneyVisuals() {
+function updatePassiveVisuals() {
+	if(isWalking) {
+		document.getElementById("walkGif"+isWalking).style.display = "inline-block";
+		document.getElementById("walkClick"+isWalking).style.display = "none";
+		document.getElementById("clickMeWalk"+isWalking).style.display = "none";
+	}
+	else if(upgradeCounts[2]) { //unlocked stroll
+		for(x = 1; x < 3; x++) {
+			document.getElementById("walkGif"+x).style.display="none";
+			document.getElementById("clickMeWalk"+x).style.display="none";
+			document.getElementById("walkClick"+x).style.display="inline-block";
+		}
+	}
+	else {
+		$("#clickMeWalk1").show();
+		$("#walkGif1").hide();
+		$("#walkGif2").hide();
+	}
+}
 
+function reducePrices() {
+	for(index = 1; index < costbuy.length; index++) {
+		if(document.getElementById("costbuy"+index) != null) {
+			costbuy[index] *= .97;
+		}
+	}
 }
 
 function upgrade(divId) {
@@ -329,8 +420,8 @@ function upgrade(divId) {
 	if(resource1_1 >= costUpgrade[id]) {
 		upgradeCounts[id]++;
 		resource1_1 -= costUpgrade[id]
-		updateStaminaSpenderVisuals() //handles 1,3 upgrades
-		updateJourneyVisuals() //handles 2
+		updateStaminaSpenderVisuals() //handles 1,3
+		updatePassiveVisuals() //handles 2
 	}
 	updateButtons()
 	updateResources()
@@ -349,27 +440,30 @@ function buy(divId) {
 
 function incrementButtonCount(id) {
 	if(id == 1) { //stamina rate
-		costbuy[id] *= 4;
-		valuebuy[id] *= 1.1;
+		costbuy[id] *= 3;
+		if(valuebuy[id] > 2)
+			valuebuy[id]*=1.05;
+		else
+			valuebuy[id] *= 1.1;
 	}
 	if(id == 2) { //stamina max
-		costbuy[id] *= 4;
+		costbuy[id] *= 3;
 		valuebuy[id] *= 1.2;
 	}
 	if(id == 3) { //power lifting
-		costbuy[id] *= 5;
+		costbuy[id] *= 3;
 		valuebuy[id] += 1;
 	}
 	if(id == 4) { //exert yourself
-		costbuy[id] *= 5;
-		valuebuy[id] += 100;
-	}
-	if(id == 5) { //Run
-		costbuy[id] *= 10;
+		costbuy[id] *= 3;
 		valuebuy[id] += 1;
 	}
-	if(id == 6) { //stroll somewhere
-		costbuy[id] *= 10;
-		valuebuy[id] += 100;
+	if(id == 5) { //Run
+		costbuy[id] *= 4;
+		valuebuy[id] += 1;
+	}
+	if(id == 6) { //stroll 
+		costbuy[id] *= 4;
+		valuebuy[id] += 1;
 	}
 }

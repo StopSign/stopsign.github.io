@@ -10,41 +10,70 @@
 <div style="text-align:right;width:100%"><div id="mainTitle" style="font-size:40px;margin:10px;margin-right:15%;">Incremental Quest v.2</div></div>
 <div id='mainBox' style='border:3px solid;padding:20px;height:800px;text-align:left;width:1400px;display:none;'>
 <div id='actionSpace' style="width:38%;vertical-align:top;text-align:left;">
-	<div id='JPArea' style="width:100%;overflow:auto;line-height:18px;display:none;">
-		<h3 style='margin-bottom:10px'>1 Journey = 2.5% global price reduction</h3>
-		<div style='margin-left:20px;'>
-			<h2 id='questProgress1' class='progressNumbers number'></h2>
-			<div class='mainNumberDesc'>Journey Points</div>
-			<h2 id='questProgress2' class='progressNumbers number' style='color:hsl(120, 100%, 45%);'></h2>
-			<div class='mainNumberDesc'>Points to next Journey complete</div>
-		</div>
-	</div>
 	<div style="width:100%;margin-top:20px;">
-		<div style="width:79%;height:250px;">
+		<div style="width:79%;height:250px;vertical-align:top">
+			<div id='DistanceArea' style="width:100%;overflow:auto;line-height:18px;margin-top:50px">
+				<h3 style='margin-bottom:10px'>3% upgrade price reduction</h3>
+				<div style='margin-left:20px;'>
+					<h2 id='distanceCur' class='progressNumbers number'></h2>
+					<div class='mainNumberDesc'>Distance</div>
+					<h2 id='distanceMax' class='progressNumbers number' style='color:hsl(120, 100%, 45%);'></h2>
+					<div class='mainNumberDesc'>Distance Needed</div>
+				</div>
+			<div style="width:100%;height:50px;">
+				<div class="distanceBar" style="">
+					<div id="innerDistance"></div>
+				</div>
+			</div>
+			</div>
 		</div>
-		<div style="width:20%;height:250px;">
+		<div style="height:250px;margin-right:10px;">
 			<div id='staminaMax' class='number' style="vertical-align:top;clear:left;float:left;"></div>
 			<div class="staminaBar" style="clear:left;float:left;">
 				<div id="innerStamina"></div>
 			</div>
 			<div id='staminaCur' class='number' style="clear:left;float:left;"></div>
 		</div>
+		<div id="sleepBar" style="height:250px;">
+			<div id='sleepMax' class='number' style="vertical-align:top;clear:left;float:left;">200%</div>
+			<div class="staminaBar" style="clear:left;float:left;">
+				<div id="innerStamina"></div>
+			</div>
+			<div id='sleepCur' class='number' style="clear:left;float:left;">100%</div>
+		</div>
 	</div>
 	<div style="width:100%;margin-top:20px;">
 		<div style="width:50%;text-align:center;height:150px;vertical-align:top;">
-			<div id='clickMe1' class="toClick" onclick='startTheClickSpree(this.id)'>Exert Yourself</div>
-			<div id='clickMe2' class="toClick" onclick='startTheClickSpree(this.id)' style='display:none'>Power Lifting</div>
-			<img id="clickGif1" src="giphy.gif" style="width:145px;height:145px;display:none;" >
-			<img id="clickGif2" src="powerLift.gif" style="width:145px;height:145px;display:none;" >
-			<div id="staminaClick1" class="halfClick"></div>
-			<div id="staminaClick2" class="halfClick"></div>
+			<div id='clickMe1' class="toClick" onclick='startTheClickSpree(this.id)' style="display:inline-block" >Exert Yourself</div>
+			<div id='clickMe2' class="toClick" onclick='startTheClickSpree(this.id)'>Power Lifting</div>
+			<div id='clickMe3' class="toClick" onclick='startTheClickSpree(this.id)'>Walk with Purpose</div>
+			<div id='clickMe4' class="toClick" onclick='startTheClickSpree(this.id)'>Run</div>
+			<img id="clickGif1" src="gifs/giphy4.gif" style="height:145px;display:none;" >
+			<img id="clickGif2" src="gifs/powerLift.gif" style="height:145px;display:none;" >
+			<img id="clickGif3" src="gifs/walk with purpose1.gif" style="height:145px;display:none;" >
+			<img id="clickGif4" src="gifs/run.gif" style="height:145px;display:none;" >
+			<div style="width:146px;text-align:left;">
+				<div id="staminaClick1" class="smallClick" style="float:left"></div>
+				<div id="staminaClick2" class="smallClick" style="float:left;margin-right:0;" ></div>
+				<div id="staminaClick3" class="smallClick" style="float:left"></div>
+				<div id="staminaClick4" class="smallClick" style="float:left:margin-right:0;" ></div>
+			</div>
 		</div>
 		<div id='walkDiv' style="width:49%;text-align:center;vertical-align:top;display:none;">
-			<div id='clickMeWalk' class="toClick" onclick='startWalking()'>Take it Easy</div>
-			<img id='walkGif' src="walking.gif" style="width:250px;height:145px;display:none;" >
+			<div id='clickMeWalk1' class="toClick" onclick='startWalking(this.id)' style="display:inline-block">Take it Easy</div>
+			<div id='clickMeWalk2' class="toClick" onclick='startWalking(this.id)'>Stroll</div>
+			<!--<div id='clickMeWalk' class="toClick" onclick='startWalking()'>Take it Easy</div>-->
+			<img id='walkGif1' src="gifs/take it easy3.gif" style="width:250px;height:145px;display:none;" >
+			<img id='walkGif2' src="gifs/stroll.gif" style="width:250px;height:145px;display:none;" >
+			<div id="walkClick1" class="halfClickHorizontal"></div>
+			<div id="walkClick2" class="halfClickHorizontal"></div>
 		</div>
 	</div>
-	
+	<div id="staminaMultOptions" style="width:100%;margin-top:5px">
+		<button id="staRateAdd5" onclick="staRateChange(5)" >+</button>
+		<button id="staRateSub5" onclick="staRateChange(-5)">-</button>
+		<div>Use <div id="staminaRate" class="number">5</div> stamina per tick for <div id="staminaBuff" class="number">100</div>% gain. <div id="secondsToGo" class="number"></div> seconds until exhausted</div>
+	</div>
 	<!--Clicks per Second: <div id="CPS" class="number">0</div> -->
 </div>
 
@@ -61,6 +90,12 @@
 				<div class='mainNumberDesc'>Resource 1_2</div>
 				<h2 id='resource1_1' class='progressNumbers color1_1'>0</h2>
 				<div class='mainNumberDesc'>Resource 1_1</div>
+				<div id="distanceRes" style="margin-top:30px;">
+					<h2 id='resource2_3' class='progressNumbers color2_3'>0</h2>
+					<div class='mainNumberDesc'>Resource 2_3</div>
+					<h2 id='resource2_2' class='progressNumbers color2_2'>0</h2>
+					<div class='mainNumberDesc'>Resource 2_2</div>
+				</div>
 			</div>
 			<div id="optionsDiv" style="display:none;">
 				<div id="clearStorage" class="optionsBox" onclick="clearStorage()">
@@ -112,12 +147,12 @@
 					<h4 style="width:80%">+1 <div class="color1_1 f18">resource1_1</div> mult per <div class="colorExert f18">Exert Yourself</div> tick</h4><br>
 					Cost: <div id='costbuy4' class='cost number'></div> <div class="color1_1" >resource1_1</div><br />
 					Value: <div id='valuebuy4' class='cost number'></div><br>
-				</div>
-			</div>
+				</div>			</div>
+
 			<div id="buyOptions5" class="buttonContainer">
 				<div id='buy5' class="buyButton" onclick='buy(this.id)' >
 					<div id="buycounts5" class="buyCount"></div>
-					<h4 style="width:80%">+1 <div class="color2_2 f18">resource2_2</div> mult per <div class="colorRun f18">Run</div> tick</h4><br>
+					<h4 style="width:80%">+1 <div class="color2_3 f18">resource2_3</div> mult per <div class="colorRun f18">Run</div> tick</h4><br>
 					Cost: <div id='costbuy5' class='cost number'></div> <div class="color1_1" >resource1_1</div><br />
 					Value: <div id='valuebuy5' class='cost number'></div><br>
 				</div>
@@ -125,7 +160,7 @@
 			<div id="buyOptions6" class="buttonContainer">
 				<div id='buy6' class="buyButton" onclick='buy(this.id)' >
 					<div id="buycounts6" class="buyCount"></div>
-					<h4 style="width:80%">+1 <div class="color2_1 f18">resource2_1</div> mult per <div class="colorWalk f18">Walk with Purpose</div> tick</h4><br>
+					<h4 style="width:80%">+1 <div class="color2_2 f18">resource2_2</div> mult per <div class="colorWalk f18">Walk with Purpose</div> tick</h4><br>
 					Cost: <div id='costbuy6' class='cost number'></div> <div class="color1_1" >resource1_1</div><br />
 					Value: <div id='valuebuy6' class='cost number'></div><br>
 				</div>
@@ -136,8 +171,8 @@
 	<div style='height:6%;border:1px solid;border-top:0;width:100%;text-align:center;margin-top:-4px;'>
 		<div id="clickMult0" class="selectedMultiplier" onclick="changeClickMult(this.id)">1</div>
 		<div id="clickMult1" class="clickMultiplier" onclick="changeClickMult(this.id)">5</div>
-		<div id="clickMult2" class="clickMultiplier" onclick="changeClickMult(this.id)">50%</div>
-		<div id="clickMult3" class="clickMultiplier" onclick="changeClickMult(this.id)">100%</div>
+		<div id="clickMult3" class="clickMultiplier" onclick="changeClickMult(this.id)">100%</div>		<div id="clickMult2" class="clickMultiplier" onclick="changeClickMult(this.id)">50%</div>
+
 	</div>
 	-->
 
@@ -146,17 +181,17 @@
 		<div style='margin-left:10px;margin-top:10px;width:96%'>
 			<div id="buyupgrade1" class="buttonContainer">
 				<div id='upgrade1' class="upgradeButton" onclick='upgrade(this.id)' >
-					<h4>Unlock <div class="colorPowerLift f18"> Power Lifting<div/></h4><br>
+					<h4>Unlock <div class="colorPowerLift f18"> Power Lifting</div></h4><br>
 					Cost: <div id='costupgrade1' class='cost number'></div> <div class="color1_1" >resource1_1</div><br />
-					A faster way to clear stamina. 5% <div class="colorSta">Stamina</div> per 500ms, always. Unlocks more upgrades.
+					A faster way to clear stamina. 10% <div class="colorSta">Stamina</div> per 500ms, always. Unlocks more upgrades.
 				</div>
 			</div>
 			<div id="buyupgrade2" class="buttonContainer">
 				<div id='upgrade2' class="upgradeButton" onclick='upgrade(this.id)' >
-					<h4>Unlock <div class="color2_1 f18">Journey</div> Upgrades</h4><br>
+					<h4>Unlock <div class="color2_2 f18">Journey</div> Upgrades</h4><br>
 					Cost: <div id='costupgrade2' class='cost number'></div> <div class="color1_1" >resource1_1</div><br />
 					Global reduction of upgrade prices.<br>
-					Also unlocks Stroll Somewhere and <div class="color2_1">resource2_1</div>
+					Also unlocks <div class="colorStroll">Stroll Somewhere</div> and Distance
 				</div>
 			</div>
 			<div id="buyupgrade3" class="buttonContainer">
@@ -168,9 +203,10 @@
 			</div>
 			<div id="buyupgrade4" class="buttonContainer">
 				<div id='upgrade4' class="upgradeButton" onclick='upgrade(this.id)' >
-					<h4>Unlock Something maybe buffs</h4><br>
+					<h4>Learn how to Sleep</h4><br>
 					Cost: <div id='costupgrade4' class='cost number'></div> <div class="color1_1" >resource1_1</div><br />
-					Who knows
+					Have you been awake this whole time?<br>
+					Increasing while idle and slowly decreasing buff that increases Distance and Resource1_1 gain
 				</div>
 			</div>
 		</div>
@@ -185,6 +221,7 @@
 </body>
 <script type='text/javascript' src='http://code.jquery.com/jquery-1.9.1.js'></script>
 <script src="handleNewOptions.js"></script>
+<script src="handleSaving.js"></script>
 <script src="IncrementalScript.js"></script>
 
 </html>

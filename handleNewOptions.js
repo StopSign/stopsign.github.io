@@ -36,21 +36,26 @@ function handleNewOptions() {
 		$("#buyOptions4").hide();
 		$("#buyupgrade2").hide();
 	}
-	if(upgradeCounts[2]) { //unlock journey upgrades
+	if(upgradeCounts[2]) { //unlock journey & stroll
 		if(!upgradeCounts[3])
 			$("#buyupgrade3").show();
+		$("#DistanceArea").show();
+		$("#distanceRes").show();
 	}
 	else {
 		$("#buyupgrade3").hide();
-
+		$("#DistanceArea").hide();
+		$("#distanceRes").hide();
 	}
 	if(upgradeCounts[3]) { //unlock walk with purpose and run
 		$("#buyOptions5").show();
 		$("#buyOptions6").show();
+		$("#buyupgrade4").show();
 	}
 	else {
 		$("#buyOptions5").hide();
 		$("#buyOptions6").hide();
-	
+		$("#buyupgrade4").hide();
 	}
+	
 }
