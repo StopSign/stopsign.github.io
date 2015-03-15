@@ -1,17 +1,17 @@
 
 
-//setInterval(function() {
-//	tick();
-//},50);
+setInterval(function() {
+	tick();
+},50);
 
 //uncomment this before checkin
-var doWork = new Worker('interval.js');
+/*var doWork = new Worker('interval.js');
 doWork.onmessage = function(event) {
     if ( event.data === 'interval.start' ) {
 		tick();
     }
 };
-doWork.postMessage({start:true,ms:50});
+doWork.postMessage({start:true,ms:50});*/
 
 loadDefaults();
 loadFromStorage();
@@ -75,22 +75,20 @@ function second() {
 	//handleClicksPerSecond();
 	if(totalSeconds % 2 === 0) {
 		if(isWalking === 1) {
-			resource1_1+=resource1_2;
+			resource1_1+=resource1_2*sleepRate;
 		}
 		if(isWalking === 2) {
 			resource2_2+=resource2_3;
 		}
-	}
-	else if(totalSeconds % 5 === 0) {
 		if(isWalking) {
-			sleepRate += .0003
+			sleepRate += .0002
 			if(sleepRate > sleepMax) {
-				sleepMax += .00003
+				sleepMax += .00002
 				sleepRate = sleepMax
 			}
 		}
 		else {
-			sleepRate -= .00004
+			sleepRate -= .00003
 			if(sleepRate < 1)
 				sleepRate = 1
 		}
@@ -113,7 +111,7 @@ function handleExertYourself() {
 
 function handlePowerLift() {
 	curStamina-=valuebuy[2]/10;
-	resource1_1+=resource1_2;
+	resource1_1+=resource1_2*sleepRate;
 	if(curStamina < 0) {
 		resource1_2+=valuebuy[3];
 	}
@@ -426,7 +424,7 @@ function updatePassiveVisuals() {
 function reducePrices() {
 	for(index = 1; index < costbuy.length; index++) {
 		if(document.getElementById("costbuy"+index) != null) {
-			costbuy[index] *= .97;
+			costbuy[index] *= .95;
 		}
 	}
 }
@@ -461,10 +459,14 @@ function buy(divId) {
 function incrementButtonCount(id) {
 	if(id == 1) { //stamina rate
 		costbuy[id] *= 3;
-		if(valuebuy[id] > 2)
+		if(valuebuy[id] > 2) {
 			valuebuy[id]*=1.05;
-		else
+			document.getElementById("staminaGainGainAmount").innerHTML = 1.05
+		}
+		else {
 			valuebuy[id] *= 1.1;
+			document.getElementById("staminaGainGainAmount").innerHTML = 1.1
+		}
 	}
 	if(id == 2) { //stamina max
 		costbuy[id] *= 3;
