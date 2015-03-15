@@ -80,20 +80,20 @@ function second() {
 		if(isWalking === 2) {
 			resource2_2+=resource2_3;
 		}
-		if(isWalking) {
-			sleepRate += .0002
-			if(sleepRate > sleepMax) {
-				sleepMax += .00002
-				sleepRate = sleepMax
-			}
-		}
-		else {
-			sleepRate -= .00003
-			if(sleepRate < 1)
-				sleepRate = 1
-		}
-		updateSleepVisuals()
 	}
+	if(isWalking) {
+		sleepRate += .0001
+		if(sleepRate > sleepMax) {
+			sleepMax += .00001
+			sleepRate = sleepMax
+		}
+	}
+	else {
+		sleepRate -= .00005
+		if(sleepRate < 1)
+			sleepRate = 1
+	}
+	updateSleepVisuals()
 	updateResources()
 	handleNewOptions()
 	saveIntoStorage()
