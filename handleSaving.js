@@ -102,7 +102,6 @@ function loadFromStorage() {
 			document.getElementById("staminaGainGainAmount").innerHTML = 1.05
 		}
 		else {
-			valuebuy[1] *= 1.1;
 			document.getElementById("staminaGainGainAmount").innerHTML = 1.1
 		}
     }
