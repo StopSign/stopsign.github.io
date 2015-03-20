@@ -1,8 +1,8 @@
 
-
-//setInterval(function() {
-//	tick();
-//},50);
+/*
+setInterval(function() {
+	tick();
+},50);*/
 
 //uncomment this before checkin
 var doWork = new Worker('interval.js');
@@ -56,6 +56,7 @@ function tick() {
 	}
 	handleStaminaBar()
 	handleDistGain()
+	handleLevelBar()
 }
 
 function halfSecond() {
@@ -78,14 +79,18 @@ function second() {
 			resource1_1+=resource1_2*sleepRate;
 		}
 		if(isWalking === 2) {
-			resource2_2+=resource2_3;
+			resource2_2+=resource2_3*sleepRate;
 		}
 	}
-	if(isWalking) {
+	if(isWalking && upgradeCounts[4]) {
 		sleepRate += .0001
 		if(sleepRate > sleepMax) {
 			sleepMax += .00001
 			sleepRate = sleepMax
+		}
+		if(Math.random() < .005) {
+			waterBottles++
+			updateWaterVisuals()
 		}
 	}
 	else {
@@ -102,7 +107,7 @@ function second() {
 function handleExertYourself() {
 	curStamina-=staminaRate;
 	resource1_1+=resource1_2*(valuebuy[4])*sleepRate;
-	if(curStamina < 0) {
+	if(curStamina <= 0) {
 		resource1_2++;
 	}
 	updateSecondsToGo()
@@ -110,18 +115,19 @@ function handleExertYourself() {
 }
 
 function handlePowerLift() {
-	curStamina-=valuebuy[2]/10;
+	curStamina-=valuebuy[2]/10*(isDrinkingWater+1);
 	resource1_1+=resource1_2*sleepRate;
-	if(curStamina < 0) {
-		resource1_2+=valuebuy[3];
+	if(curStamina <= 0) {
+		resource1_2+= valuebuy[3]*(isDrinkingWater+1)*sleepRate*(totalLevel/10+1)
+		isDrinkingWater = 0
 	}
 	commonStaminaUse();
 }
 
 function handleWalkWithPurpose() {
 	curStamina-=staminaRate;
-	resource2_2+=resource2_3*valuebuy[6];
-	if(curStamina < 0) {
+	resource2_2+=resource2_3*valuebuy[6]*sleepRate;
+	if(curStamina <= 0) {
 		resource2_3++;
 	}
 	updateSecondsToGo()
@@ -129,20 +135,23 @@ function handleWalkWithPurpose() {
 }
 
 function handleRun() {
-	curStamina-=valuebuy[2]/10;
-	resource2_2+=resource2_3;
-	if(curStamina < 0) {
-		resource2_3+=valuebuy[5];
+	curStamina-=valuebuy[2]/10*(isDrinkingWater+1);;
+	resource2_2+=resource2_3*sleepRate;
+	if(curStamina <= 0) {
+		resource2_3+=valuebuy[5]*(isDrinkingWater+1)*sleepRate*(totalLevel/10+1);
+		isDrinkingWater = 0
 	}
 	commonStaminaUse();
 }
 
 function commonStaminaUse() {
-	if(curStamina < 0) {
+	if(curStamina <= 0) {
 		isExhausted = 1; //true
 		document.getElementById("clickGif"+showingGif).style.display="none";
 		showingGif = 0; //false
 		toResume = 0;
+		if(waterBottles > 0 && !isDrinkingWater && upgradeCounts[4])
+			drinkWater()
 		handleNewOptions()
 		updateStaminaSpenderVisuals()
 	}
@@ -170,20 +179,19 @@ function handleStaminaBar() {
 	if(curStamina <= 0) {
 		curStamina = 0;
 		innerStamina.style.height=0;
-		document.getElementById("staminaCur").innerHTML = round(curStamina);
 	}
 	else {
 		innerStamina.style.height= (curStamina / valuebuy[2] * 97) + "%";
-		document.getElementById("staminaCur").innerHTML = round(curStamina);
 		document.getElementById("staminaMax").innerHTML = round(valuebuy[2]);
 	}
+	document.getElementById("staminaCur").innerHTML = round(curStamina);
 }
 
 function handleDistGain() {
 	
 	innerDist = document.getElementById('innerDistance');
 	if(upgradeCounts[2])
-		curDist+=resource2_2*sleepRate;
+		curDist+=resource2_2;
 	if(curDist >= maxDist) {
 		totalGains++;
 		curDist = 0;
@@ -195,10 +203,30 @@ function handleDistGain() {
 		/*						dist formula											  */
 		/**********************************************************************************/
 		maxDist += 20;
-		if(maxDist > 500)
+		if(maxDist > 100000000000) //100,000,000,000
 		{
 			maxDist += firstVarForDist;
-			firstVarForDist *= 1.07;
+			firstVarForDist *= 1.005;
+		}
+		else if(maxDist > 10000000000) //10,000,000,000
+		{
+			maxDist += firstVarForDist;
+			firstVarForDist *= 1.015;
+		}
+		else if(maxDist > 1000000000) //1,000,000,000
+		{
+			maxDist += firstVarForDist;
+			firstVarForDist *= 1.03;
+		}
+		else if(maxDist > 100000000) //100,000,000
+		{
+			maxDist += firstVarForDist;
+			firstVarForDist *= 1.05;
+		}
+		else if(maxDist > 300)
+		{
+			maxDist += firstVarForDist;
+			firstVarForDist *= 1.1;
 		}
 	}
 	else {
@@ -213,6 +241,15 @@ function updateSecondsToGo() {
 	document.getElementById("secondsToGo").innerHTML = temp <= 0 ? 0 : temp;
 }
 
+function drinkWater() {
+	if(waterBottles > 0 && !isDrinkingWater && !showingGif) {
+		waterBottles--
+		document.getElementById("waterBottles").innerHTML = waterBottles;
+		isDrinkingWater = 1 //true
+		updateWaterVisuals()
+		updateStaminaSpenderVisuals()
+	}
+}
 
 function handleClicksPerSecond() {
 	cpsDiv = document.getElementById("CPS");
@@ -259,9 +296,13 @@ function updateResources() {
 }
 
 function updateSleepVisuals() { //run every 5 seconds
-	document.getElementById("innersleep").style.height = ((sleepRate - 1) === 0 ? 0 : (sleepRate - 1) / (sleepMax - 1))*100 + "%"
+	document.getElementById("innersleep").style.height = ((sleepRate - 1) === 0 ? 0 : (sleepRate - 1) / (sleepMax - 1))*97 + "%"
 	document.getElementById("sleepCur").innerHTML = round3(sleepRate*100) + "%"
 	document.getElementById("sleepMax").innerHTML = round3(sleepMax*100) + "%"
+}
+
+function updateWaterVisuals() {
+		document.getElementById("waterBottles").innerHTML = waterBottles;
 }
 
 function updateButtons() {
@@ -283,6 +324,31 @@ function updateButtons() {
 	}
 }
 
+function handleLevelBar() {
+	expGain = (Math.sqrt(resource1_2) + Math.sqrt(resource2_3)) / 20
+	document.getElementById("expGain").innerHTML = round3(expGain*20)
+	if(upgradeCounts[5])
+		curExp += expGain
+	if(curExp > maxExp) {
+		curExp = 0;
+		maxExp += 75000
+		totalLevel++
+	}
+	if(Math.random() < .01) {
+		resourceGain = totalLevel*5
+		if(Math.random() < .5) {
+			resource1_2 += resourceGain
+		}
+		else {
+			resource2_3 += resourceGain
+		}
+		updateResources()
+	}
+	document.getElementById("maxExp").innerHTML = maxExp
+	document.getElementById("totalLevel").innerHTML = totalLevel
+    document.getElementById("levelBarInner").style.width = (curExp*100/maxExp)+'%';
+}
+  
 $(document).ready(function(){
     $("#staminaClick1").hover(function(){
 		$("#clickMe1").show();
@@ -290,6 +356,7 @@ $(document).ready(function(){
     });
     $("#staminaClick2").hover(function(){
 		$("#clickMe2").show();
+		document.getElementById("clickMe2").style.border = isDrinkingWater ? "5px solid rgb(10, 253, 253)" : "5px solid green";
 		hideAllStaminaClicks();
     });
     $("#staminaClick3").hover(function(){
@@ -298,6 +365,7 @@ $(document).ready(function(){
     });
     $("#staminaClick4").hover(function(){
 		$("#clickMe4").show();
+		document.getElementById("clickMe4").style.border = isDrinkingWater ? "5px solid rgb(10, 253, 253)" : "5px solid green";
 		hideAllStaminaClicks();
     });
     $("#clickMe1").mouseout(function(){
@@ -331,6 +399,7 @@ $(document).ready(function(){
     });
 	
 });
+
 
 function hideAllStaminaClicks() {
 	for(index = 1; index < 5; index++) {
@@ -368,6 +437,14 @@ function updateStaminaSpenderVisuals() {
 			else {
 				document.getElementById("staminaClick"+x).style.display="inline-block";
 			}
+		}
+		if(isDrinkingWater) {
+			document.getElementById("staminaClick2").style.border="5px solid rgb(10, 253, 253)";
+			document.getElementById("staminaClick4").style.border="5px solid rgb(10, 253, 253)";
+		}
+		else {
+			document.getElementById("staminaClick2").style.border="5px solid green";
+			document.getElementById("staminaClick4").style.border="5px solid green";
 		}
 		if(toResume) {
 			theId = "#clickMe"+toResume;
@@ -424,7 +501,7 @@ function updatePassiveVisuals() {
 function reducePrices() {
 	for(index = 1; index < costbuy.length; index++) {
 		if(document.getElementById("costbuy"+index) != null) {
-			costbuy[index] *= .95;
+			costbuy[index] *= .93;
 		}
 	}
 }
@@ -458,8 +535,12 @@ function buy(divId) {
 
 function incrementButtonCount(id) {
 	if(id == 1) { //stamina rate
-		costbuy[id] *= 3;
-		if(valuebuy[id] > 2) {
+		costbuy[id] *= 4;
+		if(valuebuy[id] > 20) {
+			valuebuy[id]*=1.02;
+			document.getElementById("staminaGainGainAmount").innerHTML = 1.02
+		}
+		if(valuebuy[id] > 5) {
 			valuebuy[id]*=1.05;
 			document.getElementById("staminaGainGainAmount").innerHTML = 1.05
 		}
@@ -469,8 +550,8 @@ function incrementButtonCount(id) {
 		}
 	}
 	if(id == 2) { //stamina max
-		costbuy[id] *= 3;
-		valuebuy[id] *= 1.2;
+		costbuy[id] *= 5;
+		valuebuy[id] += 100;
 	}
 	if(id == 3) { //power lifting
 		costbuy[id] *= 3;

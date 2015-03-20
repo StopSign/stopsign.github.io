@@ -7,18 +7,18 @@
 <body>
 <div style="height:100%;font-family:'Arial Black', Gadget, sans-serif;color:#666;display:block">
 <div id="mainColumn" style="width:100%;text-align:center">
-<div style="text-align:right;width:100%"><div id="mainTitle" style="font-size:40px;margin:10px;margin-right:15%;">Incremental Quest v.2</div></div>
+<div style="text-align:right;width:100%"><div id="mainTitle" style="font-size:40px;margin:10px;margin-right:15%;">Feature Quest v.3</div></div>
 <div id='mainBox' style='border:3px solid;padding:20px;height:800px;text-align:left;width:1400px;display:none;'>
 <div id='actionSpace' style="width:38%;vertical-align:top;text-align:left;">
 	<div style="width:100%;margin-top:20px;overflow-auto">
 		<div style="width:75%;height:250px;vertical-align:top">
 			<div id='DistanceArea' style="width:100%;overflow:auto;line-height:18px;margin-top:50px">
-				<h3 style='margin-bottom:10px'>5% upgrade price reduction</h3>
+				<h3 style='margin-bottom:10px'>7% upgrade price reduction</h3>
 				<div style='margin-left:20px;'>
 					<h2 id='distanceCur' class='progressNumbers number'></h2>
-					<div class='mainNumberDesc'>Distance</div>
+					<div class='mainNumberDesc'>Resource 2_1</div>
 					<h2 id='distanceMax' class='progressNumbers number' style='color:hsl(120, 100%, 45%);'></h2>
-					<div class='mainNumberDesc'>Distance Needed</div>
+					<div class='mainNumberDesc'>Resource 2_1 needed</div>
 				</div>
 			<div style="width:100%;height:50px;">
 				<div class="distanceBar" style="">
@@ -50,7 +50,7 @@
 			<div id='clickMe4' class="toClick" onclick='startTheClickSpree(this.id)'>Run</div>
 			<img id="clickGif1" src="gifs/giphy4.gif" style="height:145px;display:none;" >
 			<img id="clickGif2" src="gifs/powerLift.gif" style="height:145px;display:none;" >
-			<img id="clickGif3" src="gifs/walk with purpose1.gif" style="height:145px;display:none;" >
+			<img id="clickGif3" src="gifs/walk with purpose1.gif" style="height:145px;display:none;width:250px" >
 			<img id="clickGif4" src="gifs/run.gif" style="height:145px;display:none;" >
 			<div style="width:146px;text-align:left;">
 				<div id="staminaClick1" class="smallClick" style="float:left"></div>
@@ -62,16 +62,44 @@
 		<div id='walkDiv' style="width:49%;text-align:center;vertical-align:top;display:none;">
 			<div id='clickMeWalk1' class="toClick" onclick='startWalking(this.id)' style="display:inline-block">Take it Easy</div>
 			<div id='clickMeWalk2' class="toClick" onclick='startWalking(this.id)'>Stroll</div>
-			<!--<div id='clickMeWalk' class="toClick" onclick='startWalking()'>Take it Easy</div>-->
 			<img id='walkGif1' src="gifs/take it easy3.gif" style="width:250px;height:145px;display:none;" >
 			<img id='walkGif2' src="gifs/stroll.gif" style="width:250px;height:145px;display:none;" >
 			<div id="walkClick1" class="halfClickHorizontal"></div>
 			<div id="walkClick2" class="halfClickHorizontal"></div>
 		</div>
 	</div>
-	<div id="staminaMultOptions" style="width:50%;margin-top:5px;text-align:center">
-		<button onclick="stopStaminaSpender()" >Stop</button><br>
-		<div style="margin-top:5px;"><div id="secondsToGo" class="number"></div> seconds until exhausted</div>
+	<div style="width:50%;margin-top:5px;text-align:center;height:50px;vertical-align:top;">
+		<div id="staminaMultOptions" style="">
+			<button onclick="stopStaminaSpender()" >Stop</button><br>
+			<div style="margin-top:5px;"><div id="secondsToGo" class="number"></div> seconds until exhausted</div>
+		</div>
+	</div>
+	<div style="width:49%;margin-top:5px;text-align:center;height:50px;vertical-align:top;">
+		<div id="waterBottleDiv" style="">
+			<button onclick="drinkWater()" >Drink Water</button><br>
+			<div style="margin-top:5px;"><div id="waterBottles" class="number">10</div> Water Bottles left</div>
+		</div>
+	</div>
+	<div id="levelContainer" style="width:100%;margin-top:10px">
+		<h4>Level <div id="totalLevel" class="number f18"></div></h4>
+		<div id="levelBar">
+			<div id="levelBarInner">
+				
+			</div>
+		</div>
+		<div style="width:100%;">
+			<div style="float:left">
+				+<div id="expGain" class="number"></div> exp per second
+			</div>
+			<div style="float:right">
+				<div id="maxExp" class="number"></div>&nbsp;needed
+			</div>
+		</div>
+		<div style="margin-top:5px">
+			Effects:<br>
+			&nbsp;&nbsp;&nbsp;&nbsp;- 1% chance per 50 ms to gain level*<div id="resourceGainFromLevel" class="number">5</div> of either <div class="color1_2">resource1_2</div> or <div class="color2_3">resource2_3</div><br>
+			&nbsp;&nbsp;&nbsp;&nbsp;- Improves <div class="colorPowerLift">Power Lifting</div> and <div class="colorRun">Run</div> by level*<div id="staminaUseGainFromLevel" class="number">10</div>%
+		</div>
 	</div>
 	<!--Clicks per Second: <div id="CPS" class="number">0</div> -->
 </div>
@@ -127,7 +155,7 @@
 			<div id="buyOptions2" class="buttonContainer">
 				<div id='buy2' class="buyButton" onclick='buy(this.id)' >
 					<div id="buycounts2" class="buyCount"></div>
-					<h4 style="width:80%">x1.2 max <div class="colorSta f18">Stamina</div></h4><br>
+					<h4 style="width:80%">+100 max <div class="colorSta f18">Stamina</div></h4><br>
 					Cost: <div id='costbuy2' class='cost number'></div> <div class="color1_1" >resource1_1</div><br />
 					Value: <div id='valuebuy2' class='cost number'></div><br>
 				</div>
@@ -190,7 +218,7 @@
 					<h4>Unlock <div class="color2_2 f18">Journey</div> Upgrades</h4><br>
 					Cost: <div id='costupgrade2' class='cost number'></div> <div class="color1_1" >resource1_1</div><br />
 					Global reduction of upgrade prices.<br>
-					Also unlocks <div class="colorStroll">Stroll Somewhere</div> and Distance
+					Also unlocks <div class="colorStroll">Stroll</div> and Distance
 				</div>
 			</div>
 			<div id="buyupgrade3" class="buttonContainer">
@@ -202,10 +230,91 @@
 			</div>
 			<div id="buyupgrade4" class="buttonContainer">
 				<div id='upgrade4' class="upgradeButton" onclick='upgrade(this.id)' >
-					<h4>Learn how to Sleep</h4><br>
+					<h4>Learn how to Sleep and Drink Water</h4><br>
 					Cost: <div id='costupgrade4' class='cost number'></div> <div class="color1_1" >resource1_1</div><br />
 					Have you been awake this whole time?<br>
-					Increasing while idle and slowly decreasing buff that increases Distance and Resource1_1 gain
+					When using <div class="colorTakeItEasy">Take it Easy</div> or <div class="colorStroll">Stroll</div>, gain a sleep bonus and a small chance to find a Water Bottle.
+					The sleep bonus goes up slowly, and pushes against its max even slower. It affects <div class="color1_1">Resource 1_1</div>, <div class="color1_2">Resource 1_2</div>, <div class="color2_2">Resource 2_2</div>, and <div class="color2_3">Resource 2_3</div> gain.
+					The Water Bottle doubles the effect of the next <div class="colorPowerLift"> Power Lifting</div> or <div class="colorRun">Run</div>.
+				</div>
+			</div>
+			<div id="buyupgrade5" class="buttonContainer">
+				<div id='upgrade5' class="upgradeButton" onclick='upgrade(this.id)' >
+					<h4>Remember the stuff you Learn</h4><br>
+					Cost: <div id='costupgrade5' class='cost number'></div> <div class="color1_1" >resource1_1</div><br />
+					Start gaining levels.<br>
+					Exp gain resource1_2^.5 + resource2_3^.5 per second<br>
+					NOT CODED YET:Spend talent points for more bonuses. Reset available once every 2 hours.
+				</div>
+			</div>
+			<div id="buyupgrade6" class="buttonContainer">
+				<div id='upgrade6' class="upgradeButton" onclick='upgrade(this.id)' >
+					<h4><div class="colorSta f18"> Stamina</div> Talent Points</h4><br>
+					Cost: <div id='costupgrade6' class='cost number'></div> <div class="color1_1" >resource1_1</div><br />
+					Raises cost of other Talent Point upgrades by 10x
+				</div>
+			</div>
+			<div id="buyupgrade7" class="buttonContainer">
+				<div id='upgrade7' class="upgradeButton" onclick='upgrade(this.id)' >
+					<h4><div class="colorPowerLift f18">Power Lifting </div>Talent Points</h4><br>
+					Cost: <div id='costupgrade7' class='cost number'></div> <div class="color1_1" >resource1_1</div><br />
+					Raises cost of other Talent Point upgrades by 10x
+				</div>
+			</div>
+			<div id="buyupgrade8" class="buttonContainer">
+				<div id='upgrade8' class="upgradeButton" onclick='upgrade(this.id)' >
+					<h4><div class="colorExert f18">Exert Yourself </div>Talent Points</h4><br>
+					Cost: <div id='costupgrade8' class='cost number'></div> <div class="color1_1" >resource1_1</div><br />
+					Raises cost of other Talent Point upgrades by 10x
+				</div>
+			</div>
+			<div id="buyupgrade9" class="buttonContainer">
+				<div id='upgrade9' class="upgradeButton" onclick='upgrade(this.id)' >
+					<h4><div class="colorRun f18">Run </div>Talent Points</h4><br>
+					Cost: <div id='costupgrade9' class='cost number'></div> <div class="color1_1" >resource1_1</div><br />
+					Raises cost of other Talent Point upgrades by 10x
+				</div>
+			</div>
+			<div id="buyupgrade10" class="buttonContainer">
+				<div id='upgrade10' class="upgradeButton" onclick='upgrade(this.id)' >
+					<h4><div class="colorWalk f18">Walk with Purpose </div>Talent Points</h4><br>
+					Cost: <div id='costupgrade10' class='cost number'></div> <div class="color1_1" >resource1_1</div><br />
+					Raises cost of other Talent Point upgrades by 10x
+				</div>
+			</div>
+			<div id="buyupgrade11" class="buttonContainer">
+				<div id='upgrade11' class="upgradeButton" onclick='upgrade(this.id)' >
+					<h4><div class="colorTakeItEasy f18">Take it Easy </div>Talent Points</h4><br>
+					Cost: <div id='costupgrade11' class='cost number'></div> <div class="color1_1" >resource1_1</div><br />
+					Raises cost of other Talent Point upgrades by 10x
+				</div>
+			</div>
+			<div id="buyupgrade12" class="buttonContainer">
+				<div id='upgrade12' class="upgradeButton" onclick='upgrade(this.id)' >
+					<h4><div class="colorStroll f18">Stroll </div>Talent Points</h4><br>
+					Cost: <div id='costupgrade12' class='cost number'></div> <div class="color1_1" >resource1_1</div><br />
+					Raises cost of other Talent Point upgrades by 10x
+				</div>
+			</div>
+			<div id="buyupgrade13" class="buttonContainer">
+				<div id='upgrade13' class="upgradeButton" onclick='upgrade(this.id)' >
+					<h4><div class="colorStroll f18">Better Weapons </div>Talent Points</h4><br>
+					Cost: <div id='costupgrade13' class='cost number'></div> <div class="color1_1" >resource1_1</div><br />
+					More buff timers
+				</div>
+			</div>
+			<div id="buyupgrade14" class="buttonContainer">
+				<div id='upgrade14' class="upgradeButton" onclick='upgrade(this.id)' >
+					<h4><div class="colorStroll f18">Next Upgrade2 </div>Talent Points</h4><br>
+					Cost: <div id='costupgrade14' class='cost number'></div> <div class="color1_1" >resource1_1</div><br />
+					
+				</div>
+			</div>
+			<div id="buyupgrade15" class="buttonContainer">
+				<div id='upgrade15' class="upgradeButton" onclick='upgrade(this.id)' >
+					<h4><div class="colorStroll f18">Hyperspeed</div>Talent Points</h4><br>
+					Cost: <div id='costupgrade15' class='cost number'></div> <div class="color1_1" >resource1_1</div><br />
+					All that extra time you've saved condenses into faster time
 				</div>
 			</div>
 		</div>
@@ -218,7 +327,8 @@
 </div>
 </div>
 </body>
-<script type='text/javascript' src='http://code.jquery.com/jquery-1.9.1.js'></script>
+      <script src="http://code.jquery.com/jquery-1.10.2.js"></script>
+      <script src="http://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
 <script src="handleNewOptions.js"></script>
 <script src="handleSaving.js"></script>
 <script src="IncrementalScript.js"></script>

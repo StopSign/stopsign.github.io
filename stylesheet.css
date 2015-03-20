@@ -344,3 +344,18 @@ display:none;
  .colorStroll {
 	color:#FF95F6;
  }
+ 
+ .colorTakeItEasy {
+	color:#27CD29;
+ }
+ 
+ #levelBar{
+    width:100%;
+    height:15px;
+    border:1px solid #000;
+    overflow:hidden; }
+#levelBarInner{
+    width:37%;
+    height:15px;
+    border-right: 1px solid #000000;
+    background: #d65946; }
