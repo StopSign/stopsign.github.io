@@ -16,3 +16,7 @@ function newUnitDiv(id, direction, line) {
 function updateUnitPos(y, x) {
 	document.getElementById("unit"+units[y][x].id).style.left = (units[y][x].pos +7)*11.9 + "px"; 
 }
+
+function updateSpawnTimers() {
+	document.getElementById("soldierSpawnTimer").innerHTML = round2(soldierSpawnRate);
+}

@@ -52,6 +52,12 @@ h4 {
 .f18 {
 	font-size:18px;
 }
+.f20 {
+	font-size:20px;
+}
+.f24 {
+	font-size:24px;
+}
 div {
     display:inline-block;
     font-size:12px;

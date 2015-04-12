@@ -14,7 +14,15 @@
 <div id='displaySpace' style="width:100%;text-align:center;border: 2px solid; height:100px;background-color:rgb(247, 230, 220)"> </div>
 <div id='actionSpace' style="width:100%;vertical-align:top;text-align:left;border:2px solid;height:400px;background-color:rgb(223, 255, 221);position:relative;">
 	<div id="fightTime" style="width:100%;position:absolute;"></div>
-	
+	<div id="spawnTimers" style="width:100%;position:absolute;margin-left:200px;margin-top:5px;">
+		<div style='width:200px;overflow:hidden;'>
+			<div id='unit' class='unitContainer unitLine' style="position:relative;width:40px;">
+				<div id='body' class='soldier unit' style=''> </div>
+				<div id='unitWeapon' class='weapon'><div id='weapon1' style='background-color:gray;margin-top:8px;height:3px;width:100%'></div> </div>
+			</div>
+			<div id='soldierSpawnTimer' class='number f20'>3</div>
+		</div>
+	</div>
 	<div id='line1' class='actionLine' style="margin-top:70px;"> </div>
 	<div id='line2' class='actionLine'> </div>
 	<div id='line3' class='actionLine'> </div>
@@ -30,56 +38,21 @@
 
 <div style='width:2%;display:inline-block;'></div>
 <div id='leftSpace' class="buyColumn" >
-
-
+unit spawning + upgrades
 </div>
 <div style='width:2%;display:inline-block;'></div>
 <div id='middleSpace' class="buyColumn" >
+information + upgrades
 </div>
 
 <div style='width:2%;display:inline-block;'></div>
 <div id='rightSpace' class="buyColumn">
-	<!--
-	<div id="topRightTab0" class='tab' style="background-color:lightcyan;" onclick="switchTopRightTabs(this.id)">Basic</div>
-	<div id="topRightTab1" class='tab' style="background-color:lightgoldenrodyellow; color:#009CB9;" onclick="switchTopRightTabs(this.id)">EXP</div>
-	<div id="topRightTab2" class='tab' style="background-color:lightgrey;color:#009CB9;;" onclick="switchTopRightTabs(this.id)">Travel</div>
-	<div id="topRightTab3" class='tab' style="background-color:skyblue;color:#009CB9;" onclick="switchTopRightTabs(this.id)">Mana</div>
-	<div id="topRightTab4" class='tab' style="background-color:lightsteelblue;color:#009CB9;" onclick="switchTopRightTabs(this.id)">Weapons</div>
-	<div id="topRightTab5" class='tab' style="background-color:chartreuse;color:#009CB9;" onclick="switchTopRightTabs(this.id)">Luck</div> -->
-	<div id='buyQuests' class='halfBox'>
-		<div style='margin-left:10px;margin-top:10px;'>
-		<!--
-			<div id="buyOptions1" class="buttonContainer">
-				<div id='buy1' class="buyButton" onclick='buy(this.id)' >
-					<div id="buycounts1" class="buyCount"></div>
-					<h4 style="width:80%">x<div id="staminaGainGainAmount" class="f18">1.1</div> faster <div class="colorSta f18">Stamina</div> gain when exhausted</h4><br>
-					Cost: <div id='costbuy1' class='cost number'></div> <div class="color1_1" >resource1_1</div><br />
-					Value: .2% x<div id='valuebuy1' class='cost number'></div> per 50ms<br>
-				</div>
-			</div>
-			-->
-		</div>
-	</div>
-
-	<div style='height:5%'></div>
-	<div id='buyUpgrades' class='halfBox'>
-		<div style='margin-left:10px;margin-top:10px;width:96%'>
-		<!--
-			<div id="buyupgrade1" class="buttonContainer">
-				<div id='upgrade1' class="upgradeButton" onclick='upgrade(this.id)' >
-					<h4>Unlock <div class="colorPowerLift f18"> Power Lifting</div></h4><br>
-					Cost: <div id='costupgrade1' class='cost number'></div> <div class="color1_1" >resource1_1</div><br />
-					A faster way to clear stamina. 10% <div class="colorSta">Stamina</div> per 500ms, always. Unlocks more upgrades.
-				</div>
-			</div>
-			-->
-		</div>
-	</div>
-
+gold tiers + upgrades
 	
 </div>
 </div>
 
+<div id="credits" style="margin-right:10%;">Created by: <div style="color:red">Stop_Sign</div></div>
 </body>
       <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
       <script src="https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
