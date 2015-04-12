@@ -1,0 +1,169 @@
+
+.buyButton, .upgradeButton {
+    border:2px solid;
+    border-radius:8px;
+    width:90%;
+    margin-bottom:3px;
+    padding:5px;
+    min-width:247px;
+    line-height:14px;
+    cursor:pointer;
+}
+.buyCount {
+    float:right;
+    color:red;
+    font-size:20px;
+}
+
+.buttonContainer {
+	width:100%;
+	display:none;
+}
+
+div{
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+.progressNumbers {
+    text-align:left;
+    margin-right:20px;
+    line-height:20px;
+    margin-top:10px;
+}
+h3 {
+    margin:0;
+    display:inline-block;
+    font-size:20px;
+}
+h2 {
+    margin:0;
+    font-size:30px;
+    display:inline-block;
+}
+h4 {
+    margin:0;
+    display:inline-block;
+    font-size:18px;
+}
+.f18 {
+	font-size:18px;
+}
+div {
+    display:inline-block;
+    font-size:12px;
+}
+.tab {
+    height:24px;
+    border:2px solid #000;
+    border-bottom:0px;
+    border-top-left-radius:10px;
+    border-top-right-radius:10px;
+    color: #ff0003;
+    font-size:16px;
+    font-weight:bold;
+    cursor:pointer;
+    overflow:hidden;
+    text-align:left;
+    padding-left:5px;
+    width:9%;
+    margin-bottom:-4px;
+}
+#buySpace .tab:hover {
+    text-align:center;
+    width:auto;
+    padding-right:5px;
+}
+.number {
+    color:black;
+}
+.buyColumn {
+    width:30%;
+    vertical-align:top;
+    height:556px;
+	border:1px solid;
+	margin-top:30px;
+}
+.flavorText {
+    font-style:italic;
+    margin-top:10px;
+    font-size:11px;
+    line-height:10px;
+}
+.optionsBox {
+    border:2px solid;
+    font-size:20px;
+    cursor:pointer;
+    margin-bottom:10px;
+    padding:2px 15px;
+}
+.tooltipcontainer {
+position:relative;
+}
+.tooltip{
+position:absolute;
+display:none;
+}
+.unitContainer {
+width:39px;
+height:20px;
+position:absolute;
+}
+.unit {
+border-radius:50%;
+width:20px;
+height:20px;
+}
+.unitLine0 {
+top:39px;
+}
+.unitLine1 {
+top:93px;
+}
+.unitLine2 {
+top:146px;
+}
+.unitLine3 {
+top:200px;
+}
+.unitLine4 {
+top:254px;
+}
+.unitLine5 {
+top:308px;
+}
+
+.soldier {
+background-color:black;
+}
+
+.weapon {
+width:15px;
+height:20px;
+vertical-align:top;
+}
+
+.healthBarOuter {
+	width:100%;
+	background-color:rgb(255, 13, 13);
+	height:5px;
+	position:relative;
+}
+
+.healthBarInner {
+	width:100%;
+	background-color:rgb(0, 61, 0);
+	height:5px;
+	position:absolute;
+}
+.actionLine {
+margin-top:49px;
+width:90%;
+background-color:black;
+height:1px;
+margin-left:4.5%;
+margin-right:4.5%;
+}
