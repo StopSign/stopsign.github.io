@@ -1,15 +1,15 @@
-function newUnitDiv(id, direction, line) {
-	commonBefore = "<div id='unit"+id+"' class='unitContainer unitLine"+line+"'>" +
-			"<div class='healthBarOuter'><div class='healthBarInner' id='healthBar"+id+"' style='z-index:"+(zIndex--)+"'></div></div>";
-	if(direction == "right") {
+function newUnitDiv(unit) {
+	commonBefore = "<div id='unit"+unit.id+"' class='unitContainer unitLine"+unit.line+"'>" +
+			"<div class='healthBarOuter'><div class='healthBarInner' id='healthBar"+unit.id+"' style='z-index:"+(zIndex--)+"'></div></div>";
+	if(unit.direction === "right") {
 		different = "<div id='body' class='soldier unit' style=''> </div>" + 
 			"<div id='unitWeapon' class='weapon'><div id='weapon1' style='background-color:gray;margin-top:8px;height:3px;width:100%'></div> </div>";
 	}
 	else {
 		different = "<div id='unitWeapon' class='weapon'><div id='weapon1' style='background-color:gray;margin-top:8px;height:3px;width:100%'></div> </div>" +
-			"<div id='body' class='soldier unit' style=''> </div>";
+			"<div id='body' class='soldier unitLeft' style=''> </div>";
 	}
-	commonAfter = "</div>";
+	commonAfter = "<div id='count"+unit.id+"' class='count count"+unit.type+"'>"+unit.unitCount+"</div></div>";
 	document.getElementById('fightTime').innerHTML += commonBefore + different + commonAfter;
 }
 

@@ -5,15 +5,16 @@ setInterval(function() {
 globalId = 0;
 zIndex = 10000000000;
 units = [[],[],[],[],[],[]];
-for(j = 0; j < 6; j++) {
+linesEnabled = 6;
+for(j = 0; j < linesEnabled; j++) {
 	addUnit("soldier", j, "left");
 }
 addUnit("soldier", 0, "right");
-addUnit("soldier", 0, "right");
-addUnit("soldier", 0, "right");
-addUnit("soldier", 0, "right");
+//addUnit("soldier", 0, "right");
+//addUnit("soldier", 0, "right");
+//addUnit("soldier", 0, "right");
 
-soldierSpawnRate = 1;
+soldierSpawnRate = .1;
 curBattles = [];
 timer = 0;
 stop = 0;
@@ -50,9 +51,9 @@ function handleEngaged() {
 function handleSpawnRates() {
 	soldierSpawnRate -= .09999;
 	if(soldierSpawnRate <= 0) {
-		j = Math.floor(Math.random() * 1)
+		j = Math.floor(Math.random() * linesEnabled)
 		addUnit("soldier", j, "right");
-		soldierSpawnRate = 100;
+		soldierSpawnRate = 2;
 	}
 	updateSpawnTimers()
 }
@@ -75,24 +76,46 @@ function moveUnits() {
 
 
 function checkForUnitCollisions() {
+triggerForDelete=[];
 	for(y = 0; y < units.length; y++) {
-		for(x = 0; x < units[y].length; x++) {
+		for(x = 0; x < units[y].length ; x++) {
 			
 			for(z = 0; z < units.length; z++) {
 				for(w = 0; w < units[z].length; w++) {
+					if( z != y || w == x)
+						continue
 					test = 0
+					for(i = 0; i < triggerForDelete.length; i++) {
+						if(triggerForDelete[i].equals(units[y][x])) {
+							test = 1
+							break
+						}
+					}
+					if(test) {
+						continue;
+					}
 					for(i = 0; i < units[y][x].engaged.length; i++) {
 						if(units[y][x].engaged[i].equals(units[z][w])) {
 							test = 1
 							break
 						}
 					}
-					if(test || z != y ) {
+					if(test) {
 						continue;
 					}
 					if(units[z][w].direction == units[y][x].direction) {
-						
-					
+						if(Math.abs(units[y][x].pos - units[z][w].pos) <= 1 && units[z][w].type===units[y][x].type) {
+							units[y][x].unitCount+=units[z][w].unitCount;
+							units[y][x].health+=units[z][w].health;
+							units[y][x].curHealth+=units[z][w].curHealth;
+							units[y][x].damage+=units[z][w].damage;
+							units[y][x].damageRange+=units[z][w].damageRange;
+							console.log('variables1: '+y+", "+x+", "+z+", "+w+", id:"+units[y][x].id+", "+units[y][x].unitCount)
+							document.getElementById("count"+units[y][x].id).innerHTML = units[y][x].unitCount
+							document.getElementById("healthBar"+units[y][x].id).style.width = (units[y][x].curHealth / units[y][x].health * 100) + "%";
+							triggerForDelete.push(units[z][w])
+							//combine units into one
+						}
 					}
 					else if(Math.abs(units[y][x].pos - units[z][w].pos) <= 4.5) {
 						//console.log('variables: '+y+", "+x+", "+z+", "+w)
@@ -100,6 +123,17 @@ function checkForUnitCollisions() {
 						units[y][x].engaged.push(units[z][w]);
 						//console.log('new battle: '+units[y][x].id + " vs " + units[z][w].id + " at " + Math.abs(pos - units[z][w].pos));
 					}
+				}
+			}
+		}
+	}
+	
+	for(i = 0; i < triggerForDelete.length; i++) {
+		for(y = 0; y < units.length; y++) {
+			for(x = units[y].length - 1; x >= 0 ; x--) {
+				if(units[y][x].equals(triggerForDelete[i])) {
+					disengageAll(units[y][x])
+					removeUnit(units[y][x], units[y][x].direction!="right")
 				}
 			}
 		}
@@ -123,7 +157,7 @@ function handleBattles() {
 				if(engageTarget.curHealth <= 0) {
 					console.log("removing: " + engageTarget.id + " on " + totalTicks + ", "+x)
 					disengageAll(engageTarget)
-					removeUnit(engageTarget)
+					removeUnit(engageTarget, engageTarget.direction!="right")
 				}
 				else {
 					document.getElementById("healthBar"+engageTarget.id).style.width = (engageTarget.curHealth / engageTarget.health * 100) + "%";
@@ -148,7 +182,7 @@ function disengageAll(unit) {
 	}
 }
 
-function removeUnit(unit) {
+function removeUnit(unit, shouldAdd) {
 	if(document.getElementById("unit"+unit.id) == null)
 		console.log("1:"+unit.id)
 	var elem = document.getElementById("unit"+unit.id);
@@ -156,13 +190,21 @@ function removeUnit(unit) {
 	
 	for(g = 0; g < units.length; g++) {
 		for(h = units[g].length - 1; h >= 0; h--) {
-			if(units[g][h].curHealth <= 0) {
+			if(unit.equals(units[g][h])) {
 				console.log('removing2: ' + units[g][h].id + " on " + totalTicks)
 				units[g].splice(h, 1)
 			}
 		}
 	}
-	if(unit.direction!="right")
+	/*for(g = 0; g < units.length; g++) {
+		for(h = units[g].length - 1; h >= 0; h--) {
+			if(units[g][h].curHealth <= 0) {
+				console.log('removing2: ' + units[g][h].id + " on " + totalTicks)
+				units[g].splice(h, 1)
+			}
+		}
+	}*/
+	if(shouldAdd)
 		addUnit("soldier", unit.line, unit.direction);
 }
 
@@ -170,23 +212,21 @@ function addUnit(type, line, direction) {
 	if(direction == "right") {
 		pos = 0
 		health = 20
+		damage = 1
+		damageRange = 1
 	}
 	else {
 		pos = 100
 		health = 100
+		damage = 1
+		damageRange = 4
 	}
-	
+	theNewUnit = new Unit(line, pos, type, direction, health, 0, damage, damageRange);
 	if(type == "soldier") {
-		units[line].push(new Unit(line, pos, type, direction, health, 0, 2, 1));
+		units[line].push(theNewUnit);
 		//console.log("just added"+(globalId - 1))
 	}
-	if(direction == "right") {
-		newUnitDiv(globalId - 1, "right", line)
-	}
-	else {
-		newUnitDiv(globalId - 1, "left", line)
-		
-	}
+	newUnitDiv(theNewUnit)
 	updateUnitPos(line, (units[line].length-1));
 }
 

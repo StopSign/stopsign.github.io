@@ -11,6 +11,7 @@ function Unit (line, pos, type, direction, health, armor, damage, damageRange) {
 	this.id = globalId++;
 	this.engaged = [];
 	this.line = line;
+	this.unitCount = 1;
 	if(type == "soldier") {
 		this.speed = 1
 		if(direction != "right") {

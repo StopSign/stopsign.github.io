@@ -119,6 +119,10 @@ height:20px;
 position:absolute;
 }
 .unit {
+	width:20px;
+	height:20px;
+}
+.unitLeft {
 border-radius:50%;
 width:20px;
 height:20px;
@@ -172,4 +176,9 @@ background-color:black;
 height:1px;
 margin-left:4.5%;
 margin-right:4.5%;
+}
+.count {
+position:absolute;
+top:35px;
+left:13px;
 }
