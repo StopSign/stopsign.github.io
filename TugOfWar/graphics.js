@@ -22,3 +22,16 @@ function updateUnitPos(y, x) {
 function updateSpawnTimers() {
 	document.getElementById("soldierSpawnTimer").innerHTML = round2(soldierSpawnRate);
 }
+
+function handleLineTimer() {
+	document.getElementById("exitLineRight").style.backgroundColor = "red";
+	document.getElementById("exitLineLeft").style.backgroundColor = "red";
+	if(exitLineRightTimer) {
+		exitLineRightTimer--
+		document.getElementById("exitLineRight").style.backgroundColor = "yellow";
+	}
+	if(exitLineLeftTimer) {
+		exitLineLeftTimer--
+		document.getElementById("exitLineLeft").style.backgroundColor = "yellow";
+	}
+}

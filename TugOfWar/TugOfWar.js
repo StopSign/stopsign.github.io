@@ -6,6 +6,8 @@ globalId = 0;
 zIndex = 10000000000;
 unitsThroughOnRight = 0;
 unitsThroughOnLeft = 0;
+exitLineRightTimer = 0;
+exitLineLeftTimer = 0;
 
 units = [[],[],[],[],[],[]];
 linesEnabled = 6;
@@ -28,6 +30,7 @@ function tick() {
 		return
 	moveUnits()
 	checkForUnitAtEnds()
+	handleLineTimer()
 	checkForUnitCollisions()
 	handleEngaged()
 	if(timer % 2 == 0) {
@@ -84,11 +87,13 @@ function checkForUnitAtEnds() {
 			if(units[y][x].direction === "right" && units[y][x].pos > 93) { //unit made it to the right
 				unitsThroughOnRight+=units[y][x].unitCount;
 				document.getElementById("unitsThroughOnRight").innerHTML = unitsThroughOnRight
+				exitLineRightTimer = 8
 				triggerForDelete.push(units[y][x])
 			}
 			else if(units[y][x].direction != "right" && units[y][x].pos < 5) { //enemy got through
 				unitsThroughOnLeft++;
 				document.getElementById("unitsThroughOnLeft").innerHTML = unitsThroughOnLeft
+				exitLineLeftTimer = 8
 				triggerForDelete.push(units[y][x])
 			}
 		}
