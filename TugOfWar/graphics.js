@@ -1,6 +1,6 @@
 function newUnitDiv(id, direction, line) {
 	commonBefore = "<div id='unit"+id+"' class='unitContainer unitLine"+line+"'>" +
-			"<div class='healthBarOuter'><div class='healthBarInner' id='healthBar"+id+"'></div></div>";
+			"<div class='healthBarOuter'><div class='healthBarInner' id='healthBar"+id+"' style='z-index:"+(zIndex--)+"'></div></div>";
 	if(direction == "right") {
 		different = "<div id='body' class='soldier unit' style=''> </div>" + 
 			"<div id='unitWeapon' class='weapon'><div id='weapon1' style='background-color:gray;margin-top:8px;height:3px;width:100%'></div> </div>";
@@ -14,6 +14,8 @@ function newUnitDiv(id, direction, line) {
 }
 
 function updateUnitPos(y, x) {
+	if(document.getElementById("unit"+units[y][x].id) == null)
+	console.log("sadf" +units[y][x].id);
 	document.getElementById("unit"+units[y][x].id).style.left = (units[y][x].pos +7)*11.9 + "px"; 
 }
 

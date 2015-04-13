@@ -3,19 +3,23 @@ setInterval(function() {
 	tick();
 },50);
 globalId = 0;
+zIndex = 10000000000;
 units = [[],[],[],[],[],[]];
-for(j = 0; j < 1; j++) {
+for(j = 0; j < 6; j++) {
 	addUnit("soldier", j, "left");
-	addUnit("soldier", j, "left");
-	addUnit("soldier", j, "right");
 }
+addUnit("soldier", 0, "right");
+addUnit("soldier", 0, "right");
+addUnit("soldier", 0, "right");
+addUnit("soldier", 0, "right");
 
-soldierSpawnRate = 2;
+soldierSpawnRate = 1;
 curBattles = [];
-	
 timer = 0;
 stop = 0;
+totalTicks = 0
 function tick() {
+	totalTicks++;
 	if(stop)
 		return
 	moveUnits()
@@ -48,7 +52,7 @@ function handleSpawnRates() {
 	if(soldierSpawnRate <= 0) {
 		j = Math.floor(Math.random() * 1)
 		addUnit("soldier", j, "right");
-		soldierSpawnRate = 30;
+		soldierSpawnRate = 100;
 	}
 	updateSpawnTimers()
 }
@@ -69,25 +73,32 @@ function moveUnits() {
 	}
 }
 
+
 function checkForUnitCollisions() {
 	for(y = 0; y < units.length; y++) {
 		for(x = 0; x < units[y].length; x++) {
-			if(units[y][x].engaged.length > 0) {
-				continue;
-			}
-			pos = units[y][x].pos;
-			direction = units[y][x].direction;
 			
 			for(z = 0; z < units.length; z++) {
 				for(w = 0; w < units[z].length; w++) {
-					if(z != y || units[z][w].direction == direction) {
+					test = 0
+					for(i = 0; i < units[y][x].engaged.length; i++) {
+						if(units[y][x].engaged[i].equals(units[z][w])) {
+							test = 1
+							break
+						}
+					}
+					if(test || z != y ) {
 						continue;
 					}
-					if(Math.abs(pos - units[z][w].pos) <= 4.5) {
+					if(units[z][w].direction == units[y][x].direction) {
+						
+					
+					}
+					else if(Math.abs(units[y][x].pos - units[z][w].pos) <= 4.5) {
+						//console.log('variables: '+y+", "+x+", "+z+", "+w)
 						units[z][w].engaged.push(units[y][x]);
 						units[y][x].engaged.push(units[z][w]);
-						console.log('new battle: '+units[y][x].id + " vs " + units[z][w].id + " at " + Math.abs(pos - units[z][w].pos));
-						curBattles.push(new Battle(y, x, z, w, units[y][x].id, units[z][w].id));
+						//console.log('new battle: '+units[y][x].id + " vs " + units[z][w].id + " at " + Math.abs(pos - units[z][w].pos));
 					}
 				}
 			}
@@ -99,77 +110,31 @@ function checkForUnitAtEnds() {
 
 }
 
-
 function handleBattles() {
-	toDelete = [];
-	deadList = [];
 	//for each unit
 	for(y = 0; y < units.length; y++) {
-		for(x = 0; x < units[y].length; x++) {
-		
-			//for each engagement
-			//for(z = 0; z < units[y][x].engaged.length; z++) {
-				//deal dmg
-			if(units[y][x].engaged.length > 0) {
+		for(x = units[y].length - 1; x >= 0; x--) {
+			if(units[y][x].curHealth > 0 && units[y][x].engaged.length > 0) {
+				//get the first target & dmg
 				engageTarget = units[y][x].engaged[0];
 				engageTarget.curHealth -= units[y][x].getDamageRoll()
+				//console.log(units[y][x].id + " attacking "+engageTarget.id + " on " + totalTicks)
+				//if it died
 				if(engageTarget.curHealth <= 0) {
+					console.log("removing: " + engageTarget.id + " on " + totalTicks + ", "+x)
 					disengageAll(engageTarget)
 					removeUnit(engageTarget)
-					toDelete.push(i)
-					deadList.push(engageTarget.id)
 				}
 				else {
 					document.getElementById("healthBar"+engageTarget.id).style.width = (engageTarget.curHealth / engageTarget.health * 100) + "%";
 				}
-			}
-			//}
-		}
-	}
-	
-	/*
-	for(i = 0; i < curBattles.length; i++) {
-		unit1 = units[curBattles[i].y][curBattles[i].x]
-		unit2 = units[curBattles[i].z][curBattles[i].w]
-		unit1.curHealth -= unit2.getDamageRoll()
-		unit2.curHealth -= unit1.getDamageRoll()
-		document.getElementById("healthBar"+unit1.id).style.width = (unit1.curHealth / unit1.health * 100) + "%";
-		document.getElementById("healthBar"+unit2.id).style.width = (unit2.curHealth / unit2.health * 100) + "%";
-		////shouldn't re-engage if still in range of a dude - make engagement a list
-		if(unit1.curHealth <= 0) {
-			//units[curBattles[i].z][curBattles[i].w].engaged = 0;
-			disengageAll(unit1)
-			removeUnit(findUnitById(unit1.id))
-			toDelete.push(i)
-			deadList.push(unit1.id)
-		}
-		else if(unit2.curHealth <= 0) {
-			//units[curBattles[i].y][curBattles[i].x].engaged = 0;
-			disengageAll(unit2)
-			removeUnit(findUnitById(unit2.id))
-			toDelete.push(i)
-			deadList.push(unit2.id)
-		}
-	}*/
-	
-	removeDuplicates(toDelete);
-	for(i = toDelete.length - 1; i >= 0; i--) {
-		curBattles.splice(toDelete[i], 1);
-	}
-	for(i = curBattles.length - 1; i >= 0; i--) {
-		for(x = 0; x < deadList.length; x++) {
-			//remove any battle that contains a dead id
-			if(curBattles[i]) {
-				if(curBattles[i].id1 === deadList[x]) {
-					curBattles.splice(i, 1);
-				}
-				else if(curBattles[i].id2 === deadList[x]) {
-					curBattles.splice(i, 1);
-				}
+				//console.log("x:"+x)
 			}
 		}
 	}
 }
+
+//problem:31 is targetting 3 times, and after its dead
 
 function disengageAll(unit) {
 	for(i = 0; i < unit.engaged.length; i++) {
@@ -177,25 +142,28 @@ function disengageAll(unit) {
 			if(unit.engaged[i].engaged[j].equals(unit)) {
 				console.log("disengaging "+unit.id +" from "+unit.engaged[i].id);
 				unit.engaged[i].engaged.splice(j, 1);
-				console.log("remaining battles of unit 0: " + units[0][2].engaged.length);
+				//console.log("remaining battles of unit 0: " + units[0][2].engaged.length);
 			}
 		}
 	}
 }
 
-
 function removeUnit(unit) {
+	if(document.getElementById("unit"+unit.id) == null)
+		console.log("1:"+unit.id)
 	var elem = document.getElementById("unit"+unit.id);
 	elem.parentNode.removeChild(elem);
-	for(x = 0; x < units.length; x++) {
-		if(unit.equals(units[unit.line][x])) {
-			console.log(unit.id);
-			units[unit.line].splice(x, 1);
+	
+	for(g = 0; g < units.length; g++) {
+		for(h = units[g].length - 1; h >= 0; h--) {
+			if(units[g][h].curHealth <= 0) {
+				console.log('removing2: ' + units[g][h].id + " on " + totalTicks)
+				units[g].splice(h, 1)
+			}
 		}
 	}
-	
-	
-	addUnit("soldier", y, unit.direction);
+	if(unit.direction!="right")
+		addUnit("soldier", unit.line, unit.direction);
 }
 
 function addUnit(type, line, direction) {
@@ -210,12 +178,14 @@ function addUnit(type, line, direction) {
 	
 	if(type == "soldier") {
 		units[line].push(new Unit(line, pos, type, direction, health, 0, 2, 1));
+		//console.log("just added"+(globalId - 1))
 	}
 	if(direction == "right") {
 		newUnitDiv(globalId - 1, "right", line)
 	}
 	else {
 		newUnitDiv(globalId - 1, "left", line)
+		
 	}
 	updateUnitPos(line, (units[line].length-1));
 }
