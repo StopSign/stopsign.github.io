@@ -182,3 +182,9 @@ position:absolute;
 top:35px;
 left:13px;
 }
+.exitLine {
+height:400px;
+width:4px;
+background-color:red;
+position:absolute;
+}

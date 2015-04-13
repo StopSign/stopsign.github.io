@@ -4,12 +4,15 @@ setInterval(function() {
 },50);
 globalId = 0;
 zIndex = 10000000000;
+unitsThroughOnRight = 0;
+unitsThroughOnLeft = 0;
+
 units = [[],[],[],[],[],[]];
 linesEnabled = 6;
 for(j = 0; j < linesEnabled; j++) {
-	addUnit("soldier", j, "left");
+	addUnit("soldier", j, "left", 1);
 }
-addUnit("soldier", 0, "right");
+addUnit("soldier", 0, "right", 1);
 //addUnit("soldier", 0, "right");
 //addUnit("soldier", 0, "right");
 //addUnit("soldier", 0, "right");
@@ -24,8 +27,8 @@ function tick() {
 	if(stop)
 		return
 	moveUnits()
-	checkForUnitCollisions()
 	checkForUnitAtEnds()
+	checkForUnitCollisions()
 	handleEngaged()
 	if(timer % 2 == 0) {
 		handleSpawnRates()
@@ -52,8 +55,8 @@ function handleSpawnRates() {
 	soldierSpawnRate -= .09999;
 	if(soldierSpawnRate <= 0) {
 		j = Math.floor(Math.random() * linesEnabled)
-		addUnit("soldier", j, "right");
-		soldierSpawnRate = 2;
+		addUnit("soldier", j, "right", 1);
+		soldierSpawnRate = 1;
 	}
 	updateSpawnTimers()
 }
@@ -72,6 +75,25 @@ function moveUnits() {
 			updateUnitPos(y, x)
 		}
 	}
+}
+
+function checkForUnitAtEnds() {
+	triggerForDelete=[];
+	for(y = 0; y < units.length; y++) {
+		for(x = 0; x < units[y].length ; x++) {
+			if(units[y][x].direction === "right" && units[y][x].pos > 93) { //unit made it to the right
+				unitsThroughOnRight+=units[y][x].unitCount;
+				document.getElementById("unitsThroughOnRight").innerHTML = unitsThroughOnRight
+				triggerForDelete.push(units[y][x])
+			}
+			else if(units[y][x].direction != "right" && units[y][x].pos < 5) { //enemy got through
+				unitsThroughOnLeft++;
+				document.getElementById("unitsThroughOnLeft").innerHTML = unitsThroughOnLeft
+				triggerForDelete.push(units[y][x])
+			}
+		}
+	}
+	deleteUnitsInList(triggerForDelete)
 }
 
 
@@ -108,8 +130,6 @@ triggerForDelete=[];
 							units[y][x].unitCount+=units[z][w].unitCount;
 							units[y][x].health+=units[z][w].health;
 							units[y][x].curHealth+=units[z][w].curHealth;
-							units[y][x].damage+=units[z][w].damage;
-							units[y][x].damageRange+=units[z][w].damageRange;
 							console.log('variables1: '+y+", "+x+", "+z+", "+w+", id:"+units[y][x].id+", "+units[y][x].unitCount)
 							document.getElementById("count"+units[y][x].id).innerHTML = units[y][x].unitCount
 							document.getElementById("healthBar"+units[y][x].id).style.width = (units[y][x].curHealth / units[y][x].health * 100) + "%";
@@ -127,7 +147,10 @@ triggerForDelete=[];
 			}
 		}
 	}
-	
+	deleteUnitsInList(triggerForDelete)
+}
+
+function deleteUnitsInList(triggerForDelete) {
 	for(i = 0; i < triggerForDelete.length; i++) {
 		for(y = 0; y < units.length; y++) {
 			for(x = units[y].length - 1; x >= 0 ; x--) {
@@ -138,10 +161,6 @@ triggerForDelete=[];
 			}
 		}
 	}
-}
-
-function checkForUnitAtEnds() {
-
 }
 
 function handleBattles() {
@@ -205,10 +224,10 @@ function removeUnit(unit, shouldAdd) {
 		}
 	}*/
 	if(shouldAdd)
-		addUnit("soldier", unit.line, unit.direction);
+		addUnit("soldier", unit.line, unit.direction, unit.unitCount);
 }
 
-function addUnit(type, line, direction) {
+function addUnit(type, line, direction, unitCount) {
 	if(direction == "right") {
 		pos = 0
 		health = 20
@@ -221,7 +240,7 @@ function addUnit(type, line, direction) {
 		damage = 1
 		damageRange = 4
 	}
-	theNewUnit = new Unit(line, pos, type, direction, health, 0, damage, damageRange);
+	theNewUnit = new Unit(line, pos, type, direction, health, 0, damage, damageRange, unitCount);
 	if(type == "soldier") {
 		units[line].push(theNewUnit);
 		//console.log("just added"+(globalId - 1))

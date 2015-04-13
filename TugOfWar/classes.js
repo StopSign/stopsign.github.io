@@ -1,4 +1,4 @@
-function Unit (line, pos, type, direction, health, armor, damage, damageRange) {
+function Unit (line, pos, type, direction, health, armor, damage, damageRange, unitCount) {
     this.type = type;
     this.pos = pos;
 	this.health = health;
@@ -11,7 +11,7 @@ function Unit (line, pos, type, direction, health, armor, damage, damageRange) {
 	this.id = globalId++;
 	this.engaged = [];
 	this.line = line;
-	this.unitCount = 1;
+	this.unitCount = unitCount;
 	if(type == "soldier") {
 		this.speed = 1
 		if(direction != "right") {
@@ -20,7 +20,7 @@ function Unit (line, pos, type, direction, health, armor, damage, damageRange) {
 	}
 	
     this.getDamageRoll = function() {
-		return this.damage + Math.random() * this.damageRange;
+		return (this.damage + Math.random() * this.damageRange)*this.unitCount;
     };
 	
 	this.equals = function(unit) {
