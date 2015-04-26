@@ -1,4 +1,4 @@
-function Unit (line, pos, type, direction, health, armor, damage, damageRange, unitCount, attackCooldown) {
+function Unit (line, pos, type, direction, health, armor, damage, damageRange, unitCount, attackCooldown, h, g) {
     this.type = type;
     this.pos = pos;
 	this.health = health;
@@ -21,7 +21,7 @@ function Unit (line, pos, type, direction, health, armor, damage, damageRange, u
 		}
 	}
 	else if(type == "spear") {
-		this.speed = .2
+		this.speed = .6
 		if(direction != "right") {
 			this.speed = .1
 		}
@@ -37,8 +37,8 @@ function Unit (line, pos, type, direction, health, armor, damage, damageRange, u
 		}
 		this.unitCount -= unitsDead;
 		if(unitsDead > 0) {
-			if(this.direction != "right") {
-				addUnit("soldier", this.line, this.direction, unitsDead);
+			if(this.direction != "right") { //respawn the unit when it dies
+				//addUnit("soldier", this.line, this.direction, unitsDead);
 			}
 		}
 		if(this.unitCount <= 0)

@@ -23,6 +23,9 @@ function updateUnitPos(y, x) {
 
 function updateSpawnTimers() {
 	document.getElementById("soldierSpawnTimer").innerHTML = round2(soldierSpawnRate);
+	document.getElementById("spearSpawnTimer").innerHTML = round2(spearSpawnRate);
+	document.getElementById("enemySpawnTimer").innerHTML = round2(enemySpawnRate);
+	
 }
 
 function handleLineTimer() {
