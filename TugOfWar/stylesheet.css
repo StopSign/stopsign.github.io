@@ -149,13 +149,28 @@ top:308px;
 .soldier {
 background-color:black;
 }
+.spear {
+background-color:yellow;
+}
 
 .weapon {
 width:15px;
 height:20px;
 vertical-align:top;
 }
+.weaponsoldier {
+background-color:gray;
+margin-top:8px;
+height:3px;
+width:100%
+}
 
+.weaponspear {
+background-color:brown;
+margin-left:8px;
+height:100%;
+width:2px;
+}
 .healthBarOuter {
 	width:100%;
 	background-color:rgb(255, 13, 13);

@@ -1,4 +1,4 @@
-function Unit (line, pos, type, direction, health, armor, damage, damageRange, unitCount) {
+function Unit (line, pos, type, direction, health, armor, damage, damageRange, unitCount, attackCooldown) {
     this.type = type;
     this.pos = pos;
 	this.health = health;
@@ -12,14 +12,45 @@ function Unit (line, pos, type, direction, health, armor, damage, damageRange, u
 	this.engaged = [];
 	this.line = line;
 	this.unitCount = unitCount;
+	this.attackCooldown = attackCooldown;
+	this.attackCounter = attackCooldown;
 	if(type == "soldier") {
 		this.speed = 1
 		if(direction != "right") {
 			this.speed = .1
 		}
 	}
+	else if(type == "spear") {
+		this.speed = .2
+		if(direction != "right") {
+			this.speed = .1
+		}
+	}
+	
+	this.takeDamage = function(dmg) {
+		unitsDead = Math.floor(dmg / this.health);
+		dmg = dmg % this.health;
+		this.curHealth -= dmg
+		if(this.curHealth <= 0) {
+			this.curHealth = this.health + this.curHealth
+			unitsDead++;
+		}
+		this.unitCount -= unitsDead;
+		if(unitsDead > 0) {
+			if(this.direction != "right") {
+				addUnit("soldier", this.line, this.direction, unitsDead);
+			}
+		}
+		if(this.unitCount <= 0)
+			this.curHealth = -10
+	}
 	
     this.getDamageRoll = function() {
+		if(this.attackCounter > 0) {
+			this.attackCounter--;
+			return 0;
+		}
+		this.attackCounter = this.attackCooldown;
 		return (this.damage + Math.random() * this.damageRange)*this.unitCount;
     };
 	
