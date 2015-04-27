@@ -12,7 +12,7 @@ exitLineLeftTimer = 0;
 units = [[],[],[],[],[],[]];
 linesEnabled = 6;
 for(j = 0; j < linesEnabled; j++) {
-	addUnit("soldier", j, "left", 3);
+	addUnit("soldier", j, "left", 1);
 }
 //	addUnit("soldier", 1, "left", 30);
 //addUnit("soldier", 0, "right", 2);
@@ -24,7 +24,7 @@ for(j = 0; j < linesEnabled; j++) {
 
 soldierSpawnRate = 4;
 spearSpawnRate = .5;
-enemySpawnRate = 2;
+enemySpawnRate = 9;
 curBattles = [];
 storedLines = [];
 timer = 0;
@@ -81,7 +81,7 @@ function handleSpawnRates() {
 		for(j = 0; j < linesEnabled; j++) {
 			addUnit("soldier", j, "left", 1);
 		}
-		enemySpawnRate = 15;
+		enemySpawnRate = 9;
 	}
 	updateSpawnTimers()
 }
@@ -247,7 +247,7 @@ function handleBattles() {
 					}
 				}
 				//get the target & dmg
-				if(units[y][x].type == "spear" && units[y][x].attackCounter === 0) {
+				if(units[y][x].type == "spear" && units[y][x].attackCounter === 3) {
 					drawSpearLine(units[y][x], engageTarget);
 				}
 				engageTarget.takeDamage(units[y][x].getDamageRoll())
@@ -309,14 +309,14 @@ function addUnit(type, line, direction, unitCount) {
 	if(direction == "right") {
 		pos = 0
 		if(type == "soldier") {
-			health = 60
+			health = 50
 			damage = 1
 			damageRange = 0
 			attackCooldown = 1
 		}
 		if(type == "spear") {
-			health = 20
-			damage = 10
+			health = 4
+			damage = 7
 			damageRange = 0
 			attackCooldown = 15
 		}
@@ -324,7 +324,7 @@ function addUnit(type, line, direction, unitCount) {
 	else {
 		pos = 100
 		if(type == "soldier") {
-			health = 100
+			health = 150
 			damage = 1
 			damageRange = 0
 			attackCooldown = 3

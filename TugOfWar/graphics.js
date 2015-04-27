@@ -42,7 +42,7 @@ function handleLineTimer() {
 }
 
 function drawSpearLine(unit1, unit2) {
-	storedLines.push({x1:(unit1.pos+7)*11.9+22, y1:(unit1.line)*54+60, x2:(unit2.pos+7)*11.9+11, y2:(unit2.line)*54+60, count:2});
+	storedLines.push({x1:(unit1.pos+7)*11.9+22, y1:(unit1.line)*54+60, x2:(unit2.pos+7)*11.9+11, y2:(unit2.line)*54+60, curCount:4, count:4});
 }
 
 function redrawStoredLines(){
@@ -53,15 +53,17 @@ function redrawStoredLines(){
 
 	// redraw each stored line
 	for(var i=storedLines.length - 1;i>=0;i--){
-		if(storedLines[i].count <= 0) {
+		if(storedLines[i].curCount <= 0) {
 			storedLines.splice(i, 1);
 			continue;
 		}
-		storedLines[i].count--;
-		//console.log(storedLines[i].x1+", "+storedLines[i].y1+", "+storedLines[i].x2+", "+storedLines[i].y2)
+		storedLines[i].curCount--;
 		ctx.beginPath();
-		ctx.moveTo(storedLines[i].x1,storedLines[i].y1);
-		ctx.lineTo(storedLines[i].x2,storedLines[i].y2);
+		x3 = storedLines[i].x1+((storedLines[i].x2-storedLines[i].x1)/storedLines[i].count*(storedLines[i].count - storedLines[i].curCount)) - 4
+		y3 = storedLines[i].y1+((storedLines[i].y2-storedLines[i].y1)/storedLines[i].count*(storedLines[i].count - storedLines[i].curCount)) 
+		//console.log(storedLines[i].x1+", "+storedLines[i].y1+", "+storedLines[i].x2+", "+storedLines[i].y2+", " + storedLines[i].curCount+", "+x3+", "+y3)
+		ctx.moveTo(x3,y3);
+		ctx.lineTo(x3+8,y3);
 		ctx.lineWidth = 3;
 		ctx.stroke();
 	}
