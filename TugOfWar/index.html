@@ -17,18 +17,21 @@
 <div class='displayCase'></div>
 Score For Left <div id='unitsThroughOnRight' class='number'>0</div>
 Score For Right <div id='unitsThroughOnLeft' class='number'>0</div>
-
+<div style='position:absolute;top:173px;left:718px;' class='f20'>Level <div id='level' class='number f20'></div></div>
 </div>
 <div id='actionSpace' style="width:100%;vertical-align:top;text-align:left;border:2px solid;height:400px;background-color:rgb(223, 255, 221);position:relative;">
 	<div id="fightTime" style="width:100%;position:absolute;"></div>
 	<canvas id='damageLines' width="1400" height="400" style="position:absolute;border:1px solid black;"></canvas>
 	<div id="spawnTimers" style="width:100%;position:absolute;margin-left:200px;margin-top:5px;">
+		<div style='position:absolute;width:200px;overflow:hidden;left:-181px;'>
+			<div id='manualSpawnTimer' class='number f20' style='color:purple'></div>
+		</div>
 		<div style='width:150px;overflow:hidden;'>
 			<div id='unit' class='unitContainer unitLine' style="position:relative;width:40px;">
 				<div id='body' class='soldier unit' style=''> </div>
 				<div id='unitWeapon' class='weapon'><div class='weaponsoldier'></div> </div>
 			</div>
-			<div id='soldierSpawnTimer' class='number f20'>3</div>
+			<div id='soldierSpawnTimer' class='number f20'></div>
 		</div>
 		
 		<div style='width:150px;overflow:hidden;'>
@@ -36,25 +39,40 @@ Score For Right <div id='unitsThroughOnLeft' class='number'>0</div>
 				<div id='body' class='spear unit' style=''> </div>
 				<div id='unitWeapon' class='weapon'><div class='weaponspear'></div> </div>
 			</div>
-			<div id='spearSpawnTimer' class='number f20'>3</div>
+			<div id='spearSpawnTimer' class='number f20'></div>
 		</div> 
 		<div style='position:relative;width:200px;overflow:hidden;left:800px;'>
 			<div id='unit' class='unitContainer unitLine' style="position:relative;width:40px;">
 				<div id='unitWeapon' class='weapon'><div class='weaponsoldier'></div> </div>
 				<div id='body' class='soldier unitLeft' style=''> </div>
 			</div>
-			<div id='enemySpawnTimer' class='number f20'>3</div>
+			<div id='enemySpawnTimer' class='number f20'></div>
 		</div>
 	</div>
 	<div id='exitLineLeft' class='exitLine' style="margin-left:140px;"></div>
 	<div id='exitLineRight' class='exitLine' style="margin-left:1226px;"></div>
+	<div class='mouseOverArea' style='left:-23px;' onmouseover='showLeftArrow()' onmouseout='hideLeftArrow()'></div>
+	<div id='leftArrow' class='arrow' style='cursor:zoom-out;' onmouseover='showLeftArrow()' onmouseout='hideLeftArrow()' onclick='decreaseLevel()'>
+			<div style='margin-top:177px;height:60px;width:20px;background-color:rgb(68, 68, 68);margin-left:22px;'></div>
+	</div>
+	<div class='mouseOverArea' style='left:1120px;' onmouseover='showRightArrow()' onmouseout='hideRightArrow()'></div>
+	<div id='rightArrow' class='arrow' style='left:1335px;cursor:zoom-in;' onmouseover='showRightArrow()' onmouseout='hideRightArrow()' onclick='increaseLevel()'>
+			<div style='margin-top:177px;height:60px;width:20px;background-color:rgb(68, 68, 68);margin-left:22px;'></div>
+	</div>
+	<div style='position:absolute;top:33px;left:68px;' onmouseover='showLeftArrow()' onmouseout='hideLeftArrow()'>
+		<div id='clickSpace0' class='manualClickSpace' onclick='changeManualLane(this)'></div>
+		<div id='clickSpace1' class='manualClickSpace' onclick='changeManualLane(this)'></div>
+		<div id='clickSpace2' class='manualClickSpace' onclick='changeManualLane(this)'></div>
+		<div id='clickSpace3' class='manualClickSpace' onclick='changeManualLane(this)'></div>
+		<div id='clickSpace4' class='manualClickSpace' onclick='changeManualLane(this)'></div>
+		<div id='clickSpace5' class='manualClickSpace' onclick='changeManualLane(this)'></div>
+	</div>
 	<div id='line1' class='actionLine' style="margin-top:70px;"> </div>
 	<div id='line2' class='actionLine'> </div>
 	<div id='line3' class='actionLine'> </div>
 	<div id='line4' class='actionLine'> </div>
 	<div id='line5' class='actionLine'> </div>
 	<div id='line6' class='actionLine'> </div>
-	
 </div>
 
 
@@ -83,6 +101,7 @@ gold tiers + upgrades
       <script src="https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
 <script src="graphics.js"></script>
 <script src="classes.js"></script>
+<script src="manualActions.js"></script>
 <script src="TugOfWar.js"></script>
 <script src="handleSavingTug.js"></script>
 

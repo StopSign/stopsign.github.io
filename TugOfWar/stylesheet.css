@@ -203,3 +203,24 @@ width:4px;
 background-color:red;
 position:absolute;
 }
+.manualClickSpace {
+width:200px;
+height:54px;
+display:block;
+cursor:pointer;
+}
+
+.mouseOverArea{
+position:absolute;
+height:446px;
+width:300px;
+top:-27px;
+}
+
+.arrow {
+position:absolute;
+height:400px;
+width:65px;
+background-color:rgba(128, 128, 128, 0.34);
+display:none;
+}

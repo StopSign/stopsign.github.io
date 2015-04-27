@@ -4,16 +4,9 @@ setInterval(function() {
 },50);
 globalId = 0;
 zIndex = 10000000000;
-unitsThroughOnRight = 0;
-unitsThroughOnLeft = 0;
 exitLineRightTimer = 0;
 exitLineLeftTimer = 0;
 
-units = [[],[],[],[],[],[]];
-linesEnabled = 6;
-for(j = 0; j < linesEnabled; j++) {
-	addUnit("soldier", j, "left", 1);
-}
 //	addUnit("soldier", 1, "left", 30);
 //addUnit("soldier", 0, "right", 2);
 //addUnit("spear", 5, "right", 3);
@@ -22,14 +15,24 @@ for(j = 0; j < linesEnabled; j++) {
 //addUnit("soldier", 0, "right");
 //addUnit("soldier", 0, "right");
 
+unitsThroughOnRight = 0;
+unitsThroughOnLeft = 0;
+units = [[],[],[],[],[],[]];
+linesEnabled = 6;
 soldierSpawnRate = 4;
 spearSpawnRate = .5;
+spawnRateManual = 0;
+currentManualLine = -1;
+spawnManualAmounts = [0, 2];
+spawnAmounts = [2, 3, 1] //first is enemy
 enemySpawnRate = 9;
 curBattles = [];
 storedLines = [];
 timer = 0;
 stop = 0;
 totalTicks = 0
+level = 1;
+startANewLevel()
 function tick() {
 	totalTicks++;
 	if(stop)
@@ -67,21 +70,29 @@ function handleSpawnRates() {
 	soldierSpawnRate -= rateReduction;
 	if(soldierSpawnRate <= 0) {
 		j = Math.floor(Math.random() * linesEnabled)
-		addUnit("soldier", j, "right", 1);
-		soldierSpawnRate = 2;
+		addUnit("soldier", j, "right", spawnAmounts[1]);
+		soldierSpawnRate = 5;
 	}
 	spearSpawnRate -= rateReduction;
 	if(spearSpawnRate <= 0) {
 		j = Math.floor(Math.random() * linesEnabled)
-		addUnit("spear", j, "right", 1);
-		spearSpawnRate = 3;
+		addUnit("spear", j, "right", spawnAmounts[2]);
+		spearSpawnRate = 8;
 	}
 	enemySpawnRate -= rateReduction;
 	if(enemySpawnRate <= 0) {
 		for(j = 0; j < linesEnabled; j++) {
-			addUnit("soldier", j, "left", 1);
+			addUnit("soldier", j, "left", spawnAmounts[0]);
 		}
-		enemySpawnRate = 9;
+		enemySpawnRate = 15;
+	}
+	if(currentManualLine >= 0) {
+		spawnRateManual -= rateReduction;
+		if(spawnRateManual <= 0) {
+			addUnit("soldier", currentManualLine, "right", spawnManualAmounts[0]);
+			addUnit("spear", currentManualLine, "right", spawnManualAmounts[1]);
+			spawnRateManual = 10;
+		}
 	}
 	updateSpawnTimers()
 }
@@ -306,6 +317,9 @@ function removeUnit(unit, shouldAdd) {
 }
 
 function addUnit(type, line, direction, unitCount) {
+	if(unitCount <= 0) {
+		return
+	}
 	if(direction == "right") {
 		pos = 0
 		if(type == "soldier") {

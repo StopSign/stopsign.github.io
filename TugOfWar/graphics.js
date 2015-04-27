@@ -25,7 +25,7 @@ function updateSpawnTimers() {
 	document.getElementById("soldierSpawnTimer").innerHTML = round2(soldierSpawnRate);
 	document.getElementById("spearSpawnTimer").innerHTML = round2(spearSpawnRate);
 	document.getElementById("enemySpawnTimer").innerHTML = round2(enemySpawnRate);
-	
+	document.getElementById("manualSpawnTimer").innerHTML = round2(spawnRateManual);
 }
 
 function handleLineTimer() {
