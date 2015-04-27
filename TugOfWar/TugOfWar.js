@@ -14,16 +14,19 @@ linesEnabled = 6;
 for(j = 0; j < linesEnabled; j++) {
 	addUnit("soldier", j, "left", 3);
 }
+//	addUnit("soldier", 1, "left", 30);
 //addUnit("soldier", 0, "right", 2);
-//addUnit("spear", 0, "right", 1);
+//addUnit("spear", 5, "right", 3);
+//addUnit("spear", 0, "right", 3);
 //addUnit("soldier", 0, "right");
 //addUnit("soldier", 0, "right");
 //addUnit("soldier", 0, "right");
 
-soldierSpawnRate = 2;
+soldierSpawnRate = 4;
 spearSpawnRate = .5;
-enemySpawnRate = 15;
+enemySpawnRate = 2;
 curBattles = [];
+storedLines = [];
 timer = 0;
 stop = 0;
 totalTicks = 0
@@ -36,6 +39,7 @@ function tick() {
 	handleLineTimer()
 	checkForUnitCollisions()
 	handleEngaged()
+	redrawStoredLines()
 	if(timer % 2 == 0) {
 		handleSpawnRates()
 		handleBattles()
@@ -58,19 +62,21 @@ function handleEngaged() {
 }
 
 function handleSpawnRates() {
-	soldierSpawnRate -= .09999;
+	rateReduction = .09999;
+	//rateReduction = 0;
+	soldierSpawnRate -= rateReduction;
 	if(soldierSpawnRate <= 0) {
 		j = Math.floor(Math.random() * linesEnabled)
 		addUnit("soldier", j, "right", 1);
-		soldierSpawnRate = 1;
+		soldierSpawnRate = 2;
 	}
-	spearSpawnRate -= .09999;
+	spearSpawnRate -= rateReduction;
 	if(spearSpawnRate <= 0) {
 		j = Math.floor(Math.random() * linesEnabled)
 		addUnit("spear", j, "right", 1);
-		spearSpawnRate = 4;
+		spearSpawnRate = 3;
 	}
-	enemySpawnRate -= .09999;
+	enemySpawnRate -= rateReduction;
 	if(enemySpawnRate <= 0) {
 		for(j = 0; j < linesEnabled; j++) {
 			addUnit("soldier", j, "left", 1);
@@ -107,7 +113,7 @@ function checkForUnitAtEnds() {
 				triggerForDelete.push(units[y][x])
 			}
 			else if(units[y][x].direction != "right" && units[y][x].pos < 5) { //enemy got through
-				unitsThroughOnLeft++;
+				unitsThroughOnLeft+=units[y][x].unitCount;
 				document.getElementById("unitsThroughOnLeft").innerHTML = unitsThroughOnLeft
 				exitLineLeftTimer = 8
 				triggerForDelete.push(units[y][x])
@@ -148,9 +154,13 @@ triggerForDelete=[];
 					//Ranged:
 					if(units[y][x].type=="spear") {
 						if((Math.abs(y-z)<=1)&&units[z][w].direction != units[y][x].direction) {
-							if(Math.abs(units[y][x].pos - units[z][w].pos) <= 15) {
-								//console.log("pushing " + units[z][w].id + ", "+'variables1: '+y+", "+x+", "+z+", "+w+", id:"+units[y][x].id+", "+units[y][x].unitCount)
-								units[y][x].engaged.push(units[z][w])
+							difference = units[y][x].pos - units[z][w].pos
+							if(units[y][x].direction === "right") {
+								if(difference > -15 && difference < 0) {
+									//console.log("pushing " + units[z][w].id + ", "+'variables1: '+y+", "+x+", "+z+", "+w+", id:"+units[y][x].id+", "+units[y][x].engaged.length)
+									//console.log(units[y][x].engaged);
+									units[y][x].engaged.push(units[z][w])
+								}
 							}
 						}
 					}
@@ -206,22 +216,40 @@ function handleBattles() {
 	for(y = 0; y < units.length; y++) {
 		for(x = units[y].length - 1; x >= 0; x--) {
 			if(units[y][x].curHealth > 0 && units[y][x].engaged.length > 0) {
-				pos = 0;
+				bestTargetPos = 0;
+				print = 0;
 				for(i = 1; i < units[y][x].engaged.length; i++) {
-					if(units[y][x].engaged[i].line == y || Math.abs(units[y][x].engaged[i].pos - units[y][x].pos) < Math.abs(units[y][x].engaged[pos].pos - units[y][x].pos)) {
-						pos = i
+					if(units[y][x].engaged[i].line == y) {
+						if(Math.abs(units[y][x].engaged[i].pos - units[y][x].pos) < Math.abs(units[y][x].engaged[bestTargetPos].pos - units[y][x].pos)) {
+							bestTargetPos = i
+						}
+						else if(units[y][x].engaged[bestTargetPos].line != y) {
+							bestTargetPos = i
+						}
+					}
+					else if(units[y][x].engaged[bestTargetPos].line != y && Math.abs(units[y][x].engaged[i].pos - units[y][x].pos) < Math.abs(units[y][x].engaged[bestTargetPos].pos - units[y][x].pos)) {
+						//console.log(units[y][x].engaged[i].line == y)
+						//console.log(Math.abs(units[y][x].engaged[i].pos - units[y][x].pos))
+						//console.log(Math.abs(units[y][x].engaged[bestTargetPos].pos - units[y][x].pos))
+						//console.log(units[y][x].engaged[i].pos+", "+units[y][x].pos)
+						bestTargetPos = i
 					}
 				}
 				//disengage if the unit is too far away.
-				engageTarget = units[y][x].engaged[pos];
+				engageTarget = units[y][x].engaged[bestTargetPos];
+				if(print) {
+					console.log(engageTarget.id)
+				}
 				if(units[y][x].type ==="spear") {
 					if((units[y][x].direction ==="right" && units[y][x].pos - engageTarget.pos > 0) || (units[y][x].direction !="right" && units[y][x].pos - engageTarget.pos < 0)) {
-						//console.log(units[y][x].pos - engageTarget.pos)
 						units[y][x].engaged.splice(0, 1);
 						continue;
 					}
 				}
-				//get the first target & dmg
+				//get the target & dmg
+				if(units[y][x].type == "spear" && units[y][x].attackCounter === 0) {
+					drawSpearLine(units[y][x], engageTarget);
+				}
 				engageTarget.takeDamage(units[y][x].getDamageRoll())
 				//console.log(engageTarget.id)
 				document.getElementById("count"+engageTarget.id).innerHTML = engageTarget.unitCount
@@ -288,16 +316,16 @@ function addUnit(type, line, direction, unitCount) {
 		}
 		if(type == "spear") {
 			health = 20
-			damage = 5
+			damage = 10
 			damageRange = 0
-			attackCooldown = 4
+			attackCooldown = 15
 		}
 	}
 	else {
 		pos = 100
 		if(type == "soldier") {
-			health = 200
-			damage = 2
+			health = 100
+			damage = 1
 			damageRange = 0
 			attackCooldown = 3
 		}

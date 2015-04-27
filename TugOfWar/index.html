@@ -21,8 +21,9 @@ Score For Right <div id='unitsThroughOnLeft' class='number'>0</div>
 </div>
 <div id='actionSpace' style="width:100%;vertical-align:top;text-align:left;border:2px solid;height:400px;background-color:rgb(223, 255, 221);position:relative;">
 	<div id="fightTime" style="width:100%;position:absolute;"></div>
+	<canvas id='damageLines' width="1400" height="400" style="position:absolute;border:1px solid black;"></canvas>
 	<div id="spawnTimers" style="width:100%;position:absolute;margin-left:200px;margin-top:5px;">
-		<div style='width:200px;overflow:hidden;'>
+		<div style='width:150px;overflow:hidden;'>
 			<div id='unit' class='unitContainer unitLine' style="position:relative;width:40px;">
 				<div id='body' class='soldier unit' style=''> </div>
 				<div id='unitWeapon' class='weapon'><div class='weaponsoldier'></div> </div>
@@ -30,14 +31,14 @@ Score For Right <div id='unitsThroughOnLeft' class='number'>0</div>
 			<div id='soldierSpawnTimer' class='number f20'>3</div>
 		</div>
 		
-		<div style='width:200px;overflow:hidden;'>
+		<div style='width:150px;overflow:hidden;'>
 			<div id='unit' class='unitContainer unitLine' style="position:relative;width:40px;">
 				<div id='body' class='spear unit' style=''> </div>
 				<div id='unitWeapon' class='weapon'><div class='weaponspear'></div> </div>
 			</div>
 			<div id='spearSpawnTimer' class='number f20'>3</div>
 		</div> 
-		<div style='position:relative;width:200px;overflow:hidden;right:-700px;'>
+		<div style='position:relative;width:200px;overflow:hidden;left:800px;'>
 			<div id='unit' class='unitContainer unitLine' style="position:relative;width:40px;">
 				<div id='unitWeapon' class='weapon'><div class='weaponsoldier'></div> </div>
 				<div id='body' class='soldier unitLeft' style=''> </div>
