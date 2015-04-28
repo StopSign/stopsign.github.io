@@ -26,6 +26,33 @@ function updateSpawnTimers() {
 	document.getElementById("spearSpawnTimer").innerHTML = round2(spearSpawnRate);
 	document.getElementById("enemySpawnTimer").innerHTML = round2(enemySpawnRate);
 	document.getElementById("manualSpawnTimer").innerHTML = round2(spawnRateManual);
+	document.getElementById("enemyAutoSpawnAmount").innerHTML = spawnAmounts[0]
+	document.getElementById("soldierManualSpawnAmount").innerHTML = spawnManualAmounts[0]
+	document.getElementById("soldierAutoSpawnAmount").innerHTML = spawnAmounts[1]
+	document.getElementById("spearManualSpawnAmount").innerHTML = spawnManualAmounts[1]
+	document.getElementById("spearAutoSpawnAmount").innerHTML = spawnAmounts[2]
+}
+
+function updateGoldVisual() {
+	document.getElementById("gold").innerHTML = gold;
+}
+
+function updateTerritoryVisual() {
+	document.getElementById("territory").innerHTML = territory;
+}
+
+function updateProgressVisual() {
+	scoreNeededForLevel = level * 100
+	toModify = unitsThroughOnRight
+	if ( unitsThroughOnRight > scoreNeededForLevel) {
+		toModify = 1
+	}
+	if ( unitsThroughOnRight < 0 ) {
+		toModify = 0
+	}
+	document.getElementById("compete1").style.width = toModify / scoreNeededForLevel * 100 + "%";
+	document.getElementById("compete2").style.width = (1-toModify / scoreNeededForLevel) * 100 + "%";
+	document.getElementById("score").innerHTML = Math.ceil(unitsThroughOnRight / scoreNeededForLevel * 100)
 }
 
 function handleLineTimer() {
@@ -38,6 +65,15 @@ function handleLineTimer() {
 	if(exitLineLeftTimer) {
 		exitLineLeftTimer--
 		document.getElementById("exitLineLeft").style.backgroundColor = "yellow";
+	}
+}
+
+function clickedUnitStatus(type, direction) {
+	if(type == "soldier") {
+		
+	}
+	if(type == "spear") {
+		
 	}
 }
 

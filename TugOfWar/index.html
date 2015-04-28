@@ -15,34 +15,44 @@
 <div id='mainBox' style='border:3px solid;padding:20px;height:1110px;text-align:left;width:1400px;'>
 <div id='displaySpace' style="width:100%;text-align:center;border: 2px solid; height:100px;background-color:rgb(247, 230, 220);"> 
 <div class='displayCase'></div>
-Score For Left <div id='unitsThroughOnRight' class='number'>0</div>
-Score For Right <div id='unitsThroughOnLeft' class='number'>0</div>
-<div style='position:absolute;top:173px;left:718px;' class='f20'>Level <div id='level' class='number f20'></div></div>
+<div id='score' class='number' style='font-size:18px'></div>%
+<div style='width:450px;height:20px;margin-top:2px;background-color:grey;display:block;margin-left:auto;margin-right:auto;padding:5px 10px;'>
+	<div id='compete1' style='width:50%;background-color:rgb(0, 61, 0);float:left' class='progressBar'></div><div id='compete2' style='width:50%;border-top-left-radius:25px;border-bottom-left-radius:25px;background-color:rgb(255, 13, 13);float:right;' class='progressBar'></div>
 </div>
-<div id='actionSpace' style="width:100%;vertical-align:top;text-align:left;border:2px solid;height:400px;background-color:rgb(223, 255, 221);position:relative;">
+<div style='top:167px;left:697px;' class='statusLabel'>Level <div id='level' class='bigNumber'></div></div>
+<div style='top:115px;left:168px;' class='statusLabel'>Gold: <div id='gold' class='bigNumber' style='color:rgb(173, 161, 42)'></div></div>
+<div style='top:156px;left:168px;' class='statusLabel'>Territory: <div id='territory' class='bigNumber'></div></div>
+<div style='top:137px;left:998px;font-size:18px;' class='statusLabel'>Gain <div id='territoryGain' class='number' style='font-size:20px;'>10</div> territory at 100%</div>
+</div>
+<div id='actionSpace' style="width:100%;vertical-align:top;text-align:left;border:2px solid;height:400px;background-color:rgb(223, 255, 221);position:relative;font-size:12px;">
 	<div id="fightTime" style="width:100%;position:absolute;"></div>
 	<canvas id='damageLines' width="1400" height="400" style="position:absolute;border:1px solid black;"></canvas>
-	<div id="spawnTimers" style="width:100%;position:absolute;margin-left:200px;margin-top:5px;">
+	<div id="spawnTimers" style="width:1200px;position:absolute;margin-left:200px;margin-top:5px;">
 		<div style='position:absolute;width:200px;overflow:hidden;left:-181px;'>
 			<div id='manualSpawnTimer' class='number f20' style='color:purple'></div>
 		</div>
-		<div style='width:150px;overflow:hidden;'>
-			<div id='unit' class='unitContainer unitLine' style="position:relative;width:40px;">
+		<div class='pictureContainer' style='width:150px;'>
+			<div id='soldierManualSpawnAmount' class='spawnManualAmount'></div>
+			<div id='soldierAutoSpawnAmount' class='spawnAutoAmount'></div>
+			<div id='unit' class='unitContainer' style="position:relative;">
 				<div id='body' class='soldier unit' style=''> </div>
 				<div id='unitWeapon' class='weapon'><div class='weaponsoldier'></div> </div>
 			</div>
 			<div id='soldierSpawnTimer' class='number f20'></div>
 		</div>
 		
-		<div style='width:150px;overflow:hidden;'>
-			<div id='unit' class='unitContainer unitLine' style="position:relative;width:40px;">
+		<div class='pictureContainer' style='width:150px;'>
+			<div id='spearManualSpawnAmount' class='spawnManualAmount'></div>
+			<div id='spearAutoSpawnAmount' class='spawnAutoAmount'></div>
+			<div id='unit' class='unitContainer' style="position:relative;">
 				<div id='body' class='spear unit' style=''> </div>
 				<div id='unitWeapon' class='weapon'><div class='weaponspear'></div> </div>
 			</div>
 			<div id='spearSpawnTimer' class='number f20'></div>
 		</div> 
-		<div style='position:relative;width:200px;overflow:hidden;left:800px;'>
-			<div id='unit' class='unitContainer unitLine' style="position:relative;width:40px;">
+		<div class='pictureContainer' style='position:relative;left:800px;'>
+			<div id='enemyAutoSpawnAmount' class='spawnAutoAmount'></div>
+			<div id='unit' class='unitContainer' style="position:relative;">
 				<div id='unitWeapon' class='weapon'><div class='weaponsoldier'></div> </div>
 				<div id='body' class='soldier unitLeft' style=''> </div>
 			</div>
@@ -53,11 +63,11 @@ Score For Right <div id='unitsThroughOnLeft' class='number'>0</div>
 	<div id='exitLineRight' class='exitLine' style="margin-left:1226px;"></div>
 	<div class='mouseOverArea' style='left:-23px;' onmouseover='showLeftArrow()' onmouseout='hideLeftArrow()'></div>
 	<div id='leftArrow' class='arrow' style='cursor:zoom-out;' onmouseover='showLeftArrow()' onmouseout='hideLeftArrow()' onclick='decreaseLevel()'>
-			<div style='margin-top:177px;height:60px;width:20px;background-color:rgb(68, 68, 68);margin-left:22px;'></div>
+			<div class='innerArrow' style='border-right:20px solid rgb(68, 68, 68);'></div>
 	</div>
 	<div class='mouseOverArea' style='left:1120px;' onmouseover='showRightArrow()' onmouseout='hideRightArrow()'></div>
 	<div id='rightArrow' class='arrow' style='left:1335px;cursor:zoom-in;' onmouseover='showRightArrow()' onmouseout='hideRightArrow()' onclick='increaseLevel()'>
-			<div style='margin-top:177px;height:60px;width:20px;background-color:rgb(68, 68, 68);margin-left:22px;'></div>
+			<div class='innerArrow' style='border-left:20px solid rgb(68, 68, 68);'></div>
 	</div>
 	<div style='position:absolute;top:33px;left:68px;' onmouseover='showLeftArrow()' onmouseout='hideLeftArrow()'>
 		<div id='clickSpace0' class='manualClickSpace' onclick='changeManualLane(this)'></div>
@@ -81,17 +91,85 @@ Score For Right <div id='unitsThroughOnLeft' class='number'>0</div>
 
 <div style='width:2%;display:inline-block;'></div>
 <div id='leftSpace' class="buyColumn" >
-unit spawning + upgrades
 </div>
 <div style='width:2%;display:inline-block;'></div>
-<div id='middleSpace' class="buyColumn" >
-information + upgrades
+<div id='middleSpace' class="buyColumn" style='background-color:rgb(255, 229, 161);' >
+	<div id='defaultScreen' class='unitScreen' style='display:inline-block;'>
+		Units<br>
+		<div style='width:100%;margin-top:30px;'>
+			<div id='unit' class='unitContainer displayLeft'>
+				<div id='body' class='soldier unit' style=''> </div>
+				<div id='unitWeapon' class='weapon'><div class='weaponsoldier'></div> </div>
+			</div>
+			Soldier
+			<div id='unit' class='unitContainer displayRight'>
+				<div id='unitWeapon' class='weapon'><div class='weaponsoldier'></div> </div>
+				<div id='body' class='soldier unitLeft' style=''> </div>
+			</div>
+		</div>
+		<div style='width:100%;margin-top:20px;'>
+			<div id='unit' class='unitContainer displayLeft'>
+				<div id='body' class='spear unit' style=''> </div>
+				<div id='unitWeapon' class='weapon'><div class='weaponspear'></div> </div>
+			</div>
+			Spearman
+			<div id='unit' class='unitContainer displayRight'>
+				<div id='unitWeapon' class='weapon'><div class='weaponspear'></div> </div>
+				<div id='body' class='spear unitLeft' style=''> </div>
+			</div>
+		</div>
+	</div>
+	<div id='soldierScreen' class='unitScreen'></div>
+	<div id='soldierEnemyScreen' class='unitScreen'></div>
+	<div id='spearScreen' class='unitScreen'></div>
+	<div id='spearEnemyScreen' class='unitScreen'></div>
+	
 </div>
 
 <div style='width:2%;display:inline-block;'></div>
 <div id='rightSpace' class="buyColumn">
-gold tiers + upgrades
-	
+<div class='spawnContainer' style='margin-top:15px;'>
+	<div id='progress0' class='unitProgress'></div>
+	<div class='spawnLabel'>Families</div>
+	<div id='placeTimer0' class='placeTimer'>30</div>
+	<div id='placeAmount0' class='placeAmount'>30</div>
+</div>
+<div class='spawnContainer'>
+	<div id='progress1' class='unitProgress'></div>
+	<div class='spawnLabel'>Villages</div>
+	<div id='placeTimer1' class='placeTimer'>30</div>
+	<div id='placeAmount1' class='placeAmount'>30</div>
+</div>
+<div class='spawnContainer'>
+	<div id='progress2' class='unitProgress'></div>
+	<div class='spawnLabel'>Towns</div>
+	<div id='placeTimer2' class='placeTimer'>3</div>
+	<div id='placeAmount2' class='placeAmount'>3</div>
+</div>
+<div class='spawnContainer'>
+	<div id='progress3' class='unitProgress'></div>
+	<div class='spawnLabel'>Cities</div>
+	<div id='placeTimer3' class='placeTimer'>30</div>
+	<div id='placeAmount3' class='placeAmount'>30</div>
+</div>
+<div class='spawnContainer'>
+	<div id='progress4' class='unitProgress'></div>
+	<div class='spawnLabel'>States</div>
+	<div id='placeTimer4' class='placeTimer'>30</div>
+	<div id='placeAmount4' class='placeAmount'>30</div>
+</div>
+<div class='spawnContainer'>
+	<div id='progress5' class='unitProgress'></div>
+	<div class='spawnLabel'>Countries</div>
+	<div id='placeTimer5' class='placeTimer'>30</div>
+	<div id='placeAmount5' class='placeAmount'>30</div>
+</div>
+<div class='spawnContainer'>
+	<div id='progress6' class='unitProgress'></div>
+	<div class='spawnLabel'>Regions</div>
+	<div id='placeTimer6' class='placeTimer'>30</div>
+	<div id='placeAmount6' class='placeAmount'>30</div>
+</div>
 </div>
 </div>
 

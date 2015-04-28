@@ -7,7 +7,7 @@ function changeManualLane(div) {
 		$(name).find('div').first().remove();
 	}
 	currentManualLine = parseInt(id);
-	document.getElementById('clickSpace' + currentManualLine).innerHTML = "<div style='width:97%;height:97%;border:5px solid purple;border-radius:50%'></div>"
+	document.getElementById('clickSpace' + currentManualLine).innerHTML = "<div style='width: 97%;height: 97%;border-radius: 50%;border-top: 0px solid transparent;border-bottom: 0px solid transparent;border-left: 56px solid rgba(168, 37, 168, 0.73);border-right: 0px solid green;'></div>"
 }
 
 function showLeftArrow() {
@@ -29,9 +29,13 @@ function hideRightArrow() {
 }
 
 function increaseLevel() {
-	level++
-	document.getElementById("level").innerHTML=level;
-	startANewLevel();
+	if(highestLevelUnlocked != level) {
+		level++
+		unitsThroughOnRight = 0;
+		unitsThroughOnLeft = 0;
+		document.getElementById("level").innerHTML=level;
+		startANewLevel();
+	}
 }
 
 function decreaseLevel() {
@@ -58,7 +62,6 @@ function startANewLevel() {
 	soldierSpawnRate = 4;
 	spearSpawnRate = .5;
 	spawnRateManual = 0;
-	console.log(currentManualLine)
 	name = "#clickSpace"+currentManualLine
 	if($(name).find('div').first()) {
 		$(name).find('div').first().remove();
@@ -73,6 +76,8 @@ function startANewLevel() {
 	stop = 0;
 	totalTicks = 0
 	document.getElementById("level").innerHTML=level;
+	document.getElementById("territoryGain").innerHTML = level * 10;
+	updateProgressVisual()
 	spawnAmounts[0] = level;
 	for(j = 0; j < linesEnabled; j++) {
 		addUnit("soldier", j, "left", spawnAmounts[0]);

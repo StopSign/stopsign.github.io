@@ -31,8 +31,15 @@ storedLines = [];
 timer = 0;
 stop = 0;
 totalTicks = 0
+
 level = 1;
 startANewLevel()
+gold = 0;
+territory = 10;
+highestLevelUnlocked = 1;
+updateTerritoryVisual()
+updateGoldVisual()
+updateProgressVisual()
 function tick() {
 	totalTicks++;
 	if(stop)
@@ -119,13 +126,14 @@ function checkForUnitAtEnds() {
 		for(x = 0; x < units[y].length ; x++) {
 			if(units[y][x].direction === "right" && units[y][x].pos > 93) { //unit made it to the right
 				unitsThroughOnRight+=units[y][x].unitCount;
-				document.getElementById("unitsThroughOnRight").innerHTML = unitsThroughOnRight
 				exitLineRightTimer = 8
+				checkDoneLevel()
 				triggerForDelete.push(units[y][x])
 			}
 			else if(units[y][x].direction != "right" && units[y][x].pos < 5) { //enemy got through
 				unitsThroughOnLeft+=units[y][x].unitCount;
-				document.getElementById("unitsThroughOnLeft").innerHTML = unitsThroughOnLeft
+				unitsThroughOnRight-=units[y][x].unitCount*10;
+				checkDoneLevel()
 				exitLineLeftTimer = 8
 				triggerForDelete.push(units[y][x])
 			}
@@ -269,6 +277,7 @@ function handleBattles() {
 				if(engageTarget.curHealth <= 0) {
 					//console.log("removing: " + engageTarget.id + " on " + totalTicks + ", "+x)
 					//console.log(units[y][x].engaged)
+					updateGoldVisual()
 					disengageAll(engageTarget)
 					removeUnit(engageTarget, engageTarget.direction!="right")
 				}
@@ -316,12 +325,23 @@ function removeUnit(unit, shouldAdd) {
 	}*/
 }
 
+function checkDoneLevel() {
+	if(unitsThroughOnRight > scoreNeededForLevel) {
+		territory += level * 10
+		updateTerritoryVisual()
+		unitsThroughOnRight = 0;
+		highestLevelUnlocked = level+1 > highestLevelUnlocked ? level+1 : highestLevelUnlocked;
+	}
+	updateProgressVisual()
+}
+
 function addUnit(type, line, direction, unitCount) {
 	if(unitCount <= 0) {
 		return
 	}
 	if(direction == "right") {
 		pos = 0
+		goldWorth = 0
 		if(type == "soldier") {
 			health = 50
 			damage = 1
@@ -342,6 +362,7 @@ function addUnit(type, line, direction, unitCount) {
 			damage = 1
 			damageRange = 0
 			attackCooldown = 3
+			goldWorth = level;
 		}
 		if(type == "spear") {
 			health = 20
@@ -350,7 +371,7 @@ function addUnit(type, line, direction, unitCount) {
 			attackCooldown = 4
 		}
 	}
-	theNewUnit = new Unit(line, pos, type, direction, health, 0, damage, damageRange, unitCount, attackCooldown, line, units.length);
+	theNewUnit = new Unit(line, pos, type, direction, health, 0, damage, damageRange, unitCount, attackCooldown, goldWorth, line, units.length);
 	units[line].push(theNewUnit);
 	//console.log("just added"+(globalId - 1))
 	newUnitDiv(theNewUnit)

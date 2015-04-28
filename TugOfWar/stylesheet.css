@@ -60,7 +60,6 @@ h4 {
 }
 div {
     display:inline-block;
-    font-size:12px;
 }
 .tab {
     height:24px;
@@ -87,7 +86,7 @@ div {
     color:black;
 }
 .buyColumn {
-    width:30%;
+    width:420px;
     vertical-align:top;
     height:556px;
 	border:1px solid;
@@ -114,9 +113,10 @@ position:absolute;
 display:none;
 }
 .unitContainer {
-width:39px;
+width:40px;
 height:20px;
 position:absolute;
+font-size:12px;
 }
 .unit {
 	width:20px;
@@ -223,4 +223,98 @@ height:400px;
 width:65px;
 background-color:rgba(128, 128, 128, 0.34);
 display:none;
+}
+.innerArrow {
+margin-top:177px;
+margin-left:22px;
+border-top:30px solid transparent;
+border-bottom:30px solid transparent;
+}
+.spawnManualAmount {
+position:absolute;
+color:purple;
+top:23px;
+left:12px;
+font-size:14px;
+}
+.spawnAutoAmount {
+position:absolute;
+color:black;
+top:23px;
+left:57px;
+font-size:14px;
+
+}
+.pictureContainer {
+position:relative;
+width:150px;
+}
+.statusLabel {
+position:absolute;
+font-size:30px;
+}
+.bigNumber {
+color:black;
+font-size:30px;
+}
+.progressBar {
+height:15px;
+margin-top:3px;
+}
+.unitScreen {
+display:none;
+text-align:center;
+width:100%;
+margin-top:10px;
+}
+.displayLeft {
+position:relative;
+float:left;
+margin-left:20px;
+border:1px solid;
+padding:4px;
+width:100px;
+height:20px;
+}
+.displayRight {
+position:relative;
+float:right;
+margin-right:20px;
+border:1px solid;
+padding:4px;
+width:100px;
+height:20px;
+}
+.unitProgress {
+left:10px;
+top:6px;
+width:220px;
+height:12px;
+background-color:gray;
+padding:4px 0px;
+position:absolute;
+}
+.spawnContainer {
+width:100%;
+position:relative;
+height:40px;
+margin-top:5px;
+}
+.spawnLabel {
+position:relative;
+left:331px;
+top:5px;
+}
+.placeTimer {
+position:absolute;
+top:23px;
+left:9px;
+font-size:14px;
+}
+.placeAmount {
+position:absolute;
+top:0px;
+left:215px;
+font-size:21px;
+color:black;
 }

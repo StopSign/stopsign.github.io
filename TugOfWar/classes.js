@@ -1,4 +1,4 @@
-function Unit (line, pos, type, direction, health, armor, damage, damageRange, unitCount, attackCooldown, h, g) {
+function Unit (line, pos, type, direction, health, armor, damage, damageRange, unitCount, attackCooldown, goldWorth, h, g) {
     this.type = type;
     this.pos = pos;
 	this.health = health;
@@ -12,6 +12,7 @@ function Unit (line, pos, type, direction, health, armor, damage, damageRange, u
 	this.engaged = [];
 	this.line = line;
 	this.unitCount = unitCount;
+	this.goldWorth = goldWorth;
 	this.attackCooldown = attackCooldown;
 	this.attackCounter = attackCooldown;
 	if(type == "soldier") {
@@ -37,6 +38,8 @@ function Unit (line, pos, type, direction, health, armor, damage, damageRange, u
 		}
 		this.unitCount -= unitsDead;
 		if(unitsDead > 0) {
+			gold += unitsDead * this.goldWorth;
+			updateGoldVisual()
 			if(this.direction != "right") { //respawn the unit when it dies
 				//addUnit("soldier", this.line, this.direction, unitsDead);
 			}
