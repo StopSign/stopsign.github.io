@@ -82,4 +82,8 @@ function startANewLevel() {
 	for(j = 0; j < linesEnabled; j++) {
 		addUnit("soldier", j, "left", spawnAmounts[0]);
 	}
+	for(j = 0; j < placeCurTimers.length; j++) {
+		placeCurTimers[j]=placeMaxTimers[j]
+		placeAmounts[j]=placeAmountsStart[j]
+	}
 }

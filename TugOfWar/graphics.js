@@ -40,6 +40,16 @@ function updateGoldVisual() {
 function updateTerritoryVisual() {
 	document.getElementById("territory").innerHTML = territory;
 }
+function updatePlaceVisuals() {
+	document.getElementById("placeAmount0").innerHTML=placeAmounts[0];
+	document.getElementById("placeTimer0").innerHTML=round3(placeAmounts[0] / territory*100) + "% of territory";
+	document.getElementById("placeProgressInner0").style.width=round3(placeAmounts[0] / territory*100) + "%";
+	for(x = 1; x < placeAmounts.length; x++) {
+		document.getElementById("placeAmount"+x).innerHTML=placeAmounts[x];
+		document.getElementById("placeTimer"+x).innerHTML=round1(placeCurTimers[x]);
+		document.getElementById("placeProgressInner"+x).style.width= (1-placeCurTimers[x] / placeMaxTimers[x])*100+"%"
+	}
+}
 
 function updateProgressVisual() {
 	scoreNeededForLevel = level * 100

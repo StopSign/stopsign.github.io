@@ -9,7 +9,7 @@
 <body>
 
 
-<div style="height:100%;font-family:'Arial Black', Gadget, sans-serif;color:#666;display:block">
+<div style="height:100%;font-family:Arial, Helvetica, serif;color:#666;display:block;font-weight:800;">
 <div id="mainColumn" style="width:100%;margin-left:20px;">
 <div style="text-align:right;width:100%"><div id="mainTitle" style="font-size:40px;margin:10px;margin-right:15%;">Tug of War v.4</div></div>
 <div id='mainBox' style='border:3px solid;padding:20px;height:1110px;text-align:left;width:1400px;'>
@@ -93,10 +93,10 @@
 <div id='leftSpace' class="buyColumn" >
 </div>
 <div style='width:2%;display:inline-block;'></div>
-<div id='middleSpace' class="buyColumn" style='background-color:rgb(255, 229, 161);' >
+<div id='middleSpace' class="buyColumn" style='background-color:rgb(255, 237, 190);' >
 	<div id='defaultScreen' class='unitScreen' style='display:inline-block;'>
 		Units<br>
-		<div style='width:100%;margin-top:30px;'>
+		<div class='unitUpgradeContainer' style='margin-top:30px;'>
 			<div id='unit' class='unitContainer displayLeft'>
 				<div id='body' class='soldier unit' style=''> </div>
 				<div id='unitWeapon' class='weapon'><div class='weaponsoldier'></div> </div>
@@ -107,7 +107,7 @@
 				<div id='body' class='soldier unitLeft' style=''> </div>
 			</div>
 		</div>
-		<div style='width:100%;margin-top:20px;'>
+		<div class='unitUpgradeContainer' >
 			<div id='unit' class='unitContainer displayLeft'>
 				<div id='body' class='spear unit' style=''> </div>
 				<div id='unitWeapon' class='weapon'><div class='weaponspear'></div> </div>
@@ -129,43 +129,49 @@
 <div style='width:2%;display:inline-block;'></div>
 <div id='rightSpace' class="buyColumn">
 <div class='spawnContainer' style='margin-top:15px;'>
-	<div id='progress0' class='unitProgress'></div>
+	<div id='progress0' class='unitProgress'><div id='placeProgressInner0' class='placeProgresInner'></div></div>
 	<div class='spawnLabel'>Families</div>
 	<div id='placeTimer0' class='placeTimer'>30</div>
-	<div id='placeAmount0' class='placeAmount'>30</div>
+	<div id='placeAmount0' class='placeAmount'>30%</div>
 </div>
 <div class='spawnContainer'>
-	<div id='progress1' class='unitProgress'></div>
+	<div class='upArrow'></div>
+	<div id='progress1' class='unitProgress'><div id='placeProgressInner1' class='placeProgresInner'></div></div>
 	<div class='spawnLabel'>Villages</div>
 	<div id='placeTimer1' class='placeTimer'>30</div>
 	<div id='placeAmount1' class='placeAmount'>30</div>
 </div>
 <div class='spawnContainer'>
-	<div id='progress2' class='unitProgress'></div>
+	<div class='upArrow'></div>
+	<div id='progress2' class='unitProgress'><div id='placeProgressInner2' class='placeProgresInner'></div></div>
 	<div class='spawnLabel'>Towns</div>
 	<div id='placeTimer2' class='placeTimer'>3</div>
 	<div id='placeAmount2' class='placeAmount'>3</div>
 </div>
 <div class='spawnContainer'>
-	<div id='progress3' class='unitProgress'></div>
+	<div class='upArrow'></div>
+	<div id='progress3' class='unitProgress'><div id='placeProgressInner3' class='placeProgresInner'></div></div>
 	<div class='spawnLabel'>Cities</div>
 	<div id='placeTimer3' class='placeTimer'>30</div>
 	<div id='placeAmount3' class='placeAmount'>30</div>
 </div>
 <div class='spawnContainer'>
-	<div id='progress4' class='unitProgress'></div>
+	<div class='upArrow'></div>
+	<div id='progress4' class='unitProgress'><div id='placeProgressInner4' class='placeProgresInner'></div></div>
 	<div class='spawnLabel'>States</div>
 	<div id='placeTimer4' class='placeTimer'>30</div>
 	<div id='placeAmount4' class='placeAmount'>30</div>
 </div>
 <div class='spawnContainer'>
-	<div id='progress5' class='unitProgress'></div>
+	<div class='upArrow'></div>
+	<div id='progress5' class='unitProgress'><div id='placeProgressInner5' class='placeProgresInner'></div></div>
 	<div class='spawnLabel'>Countries</div>
 	<div id='placeTimer5' class='placeTimer'>30</div>
 	<div id='placeAmount5' class='placeAmount'>30</div>
 </div>
 <div class='spawnContainer'>
-	<div id='progress6' class='unitProgress'></div>
+	<div class='upArrow'></div>
+	<div id='progress6' class='unitProgress'><div id='placeProgressInner6' class='placeProgresInner'></div></div>
 	<div class='spawnLabel'>Regions</div>
 	<div id='placeTimer6' class='placeTimer'>30</div>
 	<div id='placeAmount6' class='placeAmount'>30</div>

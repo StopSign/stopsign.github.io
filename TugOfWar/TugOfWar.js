@@ -25,6 +25,10 @@ spawnRateManual = 0;
 currentManualLine = -1;
 spawnManualAmounts = [0, 2];
 spawnAmounts = [2, 3, 1] //first is enemy
+placeCurTimers=   [0, 12, 35, 100, 295, 880, 2635];
+placeMaxTimers=   [0, 12, 35, 100, 295, 880, 2635];
+placeAmounts=     [1,  1,  1,   1,   1,   1,    1];
+placeAmountsStart=[1,  1,  1,   1,   1,   1,    1];
 enemySpawnRate = 9;
 curBattles = [];
 storedLines = [];
@@ -40,6 +44,7 @@ highestLevelUnlocked = 1;
 updateTerritoryVisual()
 updateGoldVisual()
 updateProgressVisual()
+updatePlaceVisuals()
 function tick() {
 	totalTicks++;
 	if(stop)
@@ -48,10 +53,10 @@ function tick() {
 	checkForUnitAtEnds()
 	handleLineTimer()
 	checkForUnitCollisions()
-	handleEngaged()
 	redrawStoredLines()
 	if(timer % 2 == 0) {
 		handleSpawnRates()
+		handlePlaceChanges()
 		handleBattles()
 	}
 	
@@ -66,9 +71,24 @@ function tick() {
 }
 
 function halfSecond() {
+	
 }
 
-function handleEngaged() {
+function handlePlaceChanges() {
+	if(placeAmounts[0] < territory) {
+		for(x = 1; x < placeCurTimers.length; x++) {
+			placeCurTimers[x]-=.099999999999;
+	//console.log(placeCurTimers[x]+', '+x);
+			if(placeCurTimers[x] < 0) {
+				placeAmounts[x-1]+=placeAmounts[x]
+				placeCurTimers[x] = placeMaxTimers[x]
+			}
+		}
+	}
+	if(placeAmounts[0] > territory) {
+		placeAmounts[0] = territory;
+	}
+	updatePlaceVisuals()
 }
 
 function handleSpawnRates() {
@@ -331,6 +351,7 @@ function checkDoneLevel() {
 		updateTerritoryVisual()
 		unitsThroughOnRight = 0;
 		highestLevelUnlocked = level+1 > highestLevelUnlocked ? level+1 : highestLevelUnlocked;
+		startANewLevel()
 	}
 	updateProgressVisual()
 }
@@ -395,8 +416,16 @@ function removeDuplicates(a) {
 function initiate() {
 }
 
+function round3(num) {
+    return (Math.floor(num * 1000) / 1000).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
 function round2(num) {
     return (Math.floor(num * 100) / 100).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
+function round1(num) {
+    return (Math.floor(num * 10) / 10).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
 
 function round(num) {

@@ -270,7 +270,7 @@ margin-top:10px;
 .displayLeft {
 position:relative;
 float:left;
-margin-left:20px;
+margin-left:10px;
 border:1px solid;
 padding:4px;
 width:100px;
@@ -279,16 +279,22 @@ height:20px;
 .displayRight {
 position:relative;
 float:right;
-margin-right:20px;
+margin-right:10px;
 border:1px solid;
 padding:4px;
 width:100px;
 height:20px;
 }
+.unitUpgradeContainer {
+width:89%;
+margin-top:20px;
+background-color:rgb(255, 229, 161);
+padding:10px 0px;
+}
 .unitProgress {
 left:10px;
 top:6px;
-width:220px;
+width:120px;
 height:12px;
 background-color:gray;
 padding:4px 0px;
@@ -314,7 +320,28 @@ font-size:14px;
 .placeAmount {
 position:absolute;
 top:0px;
-left:215px;
+left:132px;
 font-size:21px;
 color:black;
+}
+.placeProgresInner {
+width:100%;
+position:absolute;
+height:12px;
+background-color:rgb(0, 255, 129);
+}
+.upArrow {
+    width: 15px;
+    height: 15px;
+	left:130px;
+	top:-10px;
+    border-top: 4px solid #94FFFB;
+    border-left: 4px solid rgba(32, 179, 0, 1);
+	position:absolute;
+
+    -webkit-transform: rotate(45deg);
+    -moz-transform: rotate(45deg);
+    -o-transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
+    transform: rotate(45deg);
 }
