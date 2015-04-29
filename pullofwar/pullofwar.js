@@ -6,6 +6,7 @@ globalId = 0;
 zIndex = 10000000000;
 exitLineRightTimer = 0;
 exitLineLeftTimer = 0;
+increaseLevelError = 0;
 
 //	addUnit("soldier", 1, "left", 30);
 //addUnit("soldier", 0, "right", 2);
@@ -35,6 +36,7 @@ storedLines = [];
 timer = 0;
 stop = 0;
 totalTicks = 0
+curClickedUnit = -1;
 
 level = 1;
 startANewLevel()
@@ -45,6 +47,7 @@ updateTerritoryVisual()
 updateGoldVisual()
 updateProgressVisual()
 updatePlaceVisuals()
+document.getElementById("mainColumn").style.display="inline-block";
 function tick() {
 	totalTicks++;
 	if(stop)
@@ -142,22 +145,28 @@ function moveUnits() {
 
 function checkForUnitAtEnds() {
 	triggerForDelete=[];
+	done = 0
 	for(y = 0; y < units.length; y++) {
 		for(x = 0; x < units[y].length ; x++) {
 			if(units[y][x].direction === "right" && units[y][x].pos > 93) { //unit made it to the right
 				unitsThroughOnRight+=units[y][x].unitCount;
 				exitLineRightTimer = 8
-				checkDoneLevel()
 				triggerForDelete.push(units[y][x])
+				checkDoneLevel()
+				done = 1
+				break;
 			}
 			else if(units[y][x].direction != "right" && units[y][x].pos < 5) { //enemy got through
 				unitsThroughOnLeft+=units[y][x].unitCount;
 				unitsThroughOnRight-=units[y][x].unitCount*10;
-				checkDoneLevel()
 				exitLineLeftTimer = 8
 				triggerForDelete.push(units[y][x])
+				checkDoneLevel()
+				done = 1
+				break;
 			}
 		}
+		if(done) break;
 	}
 	deleteUnitsInList(triggerForDelete)
 }
@@ -212,6 +221,8 @@ triggerForDelete=[];
 							//console.log('variables1: '+y+", "+x+", "+z+", "+w+", id:"+units[y][x].id+", "+units[y][x].unitCount)
 							document.getElementById("count"+units[y][x].id).innerHTML = units[y][x].unitCount
 							document.getElementById("healthBar"+units[y][x].id).style.width = (units[y][x].curHealth / units[y][x].health * 100) + "%";
+							if(units[z][w].id === curClickedUnit)
+								clickAUnit(units[y][x].id)
 							triggerForDelete.push(units[z][w])
 							//combine units into one
 						}
@@ -325,7 +336,8 @@ function disengageAll(unit) {
 
 function removeUnit(unit, shouldAdd) {
 	var elem = document.getElementById("unit"+unit.id);
-	elem.parentNode.removeChild(elem);
+	parent = elem.parentNode
+	parent.parentNode.removeChild(parent);
 	
 	for(g = 0; g < units.length; g++) {
 		for(h = units[g].length - 1; h >= 0; h--) {
@@ -335,14 +347,6 @@ function removeUnit(unit, shouldAdd) {
 			}
 		}
 	}
-	/*for(g = 0; g < units.length; g++) {
-		for(h = units[g].length - 1; h >= 0; h--) {
-			if(units[g][h].curHealth <= 0) {
-				console.log('removing2: ' + units[g][h].id + " on " + totalTicks)
-				units[g].splice(h, 1)
-			}
-		}
-	}*/
 }
 
 function checkDoneLevel() {
@@ -413,7 +417,14 @@ function removeDuplicates(a) {
     }
     return out;
 }
-function initiate() {
+
+function findUnitById(id) {
+	for(y = 0; y < units.length; y++) {
+		for(x = 0; x < units[y].length; x++) {
+			if(units[y][x].id == id)
+				return units[y][x]
+		}
+	}
 }
 
 function round3(num) {

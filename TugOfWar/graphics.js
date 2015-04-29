@@ -1,5 +1,5 @@
 function newUnitDiv(unit) {
-	commonBefore = "<div id='unit"+unit.id+"' class='unitContainer unitLine"+unit.line+"'>" +
+	commonBefore = "<div id='unit"+unit.id+"' class='unitContainer unitLine"+unit.line+"' style='z-index:"+(zIndex--)+"' onclick='clickAUnit("+unit.id+")'>" +
 			"<div class='healthBarOuter'><div class='healthBarInner' id='healthBar"+unit.id+"' style='z-index:"+(zIndex--)+"'></div></div>";
 	if(unit.direction === "right") {
 		different = "<div id='body' class='"+unit.type+" unit' style=''> </div>" + 
@@ -10,7 +10,9 @@ function newUnitDiv(unit) {
 			"<div id='body' class='"+unit.type+" unitLeft' style=''> </div>";
 	}
 	commonAfter = "<div id='count"+unit.id+"' class='count count"+unit.type+"'>"+unit.unitCount+"</div></div>";
-	document.getElementById('fightTime').innerHTML += commonBefore + different + commonAfter;
+	elem = document.createElement("div");
+	elem.innerHTML = commonBefore + different + commonAfter;
+	document.getElementById('fightTime').appendChild(elem)
 }
 
 function updateUnitPos(y, x) {
@@ -76,13 +78,19 @@ function handleLineTimer() {
 		exitLineLeftTimer--
 		document.getElementById("exitLineLeft").style.backgroundColor = "yellow";
 	}
+	if(increaseLevelError) {
+		increaseLevelError--
+		document.getElementById("increaseLevelError").style.display = "block";
+	} else {
+		document.getElementById("increaseLevelError").style.display = "none";
+		}
 }
 
-function clickedUnitStatus(type, direction) {
-	if(type == "soldier") {
+function updateClickedUnitStatus(unit) {
+	if(unit.type == "soldier") {
 		
 	}
-	if(type == "spear") {
+	if(unit.type == "spear") {
 		
 	}
 }

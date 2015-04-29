@@ -2,10 +2,13 @@ function changeManualLane(div) {
 	if(!div)
 		return
 	id = div.id.substring(10);
-	name = '#clickSpace' + currentManualLine
+	for(j = 0; j < 6; j++) {
+		document.getElementById('clickSpace' + j).innerHTML = "";
+	}
+	/*name = '#clickSpace' + currentManualLine
 	if($(name).find('div').first()) {
 		$(name).find('div').first().remove();
-	}
+	}*/
 	currentManualLine = parseInt(id);
 	document.getElementById('clickSpace' + currentManualLine).innerHTML = "<div style='width: 97%;height: 97%;border-radius: 50%;border-top: 0px solid transparent;border-bottom: 0px solid transparent;border-left: 56px solid rgba(168, 37, 168, 0.73);border-right: 0px solid green;'></div>"
 }
@@ -35,6 +38,8 @@ function increaseLevel() {
 		unitsThroughOnLeft = 0;
 		document.getElementById("level").innerHTML=level;
 		startANewLevel();
+	} else {
+		increaseLevelError = 40
 	}
 }
 
@@ -47,6 +52,36 @@ function decreaseLevel() {
 		document.getElementById("level").innerHTML=level;
 		startANewLevel();
 	}
+}
+
+function clickAUnit(id) {
+	prevDiv = document.getElementById("unit"+curClickedUnit);
+	if(prevDiv) {
+		prevDiv.style.border = "0px solid black";
+		prevDiv.style.marginTop = "0px";
+		prevDiv.style.marginLeft = "0px";
+		prevDiv.style.padding = "0px";
+	}
+
+	curClickedUnit = id;
+	if(id=="-1") return;
+	unit = findUnitById(id)
+	div = document.getElementById("unit"+id);
+	div.style.border = "1px solid black";
+	div.style.marginTop = "-1px";
+	div.style.marginLeft = "-3px";
+	div.style.padding = "0px 2px";
+	changeUnitScreen(unit)
+	//handleStatusScreen(unit)
+}
+
+function handleStatusScreen(unit) {
+	if(unit.type === "soldier" && unit.direction === "right") showSoldierScreen(unit);
+	if(unit.type === "soldier" && unit.direction != "right") showEnemySoldierScreen();
+	if(unit.type === "spear" && unit.direction === "right") showSpearScreen();
+	if(unit.type === "spear" && unit.direction != "right") showEnemySpearScreen();
+	
+	//put in updating the unit's values
 }
 
 function startANewLevel() {
@@ -67,6 +102,9 @@ function startANewLevel() {
 		$(name).find('div').first().remove();
 	}
 	currentManualLine = -1;
+	for(j = 0; j < 6; j++) {
+		document.getElementById('clickSpace' + j).innerHTML = "<div class='clickMe'>Click Me</div>";
+	}
 	spawnManualAmounts = [0, 2];
 	spawnAmounts = [1, 3, 1] //first is enemy
 	enemySpawnRate = 9;
@@ -75,6 +113,7 @@ function startANewLevel() {
 	timer = 0;
 	stop = 0;
 	totalTicks = 0
+	curClickedUnit = -1;
 	document.getElementById("level").innerHTML=level;
 	document.getElementById("territoryGain").innerHTML = level * 10;
 	updateProgressVisual()

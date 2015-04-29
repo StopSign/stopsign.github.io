@@ -1,5 +1,5 @@
 
-.buyButton, .upgradeButton {
+.upgradeButton {
     border:2px solid;
     border-radius:8px;
     width:90%;
@@ -9,15 +9,76 @@
     line-height:14px;
     cursor:pointer;
 }
+.buyButton {
+width:100%;
+padding:10px 0;
+height:50px;
+position:relative;
+}
+.buyName {
+font-size:16px;
+position:absolute;
+left:53px;
+top:27px;
+}
+.icon {
+position:absolute;
+left:8px;
+top:8px;
+width:40px;
+height:40px;
+border:1px solid;
+}
+.costBox {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+}
+.goldIcon {
+height: 20px;
+  width: 11px;
+  background-color: rgb(173, 161, 42);
+  border-radius: 50%;
+
+}
+.buyIncreaseAmount {
+  right: 6px;
+  top: 40px;
+  position: absolute;
+  color: black;
+}
+.buyVal {
+  left: 52px;
+  top: 4px;
+  position: absolute;
+  color: black;
+  font-size: 20px;
+}
 .buyCount {
     float:right;
     color:red;
     font-size:20px;
 }
-
+.buySpawnRate {
+display:block;
+width:90%;
+height:65px;
+margin-left:auto;
+margin-right:auto;
+margin-bottom:5px;
+position:relative;
+}
 .buttonContainer {
 	width:100%;
 	display:none;
+}
+.curUnitStatus {
+border:1px solid;
+height:100px;
+width:90%;
+margin-left:auto;
+margin-right:auto;
+position:relative;
 }
 
 div{
@@ -84,6 +145,7 @@ div {
 }
 .number {
     color:black;
+  vertical-align: top;
 }
 .buyColumn {
     width:420px;
@@ -91,6 +153,7 @@ div {
     height:556px;
 	border:1px solid;
 	margin-top:30px;
+	position:relative
 }
 .flavorText {
     font-style:italic;
@@ -114,10 +177,15 @@ display:none;
 }
 .unitContainer {
 width:40px;
-height:20px;
+height:50px;
 position:absolute;
 font-size:12px;
+cursor:pointer;
 }
+.unitContainer:not(.nohover):hover {
+background-color:yellow;
+}
+
 .unit {
 	width:20px;
 	height:20px;
@@ -338,6 +406,39 @@ background-color:rgb(0, 255, 129);
     border-top: 4px solid #94FFFB;
     border-left: 4px solid rgba(32, 179, 0, 1);
 	position:absolute;
+
+    -webkit-transform: rotate(45deg);
+    -moz-transform: rotate(45deg);
+    -o-transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
+    transform: rotate(45deg);
+}
+.clickMe {
+position:relative;
+top:2px;
+left:3px;
+color:blue;
+font-size:20px;
+border:2px solid blue;
+padding:0px 10px;
+}
+.backButton {
+position:absolute;
+top:10px;
+left:10px;
+width:45px;
+height:25px;
+border:3px solid black;
+cursor:pointer;
+}
+.backArrow {
+    width: 15px;
+    height: 15px;
+	left:03px;
+	top:2px;
+    border-bottom: 4px solid #6B0000;
+    border-left: 4px solid rgba(152, 0, 127, 1);
+	position:relative;
 
     -webkit-transform: rotate(45deg);
     -moz-transform: rotate(45deg);

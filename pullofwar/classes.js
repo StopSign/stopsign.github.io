@@ -15,6 +15,9 @@ function Unit (line, pos, type, direction, health, armor, damage, damageRange, u
 	this.goldWorth = goldWorth;
 	this.attackCooldown = attackCooldown;
 	this.attackCounter = attackCooldown;
+	this.totalDamageDone = 0;
+	this.kills = 0;
+	this.timeAlive = 0;
 	if(type == "soldier") {
 		this.speed = 1
 		if(direction != "right") {
