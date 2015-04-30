@@ -192,7 +192,7 @@ position:absolute;
 font-size:12px;
 cursor:pointer;
 }
-.unitContainer:not(.nohover):hover, {
+.unitContainer:not(.nohover):hover {
 background-color:yellow;
 }
 
