@@ -101,10 +101,6 @@ function startANewLevel() {
 	soldierSpawnRate = 4;
 	spearSpawnRate = .5;
 	spawnRateManual = 0;
-	name = "#clickSpace"+currentManualLine
-	if($(name).find('div').first()) {
-		$(name).find('div').first().remove();
-	}
 	for(j = 0; j < spawnRate.length; j++) {
 		spawnRate[j] = initialSpawnRate[j]
 		spawnAmounts[j+1]=initialSpawnAmounts[j]
@@ -120,7 +116,7 @@ function startANewLevel() {
 	document.getElementById("territoryGain").innerHTML = level * 10;
 	updateProgressVisual()
 	spawnAmounts[0] = level;
-	if(currentManualLine = -1) {
+	if(currentManualLine == -1) {
 		for(j = 0; j < 6; j++) {
 			document.getElementById('clickSpace' + j).innerHTML = "<div class='clickMe'>Click Me</div>";
 		}
