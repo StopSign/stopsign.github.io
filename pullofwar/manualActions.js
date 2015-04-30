@@ -37,6 +37,7 @@ function increaseLevel() {
 		unitsThroughOnRight = 0;
 		unitsThroughOnLeft = 0;
 		document.getElementById("level").innerHTML=level;
+		currentManualLine = -1;
 		startANewLevel();
 	} else {
 		increaseLevelError = 40
@@ -49,7 +50,10 @@ function decreaseLevel() {
 		level = 1;
 	}
 	else {
+		unitsThroughOnRight = 0;
+		unitsThroughOnLeft = 0;
 		document.getElementById("level").innerHTML=level;
+		currentManualLine = -1;
 		startANewLevel();
 	}
 }
@@ -101,12 +105,10 @@ function startANewLevel() {
 	if($(name).find('div').first()) {
 		$(name).find('div').first().remove();
 	}
-	currentManualLine = -1;
-	for(j = 0; j < 6; j++) {
-		document.getElementById('clickSpace' + j).innerHTML = "<div class='clickMe'>Click Me</div>";
+	for(j = 0; j < spawnRate.length; j++) {
+		spawnRate[j] = initialSpawnRate[j]
+		spawnAmounts[j+1]=initialSpawnAmounts[j]
 	}
-	spawnManualAmounts = [0, 2];
-	spawnAmounts = [1, 3, 1] //first is enemy
 	enemySpawnRate = 9;
 	curBattles = [];
 	storedLines = [];
@@ -118,6 +120,9 @@ function startANewLevel() {
 	document.getElementById("territoryGain").innerHTML = level * 10;
 	updateProgressVisual()
 	spawnAmounts[0] = level;
+	for(j = 0; j < 6; j++) {
+		document.getElementById('clickSpace' + j).innerHTML = "<div class='clickMe'>Click Me</div>";
+	}
 	for(j = 0; j < linesEnabled; j++) {
 		addUnit("soldier", j, "left", spawnAmounts[0]);
 	}

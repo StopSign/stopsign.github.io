@@ -132,10 +132,10 @@ function changeUnitScreen(unit) {
 	
 		finish = "</div><div class='buySpawnRate'>"+
 			"<div class='icon'></div>"+
-			"<div class='costBox'><div class='goldIcon'></div><div id='costSoldierUp0' class='number'>400</div></div>"+
+			"<div class='costBox'><div class='goldIcon'></div><div id='cost"+type+"Up0' class='number'>400</div></div>"+
 			"<div class='buyName'>Spawn Rate</div>"+
-			"<div class='buyIncreaseAmount' id='soldierIncrease0'>10% faster</div>"+
-			"<div class='buyVal' id='soldierBuy0'>3</div>"+
+			"<div class='buyIncreaseAmount' id='"+type+"Increase0'>10% faster</div>"+
+			"<div class='buyVal' id='"+type+"Buy0'></div>"+
 		"</div></div>"
 	}
 	
@@ -145,6 +145,19 @@ function changeUnitScreen(unit) {
 	document.getElementById("unitScreen").innerHTML = commonStart+different1+commonAfter+different2+next+button1+button2+button3+next2+button4+button5+finish;
 	document.getElementById("unitScreen").style.display="block"
 	document.getElementById("defaultScreen").style.display="none"
+	updateSpawnRate2(type, direction)
+}
+
+
+function updateSpawnRate2(type, direction) {
+	if(type == "soldier" && direction == "right") document.getElementById("soldierBuy0").innerHTML = round2(spawnRate[0]) + " x " + spawnAmounts[1]
+	if(type == "spear" && direction == "right") document.getElementById("spearBuy0").innerHTML = round2(spawnRate[1]) + " x " + spawnAmounts[2]
+	spawnAmounts
+}
+
+function updateSpawnRate() {
+	if(document.getElementById("soldierBuy0")) document.getElementById("soldierBuy0").innerHTML = round2(spawnRate[0]) + " x " + spawnAmounts[1]
+	if(document.getElementById("spearBuy0")) document.getElementById("spearBuy0").innerHTML = round2(spawnRate[1]) + " x " + spawnAmounts[2]
 }
 
 function addButton(type, direction, name, num) {

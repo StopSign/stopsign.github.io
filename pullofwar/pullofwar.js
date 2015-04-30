@@ -24,12 +24,19 @@ soldierSpawnRate = 4;
 spearSpawnRate = .5;
 spawnRateManual = 0;
 currentManualLine = -1;
-spawnManualAmounts = [0, 2];
-spawnAmounts = [2, 3, 1] //first is enemy
-placeCurTimers=   [0, 12, 35, 100, 295, 880, 2635];
+for(j = 0; j < 6; j++) {
+	document.getElementById('clickSpace' + j).innerHTML = "<div class='clickMe'>Click Me</div>";
+}
+placeCurTimers=   [0,  3, 35, 100, 295, 880, 2635];
 placeMaxTimers=   [0, 12, 35, 100, 295, 880, 2635];
 placeAmounts=     [1,  1,  1,   1,   1,   1,    1];
 placeAmountsStart=[1,  1,  1,   1,   1,   1,    1];
+
+spawnRate=          [9, 10];
+initialSpawnRate=   [9, 10];
+spawnManualAmounts =[0,  2];
+spawnAmounts =  [-1, 1,  1] //first is enemy
+initialSpawnAmounts=[1,  1];
 enemySpawnRate = 9;
 curBattles = [];
 storedLines = [];
@@ -77,14 +84,28 @@ function halfSecond() {
 	
 }
 
+clockTimer = .099999999999
 function handlePlaceChanges() {
 	if(placeAmounts[0] < territory) {
 		for(x = 1; x < placeCurTimers.length; x++) {
-			placeCurTimers[x]-=.099999999999;
+			placeCurTimers[x]-=clockTimer
 	//console.log(placeCurTimers[x]+', '+x);
 			if(placeCurTimers[x] < 0) {
+				temp = placeAmounts[0]
 				placeAmounts[x-1]+=placeAmounts[x]
 				placeCurTimers[x] = placeMaxTimers[x]
+				if(x = 1) {
+					for(z = 0; z < placeAmounts[1]; z++) {
+						for(h = 0; h < spawnRate.length; h++) {
+							spawnRate[h] *= (1-(1/(20+placeAmounts[0]*3)))  //SPAWN RATE FORMULA
+							if(spawnRate[h]*2 < initialSpawnRate[h]) {
+								spawnAmounts[h+1]*=2;
+								spawnRate[h]*=2;
+							}
+						}
+					}
+					updateSpawnRate()
+				}
 			}
 		}
 	}
@@ -101,13 +122,13 @@ function handleSpawnRates() {
 	if(soldierSpawnRate <= 0) {
 		j = Math.floor(Math.random() * linesEnabled)
 		addUnit("soldier", j, "right", spawnAmounts[1]);
-		soldierSpawnRate = 5;
+		soldierSpawnRate = spawnRate[0];
 	}
 	spearSpawnRate -= rateReduction;
 	if(spearSpawnRate <= 0) {
 		j = Math.floor(Math.random() * linesEnabled)
 		addUnit("spear", j, "right", spawnAmounts[2]);
-		spearSpawnRate = 8;
+		spearSpawnRate = spawnRate[1];
 	}
 	enemySpawnRate -= rateReduction;
 	if(enemySpawnRate <= 0) {
