@@ -1,11 +1,6 @@
-function Unit (line, pos, type, direction, health, armor, damage, damageRange, unitCount, attackCooldown, goldWorth, h, g) {
+function Unit (line, pos, type, direction, unitCount, goldWorth) {
     this.type = type;
     this.pos = pos;
-	this.health = health;
-	this.curHealth = health;
-	this.armor = armor;
-	this.damage = damage;
-	this.damageRange = damageRange;
 	this.direction=direction;
 	this.shouldMove = 1;
 	this.id = globalId++;
@@ -13,30 +8,18 @@ function Unit (line, pos, type, direction, health, armor, damage, damageRange, u
 	this.line = line;
 	this.unitCount = unitCount;
 	this.goldWorth = goldWorth;
-	this.attackCooldown = attackCooldown;
-	this.attackCounter = attackCooldown;
 	this.totalDamageDone = 0;
 	this.kills = 0;
-	this.timeAlive = 0;
-	if(type == "soldier") {
-		this.speed = 1
-		if(direction != "right") {
-			this.speed = .1
-		}
-	}
-	else if(type == "spear") {
-		this.speed = .6
-		if(direction != "right") {
-			this.speed = .1
-		}
-	}
-	
+	this.timeAlive = totalTicks;
+	this.typeNum = convertTypeToNum(type, direction)
+	this.attackCounter = unitValues[this.typeNum][1]
+	this.curHealth = unitValues[this.typeNum][3]
 	this.takeDamage = function(dmg) {
-		unitsDead = Math.floor(dmg / this.health);
-		dmg = dmg % this.health;
+		unitsDead = Math.floor(dmg / unitValues[this.typeNum][3]);
+		dmg = dmg % unitValues[this.typeNum][3];
 		this.curHealth -= dmg
 		if(this.curHealth <= 0) {
-			this.curHealth = this.health + this.curHealth
+			this.curHealth = unitValues[this.typeNum][3] + this.curHealth
 			unitsDead++;
 		}
 		this.unitCount -= unitsDead;
@@ -47,8 +30,10 @@ function Unit (line, pos, type, direction, health, armor, damage, damageRange, u
 				//addUnit("soldier", this.line, this.direction, unitsDead);
 			}
 		}
-		if(this.unitCount <= 0)
+		if(this.unitCount <= 0) {
 			this.curHealth = -10
+			this.unitCount = 0;
+		}
 	}
 	
     this.getDamageRoll = function() {
@@ -56,8 +41,10 @@ function Unit (line, pos, type, direction, health, armor, damage, damageRange, u
 			this.attackCounter--;
 			return 0;
 		}
-		this.attackCounter = this.attackCooldown;
-		return (this.damage + Math.random() * this.damageRange)*this.unitCount;
+		dmg = unitValues[this.typeNum][0]*this.unitCount;
+		this.totalDamageDone+=dmg
+		this.attackCounter = unitValues[this.typeNum][1]
+		return dmg
     };
 	
 	this.equals = function(unit) {

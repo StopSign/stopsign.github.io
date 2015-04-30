@@ -120,8 +120,10 @@ function startANewLevel() {
 	document.getElementById("territoryGain").innerHTML = level * 10;
 	updateProgressVisual()
 	spawnAmounts[0] = level;
-	for(j = 0; j < 6; j++) {
-		document.getElementById('clickSpace' + j).innerHTML = "<div class='clickMe'>Click Me</div>";
+	if(currentManualLine = -1) {
+		for(j = 0; j < 6; j++) {
+			document.getElementById('clickSpace' + j).innerHTML = "<div class='clickMe'>Click Me</div>";
+		}
 	}
 	for(j = 0; j < linesEnabled; j++) {
 		addUnit("soldier", j, "left", spawnAmounts[0]);

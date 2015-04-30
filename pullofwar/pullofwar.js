@@ -46,6 +46,11 @@ totalTicks = 0
 curClickedUnit = -1;
 
 level = 1;
+unitValues = [[1, 1, 1, 50, 0], [1, 3, .1, 150, 0], [7, 15, .6, 4, 0], [50, 20, .06, 30, 0]]
+unitCosts =          [50, 0, 80, 0];
+upgradePointsAvailable=[ 0, 0,  0, 0];
+upgradePointsInitial=  [ 0, 0,  0, 0];
+unitPointValues=[[0, 0, 0, 0, 0],[],[0, 0, 0, 0, 0],[]]
 startANewLevel()
 gold = 0;
 territory = 10;
@@ -78,6 +83,9 @@ function tick() {
 		halfSecond()
 		timer = 0;
 	}
+	unit = findUnitById(curClickedUnit)
+	if(unit)
+		updateStatusUpgrades(unit, unit.type, unit.direction)
 }
 
 function halfSecond() {
@@ -152,12 +160,7 @@ function moveUnits() {
 	for(y = 0; y < units.length; y++) {
 		for(x = 0; x < units[y].length; x++) {
 			if(units[y][x].engaged.length === 0) {
-				if(units[y][x].direction == "right") {
-					units[y][x].pos += units[y][x].speed;
-				}
-				else {
-					units[y][x].pos -= units[y][x].speed;
-				}
+				units[y][x].pos += unitValues[units[y][x].typeNum][2] * (units[y][x].direction != "right" ? -1 : 1);
 			}
 			updateUnitPos(y, x)
 		}
@@ -180,16 +183,25 @@ function checkForUnitAtEnds() {
 			else if(units[y][x].direction != "right" && units[y][x].pos < 5) { //enemy got through
 				unitsThroughOnLeft+=units[y][x].unitCount;
 				unitsThroughOnRight-=units[y][x].unitCount*10;
+				done = 1
+				if(unitsThroughOnRight < -200) {
+					done = 2
+				}
 				exitLineLeftTimer = 8
 				triggerForDelete.push(units[y][x])
 				checkDoneLevel()
-				done = 1
 				break;
 			}
 		}
 		if(done) break;
 	}
+	if(done == 2) {
+		startANewLevel()
+		updateProgressVisual()
+	}
+	else {
 	deleteUnitsInList(triggerForDelete)
+	}
 }
 
 function checkForUnitCollisions() {
@@ -241,9 +253,10 @@ triggerForDelete=[];
 							units[y][x].unitCount+=units[z][w].unitCount;
 							//console.log('variables1: '+y+", "+x+", "+z+", "+w+", id:"+units[y][x].id+", "+units[y][x].unitCount)
 							document.getElementById("count"+units[y][x].id).innerHTML = units[y][x].unitCount
-							document.getElementById("healthBar"+units[y][x].id).style.width = (units[y][x].curHealth / units[y][x].health * 100) + "%";
-							if(units[z][w].id === curClickedUnit)
+							document.getElementById("healthBar"+units[y][x].id).style.width = (units[y][x].curHealth / unitValues[units[y][x].typeNum][3] * 100) + "%";
+							if(units[z][w].id === curClickedUnit) {
 								clickAUnit(units[y][x].id)
+							}
 							triggerForDelete.push(units[z][w])
 							//combine units into one
 						}
@@ -321,7 +334,9 @@ function handleBattles() {
 				if(units[y][x].type == "spear" && units[y][x].attackCounter === 3) {
 					drawSpearLine(units[y][x], engageTarget);
 				}
+				count = engageTarget.unitCount
 				engageTarget.takeDamage(units[y][x].getDamageRoll())
+				units[y][x].kills = count - engageTarget.unitCount;
 				//console.log(engageTarget.id)
 				document.getElementById("count"+engageTarget.id).innerHTML = engageTarget.unitCount
 				//console.log(units[y][x].id + " attacking "+engageTarget.id + " on " + totalTicks)
@@ -334,7 +349,7 @@ function handleBattles() {
 					removeUnit(engageTarget, engageTarget.direction!="right")
 				}
 				else {
-					document.getElementById("healthBar"+engageTarget.id).style.width = (engageTarget.curHealth / engageTarget.health * 100) + "%";
+					document.getElementById("healthBar"+engageTarget.id).style.width = (engageTarget.curHealth / unitValues[engageTarget.typeNum][3] * 100) + "%";
 				}
 				//console.log("x:"+x)
 			}
@@ -381,6 +396,15 @@ function checkDoneLevel() {
 	updateProgressVisual()
 }
 
+function resetUpgradePoints(type) {
+	typeNum = convertTypeToNum(type, "right")
+	upgradePointsAvailable[typeNum] = upgradePointsInitial[typeNum]
+	for(m = 1; m < unitPointValues[typeNum].length; m++) {
+		if(document.getElementById("points"+m))
+			document.getElementById("points"+m).innerHTML = unitPointValues[typeNum][m]
+	}
+}
+
 function addUnit(type, line, direction, unitCount) {
 	if(unitCount <= 0) {
 		return
@@ -388,36 +412,17 @@ function addUnit(type, line, direction, unitCount) {
 	if(direction == "right") {
 		pos = 0
 		goldWorth = 0
-		if(type == "soldier") {
-			health = 50
-			damage = 1
-			damageRange = 0
-			attackCooldown = 1
-		}
-		if(type == "spear") {
-			health = 4
-			damage = 7
-			damageRange = 0
-			attackCooldown = 15
-		}
 	}
 	else {
 		pos = 100
 		if(type == "soldier") {
-			health = 150
-			damage = 1
-			damageRange = 0
-			attackCooldown = 3
 			goldWorth = level;
 		}
 		if(type == "spear") {
-			health = 20
-			damage = 50
-			damageRange = 0
-			attackCooldown = 4
+			goldWorth = level * 2
 		}
 	}
-	theNewUnit = new Unit(line, pos, type, direction, health, 0, damage, damageRange, unitCount, attackCooldown, goldWorth, line, units.length);
+	theNewUnit = new Unit(line, pos, type, direction, unitCount, goldWorth);
 	units[line].push(theNewUnit);
 	//console.log("just added"+(globalId - 1))
 	newUnitDiv(theNewUnit)
