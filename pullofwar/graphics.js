@@ -187,7 +187,7 @@ function updateStatusUpgrades(unit, type, direction) {
 	if(direction == "right") document.getElementById("cost").innerHTML=unitCosts[typeNum];
 	if(direction == "right") document.getElementById("buy").innerHTML=upgradePointsAvailable[typeNum]
 	for(e = 1; e < unitValues[typeNum].length; e++) {
-		document.getElementById("buy"+e).innerHTML=unitValues[typeNum][e]
+		document.getElementById("buy"+e).innerHTML=unitValues[typeNum][e-1]
 	}
 }
 
