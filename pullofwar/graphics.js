@@ -17,7 +17,7 @@ function newUnitDiv(unit) {
 
 function updateUnitPos(y, x) {
 	if(units[y][x] == null)
-	console.log("updating null unit "y+", "+x);
+	console.log("updating null unit "+y+", "+x);
 	if(document.getElementById("unit"+units[y][x].id) == null)
 	console.log("sadf" +units[y][x].id);
 	document.getElementById("unit"+units[y][x].id).style.left = (units[y][x].pos +7)*11.9 + "px"; 
