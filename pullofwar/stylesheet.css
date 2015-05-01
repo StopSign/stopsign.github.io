@@ -1,4 +1,19 @@
-
+.message {
+background-color:rgba(255, 255, 255, 0.65);
+padding:15px;
+max-width:400px;
+position:relative;
+font-size:28px;
+font-weight:900;
+}
+.OKButton {
+padding:15px;
+font-size:20px;
+font-weight:900;
+position:relative;
+background-color:rgb(255, 95, 95);
+cursor:pointer;
+}
 .upgradeButton {
     border:2px solid;
     border-radius:8px;
@@ -83,6 +98,7 @@ margin-left:auto;
 margin-right:auto;
 margin-bottom:5px;
 position:relative;
+background-color:rgb(255, 237, 190);
 }
 .buttonContainer {
 	width:100%;

@@ -1,9 +1,20 @@
 
-setInterval(function() {
+/*setInterval(function() {
 	tick();
-},50);
+},50);*/
+
+
+//uncomment this before checkin
+var doWork = new Worker('interval.js');
+doWork.onmessage = function(event) {
+    if ( event.data === 'interval.start' ) {
+		tick();
+    }
+};
+doWork.postMessage({start:true,ms:50});
+
 globalId = 0;
-zIndex = 10000000000;
+zIndex = 1000000000;
 exitLineRightTimer = 0;
 exitLineLeftTimer = 0;
 increaseLevelError = 0;
@@ -16,9 +27,8 @@ increaseLevelError = 0;
 //addUnit("soldier", 0, "right");
 //addUnit("soldier", 0, "right");
 
-unitsThroughOnRight = 0;
+/*unitsThroughOnRight = 0;
 unitsThroughOnLeft = 0;
-units = [[],[],[],[],[],[]];
 linesEnabled = 6;
 soldierSpawnRate = 4;
 spearSpawnRate = .5;
@@ -28,41 +38,19 @@ for(j = 0; j < 6; j++) {
 	document.getElementById('clickSpace' + j).innerHTML = "<div class='clickMe'>Click Me</div>";
 }
 placeCurTimers=   [0,  3, 35, 100, 295, 880, 2635];
-placeMaxTimers=   [0, 12, 35, 100, 295, 880, 2635];
 placeAmounts=     [1,  1,  1,   1,   1,   1,    1];
-placeAmountsStart=[1,  1,  1,   1,   1,   1,    1];
 
 spawnRate=          [9, 10];
-initialSpawnRate=   [9, 10];
-initialSpawnRateInitial=[9, 10];
-spawnManualAmounts =[0,  2];
 spawnAmounts =  [-1, 1,  1] //first is enemy
-initialSpawnAmounts=[1,  1];
 enemySpawnRate = 9;
 curBattles = [];
 storedLines = [];
 timer = 0;
 stop = 0;
-totalTicks = 0
-curClickedUnit = -1;
+curClickedUnit = -1;*/
 
-level = 1;
-unitValues =       [[1, 1, .6, 50, 0], [1, 3, .06, 150, 0], [7, 15, .4, 4, 0], [50, 20, .04, 30, 0]]
-unitValuesInitial =[[1, 1, 1, 50, 0], [], [7, 15, .6, 4, 0], []]
-costSpawnRate =        [20, 0, 800, 0];
-unitCosts =            [5, 0, 80, 0];
-upgradePointsAvailable=[0, 0,  0, 0];
-upgradePointsInitial=  [0, 0,  0, 0];
-unitPointValues=[[0, 0, 0, 0, 0],[],[0, 0, 0, 0, 0],[]]
-startANewLevel()
-gold = 0;
-territory = 10;
-highestLevelUnlocked = 1;
-updateTerritoryVisual()
-updateGoldVisual()
-updateProgressVisual()
-updatePlaceVisuals()
-document.getElementById("mainColumn").style.display="inline-block";
+totalTicks = 0
+startTutorial()
 function tick() {
 	totalTicks++;
 	if(stop)
@@ -92,7 +80,7 @@ function tick() {
 }
 
 function halfSecond() {
-	
+	saveIntoStorage()
 }
 
 clockTimer = .099999999999

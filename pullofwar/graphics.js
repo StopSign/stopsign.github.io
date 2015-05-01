@@ -17,7 +17,7 @@ function newUnitDiv(unit) {
 
 function updateUnitPos(y, x) {
 	if(units[y][x] == null)
-	console.log(y+", "+x);
+	console.log("updating null unit "y+", "+x);
 	if(document.getElementById("unit"+units[y][x].id) == null)
 	console.log("sadf" +units[y][x].id);
 	document.getElementById("unit"+units[y][x].id).style.left = (units[y][x].pos +7)*11.9 + "px"; 
@@ -64,10 +64,12 @@ function updateProgressVisual() {
 	}
 	document.getElementById("compete1").style.width = toModify / scoreNeededForLevel * 100 + "%";
 	document.getElementById("compete2").style.width = (1-toModify / scoreNeededForLevel) * 100 + "%";
-	document.getElementById("score").innerHTML = Math.ceil(unitsThroughOnRight / scoreNeededForLevel * 100)
+	document.getElementById("score").innerHTML = Math.ceil(unitsThroughOnRight / scoreNeededForLevel * 100)+"%"
 }
 
 function showUnitsScreen() {
+	if(buttonsToClick)
+		return
 	clickAUnit("-1")
 	document.getElementById("defaultScreen").style.display="block"
 	document.getElementById("unitScreen").innerHTML = ""
@@ -139,7 +141,7 @@ function changeUnitScreen(unit) {
 	
 	if(direction == "right") {
 	
-		finish = "</div><div class='buySpawnRate' onclick='clickBuySpawnRate(\""+type+"\")'>"+
+		finish = "</div><div id='spawnRateContainer' class='buySpawnRate' onclick='clickBuySpawnRate(\""+type+"\")'>"+
 			"<div class='icon'></div>"+
 			"<div class='costBox'><div class='goldIcon'></div><div id='costSpawn' class='number'>400</div></div>"+
 			"<div class='buyName'>Spawn Rate</div>"+
@@ -153,6 +155,9 @@ function changeUnitScreen(unit) {
 	document.getElementById("defaultScreen").style.display="none"
 	updateSpawnRate2(type, direction)
 	updateStatusUpgrades(unit, type, direction)
+	if(buttonsToClick) {
+		clickedOKButton()
+	}
 }
 
 
@@ -261,6 +266,7 @@ function redrawStoredLines(){
 		ctx.stroke();
 	}
 }
+
 
 var c = document.getElementById("damageLines");
 var ctx = c.getContext("2d");

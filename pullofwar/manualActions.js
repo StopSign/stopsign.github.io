@@ -139,14 +139,17 @@ function startANewLevel() {
 			removeUnit(units[y][x], false);
 		}
 	}
+	units = [[],[],[],[],[],[]];
 	unitsThroughOnRight = 0;
 	unitsThroughOnLeft = 0;
-	units = [[],[],[],[],[],[]];
 	linesEnabled = 6;
 	soldierSpawnRate = 4;
 	spearSpawnRate = .5;
 	spawnRateManual = 0;
-	for(j = 0; j < spawnRate.length; j++) {
+	spawnRate=[];
+	spawnAmounts=[]
+	spawnAmounts[0] = level;
+	for(j = 0; j < initialSpawnAmounts.length; j++) {
 		spawnRate[j] = initialSpawnRate[j]
 		spawnAmounts[j+1]=initialSpawnAmounts[j]
 	}
@@ -162,7 +165,6 @@ function startANewLevel() {
 	unitValues[1] = [level, 3, .06, 150+level*level, 0]
 	unitValues[3] = [50, 20, .04, 30, 0]
 	updateProgressVisual()
-	spawnAmounts[0] = level;
 	if(currentManualLine == -1) {
 		for(j = 0; j < 6; j++) {
 			document.getElementById('clickSpace' + j).innerHTML = "<div class='clickMe'>Click Me</div>";
@@ -171,7 +173,9 @@ function startANewLevel() {
 	for(j = 0; j < linesEnabled; j++) {
 		addUnit("soldier", j, "left", spawnAmounts[0]);
 	}
-	for(j = 0; j < placeCurTimers.length; j++) {
+	placeCurTimers=[]
+	placeAmounts=[]
+	for(j = 0; j < placeMaxTimers.length; j++) {
 		placeCurTimers[j]=placeMaxTimers[j]
 		placeAmounts[j]=placeAmountsStart[j]
 	}

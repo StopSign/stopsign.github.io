@@ -8,21 +8,20 @@
 </head>
 <body>
 
-
+<div id='greyBox' style='background-color:rgba(87, 70, 70, 0.79);position:absolute;height:1255px;width:100%;z-index:9999999999998;display:none;'></div>
 <div style="height:100%;font-family:Arial, Helvetica, serif;color:#666;display:block;font-weight:800;">
 <div id="mainColumn" style="width:100%;margin-left:20px;display:none;">
 <div style="text-align:right;width:100%"><div id="mainTitle" style="font-size:40px;margin:10px;margin-right:15%;">Pull of War v.4</div></div>
 <div id='mainBox' style='border:3px solid;padding:20px;height:1110px;text-align:left;width:1400px;'>
-<div id='displaySpace' style="width:100%;text-align:center;border: 2px solid; height:100px;background-color:rgb(247, 230, 220);"> 
-<div class='displayCase'></div>
-<div id='score' class='number' style='font-size:18px'></div>%
-<div style='width:450px;height:20px;margin-top:2px;background-color:grey;display:block;margin-left:auto;margin-right:auto;padding:5px 10px;'>
+<div id='displaySpace' style="width:100%;text-align:center;border: 2px solid; height:100px;background-color:rgb(247, 230, 220);position:relative"> 
+<div id='score' class='number' style='font-size:18px;position:absolute;left:700px;top:3px;height:24px;width:31px;background-color:rgb(247, 230, 220);'></div>
+<div id='mainProgressBar' style='position:absolute;width:450px;height:20px;margin-top:2px;background-color:grey;display:block;left:476px;padding:5px 10px;top:28px;'>
 	<div id='compete1' style='width:50%;background-color:rgb(0, 61, 0);float:left' class='progressBar'></div><div id='compete2' style='width:50%;border-top-left-radius:25px;border-bottom-left-radius:25px;background-color:rgb(255, 13, 13);float:right;' class='progressBar'></div>
 </div>
-<div style='top:167px;left:697px;' class='statusLabel'>Level <div id='level' class='bigNumber'></div></div>
-<div style='top:115px;left:168px;' class='statusLabel'>Gold: <div class='goldIcon'></div><div id='gold' class='bigNumber' style=''></div></div>
-<div style='top:156px;left:168px;' class='statusLabel'>Territory: <div id='territory' class='bigNumber'></div></div>
-<div style='top:137px;left:998px;font-size:18px;' class='statusLabel'>Gain <div id='territoryGain' class='number' style='font-size:20px;'>10</div> territory at 100%</div>
+<div style='top:59px;left:658px' class='statusLabel'>Level <div id='level' class='bigNumber'></div></div>
+<div style='top:4px;left:96px;' class='statusLabel'>Gold: <div class='goldIcon'></div><div id='gold' class='bigNumber' style=''></div></div>
+<div id='territoryContainer' style='top:48px;left:96px;background-color:rgb(247, 230, 220);' class='statusLabel'>Territory: <div id='territory' class='bigNumber'></div></div>
+<div id='territoryGainContainer' style='background-color:rgb(247, 230, 220);top:32px;left:950px;font-size:18px;position:absolute;' class='statusLabel'>Gain <div id='territoryGain' class='number' style='font-size:20px;'>10</div> territory at 100%</div>
 </div>
 <div id='actionSpace' style="width:100%;vertical-align:top;text-align:left;border:2px solid;height:400px;background-color:rgb(223, 255, 221);position:relative;font-size:12px;">
 	<div id="fightTime" style="width:100%;position:absolute;"></div>
@@ -61,7 +60,7 @@
 	</div>
 	<div id='exitLineLeft' class='exitLine' style="margin-left:140px;"></div>
 	<div id='exitLineRight' class='exitLine' style="margin-left:1226px;"></div>
-	<div class='mouseOverArea' style='left:-23px;' onmouseover='showLeftArrow()' onmouseout='hideLeftArrow()'></div>
+	<div  class='mouseOverArea' style='left:-23px;' onmouseover='showLeftArrow()' onmouseout='hideLeftArrow()'></div>
 	<div id='leftArrow' class='arrow' style='cursor:zoom-out;' onmouseover='showLeftArrow()' onmouseout='hideLeftArrow()' onclick='decreaseLevel()'>
 			<div class='innerArrow' style='border-right:20px solid rgb(68, 68, 68);'></div>
 	</div>
@@ -92,29 +91,30 @@
 
 <div style='width:2%;display:inline-block;'></div>
 <div id='leftSpace' class="buyColumn" >
+TODO: talent points or spells or something
 </div>
 <div style='width:2%;display:inline-block;'></div>
 <div id='middleSpace' class="buyColumn" style='background-color:rgb(255, 237, 190);' >
 	<div id='defaultScreen' class='unitScreen' style='display:inline-block;'>
 		Units<br>
 		<div class='unitUpgradeContainer' style='margin-top:30px;'>
-			<div id='unit' class='unitContainer displayLeft' onclick='changeUnitScreen("soldier")'>
+			<div id='unitContainer0' class='unitContainer displayLeft' onclick='changeUnitScreen("soldier")' style='background-color:rgb(255, 229, 161);'>
 				<div id='body' class='soldier unit' style=''> </div>
 				<div id='unitWeapon' class='weapon'><div class='weaponsoldier'></div> </div>
 			</div>
 			Soldier
-			<div id='unit' class='unitContainer displayRight' onclick='changeUnitScreen("enemySoldier")'>
+			<div id='unitContainer1' class='unitContainer displayRight' onclick='changeUnitScreen("enemySoldier")'>
 				<div id='unitWeapon' class='weapon'><div class='weaponsoldier'></div> </div>
 				<div id='body' class='soldier unitLeft' style=''> </div>
 			</div>
 		</div>
 		<div class='unitUpgradeContainer' >
-			<div id='unit' class='unitContainer displayLeft' onclick='changeUnitScreen("spear")'>
+			<div id='unitContainer2' class='unitContainer displayLeft' onclick='changeUnitScreen("spear")'>
 				<div id='body' class='spear unit' style=''> </div>
 				<div id='unitWeapon' class='weapon'><div class='weaponspear'></div> </div>
 			</div>
 			Spearman
-			<div id='unit' class='unitContainer displayRight' onclick='changeUnitScreen("enemySpear")'>
+			<div id='unitContainer3' class='unitContainer displayRight' onclick='changeUnitScreen("enemySpear")'>
 				<div id='unitWeapon' class='weapon'><div class='weaponspear'></div> </div>
 				<div id='body' class='spear unitLeft' style=''> </div>
 			</div>
@@ -124,7 +124,7 @@
 </div>
 
 <div style='width:2%;display:inline-block;'></div>
-<div id='rightSpace' class="buyColumn">
+<div id='rightSpace' class="buyColumn" style="background-color:white;">
 <div class='spawnContainer' style='margin-top:15px;'>
 	<div id='progress0' class='unitProgress'><div id='placeProgressInner0' class='placeProgresInner'></div></div>
 	<div class='spawnLabel'>Families</div>
@@ -180,6 +180,7 @@
 </body>
       <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
       <script src="https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+<script src="tutorial.js"></script>
 <script src="graphics.js"></script>
 <script src="classes.js"></script>
 <script src="manualActions.js"></script>
