@@ -63,6 +63,9 @@ function loadFromStorage() {
     if(localStorage.allVariables101) {
         expandedCookie = (','+localStorage.allVariables101).split(',');
         x = 1;
+		gold = parseFloat((','+localStorage.allVariables101).split(',')[69])
+		territory = parseFloat((','+localStorage.allVariables101).split(',')[70])
+		highestLevelUnlocked = parseFloat((','+localStorage.allVariables101).split(',')[71])
 		/*currentManualLine = parseFloat(expandedCookie[x++]);
 		for(x = 0; x < spawnManualAmounts.length; x++) {
 			spawnManualAmounts[x]=parseFloat(expandedCookie[x++]);

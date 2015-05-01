@@ -383,7 +383,7 @@ function checkDoneLevel() {
 		updateTerritoryVisual()
 		unitsThroughOnRight = 0;
 		highestLevelUnlocked = level+1 > highestLevelUnlocked ? level+1 : highestLevelUnlocked;
-		startANewLevel()
+		//startANewLevel()
 	}
 	updateProgressVisual()
 }
