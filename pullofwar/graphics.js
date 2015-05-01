@@ -36,7 +36,7 @@ function updateSpawnTimers() {
 }
 
 function updateGoldVisual() {
-	document.getElementById("gold").innerHTML = gold;
+	document.getElementById("gold").innerHTML = round(gold);
 }
 
 function updateTerritoryVisual() {
@@ -115,25 +115,17 @@ function changeUnitScreen(unit) {
 	if(unit.id) {
 		different2 = "<div class='buyName' style='left:189px;top:10px;'>Damage Done: <div id='curDamageDone' class='number'>"+unit.totalDamageDone+"</div></div>"+
 			"<div class='buyName' style='left:271px;top:35px'>Kills: <div id='curKills' class='number'>"+unit.kills+"</div></div>"+
-			"<div class='buyName' style='left:10px;top:10px;'>Health: <div id='curHealth' class='number'>"+unit.curHealth+"</div></div>"+
+			"<div class='buyName' style='left:10px;top:10px;'>Health: <div id='curHealth' class='number'>"+round1(unit.curHealth)+"</div></div>"+
 			"<div class='buyName' style='left:10px;top:35px;'>Unit Count: <div id='curUnitCount' class='number'>"+unit.unitCount+"</div></div>"+
 			"<div class='buyName' style='left:10px;top:60px;'>Time Alive: <div id='curTimeAlive' class='number'>"+unit.timeAlive+"</div></div>";
 	} 
 	next = "</div>"
-	different3 = direction === "right" ? ("<div class='buySpawnRate'>"+
+	different3 = direction === "right" ? ("<div class='buySpawnRate' onclick='buyUpgradePoint(\""+type+"\")'>"+
 			"<div class='icon'></div>"+
 			"<div class='costBox'><div class='goldIcon'></div><div id='cost' class='number'>400</div></div>"+
-			"<div class='buyName'>Buy an Upgrade Point</div>"+
+			"<div class='buyName' >Buy an <div style='color:teal;'>Upgrade Point</div></div>"+
 			"<div class='buyVal' id='buy'>3</div>"+
 		"</div>") : ""
-	
-	/*
-	"<div class='upgradePointBox'>"+
-		"<div style='position:absolute;top:5px;left:66px;'>Buy an Upgrade Point</div>"+
-		"<div id='upgradePoints' style='position:absolute;'>0</div>"+
-		"<div class='costBox' style='left:141px;'><div class='goldIcon'></div><div id='buy' class='number'></div></div>"+
-		"</div>") : ""
-	*/
 	
 	next2 = "<div style='width:50%;height:250px;vertical-align:top;'>"
 	button1 = addButton(type, direction, "Damage", 1)
@@ -147,9 +139,9 @@ function changeUnitScreen(unit) {
 	
 	if(direction == "right") {
 	
-		finish = "</div><div class='buySpawnRate'>"+
+		finish = "</div><div class='buySpawnRate' onclick='clickBuySpawnRate(\""+type+"\")'>"+
 			"<div class='icon'></div>"+
-			"<div class='costBox'><div class='goldIcon'></div><div id='cost"+type+"Up0' class='number'>400</div></div>"+
+			"<div class='costBox'><div class='goldIcon'></div><div id='costSpawn' class='number'>400</div></div>"+
 			"<div class='buyName'>Spawn Rate</div>"+
 			"<div class='buyIncreaseAmount' id='"+type+"Increase0'>10% faster</div>"+
 			"<div class='buyVal' id='buy0'></div>"+
@@ -170,25 +162,29 @@ function updateSpawnRate2(type, direction) {
 }
 
 function updateSpawnRate() {
-	if(document.getElementById("buy0")) document.getElementById("buy0").innerHTML = round2(spawnRate[0]) + " x " + spawnAmounts[1]
-	if(document.getElementById("buy0")) document.getElementById("buy0").innerHTML = round2(spawnRate[1]) + " x " + spawnAmounts[2]
+	if(document.getElementById("buy0")) document.getElementById("buy0").innerHTML = round2(spawnRate[typeNum/2]) + " x " + spawnAmounts[typeNum/2+1]
 }
 
 function updateStatusUpgrades(unit, type, direction) {
 	if(unit.id) {
 		//handle status specific to unit
-		document.getElementById("curHealth").innerHTML = unit.curHealth
+		document.getElementById("curHealth").innerHTML = round1(unit.curHealth)
 		document.getElementById("curUnitCount").innerHTML = unit.unitCount
 		document.getElementById("curTimeAlive").innerHTML = round((totalTicks - unit.timeAlive)/20)+"s"
-		document.getElementById("curDamageDone").innerHTML = unit.totalDamageDone
+		document.getElementById("curDamageDone").innerHTML = round(unit.totalDamageDone)
 		document.getElementById("curKills").innerHTML = unit.kills
 	}
 	typeNum = convertTypeToNum(type, direction)
-	if(direction == "right") document.getElementById("cost").innerHTML=unitCosts[typeNum];
-	if(direction == "right") document.getElementById("buy").innerHTML=upgradePointsAvailable[typeNum]
-	for(e = 1; e < unitValues[typeNum].length; e++) {
-		document.getElementById("buy"+e).innerHTML=unitValues[typeNum][e-1]
+	if(direction == "right")  {
+		document.getElementById("buy").innerHTML=upgradePointsAvailable[typeNum];
+		document.getElementById("cost").innerHTML=unitCosts[typeNum];
+		document.getElementById("costSpawn").innerHTML=round(costSpawnRate[typeNum]);
 	}
+	for(e = 1; e < unitValues[typeNum].length+1; e++) {
+		if(direction == "right" && document.getElementById("points"+e)) document.getElementById("points"+e).innerHTML=unitPointValues[typeNum][e-1]
+		document.getElementById("buy"+e).innerHTML=round2(unitValues[typeNum][e-1])
+	}
+	updateSpawnRate2(type, direction)
 }
 
 function convertTypeToNum(type, direction) {
@@ -201,14 +197,15 @@ function convertTypeToNum(type, direction) {
 
 function addButton(type, direction, name, num) {
 	if(direction == "right") {
-		return "<div class='buyButton'>"+
+		return "<div class='buyButton "+(num != 2 ? "" : "nohover")+"' id='buyButton"+num+"' onclick='clickBuyButton("+num+" , \""+type+"\" , \"right\")' >"+
 			"<div class='icon'></div>"+
 			"<div class='buyName'>"+name+"</div>"+
 			"<div class='buyVal' id='buy"+num+"'>3</div>"+
+			(num != 2 ? "<div class='upgradePoints' id='points"+num+"'>3</div>" : "") +
 		"</div>"
 	}
 	else {
-		return "<div class='buyButton'>"+
+		return "<div class='buyButton nohover'>"+
 			"<div class='icon'></div>"+
 			"<div class='buyName'>"+name+"</div>"+
 			"<div class='buyVal' id='buy"+num+"'>3</div>"+

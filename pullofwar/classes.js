@@ -36,12 +36,14 @@ function Unit (line, pos, type, direction, unitCount, goldWorth) {
 		}
 	}
 	
-    this.getDamageRoll = function() {
+    this.getDamageRoll = function(targetNum) {
 		if(this.attackCounter > 0) {
 			this.attackCounter--;
 			return 0;
 		}
-		dmg = unitValues[this.typeNum][0]*this.unitCount;
+		dmgPerUnit = unitValues[this.typeNum][0] - unitValues[targetNum][4]
+		if(dmgPerUnit < 0) dmgPerUnit = 0
+		dmg = dmgPerUnit*this.unitCount;
 		this.totalDamageDone+=dmg
 		this.attackCounter = unitValues[this.typeNum][1]
 		return dmg

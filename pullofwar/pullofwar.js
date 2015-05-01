@@ -34,6 +34,7 @@ placeAmountsStart=[1,  1,  1,   1,   1,   1,    1];
 
 spawnRate=          [9, 10];
 initialSpawnRate=   [9, 10];
+initialSpawnRateInitial=[9, 10];
 spawnManualAmounts =[0,  2];
 spawnAmounts =  [-1, 1,  1] //first is enemy
 initialSpawnAmounts=[1,  1];
@@ -46,10 +47,12 @@ totalTicks = 0
 curClickedUnit = -1;
 
 level = 1;
-unitValues = [[1, 1, 1, 50, 0], [1, 3, .1, 150, 0], [7, 15, .6, 4, 0], [50, 20, .06, 30, 0]]
-unitCosts =          [50, 0, 80, 0];
-upgradePointsAvailable=[ 0, 0,  0, 0];
-upgradePointsInitial=  [ 0, 0,  0, 0];
+unitValues =       [[1, 1, .6, 50, 0], [1, 3, .06, 150, 0], [7, 15, .4, 4, 0], [50, 20, .04, 30, 0]]
+unitValuesInitial =[[1, 1, 1, 50, 0], [], [7, 15, .6, 4, 0], []]
+costSpawnRate =        [20, 0, 800, 0];
+unitCosts =            [5, 0, 80, 0];
+upgradePointsAvailable=[0, 0,  0, 0];
+upgradePointsInitial=  [0, 0,  0, 0];
 unitPointValues=[[0, 0, 0, 0, 0],[],[0, 0, 0, 0, 0],[]]
 startANewLevel()
 gold = 0;
@@ -106,7 +109,7 @@ function handlePlaceChanges() {
 					for(z = 0; z < placeAmounts[1]; z++) {
 						for(h = 0; h < spawnRate.length; h++) {
 							spawnRate[h] *= (1-(1/(20+placeAmounts[0]*3)))  //SPAWN RATE FORMULA
-							if(spawnRate[h]*2 < initialSpawnRate[h]) {
+							if(spawnRate[h]*2 < initialSpawnRateInitial[h]) {
 								spawnAmounts[h+1]*=2;
 								spawnRate[h]*=2;
 							}
@@ -253,7 +256,8 @@ triggerForDelete=[];
 							units[y][x].unitCount+=units[z][w].unitCount;
 							//console.log('variables1: '+y+", "+x+", "+z+", "+w+", id:"+units[y][x].id+", "+units[y][x].unitCount)
 							document.getElementById("count"+units[y][x].id).innerHTML = units[y][x].unitCount
-							document.getElementById("healthBar"+units[y][x].id).style.width = (units[y][x].curHealth / unitValues[units[y][x].typeNum][3] * 100) + "%";
+							healthBarNum = (units[y][x].curHealth / unitValues[units[y][x].typeNum][3] * 100);
+							document.getElementById("healthBar"+units[y][x].id).style.width = healthBarNum>100?100:healthBarNum; + "%";
 							if(units[z][w].id === curClickedUnit) {
 								clickAUnit(units[y][x].id)
 							}
@@ -335,7 +339,7 @@ function handleBattles() {
 					drawSpearLine(units[y][x], engageTarget);
 				}
 				count = engageTarget.unitCount
-				engageTarget.takeDamage(units[y][x].getDamageRoll())
+				engageTarget.takeDamage(units[y][x].getDamageRoll(engageTarget.typeNum))
 				units[y][x].kills = count - engageTarget.unitCount;
 				//console.log(engageTarget.id)
 				document.getElementById("count"+engageTarget.id).innerHTML = engageTarget.unitCount
@@ -387,7 +391,7 @@ function removeUnit(unit, shouldAdd) {
 
 function checkDoneLevel() {
 	if(unitsThroughOnRight > scoreNeededForLevel) {
-		territory += level * 10
+		territory += level * 10 + (level * level)
 		updateTerritoryVisual()
 		unitsThroughOnRight = 0;
 		highestLevelUnlocked = level+1 > highestLevelUnlocked ? level+1 : highestLevelUnlocked;
@@ -396,12 +400,16 @@ function checkDoneLevel() {
 	updateProgressVisual()
 }
 
-function resetUpgradePoints(type) {
+function buyUpgradePoint(type) {
 	typeNum = convertTypeToNum(type, "right")
-	upgradePointsAvailable[typeNum] = upgradePointsInitial[typeNum]
-	for(m = 1; m < unitPointValues[typeNum].length; m++) {
-		if(document.getElementById("points"+m))
-			document.getElementById("points"+m).innerHTML = unitPointValues[typeNum][m]
+	if(unitCosts[typeNum] <= gold) {
+		gold -= unitCosts[typeNum]
+		updateGoldVisual()
+		if(unitCosts[typeNum] < 50) unitCosts[typeNum] = 50
+		unitCosts[typeNum] = Math.floor(1.3 * unitCosts[typeNum]);
+		upgradePointsAvailable[typeNum]++;
+		upgradePointsInitial[typeNum]++
+		updateStatusUpgrades("", type, "right")
 	}
 }
 

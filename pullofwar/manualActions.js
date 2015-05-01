@@ -10,7 +10,7 @@ function changeManualLane(div) {
 		$(name).find('div').first().remove();
 	}*/
 	currentManualLine = parseInt(id);
-	document.getElementById('clickSpace' + currentManualLine).innerHTML = "<div style='width: 97%;height: 97%;border-radius: 50%;border-top: 0px solid transparent;border-bottom: 0px solid transparent;border-left: 56px solid rgba(168, 37, 168, 0.73);border-right: 0px solid green;'></div>"
+	document.getElementById('clickSpace' + currentManualLine).innerHTML = "<div style='width: 97%;position:relative;height: 97%;border-radius: 50%;border-top: 0px solid transparent;border-bottom: 0px solid transparent;border-left: 56px solid rgba(168, 37, 168, 0.73);border-right: 0px solid green;'></div>"
 }
 
 function showLeftArrow() {
@@ -28,7 +28,52 @@ function showRightArrow() {
 
 function hideRightArrow() {
 	document.getElementById("rightArrow").style.display="none"
+}
 
+function clickBuyButton(pos, type, direction) {
+	typeNum = convertTypeToNum(type, direction)
+	if(typeNum == 1 && pos == 2) return
+	if(upgradePointsAvailable[typeNum] > 0) {
+		if(handleBuyAmounts(typeNum, pos-1)) {
+			upgradePointsAvailable[typeNum]--;
+			unitPointValues[typeNum][pos-1]++
+		}
+	}
+	updateStatusUpgrades("", type, direction)
+}
+
+function resetUpgradePoints(type) {
+	typeNum = convertTypeToNum(type, "right")
+	upgradePointsAvailable[typeNum] = upgradePointsInitial[typeNum]
+	for(t = 0; t < unitPointValues[typeNum].length; t++) {
+		unitPointValues[typeNum][t]=0
+	}
+	for(t = 0; t < unitValues[typeNum].length; t++) {
+		unitValues[typeNum][t]=unitValuesInitial[typeNum][t]
+	}
+	updateStatusUpgrades("", type, direction)
+}
+
+function handleBuyAmounts(y, x) {
+	if(x==0) unitValues[y][x] = 1.05 * unitValues[y][x] + 1
+	if(x==2) { 
+		if(unitValues[y][x] > 2) return 0;
+		unitValues[y][x] *= 1.1 
+	}
+	if(x==3) unitValues[y][x] = 1.05 * unitValues[y][x] + 10
+	if(x==4) unitValues[y][x]+=.300000001;
+	return 1;
+}
+
+function clickBuySpawnRate(type) {
+	typeNum = convertTypeToNum(type, "right") 
+	if(costSpawnRate[typeNum] <= gold) {
+		gold -= costSpawnRate[typeNum]
+		costSpawnRate[typeNum] *= 2.5
+		spawnRate[typeNum/2] *= .9;
+		initialSpawnRate[typeNum/2] *= .9;
+	}
+	updateStatusUpgrades("", type, "right")
 }
 
 function increaseLevel() {
@@ -113,7 +158,9 @@ function startANewLevel() {
 	totalTicks = 0
 	curClickedUnit = -1;
 	document.getElementById("level").innerHTML=level;
-	document.getElementById("territoryGain").innerHTML = level * 10;
+	document.getElementById("territoryGain").innerHTML = level * 10 + (level * level);
+	unitValues[1] = [level, 3, .06, 150+level*level, 0]
+	unitValues[3] = [50, 20, .04, 30, 0]
 	updateProgressVisual()
 	spawnAmounts[0] = level;
 	if(currentManualLine == -1) {
