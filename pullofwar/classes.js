@@ -23,16 +23,16 @@ function Unit (line, pos, type, direction, unitCount, goldWorth) {
 			unitsDead++;
 		}
 		this.unitCount -= unitsDead;
+		if(this.unitCount <= 0) {
+			this.curHealth = -10
+			this.unitCount = 0;
+		}
 		if(unitsDead > 0) {
 			gold += unitsDead * this.goldWorth;
 			updateGoldVisual()
 			if(this.direction != "right") { //respawn the unit when it dies
 				//addUnit("soldier", this.line, this.direction, unitsDead);
 			}
-		}
-		if(this.unitCount <= 0) {
-			this.curHealth = -10
-			this.unitCount = 0;
 		}
 	}
 	

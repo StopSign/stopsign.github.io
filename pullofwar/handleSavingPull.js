@@ -8,7 +8,7 @@ function loadDefaults() {
 	initialSpawnRateInitial=[9, 10];
 	initialSpawnRate=   [9, 10];
 	placeAmountsStart=[1,  1,  1,   1,   1,   1,    1];
-	placeMaxTimers=   [0, 12, 35, 100, 295, 880, 2635];
+	placeMaxTimers=   [0, 6, 17, 50, 99, 197, 393];
 	level = 1;
 	unitValues =       [[1, 1, .6, 50, 0], [1, 3, .06, 150, 0], [7, 15, .4, 4, 0], [50, 20, .04, 30, 0]]
 	unitValuesInitial =[[1, 1, .6, 50, 0], [], [7, 15, .4, 4, 0], []]
