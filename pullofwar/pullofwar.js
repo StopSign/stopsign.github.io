@@ -100,11 +100,12 @@ function handlePlaceChanges() {
 					//for(h = 0; h < spawnRate.length; h++) {
 					//	spawnRate[h] = x - 1/3*log(-3x - 20)
 					//}
+					//villages shouldn't be higher than 2.5 mil
 					for(z = 0; z < placeAmounts[1]; z++) {
 						for(h = 0; h < spawnRate.length; h++) {
 							//	console.log(placeAmounts[1]+","+territory+","+placeAmounts[0]+","+temp1)
 							if(z + (placeAmounts[0]-placeAmounts[1]) > territory) continue
-							spawnRate[h] *= (1-(1/(20+placeAmounts[1]*3)))  //SPAWN RATE FORMULA
+							spawnRate[h] *= (1-(1/(20+placeAmounts[0]*3)))  //SPAWN RATE FORMULA
 							if(spawnRate[h]*2 < initialSpawnRateInitial[h]) {
 								spawnAmounts[h+1]*=2;
 								spawnRate[h]*=2;
