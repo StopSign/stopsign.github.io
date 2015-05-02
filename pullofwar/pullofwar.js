@@ -94,12 +94,15 @@ function handlePlaceChanges() {
 				placeAmounts[x-1]+=placeAmounts[x]
 				placeCurTimers[x] = placeMaxTimers[x]
 				if(x == 1) {
+					//temp1 = placeAmounts[0] + placeAmounts[1] > territory ? (territory - placeAmounts[0]) < 0 ? 0 : (territory - placeAmounts[0]) : placeAmounts[1]
+					//for(h = 0; h < spawnRate.length; h++) {
+					//	spawnRate[h] = x - 1/3*log(-3x - 20)
+					//}
 					for(z = 0; z < placeAmounts[1]; z++) {
 						for(h = 0; h < spawnRate.length; h++) {
-							temp1 = placeAmounts[0] + placeAmounts[1] > territory ? (territory - placeAmounts[0]) < 0 ? 0 : (territory - placeAmounts[0]) : placeAmounts[1]
-							if(temp1) {
-								spawnRate[h] *= (1-(1/(20+temp1*3)))  //SPAWN RATE FORMULA
-							}
+							//	console.log(placeAmounts[1]+","+territory+","+placeAmounts[0]+","+temp1)
+							if(z + (placeAmounts[0]-placeAmounts[1]) > territory) continue
+							spawnRate[h] *= (1-(1/(20+placeAmounts[1]*3)))  //SPAWN RATE FORMULA
 							if(spawnRate[h]*2 < initialSpawnRateInitial[h]) {
 								spawnAmounts[h+1]*=2;
 								spawnRate[h]*=2;
