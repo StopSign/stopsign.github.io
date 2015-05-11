@@ -148,8 +148,8 @@ function handlePlaceChanges() {
 	updatePlaceVisuals()
 }
 
+rateReduction = .09999;
 function handleSpawnRates() {
-	rateReduction = .09999;
 	//rateReduction = 0;
 	soldierSpawnRate -= rateReduction;
 	if(soldierSpawnRate <= 0) {
