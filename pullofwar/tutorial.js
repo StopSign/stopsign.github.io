@@ -4,7 +4,7 @@ buttonsToClick = 0;
 showNextMessage = 0;
 higherZ = 9999999999999
 function startTutorial() {
-	if(localStorage.doneTutorial) return
+	if(localStorage.doneTutorial == 1) return
 	localStorage.doneTutorial = 1;
 	greyBox = document.getElementById("greyBox");
 	addGreyBox()
@@ -13,8 +13,11 @@ function startTutorial() {
 	addOKButton(258, 373)
 }
 
-function addVisibleElement() {
-
+function forceTutorial() {
+	localStorage.doneTutorial = 0;
+	showNextMessage = 0;
+	showUnitsScreen()
+	startTutorial()
 }
 
 function addMessage(msg, x, y) {
@@ -38,22 +41,22 @@ function clickedOKButton() {
 			addOKButton(260, 400)
 		}
 		if(showNextMessage == 2) {
-			addMessage("When your units make it to the red line, you gain some score, reflected by the progress bar. When you beat the level, it restarts.", 500, 283);
+			addMessage("When your units make it to the red line, you gain some score, reflected by the progress bar. When you beat the stage, it restarts.", 500, 239);
 			document.getElementById("mainProgressBar").style.zIndex = higherZ
 			document.getElementById("score").style.zIndex = higherZ
 			addOKButton(200, 400)
 		}
 		if(showNextMessage == 3) {
-			addMessage("When you beat a level, you can click on the right side of the battle area to go to the next level.", 500, 283);
+			addMessage("When you beat a stage, you can click on the right side of the battle area to go to the next stage.", 500, 283);
 			document.getElementById("mainProgressBar").style.zIndex = higherZ
 			document.getElementById("score").style.zIndex = higherZ
-			addOKButton(200, 400)
+			addOKButton(529, 214)
 		}
 		if(showNextMessage == 4) {
-			addMessage("When enemies make it to your red line, you lose score. If you are less than -200%, the level restarts.", 500, 283);
+			addMessage("When enemies make it to your red line, you lose score. If you are less than -200%, the stage restarts.", 500, 283);
 			document.getElementById("mainProgressBar").style.zIndex = higherZ
 			document.getElementById("score").style.zIndex = higherZ
-			addOKButton(260, 400)
+			addOKButton(529, 234)
 		}
 		if(showNextMessage == 5) {
 			addMessage("When you reach 100%, you gain some territory", 500, 283);
@@ -77,7 +80,7 @@ function clickedOKButton() {
 			document.getElementById("territoryContainer").style.zIndex=0
 		}
 		if(showNextMessage == 8) {
-			addMessage("Get gold by killing enemies. Gold is spent on upgrade points, which can be allocated to upgrades.", 500, 489);
+			addMessage("Get gold by killing enemies. Gold is spent on upgrade points, which can be allocated to upgrades.", 500, 452);
 			document.getElementById("middleSpace").style.zIndex = higherZ
 			addOKButton(543, 470)
 		}

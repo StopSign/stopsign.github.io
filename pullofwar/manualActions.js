@@ -1,16 +1,9 @@
-function changeManualLane(div) {
-	if(!div)
-		return
-	id = div.id.substring(10);
+function changeManualLane(id) {
 	for(j = 0; j < 6; j++) {
 		document.getElementById('clickSpace' + j).innerHTML = "";
 	}
-	/*name = '#clickSpace' + currentManualLine
-	if($(name).find('div').first()) {
-		$(name).find('div').first().remove();
-	}*/
 	currentManualLine = parseInt(id);
-	document.getElementById('clickSpace' + currentManualLine).innerHTML = "<div style='width: 97%;position:relative;height: 97%;border-radius: 50%;border-top: 0px solid transparent;border-bottom: 0px solid transparent;border-left: 56px solid rgba(168, 37, 168, 0.73);border-right: 0px solid green;'></div>"
+	document.getElementById('clickSpace' + currentManualLine).innerHTML = "<img src='img/selected.png' height='100%' width='100'>"//"<div style='width: 97%;position:relative;height: 97%;border-radius: 50%;border-top: 0px solid transparent;border-bottom: 0px solid transparent;border-left: 56px solid rgba(168, 37, 168, 0.73);border-right: 0px solid green;'></div>"
 }
 
 function showLeftArrow() {
@@ -40,6 +33,7 @@ function clickBuyButton(pos, type, direction) {
 		}
 	}
 	updateStatusUpgrades("", type, direction)
+	updateGoldVisual()
 }
 
 function resetUpgradePoints(type) {
@@ -60,8 +54,8 @@ function handleBuyAmounts(y, x) {
 		if(unitValues[y][x] > 2) return 0;
 		unitValues[y][x] *= 1.1 
 	}
-	if(x==3) unitValues[y][x] = 1.05 * unitValues[y][x] + 10
-	if(x==4) unitValues[y][x]+=.300000001;
+	if(x==3) unitValues[y][x] = 1.05 * unitValues[y][x] + 15
+	if(x==4) unitValues[y][x]+=.200000001;
 	return 1;
 }
 
@@ -69,37 +63,52 @@ function clickBuySpawnRate(type) {
 	typeNum = convertTypeToNum(type, "right") 
 	if(costSpawnRate[typeNum] <= gold) {
 		gold -= costSpawnRate[typeNum]
-		costSpawnRate[typeNum] *= 2.5
+		costSpawnRate[typeNum] *= (1.6 + typeNum/10)
 		spawnRate[typeNum/2] *= .9;
 		initialSpawnRate[typeNum/2] *= .9;
 	}
 	updateStatusUpgrades("", type, "right")
+	updateGoldVisual()
 }
 
-function increaseLevel() {
-	if(highestLevelUnlocked != level) {
-		level++
+function buyUpgradePoint(type) {
+	typeNum = convertTypeToNum(type, "right")
+	if(unitCosts[typeNum] <= gold) {
+		gold -= unitCosts[typeNum]
+		updateGoldVisual()
+		if(unitCosts[typeNum] < 30) unitCosts[typeNum] = 30
+		unitCosts[typeNum] = Math.floor(1.2 * unitCosts[typeNum]);
+		upgradePointsAvailable[typeNum]++;
+		upgradePointsInitial[typeNum]++
+		updateStatusUpgrades("", type, "right")
+	}
+	updateGoldVisual()
+}
+
+function increasestage() {
+	if(higheststageUnlocked != stage) {
+		stage++
 		unitsThroughOnRight = 0;
 		unitsThroughOnLeft = 0;
-		document.getElementById("level").innerHTML=level;
+		document.getElementById("stage").innerHTML=stage;
 		currentManualLine = -1;
-		startANewLevel();
+		startANewstage();
 	} else {
-		increaseLevelError = 40
+		increasestageError = 40
 	}
 }
 
-function decreaseLevel() {
-	level--;
-	if(level <=0) {
-		level = 1;
+function decreasestage() {
+	stage--;
+	if(stage <=0) {
+		stage = 1;
 	}
 	else {
 		unitsThroughOnRight = 0;
 		unitsThroughOnLeft = 0;
-		document.getElementById("level").innerHTML=level;
+		document.getElementById("stage").innerHTML=stage;
 		currentManualLine = -1;
-		startANewLevel();
+		startANewstage();
 	}
 }
 
@@ -133,7 +142,17 @@ function handleStatusScreen(unit) {
 	//put in updating the unit's values
 }
 
-function startANewLevel() {
+function buyStartingPlaceAmounts(num) {
+	if(territory > placeAmountCosts[num]) {
+		placeAmountsStart[num]++
+		placeAmounts[num]++
+		territory-=placeAmountCosts[num]
+	}
+	updateTerritoryVisual()
+	updatePlaceVisuals()
+}
+
+function startANewstage() {
 	for(y = 0; y < units.length; y++) {
 		for(x = units[y].length-1; x>=0; x--) {
 			removeUnit(units[y][x], false);
@@ -142,36 +161,31 @@ function startANewLevel() {
 	units = [[],[],[],[],[],[]];
 	unitsThroughOnRight = 0;
 	unitsThroughOnLeft = 0;
-	linesEnabled = 6;
 	soldierSpawnRate = 4;
-	spearSpawnRate = .5;
+	spearSpawnRate = 2.5;
 	spawnRateManual = 0;
 	spawnRate=[];
 	spawnAmounts=[]
-	spawnAmounts[0] = level;
+	spawnAmounts[0] = stage < 3 ? stage : 1+.5 * stage
 	for(j = 0; j < initialSpawnAmounts.length; j++) {
 		spawnRate[j] = initialSpawnRate[j]
 		spawnAmounts[j+1]=initialSpawnAmounts[j]
 	}
-	enemySpawnRate = 9;
+	enemySpawnRate = .5;
 	curBattles = [];
 	storedLines = [];
 	timer = 0;
-	stop = 0;
 	totalTicks = 0
 	curClickedUnit = -1;
-	document.getElementById("level").innerHTML=level;
-	document.getElementById("territoryGain").innerHTML = level * 10 + (level * level);
-	unitValues[1] = [level, 3, .06, 150+level*level, 0]
-	unitValues[3] = [50, 20, .04, 30, 0]
+	document.getElementById("stage").innerHTML=stage;
+	document.getElementById("territoryGain").innerHTML = stage * 10 + (stage * stage);
+	unitValues[1] = [stage+Math.floor(Math.pow(1.07, stage))-1, 3, .06, 150+Math.floor(stage*stage*stage/6), Math.floor(stage*stage/10)]
+	unitValues[3] = [14+stage*5+Math.floor(Math.pow(1.08, stage)), 20, .04, 15+Math.floor(stage*stage/2), 0]
 	updateProgressVisual()
 	if(currentManualLine == -1) {
 		for(j = 0; j < 6; j++) {
 			document.getElementById('clickSpace' + j).innerHTML = "<div class='clickMe'>Click Me</div>";
 		}
-	}
-	for(j = 0; j < linesEnabled; j++) {
-		addUnit("soldier", j, "left", spawnAmounts[0]);
 	}
 	placeCurTimers=[]
 	placeAmounts=[]
@@ -179,4 +193,6 @@ function startANewLevel() {
 		placeCurTimers[j]=placeMaxTimers[j]
 		placeAmounts[j]=placeAmountsStart[j]
 	}
+	updateSpawnRate()
+	//addUnit("spear", 0, "right", 1);
 }

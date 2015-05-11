@@ -14,6 +14,9 @@ position:relative;
 background-color:rgb(255, 95, 95);
 cursor:pointer;
 }
+.button {
+	border:2px solid;
+}
 .upgradeButton {
     border:2px solid;
     border-radius:8px;
@@ -24,9 +27,24 @@ cursor:pointer;
     line-height:14px;
     cursor:pointer;
 }
-.buyButton:not(.nohover):hover, .buySpawnRate:hover, .upgradePointBox:hover   {
+.buyButton:not(.nohover):hover, .buySpawnRate:hover, .upgradePointBox:hover , .button:not(.nohover):hover  {
 background-color:yellow;
 cursor:pointer;
+}
+.buyPlaceAmount {
+width:196px;
+position:relative;
+height:34px;
+}
+.placeBuyCost {
+position:absolute;
+right:5px;
+top:5px;
+}
+.placeBuyLabel {
+position:absolute;
+left:5px;
+top:5px;
 }
 .upgradePoints {
 right:10px;
