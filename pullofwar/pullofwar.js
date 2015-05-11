@@ -17,12 +17,11 @@ globalId = 0;
 zIndex = 1000000000;
 exitLineRightTimer = 0;
 exitLineLeftTimer = 0;
-increaseLevelError = 0;
+increasestageError = 0;
 
 //	addUnit("soldier", 1, "left", 30);
 //addUnit("soldier", 0, "right", 2);
-//addUnit("spear", 5, "right", 3);
-//addUnit("spear", 0, "right", 3);
+//addUnit("spear", 0, "right", 1);
 //addUnit("soldier", 0, "right");
 //addUnit("soldier", 0, "right");
 //addUnit("soldier", 0, "right");
@@ -48,10 +47,14 @@ storedLines = [];
 timer = 0;
 stop = 0;
 curClickedUnit = -1;*/
-
+timeList = [];
 totalTicks = 0
 startTutorial()
 function tick() {
+	timeList.push(new Date().getTime())
+	document.getElementById("fps").innerHTML = round(50/calcAverageTime()*100)+"%";
+	if(timeList.length > 100) timeList.splice(0, 1)
+	
 	totalTicks++;
 	if(stop)
 		return
@@ -79,8 +82,27 @@ function tick() {
 		updateStatusUpgrades(unit, unit.type, unit.direction)
 }
 
+function calcAverageTime() {
+	total = 0;
+	for(x = 1; x < timeList.length; x++) {
+		total += timeList[x] - timeList[x-1]
+	}
+	return total / timeList.length
+}
+
 function halfSecond() {
 	saveIntoStorage()
+}
+
+function pause() {
+	if(stop) {
+		document.getElementById("pauseButton").innerHTML = 'Pause';
+		stop = 0;
+	}
+	else {
+		document.getElementById("pauseButton").innerHTML = 'Play';
+		stop = 1;
+	}
 }
 
 clockTimer = .099999999999
@@ -100,12 +122,15 @@ function handlePlaceChanges() {
 					//for(h = 0; h < spawnRate.length; h++) {
 					//	spawnRate[h] = x - 1/3*log(-3x - 20)
 					//}
-					//villages shouldn't be higher than 2.5 mil
+					//villages shouldn't be higher than 50 mil
+					//families shouldn't be higher than 100 mil
+					//turn into families+ at 1 mil
+					
 					for(z = 0; z < placeAmounts[1]; z++) {
 						for(h = 0; h < spawnRate.length; h++) {
 							//	console.log(placeAmounts[1]+","+territory+","+placeAmounts[0]+","+temp1)
 							if(z + (placeAmounts[0]-placeAmounts[1]) > territory) continue
-							spawnRate[h] *= (1-(1/(20+placeAmounts[0]*3)))  //SPAWN RATE FORMULA
+							spawnRate[h] *= (1-(1/(20+placeAmounts[0]*2)))  //SPAWN RATE FORMULA
 							if(spawnRate[h]*2 < initialSpawnRateInitial[h]) {
 								spawnAmounts[h+1]*=2;
 								spawnRate[h]*=2;
@@ -141,8 +166,10 @@ function handleSpawnRates() {
 	enemySpawnRate -= rateReduction;
 	if(enemySpawnRate <= 0) {
 		for(j = 0; j < linesEnabled; j++) {
-			addUnit("soldier", j, "left", spawnAmounts[0]);
+			addUnit("soldier", j, "left", Math.floor(spawnAmounts[0]));
+			addUnit("spear", j, "left", Math.floor(spawnAmounts[0]/3))
 		}
+		if(stage >= 3) spawnAmounts[0]+=.3335*Math.pow(1.06, stage)
 		enemySpawnRate = 15;
 	}
 	if(currentManualLine >= 0) {
@@ -176,7 +203,7 @@ function checkForUnitAtEnds() {
 				unitsThroughOnRight+=units[y][x].unitCount;
 				exitLineRightTimer = 8
 				triggerForDelete.push(units[y][x])
-				checkDoneLevel()
+				checkDonestage()
 				done = 1
 				break;
 			}
@@ -189,14 +216,14 @@ function checkForUnitAtEnds() {
 				}
 				exitLineLeftTimer = 8
 				triggerForDelete.push(units[y][x])
-				checkDoneLevel()
+				checkDonestage()
 				break;
 			}
 		}
 		if(done) break;
 	}
 	if(done == 2) {
-		startANewLevel()
+		startANewstage()
 		updateProgressVisual()
 	}
 	else {
@@ -238,6 +265,13 @@ triggerForDelete=[];
 							difference = units[y][x].pos - units[z][w].pos
 							if(units[y][x].direction === "right") {
 								if(difference > -15 && difference < 0) {
+									//console.log("pushing " + units[z][w].id + ", "+'variables1: '+y+", "+x+", "+z+", "+w+", id:"+units[y][x].id+", "+units[y][x].engaged.length)
+									//console.log(units[y][x].engaged);
+									units[y][x].engaged.push(units[z][w])
+								}
+							}
+							if(units[y][x].direction === "left") {
+								if(difference < 15 && difference > 0) {
 									//console.log("pushing " + units[z][w].id + ", "+'variables1: '+y+", "+x+", "+z+", "+w+", id:"+units[y][x].id+", "+units[y][x].engaged.length)
 									//console.log(units[y][x].engaged);
 									units[y][x].engaged.push(units[z][w])
@@ -337,7 +371,7 @@ function handleBattles() {
 				}
 				count = engageTarget.unitCount
 				engageTarget.takeDamage(units[y][x].getDamageRoll(engageTarget.typeNum))
-				units[y][x].kills = count - engageTarget.unitCount;
+				units[y][x].kills += count - engageTarget.unitCount;
 				//console.log(engageTarget.id)
 				document.getElementById("count"+engageTarget.id).innerHTML = engageTarget.unitCount
 				//console.log(units[y][x].id + " attacking "+engageTarget.id + " on " + totalTicks)
@@ -365,6 +399,7 @@ function disengageAll(unit) {
 				if(units[f][e].engaged[i].equals(unit)) {
 					//console.log("disengaging "+unit.id +" from "+unit.engaged[i].id);
 					units[f][e].engaged.splice(i, 1)
+					if(i==0 && units[f][e].attackCounter <= 3) units[f][e].attackCounter = 4//unitValues[units[y][x].typeNum][1]
 				}
 			}
 		}
@@ -386,28 +421,15 @@ function removeUnit(unit, shouldAdd) {
 	}
 }
 
-function checkDoneLevel() {
-	if(unitsThroughOnRight > scoreNeededForLevel) {
-		territory += level * 10 + (level * level)
+function checkDonestage() {
+	if(unitsThroughOnRight > scoreNeededForstage) {
+		territory += stage * 10 + (stage * stage)
 		updateTerritoryVisual()
 		unitsThroughOnRight = 0;
-		highestLevelUnlocked = level+1 > highestLevelUnlocked ? level+1 : highestLevelUnlocked;
-		//startANewLevel()
+		higheststageUnlocked = stage+1 > higheststageUnlocked ? stage+1 : higheststageUnlocked;
+		startANewstage()
 	}
 	updateProgressVisual()
-}
-
-function buyUpgradePoint(type) {
-	typeNum = convertTypeToNum(type, "right")
-	if(unitCosts[typeNum] <= gold) {
-		gold -= unitCosts[typeNum]
-		updateGoldVisual()
-		if(unitCosts[typeNum] < 50) unitCosts[typeNum] = 50
-		unitCosts[typeNum] = Math.floor(1.3 * unitCosts[typeNum]);
-		upgradePointsAvailable[typeNum]++;
-		upgradePointsInitial[typeNum]++
-		updateStatusUpgrades("", type, "right")
-	}
 }
 
 function addUnit(type, line, direction, unitCount) {
@@ -421,10 +443,10 @@ function addUnit(type, line, direction, unitCount) {
 	else {
 		pos = 100
 		if(type == "soldier") {
-			goldWorth = level;
+			goldWorth = stage * stage;
 		}
 		if(type == "spear") {
-			goldWorth = level * 2
+			goldWorth = stage * stage * 2
 		}
 	}
 	theNewUnit = new Unit(line, pos, type, direction, unitCount, goldWorth);

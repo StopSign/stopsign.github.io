@@ -153,6 +153,7 @@ function buyStartingPlaceAmounts(num) {
 }
 
 function startANewstage() {
+	linesEnabled = 6;
 	for(y = 0; y < units.length; y++) {
 		for(x = units[y].length-1; x>=0; x--) {
 			removeUnit(units[y][x], false);
