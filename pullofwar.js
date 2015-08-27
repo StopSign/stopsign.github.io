@@ -1,23 +1,22 @@
 
-/*setInterval(function() {
+setInterval(function() {
 	tick();
-},50);*/
+},50);
 
 
 //uncomment this before checkin
-var doWork = new Worker('interval.js');
+/*var doWork = new Worker('interval.js');
 doWork.onmessage = function(event) {
     if ( event.data === 'interval.start' ) {
 		tick();
     }
 };
-doWork.postMessage({start:true,ms:50});
+doWork.postMessage({start:true,ms:50});*/
 
 globalId = 0;
 zIndex = 1000000000;
 exitLineRightTimer = 0;
 exitLineLeftTimer = 0;
-increasestageError = 0;
 
 //	addUnit("soldier", 1, "left", 30);
 //addUnit("soldier", 0, "right", 2);
@@ -49,10 +48,10 @@ stop = 0;
 curClickedUnit = -1;*/
 timeList = [];
 totalTicks = 0
-startTutorial()
+//startTutorial()
 function tick() {
 	timeList.push(new Date().getTime())
-	document.getElementById("fps").innerHTML = round(50/calcAverageTime()*100)+"%";
+	document.getElementById("fps").innerHTML = round(50/calcAverageTime()*100)+"% fps";
 	if(timeList.length > 100) timeList.splice(0, 1)
 	
 	totalTicks++;
@@ -78,8 +77,6 @@ function tick() {
 		timer = 0;
 	}
 	unit = findUnitById(curClickedUnit)
-	if(unit)
-		updateStatusUpgrades(unit, unit.type, unit.direction)
 }
 
 function calcAverageTime() {
@@ -112,30 +109,21 @@ function handlePlaceChanges() {
 			placeCurTimers[x]-=clockTimer
 	//console.log(placeCurTimers[x]+', '+x);
 			if(placeCurTimers[x] < 0) {
-				temp = placeAmounts[0]
 				placeAmounts[x-1]+=placeAmounts[x]
 				placeCurTimers[x] = placeMaxTimers[x]
-				if(x == 1) {
-					//temp = 
-					//num = 9 * Math.pow(1-1/(20+temp*3))^temp
-					//temp1 = placeAmounts[0] + placeAmounts[1] > territory ? (territory - placeAmounts[0]) < 0 ? 0 : (territory - placeAmounts[0]) : placeAmounts[1]
-					//for(h = 0; h < spawnRate.length; h++) {
-					//	spawnRate[h] = x - 1/3*log(-3x - 20)
-					//}
-					//villages shouldn't be higher than 50 mil
-					//families shouldn't be higher than 100 mil
-					//turn into families+ at 1 mil
-					
-					for(z = 0; z < placeAmounts[1]; z++) {
-						for(h = 0; h < spawnRate.length; h++) {
-							//	console.log(placeAmounts[1]+","+territory+","+placeAmounts[0]+","+temp1)
+				if(x == 1) { //on village timer trigger
+					extraFamilies = placeAmounts[0] - territory
+					if(extraFamilies < 0) extraFamilies = 0;
+					for(z = 0; z < placeAmounts[1] - extraFamilies; z++) {
+						globalSpawnRate *= 1+(1/(20+(placeAmounts[0]-z)*2)) //SPAWN RATE FORMULA
+						/*for(h = 0; h < spawnRate.length; h++) {
 							if(z + (placeAmounts[0]-placeAmounts[1]) > territory) continue
-							spawnRate[h] *= (1-(1/(20+placeAmounts[0]*2)))  //SPAWN RATE FORMULA
+							spawnRate[h] *= (1-(1/(20+placeAmounts[0]*2)))  
 							if(spawnRate[h]*2 < initialSpawnRateInitial[h]) {
 								spawnAmounts[h+1]*=2;
 								spawnRate[h]*=2;
 							}
-						}
+						}*/
 					}
 					updateSpawnRate()
 				}
@@ -148,20 +136,20 @@ function handlePlaceChanges() {
 	updatePlaceVisuals()
 }
 
-rateReduction = .09999;
+rateReduction = .0999999;
 function handleSpawnRates() {
 	//rateReduction = 0;
 	soldierSpawnRate -= rateReduction;
 	if(soldierSpawnRate <= 0) {
 		j = Math.floor(Math.random() * linesEnabled)
-		addUnit("soldier", j, "right", spawnAmounts[1]);
-		soldierSpawnRate = spawnRate[0];
+		addUnit("soldier", j, "right", Math.floor(spawnAmounts[1]*globalSpawnRate));
+		soldierSpawnRate += spawnRate[0];
 	}
 	spearSpawnRate -= rateReduction;
 	if(spearSpawnRate <= 0) {
 		j = Math.floor(Math.random() * linesEnabled)
-		addUnit("spear", j, "right", spawnAmounts[2]);
-		spearSpawnRate = spawnRate[1];
+		addUnit("spear", j, "right",  Math.floor(spawnAmounts[2]*globalSpawnRate));
+		spearSpawnRate += spawnRate[1];
 	}
 	enemySpawnRate -= rateReduction;
 	if(enemySpawnRate <= 0) {
@@ -264,14 +252,14 @@ triggerForDelete=[];
 						if((Math.abs(y-z)<=1)&&units[z][w].direction != units[y][x].direction) {
 							difference = units[y][x].pos - units[z][w].pos
 							if(units[y][x].direction === "right") {
-								if(difference > -15 && difference < 0) {
+								if(difference > -1*unitValues[2][5] && difference < 0) {
 									//console.log("pushing " + units[z][w].id + ", "+'variables1: '+y+", "+x+", "+z+", "+w+", id:"+units[y][x].id+", "+units[y][x].engaged.length)
 									//console.log(units[y][x].engaged);
 									units[y][x].engaged.push(units[z][w])
 								}
 							}
 							if(units[y][x].direction === "left") {
-								if(difference < 15 && difference > 0) {
+								if(difference < unitValues[3][5] && difference > 0) {
 									//console.log("pushing " + units[z][w].id + ", "+'variables1: '+y+", "+x+", "+z+", "+w+", id:"+units[y][x].id+", "+units[y][x].engaged.length)
 									//console.log(units[y][x].engaged);
 									units[y][x].engaged.push(units[z][w])
@@ -296,12 +284,12 @@ triggerForDelete=[];
 							//combine units into one
 						}
 					}
-					else if(Math.abs(units[y][x].pos - units[z][w].pos) <= 4.5) { //soldier
+					else if(Math.abs(units[y][x].pos - units[z][w].pos) <= unitValues[0][5]) { //soldier
 						if(units[y][x].direction === "right") {
-							units[y][x].pos = units[z][w].pos - 4.5;
+							units[y][x].pos = units[z][w].pos - unitValues[0][5];
 						}
 						else {
-							units[z][w].pos = units[y][x].pos - 4.5;
+							units[z][w].pos = units[y][x].pos - unitValues[0][5];
 						}
 						//console.log('variables: '+y+", "+x+", "+z+", "+w)
 						units[z][w].engaged.push(units[y][x]);

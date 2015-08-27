@@ -1,57 +1,23 @@
-* {
-margin:0
+.message {
+background-color:rgba(255, 255, 255, 0.65);
+padding:15px;
+max-width:400px;
+position:relative;
+font-size:28px;
+font-weight:900;
 }
-
-.hideForHover {
-    margin-top:4px;
-    display:none;
+.OKButton {
+padding:15px;
+font-size:20px;
+font-weight:900;
+position:relative;
+background-color:rgb(255, 95, 95);
+cursor:pointer;
 }
-
-.buyButton:hover .tooltipcontainer {
-    display:block;
+.button {
+	border:2px solid;
 }
-.buttonContainer {
-	width:100%;
-	display:none;
-}
-.guidanceOption {
-    width:100%;
-    height:20%;
-    text-align: left;
-}
-.guidanceHover {
-    padding:0px 3px;
-    margin-top:5px;
-    display:none;
-    line-height:12px;
-}
-.clickMultiplier {
-    width:18%;
-    border:0px solid;
-    padding:3px;
-    height:60%;
-    padding-top:0px;
-    text-align:center;
-    font-size:18px;
-    font-weight: bold;
-    background:#F0CABE;
-    border-radius:12px;
-    cursor:pointer !important;
-}
-.selectedMultiplier {
-    width:22%;
-    border:1px solid;
-    padding:3px;
-    height:75%;
-    text-align:center;
-    padding-top:1px;
-    font-size:20px;
-    font-weight: bold;
-    background:#FA6F96;
-    border-radius:4px;
-    cursor:pointer !important;
-}
-.buyButton, .upgradeButton {
+.upgradeButton {
     border:2px solid;
     border-radius:8px;
     width:90%;
@@ -61,11 +27,110 @@ margin:0
     line-height:14px;
     cursor:pointer;
 }
+.buyButton:not(.nohover):hover, .buySpawnRate:hover, .upgradePointBox:hover , .button:not(.nohover):hover  {
+background-color:yellow;
+cursor:pointer;
+}
+.buyPlaceAmount {
+width:196px;
+position:relative;
+height:34px;
+}
+.placeBuyCost {
+position:absolute;
+right:5px;
+top:5px;
+}
+.placeBuyLabel {
+position:absolute;
+left:5px;
+top:5px;
+}
+.upgradePoints {
+right:10px;
+top:7px;
+color:teal;
+position:absolute;
+}
+.buyButton {
+width:100%;
+padding:10px 0;
+height:50px;
+position:relative;
+}
+.buyName {
+font-size:16px;
+position:absolute;
+left:53px;
+top:27px;
+}
+.icon {
+position:absolute;
+left:8px;
+top:8px;
+width:40px;
+height:40px;
+border:1px solid;
+}
+.costBox {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+}
+.goldIcon {
+height: 18px;
+  width: 11px;
+  background-color: rgb(173, 161, 42);
+  border-radius: 50%;
+
+}
+.upgradePointBox {
+width:100%;
+height:50px;
+position:relative;
+}
+.buyIncreaseAmount {
+  right: 6px;
+  top: 40px;
+  position: absolute;
+  color: black;
+}
+.buyVal {
+  left: 52px;
+  top: 4px;
+  position: absolute;
+  color: black;
+  font-size: 16px;
+}
 .buyCount {
     float:right;
     color:red;
     font-size:20px;
 }
+
+.buySpawnRate {
+display:block;
+width:90%;
+height:65px;
+margin-left:auto;
+margin-right:auto;
+margin-bottom:5px;
+position:relative;
+background-color:rgb(255, 237, 190);
+}
+.buttonContainer {
+	width:100%;
+	display:none;
+}
+.curUnitStatus {
+border:1px solid;
+height:100px;
+width:90%;
+margin-left:auto;
+margin-right:auto;
+position:relative;
+}
+
 div{
     -webkit-touch-callout: none;
     -webkit-user-select: none;
@@ -98,9 +163,28 @@ h4 {
 .f18 {
 	font-size:18px;
 }
+.f20 {
+	font-size:20px;
+}
+.f24 {
+	font-size:24px;
+}
 div {
     display:inline-block;
-    font-size:12px;
+}
+.mainTab {
+	width:13%;
+	text-align:center;
+    font-size:20px;
+    font-weight:bold;
+	height:25px;
+    border:2px solid #000;
+    border-radius:10px;
+	cursor:pointer;
+	margin-top:3px;
+}
+.mainTab:hover {
+	background-color:rgb(194, 218, 194) !important;
 }
 .tab {
     height:24px;
@@ -125,92 +209,14 @@ div {
 }
 .number {
     color:black;
-}
-.mainNumberDesc {
-    font-size:14px;
-    line-height:14px;
-    display:block;
-}
-
-.halfClickHorizontal {
-	margin-bottom:1px;
-    cursor:pointer;
-    width:135px;
-    border:5px solid green;
-    border-radius:5px;
-	height:60px;
-	display:none;
-}
-
-.smallClick {
-	margin-right:1px;
-	margin-bottom:1px;
-    cursor:pointer;
-    width:62px;
-    border:5px solid green;
-    border-radius:5px;
-	height:62px;
-	display:none;
-}
-
-#staminaClick1, #clickMe1 {
-    background:#293B99;
-    color:#2CFFFF;
-}
-
-#staminaClick2, #clickMe2 {
-    background:#C80000;
-    color:#2CFFFF;
-}
-#staminaClick3, #clickMe3 {
-    background:#66993C;
-    color:#2CFFFF;
-}
-#staminaClick4, #clickMe4 {
-    background:#FC9B1B;
-    color:#2CFFFF;
-}
-
-.toClick {
-    text-align:center;
-    padding:30px 0px;
-    font-size:24px;
-    cursor:pointer;
-    width:135px;
-    border:5px solid green;
-    border-radius:5px;
-	height:75px;
-	display:none;
-}
-
-#clickMeWalk1, #walkClick1{
-    background:#27CD29;
-    color:#896C2C;
-}
-
-#clickMeWalk2, #walkClick2{
-    background:#FF95F6;
-    color:#896C2C;
-}
-
-#outerBar {
-    width:100%;
-    height:50px;
-    background:grey;
-    margin-top:5px;
-    text-align:center;
-}
-#expBar {
-    width:95%;
-    height:25px;
-    margin-top:12px;
-    background:white;
-    border-radius:20px;
+  vertical-align: top;
 }
 .buyColumn {
-    width:27%;
+    width:420px;
     vertical-align:top;
-    height:100%
+    height:556px;
+	border:1px solid;
+	position:relative
 }
 .flavorText {
     font-style:italic;
@@ -225,26 +231,6 @@ div {
     margin-bottom:10px;
     padding:2px 15px;
 }
-.halfBox {
-    height:46%;
-    margin:0;
-    border:1px solid;
-    width:100%;
-    text-align:left;
-    overflow:auto;
-}
-.guidanceOptionText {
-    margin:6px 5px;
-    font-size:20px;
-    vertical-align: top;
-}
-.guidanceButton {
-    float:right;
-    height:40px;
-    width:40px;
-    margin-right:5%;
-    margin-top:5px;
-}
 .tooltipcontainer {
 position:relative;
 }
@@ -252,110 +238,279 @@ position:relative;
 position:absolute;
 display:none;
 }
-
-.distanceBar {
-    width: 338px;
-    height: 24px;
-	margin-top:15px;
-    background-color: rgba(0, 0, 0, 0.25);
-    box-shadow: 0 0 3px #000000 inset, 0 0 2px rgba(255,255,255,0.1);
-    border-radius: 10px;
-    padding: 4px;
-     transform: rotate(180deg); 
-    display: inline-block;
-	text-align:left;
+.unitContainer {
+width:40px;
+height:50px;
+position:absolute;
+font-size:12px;
+cursor:pointer;
 }
-#innerDistance {
-  background: -webkit-linear-gradient(left top, rgb(13, 213, 0) , rgb(46, 47, 1)); /* For Safari 5.1 to 6.0 */
-  background: -o-linear-gradient(bottom right, rgb(13, 213, 0), rgb(46, 47, 1)); /* For Opera 11.1 to 12.0 */
-  background: -moz-linear-gradient(bottom right, rgb(13, 213, 0), rgb(46, 47, 1)); /* For Firefox 3.6 to 15 */
-  background: linear-gradient(to bottom right, rgb(13, 213, 0) , rgb(46, 47, 1)); /* Standard syntax */
-	border-radius: 12px;
-	position: absolute;
-	box-shadow: 0 1px 0 rgba(255, 255, 255, 0.3) inset, 0 -1px 3px rgba(0, 0, 0, 0.4) inset, 0 1px 1px #000000;
-	height: 24px;
-	width: 96%;
- }
-
-.staminaBar {
-    width: 24px;
-    height: 200px;
-      margin: 0;
-    background-color: rgba(0, 0, 0, 0.25);
-    box-shadow: 0 0 3px #000000 inset, 0 0 2px rgba(255,255,255,0.1);
-    border-radius: 10px;
-    padding: 4px;
-    transform: rotate(180deg);
-    display: inline-block;
+.unitContainer:not(.nohover):hover {
+background-color:yellow;
 }
 
-#innerStamina {
-	background: linear-gradient(#FFCC33, #F2E2B2);
-	border-radius: 12px;
-	position: absolute;
-	box-shadow: 0 1px 0 rgba(255, 255, 255, 0.3) inset, 0 -1px 3px rgba(0, 0, 0, 0.4) inset, 0 1px 1px #000000;
-	height: 97%;
-	width: 24px;
- }
- 
- #innersleep {
-	background: linear-gradient(#F4FDFF, #06F6FF);
-	border-radius: 12px;
-	position: absolute;
-	box-shadow: 0 1px 0 rgba(255, 255, 255, 0.3) inset, 0 -1px 3px rgba(0, 0, 0, 0.4) inset, 0 1px 1px #000000;
-	height: 97%;
-	width: 24px;
-
- }
-.color1_2 {
-	color:#AF6EEA;
+.unit {
+	width:20px;
+	height:20px;
 }
- 
- .color1_1 {
-	color:#7D36BE;
- }
- 
- .color2_2 {
-	color:#044A04;
- }
- 
- .color2_3 {
-	color:#136413;
- }
- 
- .colorSta {
-	color:#FECE3D;
- }
- 
- .colorExert {
-	color:#293B99;
- }
- 
- .colorPowerLift {
-    color:#C80000;
- } 
- .colorRun {
-    color:#FC9B1B;
- } 
- .colorWalk {
-    color:#66993C;
- }
- 
- .colorStroll {
-	color:#FF95F6;
- }
- 
- .colorTakeItEasy {
-	color:#27CD29;
- }
- 
- #levelBar{
-    width:100%;
-    height:15px;
-    border:1px solid #000;
-    overflow:hidden; }
-#levelBarInner{
-    width:37%;
-    height:15px;
-    border-right: 1px solid #000000;
-    background: #d65946; }
+.unitLeft {
+border-radius:50%;
+width:20px;
+height:20px;
+}
+.unitLine0 {
+top:39px;
+}
+.unitLine1 {
+top:93px;
+}
+.unitLine2 {
+top:146px;
+}
+.unitLine3 {
+top:200px;
+}
+.unitLine4 {
+top:254px;
+}
+.unitLine5 {
+top:308px;
+}
+
+.soldier {
+background-color:rgb(86, 56, 38);
+}
+.spear {
+background-color:rgb(120, 137, 57);
+}
+
+.weapon {
+width:15px;
+height:20px;
+vertical-align:top;
+}
+.weaponsoldier {
+background-color:gray;
+margin-top:8px;
+height:3px;
+width:100%
+}
+
+.weaponspear {
+background-color:brown;
+margin-left:8px;
+height:100%;
+width:2px;
+}
+.healthBarOuter {
+	width:100%;
+	background-color:rgb(255, 13, 13);
+	height:5px;
+	position:relative;
+}
+
+.healthBarInner {
+	width:100%;
+	background-color:rgb(0, 61, 0);
+	height:5px;
+	position:absolute;
+}
+.actionLine {
+margin-top:49px;
+width:90%;
+background-color:black;
+height:1px;
+margin-left:4.5%;
+margin-right:4.5%;
+}
+.count {
+position:absolute;
+top:35px;
+left:13px;
+}
+.exitLine {
+height:400px;
+width:4px;
+background-color:red;
+position:absolute;
+}
+.manualClickSpace {
+width:200px;
+height:54px;
+display:block;
+cursor:pointer;
+}
+
+.mouseOverArea{
+position:absolute;
+height:446px;
+width:300px;
+top:-27px;
+}
+
+.arrow {
+position:absolute;
+height:400px;
+width:65px;
+background-color:rgba(128, 128, 128, 0.34);
+display:none;
+}
+.innerArrow {
+margin-top:177px;
+margin-left:22px;
+border-top:30px solid transparent;
+border-bottom:30px solid transparent;
+}
+.spawnManualAmount {
+position:absolute;
+color:purple;
+top:23px;
+left:12px;
+font-size:14px;
+}
+.spawnAutoAmount {
+position:absolute;
+color:black;
+top:23px;
+left:57px;
+font-size:14px;
+
+}
+.pictureContainer {
+position:relative;
+width:150px;
+}
+.statusLabel {
+position:absolute;
+font-size:14px;
+}
+.bigNumber {
+color:black;
+font-size:14px;
+}
+.progressBar {
+height:15px;
+margin-top:3px;
+}
+.unitScreen {
+display:none;
+text-align:center;
+width:100%;
+margin-top:10px;
+}
+.displayLeft {
+position:relative;
+float:left;
+margin-left:10px;
+border:1px solid;
+padding:4px;
+width:100px;
+height:20px;
+}
+.displayRight {
+position:relative;
+float:right;
+margin-right:10px;
+border:1px solid;
+padding:4px;
+width:100px;
+height:20px;
+}
+.unitUpgradeContainer {
+width:90%;
+margin-top:20px;
+background-color:rgb(255, 229, 161);
+border:1px solid;
+padding:10px 0px;
+cursor:pointer;
+}
+.unitUpgradeContainer:hover {
+	background-color:yellow;
+}
+.unitProgress {
+left:10px;
+top:6px;
+width:120px;
+height:12px;
+background-color:gray;
+padding:4px 0px;
+position:absolute;
+}
+.spawnContainer {
+width:100%;
+position:relative;
+height:40px;
+margin-top:5px;
+}
+.spawnLabel {
+position:relative;
+left:331px;
+top:5px;
+}
+.placeTimer {
+position:absolute;
+top:23px;
+left:9px;
+font-size:14px;
+}
+.placeAmount {
+position:absolute;
+top:0px;
+left:132px;
+font-size:21px;
+color:black;
+}
+.placeProgresInner {
+width:100%;
+position:absolute;
+height:12px;
+background-color:rgb(0, 255, 129);
+}
+.upArrow {
+    width: 15px;
+    height: 15px;
+	left:130px;
+	top:-10px;
+    border-top: 4px solid #94FFFB;
+    border-left: 4px solid rgba(32, 179, 0, 1);
+	position:absolute;
+
+    -webkit-transform: rotate(45deg);
+    -moz-transform: rotate(45deg);
+    -o-transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
+    transform: rotate(45deg);
+}
+.clickMe {
+position:relative;
+top:2px;
+left:3px;
+color:blue;
+font-size:20px;
+border:2px solid blue;
+padding:0px 10px;
+}
+.backButton {
+position:absolute;
+top:10px;
+left:10px;
+width:45px;
+height:25px;
+border:3px solid black;
+cursor:pointer;
+}
+.backArrow {
+    width: 15px;
+    height: 15px;
+	left:03px;
+	top:2px;
+    border-bottom: 4px solid #6B0000;
+    border-left: 4px solid rgba(152, 0, 127, 1);
+	position:relative;
+
+    -webkit-transform: rotate(45deg);
+    -moz-transform: rotate(45deg);
+    -o-transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
+    transform: rotate(45deg);
+}

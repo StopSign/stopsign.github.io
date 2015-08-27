@@ -30,9 +30,9 @@ function updateSpawnTimers() {
 	document.getElementById("manualSpawnTimer").innerHTML = round2(spawnRateManual);
 	document.getElementById("enemyAutoSpawnAmount").innerHTML = round(spawnAmounts[0])
 	document.getElementById("soldierManualSpawnAmount").innerHTML = spawnManualAmounts[0]
-	document.getElementById("soldierAutoSpawnAmount").innerHTML = spawnAmounts[1]
+	document.getElementById("soldierAutoSpawnAmount").innerHTML = Math.floor(spawnAmounts[1]*globalSpawnRate)
 	document.getElementById("spearManualSpawnAmount").innerHTML = spawnManualAmounts[1]
-	document.getElementById("spearAutoSpawnAmount").innerHTML = spawnAmounts[2]
+	document.getElementById("spearAutoSpawnAmount").innerHTML = Math.floor(spawnAmounts[2]*globalSpawnRate)
 }
 
 function updateGoldVisual() {
@@ -65,7 +65,7 @@ function updateProgressVisual() {
 	}
 	document.getElementById("compete1").style.width = toModify / scoreNeededForstage * 100 + "%";
 	document.getElementById("compete2").style.width = (1-toModify / scoreNeededForstage) * 100 + "%";
-	document.getElementById("score").innerHTML = Math.ceil(unitsThroughOnRight / scoreNeededForstage * 100)+"%"
+	document.getElementById("score").innerHTML = Math.ceil(unitsThroughOnRight / scoreNeededForstage * 100)
 }
 
 function showUnitsScreen() {
@@ -79,42 +79,21 @@ function showUnitsScreen() {
 
 function changeUnitScreen(unit) {
 	type = "error"
-	direction ="error"
 	if(typeof unit.id == 'undefined') {
 		if(unit == "soldier") {
 			type = "soldier"
-			direction = "right"
-		}
-		if(unit == "enemySoldier") {
-			type = "soldier"
-			direction = "left"
 		}
 		if(unit == "spear") {
 			type = "spear"
-			direction = "right"
-		}
-		if(unit == "enemySpear") {
-			type = "spear"
-			direction = "left"
 		}
 	} else {
 		type = unit.type
-		direction = unit.direction;
 	}
 	
-	commonStart = "<div class='backButton' onclick='showUnitsScreen()'><div class='backArrow'></div></div>"+
-		"<div class='unitContainer nohover' style='cursor:auto;display:block;position:initial;margin-left:auto;margin-right:auto;'>";
-	if(direction === "right") {
-		different1 = "<div id='body' class='"+type+" unit' style=''> </div>" + 
-			"<div id='unitWeapon' class='weapon'><div class='weapon"+type+"'></div> </div>";
-	}
-	else {
-		different1 = "<div id='unitWeapon' class='weapon'><div class='weapon"+type+"'></div> </div>" +
-			"<div id='body' class='"+type+" unitLeft' style=''> </div>";
-	}
-	commonAfter = "</div><div class='curUnitStatus'>"
-	
-	different2 = "<div class='buyName' style='left:79px;top:12px;'>Click a unit for it's status</div>"
+	commonStart = "<div class='unitContainer nohover' style='cursor:auto;display:block;position:initial;margin-left:auto;margin-right:auto;margin-top:5px;height:30px;'>";
+	next = "<div id='body' class='"+type+" unit' style=''> </div>" + 
+		"<div id='unitWeapon' class='weapon'><div class='weapon"+type+"'></div> </div></div>";
+	/*different2 = "<div class='buyName' style='left:79px;top:12px;'>Click a unit for it's status</div>"
 	if(unit.id) {
 		different2 = "<div class='buyName' style='left:189px;top:10px;'>Damage Done: <div id='curDamageDone' class='number'>"+unit.totalDamageDone+"</div></div>"+
 			"<div class='buyName' style='left:271px;top:59px'>Kills: <div id='curKills' class='number'>"+unit.kills+"</div></div>"+
@@ -122,56 +101,61 @@ function changeUnitScreen(unit) {
 			"<div class='buyName' style='left:10px;top:35px;'>Unit Count: <div id='curUnitCount' class='number'>"+unit.unitCount+"</div></div>"+
 			"<div class='buyName' style='left:10px;top:60px;'>Time Alive: <div id='curTimeAlive' class='number'>"+unit.timeAlive+"</div></div>";
 	} 
-	next = "</div>"
-	different3 = direction === "right" ? ("<div class='buySpawnRate' onclick='buyUpgradePoint(\""+type+"\")'>"+
-			"<div class='icon'>"+addIcon(6)+"</div>"+
+	next = "</div>"*/
+	next2 =  "<div class='buySpawnRate' onclick='buyUpgradePoint(\""+type+"\")'>"+
+			"<div class='icon'>"+addIcon(7)+"</div>"+
 			"<div class='costBox'><div class='goldIcon'></div><div id='cost' class='number'>400</div></div>"+
 			"<div class='buyName' >Buy an <div style='color:teal;'>Upgrade Point</div></div>"+
 			"<div class='buyVal' id='buy'>3</div>"+
-		"</div>") : ""
+		"</div>"
 	
-	next2 = "<div style='width:50%;height:250px;vertical-align:top;'>"
-	button1 = addButton(type, direction, "Damage", 1)
-	button2 = addButton(type, direction, "Attack Speed", 2)
-	button3 = addButton(type, direction, "Move Speed", 3)
-	next2 = "</div><div style='width:50%;height:250px;vertical-align:top;'>"
-	button4 = addButton(type, direction, "Max Health", 4)
-	button5 = addButton(type, direction, "Armor", 5)
-	button6 = direction == "right" ? ("<div class='buyButton' style='border:1px solid;width:99%;' onclick='resetUpgradePoints(\""+type+"\")'><div class='buyName' style='left:9px;top:22px'>Reset Upgrade Points</div></div>") : ""
+	next3 = "<div style='width:50%;height:250px;vertical-align:top;'>"
+	button1 = addButton(type, "Damage", 1)
+	button2 = addButton(type, "Attack Speed", 2)
+	button3 = addButton(type, "Move Speed", 3)
+	next4 = "</div><div style='width:50%;height:250px;vertical-align:top;'>"
+	button4 = addButton(type, "Max Health", 4)
+	button5 = addButton(type, "Armor", 5)
+	button6 = addButton(type, "Range", 6)
+	//button6 = "<div class='buyButton' style='border:1px solid;width:99%;' onclick='resetUpgradePoints(\""+type+"\")'><div class='buyName' style='left:9px;top:22px'>Reset Upgrade Points</div></div>"
 	finish = "</div></div>"
 	
-	if(direction == "right") {
+	finish = "</div><div id='spawnRateContainer' class='buySpawnRate' onclick='clickBuySpawnRate(\""+type+"\")'>"+
+		"<div class='icon'>"+addIcon(0)+"</div>"+
+		"<div class='costBox'><div class='goldIcon'></div><div id='costSpawn' class='number'>400</div></div>"+
+		"<div class='buyName'>Spawn Rate</div>"+
+		"<div class='buyIncreaseAmount' id='"+type+"Increase0'>5% faster</div>"+
+		"<div class='buyVal' style='color:rgb(102, 102, 102);'>Spawn <div id='buy0' style='color:black;'></div> unit every <div id='buy02' style='color:black;'></div> seconds.</div>"+
+	"</div></div>"
 	
-		finish = "</div><div id='spawnRateContainer' class='buySpawnRate' onclick='clickBuySpawnRate(\""+type+"\")'>"+
-			"<div class='icon'>"+addIcon(0)+"</div>"+
-			"<div class='costBox'><div class='goldIcon'></div><div id='costSpawn' class='number'>400</div></div>"+
-			"<div class='buyName'>Spawn Rate</div>"+
-			"<div class='buyIncreaseAmount' id='"+type+"Increase0'>10% faster</div>"+
-			"<div class='buyVal' id='buy0'></div>"+
-		"</div></div>"
-	}
 	
-	document.getElementById("unitScreen").innerHTML = commonStart+different1+commonAfter+different2+next+different3+next2+button1+button2+button3+next2+button4+button5+button6+finish;
-	document.getElementById("unitScreen").style.display="block"
-	document.getElementById("defaultScreen").style.display="none"
-	updateSpawnRate2(type, direction)
-	updateStatusUpgrades(unit, type, direction)
+	document.getElementById("unitUpgradesBox").innerHTML = commonStart+next+next2+next3+button1+button2+button3+next4+button4+button5+button6+finish;
+	//document.getElementById("unitUpgradesBox").style.display="block"
+	//document.getElementById("defaultScreen").style.display="none"
+	updateSpawnRate2(type)
+	updateStatusUpgrades(unit, type)
 	if(buttonsToClick) {
 		clickedOKButton()
 	}
 }
 
 
-function updateSpawnRate2(type, direction) {
-	if(type == "soldier" && direction == "right") document.getElementById("buy0").innerHTML = round2(spawnRate[0]) + " x " + spawnAmounts[1]
-	if(type == "spear" && direction == "right") document.getElementById("buy0").innerHTML = round2(spawnRate[1]) + " x " + spawnAmounts[2]
+function updateSpawnRate2(type) {
+	if(type == "soldier") numToUpdate = 0
+	if(type == "spear") numToUpdate = 1
+	document.getElementById("buy0").innerHTML = round2(spawnAmounts[numToUpdate+1])
+	document.getElementById("buy02").innerHTML = round2(spawnRate[numToUpdate])
 }
 
 function updateSpawnRate() {
-	if(document.getElementById("buy0")) document.getElementById("buy0").innerHTML = round2(spawnRate[typeNum/2]) + " x " + spawnAmounts[typeNum/2+1]
+	if(document.getElementById("buy0")) {
+		document.getElementById("buy0").innerHTML = round2(spawnAmounts[typeNum/2+1])
+		document.getElementById("buy02").innerHTML = round2(spawnRate[typeNum/2])
+	}
+	document.getElementById("bonusFromFamilies").innerHTML = round3(globalSpawnRate);
 }
 
-function updateStatusUpgrades(unit, type, direction) {
+function updateStatusUpgrades(unit, type) {
 	if(unit.id) {
 		//handle status specific to unit
 		document.getElementById("curHealth").innerHTML = round1(unit.curHealth)
@@ -180,17 +164,15 @@ function updateStatusUpgrades(unit, type, direction) {
 		document.getElementById("curDamageDone").innerHTML = round(unit.totalDamageDone)
 		document.getElementById("curKills").innerHTML = unit.kills
 	}
-	typeNum = convertTypeToNum(type, direction)
-	if(direction == "right")  {
-		document.getElementById("buy").innerHTML=upgradePointsAvailable[typeNum];
-		document.getElementById("cost").innerHTML=round(unitCosts[typeNum]);
-		document.getElementById("costSpawn").innerHTML=round(costSpawnRate[typeNum]);
-	}
+	typeNum = convertTypeToNum(type, "right")
+	document.getElementById("buy").innerHTML=upgradePointsInitial[typeNum];
+	document.getElementById("cost").innerHTML=round(unitCosts[typeNum]);
+	document.getElementById("costSpawn").innerHTML=round(costSpawnRate[typeNum]);
 	for(e = 1; e < unitValues[typeNum].length+1; e++) {
-		if(direction == "right" && document.getElementById("points"+e)) document.getElementById("points"+e).innerHTML=unitPointValues[typeNum][e-1]
+		if(document.getElementById("points"+e)) document.getElementById("points"+e).innerHTML=unitPointValues[typeNum][e-1]
 		document.getElementById("buy"+e).innerHTML=round2(unitValues[typeNum][e-1])
 	}
-	updateSpawnRate2(type, direction)
+	updateSpawnRate2(type)
 }
 
 function convertTypeToNum(type, direction) {
@@ -201,23 +183,13 @@ function convertTypeToNum(type, direction) {
 	return -1;
 }
 
-function addButton(type, direction, name, num) {
-	if(direction == "right") {
-		return "<div class='buyButton "+(num != 2 ? "' onclick='clickBuyButton("+num+" , \""+type+"\" , \"right\")'" : "nohover'")+"  id='buyButton"+num+"'>"+
-			"<div class='icon'>"+addIcon(num)+"</div>"+
-			"<div class='buyName'>"+name+"</div>"+
-			"<div class='buyVal' id='buy"+num+"'>3</div>"+
-			(num != 2 ? "<div class='upgradePoints' id='points"+num+"'>3</div>" : "") +
-		"</div>"
-	}
-	else {
-		return "<div class='buyButton nohover'>"+
-			"<div class='icon'>"+addIcon(num)+"</div>"+
-			"<div class='buyName'>"+name+"</div>"+
-			"<div class='buyVal' id='buy"+num+"'>3</div>"+
-		"</div>"
-	}
-
+function addButton(type, name, num) {
+	return "<div class='buyButton "+(num == 1 || num == 4 ? "' onclick='clickBuyButton("+num+" , \""+type+"\")'" : "nohover'")+"  id='buyButton"+num+"'>"+
+		"<div class='icon'>"+addIcon(num)+"</div>"+
+		"<div class='buyName'>"+name+"</div>"+
+		"<div class='buyVal' id='buy"+num+"'>3</div>"+
+		(num == 1 || num == 4 ? "<div class='upgradePoints' id='points"+num+"'>3</div>" : "") +
+	"</div>"
 }
 
 function addIcon(num) {
@@ -240,6 +212,9 @@ function addIcon(num) {
 		return "<img src='img/shield.png' height='100%' width='100%'>"
 	}
 	if(num == 6) {
+		return "<img src='img/range.png' height='100%' width='100%'>"
+	}
+	if(num == 7) {
 		return "<img src='img/arrow.png' height='100%' width='100%'>"
 	}
 	return "";
@@ -256,12 +231,6 @@ function handleLineTimer() {
 		exitLineLeftTimer--
 		document.getElementById("exitLineLeft").style.backgroundColor = "yellow";
 	}
-	if(increasestageError) {
-		increasestageError--
-		document.getElementById("increasestageError").style.display = "block";
-	} else {
-		document.getElementById("increasestageError").style.display = "none";
-		}
 }
 
 function drawSpearLine(unit1, unit2) {
@@ -290,6 +259,54 @@ function redrawStoredLines(){
 		ctx.lineWidth = 3;
 		ctx.stroke();
 	}
+}
+
+
+function switchMainTab(switchTo) {
+	currentTab = switchTo
+	hideAllInfo()
+	switch(switchTo) {
+		case 0:
+			document.getElementById("actionSpace").style.display = "inline-block";
+			document.getElementById("warTab").style.backgroundColor="rgb(142, 212, 142)";
+		break;
+		case 1:
+			document.getElementById("mapTab").style.backgroundColor="rgb(142, 212, 142)";
+		break;
+		case 2:
+			document.getElementById("rightSpace").style.display = "inline-block";
+			document.getElementById("territoryTab").style.backgroundColor="rgb(142, 212, 142)";
+		break;
+		case 3:
+			document.getElementById("middleSpace").style.display = "inline-block";
+			document.getElementById("unitTab").style.backgroundColor="rgb(142, 212, 142)";
+		break;
+		case 4:
+			document.getElementById("buildingsTab").style.backgroundColor="rgb(142, 212, 142)";
+		break;
+		case 5:
+			document.getElementById("manaTab").style.backgroundColor="rgb(142, 212, 142)";
+		break;
+		case 6:
+			document.getElementById("optionsTab").style.backgroundColor="rgb(142, 212, 142)";
+			document.getElementById("optionsPage").style.display = "inline-block";
+		break;
+	}
+}
+
+function hideAllInfo() {
+	document.getElementById("actionSpace").style.display = "none";
+	document.getElementById("middleSpace").style.display = "none";
+	document.getElementById("rightSpace").style.display = "none";
+	document.getElementById("optionsPage").style.display = "none";
+	
+	document.getElementById("warTab").style.backgroundColor="white";
+	document.getElementById("mapTab").style.backgroundColor="white";
+	document.getElementById("territoryTab").style.backgroundColor="white";
+	document.getElementById("unitTab").style.backgroundColor="white";
+	document.getElementById("buildingsTab").style.backgroundColor="white";
+	document.getElementById("manaTab").style.backgroundColor="white";
+	document.getElementById("optionsTab").style.backgroundColor="white";
 }
 
 

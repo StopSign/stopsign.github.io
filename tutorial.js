@@ -1,6 +1,5 @@
 
 
-buttonsToClick = 0;
 showNextMessage = 0;
 higherZ = 9999999999999
 function startTutorial() {
@@ -42,25 +41,25 @@ function clickedOKButton() {
 		}
 		if(showNextMessage == 2) {
 			addMessage("When your units make it to the red line, you gain some score, reflected by the progress bar. When you beat the stage, it restarts.", 500, 239);
-			document.getElementById("mainProgressBar").style.zIndex = higherZ
+			document.getElementById("captureProgressBar").style.zIndex = higherZ
 			document.getElementById("score").style.zIndex = higherZ
 			addOKButton(200, 400)
 		}
 		if(showNextMessage == 3) {
 			addMessage("When you beat a stage, you can click on the right side of the battle area to go to the next stage.", 500, 283);
-			document.getElementById("mainProgressBar").style.zIndex = higherZ
+			document.getElementById("captureProgressBar").style.zIndex = higherZ
 			document.getElementById("score").style.zIndex = higherZ
 			addOKButton(529, 214)
 		}
 		if(showNextMessage == 4) {
 			addMessage("When enemies make it to your red line, you lose score. If you are less than -200%, the stage restarts.", 500, 283);
-			document.getElementById("mainProgressBar").style.zIndex = higherZ
+			document.getElementById("captureProgressBar").style.zIndex = higherZ
 			document.getElementById("score").style.zIndex = higherZ
 			addOKButton(529, 234)
 		}
 		if(showNextMessage == 5) {
 			addMessage("When you reach 100%, you gain some territory", 500, 283);
-			document.getElementById("mainProgressBar").style.zIndex = 0
+			document.getElementById("captureProgressBar").style.zIndex = 0
 			document.getElementById("score").style.zIndex = 0
 			document.getElementById("territoryGainContainer").style.zIndex=higherZ
 			document.getElementById("territoryContainer").style.zIndex=higherZ

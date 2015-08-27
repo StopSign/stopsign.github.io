@@ -1,0 +1,53 @@
+TODO:
+Add tabs
+Resources on top, out of tab
+ * Pause
+
+War tab
+ * Battle
+ * Places - add explicit "extra units multiplier due to families"
+ * Health of castle's on each side
+ * Hover over a unit for popup info
+  > health, unit count, time alive, damage done, kills
+ * Hover out of box to clear popup
+ 
+Territory tab
+ * Places and progression
+ * Upgrades to reduce time / add multipliers
+ * Upgrades to improve base
+
+Unit Upgrades tab
+ * Costs gold for upgrades to spawn / health / damage / special
+ * Experience points per unit that died
+ * Sliders to use exp points on health to damage
+
+Buildings tab
+ * Costs gold & territory
+ * Global upgrades
+ * Defensive upgrades
+ * Expensive but strong ugprades
+ * Next unit type
+ * Mana buildings
+ 
+Mana tab
+ * Manual actions (spells / debuffs)
+ * Gold upgrades mana regen / max
+ * Mana upgrades spell effectiveness
+ * Has a max that fills up
+ 
+Map tab
+ * Choose next level
+ * One-time bonus that resets every hour + minute * level
+ * Auto-restart level for 1/5th territory, half gold
+ * levels are varied types, custom set, alternates more melee or more ranged
+ * Boss every 5 levels, extra bonuses that reset every 3 hours + 30 minute * boss #
+ 
+Options tab
+ * Show tutorial
+ * Clear save
+ * Statistics
+ 
+Graphics
+ * Different sprites for units
+ * Varied backgrounds
+ * Gates on each side

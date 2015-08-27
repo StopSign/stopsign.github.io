@@ -6,25 +6,8 @@ function changeManualLane(id) {
 	document.getElementById('clickSpace' + currentManualLine).innerHTML = "<img src='img/selected.png' height='100%' width='100'>"//"<div style='width: 97%;position:relative;height: 97%;border-radius: 50%;border-top: 0px solid transparent;border-bottom: 0px solid transparent;border-left: 56px solid rgba(168, 37, 168, 0.73);border-right: 0px solid green;'></div>"
 }
 
-function showLeftArrow() {
-	document.getElementById("leftArrow").style.display="inline-block"
-}
-
-function hideLeftArrow() {
-	document.getElementById("leftArrow").style.display="none"
-
-}
-function showRightArrow() {
-	document.getElementById("rightArrow").style.display="inline-block"
-	
-}
-
-function hideRightArrow() {
-	document.getElementById("rightArrow").style.display="none"
-}
-
-function clickBuyButton(pos, type, direction) {
-	typeNum = convertTypeToNum(type, direction)
+function clickBuyButton(pos, type) {
+	typeNum = convertTypeToNum(type, "right")
 	if(typeNum == 1 && pos == 2) return
 	if(upgradePointsAvailable[typeNum] > 0) {
 		if(handleBuyAmounts(typeNum, pos-1)) {
@@ -32,7 +15,7 @@ function clickBuyButton(pos, type, direction) {
 			unitPointValues[typeNum][pos-1]++
 		}
 	}
-	updateStatusUpgrades("", type, direction)
+	updateStatusUpgrades("", type)
 	updateGoldVisual()
 }
 
@@ -45,7 +28,7 @@ function resetUpgradePoints(type) {
 	for(t = 0; t < unitValues[typeNum].length; t++) {
 		unitValues[typeNum][t]=unitValuesInitial[typeNum][t]
 	}
-	updateStatusUpgrades("", type, direction)
+	updateStatusUpgrades("", type)
 }
 
 function handleBuyAmounts(y, x) {
@@ -64,11 +47,18 @@ function clickBuySpawnRate(type) {
 	if(costSpawnRate[typeNum] <= gold) {
 		gold -= costSpawnRate[typeNum]
 		costSpawnRate[typeNum] *= (1.6 + typeNum/10)
-		spawnRate[typeNum/2] *= .9;
-		initialSpawnRate[typeNum/2] *= .9;
+		initialSpawnRate[typeNum/2] *= .95;
+		spawnRate[typeNum/2] *= .95;
+		if(initialSpawnRate[typeNum/2] <= .5) {
+			initialSpawnRate[typeNum/2]*=2;
+			spawnRate[typeNum/2] *= 2;
+			initialSpawnAmounts[typeNum/2]*=2;
+			spawnAmounts[typeNum/2+1] *= 2;
+		}
 	}
-	updateStatusUpgrades("", type, "right")
+	updateStatusUpgrades("", type)
 	updateGoldVisual()
+	updateSpawnRate()
 }
 
 function buyUpgradePoint(type) {
@@ -80,11 +70,12 @@ function buyUpgradePoint(type) {
 		unitCosts[typeNum] = Math.floor(1.2 * unitCosts[typeNum]);
 		upgradePointsAvailable[typeNum]++;
 		upgradePointsInitial[typeNum]++
-		updateStatusUpgrades("", type, "right")
+		updateStatusUpgrades("", type)
 	}
 	updateGoldVisual()
 }
 
+//obsolete
 function increasestage() {
 	if(higheststageUnlocked != stage) {
 		stage++
@@ -98,6 +89,7 @@ function increasestage() {
 	}
 }
 
+//obsolete
 function decreasestage() {
 	stage--;
 	if(stage <=0) {
@@ -165,6 +157,7 @@ function startANewstage() {
 	soldierSpawnRate = 4;
 	spearSpawnRate = 2.5;
 	spawnRateManual = 0;
+	globalSpawnRate=1;
 	spawnRate=[];
 	spawnAmounts=[]
 	spawnAmounts[0] = stage < 3 ? stage : 1+.5 * stage
@@ -180,8 +173,9 @@ function startANewstage() {
 	curClickedUnit = -1;
 	document.getElementById("stage").innerHTML=stage;
 	document.getElementById("territoryGain").innerHTML = stage * 10 + (stage * stage);
-	unitValues[1] = [stage+Math.floor(Math.pow(1.07, stage))-1, 3, .06, 150+Math.floor(stage*stage*stage/6), Math.floor(stage*stage/10)]
-	unitValues[3] = [14+stage*5+Math.floor(Math.pow(1.08, stage)), 20, .04, 15+Math.floor(stage*stage/2), 0]
+	document.getElementById("goldGain").innerHTML = stage * stage;
+	unitValues[1] = [stage+Math.floor(Math.pow(1.07, stage))-1, 3, .06, 150+Math.floor(stage*stage*stage/6), Math.floor(stage*stage/10), 4.5]
+	unitValues[3] = [14+stage*5+Math.floor(Math.pow(1.08, stage)), 20, .04, 15+Math.floor(stage*stage/2), 0, 10]
 	updateProgressVisual()
 	if(currentManualLine == -1) {
 		for(j = 0; j < 6; j++) {

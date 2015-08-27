@@ -1,0 +1,361 @@
+* {
+margin:0
+}
+
+.hideForHover {
+    margin-top:4px;
+    display:none;
+}
+
+.buyButton:hover .tooltipcontainer {
+    display:block;
+}
+.buttonContainer {
+	width:100%;
+	display:none;
+}
+.guidanceOption {
+    width:100%;
+    height:20%;
+    text-align: left;
+}
+.guidanceHover {
+    padding:0px 3px;
+    margin-top:5px;
+    display:none;
+    line-height:12px;
+}
+.clickMultiplier {
+    width:18%;
+    border:0px solid;
+    padding:3px;
+    height:60%;
+    padding-top:0px;
+    text-align:center;
+    font-size:18px;
+    font-weight: bold;
+    background:#F0CABE;
+    border-radius:12px;
+    cursor:pointer !important;
+}
+.selectedMultiplier {
+    width:22%;
+    border:1px solid;
+    padding:3px;
+    height:75%;
+    text-align:center;
+    padding-top:1px;
+    font-size:20px;
+    font-weight: bold;
+    background:#FA6F96;
+    border-radius:4px;
+    cursor:pointer !important;
+}
+.buyButton, .upgradeButton {
+    border:2px solid;
+    border-radius:8px;
+    width:90%;
+    margin-bottom:3px;
+    padding:5px;
+    min-width:247px;
+    line-height:14px;
+    cursor:pointer;
+}
+.buyCount {
+    float:right;
+    color:red;
+    font-size:20px;
+}
+div{
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+.progressNumbers {
+    text-align:left;
+    margin-right:20px;
+    line-height:20px;
+    margin-top:10px;
+}
+h3 {
+    margin:0;
+    display:inline-block;
+    font-size:20px;
+}
+h2 {
+    margin:0;
+    font-size:30px;
+    display:inline-block;
+}
+h4 {
+    margin:0;
+    display:inline-block;
+    font-size:18px;
+}
+.f18 {
+	font-size:18px;
+}
+div {
+    display:inline-block;
+    font-size:12px;
+}
+.tab {
+    height:24px;
+    border:2px solid #000;
+    border-bottom:0px;
+    border-top-left-radius:10px;
+    border-top-right-radius:10px;
+    color: #ff0003;
+    font-size:16px;
+    font-weight:bold;
+    cursor:pointer;
+    overflow:hidden;
+    text-align:left;
+    padding-left:5px;
+    width:9%;
+    margin-bottom:-4px;
+}
+#buySpace .tab:hover {
+    text-align:center;
+    width:auto;
+    padding-right:5px;
+}
+.number {
+    color:black;
+}
+.mainNumberDesc {
+    font-size:14px;
+    line-height:14px;
+    display:block;
+}
+
+.halfClickHorizontal {
+	margin-bottom:1px;
+    cursor:pointer;
+    width:135px;
+    border:5px solid green;
+    border-radius:5px;
+	height:60px;
+	display:none;
+}
+
+.smallClick {
+	margin-right:1px;
+	margin-bottom:1px;
+    cursor:pointer;
+    width:62px;
+    border:5px solid green;
+    border-radius:5px;
+	height:62px;
+	display:none;
+}
+
+#staminaClick1, #clickMe1 {
+    background:#293B99;
+    color:#2CFFFF;
+}
+
+#staminaClick2, #clickMe2 {
+    background:#C80000;
+    color:#2CFFFF;
+}
+#staminaClick3, #clickMe3 {
+    background:#66993C;
+    color:#2CFFFF;
+}
+#staminaClick4, #clickMe4 {
+    background:#FC9B1B;
+    color:#2CFFFF;
+}
+
+.toClick {
+    text-align:center;
+    padding:30px 0px;
+    font-size:24px;
+    cursor:pointer;
+    width:135px;
+    border:5px solid green;
+    border-radius:5px;
+	height:75px;
+	display:none;
+}
+
+#clickMeWalk1, #walkClick1{
+    background:#27CD29;
+    color:#896C2C;
+}
+
+#clickMeWalk2, #walkClick2{
+    background:#FF95F6;
+    color:#896C2C;
+}
+
+#outerBar {
+    width:100%;
+    height:50px;
+    background:grey;
+    margin-top:5px;
+    text-align:center;
+}
+#expBar {
+    width:95%;
+    height:25px;
+    margin-top:12px;
+    background:white;
+    border-radius:20px;
+}
+.buyColumn {
+    width:27%;
+    vertical-align:top;
+    height:100%
+}
+.flavorText {
+    font-style:italic;
+    margin-top:10px;
+    font-size:11px;
+    line-height:10px;
+}
+.optionsBox {
+    border:2px solid;
+    font-size:20px;
+    cursor:pointer;
+    margin-bottom:10px;
+    padding:2px 15px;
+}
+.halfBox {
+    height:46%;
+    margin:0;
+    border:1px solid;
+    width:100%;
+    text-align:left;
+    overflow:auto;
+}
+.guidanceOptionText {
+    margin:6px 5px;
+    font-size:20px;
+    vertical-align: top;
+}
+.guidanceButton {
+    float:right;
+    height:40px;
+    width:40px;
+    margin-right:5%;
+    margin-top:5px;
+}
+.tooltipcontainer {
+position:relative;
+}
+.tooltip{
+position:absolute;
+display:none;
+}
+
+.distanceBar {
+    width: 338px;
+    height: 24px;
+	margin-top:15px;
+    background-color: rgba(0, 0, 0, 0.25);
+    box-shadow: 0 0 3px #000000 inset, 0 0 2px rgba(255,255,255,0.1);
+    border-radius: 10px;
+    padding: 4px;
+     transform: rotate(180deg); 
+    display: inline-block;
+	text-align:left;
+}
+#innerDistance {
+  background: -webkit-linear-gradient(left top, rgb(13, 213, 0) , rgb(46, 47, 1)); /* For Safari 5.1 to 6.0 */
+  background: -o-linear-gradient(bottom right, rgb(13, 213, 0), rgb(46, 47, 1)); /* For Opera 11.1 to 12.0 */
+  background: -moz-linear-gradient(bottom right, rgb(13, 213, 0), rgb(46, 47, 1)); /* For Firefox 3.6 to 15 */
+  background: linear-gradient(to bottom right, rgb(13, 213, 0) , rgb(46, 47, 1)); /* Standard syntax */
+	border-radius: 12px;
+	position: absolute;
+	box-shadow: 0 1px 0 rgba(255, 255, 255, 0.3) inset, 0 -1px 3px rgba(0, 0, 0, 0.4) inset, 0 1px 1px #000000;
+	height: 24px;
+	width: 96%;
+ }
+
+.staminaBar {
+    width: 24px;
+    height: 200px;
+      margin: 0;
+    background-color: rgba(0, 0, 0, 0.25);
+    box-shadow: 0 0 3px #000000 inset, 0 0 2px rgba(255,255,255,0.1);
+    border-radius: 10px;
+    padding: 4px;
+    transform: rotate(180deg);
+    display: inline-block;
+}
+
+#innerStamina {
+	background: linear-gradient(#FFCC33, #F2E2B2);
+	border-radius: 12px;
+	position: absolute;
+	box-shadow: 0 1px 0 rgba(255, 255, 255, 0.3) inset, 0 -1px 3px rgba(0, 0, 0, 0.4) inset, 0 1px 1px #000000;
+	height: 97%;
+	width: 24px;
+ }
+ 
+ #innersleep {
+	background: linear-gradient(#F4FDFF, #06F6FF);
+	border-radius: 12px;
+	position: absolute;
+	box-shadow: 0 1px 0 rgba(255, 255, 255, 0.3) inset, 0 -1px 3px rgba(0, 0, 0, 0.4) inset, 0 1px 1px #000000;
+	height: 97%;
+	width: 24px;
+
+ }
+.color1_2 {
+	color:#AF6EEA;
+}
+ 
+ .color1_1 {
+	color:#7D36BE;
+ }
+ 
+ .color2_2 {
+	color:#044A04;
+ }
+ 
+ .color2_3 {
+	color:#136413;
+ }
+ 
+ .colorSta {
+	color:#FECE3D;
+ }
+ 
+ .colorExert {
+	color:#293B99;
+ }
+ 
+ .colorPowerLift {
+    color:#C80000;
+ } 
+ .colorRun {
+    color:#FC9B1B;
+ } 
+ .colorWalk {
+    color:#66993C;
+ }
+ 
+ .colorStroll {
+	color:#FF95F6;
+ }
+ 
+ .colorTakeItEasy {
+	color:#27CD29;
+ }
+ 
+ #levelBar{
+    width:100%;
+    height:15px;
+    border:1px solid #000;
+    overflow:hidden; }
+#levelBarInner{
+    width:37%;
+    height:15px;
+    border-right: 1px solid #000000;
+    background: #d65946; }

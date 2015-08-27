@@ -1,336 +1,265 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Feature Quest</title>
+	<meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+	<meta content="utf-8" http-equiv="encoding">
+	<title>Pull of War</title>
 	<link rel="stylesheet" href="stylesheet.css">
 </head>
 <body>
-<div style="height:100%;font-family:'Arial Black', Gadget, sans-serif;color:#666;display:block">
-<div id="mainColumn" style="width:100%;text-align:center">
-<div style="text-align:right;width:100%"><div id="mainTitle" style="font-size:40px;margin:10px;margin-right:15%;">Feature Quest v.3</div></div>
-<div id='mainBox' style='border:3px solid;padding:20px;height:800px;text-align:left;width:1400px;display:none;'>
-<div id='actionSpace' style="width:38%;vertical-align:top;text-align:left;">
-	<div style="width:100%;margin-top:20px;overflow-auto">
-		<div style="width:75%;height:250px;vertical-align:top">
-			<div id='DistanceArea' style="width:100%;overflow:auto;line-height:18px;margin-top:50px">
-				<h3 style='margin-bottom:10px'>7% upgrade price reduction</h3>
-				<div style='margin-left:20px;'>
-					<h2 id='distanceCur' class='progressNumbers number'></h2>
-					<div class='mainNumberDesc'>Resource 2_1</div>
-					<h2 id='distanceMax' class='progressNumbers number' style='color:hsl(120, 100%, 45%);'></h2>
-					<div class='mainNumberDesc'>Resource 2_1 needed</div>
-				</div>
-			<div style="width:100%;height:50px;">
-				<div class="distanceBar" style="">
-					<div id="innerDistance"></div>
-				</div>
-			</div>
-			</div>
-		</div>
-		<div style="height:250px;margin-right:10px;">
-			<div id='staminaMax' class='number' style="vertical-align:top;clear:left;float:left;"></div>
-			<div class="staminaBar" style="clear:left;float:left;">
-				<div id="innerStamina"></div>
-			</div>
-			<div id='staminaCur' class='number' style="clear:left;float:left;"></div>
-		</div>
-		<div id="sleepBar" style="height:250px;vertical-align:top;">
-			<div id='sleepMax' class='number' style="vertical-align:top;clear:left;float:left;">200</div>
-			<div class="staminaBar" style="clear:left;float:left;">
-				<div id="innersleep"></div>
-			</div>
-			<div id='sleepCur' class='number' style="clear:left;float:left;">100</div>
-		</div>
+
+<div id='greyBox' style='background-color:rgba(87, 70, 70, 0.79);position:absolute;height:1255px;width:100%;z-index:9999999999998;display:none;'></div>
+<div style="height:100%;font-family:Arial, Helvetica, serif;color:#666;display:block;font-weight:800;">
+<div id="mainColumn" style="width:100%;margin-left:20px;display:none;text-align:center;">
+<!--<div style="text-align:right;width:100%"><div id="mainTitle" style="font-size:40px;margin:10px;margin-right:15%;">Pull of War v.5</div></div> -->
+<div id='mainBox' style='border:3px solid;padding:20px;text-align:left;width:1200px;'>
+<div id='displaySpace' style="width:100%;text-align:center;border: 2px solid; height:100px;background-color:rgb(247, 230, 220);position:relative"> 
+	<div id='resourceDisplayBox' style='position:absolute;left:9px;width:400px;text-align:left;'>
+		<div style='top:4px;' class='statusLabel'>Gold: <div class='goldIcon'></div><div id='gold' class='bigNumber' style=''></div></div>
+		<div id='territoryContainer' style='top:28px;' class='statusLabel'>Territory: <img src='img/territory.png' height='18' width='15'><div id='territory' class='bigNumber'></div></div>
+		<div id='manaContainer' style='top:54px;background-color:rgb(247, 230, 220);' class='statusLabel'>Mana: <img src='img/mana.png' height='18' width='18'><div id='mana' class='bigNumber'>100f</div></div>
 	</div>
-	<div style="width:100%;margin-top:20px;">
-		<div style="width:50%;text-align:center;height:150px;vertical-align:top;">
-			<div id='clickMe1' class="toClick" onclick='startTheClickSpree(this.id)' style="display:inline-block" >Exert Yourself</div>
-			<div id='clickMe2' class="toClick" onclick='startTheClickSpree(this.id)'>Power Lifting</div>
-			<div id='clickMe3' class="toClick" onclick='startTheClickSpree(this.id)'>Walk with Purpose</div>
-			<div id='clickMe4' class="toClick" onclick='startTheClickSpree(this.id)'>Run</div>
-			<img id="clickGif1" src="gifs/giphy4.gif" style="height:145px;display:none;" >
-			<img id="clickGif2" src="gifs/powerLift.gif" style="height:145px;display:none;" >
-			<img id="clickGif3" src="gifs/walk with purpose1.gif" style="height:145px;display:none;width:250px" >
-			<img id="clickGif4" src="gifs/run.gif" style="height:145px;display:none;" >
-			<div style="width:146px;text-align:left;">
-				<div id="staminaClick1" class="smallClick" style="float:left"></div>
-				<div id="staminaClick2" class="smallClick" style="float:left;margin-right:0;" ></div>
-				<div id="staminaClick3" class="smallClick" style="float:left"></div>
-				<div id="staminaClick4" class="smallClick" style="float:left:margin-right:0;" ></div>
-			</div>
+	<div id='victoryConditionBox' style='position:absolute;left:113px;width:800px;'>
+		<div style='left:139px;top:2px;' class='statusLabel'>Your Wall Health: <div id='wallHealth' class='number' >801f</div></div>
+		<div style='left:354px;top:2px;' class='statusLabel'>Enemy Wall Health: <div id='enemyWallHealth' class='number' >800f</div></div>
+		<div style='left:590px;top:2px;' class='statusLabel'>Captured: <div id='score' class='number' ></div>%</div>
+		<div id='wallProgressBar' style='position:absolute;width:200px;height:20px;margin-top:2px;background-color:grey;display:block;left:119px;padding:5px 10px;top:21px;'>
+			<div id='compete3' style='width:50%;background-color:rgb(0, 61, 0);float:left' class='progressBar'></div><div id='compete4' style='width:50%;border-top-left-radius:25px;border-bottom-left-radius:25px;background-color:rgb(255, 13, 13);float:right;' class='progressBar'></div>
 		</div>
-		<div id='walkDiv' style="width:49%;text-align:center;vertical-align:top;display:none;">
-			<div id='clickMeWalk1' class="toClick" onclick='startWalking(this.id)' style="display:inline-block">Take it Easy</div>
-			<div id='clickMeWalk2' class="toClick" onclick='startWalking(this.id)'>Stroll</div>
-			<img id='walkGif1' src="gifs/take it easy3.gif" style="width:250px;height:145px;display:none;" >
-			<img id='walkGif2' src="gifs/stroll.gif" style="width:250px;height:145px;display:none;" >
-			<div id="walkClick1" class="halfClickHorizontal"></div>
-			<div id="walkClick2" class="halfClickHorizontal"></div>
+		<div id='enemyWallProgressBar' style='position:absolute;width:150px;height:20px;margin-top:2px;background-color:grey;display:block;left:363px;padding:5px 10px;top:21px;'>
+			<div id='compete5' style='width:50%;background-color:rgb(0, 61, 0);float:left' class='progressBar'></div><div id='compete6' style='width:50%;border-top-left-radius:25px;border-bottom-left-radius:25px;background-color:rgb(255, 13, 13);float:right;' class='progressBar'></div>
 		</div>
+		<div id='captureProgressBar' style='position:absolute;width:150px;height:20px;margin-top:2px;background-color:grey;display:block;left:549px;padding:5px 10px;top:21px;'>
+			<div id='compete1' style='width:50%;background-color:rgb(0, 61, 0);float:left' class='progressBar'></div><div id='compete2' style='width:50%;border-top-left-radius:25px;border-bottom-left-radius:25px;background-color:rgb(255, 13, 13);float:right;' class='progressBar'></div>
+		</div>
+		<div id='goldGainContainer' style='top:72px;left:137px;' class='statusLabel'>Gain <div class='goldIcon'></div><div id='goldGain' style='vertical-align:bottom' class='number'>10f</div> base gold per kill</div>
+		<div id='territoryGainContainer' style='top:72px;left:437px;' class='statusLabel'>Gain <img src='img/territory.png' height='18' width='15'><div id='territoryGain' style='vertical-align:bottom' class='number'>10</div> territory upon victory</div>
+		<div style='top:55px;left:361px' class='statusLabel'>Stage <div id='stage' class='bigNumber'></div></div>
 	</div>
-	<div style="width:50%;margin-top:5px;text-align:center;height:50px;vertical-align:top;">
-		<div id="staminaMultOptions" style="">
-			<button onclick="stopStaminaSpender()" >Stop</button><br>
-			<div style="margin-top:5px;"><div id="secondsToGo" class="number"></div> seconds until exhausted</div>
-		</div>
-	</div>
-	<div style="width:49%;margin-top:5px;text-align:center;height:50px;vertical-align:top;">
-		<div id="waterBottleDiv" style="">
-			<button onclick="drinkWater()" >Drink Water</button><br>
-			<div style="margin-top:5px;"><div id="waterBottles" class="number">10</div> Water Bottles left</div>
-		</div>
-	</div>
-	<div id="levelContainer" style="width:100%;margin-top:10px">
-		<h4>Level <div id="totalLevel" class="number f18"></div></h4>
-		<div id="levelBar">
-			<div id="levelBarInner">
-				
-			</div>
-		</div>
-		<div style="width:100%;">
-			<div style="float:left">
-				+<div id="expGain" class="number"></div> exp per second
-			</div>
-			<div style="float:right">
-				<div id="maxExp" class="number"></div>&nbsp;needed
-			</div>
-		</div>
-		<div style="margin-top:5px">
-			Effects:<br>
-			&nbsp;&nbsp;&nbsp;&nbsp;- 1% chance per 50 ms to gain level*<div id="resourceGainFromLevel" class="number">5</div> of either <div class="color1_2">resource1_2</div> or <div class="color2_3">resource2_3</div><br>
-			&nbsp;&nbsp;&nbsp;&nbsp;- Improves <div class="colorPowerLift">Power Lifting</div> and <div class="colorRun">Run</div> by level*<div id="staminaUseGainFromLevel" class="number">10</div>%
-		</div>
-	</div>
-	<!--Clicks per Second: <div id="CPS" class="number">0</div> -->
+	<div style='top:10px;left:856px' class='statusLabel'>Bonus from families: x<div id='bonusFromFamilies' class='bigNumber'>6f</div></div>
+	<div id='pauseButton' class='button' style='position:absolute;right:5px;top:5px;padding:3px;' onclick='pause()'>Pause</div>
+	<div class='button' style='position:absolute;right:5px;bottom:5px;' onclick='forceTutorial()' >Show Tutorial</div>
+	<div id='fps' style='position:absolute;left:3px;bottom:3px;font-size:11px;'></div>
 </div>
 
-<div style='width:2%;display:inline-block;'></div>
-<div id='middleSpace' class="buyColumn">
-	<div style="width:100%">
-		<div id="topMiddleTab0" class='tab' style="width:46%;text-align:center;" onclick="switchTopMiddleTabs(this.id)">Resources</div>
-		<div id="topMiddleTab1" class='tab' style="width:46%;color:#009CB9;text-align: center" onclick="switchTopMiddleTabs(this.id)">Options</div>
-	</div>
-	<div id='displaySpace' class="halfBox" style="height:95%">
-		<div style="margin-left:20px;margin-top:10px;">
-			<div id="displayDiv">
-				<h2 id='resource1_2' class='progressNumbers color1_2'>0</h2>
-				<div class='mainNumberDesc'>Resource 1_2</div>
-				<h2 id='resource1_1' class='progressNumbers color1_1'>0</h2>
-				<div class='mainNumberDesc'>Resource 1_1</div>
-				<div id="distanceRes" style="margin-top:30px;">
-					<h2 id='resource2_3' class='progressNumbers color2_3'>0</h2>
-					<div class='mainNumberDesc'>Resource 2_3</div>
-					<h2 id='resource2_2' class='progressNumbers color2_2'>0</h2>
-					<div class='mainNumberDesc'>Resource 2_2</div>
-				</div>
+<div id='allTabs' style='width:100%;height:40px;border:2px solid;text-align:center;color:black;margin-bottom:15px;'>
+	<div id='warTab' class='mainTab' onclick='switchMainTab(0)'>War</div>
+	<div id='mapTab' class='mainTab' onclick='switchMainTab(1)'>Map</div>
+	<div id='territoryTab' class='mainTab' onclick='switchMainTab(2)'>Places</div>
+	<div id='unitTab' class='mainTab' onclick='switchMainTab(3)'>Units</div>
+	<div id='buildingsTab' class='mainTab' onclick='switchMainTab(4)'>Buildings</div>
+	<div id='manaTab' class='mainTab' onclick='switchMainTab(5)'>Spells</div>
+	<div id='optionsTab' class='mainTab' onclick='switchMainTab(6)'>Options</div>
+</div>
+
+
+
+<div id='actionSpace' style="width:100%;vertical-align:top;text-align:left;border:2px solid;height:400px;background-color:rgb(223, 255, 221);position:relative;font-size:12px;">
+	<div id="fightTime" style="width:100%;position:absolute;"></div>
+	<canvas id='damageLines' width="1400" height="400" style="position:absolute;border:1px solid black;"></canvas>
+	<div id="spawnTimers" style="width:1200px;position:absolute;margin-left:200px;margin-top:5px;">
+		<div style='position:absolute;width:200px;overflow:hidden;left:-181px;'>
+			<div id='manualSpawnTimer' class='number f20' style='color:purple'></div>
+		</div>
+		<div class='pictureContainer' style='width:150px;'>
+			<div id='soldierManualSpawnAmount' class='spawnManualAmount'></div>
+			<div id='soldierAutoSpawnAmount' class='spawnAutoAmount'></div>
+			<div id='unit' class='unitContainer nohover' style="position:relative;">
+				<div id='body' class='soldier unit' style=''> </div>
+				<div id='unitWeapon' class='weapon'><div class='weaponsoldier'></div> </div>
 			</div>
-			<div id="optionsDiv" style="display:none;">
-				<div id="clearStorage" class="optionsBox" onclick="clearStorage()">
-					Clear Save
-				</div>
+			<div id='soldierSpawnTimer' class='number f20'></div>
+		</div>
+		
+		<div class='pictureContainer' style='width:150px;'>
+			<div id='spearManualSpawnAmount' class='spawnManualAmount'></div>
+			<div id='spearAutoSpawnAmount' class='spawnAutoAmount'></div>
+			<div id='unit' class='unitContainer nohover' style="position:relative;">
+				<div id='body' class='spear unit' style=''> </div>
+				<div id='unitWeapon' class='weapon'><div class='weaponspear'></div> </div>
 			</div>
+			<div id='spearSpawnTimer' class='number f20'></div>
+		</div> 
+		<div class='pictureContainer' style='position:relative;left:800px;'>
+			<div id='enemyAutoSpawnAmount' class='spawnAutoAmount'></div>
+			<div id='unit' class='unitContainer nohover' style="position:relative;">
+				<div id='unitWeapon' class='weapon'><div class='weaponsoldier'></div> </div>
+				<div id='body' class='soldier unitLeft' style=''> </div>
+			</div>
+			<div id='enemySpawnTimer' class='number f20'></div>
 		</div>
 	</div>
+	<div id='exitLineLeft' class='exitLine' style="margin-left:140px;"></div>
+	<div id='exitLineRight' class='exitLine' style="margin-left:1226px;"></div>
+	<div style='position:absolute;top:33px;left:68px;' >
+		<div id='clickSpace0' class='manualClickSpace' onclick='changeManualLane(0)'></div>
+		<div id='clickSpace1' class='manualClickSpace' onclick='changeManualLane(1)'></div>
+		<div id='clickSpace2' class='manualClickSpace' onclick='changeManualLane(2)'></div>
+		<div id='clickSpace3' class='manualClickSpace' onclick='changeManualLane(3)'></div>
+		<div id='clickSpace4' class='manualClickSpace' onclick='changeManualLane(4)'></div>
+		<div id='clickSpace5' class='manualClickSpace' onclick='changeManualLane(5)'></div>
+	</div>
+	<div id='increasestageError' style='position:absolute;left:1310px;top:47px;color:red;font-size:19px;width:78px;text-align:center;display:none;'>You must beat the current stage before you can go to the next one</div>
+	<div id='line1' class='actionLine' style="margin-top:70px;"> </div>
+	<div id='line2' class='actionLine'> </div>
+	<div id='line3' class='actionLine'> </div>
+	<div id='line4' class='actionLine'> </div>
+	<div id='line5' class='actionLine'> </div>
+	<div id='line6' class='actionLine'> </div>
 </div>
 
-<div style='width:2%;display:inline-block;'></div>
-<div id='buySpace' class="buyColumn">
-	<!--
-	<div id="topRightTab0" class='tab' style="background-color:lightcyan;" onclick="switchTopRightTabs(this.id)">Basic</div>
-	<div id="topRightTab1" class='tab' style="background-color:lightgoldenrodyellow; color:#009CB9;" onclick="switchTopRightTabs(this.id)">EXP</div>
-	<div id="topRightTab2" class='tab' style="background-color:lightgrey;color:#009CB9;;" onclick="switchTopRightTabs(this.id)">Travel</div>
-	<div id="topRightTab3" class='tab' style="background-color:skyblue;color:#009CB9;" onclick="switchTopRightTabs(this.id)">Mana</div>
-	<div id="topRightTab4" class='tab' style="background-color:lightsteelblue;color:#009CB9;" onclick="switchTopRightTabs(this.id)">Weapons</div>
-	<div id="topRightTab5" class='tab' style="background-color:chartreuse;color:#009CB9;" onclick="switchTopRightTabs(this.id)">Luck</div> -->
-	<div id='buyQuests' class='halfBox'>
-		<div style='margin-left:10px;margin-top:10px;'>
-			<div id="buyOptions1" class="buttonContainer">
-				<div id='buy1' class="buyButton" onclick='buy(this.id)' >
-					<div id="buycounts1" class="buyCount"></div>
-					<h4 style="width:80%">x<div id="staminaGainGainAmount" class="f18">1.1</div> faster <div class="colorSta f18">Stamina</div> gain when exhausted</h4><br>
-					Cost: <div id='costbuy1' class='cost number'></div> <div class="color1_1" >resource1_1</div><br />
-					Value: .2% x<div id='valuebuy1' class='cost number'></div> per 50ms<br>
+<div id='middleSpace' class="buyColumn" style='background-color:rgb(255, 237, 190);width:100%' >
+	<div id='defaultScreen' class='unitScreen' style='display:inline-block;'>
+		<div style='font-size:18px;'>Units</div><br>
+		<div>Click a unit type for possible upgrades</div><br>
+		<div id='unitList' style='width:400px;border:2px solid;position:absolute;left:10px;top:79px;height:459px;overflow:auto;'>
+			<div class='unitUpgradeContainer' onclick='changeUnitScreen("soldier")'>
+				<div id='unitContainer0' class='unitContainer displayLeft' >
+					<div id='body' class='soldier unit' style=''> </div>
+					<div id='unitWeapon' class='weapon'><div class='weaponsoldier'></div> </div>
 				</div>
+				Soldier
 			</div>
-			<div id="buyOptions2" class="buttonContainer">
-				<div id='buy2' class="buyButton" onclick='buy(this.id)' >
-					<div id="buycounts2" class="buyCount"></div>
-					<h4 style="width:80%">+100 max <div class="colorSta f18">Stamina</div></h4><br>
-					Cost: <div id='costbuy2' class='cost number'></div> <div class="color1_1" >resource1_1</div><br />
-					Value: <div id='valuebuy2' class='cost number'></div><br>
+			<div class='unitUpgradeContainer' onclick='changeUnitScreen("spear")'>
+				<div id='unitContainer2' class='unitContainer displayLeft' >
+					<div id='body' class='spear unit' style=''> </div>
+					<div id='unitWeapon' class='weapon'><div class='weaponspear'></div> </div>
 				</div>
+				Spearman
 			</div>
-			<div id="buyOptions3" class="buttonContainer">
-				<div id='buy3' class="buyButton" onclick='buy(this.id)' >
-					<div id="buycounts3" class="buyCount"></div>
-					<h4 style="width:80%">+1 <div class="color1_2 f18">resource1_2</div> mult when <div class="colorPowerLift f18">Power Lifting</div></h4><br>
-					Cost: <div id='costbuy3' class='cost number'></div> <div class="color1_1" >resource1_1</div><br />
-					Value: <div id='valuebuy3' class='cost number'></div><br>
+			<!--<div class='unitUpgradeContainer' onclick='changeUnitScreen("spear")'>
+				<div id='unitContainer3' class='unitContainer displayLeft' >
+					<div id='body' class='spear unit' style=''> </div>
+					<div id='unitWeapon' class='weapon'><div class='weaponspear'></div> </div>
 				</div>
+				Lightning Wizard
 			</div>
-			<div id="buyOptions4" class="buttonContainer">
-				<div id='buy4' class="buyButton" onclick='buy(this.id)' >
-					<div id="buycounts4" class="buyCount"></div>
-					<h4 style="width:80%">+1 <div class="color1_1 f18">resource1_1</div> mult per <div class="colorExert f18">Exert Yourself</div> tick</h4><br>
-					Cost: <div id='costbuy4' class='cost number'></div> <div class="color1_1" >resource1_1</div><br />
-					Value: <div id='valuebuy4' class='cost number'></div><br>
-				</div>			</div>
-
-			<div id="buyOptions5" class="buttonContainer">
-				<div id='buy5' class="buyButton" onclick='buy(this.id)' >
-					<div id="buycounts5" class="buyCount"></div>
-					<h4 style="width:80%">+1 <div class="color2_3 f18">resource2_3</div> mult per <div class="colorRun f18">Run</div> tick</h4><br>
-					Cost: <div id='costbuy5' class='cost number'></div> <div class="color1_1" >resource1_1</div><br />
-					Value: <div id='valuebuy5' class='cost number'></div><br>
+			<div class='unitUpgradeContainer' onclick='changeUnitScreen("spear")'>
+				<div id='unitContainer4' class='unitContainer displayLeft' >
+					<div id='body' class='spear unit' style=''> </div>
+					<div id='unitWeapon' class='weapon'><div class='weaponspear'></div> </div>
 				</div>
+				Knight
 			</div>
-			<div id="buyOptions6" class="buttonContainer">
-				<div id='buy6' class="buyButton" onclick='buy(this.id)' >
-					<div id="buycounts6" class="buyCount"></div>
-					<h4 style="width:80%">+1 <div class="color2_2 f18">resource2_2</div> mult per <div class="colorWalk f18">Walk with Purpose</div> tick</h4><br>
-					Cost: <div id='costbuy6' class='cost number'></div> <div class="color1_1" >resource1_1</div><br />
-					Value: <div id='valuebuy6' class='cost number'></div><br>
+			<div class='unitUpgradeContainer' onclick='changeUnitScreen("spear")'>
+				<div id='unitContainer5' class='unitContainer displayLeft' >
+					<div id='body' class='spear unit' style=''> </div>
+					<div id='unitWeapon' class='weapon'><div class='weaponspear'></div> </div>
 				</div>
+				Archer
 			</div>
+			<div class='unitUpgradeContainer' onclick='changeUnitScreen("spear")'>
+				<div id='unitContainer6' class='unitContainer displayLeft' >
+					<div id='body' class='spear unit' style=''> </div>
+					<div id='unitWeapon' class='weapon'><div class='weaponspear'></div> </div>
+				</div>
+				Priest
+			</div>
+			<div class='unitUpgradeContainer' onclick='changeUnitScreen("spear")'>
+				<div id='unitContainer7' class='unitContainer displayLeft' >
+					<div id='body' class='spear unit' style=''> </div>
+					<div id='unitWeapon' class='weapon'><div class='weaponspear'></div> </div>
+				</div>
+				Catapult
+			</div>-->
+		</div>
+		<div id='unitUpgradesBox' style='width:740px;border:2px solid;position:absolute;left:437px;top:79px;height:459px;'>
+			
 		</div>
 	</div>
-	<!--
-	<div style='height:6%;border:1px solid;border-top:0;width:100%;text-align:center;margin-top:-4px;'>
-		<div id="clickMult0" class="selectedMultiplier" onclick="changeClickMult(this.id)">1</div>
-		<div id="clickMult1" class="clickMultiplier" onclick="changeClickMult(this.id)">5</div>
-		<div id="clickMult3" class="clickMultiplier" onclick="changeClickMult(this.id)">100%</div>		<div id="clickMult2" class="clickMultiplier" onclick="changeClickMult(this.id)">50%</div>
+	<div id='unitScreen' class='unitScreen'></div>
+</div>
 
+<div id='rightSpace' class="buyColumn" style="background-color:white;">
+	<div class='spawnContainer' style='margin-top:15px;'>
+		<div id='progress0' class='unitProgress'><div id='placeProgressInner0' class='placeProgresInner'></div></div>
+		<div class='spawnLabel'>Families</div>
+		<div id='placeTimer0' class='placeTimer'>30</div>
+		<div id='placeAmount0' class='placeAmount'>30%</div>
 	</div>
-	-->
-
-	<div style='height:5%'></div>
-	<div id='buyUpgrades' class='halfBox'>
-		<div style='margin-left:10px;margin-top:10px;width:96%'>
-			<div id="buyupgrade1" class="buttonContainer">
-				<div id='upgrade1' class="upgradeButton" onclick='upgrade(this.id)' >
-					<h4>Unlock <div class="colorPowerLift f18"> Power Lifting</div></h4><br>
-					Cost: <div id='costupgrade1' class='cost number'></div> <div class="color1_1" >resource1_1</div><br />
-					A faster way to clear stamina. 10% <div class="colorSta">Stamina</div> per 500ms, always. Unlocks more upgrades.
-				</div>
-			</div>
-			<div id="buyupgrade2" class="buttonContainer">
-				<div id='upgrade2' class="upgradeButton" onclick='upgrade(this.id)' >
-					<h4>Unlock <div class="color2_2 f18">Journey</div> Upgrades</h4><br>
-					Cost: <div id='costupgrade2' class='cost number'></div> <div class="color1_1" >resource1_1</div><br />
-					Global reduction of upgrade prices.<br>
-					Also unlocks <div class="colorStroll">Stroll</div> and Distance
-				</div>
-			</div>
-			<div id="buyupgrade3" class="buttonContainer">
-				<div id='upgrade3' class="upgradeButton" onclick='upgrade(this.id)' >
-					<h4>Unlock <div class="colorWalk f18">Walk with Purpose</div> and <div class="colorRun f18">Run</div></h4><br>
-					Cost: <div id='costupgrade3' class='cost number'></div> <div class="color1_1" >resource1_1</div><br />
-					Use <div class="colorSta">Stamina</div> to go the distance
-				</div>
-			</div>
-			<div id="buyupgrade4" class="buttonContainer">
-				<div id='upgrade4' class="upgradeButton" onclick='upgrade(this.id)' >
-					<h4>Learn how to Sleep and Drink Water</h4><br>
-					Cost: <div id='costupgrade4' class='cost number'></div> <div class="color1_1" >resource1_1</div><br />
-					Have you been awake this whole time?<br>
-					When using <div class="colorTakeItEasy">Take it Easy</div> or <div class="colorStroll">Stroll</div>, gain a sleep bonus and a small chance to find a Water Bottle.
-					The sleep bonus goes up slowly, and pushes against its max even slower. It affects <div class="color1_1">Resource 1_1</div>, <div class="color1_2">Resource 1_2</div>, <div class="color2_2">Resource 2_2</div>, and <div class="color2_3">Resource 2_3</div> gain.
-					The Water Bottle doubles the effect of the next <div class="colorPowerLift"> Power Lifting</div> or <div class="colorRun">Run</div>.
-				</div>
-			</div>
-			<div id="buyupgrade5" class="buttonContainer">
-				<div id='upgrade5' class="upgradeButton" onclick='upgrade(this.id)' >
-					<h4>Remember the stuff you Learn</h4><br>
-					Cost: <div id='costupgrade5' class='cost number'></div> <div class="color1_1" >resource1_1</div><br />
-					Start gaining levels.<br>
-					Exp gain resource1_2^.5 + resource2_3^.5 per second<br>
-					NOT CODED YET:Spend talent points for more bonuses. Reset available once every 2 hours.
-				</div>
-			</div>
-			<div id="buyupgrade6" class="buttonContainer">
-				<div id='upgrade6' class="upgradeButton" onclick='upgrade(this.id)' >
-					<h4><div class="colorSta f18"> Stamina</div> Talent Points</h4><br>
-					Cost: <div id='costupgrade6' class='cost number'></div> <div class="color1_1" >resource1_1</div><br />
-					Raises cost of other Talent Point upgrades by 10x
-				</div>
-			</div>
-			<div id="buyupgrade7" class="buttonContainer">
-				<div id='upgrade7' class="upgradeButton" onclick='upgrade(this.id)' >
-					<h4><div class="colorPowerLift f18">Power Lifting </div>Talent Points</h4><br>
-					Cost: <div id='costupgrade7' class='cost number'></div> <div class="color1_1" >resource1_1</div><br />
-					Raises cost of other Talent Point upgrades by 10x
-				</div>
-			</div>
-			<div id="buyupgrade8" class="buttonContainer">
-				<div id='upgrade8' class="upgradeButton" onclick='upgrade(this.id)' >
-					<h4><div class="colorExert f18">Exert Yourself </div>Talent Points</h4><br>
-					Cost: <div id='costupgrade8' class='cost number'></div> <div class="color1_1" >resource1_1</div><br />
-					Raises cost of other Talent Point upgrades by 10x
-				</div>
-			</div>
-			<div id="buyupgrade9" class="buttonContainer">
-				<div id='upgrade9' class="upgradeButton" onclick='upgrade(this.id)' >
-					<h4><div class="colorRun f18">Run </div>Talent Points</h4><br>
-					Cost: <div id='costupgrade9' class='cost number'></div> <div class="color1_1" >resource1_1</div><br />
-					Raises cost of other Talent Point upgrades by 10x
-				</div>
-			</div>
-			<div id="buyupgrade10" class="buttonContainer">
-				<div id='upgrade10' class="upgradeButton" onclick='upgrade(this.id)' >
-					<h4><div class="colorWalk f18">Walk with Purpose </div>Talent Points</h4><br>
-					Cost: <div id='costupgrade10' class='cost number'></div> <div class="color1_1" >resource1_1</div><br />
-					Raises cost of other Talent Point upgrades by 10x
-				</div>
-			</div>
-			<div id="buyupgrade11" class="buttonContainer">
-				<div id='upgrade11' class="upgradeButton" onclick='upgrade(this.id)' >
-					<h4><div class="colorTakeItEasy f18">Take it Easy </div>Talent Points</h4><br>
-					Cost: <div id='costupgrade11' class='cost number'></div> <div class="color1_1" >resource1_1</div><br />
-					Raises cost of other Talent Point upgrades by 10x
-				</div>
-			</div>
-			<div id="buyupgrade12" class="buttonContainer">
-				<div id='upgrade12' class="upgradeButton" onclick='upgrade(this.id)' >
-					<h4><div class="colorStroll f18">Stroll </div>Talent Points</h4><br>
-					Cost: <div id='costupgrade12' class='cost number'></div> <div class="color1_1" >resource1_1</div><br />
-					Raises cost of other Talent Point upgrades by 10x
-				</div>
-			</div>
-			<div id="buyupgrade13" class="buttonContainer">
-				<div id='upgrade13' class="upgradeButton" onclick='upgrade(this.id)' >
-					<h4><div class="colorStroll f18">Better Weapons </div>Talent Points</h4><br>
-					Cost: <div id='costupgrade13' class='cost number'></div> <div class="color1_1" >resource1_1</div><br />
-					More buff timers
-				</div>
-			</div>
-			<div id="buyupgrade14" class="buttonContainer">
-				<div id='upgrade14' class="upgradeButton" onclick='upgrade(this.id)' >
-					<h4><div class="colorStroll f18">Next Upgrade2 </div>Talent Points</h4><br>
-					Cost: <div id='costupgrade14' class='cost number'></div> <div class="color1_1" >resource1_1</div><br />
-					
-				</div>
-			</div>
-			<div id="buyupgrade15" class="buttonContainer">
-				<div id='upgrade15' class="upgradeButton" onclick='upgrade(this.id)' >
-					<h4><div class="colorStroll f18">Hyperspeed</div>Talent Points</h4><br>
-					Cost: <div id='costupgrade15' class='cost number'></div> <div class="color1_1" >resource1_1</div><br />
-					All that extra time you've saved condenses into faster time
-				</div>
-			</div>
-		</div>
+	<div class='spawnContainer'>
+		<div class='upArrow'></div>
+		<div id='progress1' class='unitProgress'><div id='placeProgressInner1' class='placeProgresInner'></div></div>
+		<div class='spawnLabel'>Villages</div>
+		<div id='placeTimer1' class='placeTimer'>30</div>
+		<div id='placeAmount1' class='placeAmount'>30</div>
 	</div>
+	<div class='spawnContainer'>
+		<div class='upArrow'></div>
+		<div id='progress2' class='unitProgress'><div id='placeProgressInner2' class='placeProgresInner'></div></div>
+		<div class='spawnLabel'>Towns</div>
+		<div id='placeTimer2' class='placeTimer'>3</div>
+		<div id='placeAmount2' class='placeAmount'>3</div>
+	</div>
+	<div class='spawnContainer'>
+		<div class='upArrow'></div>
+		<div id='progress3' class='unitProgress'><div id='placeProgressInner3' class='placeProgresInner'></div></div>
+		<div class='spawnLabel'>Cities</div>
+		<div id='placeTimer3' class='placeTimer'>30</div>
+		<div id='placeAmount3' class='placeAmount'>30</div>
+	</div>
+	<div class='spawnContainer'>
+		<div class='upArrow'></div>
+		<div id='progress4' class='unitProgress'><div id='placeProgressInner4' class='placeProgresInner'></div></div>
+		<div class='spawnLabel'>States</div>
+		<div id='placeTimer4' class='placeTimer'>30</div>
+		<div id='placeAmount4' class='placeAmount'>30</div>
+	</div>
+	<div class='spawnContainer'>
+		<div class='upArrow'></div>
+		<div id='progress5' class='unitProgress'><div id='placeProgressInner5' class='placeProgresInner'></div></div>
+		<div class='spawnLabel'>Countries</div>
+		<div id='placeTimer5' class='placeTimer'>30</div>
+		<div id='placeAmount5' class='placeAmount'>30</div>
+	</div>
+	<div class='spawnContainer'>
+		<div class='upArrow'></div>
+		<div id='progress6' class='unitProgress'><div id='placeProgressInner6' class='placeProgresInner'></div></div>
+		<div class='spawnLabel'>Regions</div>
+		<div id='placeTimer6' class='placeTimer'>30</div>
+		<div id='placeAmount6' class='placeAmount'>30</div>
+	</div>
+	<div style='width:100%;border-top:5px solid;text-align:center;margin-top:15px;margin-bottom:10px;'>Spend territory to increase starting amounts</div>
+	<div style='width:50%;height:200px;vertical-align:top;text-align:center;'>
+		<div class='button buyPlaceAmount' onclick='buyStartingPlaceAmounts(1)'><div class='placeBuyLabel'>Villages</div><div class='placeBuyCost'><img src='img/territory.png' height='18' width='13'><div id='placeCost1' class='number'></div></div>
+		</div><div class='button buyPlaceAmount' onclick='buyStartingPlaceAmounts(2)'><div class='placeBuyLabel'>Towns</div><div class='placeBuyCost'><img src='img/territory.png' height='18' width='13'><div id='placeCost2' class='number'></div></div>
+		</div><div class='button buyPlaceAmount' onclick='buyStartingPlaceAmounts(3)'><div class='placeBuyLabel'>Cities</div><div class='placeBuyCost'><img src='img/territory.png' height='18' width='13'><div id='placeCost3' class='number'></div></div></div>
+	</div><div style='width:50%;height:200px;vertical-align:top;text-align:center;'>
+		<div class='button buyPlaceAmount' onclick='buyStartingPlaceAmounts(4)'><div class='placeBuyLabel'>States</div><div class='placeBuyCost'><img src='img/territory.png' height='18' width='13'><div id='placeCost4' class='number'></div></div>
+		</div><div class='button buyPlaceAmount' onclick='buyStartingPlaceAmounts(5)'><div class='placeBuyLabel'>Countries</div><div class='placeBuyCost'><img src='img/territory.png' height='18' width='13'><div id='placeCost5' class='number'></div></div>
+		</div><div class='button buyPlaceAmount' onclick='buyStartingPlaceAmounts(6)'><div class='placeBuyLabel'>Regions</div><div class='placeBuyCost'><img src='img/territory.png' height='18' width='13'><div id='placeCost6' class='number'>
+		</div></div></div>
+	</div>
+</div>
 
-	
+<div id='optionsPage' style='width:100%'>
+	<div id="credits" style="float:left;margin-right:70%;">Created by: <a style="color:red" href='http://reddit.com/u/stop_sign'>Stop_Sign</a></div><br>
+	<div id="credits" style="float:left;margin-right:70%;">Made for: <a style="color:black" href='http://reddit.com/r/incremental_games'>/r/incremental_games</a></div><br>
+	<div class='button' style='padding:5px;' onclick='clearStorage()'>Clear Save</div>
 </div>
+
 </div>
-<div id="credits" style="margin-right:10%;">Created by: <div style="color:red">Stop_Sign</div></div>
-</div>
-</div>
+
 </body>
       <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
       <script src="https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
-<script src="handleNewOptions.js"></script>
-<script src="handleSaving.js"></script>
-<script src="IncrementalScript.js"></script>
+<!--<script src="tutorial.js"></script>-->
+<script src="graphics.js"></script>
+<script src="classes.js"></script>
+<script src="manualActions.js"></script>
+<script src="pullofwar.js"></script>
+<script src="handleSavingPull.js"></script>
+<!--
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-60978932-1', 'auto');
+  ga('send', 'pageview');
+
+</script>
+-->
 
 </html>
