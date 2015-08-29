@@ -1,5 +1,5 @@
 function newUnitDiv(unit) {
-	commonBefore = "<div id='unit"+unit.id+"' class='unitContainer unitLine"+unit.line+"' style='z-index:"+(zIndex--)+"' onclick='clickAUnit("+unit.id+")'>" +
+	commonBefore = "<div id='unit"+unit.id+"' class='unitContainer unitLine"+unit.line+"' style='z-index:"+(zIndex--)+"' onmouseover='hoverAUnit("+unit.id+")'>" +
 			"<div class='healthBarOuter'><div class='healthBarInner' id='healthBar"+unit.id+"' style='z-index:"+(zIndex--)+"'></div></div>";
 	if(unit.direction === "right") {
 		different = "<div id='body' class='"+unit.type+" unit' style=''> </div>" + 
@@ -27,11 +27,8 @@ function updateSpawnTimers() {
 	document.getElementById("soldierSpawnTimer").innerHTML = round2(soldierSpawnRate);
 	document.getElementById("spearSpawnTimer").innerHTML = round2(spearSpawnRate);
 	document.getElementById("enemySpawnTimer").innerHTML = round2(enemySpawnRate);
-	document.getElementById("manualSpawnTimer").innerHTML = round2(spawnRateManual);
 	document.getElementById("enemyAutoSpawnAmount").innerHTML = round(spawnAmounts[0])
-	document.getElementById("soldierManualSpawnAmount").innerHTML = spawnManualAmounts[0]
 	document.getElementById("soldierAutoSpawnAmount").innerHTML = Math.floor(spawnAmounts[1]*globalSpawnRate)
-	document.getElementById("spearManualSpawnAmount").innerHTML = spawnManualAmounts[1]
 	document.getElementById("spearAutoSpawnAmount").innerHTML = Math.floor(spawnAmounts[2]*globalSpawnRate)
 }
 
@@ -54,27 +51,15 @@ function updatePlaceVisuals() {
 	}
 }
 
-function updateProgressVisual() {
-	scoreNeededForstage = 50+stage * 50
-	toModify = unitsThroughOnRight
-	if ( unitsThroughOnRight > scoreNeededForstage) {
-		toModify = 1
-	}
-	if ( unitsThroughOnRight < 0 ) {
-		toModify = 0
-	}
-	document.getElementById("compete1").style.width = toModify / scoreNeededForstage * 100 + "%";
-	document.getElementById("compete2").style.width = (1-toModify / scoreNeededForstage) * 100 + "%";
-	document.getElementById("score").innerHTML = Math.ceil(unitsThroughOnRight / scoreNeededForstage * 100)
-}
-
-function showUnitsScreen() {
-	if(buttonsToClick)
-		return
-	clickAUnit("-1")
-	document.getElementById("defaultScreen").style.display="block"
-	document.getElementById("unitScreen").innerHTML = ""
-	
+function updateWallHealthVisuals() {
+	document.getElementById("wallHealth").innerHTML = round1(wallHealth)
+	document.getElementById("enemyWallHealth").innerHTML = round1(enemyWallHealth)
+	document.getElementById("compete3").style.width = wallHealth / wallHealthInitial * 100 + "%";
+	document.getElementById("compete4").style.width = (1-wallHealth / wallHealthInitial) * 100 + "%";
+	document.getElementById("compete5").style.width = enemyWallHealth / enemyWallHealthInitial * 100 + "%";
+	document.getElementById("compete6").style.width = (1-enemyWallHealth / enemyWallHealthInitial) * 100 + "%";
+	document.getElementById("fenceHealth").innerHTML = fenceHealth;
+	document.getElementById("enemyFenceHealth").innerHTML = enemyFenceHealth;
 }
 
 function changeUnitScreen(unit) {
@@ -89,47 +74,45 @@ function changeUnitScreen(unit) {
 	} else {
 		type = unit.type
 	}
-	
+	if(type==="error") {
+		document.getElementById("unitUpgradesBox").innerHTML="";
+		return
+	}
 	commonStart = "<div class='unitContainer nohover' style='cursor:auto;display:block;position:initial;margin-left:auto;margin-right:auto;margin-top:5px;height:30px;'>";
 	next = "<div id='body' class='"+type+" unit' style=''> </div>" + 
 		"<div id='unitWeapon' class='weapon'><div class='weapon"+type+"'></div> </div></div>";
-	/*different2 = "<div class='buyName' style='left:79px;top:12px;'>Click a unit for it's status</div>"
-	if(unit.id) {
-		different2 = "<div class='buyName' style='left:189px;top:10px;'>Damage Done: <div id='curDamageDone' class='number'>"+unit.totalDamageDone+"</div></div>"+
-			"<div class='buyName' style='left:271px;top:59px'>Kills: <div id='curKills' class='number'>"+unit.kills+"</div></div>"+
-			"<div class='buyName' style='left:10px;top:10px;'>Health: <div id='curHealth' class='number'>"+round1(unit.curHealth)+"</div></div>"+
-			"<div class='buyName' style='left:10px;top:35px;'>Unit Count: <div id='curUnitCount' class='number'>"+unit.unitCount+"</div></div>"+
-			"<div class='buyName' style='left:10px;top:60px;'>Time Alive: <div id='curTimeAlive' class='number'>"+unit.timeAlive+"</div></div>";
-	} 
-	next = "</div>"*/
-	next2 =  "<div class='buySpawnRate' onclick='buyUpgradePoint(\""+type+"\")'>"+
+	next2 =  "<div class='buySpawnRate' style='margin-bottom:8px;' onclick='buyUpgradePoint(\""+type+"\")'>"+
 			"<div class='icon'>"+addIcon(7)+"</div>"+
 			"<div class='costBox'><div class='goldIcon'></div><div id='cost' class='number'>400</div></div>"+
 			"<div class='buyName' >Buy an <div style='color:teal;'>Upgrade Point</div></div>"+
 			"<div class='buyVal' id='buy'>3</div>"+
 		"</div>"
-	
-	next3 = "<div style='width:50%;height:250px;vertical-align:top;'>"
+	next25 = "<div id='slider'></div>";
+	next3 = "<div style='width:40%;height:63px;vertical-align:top;'>"
 	button1 = addButton(type, "Damage", 1)
-	button2 = addButton(type, "Attack Speed", 2)
-	button3 = addButton(type, "Move Speed", 3)
-	next4 = "</div><div style='width:50%;height:250px;vertical-align:top;'>"
+	next4 = "</div><div style='width:40%;height:63px;vertical-align:top;'>"
 	button4 = addButton(type, "Max Health", 4)
-	button5 = addButton(type, "Armor", 5)
-	button6 = addButton(type, "Range", 6)
-	//button6 = "<div class='buyButton' style='border:1px solid;width:99%;' onclick='resetUpgradePoints(\""+type+"\")'><div class='buyName' style='left:9px;top:22px'>Reset Upgrade Points</div></div>"
-	finish = "</div></div>"
-	
-	finish = "</div><div id='spawnRateContainer' class='buySpawnRate' onclick='clickBuySpawnRate(\""+type+"\")'>"+
+	next5= "</div><div id='spawnRateContainer' class='buySpawnRate' onclick='clickBuySpawnRate(\""+type+"\")'>"+
 		"<div class='icon'>"+addIcon(0)+"</div>"+
 		"<div class='costBox'><div class='goldIcon'></div><div id='costSpawn' class='number'>400</div></div>"+
 		"<div class='buyName'>Spawn Rate</div>"+
 		"<div class='buyIncreaseAmount' id='"+type+"Increase0'>5% faster</div>"+
 		"<div class='buyVal' style='color:rgb(102, 102, 102);'>Spawn <div id='buy0' style='color:black;'></div> unit every <div id='buy02' style='color:black;'></div> seconds.</div>"+
-	"</div></div>"
+	"</div>"
+	
+	next6="<div style='width:40%;height:110px;vertical-align:top;'>"
+	button2 = addButton(type, "Attack Speed", 2)
+	button3 = addButton(type, "Move Speed", 3)
+	next7="</div><div style='width:40%;height:110px;vertical-align:top;'>"
+	button5 = addButton(type, "Armor", 5)
+	button6 = addButton(type, "Range", 6)
+	finish ="</div>"
 	
 	
-	document.getElementById("unitUpgradesBox").innerHTML = commonStart+next+next2+next3+button1+button2+button3+next4+button4+button5+button6+finish;
+	document.getElementById("unitUpgradesBox").innerHTML = commonStart+next+next2+next25+next3+button1+next4+button4+next5+next6+button2+button3+next7+button5+button6+finish;
+	typeNum = convertTypeToNum(type, "right");
+	if(upgradePointsInitial[typeNum] > 0)
+		slider('slider');
 	//document.getElementById("unitUpgradesBox").style.display="block"
 	//document.getElementById("defaultScreen").style.display="none"
 	updateSpawnRate2(type)
@@ -139,6 +122,21 @@ function changeUnitScreen(unit) {
 	}
 }
 
+function slider(id) {
+    $("#" + id).slider({
+        value: 1,
+        min: 0,
+        max: upgradePointsInitial[typeNum],
+        step: 1,
+        slide: function(event, ui) {
+			unitPointValues[typeNum][0] = upgradePointsInitial[typeNum] - ui.value;
+			unitPointValues[typeNum][3] = ui.value;
+			handleBuyAmounts(typeNum, 0)
+			handleBuyAmounts(typeNum, 3)
+			updateStatusUpgrades("", type)
+        }
+    });
+}
 
 function updateSpawnRate2(type) {
 	if(type == "soldier") numToUpdate = 0
@@ -156,18 +154,14 @@ function updateSpawnRate() {
 }
 
 function updateStatusUpgrades(unit, type) {
-	if(unit.id) {
-		//handle status specific to unit
-		document.getElementById("curHealth").innerHTML = round1(unit.curHealth)
-		document.getElementById("curUnitCount").innerHTML = unit.unitCount
-		document.getElementById("curTimeAlive").innerHTML = round((totalTicks - unit.timeAlive)/20)+"s"
-		document.getElementById("curDamageDone").innerHTML = round(unit.totalDamageDone)
-		document.getElementById("curKills").innerHTML = unit.kills
-	}
 	typeNum = convertTypeToNum(type, "right")
 	document.getElementById("buy").innerHTML=upgradePointsInitial[typeNum];
 	document.getElementById("cost").innerHTML=round(unitCosts[typeNum]);
 	document.getElementById("costSpawn").innerHTML=round(costSpawnRate[typeNum]);
+	if(upgradePointsInitial[typeNum] && document.getElementById("slider").children.length == 0)
+		slider('slider');
+	if(upgradePointsInitial[typeNum])
+		$("#slider").slider('value', unitPointValues[typeNum][3]);
 	for(e = 1; e < unitValues[typeNum].length+1; e++) {
 		if(document.getElementById("points"+e)) document.getElementById("points"+e).innerHTML=unitPointValues[typeNum][e-1]
 		document.getElementById("buy"+e).innerHTML=round2(unitValues[typeNum][e-1])
@@ -190,6 +184,16 @@ function addButton(type, name, num) {
 		"<div class='buyVal' id='buy"+num+"'>3</div>"+
 		(num == 1 || num == 4 ? "<div class='upgradePoints' id='points"+num+"'>3</div>" : "") +
 	"</div>"
+}
+
+function updateHover(id) {
+	unitToDisplay = findUnitById(id)
+	if(!unitToDisplay) return
+	document.getElementById("curDamageDone").innerHTML = round1(unitToDisplay.totalDamageDone);
+	document.getElementById("curKills").innerHTML = unitToDisplay.kills;
+	document.getElementById("curHealth").innerHTML = round1(unitToDisplay.curHealth);
+	document.getElementById("curUnitCount").innerHTML = unitToDisplay.unitCount;
+	document.getElementById("curTimeAlive").innerHTML = round((totalTicks - unitToDisplay.timeAlive)/20)+"s";
 }
 
 function addIcon(num) {
@@ -218,19 +222,6 @@ function addIcon(num) {
 		return "<img src='img/arrow.png' height='100%' width='100%'>"
 	}
 	return "";
-}
-
-function handleLineTimer() {
-	document.getElementById("exitLineRight").style.backgroundColor = "red";
-	document.getElementById("exitLineLeft").style.backgroundColor = "red";
-	if(exitLineRightTimer) {
-		exitLineRightTimer--
-		document.getElementById("exitLineRight").style.backgroundColor = "yellow";
-	}
-	if(exitLineLeftTimer) {
-		exitLineLeftTimer--
-		document.getElementById("exitLineLeft").style.backgroundColor = "yellow";
-	}
 }
 
 function drawSpearLine(unit1, unit2) {

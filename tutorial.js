@@ -15,7 +15,6 @@ function startTutorial() {
 function forceTutorial() {
 	localStorage.doneTutorial = 0;
 	showNextMessage = 0;
-	showUnitsScreen()
 	startTutorial()
 }
 
@@ -40,24 +39,28 @@ function clickedOKButton() {
 			addOKButton(260, 400)
 		}
 		if(showNextMessage == 2) {
+			//obsolete
 			addMessage("When your units make it to the red line, you gain some score, reflected by the progress bar. When you beat the stage, it restarts.", 500, 239);
 			document.getElementById("captureProgressBar").style.zIndex = higherZ
 			document.getElementById("score").style.zIndex = higherZ
 			addOKButton(200, 400)
 		}
 		if(showNextMessage == 3) {
+			//obsolete
 			addMessage("When you beat a stage, you can click on the right side of the battle area to go to the next stage.", 500, 283);
 			document.getElementById("captureProgressBar").style.zIndex = higherZ
 			document.getElementById("score").style.zIndex = higherZ
 			addOKButton(529, 214)
 		}
 		if(showNextMessage == 4) {
+			//obsolete
 			addMessage("When enemies make it to your red line, you lose score. If you are less than -200%, the stage restarts.", 500, 283);
 			document.getElementById("captureProgressBar").style.zIndex = higherZ
 			document.getElementById("score").style.zIndex = higherZ
 			addOKButton(529, 234)
 		}
 		if(showNextMessage == 5) {
+			//obsolete
 			addMessage("When you reach 100%, you gain some territory", 500, 283);
 			document.getElementById("captureProgressBar").style.zIndex = 0
 			document.getElementById("score").style.zIndex = 0

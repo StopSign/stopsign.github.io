@@ -15,8 +15,6 @@ doWork.postMessage({start:true,ms:50});*/
 
 globalId = 0;
 zIndex = 1000000000;
-exitLineRightTimer = 0;
-exitLineLeftTimer = 0;
 
 //	addUnit("soldier", 1, "left", 30);
 //addUnit("soldier", 0, "right", 2);
@@ -31,10 +29,6 @@ linesEnabled = 6;
 soldierSpawnRate = 4;
 spearSpawnRate = .5;
 spawnRateManual = 0;
-currentManualLine = -1;
-for(j = 0; j < 6; j++) {
-	document.getElementById('clickSpace' + j).innerHTML = "<div class='clickMe'>Click Me</div>";
-}
 placeCurTimers=   [0,  3, 35, 100, 295, 880, 2635];
 placeAmounts=     [1,  1,  1,   1,   1,   1,    1];
 
@@ -59,7 +53,6 @@ function tick() {
 		return
 	moveUnits()
 	checkForUnitAtEnds()
-	handleLineTimer()
 	checkForUnitCollisions()
 	redrawStoredLines()
 	if(timer % 2 == 0) {
@@ -76,7 +69,7 @@ function tick() {
 		halfSecond()
 		timer = 0;
 	}
-	unit = findUnitById(curClickedUnit)
+	updateHover(curClickedUnit)
 }
 
 function calcAverageTime() {
@@ -107,7 +100,6 @@ function handlePlaceChanges() {
 	if(placeAmounts[0] < territory) {
 		for(x = 1; x < placeCurTimers.length; x++) {
 			placeCurTimers[x]-=clockTimer
-	//console.log(placeCurTimers[x]+', '+x);
 			if(placeCurTimers[x] < 0) {
 				placeAmounts[x-1]+=placeAmounts[x]
 				placeCurTimers[x] = placeMaxTimers[x]
@@ -116,14 +108,6 @@ function handlePlaceChanges() {
 					if(extraFamilies < 0) extraFamilies = 0;
 					for(z = 0; z < placeAmounts[1] - extraFamilies; z++) {
 						globalSpawnRate *= 1+(1/(20+(placeAmounts[0]-z)*2)) //SPAWN RATE FORMULA
-						/*for(h = 0; h < spawnRate.length; h++) {
-							if(z + (placeAmounts[0]-placeAmounts[1]) > territory) continue
-							spawnRate[h] *= (1-(1/(20+placeAmounts[0]*2)))  
-							if(spawnRate[h]*2 < initialSpawnRateInitial[h]) {
-								spawnAmounts[h+1]*=2;
-								spawnRate[h]*=2;
-							}
-						}*/
 					}
 					updateSpawnRate()
 				}
@@ -142,13 +126,13 @@ function handleSpawnRates() {
 	soldierSpawnRate -= rateReduction;
 	if(soldierSpawnRate <= 0) {
 		j = Math.floor(Math.random() * linesEnabled)
-		addUnit("soldier", j, "right", Math.floor(spawnAmounts[1]*globalSpawnRate));
+		//addUnit("soldier", j, "right", Math.floor(spawnAmounts[1]*globalSpawnRate));
 		soldierSpawnRate += spawnRate[0];
 	}
 	spearSpawnRate -= rateReduction;
 	if(spearSpawnRate <= 0) {
 		j = Math.floor(Math.random() * linesEnabled)
-		addUnit("spear", j, "right",  Math.floor(spawnAmounts[2]*globalSpawnRate));
+		addUnit("spear", j, "right",  1+Math.floor(spawnAmounts[2]*globalSpawnRate));
 		spearSpawnRate += spawnRate[1];
 	}
 	enemySpawnRate -= rateReduction;
@@ -160,14 +144,6 @@ function handleSpawnRates() {
 		if(stage >= 3) spawnAmounts[0]+=.3335*Math.pow(1.06, stage)
 		enemySpawnRate = 15;
 	}
-	if(currentManualLine >= 0) {
-		spawnRateManual -= rateReduction;
-		if(spawnRateManual <= 0) {
-			addUnit("soldier", currentManualLine, "right", spawnManualAmounts[0]);
-			addUnit("spear", currentManualLine, "right", spawnManualAmounts[1]);
-			spawnRateManual = 10;
-		}
-	}
 	updateSpawnTimers()
 }
 
@@ -175,7 +151,8 @@ function moveUnits() {
 	for(y = 0; y < units.length; y++) {
 		for(x = 0; x < units[y].length; x++) {
 			if(units[y][x].engaged.length === 0) {
-				units[y][x].pos += unitValues[units[y][x].typeNum][2] * (units[y][x].direction != "right" ? -1 : 1);
+				if(units[y][x].shouldMove)
+					units[y][x].pos += unitValues[units[y][x].typeNum][2] * (units[y][x].direction != "right" ? -1 : 1);
 			}
 			updateUnitPos(y, x)
 		}
@@ -186,51 +163,61 @@ function checkForUnitAtEnds() {
 	triggerForDelete=[];
 	done = 0
 	for(y = 0; y < units.length; y++) {
-		for(x = 0; x < units[y].length ; x++) {
-			if(units[y][x].direction === "right" && units[y][x].pos > 93) { //unit made it to the right
-				unitsThroughOnRight+=units[y][x].unitCount;
-				exitLineRightTimer = 8
-				triggerForDelete.push(units[y][x])
-				checkDonestage()
-				done = 1
-				break;
-			}
-			else if(units[y][x].direction != "right" && units[y][x].pos < 5) { //enemy got through
-				unitsThroughOnLeft+=units[y][x].unitCount;
-				unitsThroughOnRight-=units[y][x].unitCount*10;
-				done = 1
-				if(unitsThroughOnRight < -200) {
-					done = 2
+		for(x = 0; x < units[y].length ; x++) { //handle killing fences and walls
+			if(units[y][x].direction === "right") {
+				if(enemyFenceHealth > 0 && units[y][x].pos > 85.5-units[y][x].range) { //right fence
+					units[y][x].shouldMove = 0
+					units[y][x].shouldAttack = 0
+					if(units[y][x].getDamageRoll()) {
+						enemyFenceHealth-=units[y][x].unitCount;
+					}
+				} else {
+					units[y][x].shouldMove = 1
+					units[y][x].shouldAttack = 0
 				}
-				exitLineLeftTimer = 8
-				triggerForDelete.push(units[y][x])
-				checkDonestage()
-				break;
+				if(enemyFenceHealth <= 0 && units[y][x].pos > 89-units[y][x].range) { //right wall
+					units[y][x].shouldMove = 0
+					units[y][x].shouldAttack = 0
+					enemyWallHealth -= units[y][x].getDamageRoll()
+				}
+			}
+			else if(units[y][x].direction != "right") {
+				if(fenceHealth > 0 && units[y][x].pos < units[y][x].range-0) { //left fence
+					units[y][x].shouldMove = 0
+					units[y][x].shouldAttack = 0
+					if(units[y][x].getDamageRoll()) {
+						fenceHealth-=units[y][x].unitCount;
+					}
+					
+				} else {
+					units[y][x].shouldMove = 1
+					units[y][x].shouldAttack = 0
+				}
+				if(fenceHealth <= 0 && units[y][x].pos < units[y][x].range-4) { //left wall
+					units[y][x].shouldMove = 0
+					units[y][x].shouldAttack = 0
+					wallHealth -= units[y][x].getDamageRoll()
+				}
 			}
 		}
-		if(done) break;
 	}
-	if(done == 2) {
-		startANewstage()
-		updateProgressVisual()
-	}
-	else {
-	deleteUnitsInList(triggerForDelete)
-	}
+	checkDonestage()
+	updateWallHealthVisuals()
 }
 
 function checkForUnitCollisions() {
-triggerForDelete=[];
+	triggerForDelete=[];
 	for(y = 0; y < units.length; y++) {
-		for(x = 0; x < units[y].length ; x++) {
-			
+		for(x = 0; x < units[y].length ; x++) { //unit i'm using
+			breakOuter = 0
 			for(z = 0; z < units.length; z++) {
-				for(w = 0; w < units[z].length; w++) {
-					if(y == z && w == x)
+				for(w = 0; w < units[z].length; w++) { //unit i'm comparing against
+					if(y == z && w == x) //same unit, continue
 						continue
 					test = 0
-					for(i = 0; i < triggerForDelete.length; i++) {
+					for(i = 0; i < triggerForDelete.length; i++) { //without this, units merging kills both of them (?)
 						if(triggerForDelete[i].equals(units[y][x])) {
+							breakOuter = 1
 							test = 1
 							break
 						}
@@ -238,7 +225,7 @@ triggerForDelete=[];
 					if(test) {
 						continue;
 					}
-					for(i = 0; i < units[y][x].engaged.length; i++) {
+					for(i = 0; i < units[y][x].engaged.length; i++) { //if i'm already engaged with the target, next target
 						if(units[y][x].engaged[i].equals(units[z][w])) {
 							test = 1
 							break
@@ -247,59 +234,37 @@ triggerForDelete=[];
 					if(test) {
 						continue;
 					}
-					//Ranged:
+					//Ranged: (to hit multiple rows)
 					if(units[y][x].type=="spear") {
 						if((Math.abs(y-z)<=1)&&units[z][w].direction != units[y][x].direction) {
-							difference = units[y][x].pos - units[z][w].pos
-							if(units[y][x].direction === "right") {
-								if(difference > -1*unitValues[2][5] && difference < 0) {
-									//console.log("pushing " + units[z][w].id + ", "+'variables1: '+y+", "+x+", "+z+", "+w+", id:"+units[y][x].id+", "+units[y][x].engaged.length)
-									//console.log(units[y][x].engaged);
-									units[y][x].engaged.push(units[z][w])
-								}
-							}
-							if(units[y][x].direction === "left") {
-								if(difference < unitValues[3][5] && difference > 0) {
-									//console.log("pushing " + units[z][w].id + ", "+'variables1: '+y+", "+x+", "+z+", "+w+", id:"+units[y][x].id+", "+units[y][x].engaged.length)
-									//console.log(units[y][x].engaged);
-									units[y][x].engaged.push(units[z][w])
-								}
+							difference = Math.abs(units[y][x].pos - units[z][w].pos)
+							if(difference < units[y][x].range && difference > 2) {
+								units[y][x].engaged.push(units[z][w])
 							}
 						}
 					}
 					//Melee:
-					if(z != y)
+					if(z != y) //not on the same level = continue
 						continue
-					if(units[z][w].direction == units[y][x].direction) {
-						if(Math.abs(units[y][x].pos - units[z][w].pos) <= 2 && units[z][w].type===units[y][x].type) {
+					if(units[z][w].direction == units[y][x].direction) { //join units of the same type
+						if(Math.abs(units[y][x].pos - units[z][w].pos) <= 1.5 && units[z][w].type===units[y][x].type) {
 							units[y][x].unitCount+=units[z][w].unitCount;
-							//console.log('variables1: '+y+", "+x+", "+z+", "+w+", id:"+units[y][x].id+", "+units[y][x].unitCount)
 							document.getElementById("count"+units[y][x].id).innerHTML = units[y][x].unitCount
-							healthBarNum = (units[y][x].curHealth / unitValues[units[y][x].typeNum][3] * 100);
-							document.getElementById("healthBar"+units[y][x].id).style.width = healthBarNum>100?100:healthBarNum; + "%";
 							if(units[z][w].id === curClickedUnit) {
-								clickAUnit(units[y][x].id)
+								hoverAUnit(units[y][x].id)
 							}
 							triggerForDelete.push(units[z][w])
-							//combine units into one
 						}
 					}
-					else if(Math.abs(units[y][x].pos - units[z][w].pos) <= unitValues[0][5]) { //soldier
-						if(units[y][x].direction === "right") {
-							units[y][x].pos = units[z][w].pos - unitValues[0][5];
-						}
-						else {
-							units[z][w].pos = units[y][x].pos - unitValues[0][5];
-						}
-						//console.log('variables: '+y+", "+x+", "+z+", "+w)
-						units[z][w].engaged.push(units[y][x]);
+					else if(units[y][x].type=="soldier" && Math.abs(units[y][x].pos - units[z][w].pos) <= units[y][x].range) { //soldier
 						units[y][x].engaged.push(units[z][w]);
-						//console.log('new battle: '+units[y][x].id + " vs " + units[z][w].id + " at " + Math.abs(pos - units[z][w].pos));
-					}
-					else {
 					}
 				}
+				if(breakOuter)
+					break;
 			}
+			if(breakOuter)
+				break;
 		}
 	}
 	deleteUnitsInList(triggerForDelete)
@@ -322,7 +287,7 @@ function handleBattles() {
 	//for each unit
 	for(y = 0; y < units.length; y++) {
 		for(x = units[y].length - 1; x >= 0; x--) {
-			if(units[y][x].curHealth > 0 && units[y][x].engaged.length > 0) {
+			if(units[y][x].curHealth > 0 && units[y][x].engaged.length > 0 && units[y][x].shouldAttack) {
 				bestTargetPos = 0;
 				print = 0;
 				for(i = 1; i < units[y][x].engaged.length; i++) {
@@ -372,7 +337,8 @@ function handleBattles() {
 					removeUnit(engageTarget, engageTarget.direction!="right")
 				}
 				else {
-					document.getElementById("healthBar"+engageTarget.id).style.width = (engageTarget.curHealth / unitValues[engageTarget.typeNum][3] * 100) + "%";
+					tempHealth = (engageTarget.curHealth / engageTarget.maxHealth * 100)
+					document.getElementById("healthBar"+engageTarget.id).style.width = tempHealth>100?100:tempHealth + "%";
 				}
 				//console.log("x:"+x)
 			}
@@ -410,14 +376,18 @@ function removeUnit(unit, shouldAdd) {
 }
 
 function checkDonestage() {
-	if(unitsThroughOnRight > scoreNeededForstage) {
+	//victory
+	if(enemyWallHealth <= 0) {
 		territory += stage * 10 + (stage * stage)
 		updateTerritoryVisual()
-		unitsThroughOnRight = 0;
 		higheststageUnlocked = stage+1 > higheststageUnlocked ? stage+1 : higheststageUnlocked;
 		startANewstage()
 	}
-	updateProgressVisual()
+	//loss
+	if(wallHealth <= 0) {
+		startANewstage()
+	}
+	updateWallHealthVisuals()
 }
 
 function addUnit(type, line, direction, unitCount) {
@@ -425,11 +395,11 @@ function addUnit(type, line, direction, unitCount) {
 		return
 	}
 	if(direction == "right") {
-		pos = 0
+		pos = -8
 		goldWorth = 0
 	}
 	else {
-		pos = 100
+		pos = 90
 		if(type == "soldier") {
 			goldWorth = stage * stage;
 		}

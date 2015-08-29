@@ -14,12 +14,16 @@ function Unit (line, pos, type, direction, unitCount, goldWorth) {
 	this.typeNum = convertTypeToNum(type, direction)
 	this.attackCounter = unitValues[this.typeNum][1]
 	this.curHealth = unitValues[this.typeNum][3]
+	this.maxHealth = unitValues[this.typeNum][3]
+	this.damage = unitValues[this.typeNum][0]
+	this.range = unitValues[this.typeNum][5]
+	this.shouldAttack = 1
 	this.takeDamage = function(dmg) {
-		unitsDead = Math.floor(dmg / unitValues[this.typeNum][3]);
-		dmg = dmg % unitValues[this.typeNum][3];
+		unitsDead = Math.floor(dmg / this.maxHealth);
+		dmg = dmg % this.maxHealth;
 		this.curHealth -= dmg
 		if(this.curHealth <= 0) {
-			this.curHealth = unitValues[this.typeNum][3] + this.curHealth
+			this.curHealth = this.maxHealth + this.curHealth
 			unitsDead++;
 		}
 		unitsActuallyDead = this.unitCount
@@ -31,6 +35,7 @@ function Unit (line, pos, type, direction, unitCount, goldWorth) {
 		unitsActuallyDead -= this.unitCount
 		if(unitsDead > 0) {
 			gold += unitsActuallyDead * this.goldWorth;
+			totalDead[this.typeNum] += unitsActuallyDead
 			updateGoldVisual()
 			if(this.direction != "right") { //respawn the unit when it dies
 				//addUnit("soldier", this.line, this.direction, unitsDead);
@@ -43,7 +48,9 @@ function Unit (line, pos, type, direction, unitCount, goldWorth) {
 			this.attackCounter--;
 			return 0;
 		}
-		dmgPerUnit = unitValues[this.typeNum][0] - unitValues[targetNum][4]
+		dmgPerUnit = this.damage
+		if(targetNum)
+			dmgPerUnit = this.damage - unitValues[targetNum][4]
 		if(dmgPerUnit < 0) dmgPerUnit = 0
 		dmg = dmgPerUnit*this.unitCount;
 		this.totalDamageDone+=dmg

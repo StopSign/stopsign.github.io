@@ -1,45 +1,22 @@
-function changeManualLane(id) {
-	for(j = 0; j < 6; j++) {
-		document.getElementById('clickSpace' + j).innerHTML = "";
-	}
-	currentManualLine = parseInt(id);
-	document.getElementById('clickSpace' + currentManualLine).innerHTML = "<img src='img/selected.png' height='100%' width='100'>"//"<div style='width: 97%;position:relative;height: 97%;border-radius: 50%;border-top: 0px solid transparent;border-bottom: 0px solid transparent;border-left: 56px solid rgba(168, 37, 168, 0.73);border-right: 0px solid green;'></div>"
-}
-
 function clickBuyButton(pos, type) {
+	//only pos == 1 and 4
 	typeNum = convertTypeToNum(type, "right")
-	if(typeNum == 1 && pos == 2) return
-	if(upgradePointsAvailable[typeNum] > 0) {
-		if(handleBuyAmounts(typeNum, pos-1)) {
-			upgradePointsAvailable[typeNum]--;
-			unitPointValues[typeNum][pos-1]++
-		}
+	if(pos === 1 && unitPointValues[typeNum][3] > 0) {
+		unitPointValues[typeNum][0]++
+		unitPointValues[typeNum][3]--
 	}
+	if(pos === 4 && unitPointValues[typeNum][0] > 0) {
+		unitPointValues[typeNum][3]++
+		unitPointValues[typeNum][0]--
+	}
+	handleBuyAmounts(typeNum, 0)
+	handleBuyAmounts(typeNum, 3)
 	updateStatusUpgrades("", type)
 	updateGoldVisual()
 }
 
-function resetUpgradePoints(type) {
-	typeNum = convertTypeToNum(type, "right")
-	upgradePointsAvailable[typeNum] = upgradePointsInitial[typeNum]
-	for(t = 0; t < unitPointValues[typeNum].length; t++) {
-		unitPointValues[typeNum][t]=0
-	}
-	for(t = 0; t < unitValues[typeNum].length; t++) {
-		unitValues[typeNum][t]=unitValuesInitial[typeNum][t]
-	}
-	updateStatusUpgrades("", type)
-}
-
 function handleBuyAmounts(y, x) {
-	if(x==0) unitValues[y][x] = 1.05 * unitValues[y][x] + 1
-	if(x==2) { 
-		if(unitValues[y][x] > 2) return 0;
-		unitValues[y][x] *= 1.1 
-	}
-	if(x==3) unitValues[y][x] = 1.05 * unitValues[y][x] + 15
-	if(x==4) unitValues[y][x]+=.200000001;
-	return 1;
+	unitValues[y][x] = unitValuesInitial[y][x]*unitPointValues[y][x]*.1+unitValuesInitial[y][x]*Math.pow(1.04, unitPointValues[y][x]);
 }
 
 function clickBuySpawnRate(type) {
@@ -67,10 +44,13 @@ function buyUpgradePoint(type) {
 		gold -= unitCosts[typeNum]
 		updateGoldVisual()
 		if(unitCosts[typeNum] < 30) unitCosts[typeNum] = 30
-		unitCosts[typeNum] = Math.floor(1.2 * unitCosts[typeNum]);
-		upgradePointsAvailable[typeNum]++;
+			unitCosts[typeNum] = Math.floor(1.2 * unitCosts[typeNum]);
 		upgradePointsInitial[typeNum]++
+		unitPointValues[typeNum][3]++;
+		handleBuyAmounts(typeNum, 3)
 		updateStatusUpgrades("", type)
+		$("#slider").slider('option', 'max', upgradePointsInitial[typeNum]);
+		$("#slider").slider('value', unitPointValues[typeNum][3]);
 	}
 	updateGoldVisual()
 }
@@ -82,10 +62,7 @@ function increasestage() {
 		unitsThroughOnRight = 0;
 		unitsThroughOnLeft = 0;
 		document.getElementById("stage").innerHTML=stage;
-		currentManualLine = -1;
 		startANewstage();
-	} else {
-		increasestageError = 40
 	}
 }
 
@@ -99,12 +76,11 @@ function decreasestage() {
 		unitsThroughOnRight = 0;
 		unitsThroughOnLeft = 0;
 		document.getElementById("stage").innerHTML=stage;
-		currentManualLine = -1;
 		startANewstage();
 	}
 }
 
-function clickAUnit(id) {
+function removeHover() {
 	prevDiv = document.getElementById("unit"+curClickedUnit);
 	if(prevDiv) {
 		prevDiv.style.border = "0px solid black";
@@ -112,26 +88,36 @@ function clickAUnit(id) {
 		prevDiv.style.marginLeft = "0px";
 		prevDiv.style.padding = "0px";
 	}
+	document.getElementById("victoryConditionBox").style.display="inline-block";
+	document.getElementById("unitDisplayBox").style.display="none";
+	
+	curClickedUnit = "-1";
+}
 
+function hoverAUnit(id) {
+	prevDiv = document.getElementById("unit"+curClickedUnit);
+	if(prevDiv) {
+		prevDiv.style.border = "0px solid black";
+		prevDiv.style.marginTop = "0px";
+		prevDiv.style.marginLeft = "0px";
+		prevDiv.style.padding = "0px";
+	}
 	curClickedUnit = id;
-	if(id=="-1") return;
-	unit = findUnitById(id)
+	if(id=="-1") {
+		document.getElementById("victoryConditionBox").style.display="inline-block";
+		document.getElementById("unitDisplayBox").style.display="none";
+		return;
+	}
 	div = document.getElementById("unit"+id);
 	div.style.border = "1px solid black";
 	div.style.marginTop = "-1px";
 	div.style.marginLeft = "-3px";
 	div.style.padding = "0px 2px";
-	changeUnitScreen(unit)
-	//handleStatusScreen(unit)
-}
-
-function handleStatusScreen(unit) {
-	if(unit.type === "soldier" && unit.direction === "right") showSoldierScreen(unit);
-	if(unit.type === "soldier" && unit.direction != "right") showEnemySoldierScreen();
-	if(unit.type === "spear" && unit.direction === "right") showSpearScreen();
-	if(unit.type === "spear" && unit.direction != "right") showEnemySpearScreen();
 	
-	//put in updating the unit's values
+	updateHover(id)
+	
+	document.getElementById("victoryConditionBox").style.display="none";
+	document.getElementById("unitDisplayBox").style.display="inline-block";
 }
 
 function buyStartingPlaceAmounts(num) {
@@ -176,18 +162,18 @@ function startANewstage() {
 	document.getElementById("goldGain").innerHTML = stage * stage;
 	unitValues[1] = [stage+Math.floor(Math.pow(1.07, stage))-1, 3, .06, 150+Math.floor(stage*stage*stage/6), Math.floor(stage*stage/10), 4.5]
 	unitValues[3] = [14+stage*5+Math.floor(Math.pow(1.08, stage)), 20, .04, 15+Math.floor(stage*stage/2), 0, 10]
-	updateProgressVisual()
-	if(currentManualLine == -1) {
-		for(j = 0; j < 6; j++) {
-			document.getElementById('clickSpace' + j).innerHTML = "<div class='clickMe'>Click Me</div>";
-		}
-	}
+	//updateProgressVisual()
 	placeCurTimers=[]
 	placeAmounts=[]
 	for(j = 0; j < placeMaxTimers.length; j++) {
 		placeCurTimers[j]=placeMaxTimers[j]
 		placeAmounts[j]=placeAmountsStart[j]
 	}
+	wallHealth = wallHealthInitial
+	enemyWallHealth = enemyWallHealthInitial
+	fenceHealth = fenceHealthInitial
+	enemyFenceHealth = enemyFenceHealthInitial;
+	
 	updateSpawnRate()
 	//addUnit("spear", 0, "right", 1);
 }

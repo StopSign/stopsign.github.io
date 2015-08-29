@@ -54,15 +54,14 @@ position:absolute;
 }
 .buyButton {
 width:100%;
-padding:10px 0;
 height:50px;
 position:relative;
 }
 .buyName {
-font-size:16px;
+font-size:14px;
 position:absolute;
 left:53px;
-top:27px;
+top:22px;
 }
 .icon {
 position:absolute;
@@ -70,7 +69,6 @@ left:8px;
 top:8px;
 width:40px;
 height:40px;
-border:1px solid;
 }
 .costBox {
   position: absolute;
@@ -91,7 +89,7 @@ position:relative;
 }
 .buyIncreaseAmount {
   right: 6px;
-  top: 40px;
+  top: 23px;
   position: absolute;
   color: black;
 }
@@ -111,12 +109,13 @@ position:relative;
 .buySpawnRate {
 display:block;
 width:90%;
-height:65px;
+height:50px;
 margin-left:auto;
 margin-right:auto;
-margin-bottom:5px;
 position:relative;
 background-color:rgb(255, 237, 190);
+border:1px solid;
+border-radius:15px;
 }
 .buttonContainer {
 	width:100%;
@@ -334,12 +333,6 @@ width:4px;
 background-color:red;
 position:absolute;
 }
-.manualClickSpace {
-width:200px;
-height:54px;
-display:block;
-cursor:pointer;
-}
 
 .mouseOverArea{
 position:absolute;
@@ -513,4 +506,23 @@ cursor:pointer;
     -o-transform: rotate(45deg);
     -ms-transform: rotate(45deg);
     transform: rotate(45deg);
+}
+
+
+.ui-slider { 
+position: relative; 
+text-align: left; 
+background-color:rgb(181, 181, 181);
+border-radius:5px;
+height: 15px;
+width:80%;
+}
+.ui-slider .ui-slider-handle { 
+position: absolute;
+z-index: 2; 
+width: 10px; 
+height: 26px;
+background-color:#404040;
+border-radius:5px;
+top:-5px;
 }

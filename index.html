@@ -12,8 +12,8 @@
 <div style="height:100%;font-family:Arial, Helvetica, serif;color:#666;display:block;font-weight:800;">
 <div id="mainColumn" style="width:100%;margin-left:20px;display:none;text-align:center;">
 <!--<div style="text-align:right;width:100%"><div id="mainTitle" style="font-size:40px;margin:10px;margin-right:15%;">Pull of War v.5</div></div> -->
-<div id='mainBox' style='border:3px solid;padding:20px;text-align:left;width:1200px;'>
-<div id='displaySpace' style="width:100%;text-align:center;border: 2px solid; height:100px;background-color:rgb(247, 230, 220);position:relative"> 
+<div id='mainBox' style='border:3px solid;padding:20px;text-align:left;width:1200px;' >
+<div id='displaySpace' onmouseover="removeHover()" style="width:100%;text-align:center;border: 2px solid; height:100px;background-color:rgb(247, 230, 220);position:relative"> 
 	<div id='resourceDisplayBox' style='position:absolute;left:9px;width:400px;text-align:left;'>
 		<div style='top:4px;' class='statusLabel'>Gold: <div class='goldIcon'></div><div id='gold' class='bigNumber' style=''></div></div>
 		<div id='territoryContainer' style='top:28px;' class='statusLabel'>Territory: <img src='img/territory.png' height='18' width='15'><div id='territory' class='bigNumber'></div></div>
@@ -21,24 +21,26 @@
 	</div>
 	<div id='victoryConditionBox' style='position:absolute;left:113px;width:800px;'>
 		<div style='left:139px;top:2px;' class='statusLabel'>Your Wall Health: <div id='wallHealth' class='number' >801f</div></div>
-		<div style='left:354px;top:2px;' class='statusLabel'>Enemy Wall Health: <div id='enemyWallHealth' class='number' >800f</div></div>
-		<div style='left:590px;top:2px;' class='statusLabel'>Captured: <div id='score' class='number' ></div>%</div>
+		<div style='left:445px;top:2px;' class='statusLabel'>Enemy Wall Health: <div id='enemyWallHealth' class='number' >800f</div></div>
 		<div id='wallProgressBar' style='position:absolute;width:200px;height:20px;margin-top:2px;background-color:grey;display:block;left:119px;padding:5px 10px;top:21px;'>
 			<div id='compete3' style='width:50%;background-color:rgb(0, 61, 0);float:left' class='progressBar'></div><div id='compete4' style='width:50%;border-top-left-radius:25px;border-bottom-left-radius:25px;background-color:rgb(255, 13, 13);float:right;' class='progressBar'></div>
 		</div>
-		<div id='enemyWallProgressBar' style='position:absolute;width:150px;height:20px;margin-top:2px;background-color:grey;display:block;left:363px;padding:5px 10px;top:21px;'>
+		<div id='enemyWallProgressBar' style='position:absolute;width:200px;height:20px;margin-top:2px;background-color:grey;display:block;left:429px;padding:5px 10px;top:21px;'>
 			<div id='compete5' style='width:50%;background-color:rgb(0, 61, 0);float:left' class='progressBar'></div><div id='compete6' style='width:50%;border-top-left-radius:25px;border-bottom-left-radius:25px;background-color:rgb(255, 13, 13);float:right;' class='progressBar'></div>
 		</div>
-		<div id='captureProgressBar' style='position:absolute;width:150px;height:20px;margin-top:2px;background-color:grey;display:block;left:549px;padding:5px 10px;top:21px;'>
-			<div id='compete1' style='width:50%;background-color:rgb(0, 61, 0);float:left' class='progressBar'></div><div id='compete2' style='width:50%;border-top-left-radius:25px;border-bottom-left-radius:25px;background-color:rgb(255, 13, 13);float:right;' class='progressBar'></div>
-		</div>
-		<div id='goldGainContainer' style='top:72px;left:137px;' class='statusLabel'>Gain <div class='goldIcon'></div><div id='goldGain' style='vertical-align:bottom' class='number'>10f</div> base gold per kill</div>
-		<div id='territoryGainContainer' style='top:72px;left:437px;' class='statusLabel'>Gain <img src='img/territory.png' height='18' width='15'><div id='territoryGain' style='vertical-align:bottom' class='number'>10</div> territory upon victory</div>
+		<div id='goldGainContainer' style='top:72px;left:162px;' class='statusLabel'>Gain <div class='goldIcon'></div><div id='goldGain' style='vertical-align:bottom' class='number'>10f</div> base gold per kill</div>
+		<div id='territoryGainContainer' style='top:72px;left:402px;' class='statusLabel'>Gain <img src='img/territory.png' height='18' width='15'><div id='territoryGain' style='vertical-align:bottom' class='number'>10</div> territory upon victory</div>
 		<div style='top:55px;left:361px' class='statusLabel'>Stage <div id='stage' class='bigNumber'></div></div>
+	</div>
+	<div id='unitDisplayBox' style='position:absolute;left:203px;width:386px;border:1px solid;top:5px;height:87px;border-radius:15px;display:none;'>
+		<div class='buyName' style='left:203px;top:10px;'>Damage Done: <div id='curDamageDone' class='number'></div></div>
+		<div class='buyName' style='left:271px;top:59px'>Kills: <div id='curKills' class='number'></div></div>
+		<div class='buyName' style='left:42px;top:10px;'>Health: <div id='curHealth' class='number'></div></div>
+		<div class='buyName' style='left:11px;top:35px;'>Unit Count: <div id='curUnitCount' class='number'></div></div>
+		<div class='buyName' style='left:10px;top:60px;'>Time Alive: <div id='curTimeAlive' class='number'></div></div>
 	</div>
 	<div style='top:10px;left:856px' class='statusLabel'>Bonus from families: x<div id='bonusFromFamilies' class='bigNumber'>6f</div></div>
 	<div id='pauseButton' class='button' style='position:absolute;right:5px;top:5px;padding:3px;' onclick='pause()'>Pause</div>
-	<div class='button' style='position:absolute;right:5px;bottom:5px;' onclick='forceTutorial()' >Show Tutorial</div>
 	<div id='fps' style='position:absolute;left:3px;bottom:3px;font-size:11px;'></div>
 </div>
 
@@ -56,13 +58,9 @@
 
 <div id='actionSpace' style="width:100%;vertical-align:top;text-align:left;border:2px solid;height:400px;background-color:rgb(223, 255, 221);position:relative;font-size:12px;">
 	<div id="fightTime" style="width:100%;position:absolute;"></div>
-	<canvas id='damageLines' width="1400" height="400" style="position:absolute;border:1px solid black;"></canvas>
+	<canvas id='damageLines' width="1204" height="404" style="position:absolute;" onmouseout="removeHover()"></canvas>
 	<div id="spawnTimers" style="width:1200px;position:absolute;margin-left:200px;margin-top:5px;">
-		<div style='position:absolute;width:200px;overflow:hidden;left:-181px;'>
-			<div id='manualSpawnTimer' class='number f20' style='color:purple'></div>
-		</div>
 		<div class='pictureContainer' style='width:150px;'>
-			<div id='soldierManualSpawnAmount' class='spawnManualAmount'></div>
 			<div id='soldierAutoSpawnAmount' class='spawnAutoAmount'></div>
 			<div id='unit' class='unitContainer nohover' style="position:relative;">
 				<div id='body' class='soldier unit' style=''> </div>
@@ -72,7 +70,6 @@
 		</div>
 		
 		<div class='pictureContainer' style='width:150px;'>
-			<div id='spearManualSpawnAmount' class='spawnManualAmount'></div>
 			<div id='spearAutoSpawnAmount' class='spawnAutoAmount'></div>
 			<div id='unit' class='unitContainer nohover' style="position:relative;">
 				<div id='body' class='spear unit' style=''> </div>
@@ -80,7 +77,7 @@
 			</div>
 			<div id='spearSpawnTimer' class='number f20'></div>
 		</div> 
-		<div class='pictureContainer' style='position:relative;left:800px;'>
+		<div class='pictureContainer' style='position:relative;left:600px;'>
 			<div id='enemyAutoSpawnAmount' class='spawnAutoAmount'></div>
 			<div id='unit' class='unitContainer nohover' style="position:relative;">
 				<div id='unitWeapon' class='weapon'><div class='weaponsoldier'></div> </div>
@@ -89,17 +86,12 @@
 			<div id='enemySpawnTimer' class='number f20'></div>
 		</div>
 	</div>
-	<div id='exitLineLeft' class='exitLine' style="margin-left:140px;"></div>
-	<div id='exitLineRight' class='exitLine' style="margin-left:1226px;"></div>
-	<div style='position:absolute;top:33px;left:68px;' >
-		<div id='clickSpace0' class='manualClickSpace' onclick='changeManualLane(0)'></div>
-		<div id='clickSpace1' class='manualClickSpace' onclick='changeManualLane(1)'></div>
-		<div id='clickSpace2' class='manualClickSpace' onclick='changeManualLane(2)'></div>
-		<div id='clickSpace3' class='manualClickSpace' onclick='changeManualLane(3)'></div>
-		<div id='clickSpace4' class='manualClickSpace' onclick='changeManualLane(4)'></div>
-		<div id='clickSpace5' class='manualClickSpace' onclick='changeManualLane(5)'></div>
-	</div>
-	<div id='increasestageError' style='position:absolute;left:1310px;top:47px;color:red;font-size:19px;width:78px;text-align:center;display:none;'>You must beat the current stage before you can go to the next one</div>
+	<div id='fence' style='position:absolute;left:98px;height:300px;top:50px;width:5px;background-color:black;z-index:5;'></div>
+	<div id='enemyFence' style='position:absolute;left:1086px;height:300px;top:50px;width:5px;background-color:black;z-index:5;'></div>
+	<div id='wall' style='position:absolute;left:58px;height:350px;top:25px;width:10px;background-color:grey;z-index:5;'></div>
+	<div id='enemyWall' style='position:absolute;left:1126px;height:350px;top:25px;width:10px;background-color:grey;z-index:5;'></div>
+	<div id='fenceHealth' class='number' style='position:absolute;left:92px;top:30px;'></div>
+	<div id='enemyFenceHealth' class='number' style='position:absolute;left:1080px;top:30px;'></div>
 	<div id='line1' class='actionLine' style="margin-top:70px;"> </div>
 	<div id='line2' class='actionLine'> </div>
 	<div id='line3' class='actionLine'> </div>
@@ -108,11 +100,11 @@
 	<div id='line6' class='actionLine'> </div>
 </div>
 
-<div id='middleSpace' class="buyColumn" style='background-color:rgb(255, 237, 190);width:100%' >
+<div id='middleSpace' class="buyColumn" style='background-color:rgb(255, 237, 190);width:100%;height:431px;' >
 	<div id='defaultScreen' class='unitScreen' style='display:inline-block;'>
-		<div style='font-size:18px;'>Units</div><br>
-		<div>Click a unit type for possible upgrades</div><br>
-		<div id='unitList' style='width:400px;border:2px solid;position:absolute;left:10px;top:79px;height:459px;overflow:auto;'>
+		<div style='font-size:18px;'>Units</div>
+		<div style='display:block;margin-top:-6px;'>Click a unit type for possible upgrades</div>
+		<div id='unitList' style='width:400px;border:2px solid;position:absolute;left:10px;top:58px;height:350px;overflow:auto;'>
 			<div class='unitUpgradeContainer' onclick='changeUnitScreen("soldier")'>
 				<div id='unitContainer0' class='unitContainer displayLeft' >
 					<div id='body' class='soldier unit' style=''> </div>
@@ -163,11 +155,10 @@
 				Catapult
 			</div>-->
 		</div>
-		<div id='unitUpgradesBox' style='width:740px;border:2px solid;position:absolute;left:437px;top:79px;height:459px;'>
+		<div id='unitUpgradesBox' style='width:740px;border:2px solid;position:absolute;left:437px;top:58px;height:350px;'>
 			
 		</div>
 	</div>
-	<div id='unitScreen' class='unitScreen'></div>
 </div>
 
 <div id='rightSpace' class="buyColumn" style="background-color:white;">
@@ -235,6 +226,7 @@
 <div id='optionsPage' style='width:100%'>
 	<div id="credits" style="float:left;margin-right:70%;">Created by: <a style="color:red" href='http://reddit.com/u/stop_sign'>Stop_Sign</a></div><br>
 	<div id="credits" style="float:left;margin-right:70%;">Made for: <a style="color:black" href='http://reddit.com/r/incremental_games'>/r/incremental_games</a></div><br>
+	<div class='button' style='padding:5px;margin-top:10px;margin-bottom:10px;' onclick='forceTutorial()' >Show Tutorial</div><br>
 	<div class='button' style='padding:5px;' onclick='clearStorage()'>Clear Save</div>
 </div>
 
