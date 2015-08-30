@@ -13,9 +13,9 @@ function Unit (line, pos, type, direction, unitCount, goldWorth) {
 	this.timeAlive = totalTicks;
 	this.typeNum = convertTypeToNum(type, direction)
 	this.attackCounter = unitValues[this.typeNum][1]
-	this.curHealth = unitValues[this.typeNum][3]
-	this.maxHealth = unitValues[this.typeNum][3]
-	this.damage = unitValues[this.typeNum][0]
+	this.curHealth = this.typeNum%2==0?unitValues[this.typeNum][3]*deadUnitBonus[this.typeNum]:unitValues[this.typeNum][3]
+	this.maxHealth = this.typeNum%2==0?unitValues[this.typeNum][3]*deadUnitBonus[this.typeNum]:unitValues[this.typeNum][3]
+	this.damage = this.typeNum%2==0?unitValues[this.typeNum][0]*deadUnitBonus[this.typeNum]:unitValues[this.typeNum][0]
 	this.range = unitValues[this.typeNum][5]
 	this.shouldAttack = 1
 	this.takeDamage = function(dmg) {

@@ -71,31 +71,31 @@ function clickedOKButton() {
 		if(showNextMessage == 6) {
 			addMessage("Territory is the maximum amount of Families you can have", 690, 455);
 			document.getElementById("territoryGainContainer").style.zIndex=0
-			document.getElementById("rightSpace").style.zIndex=higherZ
+			document.getElementById("placesSpace").style.zIndex=higherZ
 			addOKButton(432, 532)
 		}
 		if(showNextMessage == 7) {
 			addMessage("Open your soldier window.", 606, 573);
 			buttonsToClick++
 			document.getElementById("unitContainer0").style.zIndex = higherZ
-			document.getElementById("rightSpace").style.zIndex=0
+			document.getElementById("placesSpace").style.zIndex=0
 			document.getElementById("territoryContainer").style.zIndex=0
 		}
 		if(showNextMessage == 8) {
 			addMessage("Get gold by killing enemies. Gold is spent on upgrade points, which can be allocated to upgrades.", 500, 452);
-			document.getElementById("middleSpace").style.zIndex = higherZ
+			document.getElementById("unitsSpace").style.zIndex = higherZ
 			addOKButton(543, 470)
 		}
 		if(showNextMessage == 9) {
 			addMessage("Spawn Rate is based on how many families you have. This isn't obvious yet, but future updates will change that.", 526, 871);
-			document.getElementById("rightSpace").style.zIndex=higherZ
-			document.getElementById("middleSpace").style.zIndex = "initial"
+			document.getElementById("placesSpace").style.zIndex=higherZ
+			document.getElementById("unitsSpace").style.zIndex = "initial"
 			document.getElementById("spawnRateContainer").style.zIndex = higherZ
 			addOKButton(375, 690)
 		}
 		if(showNextMessage == 10) {
 			addMessage("Click one of the 6 lanes to send 2 archers to that lane every 10 seconds. Future updates will give upgrades to increase this number.", 382, 291);
-			document.getElementById("rightSpace").style.zIndex=0
+			document.getElementById("placesSpace").style.zIndex=0
 			document.getElementById("spawnRateContainer").style.zIndex = 0
 			document.getElementById("clickSpace0").style.zIndex = higherZ
 			document.getElementById("clickSpace1").style.zIndex = higherZ

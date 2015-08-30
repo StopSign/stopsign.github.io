@@ -28,8 +28,8 @@ function updateSpawnTimers() {
 	document.getElementById("spearSpawnTimer").innerHTML = round2(spearSpawnRate);
 	document.getElementById("enemySpawnTimer").innerHTML = round2(enemySpawnRate);
 	document.getElementById("enemyAutoSpawnAmount").innerHTML = round(spawnAmounts[0])
-	document.getElementById("soldierAutoSpawnAmount").innerHTML = Math.floor(spawnAmounts[1]*globalSpawnRate)
-	document.getElementById("spearAutoSpawnAmount").innerHTML = Math.floor(spawnAmounts[2]*globalSpawnRate)
+	document.getElementById("soldierAutoSpawnAmount").innerHTML = Math.floor(spawnAmounts[1]*bonusFromFam)
+	document.getElementById("spearAutoSpawnAmount").innerHTML = Math.floor(spawnAmounts[2]*bonusFromFam)
 }
 
 function updateGoldVisual() {
@@ -78,6 +78,7 @@ function changeUnitScreen(unit) {
 		document.getElementById("unitUpgradesBox").innerHTML="";
 		return
 	}
+	typeNum = convertTypeToNum(type, "right");
 	commonStart = "<div class='unitContainer nohover' style='cursor:auto;display:block;position:initial;margin-left:auto;margin-right:auto;margin-top:5px;height:30px;'>";
 	next = "<div id='body' class='"+type+" unit' style=''> </div>" + 
 		"<div id='unitWeapon' class='weapon'><div class='weapon"+type+"'></div> </div></div>";
@@ -88,11 +89,13 @@ function changeUnitScreen(unit) {
 			"<div class='buyVal' id='buy'>3</div>"+
 		"</div>"
 	next25 = "<div id='slider'></div>";
-	next3 = "<div style='width:40%;height:63px;vertical-align:top;'>"
+	next3 = "<div style='width:40%;height:40px;vertical-align:top;'>"
 	button1 = addButton(type, "Damage", 1)
-	next4 = "</div><div style='width:40%;height:63px;vertical-align:top;'>"
+	next4 = "</div><div style='width:40%;height:40px;vertical-align:top;'>"
 	button4 = addButton(type, "Max Health", 4)
-	next5= "</div><div id='spawnRateContainer' class='buySpawnRate' onclick='clickBuySpawnRate(\""+type+"\")'>"+
+	next5= "</div><div style='font-size:14px;margin-bottom:14px;margin-right:60px;'>Total dead: <div id='totalDead"+typeNum+"' style='color:black'>5f</div></div>"+
+		"<div style='font-size:14px;margin-bottom:14px;'>Bonus from dead units: x<div id='deadUnitBonus"+typeNum+"' style='color:black'>5f</div></div>"+
+		"<div id='spawnRateContainer' class='buySpawnRate' onclick='clickBuySpawnRate(\""+type+"\")'>"+
 		"<div class='icon'>"+addIcon(0)+"</div>"+
 		"<div class='costBox'><div class='goldIcon'></div><div id='costSpawn' class='number'>400</div></div>"+
 		"<div class='buyName'>Spawn Rate</div>"+
@@ -108,15 +111,15 @@ function changeUnitScreen(unit) {
 	button6 = addButton(type, "Range", 6)
 	finish ="</div>"
 	
-	
+	curUnitScreen = typeNum
 	document.getElementById("unitUpgradesBox").innerHTML = commonStart+next+next2+next25+next3+button1+next4+button4+next5+next6+button2+button3+next7+button5+button6+finish;
-	typeNum = convertTypeToNum(type, "right");
 	if(upgradePointsInitial[typeNum] > 0)
 		slider('slider');
 	//document.getElementById("unitUpgradesBox").style.display="block"
 	//document.getElementById("defaultScreen").style.display="none"
 	updateSpawnRate2(type)
 	updateStatusUpgrades(unit, type)
+	updateDeadUnitBonus()
 	if(buttonsToClick) {
 		clickedOKButton()
 	}
@@ -150,7 +153,7 @@ function updateSpawnRate() {
 		document.getElementById("buy0").innerHTML = round2(spawnAmounts[typeNum/2+1])
 		document.getElementById("buy02").innerHTML = round2(spawnRate[typeNum/2])
 	}
-	document.getElementById("bonusFromFamilies").innerHTML = round3(globalSpawnRate);
+	document.getElementById("bonusFromFamilies").innerHTML = round3(bonusFromFam);
 }
 
 function updateStatusUpgrades(unit, type) {
@@ -164,7 +167,7 @@ function updateStatusUpgrades(unit, type) {
 		$("#slider").slider('value', unitPointValues[typeNum][3]);
 	for(e = 1; e < unitValues[typeNum].length+1; e++) {
 		if(document.getElementById("points"+e)) document.getElementById("points"+e).innerHTML=unitPointValues[typeNum][e-1]
-		document.getElementById("buy"+e).innerHTML=round2(unitValues[typeNum][e-1])
+		document.getElementById("buy"+e).innerHTML=round2(unitValues[typeNum][e-1]*deadUnitBonus[typeNum])
 	}
 	updateSpawnRate2(type)
 }
@@ -189,11 +192,12 @@ function addButton(type, name, num) {
 function updateHover(id) {
 	unitToDisplay = findUnitById(id)
 	if(!unitToDisplay) return
-	document.getElementById("curDamageDone").innerHTML = round1(unitToDisplay.totalDamageDone);
+	document.getElementById("curDamageDone").innerHTML = round2(unitToDisplay.totalDamageDone);
 	document.getElementById("curKills").innerHTML = unitToDisplay.kills;
 	document.getElementById("curHealth").innerHTML = round1(unitToDisplay.curHealth);
 	document.getElementById("curUnitCount").innerHTML = unitToDisplay.unitCount;
 	document.getElementById("curTimeAlive").innerHTML = round((totalTicks - unitToDisplay.timeAlive)/20)+"s";
+	document.getElementById("curDamage").innerHTML = round1(unitToDisplay.damage);
 }
 
 function addIcon(num) {
@@ -258,18 +262,19 @@ function switchMainTab(switchTo) {
 	hideAllInfo()
 	switch(switchTo) {
 		case 0:
-			document.getElementById("actionSpace").style.display = "inline-block";
+			document.getElementById("warSpace").style.display = "inline-block";
 			document.getElementById("warTab").style.backgroundColor="rgb(142, 212, 142)";
 		break;
 		case 1:
+			document.getElementById("mapSpace").style.display = "inline-block";
 			document.getElementById("mapTab").style.backgroundColor="rgb(142, 212, 142)";
 		break;
 		case 2:
-			document.getElementById("rightSpace").style.display = "inline-block";
+			document.getElementById("placesSpace").style.display = "inline-block";
 			document.getElementById("territoryTab").style.backgroundColor="rgb(142, 212, 142)";
 		break;
 		case 3:
-			document.getElementById("middleSpace").style.display = "inline-block";
+			document.getElementById("unitsSpace").style.display = "inline-block";
 			document.getElementById("unitTab").style.backgroundColor="rgb(142, 212, 142)";
 		break;
 		case 4:
@@ -286,9 +291,10 @@ function switchMainTab(switchTo) {
 }
 
 function hideAllInfo() {
-	document.getElementById("actionSpace").style.display = "none";
-	document.getElementById("middleSpace").style.display = "none";
-	document.getElementById("rightSpace").style.display = "none";
+	document.getElementById("warSpace").style.display = "none";
+	document.getElementById("mapSpace").style.display = "none";
+	document.getElementById("unitsSpace").style.display = "none";
+	document.getElementById("placesSpace").style.display = "none";
 	document.getElementById("optionsPage").style.display = "none";
 	
 	document.getElementById("warTab").style.backgroundColor="white";

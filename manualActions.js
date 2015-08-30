@@ -43,8 +43,7 @@ function buyUpgradePoint(type) {
 	if(unitCosts[typeNum] <= gold) {
 		gold -= unitCosts[typeNum]
 		updateGoldVisual()
-		if(unitCosts[typeNum] < 30) unitCosts[typeNum] = 30
-			unitCosts[typeNum] = Math.floor(1.2 * unitCosts[typeNum]);
+		unitCosts[typeNum] = Math.floor(1.2 * unitCosts[typeNum]);
 		upgradePointsInitial[typeNum]++
 		unitPointValues[typeNum][3]++;
 		handleBuyAmounts(typeNum, 3)
@@ -53,31 +52,6 @@ function buyUpgradePoint(type) {
 		$("#slider").slider('value', unitPointValues[typeNum][3]);
 	}
 	updateGoldVisual()
-}
-
-//obsolete
-function increasestage() {
-	if(higheststageUnlocked != stage) {
-		stage++
-		unitsThroughOnRight = 0;
-		unitsThroughOnLeft = 0;
-		document.getElementById("stage").innerHTML=stage;
-		startANewstage();
-	}
-}
-
-//obsolete
-function decreasestage() {
-	stage--;
-	if(stage <=0) {
-		stage = 1;
-	}
-	else {
-		unitsThroughOnRight = 0;
-		unitsThroughOnLeft = 0;
-		document.getElementById("stage").innerHTML=stage;
-		startANewstage();
-	}
 }
 
 function removeHover() {
@@ -131,22 +105,20 @@ function buyStartingPlaceAmounts(num) {
 }
 
 function startANewstage() {
-	linesEnabled = 6;
 	for(y = 0; y < units.length; y++) {
 		for(x = units[y].length-1; x>=0; x--) {
 			removeUnit(units[y][x], false);
 		}
 	}
+	//TODO:handle different lines amounts visually
+	linesEnabled = maps[stage][8];
 	units = [[],[],[],[],[],[]];
-	unitsThroughOnRight = 0;
-	unitsThroughOnLeft = 0;
-	soldierSpawnRate = 4;
-	spearSpawnRate = 2.5;
-	spawnRateManual = 0;
-	globalSpawnRate=1;
+	soldierSpawnRate = 0;
+	spearSpawnRate = 0;
+	bonusFromFam = 1;
 	spawnRate=[];
 	spawnAmounts=[]
-	spawnAmounts[0] = stage < 3 ? stage : 1+.5 * stage
+	spawnAmounts[0] = 1//stage < 3 ? stage : 1+.5 * stage
 	for(j = 0; j < initialSpawnAmounts.length; j++) {
 		spawnRate[j] = initialSpawnRate[j]
 		spawnAmounts[j+1]=initialSpawnAmounts[j]
@@ -158,9 +130,9 @@ function startANewstage() {
 	totalTicks = 0
 	curClickedUnit = -1;
 	document.getElementById("stage").innerHTML=stage;
-	document.getElementById("territoryGain").innerHTML = stage * 10 + (stage * stage);
-	document.getElementById("goldGain").innerHTML = stage * stage;
-	unitValues[1] = [stage+Math.floor(Math.pow(1.07, stage))-1, 3, .06, 150+Math.floor(stage*stage*stage/6), Math.floor(stage*stage/10), 4.5]
+	document.getElementById("territoryGain").innerHTML = mapTimers[0]>0?maps[stage][1]/5:maps[stage][1]
+	document.getElementById("goldGain").innerHTML = maps[stage][0]
+	unitValues[1] = [1+Math.floor(Math.pow(1.07, stage))-1, 3, .06, 150+Math.floor(stage*stage*stage/6), Math.floor(stage*stage/10), 4.5]
 	unitValues[3] = [14+stage*5+Math.floor(Math.pow(1.08, stage)), 20, .04, 15+Math.floor(stage*stage/2), 0, 10]
 	//updateProgressVisual()
 	placeCurTimers=[]
@@ -173,6 +145,10 @@ function startANewstage() {
 	enemyWallHealth = enemyWallHealthInitial
 	fenceHealth = fenceHealthInitial
 	enemyFenceHealth = enemyFenceHealthInitial;
+	document.getElementById("enemyFence").style.display = 'inline-block';
+	document.getElementById("enemyFenceHealth").style.display = 'inline-block';
+	document.getElementById("fence").style.display = fenceHealth>0?'inline-block':'none';
+	document.getElementById("fenceHealth").style.display = fenceHealth>0?'inline-block':'none';
 	
 	updateSpawnRate()
 	//addUnit("spear", 0, "right", 1);

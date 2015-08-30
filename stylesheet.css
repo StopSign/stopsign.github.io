@@ -211,9 +211,9 @@ div {
   vertical-align: top;
 }
 .buyColumn {
-    width:420px;
+    width:100%;
     vertical-align:top;
-    height:556px;
+    height:431px;
 	border:1px solid;
 	position:relative
 }
@@ -525,4 +525,61 @@ height: 26px;
 background-color:#404040;
 border-radius:5px;
 top:-5px;
+}
+.map {
+	position:relative;
+	width:50px;
+	height:35px;
+	padding-top:15px;
+	background-color:white;
+	margin-left:151px;
+	margin-top:80px;
+	vertical-align:top;
+	text-align:center;
+	border-radius:15px;
+	cursor:pointer;
+}
+.map:hover {
+	background-color:yellow;
+}
+.mapInfo {
+	top:20px;
+	width:130px;
+	left:212px;
+	height:180px;
+	background-color:#B4B1FF;
+	position:absolute;
+	border-radius:15px;
+	padding-top:10px;
+	display:none;
+	border:2px solid;
+}
+
+.mapInfoField {
+	font-size:10px;
+	color:rgb(102, 102, 102);
+	display:block;
+	margin-left:12px;
+}
+.infoNum {
+	color:black;
+}
+
+.timerReady {
+    width: 42px;
+    font-size: 10px;
+    background-color: yellow;
+    margin-top: 8px;
+    padding: 3px;
+    border-radius: 10px;
+}
+
+.timerContainer {
+	width:49px;
+	margin-left:152px;
+	text-align:center;
+}
+.timer {
+	color:black;
+	font-size:12px;
 }

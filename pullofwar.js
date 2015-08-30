@@ -23,8 +23,7 @@ zIndex = 1000000000;
 //addUnit("soldier", 0, "right");
 //addUnit("soldier", 0, "right");
 
-/*unitsThroughOnRight = 0;
-unitsThroughOnLeft = 0;
+/*
 linesEnabled = 6;
 soldierSpawnRate = 4;
 spearSpawnRate = .5;
@@ -65,8 +64,9 @@ function tick() {
 	if(timer === 10) {
 		halfSecond()
 	}
-	if(timer >= 20) {
+	else if(timer >= 20) {
 		halfSecond()
+		updateMapTimers()
 		timer = 0;
 	}
 	updateHover(curClickedUnit)
@@ -107,7 +107,7 @@ function handlePlaceChanges() {
 					extraFamilies = placeAmounts[0] - territory
 					if(extraFamilies < 0) extraFamilies = 0;
 					for(z = 0; z < placeAmounts[1] - extraFamilies; z++) {
-						globalSpawnRate *= 1+(1/(20+(placeAmounts[0]-z)*2)) //SPAWN RATE FORMULA
+						bonusFromFam *= 1+(1/(20+(placeAmounts[0]-z)*2)) //SPAWN RATE FORMULA
 					}
 					updateSpawnRate()
 				}
@@ -126,13 +126,13 @@ function handleSpawnRates() {
 	soldierSpawnRate -= rateReduction;
 	if(soldierSpawnRate <= 0) {
 		j = Math.floor(Math.random() * linesEnabled)
-		//addUnit("soldier", j, "right", Math.floor(spawnAmounts[1]*globalSpawnRate));
+		addUnit("soldier", j, "right", Math.floor(spawnAmounts[1]*bonusFromFam));
 		soldierSpawnRate += spawnRate[0];
 	}
 	spearSpawnRate -= rateReduction;
 	if(spearSpawnRate <= 0) {
 		j = Math.floor(Math.random() * linesEnabled)
-		addUnit("spear", j, "right",  1+Math.floor(spawnAmounts[2]*globalSpawnRate));
+		addUnit("spear", j, "right",  Math.floor(spawnAmounts[2]*bonusFromFam));
 		spearSpawnRate += spawnRate[1];
 	}
 	enemySpawnRate -= rateReduction;
@@ -170,10 +170,14 @@ function checkForUnitAtEnds() {
 					units[y][x].shouldAttack = 0
 					if(units[y][x].getDamageRoll()) {
 						enemyFenceHealth-=units[y][x].unitCount;
+						if(enemyFenceHealth <= 0) {
+							document.getElementById("enemyFence").style.display = 'none';
+							document.getElementById("enemyFenceHealth").style.display = 'none';
+						}
 					}
 				} else {
 					units[y][x].shouldMove = 1
-					units[y][x].shouldAttack = 0
+					units[y][x].shouldAttack = 1
 				}
 				if(enemyFenceHealth <= 0 && units[y][x].pos > 89-units[y][x].range) { //right wall
 					units[y][x].shouldMove = 0
@@ -182,16 +186,20 @@ function checkForUnitAtEnds() {
 				}
 			}
 			else if(units[y][x].direction != "right") {
-				if(fenceHealth > 0 && units[y][x].pos < units[y][x].range-0) { //left fence
+				if(fenceHealth > 0 && units[y][x].pos < units[y][x].range-.5) { //left fence
 					units[y][x].shouldMove = 0
 					units[y][x].shouldAttack = 0
 					if(units[y][x].getDamageRoll()) {
 						fenceHealth-=units[y][x].unitCount;
+						if(fenceHealth <= 0) {
+							document.getElementById("fence").style.display = 'none';
+							document.getElementById("fenceHealth").style.display = 'none';
+						}
 					}
 					
 				} else {
 					units[y][x].shouldMove = 1
-					units[y][x].shouldAttack = 0
+					units[y][x].shouldAttack = 1
 				}
 				if(fenceHealth <= 0 && units[y][x].pos < units[y][x].range-4) { //left wall
 					units[y][x].shouldMove = 0
@@ -248,6 +256,11 @@ function checkForUnitCollisions() {
 						continue
 					if(units[z][w].direction == units[y][x].direction) { //join units of the same type
 						if(Math.abs(units[y][x].pos - units[z][w].pos) <= 1.5 && units[z][w].type===units[y][x].type) {
+							//average the units together
+							units[y][x].damage = (units[y][x].damage*units[y][x].unitCount+units[z][w].unitCount*units[z][w].damage)/(units[y][x].unitCount+units[z][w].unitCount)
+							units[y][x].maxHealth = (units[y][x].maxHealth*units[y][x].unitCount+units[z][w].unitCount*units[z][w].maxHealth)/(units[y][x].unitCount+units[z][w].unitCount)
+							units[y][x].maxHealth = (units[y][x].maxHealth*units[y][x].unitCount+units[z][w].unitCount*units[z][w].maxHealth)/(units[y][x].unitCount+units[z][w].unitCount)
+							if(units[y][x].curHealth > units[y][x].maxHealth) units[y][x].curHealth = units[y][x].maxHealth
 							units[y][x].unitCount+=units[z][w].unitCount;
 							document.getElementById("count"+units[y][x].id).innerHTML = units[y][x].unitCount
 							if(units[z][w].id === curClickedUnit) {
@@ -333,6 +346,7 @@ function handleBattles() {
 					//console.log("removing: " + engageTarget.id + " on " + totalTicks + ", "+x)
 					//console.log(units[y][x].engaged)
 					updateGoldVisual()
+					updateDeadUnitBonus()
 					disengageAll(engageTarget)
 					removeUnit(engageTarget, engageTarget.direction!="right")
 				}
@@ -378,7 +392,7 @@ function removeUnit(unit, shouldAdd) {
 function checkDonestage() {
 	//victory
 	if(enemyWallHealth <= 0) {
-		territory += stage * 10 + (stage * stage)
+		territory += mapTimers[0]>0?maps[stage][1]/5:maps[stage][1]
 		updateTerritoryVisual()
 		higheststageUnlocked = stage+1 > higheststageUnlocked ? stage+1 : higheststageUnlocked;
 		startANewstage()
@@ -401,10 +415,10 @@ function addUnit(type, line, direction, unitCount) {
 	else {
 		pos = 90
 		if(type == "soldier") {
-			goldWorth = stage * stage;
+			goldWorth = maps[stage][0]
 		}
 		if(type == "spear") {
-			goldWorth = stage * stage * 2
+			goldWorth = maps[stage][0]*2
 		}
 	}
 	theNewUnit = new Unit(line, pos, type, direction, unitCount, goldWorth);
@@ -412,6 +426,18 @@ function addUnit(type, line, direction, unitCount) {
 	//console.log("just added"+(globalId - 1))
 	newUnitDiv(theNewUnit)
 	updateUnitPos(line, (units[line].length-1));
+}
+
+function updateDeadUnitBonus() {
+	for(m = 0; m < totalDead.length; m++) {
+		deadUnitBonus[m] = totalDead[m]/1000+1
+	}
+	if(curUnitScreen == "-1") return
+	document.getElementById("deadUnitBonus"+curUnitScreen).innerHTML = round3(deadUnitBonus[curUnitScreen])
+	document.getElementById("totalDead"+curUnitScreen).innerHTML = totalDead[curUnitScreen]
+	document.getElementById("buy1").innerHTML=round2(unitValues[curUnitScreen][0]*deadUnitBonus[curUnitScreen])
+	document.getElementById("buy4").innerHTML=round2(unitValues[curUnitScreen][3]*deadUnitBonus[curUnitScreen])
+	
 }
 
 function removeDuplicates(a) {
@@ -452,4 +478,10 @@ function round1(num) {
 
 function round(num) {
     return Math.floor(num).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
+function convertSecToMin(sec) {
+	part1 = Math.floor(sec / 60)+":"
+	part2 = sec%60<10?"0"+sec%60:sec%60+""
+	return part1+part2
 }

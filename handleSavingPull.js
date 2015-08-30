@@ -10,29 +10,32 @@ function loadDefaults() {
 	placeMaxTimers=   [0,  6,  17,  50,   99,  197,   393];
 	placeAmountsInitial=[0, 25, 100, 500, 2000, 6000, 12000]
 	placeAmountCosts= [0, 25, 100, 500, 2000, 6000, 12000]
-	stage = 1;
+	stage = 0;
 	unitValues =       [[1, 2, .6, 50, 0, 4.5], [0, 0, 0, 0, 0, 4.5], [4.5, 8, .4, 20, 0, 15], [0, 0, 0, 0, 0, 10]]
 	unitValuesInitial = [[1, 2, .6, 50, 0, 4.5], [0, 0, 0, 0, 0, 4.5], [4.5, 8, .4, 20, 0, 15], [0, 0, 0, 0, 0, 10]]
 	costSpawnRate =        [20, 0, 800, 0];
-	unitCosts =            [5, 0, 80, 0];
+	unitCosts =            [10, 0, 80, 0];
 	upgradePointsInitial=  [0, 0,  0, 0];
 	unitPointValues=[[0, 0, 0, 0, 0],[],[0, 0, 0, 0, 0],[]]
 	gold = 0;
 	territory = 0;
-	higheststageUnlocked = 1;
+	higheststageUnlocked = 0;
 	stop=0
 	buttonsToClick = 0; //tutorial thing
 	currentTab = 0;
-	globalSpawnRate = 1;
+	bonusFromFam = 1;
 	totalDead=[0, 0, 0, 0]
 	enemyWallHealthInitial = 80000;
 	enemyWallHealth = 80000;
-	enemyFenceHealthInitial = 30;
-	enemyFenceHealth = 80;
+	enemyFenceHealthInitial = 150;
+	enemyFenceHealth = 150;
 	wallHealthInitial = 800
 	wallHealth = 800
 	fenceHealthInitial = 30
 	fenceHealth = 30
+	curUnitScreen = -1
+	deadUnitBonus = [1, 1, 1, 1]
+	currentMapInfoNum = -1
 	placeHolder = 0
 }
 
@@ -119,6 +122,7 @@ function loadFromStorage() {
 	updateTerritoryVisual()
 	updateGoldVisual()
 	//updateProgressVisual()
+	updateWallHealthVisuals()
 	updatePlaceVisuals()
 	changeUnitScreen("clear")
 	switchMainTab(currentTab)

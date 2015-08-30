@@ -33,11 +33,12 @@
 		<div style='top:55px;left:361px' class='statusLabel'>Stage <div id='stage' class='bigNumber'></div></div>
 	</div>
 	<div id='unitDisplayBox' style='position:absolute;left:203px;width:386px;border:1px solid;top:5px;height:87px;border-radius:15px;display:none;'>
-		<div class='buyName' style='left:203px;top:10px;'>Damage Done: <div id='curDamageDone' class='number'></div></div>
+		<div class='buyName' style='left:203px;top:35px;'>Damage Done: <div id='curDamageDone' class='number'></div></div>
 		<div class='buyName' style='left:271px;top:59px'>Kills: <div id='curKills' class='number'></div></div>
 		<div class='buyName' style='left:42px;top:10px;'>Health: <div id='curHealth' class='number'></div></div>
 		<div class='buyName' style='left:11px;top:35px;'>Unit Count: <div id='curUnitCount' class='number'></div></div>
 		<div class='buyName' style='left:10px;top:60px;'>Time Alive: <div id='curTimeAlive' class='number'></div></div>
+		<div class='buyName' style='left:246px;top:10px;'>Damage: <div id='curDamage' class='number'></div></div>
 	</div>
 	<div style='top:10px;left:856px' class='statusLabel'>Bonus from families: x<div id='bonusFromFamilies' class='bigNumber'>6f</div></div>
 	<div id='pauseButton' class='button' style='position:absolute;right:5px;top:5px;padding:3px;' onclick='pause()'>Pause</div>
@@ -56,7 +57,7 @@
 
 
 
-<div id='actionSpace' style="width:100%;vertical-align:top;text-align:left;border:2px solid;height:400px;background-color:rgb(223, 255, 221);position:relative;font-size:12px;">
+<div id='warSpace' style="width:100%;vertical-align:top;text-align:left;border:2px solid;height:400px;background-color:rgb(223, 255, 221);position:relative;font-size:12px;">
 	<div id="fightTime" style="width:100%;position:absolute;"></div>
 	<canvas id='damageLines' width="1204" height="404" style="position:absolute;" onmouseout="removeHover()"></canvas>
 	<div id="spawnTimers" style="width:1200px;position:absolute;margin-left:200px;margin-top:5px;">
@@ -86,11 +87,11 @@
 			<div id='enemySpawnTimer' class='number f20'></div>
 		</div>
 	</div>
-	<div id='fence' style='position:absolute;left:98px;height:300px;top:50px;width:5px;background-color:black;z-index:5;'></div>
+	<div id='fence' style='position:absolute;left:118px;height:300px;top:50px;width:5px;background-color:black;z-index:5;'></div>
 	<div id='enemyFence' style='position:absolute;left:1086px;height:300px;top:50px;width:5px;background-color:black;z-index:5;'></div>
-	<div id='wall' style='position:absolute;left:58px;height:350px;top:25px;width:10px;background-color:grey;z-index:5;'></div>
+	<div id='wall' style='position:absolute;left:78px;height:350px;top:25px;width:10px;background-color:grey;z-index:5;'></div>
 	<div id='enemyWall' style='position:absolute;left:1126px;height:350px;top:25px;width:10px;background-color:grey;z-index:5;'></div>
-	<div id='fenceHealth' class='number' style='position:absolute;left:92px;top:30px;'></div>
+	<div id='fenceHealth' class='number' style='position:absolute;left:112px;top:30px;'></div>
 	<div id='enemyFenceHealth' class='number' style='position:absolute;left:1080px;top:30px;'></div>
 	<div id='line1' class='actionLine' style="margin-top:70px;"> </div>
 	<div id='line2' class='actionLine'> </div>
@@ -100,68 +101,10 @@
 	<div id='line6' class='actionLine'> </div>
 </div>
 
-<div id='middleSpace' class="buyColumn" style='background-color:rgb(255, 237, 190);width:100%;height:431px;' >
-	<div id='defaultScreen' class='unitScreen' style='display:inline-block;'>
-		<div style='font-size:18px;'>Units</div>
-		<div style='display:block;margin-top:-6px;'>Click a unit type for possible upgrades</div>
-		<div id='unitList' style='width:400px;border:2px solid;position:absolute;left:10px;top:58px;height:350px;overflow:auto;'>
-			<div class='unitUpgradeContainer' onclick='changeUnitScreen("soldier")'>
-				<div id='unitContainer0' class='unitContainer displayLeft' >
-					<div id='body' class='soldier unit' style=''> </div>
-					<div id='unitWeapon' class='weapon'><div class='weaponsoldier'></div> </div>
-				</div>
-				Soldier
-			</div>
-			<div class='unitUpgradeContainer' onclick='changeUnitScreen("spear")'>
-				<div id='unitContainer2' class='unitContainer displayLeft' >
-					<div id='body' class='spear unit' style=''> </div>
-					<div id='unitWeapon' class='weapon'><div class='weaponspear'></div> </div>
-				</div>
-				Spearman
-			</div>
-			<!--<div class='unitUpgradeContainer' onclick='changeUnitScreen("spear")'>
-				<div id='unitContainer3' class='unitContainer displayLeft' >
-					<div id='body' class='spear unit' style=''> </div>
-					<div id='unitWeapon' class='weapon'><div class='weaponspear'></div> </div>
-				</div>
-				Lightning Wizard
-			</div>
-			<div class='unitUpgradeContainer' onclick='changeUnitScreen("spear")'>
-				<div id='unitContainer4' class='unitContainer displayLeft' >
-					<div id='body' class='spear unit' style=''> </div>
-					<div id='unitWeapon' class='weapon'><div class='weaponspear'></div> </div>
-				</div>
-				Knight
-			</div>
-			<div class='unitUpgradeContainer' onclick='changeUnitScreen("spear")'>
-				<div id='unitContainer5' class='unitContainer displayLeft' >
-					<div id='body' class='spear unit' style=''> </div>
-					<div id='unitWeapon' class='weapon'><div class='weaponspear'></div> </div>
-				</div>
-				Archer
-			</div>
-			<div class='unitUpgradeContainer' onclick='changeUnitScreen("spear")'>
-				<div id='unitContainer6' class='unitContainer displayLeft' >
-					<div id='body' class='spear unit' style=''> </div>
-					<div id='unitWeapon' class='weapon'><div class='weaponspear'></div> </div>
-				</div>
-				Priest
-			</div>
-			<div class='unitUpgradeContainer' onclick='changeUnitScreen("spear")'>
-				<div id='unitContainer7' class='unitContainer displayLeft' >
-					<div id='body' class='spear unit' style=''> </div>
-					<div id='unitWeapon' class='weapon'><div class='weaponspear'></div> </div>
-				</div>
-				Catapult
-			</div>-->
-		</div>
-		<div id='unitUpgradesBox' style='width:740px;border:2px solid;position:absolute;left:437px;top:58px;height:350px;'>
-			
-		</div>
-	</div>
+<div id='mapSpace' class="buyColumn" style="background-color:#AFCDC2;overflow:auto;">
 </div>
 
-<div id='rightSpace' class="buyColumn" style="background-color:white;">
+<div id='placesSpace' class="buyColumn" style="background-color:white;">
 	<div class='spawnContainer' style='margin-top:15px;'>
 		<div id='progress0' class='unitProgress'><div id='placeProgressInner0' class='placeProgresInner'></div></div>
 		<div class='spawnLabel'>Families</div>
@@ -223,11 +166,76 @@
 	</div>
 </div>
 
-<div id='optionsPage' style='width:100%'>
-	<div id="credits" style="float:left;margin-right:70%;">Created by: <a style="color:red" href='http://reddit.com/u/stop_sign'>Stop_Sign</a></div><br>
-	<div id="credits" style="float:left;margin-right:70%;">Made for: <a style="color:black" href='http://reddit.com/r/incremental_games'>/r/incremental_games</a></div><br>
-	<div class='button' style='padding:5px;margin-top:10px;margin-bottom:10px;' onclick='forceTutorial()' >Show Tutorial</div><br>
-	<div class='button' style='padding:5px;' onclick='clearStorage()'>Clear Save</div>
+<div id='unitsSpace' class="buyColumn" style='background-color:rgb(255, 237, 190);' >
+	<div id='defaultScreen' class='unitScreen' style='display:inline-block;'>
+		<div style='font-size:18px;'>Units</div>
+		<div style='display:block;margin-top:-6px;'>Click a unit type for possible upgrades</div>
+		<div id='unitList' style='width:400px;border:2px solid;position:absolute;left:10px;top:58px;height:350px;overflow:auto;'>
+			<div class='unitUpgradeContainer' onclick='changeUnitScreen("soldier")'>
+				<div id='unitContainer0' class='unitContainer displayLeft' >
+					<div id='body' class='soldier unit' style=''> </div>
+					<div id='unitWeapon' class='weapon'><div class='weaponsoldier'></div> </div>
+				</div>
+				Soldier
+			</div>
+			<div class='unitUpgradeContainer' onclick='changeUnitScreen("spear")'>
+				<div id='unitContainer2' class='unitContainer displayLeft' >
+					<div id='body' class='spear unit' style=''> </div>
+					<div id='unitWeapon' class='weapon'><div class='weaponspear'></div> </div>
+				</div>
+				Spearman
+			</div>
+			<!--<div class='unitUpgradeContainer' onclick='changeUnitScreen("spear")'>
+				<div id='unitContainer3' class='unitContainer displayLeft' >
+					<div id='body' class='spear unit' style=''> </div>
+					<div id='unitWeapon' class='weapon'><div class='weaponspear'></div> </div>
+				</div>
+				Lightning Wizard
+			</div>
+			<div class='unitUpgradeContainer' onclick='changeUnitScreen("spear")'>
+				<div id='unitContainer4' class='unitContainer displayLeft' >
+					<div id='body' class='spear unit' style=''> </div>
+					<div id='unitWeapon' class='weapon'><div class='weaponspear'></div> </div>
+				</div>
+				Knight
+			</div>
+			<div class='unitUpgradeContainer' onclick='changeUnitScreen("spear")'>
+				<div id='unitContainer5' class='unitContainer displayLeft' >
+					<div id='body' class='spear unit' style=''> </div>
+					<div id='unitWeapon' class='weapon'><div class='weaponspear'></div> </div>
+				</div>
+				Archer
+			</div>
+			<div class='unitUpgradeContainer' onclick='changeUnitScreen("spear")'>
+				<div id='unitContainer6' class='unitContainer displayLeft' >
+					<div id='body' class='spear unit' style=''> </div>
+					<div id='unitWeapon' class='weapon'><div class='weaponspear'></div> </div>
+				</div>
+				Priest
+			</div>
+			<div class='unitUpgradeContainer' onclick='changeUnitScreen("spear")'>
+				<div id='unitContainer7' class='unitContainer displayLeft' >
+					<div id='body' class='spear unit' style=''> </div>
+					<div id='unitWeapon' class='weapon'><div class='weaponspear'></div> </div>
+				</div>
+				Catapult
+			</div>-->
+		</div>
+		<div id='unitUpgradesBox' style='width:740px;border:2px solid;position:absolute;left:437px;top:58px;height:350px;'>
+			
+		</div>
+	</div>
+</div>
+
+
+<div id='optionsPage' class='buyColumn'>
+	<div style='width:90%;margin-top:30px;margin-left:30px;'>
+		<div style="float:left;">Created by: <a style="color:red" href='http://reddit.com/u/stop_sign'>Stop_Sign</a></div><br>
+		<div style="float:left;">Made for: <a style="color:black" href='http://reddit.com/r/incremental_games'>/r/incremental_games</a></div><br>
+		<div style='float:left;'>I want a ton of feedback! Please send a message through reddit using <a style="color:black" href='https://www.reddit.com/message/compose?to=Stop_Sign&subject=Pull of War feedback&message='>this link</a><br>
+		<div class='button' style='padding:5px;margin-top:10px;margin-bottom:10px;' onclick='forceTutorial()' >Show Tutorial</div><br>
+		<div class='button' style='padding:5px;' onclick='clearStorage()'>Clear Save</div>
+	</div>
 </div>
 
 </div>
@@ -236,10 +244,11 @@
       <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
       <script src="https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
 <!--<script src="tutorial.js"></script>-->
-<script src="graphics.js"></script>
+<script src="mapvalues.js"></script>
 <script src="classes.js"></script>
 <script src="manualActions.js"></script>
 <script src="pullofwar.js"></script>
+<script src="graphics.js"></script>
 <script src="handleSavingPull.js"></script>
 <!--
 <script>
