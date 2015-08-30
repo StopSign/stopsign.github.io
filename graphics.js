@@ -27,9 +27,9 @@ function updateSpawnTimers() {
 	document.getElementById("soldierSpawnTimer").innerHTML = round2(soldierSpawnRate);
 	document.getElementById("spearSpawnTimer").innerHTML = round2(spearSpawnRate);
 	document.getElementById("enemySpawnTimer").innerHTML = round2(enemySpawnRate);
-	document.getElementById("enemyAutoSpawnAmount").innerHTML = round(spawnAmounts[0])
-	document.getElementById("soldierAutoSpawnAmount").innerHTML = Math.floor(spawnAmounts[1]*bonusFromFam)
-	document.getElementById("spearAutoSpawnAmount").innerHTML = Math.floor(spawnAmounts[2]*bonusFromFam)
+	document.getElementById("enemyAutoSpawnAmount").innerHTML = round(enemySpawnAmounts[1])
+	document.getElementById("soldierAutoSpawnAmount").innerHTML = Math.floor(spawnAmounts[0]*bonusFromFam)
+	document.getElementById("spearAutoSpawnAmount").innerHTML = Math.floor(spawnAmounts[1]*bonusFromFam)
 }
 
 function updateGoldVisual() {
@@ -144,13 +144,13 @@ function slider(id) {
 function updateSpawnRate2(type) {
 	if(type == "soldier") numToUpdate = 0
 	if(type == "spear") numToUpdate = 1
-	document.getElementById("buy0").innerHTML = round2(spawnAmounts[numToUpdate+1])
+	document.getElementById("buy0").innerHTML = round2(spawnAmounts[numToUpdate])
 	document.getElementById("buy02").innerHTML = round2(spawnRate[numToUpdate])
 }
 
 function updateSpawnRate() {
 	if(document.getElementById("buy0")) {
-		document.getElementById("buy0").innerHTML = round2(spawnAmounts[typeNum/2+1])
+		document.getElementById("buy0").innerHTML = round2(spawnAmounts[typeNum/2])
 		document.getElementById("buy02").innerHTML = round2(spawnRate[typeNum/2])
 	}
 	document.getElementById("bonusFromFamilies").innerHTML = round3(bonusFromFam);
@@ -197,7 +197,7 @@ function updateHover(id) {
 	document.getElementById("curHealth").innerHTML = round1(unitToDisplay.curHealth);
 	document.getElementById("curUnitCount").innerHTML = unitToDisplay.unitCount;
 	document.getElementById("curTimeAlive").innerHTML = round((totalTicks - unitToDisplay.timeAlive)/20)+"s";
-	document.getElementById("curDamage").innerHTML = round1(unitToDisplay.damage);
+	document.getElementById("curDamage").innerHTML = round2(unitToDisplay.damage*unitToDisplay.unitCount);
 }
 
 function addIcon(num) {
@@ -228,8 +228,38 @@ function addIcon(num) {
 	return "";
 }
 
+function handleLineAmounts(lineCount) {
+	for(m = 0; m < 6; m++) {
+		document.getElementById("line"+m).style.display = lineCount>m ? "inline-block" : "none";
+	}
+	if(lineCount == 1) offset = 120;
+	if(lineCount == 2) offset = 105;
+	if(lineCount == 3) offset = 70;
+	if(lineCount == 4) offset = 55;
+	if(lineCount == 5) offset = 30;
+	if(lineCount == 6) offset = 0;
+	document.getElementById("fightTime").style.marginTop = offset+"px";
+	document.getElementById("line0").style.marginTop=(70+offset)+"px";
+	if(lineCount == 1) {
+	}
+	if(lineCount == 2) {
+	}
+	if(lineCount == 3) {
+	}
+	if(lineCount == 4) {
+	}
+	if(lineCount == 5) {
+	}
+	if(lineCount == 6) {
+	}
+}
+
 function drawSpearLine(unit1, unit2) {
-	storedLines.push({x1:(unit1.pos+7)*11.9+22, y1:(unit1.line)*54+60, x2:(unit2.pos+7)*11.9+11, y2:(unit2.line)*54+60, curCount:4, count:4});
+	storedLines.push({x1:(unit1.pos+7)*11.9+22, y1:(unit1.line)*54+60+offset, x2:(unit2.pos+7)*11.9+11, y2:(unit2.line)*54+60+offset, curCount:4, count:4});
+}
+
+function drawSpearLine2(unit1) {
+	storedLines.push({x1:(unit1.pos+7)*11.9+22, y1:(unit1.line)*54+60+offset, x2:(unit1.pos+7)*11.9+151, y2:(unit1.line)*54+60+offset, curCount:4, count:4});
 }
 
 function redrawStoredLines(){

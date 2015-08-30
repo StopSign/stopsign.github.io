@@ -11,10 +11,10 @@ function loadDefaults() {
 	placeAmountsInitial=[0, 25, 100, 500, 2000, 6000, 12000]
 	placeAmountCosts= [0, 25, 100, 500, 2000, 6000, 12000]
 	stage = 0;
-	unitValues =       [[1, 2, .6, 50, 0, 4.5], [0, 0, 0, 0, 0, 4.5], [4.5, 8, .4, 20, 0, 15], [0, 0, 0, 0, 0, 10]]
-	unitValuesInitial = [[1, 2, .6, 50, 0, 4.5], [0, 0, 0, 0, 0, 4.5], [4.5, 8, .4, 20, 0, 15], [0, 0, 0, 0, 0, 10]]
-	costSpawnRate =        [20, 0, 800, 0];
-	unitCosts =            [10, 0, 80, 0];
+	unitValues =       [[1, 2, .6, 50, 0, 4.5], [0, 0, 0, 0, 0, 0], [6, 9, .4, 30, 0, 15], [0, 0, 0, 0, 0, 0]]
+	unitValuesInitial = [[1, 2, .6, 50, 0, 4.5], [0, 0, 0, 0, 0, 0], [6, 9, .4, 20, 0, 15], [0, 0, 0, 0, 0, 0]]
+	costSpawnRate =        [20, 0, 300, 0];
+	unitCosts =            [6, 0, 40, 0];
 	upgradePointsInitial=  [0, 0,  0, 0];
 	unitPointValues=[[0, 0, 0, 0, 0],[],[0, 0, 0, 0, 0],[]]
 	gold = 0;
@@ -36,6 +36,7 @@ function loadDefaults() {
 	curUnitScreen = -1
 	deadUnitBonus = [1, 1, 1, 1]
 	currentMapInfoNum = -1
+	offset = 0
 	placeHolder = 0
 }
 
@@ -125,6 +126,7 @@ function loadFromStorage() {
 	updateWallHealthVisuals()
 	updatePlaceVisuals()
 	changeUnitScreen("clear")
+	createMapSpace()
 	switchMainTab(currentTab)
 	document.getElementById("mainColumn").style.display="inline-block";
 }

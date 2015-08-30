@@ -30,7 +30,7 @@ function clickBuySpawnRate(type) {
 			initialSpawnRate[typeNum/2]*=2;
 			spawnRate[typeNum/2] *= 2;
 			initialSpawnAmounts[typeNum/2]*=2;
-			spawnAmounts[typeNum/2+1] *= 2;
+			spawnAmounts[typeNum/2] *= 2;
 		}
 	}
 	updateStatusUpgrades("", type)
@@ -112,28 +112,31 @@ function startANewstage() {
 	}
 	//TODO:handle different lines amounts visually
 	linesEnabled = maps[stage][8];
+	handleLineAmounts(linesEnabled)
 	units = [[],[],[],[],[],[]];
 	soldierSpawnRate = 0;
 	spearSpawnRate = 0;
 	bonusFromFam = 1;
 	spawnRate=[];
 	spawnAmounts=[]
-	spawnAmounts[0] = 1//stage < 3 ? stage : 1+.5 * stage
 	for(j = 0; j < initialSpawnAmounts.length; j++) {
 		spawnRate[j] = initialSpawnRate[j]
-		spawnAmounts[j+1]=initialSpawnAmounts[j]
+		spawnAmounts[j]=initialSpawnAmounts[j]
 	}
 	enemySpawnRate = .5;
+	enemySpawnAmounts=[maps[stage][9][0], maps[stage][9][1], maps[stage][9][2]]
+	enemySpawnRateIncrease=[maps[stage][10][0], maps[stage][10][1], maps[stage][10][2]]
+	
 	curBattles = [];
 	storedLines = [];
 	timer = 0;
 	totalTicks = 0
 	curClickedUnit = -1;
 	document.getElementById("stage").innerHTML=stage;
-	document.getElementById("territoryGain").innerHTML = mapTimers[0]>0?maps[stage][1]/5:maps[stage][1]
+	document.getElementById("territoryGain").innerHTML = mapTimers[stage]>0?maps[stage][1]/5:maps[stage][1]
 	document.getElementById("goldGain").innerHTML = maps[stage][0]
-	unitValues[1] = [1+Math.floor(Math.pow(1.07, stage))-1, 3, .06, 150+Math.floor(stage*stage*stage/6), Math.floor(stage*stage/10), 4.5]
-	unitValues[3] = [14+stage*5+Math.floor(Math.pow(1.08, stage)), 20, .04, 15+Math.floor(stage*stage/2), 0, 10]
+	unitValues[1] = [stage+Math.pow(1.2, stage), 3, .06, 150+Math.floor(stage*stage*stage*stage/3), Math.floor(stage*stage/10), 4.5]
+	unitValues[3] = [14+stage*5+Math.pow(1.25, stage), 20, .04, 35+Math.floor(stage*stage*stage/2), 0, 10]
 	//updateProgressVisual()
 	placeCurTimers=[]
 	placeAmounts=[]
@@ -141,12 +144,14 @@ function startANewstage() {
 		placeCurTimers[j]=placeMaxTimers[j]
 		placeAmounts[j]=placeAmountsStart[j]
 	}
+	enemyFenceHealthInitial = maps[stage][2]
+	enemyWallHealthInitial = maps[stage][3]
 	wallHealth = wallHealthInitial
 	enemyWallHealth = enemyWallHealthInitial
 	fenceHealth = fenceHealthInitial
 	enemyFenceHealth = enemyFenceHealthInitial;
-	document.getElementById("enemyFence").style.display = 'inline-block';
-	document.getElementById("enemyFenceHealth").style.display = 'inline-block';
+	document.getElementById("enemyFence").style.display =  enemyFenceHealth>0?'inline-block':'none';;
+	document.getElementById("enemyFenceHealth").style.display = enemyFenceHealth>0?'inline-block':'none';;
 	document.getElementById("fence").style.display = fenceHealth>0?'inline-block':'none';
 	document.getElementById("fenceHealth").style.display = fenceHealth>0?'inline-block':'none';
 	

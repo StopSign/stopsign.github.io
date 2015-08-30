@@ -27,12 +27,11 @@ zIndex = 1000000000;
 linesEnabled = 6;
 soldierSpawnRate = 4;
 spearSpawnRate = .5;
-spawnRateManual = 0;
 placeCurTimers=   [0,  3, 35, 100, 295, 880, 2635];
 placeAmounts=     [1,  1,  1,   1,   1,   1,    1];
 
 spawnRate=          [9, 10];
-spawnAmounts =  [-1, 1,  1] //first is enemy
+spawnAmounts =  [1,  1]
 enemySpawnRate = 9;
 curBattles = [];
 storedLines = [];
@@ -57,6 +56,7 @@ function tick() {
 	if(timer % 2 == 0) {
 		handleSpawnRates()
 		handlePlaceChanges()
+		handleDamageAtEnds()
 		handleBattles()
 	}
 	
@@ -126,23 +126,26 @@ function handleSpawnRates() {
 	soldierSpawnRate -= rateReduction;
 	if(soldierSpawnRate <= 0) {
 		j = Math.floor(Math.random() * linesEnabled)
-		addUnit("soldier", j, "right", Math.floor(spawnAmounts[1]*bonusFromFam));
+		addUnit("soldier", j, "right", Math.floor(spawnAmounts[0]*bonusFromFam));
 		soldierSpawnRate += spawnRate[0];
 	}
 	spearSpawnRate -= rateReduction;
 	if(spearSpawnRate <= 0) {
 		j = Math.floor(Math.random() * linesEnabled)
-		addUnit("spear", j, "right",  Math.floor(spawnAmounts[2]*bonusFromFam));
+		addUnit("spear", j, "right",  Math.floor(spawnAmounts[1]*bonusFromFam));
 		spearSpawnRate += spawnRate[1];
 	}
 	enemySpawnRate -= rateReduction;
 	if(enemySpawnRate <= 0) {
+		enemySpawnRate = maps[stage][4];
 		for(j = 0; j < linesEnabled; j++) {
-			addUnit("soldier", j, "left", Math.floor(spawnAmounts[0]));
-			addUnit("spear", j, "left", Math.floor(spawnAmounts[0]/3))
+			addUnit("soldier", j, "left", Math.floor(enemySpawnAmounts[1]));
+			addUnit("spear", j, "left", Math.floor(enemySpawnAmounts[2]))
 		}
-		if(stage >= 3) spawnAmounts[0]+=.3335*Math.pow(1.06, stage)
-		enemySpawnRate = 15;
+		for(j = 0; j < enemySpawnAmounts.length; j++) {
+			enemySpawnAmounts[j] += enemySpawnRateIncrease[j]
+			enemySpawnRateIncrease[j] += maps[stage][11][j]
+		}
 	}
 	updateSpawnTimers()
 }
@@ -160,14 +163,39 @@ function moveUnits() {
 }
 
 function checkForUnitAtEnds() {
-	triggerForDelete=[];
-	done = 0
 	for(y = 0; y < units.length; y++) {
 		for(x = 0; x < units[y].length ; x++) { //handle killing fences and walls
 			if(units[y][x].direction === "right") {
 				if(enemyFenceHealth > 0 && units[y][x].pos > 85.5-units[y][x].range) { //right fence
 					units[y][x].shouldMove = 0
+				} else {
+					units[y][x].shouldMove = 1
+				}
+				if(enemyFenceHealth <= 0 && units[y][x].pos > 89-units[y][x].range) { //right wall
+					units[y][x].shouldMove = 0
+				}
+			}
+			else if(units[y][x].direction != "right") {
+				if(fenceHealth > 0 && units[y][x].pos < units[y][x].range-.5) { //left fence
+					units[y][x].shouldMove = 0
+				} else {
+					units[y][x].shouldMove = 1
+				}
+				if(fenceHealth <= 0 && units[y][x].pos < units[y][x].range-4) { //left wall
+					units[y][x].shouldMove = 0
+				}
+			}
+		}
+	}
+}
+
+function handleDamageAtEnds() {
+	for(y = 0; y < units.length; y++) {
+		for(x = 0; x < units[y].length ; x++) { //handle killing fences and walls
+			if(units[y][x].direction === "right") {
+				if(enemyFenceHealth > 0 && units[y][x].pos > 85.5-units[y][x].range) { //right fence
 					units[y][x].shouldAttack = 0
+					if(units[y][x].type == "spear" && units[y][x].attackCounter === 3) drawSpearLine2(units[y][x]);
 					if(units[y][x].getDamageRoll()) {
 						enemyFenceHealth-=units[y][x].unitCount;
 						if(enemyFenceHealth <= 0) {
@@ -176,18 +204,16 @@ function checkForUnitAtEnds() {
 						}
 					}
 				} else {
-					units[y][x].shouldMove = 1
 					units[y][x].shouldAttack = 1
 				}
 				if(enemyFenceHealth <= 0 && units[y][x].pos > 89-units[y][x].range) { //right wall
-					units[y][x].shouldMove = 0
 					units[y][x].shouldAttack = 0
+					if(units[y][x].type == "spear" && units[y][x].attackCounter === 3) drawSpearLine2(units[y][x]);
 					enemyWallHealth -= units[y][x].getDamageRoll()
 				}
 			}
 			else if(units[y][x].direction != "right") {
 				if(fenceHealth > 0 && units[y][x].pos < units[y][x].range-.5) { //left fence
-					units[y][x].shouldMove = 0
 					units[y][x].shouldAttack = 0
 					if(units[y][x].getDamageRoll()) {
 						fenceHealth-=units[y][x].unitCount;
@@ -198,18 +224,17 @@ function checkForUnitAtEnds() {
 					}
 					
 				} else {
-					units[y][x].shouldMove = 1
 					units[y][x].shouldAttack = 1
 				}
 				if(fenceHealth <= 0 && units[y][x].pos < units[y][x].range-4) { //left wall
-					units[y][x].shouldMove = 0
 					units[y][x].shouldAttack = 0
 					wallHealth -= units[y][x].getDamageRoll()
 				}
 			}
 		}
 	}
-	checkDonestage()
+	
+	checkDoneStage()
 	updateWallHealthVisuals()
 }
 
@@ -302,7 +327,6 @@ function handleBattles() {
 		for(x = units[y].length - 1; x >= 0; x--) {
 			if(units[y][x].curHealth > 0 && units[y][x].engaged.length > 0 && units[y][x].shouldAttack) {
 				bestTargetPos = 0;
-				print = 0;
 				for(i = 1; i < units[y][x].engaged.length; i++) {
 					if(units[y][x].engaged[i].line == y) {
 						if(Math.abs(units[y][x].engaged[i].pos - units[y][x].pos) < Math.abs(units[y][x].engaged[bestTargetPos].pos - units[y][x].pos)) {
@@ -313,18 +337,11 @@ function handleBattles() {
 						}
 					}
 					else if(units[y][x].engaged[bestTargetPos].line != y && Math.abs(units[y][x].engaged[i].pos - units[y][x].pos) < Math.abs(units[y][x].engaged[bestTargetPos].pos - units[y][x].pos)) {
-						//console.log(units[y][x].engaged[i].line == y)
-						//console.log(Math.abs(units[y][x].engaged[i].pos - units[y][x].pos))
-						//console.log(Math.abs(units[y][x].engaged[bestTargetPos].pos - units[y][x].pos))
-						//console.log(units[y][x].engaged[i].pos+", "+units[y][x].pos)
 						bestTargetPos = i
 					}
 				}
 				//disengage if the unit is too far away.
 				engageTarget = units[y][x].engaged[bestTargetPos];
-				if(print) {
-					console.log(engageTarget.id)
-				}
 				if(units[y][x].type ==="spear") {
 					if((units[y][x].direction ==="right" && units[y][x].pos - engageTarget.pos > 0) || (units[y][x].direction !="right" && units[y][x].pos - engageTarget.pos < 0)) {
 						units[y][x].engaged.splice(0, 1);
@@ -389,12 +406,14 @@ function removeUnit(unit, shouldAdd) {
 	}
 }
 
-function checkDonestage() {
+function checkDoneStage() {
 	//victory
 	if(enemyWallHealth <= 0) {
-		territory += mapTimers[0]>0?maps[stage][1]/5:maps[stage][1]
+		territory += mapTimers[stage]>0?maps[stage][1]/5:maps[stage][1]
+		mapTimers[stage] += maps[stage][7]
 		updateTerritoryVisual()
 		higheststageUnlocked = stage+1 > higheststageUnlocked ? stage+1 : higheststageUnlocked;
+		createMapSpace()
 		startANewstage()
 	}
 	//loss
