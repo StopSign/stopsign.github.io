@@ -258,22 +258,22 @@ width:20px;
 height:20px;
 }
 .unitLine0 {
-top:39px;
+top:32px;
 }
 .unitLine1 {
-top:93px;
+top:86px;
 }
 .unitLine2 {
-top:146px;
+top:139px;
 }
 .unitLine3 {
-top:200px;
+top:193px;
 }
 .unitLine4 {
-top:254px;
+top:247px;
 }
 .unitLine5 {
-top:308px;
+top:301px;
 }
 
 .soldier {
@@ -324,7 +324,7 @@ margin-right:4.5%;
 }
 .count {
 position:absolute;
-top:35px;
+top:46px;
 left:13px;
 }
 .exitLine {

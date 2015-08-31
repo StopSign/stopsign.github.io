@@ -410,7 +410,7 @@ function checkDoneStage() {
 	//victory
 	if(enemyWallHealth <= 0) {
 		territory += mapTimers[stage]>0?maps[stage][1]/5:maps[stage][1]
-		mapTimers[stage] += maps[stage][7]
+		if(mapTimers[stage] === 0) mapTimers[stage] += maps[stage][7]
 		updateTerritoryVisual()
 		higheststageUnlocked = stage+1 > higheststageUnlocked ? stage+1 : higheststageUnlocked;
 		createMapSpace()
@@ -474,7 +474,7 @@ function removeDuplicates(a) {
     return out;
 }
 
-function findUnitById(id) {
+function getUnitById(id) {
 	for(y = 0; y < units.length; y++) {
 		for(x = 0; x < units[y].length; x++) {
 			if(units[y][x].id == id)
