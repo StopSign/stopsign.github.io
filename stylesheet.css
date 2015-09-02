@@ -364,13 +364,17 @@ font-size:14px;
 .spawnAutoAmount {
 position:absolute;
 color:black;
-top:23px;
+top:28px;
 left:57px;
 font-size:14px;
 
 }
-.pictureContainer {
+.unitSpawnBox {
 position:relative;
+width:150px;
+}
+.enemyUnitSpawnBox {
+position:absolute;
 width:150px;
 }
 .statusLabel {
@@ -582,4 +586,25 @@ top:-5px;
 .timer {
 	color:black;
 	font-size:12px;
+}
+.spell {
+    width: 102px;
+    height: 32px;
+    margin-top: 5px;
+    padding-top: 15px;
+    background-color: #181852;
+    color: #E2E2E2;
+    font-size: 10px;
+    vertical-align: top;
+    margin-left: 7px;
+    margin-right: 4px;
+    text-align: center;
+    border: 2px solid white;
+	cursor:pointer;
+	position:relative;
+}
+.spellCost {
+	position:absolute;
+	right:5px;
+	bottom:5px;
 }

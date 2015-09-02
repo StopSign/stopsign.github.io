@@ -103,6 +103,32 @@ function buyStartingPlaceAmounts(num) {
 	updateTerritoryVisual()
 	updatePlaceVisuals()
 }
+var myKeyQueue = [];
+
+$(document).keydown(function(e) {
+    code = (e.charCode != 0 ? e.charCode : e.keyCode)
+    myKeyQueue.push(code);
+	processKeyQueue();
+});
+
+/*$(document).keyup(function(e) {
+    processKeyQueue();
+});*/
+
+function processKeyQueue() {
+	key = myKeyQueue[0]
+	myKeyQueue.splice(0, 1);
+	if(key == 49) { //1
+		clickedSpell(0)
+	}
+	if(key == 50) { //2
+		clickedSpell(1)
+	}
+	if(myKeyQueue.length > 0)
+		processKeyQueue()
+}
+
+
 
 function startANewstage() {
 	for(y = 0; y < units.length; y++) {
@@ -129,14 +155,14 @@ function startANewstage() {
 	
 	curBattles = [];
 	storedLines = [];
-	timer = 0;
+	timer = 19;
 	totalTicks = 0
 	curClickedUnit = -1;
 	document.getElementById("stage").innerHTML=stage;
 	document.getElementById("territoryGain").innerHTML = mapTimers[stage]>0?maps[stage][1]/5:maps[stage][1]
 	document.getElementById("goldGain").innerHTML = maps[stage][0]
-	unitValues[1] = [stage+Math.pow(1.2, stage), 3, .06, 150+Math.floor(stage*stage*stage*stage/3), Math.floor(stage*stage/10), 4.5]
-	unitValues[3] = [14+stage*5+Math.pow(1.25, stage), 20, .04, 35+Math.floor(stage*stage*stage/2), 0, 10]
+	unitValues[1] = [2+stage*Math.pow(1.2, (stage))/5, 4, .06, Math.floor(Math.pow(stage+10, 4)/117), 0, 4.5]
+	unitValues[3] = [14+stage*5+Math.pow(1.25, stage), 20, .04, 35+Math.floor(Math.pow(stage+5, 3)/4), 0, 10]
 	//updateProgressVisual()
 	placeCurTimers=[]
 	placeAmounts=[]

@@ -1,5 +1,5 @@
 function newUnitDiv(unit) {
-	commonBefore = "<div id='unit"+unit.id+"' class='unitContainer unitLine"+unit.line+"' style='z-index:"+(zIndex--)+"' onmouseover='hoverAUnit("+unit.id+")'>" +
+	commonBefore = "<div id='unit"+unit.id+"' class='unitContainer unitLine"+unit.line+"' style='z-index:"+(zIndex--)+"' onmouseover='hoverAUnit("+unit.id+")' onclick='clickAUnit("+unit.id+")'>" +
 		"<div class='healthBarOuter'><div class='healthBarInner' id='healthBar"+unit.id+"' style='z-index:"+(zIndex--)+"'></div></div>";
 	src = "img/"+(unit.direction!="right"?"enemy":"")+unit.type+".png"
 	different = "<img height='30' width='50' src='"+src+"'>"
@@ -25,13 +25,29 @@ function updateUnitPos(y, x) {
 	document.getElementById("unit"+units[y][x].id).style.left = (units[y][x].pos +7)*11.9 + "px"; 
 }
 
+function updateManaVisual() {
+	document.getElementById("mana").innerHTML = round2(curMana);
+}
+
+function updateSpellVisuals() {
+	document.getElementById("spellCost0").innerHTML = round2(spellCosts[0])
+	document.getElementById("spellCost1").innerHTML = round2(spellCosts[1])
+}
+
 function updateSpawnTimers() {
 	document.getElementById("soldierSpawnTimer").innerHTML = round2(soldierSpawnRate);
-	document.getElementById("spearSpawnTimer").innerHTML = round2(spearSpawnRate);
-	document.getElementById("enemySpawnTimer").innerHTML = round2(enemySpawnRate);
-	document.getElementById("enemyAutoSpawnAmount").innerHTML = round(enemySpawnAmounts[1])
 	document.getElementById("soldierAutoSpawnAmount").innerHTML = Math.floor(spawnAmounts[0]*bonusFromFam)
-	document.getElementById("spearAutoSpawnAmount").innerHTML = Math.floor(spawnAmounts[1]*bonusFromFam)
+	document.getElementById("enemySpawnTimer").innerHTML = round2(enemySpawnRate);
+	document.getElementById("enemySoldierSpawnAmount").innerHTML = round(enemySpawnAmounts[1])
+	document.getElementById("enemySpearSpawnAmount").innerHTML = round(enemySpawnAmounts[2])
+	if(Math.floor(spawnAmounts[1]*bonusFromFam) == 0) {
+		document.getElementById("spearContainer").style.display="none"
+	}
+	else {
+		document.getElementById("spearContainer").style.display="inline-block"
+		document.getElementById("spearSpawnTimer").innerHTML = round2(spearSpawnRate);
+		document.getElementById("spearAutoSpawnAmount").innerHTML = Math.floor(spawnAmounts[1]*bonusFromFam)
+	}
 }
 
 function updateGoldVisual() {
@@ -82,8 +98,7 @@ function changeUnitScreen(unit) {
 	}
 	typeNum = convertTypeToNum(type, "right");
 	commonStart = "<div class='unitContainer nohover' style='cursor:auto;display:block;position:initial;margin-left:auto;margin-right:auto;margin-top:5px;height:30px;'>";
-	next = "<div id='body' class='"+type+" unit' style=''> </div>" + 
-		"<div id='unitWeapon' class='weapon'><div class='weapon"+type+"'></div> </div></div>";
+	next = "<img src='img/"+type+".png' img height='30' width='50'></div></div>";
 	next2 =  "<div class='buySpawnRate' style='margin-bottom:8px;' onclick='buyUpgradePoint(\""+type+"\")'>"+
 			"<div class='icon'>"+addIcon(7)+"</div>"+
 			"<div class='costBox'><div class='goldIcon'></div><div id='cost' class='number'>400</div></div>"+
@@ -194,12 +209,16 @@ function addButton(type, name, num) {
 function updateHover(id) {
 	unitToDisplay = getUnitById(id)
 	if(!unitToDisplay) return
+	
 	document.getElementById("curDamageDone").innerHTML = round2(unitToDisplay.totalDamageDone);
 	document.getElementById("curKills").innerHTML = unitToDisplay.kills;
 	document.getElementById("curHealth").innerHTML = round1(unitToDisplay.curHealth);
 	document.getElementById("curUnitCount").innerHTML = unitToDisplay.unitCount;
 	document.getElementById("curTimeAlive").innerHTML = round((totalTicks - unitToDisplay.timeAlive)/20)+"s";
-	document.getElementById("curDamage").innerHTML = round2(unitToDisplay.damage*unitToDisplay.unitCount);
+	document.getElementById("curActualHealth").innerHTML = round1(unitToDisplay.actualMaxHealth);
+	document.getElementById("totalHealth").innerHTML = round1((unitToDisplay.unitCount-1)*unitToDisplay.actualMaxHealth+unitToDisplay.curHealth);
+	document.getElementById("curDamage").innerHTML = round2(unitToDisplay.damage);
+	document.getElementById("totalDamage").innerHTML = round2(unitToDisplay.damage*unitToDisplay.unitCount);
 }
 
 function addIcon(num) {
@@ -240,6 +259,7 @@ function handleLineAmounts(lineCount) {
 	if(lineCount == 4) offset = 55;
 	if(lineCount == 5) offset = 30;
 	if(lineCount == 6) offset = 0;
+	offset+=37;
 	document.getElementById("fightTime").style.marginTop = offset+"px";
 	document.getElementById("line0").style.marginTop=(70+offset)+"px";
 	if(lineCount == 1) {
@@ -295,6 +315,7 @@ function switchMainTab(switchTo) {
 	switch(switchTo) {
 		case 0:
 			document.getElementById("warSpace").style.display = "inline-block";
+			document.getElementById("manaSpace").style.display = "inline-block";
 			document.getElementById("warTab").style.backgroundColor="rgb(142, 212, 142)";
 		break;
 		case 1:
@@ -326,6 +347,7 @@ function switchMainTab(switchTo) {
 function hideAllInfo() {
 	document.getElementById("warSpace").style.display = "none";
 	document.getElementById("mapSpace").style.display = "none";
+	document.getElementById("manaSpace").style.display = "none";
 	document.getElementById("unitsSpace").style.display = "none";
 	document.getElementById("buildingsSpace").style.display = "none";
 	document.getElementById("placesSpace").style.display = "none";

@@ -9,4 +9,3 @@ onmessage = function(event) {
         clearInterval(intervalId);
     }
 };
-

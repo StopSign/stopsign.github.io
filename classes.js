@@ -15,15 +15,16 @@ function Unit (line, pos, type, direction, unitCount, goldWorth) {
 	this.attackCounter = unitValues[this.typeNum][1]
 	this.curHealth = this.typeNum%2==0?unitValues[this.typeNum][3]*deadUnitBonus[this.typeNum]:unitValues[this.typeNum][3]
 	this.maxHealth = this.typeNum%2==0?unitValues[this.typeNum][3]*deadUnitBonus[this.typeNum]:unitValues[this.typeNum][3]
+	this.actualMaxHealth = this.maxHealth
 	this.damage = this.typeNum%2==0?unitValues[this.typeNum][0]*deadUnitBonus[this.typeNum]:unitValues[this.typeNum][0]
 	this.range = unitValues[this.typeNum][5]
 	this.shouldAttack = 1
 	this.takeDamage = function(dmg) {
-		unitsDead = Math.floor(dmg / this.maxHealth);
-		dmg = dmg % this.maxHealth;
+		unitsDead = Math.floor(dmg / this.actualMaxHealth);
+		dmg = dmg % this.actualMaxHealth;
 		this.curHealth -= dmg
 		if(this.curHealth <= 0) {
-			this.curHealth = this.maxHealth + this.curHealth
+			this.curHealth = this.actualMaxHealth + this.curHealth
 			unitsDead++;
 		}
 		unitsActuallyDead = this.unitCount

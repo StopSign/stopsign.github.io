@@ -32,13 +32,16 @@
 		<div id='territoryGainContainer' style='top:72px;left:402px;' class='statusLabel'>Gain <img src='img/territory.png' height='18' width='15'><div id='territoryGain' style='vertical-align:bottom' class='number'>10</div> territory upon victory</div>
 		<div style='top:55px;left:361px' class='statusLabel'>Stage <div id='stage' class='bigNumber'></div></div>
 	</div>
-	<div id='unitDisplayBox' style='position:absolute;left:203px;width:386px;border:1px solid;top:5px;height:87px;border-radius:15px;display:none;'>
-		<div class='buyName' style='left:203px;top:35px;'>Damage Done: <div id='curDamageDone' class='number'></div></div>
-		<div class='buyName' style='left:271px;top:59px'>Kills: <div id='curKills' class='number'></div></div>
-		<div class='buyName' style='left:42px;top:10px;'>Health: <div id='curHealth' class='number'></div></div>
-		<div class='buyName' style='left:11px;top:35px;'>Unit Count: <div id='curUnitCount' class='number'></div></div>
+	<div id='unitDisplayBox' style='position:absolute;left:203px;width:600px;border:1px solid;top:5px;height:87px;border-radius:15px;display:none;'>
+		<div class='buyName' style='left:357px;top:10px;'>Damage Done: <div id='curDamageDone' class='number'></div></div>
+		<div class='buyName' style='left:55px;top:35px'>Kills: <div id='curKills' class='number'></div></div>
+		<div class='buyName' style='left:221px;top:35px;'>Health: <div id='curHealth' class='number'></div></div>
+		<div class='buyName' style='left:10px;top:10px;'>Unit Count: <div id='curUnitCount' class='number'></div></div>
 		<div class='buyName' style='left:10px;top:60px;'>Time Alive: <div id='curTimeAlive' class='number'></div></div>
-		<div class='buyName' style='left:246px;top:10px;'>Damage: <div id='curDamage' class='number'></div></div>
+		<div class='buyName' style='left:185px;top:10px;'>Max Health: <div id='curActualHealth' class='number'></div></div>
+		<div class='buyName' style='left:177px;top:60px;'>Total Health: <div id='totalHealth' class='number'></div></div>
+		<div class='buyName' style='left:400px;top:35px;'>Damage: <div id='curDamage' class='number'></div></div>
+		<div class='buyName' style='left:356px;top:60px;'>Total Damage: <div id='totalDamage' class='number'></div></div>
 	</div>
 	<div style='top:10px;left:856px' class='statusLabel'>Bonus from families: x<div id='bonusFromFamilies' class='bigNumber'>6f</div></div>
 	<div id='pauseButton' class='button' style='position:absolute;right:5px;top:5px;padding:3px;' onclick='pause()'>Pause</div>
@@ -58,47 +61,53 @@
 
 
 <div id='warSpace' style="width:100%;vertical-align:top;text-align:left;border:2px solid;height:400px;background-color:rgb(223, 255, 221);position:relative;font-size:12px;">
-	<div id="fightTime" style="width:100%;position:absolute;"></div>
-	<canvas id='damageLines' width="1204" height="404" style="position:absolute;" onmouseout="removeHover()"></canvas>
-	<div id="spawnTimers" style="width:1200px;position:absolute;margin-left:200px;margin-top:5px;">
-		<div class='pictureContainer' style='width:150px;'>
+	<div id="fightTime" style="position:absolute;z-index:7"></div>
+	<canvas id='damageLines' width="1204" height="404" style="position:absolute;z-index:6" onmouseout="removeHover()"></canvas>
+	<div id="spawnTimers" style="width:1200px;position:absolute;margin-top:5px;">
+		<div class='unitSpawnBox' style=''>
 			<div id='soldierAutoSpawnAmount' class='spawnAutoAmount'></div>
-			<div id='unit' class='unitContainer nohover' style="position:relative;">
-				<div id='body' class='soldier unit' style=''> </div>
-				<div id='unitWeapon' class='weapon'><div class='weaponsoldier'></div> </div>
-			</div>
+			<img src='img/soldier.png' img height='30' width='50'>
 			<div id='soldierSpawnTimer' class='number f20'></div>
 		</div>
-		
-		<div class='pictureContainer' style='width:150px;'>
+		<div id='spearContainer' class='unitSpawnBox'>
 			<div id='spearAutoSpawnAmount' class='spawnAutoAmount'></div>
-			<div id='unit' class='unitContainer nohover' style="position:relative;">
-				<div id='body' class='spear unit' style=''> </div>
-				<div id='unitWeapon' class='weapon'><div class='weaponspear'></div> </div>
-			</div>
+			<img src='img/spear.png' img height='30' width='50'>
 			<div id='spearSpawnTimer' class='number f20'></div>
 		</div> 
-		<div class='pictureContainer' style='position:relative;left:600px;'>
-			<div id='enemyAutoSpawnAmount' class='spawnAutoAmount'></div>
-			<div id='unit' class='unitContainer nohover' style="position:relative;">
-				<div id='unitWeapon' class='weapon'><div class='weaponsoldier'></div> </div>
-				<div id='body' class='soldier unitLeft' style=''> </div>
-			</div>
+		<div class='enemyUnitSpawnBox' style='position:absolute;right:-53px;'>
+			<div id='enemySoldierSpawnAmount' class='spawnAutoAmount'></div>
+			<img src='img/enemysoldier.png' img height='30' width='50'>
 			<div id='enemySpawnTimer' class='number f20'></div>
 		</div>
+		<div class='enemyUnitSpawnBox' style='position:absolute;right:-2px;'>
+			<div id='enemySpearSpawnAmount' class='spawnAutoAmount' style='left:25px;'></div>
+			<img src='img/enemyspear.png' img height='30' width='50'>
+		</div>
 	</div>
-	<div id='wall' style='position:absolute;left:78px;height:350px;top:25px;width:10px;background-color:grey;z-index:5;'></div>
-	<div id='enemyWall' style='position:absolute;left:1126px;height:350px;top:25px;width:10px;background-color:grey;z-index:5;'></div>
-	<div id='fenceHealth' class='number' style='position:absolute;left:112px;top:30px;'></div>
-	<div id='enemyFenceHealth' class='number' style='position:absolute;left:1080px;top:30px;'></div>
+	<!--<div id='wall' style='position:absolute;left:78px;height:350px;top:25px;width:10px;background-color:grey;z-index:5;'></div>
+	<div id='enemyWall' style='position:absolute;left:1126px;height:350px;top:25px;width:10px;background-color:grey;z-index:5;'></div>-->
+	<img id='wall' src='img/wall.png' height='350' width='78' style='position:absolute;left:-1px;top:48px;z-index:5;'>
+	<img id='enemyWall' src='img/enemywall.png' height='350' width='78' style='position:absolute;left:1123px;top:48px;z-index:5;'>
+	<div id='fenceHealth' class='number' style='position:absolute;left:112px;top:61px;'></div>
+	<div id='enemyFenceHealth' class='number' style='position:absolute;left:1080px;top:61px;'></div>
+	<img id='fence' src='img/fence.png' height='300' width='15' style='position:absolute;left:114px;top:83px;z-index:5;'>
+	<img id='enemyFence' src='img/fence.png' height='300' width='15' style='position:absolute;left:1090px;top:83px;z-index:5;'>
 	<div id='line0' class='actionLine'> </div>
 	<div id='line1' class='actionLine'> </div>
 	<div id='line2' class='actionLine'> </div>
 	<div id='line3' class='actionLine'> </div>
 	<div id='line4' class='actionLine'> </div>
 	<div id='line5' class='actionLine'> </div>
-	<img id='fence' src='img/fence.png' height='300' width='15' style='position:absolute;left:114px;top:50px;z-index:5;'>
-	<img id='enemyFence' src='img/fence.png' height='300' width='15' style='position:absolute;left:1090px;top:50px;z-index:5;'>
+</div>
+<div id='manaSpace' style="width:100%;height:60px;background-color:#78AFFF;border:2px solid; margin-top:5px;">
+	<div id='spell0' class='spell' style='margin-left:50px;' onclick='clickedSpell(0)'>
+		<div>Fireball</div>
+		<div id='spellCost0' class='spellCost'></div>
+	</div>
+	<div id='spell1' class='spell' onclick='clickedSpell(1)'>
+		<div>Chain Lightning</div>
+		<div id='spellCost1' class='spellCost'></div>
+	</div>
 </div>
 
 <div id='mapSpace' class="buyColumn" style="background-color:#AFCDC2;overflow:auto;">
@@ -172,17 +181,11 @@
 		<div style='display:block;margin-top:-6px;'>Click a unit type for possible upgrades</div>
 		<div id='unitList' style='width:400px;border:2px solid;position:absolute;left:10px;top:58px;height:350px;overflow:auto;'>
 			<div class='unitUpgradeContainer' onclick='changeUnitScreen("soldier")'>
-				<div id='unitContainer0' class='unitContainer displayLeft' >
-					<div id='body' class='soldier unit' style=''> </div>
-					<div id='unitWeapon' class='weapon'><div class='weaponsoldier'></div> </div>
-				</div>
+				<img src='img/soldier.png' img height='30' width='50'>
 				Soldier
 			</div>
 			<div class='unitUpgradeContainer' onclick='changeUnitScreen("spear")'>
-				<div id='unitContainer2' class='unitContainer displayLeft' >
-					<div id='body' class='spear unit' style=''> </div>
-					<div id='unitWeapon' class='weapon'><div class='weaponspear'></div> </div>
-				</div>
+				<img src='img/spear.png' img height='30' width='50'>
 				Spearman
 			</div>
 			<!--<div class='unitUpgradeContainer' onclick='changeUnitScreen("spear")'>
@@ -250,6 +253,7 @@
       <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
       <script src="https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
 <!--<script src="tutorial.js"></script>-->
+<script src="spells.js"></script>
 <script src="mapvalues.js"></script>
 <script src="classes.js"></script>
 <script src="manualActions.js"></script>

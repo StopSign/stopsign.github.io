@@ -11,9 +11,9 @@ function loadDefaults() {
 	placeAmountsInitial=[0, 25, 100, 500, 2000, 6000, 12000]
 	placeAmountCosts= [0, 25, 100, 500, 2000, 6000, 12000]
 	stage = 0;
-	unitValues =       [[1, 2, .6, 50, 0, 4.5], [0, 0, 0, 0, 0, 0], [6, 9, .4, 30, 0, 15], [0, 0, 0, 0, 0, 0]]
-	unitValuesInitial = [[1, 2, .6, 50, 0, 4.5], [0, 0, 0, 0, 0, 0], [6, 9, .4, 20, 0, 15], [0, 0, 0, 0, 0, 0]]
-	costSpawnRate =        [20, 0, 300, 0];
+	unitValues =       [[1, 3, .6, 30, 0, 4.5], [0, 0, 0, 0, 0, 0], [9, 9, .4, 30, 0, 15], [0, 0, 0, 0, 0, 0]]
+	unitValuesInitial = [[1, 3, .6, 30, 0, 4.5], [0, 0, 0, 0, 0, 0], [6, 9, .4, 35, 0, 15], [0, 0, 0, 0, 0, 0]]
+	costSpawnRate =        [20, 0, 90, 0];
 	unitCosts =            [6, 0, 40, 0];
 	upgradePointsInitial=  [0, 0,  0, 0];
 	unitPointValues=[[0, 0, 0, 0, 0],[],[0, 0, 0, 0, 0],[]]
@@ -29,15 +29,26 @@ function loadDefaults() {
 	enemyWallHealth = 80000;
 	enemyFenceHealthInitial = 150;
 	enemyFenceHealth = 150;
-	wallHealthInitial = 800
-	wallHealth = 800
-	fenceHealthInitial = 30
-	fenceHealth = 30
+	wallHealthInitial = 1500
+	wallHealth = 1500
+	fenceHealthInitial = 100
+	fenceHealth = 100
 	curUnitScreen = -1
 	deadUnitBonus = [1, 1, 1, 1]
 	currentMapInfoNum = -1
 	offset = 0
-	placeHolder = 0
+	curMana = 20
+	maxMana = 30
+	holdingSpell = -1
+	spellCosts = [9, 14]
+	spellExp = 0;
+	spellLevel = 0;
+	expNeededToLevel = 200;
+	mapTimers = [];
+	for(l = 0; l < maps.length; l++) {
+		mapTimers[l] = 0;
+	}
+	manaGain = .06;
 }
 
 function saveIntoStorage() {
@@ -72,10 +83,22 @@ function saveIntoStorage() {
 	theCookie+=territory+","
 	theCookie+=higheststageUnlocked+","
 	theCookie+=currentTab+","
-	for(x = 0; x < totalDead.length; x++) {
-		theCookie+=totalDead[x]+","
+	for(y = 0; y < totalDead.length; y++) {
+		theCookie+=totalDead[y]+","
 	}
-	theCookie+=placeHolder
+	theCookie+=curMana+","
+	theCookie+=maxMana+","
+	for(y = 0; y < spellCosts.length; y++) {
+		theCookie+=spellCosts[y]+","
+	}
+	theCookie+=spellExp+","
+	theCookie+=spellLevel+","
+	theCookie+=expNeededToLevel+","
+	theCookie+=manaGain+","
+	for(l = 0; l < maps.length; l++) {
+		theCookie+=mapTimers[l]+","
+	}
+	
     localStorage.allVariables103 = theCookie;
 }
 
@@ -117,6 +140,18 @@ function loadFromStorage() {
 		currentTab=parseFloat(expandedCookie[x++]);
 		for(y = 0; y < totalDead.length; y++) {
 			totalDead[y]=parseFloat(expandedCookie[x++]);
+		}
+		curMana=parseFloat(expandedCookie[x++]);
+		maxMana=parseFloat(expandedCookie[x++]);
+		for(y = 0; y < spellCosts.length; y++) {
+			spellCosts[y]=parseFloat(expandedCookie[x++]);
+		}
+		spellExp=parseFloat(expandedCookie[x++]);
+		spellLevel=parseFloat(expandedCookie[x++]);
+		expNeededToLevel=parseFloat(expandedCookie[x++]);
+		manaGain=parseFloat(expandedCookie[x++]);
+		for(l = 0; l < maps.length; l++) {
+			mapTimers[l]=parseFloat(expandedCookie[x++]);
 		}
     }
 	startANewstage()

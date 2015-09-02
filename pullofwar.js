@@ -59,7 +59,7 @@ function tick() {
 		handleDamageAtEnds()
 		handleBattles()
 	}
-	
+	updateManaGain()
 	timer++;
 	if(timer === 10) {
 		halfSecond()
@@ -67,6 +67,8 @@ function tick() {
 	else if(timer >= 20) {
 		halfSecond()
 		updateMapTimers()
+		updateSpellCooldowns()
+		updateSpellVisuals()
 		timer = 0;
 	}
 	updateHover(curClickedUnit)
@@ -281,12 +283,23 @@ function checkForUnitCollisions() {
 						continue
 					if(units[z][w].direction == units[y][x].direction) { //join units of the same type
 						if(Math.abs(units[y][x].pos - units[z][w].pos) <= 1.5 && units[z][w].type===units[y][x].type) {
+							if(units[y][x].id > units[z][w].id) continue //if yx is the earlier one, take the merge
 							//average the units together
+							newUnitCount = units[y][x].unitCount+units[z][w].unitCount;
+							healthToChange = (units[z][w].actualMaxHealth - units[z][w].curHealth)/newUnitCount
 							units[y][x].damage = (units[y][x].damage*units[y][x].unitCount+units[z][w].unitCount*units[z][w].damage)/(units[y][x].unitCount+units[z][w].unitCount)
 							units[y][x].maxHealth = (units[y][x].maxHealth*units[y][x].unitCount+units[z][w].unitCount*units[z][w].maxHealth)/(units[y][x].unitCount+units[z][w].unitCount)
-							units[y][x].maxHealth = (units[y][x].maxHealth*units[y][x].unitCount+units[z][w].unitCount*units[z][w].maxHealth)/(units[y][x].unitCount+units[z][w].unitCount)
+							units[y][x].actualMaxHealth = (units[y][x].actualMaxHealth*units[y][x].unitCount+units[z][w].unitCount*units[z][w].actualMaxHealth)/(units[y][x].unitCount+units[z][w].unitCount)
 							if(units[y][x].curHealth > units[y][x].maxHealth) units[y][x].curHealth = units[y][x].maxHealth
-							units[y][x].unitCount+=units[z][w].unitCount;
+							units[y][x].unitCount=newUnitCount
+							if(units[y][x].actualMaxHealth - units[y][x].curHealth <= 1) {
+								units[y][x].curHealth = 1;
+								units[y][x].actualMaxHealth -= healthToChange
+								
+							} else {
+								units[y][x].actualMaxHealth -= healthToChange
+								units[y][x].takeDamage(healthToChange)
+							}
 							document.getElementById("count"+units[y][x].id).innerHTML = units[y][x].unitCount
 							if(units[z][w].id === curClickedUnit) {
 								hoverAUnit(units[y][x].id)
@@ -353,27 +366,33 @@ function handleBattles() {
 					drawSpearLine(units[y][x], engageTarget);
 				}
 				count = engageTarget.unitCount
+				
 				engageTarget.takeDamage(units[y][x].getDamageRoll(engageTarget.typeNum))
 				units[y][x].kills += count - engageTarget.unitCount;
 				//console.log(engageTarget.id)
 				document.getElementById("count"+engageTarget.id).innerHTML = engageTarget.unitCount
 				//console.log(units[y][x].id + " attacking "+engageTarget.id + " on " + totalTicks)
 				//if it died
-				if(engageTarget.curHealth <= 0) {
-					//console.log("removing: " + engageTarget.id + " on " + totalTicks + ", "+x)
-					//console.log(units[y][x].engaged)
-					updateGoldVisual()
-					updateDeadUnitBonus()
-					disengageAll(engageTarget)
-					removeUnit(engageTarget, engageTarget.direction!="right")
-				}
-				else {
-					tempHealth = (engageTarget.curHealth / engageTarget.maxHealth * 100)
-					document.getElementById("healthBar"+engageTarget.id).style.width = tempHealth>100?100:tempHealth + "%";
-				}
+				handleDeadUnit(engageTarget)
 				//console.log("x:"+x)
 			}
 		}
+	}
+}
+
+function handleDeadUnit(target) {
+	if(target.curHealth <= 0) {
+		updateGoldVisual()
+		updateDeadUnitBonus()
+		if(target.id == curClickedUnit) {
+			removeHover()
+		}
+		disengageAll(target)
+		removeUnit(target, target.direction!="right")
+	}
+	else {
+		tempHealth = (target.curHealth / target.maxHealth * 100)
+		document.getElementById("healthBar"+target.id).style.width = tempHealth>100?100:tempHealth + "%";
 	}
 }
 
