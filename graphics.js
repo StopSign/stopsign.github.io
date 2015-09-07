@@ -1,7 +1,7 @@
 function newUnitDiv(unit) {
 	commonBefore = "<div id='unit"+unit.id+"' class='unitContainer unitLine"+unit.line+"' style='z-index:"+(zIndex--)+"' onmouseover='hoverAUnit("+unit.id+")' onclick='clickAUnit("+unit.id+")'>" +
 		"<div class='healthBarOuter'><div class='healthBarInner' id='healthBar"+unit.id+"' style='z-index:"+(zIndex--)+"'></div></div>";
-	src = "img/"+(unit.direction!="right"?"enemy":"")+unit.type+".png"
+	src = "pics/"+(unit.direction!="right"?"enemy":"")+unit.type+".png"
 	different = "<img height='30' width='50' src='"+src+"'>"
 	/*if(unit.direction === "right") {
 		different = "<div id='body' class='"+unit.type+" unit' style=''> </div>" + 
@@ -11,7 +11,7 @@ function newUnitDiv(unit) {
 		different = "<div id='unitWeapon' class='weapon'><div class='weapon"+unit.type+"'></div> </div>" +
 			"<div id='body' class='"+unit.type+" unitLeft' style=''> </div>";
 	}*/
-	commonAfter = "<div id='count"+unit.id+"' class='count count"+unit.type+"'>"+unit.unitCount+"</div></div>";
+	commonAfter = "<div id='count"+unit.id+"' class='count hyperVisible count"+unit.type+"'>"+unit.unitCount+"</div></div>";
 	elem = document.createElement("div");
 	elem.innerHTML = commonBefore + different + commonAfter;
 	document.getElementById('fightTime').appendChild(elem)
@@ -80,6 +80,27 @@ function updateWallHealthVisuals() {
 	document.getElementById("enemyFenceHealth").innerHTML = enemyFenceHealth;
 }
 
+function changeBuildingScreen(buildingType) {
+	start = ""
+	if(buildingType == "wall") {
+		start = "<img src ='pics/smallwall.png' height='50' width='50' /><br>"
+		start += addBuildingButton("wall", "Wall Health", 0)
+	}
+	if(buildingType == "fence") {
+		start = "<img src ='pics/smallfence.png' height='50' width='25' /><br>"
+		start += addBuildingButton("fence", "Fence Stacks", 0)
+	}
+	start += ""
+	document.getElementById("buildingUpgradesBox").innerHTML = start
+}
+function addBuildingButton(type, name, num) {
+	return "<div class='buyButton' onclick='clickBuildingBuyButton("+num+" , \""+type+"\")'"+"  id='buyBuildingButton"+num+"' style='width:80%;border:2px solid;' >"+
+		"<div class='buyName'>"+name+"</div>"+
+		"<div class='buyVal' id='buyBuilding"+num+"'>3</div>"+
+		"<div class='costBox'><div class='goldIcon'></div><div id='costBuilding"+num+"' class='number'>400</div></div>"+
+	"</div>"
+}
+
 function changeUnitScreen(unit) {
 	type = "error"
 	if(typeof unit.id == 'undefined') {
@@ -98,7 +119,7 @@ function changeUnitScreen(unit) {
 	}
 	typeNum = convertTypeToNum(type, "right");
 	commonStart = "<div class='unitContainer nohover' style='cursor:auto;display:block;position:initial;margin-left:auto;margin-right:auto;margin-top:5px;height:30px;'>";
-	next = "<img src='img/"+type+".png' img height='30' width='50'></div></div>";
+	next = "<img src='pics/"+type+".png' img height='30' width='50'></div></div>";
 	next2 =  "<div class='buySpawnRate' style='margin-bottom:8px;' onclick='buyUpgradePoint(\""+type+"\")'>"+
 			"<div class='icon'>"+addIcon(7)+"</div>"+
 			"<div class='costBox'><div class='goldIcon'></div><div id='cost' class='number'>400</div></div>"+
@@ -166,11 +187,11 @@ function updateSpawnRate2(type) {
 }
 
 function updateSpawnRate() {
+	unit = getUnitById(curClickedUnit)
 	if(document.getElementById("buy0")) {
-		document.getElementById("buy0").innerHTML = round2(spawnAmounts[typeNum/2])
-		document.getElementById("buy02").innerHTML = round2(spawnRate[typeNum/2])
+		document.getElementById("buy0").innerHTML = round2(spawnAmounts[unit.typeNum/2])
+		document.getElementById("buy02").innerHTML = round2(spawnRate[unit.typeNum/2])
 	}
-	document.getElementById("bonusFromFamilies").innerHTML = round3(bonusFromFam);
 }
 
 function updateStatusUpgrades(unit, type) {
@@ -223,28 +244,28 @@ function updateHover(id) {
 
 function addIcon(num) {
 	if(num == 0) {
-		return "<img src='img/camp.png' height='100%' width='100%'>"
+		return "<img src='pics/camp.png' height='100%' width='100%'>"
 	}
 	if(num == 1) {
-		return "<img src='img/sword.png' height='100%' width='100%'>"
+		return "<img src='pics/sword.png' height='100%' width='100%'>"
 	}
 	if(num == 2) {
-		return "<img src='img/fast.png' height='100%' width='100%'>"
+		return "<img src='pics/fast.png' height='100%' width='100%'>"
 	}
 	if(num == 3) {
-		return "<img src='img/foot.png' height='100%' width='100%'>"
+		return "<img src='pics/foot.png' height='100%' width='100%'>"
 	}
 	if(num == 4) {
-		return "<img src='img/heart.png' height='100%' width='100%'>"
+		return "<img src='pics/heart.png' height='100%' width='100%'>"
 	}
 	if(num == 5) {
-		return "<img src='img/shield.png' height='100%' width='100%'>"
+		return "<img src='pics/shield.png' height='100%' width='100%'>"
 	}
 	if(num == 6) {
-		return "<img src='img/range.png' height='100%' width='100%'>"
+		return "<img src='pics/range.png' height='100%' width='100%'>"
 	}
 	if(num == 7) {
-		return "<img src='img/arrow.png' height='100%' width='100%'>"
+		return "<img src='pics/arrow.png' height='100%' width='100%'>"
 	}
 	return "";
 }

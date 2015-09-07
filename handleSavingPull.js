@@ -1,7 +1,8 @@
 function loadDefaults() {
 	units = [[],[],[],[],[],[]];
 
-
+	soldierSpawnRate = 0;
+	spearSpawnRate = 0;
 	spawnManualAmounts =[0,  2];
 	initialSpawnAmounts=[1,  .3333333];
 	initialSpawnRateInitial=[9, 10];
@@ -11,8 +12,8 @@ function loadDefaults() {
 	placeAmountsInitial=[0, 25, 100, 500, 2000, 6000, 12000]
 	placeAmountCosts= [0, 25, 100, 500, 2000, 6000, 12000]
 	stage = 0;
-	unitValues =       [[1, 3, .6, 30, 0, 4.5], [0, 0, 0, 0, 0, 0], [9, 9, .4, 30, 0, 15], [0, 0, 0, 0, 0, 0]]
-	unitValuesInitial = [[1, 3, .6, 30, 0, 4.5], [0, 0, 0, 0, 0, 0], [6, 9, .4, 35, 0, 15], [0, 0, 0, 0, 0, 0]]
+	unitValues =       [[1, 3, .6, 12, 0, 4.5], [0, 0, 0, 0, 0, 0], [9, 9, .4, 20, 0, 15], [0, 0, 0, 0, 0, 0]]
+	unitValuesInitial = [[1, 3, .6, 12, 0, 4.5], [0, 0, 0, 0, 0, 0], [9, 9, .4, 30, 0, 15], [0, 0, 0, 0, 0, 0]]
 	costSpawnRate =        [20, 0, 90, 0];
 	unitCosts =            [6, 0, 40, 0];
 	upgradePointsInitial=  [0, 0,  0, 0];
@@ -49,10 +50,11 @@ function loadDefaults() {
 		mapTimers[l] = 0;
 	}
 	manaGain = .06;
+	buildingUpgradesCost = [[50], [70]]
 }
 
 function saveIntoStorage() {
-    localStorage.allVariables103 = "";
+    window.localStorage.allVariables103 = "";
 	theCookie=""
 	for(x = 0; x < spawnManualAmounts.length; x++) {
 		theCookie+=spawnManualAmounts[x]+","
@@ -99,14 +101,14 @@ function saveIntoStorage() {
 		theCookie+=mapTimers[l]+","
 	}
 	
-    localStorage.allVariables103 = theCookie;
+    window.localStorage.allVariables103 = theCookie;
 }
 
 function loadFromStorage() {
 	document.getElementById("mainBox").style.display="inline-block";
 	loadDefaults();
-    if(localStorage.allVariables103) {
-        expandedCookie = (','+localStorage.allVariables103).split(',');
+    if(!!window.localStorage && window.localStorage.allVariables103) {
+        expandedCookie = (','+window.localStorage.allVariables103).split(',');
         x = 1;
 		for(y = 0; y < spawnManualAmounts.length; y++) {
 			spawnManualAmounts[y]=parseFloat(expandedCookie[x++]);
@@ -168,7 +170,7 @@ function loadFromStorage() {
 
 function clearStorage() {
 	startANewstage()
-    localStorage.allVariables103="";
+    window.localStorage.allVariables103="";
 	loadFromStorage()
 }
 

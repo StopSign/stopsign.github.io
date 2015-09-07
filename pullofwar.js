@@ -1,6 +1,7 @@
-
+started = 0
 setInterval(function() {
-	tick();
+	if(started)
+		tick();
 },50);
 
 
@@ -34,12 +35,11 @@ spawnRate=          [9, 10];
 spawnAmounts =  [1,  1]
 enemySpawnRate = 9;
 curBattles = [];
-storedLines = [];
-timer = 0;
-stop = 0;
 curClickedUnit = -1;*/
 timeList = [];
+storedLines = [];
 totalTicks = 0
+timer = 0;
 //startTutorial()
 function tick() {
 	timeList.push(new Date().getTime())
@@ -109,9 +109,9 @@ function handlePlaceChanges() {
 					extraFamilies = placeAmounts[0] - territory
 					if(extraFamilies < 0) extraFamilies = 0;
 					for(z = 0; z < placeAmounts[1] - extraFamilies; z++) {
-						bonusFromFam *= 1+(1/(20+(placeAmounts[0]-z)*2)) //SPAWN RATE FORMULA
+						bonusFromFam *= 1+(1/(20+(placeAmounts[0]-z)*1.5)) //SPAWN RATE FORMULA
 					}
-					updateSpawnRate()
+					document.getElementById("bonusFromFamilies").innerHTML = round3(bonusFromFam);
 				}
 			}
 		}
@@ -412,8 +412,8 @@ function disengageAll(unit) {
 
 function removeUnit(unit, shouldAdd) {
 	var elem = document.getElementById("unit"+unit.id);
-	parent = elem.parentNode
-	parent.parentNode.removeChild(parent);
+	theParent = elem.parentNode
+	theParent.parentNode.removeChild(theParent);
 	
 	for(g = 0; g < units.length; g++) {
 		for(h = units[g].length - 1; h >= 0; h--) {

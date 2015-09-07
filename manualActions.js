@@ -19,6 +19,25 @@ function handleBuyAmounts(y, x) {
 	unitValues[y][x] = unitValuesInitial[y][x]*unitPointValues[y][x]*.1+unitValuesInitial[y][x]*Math.pow(1.04, unitPointValues[y][x]);
 }
 
+function clickBuildingBuyButton(num, type) {
+	if(type == "wall") {
+		if(num == 0 && gold >= buildingUpgradesCost[0][0]) { 
+			gold -= buildingUpgradesCost[0][0]
+			buildingUpgradesCost[0][0]*= 1.2
+			wallHealth+=500
+			wallHealthInitial+=500
+		}
+	}
+	if(type == "fence") {
+		if(num == 0 && gold >= buildingUpgradesCost[1][0]) { 
+			gold -= buildingUpgradesCost[1][0]
+			buildingUpgradesCost[1][0]*= 1.2
+			fenceHealth+=20
+			wallHealthInitial+=20
+		}
+	}
+}
+
 function clickBuySpawnRate(type) {
 	typeNum = convertTypeToNum(type, "right") 
 	if(costSpawnRate[typeNum] <= gold) {
@@ -35,7 +54,6 @@ function clickBuySpawnRate(type) {
 	}
 	updateStatusUpgrades("", type)
 	updateGoldVisual()
-	updateSpawnRate()
 }
 
 function buyUpgradePoint(type) {
@@ -161,8 +179,8 @@ function startANewstage() {
 	document.getElementById("stage").innerHTML=stage;
 	document.getElementById("territoryGain").innerHTML = mapTimers[stage]>0?maps[stage][1]/5:maps[stage][1]
 	document.getElementById("goldGain").innerHTML = maps[stage][0]
-	unitValues[1] = [2+stage*Math.pow(1.2, (stage))/5, 4, .06, Math.floor(Math.pow(stage+10, 4)/117), 0, 4.5]
-	unitValues[3] = [14+stage*5+Math.pow(1.25, stage), 20, .04, 35+Math.floor(Math.pow(stage+5, 3)/4), 0, 10]
+	unitValues[1] = [Math.pow(stage+5, 4)*Math.pow(1.08, stage)/250, 4, .06, Math.pow(stage+3, 3)*Math.pow(1.15, stage)+30, 0, 4.5]
+	unitValues[3] = [Math.pow(stage+5, 3)*Math.pow(1.11, stage)/8, 15, .04, Math.pow(stage+5, 3)*Math.pow(1.1, stage)/6, 0, 16]
 	//updateProgressVisual()
 	placeCurTimers=[]
 	placeAmounts=[]
@@ -181,6 +199,8 @@ function startANewstage() {
 	document.getElementById("fence").style.display = fenceHealth>0?'inline-block':'none';
 	document.getElementById("fenceHealth").style.display = fenceHealth>0?'inline-block':'none';
 	
-	updateSpawnRate()
 	//addUnit("spear", 0, "right", 1);
+	document.getElementById("bonusFromFamilies").innerHTML = round3(bonusFromFam);
+	
+	started = 1
 }

@@ -3,8 +3,8 @@
 showNextMessage = 0;
 higherZ = 9999999999999
 function startTutorial() {
-	if(localStorage.doneTutorial == 1) return
-	localStorage.doneTutorial = 1;
+	if(window.localStorage.doneTutorial == 1) return
+	window.localStorage.doneTutorial = 1;
 	greyBox = document.getElementById("greyBox");
 	addGreyBox()
 	//addVisibleElement(
@@ -13,7 +13,7 @@ function startTutorial() {
 }
 
 function forceTutorial() {
-	localStorage.doneTutorial = 0;
+	window.localStorage.doneTutorial = 0;
 	showNextMessage = 0;
 	startTutorial()
 }

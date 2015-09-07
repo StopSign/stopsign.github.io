@@ -2,7 +2,6 @@
 <html>
 <head>
 	<meta content="text/html;charset=utf-8" http-equiv="Content-Type">
-	<meta content="utf-8" http-equiv="encoding">
 	<title>Pull of War</title>
 	<link rel="stylesheet" href="stylesheet.css">
 </head>
@@ -16,8 +15,8 @@
 <div id='displaySpace' onmouseover="removeHover()" style="width:100%;text-align:center;border: 2px solid; height:100px;background-color:rgb(247, 230, 220);position:relative"> 
 	<div id='resourceDisplayBox' style='position:absolute;left:9px;width:400px;text-align:left;'>
 		<div style='top:4px;' class='statusLabel'>Gold: <div class='goldIcon'></div><div id='gold' class='bigNumber' style=''></div></div>
-		<div id='territoryContainer' style='top:28px;' class='statusLabel'>Territory: <img src='img/territory.png' height='18' width='15'><div id='territory' class='bigNumber'></div></div>
-		<div id='manaContainer' style='top:54px;background-color:rgb(247, 230, 220);' class='statusLabel'>Mana: <img src='img/mana.png' height='18' width='18'><div id='mana' class='bigNumber'>100f</div></div>
+		<div id='territoryContainer' style='top:28px;' class='statusLabel'>Territory: <img src='pics/territory.png' height='18' width='15'><div id='territory' class='bigNumber'></div></div>
+		<div id='manaContainer' style='top:54px;background-color:rgb(247, 230, 220);' class='statusLabel'>Mana: <img src='pics/mana.png' height='18' width='18'><div id='mana' class='bigNumber'>100f</div></div>
 	</div>
 	<div id='victoryConditionBox' style='position:absolute;left:113px;width:800px;'>
 		<div style='left:139px;top:2px;' class='statusLabel'>Your Wall Health: <div id='wallHealth' class='number' >801f</div></div>
@@ -29,7 +28,7 @@
 			<div id='compete5' style='width:50%;background-color:rgb(0, 61, 0);float:left' class='progressBar'></div><div id='compete6' style='width:50%;border-top-left-radius:25px;border-bottom-left-radius:25px;background-color:rgb(255, 13, 13);float:right;' class='progressBar'></div>
 		</div>
 		<div id='goldGainContainer' style='top:72px;left:162px;' class='statusLabel'>Gain <div class='goldIcon'></div><div id='goldGain' style='vertical-align:bottom' class='number'>10f</div> base gold per kill</div>
-		<div id='territoryGainContainer' style='top:72px;left:402px;' class='statusLabel'>Gain <img src='img/territory.png' height='18' width='15'><div id='territoryGain' style='vertical-align:bottom' class='number'>10</div> territory upon victory</div>
+		<div id='territoryGainContainer' style='top:72px;left:402px;' class='statusLabel'>Gain <img src='pics/territory.png' height='18' width='15'><div id='territoryGain' style='vertical-align:bottom' class='number'>10</div> territory upon victory</div>
 		<div style='top:55px;left:361px' class='statusLabel'>Stage <div id='stage' class='bigNumber'></div></div>
 	</div>
 	<div id='unitDisplayBox' style='position:absolute;left:203px;width:600px;border:1px solid;top:5px;height:87px;border-radius:15px;display:none;'>
@@ -61,37 +60,38 @@
 
 
 <div id='warSpace' style="width:100%;vertical-align:top;text-align:left;border:2px solid;height:400px;background-color:rgb(223, 255, 221);position:relative;font-size:12px;">
+	<img src='pics/line2.png' width='1200' height='400' style='position:absolute;'>
 	<div id="fightTime" style="position:absolute;z-index:7"></div>
 	<canvas id='damageLines' width="1204" height="404" style="position:absolute;z-index:6" onmouseout="removeHover()"></canvas>
-	<div id="spawnTimers" style="width:1200px;position:absolute;margin-top:5px;">
+	<div id="spawnTimers" class='hyperVisible' style="width:1200px;position:absolute;margin-top:5px;">
 		<div class='unitSpawnBox' style=''>
 			<div id='soldierAutoSpawnAmount' class='spawnAutoAmount'></div>
-			<img src='img/soldier.png' img height='30' width='50'>
-			<div id='soldierSpawnTimer' class='number f20'></div>
+			<img src='pics/soldier.png' height='30' width='50'>
+			<div id='soldierSpawnTimer' class='f20' style='vertical-align:top'></div>
 		</div>
 		<div id='spearContainer' class='unitSpawnBox'>
 			<div id='spearAutoSpawnAmount' class='spawnAutoAmount'></div>
-			<img src='img/spear.png' img height='30' width='50'>
-			<div id='spearSpawnTimer' class='number f20'></div>
+			<img src='pics/spear.png' height='30' width='50'>
+			<div id='spearSpawnTimer' class='f20' style='vertical-align:top'></div>
 		</div> 
 		<div class='enemyUnitSpawnBox' style='position:absolute;right:-53px;'>
 			<div id='enemySoldierSpawnAmount' class='spawnAutoAmount'></div>
-			<img src='img/enemysoldier.png' img height='30' width='50'>
-			<div id='enemySpawnTimer' class='number f20'></div>
+			<img src='pics/enemysoldier.png' height='30' width='50'>
+			<div id='enemySpawnTimer' class='f20' style='vertical-align:top'></div>
 		</div>
 		<div class='enemyUnitSpawnBox' style='position:absolute;right:-2px;'>
 			<div id='enemySpearSpawnAmount' class='spawnAutoAmount' style='left:25px;'></div>
-			<img src='img/enemyspear.png' img height='30' width='50'>
+			<img src='pics/enemyspear.png' height='30' width='50'>
 		</div>
 	</div>
 	<!--<div id='wall' style='position:absolute;left:78px;height:350px;top:25px;width:10px;background-color:grey;z-index:5;'></div>
 	<div id='enemyWall' style='position:absolute;left:1126px;height:350px;top:25px;width:10px;background-color:grey;z-index:5;'></div>-->
-	<img id='wall' src='img/wall.png' height='350' width='78' style='position:absolute;left:-1px;top:48px;z-index:5;'>
-	<img id='enemyWall' src='img/enemywall.png' height='350' width='78' style='position:absolute;left:1123px;top:48px;z-index:5;'>
-	<div id='fenceHealth' class='number' style='position:absolute;left:112px;top:61px;'></div>
-	<div id='enemyFenceHealth' class='number' style='position:absolute;left:1080px;top:61px;'></div>
-	<img id='fence' src='img/fence.png' height='300' width='15' style='position:absolute;left:114px;top:83px;z-index:5;'>
-	<img id='enemyFence' src='img/fence.png' height='300' width='15' style='position:absolute;left:1090px;top:83px;z-index:5;'>
+	<img id='wall' src='pics/wall.png' height='350' width='78' style='position:absolute;left:-1px;top:48px;z-index:5;'>
+	<img id='enemyWall' src='pics/enemywall.png' height='350' width='78' style='position:absolute;left:1123px;top:48px;z-index:5;'>
+	<div id='fenceHealth' class='hyperVisible' style='position:absolute;left:112px;top:61px;'></div>
+	<div id='enemyFenceHealth' class='hyperVisible' style='position:absolute;left:1080px;top:61px;'></div>
+	<img id='fence' src='pics/fence.png' height='300' width='15' style='position:absolute;left:114px;top:83px;z-index:5;'>
+	<img id='enemyFence' src='pics/fence.png' height='300' width='15' style='position:absolute;left:1090px;top:83px;z-index:5;'>
 	<div id='line0' class='actionLine'> </div>
 	<div id='line1' class='actionLine'> </div>
 	<div id='line2' class='actionLine'> </div>
@@ -164,13 +164,13 @@
 	</div>
 	<div style='width:100%;border-top:5px solid;text-align:center;margin-top:15px;margin-bottom:10px;'>Spend territory to increase starting amounts</div>
 	<div style='width:50%;height:200px;vertical-align:top;text-align:center;'>
-		<div class='button buyPlaceAmount' onclick='buyStartingPlaceAmounts(1)'><div class='placeBuyLabel'>Villages</div><div class='placeBuyCost'><img src='img/territory.png' height='18' width='13'><div id='placeCost1' class='number'></div></div>
-		</div><div class='button buyPlaceAmount' onclick='buyStartingPlaceAmounts(2)'><div class='placeBuyLabel'>Towns</div><div class='placeBuyCost'><img src='img/territory.png' height='18' width='13'><div id='placeCost2' class='number'></div></div>
-		</div><div class='button buyPlaceAmount' onclick='buyStartingPlaceAmounts(3)'><div class='placeBuyLabel'>Cities</div><div class='placeBuyCost'><img src='img/territory.png' height='18' width='13'><div id='placeCost3' class='number'></div></div></div>
+		<div class='button buyPlaceAmount' onclick='buyStartingPlaceAmounts(1)'><div class='placeBuyLabel'>Villages</div><div class='placeBuyCost'><img src='pics/territory.png' height='18' width='13'><div id='placeCost1' class='number'></div></div>
+		</div><div class='button buyPlaceAmount' onclick='buyStartingPlaceAmounts(2)'><div class='placeBuyLabel'>Towns</div><div class='placeBuyCost'><img src='pics/territory.png' height='18' width='13'><div id='placeCost2' class='number'></div></div>
+		</div><div class='button buyPlaceAmount' onclick='buyStartingPlaceAmounts(3)'><div class='placeBuyLabel'>Cities</div><div class='placeBuyCost'><img src='pics/territory.png' height='18' width='13'><div id='placeCost3' class='number'></div></div></div>
 	</div><div style='width:50%;height:200px;vertical-align:top;text-align:center;'>
-		<div class='button buyPlaceAmount' onclick='buyStartingPlaceAmounts(4)'><div class='placeBuyLabel'>States</div><div class='placeBuyCost'><img src='img/territory.png' height='18' width='13'><div id='placeCost4' class='number'></div></div>
-		</div><div class='button buyPlaceAmount' onclick='buyStartingPlaceAmounts(5)'><div class='placeBuyLabel'>Countries</div><div class='placeBuyCost'><img src='img/territory.png' height='18' width='13'><div id='placeCost5' class='number'></div></div>
-		</div><div class='button buyPlaceAmount' onclick='buyStartingPlaceAmounts(6)'><div class='placeBuyLabel'>Regions</div><div class='placeBuyCost'><img src='img/territory.png' height='18' width='13'><div id='placeCost6' class='number'>
+		<div class='button buyPlaceAmount' onclick='buyStartingPlaceAmounts(4)'><div class='placeBuyLabel'>States</div><div class='placeBuyCost'><img src='pics/territory.png' height='18' width='13'><div id='placeCost4' class='number'></div></div>
+		</div><div class='button buyPlaceAmount' onclick='buyStartingPlaceAmounts(5)'><div class='placeBuyLabel'>Countries</div><div class='placeBuyCost'><img src='pics/territory.png' height='18' width='13'><div id='placeCost5' class='number'></div></div>
+		</div><div class='button buyPlaceAmount' onclick='buyStartingPlaceAmounts(6)'><div class='placeBuyLabel'>Regions</div><div class='placeBuyCost'><img src='pics/territory.png' height='18' width='13'><div id='placeCost6' class='number'>
 		</div></div></div>
 	</div>
 </div>
@@ -181,11 +181,11 @@
 		<div style='display:block;margin-top:-6px;'>Click a unit type for possible upgrades</div>
 		<div id='unitList' style='width:400px;border:2px solid;position:absolute;left:10px;top:58px;height:350px;overflow:auto;'>
 			<div class='unitUpgradeContainer' onclick='changeUnitScreen("soldier")'>
-				<img src='img/soldier.png' img height='30' width='50'>
+				<img src='pics/soldier.png' height='30' width='50'>
 				Soldier
 			</div>
 			<div class='unitUpgradeContainer' onclick='changeUnitScreen("spear")'>
-				<img src='img/spear.png' img height='30' width='50'>
+				<img src='pics/spear.png' height='30' width='50'>
 				Spearman
 			</div>
 			<!--<div class='unitUpgradeContainer' onclick='changeUnitScreen("spear")'>
@@ -233,7 +233,16 @@
 <div id='buildingsSpace' class="buyColumn" style='background-color:#E1A95F;text-align:center;' >
 	<div style='font-size:18px;margin-top:10px;'>Buildings</div>
 	<div style='display:block;margin-top:-6px;'>Click a building type for possible upgrades</div>
-	<div style='width:400px;border:2px solid;position:absolute;left:10px;top:58px;height:350px;overflow:auto;background-color:#EABD95'></div>
+	<div style='width:400px;border:2px solid;position:absolute;left:10px;top:58px;height:350px;overflow:auto;background-color:#EABD95'>
+			<div class='unitUpgradeContainer' onclick='changeBuildingScreen("wall")'>
+				<img src='pics/smallwall.png' height='50' width='50'>
+				<div style='vertical-align:top;margin-top:16px;'>Upgrade Wall</div>
+			</div>
+			<div class='unitUpgradeContainer' onclick='changeBuildingScreen("fence")'>
+				<img src='pics/smallfence.png' height='50' width='25'>
+				<div style='vertical-align:top;margin-top:16px;'>Upgrade Fence</div>
+			</div>
+	</div>
 	<div id='buildingUpgradesBox' style='width:740px;border:2px solid;position:absolute;left:437px;top:58px;height:350px;background-color:#EABD95'></div>
 </div>
 
@@ -241,12 +250,14 @@
 	<div style='width:90%;margin-top:30px;margin-left:30px;'>
 		<div style="float:left;">Created by: <a style="color:red" href='http://reddit.com/u/stop_sign'>Stop_Sign</a></div><br>
 		<div style="float:left;">Made for: <a style="color:black" href='http://reddit.com/r/incremental_games'>/r/incremental_games</a></div><br>
-		<div style='float:left;'>I want a ton of feedback! Please send a message through reddit using <a style="color:black" href='https://www.reddit.com/message/compose?to=Stop_Sign&subject=Pull of War feedback&message='>this link</a><br>
+		<div style='float:left;'>I want a ton of feedback! Please send a message through reddit using <a style="color:black" href='https://www.reddit.com/message/compose?to=Stop_Sign&subject=Pull%20of%20War%20feedback&message='>this link</a></div><br>
 		<div class='button' style='padding:5px;margin-top:10px;margin-bottom:10px;' onclick='forceTutorial()' >Show Tutorial</div><br>
 		<div class='button' style='padding:5px;' onclick='clearStorage()'>Clear Save</div>
 	</div>
 </div>
 
+</div>
+</div>
 </div>
 
 </body>
