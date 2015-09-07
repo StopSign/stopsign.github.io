@@ -15,7 +15,7 @@ function loadDefaults() {
 	unitValues =       [[1, 3, .6, 12, 0, 4.5], [0, 0, 0, 0, 0, 0], [9, 9, .4, 20, 0, 15], [0, 0, 0, 0, 0, 0]]
 	unitValuesInitial = [[1, 3, .6, 12, 0, 4.5], [0, 0, 0, 0, 0, 0], [9, 9, .4, 30, 0, 15], [0, 0, 0, 0, 0, 0]]
 	costSpawnRate =        [20, 0, 90, 0];
-	unitCosts =            [6, 0, 40, 0];
+	unitCosts =            [2, 0, 40, 0];
 	upgradePointsInitial=  [0, 0,  0, 0];
 	unitPointValues=[[0, 0, 0, 0, 0],[],[0, 0, 0, 0, 0],[]]
 	gold = 0;
@@ -100,6 +100,8 @@ function saveIntoStorage() {
 	for(l = 0; l < maps.length; l++) {
 		theCookie+=mapTimers[l]+","
 	}
+	theCookie+=wallHealthInitial+","
+	theCookie+=fenceHealthInitial+","
 	
     window.localStorage.allVariables103 = theCookie;
 }
@@ -155,6 +157,8 @@ function loadFromStorage() {
 		for(l = 0; l < maps.length; l++) {
 			mapTimers[l]=parseFloat(expandedCookie[x++]);
 		}
+		wallHealthInitial=parseFloat(expandedCookie[x++]);
+		fenceHealthInitial=parseFloat(expandedCookie[x++]);
     }
 	startANewstage()
 	updateTerritoryVisual()

@@ -67,7 +67,6 @@ function tick() {
 	else if(timer >= 20) {
 		halfSecond()
 		updateMapTimers()
-		updateSpellCooldowns()
 		updateSpellVisuals()
 		timer = 0;
 	}
@@ -272,8 +271,11 @@ function checkForUnitCollisions() {
 					//Ranged: (to hit multiple rows)
 					if(units[y][x].type=="spear") {
 						if((Math.abs(y-z)<=1)&&units[z][w].direction != units[y][x].direction) {
-							difference = Math.abs(units[y][x].pos - units[z][w].pos)
-							if(difference < units[y][x].range && difference > 2) {
+							difference = units[y][x].pos - units[z][w].pos
+							if(units[y][x].direction == "right" && difference > units[y][x].range*-1 && difference < -2) {
+								units[y][x].engaged.push(units[z][w])
+							}
+							else if(units[y][x].direction != "right" && difference < units[y][x].range && difference > 2) {
 								units[y][x].engaged.push(units[z][w])
 							}
 						}
@@ -285,21 +287,31 @@ function checkForUnitCollisions() {
 						if(Math.abs(units[y][x].pos - units[z][w].pos) <= 1.5 && units[z][w].type===units[y][x].type) {
 							if(units[y][x].id > units[z][w].id) continue //if yx is the earlier one, take the merge
 							//average the units together
-							newUnitCount = units[y][x].unitCount+units[z][w].unitCount;
-							healthToChange = (units[z][w].actualMaxHealth - units[z][w].curHealth)/newUnitCount
-							units[y][x].damage = (units[y][x].damage*units[y][x].unitCount+units[z][w].unitCount*units[z][w].damage)/(units[y][x].unitCount+units[z][w].unitCount)
-							units[y][x].maxHealth = (units[y][x].maxHealth*units[y][x].unitCount+units[z][w].unitCount*units[z][w].maxHealth)/(units[y][x].unitCount+units[z][w].unitCount)
-							units[y][x].actualMaxHealth = (units[y][x].actualMaxHealth*units[y][x].unitCount+units[z][w].unitCount*units[z][w].actualMaxHealth)/(units[y][x].unitCount+units[z][w].unitCount)
-							if(units[y][x].curHealth > units[y][x].maxHealth) units[y][x].curHealth = units[y][x].maxHealth
-							units[y][x].unitCount=newUnitCount
-							if(units[y][x].actualMaxHealth - units[y][x].curHealth <= 1) {
-								units[y][x].curHealth = 1;
-								units[y][x].actualMaxHealth -= healthToChange
-								
+							units[y][x].damage = average(units[y][x].damage, units[z][w].damage, units[y][x].unitCount, units[z][w].unitCount)
+							units[y][x].maxHealth = average(units[y][x].maxHealth, units[z][w].maxHealth, units[y][x].unitCount, units[z][w].unitCount) //visual purposes only
+							
+							totalUnitCount = units[y][x].unitCount + units[z][w].unitCount
+							totalHealthA = (units[y][x].unitCount-1)*units[y][x].actualMaxHealth + units[y][x].curHealth
+							totalHealthB = (units[z][w].unitCount-1)*units[z][w].actualMaxHealth + units[z][w].curHealth
+							averageHealth = average(units[y][x].actualMaxHealth, units[z][w].actualMaxHealth, units[y][x].unitCount, units[z][w].unitCount)
+							if(units[y][x].curHealth == units[y][x].actualMaxHealth && units[z][w].curHealth == units[z][w].actualMaxHealth)
+								newUnitCount = Math.floor((totalHealthA + totalHealthB)/averageHealth)
+							else
+								newUnitCount = Math.floor((totalHealthA + totalHealthB)/averageHealth)+1
+							temp = (totalHealthA + totalHealthB)%averageHealth
+							if(temp == 0) {
+								units[y][x].curHealth = units[y][x].actualMaxHealth;
 							} else {
-								units[y][x].actualMaxHealth -= healthToChange
-								units[y][x].takeDamage(healthToChange)
+								units[y][x].curHealth = temp;
 							}
+							units[y][x].actualMaxHealth = averageHealth;
+							units[y][x].unitCount = newUnitCount;
+							
+							unitsDead = totalUnitCount - newUnitCount
+							gold += unitsDead * units[y][x].goldWorth;
+							totalDead[units[y][x].typeNum] += unitsDead
+							updateGoldVisual()
+							
 							document.getElementById("count"+units[y][x].id).innerHTML = units[y][x].unitCount
 							if(units[z][w].id === curClickedUnit) {
 								hoverAUnit(units[y][x].id)
@@ -319,6 +331,10 @@ function checkForUnitCollisions() {
 		}
 	}
 	deleteUnitsInList(triggerForDelete)
+}
+
+function average(value1, value2, count1, count2) {
+	return (value1*count1+value2*count2)/(count1+count2)
 }
 
 function deleteUnitsInList(triggerForDelete) {
@@ -356,7 +372,7 @@ function handleBattles() {
 				//disengage if the unit is too far away.
 				engageTarget = units[y][x].engaged[bestTargetPos];
 				if(units[y][x].type ==="spear") {
-					if((units[y][x].direction ==="right" && units[y][x].pos - engageTarget.pos > 0) || (units[y][x].direction !="right" && units[y][x].pos - engageTarget.pos < 0)) {
+					if((units[y][x].direction ==="right" && units[y][x].pos - engageTarget.pos > -2) || (units[y][x].direction !="right" && units[y][x].pos - engageTarget.pos < 2)) {
 						units[y][x].engaged.splice(0, 1);
 						continue;
 					}

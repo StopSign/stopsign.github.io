@@ -27,22 +27,29 @@ function clickBuildingBuyButton(num, type) {
 			wallHealth+=500
 			wallHealthInitial+=500
 		}
+		document.getElementById("buyBuilding0").innerHTML = round1(wallHealthInitial);
+		document.getElementById("costBuilding0").innerHTML = round1(buildingUpgradesCost[0][0])
 	}
 	if(type == "fence") {
 		if(num == 0 && gold >= buildingUpgradesCost[1][0]) { 
 			gold -= buildingUpgradesCost[1][0]
 			buildingUpgradesCost[1][0]*= 1.2
 			fenceHealth+=20
-			wallHealthInitial+=20
+			fenceHealthInitial+=20
 		}
+		document.getElementById("buyBuilding0").innerHTML = round1(fenceHealthInitial);
+		document.getElementById("costBuilding0").innerHTML = round1(buildingUpgradesCost[1][0])
 	}
+	
+	updateWallHealthVisuals()
+	updateGoldVisual()
 }
 
 function clickBuySpawnRate(type) {
 	typeNum = convertTypeToNum(type, "right") 
 	if(costSpawnRate[typeNum] <= gold) {
 		gold -= costSpawnRate[typeNum]
-		costSpawnRate[typeNum] *= (1.6 + typeNum/10)
+		costSpawnRate[typeNum] *= (2.2 + typeNum/10)
 		initialSpawnRate[typeNum/2] *= .95;
 		spawnRate[typeNum/2] *= .95;
 		if(initialSpawnRate[typeNum/2] <= .5) {
@@ -61,7 +68,7 @@ function buyUpgradePoint(type) {
 	if(unitCosts[typeNum] <= gold) {
 		gold -= unitCosts[typeNum]
 		updateGoldVisual()
-		unitCosts[typeNum] = Math.floor(1.2 * unitCosts[typeNum]);
+		unitCosts[typeNum] = 1.2 * unitCosts[typeNum];
 		upgradePointsInitial[typeNum]++
 		unitPointValues[typeNum][3]++;
 		handleBuyAmounts(typeNum, 3)
@@ -179,7 +186,7 @@ function startANewstage() {
 	document.getElementById("stage").innerHTML=stage;
 	document.getElementById("territoryGain").innerHTML = mapTimers[stage]>0?maps[stage][1]/5:maps[stage][1]
 	document.getElementById("goldGain").innerHTML = maps[stage][0]
-	unitValues[1] = [Math.pow(stage+5, 4)*Math.pow(1.08, stage)/250, 4, .06, Math.pow(stage+3, 3)*Math.pow(1.15, stage)+30, 0, 4.5]
+	unitValues[1] = [Math.pow(stage+5, 4)*Math.pow(1.08, stage)/250, 4, .06, 100+Math.pow(stage+3, 3)*Math.pow(1.15, stage)+30, 0, 4.5]
 	unitValues[3] = [Math.pow(stage+5, 3)*Math.pow(1.11, stage)/8, 15, .04, Math.pow(stage+5, 3)*Math.pow(1.1, stage)/6, 0, 16]
 	//updateProgressVisual()
 	placeCurTimers=[]

@@ -68,8 +68,14 @@ function spendMana(amount) {
 			spellCosts[q] *= .99;
 		}
 	}
+	updateSpellVisuals()
 }
 
-function updateSpellCooldowns(num) {
-	
+function updateSpellVisuals() {
+	document.getElementById("spellCost0").innerHTML = round2(spellCosts[0])
+	document.getElementById("spellCost1").innerHTML = round2(spellCosts[1])
+	document.getElementById("spellLevel").innerHTML = spellLevel
+	document.getElementById("curSpellExp").innerHTML = round(spellExp)
+	document.getElementById("expNeeded").innerHTML = round(expNeededToLevel)
+	document.getElementById("curExpBar").style.width = spellExp / expNeededToLevel*100+"%"
 }

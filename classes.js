@@ -27,7 +27,7 @@ function Unit (line, pos, type, direction, unitCount, goldWorth) {
 			this.curHealth = this.actualMaxHealth + this.curHealth
 			unitsDead++;
 		}
-		unitsActuallyDead = this.unitCount
+		unitsActuallyDead = this.unitCount //handling overkill
 		this.unitCount -= unitsDead;
 		if(this.unitCount <= 0) {
 			this.curHealth = -10

@@ -29,10 +29,6 @@ function updateManaVisual() {
 	document.getElementById("mana").innerHTML = round2(curMana);
 }
 
-function updateSpellVisuals() {
-	document.getElementById("spellCost0").innerHTML = round2(spellCosts[0])
-	document.getElementById("spellCost1").innerHTML = round2(spellCosts[1])
-}
 
 function updateSpawnTimers() {
 	document.getElementById("soldierSpawnTimer").innerHTML = round2(soldierSpawnRate);
@@ -92,6 +88,7 @@ function changeBuildingScreen(buildingType) {
 	}
 	start += ""
 	document.getElementById("buildingUpgradesBox").innerHTML = start
+	clickBuildingBuyButton(-1, buildingType)
 }
 function addBuildingButton(type, name, num) {
 	return "<div class='buyButton' onclick='clickBuildingBuyButton("+num+" , \""+type+"\")'"+"  id='buyBuildingButton"+num+"' style='width:80%;border:2px solid;' >"+
@@ -205,7 +202,7 @@ function updateStatusUpgrades(unit, type) {
 		$("#slider").slider('value', unitPointValues[typeNum][3]);
 	for(e = 1; e < unitValues[typeNum].length+1; e++) {
 		if(document.getElementById("points"+e)) document.getElementById("points"+e).innerHTML=unitPointValues[typeNum][e-1]
-		document.getElementById("buy"+e).innerHTML=round2(unitValues[typeNum][e-1]*deadUnitBonus[typeNum])
+		document.getElementById("buy"+e).innerHTML=(e==1||e==4)?round2(unitValues[typeNum][e-1]*deadUnitBonus[typeNum]):unitValues[typeNum][e-1]
 	}
 	updateSpawnRate2(type)
 }
@@ -271,9 +268,6 @@ function addIcon(num) {
 }
 
 function handleLineAmounts(lineCount) {
-	for(m = 0; m < 6; m++) {
-		document.getElementById("line"+m).style.display = lineCount>m ? "inline-block" : "none";
-	}
 	if(lineCount == 1) offset = 120;
 	if(lineCount == 2) offset = 105;
 	if(lineCount == 3) offset = 70;
@@ -282,7 +276,9 @@ function handleLineAmounts(lineCount) {
 	if(lineCount == 6) offset = 0;
 	offset+=37;
 	document.getElementById("fightTime").style.marginTop = offset+"px";
-	document.getElementById("line0").style.marginTop=(70+offset)+"px";
+	for(m = 1; m < 6; m++)
+		document.getElementById("line"+m).style.display="none";
+	document.getElementById("line"+lineCount).style.display="inline-block";
 	if(lineCount == 1) {
 	}
 	if(lineCount == 2) {
@@ -334,31 +330,32 @@ function switchMainTab(switchTo) {
 	currentTab = switchTo
 	hideAllInfo()
 	switch(switchTo) {
-		case 0:
+		case 0: //war
 			document.getElementById("warSpace").style.display = "inline-block";
 			document.getElementById("manaSpace").style.display = "inline-block";
 			document.getElementById("warTab").style.backgroundColor="rgb(142, 212, 142)";
 		break;
-		case 1:
+		case 1: //map
 			document.getElementById("mapSpace").style.display = "inline-block";
 			document.getElementById("mapTab").style.backgroundColor="rgb(142, 212, 142)";
 		break;
-		case 2:
+		case 2: //places
 			document.getElementById("placesSpace").style.display = "inline-block";
 			document.getElementById("territoryTab").style.backgroundColor="rgb(142, 212, 142)";
 		break;
-		case 3:
+		case 3: //units
 			document.getElementById("unitsSpace").style.display = "inline-block";
 			document.getElementById("unitTab").style.backgroundColor="rgb(142, 212, 142)";
 		break;
-		case 4:
+		case 4: //buildings
 			document.getElementById("buildingsSpace").style.display = "inline-block";
 			document.getElementById("buildingsTab").style.backgroundColor="rgb(142, 212, 142)";
 		break;
-		case 5:
+		case 5: //spells
 			document.getElementById("manaTab").style.backgroundColor="rgb(142, 212, 142)";
+			document.getElementById("manaSpace").style.display = "inline-block";
 		break;
-		case 6:
+		case 6: //mana
 			document.getElementById("optionsTab").style.backgroundColor="rgb(142, 212, 142)";
 			document.getElementById("optionsPage").style.display = "inline-block";
 		break;

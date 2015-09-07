@@ -60,7 +60,12 @@
 
 
 <div id='warSpace' style="width:100%;vertical-align:top;text-align:left;border:2px solid;height:400px;background-color:rgb(223, 255, 221);position:relative;font-size:12px;">
-	<img src='pics/line2.png' width='1200' height='400' style='position:absolute;'>
+	<img id='line1'  src='pics/line3.png' width='1200' height='400' style='position:absolute;display:none;'>
+	<img id='line2' src='pics/line2.png' width='1200' height='400' style='position:absolute;display:none;'>
+	<img id='line3'  src='pics/line3.png' width='1200' height='400' style='position:absolute;display:none;'>
+	<img id='line4'  src='pics/line3.png' width='1200' height='400' style='position:absolute;display:none;'>
+	<img id='line5'  src='pics/line5.png' width='1200' height='400' style='position:absolute;display:none;'>
+	<img id='line6'  src='pics/line3.png' width='1200' height='400' style='position:absolute;display:none;'>
 	<div id="fightTime" style="position:absolute;z-index:7"></div>
 	<canvas id='damageLines' width="1204" height="404" style="position:absolute;z-index:6" onmouseout="removeHover()"></canvas>
 	<div id="spawnTimers" class='hyperVisible' style="width:1200px;position:absolute;margin-top:5px;">
@@ -92,14 +97,8 @@
 	<div id='enemyFenceHealth' class='hyperVisible' style='position:absolute;left:1080px;top:61px;'></div>
 	<img id='fence' src='pics/fence.png' height='300' width='15' style='position:absolute;left:114px;top:83px;z-index:5;'>
 	<img id='enemyFence' src='pics/fence.png' height='300' width='15' style='position:absolute;left:1090px;top:83px;z-index:5;'>
-	<div id='line0' class='actionLine'> </div>
-	<div id='line1' class='actionLine'> </div>
-	<div id='line2' class='actionLine'> </div>
-	<div id='line3' class='actionLine'> </div>
-	<div id='line4' class='actionLine'> </div>
-	<div id='line5' class='actionLine'> </div>
 </div>
-<div id='manaSpace' style="width:100%;height:60px;background-color:#78AFFF;border:2px solid; margin-top:5px;">
+<div id='manaSpace' style="width:100%;height:60px;background-color:#78AFFF;border:2px solid; margin-top:5px;position:relative;">
 	<div id='spell0' class='spell' style='margin-left:50px;' onclick='clickedSpell(0)'>
 		<div>Fireball</div>
 		<div id='spellCost0' class='spellCost'></div>
@@ -107,6 +106,14 @@
 	<div id='spell1' class='spell' onclick='clickedSpell(1)'>
 		<div>Chain Lightning</div>
 		<div id='spellCost1' class='spellCost'></div>
+	</div>
+	<div style='background-color:#C4E3FF;width:400px;height:46px;position:absolute;right:10px;top:5px;border:2px solid black;'>
+		<div style='position:absolute;right:10px;top:6px;'>Spell Level: <div id='spellLevel' class='number'>1f</div></div>
+		<div id='curSpellExp' class='number' style='position:absolute;left:10px;bottom:-2px;'>2f</div>
+		<div id='expNeeded' class='number' style='position:absolute;right:176px;bottom:-2px;'>3f</div>
+		<div id='spellProgressBar' style='position:absolute;width:200px;height:20px;margin-top:2px;background-color:grey;display:block;left:6px;padding:2px 10px;top:3px;'>
+			<div id='curExpBar' style='width:50%;background-color:blue;float:left;height:13px;' class='progressBar'></div>
+		</div>
 	</div>
 </div>
 
@@ -250,7 +257,7 @@
 	<div style='width:90%;margin-top:30px;margin-left:30px;'>
 		<div style="float:left;">Created by: <a style="color:red" href='http://reddit.com/u/stop_sign'>Stop_Sign</a></div><br>
 		<div style="float:left;">Made for: <a style="color:black" href='http://reddit.com/r/incremental_games'>/r/incremental_games</a></div><br>
-		<div style='float:left;'>I want a ton of feedback! Please send a message through reddit using <a style="color:black" href='https://www.reddit.com/message/compose?to=Stop_Sign&subject=Pull%20of%20War%20feedback&message='>this link</a></div><br>
+		<div style='float:left;'>I want a ton of feedback! Please send a message through reddit using <a style="color:black" href='https://www.reddit.com/message/compose?to=Stop_Sign&amp;subject=Pull%20of%20War%20feedback&message='>this link</a></div><br>
 		<div class='button' style='padding:5px;margin-top:10px;margin-bottom:10px;' onclick='forceTutorial()' >Show Tutorial</div><br>
 		<div class='button' style='padding:5px;' onclick='clearStorage()'>Clear Save</div>
 	</div>
