@@ -186,7 +186,7 @@ function startANewstage() {
 	document.getElementById("stage").innerHTML=stage;
 	document.getElementById("territoryGain").innerHTML = mapTimers[stage]>0?maps[stage][1]/5:maps[stage][1]
 	document.getElementById("goldGain").innerHTML = maps[stage][0]
-	unitValues[1] = [Math.pow(stage+5, 4)*Math.pow(1.08, stage)/250, 4, .06, 100+Math.pow(stage+3, 3)*Math.pow(1.15, stage)+30, 0, 4.5]
+	unitValues[1] = [Math.pow(stage+5, 4)*Math.pow(1.08, stage)/250, 4, .06, Math.pow(stage+3, 3)*Math.pow(1.15, stage)+30, 0, 4.5]
 	unitValues[3] = [Math.pow(stage+5, 3)*Math.pow(1.11, stage)/8, 15, .04, Math.pow(stage+5, 3)*Math.pow(1.1, stage)/6, 0, 16]
 	//updateProgressVisual()
 	placeCurTimers=[]
