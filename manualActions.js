@@ -53,10 +53,7 @@ function clickBuySpawnRate(type) {
 		initialSpawnRate[typeNum/2] *= .95;
 		spawnRate[typeNum/2] *= .95;
 		if(initialSpawnRate[typeNum/2] <= 1) {
-			initialSpawnRate[typeNum/2]*=2;
-			spawnRate[typeNum/2] *= 2;
-			initialSpawnAmounts[typeNum/2]*=2;
-			spawnAmounts[typeNum/2] *= 2;
+			//TODO:handle this (disable the button?)
 		}
 	}
 	updateStatusUpgrades("", type)
@@ -119,15 +116,6 @@ function hoverAUnit(id) {
 	document.getElementById("unitDisplayBox").style.display="inline-block";
 }
 
-function buyStartingPlaceAmounts(num) {
-	if(territory > placeAmountCosts[num]) {
-		placeAmountsStart[num]++
-		placeAmounts[num]++
-		territory-=placeAmountCosts[num]
-	}
-	updateTerritoryVisual()
-	updatePlaceVisuals()
-}
 var myKeyQueue = [];
 
 $(document).keydown(function(e) {
@@ -143,6 +131,9 @@ $(document).keydown(function(e) {
 function processKeyQueue() {
 	key = myKeyQueue[0]
 	myKeyQueue.splice(0, 1);
+	if(key == 32) {
+		pause()
+	}
 	if(key == 49) { //1
 		clickedSpell(0)
 	}
@@ -169,7 +160,6 @@ function startANewstage() {
 	units = [[],[],[],[],[],[]];
 	soldierSpawnRate = 0;
 	spearSpawnRate = 0;
-	bonusFromFam = 1;
 	spawnRate=[];
 	spawnAmounts=[]
 	for(j = 0; j < initialSpawnAmounts.length; j++) {
@@ -191,12 +181,6 @@ function startANewstage() {
 	unitValues[1] = [1.5, 4, .06, 60, 0, 4.5]
 	unitValues[3] = [Math.pow(stage+5, 3)*Math.pow(1.11, stage)/8, 15, .04, Math.pow(stage+5, 3)*Math.pow(1.1, stage)/6, 0, 16]
 	//updateProgressVisual()
-	placeCurTimers=[]
-	placeAmounts=[]
-	for(j = 0; j < placeMaxTimers.length; j++) {
-		placeCurTimers[j]=placeMaxTimers[j]
-		placeAmounts[j]=placeAmountsStart[j]
-	}
 	enemyFenceHealthInitial = maps[stage][2]
 	enemyWallHealthInitial = maps[stage][3]
 	wallHealth = wallHealthInitial
@@ -209,7 +193,6 @@ function startANewstage() {
 	document.getElementById("fenceHealth").style.display = fenceHealth>0?'inline-block':'none';
 	
 	//addUnit("spear", 0, "right", 1);
-	document.getElementById("bonusFromFamilies").innerHTML = round3(bonusFromFam);
 	
 	started = 1
 }

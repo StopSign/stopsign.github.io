@@ -69,6 +69,7 @@ function spendMana(amount) {
 		}
 	}
 	updateSpellVisuals()
+	updateManaVisual()
 }
 
 function updateSpellVisuals() {

@@ -32,7 +32,6 @@ placeCurTimers=   [0,  3, 35, 100, 295, 880, 2635];
 placeAmounts=     [1,  1,  1,   1,   1,   1,    1];
 
 spawnRate=          [9, 10];
-spawnAmounts =  [1,  1]
 enemySpawnRate = 9;
 curBattles = [];
 curClickedUnit = -1;*/
@@ -55,7 +54,6 @@ function tick() {
 	redrawStoredLines()
 	if(timer % 2 == 0) {
 		handleSpawnRates()
-		handlePlaceChanges()
 		handleDamageAtEnds()
 		handleBattles()
 	}
@@ -97,44 +95,19 @@ function pause() {
 	}
 }
 
-clockTimer = .099999999999
-function handlePlaceChanges() {
-	if(placeAmounts[0] < territory) {
-		for(x = 1; x < placeCurTimers.length; x++) {
-			placeCurTimers[x]-=clockTimer
-			if(placeCurTimers[x] < 0) {
-				placeAmounts[x-1]+=placeAmounts[x]
-				placeCurTimers[x] = placeMaxTimers[x]
-				if(x == 1) { //on village timer trigger
-					extraFamilies = placeAmounts[0] - territory
-					if(extraFamilies < 0) extraFamilies = 0;
-					for(z = 0; z < placeAmounts[1] - extraFamilies; z++) {
-						bonusFromFam *= 1+(1/(20+(placeAmounts[0]-z)*1.5)) //SPAWN RATE FORMULA
-					}
-					document.getElementById("bonusFromFamilies").innerHTML = round3(bonusFromFam);
-				}
-			}
-		}
-	}
-	if(placeAmounts[0] > territory) {
-		placeAmounts[0] = territory;
-	}
-	updatePlaceVisuals()
-}
-
 rateReduction = .0999999;
 function handleSpawnRates() {
 	//rateReduction = 0;
-	soldierSpawnRate -= rateReduction;
+	if(spawnAmounts[0] > 0) soldierSpawnRate -= rateReduction;
 	if(soldierSpawnRate <= 0) {
 		j = Math.floor(Math.random() * linesEnabled)
-		addUnit("soldier", j, "right", Math.floor(spawnAmounts[0]*bonusFromFam));
+		addUnit("soldier", j, "right", Math.floor(spawnAmounts[0]));
 		soldierSpawnRate += spawnRate[0];
 	}
-	spearSpawnRate -= rateReduction;
+	if(spawnAmounts[1] > 0) spearSpawnRate -= rateReduction;
 	if(spearSpawnRate <= 0) {
 		j = Math.floor(Math.random() * linesEnabled)
-		addUnit("spear", j, "right",  Math.floor(spawnAmounts[1]*bonusFromFam));
+		addUnit("spear", j, "right",  Math.floor(spawnAmounts[1]));
 		spearSpawnRate += spawnRate[1];
 	}
 	enemySpawnRate -= rateReduction;
@@ -295,10 +268,7 @@ function checkForUnitCollisions() {
 							totalHealthA = (units[y][x].unitCount-1)*units[y][x].actualMaxHealth + units[y][x].curHealth
 							totalHealthB = (units[z][w].unitCount-1)*units[z][w].actualMaxHealth + units[z][w].curHealth
 							averageHealth = average(units[y][x].actualMaxHealth, units[z][w].actualMaxHealth, units[y][x].unitCount, units[z][w].unitCount)
-							if(units[y][x].curHealth == units[y][x].actualMaxHealth && units[z][w].curHealth == units[z][w].actualMaxHealth)
-								newUnitCount = Math.floor((totalHealthA + totalHealthB)/averageHealth)
-							else
-								newUnitCount = Math.floor((totalHealthA + totalHealthB)/averageHealth)+1
+							newUnitCount = Math.ceil((totalHealthA + totalHealthB)/averageHealth)
 							temp = (totalHealthA + totalHealthB)%averageHealth
 							if(temp == 0) {
 								units[y][x].curHealth = units[y][x].actualMaxHealth;
@@ -313,6 +283,8 @@ function checkForUnitCollisions() {
 							totalDead[units[y][x].typeNum] += unitsDead
 							updateGoldVisual()
 							
+							tempHealth = (units[y][x].curHealth / units[y][x].maxHealth * 100)
+							document.getElementById("healthBar"+units[y][x].id).style.width = tempHealth>100?100:tempHealth + "%";
 							document.getElementById("count"+units[y][x].id).innerHTML = units[y][x].unitCount
 							if(units[z][w].id === curClickedUnit) {
 								hoverAUnit(units[y][x].id)
@@ -499,7 +471,7 @@ function tickConstruction() {
 	constructionTotal += constructionRate
 	if(constructionTotal > territory) constructionTotal = territory
 	document.getElementById("constructionTotal").innerHTML = constructionTotal
-	document.getElementById("constructionRate").innerHTML = constructionRate
+	document.getElementById("constructionRate").innerHTML = constructionRate*2
 	updateConstructionVisual()
 }
 
@@ -507,35 +479,37 @@ function addToPlaceList(type) {
 	if(type == "soldier") cost = placeUnitTerritoryCost[0] + placeUnitIncreaseRatio[0] * findNumTypeInList("soldier")
 	if(type == "spear") cost = placeUnitTerritoryCost[1] + placeUnitIncreaseRatio[1] * findNumTypeInList("spear")
 	usedPlaceTerritory = calculateUsedPlaceTerritory()
-	if(territory - usedPlaceTerritory - cost > 0) {
+	if(territory - usedPlaceTerritory - cost >= 0) {
 		spawnList.push(type)
 		calculateUsedPlaceTerritory()
 	}
 	showSpawnList()
+	updatePlaceVisuals()
 }
 
 function removeFromPlaceList(elem) {
 	spawnIndex = $(".spawnDiv").index(elem.parentNode)
-	spawnList.splice(spawnIndex+1, 1)
+	spawnList.splice(spawnIndex, 1)
 	showSpawnList()
 	calculateUsedPlaceTerritory()
+	updatePlaceVisuals()
 }
 
 function shiftPlaceListUp(elem) {
 	spawnIndex = $(".spawnDiv").index(elem.parentNode)
 	if(spawnIndex != 0) {
 		temp = spawnList[spawnIndex]
-		spawnList[spawnIndex]=spawnList[spawnIndex+1]
-		spawnList[spawnIndex+1] = temp
+		spawnList[spawnIndex]=spawnList[spawnIndex-1]
+		spawnList[spawnIndex-1] = temp
 	}
 	showSpawnList()
 }
 function shiftPlaceListDown(elem) {
 	spawnIndex = $(".spawnDiv").index(elem.parentNode)
-	if(spawnIndex < spawnList.length-2) {
-		temp = spawnList[spawnIndex+1]
-		spawnList[spawnIndex+1]=spawnList[spawnIndex+2]
-		spawnList[spawnIndex+2] = temp
+	if(spawnIndex < spawnList.length-1) {
+		temp = spawnList[spawnIndex]
+		spawnList[spawnIndex]=spawnList[spawnIndex+1]
+		spawnList[spawnIndex+1] = temp
 	}
 	showSpawnList()
 }

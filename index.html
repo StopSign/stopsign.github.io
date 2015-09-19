@@ -42,7 +42,6 @@
 		<div class='buyName' style='left:400px;top:35px;'>Damage: <div id='curDamage' class='number'></div></div>
 		<div class='buyName' style='left:356px;top:60px;'>Total Damage: <div id='totalDamage' class='number'></div></div>
 	</div>
-	<div style='top:10px;left:856px' class='statusLabel'>Bonus from families: x<div id='bonusFromFamilies' class='bigNumber'>6f</div></div>
 	<div id='pauseButton' class='button' style='position:absolute;right:5px;top:5px;padding:3px;' onclick='pause()'>Pause</div>
 	<div id='fps' style='position:absolute;left:3px;bottom:3px;font-size:11px;'></div>
 </div>
@@ -69,7 +68,7 @@
 	<div id="fightTime" style="position:absolute;z-index:7"></div>
 	<canvas id='damageLines' width="1204" height="404" style="position:absolute;z-index:6" onmouseout="removeHover()"></canvas>
 	<div id="spawnTimers" class='hyperVisible' style="width:1200px;position:absolute;margin-top:5px;">
-		<div class='unitSpawnBox' style=''>
+		<div id='soldierContainer' class='unitSpawnBox' style=''>
 			<div id='soldierAutoSpawnAmount' class='spawnAutoAmount'></div>
 			<img src='pics/soldier.png' height='30' width='50'>
 			<div id='soldierSpawnTimer' class='f20' style='vertical-align:top'></div>
@@ -146,67 +145,6 @@
 					<div id='spearPlaceCost' class='number' style='position:absolute;left:61px;bottom:1px;'>1f</div>
 				</div>
 			</div>
-		</div>
-	</div>
-	<div style='display:none':> <!-- Old places -->
-		<div class='spawnContainer' style='margin-top:15px;'>
-			<div id='progress0' class='unitProgress'><div id='placeProgressInner0' class='placeProgresInner'></div></div>
-			<div class='spawnLabel'>Families</div>
-			<div id='placeTimer0' class='placeTimer'>30</div>
-			<div id='placeAmount0' class='placeAmount'>30%</div>
-		</div>
-		<div class='spawnContainer'>
-			<div class='upArrow'></div>
-			<div id='progress1' class='unitProgress'><div id='placeProgressInner1' class='placeProgresInner'></div></div>
-			<div class='spawnLabel'>Villages</div>
-			<div id='placeTimer1' class='placeTimer'>30</div>
-			<div id='placeAmount1' class='placeAmount'>30</div>
-		</div>
-		<div class='spawnContainer'>
-			<div class='upArrow'></div>
-			<div id='progress2' class='unitProgress'><div id='placeProgressInner2' class='placeProgresInner'></div></div>
-			<div class='spawnLabel'>Towns</div>
-			<div id='placeTimer2' class='placeTimer'>3</div>
-			<div id='placeAmount2' class='placeAmount'>3</div>
-		</div>
-		<div class='spawnContainer'>
-			<div class='upArrow'></div>
-			<div id='progress3' class='unitProgress'><div id='placeProgressInner3' class='placeProgresInner'></div></div>
-			<div class='spawnLabel'>Cities</div>
-			<div id='placeTimer3' class='placeTimer'>30</div>
-			<div id='placeAmount3' class='placeAmount'>30</div>
-		</div>
-		<div class='spawnContainer'>
-			<div class='upArrow'></div>
-			<div id='progress4' class='unitProgress'><div id='placeProgressInner4' class='placeProgresInner'></div></div>
-			<div class='spawnLabel'>States</div>
-			<div id='placeTimer4' class='placeTimer'>30</div>
-			<div id='placeAmount4' class='placeAmount'>30</div>
-		</div>
-		<div class='spawnContainer'>
-			<div class='upArrow'></div>
-			<div id='progress5' class='unitProgress'><div id='placeProgressInner5' class='placeProgresInner'></div></div>
-			<div class='spawnLabel'>Countries</div>
-			<div id='placeTimer5' class='placeTimer'>30</div>
-			<div id='placeAmount5' class='placeAmount'>30</div>
-		</div>
-		<div class='spawnContainer'>
-			<div class='upArrow'></div>
-			<div id='progress6' class='unitProgress'><div id='placeProgressInner6' class='placeProgresInner'></div></div>
-			<div class='spawnLabel'>Regions</div>
-			<div id='placeTimer6' class='placeTimer'>30</div>
-			<div id='placeAmount6' class='placeAmount'>30</div>
-		</div>
-		<div style='width:100%;border-top:5px solid;text-align:center;margin-top:15px;margin-bottom:10px;'>Spend territory to increase starting amounts</div>
-		<div style='width:50%;height:200px;vertical-align:top;text-align:center;'>
-			<div class='button buyPlaceAmount' onclick='buyStartingPlaceAmounts(1)'><div class='placeBuyLabel'>Villages</div><div class='placeBuyCost'><img src='pics/territory.png' height='18' width='13'><div id='placeCost1' class='number'></div></div>
-			</div><div class='button buyPlaceAmount' onclick='buyStartingPlaceAmounts(2)'><div class='placeBuyLabel'>Towns</div><div class='placeBuyCost'><img src='pics/territory.png' height='18' width='13'><div id='placeCost2' class='number'></div></div>
-			</div><div class='button buyPlaceAmount' onclick='buyStartingPlaceAmounts(3)'><div class='placeBuyLabel'>Cities</div><div class='placeBuyCost'><img src='pics/territory.png' height='18' width='13'><div id='placeCost3' class='number'></div></div></div>
-		</div><div style='width:50%;height:200px;vertical-align:top;text-align:center;'>
-			<div class='button buyPlaceAmount' onclick='buyStartingPlaceAmounts(4)'><div class='placeBuyLabel'>States</div><div class='placeBuyCost'><img src='pics/territory.png' height='18' width='13'><div id='placeCost4' class='number'></div></div>
-			</div><div class='button buyPlaceAmount' onclick='buyStartingPlaceAmounts(5)'><div class='placeBuyLabel'>Countries</div><div class='placeBuyCost'><img src='pics/territory.png' height='18' width='13'><div id='placeCost5' class='number'></div></div>
-			</div><div class='button buyPlaceAmount' onclick='buyStartingPlaceAmounts(6)'><div class='placeBuyLabel'>Regions</div><div class='placeBuyCost'><img src='pics/territory.png' height='18' width='13'><div id='placeCost6' class='number'>
-			</div></div></div>
 		</div>
 	</div>
 </div>

@@ -4,27 +4,21 @@ function loadDefaults() {
 	soldierSpawnRate = 0;
 	spearSpawnRate = 0;
 	spawnManualAmounts =[0,  2];
-	initialSpawnAmounts=[1,  .3333333];
-	initialSpawnRateInitial=[9, 10];
+	initialSpawnAmounts=[0,  0];
 	initialSpawnRate=   [9, 10];
-	placeAmountsStart=[0,  1,   1,   1,    1,    1,     1];
-	placeMaxTimers=   [0,  6,  17,  50,   99,  197,   393];
-	placeAmountsInitial=[0, 25, 100, 500, 2000, 6000, 12000]
-	placeAmountCosts= [0, 25, 100, 500, 2000, 6000, 12000]
 	stage = 0;
-	unitValues =       [[1, 3, .6, 12, 0, 4.5], [0, 0, 0, 0, 0, 0], [9, 9, .4, 20, 0, 15], [0, 0, 0, 0, 0, 0]]
-	unitValuesInitial = [[1, 3, .6, 12, 0, 4.5], [0, 0, 0, 0, 0, 0], [9, 9, .4, 30, 0, 15], [0, 0, 0, 0, 0, 0]]
+	unitValues =       [[1, 3, .6, 20, 0, 4.5], [0, 0, 0, 0, 0, 0], [8, 20, .4, 12, 0, 15], [0, 0, 0, 0, 0, 0]]
+	unitValuesInitial = [[1, 3, .6, 20, 0, 4.5], [0, 0, 0, 0, 0, 0], [8, 20, .4, 12, 0, 15], [0, 0, 0, 0, 0, 0]]
 	costSpawnRate =        [20, 0, 90, 0];
-	unitCosts =            [2, 0, 40, 0];
+	unitCosts =            [2, 0, 10, 0];
 	upgradePointsInitial=  [0, 0,  0, 0];
 	unitPointValues=[[0, 0, 0, 0, 0],[],[0, 0, 0, 0, 0],[]]
 	gold = 0;
-	territory = 0;
+	territory = 10;
 	higheststageUnlocked = 0;
 	stop=1
 	buttonsToClick = 0; //tutorial thing
 	currentTab = 0;
-	bonusFromFam = 1;
 	totalDead=[0, 0, 0, 0]
 	enemyWallHealthInitial = 80000;
 	enemyWallHealth = 80000;
@@ -52,8 +46,8 @@ function loadDefaults() {
 	manaGain = .06;
 	buildingUpgradesCost = [[50], [70]]
 	spawnList = []
-	placeUnitTerritoryCost = [5, 10]
-	placeUnitIncreaseRatio = [1, 2]
+	placeUnitTerritoryCost = [10, 20]
+	placeUnitIncreaseRatio = [2, 5]
 }
 
 function saveIntoStorage() {
@@ -71,10 +65,6 @@ function saveIntoStorage() {
 		theCookie+=spawnManualAmounts[x]+","
 		theCookie+=initialSpawnAmounts[x]+","
 		theCookie+=initialSpawnRate[x]+","
-	}
-	for(x = 0; x < placeAmountsStart.length; x++) {
-		theCookie+=placeAmountsStart[x]+","
-		theCookie+=placeMaxTimers[x]+","
 	}
 	theCookie+=stage+","
 	for(x = 0; x < unitValues.length; x++) {
@@ -129,6 +119,7 @@ function loadFromStorage() {
 		stop=0
 		//dynamic lists
         spawnList = (window.localStorage.spawnList1).split(',');
+		if(spawnList[0] == "") spawnList =[];
 		console.log(spawnList);
 		
 		//static sizes
@@ -140,10 +131,6 @@ function loadFromStorage() {
 			initialSpawnRate[y]=parseFloat(expandedCookie[x++]);
 		}
 		
-		for(y = 0; y < placeAmountsStart.length; y++) {
-			placeAmountsStart[y]=parseFloat(expandedCookie[x++]);
-			placeMaxTimers[y]=parseFloat(expandedCookie[x++]);
-		}
 		stage=parseFloat(expandedCookie[x++]);
 		for(z = 0; z < unitValues.length; z++) {
 			for(y = 0; y < unitValues[z].length; y++) {
@@ -198,6 +185,7 @@ function loadFromStorage() {
 	switchMainTab(currentTab)
 	calculateUsedPlaceTerritory()
 	showSpawnList()
+
 	document.getElementById("mainColumn").style.display="inline-block";
 }
 

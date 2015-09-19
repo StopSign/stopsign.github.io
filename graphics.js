@@ -31,18 +31,23 @@ function updateManaVisual() {
 
 
 function updateSpawnTimers() {
-	document.getElementById("soldierSpawnTimer").innerHTML = round2(soldierSpawnRate);
-	document.getElementById("soldierAutoSpawnAmount").innerHTML = Math.floor(spawnAmounts[0]*bonusFromFam)
 	document.getElementById("enemySpawnTimer").innerHTML = round2(enemySpawnRate);
 	document.getElementById("enemySoldierSpawnAmount").innerHTML = round(enemySpawnAmounts[1])
 	document.getElementById("enemySpearSpawnAmount").innerHTML = round(enemySpawnAmounts[2])
-	if(Math.floor(spawnAmounts[1]*bonusFromFam) == 0) {
+	if(spawnAmounts[0] == 0) {
+		document.getElementById("soldierContainer").style.display="none"
+	} else {
+		document.getElementById("soldierContainer").style.display="inline-block"
+		document.getElementById("soldierSpawnTimer").innerHTML = round2(soldierSpawnRate);
+		document.getElementById("soldierAutoSpawnAmount").innerHTML = spawnAmounts[0]
+	}
+	if(spawnAmounts[1] == 0) {
 		document.getElementById("spearContainer").style.display="none"
 	}
 	else {
 		document.getElementById("spearContainer").style.display="inline-block"
 		document.getElementById("spearSpawnTimer").innerHTML = round2(spearSpawnRate);
-		document.getElementById("spearAutoSpawnAmount").innerHTML = Math.floor(spawnAmounts[1]*bonusFromFam)
+		document.getElementById("spearAutoSpawnAmount").innerHTML = spawnAmounts[1]
 	}
 }
 
@@ -59,10 +64,15 @@ function updateConstructionVisual() {
 	totalSoldierFound = 0
 	totalSpearFound = 0
 	tempTotal = constructionTotal
-	for(q = 1; q < spawnList.length; q++) {
+	for(j = 0; j < initialSpawnAmounts.length; j++) {
+		spawnAmounts[j]=initialSpawnAmounts[j]
+	}
+	for(q = 0; q < spawnList.length; q++) {
 		if(spawnList[q] == "soldier") constructionCost = round2(placeUnitTerritoryCost[0] + placeUnitIncreaseRatio[0]* totalSoldierFound++)
 		if(spawnList[q] == "spear") constructionCost = round2(placeUnitTerritoryCost[1] + placeUnitIncreaseRatio[1] * totalSpearFound++)
-		if(tempTotal > constructionCost) {
+		if(tempTotal >= constructionCost) {
+			if(spawnList[q] == "soldier") spawnAmounts[0]++
+			if(spawnList[q] == "spear") spawnAmounts[1]++
 			tempTotal -= constructionCost
 			document.getElementById("constructionGrey"+q).style.display="inline-block";
 			document.getElementById("constructionRed"+q).style.display="none";
@@ -84,7 +94,7 @@ function showSpawnList() {
 	spawnDiv=""
 	totalSoldierFound = 0
 	totalSpearFound = 0
-	for(q = 1; q < spawnList.length; q++) {
+	for(q = 0; q < spawnList.length; q++) {
 		if(spawnList[q] == "soldier") spawnDivCost = round2(placeUnitTerritoryCost[0] + placeUnitIncreaseRatio[0]* totalSoldierFound++)
 		if(spawnList[q] == "spear") spawnDivCost = round2(placeUnitTerritoryCost[1] + placeUnitIncreaseRatio[1] * totalSpearFound++)
 		spawnDiv+=  "<div class='spawnDiv'>"+
@@ -92,7 +102,7 @@ function showSpawnList() {
 			"<div class='constructionBar' id='constructionGrey"+q+"'></div>"+
 			"<img height='23' width='29' src='pics/"+spawnList[q]+".png' class='spawnListPic'>"+
 			"<div style='position:absolute;left:70px;color:black;font-size:20px;'>"+spawnDivCost+"</div>"+
-			((q>1&&spawnList[q-1]!=spawnList[q])?"<img height='21' width='21' onclick='shiftPlaceListUp(this)' src='pics/arrow.png' class='listPic'>":"")+
+			((q>0&&spawnList[q-1]!=spawnList[q])?"<img height='21' width='21' onclick='shiftPlaceListUp(this)' src='pics/arrow.png' class='listPic'>":"")+
 			((q<spawnList.length-1&&spawnList[q+1]!=spawnList[q])?"<img height='21' width='21' onclick='shiftPlaceListDown(this)' src='pics/Darrow.png' class='listPic' style='left:186px'>":"")+
 			"<img height='21' width='21' onclick='removeFromPlaceList(this)' src='pics/x.png' class='listPic' style='left:230px'>"+
 		"</div>"
@@ -104,18 +114,6 @@ function showSpawnList() {
 function updatePlaceVisuals() {
 	document.getElementById("soldierPlaceCost").innerHTML=round2(placeUnitTerritoryCost[0] + placeUnitIncreaseRatio[0] * findNumTypeInList("soldier"));
 	document.getElementById("spearPlaceCost").innerHTML=round2(placeUnitTerritoryCost[1] + placeUnitIncreaseRatio[1] * findNumTypeInList("spear"));
-	
-	
-	//old
-	document.getElementById("placeAmount0").innerHTML=placeAmounts[0];
-	document.getElementById("placeTimer0").innerHTML=round3(placeAmounts[0] / territory*100) + "% of territory";
-	document.getElementById("placeProgressInner0").style.width=round3(placeAmounts[0] / territory*100) + "%";
-	for(x = 1; x < placeAmounts.length; x++) {
-		document.getElementById("placeAmount"+x).innerHTML=placeAmounts[x];
-		document.getElementById("placeTimer"+x).innerHTML=round1(placeCurTimers[x]);
-		document.getElementById("placeProgressInner"+x).style.width= (1-placeCurTimers[x] / placeMaxTimers[x])*100+"%"
-		document.getElementById("placeCost"+x).innerHTML=round(placeAmountCosts[x])
-	}
 }
 
 function updateWallHealthVisuals() {

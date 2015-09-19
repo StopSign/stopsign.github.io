@@ -1,7 +1,7 @@
 //base gold, territory gain (enhanced), fence health, wall health, spawn timer, tower number, tower damage, cooldown on bonus, lane type index, 
 //[9]unit count [boss, soldier, spear], unit growth per spawn [boss, soldier, spear], unit growth growth per spawn [boss, soldier, spear]
 
-maps= [[1, 40, 35, 1800, 15, 0, 0, 60*30, 2, [0, 1, 0], [0, 0, 0], [0, 0, 0]],
+maps= [[1, 15, 150, 1800, 15, 0, 0, 60*30, 2, [0, 1, 0], [0, 0, 0], [0, 0, 0]],
 		[2, 150, 900, 26000, 15, 0, 0, 60*32, 5, [0, 1.7, .76], [0, .35, .05], [0, .03, 0]],
 		[3, 370, 1500, 210000, 15, 0, 0, 60*34, 3, [0, 6, 7], [0, .8, .7], [0, .04, .03]],
 		[5, 800, 4000, 1700000, 10, 0, 0, 60*36, 2, [0, 17, 25], [0, 3, 1], [0, .3, .1]],
