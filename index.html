@@ -120,65 +120,94 @@
 <div id='mapSpace' class="buyColumn" style="background-color:#AFCDC2;overflow:auto;">
 </div>
 
-<div id='placesSpace' class="buyColumn" style="background-color:white;">
-	<div class='spawnContainer' style='margin-top:15px;'>
-		<div id='progress0' class='unitProgress'><div id='placeProgressInner0' class='placeProgresInner'></div></div>
-		<div class='spawnLabel'>Families</div>
-		<div id='placeTimer0' class='placeTimer'>30</div>
-		<div id='placeAmount0' class='placeAmount'>30%</div>
+<div id='placesSpace' class="buyColumn" style="background-color:#89D496;">
+	<div id='defaultScreen' class='unitScreen' style='display:inline-block;'>
+		<div style='font-size:18px;'>Places</div>
+		<div style='display:block;margin-top:-6px;'>Click a unit type to add it to the spawn list</div>
+		<div style='left:12px;top:9px;position:absolute;font-size:14px;'>Construction Total: <div class='number' id='constructionTotal'>0f</div></div>
+		<div style='left:12px;top:25px;position:absolute;font-size:14px;'>Construction Rate: <div class='number' id='constructionRate'>0f</div></div>
+		<div style='left:12px;top:40px;position:absolute;font-size:14px;'>Territory Used: <div class='number' id='territoryUsed'>0f</div> out of <div class='number' id='totalTerritoryPlaces'>0ff</div></div>
+		<div style='width:300px;background-color:#C6EECE;position:absolute;left:10px;top:58px;height:360px;border:2px solid'>
+			<div id='spawnListBox' style='margin:5px;border:2px solid black;width:276px;height:342px;overflow:auto;padding-top:5px;position:relative;'></div>
+		</div>
+		<div style='width:840px;background-color:#C6EECE;position:absolute;right:15px;top:58px;height:360px;border:2px solid'>
+			<div style='font-size:14px;'>Fill up your territory with unit producing buildings!<br>This will decide which order your units spawn over the level!<br>
+			Click the spawn list to remove a building!</div><br>
+			<div style='width:80%;text-align:center;margin-top:20px;'>
+				<div id='soldierPlace' class='placeButton' onclick='addToPlaceList("soldier")'>
+					<img width='50' height='30' src='pics/soldier.png' style='margin-top:6px;'>
+					<div style='position:absolute;left:50px;top:3px;'>Barracks</div>
+					<img src="pics/territory.png" height="18" width="15" style='left:46px;bottom:5px;position:absolute'>
+					<div id='soldierPlaceCost' class='number' style='position:absolute;left:61px;bottom:1px;'>1f</div>
+				</div><div id='spearPlace' class='placeButton' onclick='addToPlaceList("spear")'>
+					<img width='50' height='30' src='pics/spear.png' style='margin-top:6px;'>
+					<div style='position:absolute;left:50px;top:3px;'>Lumber Yard</div>
+					<img src="pics/territory.png" height="18" width="15" style='left:46px;bottom:5px;position:absolute'>
+					<div id='spearPlaceCost' class='number' style='position:absolute;left:61px;bottom:1px;'>1f</div>
+				</div>
+			</div>
+		</div>
 	</div>
-	<div class='spawnContainer'>
-		<div class='upArrow'></div>
-		<div id='progress1' class='unitProgress'><div id='placeProgressInner1' class='placeProgresInner'></div></div>
-		<div class='spawnLabel'>Villages</div>
-		<div id='placeTimer1' class='placeTimer'>30</div>
-		<div id='placeAmount1' class='placeAmount'>30</div>
-	</div>
-	<div class='spawnContainer'>
-		<div class='upArrow'></div>
-		<div id='progress2' class='unitProgress'><div id='placeProgressInner2' class='placeProgresInner'></div></div>
-		<div class='spawnLabel'>Towns</div>
-		<div id='placeTimer2' class='placeTimer'>3</div>
-		<div id='placeAmount2' class='placeAmount'>3</div>
-	</div>
-	<div class='spawnContainer'>
-		<div class='upArrow'></div>
-		<div id='progress3' class='unitProgress'><div id='placeProgressInner3' class='placeProgresInner'></div></div>
-		<div class='spawnLabel'>Cities</div>
-		<div id='placeTimer3' class='placeTimer'>30</div>
-		<div id='placeAmount3' class='placeAmount'>30</div>
-	</div>
-	<div class='spawnContainer'>
-		<div class='upArrow'></div>
-		<div id='progress4' class='unitProgress'><div id='placeProgressInner4' class='placeProgresInner'></div></div>
-		<div class='spawnLabel'>States</div>
-		<div id='placeTimer4' class='placeTimer'>30</div>
-		<div id='placeAmount4' class='placeAmount'>30</div>
-	</div>
-	<div class='spawnContainer'>
-		<div class='upArrow'></div>
-		<div id='progress5' class='unitProgress'><div id='placeProgressInner5' class='placeProgresInner'></div></div>
-		<div class='spawnLabel'>Countries</div>
-		<div id='placeTimer5' class='placeTimer'>30</div>
-		<div id='placeAmount5' class='placeAmount'>30</div>
-	</div>
-	<div class='spawnContainer'>
-		<div class='upArrow'></div>
-		<div id='progress6' class='unitProgress'><div id='placeProgressInner6' class='placeProgresInner'></div></div>
-		<div class='spawnLabel'>Regions</div>
-		<div id='placeTimer6' class='placeTimer'>30</div>
-		<div id='placeAmount6' class='placeAmount'>30</div>
-	</div>
-	<div style='width:100%;border-top:5px solid;text-align:center;margin-top:15px;margin-bottom:10px;'>Spend territory to increase starting amounts</div>
-	<div style='width:50%;height:200px;vertical-align:top;text-align:center;'>
-		<div class='button buyPlaceAmount' onclick='buyStartingPlaceAmounts(1)'><div class='placeBuyLabel'>Villages</div><div class='placeBuyCost'><img src='pics/territory.png' height='18' width='13'><div id='placeCost1' class='number'></div></div>
-		</div><div class='button buyPlaceAmount' onclick='buyStartingPlaceAmounts(2)'><div class='placeBuyLabel'>Towns</div><div class='placeBuyCost'><img src='pics/territory.png' height='18' width='13'><div id='placeCost2' class='number'></div></div>
-		</div><div class='button buyPlaceAmount' onclick='buyStartingPlaceAmounts(3)'><div class='placeBuyLabel'>Cities</div><div class='placeBuyCost'><img src='pics/territory.png' height='18' width='13'><div id='placeCost3' class='number'></div></div></div>
-	</div><div style='width:50%;height:200px;vertical-align:top;text-align:center;'>
-		<div class='button buyPlaceAmount' onclick='buyStartingPlaceAmounts(4)'><div class='placeBuyLabel'>States</div><div class='placeBuyCost'><img src='pics/territory.png' height='18' width='13'><div id='placeCost4' class='number'></div></div>
-		</div><div class='button buyPlaceAmount' onclick='buyStartingPlaceAmounts(5)'><div class='placeBuyLabel'>Countries</div><div class='placeBuyCost'><img src='pics/territory.png' height='18' width='13'><div id='placeCost5' class='number'></div></div>
-		</div><div class='button buyPlaceAmount' onclick='buyStartingPlaceAmounts(6)'><div class='placeBuyLabel'>Regions</div><div class='placeBuyCost'><img src='pics/territory.png' height='18' width='13'><div id='placeCost6' class='number'>
-		</div></div></div>
+	<div style='display:none':> <!-- Old places -->
+		<div class='spawnContainer' style='margin-top:15px;'>
+			<div id='progress0' class='unitProgress'><div id='placeProgressInner0' class='placeProgresInner'></div></div>
+			<div class='spawnLabel'>Families</div>
+			<div id='placeTimer0' class='placeTimer'>30</div>
+			<div id='placeAmount0' class='placeAmount'>30%</div>
+		</div>
+		<div class='spawnContainer'>
+			<div class='upArrow'></div>
+			<div id='progress1' class='unitProgress'><div id='placeProgressInner1' class='placeProgresInner'></div></div>
+			<div class='spawnLabel'>Villages</div>
+			<div id='placeTimer1' class='placeTimer'>30</div>
+			<div id='placeAmount1' class='placeAmount'>30</div>
+		</div>
+		<div class='spawnContainer'>
+			<div class='upArrow'></div>
+			<div id='progress2' class='unitProgress'><div id='placeProgressInner2' class='placeProgresInner'></div></div>
+			<div class='spawnLabel'>Towns</div>
+			<div id='placeTimer2' class='placeTimer'>3</div>
+			<div id='placeAmount2' class='placeAmount'>3</div>
+		</div>
+		<div class='spawnContainer'>
+			<div class='upArrow'></div>
+			<div id='progress3' class='unitProgress'><div id='placeProgressInner3' class='placeProgresInner'></div></div>
+			<div class='spawnLabel'>Cities</div>
+			<div id='placeTimer3' class='placeTimer'>30</div>
+			<div id='placeAmount3' class='placeAmount'>30</div>
+		</div>
+		<div class='spawnContainer'>
+			<div class='upArrow'></div>
+			<div id='progress4' class='unitProgress'><div id='placeProgressInner4' class='placeProgresInner'></div></div>
+			<div class='spawnLabel'>States</div>
+			<div id='placeTimer4' class='placeTimer'>30</div>
+			<div id='placeAmount4' class='placeAmount'>30</div>
+		</div>
+		<div class='spawnContainer'>
+			<div class='upArrow'></div>
+			<div id='progress5' class='unitProgress'><div id='placeProgressInner5' class='placeProgresInner'></div></div>
+			<div class='spawnLabel'>Countries</div>
+			<div id='placeTimer5' class='placeTimer'>30</div>
+			<div id='placeAmount5' class='placeAmount'>30</div>
+		</div>
+		<div class='spawnContainer'>
+			<div class='upArrow'></div>
+			<div id='progress6' class='unitProgress'><div id='placeProgressInner6' class='placeProgresInner'></div></div>
+			<div class='spawnLabel'>Regions</div>
+			<div id='placeTimer6' class='placeTimer'>30</div>
+			<div id='placeAmount6' class='placeAmount'>30</div>
+		</div>
+		<div style='width:100%;border-top:5px solid;text-align:center;margin-top:15px;margin-bottom:10px;'>Spend territory to increase starting amounts</div>
+		<div style='width:50%;height:200px;vertical-align:top;text-align:center;'>
+			<div class='button buyPlaceAmount' onclick='buyStartingPlaceAmounts(1)'><div class='placeBuyLabel'>Villages</div><div class='placeBuyCost'><img src='pics/territory.png' height='18' width='13'><div id='placeCost1' class='number'></div></div>
+			</div><div class='button buyPlaceAmount' onclick='buyStartingPlaceAmounts(2)'><div class='placeBuyLabel'>Towns</div><div class='placeBuyCost'><img src='pics/territory.png' height='18' width='13'><div id='placeCost2' class='number'></div></div>
+			</div><div class='button buyPlaceAmount' onclick='buyStartingPlaceAmounts(3)'><div class='placeBuyLabel'>Cities</div><div class='placeBuyCost'><img src='pics/territory.png' height='18' width='13'><div id='placeCost3' class='number'></div></div></div>
+		</div><div style='width:50%;height:200px;vertical-align:top;text-align:center;'>
+			<div class='button buyPlaceAmount' onclick='buyStartingPlaceAmounts(4)'><div class='placeBuyLabel'>States</div><div class='placeBuyCost'><img src='pics/territory.png' height='18' width='13'><div id='placeCost4' class='number'></div></div>
+			</div><div class='button buyPlaceAmount' onclick='buyStartingPlaceAmounts(5)'><div class='placeBuyLabel'>Countries</div><div class='placeBuyCost'><img src='pics/territory.png' height='18' width='13'><div id='placeCost5' class='number'></div></div>
+			</div><div class='button buyPlaceAmount' onclick='buyStartingPlaceAmounts(6)'><div class='placeBuyLabel'>Regions</div><div class='placeBuyCost'><img src='pics/territory.png' height='18' width='13'><div id='placeCost6' class='number'>
+			</div></div></div>
+		</div>
 	</div>
 </div>
 
@@ -231,7 +260,7 @@
 				Catapult
 			</div>-->
 		</div>
-		<div id='unitUpgradesBox' style='width:740px;border:2px solid;position:absolute;left:437px;top:58px;height:350px;'>
+		<div id='unitUpgradesBox' style='width:740px;border:2px solid;position:absolute;right:15px;top:58px;height:350px;'>
 			
 		</div>
 	</div>
@@ -250,7 +279,7 @@
 				<div style='vertical-align:top;margin-top:16px;'>Upgrade Fence</div>
 			</div>
 	</div>
-	<div id='buildingUpgradesBox' style='width:740px;border:2px solid;position:absolute;left:437px;top:58px;height:350px;background-color:#EABD95'></div>
+	<div id='buildingUpgradesBox' style='width:740px;border:2px solid;position:absolute;right:15px;top:58px;height:350px;background-color:#EABD95'></div>
 </div>
 
 <div id='optionsPage' class='buyColumn'>

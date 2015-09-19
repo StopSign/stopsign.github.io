@@ -2,7 +2,7 @@ started = 0
 setInterval(function() {
 	if(started)
 		tick();
-},50);
+},9);
 
 
 //uncomment this before checkin
@@ -82,6 +82,7 @@ function calcAverageTime() {
 }
 
 function halfSecond() {
+	tickConstruction()
 	saveIntoStorage()
 }
 
@@ -484,7 +485,7 @@ function addUnit(type, line, direction, unitCount) {
 
 function updateDeadUnitBonus() {
 	for(m = 0; m < totalDead.length; m++) {
-		deadUnitBonus[m] = totalDead[m]/1000+1
+		deadUnitBonus[m] = 1//Math.pow(totalDead[m], .65)/1000+1
 	}
 	if(curUnitScreen == "-1") return
 	document.getElementById("deadUnitBonus"+curUnitScreen).innerHTML = round3(deadUnitBonus[curUnitScreen])
@@ -492,6 +493,77 @@ function updateDeadUnitBonus() {
 	document.getElementById("buy1").innerHTML=round2(unitValues[curUnitScreen][0]*deadUnitBonus[curUnitScreen])
 	document.getElementById("buy4").innerHTML=round2(unitValues[curUnitScreen][3]*deadUnitBonus[curUnitScreen])
 	
+}
+
+function tickConstruction() {
+	constructionTotal += constructionRate
+	if(constructionTotal > territory) constructionTotal = territory
+	document.getElementById("constructionTotal").innerHTML = constructionTotal
+	document.getElementById("constructionRate").innerHTML = constructionRate
+	updateConstructionVisual()
+}
+
+function addToPlaceList(type) {
+	if(type == "soldier") cost = placeUnitTerritoryCost[0] + placeUnitIncreaseRatio[0] * findNumTypeInList("soldier")
+	if(type == "spear") cost = placeUnitTerritoryCost[1] + placeUnitIncreaseRatio[1] * findNumTypeInList("spear")
+	usedPlaceTerritory = calculateUsedPlaceTerritory()
+	if(territory - usedPlaceTerritory - cost > 0) {
+		spawnList.push(type)
+		calculateUsedPlaceTerritory()
+	}
+	showSpawnList()
+}
+
+function removeFromPlaceList(elem) {
+	spawnIndex = $(".spawnDiv").index(elem.parentNode)
+	spawnList.splice(spawnIndex+1, 1)
+	showSpawnList()
+	calculateUsedPlaceTerritory()
+}
+
+function shiftPlaceListUp(elem) {
+	spawnIndex = $(".spawnDiv").index(elem.parentNode)
+	if(spawnIndex != 0) {
+		temp = spawnList[spawnIndex]
+		spawnList[spawnIndex]=spawnList[spawnIndex+1]
+		spawnList[spawnIndex+1] = temp
+	}
+	showSpawnList()
+}
+function shiftPlaceListDown(elem) {
+	spawnIndex = $(".spawnDiv").index(elem.parentNode)
+	if(spawnIndex < spawnList.length-2) {
+		temp = spawnList[spawnIndex+1]
+		spawnList[spawnIndex+1]=spawnList[spawnIndex+2]
+		spawnList[spawnIndex+2] = temp
+	}
+	showSpawnList()
+}
+
+function calculateUsedPlaceTerritory() {
+	totalUsedTerritory = findPrice("soldier", 0)
+	totalUsedTerritory += findPrice("spear", 1)
+	document.getElementById("territoryUsed").innerHTML=round2(totalUsedTerritory);
+	return totalUsedTerritory;
+}
+
+function findPrice(type, num) {
+	totalPrice = 0
+	totalFound = 0
+	for(q = 0; q < spawnList.length; q++) {
+		if(spawnList[q] == type) {
+			totalPrice += placeUnitTerritoryCost[num] + placeUnitIncreaseRatio[num] * totalFound++
+		}
+	}
+	return totalPrice
+}
+
+function findNumTypeInList(type) {
+	totalFound = 0
+	for(q = 0; q < spawnList.length; q++) {
+		if(spawnList[q] == type) totalFound++
+	}
+	return totalFound
 }
 
 function removeDuplicates(a) {

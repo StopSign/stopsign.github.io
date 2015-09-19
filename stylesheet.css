@@ -54,7 +54,7 @@ position:absolute;
 }
 .buyButton {
 width:100%;
-height:50px;
+height:45px;
 position:relative;
 }
 .buyName {
@@ -609,4 +609,53 @@ top:-5px;
     1px -1px 0 #000,
     -1px 1px 0 #000,
     1px 1px 0 #000;
+}
+.placeButton {
+    width: 200px;
+    background-color: #DFFFAC;
+    border: 1px solid;
+    height: 45px;
+    position: relative;
+	text-align:left;
+	cursor:pointer;
+	margin-left:5px;
+	margin-right:5px;
+	vertical-align:top
+}
+.placeButton:hover {
+	background-color:#B5E864;
+}
+.spawnDiv {
+	width:100%;
+	background-color:#DFFFAC;
+	border-bottom:1px solid;
+	height:30px;
+	position:relative;
+	margin-top: -5px;
+}
+.spawnListPic {
+	position:absolute;
+	top:0px;
+	left:35px;
+}
+.listPic {
+	position:absolute;
+	top:0px;
+	left:159px;
+	border:2px solid;
+	top:2px;
+	background-color:#A9FF00;
+	cursor:pointer;
+}
+.listPic:hover {
+	background-color:#E68B4A;
+}
+.constructionBar {
+    width: 100%;
+    background-color: rgba(128, 128, 128, 0.82);
+    height: 26px;
+    top: 2px;
+    position: absolute;
+    left: 0px;
+	display:none;
 }

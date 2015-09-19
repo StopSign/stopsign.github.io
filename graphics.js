@@ -52,8 +52,61 @@ function updateGoldVisual() {
 
 function updateTerritoryVisual() {
 	document.getElementById("territory").innerHTML = round(territory)
+	document.getElementById("totalTerritoryPlaces").innerHTML = round(territory)
 }
+
+function updateConstructionVisual() {
+	totalSoldierFound = 0
+	totalSpearFound = 0
+	tempTotal = constructionTotal
+	for(q = 1; q < spawnList.length; q++) {
+		if(spawnList[q] == "soldier") constructionCost = round2(placeUnitTerritoryCost[0] + placeUnitIncreaseRatio[0]* totalSoldierFound++)
+		if(spawnList[q] == "spear") constructionCost = round2(placeUnitTerritoryCost[1] + placeUnitIncreaseRatio[1] * totalSpearFound++)
+		if(tempTotal > constructionCost) {
+			tempTotal -= constructionCost
+			document.getElementById("constructionGrey"+q).style.display="inline-block";
+			document.getElementById("constructionRed"+q).style.display="none";
+		} else if(tempTotal > 0){
+			document.getElementById("constructionGrey"+q).style.display="none";
+			document.getElementById("constructionRed"+q).style.display="inline-block";
+			document.getElementById("constructionRed"+q).style.width = (tempTotal/constructionCost)*100+"%"
+			tempTotal -= constructionCost
+		} else {
+			document.getElementById("constructionGrey"+q).style.display="none";
+			document.getElementById("constructionRed"+q).style.display="none";
+		}
+	}
+}
+
+function showSpawnList() {
+	spawnListBox = document.getElementById("spawnListBox")
+	spawnListBox.innerHTML = ""
+	spawnDiv=""
+	totalSoldierFound = 0
+	totalSpearFound = 0
+	for(q = 1; q < spawnList.length; q++) {
+		if(spawnList[q] == "soldier") spawnDivCost = round2(placeUnitTerritoryCost[0] + placeUnitIncreaseRatio[0]* totalSoldierFound++)
+		if(spawnList[q] == "spear") spawnDivCost = round2(placeUnitTerritoryCost[1] + placeUnitIncreaseRatio[1] * totalSpearFound++)
+		spawnDiv+=  "<div class='spawnDiv'>"+
+			"<div class='constructionBar' id='constructionRed"+q+"' style='background-color:rgba(230, 69, 69, 0.82);'></div>"+
+			"<div class='constructionBar' id='constructionGrey"+q+"'></div>"+
+			"<img height='23' width='29' src='pics/"+spawnList[q]+".png' class='spawnListPic'>"+
+			"<div style='position:absolute;left:70px;color:black;font-size:20px;'>"+spawnDivCost+"</div>"+
+			((q>1&&spawnList[q-1]!=spawnList[q])?"<img height='21' width='21' onclick='shiftPlaceListUp(this)' src='pics/arrow.png' class='listPic'>":"")+
+			((q<spawnList.length-1&&spawnList[q+1]!=spawnList[q])?"<img height='21' width='21' onclick='shiftPlaceListDown(this)' src='pics/Darrow.png' class='listPic' style='left:186px'>":"")+
+			"<img height='21' width='21' onclick='removeFromPlaceList(this)' src='pics/x.png' class='listPic' style='left:230px'>"+
+		"</div>"
+	}
+	spawnListBox.innerHTML=spawnDiv
+	updateConstructionVisual()
+}
+
 function updatePlaceVisuals() {
+	document.getElementById("soldierPlaceCost").innerHTML=round2(placeUnitTerritoryCost[0] + placeUnitIncreaseRatio[0] * findNumTypeInList("soldier"));
+	document.getElementById("spearPlaceCost").innerHTML=round2(placeUnitTerritoryCost[1] + placeUnitIncreaseRatio[1] * findNumTypeInList("spear"));
+	
+	
+	//old
 	document.getElementById("placeAmount0").innerHTML=placeAmounts[0];
 	document.getElementById("placeTimer0").innerHTML=round3(placeAmounts[0] / territory*100) + "% of territory";
 	document.getElementById("placeProgressInner0").style.width=round3(placeAmounts[0] / territory*100) + "%";

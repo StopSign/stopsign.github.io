@@ -49,10 +49,10 @@ function clickBuySpawnRate(type) {
 	typeNum = convertTypeToNum(type, "right") 
 	if(costSpawnRate[typeNum] <= gold) {
 		gold -= costSpawnRate[typeNum]
-		costSpawnRate[typeNum] *= (2.2 + typeNum/10)
+		costSpawnRate[typeNum] *= 4
 		initialSpawnRate[typeNum/2] *= .95;
 		spawnRate[typeNum/2] *= .95;
-		if(initialSpawnRate[typeNum/2] <= .5) {
+		if(initialSpawnRate[typeNum/2] <= 1) {
 			initialSpawnRate[typeNum/2]*=2;
 			spawnRate[typeNum/2] *= 2;
 			initialSpawnAmounts[typeNum/2]*=2;
@@ -156,6 +156,8 @@ function processKeyQueue() {
 
 
 function startANewstage() {
+	constructionRate = .5
+	constructionTotal = 0
 	for(y = 0; y < units.length; y++) {
 		for(x = units[y].length-1; x>=0; x--) {
 			removeUnit(units[y][x], false);
@@ -186,7 +188,7 @@ function startANewstage() {
 	document.getElementById("stage").innerHTML=stage;
 	document.getElementById("territoryGain").innerHTML = mapTimers[stage]>0?maps[stage][1]/5:maps[stage][1]
 	document.getElementById("goldGain").innerHTML = maps[stage][0]
-	unitValues[1] = [Math.pow(stage+5, 4)*Math.pow(1.08, stage)/250, 4, .06, Math.pow(stage+3, 3)*Math.pow(1.15, stage)+30, 0, 4.5]
+	unitValues[1] = [1.5, 4, .06, 60, 0, 4.5]
 	unitValues[3] = [Math.pow(stage+5, 3)*Math.pow(1.11, stage)/8, 15, .04, Math.pow(stage+5, 3)*Math.pow(1.1, stage)/6, 0, 16]
 	//updateProgressVisual()
 	placeCurTimers=[]

@@ -21,7 +21,7 @@ function loadDefaults() {
 	gold = 0;
 	territory = 0;
 	higheststageUnlocked = 0;
-	stop=0
+	stop=1
 	buttonsToClick = 0; //tutorial thing
 	currentTab = 0;
 	bonusFromFam = 1;
@@ -51,10 +51,21 @@ function loadDefaults() {
 	}
 	manaGain = .06;
 	buildingUpgradesCost = [[50], [70]]
+	spawnList = []
+	placeUnitTerritoryCost = [5, 10]
+	placeUnitIncreaseRatio = [1, 2]
 }
 
 function saveIntoStorage() {
-    window.localStorage.allVariables103 = "";
+	//dynamic lists
+	window.localStorage.spawnList1 = ""
+	theCookie=""
+	for(x = 0; x < spawnList.length; x++) {
+		theCookie+=spawnList[x]+","
+	}
+	window.localStorage.spawnList1=theCookie.substring(0, theCookie.length-1)
+	//static sizes
+    window.localStorage.allVariables104 = "";
 	theCookie=""
 	for(x = 0; x < spawnManualAmounts.length; x++) {
 		theCookie+=spawnManualAmounts[x]+","
@@ -102,15 +113,26 @@ function saveIntoStorage() {
 	}
 	theCookie+=wallHealthInitial+","
 	theCookie+=fenceHealthInitial+","
+	for(l = 0; l < buildingUpgradesCost.length; l++) {
+		for(y = 0; y < buildingUpgradesCost[l].length; y++) {
+			theCookie+=buildingUpgradesCost[l][y]+","
+		}
+	}
 	
-    window.localStorage.allVariables103 = theCookie;
+    window.localStorage.allVariables104 = theCookie;
 }
 
 function loadFromStorage() {
 	document.getElementById("mainBox").style.display="inline-block";
 	loadDefaults();
-    if(!!window.localStorage && window.localStorage.allVariables103) {
-        expandedCookie = (','+window.localStorage.allVariables103).split(',');
+    if(!!window.localStorage && window.localStorage.allVariables104) {
+		stop=0
+		//dynamic lists
+        spawnList = (window.localStorage.spawnList1).split(',');
+		console.log(spawnList);
+		
+		//static sizes
+        expandedCookie = (','+window.localStorage.allVariables104).split(',');
         x = 1;
 		for(y = 0; y < spawnManualAmounts.length; y++) {
 			spawnManualAmounts[y]=parseFloat(expandedCookie[x++]);
@@ -159,6 +181,11 @@ function loadFromStorage() {
 		}
 		wallHealthInitial=parseFloat(expandedCookie[x++]);
 		fenceHealthInitial=parseFloat(expandedCookie[x++]);
+		for(l = 0; l < buildingUpgradesCost.length; l++) {
+			for(y = 0; y < buildingUpgradesCost[l].length; y++) {
+				buildingUpgradesCost[l][y]=parseFloat(expandedCookie[x++]);
+			}
+		}
     }
 	startANewstage()
 	updateTerritoryVisual()
@@ -169,12 +196,14 @@ function loadFromStorage() {
 	changeUnitScreen("clear")
 	createMapSpace()
 	switchMainTab(currentTab)
+	calculateUsedPlaceTerritory()
+	showSpawnList()
 	document.getElementById("mainColumn").style.display="inline-block";
 }
 
 function clearStorage() {
 	startANewstage()
-    window.localStorage.allVariables103="";
+    window.localStorage.allVariables104="";
 	loadFromStorage()
 }
 
