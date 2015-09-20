@@ -186,7 +186,7 @@ function changeUnitScreen(unit) {
 		"<div class='costBox'><div class='goldIcon'></div><div id='costSpawn' class='number'>400</div></div>"+
 		"<div class='buyName'>Spawn Rate</div>"+
 		"<div class='buyIncreaseAmount' id='"+type+"Increase0'>5% faster</div>"+
-		"<div class='buyVal' style='color:rgb(102, 102, 102);'>Spawn <div id='buy0' style='color:black;'></div> unit every <div id='buy02' style='color:black;'></div> seconds.</div>"+
+		"<div class='buyVal' style='color:rgb(102, 102, 102);'>Spawn units of this type every <div id='buy02' style='color:black;'></div> seconds.</div>"+
 	"</div>"
 	
 	next6="<div style='width:40%;height:110px;vertical-align:top;'>"
@@ -230,14 +230,12 @@ function slider(id) {
 function updateSpawnRate2(type) {
 	if(type == "soldier") numToUpdate = 0
 	if(type == "spear") numToUpdate = 1
-	document.getElementById("buy0").innerHTML = round2(spawnAmounts[numToUpdate])
 	document.getElementById("buy02").innerHTML = round2(spawnRate[numToUpdate])
 }
 
 function updateSpawnRate() {
 	unit = getUnitById(curClickedUnit)
 	if(document.getElementById("buy0")) {
-		document.getElementById("buy0").innerHTML = round2(spawnAmounts[unit.typeNum/2])
 		document.getElementById("buy02").innerHTML = round2(spawnRate[unit.typeNum/2])
 	}
 }
@@ -345,33 +343,51 @@ function handleLineAmounts(lineCount) {
 }
 
 function drawSpearLine(unit1, unit2) {
-	storedLines.push({x1:(unit1.pos+7)*11.9+22, y1:(unit1.line)*54+60+offset, x2:(unit2.pos+7)*11.9+11, y2:(unit2.line)*54+60+offset, curCount:4, count:4});
+	storedArrowVisuals.push({x1:(unit1.pos+7)*11.9+22, y1:(unit1.line)*54+60+offset, x2:(unit2.pos+7)*11.9+11, y2:(unit2.line)*54+60+offset, curCount:4, count:4});
 }
 
-function drawSpearLine2(unit1) {
-	storedLines.push({x1:(unit1.pos+7)*11.9+22, y1:(unit1.line)*54+60+offset, x2:(unit1.pos+7)*11.9+151, y2:(unit1.line)*54+60+offset, curCount:4, count:4});
+function drawSpearLineToWall(unit1) {
+	storedArrowVisuals.push({x1:(unit1.pos+7)*11.9+22, y1:(unit1.line)*54+60+offset, x2:(unit1.pos+7)*11.9+151, y2:(unit1.line)*54+60+offset, curCount:4, count:4});
 }
 
-function redrawStoredLines(){
+function drawLightning(unit1, unit2) {
+	storedLightningVisuals.push({x1:(unit1.pos+7)*11.9+15, y1:(unit1.line)*54+60+offset, x2:(unit2.pos+7)*11.9+15, y2:(unit2.line)*54+60+offset, curCount:16});
+}
 
+function redrawStoredLines(onTick){
 	ctx.clearRect(0,0,c.width,c.height);
-
-	if(storedLines.length==0){ return; }
-
 	// redraw each stored line
-	for(var i=storedLines.length - 1;i>=0;i--){
-		if(storedLines[i].curCount <= 0) {
-			storedLines.splice(i, 1);
-			continue;
+	for(i=storedArrowVisuals.length - 1; i>=0; i--){
+		if(onTick) {
+			if(storedArrowVisuals[i].curCount <= 0) {
+				storedArrowVisuals.splice(i, 1);
+				continue;
+			}
+			storedArrowVisuals[i].curCount--;
 		}
-		storedLines[i].curCount--;
+		ctx.strokeStyle="#000000"
 		ctx.beginPath();
-		x3 = storedLines[i].x1+((storedLines[i].x2-storedLines[i].x1)/storedLines[i].count*(storedLines[i].count - storedLines[i].curCount)) - 4
-		y3 = storedLines[i].y1+((storedLines[i].y2-storedLines[i].y1)/storedLines[i].count*(storedLines[i].count - storedLines[i].curCount)) 
-		//console.log(storedLines[i].x1+", "+storedLines[i].y1+", "+storedLines[i].x2+", "+storedLines[i].y2+", " + storedLines[i].curCount+", "+x3+", "+y3)
+		x3 = storedArrowVisuals[i].x1+((storedArrowVisuals[i].x2-storedArrowVisuals[i].x1)/storedArrowVisuals[i].count*(storedArrowVisuals[i].count - storedArrowVisuals[i].curCount)) - 4
+		y3 = storedArrowVisuals[i].y1+((storedArrowVisuals[i].y2-storedArrowVisuals[i].y1)/storedArrowVisuals[i].count*(storedArrowVisuals[i].count - storedArrowVisuals[i].curCount)) 
+		//console.log(storedArrowVisuals[i].x1+", "+storedArrowVisuals[i].y1+", "+storedArrowVisuals[i].x2+", "+storedArrowVisuals[i].y2+", " + storedArrowVisuals[i].curCount+", "+x3+", "+y3)
 		ctx.moveTo(x3,y3);
 		ctx.lineTo(x3+8,y3);
 		ctx.lineWidth = 3;
+		ctx.stroke();
+	}
+	for(i=storedLightningVisuals.length-1; i>=0; i--) {
+		if(onTick) {
+			if(storedLightningVisuals[i].curCount <= 0) {
+				storedLightningVisuals.splice(i, 1);
+				continue;
+			}
+			storedLightningVisuals[i].curCount--;
+		}
+		ctx.strokeStyle="rgba(161, 255, 251, "+storedLightningVisuals[i].curCount/16+")"
+		ctx.lineWidth=8
+		ctx.beginPath();
+		ctx.moveTo(storedLightningVisuals[i].x1, storedLightningVisuals[i].y1)
+		ctx.lineTo(storedLightningVisuals[i].x2, storedLightningVisuals[i].y2)
 		ctx.stroke();
 	}
 }

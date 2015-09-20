@@ -16,7 +16,7 @@ function clickBuyButton(pos, type) {
 }
 
 function handleBuyAmounts(y, x) {
-	unitValues[y][x] = unitValuesInitial[y][x]*unitPointValues[y][x]*.1+unitValuesInitial[y][x]*Math.pow(1.04, unitPointValues[y][x]);
+	unitValues[y][x] = unitValuesInitial[y][x]*unitPointValues[y][x]*.3+unitValuesInitial[y][x]*Math.pow(1.08, unitPointValues[y][x]);
 }
 
 function clickBuildingBuyButton(num, type) {
@@ -24,8 +24,8 @@ function clickBuildingBuyButton(num, type) {
 		if(num == 0 && gold >= buildingUpgradesCost[0][0]) { 
 			gold -= buildingUpgradesCost[0][0]
 			buildingUpgradesCost[0][0]*= 1.2
-			wallHealth+=500
-			wallHealthInitial+=500
+			wallHealth+=750
+			wallHealthInitial+=750
 		}
 		document.getElementById("buyBuilding0").innerHTML = round1(wallHealthInitial);
 		document.getElementById("costBuilding0").innerHTML = round1(buildingUpgradesCost[0][0])
@@ -34,8 +34,8 @@ function clickBuildingBuyButton(num, type) {
 		if(num == 0 && gold >= buildingUpgradesCost[1][0]) { 
 			gold -= buildingUpgradesCost[1][0]
 			buildingUpgradesCost[1][0]*= 1.2
-			fenceHealth+=20
-			fenceHealthInitial+=20
+			fenceHealth+=50
+			fenceHealthInitial+=50
 		}
 		document.getElementById("buyBuilding0").innerHTML = round1(fenceHealthInitial);
 		document.getElementById("costBuilding0").innerHTML = round1(buildingUpgradesCost[1][0])
@@ -65,7 +65,7 @@ function buyUpgradePoint(type) {
 	if(unitCosts[typeNum] <= gold) {
 		gold -= unitCosts[typeNum]
 		updateGoldVisual()
-		unitCosts[typeNum] = 1.2 * unitCosts[typeNum];
+		unitCosts[typeNum] = 1.6 * unitCosts[typeNum];
 		upgradePointsInitial[typeNum]++
 		unitPointValues[typeNum][3]++;
 		handleBuyAmounts(typeNum, 3)
@@ -171,15 +171,16 @@ function startANewstage() {
 	enemySpawnRateIncrease=[maps[stage][10][0], maps[stage][10][1], maps[stage][10][2]]
 	
 	curBattles = [];
-	storedLines = [];
+	storedArrowVisuals = [];
+	storedLightningVisuals=[]
 	timer = 19;
 	totalTicks = 0
 	curClickedUnit = -1;
 	document.getElementById("stage").innerHTML=stage;
 	document.getElementById("territoryGain").innerHTML = mapTimers[stage]>0?maps[stage][1]/5:maps[stage][1]
 	document.getElementById("goldGain").innerHTML = maps[stage][0]
-	unitValues[1] = [1.5, 4, .06, 60, 0, 4.5]
-	unitValues[3] = [Math.pow(stage+5, 3)*Math.pow(1.11, stage)/8, 15, .04, Math.pow(stage+5, 3)*Math.pow(1.1, stage)/6, 0, 16]
+	unitValues[1] = [Math.pow(stage+12, 2)/10-12.89999, 4, .06, Math.pow(stage+1, 2)*10+50, 0, 4.5]
+	unitValues[3] = [Math.pow(stage+9, 3)/100, 15, .04, Math.pow(stage+3, 2)*5-30, 0, 16]
 	//updateProgressVisual()
 	enemyFenceHealthInitial = maps[stage][2]
 	enemyWallHealthInitial = maps[stage][3]

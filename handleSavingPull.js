@@ -7,10 +7,10 @@ function loadDefaults() {
 	initialSpawnAmounts=[0,  0];
 	initialSpawnRate=   [9, 10];
 	stage = 0;
-	unitValues =       [[1, 3, .6, 20, 0, 4.5], [0, 0, 0, 0, 0, 0], [8, 20, .4, 12, 0, 15], [0, 0, 0, 0, 0, 0]]
-	unitValuesInitial = [[1, 3, .6, 20, 0, 4.5], [0, 0, 0, 0, 0, 0], [8, 20, .4, 12, 0, 15], [0, 0, 0, 0, 0, 0]]
+	unitValues =       [[1, 3, .6, 30, 0, 4.5], [0, 0, 0, 0, 0, 0], [8, 20, .4, 12, 0, 15], [0, 0, 0, 0, 0, 0]]
+	unitValuesInitial = [[1, 3, .6, 30, 0, 4.5], [0, 0, 0, 0, 0, 0], [8, 20, .4, 12, 0, 15], [0, 0, 0, 0, 0, 0]]
 	costSpawnRate =        [20, 0, 90, 0];
-	unitCosts =            [2, 0, 10, 0];
+	unitCosts =            [8, 0, 30, 0];
 	upgradePointsInitial=  [0, 0,  0, 0];
 	unitPointValues=[[0, 0, 0, 0, 0],[],[0, 0, 0, 0, 0],[]]
 	gold = 0;

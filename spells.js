@@ -44,7 +44,7 @@ function clickAUnit(id) {
 		}
 		if(holdingSpell == 1) {
 			spendMana(spellCosts[1])
-			unit.takeDamage(45)
+			chainDamage(unit, 18)
 			holdingSpell = -1
 		}
 		updateHover(id)
@@ -52,6 +52,27 @@ function clickAUnit(id) {
 		
 		handleDeadUnit(unit)
 	}
+}
+
+function chainDamage(unit, damage) {
+	firstToTakeDamage = findNearestList(unit)[1]
+	second= findNearestList(firstToTakeDamage)
+	if(second && second.length > 1) {
+		secondsIndex = second[1] != firstToTakeDamage && second[1] != unit ? 1 :
+					(second[2] != firstToTakeDamage && second[2] != unit ? 2 : 3)
+		if(second[secondsIndex]) {
+			drawLightning(firstToTakeDamage, second[secondsIndex])
+			second[secondsIndex].takeDamage(damage)
+			handleDeadUnit(second[secondsIndex])
+		}
+	}
+	if(firstToTakeDamage) {
+		drawLightning(unit, firstToTakeDamage)
+		firstToTakeDamage.takeDamage(damage)
+		handleDeadUnit(firstToTakeDamage)
+	}
+	unit.takeDamage(damage)
+	redrawStoredLines(false)
 }
 
 function spendMana(amount) {

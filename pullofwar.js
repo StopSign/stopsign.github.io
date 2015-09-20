@@ -36,7 +36,6 @@ enemySpawnRate = 9;
 curBattles = [];
 curClickedUnit = -1;*/
 timeList = [];
-storedLines = [];
 totalTicks = 0
 timer = 0;
 //startTutorial()
@@ -51,7 +50,7 @@ function tick() {
 	moveUnits()
 	checkForUnitAtEnds()
 	checkForUnitCollisions()
-	redrawStoredLines()
+	redrawStoredLines(true)
 	if(timer % 2 == 0) {
 		handleSpawnRates()
 		handleDamageAtEnds()
@@ -100,14 +99,18 @@ function handleSpawnRates() {
 	//rateReduction = 0;
 	if(spawnAmounts[0] > 0) soldierSpawnRate -= rateReduction;
 	if(soldierSpawnRate <= 0) {
-		j = Math.floor(Math.random() * linesEnabled)
-		addUnit("soldier", j, "right", Math.floor(spawnAmounts[0]));
+		for(j = 0; j < spawnAmounts[0]; j++) {
+			q = Math.floor(Math.random() * linesEnabled)
+			addUnit("soldier", q, "right", 1);
+		}
 		soldierSpawnRate += spawnRate[0];
 	}
 	if(spawnAmounts[1] > 0) spearSpawnRate -= rateReduction;
 	if(spearSpawnRate <= 0) {
-		j = Math.floor(Math.random() * linesEnabled)
-		addUnit("spear", j, "right",  Math.floor(spawnAmounts[1]));
+		for(j = 0; j < spawnAmounts[1]; j++) {
+			q = Math.floor(Math.random() * linesEnabled)
+			addUnit("spear", q, "right",  1);
+		}
 		spearSpawnRate += spawnRate[1];
 	}
 	enemySpawnRate -= rateReduction;
@@ -170,7 +173,7 @@ function handleDamageAtEnds() {
 			if(units[y][x].direction === "right") {
 				if(enemyFenceHealth > 0 && units[y][x].pos > 85.5-units[y][x].range) { //right fence
 					units[y][x].shouldAttack = 0
-					if(units[y][x].type == "spear" && units[y][x].attackCounter === 3) drawSpearLine2(units[y][x]);
+					if(units[y][x].type == "spear" && units[y][x].attackCounter === 3) drawSpearLineToWall(units[y][x]);
 					if(units[y][x].getDamageRoll()) {
 						enemyFenceHealth-=units[y][x].unitCount;
 						if(enemyFenceHealth <= 0) {
@@ -183,7 +186,7 @@ function handleDamageAtEnds() {
 				}
 				if(enemyFenceHealth <= 0 && units[y][x].pos > 89-units[y][x].range) { //right wall
 					units[y][x].shouldAttack = 0
-					if(units[y][x].type == "spear" && units[y][x].attackCounter === 3) drawSpearLine2(units[y][x]);
+					if(units[y][x].type == "spear" && units[y][x].attackCounter === 3) drawSpearLineToWall(units[y][x]);
 					enemyWallHealth -= units[y][x].getDamageRoll()
 				}
 			}
@@ -382,6 +385,7 @@ function handleDeadUnit(target) {
 	else {
 		tempHealth = (target.curHealth / target.maxHealth * 100)
 		document.getElementById("healthBar"+target.id).style.width = tempHealth>100?100:tempHealth + "%";
+		document.getElementById("count"+target.id).innerHTML= target.unitCount
 	}
 }
 
@@ -562,6 +566,36 @@ function getUnitById(id) {
 				return units[y][x]
 		}
 	}
+}
+
+function findNearestList(unit) {
+	//console.log("line:"+unit.line+" pos:"+unit.pos)
+	if(!unit) return
+	nearestList = [unit]
+	needsFirstUnit = 1
+	for(q = 0; q < units.length; q++) {
+		for(w = 0; w < units[q].length; w++) {
+			if(units[q][w].id == unit.id || units[q][w].direction != unit.direction) continue; //don't check yourself or opposite affiliations
+			if(needsFirstUnit == 1) {
+				needsFirstUnit = 0
+				nearestList[1]=units[q][w]
+				continue
+			}
+			theIndex = nearestList.length
+			for(e = 1; e < nearestList.length; e++) {
+				if(Math.abs(units[q][w].pos - nearestList[0].pos)+Math.abs(q-nearestList[0].line)*5 < 
+				Math.abs(nearestList[e].pos - nearestList[0].pos)+Math.abs(nearestList[e].line-nearestList[0].line)*6) {
+					theIndex = e
+					break
+				}
+			}
+			nearestList.splice(theIndex, 0, units[q][w])
+		}
+	}
+	return nearestList
+	//for(e = 0; e < nearestList.length; e++) {
+	//	console.log(nearestList[e].toString())
+	//}
 }
 
 function round3(num) {

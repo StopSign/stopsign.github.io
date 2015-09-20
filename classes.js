@@ -65,13 +65,8 @@ function Unit (line, pos, type, direction, unitCount, goldWorth) {
 		}
 		return (this.id === unit.id)
 	};
-}
-
-function Battle(y, x, z, w, id1, id2) {
-	this.x = x;
-	this.y = y;
-	this.z = z;
-	this.w = w;
-	this.id1 = id1;
-	this.id2 = id2;
+	
+	this.toString = function() {
+		return "ID:"+this.id+" Line:"+this.line+" Pos:"+this.pos+" Direction:"+this.direction
+	}
 }
