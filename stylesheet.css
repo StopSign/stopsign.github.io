@@ -303,14 +303,14 @@ width:2px;
 }
 .healthBarOuter {
 	width:100%;
-	background-color:rgb(255, 13, 13);
+	background-color:blue;
 	height:5px;
 	position:relative;
 }
 
 .healthBarInner {
 	width:100%;
-	background-color:rgb(0, 61, 0);
+	background-color:yellow;
 	height:5px;
 	position:absolute;
 }

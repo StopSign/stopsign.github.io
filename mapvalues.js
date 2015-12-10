@@ -78,7 +78,7 @@ function updateMapTimers() {
 		}
 	}
 }
-http://imgur.com/Dc5yJOl
+//http://imgur.com/Dc5yJOl
 function clickedStartMap() {
 	stage = currentMapInfoNum
 	startANewstage()

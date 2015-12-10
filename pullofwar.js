@@ -1,8 +1,8 @@
-started = 0
+started = 1
 setInterval(function() {
 	if(started)
 		tick();
-},9);
+},15);
 
 
 

@@ -16,7 +16,7 @@ function loadDefaults() {
 	gold = 0;
 	territory = 10;
 	higheststageUnlocked = 0;
-	stop=1
+	stop=0
 	buttonsToClick = 0; //tutorial thing
 	currentTab = 0;
 	totalDead=[0, 0, 0, 0]
