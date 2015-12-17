@@ -8,6 +8,7 @@ function loadDefaults() {
 	initialSpawnRate=   [9, 10];
 	stage = 0;
 	//TODO need to be cleaned up, enemy initial values are set elsewhere
+	//[initial dmg, ticks between attacks, movespeed per tick, health, armor (not in use), range]
 	unitValues =       [[1, 3, .6, 30, 0, 4.5], [0, 0, 0, 0, 0, 0], [8, 20, .4, 12, 0, 15], [0, 0, 0, 0, 0, 0]]
 	unitValuesInitial = [[1, 3, .6, 30, 0, 4.5], [0, 0, 0, 0, 0, 0], [8, 20, .4, 12, 0, 15], [0, 0, 0, 0, 0, 0]]
 	costSpawnRate =        [20, 0, 90, 0];
@@ -116,8 +117,9 @@ function saveIntoStorage() {
 function loadFromStorage() {
 	document.getElementById("mainBox").style.display="inline-block";
 	loadDefaults();
+	//if (you haven't loaded the game before) {
     if(!!window.localStorage && window.localStorage.allVariables104) {
-		stop=0
+		stop=0 //actually starts the game, here to wait for everything to load
 		//dynamic lists
         spawnList = (window.localStorage.spawnList1).split(',');
 		if(spawnList[0] == "") spawnList =[];
@@ -125,6 +127,7 @@ function loadFromStorage() {
 		
 		//static sizes
         expandedCookie = (','+window.localStorage.allVariables104).split(',');
+		//TODO: fix this next time when changing versions
         x = 1;
 		for(y = 0; y < spawnManualAmounts.length; y++) {
 			spawnManualAmounts[y]=parseFloat(expandedCookie[x++]);
@@ -174,7 +177,10 @@ function loadFromStorage() {
 				buildingUpgradesCost[l][y]=parseFloat(expandedCookie[x++]);
 			}
 		}
+		//Add new values only at the end
     }
+	
+	//
 	startANewstage()
 	updateTerritoryVisual()
 	updateGoldVisual()
@@ -193,6 +199,7 @@ function loadFromStorage() {
 function clearStorage() {
 	startANewstage()
     window.localStorage.allVariables104="";
+	window.localStorage.spawnList1="";
 	loadFromStorage()
 }
 

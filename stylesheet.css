@@ -1,3 +1,8 @@
+/* 
+TODO: remove all unused classes (ctrl-f across all files,
+if it's not found, remove)
+ */
+
 .message {
 background-color:rgba(255, 255, 255, 0.65);
 padding:15px;

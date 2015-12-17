@@ -118,6 +118,7 @@ function hoverAUnit(id) {
 
 var myKeyQueue = [];
 
+//This happens in order to make hotkeys
 $(document).keydown(function(e) {
     code = (e.charCode != 0 ? e.charCode : e.keyCode)
     myKeyQueue.push(code);
