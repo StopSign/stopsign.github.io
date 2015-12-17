@@ -6,6 +6,19 @@ setInterval(function() {
 
 
 
+function addbyinteger(toAdd1, toAdd2, precision) {
+	addbyinteger(toAdd1, toAdd2, precision, true);
+}
+function addbyinteger(toAdd1, toAdd2, precision, isAdd) {
+	precisionMult = Math.pow(10, precision)
+	toAdd1 *= precisionMult;
+	toAdd2 *= precisionMult * (isAdd?1:-1)
+	//make toAdd2 negative when isAdd is false.
+	toReturn = Math.floor(toAdd1 + toAdd2)
+	return toReturn / precisionMult
+	
+}
+
 //uncomment this before checkin
 /*var doWork = new Worker('interval.js');
 doWork.onmessage = function(event) {
@@ -98,6 +111,8 @@ function pause() {
 rateReduction = .0999999;
 function handleSpawnRates() {
 	//rateReduction = 0;
+	
+	//TODO: put these variables into an array
 	if(spawnAmounts[0] > 0) soldierSpawnRate -= rateReduction;
 	if(soldierSpawnRate <= 0) {
 		for(j = 0; j < spawnAmounts[0]; j++) {
@@ -264,14 +279,20 @@ function checkForUnitCollisions() {
 					if(units[z][w].direction == units[y][x].direction) { //join units of the same type
 						if(Math.abs(units[y][x].pos - units[z][w].pos) <= 1.5 && units[z][w].type===units[y][x].type) {
 							if(units[y][x].id > units[z][w].id) continue //if yx is the earlier one, take the merge
+							//NOTE: this means that your units don't get pushed back while merging, but their units do
+							//because of the order the unit id's get created
+							
 							//average the units together
 							units[y][x].damage = average(units[y][x].damage, units[z][w].damage, units[y][x].unitCount, units[z][w].unitCount)
 							units[y][x].maxHealth = average(units[y][x].maxHealth, units[z][w].maxHealth, units[y][x].unitCount, units[z][w].unitCount) //visual purposes only
 							
 							totalUnitCount = units[y][x].unitCount + units[z][w].unitCount
-							totalHealthA = (units[y][x].unitCount-1)*units[y][x].actualMaxHealth + units[y][x].curHealth
+							totalHealthA = (units[y][x].unitCount-1)*units[y][x].actualMaxHealth + units[y][x].curHealth //represents total health the unit stack
 							totalHealthB = (units[z][w].unitCount-1)*units[z][w].actualMaxHealth + units[z][w].curHealth
 							averageHealth = average(units[y][x].actualMaxHealth, units[z][w].actualMaxHealth, units[y][x].unitCount, units[z][w].unitCount)
+							averageHealth = average(units[y][x].actualMaxHealth, units[z][w].actualMaxHealth, units[y][x].unitCount, units[z][w].unitCount)-.000001
+							//Fix: (trunc(healthA*100) + trunc(healthB*100))/100
+							//Fix: alternate fix, subtract by -.000001
 							newUnitCount = Math.ceil((totalHealthA + totalHealthB)/averageHealth)
 							temp = (totalHealthA + totalHealthB)%averageHealth
 							if(temp == 0) {

@@ -145,7 +145,8 @@ function processKeyQueue() {
 }
 
 
-
+//these are variables that aren't saved, being reset per level
+//using variables that are saved to set, though
 function startANewstage() {
 	constructionRate = .5
 	constructionTotal = 0
@@ -179,6 +180,8 @@ function startANewstage() {
 	document.getElementById("stage").innerHTML=stage;
 	document.getElementById("territoryGain").innerHTML = mapTimers[stage]>0?maps[stage][1]/5:maps[stage][1]
 	document.getElementById("goldGain").innerHTML = maps[stage][0]
+	//TODO: make this more clear it's the enemy health/dmg formulas
+	//elevate it to more visible? These numbers will be tweaked a lot
 	unitValues[1] = [Math.pow(stage+12, 2)/10-12.89999, 4, .06, Math.pow(stage+1, 2)*10+50, 0, 4.5]
 	unitValues[3] = [Math.pow(stage+9, 3)/100, 15, .04, Math.pow(stage+3, 2)*5-30, 0, 16]
 	//updateProgressVisual()
@@ -193,7 +196,7 @@ function startANewstage() {
 	document.getElementById("fence").style.display = fenceHealth>0?'inline-block':'none';
 	document.getElementById("fenceHealth").style.display = fenceHealth>0?'inline-block':'none';
 	
-	//addUnit("spear", 0, "right", 1);
+	//addUnit("soldier", 0, "left", 1);
 	
 	started = 1
 }

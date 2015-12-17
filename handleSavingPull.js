@@ -7,6 +7,7 @@ function loadDefaults() {
 	initialSpawnAmounts=[0,  0];
 	initialSpawnRate=   [9, 10];
 	stage = 0;
+	//TODO need to be cleaned up, enemy initial values are set elsewhere
 	unitValues =       [[1, 3, .6, 30, 0, 4.5], [0, 0, 0, 0, 0, 0], [8, 20, .4, 12, 0, 15], [0, 0, 0, 0, 0, 0]]
 	unitValuesInitial = [[1, 3, .6, 30, 0, 4.5], [0, 0, 0, 0, 0, 0], [8, 20, .4, 12, 0, 15], [0, 0, 0, 0, 0, 0]]
 	costSpawnRate =        [20, 0, 90, 0];

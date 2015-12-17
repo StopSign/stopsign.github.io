@@ -11,6 +11,7 @@ War tab
   > health, unit count, time alive, damage done, kills
  * Hover out of box to clear popup
  
+ 
 Territory tab
  * Places and progression
  * Upgrades to reduce time / add multipliers
