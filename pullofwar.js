@@ -2,18 +2,15 @@ started = 0
 setInterval(function() {
 	if(started)
 		tick();
-},15);
+},1);
 
 
 //Messed up the commit on this page on this comment I suppose
 //TODO: research on effectiveness and value
-function addbyinteger(toAdd1, toAdd2, precision) {
-	addbyinteger(toAdd1, toAdd2, precision, true);
-}
 function addbyinteger(toAdd1, toAdd2, precision, isAdd) {
 	precisionMult = Math.pow(10, precision)
 	toAdd1 *= precisionMult;
-	toAdd2 *= precisionMult * (isAdd?1:-1)
+	toAdd2 *= precisionMult * (isAdd==0?-1:1)
 	//make toAdd2 negative when isAdd is false.
 	toReturn = Math.floor(toAdd1 + toAdd2)
 	return toReturn / precisionMult
@@ -291,10 +288,11 @@ function checkForUnitCollisions() {
 							totalHealthA = (units[y][x].unitCount-1)*units[y][x].actualMaxHealth + units[y][x].curHealth //represents total health the unit stack
 							totalHealthB = (units[z][w].unitCount-1)*units[z][w].actualMaxHealth + units[z][w].curHealth
 							averageHealth = average(units[y][x].actualMaxHealth, units[z][w].actualMaxHealth, units[y][x].unitCount, units[z][w].unitCount)
-							averageHealth = average(units[y][x].actualMaxHealth, units[z][w].actualMaxHealth, units[y][x].unitCount, units[z][w].unitCount)-.000001
+							averageHealth = average(units[y][x].actualMaxHealth, units[z][w].actualMaxHealth, units[y][x].unitCount, units[z][w].unitCount)
 							//Fix: (trunc(healthA*100) + trunc(healthB*100))/100
 							//Fix: alternate fix, subtract by -.000001
-							newUnitCount = Math.ceil((totalHealthA + totalHealthB)/averageHealth)
+							//console.log(totalHealthA +","+totalHealthB+","+addbyinteger(totalHealthA, totalHealthB, 3)+","+ Math.ceil(addbyinteger(totalHealthA, totalHealthB, 3)/averageHealth))
+							newUnitCount = Math.ceil(addbyinteger(totalHealthA, totalHealthB, 3)/averageHealth)
 							temp = (totalHealthA + totalHealthB)%averageHealth
 							if(temp == 0) {
 								units[y][x].curHealth = units[y][x].actualMaxHealth;
