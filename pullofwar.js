@@ -5,7 +5,8 @@ setInterval(function() {
 },15);
 
 
-
+//Messed up the commit on this page on this comment I suppose
+//TODO: research on effectiveness and value
 function addbyinteger(toAdd1, toAdd2, precision) {
 	addbyinteger(toAdd1, toAdd2, precision, true);
 }
