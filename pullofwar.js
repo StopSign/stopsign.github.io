@@ -3,6 +3,19 @@ setInterval(function() {
 	if(started)
 		tick();
 },1);
+//Default rate is 50, which makes it 20 ticks a second
+
+//uncomment this before checkin
+/*var doWork = new Worker('interval.js');
+doWork.onmessage = function(event) {
+    if ( event.data === 'interval.start' ) {
+		tick();
+    }
+};
+doWork.postMessage({start:true,ms:50});*/
+
+//TODO: change this dynamically
+
 
 
 //Messed up the commit on this page on this comment I suppose
@@ -17,14 +30,6 @@ function addbyinteger(toAdd1, toAdd2, precision, isAdd) {
 	
 }
 
-//uncomment this before checkin
-/*var doWork = new Worker('interval.js');
-doWork.onmessage = function(event) {
-    if ( event.data === 'interval.start' ) {
-		tick();
-    }
-};
-doWork.postMessage({start:true,ms:50});*/
 
 globalId = 0;
 zIndex = 1000000000;
@@ -106,11 +111,15 @@ function pause() {
 	}
 }
 
-rateReduction = .0999999;
+rateReduction = 99.0999999;
 function handleSpawnRates() {
 	//rateReduction = 0;
 	
 	//TODO: put these variables into an array
+	
+	//TODO: change the random spawn algorithm. Currently it'll spawn X units in potentially
+	//the same spot, and then the trigger for merging to two units triggers (this causes slowdown on mass unit # spawn)
+	//Correct formula 
 	if(spawnAmounts[0] > 0) soldierSpawnRate -= rateReduction;
 	if(soldierSpawnRate <= 0) {
 		for(j = 0; j < spawnAmounts[0]; j++) {
@@ -634,6 +643,15 @@ function round1(num) {
 function round(num) {
     return Math.floor(num).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
+
+function roundtoFormat1(num) {
+    return num.toFixed(1).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+function roundtoFormat2(num) {
+    return num.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+	
+
 
 function convertSecToMin(sec) {
 	part1 = Math.floor(sec / 60)+":"

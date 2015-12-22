@@ -26,19 +26,19 @@ function updateUnitPos(y, x) {
 }
 
 function updateManaVisual() {
-	document.getElementById("mana").innerHTML = round2(curMana);
+	document.getElementById("mana").innerHTML = roundtoFormat2(curMana);
 }
 
 
 function updateSpawnTimers() {
-	document.getElementById("enemySpawnTimer").innerHTML = round2(enemySpawnRate);
-	document.getElementById("enemySoldierSpawnAmount").innerHTML = round(enemySpawnAmounts[1])
-	document.getElementById("enemySpearSpawnAmount").innerHTML = round(enemySpawnAmounts[2])
+	document.getElementById("enemySpawnTimer").innerHTML = roundtoFormat1(enemySpawnRate);
+	document.getElementById("enemySoldierSpawnAmount").innerHTML = enemySpawnAmounts[1]
+	document.getElementById("enemySpearSpawnAmount").innerHTML = enemySpawnAmounts[2]
 	if(spawnAmounts[0] == 0) {
 		document.getElementById("soldierContainer").style.display="none"
 	} else {
 		document.getElementById("soldierContainer").style.display="inline-block"
-		document.getElementById("soldierSpawnTimer").innerHTML = round2(soldierSpawnRate);
+		document.getElementById("soldierSpawnTimer").innerHTML = roundtoFormat1(soldierSpawnRate);
 		document.getElementById("soldierAutoSpawnAmount").innerHTML = spawnAmounts[0]
 	}
 	if(spawnAmounts[1] == 0) {
@@ -46,7 +46,7 @@ function updateSpawnTimers() {
 	}
 	else {
 		document.getElementById("spearContainer").style.display="inline-block"
-		document.getElementById("spearSpawnTimer").innerHTML = round2(spearSpawnRate);
+		document.getElementById("spearSpawnTimer").innerHTML = roundtoFormat1(spearSpawnRate);
 		document.getElementById("spearAutoSpawnAmount").innerHTML = spawnAmounts[1]
 	}
 }
@@ -342,10 +342,10 @@ function handleLineAmounts(lineCount) {
 	}
 }
 
-function drawSpearLine(unit1, unit2) {
-	storedArrowVisuals.push({x1:(unit1.pos+7)*11.9+22, y1:(unit1.line)*54+60+offset, x2:(unit2.pos+7)*11.9+11, y2:(unit2.line)*54+60+offset, curCount:4, count:4});
-}
 
+//TODO: change the hardcoded values to relative based on canvas width
+
+//Methods to set up the data for canvas drawing
 function drawSpearLineToWall(unit1) {
 	storedArrowVisuals.push({x1:(unit1.pos+7)*11.9+22, y1:(unit1.line)*54+60+offset, x2:(unit1.pos+7)*11.9+151, y2:(unit1.line)*54+60+offset, curCount:4, count:4});
 }
@@ -354,6 +354,12 @@ function drawLightning(unit1, unit2) {
 	storedLightningVisuals.push({x1:(unit1.pos+7)*11.9+15, y1:(unit1.line)*54+60+offset, x2:(unit2.pos+7)*11.9+15, y2:(unit2.line)*54+60+offset, curCount:16});
 }
 
+//TODO: change map values to use this type of arrays
+function drawSpearLine(unit1, unit2) {
+	storedArrowVisuals.push({x1:(unit1.pos+7)*11.9+22, y1:(unit1.line)*54+60+offset, x2:(unit2.pos+7)*11.9+11, y2:(unit2.line)*54+60+offset, curCount:4, count:4});
+}
+
+//Draws the lines that move around a lot
 function redrawStoredLines(onTick){
 	ctx.clearRect(0,0,c.width,c.height);
 	// redraw each stored line
