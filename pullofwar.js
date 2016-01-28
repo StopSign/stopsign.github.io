@@ -2,7 +2,7 @@ started = 0
 setInterval(function() {
 	if(started)
 		tick();
-},25);
+},50);
 //Default rate is 50, which makes it 20 ticks a second
 
 //uncomment this before checkin
