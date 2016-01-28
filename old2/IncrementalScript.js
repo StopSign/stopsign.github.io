@@ -2,18 +2,18 @@
 
 
 
-/*setInterval(function() {
+setInterval(function() {
 	tick();
-},50);*/
+},50);
 
 //uncomment this before checkin
-var doWork = new Worker('interval.js');
+/*var doWork = new Worker('interval.js');
 doWork.onmessage = function(event) {
     if ( event.data === 'interval.start' ) {
 		tick();
     }
 };
-doWork.postMessage({start:true,ms:50});
+doWork.postMessage({start:true,ms:50});*/
 
 (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
 (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
