@@ -2,7 +2,7 @@ started = 0
 setInterval(function() {
 	if(started)
 		tick();
-},1);
+},25);
 //Default rate is 50, which makes it 20 ticks a second
 
 //uncomment this before checkin
@@ -111,7 +111,7 @@ function pause() {
 	}
 }
 
-rateReduction = 99.0999999;
+rateReduction = .0999999;
 function handleSpawnRates() {
 	//rateReduction = 0;
 	

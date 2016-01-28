@@ -15,8 +15,13 @@ function loadDefaults() {
 	unitCosts =            [8, 0, 30, 0];
 	upgradePointsInitial=  [0, 0,  0, 0];
 	unitPointValues=[[0, 0, 0, 0, 0],[],[0, 0, 0, 0, 0],[]]
-	gold = 0;
-	territory = 10;
+	//Intended defaults:
+	
+		//gold = 0;
+		//territory = 10;
+	gold = 500
+	territory = 100
+	
 	higheststageUnlocked = 0;
 	stop=0
 	buttonsToClick = 0; //tutorial thing
