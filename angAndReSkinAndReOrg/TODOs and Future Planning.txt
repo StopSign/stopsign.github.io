@@ -1,0 +1,19 @@
+
+1/28
+
+Reorganize the Code and Structure and
+Use Angular to
+Re-Skin the Visuals
+
+or [O] Organize, [A] Angular, [V] Visuals
+
+TODOs:
+
+
+
+
+
+
+
+
+
