@@ -1,0 +1,185 @@
+
+
+<!DOCTYPE html>
+<html>
+<head>
+	<meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+	<title>Pull of War</title>
+	<link rel="stylesheet" href="stylesheets/stylesheet.css">
+	<script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+	<script src="https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+	<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+	<script src="GUI Code/helpersUI.js"></script>
+</head>
+<body>
+	<div ng-app="myApp" ng-controller="myCtrl" style='background-color:grey;width:100%;text-align:center;position:absolute;'>
+		<div id='fps' style='text-align:left'></div>
+		<div id='progressBars' style='width:100%'></div>
+
+		<div class='buttonContainer'>
+			<div class='resource' style=''>{{carryOverRate}}</div>
+			<button class='buyButton' ng-click="buyProgressBar()">Buy % Carryover</button>
+			<div class='middleLabel'>It costs <div style='color:red'>{{costCarryOver}}</div></div>
+		</div><div class='buttonContainer'>
+			<div class='resource' style=''>{{secondsBoost}}</div>
+			<button class='buyButton' ng-click="buyProgressBar()">Seconds of Boost</button>
+			<div class='middleLabel'>It costs <div style='color:red'>{{costSecondsBoost}}}}</div></div>
+		</div><div class='buttonContainer'>
+			<div class='resource' style=''>{{count}}</div>
+			<button class='buyButton' ng-click="buyProgressBar()">Buy Progress Bar</button>
+			<div class='middleLabel'>It costs <div style='color:red'>{{cost}}</div></div>
+		</div><div class='buttonContainer'>
+			<div class='resource' style=''>{{gainFirst}}</div>
+			<button class='buyButton' ng-click="buyProgressBar()">Gain for First</button>
+			<div class='middleLabel'>It costs <div style='color:red'>{{costGainFirst}}</div></div>
+		</div><div class='buttonContainer'>
+			<div class='resource' style=''>{{gainAll}}</div>
+			<button class='buyButton' ng-click="buyProgressBar()">Gain for All</button>
+			<div class='middleLabel'>It costs <div style='color:red'>{{costGainAll}}</div></div>
+		</div><div class='buttonContainer'>
+	</div>
+
+</body>
+</html>
+
+<script>
+//general vars
+started = 0
+timeList = [];
+totalTicks = 0
+timer = 0;
+timeFactor=1
+carryOverRate = 20
+gainAll = 1
+
+
+//game important vars
+rowTimeRate = .01*timeFactor
+
+//custom vars to debug
+maxRows=8;
+
+var app = angular.module('myApp', []);
+app.controller('myCtrl', function($scope, $interval, $compile) {
+	//ang vars
+	$scope.progress = []
+	//ang game vars
+	$scope.count=0
+	$scope.cost=5
+	$scope.secondsBoost=
+	$scope.costSecondsBoost=
+	$scope.=
+	$scope.=
+	$scope.gainAll=1
+	$scope.costGainAll=200
+	$scope.gainFirst=4
+	$scope.costGainFirst = 10
+	tickTemp1 = timer;
+	
+	$scope.tick = function() {
+		if(timeFactor-1>=1) {
+			timeFactor-- //todo right
+			return
+		}
+		timer++
+		timeList.push(new Date().getTime())
+		if(timeList.length > 100) {
+			timeList.splice(0, 1)
+			timeFactor
+			fps = 50/calcAverageTime()*10
+			if(fps < 80) { //slow down if you start lagging
+				timeFactor *= 2
+			}
+			document.getElementById("fps").innerHTML = round(fps*(timeFactor))+"% fps";
+		}
+		
+		$scope.checkAllRows()
+		
+		if(maxRows > 0 && timer - tickTemp1 >= 50) {
+			$scope.addAndRefreshProgressBar()
+			maxRows--;
+			tickTemp1 = timer
+		}
+	}
+	
+	$scope.checkAllRows = function() {
+		for(lx = 0; lx < $scope.progress.length ; lx++) {
+			$scope.checkRowProgress(lx)
+		}
+	}
+	
+	$scope.buyProgressBar = function() {
+		if($scope.count >= $scope.cost) {
+			$scope.addAndRefreshProgressBar()
+			$scope.count=Math.floor($scope.count-$scope.cost*1000)/1000
+			$scope.cost=Math.floor((1.1*$scope.cost)*1000)/1000												//main cost
+		}
+	}
+	
+	$scope.addAndRefreshProgressBar = function() {
+		$scope.addProgressBar()
+		$scope.refreshProgressBar()
+	}
+	
+	$scope.addProgressBar = function() {
+		$scope.progress.push(100)
+	}
+	
+	$scope.refreshProgressBar = function() {
+		extraClass = ""
+		extraClass2=""
+		if($scope.progress.length==1) {
+			extraClass = "firstProgressOuter"
+			extraClass2 = "firstProgressInner"
+		}
+		var newDirective = angular.element("<div class='progressOuter "+extraClass+"'>"+
+		"<div id='progressInner"+($scope.progress.length-1)+"' class='progressInner "+extraClass2+"'"+
+		"style='width:{{progress["+($scope.progress.length-1)+"]}}%'></div></div>");
+		$("#progressBars").append(newDirective);
+		$compile(newDirective)($scope);
+	}
+	
+	$scope.checkRowProgress = function(row) {
+		boostRate = 0
+		
+		$scope.progress[row]-=rowTimeRate*boostRate
+		if($scope.progress[row] <= 0) {
+			$scope.count+=gainAll														//main gain
+			$scope.progress[row] += 100
+			if(row==0) {
+				$scope.count+=gainFirst
+			} else if(row != 0) {
+				$scope.progress[row-1]-=carryOverRate
+				$scope.isBoosted[row-1]+=1
+			}
+			
+																									//main boost
+			
+		}
+	}
+	
+	$interval(function() { if(!stop) $scope.tick(); }, 5);
+});
+stop=0
+
+
+function calcAverageTime() {
+	total = 0;
+	for(x = 1; x < timeList.length; x++) {
+		total += timeList[x] - timeList[x-1]
+	}
+	return total / timeList.length
+}
+
+//I need my helper functions .
+</script>
+
+
+<!--<script src="spells.js"></script>
+<script src="mapvalues.js"></script>
+<script src="classes.js"></script>
+<script src="manualActions.js"></script>
+<script src="pullofwar.js"></script>
+<script src="graphics.js"></script>
+<script src="handleSavingPull.js"></script>-->
+

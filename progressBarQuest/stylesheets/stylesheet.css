@@ -1,0 +1,59 @@
+
+
+div{
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    display:inline-block;
+}
+.number {
+    color:black;
+  vertical-align: top;
+}
+.progressOuter {
+	width:100%;
+	height:30px;
+	background-color: black;
+	position:relative;
+	text-align:left;
+}
+.progressInner {
+	background-color:red;
+	height:15px;
+	top:8px;
+	position:absolute;
+	
+}
+.middleLabel {
+	text-align:center;
+	font-size:16px;
+	position:relative;
+	display:block;
+}
+.firstProgressOuter {
+	background-color:#424242;
+}
+.firstProgressInner {
+	background-color:yellow;
+}
+.buttonContainer {
+	width:20%;
+	vertical-align:top;
+}
+.buyButton {
+	width:90px;
+	height:80px;
+	margin-bottom:20px;
+	font-size:18px;
+	margin-top:30px;
+}
+.resource {
+	font-size:20px;
+	margin-top:5px;
+	margin-bottom:5px;
+	display:block;
+	color:blue
+}
