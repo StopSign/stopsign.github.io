@@ -40,8 +40,9 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 		if(timeList.length > 100) {
 			timeList.splice(0, 1)
 			
-			$scope.fps = 50/calcAverageTime()*10
-			multFromFps = 100/$scope.fps
+			var fps = 50/calcAverageTime()*10
+			multFromFps = 100/fps
+			$scope.fps = round(fps)
 			//TODO Reduce the lag, don't just compensate for it.
 		}
 		
@@ -221,8 +222,10 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 		function round1(num) {
 			return Math.floor(num*10)/10
 		}
-
-		function formatNumber(num) {
+		
+		function round(num) {
+			return formatNumber(num);
+		} function formatNumber(num) {
 			return Math.floor(num).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 		}
 	}
