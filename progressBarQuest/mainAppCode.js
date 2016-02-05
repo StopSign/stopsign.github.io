@@ -87,6 +87,7 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 	}
 	$scope.addProgressBarData = function() {
 		$scope.progress.push(100)
+		//TODO make more data initially, data-driven it
 	}
 	
 	//--------------------------------------------------
