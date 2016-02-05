@@ -19,7 +19,7 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 	//ang vars
 	$scope.progress = []
 	
-	//ang game vars
+	//ang game&graphics vars
 	$scope.count=8
 	$scope.cost=5
 	$scope.secondsBoost=1
@@ -29,7 +29,7 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 	$scope.gainAll=5
 	$scope.costGainAll=200
 	$scope.gainFirst=40
-	$scope.costGainFirst =10
+	$scope.costGainFirst=10
 	tickTemp1 = timer;
 	
 	$scope.tick = function() {

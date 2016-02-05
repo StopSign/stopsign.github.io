@@ -1,5 +1,6 @@
-
-
+/* -------------------------------------------- */
+/* 					universal							   */
+/* -------------------------------------------- */
 div{
     -webkit-touch-callout: none;
     -webkit-user-select: none;
@@ -9,11 +10,10 @@ div{
     user-select: none;
     display:inline-block;
 }
-.number {
-    color:black;
-  vertical-align: top;
-}
-/* Progress Bar stuff*/
+
+/* -------------------------------------------- */
+/* 			Progress Bar specific					   */
+/* -------------------------------------------- */
 .progressOuter {
 	width:100%;
 	height:15px;
@@ -61,6 +61,19 @@ div{
 	width:20%;
 	vertical-align:top;
 }
+.countCost {
+	color:red;
+	width:40%;
+	background-color:#A9FFFF;
+}
+
+/* -------------------------------------------- */
+/* 						helper 							   */
+/* -------------------------------------------- */
+.number {
+    color:black;
+  vertical-align: top;
+}
 .buyButton {
 	width:90px;
 	height:80px;
@@ -77,11 +90,6 @@ div{
 	background-color:#A9FFFF;
 	width:50%;
 	margin-left:25%;
-}
-.countCost {
-	color:red;
-	width:40%;
-	background-color:#A9FFFF;
 }
 .hyperVisible {
     text-shadow:
