@@ -20,8 +20,8 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 	$scope.progress = []
 	
 	//ang game&graphics vars
-	$scope.count=8
-	$scope.cost=5
+	$scope.theResource=8
+	$scope.costBuyRow=5
 	$scope.secondsBoost=1
 	$scope.costSecondsBoost=200
 	$scope.carryOverRate =0
@@ -31,6 +31,8 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 	$scope.gainFirst=40
 	$scope.costGainFirst=10
 	tickTemp1 = timer;
+	//Button Creation
+	
 	
 	$scope.tick = function() {
 		justSpliced = 0
@@ -56,6 +58,7 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 			tickTemp1 = timer
 		}
 	}
+	
 	//--------------------------------------------------
 	//--------------application functions------------
 	//--------------------------------------------------
@@ -71,10 +74,10 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 		rowTimeRate = rowTimeRateStarting * lagHandler;
 		$scope.progress[row]-=rowTimeRate
 		if($scope.progress[row] <= 0) {
-			$scope.count+=$scope.gainAll
+			$scope.theResource+=$scope.gainAll
 			$scope.progress[row] += 100
 			if(row==0) {
-				$scope.count+=$scope.gainFirst
+				$scope.theResource+=$scope.gainFirst
 			} else if(row != 0) {
 				$scope.progress[row-1]-=$scope.carryOverRate
 			}
@@ -95,53 +98,48 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 	//--------------------------------------------------
 	
 	$scope.buyPrcCarryover = function() {
-		if($scope.count >= $scope.costCarryOver) {
+		if($scope.theResource >= $scope.costCarryOver) {
+			$scope.costCarryOver= Math.ceil(1.1* $scope.costCarryOver) //cost increase
+			$scope.theResource-= $scope.costCarryOver //cost
+			
 			//increase a var when you click the button
-			console.log('buying Prc Carryover');
 			$scope.carryOverRate++
-			//cost & cost increase
-			$scope.count=$scope.count-$scope.costCarryOver
-			$scope.costCarryOver=Math.ceil(1.1*$scope.costCarryOver)
 		}
 	}
 	$scope.buySecondsBoost = function() {
-		if($scope.count >= $scope.costSecondsBoost) {
+		if($scope.theResource >= $scope.costSecondsBoost) {
+			$scope.costSecondsBoost= Math.ceil(1.1* $scope.costSecondsBoost) //cost increase
+			$scope.theResource-= $scope.costSecondsBoost //cost
+			
 			//increase a var when you click the button
-			console.log('buying Seconds Boost');
 			$scope.secondsBoost++
-			//cost & cost increase
-			$scope.count=$scope.count-$scope.costSecondsBoost
-			$scope.costSecondsBoost=Math.ceil(1.1*$scope.costSecondsBoost)
 		}
 	}
 	$scope.buyProgressBar = function() {
-		if($scope.count >= $scope.cost) {
+		if($scope.theResource >= $scope.costBuyRow) {
+			$scope.costBuyRow= Math.ceil(1.1* $scope.costBuyRow) //cost increase
+			$scope.theResource-= $scope.costBuyRow //cost
+			
 			//increase a var when you click the button
-			console.log('buying progress bar');
 			$scope.addProgressBar()
-			//cost & cost increase
-			$scope.count=$scope.count-$scope.cost
-			$scope.cost=round2(1.1*$scope.cost)
 		}
 	}
 	$scope.buyGainFirst = function() {
-		if($scope.count >= $scope.costGainFirst) {
+		if($scope.theResource >= $scope.costGainFirst) {
+			$scope.costGainFirst= Math.ceil(1.1* $scope.costGainFirst) //cost increase
+			$scope.theResource-= $scope.costGainFirst //cost
+			
 			//increase a var when you click the button
-			console.log('buying Gain First');
 			$scope.gainFirst+=3
-			//cost & cost increase
-			$scope.count=$scope.count-$scope.costGainFirst
-			$scope.costGainFirst=Math.ceil(1.1*$scope.costGainFirst)
 		}
 	}
 	$scope.buyGainAll = function() {
-		if($scope.count >= $scope.costGainAll) {
+		if($scope.theResource >= $scope.costGainAll) {
+			$scope.costGainAll= Math.ceil(1.1* $scope.costGainAll) //cost increase
+			$scope.theResource-= $scope.costGainAll //cost
+			
 			//increase a var when you click the button
-			console.log('buying Gain All');
 			$scope.gainAll++
-			//cost & cost increase
-			$scope.count=$scope.count-$scope.costGainAll
-			$scope.costGainAll=Math.ceil(1.1*$scope.costGainAll)
 		}
 	}
 	
