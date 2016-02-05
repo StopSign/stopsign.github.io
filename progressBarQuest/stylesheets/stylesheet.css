@@ -9,6 +9,7 @@ div{
     -ms-user-select: none;
     user-select: none;
     display:inline-block;
+	margin-top:0;
 }
 
 /* -------------------------------------------- */
@@ -101,4 +102,5 @@ div{
 .objectContainer {
 	width:100%;
 	font-size:0;
+	margin:0;
 }

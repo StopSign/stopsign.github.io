@@ -6,6 +6,10 @@ In common:
 	keeping track of it for the row (class?)
 	css changers for dynamic linking
 
+notes:
+have a buffer of progress left, and add and take 100 from it upon completion.
+Have a slider to allow taking x2 (double speed), but at .9x the effect
+
 Variants:
 Row completion temporarily improves speed of row above it
 	New row costs
