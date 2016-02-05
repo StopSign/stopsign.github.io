@@ -1,38 +1,25 @@
+fix space at left
+revert to just adding a progress bar / no colors
 
-1/28
+2 versions:
+yellow at top (resource), blue at bottom (driver), 
+	all progress running at start
+	progress completion = 20% lower of the one above
+	Current
+		new progress bar is cost of money
+		fix buy progres
 
-Reorganize the Code and Structure and
-Use Angular to
-Re-Skin the Visuals
-
-or [O] Organize, [A] Angular, [V] Visuals
-
-TODOs:
-
-
+All red, 
+	Bottom progress running at start
+	upgrades are entirely on driver
+	money is gained from progress of top
+	progress bars can be added/removed at will
+	extra progress bars 
 	
-remove left/right:direction distinction with us/them:allegiance?
-
-
-
-re-do the structure of holding allied/enemy data
-	Remove concept of typeNum entirely
-		This is 100% spaghetti
-		Think of it like a table name that has IDs 1-4
-	Split the single 
+In common:
+	thinner bars
+	different numbers besides 0-100
+	individual growth rates
+	keeping track of it for the row (class?)
 	
-
-
-go through every line in every function and re-implement/improve/rename to higher standards.
-	remove unused comments
-		helpersUI
-	30 mins a day?
-
-
-
-
-
-
-
-
-
+	

@@ -15,17 +15,22 @@ div{
 }
 .progressOuter {
 	width:100%;
-	height:30px;
+	height:15px;
 	background-color: black;
 	position:relative;
 	text-align:left;
 }
 .progressInner {
 	background-color:red;
-	height:15px;
-	top:8px;
+	height:9px;
+	top:3px;
 	position:absolute;
-	
+}
+.progressExp {
+	background-color:white;
+	height:3px;
+	top:12px;
+	position:absolute;
 }
 .middleLabel {
 	text-align:center;
