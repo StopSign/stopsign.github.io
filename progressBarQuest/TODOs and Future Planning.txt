@@ -1,10 +1,10 @@
-fix space at left
+BUG: holding enter when buying sometimes causes negative numbers.
+what?
 
 In common:
 	different numbers besides 0-100
 	individual growth rates
 	keeping track of it for the row (class?)
-	css changers for dynamic linking
 
 notes:
 have a buffer of progress left, and add and take 100 from it upon completion.
