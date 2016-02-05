@@ -6,8 +6,6 @@ timeList = [];
 totalTicks = 0
 timer = 0;
 lagHandler=1
-lagTimer = 0
-
 
 
 //game important vars
@@ -20,12 +18,13 @@ var app = angular.module('myApp', []);
 app.controller('myCtrl', function($scope, $interval, $compile) {
 	//ang vars
 	$scope.progress = []
+	
 	//ang game vars
 	$scope.count=8
 	$scope.cost=5
 	$scope.secondsBoost=1
 	$scope.costSecondsBoost=200
-	$scope.carryOverRate =20
+	$scope.carryOverRate =0
 	$scope.costCarryOver=400
 	$scope.gainAll=5
 	$scope.costGainAll=200
@@ -41,23 +40,18 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 			timeList.splice(0, 1)
 			justSpliced = 1
 		}
-		if(lagTimer-timer >= 0) {
-			return;
-		}
 		if(justSpliced) {
 			fps = 50/calcAverageTime()*10
 			lagHandler = 100/fps
-			document.getElementById("fps").innerHTML = round(fps)+"% fps";
-			console.log(fps+" and "+lagHandler)
-			//if(fps < 80)
-			//	lagTimer=timer+2
+			document.getElementById("fps").innerHTML = formatNumber(fps)+"% fps";
+			//TODO Reduce the lag, don't just compensate for it.
 		}
 		
-		$scope.checkAllRows()
+		$scope.updateProgressForAllRows()
 		
 		//manual addition to give starting rows
 		if(maxRows > 0 && timer - tickTemp1 >= 5) {
-			$scope.addAndRefreshProgressBar()
+			$scope.addProgressBar()
 			maxRows--;
 			tickTemp1 = timer
 		}
@@ -66,15 +60,14 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 	//--------------application functions------------
 	//--------------------------------------------------
 	
-	$scope.checkAllRows = function() {
-		console.log($scope.progress[0])
+	$scope.updateProgressForAllRows = function() {
 		for(lx = 0; lx < $scope.progress.length ; lx++) {
-			$scope.checkRowProgress(lx)
+			$scope.updateRowProgress(lx)
 		}
 	}
 	
 	//main game progress
-	$scope.checkRowProgress = function(row) {
+	$scope.updateRowProgress = function(row) {
 		rowTimeRate = rowTimeRateStarting * lagHandler;
 		$scope.progress[row]-=rowTimeRate
 		if($scope.progress[row] <= 0) {
@@ -87,7 +80,12 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 			}
 		}
 	}
+	
 	$scope.addProgressBar = function() {
+		$scope.addProgressBarData()
+		$scope.addProgressBarUI()
+	}
+	$scope.addProgressBarData = function() {
 		$scope.progress.push(100)
 	}
 	
@@ -119,10 +117,10 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 		if($scope.count >= $scope.cost) {
 			//increase a var when you click the button
 			console.log('buying progress bar');
-			$scope.addAndRefreshProgressBar()
+			$scope.addProgressBar()
 			//cost & cost increase
 			$scope.count=$scope.count-$scope.cost
-			$scope.cost=Math.ceil(1.1*$scope.cost)
+			$scope.cost=round2(1.1*$scope.cost)
 		}
 	}
 	$scope.buyGainFirst = function() {
@@ -151,20 +149,22 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 	//--------------------------------------------------
 	
 	
-	$scope.addAndRefreshProgressBar = function() {
-		$scope.addProgressBar()
-		$scope.refreshProgressBar()
-	}
-	$scope.refreshProgressBar = function() {
-		extraClass = ""
-		extraClass2=""
-		if($scope.progress.length==1) {
+	
+	$scope.addProgressBarUI = function() {
+		extraClass = extraClass2 = ""
+		curRowCount = $scope.progress.length
+		if(curRowCount==1) {
 			extraClass = "firstProgressOuter"
 			extraClass2 = "firstProgressInner"
 		}
-		var newDirective = angular.element("<div class='progressOuter "+extraClass+"'>"+
-		"<div id='progressInner"+($scope.progress.length-1)+"' class='progressInner "+extraClass2+"'"+
-		"style='width:{{progress["+($scope.progress.length-1)+"]}}%'></div></div>");
+		
+		var newDirective = angular.element(
+		"<div class='progressOuter "+extraClass+"'>"+
+			"<div id='progressInner"+(curRowCount-1)+"' class='progressInner "+extraClass2+"'"+
+				"style='width:{{progress["+(curRowCount-1)+"]}}%'>"+
+			"</div>"+
+		"</div>"
+		);
 		$("#progressBars").append(newDirective);
 		$compile(newDirective)($scope);
 	}
@@ -178,26 +178,6 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 stop=0
 
 //--------------------------------------------------
-//--------------General Utilities---------------
+//-------------------General Utilities---------------
 //--------------------------------------------------
-	
-
-function calcAverageTime() {
-	total = 0;
-	for(x = 1; x < timeList.length; x++) {
-		total += timeList[x] - timeList[x-1]
-	}
-	return total / timeList.length
-}
-
-function round3(num) {
-	return Math.floor(num*1000)/1000
-}
-function round2(num) {
-	return Math.floor(num*100)/100
-}
-function round1(num) {
-	return Math.floor(num*10)/10
-}
-
-
+//Are found at /generalHelpers.js
