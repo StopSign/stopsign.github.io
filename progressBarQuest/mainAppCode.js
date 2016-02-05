@@ -35,14 +35,11 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 	{//----------------Starting Point-----------------
 	
 	$scope.tick = function() {
-		justSpliced = 0
 		timer++
 		timeList.push(new Date().getTime())
 		if(timeList.length > 100) {
 			timeList.splice(0, 1)
-			justSpliced = 1
-		}
-		if(justSpliced) {
+			
 			$scope.fps = 50/calcAverageTime()*10
 			multFromFps = 100/$scope.fps
 			//TODO Reduce the lag, don't just compensate for it.
