@@ -11,7 +11,7 @@ lagTimer = 0
 
 
 //game important vars
-rowTimeRate = .2*lagHandler
+rowTimeRateStarting = .2
 
 //custom vars to debug
 maxRows=28;
@@ -49,8 +49,8 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 			lagHandler = 100/fps
 			document.getElementById("fps").innerHTML = round(fps)+"% fps";
 			console.log(fps+" and "+lagHandler)
-			if(fps < 80)
-				lagTimer=timer+2
+			//if(fps < 80)
+			//	lagTimer=timer+2
 		}
 		
 		$scope.checkAllRows()
@@ -67,6 +67,7 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 	//--------------------------------------------------
 	
 	$scope.checkAllRows = function() {
+		console.log($scope.progress[0])
 		for(lx = 0; lx < $scope.progress.length ; lx++) {
 			$scope.checkRowProgress(lx)
 		}
@@ -74,6 +75,7 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 	
 	//main game progress
 	$scope.checkRowProgress = function(row) {
+		rowTimeRate = rowTimeRateStarting * lagHandler;
 		$scope.progress[row]-=rowTimeRate
 		if($scope.progress[row] <= 0) {
 			$scope.count+=$scope.gainAll
