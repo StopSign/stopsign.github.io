@@ -31,7 +31,7 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 	$scope.gainFirst=40
 	$scope.costGainFirst=10
 	tickTemp1 = timer;
-	//Button Creation
+	//Button Creation are below the functions
 	
 	
 	$scope.tick = function() {
@@ -59,40 +59,40 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 		}
 	}
 	
-	//--------------------------------------------------
-	//--------------application functions------------
-	//--------------------------------------------------
 	
-	$scope.updateProgressForAllRows = function() {
-		for(lx = 0; lx < $scope.progress.length ; lx++) {
-			$scope.updateRowProgress(lx)
-		}
-	}
+	{ //--------------application functions------------
 	
-	//main game progress
-	$scope.updateRowProgress = function(row) {
-		rowTimeRate = rowTimeRateStarting * lagHandler;
-		$scope.progress[row]-=rowTimeRate
-		if($scope.progress[row] <= 0) {
-			$scope.theResource+=$scope.gainAll
-			$scope.progress[row] += 100
-			if(row==0) {
-				$scope.theResource+=$scope.gainFirst
-			} else if(row != 0) {
-				$scope.progress[row-1]-=$scope.carryOverRate
+		$scope.updateProgressForAllRows = function() {
+			for(lx = 0; lx < $scope.progress.length ; lx++) {
+				$scope.updateRowProgress(lx)
 			}
 		}
-	}
+		
+		//main game progress
+		$scope.updateRowProgress = function(row) {
+			rowTimeRate = rowTimeRateStarting * lagHandler;
+			$scope.progress[row]-=rowTimeRate
+			if($scope.progress[row] <= 0) {
+				$scope.theResource+=$scope.gainAll
+				$scope.progress[row] += 100
+				if(row==0) {
+					$scope.theResource+=$scope.gainFirst
+				} else if(row != 0) {
+					$scope.progress[row-1]-=$scope.carryOverRate
+				}
+			}
+		}
+		
+		$scope.addProgressBar = function() {
+			$scope.addProgressBarData()
+			$scope.addProgressBarUI()
+		}
+		$scope.addProgressBarData = function() {
+			$scope.progress.push(100)
+			//TODO make more data initially, data-driven it
+		}
 	
-	$scope.addProgressBar = function() {
-		$scope.addProgressBarData()
-		$scope.addProgressBarUI()
 	}
-	$scope.addProgressBarData = function() {
-		$scope.progress.push(100)
-		//TODO make more data initially, data-driven it
-	}
-	
 	//--------------------------------------------------
 	//--------------buyButtonClicks-----------------
 	//--------------------------------------------------
@@ -168,6 +168,36 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 		$compile(newDirective)($scope);
 	}
 	
+	/*Parameters:
+	@buttonText - the text to appear on the button
+	@topNumVarName - the number displayed at the top of the button container
+	@topNumColor - the color of displayed topNumVar
+	@onClickFunctionName - the name of the function to put in the ng-click. "hello" becomes ng-click="hello()"
+	@costVarName - the name of the cost amount variable
+	@botNumColor - the color of displayed costVar
+	*/
+	$scope.addBuyButtonTemplate = function(buttonText, topNumVarName, 
+		topNumColor, onClickFunctionName, costVarName, botNumColor) {
+		
+		//make an element
+		var newDirective = angular.element(
+		"<div class='buttonContainer'>"+
+			"<div class='resource hyperVisible' style='color:"+topNumColor+"'>{{"+topNumVarName+"}}</div>"+
+			"<button class='buyButton' ng-click='"+onClickFunctionName+"()'>"+buttonText+"</button>"+
+			"<div class='middleLabel'>It costs <div class='countCost hyperVisible' style='color:"+botNumColor+"'>{{"+costVarName+"}}</div></div>"+
+		"</div>"
+		);
+		$("#buttons").append(newDirective); //add the element
+		$compile(newDirective)($scope); //re-compile (so it picks up the angular vars)
+	}
+	
+	//This stuff belongs in a database.
+	$scope.addBuyButtonTemplate("Buy % Carryover", "carryOverRate", "blue", "buyPrcCarryover", "costCarryOver", "red")
+	$scope.addBuyButtonTemplate("Seconds of Boost", "secondsBoost", "blue", "buySecondsBoost", "costSecondsBoost", "red")
+	$scope.addBuyButtonTemplate("Buy Progress Bar", "theResource", "red", "buyProgressBar", "costBuyRow", "red")
+	$scope.addBuyButtonTemplate("Gain for First", "gainFirst", "blue", "buyGainFirst", "costGainFirst", "red")
+	$scope.addBuyButtonTemplate("Gain for All", "gainAll", "blue", "buyGainAll", "costGainAll", "red")
+	
 	//this is the main thing that keeps the timer running
 	//this way doesn't work when javascript is open in a different tab
 	//javascript will default change the 5 to minimum 500 in that case
@@ -176,7 +206,4 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 });
 stop=0
 
-//--------------------------------------------------
-//-------------------General Utilities---------------
-//--------------------------------------------------
-//Are found at /generalHelpers.js
+//General utilities are found at /generalHelpers.js
