@@ -11,10 +11,10 @@ lagTimer = 0
 
 
 //game important vars
-rowTimeRate = .1*lagHandler
+rowTimeRate = .2*lagHandler
 
 //custom vars to debug
-maxRows=8;
+maxRows=28;
 
 var app = angular.module('myApp', []);
 app.controller('myCtrl', function($scope, $interval, $compile) {
@@ -27,36 +27,36 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 	$scope.costSecondsBoost=200
 	$scope.carryOverRate =20
 	$scope.costCarryOver=400
-	$scope.gainAll=1
+	$scope.gainAll=5
 	$scope.costGainAll=200
-	$scope.gainFirst=4
+	$scope.gainFirst=40
 	$scope.costGainFirst =10
 	tickTemp1 = timer;
 	
 	$scope.tick = function() {
-		
-		if(lagTimer) {
-			lagTimer--;
-			return;
-		}
-		
+		justSpliced = 0
 		timer++
 		timeList.push(new Date().getTime())
 		if(timeList.length > 100) {
 			timeList.splice(0, 1)
-			lagHandler
+			justSpliced = 1
+		}
+		if(lagTimer-timer >= 0) {
+			return;
+		}
+		if(justSpliced) {
 			fps = 50/calcAverageTime()*10
-			if(fps < 80) { //slow down if you start lagging
-				lagHandler *= 2
-				lagTimer = lagHandler - 1;
-				console.log(lagHandler)
-			}
-			document.getElementById("fps").innerHTML = round(fps*(lagHandler))+"% fps";
+			lagHandler = 100/fps
+			document.getElementById("fps").innerHTML = round(fps)+"% fps";
+			console.log(fps+" and "+lagHandler)
+			if(fps < 80)
+				lagTimer=timer+2
 		}
 		
 		$scope.checkAllRows()
 		
-		if(maxRows > 0 && timer - tickTemp1 >= 50) {
+		//manual addition to give starting rows
+		if(maxRows > 0 && timer - tickTemp1 >= 5) {
 			$scope.addAndRefreshProgressBar()
 			maxRows--;
 			tickTemp1 = timer
@@ -74,7 +74,7 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 	
 	//main game progress
 	$scope.checkRowProgress = function(row) {
-		$scope.progress[row]-=rowTimeRate*lagHandler
+		$scope.progress[row]-=rowTimeRate
 		if($scope.progress[row] <= 0) {
 			$scope.count+=$scope.gainAll
 			$scope.progress[row] += 100
@@ -85,7 +85,6 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 			}
 		}
 	}
-	
 	$scope.addProgressBar = function() {
 		$scope.progress.push(100)
 	}
@@ -100,8 +99,8 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 			console.log('buying Prc Carryover');
 			$scope.carryOverRate++
 			//cost & cost increase
-			$scope.count=parseInt(round2($scope.count-$scope.costCarryOver))
-			$scope.costCarryOver=round2(1.1*$scope.costCarryOver)
+			$scope.count=$scope.count-$scope.costCarryOver
+			$scope.costCarryOver=Math.ceil(1.1*$scope.costCarryOver)
 		}
 	}
 	$scope.buySecondsBoost = function() {
@@ -110,8 +109,8 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 			console.log('buying Seconds Boost');
 			$scope.secondsBoost++
 			//cost & cost increase
-			$scope.count=parseInt(round2($scope.count-$scope.costSecondsBoost))
-			$scope.costSecondsBoost=round2(1.1*$scope.costSecondsBoost)
+			$scope.count=$scope.count-$scope.costSecondsBoost
+			$scope.costSecondsBoost=Math.ceil(1.1*$scope.costSecondsBoost)
 		}
 	}
 	$scope.buyProgressBar = function() {
@@ -120,18 +119,18 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 			console.log('buying progress bar');
 			$scope.addAndRefreshProgressBar()
 			//cost & cost increase
-			$scope.count=parseInt(round2($scope.count-$scope.cost))
-			$scope.cost=round2(1.1*$scope.cost)
+			$scope.count=$scope.count-$scope.cost
+			$scope.cost=Math.ceil(1.1*$scope.cost)
 		}
 	}
 	$scope.buyGainFirst = function() {
 		if($scope.count >= $scope.costGainFirst) {
 			//increase a var when you click the button
 			console.log('buying Gain First');
-			$scope.gainFirst++
+			$scope.gainFirst+=3
 			//cost & cost increase
-			$scope.count=parseInt(round2($scope.count-$scope.costGainFirst))
-			$scope.costGainFirst=round2(1.1*$scope.costGainFirst)
+			$scope.count=$scope.count-$scope.costGainFirst
+			$scope.costGainFirst=Math.ceil(1.1*$scope.costGainFirst)
 		}
 	}
 	$scope.buyGainAll = function() {
@@ -140,8 +139,8 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 			console.log('buying Gain All');
 			$scope.gainAll++
 			//cost & cost increase
-			$scope.count=parseInt(round2($scope.count-$scope.costGainAll))
-			$scope.costGainAll=round2(1.1*$scope.costGainAll)
+			$scope.count=$scope.count-$scope.costGainAll
+			$scope.costGainAll=Math.ceil(1.1*$scope.costGainAll)
 		}
 	}
 	
@@ -198,7 +197,5 @@ function round2(num) {
 function round1(num) {
 	return Math.floor(num*10)/10
 }
-
-
 
 

@@ -13,6 +13,7 @@ div{
     color:black;
   vertical-align: top;
 }
+/* Progress Bar stuff*/
 .progressOuter {
 	width:100%;
 	height:15px;
@@ -22,8 +23,8 @@ div{
 }
 .progressInner {
 	background-color:red;
-	height:9px;
-	top:3px;
+	height:11px;
+	top:2px;
 	position:absolute;
 }
 .progressExp {
@@ -32,6 +33,18 @@ div{
 	top:12px;
 	position:absolute;
 }
+.progressOuter:hover {
+	background-color:#0A005F;
+}
+.progressInner:hover .progressOuter{
+	background-color:#0A005F;
+}
+.progressExp:hover .progressOuter{
+	background-color:#0A005F;
+}
+
+
+
 .middleLabel {
 	text-align:center;
 	font-size:16px;
@@ -60,5 +73,20 @@ div{
 	margin-top:5px;
 	margin-bottom:5px;
 	display:block;
-	color:blue
+	color:blue;
+	background-color:#A9FFFF;
+	width:50%;
+	margin-left:25%;
+}
+.countCost {
+	color:red;
+	width:40%;
+	background-color:#A9FFFF;
+}
+.hyperVisible {
+    text-shadow:
+    -1px -1px 0 #000,
+    1px -1px 0 #000,
+    -1px 1px 0 #000,
+    1px 1px 0 #000;
 }

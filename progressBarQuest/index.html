@@ -15,28 +15,28 @@
 <body>
 	<div ng-app="myApp" ng-controller="myCtrl" style='background-color:grey;width:100%;text-align:center;position:absolute;'>
 		<div id='fps' style='text-align:left'></div>
-		<div id='progressBars' style='width:100%'></div>
+		<div id='progressBars' style='width:100%;font-size:0;'></div>
 
 		<div class='buttonContainer'>
-			<div class='resource' style=''>{{carryOverRate}}</div>
+			<div class='resource hyperVisible' style=''>{{carryOverRate}}</div>
 			<button class='buyButton' ng-click="buyPrcCarryover()">Buy % Carryover</button>
-			<div class='middleLabel'>It costs <div style='color:red'>{{costCarryOver}}</div></div>
+			<div class='middleLabel'>It costs <div class='countCost hyperVisible'>{{costCarryOver}}</div></div>
 		</div><div class='buttonContainer'>
-			<div class='resource' style=''>{{secondsBoost}}</div>
+			<div class='resource hyperVisible' style=''>{{secondsBoost}}</div>
 			<button class='buyButton' ng-click="buySecondsBoost()">Seconds of Boost</button>
-			<div class='middleLabel'>It costs <div style='color:red'>{{costSecondsBoost}}</div></div>
+			<div class='middleLabel'>It costs <div class='countCost hyperVisible'>{{costSecondsBoost}}</div></div>
 		</div><div class='buttonContainer'>
-			<div class='resource' style='color:red'>{{count}}</div>
+			<div class='resource hyperVisible' style='color:red'>{{count}}</div>
 			<button class='buyButton' ng-click="buyProgressBar()">Buy Progress Bar</button>
-			<div class='middleLabel'>It costs <div style='color:red'>{{cost}}</div></div>
+			<div class='middleLabel'>It costs <div class='countCost hyperVisible'>{{cost}}</div></div>
 		</div><div class='buttonContainer'>
-			<div class='resource' style=''>{{gainFirst}}</div>
+			<div class='resource hyperVisible' style=''>{{gainFirst}}</div>
 			<button class='buyButton' ng-click="buyGainFirst()">Gain for First</button>
-			<div class='middleLabel'>It costs <div style='color:red'>{{costGainFirst}}</div></div>
+			<div class='middleLabel'>It costs <div class='countCost hyperVisible'>{{costGainFirst}}</div></div>
 		</div><div class='buttonContainer'>
-			<div class='resource' style=''>{{gainAll}}</div>
+			<div class='resource hyperVisible' style=''>{{gainAll}}</div>
 			<button class='buyButton' ng-click="buyGainAll()">Gain for All</button>
-			<div class='middleLabel'>It costs <div style='color:red'>{{costGainAll}}</div></div>
+			<div class='middleLabel'>It costs <div class='countCost hyperVisible'>{{costGainAll}}</div></div>
 		</div><div class='buttonContainer'>
 	</div>
 
