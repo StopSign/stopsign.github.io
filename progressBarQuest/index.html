@@ -8,20 +8,19 @@
 		<script src="https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
 		<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
 	</head>
-	<body class='objectContainer'>
-		<div ng-app="myApp" ng-controller="myCtrl" style='background-color:grey;width:100%;text-align:center;position:absolute;margin-top:0;'>
-				<div id='fps' style='text-align:left;font-size:14px'>{{fps}}% fps</div>
-				<div id='progressBars' class='objectContainer'></div>
-				<div id='buttons' class='objectContainer'></div>
-				
-				<div style='width:100%;font-size: 16px;margin-top:10px;text-align:center;'>To mass-buy, click a button then hold Enter</div>
-		</div>
+	<body ng-app="myApp" ng-controller="myCtrl" class='objectContainer' style='text-align:center;position:absolute;'>\
+		<div id='fps' style='text-align:left;font-size:14px'>{{fps}}% fps</div>
+		<div ng-click="testSettings()" class='testSettingsButton hyperVisible'>Test Settings</div>
+		<div id='progressBars' class='objectContainer'></div>
+		<div id='buttons' class='objectContainer'></div>
+
+		<div style='width:100%;font-size: 16px;margin-top:10px;text-align:center;'>To mass-buy, click a button then hold Enter</div>
 	</body>
 </html>
 
 <script>
 //the answer to "how to i access scope variables from console"
-//angular.element($0).scope().progress
+//angular.element($0).scope()
 
 
 var app = angular.module('myApp', []);
@@ -36,24 +35,27 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 	{//------------Initial Variable Settings-----------
 
 		//not public-facing game vars
-		rowTimeRateStarting = .01
-		maxRows=7;
+		rowTimeRateStarting = .05
+		initialRowCount=7;
 		
 		//ang both game & graphics vars
-		$scope.theResource=8
+		$scope.theResource=0
 		$scope.costBuyRow=5
 		$scope.secondsBoost=1
 		$scope.costSecondsBoost=200
-		$scope.carryOverRate =0
-		$scope.costCarryOver=400
+		$scope.boughtSpeedBonus =0
+		$scope.costSpeedBonus=400
 		$scope.gainAll=5
 		$scope.costGainAll=200
 		$scope.gainFirst=40
 		$scope.costGainFirst=10
 		
-		//debug vars. Comment these out to play how I intend
-		rowTimeRateStarting = .2
-		maxRows=28;
+		//debug vars. Click the in-game button to switch to these
+		$scope.testSettings = function() {
+			rowTimeRateStarting = 1
+			initialRowCount=28;
+			$scope.theResource=280
+		}
 	}
 
 	{//----------------Starting Point-----------------
@@ -64,8 +66,9 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 		if(timeList.length > 100) {
 			timeList.splice(0, 1)
 			
-			var fps = 50/calcAverageTime()*10
+			var fps = msWaitTime/calcAverageTime()*100
 			multFromFps = 100/fps
+			//console.log(calcAverageTime()+","+fps)
 			$scope.fps = round(fps)
 			//TODO Reduce the lag, don't just compensate for it.
 		}
@@ -73,9 +76,8 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 		$scope.updateProgressForAllRows()
 		
 		//manual addition to give starting rows
-		if(maxRows > 0 && timer - tickTemp1 >= 5) {
+		if($scope.progress.length < initialRowCount && timer - tickTemp1 >= 5) {
 			$scope.addProgressBar()
-			maxRows--;
 			tickTemp1 = timer
 		}
 	}
@@ -85,19 +87,19 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 
 
 	{//--------------ng-OnClick Methods-------------
-		$scope.buyPrcCarryover = function() {
-			if($scope.theResource >= $scope.costCarryOver) {
-				$scope.costCarryOver= Math.ceil(1.1* $scope.costCarryOver) //cost increase
-				$scope.theResource-= $scope.costCarryOver //cost
+		$scope.buySpeedBonus = function() {
+			if($scope.theResource >= $scope.costSpeedBonus) {
+				$scope.theResource-= $scope.costSpeedBonus //cost
+				$scope.costSpeedBonus= Math.ceil(1.1* $scope.costSpeedBonus) //cost increase
 				
 				//increase a var when you click the button
-				$scope.carryOverRate++
+				$scope.boughtSpeedBonus++
 			}
 		}
 		$scope.buySecondsBoost = function() {
 			if($scope.theResource >= $scope.costSecondsBoost) {
-				$scope.costSecondsBoost= Math.ceil(1.1* $scope.costSecondsBoost) //cost increase
 				$scope.theResource-= $scope.costSecondsBoost //cost
+				$scope.costSecondsBoost= Math.ceil(1.1* $scope.costSecondsBoost) //cost increase
 				
 				//increase a var when you click the button
 				$scope.secondsBoost++
@@ -105,8 +107,8 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 		}
 		$scope.buyProgressBar = function() {
 			if($scope.theResource >= $scope.costBuyRow) {
-				$scope.costBuyRow= Math.ceil(1.1* $scope.costBuyRow) //cost increase
 				$scope.theResource-= $scope.costBuyRow //cost
+				$scope.costBuyRow= Math.ceil(1.1* $scope.costBuyRow) //cost increase
 				
 				//increase a var when you click the button
 				$scope.addProgressBar()
@@ -114,8 +116,8 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 		}
 		$scope.buyGainFirst = function() {
 			if($scope.theResource >= $scope.costGainFirst) {
-				$scope.costGainFirst= Math.ceil(1.1* $scope.costGainFirst) //cost increase
 				$scope.theResource-= $scope.costGainFirst //cost
+				$scope.costGainFirst= Math.ceil(1.1* $scope.costGainFirst) //cost increase
 				
 				//increase a var when you click the button
 				$scope.gainFirst+=3
@@ -123,8 +125,8 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 		}
 		$scope.buyGainAll = function() {
 			if($scope.theResource >= $scope.costGainAll) {
-				$scope.costGainAll= Math.ceil(1.1* $scope.costGainAll) //cost increase
 				$scope.theResource-= $scope.costGainAll //cost
+				$scope.costGainAll= Math.ceil(1.1* $scope.costGainAll) //cost increase
 				
 				//increase a var when you click the button
 				$scope.gainAll++
@@ -133,7 +135,82 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 	}
 	{//----------------Object Classes-----------------
 		{//---------------Progress Bar Row---------------
+		
+		
+		//red
+		//progressBar(100,  rowTimeRateStarting, 100, 100, true, 
+		
+		
 			//all unique info about a single progress bar (row) is represented here
+			function progressBar (initialProgressReq, initialProgressRate, initialProgress, expToNextLevel, 
+				isExpGainOn, secondsBoostUntilDensityIncrease) {
+				//parameter driven
+				this.progressReq = initialProgressReq
+				this.progressRate = initialProgressRate
+				this.expToNextLevel = expToNextLevel
+				this.progress = initialProgress
+				
+				//declarations
+				this.exp = 0
+				this.level = 1
+				this.totalBoostTicks = 0
+				
+				//So this is 10 seconds on the limit, converted into ticks
+				this.boostTickLimitFromSeconds = Math.floor(secondsBoostUntilDensityIncrease * (1000/ msWaitTime)) 
+				
+				{//Progress Gain Functions
+					this.nextProgressDown = function(variantSpeedBonus, resultOfFinish) {
+						this.progress -= this.progressRate*multFromFps*variantSpeedBonus
+						while(this.progress <= 0) {
+							this.progress += this.progressReq
+							resultOfFinish()
+						}
+					}
+					this.nextProgressUp = function(variantSpeedBonus, resultOfFinish) {
+						this.progress += this.progressRate * multFromFps * variantSpeedBonus
+						while(this.progress >= this.progressReq) {
+							this.progress -= this.progressReq
+							resultOfFinish()
+						}
+					}
+				}
+				{//Level Gain Functions
+					this.nextExp = function(resultOfLevelGain) {
+						this.exp++
+						while(this.exp >= expToNextLevel) {
+							this.exp -= expToNextLevel
+							resultOfLevelGain()
+						}
+					}
+				}
+				{//Boost Functions
+					//will be called on progress completions
+					this.nextBoost = function() {
+						this.totalBoostTicks--
+						if(this.totalBoostTicks <= 0) {
+							this.totalBoostTicks = 0
+						}
+						//TODO only do this when ?boostTicks mod 10 is different? for performance
+						return this.calcBoostBonus()
+					}
+					
+					this.addBoost = function(boostChange) {
+						this.totalBoostTicks+=boostChange
+						return this.calcBoostBonus()
+					}
+					
+					this.calcBoostBonus = function() {
+						//TODO probably a fancier way to do this w/o looping
+						tempMulti = 1
+						tempNum = this.totalBoostTicks
+						while((tempNum/tempMulti) >= this.boostTickLimitFromSeconds) {
+							tempNum -= this.boostTickLimitFromSeconds * tempMulti
+							tempMulti *= 2
+						}
+						return tempMulti
+					}
+				}
+			}
 		}
 		
 	}
@@ -145,7 +222,7 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 		}
 		
 		$scope.updateRowProgress = function(row) { //main game progress
-			rowTimeRate = rowTimeRateStarting * multFromFps;
+			rowTimeRate = rowTimeRateStarting * multFromFps*(1+$scope.boughtSpeedBonus/100)
 			$scope.progress[row]-=rowTimeRate
 			if($scope.progress[row] <= 0) {
 				$scope.theResource+=$scope.gainAll
@@ -153,7 +230,8 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 				if(row==0) {
 					$scope.theResource+=$scope.gainFirst
 				} else if(row != 0) {
-					$scope.progress[row-1]-=$scope.carryOverRate
+					//TODO affect the row above itself
+					//$scope.progress[row-1]-=$scope.boughtSpeedBonus
 				}
 			}
 		}
@@ -170,8 +248,6 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 	}
 		
 	{//--------------Graphics Functions---------------
-		
-		
 		
 		$scope.addProgressBarUI = function() {
 			extraClass = extraClass2 = ""
@@ -218,11 +294,11 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 	{//--------------Initial Graphics Load--------------
 		//This stuff really belongs in a database
 		//function calls are required to be after variable declarations
-		$scope.addBuyButtonTemplate("Buy % Carryover", 	"carryOverRate", 	"blue", 	"buyPrcCarryover", 		"costCarryOver", 			"red")
-		$scope.addBuyButtonTemplate("Seconds of Boost", 	"secondsBoost", 	"blue", 	"buySecondsBoost", 	"costSecondsBoost", 	"red")
-		$scope.addBuyButtonTemplate("Buy Progress Bar", 	"theResource", 		"red", 	"buyProgressBar", 		"costBuyRow", 				"red")
-		$scope.addBuyButtonTemplate("Gain for First", 		"gainFirst", 			"blue", 	"buyGainFirst", 				"costGainFirst", 			"red")
-		$scope.addBuyButtonTemplate("Gain for All", 			"gainAll", 				"blue", 	"buyGainAll", 				"costGainAll", 				"red")
+		$scope.addBuyButtonTemplate("% Global Speed Increase", 	"boughtSpeedBonus", 	"blue", 	"buySpeedBonus", 		"costSpeedBonus", 			"red")
+		$scope.addBuyButtonTemplate("Seconds of Boost", 				"secondsBoost", 			"blue", 	"buySecondsBoost", 	"costSecondsBoost", 	"red")
+		$scope.addBuyButtonTemplate("Buy Progress Bar", 				"theResource", 				"red", 	"buyProgressBar", 		"costBuyRow", 				"red")
+		$scope.addBuyButtonTemplate("Gain for First", 					"gainFirst", 					"blue", 	"buyGainFirst", 				"costGainFirst", 			"red")
+		$scope.addBuyButtonTemplate("Gain for All", 						"gainAll", 						"blue", 	"buyGainAll", 				"costGainAll", 				"red")
 	}
 
 
@@ -259,7 +335,8 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 	//this way doesn't work when javascript is open in a different tab
 	//javascript will default change the 5 to minimum 500 in that case
 	//use interval.js somehow to get around it. google that along with angular?
-	$interval(function() { if(!stop) $scope.tick(); }, 5);
+	msWaitTime = 30
+	$interval(function() { if(!stop) $scope.tick(); }, msWaitTime);
 	}
 });
 </script>

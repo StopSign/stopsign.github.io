@@ -1,5 +1,6 @@
 BUG: holding enter when buying sometimes causes negative numbers.
 what?
+FOUND: cost increase happened before cost was deducted
 
 In common:
 	different numbers besides 0-100
@@ -7,8 +8,11 @@ In common:
 	keeping track of it for the row (class?)
 
 notes:
-have a buffer of progress left, and add and take 100 from it upon completion.
-Have a slider to allow taking x2 (double speed), but at .9x the effect
+exp is grey and hard to see until hover, then it's white
+
+hover works on all nearby rows, not just current
+	color of selection fades out
+
 
 Variants:
 Row completion temporarily improves speed of row above it
