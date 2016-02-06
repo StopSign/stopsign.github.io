@@ -134,21 +134,19 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 		}
 	}
 	{//----------------Object Classes-----------------
-		{//---------------Progress Bar Row---------------
-		
-		
-		//red
-		//progressBar(100,  rowTimeRateStarting, 100, 100, true, 
-		
+		{//Progress Bar
 		
 			//all unique info about a single progress bar (row) is represented here
 			function progressBar (initialProgressReq, initialProgressRate, initialProgress, expToNextLevel, 
-				isExpGainOn, secondsBoostUntilDensityIncrease) {
+				isExpGainOn, secondsBoostUntilDensityIncrease, initialColor) {
+				{//Vars
 				//parameter driven
 				this.progressReq = initialProgressReq
 				this.progressRate = initialProgressRate
 				this.expToNextLevel = expToNextLevel
 				this.progress = initialProgress
+				this.initialColor=initialColor
+				this.color=initialColor
 				
 				//declarations
 				this.exp = 0
@@ -156,8 +154,8 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 				this.totalBoostTicks = 0
 				
 				//So this is 10 seconds on the limit, converted into ticks
-				this.boostTickLimitFromSeconds = Math.floor(secondsBoostUntilDensityIncrease * (1000/ msWaitTime)) 
-				
+				this.boostLimitInTicks = Math.floor(secondsBoostUntilDensityIncrease * (1000/ msWaitTime)) 
+				}
 				{//Progress Gain Functions
 					this.nextProgressDown = function(variantSpeedBonus, resultOfFinish) {
 						this.progress -= this.progressRate*multFromFps*variantSpeedBonus
@@ -186,16 +184,17 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 				{//Boost Functions
 					//will be called on progress completions
 					this.nextBoost = function() {
-						this.totalBoostTicks--
-						if(this.totalBoostTicks <= 0) {
-							this.totalBoostTicks = 0
+						if(this.totalBoostTicks >= 0) {
+							multiFromBoost = this.calcBoostBonus()
+							this.totalBoostTicks-=multiFromBoost
+							//TODO only do this when ?boostTicks mod 10 is different? for performance
+							return this.calcBoostBonus()
 						}
-						//TODO only do this when ?boostTicks mod 10 is different? for performance
-						return this.calcBoostBonus()
+						return 1
 					}
 					
-					this.addBoost = function(boostChange) {
-						this.totalBoostTicks+=boostChange
+					this.addBoost = function(secondsBoostChange) {
+						this.totalBoostTicks += secondsBoostChange * (1000/ msWaitTime)
 						return this.calcBoostBonus()
 					}
 					
@@ -203,13 +202,28 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 						//TODO probably a fancier way to do this w/o looping
 						tempMulti = 1
 						tempNum = this.totalBoostTicks
-						while((tempNum/tempMulti) >= this.boostTickLimitFromSeconds) {
-							tempNum -= this.boostTickLimitFromSeconds * tempMulti
+						while((tempNum/tempMulti) >= this.boostLimitInTicks * tempMulti) {
+							tempNum -= this.boostLimitInTicks * tempMulti
 							tempMulti *= 2
 						}
+						multiToColor(tempMulti)
 						return tempMulti
 					}
 				}
+			
+				{//GUI Functions
+					this.multiToColor = function(multi) {
+						//todo make it more interesting based on initial color
+						if(multi == 1) {
+							this.color = this.initialColor;
+						} else if(multi == 2) {
+							this.color = "blue"
+						} else if(multi == 3) {
+							this.color = "purple"
+						}
+					}
+				}
+			
 			}
 		}
 		
@@ -236,11 +250,18 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 			}
 		}
 		
-		$scope.addProgressBar = function() { //add progress bar (both data and UI)
-			$scope.addProgressBarData()
-			$scope.addProgressBarUI()
+		$scope.addProgressBar = function(type) { //add progress bar (both data and UI)
+			$scope.addProgressBarData(type)
+			$scope.addProgressBarUI(type)
 		}
-		$scope.addProgressBarData = function() { //add progress bar data (UI is in UI section)
+		$scope.addProgressBarData = function(type) { //add progress bar data (UI is in UI section)
+			//function progressBar (initialProgressReq, initialProgressRate, initialProgress, expToNextLevel, 
+			//	isExpGainOn, secondsBoostUntilDensityIncrease, initialColor) {
+			if(type == "first") {
+			
+			} else if(type == "regular") {
+			
+			}
 			$scope.progress.push(100)
 			//TODO make more data initially, data-driven it
 		}
@@ -248,9 +269,16 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 	}
 		
 	{//--------------Graphics Functions---------------
-		
-		$scope.addProgressBarUI = function() {
+		//Types: first
+		$scope.addProgressBarUI = function(type) {
 			extraClass = extraClass2 = ""
+			if(type == "first") {
+				extraClass = "firstProgressOuter"
+				extraClass2 = "firstProgressInner"
+			} else if(type == "regular") {
+			
+			}
+			
 			curRowCount = $scope.progress.length
 			if(curRowCount==1) {
 				extraClass = "firstProgressOuter"
