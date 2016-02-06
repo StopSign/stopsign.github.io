@@ -60,6 +60,7 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 
 	{//----------------Starting Point-----------------
 	
+	firstTime=1
 	$scope.tick = function() {
 		timer++
 		timeList.push(new Date().getTime())
@@ -75,9 +76,13 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 		
 		$scope.updateProgressForAllRows()
 		
+		if(firstTime) {
+			firstTime=0
+			$scope.addProgressBar("first")
+		}
 		//manual addition to give starting rows
 		if($scope.progress.length < initialRowCount && timer - tickTemp1 >= 5) {
-			$scope.addProgressBar()
+			$scope.addProgressBar("regular")
 			tickTemp1 = timer
 		}
 	}
@@ -111,7 +116,7 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 				$scope.costBuyRow= Math.ceil(1.1* $scope.costBuyRow) //cost increase
 				
 				//increase a var when you click the button
-				$scope.addProgressBar()
+				$scope.addProgressBar("regular")
 			}
 		}
 		$scope.buyGainFirst = function() {
@@ -133,7 +138,7 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 			}
 		}
 	}
-	{//----------------Object Classes-----------------
+	{//----------------Object Classes----------------- progressBar,.nextProgressDown,.nextExp,.nextBoost,.addBoost
 		{//Progress Bar
 		
 			//all unique info about a single progress bar (row) is represented here
@@ -228,7 +233,7 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 		}
 		
 	}
-	{//-------------Application Functions--------------
+	{//-------------Application Functions-------------- updateProgressForAllRows, updateRowProgress, addProgressBar, addProgressBarData
 		$scope.updateProgressForAllRows = function() {
 			for(lx = 0; lx < $scope.progress.length ; lx++) {
 				$scope.updateRowProgress(lx)
@@ -236,18 +241,12 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 		}
 		
 		$scope.updateRowProgress = function(row) { //main game progress
-			rowTimeRate = rowTimeRateStarting * multFromFps*(1+$scope.boughtSpeedBonus/100)
-			$scope.progress[row]-=rowTimeRate
-			if($scope.progress[row] <= 0) {
-				$scope.theResource+=$scope.gainAll
-				$scope.progress[row] += 100
-				if(row==0) {
-					$scope.theResource+=$scope.gainFirst
-				} else if(row != 0) {
-					//TODO affect the row above itself
-					//$scope.progress[row-1]-=$scope.boughtSpeedBonus
-				}
-			}
+			//variant specific
+			//console.log($scope.progress)
+			$scope.progress[row].nextProgressDown(1+$scope.boughtSpeedBonus/100, function() { 
+				$scope.theResource += $scope.gainAll 
+				$scope.theResource += (row == 0) ? $scope.gainFirst : 0; //first row, the Collector
+			})
 		}
 		
 		$scope.addProgressBar = function(type) { //add progress bar (both data and UI)
@@ -257,19 +256,19 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 		$scope.addProgressBarData = function(type) { //add progress bar data (UI is in UI section)
 			//function progressBar (initialProgressReq, initialProgressRate, initialProgress, expToNextLevel, 
 			//	isExpGainOn, secondsBoostUntilDensityIncrease, initialColor) {
+			//variant specific
 			if(type == "first") {
-			
+				$scope.progress.push(new progressBar (100, rowTimeRateStarting, 100, 20, true, 10, "yellow"))
+			console.log($scope.progress.length)
 			} else if(type == "regular") {
-			
+				$scope.progress.push(new progressBar (100, rowTimeRateStarting, 100, 20, true, 10, "red"))
 			}
-			$scope.progress.push(100)
-			//TODO make more data initially, data-driven it
 		}
 	
 	}
 		
-	{//--------------Graphics Functions---------------
-		//Types: first
+	//Types: first, regular
+	{//--------------Graphics Functions--------------- addProgressBarUI, addBuyButtonTemplate,
 		$scope.addProgressBarUI = function(type) {
 			extraClass = extraClass2 = ""
 			if(type == "first") {
@@ -288,7 +287,7 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 			var newDirective = angular.element(
 			"<div class='progressOuter "+extraClass+"'>"+
 				"<div id='progressInner"+(curRowCount-1)+"' class='progressInner "+extraClass2+"'"+
-					"style='width:{{progress["+(curRowCount-1)+"]}}%'>"+
+					"style='width:{{progress["+(curRowCount-1)+"].progress}}%'>"+
 				"</div>"+
 			"</div>"
 			);
