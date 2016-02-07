@@ -178,13 +178,14 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 							multiFromBoost = this.calcBoostBonus()
 							this.totalBoostTicks-= multiFromBoost
 							//TODO only do this when ?boostTicks mod 10 is different? for performance
-							return multiFromBoost
+							return multiFromBoost*2
 						}
 						return 1
 					}
 					
 					this.addBoost = function(secondsBoostChange) {
 						this.totalBoostTicks += secondsBoostChange * (1000/ msWaitTime)
+						//console.log(this.totalBoostTicks+", "+new Date().getTime()/1000)
 						return this.calcBoostBonus()
 					}
 					
@@ -203,23 +204,19 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 						//if(this.row==0)
 							//console.log(this.totalBoostTicks+", "+tempMulti)
 						this.multiToColor(tempMulti, leftOverMulti)
-						return tempMulti*2
+						return tempMulti
 					}
 				}
 			
 				{//GUI Functions
 					this.multiToColor = function(multi, leftOverMulti) {
-						//todo make it more interesting based on initial color
-						multiTemp = multi
 						//hsl("+(Math.floor(journeyPoints / questMax*100))+", 100%, 45%)
 						//hsl = Hue Saturation Lightness
 						//Hue is 0-360, 0 is red, 120 is green, 240 is blue. 
 						//Saturation is 0-100, 0 means greyscale and 100 means entirely that color
 						//Lightness is 0-100, 50 is entirely that color, 75 is half color/half white, 25 is half color/half black
-						hue = this.initialColorHue - Math.log2(multi)*60 - leftOverMulti*30;
-						if(Math.log2(multi) == 0) {
-							hue = this.initialColorHue;
-						}
+						hue = this.initialColorHue - Math.log2(multi)*30 - leftOverMulti*15;
+						//console.log(multi+","+(leftOverMulti*100)+","+hue+","+new Date().getTime()/1000)
 						this.color = "hsl("+hue+", 100%, 50%)"
 						
 					}
