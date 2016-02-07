@@ -215,7 +215,7 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 						//Hue is 0-360, 0 is red, 120 is green, 240 is blue. 
 						//Saturation is 0-100, 0 means greyscale and 100 means entirely that color
 						//Lightness is 0-100, 50 is entirely that color, 75 is half color/half white, 25 is half color/half black
-						hue = this.initialColorHue - Math.log2(multi)*30 - leftOverMulti*15;
+						hue = this.initialColorHue - Math.log2(multi)*45 - leftOverMulti*22;
 						//console.log(multi+","+(leftOverMulti*100)+","+hue+","+new Date().getTime()/1000)
 						this.color = "hsl("+hue+", 100%, 50%)"
 						
