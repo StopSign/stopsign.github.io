@@ -36,11 +36,11 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 
 		//not public-facing game vars
 		rowTimeRateStarting = .025
-		initialRowCount=7;
+		initialRowCount=10;
 		
 		//ang both game & graphics vars
 		$scope.theResource=0
-		$scope.costBuyRow=5
+		$scope.costBuyRow=50
 		$scope.secondsBoost=1
 		$scope.costSecondsBoost=40
 		$scope.boughtSpeedBonus =0
@@ -58,7 +58,7 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 			//$scope.progress[6].progressRate = 1 //I intend for a "driver" that functions similar as this later
 			//$scope.progress[2].progressRate = 1
 			//initialRowCount=10;
-			$scope.theResource+=200000
+			$scope.theResource+=2000
 		}
 	}
 
@@ -109,18 +109,19 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 				})};
 		$scope.buyProgressBar = function() { //Buy Progress Bar
 				$scope.buyButtonClicked($scope.costBuyRow, function() {
-					$scope.costBuyRow = Math.ceil(1.05* $scope.costBuyRow) 
+					$scope.costBuyRow = Math.ceil(2* $scope.costBuyRow) 
+					initialRowCount+=10
 					$scope.addProgressBar("regular")
 				})};
 		$scope.buyGainFirst = function() { //Gain for First
 				$scope.buyButtonClicked($scope.costGainFirst, function() {
 					$scope.costGainFirst = Math.ceil(1.1* $scope.costGainFirst)
-					$scope.gainFirst+=Math.floor(3 * (1+Math.pow($scope.gainFirst, .4)/10))
+					$scope.gainFirst+=Math.floor(3 * (1+Math.pow($scope.gainFirst, .5)/10))
 				})};
 		$scope.buyGainAll = function() { //Gain for All
 				$scope.buyButtonClicked($scope.costGainAll, function() {
 					$scope.costGainAll = Math.ceil(1.25* $scope.costGainAll)
-					$scope.gainAll+=Math.floor(2 * (1+Math.pow($scope.gainAll, .4)/10))
+					$scope.gainAll+=Math.floor(2.2 * (1+Math.pow($scope.gainAll, .6)/10))
 				})};
 	}
 	{//----------------Object Classes----------------- progressBar,.nextProgressDown,.nextExp,.nextBoost,.addBoost
@@ -200,7 +201,7 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 							}
 							//TODO only do this when ?boostTicks mod 10 is different? for performance
 							//console.log("multi: "+multiFromBoost)
-							return Math.pow(1.7, Math.log2(multiFromBoost))*2                                // boost decay math
+							return Math.pow(1.2, Math.log2(multiFromBoost))*1.5                                // boost decay math
 						}
 						return 1
 					}
@@ -235,22 +236,23 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 							//Saturation is 0-100, 0 means greyscale and 100 means entirely that color
 							//Lightness is 0-100, 50 is entirely that color, 75 is half color/half white, 25 is half color/half black
 						}
-						hue = this.initialColorHue - Math.log2(multi)*45 - leftOverMulti*22;
+						hue = this.initialColorHue - Math.log2(multi)*35 - leftOverMulti*15;
 						sat = 0
-						var num = 12
+						var num = 7
 						var rate = 1
 						while(rate <= Math.log2(multi*2)) {
 							rate ++
-							num -= .5
+							num *= .9
 							sat += num
 							if(sat > 100) {
 								sat = 100
 								break;
 							}
 						}
+						var light = 50 //(48-leftOverMulti*48)+2
 						//if(this.row==5)
 						//	console.log(sat, hue, multi, leftOverMulti)
-						this.color = "hsl("+hue+", "+sat+"%, 50%)"
+						this.color = "hsl("+hue+", "+sat+"%, "+light+"%)"
 						
 					}
 				}
@@ -288,8 +290,8 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 			//variant specific
 			if(type == "first") {
 				//$scope.progress.push(new progressBar (100, rowTimeRateStarting, 100, 20, true, 1, 90, $scope.progress.length))
-			} else if(type == "regular") {
-				$scope.progress.push(new progressBar (100, rowTimeRateStarting, 100, 20, true, 50, 60, $scope.progress.length))
+			} else if(type == "regular") {//+$scope.progress.length
+				$scope.progress.push(new progressBar (20+$scope.progress.length, rowTimeRateStarting, 20+$scope.progress.length, 20, true, 100, 180, $scope.progress.length))
 			}
 		}
 	
@@ -310,11 +312,11 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 			//}
 			
 			curRowCount = $scope.progress.length
-			
+			progressPerc = "progress["+(curRowCount-1)+"].progress/progress["+(curRowCount-1)+"].progressReq * 100"
 			var newDirective = angular.element(
 			"<div class='progressOuter "+extraClass+"'>"+
 				"<div id='progressInner"+(curRowCount-1)+"' class='progressInner'"+
-					"style='width:{{progress["+(curRowCount-1)+"].progress}}%;background-color:{{progress["+(curRowCount-1)+"].color}};'>"+
+					"style='width:{{"+progressPerc+"}}%;background-color:{{progress["+(curRowCount-1)+"].color}};'>"+
 					
 				"</div>"+
 			"</div>"
@@ -346,12 +348,12 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 			$compile(newDirective)($scope); //re-compile (so it picks up the angular vars)
 		}
 	}
-	{//--------------Initial Graphics Load--------------
+	{//--------------Initial Button Load--------------
 		//This stuff really belongs in a database
 		//function calls are required to be after variable declarations
 		$scope.addBuyButtonTemplate("% Global Speed Increase", 	"boughtSpeedBonus", 	"blue", 	"buySpeedBonus", 		"costSpeedBonus", 			"red")
 		$scope.addBuyButtonTemplate("Seconds of Boost", 				"secondsBoost", 			"blue", 	"buySecondsBoost", 	"costSecondsBoost", 	"red")
-		$scope.addBuyButtonTemplate("Buy Progress Bar", 				"theResource", 				"red", 	"buyProgressBar", 		"costBuyRow", 				"red")
+		$scope.addBuyButtonTemplate("Buy 10 Progress Bars", 				"theResource", 				"red", 	"buyProgressBar", 		"costBuyRow", 				"red")
 		$scope.addBuyButtonTemplate("Gain for First", 					"gainFirst", 					"blue", 	"buyGainFirst", 				"costGainFirst", 			"red")
 		$scope.addBuyButtonTemplate("Gain for All", 						"gainAll", 						"blue", 	"buyGainAll", 				"costGainAll", 				"red")
 	}

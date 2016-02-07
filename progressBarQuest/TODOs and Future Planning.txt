@@ -2,13 +2,15 @@ BUG: holding enter when buying sometimes causes negative numbers.
 what?
 FOUND: cost increase happened before cost was deducted
 
-In common:
-	different numbers besides 0-100
-	individual growth rates
-	keeping track of it for the row (class?)
+Next:
+	tweak formula for boost growth
+	tweak prices
+Add bars slowly
+hovermultiple	
 
-notes:
-exp is grey and hard to see until hover, then it's white
+Add Exp
+	Levels affect boost growth formula
+	show level of row (and row num) on hover
 
 hover works on all nearby rows, not just current
 	color of selection fades out
@@ -59,3 +61,5 @@ Variations based on two resources
 		
 Row-specific buffs
 	Removes generated patterns to give specific ones
+	
+5 choices of progress bar types to add (as the buttons), with each having a different effect (local powerful buff, global slow-as-hell perma buffs, collector, driver, ?)
