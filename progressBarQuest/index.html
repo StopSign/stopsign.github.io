@@ -143,15 +143,26 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 					this.level = 1
 					this.totalBoostTicks = 0
 					
+					//for debugging
+					this.progressOld=0
+					this.progressDelta=0
+					this.printCounter = 0;
+					
 					//So this is 10 seconds on the limit, converted into ticks
 					this.boostLimitInTicks = Math.floor(secondsBoostUntilDensityIncrease * (1000/ msWaitTime)) 
 				}
 				{//Progress Gain Functions
 					this.nextProgressDown = function(variantSpeedBonus, resultOfFinish) {
-						if(this.row==5) {
-							console.log("variant speed bonus: " + variantSpeedBonus)
+						var rateOfChange = this.progressRate*multFromFps*variantSpeedBonus
+						this.progress -= rateOfChange
+						this.printCounter++
+						if(this.row==0) {
+							if(this.printCounter % 30 == 0) {
+								this.progressDelta = Math.ceil((this.progressOld - this.progress)*100)/100
+								this.progressOld = this.progress
+								console.log("Progress per 1s is "+(this.progressDelta*8)+"%, Boost: " + variantSpeedBonus)
+							}
 						}
-						this.progress -= this.progressRate*multFromFps*variantSpeedBonus
 						while(this.progress <= 0) {
 							this.progress += this.progressReq
 							resultOfFinish()
@@ -180,8 +191,11 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 						if(this.totalBoostTicks > 0) {
 							multiFromBoost = this.calcBoostBonus()
 							this.totalBoostTicks-= multiFromBoost
+							if(this.totalBoostTicks <= 0) {
+								this.color = "hsl("+this.initialColorHue+", 0%, 50%)"
+							}
 							//TODO only do this when ?boostTicks mod 10 is different? for performance
-							return multiFromBoost*2
+							return Math.log2(multiFromBoost*2)*Math.log2(multiFromBoost*2)/4+1.75
 						}
 						return 1
 					}
@@ -203,21 +217,8 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 							tensOfSeconds -= theBonus
 							theBonus *= 2
 						}
-						this.multiToColor(tempMulti, tensOfSeconds/theBonus) //leftover multi
-						if(this.totalBoostTicks < 0)
-							return .5 //default speed
+						this.multiToColor(theBonus, tensOfSeconds/theBonus) //leftover multi
 						return theBonus //some boost
-						while((tempNum/tempMulti) >= this.boostLimitInTicks) {
-							tempNum -= this.boostLimitInTicks * tempMulti
-							tempMulti *= 2
-						}
-						leftOverMulti = tempNum/tempMulti/this.boostLimitInTicks //Remaining boost ticks / (Finishing multiplier to how much they count * unit to convert multiplier to ticks)
-						
-						this.multiToColor(tempMulti, leftOverMulti)
-						if(this.row==5) {
-							console.log(tempMulti + ", " + leftOverMulti+", "+this.boostLimitInTicks+", "+this.totalBoostTicks+", "+tempNum)
-						}
-						return tempMulti
 					}
 				}
 			
@@ -228,9 +229,26 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 						//Hue is 0-360, 0 is red, 120 is green, 240 is blue. 
 						//Saturation is 0-100, 0 means greyscale and 100 means entirely that color
 						//Lightness is 0-100, 50 is entirely that color, 75 is half color/half white, 25 is half color/half black
-						hue = this.initialColorHue + Math.log2(multi)*45 + leftOverMulti*22;
-						sat = Math.pow(Math.log2(multi) * 10, .5) * 10
+						hue = this.initialColorHue + Math.log2(multi)*30 + leftOverMulti*15;
+						sat = 100
+						if(multi==1) {
+							sat = 17
+						} else if(multi==2) {
+							sat = 33
+						} else if(multi==3) {
+							sat = 48
+						} else if(multi==4) {
+							sat = 62
+						} else if(multi==5) {
+							sat = 75
+						} else if(multi==6) {
+							sat = 87
+						} else if(multi==7) {
+							sat = 96
+						}
+							
 						sat = sat > 100 ? 100 : sat
+						//console.log(sat, hue, multi, leftOverMulti)
 						this.color = "hsl("+hue+", "+sat+"%, 50%)"
 						
 					}
@@ -242,7 +260,7 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 	}
 	{//-------------Application Functions-------------- updateProgressForAllRows, updateRowProgress, addProgressBar, addProgressBarData
 		$scope.updateProgressForAllRows = function() {
-			for(lx = 0; lx < $scope.progress.length ; lx++) {
+			for(var lx = 0; lx < $scope.progress.length ; lx++) {
 				$scope.updateRowProgress(lx)
 			}
 		}
@@ -449,7 +467,7 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 	//this way doesn't work when javascript is open in a different tab
 	//javascript will default change the 5 to minimum 500 in that case
 	//use interval.js somehow to get around it. google that along with angular?
-	msWaitTime = 30
+	msWaitTime = 33.3
 	$interval(function() { if(!stop) $scope.tick(); }, msWaitTime);
 	}
 });
