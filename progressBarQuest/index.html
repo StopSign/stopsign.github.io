@@ -35,18 +35,18 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 	{//------------Initial Variable Settings-----------
 
 		//not public-facing game vars
-		rowTimeRateStarting = .05
+		rowTimeRateStarting = .025
 		initialRowCount=7;
 		
 		//ang both game & graphics vars
 		$scope.theResource=0
 		$scope.costBuyRow=5
 		$scope.secondsBoost=1
-		$scope.costSecondsBoost=200
+		$scope.costSecondsBoost=40
 		$scope.boughtSpeedBonus =0
-		$scope.costSpeedBonus=400
-		$scope.gainAll=5
-		$scope.costGainAll=200
+		$scope.costSpeedBonus=500
+		$scope.gainAll=3
+		$scope.costGainAll=150
 		$scope.gainFirst=40
 		$scope.costGainFirst=10
 		
@@ -55,10 +55,10 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 		$scope.testSettings = function() {
 			//rowTimeRateStarting = 1
 			//$scope.progress[0].progressRate = 1
-			$scope.progress[6].progressRate = 2 //I intend for a "driver" that functions similar as this later
+			//$scope.progress[6].progressRate = 1 //I intend for a "driver" that functions similar as this later
 			//$scope.progress[2].progressRate = 1
 			//initialRowCount=10;
-			$scope.theResource=99580
+			$scope.theResource+=200000
 		}
 	}
 
@@ -71,6 +71,7 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 		if(timeList.length > 100) {
 			timeList.splice(0, 1)
 			
+			//TODO instead of calc average, sub first from last / 2
 			var fps = msWaitTime/calcAverageTime()*100
 			multFromFps = 100/fps
 			//console.log(calcAverageTime()+","+fps)
@@ -80,10 +81,10 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 		
 		$scope.updateProgressForAllRows()
 		
-		if(firstTime) {
-			firstTime=0
-			$scope.addProgressBar("first")
-		}
+		//if(firstTime) {
+		//	firstTime=0
+		//	$scope.addProgressBar("first")
+		//}
 		//manual addition to give starting rows
 		if($scope.progress.length < initialRowCount && timer - tickTemp1 >= 5) {
 			$scope.addProgressBar("regular")
@@ -98,7 +99,7 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 	{//--------------ng-OnClick Methods-------------
 		$scope.buySpeedBonus = function() { //% Global Speed Increase
 				$scope.buyButtonClicked($scope.costSpeedBonus, function() {
-					$scope.costSpeedBonus = Math.ceil(1.1* $scope.costSpeedBonus) //cost increase
+					$scope.costSpeedBonus = Math.ceil(1.2* $scope.costSpeedBonus) //cost increase
 					$scope.boughtSpeedBonus++
 				})};
 		$scope.buySecondsBoost = function() { //Seconds of Boost
@@ -108,18 +109,18 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 				})};
 		$scope.buyProgressBar = function() { //Buy Progress Bar
 				$scope.buyButtonClicked($scope.costBuyRow, function() {
-					$scope.costBuyRow = Math.ceil(1.1* $scope.costBuyRow) 
+					$scope.costBuyRow = Math.ceil(1.05* $scope.costBuyRow) 
 					$scope.addProgressBar("regular")
 				})};
 		$scope.buyGainFirst = function() { //Gain for First
 				$scope.buyButtonClicked($scope.costGainFirst, function() {
 					$scope.costGainFirst = Math.ceil(1.1* $scope.costGainFirst)
-					$scope.gainFirst+=3
+					$scope.gainFirst+=Math.floor(3 * (1+Math.pow($scope.gainFirst, .4)/10))
 				})};
 		$scope.buyGainAll = function() { //Gain for All
 				$scope.buyButtonClicked($scope.costGainAll, function() {
-					$scope.costGainAll = Math.ceil(1.1* $scope.costGainAll)
-					$scope.gainAll++
+					$scope.costGainAll = Math.ceil(1.25* $scope.costGainAll)
+					$scope.gainAll+=Math.floor(2 * (1+Math.pow($scope.gainAll, .4)/10))
 				})};
 	}
 	{//----------------Object Classes----------------- progressBar,.nextProgressDown,.nextExp,.nextBoost,.addBoost
@@ -153,14 +154,17 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 				}
 				{//Progress Gain Functions
 					this.nextProgressDown = function(variantSpeedBonus, resultOfFinish) {
+						if(this.row == 5)
+							console.log("Bonus: "+ variantSpeedBonus)
 						var rateOfChange = this.progressRate*multFromFps*variantSpeedBonus
 						this.progress -= rateOfChange
 						this.printCounter++
 						if(this.row==0) {
 							if(this.printCounter % 30 == 0) {
-								this.progressDelta = Math.ceil((this.progressOld - this.progress)*100)/100
-								this.progressOld = this.progress
-								console.log("Progress per 1s is "+(this.progressDelta*8)+"%, Boost: " + variantSpeedBonus)
+							//TODO avg the old rateOfChange w/ the new one
+								//this.progressDelta = Math.ceil((this.progressOld - this.progress)*100)/100
+								//this.progressOld = this.progress
+								//console.log("Progress per 1s is "+(this.progressDelta*8)+"%, Boost: " + variantSpeedBonus)
 							}
 						}
 						while(this.progress <= 0) {
@@ -195,14 +199,14 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 								this.color = "hsl("+this.initialColorHue+", 0%, 50%)"
 							}
 							//TODO only do this when ?boostTicks mod 10 is different? for performance
-							return Math.log2(multiFromBoost*2)*Math.log2(multiFromBoost*2)/4+1.75
+							//console.log("multi: "+multiFromBoost)
+							return Math.pow(1.7, Math.log2(multiFromBoost))*2                                // boost decay math
 						}
 						return 1
 					}
 					
 					this.addBoost = function(secondsBoostChange) {
 						this.totalBoostTicks += secondsBoostChange * (1000/ msWaitTime)
-						//console.log(this.totalBoostTicks+", "+new Date().getTime()/1000)
 						return this.calcBoostBonus()
 					}
 					
@@ -224,31 +228,28 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 			
 				{//GUI Functions
 					this.multiToColor = function(multi, leftOverMulti) {
-						//hsl("+(Math.floor(journeyPoints / questMax*100))+", 100%, 45%)
-						//hsl = Hue Saturation Lightness
-						//Hue is 0-360, 0 is red, 120 is green, 240 is blue. 
-						//Saturation is 0-100, 0 means greyscale and 100 means entirely that color
-						//Lightness is 0-100, 50 is entirely that color, 75 is half color/half white, 25 is half color/half black
-						hue = this.initialColorHue + Math.log2(multi)*30 + leftOverMulti*15;
-						sat = 100
-						if(multi==1) {
-							sat = 17
-						} else if(multi==2) {
-							sat = 33
-						} else if(multi==3) {
-							sat = 48
-						} else if(multi==4) {
-							sat = 62
-						} else if(multi==5) {
-							sat = 75
-						} else if(multi==6) {
-							sat = 87
-						} else if(multi==7) {
-							sat = 96
+						{//description
+							//hsl("+(Math.floor(journeyPoints / questMax*100))+", 100%, 45%)
+							//hsl = Hue Saturation Lightness
+							//Hue is 0-360, 0 is red, 120 is green, 240 is blue. 
+							//Saturation is 0-100, 0 means greyscale and 100 means entirely that color
+							//Lightness is 0-100, 50 is entirely that color, 75 is half color/half white, 25 is half color/half black
 						}
-							
-						sat = sat > 100 ? 100 : sat
-						//console.log(sat, hue, multi, leftOverMulti)
+						hue = this.initialColorHue - Math.log2(multi)*45 - leftOverMulti*22;
+						sat = 0
+						var num = 12
+						var rate = 1
+						while(rate <= Math.log2(multi*2)) {
+							rate ++
+							num -= .5
+							sat += num
+							if(sat > 100) {
+								sat = 100
+								break;
+							}
+						}
+						//if(this.row==5)
+						//	console.log(sat, hue, multi, leftOverMulti)
 						this.color = "hsl("+hue+", "+sat+"%, 50%)"
 						
 					}
@@ -286,9 +287,9 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 			//	isExpGainOn, secondsBoostUntilDensityIncrease, initialColorHue) {
 			//variant specific
 			if(type == "first") {
-				$scope.progress.push(new progressBar (100, rowTimeRateStarting, 100, 20, true, 10,-15, $scope.progress.length))
+				//$scope.progress.push(new progressBar (100, rowTimeRateStarting, 100, 20, true, 1, 90, $scope.progress.length))
 			} else if(type == "regular") {
-				$scope.progress.push(new progressBar (100, rowTimeRateStarting, 100, 20, true, 10, 60, $scope.progress.length))
+				$scope.progress.push(new progressBar (100, rowTimeRateStarting, 100, 20, true, 50, 60, $scope.progress.length))
 			}
 		}
 	
@@ -467,7 +468,7 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 	//this way doesn't work when javascript is open in a different tab
 	//javascript will default change the 5 to minimum 500 in that case
 	//use interval.js somehow to get around it. google that along with angular?
-	msWaitTime = 33.3
+	msWaitTime = 17 //doesn't actually wait decimal amounts
 	$interval(function() { if(!stop) $scope.tick(); }, msWaitTime);
 	}
 });
