@@ -127,15 +127,15 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 		
 			//all unique info about a single progress bar (row) is represented here
 			function progressBar (initialProgressReq, initialProgressRate, initialProgress, expToNextLevel, 
-				isExpGainOn, secondsBoostUntilDensityIncrease, initialColor, row) {
+				isExpGainOn, secondsBoostUntilDensityIncrease, initialColorHue, row) {
 				{//Vars
 					//parameter driven
 					this.progressReq = initialProgressReq
 					this.progressRate = initialProgressRate
 					this.expToNextLevel = expToNextLevel
 					this.progress = initialProgress
-					this.initialColor = initialColor
-					this.color = initialColor
+					this.initialColorHue = initialColorHue
+					this.color = "hsl("+initialColorHue+", 100%, 50%)"
 					this.row = row
 					
 					//declarations
@@ -197,7 +197,7 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 							tempNum -= this.boostLimitInTicks * tempMulti
 							tempMulti *= 2
 						}
-						leftOverMulti = 100*tempNum/tempMulti/this.boostLimitInTicks //Remaining boost ticks / (Finishing multiplier to how much they count * unit to convert multiplier to ticks)
+						leftOverMulti = tempNum/tempMulti/this.boostLimitInTicks //Remaining boost ticks / (Finishing multiplier to how much they count * unit to convert multiplier to ticks)
 						//if(this.row==0)
 							//console.log(leftOverMulti)
 						//if(this.row==0)
@@ -216,23 +216,12 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 						//Hue is 0-360, 0 is red, 120 is green, 240 is blue. 
 						//Saturation is 0-100, 0 means greyscale and 100 means entirely that color
 						//Lightness is 0-100, 50 is entirely that color, 75 is half color/half white, 25 is half color/half black
+						hue = this.initialColorHue - Math.log2(multi)*60 - leftOverMulti*30;
 						if(Math.log2(multi) == 0) {
-							this.color = this.initialColor;
-						} else if(Math.log2(multi) == 1) {
-							this.color = "blue"
-						} else if(Math.log2(multi) == 2) {
-							this.color = "purple"
-						} else if(Math.log2(multi) == 3) {
-							this.color = "red"
-						} else if(Math.log2(multi) == 4) {
-							this.color = "orange"
-						} else if(Math.log2(multi) == 5) {
-							this.color = "yellow"
-						} else if(Math.log2(multi) == 6) {
-							this.color = "green"
-						} else if(Math.log2(multi) == 7) {
-							this.color = "blue"
+							hue = this.initialColorHue;
 						}
+						this.color = "hsl("+hue+", 100%, 50%)"
+						
 					}
 				}
 			
@@ -265,12 +254,12 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 		}
 		$scope.addProgressBarData = function(type) { //add progress bar data (UI is in UI section)
 			//function progressBar (initialProgressReq, initialProgressRate, initialProgress, expToNextLevel, 
-			//	isExpGainOn, secondsBoostUntilDensityIncrease, initialColor) {
+			//	isExpGainOn, secondsBoostUntilDensityIncrease, initialColorHue) {
 			//variant specific
 			if(type == "first") {
-				$scope.progress.push(new progressBar (100, rowTimeRateStarting, 100, 20, true, 10, "yellow", $scope.progress.length))
+				$scope.progress.push(new progressBar (100, rowTimeRateStarting, 100, 20, true, 10, 60, $scope.progress.length))
 			} else if(type == "regular") {
-				$scope.progress.push(new progressBar (100, rowTimeRateStarting, 100, 20, true, 10, "red", $scope.progress.length))
+				$scope.progress.push(new progressBar (100, rowTimeRateStarting, 100, 20, true, 10, 0, $scope.progress.length))
 			}
 		}
 	
