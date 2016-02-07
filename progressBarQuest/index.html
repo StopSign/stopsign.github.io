@@ -55,10 +55,10 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 		$scope.testSettings = function() {
 			//rowTimeRateStarting = 1
 			//$scope.progress[0].progressRate = 1
-			$scope.progress[2].progressRate = 2 //I intend for a "driver" that functions similar as this later
+			$scope.progress[6].progressRate = 2 //I intend for a "driver" that functions similar as this later
 			//$scope.progress[2].progressRate = 1
 			//initialRowCount=10;
-			$scope.theResource=580
+			$scope.theResource=99580
 		}
 	}
 
@@ -135,7 +135,7 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 					this.expToNextLevel = expToNextLevel
 					this.progress = initialProgress
 					this.initialColorHue = initialColorHue
-					this.color = "hsl("+initialColorHue+", 100%, 50%)"
+					this.color = "hsl("+initialColorHue+", 0%, 50%)"
 					this.row = row
 					
 					//declarations
@@ -148,6 +148,9 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 				}
 				{//Progress Gain Functions
 					this.nextProgressDown = function(variantSpeedBonus, resultOfFinish) {
+						if(this.row==5) {
+							console.log("variant speed bonus: " + variantSpeedBonus)
+						}
 						this.progress -= this.progressRate*multFromFps*variantSpeedBonus
 						while(this.progress <= 0) {
 							this.progress += this.progressReq
@@ -194,16 +197,26 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 						tempMulti = 1
 						tempNum = this.totalBoostTicks
 						//Takes the first 10 from totalBoostTicks at price X, then the next 10 at price 2X, the next 10 at 4X, etc.
-						while((tempNum/tempMulti) >= this.boostLimitInTicks * tempMulti) {
+						tensOfSeconds = this.totalBoostTicks / this.boostLimitInTicks
+						theBonus = 1
+						while(tensOfSeconds > theBonus) {
+							tensOfSeconds -= theBonus
+							theBonus *= 2
+						}
+						this.multiToColor(tempMulti, tensOfSeconds/theBonus) //leftover multi
+						if(this.totalBoostTicks < 0)
+							return .5 //default speed
+						return theBonus //some boost
+						while((tempNum/tempMulti) >= this.boostLimitInTicks) {
 							tempNum -= this.boostLimitInTicks * tempMulti
 							tempMulti *= 2
 						}
 						leftOverMulti = tempNum/tempMulti/this.boostLimitInTicks //Remaining boost ticks / (Finishing multiplier to how much they count * unit to convert multiplier to ticks)
-						//if(this.row==0)
-							//console.log(leftOverMulti)
-						//if(this.row==0)
-							//console.log(this.totalBoostTicks+", "+tempMulti)
+						
 						this.multiToColor(tempMulti, leftOverMulti)
+						if(this.row==5) {
+							console.log(tempMulti + ", " + leftOverMulti+", "+this.boostLimitInTicks+", "+this.totalBoostTicks+", "+tempNum)
+						}
 						return tempMulti
 					}
 				}
@@ -215,9 +228,10 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 						//Hue is 0-360, 0 is red, 120 is green, 240 is blue. 
 						//Saturation is 0-100, 0 means greyscale and 100 means entirely that color
 						//Lightness is 0-100, 50 is entirely that color, 75 is half color/half white, 25 is half color/half black
-						hue = this.initialColorHue - Math.log2(multi)*45 - leftOverMulti*22;
-						//console.log(multi+","+(leftOverMulti*100)+","+hue+","+new Date().getTime()/1000)
-						this.color = "hsl("+hue+", 100%, 50%)"
+						hue = this.initialColorHue + Math.log2(multi)*45 + leftOverMulti*22;
+						sat = Math.pow(Math.log2(multi) * 10, .5) * 10
+						sat = sat > 100 ? 100 : sat
+						this.color = "hsl("+hue+", "+sat+"%, 50%)"
 						
 					}
 				}
@@ -254,9 +268,9 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 			//	isExpGainOn, secondsBoostUntilDensityIncrease, initialColorHue) {
 			//variant specific
 			if(type == "first") {
-				$scope.progress.push(new progressBar (100, rowTimeRateStarting, 100, 20, true, 10, 60, $scope.progress.length))
+				$scope.progress.push(new progressBar (100, rowTimeRateStarting, 100, 20, true, 10,-15, $scope.progress.length))
 			} else if(type == "regular") {
-				$scope.progress.push(new progressBar (100, rowTimeRateStarting, 100, 20, true, 10, 0, $scope.progress.length))
+				$scope.progress.push(new progressBar (100, rowTimeRateStarting, 100, 20, true, 10, 60, $scope.progress.length))
 			}
 		}
 	
@@ -270,11 +284,11 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 	{//--------------Graphics Functions--------------- addProgressBarUI, addBuyButtonTemplate,
 		$scope.addProgressBarUI = function(type) {
 			extraClass = extraClass2 = ""
-			if(type == "first") {
-				extraClass = "firstProgressOuter"
-			} else if(type == "regular") {
+			//if(type == "first") {
+			//	extraClass = "firstProgressOuter"
+			//} else if(type == "regular") {
 			
-			}
+			//}
 			
 			curRowCount = $scope.progress.length
 			
