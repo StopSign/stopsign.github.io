@@ -11,12 +11,32 @@ TODO NEXT:
 		Affects multiple rows at a time
 		Color potency fades out, further from cursor
 	Display buttons
-		Progress Movement - stop the right to left movement
-		Color shift - add 30 hue to all row's initialColor
 		EXP Visible - on/off for exp
 		Progress Visible - on/off for progress (brings all rows to black)
 	Graphics
 		Improve buyButton look/feel
+	EXP
+		Each row has exp, levels
+		Leveling up increases the amount of $ it gets
+	v2.0
+		When it gets to level 20, it starts adding to a count every time it ticks (based on level) to an equivalent row on the next screen
+			Arrows to move left and right
+			Initial color hue is +120
+			Same buttons, new resource / reset cost
+			New progress still gets more difficult
+			Extra row of buttons for additional upgrades unlocks for sending/receiving boost
+				Improvements to 1st unlock for 1st page
+					Or general improvements, 1 of which ups the usefulness of 1st
+			"Some of the lost boost gets sent over" Like 20%
+			On the second page, it sends boost downwards instead of up
+				I have no idea what this would look like
+			Each row has a level
+				level increase speed % if going too slow
+	v3.0
+		Repeat it as a formula, expanding to the right and alternating sending boost up and down
+			
+			
+		
 
 Add Exp
 	Levels affect boost growth formula
