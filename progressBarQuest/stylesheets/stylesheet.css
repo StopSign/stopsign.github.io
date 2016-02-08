@@ -105,15 +105,15 @@ div{
 	margin:0;
 }
 .quickButton {
-	margin-left:30px;
-	width:150px;
+	margin-left:10px;
+	width:70px;
 	background-color:black;
 	font-size:14px;
 	color:white;
 	cursor:pointer;
 	border:3px solid black;
 	border-radius:5px;
-	padding:5px;
+	padding:3px;
 }
 .quickButton:hover {
 	border:3px solid red;

@@ -15,6 +15,8 @@ TODO NEXT:
 		Color shift - add 30 hue to all row's initialColor
 		EXP Visible - on/off for exp
 		Progress Visible - on/off for progress (brings all rows to black)
+	Graphics
+		Improve buyButton look/feel
 
 Add Exp
 	Levels affect boost growth formula
