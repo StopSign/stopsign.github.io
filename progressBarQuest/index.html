@@ -9,13 +9,14 @@
 		<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
 	</head>
 	<body ng-app="myApp" ng-controller="myCtrl" class='objectContainer' style='text-align:center;position:absolute;'>
-		<div ng-click="progressVisible = (!progressVisible)" class='testSettingsButton hyperVisible'>Progress Visible</div>
-		<div id='fps' style='text-align:left;font-size:14px'>{{fps}}% fps</div>
-		<div ng-click="testSettings()" class='testSettingsButton hyperVisible'>Bonus Start</div>
+		<div ng-click="progressVisible = (!progressVisible)" class='quickButton hyperVisible'>Toggle Progress Movement is Visible</div>
+		<div id='fps' style='float:left;font-size:14px;background-color:grey;width:60px;padding:3px;border-radius:5px;'>{{fps}}% fps</div>
+		
 		<div id='progressBars' class='objectContainer'></div>
 		<div id='buttons' class='objectContainer'></div>
 
 		<div style='width:100%;font-size: 16px;margin-top:10px;text-align:center;'>To mass-buy, click a button then hold Enter</div>
+		<div ng-click="testSettings()" class='quickButton hyperVisible'>Bonus Start</div>
 	</body>
 </html>
 

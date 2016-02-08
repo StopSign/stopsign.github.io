@@ -104,14 +104,21 @@ div{
 	font-size:0;
 	margin:0;
 }
-.testSettingsButton {
+.quickButton {
 	margin-left:30px;
-	width:50px;
+	width:150px;
 	background-color:black;
 	font-size:14px;
 	color:white;
 	cursor:pointer;
+	border:3px solid black;
+	border-radius:5px;
+	padding:5px;
 }
-.testSettingsButton:hover {
+.quickButton:hover {
+	border:3px solid red;
+}
+.quickButton:active {
+	border:3px solid red;
 	background-color:grey;
 }
