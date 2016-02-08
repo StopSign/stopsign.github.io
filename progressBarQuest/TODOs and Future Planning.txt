@@ -1,16 +1,23 @@
-BUG: holding enter when buying sometimes causes negative numbers.
-what?
-FOUND: cost increase happened before cost was deducted
-
-Next:
-	tweak formula for boost growth
-	tweak prices
-Add bars slowly
-hovermultiple	
+TODO NEXT:
+	up the speed of game (debug only? exp/later upgrades will up the speed)
+	Stop game from breaking when progress gain > progress req
+	Hover methods
+		Display row #
+		Display progressReq
+		Display progressSpeed
+		Display current seconds of Bonus
+		Display current total bonus modifier
+		Display expCur / expTot, level
+		Affects multiple rows at a time
+		Color potency fades out, further from cursor
+	Display buttons
+		Progress Movement - stop the right to left movement
+		Color shift - add 30 hue to all row's initialColor
+		EXP Visible - on/off for exp
+		Progress Visible - on/off for progress (brings all rows to black)
 
 Add Exp
 	Levels affect boost growth formula
-	show level of row (and row num) on hover
 
 hover works on all nearby rows, not just current
 	color of selection fades out

@@ -9,7 +9,7 @@
 		<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
 	</head>
 	<body ng-app="myApp" ng-controller="myCtrl" class='objectContainer' style='text-align:center;position:absolute;'>
-		<div ng-click="progressVisible = !progressVisible" class='testSettingsButton hyperVisible'>Progress Visible</div>
+		<div ng-click="progressVisible = (!progressVisible)" class='testSettingsButton hyperVisible'>Progress Visible</div>
 		<div id='fps' style='text-align:left;font-size:14px'>{{fps}}% fps</div>
 		<div ng-click="testSettings()" class='testSettingsButton hyperVisible'>Bonus Start</div>
 		<div id='progressBars' class='objectContainer'></div>
@@ -38,6 +38,7 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 		//not public-facing game vars
 		rowTimeRateStarting = .1
 		initialRowCount=10;
+		progressCreationLength = 50
 		
 		//ang both game & graphics vars
 		$scope.theResource=0
@@ -52,18 +53,32 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 		$scope.costGainFirst=10	
 		$scope.progressVisible = 1
 		
-		
 		//debug vars. Click the in-game button to switch to these
 		$scope.testSettings = function() {
 			//rowTimeRateStarting = 1
 			//$scope.progress[0].progressRate = 1
-			//$scope.progress[6].progressRate = 1 //I intend for a "driver" that functions similar as this later
+			//$scope.progress[6].progressRate *=4 //I intend for a "driver" that functions similar as this later
 			//$scope.progress[2].progressRate = 1
 			//initialRowCount=10;
 			$scope.theResource+=20000
 		}
+		
 	}
-
+	{//------------------Formula---------------------- boostDecayMath
+		function boostDecayMath(num) {
+			return Math.pow(1.4, Math.log2(num))*1.5
+		}
+		//multi is a whole, sequential integer. leftOverMulti is 0-1
+		function colorShiftMath(initialColor, multi, leftOverMulti) {
+			//Hue is 0-360, 0 is red, 120 is green, 240 is blue. Sat is 0-100, 0=greyscale. Light is 0-100, 25=half black
+			var hue = initialColor - (multi-1)*35 - (leftOverMulti)*15;
+			var sat = Math.pow(multi, .9) * 6
+			sat = sat > 100 ? 100 : sat
+			var light = 50
+			return "hsl("+hue+", "+sat+"%, "+light+"%)"
+		}
+	}
+	
 	{//----------------Starting Point-----------------
 	
 	firstTime=1
@@ -97,6 +112,7 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 	
 	}
 
+	
 
 	{//--------------ng-OnClick Methods-------------
 		$scope.buySpeedBonus = function() { //% Global Speed Increase
@@ -127,142 +143,110 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 				})};
 	}
 	{//----------------Object Classes----------------- progressBar,.nextProgressDown,.nextExp,.nextBoost,.addBoost
-		{//Progress Bar
 		
-			//all unique info about a single progress bar (row) is represented here
-			function progressBar (initialProgressReq, initialProgressRate, initialProgress, expToNextLevel, 
-				isExpGainOn, secondsBoostUntilDensityIncrease, initialColorHue, row) {
-				{//Vars
-					//parameter driven
-					this.progressReq = initialProgressReq
-					this.progressRate = initialProgressRate
-					this.expToNextLevel = expToNextLevel
-					this.progress = initialProgress
-					this.initialColorHue = initialColorHue
-					this.color = "hsl("+initialColorHue+", 0%, 50%)"
-					this.row = row
-					
-					//declarations
-					this.exp = 0
-					this.level = 1
-					this.totalBoostTicks = 0
-					
-					//for debugging
-					this.progressOld=0
-					this.progressDelta=0
-					this.printCounter = 0;
-					
-					//So this is 10 seconds on the limit, converted into ticks
-					this.boostLimitInTicks = Math.floor(secondsBoostUntilDensityIncrease * (1000/ msWaitTime)) 
-				}
-				{//Progress Gain Functions
-					this.nextProgressDown = function(variantSpeedBonus, resultOfFinish) {
-						//if(this.row == 5)
-							//console.log("Bonus: "+ variantSpeedBonus)
-						var rateOfChange = this.progressRate*multFromFps*variantSpeedBonus
-						this.progress -= rateOfChange
-						this.printCounter++
-						if(this.row==0) {
-							if(this.printCounter % 30 == 0) {
-							//TODO avg the old rateOfChange w/ the new one
-								//this.progressDelta = Math.ceil((this.progressOld - this.progress)*100)/100
-								//this.progressOld = this.progress
-								//console.log("Progress per 1s is "+(this.progressDelta*8)+"%, Boost: " + variantSpeedBonus)
-							}
-						}
-						while(this.progress <= 0) {
-							this.progress += this.progressReq
-							resultOfFinish()
+		//all unique info about a single progress bar (row) is represented here
+		function progressBar (initialProgressReq, initialProgressRate, initialProgress, expToNextLevel, 
+			isExpGainOn, secondsBoostUntilDensityIncrease, initialColorHue, row) {
+			{//Vars
+				//parameter driven
+				this.progressReq = initialProgressReq
+				this.progressRate = initialProgressRate
+				this.expToNextLevel = expToNextLevel
+				this.progress = initialProgress
+				this.initialColorHue = initialColorHue
+				this.color = colorShiftMath(this.initialColorHue, 0, 0)
+				this.row = row
+				
+				//declarations
+				this.exp = 0
+				this.level = 1
+				this.totalBoostTicks = 0
+				
+				//for debugging
+				this.progressOld=0
+				this.progressDelta=0
+				this.printCounter = 0;
+				
+				//So this is 10 seconds on the limit, converted into ticks
+				this.boostLimitInTicks = Math.floor(secondsBoostUntilDensityIncrease * (1000/ msWaitTime)) 
+			}
+			{//Progress Gain Functions
+				this.nextProgressDown = function(variantSpeedBonus, resultOfFinish) {
+					//if(this.row == 5)
+						//console.log("Bonus: "+ variantSpeedBonus)
+					var rateOfChange = this.progressRate*multFromFps*variantSpeedBonus
+					this.progress -= rateOfChange
+					this.printCounter++
+					if(this.row==0) {
+						if(this.printCounter % 30 == 0) {
+						//TODO avg the old rateOfChange w/ the new one
+							//this.progressDelta = Math.ceil((this.progressOld - this.progress)*100)/100
+							//this.progressOld = this.progress
+							//console.log("Progress per 1s is "+(this.progressDelta*8)+"%, Boost: " + variantSpeedBonus)
 						}
 					}
-					this.nextProgressUp = function(variantSpeedBonus, resultOfFinish) {
-						this.progress += this.progressRate * multFromFps * variantSpeedBonus
-						while(this.progress >= this.progressReq) {
-							this.progress -= this.progressReq
-							resultOfFinish()
-						}
+					while(this.progress <= 0) {
+						this.progress += this.progressReq
+						resultOfFinish()
 					}
 				}
-				{//Level Gain Functions
-					this.nextExp = function(resultOfLevelGain) {
-						this.exp++
-						while(this.exp >= expToNextLevel) {
-							this.exp -= expToNextLevel
-							resultOfLevelGain()
-						}
+				this.nextProgressUp = function(variantSpeedBonus, resultOfFinish) {
+					this.progress += this.progressRate * multFromFps * variantSpeedBonus
+					while(this.progress >= this.progressReq) {
+						this.progress -= this.progressReq
+						resultOfFinish()
 					}
 				}
-				{//Boost Functions
-					//will be called on progress completions
-					this.nextBoost = function() {
-						if(this.totalBoostTicks > 0) {
-							multiFromBoost = this.calcBoostBonus()
-							this.totalBoostTicks-= multiFromBoost * multFromFps
-							if(this.totalBoostTicks <= 0) {
-								this.color = "hsl("+this.initialColorHue+", 0%, 50%)"
-							}
-							//TODO only do this when ?boostTicks mod 10 is different? for performance
-							//console.log("multi: "+multiFromBoost)
-							return Math.pow(1.3, Math.log2(multiFromBoost))*1.5                                // boost decay math
-						}
-						return 1
-					}
-					
-					this.addBoost = function(secondsBoostChange) {
-						this.totalBoostTicks += secondsBoostChange * (1000/ msWaitTime)
-						return this.calcBoostBonus()
-					}
-					
-					this.calcBoostBonus = function() {
-						//TODO probably a fancier way to do this w/o looping
-						tempMulti = 1
-						tempNum = this.totalBoostTicks
-						//Takes the first 10 from totalBoostTicks at price X, then the next 10 at price 2X, the next 10 at 4X, etc.
-						tensOfSeconds = this.totalBoostTicks / this.boostLimitInTicks
-						theBonus = 1
-						while(tensOfSeconds > theBonus) {
-							tensOfSeconds -= theBonus
-							theBonus *= 2
-						}
-						this.multiToColor(theBonus, tensOfSeconds/theBonus) //leftover multi
-						return theBonus //some boost
+			}
+			{//Level Gain Functions
+				this.nextExp = function(resultOfLevelGain) {
+					this.exp++
+					while(this.exp >= expToNextLevel) {
+						this.exp -= expToNextLevel
+						resultOfLevelGain()
 					}
 				}
-			
-				{//GUI Functions
-					this.multiToColor = function(multi, leftOverMulti) {
-						{//description
-							//hsl("+(Math.floor(journeyPoints / questMax*100))+", 100%, 45%)
-							//hsl = Hue Saturation Lightness
-							//Hue is 0-360, 0 is red, 120 is green, 240 is blue. 
-							//Saturation is 0-100, 0 means greyscale and 100 means entirely that color
-							//Lightness is 0-100, 50 is entirely that color, 75 is half color/half white, 25 is half color/half black
+			}
+			{//Boost Functions
+				//will be called on progress completions
+				this.nextBoost = function() {
+					if(this.totalBoostTicks > 0) {
+						multiFromBoost = this.calcBoostBonus()
+						this.totalBoostTicks-= multiFromBoost * multFromFps
+						if(this.totalBoostTicks <= 0) {
+							this.color = colorShiftMath(this.initialColorHue, 0, 0)
 						}
-						hue = this.initialColorHue - Math.log2(multi)*35 - leftOverMulti*15;
-						sat = 0
-						var num = 7
-						var rate = 1
-						while(rate <= Math.log2(multi*2)) {
-							rate ++
-							num *= .9
-							sat += num
-							if(sat > 100) {
-								sat = 100
-								break;
-							}
-						}
-						var light = 50 //(48-leftOverMulti*48)+2
-						//if(this.row==5)
-						//	console.log(sat, hue, multi, leftOverMulti)
-						this.color = "hsl("+hue+", "+sat+"%, "+light+"%)"
-						
+						return boostDecayMath(multiFromBoost)                                // boost decay math
 					}
+					return 1
 				}
-			
+				
+				this.addBoost = function(secondsBoostChange) {
+					this.totalBoostTicks += secondsBoostChange * (1000/ msWaitTime)
+					return this.calcBoostBonus()
+				}
+				
+				this.calcBoostBonus = function() {
+					//TODO probably a fancier way to do this w/o looping
+					//Takes the first 10 from totalBoostTicks at price X, then the next 10 at price 2X, the next 10 at 4X, etc.
+					var tensOfSeconds = this.totalBoostTicks / this.boostLimitInTicks
+					var theMulti = Math.floor(Math.log2(tensOfSeconds))
+					if(theMulti < 1) {
+						theMulti = 0
+					}
+					var leftOver =  tensOfSeconds / Math.pow(2, theMulti*2)
+					if(this.row==0) {
+						console.log("0's leftOver: "+(leftOver*100))
+					}
+					theMulti++ //1 is 2x, 2 is 3x, 3 is 4.5x, etc.
+					this.color = colorShiftMath(this.initialColorHue, theMulti, leftOver)
+					return theMulti //some boost
+				}
 			}
 		}
 		
 	}
+	
 	{//-------------Application Functions-------------- updateProgressForAllRows, updateRowProgress, addProgressBar, addProgressBarData
 		$scope.updateProgressForAllRows = function() {
 			for(var lx = 0; lx < $scope.progress.length ; lx++) {
@@ -286,44 +270,20 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 			$scope.addProgressBarData(type)
 			$scope.addProgressBarUI(type)
 		}
-		$scope.addProgressBarData = function(type) { //add progress bar data (UI is in UI section)
-			//function progressBar (initialProgressReq, initialProgressRate, initialProgress, expToNextLevel, 
-			//	isExpGainOn, secondsBoostUntilDensityIncrease, initialColorHue) {
-			//variant specific
-			if(type == "first") {
-				//$scope.progress.push(new progressBar (100, rowTimeRateStarting, 100, 20, true, 1, 90, $scope.progress.length))
-			} else if(type == "regular") {//+$scope.progress.length
-				var length = 100+ $scope.progress.length*5
-				$scope.progress.push(new progressBar (length, rowTimeRateStarting, length, 20, true, 10, 180, $scope.progress.length))
-			}
-		}
 	
 	}
 		
 		
 		
-		
-		
-	//Types: first, regular
 	{//--------------Graphics Functions--------------- addProgressBarUI, addBuyButtonTemplate,
 		$scope.addProgressBarUI = function(type) {
-			extraClass = extraClass2 = ""
-			//if(type == "first") {
-			//	extraClass = "firstProgressOuter"
-			//} else if(type == "regular") {
-			
-			//}
 			
 			curRowCount = $scope.progress.length
-			var progressPerc = "{{progress["+(curRowCount-1)+"].progress/progress["+(curRowCount-1)+"].progressReq * 100}}"
-			if(!$scope.progressVisible) {
-				progressPerc = 100
-			}
+			var progressPerc = "{{progressVisible ?  progress["+(curRowCount-1)+"].progress/progress["+(curRowCount-1)+"].progressReq * 100 : 100}}"
 			var newDirective = angular.element(
-			"<div class='progressOuter "+extraClass+"'>"+
+			"<div class='progressOuter'>"+
 				"<div id='progressInner"+(curRowCount-1)+"' class='progressInner'"+
 					"style='width:"+progressPerc+"%;background-color:{{progress["+(curRowCount-1)+"].color}};'>"+
-					
 				"</div>"+
 			"</div>"
 			);
@@ -354,7 +314,9 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 			$compile(newDirective)($scope); //re-compile (so it picks up the angular vars)
 		}
 	}
-	{//--------------Initial Button Load--------------
+	
+	
+	{//----------Initial Button & Row Load------------
 		//This stuff really belongs in a database
 		//function calls are required to be after variable declarations
 		$scope.addBuyButtonTemplate("% Global Speed Increase", 	"boughtSpeedBonus", 	"blue", 	"buySpeedBonus", 		"costSpeedBonus", 			"red")
@@ -362,11 +324,22 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 		$scope.addBuyButtonTemplate("Buy 10 Progress Bars", 				"theResource", 				"red", 	"buyProgressBar", 		"costBuyRow", 				"red")
 		$scope.addBuyButtonTemplate("Gain for First", 					"gainFirst", 					"blue", 	"buyGainFirst", 				"costGainFirst", 			"red")
 		$scope.addBuyButtonTemplate("Gain for All", 						"gainAll", 						"blue", 	"buyGainAll", 				"costGainAll", 				"red")
+	
+	
+		$scope.addProgressBarData = function(type) { 
+			//progressBar (initialProgressReq, initialProgressRate, initialProgress, expToNextLevel, isExpGainOn, secondsBoostUntilDensityIncrease, initialColorHue, row) {
+			if(type == "first") {
+				//$scope.progress.push(new progressBar (100, rowTimeRateStarting, 100, 20, true, 1, 90, $scope.progress.length))
+			} else if(type == "regular") {
+				progressCreationLength = 50 * Math.pow(1.01, $scope.progress.length)
+				$scope.progress.push(new progressBar (progressCreationLength, rowTimeRateStarting, progressCreationLength, 20, true, 20, 180, $scope.progress.length))
+			}
+		}
 	}
 
-
-
-
+	
+	
+	
 	{//---------------Helper Functions----------------- AKA Not specific to this game
 		function calcAverageTime() {
 			total = 0;
