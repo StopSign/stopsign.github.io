@@ -9,17 +9,18 @@
 		<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
 	</head>
 	<body ng-app="myApp" ng-controller="myCtrl" class='objectContainer' style='text-align:center;position:absolute;'>
-		<div ng-click="progressVisible = (!progressVisible)" class='quickButton hyperVisible' style='width:117px;'>Toggle Progress Movement Visibility</div>
-		<div ng-click="toggleStartStop()" class='quickButton hyperVisible'>Toggle Start / Stop</div>
-		<div ng-click="toggleNextColor()" class='quickButton hyperVisible'>Toggle Next Color</div>
+		<div ng-click="progressVisible = (!progressVisible)" class='hyperVisible quickButton ' style='width:117px;'>Toggle Progress Movement Visibility</div>
+		<div ng-click="toggleStartStop()" class='hyperVisible quickButton '>Toggle Start / Stop</div>
+		<div ng-click="toggleNextColor()" class='hyperVisible quickButton '>Toggle Next Color</div>
 		<div id='fps' style='float:left;font-size:14px;background-color:grey;width:60px;padding:3px;border-radius:5px;'>{{fps}} fps</div>
 		
 		<div id='progressBars' style='margin-top:10px;' class='objectContainer'></div>
 		<div id='buttons' class='objectContainer'></div>
 
 		<div style='width:100%;font-size: 16px;margin-top:10px;text-align:center;'>To mass-buy, click a button then hold Enter</div>
-		<div ng-click="testSettings()" style='float:left;width:75px' class='quickButton hyperVisible'>Extra Gold for Debug</div>
-		<div ng-click="testSettings()" style='float:left;width:75px' class='quickButton hyperVisible'>More Gold for Debug</div>
+		<div style='text-align:left;font-size:12px;width:100%;margin-top:30px;margin-left:10px;margin-bottom:10px;color:grey'>If you want patterns, not gameplay (won't be in final version):</div>
+		<div ng-click="testSettings()" style='float:left;width:75px' class='hyperVisible quickButton '>+1k</div>
+		<div ng-click="testSettings2()" style='float:left;width:75px' class='hyperVisible quickButton '>+50k </div>
 	</body>
 </html>
 
@@ -33,7 +34,8 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 	{//----------------Declarations------------------ AKA vars that need a start but no default, ang or not.
 		$scope.progress = []
 		timeList = [];
-		timer = tickTemp1 = totalTicks = 0;
+		timer =  totalTicks = 0;
+		tickTemp1 = -500; //so that it makes the first row immediately
 		multFromFps=1
 		stop=0 //type stop=1 in console to pause the game. If you do it often, put a button on the action or make it hotkeyed to the 'space' key. (example in manualactions.js)
 		$scope.progressVisible = 1
@@ -56,7 +58,7 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 		$scope.gainAll=3
 		$scope.costGainAll=150
 		$scope.gainFirst=40
-		$scope.costGainFirst=10	
+		$scope.costGainFirst=8
 		
 		//debug vars. Click the in-game button to switch to these
 		$scope.testSettings = function() {
@@ -74,14 +76,14 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 	}
 	{//------------------Formula---------------------- boostDecayMath, colorShiftMath
 		function boostDecayMath(num) {
-			return Math.pow(1.7, Math.log2(num))*1.8
+			return Math.pow(1.5, num)*1.75
 		}
 		//multi is a whole, sequential integer. leftOverMulti is 0-1
 		function colorShiftMath(initialColor, multi, leftOverMulti) {
 			//Hue is 0-360, 0 is red, 120 is green, 240 is blue. Sat is 0-100, 0=greyscale. Light is 0-100, 25=half black
-			var hue = initialColor - (multi-1)*36 - (leftOverMulti)*18;
-			var sat = Math.pow(multi, .9) * 6
-			sat = sat > 100 ? 100 : sat
+			var hue = initialColor - (multi-1)*36 - (1-leftOverMulti)*24;
+			var sat = Math.pow(multi, .9) * 6 + (1-leftOverMulti)*3
+			sat = sat > 100 ? 100 : sat //multi^.9 * 6 reaches at 23
 			var light = 50
 			return "hsl("+hue+", "+sat+"%, "+light+"%)"
 		}
@@ -108,7 +110,7 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 			$scope.updateProgressForAllRows()
 			
 			//manual addition to give starting rows
-			if($scope.progress.length < initialRowCount && timer - tickTemp1 >= 5) {
+			if($scope.progress.length < initialRowCount && timer - tickTemp1 >= 25) {
 				$scope.addProgressBar("regular")
 				tickTemp1 = timer
 			}
@@ -126,14 +128,13 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 				})};
 		$scope.buySecondsBoost = function() { //Seconds of Boost
 				$scope.buyButtonClicked($scope.costSecondsBoost, function() {
-					$scope.costSecondsBoost = Math.ceil(1.2* $scope.costSecondsBoost)
+					$scope.costSecondsBoost = Math.ceil(1.1* $scope.costSecondsBoost)
 					$scope.secondsBoost++
 				})};
 		$scope.buyProgressBar = function() { //Buy Progress Bar
 				$scope.buyButtonClicked($scope.costBuyRow, function() {
-					$scope.costBuyRow = Math.ceil(4* $scope.costBuyRow) 
-					initialRowCount+=10
-					$scope.addProgressBar("regular")
+					$scope.costBuyRow = Math.ceil(2* $scope.costBuyRow)
+					initialRowCount+=5
 				})};
 		$scope.buyGainFirst = function() { //Gain for First
 				$scope.buyButtonClicked($scope.costGainFirst, function() {
@@ -216,7 +217,7 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 				this.nextBoost = function() {
 					if(this.totalBoostTicks > 0) {
 						multiFromBoost = this.calcBoostBonus()
-						this.totalBoostTicks-= multiFromBoost * multFromFps
+						this.totalBoostTicks -= Math.pow(2, multiFromBoost) * multFromFps
 						if(this.totalBoostTicks <= 0) {
 							this.color = colorShiftMath(this.initialColorHue, 0, 0)
 						}
@@ -238,12 +239,12 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 					if(theMulti < 1) {
 						theMulti = 0
 					}
-					var leftOver =  tensOfSeconds / Math.pow(2, theMulti*2)
+					var leftOver = theMulti - Math.log2(tensOfSeconds)
 					theMulti++ //1 is 2x, 2 is 3x, 3 is 4.5x, etc.
-					if(this.row==0) {
-						//console.log(theMulti+" <-- multi.  leftOver: "+Math.floor(leftOver*100)+" boost Limit: " + this.boostLimitInTicks+ " total Ticks "+this.totalBoostTicks )
-					}
 					this.color = colorShiftMath(this.initialColorHue, theMulti, leftOver)
+					if(this.row==0) {
+						//console.log(theMulti+" <-- multi.  leftOver: "+Math.floor(leftOver*100)+" color: "+this.color+" boost Limit: " + this.boostLimitInTicks+ " total Ticks "+this.totalBoostTicks )
+					}
 					return theMulti //some boost
 				}
 			}
@@ -332,7 +333,7 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 		//function calls are required to be after variable declarations
 		$scope.addBuyButtonTemplate("% Global Speed Increase", 	"boughtSpeedBonus",	"blue", 	"buySpeedBonus", 	"costSpeedBonus", 	"red")
 		$scope.addBuyButtonTemplate("Seconds of Boost", 				"secondsBoost", 		"blue", 	"buySecondsBoost", 	"costSecondsBoost", 	"red")
-		$scope.addBuyButtonTemplate("Buy 10 Progress Bars", 		"theResource", 			"red", 	"buyProgressBar", 		"costBuyRow", 			"red")
+		$scope.addBuyButtonTemplate("Buy 5 Progress Bars", 		"theResource", 			"red", 	"buyProgressBar", 		"costBuyRow", 			"red")
 		$scope.addBuyButtonTemplate("Gain for First", 					"gainFirst", 				"blue", 	"buyGainFirst", 			"costGainFirst", 			"red")
 		$scope.addBuyButtonTemplate("Gain for All", 						"gainAll", 					"blue", 	"buyGainAll", 			"costGainAll", 			"red")
 	
@@ -342,8 +343,8 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 			if(type == "first") {
 				//$scope.progress.push(new progressBar (100, rowTimeRateStarting, 100, 20, true, 1, 90, $scope.progress.length))
 			} else if(type == "regular") {
-				progressCreationLength = 100 * Math.pow(1.02, $scope.progress.length)
-				$scope.progress.push(new progressBar (progressCreationLength, rowTimeRateStarting, progressCreationLength, 100, true, 4, regularRowHue, $scope.progress.length))
+				progressCreationLength = 100 * Math.pow(1.01, $scope.progress.length)
+				$scope.progress.push(new progressBar (progressCreationLength, rowTimeRateStarting, progressCreationLength, 100, true, 20, regularRowHue, $scope.progress.length))
 			}
 		}
 	}
