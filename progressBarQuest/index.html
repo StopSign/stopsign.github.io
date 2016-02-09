@@ -352,7 +352,7 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 				//$scope.progress.push(new progressBar (100, rowTimeRateStarting, 100, 20, true, 1, 90, $scope.progress.length))
 			} else if(type == "regular") {
 				progressCreationLength = 100 * Math.pow(1.01, $scope.progress.length)
-				$scope.progress.push(new progressBar (progressCreationLength, rowTimeRateStarting, progressCreationLength, 100, true, 8, regularRowHue, $scope.progress.length))
+				$scope.progress.push(new progressBar (progressCreationLength, rowTimeRateStarting, progressCreationLength, 100, true, 6, regularRowHue, $scope.progress.length))
 			}
 		}
 	}
