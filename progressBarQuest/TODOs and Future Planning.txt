@@ -10,6 +10,7 @@ TODO NEXT:
 		Display expCur / expTot, level
 		Affects multiple rows at a time
 		Color potency fades out, further from cursor
+			Of all variables, too
 	Display buttons
 		EXP Visible - on/off for exp
 		Progress Visible - on/off for progress (brings all rows to black)
@@ -18,6 +19,9 @@ TODO NEXT:
 	EXP
 		Each row has exp, levels
 		Leveling up increases the amount of $ it gets
+	Saving
+		Try to make it as neat as possible
+		It's a goddamn hassle, if I can avoid adding variables left and right i would prefer it.
 	v2.0
 		When it gets to level 20, it starts adding to a count every time it ticks (based on level) to an equivalent row on the next screen
 			Arrows to move left and right

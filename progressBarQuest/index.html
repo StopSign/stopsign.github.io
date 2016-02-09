@@ -365,6 +365,9 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 			stop = !stop
 			timeList = []
 		}
+		
+		//because I hate IE so much
+		Math.log2 = Math.log2 || function(x){return Math.log(x)*Math.LOG2E;};
 	
 		function calcAverageTime() {
 			total = 0;
