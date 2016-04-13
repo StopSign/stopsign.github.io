@@ -9,14 +9,13 @@
 		<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
 		<script src="snap.svg-min.js"></script>
 	</head>
-<body style="margin:0px;background-color:black;width:1650px;overflow:auto;margin:auto;">
+<body style="margin:0px;background-color:black;overflow:auto;width:1000px;height:1000px;margin:auto;">
 </body>
 </html>
 
 <script>
 	var s = new Snap();
-	s.attr({ viewBox: "0 0 1600 1000"})
-	s.circle(0, 0, 1000).attr({color:'yellow'})
+	s.attr({ viewBox: "0 0 1010 1010"})
 	progress = []
 	timeList = []
 	rectList = []
@@ -26,9 +25,9 @@
 
 
 	//------------Initial Variable Settings-----------
-		rectSizeTypes = [[10,10,'red']];
+		rectSizeTypes = [[20,20,'red']];
 		rectCurLocs = [[0, 0]];
-		xLimit = 1650
+		xLimit = 1000
 		yLimit = 1000
 	//------------------Formula----------------------
 
@@ -51,22 +50,31 @@ function tick() {
 
 	//ACTION here
 	addNextRect();
+	addNextRect();
+	console.log(radius +", "+rectList.length)
 }
 
 function addNextRect() {
+	radius = Math.floor(Math.pow(rectList.length, .5)+.0000000001)
+	if(rectList.length == 0) {
+		rectCurLocs[0] = [0, 0]
+	}
+
+
 	newRect = s.rect(rectCurLocs[0][0], rectCurLocs[0][1], rectSizeTypes[0][0], rectSizeTypes[0][1], 3, 3).attr({fill:'white'});
+
 	rectList.push(newRect)
 	//console.log("x:"+ rectCurLocs[0][0] +" y: "+rectCurLocs[0][1])
-	newRect.animate({fill:'red'}, 2000)
-	rectCurLocs[0][0] += 10
-	if(rectCurLocs[0][0] > xLimit) {
-		rectCurLocs[0][1] += 10
+	newRect.animate({fill:'red'}, 80000)
+	rectCurLocs[0][0] += 20
+	if(rectCurLocs[0][0] >= xLimit) {
+		rectCurLocs[0][1] += 20
 		rectCurLocs[0][0] = 0
-	}
-	if(rectCurLocs[0][1] > yLimit) {
-			rectCurLocs[0][1] = 0
-			clearList(rectList)
-			rectList = []
+		if(rectCurLocs[0][1] >= yLimit) {
+				rectCurLocs[0][1] = 0
+				clearList(rectList)
+				rectList = []
+		}
 	}
 }
 
@@ -193,7 +201,7 @@ function clearList(aList) {
 //this way doesn't work when javascript is open in a different tab
 //javascript will default change the 5 to minimum 500 in that case
 //use interval.js somehow to get around it. google that along with angular?
-msWaitTime = 16 //doesn't actually wait decimal amounts
+msWaitTime = 500 //doesn't actually wait decimal amounts
 //$interval(function() { if(!stop) tick(); }, msWaitTime);
 setInterval(function() { if(!stop) tick(); }, msWaitTime);
 </script>
