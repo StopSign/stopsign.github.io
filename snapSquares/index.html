@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+		<title>Progress Bars</title>
+		<link rel="stylesheet" href="stylesheets/stylesheet.css">
+		<script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+		<script src="https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+		<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+		<script src="snap.svg-min.js"></script>
+	</head>
+<body style="margin:0px;background-color:black;width:1650px;overflow:auto;margin:auto;">
+</body>
+</html>
+
+<script>
+	var s = new Snap();
+	s.attr({ viewBox: "0 0 1600 1000"})
+	s.circle(0, 0, 1000).attr({color:'yellow'})
+	progress = []
+	timeList = []
+	rectList = []
+	timer =  totalTicks = 0;
+	multFromFps=1
+	stop=0 //type stop=1 in console to pause the game. If you do it often, put a button on the action or make it hotkeyed to the 'space' key. (example in manualactions.js)
+
+
+	//------------Initial Variable Settings-----------
+		rectSizeTypes = [[10,10,'red']];
+		rectCurLocs = [[0, 0]];
+		xLimit = 1650
+		yLimit = 1000
+	//------------------Formula----------------------
+
+
+function tick() {
+	timer++
+	timeList.push(new Date().getTime())
+	if(timeList.length > 100) {
+		timeList.splice(0, 1)
+
+		//TODO instead of calc average, sub first from last / 2
+		fps = msWaitTime/calcAverageTime()*100
+		multFromFps = 100/fps
+		fps = round(fps)+"%"
+		//TODO Reduce the lag, don't just compensate for it.
+	} else {
+		multFromFps = 1
+		fps = "..."
+	}
+
+	//ACTION here
+	addNextRect();
+}
+
+function addNextRect() {
+	newRect = s.rect(rectCurLocs[0][0], rectCurLocs[0][1], rectSizeTypes[0][0], rectSizeTypes[0][1], 3, 3).attr({fill:'white'});
+	rectList.push(newRect)
+	//console.log("x:"+ rectCurLocs[0][0] +" y: "+rectCurLocs[0][1])
+	newRect.animate({fill:'red'}, 2000)
+	rectCurLocs[0][0] += 10
+	if(rectCurLocs[0][0] > xLimit) {
+		rectCurLocs[0][1] += 10
+		rectCurLocs[0][0] = 0
+	}
+	if(rectCurLocs[0][1] > yLimit) {
+			rectCurLocs[0][1] = 0
+			clearList(rectList)
+			rectList = []
+	}
+}
+
+function clearList(aList) {
+	for(var i = 0; i < aList.length; i++) {
+		aList[i].remove();
+	}
+}
+
+{//---------------Helper Functions----------------- AKA Not specific to this game
+	toggleStartStop = function() {
+		stop = !stop
+		timeList = []
+	}
+
+	//because I hate IE so much
+	Math.log2 = Math.log2 || function(x){return Math.log(x)*Math.LOG2E;};
+
+	function calcAverageTime() {
+		total = 0;
+		for(x = 1; x < timeList.length; x++) {
+			total += timeList[x] - timeList[x-1]
+		}
+		return total / timeList.length
+	}
+
+	function round3(num) {
+		return Math.floor(num*1000)/1000
+	}
+	function round2(num) {
+		return Math.floor(num*100)/100
+	}
+	function round1(num) {
+		return Math.floor(num*10)/10
+	}
+
+	function round(num) {
+		return formatNumber(num);
+	} function formatNumber(num) {
+		return Math.floor(num).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+	}
+
+	/*
+	  Converts an HSL color value to RGB. Conversion formula
+	  adapted from http://en.wikipedia.org/wiki/HSL_color_space.
+	  Assumes h, s, and l are contained in the set [0, 1] and
+	  returns r, g, and b in the set [0, 255].
+
+	  @param   Number  h       The hue
+	  @param   Number  s       The saturation
+	  @param   Number  l       The lightness
+	  @return  Array           The RGB representation
+	 */
+	function hslToRgb(h, s, l){
+		var r, g, b;
+
+		if(s == 0){
+			r = g = b = l; // achromatic
+		}else{
+			var hue2rgb = function hue2rgb(p, q, t){
+				if(t < 0) t += 1;
+				if(t > 1) t -= 1;
+				if(t < 1/6) return p + (q - p) * 6 * t;
+				if(t < 1/2) return q;
+				if(t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+				return p;
+			}
+
+			var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+			var p = 2 * l - q;
+			r = hue2rgb(p, q, h + 1/3);
+			g = hue2rgb(p, q, h);
+			b = hue2rgb(p, q, h - 1/3);
+		}
+
+		return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
+	}
+
+	/*
+	  Converts an RGB color value to HSL. Conversion formula
+	  adapted from http://en.wikipedia.org/wiki/HSL_color_space.
+	  Assumes r, g, and b are contained in the set [0, 255] and
+	  returns h, s, and l in the set [0, 1].
+
+	  @param   Number  r       The red color value
+	  @param   Number  g       The green color value
+	  @param   Number  b       The blue color value
+	  @return  Array           The HSL representation
+	 */
+	function rgbToHsl(r, g, b){
+		r /= 255, g /= 255, b /= 255;
+		var max = Math.max(r, g, b), min = Math.min(r, g, b);
+		var h, s, l = (max + min) / 2;
+
+		if(max == min){
+			h = s = 0; // achromatic
+		}else{
+			var d = max - min;
+			s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+			switch(max){
+				case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+				case g: h = (b - r) / d + 2; break;
+				case b: h = (r - g) / d + 4; break;
+			}
+			h /= 6;
+		}
+
+		return [h, s, l];
+	}
+
+	//ang helper methods
+	buyButtonClicked = function(costVar, resultOfFinish) {
+		if(theResource >= costVar) {
+			theResource -= costVar //cost
+			resultOfFinish()
+		}
+	}
+
+
+}
+
+
+//----The Timer----
+//this way doesn't work when javascript is open in a different tab
+//javascript will default change the 5 to minimum 500 in that case
+//use interval.js somehow to get around it. google that along with angular?
+msWaitTime = 16 //doesn't actually wait decimal amounts
+//$interval(function() { if(!stop) tick(); }, msWaitTime);
+setInterval(function() { if(!stop) tick(); }, msWaitTime);
+</script>

@@ -149,7 +149,7 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 		$scope.buyGainAll = function() { //Gain for All
 				$scope.buyButtonClicked($scope.costGainAll, function() {
 					$scope.costGainAll = Math.ceil(1.35* $scope.costGainAll)
-					$scope.gainAll += 1 + Math.floor($scope.gainAll * .15)
+					$scope.gainAll += 1 + Math.floor($scope.gainAll * .2)
 				})};
 	}
 	{//----------------Object Classes----------------- progressBar,.nextProgressDown,.nextExp,.nextBoost,.addBoost
@@ -226,7 +226,7 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 						if(this.totalBoostTicks <= 0) {
 							this.color = colorShiftMath(this.initialColorHue, 0, 0)
 						}
-						return boostDecayMath(multiFromBoost)                                // boost decay math
+						return boostDecayMath(multiFromBoost)
 					}
 					return 1
 				}
@@ -331,6 +331,7 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 			regularRowHue -= 18;
 			for(var lx = 0; lx < $scope.progress.length; lx++) {
 				$scope.progress[lx].initialColorHue = regularRowHue
+				$scope.progress[lx].color = colorShiftMath(regularRowHue, 0, 0)
 			}
 		}
 	}
