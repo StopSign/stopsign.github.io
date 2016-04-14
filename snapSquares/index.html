@@ -29,8 +29,7 @@
 	nextSquarePosition = [[0, 0]];
 	xLimit = 1000
 	yLimit = 1000
-	xIndexes = []
-	yIndexes = []
+	growAmount = 20;
 	//------------------Formula----------------------
 
 
@@ -54,41 +53,62 @@ function tick() {
 	addNextRect();
 }
 
-function addNextRect() {
-	radius = Math.floor(Math.pow(rectList.length, .5)+.0000000001)
-	console.log(radius +", "+rectList.length+", is going "+nextSquarePosition[0][0]+", "+nextSquarePosition[0][1])
-	var growAmount = 20;
-	var rowLengthNeeded=(radius+1)
-	var columnLengthNeeded=radius+1
-	
-	newRect = s.rect(nextSquarePosition[0][0], nextSquarePosition[0][1], rectSizeTypes[0][0], rectSizeTypes[0][1], 3, 3).attr({fill:'white'});
-	
-	if(xIndexes[0] == undefined) {
-		xIndexes[0] = 0;
-		yIndexes[0] = 0;
-	}
-	xIndexes[0]++
-	if(xIndexes[0] > radius) {
-		xIndexes[0] = radius
-		yIndexes[0]--
-		if(yIndexes[0] < 0) {
-			xIndexes[0] = 0;
-			yIndexes[0] = columnLengthNeeded;
+function getPosXYOfRect(x) { //TODO: better efficiency through datastructures - this method can be replaced.
+	console.log(Math.floor((rectList[x].node.x.baseVal.value+.0001)/growAmount));
+	return {x:Math.floor((rectList[x].node.x.baseVal.value+.0001)/growAmount), y:Math.floor((rectList[x].node.y.baseVal.value+.0001)/growAmount)}
+}
+
+function getDistanceOfRect(rect) {
+	var xy = getPosXYOfRect(rect)
+	return Math.pow(xy.x + xy.y, .5)
+}
+
+function isPosOpen(x, y) {
+	for(var i = 0; i < rectList.length; i++) {
+		//console.log(rectList[i])
+		var xy = getPosXYOfRect(i);
+		if(xy.x == x && xy.y == y) {
+			return false;
 		}
 	}
-	nextSquarePosition[0] = [growAmount*xIndexes[0], growAmount*yIndexes[0]];
+	return true
+}
 
-
+function addNextRect() {
+	//radius = Math.floor(Math.pow(rectList.length, .5)+.0000000001)
+	console.log(rectList.length+", is going "+nextSquarePosition[0][0]+", "+nextSquarePosition[0][1])
+	
+	
+	newRect = s.rect(nextSquarePosition[0][0], nextSquarePosition[0][1], rectSizeTypes[0][0], rectSizeTypes[0][1], 3, 3).attr({fill:'white'});
 	rectList.push(newRect)
+	
+	
+	initialX = 0
+	initialY = 0
+	var distance = getDistanceOfRect(rectList.length-1)
+	var testDist = Math.pow(initialX+initialY, .5)
+	while(testDist <= distance && !isPosOpen(initialX, initialY)) {
+		testDist = Math.pow(initialX+initialY, .5)
+		if(Math.random() < .5) {
+			initialY++
+		} else {
+			initialX++
+		}
+	}
+	console.log(distance, testDist)
+	//stop = 1
+	nextSquarePosition[0] = [initialX*growAmount,initialY*growAmount]
+	
 	//console.log("x:"+ nextSquarePosition[0][0] +" y: "+nextSquarePosition[0][1])
 	newRect.animate({fill:'red'}, 80000)
 
 	if(nextSquarePosition[0][0] >= xLimit || nextSquarePosition[0][1] >= yLimit) {
 		nextSquarePosition[0] = [0, 0]
-		xIndexes[0] = 0;
-		yIndexes[0] = 0;
-		clearList(rectList)
-		rectList = []
+	}
+	if(rectList.length > 500) {
+		stop = 1
+		// clearList(rectList)
+		// rectList = []
 	}
 }
 
