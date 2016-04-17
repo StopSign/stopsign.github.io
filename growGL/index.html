@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<title>three.js webgl - interactive particles</title>
+	<title>growGL</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 	<style>
@@ -205,8 +205,8 @@
 	
 	function render() {
 		
-		particles.rotation.x += 0.0005;
-		particles.rotation.y += 0.001;
+		particles.rotation.x += 0.00005;
+		particles.rotation.y += 0.0001;
 		
 		var geometry = particles.geometry;
 		var attributes = geometry.attributes;
@@ -223,14 +223,14 @@
 				
 				INTERSECTED = intersects[ 0 ].index;
 				
-				attributes.size.array[ INTERSECTED ] = PARTICLE_SIZE * 1.25;
+				attributes.size.array[ INTERSECTED ] = PARTICLE_SIZE * .1;
 				attributes.size.needsUpdate = true;
 				
 			}
 			
 		} else if ( INTERSECTED !== null ) {
 			
-			attributes.size.array[ INTERSECTED ] = PARTICLE_SIZE;
+			attributes.size.array[ INTERSECTED ] = PARTICLE_SIZE * 2;
 			attributes.size.needsUpdate = true;
 			INTERSECTED = null;
 			
