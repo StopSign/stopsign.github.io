@@ -11,6 +11,7 @@
 </head>
 <svg xmlns="http://www.w3.org/2000/svg" width="50px" height="50px" viewBox="0 0 200 200" version="1.1" style='position:absolute;right:30px;'>
     <polygon onmouseover='hoveredStartStopButton(this, true)' onmouseout='hoveredStartStopButton(this, false)' onclick='toggleStartStop(this)' style="fill:red;stroke:grey;stroke-width:8px;font-size:10px;" points="136.737609507049,188.692435121084 63.2623904929514,188.692435121084 11.3075648789165,136.737609507049 11.3075648789165,63.2623904929514 63.2623904929513,11.3075648789165 136.737609507049,11.3075648789165 188.692435121084,63.2623904929513 188.692435121084,136.737609507049"/>
+	
 </svg>
 <body style="margin:0px;background-color:black;overflow:auto;width:1000px;height:1000px;margin:auto;"></body>
 </html>
@@ -39,12 +40,12 @@ growAmount = 15;
 index = [0,0];
 offset = [];
 offset[0] = {'x':100,'y':0}
-offset[1] = {'x':100,'y':320}
+offset[1] = {'x':100,'y':300}
 
 
 
 positions = []
-squareSize = 20; //missing 7,6 and 6,7 and 7,7
+squareSize = 20;
 console.log(squareSize);
 for(var i = 0; i <= (squareSize * 2); i++) {
 	for(var j = 0; j <= i; j++) {
@@ -68,7 +69,6 @@ function tick() {
 		fps = msWaitTime/calcAverageTime()*100
 		multFromFps = 100/fps
 		fps = round(fps)+"%"
-		//TODO Reduce the lag, don't just compensate for it.
 	} else {
 		multFromFps = 1
 		fps = "..."
@@ -76,13 +76,11 @@ function tick() {
 	
 	
 	//ACTION here
-	//if(timer % 2 == 0) {
+	if(timer % 2 == 0) {
 		addNextRect();
 		addNextRect();
 		addNextRect();
-		addNextRect();
-		addNextRect();
-	//}
+	}
 }
 
 function isOpen(x,y) {
@@ -126,7 +124,23 @@ function addRow2() {
 }
 
 function addRow3() {
-	//repeat it
+	if(index[2] >= positions.length) { //finished
+		clearList(rectList)
+		index[3] = 1;
+		addRow4()
+		return;
+	}
+	
+	var nextX = positions[index[2]].x*growAmount+offset[2].x
+	var nextY = positions[index[2]].y*growAmount+offset[2].y
+	var newRect = s.rect(nextX, nextY, growAmount, growAmount, 3, 3).attr({fill:'#3C883A'});
+	newRect.animate({fill:'#C58909'}, 40000)
+	rectList[positions[index[2]].x][positions[index[2]].y] = newRect;
+	index[2]++;
+}
+
+function addRow4() {
+	
 }
 
 function clearList(aList) {
