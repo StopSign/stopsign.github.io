@@ -37,6 +37,16 @@
 	growAmount = 15;
 	squareCount = 0;
 	randomAmount=.5
+	index = 0;
+	xPointer = 0
+	yPointer = 0
+	
+	positions = []
+	for(var i = 0; i < 100; i++) {
+		for(var j = 0; j <= i; j++) {
+			positions.push({'x':(i-j),'y':j});
+		}
+	}
 	//------------------Formula----------------------
 
 
@@ -70,39 +80,22 @@ function isOpen(x,y) {
 }
 
 function addNextRect() {
-	//radius = Math.floor(Math.pow(rectList.length, .5)+.0000000001)
-	//console.log(squareCount+", is going "+nextX+", "+nextY)
+	var nextX = positions[index].x*growAmount
+	var nextY = positions[index].y*growAmount
+	var newRect = s.rect(nextX, nextY, growAmount, growAmount, 3, 3).attr({fill:'#5071B7'});
+	newRect.animate({fill:'#1B5E20'}, 80000)
+	rectList[positions[index].x][positions[index].y] = newRect;
+	index++;
 	
-	xPointer = 0
-	yPointer = 0
-	hasSpace = true;
-	while(!isOpen(xPointer, yPointer)) {
-		randomAmount+=.0003
-		if(randomAmount >= 1) {
-			randomAmount=0
-		}
-		if(Math.random() < randomAmount) {
-			xPointer++
-		} else {
-			yPointer++
-		}
-		if(xPointer >= rectList.length || yPointer >= rectList[0].length) {
-			hasSpace = false;
-			break;
-		}
-	}
-	if(hasSpace) {
-		var newRect = s.rect(nextX, nextY, growAmount, growAmount, 3, 3).attr({fill:'red'});
-		nextX = xPointer*growAmount
-		nextY = yPointer*growAmount
-		rectList[xPointer][yPointer] = newRect;
-		newRect.animate({fill:'yellow'}, 80000)
-	}
-	//console.log("x:"+ nextSquarePosition[0][0] +" y: "+nextSquarePosition[0][1])
-	if(nextX >= xLimit || nextY >= yLimit) {
+	if(index >= positions.length) {
 		clearList(rectList)
-		nextSquarePosition[0] = [0, 0]
+		index = 0;
 	}
+	
+	// if(nextX >= xLimit || nextY >= yLimit) {
+	// 	clearList(rectList)
+	// 	index = 0;
+	// }
 	squareCount++
 }
 
@@ -146,7 +139,8 @@ function clearList(aList) {
 
 	function round(num) {
 		return formatNumber(num);
-	} function formatNumber(num) {
+	}
+	function formatNumber(num) {
 		return Math.floor(num).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 	}
 
