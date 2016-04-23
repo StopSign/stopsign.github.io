@@ -1,53 +1,61 @@
 <!DOCTYPE html>
 <html>
-	<head>
-		<meta content="text/html;charset=utf-8" http-equiv="Content-Type">
-		<title>Progress Bars</title>
-		<link rel="stylesheet" href="stylesheets/stylesheet.css">
-		<script src="https://code.jquery.com/jquery-1.10.2.js"></script>
-		<script src="https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
-		<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
-		<script src="snap.svg-min.js"></script>
-	</head>
-<body style="margin:0px;background-color:black;overflow:auto;width:1000px;height:1000px;margin:auto;">
-</body>
+<head>
+	<meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+	<title>Progress Bars</title>
+	<link rel="stylesheet" href="stylesheets/stylesheet.css">
+	<script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+	<script src="https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+	<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+	<script src="snap.svg-min.js"></script>
+</head>
+<svg xmlns="http://www.w3.org/2000/svg" width="50px" height="50px" viewBox="0 0 200 200" version="1.1" style='position:absolute;right:30px;'>
+    <polygon onmouseover='hoveredStartStopButton(this, true)' onmouseout='hoveredStartStopButton(this, false)' onclick='toggleStartStop(this)' style="fill:red;stroke:grey;stroke-width:8px;font-size:10px;" points="136.737609507049,188.692435121084 63.2623904929514,188.692435121084 11.3075648789165,136.737609507049 11.3075648789165,63.2623904929514 63.2623904929513,11.3075648789165 136.737609507049,11.3075648789165 188.692435121084,63.2623904929513 188.692435121084,136.737609507049"/>
+</svg>
+<body style="margin:0px;background-color:black;overflow:auto;width:1000px;height:1000px;margin:auto;"></body>
 </html>
 
 <script>
-	var s = new Snap();
-	s.attr({ viewBox: "0 0 1010 1010"})
-	progress = []
-	timeList = []
-	rectList = []
-	var size = 200
-	for(var x = 0; x < size; x++) {
-		rectList.push(new Array(size+1).join('0').split('').map(parseFloat));
-	}
-	timer =  totalTicks = 0;
-	multFromFps=1
-	stop=0 //type stop=1 in console to pause the game. If you do it often, put a button on the action or make it hotkeyed to the 'space' key. (example in manualactions.js)
+var s = new Snap();
+s.attr({ viewBox: "0 0 1010 1010"})
+progress = []
+timeList = []
+rectList = []
+var size = 200
+for(var x = 0; x < size; x++) {
+	rectList.push(new Array(size+1).join('0').split('').map(parseFloat));
+}
+timer =  totalTicks = 0;
+multFromFps=1
+stop=0 //type stop=1 in console to pause the game. If you do it often, put a button on the action or make it hotkeyed to the 'space' key. (example in manualactions.js)
 
 
-	//------------Initial Variable Settings-----------
-	nextSquarePosition = [[0, 0]];
-	xLimit = 800
-	yLimit = 800
-	nextX = 0;
-	nextY = 0;
-	growAmount = 15;
-	squareCount = 0;
-	randomAmount=.5
-	index = 0;
-	xPointer = 0
-	yPointer = 0
-	
-	positions = []
-	for(var i = 0; i < 100; i++) {
-		for(var j = 0; j <= i; j++) {
+//------------Initial Variable Settings-----------
+xLimit = 800
+yLimit = 800
+nextX = 0;
+nextY = 0;
+growAmount = 15;
+index = [0,0];
+offset = [];
+offset[0] = {'x':100,'y':0}
+offset[1] = {'x':100,'y':320}
+
+
+
+positions = []
+squareSize = 20; //missing 7,6 and 6,7 and 7,7
+console.log(squareSize);
+for(var i = 0; i <= (squareSize * 2); i++) {
+	for(var j = 0; j <= i; j++) {
+		if((i-j) < squareSize && j < squareSize) {
 			positions.push({'x':(i-j),'y':j});
+			//console.log('['+(i-j)+','+j+'] and ('+i+','+j+')')
+			//console.log('i is: '+i+' and j is: '+j+' and formula is: '+(i-j));
 		}
 	}
-	//------------------Formula----------------------
+}
+//------------------Formula----------------------
 
 
 function tick() {
@@ -55,7 +63,7 @@ function tick() {
 	timeList.push(new Date().getTime())
 	if(timeList.length > 100) {
 		timeList.splice(0, 1)
-
+		
 		//TODO instead of calc average, sub first from last / 2
 		fps = msWaitTime/calcAverageTime()*100
 		multFromFps = 100/fps
@@ -65,10 +73,16 @@ function tick() {
 		multFromFps = 1
 		fps = "..."
 	}
-	//if(timer>10)
-	//	stop=1
+	
+	
 	//ACTION here
-	addNextRect();
+	//if(timer % 2 == 0) {
+		addNextRect();
+		addNextRect();
+		addNextRect();
+		addNextRect();
+		addNextRect();
+	//}
 }
 
 function isOpen(x,y) {
@@ -80,23 +94,39 @@ function isOpen(x,y) {
 }
 
 function addNextRect() {
-	var nextX = positions[index].x*growAmount
-	var nextY = positions[index].y*growAmount
-	var newRect = s.rect(nextX, nextY, growAmount, growAmount, 3, 3).attr({fill:'#5071B7'});
-	newRect.animate({fill:'#1B5E20'}, 80000)
-	rectList[positions[index].x][positions[index].y] = newRect;
-	index++;
-	
-	if(index >= positions.length) {
+	if(index[0] >= positions.length) { //finished
 		clearList(rectList)
-		index = 0;
+		index[0] = 0;
+		addRow2()
+		return;
 	}
 	
-	// if(nextX >= xLimit || nextY >= yLimit) {
-	// 	clearList(rectList)
-	// 	index = 0;
-	// }
-	squareCount++
+	var nextX = positions[index[0]].x*growAmount+offset[0].x
+	var nextY = positions[index[0]].y*growAmount+offset[0].y
+	var newRect = s.rect(nextX, nextY, growAmount, growAmount, 3, 3).attr({fill:'#5071B7'});
+	newRect.animate({fill:'#1B5E20'}, 20000)
+	rectList[positions[index[0]].x][positions[index[0]].y] = newRect;
+	index[0]++;
+}
+
+function addRow2() {
+	if(index[1] >= positions.length) { //finished
+		clearList(rectList)
+		index[2] = 1;
+		addRow3()
+		return;
+	}
+	
+	var nextX = positions[index[1]].x*growAmount+offset[1].x
+	var nextY = positions[index[1]].y*growAmount+offset[1].y
+	var newRect = s.rect(nextX, nextY, growAmount, growAmount, 3, 3).attr({fill:'#F9A825'});
+	newRect.animate({fill:'#28AFA2'}, 40000)
+	rectList[positions[index[1]].x][positions[index[1]].y] = newRect;
+	index[1]++;
+}
+
+function addRow3() {
+	//repeat it
 }
 
 function clearList(aList) {
@@ -111,14 +141,19 @@ function clearList(aList) {
 }
 
 {//---------------Helper Functions----------------- AKA Not specific to this game
-	toggleStartStop = function() {
+	toggleStartStop = function(button) {
 		stop = !stop
 		timeList = []
+		if(!stop) {
+			button.style.fill='#841414';
+		} else {
+			button.style.fill='#2E7932';
+		}
 	}
-
+	
 	//because I hate IE so much
 	Math.log2 = Math.log2 || function(x){return Math.log(x)*Math.LOG2E;};
-
+	
 	function calcAverageTime() {
 		total = 0;
 		for(x = 1; x < timeList.length; x++) {
@@ -126,7 +161,7 @@ function clearList(aList) {
 		}
 		return total / timeList.length
 	}
-
+	
 	function round3(num) {
 		return Math.floor(num*1000)/1000
 	}
@@ -136,28 +171,44 @@ function clearList(aList) {
 	function round1(num) {
 		return Math.floor(num*10)/10
 	}
-
+	
 	function round(num) {
 		return formatNumber(num);
 	}
 	function formatNumber(num) {
 		return Math.floor(num).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 	}
-
+	
+	function hoveredStartStopButton(button, isEntering) {
+		if(isEntering) {
+			if(!stop) {
+				button.style.fill='#A71A1A';
+			} else {
+				button.style.fill='#44A248';
+			}
+		} else {
+			if(!stop) {
+				button.style.fill='#841414';
+			} else {
+				button.style.fill='#2E7932';
+			}
+		}
+	}
+	
 	/*
-	  Converts an HSL color value to RGB. Conversion formula
-	  adapted from http://en.wikipedia.org/wiki/HSL_color_space.
-	  Assumes h, s, and l are contained in the set [0, 1] and
-	  returns r, g, and b in the set [0, 255].
-
-	  @param   Number  h       The hue
-	  @param   Number  s       The saturation
-	  @param   Number  l       The lightness
-	  @return  Array           The RGB representation
-	 */
+	Converts an HSL color value to RGB. Conversion formula
+	adapted from http://en.wikipedia.org/wiki/HSL_color_space.
+	Assumes h, s, and l are contained in the set [0, 1] and
+	returns r, g, and b in the set [0, 255].
+	
+	@param   Number  h       The hue
+	@param   Number  s       The saturation
+	@param   Number  l       The lightness
+	@return  Array           The RGB representation
+	*/
 	function hslToRgb(h, s, l){
 		var r, g, b;
-
+		
 		if(s == 0){
 			r = g = b = l; // achromatic
 		}else{
@@ -169,33 +220,33 @@ function clearList(aList) {
 				if(t < 2/3) return p + (q - p) * (2/3 - t) * 6;
 				return p;
 			}
-
+			
 			var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
 			var p = 2 * l - q;
 			r = hue2rgb(p, q, h + 1/3);
 			g = hue2rgb(p, q, h);
 			b = hue2rgb(p, q, h - 1/3);
 		}
-
+		
 		return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
 	}
-
+	
 	/*
-	  Converts an RGB color value to HSL. Conversion formula
-	  adapted from http://en.wikipedia.org/wiki/HSL_color_space.
-	  Assumes r, g, and b are contained in the set [0, 255] and
-	  returns h, s, and l in the set [0, 1].
-
-	  @param   Number  r       The red color value
-	  @param   Number  g       The green color value
-	  @param   Number  b       The blue color value
-	  @return  Array           The HSL representation
-	 */
+	Converts an RGB color value to HSL. Conversion formula
+	adapted from http://en.wikipedia.org/wiki/HSL_color_space.
+	Assumes r, g, and b are contained in the set [0, 255] and
+	returns h, s, and l in the set [0, 1].
+	
+	@param   Number  r       The red color value
+	@param   Number  g       The green color value
+	@param   Number  b       The blue color value
+	@return  Array           The HSL representation
+	*/
 	function rgbToHsl(r, g, b){
 		r /= 255, g /= 255, b /= 255;
 		var max = Math.max(r, g, b), min = Math.min(r, g, b);
 		var h, s, l = (max + min) / 2;
-
+		
 		if(max == min){
 			h = s = 0; // achromatic
 		}else{
@@ -208,10 +259,10 @@ function clearList(aList) {
 			}
 			h /= 6;
 		}
-
+		
 		return [h, s, l];
 	}
-
+	
 	//ang helper methods
 	buyButtonClicked = function(costVar, resultOfFinish) {
 		if(theResource >= costVar) {
@@ -219,8 +270,8 @@ function clearList(aList) {
 			resultOfFinish()
 		}
 	}
-
-
+	
+	
 }
 
 

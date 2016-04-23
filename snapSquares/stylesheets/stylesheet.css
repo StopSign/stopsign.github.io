@@ -27,20 +27,21 @@ div,svg{
 		left:0;
 		width:100%;
 }
-
+/* Css for the buttons on the left of the page */
+.buyButton {
+	position:absolute;
+	width:90px;
+	height:80px;
+	margin-bottom:20px;
+	font-size:18px;
+	margin-top:30px;
+}
 /* -------------------------------------------- */
 /* 						helper 							   */
 /* -------------------------------------------- */
 .number {
     color:black;
   vertical-align: top;
-}
-.buyButton {
-	width:90px;
-	height:80px;
-	margin-bottom:20px;
-	font-size:18px;
-	margin-top:30px;
 }
 .resource {
 	font-size:20px;
