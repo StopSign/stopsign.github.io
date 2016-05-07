@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+	<title>Snap Squares</title>
+	<link rel="stylesheet" href="stylesheets/stylesheet.css">
+	<script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+	<script src="https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+	<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+	<script src="pixi.min.js"></script>
+</head>
+<body style="margin:0px;margin:auto;text-align:center;background-color:#080808;">
+	<svg xmlns="http://www.w3.org/2000/svg" width="50px" height="50px" viewBox="0 0 200 200" version="1.1" style='position:absolute;right:30px;'>
+	    <polygon onmouseover='hoveredStartStopButton(this, true)' onmouseout='hoveredStartStopButton(this, false)' onclick='toggleStartStop(this)' style="fill:#841414;stroke:grey;stroke-width:8px;font-size:10px;" points="136.737609507049,188.692435121084 63.2623904929514,188.692435121084 11.3075648789165,136.737609507049 11.3075648789165,63.2623904929514 63.2623904929513,11.3075648789165 136.737609507049,11.3075648789165 188.692435121084,63.2623904929513 188.692435121084,136.737609507049"/>
+	</svg>
+</body>
+</html>
+
+<script>
+var renderer = PIXI.autoDetectRenderer(1200, 750, { backgroundColor: 0x000000, antialias: true, interactive: true });
+document.body.appendChild(renderer.view);
+// Create the main stage for your display objects
+var stage = new PIXI.Container();
+var graphics = new PIXI.Graphics();
+stage.addChild(graphics);
+
+progress = []
+timeList = []
+rectList = []
+rectList2 = []
+rectList3 = []
+rectList4 = []
+timer =  totalTicks = 0;
+multFromFps=1
+stop=0 //type stop=1 in console to pause the game. If you do it often, put a button on the action or make it hotkeyed to the 'space' key. (example in manualactions.js)
+
+
+//------------Initial Variable Settings-----------
+xLimit = 800
+yLimit = 800
+nextX = 0;
+nextY = 0;
+growAmount = 15;
+index = [0,0];
+offset = [];
+offset[0] = {'x':100,'y':0}
+offset[1] = {'x':100,'y':300}
+group1SpawnNum = 1;
+
+function rectangle( x, y, width, height, backgroundColor, borderColor, borderWidth ) {
+	var box = new PIXI.Graphics();
+	box.beginFill(backgroundColor);
+	box.lineStyle(borderWidth , borderColor);
+	box.drawRect(0, 0, width - borderWidth, height - borderWidth);
+	box.endFill();
+	box.position.x = x + borderWidth/2;
+	box.position.y = y + borderWidth/2;
+	return box;
+};
+
+
+positions = []
+squareSize = 30;
+for(var x = 0; x < squareSize; x++) {
+	rectList.push(new Array(squareSize+1).join('0').split('').map(parseFloat));
+	rectList2.push(new Array(squareSize+1).join('0').split('').map(parseFloat));
+	rectList3.push(new Array(squareSize+1).join('0').split('').map(parseFloat));
+	rectList4.push(new Array(squareSize+1).join('0').split('').map(parseFloat));
+}
+for(var i = 0; i <= (squareSize * 2); i++) {
+	for(var j = 0; j <= i; j++) {
+		if((i-j) < squareSize && j < squareSize) {
+			positions.push({'x':(i-j),'y':j});
+			//console.log('['+(i-j)+','+j+'] and ('+i+','+j+')')
+			//console.log('i is: '+i+' and j is: '+j+' and formula is: '+(i-j));
+		}
+	}
+}
+//------------------Formula----------------------
+// buyButton = s.rect(30, growAmount, 30, growAmount, 3, 3).attr({fill:'#5071B7'});
+// drawButtons = [];
+// aButton = {'x':30,'y':growAmount}
+//
+// drawButtons.push(createButton(aButton.x, aButton.y));
+//
+// function createButton(x, y) {
+// 	var button = PIXI.Sprite.fromImage('bunny.png');
+// 	button.position.x = x
+// 	button.position.y = y
+// 	button.interactive = true;
+// 	button.mouseover = function(mouseData) {
+// 		//buyButton.fillColor = 0x50A8A8;
+// 		console.log('here');
+// 	}
+// 	button.click = function(mouseData) {
+// 		group1SpawnNum++
+// 		button.position.y += growAmount
+// 	}
+// 	stage.addChild(button)
+// 	return button;
+// }
+//
+// function makeDrawButton(x, y, width, height) {
+// 	graphics.beginFill(0x5071B7)
+// 	buyButton = graphics.drawRoundedRect(x, y, width, growAmount, 3)
+// 	buyButton.interactive = true
+// 	return buyButton
+// }
+
+// Start animating
+animate();
+function animate() {
+	//Render the stage
+	if(!stop)
+		tick()
+	
+	renderer.render(stage);
+	requestAnimationFrame(animate);
+}
+function tick() {
+	timer++
+	timeList.push(new Date().getTime())
+	if(timeList.length > 100) {
+		timeList.splice(0, 1)
+		
+		//TODO instead of calc average, sub first from last / 2
+		fps = msWaitTime/calcAverageTime()*100
+		multFromFps = 100/fps
+		fps = round(fps)+"%"
+	} else {
+		multFromFps = 1
+		fps = "..."
+	}
+	//ACTION here
+	// if(timer % 20 == 0) {
+	for(var w = 0; w < group1SpawnNum; w++) {
+		addNextRect();
+		addNextRect();
+		addNextRect();
+	}
+	for(var x = 0; x < rectList.length; x++) {
+		for(var y = 0; y < rectList[x].length; y++) {
+			if(rectList[x][y] && rectList[x][y].colorTimeLeft > 0) {
+				if(rectList[x][y]) {
+					//console.log(rectList[x][y])
+					// rectList[x][y].rectangle.delete
+				}
+				rectList[x][y].rectangle = theRect
+				rectList[x][y].colorTimeLeft--;
+				// if(x == 0 && y == 0)
+				// 	console.log(rectList[x][y].colorTimeLeft+','+(rectList[x][y].h+rectList[x][y].colorTimeLeft*.01))
+			}
+		}
+	}
+	//}
+}
+
+function isOpen(x,y) {
+	//console.log(rectList[x][y])
+	// if(rectList.length <= x || rectList[0].length <= y) {
+	// 	return false;
+	// }
+	return rectList[x][y] == 0
+}
+
+function addNextRect() {
+	if(index[0] == positions.length) { //finished
+		if(rectList[positions[index[0]-1].x][positions[index[0]-1].y].colorTimeLeft > 0) { //Wait for all color to be done.
+			return
+		}
+		clearList()
+		index[0] = 0;
+		//addRow2()
+		return;
+	}
+	
+	var nextX = positions[index[0]].x*growAmount+offset[0].x
+	var nextY = positions[index[0]].y*growAmount+offset[0].y
+	var hStart = Math.random();
+	var newRect = {'colorTimeLeft':100,'x':nextX,'y':nextY,'width':growAmount,'height':growAmount, 'h':hStart, 's':.41, 'l':.41}
+	
+	var theRect = makeRect(newRect)
+	newRect.rectangle = theRect
+	var position = positions[index[0]]
+	if(!rectList[position.x][position.y]) { //make a new rect
+		//console.log(rectList[position.x][position.y])
+		// rectList[position.x][position.y].rectangle.delete
+	}
+	rectList[position.x][position.y] = newRect;
+	index[0]++;
+}
+
+function makeRect(rectObj) {
+	var colorh = (rectObj.h*Math.pow(rectObj.colorTimeLeft*.003, .6))
+	graphics.beginFill(hslToHex(colorh, rectObj.s, rectObj.l))
+	return graphics.drawRoundedRect(rectObj.x, rectObj.y, rectObj.width, rectObj.height, 3)
+}
+//
+// function addRow2() {
+// 	if(index[1] >= positions.length) { //finished
+// 		clearList(rectList)
+// 		index[2] = 1;
+// 		addRow3()
+// 		return;
+// 	}
+//
+// 	var nextX = positions[index[1]].x*growAmount+offset[1].x
+// 	var nextY = positions[index[1]].y*growAmount+offset[1].y
+// 	var newRect = {'color':0xF9A825,'colorTimeLeft':20,'x':nextX,'y':nextY,'width':growAmount,'height':growAmount}
+// 	makeRect(newRect)
+// 	//newRect.animate({fill:'#28AFA2'}, 40000)
+// 	rectList[positions[index[1]].x][positions[index[1]].y] = newRect;
+// 	index[1]++;
+// }
+//
+// function addRow3() {
+// 	if(index[2] >= positions.length) { //finished
+// 		clearList(rectList)
+// 		index[3] = 1;
+// 		addRow4()
+// 		return;
+// 	}
+//
+// 	var nextX = positions[index[2]].x*growAmount+offset[2].x
+// 	var nextY = positions[index[2]].y*growAmount+offset[2].y
+// 	var newRect = {'color':0x3C883A,'colorTimeLeft':20,'x':nextX,'y':nextY,'width':growAmount,'height':growAmount}
+// 	makeRect(newRect)
+// 	//newRect.animate({fill:'#C58909'}, 40000)
+// 	rectList[positions[index[2]].x][positions[index[2]].y] = newRect;
+// 	index[2]++;
+// }
+//
+// function addRow4() {
+// 	//
+// }
+
+function clearList() {
+	// for(var i = 0; i < rectList.length; i++) {
+	// 	for(var j = 0; j < rectList[i].length; j++) {
+	// 		if(rectList[i][j].) {
+	// 			rectList[i][j].rectangle.delete;
+	// 			//stage.removeChild(rectList[i][j])
+	// 			//rectList[i][j] = null
+	// 		}
+	// 	}
+	// }
+	//graphics.clear();
+}
+
+//---------------Helper Functions----------------- AKA Not specific to this game
+	toggleStartStop = function(button) {
+		stop = !stop
+		timeList = []
+		if(!stop) {
+			button.style.fill='#841414';
+		} else {
+			button.style.fill='#2E7932';
+		}
+	}
+	
+	//because I hate IE so much
+	Math.log2 = Math.log2 || function(x){return Math.log(x)*Math.LOG2E;};
+	
+	function calcAverageTime() {
+		total = 0;
+		for(x = 1; x < timeList.length; x++) {
+			total += timeList[x] - timeList[x-1]
+		}
+		return total / timeList.length
+	}
+	
+	function round3(num) {
+		return Math.floor(num*1000)/1000
+	}
+	function round2(num) {
+		return Math.floor(num*100)/100
+	}
+	function round1(num) {
+		return Math.floor(num*10)/10
+	}
+	
+	function round(num) {
+		return formatNumber(num);
+	}
+	function formatNumber(num) {
+		return Math.floor(num).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+	}
+	
+	function hoveredStartStopButton(button, isEntering) {
+		if(isEntering) {
+			if(!stop) {
+				button.style.fill='#A71A1A';
+			} else {
+				button.style.fill='#44A248';
+			}
+		} else {
+			if(!stop) {
+				button.style.fill='#841414';
+			} else {
+				button.style.fill='#2E7932';
+			}
+		}
+	}
+	
+	/*
+	Converts an HSL color value to RGB. Conversion formula
+	adapted from http://en.wikipedia.org/wiki/HSL_color_space.
+	Assumes h, s, and l are contained in the set [0, 1] and
+	returns r, g, and b in the set [0, 255].
+	
+	@param   Number  h       The hue
+	@param   Number  s       The saturation
+	@param   Number  l       The lightness
+	@return  Array           The RGB representation
+	*/
+	function hslToRgb(h, s, l){
+		var r, g, b;
+		
+		if(s == 0){
+			r = g = b = l; // achromatic
+		}else{
+			var hue2rgb = function hue2rgb(p, q, t){
+				if(t < 0) t += 1;
+				if(t > 1) t -= 1;
+				if(t < 1/6) return p + (q - p) * 6 * t;
+				if(t < 1/2) return q;
+				if(t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+				return p;
+			}
+			
+			var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+			var p = 2 * l - q;
+			r = hue2rgb(p, q, h + 1/3);
+			g = hue2rgb(p, q, h);
+			b = hue2rgb(p, q, h - 1/3);
+		}
+		
+		return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
+	}
+	
+	function hslToHex(h, s, l) {
+		var rgbValues = hslToRgb(h,s,l)
+		return '0x'+rgbToHex(rgbValues[0], rgbValues[1], rgbValues[2])
+	}
+	
+	/*
+	Converts an RGB color value to HSL. Conversion formula
+	adapted from http://en.wikipedia.org/wiki/HSL_color_space.
+	Assumes r, g, and b are contained in the set [0, 255] and
+	returns h, s, and l in the set [0, 1].
+	
+	@param   Number  r       The red color value
+	@param   Number  g       The green color value
+	@param   Number  b       The blue color value
+	@return  Array           The HSL representation
+	*/
+	function rgbToHsl(r, g, b){
+		r /= 255, g /= 255, b /= 255;
+		var max = Math.max(r, g, b), min = Math.min(r, g, b);
+		var h, s, l = (max + min) / 2;
+		
+		if(max == min){
+			h = s = 0; // achromatic
+		}else{
+			var d = max - min;
+			s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+			switch(max){
+				case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+				case g: h = (b - r) / d + 2; break;
+				case b: h = (r - g) / d + 4; break;
+			}
+			h /= 6;
+		}
+		
+		return [h, s, l];
+	}
+	
+	// Converts an RGB color to hex
+	// Assumes r, g, and b are contained in the set [0, 255]
+	// Returns a 3 or 6 character hex
+	function rgbToHex(r, g, b, allow3Char) {
+
+	    var hex = [
+	        pad2(r.toString(16)),
+	        pad2(g.toString(16)),
+	        pad2(b.toString(16))
+	    ];
+
+	    // Return a 3 character hex if possible
+	    if (allow3Char && hex[0].charAt(0) == hex[0].charAt(1) && hex[1].charAt(0) == hex[1].charAt(1) && hex[2].charAt(0) == hex[2].charAt(1)) {
+	        return hex[0].charAt(0) + hex[1].charAt(0) + hex[2].charAt(0);
+	    }
+
+	    return hex.join("");
+	}
+	
+	// Force a hex value to have 2 characters
+	function pad2(c) {
+	    return c.length == 1 ? '0' + c : '' + c;
+	}
+	
+	//ang helper methods
+	buyButtonClicked = function(costVar, resultOfFinish) {
+		if(theResource >= costVar) {
+			theResource -= costVar //cost
+			resultOfFinish()
+		}
+	}
+	
+	
+
+
+
+//----The Timer----
+//this way doesn't work when javascript is open in a different tab
+//javascript will default change the 5 to minimum 500 in that case
+//use interval.js somehow to get around it. google that along with angular?
+msWaitTime = 100 //doesn't actually wait decimal amounts
+//$interval(function() { if(!stop) tick(); }, msWaitTime);
+//setInterval(function() { if(!stop) tick(); }, msWaitTime);
+</script>
