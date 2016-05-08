@@ -35,7 +35,7 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 	currentIndexOfType = [0]
 	//------------Initial Variable Settings-----------
 	
-	var gridSize = 4;
+	var gridSize = 7;
 	var squareSizePx = 700 / gridSize;
 	//Map the objects position to their xy
 	positions = []
@@ -111,7 +111,9 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 		}
 
 		//ACTION here
-		addNewSquareOfType(0)
+		for(var x = 0; x < 5; x++) {
+			addNewSquareOfType(0)
+		}
 		// addNewSquareOfType(0)
 		// addNewSquareOfType(0)
 		// addNewSquareOfType(0)
