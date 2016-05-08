@@ -35,7 +35,7 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 	currentIndexOfType = [0]
 	//------------Initial Variable Settings-----------
 	
-	var gridSize = 10;
+	var gridSize = 4;
 	var squareSizePx = 700 / gridSize;
 	//Map the objects position to their xy
 	positions = []
@@ -112,6 +112,9 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 
 		//ACTION here
 		addNewSquareOfType(0)
+		// addNewSquareOfType(0)
+		// addNewSquareOfType(0)
+		// addNewSquareOfType(0)
 		
 		for(var x = 0; x < theGrid.length; x++) {
 			if(theGrid[x].fadeTimeLeft > 0) {
@@ -129,7 +132,7 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 			}
 		} else {
 			var color = 216 - type * 49
-			var fadeTime = 25 + 50 * type
+			var fadeTime = 25 + 75 * type
 			setColorsForNewSquare(currentIndexOfType[type], color, 51, 33, fadeTime)
 			changeSquareColor(currentIndexOfType[type])
 			currentIndexOfType[type]++
