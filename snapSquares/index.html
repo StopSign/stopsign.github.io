@@ -32,11 +32,11 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 	var timer =  totalTicks = 0;
 	var multFromFps=1
 	stop=0 //type stop=1 in console to pause the game. If you do it often, put a button on the action or make it hotkeyed to the 'space' key. (example in manualactions.js)
-	var currentIndexOfType = [0]
+	currentIndexOfType = [0]
 	//------------Initial Variable Settings-----------
 	
-	var gridSize = 15;
-	var squareSizePx = 20;
+	var gridSize = 10;
+	var squareSizePx = 700 / gridSize;
 	//Map the objects position to their xy
 	positions = []
 	for(var i = 0; i <= (gridSize * 2); i++) {
@@ -48,36 +48,12 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 	}
 	
 	var curSquareCount = positions.length;
-	var theGrid = []
+	theGrid = []
 	//Create the objects
 	for(var x = 0; x < curSquareCount; x++) {
-		var newSquare = newBlueSquare() //changeable meta-data
+		var newSquare = new Object()
 		newSquare.elem = makeSquareDiv(x); //keep the DOM element
 		theGrid.push(newSquare);
-	}
-	
-	function newSquareClass() { //common stuff
-		var newSquare = new Object();
-		newSquare.alive = 0;
-		return newSquare
-	}
-	
-	function newBlueSquare() { //blueSquareSpecific
-		var newSquare = newSquareClass()
-		newSquare.h = 216
-		newSquare.s = 51
-		newSquare.l = 33
-		newSquare.fadeTimeMax = newSquare.fadeTimeLeft = 25; // # of ticks
-		return newSquare;
-	}
-	
-	function newYellowSquare() {
-		var newSquare = newSquareClass()
-		newSquare.h = 61
-		newSquare.s = 51
-		newSquare.l = 33
-		newSquare.fadeTimeMax = newSquare.fadeTimeLeft = 100; // # of ticks
-		return newSquare;
 	}
 	
 	function makeSquareDiv(index) {
@@ -92,9 +68,16 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 		return div;
 	}
 	
-	
+	function setColorsForNewSquare(index, h, s, l, fadeTime) {
+		theGrid[index].alive = 1;
+		theGrid[index].h = h
+		theGrid[index].s = s
+		theGrid[index].l = l
+		theGrid[index].fadeTimeMax = theGrid[index].fadeTimeLeft = fadeTime; // # of ticks
+	}
 	//------------------Formula----------------------
 	function changeSquareColor(index) {
+		
 		var nextColor = 'black'
 		if(theGrid[index].alive) {
 			var h = theGrid[index].h
@@ -109,7 +92,6 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 		theGrid[index].elem.style.background = nextColor;
 	}
 	
-
 	//----------------Starting Point-----------------
 
 	$scope.tick = function() {
@@ -130,10 +112,6 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 
 		//ACTION here
 		addNewSquareOfType(0)
-		addNewSquareOfType(0)
-		addNewSquareOfType(0)
-		addNewSquareOfType(0)
-		addNewSquareOfType(0)
 		
 		for(var x = 0; x < theGrid.length; x++) {
 			if(theGrid[x].fadeTimeLeft > 0) {
@@ -144,28 +122,33 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 	}
 
 	function addNewSquareOfType(type) {
+		// console.log(type)
 		if(currentIndexOfType[type] == curSquareCount) { //if done adding
-			if(theGrid[currentIndexOfType[type]-1].fadeTimeLeft == type) { //if done fading in
+			 if(theGrid[currentIndexOfType[type]-1].fadeTimeLeft == type) { //if done fading in
 				victoryForType(type)
 			}
 		} else {
-			theGrid[currentIndexOfType[type]].fadeTimeLeft = theGrid[currentIndexOfType[type]].fadeTimeMax;
-			theGrid[currentIndexOfType[type]].alive = 1
+			var color = 216 - type * 49
+			var fadeTime = 25 + 50 * type
+			setColorsForNewSquare(currentIndexOfType[type], color, 51, 33, fadeTime)
 			changeSquareColor(currentIndexOfType[type])
 			currentIndexOfType[type]++
 		}
 	}
 	
 	function victoryForType(type) {
+		// console.log('1 '+type +', '+ timer+', '+currentIndexOfType[type])
+		if(currentIndexOfType[type+1] && currentIndexOfType[type+1] == curSquareCount && theGrid[currentIndexOfType[type]-1].fadeTimeLeft == 0) { //if the above layer is ready
+			victoryForType(type+1)
+			currentIndexOfType[type] = currentIndexOfType[type+1]
+			return
+		}
 		if(currentIndexOfType[type+1] === undefined) {
 			currentIndexOfType[type+1] = 0;
-		} else {
-			currentIndexOfType[type+1]++
 		}
-		var tempElem = theGrid[currentIndexOfType[type+1]].elem
-		theGrid[currentIndexOfType[type+1]] = newYellowSquare();
-		theGrid[currentIndexOfType[type+1]].elem = tempElem;
+		addNewSquareOfType(type+1)
 		currentIndexOfType[type] = currentIndexOfType[type+1];
+		// console.log('2 '+type +', '+ timer+', '+currentIndexOfType[type])
 		
 		for(var x = currentIndexOfType[type]; x < theGrid.length; x++) {
 			theGrid[x].alive = 0;
@@ -174,10 +157,10 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 	}
 
 
-
 	{//--------------- Utility Functions----------------- AKA Not specific to this game
 		$scope.toggleStartStop = function() {
 			stop = !stop
+			$scope.hoveredStartStopButton(true)
 			timeList = []
 		}
 		
