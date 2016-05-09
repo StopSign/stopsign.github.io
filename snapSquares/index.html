@@ -2,14 +2,15 @@
 <html class='objectContainer'>
 	<head>
 		<meta content="text/html;charset=utf-8" http-equiv="Content-Type">
-		<title>Progress Bars</title>
+		<title>■</title>
 		<link rel="stylesheet" href="stylesheets/stylesheet.css">
-		<script src="https://code.jquery.com/jquery-1.10.2.js"></script>
-		<script src="https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
-		<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+		<!-- <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+		<script src="https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script> -->
+		<!-- <script src='Queue.js'></script> -->
+		<script src="angular.min.js"></script>
 	</head>
 	<body ng-app="myApp" ng-controller="myCtrl" class='objectContainer' style='position:absolute;height:100%;background-color:black;'>
-		<div id='fps' style='position:absolute;font-size:14px;color:white;'>{{fps}}</div>
+		<div id='fps' style='position:absolute;font-size:14px;color:grey;top:1px;right:1px;'>{{fps}}</div>
 		<div id='theGrid' style='margin-left:20%;margin-top:5px;position:absolute;'></div>
 		<svg xmlns="http://www.w3.org/2000/svg" width="50px" height="50px" viewBox="0 0 200 200" version="1.1" style='position:absolute;right:30px;'>
 		    <polygon id='startStop' ng-mouseover='hoveredStartStopButton(true)' ng-mouseout='hoveredStartStopButton(false)' ng-click='toggleStartStop()' style="fill:#841414;stroke:grey;stroke-width:8px;font-size:10px;" points="136.737609507049,188.692435121084 63.2623904929514,188.692435121084 11.3075648789165,136.737609507049 11.3075648789165,63.2623904929514 63.2623904929513,11.3075648789165 136.737609507049,11.3075648789165 188.692435121084,63.2623904929513 188.692435121084,136.737609507049"/>
@@ -30,11 +31,11 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 	var timer =  totalTicks = 0;
 	var multFromFps=1
 	stop=0 //type stop=1 in console to pause the game. If you do it often, put a button on the action or make it hotkeyed to the 'space' key. (example in manualactions.js)
-	currentIndexOfType = [0, 0, 0, 0, 0, 0, 0]
+	currentIndexOfDepth = [0, 0, 0, 0, 0, 0, 0]
 	//------------Initial Variable Settings-----------
 	
 	var newSquareAmount = 1
-	var gridSize = 5;
+	var gridSize = 15;
 	var squareSizePx = 800 / gridSize;
 	//Map the objects position to their xy
 	positions = []
@@ -45,7 +46,6 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 			}
 		}
 	}
-	
 	var curSquareCount = positions.length;
 	theGrid = []
 	//Create the objects
@@ -54,6 +54,10 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 		newSquare.elem = makeSquareDiv(x); //keep the DOM element
 		theGrid.push(newSquare);
 	}
+	
+	var buttons = new Object()
+	buttons.countUpgrade = createCountUpgradeButton(0) //initial row
+	buttons.countUpgrade.depth = 0
 	
 	function makeSquareDiv(index) {
 		var div = document.createElement("div");
@@ -76,19 +80,22 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 	}
 	//------------------Formula----------------------
 	function changeSquareColor(index) {
-		
 		var nextColor = 'black'
 		if(theGrid[index].alive) {
-			var h = theGrid[index].h
-			var s = theGrid[index].s
-			var l = theGrid[index].l
-			if(theGrid[index].fadeTimeLeft) {
-				h = h + (80 * theGrid[index].fadeTimeLeft / theGrid[index].fadeTimeMax)
-				l = l - (25 * theGrid[index].fadeTimeLeft / theGrid[index].fadeTimeMax) - 8
-			}
-			nextColor = 'hsl('+h+','+s+'%,'+l+'%)'
+			nextColor = getColorFromObj(theGrid[index])
 		}
 		theGrid[index].elem.style.background = nextColor;
+	}
+	
+	function getColorFromObj(obj) { //h and l color fade time formula. returns hsl
+		var h = obj.h
+		var s = obj.s
+		var l = obj.l
+		if(obj.fadeTimeLeft) {
+			h = h + (80 * obj.fadeTimeLeft / obj.fadeTimeMax)
+			l = l - (25 * obj.fadeTimeLeft / obj.fadeTimeMax) - 8
+		}
+		return 'hsl('+h+','+s+'%,'+l+'%)'
 	}
 	
 	//----------------Starting Point-----------------
@@ -103,14 +110,13 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 			var fps = msWaitTime/calcAverageTime()*100
 			multFromFps = 100/fps
 			$scope.fps = round(fps)+"%"
-			//TODO Reduce the lag, don't just compensate for it.
 		} else {
 			multFromFps = 1
 			$scope.fps = "..."
 		}
 
 		//ACTION here
-		if(timer % 5 == 0) {
+		if(timer % 10) {
 			for(var x = 0; x < newSquareAmount; x++) {
 				addNewSquareOfType(0)
 			}
@@ -124,42 +130,114 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 			}
 		}
 	}
-
-	function addNewSquareOfType(type) {
-		// console.log(type)
-		if(currentIndexOfType[type] >= curSquareCount) { //if done adding
+	
+	
+	function addNewSquareOfType(type) { //Fade & color formulas
+		if(currentIndexOfDepth[type] >= curSquareCount) { //if done adding
 			 if(theGrid[curSquareCount-1].fadeTimeLeft == type) { //if done fading in
 				victoryForType(type)
 			}
 		} else {
 			var color = 216 - type * 49
-			var fadeTime = (30 + 75 * type * Math.pow(1.5, type))|0
-			setColorsForNewSquare(currentIndexOfType[type], color, 51, 33, fadeTime)
-			changeSquareColor(currentIndexOfType[type])
-			currentIndexOfType[type]++
+			var fadeTime = (50 + 75 * type * Math.pow(1.5, type))|0 // the |0 is Math.floor
+			setColorsForNewSquare(currentIndexOfDepth[type], color, 51, 33, fadeTime) //intial s and l
+			changeSquareColor(currentIndexOfDepth[type])
+			currentIndexOfDepth[type]++
 		}
 	}
 	
 	function victoryForType(type) {
-		// console.log('1 '+type +', '+ timer+', '+currentIndexOfType[type])
-		if(currentIndexOfType[type+1] && currentIndexOfType[type+1] == curSquareCount && theGrid[currentIndexOfType[type]-1].fadeTimeLeft == 0) { //if the above layer is ready
+		// console.log('1 '+type +', '+ timer+', '+currentIndexOfDepth[type])
+		if(currentIndexOfDepth[type+1] && currentIndexOfDepth[type+1] == curSquareCount && theGrid[currentIndexOfDepth[type]-1].fadeTimeLeft == 0) { //if the above layer is ready
 			victoryForType(type+1)
-			currentIndexOfType[type] = currentIndexOfType[type+1]
+			currentIndexOfDepth[type] = currentIndexOfDepth[type+1]
 			return
 		}
-		if(currentIndexOfType[type+1] === undefined) {
-			currentIndexOfType[type+1] = 0;
+		if(currentIndexOfDepth[type+1] === undefined) {
+			currentIndexOfDepth[type+1] = 0;
 		}
 		addNewSquareOfType(type+1)
-		currentIndexOfType[type] = currentIndexOfType[type+1];
-		// console.log('2 '+type +', '+ timer+', '+currentIndexOfType[type])
-		
-		for(var x = currentIndexOfType[type]; x < theGrid.length; x++) {
+		currentIndexOfDepth[type] = currentIndexOfDepth[type+1];
+		// console.log('2 '+type +', '+ timer+', '+currentIndexOfDepth[type])
+		clearGridFrom(currentIndexOfDepth[type], theGrid.length)
+	}
+	
+	//--------------------Buttons--------------------
+	function clickCountUpgradeButton() {
+		var depth = buttons.countUpgrade.depth
+		var i = findIndexOfGrid(0, buttons.countUpgrade.row)
+		if(theGrid[i].alive == 1 && theGrid[i].fadeTimeLeft <= 0 && currentIndexOfDepth[depth] >= i) {
+			var newIndex = (currentIndexOfDepth[depth] - (i+1))
+			if(currentIndexOfDepth[depth+1] && newIndex <= currentIndexOfDepth[depth+1]) {
+				newIndex = currentIndexOfDepth[depth+1] //retreat to latest currency
+			} else if(newIndex < 0) {
+				newIndex = 0
+			}
+			clearGridFrom(newIndex, currentIndexOfDepth[depth])
+			currentIndexOfDepth[depth] = newIndex
+			
+			buttons.countUpgrade.row+=2
+			if(buttons.countUpgrade.row >= gridSize) {
+				buttons.countUpgrade.row = 0
+				buttons.countUpgrade.depth++
+			}
+			buttons.countUpgrade.style.top = buttons.countUpgrade.row * squareSizePx + 'px'
+			buttons.countUpgrade.style.background = getColorFromObj({'h':216 - depth * 49,'s':51,'l':33})
+			
+			newSquareAmount++
+		}
+		else {
+			//clicked w/o the money
+			buttons.countUpgrade.style.border = '2px solid red'
+		}
+	}
+	
+	function clearGridFrom(index1, index2) {
+		for(var x = index1; x < index2; x++) {
 			theGrid[x].alive = 0;
+			theGrid[x].fadeTimeLeft = 0;
 			changeSquareColor(x)
 		}
 	}
-
+	
+	function createCountUpgradeButton(row) {
+		var div = document.createElement("div");
+		div.row = row;
+		div.style.height = ((squareSizePx/3)|0) + 'px'
+		div.style.width = squareSizePx + 'px'
+		div.style.marginTop = ((squareSizePx/3)|0)+'px'
+		div.style.background = getColorFromObj({'h':216,'s':51,'l':33})
+		div.style.left = -(squareSizePx+10)+'px'
+		div.style.top = row * squareSizePx + 'px'
+		div.setAttribute('class', 'buyButton');
+		div.onclick = clickCountUpgradeButton;
+		div.style.border = '2px solid grey'
+		div.onmouseover = function() {
+			buttons.countUpgrade.style.background = getColorFromObj({'h':216 - buttons.countUpgrade.depth * 49,'s':51,'l':50})
+		}
+		div.onmouseout = function() {
+			buttons.countUpgrade.style.background = getColorFromObj({'h':216 - buttons.countUpgrade.depth * 49,'s':51,'l':33})
+			buttons.countUpgrade.style.border = '2px solid grey'
+		}
+		document.getElementById('theGrid').appendChild(div);
+		return div;
+	}
+	
+	function findIndexOfGrid(x, y) {
+		for(var i = 0; i < positions.length; i++) {
+			if(positions[i].x == x && positions[i].y == y) {
+				return i;
+			}
+		}
+	}
+	function findXGivenRow(row) {
+		for(var x = 0; x < positions.length; x++) {
+			if(positions[x].x == 0 && positions[x].y == row) {
+				return x;
+			}
+		}
+	}
+	
 
 	{//--------------- Utility Functions----------------- AKA Not specific to this game
 		$scope.toggleStartStop = function() {
@@ -193,7 +271,7 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 			for(x = 1; x < timeList.length; x++) {
 				total += timeList[x] - timeList[x-1]
 			}
-			return total / timeList.length
+			return total / (timeList.length-1)
 		}
 
 		function round3(num) {
