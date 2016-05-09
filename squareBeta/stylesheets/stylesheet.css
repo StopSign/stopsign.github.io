@@ -32,6 +32,11 @@ div{
 		left:0;
 		width:100%;
 }
+.buyButton {
+	cursor:pointer;
+	left:-110px;
+	position:absolute;
+}
 
 /* -------------------------------------------- */
 /* 						helper 							   */
@@ -39,13 +44,6 @@ div{
 .number {
     color:black;
   vertical-align: top;
-}
-.buyButton {
-	width:90px;
-	height:80px;
-	margin-bottom:20px;
-	font-size:18px;
-	margin-top:30px;
 }
 .resource {
 	font-size:20px;
