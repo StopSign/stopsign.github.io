@@ -29,13 +29,14 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 	$scope.progress = []
 	timeList = [];
 	var timer =  totalTicks = 0;
-	var multFromFps=1
+	var multFromFps  =1
 	stop=0 //type stop=1 in console to pause the game. If you do it often, put a button on the action or make it hotkeyed to the 'space' key. (example in manualactions.js)
 	currentIndexOfDepth = [0, 0, 0, 0, 0, 0, 0]
+	var fadeReduction = 0;
 	//------------Initial Variable Settings-----------
 	
 	var newSquareAmount = 1
-	var gridSize = 7;
+	var gridSize = 5;
 	var squareSizePx = 800 / gridSize;
 	//Map the objects position to their xy
 	positions = []
@@ -139,7 +140,10 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 			}
 		} else {
 			var color = 216 - type * 49
-			var fadeTime = (5 + 15 * type * Math.pow(1.5, type))|0 // the |0 is Math.floor
+			var fadeTime = (30 + 15 * type * Math.pow(1.1, type) - fadeReduction)|0  // the |0 is Math.floor
+			if(fadeTime < 0) {
+				fadeTime = 0;
+			}
 			setColorsForNewSquare(currentIndexOfDepth[type], color, 51, 33, fadeTime) //intial s and l
 			changeSquareColor(currentIndexOfDepth[type])
 			currentIndexOfDepth[type]++
@@ -166,7 +170,7 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 	function clickCountUpgradeButton() {
 		var depth = buttons.countUpgrade.depth
 		var i = findIndexOfGrid(0, buttons.countUpgrade.row)
-		if(theGrid[i].alive == 1 && theGrid[i].fadeTimeLeft <= 0 && currentIndexOfDepth[depth] >= i) {
+		if(theGrid[i].alive == 1 && theGrid[i].fadeTimeLeft <= 0 && currentIndexOfDepth[depth] > i) {
 			var newIndex = (currentIndexOfDepth[depth] - (i+1))
 			if(currentIndexOfDepth[depth+1] && newIndex <= currentIndexOfDepth[depth+1]) {
 				newIndex = currentIndexOfDepth[depth+1] //retreat to latest currency
@@ -185,6 +189,7 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 			buttons.countUpgrade.style.background = getColorFromObj({'h':216 - depth * 49,'s':51,'l':33})
 			
 			newSquareAmount++
+			fadeReduction+=depth*5
 		}
 		else {
 			//clicked w/o the money
