@@ -140,7 +140,7 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 			}
 		} else {
 			var color = 216 - type * 49
-			var fadeTime = (30 + 15 * type * Math.pow(1.1, type) - fadeReduction)|0  // the |0 is Math.floor
+			var fadeTime = (30 + 15 * type * Math.pow(1.2, type) - fadeReduction)|0  // the |0 is Math.floor
 			if(fadeTime < 0) {
 				fadeTime = 0;
 			}
@@ -189,7 +189,7 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 			buttons.countUpgrade.style.background = getColorFromObj({'h':216 - depth * 49,'s':51,'l':33})
 			
 			newSquareAmount++
-			fadeReduction+=depth*5
+			fadeReduction+=5
 		}
 		else {
 			//clicked w/o the money
