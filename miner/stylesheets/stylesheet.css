@@ -1,0 +1,89 @@
+/* -------------------------------------------- */
+/* 					universal							   */
+/* -------------------------------------------- */
+div{
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    display:inline-block;
+	margin-top:0;
+}
+
+/* -------------------------------------------- */
+/* 			This Game   specific					   */
+/* -------------------------------------------- */
+.dirt {
+	position:absolute;
+}
+.tree {
+	position:absolute;
+  width: 0; 
+  height: 0; 
+  border-left: 12px solid transparent;
+  border-right: 12px solid transparent;
+  
+  border-bottom: 35px solid green;
+}
+.buyButton {
+	cursor:pointer;
+	background-color:grey;
+	font-size:12px;
+	padding:5px;
+	text-align:center;
+}
+.buyButton:hover {
+	background-color:white;
+	border:2px red solid;
+}
+
+/* -------------------------------------------- */
+/* 						helper 							   */
+/* -------------------------------------------- */
+.number {
+	color:gold;
+	font-size:14px;
+}
+.resource {
+	font-size:20px;
+	margin-top:5px;
+	margin-bottom:5px;
+	display:block;
+	color:blue;
+	background-color:#A9FFFF;
+	width:50%;
+	margin-left:25%;
+}
+.hyperVisible {
+    text-shadow:
+    -1px -1px 0 #000,
+    1px -1px 0 #000,
+    -1px 1px 0 #000,
+    1px 1px 0 #000;
+	color:white;
+}
+.objectContainer {
+	width:100%;
+	font-size:0;
+	margin:0;
+}
+.quickButton {
+	margin-left:10px;
+	width:70px;
+	background-color:black;
+	font-size:14px;
+	color:white;
+	cursor:pointer;
+	border:3px solid black;
+	border-radius:5px;
+	padding:3px;
+}
+.quickButton:hover {
+	border:3px solid red;
+}
+.quickButton:active {
+	border:3px solid red;
+	background-color:grey;
+}

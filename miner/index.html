@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html class='objectContainer'>
+	<head>
+		<meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+		<title>miner</title>
+		<link rel="stylesheet" href="stylesheets/stylesheet.css">
+		<!-- <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+		<script src="https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script> -->
+		<script src='model.js'></script>
+		<script src='view.js'></script>
+		<script src="angular.min.js"></script>
+	</head>
+	<body ng-app="myApp" ng-controller="myCtrl" class='objectContainer' style='position:absolute;height:100%;background-color:black;'>
+		<div id='fps' style='position:absolute;font-size:14px;color:grey;top:1px;right:1px;'>{{fps}}</div>
+		<div id='theForest' style='left:20%;top:5px;position:absolute;'></div>
+		<div id='theGrid' style='left:20%;top:150px;position:absolute;'></div>
+		<div id='gold' style='color:gold;font-size:20px;'>Gold: {{gold}}</div>
+		<div id='wood' style='color:green;font-size:20px;'>Wood: {{wood}}</div>
+		<div id='miner1Width' ng-click='miner1WidthBuy()' class='buyButton hyperVisible'>+ Miner Width</div><div class='number'>Cost: {{miner1WidthCost}}</div>
+		<div id='buyNewMine' ng-click='buyNewMine()' class='buyButton hyperVisible'>Buy New Stake</div><div class='number'>Cost: {{buyNewMineCost}}</div>
+		<svg xmlns="http://www.w3.org/2000/svg" width="50px" height="50px" viewBox="0 0 200 200" version="1.1" style='position:absolute;right:30px;'>
+		    <polygon id='startStop' ng-mouseover='hoveredStartStopButton(true)' ng-mouseout='hoveredStartStopButton(false)' ng-click='toggleStartStop()' style="fill:#841414;stroke:grey;stroke-width:8px;font-size:10px;" points="136.737609507049,188.692435121084 63.2623904929514,188.692435121084 11.3075648789165,136.737609507049 11.3075648789165,63.2623904929514 63.2623904929513,11.3075648789165 136.737609507049,11.3075648789165 188.692435121084,63.2623904929513 188.692435121084,136.737609507049"/>
+		</svg>
+	</body>
+</html>
+
+<script>
+//the answer to "how to i access scope variables from console"
+//angular.element($0).scope()
+
+var app = angular.module('myApp', []);
+app.controller('myCtrl', function($scope, $interval, $compile) {
+	
+	
+	timeList = [];
+	var timer =  totalTicks = 0;
+	stop=0
+	
+	//----------------Starting Point-----------------
+	theGrid = []
+	theForest = []
+	maxWidth = 10
+	maxDepth = 10
+	maxX = 800
+	maxY = 1000
+	id=0
+	treeId=0
+	for(var x = 0; x < maxWidth; x++) {
+		for(var y = 0; y < maxDepth; y++) {
+			theGrid.push(new Dirt(x, y))
+		}
+	}
+	for(var x = 0; x < 50; x++) {
+		theForest.push(new Tree((x/3)|0))
+	}
+	
+	
+	
+	$scope.tick = function() {
+		timer++
+		timeList.push(new Date().getTime())
+		if(timeList.length > 100) {
+			timeList.splice(0, 1)
+
+			//TODO instead of calc average, sub first from last / 2
+			var fps = msWaitTime/calcAverageTime()*100
+			multFromFps = 100/fps
+			$scope.fps = round(fps)+"%"
+		} else {
+			multFromFps = 1
+			$scope.fps = "..."
+		}
+
+		//ACTION here
+		miners.forEach(minersMove)
+		loggers.forEach(chopWood)
+		draw()
+	}
+	//Starting vars
+	miners = []
+	loggers = []
+	miners.push(new Miner(function() {
+		//choose next material
+		this.mineCounter++
+		if(this.mineCounter%this.miningWidth==0) {
+			this.y++
+			this.x -= (this.miningWidth-2)
+		} else {
+			this.x++
+		}
+	})) 
+	loggers.push(new Logger(function() {
+		//choose next tree
+		this.target++
+	}));
+	$scope.gold = 0
+	$scope.wood = 0
+	$scope.miner1WidthCost = 20
+	$scope.buyNewMineCost = 10
+	
+	
+	
+	
+	function minersMove(miner, index) {
+		if(miner.stop) {
+			return
+		}
+		miner.curSpeed--
+		if(miner.curSpeed <= 0) {
+			miner.curSpeed = miner.speed
+			var material = findMaterialInGrid(miner.x, miner.y)
+			material.isUpdating = true
+			material.toughness -= miner.power
+			if(material.toughness <= 0) {
+				material.toughness = 0
+				material.isDead = 1
+				$scope.gold += material.value
+				miner.movementPattern()
+				while(miner.x < 0 || miner.y < 0) {
+					miner.movementPattern()
+				}
+				if(miner.x >= maxWidth || miner.y >= maxDepth) {
+					miner.stop = true
+				}
+			}
+			//console.log(material)
+		}
+	}
+	
+	$scope.miner1WidthBuy = function() {
+		if($scope.gold >= $scope.miner1WidthCost) {
+			$scope.gold -= $scope.miner1WidthCost
+			//cost growth
+			$scope.miner1WidthCost *= 2
+			//effect
+			miners[0].miningWidth++
+		}
+	}
+	
+	$scope.buyNewMine = function() {
+		if($scope.gold >= $scope.buyNewMineCost) {
+			$scope.gold -= $scope.buyNewMineCost
+			//effect
+			miners[0].x = 0
+			miners[0].y = 0
+			miners[0].stop = false
+			miners[0].mineCounter = 0
+			
+			loggers[0].target = 0
+			loggers[0].stop = false
+			resetAllMaterial()
+		}
+	}
+	
+	function findMaterialInGrid(targetX, targetY) {
+		for(var x = 0; x < theGrid.length; x++) {
+			if(theGrid[x].x === targetX && theGrid[x].y === targetY) {
+				return theGrid[x]
+			}
+		}
+		console.log('Couldnt find with '+targetX+','+targetY)
+		return null
+	}
+	
+	function resetAllMaterial() {
+		for(var x = 0; x < theGrid.length; x++) {
+			theGrid[x].toughness = theGrid[x].toughnessMax
+			theGrid[x].isUpdating = true;
+		}
+		for(var x = 0; x < theForest.length; x++) {
+			theForest[x].health = theForest[x].healthMax
+			theForest[x].isUpdating = true
+		}
+		draw();
+	}
+	
+	
+	function chopWood(logger, index) {
+		if(logger.stop) {
+			return
+		}
+		logger.curSpeed--
+		if(logger.curSpeed <= 0) {
+			logger.curSpeed = logger.speed
+			var tree = theForest[logger.target]
+			tree.isUpdating = true
+			tree.health -= logger.power
+			if(tree.health <= 0) {
+				tree.health = 0
+				tree.isDead = 1
+				$scope.wood += tree.woodValue
+				logger.movementPattern()
+				if(logger.target >= theForest.length) {
+					logger.stop = true
+				}
+			}
+		}
+	}
+	
+	
+	
+	
+	
+	{//--------------- Utility Functions----------------- AKA Not specific to this game
+		$scope.toggleStartStop = function() {
+			stop = !stop
+			$scope.hoveredStartStopButton(true)
+			timeList = []
+		}
+		
+		$scope.hoveredStartStopButton = function(isEntering) {
+			startStopButton = document.getElementById('startStop')
+			if(isEntering) {
+				if(!stop) {
+					startStopButton.style.fill='#A71A1A';
+				} else {
+					startStopButton.style.fill='#44A248';
+				}
+			} else {
+				if(!stop) {
+					startStopButton.style.fill='#841414';
+				} else {
+					startStopButton.style.fill='#2E7932';
+				}
+			}
+		}
+
+		//because I hate IE so much
+		Math.log2 = Math.log2 || function(x){return Math.log(x)*Math.LOG2E;};
+
+		function calcAverageTime() {
+			total = 0;
+			for(x = 1; x < timeList.length; x++) {
+				total += timeList[x] - timeList[x-1]
+			}
+			return total / (timeList.length-1)
+		}
+
+		function round3(num) {
+			return Math.floor(num*1000)/1000
+		}
+		function round2(num) {
+			return Math.floor(num*100)/100
+		}
+		function round1(num) {
+			return Math.floor(num*10)/10
+		}
+
+		function round(num) {
+			return formatNumber(num);
+		} function formatNumber(num) {
+			return Math.floor(num).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+		}
+
+		/*
+		  Converts an HSL color value to RGB. Conversion formula
+		  adapted from http://en.wikipedia.org/wiki/HSL_color_space.
+		  Assumes h, s, and l are contained in the set [0, 1] and
+		  returns r, g, and b in the set [0, 255].
+
+		  @param   Number  h       The hue
+		  @param   Number  s       The saturation
+		  @param   Number  l       The lightness
+		  @return  Array           The RGB representation
+		 */
+		function hslToRgb(h, s, l){
+			var r, g, b;
+
+			if(s == 0){
+				r = g = b = l; // achromatic
+			}else{
+				var hue2rgb = function hue2rgb(p, q, t){
+					if(t < 0) t += 1;
+					if(t > 1) t -= 1;
+					if(t < 1/6) return p + (q - p) * 6 * t;
+					if(t < 1/2) return q;
+					if(t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+					return p;
+				}
+
+				var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+				var p = 2 * l - q;
+				r = hue2rgb(p, q, h + 1/3);
+				g = hue2rgb(p, q, h);
+				b = hue2rgb(p, q, h - 1/3);
+			}
+
+			return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
+		}
+
+		/*
+		  Converts an RGB color value to HSL. Conversion formula
+		  adapted from http://en.wikipedia.org/wiki/HSL_color_space.
+		  Assumes r, g, and b are contained in the set [0, 255] and
+		  returns h, s, and l in the set [0, 1].
+
+		  @param   Number  r       The red color value
+		  @param   Number  g       The green color value
+		  @param   Number  b       The blue color value
+		  @return  Array           The HSL representation
+		 */
+		function rgbToHsl(r, g, b){
+			r /= 255, g /= 255, b /= 255;
+			var max = Math.max(r, g, b), min = Math.min(r, g, b);
+			var h, s, l = (max + min) / 2;
+
+			if(max == min){
+				h = s = 0; // achromatic
+			}else{
+				var d = max - min;
+				s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+				switch(max){
+					case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+					case g: h = (b - r) / d + 2; break;
+					case b: h = (r - g) / d + 4; break;
+				}
+				h /= 6;
+			}
+
+			return [h, s, l];
+		}
+
+		//ang helper methods
+		$scope.buyButtonClicked = function(costVar, resultOfFinish) {
+			if($scope.theResource >= costVar) {
+				$scope.theResource -= costVar //cost
+				resultOfFinish()
+			}
+		}
+		
+
+
+	}
+
+
+	{//----The Timer----
+	//this way doesn't work when javascript is open in a different tab
+	//javascript will default change the 5 to minimum 500 in that case
+	//use interval.js somehow to get around it. google that along with angular?
+	msWaitTime = 50 //doesn't actually wait decimal amounts
+	$interval(function() { if(!stop) $scope.tick(); }, msWaitTime);
+	}
+});
+</script>
