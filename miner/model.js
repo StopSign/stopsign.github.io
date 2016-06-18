@@ -1,21 +1,23 @@
 
 function Logger(movementPattern) {
-	this.power = 1
-	this.speed = 1
+	this.power = 6
+	this.speed = 40
 	this.curSpeed = 10
 	this.target = 0
 	this.movementPattern = movementPattern
+	this.isVisible = true
 }
 	
 function Miner(movementPattern) {
-	this.power = 1
-	this.speed = 5
+	this.power = 6
+	this.speed = 20
 	this.curSpeed = 10
 	this.x = 0
 	this.y = 0
 	this.mineCounter = 0
 	this.miningWidth = 2
 	this.movementPattern = movementPattern
+	this.isVisible = true
 }
 
 function Dirt(x, y) {
@@ -38,7 +40,8 @@ function Dirt(x, y) {
 
 function Tree(size) {
 	this.id = treeId++
-	this.healthMax = this.health = ((((size+5)^2)/100+1)*20)|0
+	this.healthMax = this.health = (20*Math.pow(1.3, size))|0 + 20
+	//console.log("healthMax: "+this.healthMax+", size: "+size)
 	this.x = (Math.random() * maxX)|0
 	this.y = 100 - this.id*1.4
 	

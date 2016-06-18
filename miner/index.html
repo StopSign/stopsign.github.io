@@ -12,12 +12,86 @@
 	</head>
 	<body ng-app="myApp" ng-controller="myCtrl" class='objectContainer' style='position:absolute;height:100%;background-color:black;'>
 		<div id='fps' style='position:absolute;font-size:14px;color:grey;top:1px;right:1px;'>{{fps}}</div>
-		<div id='theForest' style='left:20%;top:5px;position:absolute;'></div>
-		<div id='theGrid' style='left:20%;top:150px;position:absolute;'></div>
-		<div id='gold' style='color:gold;font-size:20px;'>Gold: {{gold}}</div>
-		<div id='wood' style='color:green;font-size:20px;'>Wood: {{wood}}</div>
-		<div id='miner1Width' ng-click='miner1WidthBuy()' class='buyButton hyperVisible'>+ Miner Width</div><div class='number'>Cost: {{miner1WidthCost}}</div>
-		<div id='buyNewMine' ng-click='buyNewMine()' class='buyButton hyperVisible'>Buy New Stake</div><div class='number'>Cost: {{buyNewMineCost}}</div>
+		<div id='theForest' style='left:400px;top:5px;position:absolute;'></div>
+		<div id='theGrid' style='left:400px;top:150px;position:absolute;'></div>
+		<div style='position:absolute;left:10px;top:5px;background-color:#383838;padding:3px;'>
+			<div id='gold' class='goldColor' style='color:gold;font-size:20px;'>Gold: {{gold}}</div><br>
+			<div id='wood' class='woodColor' style='font-size:20px;'>Wood: {{wood}}</div>
+		</div>
+		<div    id='theStakeList'         style='position:absolute;left:10px;top:65px;height:177px;width:191px;background-color:#383838'>
+			<div id='buyNewStake' ng-click='buyNewStake(0)'class='buyButton hyperVisible'>Buy Cheap Stake</div>
+			<div class='number woodColor someSpace'>Cost: {{buyNewStakeCost[0]}}</div>
+			<div id='buyNewStake' ng-click='buyNewStake(1)' class='buyButton hyperVisible'>Buy Small Stake</div>
+			<div class='number woodColor someSpace'>Cost: {{buyNewStakeCost[1]}}</div><br>
+			<div id='buyNewStake' ng-click='buyNewStake(2)' class='buyButton hyperVisible'>Buy OK Stake</div>
+			<div class='number woodColor someSpace'>Cost: {{buyNewStakeCost[2]}}</div><br>
+			<div id='buyNewStake' ng-show='plotUnlocked3' ng-click='buyNewStake(3)' class='buyButton hyperVisible'>Buy Nice Stake</div>
+			<div ng-show='plotUnlocked3' class='number woodColor someSpace'>Cost: {{buyNewStakeCost[3]}}</div><br>
+			<div id='buyNewStake' ng-show='plotUnlocked4' ng-click='buyNewStake(4)' class='buyButton hyperVisible'>Buy Interesting Stake</div>
+			<div ng-show='plotUnlocked4' class='number woodColor someSpace'>Cost: {{buyNewStakeCost[4]}}</div><br>
+			<div id='buyNewStake' ng-show='plotUnlocked5' ng-click='buyNewStake(5)' class='buyButton hyperVisible'>Buy Premium Stake</div>
+			<div ng-show='plotUnlocked5' class='number woodColor someSpace'>Cost: {{buyNewStakeCost[5]}}</div><br>
+			<div id='buyNewStake' ng-show='plotUnlocked6' ng-click='buyNewStake(6)' class='buyButton hyperVisible'>Buy Excellent Stake</div>
+			<div ng-show='plotUnlocked6' class='number woodColor someSpace'>Cost: {{buyNewStakeCost[6]}}</div>
+		</div>
+		<div    id='Names and Upgrades'   style='position:absolute;left:10px;top:251px;height:400px;width:379px;background-color:#383838;border:2px solid white;'>
+			<div ng-show='totalWorkers>0 && loggers[0].isVisible' ng-click='playerSpaceVisible = playerSpaceVisible == 0 ? -1 : 0' class='nameButton hyperVisible'>Jane</div>
+			<div ng-show='totalWorkers>2 && loggers[1].isVisible' ng-click='playerSpaceVisible = playerSpaceVisible == 1 ? -1 : 1' class='nameButton hyperVisible'>Alexa</div>
+			<div ng-show='totalWorkers>4 && loggers[2].isVisible' ng-click='playerSpaceVisible = playerSpaceVisible == 2 ? -1 : 2' class='nameButton hyperVisible'>Beth</div>
+			<div ng-show='totalWorkers>8 && loggers[3].isVisible' ng-click='playerSpaceVisible = playerSpaceVisible == 3 ? -1 : 3' class='nameButton hyperVisible'>Lucy</div>
+			<div ng-show='totalWorkers>1 && miners[0].isVisible' ng-click='playerSpaceVisible = playerSpaceVisible == 4 ? -1 : 4' class='nameButton hyperVisible'>Kyle</div>
+			<div ng-show='totalWorkers>3 && miners[1].isVisible' ng-click='playerSpaceVisible = playerSpaceVisible == 5 ? -1 : 5' class='nameButton hyperVisible'>Paul</div>
+			<div ng-show='totalWorkers>5 && miners[2].isVisible' ng-click='playerSpaceVisible = playerSpaceVisible == 6 ? -1 : 6' class='nameButton hyperVisible'>Blaine</div>
+			<div ng-show='totalWorkers>7 && miners[3].isVisible' ng-click='playerSpaceVisible = playerSpaceVisible == 7 ? -1 : 7' class='nameButton hyperVisible'>Moreccio</div><br>
+			<div ng-show='playerSpaceVisible == 0'> 
+				<div id='miner1Width' ng-click='buyNewEmployee()'  ng-mouseover='isHover1 = 1' ng-mouseleave='isHover1 = 0' class='buyButton hyperVisible'>New Employee</div>
+				<div class='number hyperVisible someSpace'>&nbsp;Current: {{totalWorkers}}</div>
+				<div ng-show='isHover1' class='number tealColor'>--> {{totalWorkers}}&nbsp;</div>
+				<div class='number goldColor'>Cost: {{employeeCost}}</div>
+				<div ng-show='isHover1' class='number tealColor'>--> {{employeeCost}}&nbsp;</div><br>
+				<div id='miner1Width' ng-click='buyPlotSize()' class='buyButton hyperVisible'>+ Plot Size</div>
+				<div class='number hyperVisible someSpace'>&nbsp;Current: {{bonusPlotSize}}&nbsp;</div>
+				<div ng-show='isHover1' class='number tealColor'>--> {{bonusPlotSize}}&nbsp;</div>
+				<div class='number goldColor'>Cost: {{plotSizeCost}}</div>
+				<div ng-show='isHover1' class='number tealColor'>--> {{plotSizeCost}}&nbsp;</div><br>
+				<div id='miner1Width' ng-click='buyTreeCount()' class='buyButton hyperVisible'>+ Tree Count</div>
+				<div class='number hyperVisible someSpace'>&nbsp;Current: {{bonusForestSize}}&nbsp;</div>
+				<div ng-show='isHover1' class='number tealColor'>--> {{bonusForestSize}}&nbsp;</div>
+				<div class='number goldColor'>Cost: {{treeCountCost}}</div>
+				<div ng-show='isHover1' class='number tealColor'>--> {{treeCountCost}}&nbsp;</div><br>
+				<div id='miner1Width' ng-click='buyMiner1Width()()' class='buyButton hyperVisible'>+ Miner1 Width</div>
+				<div class='number hyperVisible someSpace'>&nbsp;Current: {{miners[0].miningWidth}}&nbsp;</div>
+				<div class='number goldColor'>Cost: {{miner1WidthCost}}</div><br>
+			</div>
+			<div ng-show='playerSpaceVisible == 1'>
+				
+			</div>
+			<div ng-show='playerSpaceVisible == 2'>
+				
+			</div>
+			<div ng-show='playerSpaceVisible == 3'>
+				
+			</div>
+			<div ng-show='playerSpaceVisible == 4'>
+				<div id='miner1Width' ng-click='buyChanceForGold(0)' class='buyButton hyperVisible'>Chance for Gold when Mining Dirt</div>
+				<div class='number hyperVisible someSpace'>Current: {{chanceForGold[0]}}%</div>
+				<div class='number goldColor'>Cost: {{chanceForGoldCost[0]}}</div><br>
+				<div id='miner1Width' ng-click='buyChanceForGold(1)' class='buyButton hyperVisible'>Chance for Gold when Mining Stone</div>
+				<div class='number hyperVisible someSpace'>Current: {{chanceForGoldCost[1]}}%</div>
+				<div class='number goldColor'>Cost: {{chanceForGoldCost[1]}}</div><br>
+			</div>
+			<div ng-show='playerSpaceVisible == 5'>
+				
+			</div>
+			<div ng-show='playerSpaceVisible == 6'>
+				
+			</div>
+			<div ng-show='playerSpaceVisible == 7'>
+				
+			</div>
+			
+		</div>
+		<!-- stop=1 when pressed -->
 		<svg xmlns="http://www.w3.org/2000/svg" width="50px" height="50px" viewBox="0 0 200 200" version="1.1" style='position:absolute;right:30px;'>
 		    <polygon id='startStop' ng-mouseover='hoveredStartStopButton(true)' ng-mouseout='hoveredStartStopButton(false)' ng-click='toggleStartStop()' style="fill:#841414;stroke:grey;stroke-width:8px;font-size:10px;" points="136.737609507049,188.692435121084 63.2623904929514,188.692435121084 11.3075648789165,136.737609507049 11.3075648789165,63.2623904929514 63.2623904929513,11.3075648789165 136.737609507049,11.3075648789165 188.692435121084,63.2623904929513 188.692435121084,136.737609507049"/>
 		</svg>
@@ -36,22 +110,24 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 	var timer =  totalTicks = 0;
 	stop=0
 	
-	//----------------Starting Point-----------------
+	{//----------------Starting vars-----------------
 	theGrid = []
 	theForest = []
-	maxWidth = 10
-	maxDepth = 10
+	treeAmount = 4
+	maxWidth = 8
+	maxDepth = 8
 	maxX = 800
 	maxY = 1000
 	id=0
 	treeId=0
-	for(var x = 0; x < maxWidth; x++) {
-		for(var y = 0; y < maxDepth; y++) {
+	for(var x = 0; x < 40; x++) {
+		for(var y = 0; y < 55; y++) {
 			theGrid.push(new Dirt(x, y))
 		}
 	}
-	for(var x = 0; x < 50; x++) {
+	for(var x = 0; x < 75; x++) {
 		theForest.push(new Tree((x/3)|0))
+	}
 	}
 	
 	
@@ -72,14 +148,36 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 		}
 
 		//ACTION here
-		miners.forEach(minersMove)
-		loggers.forEach(chopWood)
+		$scope.miners.forEach(minersMove)
+		$scope.loggers.forEach(chopWood)
+		if(timer==1) {
+			resetAllMaterial()
+		}
 		draw()
 	}
-	//Starting vars
-	miners = []
-	loggers = []
-	miners.push(new Miner(function() {
+	
+	{//================Starting scope vars=======================
+	$scope.totalWorkers = 2
+	$scope.miners = []
+	$scope.loggers = []
+	$scope.gold = 0
+	$scope.wood = 0
+	$scope.miner1WidthCost = 20
+	$scope.plotSizeCost = 3
+	$scope.treeCountCost = 8
+	$scope.employeeCost = 100
+	$scope.chanceForGoldCost = [3, 30]
+	
+	$scope.buyNewStakeCost = [0, 50, 300, 1800, 10800, 64800, 500000]
+	$scope.plotUnlocked3 = $scope.plotUnlocked4 = $scope.plotUnlocked5 = $scope.plotUnlocked6 = false
+	$scope.bonusPlotSize = 0
+	$scope.bonusForestSize = 0
+	
+	$scope.chanceForGold = [10, 30]
+	}
+	
+	{ //=================Worker formula=================
+	$scope.miners.push(new Miner(function() {
 		//choose next material
 		this.mineCounter++
 		if(this.mineCounter%this.miningWidth==0) {
@@ -89,17 +187,104 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 			this.x++
 		}
 	})) 
-	loggers.push(new Logger(function() {
+	$scope.miners.push(new Miner(function() {
+		this.stop = true
+	})) 
+	$scope.miners.push(new Miner(function() {
+		this.stop = true
+	})) 
+	$scope.miners.push(new Miner(function() {
+		this.stop = true
+	})) 
+	$scope.loggers.push(new Logger(function() {
 		//choose next tree
 		this.target++
 	}));
-	$scope.gold = 0
-	$scope.wood = 0
-	$scope.miner1WidthCost = 20
-	$scope.buyNewMineCost = 10
+	$scope.loggers.push(new Logger(function() {
+		this.stop = true
+	}));
+	$scope.loggers.push(new Logger(function() {
+		this.stop = true
+	}));
+	$scope.loggers.push(new Logger(function() {
+		this.stop = true
+	}));
+	}
 	
 	
+	$scope.buyMiner1Width = function() {
+		if($scope.gold >= $scope.miner1WidthCost) {
+			$scope.gold -= $scope.miner1WidthCost
+			//cost growth
+			$scope.miner1WidthCost *= 2
+			//effect
+			$scope.miners[0].miningWidth++
+		}
+	}
+	$scope.buyPlotSize = function() {
+		if($scope.gold >= $scope.plotSizeCost) {
+			$scope.gold -= $scope.plotSizeCost
+			//cost growth
+			$scope.plotSizeCost = Math.pow($scope.bonusPlotSize, 2) + 3
+			//effect
+			$scope.bonusPlotSize++
+		}
+	}
+	$scope.buyNewEmployee = function() {
+		
+		if($scope.gold >= $scope.employeeCost) {
+			$scope.gold -= $scope.employeeCost
+			//cost growth
+			$scope.employeeCost *= 30
+			//effect
+			$scope.totalWorkers++
+		}
+	}
+	$scope.buyTreeCount = function() {
+		if($scope.gold >= $scope.treeCountCost) {
+			$scope.gold -= $scope.treeCountCost
+			//cost growth
+			$scope.treeCountCost *= 3
+			//effect
+			$scope.bonusForestSize++
+		}
+		
+	}
+	$scope.buyChanceForGold = function(num) {
+		if($scope.gold >= $scope.chanceForGoldCost[num]) {
+			$scope.gold -= $scope.chanceForGoldCost[num]
+			//cost growth
+			$scope.chanceForGoldCost[num] *= 2
+			//effect
+			$scope.chanceForGold[num] += ((num+1)/2)+1
+		}
+	}
 	
+	$scope.buyNewStake = function(num) {
+		if($scope.wood >= $scope.buyNewStakeCost[num]) {
+			$scope.wood -= $scope.buyNewStakeCost[num]
+			//effect of resetting the stakes
+			$scope.miners[0].x = 0
+			$scope.miners[0].y = 0
+			$scope.miners[0].stop = false
+			$scope.miners[0].mineCounter = 0
+			
+			$scope.loggers[0].target = 0
+			$scope.loggers[0].stop = false
+			
+			var mult = Math.pow(2, num) //stake value growth rate
+			var size = ((Math.random()*6 + 3*(num+1) + $scope.bonusPlotSize)*mult)|0
+			maxWidth = size
+			maxDepth = (size*1.5)|0
+			
+			treeAmount = ((Math.random()*3 + $scope.bonusForestSize)*mult)|0
+			
+			//console.log("size:"+size)
+			//console.log("mult:"+mult)
+			resetAllMaterial()
+			
+		}
+	}
 	
 	function minersMove(miner, index) {
 		if(miner.stop) {
@@ -109,12 +294,17 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 		if(miner.curSpeed <= 0) {
 			miner.curSpeed = miner.speed
 			var material = findMaterialInGrid(miner.x, miner.y)
+			if(!material) {
+				return;
+			}
 			material.isUpdating = true
 			material.toughness -= miner.power
 			if(material.toughness <= 0) {
 				material.toughness = 0
 				material.isDead = 1
-				$scope.gold += material.value
+				if(Math.random() < $scope.chanceForGold[0]/100) {//10% by default
+					$scope.gold += material.value
+				}
 				miner.movementPattern()
 				while(miner.x < 0 || miner.y < 0) {
 					miner.movementPattern()
@@ -126,32 +316,33 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 			//console.log(material)
 		}
 	}
-	
-	$scope.miner1WidthBuy = function() {
-		if($scope.gold >= $scope.miner1WidthCost) {
-			$scope.gold -= $scope.miner1WidthCost
-			//cost growth
-			$scope.miner1WidthCost *= 2
-			//effect
-			miners[0].miningWidth++
+
+	function chopWood(logger, index) {
+		if(logger.stop) {
+			return
+		}
+		logger.curSpeed--
+		if(logger.curSpeed <= 0) {
+			logger.curSpeed = logger.speed
+			var tree = theForest[logger.target]
+			if(!tree) {
+				return;
+			}
+			tree.isUpdating = true
+			tree.health -= logger.power
+			if(tree.health <= 0) {
+				tree.health = 0
+				tree.isDead = 1
+				$scope.wood += tree.woodValue
+				logger.movementPattern()
+				if(logger.target >= theForest.length || logger.target > treeAmount) {
+					logger.stop = true
+				}
+			}
 		}
 	}
-	
-	$scope.buyNewMine = function() {
-		if($scope.gold >= $scope.buyNewMineCost) {
-			$scope.gold -= $scope.buyNewMineCost
-			//effect
-			miners[0].x = 0
-			miners[0].y = 0
-			miners[0].stop = false
-			miners[0].mineCounter = 0
-			
-			loggers[0].target = 0
-			loggers[0].stop = false
-			resetAllMaterial()
-		}
-	}
-	
+
+
 	function findMaterialInGrid(targetX, targetY) {
 		for(var x = 0; x < theGrid.length; x++) {
 			if(theGrid[x].x === targetX && theGrid[x].y === targetY) {
@@ -164,38 +355,27 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 	
 	function resetAllMaterial() {
 		for(var x = 0; x < theGrid.length; x++) {
-			theGrid[x].toughness = theGrid[x].toughnessMax
+			if(theGrid[x].x < maxWidth && theGrid[x].y < maxDepth) {
+				theGrid[x].toughness = theGrid[x].toughnessMax
+			} else {
+				theGrid[x].toughness = 0
+			}
 			theGrid[x].isUpdating = true;
 		}
 		for(var x = 0; x < theForest.length; x++) {
-			theForest[x].health = theForest[x].healthMax
+			if(x <= treeAmount) {
+				theForest[x].health = theForest[x].healthMax
+				var effect = (maxX - 25*(32-treeAmount))
+				theForest[x].x = (Math.random() * (effect>800?800:effect))|0
+			} else {
+				theForest[x].health = 0;
+			}
 			theForest[x].isUpdating = true
 		}
 		draw();
 	}
 	
 	
-	function chopWood(logger, index) {
-		if(logger.stop) {
-			return
-		}
-		logger.curSpeed--
-		if(logger.curSpeed <= 0) {
-			logger.curSpeed = logger.speed
-			var tree = theForest[logger.target]
-			tree.isUpdating = true
-			tree.health -= logger.power
-			if(tree.health <= 0) {
-				tree.health = 0
-				tree.isDead = 1
-				$scope.wood += tree.woodValue
-				logger.movementPattern()
-				if(logger.target >= theForest.length) {
-					logger.stop = true
-				}
-			}
-		}
-	}
 	
 	
 	

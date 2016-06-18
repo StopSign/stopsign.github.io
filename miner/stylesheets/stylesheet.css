@@ -37,13 +37,44 @@ div{
 .buyButton:hover {
 	background-color:white;
 	border:2px red solid;
+	padding:3px
+}
+.goldColor {
+	color:gold;
+}
+.woodColor {
+	color:green;
+}
+.tealColor {
+	color:teal;
+}
+
+
+.someSpace {
+	margin-left:4px;
+	margin-right:4px;
+}
+.nameButton {
+	cursor:pointer;
+	background-color:grey;
+	font-size:12px;
+	padding:5px;
+	padding-left:10px;
+	padding-right:10px;
+	text-align:center;
+}
+.nameButton:hover {
+	background-color:red;
+	border:2px white solid;
+	padding:3px;
+	padding-left:8px;
+	padding-right:8px;
 }
 
 /* -------------------------------------------- */
 /* 						helper 							   */
 /* -------------------------------------------- */
 .number {
-	color:gold;
 	font-size:14px;
 }
 .resource {
