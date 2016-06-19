@@ -1,7 +1,5 @@
 
 function Logger(movementPattern) {
-	this.power = 6
-	this.speed = 40
 	this.curSpeed = 10
 	this.target = 0
 	this.movementPattern = movementPattern
@@ -9,8 +7,6 @@ function Logger(movementPattern) {
 }
 	
 function Miner(movementPattern) {
-	this.power = 6
-	this.speed = 20
 	this.curSpeed = 10
 	this.x = 0
 	this.y = 0
@@ -35,17 +31,18 @@ function Dirt(x, y) {
 	this.theDiv = theDiv
 	this.isDrawn = false
 	this.isUpdating = true
+	this.hasGivenGold = 0;
 }
 
 
 function Tree(size) {
 	this.id = treeId++
-	this.healthMax = this.health = (20*Math.pow(1.3, size))|0 + 20
+	this.healthMax = this.health = (20*Math.pow(1.3, size))|0 + 40
 	//console.log("healthMax: "+this.healthMax+", size: "+size)
 	this.x = (Math.random() * maxX)|0
 	this.y = 100 - this.id*1.4
 	
-	this.woodValue = (1+(size*.2001))|0
+	this.woodValue = (2+(size*.4001))|0
 	
 	var theDiv = document.createElement("div");
 	theDiv.id = 'tree'+this.id
@@ -55,4 +52,5 @@ function Tree(size) {
 	this.theDiv = theDiv
 	this.isDrawn = false
 	this.isUpdating = true
+	this.hasGivenGold = 0;
 }

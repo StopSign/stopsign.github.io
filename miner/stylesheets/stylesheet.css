@@ -39,6 +39,19 @@ div{
 	border:2px red solid;
 	padding:3px
 }
+.buttonContainer {
+	width:360px;
+	padding:3px;
+	background-color:black;
+	border:1px solid grey;
+}
+.loggerUpgrades {
+	background-color:green;
+}
+.minerUpgrades {
+	background-color:yellow;
+}
+
 .goldColor {
 	color:gold;
 }
@@ -48,6 +61,7 @@ div{
 .tealColor {
 	color:teal;
 }
+
 
 
 .someSpace {

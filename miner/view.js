@@ -43,3 +43,5 @@
 		tree.theDiv.style.opacity = tree.health/tree.healthMax
 		tree.isUpdating = false;
 	}
+	
+	
