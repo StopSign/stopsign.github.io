@@ -11,29 +11,9 @@ function Miner(movementPattern) {
 	this.x = 0
 	this.y = 0
 	this.mineCounter = 0
-	this.miningWidth = 2
 	this.movementPattern = movementPattern
 	this.isVisible = true
 }
-
-function Dirt(x, y) {
-	this.toughness = this.toughnessMax = 10
-	this.x = x
-	this.y = y
-	this.id = id++
-	
-	this.value = 1
-	
-	var theDiv = document.createElement("div");
-	theDiv.id = 'material'+this.id
-	theDiv.className = 'dirt'
-	theDiv.style.backgroundColor = 'rgb(109, 67, 67)'
-	this.theDiv = theDiv
-	this.isDrawn = false
-	this.isUpdating = true
-	this.hasGivenGold = 0;
-}
-
 
 function Tree(size) {
 	this.id = treeId++
@@ -44,13 +24,53 @@ function Tree(size) {
 	
 	this.woodValue = (2+(size*.4001))|0
 	
+	TreeGraphics(this)
+	
+	this.hasGivenGold = 0;
+	this.isDead = 0
+	this.stop = 0
+}
+
+
+function Material(x, y) {
+	this.toughness = this.toughnessMax = 10
+	this.x = x
+	this.y = y
+	this.id = id++
+	
 	var theDiv = document.createElement("div");
-	theDiv.id = 'tree'+this.id
-	theDiv.className = 'tree'
-	theDiv.style.borderBottom = (35+this.id*.8)+'px solid rgba(31,88,31,.9)'
-	//theDiv.style.backgroundColor = 'rgb(109, 67, 67)'
+	theDiv.id = 'material'+this.id
 	this.theDiv = theDiv
+	
 	this.isDrawn = false
 	this.isUpdating = true
 	this.hasGivenGold = 0;
+	this.isDead = 0
+	this.stop = 0
+}
+
+function Dirt(theMaterial, depth) {
+	theMaterial.toughness = 10 + depth
+	theMaterial.toughnessMax = theMaterial.toughness
+	theMaterial.value = 1
+	
+	var theDiv = theMaterial.theDiv
+	theDiv.className = 'dirt'
+	theMaterial.theDiv = theDiv
+	theMaterial.isUpdating = true
+	
+	return theMaterial
+}
+
+
+function Stone(theDirt, depth) {
+	theDirt.toughness = theDirt.toughnessMax = 11 + (depth * 2)
+	theDirt.value = 3
+	
+	var theDiv = theDirt.theDiv
+	theDiv.className = 'stone'
+	theDirt.theDiv = theDiv
+	theDirt.isUpdating = true
+	
+	return theDirt
 }

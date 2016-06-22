@@ -17,6 +17,11 @@ div{
 /* -------------------------------------------- */
 .dirt {
 	position:absolute;
+	background-color:rgb(109, 67, 67);
+}
+.stone {
+	position:absolute;
+	background-color:grey
 }
 .tree {
 	position:absolute;
@@ -61,7 +66,18 @@ div{
 .tealColor {
 	color:teal;
 }
-
+.healthBarOuter {
+	width:2px;
+	height:10px;
+	background-color:white;
+	position:absolute;
+}
+.healthBar {
+	width:28px;
+	height:2px;
+	background-color:red;
+	position:absolute;
+}
 
 
 .someSpace {
