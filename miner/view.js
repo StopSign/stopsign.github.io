@@ -3,11 +3,11 @@
 var goldDiv = document.getElementById('gold')
 
 function draw() {
-	theGrid.forEach(updateVisual)
+	theGrid.forEach(updateMaterialVisual)
 	theForest.forEach(updateForestVisual);
 }
 
-function updateVisual(material, index) {
+function updateMaterialVisual(material, index) {
 	if(!material.isUpdating) {
 		return
 	}
@@ -17,17 +17,49 @@ function updateVisual(material, index) {
 	}
 	newWidth = (maxX / maxWidth) < 15 ? (maxX / maxWidth) : 15
 	newHeight = (maxY / maxDepth) < 15 ? (maxY / maxDepth) : 15
-	material.theDiv.style.width = newWidth+'px'
-	material.theDiv.style.height = newHeight+'px'
-	material.theDiv.style.left = (material.x * newWidth)+'px'
-	material.theDiv.style.top = (material.y * newHeight)+'px'
-	material.theDiv.style.opacity = material.toughness/material.toughnessMax
+	material.theMaterial.style.width = newWidth+'px'
+	material.theMaterial.style.height = newHeight+'px'
+	material.theMaterial.style.left = (material.x * newWidth)+'px'
+	material.theMaterial.style.top = (material.y * newHeight)+'px'
+	if(material.toughness <= 0) {
+		material.theMaterial.style.opacity = 0
+	} else {
+		material.theMaterial.style.opacity = material.toughness/material.toughnessMax * .8 + .2
+	}
+	
+	material.healthBar.style.height = 15*material.toughness/material.toughnessMax + 'px'
+	material.healthBar.style.left = ((material.x+1) * newWidth - 2)+'px'
+	material.healthBar.style.top = (material.y * newHeight)+'px'
+	if(material.toughness/material.toughnessMax === 1) {
+		material.healthBar.style.opacity = 0
+	} else {
+		material.healthBar.style.opacity = 1
+	}
 	
 	//material.theDiv.style.backgroundColor = hslToRgb(0, 55, 50, material.toughness/material.toughnessMax)
 	material.isUpdating = false;
 }
 
-
+function MaterialGraphics(theMaterialObj) {
+	
+	var theDiv = document.createElement("div");
+	theDiv.style.position = 'relative';
+	theMaterialObj.theDiv = theDiv
+	
+	var theMaterial = document.createElement("div");
+	theMaterial.id = 'material'+theMaterialObj.id
+	theMaterialObj.theMaterial = theMaterial
+	theDiv.appendChild(theMaterial)
+	
+	var healthBar = document.createElement("div");
+	healthBar.style.position = 'absolute';
+	healthBar.className = 'healthBar';
+	theDiv.appendChild(healthBar)
+	theMaterialObj.healthBar = healthBar
+	
+	theMaterialObj.isDrawn = false
+	theMaterialObj.isUpdating = true
+}
 
 
 
@@ -51,17 +83,17 @@ function TreeGraphics(theTreeObj) {
 	theTreeObj.theTree = theTree
 	theDiv.appendChild(theTree)
 	
-	var healthBarOuter = document.createElement("div");
-	healthBarOuter.style.position = 'absolute';
-	healthBarOuter.className = 'healthBarOuter';
-	theDiv.appendChild(healthBarOuter)
-	theTreeObj.healthBarOuter = healthBarOuter
+	var treeHealthBarOuter = document.createElement("div");
+	treeHealthBarOuter.style.position = 'absolute';
+	treeHealthBarOuter.className = 'treeHealthBarOuter';
+	theDiv.appendChild(treeHealthBarOuter)
+	theTreeObj.treeHealthBarOuter = treeHealthBarOuter
 	
-	var healthBar = document.createElement("div");
-	healthBar.style.position = 'absolute';
-	healthBar.className = 'healthBar';
-	theDiv.appendChild(healthBar)
-	theTreeObj.healthBar = healthBar
+	var treeHealthBar = document.createElement("div");
+	treeHealthBar.style.position = 'absolute';
+	treeHealthBar.className = 'treeHealthBar';
+	theDiv.appendChild(treeHealthBar)
+	theTreeObj.treeHealthBar = treeHealthBar
 	
 	theTreeObj.isDrawn = false
 	theTreeObj.isUpdating = true
@@ -77,23 +109,26 @@ function updateForestVisual(tree, index) {
 	}
 	tree.theTree.style.left = (tree.x)+'px'
 	tree.theTree.style.top = (tree.y)+'px'
-	tree.theTree.style.opacity = tree.health/tree.healthMax
-	
-	tree.healthBarOuter.style.left = (tree.x)+'px'
-	tree.healthBarOuter.style.top = (tree.y-3)+'px'
-	if(tree.health <= 0 && tree.health != tree.healthMax) { //show when under damage
-		tree.healthBarOuter.style.opacity = 0
-	} else {
-		tree.healthBarOuter.style.opacity = 1
+	tree.theTree.style.opacity = (tree.health/tree.healthMax)*.7+.3
+	if(tree.health <= 0) {
+		tree.theTree.style.opacity = 0
 	}
 	
-	tree.healthBar.style.left = (tree.x+2)+'px'
-	tree.healthBar.style.top = (tree.y)+'px'
-	tree.healthBar.style.width = (tree.health / tree.healthMax * 24)+'px'
-	if(tree.health <= 0 && tree.health != tree.healthMax) {
-		tree.healthBar.style.opacity = 0
+	tree.treeHealthBarOuter.style.left = (tree.x)+'px'
+	tree.treeHealthBarOuter.style.top = (tree.y-3)+'px'
+	if(tree.health <= 0 && tree.health != tree.healthMax) { //show when under damage
+		tree.treeHealthBarOuter.style.opacity = 0
 	} else {
-		tree.healthBar.style.opacity = 1
+		tree.treeHealthBarOuter.style.opacity = 1
+	}
+	
+	tree.treeHealthBar.style.left = (tree.x+2)+'px'
+	tree.treeHealthBar.style.top = (tree.y)+'px'
+	tree.treeHealthBar.style.width = (tree.health / tree.healthMax * 24)+'px'
+	if(tree.health <= 0 && tree.health != tree.healthMax) {
+		tree.treeHealthBar.style.opacity = 0
+	} else {
+		tree.treeHealthBar.style.opacity = 1
 	}
 	
 	tree.isUpdating = false;

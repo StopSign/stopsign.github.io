@@ -315,7 +315,7 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 	$scope.gold = 0
 	$scope.wood = 0
 	$scope.chanceForGoldCost = [10, 30]
-	$scope.employeeCost = 60
+	$scope.employeeCost = 20
 	$scope.plotSizeCost = 5
 	$scope.treeCountCost = 8
 	
@@ -345,10 +345,9 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 	}
 	{$scope.loggers.push(new Logger(function() { //Logger 1 - Alexa
 		//choose next tree
-		var amount = 2
-		this.target= amount + $scope.loggers[1].target
-		if(theForest[this.target] && theForest[this.target].isDead) {
-			this.target = amount+1 + $scope.loggers[1].target
+		this.target= 2 + this.target
+		while(theForest[this.target] && theForest[this.target].isDead && this.target < treeAmount) {
+			this.target++
 		}
 	}));
 		$scope.loggers[1].stop=true //unpause when unlocked
@@ -363,10 +362,9 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 	}
 	{$scope.loggers.push(new Logger(function() { //Logger 2 - Beth
 		//choose next tree
-		var amount = 3
-		this.target= amount + $scope.loggers[2].target
-		if(theForest[this.target] && theForest[this.target].isDead) {
-			this.target = amount+1 + $scope.loggers[2].target
+		this.target= 3 + this.target
+		while(theForest[this.target] && theForest[this.target].isDead && this.target < treeAmount) {
+			this.target++
 		}
 	}));
 		$scope.loggers[2].stop=true //unpause when unlocked
@@ -381,10 +379,9 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 	}
 	{$scope.loggers.push(new Logger(function() { //Logger 3 - Lucy
 		//choose next tree
-		var amount = 4
-		this.target= amount + $scope.loggers[3].target
-		if(theForest[this.target] && theForest[this.target].isDead) {
-			this.target = amount+1 + $scope.loggers[3].target
+		this.target= 4 + this.target
+		while(theForest[this.target] && theForest[this.target].isDead && this.target < treeAmount) {
+			this.target++
 		}
 	}));
 		$scope.loggers[3].stop=true //unpause when unlocked
@@ -445,7 +442,7 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 		$scope.miners[1].strikeSpeedCap = 2
 		$scope.miners[1].identifyStone = 0
 		$scope.miners[1].identifyStoneCost = 5
-		$scope.miners[1].identifyStoneIncrease = 20
+		$scope.miners[1].identifyStoneIncrease = 15
 		$scope.miners[1].identifyStoneCap = 100
 		
 		
@@ -606,7 +603,7 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 	}
 	
 	$scope.nextEmployeeCost = function() {
-		return $scope.employeeCost + 30
+		return $scope.employeeCost + 20
 	}
 	$scope.nextPlotSizeCost = function() {
 		return ($scope.plotSizeCost * 1.2)|0

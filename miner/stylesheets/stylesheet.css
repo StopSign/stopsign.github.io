@@ -66,17 +66,24 @@ div{
 .tealColor {
 	color:teal;
 }
-.healthBarOuter {
+.treeHealthBarOuter {
 	width:2px;
 	height:10px;
 	background-color:white;
 	position:absolute;
 }
-.healthBar {
+.treeHealthBar {
 	width:28px;
 	height:2px;
 	background-color:red;
 	position:absolute;
+}
+.healthBar {
+	width:2px;
+	background-color:red;
+	position:absolute;
+	
+
 }
 
 

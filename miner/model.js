@@ -17,12 +17,12 @@ function Miner(movementPattern) {
 
 function Tree(size) {
 	this.id = treeId++
-	this.healthMax = this.health = (20*Math.pow(1.3, size))|0 + 40
+	this.healthMax = this.health = (20*Math.pow(1.30001, size))|0 + 40 + size*10
 	//console.log("healthMax: "+this.healthMax+", size: "+size)
 	this.x = (Math.random() * maxX)|0
 	this.y = 100 - this.id*1.4
 	
-	this.woodValue = (2+(size*.4001))|0
+	this.woodValue = (2 + size * Math.pow(1.30001, size) * .3)|0
 	
 	TreeGraphics(this)
 	
@@ -38,12 +38,9 @@ function Material(x, y) {
 	this.y = y
 	this.id = id++
 	
-	var theDiv = document.createElement("div");
-	theDiv.id = 'material'+this.id
-	this.theDiv = theDiv
+	MaterialGraphics(this)
 	
-	this.isDrawn = false
-	this.isUpdating = true
+	
 	this.hasGivenGold = 0;
 	this.isDead = 0
 	this.stop = 0
@@ -54,23 +51,23 @@ function Dirt(theMaterial, depth) {
 	theMaterial.toughnessMax = theMaterial.toughness
 	theMaterial.value = 1
 	
-	var theDiv = theMaterial.theDiv
-	theDiv.className = 'dirt'
-	theMaterial.theDiv = theDiv
+	var theDirt = theMaterial.theMaterial
+	theDirt.className = 'dirt'
+	theMaterial.theMaterial = theDirt
 	theMaterial.isUpdating = true
 	
 	return theMaterial
 }
 
 
-function Stone(theDirt, depth) {
-	theDirt.toughness = theDirt.toughnessMax = 11 + (depth * 2)
-	theDirt.value = 3
+function Stone(theMaterial, depth) {
+	theMaterial.toughness = theMaterial.toughnessMax = 11 + (depth * 2)
+	theMaterial.value = 3
 	
-	var theDiv = theDirt.theDiv
-	theDiv.className = 'stone'
-	theDirt.theDiv = theDiv
-	theDirt.isUpdating = true
+	var theStone = theMaterial.theMaterial
+	theStone.className = 'stone'
+	theMaterial.theDiv = theStone
+	theMaterial.isUpdating = true
 	
-	return theDirt
+	return theMaterial
 }
