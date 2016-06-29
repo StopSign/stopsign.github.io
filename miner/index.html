@@ -264,14 +264,14 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 	//game
 	theGrid = []
 	theForest = []
-	treeAmount = 4
+	treeAmount = 2
 	maxWidth = 8
 	maxDepth = 8
 	maxX = 800
 	maxY = 1000
 	id=0
 	treeId=0
-	for(var x = 0; x < 40; x++) {
+	for(var x = 0; x < 60; x++) {
 		for(var y = 0; y < 55; y++) {
 			var newMaterial = new Material(x, y)
 			newMaterial = Dirt(newMaterial, y) //class specific vars
@@ -320,7 +320,7 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 	$scope.treeCountCost = 8
 	
 	
-	$scope.buyNewStakeCost = [2, 50, 300, 1800, 10800, 64800, 500000]
+	$scope.buyNewStakeCost = [2, 30, 150, 1800, 10800, 64800, 500000]
 	$scope.plotUnlocked3 = $scope.plotUnlocked4 = $scope.plotUnlocked5 = $scope.plotUnlocked6 = false
 	$scope.bonusStakeSize = 0
 	$scope.bonusForestSize = 0
@@ -411,11 +411,11 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 	}))
 		$scope.miners[0].power = 3
 		$scope.miners[0].pickQualityCost = 1
-		$scope.miners[0].pickQualityIncrease = 2
+		$scope.miners[0].pickQualityIncrease = 5
 		$scope.miners[0].pickQualityCap = 100
 		$scope.miners[0].speed = 20
-		$scope.miners[0].strikeSpeedCost = 20
-		$scope.miners[0].strikeSpeedIncrease = 5
+		$scope.miners[0].strikeSpeedCost = 10
+		$scope.miners[0].strikeSpeedIncrease = 8
 		$scope.miners[0].strikeSpeedCap = 5
 		$scope.miners[0].miningWidth = 2
 		$scope.miners[0].miningWidthCost = 75
@@ -434,7 +434,7 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 		$scope.miners[1].stop=1 //unpause when unlocked
 		$scope.miners[1].power = 2
 		$scope.miners[1].pickQualityCost = 10
-		$scope.miners[1].pickQualityIncrease = 8
+		$scope.miners[1].pickQualityIncrease = 13
 		$scope.miners[1].pickQualityCap = 50
 		$scope.miners[1].speed = 10
 		$scope.miners[1].strikeSpeedCost = 15
@@ -444,18 +444,15 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 		$scope.miners[1].identifyStoneCost = 5
 		$scope.miners[1].identifyStoneIncrease = 15
 		$scope.miners[1].identifyStoneCap = 100
-		
-		
-		
 	}
 	{$scope.miners.push(new Miner(function() {   //Miner  2 - Blaine
 		//choose next material
 		var theChoice = Math.random()
-		if(theChoice < .25) {
+		if(theChoice < .15) {
 			this.x++
 		} else if(theChoice < .50) {
 			this.y++
-		} else if(theChoice < .75) {
+		} else if(theChoice < .8) {
 			this.x++
 			this.y++
 		} else {
@@ -466,20 +463,20 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 	})) 
 		$scope.miners[2].stop=1 //unpause when unlocked
 		$scope.miners[2].power = 20
-		$scope.miners[2].pickQualityCost = 1
-		$scope.miners[2].pickQualityIncrease = 1
+		$scope.miners[2].pickQualityCost = 5
+		$scope.miners[2].pickQualityIncrease = 10
 		$scope.miners[2].pickQualityCap = 100
-		$scope.miners[2].speed = 20
+		$scope.miners[2].speed = 40
 		$scope.miners[2].strikeSpeedCost = 20
-		$scope.miners[2].strikeSpeedIncrease = -1
-		$scope.miners[2].strikeSpeedCap = 5
+		$scope.miners[2].strikeSpeedIncrease = 10
+		$scope.miners[2].strikeSpeedCap = 4
 	}
 	{$scope.miners.push(new Miner(function() {   //Miner  3 - Moreccio
 	
 		//findNextAliveMaterial
 		var foundOne = 0
 		for(var x = 0; x < theGrid.length; x++) {
-			if(!theGrid[x].isDead && theGrid[x].toughness > 0) {
+			if(theGrid[x].toughness > 0) {
 				foundOne = 1
 				this.x = theGrid[x].x
 				this.y = theGrid[x].y
@@ -491,14 +488,14 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 		}
 	})) 
 		$scope.miners[3].stop=1 //unpause when unlocked
-		$scope.miners[3].power = 6
+		$scope.miners[3].power = 10
 		$scope.miners[3].pickQualityCost = 1
-		$scope.miners[3].pickQualityIncrease = 1
+		$scope.miners[3].pickQualityIncrease = 3
 		$scope.miners[3].pickQualityCap = 100
 		$scope.miners[3].speed = 20
-		$scope.miners[3].strikeSpeedCost = 20
-		$scope.miners[3].strikeSpeedIncrease = -1
-		$scope.miners[3].strikeSpeedCap = 5
+		$scope.miners[3].strikeSpeedCost = 50
+		$scope.miners[3].strikeSpeedIncrease = 5
+		$scope.miners[3].strikeSpeedCap = 10
 	}
 	
 	
@@ -596,7 +593,7 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 		if($scope.gold >= $scope.miners[1].identifyStoneCost) {
 			$scope.gold -= $scope.miners[1].identifyStoneCost
 			//cost growth
-			$scope.miners[1].identifyStoneCost = $scope.miners[1].identifyStoneIncrease
+			$scope.miners[1].identifyStoneCost += $scope.miners[1].identifyStoneIncrease
 			//effect
 			$scope.miners[1].identifyStone += 5
 		}
