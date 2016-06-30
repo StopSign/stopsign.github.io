@@ -72,54 +72,14 @@ function Stone(theMaterial, depth) {
 	return theMaterial
 }
 
-//There are over 4000 different types of minerals currently classified by the International Mineralogical Association (IMA).
-//Let's start with hard coding but later let's update thing later.
+//////////////////////////////////////////////////////////////////////
+//////// Work in Progress ////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////
 
-/*
-  Antimony
-  Barium
-  Bauxite
-  Beryllium
-  Chromite
-  Clays
-  Cobalt
-  Copper
-  Feldspar
-  Flourite (fluorspar)
-  Gallium
-  Gold
-  Gypsum
-  Halite (sodium Chloride -- Salt)
-  Indium
-  Iron Ore
-  Lead
-  Lithium
-  Manganese
-  Mica
-  Molybdenum
-  Nickel
-  Perlite
-  Platinum Group Metals (PGM)
-  Phosphate Rock
-  Potash
-  Pyrite
-  Quartz (silica)
-  Rare Earth Metals (lanthanum, cerium, praseodymium, neodymium, promethium, samarium, europium, gadolinium, terbium, dysprosium, holmium, erbium, thulium ytterbium and lutetium)
-  Silica
-  Silver
-  Sodium Carbonate (soda ash or trona)
-  Sulfur
-  Tantalum
-  Titanium
-  Tungsten
-  Uranium
-  Vanadium
-  Zeolites
-  Zinc
-*/
+//The toughness and value needs updated still.
 
 function Aluminum(theMaterial, depth) {
-    theMaterial.toughness = theMaterial.toughnessMax = 12 + (depth * 5)
+    theMaterial.toughness = theMaterial.toughnessMax = 12 + (depth * 3)
     theMaterial.value = 5
 
     var theAluminum = theMaterial.theMaterial
@@ -129,3 +89,64 @@ function Aluminum(theMaterial, depth) {
 
     return theMaterial
 }
+
+function Feldspar(theMaterial, depth) {
+    theMaterial.toughness = theMaterial.toughnessMax = 13 + (depth * 4)
+    theMaterial.value = 6
+
+    var Feldspar = theMaterial.theMaterial
+    theStone.className = 'Feldspar'
+    theMaterial.theDiv = theFeldspar
+    theMaterial.isUpdating = true
+
+    return theMaterial
+}
+
+function Beryllium(theMaterial, depth) {
+    theMaterial.toughness = theMaterial.toughnessMax = 14 + (depth * 5)
+    theMaterial.value = 7
+
+    var theBeryllium = theMaterial.theMaterial
+    theStone.className = 'Beryllium'
+    theMaterial.theDiv = theBeryllium
+    theMaterial.isUpdating = true
+
+    return theMaterial
+}
+
+function Quartz(theMaterial, depth) {
+    theMaterial.toughness = theMaterial.toughnessMax = 15 + (depth * 6)
+    theMaterial.value = 8
+
+    var theQuartz = theMaterial.theMaterial
+    theStone.className = 'Quartz'
+    theMaterial.theDiv = theQuartz
+    theMaterial.isUpdating = true
+
+    return theMaterial
+}
+
+function SodiumCarbonate(theMaterial, depth) {
+    theMaterial.toughness = theMaterial.toughnessMax = 16 + (depth * 7)
+    theMaterial.value = 9
+
+    var theSodiumCarbonate = theMaterial.theMaterial
+    theStone.className = 'SodiumCarbonate'
+    theMaterial.theDiv = theSodiumCarbonate
+    theMaterial.isUpdating = true
+
+    return theMaterial
+}
+
+function Zeolites(theMaterial, depth) {
+    theMaterial.toughness = theMaterial.toughnessMax = 17 + (depth * 8)
+    theMaterial.value = 10
+
+    var theZeolites = theMaterial.theMaterial
+    theStone.className = 'theZeolites'
+    theMaterial.theDiv = theZeolites
+    theMaterial.isUpdating = true
+
+    return theMaterial
+}
+
