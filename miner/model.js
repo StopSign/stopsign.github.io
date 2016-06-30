@@ -71,3 +71,82 @@ function Stone(theMaterial, depth) {
 	
 	return theMaterial
 }
+
+//////////////////////////////////////////////////////////////////////
+//////// Work in Progress ////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////
+
+//The toughness and value needs updated still.
+
+function Aluminum(theMaterial, depth) {
+    theMaterial.toughness = theMaterial.toughnessMax = 12 + (depth * 3)
+    theMaterial.value = 5
+
+    var theAluminum = theMaterial.theMaterial
+    theStone.className = 'Aluminum'
+    theMaterial.theDiv = theAluminum
+    theMaterial.isUpdating = true
+
+    return theMaterial
+}
+
+function Feldspar(theMaterial, depth) {
+    theMaterial.toughness = theMaterial.toughnessMax = 13 + (depth * 4)
+    theMaterial.value = 6
+
+    var Feldspar = theMaterial.theMaterial
+    theStone.className = 'Feldspar'
+    theMaterial.theDiv = theFeldspar
+    theMaterial.isUpdating = true
+
+    return theMaterial
+}
+
+function Beryllium(theMaterial, depth) {
+    theMaterial.toughness = theMaterial.toughnessMax = 14 + (depth * 5)
+    theMaterial.value = 7
+
+    var theBeryllium = theMaterial.theMaterial
+    theStone.className = 'Beryllium'
+    theMaterial.theDiv = theBeryllium
+    theMaterial.isUpdating = true
+
+    return theMaterial
+}
+
+function Quartz(theMaterial, depth) {
+    theMaterial.toughness = theMaterial.toughnessMax = 15 + (depth * 6)
+    theMaterial.value = 8
+
+    var theQuartz = theMaterial.theMaterial
+    theStone.className = 'Quartz'
+    theMaterial.theDiv = theQuartz
+    theMaterial.isUpdating = true
+
+    return theMaterial
+}
+
+function SodiumCarbonate(theMaterial, depth) {
+    theMaterial.toughness = theMaterial.toughnessMax = 16 + (depth * 7)
+    theMaterial.value = 9
+
+    var theSodiumCarbonate = theMaterial.theMaterial
+    theStone.className = 'SodiumCarbonate'
+    theMaterial.theDiv = theSodiumCarbonate
+    theMaterial.isUpdating = true
+
+    return theMaterial
+}
+
+function Zeolites(theMaterial, depth) {
+    theMaterial.toughness = theMaterial.toughnessMax = 17 + (depth * 8)
+    theMaterial.value = 10
+
+    var theZeolites = theMaterial.theMaterial
+    theStone.className = 'theZeolites'
+    theMaterial.theDiv = theZeolites
+    theMaterial.isUpdating = true
+
+    return theMaterial
+}
+
