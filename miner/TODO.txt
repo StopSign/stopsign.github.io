@@ -1,0 +1,9 @@
+
+TODOs:
+Change the algorithms of Miner 3 & 4
+Math the findMaterialInGrid method so it doesn't have a for loop
+get rid of the isDead variable, everywhere. toughness/health<= 0 is the equivalent
+rename 'plot' to 'stake' in the code, to match the UI name
+
+
+Potential bug? I saw hitting no trees, while other trees exist, later get wood and the next tree starts being hit - invisible first tree?
