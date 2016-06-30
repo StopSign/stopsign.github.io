@@ -71,3 +71,61 @@ function Stone(theMaterial, depth) {
 	
 	return theMaterial
 }
+
+//There are over 4000 different types of minerals currently classified by the International Mineralogical Association (IMA).
+//Let's start with hard coding but later let's update thing later.
+
+/*
+  Antimony
+  Barium
+  Bauxite
+  Beryllium
+  Chromite
+  Clays
+  Cobalt
+  Copper
+  Feldspar
+  Flourite (fluorspar)
+  Gallium
+  Gold
+  Gypsum
+  Halite (sodium Chloride -- Salt)
+  Indium
+  Iron Ore
+  Lead
+  Lithium
+  Manganese
+  Mica
+  Molybdenum
+  Nickel
+  Perlite
+  Platinum Group Metals (PGM)
+  Phosphate Rock
+  Potash
+  Pyrite
+  Quartz (silica)
+  Rare Earth Metals (lanthanum, cerium, praseodymium, neodymium, promethium, samarium, europium, gadolinium, terbium, dysprosium, holmium, erbium, thulium ytterbium and lutetium)
+  Silica
+  Silver
+  Sodium Carbonate (soda ash or trona)
+  Sulfur
+  Tantalum
+  Titanium
+  Tungsten
+  Uranium
+  Vanadium
+  Zeolites
+  Zinc
+*/
+
+function Aluminum(theMaterial, depth) {
+    theMaterial.toughness = theMaterial.toughnessMax = 12 + (depth * 5)
+    theMaterial.value = 5
+
+    var theAluminum = theMaterial.theMaterial
+    theStone.className = 'Aluminum'
+    theMaterial.theDiv = theAluminum
+    theMaterial.isUpdating = true
+
+    return theMaterial
+}
