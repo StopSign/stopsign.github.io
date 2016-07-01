@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html class='objectContainer'>
+	<head>
+		<meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+		<title>Progress Bars</title>
+		<link rel="stylesheet" href="stylesheets/stylesheet.css">
+		<script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+		<script src="https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+		<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+	</head>
+	<body ng-app="myApp" ng-controller="myCtrl" class='objectContainer' style='text-align:center;position:absolute;'>
+		<div ng-click="hasProgressMovement = (!hasProgressMovement)" class='hyperVisible quickButton ' style='width:117px;'>Toggle Progress Movement Visibility</div>
+		<div ng-click="toggleStartStop()" class='hyperVisible quickButton '>Toggle Start / Stop</div>
+		<div ng-click="toggleNextColor()" class='hyperVisible quickButton '>Toggle Next Color</div>
+		<div ng-click="isRowsVisible = (!isRowsVisible)" class='hyperVisible quickButton'>Toggle Progress Visible</div>
+		<!--<div ng-click="" class='hyperVisible quickButton'>Toggle Row Visible</div>
+		<div ng-click="" class='hyperVisible quickButton'>Toggle Exp Visible</div>-->
+		<div id='fps' style='float:left;font-size:14px;background-color:grey;width:60px;padding:3px;border-radius:5px;'>{{fps}} fps</div>
+		
+		<div id='progressBars' style='margin-top:10px;display:{{isRowsVisible?"block":"none"}};' class='objectContainer'></div>
+		<div id='buttons' class='objectContainer'></div>
+
+		<div style='width:100%;font-size: 16px;margin-top:10px;text-align:center;'>To mass-buy, click a button then hold Enter</div>
+		<div style='text-align:left;font-size:12px;width:100%;margin-top:30px;margin-left:10px;margin-bottom:10px;color:grey'>If you want patterns, not gameplay (won't be in final version):</div>
+		<div ng-click="testSettings()" style='float:left;width:75px' class='hyperVisible quickButton '>+1k</div>
+		<div ng-click="testSettings2()" style='float:left;width:75px' class='hyperVisible quickButton '>+50k </div>
+	</body>
+</html>
+
+<script>
+//the answer to "how to i access scope variables from console"
+//angular.element($0).scope()
+
+
+var app = angular.module('myApp', []);
+app.controller('myCtrl', function($scope, $interval, $compile) {
+	{//----------------Declarations------------------ AKA vars that need a start but no default, ang or not.
+		$scope.progress = []
+		timeList = [];
+		timer =  totalTicks = 0;
+		tickTemp1 = -500; //so that it makes the first row immediately
+		multFromFps=1
+		stop=0 //type stop=1 in console to pause the game. If you do it often, put a button on the action or make it hotkeyed to the 'space' key. (example in manualactions.js)
+		$scope.hasProgressMovement = 1
+		$scope.isRowsVisible = 1
+	}
+	{//------------Initial Variable Settings-----------
+
+		//not public-facing game vars
+		rowTimeRateStarting = .1
+		initialRowCount=10
+		progressCreationLength = 50
+		regularRowHue = 180
+		
+		//ang both game & graphics vars
+		$scope.boughtSpeedBonus =0
+		$scope.secondsBoost=1 
+		$scope.theResource=0
+		$scope.gainFirst=20
+		$scope.gainAll=1
+		
+		$scope.costSpeedBonus=500
+		$scope.costSecondsBoost=15
+		$scope.costBuyRow=25
+		$scope.costGainFirst=8
+		$scope.costGainAll=150
+		
+		//debug vars. Click the in-game button to switch to these
+		$scope.testSettings = function() {
+			//rowTimeRateStarting = 1
+			//$scope.progress[1].progressRate *= 2
+			//$scope.progress[6].progressRate *=4 //I intend for a "driver" that functions similar as this later
+			//$scope.progress[2].progressRate = 1
+			//initialRowCount=10;
+			$scope.theResource+=1000
+		}
+		$scope.testSettings2 = function() {
+			$scope.theResource+=50000
+		}
+		
+	}
+	{//------------------Formula---------------------- boostDecayMath, colorShiftMath
+		function boostDecayMath(num) {
+			return Math.pow(1.5, num)*1.75
+		}
+		//multi is a whole, sequential integer. leftOverMulti is 0-1
+		function colorShiftMath(initialColor, multi, leftOverMulti) {
+			//Hue is 0-360, 0 is red, 120 is green, 240 is blue. Sat is 0-100, 0=greyscale. Light is 0-100, 25=half black
+			var hue = initialColor - (multi-1)*36 - (leftOverMulti)*24;
+			var sat = 10+Math.pow(multi, .9) * 4 + (leftOverMulti)*3
+			sat = sat > 100 ? 100 : sat //multi^.9 * 6 reaches at 23
+			var light = 50
+			return "hsl("+hue+", "+sat+"%, "+light+"%)"
+		}
+	}
+	
+	{//----------------Starting Point-----------------
+	
+		$scope.tick = function() {
+			timer++
+			timeList.push(new Date().getTime())
+			if(timeList.length > 100) {
+				timeList.splice(0, 1)
+				
+				//TODO instead of calc average, sub first from last / 2
+				var fps = msWaitTime/calcAverageTime()*100
+				multFromFps = 100/fps
+				$scope.fps = round(fps)+"%"
+				//TODO Reduce the lag, don't just compensate for it.
+			} else {
+				multFromFps = 1
+				$scope.fps = "..."
+			}
+			
+			$scope.updateProgressForAllRows()
+			
+			//manual addition to give starting rows
+			if($scope.progress.length < initialRowCount && timer - tickTemp1 >= 25) {
+				$scope.addProgressBar("regular")
+				tickTemp1 = timer
+			}
+		}
+	
+	}
+
+	
+
+	{//--------------ng-OnClick Methods-------------
+		$scope.buySpeedBonus = function() { //% Global Speed Increase
+				$scope.buyButtonClicked($scope.costSpeedBonus, function() {
+					$scope.costSpeedBonus = Math.ceil(1.2* $scope.costSpeedBonus) //cost increase
+					$scope.boughtSpeedBonus++
+				})};
+		$scope.buySecondsBoost = function() { //Seconds of Boost
+				$scope.buyButtonClicked($scope.costSecondsBoost, function() {
+					$scope.costSecondsBoost = Math.ceil(1.1* $scope.costSecondsBoost)
+					$scope.secondsBoost++
+				})};
+		$scope.buyProgressBar = function() { //Buy Progress Bar
+				$scope.buyButtonClicked($scope.costBuyRow, function() {
+					$scope.costBuyRow = Math.ceil(2* $scope.costBuyRow)
+					initialRowCount+=5
+				})};
+		$scope.buyGainFirst = function() { //Gain for First
+				$scope.buyButtonClicked($scope.costGainFirst, function() {
+					$scope.costGainFirst = Math.ceil(1.25* $scope.costGainFirst)
+					$scope.gainFirst+= 3 + Math.floor($scope.gainFirst * .12)
+				})};
+		$scope.buyGainAll = function() { //Gain for All
+				$scope.buyButtonClicked($scope.costGainAll, function() {
+					$scope.costGainAll = Math.ceil(1.35* $scope.costGainAll)
+					$scope.gainAll += 1 + Math.floor($scope.gainAll * .2)
+				})};
+	}
+	{//----------------Object Classes----------------- progressBar,.nextProgressDown,.nextExp,.nextBoost,.addBoost
+		
+		//all unique info about a single progress bar (row) is represented here
+		function progressBar (initialProgressReq, initialProgressRate, initialProgress, expToNextLevel, 
+			isExpGainOn, secondsBoostUntilDensityIncrease, initialColorHue, row) {
+			{//Vars
+				//parameter driven
+				this.progressReq = initialProgressReq
+				this.progressRate = initialProgressRate
+				this.expToNextLevel = expToNextLevel
+				this.progress = initialProgress
+				this.initialColorHue = initialColorHue
+				this.color = colorShiftMath(this.initialColorHue, 0, 0)
+				this.row = row
+				
+				//declarations
+				this.exp = 0
+				this.level = 1
+				this.totalBoostTicks = 0
+				
+				//for debugging
+				this.progressOld=0
+				this.progressDelta=0
+				this.printCounter = 0;
+				
+				//This is [secondsBoostUntilDensityIncrease] seconds on the limit, converted into ticks
+				this.boostLimitInTicks = secondsBoostUntilDensityIncrease * (1000/ msWaitTime)
+			}
+			{//Progress Gain Functions
+				this.nextProgressDown = function(variantSpeedBonus, resultOfFinish) {
+					//if(this.row == 5)
+						//console.log("Bonus: "+ variantSpeedBonus)
+					var rateOfChange = this.progressRate*multFromFps*variantSpeedBonus
+					this.progress -= rateOfChange
+					this.printCounter++
+					if(this.row==0) {
+						if(this.printCounter % 30 == 0) {
+						//TODO avg the old rateOfChange w/ the new one
+							//this.progressDelta = Math.ceil((this.progressOld - this.progress)*100)/100
+							//this.progressOld = this.progress
+							//console.log("Progress per 1s is "+(this.progressDelta*8)+"%, Boost: " + variantSpeedBonus)
+						}
+					}
+					while(this.progress <= 0) {
+						this.progress += this.progressReq
+						resultOfFinish()
+					}
+				}
+				this.nextProgressUp = function(variantSpeedBonus, resultOfFinish) {
+					this.progress += this.progressRate * multFromFps * variantSpeedBonus
+					while(this.progress >= this.progressReq) {
+						this.progress -= this.progressReq
+						resultOfFinish()
+					}
+				}
+			}
+			{//Level Gain Functions
+				this.nextExp = function(resultOfLevelGain) {
+					this.exp++
+					while(this.exp >= expToNextLevel) {
+						this.exp -= expToNextLevel
+						resultOfLevelGain()
+					}
+				}
+			}
+			{//Boost Functions
+				//will be called on progress completions
+				this.nextBoost = function() {
+					if(this.totalBoostTicks > 0) {
+						multiFromBoost = this.calcBoostBonus()
+						this.totalBoostTicks -= Math.pow(2, multiFromBoost) * multFromFps
+						if(this.totalBoostTicks <= 0) {
+							this.color = colorShiftMath(this.initialColorHue, 0, 0)
+						}
+						return boostDecayMath(multiFromBoost)
+					}
+					return 1
+				}
+				
+				this.addBoost = function(secondsBoostChange) {
+					this.totalBoostTicks += secondsBoostChange * (1000/ msWaitTime)
+					return this.calcBoostBonus()
+				}
+				
+				this.calcBoostBonus = function() {
+					//TODO probably a fancier way to do this w/o looping
+					//Takes the first 10 from totalBoostTicks at price X, then the next 10 at price 2X, the next 10 at 4X, etc.
+					var tensOfSeconds = this.totalBoostTicks / this.boostLimitInTicks
+					var theMulti = Math.ceil(Math.log2(tensOfSeconds))
+					if(theMulti < 1) {
+						theMulti = 0
+					}
+					if(row == 0) {
+						//console.log("1:"+Math.pow(2, theMulti)+" 2:"+tensOfSeconds+" 3:"+Math.pow(2, theMulti-1))
+					}
+					var leftOver = (tensOfSeconds - Math.pow(2, theMulti-1)) / Math.pow(2, theMulti-1) //theMulti - Math.log2(tensOfSeconds) was close but failed when tensOfSeconds was decimal
+					theMulti++ //1 is 2x, 2 is 3x, 3 is 4.5x, etc.
+					this.color = colorShiftMath(this.initialColorHue, theMulti, leftOver)
+					if(this.row==0) {
+						//console.log(theMulti+" <-- multi.  leftOver: "+Math.floor(leftOver*100)+" color: "+this.color+" boost Limit: " + this.boostLimitInTicks+ " total Ticks "+this.totalBoostTicks )
+					}
+					return theMulti //some boost
+				}
+			}
+		}
+		
+	}
+	
+	{//-------------Application Functions-------------- updateProgressForAllRows, updateRowProgress, addProgressBar, addProgressBarData
+		$scope.updateProgressForAllRows = function() {
+			for(var lx = 0; lx < $scope.progress.length ; lx++) {
+				$scope.updateRowProgress(lx)
+			}
+		}
+		
+		$scope.updateRowProgress = function(row) { //main game progress
+			//variant specific
+			$scope.progress[row].nextProgressDown((1+$scope.boughtSpeedBonus/100)*$scope.progress[row].nextBoost(), function() { 
+				$scope.theResource += $scope.gainAll 
+				$scope.theResource += (row == 0) ? $scope.gainFirst : 0; //first row, the Collector'
+				if(row > 0) {
+					$scope.progress[row-1].addBoost($scope.secondsBoost)
+				}
+			})
+			
+		}
+		
+		$scope.addProgressBar = function(type) { //add progress bar (both data and UI)
+			$scope.addProgressBarData(type)
+			$scope.addProgressBarUI(type)
+		}
+	
+	}
+		
+		
+		
+	{//--------------Graphics Functions--------------- addProgressBarUI, addBuyButtonTemplate,
+		$scope.addProgressBarUI = function(type) {
+			
+			curRowCount = $scope.progress.length
+			var progressPerc = "{{hasProgressMovement ?  progress["+(curRowCount-1)+"].progress/progress["+(curRowCount-1)+"].progressReq * 100 : 100}}"
+			var newDirective = angular.element(
+			"<div class='progressOuter'>"+
+				"<div id='progressInner"+(curRowCount-1)+"' class='progressInner'"+
+					"style='width:"+progressPerc+"%;background-color:{{progress["+(curRowCount-1)+"].color}};'>"+
+				"</div>"+
+			"</div>"
+			);
+			$("#progressBars").append(newDirective);
+			$compile(newDirective)($scope);
+		}
+		
+		/*Parameters:
+		@buttonText - the text to appear on the button
+		@topNumVarName - the number displayed at the top of the button container
+		@topNumColor - the color of displayed topNumVar
+		@onClickFunctionName - the name of the function to put in the ng-click. "hello" becomes ng-click="hello()"
+		@costVarName - the name of the cost amount variable
+		@botNumColor - the color of displayed costVar
+		*/
+		$scope.addBuyButtonTemplate = function(buttonText, topNumVarName, 
+			topNumColor, onClickFunctionName, costVarName, botNumColor) {
+			
+			//make an element
+			var newDirective = angular.element(
+			"<div class='buttonContainer'>"+
+				"<div class='resource hyperVisible' style='color:"+topNumColor+"'>{{"+topNumVarName+"}}</div>"+
+				"<button class='buyButton' ng-click='"+onClickFunctionName+"()'>"+buttonText+"</button>"+
+				"<div class='middleLabel'>It costs <div class='countCost hyperVisible' style='color:"+botNumColor+"'>{{"+costVarName+"}}</div></div>"+
+			"</div>"
+			);
+			$("#buttons").append(newDirective); //add the element
+			$compile(newDirective)($scope); //re-compile (so it picks up the angular vars)
+		}
+		
+		$scope.toggleNextColor = function() {
+			regularRowHue -= 18;
+			for(var lx = 0; lx < $scope.progress.length; lx++) {
+				$scope.progress[lx].initialColorHue = regularRowHue
+				$scope.progress[lx].color = colorShiftMath(regularRowHue, 0, 0)
+			}
+		}
+	}
+	
+	
+	{//----------Initial Button & Row Load------------
+		//This stuff really belongs in a database
+		//function calls are required to be after variable declarations
+		$scope.addBuyButtonTemplate("% Global Speed Increase", 	"boughtSpeedBonus",	"blue", 	"buySpeedBonus", 	"costSpeedBonus", 	"red")
+		$scope.addBuyButtonTemplate("Seconds of Boost", 				"secondsBoost", 		"blue", 	"buySecondsBoost", 	"costSecondsBoost", 	"red")
+		$scope.addBuyButtonTemplate("Buy 5 Progress Bars", 		"theResource", 			"red", 	"buyProgressBar", 		"costBuyRow", 			"red")
+		$scope.addBuyButtonTemplate("Gain for First", 					"gainFirst", 				"blue", 	"buyGainFirst", 			"costGainFirst", 			"red")
+		$scope.addBuyButtonTemplate("Gain for All", 						"gainAll", 					"blue", 	"buyGainAll", 			"costGainAll", 			"red")
+	
+	
+		$scope.addProgressBarData = function(type) { 
+			//progressBar (initialProgressReq, initialProgressRate, initialProgress, expToNextLevel, isExpGainOn, secondsBoostUntilDensityIncrease, initialColorHue, row) {
+			if(type == "first") {
+				//$scope.progress.push(new progressBar (100, rowTimeRateStarting, 100, 20, true, 1, 90, $scope.progress.length))
+			} else if(type == "regular") {
+				progressCreationLength = 100 * Math.pow(1.01, $scope.progress.length)
+				$scope.progress.push(new progressBar (progressCreationLength, rowTimeRateStarting, progressCreationLength, 100, true, 6, regularRowHue, $scope.progress.length))
+			}
+		}
+	}
+
+	
+	
+	
+	{//---------------Helper Functions----------------- AKA Not specific to this game
+		$scope.toggleStartStop = function() {
+			stop = !stop
+			timeList = []
+		}
+		
+		//because I hate IE so much
+		Math.log2 = Math.log2 || function(x){return Math.log(x)*Math.LOG2E;};
+	
+		function calcAverageTime() {
+			total = 0;
+			for(x = 1; x < timeList.length; x++) {
+				total += timeList[x] - timeList[x-1]
+			}
+			return total / timeList.length
+		}
+		
+		function round3(num) {
+			return Math.floor(num*1000)/1000
+		}
+		function round2(num) {
+			return Math.floor(num*100)/100
+		}
+		function round1(num) {
+			return Math.floor(num*10)/10
+		}
+		
+		function round(num) {
+			return formatNumber(num);
+		} function formatNumber(num) {
+			return Math.floor(num).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+		}
+		
+		/*
+		  Converts an HSL color value to RGB. Conversion formula
+		  adapted from http://en.wikipedia.org/wiki/HSL_color_space.
+		  Assumes h, s, and l are contained in the set [0, 1] and
+		  returns r, g, and b in the set [0, 255].
+		 
+		  @param   Number  h       The hue
+		  @param   Number  s       The saturation
+		  @param   Number  l       The lightness
+		  @return  Array           The RGB representation
+		 */
+		function hslToRgb(h, s, l){
+			var r, g, b;
+
+			if(s == 0){
+				r = g = b = l; // achromatic
+			}else{
+				var hue2rgb = function hue2rgb(p, q, t){
+					if(t < 0) t += 1;
+					if(t > 1) t -= 1;
+					if(t < 1/6) return p + (q - p) * 6 * t;
+					if(t < 1/2) return q;
+					if(t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+					return p;
+				}
+
+				var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+				var p = 2 * l - q;
+				r = hue2rgb(p, q, h + 1/3);
+				g = hue2rgb(p, q, h);
+				b = hue2rgb(p, q, h - 1/3);
+			}
+
+			return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
+		}
+		
+		/*
+		  Converts an RGB color value to HSL. Conversion formula
+		  adapted from http://en.wikipedia.org/wiki/HSL_color_space.
+		  Assumes r, g, and b are contained in the set [0, 255] and
+		  returns h, s, and l in the set [0, 1].
+		 
+		  @param   Number  r       The red color value
+		  @param   Number  g       The green color value
+		  @param   Number  b       The blue color value
+		  @return  Array           The HSL representation
+		 */
+		function rgbToHsl(r, g, b){
+			r /= 255, g /= 255, b /= 255;
+			var max = Math.max(r, g, b), min = Math.min(r, g, b);
+			var h, s, l = (max + min) / 2;
+
+			if(max == min){
+				h = s = 0; // achromatic
+			}else{
+				var d = max - min;
+				s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+				switch(max){
+					case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+					case g: h = (b - r) / d + 2; break;
+					case b: h = (r - g) / d + 4; break;
+				}
+				h /= 6;
+			}
+
+			return [h, s, l];
+		}
+		
+		//ang helper methods
+		$scope.buyButtonClicked = function(costVar, resultOfFinish) {
+			if($scope.theResource >= costVar) {
+				$scope.theResource -= costVar //cost
+				resultOfFinish()
+			}
+		}
+		
+		
+	}
+	
+	
+	{//----The Timer----
+	//this way doesn't work when javascript is open in a different tab
+	//javascript will default change the 5 to minimum 500 in that case
+	//use interval.js somehow to get around it. google that along with angular?
+	msWaitTime = 33 //doesn't actually wait decimal amounts
+	$interval(function() { if(!stop) $scope.tick(); }, msWaitTime);
+	}
+});
+</script>

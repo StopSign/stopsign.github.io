@@ -1,0 +1,41 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+	<meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+	<title>Pull of War</title>
+	<link rel="stylesheet" href="stylesheets/stylesheet.css">
+	<script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+	<script src="https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+	<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+	<script src="scriptsToLoad.js"></script>
+</head>
+
+<div ng-app="myApp" ng-controller="myCtrl">
+	<div id='test'></div>
+
+	First Name: <input type="text" ng-model="firstName"><br>
+	Last Name: <input type="text" ng-model="lastName"><br>
+	<br>
+	Full Name: {{firstName + " " + lastName}}
+
+</div>
+
+<script>
+var app = angular.module('myApp', []);
+app.controller('myCtrl', function($scope) {
+    $scope.firstName= "John";
+    $scope.lastName= "Doe";
+});
+
+//I need my helper functions .
+</script>
+
+<!--<script src="spells.js"></script>
+<script src="mapvalues.js"></script>
+<script src="classes.js"></script>
+<script src="manualActions.js"></script>
+<script src="pullofwar.js"></script>
+<script src="graphics.js"></script>
+<script src="handleSavingPull.js"></script>-->
+

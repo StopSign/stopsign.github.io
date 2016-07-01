@@ -1,0 +1,38 @@
+
+1/28
+
+Reorganize the Code and Structure and
+Use Angular to
+Re-Skin the Visuals
+
+or [O] Organize, [A] Angular, [V] Visuals
+
+TODOs:
+
+
+	
+remove left/right:direction distinction with us/them:allegiance?
+
+
+
+re-do the structure of holding allied/enemy data
+	Remove concept of typeNum entirely
+		This is 100% spaghetti
+		Think of it like a table name that has IDs 1-4
+	Split the single 
+	
+
+
+go through every line in every function and re-implement/improve/rename to higher standards.
+	remove unused comments
+		helpersUI
+	30 mins a day?
+
+
+
+
+
+
+
+
+

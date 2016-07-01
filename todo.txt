@@ -1,3 +1,13 @@
+
+
+
+
+
+
+
+As of December, 2015 this part is outdated. I wrote it at
+the start and didn't change it
+
 TODO:
 Add tabs
 Resources on top, out of tab
@@ -10,7 +20,6 @@ War tab
  * Hover over a unit for popup info
   > health, unit count, time alive, damage done, kills
  * Hover out of box to clear popup
- 
  
 Territory tab
  * Places and progression
