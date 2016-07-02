@@ -257,31 +257,31 @@ var app = angular.module('myApp', []);
 app.controller('myCtrl', function($scope, $interval, $compile) {
 	
 	{//----------------Starting vars-----------------
-	//universal
-	timeList = [];
-	var timer =  totalTicks = 0;
-	stop=0
-	//game
-	theGrid = []
-	theForest = []
-	treeAmount = 2
-	maxWidth = 8
-	maxDepth = 8
-	maxX = 800
-	maxY = 1000
-	id=0
-	treeId=0
-	for(var x = 0; x < 60; x++) {
-		for(var y = 0; y < 55; y++) {
-			var newMaterial = new Material(x, y)
-			newMaterial = Dirt(newMaterial, y) //class specific vars
-			theGrid.push(newMaterial)
+		//universal
+		timeList = [];
+		var timer =  totalTicks = 0;
+		stop=0
+		//game
+		theGrid = []
+		theForest = []
+		treeAmount = 2
+		maxWidth = 8
+		maxDepth = 8
+		maxX = 800
+		maxY = 1000
+		id=0
+		treeId=0
+		for(var x = 0; x < 60; x++) {
+			for(var y = 0; y < 55; y++) {
+				var newMaterial = new Material(x, y)
+				newMaterial = Dirt(newMaterial, y) //class specific vars
+				theGrid.push(newMaterial)
+			}
 		}
-	}
-	for(var x = 0; x < 100; x++) {
-		theForest.push(new Tree((x/3)|0))
-	}
-	}
+		for(var x = 0; x < 100; x++) {
+			theForest.push(new Tree((x/3)|0))
+		}
+	}//==============End Starting vars===============
 	
 	$scope.tick = function() { //Action counter
 		timer++
@@ -307,354 +307,364 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 		draw()
 	}
 	
-	{//================Starting scope vars=======================
-	$scope.showHiddenUpgrades = 0
-	$scope.totalWorkers = 2
-	$scope.miners = []
-	$scope.loggers = []
-	$scope.gold = 0
-	$scope.wood = 0
-	$scope.chanceForGoldCost = [10, 30]
-	$scope.employeeCost = 20
-	$scope.plotSizeCost = 5
-	$scope.treeCountCost = 8
+	{//--------------Starting scope vars-------------
+		$scope.showHiddenUpgrades = 0
+		$scope.totalWorkers = 2
+		$scope.miners = []
+		$scope.loggers = []
+		$scope.gold = 0
+		$scope.wood = 0
+		$scope.chanceForGoldCost = [10, 30]
+		$scope.employeeCost = 20
+		$scope.plotSizeCost = 5
+		$scope.treeCountCost = 8
+		
+		
+		$scope.buyNewStakeCost = [2, 30, 150, 1800, 10800, 64800, 500000]
+		$scope.plotUnlocked3 = $scope.plotUnlocked4 = $scope.plotUnlocked5 = $scope.plotUnlocked6 = false
+		$scope.bonusStakeSize = 0
+		$scope.bonusForestSize = 0
+		
+		$scope.chanceForGold = [30, 50]
+	}//==============End Starting scope vars=========
 	
-	
-	$scope.buyNewStakeCost = [2, 30, 150, 1800, 10800, 64800, 500000]
-	$scope.plotUnlocked3 = $scope.plotUnlocked4 = $scope.plotUnlocked5 = $scope.plotUnlocked6 = false
-	$scope.bonusStakeSize = 0
-	$scope.bonusForestSize = 0
-	
-	$scope.chanceForGold = [30, 50]
-	}
-	
-	{ //=================Worker formulae=================
-	
-	{$scope.loggers.push(new Logger(function() { //Logger 0 - Jane
-		//choose next tree
-		this.target++
-	}));
-		$scope.loggers[0].power = 6
-		$scope.loggers[0].axePowerCost = 1
-		$scope.loggers[0].axePowerIncrease = 1
-		$scope.loggers[0].axePowerCap = 100
-		$scope.loggers[0].speed = 40
-		$scope.loggers[0].chopSpeedCost = 5
-		$scope.loggers[0].chopSpeedIncrease = 5
-		$scope.loggers[0].chopSpeedCap = 8
-	}
-	{$scope.loggers.push(new Logger(function() { //Logger 1 - Alexa
-		//choose next tree
-		this.target= 2 + this.target
-		while(theForest[this.target] && theForest[this.target].isDead && this.target < treeAmount) {
-			this.target++
-		}
-	}));
-		$scope.loggers[1].stop=true //unpause when unlocked
-		$scope.loggers[1].power = 10
-		$scope.loggers[1].axePowerCost = 1
-		$scope.loggers[1].axePowerIncrease = 1
-		$scope.loggers[1].axePowerCap = 100
-		$scope.loggers[1].speed = 15
-		$scope.loggers[1].chopSpeedCost = 20
-		$scope.loggers[1].chopSpeedIncrease = -1
-		$scope.loggers[1].chopSpeedCap = 5
-	}
-	{$scope.loggers.push(new Logger(function() { //Logger 2 - Beth
-		//choose next tree
-		this.target= 3 + this.target
-		while(theForest[this.target] && theForest[this.target].isDead && this.target < treeAmount) {
-			this.target++
-		}
-	}));
-		$scope.loggers[2].stop=true //unpause when unlocked
-		$scope.loggers[2].power = 6
-		$scope.loggers[2].axePowerCost = 1
-		$scope.loggers[2].axePowerIncrease = 1
-		$scope.loggers[2].axePowerCap = 100
-		$scope.loggers[2].speed = 20
-		$scope.loggers[2].chopSpeedCost = 20
-		$scope.loggers[2].chopSpeedIncrease = -1
-		$scope.loggers[2].chopSpeedCap = 5
-	}
-	{$scope.loggers.push(new Logger(function() { //Logger 3 - Lucy
-		//choose next tree
-		this.target= 4 + this.target
-		while(theForest[this.target] && theForest[this.target].isDead && this.target < treeAmount) {
-			this.target++
-		}
-	}));
-		$scope.loggers[3].stop=true //unpause when unlocked
-		$scope.loggers[3].power = 6
-		$scope.loggers[3].axePowerCost = 1
-		$scope.loggers[3].axePowerIncrease = 1
-		$scope.loggers[3].axePowerCap = 100
-		$scope.loggers[3].speed = 20
-		$scope.loggers[3].chopSpeedCost = 20
-		$scope.loggers[3].chopSpeedIncrease = -1
-		$scope.loggers[3].chopSpeedCap = 5
-	}
-	
-	
-	{$scope.miners.push(new Miner(function() {   //Miner  0 - Kyle
-		//choose next material
-		this.mineCounter++
-		if(this.mineCounter%this.miningWidth==0) {
-			this.y++
-			this.x -= (this.miningWidth-2)
-			if(this.x < 0) {
-				this.x = 0
-			}
-		} else {
-			this.x++
-		}
-	}))
-		$scope.miners[0].power = 3
-		$scope.miners[0].pickQualityCost = 1
-		$scope.miners[0].pickQualityIncrease = 5
-		$scope.miners[0].pickQualityCap = 100
-		$scope.miners[0].speed = 20
-		$scope.miners[0].strikeSpeedCost = 10
-		$scope.miners[0].strikeSpeedIncrease = 8
-		$scope.miners[0].strikeSpeedCap = 5
-		$scope.miners[0].miningWidth = 2
-		$scope.miners[0].miningWidthCost = 75
-		$scope.miners[0].miningWidthIncrease = 125
-		$scope.miners[0].miningWidthCap = 7
-	}
-	{$scope.miners.push(new Miner(function() {   //Miner  1 - Paul
-		//choose next material
-		var theChoice = Math.random()
-		if(theChoice < .30) {
-			this.x++
-		} else {
-			this.y++
-		}
-	}))
-		$scope.miners[1].stop=1 //unpause when unlocked
-		$scope.miners[1].power = 2
-		$scope.miners[1].pickQualityCost = 10
-		$scope.miners[1].pickQualityIncrease = 13
-		$scope.miners[1].pickQualityCap = 50
-		$scope.miners[1].speed = 10
-		$scope.miners[1].strikeSpeedCost = 15
-		$scope.miners[1].strikeSpeedIncrease = 15
-		$scope.miners[1].strikeSpeedCap = 2
-		$scope.miners[1].identifyStone = 0
-		$scope.miners[1].identifyStoneCost = 5
-		$scope.miners[1].identifyStoneIncrease = 15
-		$scope.miners[1].identifyStoneCap = 100
-	}
-	{$scope.miners.push(new Miner(function() {   //Miner  2 - Blaine
-		//choose next material
-		var theChoice = Math.random()
-		if(theChoice < .15) {
-			this.x++
-		} else if(theChoice < .50) {
-			this.y++
-		} else if(theChoice < .8) {
-			this.x++
-			this.y++
-		} else {
-			this.y++
-			this.y++
+	{//--------------Worker formulae-----------------
+		{
+			$scope.loggers.push(new Logger(function() { //Logger 0 - Jane
+				//choose next tree
+				this.target++
+			}));
+			$scope.loggers[0].power = 6
+			$scope.loggers[0].axePowerCost = 1
+			$scope.loggers[0].axePowerIncrease = 1
+			$scope.loggers[0].axePowerCap = 100
+			$scope.loggers[0].speed = 40
+			$scope.loggers[0].chopSpeedCost = 5
+			$scope.loggers[0].chopSpeedIncrease = 5
+			$scope.loggers[0].chopSpeedCap = 8
 		}
 		
-	})) 
-		$scope.miners[2].stop=1 //unpause when unlocked
-		$scope.miners[2].power = 20
-		$scope.miners[2].pickQualityCost = 5
-		$scope.miners[2].pickQualityIncrease = 10
-		$scope.miners[2].pickQualityCap = 100
-		$scope.miners[2].speed = 40
-		$scope.miners[2].strikeSpeedCost = 20
-		$scope.miners[2].strikeSpeedIncrease = 10
-		$scope.miners[2].strikeSpeedCap = 4
-	}
-	{$scope.miners.push(new Miner(function() {   //Miner  3 - Moreccio
-	
-		//findNextAliveMaterial
-		var foundOne = 0
-		for(var x = 0; x < theGrid.length; x++) {
-			if(theGrid[x].toughness > 0) {
-				foundOne = 1
-				this.x = theGrid[x].x
-				this.y = theGrid[x].y
-				break
-			}
-		}
-		if(!foundOne) {
-			this.x++
-		}
-	})) 
-		$scope.miners[3].stop=1 //unpause when unlocked
-		$scope.miners[3].power = 10
-		$scope.miners[3].pickQualityCost = 1
-		$scope.miners[3].pickQualityIncrease = 3
-		$scope.miners[3].pickQualityCap = 100
-		$scope.miners[3].speed = 20
-		$scope.miners[3].strikeSpeedCost = 50
-		$scope.miners[3].strikeSpeedIncrease = 5
-		$scope.miners[3].strikeSpeedCap = 10
-	}
-	
-	
-	}
-	
-	{ //====================Buttons======================
-	$scope.buyAxePower = function(num) {
-		if($scope.gold >= $scope.loggers[num].axePowerCost) {
-			$scope.gold -= $scope.loggers[num].axePowerCost
-			//cost growth
-			$scope.loggers[num].axePowerCost = $scope.loggers[num].axePowerCost + $scope.loggers[num].axePowerIncrease
-			//effect
-			$scope.loggers[num].power++
-		}
-	}
-	$scope.buyChopSpeed = function(num) {
-		if($scope.gold >= $scope.loggers[num].axePowerCost) {
-			$scope.gold -= $scope.loggers[num].axePowerCost
-			//cost growth
-			$scope.loggers[num].chopSpeedCost = $scope.loggers[num].chopSpeedCost + $scope.loggers[num].chopSpeedIncrease
-			//effect
-			$scope.loggers[num].speed--
-		}
-	}
-	
-	$scope.buyPickQuality = function(num) {
-		if($scope.gold >= $scope.miners[num].pickQualityCost) {
-			$scope.gold -= $scope.miners[num].pickQualityCost
-			//cost growth
-			$scope.miners[num].pickQualityCost = $scope.miners[num].pickQualityCost + $scope.miners[num].pickQualityIncrease
-			//effect
-			$scope.miners[num].power++
-		}
-	}
-	$scope.buyStrikeSpeed = function(num) {
-		if($scope.gold >= $scope.miners[num].strikeSpeedCost) {
-			$scope.gold -= $scope.miners[num].strikeSpeedCost
-			//cost growth
-			$scope.miners[num].strikeSpeedCost = $scope.miners[num].strikeSpeedCost + $scope.miners[num].strikeSpeedIncrease
-			//effect
-			$scope.miners[num].speed--
-		}
-	}
-	
-	$scope.buyNewEmployee = function() {
-		if($scope.gold >= $scope.employeeCost && $scope.totalWorkers <= 7) {
-			$scope.gold -= $scope.employeeCost
-			//cost growth
-			$scope.employeeCost = $scope.nextEmployeeCost()
-			//effect
-			$scope.totalWorkers++
-			$scope.loggers[(($scope.totalWorkers-2)/2)|0].stop = 0
-			console.log('unlocking logger' + (($scope.totalWorkers-2)/2)|0)
-			$scope.miners[(($scope.totalWorkers-1)/2)|0].stop = 0
-		}
-	}
-	$scope.buyMiningWidth = function() {
-		if($scope.gold >= $scope.miners[0].miningWidthCost) {
-			$scope.gold -= $scope.miners[0].miningWidthCost
-			//cost growth
-			$scope.miners[0].miningWidthCost += $scope.miners[0].miningWidthIncrease
-			//effect
-			$scope.miners[0].miningWidth++
-		}
-	}
-	$scope.buyPlotSize = function() {
-		if($scope.gold >= $scope.plotSizeCost) {
-			$scope.gold -= $scope.plotSizeCost
-			//cost growth
-			$scope.plotSizeCost = $scope.nextPlotSizeCost()
-			//effect
-			$scope.bonusStakeSize++
-		}
-	}
-	$scope.buyTreeCount = function() {
-		if($scope.gold >= $scope.treeCountCost) {
-			$scope.gold -= $scope.treeCountCost
-			//cost growth
-			$scope.treeCountCost = $scope.nextTreeCountCost()
-			//effect
-			$scope.bonusForestSize++
+		{
+			$scope.loggers.push(new Logger(function() { //Logger 1 - Alexa
+				//choose next tree
+				this.target= 2 + this.target
+				while(theForest[this.target] && theForest[this.target].isDead && this.target < treeAmount) {
+					this.target++
+				}
+			}));
+			$scope.loggers[1].stop = true //unpause when unlocked
+			$scope.loggers[1].power = 10
+			$scope.loggers[1].axePowerCost = 1
+			$scope.loggers[1].axePowerIncrease = 1
+			$scope.loggers[1].axePowerCap = 100
+			$scope.loggers[1].speed = 15
+			$scope.loggers[1].chopSpeedCost = 20
+			$scope.loggers[1].chopSpeedIncrease = -1
+			$scope.loggers[1].chopSpeedCap = 5
 		}
 		
-	}
-	$scope.buyChanceForGold = function(num) {
-		if($scope.gold >= $scope.treeCountCost) {
-			$scope.gold -= $scope.treeCountCost
-			//cost growth
-			$scope.treeCountCost = $scope.nextTreeCountCost()
-			//effect
-			$scope.bonusForestSize++
+		{
+			$scope.loggers.push(new Logger(function() { //Logger 2 - Beth
+				//choose next tree
+				this.target= 3 + this.target
+				while(theForest[this.target] && theForest[this.target].isDead && this.target < treeAmount) {
+					this.target++
+				}
+			}));
+			$scope.loggers[2].stop = true //unpause when unlocked
+			$scope.loggers[2].power = 6
+			$scope.loggers[2].axePowerCost = 1
+			$scope.loggers[2].axePowerIncrease = 1
+			$scope.loggers[2].axePowerCap = 100
+			$scope.loggers[2].speed = 20
+			$scope.loggers[2].chopSpeedCost = 20
+			$scope.loggers[2].chopSpeedIncrease = -1
+			$scope.loggers[2].chopSpeedCap = 5
 		}
-	}
-	$scope.buyIdentifyStone = function() {
-		if($scope.gold >= $scope.miners[1].identifyStoneCost) {
-			$scope.gold -= $scope.miners[1].identifyStoneCost
-			//cost growth
-			$scope.miners[1].identifyStoneCost += $scope.miners[1].identifyStoneIncrease
-			//effect
-			$scope.miners[1].identifyStone += 5
+		
+		{
+			$scope.loggers.push(new Logger(function() { //Logger 3 - Lucy
+				//choose next tree
+				this.target= 4 + this.target
+				while(theForest[this.target] && theForest[this.target].isDead && this.target < treeAmount) {
+					this.target++
+				}
+			}));
+			$scope.loggers[3].stop = true //unpause when unlocked
+			$scope.loggers[3].power = 6
+			$scope.loggers[3].axePowerCost = 1
+			$scope.loggers[3].axePowerIncrease = 1
+			$scope.loggers[3].axePowerCap = 100
+			$scope.loggers[3].speed = 20
+			$scope.loggers[3].chopSpeedCost = 20
+			$scope.loggers[3].chopSpeedIncrease = -1
+			$scope.loggers[3].chopSpeedCap = 5
 		}
-	}
+		
+		{
+			$scope.miners.push(new Miner(function() {   //Miner  0 - Kyle
+				//choose next material
+				this.mineCounter++
+				if(this.mineCounter%this.miningWidth==0) {
+					this.y++
+					this.x -= (this.miningWidth-2)
+					if(this.x < 0) {
+						this.x = 0
+					}
+				} else {
+					this.x++
+				}
+			}))
+			$scope.miners[0].power = 3
+			$scope.miners[0].pickQualityCost = 1
+			$scope.miners[0].pickQualityIncrease = 5
+			$scope.miners[0].pickQualityCap = 100
+			$scope.miners[0].speed = 20
+			$scope.miners[0].strikeSpeedCost = 10
+			$scope.miners[0].strikeSpeedIncrease = 8
+			$scope.miners[0].strikeSpeedCap = 5
+			$scope.miners[0].miningWidth = 2
+			$scope.miners[0].miningWidthCost = 75
+			$scope.miners[0].miningWidthIncrease = 125
+			$scope.miners[0].miningWidthCap = 7
+		}
+		
+		{
+			$scope.miners.push(new Miner(function() {   //Miner  1 - Paul
+				//choose next material
+				var theChoice = Math.random()
+				if(theChoice < .30) {
+					this.x++
+				} else {
+					this.y++
+				}
+			}))
+			$scope.miners[1].stop = 1 //unpause when unlocked
+			$scope.miners[1].power = 2
+			$scope.miners[1].pickQualityCost = 10
+			$scope.miners[1].pickQualityIncrease = 13
+			$scope.miners[1].pickQualityCap = 50
+			$scope.miners[1].speed = 10
+			$scope.miners[1].strikeSpeedCost = 15
+			$scope.miners[1].strikeSpeedIncrease = 15
+			$scope.miners[1].strikeSpeedCap = 2
+			$scope.miners[1].identifyStone = 0
+			$scope.miners[1].identifyStoneCost = 5
+			$scope.miners[1].identifyStoneIncrease = 15
+			$scope.miners[1].identifyStoneCap = 100
+		}
+		
+		{
+			$scope.miners.push(new Miner(function() {   //Miner  2 - Blaine
+				//choose next material
+				var theChoice = Math.random()
+				if(theChoice < .15) {
+					this.x++
+				} else if(theChoice < .50) {
+					this.y++
+				} else if(theChoice < .8) {
+					this.x++
+					this.y++
+				} else {
+					this.y++
+					this.y++
+				}
+			})) 
+			$scope.miners[2].stop = 1 //unpause when unlocked
+			$scope.miners[2].power = 20
+			$scope.miners[2].pickQualityCost = 5
+			$scope.miners[2].pickQualityIncrease = 10
+			$scope.miners[2].pickQualityCap = 100
+			$scope.miners[2].speed = 40
+			$scope.miners[2].strikeSpeedCost = 20
+			$scope.miners[2].strikeSpeedIncrease = 10
+			$scope.miners[2].strikeSpeedCap = 4
+		}
+		
+		{
+			$scope.miners.push(new Miner(function() {   //Miner  3 - Moreccio
+				//findNextAliveMaterial
+				var foundOne = 0
+				for(var x = 0; x < theGrid.length; x++) {
+					if(theGrid[x].toughness > 0) {
+						foundOne = 1
+						this.x = theGrid[x].x
+						this.y = theGrid[x].y
+						break
+					}
+				}
+				if(!foundOne) {
+					this.x++
+				}
+			})) 
+			$scope.miners[3].stop = 1 //unpause when unlocked
+			$scope.miners[3].power = 10
+			$scope.miners[3].pickQualityCost = 1
+			$scope.miners[3].pickQualityIncrease = 3
+			$scope.miners[3].pickQualityCap = 100
+			$scope.miners[3].speed = 20
+			$scope.miners[3].strikeSpeedCost = 50
+			$scope.miners[3].strikeSpeedIncrease = 5
+			$scope.miners[3].strikeSpeedCap = 10
+		}
+	}//==============End Worker formulae=============
 	
-	$scope.nextEmployeeCost = function() {
-		return $scope.employeeCost + 20
-	}
-	$scope.nextPlotSizeCost = function() {
-		return ($scope.plotSizeCost * 1.2)|0
-	}
-	$scope.nextTreeCountCost = function() {
-		return $scope.treeCountCost + 3
-	}
-	$scope.nextChanceForGoldCost = function(num) {
-		return ($scope.chanceForGoldCost[num]*1.2+1)|0
-	}
+	{//--------------Buttons-------------------------
+		$scope.buyAxePower = function(num) {
+			if($scope.gold >= $scope.loggers[num].axePowerCost) {
+				$scope.gold -= $scope.loggers[num].axePowerCost
+				//cost growth
+				$scope.loggers[num].axePowerCost = $scope.loggers[num].axePowerCost + $scope.loggers[num].axePowerIncrease
+				//effect
+				$scope.loggers[num].power++
+			}
+		}
+		
+		$scope.buyChopSpeed = function(num) {
+			if($scope.gold >= $scope.loggers[num].axePowerCost) {
+				$scope.gold -= $scope.loggers[num].axePowerCost
+				//cost growth
+				$scope.loggers[num].chopSpeedCost = $scope.loggers[num].chopSpeedCost + $scope.loggers[num].chopSpeedIncrease
+				//effect
+				$scope.loggers[num].speed--
+			}
+		}
+		
+		$scope.buyPickQuality = function(num) {
+			if($scope.gold >= $scope.miners[num].pickQualityCost) {
+				$scope.gold -= $scope.miners[num].pickQualityCost
+				//cost growth
+				$scope.miners[num].pickQualityCost = $scope.miners[num].pickQualityCost + $scope.miners[num].pickQualityIncrease
+				//effect
+				$scope.miners[num].power++
+			}
+		}
+		
+		$scope.buyStrikeSpeed = function(num) {
+			if($scope.gold >= $scope.miners[num].strikeSpeedCost) {
+				$scope.gold -= $scope.miners[num].strikeSpeedCost
+				//cost growth
+				$scope.miners[num].strikeSpeedCost = $scope.miners[num].strikeSpeedCost + $scope.miners[num].strikeSpeedIncrease
+				//effect
+				$scope.miners[num].speed--
+			}
+		}
+		
+		$scope.buyNewEmployee = function() {
+			if($scope.gold >= $scope.employeeCost && $scope.totalWorkers <= 7) {
+				$scope.gold -= $scope.employeeCost
+				//cost growth
+				$scope.employeeCost = $scope.nextEmployeeCost()
+				//effect
+				$scope.totalWorkers++
+				$scope.loggers[(($scope.totalWorkers-2)/2)|0].stop = 0
+				console.log('unlocking logger' + (($scope.totalWorkers-2)/2)|0)
+				$scope.miners[(($scope.totalWorkers-1)/2)|0].stop = 0
+			}
+		}
+		
+		$scope.buyMiningWidth = function() {
+			if($scope.gold >= $scope.miners[0].miningWidthCost) {
+				$scope.gold -= $scope.miners[0].miningWidthCost
+				//cost growth
+				$scope.miners[0].miningWidthCost += $scope.miners[0].miningWidthIncrease
+				//effect
+				$scope.miners[0].miningWidth++
+			}
+		}
+		
+		$scope.buyPlotSize = function() {
+			if($scope.gold >= $scope.plotSizeCost) {
+				$scope.gold -= $scope.plotSizeCost
+				//cost growth
+				$scope.plotSizeCost = $scope.nextPlotSizeCost()
+				//effect
+				$scope.bonusStakeSize++
+			}
+		}
+		
+		$scope.buyTreeCount = function() {
+			if($scope.gold >= $scope.treeCountCost) {
+				$scope.gold -= $scope.treeCountCost
+				//cost growth
+				$scope.treeCountCost = $scope.nextTreeCountCost()
+				//effect
+				$scope.bonusForestSize++
+			}
+		}
+		
+		$scope.buyChanceForGold = function(num) {
+			if($scope.gold >= $scope.treeCountCost) {
+				$scope.gold -= $scope.treeCountCost
+				//cost growth
+				$scope.treeCountCost = $scope.nextTreeCountCost()
+				//effect
+				$scope.bonusForestSize++
+			}
+		}
+		
+		$scope.buyIdentifyStone = function() {
+			if($scope.gold >= $scope.miners[1].identifyStoneCost) {
+				$scope.gold -= $scope.miners[1].identifyStoneCost
+				//cost growth
+				$scope.miners[1].identifyStoneCost += $scope.miners[1].identifyStoneIncrease
+				//effect
+				$scope.miners[1].identifyStone += 5
+			}
+		}
+		
+		$scope.nextEmployeeCost = function() {
+			return $scope.employeeCost + 20
+		}
+		
+		$scope.nextPlotSizeCost = function() {
+			return ($scope.plotSizeCost * 1.2)|0
+		}
+		
+		$scope.nextTreeCountCost = function() {
+			return $scope.treeCountCost + 3
+		}
+		
+		$scope.nextChanceForGoldCost = function(num) {
+			return ($scope.chanceForGoldCost[num]*1.2+1)|0
+		}
 	
-	//angular.element($0).scope().gold+=5
+		//angular.element($0).scope().gold+=5
 	
-	
-	
-	
-	
-	$scope.buyNewStake = function(num) {
-		if($scope.wood >= $scope.buyNewStakeCost[num]) {
-			$scope.wood -= $scope.buyNewStakeCost[num]
-			//effect of resetting the stakes
-			for(var i = 0; i < 4; i++) {
-				$scope.miners[i].x = 0
-				$scope.miners[i].y = 0
+		$scope.buyNewStake = function(num) {
+			if($scope.wood >= $scope.buyNewStakeCost[num]) {
+				$scope.wood -= $scope.buyNewStakeCost[num]
+				//effect of resetting the stakes
+				for(var i = 0; i < 4; i++) {
+					$scope.miners[i].x = 0
+					$scope.miners[i].y = 0
+					
+					$scope.loggers[i].target = 0
+					if(i*2 < $scope.totalWorkers) { //if they're unlocked, turn them on
+						$scope.miners[i].stop = 0
+					}
+					if(i*2+1 < $scope.totalWorkers) { //if they're unlocked, turn them on
+						$scope.loggers[i].stop = 0
+					}
+				}
+				$scope.miners[0].mineCounter = 0
 				
-				$scope.loggers[i].target = 0
-				if(i*2 < $scope.totalWorkers) { //if they're unlocked, turn them on
-					$scope.miners[i].stop = 0
-				}
-				if(i*2+1 < $scope.totalWorkers) { //if they're unlocked, turn them on
-					$scope.loggers[i].stop = 0
-				}
+				
+				var mult = Math.pow(1.2, num) //stake value growth rate
+				var size = ((Math.random()*3*(num*1.5+1) + 4*(num*1.5+1) + $scope.bonusStakeSize)*mult)|0
+				maxWidth = size > 40 ? 40 : size
+				maxDepth = (size*1.5) > 55 ? 55 : (size*1.5)|0
+				
+				treeAmount = ((Math.random()*3 + $scope.bonusForestSize + num)*mult)|0
+				
+				
+				//console.log("size:"+size)
+				//console.log("mult:"+mult)
+				resetAllMaterial()
+				
 			}
-			$scope.miners[0].mineCounter = 0
-			
-			
-			var mult = Math.pow(1.2, num) //stake value growth rate
-			var size = ((Math.random()*3*(num*1.5+1) + 4*(num*1.5+1) + $scope.bonusStakeSize)*mult)|0
-			maxWidth = size > 40 ? 40 : size
-			maxDepth = (size*1.5) > 55 ? 55 : (size*1.5)|0
-			
-			treeAmount = ((Math.random()*3 + $scope.bonusForestSize + num)*mult)|0
-			
-			
-			//console.log("size:"+size)
-			//console.log("mult:"+mult)
-			resetAllMaterial()
-			
 		}
-	}
-	
-	}
-	
-	
+	}//==============End Buttons=====================
 	
 	//
 	function minersMove(miner, index) {
@@ -739,7 +749,6 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 				theGrid[x].toughness = theGrid[x].toughnessMax
 				theGrid[x].hasGivenGold = 0
 				theGrid[x].isDead = 0
-				
 				if(theGrid[x].y > 4) { //Evolve into stone
 					chanceOfBeingStone = .15 + .02 * theGrid[x].y
 					if(Math.random() < (chanceOfBeingStone * $scope.miners[1].identifyStone / 100)) {
@@ -748,7 +757,6 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 						theGrid[x] = Dirt(theGrid[x], theGrid[x].y)
 					}
 				}
-				
 			} else {
 				theGrid[x].toughness = 0
 				theGrid[x].isDead = 1
@@ -772,7 +780,7 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 	}
 	
 	
-	{//--------------- Utility Functions----------------- AKA Not specific to this game
+	{//--------------Utility Functions--------------- AKA Not specific to this game
 		$scope.toggleStartStop = function() {
 			stop = !stop
 			$scope.hoveredStartStopButton(true)
@@ -810,13 +818,15 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 		function round3(num) {
 			return Math.floor(num*1000)/1000
 		}
+		
 		function round2(num) {
 			return Math.floor(num*100)/100
 		}
+		
 		function round1(num) {
 			return Math.floor(num*10)/10
 		}
-
+		
 		function round(num) {
 			return formatNumber(num);
 		} function formatNumber(num) {
@@ -898,10 +908,7 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 				resultOfFinish()
 			}
 		}
-		
-
-
-	}
+	}//==============End Utility Functions=========== AKA Not specific to this game
 
 	$scope.cheat = function() {
 		$scope.gold+=1000; 
@@ -909,11 +916,11 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 	}
 	
 	{//----The Timer----
-	//this way doesn't work when javascript is open in a different tab
-	//javascript will default change the 5 to minimum 500 in that case
-	//use interval.js somehow to get around it. google that along with angular?
-	msWaitTime = 50 //doesn't actually wait decimal amounts
-	$interval(function() { if(!stop) $scope.tick(); }, msWaitTime);
+		//this way doesn't work when javascript is open in a different tab
+		//javascript will default change the 5 to minimum 500 in that case
+		//use interval.js somehow to get around it. google that along with angular?
+		msWaitTime = 50 //doesn't actually wait decimal amounts
+		$interval(function() { if(!stop) $scope.tick(); }, msWaitTime);
 	}
 });
 </script>
