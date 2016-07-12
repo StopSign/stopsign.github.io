@@ -108,6 +108,20 @@ div{
 	padding-right:8px;
 }
 
+.depthArrow {
+	position:absolute;
+	background-color:yellow;
+	width:20px;
+	height:238px;
+	left:1056px;
+	cursor:pointer;
+	padding: 2px;
+}
+.depthArrow:hover {
+	border: 2px solid blue;
+	padding:0px;
+}
+
 /* -------------------------------------------- */
 /* 						helper 							   */
 /* -------------------------------------------- */

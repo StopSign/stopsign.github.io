@@ -14,6 +14,8 @@
 		<div id='fps' style='position:absolute;font-size:14px;color:grey;top:1px;right:1px;'>{{fps}}</div>
 		<div id='theForest' style='left:400px;top:5px;position:absolute;'></div>
 		<div id='theGrid' style='left:400px;top:150px;position:absolute;'></div>
+		<div id='previousDepthButton' class='depthArrow' ng-click='clickPreviousDepthButton()' ng-show='isPreviousDepthVisible' style='top:100px;'></div>
+		<div id='nextDepthButton' class='depthArrow' ng-click='clickNextDepthButton()' ng-show='isNextDepthVisible' style='top:500px;'></div>
 		<div style='position:absolute;left:10px;top:5px;background-color:#383838;padding:3px;'>
 			<div id='gold' class='goldColor' style='color:gold;font-size:20px;'>Gold: {{gold}}</div><br>
 			<div id='wood' class='woodColor' style='font-size:20px;'>Wood: {{wood}}</div>
@@ -263,6 +265,7 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 		stop=0
 		//game
 		theGrid = []
+		theGridGraphics = []
 		theForest = []
 		treeAmount = 2
 		maxWidth = 8
@@ -271,11 +274,18 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 		maxY = 1000
 		id=0
 		treeId=0
-		for(var x = 0; x < 60; x++) {
+		curPage = 0
+		for(var x = 0; x < 40; x++) {
 			for(var y = 0; y < 55; y++) {
 				var newMaterial = new Material(x, y)
 				newMaterial = Dirt(newMaterial, y) //class specific vars
 				theGrid.push(newMaterial)
+				
+				var theGraphic = MaterialGraphics(newMaterial.id)
+				theGraphic.theMaterial.className = 'dirt'
+				theGridGraphics.push(theGraphic)
+				document.getElementById('theGrid').appendChild(theGraphic.theDiv)
+				
 			}
 		}
 		for(var x = 0; x < 100; x++) {
@@ -291,6 +301,7 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 
 			//TODO instead of calc average, sub first from last / 2
 			var fps = msWaitTime/calcAverageTime()*100
+			
 			multFromFps = 100/fps
 			$scope.fps = round(fps)+"%"
 		} else {
@@ -329,8 +340,8 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 	}//==============End Starting scope vars=========
 	
 	{//--------------Worker formulae-----------------
-		{
-			$scope.loggers.push(new Logger(function() { //Logger 0 - Jane
+		{//Logger 0 - Jane
+			$scope.loggers.push(new Logger(function() { 
 				//choose next tree
 				this.target++
 			}));
@@ -344,11 +355,11 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 			$scope.loggers[0].chopSpeedCap = 8
 		}
 		
-		{
-			$scope.loggers.push(new Logger(function() { //Logger 1 - Alexa
+		{//Logger 1 - Alexa
+			$scope.loggers.push(new Logger(function() { 
 				//choose next tree
 				this.target= 2 + this.target
-				while(theForest[this.target] && theForest[this.target].isDead && this.target < treeAmount) {
+				while(theForest[this.target] && theForest[this.target].health <= 0 && this.target < treeAmount) {
 					this.target++
 				}
 			}));
@@ -363,11 +374,11 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 			$scope.loggers[1].chopSpeedCap = 5
 		}
 		
-		{
-			$scope.loggers.push(new Logger(function() { //Logger 2 - Beth
+		{//Logger 2 - Beth
+			$scope.loggers.push(new Logger(function() { 
 				//choose next tree
 				this.target= 3 + this.target
-				while(theForest[this.target] && theForest[this.target].isDead && this.target < treeAmount) {
+				while(theForest[this.target] && theForest[this.target].health <= 0 && this.target < treeAmount) {
 					this.target++
 				}
 			}));
@@ -382,11 +393,11 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 			$scope.loggers[2].chopSpeedCap = 5
 		}
 		
-		{
-			$scope.loggers.push(new Logger(function() { //Logger 3 - Lucy
+		{//Logger 3 - Lucy
+			$scope.loggers.push(new Logger(function() { 
 				//choose next tree
 				this.target= 4 + this.target
-				while(theForest[this.target] && theForest[this.target].isDead && this.target < treeAmount) {
+				while(theForest[this.target] && theForest[this.target].health <= 0 && this.target < treeAmount) {
 					this.target++
 				}
 			}));
@@ -401,8 +412,8 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 			$scope.loggers[3].chopSpeedCap = 5
 		}
 		
-		{
-			$scope.miners.push(new Miner(function() {   //Miner  0 - Kyle
+		{//Miner  0 - Kyle
+			$scope.miners.push(new Miner(function() {   
 				//choose next material
 				this.mineCounter++
 				if(this.mineCounter%this.miningWidth==0) {
@@ -429,8 +440,8 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 			$scope.miners[0].miningWidthCap = 7
 		}
 		
-		{
-			$scope.miners.push(new Miner(function() {   //Miner  1 - Paul
+		{//Miner  1 - Paul
+			$scope.miners.push(new Miner(function() {   
 				//choose next material
 				var theChoice = Math.random()
 				if(theChoice < .30) {
@@ -454,8 +465,8 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 			$scope.miners[1].identifyStoneCap = 100
 		}
 		
-		{
-			$scope.miners.push(new Miner(function() {   //Miner  2 - Blaine
+		{//Miner  2 - Blaine
+			$scope.miners.push(new Miner(function() {   
 				//choose next material
 				var theChoice = Math.random()
 				if(theChoice < .15) {
@@ -481,12 +492,12 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 			$scope.miners[2].strikeSpeedCap = 4
 		}
 		
-		{
-			$scope.miners.push(new Miner(function() {   //Miner  3 - Moreccio
+		{//Miner  3 - Moreccio
+			$scope.miners.push(new Miner(function() {   
 				//findNextAliveMaterial
 				var foundOne = 0
 				for(var x = 0; x < theGrid.length; x++) {
-					if(theGrid[x].toughness > 0) {
+					if(theGrid[x].materialHealth > 0) {
 						foundOne = 1
 						this.x = theGrid[x].x
 						this.y = theGrid[x].y
@@ -655,6 +666,22 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 				maxWidth = size > 40 ? 40 : size
 				maxDepth = (size*1.5) > 55 ? 55 : (size*1.5)|0
 				
+				
+				//Logic for next & previous buttons' visibility
+				if(size > 40) {
+					$scope.isNextDepthVisible = 1
+				} else {
+					$scope.isNextDepthVisible = 0
+				}
+				
+				if(true) { //TODO: if previous page exists
+					$scope.isPreviousDepthVisible = 1
+				} else {
+					$scope.isPreviousDepthVisible = 0
+				}
+				
+				
+				
 				treeAmount = ((Math.random()*3 + $scope.bonusForestSize + num)*mult)|0
 				
 				
@@ -663,6 +690,22 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 				resetAllMaterial()
 				
 			}
+		}
+	
+		$scope.clickNextDepthButton = function() {
+			//go to next depth
+			curPage++
+			
+			for(var x = 0; x < theGrid.length; x++) {
+				if(theGrid[x].x < maxWidth && theGrid[x].y < maxDepth) {
+					theGrid[x].materialHealth = theGrid[x].materialHealthMax
+					theGrid[x].hasGivenGold = 0
+				}
+			}
+		}
+		$scope.clickPreviousDepthButton = function() {
+			//go to next depth
+			curPage--
 		}
 	}//==============End Buttons=====================
 	
@@ -682,16 +725,15 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 				return;
 			}
 			material.isUpdating = true
-			material.toughness -= miner.power
-			if(material.toughness <= 0) {
-				material.toughness = 0
-				material.isDead = 1
+			material.materialHealth -= miner.power
+			if(material.materialHealth <= 0) {
+				material.materialHealth = 0
 				materialType = material.className=='dirt'?0:material.className=='stone'?1:0
 				if(Math.random() < $scope.chanceForGold[materialType]/100) {
 					$scope.gold += material.value
 				}
 				miner.movementPattern()
-				while(miner.x < maxWidth && miner.y < maxDepth && findMaterialInGrid(miner.x, miner.y).toughness <= 0) { //if it's in bounds and the target is dead, move next
+				while(miner.x < maxWidth && miner.y < maxDepth && findMaterialInGrid(miner.x, miner.y).materialHealth <= 0) { //if it's in bounds and the target is dead, move next
 					miner.movementPattern()
 				}
 				if(miner.x >= maxWidth || miner.y >= maxDepth) {
@@ -732,7 +774,6 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 		}
 	}
 
-	
 	function findMaterialInGrid(targetX, targetY) {
 		for(var x = 0; x < theGrid.length; x++) {
 			if(theGrid[x].x === targetX && theGrid[x].y === targetY) {
@@ -746,20 +787,20 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 	function resetAllMaterial() {
 		for(var x = 0; x < theGrid.length; x++) {
 			if(theGrid[x].x < maxWidth && theGrid[x].y < maxDepth) {
-				theGrid[x].toughness = theGrid[x].toughnessMax
+				theGrid[x].materialHealth = theGrid[x].materialHealthMax
 				theGrid[x].hasGivenGold = 0
-				theGrid[x].isDead = 0
 				if(theGrid[x].y > 4) { //Evolve into stone
 					chanceOfBeingStone = .15 + .02 * theGrid[x].y
 					if(Math.random() < (chanceOfBeingStone * $scope.miners[1].identifyStone / 100)) {
 						theGrid[x] = Stone(theGrid[x], theGrid[x].y)
+						
 					} else {
-						theGrid[x] = Dirt(theGrid[x], theGrid[x].y)
+						//didn't evolve
+						//theGrid[x] = Dirt(theGrid[x], theGrid[x].y)
 					}
 				}
 			} else {
-				theGrid[x].toughness = 0
-				theGrid[x].isDead = 1
+				theGrid[x].materialHealth = 0
 			}
 			theGrid[x].isUpdating = true;
 		}
@@ -769,10 +810,8 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 				var effect = (maxX - 25*(32-treeAmount))
 				theForest[x].x = (Math.random() * (effect>800?800:effect))|0
 				theForest[x].hasGivenGold = 0
-				theForest[x].isDead = 0
 			} else {
 				theForest[x].health = 0;
-				theForest[x].isDead = 1
 			}
 			theForest[x].isUpdating = true
 		}
@@ -917,8 +956,9 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 	
 	{//----The Timer----
 		//this way doesn't work when javascript is open in a different tab
-		//javascript will default change the 5 to minimum 500 in that case
-		//use interval.js somehow to get around it. google that along with angular?
+		//javascript will default change the 50 to minimum 500 in that case
+		//There's an interval.js within the repository that uses "workers" that fixes this problem
+		//But workers can't be used when testing it via file:///C:/ on the browser, only http
 		msWaitTime = 50 //doesn't actually wait decimal amounts
 		$interval(function() { if(!stop) $scope.tick(); }, msWaitTime);
 	}

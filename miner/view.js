@@ -3,51 +3,48 @@
 var goldDiv = document.getElementById('gold')
 
 function draw() {
-	theGrid.forEach(updateMaterialVisual)
+	theGridGraphics.forEach(updateMaterialVisual)
 	theForest.forEach(updateForestVisual);
 }
 
 function updateMaterialVisual(material, index) {
-	if(!material.isUpdating) {
+	if(!theGrid[index].isUpdating) {
 		return
-	}
-	if(!material.isDrawn) {
-		document.getElementById('theGrid').appendChild(material.theDiv)
-		material.isDrawn = true 
 	}
 	newWidth = (maxX / maxWidth) < 15 ? (maxX / maxWidth) : 15
 	newHeight = (maxY / maxDepth) < 15 ? (maxY / maxDepth) : 15
 	material.theMaterial.style.width = newWidth+'px'
 	material.theMaterial.style.height = newHeight+'px'
-	material.theMaterial.style.left = (material.x * newWidth)+'px'
-	material.theMaterial.style.top = (material.y * newHeight)+'px'
-	if(material.toughness <= 0) {
+	material.theMaterial.style.left = (theGrid[index].x * newWidth)+'px'
+	material.theMaterial.style.top = (theGrid[index].y * newHeight)+'px'
+	if(theGrid[index].materialHealth <= 0) {
 		material.theMaterial.style.opacity = 0
 	} else {
-		material.theMaterial.style.opacity = material.toughness/material.toughnessMax * .8 + .2
+		material.theMaterial.style.opacity = theGrid[index].materialHealth/theGrid[index].materialHealthMax * .8 + .2
 	}
 	
-	material.healthBar.style.height = 15*material.toughness/material.toughnessMax + 'px'
-	material.healthBar.style.left = ((material.x+1) * newWidth - 2)+'px'
-	material.healthBar.style.top = (material.y * newHeight)+'px'
-	if(material.toughness/material.toughnessMax === 1) {
+	material.healthBar.style.height = 15*theGrid[index].materialHealth/theGrid[index].materialHealthMax + 'px'
+	material.healthBar.style.left = ((theGrid[index].x+1) * newWidth - 2)+'px'
+	material.healthBar.style.top = (theGrid[index].y * newHeight)+'px'
+	if(theGrid[index].materialHealth === theGrid[index].materialHealthMax) {
 		material.healthBar.style.opacity = 0
 	} else {
 		material.healthBar.style.opacity = 1
 	}
 	
-	//material.theDiv.style.backgroundColor = hslToRgb(0, 55, 50, material.toughness/material.toughnessMax)
+	//material.theDiv.style.backgroundColor = hslToRgb(0, 55, 50, material.materialHealth/material.materialHealthMax)
 	material.isUpdating = false;
 }
 
-function MaterialGraphics(theMaterialObj) {
+//used in the above updateMaterialVisual
+function MaterialGraphics(theid) {
+	theMaterialObj = {}
 	
 	var theDiv = document.createElement("div");
-	theDiv.style.position = 'relative';
 	theMaterialObj.theDiv = theDiv
 	
 	var theMaterial = document.createElement("div");
-	theMaterial.id = 'material'+theMaterialObj.id
+	theMaterial.id = 'material'+theid
 	theMaterialObj.theMaterial = theMaterial
 	theDiv.appendChild(theMaterial)
 	
@@ -57,8 +54,9 @@ function MaterialGraphics(theMaterialObj) {
 	theDiv.appendChild(healthBar)
 	theMaterialObj.healthBar = healthBar
 	
-	theMaterialObj.isDrawn = false
 	theMaterialObj.isUpdating = true
+	
+	return theMaterialObj
 }
 
 
@@ -115,17 +113,17 @@ function updateForestVisual(tree, index) {
 	}
 	
 	tree.treeHealthBarOuter.style.left = (tree.x)+'px'
-	tree.treeHealthBarOuter.style.top = (tree.y-3)+'px'
-	if(tree.health <= 0 && tree.health != tree.healthMax) { //show when under damage
+	tree.treeHealthBarOuter.style.top = (tree.y-3+tree.id*.8+35)+'px'
+	if(tree.health <= 0 || tree.health === tree.healthMax) { //show when under damage
 		tree.treeHealthBarOuter.style.opacity = 0
 	} else {
 		tree.treeHealthBarOuter.style.opacity = 1
 	}
 	
 	tree.treeHealthBar.style.left = (tree.x+2)+'px'
-	tree.treeHealthBar.style.top = (tree.y)+'px'
+	tree.treeHealthBar.style.top = (tree.y+tree.id*.8+35)+'px'
 	tree.treeHealthBar.style.width = (tree.health / tree.healthMax * 24)+'px'
-	if(tree.health <= 0 && tree.health != tree.healthMax) {
+	if(tree.health <= 0 || tree.health === tree.healthMax) {
 		tree.treeHealthBar.style.opacity = 0
 	} else {
 		tree.treeHealthBar.style.opacity = 1

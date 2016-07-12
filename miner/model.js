@@ -27,48 +27,35 @@ function Tree(size) {
 	TreeGraphics(this)
 	
 	this.hasGivenGold = 0;
-	this.isDead = 0
 	this.stop = 0
 }
 
 
 function Material(x, y) {
-	this.toughness = this.toughnessMax = 10
 	this.x = x
 	this.y = y
 	this.id = id++
 	
-	MaterialGraphics(this)
-	
-	
 	this.hasGivenGold = 0;
-	this.isDead = 0
 	this.stop = 0
 }
 
 function Dirt(theMaterial, depth) {
-	theMaterial.toughness = 10 + depth
-	theMaterial.toughnessMax = theMaterial.toughness
+	theMaterial.materialHealth = 10 + depth
+	theMaterial.materialHealthMax = theMaterial.materialHealth
 	theMaterial.value = 1
 	
-	var theDirt = theMaterial.theMaterial
-	theDirt.className = 'dirt'
-	theMaterial.theMaterial = theDirt
+
 	theMaterial.isUpdating = true
-	
 	return theMaterial
 }
 
 
 function Stone(theMaterial, depth) {
-	theMaterial.toughness = theMaterial.toughnessMax = 11 + (depth * 2)
+	theMaterial.materialHealth = theMaterial.materialHealthMax = 11 + (depth * 2)
 	theMaterial.value = 3
 	
-	var theStone = theMaterial.theMaterial
-	theStone.className = 'stone'
-	theMaterial.theDiv = theStone
 	theMaterial.isUpdating = true
-	
 	return theMaterial
 }
 
@@ -79,7 +66,7 @@ function Stone(theMaterial, depth) {
 //The toughness and value needs updated still.
 
 function Aluminum(theMaterial, depth) {
-    theMaterial.toughness = theMaterial.toughnessMax = 12 + (depth * 3)
+    theMaterial.materialHealth = theMaterial.materialHealthMax = 12 + (depth * 3)
     theMaterial.value = 5
 
     var theAluminum = theMaterial.theMaterial
@@ -91,7 +78,7 @@ function Aluminum(theMaterial, depth) {
 }
 
 function Feldspar(theMaterial, depth) {
-    theMaterial.toughness = theMaterial.toughnessMax = 13 + (depth * 4)
+    theMaterial.materialHealth = theMaterial.materialHealthMax = 13 + (depth * 4)
     theMaterial.value = 6
 
     var Feldspar = theMaterial.theMaterial
@@ -103,7 +90,7 @@ function Feldspar(theMaterial, depth) {
 }
 
 function Beryllium(theMaterial, depth) {
-    theMaterial.toughness = theMaterial.toughnessMax = 14 + (depth * 5)
+    theMaterial.materialHealth = theMaterial.materialHealthMax = 14 + (depth * 5)
     theMaterial.value = 7
 
     var theBeryllium = theMaterial.theMaterial
@@ -115,7 +102,7 @@ function Beryllium(theMaterial, depth) {
 }
 
 function Quartz(theMaterial, depth) {
-    theMaterial.toughness = theMaterial.toughnessMax = 15 + (depth * 6)
+    theMaterial.materialHealth = theMaterial.materialHealthMax = 15 + (depth * 6)
     theMaterial.value = 8
 
     var theQuartz = theMaterial.theMaterial
@@ -127,7 +114,7 @@ function Quartz(theMaterial, depth) {
 }
 
 function SodiumCarbonate(theMaterial, depth) {
-    theMaterial.toughness = theMaterial.toughnessMax = 16 + (depth * 7)
+    theMaterial.materialHealth = theMaterial.materialHealthMax = 16 + (depth * 7)
     theMaterial.value = 9
 
     var theSodiumCarbonate = theMaterial.theMaterial
@@ -139,7 +126,7 @@ function SodiumCarbonate(theMaterial, depth) {
 }
 
 function Zeolites(theMaterial, depth) {
-    theMaterial.toughness = theMaterial.toughnessMax = 17 + (depth * 8)
+    theMaterial.materialHealth = theMaterial.materialHealthMax = 17 + (depth * 8)
     theMaterial.value = 10
 
     var theZeolites = theMaterial.theMaterial
