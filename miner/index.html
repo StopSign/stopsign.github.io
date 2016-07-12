@@ -177,7 +177,7 @@
 				<div class='buttonContainer'><!-- % Gold Find in Stone -->
 					<div ng-click='buyChanceForGold(1)' ng-mouseover='isHover3 = 1' ng-mouseleave='isHover3 = 0' class='buyButton hyperVisible'>% Gold Find in Stone</div>
 					<div class='number hyperVisible someSpace'>Current: {{chanceForGold[1]}}%</div>
-					<div ng-show='isHover3' class='number tealColor'>--> {{chanceForGold[1]+3}}&nbsp;</div>
+					<div ng-show='isHover3' class='number tealColor'>--> {{chanceForGold[1]+1}}&nbsp;</div>
 					<div class='number goldColor'>Cost: {{chanceForGoldCost[1]}}</div>
 					<div ng-show='isHover3' class='number tealColor'>--> {{nextChanceForGoldCost(1)}}&nbsp;</div><br>
 				</div>
@@ -605,12 +605,12 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 		}
 		
 		$scope.buyChanceForGold = function(num) {
-			if($scope.gold >= $scope.treeCountCost) {
-				$scope.gold -= $scope.treeCountCost
+			if($scope.gold >= $scope.chanceForGoldCost[num]) {
+				$scope.gold -= $scope.chanceForGoldCost[num]
 				//cost growth
-				$scope.treeCountCost = $scope.nextTreeCountCost()
+				$scope.chanceForGoldCost[num] = $scope.nextChanceForGoldCost(num)
 				//effect
-				$scope.bonusForestSize++
+				$scope.chanceForGold[num]++
 			}
 		}
 		
@@ -637,7 +637,7 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 		}
 		
 		$scope.nextChanceForGoldCost = function(num) {
-			return ($scope.chanceForGoldCost[num]*1.2+1)|0
+			return $scope.chanceForGoldCost[num] + 5*(num+1)
 		}
 	
 		//angular.element($0).scope().gold+=5
