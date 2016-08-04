@@ -19,8 +19,8 @@ function loadDefaults() {
 	
 		//gold = 0;
 		//territory = 10;
-	gold = 500
-	territory = 100
+	gold = 0
+	territory = 10
 	
 	higheststageUnlocked = 0;
 	stop=0
