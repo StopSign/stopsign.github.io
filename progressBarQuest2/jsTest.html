@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+	<!--<script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+	<script src="https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+	<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>-->
+</head>
+<script>
+
+//TODO probably a fancier way to do this w/o looping
+//between (10, 50, 210, )*34 total ticks,
+tempMulti = 1
+tempNum = 50 *34
+while((tempNum/tempMulti) >= 10*34*tempMulti) {
+	tempNum -=  10*34 * tempMulti
+	console.log(tempMulti+","+tempNum)
+	tempMulti *= 2
+}
+console.log( tempMulti)
+</script>
+</html>
