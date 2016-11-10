@@ -1,43 +1,101 @@
 /* -------------------------------------------- */
-/* 					universal							   */
+/* 					game     							   */
 /* -------------------------------------------- */
-div{
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -khtml-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-    display:inline-block;
-	margin-top:0;
+
+.cellGrid {
+	margin-left:300px;
+	position:relative;
+	margin-top:150px;
+}
+.resource {
+	position:absolute;
+	left:7px;
+	top:6px;
+}
+.amount {
+	position:absolute;
+	left:37px;
+	top:30px;
+	font-size:17px;
+}
+.cost {
+	position:absolute;
+	left:3px;
+	top:18px;
+	display:none;
+}
+.mult {
+	position:absolute;
+	right:7px;
+	top:1px;
+}
+.gain {
+	position:absolute;
+	right:7px;
+	bottom:5px;
+}
+.small {
+	font-size:11px;
 }
 
-.cell {
-	width:50px;
-	height:50px;
-	border:2px solid;
+
+/*  buttons  */
+.button {
 	font-size:14px;
 	cursor:pointer;
+	background: #ECECEC;
+	border-radius: 10px;
+	padding: 10px 20px;
+	font-family: arial;
+	font-weight: bold;
+	text-decoration: none;
+	text-shadow:0px 1px 0px #fff;
+	border:1px solid #a7a7a7;
+	text-align:center;
+	color:#7f7f7f;
+	-webkit-transition:box-shadow 0.5s;
+	position:absolute;
+	box-shadow: 0px 2px 1px white inset, 0px -2px 8px white, 0px 2px 5px rgba(0, 0, 0, 0.1), 0px 8px 10px rgba(0, 0, 0, 0.1);
 }
-
+.button:hover{
+	box-shadow: 0px 2px 1px white inset, 0px -2px 20px white, 0px 2px 5px rgba(0, 0, 0, 0.1), 0px 8px 10px rgba(0, 0, 0, 0.1);
+}
+.button:active{
+	box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.5) inset, 0px -2px 20px white, 0px 1px 5px rgba(0, 0, 0, 0.1), 0px 2px 10px rgba(0, 0, 0, 0.1);
+	background:-webkit-linear-gradient(top, #d1d1d1 0%,#ECECEC 100%);
+}
+.cell {
+	width: 60px;
+	height:50px;
+	cursor:default;
+}
+.cell:hover .cost{
+	color:#fd3100;
+	display:inline-block;
+}
+.costReady, .cell:hover .costReady{
+	color:blue;
+	display:inline-block;
+}
+.clickAll {
+	top:-47px;
+	left:171px;
+	width: 65px;
+	height:14px;
+	font-size:16px;
+}
 
 
 /* -------------------------------------------- */
 /* 						helper 							   */
 /* -------------------------------------------- */
+
+.pointer {
+	cursor:pointer;
+}
 .number {
     color:black;
   vertical-align: top;
-}
-.resource {
-	font-size:20px;
-	margin-top:5px;
-	margin-bottom:5px;
-	display:block;
-	color:blue;
-	background-color:#A9FFFF;
-	width:50%;
-	margin-left:25%;
 }
 .hyperVisible {
     text-shadow:
@@ -51,4 +109,24 @@ div{
 	width:100%;
 	font-size:0;
 	margin:0;
+}
+.noselect {
+  -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Chrome/Safari/Opera */
+     -khtml-user-select: none; /* Konqueror */
+       -moz-user-select: none; /* Firefox */
+        -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Non-prefixed version, currently
+                                  not supported by any browser */
+}
+
+div{
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    display:inline-block;
+	margin-top:0;
 }

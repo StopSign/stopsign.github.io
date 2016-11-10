@@ -7,29 +7,39 @@ var app = angular.module('myApp', []);
 
 app.controller('myCtrl', function($scope, $interval, $compile) {
   
-  $scope.cellGrid = [[]]
-  $scope.cellGrid[0].push(new Cell(0, 0));
-  $scope.cellGrid[0].push(new Cell(0, 1));
+  $scope.cellGrid = new CellGrid();
+  $scope.cellGrid.addNewCell(0, 0)
+  $scope.cellGrid.addNewCell(1, 0)
+  $scope.cellGrid.addNewCell(2, 0)
+  $scope.cellGrid.addNewCell(3, 0)
+  $scope.cellGrid.addNewCell(4, 0)
   
-  for(var x = 0; x < $scope.cellGrid.length; x++) {
-    for(var y = 0; y < $scope.cellGrid[x].length; y++) {
-      var newDirective = angular.element($scope.cellGrid[x][y].div); 
-      $('#cellGrid').append(newDirective);
-      $compile(newDirective)($scope);
-    }
-  };
+  $scope.cellGrid.addNewCell(0, 1)
+  $scope.cellGrid.addNewCell(1, 1)
+  $scope.cellGrid.addNewCell(2, 1)
+  $scope.cellGrid.addNewCell(3, 1)
+  
+  $scope.cellGrid.addNewCell(0, 2)
+  $scope.cellGrid.addNewCell(1, 2)
+  $scope.cellGrid.addNewCell(2, 2)
+  
+  $scope.cellGrid.addNewCell(0, 3)
+  $scope.cellGrid.addNewCell(1, 3)
+  
+  $scope.cellGrid.addNewCell(0, 4)
   
   $scope.tick = function() {
-    for(var x = 0; x < $scope.cellGrid.length; x++) {
-      for(var y = 0; y < $scope.cellGrid[x].length; y++) {
-        $scope.cellGrid[x][y].tick()
-      }
-    }
+    $scope.cellGrid.tick()
   }
   
   $scope.clickCell = function(row, column) {
-    $scope.cellGrid[row][column].clicked() 
+    $scope.cellGrid.clicked(row, column)
   }
+  $scope.clickAll = function() {
+    $scope.cellGrid.clickAll()
+  }
+  $scope.cellGrid.addToAngular($scope, $compile)
+  
   
   stop = 0
 	msWaitTime = 1000 //doesn't wait decimal amounts
