@@ -31,8 +31,8 @@ function Research() {
   }
   
   this.addNewCellButton = function(column) {
-    var cost = sigFigs(200 * Math.pow(5, column), 2)
-    var newButtonData = { baseCost : cost, costGain : 4, name : "Add Cell on column "+(column+1), onclick : "addCellToColumn("+column+")" }
+    var cost = sigFigs(200 * Math.pow(2, column), 2)
+    var newButtonData = { baseCost : cost, costGain : 3, name : "Add Cell on column "+(column+1), onclick : "addCellToColumn("+column+")" }
     var newUpgradeButton = new Upgrade(this.upgrades.length, newButtonData)
     this.upgrades.push(newUpgradeButton)
     return newUpgradeButton;
@@ -58,8 +58,8 @@ function Research() {
 
 const data = {
   buttons : [
-    { baseCost : 5000, costGain : 20, name : "Cell multiplier distance", onclick: "cellGrid.gainMultiDistance()" },
-    { baseCost : 1000, costGain : 5, name : "Add column", onclick : "addCellColumn()" },
+    { baseCost : 5000, costGain : 5, name : "Cell multiplier distance", onclick: "cellGrid.gainMultiDistance()" },
+    { baseCost : 1000, costGain : 2, name : "Add column", onclick : "addCellColumn()" },
   ],
   counter : 0
 }
