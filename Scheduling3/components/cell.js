@@ -39,16 +39,18 @@ function Cell(column, row) {
   var grid = "cellGrid.grid["+this.column+"]["+this.row+"]"
   var xValue = this.column * 118
   var yValue = this.row * 85
-  var arrowType = row === 0 ? 'arrow_left' : 'arrow_up'
-  if(row == 0) {
-    
+  var arrowType = 'arrow_up'
+  var mult = "<div class='mult'><div class='small'>x</div>{{"+grid+".multFromRes.toPrecision(3)}}</div>"
+  if(row === 0) {
+    arrowType = 'arrow_left'
+    mult = "<div class='mult'><div class='small'>+</div>{{"+grid+".multFromRes.toPrecision(3)}}<img src='images/science.png' class='smallIcon'></div>"
   }
     
   this.div = "<div class='cell button noselect "+arrowType+"' style='left:"+xValue+"px;top:"+yValue+"px;' ng-class='{ pointer : "+grid+".costReady}' ng-click='clickCell("+this.column+", "+this.row+")'>"+
     "<div class='resource'>{{"+grid+".resourceUI}}</div>"+
     "<div class='amount'>{{"+grid+".amount}}</div>"+
     "<div class='cellCost' ng-class='{ costReady : "+grid+".costReady}'><div class='small'>-</div>{{"+grid+".costUI}}</div>"+
-    "<div class='mult'><div class='small'>x</div>{{"+grid+".multFromRes.toPrecision(3)}}</div>"+
+    mult+
     "<div class='gain'><div class='small'>+</div>{{"+grid+".gainUI}}</div>"+
   "</div>"
 }
