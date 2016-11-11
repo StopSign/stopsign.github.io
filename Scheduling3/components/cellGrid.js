@@ -1,31 +1,41 @@
 function CellGrid(row, column) {
   this.grid = []
+  this.multiDistance = 1
   
-  this.addNewCell = function(row, column) {
+  this.addNewCell = function(column) {
     if(!this.grid[column]) {
       this.grid[column] = []
     }
-    this.grid[column].push(new Cell(column, row))
+    var row = this.grid[column].length;
+    var newCell = new Cell(column, row)
+    this.grid[column].push(newCell)
+    return newCell;
   }
+  
   this.tick = function() {
+    var researchGain = 0;
     for(var x = 0; x < this.grid.length; x++) {
       for(var y = 0; y < this.grid[x].length; y++) { //For each cell in the crid
         this.grid[x][y].gainFromDown = 1
-        for(z = y+1; z < this.grid[x].length; z++) { //Get the multi of all cells below it
-          this.grid[x][y].gainFromDown *= this.grid[x][z].multFromRes
+        for(y2 = y+1; y2 < this.grid[x].length && y2 < y+this.multiDistance+1; y2++) { //Get the multi of all cells below it
+          this.grid[x][y].gainFromDown *= this.grid[x][y2].multFromRes
         }
         this.grid[x][y].refreshGain();
       }
+      researchGain += this.grid[x][0].multFromRes
     }
     for(var x = 0; x < this.grid.length; x++) {
       for(var y = 0; y < this.grid[x].length; y++) {
         this.grid[x][y].tick()
       }
     }
+    return researchGain;
   }
+  
   this.clicked = function(row, column) {
     this.grid[row][column].clicked();
   }
+  
   this.clickAll = function() {
     for(var x = 0; x < this.grid.length; x++) {
       for(var y = 0; y < this.grid[x].length; y++) {
@@ -34,8 +44,12 @@ function CellGrid(row, column) {
     }
   }
   
+  this.gainMultiDistance = function() {
+    this.multiDistance++;
+  }
+  
   this.div = "<div id='cellGrid' class='cellGrid'>"+
-  "<div class='button clickAll' ng-click='clickAll()'>Click All</div>"+
+    "<div class='button clickAll' ng-click='clickAll()'>Click All</div>"+
   "</div>"
   
   

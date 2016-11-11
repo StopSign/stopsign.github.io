@@ -7,38 +7,49 @@ var app = angular.module('myApp', []);
 
 app.controller('myCtrl', function($scope, $interval, $compile) {
   
-  $scope.cellGrid = new CellGrid();
-  $scope.cellGrid.addNewCell(0, 0)
-  $scope.cellGrid.addNewCell(1, 0)
-  $scope.cellGrid.addNewCell(2, 0)
-  $scope.cellGrid.addNewCell(3, 0)
-  $scope.cellGrid.addNewCell(4, 0)
-  
-  $scope.cellGrid.addNewCell(0, 1)
-  $scope.cellGrid.addNewCell(1, 1)
-  $scope.cellGrid.addNewCell(2, 1)
-  $scope.cellGrid.addNewCell(3, 1)
-  
-  $scope.cellGrid.addNewCell(0, 2)
-  $scope.cellGrid.addNewCell(1, 2)
-  $scope.cellGrid.addNewCell(2, 2)
-  
-  $scope.cellGrid.addNewCell(0, 3)
-  $scope.cellGrid.addNewCell(1, 3)
-  
-  $scope.cellGrid.addNewCell(0, 4)
-  
   $scope.tick = function() {
-    $scope.cellGrid.tick()
+    var researchGain = $scope.cellGrid.tick()
+    $scope.research.add(researchGain);
+    $scope.research.tick();
   }
   
-  $scope.clickCell = function(row, column) {
-    $scope.cellGrid.clicked(row, column)
+  $scope.clickUpgrade = function(id, action) {
+    if($scope.research.clicked(id)) {
+      eval(action);
+    }
   }
+  
+  $scope.clickCell = function(column, row) {
+    $scope.cellGrid.clicked(column, row)
+  }
+  
   $scope.clickAll = function() {
     $scope.cellGrid.clickAll()
   }
-  $scope.cellGrid.addToAngular($scope, $compile)
+  
+  $scope.addCellColumn = function() {
+    var column = $scope.cellGrid.grid.length
+    $scope.addDiv($scope.research.addNewCellButton(column).div, '#research');
+    $scope.addDiv($scope.cellGrid.addNewCell(column).div, '#cellGrid');
+  }
+  
+  $scope.addCellToColumn = function(column) {
+    $scope.addDiv($scope.cellGrid.addNewCell(column).div, '#cellGrid');
+  }
+  
+  $scope.addDiv = function(div, id) {
+    var newDirective = angular.element(div);
+    $(id).append(newDirective);
+    $compile(newDirective)($scope);
+  }
+  
+  $scope.research = new Research();
+  $scope.cellGrid = new CellGrid();
+  $scope.addDiv($scope.research.div, '#page');
+  $scope.addDiv($scope.cellGrid.div, '#page');
+  $scope.addDiv($scope.research.addUpgradeButton().div, '#research')
+  $scope.addDiv($scope.research.addUpgradeButton().div, '#research')
+  $scope.addCellColumn();
   
   
   stop = 0
