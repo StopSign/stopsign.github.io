@@ -1,0 +1,113 @@
+
+.clickAll {
+	top:-47px;
+	left:171px;
+	width: 65px;
+	height:14px;
+	font-size:16px;
+}
+
+.arrow_up:after, .arrow_up:before {
+	border: solid transparent;
+	content: " ";
+	height: 0;
+	width: 0;
+	position: absolute;
+	pointer-events: none;
+}
+
+.arrow_up:after {
+	border-color: rgba(136, 183, 213, 0);
+	border-bottom-color: #ECECEC;
+	border-width: 14px;
+	margin-left: -24px;
+	top:-25px;
+	left:85px;
+}
+.arrow_up:before {
+	border-color: rgba(194, 225, 245, 0);
+	border-bottom-color: #a7a7a7;
+	border-width: 12px;
+	margin-left: -26px;
+	top:-24px;
+	left:89px;
+}
+.arrow_left:after, .arrow_left:before {
+	border: solid transparent;
+	content: " ";
+	height: 0;
+	width: 0;
+	position: absolute;
+	pointer-events: none;
+}
+
+.arrow_left:after {
+	border-color: rgba(136, 183, 213, 0);
+	border-right-color: #ECECEC;
+	border-width: 14px;
+	margin-left: -24px;
+	top:8px;
+	left:-2px;
+}
+.arrow_left:before {
+	border-color: rgba(194, 225, 245, 0);
+	border-right-color: #a7a7a7;
+	border-width: 12px;
+	margin-left: -26px;
+	top:10px;
+	left:1px;
+}
+
+.cellGrid {
+	left:300px;
+	position:absolute;
+	top:150px;
+}
+.resource {
+	position:absolute;
+	left:7px;
+	top:6px;
+}
+.amount {
+	position:absolute;
+	left:37px;
+	top:30px;
+	font-size:17px;
+}
+.cellCost {
+	position:absolute;
+	left:3px;
+	top:18px;
+	display:none;
+}
+.mult {
+	position:absolute;
+	right:7px;
+	top:1px;
+}
+.gain {
+	position:absolute;
+	right:7px;
+	bottom:5px;
+}
+.small {
+	font-size:11px;
+}
+.cell {
+	width: 60px;
+	height:50px;
+	cursor:default;
+	margin-bottom:20px;
+}
+.cell:hover .cellCost{
+	color:#fd3100;
+	display:inline-block;
+}
+
+.costReady, .cell:hover .costReady{
+	color:blue;
+	display:inline-block;
+}
+.pointer {
+	cursor:pointer;
+}
