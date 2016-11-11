@@ -59,7 +59,7 @@ function Research() {
 const data = {
   buttons : [
     { baseCost : 5000, costGain : 20, name : "Cell multiplier distance", onclick: "cellGrid.gainMultiDistance()" },
-    { baseCost : 1000, costGain : 10, name : "Add column", onclick : "addCellColumn()" },
+    { baseCost : 1000, costGain : 5, name : "Add column", onclick : "addCellColumn()" },
   ],
   counter : 0
 }
