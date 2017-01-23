@@ -12,8 +12,9 @@ function CellGrid(row, column) {
     return newCell;
   }
   
-  this.tick = function() {
+  this.tick = function(resources, bonusFromGarden) {
     var researchGain = 0;
+    var electronicsGain = 0;
     for(var x = 0; x < this.grid.length; x++) {
       for(var y = 0; y < this.grid[x].length; y++) { //For each cell in the crid
         this.grid[x][y].gainFromDown = 1
@@ -22,14 +23,19 @@ function CellGrid(row, column) {
         }
         this.grid[x][y].refreshGain();
       }
-      researchGain += this.grid[x][0].multFromRes
+      if(this.grid[x][0].isResourceElec) {
+        electronicsGain += this.grid[x][0].multFromRes
+      } else {
+        researchGain += this.grid[x][0].multFromRes
+      }
     }
     for(var x = 0; x < this.grid.length; x++) {
       for(var y = 0; y < this.grid[x].length; y++) {
-        this.grid[x][y].tick()
+        this.grid[x][y].tick(bonusFromGarden)
       }
     }
-    return researchGain;
+    resources.researchGain = researchGain
+    resources.electronicsGain = electronicsGain
   }
   
   this.clicked = function(row, column) {
@@ -48,14 +54,25 @@ function CellGrid(row, column) {
     this.multiDistance++;
   }
   
-  this.div = "<div id='cellGrid' class='cellGrid'>"+
+  this.harvest = function() {
+    var harvestAmount = 0;
+    for(var x = 0; x < this.grid.length; x++) {
+      for(var y = 0; y < this.grid[x].length; y++) { //For each cell in the crid
+        harvestAmount += this.grid[x][y].amount
+        this.grid[x][y].clear()
+      }
+    }
+    return harvestAmount;
+  }
+  
+  this.div = "<div id='cellGrid' class='cellGrid text'>"+
     "<div class='button clickAll' ng-click='clickAll()'>Click All</div>"+
   "</div>"
   
   
   this.addToAngular = function(scope, compile) {
     var newDirective = angular.element(this.div);
-    $('#page').append(newDirective);
+    $('#cities').append(newDirective);
     compile(newDirective)(scope);
     for(var x = 0; x < this.grid.length; x++) {
       for(var y = 0; y < this.grid[x].length; y++) {

@@ -1,0 +1,53 @@
+#garden {
+  position:relative;
+  width:100%;
+  z-index:100;
+}
+.gardenName, .gardenAmount {
+   font-size:14px;
+   margin:0px 3px;
+   z-index:10;
+}
+.gardenName {
+  position:absolute;
+}
+
+.gardenRow {
+  width:150px;
+  background-color:white;
+  border-radius:5px;
+}
+
+.gardenProgressBar {
+  width:150px;
+  background-color:white;
+  border-radius:5px;
+  height:19px;
+  position:relative;
+}
+.gardenInnerProgressBar {
+   width:0%;
+   height:100%;
+   background-color:red;
+   z-index:5;
+   display:block;
+}
+
+.gardenContainer {
+  position:absolute;
+  background-color:#85d874;
+  border-radius:5px;
+  padding:0px 10px;
+}
+
+.plusButton {
+  padding:5px;
+  font-size:14px;
+  cursor:pointer;
+  background-color:grey;
+  border-radius:10px;
+}
+.plusButton:hover {
+  background-color:red;
+}
+

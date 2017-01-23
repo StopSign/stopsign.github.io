@@ -1,6 +1,6 @@
 
 .clickAll {
-	top:-47px;
+	top:-62px;
 	left:171px;
 	width: 65px;
 	height:14px;
@@ -61,7 +61,6 @@
 .cellGrid {
 	left:300px;
 	position:absolute;
-	top:150px;
 }
 .resource {
 	position:absolute;
@@ -110,4 +109,71 @@
 }
 .pointer {
 	cursor:pointer;
+}
+.cityImage {
+  position:absolute;
+  top:33px;
+  left:4px;
+}
+
+
+.slider {
+  border-radius: 34px;
+}
+
+.slider:before {
+  border-radius: 50%;
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(35px);
+  -ms-transform: translateX(35px);
+  transform: translateX(35px);
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 20px;
+  top:-24px;
+  left:6px;
+}
+
+.switch input {display:none;}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #39cede;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 16px;
+  width: 16px;
+  left: 4px;
+  bottom: 2px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+input:checked + .slider {
+  background-color: #317047;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #317047;
+}
+
+.cellParts {
+  position:absolute;
 }

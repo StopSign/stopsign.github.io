@@ -21,7 +21,7 @@ function Upgrade(id, data) {
   
   var  upgrades = "research.upgrades["+this.id+"]"
   
-  this.div = "<div id='upgrade"+id+"' class='upgrade button noselect' ng-class='{ pointer : "+upgrades+".costReady}' ng-click='clickUpgrade("+this.id+", \"$scope."+data.onclick+"\")'>"+
+  this.div = "<div id='upgrade"+id+"' class='upgrade button noselect text' ng-class='{ pointer : "+upgrades+".costReady}' ng-click='clickUpgrade("+this.id+", \"$scope."+data.onclick+"\")'>"+
     "<div class='rcost' ng-class='{ costReady : "+upgrades+".costReady}'><div class='small'>-</div>{{"+upgrades+".costUI}}<img src='images/science.png' class='smallIcon'></div>"+
     "<div class='rname'>{{"+upgrades+".name}}</div>"+
   "</div>"

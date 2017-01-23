@@ -1,0 +1,68 @@
+#technology {
+    position:relative;
+    width:100%;
+}
+.harvest {
+    position:relative;
+}
+
+.progress-bar {
+  position:relative;
+  display: inline-block;
+  width: 210px;
+  height: 210px;
+  margin: 7px;
+  padding: 0;
+  margin-bottom:30px;
+  margin-left:280px;
+}
+
+.progress-bar .progress-active {
+  position: absolute;
+}
+
+.progress-bar .progress-inactive {
+  position: absolute;
+}
+
+.progress-bar p {
+  position: absolute;
+  margin: 0;
+  padding: 0;
+  width: 200px;
+  top: 73px;
+  font-size: 35px;
+  font-weight: 900;
+  text-align: center;
+  color: #5e5e5e;
+}
+
+.buyButton {
+  width:130px;
+  height:30px;
+}
+
+.tName {
+  position:absolute;
+  left:88px;
+  font-size:14px;
+  top:4px;
+}
+.tInfo {
+  position:absolute;
+  left:55px;
+  font-size:11px;
+  top:20px;
+}
+
+.tCost1, .tCost2 {
+  position: absolute;
+  left: 4px;
+  font-size: 14px;
+}
+.tCost1 {
+  top: 10px;
+}
+.tCost2 {
+  top: 24px;
+}

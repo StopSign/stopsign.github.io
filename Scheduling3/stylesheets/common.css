@@ -19,10 +19,6 @@ body {
 	background: #ECECEC;
 	border-radius: 10px;
 	padding: 10px 20px;
-	font-family: arial;
-	font-weight: bold;
-	text-decoration: none;
-	text-shadow:0px 1px 0px #fff;
 	border:1px solid #a7a7a7;
 	text-align:center;
 	color:#7f7f7f;
@@ -30,7 +26,10 @@ body {
 	position:absolute;
 	box-shadow: 0px 2px 1px white inset, 0px -2px 8px white, 0px 2px 5px rgba(0, 0, 0, 0.1), 0px 8px 10px rgba(0, 0, 0, 0.1);
 }
-
+.superLargeIcon {
+  width:30px;
+  height:30px;
+}
 .largeIcon {
 	width:16px;
 	height:16px;
@@ -43,7 +42,13 @@ body {
 /* -------------------------------------------- */
 /* 						helper 							   */
 /* -------------------------------------------- */
-
+.text {
+	font-family: arial;
+	font-weight: bold;
+	text-decoration: none;
+	text-shadow:0px 1px 0px #fff;
+	color:#7f7f7f;
+}
 .number {
     color:black;
   vertical-align: top;

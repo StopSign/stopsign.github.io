@@ -1,5 +1,5 @@
 function Research() {
-  this.resource = this.resourceUI = this.gainUI = 0
+  this.resource = this.resourceUI = this.gainUI = 2000
   this.upgrades = []
   
   this.addUpgradeButton = function() {
@@ -31,8 +31,8 @@ function Research() {
   }
   
   this.addNewCellButton = function(column) {
-    var cost = sigFigs(200 * Math.pow(2, column), 2)
-    var newButtonData = { baseCost : cost, costGain : 3, name : "Add Cell on column "+(column+1), onclick : "addCellToColumn("+column+")" }
+    var cost = sigFigs((200+column*100) * Math.pow(2, column), 2)
+    var newButtonData = { baseCost : cost, costGain : 3, name : "Add city on column "+(column+1), onclick : "addCellToColumn("+column+")" }
     var newUpgradeButton = new Upgrade(this.upgrades.length, newButtonData)
     this.upgrades.push(newUpgradeButton)
     return newUpgradeButton;
@@ -40,7 +40,7 @@ function Research() {
   
   this.addToAngular = function(scope, compile) {
     var newDirective = angular.element(this.div);
-    $('#page').append(newDirective);
+    $('#cities').append(newDirective);
     compile(newDirective)(scope);
     
     for(var x = 0; x < this.upgrades.length; x++) {
@@ -50,7 +50,7 @@ function Research() {
     }
   }
     
-  this.div = "<div id='research' class='researchContainer gradient'>"+
+  this.div = "<div id='research' class='researchContainer gradient text'>"+
     "<div class='researchAmount'><img src='images/science.png' class='largeIcon'>{{research.resourceUI}}</div>"+
     "<div class='researchGain'><div class='small'>+</div>{{research.gainUI}}<img src='images/science.png' class='largeIcon'></div>"+
   "</div>"
@@ -58,8 +58,8 @@ function Research() {
 
 const data = {
   buttons : [
-    { baseCost : 5000, costGain : 5, name : "Cell multiplier distance", onclick: "cellGrid.gainMultiDistance()" },
-    { baseCost : 1000, costGain : 2, name : "Add column", onclick : "addCellColumn()" },
+    { baseCost : 3000, costGain : 5, name : "City multiplier distance", onclick: "cellGrid.gainMultiDistance()" },
+    { baseCost : 1000, costGain : 2.5, name : "Add new capitol city", onclick : "addCellColumn()" },
   ],
   counter : 0
 }
