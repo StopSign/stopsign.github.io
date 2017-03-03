@@ -20,29 +20,16 @@ function createMapSpace() {
 	"<div class='mapInfoField'>Total Unit <br>Growth: <div id='totalUnitGrowthInfo' class='infoNum'>4f</div></div>"+
 	"<button style='margin-left:43px' onclick='clickedStartMap()'>Start!</button>"+
 	"</div>"
-	num = 0
-	//TODO: Known issue, trying to display more than 4 maps causes an error
-	//Formula!
-	//Total goal: add N stage buttons in map where N = higheststageUnlocked+1
-	//sub goal: only have 5 per level
-	//tricky part: needs to work for all values of higheststageUnlocked
-	//and there's css concerns about the 
-	//NEW TODO: Clarify the problem
-	for(l = 0; l < higheststageUnlocked+1; l++) {
-		theString += "<div id='map"+l+"' class='map' onmouseover='updateMapInfo("+l+")'>"+l+"</div>"
-		if((l+1)%5 === 0) {
-			theString += "<br>"
-			for(m = 0; m < 5; m++) {
-				num = (m+l-4)
-				theString += "<div class='timerContainer' id='timer"+(num++)+"'></div>"
-			}
-			theString += "<br>"
-		}
-	}
-	theString += "<br>"
-    for(m = 0; m < (higheststageUnlocked+1)%5; m++) {
-		theString += "<div class='timerContainer' id='timer"+(num++)+"'></div>"
-	}
+	for(stageNum = 0; stageNum < higheststageUnlocked+1; stageNum++) {
+    var xVal = 155+(stageNum%5)*201;
+    var yVal = 105+(((stageNum)/5)|0)*130;
+    theString += "<div id='map"+stageNum+"' class='mapSpace' onmouseover='updateMapInfo("+stageNum+")'"+
+    "style='left:"+xVal+"px;top:"+yVal+"px'"+
+    ">"+(stageNum+1)+"</div>"
+    theString += "<div id='timer"+stageNum+"' class='timerContainer'"+
+    "style='left:"+xVal+"px;top:"+(yVal+47)+"px'"+
+    "></div>"
+  }
 	
 	document.getElementById("mapSpace").innerHTML = theString
 }

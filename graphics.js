@@ -32,14 +32,14 @@ function updateManaVisual() {
 
 function updateSpawnTimers() {
 	document.getElementById("enemySpawnTimer").innerHTML = roundtoFormat1(enemySpawnRate);
-	document.getElementById("enemySoldierSpawnAmount").innerHTML = enemySpawnAmounts[1]
-	document.getElementById("enemySpearSpawnAmount").innerHTML = enemySpawnAmounts[2]
+	document.getElementById("enemySoldierSpawnAmount").innerHTML = roundtoFormat1(enemySpawnAmounts[1])
+	document.getElementById("enemySpearSpawnAmount").innerHTML = roundtoFormat1(enemySpawnAmounts[2])
 	if(spawnAmounts[0] == 0) {
 		document.getElementById("soldierContainer").style.display="none"
 	} else {
 		document.getElementById("soldierContainer").style.display="inline-block"
 		document.getElementById("soldierSpawnTimer").innerHTML = roundtoFormat1(soldierSpawnRate);
-		document.getElementById("soldierAutoSpawnAmount").innerHTML = spawnAmounts[0]
+		document.getElementById("soldierAutoSpawnAmount").innerHTML = roundtoFormat1(spawnAmounts[0])
 	}
 	if(spawnAmounts[1] == 0) {
 		document.getElementById("spearContainer").style.display="none"
@@ -47,7 +47,7 @@ function updateSpawnTimers() {
 	else {
 		document.getElementById("spearContainer").style.display="inline-block"
 		document.getElementById("spearSpawnTimer").innerHTML = roundtoFormat1(spearSpawnRate);
-		document.getElementById("spearAutoSpawnAmount").innerHTML = spawnAmounts[1]
+		document.getElementById("spearAutoSpawnAmount").innerHTML = roundtoFormat1(spawnAmounts[1])
 	}
 }
 

@@ -21,7 +21,7 @@ function loadDefaults() {
 		//territory = 10;
 	gold = 0
 	territory = 10
-	
+	timer = 0
 	higheststageUnlocked = 0;
 	stop=0
 	buttonsToClick = 0; //tutorial thing
@@ -55,6 +55,7 @@ function loadDefaults() {
 	spawnList = []
 	placeUnitTerritoryCost = [10, 20]
 	placeUnitIncreaseRatio = [2, 5]
+	switchMainTab(2)
 }
 
 function saveIntoStorage() {
@@ -124,7 +125,7 @@ function loadFromStorage() {
 	loadDefaults();
 	//if (you haven't loaded the game before) {
     if(!!window.localStorage && window.localStorage.allVariables104) {
-		stop=0 //actually starts the game, here to wait for everything to load
+		//stop=0 //actually starts the game, here to wait for everything to load
 		//dynamic lists
         spawnList = (window.localStorage.spawnList1).split(',');
 		if(spawnList[0] == "") spawnList =[];
@@ -197,6 +198,7 @@ function loadFromStorage() {
 	switchMainTab(currentTab)
 	calculateUsedPlaceTerritory()
 	showSpawnList()
+	updateMapTimers()
 
 	document.getElementById("mainColumn").style.display="inline-block";
 }

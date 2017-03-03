@@ -386,7 +386,6 @@ height:15px;
 margin-top:3px;
 }
 .unitScreen {
-display:none;
 text-align:center;
 width:100%;
 margin-top:10px;
@@ -533,9 +532,9 @@ top:-5px;
 	width:50px;
 	height:35px;
 	padding-top:15px;
-	background-color:white;
 	margin-left:151px;
 	margin-top:80px;
+	background-color:white;
 	vertical-align:top;
 	text-align:center;
 	border-radius:15px;
@@ -555,6 +554,17 @@ top:-5px;
 	padding-top:10px;
 	display:none;
 	border:2px solid;
+}
+.mapSpace {
+	position:absolute;
+	width:50px;
+	height:35px;
+	padding-top:15px;
+	background-color:white;
+	vertical-align:top;
+	text-align:center;
+	border-radius:15px;
+	cursor:pointer;
 }
 
 .mapInfoField {
@@ -577,9 +587,7 @@ top:-5px;
 }
 
 .timerContainer {
-	width:49px;
-	margin-left:152px;
-	text-align:center;
+    position:absolute;
 }
 .timer {
 	color:black;
@@ -600,11 +608,6 @@ top:-5px;
     border: 2px solid white;
 	cursor:pointer;
 	position:relative;
-}
-.spellCost {
-	position:absolute;
-	right:5px;
-	bottom:5px;
 }
 .hyperVisible
 {
@@ -663,4 +666,14 @@ top:-5px;
     position: absolute;
     left: 0px;
 	display:none;
+}
+.spellCost {
+	position:absolute;
+	right:5px;
+	bottom:5px;
+}
+.hotkeyNum {
+  position:absolute;
+  left:5px;
+  top:5px;
 }

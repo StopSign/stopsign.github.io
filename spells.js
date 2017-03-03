@@ -78,7 +78,13 @@ function chainDamage(unit, damage) {
 function spendMana(amount) {
 	curMana -= amount
 	spellExp += amount
-	if(spellExp >= expNeededToLevel) { //levelUp
+  levelUp()
+	updateSpellVisuals()
+	updateManaVisual()
+}
+
+function levelUp() {
+	if(spellExp >= expNeededToLevel) {
 		spellLevel++
 		spellExp -= expNeededToLevel
 		expNeededToLevel = expNeededToLevel*1.3*Math.pow(1.02, spellLevel)
@@ -88,9 +94,7 @@ function spendMana(amount) {
 		for(q = 0; q < spellCosts.length; q++) {
 			spellCosts[q] *= .99;
 		}
-	}
-	updateSpellVisuals()
-	updateManaVisual()
+  }
 }
 
 function updateSpellVisuals() {

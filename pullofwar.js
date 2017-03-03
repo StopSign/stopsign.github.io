@@ -1,24 +1,22 @@
 started = 0
-setInterval(function() {
+//comment this before checking - it makes the came run locally
+/*setInterval(function() {
 	if(started)
 		tick();
-},50);
+},50);*/
 //Default rate is 50, which makes it 20 ticks a second
 
-//uncomment this before checkin
-/*var doWork = new Worker('interval.js');
+//uncomment this before checkin - it makes the game move when not in focus.
+//TODO: change this dynamically
+var doWork = new Worker('interval.js');
 doWork.onmessage = function(event) {
     if ( event.data === 'interval.start' ) {
 		tick();
     }
 };
-doWork.postMessage({start:true,ms:50});*/
-
-//TODO: change this dynamically
+doWork.postMessage({start:true,ms:50});
 
 
-
-//Messed up the commit on this page on this comment I suppose
 //TODO: research on effectiveness and value
 function addbyinteger(toAdd1, toAdd2, precision, isAdd) {
 	precisionMult = Math.pow(10, precision)
@@ -34,6 +32,7 @@ function addbyinteger(toAdd1, toAdd2, precision, isAdd) {
 globalId = 0;
 zIndex = 1000000000;
 
+//debug initial conditions
 //	addUnit("soldier", 1, "left", 30);
 //addUnit("soldier", 0, "right", 2);
 //addUnit("spear", 0, "right", 1);
@@ -85,6 +84,10 @@ function tick() {
 		timer = 0;
 	}
 	updateHover(curClickedUnit)
+	
+	if(totalTicks < 3 && spawnList.length == 0) { //Pause at start
+		stop = 1
+	}
 }
 
 function calcAverageTime() {
@@ -514,6 +517,9 @@ function addToPlaceList(type) {
 	if(type == "spear") cost = placeUnitTerritoryCost[1] + placeUnitIncreaseRatio[1] * findNumTypeInList("spear")
 	usedPlaceTerritory = calculateUsedPlaceTerritory()
 	if(territory - usedPlaceTerritory - cost >= 0) {
+		if(spawnList.length == 0) {
+			stop = 0
+		}
 		spawnList.push(type)
 		calculateUsedPlaceTerritory()
 	}

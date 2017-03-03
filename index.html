@@ -7,8 +7,7 @@
 </head>
 <body>
 
-<div id='greyBox' style='background-color:rgba(87, 70, 70, 0.79);position:absolute;height:1255px;width:100%;z-index:9999999999998;display:none;'></div>
-<div style="height:100%;font-family:Arial, Helvetica, serif;color:#666;display:block;font-weight:800;">
+<div style="height:100%;font-family:Arial, Helvetica, serif;color:#484848;display:block;font-weight:800;">
 <div id="mainColumn" style="width:100%;margin-left:20px;display:none;text-align:center;">
 <!--<div style="text-align:right;width:100%"><div id="mainTitle" style="font-size:40px;margin:10px;margin-right:15%;">Pull of War v.5</div></div> -->
 <div id='mainBox' style='border:3px solid;padding:20px;text-align:left;width:1200px;' >
@@ -47,10 +46,10 @@
 </div>
 
 <div id='allTabs' style='width:100%;height:40px;border:2px solid;text-align:center;color:black;margin-bottom:15px;'>
-	<div id='warTab' class='mainTab' onclick='switchMainTab(0)'>War</div>
+	<div id='warTab' class='mainTab' onclick='switchMainTab(0)'>Battle</div>
 	<div id='mapTab' class='mainTab' onclick='switchMainTab(1)'>Map</div>
-	<div id='territoryTab' class='mainTab' onclick='switchMainTab(2)'>Places</div>
-	<div id='unitTab' class='mainTab' onclick='switchMainTab(3)'>Units</div>
+	<div id='territoryTab' class='mainTab' onclick='switchMainTab(2)'>Unit Spawning</div>
+	<div id='unitTab' class='mainTab' onclick='switchMainTab(3)'>Unit Upgrades</div>
 	<div id='buildingsTab' class='mainTab' onclick='switchMainTab(4)'>Buildings</div>
 	<div id='manaTab' class='mainTab' onclick='switchMainTab(5)'>Spells</div>
 	<div id='optionsTab' class='mainTab' onclick='switchMainTab(6)'>Options</div>
@@ -67,7 +66,7 @@
 	<img id='line6'  src='pics/line3.png' width='1200' height='400' style='position:absolute;display:none;'>
 	<div id="fightTime" style="position:absolute;z-index:7"></div>
 	<canvas id='damageLines' width="1204" height="404" style="position:absolute;z-index:6" onmouseout="removeHover()"></canvas>
-	<div id="spawnTimers" class='hyperVisible' style="width:1200px;position:absolute;margin-top:5px;">
+	<div id="spawnTimers" class='hyperVisible' style="width:1200px;position:absolute;margin-top:5px;height:50px">
 		<div id='soldierContainer' class='unitSpawnBox' style=''>
 			<div id='soldierAutoSpawnAmount' class='spawnAutoAmount'></div>
 			<img src='pics/soldier.png' height='30' width='50'>
@@ -97,12 +96,15 @@
 	<img id='fence' src='pics/fence.png' height='300' width='15' style='position:absolute;left:114px;top:83px;z-index:5;'>
 	<img id='enemyFence' src='pics/fence.png' height='300' width='15' style='position:absolute;left:1090px;top:83px;z-index:5;'>
 </div>
+
 <div id='manaSpace' style="width:100%;height:60px;background-color:#78AFFF;border:2px solid; margin-top:5px;position:relative;">
 	<div id='spell0' class='spell' style='margin-left:50px;' onclick='clickedSpell(0)'>
+    <div class='hotkeyNum' >(1)</div>
 		<div>Fireball</div>
 		<div id='spellCost0' class='spellCost'></div>
 	</div>
 	<div id='spell1' class='spell' onclick='clickedSpell(1)'>
+    <div class='hotkeyNum' >(2)</div>
 		<div>Chain Lightning</div>
 		<div id='spellCost1' class='spellCost'></div>
 	</div>
@@ -120,13 +122,13 @@
 </div>
 
 <div id='placesSpace' class="buyColumn" style="background-color:#89D496;">
-	<div id='defaultScreen' class='unitScreen' style='display:inline-block;'>
-		<div style='font-size:18px;'>Places</div>
+	<div id='defaultScreen' class='unitScreen'>
+		<div style='font-size:18px;'>Unit Spawning</div>
 		<div style='display:block;margin-top:-6px;'>Click a unit type to add it to the spawn list</div>
 		<div style='left:12px;top:9px;position:absolute;font-size:14px;'>Construction Total: <div class='number' id='constructionTotal'>0f</div></div>
 		<div style='left:12px;top:25px;position:absolute;font-size:14px;'>Construction Rate: <div class='number' id='constructionRate'>0f</div></div>
-		<div style='left:12px;top:40px;position:absolute;font-size:14px;'>Territory Used: <div class='number' id='territoryUsed'>0f</div> out of <div class='number' id='totalTerritoryPlaces'>0ff</div></div>
-		<div style='width:300px;background-color:#C6EECE;position:absolute;left:10px;top:58px;height:360px;border:2px solid'>
+		<div style='left:12px;top:40px;position:absolute;font-size:14px;'>Territory Used: <div class='number' id='territoryUsed'>0f</div> / <img src="pics/territory.png" height="18" width="15"><div class='number' id='totalTerritoryPlaces'>0ff</div></div>
+		<div style='width:300px;background-color:#C6EECE;position:absolute;left:10px;top:62px;height:360px;border:2px solid'>
 			<div id='spawnListBox' style='margin:5px;border:2px solid black;width:276px;height:342px;overflow:auto;padding-top:5px;position:relative;'></div>
 		</div>
 		<div style='width:840px;background-color:#C6EECE;position:absolute;right:15px;top:58px;height:360px;border:2px solid'>
@@ -150,8 +152,8 @@
 </div>
 
 <div id='unitsSpace' class="buyColumn" style='background-color:rgb(255, 237, 190);' >
-	<div id='defaultScreen' class='unitScreen' style='display:inline-block;'>
-		<div style='font-size:18px;'>Units</div>
+	<div id='defaultScreen' class='unitScreen'>
+		<div style='font-size:18px;'>Unit Upgrades</div>
 		<div style='display:block;margin-top:-6px;'>Click a unit type for possible upgrades</div>
 		<div id='unitList' style='width:400px;border:2px solid;position:absolute;left:10px;top:58px;height:350px;overflow:auto;'>
 			<div class='unitUpgradeContainer' onclick='changeUnitScreen("soldier")'>
@@ -223,10 +225,15 @@
 <div id='optionsPage' class='buyColumn'>
 	<div style='width:90%;margin-top:30px;margin-left:30px;'>
 		<div style="float:left;">Created by: <a style="color:red" href='http://reddit.com/u/stop_sign'>Stop_Sign</a></div><br>
-		<div style="float:left;">Made for: <a style="color:black" href='http://reddit.com/r/incremental_games'>/r/incremental_games</a></div><br>
-		<div style='float:left;'>I want a ton of feedback! Please send a message through reddit using <a style="color:black" href='https://www.reddit.com/message/compose?to=Stop_Sign&amp;subject=Pull%20of%20War%20feedback&message='>this link</a></div><br>
-		<div class='button' style='padding:5px;margin-top:10px;margin-bottom:10px;' onclick='forceTutorial()' >Show Tutorial</div><br>
-		<div class='button' style='padding:5px;' onclick='clearStorage()'>Clear Save</div>
+		<div style="float:left;">Made for: <a style="color:black" href='http://reddit.com/r/incremental_games'>/r/incremental_games</a></div><br><br>
+    <h3>How to Play:</h3><br>
+		Click Unit Spawning, then Barracks, then War to start the game<br>
+    Watch the fight in Battle<br>
+    Use hotkeys or tap spells and use them on enemies<br>
+    Upgrade units, kill the enemy wall health, go further on the map<br>
+    Boss every 5 levels<br>
+    Even if you die on harder levels, you'll still get more gold<br><br>
+		<div class='button' style='padding:5px;' onclick='clearStorage()'>Clear Save (CAREFUL!)</div>
 	</div>
 </div>
 
@@ -237,7 +244,6 @@
 </body>
       <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
       <script src="https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
-<!--<script src="tutorial.js"></script>-->
 <script src="spells.js"></script>
 <script src="mapvalues.js"></script>
 <script src="classes.js"></script>

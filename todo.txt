@@ -1,5 +1,37 @@
 
+TODO:
 
+Put a cap on spawn rate
+BUG:
+  attack power of units is universal, instead of when it gets created
+  solution:
+    use a variable to make an instance of the unit
+    average that variable together based on unitcount when they merge
+
+
+IMPROVEMENT:
+Color code the difficulty of the next level based on # units spawning * total unit growth
+  
+HELPFUL:
+Tooltips:
+  Spells - Get 10 max mana on level up, more mana gain, and cheaper spells.
+  Fireball - 
+  Chain Lightning - Does 18 damage to 3 units!
+
+IMPROVEMENT:
+Graphics on the bullet
+slow down the bullet
+
+NECESSARY:
+Sell land for Construction Workers
+-<tree>100, +.5 Construction rate
+(The price increases by 50 each time)
+Can only purchase with unused Territory
+<disable it until <price+10>>
+<saves and loads too>
+
+IMPROVEMENT:
+reset button at the top of battle
 
 
 
