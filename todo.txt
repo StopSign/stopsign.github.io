@@ -43,11 +43,16 @@ chain lightning - dmg upgrades by 9 per talent point
 	utility: cost 2, extra arc, base mana cost *= previous mana - current mana * .9
 	
 IMPROVEMENT:
-round fex stacks to ints when ugprading
+round fex stacks to ints when upgrading
 
 IMPROVEMENT:
 Numbering the unit spawners
 	
+ANALYSIS:
+The spawner might lag when it has high amounts. check the math
+
+NECESSARY:
+Goals, like unlocking units
 	
 	
 As of December, 2015 this part is outdated. I wrote it at
