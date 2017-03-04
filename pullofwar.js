@@ -57,7 +57,8 @@ timer = 0;
 //startTutorial()
 function tick() {
 	timeList.push(new Date().getTime())
-	document.getElementById("fps").innerHTML = round(50/calcAverageTime()*100)+"% fps";
+	var fps = round(50/calcAverageTime()* 20) 
+	document.getElementById("fps").innerHTML = (fps > 20 ? 20 : fps)+" fps";
 	if(timeList.length > 100) timeList.splice(0, 1)
 	
 	totalTicks++;
