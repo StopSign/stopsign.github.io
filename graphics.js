@@ -240,6 +240,10 @@ function updateSpawnRate() {
 	}
 }
 
+function updateConstructionWorkers() {
+	document.getElementById("costructionRateCost").innerHTML = upgradeConstructionRateCost
+}
+
 function updateStatusUpgrades(unit, type) {
 	typeNum = convertTypeToNum(type, "right")
 	document.getElementById("buy").innerHTML=upgradePointsInitial[typeNum];

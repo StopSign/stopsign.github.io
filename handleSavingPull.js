@@ -204,6 +204,7 @@ function loadFromStorage() {
 	calculateUsedPlaceTerritory()
 	showSpawnList()
 	updateMapTimers()
+	updateConstructionWorkers()
 
 	document.getElementById("mainColumn").style.display="inline-block";
 }
