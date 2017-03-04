@@ -118,7 +118,7 @@ function saveIntoStorage() {
 			theCookie+=buildingUpgradesCost[l][y]+","
 		}
 	}
-	theCookie+=upgradeConstructionRateCost
+	theCookie+=upgradeConstructionRateCost+","
 	theCookie+=constructionRate
 	
     window.localStorage.allVariables104 = theCookie;
