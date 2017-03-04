@@ -183,7 +183,7 @@ function startANewstage() {
 	//TODO: make this more clear it's the enemy health/dmg formulas
 	//elevate it to more visible? These numbers will be tweaked a lot
 	unitValues[1] = [Math.pow(stage+12, 2)/20-6.19999, 4, .06, Math.pow(stage+1, 2)*10+50, 0, 4.5]
-	unitValues[3] = [Math.pow(stage+12, 2)/10+Math.pow(stage/5)-9.1, 15, .04, Math.pow(stage+8, 2)*2-142, 0, 16]
+	unitValues[3] = [Math.pow(stage+12, 2)/10+stage/5-9.1, 15, .04, Math.pow(stage+8, 2)*2-142, 0, 16]
 	//updateProgressVisual()
 	enemyFenceHealthInitial = maps[stage][2]
 	enemyWallHealthInitial = maps[stage][3]
