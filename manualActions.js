@@ -149,7 +149,6 @@ function processKeyQueue() {
 //these are variables that aren't saved, being reset per level
 //using variables that are saved to set, though
 function startANewstage() {
-	constructionRate = .5
 	constructionTotal = 0
 	for(y = 0; y < units.length; y++) {
 		for(x = units[y].length-1; x>=0; x--) {

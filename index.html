@@ -135,6 +135,7 @@
 			<div style='font-size:14px;'>Fill up your territory with unit producing buildings!<br>This will decide which order your units spawn over the level!<br>
 			Click the spawn list to remove a building!</div><br>
 			<div style='width:80%;text-align:center;margin-top:20px;'>
+      
 				<div id='soldierPlace' class='placeButton' onclick='addToPlaceList("soldier")'>
 					<img width='50' height='30' src='pics/soldier.png' style='margin-top:6px;'>
 					<div style='position:absolute;left:50px;top:3px;'>Barracks</div>
@@ -146,6 +147,15 @@
 					<img src="pics/territory.png" height="18" width="15" style='left:46px;bottom:5px;position:absolute'>
 					<div id='spearPlaceCost' class='number' style='position:absolute;left:61px;bottom:1px;'>1f</div>
 				</div>
+        
+			</div>
+			<div style='width:80%;text-align:center;margin-top:20px;' onclick='upgradeConstructionRate()'>
+        <div id='upgradeConstructionRate' class='placeButton' style='font-size:14px;width:auto;height:auto;text-align:center;padding:5px;'>
+          Sell Land for Construction Workers<br>
+          -<img src="pics/territory.png" height="18" width="15" style=''><div id='costructionRateCost' class='number' >100</div>, +.5 Construction Rate<br>
+          Can only be purchased with unused Territory
+        </div>
+        
 			</div>
 		</div>
 	</div>
@@ -231,7 +241,6 @@
     Watch the fight in Battle<br>
     Use hotkeys or tap spells and use them on enemies<br>
     Upgrade units, kill the enemy wall health, go further on the map<br>
-    Boss every 5 levels<br>
     Even if you die on harder levels, you'll still get more gold<br><br>
 		<div class='button' style='padding:5px;' onclick='clearStorage()'>Clear Save (CAREFUL!)</div>
 	</div>

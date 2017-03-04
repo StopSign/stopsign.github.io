@@ -53,8 +53,10 @@ function loadDefaults() {
 	manaGain = .06;
 	buildingUpgradesCost = [[50], [70]]
 	spawnList = []
-	placeUnitTerritoryCost = [10, 20]
+	placeUnitTerritoryCost = [10, 20] //cost of barracks, lumber yard..
 	placeUnitIncreaseRatio = [2, 5]
+	upgradeConstructionRateCost = 100
+	constructionRate=.5
 	switchMainTab(2)
 }
 
@@ -116,6 +118,8 @@ function saveIntoStorage() {
 			theCookie+=buildingUpgradesCost[l][y]+","
 		}
 	}
+	theCookie+=upgradeConstructionRateCost
+	theCookie+=constructionRate
 	
     window.localStorage.allVariables104 = theCookie;
 }
@@ -129,7 +133,6 @@ function loadFromStorage() {
 		//dynamic lists
         spawnList = (window.localStorage.spawnList1).split(',');
 		if(spawnList[0] == "") spawnList =[];
-		console.log(spawnList);
 		
 		//static sizes
         expandedCookie = (','+window.localStorage.allVariables104).split(',');
@@ -183,6 +186,8 @@ function loadFromStorage() {
 				buildingUpgradesCost[l][y]=parseFloat(expandedCookie[x++]);
 			}
 		}
+		upgradeConstructionRateCost=parseFloat(expandedCookie[x++]);
+		constructionRate=parseFloat(expandedCookie[x++]);
 		//Add new values only at the end
     }
 	

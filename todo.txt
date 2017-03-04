@@ -15,28 +15,41 @@ Color code the difficulty of the next level based on # units spawning * total un
 HELPFUL:
 Tooltips:
   Spells - Get 10 max mana on level up, more mana gain, and cheaper spells.
-  Fireball - 
+  Fireball - Deals 5 damage per stacked enemy, then 17 damage!
   Chain Lightning - Does 18 damage to 3 units!
 
 IMPROVEMENT:
 Graphics on the bullet
 slow down the bullet
 
-NECESSARY:
-Sell land for Construction Workers
--<tree>100, +.5 Construction rate
-(The price increases by 50 each time)
-Can only purchase with unused Territory
-<disable it until <price+10>>
-<saves and loads too>
-
 IMPROVEMENT:
 reset button at the top of battle
 
+IMPROVEMENT:
+change the spawn upgrade rate from 5% reduction to +5% slower
+	make it cheaper to buy
 
+MAJOR IMPROVEMENT:
+add a new unit type
 
+IMPROVEMENT:
+Spell level gives talent points
+Each spell has 2 options - Damage and Utility
+Utility increases cost and damage too and 2 talent points
+lower spell level gain cost
+FireBall - damage upgrades by 9 per talent point
+	utility: dmg + 3, base mana cost + 2, dmg per unit + 1
+chain lightning - dmg upgrades by 9 per talent point
+	utility: cost 2, extra arc, base mana cost *= previous mana - current mana * .9
+	
+IMPROVEMENT:
+round fex stacks to ints when ugprading
 
-
+IMPROVEMENT:
+Numbering the unit spawners
+	
+	
+	
 As of December, 2015 this part is outdated. I wrote it at
 the start and didn't change it
 

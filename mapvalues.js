@@ -1,13 +1,66 @@
-//base gold, territory gain (enhanced), fence health, wall health, spawn timer, tower number, tower damage, cooldown on bonus, lane type index, 
-//[9]unit count [boss, soldier, spear], unit growth per spawn [boss, soldier, spear], unit growth growth per spawn [boss, soldier, spear]
-//asdfasdfa
-maps= [[1, 15, 150, 1800, 15, 0, 0, 60*30, 2, [0, 1, 0], [0, 0, 0], [0, 0, 0]],
-		[3, 45, 600, 8000, 15, 0, 0, 60*32, 3, [0, 2.45, .31], [0, .07, .05], [0, 0, 0]],
-		[5, 100, 2200, 50000, 15, 0, 0, 60*34, 5, [0, 3, .61], [0, .2, .09], [0, 0.002, 0]],
-		[8, 800, 4000, 350000, 10, 0, 0, 60*36, 2, [0, 2, 1], [0, 1, .05], [0, .004, .003]],
-		[12, 1700, 8000, 810000, 15, 0, 0, 60*38, 6, [0, 6, 4], [0, .2, 1], [0, .008, .004]],
-		[16, 2900, 11000, 126000, 10, 0, 0, 60*40, 4, [0, 9, 12], [0, 1, 1], [0, .05, .03]],
-		[13, 2900, 7000, 126000, 10, 0, 0, 60*40, 4, [0, 15, 15], [0, 2, 2], [0,  .1, .06]]]
+
+/*maps= [[1, 15, 150, 1800, 15, 0, 0, 60*30, 2, [0, 1, 0], [0, 0, 0], [0, 0, 0]],
+		[3, 45, 600, 8000, 15, 0, 0, 60*32, 3, [0, 2.71, .51], [0, .03, .02], [0, 0, 0]],
+		[5, 100, 1000, 18000, 15, 0, 0, 60*34, 5, [0, 4, .61], [0, .06, .03], [0, 0.002, 0]],
+		[8, 800, 1700, 35000, 10, 0, 0, 60*36, 2, [0, 2, 3], [0, .07, .1], [0, .0004, .0003]],
+		[12, 1700, 2500, 60000, 15, 0, 0, 60*38, 6, [0, 5, 4], [0, .2, .12], [0, .0005, .0004]],
+		[16, 2900, 3400, 90000, 10, 0, 0, 60*40, 4, [0, 8.5, 8], [0, .25, .25], [0, .0005, .0005]],
+		[13, 2900, 5000, 100000, 10, 0, 0, 60*40, 3, [0, 12, 11], [0, 2, 2], [0,  .001, .001]]]*/
+		
+var maps = []
+
+for(level = 0; level < 50; level++) {
+	if(level % 17 == 0) createMap(maps, level, 2,'start')
+	if(level % 17 == 1) createMap(maps, level, 3, 'soldier')
+	if(level % 17 == 2) createMap(maps, level, 5, 'soldier')
+	if(level % 17 == 3) createMap(maps, level, 2, 'spear')
+	if(level % 17 == 4) createMap(maps, level, 6, 'soldier')
+	if(level % 17 == 5) createMap(maps, level, 4, 'both')
+	if(level % 17 == 6) createMap(maps, level, 3, 'spear')
+	if(level % 17 == 7) createMap(maps, level, 4, 'soldier')
+	if(level % 17 == 8) createMap(maps, level, 2, 'both')
+	if(level % 17 == 9) createMap(maps, level, 5, 'spear')
+	if(level % 17 == 10) createMap(maps, level, 4, 'both')
+	if(level % 17 == 11) createMap(maps, level, 2, 'spear')
+	if(level % 17 == 12) createMap(maps, level, 3, 'soldier')
+	if(level % 17 == 13) createMap(maps, level, 5, 'soldier')
+	if(level % 17 == 14) createMap(maps, level, 3, 'both')
+	if(level % 17 == 15) createMap(maps, level, 4, 'spear')
+	if(level % 17 == 16) createMap(maps, level, 5, 'soldier')
+}
+
+
+//level is incrementing, the index. lanes is 2-6
+function createMap(maps, level, lanes, type) {
+	//var extraDifficulty = (((level+1)/2)|0)
+	var theMap = []
+	theMap[0] = (Math.pow(1.6, level)).toFixed(0) 					//Base Gold
+	theMap[1] = (15*Math.pow(1.05, level)*(level*level*.5+1)).toFixed(0)                               //Territory Gain (with Bonus)
+	theMap[2] = ((150*Math.pow(1.06, level).toFixed(1))*(level*3+1)).toFixed(0)                                 //Enemy Fence Health
+	theMap[3] = ((1800*Math.pow(1.4, level)*(level+1))).toFixed(0)                                 //Enemy Wall Health 
+	theMap[4] = (lanes==2&&type!='start'?10:15)                                 //Spawn Timer
+	theMap[5] = 0                              	  //Tower Number TODO
+	theMap[6] = 0                              	  //Tower Damage TODO
+	theMap[7] =  60*(10+level*2)                              	  //Cooldown on Bonus
+	theMap[8] = lanes                              	  //Lane Count
+	
+	if(type === 'start') {
+		theMap[9] = [0, 1, 0]
+		theMap[10] = [0, 0, 0]
+	} else if(type === 'soldier') {
+		theMap[9] = [0, 1.5*level+1, .5*level]
+		theMap[10] = [0, .03*level, .01*(level+1)]
+	} else if(type === 'spear') {
+		theMap[9] = [0, .75*level+1, level]
+		theMap[10] = [0, .02*level, .02*(level+1)]
+	} else if(type === 'both') {
+		theMap[9] = [0, 1.25*level+1, .75*level]
+		theMap[10] = [0, .02*level, .015*(level+1)]
+	}
+	theMap[11] = [0, ((level>1) ? (level-1)*.002 : 0), ((level>3) ? (level-3)*.003 : 0)] //Unit Growth Per Spawn Per Spawn [Boss, Soldier Spear]
+	maps[level] = theMap
+}
+
 function createMapSpace() {
 	theString="<div id='mapInfo' class='mapInfo'>"+
 	"<div class='mapInfoField'>Base Gold: <div id='baseGoldInfo' class='infoNum'>4f</div></div>"+
@@ -20,7 +73,7 @@ function createMapSpace() {
 	"<div class='mapInfoField'>Total Unit <br>Growth: <div id='totalUnitGrowthInfo' class='infoNum'>4f</div></div>"+
 	"<button style='margin-left:43px' onclick='clickedStartMap()'>Start!</button>"+
 	"</div>"
-	for(stageNum = 0; stageNum < higheststageUnlocked+1; stageNum++) {
+	for(stageNum = 0; stageNum < (higheststageUnlocked+1) && stageNum < 50; stageNum++) {
     var xVal = 155+(stageNum%5)*201;
     var yVal = 105+(((stageNum)/5)|0)*130;
     theString += "<div id='map"+stageNum+"' class='mapSpace' onmouseover='updateMapInfo("+stageNum+")'"+
@@ -42,10 +95,10 @@ function updateMapInfo(num) {
 	
 	document.getElementById('territoryGainInfo').style.color=mapTimers[num]===0?'yellow':'black';
 	
-	document.getElementById('baseGoldInfo').innerHTML = maps[num][0]
-	document.getElementById('territoryGainInfo').innerHTML = mapTimers[num]===0?maps[num][1]:maps[num][1]/5
-	document.getElementById('fenceHealthInfo').innerHTML = maps[num][2]
-	document.getElementById('wallHealthInfo').innerHTML = maps[num][3]
+	document.getElementById('baseGoldInfo').innerHTML = intToStringRound(maps[num][0])
+	document.getElementById('territoryGainInfo').innerHTML = mapTimers[num]===0?intToStringRound(maps[num][1]):intToStringRound(maps[num][1]/5)
+	document.getElementById('fenceHealthInfo').innerHTML = intToStringRound(maps[num][2])
+	document.getElementById('wallHealthInfo').innerHTML = intToStringRound(maps[num][3])
 	document.getElementById('spawnTimerInfo').innerHTML = maps[num][4]
 	document.getElementById('laneCountInfo').innerHTML = maps[num][8]
 	document.getElementById('totalUnitsSpawningInfo').innerHTML = round2(maps[num][9][0] + maps[num][9][1] + maps[num][9][2])
@@ -55,11 +108,12 @@ function updateMapInfo(num) {
 function updateMapTimers() {
 	if(currentMapInfoNum != -1) {
 		document.getElementById('territoryGainInfo').style.color=mapTimers[currentMapInfoNum]===0?'yellow':'black';
-		document.getElementById('territoryGainInfo').innerHTML = mapTimers[currentMapInfoNum]===0?maps[currentMapInfoNum][1]:maps[currentMapInfoNum][1]/5
+		document.getElementById('territoryGainInfo').innerHTML = mapTimers[currentMapInfoNum]===0?intToStringRound(maps[currentMapInfoNum][1]):intToStringRound(maps[currentMapInfoNum][1]/5)
 		
 	}
 	document.getElementById("territoryGain").innerHTML = mapTimers[stage]>0?maps[stage][1]/5:maps[stage][1]
-	for(m = 0; m < (higheststageUnlocked+1); m++) {
+	
+	for(m = 0; m < (higheststageUnlocked+1) && m < 50; m++) {
 		if(mapTimers[m]===0) {
 			document.getElementById("timer"+m).innerHTML = "<div class='timerReady'>Bonus Ready!</div>"
 		}
@@ -74,4 +128,35 @@ function clickedStartMap() {
 	stage = currentMapInfoNum
 	startANewstage()
 	switchMainTab(0)
+}
+
+
+function intToString (value) {
+  if (value>=10000)
+  {
+    value=Math.round(value);
+    var suffixes = ["", "K", "M", "B","T","C","Q","S"];
+    var suffixNum = Math.floor(((""+value).length-1)/3);
+    var shortValue = parseFloat((suffixNum != 0 ? (value / Math.pow(1000,suffixNum)) : value).toPrecision(3));
+    if (shortValue % 1 != 0)  shortNum = shortValue.toFixed(1);
+    return shortValue+suffixes[suffixNum];
+  }
+  else {
+    return parseFloat(value).toFixed(2);
+  }
+}
+
+function intToStringRound(value) {
+  if (value>=10000)
+  {
+    value=Math.round(value);
+    var suffixes = ["", "K", "M", "B","T","C","Q","S"];
+    var suffixNum = Math.floor(((""+value).length-1)/3);
+    var shortValue = parseFloat((suffixNum != 0 ? (value / Math.pow(1000,suffixNum)) : value).toPrecision(3));
+    if (shortValue % 1 != 0)  shortNum = shortValue.toFixed(1);
+    return shortValue+suffixes[suffixNum];
+  }
+  else {
+    return Math.floor(value);
+  }
 }

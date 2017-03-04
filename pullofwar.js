@@ -512,6 +512,16 @@ function tickConstruction() {
 	updateConstructionVisual()
 }
 
+function upgradeConstructionRate() {
+	if((territory - totalUsedTerritory) > (upgradeConstructionRateCost) && (territory-upgradeConstructionRateCost > 10)) {
+		territory -= upgradeConstructionRateCost
+		upgradeConstructionRateCost += 50
+		constructionRate += .25
+		document.getElementById('costructionRateCost').innerHTML=upgradeConstructionRateCost
+	}
+	updateTerritoryVisual()
+}
+
 function addToPlaceList(type) {
 	if(type == "soldier") cost = placeUnitTerritoryCost[0] + placeUnitIncreaseRatio[0] * findNumTypeInList("soldier")
 	if(type == "spear") cost = placeUnitTerritoryCost[1] + placeUnitIncreaseRatio[1] * findNumTypeInList("spear")
