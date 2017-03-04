@@ -316,7 +316,9 @@ function checkForUnitCollisions() {
 							units[y][x].unitCount = newUnitCount;
 							
 							unitsDead = totalUnitCount - newUnitCount
-							gold += unitsDead * units[y][x].goldWorth;
+							if(unitsDead * units[y][x].goldWorth) { //prevent adding NaN
+								gold += unitsDead * units[y][x].goldWorth;
+							}
 							totalDead[units[y][x].typeNum] += unitsDead
 							updateGoldVisual()
 							
@@ -508,8 +510,8 @@ function updateDeadUnitBonus() {
 function tickConstruction() {
 	constructionTotal += constructionRate
 	if(constructionTotal > territory) constructionTotal = territory
-	document.getElementById("constructionTotal").innerHTML = constructionTotal
-	document.getElementById("constructionRate").innerHTML = constructionRate*2
+	document.getElementById("constructionTotal").innerHTML = intToString(constructionTotal)
+	document.getElementById("constructionRate").innerHTML = intToString(constructionRate*2)
 	updateConstructionVisual()
 }
 
