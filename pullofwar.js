@@ -301,17 +301,31 @@ function checkForUnitCollisions() {
 							totalHealthA = (units[y][x].unitCount-1)*units[y][x].actualMaxHealth + units[y][x].curHealth //represents total health the unit stack
 							totalHealthB = (units[z][w].unitCount-1)*units[z][w].actualMaxHealth + units[z][w].curHealth
 							averageHealth = average(units[y][x].actualMaxHealth, units[z][w].actualMaxHealth, units[y][x].unitCount, units[z][w].unitCount)
-							averageHealth = average(units[y][x].actualMaxHealth, units[z][w].actualMaxHealth, units[y][x].unitCount, units[z][w].unitCount)
+							
 							//Fix: (trunc(healthA*100) + trunc(healthB*100))/100
 							//Fix: alternate fix, subtract by -.000001
 							//console.log(totalHealthA +","+totalHealthB+","+addbyinteger(totalHealthA, totalHealthB, 3)+","+ Math.ceil(addbyinteger(totalHealthA, totalHealthB, 3)/averageHealth))
 							newUnitCount = Math.ceil(addbyinteger(totalHealthA, totalHealthB, 3)/averageHealth)
 							temp = (totalHealthA + totalHealthB)%averageHealth
-							if(temp == 0) {
+							
+							if(temp < 1) { //1 because javascript rounding
 								units[y][x].curHealth = units[y][x].actualMaxHealth;
 							} else {
 								units[y][x].curHealth = temp;
 							}
+							/*if(units[y][x].curHealth < 2) { //debugging
+								console.log('curHealth:'+units[y][x].curHealth)
+								console.log('totalHealthA:'+totalHealthA)
+								console.log('totalHealthB:'+totalHealthB)
+								console.log('averageHealth:'+averageHealth)
+								console.log('units[y][x].actualMaxHealth:'+units[y][x].actualMaxHealth)
+								console.log('units[z][w].actualMaxHealth:'+units[z][w].actualMaxHealth)
+								console.log('units[y][x].unitCount:'+units[y][x].unitCount)
+								console.log('units[z][w].unitCount:'+units[z][w].unitCount)
+								console.log('temp:'+temp)
+								
+							}*/
+							
 							units[y][x].actualMaxHealth = averageHealth;
 							units[y][x].unitCount = newUnitCount;
 							
