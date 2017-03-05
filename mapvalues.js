@@ -34,10 +34,10 @@ for(level = 0; level < 50; level++) {
 function createMap(maps, level, lanes, type) {
 	//var extraDifficulty = (((level+1)/2)|0)
 	var theMap = []
-	theMap[0] = Math.floor(Math.pow(1.6, level)) 					//Base Gold
-	theMap[1] = Math.floor(15*Math.pow(1.05, level)*(level*level*.5+1))                               //Territory Gain (with Bonus)
-	theMap[2] = Math.floor((150*Math.pow(1.06, level).toFixed(1))*(level*3+1))                                 //Enemy Fence Health
-	theMap[3] = Math.floor((1800*Math.pow(1.4, level)*(level+1)))                                 //Enemy Wall Health 
+	theMap[0] = Math.floor(Math.pow(1.6, level+1)) 					//Base Gold
+	theMap[1] = Math.floor(15*Math.pow(1.05, level)*(level*level*.5+1)+level*10)                               //Territory Gain (with Bonus)
+	theMap[2] = Math.floor((150*Math.pow(1.06, level))*(level*2+1))                                 //Enemy Fence Health
+	theMap[3] = Math.floor((1800*Math.pow(1.5, level)*(level+1)))                                 //Enemy Wall Health 
 	theMap[4] = (lanes==2&&type!='start'?10:15)                                 //Spawn Timer
 	theMap[5] = 0                              	  //Tower Number TODO
 	theMap[6] = 0                              	  //Tower Damage TODO
@@ -48,16 +48,16 @@ function createMap(maps, level, lanes, type) {
 		theMap[9] = [0, 1, 0]
 		theMap[10] = [0, 0, 0]
 	} else if(type === 'soldier') {
-		theMap[9] = [0, 1.5*level+1, .5*level]
-		theMap[10] = [0, .03*level, .01*(level+1)]
+		theMap[9] = [0, 1.4*level+1, .6*level]
+		theMap[10] = [0, .02*level, .008*(level+1)]
 	} else if(type === 'spear') {
-		theMap[9] = [0, .75*level+1, level]
-		theMap[10] = [0, .02*level, .02*(level+1)]
+		theMap[9] = [0, .6*level+1, .9*level]
+		theMap[10] = [0, .01*level, .016*(level+1)]
 	} else if(type === 'both') {
-		theMap[9] = [0, 1.25*level+1, .75*level]
-		theMap[10] = [0, .02*level, .015*(level+1)]
+		theMap[9] = [0, level+1, .75*level]
+		theMap[10] = [0, .015*level, .012*(level+1)]
 	}
-	theMap[11] = [0, ((level>1) ? (level-1)*.002 : 0), ((level>3) ? (level-3)*.003 : 0)] //Unit Growth Per Spawn Per Spawn [Boss, Soldier Spear]
+	theMap[11] = [0, ((level>1) ? (level-1)*.0015 : 0), ((level>3) ? (level-3)*.0025 : 0)] //Unit Growth Per Spawn Per Spawn [Boss, Soldier Spear]
 	maps[level] = theMap
 }
 

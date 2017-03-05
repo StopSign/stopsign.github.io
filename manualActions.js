@@ -23,9 +23,9 @@ function clickBuildingBuyButton(num, type) {
 	if(type == "wall") {
 		if(num == 0 && gold >= buildingUpgradesCost[0][0]) { 
 			gold -= buildingUpgradesCost[0][0]
-			buildingUpgradesCost[0][0]*= 1.2
-			wallHealth+=750
-			wallHealthInitial+=750
+			buildingUpgradesCost[0][0] = Math.floor(1.12 * buildingUpgradesCost[0][0])
+			wallHealth+=1250
+			wallHealthInitial+=1250
 		}
 		document.getElementById("buyBuilding0").innerHTML = round1(wallHealthInitial);
 		document.getElementById("costBuilding0").innerHTML = round1(buildingUpgradesCost[0][0])
@@ -33,7 +33,7 @@ function clickBuildingBuyButton(num, type) {
 	if(type == "fence") {
 		if(num == 0 && gold >= buildingUpgradesCost[1][0]) { 
 			gold -= buildingUpgradesCost[1][0]
-			buildingUpgradesCost[1][0]*= 1.2
+			buildingUpgradesCost[1][0] = Math.floor(1.15 * buildingUpgradesCost[1][0])
 			fenceHealth+=50
 			fenceHealthInitial+=50
 		}
@@ -182,8 +182,8 @@ function startANewstage() {
 	document.getElementById("goldGain").innerHTML = maps[stage][0]
 	//TODO: make this more clear it's the enemy health/dmg formulas
 	//elevate it to more visible? These numbers will be tweaked a lot
-	unitValues[1] = [Math.pow(stage+12, 2)/20-6.19999, 4, .06, Math.pow(stage+1, 2)*10+50, 0, 4.5]
-	unitValues[3] = [Math.pow(stage+12, 2)/10+stage/5-9.1, 15, .04, Math.pow(stage+8, 2)*2-142, 0, 16]
+	unitValues[1] = [Math.pow(stage+12, 2)/20-6.19999, 4, .06, Math.pow(stage+1, 2)*12+50, 0, 4.5]
+	unitValues[3] = [Math.pow(stage+12, 2)/12+stage/5-6.2833333333, 15, .04, Math.pow(stage+8, 2)*2-142, 0, 16]
 	//updateProgressVisual()
 	enemyFenceHealthInitial = maps[stage][2]
 	enemyWallHealthInitial = maps[stage][3]
