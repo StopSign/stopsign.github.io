@@ -35,11 +35,13 @@ function Unit (line, pos, type, direction, unitCount, goldWorth) {
 		}
 		unitsActuallyDead -= this.unitCount
 		if(unitsDead > 0) {
-			var theGoldGain = unitsActuallyDead * this.goldWorth;
-			if(theGoldGain && theGoldGain > 0) {
-			gold += unitsActuallyDead * this.goldWorth;
-			} else {
-				console.log('tried to gain '+theGoldGain+' gold');
+			if(this.direction==='left') {
+				var theGoldGain = unitsActuallyDead * this.goldWorth;
+				if(theGoldGain && theGoldGain > 0) {
+					gold += unitsActuallyDead * this.goldWorth;
+				} else {
+					console.log('tried to gain '+theGoldGain+' gold');
+				}
 			}
 			totalDead[this.typeNum] += unitsActuallyDead
 			updateGoldVisual()

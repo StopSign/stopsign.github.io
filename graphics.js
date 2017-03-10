@@ -26,7 +26,7 @@ function updateUnitPos(y, x) {
 }
 
 function updateManaVisual() {
-	document.getElementById("mana").innerHTML = roundtoFormat2(curMana);
+	document.getElementById("mana").innerHTML = intToString(curMana);
 }
 
 
@@ -52,12 +52,12 @@ function updateSpawnTimers() {
 }
 
 function updateGoldVisual() {
-	document.getElementById("gold").innerHTML = round(gold);
+	document.getElementById("gold").innerHTML = intToStringRound(gold);
 }
 
 function updateTerritoryVisual() {
-	document.getElementById("territory").innerHTML = round(territory)
-	document.getElementById("totalTerritoryPlaces").innerHTML = round(territory)
+	document.getElementById("territory").innerHTML = intToStringRound(territory)
+	document.getElementById("totalTerritoryPlaces").innerHTML = intToStringRound(territory)
 }
 
 function updateConstructionVisual() {
@@ -117,14 +117,14 @@ function updatePlaceVisuals() {
 }
 
 function updateWallHealthVisuals() {
-	document.getElementById("wallHealth").innerHTML = round1(wallHealth)
-	document.getElementById("enemyWallHealth").innerHTML = round1(enemyWallHealth)
+	document.getElementById("wallHealth").innerHTML = intToString(wallHealth)
+	document.getElementById("enemyWallHealth").innerHTML = intToString(enemyWallHealth)
 	document.getElementById("compete3").style.width = wallHealth / wallHealthInitial * 100 + "%";
 	document.getElementById("compete4").style.width = (1-wallHealth / wallHealthInitial) * 100 + "%";
 	document.getElementById("compete5").style.width = enemyWallHealth / enemyWallHealthInitial * 100 + "%";
 	document.getElementById("compete6").style.width = (1-enemyWallHealth / enemyWallHealthInitial) * 100 + "%";
-	document.getElementById("fenceHealth").innerHTML = fenceHealth;
-	document.getElementById("enemyFenceHealth").innerHTML = enemyFenceHealth;
+	document.getElementById("fenceHealth").innerHTML = intToString(fenceHealth);
+	document.getElementById("enemyFenceHealth").innerHTML = intToString(enemyFenceHealth);
 }
 
 function changeBuildingScreen(buildingType) {
@@ -431,6 +431,7 @@ function switchMainTab(switchTo) {
 		case 5: //spells
 			document.getElementById("manaTab").style.backgroundColor="rgb(142, 212, 142)";
 			document.getElementById("manaSpace").style.display = "inline-block";
+			document.getElementById("spellUpgradeSpace").style.display = "inline-block";
 		break;
 		case 6: //mana
 			document.getElementById("optionsTab").style.backgroundColor="rgb(142, 212, 142)";
@@ -443,6 +444,7 @@ function hideAllInfo() {
 	document.getElementById("warSpace").style.display = "none";
 	document.getElementById("mapSpace").style.display = "none";
 	document.getElementById("manaSpace").style.display = "none";
+	document.getElementById("spellUpgradeSpace").style.display = "none";
 	document.getElementById("unitsSpace").style.display = "none";
 	document.getElementById("buildingsSpace").style.display = "none";
 	document.getElementById("placesSpace").style.display = "none";

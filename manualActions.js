@@ -16,7 +16,7 @@ function clickBuyButton(pos, type) {
 }
 
 function handleBuyAmounts(y, x) {
-	unitValues[y][x] = unitValuesInitial[y][x]*unitPointValues[y][x]*.3+unitValuesInitial[y][x]*Math.pow(1.08, unitPointValues[y][x]);
+	unitValues[y][x] = unitValuesInitial[y][x]*unitPointValues[y][x]*.4+unitValuesInitial[y][x]*Math.pow(1.15, unitPointValues[y][x]);
 }
 
 function clickBuildingBuyButton(num, type) {
@@ -177,7 +177,7 @@ function startANewstage() {
 	timer = 19;
 	totalTicks = 0
 	curClickedUnit = -1;
-	document.getElementById("stage").innerHTML=stage;
+	document.getElementById("stage").innerHTML=stage+1;
 	document.getElementById("territoryGain").innerHTML = mapTimers[stage]>0?maps[stage][1]/5:maps[stage][1]
 	document.getElementById("goldGain").innerHTML = maps[stage][0]
 	//TODO: make this more clear it's the enemy health/dmg formulas
