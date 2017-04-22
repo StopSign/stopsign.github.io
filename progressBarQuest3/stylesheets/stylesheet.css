@@ -63,6 +63,12 @@ div{
 	font-size:14px;
 	right:7%;
 }
+.resources {
+	font-size:14px;
+	left:102%;
+	position:absolute;
+	width:100%;
+}
 .level {
 	color:yellow;
 	margin-right:10px;

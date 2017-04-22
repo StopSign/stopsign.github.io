@@ -7,62 +7,63 @@
 		[16, 2900, 3400, 90000, 10, 0, 0, 60*40, 4, [0, 8.5, 8], [0, .25, .25], [0, .0005, .0005]],
 		[13, 2900, 5000, 100000, 10, 0, 0, 60*40, 3, [0, 12, 11], [0, 2, 2], [0,  .001, .001]]]*/
 		
-var maps = []
+var maps = [];
+var currentMapInfoNum = 0;
 
-for(level = 0; level < 50; level++) {
-	if(level % 17 == 0) createMap(maps, level, 2,'start')
-	if(level % 17 == 1) createMap(maps, level, 3, 'soldier')
-	if(level % 17 == 2) createMap(maps, level, 5, 'soldier')
-	if(level % 17 == 3) createMap(maps, level, 2, 'spear')
-	if(level % 17 == 4) createMap(maps, level, 6, 'soldier')
-	if(level % 17 == 5) createMap(maps, level, 4, 'both')
-	if(level % 17 == 6) createMap(maps, level, 3, 'spear')
-	if(level % 17 == 7) createMap(maps, level, 4, 'soldier')
-	if(level % 17 == 8) createMap(maps, level, 2, 'both')
-	if(level % 17 == 9) createMap(maps, level, 5, 'spear')
-	if(level % 17 == 10) createMap(maps, level, 4, 'both')
-	if(level % 17 == 11) createMap(maps, level, 2, 'spear')
-	if(level % 17 == 12) createMap(maps, level, 3, 'soldier')
-	if(level % 17 == 13) createMap(maps, level, 5, 'soldier')
-	if(level % 17 == 14) createMap(maps, level, 3, 'both')
-	if(level % 17 == 15) createMap(maps, level, 4, 'spear')
-	if(level % 17 == 16) createMap(maps, level, 5, 'soldier')
+for(var level = 0; level < 50; level++) {
+	if(level % 17 === 0) createMap(maps, level, 2,'start');
+	if(level % 17 === 1) createMap(maps, level, 3, 'soldier');
+	if(level % 17 === 2) createMap(maps, level, 5, 'soldier');
+    if(level % 17 === 3) createMap(maps, level, 2, 'spear');
+	if(level % 17 === 4) createMap(maps, level, 6, 'soldier');
+	if(level % 17 === 5) createMap(maps, level, 4, 'both');
+	if(level % 17 === 6) createMap(maps, level, 3, 'spear');
+	if(level % 17 === 7) createMap(maps, level, 4, 'soldier');
+	if(level % 17 === 8) createMap(maps, level, 2, 'both');
+	if(level % 17 === 9) createMap(maps, level, 5, 'spear');
+	if(level % 17 === 10) createMap(maps, level, 4, 'both');
+	if(level % 17 === 11) createMap(maps, level, 2, 'spear');
+	if(level % 17 === 12) createMap(maps, level, 3, 'soldier');
+	if(level % 17 === 13) createMap(maps, level, 5, 'soldier');
+	if(level % 17 === 14) createMap(maps, level, 3, 'both');
+	if(level % 17 === 15) createMap(maps, level, 4, 'spear');
+	if(level % 17 === 16) createMap(maps, level, 5, 'soldier');
 }
 
 
 //level is incrementing, the index. lanes is 2-6
 function createMap(maps, level, lanes, type) {
 	//var extraDifficulty = (((level+1)/2)|0)
-	var theMap = []
-	theMap[0] = Math.floor(Math.pow(1.6, level+1)) 					//Base Gold
-	theMap[1] = Math.floor(15*Math.pow(1.05, level)*(level*level*.5+1)+level*10)                               //Territory Gain (with Bonus)
-	theMap[2] = Math.floor((150*Math.pow(1.06, level))*(level*2+1))                                 //Enemy Fence Health
-	theMap[3] = Math.floor((1800*Math.pow(1.5, level)*(level+1)))                                 //Enemy Wall Health 
-	theMap[4] = (lanes==2&&type!='start'?10:15)                                 //Spawn Timer
-	theMap[5] = 0                              	  //Tower Number TODO
-	theMap[6] = 0                              	  //Tower Damage TODO
-	theMap[7] =  60*(10+level*2)                              	  //Cooldown on Bonus
-	theMap[8] = lanes                              	  //Lane Count
+	var theMap = [];
+	theMap[0] = Math.floor(Math.pow(1.6, level+1)); 					//Base Gold
+	theMap[1] = Math.floor(15*Math.pow(1.05, level)*(level*level*.5+1)+level*10);                               //Territory Gain (with Bonus)
+	theMap[2] = Math.floor((150*Math.pow(1.06, level))*(level*2+1));                                 //Enemy Fence Health
+	theMap[3] = Math.floor((1800*Math.pow(1.5, level)*(level+1)));                                 //Enemy Wall Health
+	theMap[4] = (lanes===2&&type!=='start'?10:15);                                 //Spawn Timer
+	theMap[5] = 0;                             	  //Tower Number TODO
+	theMap[6] = 0;                              	  //Tower Damage TODO
+	theMap[7] =  60*(10+level*2);                              	  //Cooldown on Bonus
+	theMap[8] = lanes;                              	  //Lane Count
 	
 	if(type === 'start') {
-		theMap[9] = [0, 1, 0]
-		theMap[10] = [0, 0, 0]
+		theMap[9] = [0, 1, 0];
+		theMap[10] = [0, 0, 0];
 	} else if(type === 'soldier') {
-		theMap[9] = [0, 1.4*level+1, .6*level]
-		theMap[10] = [0, .02*level, .008*(level+1)]
+		theMap[9] = [0, 1.4*level+1, .6*level];
+		theMap[10] = [0, .02*level, .008*(level+1)];
 	} else if(type === 'spear') {
-		theMap[9] = [0, .6*level+1, .9*level]
-		theMap[10] = [0, .01*level, .016*(level+1)]
+		theMap[9] = [0, .6*level+1, .9*level];
+		theMap[10] = [0, .01*level, .016*(level+1)];
 	} else if(type === 'both') {
-		theMap[9] = [0, level+1, .75*level]
-		theMap[10] = [0, .015*level, .012*(level+1)]
+		theMap[9] = [0, level+1, .75*level];
+		theMap[10] = [0, .015*level, .012*(level+1)];
 	}
-	theMap[11] = [0, ((level>1) ? (level-1)*.0015 : 0), ((level>3) ? (level-3)*.0025 : 0)] //Unit Growth Per Spawn Per Spawn [Boss, Soldier Spear]
-	maps[level] = theMap
+	theMap[11] = [0, ((level>1) ? (level-1)*.0015 : 0), ((level>3) ? (level-3)*.0025 : 0)]; //Unit Growth Per Spawn Per Spawn [Boss, Soldier Spear]
+	maps[level] = theMap;
 }
 
 function createMapSpace() {
-	theString="<div id='mapInfo' class='mapInfo'>"+
+	var theString="<div id='mapInfo' class='mapInfo'>"+
 	"<div class='mapInfoField'>Base Gold: <div id='baseGoldInfo' class='infoNum'>4f</div></div>"+
 	"<div class='mapInfoField'>Territory Gain: <div id='territoryGainInfo' class='infoNum'>4f</div></div>"+
 	"<div class='mapInfoField'>Fence Health <div id='fenceHealthInfo' class='infoNum'>4f</div></div>"+
@@ -72,19 +73,21 @@ function createMapSpace() {
 	"<div class='mapInfoField'>Total Units Spawning: <div id='totalUnitsSpawningInfo' class='infoNum'>4f</div></div>"+
 	"<div class='mapInfoField'>Total Unit <br>Growth: <div id='totalUnitGrowthInfo' class='infoNum'>4f</div></div>"+
 	"<button style='margin-left:43px' onclick='clickedStartMap()'>Start!</button>"+
-	"</div>"
-	for(stageNum = 0; stageNum < (higheststageUnlocked+1) && stageNum < 50; stageNum++) {
-    var xVal = 155+(stageNum%5)*201;
-    var yVal = 105+(((stageNum)/5)|0)*130;
-    theString += "<div id='map"+stageNum+"' class='mapSpace' onmouseover='updateMapInfo("+stageNum+")'"+
-    "style='left:"+xVal+"px;top:"+yVal+"px'"+
-    ">"+(stageNum+1)+"</div>"
-    theString += "<div id='timer"+stageNum+"' class='timerContainer'"+
-    "style='left:"+xVal+"px;top:"+(yVal+47)+"px'"+
-    "></div>"
-  }
-	
-	document.getElementById("mapSpace").innerHTML = theString
+	"</div>";
+    for(var stageNum = 0; stageNum < (higheststageUnlocked+1) && stageNum < 50; stageNum++) {
+        var xVal = 155+(stageNum%5)*201;
+        var yVal = 105+(((stageNum)/5)|0)*130;
+
+        theString += "<div id='map"+stageNum+"' class='mapSpace' onmouseover='updateMapInfo("+stageNum+")'"+
+            " style='left:"+xVal+"px;top:"+yVal+"px'"+
+            ">"+(stageNum+1)+"</div>";
+
+        theString += "<div id='timer"+stageNum+"' class='timerContainer'"+
+            " style='left:"+xVal+"px;top:"+(yVal+47)+"px'"+
+            "></div>";
+    }
+
+    document.getElementById("mapSpace").innerHTML = theString
 }
 
 function updateMapInfo(num) {

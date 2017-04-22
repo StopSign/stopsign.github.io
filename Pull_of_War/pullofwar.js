@@ -4,10 +4,8 @@ started = 0
 	if(started)
 		tick();
 },50);*/
-//Default rate is 50, which makes it 20 ticks a second
 
-//uncomment this before checkin - it makes the game move when not in focus.
-//TODO: change this dynamically
+//This makes the game work at full speed when not in focus.
 var doWork = new Worker('interval.js');
 doWork.onmessage = function(event) {
     if ( event.data === 'interval.start' ) {
@@ -16,17 +14,6 @@ doWork.onmessage = function(event) {
 };
 doWork.postMessage({start:true,ms:50});
 
-
-//TODO: research on effectiveness and value
-function addbyinteger(toAdd1, toAdd2, precision, isAdd) {
-	precisionMult = Math.pow(10, precision)
-	toAdd1 *= precisionMult;
-	toAdd2 *= precisionMult * (isAdd==0?-1:1)
-	//make toAdd2 negative when isAdd is false.
-	toReturn = Math.floor(toAdd1 + toAdd2)
-	return toReturn / precisionMult
-	
-}
 
 
 globalId = 0;
@@ -100,8 +87,8 @@ function calcAverageTime() {
 }
 
 function halfSecond() {
-	tickConstruction()
-	saveIntoStorage()
+	tickConstruction();
+	saveIntoStorage();
 }
 
 function pause() {
@@ -145,7 +132,7 @@ function handleSpawnRates() {
 		enemySpawnRate = maps[stage][4];
 		for(j = 0; j < linesEnabled; j++) {
 			addUnit("soldier", j, "left", Math.floor(enemySpawnAmounts[1]));
-			addUnit("spear", j, "left", Math.floor(enemySpawnAmounts[2]))
+            addUnit("spear", j, "left", Math.floor(enemySpawnAmounts[2]))
 		}
 		for(j = 0; j < enemySpawnAmounts.length; j++) {
 			enemySpawnAmounts[j] += enemySpawnRateIncrease[j]

@@ -18,7 +18,7 @@
 		<div ng-click="toggledBarsLeft=!toggledBarsLeft" class='hyperVisible quickButton'>Toggle Bar Direction</div>
 		<div id='fps' style='float:left;font-size:14px;background-color:grey;width:60px;padding:3px;border-radius:5px;'>{{fps}} fps</div>
 		
-		<div id='progressBars' style='margin-top:10px;display:{{isRowsVisible?"block":"none"}};' class='objectContainer'></div>
+		<div id='progressBars' style='margin-top:10px;display:{{isRowsVisible?"block":"none"}};width:50%' class='objectContainer'></div>
 		<div id='buttons' class='objectContainer'></div>
 
 		<div style='width:100%;font-size: 16px;margin-top:10px;text-align:center;'>To mass-buy, click a button then hold Enter</div>
@@ -87,9 +87,11 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 			//$scope.pbars[2].progressRate = 1
 			//initialRowCount=10;
 			$scope.theResource+=1000
+			$scope.resources[0]+=1000
 		}
 		$scope.testSettings2 = function() {
 			$scope.theResource+=50000
+			$scope.resources[0]+=50000
 		}
 		
 	}
@@ -169,7 +171,7 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 	{//----------------Object Classes----------------- progressBar,.nextProgressDown,.nextExp,.nextBoost,.addBoost
 		
 		//all unique info about a single progress bar (row) is represented here
-		function progressBar(initialProgressReq, initialProgressRate, initialProgress, isExpGainOn, secondsBoostUntilDensityIncrease, initialColorHue, row) {
+		function progressBar(initialProgressReq, initialProgressRate, initialProgress, isExpGainOn, secondsBoostUntilDensityIncrease, initialColorHue, row, name) {
 			{//Vars
 				//parameter driven
 				this.progressReq = initialProgressReq
@@ -187,6 +189,10 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 				this.speedMult = 100;
 				this.speedGainOpacity = 0
 				this.speedReduceMult = 1
+				this.resources = 0
+				this.resGain = 1
+				
+				this.name = name
 				
 				//for debugging
 				this.progressOld=0
@@ -303,14 +309,15 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 			
 			$scope.pbars[row].nextProgressDown((1+$scope.boughtSpeedBonus/100), function() { 
 				var lastIndex = $scope.pbars.length-1
-				$scope.theResource += $scope.gainAll *Math.pow(10, $scope.pbars[row].speedReduceMult-1)
-				$scope.theResource += (row == lastIndex) ? $scope.gainFirst*Math.pow(10, $scope.pbars[row].speedReduceMult-1) : 0; //first/top row, the Collector
+				//$scope.theResource += $scope.gainAll *Math.pow(10, $scope.pbars[row].speedReduceMult-1)
 				
 				$scope.pbars[row].nextExp()
+				$scope.pbars[row].resources += $scope.pbars[row].resGain * Math.pow(10, $scope.pbars[row].speedReduceMult-1); //first/top row, the Collector
 				if(row < lastIndex) { //all but the bottom-most row
 					$scope.pbars[row+1].speedGainOpacity = 1
 					$scope.pbars[row+1].speedGain = round1((1+($scope.pbars[row].level-1)*.1)*Math.pow(10, $scope.pbars[row].speedReduceMult-1))
 					$scope.pbars[row+1].speedMult = round1($scope.pbars[row+1].speedGain + $scope.pbars[row+1].speedMult)
+					
 				}
 				
 			})
@@ -356,6 +363,7 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 				"<div class='exp hyperVisible'><div class='level'>Level {{pbars["+(curRowCount-1)+"].level}}</div>{{pbars["+(curRowCount-1)+"].exp+'  / '+pbars["+(curRowCount-1)+"].expToNextLevel}} exp</div>"+
 				"<div class='hyperVisible speedMult'>{{pbars["+(curRowCount-1)+"].speedMult}}%</div>"+
 				"<div class='hyperVisible speedGain' style='opacity:{{pbars["+(curRowCount-1)+"].speedGainOpacity}}'>+{{pbars["+(curRowCount-1)+"].speedGain}}</div>"+
+				"<div class='hyperVisible resources' style='color:getResourceColor("+(curRowCount-1)+")'>Resource {{pbars["+(curRowCount-1)+"].row+1}}= {{pbars["+(curRowCount-1)+"].resources}}</div>"+
 			"</div>"
 			);
 			$("#progressBars").append(newDirective);
@@ -392,6 +400,10 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 				$scope.pbars[lx].color = colorShiftMath(regularRowHue, 0, 0)
 			}
 		}
+		
+		function getResourceColor(resNum) {
+			return colorShiftMath(regularRowHue, resNum, 0)
+		}
 	}
 	
 	
@@ -400,7 +412,7 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 		//function calls are required to be after variable declarations
 		$scope.addBuyButtonTemplate("% Global Speed Increase", 	"boughtSpeedBonus",	"blue", 	"buySpeedBonus", 	"costSpeedBonus", 	"red")
 		$scope.addBuyButtonTemplate("Seconds of Boost on Level Up", 				"secondsBoost", 		"blue", 	"buySecondsBoost", 	"costSecondsBoost", 	"red")
-		$scope.addBuyButtonTemplate("Buy 2 Progress Bars", 		"theResource", 			"red", 	"buyProgressBar", 		"costBuyRow", 			"red")
+		$scope.addBuyButtonTemplate("Buy 2 Progress Bars", 		"pbars[pbars.length-1].resources", 			"red", 	"buyProgressBar", 		"costBuyRow", 			"red")
 		$scope.addBuyButtonTemplate("Gain for Last", 					"gainFirst", 				"blue", 	"buyGainFirst", 			"costGainFirst", 			"red")
 		$scope.addBuyButtonTemplate("Gain for All", 						"gainAll", 					"blue", 	"buyGainAll", 			"costGainAll", 			"red")
 	
@@ -522,8 +534,8 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 		
 		//ang helper methods
 		$scope.buyButtonClicked = function(costVar, resultOfFinish) {
-			if($scope.theResource >= costVar) {
-				$scope.theResource -= costVar //cost
+			if($scope.resources[0] >= costVar) {
+				$scope.resources[0] -= costVar //cost
 				resultOfFinish()
 			}
 		}
