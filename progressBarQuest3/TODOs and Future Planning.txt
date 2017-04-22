@@ -1,3 +1,5 @@
+
+
 TODO NEXT:
 	up the speed of game (debug only? exp/later upgrades will up the speed)
 	Stop game from breaking when progress gain > progress req
