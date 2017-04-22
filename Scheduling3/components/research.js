@@ -1,5 +1,5 @@
 function Research() {
-  this.resource = this.resourceUI = this.gainUI = 2000
+  this.resource = this.resourceUI = this.gainUI = 0
   this.upgrades = []
   
   this.addUpgradeButton = function() {

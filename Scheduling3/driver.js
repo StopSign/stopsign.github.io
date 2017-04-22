@@ -8,8 +8,8 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
   
   $scope.tick = function() {
     curTick++
-    //if(curTick >= ticksPerSecond) { //triggers once a second
-    if(curTick >= 0) { //debug
+    if(curTick >= ticksPerSecond) { //triggers once a second
+    // if(curTick >= 0) { //debug
       curTick = 0;
       $scope.gardenWall.tick($scope.resources);
       $scope.cellGrid.tick($scope.resources, $scope.resources.gardenBonus)

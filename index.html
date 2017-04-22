@@ -5,16 +5,17 @@
     <title>StopSigns github</title>
 </head>
 <body style="font-family:Arial;text-align:center;background-color:teal">
-    <div style="display:inline-block;width:50%;margin-top:20px;border:2px solid black;background-color:white;">
+    <div class='centerTextArea' >
         <br>
         This is the personal github of James Kaplan. <br>
         My other online handles are Phurple or Stop_Sign.<br>
+        Links are top to bottom for how worthwhile it is to click them.<br>
 
         <h3>Games to Play</h3>
         <div class="gameDescription">
             <a href="Pull_of_War/index.html">Pull of War</a><br>
-            My most developed game. When you load, you'll be on "Unit Spawning" - click Barracks, then Battle to start the game<br>
-            This game has saving, but no offline progress. It works at full speed in another tab.
+            My most developed game. When you load, you'll be on "Unit Spawning" - click Barracks, then Battle to start the game.<br>
+            This game has saving, but no offline progress. It works at full speed in another tab.<br>
             <br>
             I've spent ~100 hours on this total. It is my fourth attempt at a game. <br>
             The idea came from Desert Strike, a custom game in SC2, and other such Tug of War games. <br>
@@ -23,32 +24,127 @@
             The aspect of idle games that I'm focusing on is needing to watch the game in order to know where to spend your money.<br>
         </div>
         <div class="gameDescription">
-            <a href="progressBarQuest3/index.html">Progress Bar Quest 3rd</a><br>
+            <a href="progressBarQuest3/index.html">Progress Bar Quest v2</a><br>
             Fun with progress bars. There's lots of unused features in this version.<br>
             This game no saving, and sort-of works in another tab.<br>
-            It goes too fast, and breaks<br>
+            It goes too fast eventually, and crashes because of it.<br>
             <br>
-            ~30 hours of work or so. This is my fifth game.<br>
+            ~30 hours of work or so. This is my sixth game.<br>
             I abandoned this because the coding was terrible - it's all in one file.<br>
-            It uses angular.js for the two-way binding. This was also my first attempt at passing functions as parameters.<br>
+            It uses angular.js for the two-way binding.<br>
             I still think this has potential, but it's got quite a bit of cleanup needed.<br>
+            Color changes based on the level of each progress bar.<br>
+            This is the better attempt at visualizing propagation. It has more to go to get to that point.<br>
         </div>
         <div class="gameDescription">
-            <a href="progressBarQuest2/index.html">Progress Bar Quest</a><br>
-
+            <a href="progressBarQuest/index.html">Progress Bar Quest v1</a><br>
+            Fun with progress bars, the first attempt.<br>
+            This game no saving, and sort-of works in another tab.<br>
+            It goes too fast to make sense of things eventually, but doesn't crash.<br>
+            <br>
+            ~15 hours of work or so. This is my fifth game.<br>
+            I saved this because I enjoy the color progression better than the v2.<br>
+            It uses angular.js for the two-way binding. This was also my first attempt at passing functions as parameters.<br>
+            Colors change based on how much boost a progress bar has. Give 'em more boost for pretty colors.<br>
+            This was my attempt at visualizing propagation. It turns out it's terrible at that, but it's a fascinating result regardless.<br>
         </div>
         <div class="gameDescription">
-            <a href="progressBarQuest/index.html">Progress Bar Quest</a><br>
-
+            <a href="square/index.html">Square</a><br>
+            A simple idle game with pretty colors.<br>
+            This game no saving, and doesn't.<br>
+            It lasts infinitely.<br>
+            <br>
+            ~10 hours of work or so. This is my seventh game.<br>
+            I got frustrated with how much work these games take, so I experimented with what the minimum means.<br>
+            This is a game with a single button and no numbers.<br>
+            I learned a lot about patterns and colors with this. A 5x5 grid works *far* better than a 4x4 or 6x6.<br>
+            I've watched this run for longer than I spent time on it. It was a success from that perspective.<br>
+            My most "art"-like game. I think it's pretty. No plans for changing it in the future.<br>
+        </div>
+        <div class="gameDescription">
+            <a href="old1/index.html">Incremental Quest</a><br>
+            A clicker game.<br>
+            This game has saving, and the idle elements work in another tab.<br>
+            <br>
+            ~40 hours of work or so. This is my first game attempt.<br>
+            Using a single .html file and a single .js file, with no libraries whatsoever.<br>
+            This was my attempt at creating elements I hadn't seen before in existing games.<br>
+            The main goal of coding it was to keep numbers low - costs less than 6 digits - for the duration of play.<br>
+            The UI is modeled off of Cookie Clicker.<br>
+            I abandoned it because it was too much work to add another piece for not a lot of play.<br>
+            I wanted to create guide-rails for play, like Cookie Clicker or AdCap, but I got bored of how much coding that required.<br>
+            I learned a *lot* about game making from this.<br>
+            Feel free to use an auto-clicker on it. I know I am.<br>
+        </div>
+        <div class="gameDescription">
+            <a href="old2/index.html">Feature Quest</a><br>
+            A slow clicker game.<br>
+            This game has saving, and the idle elements work in another tab.<br>
+            <br>
+            ~30 hours of work or so. This is my second game attempt.<br>
+            The first upgrade costs 500 resource1_1, so keep clicking "Exert Yourself". More unlocks with more resource1_1.<br>
+            The game picks up a lot on the 15000 costing upgrade to unlock Stroll. It has the upgrade price reduction carryover from the first attempt.<br>
+            I actually split my javascript into multiple files! I did it poorly though.<br>
+            For this game, I wanted to make a clicker that you only needed to click every few seconds, instead of with an auto-clicker.<br>
+            This was also an experiment with polynomial growth, and showing less elements to start.<br>
+            I wanted it to be a choice between getting X, X^2, or a lesser amount of both. Practice vs Application, if you will.<br>
+            Instead I learned that balance is kind of hard to maintain unless the balance is built-in to the game.<br>
+            A different lesson I learned here was to build around a theme - my unnamed resources aren't interesting.<br>
+            Another lesson is that good pacing takes planning. This game has terrible pacing - it's much too slow.<br>
+            Yet another is that explanations might be important: The block that contains Exert Yourself is active play, the block that contains Take it Easy is idle play.<br>
+            I abandoned it because it was too much work to add another piece for not a lot of play. Again.<br>
+            Feel free to open the console and type resource1_1 += 100000
         </div>
 
-        <h3>Games History</h3>
+
+        <h3>Game Fragments</h3>
+        <div class="gameDescription">
+            <a href="Scheduling3/index.html">Reap and Sow</a><br>
+            ~40 hours.<br>
+            My ninth game attempt.<br>
+            I'll write more after I fix it ..<br>
+        </div>
+        <div class="gameDescription">
+            <a href="miner/index.html">Miner</a><br>
+            ~30 hours.<br>
+            My eighth game attempt. It doesn't have anything worth playing.<br>
+            I had a few goals with this one, the biggest being collaboration.
+            I recognized that there were a few parts in my games where I didn't need to know anything about the larger game, and could hand it off to someone else.
+            So, I got some friends to say they'd try it, and one immediately refactored all the code to look nicer to them. The other made a list of mineral words to incorporate in the far future.
+            I didn't like the first guys changes, and the second wasn't very helpful, so I got discouraged and it died. Lesson learned.<br>
+            I wanted to make a game with two and only two resources, both visually represented.<br>
+            I also wanted to incorporate story elements via upgrades. This never got added.<br>
+            It needs to be more complicated in some parts, less complicated in others, so it was off-balance from the start.<br>
+            I still like the vision it was supposed to be, but it requires some heavy updates and refactoring to be useful again.<br>
+            I'm rather disappointed with how the development of this went.<br>
+        </div>
+        <div class="gameDescription">
+            <a href="Idiot Quest/index.html">Idiot Quest</a><br>
+            ~5 hours.<br>
+            My third game attempt. It doesn't have anything worth playing.<br>
+            I started this with the goal of using a javascript library - jquery. As it turns out, a single new language isn't enough to make a game.<br>
+            I also started arranging my coding to use dynamic creations of graphic elements here.<br>
+            I recognized where it was going - too much work to add another piece for not a lot of play. I abandoned it quickly.<br>
+        </div>
+
+
     </div>
 </body>
 </html>
 <style>
+    .centerTextArea {
+        display:inline-block;
+        width:50%;
+        margin-top:20px;
+        border:2px solid black;
+        background-color: #cbcdcb;
+    }
     .gameDescription {
+        border:1px solid black;
+        background-color:white;
         text-align:left;
-        width:80%;
+        width:90%;
+        padding:5px;
+        margin:10px auto;
     }
 </style>
