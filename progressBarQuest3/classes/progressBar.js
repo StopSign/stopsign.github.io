@@ -2,7 +2,7 @@
  * Created by Jim on 4/23/2017.
  */
 
-function progressBar(initialProgressReq, initialProgressRate, initialProgress, isExpGainOn, secondsBoostUntilDensityIncrease, initialColorHue, gainAmount, row, name) {
+function ProgressBar(initialProgressReq, initialProgressRate, initialProgress, boostLimitInTicks, initialColorHue, gainAmount, row, name) {
     //parameter driven
     this.progressReq = initialProgressReq;
     this.progressRate = initialProgressRate;
@@ -28,12 +28,11 @@ function progressBar(initialProgressReq, initialProgressRate, initialProgress, i
     this.progressDelta=0;
     this.printCounter = 0;
 
-    //This is [secondsBoostUntilDensityIncrease] seconds on the limit, converted into ticks
-    this.boostLimitInTicks = secondsBoostUntilDensityIncrease * (1000/ msWaitTime)
+    this.boostLimitInTicks = boostLimitInTicks;
 
     this.nextProgressDown = function(variantSpeedBonus, resultOfFinish) {
 
-        var rateOfChange = this.progressRate*multFromFps*variantSpeedBonus*this.speedMult/100 / Math.pow(10, this.speedReduceMult-1);
+        var rateOfChange = this.progressRate * multFromFps * variantSpeedBonus * this.speedMult / 100 / Math.pow(10, this.speedReduceMult-1);
         while(rateOfChange > .5) {
             rateOfChange /= 10;
             this.speedReduceMult++
