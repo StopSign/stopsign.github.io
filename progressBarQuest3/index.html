@@ -12,16 +12,15 @@
         <script src="classes/graphics.js"></script>
     </head>
     <body data-ng-app="myApp" ng-controller="myCtrl" class='objectContainer' style='text-align:center;position:absolute;background-color:#c1d7ee'>
-        <div data-ng-click="hasProgressMovement = (!hasProgressMovement)" class='hyperVisible quickButton ' style='width:117px;'>Toggle Progress Movement Visibility</div>
+        <div data-ng-click="isProgressStopped = (!isProgressStopped)" class='hyperVisible quickButton ' style='width:117px;'>Toggle Progress Movement Visibility</div>
         <div data-ng-click="toggleStartStop()" class='hyperVisible quickButton '>Toggle Start / Stop</div>
-        <div data-ng-click="toggleNextColor()" class='hyperVisible quickButton '>Toggle Next Color</div>
-        <div data-ng-click="isRowsVisible = (!isRowsVisible)" class='hyperVisible quickButton' style="width:91px;">Toggle Progress Visible</div>
+        <div data-ng-click="hideRows = (!hideRows)" class='hyperVisible quickButton' style="width:91px;">Toggle Progress Visible</div>
         <!--<div ng-click="" class='hyperVisible quickButton'>Toggle Row Visible</div>
         <div ng-click="" class='hyperVisible quickButton'>Toggle Exp Visible</div>-->
         <div data-ng-click="toggledBarsLeft=!toggledBarsLeft" class='hyperVisible quickButton'>Toggle Bar Direction</div>
         <div id='fps' style='float:left;font-size:14px;background-color:grey;width:60px;padding:3px;border-radius:5px;'>{{fps}} fps</div>
         
-        <div id='progressBars' style='margin-top:10px;display:block;width:50%' ng-show="isRowsVisible" class='objectContainer'></div>
+        <div id='progressBars' style='margin-top:10px;display:block;width:50%' ng-show="!hideRows" class='objectContainer'></div>
         <div id='buttons' class='objectContainer'></div>
 
         <div style='width:100%;font-size: 16px;margin-top:10px;text-align:center;'>To mass-buy, click a button then hold Enter</div>
@@ -55,51 +54,38 @@ var msWaitTime = 33;
 var app = angular.module('myApp', []);
 app.controller('myCtrl', function($scope, $interval, $compile) {
 
-    $scope.pbars = [];
-    var timeList = [];
-    var timer = 0;
-    var timeUntilNextBar = -500; //so that it makes the first row immediately
-    var stop = 0;
-    $scope.hasProgressMovement = 1;
-    $scope.isRowsVisible = 1;
+    //-----------------Variables----------------
+    {
+        $scope.pbars = [];
+        var timeList = [];
+        var timer = 0;
+        var timeUntilNextBar = -500; //so that it makes the first row immediately
+        var stop = 0;
 
-    //not public-facing game vars
-    var initialProgressRate = .025;
-    var regularRowHue = 180;
+        //ang both game & graphics vars
+        $scope.boughtSpeedBonus = 0;
+        $scope.secondsLevelBoost = 1;
+        $scope.gainFirst = 20;
+        $scope.gainAll = 1;
 
-    //ang both game & graphics vars
-    $scope.boughtSpeedBonus =0;
-    $scope.secondsBoost = 1;
-    $scope.theResource = 0;
-    $scope.gainFirst = 20;
-    $scope.gainAll = 1;
-
-    $scope.costSpeedBonus = 500;
-    $scope.costSecondsBoost = 30;
-    $scope.costBuyRow = 25;
-    $scope.costGainFirst = 8;
-    $scope.costGainAll = 150;
+        $scope.costSpeedBonus = 500;
+        $scope.costSecondsBoost = 30;
+        $scope.costBuyRow = 25;
+        $scope.costGainFirst = 8;
+        $scope.costGainAll = 150;
+    }
 
     $scope.tick = function() {
         if(stop) {
             return;
         }
         timer++;
-        timeList.push(new Date().getTime());
-        if(timeList.length > 100) {
-            timeList.splice(0, 1);
-            var fps = msWaitTime/((timeList[timeList.length-1] - timeList[0]) / (timeList.length-1))*100;
-            multFromFps = 100/fps;
-            $scope.fps = round(fps)+"%";
-        } else {
-            multFromFps = 1;
-            $scope.fps = "...";
-        }
+        handleFPSDifference();
 
         $scope.updateProgressForAllRows();
 
         //manual addition to give starting rows
-        if($scope.pbars.length < initialRowCount && timer - timeUntilNextBar >= 25) {
+        if(($scope.pbars.length < initialRowCount) && (timer - timeUntilNextBar >= 25)) {
             if($scope.pbars.length === 0) {
                 $scope.addProgressBar("first");
             } else {
@@ -108,6 +94,85 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
             timeUntilNextBar = timer
         }
     };
+
+    $scope.updateProgressForAllRows = function() {
+        for(var lx = 0; lx < $scope.pbars.length; lx++) {
+            $scope.updateRowProgress(lx)
+        }
+    };
+
+    $scope.updateRowProgress = function(row) { //main game progress
+        $scope.pbars[row].nextProgressDown((1+$scope.boughtSpeedBonus/100), function() {
+            var lastIndex = $scope.pbars.length-1;
+
+            $scope.pbars[row].nextExp($scope.secondsLevelBoost);
+            var resourceGain = $scope.pbars[row].resGain * Math.pow(10, $scope.pbars[row].speedReduceMult-1);
+            $scope.pbars[row].resources += resourceGain;
+            if(row < lastIndex) { //all but the bottom-most row
+                $scope.pbars[lastIndex].resources += resourceGain;
+                $scope.pbars[row+1].speedGainOpacity = 1;
+                $scope.pbars[row+1].speedGain = round1((1+($scope.pbars[row].level-1)*.1)*Math.pow(10, $scope.pbars[row].speedReduceMult-1));
+                $scope.pbars[row+1].speedMult = round1($scope.pbars[row+1].speedGain + $scope.pbars[row+1].speedMult);
+            }
+        });
+    };
+
+    //----------------Don't bother looking----------------
+    {
+        var graphics = new Graphics($scope);
+        $scope.addProgressBarUI = function () {
+            var newDiv = angular.element(graphics.createProgressBarUI($scope.pbars.length - 1));
+            var progressBarContainer = document.getElementById('progressBars');
+            angular.element(progressBarContainer).append(newDiv);
+            $compile(newDiv)($scope);
+        };
+        $scope.addBuyButtonTemplate = function (buttonText, topNumVarName, topNumColor,
+                                                onClickFunctionName, costVarName, botNumColor) {
+            var newDiv = angular.element(graphics.createButton(buttonText, topNumVarName, topNumColor,
+                onClickFunctionName, costVarName, botNumColor));
+            var progressBarContainer = document.getElementById('buttons');
+            angular.element(progressBarContainer).append(newDiv);
+            $compile(newDiv)($scope);
+        };
+
+        $scope.addProgressBar = function (type) { //add progress bar (both data and UI)
+            $scope.addProgressBarData(type);
+            $scope.addProgressBarUI();
+        };
+
+        $scope.toggleStartStop = function () {
+            stop = !stop;
+            timeList = [];
+        };
+
+        function handleFPSDifference() {
+            timeList.push(new Date().getTime());
+            if(timeList.length > 100) {
+                timeList.splice(0, 1);
+                var fps = msWaitTime/((timeList[timeList.length-1] - timeList[0]) / (timeList.length-1))*100;
+                multFromFps = 100/fps;
+                $scope.fps = round(fps)+"%";
+            } else {
+                multFromFps = 1;
+                $scope.fps = "...";
+            }
+        }
+
+        var doWork = new Worker('interval.js');
+        doWork.onmessage = function (event) {
+            if (event.data === 'interval.start') {
+                $scope.$apply($scope.tick());
+            }
+        };
+        doWork.postMessage({start: true, ms: msWaitTime});
+    }
+
+    //Initial conditions
+    $scope.addBuyButtonTemplate("% Global Speed Increase", "boughtSpeedBonus", "blue", "buySpeedBonus", "costSpeedBonus", "red");
+    $scope.addBuyButtonTemplate("Seconds of Boost on Level Up", "secondsLevelBoost", "blue","buySecondsBoost", "costSecondsBoost", "red");
+    $scope.addBuyButtonTemplate("Buy 2 Progress Bars", "pbars[pbars.length-1].resources", "red", "buyProgressBar", "costBuyRow", "red");
+    $scope.addBuyButtonTemplate("Gain for Last", "pbars[pbars.length-1].resGain", "blue", "buyGainFirst", "costGainFirst", "red");
+    $scope.addBuyButtonTemplate("Gain for All", "gainAll", "blue", "buyGainAll", "costGainAll", "red");
 
     var buttons = new GlobalButtons($scope);
     $scope.buySpeedBonus = buttons.buySpeedBonus;
@@ -119,104 +184,16 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
     $scope.testSettings = buttons.testSettings;
     $scope.testSettings2 = buttons.testSettings2;
 
-
-    {//-------------Application Functions-------------- updateProgressForAllRows, updateRowProgress, addProgressBar, addProgressBarData
-
-        $scope.updateProgressForAllRows = function() {
-            for(var lx = 0; lx < $scope.pbars.length ; lx++) {
-                $scope.updateRowProgress(lx)
-            }
-        };
-        
-        $scope.updateRowProgress = function(row) { //main game progress
-            $scope.pbars[row].nextProgressDown((1+$scope.boughtSpeedBonus/100), function() { 
-                var lastIndex = $scope.pbars.length-1;
-                //$scope.theResource += $scope.gainAll *Math.pow(10, $scope.pbars[row].speedReduceMult-1)
-                
-                $scope.pbars[row].nextExp($scope.secondsBoost);
-                var resourceGain = $scope.pbars[row].resGain * Math.pow(10, $scope.pbars[row].speedReduceMult-1);
-                $scope.pbars[row].resources += resourceGain;
-                if(row < lastIndex) { //all but the bottom-most row
-                    $scope.pbars[lastIndex].resources += resourceGain;
-                    $scope.pbars[row+1].speedGainOpacity = 1;
-                    $scope.pbars[row+1].speedGain = round1((1+($scope.pbars[row].level-1)*.1)*Math.pow(10, $scope.pbars[row].speedReduceMult-1));
-                    $scope.pbars[row+1].speedMult = round1($scope.pbars[row+1].speedGain + $scope.pbars[row+1].speedMult);
-                }
-            });
-        };
-        
-        $scope.addProgressBar = function(type) { //add progress bar (both data and UI)
-            $scope.addProgressBarData(type);
-            $scope.addProgressBarUI();
-        }
-    
-    }
-
-
-
-    var graphics = new Graphics($scope);
-    $scope.addProgressBarUI = function() {
-        var newDiv = angular.element(graphics.createProgressBarUI($scope.pbars.length-1));
-        var progressBarContainer = document.getElementById('progressBars');
-        angular.element(progressBarContainer).append(newDiv);
-        $compile(newDiv)($scope);
-    };
-
-    $scope.addBuyButtonTemplate = function(buttonText, topNumVarName,topNumColor,
-                                           onClickFunctionName, costVarName, botNumColor) {
-        var newDiv = angular.element(graphics.createButton(buttonText, topNumVarName,topNumColor,
-            onClickFunctionName, costVarName, botNumColor));
-        var progressBarContainer = document.getElementById('buttons');
-        angular.element(progressBarContainer).append(newDiv);
-        $compile(newDiv)($scope);
-    };
-    
-    
-    {//----------Initial Button & Row Load------------
-        //This stuff really belongs in a database
-        //function calls are required to be after variable declarations
-        $scope.addBuyButtonTemplate("% Global Speed Increase", "boughtSpeedBonus", "blue", "buySpeedBonus", "costSpeedBonus", "red");
-        $scope.addBuyButtonTemplate("Seconds of Boost on Level Up", "secondsBoost", "blue","buySecondsBoost", "costSecondsBoost", "red");
-        $scope.addBuyButtonTemplate("Buy 2 Progress Bars", "pbars[pbars.length-1].resources", "red", "buyProgressBar", "costBuyRow", "red");
-        $scope.addBuyButtonTemplate("Gain for Last", "pbars[pbars.length-1].resGain", "blue", "buyGainFirst", "costGainFirst", "red");
-        $scope.addBuyButtonTemplate("Gain for All", "gainAll", "blue", "buyGainAll", "costGainAll", "red");
-    
-    
-        $scope.addProgressBarData = function(type) { 
-            //progressBar (initialProgressReq, initialProgressRate, initialProgress, isExpGainOn, boostLimitInTicks, initialColorHue, gainAmount, row) {
-            var progressCreationLength = 20; //* Math.pow(1.01, $scope.pbars.length)
-            if(type === "first") {
-                $scope.pbars.push(new ProgressBar (progressCreationLength, initialProgressRate, progressCreationLength/2, 6*(1000/ msWaitTime), regularRowHue, 20, $scope.pbars.length))
-            } else if(type === "regular") {
-                $scope.pbars.unshift(new ProgressBar (progressCreationLength, initialProgressRate, progressCreationLength, 6*(1000/ msWaitTime), regularRowHue, $scope.gainAll, $scope.pbars.length))
-            }
-        }
-    }
-
-
-    $scope.toggleNextColor = function() {
-        regularRowHue -= 18;
-        for(var lx = 0; lx < $scope.pbars.length; lx++) {
-            $scope.pbars[lx].initialColorHue = regularRowHue;
-            $scope.pbars[lx].color = colorShiftMath(regularRowHue, 0, 0);
+    $scope.addProgressBarData = function(type) {
+        //progressBar (initialProgressReq, initialProgress, isExpGainOn, boostLimitInTicks, initialColorHue, gainAmount, row) {
+        var progressCreationLength = 20; //* Math.pow(1.01, $scope.pbars.length)
+        if(type === "first") {
+            $scope.pbars.push(new ProgressBar (progressCreationLength, progressCreationLength/2, 6*(1000/ msWaitTime), 20, $scope.pbars.length))
+        } else if(type === "regular") {
+            $scope.pbars.unshift(new ProgressBar (progressCreationLength, progressCreationLength, 6*(1000/ msWaitTime), $scope.gainAll, $scope.pbars.length))
         }
     };
 
-    $scope.toggleStartStop = function() {
-        stop = !stop;
-        timeList = [];
-    };
-
-
-
-    var doWork = new Worker('interval.js');
-    doWork.onmessage = function(event) {
-        if ( event.data === 'interval.start' ) {
-            $scope.$apply($scope.tick());
-        }
-    };
-    doWork.postMessage({start:true, ms:msWaitTime});
-    //$interval(function() { if(!stop) $scope.tick(); }, msWaitTime);
 });
 
 </script>

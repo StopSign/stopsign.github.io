@@ -3,7 +3,7 @@
  */
 function Graphics() {
     this.createProgressBarUI = function(curRowCount) {
-        var progressPrc = "{{ !hasProgressMovement ? 75 : " + //force to 100
+        var progressPrc = "{{ isProgressStopped ? 100 : " + //force to 100
             "(toggledBarsLeft ? " +
             "pbars[" + (curRowCount) + "].progress/pbars[" + curRowCount + "].progressReq * 100  :" + //go left
             "100 - (pbars[" + curRowCount + "].progress/pbars[" + curRowCount + "].progressReq * 100))" //go right

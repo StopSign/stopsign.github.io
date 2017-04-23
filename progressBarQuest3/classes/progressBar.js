@@ -2,12 +2,10 @@
  * Created by Jim on 4/23/2017.
  */
 
-function ProgressBar(initialProgressReq, initialProgressRate, initialProgress, boostLimitInTicks, initialColorHue, gainAmount, row, name) {
+function ProgressBar(initialProgressReq, initialProgress, boostLimitInTicks, gainAmount, row, name) {
     //parameter driven
     this.progressReq = initialProgressReq;
-    this.progressRate = initialProgressRate;
     this.progress = initialProgress;
-    this.initialColorHue = initialColorHue;
     this.row = row;
     this.resGain = gainAmount;
     this.name = name;
@@ -15,6 +13,7 @@ function ProgressBar(initialProgressReq, initialProgressRate, initialProgress, b
 
     //declarations
     this.exp = 0;
+    this.progressRate = 0.025;
     this.level = 1;
     this.totalBoostTicks = 0;
     this.expGain = 1;
@@ -23,6 +22,7 @@ function ProgressBar(initialProgressReq, initialProgressRate, initialProgress, b
     this.speedGainOpacity = 0;
     this.speedReduceMult = 1;
     this.resources=0;
+    this.initialColorHue = 180;
 
 
     this.nextProgressDown = function(variantSpeedBonus, resultOfFinish) {
@@ -61,13 +61,13 @@ function ProgressBar(initialProgressReq, initialProgressRate, initialProgress, b
     };
 
 
-    this.nextExp = function(secondsBoost) {
+    this.nextExp = function(secondsLevelBoost) {
         this.exp += this.expGain*Math.pow(10, this.speedReduceMult-1); //EXP GAIN
         while(this.exp >= this.expToNextLevel) {
             this.exp -= this.expToNextLevel;
             this.expToNextLevel = Math.floor(Math.pow(1.4, ++this.level)); //EXP REQUIREMENTS
             this.color = colorShiftMath(this.initialColorHue, this.level, 0); //color based on level
-            this.totalBoostTicks += secondsBoost * (1000/ msWaitTime);
+            this.totalBoostTicks += secondsLevelBoost * (1000/ msWaitTime);
         }
     };
 
