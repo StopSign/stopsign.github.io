@@ -11,6 +11,7 @@ function ProgressBar(initialProgressReq, initialProgressRate, initialProgress, b
     this.row = row;
     this.resGain = gainAmount;
     this.name = name;
+    this.boostLimitInTicks = boostLimitInTicks;
 
     //declarations
     this.exp = 0;
@@ -23,26 +24,19 @@ function ProgressBar(initialProgressReq, initialProgressRate, initialProgress, b
     this.speedReduceMult = 1;
     this.resources=0;
 
-    //for debugging
-    this.progressOld=0;
-    this.progressDelta=0;
-    this.printCounter = 0;
-
-    this.boostLimitInTicks = boostLimitInTicks;
 
     this.nextProgressDown = function(variantSpeedBonus, resultOfFinish) {
-
         var rateOfChange = this.progressRate * multFromFps * variantSpeedBonus * this.speedMult / 100 / Math.pow(10, this.speedReduceMult-1);
+        if(this.totalBoostTicks > 0) {
+            rateOfChange *= 2;
+            this.isLeveling = true; //used to set the background
+            this.totalBoostTicks--;
+        } else {
+            this.isLeveling = false;
+        }
         while(rateOfChange > .5) {
             rateOfChange /= 10;
             this.speedReduceMult++
-        }
-        if(this.totalBoostTicks > 0) {
-            rateOfChange *= 2;
-            this.totalBoostTicks--;
-            this.isLeveling = true;
-        } else {
-            this.isLeveling = false;
         }
         if(this.speedGainOpacity) {
             this.speedGainOpacity -= .025;
@@ -51,7 +45,7 @@ function ProgressBar(initialProgressReq, initialProgressRate, initialProgress, b
             }
         }
         this.progress -= rateOfChange;
-        this.printCounter++;
+
         while(this.progress <= 0) {
             this.progress += this.progressReq;
             resultOfFinish();
@@ -80,7 +74,7 @@ function ProgressBar(initialProgressReq, initialProgressRate, initialProgress, b
     this.nextBoost = function() {
         if(this.totalBoostTicks > 0) {
             //convert the seconds of boost on this into the actual bonus
-            multiFromBoost = this.calcBoostBonus();
+            var multiFromBoost = this.calcBoostBonus();
             this.totalBoostTicks -= Math.pow(2, multiFromBoost) * multFromFps;
             if(this.totalBoostTicks <= 0) {
                 this.color = colorShiftMath(this.initialColorHue, 0, 0)
@@ -124,9 +118,9 @@ function boostDecayMath(num) {
 //multi is a whole, sequential integer. leftOverMulti is 0-1
 function colorShiftMath(initialColor, multi, leftOverMulti) {
     //Hue is 0-360, 0 is red, 120 is green, 240 is blue. Sat is 0-100, 0=greyscale. Light is 0-100, 25=half black
-    var hue = initialColor - (multi-1)*18 //- (leftOverMulti)*9;
-    var sat = 10+Math.pow(multi, .95) * 4 //+ (leftOverMulti)*3
-    sat = sat > 100 ? 100 : sat //multi^.9 * 6 reaches at 23
-    var light = 50
-    return "hsl("+hue+", "+sat+"%, "+light+"%)"
+    var hue = initialColor - (multi-1)*18; //- (leftOverMulti)*9;
+    var sat = 10+Math.pow(multi, .95) * 4; //+ (leftOverMulti)*3
+    sat = sat > 100 ? 100 : sat; //multi^.9 * 6 reaches at 23
+    var light = 50;
+    return "hsl("+hue+", "+sat+"%, "+light+"%)";
 }

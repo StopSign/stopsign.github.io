@@ -9,6 +9,7 @@
         <script src="classes/progressBar.js"></script>
         <script src="classes/globalButtons.js"></script>
         <script src="classes/helpers.js"></script>
+        <script src="classes/graphics.js"></script>
     </head>
     <body data-ng-app="myApp" ng-controller="myCtrl" class='objectContainer' style='text-align:center;position:absolute;background-color:#c1d7ee'>
         <div data-ng-click="hasProgressMovement = (!hasProgressMovement)" class='hyperVisible quickButton ' style='width:117px;'>Toggle Progress Movement Visibility</div>
@@ -153,73 +154,22 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 
 
 
-    {//--------------Graphics Functions--------------- addProgressBarUI, addBuyButtonTemplate,
-        $scope.addProgressBarUI = function() {
-            
-            var curRowCount = $scope.pbars.length;
-            //$scope.expToNextLevel
-            var progressPrc = "{{ !hasProgressMovement ? 75 : "+ //force to 100
-            "(toggledBarsLeft ? "+
-            "pbars["+(curRowCount-1)+"].progress/pbars["+(curRowCount-1)+"].progressReq * 100  :" + //go left
-            "100 - (pbars["+(curRowCount-1)+"].progress/pbars["+(curRowCount-1)+"].progressReq * 100))" //go right
-            +"}}";
+    var graphics = new Graphics($scope);
+    $scope.addProgressBarUI = function() {
+        var newDiv = angular.element(graphics.createProgressBarUI($scope.pbars.length-1));
+        var progressBarContainer = document.getElementById('progressBars');
+        angular.element(progressBarContainer).append(newDiv);
+        $compile(newDiv)($scope);
+    };
 
-            var newDirective = angular.element(
-                "<div class='progressOuter' ng-class="+'"'+"{ 'leveling' : pbars["+(curRowCount-1)+"].isLeveling }"+'"'+">"+
-                    "<div id='progressInner"+(curRowCount-1)+"' class='progressInner'"+
-                        " style='width:"+progressPrc+"%;background-color:{{pbars["+(curRowCount-1)+"].color}};'>"+
-                    "</div>"+
-                    "<div class='exp hyperVisible'><div class='level'>Level {{pbars["+(curRowCount-1)+"].level}}</div>{{pbars["+(curRowCount-1)+"].exp+" +
-                    "'  / '+pbars["+(curRowCount-1)+"].expToNextLevel}} exp</div>"+
-                    "<div class='hyperVisible speedMult'>{{pbars["+(curRowCount-1)+"].speedMult}}%</div>"+
-                    "<div class='hyperVisible speedGain' style='opacity:{{pbars["+(curRowCount-1)+"].speedGainOpacity}}'>+{{pbars["+(curRowCount-1)+"].speedGain}}</div>"+
-                    "<div class='hyperVisible resources' style='color:" + getResourceColor(curRowCount-1) + "'>" +
-                        "Resource {{pbars["+(curRowCount-1)+"].row+1}} = {{pbars["+(curRowCount-1)+"].resources}}" +
-                        ", Gain = {{pbars["+(curRowCount-1)+"].resGain}}" +
-                    "</div>"+
-                "</div>"
-            );
-            var progressBarContainer = document.getElementById('progressBars');
-            angular.element(progressBarContainer).append(newDirective);
-            $compile(newDirective)($scope);
-        };
-        
-        /*Parameters:
-        @buttonText - the text to appear on the button
-        @topNumVarName - the number displayed at the top of the button container
-        @topNumColor - the color of displayed topNumVar
-        @onClickFunctionName - the name of the function to put in the ng-click. "hello" becomes ng-click="hello()"
-        @costVarName - the name of the cost amount variable
-        @botNumColor - the color of displayed costVar
-        */
-        $scope.addBuyButtonTemplate = function(buttonText, topNumVarName, 
-            topNumColor, onClickFunctionName, costVarName, botNumColor) {
-            
-            //make an element
-            var newDirective = angular.element(
-            "<div class='buttonContainer'>"+
-                "<div class='resource hyperVisible' style='color:"+topNumColor+"'>{{"+topNumVarName+"}}</div>"+
-                "<button class='buyButton' data-ng-click='"+onClickFunctionName+"()'>"+buttonText+"</button>"+
-                "<div class='middleLabel'>It costs <div class='countCost hyperVisible' style='color:"+botNumColor+"'>{{"+costVarName+"}}</div></div>"+
-            "</div>"
-            );
-            var buttonsContainer = document.getElementById('buttons');
-            angular.element(buttonsContainer).append(newDirective);
-            $compile(newDirective)($scope); //re-compile (so it picks up the angular vars)
-        };
-        
-        $scope.toggleNextColor = function() {
-            regularRowHue -= 18;
-            for(var lx = 0; lx < $scope.pbars.length; lx++) {
-                $scope.pbars[lx].initialColorHue = regularRowHue;
-                $scope.pbars[lx].color = colorShiftMath(regularRowHue, 0, 0);
-            }
-        };
-        
-        function getResourceColor(resNum) {
-            return colorShiftMath(regularRowHue, resNum*4, 0);
-        }
-    }
+    $scope.addBuyButtonTemplate = function(buttonText, topNumVarName,topNumColor,
+                                           onClickFunctionName, costVarName, botNumColor) {
+        var newDiv = angular.element(graphics.createButton(buttonText, topNumVarName,topNumColor,
+            onClickFunctionName, costVarName, botNumColor));
+        var progressBarContainer = document.getElementById('buttons');
+        angular.element(progressBarContainer).append(newDiv);
+        $compile(newDiv)($scope);
+    };
     
     
     {//----------Initial Button & Row Load------------
@@ -243,6 +193,14 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
         }
     }
 
+
+    $scope.toggleNextColor = function() {
+        regularRowHue -= 18;
+        for(var lx = 0; lx < $scope.pbars.length; lx++) {
+            $scope.pbars[lx].initialColorHue = regularRowHue;
+            $scope.pbars[lx].color = colorShiftMath(regularRowHue, 0, 0);
+        }
+    };
 
     $scope.toggleStartStop = function() {
         stop = !stop;
