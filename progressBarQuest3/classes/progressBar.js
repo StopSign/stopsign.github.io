@@ -2,14 +2,13 @@
  * Created by Jim on 4/23/2017.
  */
 
-function ProgressBar(initialProgressReq, initialProgress, boostLimitInTicks, gainAmount, row, name) {
+function ProgressBar(initialProgressReq, initialProgress, gainAmount, row, name) {
     //parameter driven
     this.progressReq = initialProgressReq;
     this.progress = initialProgress;
     this.row = row;
     this.resGain = gainAmount;
     this.name = name;
-    this.boostLimitInTicks = boostLimitInTicks;
 
     //declarations
     this.exp = 0;
@@ -23,6 +22,7 @@ function ProgressBar(initialProgressReq, initialProgress, boostLimitInTicks, gai
     this.speedReduceMult = 1;
     this.resources=0;
     this.initialColorHue = 180;
+    this.boostLimitInTicks = 6*(1000/ msWaitTime);
 
 
     this.nextProgressDown = function(variantSpeedBonus, resultOfFinish) {
@@ -34,7 +34,7 @@ function ProgressBar(initialProgressReq, initialProgress, boostLimitInTicks, gai
         } else {
             this.isLeveling = false;
         }
-        while(rateOfChange > .5) {
+        while(rateOfChange > .6) {
             rateOfChange /= 10;
             this.speedReduceMult++
         }

@@ -10,6 +10,7 @@
         <script src="classes/globalButtons.js"></script>
         <script src="classes/helpers.js"></script>
         <script src="classes/graphics.js"></script>
+        <script src="classes/handleSaving.js"></script>
     </head>
     <body data-ng-app="myApp" ng-controller="myCtrl" class='objectContainer' style='text-align:center;position:absolute;background-color:#c1d7ee'>
         <div data-ng-click="isProgressStopped = (!isProgressStopped)" class='hyperVisible quickButton ' style='width:117px;'>Toggle Progress Movement Visibility</div>
@@ -27,6 +28,7 @@
         <div style='text-align:left;font-size:12px;width:100%;margin-top:30px;margin-left:10px;margin-bottom:10px;color:grey'>If you want patterns, not gameplay (won't be in final version):</div>
         <div data-ng-click="testSettings()" style='float:left;width:75px' class='hyperVisible quickButton '>+1k</div>
         <div data-ng-click="testSettings2()" style='float:left;width:75px' class='hyperVisible quickButton '>+50k </div>
+        <div data-ng-click="clearSave()" style='float:left;width:75px' class='hyperVisible quickButton '>Clear Save</div>
     </body>
 </html>
 
@@ -50,30 +52,14 @@ levelUp needs 10 exp to start,
 var multFromFps = 1;
 var initialRowCount = 4;
 var msWaitTime = 33;
+var timeList = [];
+var timer = 0;
+var timeUntilNextBar = -500; //so that it makes the first row immediately
+var timeUntilNextSave = 0;
+var stop = 0;
 
 var app = angular.module('myApp', []);
 app.controller('myCtrl', function($scope, $interval, $compile) {
-
-    //-----------------Variables----------------
-    {
-        $scope.pbars = [];
-        var timeList = [];
-        var timer = 0;
-        var timeUntilNextBar = -500; //so that it makes the first row immediately
-        var stop = 0;
-
-        //ang both game & graphics vars
-        $scope.boughtSpeedBonus = 0;
-        $scope.secondsLevelBoost = 1;
-        $scope.gainFirst = 20;
-        $scope.gainAll = 1;
-
-        $scope.costSpeedBonus = 500;
-        $scope.costSecondsBoost = 30;
-        $scope.costBuyRow = 25;
-        $scope.costGainFirst = 8;
-        $scope.costGainAll = 150;
-    }
 
     $scope.tick = function() {
         if(stop) {
@@ -86,12 +72,12 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 
         //manual addition to give starting rows
         if(($scope.pbars.length < initialRowCount) && (timer - timeUntilNextBar >= 25)) {
-            if($scope.pbars.length === 0) {
-                $scope.addProgressBar("first");
-            } else {
-                $scope.addProgressBar("regular");
-            }
-            timeUntilNextBar = timer
+            $scope.addProgressBar();
+            timeUntilNextBar = timer;
+        }
+        if(timer - timeUntilNextSave >= 100) {
+            saveGame.saveTheGame();
+            timeUntilNextSave = timer;
         }
     };
 
@@ -111,14 +97,15 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
             if(row < lastIndex) { //all but the bottom-most row
                 $scope.pbars[lastIndex].resources += resourceGain;
                 $scope.pbars[row+1].speedGainOpacity = 1;
-                $scope.pbars[row+1].speedGain = round1((1+($scope.pbars[row].level-1)*.1)*Math.pow(10, $scope.pbars[row].speedReduceMult-1));
-                $scope.pbars[row+1].speedMult = round1($scope.pbars[row+1].speedGain + $scope.pbars[row+1].speedMult);
+                $scope.pbars[row+1].speedGain = round2((1+($scope.pbars[row].level-1)*.01)*Math.pow(10, $scope.pbars[row].speedReduceMult-1));
+                $scope.pbars[row+1].speedMult = round2($scope.pbars[row+1].speedGain + $scope.pbars[row+1].speedMult);
             }
         });
     };
 
     //----------------Don't bother looking----------------
     {
+
         var graphics = new Graphics($scope);
         $scope.addProgressBarUI = function () {
             var newDiv = angular.element(graphics.createProgressBarUI($scope.pbars.length - 1));
@@ -135,8 +122,8 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
             $compile(newDiv)($scope);
         };
 
-        $scope.addProgressBar = function (type) { //add progress bar (both data and UI)
-            $scope.addProgressBarData(type);
+        $scope.addProgressBar = function () { //add progress bar (both data and UI)
+            $scope.addProgressBarData();
             $scope.addProgressBarUI();
         };
 
@@ -165,6 +152,10 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
             }
         };
         doWork.postMessage({start: true, ms: msWaitTime});
+
+        var saveGame = new SaveGame($scope);
+        saveGame.loadTheGame();
+        $scope.clearSave = saveGame.loadDefaults;
     }
 
     //Initial conditions
@@ -185,13 +176,8 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
     $scope.testSettings2 = buttons.testSettings2;
 
     $scope.addProgressBarData = function(type) {
-        //progressBar (initialProgressReq, initialProgress, isExpGainOn, boostLimitInTicks, initialColorHue, gainAmount, row) {
-        var progressCreationLength = 20; //* Math.pow(1.01, $scope.pbars.length)
-        if(type === "first") {
-            $scope.pbars.push(new ProgressBar (progressCreationLength, progressCreationLength/2, 6*(1000/ msWaitTime), 20, $scope.pbars.length))
-        } else if(type === "regular") {
-            $scope.pbars.unshift(new ProgressBar (progressCreationLength, progressCreationLength, 6*(1000/ msWaitTime), $scope.gainAll, $scope.pbars.length))
-        }
+        //progressBar (initialProgressReq, initialProgress, gainAmount, row) {
+        $scope.pbars.unshift(new ProgressBar (20, 20, $scope.gainAll, $scope.pbars.length));
     };
 
 });
