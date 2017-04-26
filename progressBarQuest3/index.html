@@ -12,10 +12,10 @@
         <script src="classes/graphics.js"></script>
         <script src="classes/handleSaving.js"></script>
     </head>
-    <body data-ng-app="myApp" ng-controller="myCtrl" class='objectContainer' style='text-align:center;position:absolute;background-color:#c1d7ee'>
-        <div data-ng-click="isProgressStopped = (!isProgressStopped)" class='hyperVisible quickButton ' style='width:117px;'>Toggle Progress Movement Visibility</div>
+    <body data-ng-app="myApp" ng-controller="myCtrl" class='objectContainer' style='text-align:center;position:absolute;background-color:#c1d7ee;font-family:Arial, Helvetica, serif;'>
+        <div data-ng-click="isProgressStopped = (!isProgressStopped)" class='hyperVisible quickButton ' style='width:120px;'>Toggle Progress Movement Visibility</div>
         <div data-ng-click="toggleStartStop()" class='hyperVisible quickButton '>Toggle Start / Stop</div>
-        <div data-ng-click="hideRows = (!hideRows)" class='hyperVisible quickButton' style="width:91px;">Toggle Progress Visible</div>
+        <div data-ng-click="hideRows = (!hideRows)" class='hyperVisible quickButton' style="width:102px;">Toggle Progress Visible</div>
         <!--<div ng-click="" class='hyperVisible quickButton'>Toggle Row Visible</div>
         <div ng-click="" class='hyperVisible quickButton'>Toggle Exp Visible</div>-->
         <div data-ng-click="toggledBarsLeft=!toggledBarsLeft" class='hyperVisible quickButton'>Toggle Bar Direction</div>
@@ -24,7 +24,12 @@
         <div id='progressBars' style='margin-top:10px;display:block;width:50%' ng-show="!hideRows" class='objectContainer'></div>
         <div id='buttons' class='objectContainer'></div>
 
-        <div style='width:100%;font-size: 16px;margin-top:10px;text-align:center;'>To mass-buy, click a button then hold Enter</div>
+        <div style='width:100%;font-size: 16px;margin-top:10px;text-align:center;'>
+            To mass-buy, click a button then hold Enter<br>
+            1% of current resources will transfer to the next progress bar upon completion<br>
+            Level 2 gives +5% speed, Level 3 gives +6% speed, etc.<br>
+            If speed is high enough, visible speed is reduced by 10, but all gains are unchanged
+        </div>
         <div style='text-align:left;font-size:12px;width:100%;margin-top:30px;margin-left:10px;margin-bottom:10px;color:grey'>If you want patterns, not gameplay (won't be in final version):</div>
         <div data-ng-click="testSettings()" style='float:left;width:75px' class='hyperVisible quickButton '>+1k</div>
         <div data-ng-click="testSettings2()" style='float:left;width:75px' class='hyperVisible quickButton '>+50k </div>
@@ -93,19 +98,29 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 
             $scope.pbars[row].nextExp($scope.secondsLevelBoost);
             var resourceGain = $scope.pbars[row].resGain * Math.pow(10, $scope.pbars[row].speedReduceMult-1);
+            $scope.pbars[row].resGainOpacity = 1;
             $scope.pbars[row].resources += resourceGain;
+            $scope.pbars[row].tempResGain = resourceGain;
             if(row < lastIndex) { //all but the bottom-most row
-                $scope.pbars[lastIndex].resources += resourceGain;
-                $scope.pbars[row+1].speedGainOpacity = 1;
-                $scope.pbars[row+1].speedGain = round2((1+($scope.pbars[row].level-1)*.01)*Math.pow(10, $scope.pbars[row].speedReduceMult-1));
-                $scope.pbars[row+1].speedMult = round2($scope.pbars[row+1].speedGain + $scope.pbars[row+1].speedMult);
+                var onePercent = Math.floor($scope.pbars[row].resources * .01 * Math.pow(10, $scope.pbars[row].speedReduceMult-1));
+                $scope.pbars[row+1].resGainOpacity = 1;
+                $scope.pbars[row+1].tempResGain = onePercent;
+                $scope.pbars[row+1].resources += onePercent;
+                $scope.pbars[row].resources -= onePercent;
+
+                $scope.pbars[row+1].handleResourceChange();
+
+                //$scope.pbars[row+1].speedGain = 1 * Math.pow(10, $scope.pbars[row].speedReduceMult-1); //($scope.pbars[row].level) * .05
+                //$scope.pbars[row+1].speedMult = $scope.pbars[row+1].speedGain + $scope.pbars[row+1].speedMult;
             }
+            $scope.pbars[row].handleResourceChange();
         });
     };
 
     //----------------Don't bother looking----------------
     {
-
+        $scope.intToString = intToString;
+        $scope.intToStringRound = intToStringRound;
         var graphics = new Graphics($scope);
         $scope.addProgressBarUI = function () {
             var newDiv = angular.element(graphics.createProgressBarUI($scope.pbars.length - 1));
@@ -162,7 +177,7 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
     $scope.addBuyButtonTemplate("% Global Speed Increase", "boughtSpeedBonus", "blue", "buySpeedBonus", "costSpeedBonus", "red");
     $scope.addBuyButtonTemplate("Seconds of Boost on Level Up", "secondsLevelBoost", "blue","buySecondsBoost", "costSecondsBoost", "red");
     $scope.addBuyButtonTemplate("Buy 2 Progress Bars", "pbars[pbars.length-1].resources", "red", "buyProgressBar", "costBuyRow", "red");
-    $scope.addBuyButtonTemplate("Gain for Last", "pbars[pbars.length-1].resGain", "blue", "buyGainFirst", "costGainFirst", "red");
+//    $scope.addBuyButtonTemplate("Gain for Last", "pbars[pbars.length-1].resGain", "blue", "buyGainFirst", "costGainFirst", "red");
     $scope.addBuyButtonTemplate("Gain for All", "gainAll", "blue", "buyGainAll", "costGainAll", "red");
 
     var buttons = new GlobalButtons($scope);

@@ -1,5 +1,5 @@
 /* -------------------------------------------- */
-/* 					universal							   */
+/*                     universal                               */
 /* -------------------------------------------- */
 div{
     -webkit-touch-callout: none;
@@ -8,117 +8,164 @@ div{
     -ms-user-select: none;
     user-select: none;
     display:inline-block;
-	margin-top:0;
+    margin-top:0;
 }
 
 /* -------------------------------------------- */
-/* 			Progress Bar specific					   */
+/*             Progress Bar specific                       */
 /* -------------------------------------------- */
 .progressOuter {
-	width:80%;
-	height:15px;
-	background-color: black;
-	position:relative;
-	text-align:left;
+    width:80%;
+    height:21px;
+    background-color: black;
+    position:relative;
+    text-align:left;
+    color:black;
 }
 .progressInner {
-	background-color:white;
-	height:11px;
-	top:2px;
-	position:absolute;
+    height:15px;
+    top:3px;
+    position:absolute;
 }
 .progressExp {
-	background-color:white;
-	height:3px;
-	top:12px;
-	position:absolute;
+    background-color:white;
+    height:3px;
+    top:12px;
+    position:absolute;
 }
 .progressOuter:hover {
-	background-color:#0A005F;
+    background-color:#0A005F;
 }
 .progressInner:hover .progressOuter{
-	background-color:#0A005F;
+    background-color:#0A005F;
 }
 .progressExp:hover .progressOuter{
-	background-color:#0A005F;
+    background-color:#0A005F;
 }
 .leveling {
-	background-color:#796914;
-}
-.exp {
-	position:absolute;
-	color:white;
-	font-size:14px;
-	right:115px;
-}
-.speedMult {
-	position:absolute;
-	color:white;
-	font-size:14px;
-	left:94%;
-}
-.speedGain {
-	position:absolute;
-	font-size:14px;
-	right:7%;
-}
-.resources {
-	font-size:14px;
-	left:102%;
-	position:absolute;
-	width:100%;
+    background-color:#796914;
 }
 .level {
-	color:yellow;
-	margin-right:10px;
+    color:yellow;
+    margin-right:10px;
+}
+.exp {
+    position:absolute;
+    color:white;
+    font-size:14px;
+    right:115px;
+    top:2px;
+}
+.resGain {
+    position:absolute;
+    font-size:14px;
+    right:44px;
+    top:2px;
+}
+.resources {
+    position:absolute;
+    color:white;
+    font-size:14px;
+    right:5px;
+    top:2px;
+}
+.pbarNum {
+    position:absolute;
+    font-size:14px;
+    right:-25px;
+    width:20px;
+    font-weight:bold;
+    top:2px;
+}
+.speedMult {
+    position:absolute;
+    font-size:14px;
+    right:-150px;
+    width:110px;
+    border-left:1px solid grey;
+    top:2px;
+}
+.gainAmount {
+    position:absolute;
+    font-size:14px;
+    right:-233px;
+    width:100px;
+    border-left:1px solid grey;
+    top:2px;
+}
+.pbuyButton {
+    color:white;
+    margin:0 5px;
+    position:absolute;
+    font-size:14px;
+    background-color:grey;
+    border-radius:2px;
+    cursor:pointer;
+    padding:0 2px;
+    border:2px solid grey;
+    width:134px;
+}
+.pbuyButtonReady {
+    border:2px solid blue;
+}
+.pbuyButtonReady:hover {
+    border:2px solid #000096;
+}
+.pbuyButtonReady:active {
+    border:2px solid #000096;
+    background-color:black;
+}
+.buySpeed {
+    right:-350px;
 }
 
+
 .middleLabel {
-	text-align:center;
-	font-size:16px;
-	position:relative;
-	display:block;
+    text-align:center;
+    font-size:16px;
+    position:relative;
+    display:block;
 }
 .firstProgressOuter {
-	background-color:#424242;
+    background-color:#424242;
 }
 .firstProgressInner {
-	background-color:yellow;
+    background-color:yellow;
 }
 .buttonContainer {
-	width:20%;
-	vertical-align:top;
+    width:20%;
+    vertical-align:top;
 }
 .countCost {
-	color:red;
-	width:40%;
-	background-color:#A9FFFF;
-	font-size:20px;
+    color:red;
+    width:40%;
+    background-color:#A9FFFF;
+    font-size:20px;
 }
 
 /* -------------------------------------------- */
-/* 						helper 							   */
+/*                         helper                                */
 /* -------------------------------------------- */
 .number {
     color:black;
   vertical-align: top;
 }
 .buyButton {
-	width:90px;
-	height:80px;
-	margin-bottom:20px;
-	font-size:18px;
-	margin-top:30px;
+    width:110px;
+    height:80px;
+    margin-bottom:20px;
+    font-size:18px;
+    margin-top:30px;
 }
 .resource {
-	font-size:20px;
-	margin-top:5px;
-	margin-bottom:5px;
-	display:block;
-	color:blue;
-	background-color:#A9FFFF;
-	width:50%;
-	margin-left:25%;
+    font-size:20px;
+    margin-top:5px;
+    margin-bottom:5px;
+    display:block;
+    color:blue;
+    background-color:#A9FFFF;
+    width:50%;
+    margin-left:25%;
 }
 .hyperVisible {
     text-shadow:
@@ -126,28 +173,28 @@ div{
     1px -1px 0 #000,
     -1px 1px 0 #000,
     1px 1px 0 #000;
-	color:white;
+    color:white;
 }
 .objectContainer {
-	width:100%;
-	font-size:0;
-	margin:0;
+    width:100%;
+    font-size:0;
+    margin:0;
 }
 .quickButton {
-	margin-left:10px;
-	width:70px;
-	background-color:black;
-	font-size:14px;
-	color:white;
-	cursor:pointer;
-	border:3px solid black;
-	border-radius:5px;
-	padding:3px;
+    margin-left:10px;
+    width:71px;
+    background-color:black;
+    font-size:14px;
+    color:white;
+    cursor:pointer;
+    border:3px solid black;
+    border-radius:5px;
+    padding:3px;
 }
 .quickButton:hover {
-	border:3px solid red;
+    border:3px solid red;
 }
 .quickButton:active {
-	border:3px solid red;
-	background-color:grey;
+    border:3px solid red;
+    background-color:grey;
 }

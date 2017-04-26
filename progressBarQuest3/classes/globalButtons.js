@@ -24,7 +24,7 @@ function GlobalButtons(scope) {
         })};
     this.buyGainAll = function() { //Gain for All
         buyButtonClicked(getLastRow(), scope.costGainAll, function() {
-            scope.costGainAll = Math.ceil(1.35* scope.costGainAll);
+            scope.costGainAll = Math.ceil(1.35 * scope.costGainAll);
             scope.gainAll += 1; // + Math.floor($scope.gainAll * .2)
             for(var x = 0; x < scope.pbars.length; x++) {
                 scope.pbars[x].resGain++;

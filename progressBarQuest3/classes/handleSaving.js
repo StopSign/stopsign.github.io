@@ -42,6 +42,7 @@ function SaveGame(scope) {
             }
             scope.pbars.unshift(pbar);
             scope.addProgressBarUI();
+            pbar.calcSpeedMult();
         }
         initialRowCount = scope.pbars.length;
     };

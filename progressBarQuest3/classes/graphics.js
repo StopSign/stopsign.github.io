@@ -3,25 +3,29 @@
  */
 function Graphics() {
     this.createProgressBarUI = function(curRowCount) {
+        var pbar = "pbars[" + curRowCount + "]";
         var progressPrc = "{{ isProgressStopped ? 100 : " + //force to 100
             "(toggledBarsLeft ? " +
-            "pbars[" + (curRowCount) + "].progress/pbars[" + curRowCount + "].progressReq * 100  :" + //go left
-            "100 - (pbars[" + curRowCount + "].progress/pbars[" + curRowCount + "].progressReq * 100))" //go right
+            pbar+".progress/"+pbar+".progressReq * 100  :" + //go left
+            "100 - ("+pbar+".progress/"+pbar+".progressReq * 100))" //go right
             + "}}";
 
-        return "<div class='progressOuter' ng-class=" + '"' + "{ 'leveling' : pbars[" + curRowCount + "].isLeveling }" + '"' + ">" +
+        return "<div class='progressOuter' ng-class="+'"'+"{ 'leveling' : "+pbar+".isLeveling }"+'"'+">" +
                 "<div id='progressInner" + curRowCount + "' class='progressInner'" +
-                    " style='width:" + progressPrc + "%;background-color:{{pbars[" + curRowCount + "].color}};'>" +
+                    " style='width:" + progressPrc + "%;background-color:{{"+pbar+".color}};'>" +
                 "</div>" +
                 "<div class='exp hyperVisible'>" +
-                    "<div class='level'>Level {{pbars[" + curRowCount + "].level}}</div>" +
-                    "{{pbars[" + curRowCount + "].exp+' / '+pbars[" + curRowCount + "].expToNextLevel}} exp" +
+                    "<div class='level'>Level {{"+pbar+".level}}</div>" +
+                    "{{intToStringRound("+pbar+".exp)+' / '+intToStringRound("+pbar+".expToNextLevel)}} exp" +
                 "</div>" +
-                "<div class='hyperVisible speedMult'>{{pbars[" + curRowCount + "].speedMult}}%</div>" +
-                "<div class='hyperVisible speedGain' style='opacity:{{pbars[" + curRowCount + "].speedGainOpacity}}'>+{{pbars[" + curRowCount + "].speedGain}}</div>" +
-                "<div class='hyperVisible resources'>" +
-                    "Resource {{pbars[" + curRowCount + "].row+1}} = {{pbars[" + curRowCount + "].resources}}" +
-                    ", Gain = {{pbars[" + curRowCount + "].resGain}}" +
+                "<div class='hyperVisible resources'>{{intToStringRound("+pbar+".resources)}}</div>" +
+                "<div class='hyperVisible resGain' style='opacity:{{"+pbar+".resGainOpacity}}'>+{{intToStringRound("+pbar+".tempResGain)}}</div>" +
+                "<div class='pbarNum'>#{{"+pbar+".row+1}}</div>" +
+                "<div class='speedMult'>Speed: {{intToStringRound("+pbar+".speedMult)}}%</div>" +
+                "<div class='gainAmount'>Gain: {{"+pbar+".resGain}}</div>" +
+                "<div class='pbuyButton buySpeed' ng-click='"+pbar+".buySpeed()' " +
+                    "ng-class="+'"'+"{ 'pbuyButtonReady' : "+pbar+".speedBuyable }"+'"'+">" +
+                    "*110% Speed: {{intToStringRound("+pbar+".calcSpeedCost())}}" +
                 "</div>" +
             "</div>";
     };
