@@ -49,6 +49,14 @@ div{
     color:yellow;
     margin-right:10px;
 }
+.pbarNum {
+    position:absolute;
+    font-size:14px;
+    left:-33px;
+    width:20px;
+    font-weight:bold;
+    top:2px;
+}
 .exp {
     position:absolute;
     color:white;
@@ -69,30 +77,33 @@ div{
     right:5px;
     top:2px;
 }
-.pbarNum {
+.gainAmount {
     position:absolute;
     font-size:14px;
-    right:-25px;
-    width:20px;
-    font-weight:bold;
+    right:-72px;
+    width:70px;
     top:2px;
+}
+.speedIcon {
+    position:absolute;
+    border-left:1px solid grey;
+    width:20px;
+    height:20px;
+    right:-70px;
 }
 .speedMult {
     position:absolute;
     font-size:14px;
-    right:-150px;
-    width:110px;
-    border-left:1px solid grey;
+    right:-139px;
+    width:70px;
     top:2px;
+    vertical-align:top;
 }
-.gainAmount {
-    position:absolute;
-    font-size:14px;
-    right:-233px;
-    width:100px;
-    border-left:1px solid grey;
-    top:2px;
+.buySpeed {
+    right:-283px;
 }
+
+
 .pbuyButton {
     color:white;
     margin:0 5px;
@@ -114,9 +125,6 @@ div{
 .pbuyButtonReady:active {
     border:2px solid #000096;
     background-color:black;
-}
-.buySpeed {
-    right:-350px;
 }
 
 

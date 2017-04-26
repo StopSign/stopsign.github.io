@@ -27,7 +27,7 @@
         <div style='width:100%;font-size: 16px;margin-top:10px;text-align:center;'>
             To mass-buy, click a button then hold Enter<br>
             1% of current resources will transfer to the next progress bar upon completion<br>
-            Level 2 gives +5% speed, Level 3 gives +6% speed, etc.<br>
+            Level 2 gives +5% speed, 3 gives +6%, 4 gives +7%, 5 gives +8%, etc.<br>
             If speed is high enough, visible speed is reduced by 10, but all gains are unchanged
         </div>
         <div style='text-align:left;font-size:12px;width:100%;margin-top:30px;margin-left:10px;margin-bottom:10px;color:grey'>If you want patterns, not gameplay (won't be in final version):</div>
@@ -97,7 +97,7 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
             var lastIndex = $scope.pbars.length-1;
 
             $scope.pbars[row].nextExp($scope.secondsLevelBoost);
-            var resourceGain = $scope.pbars[row].resGain * Math.pow(10, $scope.pbars[row].speedReduceMult-1);
+            var resourceGain = $scope.pbars[row].calcTotalResGain();
             $scope.pbars[row].resGainOpacity = 1;
             $scope.pbars[row].resources += resourceGain;
             $scope.pbars[row].tempResGain = resourceGain;

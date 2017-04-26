@@ -21,8 +21,9 @@ function Graphics() {
                 "<div class='hyperVisible resources'>{{intToStringRound("+pbar+".resources)}}</div>" +
                 "<div class='hyperVisible resGain' style='opacity:{{"+pbar+".resGainOpacity}}'>+{{intToStringRound("+pbar+".tempResGain)}}</div>" +
                 "<div class='pbarNum'>#{{"+pbar+".row+1}}</div>" +
-                "<div class='speedMult'>Speed: {{intToStringRound("+pbar+".speedMult)}}%</div>" +
-                "<div class='gainAmount'>Gain: {{"+pbar+".resGain}}</div>" +
+                "<img class='speedIcon' src='icons/speed.png' height='100%' width='100%'/>"+
+                "<div class='speedMult'>{{intToStringRound("+pbar+".speedMult)}}%</div>" +
+                "<div class='gainAmount'>+{{intToStringRound("+pbar+".totalResGain)}}</div>" +
                 "<div class='pbuyButton buySpeed' ng-click='"+pbar+".buySpeed()' " +
                     "ng-class="+'"'+"{ 'pbuyButtonReady' : "+pbar+".speedBuyable }"+'"'+">" +
                     "*110% Speed: {{intToStringRound("+pbar+".calcSpeedCost())}}" +

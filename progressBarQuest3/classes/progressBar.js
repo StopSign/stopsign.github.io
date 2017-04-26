@@ -101,6 +101,11 @@ function ProgressBar(initialProgressReq, initialProgress, gainAmount, row, name)
         this.speedBuyable = this.resources >= this.calcSpeedCost();
     }
 
+    this.calcTotalResGain = function() {
+        this.totalResGain = this.resGain * Math.pow(10, this.speedReduceMult-1);
+        return this.totalResGain;
+    }
+
     /*
     this.nextBoost = function() {
         if(this.totalBoostTicks > 0) {
