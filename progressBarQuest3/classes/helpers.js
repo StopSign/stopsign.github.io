@@ -19,11 +19,15 @@ function round(num) {
 }
 
 
-function intToString (value) {
+function intToString (value, amount) {
     if (value>=10000) {
         return nFormatter(value, 3);
     } else {
-        return parseFloat(value).toFixed(2);
+        var baseValue = 3;
+        if(amount) {
+            baseValue = amount;
+        }
+        return parseFloat(value).toFixed(baseValue-1);
     }
 }
 

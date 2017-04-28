@@ -14,9 +14,12 @@ function SaveGame(scope) {
         toSave.costGainFirst = scope.costGainFirst;
         toSave.costGainAll = scope.costGainAll;
         toSave.pbars = scope.pbars;
+        toSave.selectedButton = selectedButton;
         window.localStorage.version1 = JSON.stringify(toSave);
     };
     this.loadTheGame = function() {
+        // this.loadDefaults();
+        // return;
         if (!window.localStorage.version1) {
             this.loadDefaults();
             return;
@@ -31,10 +34,11 @@ function SaveGame(scope) {
         scope.costBuyRow = toLoad.costBuyRow;
         scope.costGainFirst = toLoad.costGainFirst;
         scope.costGainAll = toLoad.costGainAll;
+        scope.selectedButton = toLoad.selectedButton;
         scope.pbars = [];
         for(var x = toLoad.pbars.length - 1; x >= 0; x--) {
             var progressBarFromSave = toLoad.pbars[x];
-            var pbar = new ProgressBar();
+            var pbar = new ProgressBar(scope);
             for (var key in progressBarFromSave) {
                 if (progressBarFromSave.hasOwnProperty(key)) {
                     pbar[key] = progressBarFromSave[key];
@@ -42,7 +46,9 @@ function SaveGame(scope) {
             }
             scope.pbars.unshift(pbar);
             scope.addProgressBarUI();
+            pbar.changeSelect(-1);
             pbar.calcSpeedMult();
+            pbar.calcTotalResGain();
         }
         initialRowCount = scope.pbars.length;
     };
@@ -57,9 +63,9 @@ function SaveGame(scope) {
         scope.gainAll = 1;
         scope.costSpeedBonus = 500;
         scope.costSecondsBoost = 30;
-        scope.costBuyRow = 25;
+        scope.costBuyRow = 150;
         scope.costGainFirst = 8;
-        scope.costGainAll = 150;
+        scope.costGainAll = 120;
         initialRowCount = 4
     }
 }

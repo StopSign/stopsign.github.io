@@ -4,7 +4,7 @@
 function GlobalButtons(scope) {
     this.buySpeedBonus = function() { //% Global Speed Increase
         buyButtonClicked(getLastRow(), scope.costSpeedBonus, function() {
-            scope.costSpeedBonus = Math.ceil(1.75* scope.costSpeedBonus); //cost increase
+            scope.costSpeedBonus = Math.ceil(3* scope.costSpeedBonus); //cost increase
             scope.boughtSpeedBonus += 5;
         })};
     this.buySecondsBoost = function() { //Seconds of Boost on Levelup
@@ -14,7 +14,7 @@ function GlobalButtons(scope) {
         })};
     this.buyProgressBar = function() { //Buy Progress Bar
         buyButtonClicked(getLastRow(), scope.costBuyRow, function() {
-            scope.costBuyRow = Math.ceil(2* scope.costBuyRow);
+            scope.costBuyRow = Math.ceil(3 * scope.costBuyRow);
             initialRowCount += 2;
         })};
     this.buyGainFirst = function() { //Gain for First
@@ -24,10 +24,11 @@ function GlobalButtons(scope) {
         })};
     this.buyGainAll = function() { //Gain for All
         buyButtonClicked(getLastRow(), scope.costGainAll, function() {
-            scope.costGainAll = Math.ceil(1.35 * scope.costGainAll);
+            scope.costGainAll = Math.ceil(4 * scope.costGainAll);
             scope.gainAll += 1; // + Math.floor($scope.gainAll * .2)
             for(var x = 0; x < scope.pbars.length; x++) {
                 scope.pbars[x].resGain++;
+                scope.pbars[x].calcTotalResGain();
             }
         })};
 

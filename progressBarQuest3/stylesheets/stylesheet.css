@@ -67,7 +67,7 @@ div{
 .resGain {
     position:absolute;
     font-size:14px;
-    right:44px;
+    right:52px;
     top:2px;
 }
 .resources {
@@ -101,6 +101,26 @@ div{
 }
 .buySpeed {
     right:-283px;
+    width:134px;
+}
+.buyGain {
+    right:-396px;
+    width:95px;
+}
+.mult1 {
+    right:-550px;
+    width:134px;
+}
+.mult2 {
+    right:-700px;
+    width:134px;
+}
+.mult3 {
+    right:-850px;
+    width:134px;
+}
+.selectedButton {
+    background-color:red !important;
 }
 
 
@@ -114,13 +134,13 @@ div{
     cursor:pointer;
     padding:0 2px;
     border:2px solid grey;
-    width:134px;
 }
 .pbuyButtonReady {
     border:2px solid blue;
 }
 .pbuyButtonReady:hover {
     border:2px solid #000096;
+    border:2px solid #404040;
 }
 .pbuyButtonReady:active {
     border:2px solid #000096;

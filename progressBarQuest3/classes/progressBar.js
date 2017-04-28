@@ -2,7 +2,7 @@
  * Created by Jim on 4/23/2017.
  */
 
-function ProgressBar(initialProgressReq, initialProgress, gainAmount, row, name) {
+function ProgressBar(scope, initialProgressReq, initialProgress, gainAmount, row, name) {
     //parameter driven
     this.progressReq = initialProgressReq;
     this.progress = initialProgress;
@@ -26,13 +26,28 @@ function ProgressBar(initialProgressReq, initialProgress, gainAmount, row, name)
     this.speedMultFromLevel = 0;
     this.speedMultFromBuy = 1;
 
-    this.speedInitialCost = 150;
+    this.speedInitialCost = 125;
     this.speedBought = 0;
+    this.totalResGain = gainAmount;
+
+    this.gainInitialCost = 3;
+    this.gainBought = 0;
+
+    this.gainMultInitialCost = [0, 200, 400, 700, 5000, 2000, 3500, 100000];
+    this.gainMultAmount = [0, 0, 0, 0, 0, 0, 0, 0];
+    this.gainMult = [1, 2, 2, 2, 3, 3, 3, 4];
+
+    this.isSelected = [0, 0, 0, 0, 0];
 
     this.color = colorShiftMath(this.initialColorHue, this.level, 0);
 
     this.nextProgressDown = function(variantSpeedBonus, resultOfFinish) {
-        var rateOfChange = this.progressRate * multFromFps * variantSpeedBonus * this.speedMult / 100 / Math.pow(10, this.speedReduceMult-1);
+        var rateOfChange = this.progressRate * variantSpeedBonus * this.speedMult / 100 / Math.pow(10, this.speedReduceMult-1);
+        while(rateOfChange > .4) {
+            rateOfChange /= 10;
+            this.speedReduceMult++
+        }
+        rateOfChange *= multFromFps;
         if(this.totalBoostTicks > 0) {
             rateOfChange *= 2;
             this.isLeveling = true; //used to set the background
@@ -40,12 +55,8 @@ function ProgressBar(initialProgressReq, initialProgress, gainAmount, row, name)
         } else {
             this.isLeveling = false;
         }
-        while(rateOfChange > .6) {
-            rateOfChange /= 10;
-            this.speedReduceMult++
-        }
         if(this.resGainOpacity) {
-            this.resGainOpacity -= .025;
+            this.resGainOpacity -= .015;
             if(this.resGainOpacity < 0) {
                 this.resGainOpacity = 0;
             }
@@ -83,12 +94,13 @@ function ProgressBar(initialProgressReq, initialProgress, gainAmount, row, name)
         if(this.resources >= speedCost) {
             this.resources -= speedCost;
             this.handleResourceChange();
-            this.speedMultFromBuy = Math.pow(1.1, ++this.speedBought);
+            this.speedMultFromBuy = Math.pow(1.4, ++this.speedBought);
             this.calcSpeedMult();
+            this.calcSpeedCost();
         }
     };
     this.calcSpeedCost = function() {
-        return Math.floor(Math.pow(1.5, this.speedBought) * this.speedInitialCost);
+        return Math.floor(Math.pow(5, this.speedBought) * this.speedInitialCost);
     };
 
     //=((A1+4)^2-(A1+4))/2-10
@@ -97,14 +109,94 @@ function ProgressBar(initialProgressReq, initialProgress, gainAmount, row, name)
         this.speedMult = Math.floor((100 + this.bonusFromLevel) * this.speedMultFromBuy);
     };
 
+    this.buyGain = function() {
+        var gainCost = this.calcGainCost();
+        if(this.resources >= gainCost) {
+            this.resources -= gainCost;
+            this.gainBought++;
+            this.resGain++;
+            this.calcTotalResGain();
+            this.handleResourceChange();
+        }
+    };
+    this.calcGainCost = function() {
+        return Math.floor(Math.pow(2, this.gainBought) * this.gainInitialCost);
+    };
+
+    this.buyGainMult = function(target) {
+        var pbar = scope.pbars[scope.pbars.length - (this.row + target + 1)];
+        if(!pbar) {
+            return;
+        }
+        var difference = pbar.row - this.row;
+        console.log(difference);
+        var multCost = this.calcGainMultCost(difference);
+        if(pbar.resources >= multCost) {
+            pbar.resources -= multCost;
+            this.gainMultAmount[difference]++;
+            this.calcTotalResGain();
+            pbar.handleResourceChange();
+        }
+    };
+    this.calcGainMultCost = function(difference) {
+        // console.log(rowNum+", "+this.gainMultAmount[rowNum]+", "+this.gainMultInitialCost[rowNum]);
+        return Math.floor(Math.pow(100, this.gainMultAmount[difference]) * this.gainMultInitialCost[difference]);
+    };
+
     this.handleResourceChange = function() {
         this.speedBuyable = this.resources >= this.calcSpeedCost();
+        this.gainBuyable = this.resources >= this.calcGainCost();
+        for(var x = 0; x < this.gainMultAmount.length; x++) {
+            if(x === 1 || x === 4 || x === 7 ) {
+                var rowNum = (scope.pbars.length - this.row)+x-1;
+                if(rowNum > 0) {
+                    var pbar = scope.pbars[rowNum];
+                    if(pbar) {
+                        pbar["gainMultFrom"+x+"Buyable"] = this.resources >= pbar.calcGainMultCost(x);
+                    }
+                }
+            }
+        }
+    };
+    this.calcTotalResGain = function() {
+        var totalMult = 1;
+        for(var x = 0; x < this.gainMult.length; x++) {
+            totalMult *= Math.pow(this.gainMult[x], this.gainMultAmount[x]);
+        }
+        this.totalResGain = this.resGain * Math.pow(10, this.speedReduceMult-1) * totalMult;
+        return this.totalResGain;
+    };
+
+    this.changeSelect = function(num) {
+        if(num === -1) {
+            for(var x = 0; x < this.isSelected.length; x++) {
+                this.isSelected[x] = false;
+            }
+        }
+        if(num >= 0) {
+            this.isSelected[num] = true;
+            // console.log(this.row + ", " + num);
+        }
+    };
+
+    this.clickButtonByColumn = function(num) {
+        if(num === 0) {
+            this.buySpeed();
+        }
+        if(num === 1) {
+            this.buyGain();
+        }
+        if(num === 2) {
+            this.buyGainMult(1);
+        }
+        if(num === 3) {
+            this.buyGainMult(4);
+        }
+        if(num === 3) {
+            this.buyGainMult(7);
+        }
     }
 
-    this.calcTotalResGain = function() {
-        this.totalResGain = this.resGain * Math.pow(10, this.speedReduceMult-1);
-        return this.totalResGain;
-    }
 
     /*
     this.nextBoost = function() {

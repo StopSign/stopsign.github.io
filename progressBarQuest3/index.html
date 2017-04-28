@@ -22,13 +22,16 @@
         <div id='fps' style='float:left;font-size:14px;background-color:grey;width:60px;padding:3px;border-radius:5px;'>{{fps}} fps</div>
         
         <div id='progressBars' style='margin-top:10px;display:block;width:50%' ng-show="!hideRows" class='objectContainer'></div>
+        <div id='mainResource' style="font-size:25px;font-weight:bold;">{{intToStringRound(pbars[pbars.length-1].resources)}}</div>
         <div id='buttons' class='objectContainer'></div>
 
-        <div style='width:100%;font-size: 16px;margin-top:10px;text-align:center;'>
+        <div style='width:100%;font-size: 14px;margin-top:10px;text-align:center;'>
             To mass-buy, click a button then hold Enter<br>
             1% of current resources will transfer to the next progress bar upon completion<br>
             Level 2 gives +5% speed, 3 gives +6%, 4 gives +7%, 5 gives +8%, etc.<br>
-            If speed is high enough, visible speed is reduced by 10, but all gains are unchanged
+            If speed is high enough, visible speed is reduced by 10, but all gains are unchanged.<br>
+            There is full saving every few seconds, and the game works 100% in a different tab.<br>
+            Use the arrow keys and Enter (or WASD and Space) to buy upgrades.<br>
         </div>
         <div style='text-align:left;font-size:12px;width:100%;margin-top:30px;margin-left:10px;margin-bottom:10px;color:grey'>If you want patterns, not gameplay (won't be in final version):</div>
         <div data-ng-click="testSettings()" style='float:left;width:75px' class='hyperVisible quickButton '>+1k</div>
@@ -62,6 +65,9 @@ var timer = 0;
 var timeUntilNextBar = -500; //so that it makes the first row immediately
 var timeUntilNextSave = 0;
 var stop = 0;
+var selectedButton = [0, 0];
+var myKeyQueue = [];
+
 
 var app = angular.module('myApp', []);
 app.controller('myCtrl', function($scope, $interval, $compile) {
@@ -80,7 +86,7 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
             $scope.addProgressBar();
             timeUntilNextBar = timer;
         }
-        if(timer - timeUntilNextSave >= 100) {
+        if(timer - timeUntilNextSave >= 300) {
             saveGame.saveTheGame();
             timeUntilNextSave = timer;
         }
@@ -102,11 +108,14 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
             $scope.pbars[row].resources += resourceGain;
             $scope.pbars[row].tempResGain = resourceGain;
             if(row < lastIndex) { //all but the bottom-most row
-                var onePercent = Math.floor($scope.pbars[row].resources * .01 * Math.pow(10, $scope.pbars[row].speedReduceMult-1));
+                var onePercentGrid = [.01, 0.0956179249911957, 0.6339676587267711, 0.9999568287525893, 1,1,1,1,1,1,1,1,1,1,1,1];
+                var onePercent = Math.floor($scope.pbars[row].resources * onePercentGrid[$scope.pbars[row].speedReduceMult-1] * 10)/10;
+                //console.log(onePercent);
                 $scope.pbars[row+1].resGainOpacity = 1;
                 $scope.pbars[row+1].tempResGain = onePercent;
                 $scope.pbars[row+1].resources += onePercent;
                 $scope.pbars[row].resources -= onePercent;
+                $scope.pbars[row].tempResGain = (resourceGain - onePercent);
 
                 $scope.pbars[row+1].handleResourceChange();
 
@@ -119,6 +128,83 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 
     //----------------Don't bother looking----------------
     {
+        function changeSelected(newSelected) {
+            $scope.pbars[selectedButton[0]].changeSelect(selectedButton[1]);
+            selectedButton = newSelected;
+            $scope.pbars[selectedButton[0]].changeSelect(selectedButton[1]);
+        }
+        document.addEventListener("keydown", function(e) {
+            var code = (e.charCode !== 0 ? e.charCode : e.keyCode);
+            myKeyQueue.push(code);
+            processKeyQueue();
+        });
+
+        function processKeyQueue() {
+            var key = myKeyQueue[0];
+            myKeyQueue.splice(0, 1);
+            if(key === 13 || key === 32) { //enter
+                $scope.pbars[selectedButton[0]].clickButtonByColumn(selectedButton[1]);
+            }
+            if(key === 38 || key === 87) { //up
+                if(selectedButton[0] > 0) {
+                    $scope.pbars[selectedButton[0]].changeSelect(-1);
+                    selectedButton[0]--;
+                    $scope.pbars[selectedButton[0]].changeSelect(selectedButton[1]);
+                }
+            }
+            if(key === 40 || key === 83) { //down
+                if(selectedButton[0] < $scope.pbars.length-1) {
+                    $scope.pbars[selectedButton[0]].changeSelect(-1);
+                    selectedButton[0]++;
+                    $scope.pbars[selectedButton[0]].changeSelect(selectedButton[1]);
+                }
+            }
+            if(key === 37 || key === 65) { //left / a
+                if(selectedButton[1] > 0) {
+                    $scope.pbars[selectedButton[0]].changeSelect(-1);
+                    selectedButton[1]--;
+                    $scope.pbars[selectedButton[0]].changeSelect(selectedButton[1]);
+                }
+            }
+            if(key === 39 || key === 68) { //right
+                if(selectedButton[1] < $scope.pbars[selectedButton[0]].isSelected.length-1) {
+                    $scope.pbars[selectedButton[0]].changeSelect(-1);
+                    selectedButton[1]++;
+                    $scope.pbars[selectedButton[0]].changeSelect(selectedButton[1]);
+                }
+            }
+            if(myKeyQueue.length > 0) {
+                $scope.pbars[selectedButton[0]].changeSelect(selectedButton[1]);
+            }
+        }
+
+        var keys = {37: 1, 38: 1, 39: 1, 40: 1};
+
+        function preventDefault(e) {
+            e = e || window.event;
+            if (e.preventDefault)
+                e.preventDefault();
+            e.returnValue = false;
+        }
+
+        function preventDefaultForScrollKeys(e) {
+            if (keys[e.keyCode]) {
+                preventDefault(e);
+                return false;
+            }
+        }
+
+        function disableScroll() {
+            document.onkeydown  = preventDefaultForScrollKeys;
+        }
+        disableScroll();
+
+        function enableScroll() {
+            if (window.removeEventListener)
+                window.removeEventListener('DOMMouseScroll', preventDefault, false);
+            document.onkeydown = null;
+        }
+
         $scope.intToString = intToString;
         $scope.intToStringRound = intToStringRound;
         var graphics = new Graphics($scope);
@@ -192,7 +278,7 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 
     $scope.addProgressBarData = function(type) {
         //progressBar (initialProgressReq, initialProgress, gainAmount, row) {
-        $scope.pbars.unshift(new ProgressBar (20, 20, $scope.gainAll, $scope.pbars.length));
+        $scope.pbars.unshift(new ProgressBar ($scope, 20, 20, $scope.gainAll, $scope.pbars.length));
     };
 
 });
