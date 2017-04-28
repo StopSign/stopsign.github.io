@@ -63,7 +63,7 @@ function SaveGame(scope) {
         scope.gainAll = 1;
         scope.costSpeedBonus = 500;
         scope.costSecondsBoost = 30;
-        scope.costBuyRow = 150;
+        scope.costBuyRow = 22;
         scope.costGainFirst = 8;
         scope.costGainAll = 120;
         initialRowCount = 4
