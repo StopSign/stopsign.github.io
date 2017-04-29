@@ -79,7 +79,7 @@ function ProgressBar(scope, initialProgressReq, initialProgress, gainAmount, row
 
 
     this.nextExp = function(secondsLevelBoost) {
-        this.exp += this.expGain*Math.pow(10, this.speedReduceMult-1); //EXP GAIN
+        this.exp += scope.expMult*Math.pow(10, this.speedReduceMult-1); //EXP GAIN
         while(this.exp >= this.expToNextLevel) {
             this.exp -= this.expToNextLevel;
             this.expToNextLevel = Math.floor(Math.pow(1.4, ++this.level)); //EXP REQUIREMENTS
