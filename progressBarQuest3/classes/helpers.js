@@ -18,6 +18,22 @@ function round(num) {
     return Math.floor(num).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
 
+function intToStringNegative(value, amount) {
+    var isPositive = 1;
+    if(value < 0) {
+        isPositive = -1;
+        value *= -1;
+    }
+    if (value>=10000) {
+        return (isPositive ? "+" : "-") + nFormatter(value, 3);
+    } else {
+        var baseValue = 3;
+        if(amount) {
+            baseValue = amount;
+        }
+        return (isPositive ? "+" : "-") + parseFloat(value).toFixed(baseValue-1);
+    }
+}
 
 function intToString (value, amount) {
     if (value>=10000) {

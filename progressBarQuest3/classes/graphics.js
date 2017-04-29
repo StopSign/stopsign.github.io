@@ -23,7 +23,7 @@ function Graphics() {
                     "<div class='level'>Level {{"+pbar+".level}}</div>" +
                     "{{intToStringRound("+pbar+".exp)+' / '+intToStringRound("+pbar+".expToNextLevel)}} exp" +
                 "</div>" +
-                "<div class='hyperVisible resGain' style='opacity:{{"+pbar+".resGainOpacity}}'>+{{intToString("+pbar+".tempResGain, 2)}}</div>" +
+                "<div class='hyperVisible resGain' style='opacity:{{"+pbar+".resGainOpacity}}'>{{intToStringNegative("+pbar+".tempResGain, 2)}}</div>" +
                 "<div class='hyperVisible resources' ng-class='{\"isFirst\" : pbars[pbars.length-1].row === "+pbar+".row}' >{{intToString("+pbar+".resources, 2)}}</div>" +
                 "<div class='gainAmount'>+{{intToStringRound("+pbar+".totalResGain)}}</div>" +
                 "<img class='speedIcon' src='icons/speed.png' height='100%' width='100%'/>"+
