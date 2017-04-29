@@ -21,7 +21,7 @@
         <div id='fps' style='float:left;font-size:14px;background-color:grey;width:60px;padding:3px;border-radius:5px;'>{{fps}} fps</div>
         
         <div id='progressBars' style='margin-top:10px;display:block;width:50%' ng-show="!hideRows" class='objectContainer'></div>
-        <div id='mainResource' class='mainResource'>{{intToStringRound(pbars[pbars.length-1].resources)}}</div>
+        <div id='mainResource' class='mainResource'>{{round1(pbars[pbars.length-1].resources)}}</div>
         <div id='buttons' class='objectContainer'></div>
 
         <div style='width:100%;font-size: 14px;margin-top:10px;text-align:center;'>
@@ -220,6 +220,7 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
 
         $scope.intToString = intToString;
         $scope.intToStringRound = intToStringRound;
+        $scope.round1 = round1;
         var graphics = new Graphics($scope);
         $scope.addProgressBarUI = function () {
             var newDiv = angular.element(graphics.createProgressBarUI($scope.pbars.length - 1));

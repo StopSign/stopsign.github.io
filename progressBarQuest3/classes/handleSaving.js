@@ -55,6 +55,10 @@ function SaveGame(scope) {
             pbar.calcTotalResGain();
         }
         initialRowCount = scope.pbars.length;
+        if(!scope.costExpMult) {
+            scope.costExpMult = 10000;
+            scope.expMult = 1;
+        }
     };
     this.loadDefaults = function() {
         scope.pbars = [];
