@@ -129,7 +129,6 @@ function ProgressBar(scope, initialProgressReq, initialProgress, gainAmount, row
             return;
         }
         var difference = pbar.row - this.row;
-        console.log(difference);
         var multCost = this.calcGainMultCost(difference);
         if(pbar.resources >= multCost) {
             pbar.resources -= multCost;

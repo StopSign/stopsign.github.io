@@ -31,6 +31,14 @@ function GlobalButtons(scope) {
                 scope.pbars[x].calcTotalResGain();
             }
         })};
+    this.buyExpMult = function() { //Gain for All
+        buyButtonClicked(getLastRow(), scope.costExpMult, function() {
+            scope.costExpMult = Math.ceil(8 * scope.costExpMult);
+            scope.expMult += 1;
+            for(var x = 0; x < scope.pbars.length; x++) {
+                scope.pbars[x].expGain++;
+            }
+        })};
 
     //Debug/Cheating
     this.testSettings = function() {

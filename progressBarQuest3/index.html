@@ -14,7 +14,6 @@
     </head>
     <body data-ng-app="myApp" ng-controller="myCtrl" class='objectContainer' style='text-align:center;position:absolute;background-color:#c1d7ee;font-family:Arial, Helvetica, serif;'>
         <div data-ng-click="isProgressStopped = (!isProgressStopped)" class='hyperVisible quickButton ' style='width:120px;'>Toggle Progress Movement Visibility</div>
-        <div data-ng-click="toggleStartStop()" class='hyperVisible quickButton '>Toggle Start / Stop</div>
         <div data-ng-click="hideRows = (!hideRows)" class='hyperVisible quickButton' style="width:102px;">Toggle Progress Visible</div>
         <!--<div ng-click="" class='hyperVisible quickButton'>Toggle Row Visible</div>
         <div ng-click="" class='hyperVisible quickButton'>Toggle Exp Visible</div>-->
@@ -22,7 +21,7 @@
         <div id='fps' style='float:left;font-size:14px;background-color:grey;width:60px;padding:3px;border-radius:5px;'>{{fps}} fps</div>
         
         <div id='progressBars' style='margin-top:10px;display:block;width:50%' ng-show="!hideRows" class='objectContainer'></div>
-        <div id='mainResource' style="font-size:25px;font-weight:bold;">{{intToStringRound(pbars[pbars.length-1].resources)}}</div>
+        <div id='mainResource' class='mainResource'>{{intToStringRound(pbars[pbars.length-1].resources)}}</div>
         <div id='buttons' class='objectContainer'></div>
 
         <div style='width:100%;font-size: 14px;margin-top:10px;text-align:center;'>
@@ -37,6 +36,7 @@
         <!--<div data-ng-click="testSettings()" style='float:left;width:75px' class='hyperVisible quickButton '>+1k</div>-->
         <!--<div data-ng-click="testSettings2()" style='float:left;width:75px' class='hyperVisible quickButton '>+50k </div>-->
         <div data-ng-click="clearSave()" style='float:left;width:75px' class='hyperVisible quickButton '>Clear Save</div>
+        <div data-ng-click="toggleStartStop()" class='hyperVisible quickButton ' style="float:left;">Toggle Start / Stop (for debug)</div>
     </body>
 </html>
 
@@ -65,7 +65,7 @@ var timer = 0;
 var timeUntilNextBar = -500; //so that it makes the first row immediately
 var timeUntilNextSave = 0;
 var stop = 0;
-var selectedButton = [0, 0];
+var selectedButton = [-1, 0];
 var myKeyQueue = [];
 
 
@@ -129,9 +129,14 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
     //----------------Don't bother looking----------------
     {
         function changeSelected(newSelected) {
+            if(!$scope.pbars[selectedButton[0]+1]) {
+                return;
+            }
             $scope.pbars[selectedButton[0]].changeSelect(selectedButton[1]);
             selectedButton = newSelected;
-            $scope.pbars[selectedButton[0]].changeSelect(selectedButton[1]);
+            if($scope.pbars[selectedButton[0]]) {
+                $scope.pbars[selectedButton[0]].changeSelect(selectedButton[1]);
+            }
         }
         document.addEventListener("keydown", function(e) {
             var code = (e.charCode !== 0 ? e.charCode : e.keyCode);
@@ -145,37 +150,45 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
             if(key === 13 || key === 32) { //enter
                 $scope.pbars[selectedButton[0]].clickButtonByColumn(selectedButton[1]);
             }
+            if(!$scope.pbars[selectedButton[0]]) {
+                selectedButton[0] = $scope.pbars.length-1;
+                return;
+            }
             if(key === 38 || key === 87) { //up
-                if(selectedButton[0] > 0) {
-                    $scope.pbars[selectedButton[0]].changeSelect(-1);
-                    selectedButton[0]--;
-                    $scope.pbars[selectedButton[0]].changeSelect(selectedButton[1]);
+                if(selectedButton[0] < 1) {
+                    selectedButton[0] = 1;
                 }
-            }
-            if(key === 40 || key === 83) { //down
-                if(selectedButton[0] < $scope.pbars.length-1) {
-                    $scope.pbars[selectedButton[0]].changeSelect(-1);
-                    selectedButton[0]++;
-                    $scope.pbars[selectedButton[0]].changeSelect(selectedButton[1]);
-                }
-            }
-            if(key === 37 || key === 65) { //left / a
-                if(selectedButton[1] > 0) {
-                    $scope.pbars[selectedButton[0]].changeSelect(-1);
-                    selectedButton[1]--;
-                    $scope.pbars[selectedButton[0]].changeSelect(selectedButton[1]);
-                }
-            }
-            if(key === 39 || key === 68) { //right
-                if(selectedButton[1] < $scope.pbars[selectedButton[0]].isSelected.length-1) {
-                    $scope.pbars[selectedButton[0]].changeSelect(-1);
-                    selectedButton[1]++;
-                    $scope.pbars[selectedButton[0]].changeSelect(selectedButton[1]);
-                }
-            }
-            if(myKeyQueue.length > 0) {
+                $scope.pbars[selectedButton[0]].changeSelect(-1);
+                selectedButton[0]--;
                 $scope.pbars[selectedButton[0]].changeSelect(selectedButton[1]);
             }
+            if(key === 40 || key === 83) { //down
+                if(selectedButton[0] > $scope.pbars.length-2) {
+                    selectedButton[0] = $scope.pbars.length-2;
+                }
+                $scope.pbars[selectedButton[0]].changeSelect(-1);
+                selectedButton[0]++;
+                $scope.pbars[selectedButton[0]].changeSelect(selectedButton[1]);
+            }
+            if(key === 37 || key === 65) { //left / a
+                if(selectedButton[1] < 1) {
+                    selectedButton[1] = 1;
+                }
+                $scope.pbars[selectedButton[0]].changeSelect(-1);
+                selectedButton[1]--;
+                $scope.pbars[selectedButton[0]].changeSelect(selectedButton[1]);
+            }
+            if(key === 39 || key === 68) { //right
+                if(selectedButton[1] > $scope.pbars[selectedButton[0]].isSelected.length-2) {
+                    selectedButton[1] = $scope.pbars[selectedButton[0]].isSelected.length-2;
+                }
+                $scope.pbars[selectedButton[0]].changeSelect(-1);
+                selectedButton[1]++;
+                $scope.pbars[selectedButton[0]].changeSelect(selectedButton[1]);
+            }
+//            if(myKeyQueue.length > 0) {
+//                $scope.pbars[selectedButton[0]].changeSelect(selectedButton[1]);
+//            }
         }
 
         var keys = {32: 1, 37: 1, 38: 1, 39: 1, 40: 1};
@@ -262,9 +275,10 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
     //Initial conditions
     $scope.addBuyButtonTemplate("% Global Speed Increase", "boughtSpeedBonus", "blue", "buySpeedBonus", "costSpeedBonus", "red");
     $scope.addBuyButtonTemplate("Seconds of Boost on Level Up", "secondsLevelBoost", "blue","buySecondsBoost", "costSecondsBoost", "red");
-    $scope.addBuyButtonTemplate("Buy 2 Progress Bars", "pbars[pbars.length-1].resources", "red", "buyProgressBar", "costBuyRow", "red");
+    $scope.addBuyButtonTemplate("Buy 2 Progress Bars", "pbars.length", "blue", "buyProgressBar", "costBuyRow", "red");
 //    $scope.addBuyButtonTemplate("Gain for Last", "pbars[pbars.length-1].resGain", "blue", "buyGainFirst", "costGainFirst", "red");
     $scope.addBuyButtonTemplate("Gain for All", "gainAll", "blue", "buyGainAll", "costGainAll", "red");
+    $scope.addBuyButtonTemplate("Exp Gain +1", "expMult", "blue", "buyExpMult", "costExpMult", "red");
 
     var buttons = new GlobalButtons($scope);
     $scope.buySpeedBonus = buttons.buySpeedBonus;
@@ -272,6 +286,7 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
     $scope.buyProgressBar = buttons.buyProgressBar;
     $scope.buyGainFirst = buttons.buyGainFirst;
     $scope.buyGainAll = buttons.buyGainAll;
+    $scope.buyExpMult = buttons.buyExpMult;
 
     $scope.testSettings = buttons.testSettings;
     $scope.testSettings2 = buttons.testSettings2;
@@ -279,6 +294,7 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
     $scope.addProgressBarData = function(type) {
         //progressBar (initialProgressReq, initialProgress, gainAmount, row) {
         $scope.pbars.unshift(new ProgressBar ($scope, 20, 20, $scope.gainAll, $scope.pbars.length));
+        changeSelected([selectedButton[0]++, selectedButton[1]]);
     };
 
 });

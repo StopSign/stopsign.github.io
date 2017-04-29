@@ -14,7 +14,8 @@ function Graphics() {
             + "}}";
 
 
-        return "<div class='progressOuter' ng-class="+'"'+"{ 'leveling' : "+pbar+".isLeveling }"+'"'+">" +
+        return "<div class='progressOuter' ng-class=\" { 'leveling' : "+pbar+".isLeveling  } \">" +
+                "<div class='pbarNum'>#{{"+pbar+".row+1}}</div>" +
                 "<div id='progressInner" + curRowCount + "' class='progressInner'" +
                     " style='width:" + progressPrc + "%;background-color:{{"+pbar+".color}};'>" +
                 "</div>" +
@@ -23,11 +24,10 @@ function Graphics() {
                     "{{intToStringRound("+pbar+".exp)+' / '+intToStringRound("+pbar+".expToNextLevel)}} exp" +
                 "</div>" +
                 "<div class='hyperVisible resGain' style='opacity:{{"+pbar+".resGainOpacity}}'>+{{intToString("+pbar+".tempResGain, 2)}}</div>" +
-            "<div class='hyperVisible resources'>{{intToString("+pbar+".resources, 2)}}</div>" +
-                "<div class='pbarNum'>#{{"+pbar+".row+1}}</div>" +
+                "<div class='hyperVisible resources' ng-class='{\"isFirst\" : pbars[pbars.length-1].row === "+pbar+".row}' >{{intToString("+pbar+".resources, 2)}}</div>" +
+                "<div class='gainAmount'>+{{intToStringRound("+pbar+".totalResGain)}}</div>" +
                 "<img class='speedIcon' src='icons/speed.png' height='100%' width='100%'/>"+
                 "<div class='speedMult'>{{intToStringRound("+pbar+".speedMult)}}%</div>" +
-                "<div class='gainAmount'>+{{intToStringRound("+pbar+".totalResGain)}}</div>" +
                 "<div class='pbuyButton buySpeed' ng-click='"+pbar+".buySpeed()' " +
                     "ng-class="+'"'+"{ 'pbuyButtonReady' : "+pbar+".speedBuyable , " +
                     "'selectedButton' : "+pbar+".isSelected[0] }"+'"'+
@@ -64,9 +64,9 @@ function Graphics() {
     this.createButton = function(buttonText, topNumVarName,topNumColor,
                                  onClickFunctionName, costVarName, botNumColor) {
         return "<div class='buttonContainer'>"+
-                "<div class='resource hyperVisible' style='color:"+topNumColor+"'>{{intToString("+topNumVarName+")}}</div>"+
+                "<div class='resource' style='color:"+topNumColor+"'>{{intToStringRound("+topNumVarName+")}}</div>"+
                 "<button class='buyButton' data-ng-click='"+onClickFunctionName+"()'>"+buttonText+"</button>"+
-                "<div class='middleLabel'>It costs <div class='countCost hyperVisible' style='color:"+botNumColor+"'>{{intToStringRound("+costVarName+")}}</div></div>"+
+                "<div class='middleLabel'>It costs: <div class='countCost' style='color:"+botNumColor+"'>{{intToStringRound("+costVarName+")}}</div> from #1</div>"+
             "</div>";
     };
 

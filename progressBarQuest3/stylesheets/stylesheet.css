@@ -165,10 +165,13 @@ div{
     vertical-align:top;
 }
 .countCost {
-    color:red;
-    width:40%;
-    background-color:#A9FFFF;
     font-size:20px;
+    margin-top:5px;
+    margin-bottom:5px;
+    display:inline-block;
+    color:blue;
+    font-weight:bold;
+    margin-left:10px;
 }
 
 /* -------------------------------------------- */
@@ -181,9 +184,17 @@ div{
 .buyButton {
     width:110px;
     height:80px;
-    margin-bottom:20px;
-    font-size:18px;
-    margin-top:30px;
+    margin-bottom:7px;
+    font-size:14px;
+    border:2px solid grey;
+    border-radius:10px;
+    cursor:pointer;
+}
+.buyButton:hover {
+    border:2px solid black;
+}
+.buyButton:active {
+    background-color: #9a9a9a;
 }
 .resource {
     font-size:20px;
@@ -191,9 +202,15 @@ div{
     margin-bottom:5px;
     display:block;
     color:blue;
-    background-color:#A9FFFF;
-    width:50%;
-    margin-left:25%;
+    font-weight:bold;
+}
+.mainResource {
+    font-size:25px;
+    font-weight:bold;
+    margin-top:5px;
+    margin-bottom:5px;
+    display:block;
+    color:red;
 }
 .hyperVisible {
     text-shadow:
@@ -215,7 +232,7 @@ div{
     font-size:14px;
     color:white;
     cursor:pointer;
-    border:3px solid black;
+    border:3px solid grey;
     border-radius:5px;
     padding:3px;
 }
@@ -225,4 +242,7 @@ div{
 .quickButton:active {
     border:3px solid red;
     background-color:grey;
+}
+.isFirst {
+    color:red;
 }
