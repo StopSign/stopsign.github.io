@@ -129,10 +129,10 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
     //----------------Don't bother looking----------------
     {
         function changeSelected(newSelected) {
-            if(!$scope.pbars[selectedButton[0]+1]) {
+            if(!$scope.pbars[selectedButton[0]]) {
                 return;
             }
-            $scope.pbars[selectedButton[0]].changeSelect(selectedButton[1]);
+            $scope.pbars[selectedButton[0]].changeSelect(-1);
             selectedButton = newSelected;
             if($scope.pbars[selectedButton[0]]) {
                 $scope.pbars[selectedButton[0]].changeSelect(selectedButton[1]);
@@ -294,7 +294,7 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
     $scope.addProgressBarData = function(type) {
         //progressBar (initialProgressReq, initialProgress, gainAmount, row) {
         $scope.pbars.unshift(new ProgressBar ($scope, 20, 20, $scope.gainAll, $scope.pbars.length));
-        changeSelected([selectedButton[0]++, selectedButton[1]]);
+        changeSelected([selectedButton[0]+1, selectedButton[1]]);
     };
 
 });
