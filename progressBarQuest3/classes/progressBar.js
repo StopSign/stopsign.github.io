@@ -143,6 +143,9 @@ function ProgressBar(scope, initialProgressReq, initialProgress, gainAmount, row
     };
 
     this.handleResourceChange = function() {
+        if(this.resources instanceof String) {
+            this.resources = 0;
+        }
         this.speedBuyable = this.resources >= this.calcSpeedCost();
         this.gainBuyable = this.resources >= this.calcGainCost();
         for(var x = 0; x < this.gainMultAmount.length; x++) {
