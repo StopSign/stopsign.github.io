@@ -25,13 +25,13 @@ function intToStringNegative(value, amount) {
         value *= -1;
     }
     if (value>=10000) {
-        return (isPositive ? "+" : "-") + nFormatter(value, 3);
+        return (isPositive===1 ? "+" : "-") + nFormatter(value, 3);
     } else {
         var baseValue = 3;
         if(amount) {
             baseValue = amount;
         }
-        return (isPositive ? "+" : "-") + parseFloat(value).toFixed(baseValue-1);
+        return (isPositive===1 ? "+" : "-") + parseFloat(value).toFixed(baseValue-1);
     }
 }
 
