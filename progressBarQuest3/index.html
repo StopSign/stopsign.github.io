@@ -21,7 +21,6 @@
         <div id='fps' style='float:left;font-size:14px;background-color:grey;width:60px;padding:3px;border-radius:5px;'>{{fps}} fps</div>
         
         <div id='progressBars' style='margin-top:10px;display:block;width:50%' ng-show="!hideRows" class='objectContainer'></div>
-        <div id='mainResource' class='mainResource'>{{intToStringRound(pbars[pbars.length-1].resources, 1)}}</div>
         <div id='buttons' class='objectContainer'></div>
 
         <div style='width:100%;font-size: 14px;margin-top:10px;text-align:center;'>
@@ -59,7 +58,7 @@ levelUp needs 10 exp to start,
 
 var multFromFps = 1;
 var initialRowCount = 4;
-var msWaitTime = 33;
+var msWaitTime = 50;
 var timeList = [];
 var timer = 0;
 var timeUntilNextBar = -500; //so that it makes the first row immediately
@@ -275,12 +274,12 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
     }
 
     //Initial conditions
-    $scope.addBuyButtonTemplate("% Global Speed Increase", "boughtSpeedBonus", "blue", "buySpeedBonus", "costSpeedBonus", "red");
-    $scope.addBuyButtonTemplate("Seconds of Boost on Level Up", "secondsLevelBoost", "blue","buySecondsBoost", "costSecondsBoost", "red");
-    $scope.addBuyButtonTemplate("Buy 2 Progress Bars", "pbars.length", "blue", "buyProgressBar", "costBuyRow", "red");
-//    $scope.addBuyButtonTemplate("Gain for Last", "pbars[pbars.length-1].resGain", "blue", "buyGainFirst", "costGainFirst", "red");
-    $scope.addBuyButtonTemplate("Gain for All", "gainAll", "blue", "buyGainAll", "costGainAll", "red");
-    $scope.addBuyButtonTemplate("Exp Gain +1", "expMult", "blue", "buyExpMult", "costExpMult", "red");
+    $scope.addBuyButtonTemplate("+5% Global Speed Increase", "boughtSpeedBonus", "blue", "buySpeedBonus", "costSpeedBonus", "white");
+    $scope.addBuyButtonTemplate("Seconds of Boost on Level Up +1", "secondsLevelBoost", "blue","buySecondsBoost", "costSecondsBoost", "white");
+    $scope.addBuyButtonTemplate("Buy 2 Progress Bars", "pbars.length", "blue", "buyProgressBar", "costBuyRow", "white");
+//    $scope.addBuyButtonTemplate("Gain for Last", "pbars[pbars.length-1].resGain", "blue", "buyGainFirst", "costGainFirst", "white");
+    $scope.addBuyButtonTemplate("Gain for All +1", "gainAll", "blue", "buyGainAll", "costGainAll", "white");
+    $scope.addBuyButtonTemplate("Exp Gain +1", "expMult", "blue", "buyExpMult", "costExpMult", "white");
 
     var buttons = new GlobalButtons($scope);
     $scope.buySpeedBonus = buttons.buySpeedBonus;
@@ -289,6 +288,9 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
     $scope.buyGainFirst = buttons.buyGainFirst;
     $scope.buyGainAll = buttons.buyGainAll;
     $scope.buyExpMult = buttons.buyExpMult;
+
+    $scope.buttonMouseOver = buttons.buttonMouseOver;
+    $scope.buttonMouseLeave = buttons.buttonMouseLeave;
 
     $scope.testSettings = buttons.testSettings;
     $scope.testSettings2 = buttons.testSettings2;

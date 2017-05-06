@@ -42,12 +42,13 @@ function ProgressBar(scope, initialProgressReq, initialProgress, gainAmount, row
     this.color = colorShiftMath(this.initialColorHue, this.level, 0);
 
     this.nextProgressDown = function(variantSpeedBonus, resultOfFinish) {
-        var rateOfChange = this.progressRate * variantSpeedBonus * this.speedMult / 100 / Math.pow(10, this.speedReduceMult-1);
+        var rateOfChange = this.progressRate * variantSpeedBonus * this.speedMult / 100 / Math.pow(10, this.speedReduceMult-1) ;
         while(rateOfChange > .4) {
             rateOfChange /= 10;
             this.speedReduceMult++
         }
-        rateOfChange *= multFromFps;
+        var multFromTicks = (1000/msWaitTime)/33; //because I balanced around 33ms time
+        rateOfChange = rateOfChange * multFromFps / multFromTicks;
         if(this.totalBoostTicks > 0) {
             rateOfChange *= 2;
             this.isLeveling = true; //used to set the background
@@ -56,7 +57,7 @@ function ProgressBar(scope, initialProgressReq, initialProgress, gainAmount, row
             this.isLeveling = false;
         }
         if(this.resGainOpacity) {
-            this.resGainOpacity -= .015;
+            this.resGainOpacity -= .015 / multFromTicks;
             if(this.resGainOpacity < 0) {
                 this.resGainOpacity = 0;
             }
@@ -142,6 +143,25 @@ function ProgressBar(scope, initialProgressReq, initialProgress, gainAmount, row
         return Math.floor(Math.pow(100, this.gainMultAmount[difference]) * this.gainMultInitialCost[difference]);
     };
 
+    this.mouseOverUpgrade = function(num) {
+        var rowNum = (scope.pbars.length - this.row)-num-1;
+        if(rowNum >= 0) {
+            var pbar = scope.pbars[rowNum];
+            if(pbar) {
+                pbar["isHovered"] = true;
+            }
+        }
+    };
+    this.mouseLeaveUpgrade = function(num) {
+        var rowNum = (scope.pbars.length - this.row)-num-1;
+        if(rowNum >= 0) {
+            var pbar = scope.pbars[rowNum];
+            if(pbar) {
+                pbar["isHovered"] = false;
+            }
+        }
+    };
+
     this.handleResourceChange = function() {
         if(this.resources instanceof String) {
             this.resources = 0;
@@ -198,6 +218,7 @@ function ProgressBar(scope, initialProgressReq, initialProgress, gainAmount, row
             this.buyGainMult(7);
         }
     }
+
 
 
     /*

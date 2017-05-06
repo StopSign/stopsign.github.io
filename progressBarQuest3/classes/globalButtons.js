@@ -40,12 +40,13 @@ function GlobalButtons(scope) {
             }
         })};
 
-    //Debug/Cheating
-    this.testSettings = function() {
-        getLastRow().resources += 1000;
+
+
+    this.buttonMouseOver = function() {
+        getLastRow().isHovered = true;
     };
-    this.testSettings2 = function() {
-        getLastRow().resources += 50000;
+    this.buttonMouseLeave = function() {
+        getLastRow().isHovered = false;
     };
 
     function buyButtonClicked(lastRow, costVar, resultOfFinish) {
@@ -54,8 +55,16 @@ function GlobalButtons(scope) {
             resultOfFinish();
         }
     }
-
     function getLastRow() {
         return scope.pbars[scope.pbars.length-1];
     }
+
+
+    //Debug/Cheating
+    this.testSettings = function() {
+        getLastRow().resources += 1000;
+    };
+    this.testSettings2 = function() {
+        getLastRow().resources += 50000;
+    };
 }
