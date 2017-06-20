@@ -1,0 +1,7 @@
+.naniteSquare {
+    width:20px;
+    height:20px;
+    border:2px solid black;
+    position:absolute;
+    background-color:white;
+}
