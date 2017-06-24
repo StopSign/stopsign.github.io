@@ -15,7 +15,7 @@
 <body style="font-family:Arial, Helvetica, serif;color:black;font-size:14px;">
 <!--<canvas id="drawArea" width="800" height="1000"></canvas>-->
 <div id="naniteGrid" style="position:relative;width:800px;height:1000px;background-color:grey;"></div>
-<div id="infoBox" style="position:fixed;bottom:0;height:200px;width:400px;background-color:blue;z-index:999;display:none;">
+<div id="infoBox" style="position:fixed;bottom:0;height:200px;width:800px;background-color:#8194bd;z-index:999;display:none;">
     <div id="totalNanitesContainer" class="resourceBlock">
         <div id="totalNanitesLabel" class="resourceLabel"></div>
         <div id="totalNanites" style="color:black;"></div>
@@ -24,14 +24,73 @@
         <div class="resourceLabel">Average Nanites: </div>
         <div id="averageNanites" style="color:black;"></div>
     </div>
+    <div id="totalNaniteRateContainer" class="resourceBlock">
+        <div id="totalNaniteRateLabel" class="resourceLabel"></div>
+        <div id="totalNaniteRate" style="color:black;"></div>
+    </div>
+    <div id="averageNaniteRateContainer" class="resourceBlock">
+        <div class="resourceLabel">Average Nanites per second: </div>
+        <div id="averageNaniteRate" style="color:black;"></div>
+    </div>
+    <div id="totalNaniteTransferAmountContainer" class="resourceBlock">
+        <div id="totalNaniteTransferAmountLabel" class="resourceLabel"></div>
+        <div id="totalNaniteTransferAmount" style="color:black;"></div>
+    </div>
+    <div id="averageNaniteTransferAmountContainer" class="resourceBlock">
+        <div class="resourceLabel">Average Nanites Sent: </div>
+        <div id="averageNaniteTransferAmount" style="color:black;"></div>
+    </div>
+    <div id="totalNaniteAmountReceivedContainer" class="resourceBlock">
+        <div id="totalNaniteAmountReceivedLabel" class="resourceLabel"></div>
+        <div id="totalNaniteAmountReceived" style="color:black;"></div>
+    </div>
+    <div id="averageNaniteAmountReceivedContainer" class="resourceBlock">
+        <div class="resourceLabel">Average Nanites Received: </div>
+        <div id="averageNaniteAmountReceived" style="color:black;"></div>
+    </div>
+
+    <div id="transferRateContainer" class="resourceBlock">
+        <div class="resourceLabel">Transfer Rate: <div id="transferRate" style="color:black;"></div>%</div>
+    </div>
+
+    <div id="totalAdvBotsContainer" class="resourceBlock">
+        <div id="totalAdvBotsLabel" class="resourceLabel"></div>
+        <div id="totalAdvBots" style="color:black;"></div>
+    </div>
+    <div id="averageAdvBotsContainer" class="resourceBlock">
+        <div class="resourceLabel">Average Adv Robots: </div>
+        <div id="averageAdvBots" style="color:black;"></div>
+    </div>
+    <div id="totalAdvBotRateContainer" class="resourceBlock">
+        <div id="totalAdvBotRateLabel" class="resourceLabel"></div>
+        <div id="totalAdvBotRate" style="color:black;"></div>
+    </div>
+    <div id="averageAdvBotRateContainer" class="resourceBlock">
+        <div class="resourceLabel">Average Adv Robots per second: </div>
+        <div id="averageAdvBotRate" style="color:black;"></div>
+    </div>
+    <div id="totalAdvBotTransferAmountContainer" class="resourceBlock">
+        <div id="totalAdvBotTransferAmountLabel" class="resourceLabel"></div>
+        <div id="totalAdvBotTransferAmount" style="color:black;"></div>
+    </div>
+    <div id="averageAdvBotTransferAmountContainer" class="resourceBlock">
+        <div class="resourceLabel">Average Adv Robots Sent: </div>
+        <div id="averageAdvBotTransferAmount" style="color:black;"></div>
+    </div>
+    <div id="totalAdvBotAmountReceivedContainer" class="resourceBlock">
+        <div id="totalAdvBotAmountReceivedLabel" class="resourceLabel"></div>
+        <div id="totalAdvBotAmountReceived" style="color:black;"></div>
+    </div>
+    <div id="averageAdvBotAmountReceivedContainer" class="resourceBlock">
+        <div class="resourceLabel">Average Adv Robots Received: </div>
+        <div id="averageAdvBotAmountReceived" style="color:black;"></div>
+    </div>
+
+
     <div id="totalConsumeCostContainer" class="resourceBlock">
         <div id="totalConsumeCostLabel" class="resourceLabel"></div>
         <div id="totalConsumeCost" style="color:black;"></div>
     </div>
-    <!--<div id="totalConsumeCostContainer" class="resourceBlock">-->
-        <!--<div id="totalConsumeCostLabel" class="resourceLabel"></div>-->
-        <!--<div id="totalConsumeCost" style="color:black;"></div>-->
-    <!--</div>-->
     <i id="closeButton" class="fa fa-close" onclick="deselectAll()"></i>
     <i id="leftArrow" class="fa fa-arrow-circle-left arrow" onclick="clickedDirectionArrow('West')"></i>
     <i id="rightArrow" class="fa fa-arrow-circle-right arrow" onclick="clickedDirectionArrow('East')"></i>
@@ -40,14 +99,16 @@
 
     <div id="buttonContainer">
         <div id="buyNanitesButton" class="buyButton" onclick="buyNanitesButtonPressed()">
-            <div id="naniteAmount"></div>
+            <div id="naniteAmount" style="font-size:18px;"></div>
             <div id="naniteCost"></div>
             <div id="naniteBenefit"></div>
+            <div id="numSelectedNanitesButtonBuyable" style="position:absolute;right:5px;top:2px;"></div>
         </div>
         <div id="buyAdvBotsButton" class="buyButton" onclick="buyAdvBotsButtonPressed()">
-            <div id="advBotAmount"></div>
+            <div id="advBotAmount" style="font-size:18px;"></div>
             <div id="advBotCost"></div>
             <div id="advBotBenefit"></div>
+            <div id="numSelectedAdvBotsButtonBuyable" style="position:absolute;right:5px;top:2px;"></div>
         </div>
     </div>
 

@@ -1,4 +1,4 @@
-function Square(col,row,distanceFromCenter) {
+function Square(col,row,initialConsumeCost) {
     this.col = col;
     this.row = row;
     this.targetRow = 0;
@@ -12,13 +12,20 @@ function Square(col,row,distanceFromCenter) {
     this.naniteRate = 0;
     this.naniteCost = 10;
     this.naniteAmount = 0;
-    this.naniteTransfRate = 0;
+    this.curSpecialPosNanites = 0;
+    this.naniteAmountBonus = 1;
+    this.naniteTransferAmount = 0;
+    this.naniteAmountReceived = 0;
     this.advBots = 0;
     this.advBotRate = 0;
-    this.advBotCost = 0;
+    this.advBotCost = 10000;
     this.advBotAmount = 0;
-    this.advBotTransfRate = 0;
-    this.consumeCost = Math.pow(distanceFromCenter, 3);
+    this.curSpecialPosAdvBots = 0;
+    this.advBotAmountBonus = 1;
+    this.advBotTransferAmount = 0;
+    this.advBotAmountReceived = 0;
+    this.consumeCost = initialConsumeCost;
+    this.specialLevels = [10, 25, 50, 75, 100, 150, 200, 300, 400, 500];
 
     this.canBuyNanites = function() {
         return this.nanites >= this.naniteCost;
@@ -26,8 +33,11 @@ function Square(col,row,distanceFromCenter) {
     this.buyNanites = function() {
         this.nanites -= this.naniteCost;
         this.naniteAmount++;
+        if (this.naniteAmount >= this.specialLevels[this.curSpecialPosNanites]) {
+            this.naniteAmountBonus = Math.pow(2, ++this.curSpecialPosNanites);
+        }
         this.naniteCost = Math.ceil(Math.pow(1.2, this.naniteAmount)*10);
-        this.naniteRate = this.naniteAmount;
+        this.naniteRate = this.naniteAmount * this.naniteAmountBonus;
     };
     this.canBuyAdvBots = function() {
         return this.nanites >= this.advBotCost;
@@ -35,9 +45,14 @@ function Square(col,row,distanceFromCenter) {
     this.buyAdvBots = function() {
         this.nanites -= this.advBotCost;
         this.advBotAmount++;
-        this.advBotCost = 1000 + 500 * Math.pow((this.advBotAmount),2);
-        this.advBotRate++;
+        if (this.advBotAmount >= this.specialLevels[this.curSpecialPosAdvBots]) {
+            this.advBotAmountBonus = Math.pow(2, this.curSpecialPosAdvBots);
+            this.curSpecialPosAdvBots++;
+        }
+        this.advBotCost = 10000 + 5000 * Math.pow(this.advBotAmount,2);
+        this.advBotRate = this.advBotAmount * this.advBotAmountBonus;
     };
+
     this.initializeIfConsumed = function() {
         if(this.consumeCost <= this.nanites) {
             this.nanites -= this.consumeCost;
@@ -64,19 +79,25 @@ function Square(col,row,distanceFromCenter) {
     };
     this.isActive = function() { return this.naniteAmount > 0; };
     this.sendPieceOfNanites = function() {
-        this.naniteTransfRate = this.nanites * this.transferRate / 100;
-        this.nanites -= this.naniteTransfRate;
-        return this.naniteTransfRate;
+        this.naniteTransferAmount = this.nanites * this.transferRate / 100;
+        this.nanites -= this.naniteTransferAmount;
+        return this.naniteTransferAmount;
     };
     this.sendPieceOfAdvBots = function() {
-        this.advBotTransfRate = Math.floor(this.advBots * this.transferRate / 100);
-        this.advBots -= this.advBotTransfRate;
-        return this.advBotTransfRate;
+        this.advBotTransferAmount = Math.floor(this.advBots * this.transferRate / 100);
+        this.advBots -= this.advBotTransferAmount;
+        return this.advBotTransferAmount;
     };
     this.changeTargetDirection = function(newDirection) {
         if(newDirection === this.transferDirection) {
             return;
         }
+        var target = theGrid[this.targetCol] ? theGrid[this.targetCol][this.targetRow] : false;
+        if(target) {
+            target.naniteAmountReceived = 0;
+            target.advBotAmountReceived = 0;
+        }
+
         var tempCol = this.col;
         var tempRow = this.row;
         if(newDirection === "South" ) {
@@ -109,12 +130,9 @@ function Square(col,row,distanceFromCenter) {
         if(!target) {
             this.changeTargetDirection("West");
         }
+
     };
     this.getTarget = function() {
-        if(this.isActive()) {
-            return theGrid[this.targetCol][this.targetRow]
-        } else {
-            return null;
-        }
+        return theGrid[this.targetCol] ? theGrid[this.targetCol][this.targetRow] : null;
     };
 }

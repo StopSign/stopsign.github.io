@@ -19,7 +19,8 @@ function createGrid() {
             }
             var squareCoords = {x:column,y:row};
             var distanceFromCenter = Math.sqrt(Math.pow((squareCoords.x-startingCoords.x),2)+Math.pow((squareCoords.y-startingCoords.y),2));
-            theGrid[column][row] =  new Square(squareCoords.x, squareCoords.y, distanceFromCenter);
+            var initialConsumeCost = Math.pow(distanceFromCenter, 2) * Math.pow(levelData[row][column], 2);
+            theGrid[column][row] =  new Square(squareCoords.x, squareCoords.y, initialConsumeCost);
         }
     }
 
@@ -57,7 +58,13 @@ function tick() {
                 if(target.isActive()) {
                     target.gainAdvBots(square.sendPieceOfAdvBots()); //transfer .1% advBots
                 }
-                target.gainNanites(square.sendPieceOfNanites()); //transfer .1% nanites
+                var amountTransferred = square.sendPieceOfNanites();
+                target.gainNanites(amountTransferred); //transfer .1% nanites
+                target.naniteAmountReceived = amountTransferred;
+
+                amountTransferred = square.sendPieceOfAdvBots();
+                target.gainAdvBots(amountTransferred); //transfer .1% adv bots
+                target.advBotAmountReceived = amountTransferred;
 
                 square.gainNanites(square.naniteRate);
                 square.gainAdvBots(square.advBotRate);
@@ -103,6 +110,9 @@ function deselectAll() {
 function clickedDirectionArrow(direction) {
     for(var i = 0; i < selected.length; i++) {
         selected[i].changeTargetDirection(direction);
+        if(!selected[i].getTarget()) {
+            selected[i].chooseStartingDirection();
+        }
     }
     theView.updateInfoBox();
 }

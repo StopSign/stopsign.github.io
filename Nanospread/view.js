@@ -20,8 +20,8 @@ function View() {
     }
 
     this.drawButtons = function() {
-        buttonSetup('nanite', 'Nanites');
-        buttonSetup('advBot', 'AdvBots');
+        buttonSetup('nanite', 'Nanites', 'Nanites');
+        buttonSetup('advBot', 'AdvBots', 'Adv Robots');
     };
 
     this.selectedChange = function() {
@@ -56,22 +56,26 @@ function View() {
     };
 }
 
-function buttonSetup(type, typeUpper) { //lol javascript
-    var buyAvailableOr = selected[0]["canBuy"+typeUpper]();
+function buttonSetup(type, typeUpper, label) { //lol javascript
+    var buyAvailableOr = selected[0]["canBuy"+typeUpper]() ? 1 : 0;
     var buyAvailableAnd = selected[0]["canBuy"+typeUpper]();
     var amount = selected[0][type+'Amount'];
-    for(var i = 0; i < selected.length; i++) {
+    var lastSelected = selected[0];
+    for(var i = 1; i < selected.length; i++) {
         if(selected[i][type+'Amount'] !== amount) {
             amount = -1;
         }
-        document.getElementById(type+'Amount').innerHTML = "#: "+selected[i][type+'Amount'];
-        document.getElementById(type+'Cost').innerHTML = "Cost is: " + intToStringRound(selected[i][type+'Cost']);
-        document.getElementById(type+'Benefit').innerHTML = "You will get +1 per buy";
-        buyAvailableOr = buyAvailableOr || selected[i]["canBuy"+typeUpper]();
+        lastSelected = selected[i];
+        buyAvailableOr += selected[i]["canBuy"+typeUpper]() ? 1 : 0;
         buyAvailableAnd = buyAvailableAnd && selected[i]["canBuy"+typeUpper]();
     }
-    document.getElementById(type+'Amount').innerHTML = "#: " + (amount === -1 ? " " : amount) + ", ";
+    document.getElementById(type+'Amount').innerHTML = "#: "+lastSelected[type+'Amount'];
+    // document.getElementById(type+'Amount').innerHTML = "#: " + (amount === -1 ? " " : amount) + ", ";
+    document.getElementById(type+'Cost').innerHTML = "Cost is: " + intToStringRound(lastSelected[type+'Cost']);
+    document.getElementById(type+'Benefit').innerHTML = ", Gain: +"+lastSelected[type+'AmountBonus']+" "+label+" per second.";
     document.getElementById('buy'+typeUpper+'Button').style.borderColor = buyAvailableAnd ? "green" : buyAvailableOr ? "yellow" : "red";
+    document.getElementById('numSelected'+typeUpper+'ButtonBuyable').style.color = buyAvailableAnd ? "green" : buyAvailableOr ? "yellow" : "red";
+    document.getElementById('numSelected'+typeUpper+'ButtonBuyable').innerHTML = buyAvailableOr + " / " + selected.length;
 }
 
 function drawDirectionArrow() {
@@ -126,37 +130,91 @@ function changeBorder(gridSquare, square) {
     }
 }
 
-function showOrHideConsumeCost(totalConsumeCost) {
-    if(totalConsumeCost !== 0) {
-        document.getElementById('totalConsumeCostContainer').style.display = "block";
-    } else {
-        document.getElementById('totalConsumeCostContainer').style.display = "none";
-    }
-}
-
 function selectedSingleOrMultiple() {
     if(selected.length > 1) { //selected multiple
-        document.getElementById('averageNanitesContainer').style.display = "block";
         document.getElementById('totalNanitesLabel').innerHTML = "Total Nanites: ";
+        document.getElementById('averageNanitesContainer').style.display = "block";
+        document.getElementById('totalNaniteRateLabel').innerHTML = "Total Nanites Per Second: ";
+        document.getElementById('averageNaniteRateContainer').style.display = "block";
+        document.getElementById('totalNaniteTransferAmountLabel').innerHTML = "Total Nanites Sent: ";
+        document.getElementById('averageNaniteTransferAmountContainer').style.display = "block";
+        document.getElementById('totalNaniteAmountReceivedLabel').innerHTML = "Total Nanites Received: ";
+        document.getElementById('averageNaniteAmountReceivedContainer').style.display = "block";
+        document.getElementById('totalAdvBotsLabel').innerHTML = "Total Adv Robots: ";
+        document.getElementById('averageAdvBotsContainer').style.display = "block";
+        document.getElementById('totalAdvBotTransferAmountLabel').innerHTML = "Total Adv Robots Sent: ";
+        document.getElementById('averageAdvBotTransferAmountContainer').style.display = "block";
+        document.getElementById('totalAdvBotAmountReceivedLabel').innerHTML = "Total Adv Robots Received: ";
+        document.getElementById('averageAdvBotAmountReceivedContainer').style.display = "block";
+
         document.getElementById('totalConsumeCostLabel').innerHTML = "Total Consume Cost: ";
     } else {
-        document.getElementById('averageNanitesContainer').style.display = "none";
         document.getElementById('totalNanitesLabel').innerHTML = "Nanites: ";
+        document.getElementById('averageNanitesContainer').style.display = "none";
+        document.getElementById('totalNaniteRateLabel').innerHTML = "Nanites Per Second: ";
+        document.getElementById('averageNaniteRateContainer').style.display = "none";
+        document.getElementById('totalNaniteTransferAmountLabel').innerHTML = "Nanites Sent: ";
+        document.getElementById('averageNaniteTransferAmountContainer').style.display = "none";
+        document.getElementById('totalNaniteAmountReceivedLabel').innerHTML = "Nanites Received: ";
+        document.getElementById('averageNaniteAmountReceivedContainer').style.display = "none";
+        document.getElementById('totalAdvBotsLabel').innerHTML = "Adv Robots: ";
+        document.getElementById('averageAdvBotsContainer').style.display = "none";
+        document.getElementById('totalAdvBotRateLabel').innerHTML = "Adv Robots per Second: ";
+        document.getElementById('averageAdvBotRateContainer').style.display = "none";
+        document.getElementById('totalAdvBotTransferAmountLabel').innerHTML = "Adv Robots Sent: ";
+        document.getElementById('averageAdvBotTransferAmountContainer').style.display = "none";
+        document.getElementById('totalAdvBotAmountReceivedLabel').innerHTML = "Adv Robots Received: ";
+        document.getElementById('averageAdvBotAmountReceivedContainer').style.display = "none";
+
+
         document.getElementById('totalConsumeCostLabel').innerHTML = "Consume Cost: ";
     }
 }
 
 function showNanites() {
     var totalNanites = 0;
+    var totalNaniteRate = 0;
+    var totalNaniteTransferAmount = 0;
+    var totalNaniteAmountReceived = 0;
+    var totalAdvBots = 0;
+    var totalAdvBotRate = 0;
+    var totalAdvBotTransferAmount = 0;
+    var totalAdvBotAmountReceived = 0;
+
     var totalConsumeCost = 0;
+    var transferRate = 0.1;
     for(var i = 0; i < selected.length; i++) {
         totalNanites += selected[i].nanites;
+        totalNaniteRate += selected[i].naniteRate;
+        totalNaniteTransferAmount += selected[i].naniteTransferAmount;
+        totalNaniteAmountReceived += selected[i].naniteAmountReceived;
+        totalAdvBots += selected[i].advBots;
+        totalAdvBotRate += selected[i].advBotRate;
+        totalAdvBotTransferAmount += selected[i].advBotRate;
+        totalAdvBotAmountReceived += selected[i].advBotAmountReceived;
+
         totalConsumeCost += selected[i].consumeCost;
     }
     document.getElementById('totalNanites').innerHTML = intToString(totalNanites);
     document.getElementById('averageNanites').innerHTML = intToString(totalNanites / selected.length);
-    showOrHideConsumeCost(totalConsumeCost);
+    document.getElementById('totalNaniteRate').innerHTML = intToString(totalNaniteRate);
+    document.getElementById('averageNaniteRate').innerHTML = intToString(totalNaniteRate / selected.length);
+    document.getElementById('totalNaniteTransferAmount').innerHTML = intToString(totalNaniteTransferAmount);
+    document.getElementById('averageNaniteTransferAmount').innerHTML = intToString(totalNaniteTransferAmount / selected.length);
+    document.getElementById('totalNaniteAmountReceived').innerHTML = intToString(totalNaniteAmountReceived);
+    document.getElementById('averageNaniteAmountReceived').innerHTML = intToString(totalNaniteAmountReceived / selected.length);
+    document.getElementById('totalAdvBots').innerHTML = intToString(totalAdvBots);
+    document.getElementById('averageAdvBots').innerHTML = intToString(totalAdvBots / selected.length);
+    document.getElementById('totalAdvBotRate').innerHTML = intToString(totalAdvBotRate);
+    document.getElementById('averageAdvBotRate').innerHTML = intToString(totalAdvBotRate / selected.length);
+    document.getElementById('totalAdvBotTransferAmount').innerHTML = intToString(totalAdvBotTransferAmount);
+    document.getElementById('averageAdvBotTransferAmount').innerHTML = intToString(totalAdvBotTransferAmount / selected.length);
+    document.getElementById('totalAdvBotAmountReceived').innerHTML = intToString(totalAdvBotAmountReceived);
+    document.getElementById('averageAdvBotAmountReceived').innerHTML = intToString(totalAdvBotAmountReceived / selected.length);
+
+    document.getElementById('transferRate').innerHTML = intToString(transferRate);
     document.getElementById('totalConsumeCost').innerHTML = intToString(totalConsumeCost);
+    document.getElementById('totalConsumeCostContainer').style.display = totalConsumeCost !== 0 ? "block" : "none";
 }
 
 function showOrHideBox() {

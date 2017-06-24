@@ -13,6 +13,11 @@
 
 div {
     display:inline-block;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 
 .arrow {
@@ -45,14 +50,15 @@ div {
     border:2px solid black;
     margin-bottom:5px;
     cursor:pointer;
+    position:relative;
 }
 .buyButton:hover {
-    background-color:#ff4400;
+    background-color:#51afb5;
 }
 
 #buttonContainer {
-    left:50%;
-    width:45%;
+    left:40%;
+    width:56%;
     position:absolute;
     top:100px;
 }
