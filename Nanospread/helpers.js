@@ -4,6 +4,7 @@
 
 //because I hate IE so much
 Math.log2 = Math.log2 || function(x){return Math.log(x)*Math.LOG2E;};
+Math.log10 = Math.log10 || function(x) { return Math.log(x) * Math.LOG10E; };
 
 function round1(num) {
     return Math.floor(num*10)/10
@@ -59,8 +60,8 @@ function toSuffix(value) {
     value=Math.round(value);
     var suffixes = ["", "K", "M", "B","T","Qu","Qi","Sx","Sp","O","N","Dc","Ud","Dd","Td","qd","Qd","sd","Sd","Od","Nd","V"];
     var suffixNum = Math.floor(((""+value).length-1)/3);
-    var shortValue = parseFloat((suffixNum != 0 ? (value / Math.pow(1000,suffixNum)) : value).toPrecision(3));
-    if (shortValue % 1 != 0)  shortNum = shortValue.toFixed(1);
+    var shortValue = parseFloat((suffixNum !== 0 ? (value / Math.pow(1000,suffixNum)) : value).toPrecision(3));
+    if (shortValue % 1 !== 0)  shortValue = shortValue.toPrecision(2);
     return shortValue+suffixes[suffixNum];
 }
 

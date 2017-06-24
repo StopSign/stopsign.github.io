@@ -4,14 +4,54 @@
     <meta charset="UTF-8">
     <title>Nanospread</title>
     <link rel="stylesheet" href="stylesheet.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <script src="helpers.js"></script>
     <script src="view.js"></script>
     <script src="Square.js"></script>
     <script src="Building.js"></script>
+    <script src="levelData.js"></script>
     <script src="game.js"></script>
 </head>
-<body>
-<canvas id="drawArea" width="800" height="1000"></canvas>
+<body style="font-family:Arial, Helvetica, serif;color:black;font-size:14px;">
+<!--<canvas id="drawArea" width="800" height="1000"></canvas>-->
+<div id="naniteGrid" style="position:relative;width:800px;height:1000px;background-color:grey;"></div>
+<div id="infoBox" style="position:fixed;bottom:0;height:200px;width:400px;background-color:blue;z-index:999;display:none;">
+    <div id="totalNanitesContainer" class="resourceBlock">
+        <div id="totalNanitesLabel" class="resourceLabel"></div>
+        <div id="totalNanites" style="color:black;"></div>
+    </div>
+    <div id="averageNanitesContainer" class="resourceBlock">
+        <div class="resourceLabel">Average Nanites: </div>
+        <div id="averageNanites" style="color:black;"></div>
+    </div>
+    <div id="totalConsumeCostContainer" class="resourceBlock">
+        <div id="totalConsumeCostLabel" class="resourceLabel"></div>
+        <div id="totalConsumeCost" style="color:black;"></div>
+    </div>
+    <!--<div id="totalConsumeCostContainer" class="resourceBlock">-->
+        <!--<div id="totalConsumeCostLabel" class="resourceLabel"></div>-->
+        <!--<div id="totalConsumeCost" style="color:black;"></div>-->
+    <!--</div>-->
+    <i id="closeButton" class="fa fa-close" onclick="deselectAll()"></i>
+    <i id="leftArrow" class="fa fa-arrow-circle-left arrow" onclick="clickedDirectionArrow('West')"></i>
+    <i id="rightArrow" class="fa fa-arrow-circle-right arrow" onclick="clickedDirectionArrow('East')"></i>
+    <i id="upArrow" class="fa fa-arrow-circle-up arrow" onclick="clickedDirectionArrow('North')"></i>
+    <i id="downArrow" class="fa fa-arrow-circle-down arrow" onclick="clickedDirectionArrow('South')"></i>
+
+    <div id="buttonContainer">
+        <div id="buyNanitesButton" class="buyButton" onclick="buyNanitesButtonPressed()">
+            <div id="naniteAmount"></div>
+            <div id="naniteCost"></div>
+            <div id="naniteBenefit"></div>
+        </div>
+        <div id="buyAdvBotsButton" class="buyButton" onclick="buyAdvBotsButtonPressed()">
+            <div id="advBotAmount"></div>
+            <div id="advBotCost"></div>
+            <div id="advBotBenefit"></div>
+        </div>
+    </div>
+
+</div>
 </body>
 
 </html>

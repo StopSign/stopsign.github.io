@@ -2,97 +2,167 @@ function View() {
     this.offsetx = 0;
     this.offsety = 0;
     this.grid = [];
-    for(var col = 0; col < theGrid.length; col++) {
-        for (var row = 0; row < theGrid[col].length; row++) {
 
+    for(var col = 0; col < theGrid.length; col++) {
+        this.grid[col] = [];
+        for (var row = 0; row < theGrid[col].length; row++) {
+            if(!theGrid[col][row]) {
+                continue;
+            }
             var elem = document.createElement("div");
-            var rowSize = 150;
-            var rectStartX = col*rowSize*.8 + this.offsetx + 50;
+            var rowSize = 25;
+            var rectStartX = col*rowSize + this.offsetx + 50;
             var rectStartY = row*rowSize + this.offsety + 150;
-            elem.innerHTML = "<div class='naniteSquare' style='left:"+rectStartX+";top:"+rectStartY+";'></div>";
-            document.getElementById('fightTime').appendChild(elem);
-            this.grid[row][col] = elem;
+            elem.innerHTML = "<div class='naniteSquare' style='left:"+rectStartX+"px;top:"+rectStartY+"px;' onclick='clickedSquare("+col+","+row+")'></div>";
+            document.getElementById('naniteGrid').appendChild(elem);
+            this.grid[col][row] = elem.firstChild;
         }
     }
 
-    var canvas = document.getElementById('drawArea');
-    var ctx = canvas.getContext("2d");
-    ctx.font="12px Arial, Helvetica, serif";
+    this.drawButtons = function() {
+        buttonSetup('nanite', 'Nanites');
+        buttonSetup('advBot', 'AdvBots');
+    };
 
-    canvas.addEventListener('mousemove', function(evt) {
-        var mousePos = getMousePos(canvas, evt);
-        highlightHovered(canvas, mousePos);
-    }, false);
-
-    function highlightHovered(canvas, message) {
-
-    }
+    this.selectedChange = function() {
+        for(var i = 0; i < selected.length; i++) {
+            changeBorder(this.grid[selected[i].col][selected[i].row], selected[i]);
+        }
+        this.updateInfoBox();
+    };
 
     this.update = function() {
-
-        ctx.fillStyle = "#918f86";
-        ctx.fillRect(0,0,1000,800);
-
         for(var col = 0; col < theGrid.length; col++) {
-            for(var row = 0; row < theGrid[col].length; row++) {
+            for (var row = 0; row < theGrid[col].length; row++) {
                 var square = theGrid[col][row];
                 if(!square) {
                     continue;
                 }
-                var rowSize = 150;
-                var rectStartX = col*rowSize*.8 + this.offsetx + 50;
-                var rectStartY = row*rowSize + this.offsety + 150;
-                drawBorders(ctx, square, rowSize, rectStartX, rectStartY);
-                if(!square.isActive()) {
-                    writeConsumeCost(ctx, square, rowSize, rectStartX, rectStartY);
-                } else {
-                    writeNanites(ctx, square, rowSize, rectStartX, rectStartY);
-                }
-                createNaniteBuyButton(ctx, square, rowSize, rectStartX, rectStartY);
+                changeBorder(this.grid[col][row], square);
+                changeBackground(this.grid[col][row], square);
             }
         }
+        this.updateInfoBox();
+    };
 
+    this.updateInfoBox = function() {
+        if(showOrHideBox()) {
+            return;
+        }
+        showNanites();
+        selectedSingleOrMultiple();
+        drawDirectionArrow();
+        this.drawButtons();
+    };
+}
 
+function buttonSetup(type, typeUpper) { //lol javascript
+    var buyAvailableOr = selected[0]["canBuy"+typeUpper]();
+    var buyAvailableAnd = selected[0]["canBuy"+typeUpper]();
+    var amount = selected[0][type+'Amount'];
+    for(var i = 0; i < selected.length; i++) {
+        if(selected[i][type+'Amount'] !== amount) {
+            amount = -1;
+        }
+        document.getElementById(type+'Amount').innerHTML = "#: "+selected[i][type+'Amount'];
+        document.getElementById(type+'Cost').innerHTML = "Cost is: " + intToStringRound(selected[i][type+'Cost']);
+        document.getElementById(type+'Benefit').innerHTML = "You will get +1 per buy";
+        buyAvailableOr = buyAvailableOr || selected[i]["canBuy"+typeUpper]();
+        buyAvailableAnd = buyAvailableAnd && selected[i]["canBuy"+typeUpper]();
+    }
+    document.getElementById(type+'Amount').innerHTML = "#: " + (amount === -1 ? " " : amount) + ", ";
+    document.getElementById('buy'+typeUpper+'Button').style.borderColor = buyAvailableAnd ? "green" : buyAvailableOr ? "yellow" : "red";
+}
+
+function drawDirectionArrow() {
+    var arrows = [document.getElementById('leftArrow'), document.getElementById('rightArrow'), document.getElementById('upArrow'), document.getElementById('downArrow')];
+    var dir = selected[0].transferDirection;
+    clearArrows(arrows);
+
+    for(var i = 0; i < selected.length; i++) {
+        if(selected[i].transferDirection !== dir) {
+            return; //just clear arrows if they're not all the same
+        }
+    }
+    var arrowToChange = arrows[0];
+    if(dir === "East") {
+        arrowToChange = arrows[1];
+    } else if(dir === "North") {
+        arrowToChange = arrows[2];
+    } else if(dir === "South") {
+        arrowToChange = arrows[3];
+    }
+    arrowToChange.style.backgroundColor = "#ff9600";
+}
+
+function clearArrows(arrows) {
+    for(var x = 0; x < arrows.length; x++) {
+        arrows[x].style.backgroundColor = "transparent";
     }
 }
 
-function createNaniteBuyButton(ctx, square, rowSize, rectStartX, rectStartY) {
-
-}
-
-function writeConsumeCost(ctx, square, rowSize, rectStartX, rectStartY) {
-    ctx.fillStyle = "#fafff8";
-    ctx.fillText(intToString(square.consumeCost, 3),rectStartX+rowSize/3,rectStartY+rowSize/2);
-}
-
-function writeNanites(ctx, square, rowSize, rectStartX, rectStartY) {
-    ctx.fillStyle = "#0b2928";
-    ctx.fillText(intToString(square.nanites, 3),rectStartX+rowSize/3,rectStartY+rowSize/2);
-
-}
-
-function drawBorders(ctx, square, rowSize, rectStartX, rectStartY) {
+function changeBackground(gridSquare, square) {
     if(square.isActive()) {
-        ctx.fillStyle = "rgba(61, 255, 255, .8)";
+        gridSquare.style.background = colorShiftMath(360, Math.log10(square.nanites));
     } else {
-        ctx.fillStyle = "rgba(6, 17, 17, .5)";
+        gridSquare.style.background = "grey";
     }
-    ctx.fillRect(rectStartX, rectStartY, 3, rowSize-3); //left border
-    ctx.fillRect(rectStartX+rowSize*.8-6, rectStartY, 3, rowSize-3); //right border
-    ctx.fillRect(rectStartX, rectStartY, rowSize*.8-3, 3); //north border
-    ctx.fillRect(rectStartX, rectStartY+rowSize-6, rowSize*.8-3, 3); //south border
-    if(!square.isActive()) {
-        return;
+}
+
+function colorShiftMath(initialColor, multi, leftOverMulti) {
+    //Hue is 0-360, 0 is red, 120 is green, 240 is blue. Sat is 0-100, 0=greyscale. Light is 0-100, 25=half black
+    var hue = initialColor - (multi-1)*30; //- (leftOverMulti)*9;
+    var sat = 10+Math.pow(multi, .85) * 3; //+ (leftOverMulti)*3
+    sat = sat > 100 ? 100 : sat; //multi^.9 * 6 reaches at 23
+    var light = 50;
+    return "hsl("+hue+", "+sat+"%, "+light+"%)";
+}
+
+function changeBorder(gridSquare, square) {
+    if(square.isSelected) {
+        gridSquare.style.border = "2px solid #ff9600";
+    } else {
+        gridSquare.style.border = square.isActive() ? "2px solid black" : "2px solid white";
     }
-    ctx.fillStyle = "#ff7e03";
-    var direction = square.transferDirection;
-    if(direction === "South") {
-        ctx.fillRect(rectStartX, rectStartY+rowSize-6, rowSize*.8-3, 3); //south border
-    } else if(direction === "North") {
-        ctx.fillRect(rectStartX, rectStartY, rowSize*.8-3, 3); //north border
-    } else if(direction === "East") {
-        ctx.fillRect(rectStartX+rowSize*.8-6, rectStartY, 3, rowSize-3); //right border
-    } else if(direction === "West") {
-        ctx.fillRect(rectStartX, rectStartY, 3, rowSize - 3); //left border
+}
+
+function showOrHideConsumeCost(totalConsumeCost) {
+    if(totalConsumeCost !== 0) {
+        document.getElementById('totalConsumeCostContainer').style.display = "block";
+    } else {
+        document.getElementById('totalConsumeCostContainer').style.display = "none";
     }
+}
+
+function selectedSingleOrMultiple() {
+    if(selected.length > 1) { //selected multiple
+        document.getElementById('averageNanitesContainer').style.display = "block";
+        document.getElementById('totalNanitesLabel').innerHTML = "Total Nanites: ";
+        document.getElementById('totalConsumeCostLabel').innerHTML = "Total Consume Cost: ";
+    } else {
+        document.getElementById('averageNanitesContainer').style.display = "none";
+        document.getElementById('totalNanitesLabel').innerHTML = "Nanites: ";
+        document.getElementById('totalConsumeCostLabel').innerHTML = "Consume Cost: ";
+    }
+}
+
+function showNanites() {
+    var totalNanites = 0;
+    var totalConsumeCost = 0;
+    for(var i = 0; i < selected.length; i++) {
+        totalNanites += selected[i].nanites;
+        totalConsumeCost += selected[i].consumeCost;
+    }
+    document.getElementById('totalNanites').innerHTML = intToString(totalNanites);
+    document.getElementById('averageNanites').innerHTML = intToString(totalNanites / selected.length);
+    showOrHideConsumeCost(totalConsumeCost);
+    document.getElementById('totalConsumeCost').innerHTML = intToString(totalConsumeCost);
+}
+
+function showOrHideBox() {
+    if(selected.length === 0) {
+        document.getElementById('infoBox').style.display = "none";
+        return true;
+    }
+    document.getElementById('infoBox').style.display = "block";
 }

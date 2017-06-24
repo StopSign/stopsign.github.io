@@ -37,7 +37,7 @@ function Graphics() {
                     "ng-class="+'"'+"{ 'pbuyButtonReady' : "+pbar+".speedBuyable , " +
                     "'selectedButton' : "+pbar+".isSelected[0] }"+'"'+
                     ">" +
-                    "x1.4 Speed: {{intToStringRound("+pbar+".calcSpeedCost())}}" +
+                    "x1.3 Speed: {{intToStringRound("+pbar+".calcSpeedCost())}}" +
                 "</div>" +
                 "<div class='pbuyButton buyGain' ng-click='"+pbar+".buyGain()' " +
                     "ng-mouseover=\""+pbar+".mouseOverUpgrade(0)\" " +

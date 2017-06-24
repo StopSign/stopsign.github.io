@@ -95,7 +95,7 @@ function ProgressBar(scope, initialProgressReq, initialProgress, gainAmount, row
         if(this.resources >= speedCost) {
             this.resources -= speedCost;
             this.handleResourceChange();
-            this.speedMultFromBuy = Math.pow(1.4, ++this.speedBought);
+            this.speedMultFromBuy = Math.pow(1.3, ++this.speedBought);
             this.calcSpeedMult();
             this.calcSpeedCost();
         }
@@ -214,7 +214,7 @@ function ProgressBar(scope, initialProgressReq, initialProgress, gainAmount, row
         if(num === 3) {
             this.buyGainMult(4);
         }
-        if(num === 3) {
+        if(num === 4) {
             this.buyGainMult(7);
         }
     }

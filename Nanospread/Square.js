@@ -1,6 +1,6 @@
-function Square(x,y,distanceFromCenter) {
-    this.x = x;
-    this.y = y;
+function Square(col,row,distanceFromCenter) {
+    this.col = col;
+    this.row = row;
     this.targetRow = 0;
     this.targetCol = 0;
     this.isHovered = 0;
@@ -19,6 +19,7 @@ function Square(x,y,distanceFromCenter) {
     this.advBotAmount = 0;
     this.advBotTransfRate = 0;
     this.consumeCost = Math.pow(distanceFromCenter, 3);
+
     this.canBuyNanites = function() {
         return this.nanites >= this.naniteCost;
     };
@@ -26,7 +27,7 @@ function Square(x,y,distanceFromCenter) {
         this.nanites -= this.naniteCost;
         this.naniteAmount++;
         this.naniteCost = Math.ceil(Math.pow(1.2, this.naniteAmount)*10);
-        this.naniteRate++;
+        this.naniteRate = this.naniteAmount;
     };
     this.canBuyAdvBots = function() {
         return this.nanites >= this.advBotCost;
@@ -76,34 +77,34 @@ function Square(x,y,distanceFromCenter) {
         if(newDirection === this.transferDirection) {
             return;
         }
-        var tempCol = this.x;
-        var tempRow = this.y;
+        var tempCol = this.col;
+        var tempRow = this.row;
         if(newDirection === "South" ) {
-            tempRow = this.y + 1;
+            tempRow = this.row + 1;
         } else if(newDirection === "East") {
-            tempCol = this.x + 1;
+            tempCol = this.col + 1;
         } else if(newDirection === "North" ) {
-            tempRow = this.y - 1;
+            tempRow = this.row - 1;
         } else if(newDirection === "West") {
-            tempCol = this.x - 1;
+            tempCol = this.col - 1;
         }
         this.targetRow = tempRow;
         this.targetCol = tempCol;
         this.transferDirection = newDirection;
     };
     this.chooseStartingDirection = function() {
-        this.targetRow = this.y;
-        this.targetCol = this.x;
+        this.targetRow = this.row;
+        this.targetCol = this.col;
         this.changeTargetDirection("South");
 
-        var target = theGrid[this.targetRow] ? theGrid[this.targetRow][this.targetCol] : false;
+        var target = theGrid[this.targetCol] ? theGrid[this.targetCol][this.targetRow] : false;
         if(!target) {
             this.changeTargetDirection("East");
-            target = theGrid[this.targetRow] ? theGrid[this.targetRow][this.targetCol] : false;
+            target = theGrid[this.targetCol] ? theGrid[this.targetCol][this.targetRow] : false;
         }
         if(!target) {
             this.changeTargetDirection("North");
-            target = theGrid[this.targetRow] ? theGrid[this.targetRow][this.targetCol] : false;
+            target = theGrid[this.targetCol] ? theGrid[this.targetCol][this.targetRow] : false;
         }
         if(!target) {
             this.changeTargetDirection("West");

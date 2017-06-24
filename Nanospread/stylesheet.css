@@ -5,3 +5,61 @@
     position:absolute;
     background-color:white;
 }
+
+.resourceBlock {
+    position:relative;
+    display:block;
+}
+
+div {
+    display:inline-block;
+}
+
+.arrow {
+    position:absolute;
+    font-size:24px !important;
+    cursor:pointer;
+}
+.arrow:hover {
+    background-color:#ff4400 !important;
+}
+#leftArrow {
+    right:63px;
+    top:50px;
+}
+#rightArrow {
+    right:23px;
+    top:50px;
+}
+#upArrow {
+    right:43px;
+    top:30px;
+}
+#downArrow {
+    right:43px;
+    top:70px;
+}
+
+.buyButton {
+    width:100%;
+    border:2px solid black;
+    margin-bottom:5px;
+    cursor:pointer;
+}
+.buyButton:hover {
+    background-color:#ff4400;
+}
+
+#buttonContainer {
+    left:50%;
+    width:45%;
+    position:absolute;
+    top:100px;
+}
+#closeButton {
+    position:absolute;
+    right:5px;
+    top:5px;
+    font-size:24px;
+    cursor:pointer;
+}
