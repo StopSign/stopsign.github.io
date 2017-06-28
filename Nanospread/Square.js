@@ -6,7 +6,7 @@ function Square(col,row,initialConsumeCost) {
     this.isHovered = 0;
     this.isSelected = 0;
 
-    this.transferRate = .1;
+    this.transferRate = 1;
 
     this.nanites = 0;
     this.naniteRate = 0;
@@ -25,7 +25,8 @@ function Square(col,row,initialConsumeCost) {
     this.advBotTransferAmount = 0;
     this.advBotAmountReceived = 0;
     this.consumeCost = initialConsumeCost;
-    this.specialLevels = [10, 25, 50, 75, 100, 150, 200, 300, 400, 500];
+    this.specialLevels = [0, 10, 25, 50, 75, 100, 150, 200, 300, 400, 500, 600, 700, 800, 900, 1000];
+
 
     this.canBuyNanites = function() {
         return this.nanites >= this.naniteCost;
@@ -33,10 +34,12 @@ function Square(col,row,initialConsumeCost) {
     this.buyNanites = function() {
         this.nanites -= this.naniteCost;
         this.naniteAmount++;
-        if (this.naniteAmount >= this.specialLevels[this.curSpecialPosNanites]) {
-            this.naniteAmountBonus = Math.pow(2, ++this.curSpecialPosNanites);
+        if (this.naniteAmount >= this.specialLevels[this.curSpecialPosNanites+1]) {
+            this.naniteAmountBonus = Math.pow(2, (++this.curSpecialPosNanites));
         }
-        this.naniteCost = Math.ceil(Math.pow(1.2, this.naniteAmount)*10);
+        var naniteCostExtra = Math.pow(3.333333, (this.curSpecialPosNanites));
+        var amountShift = this.curSpecialPosNanites === 0 ? 0 : Math.floor(Math.pow((this.curSpecialPosNanites+1), 2));
+        this.naniteCost = (this.naniteAmount - this.specialLevels[this.curSpecialPosNanites] + amountShift) * 10 * naniteCostExtra; //Math.ceil(Math.pow(1.2, this.naniteAmount)*10) * naniteCostExtra;
         this.naniteRate = this.naniteAmount * this.naniteAmountBonus;
     };
     this.canBuyAdvBots = function() {

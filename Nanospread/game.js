@@ -55,16 +55,27 @@ function tick() {
             var square = theGrid[column][row];
             if(square && square.isActive()) {
                 var target = theGrid[square.targetCol][square.targetRow];
+                target.naniteAmountReceived = 0;
+                target.advBotAmountReceived = 0;
+            }
+        }
+    }
+
+    for (column = 0; column < theGrid.length; column++) {
+        for (row = 0; row < theGrid.length; row++) {
+            square = theGrid[column][row];
+            if(square && square.isActive()) {
+                target = theGrid[square.targetCol][square.targetRow];
                 if(target.isActive()) {
                     target.gainAdvBots(square.sendPieceOfAdvBots()); //transfer .1% advBots
                 }
                 var amountTransferred = square.sendPieceOfNanites();
                 target.gainNanites(amountTransferred); //transfer .1% nanites
-                target.naniteAmountReceived = amountTransferred;
+                target.naniteAmountReceived += amountTransferred;
 
                 amountTransferred = square.sendPieceOfAdvBots();
                 target.gainAdvBots(amountTransferred); //transfer .1% adv bots
-                target.advBotAmountReceived = amountTransferred;
+                target.advBotAmountReceived += amountTransferred;
 
                 square.gainNanites(square.naniteRate);
                 square.gainAdvBots(square.advBotRate);
@@ -118,9 +129,21 @@ function clickedDirectionArrow(direction) {
 }
 
 function buyNanitesButtonPressed() {
-    for(var i = 0; i < selected.length; i++) {
-        if(selected[i].canBuyNanites()) {
-            selected[i].buyNanites();
+    var lowestAmountSquares = [selected[0]];
+    for(var i = 1; i < selected.length; i++) {
+        if(!selected[i].isActive()) {
+            continue;
+        }
+        if(selected[i].naniteAmount < lowestAmountSquares[0].naniteAmount) {
+            lowestAmountSquares = []; //clear list
+            lowestAmountSquares.push(selected[i]);
+        } else if(selected[i].naniteAmount === lowestAmountSquares[0].naniteAmount) {
+            lowestAmountSquares.push(selected[i]);
+        }
+    }
+    for(i = 0; i < lowestAmountSquares.length; i++) {
+        if(lowestAmountSquares[i].canBuyNanites()) {
+            lowestAmountSquares[i].buyNanites();
         }
     }
     theView.updateInfoBox();
