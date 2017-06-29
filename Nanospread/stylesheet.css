@@ -70,3 +70,24 @@ div {
     font-size:24px;
     cursor:pointer;
 }
+#settingsButton {
+    position:absolute;
+    right:30px;
+    top:5px;
+    font-size:24px;
+    cursor:pointer;
+}
+#helpButton {
+    position:absolute;
+    right:55px;
+    top:5px;
+    font-size:24px;
+    cursor:pointer;
+}
+.backButton {
+    position:absolute;
+    right:30px;
+    top:5px;
+    font-size:24px;
+    cursor:pointer;
+}

@@ -10,10 +10,10 @@ function View() {
                 continue;
             }
             var elem = document.createElement("div");
-            var rowSize = 40;
-            var rectStartX = col*rowSize + this.offsetx + 50;
-            var rectStartY = row*rowSize + this.offsety + 150;
-            elem.innerHTML = "<div class='naniteSquare' style='left:"+rectStartX+"px;top:"+rectStartY+"px;' onclick='clickedSquare("+col+","+row+")'></div>";
+            var rowSize = 700 / 13;
+            var rectStartX = col*rowSize + this.offsetx + 30;
+            var rectStartY = row*rowSize + this.offsety + 30;
+            elem.innerHTML = "<div class='naniteSquare' style='left:"+rectStartX+"px;top:"+rectStartY+"px;width:"+(rowSize-10)+"px;height:"+(rowSize-10)+"px;' onclick='clickedSquare("+col+","+row+")'></div>";
             document.getElementById('naniteGrid').appendChild(elem);
             this.grid[col][row] = elem.firstChild;
         }
@@ -25,6 +25,7 @@ function View() {
     };
 
     this.selectedChange = function() {
+        showOrHideBox();
         for(var i = 0; i < selected.length; i++) {
             changeBorder(this.grid[selected[i].col][selected[i].row], selected[i]);
         }
@@ -46,7 +47,7 @@ function View() {
     };
 
     this.updateInfoBox = function() {
-        if(showOrHideBox()) {
+        if(selected.length === 0) {
             return;
         }
         showNanites();
@@ -108,8 +109,11 @@ function clearArrows(arrows) {
 function changeBackground(gridSquare, square) {
     if(square.isActive()) {
         gridSquare.style.background = colorShiftMath(360, Math.log10(square.nanites));
+        gridSquare.style.opacity = 1;
     } else {
-        gridSquare.style.background = "grey";
+        var temp = Math.log10(square.consumeCost)/14+.2;
+        gridSquare.style.background = "hsl(120, 88%, 13%)";
+        gridSquare.style.opacity = temp > 1 ? 1 : temp;
     }
 }
 
@@ -224,5 +228,6 @@ function showOrHideBox() {
         document.getElementById('infoBox').style.display = "none";
         return true;
     }
+    document.getElementById('settingsBox').style.display = "none";
     document.getElementById('infoBox').style.display = "block";
 }

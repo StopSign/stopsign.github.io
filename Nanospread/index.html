@@ -11,10 +11,29 @@
     <script src="Building.js"></script>
     <script src="levelData.js"></script>
     <script src="game.js"></script>
+    <script src="hotkeys.js"></script>
+    <script src="settings.js"></script>
+    <script src="saving.js"></script>
 </head>
 <body style="font-family:Arial, Helvetica, serif;color:black;font-size:14px;">
 <!--<canvas id="drawArea" width="800" height="1000"></canvas>-->
 <div id="naniteGrid" style="position:relative;width:800px;height:1000px;background-color:grey;"></div>
+
+
+<div id="helpBox" style="position:fixed;bottom:0;height:200px;width:800px;background-color:#8194bd;z-index:999;display:none;">
+    Press the WASD / arrow keys to change direction<br>
+    Press enter / space to buy the first upgrade of the selected<br>
+    Cost goes up every bonus level. Bonus levels are at 10, then every 25, increasing later.<br>
+    Every second, a Square generates its own nanites, and sends nanites to another Square.<br>
+    It sends Transfer Rate * Nanites per second to the Square in the direction of its arrow.<br>
+    Capture all the squares to advance to the next level
+    <i id="backButton1" class="backButton fa fa-reply" onclick="closeHelpBox()"></i>
+</div>
+<div id="settingsBox" style="position:fixed;bottom:0;height:200px;width:800px;background-color:#8194bd;z-index:999;display:none;">
+    <input type="radio" name="selectOneOrMultiple" onclick="selectOneOrMultipleSetting(0)">Select Multiple<br>
+    <input type="radio" name="selectOneOrMultiple" onclick="selectOneOrMultipleSetting(1)">Select One<br>
+    <i id="backButton2" class="backButton fa fa-reply" onclick="closeSettingsBox()"></i>
+</div>
 <div id="infoBox" style="position:fixed;bottom:0;height:200px;width:800px;background-color:#8194bd;z-index:999;display:none;">
     <div id="totalNanitesContainer" class="resourceBlock">
         <div id="totalNanitesLabel" class="resourceLabel"></div>
@@ -99,11 +118,13 @@
         <div id="totalConsumeCostLabel" class="resourceLabel"></div>
         <div id="totalConsumeCost" style="color:black;"></div>
     </div>
+    <i id="helpButton" class="fa fa-question-circle-o" onclick="openHelpBox()"></i>
+    <i id="settingsButton" class="fa fa-sliders" onclick="openSettingsBox()"></i>
     <i id="closeButton" class="fa fa-close" onclick="deselectAll()"></i>
-    <i id="leftArrow" class="fa fa-arrow-circle-left arrow" onclick="clickedDirectionArrow('West')"></i>
-    <i id="rightArrow" class="fa fa-arrow-circle-right arrow" onclick="clickedDirectionArrow('East')"></i>
-    <i id="upArrow" class="fa fa-arrow-circle-up arrow" onclick="clickedDirectionArrow('North')"></i>
-    <i id="downArrow" class="fa fa-arrow-circle-down arrow" onclick="clickedDirectionArrow('South')"></i>
+    <i id="leftArrow" class="fa fa-arrow-circle-left arrow" onclick="changeDirectionOfSelected('West')"></i>
+    <i id="rightArrow" class="fa fa-arrow-circle-right arrow" onclick="changeDirectionOfSelected('East')"></i>
+    <i id="upArrow" class="fa fa-arrow-circle-up arrow" onclick="changeDirectionOfSelected('North')"></i>
+    <i id="downArrow" class="fa fa-arrow-circle-down arrow" onclick="changeDirectionOfSelected('South')"></i>
 
     <div id="buttonContainer">
         <div id="buyNanitesButton" class="buyButton" onclick="buyNanitesButtonPressed()">

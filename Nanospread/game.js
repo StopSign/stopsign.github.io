@@ -11,15 +11,15 @@ var size = 3;
 var theGrid = [];
 function createGrid() {
     var startingCoords = {x:0,y:0};
-    for (var column = 0; column < levelData.length; column++) {
+    for (var column = 0; column < levelData[0].length; column++) {
         theGrid[column] = [];
-        for (var row = 0; row < levelData[column].length; row++) {
+        for (var row = 0; row < levelData.length; row++) {
             if(!levelData[row][column]) {
                 continue;
             }
             var squareCoords = {x:column,y:row};
             var distanceFromCenter = Math.sqrt(Math.pow((squareCoords.x-startingCoords.x),2)+Math.pow((squareCoords.y-startingCoords.y),2));
-            var initialConsumeCost = Math.pow(distanceFromCenter, 2) * Math.pow(levelData[row][column], 2);
+            var initialConsumeCost = Math.pow(distanceFromCenter, 2) * Math.pow(levelData[row][column], 2)*10;
             theGrid[column][row] =  new Square(squareCoords.x, squareCoords.y, initialConsumeCost);
         }
     }
@@ -101,7 +101,14 @@ function clickedSquare(col, row) {
     square.isSelected = !square.isSelected;
     var pos = selected.indexOf(square);
     if(pos === -1) {
-        selected.push(square);
+        if(settings.selectOneOrMultiple && selected.length >= 1) {
+            setSelectedFalse();
+            selected = [];
+            selected.push(square);
+        } else { //multiple
+            selected.push(square);
+        }
+        theView.updateInfoBox();
         theView.selectedChange();
         return;
     }
@@ -110,15 +117,25 @@ function clickedSquare(col, row) {
     theView.updateInfoBox();
 }
 function deselectAll() {
+    if(selected.length === 0) {
+        return;
+    }
+    setSelectedFalse();
+    selected = [];
+    theView.updateInfoBox();
+    showOrHideBox();
+}
+function setSelectedFalse() {
     for(var i = 0; i < selected.length; i++) {
         selected[i].isSelected = 0;
     }
     theView.selectedChange();
-    selected = [];
-    theView.updateInfoBox();
 }
 
-function clickedDirectionArrow(direction) {
+function changeDirectionOfSelected(direction) {
+    if(selected.length === 0) {
+        return;
+    }
     for(var i = 0; i < selected.length; i++) {
         selected[i].changeTargetDirection(direction);
         if(!selected[i].getTarget()) {
@@ -129,6 +146,9 @@ function clickedDirectionArrow(direction) {
 }
 
 function buyNanitesButtonPressed() {
+    if(selected.length === 0) {
+        return;
+    }
     var lowestAmountSquares = [selected[0]];
     for(var i = 1; i < selected.length; i++) {
         if(!selected[i].isActive()) {

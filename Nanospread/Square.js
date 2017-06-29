@@ -25,7 +25,7 @@ function Square(col,row,initialConsumeCost) {
     this.advBotTransferAmount = 0;
     this.advBotAmountReceived = 0;
     this.consumeCost = initialConsumeCost;
-    this.specialLevels = [0, 10, 25, 50, 75, 100, 150, 200, 300, 400, 500, 600, 700, 800, 900, 1000];
+    this.specialLevels = [0, 10, 25, 50, 75, 100, 125, 150, 175, 200, 225, 250, 275, 300, 350, 400, 450, 500, 550, 600, 650, 700, 775, 850, 925, 1000, 1100, 1200]; // 45, 70, 100, 135, 175, 220, 270, 325, 385, 450, 520, 595, 675, 760, 850, 945, 1045, 1150, 1260];
 
 
     this.canBuyNanites = function() {
@@ -37,8 +37,8 @@ function Square(col,row,initialConsumeCost) {
         if (this.naniteAmount >= this.specialLevels[this.curSpecialPosNanites+1]) {
             this.naniteAmountBonus = Math.pow(2, (++this.curSpecialPosNanites));
         }
-        var naniteCostExtra = Math.pow(3.333333, (this.curSpecialPosNanites));
-        var amountShift = this.curSpecialPosNanites === 0 ? 0 : Math.floor(Math.pow((this.curSpecialPosNanites+1), 2));
+        var naniteCostExtra = Math.pow(5, (this.curSpecialPosNanites));
+        var amountShift = this.curSpecialPosNanites === 0 ? 0 : this.curSpecialPosNanites*3; //Math.floor(Math.pow((this.curSpecialPosNanites+1), 2)
         this.naniteCost = (this.naniteAmount - this.specialLevels[this.curSpecialPosNanites] + amountShift) * 10 * naniteCostExtra; //Math.ceil(Math.pow(1.2, this.naniteAmount)*10) * naniteCostExtra;
         this.naniteRate = this.naniteAmount * this.naniteAmountBonus;
     };
