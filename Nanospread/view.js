@@ -165,30 +165,31 @@ function selectedActiveOrNot() {
         selectedActiveOR = selectedActiveOR || isActive;
     }
     if(selectedActiveAND) {
-        document.getElementById('consumeCostLabel').style.display = "none";
-        document.getElementById('totalConsumeCost').style.display = "none";
-        document.getElementById('averageConsumeCost').style.display ="none";
-        document.getElementById('totalLabel').style.display = "block";
-        document.getElementById('createdLabel').style.display = "block";
-        document.getElementById('sentLabel').style.display = "block";
-        document.getElementById('transferRateLabel').style.display = "block";
+        labelChange(true, false);
     } else if(selectedActiveOR) {
-        document.getElementById('totalLabel').style.display = "block";
-        document.getElementById('createdLabel').style.display = "block";
-        document.getElementById('sentLabel').style.display = "block";
-        document.getElementById('transferRateLabel').style.display = "block";
-        document.getElementById('consumeCostLabel').style.display = "block";
-        document.getElementById('totalConsumeCost').style.display = "block";
-        document.getElementById('averageConsumeCost').style.display ="block";
+        labelChange(true, true);
     } else if(!selectedActiveAND) {
-        document.getElementById('totalLabel').style.display = "none";
-        document.getElementById('createdLabel').style.display = "none";
-        document.getElementById('sentLabel').style.display = "none";
-        document.getElementById('transferRateLabel').style.display = "none";
-        document.getElementById('consumeCostLabel').style.display = "block";
-        document.getElementById('totalConsumeCost').style.display = "block";
-        document.getElementById('averageConsumeCost').style.display ="block";
+        labelChange(false, true);
     }
+}
+
+function labelChange(isShowing, consumeShowing) {
+    document.getElementById('totalLabel').style.display = isShowing ? "block" : "none";
+    document.getElementById('totalTs').style.display = isShowing ? "block" : "none";
+    document.getElementById('averageTs').style.display = isShowing ? "block" : "none";
+    document.getElementById('createdLabel').style.display = isShowing ? "block" : "none";
+    document.getElementById('totalTRate').style.display = isShowing ? "block" : "none";
+    document.getElementById('averageTRate').style.display = isShowing ? "block" : "none";
+    document.getElementById('sentLabel').style.display = isShowing ? "block" : "none";
+    document.getElementById('totalTTransferAmount').style.display = isShowing ? "block" : "none";
+    document.getElementById('averageTTransferAmount').style.display = isShowing ? "block" : "none";
+    document.getElementById('transferRateLabel').style.display = isShowing ? "block" : "none";
+    document.getElementById('totalTransferRate').style.display = isShowing ? "block" : "none";
+    document.getElementById('averageTransferRate').style.display = isShowing ? "block" : "none";
+
+    document.getElementById('consumeCostLabel').style.display = consumeShowing ? "block" : "none";
+    document.getElementById('totalConsumeCost').style.display = consumeShowing ? "block" : "none";
+    document.getElementById('averageConsumeCost').style.display = consumeShowing ? "block" : "none";
 }
 
 function showNanites() {
