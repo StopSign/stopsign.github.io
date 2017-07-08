@@ -17,3 +17,20 @@ function closeHelpBox() {
 function selectOneOrMultipleSetting(num) {
     settings.selectOneOrMultiple = num;
 }
+function selectBuyLowestOrAll(num) {
+    settings.buyLowestOrAll = num;
+}
+
+function buyAmountOption(num) {
+    var highlighted = document.getElementById('buy'+settings.buyPerClick);
+    if(highlighted) {
+        highlighted.style.backgroundColor = "grey";
+    }
+    settings.buyPerClick = num;
+    theView.drawBuyPerClickButtons();
+    document.getElementById('buy'+num).style.backgroundColor = "#ff4400";
+
+
+    theView.updateInfoBox();
+
+}

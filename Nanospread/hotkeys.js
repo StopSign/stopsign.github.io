@@ -5,7 +5,6 @@ document.addEventListener("keydown", function(e) {
     processKeyQueue();
 });
 
-var selectedButton = [-1, 0];
 function processKeyQueue() {
     var key = myKeyQueue[0];
     myKeyQueue.splice(0, 1);

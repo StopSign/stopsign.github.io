@@ -1,14 +1,4 @@
 
-var timeList = [];
-var timer = 0;
-var stop = 0;
-var myKeyQueue = [];
-var multFromFps = 1;
-var msWaitTime = 1000;
-var size = 3;
-
-
-var theGrid = [];
 function createGrid() {
     var startingCoords = {x:0,y:0};
     for (var column = 0; column < levelData[0].length; column++) {
@@ -19,7 +9,7 @@ function createGrid() {
             }
             var squareCoords = {x:column,y:row};
             var distanceFromCenter = Math.sqrt(Math.pow((squareCoords.x-startingCoords.x),2)+Math.pow((squareCoords.y-startingCoords.y),2));
-            var initialConsumeCost = Math.pow(distanceFromCenter, 2) * Math.pow(levelData[row][column], 2)*10;
+            var initialConsumeCost = Math.pow(distanceFromCenter, 2) * Math.pow(levelData[row][column], 2)*30;
             theGrid[column][row] =  new Square(squareCoords.x, squareCoords.y, initialConsumeCost);
         }
     }
@@ -36,36 +26,27 @@ function createGrid() {
     theGrid[startingCoords.x][startingCoords.y].gainNanites(1);
 }
 
-
-
-//level definitions
-var selected = [];
-createGrid();
-var theView;
-
 function tick() {
     if(stop) {
         return;
     }
     timer++;
     handleFPSDifference();
+    clearNanitesReceived();
+    sendNanites();
 
+    if(!theView) {
+        theView = new View();
+    }
+    theView.update();
+}
+
+function sendNanites() {
     for (var column = 0; column < theGrid.length; column++) {
-        for (var row = 0; row < theGrid.length; row++) {
+        for (var row = 0; row < theGrid[column].length; row++) {
             var square = theGrid[column][row];
             if(square && square.isActive()) {
                 var target = theGrid[square.targetCol][square.targetRow];
-                target.naniteAmountReceived = 0;
-                target.advBotAmountReceived = 0;
-            }
-        }
-    }
-
-    for (column = 0; column < theGrid.length; column++) {
-        for (row = 0; row < theGrid.length; row++) {
-            square = theGrid[column][row];
-            if(square && square.isActive()) {
-                target = theGrid[square.targetCol][square.targetRow];
                 if(target.isActive()) {
                     target.gainAdvBots(square.sendPieceOfAdvBots()); //transfer .1% advBots
                 }
@@ -82,18 +63,19 @@ function tick() {
             }
         }
     }
-    // var tcol = theGrid[1][1].targetCol;
-    // var trow = theGrid[1][1].targetRow;
-    // var tcol2 = theGrid[tcol][trow].targetCol;
-    // var trow2 = theGrid[tcol][trow].targetRow;
-    if(!theView) {
-        theView = new View();
+}
+
+function clearNanitesReceived() {
+    for (var column = 0; column < theGrid.length; column++) {
+        for (var row = 0; row < theGrid.length; row++) {
+            var square = theGrid[column][row];
+            if(square) {
+                var target = theGrid[square.targetCol][square.targetRow];
+                target.naniteAmountReceived = 0;
+                target.advBotAmountReceived = 0;
+            }
+        }
     }
-    theView.update();
-
-    //console.log("nanites: "+theGrid[1][1].nanites+", transferRate: "+theGrid[1][1].naniteTransfRate+", tcol: "+tcol+", trow: "+trow+ ", tnanites: "+theGrid[tcol][trow].nanites+", tconsumeCost: "+theGrid[tcol][trow].consumeCost);
-    //console.log("0n:"+intToString(theGrid[1][1].nanites,2)+" 1n:"+intToString(theGrid[tcol][trow].nanites,2)+" 2n:"+intToString(theGrid[tcol2][trow2].nanites,2))
-
 }
 
 function clickedSquare(col, row) {
@@ -115,6 +97,7 @@ function clickedSquare(col, row) {
     theView.selectedChange();
     selected.splice(pos, 1);
     theView.updateInfoBox();
+    showOrHideBox();
 }
 function deselectAll() {
     if(selected.length === 0) {
@@ -145,10 +128,28 @@ function changeDirectionOfSelected(direction) {
     theView.updateInfoBox();
 }
 
+function buyAll() {
+    for(var i = 1; i < selected.length; i++) {
+        if (!selected[i].isActive()) {
+            continue;
+        }
+        if(selected[i].isActive() && selected[i].canBuyNanitesAfterMultiBuy()) {
+            selected[i].buyNanites();
+        }
+    }
+}
 function buyNanitesButtonPressed() {
     if(selected.length === 0) {
         return;
     }
+    if(settings.buyLowestOrAll) {
+        buyAll();
+    } else {
+        buyLowest();
+    }
+    theView.updateInfoBox();
+}
+function buyLowest() {
     var lowestAmountSquares = [selected[0]];
     for(var i = 1; i < selected.length; i++) {
         if(!selected[i].isActive()) {
@@ -161,12 +162,15 @@ function buyNanitesButtonPressed() {
             lowestAmountSquares.push(selected[i]);
         }
     }
+    var allBuyable = true;
     for(i = 0; i < lowestAmountSquares.length; i++) {
-        if(lowestAmountSquares[i].canBuyNanites()) {
-            lowestAmountSquares[i].buyNanites();
+        allBuyable = allBuyable && lowestAmountSquares[i].canBuyNanitesAfterMultiBuy();
+    }
+    if(allBuyable) {
+        for(i = 0; i < lowestAmountSquares.length; i++) {
+            lowestAmountSquares[i].buyMultipleNanites(settings.buyPerClick);
         }
     }
-    theView.updateInfoBox();
 }
 function buyAdvBotsButtonPressed() {
     for(var i = 0; i < selected.length; i++) {
@@ -178,7 +182,6 @@ function buyAdvBotsButtonPressed() {
 }
 
 
-setInterval(tick, 1000);
 
 
 function handleFPSDifference() {

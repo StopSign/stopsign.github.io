@@ -6,7 +6,7 @@ function Square(col,row,initialConsumeCost) {
     this.isHovered = 0;
     this.isSelected = 0;
 
-    this.transferRate = 1;
+    this.transferRate = .5;
 
     this.nanites = 0;
     this.naniteRate = 0;
@@ -16,6 +16,7 @@ function Square(col,row,initialConsumeCost) {
     this.naniteAmountBonus = 1;
     this.naniteTransferAmount = 0;
     this.naniteAmountReceived = 0;
+    this.naniteNextSpecial = 10;
     this.advBots = 0;
     this.advBotRate = 0;
     this.advBotCost = 10000;
@@ -24,24 +25,65 @@ function Square(col,row,initialConsumeCost) {
     this.advBotAmountBonus = 1;
     this.advBotTransferAmount = 0;
     this.advBotAmountReceived = 0;
+    this.advBotNextSpecial = 10;
     this.consumeCost = initialConsumeCost;
     this.specialLevels = [0, 10, 25, 50, 75, 100, 125, 150, 175, 200, 225, 250, 275, 300, 350, 400, 450, 500, 550, 600, 650, 700, 775, 850, 925, 1000, 1100, 1200]; // 45, 70, 100, 135, 175, 220, 270, 325, 385, 450, 520, 595, 675, 760, 850, 945, 1045, 1150, 1260];
 
-
-    this.canBuyNanites = function() {
-        return this.nanites >= this.naniteCost;
-    };
     this.buyNanites = function() {
         this.nanites -= this.naniteCost;
         this.naniteAmount++;
         if (this.naniteAmount >= this.specialLevels[this.curSpecialPosNanites+1]) {
             this.naniteAmountBonus = Math.pow(2, (++this.curSpecialPosNanites));
+            this.naniteNextSpecial = this.specialLevels[this.curSpecialPosNanites+1]; //for graphics only
         }
         var naniteCostExtra = Math.pow(5, (this.curSpecialPosNanites));
         var amountShift = this.curSpecialPosNanites === 0 ? 0 : this.curSpecialPosNanites*3; //Math.floor(Math.pow((this.curSpecialPosNanites+1), 2)
         this.naniteCost = (this.naniteAmount - this.specialLevels[this.curSpecialPosNanites] + amountShift) * 10 * naniteCostExtra; //Math.ceil(Math.pow(1.2, this.naniteAmount)*10) * naniteCostExtra;
         this.naniteRate = this.naniteAmount * this.naniteAmountBonus;
     };
+    this.buyMultipleNanites = function(num2) {
+        var num = settings.buyPerClick - this.naniteAmount % settings.buyPerClick;
+        for(var j = 0; j < num; j++) {
+            this.buyNanites();
+        }
+    };
+    this.canBuyNanitesAfterMultiBuy = function() {
+        var num = settings.buyPerClick - this.naniteAmount % settings.buyPerClick;
+        var nextNaniteCost;
+        for(var i = 0; i < num; i++) {
+            nextNaniteCost = this.naniteCostAfterMultiBuy(num);
+        }
+        return this.nanites >= nextNaniteCost;
+    };
+    this.naniteCostAfterMultiBuy = function(num2) {
+        var num = settings.buyPerClick - this.naniteAmount % settings.buyPerClick;
+
+        var totalNaniteCost = 0;
+        for(var i = 1; i < num+1; i++) {
+            totalNaniteCost += this.calcPrice(i);
+        }
+        return totalNaniteCost;
+    };
+    this.calcPrice = function(num) {
+        var nextNaniteCost = this.naniteCost;
+        var tempNanites = this.nanites;
+        var tempAmount = this.naniteAmount;
+        var tempSpecialPos = this.curSpecialPosNanites;
+        var tempNaniteAmountBonus = this.naniteAmountBonus;
+        for(var i = 0; i < num-1; i++) {
+            tempNanites -= nextNaniteCost;
+            tempAmount++;
+            if (tempAmount >= this.specialLevels[tempSpecialPos+1]) {
+                tempNaniteAmountBonus = Math.pow(2, (++tempSpecialPos));
+            }
+
+            var naniteCostExtra = Math.pow(5, (tempSpecialPos));
+            var amountShift = tempSpecialPos === 0 ? 0 : tempSpecialPos*3; //Math.floor(Math.pow((this.curSpecialPosNanites+1), 2)
+            nextNaniteCost = (tempAmount - this.specialLevels[tempSpecialPos] + amountShift) * 10 * naniteCostExtra; //Math.ceil(Math.pow(1.2, this.naniteAmount)*10) * naniteCostExtra;
+        }
+        return nextNaniteCost;
+    };
+
     this.canBuyAdvBots = function() {
         return this.nanites >= this.advBotCost;
     };
@@ -54,6 +96,12 @@ function Square(col,row,initialConsumeCost) {
         }
         this.advBotCost = 10000 + 5000 * Math.pow(this.advBotAmount,2);
         this.advBotRate = this.advBotAmount * this.advBotAmountBonus;
+    };
+    this.canBuyAdvBotsAfterMultiBuy = function(num) {
+
+    };
+    this.advBotCostAfterMultiBuy = function(num) {
+
     };
 
     this.initializeIfConsumed = function() {
