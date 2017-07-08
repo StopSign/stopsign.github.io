@@ -137,8 +137,9 @@ input, label {
 
 #infoGrid {
     position:relative;
-    width:250px;
     border:2px solid black;
+    font-size:12px;
+    padding:5px;
 }
 
 .col {
@@ -148,7 +149,7 @@ input, label {
     text-align:center;
     vertical-align:top;
 }
-.row, .rowLabel, .largeRow {
+.row, .rowLabel, .medRow, .largeRow {
     color:black;
     width:100%;
     margin:0;
@@ -156,6 +157,9 @@ input, label {
 }
 .largeRow {
     font-size:14px;
+}
+.medRow {
+    font-size:13px;
 }
 .rowLabel {
     text-decoration:underline;

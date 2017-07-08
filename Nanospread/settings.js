@@ -20,6 +20,9 @@ function selectOneOrMultipleSetting(num) {
 function selectBuyLowestOrAll(num) {
     settings.buyLowestOrAll = num;
 }
+function selectLastOrLowest(num) {
+    settings.showLastOrLowest = num;
+}
 
 function buyAmountOption(num) {
     var highlighted = document.getElementById('buy'+settings.buyPerClick);
@@ -27,7 +30,6 @@ function buyAmountOption(num) {
         highlighted.style.backgroundColor = "grey";
     }
     settings.buyPerClick = num;
-    theView.drawBuyPerClickButtons();
     document.getElementById('buy'+num).style.backgroundColor = "#ff4400";
 
 

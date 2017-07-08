@@ -26,6 +26,7 @@
     Cost goes up every bonus level, but nanite production doubles. The first bonus level is at 10, then every 25, increasing later.<br>
     Every second, a Square generates its own nanites, and sends nanites to another Square.<br>
     It sends Transfer Rate * Nanites per second to the Square in the direction of its arrow.<br>
+    'Lowest' will show the square with the least upgrades, then least nanites.<br>
     Capture all the squares to advance to the next level (TODO)
     <i id="backButton1" class="backButton fa fa-reply" onclick="closeHelpBox()"></i>
 </div>
@@ -33,24 +34,24 @@
     <!--<div style="scroll:auto;">-->
     <div class="settingContainer">
         When clicking Squares on the grid:<br>
-        <input id='selectMultiple' type="radio" name="selectOneOrMultiple" onclick="selectOneOrMultipleSetting(0)" checked><label for="selectMultiple">Select Multiple</label><br>
-        <input id='selectOne' type="radio" name="selectOneOrMultiple" onclick="selectOneOrMultipleSetting(1)"><label for="selectOne">Select One</label><br>
+        <input id='selectOne' type="radio" name="selectOneOrMultiple" onclick="selectOneOrMultipleSetting(0)" checked="checked"><label for="selectOne">Select One</label><br>
+        <input id='selectMultiple' type="radio" name="selectOneOrMultiple" onclick="selectOneOrMultipleSetting(1)"><label for="selectMultiple">Select Multiple</label><br>
     </div>
-    <!--<div class="settingContainer">-->
-        <!--When selecting multiple Squares:<br>-->
-        <!--<input id='selectLowest' type="radio" name="selectOneOrMultiple" onclick="selectOneOrMultipleSetting(0)" checked><label for="selectLowest">Show Lowest</label><br>-->
-        <!--<input id='selectLast' type="radio" name="selectOneOrMultiple" onclick="selectOneOrMultipleSetting(1)"><label for="selectLast">Show Last Selected</label><br>-->
-    <!--</div>-->
+    <div class="settingContainer">
+        When buying an upgrade for multiple Squares:<br>
+        <input id='selectBuyLowest' type="radio" name="selectBuyLowestOrAll" onclick="selectBuyLowestOrAll(0)" checked="checked"><label for="selectBuyLowest">Buy Squares with lowest upgrade amount, all together</label><br>
+        <input id='selectAllBuy' type="radio" name="selectBuyLowestOrAll" onclick="selectBuyLowestOrAll(1)"><label for="selectAllBuy">Every Square tries to buy</label><br>
+    </div>
+    <div class="settingContainer">
+        When selecting multiple Squares,<br>the upgrade amount/cost will:<br>
+        <input id='selectLast' type="radio" name="selectLastOrLowest" onclick="selectLastOrLowest(0)" checked="checked"><label for="selectLast">Show Last Selected</label><br>
+        <input id='selectLowest' type="radio" name="selectLastOrLowest" onclick="selectLastOrLowest(1)"><label for="selectLowest">Show Lowest</label><br>
+    </div>
     <!--<div class="settingContainer">-->
         <!--When selecting multiple Squares:<br>-->
         <!--<input id='selectSameColor' type="radio" name="selectOneOrMultiple" onclick="selectOneOrMultipleSetting(0)" checked><label for="selectSameColor">Selected Squares are the same color</label><br>-->
         <!--<input id='selectNanitesLowest' type="radio" name="selectOneOrMultiple" onclick="selectOneOrMultipleSetting(1)"><label for="selectNanitesLowest">Lowest Nanites of Selected Square is a different color</label><br>-->
         <!--<input id='selectAdvBotsLowest' type="radio" name="selectOneOrMultiple" onclick="selectOneOrMultipleSetting(1)"><label for="selectAdvBotsLowest">Lowest Advanced Robots of selected Square is a different color</label><br>-->
-    <!--</div>-->
-    <!--<div class="settingContainer">-->
-        <!--When buying an upgrade for multiple Squares:<br>-->
-        <!--<input id='selectBuyLowest' type="radio" name="selectOneOrMultiple" onclick="selectOneOrMultipleSetting(0)" checked><label for="selectBuyLowest">Only buy lowest</label><br>-->
-        <!--<input id='selectAllBuy' type="radio" name="selectOneOrMultiple" onclick="selectOneOrMultipleSetting(1)"><label for="selectAllBuy">Have every Square buy</label><br>-->
     <!--</div>-->
     <!--<div class="settingContainer">-->
         <!--Square's color is based on:<br>-->
@@ -84,7 +85,7 @@
         <div class="col" style="width:91px;text-align:right;margin-right:10px;">
             <div class="row"></div>
             <div class="largeRow"><div id="totalLabel">Total:</div></div>
-            <div class="largeRow"><div id="netLabel">Net:</div></div>
+            <div class="medRow"><div id="netLabel">Net:</div></div>
             <div class="row"><div id="createdLabel">Created:</div></div>
             <div class="row"><div id="receivedLabel">Received:</div></div>
             <div class="row"><div id="sentLabel">Sent:</div></div>
@@ -94,22 +95,32 @@
         <div id="infoGridSingle" class="col">
             <div class="rowLabel" id="selectedTypeLabel">Amount</div>
             <div class="largeRow"><div id="totalTs"></div></div>
-            <div class="largeRow"><div id="netTs"></div></div>
+            <div class="medRow"><div id="netTs"></div></div>
             <div class="row"><div id="totalTRate"></div></div>
             <div class="row"><div id="totalTAmountReceived"></div></div>
             <div class="row"><div id="totalTTransferAmount"></div></div>
             <div class="row"><div id="totalTransferRate"></div></div>
             <div class="row" id="totalConsumeCostContainer"><div id="totalConsumeCost"></div></div>
         </div>
-        <div id="infoGridMult" class="col">
+        <div id="infoGridAverage" class="col">
             <div class="rowLabel">Average</div>
             <div class="largeRow"><div id="averageTs"></div></div>
-            <div class="largeRow"><div id="averageNetTs"></div></div>
+            <div class="medRow"><div id="averageNetTs"></div></div>
             <div class="row"><div id="averageTRate"></div></div>
             <div class="row"><div id="averageTAmountReceived"></div></div>
             <div class="row"><div id="averageTTransferAmount"></div></div>
             <div class="row"><div id="averageTransferRate"></div></div>
             <div class="row" id="averageConsumeCostContainer"><div id="averageConsumeCost"></div></div>
+        </div>
+        <div id="infoGridLowest" class="col">
+            <div class="rowLabel">Lowest</div>
+            <div class="largeRow"><div id="lowestTs"></div></div>
+            <div class="medRow"><div id="lowestNetTs"></div></div>
+            <div class="row"><div id="lowestTRate"></div></div>
+            <div class="row"><div id="lowestTAmountReceived"></div></div>
+            <div class="row"><div id="lowestTTransferAmount"></div></div>
+            <div class="row"><div id="lowestTransferRate"></div></div>
+            <div class="row" id="lowestConsumeCostContainer"><div id="lowestConsumeCost"></div></div>
         </div>
 
         <!--<div id="transferRateContainer" class="resourceBlock" style="margin-top:5px;">-->

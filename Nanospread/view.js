@@ -29,7 +29,6 @@ function View() {
         for(var i = 0; i < selected.length; i++) {
             changeBorder(this.grid[selected[i].col][selected[i].row], selected[i]);
         }
-        this.updateInfoBox();
     };
 
     this.update = function() {
@@ -51,18 +50,9 @@ function View() {
             return;
         }
         showNanites();
-        if(settings.selectedResourceNum === 0) {
-            selectedSingleOrMultiple('Nanites');
-        } else if(settings.selectedResourceNum === 1) {
-            selectedSingleOrMultiple('AdvBots');
-        }
         selectedActiveOrNot();
         drawDirectionArrow();
         this.drawButtons();
-    };
-
-    this.drawBuyPerClickButtons = function() {
-
     };
 }
 
@@ -79,11 +69,12 @@ function buttonSetup(type, typeUpper, label) { //lol javascript
         buyAvailableOr += selected[i]["canBuy"+typeUpper+"AfterMultiBuy"]() ? 1 : 0;
         buyAvailableAnd = buyAvailableAnd && selected[i]["canBuy"+typeUpper+"AfterMultiBuy"]();
     }
-    document.getElementById(type+'Amount').innerHTML = lastSelected[type+'Amount'];
-    // document.getElementById(type+'Amount').innerHTML = (amount === -1 ? " " : amount) + ", ";
-    document.getElementById(type+'Cost').innerHTML = "Cost is: " + intToStringRound(lastSelected[type+'CostAfterMultiBuy'](settings.buyPerClick))+", ";
-    document.getElementById(type+'Benefit').innerHTML = "Gain: +"+lastSelected[type+'AmountBonus']+" "+label+" per second, ";
-    document.getElementById(type+'SpecialNext').innerHTML = "Next Bonus at "+lastSelected[type+'NextSpecial']+".";
+    var lowestSelected = selected.length > 1 ? getLowestSquare(selected, type) : selected[0];
+    var displaySquare = settings.showLastOrLowest ? lowestSelected : lastSelected;
+    document.getElementById(type+'Amount').innerHTML = displaySquare[type+'Amount'];
+    document.getElementById(type+'Cost').innerHTML = "Cost is: " + intToStringRound(displaySquare[type+'CostAfterMultiBuy'](settings.buyPerClick))+", ";
+    document.getElementById(type+'Benefit').innerHTML = "Gain: +"+displaySquare[type+'AmountBonus']+" "+label+" per second, ";
+    document.getElementById(type+'SpecialNext').innerHTML = "Next Bonus at "+displaySquare[type+'NextSpecial']+".";
     document.getElementById('buy'+typeUpper+'Button').style.borderColor = buyAvailableAnd ? "green" : buyAvailableOr ? "yellow" : "red";
     document.getElementById('numSelected'+typeUpper+'ButtonBuyable').style.color = buyAvailableAnd ? "green" : buyAvailableOr ? "yellow" : "red";
     document.getElementById('numSelected'+typeUpper+'ButtonBuyable').innerHTML = buyAvailableOr + " / " + selected.length;
@@ -147,12 +138,12 @@ function changeBorder(gridSquare, square) {
 function selectedSingleOrMultiple() {
     if(selected.length > 1) { //selected multiple
         document.getElementById('selectedTypeLabel').innerHTML = "Total";
-        document.getElementById('infoGridMult').style.display = 'inline-block';
-        document.getElementById('totalTransferRate').style.display = 'none';
+        document.getElementById('infoGridAverage').style.display = 'inline-block';
+        document.getElementById('infoGridLowest').style.display = 'inline-block';
     } else {
         document.getElementById('selectedTypeLabel').innerHTML = "Amount";
-        document.getElementById('infoGridMult').style.display = 'none';
-        document.getElementById('totalTransferRate').style.display = 'block';
+        document.getElementById('infoGridAverage').style.display = 'none';
+        document.getElementById('infoGridLowest').style.display = 'none';
     }
 }
 
@@ -171,6 +162,7 @@ function selectedActiveOrNot() {
     } else if(!selectedActiveAND) {
         labelChange(false, true);
     }
+    selectedSingleOrMultiple()
 }
 
 function labelChange(isShowing, consumeShowing) {
@@ -184,7 +176,7 @@ function labelChange(isShowing, consumeShowing) {
     document.getElementById('totalTTransferAmount').style.display = isShowing ? "block" : "none";
     document.getElementById('averageTTransferAmount').style.display = isShowing ? "block" : "none";
     document.getElementById('transferRateLabel').style.display = isShowing ? "block" : "none";
-    document.getElementById('totalTransferRate').style.display = isShowing ? "block" : "none";
+    document.getElementById('totalTransferRate').style.display = !consumeShowing ? (isShowing ? "block" : "none") : "none";
     document.getElementById('averageTransferRate').style.display = isShowing ? "block" : "none";
 
     document.getElementById('consumeCostLabel').style.display = consumeShowing ? "block" : "none";
@@ -194,9 +186,9 @@ function labelChange(isShowing, consumeShowing) {
 
 function showNanites() {
     if(settings.selectedResourceNum === 0) {
-        updateInfoGrid('Nanites', 'nanites', 'nanite');
+        updateInfoGrid('Nanites', 'nanite');
     } else if(settings.selectedResourceNum === 1) {
-        updateInfoGrid('Advanced Robots', 'advBots', 'advBot');
+        updateInfoGrid('Advanced Robots', 'advBot');
     }
 
     updateInfoGridExtras();
@@ -216,17 +208,17 @@ function updateInfoGridExtras() {
     document.getElementById('averageConsumeCost').innerHTML = intToString(totalConsumeCost / selected.length);
 }
 
-function updateInfoGrid(label, varLabel, varSingle) {
+function updateInfoGrid(label, varLabel) {
     var totalNanites = 0;
     var totalNaniteRate = 0;
     var totalNaniteTransferAmount = 0;
     var totalNaniteAmountReceived = 0;
     var totalConsumeCost = 0;
     for(var i = 0; i < selected.length; i++) {
-        totalNanites += selected[i][varLabel];
-        totalNaniteRate += selected[i][varSingle+'Rate'];
-        totalNaniteTransferAmount += selected[i][varSingle+'TransferAmount'];
-        totalNaniteAmountReceived += selected[i][varSingle+'AmountReceived'];
+        totalNanites += selected[i][varLabel+'s'];
+        totalNaniteRate += selected[i][varLabel+'Rate'];
+        totalNaniteTransferAmount += selected[i][varLabel+'TransferAmount'];
+        totalNaniteAmountReceived += selected[i][varLabel+'AmountReceived'];
         totalConsumeCost += selected[i].consumeCost;
     }
     document.getElementById('resourceTypeLabel').innerHTML = label;
@@ -238,7 +230,17 @@ function updateInfoGrid(label, varLabel, varSingle) {
     document.getElementById('averageTTransferAmount').innerHTML = intToString(totalNaniteTransferAmount / selected.length);
     document.getElementById('totalTAmountReceived').innerHTML = intToString(totalNaniteAmountReceived);
     document.getElementById('averageTAmountReceived').innerHTML = intToString(totalNaniteAmountReceived / selected.length);
-    document.getElementById('netTs').innerHTML = intToString(totalNaniteRate + totalNaniteAmountReceived - totalNaniteTransferAmount );
+
+    var lowestSquare = getLowestSquare(selected, varLabel);
+    document.getElementById('lowestTs').innerHTML = intToString(lowestSquare[varLabel+'s']);
+    document.getElementById('lowestNetTs').innerHTML = intToStringNegative(lowestSquare[varLabel+'Rate'] + lowestSquare[varLabel+'AmountReceived'] - lowestSquare[varLabel+'TransferAmount']);
+    document.getElementById('lowestTRate').innerHTML = intToString(lowestSquare[varLabel+'Rate']);
+    document.getElementById('lowestTAmountReceived').innerHTML = intToString(lowestSquare[varLabel+'AmountReceived']);
+    document.getElementById('lowestTTransferAmount').innerHTML = intToString(lowestSquare[varLabel+'TransferAmount']);
+    document.getElementById('lowestTransferRate').innerHTML = intToString(lowestSquare.transferRate / 100);
+    document.getElementById('lowestConsumeCostContainer').innerHtml = intToString(lowestSquare.consumeCost);
+
+    document.getElementById('netTs').innerHTML = intToStringNegative(totalNaniteRate + totalNaniteAmountReceived - totalNaniteTransferAmount );
 }
 
 function showOrHideBox() {

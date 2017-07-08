@@ -9,11 +9,12 @@ var msWaitTime = 1000;
 var theGrid = [];
 
 function loadDefaults() {
-
-    selectOneOrMultipleSetting(0); //multiple
-    selectBuyLowestOrAll(0); //Lowest
     settings.buyPerClick = 1;
+
+    settings.selectOneOrMultiple = 0;
+    settings.buyLowestOrAll = 0;
     settings.selectedResourceNum = 0;
+    settings.showLastOrLowest = 0;
 }
 
 loadDefaults();

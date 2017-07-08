@@ -83,15 +83,15 @@ function clickedSquare(col, row) {
     square.isSelected = !square.isSelected;
     var pos = selected.indexOf(square);
     if(pos === -1) {
-        if(settings.selectOneOrMultiple && selected.length >= 1) {
+        if(!settings.selectOneOrMultiple && selected.length >= 1) { //single
             setSelectedFalse();
             selected = [];
             selected.push(square);
         } else { //multiple
             selected.push(square);
         }
-        theView.updateInfoBox();
         theView.selectedChange();
+        theView.updateInfoBox();
         return;
     }
     theView.selectedChange();
@@ -129,12 +129,9 @@ function changeDirectionOfSelected(direction) {
 }
 
 function buyAll() {
-    for(var i = 1; i < selected.length; i++) {
-        if (!selected[i].isActive()) {
-            continue;
-        }
+    for(var i = 0; i < selected.length; i++) {
         if(selected[i].isActive() && selected[i].canBuyNanitesAfterMultiBuy()) {
-            selected[i].buyNanites();
+            selected[i].buyMultipleNanites(settings.buyPerClick);
         }
     }
 }
@@ -150,20 +147,9 @@ function buyNanitesButtonPressed() {
     theView.updateInfoBox();
 }
 function buyLowest() {
-    var lowestAmountSquares = [selected[0]];
-    for(var i = 1; i < selected.length; i++) {
-        if(!selected[i].isActive()) {
-            continue;
-        }
-        if(selected[i].naniteAmount < lowestAmountSquares[0].naniteAmount) {
-            lowestAmountSquares = []; //clear list
-            lowestAmountSquares.push(selected[i]);
-        } else if(selected[i].naniteAmount === lowestAmountSquares[0].naniteAmount) {
-            lowestAmountSquares.push(selected[i]);
-        }
-    }
+    var lowestAmountSquares = getLowestSquares('nanite');
     var allBuyable = true;
-    for(i = 0; i < lowestAmountSquares.length; i++) {
+    for(var i = 0; i < lowestAmountSquares.length; i++) {
         allBuyable = allBuyable && lowestAmountSquares[i].canBuyNanitesAfterMultiBuy();
     }
     if(allBuyable) {
@@ -172,6 +158,7 @@ function buyLowest() {
         }
     }
 }
+
 function buyAdvBotsButtonPressed() {
     for(var i = 0; i < selected.length; i++) {
         if(selected[i].canBuyAdvBots()) {
@@ -179,6 +166,35 @@ function buyAdvBotsButtonPressed() {
         }
     }
     theView.updateInfoBox();
+}
+
+function getLowestSquares(resourceType) {  //gets all the Squares with the lowest upgrade amount
+    var lowestAmountSquares = [selected[0]];
+    for(var i = 1; i < selected.length; i++) {
+        if(!selected[i].isActive()) {
+            continue;
+        }
+        if(selected[i][resourceType + 'Amount'] < lowestAmountSquares[0][resourceType + 'Amount']) {
+            lowestAmountSquares = [];
+            lowestAmountSquares.push(selected[i]);
+        } else if(selected[i][resourceType + 'Amount'] === lowestAmountSquares[0][resourceType + 'Amount']) {
+            lowestAmountSquares.push(selected[i]);
+        }
+    }
+    return lowestAmountSquares;
+}
+function getLowestSquare(list, resourceType) {
+    var lowestSquare = list[0];
+    for(var i = 1; i < list.length; i++) {
+        if(!list[i].isActive()) {
+            continue;
+        }
+        if(list[i][resourceType + 'Amount'] < lowestSquare[resourceType + 'Amount'] ||
+            (list[i][resourceType + 'Amount'] === lowestSquare[resourceType + 'Amount'] && list[i][resourceType + 's'] < lowestSquare[resourceType + 's'])) {
+            lowestSquare = list[i];
+        }
+    }
+    return lowestSquare;
 }
 
 
