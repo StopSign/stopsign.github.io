@@ -23,6 +23,12 @@ function selectBuyLowestOrAll(num) {
 function selectLastOrLowest(num) {
     settings.showLastOrLowest = num;
 }
+function selectAllOrLowestBorderColor(num) {
+    settings.selectAllOrLowestBorderColor = num;
+}
+function selectShowNoneOrNanitesOrAmount(num) {
+    settings.selectShowNoneOrNanitesOrAmount = num;
+}
 
 function buyAmountOption(num) {
     var highlighted = document.getElementById('buy'+settings.buyPerClick);

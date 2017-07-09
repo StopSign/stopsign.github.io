@@ -13,7 +13,11 @@ function View() {
             var rowSize = 700 / 13;
             var rectStartX = col*rowSize + this.offsetx + 30;
             var rectStartY = row*rowSize + this.offsety + 30;
-            elem.innerHTML = "<div class='naniteSquare' style='left:"+rectStartX+"px;top:"+rectStartY+"px;width:"+(rowSize-10)+"px;height:"+(rowSize-10)+"px;' onclick='clickedSquare("+col+","+row+")'></div>";
+            elem.innerHTML =
+                "<div class='naniteSquare' style='left:"+rectStartX+"px;top:"+rectStartY+"px;width:"+(rowSize-10)+"px;height:"+(rowSize-10)+"px;' onclick='clickedSquare("+col+","+row+")'>" +
+                    "<div class='displayNum' id='displayNumcol"+col+"row"+row+"'>" +
+                    "</div>" +
+                "</div>";
             document.getElementById('naniteGrid').appendChild(elem);
             this.grid[col][row] = elem.firstChild;
         }
@@ -24,10 +28,24 @@ function View() {
         buttonSetup('advBot', 'AdvBots', 'Adv Robots');
     };
 
-    this.selectedChange = function() {
-        showOrHideBox();
+    this.setSelectedFalse = function() {
         for(var i = 0; i < selected.length; i++) {
-            changeBorder(this.grid[selected[i].col][selected[i].row], selected[i]);
+            selected[i].isSelected = 0;
+            this.changeBorderSelected(selected[i]);
+        }
+    };
+    this.changeBorderColors = function() {
+        for(var i = 0; i < selected.length; i++) {
+            this.changeBorderSelected(selected[i]);
+        }
+        changeBordersOfLowest(this.grid);
+    };
+    this.changeBorderSelected = function(square) {
+        var gridSquare = this.grid[square.col][square.row];
+        if(square.isSelected) {
+            gridSquare.style.border = "2px solid #ff9600";
+        } else {
+            gridSquare.style.border = square.isActive() ? "2px solid black" : "2px solid white";
         }
     };
 
@@ -38,22 +56,51 @@ function View() {
                 if(!square) {
                     continue;
                 }
-                changeBorder(this.grid[col][row], square);
-                changeBackground(this.grid[col][row], square);
+                this.changeBorderSelected(square);
+                this.changeBackground(square);
+                this.updateDisplayNum(square, settings.selectedResourceNum === 0 ? 'nanite' : 'advBot');
             }
         }
         this.updateInfoBox();
+    };
+
+    this.updateDisplayNum = function(square, resourceType) {
+        var displayNum = document.getElementById('displayNumcol'+square.col+'row'+square.row);
+        if(!displayNum) {
+            return;
+        }
+        if(settings.selectShowNoneOrNanitesOrAmount === 0) {
+            displayNum.innerHTML = '';
+        } else if(settings.selectShowNoneOrNanitesOrAmount === 1) {
+            displayNum.innerHTML = intToStringRound(square[resourceType+'s']);
+        } else {
+            displayNum.innerHTML = intToStringRound(square[resourceType+'Amount']);
+        }
+    };
+
+    this.changeBackground = function(square) {
+        var gridSquare = this.grid[square.col][square.row];
+        if(square.isActive()) {
+            gridSquare.style.background = colorShiftMath(360, Math.log10(square.nanites));
+            gridSquare.style.opacity = 1;
+        } else {
+            var temp = Math.log10(square.consumeCost)/15+.2;
+            gridSquare.style.background = "hsl(120, 88%, 13%)";
+            gridSquare.style.opacity = temp > 1 ? 1 : temp;
+        }
     };
 
     this.updateInfoBox = function() {
         if(selected.length === 0) {
             return;
         }
+        this.changeBorderColors();
         showNanites();
         selectedActiveOrNot();
         drawDirectionArrow();
         this.drawButtons();
     };
+
 }
 
 function buttonSetup(type, typeUpper, label) { //lol javascript
@@ -69,8 +116,11 @@ function buttonSetup(type, typeUpper, label) { //lol javascript
         buyAvailableOr += selected[i]["canBuy"+typeUpper+"AfterMultiBuy"]() ? 1 : 0;
         buyAvailableAnd = buyAvailableAnd && selected[i]["canBuy"+typeUpper+"AfterMultiBuy"]();
     }
-    var lowestSelected = selected.length > 1 ? getLowestSquare(selected, type) : selected[0];
+    var lowestSelected = selected.length > 1 ? getLowestSquare(getSelectedActive(), type) : selected[0];
     var displaySquare = settings.showLastOrLowest ? lowestSelected : lastSelected;
+    if(!displaySquare) {
+        return;
+    }
     document.getElementById(type+'Amount').innerHTML = displaySquare[type+'Amount'];
     document.getElementById(type+'Cost').innerHTML = "Cost is: " + intToStringRound(displaySquare[type+'CostAfterMultiBuy'](settings.buyPerClick))+", ";
     document.getElementById(type+'Benefit').innerHTML = "Gain: +"+displaySquare[type+'AmountBonus']+" "+label+" per second, ";
@@ -107,17 +157,6 @@ function clearArrows(arrows) {
     }
 }
 
-function changeBackground(gridSquare, square) {
-    if(square.isActive()) {
-        gridSquare.style.background = colorShiftMath(360, Math.log10(square.nanites));
-        gridSquare.style.opacity = 1;
-    } else {
-        var temp = Math.log10(square.consumeCost)/15+.2;
-        gridSquare.style.background = "hsl(120, 88%, 13%)";
-        gridSquare.style.opacity = temp > 1 ? 1 : temp;
-    }
-}
-
 function colorShiftMath(initialColor, multi, leftOverMulti) {
     //Hue is 0-360, 0 is red, 120 is green, 240 is blue. Sat is 0-100, 0=greyscale. Light is 0-100, 25=half black
     var hue = initialColor - (multi-1)*30; //- (leftOverMulti)*9;
@@ -127,11 +166,21 @@ function colorShiftMath(initialColor, multi, leftOverMulti) {
     return "hsl("+hue+", "+sat+"%, "+light+"%)";
 }
 
-function changeBorder(gridSquare, square) {
-    if(square.isSelected) {
-        gridSquare.style.border = "2px solid #ff9600";
+function changeBordersOfLowest(viewGrid) {
+    if(!settings.selectOneOrMultiple || !settings.selectAllOrLowestBorderColor || selected.length === 0) {
+        return;
+    }
+    var lowestSquares;
+    if(settings.selectedResourceNum === 0) {
+        lowestSquares = getLowestSquares(getSelectedActive(), 'nanite');
     } else {
-        gridSquare.style.border = square.isActive() ? "2px solid black" : "2px solid white";
+        lowestSquares = getLowestSquares(getSelectedActive(), 'advBot');
+    }
+    for (var i = 0; i < lowestSquares.length; i++) {
+        var gridSquare = viewGrid[lowestSquares[i].col][lowestSquares[i].row];
+        if(lowestSquares[i].isSelected) {
+            gridSquare.style.border = "2px solid blue";
+        }
     }
 }
 
@@ -159,7 +208,7 @@ function selectedActiveOrNot() {
         labelChange(true, false);
     } else if(selectedActiveOR) {
         labelChange(true, true);
-    } else if(!selectedActiveAND) {
+    } else {
         labelChange(false, true);
     }
     selectedSingleOrMultiple()
@@ -169,19 +218,27 @@ function labelChange(isShowing, consumeShowing) {
     document.getElementById('totalLabel').style.display = isShowing ? "block" : "none";
     document.getElementById('totalTs').style.display = isShowing ? "block" : "none";
     document.getElementById('averageTs').style.display = isShowing ? "block" : "none";
+    document.getElementById('lowestTs').style.display = isShowing || !consumeShowing ? "block" : "none";
+
     document.getElementById('createdLabel').style.display = isShowing ? "block" : "none";
     document.getElementById('totalTRate').style.display = isShowing ? "block" : "none";
     document.getElementById('averageTRate').style.display = isShowing ? "block" : "none";
+    document.getElementById('lowestTRate').style.display = isShowing || !consumeShowing ? "block" : "none";
+
     document.getElementById('sentLabel').style.display = isShowing ? "block" : "none";
     document.getElementById('totalTTransferAmount').style.display = isShowing ? "block" : "none";
     document.getElementById('averageTTransferAmount').style.display = isShowing ? "block" : "none";
+    document.getElementById('lowestTTransferAmount').style.display = isShowing || !consumeShowing ? "block" : "none";
+
     document.getElementById('transferRateLabel').style.display = isShowing ? "block" : "none";
-    document.getElementById('totalTransferRate').style.display = !consumeShowing ? (isShowing ? "block" : "none") : "none";
+    document.getElementById('totalTransferRate').style.display = isShowing ? "block" : "none";
     document.getElementById('averageTransferRate').style.display = isShowing ? "block" : "none";
+    document.getElementById('lowestTransferRate').style.display = isShowing || !consumeShowing ? "block" : "none";
 
     document.getElementById('consumeCostLabel').style.display = consumeShowing ? "block" : "none";
     document.getElementById('totalConsumeCost').style.display = consumeShowing ? "block" : "none";
     document.getElementById('averageConsumeCost').style.display = consumeShowing ? "block" : "none";
+    document.getElementById('lowestConsumeCost').style.display = consumeShowing ? "block" : "none";
 }
 
 function showNanites() {
@@ -196,16 +253,24 @@ function showNanites() {
 
 function updateInfoGridExtras() {
     var totalTransferRate = 0;
-    var totalConsumeCost = 0;
     for(var i = 0; i < selected.length; i++) {
         totalTransferRate += (selected[i].transferRate/100);
-        totalConsumeCost += selected[i].consumeCost;
     }
+    var inactiveList = getSelectedInactive();
+    var totalConsumeCost = 0;
+    for(i = 0; i < inactiveList.length; i++) {
+        totalConsumeCost += inactiveList[i].consumeCost;
+    }
+    var lowestInactive = getLowestInactiveSquare(inactiveList);
+
     document.getElementById('totalTransferRate').innerHTML = intToString(totalTransferRate);
     document.getElementById('averageTransferRate').innerHTML = intToString(totalTransferRate / selected.length);
 
     document.getElementById('totalConsumeCost').innerHTML = intToString(totalConsumeCost);
-    document.getElementById('averageConsumeCost').innerHTML = intToString(totalConsumeCost / selected.length);
+    document.getElementById('averageConsumeCost').innerHTML = intToString(totalConsumeCost / inactiveList.length);
+    if(lowestInactive) {
+        document.getElementById('lowestConsumeCost').innerHTML = intToString(lowestInactive.consumeCost);
+    }
 }
 
 function updateInfoGrid(label, varLabel) {
@@ -223,31 +288,43 @@ function updateInfoGrid(label, varLabel) {
     }
     document.getElementById('resourceTypeLabel').innerHTML = label;
     document.getElementById('totalTs').innerHTML = intToString(totalNanites);
-    document.getElementById('averageTs').innerHTML = intToString(totalNanites / selected.length);
     document.getElementById('totalTRate').innerHTML = intToString(totalNaniteRate);
-    document.getElementById('averageTRate').innerHTML = intToString(totalNaniteRate / selected.length);
     document.getElementById('totalTTransferAmount').innerHTML = intToString(totalNaniteTransferAmount);
-    document.getElementById('averageTTransferAmount').innerHTML = intToString(totalNaniteTransferAmount / selected.length);
     document.getElementById('totalTAmountReceived').innerHTML = intToString(totalNaniteAmountReceived);
-    document.getElementById('averageTAmountReceived').innerHTML = intToString(totalNaniteAmountReceived / selected.length);
-
-    var lowestSquare = getLowestSquare(selected, varLabel);
-    document.getElementById('lowestTs').innerHTML = intToString(lowestSquare[varLabel+'s']);
-    document.getElementById('lowestNetTs').innerHTML = intToStringNegative(lowestSquare[varLabel+'Rate'] + lowestSquare[varLabel+'AmountReceived'] - lowestSquare[varLabel+'TransferAmount']);
-    document.getElementById('lowestTRate').innerHTML = intToString(lowestSquare[varLabel+'Rate']);
-    document.getElementById('lowestTAmountReceived').innerHTML = intToString(lowestSquare[varLabel+'AmountReceived']);
-    document.getElementById('lowestTTransferAmount').innerHTML = intToString(lowestSquare[varLabel+'TransferAmount']);
-    document.getElementById('lowestTransferRate').innerHTML = intToString(lowestSquare.transferRate / 100);
-    document.getElementById('lowestConsumeCostContainer').innerHtml = intToString(lowestSquare.consumeCost);
-
     document.getElementById('netTs').innerHTML = intToStringNegative(totalNaniteRate + totalNaniteAmountReceived - totalNaniteTransferAmount );
+
+    if(selected.length > 1) {
+        document.getElementById('averageTs').innerHTML = intToString(totalNanites / selected.length);
+        document.getElementById('averageTRate').innerHTML = intToString(totalNaniteRate / selected.length);
+        document.getElementById('averageTTransferAmount').innerHTML = intToString(totalNaniteTransferAmount / selected.length);
+        document.getElementById('averageTAmountReceived').innerHTML = intToString(totalNaniteAmountReceived / selected.length);
+
+        var lowestSquare = getLowestSquare(getSelectedActive(), varLabel);
+        if(lowestSquare) {
+            document.getElementById('lowestTs').innerHTML = intToString(lowestSquare[varLabel + 's']);
+            document.getElementById('lowestNetTs').innerHTML = intToStringNegative(lowestSquare[varLabel + 'Rate'] + lowestSquare[varLabel + 'AmountReceived'] - lowestSquare[varLabel + 'TransferAmount']);
+            document.getElementById('lowestTRate').innerHTML = intToString(lowestSquare[varLabel + 'Rate']);
+            document.getElementById('lowestTAmountReceived').innerHTML = intToString(lowestSquare[varLabel + 'AmountReceived']);
+            document.getElementById('lowestTTransferAmount').innerHTML = intToString(lowestSquare[varLabel + 'TransferAmount']);
+            document.getElementById('lowestTransferRate').innerHTML = intToString(lowestSquare.transferRate / 100);
+            document.getElementById('lowestConsumeCost').innerHtml = intToString(lowestSquare.consumeCost);
+        }
+        var selectedInactive = getSelectedInactive();
+        if(selectedInactive.length === selected.length) { //only selecting inactive
+            var lowestInactive = getLowestInactiveSquare(selectedInactive);
+            document.getElementById('lowestNetTs').innerHTML = intToStringNegative(lowestInactive[varLabel + 'Rate'] + lowestInactive[varLabel + 'AmountReceived'] - lowestInactive[varLabel + 'TransferAmount']);
+            document.getElementById('lowestTAmountReceived').innerHTML = intToString(lowestInactive[varLabel + 'AmountReceived']);
+            document.getElementById('lowestConsumeCost').innerHtml = intToString(lowestInactive.consumeCost);
+        }
+
+    }
+
 }
 
 function showOrHideBox() {
     if(selected.length === 0) {
-        document.getElementById('infoBox').style.display = "none";
+        document.getElementById('infoPanel').style.display = "none";
         return true;
     }
-    document.getElementById('settingsBox').style.display = "none";
-    document.getElementById('infoBox').style.display = "block";
+    document.getElementById('infoPanel').style.display = "block";
 }

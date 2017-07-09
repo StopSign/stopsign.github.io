@@ -10,11 +10,13 @@ var theGrid = [];
 
 function loadDefaults() {
     settings.buyPerClick = 1;
+    settings.selectedResourceNum = 0;
 
     settings.selectOneOrMultiple = 0;
     settings.buyLowestOrAll = 0;
-    settings.selectedResourceNum = 0;
     settings.showLastOrLowest = 0;
+    settings.selectAllOrLowestBorderColor = 0;
+    settings.selectShowNoneOrNanitesOrAmount = 2;
 }
 
 loadDefaults();

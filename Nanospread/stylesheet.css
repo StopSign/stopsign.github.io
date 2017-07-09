@@ -1,10 +1,12 @@
 .naniteSquare {
     width:33px;
     height:33px;
-    border:2px solid black;
+    border:2px solid white;
     position:absolute;
     background-color:white;
     cursor:pointer;
+    text-align:center;
+
 }
 
 .resourceBlock {
@@ -163,4 +165,9 @@ input, label {
 }
 .rowLabel {
     text-decoration:underline;
+}
+.displayNum {
+    font-weight:bold;
+    font-size:12px;
+    margin-top:29%;
 }

@@ -20,149 +20,147 @@
 <div id="naniteGrid" style="position:relative;width:800px;height:1000px;background-color:grey;"></div>
 
 
-<div id="helpBox" style="position:fixed;bottom:0;height:200px;width:800px;background-color:#8194bd;z-index:999;display:none;">
-    Press the WASD / arrow keys to change direction<br>
-    Press enter / space to buy the first upgrade of the selected<br>
-    Cost goes up every bonus level, but nanite production doubles. The first bonus level is at 10, then every 25, increasing later.<br>
-    Every second, a Square generates its own nanites, and sends nanites to another Square.<br>
-    It sends Transfer Rate * Nanites per second to the Square in the direction of its arrow.<br>
-    'Lowest' will show the square with the least upgrades, then least nanites.<br>
-    Capture all the squares to advance to the next level (TODO)
-    <i id="backButton1" class="backButton fa fa-reply" onclick="closeHelpBox()"></i>
-</div>
-<div id="settingsBox" style="position:fixed;bottom:0;height:200px;width:800px;background-color:#8194bd;z-index:999;display:none;overflow:auto;">
-    <!--<div style="scroll:auto;">-->
-    <div class="settingContainer">
-        When clicking Squares on the grid:<br>
-        <input id='selectOne' type="radio" name="selectOneOrMultiple" onclick="selectOneOrMultipleSetting(0)" checked="checked"><label for="selectOne">Select One</label><br>
-        <input id='selectMultiple' type="radio" name="selectOneOrMultiple" onclick="selectOneOrMultipleSetting(1)"><label for="selectMultiple">Select Multiple</label><br>
-    </div>
-    <div class="settingContainer">
-        When buying an upgrade for multiple Squares:<br>
-        <input id='selectBuyLowest' type="radio" name="selectBuyLowestOrAll" onclick="selectBuyLowestOrAll(0)" checked="checked"><label for="selectBuyLowest">Buy Squares with lowest upgrade amount, all together</label><br>
-        <input id='selectAllBuy' type="radio" name="selectBuyLowestOrAll" onclick="selectBuyLowestOrAll(1)"><label for="selectAllBuy">Every Square tries to buy</label><br>
-    </div>
-    <div class="settingContainer">
-        When selecting multiple Squares,<br>the upgrade amount/cost will:<br>
-        <input id='selectLast' type="radio" name="selectLastOrLowest" onclick="selectLastOrLowest(0)" checked="checked"><label for="selectLast">Show Last Selected</label><br>
-        <input id='selectLowest' type="radio" name="selectLastOrLowest" onclick="selectLastOrLowest(1)"><label for="selectLowest">Show Lowest</label><br>
-    </div>
-    <!--<div class="settingContainer">-->
-        <!--When selecting multiple Squares:<br>-->
-        <!--<input id='selectSameColor' type="radio" name="selectOneOrMultiple" onclick="selectOneOrMultipleSetting(0)" checked><label for="selectSameColor">Selected Squares are the same color</label><br>-->
-        <!--<input id='selectNanitesLowest' type="radio" name="selectOneOrMultiple" onclick="selectOneOrMultipleSetting(1)"><label for="selectNanitesLowest">Lowest Nanites of Selected Square is a different color</label><br>-->
-        <!--<input id='selectAdvBotsLowest' type="radio" name="selectOneOrMultiple" onclick="selectOneOrMultipleSetting(1)"><label for="selectAdvBotsLowest">Lowest Advanced Robots of selected Square is a different color</label><br>-->
-    <!--</div>-->
-    <!--<div class="settingContainer">-->
-        <!--Square's color is based on:<br>-->
-        <!--<input id='selectNanitesColor' type="radio" name="selectOneOrMultiple" onclick="selectOneOrMultipleSetting(0)" checked><label for="selectNanitesColor">Nanites</label><br>-->
-        <!--<input id='selectAdvBotsColor' type="radio" name="selectOneOrMultiple" onclick="selectOneOrMultipleSetting(1)"><label for="selectAdvBotsColor">Advanced Robots</label><br>-->
-    <!--</div>-->
-    <!--<div class="settingContainer">-->
-        <!--Show which amount on the Square:<br>-->
-        <!--<input id='selectNaniteAmount' type="radio" name="selectOneOrMultiple" onclick="selectOneOrMultipleSetting(0)" checked><label for="selectNaniteAmount">Nanite Amount</label><br>-->
-        <!--<input id='selectAdvBotsAmount' type="radio" name="selectOneOrMultiple" onclick="selectOneOrMultipleSetting(1)"><label for="selectAdvBotsAmount">Advanced Robot Amount</label><br>-->
-    <!--</div>-->
-    <!--<div class="settingContainer">-->
-        <!--Show how much on the Square:<br>-->
-        <!--<input id='selectNanites' type="radio" name="selectOneOrMultiple" onclick="selectOneOrMultipleSetting(0)" checked><label for="selectNanites">Nanites</label><br>-->
-        <!--<input id='selectAdvBots' type="radio" name="selectOneOrMultiple" onclick="selectOneOrMultipleSetting(1)"><label for="selectAdvBots">Advanced Robots</label><br>-->
-    <!--</div>-->
-    <!--<div class="settingContainer">-->
-        <!--When buying upgrades:<br>-->
-        <!--<input id='selectRounding' type="radio" name="selectOneOrMultiple" onclick="selectOneOrMultipleSetting(0)" checked><label for="selectRounding">Automatic Rounding</label><br>-->
-        <!--<input id='selectNoRounding' type="radio" name="selectOneOrMultiple" onclick="selectOneOrMultipleSetting(1)"><label for="selectNoRounding">No Rounding</label><br>-->
-    <!--</div>-->
+<div id="infoPanel" style="position:fixed;bottom:0;height:200px;width:800px;background-color:#8194bd;z-index:999;display:none;overflow:auto;">
 
-    <!--</div>-->
-    <i id="backButton2" class="backButton fa fa-reply" onclick="closeSettingsBox()"></i>
-    <i id="closeButton2" class="closeButton fa fa-close" onclick="deselectAll()"></i>
-</div>
-<div id="infoBox" style="position:fixed;bottom:0;height:200px;width:800px;background-color:#8194bd;z-index:999;display:none;">
-
-    <div id="resourceTypeLabel" class="large">Nanites</div><br>
-    <div id="infoGrid" class="small">
-        <div class="col" style="width:91px;text-align:right;margin-right:10px;">
-            <div class="row"></div>
-            <div class="largeRow"><div id="totalLabel">Total:</div></div>
-            <div class="medRow"><div id="netLabel">Net:</div></div>
-            <div class="row"><div id="createdLabel">Created:</div></div>
-            <div class="row"><div id="receivedLabel">Received:</div></div>
-            <div class="row"><div id="sentLabel">Sent:</div></div>
-            <div class="row"><div id="transferRateLabel">Transfer Rate:</div></div>
-            <div class="row"><div id="consumeCostLabel">Consume Cost:</div></div>
+    <div id="helpBox" style="position:fixed;bottom:0;height:200px;width:800px;background-color:#8194bd;z-index:999;display:none;">
+        Press the WASD / arrow keys to change direction<br>
+        Press enter / space to buy the first upgrade of the selected<br>
+        Cost goes up every bonus level, but nanite production doubles. The first bonus level is at 10, then every 25, increasing later.<br>
+        Every second, a Square generates its own nanites, and sends nanites to another Square.<br>
+        It sends Transfer Rate * Nanites per second to the Square in the direction of its arrow.<br>
+        'Lowest' will show the square with the least upgrades, then least nanites.<br>
+        Capture all the squares to advance to the next level (TODO)
+        <i id="backButton1" class="backButton fa fa-reply" onclick="closeHelpBox()"></i>
+    </div>
+    <div id="settingsBox" style="display:none;">
+        <div class="settingContainer">
+            When clicking Squares on the grid:<br>
+            <input id='selectOne' type="radio" name="selectOneOrMultiple" onclick="selectOneOrMultipleSetting(0)" checked="checked"><label for="selectOne">Select One</label><br>
+            <input id='selectMultiple' type="radio" name="selectOneOrMultiple" onclick="selectOneOrMultipleSetting(1)"><label for="selectMultiple">Select Multiple</label><br>
         </div>
-        <div id="infoGridSingle" class="col">
-            <div class="rowLabel" id="selectedTypeLabel">Amount</div>
-            <div class="largeRow"><div id="totalTs"></div></div>
-            <div class="medRow"><div id="netTs"></div></div>
-            <div class="row"><div id="totalTRate"></div></div>
-            <div class="row"><div id="totalTAmountReceived"></div></div>
-            <div class="row"><div id="totalTTransferAmount"></div></div>
-            <div class="row"><div id="totalTransferRate"></div></div>
-            <div class="row" id="totalConsumeCostContainer"><div id="totalConsumeCost"></div></div>
+        <div class="settingContainer">
+            When buying an upgrade for multiple Squares:<br>
+            <input id='selectBuyLowest' type="radio" name="selectBuyLowestOrAll" onclick="selectBuyLowestOrAll(0)" checked="checked"><label for="selectBuyLowest">Buy Squares with lowest upgrade amount, all together</label><br>
+            <input id='selectAllBuy' type="radio" name="selectBuyLowestOrAll" onclick="selectBuyLowestOrAll(1)"><label for="selectAllBuy">Every Square tries to buy</label><br>
         </div>
-        <div id="infoGridAverage" class="col">
-            <div class="rowLabel">Average</div>
-            <div class="largeRow"><div id="averageTs"></div></div>
-            <div class="medRow"><div id="averageNetTs"></div></div>
-            <div class="row"><div id="averageTRate"></div></div>
-            <div class="row"><div id="averageTAmountReceived"></div></div>
-            <div class="row"><div id="averageTTransferAmount"></div></div>
-            <div class="row"><div id="averageTransferRate"></div></div>
-            <div class="row" id="averageConsumeCostContainer"><div id="averageConsumeCost"></div></div>
+        <div class="settingContainer">
+            When selecting multiple Squares,<br>the upgrade amount/cost will:<br>
+            <input id='selectLast' type="radio" name="selectLastOrLowest" onclick="selectLastOrLowest(0)" checked="checked"><label for="selectLast">Show Last Selected</label><br>
+            <input id='selectLowest' type="radio" name="selectLastOrLowest" onclick="selectLastOrLowest(1)"><label for="selectLowest">Show Lowest</label><br>
         </div>
-        <div id="infoGridLowest" class="col">
-            <div class="rowLabel">Lowest</div>
-            <div class="largeRow"><div id="lowestTs"></div></div>
-            <div class="medRow"><div id="lowestNetTs"></div></div>
-            <div class="row"><div id="lowestTRate"></div></div>
-            <div class="row"><div id="lowestTAmountReceived"></div></div>
-            <div class="row"><div id="lowestTTransferAmount"></div></div>
-            <div class="row"><div id="lowestTransferRate"></div></div>
-            <div class="row" id="lowestConsumeCostContainer"><div id="lowestConsumeCost"></div></div>
+        <div class="settingContainer">
+            When selecting multiple Squares, the borders colors are:<br>
+            <input id='selectSameColor' type="radio" name="selectAllOrLowestBorderColor" onclick="selectAllOrLowestBorderColor(0)" checked="checked"><label for="selectSameColor">The same color</label><br>
+            <input id='selectLowestColor' type="radio" name="selectAllOrLowestBorderColor" onclick="selectAllOrLowestBorderColor(1)"><label for="selectLowestColor">Lowest Squares are a different color</label><br>
         </div>
-
-        <!--<div id="transferRateContainer" class="resourceBlock" style="margin-top:5px;">-->
-            <!--<div>Transfer Rate: <div id="transferRate"></div>%</div>-->
+        <div class="settingContainer">
+            Show what on the Square:<br>
+            <input id='selectShowNone' type="radio" name="selectShowNoneOrNanitesOrAmount" onclick="selectShowNoneOrNanitesOrAmount(0)" checked><label for="selectShowNone">None</label><br>
+            <input id='selectShowNanites' type="radio" name="selectShowNoneOrNanitesOrAmount" onclick="selectShowNoneOrNanitesOrAmount(1)"><label for="selectShowNanites">Nanites</label><br>
+            <input id='selectShowUpgradeAmount' type="radio" name="selectShowNoneOrNanitesOrAmount" onclick="selectShowNoneOrNanitesOrAmount(2)"><label for="selectShowUpgradeAmount">Upgrade Amount</label><br>
+        </div>
+        <!--<div class="settingContainer">-->
+            <!--Show how much on the Square:<br>-->
+            <!--<input id='selectNanites' type="radio" name="selectOneOrMultiple" onclick="selectOneOrMultipleSetting(0)" checked><label for="selectNanites">Nanites</label><br>-->
+            <!--<input id='selectAdvBots' type="radio" name="selectOneOrMultiple" onclick="selectOneOrMultipleSetting(1)"><label for="selectAdvBots">Advanced Robots</label><br>-->
         <!--</div>-->
-        <!--<div id="totalConsumeCostContainer" class="resourceBlock">-->
-            <!--<div id="totalConsumeCostLabel" class="resourceLabel"></div>-->
-            <!--<div id="totalConsumeCost"></div>-->
+        <!--<div class="settingContainer">-->
+            <!--When buying upgrades:<br>-->
+            <!--<input id='selectRounding' type="radio" name="selectOneOrMultiple" onclick="selectOneOrMultipleSetting(0)" checked><label for="selectRounding">Automatic Rounding</label><br>-->
+            <!--<input id='selectNoRounding' type="radio" name="selectOneOrMultiple" onclick="selectOneOrMultipleSetting(1)"><label for="selectNoRounding">No Rounding</label><br>-->
         <!--</div>-->
+
+        <!--</div>-->
+        <i id="backButton2" class="backButton fa fa-reply" onclick="closeSettingsBox()"></i>
+        <i id="closeButton2" class="closeButton fa fa-close" onclick="deselectAll()"></i>
     </div>
+    <div id="infoBox" style="">
 
-    <i id="helpButton" class="fa fa-question-circle-o" onclick="openHelpBox()"></i>
-    <i id="settingsButton" class="fa fa-sliders" onclick="openSettingsBox()"></i>
-    <i id="closeButton" class="closeButton fa fa-close" onclick="deselectAll()"></i>
-    <i id="leftArrow" class="fa fa-arrow-circle-left arrow" onclick="changeDirectionOfSelected('West')"></i>
-    <i id="rightArrow" class="fa fa-arrow-circle-right arrow" onclick="changeDirectionOfSelected('East')"></i>
-    <i id="upArrow" class="fa fa-arrow-circle-up arrow" onclick="changeDirectionOfSelected('North')"></i>
-    <i id="downArrow" class="fa fa-arrow-circle-down arrow" onclick="changeDirectionOfSelected('South')"></i>
+        <div id="resourceTypeLabel" class="large">Nanites</div><br>
+        <div id="infoGrid" class="small">
+            <div class="col" style="width:91px;text-align:right;margin-right:10px;">
+                <div class="row"></div>
+                <div class="largeRow"><div id="totalLabel">Total:</div></div>
+                <div class="medRow"><div id="netLabel">Net:</div></div>
+                <div class="row"><div id="createdLabel">Created:</div></div>
+                <div class="row"><div id="receivedLabel">Received:</div></div>
+                <div class="row"><div id="sentLabel">Sent:</div></div>
+                <div class="row"><div id="transferRateLabel">Transfer Rate:</div></div>
+                <div class="row"><div id="consumeCostLabel">Consume Cost:</div></div>
+            </div>
+            <div id="infoGridSingle" class="col">
+                <div class="rowLabel" id="selectedTypeLabel">Amount</div>
+                <div class="largeRow"><div id="totalTs"></div></div>
+                <div class="medRow"><div id="netTs"></div></div>
+                <div class="row"><div id="totalTRate"></div></div>
+                <div class="row"><div id="totalTAmountReceived"></div></div>
+                <div class="row"><div id="totalTTransferAmount"></div></div>
+                <div class="row"><div id="totalTransferRate"></div></div>
+                <div class="row"><div id="totalConsumeCost"></div></div>
+            </div>
+            <div id="infoGridAverage" class="col">
+                <div class="rowLabel">Average</div>
+                <div class="largeRow"><div id="averageTs"></div></div>
+                <div class="medRow"><div id="averageNetTs"></div></div>
+                <div class="row"><div id="averageTRate"></div></div>
+                <div class="row"><div id="averageTAmountReceived"></div></div>
+                <div class="row"><div id="averageTTransferAmount"></div></div>
+                <div class="row"><div id="averageTransferRate"></div></div>
+                <div class="row"><div id="averageConsumeCost"></div></div>
+            </div>
+            <div id="infoGridLowest" class="col">
+                <div class="rowLabel">Lowest</div>
+                <div class="largeRow"><div id="lowestTs"></div></div>
+                <div class="medRow"><div id="lowestNetTs"></div></div>
+                <div class="row"><div id="lowestTRate"></div></div>
+                <div class="row"><div id="lowestTAmountReceived"></div></div>
+                <div class="row"><div id="lowestTTransferAmount"></div></div>
+                <div class="row"><div id="lowestTransferRate"></div></div>
+                <div class="row"><div id="lowestConsumeCost"></div></div>
+            </div>
 
-    <div id="buttonContainer">
-        Buy Per Click:
-        <div id="buyAmountOptionContainer">
-            <div id="buy1" class="buyAmountOption" onclick="buyAmountOption(1)" style="background-color:#ff4400">1</div>
-            <div id="buy5" class="buyAmountOption" onclick="buyAmountOption(5)">5</div>
-            <div id="buy10" class="buyAmountOption" onclick="buyAmountOption(10)">10</div>
-            <div id="buy25" class="buyAmountOption" onclick="buyAmountOption(25)">25</div>
-            <div id="buy50" class="buyAmountOption" onclick="buyAmountOption(50)">50</div>
+            <!--<div id="transferRateContainer" class="resourceBlock" style="margin-top:5px;">-->
+                <!--<div>Transfer Rate: <div id="transferRate"></div>%</div>-->
+            <!--</div>-->
+            <!--<div id="totalConsumeCostContainer" class="resourceBlock">-->
+                <!--<div id="totalConsumeCostLabel" class="resourceLabel"></div>-->
+                <!--<div id="totalConsumeCost"></div>-->
+            <!--</div>-->
         </div>
-        <div id="buyNanitesButton" class="buyButton" onclick="buyNanitesButtonPressed()">
-            <div id="naniteAmount" style="font-size:18px;"></div>
-            <div id="naniteCost"></div>
-            <div id="naniteBenefit"></div>
-            <div id="naniteSpecialNext"></div>
-            <div id="numSelectedNanitesButtonBuyable" style="position:absolute;right:5px;top:2px;"></div>
+
+        <i id="helpButton" class="fa fa-question-circle-o" onclick="openHelpBox()"></i>
+        <i id="settingsButton" class="fa fa-sliders" onclick="openSettingsBox()"></i>
+        <i id="closeButton" class="closeButton fa fa-close" onclick="deselectAll()"></i>
+        <i id="leftArrow" class="fa fa-arrow-circle-left arrow" onclick="changeDirectionOfSelected('West')"></i>
+        <i id="rightArrow" class="fa fa-arrow-circle-right arrow" onclick="changeDirectionOfSelected('East')"></i>
+        <i id="upArrow" class="fa fa-arrow-circle-up arrow" onclick="changeDirectionOfSelected('North')"></i>
+        <i id="downArrow" class="fa fa-arrow-circle-down arrow" onclick="changeDirectionOfSelected('South')"></i>
+
+        <div id="buttonContainer">
+            Buy Per Click:
+            <div id="buyAmountOptionContainer">
+                <div id="buy1" class="buyAmountOption" onclick="buyAmountOption(1)" style="background-color:#ff4400">1</div>
+                <div id="buy5" class="buyAmountOption" onclick="buyAmountOption(5)">5</div>
+                <div id="buy10" class="buyAmountOption" onclick="buyAmountOption(10)">10</div>
+                <div id="buy25" class="buyAmountOption" onclick="buyAmountOption(25)">25</div>
+                <div id="buy50" class="buyAmountOption" onclick="buyAmountOption(50)">50</div>
+            </div>
+            <div id="buyNanitesButton" class="buyButton" onclick="buyNanitesButtonPressed()">
+                <div id="naniteAmount" style="font-size:18px;"></div>
+                <div id="naniteCost"></div>
+                <div id="naniteBenefit"></div>
+                <div id="naniteSpecialNext"></div>
+                <div id="numSelectedNanitesButtonBuyable" style="position:absolute;right:5px;top:2px;"></div>
+            </div>
+            <div id="buyAdvBotsButton" class="buyButton" onclick="buyAdvBotsButtonPressed()" style="display:none;">
+                <div id="advBotAmount" style="font-size:18px;"></div>
+                <div id="advBotCost"></div>
+                <div id="advBotBenefit"></div>
+                <div id="advBotSpecialNext"></div>
+                <div id="numSelectedAdvBotsButtonBuyable" style="position:absolute;right:5px;top:2px;"></div>
+            </div>
         </div>
-        <div id="buyAdvBotsButton" class="buyButton" onclick="buyAdvBotsButtonPressed()" style="display:none;">
-            <div id="advBotAmount" style="font-size:18px;"></div>
-            <div id="advBotCost"></div>
-            <div id="advBotBenefit"></div>
-            <div id="advBotSpecialNext"></div>
-            <div id="numSelectedAdvBotsButtonBuyable" style="position:absolute;right:5px;top:2px;"></div>
-        </div>
+
     </div>
 
 </div>

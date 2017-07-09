@@ -84,35 +84,29 @@ function clickedSquare(col, row) {
     var pos = selected.indexOf(square);
     if(pos === -1) {
         if(!settings.selectOneOrMultiple && selected.length >= 1) { //single
-            setSelectedFalse();
+            theView.setSelectedFalse();
             selected = [];
             selected.push(square);
         } else { //multiple
             selected.push(square);
         }
-        theView.selectedChange();
         theView.updateInfoBox();
-        return;
+    } else {
+        theView.changeBorderSelected(square);
+        selected.splice(pos, 1);
+        theView.updateInfoBox();
     }
-    theView.selectedChange();
-    selected.splice(pos, 1);
-    theView.updateInfoBox();
     showOrHideBox();
 }
 function deselectAll() {
     if(selected.length === 0) {
         return;
     }
-    setSelectedFalse();
+    theView.setSelectedFalse();
     selected = [];
     theView.updateInfoBox();
+    closeSettingsBox();
     showOrHideBox();
-}
-function setSelectedFalse() {
-    for(var i = 0; i < selected.length; i++) {
-        selected[i].isSelected = 0;
-    }
-    theView.selectedChange();
 }
 
 function changeDirectionOfSelected(direction) {
@@ -147,7 +141,7 @@ function buyNanitesButtonPressed() {
     theView.updateInfoBox();
 }
 function buyLowest() {
-    var lowestAmountSquares = getLowestSquares('nanite');
+    var lowestAmountSquares = getLowestSquares(getSelectedActive(), 'nanite');
     var allBuyable = true;
     for(var i = 0; i < lowestAmountSquares.length; i++) {
         allBuyable = allBuyable && lowestAmountSquares[i].canBuyNanitesAfterMultiBuy();
@@ -168,25 +162,27 @@ function buyAdvBotsButtonPressed() {
     theView.updateInfoBox();
 }
 
-function getLowestSquares(resourceType) {  //gets all the Squares with the lowest upgrade amount
-    var lowestAmountSquares = [selected[0]];
-    for(var i = 1; i < selected.length; i++) {
-        if(!selected[i].isActive()) {
+function getLowestSquares(list, resourceType) {  //gets all the Squares with the lowest upgrade amount
+    var lowestAmountSquares;
+    for(var i = 0; i < list.length; i++) {
+        if(!lowestAmountSquares) {
+            lowestAmountSquares = [list[i]];
             continue;
         }
-        if(selected[i][resourceType + 'Amount'] < lowestAmountSquares[0][resourceType + 'Amount']) {
+        if(list[i][resourceType + 'Amount'] < lowestAmountSquares[0][resourceType + 'Amount']) {
             lowestAmountSquares = [];
-            lowestAmountSquares.push(selected[i]);
-        } else if(selected[i][resourceType + 'Amount'] === lowestAmountSquares[0][resourceType + 'Amount']) {
-            lowestAmountSquares.push(selected[i]);
+            lowestAmountSquares.push(list[i]);
+        } else if(list[i][resourceType + 'Amount'] === lowestAmountSquares[0][resourceType + 'Amount']) {
+            lowestAmountSquares.push(list[i]);
         }
     }
-    return lowestAmountSquares;
+    return lowestAmountSquares ? lowestAmountSquares : [];
 }
 function getLowestSquare(list, resourceType) {
-    var lowestSquare = list[0];
-    for(var i = 1; i < list.length; i++) {
-        if(!list[i].isActive()) {
+    var lowestSquare;
+    for(var i = 0; i < list.length; i++) {
+        if(!lowestSquare) {
+            lowestSquare = list[i];
             continue;
         }
         if(list[i][resourceType + 'Amount'] < lowestSquare[resourceType + 'Amount'] ||
@@ -195,6 +191,37 @@ function getLowestSquare(list, resourceType) {
         }
     }
     return lowestSquare;
+}
+function getSelectedActive() {
+    var selectedActive = [];
+    for(var i = 0; i < selected.length; i++) {
+        if(selected[i].isActive()) {
+            selectedActive.push(selected[i]);
+        }
+    }
+    return selectedActive;
+}
+function getSelectedInactive() {
+    var selectedInactive = [];
+    for(var i = 0; i < selected.length; i++) {
+        if(!selected[i].isActive()) {
+            selectedInactive.push(selected[i]);
+        }
+    }
+    return selectedInactive;
+}
+function getLowestInactiveSquare(list) {
+    var lowestInactive;
+    for(var i = 0; i < list.length; i++) {
+        if(!lowestInactive) {
+            lowestInactive = list[i];
+            continue;
+        }
+        if(list[i].consumeCost < lowestInactive.consumeCost) {
+            lowestInactive = list[i];
+        }
+    }
+    return lowestInactive;
 }
 
 
