@@ -94,9 +94,17 @@ function View() {
         if(settings.selectShowNoneOrNanitesOrAmount === 0) {
             displayNum.innerHTML = '';
         } else if(settings.selectShowNoneOrNanitesOrAmount === 1) {
-            displayNum.innerHTML = intToStringRound(square[resourceType+'s']);
+            if(square.isActive()) {
+                displayNum.innerHTML = intToStringRound(square[resourceType+'s']);
+            } else {
+                displayNum.innerHTML = intToStringRound(square.consumeCost);
+            }
         } else {
-            displayNum.innerHTML = intToStringRound(square[resourceType+'Amount']);
+            if(square.isActive()) {
+                displayNum.innerHTML = intToStringRound(square[resourceType+'Amount']);
+            } else {
+                displayNum.innerHTML = intToStringRound(square.consumeCost);
+            }
         }
     };
 

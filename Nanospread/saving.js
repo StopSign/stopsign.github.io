@@ -16,7 +16,7 @@ function loadDefaults() {
     settings.buyLowestOrAll = 0;
     settings.showLastOrLowest = 0;
     settings.selectAllOrLowestBorderColor = 0;
-    settings.selectShowNoneOrNanitesOrAmount = 2;
+    settings.selectShowNoneOrNanitesOrAmount = 0;
 }
 
 loadDefaults();
