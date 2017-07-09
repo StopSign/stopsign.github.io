@@ -165,20 +165,14 @@ function Square(col,row,initialConsumeCost) {
         this.transferDirection = newDirection;
     };
     this.chooseStartingDirection = function() {
-        this.targetRow = this.row;
-        this.targetCol = this.col;
         this.changeTargetDirection("South");
-
-        var target = theGrid[this.targetCol] ? theGrid[this.targetCol][this.targetRow] : false;
-        if(!target) {
+        if(!this.getTarget()) {
             this.changeTargetDirection("East");
-            target = theGrid[this.targetCol] ? theGrid[this.targetCol][this.targetRow] : false;
         }
-        if(!target) {
+        if(!this.getTarget()) {
             this.changeTargetDirection("North");
-            target = theGrid[this.targetCol] ? theGrid[this.targetCol][this.targetRow] : false;
         }
-        if(!target) {
+        if(!this.getTarget()) {
             this.changeTargetDirection("West");
         }
 

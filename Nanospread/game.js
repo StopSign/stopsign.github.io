@@ -18,7 +18,7 @@ function createGrid() {
         for (row = 0; row < theGrid[column].length; row++) {
             var square = theGrid[column][row];
             if(square) {
-                square.chooseStartingDirection(square); //All of them have a transfer target
+                square.chooseStartingDirection(); //All of them have a transfer target
             }
         }
     }
@@ -120,6 +120,9 @@ function changeDirectionOfSelected(direction) {
         }
     }
     theView.updateInfoBox();
+    for(i = 0; i < selected.length; i++) {
+        theView.updateDirectionDot(selected[i]);
+    }
 }
 
 function buyAll() {
@@ -139,6 +142,9 @@ function buyNanitesButtonPressed() {
         buyLowest();
     }
     theView.updateInfoBox();
+    for(var i = 0; i < selected.length; i++) {
+        theView.updateDisplayNum(selected[i], settings.selectedResourceNum === 0 ? 'nanite' : 'advBot');
+    }
 }
 function buyLowest() {
     var lowestAmountSquares = getLowestSquares(getSelectedActive(), 'nanite');

@@ -15,8 +15,8 @@ function View() {
             var rectStartY = row*rowSize + this.offsety + 30;
             elem.innerHTML =
                 "<div class='naniteSquare' style='left:"+rectStartX+"px;top:"+rectStartY+"px;width:"+(rowSize-10)+"px;height:"+(rowSize-10)+"px;' onclick='clickedSquare("+col+","+row+")'>" +
-                    "<div class='displayNum' id='displayNumcol"+col+"row"+row+"'>" +
-                    "</div>" +
+                    "<div class='displayNum' id='displayNumcol"+col+"row"+row+"'></div>" +
+                    "<div class='directionDot' id='directionDotcol"+col+"row"+row+"'></div>" +
                 "</div>";
             document.getElementById('naniteGrid').appendChild(elem);
             this.grid[col][row] = elem.firstChild;
@@ -59,9 +59,31 @@ function View() {
                 this.changeBorderSelected(square);
                 this.changeBackground(square);
                 this.updateDisplayNum(square, settings.selectedResourceNum === 0 ? 'nanite' : 'advBot');
+                this.updateDirectionDot(square);
             }
         }
         this.updateInfoBox();
+    };
+
+    this.updateDirectionDot = function(square) {
+        var directionDot = document.getElementById('directionDotcol'+square.col+'row'+square.row);
+        if(!directionDot) {
+            return;
+        }
+        var dir = square.transferDirection;
+        if(dir === "East") {
+            directionDot.style.top = '22px';
+            directionDot.style.left = '39px';
+        } else if(dir === "West") {
+            directionDot.style.top = '22px';
+            directionDot.style.left = '3px';
+        } else if(dir === "North") {
+            directionDot.style.top = '3px';
+            directionDot.style.left = '22px';
+        } else if(dir === "South") {
+            directionDot.style.top = '39px';
+            directionDot.style.left = '22px';
+        }
     };
 
     this.updateDisplayNum = function(square, resourceType) {
@@ -132,9 +154,9 @@ function buttonSetup(type, typeUpper, label) { //lol javascript
 
 function drawDirectionArrow() {
     var arrows = [document.getElementById('leftArrow'), document.getElementById('rightArrow'), document.getElementById('upArrow'), document.getElementById('downArrow')];
-    var dir = selected[0].transferDirection;
     clearArrows(arrows);
 
+    var dir = selected[0].transferDirection;
     for(var i = 0; i < selected.length; i++) {
         if(selected[i].transferDirection !== dir) {
             return; //just clear arrows if they're not all the same

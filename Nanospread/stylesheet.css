@@ -6,7 +6,6 @@
     background-color:white;
     cursor:pointer;
     text-align:center;
-
 }
 
 .resourceBlock {
@@ -170,4 +169,11 @@ input, label {
     font-weight:bold;
     font-size:12px;
     margin-top:29%;
+}
+.directionDot {
+    background-color:white;
+    width:2px;
+    position:absolute;
+    height:2px;
+    border-radius:10px;
 }
