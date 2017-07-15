@@ -1,15 +1,15 @@
 
 function createGrid() {
     var startingCoords = {x:0,y:0};
-    for (var column = 0; column < levelData[0].length; column++) {
+    for (var column = 0; column < levelData[currentLevel].grid[0].length; column++) {
         theGrid[column] = [];
-        for (var row = 0; row < levelData.length; row++) {
-            if(!levelData[row][column]) {
+        for (var row = 0; row < levelData[currentLevel].grid.length; row++) {
+            if(!levelData[currentLevel].grid[row][column]) {
                 continue;
             }
             var squareCoords = {x:column,y:row};
             // var distanceFromCenter = Math.sqrt(Math.pow((squareCoords.x-startingCoords.x),2)+Math.pow((squareCoords.y-startingCoords.y),2));
-            var initialConsumeCost = Math.pow(2, levelData[row][column])*30;
+            var initialConsumeCost = Math.pow(2, levelData[currentLevel].grid[row][column])*30;
             theGrid[column][row] =  new Square(squareCoords.x, squareCoords.y, initialConsumeCost);
         }
     }

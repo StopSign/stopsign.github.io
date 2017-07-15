@@ -8,6 +8,7 @@ document.addEventListener("keydown", function(e) {
 function processKeyQueue() {
     var key = myKeyQueue[0];
     myKeyQueue.splice(0, 1);
+    // console.log(key);
     if(key === 27) { //escape
         select.deselectAll()
     } else if(key === 13 || key === 32) { //enter / space
@@ -28,6 +29,8 @@ function processKeyQueue() {
         select.selectAllActive()
     } else if(key === 82) { //r
 
+    } else if(key === 72) { //h
+        toggleHelp();
     }
 //            if(myKeyQueue.length > 0) {
 //                $scope.pbars[selectedButton[0]].changeSelect(selectedButton[1]);

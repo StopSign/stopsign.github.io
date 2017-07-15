@@ -13,6 +13,7 @@ var endingDragPoint = {};
 var select = new Select();
 var totalMouseMoves = 0;
 var isDragging = false;
+var currentLevel = 1;
 
 function loadDefaults() {
     settings.buyPerClick = 1;

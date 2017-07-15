@@ -26,7 +26,7 @@
 <div id="menuBar" class="small" style="position:fixed;bottom:0;height:30px;width:800px;background-color:#8194bd;z-index:999;left:8px;">
     <div class="menuButton" onclick="toggleBuild()"><i class="fa fa-microchip" style="font-size:20px;"></i> Build (b)</div>
     <div class="menuButton" onclick="toggleSettingsBox()"><i class="fa fa-sliders" style="font-size:20px;"></i> Settings (q)</div>
-    <div class="menuButton" onclick="toggleHelp()"><i class="fa fa-question-circle-o" style="font-size:20px;"></i> Help</div>
+    <div class="menuButton" onclick="toggleHelp()"><i class="fa fa-question-circle-o" style="font-size:20px;"></i> Help (h)</div>
     <div class="menuButton" style="float:right" onclick="select.selectAllActive()"><div style="margin-top:3px;">Select Active (e)</div></div>
 </div>
 <div id="infoPanel" style="position:fixed;bottom:30px;height:170px;width:800px;background-color:#8194bd;z-index:999;display:none;overflow:auto;">
@@ -51,6 +51,7 @@
         Every second, a Square generates its own nanites, and sends nanites to another Square.<br>
         It sends Transfer Rate * Nanites per second to the Square in the direction of its arrow.<br>
         'Lowest' will show the square with the least upgrades, then least nanites.<br>
+        Click and drag to select multiple. It only works in one direction at the moment.<br>
         Capture all the squares to advance to the next level (TODO)
         <i id="backButton1" class="backButton fa fa-close" onclick="closeHelpBox()" style="font-size:24px"></i>
     </div>
