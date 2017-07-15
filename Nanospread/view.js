@@ -2,6 +2,7 @@ function View() {
     this.offsetx = 0;
     this.offsety = 0;
     this.grid = [];
+    this.backgroundGrid = document.getElementById('naniteGrid');
 
     for(var col = 0; col < theGrid.length; col++) {
         this.grid[col] = [];
@@ -18,10 +19,45 @@ function View() {
                     "<div class='displayNum' id='displayNumcol"+col+"row"+row+"'></div>" +
                     "<div class='directionDot' id='directionDotcol"+col+"row"+row+"'></div>" +
                 "</div>";
-            document.getElementById('naniteGrid').appendChild(elem);
+            this.backgroundGrid.appendChild(elem);
             this.grid[col][row] = elem.firstChild;
         }
     }
+
+    this.backgroundGrid.onmousedown  = function(e) {
+        startingDragPoint = {x:e.pageX-8, y:e.pageY-8};
+        var dragSelectDiv = document.getElementById('dragSelectDiv');
+        dragSelectDiv.style.width = '2px';
+        dragSelectDiv.style.height = '2px';
+        dragSelectDiv.style.left = startingDragPoint.x+"px";
+        dragSelectDiv.style.top = startingDragPoint.y+"px";
+        totalMouseMoves = 0;
+        isDragging = true;
+    };
+    this.backgroundGrid.onmousemove = function(e) {
+        var dragSelectDiv = document.getElementById('dragSelectDiv');
+        if(isDragging) {
+            totalMouseMoves++;
+            if(totalMouseMoves < 15) {
+                dragSelectDiv.style.display = "none";
+            } else {
+                dragSelectDiv.style.display = "block";
+            }
+        }
+        if(dragSelectDiv.style.display === "block") {
+            dragSelectDiv.style.width = (e.pageX - startingDragPoint.x - 8)+"px";
+            dragSelectDiv.style.height = (e.pageY - startingDragPoint.y - 8)+"px";
+        }
+    };
+    this.backgroundGrid.onmouseup  = function(e) {
+        document.getElementById('dragSelectDiv').style.display = 'none';
+        isDragging = false;
+        if(totalMouseMoves < 15) {
+            return;
+        }
+        endingDragPoint = {x:(e.pageX - 8), y:(e.pageY - 8)};
+        select.selectAllInCoordinates(startingDragPoint, endingDragPoint);
+    };
 
     this.drawButtons = function() {
         buttonSetup('nanite', 'Nanites', 'Nanites');
@@ -146,7 +182,7 @@ function buttonSetup(type, typeUpper, label) { //lol javascript
         buyAvailableOr += selected[i]["canBuy"+typeUpper+"AfterMultiBuy"]() ? 1 : 0;
         buyAvailableAnd = buyAvailableAnd && selected[i]["canBuy"+typeUpper+"AfterMultiBuy"]();
     }
-    var lowestSelected = selected.length > 1 ? getLowestSquare(getSelectedActive(), type) : selected[0];
+    var lowestSelected = selected.length > 1 ? select.getLowestSquare(select.getSelectedActive(), type) : selected[0];
     var displaySquare = settings.showLastOrLowest ? lowestSelected : lastSelected;
     if(!displaySquare) {
         return;
@@ -197,14 +233,14 @@ function colorShiftMath(initialColor, multi, leftOverMulti) {
 }
 
 function changeBordersOfLowest(viewGrid) {
-    if(!settings.selectOneOrMultiple || !settings.selectAllOrLowestBorderColor || selected.length === 0) {
+    if(!settings.selectAllOrLowestBorderColor || selected.length <= 1) {
         return;
     }
     var lowestSquares;
     if(settings.selectedResourceNum === 0) {
-        lowestSquares = getLowestSquares(getSelectedActive(), 'nanite');
+        lowestSquares = select.getLowestSquares(select.getSelectedActive(), 'nanite');
     } else {
-        lowestSquares = getLowestSquares(getSelectedActive(), 'advBot');
+        lowestSquares = select.getLowestSquares(select.getSelectedActive(), 'advBot');
     }
     for (var i = 0; i < lowestSquares.length; i++) {
         var gridSquare = viewGrid[lowestSquares[i].col][lowestSquares[i].row];
@@ -286,12 +322,12 @@ function updateInfoGridExtras() {
     for(var i = 0; i < selected.length; i++) {
         totalTransferRate += (selected[i].transferRate/100);
     }
-    var inactiveList = getSelectedInactive();
+    var inactiveList = select.getSelectedInactive();
     var totalConsumeCost = 0;
     for(i = 0; i < inactiveList.length; i++) {
         totalConsumeCost += inactiveList[i].consumeCost;
     }
-    var lowestInactive = getLowestInactiveSquare(inactiveList);
+    var lowestInactive = select.getLowestInactiveSquare(inactiveList);
 
     document.getElementById('totalTransferRate').innerHTML = intToString(totalTransferRate);
     document.getElementById('averageTransferRate').innerHTML = intToString(totalTransferRate / selected.length);
@@ -329,7 +365,7 @@ function updateInfoGrid(label, varLabel) {
         document.getElementById('averageTTransferAmount').innerHTML = intToString(totalNaniteTransferAmount / selected.length);
         document.getElementById('averageTAmountReceived').innerHTML = intToString(totalNaniteAmountReceived / selected.length);
 
-        var lowestSquare = getLowestSquare(getSelectedActive(), varLabel);
+        var lowestSquare = select.getLowestSquare(select.getSelectedActive(), varLabel);
         if(lowestSquare) {
             document.getElementById('lowestTs').innerHTML = intToString(lowestSquare[varLabel + 's']);
             document.getElementById('lowestNetTs').innerHTML = intToStringNegative(lowestSquare[varLabel + 'Rate'] + lowestSquare[varLabel + 'AmountReceived'] - lowestSquare[varLabel + 'TransferAmount']);
@@ -339,9 +375,9 @@ function updateInfoGrid(label, varLabel) {
             document.getElementById('lowestTransferRate').innerHTML = intToString(lowestSquare.transferRate / 100);
             document.getElementById('lowestConsumeCost').innerHtml = intToString(lowestSquare.consumeCost);
         }
-        var selectedInactive = getSelectedInactive();
+        var selectedInactive = select.getSelectedInactive();
         if(selectedInactive.length === selected.length) { //only selecting inactive
-            var lowestInactive = getLowestInactiveSquare(selectedInactive);
+            var lowestInactive = select.getLowestInactiveSquare(selectedInactive);
             document.getElementById('lowestNetTs').innerHTML = intToStringNegative(lowestInactive[varLabel + 'Rate'] + lowestInactive[varLabel + 'AmountReceived'] - lowestInactive[varLabel + 'TransferAmount']);
             document.getElementById('lowestTAmountReceived').innerHTML = intToString(lowestInactive[varLabel + 'AmountReceived']);
             document.getElementById('lowestConsumeCost').innerHtml = intToString(lowestInactive.consumeCost);

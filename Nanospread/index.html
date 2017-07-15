@@ -6,6 +6,7 @@
     <link rel="stylesheet" href="stylesheet.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <script src="helpers.js"></script>
+    <script src="select.js"></script>
     <script src="view.js"></script>
     <script src="Square.js"></script>
     <script src="Building.js"></script>
@@ -17,19 +18,31 @@
 </head>
 <body style="font-family:Arial, Helvetica, serif;color:black;font-size:14px;">
 <!--<canvas id="drawArea" width="800" height="1000"></canvas>-->
-<div id="naniteGrid" style="position:relative;width:800px;height:1000px;background-color:grey;"></div>
+<div id="naniteGrid" style="position:relative;width:800px;height:1000px;background-color:grey;">
+    <div id="dragSelectDiv" style="display:none;border:2px solid yellow;border-radius:1px;position:absolute;"></div>
+</div>
 
 
 <div id="menuBar" class="small" style="position:fixed;bottom:0;height:30px;width:800px;background-color:#8194bd;z-index:999;left:8px;">
     <div class="menuButton" onclick="toggleBuild()"><i class="fa fa-microchip" style="font-size:20px;"></i> Build (b)</div>
     <div class="menuButton" onclick="toggleSettingsBox()"><i class="fa fa-sliders" style="font-size:20px;"></i> Settings (q)</div>
     <div class="menuButton" onclick="toggleHelp()"><i class="fa fa-question-circle-o" style="font-size:20px;"></i> Help</div>
-    <div class="menuButton" style="float:right" onclick="selectAllActive()"><div style="margin-top:3px;">Select Active (e)</div></div>
+    <div class="menuButton" style="float:right" onclick="select.selectAllActive()"><div style="margin-top:3px;">Select Active (e)</div></div>
 </div>
 <div id="infoPanel" style="position:fixed;bottom:30px;height:170px;width:800px;background-color:#8194bd;z-index:999;display:none;overflow:auto;">
 
     <div id="buildBox" style="display:none;">
         <!--fa fa-truck, microchip, industry -->
+        <div class="buildingTypeContainer">
+            <div class="buildIconContainer">
+                <i class="fa truck" onclick="" style="font-size:24px;"></i>
+                2x1 Road
+            </div>
+            <div class="buildIconContainer">
+                <i class="rotate fa truck" onclick="" style="font-size:24px;"></i>
+
+            </div>
+        </div>
     </div>
     <div id="helpBox" style="display:none;">
         Press the WASD / arrow keys to change direction<br>
@@ -130,7 +143,7 @@
             <!--</div>-->
         </div>
 
-        <i id="closeButton" class="closeButton fa fa-close" onclick="deselectAll()"></i>
+        <i id="closeButton" class="closeButton fa fa-close" onclick="select.deselectAll()"></i>
         <i id="leftArrow" class="fa fa-arrow-circle-left arrow" onclick="changeDirectionOfSelected('West')"></i>
         <i id="rightArrow" class="fa fa-arrow-circle-right arrow" onclick="changeDirectionOfSelected('East')"></i>
         <i id="upArrow" class="fa fa-arrow-circle-up arrow" onclick="changeDirectionOfSelected('North')"></i>

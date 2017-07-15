@@ -8,6 +8,11 @@ var multFromFps = 1;
 var msWaitTime = 1000;
 var theGrid = [];
 var menuOpen = "";
+var startingDragPoint = {};
+var endingDragPoint = {};
+var select = new Select();
+var totalMouseMoves = 0;
+var isDragging = false;
 
 function loadDefaults() {
     settings.buyPerClick = 1;
@@ -18,6 +23,7 @@ function loadDefaults() {
     settings.showLastOrLowest = 0;
     settings.selectAllOrLowestBorderColor = 0;
     settings.selectShowNoneOrNanitesOrAmount = 0;
+
 }
 
 loadDefaults();

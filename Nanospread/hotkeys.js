@@ -9,7 +9,7 @@ function processKeyQueue() {
     var key = myKeyQueue[0];
     myKeyQueue.splice(0, 1);
     if(key === 27) { //escape
-        deselectAll()
+        select.deselectAll()
     } else if(key === 13 || key === 32) { //enter / space
         buyNanitesButtonPressed()
     } else if(key === 38 || key === 87) { //up
@@ -25,7 +25,7 @@ function processKeyQueue() {
     } else if(key === 81) { //q
         toggleSettingsBox();
     } else if(key === 69) { //e
-        selectAllActive()
+        select.selectAllActive()
     } else if(key === 82) { //r
 
     }
