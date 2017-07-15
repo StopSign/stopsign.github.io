@@ -7,6 +7,7 @@ var stop = 0;
 var multFromFps = 1;
 var msWaitTime = 1000;
 var theGrid = [];
+var menuOpen = "";
 
 function loadDefaults() {
     settings.buyPerClick = 1;

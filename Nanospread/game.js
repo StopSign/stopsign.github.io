@@ -82,7 +82,8 @@ function clickedSquare(col, row) {
     var square = theGrid[col][row];
     square.isSelected = !square.isSelected;
     var pos = selected.indexOf(square);
-    if(pos === -1) {
+    if(pos === -1) { //click new square
+        menuOpen = "";
         if(!settings.selectOneOrMultiple && selected.length >= 1) { //single
             theView.setSelectedFalse();
             selected = [];
@@ -96,6 +97,7 @@ function clickedSquare(col, row) {
         selected.splice(pos, 1);
         theView.updateInfoBox();
     }
+    adjustMenus();
     showOrHideBox();
 }
 function deselectAll() {

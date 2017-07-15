@@ -71,20 +71,6 @@ div {
     font-size:24px !important;
     cursor:pointer;
 }
-#settingsButton {
-    position:absolute;
-    right:30px;
-    top:5px;
-    font-size:24px;
-    cursor:pointer;
-}
-#helpButton {
-    position:absolute;
-    right:55px;
-    top:5px;
-    font-size:24px;
-    cursor:pointer;
-}
 .backButton {
     position:absolute;
     right:30px;
@@ -176,4 +162,14 @@ input, label {
     position:absolute;
     height:2px;
     border-radius:10px;
+}
+.menuButton {
+    padding:2px 10px;
+    border:1px solid black;
+    vertical-align: top;
+    cursor:pointer;
+    text-align:center;
+}
+.menuButton:hover {
+    background-color: #5f6f90;
 }

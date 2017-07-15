@@ -1,19 +1,77 @@
+function toggleSettingsBox() {
+    if(menuOpen === "settings") {
+        closeSettingsBox();
+    } else  {
+        openSettingsBox();
+    }
+    adjustMenus();
+}
 function openSettingsBox() {
-    document.getElementById('settingsBox').style.display = "block";
-    document.getElementById('infoBox').style.display = "none";
+    menuOpen = "settings";
+    adjustMenus();
 }
 function closeSettingsBox() {
-    document.getElementById('settingsBox').style.display = "none";
-    document.getElementById('infoBox').style.display = "block";
+    menuOpen = "";
+    adjustMenus();
+}
+function toggleHelp() {
+    if(menuOpen === "help") {
+        closeHelpBox()
+    } else  {
+        openHelpBox()
+    }
+    adjustMenus();
 }
 function openHelpBox() {
-    document.getElementById('helpBox').style.display = "block";
-    document.getElementById('infoBox').style.display = "none";
+    menuOpen = "help";
+    adjustMenus();
 }
 function closeHelpBox() {
-    document.getElementById('helpBox').style.display = "none";
-    document.getElementById('infoBox').style.display = "block";
+    menuOpen = "";
+    adjustMenus();
 }
+function toggleBuild() {
+    if(menuOpen === "build") {
+        closeBuildBox()
+    } else  {
+        openBuildBox()
+    }
+    adjustMenus();
+}
+function openBuildBox() {
+    menuOpen = "build";
+    adjustMenus();
+}
+function closeBuildBox() {
+    menuOpen = "";
+    adjustMenus();
+}
+
+function adjustMenus() {
+    closeMenus();
+    if(menuOpen === "help") {
+        document.getElementById('helpBox').style.display = "block";
+        document.getElementById('infoPanel').style.display = "block";
+    } else if(menuOpen === "settings") {
+        document.getElementById('settingsBox').style.display = "block";
+        document.getElementById('infoPanel').style.display = "block";
+    } else if(menuOpen === "build") {
+        document.getElementById('buildBox').style.display = "block";
+        document.getElementById('infoPanel').style.display = "block";
+    } else if(selected.length > 0) {
+        document.getElementById('infoBox').style.display = "block";
+        document.getElementById('infoPanel').style.display = "block";
+    }
+}
+
+function closeMenus() {
+    document.getElementById('infoBox').style.display = "none";
+    document.getElementById('buildBox').style.display = "none";
+    document.getElementById('settingsBox').style.display = "none";
+    document.getElementById('helpBox').style.display = "none";
+    document.getElementById('infoPanel').style.display = "none";
+}
+
 function selectOneOrMultipleSetting(num) {
     settings.selectOneOrMultiple = num;
 }

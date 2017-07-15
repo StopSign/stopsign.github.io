@@ -10,21 +10,24 @@ function processKeyQueue() {
     myKeyQueue.splice(0, 1);
     if(key === 27) { //escape
         deselectAll()
-    }
-    if(key === 13 || key === 32) { //enter / space
+    } else if(key === 13 || key === 32) { //enter / space
         buyNanitesButtonPressed()
-    }
-    if(key === 38 || key === 87) { //up
+    } else if(key === 38 || key === 87) { //up
         changeDirectionOfSelected('North')
-    }
-    if(key === 40 || key === 83) { //down
+    } else if(key === 40 || key === 83) { //down
         changeDirectionOfSelected('South')
-    }
-    if(key === 37 || key === 65) { //left / a
+    } else if(key === 37 || key === 65) { //left / a
         changeDirectionOfSelected('West')
-    }
-    if(key === 39 || key === 68) { //right
+    } else if(key === 39 || key === 68) { //right
         changeDirectionOfSelected('East')
+    } else if(key === 66) { //b
+        toggleBuild();
+    } else if(key === 81) { //q
+        toggleSettingsBox();
+    } else if(key === 69) { //e
+
+    } else if(key === 82) { //r
+
     }
 //            if(myKeyQueue.length > 0) {
 //                $scope.pbars[selectedButton[0]].changeSelect(selectedButton[1]);

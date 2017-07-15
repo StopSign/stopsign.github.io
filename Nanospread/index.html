@@ -20,9 +20,17 @@
 <div id="naniteGrid" style="position:relative;width:800px;height:1000px;background-color:grey;"></div>
 
 
-<div id="infoPanel" style="position:fixed;bottom:0;height:200px;width:800px;background-color:#8194bd;z-index:999;display:none;overflow:auto;">
+<div id="menuBar" class="small" style="position:fixed;bottom:0;height:30px;width:800px;background-color:#8194bd;z-index:999;left:8px;">
+    <div class="menuButton" onclick="toggleBuild()"><i class="fa fa-microchip" style="font-size:20px;"></i> Build (b)</div>
+    <div class="menuButton" onclick="toggleSettingsBox()"><i class="fa fa-sliders" style="font-size:20px;"></i> Settings (q)</div>
+    <div class="menuButton" onclick="toggleHelp()"><i class="fa fa-question-circle-o" style="font-size:20px;"></i> Help</div>
+</div>
+<div id="infoPanel" style="position:fixed;bottom:30px;height:170px;width:800px;background-color:#8194bd;z-index:999;display:none;overflow:auto;">
 
-    <div id="helpBox" style="position:fixed;bottom:0;height:200px;width:800px;background-color:#8194bd;z-index:999;display:none;">
+    <div id="buildBox" style="display:none;">
+        <!--fa fa-truck, microchip, industry -->
+    </div>
+    <div id="helpBox" style="display:none;">
         Press the WASD / arrow keys to change direction<br>
         Press enter / space to buy the first upgrade of the selected<br>
         Cost goes up every bonus level, but nanite production doubles. The first bonus level is at 10, then every 25, increasing later.<br>
@@ -30,7 +38,7 @@
         It sends Transfer Rate * Nanites per second to the Square in the direction of its arrow.<br>
         'Lowest' will show the square with the least upgrades, then least nanites.<br>
         Capture all the squares to advance to the next level (TODO)
-        <i id="backButton1" class="backButton fa fa-reply" onclick="closeHelpBox()"></i>
+        <i id="backButton1" class="backButton fa fa-close" onclick="closeHelpBox()" style="font-size:24px"></i>
     </div>
     <div id="settingsBox" style="display:none;">
         <div class="settingContainer">
@@ -65,8 +73,7 @@
             <!--<input id='selectNoRounding' type="radio" name="selectOneOrMultiple" onclick="selectOneOrMultipleSetting(1)"><label for="selectNoRounding">No Rounding</label><br>-->
         <!--</div>-->
 
-        <i id="backButton2" class="backButton fa fa-reply" onclick="closeSettingsBox()"></i>
-        <i id="closeButton2" class="closeButton fa fa-close" onclick="deselectAll()"></i>
+        <i id="closeButton2" class="closeButton fa fa-close" onclick="closeSettingsBox()"></i>
     </div>
     <div id="infoBox" style="">
 
@@ -122,8 +129,6 @@
             <!--</div>-->
         </div>
 
-        <i id="helpButton" class="fa fa-question-circle-o" onclick="openHelpBox()"></i>
-        <i id="settingsButton" class="fa fa-sliders" onclick="openSettingsBox()"></i>
         <i id="closeButton" class="closeButton fa fa-close" onclick="deselectAll()"></i>
         <i id="leftArrow" class="fa fa-arrow-circle-left arrow" onclick="changeDirectionOfSelected('West')"></i>
         <i id="rightArrow" class="fa fa-arrow-circle-right arrow" onclick="changeDirectionOfSelected('East')"></i>
