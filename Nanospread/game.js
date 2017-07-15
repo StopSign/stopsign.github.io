@@ -8,8 +8,8 @@ function createGrid() {
                 continue;
             }
             var squareCoords = {x:column,y:row};
-            var distanceFromCenter = Math.sqrt(Math.pow((squareCoords.x-startingCoords.x),2)+Math.pow((squareCoords.y-startingCoords.y),2));
-            var initialConsumeCost = Math.pow(distanceFromCenter, 2) * Math.pow(levelData[row][column], 2)*30;
+            // var distanceFromCenter = Math.sqrt(Math.pow((squareCoords.x-startingCoords.x),2)+Math.pow((squareCoords.y-startingCoords.y),2));
+            var initialConsumeCost = Math.pow(2, levelData[row][column])*30;
             theGrid[column][row] =  new Square(squareCoords.x, squareCoords.y, initialConsumeCost);
         }
     }
@@ -22,8 +22,8 @@ function createGrid() {
             }
         }
     }
-
-    theGrid[startingCoords.x][startingCoords.y].gainNanites(1);
+    var startingSquare = theGrid[startingCoords.x][startingCoords.y];
+    startingSquare.gainNanites(startingSquare.consumeCost);
 }
 
 function tick() {
@@ -109,6 +109,20 @@ function deselectAll() {
     theView.updateInfoBox();
     closeSettingsBox();
     showOrHideBox();
+}
+function selectAllActive() {
+    deselectAll();
+    var temp = settings.selectOneOrMultiple;
+    settings.selectOneOrMultiple = 1;
+    for (var column = 0; column < theGrid.length; column++) {
+        for (var row = 0; row < theGrid.length; row++) {
+            var square = theGrid[column][row];
+            if (square && square.isActive()) {
+                clickedSquare(column, row);
+            }
+        }
+    }
+    settings.selectOneOrMultiple = temp;
 }
 
 function changeDirectionOfSelected(direction) {

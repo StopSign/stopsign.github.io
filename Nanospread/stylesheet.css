@@ -169,6 +169,8 @@ input, label {
     vertical-align: top;
     cursor:pointer;
     text-align:center;
+    margin:1px;
+    height:20px;
 }
 .menuButton:hover {
     background-color: #5f6f90;

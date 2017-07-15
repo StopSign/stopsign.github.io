@@ -114,7 +114,7 @@ function View() {
             gridSquare.style.background = colorShiftMath(360, Math.log10(square.nanites));
             gridSquare.style.opacity = 1;
         } else {
-            var temp = Math.log10(square.consumeCost)/15+.2;
+            var temp = Math.log10(square.consumeCost)/13+.15;
             gridSquare.style.background = "hsl(120, 88%, 13%)";
             gridSquare.style.opacity = temp > 1 ? 1 : temp;
         }

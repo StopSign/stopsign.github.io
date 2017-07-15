@@ -25,7 +25,7 @@ function processKeyQueue() {
     } else if(key === 81) { //q
         toggleSettingsBox();
     } else if(key === 69) { //e
-
+        selectAllActive()
     } else if(key === 82) { //r
 
     }
