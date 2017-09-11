@@ -189,8 +189,8 @@ function buttonSetup(type, typeUpper, label) { //lol javascript
     }
     document.getElementById(type+'Amount').innerHTML = displaySquare[type+'Amount'];
     document.getElementById(type+'Cost').innerHTML = "Cost is: " + intToStringRound(displaySquare[type+'CostAfterMultiBuy'](settings.buyPerClick))+", ";
-    document.getElementById(type+'Benefit').innerHTML = "Gain: +"+displaySquare[type+'AmountBonus']+" "+label+" per second, ";
-    document.getElementById(type+'SpecialNext').innerHTML = "Next Bonus at "+displaySquare[type+'NextSpecial']+".";
+    document.getElementById(type+'Benefit').innerHTML = "+"+displaySquare[type+'AmountBonus']+" created per, ";
+    document.getElementById(type+'SpecialNext').innerHTML = "next Bonus at "+displaySquare[type+'NextSpecial']+".";
     document.getElementById('buy'+typeUpper+'Button').style.borderColor = buyAvailableAnd ? "green" : buyAvailableOr ? "yellow" : "red";
     document.getElementById('numSelected'+typeUpper+'ButtonBuyable').style.color = buyAvailableAnd ? "green" : buyAvailableOr ? "yellow" : "red";
     document.getElementById('numSelected'+typeUpper+'ButtonBuyable').innerHTML = buyAvailableOr + " / " + selected.length;

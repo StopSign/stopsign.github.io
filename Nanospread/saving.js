@@ -13,14 +13,14 @@ var endingDragPoint = {};
 var select = new Select();
 var totalMouseMoves = 0;
 var isDragging = false;
-var currentLevel = 1;
+var currentLevel = 0; //SWITCH LEVELS
 
 function loadDefaults() {
     settings.buyPerClick = 1;
     settings.selectedResourceNum = 0;
 
     settings.selectOneOrMultiple = 0;
-    settings.buyLowestOrAll = 0;
+    settings.buyLowestOrAll = 1;
     settings.showLastOrLowest = 0;
     settings.selectAllOrLowestBorderColor = 0;
     settings.selectShowNoneOrNanitesOrAmount = 0;
