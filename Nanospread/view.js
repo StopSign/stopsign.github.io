@@ -31,14 +31,13 @@ function View() {
         dragSelectDiv.style.height = '2px';
         dragSelectDiv.style.left = startingDragPoint.x+"px";
         dragSelectDiv.style.top = startingDragPoint.y+"px";
-        totalMouseMoves = 0;
         isDragging = true;
     };
     this.backgroundGrid.onmousemove = function(e) {
         var dragSelectDiv = document.getElementById('dragSelectDiv');
         if(isDragging) {
-            totalMouseMoves++;
-            if(totalMouseMoves < 15) {
+            var distance = Math.sqrt(Math.pow(startingDragPoint.x - e.pageX, 2) + Math.pow(startingDragPoint.y - e.pageY, 2));
+            if(distance < 20) {
                 dragSelectDiv.style.display = "none";
             } else {
                 dragSelectDiv.style.display = "block";
@@ -52,7 +51,8 @@ function View() {
     this.backgroundGrid.onmouseup  = function(e) {
         document.getElementById('dragSelectDiv').style.display = 'none';
         isDragging = false;
-        if(totalMouseMoves < 15) {
+        var distance = Math.sqrt(Math.pow(startingDragPoint.x - e.pageX, 2) + Math.pow(startingDragPoint.y - e.pageY, 2));
+        if(distance < 20) {
             return;
         }
         endingDragPoint = {x:(e.pageX - 8), y:(e.pageY - 8)};
@@ -99,6 +99,7 @@ function View() {
             }
         }
         this.updateInfoBox();
+        this.updateSettings();
     };
 
     this.updateDirectionDot = function(square) {
@@ -167,7 +168,39 @@ function View() {
         this.drawButtons();
     };
 
+    this.updateSettings = function() {
+        if(settings.selectOneOrMultiple) {
+            document.getElementById('selectMultiple').checked = "checked";
+        } else {
+            document.getElementById('selectOne').checked = "checked";
+        }
+        if(settings.buyLowestOrAll) {
+            document.getElementById('selectAllBuy').checked = "checked";
+        } else {
+            document.getElementById('selectBuyLowest').checked = "checked";
+        }
+        if(!settings.showLastOrLowest) {
+            document.getElementById('selectLast').checked = "checked";
+        } else {
+            document.getElementById('selectLowest').checked = "checked";
+        }
+        if(!settings.selectAllOrLowestBorderColor) {
+            document.getElementById('selectSameColor').checked = "checked";
+        } else {
+            document.getElementById('selectLowestColor').checked = "checked";
+        }
+        if(settings.selectShowNoneOrNanitesOrAmount === 0) {
+            document.getElementById('selectShowNone').checked = "checked";
+        } else if(settings.selectShowNoneOrNanitesOrAmount === 1) {
+            document.getElementById('selectShowNanites').checked = "checked";
+        } else {
+            document.getElementById('selectShowUpgradeAmount').checked = "checked";
+        }
+    }
+
 }
+
+
 
 function buttonSetup(type, typeUpper, label) { //lol javascript
     var buyAvailableOr = selected[0]["canBuy"+typeUpper+"AfterMultiBuy"]() ? 1 : 0;
