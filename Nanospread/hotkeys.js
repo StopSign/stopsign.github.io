@@ -22,7 +22,7 @@ function processKeyQueue() {
     } else if(key === 39 || key === 68) { //right
         changeDirectionOfSelected('East')
     } else if(key === 66) { //b
-        toggleBuild();
+        // toggleBuild();
     } else if(key === 81) { //q
         toggleSettingsBox();
     } else if(key === 69) { //e

@@ -24,7 +24,7 @@
 
 
 <div id="menuBar" class="small" style="position:fixed;bottom:0;height:30px;width:800px;background-color:#8194bd;z-index:999;left:8px;">
-    <div class="menuButton" onclick="toggleBuild()"><i class="fa fa-microchip" style="font-size:20px;"></i> Build (b)</div>
+    <!--<div class="menuButton" onclick="toggleBuild()"><i class="fa fa-microchip" style="font-size:20px;"></i> Build (b)</div>-->
     <div class="menuButton" onclick="toggleSettingsBox()"><i class="fa fa-sliders" style="font-size:20px;"></i> Settings (q)</div>
     <div class="menuButton" onclick="toggleHelp()"><i class="fa fa-question-circle-o" style="font-size:20px;"></i> Help (h)</div>
     <div class="menuButton" style="float:right" onclick="select.selectAllActive()"><div style="margin-top:3px;">Select Active (e)</div></div>
@@ -60,27 +60,27 @@
     <div id="settingsBox" style="display:none;">
         <div class="settingContainer">
             When clicking Squares on the grid:<br>
-            <input id='selectOne' type="radio" name="selectOneOrMultiple" onclick="selectOneOrMultipleSetting(0)" checked="checked"><label for="selectOne">Select One</label><br>
+            <input id='selectOne' type="radio" name="selectOneOrMultiple" onclick="selectOneOrMultipleSetting(0)"><label for="selectOne">Select One</label><br>
             <input id='selectMultiple' type="radio" name="selectOneOrMultiple" onclick="selectOneOrMultipleSetting(1)"><label for="selectMultiple">Select Multiple</label><br>
         </div>
         <div class="settingContainer">
             When buying an upgrade for multiple Squares:<br>
             <input id='selectBuyLowest' type="radio" name="selectBuyLowestOrAll" onclick="selectBuyLowestOrAll(0)"><label for="selectBuyLowest">Buy Squares with lowest upgrade amount, all together</label><br>
-            <input id='selectAllBuy' type="radio" name="selectBuyLowestOrAll" onclick="selectBuyLowestOrAll(1)" checked="checked"><label for="selectAllBuy">Every Square tries to buy</label><br>
+            <input id='selectAllBuy' type="radio" name="selectBuyLowestOrAll" onclick="selectBuyLowestOrAll(1)"><label for="selectAllBuy">Every Square tries to buy</label><br>
         </div>
         <div class="settingContainer">
             When selecting multiple Squares,<br>the upgrade amount/cost will:<br>
-            <input id='selectLast' type="radio" name="selectLastOrLowest" onclick="selectLastOrLowest(0)" checked="checked"><label for="selectLast">Show Last Selected</label><br>
+            <input id='selectLast' type="radio" name="selectLastOrLowest" onclick="selectLastOrLowest(0)"><label for="selectLast">Show Last Selected</label><br>
             <input id='selectLowest' type="radio" name="selectLastOrLowest" onclick="selectLastOrLowest(1)"><label for="selectLowest">Show Lowest</label><br>
         </div>
         <div class="settingContainer">
             When selecting multiple Squares, the borders colors are:<br>
-            <input id='selectSameColor' type="radio" name="selectAllOrLowestBorderColor" onclick="selectAllOrLowestBorderColor(0)" checked="checked"><label for="selectSameColor">The same color</label><br>
+            <input id='selectSameColor' type="radio" name="selectAllOrLowestBorderColor" onclick="selectAllOrLowestBorderColor(0)"><label for="selectSameColor">The same color</label><br>
             <input id='selectLowestColor' type="radio" name="selectAllOrLowestBorderColor" onclick="selectAllOrLowestBorderColor(1)"><label for="selectLowestColor">Lowest Squares are a different color</label><br>
         </div>
         <div class="settingContainer">
             Show what on the Square:<br>
-            <input id='selectShowNone' type="radio" name="selectShowNoneOrNanitesOrAmount" onclick="selectShowNoneOrNanitesOrAmount(0)" checked="checked"><label for="selectShowNone">None</label><br>
+            <input id='selectShowNone' type="radio" name="selectShowNoneOrNanitesOrAmount" onclick="selectShowNoneOrNanitesOrAmount(0)"><label for="selectShowNone">None</label><br>
             <input id='selectShowNanites' type="radio" name="selectShowNoneOrNanitesOrAmount" onclick="selectShowNoneOrNanitesOrAmount(1)"><label for="selectShowNanites">Nanites</label><br>
             <input id='selectShowUpgradeAmount' type="radio" name="selectShowNoneOrNanitesOrAmount" onclick="selectShowNoneOrNanitesOrAmount(2)"><label for="selectShowUpgradeAmount">Upgrade Amount</label><br>
         </div>

@@ -39,6 +39,10 @@ function tick() {
         theView = new View();
     }
     theView.update();
+
+    if(timer % 10 === 0) {
+        save();
+    }
 }
 
 function sendNanites() {
