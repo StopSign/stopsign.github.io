@@ -46,6 +46,22 @@ function closeBuildBox() {
     menuOpen = "";
     adjustMenus();
 }
+function toggleLevelMenu() {
+    if(menuOpen === "level") {
+        closeLevelBox()
+    } else  {
+        openLevelBox()
+    }
+    adjustMenus();
+}
+function openLevelBox() {
+    menuOpen = "level";
+    adjustMenus();
+}
+function closeLevelBox() {
+    menuOpen = "";
+    adjustMenus();
+}
 
 function adjustMenus() {
     closeMenus();
@@ -58,6 +74,9 @@ function adjustMenus() {
     } else if(menuOpen === "build") {
         document.getElementById('buildBox').style.display = "block";
         document.getElementById('infoPanel').style.display = "block";
+    } else if(menuOpen === "level") {
+        document.getElementById('levelBox').style.display = "block";
+        document.getElementById('infoPanel').style.display = "block";
     } else if(selected.length > 0) {
         document.getElementById('infoBox').style.display = "block";
         document.getElementById('infoPanel').style.display = "block";
@@ -67,6 +86,7 @@ function adjustMenus() {
 function closeMenus() {
     document.getElementById('infoBox').style.display = "none";
     document.getElementById('buildBox').style.display = "none";
+    document.getElementById('levelBox').style.display = "none";
     document.getElementById('settingsBox').style.display = "none";
     document.getElementById('helpBox').style.display = "none";
     document.getElementById('infoPanel').style.display = "none";
@@ -86,6 +106,7 @@ function selectAllOrLowestBorderColor(num) {
 }
 function selectShowNoneOrNanitesOrAmount(num) {
     settings.selectShowNoneOrNanitesOrAmount = num;
+    theView.update();
 }
 
 function buyAmountOption(num) {

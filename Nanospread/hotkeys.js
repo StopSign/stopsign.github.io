@@ -11,6 +11,8 @@ function processKeyQueue() {
     // console.log(key);
     if(key === 27) { //escape
         select.deselectAll()
+        menuOpen = "";
+        adjustMenus();
     } else if(key === 13 || key === 32) { //enter / space
         buyNanitesButtonPressed()
     } else if(key === 38 || key === 87) { //up
@@ -29,6 +31,8 @@ function processKeyQueue() {
         select.selectAllActive()
     } else if(key === 82) { //r
 
+    } else if(key === 76) { //l
+        toggleLevelMenu();
     } else if(key === 72) { //h
         toggleHelp();
     }

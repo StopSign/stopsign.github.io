@@ -5,7 +5,6 @@ function Select() {
             return;
         }
         theView.setSelectedFalse();
-        selected = [];
         theView.updateInfoBox();
         closeSettingsBox();
         showOrHideBox();

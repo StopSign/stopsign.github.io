@@ -1,28 +1,48 @@
 function View() {
     this.offsetx = 0;
     this.offsety = 0;
-    this.grid = [];
     this.backgroundGrid = document.getElementById('naniteGrid');
 
-    for(var col = 0; col < theGrid.length; col++) {
-        this.grid[col] = [];
-        for (var row = 0; row < theGrid[col].length; row++) {
-            if(!theGrid[col][row]) {
-                continue;
+
+    this.createGrid = function() {
+        this.deleteGrid();
+        this.grid = [];
+        for(var col = 0; col < theGrid.length; col++) {
+            this.grid[col] = [];
+            for (var row = 0; row < theGrid[col].length; row++) {
+                if(!theGrid[col][row]) {
+                    continue;
+                }
+                var elem = document.createElement("div");
+                var rowSize = 700 / 13;
+                var rectStartX = col*rowSize + this.offsetx + 30;
+                var rectStartY = row*rowSize + this.offsety + 30;
+                elem.innerHTML =
+                    "<div class='naniteSquare' style='left:"+rectStartX+"px;top:"+rectStartY+"px;width:"+(rowSize-10)+"px;height:"+(rowSize-10)+"px;' onclick='clickedSquare("+col+","+row+")'>" +
+                        "<div class='displayNum' id='displayNumcol"+col+"row"+row+"'></div>" +
+                        "<div class='directionDot' id='directionDotcol"+col+"row"+row+"'></div>" +
+                    "</div>";
+                this.backgroundGrid.appendChild(elem);
+                this.grid[col][row] = elem.firstChild;
             }
-            var elem = document.createElement("div");
-            var rowSize = 700 / 13;
-            var rectStartX = col*rowSize + this.offsetx + 30;
-            var rectStartY = row*rowSize + this.offsety + 30;
-            elem.innerHTML =
-                "<div class='naniteSquare' style='left:"+rectStartX+"px;top:"+rectStartY+"px;width:"+(rowSize-10)+"px;height:"+(rowSize-10)+"px;' onclick='clickedSquare("+col+","+row+")'>" +
-                    "<div class='displayNum' id='displayNumcol"+col+"row"+row+"'></div>" +
-                    "<div class='directionDot' id='directionDotcol"+col+"row"+row+"'></div>" +
-                "</div>";
-            this.backgroundGrid.appendChild(elem);
-            this.grid[col][row] = elem.firstChild;
         }
-    }
+    };
+
+    this.deleteGrid = function() {
+        if(!this.grid) {
+            return;
+        }
+        for(var col = 0; col < this.grid.length; col++) {
+            for(var row = 0; row < this.grid[col].length; row++) {
+                if(this.grid[col][row]) {
+                    var parent = this.grid[col][row].parentElement;
+                    parent.parentElement.removeChild(parent);
+                }
+            }
+        }
+    };
+
+    this.createGrid();
 
     this.backgroundGrid.onmousedown  = function(e) {
         startingDragPoint = {x:e.pageX-8, y:e.pageY-8};
@@ -44,8 +64,8 @@ function View() {
             }
         }
         if(dragSelectDiv.style.display === "block") {
-            dragSelectDiv.style.width = (e.pageX - startingDragPoint.x - 8)+"px";
-            dragSelectDiv.style.height = (e.pageY - startingDragPoint.y - 8)+"px";
+            dragSelectDiv.style.width = (e.pageX - startingDragPoint.x - 11)+"px";
+            dragSelectDiv.style.height = (e.pageY - startingDragPoint.y - 4)+"px";
         }
     };
     this.backgroundGrid.onmouseup  = function(e) {
@@ -69,6 +89,7 @@ function View() {
             selected[i].isSelected = 0;
             this.changeBorderSelected(selected[i]);
         }
+        selected = [];
     };
     this.changeBorderColors = function() {
         for(var i = 0; i < selected.length; i++) {
@@ -100,6 +121,8 @@ function View() {
         }
         this.updateInfoBox();
         this.updateSettings();
+        this.updateLevel();
+        this.updateEvolutionGain();
     };
 
     this.updateDirectionDot = function(square) {
@@ -196,8 +219,30 @@ function View() {
         } else {
             document.getElementById('selectShowUpgradeAmount').checked = "checked";
         }
-    }
+    };
 
+    this.updateLevel = function() {
+        document.getElementById('previousLevelButton').style.borderColor = 'yellow';
+        document.getElementById('nextLevelButton').style.borderColor = 'yellow';
+        document.getElementById('resetLevelButton').style.borderColor = 'yellow';
+        if(document.getElementById('levelConfirm').checked) {
+            document.getElementById('previousLevelButton').style.borderColor = 'green';
+            document.getElementById('nextLevelButton').style.borderColor = 'green';
+            document.getElementById('resetLevelButton').style.borderColor = 'green';
+        }
+        if(currentLevel === 0) {
+            document.getElementById('previousLevelButton').style.borderColor = 'red';
+        }
+        if(currentLevel === highestLevel) {
+            document.getElementById('nextLevelButton').style.borderColor = 'red';
+        }
+        document.getElementById('currentLevel').innerHTML = currentLevel;
+    };
+
+    this.updateEvolutionGain = function() {
+        document.getElementById('evolutionGain').innerHTML = intToString(calcEvolutionPointGain());
+        document.getElementById('evolutionPoints').innerHTML = intToString(bonuses.points);
+    }
 }
 
 
@@ -385,6 +430,7 @@ function updateInfoGrid(label, varLabel) {
         totalNaniteAmountReceived += selected[i][varLabel+'AmountReceived'];
         totalConsumeCost += selected[i].consumeCost;
     }
+    totalNaniteRate *= getNaniteGainBonus();
     document.getElementById('resourceTypeLabel').innerHTML = label;
     document.getElementById('totalTs').innerHTML = intToString(totalNanites);
     document.getElementById('totalTRate').innerHTML = intToString(totalNaniteRate);

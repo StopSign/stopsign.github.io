@@ -1,15 +1,38 @@
 
 function createGrid() {
     var startingCoords = {x:0,y:0};
-    for (var column = 0; column < levelData[currentLevel].grid[0].length; column++) {
+    theGrid = [];
+    var wrapAroundLevel = currentLevel % levelData.length;
+
+    var currentLevelGrid = levelData[wrapAroundLevel].grid;
+    var goalCost = Math.pow(1.5, currentLevel) * 1000000000;
+
+    var totalFromLevelData = 0;
+    for(var column = 0; column < currentLevelGrid[0].length; column++) {
+        for (var row = 0; row < currentLevelGrid.length; row++) {
+            totalFromLevelData += Math.pow(2, currentLevelGrid[row][column]);
+        }
+    }
+
+    var consumeCostModifier = goalCost / totalFromLevelData;
+
+    var initialCostGrid = [];
+    for(var x = 0; x < currentLevelGrid.length; x++) {
+        initialCostGrid[x] = [];
+        for(var y = 0; y < currentLevelGrid[x].length; y++) {
+            initialCostGrid[x][y] = (Math.pow(2, currentLevelGrid[x][y]) * consumeCostModifier) * 20;
+        }
+    }
+
+    for (column = 0; column < currentLevelGrid[0].length; column++) {
         theGrid[column] = [];
-        for (var row = 0; row < levelData[currentLevel].grid.length; row++) {
-            if(!levelData[currentLevel].grid[row][column]) {
-                continue;
+        for (row = 0; row < currentLevelGrid.length; row++) {
+            if(currentLevelGrid[row][column] === 0) {
+                continue; //this makes the empty spots undefined in theGrid. Change if you want other terrain there.
             }
             var squareCoords = {x:column,y:row};
             // var distanceFromCenter = Math.sqrt(Math.pow((squareCoords.x-startingCoords.x),2)+Math.pow((squareCoords.y-startingCoords.y),2));
-            var initialConsumeCost = Math.pow(2, levelData[currentLevel].grid[row][column])*30;
+            var initialConsumeCost = initialCostGrid[row][column];
             theGrid[column][row] =  new Square(squareCoords.x, squareCoords.y, initialConsumeCost);
         }
     }
@@ -62,16 +85,20 @@ function sendNanites() {
                 target.gainAdvBots(amountTransferred); //transfer .1% adv bots
                 target.advBotAmountReceived += amountTransferred;
 
-                square.gainNanites(square.naniteRate);
+                square.gainNanites(square.naniteRate * getNaniteGainBonus());
                 square.gainAdvBots(square.advBotRate);
             }
         }
     }
 }
 
+function getNaniteGainBonus() {
+    return ((bonuses.points * 5)+100)/100;
+}
+
 function clearNanitesReceived() {
     for (var column = 0; column < theGrid.length; column++) {
-        for (var row = 0; row < theGrid.length; row++) {
+        for (var row = 0; row < theGrid[column].length; row++) {
             var square = theGrid[column][row];
             if(square) {
                 var target = theGrid[square.targetCol][square.targetRow];
@@ -90,7 +117,6 @@ function clickedSquare(col, row) {
         menuOpen = "";
         if(!settings.selectOneOrMultiple && selected.length >= 1) { //single
             theView.setSelectedFalse();
-            selected = [];
             selected.push(square);
         } else { //multiple
             selected.push(square);
@@ -164,7 +190,6 @@ function buyAdvBotsButtonPressed() {
     theView.updateInfoBox();
 }
 
-
 function handleFPSDifference() {
     timeList.push(new Date().getTime());
     if(timeList.length > 10) {
@@ -176,4 +201,37 @@ function handleFPSDifference() {
         multFromFps = 1;
         //$scope.fps = "...";
     }
+}
+
+
+function changeLevel(newLevel) {
+
+    if(!document.getElementById('levelConfirm').checked || newLevel < 0 || newLevel > highestLevel) {
+        console.log('level change blocked');
+        return;
+    }
+    theView.setSelectedFalse();
+    bonuses.points += calcEvolutionPointGain();
+    currentLevel = newLevel;
+    createGrid();
+    theView.createGrid();
+    theView.update();
+}
+
+function calcEvolutionPointGain() {
+    var bonus = 9999999999;
+    for (var column = 0; column < theGrid.length; column++) {
+        for (var row = 0; row < theGrid[column].length; row++) {
+            var square = theGrid[column][row];
+            if (square && square.curSpecialPosNanites < bonus) { //gets lowest
+               bonus = square.curSpecialPosNanites;
+            }
+        }
+    }
+    if(bonus > 0 && currentLevel === highestLevel) {
+        highestLevel++;
+        console.log('level up!');
+    }
+    bonus *= Math.pow(1.3, currentLevel);
+    return bonus;
 }

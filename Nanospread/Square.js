@@ -27,7 +27,7 @@ function Square(col,row,initialConsumeCost) {
     this.advBotAmountReceived = 0;
     this.advBotNextSpecial = 10;
     this.consumeCost = initialConsumeCost;
-    this.specialLevels = [0, 10, 25, 50, 75, 100, 125, 150, 175, 200, 225, 250, 275, 300, 350, 400, 450, 500, 550, 600, 650, 700, 775, 850, 925, 1000, 1100, 1200]; // 45, 70, 100, 135, 175, 220, 270, 325, 385, 450, 520, 595, 675, 760, 850, 945, 1045, 1150, 1260];
+    this.specialLevels = [0, 10, 25, 50, 75, 100, 125, 150, 175, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 775, 850, 925, 1000, 1075, 1150, 1225, 1300, 1400, 1500, 1600, 1700, 1800, 1900, 2000, 2200, 2400, 2600, 2800, 3000, 3300, 3600, 3900, 4200, 4500, 4800, 5200, 5600, 6000];
 
     this.buyNanites = function() {
         this.nanites -= this.naniteCost;

@@ -13,6 +13,8 @@ var endingDragPoint = {};
 var select = new Select();
 var isDragging = false;
 var currentLevel = 0; //SWITCH LEVELS
+var highestLevel;
+var bonuses = { points:0 };
 
 function loadDefaults() {
     settings.buyPerClick = 1;
@@ -23,20 +25,20 @@ function loadDefaults() {
     settings.showLastOrLowest = 0;
     settings.selectAllOrLowestBorderColor = 0;
     settings.selectShowNoneOrNanitesOrAmount = 0;
-
-    currentLevel = 0;
-    createGrid();
+    highestLevel = 0; //SHOULD BE 0 BEFORE COMMIT
 }
 
 function load() {
     loadDefaults();
-    // return; //hard-clear the save
-    if (!window.localStorage.version1) {
+    if (!window.localStorage.version1) { //hard clear the save
+        createGrid();
         return;
     }
     var toLoad = JSON.parse(window.localStorage.version1);
-    settings = toLoad.settings;
     currentLevel = toLoad.currentLevel;
+    createGrid();
+
+    settings = toLoad.settings;
     for(var x = 0; x < toLoad.theGrid.length; x++) {
         for(var y = 0; y < toLoad.theGrid[x].length; y++) {
             for(var property in toLoad.theGrid[x][y]) {
@@ -49,6 +51,8 @@ function load() {
             }
         }
     }
+    highestLevel = toLoad.highestLevel;
+    bonuses = toLoad.bonuses;
 
     settings.buyPerClick = 1; //resets on refresh
     settings.selectedResourceNum = 0;
@@ -59,7 +63,9 @@ function save() {
     toSave.settings = settings;
     toSave.currentLevel = currentLevel;
     toSave.theGrid = theGrid;
-    console.log('saved');
+    toSave.highestLevel = highestLevel;
+    toSave.bonuses = bonuses;
+    // console.log('saved');
     window.localStorage.version1 = JSON.stringify(toSave);
 }
 

@@ -171,6 +171,7 @@ input, label {
     text-align:center;
     margin:1px;
     height:20px;
+    background-color:#acbde2;
 }
 .menuButton:hover {
     background-color: #5f6f90;
