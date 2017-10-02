@@ -30,11 +30,11 @@ function loadDefaults() {
 
 function load() {
     loadDefaults();
-    if (!window.localStorage.version1) { //hard clear the save
+    if (!window.localStorage.version2) { //hard clear the save
         createGrid();
         return;
     }
-    var toLoad = JSON.parse(window.localStorage.version1);
+    var toLoad = JSON.parse(window.localStorage.version2);
     currentLevel = toLoad.currentLevel;
     createGrid();
 
@@ -66,7 +66,7 @@ function save() {
     toSave.highestLevel = highestLevel;
     toSave.bonuses = bonuses;
     // console.log('saved');
-    window.localStorage.version1 = JSON.stringify(toSave);
+    window.localStorage.version2 = JSON.stringify(toSave);
 }
 
 load();
