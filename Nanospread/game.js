@@ -2,6 +2,9 @@
 function createGrid() {
     var startingCoords = {x:0,y:0};
     theGrid = [];
+    for(var x = 0; x < 20; x++) {
+        theGrid[x] = [];
+    }
     var wrapAroundLevel = currentLevel % levelData.length;
 
     var currentLevelGrid = levelData[wrapAroundLevel].grid;
@@ -17,15 +20,14 @@ function createGrid() {
     var consumeCostModifier = goalCost / totalFromLevelData;
 
     var initialCostGrid = [];
-    for(var x = 0; x < currentLevelGrid.length; x++) {
+    for(x = 0; x < currentLevelGrid.length; x++) {
         initialCostGrid[x] = [];
         for(var y = 0; y < currentLevelGrid[x].length; y++) {
-            initialCostGrid[x][y] = (Math.pow(2, currentLevelGrid[x][y]) * consumeCostModifier) * 20;
+            initialCostGrid[x][y] = (Math.pow(2, currentLevelGrid[x][y]) * consumeCostModifier) * 2;
         }
     }
 
     for (column = 0; column < currentLevelGrid[0].length; column++) {
-        theGrid[column] = [];
         for (row = 0; row < currentLevelGrid.length; row++) {
             if(currentLevelGrid[row][column] === 0) {
                 continue; //this makes the empty spots undefined in theGrid. Change if you want other terrain there.

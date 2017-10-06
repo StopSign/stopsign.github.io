@@ -30,11 +30,11 @@ function loadDefaults() {
 
 function load() {
     loadDefaults();
-    if (!window.localStorage.version2) { //hard clear the save
+    if (!window.localStorage.version3) { //hard clear the save
         createGrid();
         return;
     }
-    var toLoad = JSON.parse(window.localStorage.version2);
+    var toLoad = JSON.parse(window.localStorage.version3);
     currentLevel = toLoad.currentLevel;
     createGrid();
 
@@ -43,6 +43,7 @@ function load() {
         for(var y = 0; y < toLoad.theGrid[x].length; y++) {
             for(var property in toLoad.theGrid[x][y]) {
                 if (toLoad.theGrid[x][y].hasOwnProperty(property)) {
+                    if(theGrid[x][y])
                     theGrid[x][y][property] = toLoad.theGrid[x][y][property];
                 }
             }
@@ -66,7 +67,7 @@ function save() {
     toSave.highestLevel = highestLevel;
     toSave.bonuses = bonuses;
     // console.log('saved');
-    window.localStorage.version2 = JSON.stringify(toSave);
+    window.localStorage.version3 = JSON.stringify(toSave);
 }
 
 load();
