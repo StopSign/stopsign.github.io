@@ -113,11 +113,22 @@ function clearNanitesReceived() {
 
 function clickedSquare(col, row) {
     var square = theGrid[col][row];
+    //multiple are selected, selectOne setting is on, clicked a selected
+    if(!settings.selectOneOrMultiple && selected.length > 1) {
+        theView.setSelectedFalse();
+        square.isSelected = true;
+        selected.push(square);
+        menuOpen = "";
+        theView.updateInfoBox();
+        adjustMenus();
+        return;
+    }
+
     square.isSelected = !square.isSelected;
     var pos = selected.indexOf(square);
     if(pos === -1) { //click new square
         menuOpen = "";
-        if(!settings.selectOneOrMultiple && selected.length >= 1) { //single
+        if(!settings.selectOneOrMultiple && selected.length > 0) { //single
             theView.setSelectedFalse();
             selected.push(square);
         } else { //multiple
