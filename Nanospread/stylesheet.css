@@ -163,6 +163,16 @@ input, label {
     height:2px;
     border-radius:10px;
 }
+.directionArrowInner {
+    position:absolute;
+    width:0;
+    height:0;
+}
+.directionArrowOuter {
+    position:absolute;
+    width:0;
+    height:0;
+}
 .menuButton {
     padding:2px 10px;
     border:1px solid black;

@@ -21,6 +21,8 @@ function View() {
                     "<div class='naniteSquare' style='left:"+rectStartX+"px;top:"+rectStartY+"px;width:"+(rowSize-10)+"px;height:"+(rowSize-10)+"px;' onclick='clickedSquare("+col+","+row+")'>" +
                         "<div class='displayNum' id='displayNumcol"+col+"row"+row+"'></div>" +
                         "<div class='directionDot' id='directionDotcol"+col+"row"+row+"'></div>" +
+                        "<div class='directionArrowOuter' id='directionArrowOutercol"+col+"row"+row+"'></div>" +
+                        "<div class='directionArrowInner' id='directionArrowInnercol"+col+"row"+row+"'></div>" +
                     "</div>";
                 this.backgroundGrid.appendChild(elem);
                 this.grid[col][row] = elem.firstChild;
@@ -88,12 +90,14 @@ function View() {
         for(var i = 0; i < selected.length; i++) {
             selected[i].isSelected = 0;
             this.changeBorderSelected(selected[i]);
+            this.updateDirectionArrow(selected[i]);
         }
         selected = [];
     };
     this.changeBorderColors = function() {
         for(var i = 0; i < selected.length; i++) {
             this.changeBorderSelected(selected[i]);
+            this.updateDirectionArrow(selected[i]);
         }
         changeBordersOfLowest(this.grid);
     };
@@ -104,6 +108,7 @@ function View() {
         } else {
             gridSquare.style.border = square.isActive() ? "2px solid black" : "2px solid white";
         }
+        this.updateDirectionArrow(square);
     };
 
     this.update = function() {
@@ -125,11 +130,85 @@ function View() {
         this.updateEvolutionGain();
     };
 
+    this.updateDirectionArrow = function(square, borderColor) {
+        var directionArrowInner = document.getElementById('directionArrowInnercol'+square.col+'row'+square.row);
+        var directionArrowOuter = document.getElementById('directionArrowOutercol'+square.col+'row'+square.row);
+        if(!directionArrowInner) {
+            return;
+        }
+        if(!borderColor) {
+            borderColor = square.isSelected ? "#ff9600" : (square.isActive() ? "black" : "white");
+        }
+        var dir = square.transferDirection;
+        var backgroundColor = getInactiveBackgroundColor(square.consumeCost);
+        if(square.isActive()) {
+            backgroundColor = getActiveBackgroundColor(square.nanites);
+        }
+        if(dir === "East") {
+            directionArrowOuter.style.top = '8px';
+            directionArrowOuter.style.left = '44px';
+            directionArrowOuter.style.borderTop = '15px solid transparent';
+            directionArrowOuter.style.borderBottom = '15px solid transparent';
+            directionArrowOuter.style.borderLeft = '7px solid '+borderColor;
+            directionArrowOuter.style.borderRight = '0';
+
+            directionArrowInner.style.top = '8px';
+            directionArrowInner.style.left = '42px';
+            directionArrowInner.style.borderTop = '15px solid transparent';
+            directionArrowInner.style.borderBottom = '15px solid transparent';
+            directionArrowInner.style.borderLeft = '7px solid '+backgroundColor;
+            directionArrowInner.style.borderRight = '0';
+        } else if(dir === "West") {
+            directionArrowOuter.style.top = '8px';
+            directionArrowOuter.style.left = '-7px';
+            directionArrowOuter.style.borderTop = '15px solid transparent';
+            directionArrowOuter.style.borderBottom = '15px solid transparent';
+            directionArrowOuter.style.borderRight = '7px solid '+borderColor;
+            directionArrowOuter.style.borderLeft = '0';
+
+            directionArrowInner.style.top = '8px';
+            directionArrowInner.style.left = '-5px';
+            directionArrowInner.style.borderTop = '15px solid transparent';
+            directionArrowInner.style.borderBottom = '15px solid transparent';
+            directionArrowInner.style.borderRight = '7px solid '+backgroundColor;
+            directionArrowInner.style.borderLeft = '0';
+        } else if(dir === "North") {
+            directionArrowOuter.style.top = '-7px';
+            directionArrowOuter.style.left = '8px';
+            directionArrowOuter.style.borderLeft = '15px solid transparent';
+            directionArrowOuter.style.borderRight = '15px solid transparent';
+            directionArrowOuter.style.borderBottom = '7px solid '+borderColor;
+            directionArrowOuter.style.borderTop = '0';
+
+            directionArrowInner.style.top = '-5px';
+            directionArrowInner.style.left = '8px';
+            directionArrowInner.style.borderLeft = '15px solid transparent';
+            directionArrowInner.style.borderRight = '15px solid transparent';
+            directionArrowInner.style.borderBottom = '7px solid '+backgroundColor;
+            directionArrowInner.style.borderTop = '0';
+        } else if(dir === "South") {
+            directionArrowOuter.style.top = '44px';
+            directionArrowOuter.style.left = '8px';
+            directionArrowOuter.style.borderLeft = '15px solid transparent';
+            directionArrowOuter.style.borderRight = '15px solid transparent';
+            directionArrowOuter.style.borderTop = '7px solid '+borderColor;
+            directionArrowOuter.style.borderBottom = '0';
+
+            directionArrowInner.style.top = '42px';
+            directionArrowInner.style.left = '8px';
+            directionArrowInner.style.borderLeft = '15px solid transparent';
+            directionArrowInner.style.borderRight = '15px solid transparent';
+            directionArrowInner.style.borderTop = '7px solid '+backgroundColor;
+            directionArrowInner.style.borderBottom = '0';
+        }
+    };
+
     this.updateDirectionDot = function(square) {
         var directionDot = document.getElementById('directionDotcol'+square.col+'row'+square.row);
         if(!directionDot) {
             return;
         }
+
         var dir = square.transferDirection;
         if(dir === "East") {
             directionDot.style.top = '22px';
@@ -144,6 +223,7 @@ function View() {
             directionDot.style.top = '39px';
             directionDot.style.left = '22px';
         }
+
     };
 
     this.updateDisplayNum = function(square, resourceType) {
@@ -171,11 +251,11 @@ function View() {
     this.changeBackground = function(square) {
         var gridSquare = this.grid[square.col][square.row];
         if(square.isActive()) {
-            gridSquare.style.background = colorShiftMath(360, Math.log10(square.nanites));
+            gridSquare.style.background = getActiveBackgroundColor(square.nanites);
             gridSquare.style.opacity = 1;
         } else {
             var temp = Math.log10(square.consumeCost)/13+.15;
-            gridSquare.style.background = "hsl(120, 88%, 13%)";
+            gridSquare.style.background = getInactiveBackgroundColor(square.consumeCost);
             gridSquare.style.opacity = temp > 1 ? 1 : temp;
         }
     };
@@ -246,6 +326,13 @@ function View() {
 }
 
 
+function getActiveBackgroundColor(nanites) {
+    return colorShiftMath(360, Math.log10(nanites));
+}
+function getInactiveBackgroundColor(consumeCost) {
+    //TODO handle very large consumeCost amounts via color changes
+    return "hsl(120, 88%, 13%)";
+}
 
 function buttonSetup(type, typeUpper, label) { //lol javascript
     var buyAvailableOr = selected[0]["canBuy"+typeUpper+"AfterMultiBuy"]() ? 1 : 0;
@@ -324,6 +411,7 @@ function changeBordersOfLowest(viewGrid) {
         var gridSquare = viewGrid[lowestSquares[i].col][lowestSquares[i].row];
         if(lowestSquares[i].isSelected) {
             gridSquare.style.border = "2px solid blue";
+            theView.updateDirectionArrow(lowestSquares[i], "blue");
         }
     }
 }
