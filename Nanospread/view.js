@@ -447,8 +447,8 @@ function updateInfoGrid(label, varLabel) {
         var lowestSquare = select.getLowestSquare(select.getSelectedActive(), varLabel);
         if(lowestSquare) {
             document.getElementById('lowestTs').innerHTML = intToString(lowestSquare[varLabel + 's']);
-            document.getElementById('lowestNetTs').innerHTML = intToStringNegative(lowestSquare[varLabel + 'Rate'] + lowestSquare[varLabel + 'AmountReceived'] - lowestSquare[varLabel + 'TransferAmount']);
-            document.getElementById('lowestTRate').innerHTML = intToString(lowestSquare[varLabel + 'Rate']);
+            document.getElementById('lowestNetTs').innerHTML = intToStringNegative((lowestSquare[varLabel + 'Rate'] * getNaniteGainBonus()) + lowestSquare[varLabel + 'AmountReceived'] - lowestSquare[varLabel + 'TransferAmount']);
+            document.getElementById('lowestTRate').innerHTML = intToString(lowestSquare[varLabel + 'Rate'] * getNaniteGainBonus());
             document.getElementById('lowestTAmountReceived').innerHTML = intToString(lowestSquare[varLabel + 'AmountReceived']);
             document.getElementById('lowestTTransferAmount').innerHTML = intToString(lowestSquare[varLabel + 'TransferAmount']);
             document.getElementById('lowestTransferRate').innerHTML = intToString(lowestSquare.transferRate / 100);
