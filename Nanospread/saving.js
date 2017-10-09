@@ -14,7 +14,7 @@ var select = new Select();
 var isDragging = false;
 var currentLevel = 0; //SWITCH LEVELS
 var highestLevel;
-var bonuses = { points:0 };
+var bonuses = { points:15 };
 
 function loadDefaults() {
     settings.buyPerClick = 1;
@@ -25,7 +25,7 @@ function loadDefaults() {
     settings.showLastOrLowest = 0;
     settings.selectAllOrLowestBorderColor = 0;
     settings.selectShowNoneOrNanitesOrAmount = 0;
-    highestLevel = 0; //SHOULD BE 0 BEFORE COMMIT
+    highestLevel = 10; //SHOULD BE 0 BEFORE COMMIT
 }
 
 function load() {
