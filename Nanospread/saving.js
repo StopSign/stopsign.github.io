@@ -78,5 +78,3 @@ doWork.onmessage = function (event) {
         tick();
     }
 };
-
-doWork.postMessage({start:true,ms:(1000 / bonuses.tickSpeedLevel)});
