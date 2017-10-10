@@ -127,6 +127,7 @@ function View() {
         this.updateInfoBox();
         this.updateSettings();
         this.updateLevel();
+		this.updateUpgrade();
         this.updateEvolutionGain();
     };
 
@@ -325,6 +326,28 @@ function View() {
     this.updateEvolutionGain = function() {
         document.getElementById('evolutionGain').innerHTML = intToString(calcEvolutionPointGain());
         document.getElementById('evolutionPoints').innerHTML = intToString(bonuses.points);
+    }
+	
+	this.updateUpgrade = function() {
+        if(bonuses.points >= (1 * 10^bonuses.tickSpeedLevel)) {
+            document.getElementById('buyTickSpeedButton').style.borderColor = 'green';
+        } else if(bonuses.tickSpeedLevel >= 20) {
+			document.getElementById('buyTickSpeedButton').style.borderColor = 'grey';
+		} else {
+			document.getElementById('buyTickSpeedButton').style.borderColor = 'red';
+		}
+		if(bonuses.points >= (1 * 100^bonuses.transferRateLevel)) {
+            document.getElementById('buyTransferRateButton').style.borderColor = 'green';
+        } else if(bonuses.transferRateLevel >= 20) {
+			document.getElementById('buyTransferRateButton').style.borderColor = 'grey';
+		} else {
+			document.getElementById('buyTransferRateButton').style.borderColor = 'red';
+		}
+		
+				document.getElementById('currentTickSpeed').innerHTML = bonuses.tickSpeedLevel;
+				document.getElementById('buyTickSpeedCost').innerHTML = (1 * 10^bonuses.tickSpeedLevel);
+				document.getElementById('currentTransferRate').innerHTML = bonuses.transferRateLevel;
+				document.getElementById('buyTransferRateCost').innerHTML = (1 * 100^bonuses.transferRateLevel);
     }
 }
 

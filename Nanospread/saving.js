@@ -15,6 +15,7 @@ var isDragging = false;
 var currentLevel = 0; //SWITCH LEVELS
 var highestLevel;
 var bonuses = { points:0, tickSpeedLevel:1, transferRateLevel:1 };
+var tickInterval = 0;
 
 function loadDefaults() {
     settings.buyPerClick = 1;
@@ -72,9 +73,11 @@ function save() {
 
 load();
 
-var doWork = new Worker('interval.js');
-doWork.onmessage = function (event) {
-    if (event.data === 'interval.start') {
-        tick();
-    }
-};
+tickInterval = setInterval(tick, (1000 / bonuses.tickSpeedLevel));
+
+//var doWork = new Worker('interval.js');
+//doWork.onmessage = function (event) {
+//    if (event.data === 'interval.start') {
+//        tick();
+//    }
+//};
