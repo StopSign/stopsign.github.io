@@ -14,7 +14,7 @@ var select = new Select();
 var isDragging = false;
 var currentLevel = 0; //SWITCH LEVELS
 var highestLevel;
-var bonuses = { points:0 };
+var bonuses = { points:0, tickSpeedLevel:1, transferRateLevel:1 };
 
 function loadDefaults() {
     settings.buyPerClick = 1;
@@ -36,6 +36,7 @@ function load() {
     }
     var toLoad = JSON.parse(window.localStorage.version3);
     currentLevel = toLoad.currentLevel;
+	bonuses = toLoad.bonuses;
     createGrid();
 
     settings = toLoad.settings;
@@ -72,4 +73,9 @@ function save() {
 
 load();
 
-setInterval(tick, 1000);
+var doWork = new Worker('interval.js');
+doWork.onmessage = function (event) {
+    if (event.data === 'interval.start') {
+        tick();
+    }
+};

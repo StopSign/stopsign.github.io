@@ -259,3 +259,36 @@ function calcEvolutionPointGain() {
     bonus *= Math.pow(1.3, currentLevel);
     return bonus;
 }
+
+function recalcInterval(newSpeed) {
+    doWork.postMessage({start:false});
+    doWork.postMessage({start:true,ms:(1000 / newSpeed)});
+}
+
+function buyTickSpeed() {
+    
+    if(bonuses.points >= (1 * 10^bonuses.tickSpeedLevel) && bonuses.tickSpeedLevel < 20) {
+		bonuses.points -= (1 * 10^bonuses.tickSpeedLevel);
+		bonuses.tickSpeedLevel++;
+        recalcInterval(bonuses.tickSpeedLevel)
+    }
+}
+
+function setTransferRate(newRate) {
+    bonuses.transferRateLevel = newRate;
+    for (var column = 0; column < theGrid.length; column++) {
+        for (var row = 0; row < theGrid[column].length; row++) {
+            var square = theGrid[column][row];
+            square.transferRate = newRate;
+        }
+    }
+}
+
+function buyTransferRate() {
+    if(bonuses.points >= (1 * 100^bonuses.transferRateLevel) && bonuses.transferRateLevel < 20) {
+		bonuses.points -= (1 * 10^bonuses.transferRateLevel);
+		bonuses.transferRateLevel++;
+        setTransferRate(bonuses.transferRateLevel);
+    }
+    theView.update();
+}
