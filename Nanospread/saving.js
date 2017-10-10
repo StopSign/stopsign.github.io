@@ -20,10 +20,10 @@ var tickInterval = 0;
 function loadDefaults() {
     settings.buyPerClick = 1;
     settings.selectedResourceNum = 0;
-	if(bonuses.tickSpeedLevel === "undefined") {
+	if(bonuses.tickSpeedLevel === 'undefined') {
 		bonuses.tickSpeedLevel = 1;
 	}
-	if(bonuses.transferRateLevel === "undefined") {
+	if(bonuses.transferRateLevel === 'undefined') {
 		bonuses.transferRateLevel = 1;
 	}
     settings.selectOneOrMultiple = 0;
