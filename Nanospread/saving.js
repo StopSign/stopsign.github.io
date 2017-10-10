@@ -38,10 +38,10 @@ function load() {
     var toLoad = JSON.parse(window.localStorage.version3);
     currentLevel = toLoad.currentLevel;
 	bonuses = toLoad.bonuses;
-	if(bonuses.tickSpeedLevel === 'undefined') {
+	if(bonuses.tickSpeedLevel === undefined) {
 		bonuses.tickSpeedLevel = 1;
 	}
-	if(bonuses.transferRateLevel === 'undefined') {
+	if(bonuses.transferRateLevel === undefined) {
 		bonuses.transferRateLevel = 1;
 	}
     createGrid();

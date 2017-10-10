@@ -343,7 +343,7 @@ function View() {
 		} else {
 			document.getElementById('buyTransferRateButton').style.borderColor = 'red';
 		}
-				document.getElementById('currentEP').innerHTML = bonuses.points;
+				document.getElementById('currentEP').innerHTML = floor(bonuses.points * 100) / 100;
 				document.getElementById('currentTickSpeed').innerHTML = bonuses.tickSpeedLevel;
 				document.getElementById('buyTickSpeedCost').innerHTML = (1 * 10^bonuses.tickSpeedLevel);
 				document.getElementById('currentTransferRate').innerHTML = (bonuses.transferRateLevel / 100);
