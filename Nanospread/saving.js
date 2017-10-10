@@ -30,7 +30,7 @@ function loadDefaults() {
 
 function load() {
     loadDefaults();
-    if (TRUE || !window.localStorage.version3) { //hard clear the save
+    if (true || !window.localStorage.version3) { //hard clear the save
         createGrid();
         return;
     }
