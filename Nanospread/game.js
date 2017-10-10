@@ -270,7 +270,7 @@ function buyTickSpeed() {
     if(bonuses.points >= (1 * 10^bonuses.tickSpeedLevel) && bonuses.tickSpeedLevel < 20) {
 		bonuses.points -= (1 * 10^bonuses.tickSpeedLevel);
 		bonuses.tickSpeedLevel++;
-        recalcInterval(bonuses.tickSpeedLevel)
+        recalcInterval(bonuses.tickSpeedLevel);
     }
 }
 
