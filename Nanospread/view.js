@@ -346,7 +346,7 @@ function View() {
 				document.getElementById('currentEP').innerHTML = bonuses.points;
 				document.getElementById('currentTickSpeed').innerHTML = bonuses.tickSpeedLevel;
 				document.getElementById('buyTickSpeedCost').innerHTML = (1 * 10^bonuses.tickSpeedLevel);
-				document.getElementById('currentTransferRate').innerHTML = bonuses.transferRateLevel;
+				document.getElementById('currentTransferRate').innerHTML = (bonuses.transferRateLevel / 100);
 				document.getElementById('buyTransferRateCost').innerHTML = (1 * 100^bonuses.transferRateLevel);
     }
 }
