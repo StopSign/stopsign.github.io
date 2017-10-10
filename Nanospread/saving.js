@@ -20,7 +20,12 @@ var tickInterval = 0;
 function loadDefaults() {
     settings.buyPerClick = 1;
     settings.selectedResourceNum = 0;
-
+	if(bonuses.tickSpeedLevel === "undefined") {
+		bonuses.tickSpeedLevel = 1;
+	}
+	if(bonuses.transferRateLevel === "undefined") {
+		bonuses.transferRateLevel = 1;
+	}
     settings.selectOneOrMultiple = 0;
     settings.buyLowestOrAll = 1;
     settings.showLastOrLowest = 0;
@@ -72,13 +77,6 @@ function save() {
 }
 
 load();
-if(bonuses.tickSpeedLevel === "undefined") {
-	bonuses.tickSpeedLevel = 1;
-}
-
-if(bonuses.transferRateLevel === "undefined") {
-	bonuses.transferRateLevel = 1;
-}
 
 tickInterval = setInterval(tick, (1000 / bonuses.tickSpeedLevel));
 
