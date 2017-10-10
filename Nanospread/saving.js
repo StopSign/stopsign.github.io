@@ -72,8 +72,16 @@ function save() {
 }
 
 load();
+if(bonuses.tickSpeedLevel === undefined) {
+	bonuses.tickSpeedLevel = 1;
+}
+
+if(bonuses.transferRateLevel === undefined) {
+	bonuses.transferRateLevel = 1;
+}
 
 tickInterval = setInterval(tick, (1000 / bonuses.tickSpeedLevel));
+
 
 //var doWork = new Worker('interval.js');
 //doWork.onmessage = function (event) {
