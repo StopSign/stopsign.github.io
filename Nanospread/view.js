@@ -329,14 +329,14 @@ function View() {
     }
 	
 	this.updateUpgrade = function() {
-        if(bonuses.points >= (1 * 10^bonuses.tickSpeedLevel)) {
+        if(bonuses.points >= (1 * Math.pow(10, bonuses.tickSpeedLevel))) {
             document.getElementById('buyTickSpeedButton').style.borderColor = 'green';
         } else if(bonuses.tickSpeedLevel >= 20) {
 			document.getElementById('buyTickSpeedButton').style.borderColor = 'grey';
 		} else {
 			document.getElementById('buyTickSpeedButton').style.borderColor = 'red';
 		}
-		if(bonuses.points >= (1 * 100^bonuses.transferRateLevel)) {
+		if(bonuses.points >= (1 * Math.pow(100, bonuses.transferRateLevel))) {
             document.getElementById('buyTransferRateButton').style.borderColor = 'green';
         } else if(bonuses.transferRateLevel >= 20) {
 			document.getElementById('buyTransferRateButton').style.borderColor = 'grey';
@@ -345,9 +345,9 @@ function View() {
 		}
 				document.getElementById('currentEP').innerHTML = Math.floor(bonuses.points * 100) / 100;
 				document.getElementById('currentTickSpeed').innerHTML = bonuses.tickSpeedLevel;
-				document.getElementById('buyTickSpeedCost').innerHTML = (1 * 10^bonuses.tickSpeedLevel);
+				document.getElementById('buyTickSpeedCost').innerHTML = (1 * Math.pow(10, bonuses.tickSpeedLevel));
 				document.getElementById('currentTransferRate').innerHTML = (bonuses.transferRateLevel / 100);
-				document.getElementById('buyTransferRateCost').innerHTML = (1 * 100^bonuses.transferRateLevel);
+				document.getElementById('buyTransferRateCost').innerHTML = (1 * Math.pow(100, bonuses.transferRateLevel));
     }
 }
 
