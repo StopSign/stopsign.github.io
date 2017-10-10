@@ -20,12 +20,7 @@ var tickInterval = 0;
 function loadDefaults() {
     settings.buyPerClick = 1;
     settings.selectedResourceNum = 0;
-	if(bonuses.tickSpeedLevel === 'undefined') {
-		bonuses.tickSpeedLevel = 1;
-	}
-	if(bonuses.transferRateLevel === 'undefined') {
-		bonuses.transferRateLevel = 1;
-	}
+
     settings.selectOneOrMultiple = 0;
     settings.buyLowestOrAll = 1;
     settings.showLastOrLowest = 0;
@@ -43,6 +38,12 @@ function load() {
     var toLoad = JSON.parse(window.localStorage.version3);
     currentLevel = toLoad.currentLevel;
 	bonuses = toLoad.bonuses;
+	if(bonuses.tickSpeedLevel === 'undefined') {
+		bonuses.tickSpeedLevel = 1;
+	}
+	if(bonuses.transferRateLevel === 'undefined') {
+		bonuses.transferRateLevel = 1;
+	}
     createGrid();
 
     settings = toLoad.settings;
