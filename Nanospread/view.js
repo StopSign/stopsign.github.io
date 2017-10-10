@@ -277,11 +277,14 @@ function View() {
         } else {
             document.getElementById('selectOne').checked = "checked";
         }
-        if(settings.buyLowestOrAll) {
+        if(settings.buyLowestOrAll === 1) {
             document.getElementById('selectAllBuy').checked = "checked";
-        } else {
+        } else if(settings.buyLowestOrAll === 0) {
             document.getElementById('selectBuyLowest').checked = "checked";
+        } else {
+            document.getElementById('selectBuyLowestEach').checked = "checked";
         }
+
         if(!settings.showLastOrLowest) {
             document.getElementById('selectLast').checked = "checked";
         } else {

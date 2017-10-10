@@ -172,10 +172,12 @@ function buyNanitesButtonPressed() {
     if(selected.length === 0) {
         return;
     }
-    if(settings.buyLowestOrAll) {
+    if(settings.buyLowestOrAll === 1) {
         buyAll();
-    } else {
+    } else if(settings.buyLowestOrAll === 0) {
         buyLowest();
+    } else {
+        buyLowestEach();
     }
     theView.updateInfoBox();
     for(var i = 0; i < selected.length; i++) {
@@ -190,6 +192,14 @@ function buyLowest() {
     }
     if(allBuyable) {
         for(i = 0; i < lowestAmountSquares.length; i++) {
+            lowestAmountSquares[i].buyMultipleNanites(settings.buyPerClick);
+        }
+    }
+}
+function buyLowestEach() {
+    var lowestAmountSquares = select.getLowestSquares(select.getSelectedActive(), 'nanite');
+    for(var i = 0; i < lowestAmountSquares.length; i++) {
+        if(lowestAmountSquares[i].isActive() && lowestAmountSquares[i].canBuyNanitesAfterMultiBuy()) {
             lowestAmountSquares[i].buyMultipleNanites(settings.buyPerClick);
         }
     }
