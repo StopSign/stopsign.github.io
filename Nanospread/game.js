@@ -261,16 +261,15 @@ function calcEvolutionPointGain() {
 }
 
 function recalcInterval(newSpeed) {
+	bonuses.tickSpeedLevel = newSpeed;
     doWork.postMessage({start:false});
     doWork.postMessage({start:true,ms:(1000 / newSpeed)});
 }
 
 function buyTickSpeed() {
-    
     if(bonuses.points >= (1 * 10^bonuses.tickSpeedLevel) && bonuses.tickSpeedLevel < 20) {
 		bonuses.points -= (1 * 10^bonuses.tickSpeedLevel);
-		bonuses.tickSpeedLevel++;
-        recalcInterval(bonuses.tickSpeedLevel);
+		recalcInterval(bonuses.tickSpeedLevel + 1);
     }
 }
 
@@ -287,8 +286,7 @@ function setTransferRate(newRate) {
 function buyTransferRate() {
     if(bonuses.points >= (1 * 100^bonuses.transferRateLevel) && bonuses.transferRateLevel < 20) {
 		bonuses.points -= (1 * 10^bonuses.transferRateLevel);
-		bonuses.transferRateLevel++;
-        setTransferRate(bonuses.transferRateLevel);
+		setTransferRate(bonuses.transferRateLevel + 1);
     }
     theView.update();
 }

@@ -30,7 +30,7 @@ function loadDefaults() {
 
 function load() {
     loadDefaults();
-    if (true || !window.localStorage.version3) { //hard clear the save
+    if (!window.localStorage.version3) { //hard clear the save
         createGrid();
         return;
     }
@@ -54,7 +54,6 @@ function load() {
         }
     }
     highestLevel = toLoad.highestLevel;
-    bonuses = toLoad.bonuses;
 
     settings.buyPerClick = 1; //resets on refresh
     settings.selectedResourceNum = 0;
