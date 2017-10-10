@@ -72,11 +72,11 @@ function save() {
 }
 
 load();
-if(bonuses.tickSpeedLevel === undefined) {
+if(bonuses.tickSpeedLevel === "undefined") {
 	bonuses.tickSpeedLevel = 1;
 }
 
-if(bonuses.transferRateLevel === undefined) {
+if(bonuses.transferRateLevel === "undefined") {
 	bonuses.transferRateLevel = 1;
 }
 

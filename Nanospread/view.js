@@ -343,7 +343,7 @@ function View() {
 		} else {
 			document.getElementById('buyTransferRateButton').style.borderColor = 'red';
 		}
-		
+				document.getElementById('currentTickSpeed').innerHTML = bonuses.points;
 				document.getElementById('currentTickSpeed').innerHTML = bonuses.tickSpeedLevel;
 				document.getElementById('buyTickSpeedCost').innerHTML = (1 * 10^bonuses.tickSpeedLevel);
 				document.getElementById('currentTransferRate').innerHTML = bonuses.transferRateLevel;
