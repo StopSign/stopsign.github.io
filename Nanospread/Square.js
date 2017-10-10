@@ -41,25 +41,20 @@ function Square(col,row,initialConsumeCost) {
         this.naniteCost = (this.naniteAmount - this.specialLevels[this.curSpecialPosNanites] + amountShift) * 10 * naniteCostExtra; //Math.ceil(Math.pow(1.2, this.naniteAmount)*10) * naniteCostExtra;
         this.naniteRate = this.naniteAmount * this.naniteAmountBonus;
     };
-    this.buyMultipleNanites = function(num2) {
-        var num = settings.buyPerClick - this.naniteAmount % settings.buyPerClick;
+    this.buyMultipleNanites = function(buyPerClick) {
+        var num = settings.buyPerClick - this.naniteAmount % buyPerClick;
         for(var j = 0; j < num; j++) {
             this.buyNanites();
         }
     };
     this.canBuyNanitesAfterMultiBuy = function() {
-        var num = settings.buyPerClick - this.naniteAmount % settings.buyPerClick;
-        var nextNaniteCost;
-        for(var i = 0; i < num; i++) {
-            nextNaniteCost = this.naniteCostAfterMultiBuy(num);
-        }
-        return this.nanites >= nextNaniteCost;
+        return this.nanites >= this.naniteCostAfterMultiBuy();
     };
-    this.naniteCostAfterMultiBuy = function(num2) {
-        var num = settings.buyPerClick - this.naniteAmount % settings.buyPerClick;
+    this.naniteCostAfterMultiBuy = function() {
+        var numToBuy = settings.buyPerClick - this.naniteAmount % settings.buyPerClick;
 
         var totalNaniteCost = 0;
-        for(var i = 1; i < num+1; i++) {
+        for(var i = 1; i < numToBuy+1; i++) {
             totalNaniteCost += this.calcPrice(i);
         }
         return totalNaniteCost;

@@ -102,7 +102,7 @@ function Select() {
                     var squareStartingPoint = {x:pxToInt(squareDiv.style.left), y:pxToInt(squareDiv.style.top)};
                     var squareEndingPoint = {x:(pxToInt(squareDiv.style.left)+pxToInt(squareDiv.style.width)), y:(pxToInt(squareDiv.style.top)+pxToInt(squareDiv.style.height))};
                     if(doOverlap(squareStartingPoint, squareEndingPoint, startingDragPoint, endingDragPoint) &&
-                    !insideSquare(squareStartingPoint, squareEndingPoint, startingDragPoint, endingDragPoint)) {
+                        !insideSquare(squareStartingPoint, squareEndingPoint, startingDragPoint, endingDragPoint)) {
                         clickedSquare(column, row);
                     }
                 }

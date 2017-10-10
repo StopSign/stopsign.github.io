@@ -51,6 +51,7 @@ function createGrid() {
     startingSquare.gainNanites(startingSquare.consumeCost);
 }
 
+
 function tick() {
     if(stop) {
         return;
@@ -237,7 +238,7 @@ function calcEvolutionPointGain() {
         for (var row = 0; row < theGrid[column].length; row++) {
             var square = theGrid[column][row];
             if (square && square.curSpecialPosNanites < bonus) { //gets lowest
-               bonus = square.curSpecialPosNanites;
+                bonus = square.curSpecialPosNanites;
             }
         }
     }
