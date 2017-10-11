@@ -6,7 +6,7 @@ function Square(col,row,initialConsumeCost) {
     this.isHovered = 0;
     this.isSelected = 0;
 
-    this.transferRate = 1;
+    this.transferRate = bonus.transferRateLevel;
 
     this.nanites = 0;
     this.naniteRate = 0;
