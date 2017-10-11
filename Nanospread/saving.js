@@ -1,3 +1,10 @@
+var doWork = new Worker('interval.js');
+doWork.onmessage = function (event) {
+    if (event.data === 'interval.start') {
+        tick();
+    }
+};
+
 var settings = {};
 var theView;
 var selected = [];
@@ -15,7 +22,7 @@ var isDragging = false;
 var currentLevel = 0; //SWITCH LEVELS
 var highestLevel;
 var bonuses = { points:0, tickSpeedLevel:1, transferRateLevel:1 };
-var tickInterval = 0;
+// var tickInterval = 0;
 
 function loadDefaults() {
     settings.buyPerClick = 1;
@@ -38,6 +45,7 @@ function load() {
     var toLoad = JSON.parse(window.localStorage.version3);
     currentLevel = toLoad.currentLevel;
 	bonuses = toLoad.bonuses;
+	//Handling previous versions
 	if(bonuses.tickSpeedLevel === undefined) {
 		bonuses.tickSpeedLevel = 1;
 	}
@@ -64,6 +72,8 @@ function load() {
 
     settings.buyPerClick = 1; //resets on refresh
     settings.selectedResourceNum = 0;
+    setTransferRate(bonuses.transferRateLevel);
+    recalcInterval(bonuses.tickSpeedLevel);
 }
 
 function save() {
@@ -78,13 +88,3 @@ function save() {
 }
 
 load();
-
-tickInterval = setInterval(tick, (1000 / bonuses.tickSpeedLevel));
-
-
-//var doWork = new Worker('interval.js');
-//doWork.onmessage = function (event) {
-//    if (event.data === 'interval.start') {
-//        tick();
-//    }
-//};
