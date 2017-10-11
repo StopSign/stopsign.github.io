@@ -58,14 +58,19 @@
         <div class="medium" style="padding:5px">
             Current EP: <div id="currentEP">0</div>
         </div><br>
-        <div style="padding:5px;">
-            <div id='buyTickSpeedButton' class="menuButton" onclick="buyTickSpeed()"> + Tick Speed    </div><br> Current Tick Speed: <div id="currentTickSpeed">1</div>/sec<br> Cost: <div id="buyTickSpeedCost">10</div> EP<br>
-        </div><br>
-		<div style="padding:5px;">
-            <div id='buyTransferRateButton' class="menuButton" onclick="buyTransferRate()"> + Transfer Rate </div><br> Current Transfer Rate: <div id="currentTransferRate">0.01</div><br> Cost: <div id="buyTransferRateCost">100</div> EP<br>
+        <div>
+            <div style="padding:5px;">
+                <div id='buyTickSpeedButton' class="menuButton" onclick="buyTickSpeed()" style="padding-top:5px;padding-bottom:0;"> +20% Tick Speed </div><br>
+                Current Tick Speed: <div id="currentTickSpeed">1</div>/sec<br> Cost: <div id="buyTickSpeedCost">10</div> EP<br>
+                Maximum of 5/sec
+            </div>
+            <div style="padding:5px;">
+                <div id='buyTransferRateButton' class="menuButton" onclick="buyTransferRate()" style="padding-top:5px;padding-bottom:0;"> +0.01 Transfer Rate </div><br>
+                Current Transfer Rate: <div id="currentTransferRate">0.01</div><br> Cost: <div id="buyTransferRateCost">100</div> EP<br>
+                Maximum of 0.1
+            </div>
         </div>
-		<i id="backButton1" class="backButton fa fa-close" onclick="closeUpgradeBox()" style="font-size:24px"></i>
-        
+        <i id="backButton2" class="backButton fa fa-close" onclick="closeUpgradeBox()" style="font-size:24px"></i>
     </div>
     <div id="buildBox" style="display:none;">
         <!--fa fa-truck, microchip, industry -->
@@ -93,7 +98,7 @@
         Capture all the Squares and improve them before changing levels<br>
         The total nanite consume cost of a level goes up 1.5x per level.<br>
 
-        <i id="backButton1" class="backButton fa fa-close" onclick="closeHelpBox()" style="font-size:24px"></i>
+        <i id="backButton3" class="backButton fa fa-close" onclick="closeHelpBox()" style="font-size:24px"></i>
     </div>
     <div id="settingsBox" style="display:none;">
         <div class="settingContainer">

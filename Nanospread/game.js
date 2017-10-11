@@ -263,18 +263,23 @@ function calcEvolutionPointGain() {
 
 function recalcInterval(newSpeed) {
 	bonuses.tickSpeedLevel = newSpeed;
-	tickInterval = clearInterval();
-	tickInterval = (tick, (1000 / newSpeed));
+	// clearInterval(tickInterval);
+	// tickInterval = setInterval(tick, (1000 / newSpeed));
 	
-//    doWork.postMessage({start:false});
-//    doWork.postMessage({start:true,ms:(1000 / newSpeed)});
+   doWork.postMessage({start:false});
+   doWork.postMessage({start:true,ms:(1000 / newSpeed)});
 }
 
 function buyTickSpeed() {
-    if(bonuses.points >= (25 * Math.pow(2, bonuses.tickSpeedLevel - 1)) && bonuses.tickSpeedLevel < 20) {
-		bonuses.points -= (25 * Math.pow(2, bonuses.tickSpeedLevel - 1));
-		recalcInterval(bonuses.tickSpeedLevel + 1);
+    if(bonuses.points >= getTickSpeedCost() && bonuses.tickSpeedLevel < 5) {
+		bonuses.points -= getTickSpeedCost();
+		recalcInterval(bonuses.tickSpeedLevel + .2);
     }
+    theView.updateUpgrade();
+}
+
+function getTickSpeedCost() {
+    return round2(50 * Math.pow(2, (bonuses.tickSpeedLevel - 1)*5));
 }
 
 function setTransferRate(newRate) {
@@ -282,15 +287,21 @@ function setTransferRate(newRate) {
     for (var column = 0; column < theGrid.length; column++) {
         for (var row = 0; row < theGrid[column].length; row++) {
             var square = theGrid[column][row];
-            square.transferRate = newRate;
+            if(square) {
+                square.transferRate = newRate;
+            }
         }
     }
 }
 
 function buyTransferRate() {
-    if(bonuses.points >= (250 * Math.pow(2, bonuses.transferRateLevel - 1)) && bonuses.transferRateLevel < 20) {
-		bonuses.points -= (250 * Math.pow(2, bonuses.transferRateLevel - 1));
+    if(bonuses.points >= getTransferRateCost() && bonuses.transferRateLevel < 10) {
+		bonuses.points -= getTransferRateCost();
 		setTransferRate(bonuses.transferRateLevel + 1);
     }
     theView.update();
+}
+
+function getTransferRateCost() {
+    return round2(15 * Math.pow(2, bonuses.transferRateLevel - 1));
 }

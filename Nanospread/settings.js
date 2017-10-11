@@ -20,7 +20,6 @@ function toggleHelp() {
     } else  {
         openHelpBox()
     }
-    adjustMenus();
 }
 function openHelpBox() {
     menuOpen = "help";
@@ -36,7 +35,6 @@ function toggleBuild() {
     } else  {
         openBuildBox()
     }
-    adjustMenus();
 }
 function openBuildBox() {
     menuOpen = "build";
@@ -52,7 +50,6 @@ function toggleLevelMenu() {
     } else  {
         openLevelBox()
     }
-    adjustMenus();
 }
 function openLevelBox() {
     menuOpen = "level";
@@ -69,7 +66,6 @@ function toggleUpgradeMenu() {
     } else  {
         openUpgradeBox()
     }
-    adjustMenus();
 }
 function openUpgradeBox() {
     menuOpen = "upgrade";
