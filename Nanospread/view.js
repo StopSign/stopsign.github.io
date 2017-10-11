@@ -65,9 +65,25 @@ function View() {
                 dragSelectDiv.style.display = "block";
             }
         }
+        if(startingDragPoint.x > e.x) {
+            var leftX = e.x;
+            var rightX = startingDragPoint.x;
+        } else {
+            leftX = startingDragPoint.x;
+            rightX = e.x;
+        }
+        if(startingDragPoint.y > e.y) {
+            var topY = e.y;
+            var bottomY = startingDragPoint.y;
+        } else {
+            topY = startingDragPoint.y;
+            bottomY = e.y;
+        }
         if(dragSelectDiv.style.display === "block") {
-            dragSelectDiv.style.width = (e.pageX - startingDragPoint.x - 11)+"px";
-            dragSelectDiv.style.height = (e.pageY - startingDragPoint.y - 4)+"px";
+            dragSelectDiv.style.top = (topY + 4)+"px";
+            dragSelectDiv.style.left = (leftX - 10)+"px";
+            dragSelectDiv.style.width = (rightX - leftX)+"px";
+            dragSelectDiv.style.height = (bottomY - topY - 4)+"px";
         }
     };
     this.backgroundGrid.onmouseup  = function(e) {
@@ -78,7 +94,21 @@ function View() {
             return;
         }
         endingDragPoint = {x:(e.pageX - 8), y:(e.pageY - 8)};
-        select.selectAllInCoordinates(startingDragPoint, endingDragPoint);
+        if(startingDragPoint.x > endingDragPoint.x) {
+            var leftX = endingDragPoint.x;
+            var rightX = startingDragPoint.x;
+        } else {
+            leftX = startingDragPoint.x;
+            rightX = endingDragPoint.x;
+        }
+        if(startingDragPoint.y > endingDragPoint.y) {
+            var topY = endingDragPoint.y;
+            var bottomY = startingDragPoint.y;
+        } else {
+            topY = startingDragPoint.y;
+            bottomY = endingDragPoint.y;
+        }
+        select.selectAllInCoordinates({x:leftX, y:topY}, {x:rightX, y:bottomY})
     };
 
     this.drawButtons = function() {
