@@ -35,6 +35,8 @@ function processKeyQueue() {
         toggleLevelMenu();
     } else if(key === 72) { //h
         toggleHelp();
+    } else if(key === 85) { //u
+        toggleUpgradeMenu();
     }
 //            if(myKeyQueue.length > 0) {
 //                $scope.pbars[selectedButton[0]].changeSelect(selectedButton[1]);

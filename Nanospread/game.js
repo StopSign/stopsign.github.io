@@ -239,6 +239,7 @@ function changeLevel(newLevel) {
     currentLevel = newLevel;
     createGrid();
     theView.createGrid();
+	setTransferRate(bonuses.transferRateLevel);
     theView.update();
 }
 
@@ -258,4 +259,38 @@ function calcEvolutionPointGain() {
     }
     bonus *= Math.pow(1.3, currentLevel);
     return bonus;
+}
+
+function recalcInterval(newSpeed) {
+	bonuses.tickSpeedLevel = newSpeed;
+	tickInterval = clearInterval();
+	tickInterval = (tick, (1000 / newSpeed));
+	
+//    doWork.postMessage({start:false});
+//    doWork.postMessage({start:true,ms:(1000 / newSpeed)});
+}
+
+function buyTickSpeed() {
+    if(bonuses.points >= (25 * Math.pow(2, bonuses.tickSpeedLevel - 1)) && bonuses.tickSpeedLevel < 20) {
+		bonuses.points -= (25 * Math.pow(2, bonuses.tickSpeedLevel - 1));
+		recalcInterval(bonuses.tickSpeedLevel + 1);
+    }
+}
+
+function setTransferRate(newRate) {
+    bonuses.transferRateLevel = newRate;
+    for (var column = 0; column < theGrid.length; column++) {
+        for (var row = 0; row < theGrid[column].length; row++) {
+            var square = theGrid[column][row];
+            square.transferRate = newRate;
+        }
+    }
+}
+
+function buyTransferRate() {
+    if(bonuses.points >= (250 * Math.pow(2, bonuses.transferRateLevel - 1)) && bonuses.transferRateLevel < 20) {
+		bonuses.points -= (250 * Math.pow(2, bonuses.transferRateLevel - 1));
+		setTransferRate(bonuses.transferRateLevel + 1);
+    }
+    theView.update();
 }

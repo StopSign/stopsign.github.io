@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="stylesheet.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <script src="helpers.js"></script>
-    <script src="select.js"></script>
+	<script src="select.js"></script>
     <script src="view.js"></script>
     <script src="Square.js"></script>
     <script src="Building.js"></script>
@@ -15,6 +15,7 @@
     <script src="hotkeys.js"></script>
     <script src="settings.js"></script>
     <script src="saving.js"></script>
+	
 </head>
 <body style="font-family:Arial, Helvetica, serif;color:black;font-size:14px;background-color:black;height:100%;margin-top:0;margin-bottom:0;">
 <!--<canvas id="drawArea" width="800" height="1000"></canvas>-->
@@ -28,21 +29,21 @@
     <div class="menuButton" onclick="toggleSettingsBox()"><i class="fa fa-sliders" style="font-size:20px;"></i> Settings (Q)</div>
     <div class="menuButton" onclick="toggleHelp()"><i class="fa fa-question-circle-o" style="font-size:20px;"></i> Help (H)</div>
     <div class="menuButton" onclick="toggleLevelMenu()"><i class="fa fa-line-chart" style="font-size:20px;"></i> Level (L)</div>
+	<div class="menuButton" onclick="toggleUpgradeMenu()"><i class="fa fa-line-chart" style="font-size:20px;"></i> Upgrades (U)</div>
     <div class="menuButton" style="float:right" onclick="select.selectAllActive()"><div style="margin-top:3px;">Select Active (E)</div></div>
 </div>
 
 <div id="infoPanel" class="small" style="position:fixed;bottom:30px;height:170px;width:800px;background-color:#8194bd;z-index:999;display:none;overflow:auto;">
     <div id="levelBox" style="display:none">
-        <div class="medium" style="padding:5px">
+		<div class="medium" style="padding:5px">
             Current Level: <div id="currentLevel"></div>
         </div><br>
         <div style="padding:5px;">
-            <div id='previousLevelButton' class="menuButton" onclick="changeLevel(currentLevel-1)"><i class="fa fa-caret-square-o-left" style="font-size:20px;"></i> Previous Level</div>
+			<div id='previousLevelButton' class="menuButton" onclick="changeLevel(currentLevel-1)"><i class="fa fa-caret-square-o-left" style="font-size:20px;"></i> Previous Level</div>
             <div id='resetLevelButton' class="menuButton" onclick="changeLevel(currentLevel)"><i class="fa fa-refresh" style="font-size:20px;"></i> Reset Current Level</div>
             <div id='nextLevelButton' class="menuButton" onclick="changeLevel(currentLevel+1)"><i class="fa fa-caret-square-o-right" style="font-size:20px;"></i> Next Level</div>
         </div>
-
-        <div style="padding:5px;">
+		<div style="padding:5px;">
             Switching levels or resetting will prestige you, removing most upgrades<br>
             You will gain evolution points equal to the lowest Square's Bonus * 1.3^(Level #)<br>
             Each evolution point gives 5% more nanite production<br>
@@ -51,6 +52,20 @@
             <label for="levelConfirm">Confirm new level</label><br>
             You have <div id="evolutionPoints">0</div> evolution points.
         </div>
+		<i id="backButton1" class="backButton fa fa-close" onclick="closeLevelBox()" style="font-size:24px"></i>
+    </div>
+	<div id="upgradeBox" style="display:none">
+        <div class="medium" style="padding:5px">
+            Current EP: <div id="currentEP">0</div>
+        </div><br>
+        <div style="padding:5px;">
+            <div id='buyTickSpeedButton' class="menuButton" onclick="buyTickSpeed()"> + Tick Speed    </div><br> Current Tick Speed: <div id="currentTickSpeed">1</div>/sec<br> Cost: <div id="buyTickSpeedCost">10</div> EP<br>
+        </div><br>
+		<div style="padding:5px;">
+            <div id='buyTransferRateButton' class="menuButton" onclick="buyTransferRate()"> + Transfer Rate </div><br> Current Transfer Rate: <div id="currentTransferRate">0.01</div><br> Cost: <div id="buyTransferRateCost">100</div> EP<br>
+        </div>
+		<i id="backButton1" class="backButton fa fa-close" onclick="closeUpgradeBox()" style="font-size:24px"></i>
+        
     </div>
     <div id="buildBox" style="display:none;">
         <!--fa fa-truck, microchip, industry -->

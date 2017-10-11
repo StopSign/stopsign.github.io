@@ -14,7 +14,8 @@ var select = new Select();
 var isDragging = false;
 var currentLevel = 0; //SWITCH LEVELS
 var highestLevel;
-var bonuses = { points:0 };
+var bonuses = { points:0, tickSpeedLevel:1, transferRateLevel:1 };
+var tickInterval = 0;
 
 function loadDefaults() {
     settings.buyPerClick = 1;
@@ -36,6 +37,13 @@ function load() {
     }
     var toLoad = JSON.parse(window.localStorage.version3);
     currentLevel = toLoad.currentLevel;
+	bonuses = toLoad.bonuses;
+	if(bonuses.tickSpeedLevel === undefined) {
+		bonuses.tickSpeedLevel = 1;
+	}
+	if(bonuses.transferRateLevel === undefined) {
+		bonuses.transferRateLevel = 1;
+	}
     createGrid();
 
     settings = toLoad.settings;
@@ -53,7 +61,6 @@ function load() {
         }
     }
     highestLevel = toLoad.highestLevel;
-    bonuses = toLoad.bonuses;
 
     settings.buyPerClick = 1; //resets on refresh
     settings.selectedResourceNum = 0;
@@ -72,4 +79,12 @@ function save() {
 
 load();
 
-setInterval(tick, 1000);
+tickInterval = setInterval(tick, (1000 / bonuses.tickSpeedLevel));
+
+
+//var doWork = new Worker('interval.js');
+//doWork.onmessage = function (event) {
+//    if (event.data === 'interval.start') {
+//        tick();
+//    }
+//};
