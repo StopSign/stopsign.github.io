@@ -239,6 +239,7 @@ function changeLevel(newLevel) {
     currentLevel = newLevel;
     createGrid();
     theView.createGrid();
+	setTransferRate(bonuses.transferRateLevel);
     theView.update();
 }
 
