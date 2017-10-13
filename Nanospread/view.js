@@ -418,7 +418,7 @@ function buttonSetup(type, typeUpper, label) { //lol javascript
         return;
     }
     document.getElementById(type+'Amount').innerHTML = displaySquare[type+'Amount'];
-    document.getElementById(type+'Cost').innerHTML = "Cost is: " + intToStringRound(displaySquare[type+'CostAfterMultiBuy'](settings.buyPerClick))+", ";
+    document.getElementById(type+'Cost').innerHTML = "Cost is: " + intToString(displaySquare[type+'CostAfterMultiBuy'](settings.buyPerClick))+", ";
     document.getElementById(type+'Benefit').innerHTML = "+"+displaySquare[type+'AmountBonus']+" created per, ";
     document.getElementById(type+'SpecialNext').innerHTML = "next Bonus at "+displaySquare[type+'NextSpecial']+".";
     document.getElementById('buy'+typeUpper+'Button').style.borderColor = buyAvailableAnd ? "green" : buyAvailableOr ? "yellow" : "red";
