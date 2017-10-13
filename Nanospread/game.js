@@ -316,7 +316,7 @@ function buyDiscountLevel() {
 
 function getDiscountBonus() {
 	if(bonuses.discountLevel >= 1) {
-		return round2(1 + (((1 * (1 - (Math.pow(1.01, bonuses.discountLevel - 1)))) / (1 - 1.01)) / 100));
+		return round2((1 * (1 - (Math.pow(1.01, bonuses.discountLevel - 1)))) / (1 - 1.01));
 	} else {
 		return 0;
 	}
