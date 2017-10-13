@@ -374,11 +374,19 @@ function View() {
         } else {
 			document.getElementById('buyTransferRateButton').style.borderColor = 'red';
 		}
+		if(bonuses.points >= getDiscountCost()) {
+            document.getElementById('buyDiscountButton').style.borderColor = 'green';
+        } else {
+			document.getElementById('buyDiscountButton').style.borderColor = 'red';
+		}
         document.getElementById('currentEP').innerHTML = intToString(bonuses.points);
         document.getElementById('currentTickSpeed').innerHTML = intToString(bonuses.tickSpeedLevel);
         document.getElementById('buyTickSpeedCost').innerHTML = intToString(getTickSpeedCost());
         document.getElementById('currentTransferRate').innerHTML = intToString(bonuses.transferRateLevel / 100);
         document.getElementById('buyTransferRateCost').innerHTML = intToString(getTransferRateCost());
+		document.getElementById('nextDiscountBonus').innerHTML = intToString((getDiscountBonus()) * 1.01);
+        document.getElementById('currentDiscountBonus').innerHTML = intToString(getDiscountBonus());
+		document.getElementById('buyDiscountCost').innerHTML = intToString(getDiscountCost());
     }
 }
 

@@ -305,3 +305,11 @@ function buyTransferRate() {
 function getTransferRateCost() {
     return round2(15 * Math.pow(2, bonuses.transferRateLevel - 1));
 }
+
+function getDiscountBonus() {
+    return round2(1 + (((1 * (1 - (Math.pow(1.01, bonuses.discountLevel - 1)))) / (1 - 1.01)) / 100));
+}
+
+function getDiscountCost() {
+    return round2(bonuses.discountLevel + 1);
+}

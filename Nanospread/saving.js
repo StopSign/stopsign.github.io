@@ -21,7 +21,7 @@ var select = new Select();
 var isDragging = false;
 var currentLevel = 0; //SWITCH LEVELS
 var highestLevel;
-var bonuses = { points:0, tickSpeedLevel:1, transferRateLevel:1 };
+var bonuses = { points:0, tickSpeedLevel:1, transferRateLevel:1, discountLevel:0 };
 // var tickInterval = 0;
 
 function loadDefaults() {
@@ -52,6 +52,9 @@ function load() {
 	}
 	if(bonuses.transferRateLevel === undefined) {
 		bonuses.transferRateLevel = 1;
+	}
+	if(bonuses.discountLevel === undefined) {
+		bonuses.discountLevel = 0;
 	}
     createGrid();
 
