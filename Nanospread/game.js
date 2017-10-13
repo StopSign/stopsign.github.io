@@ -325,7 +325,9 @@ function getCurrentDiscountBonus() {
 function getNextDiscountBonus() { 
 	if(bonuses.discountLevel >= 1) {
 		return round2((1 * (1 - (Math.pow(1.01, bonuses.discountLevel)))) / (1 - 1.01));
-	} 
+	} else {
+		return 1;
+	}
 }
 function getDiscountCost() {
     return round2(bonuses.discountLevel + 1);
