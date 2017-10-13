@@ -40,6 +40,7 @@ function load() {
     loadDefaults();
     if (!window.localStorage.version3) { //hard clear the save
         createGrid();
+        recalcInterval(bonuses.tickSpeedLevel);
         return;
     }
     var toLoad = JSON.parse(window.localStorage.version3);
