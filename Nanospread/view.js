@@ -384,8 +384,8 @@ function View() {
         document.getElementById('buyTickSpeedCost').innerHTML = intToString(getTickSpeedCost());
         document.getElementById('currentTransferRate').innerHTML = intToString(bonuses.transferRateLevel / 100);
         document.getElementById('buyTransferRateCost').innerHTML = intToString(getTransferRateCost());
-		document.getElementById('nextDiscountBonus').innerHTML = intToString((getDiscountBonus()) * 1.01);
-        document.getElementById('currentDiscountBonus').innerHTML = intToString(getDiscountBonus());
+		document.getElementById('nextDiscountBonus').innerHTML = intToString((getNextDiscountBonus()));
+        document.getElementById('currentDiscountBonus').innerHTML = intToString(getCurrentDiscountBonus());
 		document.getElementById('buyDiscountCost').innerHTML = intToString(getDiscountCost());
     }
 }
