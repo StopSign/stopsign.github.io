@@ -306,8 +306,20 @@ function getTransferRateCost() {
     return round2(15 * Math.pow(2, bonuses.transferRateLevel - 1));
 }
 
+function buyDiscountLevel() {
+    if(bonuses.points >= getDiscountCost()) {
+		bonuses.points -= getDiscountCost();
+		bonuses.discountLevel++;
+    }
+    theView.update();
+}
+
 function getDiscountBonus() {
-    return round2(1 + (((1 * (1 - (Math.pow(1.01, bonuses.discountLevel - 1)))) / (1 - 1.01)) / 100));
+	if(bonuses.discountLevel >= 1) {
+		return round2(1 + (((1 * (1 - (Math.pow(1.01, bonuses.discountLevel - 1)))) / (1 - 1.01)) / 100));
+	} else {
+		return 0;
+	}
 }
 
 function getDiscountCost() {
