@@ -57,7 +57,7 @@ function Square(col,row,initialConsumeCost) {
         for(var i = 1; i < numToBuy+1; i++) {
             totalNaniteCost += this.calcPrice(i);
         }
-        return totalNaniteCost;
+        return totalNaniteCost / (1 + (getCurrentDiscountBonus() / 100));
     };
     this.calcPrice = function(num) {
         var nextNaniteCost = this.naniteCost;
@@ -76,7 +76,7 @@ function Square(col,row,initialConsumeCost) {
             var amountShift = tempSpecialPos === 0 ? 0 : tempSpecialPos*3; //Math.floor(Math.pow((this.curSpecialPosNanites+1), 2)
             nextNaniteCost = (tempAmount - this.specialLevels[tempSpecialPos] + amountShift) * 10 * naniteCostExtra; //Math.ceil(Math.pow(1.2, this.naniteAmount)*10) * naniteCostExtra;
         }
-        return nextNaniteCost  / (1 + (getCurrentDiscountBonus() / 100));
+        return nextNaniteCost;
     };
 
     this.canBuyAdvBots = function() {
