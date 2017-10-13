@@ -66,7 +66,7 @@ function Square(col,row,initialConsumeCost) {
         var tempSpecialPos = this.curSpecialPosNanites;
         var tempNaniteAmountBonus = this.naniteAmountBonus;
         for(var i = 0; i < num-1; i++) {
-            tempNanites -= nextNaniteCost / (1 + (getCurrentDiscountBonus() / 100));
+            tempNanites -= nextNaniteCost;
             tempAmount++;
             if (tempAmount >= this.specialLevels[tempSpecialPos+1]) {
                 tempNaniteAmountBonus = Math.pow(2, (++tempSpecialPos));
@@ -76,7 +76,7 @@ function Square(col,row,initialConsumeCost) {
             var amountShift = tempSpecialPos === 0 ? 0 : tempSpecialPos*3; //Math.floor(Math.pow((this.curSpecialPosNanites+1), 2)
             nextNaniteCost = (tempAmount - this.specialLevels[tempSpecialPos] + amountShift) * 10 * naniteCostExtra; //Math.ceil(Math.pow(1.2, this.naniteAmount)*10) * naniteCostExtra;
         }
-        return nextNaniteCost;
+        return nextNaniteCost  / (1 + (getCurrentDiscountBonus() / 100));
     };
 
     this.canBuyAdvBots = function() {
