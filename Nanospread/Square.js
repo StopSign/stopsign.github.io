@@ -60,13 +60,13 @@ function Square(col,row,initialConsumeCost) {
         return totalNaniteCost;
     };
     this.calcPrice = function(num) {
-        var nextNaniteCost = this.naniteCost / (1 + (getCurrentDiscountBonus() / 100));
+        var nextNaniteCost = this.naniteCost;
         var tempNanites = this.nanites;
         var tempAmount = this.naniteAmount;
         var tempSpecialPos = this.curSpecialPosNanites;
         var tempNaniteAmountBonus = this.naniteAmountBonus;
         for(var i = 0; i < num-1; i++) {
-            tempNanites -= nextNaniteCost;
+            tempNanites -= nextNaniteCost / (1 + (getCurrentDiscountBonus() / 100));
             tempAmount++;
             if (tempAmount >= this.specialLevels[tempSpecialPos+1]) {
                 tempNaniteAmountBonus = Math.pow(2, (++tempSpecialPos));
