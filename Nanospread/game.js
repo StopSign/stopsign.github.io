@@ -357,7 +357,7 @@ function buyAbMaxLevel() {
 }
 
 function getAbMaxCost() {
-    return round2(50 * Math.pow(2, autobuy.currentMax - 1));
+    return round2(25 * autobuy.currentMax);
 }
 
 function buyAbAmtToSpendLevel() {
@@ -369,5 +369,5 @@ function buyAbAmtToSpendLevel() {
 }
 
 function getAbAmtToSpendCost() {
-    return round2(25 * Math.pow(2, autobuy.amtToSpend - 1));
+    return round2(10 * autobuy.amtToSpend);
 }
