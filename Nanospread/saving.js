@@ -58,6 +58,9 @@ function load() {
 	if(bonuses.discountLevel === undefined) {
 		bonuses.discountLevel = 0;
 	}
+	if(autobuy === undefined) {
+		var autobuy = { currentMax:0, amtToSpend:1 };
+	}
 	if(autobuy.currentMax === undefined) {
 		autobuy.currentMax = 1;
 	}
