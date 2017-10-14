@@ -60,6 +60,7 @@ function tick() {
     handleFPSDifference();
     clearNanitesReceived();
     sendNanites();
+	autobuyLevels();
 
     if(!theView) {
         theView = new View();
@@ -71,6 +72,20 @@ function tick() {
     }
 }
 
+function autobuyLevels() {
+    for (var column = 0; column < theGrid.length; column++) {
+        for (var row = 0; row < theGrid[column].length; row++) {
+            var square = theGrid[column][row];
+            if(square && square.isActive()) {
+				if(square.naniteAmount < autobuy.currentMax && (square.nanites * (autobuy.AmtToSpend / 100)) >= (square.naniteCost / (1 + (getCurrentDiscountBonus() / 100))) {
+					square.buyNanites();
+				}
+			}
+		}
+	}
+}
+			
+			
 function sendNanites() {
     for (var column = 0; column < theGrid.length; column++) {
         for (var row = 0; row < theGrid[column].length; row++) {
@@ -331,4 +346,28 @@ function getNextDiscountBonus() {
 }
 function getDiscountCost() {
     return round2(bonuses.discountLevel + 1);
+}
+
+function buyAbMaxLevel() {
+    if(bonuses.points >= getAbMaxCost()) {
+		bonuses.points -= getAbMaxCost();
+		autobuy.currentMax++;
+    }
+    theView.update();
+}
+
+function getAbMaxCost() {
+    return round2(50 * Math.pow(2, autobuy.currentMax - 1));
+}
+
+function buyAbAmtToSpendLevel() {
+    if(bonuses.points >= getAbAmtToSpendCost()) {
+		bonuses.points -= getAbAmtToSpendCost();
+		autobuy.amtToSpend++;
+    }
+    theView.update();
+}
+
+function getAbAmtToSpendCost() {
+    return round2(25 * Math.pow(2, autobuy.amtToSpend - 1));
 }

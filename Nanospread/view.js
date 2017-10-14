@@ -374,10 +374,27 @@ function View() {
         } else {
 			document.getElementById('buyTransferRateButton').style.borderColor = 'red';
 		}
+		
 		if(bonuses.points >= getDiscountCost()) {
             document.getElementById('buyDiscountButton').style.borderColor = 'green';
         } else {
 			document.getElementById('buyDiscountButton').style.borderColor = 'red';
+		}
+		
+		if(autobuy.currentMax >= autobuy.maxMax) {
+            document.getElementById('buyAbMaxButton').style.borderColor = 'grey';
+        } else if(bonuses.points >= getAbMaxCost()) {
+            document.getElementById('buyAbMaxButton').style.borderColor = 'green';
+        } else {
+			document.getElementById('buyAbMaxButton').style.borderColor = 'red';
+		}
+		
+		if(autobuy.amtToSpend >= 100) {
+            document.getElementById('buyAbAmtToSpendButton').style.borderColor = 'grey';
+        } else if(bonuses.points >= getAbAmtToSpendCost()) {
+            document.getElementById('buyAbAmtToSpendButton').style.borderColor = 'green';
+        } else {
+			document.getElementById('buyAbAmtToSpendButton').style.borderColor = 'red';
 		}
         document.getElementById('currentEP').innerHTML = intToString(bonuses.points);
         document.getElementById('currentTickSpeed').innerHTML = intToString(bonuses.tickSpeedLevel);
@@ -387,6 +404,11 @@ function View() {
 		document.getElementById('nextDiscountBonus').innerHTML = intToString((getNextDiscountBonus() - getCurrentDiscountBonus()));
         document.getElementById('currentDiscountBonus').innerHTML = intToString(getCurrentDiscountBonus());
 		document.getElementById('buyDiscountCost').innerHTML = intToString(getDiscountCost());
+		document.getElementById('abCurrentMax').innerHTML = intToString(autobuy.currentMax);
+        document.getElementById('abMaxMax').innerHTML = intToString(highestLevel * 2);
+        document.getElementById('buyAbMaxCost').innerHTML = intToString(getAbMaxCost());
+        document.getElementById('abAmtToSpendLevel').innerHTML = intToString(autobuy.AmtToSpend);
+		document.getElementById('buyAbAmtToSpendCost').innerHTML = intToString(getAbAmtToSpendCost());
     }
 }
 

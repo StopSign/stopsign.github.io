@@ -22,6 +22,7 @@ var isDragging = false;
 var currentLevel = 0; //SWITCH LEVELS
 var highestLevel;
 var bonuses = { points:0, tickSpeedLevel:1, transferRateLevel:1, discountLevel:0 };
+var autobuy = { currentMax:0, amtToSpend:1 };
 // var tickInterval = 0;
 
 function loadDefaults() {
@@ -46,6 +47,7 @@ function load() {
     var toLoad = JSON.parse(window.localStorage.version3);
     currentLevel = toLoad.currentLevel;
 	bonuses = toLoad.bonuses;
+	autobuy = toLoad.autobuy;
 	//Handling previous versions
 	if(bonuses.tickSpeedLevel === undefined) {
 		bonuses.tickSpeedLevel = 1;
@@ -55,6 +57,12 @@ function load() {
 	}
 	if(bonuses.discountLevel === undefined) {
 		bonuses.discountLevel = 0;
+	}
+	if(autobuy.currentMax === undefined) {
+		autobuy.currentMax = 1;
+	}
+	if(autobuy.amtToSpend === undefined) {
+		autobuy.amtToSpend = 1;
 	}
     createGrid();
 
@@ -87,6 +95,7 @@ function save() {
     toSave.theGrid = theGrid;
     toSave.highestLevel = highestLevel;
     toSave.bonuses = bonuses;
+	toSave.autobuy = autobuy;
     // console.log('saved');
     window.localStorage.version3 = JSON.stringify(toSave);
 }
