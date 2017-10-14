@@ -22,7 +22,7 @@ var isDragging = false;
 var currentLevel = 0; //SWITCH LEVELS
 var highestLevel;
 var bonuses = { points:0, tickSpeedLevel:1, transferRateLevel:1, discountLevel:0 };
-var autobuy = { currentMax:0, amtToSpend:1 };
+var autobuy = { currentMax:1, amtToSpend:1 };
 // var tickInterval = 0;
 
 function loadDefaults() {
@@ -59,7 +59,7 @@ function load() {
 		bonuses.discountLevel = 0;
 	}
 	if(autobuy === undefined) {
-		var autobuy = { currentMax:0, amtToSpend:1 };
+		var autobuy = { currentMax:1, amtToSpend:1 };
 	}
 	if(autobuy.currentMax === undefined) {
 		autobuy.currentMax = 1;
