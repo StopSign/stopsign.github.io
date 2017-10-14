@@ -407,7 +407,7 @@ function View() {
 		document.getElementById('abCurrentMax').innerHTML = intToString(autobuy.currentMax);
         document.getElementById('abMaxMax').innerHTML = intToString(highestLevel * 2);
         document.getElementById('buyAbMaxCost').innerHTML = intToString(getAbMaxCost());
-        document.getElementById('abAmtToSpendLevel').innerHTML = intToString(autobuy.AmtToSpend);
+        document.getElementById('abAmtToSpendLevel').innerHTML = intToString(autobuy.amtToSpend);
 		document.getElementById('buyAbAmtToSpendCost').innerHTML = intToString(getAbAmtToSpendCost());
     }
 }

@@ -77,7 +77,7 @@ function autobuyLevels() {
         for (var row = 0; row < theGrid[column].length; row++) {
             var square = theGrid[column][row];
             if(square && square.isActive()) {
-				if(square.naniteAmount < autobuy.currentMax && (square.nanites * (autobuy.AmtToSpend / 100)) >= (square.naniteCost / (1 + (getCurrentDiscountBonus() / 100)))) {
+				if(square.naniteAmount < autobuy.currentMax && (square.nanites * (autobuy.amtToSpend / 100)) >= (square.naniteCost / (1 + (getCurrentDiscountBonus() / 100)))) {
 					square.buyNanites();
 				}
 			}
