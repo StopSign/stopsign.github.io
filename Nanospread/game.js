@@ -60,6 +60,7 @@ function tick() {
     handleFPSDifference();
     clearNanitesReceived();
     sendNanites();
+	autobuyLevels();
 
     if(!theView) {
         theView = new View();
@@ -71,6 +72,20 @@ function tick() {
     }
 }
 
+function autobuyLevels() {
+    for (var column = 0; column < theGrid.length; column++) {
+        for (var row = 0; row < theGrid[column].length; row++) {
+            var square = theGrid[column][row];
+            if(square && square.isActive()) {
+				if(square.naniteAmount < autobuy.currentMax && (square.nanites * (autobuy.amtToSpend / 100)) >= (square.naniteCost / (1 + (getCurrentDiscountBonus() / 100)))) {
+					square.buyNanites();
+				}
+			}
+		}
+	}
+}
+			
+			
 function sendNanites() {
     for (var column = 0; column < theGrid.length; column++) {
         for (var row = 0; row < theGrid[column].length; row++) {
@@ -304,4 +319,55 @@ function buyTransferRate() {
 
 function getTransferRateCost() {
     return round2(15 * Math.pow(2, bonuses.transferRateLevel - 1));
+}
+
+function buyDiscountLevel() {
+    if(bonuses.points >= getDiscountCost()) {
+		bonuses.points -= getDiscountCost();
+		bonuses.discountLevel++;
+    }
+    theView.update();
+}
+
+function getCurrentDiscountBonus() { 
+	if(bonuses.discountLevel >= 1) {
+		return round2((1 * (1 - (Math.pow(1.01, bonuses.discountLevel)))) / (1 - 1.01));
+	} else {
+		return 0;
+	}
+}
+
+function getNextDiscountBonus() { 
+	if(bonuses.discountLevel >= 1) {
+		return round2((1 * (1 - (Math.pow(1.01, (bonuses.discountLevel + 1))))) / (1 - 1.01));
+	} else {
+		return 1;
+	}
+}
+function getDiscountCost() {
+    return round2(bonuses.discountLevel + 1);
+}
+
+function buyAbMaxLevel() {
+    if(bonuses.points >= getAbMaxCost()) {
+		bonuses.points -= getAbMaxCost();
+		autobuy.currentMax++;
+    }
+    theView.update();
+}
+
+function getAbMaxCost() {
+    return round2(25 * autobuy.currentMax);
+}
+
+function buyAbAmtToSpendLevel() {
+    if(bonuses.points >= getAbAmtToSpendCost()) {
+		bonuses.points -= getAbAmtToSpendCost();
+		autobuy.amtToSpend++;
+    }
+    theView.update();
+}
+
+function getAbAmtToSpendCost() {
+    return round2(10 * autobuy.amtToSpend);
 }
