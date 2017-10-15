@@ -58,7 +58,7 @@ function intToStringRound(value) {
 
 function toSuffix(value) {
     value=Math.round(value);
-    var suffixes = ["", "K", "M", "B","T","Qu","Qi","Sx","Sp","O","N","Dc","Ud","Dd","Td","qd","Qd","sd","Sd","Od","Nd","V"];
+    var suffixes = ["", "K", "M", "B","T","Qa","Qi","Sx","Sp","O","N","Dc","Ud","Dd","Td","qd","Qd","sd","Sd","Od","Nd","V"];
     var suffixNum = Math.floor(((""+value).length-1)/3);
     var shortValue = parseFloat((suffixNum !== 0 ? (value / Math.pow(1000,suffixNum)) : value).toPrecision(3));
     if (shortValue % 1 !== 0)  shortValue = shortValue.toPrecision(2);
@@ -83,14 +83,14 @@ function nFormatter(num, digits) {
         { value: 1E24, symbol: "Sp" },
         { value: 1E21, symbol: "Sx" },
         { value: 1E18, symbol: "Qi" },
-        { value: 1E15, symbol: "Qu" },
+        { value: 1E15, symbol: "Qa" },
         { value: 1E12, symbol: "T" },
         { value: 1E9,  symbol: "B" },
         { value: 1E6,  symbol: "M" },
         { value: 1E3,  symbol: "K" }
     ], rx = /\.0+$|(\.[0-9]*[1-9])0+$/, i;
     for (i = 0; i < si.length; i++) {
-        if (num >= si[i].value) {
+        if ((num*1.1) >= si[i].value) { // *1.1 to handle rounding
             return (num / si[i].value).toPrecision(digits).replace(rx, "$1") + si[i].symbol;
         }
     }

@@ -61,13 +61,33 @@
         <div>
             <div style="padding:5px;">
                 <div id='buyTickSpeedButton' class="menuButton" onclick="buyTickSpeed()" style="padding-top:5px;padding-bottom:0;"> +20% Tick Speed </div><br>
-                Current Tick Speed: <div id="currentTickSpeed">1</div>/sec<br> Cost: <div id="buyTickSpeedCost">10</div> EP<br>
+                Current Tick Speed: <div id="currentTickSpeed">1</div>/sec
+                <br> Cost: <div id="buyTickSpeedCost">10</div> EP<br>
                 Maximum of 5/sec
             </div>
             <div style="padding:5px;">
                 <div id='buyTransferRateButton' class="menuButton" onclick="buyTransferRate()" style="padding-top:5px;padding-bottom:0;"> +0.01 Transfer Rate </div><br>
-                Current Transfer Rate: <div id="currentTransferRate">0.01</div><br> Cost: <div id="buyTransferRateCost">100</div> EP<br>
+                Current Transfer Rate: <div id="currentTransferRate">0.01</div>
+                <br> Cost: <div id="buyTransferRateCost">100</div> EP<br>
                 Maximum of 0.1
+            </div>
+			<div style="padding:5px;">
+                <div id='buyDiscountButton' class="menuButton" onclick="buyDiscountLevel()" style="padding-top:5px;padding-bottom:0;"> +<div id="nextDiscountBonus">0</div>% Cost Reduction </div><br>
+                Nanite Cost Reduction: <div id="currentDiscountBonus">0</div>%
+                <br> Cost: <div id="buyDiscountCost">1</div> EP<br>
+				<div id="blankSpace"> </div>
+            </div>
+        </div>
+		<div>
+            <div style="padding:5px;">
+                <div id='buyAbMaxButton' class="menuButton" onclick="buyAbMaxLevel()" style="padding-top:5px;padding-bottom:0;"> +1 Max Level </div><br>
+                Autobuy Max Level: <div id="abCurrentMax">1</div><br> Cost: <div id="buyAbMaxCost">10</div> EP<br>
+                Maximum of <div id="abMaxMax">0</div>
+            </div>
+            <div style="padding:5px;">
+                <div id='buyAbAmtToSpendButton' class="menuButton" onclick="buyAbAmtToSpendLevel()" style="padding-top:5px;padding-bottom:0;"> +1% Max Spent </div><br>
+                Autobuy Max Amt. To Spend: <div id="abAmtToSpendLevel">1</div>%<br> Cost: <div id="buyAbAmtToSpendCost">100</div> EP<br>
+                Maximum of 100%
             </div>
         </div>
         <i id="backButton2" class="backButton fa fa-close" onclick="closeUpgradeBox()" style="font-size:24px"></i>
@@ -148,6 +168,7 @@
                 <div class="row"><div id="receivedLabel">Received:</div></div>
                 <div class="row"><div id="sentLabel">Sent:</div></div>
                 <div class="row"><div id="transferRateLabel">Transfer Rate:</div></div>
+                <div class="row"><div id="equilibriumLabel">Equilibrium:</div></div>
                 <div class="row"><div id="consumeCostLabel">Consume Cost:</div></div>
             </div>
             <div id="infoGridSingle" class="col">
@@ -158,6 +179,7 @@
                 <div class="row"><div id="totalTAmountReceived"></div></div>
                 <div class="row"><div id="totalTTransferAmount"></div></div>
                 <div class="row"><div id="totalTransferRate"></div></div>
+                <div class="row"><div id="totalTEquilibrium"></div></div>
                 <div class="row"><div id="totalConsumeCost"></div></div>
             </div>
             <div id="infoGridAverage" class="col">
@@ -168,6 +190,7 @@
                 <div class="row"><div id="averageTAmountReceived"></div></div>
                 <div class="row"><div id="averageTTransferAmount"></div></div>
                 <div class="row"><div id="averageTransferRate"></div></div>
+                <div class="row"><div id="averageTEquilibrium"></div></div>
                 <div class="row"><div id="averageConsumeCost"></div></div>
             </div>
             <div id="infoGridLowest" class="col">
@@ -178,6 +201,7 @@
                 <div class="row"><div id="lowestTAmountReceived"></div></div>
                 <div class="row"><div id="lowestTTransferAmount"></div></div>
                 <div class="row"><div id="lowestTransferRate"></div></div>
+                <div class="row"><div id="lowestTEquilibrium"></div></div>
                 <div class="row"><div id="lowestConsumeCost"></div></div>
             </div>
 
@@ -204,6 +228,7 @@
                 <div id="buy10" class="buyAmountOption" onclick="buyAmountOption(10)">10</div>
                 <div id="buy25" class="buyAmountOption" onclick="buyAmountOption(25)">25</div>
                 <div id="buy50" class="buyAmountOption" onclick="buyAmountOption(50)">50</div>
+                <div id="buy100" class="buyAmountOption" onclick="buyAmountOption(100)">100</div>
             </div>
             <div id="buyNanitesButton" class="buyButton" onclick="buyNanitesButtonPressed()">
                 <div id="naniteAmount" style="font-size:18px;"></div>

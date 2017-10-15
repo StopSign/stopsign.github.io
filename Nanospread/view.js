@@ -374,11 +374,41 @@ function View() {
         } else {
 			document.getElementById('buyTransferRateButton').style.borderColor = 'red';
 		}
+		
+		if(bonuses.points >= getDiscountCost()) {
+            document.getElementById('buyDiscountButton').style.borderColor = 'green';
+        } else {
+			document.getElementById('buyDiscountButton').style.borderColor = 'red';
+		}
+		
+		if(autobuy.currentMax >= highestLevel*2) {
+            document.getElementById('buyAbMaxButton').style.borderColor = 'grey';
+        } else if(bonuses.points >= getAbMaxCost()) {
+            document.getElementById('buyAbMaxButton').style.borderColor = 'green';
+        } else {
+			document.getElementById('buyAbMaxButton').style.borderColor = 'red';
+		}
+		
+		if(autobuy.amtToSpend >= 100) {
+            document.getElementById('buyAbAmtToSpendButton').style.borderColor = 'grey';
+        } else if(bonuses.points >= getAbAmtToSpendCost()) {
+            document.getElementById('buyAbAmtToSpendButton').style.borderColor = 'green';
+        } else {
+			document.getElementById('buyAbAmtToSpendButton').style.borderColor = 'red';
+		}
         document.getElementById('currentEP').innerHTML = intToString(bonuses.points);
         document.getElementById('currentTickSpeed').innerHTML = intToString(bonuses.tickSpeedLevel);
         document.getElementById('buyTickSpeedCost').innerHTML = intToString(getTickSpeedCost());
         document.getElementById('currentTransferRate').innerHTML = intToString(bonuses.transferRateLevel / 100);
         document.getElementById('buyTransferRateCost').innerHTML = intToString(getTransferRateCost());
+		document.getElementById('nextDiscountBonus').innerHTML = intToString((getCostReduction(bonuses.discountLevel + 1) - getCostReduction(bonuses.discountLevel)) * 100);
+        document.getElementById('currentDiscountBonus').innerHTML = intToString((getCostReduction(bonuses.discountLevel) - 1) * 100);
+		document.getElementById('buyDiscountCost').innerHTML = intToString(getDiscountCost());
+		document.getElementById('abCurrentMax').innerHTML = intToString(autobuy.currentMax);
+        document.getElementById('abMaxMax').innerHTML = intToString(highestLevel * 2);
+        document.getElementById('buyAbMaxCost').innerHTML = intToString(getAbMaxCost());
+        document.getElementById('abAmtToSpendLevel').innerHTML = intToString(autobuy.amtToSpend);
+		document.getElementById('buyAbAmtToSpendCost').innerHTML = intToString(getAbAmtToSpendCost());
     }
 }
 
@@ -410,7 +440,7 @@ function buttonSetup(type, typeUpper, label) { //lol javascript
         return;
     }
     document.getElementById(type+'Amount').innerHTML = displaySquare[type+'Amount'];
-    document.getElementById(type+'Cost').innerHTML = "Cost is: " + intToStringRound(displaySquare[type+'CostAfterMultiBuy'](settings.buyPerClick))+", ";
+    document.getElementById(type+'Cost').innerHTML = "Cost is: " + intToString(displaySquare[type+'CostAfterMultiBuy'](settings.buyPerClick))+", ";
     document.getElementById(type+'Benefit').innerHTML = "+"+displaySquare[type+'AmountBonus']+" created per, ";
     document.getElementById(type+'SpecialNext').innerHTML = "next Bonus at "+displaySquare[type+'NextSpecial']+".";
     document.getElementById('buy'+typeUpper+'Button').style.borderColor = buyAvailableAnd ? "green" : buyAvailableOr ? "yellow" : "red";
@@ -524,6 +554,11 @@ function labelChange(isShowing, consumeShowing) {
     document.getElementById('averageTransferRate').style.display = isShowing ? "block" : "none";
     document.getElementById('lowestTransferRate').style.display = isShowing || !consumeShowing ? "block" : "none";
 
+    document.getElementById('equilibriumLabel').style.display = isShowing ? "block" : "none";
+    document.getElementById('totalTEquilibrium').style.display = isShowing ? "block" : "none";
+    document.getElementById('averageTEquilibrium').style.display = isShowing ? "block" : "none";
+    document.getElementById('lowestTEquilibrium').style.display = isShowing || !consumeShowing ? "block" : "none";
+
     document.getElementById('consumeCostLabel').style.display = consumeShowing ? "block" : "none";
     document.getElementById('totalConsumeCost').style.display = consumeShowing ? "block" : "none";
     document.getElementById('averageConsumeCost').style.display = consumeShowing ? "block" : "none";
@@ -568,12 +603,14 @@ function updateInfoGrid(label, varLabel) {
     var totalNaniteTransferAmount = 0;
     var totalNaniteAmountReceived = 0;
     var totalConsumeCost = 0;
+    var totalEquilibrium = 0;
     for(var i = 0; i < selected.length; i++) {
         totalNanites += selected[i][varLabel+'s'];
         totalNaniteRate += selected[i][varLabel+'Rate'];
         totalNaniteTransferAmount += selected[i][varLabel+'TransferAmount'];
         totalNaniteAmountReceived += selected[i][varLabel+'AmountReceived'];
         totalConsumeCost += selected[i].consumeCost;
+        totalEquilibrium += (selected[i][varLabel + 'Rate'] * getNaniteGainBonus() + selected[i][varLabel + 'AmountReceived']) / selected[i].transferRate * 100;
     }
     totalNaniteRate *= getNaniteGainBonus();
     document.getElementById('resourceTypeLabel').innerHTML = label;
@@ -582,6 +619,7 @@ function updateInfoGrid(label, varLabel) {
     document.getElementById('totalTTransferAmount').innerHTML = intToString(totalNaniteTransferAmount);
     document.getElementById('totalTAmountReceived').innerHTML = intToString(totalNaniteAmountReceived);
     document.getElementById('netTs').innerHTML = intToStringNegative(totalNaniteRate + totalNaniteAmountReceived - totalNaniteTransferAmount );
+    document.getElementById('totalTEquilibrium').innerHTML = intToString(totalEquilibrium);
 
     if(selected.length > 1) {
         document.getElementById('averageTs').innerHTML = intToString(totalNanites / selected.length);
@@ -597,6 +635,7 @@ function updateInfoGrid(label, varLabel) {
             document.getElementById('lowestTAmountReceived').innerHTML = intToString(lowestSquare[varLabel + 'AmountReceived']);
             document.getElementById('lowestTTransferAmount').innerHTML = intToString(lowestSquare[varLabel + 'TransferAmount']);
             document.getElementById('lowestTransferRate').innerHTML = intToString(lowestSquare.transferRate / 100);
+            document.getElementById('lowestTEquilibrium').innerHTML = intToString((lowestSquare[varLabel + 'Rate'] * getNaniteGainBonus() + lowestSquare[varLabel + 'AmountReceived']) / lowestSquare.transferRate * 100);
             document.getElementById('lowestConsumeCost').innerHtml = intToString(lowestSquare.consumeCost);
         }
         var selectedInactive = select.getSelectedInactive();
