@@ -554,6 +554,11 @@ function labelChange(isShowing, consumeShowing) {
     document.getElementById('averageTransferRate').style.display = isShowing ? "block" : "none";
     document.getElementById('lowestTransferRate').style.display = isShowing || !consumeShowing ? "block" : "none";
 
+    document.getElementById('equilibriumLabel').style.display = isShowing ? "block" : "none";
+    document.getElementById('totalTEquilibrium').style.display = isShowing ? "block" : "none";
+    document.getElementById('averageTEquilibrium').style.display = isShowing ? "block" : "none";
+    document.getElementById('lowestTEquilibrium').style.display = isShowing || !consumeShowing ? "block" : "none";
+
     document.getElementById('consumeCostLabel').style.display = consumeShowing ? "block" : "none";
     document.getElementById('totalConsumeCost').style.display = consumeShowing ? "block" : "none";
     document.getElementById('averageConsumeCost').style.display = consumeShowing ? "block" : "none";
@@ -598,12 +603,14 @@ function updateInfoGrid(label, varLabel) {
     var totalNaniteTransferAmount = 0;
     var totalNaniteAmountReceived = 0;
     var totalConsumeCost = 0;
+    var totalEquilibrium = 0;
     for(var i = 0; i < selected.length; i++) {
         totalNanites += selected[i][varLabel+'s'];
         totalNaniteRate += selected[i][varLabel+'Rate'];
         totalNaniteTransferAmount += selected[i][varLabel+'TransferAmount'];
         totalNaniteAmountReceived += selected[i][varLabel+'AmountReceived'];
         totalConsumeCost += selected[i].consumeCost;
+        totalEquilibrium += (selected[i][varLabel + 'Rate'] * getNaniteGainBonus() + selected[i][varLabel + 'AmountReceived']) / selected[i].transferRate * 100;
     }
     totalNaniteRate *= getNaniteGainBonus();
     document.getElementById('resourceTypeLabel').innerHTML = label;
@@ -612,6 +619,7 @@ function updateInfoGrid(label, varLabel) {
     document.getElementById('totalTTransferAmount').innerHTML = intToString(totalNaniteTransferAmount);
     document.getElementById('totalTAmountReceived').innerHTML = intToString(totalNaniteAmountReceived);
     document.getElementById('netTs').innerHTML = intToStringNegative(totalNaniteRate + totalNaniteAmountReceived - totalNaniteTransferAmount );
+    document.getElementById('totalTEquilibrium').innerHTML = intToString(totalEquilibrium);
 
     if(selected.length > 1) {
         document.getElementById('averageTs').innerHTML = intToString(totalNanites / selected.length);
@@ -627,6 +635,7 @@ function updateInfoGrid(label, varLabel) {
             document.getElementById('lowestTAmountReceived').innerHTML = intToString(lowestSquare[varLabel + 'AmountReceived']);
             document.getElementById('lowestTTransferAmount').innerHTML = intToString(lowestSquare[varLabel + 'TransferAmount']);
             document.getElementById('lowestTransferRate').innerHTML = intToString(lowestSquare.transferRate / 100);
+            document.getElementById('lowestTEquilibrium').innerHTML = intToString((lowestSquare[varLabel + 'Rate'] * getNaniteGainBonus() + lowestSquare[varLabel + 'AmountReceived']) / lowestSquare.transferRate * 100);
             document.getElementById('lowestConsumeCost').innerHtml = intToString(lowestSquare.consumeCost);
         }
         var selectedInactive = select.getSelectedInactive();
