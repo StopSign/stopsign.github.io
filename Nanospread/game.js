@@ -341,7 +341,7 @@ function getCostReduction(discountLevel) {
 }
 
 function getDiscountCost() {
-    return Math.pow((bonuses.discountLevel + 1), 2) * 2;
+    return Math.pow(1.01, bonuses.discountLevel) * Math.pow(bonuses.discountLevel+1, 2); // 1.01^n * (n+1)^2
 }
 
 function buyAbMaxLevel() {
