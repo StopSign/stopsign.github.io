@@ -39,14 +39,10 @@ function createGrid() {
         }
     }
 
-    for (column = 0; column < theGrid.length; column++) {
-        for (row = 0; row < theGrid[column].length; row++) {
-            var square = theGrid[column][row];
-            if(square) {
-                square.chooseStartingDirection(); //All of them have a transfer target
-            }
-        }
-    }
+    doToAllSquares(function (square) {
+        square.chooseStartingDirection(); //All of them have a transfer target
+    }, false);
+
     var startingSquare = theGrid[startingCoords.x][startingCoords.y];
     startingSquare.gainNanites(startingSquare.consumeCost);
 }
@@ -73,58 +69,44 @@ function tick() {
 }
 
 function autobuyLevels() {
-    for (var column = 0; column < theGrid.length; column++) {
-        for (var row = 0; row < theGrid[column].length; row++) {
-            var square = theGrid[column][row];
-            if(square && square.isActive()) {
-				if(square.naniteAmount < autobuy.currentMax && (square.nanites * (autobuy.amtToSpend / 100)) >= square.naniteCost ) {
-					square.buyNanites();
-				}
-			}
-		}
-	}
+    doToAllSquares(function (square) {
+        if(square.naniteAmount < autobuy.currentMax && (square.nanites * (autobuy.amtToSpend / 100)) >= square.naniteCost ) {
+            square.buyNanites();
+        }
+    }, true);
+}
+
+function clearNanitesReceived() {
+    doToAllSquares(function (square) {
+        var target = theGrid[square.targetCol][square.targetRow];
+        target.naniteAmountReceived = 0;
+        target.advBotAmountReceived = 0;
+    }, false);
 }
 
 function sendNanites() {
-    for (var column = 0; column < theGrid.length; column++) {
-        for (var row = 0; row < theGrid[column].length; row++) {
-            var square = theGrid[column][row];
-            if(square && square.isActive()) {
-                var target = theGrid[square.targetCol][square.targetRow];
-                if(target.isActive()) {
-                    target.gainAdvBots(square.sendPieceOfAdvBots()); //transfer .1% advBots
-                }
-                var amountTransferred = square.sendPieceOfNanites();
-                target.gainNanites(amountTransferred); //transfer .1% nanites
-                target.naniteAmountReceived += amountTransferred;
-
-                amountTransferred = square.sendPieceOfAdvBots();
-                target.gainAdvBots(amountTransferred); //transfer .1% adv bots
-                target.advBotAmountReceived += amountTransferred;
-
-                square.gainNanites(square.naniteRate * getNaniteGainBonus());
-                square.gainAdvBots(square.advBotRate);
-            }
+    doToAllSquares(function (square) {
+        var target = theGrid[square.targetCol][square.targetRow];
+        if(target.isActive()) {
+            target.gainAdvBots(square.sendPieceOfAdvBots()); //transfer .1% advBots
         }
-    }
+        var amountTransferred = square.sendPieceOfNanites();
+        target.gainNanites(amountTransferred); //transfer .1% nanites
+        target.naniteAmountReceived += amountTransferred;
+
+        amountTransferred = square.sendPieceOfAdvBots();
+        target.gainAdvBots(amountTransferred); //transfer .1% adv bots
+        target.advBotAmountReceived += amountTransferred;
+
+        square.gainNanites(square.naniteRate * getNaniteGainBonus());
+        square.gainAdvBots(square.advBotRate);
+    }, true);
 }
 
 function getNaniteGainBonus() {
     return ((bonuses.points * 5)+100)/100;
 }
 
-function clearNanitesReceived() {
-    for (var column = 0; column < theGrid.length; column++) {
-        for (var row = 0; row < theGrid[column].length; row++) {
-            var square = theGrid[column][row];
-            if(square) {
-                var target = theGrid[square.targetCol][square.targetRow];
-                target.naniteAmountReceived = 0;
-                target.advBotAmountReceived = 0;
-            }
-        }
-    }
-}
 
 function clickedSquare(col, row) {
     var square = theGrid[col][row];
@@ -276,12 +258,9 @@ function calcEvolutionPointGain() {
 }
 
 function recalcInterval(newSpeed) {
-	bonuses.tickSpeedLevel = newSpeed;
-	// clearInterval(tickInterval);
-	// tickInterval = setInterval(tick, (1000 / newSpeed));
-	
-   doWork.postMessage({start:false});
-   doWork.postMessage({start:true,ms:(1000 / newSpeed)});
+    bonuses.tickSpeedLevel = newSpeed;
+    doWork.postMessage({start:false});
+    doWork.postMessage({start:true,ms:(1000 / newSpeed)});
 }
 
 function buyTickSpeed() {
@@ -298,14 +277,9 @@ function getTickSpeedCost() {
 
 function setTransferRate(newRate) {
     bonuses.transferRateLevel = newRate;
-    for (var column = 0; column < theGrid.length; column++) {
-        for (var row = 0; row < theGrid[column].length; row++) {
-            var square = theGrid[column][row];
-            if(square) {
-                square.transferRate = newRate;
-            }
-        }
-    }
+    doToAllSquares(function (square) {
+        square.transferRate = newRate;
+    }, false);
 }
 
 function buyTransferRate() {
@@ -322,16 +296,11 @@ function getTransferRateCost() {
 
 function buyDiscountLevel() {
     if(bonuses.points >= getDiscountCost()) {
-		bonuses.points -= getDiscountCost();
-		bonuses.discountLevel++;
-        for (var column = 0; column < theGrid.length; column++) {
-            for (var row = 0; row < theGrid[column].length; row++) {
-                var square = theGrid[column][row];
-                if(square) {
-                    square.naniteCost = square.calcNaniteCost();
-                }
-            }
-        }
+        bonuses.points -= getDiscountCost();
+        bonuses.discountLevel++;
+        doToAllSquares(function (square) {
+            square.naniteCost = square.calcNaniteCost();
+        }, false);
     }
     theView.update();
 }
@@ -341,7 +310,7 @@ function getCostReduction(discountLevel) {
 }
 
 function getDiscountCost() {
-    return Math.pow(1.01, bonuses.discountLevel) * Math.pow(bonuses.discountLevel+1, 2); // 1.01^n * (n+1)^2
+    return round2(Math.pow(1.01, bonuses.discountLevel) * Math.pow(bonuses.discountLevel+1, 2)); // 1.01^n * (n+1)^2
 }
 
 function buyAbMaxLevel() {
@@ -366,4 +335,15 @@ function buyAbAmtToSpendLevel() {
 
 function getAbAmtToSpendCost() {
     return round2(10 * autobuy.amtToSpend);
+}
+
+function doToAllSquares(functionToRun, onlyIsActive) {
+    for (var column = 0; column < theGrid.length; column++) {
+        for (var row = 0; row < theGrid[column].length; row++) {
+            var square = theGrid[column][row];
+            if(square && (!onlyIsActive || square.isActive())) {
+                functionToRun(square);
+            }
+        }
+    }
 }
