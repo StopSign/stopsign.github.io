@@ -381,7 +381,7 @@ function View() {
 			document.getElementById('buyDiscountButton').style.borderColor = 'red';
 		}
 		
-		if(autobuy.currentMax >= autobuy.maxMax) {
+		if(autobuy.currentMax >= highestLevel*2) {
             document.getElementById('buyAbMaxButton').style.borderColor = 'grey';
         } else if(bonuses.points >= getAbMaxCost()) {
             document.getElementById('buyAbMaxButton').style.borderColor = 'green';

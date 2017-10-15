@@ -314,7 +314,7 @@ function getDiscountCost() {
 }
 
 function buyAbMaxLevel() {
-    if(bonuses.points >= getAbMaxCost()) {
+    if(autobuy.currentMax < highestLevel*2 && bonuses.points >= getAbMaxCost()) {
 		bonuses.points -= getAbMaxCost();
 		autobuy.currentMax++;
     }
@@ -322,11 +322,11 @@ function buyAbMaxLevel() {
 }
 
 function getAbMaxCost() {
-    return round2(25 * autobuy.currentMax);
+    return round2(10 * autobuy.currentMax);
 }
 
 function buyAbAmtToSpendLevel() {
-    if(bonuses.points >= getAbAmtToSpendCost()) {
+    if(autobuy.amtToSpend < 100 && bonuses.points >= getAbAmtToSpendCost()) {
 		bonuses.points -= getAbAmtToSpendCost();
 		autobuy.amtToSpend++;
     }
@@ -334,7 +334,7 @@ function buyAbAmtToSpendLevel() {
 }
 
 function getAbAmtToSpendCost() {
-    return round2(10 * autobuy.amtToSpend);
+    return round2(25 * autobuy.amtToSpend);
 }
 
 function doToAllSquares(functionToRun, onlyIsActive) {
