@@ -401,8 +401,8 @@ function View() {
         document.getElementById('buyTickSpeedCost').innerHTML = intToString(getTickSpeedCost());
         document.getElementById('currentTransferRate').innerHTML = intToString(bonuses.transferRateLevel / 100);
         document.getElementById('buyTransferRateCost').innerHTML = intToString(getTransferRateCost());
-		document.getElementById('nextDiscountBonus').innerHTML = intToString((getNextDiscountBonus() - getCurrentDiscountBonus()));
-        document.getElementById('currentDiscountBonus').innerHTML = intToString(getCurrentDiscountBonus());
+		document.getElementById('nextDiscountBonus').innerHTML = intToString((getCostReduction(bonuses.discountLevel + 1) - getCostReduction(bonuses.discountLevel)) * 100);
+        document.getElementById('currentDiscountBonus').innerHTML = intToString((getCostReduction(bonuses.discountLevel) - 1) * 100);
 		document.getElementById('buyDiscountCost').innerHTML = intToString(getDiscountCost());
 		document.getElementById('abCurrentMax').innerHTML = intToString(autobuy.currentMax);
         document.getElementById('abMaxMax').innerHTML = intToString(highestLevel * 2);

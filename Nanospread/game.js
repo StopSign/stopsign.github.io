@@ -77,15 +77,14 @@ function autobuyLevels() {
         for (var row = 0; row < theGrid[column].length; row++) {
             var square = theGrid[column][row];
             if(square && square.isActive()) {
-				if(square.naniteAmount < autobuy.currentMax && (square.nanites * (autobuy.amtToSpend / 100)) >= (square.naniteCost / (1 + (getCurrentDiscountBonus() / 100)))) {
+				if(square.naniteAmount < autobuy.currentMax && (square.nanites * (autobuy.amtToSpend / 100)) >= square.naniteCost ) {
 					square.buyNanites();
 				}
 			}
 		}
 	}
 }
-			
-			
+
 function sendNanites() {
     for (var column = 0; column < theGrid.length; column++) {
         for (var row = 0; row < theGrid[column].length; row++) {
@@ -178,7 +177,7 @@ function changeDirectionOfSelected(direction) {
 
 function buyAll() {
     for(var i = 0; i < selected.length; i++) {
-        if(selected[i].isActive() && selected[i].canBuyNanitesAfterMultiBuy()) {
+        if(selected[i].canBuyNanitesAfterMultiBuy()) {
             selected[i].buyMultipleNanites(settings.buyPerClick);
         }
     }
@@ -325,27 +324,24 @@ function buyDiscountLevel() {
     if(bonuses.points >= getDiscountCost()) {
 		bonuses.points -= getDiscountCost();
 		bonuses.discountLevel++;
+        for (var column = 0; column < theGrid.length; column++) {
+            for (var row = 0; row < theGrid[column].length; row++) {
+                var square = theGrid[column][row];
+                if(square) {
+                    square.naniteCost = square.calcNaniteCost();
+                }
+            }
+        }
     }
     theView.update();
 }
 
-function getCurrentDiscountBonus() { 
-	if(bonuses.discountLevel >= 1) {
-		return round2((1 * (1 - (Math.pow(1.01, bonuses.discountLevel)))) / (1 - 1.01));
-	} else {
-		return 0;
-	}
+function getCostReduction(discountLevel) {
+    return Math.pow(1.01, discountLevel)*5 - 4;
 }
 
-function getNextDiscountBonus() { 
-	if(bonuses.discountLevel >= 1) {
-		return round2((1 * (1 - (Math.pow(1.01, (bonuses.discountLevel + 1))))) / (1 - 1.01));
-	} else {
-		return 1;
-	}
-}
 function getDiscountCost() {
-    return round2(bonuses.discountLevel + 1);
+    return Math.pow((bonuses.discountLevel + 1), 2) * 2;
 }
 
 function buyAbMaxLevel() {
