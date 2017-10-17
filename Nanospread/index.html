@@ -9,20 +9,9 @@
     <meta http-equiv="expires" content="Tue, 01 Jan 1980 1:00:00 GMT" />
     <meta http-equiv="pragma" content="no-cache" />
 
-
     <title>Nanospread</title>
     <link rel="stylesheet" href="stylesheet.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <script src="helpers.js"></script>
-	<script src="select.js"></script>
-    <script src="view.js"></script>
-    <script src="Square.js"></script>
-    <script src="Building.js"></script>
-    <script src="levelData.js"></script>
-    <script src="game.js"></script>
-    <script src="hotkeys.js"></script>
-    <script src="settings.js"></script>
-    <script src="saving.js"></script>
 	
 </head>
 <body style="font-family:Arial, Helvetica, serif;color:black;font-size:14px;background-color:black;height:100%;margin-top:0;margin-bottom:0;">
@@ -31,6 +20,17 @@
     <div id="dragSelectDiv" style="display:none;border:2px solid yellow;border-radius:1px;position:absolute;"></div>
 </div>
 
+<div id="imessedup" style="position:absolute;left:200px;top:200px;background-color:blue;padding:10px;display:none;">
+    To all existing players:<br>
+    I messed up. The formula for EP gain went out of control significantly faster than I expected.<br>
+    Gaining 10 trillion EP at level 100 was not intended, and I've changed the formula to be more<br>
+    in line with what I wanted.<br><br>
+    Unfortunately, to avoid immediately ruining the game experience, I have to remove large amounts<br>
+    of EP that you already gained. You will keep up to 1000 EP, which for you means you have <div id="messedupEP"></div> now.<br>
+    I apologize for the inconvenience, and I will strive avoid such mistakes in the future.<br><br>
+    If you have any feedback on the game, please send me a message on reddit using <a href="https://www.reddit.com/message/compose?to=Stop_Sign&subject=Nanospread%20Feedback">this link</a>.<br>
+    Happy consuming! <div style="cursor:pointer;" class="medium" onclick="toggleIMessedUpPopup1()">Click here to close this message.</div>
+</div>
 
 <div id="menuBar" class="small" style="position:fixed;bottom:0;height:30px;width:800px;background-color:#8194bd;z-index:999;left:8px;">
     <!--<div class="menuButton" onclick="toggleBuild()"><i class="fa fa-microchip" style="font-size:20px;"></i> Build (B)</div>-->
@@ -53,7 +53,7 @@
         </div>
 		<div style="padding:5px;">
             Switching levels or resetting will prestige you, removing most upgrades<br>
-            You will gain evolution points equal to the lowest Square's Bonus * 1.3^(Level #)<br>
+            You will gain evolution points equal to (Level # + 1) * 1.3^(Lowest Square's Bonus)<br>
             Each evolution point gives 5% more nanite production<br>
             Currently you will get <div id="evolutionGain">0</div> evolution points on new level<br>
             <input type="checkbox" id="levelConfirm" onclick="theView.updateLevel()">
@@ -269,5 +269,15 @@
     ga('send', 'pageview');
 
 </script>
+<script src="helpers.js"></script>
+<script src="select.js"></script>
+<script src="view.js"></script>
+<script src="Square.js"></script>
+<script src="Building.js"></script>
+<script src="levelData.js"></script>
+<script src="game.js"></script>
+<script src="hotkeys.js"></script>
+<script src="settings.js"></script>
+<script src="saving.js"></script>
 
 </html>

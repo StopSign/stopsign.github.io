@@ -283,13 +283,12 @@ function calcEvolutionPointGain() {
         highestLevel++;
         console.log('level up!');
     }
-    bonus *= Math.pow(1.3, currentLevel);
-    return bonus;
+    return bonus === 0 ? 0 : (currentLevel+1) * Math.pow(1.3, bonus);
 }
 
 function recalcInterval(newSpeed) {
     bonuses.tickSpeedLevel = newSpeed;
-    doWork.postMessage({start:false});
+    doWork.postMessage({stop:true});
     doWork.postMessage({start:true,ms:(1000 / newSpeed)});
 }
 

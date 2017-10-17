@@ -24,7 +24,7 @@ var highestLevel;
 var bonuses, autobuy;
 
 function clearSave() {
-    window.localStorage.version3 = "";
+    window.localStorage.version4 = "";
     load();
 }
 
@@ -39,19 +39,37 @@ function loadDefaults() {
     settings.selectShowNoneOrNanitesOrAmount = 1;
     highestLevel = 0; //SHOULD BE 0 BEFORE COMMIT
 
-    bonuses = { points:0, tickSpeedLevel:1, transferRateLevel:1, discountLevel:0, test2:10};
+    bonuses = { points:0, tickSpeedLevel:1, transferRateLevel:1, discountLevel:0, spentEP:0};
     autobuy = { currentMax:1, amtToSpend:1 };
+}
+
+function toggleIMessedUpPopup1() { //Let's hope there's not more
+    if(document.getElementById("imessedup").style.display === "block") {
+        document.getElementById("imessedup").style.display = "none";
+    } else {
+        document.getElementById("imessedup").style.display = "block";
+    }
 }
 
 function load() {
     loadDefaults();
-    if (!window.localStorage.version3) { //New players to the game
+    if (!window.localStorage.version4) { //New players to the game
         createGrid();
         recalcInterval(bonuses.tickSpeedLevel);
+        if(window.localStorage.version3) {
+            var oldLoad = JSON.parse(window.localStorage.version3);
+            var roughBonus = ((oldLoad.bonuses.tickSpeedLevel - 1)  * 5) + oldLoad.bonuses.transferRateLevel * .4 + oldLoad.bonuses.discountLevel * .2 + oldLoad.autobuy.currentMax * .3 + oldLoad.autobuy.amtToSpend * .5;
+            roughBonus = round2(Math.pow(2, roughBonus));
+            oldLoad.bonuses.points += roughBonus;
+            bonuses.points = oldLoad.bonuses.points > 1000 ? 1000 : oldLoad.bonuses.points;
+            toggleIMessedUpPopup1();
+            document.getElementById("messedupEP").innerHTML = bonuses.points;
+            window.localStorage.version3 = "";
+        }
         openHelpBox();
         return;
     }
-    var toLoad = JSON.parse(window.localStorage.version3);
+    var toLoad = JSON.parse(window.localStorage.version4);
     currentLevel = toLoad.currentLevel;
 
     //Handles a change in properties
@@ -85,7 +103,7 @@ function save() {
     toSave.bonuses = bonuses;
 	toSave.autobuy = autobuy;
     // console.log('saved');
-    window.localStorage.version3 = JSON.stringify(toSave);
+    window.localStorage.version4 = JSON.stringify(toSave);
 }
 
 load();
