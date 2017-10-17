@@ -36,7 +36,7 @@ function loadDefaults() {
     settings.buyLowestOrAll = 1;
     settings.showLastOrLowest = 0;
     settings.selectAllOrLowestBorderColor = 0;
-    settings.selectShowNoneOrNanitesOrAmount = 0;
+    settings.selectShowNoneOrNanitesOrAmount = 1;
     highestLevel = 0; //SHOULD BE 0 BEFORE COMMIT
 
     bonuses = { points:0, tickSpeedLevel:1, transferRateLevel:1, discountLevel:0, test2:10};
@@ -45,9 +45,10 @@ function loadDefaults() {
 
 function load() {
     loadDefaults();
-    if (!window.localStorage.version3) { //hard clear the save
+    if (!window.localStorage.version3) { //New players to the game
         createGrid();
         recalcInterval(bonuses.tickSpeedLevel);
+        openHelpBox();
         return;
     }
     var toLoad = JSON.parse(window.localStorage.version3);
@@ -64,22 +65,9 @@ function load() {
             autobuy[property] = toLoad.autobuy[property];
         }
     }
-    createGrid();
+    createGridFromSave(toLoad.theGrid);
 
     settings = toLoad.settings;
-    for(var x = 0; x < toLoad.theGrid.length; x++) {
-        for(var y = 0; y < toLoad.theGrid[x].length; y++) {
-            for(property in toLoad.theGrid[x][y]) {
-                if (toLoad.theGrid[x][y].hasOwnProperty(property)) {
-                    if(theGrid[x][y])
-                    theGrid[x][y][property] = toLoad.theGrid[x][y][property];
-                }
-            }
-            if(theGrid[x][y]) {
-                theGrid[x][y].isSelected = 0;
-            }
-        }
-    }
     highestLevel = toLoad.highestLevel;
 
     settings.buyPerClick = 1; //resets on refresh
