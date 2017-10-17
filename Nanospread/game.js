@@ -1,6 +1,30 @@
+//This function is exclusively for avoiding loading issues when the level data has been changed
+//It will load whatever you've saved, and all subsequent level changes will use createGrid() instead
+//Even if that means a level reset causes a different level to appear.
+function createGridFromSave(savedGrid) {
+    theGrid = [];
+    for(var x = 0; x < 20; x++) {
+        theGrid[x] = [];
+    }
+    for (var column = 0; column < savedGrid.length; column++) {
+        for (var row = 0; row < savedGrid[column].length; row++) {
+            if(savedGrid[column][row]) {
+                theGrid[column][row] = new Square(column, row, 5);
+                for(var property in savedGrid[column][row]) {
+                    if (savedGrid[column][row].hasOwnProperty(property)) {
+                        theGrid[column][row][property] = savedGrid[column][row][property];
+                    }
+                }
+                theGrid[column][row].isSelected = 0;
+            }
+        }
+    }
+}
+
 
 function createGrid() {
     var startingCoords = {x:0,y:0};
+
     theGrid = [];
     for(var x = 0; x < 20; x++) {
         theGrid[x] = [];
@@ -13,7 +37,14 @@ function createGrid() {
     var totalFromLevelData = 0;
     for(var column = 0; column < currentLevelGrid[0].length; column++) {
         for (var row = 0; row < currentLevelGrid.length; row++) {
-            totalFromLevelData += Math.pow(2, currentLevelGrid[row][column]);
+            var levelDataNum = currentLevelGrid[row][column];
+            if(levelDataNum === -1) {
+                startingCoords.x = column;
+                startingCoords.y = column;
+            }
+            if(levelDataNum > 0) {
+                totalFromLevelData += Math.pow(2, levelDataNum);
+            }
         }
     }
 
@@ -27,15 +58,14 @@ function createGrid() {
         }
     }
 
+
     for (column = 0; column < currentLevelGrid[0].length; column++) {
         for (row = 0; row < currentLevelGrid.length; row++) {
             if(currentLevelGrid[row][column] === 0) {
                 continue; //this makes the empty spots undefined in theGrid. Change if you want other terrain there.
             }
-            var squareCoords = {x:column,y:row};
-            // var distanceFromCenter = Math.sqrt(Math.pow((squareCoords.x-startingCoords.x),2)+Math.pow((squareCoords.y-startingCoords.y),2));
             var initialConsumeCost = initialCostGrid[row][column];
-            theGrid[column][row] =  new Square(squareCoords.x, squareCoords.y, initialConsumeCost);
+            theGrid[column][row] =  new Square(column, row, initialConsumeCost);
         }
     }
 
