@@ -88,7 +88,7 @@ function tick() {
     handleFPSDifference();
     clearNanitesReceived();
     sendNanites();
-	if(document.getElementById('autobuyToggle').checked) {
+	if(autobuy.toggle === 1) {
 		autobuyLevels();
 	}
     if(!theView) {
@@ -107,6 +107,14 @@ function autobuyLevels() {
             square.buyNanites();
         }
     }, true);
+}
+
+function toggleAutobuy() {
+	if(autobuy.toggle === 0) {
+		autobuy.toggle = 1;
+	} else {
+		autobuy.toggle = 0;
+	}
 }
 
 function clearNanitesReceived() {

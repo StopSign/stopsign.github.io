@@ -51,6 +51,7 @@ function resetEPUpgrades() {
     bonuses.discountLevel = 0;
     autobuy.currentMax = 1;
     autobuy.amtToSpend = 1;
+	autobuy.toggle = 0;
 }
 
 function toggleIMessedUpPopup1() { //Let's hope there's not more
