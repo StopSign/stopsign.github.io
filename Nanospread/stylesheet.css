@@ -15,6 +15,9 @@
 
 div {
     display:inline-block;
+}
+
+body {
     -webkit-touch-callout: none;
     -webkit-user-select: none;
     -moz-user-select: none;
@@ -22,6 +25,15 @@ div {
     user-select: none;
 }
 
+.scrollArrow {
+    opacity:.1;
+    background-color:blue;
+    cursor:pointer;
+    position:absolute;
+}
+.scrollArrow:hover {
+    opacity:.2;
+}
 .arrow {
     position:absolute;
     font-size:24px !important;
