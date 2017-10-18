@@ -269,6 +269,9 @@ function changeLevel(newLevel) {
     var EPGain = calcEvolutionPointGain();
     bonuses.points += EPGain;
     bonuses.availableEP += EPGain;
+	if(EPGain > 0) {
+		stats.totalLevels++;
+	}
     if(document.getElementById('resetAvailableEP').checked) {
         resetBonusPoints();
     }
@@ -296,9 +299,6 @@ function calcEvolutionPointGain() {
         highestLevel++;
         console.log('level up!');
     }
-	if(bonus > 0) {
-		stats.totalLevels++;
-	}
     return bonus === 0 ? 0 : (currentLevel+1) * Math.pow(1.3, bonus);
 }
 
