@@ -171,7 +171,7 @@ function toggleAutobuy(setting) {
 }
 
 function autobuyAmountOption(num) {
-    var highlighted = document.getElementById('autobuy'+settings.autobuyPertick);
+    var highlighted = document.getElementById('autobuy'+settings.autobuyPerTick);
     if(highlighted) {
         highlighted.style.backgroundColor = "grey";
     }
