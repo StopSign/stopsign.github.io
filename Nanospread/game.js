@@ -104,7 +104,7 @@ function tick() {
 function autobuyLevels() {
     doToAllSquares(function (square) {
         if((square.naniteAmount + settings.autobuyPerTick) <= autobuy.currentMax && (square.nanites * (autobuy.amtToSpend / 100)) >= square.calcPrice(settings.autobuyPerTick)) {
-            square.buyMultipleNanites(settings.autobuyPerTick);
+            square.autobuyMultipleNanites(settings.autobuyPerTick);
         }
     }, true);
 }

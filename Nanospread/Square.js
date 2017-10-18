@@ -56,6 +56,12 @@ function Square(col,row,initialConsumeCost) {
             this.buyNanites();
         }
     };
+	this.autobuyMultipleNanites = function(autobuyPerTick) {
+        var num = settings.autobuyPerTick - this.naniteAmount % autobuyPerTick;
+        for(var j = 0; j < num; j++) {
+            this.buyNanites();
+        }
+    };
     this.canBuyNanitesAfterMultiBuy = function() {
         return this.isActive() && this.nanites >= this.naniteCostAfterMultiBuy();
     };
