@@ -158,6 +158,7 @@ function View() {
         this.updateSettings();
         this.updateLevel();
 		this.updateUpgrade();
+		this.updateStats();
         this.updateEvolutionGain();
     };
 
@@ -409,7 +410,15 @@ function View() {
         document.getElementById('buyAbMaxCost').innerHTML = intToString(getAbMaxCost());
         document.getElementById('abAmtToSpendLevel').innerHTML = intToString(autobuy.amtToSpend);
 		document.getElementById('buyAbAmtToSpendCost').innerHTML = intToString(getAbAmtToSpendCost());
-    }
+    };
+	this.updateStats = function() {
+        document.getElementById('ticksThisLevel').innerHTML = intToString(stats.ticksThisLevel);
+        document.getElementById('totalTicks').innerHTML = intToString(stats.totalTicks);
+        document.getElementById('nanobotsProducedThisLevel').innerHTML = intToString(stats.producedThisLevel);
+        document.getElementById('totalProducedNanobots').innerHTML = intToString(stats.totalProduced);
+        document.getElementById('nanobotsTransferredThisLevel').innerHTML = intToString(stats.transferredThisLevel);
+		document.getElementById('totalTransferredNanobots').innerHTML = intToString(stats.totalTransferred);
+    };
 }
 
 

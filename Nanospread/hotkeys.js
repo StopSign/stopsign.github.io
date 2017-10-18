@@ -35,6 +35,8 @@ function processKeyQueue() {
         toggleLevelMenu();
     } else if(key === 72) { //h
         toggleHelp();
+    } else if(key === 73) { //i
+        toggleStatsMenu();
     } else if(key === 85) { //u
         toggleUpgradeMenu();
     }
