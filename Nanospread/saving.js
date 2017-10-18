@@ -31,6 +31,7 @@ function clearSave() {
 function loadDefaults() {
     settings.buyPerClick = 1;
 	settings.autobuyToggle = 0;
+	settings.autobuyPerTick = 1;
     settings.selectedResourceNum = 0;
 
     settings.selectOneOrMultiple = 0;

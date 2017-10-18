@@ -169,3 +169,16 @@ function toggleAutobuy(setting) {
 		document.getElementById('autobuyOn').style.backgroundColor = "grey";
 	}
 }
+
+function autobuyAmountOption(num) {
+    var highlighted = document.getElementById('autobuy'+settings.autobuyPertick);
+    if(highlighted) {
+        highlighted.style.backgroundColor = "grey";
+    }
+    settings.buyPerClick = num;
+    document.getElementById('autobuy'+num).style.backgroundColor = "#ff4400";
+
+
+    theView.updateInfoBox();
+
+}

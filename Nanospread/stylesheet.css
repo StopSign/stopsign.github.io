@@ -140,6 +140,23 @@ input, label {
     padding:3px;
 }
 
+.autobuyAmountOption {
+    border-radius:5px;
+    width:30px;
+    text-align:center;
+    font-size:14px;
+    font-weight:bold;
+    background-color:grey;
+    padding:1px;
+    cursor:pointer;
+}
+
+#autobuyAmountOptionContainer {
+    position:relative;
+    background-color: #434d62;
+    margin-bottom:3px;
+    padding:3px;
+	
 #infoGrid {
     position:relative;
     border:2px solid black;
