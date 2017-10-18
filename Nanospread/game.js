@@ -371,7 +371,7 @@ function getAbMaxCost() {
 }
 
 function buyAbAmtToSpendLevel() {
-    if(autobuy.amtToSpend < 100 && bonuses.availableEP >= getAbAmtToSpendCost()) {
+    if(autobuy.amtToSpend < 50 && bonuses.availableEP >= getAbAmtToSpendCost()) {
 		bonuses.availableEP -= getAbAmtToSpendCost();
 		autobuy.amtToSpend++;
     }
