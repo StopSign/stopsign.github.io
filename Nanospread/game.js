@@ -269,6 +269,9 @@ function changeLevel(newLevel) {
     theView.setSelectedFalse();
     bonuses.points += calcEvolutionPointGain();
     currentLevel = newLevel;
+	stats.ticksThisLevel = 0;
+	stats.producedThisLevel = 0;
+	stats.transferredThisLevel = 0;
     createGrid();
     theView.createGrid();
 	setTransferRate(bonuses.transferRateLevel);
