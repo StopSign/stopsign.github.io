@@ -362,7 +362,7 @@ function View() {
 	this.updateUpgrade = function() {
         if(bonuses.tickSpeedLevel >= 5) {
             document.getElementById('buyTickSpeedButton').style.borderColor = 'grey';
-        } else if(bonuses.points >= getTickSpeedCost()) {
+        } else if(bonuses.availableEP >= getTickSpeedCost()) {
             document.getElementById('buyTickSpeedButton').style.borderColor = 'green';
         } else {
 			document.getElementById('buyTickSpeedButton').style.borderColor = 'red';
@@ -370,13 +370,13 @@ function View() {
 
         if(bonuses.transferRateLevel >= 10) {
             document.getElementById('buyTransferRateButton').style.borderColor = 'grey';
-        } else if(bonuses.points >= getTransferRateCost()) {
+        } else if(bonuses.availableEP >= getTransferRateCost()) {
             document.getElementById('buyTransferRateButton').style.borderColor = 'green';
         } else {
 			document.getElementById('buyTransferRateButton').style.borderColor = 'red';
 		}
 		
-		if(bonuses.points >= getDiscountCost()) {
+		if(bonuses.availableEP >= getDiscountCost()) {
             document.getElementById('buyDiscountButton').style.borderColor = 'green';
         } else {
 			document.getElementById('buyDiscountButton').style.borderColor = 'red';
@@ -384,7 +384,7 @@ function View() {
 		
 		if(autobuy.currentMax >= highestLevel*2) {
             document.getElementById('buyAbMaxButton').style.borderColor = 'grey';
-        } else if(bonuses.points >= getAbMaxCost()) {
+        } else if(bonuses.availableEP >= getAbMaxCost()) {
             document.getElementById('buyAbMaxButton').style.borderColor = 'green';
         } else {
 			document.getElementById('buyAbMaxButton').style.borderColor = 'red';
@@ -392,12 +392,12 @@ function View() {
 		
 		if(autobuy.amtToSpend >= 100) {
             document.getElementById('buyAbAmtToSpendButton').style.borderColor = 'grey';
-        } else if(bonuses.points >= getAbAmtToSpendCost()) {
+        } else if(bonuses.availableEP >= getAbAmtToSpendCost()) {
             document.getElementById('buyAbAmtToSpendButton').style.borderColor = 'green';
         } else {
 			document.getElementById('buyAbAmtToSpendButton').style.borderColor = 'red';
 		}
-        document.getElementById('currentEP').innerHTML = intToString(bonuses.points);
+        document.getElementById('currentEP').innerHTML = intToString(bonuses.availableEP);
         document.getElementById('currentTickSpeed').innerHTML = intToString(bonuses.tickSpeedLevel);
         document.getElementById('buyTickSpeedCost').innerHTML = intToString(getTickSpeedCost());
         document.getElementById('currentTransferRate').innerHTML = intToString(bonuses.transferRateLevel / 100);

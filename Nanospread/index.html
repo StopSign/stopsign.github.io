@@ -72,13 +72,15 @@
             Currently you will get <div id="evolutionGain">0</div> evolution points on new level<br>
             <input type="checkbox" id="levelConfirm" onclick="theView.updateLevel()">
             <label for="levelConfirm">Confirm new level</label><br>
-            You have <div id="evolutionPoints">0</div> evolution points.
+            You have <div id="evolutionPoints">0</div> evolution points.<br>
+            <input type="checkbox" id="resetAvailableEP">
+            <label for="resetAvailableEP">Reset Available EP on new level</label><br>
         </div>
 		<i id="backButton1" class="backButton fa fa-close" onclick="closeLevelBox()" style="font-size:24px"></i>
     </div>
 	<div id="upgradeBox" style="display:none">
         <div class="medium" style="padding:5px">
-            Current EP: <div id="currentEP">0</div>
+            Current Available EP: <div id="currentEP">0</div>
         </div><br>
         <div>
             <div style="padding:5px;">
