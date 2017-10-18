@@ -296,6 +296,9 @@ function calcEvolutionPointGain() {
         highestLevel++;
         console.log('level up!');
     }
+	if(bonus > 0) {
+		stats.totalLevels++;
+	}
     return bonus === 0 ? 0 : (currentLevel+1) * Math.pow(1.3, bonus);
 }
 
