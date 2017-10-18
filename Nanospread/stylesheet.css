@@ -133,7 +133,7 @@ input, label {
     cursor:pointer;
 }
 	
-#autobuyOptionContainer {
+#autobuyToggleContainer {
     position:relative;
     background-color: #434d62;
     margin-bottom:3px;

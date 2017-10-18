@@ -88,7 +88,7 @@ function tick() {
     handleFPSDifference();
     clearNanitesReceived();
     sendNanites();
-	if(autobuy.toggle === 1) {
+	if(settings.autobuyToggle === 1) {
 		autobuyLevels();
 	}
     if(!theView) {
@@ -107,10 +107,6 @@ function autobuyLevels() {
             square.buyNanites();
         }
     }, true);
-}
-
-function toggleAutobuy(setting) {
-	autobuy.toggle = setting;
 }
 
 function clearNanitesReceived() {

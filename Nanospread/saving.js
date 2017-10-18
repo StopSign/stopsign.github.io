@@ -30,6 +30,7 @@ function clearSave() {
 
 function loadDefaults() {
     settings.buyPerClick = 1;
+	settings.autobuyToggle = 0;
     settings.selectedResourceNum = 0;
 
     settings.selectOneOrMultiple = 0;
@@ -51,7 +52,6 @@ function resetEPUpgrades() {
     bonuses.discountLevel = 0;
     autobuy.currentMax = 1;
     autobuy.amtToSpend = 1;
-	autobuy.toggle = 0;
 }
 
 function toggleIMessedUpPopup1() { //Let's hope there's not more

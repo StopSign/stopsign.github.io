@@ -158,3 +158,14 @@ function buyAmountOption(num) {
     theView.updateInfoBox();
 
 }
+
+function toggleAutobuy(setting) {
+	settings.autobuyToggle = setting;
+	if(settings.autobuyToggle === 1) {
+		document.getElementById('autobuyOn).style.backgroundColor = "green";
+		document.getElementById('autobuyOff).style.backgroundColor = "grey";
+	} else {
+		document.getElementById('autobuyOff).style.backgroundColor = "red";
+		document.getElementById('autobuyOn).style.backgroundColor = "grey";
+	}
+}
