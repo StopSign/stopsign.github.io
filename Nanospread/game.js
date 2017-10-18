@@ -40,7 +40,7 @@ function createGrid() {
             var levelDataNum = currentLevelGrid[row][column];
             if(levelDataNum === -1) {
                 startingCoords.x = column;
-                startingCoords.y = column;
+                startingCoords.y = row;
             }
             if(levelDataNum > 0) {
                 totalFromLevelData += Math.pow(2, levelDataNum);
