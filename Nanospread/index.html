@@ -37,23 +37,42 @@
     <div class="menuButton" onclick="toggleSettingsBox()"><i class="fa fa-sliders" style="font-size:20px;"></i> Settings (Q)</div>
     <div class="menuButton" onclick="toggleHelp()"><i class="fa fa-question-circle-o" style="font-size:20px;"></i> Help (H)</div>
     <div class="menuButton" onclick="toggleLevelMenu()"><i class="fa fa-line-chart" style="font-size:20px;"></i> Level (L)</div>
-	<div class="menuButton" onclick="toggleUpgradeMenu()"><i class="fa fa-line-chart" style="font-size:20px;"></i> Upgrades (U)</div>
-	<div class="menuButton" onclick="toggleStatsMenu()" style="font-size:20px;"> Stats (I)</div>
+	<div class="menuButton" onclick="toggleUpgradeMenu()"><i class="fa fa-gear" style="font-size:20px;"></i> Upgrades (U)</div>
+	<div class="menuButton" onclick="toggleStatsMenu()"><i class="fa fa-bar-chart" style="font-size:20px;"></i> Stats (I)</div>
     <div class="menuButton" style="float:right" onclick="select.selectAllActive()"><div style="margin-top:3px;">Select Active (E)</div></div>
 </div>
 
 <div id="infoPanel" class="small" style="position:fixed;bottom:30px;height:170px;width:800px;background-color:#8194bd;z-index:999;display:none;overflow:auto;">
 	<div id="statsBox" style="display:none;">
-        Ticks:<br><br>
-        This Level: <div id="ticksThisLevel">0</div><br>
-        Total: <div id="totalTicks">0</div><br><br>
-        Nanobot Production:<br><br>
-        This Level: <div id="nanobotsProducedThisLevel">0</div><br>
-        Total: <div id="totalProducedNanobots">0</div><br><br>
-        Nanobots Transferred:<br><br>
-        This Level: <div id="nanobotsTransferredThisLevel">0</div><br>
-        Total: <div id="totalTransferredNanobots">0</div><br>
-
+		<div style="padding:5px;">
+			Ticks:<br>
+			<div style="padding:5px;">
+				This Level: <div id="ticksThisLevel">0</div><br>
+				Total: <div id="totalTicks">0</div><br>
+				Avg. Per Level: <div id="averageTicks">0</div>
+			</div><br><br>
+			Nanobot Production:<br>
+			<div style="padding:5px;">
+				This Level: <div id="nanobotsProducedThisLevel">0</div><br>
+				Total: <div id="totalProducedNanobots">0</div><br>
+				Avg. Per Level: <div id="averageProduced">0</div>
+			</div><br><br>
+			Nanobots Transferred:<br>
+			<div style="padding:5px;">
+				This Level: <div id="nanobotsTransferredThisLevel">0</div><br>
+				Total: <div id="totalTransferredNanobots">0</div><br>
+				Avg. Per Level: <div id="averageTransferred">0</div>
+			</div><br><br>
+			Levels and EP:<br>
+			<div style="padding:5px;">
+				Highest Level: <div id="highestLevel">0</div><br>
+				Total Levels: <div id="totalLevels">0</div><br><br>
+				Total EP: <div id="totalEP">0</div><br>
+				EP Bonus: <div id="epBonus">0</div>%<br>
+				Available EP: <div id="availableEP">0</div><br>
+				Avg. EP Per Level: <div id="averageEPPerLevel">0</div><br>
+			</div>
+		</div>
         <i id="backButton4" class="backButton fa fa-close" onclick="closeHelpBox()" style="font-size:24px"></i>
     </div>
     <div id="levelBox" style="display:none">
@@ -111,7 +130,7 @@
             <div style="padding:5px;">
                 <div id='buyAbAmtToSpendButton' class="menuButton" onclick="buyAbAmtToSpendLevel()" style="padding-top:5px;padding-bottom:0;"> +1% Max Spent </div><br>
                 Autobuy Max Amt. To Spend: <div id="abAmtToSpendLevel">1</div>%<br> Cost: <div id="buyAbAmtToSpendCost">100</div> EP<br>
-                Maximum of 100%
+                Maximum of 50%
             </div>
         </div>
         <i id="backButton2" class="backButton fa fa-close" onclick="closeUpgradeBox()" style="font-size:24px"></i>
@@ -182,7 +201,7 @@
     </div>
     <div id="infoBox" style="">
 
-        <div id="resourceTypeLabel" class="large">Nanites</div><br>
+        <div id="resourceTypeLabel" class="large">Nanites</div> <br>
         <div id="infoGrid" class="small">
             <div class="col" style="width:91px;text-align:right;margin-right:10px;">
                 <div class="row"></div>
@@ -237,7 +256,7 @@
                 <!--<div id="totalConsumeCost"></div>-->
             <!--</div>-->
         </div>
-
+		Autobuy <input type="checkbox" id="autobuyToggle" onclick="toggleAutobuy()">
         <i id="closeButton" class="closeButton fa fa-close" onclick="select.deselectAll()"></i>
         <i id="leftArrow" class="fa fa-arrow-circle-left arrow" onclick="changeDirectionOfSelected('West')"></i>
         <i id="rightArrow" class="fa fa-arrow-circle-right arrow" onclick="changeDirectionOfSelected('East')"></i>

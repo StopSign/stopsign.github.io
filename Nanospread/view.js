@@ -414,10 +414,19 @@ function View() {
 	this.updateStats = function() {
         document.getElementById('ticksThisLevel').innerHTML = intToString(stats.ticksThisLevel);
         document.getElementById('totalTicks').innerHTML = intToString(stats.totalTicks);
+		document.getElementById('averageTicks').innerHTML = intToString(stats.totalTicks / stats.totalLevels);
         document.getElementById('nanobotsProducedThisLevel').innerHTML = intToString(stats.producedThisLevel);
         document.getElementById('totalProducedNanobots').innerHTML = intToString(stats.totalProduced);
+		document.getElementById('averageProduced').innerHTML = intToString(stats.totalProduced / stats.totalLevels);
         document.getElementById('nanobotsTransferredThisLevel').innerHTML = intToString(stats.transferredThisLevel);
 		document.getElementById('totalTransferredNanobots').innerHTML = intToString(stats.totalTransferred);
+		document.getElementById('averageTransferred').innerHTML = intToString(stats.totalTransferred / stats.totalLevels);
+		document.getElementById('highestLevel').innerHTML = intToString(highestLevel);
+		document.getElementById('totalLevels').innerHTML = intToString(stats.totalLevels);
+		document.getElementById('totalEP').innerHTML = intToString(bonuses.points);
+		document.getElementById('epBonus').innerHTML = intToString(bonuses.points * 5);
+		document.getElementById('availableEP').innerHTML = intToString(bonuses.availableEP);
+		document.getElementById('averageEPPerLevel').innerHTML = intToString(bonuses.points / stats.totalLevels);
     };
 }
 
@@ -450,7 +459,7 @@ function buttonSetup(type, typeUpper, label) { //lol javascript
     }
     document.getElementById(type+'Amount').innerHTML = displaySquare[type+'Amount'];
     document.getElementById(type+'Cost').innerHTML = "Cost is: " + intToString(displaySquare[type+'CostAfterMultiBuy'](settings.buyPerClick))+", ";
-    document.getElementById(type+'Benefit').innerHTML = "+"+displaySquare[type+'AmountBonus']+" created per, ";
+    document.getElementById(type+'Benefit').innerHTML = "+"+ intToString(displaySquare[type+'AmountBonus']*getNaniteGainBonus()) +" created per, ";
     document.getElementById(type+'SpecialNext').innerHTML = "next Bonus at "+displaySquare[type+'NextSpecial']+".";
     document.getElementById('buy'+typeUpper+'Button').style.borderColor = buyAvailableAnd ? "green" : buyAvailableOr ? "yellow" : "red";
     document.getElementById('numSelected'+typeUpper+'ButtonBuyable').style.color = buyAvailableAnd ? "green" : buyAvailableOr ? "yellow" : "red";

@@ -42,7 +42,7 @@ function loadDefaults() {
     bonuses = { points:0, availableEP:0};
     autobuy = {};
     resetEPUpgrades();
-	stats = { ticksThisLevel:0, totalTicks:0, producedThisLevel:0, totalProduced:0, transferredThisLevel:0, totalTransferred:0};
+	stats = { ticksThisLevel:0, totalTicks:0, producedThisLevel:0, totalProduced:0, transferredThisLevel:0, totalTransferred:0, totalLevels:0};
 }
 
 function resetEPUpgrades() {
@@ -51,6 +51,7 @@ function resetEPUpgrades() {
     bonuses.discountLevel = 0;
     autobuy.currentMax = 1;
     autobuy.amtToSpend = 1;
+	autobuy.toggle = 0;
 }
 
 function toggleIMessedUpPopup1() { //Let's hope there's not more

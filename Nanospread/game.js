@@ -88,8 +88,9 @@ function tick() {
     handleFPSDifference();
     clearNanitesReceived();
     sendNanites();
-	autobuyLevels();
-
+	if(autobuy.toggle === 1) {
+		autobuyLevels();
+	}
     if(!theView) {
         theView = new View();
     }
@@ -106,6 +107,14 @@ function autobuyLevels() {
             square.buyNanites();
         }
     }, true);
+}
+
+function toggleAutobuy() {
+	if(autobuy.toggle === 0) {
+		autobuy.toggle = 1;
+	} else {
+		autobuy.toggle = 0;
+	}
 }
 
 function clearNanitesReceived() {
@@ -269,10 +278,16 @@ function changeLevel(newLevel) {
     var EPGain = calcEvolutionPointGain();
     bonuses.points += EPGain;
     bonuses.availableEP += EPGain;
+	if(EPGain > 0) {
+		stats.totalLevels++;
+	}
     if(document.getElementById('resetAvailableEP').checked) {
         resetBonusPoints();
     }
     currentLevel = newLevel;
+	stats.ticksThisLevel = 0;
+	stats.producedThisLevel = 0;
+	stats.transferredThisLevel = 0;
     createGrid();
     theView.createGrid();
 	setTransferRate(bonuses.transferRateLevel);
@@ -365,7 +380,7 @@ function getAbMaxCost() {
 }
 
 function buyAbAmtToSpendLevel() {
-    if(autobuy.amtToSpend < 100 && bonuses.availableEP >= getAbAmtToSpendCost()) {
+    if(autobuy.amtToSpend < 50 && bonuses.availableEP >= getAbAmtToSpendCost()) {
 		bonuses.availableEP -= getAbAmtToSpendCost();
 		autobuy.amtToSpend++;
     }
