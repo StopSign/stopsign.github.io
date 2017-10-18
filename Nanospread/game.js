@@ -109,12 +109,8 @@ function autobuyLevels() {
     }, true);
 }
 
-function toggleAutobuy() {
-	if(autobuy.toggle === 0) {
-		autobuy.toggle = 1;
-	} else {
-		autobuy.toggle = 0;
-	}
+function toggleAutobuy(setting) {
+	autobuy.toggle = setting;
 }
 
 function clearNanitesReceived() {

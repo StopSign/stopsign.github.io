@@ -256,7 +256,13 @@
                 <!--<div id="totalConsumeCost"></div>-->
             <!--</div>-->
         </div>
-		Autobuy <input type="checkbox" id="autobuyToggle" onclick="toggleAutobuy()">
+		<div id="autobuyContainer">
+			Autobuy 
+			<div id="autobuyToggleContainer">
+                <div id="off" class="autobuyOff" onclick="toggleAutobuy(0)" style="background-color:#ff4400">Off</div>
+                <div id="on" class="autobuyOn" onclick="toggleAutobuy(1)">On</div>
+			</div>
+		</div>	
         <i id="closeButton" class="closeButton fa fa-close" onclick="select.deselectAll()"></i>
         <i id="leftArrow" class="fa fa-arrow-circle-left arrow" onclick="changeDirectionOfSelected('West')"></i>
         <i id="rightArrow" class="fa fa-arrow-circle-right arrow" onclick="changeDirectionOfSelected('East')"></i>
