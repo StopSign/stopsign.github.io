@@ -21,7 +21,7 @@ var select = new Select();
 var isDragging = false;
 var currentLevel = 0; //SWITCH LEVELS
 var highestLevel;
-var bonuses, autobuy;
+var bonuses, autobuy, stats;
 
 function clearSave() {
     window.localStorage.version4 = "";
@@ -41,6 +41,7 @@ function loadDefaults() {
 
     bonuses = { points:0, tickSpeedLevel:1, transferRateLevel:1, discountLevel:0, spentEP:0};
     autobuy = { currentMax:1, amtToSpend:1 };
+	stats = { ticksThisLevel:0, totalTicks:0, producedThisLevel:0, totalProduced:0, transferredThisLevel:0, totalTransferred:0};
 }
 
 function toggleIMessedUpPopup1() { //Let's hope there's not more
@@ -83,6 +84,11 @@ function load() {
             autobuy[property] = toLoad.autobuy[property];
         }
     }
+	for(property in toLoad.stats) {
+        if (toLoad.stats.hasOwnProperty(property)) {
+            stats[property] = toLoad.stats[property];
+        }
+    }
     createGridFromSave(toLoad.theGrid);
 
     settings = toLoad.settings;
@@ -102,6 +108,7 @@ function save() {
     toSave.highestLevel = highestLevel;
     toSave.bonuses = bonuses;
 	toSave.autobuy = autobuy;
+	toSave.stats = stats;
     // console.log('saved');
     window.localStorage.version4 = JSON.stringify(toSave);
 }

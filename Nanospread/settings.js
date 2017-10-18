@@ -76,6 +76,22 @@ function closeUpgradeBox() {
     adjustMenus();
 }
 
+function toggleStatsMenu() {
+    if(menuOpen === "stats") {
+        closeStatsBox()
+    } else  {
+        openStatsBox()
+    }
+}
+function openStatsBox() {
+    menuOpen = "stats";
+    adjustMenus();
+}
+function closeStatsBox() {
+    menuOpen = "";
+    adjustMenus();
+}
+
 function adjustMenus() {
     closeMenus();
     if(menuOpen === "help") {
@@ -93,6 +109,9 @@ function adjustMenus() {
     } else if(menuOpen === "upgrade") {
         document.getElementById('upgradeBox').style.display = "block";
         document.getElementById('infoPanel').style.display = "block";
+    } else if(menuOpen === "stats") {
+        document.getElementById('statsBox').style.display = "block";
+        document.getElementById('infoPanel').style.display = "block";
     } else if(selected.length > 0) {
         document.getElementById('infoBox').style.display = "block";
         document.getElementById('infoPanel').style.display = "block";
@@ -104,6 +123,7 @@ function closeMenus() {
     document.getElementById('buildBox').style.display = "none";
     document.getElementById('levelBox').style.display = "none";
 	document.getElementById('upgradeBox').style.display = "none";
+	document.getElementById('statsBox').style.display = "none";
     document.getElementById('settingsBox').style.display = "none";
     document.getElementById('helpBox').style.display = "none";
     document.getElementById('infoPanel').style.display = "none";

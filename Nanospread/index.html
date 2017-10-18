@@ -38,10 +38,24 @@
     <div class="menuButton" onclick="toggleHelp()"><i class="fa fa-question-circle-o" style="font-size:20px;"></i> Help (H)</div>
     <div class="menuButton" onclick="toggleLevelMenu()"><i class="fa fa-line-chart" style="font-size:20px;"></i> Level (L)</div>
 	<div class="menuButton" onclick="toggleUpgradeMenu()"><i class="fa fa-line-chart" style="font-size:20px;"></i> Upgrades (U)</div>
+	<div class="menuButton" onclick="toggleStatsMenu()" style="font-size:20px;"> Stats (I)</div>
     <div class="menuButton" style="float:right" onclick="select.selectAllActive()"><div style="margin-top:3px;">Select Active (E)</div></div>
 </div>
 
 <div id="infoPanel" class="small" style="position:fixed;bottom:30px;height:170px;width:800px;background-color:#8194bd;z-index:999;display:none;overflow:auto;">
+	<div id="statsBox" style="display:none;">
+        Ticks:<br><br>
+        This Level: <div id="ticksThisLevel">0</div><br>
+        Total: <div id="totalTicks">0</div><br><br>
+        Nanobot Production:<br><br>
+        This Level: <div id="nanobotsProducedThisLevel">0</div><br>
+        Total: <div id="totalProducedNanobots">0</div><br><br>
+        Nanobots Transferred:<br><br>
+        This Level: <div id="nanobotsTransferredThisLevel">0</div><br>
+        Total: <div id="totalTransferredNanobots">0</div><br>
+
+        <i id="backButton4" class="backButton fa fa-close" onclick="closeHelpBox()" style="font-size:24px"></i>
+    </div>
     <div id="levelBox" style="display:none">
 		<div class="medium" style="padding:5px">
             Current Level: <div id="currentLevel"></div>

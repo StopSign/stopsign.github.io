@@ -40,7 +40,7 @@ function createGrid() {
             var levelDataNum = currentLevelGrid[row][column];
             if(levelDataNum === -1) {
                 startingCoords.x = column;
-                startingCoords.y = column;
+                startingCoords.y = row;
             }
             if(levelDataNum > 0) {
                 totalFromLevelData += Math.pow(2, levelDataNum);
@@ -83,6 +83,8 @@ function tick() {
         return;
     }
     timer++;
+	stats.ticksThisLevel++;
+	stats.totalTicks++;
     handleFPSDifference();
     clearNanitesReceived();
     sendNanites();
@@ -123,6 +125,8 @@ function sendNanites() {
         var amountTransferred = square.sendPieceOfNanites();
         target.gainNanites(amountTransferred); //transfer .1% nanites
         target.naniteAmountReceived += amountTransferred;
+		stats.transferredThisLevel += amountTransferred;
+		stats.totalTransferred += amountTransferred;
 
         amountTransferred = square.sendPieceOfAdvBots();
         target.gainAdvBots(amountTransferred); //transfer .1% adv bots
@@ -130,6 +134,8 @@ function sendNanites() {
 
         square.gainNanites(square.naniteRate * getNaniteGainBonus());
         square.gainAdvBots(square.advBotRate);
+		stats.producedThisLevel += (square.naniteRate * getNaniteGainBonus());
+		stats.totalProduced += (square.naniteRate * getNaniteGainBonus());
     }, true);
 }
 
