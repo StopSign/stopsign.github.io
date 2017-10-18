@@ -103,7 +103,7 @@ function tick() {
 
 function autobuyLevels() {
     doToAllSquares(function (square) {
-        if(square.naniteAmount < autobuy.currentMax && (square.nanites * (autobuy.amtToSpend / 100)) >= square.calcprice(settings.autobuyPerTick) {
+        if(square.naniteAmount < autobuy.currentMax && (square.nanites * (autobuy.amtToSpend / 100)) >= square.calcprice(settings.autobuyPerTick)) {
             square.buyMultipleNanites(settings.autobuyPerTick);
         }
     }, true);
