@@ -261,13 +261,17 @@ function handleFPSDifference() {
 
 
 function changeLevel(newLevel) {
-
     if(!document.getElementById('levelConfirm').checked || newLevel < 0 || newLevel > highestLevel) {
         console.log('level change blocked');
         return;
     }
     theView.setSelectedFalse();
-    bonuses.points += calcEvolutionPointGain();
+    var EPGain = calcEvolutionPointGain();
+    bonuses.points += EPGain;
+    bonuses.availableEP += EPGain;
+    if(document.getElementById('resetAvailableEP').checked) {
+        resetBonusPoints();
+    }
     currentLevel = newLevel;
 	stats.ticksThisLevel = 0;
 	stats.producedThisLevel = 0;
@@ -302,8 +306,8 @@ function recalcInterval(newSpeed) {
 }
 
 function buyTickSpeed() {
-    if(bonuses.points >= getTickSpeedCost() && bonuses.tickSpeedLevel < 5) {
-		bonuses.points -= getTickSpeedCost();
+    if(bonuses.availableEP >= getTickSpeedCost() && bonuses.tickSpeedLevel < 5) {
+		bonuses.availableEP -= getTickSpeedCost();
 		recalcInterval(bonuses.tickSpeedLevel + .2);
     }
     theView.updateUpgrade();
@@ -321,8 +325,8 @@ function setTransferRate(newRate) {
 }
 
 function buyTransferRate() {
-    if(bonuses.points >= getTransferRateCost() && bonuses.transferRateLevel < 10) {
-		bonuses.points -= getTransferRateCost();
+    if(bonuses.availableEP >= getTransferRateCost() && bonuses.transferRateLevel < 10) {
+		bonuses.availableEP -= getTransferRateCost();
 		setTransferRate(bonuses.transferRateLevel + 1);
     }
     theView.update();
@@ -333,8 +337,8 @@ function getTransferRateCost() {
 }
 
 function buyDiscountLevel() {
-    if(bonuses.points >= getDiscountCost()) {
-        bonuses.points -= getDiscountCost();
+    if(bonuses.availableEP >= getDiscountCost()) {
+        bonuses.availableEP -= getDiscountCost();
         bonuses.discountLevel++;
         doToAllSquares(function (square) {
             square.naniteCost = square.calcNaniteCost();
@@ -352,8 +356,8 @@ function getDiscountCost() {
 }
 
 function buyAbMaxLevel() {
-    if(autobuy.currentMax < highestLevel*2 && bonuses.points >= getAbMaxCost()) {
-		bonuses.points -= getAbMaxCost();
+    if(autobuy.currentMax < highestLevel*2 && bonuses.availableEP >= getAbMaxCost()) {
+		bonuses.availableEP -= getAbMaxCost();
 		autobuy.currentMax++;
     }
     theView.update();
@@ -364,8 +368,8 @@ function getAbMaxCost() {
 }
 
 function buyAbAmtToSpendLevel() {
-    if(autobuy.amtToSpend < 100 && bonuses.points >= getAbAmtToSpendCost()) {
-		bonuses.points -= getAbAmtToSpendCost();
+    if(autobuy.amtToSpend < 100 && bonuses.availableEP >= getAbAmtToSpendCost()) {
+		bonuses.availableEP -= getAbAmtToSpendCost();
 		autobuy.amtToSpend++;
     }
     theView.update();
@@ -373,6 +377,12 @@ function buyAbAmtToSpendLevel() {
 
 function getAbAmtToSpendCost() {
     return round2(25 * autobuy.amtToSpend);
+}
+
+function resetBonusPoints() {
+    resetEPUpgrades();
+    bonuses.availableEP = bonuses.points;
+    theView.update();
 }
 
 function doToAllSquares(functionToRun, onlyIsActive) {

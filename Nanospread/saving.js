@@ -39,9 +39,18 @@ function loadDefaults() {
     settings.selectShowNoneOrNanitesOrAmount = 1;
     highestLevel = 0; //SHOULD BE 0 BEFORE COMMIT
 
-    bonuses = { points:0, tickSpeedLevel:1, transferRateLevel:1, discountLevel:0, spentEP:0};
-    autobuy = { currentMax:1, amtToSpend:1 };
+    bonuses = { points:0, availableEP:0};
+    autobuy = {};
+    resetEPUpgrades();
 	stats = { ticksThisLevel:0, totalTicks:0, producedThisLevel:0, totalProduced:0, transferredThisLevel:0, totalTransferred:0};
+}
+
+function resetEPUpgrades() {
+    bonuses.tickSpeedLevel = 1;
+    bonuses.transferRateLevel = 1;
+    bonuses.discountLevel = 0;
+    autobuy.currentMax = 1;
+    autobuy.amtToSpend = 1;
 }
 
 function toggleIMessedUpPopup1() { //Let's hope there's not more
@@ -57,7 +66,7 @@ function load() {
     if (!window.localStorage.version4) { //New players to the game
         createGrid();
         recalcInterval(bonuses.tickSpeedLevel);
-        if(window.localStorage.version3) {
+        if(window.localStorage.version3) { //New players to version 4
             var oldLoad = JSON.parse(window.localStorage.version3);
             var roughBonus = ((oldLoad.bonuses.tickSpeedLevel - 1)  * 5) + oldLoad.bonuses.transferRateLevel * .4 + oldLoad.bonuses.discountLevel * .2 + oldLoad.autobuy.currentMax * .3 + oldLoad.autobuy.amtToSpend * .5;
             roughBonus = round2(Math.pow(2, roughBonus));
