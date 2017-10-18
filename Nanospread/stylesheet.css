@@ -59,10 +59,10 @@ div {
 }
 
 #buttonContainer {
-    left:40%;
-    width:56%;
+    width:50%;
     position:absolute;
     top:100px;
+	padding:5px;
 }
 .closeButton {
     position:absolute;

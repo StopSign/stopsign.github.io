@@ -201,7 +201,7 @@
     </div>
     <div id="infoBox" style="">
 
-        <div id="resourceTypeLabel" class="large">Nanites</div> <br>
+        <div id="resourceTypeLabel" class="large">Nanites</div><br>
         <div id="infoGrid" class="small">
             <div class="col" style="width:91px;text-align:right;margin-right:10px;">
                 <div class="row"></div>
@@ -256,7 +256,7 @@
                 <!--<div id="totalConsumeCost"></div>-->
             <!--</div>-->
         </div>
-		<div id="autobuyContainer" style="padding:5px;">
+		<div id="autobuyContainer" style="padding:5px;position:absolute;">
 			Autobuy 
 			<div id="autobuyToggleContainer">
                 <div id="autobuyOff" class="autobuyToggle" onclick="toggleAutobuy(0)" style="background-color:#ff4400">Off</div>
@@ -271,14 +271,8 @@
                 <div id="autobuy50" class="autobuyAmountOption" onclick="autobuyAmountOption(50)">50</div>
                 <div id="autobuy100" class="autobuyAmountOption" onclick="autobuyAmountOption(100)">100</div>
             </div>
-		</div>	
-        <i id="closeButton" class="closeButton fa fa-close" onclick="select.deselectAll()"></i>
-        <i id="leftArrow" class="fa fa-arrow-circle-left arrow" onclick="changeDirectionOfSelected('West')"></i>
-        <i id="rightArrow" class="fa fa-arrow-circle-right arrow" onclick="changeDirectionOfSelected('East')"></i>
-        <i id="upArrow" class="fa fa-arrow-circle-up arrow" onclick="changeDirectionOfSelected('North')"></i>
-        <i id="downArrow" class="fa fa-arrow-circle-down arrow" onclick="changeDirectionOfSelected('South')"></i>
-
-        <div id="buttonContainer">
+		</div>
+		<div id="buttonContainer">
             Buy Per Click:
             <div id="buyAmountOptionContainer">
                 <div id="buy1" class="buyAmountOption" onclick="buyAmountOption(1)" style="background-color:#ff4400">1</div>
@@ -302,7 +296,14 @@
                 <div id="advBotSpecialNext"></div>
                 <div id="numSelectedAdvBotsButtonBuyable" style="position:absolute;right:5px;top:2px;"></div>
             </div>
-        </div>
+        </div>		
+        <i id="closeButton" class="closeButton fa fa-close" onclick="select.deselectAll()"></i>
+        <i id="leftArrow" class="fa fa-arrow-circle-left arrow" onclick="changeDirectionOfSelected('West')"></i>
+        <i id="rightArrow" class="fa fa-arrow-circle-right arrow" onclick="changeDirectionOfSelected('East')"></i>
+        <i id="upArrow" class="fa fa-arrow-circle-up arrow" onclick="changeDirectionOfSelected('North')"></i>
+        <i id="downArrow" class="fa fa-arrow-circle-down arrow" onclick="changeDirectionOfSelected('South')"></i>
+
+        
 
     </div>
 
