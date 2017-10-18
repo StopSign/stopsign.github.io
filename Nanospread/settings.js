@@ -116,6 +116,9 @@ function adjustMenus() {
         document.getElementById('infoBox').style.display = "block";
         document.getElementById('infoPanel').style.display = "block";
     }
+    if(document.getElementById('infoPanel').style.display === "block") {
+        document.getElementById('scrollSouth').style.bottom = "240px";
+    }
 }
 
 function closeMenus() {
@@ -127,6 +130,7 @@ function closeMenus() {
     document.getElementById('settingsBox').style.display = "none";
     document.getElementById('helpBox').style.display = "none";
     document.getElementById('infoPanel').style.display = "none";
+    document.getElementById('scrollSouth').style.bottom = "30px";
 }
 
 function selectOneOrMultipleSetting(num) {

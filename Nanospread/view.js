@@ -1,8 +1,30 @@
 function View() {
     this.offsetx = 0;
     this.offsety = 0;
-    this.backgroundGrid = document.getElementById('naniteGrid');
+    this.backgroundGrid = document.getElementById('theBody');
+    this.naniteGrid = document.getElementById('naniteGrid');
+    this.dragSelectDiv = document.getElementById('dragSelectDiv');
 
+    this.shiftRight = function() {
+        this.offsetx += 50;
+        this.updateOffset();
+    };
+    this.shiftLeft = function() {
+        this.offsetx -= 50;
+        this.updateOffset();
+    };
+    this.shiftUp = function() {
+        this.offsety -= 50;
+        this.updateOffset();
+    };
+    this.shiftDown = function() {
+        this.offsety += 50;
+        this.updateOffset();
+    };
+    this.updateOffset = function() {
+        document.getElementById('naniteGridPosition').style.left = this.offsetx+'px';
+        document.getElementById('naniteGridPosition').style.top = this.offsety+'px';
+    };
 
     this.createGrid = function() {
         this.deleteGrid();
@@ -15,8 +37,8 @@ function View() {
                 }
                 var elem = document.createElement("div");
                 var rowSize = 700 / 13;
-                var rectStartX = col*rowSize + this.offsetx + 30;
-                var rectStartY = row*rowSize + this.offsety + 30;
+                var rectStartX = col*rowSize + 30;
+                var rectStartY = row*rowSize + 30;
                 elem.innerHTML =
                     "<div class='naniteSquare' style='left:"+rectStartX+"px;top:"+rectStartY+"px;width:"+(rowSize-10)+"px;height:"+(rowSize-10)+"px;' onclick='clickedSquare("+col+","+row+")'>" +
                     "<div class='displayNum' id='displayNumcol"+col+"row"+row+"'></div>" +
@@ -24,7 +46,8 @@ function View() {
                     "<div class='directionArrowOuter' id='directionArrowOutercol"+col+"row"+row+"'></div>" +
                     "<div class='directionArrowInner' id='directionArrowInnercol"+col+"row"+row+"'></div>" +
                     "</div>";
-                this.backgroundGrid.appendChild(elem);
+
+                this.naniteGrid.appendChild(elem);
                 this.grid[col][row] = elem.firstChild;
             }
         }
@@ -47,53 +70,56 @@ function View() {
     this.createGrid();
 
     this.backgroundGrid.onmousedown  = function(e) {
-        startingDragPoint = {x:e.pageX-8, y:e.pageY-8};
-        var dragSelectDiv = document.getElementById('dragSelectDiv');
-        dragSelectDiv.style.width = '2px';
-        dragSelectDiv.style.height = '2px';
-        dragSelectDiv.style.left = startingDragPoint.x+"px";
-        dragSelectDiv.style.top = startingDragPoint.y+"px";
+        startingDragPoint = {x:e.pageX - theView.offsetx - 8, y:e.pageY - theView.offsety};
+        theView.dragSelectDiv.style.width = '2px';
+        theView.dragSelectDiv.style.height = '2px';
+        theView.dragSelectDiv.style.left = startingDragPoint.x+"px";
+        theView.dragSelectDiv.style.top = startingDragPoint.y+"px";
         isDragging = true;
     };
     this.backgroundGrid.onmousemove = function(e) {
-        var dragSelectDiv = document.getElementById('dragSelectDiv');
+
+        var currentPos = {x:e.x - theView.offsetx, y:e.y - theView.offsety};
         if(isDragging) {
-            var distance = Math.sqrt(Math.pow(startingDragPoint.x - e.pageX, 2) + Math.pow(startingDragPoint.y - e.pageY, 2));
+            var distance = Math.sqrt(Math.pow(startingDragPoint.x - currentPos.x, 2) + Math.pow(startingDragPoint.y - currentPos.y, 2));
             if(distance < 20) {
-                dragSelectDiv.style.display = "none";
+                theView.dragSelectDiv.style.display = "none";
             } else {
-                dragSelectDiv.style.display = "block";
+                theView.dragSelectDiv.style.display = "block";
             }
-        }
-        if(startingDragPoint.x > e.x) {
-            var leftX = e.x;
-            var rightX = startingDragPoint.x;
         } else {
-            leftX = startingDragPoint.x;
-            rightX = e.x;
+            return;
         }
-        if(startingDragPoint.y > e.y) {
-            var topY = e.y;
+        if(startingDragPoint.x > currentPos.x) {
+            var leftX = currentPos.x;
+            var rightX = startingDragPoint.x + 4;
+        } else {
+            leftX = startingDragPoint.x + 8;
+            rightX = currentPos.x - 4;
+        }
+        if(startingDragPoint.y > currentPos.y) {
+            var topY = currentPos.y;
             var bottomY = startingDragPoint.y;
         } else {
             topY = startingDragPoint.y;
-            bottomY = e.y;
+            bottomY = currentPos.y;
         }
-        if(dragSelectDiv.style.display === "block") {
-            dragSelectDiv.style.top = (topY + 4)+"px";
-            dragSelectDiv.style.left = (leftX - 10)+"px";
-            dragSelectDiv.style.width = (rightX - leftX)+"px";
-            dragSelectDiv.style.height = (bottomY - topY - 4)+"px";
+        if(theView.dragSelectDiv.style.display === "block") {
+            theView.dragSelectDiv.style.top = (topY + theView.offsety)+"px";
+            theView.dragSelectDiv.style.left = (leftX + theView.offsetx)+"px";
+            theView.dragSelectDiv.style.width = (rightX - leftX)+"px";
+            theView.dragSelectDiv.style.height = (bottomY - topY - 4)+"px";
         }
+
     };
     this.backgroundGrid.onmouseup  = function(e) {
         document.getElementById('dragSelectDiv').style.display = 'none';
         isDragging = false;
-        var distance = Math.sqrt(Math.pow(startingDragPoint.x - e.pageX, 2) + Math.pow(startingDragPoint.y - e.pageY, 2));
+        endingDragPoint = {x:(e.x - theView.offsetx), y:(e.y - theView.offsety)};
+        var distance = Math.sqrt(Math.pow(startingDragPoint.x - endingDragPoint.x, 2) + Math.pow(startingDragPoint.y - endingDragPoint.y, 2));
         if(distance < 20) {
             return;
         }
-        endingDragPoint = {x:(e.pageX - 8), y:(e.pageY - 8)};
         if(startingDragPoint.x > endingDragPoint.x) {
             var leftX = endingDragPoint.x;
             var rightX = startingDragPoint.x;
@@ -108,7 +134,7 @@ function View() {
             topY = startingDragPoint.y;
             bottomY = endingDragPoint.y;
         }
-        select.selectAllInCoordinates({x:leftX, y:topY}, {x:rightX, y:bottomY})
+        select.selectAllInCoordinates({x:leftX, y:topY}, {x:rightX, y:bottomY});
     };
 
     this.drawButtons = function() {
