@@ -88,8 +88,9 @@ function tick() {
     handleFPSDifference();
     clearNanitesReceived();
     sendNanites();
-	autobuyLevels();
-
+	if(document.getElementById('autobuyToggle').checked) {
+		autobuyLevels();
+	}
     if(!theView) {
         theView = new View();
     }
