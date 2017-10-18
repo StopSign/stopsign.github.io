@@ -175,7 +175,7 @@ function autobuyAmountOption(num) {
     if(highlighted) {
         highlighted.style.backgroundColor = "grey";
     }
-    settings.buyPerClick = num;
+    settings.autobuyPerTick = num;
     document.getElementById('autobuy'+num).style.backgroundColor = "#ff4400";
 
 
