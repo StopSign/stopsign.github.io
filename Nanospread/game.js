@@ -412,4 +412,7 @@ function statsUpdate() {
 	stats.producedThisLevel = 0;
 	stats.transferredThisLevel = 0;
 }
-		
+	
+function NextAchieveLevelGoal(achievement) {
+		return(10 * Math.pow(10, achievement)
+}

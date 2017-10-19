@@ -21,7 +21,7 @@ var select = new Select();
 var isDragging = false;
 var currentLevel = 0; //SWITCH LEVELS
 var highestLevel;
-var bonuses, autobuy, stats;
+var bonuses, autobuy, stats, achieves;
 
 function clearSave() {
     window.localStorage.version4 = "";
@@ -45,7 +45,8 @@ function loadDefaults() {
     autobuy = {};
     resetEPUpgrades();
 	stats = { ticksThisLevel:0, totalTicks:0, producedThisLevel:0, totalProduced:0, transferredThisLevel:0, totalTransferred:0, totalLevels:0, highestTicks:0, highestProduced:0, highestTransferred:0};
-}
+	achieves = { highestTicksAch: 0, totalTicksAch:0, highestProductionAch:0, totalProductionAch:0, highestTransferredAch:0, totalTransferredAch:0, highestLevelAch:0, totalLevelsAch:0};
+	} 
 
 function resetEPUpgrades() {
     bonuses.tickSpeedLevel = 1;
