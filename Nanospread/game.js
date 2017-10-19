@@ -83,7 +83,8 @@ function tick() {
         return;
     }
     timer++;
-	handleFPSDifference();
+	tickGrowth();
+    handleFPSDifference();
     clearNanitesReceived();
     sendNanites();
 	tickStats();
@@ -140,7 +141,7 @@ function sendNanites() {
 }
 
 function getNaniteGainBonus() {
-    return ((bonuses.points * 5)+100)/100;
+    return ((bonuses.points * 5)+100)/100 * bonuses.growthBonus;
 }
 
 
@@ -432,7 +433,7 @@ function statsUpdate() {
 			achieves.totalLevelsAch++;
 		}
 	}
-	stats.ticksThisLevel = 0;	
+	stats.ticksThisLevel = 0;
 	stats.producedThisLevel = 0;
 	stats.transferredThisLevel = 0;
 }
@@ -474,4 +475,22 @@ function calcTotalAchieveBonus() {
 	totalAchieveBonus += calcAchieveBonus(achieves.highestLevelAch);
 	totalAchieveBonus += calcAchieveBonus(achieves.totalLevelsAch);
 	return round2(totalAchieveBonus);
+}
+
+function tickGrowth() {
+    //TODO calculate from last to first instead of first to last
+    for(var x = 0; x < bonuses.derivBonuses.length; x++) {
+        var deriv = bonuses.derivBonuses[x];
+        deriv.currentTicks++;
+        if(deriv.currentTicks >= deriv.ticksNeeded) {
+            deriv.currentTicks -= deriv.ticksNeeded;
+            if(x === 0) {
+                //deriv.amount  deriv.gainMultiplier
+                bonuses.growthBonus += (deriv.amount * deriv.gainMultiplier) / 100;
+                continue;
+            }
+            var prevDeriv = bonuses.derivBonuses[x-1];
+            prevDeriv.amount += deriv.amount * deriv.gainMultiplier;
+        }
+    }
 }

@@ -180,6 +180,7 @@ function View() {
                 this.updateDirectionDot(square);
             }
         }
+        this.updateGrowth();
         this.updateInfoBox();
         this.updateSettings();
         this.updateLevel();
@@ -481,6 +482,14 @@ function View() {
 		document.getElementById('epBonus').innerHTML = intToString(bonuses.points * 5);
 		document.getElementById('availableEP').innerHTML = intToString(bonuses.availableEP);
 		document.getElementById('averageEPPerLevel').innerHTML = intToString(bonuses.points / stats.totalLevels);
+    };
+	this.updateGrowth = function() {
+        for(var x = 0; x < bonuses.derivBonuses.length; x++) {
+            var deriv = bonuses.derivBonuses[x];
+            document.getElementById('deriv'+x+'Gain').innerHTML = intToString(x === 0 ? (deriv.amount * deriv.gainMultiplier) / 100 : (deriv.amount * deriv.gainMultiplier));
+            document.getElementById(x+'DerivInner').style.width = (deriv.currentTicks / deriv.ticksNeeded * 100) + '%';
+        }
+        document.getElementById('growthBonus').innerHTML = intToString(bonuses.growthBonus);
     };
 }
 

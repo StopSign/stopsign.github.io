@@ -147,6 +147,36 @@
                 Maximum of 50%
             </div>
         </div>
+        <div id="epGrowthContainer" style="width:100%">
+            <div id="0Deriv" class="derivContainer medium">
+                Total bonus from growth: x<div id="growthBonus"></div>
+            </div>
+            <div id="1Deriv" class="derivContainer">
+                <div class="derivLabel medium">First Derivative</div>
+                <div class="outerDerivBar"><div id="0DerivInner" class="innerDerivBar"></div></div>
+                Gain <div id="deriv0Gain">0.01</div>% growth per tick
+            </div>
+            <div id="2Deriv" class="derivContainer">
+                <div class="derivLabel medium">Second Derivative</div>
+                <div class="outerDerivBar"><div id="1DerivInner" class="innerDerivBar"></div></div>
+                Gain <div id="deriv1Gain">1</div> First Derivatives per 5 ticks
+            </div>
+            <div id="3Deriv" class="derivContainer">
+                <div class="derivLabel medium">Third Derivative</div>
+                <div class="outerDerivBar"><div id="2DerivInner" class="innerDerivBar"></div></div>
+                Gain <div id="deriv2Gain">1</div> Second Derivatives per 10 ticks
+            </div>
+            <div id="4Deriv" class="derivContainer">
+                <div class="derivLabel medium">Fourth Derivative</div>
+                <div class="outerDerivBar"><div id="3DerivInner" class="innerDerivBar"></div></div>
+                Gain <div id="deriv3Gain">1</div> Third Derivatives per 20 ticks
+            </div>
+            <div id="5Deriv" class="derivContainer">
+                <div class="derivLabel medium">Fifth Derivative</div>
+                <div class="outerDerivBar"><div id="4DerivInner" class="innerDerivBar"></div></div>
+                Gain <div id="deriv4Gain">1</div> Fourth Derivatives per 40 ticks
+            </div>
+        </div>
         <i id="backButton2" class="backButton fa fa-close" onclick="closeUpgradeBox()" style="font-size:24px"></i>
     </div>
     <div id="buildBox" style="display:none;">

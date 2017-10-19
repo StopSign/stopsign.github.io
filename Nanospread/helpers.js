@@ -90,7 +90,7 @@ function nFormatter(num, digits) {
         { value: 1E3,  symbol: "K" }
     ], rx = /\.0+$|(\.[0-9]*[1-9])0+$/, i;
     for (i = 0; i < si.length; i++) {
-        if ((num*1.1) >= si[i].value) { // *1.1 to handle rounding
+        if ((num) >= si[i].value / 1.005) { // /1.005 to handle rounding
             return (num / si[i].value).toPrecision(digits).replace(rx, "$1") + si[i].symbol;
         }
     }
