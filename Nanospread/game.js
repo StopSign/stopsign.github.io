@@ -83,8 +83,7 @@ function tick() {
         return;
     }
     timer++;
-	stats.ticksThisLevel++;
-	stats.totalTicks++;
+	tickStats();
     handleFPSDifference();
     clearNanitesReceived();
     sendNanites();
@@ -417,7 +416,16 @@ function statsUpdate() {
 	stats.producedThisLevel = 0;
 	stats.transferredThisLevel = 0;
 }
-	
+
+function tickStats() {
+	stats.ticksThisLevel++;
+	stats.totalTicks++;
+	if(stats.totalTicks >= NextAchieveLevelGoal(achieves.totalTicksAch)) {
+		while(stats.totalTicks >= NextAchieveLevelGoal(achieves.totalTicksAch)) {
+			achieves.totalTicksAch++;
+		}
+	}
+}
 function NextAchieveLevelGoal(achievement) {
 		return(10 * Math.pow(10, achievement))
 }
@@ -428,5 +436,6 @@ function calcAchieveBonus(achievement) {
 function calcTotalAchieveBonus() {
 	var totalAchieveBonus = 0;
 	totalAchieveBonus += calcAchieveBonus(achieves.highestTicksAch);
+	totalAchieveBonus += calcAchieveBonus(achieves.totalTicksAch);
 	return round2(totalAchieveBonus);
 }
