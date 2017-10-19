@@ -101,6 +101,11 @@ function load() {
             stats[property] = toLoad.stats[property];
         }
     }
+	for(property in toLoad.achieves) {
+        if (toLoad.achieves.hasOwnProperty(property)) {
+            achieves[property] = toLoad.achieves[property];
+        }
+    }
     createGridFromSave(toLoad.theGrid);
 
     settings = toLoad.settings;
@@ -121,6 +126,7 @@ function save() {
     toSave.bonuses = bonuses;
 	toSave.autobuy = autobuy;
 	toSave.stats = stats;
+	toSave.achieves = achieves;
     // console.log('saved');
     window.localStorage.version4 = JSON.stringify(toSave);
 }

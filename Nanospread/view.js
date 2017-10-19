@@ -441,7 +441,7 @@ function View() {
         document.getElementById('ticksThisLevel').innerHTML = intToString(stats.ticksThisLevel);
 		document.getElementById('highestTicks').innerHTML = intToString(stats.highestTicks);
 		document.getElementById('highestTicksAchNextLvl').innerHTML = intToString(NextAchieveLevelGoal(achieves.highestTicksAch));
-		document.getElementById('highestTicksAch').innerHTML = intToString(achieves.highestTicksAch);
+		document.getElementById('highestTicksAchLvl').innerHTML = intToString(achieves.highestTicksAch);
         document.getElementById('totalTicks').innerHTML = intToString(stats.totalTicks);
 		document.getElementById('averageTicks').innerHTML = intToString(stats.totalTicks / stats.totalLevels);
         document.getElementById('nanobotsProducedThisLevel').innerHTML = intToString(stats.producedThisLevel);
