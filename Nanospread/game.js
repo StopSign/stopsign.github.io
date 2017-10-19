@@ -297,7 +297,7 @@ function calcEvolutionPointGain() {
         highestLevel++;
         console.log('level up!');
     }
-    return bonus === 0 ? 0 : (currentLevel+1) * Math.pow(1.3, bonus);
+    return bonus === 0 ? 0 : ((currentLevel+1) * Math.pow(1.3, bonus) * (1 + (calcTotalAchieveBonus() / 100)));
 }
 
 function recalcInterval(newSpeed) {
