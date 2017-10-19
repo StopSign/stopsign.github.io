@@ -83,10 +83,10 @@ function tick() {
         return;
     }
     timer++;
-	tickStats();
-    handleFPSDifference();
+	handleFPSDifference();
     clearNanitesReceived();
     sendNanites();
+	tickStats();
 	if(settings.autobuyToggle === 1) {
 		autobuyLevels();
 	}
@@ -409,8 +409,28 @@ function statsUpdate() {
 	if(stats.producedThisLevel > stats.highestProduced) {
 		stats.highestProduced = stats.producedThisLevel;
 	}
+	if(stats.highestProduced >= NextAchieveLevelGoal(achieves.highestProducedAch)) {
+		while(stats.highestProduced >= NextAchieveLevelGoal(achieves.highestProducedAch)) {
+			achieves.highestProducedAch++;
+		}
+	}
 	if(stats.transferredThisLevel > stats.highestTransferred) {
 		stats.highestTransferred = stats.transferredThisLevel;
+	}
+	if(stats.highestTransferred >= NextAchieveLevelGoal(achieves.highestTransferredAch)) {
+		while(stats.highestTransferred >= NextAchieveLevelGoal(achieves.highestTransferredAch)) {
+			achieves.highestTransferredAch++;
+		}
+	}
+	if(highestLevel >= ((achieves.highestLevelAch + 1) * 10)) {
+		while(highestLevel >= ((achieves.highestLevelAch + 1) * 10)) {
+			achieves.highestLevelAch++;
+		}
+	}
+	if(stats.totalLevels >= ((achieves.totalLevelsAch + 1) * 10)) {
+		while(stats.totalLevels >= ((achieves.totalLevelsAch + 1) * 10)) {
+			achieves.totalLevelsAch++;
+		}
 	}
 	stats.ticksThisLevel = 0;	
 	stats.producedThisLevel = 0;
@@ -425,6 +445,16 @@ function tickStats() {
 			achieves.totalTicksAch++;
 		}
 	}
+	if(stats.totalProduced >= NextAchieveLevelGoal(achieves.totalProducedAch)) {
+		while(stats.totalProduced >= NextAchieveLevelGoal(achieves.totalProducedAch)) {
+			achieves.totalProducedAch++;
+		}
+	}
+	if(stats.totalTransferred >= NextAchieveLevelGoal(achieves.totalTransferredAch)) {
+		while(stats.totalTransferred >= NextAchieveLevelGoal(achieves.totalTransferredAch)) {
+			achieves.totalTransferredAch++;
+		}
+	}
 }
 function NextAchieveLevelGoal(achievement) {
 		return(10 * Math.pow(10, achievement))
@@ -437,5 +467,11 @@ function calcTotalAchieveBonus() {
 	var totalAchieveBonus = 0;
 	totalAchieveBonus += calcAchieveBonus(achieves.highestTicksAch);
 	totalAchieveBonus += calcAchieveBonus(achieves.totalTicksAch);
+	totalAchieveBonus += calcAchieveBonus(achieves.highestProducedAch);
+	totalAchieveBonus += calcAchieveBonus(achieves.totalProducedAch);
+	totalAchieveBonus += calcAchieveBonus(achieves.highestTransferredAch);
+	totalAchieveBonus += calcAchieveBonus(achieves.totalTransferredAch);
+	totalAchieveBonus += calcAchieveBonus(achieves.highestLevelAch);
+	totalAchieveBonus += calcAchieveBonus(achieves.totalLevelsAch);
 	return round2(totalAchieveBonus);
 }
