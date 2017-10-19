@@ -401,13 +401,12 @@ function doToAllSquares(functionToRun, onlyIsActive) {
 function statsUpdate() {
 	if(stats.ticksThisLevel > stats.highestTicks) {
 		stats.highestTicks = stats.ticksThisLevel;
-			if(stats.highestTicks >= NextAchieveLevelGoal(achieves.highestTicksAch)) {
-				while(stats.highestTicks >= NextAchieveLevelGoal(achieves.highestTicksAch)) {
-					achieves.highestTicksAch++;
-				}
-			}
 	}
-	
+	if(stats.highestTicks >= NextAchieveLevelGoal(achieves.highestTicksAch)) {
+		while(stats.highestTicks >= NextAchieveLevelGoal(achieves.highestTicksAch)) {
+			achieves.highestTicksAch++;
+		}
+	}
 	if(stats.producedThisLevel > stats.highestProduced) {
 		stats.highestProduced = stats.producedThisLevel;
 	}
