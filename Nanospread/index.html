@@ -56,25 +56,28 @@
 <div id="infoPanel" class="small" style="position:fixed;bottom:30px;height:210px;width:800px;background-color:#8194bd;z-index:999;display:none;overflow:auto;">
 	<div id="statsBox" style="display:none;">
 		<div style="padding:5px;">
-			Ticks:<br>
+			<div class="medium">Ticks:</div><div class="medium" style="margin-left:200px;">Total Achievement Bonus: </div><div id="totalAchievementBonus">0</div>%<br>
 			<div style="padding:5px;">
 				This Level: <div id="ticksThisLevel">0</div><br>
-				Total: <div id="totalTicks">0</div><br>
+				Highest: <div id="highestTicks">0</div>/<div id="highestTicksAchNextLvl">1 </div><div style="margin-left:100px;">Level: </div><div id="highestTicksAchLvl">0</div><div style="margin-left:50px;"> EP Bonus: </div><div id="highestTicksAchBonus">0</div><br>
+				Total: <div id="totalTicks">0</div>/<div id="totalTicksAchNextLvl">1 </div><div style="margin-left:100px;">Level: </div><div id="totalTicksAchLvl">0</div><div style="margin-left:50px;"> EP Bonus: </div><div id="totalTicksAchBonus">0</div><br>
 				Avg. Per Level: <div id="averageTicks">0</div>
 			</div><br><br>
-			Nanobot Production:<br>
+			<div class="medium">Nanobot Production:</div><br>
 			<div style="padding:5px;">
 				This Level: <div id="nanobotsProducedThisLevel">0</div><br>
+				Highest: <div id="highestProduced">0</div><br>
 				Total: <div id="totalProducedNanobots">0</div><br>
 				Avg. Per Level: <div id="averageProduced">0</div>
 			</div><br><br>
-			Nanobots Transferred:<br>
+			<div class="medium">Nanobots Transferred:</div><br>
 			<div style="padding:5px;">
 				This Level: <div id="nanobotsTransferredThisLevel">0</div><br>
+				Highest: <div id="highestTransferred">0</div><br>
 				Total: <div id="totalTransferredNanobots">0</div><br>
 				Avg. Per Level: <div id="averageTransferred">0</div>
 			</div><br><br>
-			Levels and EP:<br>
+			<div class="medium">Levels and EP:</div><br>
 			<div style="padding:5px;">
 				Highest Level: <div id="highestLevel">0</div><br>
 				Total Levels: <div id="totalLevels">0</div><br><br>
@@ -97,7 +100,7 @@
         </div>
 		<div style="padding:5px;">
             Switching levels or resetting will prestige you, removing most upgrades<br>
-            You will gain evolution points equal to (Level # + 1) * 1.3^(Lowest Square's Bonus)<br>
+            You will gain evolution points equal to ((Level # + 1) * 1.3^(Lowest Square's Bonus)) * (Achievement Bonus)<br>
             Each evolution point gives 5% more nanite production<br>
             Currently you will get <div id="evolutionGain">0</div> evolution points on new level<br>
             <input type="checkbox" id="levelConfirm" onclick="theView.updateLevel()">
@@ -212,7 +215,7 @@
     </div>
     <div id="infoBox" style="">
 
-        <div id="resourceTypeLabel" class="large">Nanites</div> <br>
+        <div id="resourceTypeLabel" class="large">Nanites</div><br>
         <div id="infoGrid" class="small">
             <div class="col" style="width:91px;text-align:right;margin-right:10px;">
                 <div class="row"></div>
@@ -267,14 +270,23 @@
                 <!--<div id="totalConsumeCost"></div>-->
             <!--</div>-->
         </div>
-		Autobuy <input type="checkbox" id="autobuyToggle" onclick="toggleAutobuy()">
-        <i id="closeButton" class="closeButton fa fa-close" onclick="select.deselectAll()"></i>
-        <i id="leftArrow" class="fa fa-arrow-circle-left arrow" onclick="changeDirectionOfSelected('West')"></i>
-        <i id="rightArrow" class="fa fa-arrow-circle-right arrow" onclick="changeDirectionOfSelected('East')"></i>
-        <i id="upArrow" class="fa fa-arrow-circle-up arrow" onclick="changeDirectionOfSelected('North')"></i>
-        <i id="downArrow" class="fa fa-arrow-circle-down arrow" onclick="changeDirectionOfSelected('South')"></i>
-
-        <div id="buttonContainer">
+		<div id="autobuyContainer" style="padding:5px;position:absolute;">
+			Autobuy 
+			<div id="autobuyToggleContainer">
+                <div id="autobuyOff" class="autobuyToggle" onclick="toggleAutobuy(0)" style="background-color:#ff4400">Off</div>
+                <div id="autobuyOn" class="autobuyToggle" onclick="toggleAutobuy(1)">On</div>
+			</div><br>
+			Amount
+			<div id="autobuyAmountOptionContainer">
+                <div id="autobuy1" class="autobuyAmountOption" onclick="autobuyAmountOption(1)" style="background-color:#ff4400">1</div>
+                <div id="autobuy5" class="autobuyAmountOption" onclick="autobuyAmountOption(5)">5</div>
+                <div id="autobuy10" class="autobuyAmountOption" onclick="autobuyAmountOption(10)">10</div>
+                <div id="autobuy25" class="autobuyAmountOption" onclick="autobuyAmountOption(25)">25</div>
+                <div id="autobuy50" class="autobuyAmountOption" onclick="autobuyAmountOption(50)">50</div>
+                <div id="autobuy100" class="autobuyAmountOption" onclick="autobuyAmountOption(100)">100</div>
+            </div>
+		</div>
+		<div id="buttonContainer">
             Buy Per Click:
             <div id="buyAmountOptionContainer">
                 <div id="buy1" class="buyAmountOption" onclick="buyAmountOption(1)" style="background-color:#ff4400">1</div>
@@ -298,7 +310,14 @@
                 <div id="advBotSpecialNext"></div>
                 <div id="numSelectedAdvBotsButtonBuyable" style="position:absolute;right:5px;top:2px;"></div>
             </div>
-        </div>
+        </div>		
+        <i id="closeButton" class="closeButton fa fa-close" onclick="select.deselectAll()"></i>
+        <i id="leftArrow" class="fa fa-arrow-circle-left arrow" onclick="changeDirectionOfSelected('West')"></i>
+        <i id="rightArrow" class="fa fa-arrow-circle-right arrow" onclick="changeDirectionOfSelected('East')"></i>
+        <i id="upArrow" class="fa fa-arrow-circle-up arrow" onclick="changeDirectionOfSelected('North')"></i>
+        <i id="downArrow" class="fa fa-arrow-circle-down arrow" onclick="changeDirectionOfSelected('South')"></i>
+
+        
 
     </div>
 

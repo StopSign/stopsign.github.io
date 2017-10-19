@@ -21,7 +21,7 @@ var select = new Select();
 var isDragging = false;
 var currentLevel = 0; //SWITCH LEVELS
 var highestLevel;
-var bonuses, autobuy, stats;
+var bonuses, autobuy, stats, achieves;
 
 function clearSave() {
     window.localStorage.version4 = "";
@@ -30,6 +30,8 @@ function clearSave() {
 
 function loadDefaults() {
     settings.buyPerClick = 1;
+	settings.autobuyToggle = 0;
+	settings.autobuyPerTick = 1;
     settings.selectedResourceNum = 0;
 
     settings.selectOneOrMultiple = 0;
@@ -42,8 +44,9 @@ function loadDefaults() {
     bonuses = { points:0, availableEP:0};
     autobuy = {};
     resetEPUpgrades();
-	stats = { ticksThisLevel:0, totalTicks:0, producedThisLevel:0, totalProduced:0, transferredThisLevel:0, totalTransferred:0, totalLevels:0};
-}
+	stats = { ticksThisLevel:0, totalTicks:0, producedThisLevel:0, totalProduced:0, transferredThisLevel:0, totalTransferred:0, totalLevels:0, highestTicks:0, highestProduced:0, highestTransferred:0};
+	achieves = { highestTicksAch:0, totalTicksAch:0, highestProductionAch:0, totalProductionAch:0, highestTransferredAch:0, totalTransferredAch:0, highestLevelAch:0, totalLevelsAch:0};
+	} 
 
 function resetEPUpgrades() {
     bonuses.tickSpeedLevel = 1;
@@ -51,7 +54,6 @@ function resetEPUpgrades() {
     bonuses.discountLevel = 0;
     autobuy.currentMax = 1;
     autobuy.amtToSpend = 1;
-	autobuy.toggle = 0;
 }
 
 function toggleIMessedUpPopup1() { //Let's hope there's not more
@@ -99,6 +101,11 @@ function load() {
             stats[property] = toLoad.stats[property];
         }
     }
+	for(property in toLoad.achieves) {
+        if (toLoad.achieves.hasOwnProperty(property)) {
+            achieves[property] = toLoad.achieves[property];
+        }
+    }
     createGridFromSave(toLoad.theGrid);
 
     settings = toLoad.settings;
@@ -119,6 +126,7 @@ function save() {
     toSave.bonuses = bonuses;
 	toSave.autobuy = autobuy;
 	toSave.stats = stats;
+	toSave.achieves = achieves;
     // console.log('saved');
     window.localStorage.version4 = JSON.stringify(toSave);
 }

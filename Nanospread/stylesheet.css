@@ -71,10 +71,10 @@ body {
 }
 
 #buttonContainer {
-    left:40%;
-    width:56%;
+    width:50%;
     position:absolute;
     top:100px;
+	padding:5px;
 }
 .closeButton {
     position:absolute;
@@ -128,6 +128,42 @@ input, label {
     background-color:#A5704A !important;
 }
 #buyAmountOptionContainer {
+    position:relative;
+    background-color: #434d62;
+    margin-bottom:3px;
+    padding:3px;
+}
+
+.autobuyToggle {
+    border-radius:5px;
+    width:30px;
+    text-align:center;
+    font-size:14px;
+    font-weight:bold;
+    background-color:grey;
+    padding:1px;
+    cursor:pointer;
+}
+	
+#autobuyToggleContainer {
+    position:relative;
+    background-color: #434d62;
+    margin-bottom:3px;
+    padding:3px;
+}
+
+.autobuyAmountOption {
+    border-radius:5px;
+    width:30px;
+    text-align:center;
+    font-size:14px;
+    font-weight:bold;
+    background-color:grey;
+    padding:1px;
+    cursor:pointer;
+}
+
+#autobuyAmountOptionContainer {
     position:relative;
     background-color: #434d62;
     margin-bottom:3px;

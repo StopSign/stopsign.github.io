@@ -83,12 +83,11 @@ function tick() {
         return;
     }
     timer++;
-	stats.ticksThisLevel++;
-	stats.totalTicks++;
+	tickStats();
     handleFPSDifference();
     clearNanitesReceived();
     sendNanites();
-	if(autobuy.toggle === 1) {
+	if(settings.autobuyToggle === 1) {
 		autobuyLevels();
 	}
     if(!theView) {
@@ -103,18 +102,10 @@ function tick() {
 
 function autobuyLevels() {
     doToAllSquares(function (square) {
-        if(square.naniteAmount < autobuy.currentMax && (square.nanites * (autobuy.amtToSpend / 100)) >= square.naniteCost ) {
-            square.buyNanites();
+        if((square.naniteAmount + settings.autobuyPerTick) <= autobuy.currentMax && (square.nanites * (autobuy.amtToSpend / 100)) >= square.naniteCostAfterMultiBuy(settings.autobuyPerTick)) {
+            square.autobuyMultipleNanites(settings.autobuyPerTick);
         }
     }, true);
-}
-
-function toggleAutobuy() {
-	if(autobuy.toggle === 0) {
-		autobuy.toggle = 1;
-	} else {
-		autobuy.toggle = 0;
-	}
 }
 
 function clearNanitesReceived() {
@@ -285,9 +276,7 @@ function changeLevel(newLevel) {
         resetBonusPoints();
     }
     currentLevel = newLevel;
-	stats.ticksThisLevel = 0;
-	stats.producedThisLevel = 0;
-	stats.transferredThisLevel = 0;
+	statsUpdate();
     createGrid();
     theView.createGrid();
 	setTransferRate(bonuses.transferRateLevel);
@@ -308,7 +297,7 @@ function calcEvolutionPointGain() {
         highestLevel++;
         console.log('level up!');
     }
-    return bonus === 0 ? 0 : (currentLevel+1) * Math.pow(1.3, bonus);
+    return bonus === 0 ? 0 : ((currentLevel+1) * Math.pow(1.3, bonus) * (1 + (calcTotalAchieveBonus() / 100)));
 }
 
 function recalcInterval(newSpeed) {
@@ -406,4 +395,47 @@ function doToAllSquares(functionToRun, onlyIsActive) {
             }
         }
     }
+}
+
+function statsUpdate() {
+	if(stats.ticksThisLevel > stats.highestTicks) {
+		stats.highestTicks = stats.ticksThisLevel;
+	}
+	if(stats.highestTicks >= NextAchieveLevelGoal(achieves.highestTicksAch)) {
+		while(stats.highestTicks >= NextAchieveLevelGoal(achieves.highestTicksAch)) {
+			achieves.highestTicksAch++;
+		}
+	}
+	if(stats.producedThisLevel > stats.highestProduced) {
+		stats.highestProduced = stats.producedThisLevel;
+	}
+	if(stats.transferredThisLevel > stats.highestTransferred) {
+		stats.highestTransferred = stats.transferredThisLevel;
+	}
+	stats.ticksThisLevel = 0;	
+	stats.producedThisLevel = 0;
+	stats.transferredThisLevel = 0;
+}
+
+function tickStats() {
+	stats.ticksThisLevel++;
+	stats.totalTicks++;
+	if(stats.totalTicks >= NextAchieveLevelGoal(achieves.totalTicksAch)) {
+		while(stats.totalTicks >= NextAchieveLevelGoal(achieves.totalTicksAch)) {
+			achieves.totalTicksAch++;
+		}
+	}
+}
+function NextAchieveLevelGoal(achievement) {
+		return(10 * Math.pow(10, achievement))
+}
+
+function calcAchieveBonus(achievement) {
+		return(achievement * ((0.1 + (achievement * 0.1)) / 2));
+}
+function calcTotalAchieveBonus() {
+	var totalAchieveBonus = 0;
+	totalAchieveBonus += calcAchieveBonus(achieves.highestTicksAch);
+	totalAchieveBonus += calcAchieveBonus(achieves.totalTicksAch);
+	return round2(totalAchieveBonus);
 }

@@ -438,13 +438,23 @@ function View() {
 		document.getElementById('buyAbAmtToSpendCost').innerHTML = intToString(getAbAmtToSpendCost());
     };
 	this.updateStats = function() {
+		document.getElementById('totalAchievementBonus').innerHTML = intToString(calcTotalAchieveBonus());
         document.getElementById('ticksThisLevel').innerHTML = intToString(stats.ticksThisLevel);
+		document.getElementById('highestTicks').innerHTML = intToString(stats.highestTicks);
+		document.getElementById('highestTicksAchNextLvl').innerHTML = intToString(NextAchieveLevelGoal(achieves.highestTicksAch));
+		document.getElementById('highestTicksAchLvl').innerHTML = intToString(achieves.highestTicksAch);
+		document.getElementById('highestTicksAchBonus').innerHTML = intToString(calcAchieveBonus(achieves.highestTicksAch));
         document.getElementById('totalTicks').innerHTML = intToString(stats.totalTicks);
+		document.getElementById('totalTicksAchNextLvl').innerHTML = intToString(NextAchieveLevelGoal(achieves.totalTicksAch));
+		document.getElementById('totalTicksAchLvl').innerHTML = intToString(achieves.totalTicksAch);
+		document.getElementById('totalTicksAchBonus').innerHTML = intToString(calcAchieveBonus(achieves.totalTicksAch));
 		document.getElementById('averageTicks').innerHTML = intToString(stats.totalTicks / stats.totalLevels);
         document.getElementById('nanobotsProducedThisLevel').innerHTML = intToString(stats.producedThisLevel);
+		document.getElementById('highestProduced').innerHTML = intToString(stats.highestProduced);
         document.getElementById('totalProducedNanobots').innerHTML = intToString(stats.totalProduced);
 		document.getElementById('averageProduced').innerHTML = intToString(stats.totalProduced / stats.totalLevels);
         document.getElementById('nanobotsTransferredThisLevel').innerHTML = intToString(stats.transferredThisLevel);
+		document.getElementById('highestTransferred').innerHTML = intToString(stats.highestTransferred);
 		document.getElementById('totalTransferredNanobots').innerHTML = intToString(stats.totalTransferred);
 		document.getElementById('averageTransferred').innerHTML = intToString(stats.totalTransferred / stats.totalLevels);
 		document.getElementById('highestLevel').innerHTML = intToString(highestLevel);
