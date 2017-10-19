@@ -425,3 +425,8 @@ function NextAchieveLevelGoal(achievement) {
 function calcAchieveBonus(achievement) {
 		return(achievement * ((0.1 + (achievement * 0.1)) / 2));
 }
+function calcTotalAchieveBonus() {
+	var totalAchieveBonus = 0;
+	totalAchieveBonus += calcAchieveBonus(achieves.highestTicksAch);
+	return(totalAchieveBonus);
+}

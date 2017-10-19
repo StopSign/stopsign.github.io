@@ -438,6 +438,7 @@ function View() {
 		document.getElementById('buyAbAmtToSpendCost').innerHTML = intToString(getAbAmtToSpendCost());
     };
 	this.updateStats = function() {
+		document.getElementById('totalAchievementBonus').innerHTML = intToString(calcTotalAchievementBonus());
         document.getElementById('ticksThisLevel').innerHTML = intToString(stats.ticksThisLevel);
 		document.getElementById('highestTicks').innerHTML = intToString(stats.highestTicks);
 		document.getElementById('highestTicksAchNextLvl').innerHTML = intToString(NextAchieveLevelGoal(achieves.highestTicksAch));
