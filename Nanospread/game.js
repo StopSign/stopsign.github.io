@@ -416,3 +416,7 @@ function statsUpdate() {
 function NextAchieveLevelGoal(achievement) {
 		return(10 * Math.pow(10, achievement))
 }
+
+function calcAchieveBonus(achievement) {
+		return(achievement * ((0.1 + (achievement * 0.1)) / 2));
+}
