@@ -439,12 +439,15 @@ function View() {
     };
 	this.updateStats = function() {
         document.getElementById('ticksThisLevel').innerHTML = intToString(stats.ticksThisLevel);
+		document.getElementById('highestTicks').innerHTML = intToString(stats.highestTicks);
         document.getElementById('totalTicks').innerHTML = intToString(stats.totalTicks);
 		document.getElementById('averageTicks').innerHTML = intToString(stats.totalTicks / stats.totalLevels);
         document.getElementById('nanobotsProducedThisLevel').innerHTML = intToString(stats.producedThisLevel);
+		document.getElementById('highestProduced').innerHTML = intToString(stats.highestProduced);
         document.getElementById('totalProducedNanobots').innerHTML = intToString(stats.totalProduced);
 		document.getElementById('averageProduced').innerHTML = intToString(stats.totalProduced / stats.totalLevels);
         document.getElementById('nanobotsTransferredThisLevel').innerHTML = intToString(stats.transferredThisLevel);
+		document.getElementById('highestTransferred').innerHTML = intToString(stats.highestTransferred);
 		document.getElementById('totalTransferredNanobots').innerHTML = intToString(stats.totalTransferred);
 		document.getElementById('averageTransferred').innerHTML = intToString(stats.totalTransferred / stats.totalLevels);
 		document.getElementById('highestLevel').innerHTML = intToString(highestLevel);

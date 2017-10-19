@@ -44,7 +44,7 @@ function loadDefaults() {
     bonuses = { points:0, availableEP:0};
     autobuy = {};
     resetEPUpgrades();
-	stats = { ticksThisLevel:0, totalTicks:0, producedThisLevel:0, totalProduced:0, transferredThisLevel:0, totalTransferred:0, totalLevels:0};
+	stats = { ticksThisLevel:0, totalTicks:0, producedThisLevel:0, totalProduced:0, transferredThisLevel:0, totalTransferred:0, totalLevels:0, highestTicks:0, highestProduced:0, highestTransferred:0};
 }
 
 function resetEPUpgrades() {

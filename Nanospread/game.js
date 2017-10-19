@@ -277,9 +277,7 @@ function changeLevel(newLevel) {
         resetBonusPoints();
     }
     currentLevel = newLevel;
-	stats.ticksThisLevel = 0;
-	stats.producedThisLevel = 0;
-	stats.transferredThisLevel = 0;
+	statsUpdate();
     createGrid();
     theView.createGrid();
 	setTransferRate(bonuses.transferRateLevel);
@@ -399,3 +397,19 @@ function doToAllSquares(functionToRun, onlyIsActive) {
         }
     }
 }
+
+function statsUpdate() {
+	if(stats.ticksThisLevel > stats.highestTicks) {
+		stats.highestTicks = stats.ticksThisLevel;
+	}
+	if(stats.producedThisLevel > stats.highestProduced) {
+		stats.highestProduced = stats.producedThisLevel;
+	}
+	if(stats.transferredThisLevel > stats.highestTransferred) {
+		stats.highestTransferred = stats.transferredThisLevel;
+	}
+	stats.ticksThisLevel = 0;	
+	stats.producedThisLevel = 0;
+	stats.transferredThisLevel = 0;
+}
+		
