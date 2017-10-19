@@ -428,5 +428,5 @@ function calcAchieveBonus(achievement) {
 function calcTotalAchieveBonus() {
 	var totalAchieveBonus = 0;
 	totalAchieveBonus += calcAchieveBonus(achieves.highestTicksAch);
-	return(totalAchieveBonus);
+	return round2(totalAchieveBonus);
 }
