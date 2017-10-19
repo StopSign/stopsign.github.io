@@ -406,8 +406,8 @@ function statsUpdate() {
 					achieves.highestTicksAch++;
 				}
 			}
-		}
 	}
+	
 	if(stats.producedThisLevel > stats.highestProduced) {
 		stats.highestProduced = stats.producedThisLevel;
 	}
