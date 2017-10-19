@@ -242,3 +242,25 @@ input, label {
     -ms-transform: rotate(90deg);
     transform: rotate(90deg);
 }
+
+.derivContainer {
+    margin-left:20px;
+    display:block;
+}
+
+.outerDerivBar {
+    width:100px;
+    height:20px;
+    background-color:black;
+    margin-bottom:5px;
+}
+
+.innerDerivBar {
+    width:60%;
+    height:16px;
+    margin-top:2px;
+    background-color:red;
+}
+.derivLabel {
+    width:130px;
+}

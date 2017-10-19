@@ -44,9 +44,10 @@ function loadDefaults() {
     bonuses = { points:0, availableEP:0};
     autobuy = {};
     resetEPUpgrades();
+    resetDerivBonuses();
 	stats = { ticksThisLevel:0, totalTicks:0, producedThisLevel:0, totalProduced:0, transferredThisLevel:0, totalTransferred:0, totalLevels:0, highestTicks:0, highestProduced:0, highestTransferred:0};
 	achieves = { highestTicksAch:0, totalTicksAch:0, highestProductionAch:0, totalProductionAch:0, highestTransferredAch:0, totalTransferredAch:0, highestLevelAch:0, totalLevelsAch:0};
-	} 
+	}
 
 function resetEPUpgrades() {
     bonuses.tickSpeedLevel = 1;
@@ -54,6 +55,20 @@ function resetEPUpgrades() {
     bonuses.discountLevel = 0;
     autobuy.currentMax = 1;
     autobuy.amtToSpend = 1;
+}
+
+function resetDerivBonuses() {
+    //TODO reset on level change
+    bonuses.growthBonus = 1;
+    bonuses.derivBonuses = [];
+    for(var x = 0; x < 5; x++) { //5 to start
+        bonuses.derivBonuses[x] = {
+            ticksNeeded:x===0?1:Math.pow(2, (x-1))*5,
+            currentTicks:0,
+            gainMultiplier:1,
+            amount:0
+        }
+    }
 }
 
 function toggleIMessedUpPopup1() { //Let's hope there's not more

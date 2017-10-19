@@ -125,8 +125,8 @@ function closeMenus() {
     document.getElementById('infoBox').style.display = "none";
     document.getElementById('buildBox').style.display = "none";
     document.getElementById('levelBox').style.display = "none";
-	document.getElementById('upgradeBox').style.display = "none";
-	document.getElementById('statsBox').style.display = "none";
+  	document.getElementById('upgradeBox').style.display = "none";
+  	document.getElementById('statsBox').style.display = "none";
     document.getElementById('settingsBox').style.display = "none";
     document.getElementById('helpBox').style.display = "none";
     document.getElementById('infoPanel').style.display = "none";
@@ -164,14 +164,14 @@ function buyAmountOption(num) {
 }
 
 function toggleAutobuy(setting) {
-	settings.autobuyToggle = setting;
-	if(settings.autobuyToggle === 1) {
-		document.getElementById('autobuyOn').style.backgroundColor = "green";
-		document.getElementById('autobuyOff').style.backgroundColor = "grey";
-	} else {
-		document.getElementById('autobuyOff').style.backgroundColor = "red";
-		document.getElementById('autobuyOn').style.backgroundColor = "grey";
-	}
+    settings.autobuyToggle = setting;
+    if(settings.autobuyToggle === 1) {
+        document.getElementById('autobuyOn').style.backgroundColor = "green";
+        document.getElementById('autobuyOff').style.backgroundColor = "grey";
+    } else {
+        document.getElementById('autobuyOff').style.backgroundColor = "red";
+        document.getElementById('autobuyOn').style.backgroundColor = "grey";
+    }
 }
 
 function autobuyAmountOption(num) {
