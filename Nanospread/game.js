@@ -276,12 +276,31 @@ function changeLevel(newLevel) {
     if(document.getElementById('resetAvailableEP').checked) {
         resetBonusPoints();
     }
+    var keepDirections;
+    if(newLevel === currentLevel) {
+        keepDirections = theGrid;
+    }
     currentLevel = newLevel;
 	statsUpdate();
     createGrid();
     theView.createGrid();
+    if(keepDirections) {
+        applyDirectionsToGrid(keepDirections);
+    }
 	setTransferRate(bonuses.transferRateLevel);
     theView.update();
+}
+
+function applyDirectionsToGrid(tempGrid) {
+    for (var column = 0; column < theGrid.length; column++) {
+        for (var row = 0; row < theGrid[column].length; row++) {
+            var oldSquare = tempGrid[column][row];
+            var square = theGrid[column][row];
+            if(oldSquare && square) {
+                square.changeTargetDirection(oldSquare.transferDirection);
+            }
+        }
+    }
 }
 
 function calcEvolutionPointGain() {
