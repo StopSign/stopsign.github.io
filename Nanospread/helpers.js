@@ -13,6 +13,10 @@ function round2(num) {
     return Math.floor(num*100)/100
 }
 
+function precision2(num) {
+    return Number(num.toPrecision(2));
+}
+
 function round(num) {
     return formatNumber(num);
 } function formatNumber(num) {
@@ -90,9 +94,19 @@ function nFormatter(num, digits) {
         { value: 1E3,  symbol: "K" }
     ], rx = /\.0+$|(\.[0-9]*[1-9])0+$/, i;
     for (i = 0; i < si.length; i++) {
-        if ((num) >= si[i].value / 1.005) { // /1.005 to handle rounding
+        if ((num) >= si[i].value / 1.000501) { // /1.000501 to handle rounding
             return (num / si[i].value).toPrecision(digits).replace(rx, "$1") + si[i].symbol;
         }
     }
     return num.toPrecision(digits).replace(rx, "$1");
 }
+
+var factorials = [];
+function factorial(n) {
+    if (n === 0 || n === 1)
+        return 1;
+    if (factorials[n] > 0)
+        return factorials[n];
+    return factorials[n] = factorial(n-1) * n;
+}
+

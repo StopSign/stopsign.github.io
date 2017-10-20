@@ -44,10 +44,11 @@ function loadDefaults() {
     bonuses = { points:0, availableEP:0};
     autobuy = {};
     resetEPUpgrades();
+    bonuses.derivs = [];
     resetDerivBonuses();
 	stats = { ticksThisLevel:0, totalTicks:0, producedThisLevel:0, totalProduced:0, transferredThisLevel:0, totalTransferred:0, totalLevels:0, highestTicks:0, highestProduced:0, highestTransferred:0};
 	achieves = { highestTicksAch:0, totalTicksAch:0, highestProductionAch:0, totalProductionAch:0, highestTransferredAch:0, totalTransferredAch:0, highestLevelAch:0, totalLevelsAch:0};
-	}
+}
 
 function resetEPUpgrades() {
     bonuses.tickSpeedLevel = 1;
@@ -55,20 +56,6 @@ function resetEPUpgrades() {
     bonuses.discountLevel = 0;
     autobuy.currentMax = 1;
     autobuy.amtToSpend = 1;
-}
-
-function resetDerivBonuses() {
-    //TODO reset on level change
-    bonuses.growthBonus = 1;
-    bonuses.derivBonuses = [];
-    for(var x = 0; x < 5; x++) { //5 to start
-        bonuses.derivBonuses[x] = {
-            ticksNeeded:x===0?1:Math.pow(2, (x-1))*5,
-            currentTicks:0,
-            gainMultiplier:1,
-            amount:0
-        }
-    }
 }
 
 function toggleIMessedUpPopup1() { //Let's hope there's not more
@@ -83,10 +70,11 @@ function load() {
     loadDefaults();
     if (!window.localStorage.version4) { //New players to the game
         createGrid();
-        if(theView) { //handles clearing the save mid-game
-            theView.createGrid();
-            theView.update();
+        if(!theView) {
+            theView = new View();
         }
+        theView.createGrid();
+        theView.update();
         recalcInterval(bonuses.tickSpeedLevel);
         if(window.localStorage.version3) { //New players to version 4
             var oldLoad = JSON.parse(window.localStorage.version3);
@@ -99,7 +87,6 @@ function load() {
             window.localStorage.version3 = "";
         }
         openHelpBox();
-
         return;
     }
     var toLoad = JSON.parse(window.localStorage.version4);
@@ -111,6 +98,7 @@ function load() {
             bonuses[property] = toLoad.bonuses[property];
         }
     }
+
     for(property in toLoad.autobuy) {
         if (toLoad.autobuy.hasOwnProperty(property)) {
             autobuy[property] = toLoad.autobuy[property];
@@ -126,15 +114,13 @@ function load() {
             achieves[property] = toLoad.achieves[property];
         }
     }
-    createGridFromSave(toLoad.theGrid);
-    theView = new View();
-    theView.update();
 
     settings = toLoad.settings;
     highestLevel = toLoad.highestLevel;
-
     settings.buyPerClick = 1; //resets on refresh
     settings.selectedResourceNum = 0;
+
+    createGridFromSave(toLoad.theGrid);
     setTransferRate(bonuses.transferRateLevel);
     recalcInterval(bonuses.tickSpeedLevel);
 }

@@ -19,6 +19,8 @@ function createGridFromSave(savedGrid) {
             }
         }
     }
+
+    theView = new View();
 }
 
 
@@ -76,7 +78,6 @@ function createGrid() {
     var startingSquare = theGrid[startingCoords.x][startingCoords.y];
     startingSquare.gainNanites(startingSquare.consumeCost);
 }
-
 
 function tick() {
     if(stop) {
@@ -262,6 +263,7 @@ function changeLevel(newLevel) {
         console.log('level change blocked');
         return;
     }
+    resetDerivBonuses();
     document.getElementById('levelConfirm').checked = "";
     theView.setSelectedFalse();
     var EPGain = calcEvolutionPointGain();
@@ -332,7 +334,7 @@ function buyTickSpeed() {
 }
 
 function getTickSpeedCost() {
-    return round2(50 * Math.pow(2, (bonuses.tickSpeedLevel - 1)*5));
+    return precision2(50 * Math.pow(2, (bonuses.tickSpeedLevel - 1)*5));
 }
 
 function setTransferRate(newRate) {
@@ -351,7 +353,7 @@ function buyTransferRate() {
 }
 
 function getTransferRateCost() {
-    return round2(15 * Math.pow(2, bonuses.transferRateLevel - 1));
+    return precision2(15 * Math.pow(2, bonuses.transferRateLevel - 1));
 }
 
 function buyDiscountLevel() {
@@ -370,11 +372,11 @@ function getCostReduction(discountLevel) {
 }
 
 function getDiscountCost() {
-    return round2(Math.pow(1.01, bonuses.discountLevel) * Math.pow(bonuses.discountLevel+1, 2)); // 1.01^n * (n+1)^2
+    return precision2(Math.pow(1.01, bonuses.discountLevel) * Math.pow(bonuses.discountLevel+1, 2)); // 1.01^n * (n+1)^2
 }
 
 function buyAbMaxLevel() {
-    if(autobuy.currentMax < highestLevel*2 && bonuses.availableEP >= getAbMaxCost()) {
+    if(autobuy.currentMax < highestLevel * 5 && bonuses.availableEP >= getAbMaxCost()) {
 		bonuses.availableEP -= getAbMaxCost();
 		autobuy.currentMax++;
     }
@@ -382,7 +384,7 @@ function buyAbMaxLevel() {
 }
 
 function getAbMaxCost() {
-    return round2(10 * autobuy.currentMax);
+    return precision2(10 * autobuy.currentMax);
 }
 
 function buyAbAmtToSpendLevel() {
@@ -394,7 +396,7 @@ function buyAbAmtToSpendLevel() {
 }
 
 function getAbAmtToSpendCost() {
-    return round2(25 * autobuy.amtToSpend);
+    return precision2(25 * autobuy.amtToSpend);
 }
 
 function resetBonusPoints() {
@@ -418,8 +420,8 @@ function statsUpdate() {
 	if(stats.ticksThisLevel > stats.highestTicks) {
 		stats.highestTicks = stats.ticksThisLevel;
 	}
-	if(stats.highestTicks >= NextAchieveLevelGoal(achieves.highestTicksAch)) {
-		while(stats.highestTicks >= NextAchieveLevelGoal(achieves.highestTicksAch)) {
+	if(stats.highestTicks >= nextAchieveLevelGoal(achieves.highestTicksAch)) {
+		while(stats.highestTicks >= nextAchieveLevelGoal(achieves.highestTicksAch)) {
 			achieves.highestTicksAch++;
 		}
 	}
@@ -437,19 +439,20 @@ function statsUpdate() {
 function tickStats() {
 	stats.ticksThisLevel++;
 	stats.totalTicks++;
-	if(stats.totalTicks >= NextAchieveLevelGoal(achieves.totalTicksAch)) {
-		while(stats.totalTicks >= NextAchieveLevelGoal(achieves.totalTicksAch)) {
+	if(stats.totalTicks >= nextAchieveLevelGoal(achieves.totalTicksAch)) {
+		while(stats.totalTicks >= nextAchieveLevelGoal(achieves.totalTicksAch)) {
 			achieves.totalTicksAch++;
 		}
 	}
 }
-function NextAchieveLevelGoal(achievement) {
-		return(10 * Math.pow(10, achievement))
+function nextAchieveLevelGoal(achievement) {
+	return 10 * Math.pow(10, achievement);
 }
 
 function calcAchieveBonus(achievement) {
-		return(achievement * ((0.1 + (achievement * 0.1)) / 2));
+    return achievement * ((0.1 + (achievement * 0.1)) / 2);
 }
+
 function calcTotalAchieveBonus() {
 	var totalAchieveBonus = 0;
 	totalAchieveBonus += calcAchieveBonus(achieves.highestTicksAch);
@@ -458,19 +461,52 @@ function calcTotalAchieveBonus() {
 }
 
 function tickGrowth() {
-    //TODO calculate from last to first instead of first to last
-    for(var x = 0; x < bonuses.derivBonuses.length; x++) {
-        var deriv = bonuses.derivBonuses[x];
+    for(var x = bonuses.derivs.length - 1; x >= 0; x--) {
+        var deriv = bonuses.derivs[x];
         deriv.currentTicks++;
         if(deriv.currentTicks >= deriv.ticksNeeded) {
             deriv.currentTicks -= deriv.ticksNeeded;
             if(x === 0) {
                 //deriv.amount  deriv.gainMultiplier
-                bonuses.growthBonus += (deriv.amount * deriv.gainMultiplier) / 100;
+                bonuses.growthBonus += (deriv.amount * Math.pow(2, deriv.upgradeAmount)) / 100;
                 continue;
             }
-            var prevDeriv = bonuses.derivBonuses[x-1];
-            prevDeriv.amount += deriv.amount * deriv.gainMultiplier;
+            var prevDeriv = bonuses.derivs[x-1];
+            prevDeriv.amount += deriv.amount * Math.pow(2, deriv.upgradeAmount);
         }
     }
+}
+
+function resetDerivBonuses() {
+    bonuses.growthBonus = 1;
+    for(var x = 0; x < bonuses.derivs.length; x++) {
+        bonuses.derivs[x].ticksNeeded = x === 0 ? 1 : Math.pow(2, (x-1))*5;
+        bonuses.derivs[x].currentTicks = 0;
+        bonuses.derivs[x].upgradeAmount = 0;
+        bonuses.derivs[x].amount = 1;
+    }
+}
+
+function calcCostForNextDeriv() {
+    return precision2(factorial(bonuses.derivs.length+4)*4.2); //Starts at 100
+}
+
+function buyNextDeriv() {
+    var cost = calcCostForNextDeriv();
+    if(bonuses.availableEP >= cost) {
+        bonuses.availableEP -= cost;
+        bonuses.points -= cost;
+        addDeriv();
+    }
+}
+
+function addDeriv() {
+    var pos = bonuses.derivs.length;
+    bonuses.derivs[pos] = {};
+    var newDeriv = bonuses.derivs[pos];
+    newDeriv.ticksNeeded = pos === 0 ? 1 : Math.pow(2, (pos-1))*5;
+    newDeriv.currentTicks = 0;
+    newDeriv.upgradeAmount = 0;
+    newDeriv.amount = 1;
+    theView.recreateDerivs();
 }
