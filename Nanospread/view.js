@@ -498,8 +498,13 @@ function getActiveBackgroundColor(nanites) {
     return colorShiftMath(360, Math.log10(nanites));
 }
 function getInactiveBackgroundColor(consumeCost) {
-    //TODO handle very large consumeCost amounts via color changes
-    return "hsl(120, 88%, 13%)";
+    if(consumeCost < 1e11) {
+        return "hsl(120, 88%, 17%)";
+    } else {
+        var newColor = (Math.log10(consumeCost)-11)*10 + 120;
+        return "hsl("+newColor+", 88%, 17%)";
+    }
+
 }
 
 function buttonSetup(type, typeUpper, label) { //lol javascript
