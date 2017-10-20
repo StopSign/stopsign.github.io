@@ -32,7 +32,7 @@ function createGrid() {
     var wrapAroundLevel = currentLevel % levelData.length;
 
     var currentLevelGrid = levelData[wrapAroundLevel].grid;
-    var goalCost = Math.pow(1.5, currentLevel) * 1000000000;
+    var goalCost = Math.pow(1.5, currentLevel) * 100000000;
 
     var totalFromLevelData = 0;
     for(var column = 0; column < currentLevelGrid[0].length; column++) {
@@ -91,10 +91,7 @@ function tick() {
 	if(settings.autobuyToggle === 1) {
 		autobuyLevels();
 	}
-    if(!theView) {
-        theView = new View();
-    }
-    theView.update();
+	theView.update();
 
     if(timer % 10 === 0) {
         save();
@@ -143,7 +140,6 @@ function sendNanites() {
 function getNaniteGainBonus() {
     return ((bonuses.points * 5)+100)/100 * bonuses.growthBonus;
 }
-
 
 function clickedSquare(col, row) {
     var square = theGrid[col][row];
@@ -201,6 +197,7 @@ function buyAll() {
         }
     }
 }
+
 function buyNanitesButtonPressed() {
     if(selected.length === 0) {
         return;
@@ -260,12 +257,12 @@ function handleFPSDifference() {
     }
 }
 
-
 function changeLevel(newLevel) {
     if(!document.getElementById('levelConfirm').checked || newLevel < 0 || newLevel > highestLevel) {
         console.log('level change blocked');
         return;
     }
+    document.getElementById('levelConfirm').checked = "";
     theView.setSelectedFalse();
     var EPGain = calcEvolutionPointGain();
     bonuses.points += EPGain;

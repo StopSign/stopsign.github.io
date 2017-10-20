@@ -19,8 +19,7 @@ var startingDragPoint = {};
 var endingDragPoint = {};
 var select = new Select();
 var isDragging = false;
-var currentLevel = 0; //SWITCH LEVELS
-var highestLevel;
+var currentLevel, highestLevel;
 var bonuses, autobuy, stats, achieves;
 
 function clearSave() {
@@ -40,6 +39,7 @@ function loadDefaults() {
     settings.selectAllOrLowestBorderColor = 0;
     settings.selectShowNoneOrNanitesOrAmount = 1;
     highestLevel = 0; //SHOULD BE 0 BEFORE COMMIT
+    currentLevel = 0;
 
     bonuses = { points:0, availableEP:0};
     autobuy = {};
@@ -83,6 +83,10 @@ function load() {
     loadDefaults();
     if (!window.localStorage.version4) { //New players to the game
         createGrid();
+        if(theView) { //handles clearing the save mid-game
+            theView.createGrid();
+            theView.update();
+        }
         recalcInterval(bonuses.tickSpeedLevel);
         if(window.localStorage.version3) { //New players to version 4
             var oldLoad = JSON.parse(window.localStorage.version3);
@@ -95,6 +99,7 @@ function load() {
             window.localStorage.version3 = "";
         }
         openHelpBox();
+
         return;
     }
     var toLoad = JSON.parse(window.localStorage.version4);
@@ -122,6 +127,8 @@ function load() {
         }
     }
     createGridFromSave(toLoad.theGrid);
+    theView = new View();
+    theView.update();
 
     settings = toLoad.settings;
     highestLevel = toLoad.highestLevel;
