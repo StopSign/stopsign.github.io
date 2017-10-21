@@ -51,6 +51,8 @@ function View() {
                 this.grid[col][row] = elem.firstChild;
             }
         }
+        this.recreateDerivs();
+        this.update();
     };
 
     this.deleteGrid = function() {
@@ -66,8 +68,6 @@ function View() {
             }
         }
     };
-
-    this.createGrid();
 
     this.backgroundGrid.onmousedown  = function(e) {
         startingDragPoint = {x:e.pageX - theView.offsetx - 8, y:e.pageY - theView.offsety};
@@ -409,7 +409,7 @@ function View() {
 			document.getElementById('buyDiscountButton').style.borderColor = 'red';
 		}
 		
-		if(autobuy.currentMax >= highestLevel*2) {
+		if(autobuy.currentMax >= highestLevel * 5) {
             document.getElementById('buyAbMaxButton').style.borderColor = 'grey';
         } else if(bonuses.availableEP >= getAbMaxCost()) {
             document.getElementById('buyAbMaxButton').style.borderColor = 'green';
@@ -424,6 +424,7 @@ function View() {
         } else {
 			document.getElementById('buyAbAmtToSpendButton').style.borderColor = 'red';
 		}
+
         document.getElementById('currentEP').innerHTML = intToString(bonuses.availableEP);
         document.getElementById('currentTickSpeed').innerHTML = intToString(bonuses.tickSpeedLevel);
         document.getElementById('buyTickSpeedCost').innerHTML = intToString(getTickSpeedCost());
@@ -433,7 +434,7 @@ function View() {
         document.getElementById('currentDiscountBonus').innerHTML = intToString((getCostReduction(bonuses.discountLevel) - 1) * 100);
 		document.getElementById('buyDiscountCost').innerHTML = intToString(getDiscountCost());
 		document.getElementById('abCurrentMax').innerHTML = intToString(autobuy.currentMax);
-        document.getElementById('abMaxMax').innerHTML = intToString(highestLevel * 2);
+        document.getElementById('abMaxMax').innerHTML = intToString(highestLevel * 5);
         document.getElementById('buyAbMaxCost').innerHTML = intToString(getAbMaxCost());
         document.getElementById('abAmtToSpendLevel').innerHTML = intToString(autobuy.amtToSpend);
 		document.getElementById('buyAbAmtToSpendCost').innerHTML = intToString(getAbAmtToSpendCost());
@@ -442,11 +443,11 @@ function View() {
 		document.getElementById('totalAchievementBonus').innerHTML = intToString(calcTotalAchieveBonus());
         document.getElementById('ticksThisLevel').innerHTML = intToString(stats.ticksThisLevel);
 		document.getElementById('highestTicks').innerHTML = intToString(stats.highestTicks);
-		document.getElementById('highestTicksAchNextLvl').innerHTML = intToString(NextAchieveLevelGoal(achieves.highestTicksAch));
+		document.getElementById('highestTicksAchNextLvl').innerHTML = intToString(nextAchieveLevelGoal(achieves.highestTicksAch));
 		document.getElementById('highestTicksAchLvl').innerHTML = intToString(achieves.highestTicksAch);
 		document.getElementById('highestTicksAchBonus').innerHTML = intToString(calcAchieveBonus(achieves.highestTicksAch));
         document.getElementById('totalTicks').innerHTML = intToString(stats.totalTicks);
-		document.getElementById('totalTicksAchNextLvl').innerHTML = intToString(NextAchieveLevelGoal(achieves.totalTicksAch));
+		document.getElementById('totalTicksAchNextLvl').innerHTML = intToString(nextAchieveLevelGoal(achieves.totalTicksAch));
 		document.getElementById('totalTicksAchLvl').innerHTML = intToString(achieves.totalTicksAch);
 		document.getElementById('totalTicksAchBonus').innerHTML = intToString(calcAchieveBonus(achieves.totalTicksAch));
 		document.getElementById('averageTicks').innerHTML = intToString(stats.totalTicks / stats.totalLevels);
@@ -484,13 +485,60 @@ function View() {
 		document.getElementById('averageEPPerLevel').innerHTML = intToString(bonuses.points / stats.totalLevels);
     };
 	this.updateGrowth = function() {
-        for(var x = 0; x < bonuses.derivBonuses.length; x++) {
-            var deriv = bonuses.derivBonuses[x];
-            document.getElementById('deriv'+x+'Gain').innerHTML = intToString(x === 0 ? (deriv.amount * deriv.gainMultiplier) / 100 : (deriv.amount * deriv.gainMultiplier));
-            document.getElementById(x+'DerivInner').style.width = (deriv.currentTicks / deriv.ticksNeeded * 100) + '%';
+        for(var x = 0; x < bonuses.derivs.length; x++) {
+            var deriv = bonuses.derivs[x];
+            var derivGain = deriv.amount * Math.pow(2, deriv.upgradeAmount);
+            document.getElementById('deriv'+x+'Gain').innerHTML = intToString(x === 0 ? derivGain / 100 : derivGain);
+            document.getElementById(x+'DerivInner').style.width = ((deriv.currentTicks+1) / deriv.ticksNeeded * 100) + '%';
         }
+
+        if(bonuses.availableEP >= calcCostForNextDeriv()) {
+            document.getElementById('unlockNextDerivButton').style.borderColor = 'green';
+        } else {
+            document.getElementById('unlockNextDerivButton').style.borderColor = 'red';
+        }
+
         document.getElementById('growthBonus').innerHTML = intToString(bonuses.growthBonus);
     };
+
+	this.derivNames = ['Neurons', 'Neural Paths', 'Neural Nodes', 'Neural Groups', 'Neural Clusters', 'Neural Swarms', 'Neural Nets', 'Neural Cities', 'Processors', 'Chips', 'Chipsets', 'Architectures', 'Computers'];
+
+	this.recreateDerivs = function() {
+	    //Dynamically create all divs and their buy buttons
+        document.getElementById('derivCost').innerHTML = intToString(calcCostForNextDeriv());
+        var parentElem = document.getElementById('autoGenDerivs');
+        while (parentElem.firstChild) {
+            parentElem.removeChild(parentElem.firstChild);
+        }
+
+        for(var x = 0; x < bonuses.derivs.length; x++) {
+            if (x > this.derivNames.length) {
+                break;
+            }
+            var prevName = "";
+            if (x === 0) {
+                prevName = "% added growth bonus";
+            } else {
+                prevName = " "+this.derivNames[x-1];
+            }
+
+            var labelName = this.derivNames[x];
+            var ticksNeeded = bonuses.derivs[x].ticksNeeded;
+
+            var elem = document.createElement("div");
+            elem.innerHTML = '<div id="'+x+'Deriv" class="derivContainer">' +
+                '<div class="derivLabel medium">'+labelName+'</div>' +
+                '<div class="outerDerivBar"><div id="'+x+'DerivInner" class="innerDerivBar"></div></div>' +
+                'Gain <div id="deriv'+x+'Gain">1</div>'+prevName+' per '+ticksNeeded+' ticks' +
+                '</div>';
+
+            parentElem.appendChild(elem);
+        }
+        this.updateGrowth();
+    };
+
+
+    this.createGrid(); //start using View
 }
 
 

@@ -102,10 +102,10 @@
             Switching levels or resetting will prestige you, removing most upgrades<br>
             You will gain evolution points equal to ((Level # + 1) * 1.3^(Lowest Square's Bonus)) * (Achievement Bonus)<br>
             Each evolution point gives 5% more nanite production<br>
-            Currently you will get <div id="evolutionGain">0</div> evolution points on new level<br>
+            Currently you have <div id="evolutionPoints">0</div> evolution points.<br>
             <input type="checkbox" id="levelConfirm" onclick="theView.updateLevel()">
             <label for="levelConfirm">Confirm new level</label><br>
-            You have <div id="evolutionPoints">0</div> evolution points.<br>
+            You will get <div id="evolutionGain">0</div> evolution points on new level<br>
             <input type="checkbox" id="resetAvailableEP">
             <label for="resetAvailableEP">Reset Available EP on new level</label><br>
         </div>
@@ -113,69 +113,45 @@
     </div>
 	<div id="upgradeBox" style="display:none">
         <div class="medium" style="padding:5px">
-            Current Available EP: <div id="currentEP">0</div>
+            Available EP: <div id="currentEP">0</div>
         </div><br>
         <div>
             <div style="padding:5px;">
-                <div id='buyTickSpeedButton' class="menuButton" onclick="buyTickSpeed()" style="padding-top:5px;padding-bottom:0;"> +20% Tick Speed </div><br>
+                <div id='buyTickSpeedButton' class="normalButton" onclick="buyTickSpeed()"> +20% Tick Speed </div><br>
                 Current Tick Speed: <div id="currentTickSpeed">1</div>/sec
                 <br> Cost: <div id="buyTickSpeedCost">10</div> EP<br>
                 Maximum of 5/sec
             </div>
             <div style="padding:5px;">
-                <div id='buyTransferRateButton' class="menuButton" onclick="buyTransferRate()" style="padding-top:5px;padding-bottom:0;"> +0.01 Transfer Rate </div><br>
+                <div id='buyTransferRateButton' class="normalButton" onclick="buyTransferRate()"> +0.01 Transfer Rate </div><br>
                 Current Transfer Rate: <div id="currentTransferRate">0.01</div>
                 <br> Cost: <div id="buyTransferRateCost">100</div> EP<br>
                 Maximum of 0.1
             </div>
 			<div style="padding:5px;">
-                <div id='buyDiscountButton' class="menuButton" onclick="buyDiscountLevel()" style="padding-top:5px;padding-bottom:0;"> +<div id="nextDiscountBonus">0</div>% Cost Reduction </div><br>
+                <div id='buyDiscountButton' class="normalButton" onclick="buyDiscountLevel()"> +<div id="nextDiscountBonus">0</div>% Cost Reduction </div><br>
                 Nanite Cost Reduction: <div id="currentDiscountBonus">0</div>%
                 <br> Cost: <div id="buyDiscountCost">1</div> EP<br>
 				<div id="blankSpace"> </div>
             </div>
-        </div>
-		<div>
             <div style="padding:5px;">
-                <div id='buyAbMaxButton' class="menuButton" onclick="buyAbMaxLevel()" style="padding-top:5px;padding-bottom:0;"> +1 Max Level </div><br>
+                <div id='buyAbMaxButton' class="normalButton" onclick="buyAbMaxLevel()"> +1 Max Level </div><br>
                 Autobuy Max Level: <div id="abCurrentMax">1</div><br> Cost: <div id="buyAbMaxCost">10</div> EP<br>
                 Maximum of <div id="abMaxMax">0</div>
             </div>
             <div style="padding:5px;">
-                <div id='buyAbAmtToSpendButton' class="menuButton" onclick="buyAbAmtToSpendLevel()" style="padding-top:5px;padding-bottom:0;"> +1% Max Spent </div><br>
+                <div id='buyAbAmtToSpendButton' class="normalButton" onclick="buyAbAmtToSpendLevel()"> +1% Max Spent </div><br>
                 Autobuy Max Amt. To Spend: <div id="abAmtToSpendLevel">1</div>%<br> Cost: <div id="buyAbAmtToSpendCost">100</div> EP<br>
                 Maximum of 50%
             </div>
         </div>
-        <div id="epGrowthContainer" style="width:100%">
+        <div id="derivContainer">
             <div id="0Deriv" class="derivContainer medium">
                 Total bonus from growth: x<div id="growthBonus"></div>
             </div>
-            <div id="1Deriv" class="derivContainer">
-                <div class="derivLabel medium">First Derivative</div>
-                <div class="outerDerivBar"><div id="0DerivInner" class="innerDerivBar"></div></div>
-                Gain <div id="deriv0Gain">0.01</div>% growth per tick
-            </div>
-            <div id="2Deriv" class="derivContainer">
-                <div class="derivLabel medium">Second Derivative</div>
-                <div class="outerDerivBar"><div id="1DerivInner" class="innerDerivBar"></div></div>
-                Gain <div id="deriv1Gain">1</div> First Derivatives per 5 ticks
-            </div>
-            <div id="3Deriv" class="derivContainer">
-                <div class="derivLabel medium">Third Derivative</div>
-                <div class="outerDerivBar"><div id="2DerivInner" class="innerDerivBar"></div></div>
-                Gain <div id="deriv2Gain">1</div> Second Derivatives per 10 ticks
-            </div>
-            <div id="4Deriv" class="derivContainer">
-                <div class="derivLabel medium">Fourth Derivative</div>
-                <div class="outerDerivBar"><div id="3DerivInner" class="innerDerivBar"></div></div>
-                Gain <div id="deriv3Gain">1</div> Third Derivatives per 20 ticks
-            </div>
-            <div id="5Deriv" class="derivContainer">
-                <div class="derivLabel medium">Fifth Derivative</div>
-                <div class="outerDerivBar"><div id="4DerivInner" class="innerDerivBar"></div></div>
-                Gain <div id="deriv4Gain">1</div> Fourth Derivatives per 40 ticks
-            </div>
+            <div id="autoGenDerivs"></div><br>
+            <div id="unlockNextDerivButton" onclick="buyNextDeriv()" class="normalButton">Unlock Next for <div id="derivCost"></div> permanent EP</div><br>
+            (Must have enough available EP, and the takes from both available and permanent EP)
         </div>
         <i id="backButton2" class="backButton fa fa-close" onclick="closeUpgradeBox()" style="font-size:24px"></i>
     </div>

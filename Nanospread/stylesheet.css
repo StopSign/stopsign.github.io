@@ -221,7 +221,7 @@ input, label {
     width:0;
     height:0;
 }
-.menuButton {
+.menuButton, .normalButton {
     padding:2px 10px;
     border:1px solid black;
     vertical-align: top;
@@ -231,7 +231,11 @@ input, label {
     height:20px;
     background-color:#acbde2;
 }
-.menuButton:hover {
+.normalButton {
+    padding-top:5px;
+    padding-bottom:0;
+}
+.menuButton:hover, .normalButton:hover {
     background-color: #5f6f90;
 }
 

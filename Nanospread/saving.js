@@ -19,8 +19,7 @@ var startingDragPoint = {};
 var endingDragPoint = {};
 var select = new Select();
 var isDragging = false;
-var currentLevel = 0; //SWITCH LEVELS
-var highestLevel;
+var currentLevel, highestLevel;
 var bonuses, autobuy, stats, achieves;
 
 function clearSave() {
@@ -40,14 +39,21 @@ function loadDefaults() {
     settings.selectAllOrLowestBorderColor = 0;
     settings.selectShowNoneOrNanitesOrAmount = 1;
     highestLevel = 0; //SHOULD BE 0 BEFORE COMMIT
+    currentLevel = 0;
 
     bonuses = { points:0, availableEP:0};
     autobuy = {};
     resetEPUpgrades();
+    bonuses.derivs = [];
     resetDerivBonuses();
 	stats = { ticksThisLevel:0, totalTicks:0, producedThisLevel:0, totalProduced:0, transferredThisLevel:0, totalTransferred:0, totalLevels:0, highestTicks:0, highestProduced:0, highestTransferred:0};
+<<<<<<< HEAD
 	achieves = { highestTicksAch:0, totalTicksAch:0, highestProducedAch:0, totalProducedAch:0, highestTransferredAch:0, totalTransferredAch:0, highestLevelAch:0, totalLevelsAch:0};
 	}
+=======
+	achieves = { highestTicksAch:0, totalTicksAch:0, highestProductionAch:0, totalProductionAch:0, highestTransferredAch:0, totalTransferredAch:0, highestLevelAch:0, totalLevelsAch:0};
+}
+>>>>>>> refs/remotes/StopSign/testBranch
 
 function resetEPUpgrades() {
     bonuses.tickSpeedLevel = 1;
@@ -55,20 +61,6 @@ function resetEPUpgrades() {
     bonuses.discountLevel = 0;
     autobuy.currentMax = 1;
     autobuy.amtToSpend = 1;
-}
-
-function resetDerivBonuses() {
-    //TODO reset on level change
-    bonuses.growthBonus = 1;
-    bonuses.derivBonuses = [];
-    for(var x = 0; x < 5; x++) { //5 to start
-        bonuses.derivBonuses[x] = {
-            ticksNeeded:x===0?1:Math.pow(2, (x-1))*5,
-            currentTicks:0,
-            gainMultiplier:1,
-            amount:0
-        }
-    }
 }
 
 function toggleIMessedUpPopup1() { //Let's hope there's not more
@@ -83,6 +75,11 @@ function load() {
     loadDefaults();
     if (!window.localStorage.version4) { //New players to the game
         createGrid();
+        if(!theView) {
+            theView = new View();
+        }
+        theView.createGrid();
+        theView.update();
         recalcInterval(bonuses.tickSpeedLevel);
         if(window.localStorage.version3) { //New players to version 4
             var oldLoad = JSON.parse(window.localStorage.version3);
@@ -106,6 +103,7 @@ function load() {
             bonuses[property] = toLoad.bonuses[property];
         }
     }
+
     for(property in toLoad.autobuy) {
         if (toLoad.autobuy.hasOwnProperty(property)) {
             autobuy[property] = toLoad.autobuy[property];
@@ -121,13 +119,13 @@ function load() {
             achieves[property] = toLoad.achieves[property];
         }
     }
-    createGridFromSave(toLoad.theGrid);
 
     settings = toLoad.settings;
     highestLevel = toLoad.highestLevel;
-
     settings.buyPerClick = 1; //resets on refresh
     settings.selectedResourceNum = 0;
+
+    createGridFromSave(toLoad.theGrid);
     setTransferRate(bonuses.transferRateLevel);
     recalcInterval(bonuses.tickSpeedLevel);
 }
