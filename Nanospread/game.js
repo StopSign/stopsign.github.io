@@ -428,16 +428,16 @@ function statsUpdate() {
 	if(stats.producedThisLevel > stats.highestProduced) {
 		stats.highestProduced = stats.producedThisLevel;
 	}
-	if(stats.highestProduced >= NextAchieveLevelGoal(achieves.highestProducedAch)) {
-		while(stats.highestProduced >= NextAchieveLevelGoal(achieves.highestProducedAch)) {
+	if(stats.highestProduced >= nextAchieveLevelGoal(achieves.highestProducedAch)) {
+		while(stats.highestProduced >= nextAchieveLevelGoal(achieves.highestProducedAch)) {
 			achieves.highestProducedAch++;
 		}
 	}
 	if(stats.transferredThisLevel > stats.highestTransferred) {
 		stats.highestTransferred = stats.transferredThisLevel;
 	}
-	if(stats.highestTransferred >= NextAchieveLevelGoal(achieves.highestTransferredAch)) {
-		while(stats.highestTransferred >= NextAchieveLevelGoal(achieves.highestTransferredAch)) {
+	if(stats.highestTransferred >= nextAchieveLevelGoal(achieves.highestTransferredAch)) {
+		while(stats.highestTransferred >= nextAchieveLevelGoal(achieves.highestTransferredAch)) {
 			achieves.highestTransferredAch++;
 		}
 	}
@@ -464,13 +464,13 @@ function tickStats() {
 			achieves.totalTicksAch++;
 		}
 	}
-	if(stats.totalProduced >= NextAchieveLevelGoal(achieves.totalProducedAch)) {
-		while(stats.totalProduced >= NextAchieveLevelGoal(achieves.totalProducedAch)) {
+	if(stats.totalProduced >= nextAchieveLevelGoal(achieves.totalProducedAch)) {
+		while(stats.totalProduced >= nextAchieveLevelGoal(achieves.totalProducedAch)) {
 			achieves.totalProducedAch++;
 		}
 	}
-	if(stats.totalTransferred >= NextAchieveLevelGoal(achieves.totalTransferredAch)) {
-		while(stats.totalTransferred >= NextAchieveLevelGoal(achieves.totalTransferredAch)) {
+	if(stats.totalTransferred >= nextAchieveLevelGoal(achieves.totalTransferredAch)) {
+		while(stats.totalTransferred >= nextAchieveLevelGoal(achieves.totalTransferredAch)) {
 			achieves.totalTransferredAch++;
 		}
 	}
@@ -512,8 +512,6 @@ function tickGrowth() {
         }
     }
 }
-<<<<<<< HEAD
-=======
 
 function resetDerivBonuses() {
     bonuses.growthBonus = 1;
@@ -548,4 +546,3 @@ function addDeriv() {
     newDeriv.amount = 1;
     theView.recreateDerivs();
 }
->>>>>>> refs/remotes/StopSign/testBranch

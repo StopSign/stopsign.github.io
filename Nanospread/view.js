@@ -385,7 +385,7 @@ function View() {
         document.getElementById('evolutionGain').innerHTML = intToString(calcEvolutionPointGain());
         document.getElementById('evolutionPoints').innerHTML = intToString(bonuses.points);
     };
-	
+
 	this.updateUpgrade = function() {
         if(bonuses.tickSpeedLevel >= 5) {
             document.getElementById('buyTickSpeedButton').style.borderColor = 'grey';
@@ -402,13 +402,13 @@ function View() {
         } else {
 			document.getElementById('buyTransferRateButton').style.borderColor = 'red';
 		}
-		
+
 		if(bonuses.availableEP >= getDiscountCost()) {
             document.getElementById('buyDiscountButton').style.borderColor = 'green';
         } else {
 			document.getElementById('buyDiscountButton').style.borderColor = 'red';
 		}
-		
+
 		if(autobuy.currentMax >= highestLevel * 5) {
             document.getElementById('buyAbMaxButton').style.borderColor = 'grey';
         } else if(bonuses.availableEP >= getAbMaxCost()) {
@@ -416,7 +416,7 @@ function View() {
         } else {
 			document.getElementById('buyAbMaxButton').style.borderColor = 'red';
 		}
-		
+
 		if(autobuy.amtToSpend >= 100) {
             document.getElementById('buyAbAmtToSpendButton').style.borderColor = 'grey';
         } else if(bonuses.availableEP >= getAbAmtToSpendCost()) {
@@ -453,21 +453,21 @@ function View() {
 		document.getElementById('averageTicks').innerHTML = intToString(stats.totalTicks / stats.totalLevels);
         document.getElementById('nanobotsProducedThisLevel').innerHTML = intToString(stats.producedThisLevel);
 		document.getElementById('highestProduced').innerHTML = intToString(stats.highestProduced);
-		document.getElementById('highestProducedAchNextLvl').innerHTML = intToString(NextAchieveLevelGoal(achieves.highestProducedAch));
+		document.getElementById('highestProducedAchNextLvl').innerHTML = intToString(nextAchieveLevelGoal(achieves.highestProducedAch));
 		document.getElementById('highestProducedAchLvl').innerHTML = intToString(achieves.highestProducedAch);
 		document.getElementById('highestProducedAchBonus').innerHTML = intToString(calcAchieveBonus(achieves.highestProducedAch));
         document.getElementById('totalProducedNanobots').innerHTML = intToString(stats.totalProduced);
-		document.getElementById('totalProducedAchNextLvl').innerHTML = intToString(NextAchieveLevelGoal(achieves.totalProducedAch));
+		document.getElementById('totalProducedAchNextLvl').innerHTML = intToString(nextAchieveLevelGoal(achieves.totalProducedAch));
 		document.getElementById('totalProducedAchLvl').innerHTML = intToString(achieves.totalProducedAch);
 		document.getElementById('totalProducedAchBonus').innerHTML = intToString(calcAchieveBonus(achieves.totalProducedAch));
 		document.getElementById('averageProduced').innerHTML = intToString(stats.totalProduced / stats.totalLevels);
         document.getElementById('nanobotsTransferredThisLevel').innerHTML = intToString(stats.transferredThisLevel);
 		document.getElementById('highestTransferred').innerHTML = intToString(stats.highestTransferred);
-		document.getElementById('highestTransferredAchNextLvl').innerHTML = intToString(NextAchieveLevelGoal(achieves.highestTransferredAch));
+		document.getElementById('highestTransferredAchNextLvl').innerHTML = intToString(nextAchieveLevelGoal(achieves.highestTransferredAch));
 		document.getElementById('highestTransferredAchLvl').innerHTML = intToString(achieves.highestTransferredAch);
 		document.getElementById('highestTransferredAchBonus').innerHTML = intToString(calcAchieveBonus(achieves.highestTransferredAch));
 		document.getElementById('totalTransferredNanobots').innerHTML = intToString(stats.totalTransferred);
-		document.getElementById('totalTransferredAchNextLvl').innerHTML = intToString(NextAchieveLevelGoal(achieves.totalTransferredAch));
+		document.getElementById('totalTransferredAchNextLvl').innerHTML = intToString(nextAchieveLevelGoal(achieves.totalTransferredAch));
 		document.getElementById('totalTransferredAchLvl').innerHTML = intToString(achieves.totalTransferredAch);
 		document.getElementById('totalTransferredAchBonus').innerHTML = intToString(calcAchieveBonus(achieves.totalTransferredAch));
 		document.getElementById('averageTransferred').innerHTML = intToString(stats.totalTransferred / stats.totalLevels);
