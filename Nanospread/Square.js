@@ -42,7 +42,7 @@ function Square(col,row,initialConsumeCost) {
     };
 
     this.calcNaniteCost = function(curSpecialPosNanites, naniteAmount) {
-        if(!curSpecialPosNanites) { //javascript form of overloading a method
+        if(curSpecialPosNanites === undefined) { //javascript form of overloading a method
             curSpecialPosNanites = this.curSpecialPosNanites;
             naniteAmount = this.naniteAmount;
         }
