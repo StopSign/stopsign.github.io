@@ -23,19 +23,18 @@
         <div id="naniteGrid" style="">
         </div>
     </div>
-    <div id="scrollWest" class="scrollArrow" onclick="theView.shiftRight()" style="width:20px;height:100%;left:0;"></div>
-    <div id="scrollEast" class="scrollArrow" onclick="theView.shiftLeft()" style="width:20px;height:100%;right:0;"></div>
-    <div id="scrollNorth" class="scrollArrow" onclick="theView.shiftDown()" style="width:100%;height:20px;top:0;"></div>
-    <div id="scrollSouth" class="scrollArrow" onclick="theView.shiftUp()" style="width:100%;height:20px;bottom:30px;"></div>
+    <div id="scrollWest" class="scrollArrow" onclick="theView.shiftRight()" style=""></div>
+    <div id="scrollEast" class="scrollArrow" onclick="theView.shiftLeft()" style=""></div>
+    <div id="scrollNorth" class="scrollArrow" onclick="theView.shiftDown()" style=""></div>
+    <div id="scrollSouth" class="scrollArrow" onclick="theView.shiftUp()" style=""></div>
 </div>
 
 <div id="dragSelectDiv" style="display:none;border:2px solid yellow;border-radius:1px;position:absolute;"></div>
 
 <div id="imessedup" style="position:absolute;left:200px;top:200px;background-color:blue;padding:10px;display:none;">
     To all existing players:<br>
-    I messed up. The formula for EP gain went out of control significantly faster than I expected.<br>
-    Gaining 10 trillion EP at level 100 was not intended, and I've changed the formula to be more<br>
-    in line with what I wanted.<br><br>
+    I've made significant changes to the EP gain formula, as it grew far more than I intended. I've <br>
+    now changed the formula to be more like what I wanted.<br>
     Unfortunately, to avoid immediately ruining the game experience, I have to remove large amounts<br>
     of EP that you already gained. You will keep up to 1000 EP, which for you means you have <div id="messedupEP"></div> now.<br>
     I apologize for the inconvenience, and I will strive avoid such mistakes in the future.<br><br>
@@ -188,6 +187,7 @@
         The total nanite consume cost of a level goes up 1.5x per level.<br>
         Press the WASD / arrow keys to change direction<br>
         Press enter / space to buy the first upgrade of the selected<br>
+        Click the edges of the screen to scroll around<br>
 
         <i id="backButton3" class="backButton fa fa-close" onclick="closeHelpBox()" style="font-size:24px"></i>
     </div>
@@ -239,7 +239,7 @@
                 <div class="row"><div id="receivedLabel">Received:</div></div>
                 <div class="row"><div id="sentLabel">Sent:</div></div>
                 <div class="row"><div id="transferRateLabel">Transfer Rate:</div></div>
-                <div class="row"><div id="equilibriumLabel">Equilibrium:</div></div>
+                <div class="row" style="display:none"><div id="equilibriumLabel">Equilibrium:</div></div>
                 <div class="row"><div id="consumeCostLabel">Consume Cost:</div></div>
             </div>
             <div id="infoGridSingle" class="col">
@@ -250,7 +250,7 @@
                 <div class="row"><div id="totalTAmountReceived"></div></div>
                 <div class="row"><div id="totalTTransferAmount"></div></div>
                 <div class="row"><div id="totalTransferRate"></div></div>
-                <div class="row"><div id="totalTEquilibrium"></div></div>
+                <div class="row" style="display:none"><div id="totalTEquilibrium"></div></div>
                 <div class="row"><div id="totalConsumeCost"></div></div>
             </div>
             <div id="infoGridAverage" class="col">
@@ -261,7 +261,7 @@
                 <div class="row"><div id="averageTAmountReceived"></div></div>
                 <div class="row"><div id="averageTTransferAmount"></div></div>
                 <div class="row"><div id="averageTransferRate"></div></div>
-                <div class="row"><div id="averageTEquilibrium"></div></div>
+                <div class="row" style="display:none"><div id="averageTEquilibrium"></div></div>
                 <div class="row"><div id="averageConsumeCost"></div></div>
             </div>
             <div id="infoGridLowest" class="col">
@@ -272,7 +272,7 @@
                 <div class="row"><div id="lowestTAmountReceived"></div></div>
                 <div class="row"><div id="lowestTTransferAmount"></div></div>
                 <div class="row"><div id="lowestTransferRate"></div></div>
-                <div class="row"><div id="lowestTEquilibrium"></div></div>
+                <div class="row" style="display:none"><div id="lowestTEquilibrium"></div></div>
                 <div class="row"><div id="lowestConsumeCost"></div></div>
             </div>
 

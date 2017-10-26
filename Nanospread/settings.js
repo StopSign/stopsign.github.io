@@ -201,7 +201,6 @@ function openGrowthTab() {
 function adjustUpgradeTabs() {
     var selectedScreen = document.getElementById("selectedScreen");
     closeUpgradeScreens();
-    console.log(upgradeTab);
     if (upgradeTab === "upgrade") {
         selectedScreen.style.backgroundColor = "#6d6dc5";
         document.getElementById("upgradeScreen").style.display = "inline-block";
