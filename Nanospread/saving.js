@@ -15,6 +15,7 @@ var multFromFps = 1;
 var msWaitTime = 1000;
 var theGrid = [];
 var menuOpen = "";
+var upgradeTab;
 var startingDragPoint = {};
 var endingDragPoint = {};
 var select = new Select();
@@ -48,7 +49,8 @@ function loadDefaults() {
     resetDerivBonuses();
 	stats = { ticksThisLevel:0, totalTicks:0, producedThisLevel:0, totalProduced:0, transferredThisLevel:0, totalTransferred:0, totalLevels:0, highestTicks:0, highestProduced:0, highestTransferred:0};
 	achieves = { highestTicksAch:0, totalTicksAch:0, highestProducedAch:0, totalProducedAch:0, highestTransferredAch:0, totalTransferredAch:0, highestLevelAch:0, totalLevelsAch:0};
-	}
+    openUpgradeTab();
+}
 
 function resetEPUpgrades() {
     bonuses.tickSpeedLevel = 1;

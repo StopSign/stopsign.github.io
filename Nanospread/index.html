@@ -23,19 +23,18 @@
         <div id="naniteGrid" style="">
         </div>
     </div>
-    <div id="scrollWest" class="scrollArrow" onclick="theView.shiftRight()" style="width:20px;height:100%;left:0;"></div>
-    <div id="scrollEast" class="scrollArrow" onclick="theView.shiftLeft()" style="width:20px;height:100%;right:0;"></div>
-    <div id="scrollNorth" class="scrollArrow" onclick="theView.shiftDown()" style="width:100%;height:20px;top:0;"></div>
-    <div id="scrollSouth" class="scrollArrow" onclick="theView.shiftUp()" style="width:100%;height:20px;bottom:30px;"></div>
+    <div id="scrollWest" class="scrollArrow" onclick="theView.shiftRight()" style=""></div>
+    <div id="scrollEast" class="scrollArrow" onclick="theView.shiftLeft()" style=""></div>
+    <div id="scrollNorth" class="scrollArrow" onclick="theView.shiftDown()" style=""></div>
+    <div id="scrollSouth" class="scrollArrow" onclick="theView.shiftUp()" style=""></div>
 </div>
 
 <div id="dragSelectDiv" style="display:none;border:2px solid yellow;border-radius:1px;position:absolute;"></div>
 
 <div id="imessedup" style="position:absolute;left:200px;top:200px;background-color:blue;padding:10px;display:none;">
     To all existing players:<br>
-    I messed up. The formula for EP gain went out of control significantly faster than I expected.<br>
-    Gaining 10 trillion EP at level 100 was not intended, and I've changed the formula to be more<br>
-    in line with what I wanted.<br><br>
+    I've made significant changes to the EP gain formula, as it grew far more than I intended. I've <br>
+    now changed the formula to be more like what I wanted.<br>
     Unfortunately, to avoid immediately ruining the game experience, I have to remove large amounts<br>
     of EP that you already gained. You will keep up to 1000 EP, which for you means you have <div id="messedupEP"></div> now.<br>
     I apologize for the inconvenience, and I will strive avoid such mistakes in the future.<br><br>
@@ -112,46 +111,54 @@
 		<i id="backButton1" class="backButton fa fa-close" onclick="closeLevelBox()" style="font-size:24px"></i>
     </div>
 	<div id="upgradeBox" style="display:none">
-        <div class="medium" style="padding:5px">
+        <div class="medium" style="padding:5px;position:absolute;">
             Available EP: <div id="currentEP">0</div>
-        </div><br>
-        <div>
-            <div style="padding:5px;">
-                <div id='buyTickSpeedButton' class="normalButton" onclick="buyTickSpeed()"> +20% Tick Speed </div><br>
-                Current Tick Speed: <div id="currentTickSpeed">1</div>/sec
-                <br> Cost: <div id="buyTickSpeedCost">10</div> EP<br>
-                Maximum of 5/sec
-            </div>
-            <div style="padding:5px;">
-                <div id='buyTransferRateButton' class="normalButton" onclick="buyTransferRate()"> +0.01 Transfer Rate </div><br>
-                Current Transfer Rate: <div id="currentTransferRate">0.01</div>
-                <br> Cost: <div id="buyTransferRateCost">100</div> EP<br>
-                Maximum of 0.1
-            </div>
-			<div style="padding:5px;">
-                <div id='buyDiscountButton' class="normalButton" onclick="buyDiscountLevel()"> +<div id="nextDiscountBonus">0</div>% Cost Reduction </div><br>
-                Nanite Cost Reduction: <div id="currentDiscountBonus">0</div>%
-                <br> Cost: <div id="buyDiscountCost">1</div> EP<br>
-				<div id="blankSpace"> </div>
-            </div>
-            <div style="padding:5px;">
-                <div id='buyAbMaxButton' class="normalButton" onclick="buyAbMaxLevel()"> +1 Max Level </div><br>
-                Autobuy Max Level: <div id="abCurrentMax">1</div><br> Cost: <div id="buyAbMaxCost">10</div> EP<br>
-                Maximum of <div id="abMaxMax">0</div>
-            </div>
-            <div style="padding:5px;">
-                <div id='buyAbAmtToSpendButton' class="normalButton" onclick="buyAbAmtToSpendLevel()"> +1% Max Spent </div><br>
-                Autobuy Max Amt. To Spend: <div id="abAmtToSpendLevel">1</div>%<br> Cost: <div id="buyAbAmtToSpendCost">100</div> EP<br>
-                Maximum of 50%
-            </div>
         </div>
-        <div id="derivContainer">
-            <div id="0Deriv" class="derivContainer medium">
-                Total bonus from growth: x<div id="growthBonus"></div>
+        <div class="tabContainer">
+            <div class="tabSelect upgradeTab" onclick="openUpgradeTab()"><i class="fa fa-gear" style="font-size:20px;"></i> EP Upgrades</div>
+            <div class="tabSelect growthTab" onclick="openGrowthTab()"><i class="fa fa-bar-chart" style="font-size:20px;"></i> Growth</div>
+        </div>
+        <div class="selectedScreen" id="selectedScreen">
+            <div id="upgradeScreen">
+                <div style="padding:5px;">
+                    <div id='buyTickSpeedButton' class="normalButton" onclick="buyTickSpeed()"> +20% Tick Speed </div><br>
+                    Current Tick Speed: <div id="currentTickSpeed">1</div>/sec
+                    <br> Cost: <div id="buyTickSpeedCost">10</div> EP<br>
+                    Maximum of 5/sec
+                </div>
+                <div style="padding:5px;">
+                    <div id='buyTransferRateButton' class="normalButton" onclick="buyTransferRate()"> +0.01 Transfer Rate </div><br>
+                    Current Transfer Rate: <div id="currentTransferRate">0.01</div>
+                    <br> Cost: <div id="buyTransferRateCost">100</div> EP<br>
+                    Maximum of 0.1
+                </div>
+                <div style="padding:5px;">
+                    <div id='buyDiscountButton' class="normalButton" onclick="buyDiscountLevel()"> +<div id="nextDiscountBonus">0</div>% Cost Reduction </div><br>
+                    Nanite Cost Reduction: <div id="currentDiscountBonus">0</div>%
+                    <br> Cost: <div id="buyDiscountCost">1</div> EP<br>
+                    <div id="blankSpace"> </div>
+                </div>
+                <div style="padding:5px;">
+                    <div id='buyAbMaxButton' class="normalButton" onclick="buyAbMaxLevel()"> +1 Max Level </div><br>
+                    Autobuy Max Level: <div id="abCurrentMax">1</div><br> Cost: <div id="buyAbMaxCost">10</div> EP<br>
+                    Maximum of <div id="abMaxMax">0</div>
+                </div>
+                <div style="padding:5px;">
+                    <div id='buyAbAmtToSpendButton' class="normalButton" onclick="buyAbAmtToSpendLevel()"> +1% Max Spent </div><br>
+                    Autobuy Max Amt. To Spend: <div id="abAmtToSpendLevel">1</div>%<br> Cost: <div id="buyAbAmtToSpendCost">100</div> EP<br>
+                    Maximum of 50%
+                </div>
             </div>
-            <div id="autoGenDerivs"></div><br>
-            <div id="unlockNextDerivButton" onclick="buyNextDeriv()" class="normalButton">Unlock Next for <div id="derivCost"></div> permanent EP</div><br>
-            (Must have enough available EP, and the takes from both available and permanent EP)
+            <div id="growthScreen">
+                <div id="derivContainer">
+                    <div id="0Deriv" class="derivContainer medium">
+                        Total bonus from growth: x<div id="growthBonus"></div>
+                    </div>
+                    <div id="autoGenDerivs"></div><br>
+                    <div id="unlockNextDerivButton" onclick="buyNextDeriv()" class="normalButton">Unlock Next for <div id="derivCost"></div> permanent EP</div><br>
+                    (Must have enough available EP, and it takes from both available and permanent EP)
+                </div>
+            </div>
         </div>
         <i id="backButton2" class="backButton fa fa-close" onclick="closeUpgradeBox()" style="font-size:24px"></i>
     </div>
@@ -180,6 +187,7 @@
         The total nanite consume cost of a level goes up 1.5x per level.<br>
         Press the WASD / arrow keys to change direction<br>
         Press enter / space to buy the first upgrade of the selected<br>
+        Click the edges of the screen to scroll around<br>
 
         <i id="backButton3" class="backButton fa fa-close" onclick="closeHelpBox()" style="font-size:24px"></i>
     </div>
@@ -231,7 +239,7 @@
                 <div class="row"><div id="receivedLabel">Received:</div></div>
                 <div class="row"><div id="sentLabel">Sent:</div></div>
                 <div class="row"><div id="transferRateLabel">Transfer Rate:</div></div>
-                <div class="row"><div id="equilibriumLabel">Equilibrium:</div></div>
+                <div class="row" style="display:none"><div id="equilibriumLabel">Equilibrium:</div></div>
                 <div class="row"><div id="consumeCostLabel">Consume Cost:</div></div>
             </div>
             <div id="infoGridSingle" class="col">
@@ -242,7 +250,7 @@
                 <div class="row"><div id="totalTAmountReceived"></div></div>
                 <div class="row"><div id="totalTTransferAmount"></div></div>
                 <div class="row"><div id="totalTransferRate"></div></div>
-                <div class="row"><div id="totalTEquilibrium"></div></div>
+                <div class="row" style="display:none"><div id="totalTEquilibrium"></div></div>
                 <div class="row"><div id="totalConsumeCost"></div></div>
             </div>
             <div id="infoGridAverage" class="col">
@@ -253,7 +261,7 @@
                 <div class="row"><div id="averageTAmountReceived"></div></div>
                 <div class="row"><div id="averageTTransferAmount"></div></div>
                 <div class="row"><div id="averageTransferRate"></div></div>
-                <div class="row"><div id="averageTEquilibrium"></div></div>
+                <div class="row" style="display:none"><div id="averageTEquilibrium"></div></div>
                 <div class="row"><div id="averageConsumeCost"></div></div>
             </div>
             <div id="infoGridLowest" class="col">
@@ -264,7 +272,7 @@
                 <div class="row"><div id="lowestTAmountReceived"></div></div>
                 <div class="row"><div id="lowestTTransferAmount"></div></div>
                 <div class="row"><div id="lowestTransferRate"></div></div>
-                <div class="row"><div id="lowestTEquilibrium"></div></div>
+                <div class="row" style="display:none"><div id="lowestTEquilibrium"></div></div>
                 <div class="row"><div id="lowestConsumeCost"></div></div>
             </div>
 

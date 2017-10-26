@@ -297,6 +297,9 @@ function applyDirectionsToGrid(tempGrid) {
             var square = theGrid[column][row];
             if(oldSquare && square) {
                 square.changeTargetDirection(oldSquare.transferDirection);
+                if(!square.getTarget()) {
+                    square.chooseStartingDirection();
+                }
             }
         }
     }
@@ -372,7 +375,7 @@ function getCostReduction(discountLevel) {
 }
 
 function getDiscountCost() {
-    return precision2(Math.pow(1.01, bonuses.discountLevel) * Math.pow(bonuses.discountLevel+1, 2)); // 1.01^n * (n+1)^2
+    return precision2(Math.pow(1.03, bonuses.discountLevel) * Math.pow(bonuses.discountLevel+1, 2)); // 1.01^n * (n+1)^2
 }
 
 function buyAbMaxLevel() {

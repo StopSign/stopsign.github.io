@@ -186,3 +186,31 @@ function autobuyAmountOption(num) {
     theView.updateInfoBox();
 
 }
+
+
+
+function openUpgradeTab() {
+    upgradeTab = "upgrade";
+    adjustUpgradeTabs();
+}
+function openGrowthTab() {
+    upgradeTab = "growth";
+    adjustUpgradeTabs();
+}
+
+function adjustUpgradeTabs() {
+    var selectedScreen = document.getElementById("selectedScreen");
+    closeUpgradeScreens();
+    if (upgradeTab === "upgrade") {
+        selectedScreen.style.backgroundColor = "#6d6dc5";
+        document.getElementById("upgradeScreen").style.display = "inline-block";
+    } else if(upgradeTab === "growth") {
+        selectedScreen.style.backgroundColor = "#6bb347";
+        document.getElementById("growthScreen").style.display = "inline-block";
+    }
+}
+
+function closeUpgradeScreens() {
+    document.getElementById("upgradeScreen").style.display = "none";
+    document.getElementById("growthScreen").style.display = "none";
+}
