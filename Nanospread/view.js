@@ -425,6 +425,12 @@ function View() {
 			document.getElementById('buyAbAmtToSpendButton').style.borderColor = 'red';
 		}
 
+		if(autobuy.currentMax > 0) { //bought a single autobuy upgrade
+            document.getElementById('autobuyContainer').style.display = "inline-block";
+        } else {
+            document.getElementById('autobuyContainer').style.display = "none";
+        }
+
         document.getElementById('currentEP').innerHTML = intToString(bonuses.availableEP);
         document.getElementById('currentTickSpeed').innerHTML = intToString(bonuses.tickSpeedLevel);
         document.getElementById('buyTickSpeedCost').innerHTML = intToString(getTickSpeedCost());

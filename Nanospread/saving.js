@@ -56,7 +56,7 @@ function resetEPUpgrades() {
     bonuses.tickSpeedLevel = 1;
     bonuses.transferRateLevel = 1;
     bonuses.discountLevel = 0;
-    autobuy.currentMax = 1;
+    autobuy.currentMax = 0;
     autobuy.amtToSpend = 1;
 }
 

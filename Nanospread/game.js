@@ -387,7 +387,7 @@ function buyAbMaxLevel() {
 }
 
 function getAbMaxCost() {
-    return precision2(10 * autobuy.currentMax);
+    return precision2(10 * autobuy.currentMax + 10);
 }
 
 function buyAbAmtToSpendLevel() {
