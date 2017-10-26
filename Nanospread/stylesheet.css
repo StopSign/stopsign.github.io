@@ -268,3 +268,39 @@ input, label {
 .derivLabel {
     width:130px;
 }
+.tabContainer {
+    width:150px;
+    padding-top: 30px;
+}
+.tabSelect {
+    border-left:2px solid;
+    border-top:2px solid;
+    border-bottom:2px solid;
+    border-bottom-left-radius: 5px;
+    border-top-left-radius: 5px;
+    width:100%;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    padding-left: 5px;
+    border-color:white;
+    margin-bottom: 3px;
+    margin-left: 3px;
+    cursor:pointer;
+}
+.tabSelect:hover {
+    border-color:blue;
+}
+.selectedScreen {
+    width: 642px;
+    height: 210px;
+    margin-left: 5px;
+    vertical-align: top;
+    position: absolute;
+    overflow: auto;
+}
+.upgradeTab {
+    background-color: #6d6dc5;
+}
+.growthTab {
+    background-color: #6bb347;
+}

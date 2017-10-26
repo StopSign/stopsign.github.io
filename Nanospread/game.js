@@ -504,7 +504,7 @@ function tickGrowth() {
             deriv.currentTicks -= deriv.ticksNeeded;
             if(x === 0) {
                 //deriv.amount  deriv.gainMultiplier
-                bonuses.growthBonus += (deriv.amount * Math.pow(2, deriv.upgradeAmount)) / 100;
+                bonuses.growthBonus += (deriv.amount * Math.pow(2, deriv.upgradeAmount)) / 10000;
                 continue;
             }
             var prevDeriv = bonuses.derivs[x-1];
