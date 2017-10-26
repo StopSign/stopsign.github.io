@@ -84,11 +84,11 @@ function tick() {
         return;
     }
     timer++;
-	tickStats();
 	tickGrowth();
     handleFPSDifference();
     clearNanitesReceived();
     sendNanites();
+	tickStats();
 	if(settings.autobuyToggle === 1) {
 		autobuyLevels();
 	}
@@ -428,8 +428,28 @@ function statsUpdate() {
 	if(stats.producedThisLevel > stats.highestProduced) {
 		stats.highestProduced = stats.producedThisLevel;
 	}
+	if(stats.highestProduced >= nextAchieveLevelGoal(achieves.highestProducedAch)) {
+		while(stats.highestProduced >= nextAchieveLevelGoal(achieves.highestProducedAch)) {
+			achieves.highestProducedAch++;
+		}
+	}
 	if(stats.transferredThisLevel > stats.highestTransferred) {
 		stats.highestTransferred = stats.transferredThisLevel;
+	}
+	if(stats.highestTransferred >= nextAchieveLevelGoal(achieves.highestTransferredAch)) {
+		while(stats.highestTransferred >= nextAchieveLevelGoal(achieves.highestTransferredAch)) {
+			achieves.highestTransferredAch++;
+		}
+	}
+	if(highestLevel >= ((achieves.highestLevelAch + 1) * 10)) {
+		while(highestLevel >= ((achieves.highestLevelAch + 1) * 10)) {
+			achieves.highestLevelAch++;
+		}
+	}
+	if(stats.totalLevels >= ((achieves.totalLevelsAch + 1) * 10)) {
+		while(stats.totalLevels >= ((achieves.totalLevelsAch + 1) * 10)) {
+			achieves.totalLevelsAch++;
+		}
 	}
 	stats.ticksThisLevel = 0;
 	stats.producedThisLevel = 0;
@@ -442,6 +462,16 @@ function tickStats() {
 	if(stats.totalTicks >= nextAchieveLevelGoal(achieves.totalTicksAch)) {
 		while(stats.totalTicks >= nextAchieveLevelGoal(achieves.totalTicksAch)) {
 			achieves.totalTicksAch++;
+		}
+	}
+	if(stats.totalProduced >= nextAchieveLevelGoal(achieves.totalProducedAch)) {
+		while(stats.totalProduced >= nextAchieveLevelGoal(achieves.totalProducedAch)) {
+			achieves.totalProducedAch++;
+		}
+	}
+	if(stats.totalTransferred >= nextAchieveLevelGoal(achieves.totalTransferredAch)) {
+		while(stats.totalTransferred >= nextAchieveLevelGoal(achieves.totalTransferredAch)) {
+			achieves.totalTransferredAch++;
 		}
 	}
 }
@@ -457,6 +487,12 @@ function calcTotalAchieveBonus() {
 	var totalAchieveBonus = 0;
 	totalAchieveBonus += calcAchieveBonus(achieves.highestTicksAch);
 	totalAchieveBonus += calcAchieveBonus(achieves.totalTicksAch);
+	totalAchieveBonus += calcAchieveBonus(achieves.highestProducedAch);
+	totalAchieveBonus += calcAchieveBonus(achieves.totalProducedAch);
+	totalAchieveBonus += calcAchieveBonus(achieves.highestTransferredAch);
+	totalAchieveBonus += calcAchieveBonus(achieves.totalTransferredAch);
+	totalAchieveBonus += calcAchieveBonus(achieves.highestLevelAch);
+	totalAchieveBonus += calcAchieveBonus(achieves.totalLevelsAch);
 	return round2(totalAchieveBonus);
 }
 
