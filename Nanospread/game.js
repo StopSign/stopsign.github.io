@@ -34,7 +34,7 @@ function createGrid() {
     var wrapAroundLevel = currentLevel % levelData.length;
 
     var currentLevelGrid = levelData[wrapAroundLevel].grid;
-    var goalCost = Math.pow(1.5, currentLevel) * 100000000;
+    var goalCost = Math.pow(2, currentLevel) * 100000000;
 
     var totalFromLevelData = 0;
     for(var column = 0; column < currentLevelGrid[0].length; column++) {
@@ -504,7 +504,7 @@ function tickGrowth() {
             deriv.currentTicks -= deriv.ticksNeeded;
             if(x === 0) {
                 //deriv.amount  deriv.gainMultiplier
-                bonuses.growthBonus += (deriv.amount * Math.pow(2, deriv.upgradeAmount)) / 100;
+                bonuses.growthBonus += (deriv.amount * Math.pow(2, deriv.upgradeAmount)) / 10000;
                 continue;
             }
             var prevDeriv = bonuses.derivs[x-1];
