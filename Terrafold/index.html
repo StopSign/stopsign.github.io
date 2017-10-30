@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <!-- to force a reload -->
+    <meta http-equiv="cache-control" content="max-age=0" />
+    <meta http-equiv="cache-control" content="no-cache" />
+    <meta http-equiv="expires" content="0" />
+    <meta http-equiv="expires" content="Tue, 01 Jan 1980 1:00:00 GMT" />
+    <meta http-equiv="pragma" content="no-cache" />
+
+    <title>Terrafold</title>
+    <link rel="stylesheet" href="stylesheet.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+<body>
+
+<div id="info">
+    <div>Cash: <div id="cash"></div></div>
+    <div> Wood: <div id="wood"></div></div>
+    <div> Ore: <div id="ore"></div></div>
+</div><br>
+
+<div id="sky" style="position:absolute;">
+</div>
+<div id="ground" style="position:absolute;">
+</div>
+
+<div id="iceContainer">
+    <div>Ice: <div id="ice"></div></div>
+    <div class="button" onclick="game.buyIce()">Buy Ice for $1</div>
+    <input id="buyIceAmount" type="number"><label for="buyIceAmount">Amount to buy</label>
+    <div> Buyable Ice: <div id="buyableIce"></div></div>
+    <div> Sending: <div id="iceTransferred"></div></div>
+</div><br>
+<div id="indoorWaterContainer">
+    <div>Indoor Water: <div id="indoorWater"></div></div>
+    <div class="button" onclick="game.sellWater()">Sell Indoor Water for $1.2</div>
+    <input id="sellIndoorWaterAmount" type="number"><label for="sellIndoorWaterAmount">Amount to sell</label>
+    <div> Max: <div id="indoorWaterMax"></div></div>
+</div><br>
+<div id="outdoorWaterContainer">
+    <div>Outdoor Water: <div id="outdoorWater"></div></div>
+    <div>Sending: <div id="waterTransferred"></div></div>
+</div><br>
+<div id="cloudsContainer">
+    <div>Cloud Water: <div id="clouds"></div></div>
+    <div>Next Storm: <div id="stormTimer"></div></div>
+    <div>Storm Intensity: <div id="stormRate"></div></div>
+    <div>Storm Duration: <div id="stormDuration"></div></div>
+    <div>Rain: <div id="rain"></div></div>
+</div><br>
+<div id="landContainer">
+    <div>Land Water: <div id="landWater"></div></div>
+    <div>Land: <div id="land"></div></div>
+    <div>Soil: <div id="soil"></div></div>
+    <div>Converted: <div id="landConverted"></div></div>
+    <div>Sent: <div id="soilWaterTransferred"></div></div>
+</div><br>
+<div id="forestContainer">
+    <div>Trees: <div id="forest"></div></div>
+    <div>Forest Water: <div id="forestWater"></div></div>
+</div><br>
+<div id="foodContainer">
+    <div>Food: <div id="food"></div></div>
+    <div>Food Water: <div id="foodWater"></div></div>
+</div><br>
+<div id="populationContainer">
+    <div>Population: <div id="population"></div></div>
+</div><br>
+<div id="mineContainer">
+    <div>Mines: <div id="mines"></div></div>
+</div><br>
+<div id="robotsContainer">
+    <div>Robots: <div id="robots"></div></div>
+</div><br>
+<div id="spaceportContainer">
+
+</div>
+
+</body>
+<script src="helpers.js"></script>
+<script src="interval.js"></script>
+<script src="view.js"></script>
+<script src="driver.js"></script>
+<script src="game.js"></script>
+<script src="classes/Clouds.js"></script>
+<script src="classes/Food.js"></script>
+<script src="classes/Ice.js"></script>
+<script src="classes/Land.js"></script>
+<script src="classes/Population.js"></script>
+<script src="classes/Robots.js"></script>
+<script src="classes/Spaceport.js"></script>
+<script src="classes/Water.js"></script>
+<script src="saving.js"></script>
+</html>
