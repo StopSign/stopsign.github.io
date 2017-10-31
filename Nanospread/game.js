@@ -319,7 +319,7 @@ function calcEvolutionPointGain() {
         highestLevel++;
         console.log('level up!');
     }
-    return bonus === 0 ? 0 : ((currentLevel+1) * Math.pow(1.3, bonus) * (1 + (calcTotalAchieveBonus() / 100)));
+    return bonus === 0 ? 0 : ((currentLevel+1) * Math.pow(1.2, bonus) * (1 + (calcTotalAchieveBonus() / 100)));
 }
 
 function recalcInterval(newSpeed) {
@@ -519,7 +519,7 @@ function tickGrowth() {
 function resetDerivBonuses() {
     bonuses.growthBonus = 1;
     for(var x = 0; x < bonuses.derivs.length; x++) {
-        bonuses.derivs[x].ticksNeeded = x === 0 ? 1 : Math.pow(2, (x-1))*5;
+        bonuses.derivs[x].ticksNeeded = x === 0 ? 4 : Math.pow(2, (x-1))*10;
         bonuses.derivs[x].currentTicks = 0;
         bonuses.derivs[x].upgradeAmount = 0;
         bonuses.derivs[x].amount = 1;
@@ -543,7 +543,7 @@ function addDeriv() {
     var pos = bonuses.derivs.length;
     bonuses.derivs[pos] = {};
     var newDeriv = bonuses.derivs[pos];
-    newDeriv.ticksNeeded = pos === 0 ? 1 : Math.pow(2, (pos-1))*5;
+    newDeriv.ticksNeeded = pos === 0 ? 4 : Math.pow(2, (pos-1))*10;
     newDeriv.currentTicks = 0;
     newDeriv.upgradeAmount = 0;
     newDeriv.amount = 1;
