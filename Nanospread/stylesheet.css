@@ -245,6 +245,11 @@ input, label {
     font-size:12px;
     margin-top:36%;
 }
+.displayNum2 {
+    font-weight:bold;
+    font-size:12px;
+    display:block;
+}
 .directionDot {
     background-color:white;
     width:2px;

@@ -46,7 +46,7 @@ function loadDefaults() {
     settings.buyLowestOrAll = 1;
     settings.showLastOrLowest = 0;
     settings.selectAllOrLowestBorderColor = 0;
-    settings.selectShowNoneOrNanitesOrAmount = 1;
+    settings.selectShowNoneOrNanitesOrAmount = 3;
     highestLevel = 0; //SHOULD BE 0 BEFORE COMMIT
     currentLevel = 0;
 

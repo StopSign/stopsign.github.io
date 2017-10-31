@@ -42,6 +42,7 @@ function View() {
                 elem.innerHTML =
                     "<div class='naniteSquare' style='left:"+rectStartX+"px;top:"+rectStartY+"px;width:"+(rowSize-10)+"px;height:"+(rowSize-10)+"px;' onclick='clickedSquare("+col+","+row+")'>" +
                     "<div class='displayNum' id='displayNumcol"+col+"row"+row+"'></div>" +
+                    "<div class='displayNum2' id='displayNum2col"+col+"row"+row+"'></div>" +
                     "<div class='directionDot' id='directionDotcol"+col+"row"+row+"'></div>" +
                     "<div class='directionArrowOuter' id='directionArrowOutercol"+col+"row"+row+"'></div>" +
                     "<div class='directionArrowInner' id='directionArrowInnercol"+col+"row"+row+"'></div>" +
@@ -290,6 +291,7 @@ function View() {
         if(!displayNum) {
             return;
         }
+        displayNum.style.marginTop = "36%";
         if(settings.selectShowNoneOrNanitesOrAmount === 0) {
             displayNum.innerHTML = '';
         } else if(settings.selectShowNoneOrNanitesOrAmount === 1) {
@@ -298,9 +300,18 @@ function View() {
             } else {
                 displayNum.innerHTML = intToStringRound(square.consumeCost);
             }
-        } else {
+        } else if(settings.selectShowNoneOrNanitesOrAmount === 2) {
             if(square.isActive()) {
                 displayNum.innerHTML = intToStringRound(square[resourceType+'Amount']);
+            } else {
+                displayNum.innerHTML = intToStringRound(square.consumeCost);
+            }
+        } else {
+            var secondDisplayNum = document.getElementById('displayNum2col'+square.col+'row'+square.row);
+            if(square.isActive()) {
+                displayNum.style.marginTop = "23%";
+                displayNum.innerHTML = intToStringRound(square[resourceType+'s']);
+                secondDisplayNum.innerHTML = "("+intToStringRound(square[resourceType+'Amount'])+")";
             } else {
                 displayNum.innerHTML = intToStringRound(square.consumeCost);
             }
