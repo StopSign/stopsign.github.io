@@ -6,16 +6,20 @@ function View() {
         this.updateWater();
         this.updateClouds();
         this.updateLand();
+        this.updateTrees();
+        this.updateFarms();
+        this.updatePopulation();
     };
 
     this.updateInfo = function() {
         document.getElementById('cash').innerHTML = intToString(game.cash);
         document.getElementById('wood').innerHTML = intToString(game.wood);
-        document.getElementById('ore').innerHTML = intToString(game.ore);
+        document.getElementById('science').innerHTML = intToString(game.science);
+        document.getElementById('metal').innerHTML = intToString(game.metal);
     };
 
     this.updateIce = function() {
-        document.getElementById('ice').innerHTML = intToString(game.ice.amount);
+        document.getElementById('ice').innerHTML = intToString(game.ice.ice);
         document.getElementById('buyableIce').innerHTML = intToString(game.ice.buyable);
         document.getElementById('iceTransferred').innerHTML = intToString(game.ice.transferred, 4);
     };
@@ -29,7 +33,7 @@ function View() {
     };
 
     this.updateClouds = function() {
-        document.getElementById('clouds').innerHTML = intToString(game.clouds.amount);
+        document.getElementById('clouds').innerHTML = intToString(game.clouds.water);
         document.getElementById('stormTimer').innerHTML = game.clouds.stormTimer+"";
         document.getElementById('stormRate').innerHTML = game.clouds.stormRate+"%";
         document.getElementById('stormDuration').innerHTML = game.clouds.stormDuration+"";
@@ -37,11 +41,30 @@ function View() {
     };
 
     this.updateLand = function() {
-        document.getElementById('landWater').innerHTML = intToString(game.land.amount);
+        document.getElementById('landWater').innerHTML = intToString(game.land.water);
         document.getElementById('land').innerHTML = intToString(game.land.land);
         document.getElementById('soil').innerHTML = intToString(game.land.soil);
-        document.getElementById('landConverted').innerHTML = intToString(game.land.convertedLand);
+        document.getElementById('landConverted').innerHTML = intToString(game.land.convertedLand, 4);
         document.getElementById('soilWaterTransferred').innerHTML = intToString(game.land.transferred, 4);
     };
+
+    this.updateTrees = function() {
+        document.getElementById('treesWater').innerHTML = intToString(game.trees.water);
+        document.getElementById('trees').innerHTML = intToString(game.trees.trees);
+    };
+
+    this.updateFarms = function() {
+        document.getElementById('farmsWater').innerHTML = intToString(game.farms.water);
+        document.getElementById('farms').innerHTML = intToString(game.farms.farms);
+        document.getElementById('food').innerHTML = intToString(game.farms.food);
+        document.getElementById('foodCreated').innerHTML = intToString(game.farms.foodCreated, 4);
+    };
+
+    this.updatePopulation = function() {
+        document.getElementById('population').innerHTML = intToString(game.population.people);
+        document.getElementById('foodEaten').innerHTML = intToString(game.population.foodEaten);
+        document.getElementById('populationGrowth').innerHTML = intToString(game.population.popGrowth);
+
+    }
 
 }

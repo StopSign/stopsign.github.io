@@ -1,8 +1,8 @@
 function Ice() {
-    this.amount = 0;
-    this.buyable = 100;
-    this.gain = 1;
-    this.max = 100;
+    this.ice = 0;
+    this.buyable = 1000;
+    this.gain = 10;
+    this.max = 1000;
 
     this.transferred = 0;
 
@@ -13,9 +13,9 @@ function Ice() {
         }
     };
 
-    this.transferAmount = function() {
-        this.transferred = this.amount / 1000;
-        this.amount -= this.transferred;
+    this.transferWater = function() {
+        this.transferred = this.ice / 1000;
+        this.ice -= this.transferred;
         return this.transferred;
     };
 
@@ -24,7 +24,7 @@ function Ice() {
             toBuy = this.buyable;
         }
         this.buyable -= toBuy;
-        this.amount += toBuy;
+        this.ice += toBuy;
         return toBuy;
     };
 }

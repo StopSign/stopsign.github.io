@@ -1,21 +1,21 @@
 function Clouds() {
-    this.amount = 0;
+    this.water = 0;
     this.initialStormTimer = 300;
     this.stormTimer = 300;
     this.stormRate = 0; //climbs to 100, stays for stormDuration, falls to 0
     this.storming = 0;
-    this.initialStormDuration = 20;
-    this.stormDuration = 20;
+    this.initialStormDuration = 60;
+    this.stormDuration = 60;
     this.transferred = 0;
 
     this.tick = function(gained) {
-        this.amount += gained;
+        this.water += gained;
         this.nextStormTimer();
     };
 
-    this.transferAmount = function() {
-        this.transferred = this.amount / 1000 * this.stormRate / 100;
-        this.amount -= this.transferred;
+    this.transferWater = function() {
+        this.transferred = this.water / 1000 * this.stormRate / 100;
+        this.water -= this.transferred;
         return this.transferred;
     };
 

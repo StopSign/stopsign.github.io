@@ -1,17 +1,22 @@
 //All things related to cash should be in this class
 function Game() {
-    this.totalLand = 1e10;
-    this.cash = 100;
+    this.totalLand = 1000;
+    this.cash = 1000; //Actual default: 10
     this.wood = 0;
-    this.ore = 0;
+    this.science = 0;
+    this.metal = 0;
 
     this.tick = function() {
         this.ice.tick();
 
-
-        this.land.tick(this.clouds.transferAmount());
-        this.clouds.tick(this.water.transferAmount());
-        this.water.tick(this.ice.transferAmount());
+        this.population.tick();
+        this.farms.tick(this.land.transferWater());
+        this.water.outdoor += this.farms.transferWater();
+        this.wood += this.trees.tick(this.land.transferWater());
+        this.water.outdoor += this.trees.transferWater();
+        this.land.tick(this.clouds.transferWater());
+        this.clouds.tick(this.water.transferWater());
+        this.water.tick(this.ice.transferWater());
     };
 
     this.initialize = function() {
@@ -19,6 +24,8 @@ function Game() {
         this.water = new Water();
         this.clouds = new Clouds();
         this.land = new Land(this.totalLand);
+        this.trees = new Trees();
+        this.farms = new Farms();
         this.population = new Population();
         this.robots = new Robots();
         this.spaceport = new Spaceport();
@@ -45,5 +52,21 @@ function Game() {
         var waterSold = this.water.sellWater(toSell);
         this.cash += this.water.getPrice(waterSold);
         view.update();
-    }
+    };
+
+    this.buyFarms = function() {
+        var toBuy = Number(document.getElementById('buyFarmAmount').value);
+        if(toBuy * 20 > this.wood) {
+            toBuy = Math.floor(this.wood/20);
+        }
+        if(toBuy * 20 > this.soil) {
+            toBuy = Math.floor(this.soil/20);
+        }
+        if(toBuy <= 0) {
+            return;
+        }
+        this.wood -= toBuy * 20;
+        this.soil -= toBuy * 20;
+        this.farms.addFarm(toBuy);
+    };
 }

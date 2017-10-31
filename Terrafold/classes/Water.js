@@ -1,7 +1,7 @@
 function Water() {
     this.indoor = 0;
     this.outdoor = 0;
-    this.maxIndoor = 5;
+    this.maxIndoor = 50;
 
     this.tick = function(gained) {
         this.indoor += gained;
@@ -13,7 +13,7 @@ function Water() {
 
     };
 
-    this.transferAmount = function() {
+    this.transferWater = function() {
         this.transferred = this.outdoor / 1000;
         this.outdoor -= this.transferred;
         return this.transferred;
