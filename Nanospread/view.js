@@ -522,7 +522,10 @@ function View() {
         document.getElementById('growthBonus').innerHTML = intToString(bonuses.growthBonus, 5);
     };
 
-	this.derivNames = ['Neurons', 'Neural Paths', 'Neural Nodes', 'Neural Groups', 'Neural Clusters', 'Neural Swarms', 'Neural Nets', 'Neural Cities', 'Processors', 'Chips', 'Chipsets', 'Architectures', 'Computers'];
+	this.derivNames = ['Neurons', 'Neural Paths', 'Neural Nodes', 'Neural Groups', 'Neural Clusters', 'Neural Swarms',
+        'Neural Nets', 'Neural Cities', 'Processors', 'Chips', 'Chipsets', 'Architectures', 'Computers',
+        'Supercomputers', 'Computer Clusters', 'Logical AI', 'Chained AI', 'Subservient AI', 'Sentient AI',
+        'Singularities'];
 
 	this.recreateDerivs = function() {
 	    //Dynamically create all divs and their buy buttons
