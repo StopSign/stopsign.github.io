@@ -12,6 +12,9 @@ function createGridFromSave(savedGrid) {
                 theGrid[column][row] = new Square(column, row, 5);
                 for(var property in savedGrid[column][row]) {
                     if (savedGrid[column][row].hasOwnProperty(property)) {
+                        if(property === "specialLevels") {
+                            continue;
+                        }
                         theGrid[column][row][property] = savedGrid[column][row][property];
                     }
                 }
@@ -19,8 +22,9 @@ function createGridFromSave(savedGrid) {
             }
         }
     }
-
-    theView = new View();
+    if(!theView) {
+        theView = new View();
+    }
 }
 
 

@@ -76,16 +76,20 @@ function toggleIMessedUpPopup1() { //Let's hope there's not more
     }
 }
 
+function clearBoard() {
+    createGrid();
+    if(!theView) {
+        theView = new View();
+    }
+    theView.createGrid();
+    theView.update();
+    recalcInterval(bonuses.tickSpeedLevel);
+}
+
 function load() {
     loadDefaults();
     if (!window.localStorage.version4) { //New players to the game
-        createGrid();
-        if(!theView) {
-            theView = new View();
-        }
-        theView.createGrid();
-        theView.update();
-        recalcInterval(bonuses.tickSpeedLevel);
+        clearBoard();
         if(window.localStorage.version3) { //New players to version 4
             var oldLoad = JSON.parse(window.localStorage.version3);
             var roughBonus = ((oldLoad.bonuses.tickSpeedLevel - 1)  * 5) + oldLoad.bonuses.transferRateLevel * .4 + oldLoad.bonuses.discountLevel * .2 + oldLoad.autobuy.currentMax * .3 + oldLoad.autobuy.amtToSpend * .5;
@@ -147,6 +151,19 @@ function save() {
 	toSave.achieves = achieves;
     // console.log('saved');
     window.localStorage.version4 = JSON.stringify(toSave);
+}
+
+function exportSave() {
+    save();
+    document.getElementById("exportImport").value = encode(window.localStorage.version4);
+    document.getElementById("exportImport").select();
+    document.execCommand('copy');
+    document.getElementById("exportImport").value = "";
+}
+
+function importSave() {
+    window.localStorage.version4 = decode(document.getElementById("exportImport").value);
+    load();
 }
 
 load();

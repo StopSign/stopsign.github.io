@@ -288,10 +288,12 @@ function View() {
 
     this.updateDisplayNum = function(square, resourceType) {
         var displayNum = document.getElementById('displayNumcol'+square.col+'row'+square.row);
+        var secondDisplayNum = document.getElementById('displayNum2col'+square.col+'row'+square.row);
         if(!displayNum) {
             return;
         }
         displayNum.style.marginTop = "36%";
+        secondDisplayNum.style.display = "none";
         if(settings.selectShowNoneOrNanitesOrAmount === 0) {
             displayNum.innerHTML = '';
         } else if(settings.selectShowNoneOrNanitesOrAmount === 1) {
@@ -307,7 +309,7 @@ function View() {
                 displayNum.innerHTML = intToStringRound(square.consumeCost);
             }
         } else {
-            var secondDisplayNum = document.getElementById('displayNum2col'+square.col+'row'+square.row);
+            secondDisplayNum.style.display = "block";
             if(square.isActive()) {
                 displayNum.style.marginTop = "23%";
                 displayNum.innerHTML = intToStringRound(square[resourceType+'s']);
@@ -369,8 +371,10 @@ function View() {
             document.getElementById('selectShowNone').checked = "checked";
         } else if(settings.selectShowNoneOrNanitesOrAmount === 1) {
             document.getElementById('selectShowNanites').checked = "checked";
-        } else {
+        } else if(settings.selectShowNoneOrNanitesOrAmount === 2) {
             document.getElementById('selectShowUpgradeAmount').checked = "checked";
+        } else {
+            document.getElementById('selectShowBoth').checked = "checked";
         }
     };
 

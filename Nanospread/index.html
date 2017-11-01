@@ -187,8 +187,14 @@
         The total nanite consume cost of a level goes up 2x per level.<br>
         Press the WASD / arrow keys to change direction<br>
         Press enter / space to buy the first upgrade of the selected<br>
-        Click the edges of the screen to scroll around<br>
-        <div class="menuButton" onclick="save()">Save</div>
+        Click the edges of the screen to scroll around<br><br>
+        <div class="menuButton" onclick="save()">Save Manually</div><br>
+        <input id="exportImport"><label for="exportImport">Export/Import</label><br>
+        Click Export to export to your clipboard (ctrl-v somewhere else).<br>
+        Paste a save and click Import to import.<br>
+        Sorry for lag when pasting save.<br>
+        <div class="menuButton" onclick="exportSave()">Export</div><br>
+        <div class="menuButton" onclick="importSave()">Import</div> WARNING: Import will break the game if invalid save. Empty import will hard clear the game
         <i id="backButton3" class="backButton fa fa-close" onclick="closeHelpBox()" style="font-size:24px"></i>
     </div>
     <div id="settingsBox" style="display:none;">
