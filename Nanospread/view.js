@@ -1,8 +1,6 @@
 function View() {
     this.offsetx = 0;
     this.offsety = 0;
-    this.dragOffsetx = 0;
-    this.dragOffsety = 0;
     this.backgroundGrid = document.getElementById('theBody');
     this.naniteGrid = document.getElementById('naniteGrid');
     this.dragSelectDiv = document.getElementById('dragSelectDiv');
@@ -24,8 +22,8 @@ function View() {
         this.updateOffset();
     };
     this.updateOffset = function() {
-        document.getElementById('naniteGridPosition').style.left = this.offsetx+this.dragOffsetx+'px';
-        document.getElementById('naniteGridPosition').style.top = this.offsety+this.dragOffsety+'px';
+        document.getElementById('naniteGridPosition').style.left = this.offsetx+'px';
+        document.getElementById('naniteGridPosition').style.top = this.offsety+'px';
     };
 
     this.createGrid = function() {
