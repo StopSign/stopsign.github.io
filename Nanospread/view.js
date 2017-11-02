@@ -1,6 +1,8 @@
 function View() {
     this.offsetx = 0;
     this.offsety = 0;
+    this.dragOffsetx = 0;
+    this.dragOffsety = 0;
     this.backgroundGrid = document.getElementById('theBody');
     this.naniteGrid = document.getElementById('naniteGrid');
     this.dragSelectDiv = document.getElementById('dragSelectDiv');
@@ -22,8 +24,8 @@ function View() {
         this.updateOffset();
     };
     this.updateOffset = function() {
-        document.getElementById('naniteGridPosition').style.left = this.offsetx+'px';
-        document.getElementById('naniteGridPosition').style.top = this.offsety+'px';
+        document.getElementById('naniteGridPosition').style.left = this.offsetx+this.dragOffsetx+'px';
+        document.getElementById('naniteGridPosition').style.top = this.offsety+this.dragOffsety+'px';
     };
 
     this.createGrid = function() {
@@ -71,6 +73,10 @@ function View() {
     };
 
     this.backgroundGrid.onmousedown  = function(e) {
+        if(e.which === 3) { //Right click
+            rclickStartingPoint = {x:e.pageX, y:e.pageY};
+            return;
+        }
         startingDragPoint = {x:e.pageX - theView.offsetx - 8, y:e.pageY - theView.offsety};
         theView.dragSelectDiv.style.width = '2px';
         theView.dragSelectDiv.style.height = '2px';
@@ -79,7 +85,14 @@ function View() {
         isDragging = true;
     };
     this.backgroundGrid.onmousemove = function(e) {
-
+        if(e.which === 3) {
+            var dragToPoint = {x:e.pageX, y:e.pageY};
+            theView.offsetx += dragToPoint.x - rclickStartingPoint.x;
+            theView.offsety += dragToPoint.y - rclickStartingPoint.y;
+            theView.updateOffset();
+            rclickStartingPoint = dragToPoint;
+            return;
+        }
         var currentPos = {x:e.x - theView.offsetx, y:e.y - theView.offsety};
         if(isDragging) {
             var distance = Math.sqrt(Math.pow(startingDragPoint.x - currentPos.x, 2) + Math.pow(startingDragPoint.y - currentPos.y, 2));
@@ -114,6 +127,9 @@ function View() {
 
     };
     this.backgroundGrid.onmouseup  = function(e) {
+        if(e.which === 3) {
+            return;
+        }
         document.getElementById('dragSelectDiv').style.display = 'none';
         isDragging = false;
         endingDragPoint = {x:(e.x - theView.offsetx), y:(e.y - theView.offsety)};
