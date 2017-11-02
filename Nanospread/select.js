@@ -99,8 +99,11 @@ function Select() {
                 var square = theGrid[column][row];
                 var squareDiv = theView.grid[column][row];
                 if (square && squareDiv) {
-                    var squareStartingPoint = {x:pxToInt(squareDiv.style.left), y:pxToInt(squareDiv.style.top)};
-                    var squareEndingPoint = {x:(pxToInt(squareDiv.style.left)+pxToInt(squareDiv.style.width)), y:(pxToInt(squareDiv.style.top)+pxToInt(squareDiv.style.height))};
+                    var containerOffset = (document.getElementById('theBody').offsetWidth - 800)/2;
+
+                    var squareStartingPoint = {x:pxToInt(squareDiv.style.left)+containerOffset, y:pxToInt(squareDiv.style.top)};
+                    var squareEndingPoint = {x:(pxToInt(squareDiv.style.left)+pxToInt(squareDiv.style.width)+containerOffset), y:(pxToInt(squareDiv.style.top)+pxToInt(squareDiv.style.height))};
+
                     if(doOverlap(squareStartingPoint, squareEndingPoint, startingDragPoint, endingDragPoint) &&
                         !insideSquare(squareStartingPoint, squareEndingPoint, startingDragPoint, endingDragPoint)) {
                         clickedSquare(column, row);
