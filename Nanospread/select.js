@@ -99,7 +99,7 @@ function Select() {
                 var square = theGrid[column][row];
                 var squareDiv = theView.grid[column][row];
                 if (square && squareDiv) {
-                    var containerOffset = (document.getElementById('theBody').offsetWidth - 800)/2;
+                    var containerOffset = document.getElementById('theBody').offsetWidth > 800 ? (document.getElementById('theBody').offsetWidth - 800)/2 : 0;
 
                     var squareStartingPoint = {x:pxToInt(squareDiv.style.left)+containerOffset, y:pxToInt(squareDiv.style.top)};
                     var squareEndingPoint = {x:(pxToInt(squareDiv.style.left)+pxToInt(squareDiv.style.width)+containerOffset), y:(pxToInt(squareDiv.style.top)+pxToInt(squareDiv.style.height))};
