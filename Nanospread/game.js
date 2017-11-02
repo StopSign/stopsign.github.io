@@ -184,9 +184,10 @@ function changeDirectionOfSelected(direction) {
         return;
     }
     for(var i = 0; i < selected.length; i++) {
+        var tempDirection = selected[i].transferDirection;
         selected[i].changeTargetDirection(direction);
         if(!selected[i].getTarget()) {
-            selected[i].chooseStartingDirection();
+            selected[i].changeTargetDirection(tempDirection);
         }
     }
     theView.updateInfoBox();
