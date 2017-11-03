@@ -57,13 +57,14 @@ function View() {
         document.getElementById('farmsWater').innerHTML = intToString(game.farms.water);
         document.getElementById('farms').innerHTML = intToString(game.farms.farms);
         document.getElementById('food').innerHTML = intToString(game.farms.food);
-        document.getElementById('foodCreated').innerHTML = intToString(game.farms.foodCreated, 4);
+        document.getElementById('foodCreated').innerHTML = intToString(game.farms.foodCreated);
     };
 
     this.updatePopulation = function() {
         document.getElementById('population').innerHTML = intToString(game.population.people);
-        document.getElementById('foodEaten').innerHTML = intToString(game.population.foodEaten);
-        document.getElementById('populationGrowth').innerHTML = intToString(game.population.popGrowth);
+        document.getElementById('foodEaten').innerHTML = intToString(game.population.foodEaten, 4);
+        document.getElementById('populationGrowth').innerHTML = intToString(game.population.popGrowth, 4);
+        document.getElementById('starving').innerHTML = intToString(game.population.starving, 4);
 
     }
 

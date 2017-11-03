@@ -1,7 +1,7 @@
 //All things related to cash should be in this class
 function Game() {
     this.totalLand = 1000;
-    this.cash = 1000; //Actual default: 10
+    this.cash = 10000; //Actual default: 100
     this.wood = 0;
     this.science = 0;
     this.metal = 0;
@@ -59,14 +59,14 @@ function Game() {
         if(toBuy * 20 > this.wood) {
             toBuy = Math.floor(this.wood/20);
         }
-        if(toBuy * 20 > this.soil) {
-            toBuy = Math.floor(this.soil/20);
+        if(toBuy * 20 > this.land.soil) {
+            toBuy = Math.floor(this.land.soil/20);
         }
         if(toBuy <= 0) {
             return;
         }
         this.wood -= toBuy * 20;
-        this.soil -= toBuy * 20;
+        this.land.soil -= toBuy * 20;
         this.farms.addFarm(toBuy);
     };
 }
