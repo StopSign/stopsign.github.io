@@ -71,7 +71,7 @@ function View() {
     };
 
     this.backgroundGrid.onmousedown  = function(e) {
-        if(e.which === 3) { //Right click
+        if((e.which && e.which === 3) || (e.buttons && e.buttons === 2)) { //Right click
             rclickStartingPoint = {x:e.pageX, y:e.pageY};
             return;
         }
@@ -83,15 +83,16 @@ function View() {
         isDragging = true;
     };
     this.backgroundGrid.onmousemove = function(e) {
-        if(e.which === 3) {
+        if((e.which && e.which === 3) || (e.buttons && e.buttons === 2)) {
             var dragToPoint = {x:e.pageX, y:e.pageY};
+            console.log(dragToPoint);
             theView.offsetx += dragToPoint.x - rclickStartingPoint.x;
             theView.offsety += dragToPoint.y - rclickStartingPoint.y;
             theView.updateOffset();
             rclickStartingPoint = dragToPoint;
             return;
         }
-        var currentPos = {x:e.x - theView.offsetx, y:e.y - theView.offsety};
+        var currentPos = {x:e.pageX - theView.offsetx, y:e.pageY - theView.offsety};
         if(isDragging) {
             var distance = Math.sqrt(Math.pow(startingDragPoint.x - currentPos.x, 2) + Math.pow(startingDragPoint.y - currentPos.y, 2));
             if(distance < 20) {
@@ -125,12 +126,12 @@ function View() {
 
     };
     this.backgroundGrid.onmouseup  = function(e) {
-        if(e.which === 3) {
+        if((e.which && e.which === 3) || (e.buttons && e.buttons === 2)) {
             return;
         }
         document.getElementById('dragSelectDiv').style.display = 'none';
         isDragging = false;
-        endingDragPoint = {x:(e.x - theView.offsetx), y:(e.y - theView.offsety)};
+        endingDragPoint = {x:(e.pageX - theView.offsetx), y:(e.pageY - theView.offsety)};
         var distance = Math.sqrt(Math.pow(startingDragPoint.x - endingDragPoint.x, 2) + Math.pow(startingDragPoint.y - endingDragPoint.y, 2));
         if(distance < 20) {
             return;
@@ -219,61 +220,25 @@ function View() {
             backgroundColor = getActiveBackgroundColor(square.nanites);
         }
         if(dir === "East") {
-            directionArrowOuter.style.top = '8px';
-            directionArrowOuter.style.left = '44px';
-            directionArrowOuter.style.borderTop = '15px solid transparent';
-            directionArrowOuter.style.borderBottom = '15px solid transparent';
+            directionArrowOuter.className = "directionArrowOuterEast";
+            directionArrowInner.className = "directionArrowInnerEast";
             directionArrowOuter.style.borderLeft = '7px solid '+borderColor;
-            directionArrowOuter.style.borderRight = '0';
-
-            directionArrowInner.style.top = '8px';
-            directionArrowInner.style.left = '42px';
-            directionArrowInner.style.borderTop = '15px solid transparent';
-            directionArrowInner.style.borderBottom = '15px solid transparent';
             directionArrowInner.style.borderLeft = '7px solid '+backgroundColor;
-            directionArrowInner.style.borderRight = '0';
         } else if(dir === "West") {
-            directionArrowOuter.style.top = '8px';
-            directionArrowOuter.style.left = '-7px';
-            directionArrowOuter.style.borderTop = '15px solid transparent';
-            directionArrowOuter.style.borderBottom = '15px solid transparent';
+            directionArrowOuter.className = "directionArrowOuterWest";
+            directionArrowInner.className = "directionArrowInnerWest";
             directionArrowOuter.style.borderRight = '7px solid '+borderColor;
-            directionArrowOuter.style.borderLeft = '0';
-
-            directionArrowInner.style.top = '8px';
-            directionArrowInner.style.left = '-5px';
-            directionArrowInner.style.borderTop = '15px solid transparent';
-            directionArrowInner.style.borderBottom = '15px solid transparent';
             directionArrowInner.style.borderRight = '7px solid '+backgroundColor;
-            directionArrowInner.style.borderLeft = '0';
         } else if(dir === "North") {
-            directionArrowOuter.style.top = '-7px';
-            directionArrowOuter.style.left = '8px';
-            directionArrowOuter.style.borderLeft = '15px solid transparent';
-            directionArrowOuter.style.borderRight = '15px solid transparent';
+            directionArrowOuter.className = "directionArrowOuterNorth";
+            directionArrowInner.className = "directionArrowInnerNorth";
             directionArrowOuter.style.borderBottom = '7px solid '+borderColor;
-            directionArrowOuter.style.borderTop = '0';
-
-            directionArrowInner.style.top = '-5px';
-            directionArrowInner.style.left = '8px';
-            directionArrowInner.style.borderLeft = '15px solid transparent';
-            directionArrowInner.style.borderRight = '15px solid transparent';
             directionArrowInner.style.borderBottom = '7px solid '+backgroundColor;
-            directionArrowInner.style.borderTop = '0';
         } else if(dir === "South") {
-            directionArrowOuter.style.top = '44px';
-            directionArrowOuter.style.left = '8px';
-            directionArrowOuter.style.borderLeft = '15px solid transparent';
-            directionArrowOuter.style.borderRight = '15px solid transparent';
+            directionArrowOuter.className = "directionArrowOuterSouth";
+            directionArrowInner.className = "directionArrowInnerSouth";
             directionArrowOuter.style.borderTop = '7px solid '+borderColor;
-            directionArrowOuter.style.borderBottom = '0';
-
-            directionArrowInner.style.top = '42px';
-            directionArrowInner.style.left = '8px';
-            directionArrowInner.style.borderLeft = '15px solid transparent';
-            directionArrowInner.style.borderRight = '15px solid transparent';
             directionArrowInner.style.borderTop = '7px solid '+backgroundColor;
-            directionArrowInner.style.borderBottom = '0';
         }
     };
 

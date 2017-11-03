@@ -350,3 +350,60 @@ input, label {
 .growthTab {
     background-color: #6bb347;
 }
+
+.directionArrowOuterEast, .directionArrowInnerEast {
+    top:8px;
+    position:absolute;
+    border-top:15px solid transparent !important;
+    border-bottom:15px solid transparent !important;
+    border-right:0 !important;
+}
+.directionArrowOuterEast {
+    left:44px;
+}
+.directionArrowInnerEast {
+    left:42px;
+}
+
+.directionArrowOuterWest, .directionArrowInnerWest {
+    top:8px;
+    position:absolute;
+    border-top:15px solid transparent !important;
+    border-bottom:15px solid transparent !important;
+    border-left:0 !important;
+}
+.directionArrowOuterWest {
+    left:-7px;
+}
+.directionArrowInnerWest {
+    left:-5px;
+}
+
+.directionArrowOuterSouth, .directionArrowInnerSouth {
+    left:8px;
+    position:absolute;
+    border-left:15px solid transparent !important;
+    border-right:15px solid transparent !important;
+    border-bottom:0 !important;
+}
+.directionArrowOuterSouth {
+    top:44px;
+}
+.directionArrowInnerSouth {
+    top:42px;
+}
+
+
+.directionArrowOuterNorth, .directionArrowInnerNorth {
+    left:8px;
+    position:absolute;
+    border-left:15px solid transparent !important;
+    border-right:15px solid transparent !important;
+    border-top:0 !important;
+}
+.directionArrowOuterNorth {
+    top:-7px;
+}
+.directionArrowInnerNorth {
+    top:-5px;
+}

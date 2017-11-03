@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE HTML>
 <html lang="en" style="height:100%">
 <head>
     <meta charset="UTF-8">
@@ -14,10 +14,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 	
 </head>
-<body id="theBody" style="font-family:Arial, Helvetica, serif;color:black;font-size:14px;background-color:black;height:100%;margin:0;" oncontextmenu="return false;">
-<!--<canvas id="drawArea" width="800" height="1000"></canvas>-->
+<body id="theBody" style="font-family:Arial, Helvetica, serif;color:black;font-size:0px;background-color:black;height:100%;margin:0;" oncontextmenu="return false;">
 
-<div id="container" style="display:block; margin:auto; height:100%; width:800px">
+<div id="container" style="display:block; margin:auto; height:100%; width:800px;">
 
 <div id="gridSpace" style="background-color:grey;position:relative;overflow:hidden;height:100%;width:100%">
     <div id="naniteGridPosition" style="position:relative;height:100%;">
@@ -32,7 +31,7 @@
 
 <div id="dragSelectDiv" style="display:none;border:2px solid yellow;border-radius:1px;position:absolute;"></div>
 
-<div id="imessedup" style="position:absolute;left:200px;top:200px;background-color:blue;padding:10px;display:none;">
+<div id="imessedup" class="small" style="position:absolute;left:200px;top:200px;background-color:blue;padding:10px;display:none;">
     To all existing players:<br>
     I've made significant changes to the EP gain formula, as it grew far more than I intended. I've <br>
     now changed the formula to be more like what I wanted.<br>
@@ -43,7 +42,7 @@
     Happy consuming! <div style="cursor:pointer;" class="medium" onclick="toggleIMessedUpPopup1()">Click here to close this message.</div>
 </div>
 
-<div id="menuBar" class="small" style="position:fixed;bottom:0;height:30px;width:800px;background-color:#8194bd;z-index:999;">
+<div id="menuBar" class="small" style="position:fixed;bottom:0;height:30px;width:800px;background-color:#8194bd;z-index:999;display:block;">
     <!--<div class="menuButton" onclick="toggleBuild()"><i class="fa fa-microchip" style="font-size:20px;"></i> Build (B)</div>-->
     <div class="menuButton" onclick="toggleSettingsBox()"><i class="fa fa-sliders" style="font-size:20px;"></i> Settings (Q)</div>
     <div class="menuButton" onclick="toggleHelp()"><i class="fa fa-question-circle-o" style="font-size:20px;"></i> Help (H)</div>
