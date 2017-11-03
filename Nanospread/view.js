@@ -219,24 +219,18 @@ function View() {
         if(square.isActive()) {
             backgroundColor = getActiveBackgroundColor(square.nanites);
         }
+        directionArrowOuter.className = "directionArrowOuter"+dir;
+        directionArrowInner.className = "directionArrowInner"+dir;
         if(dir === "East") {
-            directionArrowOuter.className = "directionArrowOuterEast";
-            directionArrowInner.className = "directionArrowInnerEast";
             directionArrowOuter.style.borderLeft = '7px solid '+borderColor;
             directionArrowInner.style.borderLeft = '7px solid '+backgroundColor;
         } else if(dir === "West") {
-            directionArrowOuter.className = "directionArrowOuterWest";
-            directionArrowInner.className = "directionArrowInnerWest";
             directionArrowOuter.style.borderRight = '7px solid '+borderColor;
             directionArrowInner.style.borderRight = '7px solid '+backgroundColor;
         } else if(dir === "North") {
-            directionArrowOuter.className = "directionArrowOuterNorth";
-            directionArrowInner.className = "directionArrowInnerNorth";
             directionArrowOuter.style.borderBottom = '7px solid '+borderColor;
             directionArrowInner.style.borderBottom = '7px solid '+backgroundColor;
         } else if(dir === "South") {
-            directionArrowOuter.className = "directionArrowOuterSouth";
-            directionArrowInner.className = "directionArrowInnerSouth";
             directionArrowOuter.style.borderTop = '7px solid '+borderColor;
             directionArrowInner.style.borderTop = '7px solid '+backgroundColor;
         }
