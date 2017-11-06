@@ -27,7 +27,7 @@ function loadDefaults() {
 function load() {
     loadDefaults();
     if (!window.localStorage.terrafold1) { //New players to the game
-        recalcInterval(10);
+        recalcInterval(10); //SHOULD BE 10 BEFORE CHECKIN
         return;
     }
     var toLoad = JSON.parse(window.localStorage.terrafold1);

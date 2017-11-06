@@ -2,7 +2,7 @@
 function Game() {
     this.totalLand = 1000;
     this.cash = 10000; //Actual default: 100
-    this.wood = 0;
+    this.oxygen = 0;
     this.science = 0;
     this.metal = 0;
 
@@ -12,11 +12,14 @@ function Game() {
         this.population.tick();
         this.farms.tick(this.land.transferWater());
         this.water.outdoor += this.farms.transferWater();
-        this.wood += this.trees.tick(this.land.transferWater());
+        this.trees.tick(this.land.transferWater());
         this.water.outdoor += this.trees.transferWater();
         this.land.tick(this.clouds.transferWater());
         this.clouds.tick(this.water.transferWater());
         this.water.tick(this.ice.transferWater());
+
+        this.oxygenLeak = this.oxygen / 100000;
+        this.oxygen -= this.oxygenLeak;
     };
 
     this.initialize = function() {
@@ -56,17 +59,17 @@ function Game() {
 
     this.buyFarms = function() {
         var toBuy = Number(document.getElementById('buyFarmAmount').value);
-        if(toBuy * 20 > this.wood) {
-            toBuy = Math.floor(this.wood/20);
+        if(toBuy * 50 > this.oxygen) {
+            toBuy = Math.floor(this.oxygen/50);
         }
-        if(toBuy * 20 > this.land.soil) {
-            toBuy = Math.floor(this.land.soil/20);
+        if(toBuy * 50 > this.land.soil) {
+            toBuy = Math.floor(this.land.soil/50);
         }
         if(toBuy <= 0) {
             return;
         }
-        this.wood -= toBuy * 20;
-        this.land.soil -= toBuy * 20;
+        this.oxygen -= toBuy * 50;
+        this.land.soil -= toBuy * 50;
         this.farms.addFarm(toBuy);
     };
 }

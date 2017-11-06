@@ -16,8 +16,9 @@
 <body>
 
 <div id="info">
-    <div>Cash: <div id="cash"></div></div>
-    <div> Wood: <div id="wood"></div></div>
+    <div> Total Water: <div id="totalWater"></div></div>
+    <div> Cash: <div id="cash"></div></div>
+    <div> Oxygen: <div id="oxygen"></div></div>
     <div> Science: <div id="science"></div></div>
     <div> Metal: <div id="metal"></div></div>
 </div><br>
@@ -62,21 +63,36 @@
     <div>Converted: <div id="landConverted"></div></div><br>
     <div>Sent: <div id="soilWaterTransferred"></div></div><br>
     Land + water = soil<br>
-    Water also goes to trees and hydroponics
+    Water also goes to trees and farms
 </div><br>
 <div id="treesContainer" class="container">
     <div>Forest Water: <div id="treesWater"></div></div><br>
+    <div>Ferns: <div id="ferns"></div></div><br>
+    <div>Ferns Growing: <div id="fernsDelta"></div></div><br>
+    <div>Ferns Dying: <div id="fernsDying"></div></div><br>
+    <div>Compost: <div id="compost"></div></div><br>
+    <div>CO2: <div id="co2"></div></div><br>
     <div>Trees: <div id="trees"></div></div><br>
-    Water makes trees grow, up to how much soil you have.<br>
-    One tree makes .01 wood/tick<br>
-    Extra water goes back outside
+    <div>Ferns Converted to Trees: <div id="treesDelta"></div></div><br>
+    <div>Trees Dying: <div id="treesDying"></div></div><br>
+    <div>Oxygen Produced: <div id="oxygenGain"></div></div><br>
+    Tree amount equilibrium is equal to soil amount.<br>
+    Water makes small trees grow<br>
+    Small trees die, becoming compost<br>
+    Compost becomes CO2<br>
+    Ferns, CO2, and water make trees<br>
+    One fern makes .001 oxygen/tick<br>
+    One big tree makes .01 oxygen/tick<br>
+    Extra water goes back outside<br>
+    A small amount of oxygen leaks into space<br>
+    <div>Oxygen Leaked: <div id="oxygenLeak"></div></div><br>
 </div><br>
 <div id="foodContainer" class="container">
     <div>Farm Water: <div id="farmsWater"></div></div><br>
     <div>Farms: <div id="farms"></div></div><br>
     <div>Food: <div id="food"></div></div><br>
     <div>Food Created: <div id="foodCreated"></div></div><br>
-    <div class="button" onclick="game.buyFarms()">Buy Farm for 20 wood and 20 soil</div><br>
+    <div class="button" onclick="game.buyFarms()">Buy Farm for 50 oxygen and 50 soil</div><br>
     <input id="buyFarmAmount" type="number" step="1"><label for="buyFarmAmount">Amount to buy</label><br>
     WARNING: using soil reduces trees.<br>
     One farm makes .01 food/tick, using water<br>
@@ -89,18 +105,22 @@
     <div>Dying from Starvation: <div id="starving"></div></div><br>
     One person eats .01 food / tick.<br>
     People die faster if there is no food.<br>
+    <div>Happiness: <div id="happiness"></div></div><br>
+    <div>Happiness From Trees: <div id="happinessFromTrees"></div></div><br>
+    <div>Happiness From Oxygen: <div id="happinessFromOxygen"></div></div><br>
+    People work harder if they are happier<br>
     <div id="sliderContainer" style="width:100px;">
         <input type="range" min="0" max="100" value="0" class="slider" id="scienceSlider">
-    </div><div><div id="scienceRatio"></div> science</div><br>
+    </div><div> <div id="scienceRatio"></div> science</div><br>
     Choose whether people create science or cash<br>
     <div>Science created: <div id="scienceDelta"></div></div><br>
     <div>Cash created: <div id="cashDelta"></div></div><br>
 </div><br>
-<div id="mineContainer" class="container">
-    <div>Mines: <div id="mines"></div></div>
-</div><br>
 <div id="robotsContainer" class="container">
     <div>Robots: <div id="robots"></div></div>
+</div><br>
+<div id="mineContainer" class="container">
+    <div>Mines: <div id="mines"></div></div>
 </div><br>
 <div id="spaceportContainer" class="container">
 

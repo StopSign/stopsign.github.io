@@ -12,8 +12,9 @@ function View() {
     };
 
     this.updateInfo = function() {
+        document.getElementById('totalWater').innerHTML = intToString(game.ice.ice + game.water.indoor + game.water.outdoor + game.clouds.water + game.land.water + game.trees.water + game.farms.water);
         document.getElementById('cash').innerHTML = intToString(game.cash);
-        document.getElementById('wood').innerHTML = intToString(game.wood);
+        document.getElementById('oxygen').innerHTML = intToString(game.oxygen);
         document.getElementById('science').innerHTML = intToString(game.science);
         document.getElementById('metal').innerHTML = intToString(game.metal);
     };
@@ -50,7 +51,17 @@ function View() {
 
     this.updateTrees = function() {
         document.getElementById('treesWater').innerHTML = intToString(game.trees.water);
+        document.getElementById('ferns').innerHTML = intToString(game.trees.ferns);
+        document.getElementById('fernsDelta').innerHTML = intToString(game.trees.fernsDelta, 4);
+        document.getElementById('fernsDying').innerHTML = intToString(game.trees.fernsDying, 4);
         document.getElementById('trees').innerHTML = intToString(game.trees.trees);
+        document.getElementById('treesDelta').innerHTML = intToString(game.trees.treesDelta, 4);
+        document.getElementById('treesDying').innerHTML = intToString(game.trees.treesDying, 4);
+        document.getElementById('compost').innerHTML = intToString(game.trees.compost, 4);
+        document.getElementById('co2').innerHTML = intToString(game.trees.co2, 4);
+        document.getElementById('oxygenGain').innerHTML = intToString(game.trees.oxygenGain, 4);
+        document.getElementById('oxygenLeak').innerHTML = intToString(game.oxygenLeak, 4);
+
     };
 
     this.updateFarms = function() {
@@ -68,6 +79,9 @@ function View() {
         document.getElementById('scienceDelta').innerHTML = intToString(game.population.scienceDelta, 4);
         document.getElementById('cashDelta').innerHTML = intToString(game.population.cashDelta, 4);
         document.getElementById('scienceRatio').innerHTML = game.population.scienceRatio+"%";
+        document.getElementById('happiness').innerHTML = intToString(game.population.happiness, 4);
+        document.getElementById('happinessFromTrees').innerHTML = intToString(game.population.happinessFromTrees, 4);
+        document.getElementById('happinessFromOxygen').innerHTML = intToString(game.population.happinessFromOxygen, 4);
     }
 
 
