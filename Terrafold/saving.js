@@ -41,6 +41,8 @@ function load() {
     //         game.ice[property] = toLoad.game.ice[property];
     //     }
     // }
+
+    view.checkComputerUnlocked();
     recalcInterval(10);
 }
 

@@ -9,6 +9,7 @@ function View() {
         this.updateTrees();
         this.updateFarms();
         this.updatePopulation();
+        this.updateComputer();
     };
 
     this.updateInfo = function() {
@@ -82,8 +83,25 @@ function View() {
         document.getElementById('happiness').innerHTML = intToString(game.population.happiness, 4);
         document.getElementById('happinessFromTrees').innerHTML = intToString(game.population.happinessFromTrees, 4);
         document.getElementById('happinessFromOxygen').innerHTML = intToString(game.population.happinessFromOxygen, 4);
-    }
+    };
 
+    this.checkComputerUnlocked = function() {
+        if(game.computer.unlocked) {
+            document.getElementById('unlockedComputer').style.display = "inline-block";
+            document.getElementById('unlockComputer').style.display = "none";
+        } else {
+            document.getElementById('unlockedComputer').style.display = "none";
+            document.getElementById('unlockComputer').style.display = "inline-block";
+        }
+    };
+
+    this.updateComputer = function() {
+        document.getElementById('freeThreads').innerHTML = game.computer.freeThreads+"";
+        document.getElementById('threads').innerHTML = game.computer.threads+"";
+        document.getElementById('speed').innerHTML = game.computer.speed+"";
+        document.getElementById('threadCost').innerHTML = intToString(game.computer.getThreadCost());
+        document.getElementById('speedCost').innerHTML = intToString(game.computer.getSpeedCost());
+    }
 
 
 }

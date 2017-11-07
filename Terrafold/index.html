@@ -15,7 +15,7 @@
 </head>
 <body>
 
-<div id="info">
+<div id="info" style="position:fixed;border-bottom:1px solid;background-color:white;">
     <div> Total Water: <div id="totalWater"></div></div>
     <div> Cash: <div id="cash"></div></div>
     <div> Oxygen: <div id="oxygen"></div></div>
@@ -25,105 +25,118 @@
 
 <div id="sky" style="position:absolute;">
 </div>
-<div id="ground" style="position:absolute;">
+<div style="position:absolute;">
 </div>
-
-<div id="iceContainer" class="container">
-    <div>Ice: <div id="ice"></div></div><br>
-    <div class="button" onclick="game.buyIce()">Buy Ice for $1</div><br>
-    <input id="buyIceAmount" type="number"><label for="buyIceAmount">Amount to buy</label><br>
-    <div> Buyable Ice: <div id="buyableIce"></div></div><br>
-    <div> Sending: <div id="iceTransferred"></div></div><br>
-    Ice melts and becomes water
-</div><br>
-<div id="indoorWaterContainer" class="container">
-    <div>Indoor Water: <div id="indoorWater"></div></div><br>
-    <div class="button" onclick="game.sellWater()">Sell Indoor Water for $1.2</div><br>
-    <input id="sellIndoorWaterAmount" type="number"><label for="sellIndoorWaterAmount">Amount to sell</label><br>
-    <div> Max: <div id="indoorWaterMax"></div></div><br>
-    When indoor water is full, extra becomes outdoor water.
-</div><br>
-<div id="outdoorWaterContainer" class="container">
-    <div>Outdoor Water: <div id="outdoorWater"></div></div><br>
-    <div>Sending: <div id="waterTransferred"></div></div><br>
-    Outdoor water evaporates into clouds.
-</div><br>
-<div id="cloudsContainer" class="container">
-    <div>Cloud Water: <div id="clouds"></div></div><br>
-    <div>Next Storm: <div id="stormTimer"></div></div><br>
-    <div>Storm Intensity: <div id="stormRate"></div></div><br>
-    <div>Storm Duration: <div id="stormDuration"></div></div><br>
-    <div>Rain: <div id="rain"></div></div><br>
-    Rain falls on land.
-</div><br>
-<div id="landContainer" class="container">
-    <div>Land Water: <div id="landWater"></div></div><br>
-    <div>Land: <div id="land"></div></div><br>
-    <div>Soil: <div id="soil"></div></div><br>
-    <div>Converted: <div id="landConverted"></div></div><br>
-    <div>Sent: <div id="soilWaterTransferred"></div></div><br>
-    Land + water = soil<br>
-    Water also goes to trees and farms
-</div><br>
-<div id="treesContainer" class="container">
-    <div>Forest Water: <div id="treesWater"></div></div><br>
-    <div>Ferns: <div id="ferns"></div></div><br>
-    <div>Ferns Growing: <div id="fernsDelta"></div></div><br>
-    <div>Ferns Dying: <div id="fernsDying"></div></div><br>
-    <div>Compost: <div id="compost"></div></div><br>
-    <div>CO2: <div id="co2"></div></div><br>
-    <div>Trees: <div id="trees"></div></div><br>
-    <div>Ferns Converted to Trees: <div id="treesDelta"></div></div><br>
-    <div>Trees Dying: <div id="treesDying"></div></div><br>
-    <div>Oxygen Produced: <div id="oxygenGain"></div></div><br>
-    Tree amount equilibrium is equal to soil amount.<br>
-    Water makes small trees grow<br>
-    Small trees die, becoming compost<br>
-    Compost becomes CO2<br>
-    Ferns, CO2, and water make trees<br>
-    One fern makes .001 oxygen/tick<br>
-    One big tree makes .01 oxygen/tick<br>
-    Extra water goes back outside<br>
-    A small amount of oxygen leaks into space<br>
-    <div>Oxygen Leaked: <div id="oxygenLeak"></div></div><br>
-</div><br>
-<div id="foodContainer" class="container">
-    <div>Farm Water: <div id="farmsWater"></div></div><br>
-    <div>Farms: <div id="farms"></div></div><br>
-    <div>Food: <div id="food"></div></div><br>
-    <div>Food Created: <div id="foodCreated"></div></div><br>
-    <div class="button" onclick="game.buyFarms()">Buy Farm for 50 oxygen and 50 soil</div><br>
-    <input id="buyFarmAmount" type="number" step="1"><label for="buyFarmAmount">Amount to buy</label><br>
-    WARNING: using soil reduces trees.<br>
-    One farm makes .01 food/tick, using water<br>
-    Extra water goes back outside
-</div><br>
-<div id="populationContainer" class="container">
-    <div>Population: <div id="population"></div></div><br>
-    <div>Food Eaten: <div id="foodEaten"></div></div><br>
-    <div>Population Growth: <div id="populationGrowth"></div></div><br>
-    <div>Dying from Starvation: <div id="starving"></div></div><br>
-    One person eats .01 food / tick.<br>
-    People die faster if there is no food.<br>
-    <div>Happiness: <div id="happiness"></div></div><br>
-    <div>Happiness From Trees: <div id="happinessFromTrees"></div></div><br>
-    <div>Happiness From Oxygen: <div id="happinessFromOxygen"></div></div><br>
-    People work harder if they are happier<br>
-    <div id="sliderContainer" style="width:100px;">
-        <input type="range" min="0" max="100" value="0" class="slider" id="scienceSlider">
-    </div><div> <div id="scienceRatio"></div> science</div><br>
-    Choose whether people create science or cash<br>
-    <div>Science created: <div id="scienceDelta"></div></div><br>
-    <div>Cash created: <div id="cashDelta"></div></div><br>
-</div><br>
-<div id="robotsContainer" class="container">
-    <div>Robots: <div id="robots"></div></div>
-</div><br>
-<div id="mineContainer" class="container">
-    <div>Mines: <div id="mines"></div></div>
-</div><br>
-<div id="spaceportContainer" class="container">
-
+<div id="ground" style="width:50%">
+    <div id="iceContainer" class="container">
+        <div>Ice: <div id="ice"></div></div><br>
+        <div class="button" onclick="game.buyIce()">Buy Ice for $1</div><br>
+        <input id="buyIceAmount" type="number"><label for="buyIceAmount">Amount to buy</label><br>
+        <div> Buyable Ice: <div id="buyableIce"></div></div><br>
+        <div> Sending: <div id="iceTransferred"></div></div><br>
+        Ice melts and becomes water
+    </div><br>
+    <div id="indoorWaterContainer" class="container">
+        <div>Indoor Water: <div id="indoorWater"></div></div><br>
+        <div class="button" onclick="game.sellWater()">Sell Indoor Water for $1.2</div><br>
+        <input id="sellIndoorWaterAmount" type="number"><label for="sellIndoorWaterAmount">Amount to sell</label><br>
+        <div> Max: <div id="indoorWaterMax"></div></div><br>
+        When indoor water is full, extra becomes outdoor water.
+    </div><br>
+    <div id="outdoorWaterContainer" class="container">
+        <div>Outdoor Water: <div id="outdoorWater"></div></div><br>
+        <div>Sending: <div id="waterTransferred"></div></div><br>
+        Outdoor water evaporates into clouds.
+    </div><br>
+    <div id="cloudsContainer" class="container">
+        <div>Cloud Water: <div id="clouds"></div></div><br>
+        <div>Next Storm: <div id="stormTimer"></div></div><br>
+        <div>Storm Intensity: <div id="stormRate"></div></div><br>
+        <div>Storm Duration: <div id="stormDuration"></div></div><br>
+        <div>Rain: <div id="rain"></div></div><br>
+        Rain falls on land.
+    </div><br>
+    <div id="landContainer" class="container">
+        <div>Land Water: <div id="landWater"></div></div><br>
+        <div>Land: <div id="land"></div></div><br>
+        <div>Soil: <div id="soil"></div></div><br>
+        <div>Converted: <div id="landConverted"></div></div><br>
+        <div>Sent: <div id="soilWaterTransferred"></div></div><br>
+        Land + water = soil<br>
+        Water also goes to trees and farms
+    </div><br>
+    <div id="treesContainer" class="container">
+        <div>Forest Water: <div id="treesWater"></div></div><br>
+        <div>Ferns: <div id="ferns"></div></div><br>
+        <div>Ferns Growing: <div id="fernsDelta"></div></div><br>
+        <div>Ferns Dying: <div id="fernsDying"></div></div><br>
+        <div>Compost: <div id="compost"></div></div><br>
+        <div>CO2: <div id="co2"></div></div><br>
+        <div>Trees: <div id="trees"></div></div><br>
+        <div>Ferns Converted to Trees: <div id="treesDelta"></div></div><br>
+        <div>Trees Dying: <div id="treesDying"></div></div><br>
+        <div>Oxygen Produced: <div id="oxygenGain"></div></div><br>
+        Tree amount equilibrium is equal to soil amount.<br>
+        Water makes small trees grow<br>
+        Small trees die, becoming compost<br>
+        Compost becomes CO2<br>
+        Ferns, CO2, and water make trees<br>
+        One fern makes .001 oxygen/tick<br>
+        One big tree makes .01 oxygen/tick<br>
+        Extra water goes back outside<br>
+        A small amount of oxygen leaks into space<br>
+        <div>Oxygen Leaked: <div id="oxygenLeak"></div></div><br>
+    </div><br>
+    <div id="foodContainer" class="container">
+        <div>Farm Water: <div id="farmsWater"></div></div><br>
+        <div>Farms: <div id="farms"></div></div><br>
+        <div>Food: <div id="food"></div></div><br>
+        <div>Food Created: <div id="foodCreated"></div></div><br>
+        <div class="button" onclick="game.buyFarms()">Buy Farm for 50 oxygen and 50 soil</div><br>
+        <input id="buyFarmAmount" type="number" step="1"><label for="buyFarmAmount">Amount to buy</label><br>
+        WARNING: using soil reduces trees.<br>
+        One farm makes .01 food/tick, using water<br>
+        Extra water goes back outside
+    </div><br>
+    <div id="populationContainer" class="container">
+        <div>Population: <div id="population"></div></div><br>
+        <div>Food Eaten: <div id="foodEaten"></div></div><br>
+        <div>Population Growth: <div id="populationGrowth"></div></div><br>
+        <div>Dying from Starvation: <div id="starving"></div></div><br>
+        One person eats .01 food / tick.<br>
+        People die faster if there is no food.<br>
+        <div>Happiness: <div id="happiness"></div></div><br>
+        <div>Happiness From Trees: <div id="happinessFromTrees"></div></div><br>
+        <div>Happiness From Oxygen: <div id="happinessFromOxygen"></div></div><br>
+        People work harder if they are happier<br>
+        <div id="sliderContainer" style="width:100px;">
+            <input type="range" min="0" max="100" value="0" class="slider" id="scienceSlider">
+        </div><div> <div id="scienceRatio"></div> science</div><br>
+        Choose whether people create science or cash<br>
+        <div>Science created: <div id="scienceDelta"></div></div><br>
+        <div>Cash created: <div id="cashDelta"></div></div><br>
+    </div><br>
+</div>
+<div id="factory" style="vertical-align:top">
+    <div id="computerContainer" class="container">
+        <div id="unlockComputer" class="button" onclick="game.computer.unlockComputer()">Build Computer (1000 science)</div>
+        <div id="unlockedComputer" style="display:none;">
+            <div>Threads: <div id="freeThreads"></div>/<div id="threads"></div></div> Speed: <div id="speed"></div><br>
+            <div id="buyThread" class="button" onclick="game.computer.buyThread()">Research New Thread (+1 thread) for <div id="threadCost"></div> science</div><br>
+            <div id="buySpeed" class="button" onclick="game.computer.buySpeed()">Buy Processor (+1 speed) for <div id="speedCost"></div> cash</div>
+            <div id="computerRows">
+            </div>
+        </div>
+    </div><br>
+    <div id="robotsContainer" class="container">
+        <div>Robots: <div id="robots"></div></div>
+    </div><br>
+    <div id="mineContainer" class="container">
+        <div>Mines: <div id="mines"></div></div>
+    </div><br>
+    <div id="spaceportContainer" class="container">
+        <div>Spaceport</div>
+    </div>
 </div>
 
 </body>
@@ -133,6 +146,7 @@
 <script src="driver.js"></script>
 <script src="game.js"></script>
 <script src="classes/Clouds.js"></script>
+<script src="classes/Computer.js"></script>
 <script src="classes/Farms.js"></script>
 <script src="classes/Ice.js"></script>
 <script src="classes/Land.js"></script>

@@ -30,6 +30,7 @@ function Game() {
         this.trees = new Trees();
         this.farms = new Farms();
         this.population = new Population();
+        this.computer = new Computer();
         this.robots = new Robots();
         this.spaceport = new Spaceport();
     };
@@ -72,4 +73,5 @@ function Game() {
         this.land.soil -= toBuy * 50;
         this.farms.addFarm(toBuy);
     };
+
 }
