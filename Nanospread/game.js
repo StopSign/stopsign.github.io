@@ -196,6 +196,19 @@ function clickedSquare(col, row) {
     showOrHideBox();
 }
 
+function singleSelect(xDelta, yDelta) {
+    if(selected.length === 0) {
+        return;
+    }
+    var lastSelected = selected[selected.length - 1];
+    var targetX = lastSelected.col + xDelta;
+    var targetY = lastSelected.row + yDelta;
+    if(targetX < 0 || targetX > theGrid.length || targetY < 0 || !theGrid[targetX][targetY]) {
+        return;
+    }
+    clickedSquare(targetX, targetY);
+}
+
 function changeDirectionOfSelected(direction) {
     if(selected.length === 0) {
         return;

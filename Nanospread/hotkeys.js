@@ -1,14 +1,14 @@
 var myKeyQueue = [];
 document.addEventListener("keydown", function(e) {
-    var code = (e.charCode !== 0 ? e.charCode : e.keyCode);
+    var code = {key:(e.charCode !== 0 ? e.charCode : e.keyCode), shift:e.shiftKey};
     myKeyQueue.push(code);
     processKeyQueue();
 });
 
 function processKeyQueue() {
-    var key = myKeyQueue[0];
+    var key = myKeyQueue[0].key;
+    var shift = myKeyQueue[0].shift;
     myKeyQueue.splice(0, 1);
-    // console.log(key);
     if(key === 27) { //escape
         select.deselectAll();
         menuOpen = "";
@@ -16,13 +16,29 @@ function processKeyQueue() {
     } else if(key === 13 || key === 32) { //enter / space
         buyNanitesButtonPressed()
     } else if(key === 38 || key === 87) { //up
-        changeDirectionOfSelected('North')
+        if(!shift) {
+            changeDirectionOfSelected('North')
+        } else {
+            singleSelect(0, -1);
+        }
     } else if(key === 40 || key === 83) { //down
-        changeDirectionOfSelected('South')
+        if(!shift) {
+            changeDirectionOfSelected('South')
+        } else {
+            singleSelect(0, 1);
+        }
     } else if(key === 37 || key === 65) { //left / a
-        changeDirectionOfSelected('West')
+        if(!shift) {
+            changeDirectionOfSelected('West')
+        } else {
+            singleSelect(-1, 0);
+        }
     } else if(key === 39 || key === 68) { //right
-        changeDirectionOfSelected('East')
+        if(!shift) {
+            changeDirectionOfSelected('East')
+        } else {
+            singleSelect(1, 0);
+        }
     } else if(key === 66) { //b
         // toggleBuild();
     } else if(key === 81) { //q
