@@ -41,8 +41,8 @@ function View() {
                 var rectStartY = row*rowSize + 30;
                 elem.innerHTML =
                     "<div class='naniteSquare' style='left:"+rectStartX+"px;top:"+rectStartY+"px;width:"+(rowSize-10)+"px;height:"+(rowSize-10)+"px;' onclick='clickedSquare("+col+","+row+")'>" +
-                    "<div class='displayNum' id='displayNumcol"+col+"row"+row+"'></div>" +
-                    "<div class='displayNum2' id='displayNum2col"+col+"row"+row+"'></div>" +
+                    "<div class='displayNum hyperVisible' id='displayNumcol"+col+"row"+row+"'></div>" +
+                    "<div class='displayNum2 hyperVisible' id='displayNum2col"+col+"row"+row+"'></div>" +
                     "<div class='directionDot' id='directionDotcol"+col+"row"+row+"'></div>" +
                     "<div class='directionArrowOuter' id='directionArrowOutercol"+col+"row"+row+"'></div>" +
                     "<div class='directionArrowInner' id='directionArrowInnercol"+col+"row"+row+"'></div>" +
