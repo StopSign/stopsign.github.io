@@ -41,8 +41,8 @@ function View() {
                 var rectStartY = row*rowSize + 30;
                 elem.innerHTML =
                     "<div class='naniteSquare' style='left:"+rectStartX+"px;top:"+rectStartY+"px;width:"+(rowSize-10)+"px;height:"+(rowSize-10)+"px;' onclick='clickedSquare("+col+","+row+")'>" +
-                    "<div class='displayNum hyperVisible' id='displayNumcol"+col+"row"+row+"'></div>" +
-                    "<div class='displayNum2 hyperVisible' id='displayNum2col"+col+"row"+row+"'></div>" +
+                    "<div class='displayNum' id='displayNumcol"+col+"row"+row+"'></div>" +
+                    "<div class='displayNum2' id='displayNum2col"+col+"row"+row+"'></div>" +
                     "<div class='directionDot' id='directionDotcol"+col+"row"+row+"'></div>" +
                     "<div class='directionArrowOuter' id='directionArrowOutercol"+col+"row"+row+"'></div>" +
                     "<div class='directionArrowInner' id='directionArrowInnercol"+col+"row"+row+"'></div>" +
@@ -291,6 +291,24 @@ function View() {
                 displayNum.innerHTML = intToStringRound(square.consumeCost);
             }
         }
+
+        if(settings.selectGridFont === 0) { //default
+            if (displayNum.classList.contains('hyperVisible') ) {
+                displayNum.classList.toggle('hyperVisible');
+                secondDisplayNum.classList.toggle('hyperVisible');
+            }
+            if(!square.isActive()) {
+                displayNum.style.color = "white";
+            } else {
+                displayNum.style.color = "black";
+            }
+        } else {
+            if (!displayNum.classList.contains('hyperVisible') ) {
+                displayNum.classList.toggle('hyperVisible');
+                secondDisplayNum.classList.toggle('hyperVisible');
+            }
+
+        }
     };
 
     this.changeBackground = function(square) {
@@ -349,6 +367,13 @@ function View() {
         } else {
             document.getElementById('selectShowBoth').checked = "checked";
         }
+
+        if(settings.selectGridFont === 0) { //
+            document.getElementById('selectFontDefault').checked = "checked";
+        } else {
+            document.getElementById('selectFontHyperVisible').checked = "checked";
+        }
+
     };
 
     this.updateLevel = function() {

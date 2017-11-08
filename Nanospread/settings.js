@@ -149,6 +149,11 @@ function selectShowNoneOrNanitesOrAmount(num) {
     settings.selectShowNoneOrNanitesOrAmount = num;
     theView.update();
 }
+function selectGridFont(num) {
+    settings.selectGridFont = num;
+    theView.update();
+}
+
 
 function buyAmountOption(num) {
     var highlighted = document.getElementById('buy'+settings.buyPerClick);

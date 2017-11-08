@@ -233,6 +233,11 @@
             <input id='selectShowUpgradeAmount' type="radio" name="selectShowNoneOrNanitesOrAmount" onclick="selectShowNoneOrNanitesOrAmount(2)"><label for="selectShowUpgradeAmount">Upgrade Amount</label><br>
             <input id='selectShowBoth' type="radio" name="selectShowNoneOrNanitesOrAmount" onclick="selectShowNoneOrNanitesOrAmount(3)"><label for="selectShowBoth">Both</label><br>
         </div>
+        <div class="settingContainer">
+            Grid Font Color:<br>
+            <input id='selectFontDefault' type="radio" name="selectGridFont" onclick="selectGridFont(0)"><label for="selectFontDefault">Default</label><br>
+            <input id='selectFontHyperVisible' type="radio" name="selectGridFont" onclick="selectGridFont(1)"><label for="selectFontHyperVisible">Hyper Visible</label><br>
+        </div>
         <!--<div class="settingContainer">-->
             <!--When buying upgrades:<br>-->
             <!--<input id='selectRounding' type="radio" name="selectOneOrMultiple" onclick="selectOneOrMultipleSetting(0)" checked><label for="selectRounding">Automatic Rounding</label><br>-->
@@ -323,6 +328,7 @@
                 <div id="buy25" class="buyAmountOption" onclick="buyAmountOption(25)">25</div>
                 <div id="buy50" class="buyAmountOption" onclick="buyAmountOption(50)">50</div>
                 <div id="buy100" class="buyAmountOption" onclick="buyAmountOption(100)">100</div>
+                <div id="buyNext" class="buyAmountOption" onclick="buyAmountOption('Next')">Next</div>
             </div>
             <div id="buyNanitesButton" class="buyButton" onclick="buyNanitesButtonPressed()">
                 <div id="naniteAmount" style="font-size:18px;"></div>

@@ -10,7 +10,7 @@ function processKeyQueue() {
     myKeyQueue.splice(0, 1);
     // console.log(key);
     if(key === 27) { //escape
-        select.deselectAll()
+        select.deselectAll();
         menuOpen = "";
         adjustMenus();
     } else if(key === 13 || key === 32) { //enter / space
@@ -39,6 +39,20 @@ function processKeyQueue() {
         toggleStatsMenu();
     } else if(key === 85) { //u
         toggleUpgradeMenu();
+    } else if(key === 49) { //1
+        buyAmountOption(1);
+    } else if(key === 50) { //2
+        buyAmountOption(5);
+    } else if(key === 51) { //3
+        buyAmountOption(10);
+    } else if(key === 52) { //4
+        buyAmountOption(25);
+    } else if(key === 53) { //5
+        buyAmountOption(50);
+    } else if(key === 54) { //6
+        buyAmountOption(100);
+    } else if(key === 55) { //7
+        buyAmountOption('Next');
     }
 //            if(myKeyQueue.length > 0) {
 //                $scope.pbars[selectedButton[0]].changeSelect(selectedButton[1]);

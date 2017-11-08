@@ -53,8 +53,13 @@ function Square(col,row,initialConsumeCost) {
         return (naniteAmount - getSpecialLevels(curSpecialPosNanites) + amountShift) * 10 * naniteCostExtra / getCostReduction(bonuses.discountLevel);
     };
     this.buyMultipleNanites = function(buyPerClick) {
-        var num = settings.buyPerClick - this.naniteAmount % buyPerClick;
-        for(var j = 0; j < num; j++) {
+        var toBuy;
+        if(buyPerClick === "Next") {
+            toBuy = getSpecialLevels(this.curSpecialPosNanites+1) - this.naniteAmount;
+        } else {
+            toBuy = buyPerClick - this.naniteAmount % buyPerClick;
+        }
+        for(var j = 0; j < toBuy; j++) {
             this.buyNanites();
         }
     };
@@ -68,7 +73,12 @@ function Square(col,row,initialConsumeCost) {
         return this.isActive() && this.nanites >= this.naniteCostAfterMultiBuy(settings.buyPerClick);
     };
     this.naniteCostAfterMultiBuy = function(amount) {
-        var numToBuy = amount - this.naniteAmount % amount;
+        var numToBuy;
+        if(amount === "Next") {
+            numToBuy = getSpecialLevels(this.curSpecialPosNanites+1) - this.naniteAmount;
+        } else {
+            numToBuy = amount - this.naniteAmount % amount;
+        }
 
         var totalNaniteCost = 0;
         for(var i = 1; i < numToBuy+1; i++) {

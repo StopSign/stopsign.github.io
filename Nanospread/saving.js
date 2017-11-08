@@ -42,6 +42,7 @@ function loadDefaults() {
 	settings.autobuyToggle = 0;
 	settings.autobuyPerTick = 1;
     settings.selectedResourceNum = 0;
+    settings.selectGridFont = 0;
 
     settings.selectOneOrMultiple = 0;
     settings.buyLowestOrAll = 1;
