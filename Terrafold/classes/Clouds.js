@@ -42,4 +42,8 @@ function Clouds() {
 
         this.stormRate += this.storming;
     };
+
+    this.gainStormDuration = function(amount) {
+        this.stormDuration += amount;
+    }
 }

@@ -10,6 +10,7 @@ function View() {
         this.updateFarms();
         this.updatePopulation();
         this.updateComputer();
+        this.updateRobots();
     };
 
     this.updateInfo = function() {
@@ -17,6 +18,7 @@ function View() {
         document.getElementById('cash').innerHTML = intToString(game.cash);
         document.getElementById('oxygen').innerHTML = intToString(game.oxygen);
         document.getElementById('science').innerHTML = intToString(game.science);
+        document.getElementById('wood').innerHTML = intToString(game.wood);
         document.getElementById('metal').innerHTML = intToString(game.metal);
     };
 
@@ -81,6 +83,7 @@ function View() {
         document.getElementById('cashDelta').innerHTML = intToString(game.population.cashDelta, 4);
         document.getElementById('scienceRatio').innerHTML = game.population.scienceRatio+"%";
         document.getElementById('happiness').innerHTML = intToString(game.population.happiness, 4);
+        document.getElementById('happinessFromHouse').innerHTML = intToString(game.population.houseBonus);
         document.getElementById('happinessFromTrees').innerHTML = intToString(game.population.happinessFromTrees, 4);
         document.getElementById('happinessFromOxygen').innerHTML = intToString(game.population.happinessFromOxygen, 4);
     };
@@ -101,6 +104,11 @@ function View() {
         document.getElementById('speed').innerHTML = game.computer.speed+"";
         document.getElementById('threadCost').innerHTML = intToString(game.computer.getThreadCost());
         document.getElementById('speedCost').innerHTML = intToString(game.computer.getSpeedCost());
+    };
+
+    this.updateRobots = function() {
+        document.getElementById('robots').innerHTML = game.robots.robots+"";
+        document.getElementById('robotMax').innerHTML = game.robots.robotMax+"";
     }
 
 

@@ -4,6 +4,7 @@ function Game() {
     this.cash = 10000; //Actual default: 100
     this.oxygen = 0;
     this.science = 0;
+    this.wood = 0;
     this.metal = 0;
 
     this.tick = function() {
@@ -35,8 +36,10 @@ function Game() {
         this.spaceport = new Spaceport();
     };
 
-    this.buyIce = function() {
-        var toBuy = Number(document.getElementById('buyIceAmount').value);
+    this.buyIce = function(toBuy) {
+        if(toBuy === undefined) {
+            toBuy = Number(document.getElementById('buyIceAmount').value);
+        }
         if(toBuy <= 0) {
             return;
         }
@@ -48,8 +51,10 @@ function Game() {
         view.update();
     };
 
-    this.sellWater = function() {
-        var toSell = Number(document.getElementById('sellIndoorWaterAmount').value);
+    this.sellWater = function(toSell) {
+        if(toSell === undefined) {
+            toSell = Number(document.getElementById('sellIndoorWaterAmount').value);
+        }
         if(toSell <= 0) {
             return;
         }

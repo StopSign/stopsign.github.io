@@ -1,5 +1,6 @@
 function Land(totalLand) {
     this.land = totalLand;
+    this.baseLand = totalLand;
     this.water = 0;
     this.soil = 0;
     this.transferred = 0;
@@ -24,4 +25,11 @@ function Land(totalLand) {
         this.water -= this.transferred;
         return this.transferred;
     };
+
+    this.improveLand = function(amount) {
+        this.land += amount;
+        if(this.land > this.baseLand * 10) {
+            this.land = this.baseLand * 10;
+        }
+    }
 }

@@ -27,4 +27,9 @@ function Ice() {
         this.ice += toBuy;
         return toBuy;
     };
+
+    this.findIceSeller = function(amount) {
+        this.max += amount * 100;
+        this.gain += amount;
+    }
 }

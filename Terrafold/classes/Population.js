@@ -7,6 +7,7 @@ function Population() {
     this.scienceDelta = 0;
     this.cashDelta = 0;
     this.happiness = 1;
+    this.houseBonus = 1;
 
     this.tick = function() {
         this.foodEaten = this.people / 100;
@@ -24,7 +25,7 @@ function Population() {
     this.updateHappiness = function() {
         this.happinessFromTrees = Math.log10((game.trees.trees+1))/10;
         this.happinessFromOxygen = Math.log10((game.oxygen+1))/100;
-        this.happiness = 1 + this.happinessFromTrees + this.happinessFromOxygen;
+        this.happiness = this.houseBonus * (1 + this.happinessFromTrees + this.happinessFromOxygen);
     };
 
     this.tickRatio = function() {
@@ -33,6 +34,10 @@ function Population() {
         game.science += this.scienceDelta;
         game.cash += this.cashDelta;
     };
+
+    this.improveHouse = function() {
+        this.houseBonus += .1;
+    }
 
 
 }
