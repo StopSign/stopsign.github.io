@@ -85,7 +85,6 @@ function View() {
     this.backgroundGrid.onmousemove = function(e) {
         if((e.which && e.which === 3) || (e.buttons && e.buttons === 2)) {
             var dragToPoint = {x:e.pageX, y:e.pageY};
-            console.log(dragToPoint);
             theView.offsetx += dragToPoint.x - rclickStartingPoint.x;
             theView.offsety += dragToPoint.y - rclickStartingPoint.y;
             theView.updateOffset();

@@ -35,10 +35,27 @@ function createGrid() {
     for(var x = 0; x < 20; x++) {
         theGrid[x] = [];
     }
-    var wrapAroundLevel = currentLevel % levelData.length;
+    var wrapAroundLevel = currentLevel;
+    if(currentLevel >= levelData.length) {
+        wrapAroundLevel = (currentLevel-4) % (levelData.length-4) + 4; //first 4 levels are 'tutorial', and don't repeat
+    }
+    console.log(wrapAroundLevel);
 
     var currentLevelGrid = levelData[wrapAroundLevel].grid;
-    var goalCost = Math.pow(2, currentLevel) * 100000000;
+    var goalCost = Math.pow(2, currentLevel-2) * 100000000;
+    if(currentLevel === 0) {
+        goalCost /= 2000;
+    }
+    if(currentLevel === 1) {
+        goalCost /= 300;
+    }
+    if(currentLevel === 2) {
+        goalCost /= 250;
+    }
+    if(currentLevel === 3) {
+        goalCost /= 50;
+    }
+
 
     var totalFromLevelData = 0;
     for(var column = 0; column < currentLevelGrid[0].length; column++) {
