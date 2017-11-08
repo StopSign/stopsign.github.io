@@ -115,7 +115,7 @@ function tick() {
 	}
 	theView.update();
 
-    if(timer % 10 === 0) {
+    if(timer % 30 === 0) {
         save();
     }
 }
