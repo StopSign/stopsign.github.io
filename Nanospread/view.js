@@ -422,16 +422,21 @@ function View() {
         document.getElementById('currentEP').innerHTML = intToString(bonuses.availableEP);
         document.getElementById('currentTickSpeed').innerHTML = intToString(bonuses.tickSpeedLevel);
         document.getElementById('buyTickSpeedCost').innerHTML = intToString(getTickSpeedCost());
+        document.getElementById('buyTickSpeedCostN').innerHTML = intToString(getTickSpeedCost(bonuses.tickSpeedLevel+.2));
         document.getElementById('currentTransferRate').innerHTML = intToString(bonuses.transferRateLevel / 100);
         document.getElementById('buyTransferRateCost').innerHTML = intToString(getTransferRateCost());
+        document.getElementById('buyTransferRateCostN').innerHTML = intToString(getTransferRateCost(bonuses.transferRateLevel+1));
 		document.getElementById('nextDiscountBonus').innerHTML = intToString((getCostReduction(bonuses.discountLevel + 1) - getCostReduction(bonuses.discountLevel)) * 100);
         document.getElementById('currentDiscountBonus').innerHTML = intToString((getCostReduction(bonuses.discountLevel) - 1) * 100);
 		document.getElementById('buyDiscountCost').innerHTML = intToString(getDiscountCost());
+        document.getElementById('buyDiscountCostN').innerHTML = intToString(getDiscountCost(bonuses.discountLevel+1));
 		document.getElementById('abCurrentMax').innerHTML = intToString(autobuy.currentMax);
         document.getElementById('abMaxMax').innerHTML = intToString(highestLevel * 5);
         document.getElementById('buyAbMaxCost').innerHTML = intToString(getAbMaxCost());
+        document.getElementById('buyAbMaxCostN').innerHTML = intToString(getAbMaxCost(autobuy.currentMax+1));
         document.getElementById('abAmtToSpendLevel').innerHTML = intToString(autobuy.amtToSpend);
 		document.getElementById('buyAbAmtToSpendCost').innerHTML = intToString(getAbAmtToSpendCost());
+        document.getElementById('buyAbAmtToSpendCostN').innerHTML = intToString(getAbAmtToSpendCost(autobuy.amtToSpend+1));
     };
 	this.updateStats = function() {
 		document.getElementById('totalAchievementBonus').innerHTML = intToString(calcTotalAchieveBonus());

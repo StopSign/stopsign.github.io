@@ -341,8 +341,11 @@ function buyTickSpeed() {
     theView.updateUpgrade();
 }
 
-function getTickSpeedCost() {
-    return precision2(50 * Math.pow(2, (bonuses.tickSpeedLevel - 1)*5));
+function getTickSpeedCost(tickSpeedLevel) {
+    if(tickSpeedLevel === undefined) {
+        tickSpeedLevel = bonuses.tickSpeedLevel;
+    }
+    return precision2(50 * Math.pow(2, (tickSpeedLevel - 1)*5));
 }
 
 function setTransferRate(newRate) {
@@ -360,8 +363,11 @@ function buyTransferRate() {
     theView.update();
 }
 
-function getTransferRateCost() {
-    return precision2(15 * Math.pow(2, bonuses.transferRateLevel - 1));
+function getTransferRateCost(transferRateLevel) {
+    if(transferRateLevel === undefined) {
+        transferRateLevel = bonuses.transferRateLevel;
+    }
+    return precision2(15 * Math.pow(2, transferRateLevel - 1));
 }
 
 function buyDiscountLevel() {
@@ -379,8 +385,11 @@ function getCostReduction(discountLevel) {
     return Math.pow(1.01, discountLevel)*5 - 4;
 }
 
-function getDiscountCost() {
-    return precision2(Math.pow(1.03, bonuses.discountLevel) * Math.pow(bonuses.discountLevel+1, 2)); // 1.01^n * (n+1)^2
+function getDiscountCost(discountLevel) {
+    if(discountLevel === undefined) {
+        discountLevel = bonuses.discountLevel;
+    }
+    return precision2(Math.pow(1.03, discountLevel) * Math.pow(discountLevel+1, 2)); // 1.01^n * (n+1)^2
 }
 
 function buyAbMaxLevel() {
@@ -391,8 +400,11 @@ function buyAbMaxLevel() {
     theView.update();
 }
 
-function getAbMaxCost() {
-    return precision2(10 * autobuy.currentMax);
+function getAbMaxCost(currentMax) {
+    if(currentMax === undefined) {
+        currentMax = autobuy.currentMax;
+    }
+    return precision2(10 * currentMax);
 }
 
 function buyAbAmtToSpendLevel() {
@@ -403,8 +415,11 @@ function buyAbAmtToSpendLevel() {
     theView.update();
 }
 
-function getAbAmtToSpendCost() {
-    return precision2(25 * autobuy.amtToSpend);
+function getAbAmtToSpendCost(amtToSpend) {
+    if(amtToSpend === undefined) {
+        amtToSpend = autobuy.amtToSpend;
+    }
+    return precision2(25 * amtToSpend);
 }
 
 function resetBonusPoints() {
