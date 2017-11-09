@@ -423,7 +423,7 @@ function getDiscountCost(discountLevel) {
 }
 
 function buyAbMaxLevel() {
-    if(autobuy.currentMax < highestLevel * 5 && bonuses.availableEP >= getAbMaxCost()) {
+    if(autobuy.currentMax < highestLevel * 10 && bonuses.availableEP >= getAbMaxCost()) {
 		bonuses.availableEP -= getAbMaxCost();
 		autobuy.currentMax++;
     }
@@ -434,7 +434,7 @@ function getAbMaxCost(currentMax) {
     if(currentMax === undefined) {
         currentMax = autobuy.currentMax;
     }
-    return precision2(10 * currentMax);
+    return precision2(10 / 4 * currentMax);
 }
 
 function buyAbAmtToSpendLevel() {
