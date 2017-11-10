@@ -81,3 +81,8 @@ input, label {
     background: #4CAF50; /* Green background */
     cursor: pointer; /* Cursor on hover */
 }
+
+.computerRow {
+    margin-bottom:5px;
+    border-bottom:1px solid;
+}
