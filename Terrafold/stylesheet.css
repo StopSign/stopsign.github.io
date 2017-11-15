@@ -36,9 +36,13 @@ input, label {
 
 .button {
     border:2px white solid;
-    background-color: #aeb541;
-    padding:3px;
+    background-color: #bde0b7;
+    padding:3px 5px;
     cursor:pointer;
+    border-radius:10px;
+    min-width:9px;
+    text-align:center;
+    vertical-align:center;
 }
 .button:hover {
     border:2px blue solid;
@@ -85,4 +89,38 @@ input, label {
 .computerRow {
     margin-bottom:5px;
     border-bottom:1px solid;
+    display:block;
+    position:relative;
+}
+
+.computerTooltipContainer {
+    display:none;
+    position:absolute;
+    left:100%;
+    border:2px solid;
+    border-radius:5px;
+    background-color:white;
+    top:0;
+    padding:2px;
+}
+
+.computerTooltip {
+    display:block;
+    width:200px;
+}
+
+.computerProgressBarOuter {
+    width:100px;
+    height:20px;
+    background-color:black;
+    float:right;
+    margin-left:5px;
+    margin-top:3px;
+}
+
+.computerProgressBarInner {
+    width:0;
+    height:18px;
+    margin-top:1px;
+    background-color:red;
 }

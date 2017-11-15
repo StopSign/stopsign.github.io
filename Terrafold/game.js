@@ -1,15 +1,16 @@
 //All things related to cash should be in this class
 function Game() {
     this.totalLand = 1000;
-    this.cash = 10000; //Actual default: 100
+    this.cash = 10000; //Actual default: 1000
     this.oxygen = 0;
-    this.science = 0;
+    this.science = 8000; //Actual default: 0
     this.wood = 0;
     this.metal = 0;
 
     this.tick = function() {
         this.ice.tick();
 
+        this.computer.tick();
         this.population.tick();
         this.farms.tick(this.land.transferWater());
         this.water.outdoor += this.farms.transferWater();

@@ -28,7 +28,7 @@ function Water() {
     };
 
     this.getPrice = function(toSell) {
-        return toSell * 1.2;
+        return toSell * 2;
     }
 
 }
