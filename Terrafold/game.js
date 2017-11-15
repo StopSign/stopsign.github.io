@@ -1,9 +1,9 @@
 //All things related to cash should be in this class
 function Game() {
     this.totalLand = 1000;
-    this.cash = 10000; //Actual default: 1000
+    this.cash = 1000; //Actual default: 1000
     this.oxygen = 0;
-    this.science = 8000; //Actual default: 0
+    this.science = 0; //Actual default: 0
     this.wood = 0;
     this.metal = 0;
 
