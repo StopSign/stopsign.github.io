@@ -55,7 +55,12 @@
         <div>Storm Intensity: <div id="stormRate"></div></div><br>
         <div>Storm Duration: <div id="stormDuration"></div></div><br>
         <div>Rain: <div id="rain"></div></div><br>
-        Rain falls on land.
+        Rain falls on land.<br>
+        <div id="lightningContainer">
+            <div>Lightning Chance: <div id="lightningChance"></div></div>%<br>
+            <div>Lightning Strength: <div id="lightningStrength"></div></div><br>
+            Change to strike per tick. Only strikes with a full storm.
+        </div>
     </div><br>
     <div id="landContainer" class="container">
         <div>Land Water: <div id="landWater"></div></div><br>
@@ -95,6 +100,7 @@
         <div>Farms: <div id="farms"></div></div><br>
         <div>Food: <div id="food"></div></div><br>
         <div>Food Created: <div id="foodCreated"></div></div><br>
+        <div>Farm Efficiency: <div id="efficiency"></div></div><br>
         <div class="button" onclick="game.buyFarms()">Buy Farm for 50 oxygen and 50 soil</div><br>
         <input id="buyFarmAmount" type="number" step="1"><label for="buyFarmAmount">Amount to buy</label><br>
         WARNING: using soil reduces trees.<br>
@@ -144,7 +150,7 @@
         </div>
     </div><br>
     <div id="energyContainer" class="container">
-        <div>Energy</div>
+        <div>Energy<div id="energy"></div></div>
     </div>
     <div id="spaceportContainer" class="container">
         <div>Spaceport</div>
@@ -159,6 +165,7 @@
 <script src="game.js"></script>
 <script src="classes/Clouds.js"></script>
 <script src="classes/Computer.js"></script>
+<script src="classes/Energy.js"></script>
 <script src="classes/Farms.js"></script>
 <script src="classes/Ice.js"></script>
 <script src="classes/Land.js"></script>

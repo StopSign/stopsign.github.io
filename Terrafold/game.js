@@ -35,6 +35,7 @@ function Game() {
         this.population = new Population();
         this.computer = new Computer();
         this.robots = new Robots();
+        this.energy = new Energy();
         this.spaceport = new Spaceport();
 
 

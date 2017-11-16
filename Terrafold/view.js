@@ -11,6 +11,7 @@ function View() {
         this.updatePopulation();
         this.updateComputerRowProgress();
         this.updateRobotsRowProgress();
+        this.updateEnergy();
     };
 
     this.updateInfo = function() {
@@ -42,6 +43,8 @@ function View() {
         document.getElementById('stormRate').innerHTML = game.clouds.stormRate+"%";
         document.getElementById('stormDuration').innerHTML = game.clouds.stormDuration+"";
         document.getElementById('rain').innerHTML = intToString(game.clouds.transferred, 4);
+        document.getElementById('lightningChance').innerHTML = intToString(game.clouds.lightningChance);
+        document.getElementById('lightningStrength').innerHTML = intToString(game.clouds.lightningStrength);
     };
 
     this.updateLand = function() {
@@ -74,6 +77,7 @@ function View() {
         document.getElementById('farms').innerHTML = intToString(game.farms.farms);
         document.getElementById('food').innerHTML = intToString(game.farms.food);
         document.getElementById('foodCreated').innerHTML = intToString(game.farms.foodCreated);
+        document.getElementById('efficiency').innerHTML = intToString(game.farms.efficiency);
     };
 
     this.updatePopulation = function() {
@@ -230,5 +234,9 @@ function View() {
         rowContainer.innerHTML = plusButton + workers + minusButton + text + progressBar + tooltipContainer;
         containerDiv.appendChild(rowContainer);
     };
+
+    this.updateEnergy = function() {
+        document.getElementById('energy').innerHTML = intToString(game.energy.energy);
+    }
 
 }

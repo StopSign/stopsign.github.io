@@ -155,6 +155,15 @@ function Computer() {
             costType:"science",
             finish:function() { game.robots.gainStorage(10); this.cost += 1; },
             showing: function() { return game.robots.unlocked; }
+        },
+        { //Improve Farms
+            currentTicks: 0,
+            ticksNeeded: 3000,
+            threads: 0,
+            cost:.5,
+            costType:"wood",
+            finish:function() { game.farms.improve(); this.cost += .5; },
+            showing: function() { return game.robots.unlocked; }
         }
     ];
 }
@@ -192,5 +201,9 @@ var processesView = [
     {
         text:"More Robot Storage",
         tooltip:"Can hold 10 more robots"
+    },
+    {
+        text:"Improve Farms",
+        tooltip:"Farm efficiency increases by 50%"
     }
 ];

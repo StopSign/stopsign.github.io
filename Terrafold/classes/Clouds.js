@@ -7,10 +7,22 @@ function Clouds() {
     this.initialStormDuration = 60;
     this.stormDuration = 60;
     this.transferred = 0;
+    this.lightningChance = 0;
+    this.lightningStrength = 0;
 
     this.tick = function(gained) {
         this.water += gained;
         this.nextStormTimer();
+        this.tickLightning();
+    };
+
+    this.tickLightning = function() {
+        this.lightningChance += .01 * this.stormRate / 100;
+        this.lightningStrength = Math.log2(this.water+1);
+        if(this.stormRate === 100 && this.lightningChance > Math.random()*100) {
+            this.lightningChance = 0;
+            game.energy.energy += this.lightningStrength;
+        }
     };
 
     this.transferWater = function() {
