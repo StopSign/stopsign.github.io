@@ -85,19 +85,12 @@ function Computer() {
     this.processes = [
         { //Optimize Land
             currentTicks: 0,
-            ticksNeeded: 100,
+            ticksNeeded: 600,
             threads: 0,
             cost:0,
             costType:"",
-            finish:function() { game.land.improveLand(1); }
-        },
-        { //Build Robots
-            currentTicks: 0,
-            ticksNeeded: 400,
-            threads: 0,
-            cost:.5,
-            costType:"metal",
-            finish:function() { game.robots.gainRobots(1) }
+            finish:function() { game.land.improveLand(); },
+            showing: function() { return true; }
         },
         { //Buy Ice
             currentTicks: 0,
@@ -105,7 +98,8 @@ function Computer() {
             threads: 0,
             cost:0,
             costType:"",
-            finish:function() { game.buyIce(10) }
+            finish:function() { game.buyIce(10) },
+            showing: function() { return true; }
         },
         { //Sell Water
             currentTicks: 0,
@@ -113,7 +107,8 @@ function Computer() {
             threads: 0,
             cost:0,
             costType:"",
-            finish:function() { game.sellWater(10) }
+            finish:function() { game.sellWater(10) },
+            showing: function() { return true; }
         },
         { //Improve House Design
             currentTicks: 0,
@@ -121,15 +116,8 @@ function Computer() {
             threads: 0,
             cost:0,
             costType:"",
-            finish:function() { game.population.improveHouse(); this.ticksNeeded = 300; }
-        },
-        { //More Robot Storage
-            currentTicks: 0,
-            ticksNeeded: 6000,
-            threads: 0,
-            cost:2,
-            costType:"science",
-            finish:function() { game.robots.gainStorage(10); this.cost += 1; }
+            finish:function() { game.population.improveHouse(); this.ticksNeeded += 30; },
+            showing: function() { return true; }
         },
         { //Find more Ice Sellers
             currentTicks: 0,
@@ -137,7 +125,8 @@ function Computer() {
             threads: 0,
             cost: .1,
             costType:"cash",
-            finish:function() { game.ice.findIceSeller(1) }
+            finish:function() { game.ice.findIceSeller(1) },
+            showing: function() { return true; }
         },
         { //Bigger Storms
             currentTicks: 0,
@@ -146,24 +135,35 @@ function Computer() {
             cost: 2,
             costType:"science",
             finish:function() { game.clouds.gainStormDuration(5); this.cost += 1; this.ticksNeeded += 100; },
-            done:function() { return game.clouds.stormDuration >= 300; }
+            done:function() { return game.clouds.initialStormDuration >= 300; },
+            showing: function() { return true; }
+        },
+        { //Build Robots
+            currentTicks: 0,
+            ticksNeeded: 400,
+            threads: 0,
+            cost:.1,
+            costType:"metal",
+            finish:function() { game.robots.gainRobots(1) },
+            showing: function() { return game.robots.unlocked; }
+        },
+        { //More Robot Storage
+            currentTicks: 0,
+            ticksNeeded: 6000,
+            threads: 0,
+            cost:2,
+            costType:"science",
+            finish:function() { game.robots.gainStorage(10); this.cost += 1; },
+            showing: function() { return game.robots.unlocked; }
         }
     ];
-
-    for(var i = 0; i < this.processes.length; i++) {
-        view.addComputerRow(i);
-    }
 }
 
 //Not saved, keep parity with processes
 var processesView = [
     {
         text:"Optimize Land",
-        tooltip:"Turn one land into ten.<br>Cannot convert land twice<br>Percent Optimzed: <div id='landOptimized'></div>"
-    },
-    {
-        text:"Build Robots",
-        tooltip:"Builds a robot"
+        tooltip:"Improve 1% of unimproved land.<br>Max to improve is ( 10 x base land )<br>Percent Optimized: <div id='landOptimized'></div>"
     },
     {
         text:"Buy Ice",
@@ -178,15 +178,19 @@ var processesView = [
         tooltip:"Improves base happiness modifier by .1"
     },
     {
-        text:"More Robot Storage",
-        tooltip:"Can hold 10 more robots"
-    },
-    {
         text:"Find more Ice Sellers",
         tooltip:"Gain 100 buyable ice and 1 more per tick"
     },
     {
         text:"Bigger Storms",
         tooltip:"Storms last 5 more ticks. Max 300 duration."
+    },
+    {
+        text:"Build Robots",
+        tooltip:"Builds a robot"
+    },
+    {
+        text:"More Robot Storage",
+        tooltip:"Can hold 10 more robots"
     }
 ];

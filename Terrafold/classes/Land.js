@@ -27,11 +27,15 @@ function Land(totalLand) {
         return this.transferred;
     };
 
-    this.improveLand = function(amount) {
-        if(this.optimizedLand + amount > this.baseLand * 10) {
-            amount = this.baseLand*10 - this.optimizedLand;
-        }
+    this.improveLand = function() {
+        var amount = (10 * this.baseLand - this.optimizedLand) / 100;
         this.optimizedLand += amount;
         this.land += amount;
+    };
+
+    this.addLand = function(amount) {
+        this.optimizedLand += amount;
+        this.land += amount;
+        this.baseLand += amount;
     }
 }

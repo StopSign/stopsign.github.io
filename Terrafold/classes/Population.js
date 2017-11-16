@@ -24,7 +24,7 @@ function Population() {
 
     this.updateHappiness = function() {
         this.happinessFromTrees = Math.log10((game.trees.trees+1))/10;
-        this.happinessFromOxygen = Math.log10((game.oxygen+1))/100;
+        this.happinessFromOxygen = Math.log10((game.oxygen+1))/50;
         this.happiness = this.houseBonus * (1 + this.happinessFromTrees + this.happinessFromOxygen);
     };
 

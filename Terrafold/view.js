@@ -10,7 +10,7 @@ function View() {
         this.updateFarms();
         this.updatePopulation();
         this.updateComputerRowProgress();
-        this.updateRobots();
+        this.updateRobotsRowProgress();
     };
 
     this.updateInfo = function() {
@@ -46,6 +46,8 @@ function View() {
 
     this.updateLand = function() {
         document.getElementById('landWater').innerHTML = intToString(game.land.water);
+        document.getElementById('optimizedLand').innerHTML = intToString(game.land.optimizedLand);
+        document.getElementById('baseLand').innerHTML = intToString(game.land.baseLand);
         document.getElementById('land').innerHTML = intToString(game.land.land);
         document.getElementById('soil').innerHTML = intToString(game.land.soil);
         document.getElementById('landConverted').innerHTML = intToString(game.land.convertedLand, 4);
@@ -92,25 +94,36 @@ function View() {
         if(game.computer.unlocked) {
             document.getElementById('unlockedComputer').style.display = "inline-block";
             document.getElementById('unlockComputer').style.display = "none";
+            document.getElementById('robotsContainer').style.display = "inline-block";
         } else {
             document.getElementById('unlockedComputer').style.display = "none";
             document.getElementById('unlockComputer').style.display = "inline-block";
+            document.getElementById('robotsContainer').style.display = "none";
+        }
+    };
+
+    this.checkRobotsUnlocked = function() {
+        if(game.robots.unlocked) {
+            document.getElementById('unlockedRobots').style.display = "inline-block";
+            document.getElementById('unlockRobots').style.display = "none";
+        } else {
+            document.getElementById('unlockedRobots').style.display = "none";
+            document.getElementById('unlockRobots').style.display = "inline-block";
         }
     };
 
     this.updateComputerRowProgress = function() {
         for(var i = 0; i < game.computer.processes.length; i++) {
             var row = game.computer.processes[i];
-            if(!row) {
-                continue;
-            }
-            document.getElementById("computerRow"+i+"PB").style.width = (row.currentTicks / row.ticksNeeded)*100 + "%";
-            document.getElementById("computerRow"+i+"TicksNeeded").innerHTML = row.ticksNeeded+"";
+            var baseId = "computerRow" + i;
+            document.getElementById(baseId+"PB").style.width = (row.currentTicks / row.ticksNeeded)*100 + "%";
+            document.getElementById(baseId+"PB").style.backgroundColor = row.isMoving ? "yellow" : "red";
+            document.getElementById(baseId+"TicksNeeded").innerHTML = row.ticksNeeded+"";
             if(row.cost !== 0) {
-                document.getElementById("computerRow"+i+"Cost").style.display = "block";
-                document.getElementById("computerRow"+i+"Cost").innerHTML = "Each tick costs "+row.cost + " "+row.costType;
+                document.getElementById(baseId+"Cost").style.display = "block";
+                document.getElementById(baseId+"Cost").innerHTML = "Each tick costs "+intToString(row.cost) + " "+row.costType;
             } else {
-                document.getElementById("computerRow"+i+"Cost").style.display = "none";
+                document.getElementById(baseId+"Cost").style.display = "none";
             }
         }
         document.getElementById('landOptimized').innerHTML = round2((game.land.optimizedLand / (game.land.baseLand * 10))*100)+"%";
@@ -123,11 +136,9 @@ function View() {
         document.getElementById('threadCost').innerHTML = intToString(game.computer.getThreadCost());
         document.getElementById('speedCost').innerHTML = intToString(game.computer.getSpeedCost());
         for(var i = 0; i < game.computer.processes.length; i++) {
-            var row = document.getElementById('computerRow'+i+'Threads');
-            if(!row) {
-                continue;
-            }
-            document.getElementById('computerRow'+i+'Threads').innerHTML = game.computer.processes[i].threads;
+            var row = game.computer.processes[i];
+            document.getElementById('computerRow'+i+'Threads').innerHTML = row.threads;
+            document.getElementById('computerRow'+i+'Container').style.display = row.showing() ? "block" : "none";
         }
     };
 
@@ -136,15 +147,16 @@ function View() {
         var rowContainer = document.createElement("div");
         rowContainer.className = "computerRow";
         var baseId = "computerRow" + dataPos;
+        rowContainer.id = baseId + 'Container';
         var plusButton = "<div id='"+baseId+"Plus' class='button' onclick='game.computer.addThread("+dataPos+", 1)'>+</div>";
         var minusButton = "<div id='"+baseId+"Minus' class='button' onclick='game.computer.removeThread("+dataPos+", 1)'>-</div>";
         var threads = " <div id='"+baseId+"Threads' class='small' style='margin-right:4px'></div>" ;
         var text = "<div>" + processesView[dataPos].text + "</div>";
-        var progressBar = "<div class='computerProgressBarOuter'><div class='computerProgressBarInner' id='"+baseId+"PB'></div></div>";
+        var progressBar = "<div class='rowProgressBarOuter'><div class='rowProgressBarInner' id='"+baseId+"PB'></div></div>";
 
         var tooltip = "<div id='"+baseId+"TicksNeeded'></div> ticks needed<br>" +
-            "<div id='"+baseId+"Cost'></div>";
-        var tooltipContainer = "<div class='computerTooltipContainer' id='"+baseId+"Tooltip'><div class='computerTooltip'>" + tooltip + "<br>" + processesView[dataPos].tooltip + "</div></div>";
+            "<div id='"+baseId+"Cost'></div><br>";
+        var tooltipContainer = "<div class='computerTooltipContainer' id='"+baseId+"Tooltip'><div class='rowTooltip'>" + tooltip +  processesView[dataPos].tooltip + "</div></div>";
         rowContainer.onmouseover = function () {
             document.getElementById(baseId+"Tooltip").style.display = "block";
         };
@@ -158,7 +170,65 @@ function View() {
 
     this.updateRobots = function() {
         document.getElementById('robots').innerHTML = game.robots.robots+"";
+        document.getElementById('robotsFree').innerHTML = game.robots.robotsFree+"";
         document.getElementById('robotMax').innerHTML = game.robots.robotMax+"";
+        for(var i = 0; i < game.robots.jobs.length; i++) {
+            var row = game.robots.jobs[i];
+            document.getElementById('robotRow'+i+'Workers').innerHTML = row.workers;
+            document.getElementById('robotRow'+i+'Container').style.display = row.showing() ? "block" : "none";
+        }
+    };
+
+    this.updateRobotsRowProgress = function() {
+        document.getElementById('ore').innerHTML = intToString(game.robots.ore);
+        for(var i = 0; i < game.robots.jobs.length; i++) {
+            var row = game.robots.jobs[i];
+            var baseId = "robotRow" + i;
+            if(!row.ticksNeeded) { //Has a progress bar
+                continue;
+            }
+            document.getElementById(baseId+"PB").style.width = (row.currentTicks / row.ticksNeeded)*100 + "%";
+            document.getElementById(baseId+"PB").style.backgroundColor = row.isMoving ? "yellow" : "red";
+            document.getElementById(baseId+"TicksNeeded").innerHTML = row.ticksNeeded+"";
+            if(row.cost !== 0) {
+                document.getElementById(baseId+"Cost").style.display = "block";
+                document.getElementById(baseId+"Cost").innerHTML = "Each tick costs "+intToString(row.cost) + " "+row.costType;
+            } else {
+                document.getElementById(baseId+"Cost").style.display = "none";
+            }
+        }
+    };
+
+    this.addRobotRow = function(dataPos) {
+        var containerDiv = document.getElementById('robotRows');
+        var rowContainer = document.createElement("div");
+        rowContainer.className = "robotRow";
+        var baseId = "robotRow" + dataPos;
+        rowContainer.id = baseId + 'Container';
+        var plusButton = "<div id='"+baseId+"Plus' class='button' onclick='game.robots.addWorker("+dataPos+", 1)'>+</div>";
+        var minusButton = "<div id='"+baseId+"Minus' class='button' onclick='game.robots.removeWorker("+dataPos+", 1)'>-</div>";
+        var workers = " <div id='"+baseId+"Workers' class='small' style='margin-right:4px'></div>" ;
+        var text = "<div>" + jobsView[dataPos].text + "</div>";
+
+        if(game.robots.jobs[dataPos].ticksNeeded) {
+            var tooltip = "<div id='"+baseId+"TicksNeeded'></div> ticks needed<br>" +
+                "<div id='"+baseId+"Cost'></div><br>";
+            var progressBar = "<div class='rowProgressBarOuter'><div class='rowProgressBarInner' id='" + baseId + "PB'></div></div>";
+        } else {
+            tooltip = "";
+            progressBar = "";
+        }
+
+        var tooltipContainer = "<div class='computerTooltipContainer' id='"+baseId+"Tooltip'><div class='rowTooltip'>" + tooltip + jobsView[dataPos].tooltip + "</div></div>";
+        rowContainer.onmouseover = function () {
+            document.getElementById(baseId+"Tooltip").style.display = "block";
+        };
+        rowContainer.onmouseout = function() {
+            document.getElementById(baseId+"Tooltip").style.display = "none";
+        };
+
+        rowContainer.innerHTML = plusButton + workers + minusButton + text + progressBar + tooltipContainer;
+        containerDiv.appendChild(rowContainer);
     };
 
 }

@@ -10,6 +10,7 @@ function Game() {
     this.tick = function() {
         this.ice.tick();
 
+        this.robots.tick();
         this.computer.tick();
         this.population.tick();
         this.farms.tick(this.land.transferWater());
@@ -35,6 +36,16 @@ function Game() {
         this.computer = new Computer();
         this.robots = new Robots();
         this.spaceport = new Spaceport();
+
+
+        for(var i = 0; i < this.computer.processes.length; i++) {
+            view.addComputerRow(i);
+            this.computer.processes[i].isMoving = 0;
+        }
+        for(i = 0; i < this.robots.jobs.length; i++) {
+            view.addRobotRow(i);
+            this.robots.jobs[i].isMoving = 0;
+        }
     };
 
     this.buyIce = function(toBuy) {

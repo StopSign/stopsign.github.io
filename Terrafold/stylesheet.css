@@ -86,7 +86,7 @@ input, label {
     cursor: pointer; /* Cursor on hover */
 }
 
-.computerRow {
+.computerRow, .robotRow {
     margin-bottom:5px;
     border-bottom:1px solid;
     display:block;
@@ -104,12 +104,12 @@ input, label {
     padding:2px;
 }
 
-.computerTooltip {
+.rowTooltip {
     display:block;
     width:200px;
 }
 
-.computerProgressBarOuter {
+.rowProgressBarOuter {
     width:100px;
     height:20px;
     background-color:black;
@@ -118,7 +118,7 @@ input, label {
     margin-top:3px;
 }
 
-.computerProgressBarInner {
+.rowProgressBarInner {
     width:0;
     height:18px;
     margin-top:1px;

@@ -59,7 +59,9 @@
     </div><br>
     <div id="landContainer" class="container">
         <div>Land Water: <div id="landWater"></div></div><br>
-        <div>Land: <div id="land"></div></div><br>
+        <div>Total Land: <div id="optimizedLand"></div></div><br>
+        <div>Base Land: <div id="baseLand"></div></div><br>
+        <div>Dry Land: <div id="land"></div></div><br>
         <div>Soil: <div id="soil"></div></div><br>
         <div>Converted: <div id="landConverted"></div></div><br>
         <div>Sent: <div id="soilWaterTransferred"></div></div><br>
@@ -131,12 +133,19 @@
         </div>
     </div><br>
     <div id="robotsContainer" class="container">
-        <div>Robots: <div id="robots"></div></div><br>
-        <div>Robot Max: <div id="robotMax"></div></div>
+        <div id="unlockRobots" class="button" onclick="game.robots.unlockRobots()">Special deal! Buy first robot for $3000</div>
+        <div id="unlockedRobots">
+            <div>Total Robots: <div id="robots"></div></div><br>
+            <div>Robots Free: <div id="robotsFree"></div></div><br>
+            <div>Robot Max: <div id="robotMax"></div></div><br>
+            <div>Ore: <div id="ore"></div></div><br>
+            <div id="robotRows">
+            </div>
+        </div>
     </div><br>
-    <div id="mineContainer" class="container">
-        <div>Mines: <div id="mines"></div></div>
-    </div><br>
+    <div id="energyContainer" class="container">
+        <div>Energy</div>
+    </div>
     <div id="spaceportContainer" class="container">
         <div>Spaceport</div>
     </div>

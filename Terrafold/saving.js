@@ -21,6 +21,8 @@ function loadDefaults() {
     view = new View();
     game = new Game();
     game.initialize();
+    view.checkComputerUnlocked();
+    view.checkRobotsUnlocked();
 }
 
 
@@ -43,6 +45,7 @@ function load() {
     // }
 
     view.checkComputerUnlocked();
+    view.checkRobotsUnlocked();
     recalcInterval(10);
 }
 

@@ -45,5 +45,6 @@ function Clouds() {
 
     this.gainStormDuration = function(amount) {
         this.stormDuration += amount;
+        this.initialStormDuration += amount;
     }
 }
