@@ -14,6 +14,45 @@ body {
     height:100%;
     margin:0;
     background-color:white;
+    cursor:default;
+}
+
+.showthat:hover .showthis, .showthat2:hover .showthis2 {
+    display:block;
+}
+.showthis, .showthis2 {
+    display:none;
+    position:absolute;
+    background-color: #b4b3e4;
+    border:1px solid;
+    padding:3px 5px;
+    min-width:200px;
+    border-radius:4px;
+    margin-top:5px;
+    z-index:999;
+    text-align:left;
+}
+
+.showthis2 {
+    z-index:1000;
+}
+
+.waterIcon {
+    position:absolute;
+    top:0;
+    right:0;
+}
+
+
+input {
+    width:100px;
+}
+
+.title {
+    font-size:16px;
+    font-weight:bold;
+    display:block;
+    text-align:center;
 }
 
 
@@ -28,6 +67,19 @@ body {
 .small {
     font-size:12px;
     font-weight:bold;
+}
+
+.superLargeIcon {
+    width:30px;
+    height:30px;
+}
+.largeIcon {
+    width:20px;
+    height:20px;
+}
+.smallIcon {
+    width:16px;
+    height:16px;
 }
 
 input, label {
@@ -51,7 +103,11 @@ input, label {
 .container {
     border:1px solid black;
     margin:10px;
-    padding:3px;
+    padding:3px 8px;
+    position:absolute;
+    border-radius:5px;
+    text-align:center;
+    min-width:100px;
 }
 
 .slider {
@@ -124,3 +180,51 @@ input, label {
     margin-top:1px;
     background-color:red;
 }
+
+
+.progress-bar {
+    position:relative;
+    display: inline-block;
+    width: 80px;
+    height: 80px;
+    margin: 7px;
+    padding: 0;
+    text-align:center;
+}
+
+.progress-bar .progress-active {
+    position: absolute;
+    left:0;
+}
+
+.progress-bar .progress-inactive {
+    position: absolute;
+    left:0;
+}
+
+.verticalProgress {
+    width:20px;
+    height:45px;
+    background-color:grey;
+    position: absolute;
+}
+
+.verticalProgressInner {
+    width: 18px;
+    background-color: black;
+    position: absolute;
+    bottom: 0;
+    left: 1px;
+}
+
+/*.progress-bar p {*/
+    /*position: absolute;*/
+    /*margin: 0;*/
+    /*padding: 0;*/
+    /*width: 200px;*/
+    /*top: 73px;*/
+    /*font-size: 35px;*/
+    /*font-weight: 900;*/
+    /*text-align: center;*/
+    /*color: #5e5e5e;*/
+/*}*/

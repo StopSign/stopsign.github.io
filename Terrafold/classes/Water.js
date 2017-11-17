@@ -2,13 +2,16 @@ function Water() {
     this.indoor = 0;
     this.outdoor = 0;
     this.maxIndoor = 50;
+    this.excess = 0;
 
     this.tick = function(gained) {
         this.indoor += gained;
-        var excess = this.indoor - this.maxIndoor;
-        if(excess > 0) {
+        this.excess = this.indoor - this.maxIndoor;
+        if(this.excess > 0) {
             this.indoor = this.maxIndoor;
-            this.outdoor += excess;
+            this.outdoor += this.excess;
+        } else {
+            this.excess = 0;
         }
 
     };

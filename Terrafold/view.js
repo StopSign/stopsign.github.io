@@ -12,6 +12,8 @@ function View() {
         this.updateComputerRowProgress();
         this.updateRobotsRowProgress();
         this.updateEnergy();
+        this.progressBar1.tick(game.clouds.initialStormTimer - game.clouds.stormTimer, game.clouds.initialStormTimer);
+        this.progressBar2.tick(game.clouds.stormDuration, game.clouds.initialStormDuration);
     };
 
     this.updateInfo = function() {
@@ -27,11 +29,13 @@ function View() {
         document.getElementById('ice').innerHTML = intToString(game.ice.ice);
         document.getElementById('buyableIce').innerHTML = intToString(game.ice.buyable);
         document.getElementById('iceTransferred').innerHTML = intToString(game.ice.transferred, 4);
+        document.getElementById('iceBuyerAmount').innerHTML = game.ice.gain+"";
     };
 
     this.updateWater = function() {
         document.getElementById('indoorWater').innerHTML = intToString(game.water.indoor);
         document.getElementById('indoorWaterMax').innerHTML = intToString(game.water.maxIndoor);
+        document.getElementById('excessWater').innerHTML = intToString(game.water.excess, 4);
 
         document.getElementById('outdoorWater').innerHTML = intToString(game.water.outdoor);
         document.getElementById('waterTransferred').innerHTML = intToString(game.water.transferred, 4);
@@ -41,6 +45,7 @@ function View() {
         document.getElementById('clouds').innerHTML = intToString(game.clouds.water);
         document.getElementById('stormTimer').innerHTML = game.clouds.stormTimer+"";
         document.getElementById('stormRate').innerHTML = game.clouds.stormRate+"%";
+        document.getElementById('intensityPB').style.height = game.clouds.stormRate+"%";
         document.getElementById('stormDuration').innerHTML = game.clouds.stormDuration+"";
         document.getElementById('rain').innerHTML = intToString(game.clouds.transferred, 4);
         document.getElementById('lightningChance').innerHTML = intToString(game.clouds.lightningChance);
@@ -110,9 +115,11 @@ function View() {
         if(game.robots.unlocked) {
             document.getElementById('unlockedRobots').style.display = "inline-block";
             document.getElementById('unlockRobots').style.display = "none";
+            document.getElementById('lightningContainer').style.display = "inline-block";
         } else {
             document.getElementById('unlockedRobots').style.display = "none";
             document.getElementById('unlockRobots').style.display = "inline-block";
+            document.getElementById('lightningContainer').style.display = "none";
         }
     };
 
@@ -237,6 +244,9 @@ function View() {
 
     this.updateEnergy = function() {
         document.getElementById('energy').innerHTML = intToString(game.energy.energy);
-    }
+    };
 
+    this.progressBar1 = new ProgressBar('nextStormProgress', '#21276a');
+    this.progressBar2 = new ProgressBar('stormDurationProgress', '#1c7682');
 }
+
