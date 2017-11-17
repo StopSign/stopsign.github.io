@@ -31,7 +31,7 @@ function Robots() {
         }
         row.currentTicks += ticksGained;
         row.isMoving = 1;
-        if (row.currentTicks > row.ticksNeeded) {
+        if (row.currentTicks >= row.ticksNeeded) {
             var overflow = row.currentTicks - row.ticksNeeded;
             row.currentTicks = 0;
             row.finish();
