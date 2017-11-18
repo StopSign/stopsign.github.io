@@ -7,7 +7,7 @@ function Farms() {
 
     this.tick = function(gained) {
         this.water += gained;
-        this.food += this.gainFood();
+        this.gainFood();
     };
 
     this.transferWater = function() {
@@ -17,20 +17,19 @@ function Farms() {
     };
 
     this.gainFood = function() {
-        var foodGain = this.farms / 100 * this.efficiency;
-        if(foodGain > this.water) {
-            foodGain = this.water;
+        this.foodCreated = this.farms / 100 * this.efficiency;
+        if(this.foodCreated > this.water) {
+            this.foodCreated = this.water;
         }
-        this.foodCreated = foodGain;
-        this.water -= foodGain;
-        return foodGain;
+        this.water -= this.foodCreated;
+        this.food += this.foodCreated;
     };
 
     this.addFarm = function(amount) {
         this.farms += amount;
     };
 
-    this.improve = function(amount) {
+    this.improve = function() {
         this.efficiency += .5;
     };
 }

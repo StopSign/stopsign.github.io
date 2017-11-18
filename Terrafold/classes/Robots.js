@@ -43,10 +43,12 @@ function Robots() {
     this.gainRobots = function(amount) {
         this.robots += amount;
         this.robotsFree += amount;
+        view.updateRobots();
     };
 
     this.gainStorage = function(amount) {
         this.robotMax += amount;
+        view.updateRobots();
     };
 
     this.unlockRobots = function() {
@@ -76,8 +78,8 @@ function Robots() {
     };
 
     this.cutTrees = function(mult) {
-        if(game.trees.trees >= 5 * mult) {
-            game.trees.trees -= 5 * mult;
+        if(game.trees.trees >= 1 * mult) {
+            game.trees.trees -= 1 * mult;
             game.wood += mult;
         }
     };
@@ -87,8 +89,8 @@ function Robots() {
     };
 
     this.smeltOre = function(mult) {
-        if(game.wood >= mult && this.ore >= mult && game.oxygen >= mult*1000) {
-            game.wood -= mult;
+        if(game.wood >= 5 * mult && this.ore >= mult && game.oxygen >= mult*1000) {
+            game.wood -= 5 * mult;
             this.ore -= mult;
             game.oxygen -= 1000*mult;
             game.metal += mult;
@@ -103,16 +105,16 @@ function Robots() {
         },
         { //Expand indoor water storage
             currentTicks: 0,
-            ticksNeeded: 400,
+            ticksNeeded: 3000,
             workers:0,
-            cost:1,
-            costType:"wood",
-            finish: function() { this.cost += 1; game.water.maxIndoor+= 50; },
+            cost:.1,
+            costType:"metal",
+            finish: function() { this.ticksNeeded += 1000; game.water.maxIndoor+= 50; },
             showing: function() { return true; }
         },
         { //Build Mines
             currentTicks: 0,
-            ticksNeeded: 300,
+            ticksNeeded: 1000,
             workers:0,
             cost:1,
             costType:"wood",
@@ -136,7 +138,7 @@ function Robots() {
 var jobsView = [
     {
         text:"Cut Trees",
-        tooltip:"Cut down 5 trees for 1 wood"
+        tooltip:"Cut down 1 tree for 1 wood"
     },
     {
         text:"Expand indoor water storage",
@@ -152,6 +154,6 @@ var jobsView = [
     },
     {
         text:"Smelt Ore",
-        tooltip:"Each tick costs 1 wood, 1 ore, and 1000 oxygen<br>Gain 1 metal"
+        tooltip:"Each tick costs 5 wood, 1 ore, and 1000 oxygen<br>Gain 1 metal"
     }
 ];

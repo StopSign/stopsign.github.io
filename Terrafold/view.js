@@ -23,6 +23,7 @@ function View() {
         document.getElementById('science').innerHTML = intToString(game.science);
         document.getElementById('wood').innerHTML = intToString(game.wood);
         document.getElementById('metal').innerHTML = intToString(game.metal);
+        document.getElementById('oxygenLeak').innerHTML = intToString(game.oxygenLeak, 4);
     };
 
     this.updateIce = function() {
@@ -73,17 +74,17 @@ function View() {
         document.getElementById('forestWater').innerHTML = intToString(game.trees.water);
         document.getElementById('ferns').innerHTML = intToString(game.trees.ferns);
         document.getElementById('fernsDelta').innerHTML = intToString(game.trees.fernsDelta, 4);
+        document.getElementById('smallTrees').innerHTML = intToString(game.trees.smallTrees);
+        document.getElementById('smallTreesDelta').innerHTML = intToString(game.trees.smallTreesDelta, 4);
         document.getElementById('trees').innerHTML = intToString(game.trees.trees);
         document.getElementById('treesDelta').innerHTML = intToString(game.trees.treesDelta, 4);
-        document.getElementById('treesDying').innerHTML = intToString(game.trees.treesDying, 4);
-        document.getElementById('compost').innerHTML = intToString(game.trees.compost, 4);
-        document.getElementById('co2').innerHTML = intToString(game.trees.co2, 4);
+        document.getElementById('totalPlants').innerHTML = intToString(game.trees.totalPlants);
         document.getElementById('oxygenGain').innerHTML = intToString(game.trees.oxygenGain, 4);
-        document.getElementById('oxygenLeak').innerHTML = intToString(game.oxygenLeak, 4);
         document.getElementById('forestWaterToLake').innerHTML = intToString(game.trees.transferred, 4);
         document.getElementById('lakeWaterFromForest').innerHTML = intToString(game.trees.transferred, 4);
         document.getElementById('fernWater').innerHTML = intToString(game.trees.fernsDelta > 0 ? game.trees.fernsDelta : 0, 4);
-        document.getElementById('treesWater').innerHTML = intToString(game.trees.treesDelta, 4);
+        document.getElementById('smallTreesWater').innerHTML = intToString(game.trees.smallTreesDelta > 0 ? game.trees.smallTreesDelta : 0, 4);
+        document.getElementById('treesWater').innerHTML = intToString(game.trees.treesDelta > 0 ? game.trees.treesDelta : 0, 4);
     };
 
     this.updateFarms = function() {
@@ -149,6 +150,7 @@ function View() {
             var baseId = "computerRow" + i;
             document.getElementById(baseId+"PB").style.width = (row.currentTicks / row.ticksNeeded)*100 + "%";
             document.getElementById(baseId+"PB").style.backgroundColor = row.isMoving ? "yellow" : "red";
+            document.getElementById(baseId+"CurrentTicks").innerHTML = row.currentTicks+"";
             document.getElementById(baseId+"TicksNeeded").innerHTML = row.ticksNeeded+"";
             if(row.cost !== 0) {
                 document.getElementById(baseId+"Cost").style.display = "block";
@@ -185,7 +187,8 @@ function View() {
         var text = "<div>" + processesView[dataPos].text + "</div>";
         var progressBar = "<div class='rowProgressBarOuter'><div class='rowProgressBarInner' id='"+baseId+"PB'></div></div>";
 
-        var tooltip = "<div id='"+baseId+"TicksNeeded'></div> ticks needed<br>" +
+        var tooltip = "<div id='"+baseId+"CurrentTicks'></div> ticks needed<br>" +
+            "<div id='"+baseId+"TicksNeeded'></div> ticks needed<br>" +
             "<div id='"+baseId+"Cost'></div><br>";
         var tooltipContainer = "<div class='computerTooltipContainer' id='"+baseId+"Tooltip'><div class='rowTooltip'>" + tooltip +  processesView[dataPos].tooltip + "</div></div>";
         rowContainer.onmouseover = function () {
@@ -220,6 +223,7 @@ function View() {
             }
             document.getElementById(baseId+"PB").style.width = (row.currentTicks / row.ticksNeeded)*100 + "%";
             document.getElementById(baseId+"PB").style.backgroundColor = row.isMoving ? "yellow" : "red";
+            document.getElementById(baseId+"CurrentTicks").innerHTML = row.currentTicks+"";
             document.getElementById(baseId+"TicksNeeded").innerHTML = row.ticksNeeded+"";
             if(row.cost !== 0) {
                 document.getElementById(baseId+"Cost").style.display = "block";
@@ -242,7 +246,8 @@ function View() {
         var text = "<div>" + jobsView[dataPos].text + "</div>";
 
         if(game.robots.jobs[dataPos].ticksNeeded) {
-            var tooltip = "<div id='"+baseId+"TicksNeeded'></div> ticks needed<br>" +
+            var tooltip = "<div id='"+baseId+"CurrentTicks'></div> ticks needed<br>" +
+                "<div id='"+baseId+"TicksNeeded'></div> ticks needed<br>" +
                 "<div id='"+baseId+"Cost'></div><br>";
             var progressBar = "<div class='rowProgressBarOuter'><div class='rowProgressBarInner' id='" + baseId + "PB'></div></div>";
         } else {

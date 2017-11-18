@@ -3,7 +3,7 @@ function Game() {
     this.totalLand = 1000;
     this.cash = 10000; //Actual default: 1000
     this.oxygen = 0;
-    this.science = 8000; //Actual default: 0
+    this.science = 0; //Actual default: 0
     this.wood = 0;
     this.metal = 0;
 
@@ -12,8 +12,8 @@ function Game() {
 
         this.robots.tick();
         this.computer.tick();
-        this.population.tick();
         this.farms.tick(this.land.transferWater());
+        this.population.tick();
         this.water.outdoor += this.farms.transferWater();
         this.trees.tick(this.land.transferWater());
         this.water.outdoor += this.trees.transferWater();

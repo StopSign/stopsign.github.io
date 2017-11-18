@@ -219,14 +219,14 @@ input, label {
     left: 1px;
 }
 
-/*.progress-bar p {*/
-    /*position: absolute;*/
-    /*margin: 0;*/
-    /*padding: 0;*/
-    /*width: 200px;*/
-    /*top: 73px;*/
-    /*font-size: 35px;*/
-    /*font-weight: 900;*/
-    /*text-align: center;*/
-    /*color: #5e5e5e;*/
-/*}*/
+.fa.fa-arrow-right {
+    vertical-align:top;
+    margin-top:14px;
+    font-size:16px;
+}
+
+.forestIcon {
+    border:1px solid;
+    border-radius:3px;
+    width:45px;
+}

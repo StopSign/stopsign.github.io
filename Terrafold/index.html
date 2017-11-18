@@ -34,7 +34,7 @@
 </div>
 <div style="position:absolute;width:2000px;" class="small">
 
-    <div id="iceContainer" class="container showthat" style="left:0;top:25px;">
+    <div id="iceContainer" class="container showthat" style="left:0;top:25px;width:130px;">
         <div class="title">Ice</div>
         <div class="waterIcon showthat2"><img src='img/water.png' class='superLargeIcon'>
             <div class="showthis2">
@@ -42,7 +42,7 @@
             </div>
         </div>
         <div>Ice: <div id="ice"></div></div><br>
-        <input id="buyIceAmount" type="number" value="1"><br>
+        <input id="buyIceAmount" type="number" value="1000"><br>
         <div class="button" onclick="game.buyIce()">Buy Ice for $1</div><br>
         <div>Buyable Ice: <div id="buyableIce"></div></div><br>
         <div class="showthis">
@@ -61,7 +61,7 @@
             </div>
         </div>
         <div><img src='img/water.png' class='smallIcon'>: <div id="indoorWater"></div></div><br>
-        <input id="sellIndoorWaterAmount" type="number" value="1"><br>
+        <input id="sellIndoorWaterAmount" type="number" value="50"><br>
         <div class="button" onclick="game.sellWater()">Sell <img src='img/water.png' class='smallIcon'> for $2</div><br>
         <div> Max: <div id="indoorWaterMax"></div></div><br>
         <div class="showthis">
@@ -122,7 +122,7 @@
         </div>
     </div>
 
-    <div id="landContainer" class="container showthat" style="left:500px;top:220px;">
+    <div id="landContainer" class="container showthat" style="left:470px;top:245px;">
         <div class="title">Land</div>
         <div class="waterIcon showthat2"><img src='img/water.png' class='superLargeIcon'>
             <div class="showthis2">
@@ -143,40 +143,62 @@
         </div>
     </div>
 
-    <div id="treesContainer" class="container showthat" style="left:665px;top:90px;">
+    <div id="treesContainer" class="container showthat" style="left:640px;top:80px;">
         <div class="title">Forest</div>
         <div class="waterIcon showthat2"><img src='img/water.png' class='superLargeIcon'>
             <div class="showthis2">
                 <div>Receiving: <div id="forestReceived"></div> <img src='img/water.png' class='smallIcon'></div><br>
                 <div><img src='img/water.png' class='smallIcon'> to grow Ferns: <div id="fernWater"></div> <img src='img/water.png' class='smallIcon'></div><br>
+                <div><img src='img/water.png' class='smallIcon'> to grow Small Trees: <div id="smallTreesWater"></div> <img src='img/water.png' class='smallIcon'></div><br>
                 <div><img src='img/water.png' class='smallIcon'> to grow Trees: <div id="treesWater"></div> <img src='img/water.png' class='smallIcon'></div><br>
                 <div>Flowing to Lake: <div id="forestWaterToLake"></div> <img src='img/water.png' class='smallIcon'></div><br>
             </div>
         </div>
         <div><img src='img/water.png' class='smallIcon'>: <div id="forestWater"></div></div><br>
-        <div>Ferns: <div id="ferns"></div></div><br>
-        <div>Compost: <div id="compost"></div></div><br>
-        <div>CO2: <div id="co2"></div></div><br>
-        <div>Trees: <div id="trees"></div></div><br>
+
+        <div class="forestIcon showthat2">
+            <img src='img/fern.png' class='superLargeIcon'><br>
+            <div><div id="ferns"></div></div>
+            <div class="showthis2">
+                Ferns<br>
+                <div>Ferns Delta: <div id="fernsDelta"></div></div><br>
+                .1% of Ferns become Small Trees, using Water.<br>
+                One Fern makes .001 oxygen/tick<br>
+            </div>
+        </div>
+        <i class="fa fa-arrow-right"></i>
+        <div class="forestIcon showthat2">
+            <img src='img/smalltree.svg' class='superLargeIcon'><br>
+            <div><div id="smallTrees"></div></div>
+            <div class="showthis2">
+                Small Trees<br>
+                <div>Small Trees Delta: <div id="smallTreesDelta"></div></div><br>
+                .1% of Small Trees become Trees, using Water.<br>
+                One Small Tree makes .003 oxygen/tick<br>
+            </div>
+        </div>
+        <i class="fa fa-arrow-right"></i>
+        <div class="forestIcon showthat2">
+            <img src='img/tree.png' class='superLargeIcon'><br>
+            <div><div id="trees"></div></div>
+            <div class="showthis2">
+                Trees<br>
+                <div>Trees Delta: <div id="treesDelta"></div></div><br>
+                One Tree makes .01 oxygen/tick<br>
+            </div>
+        </div><br>
+        <div>Total Plants: <div id="totalPlants"></div></div><br>
+        <div>Oxygen Produced: <div id="oxygenGain"></div></div><br>
 
         <div class="showthis" style="width:300px;">
-            Ferns+Trees amount equilibrium is equal to Soil amount.<br>
-            If you have less Ferns+Trees than Soil, Ferns die first then Trees.<br>
-            <div>Trees Dying to not enough Soil: <div id="treesDying"></div></div><br>
-            Ferns grow slower the closer they are to equilibrium, using Water.<br>
-            .01% of Ferns die per tick, becoming compost.<br>
-            <div>Total Ferns Delta: <div id="fernsDelta"></div></div><br>
-            1% of Compost per tick becomes CO2<br>
-            .1% of CO2 become Trees per tick, costing equivalent Ferns and Water<br>
-            <div>Ferns Converted to Trees: <div id="treesDelta"></div></div><br>
-            One Fern makes .001 oxygen/tick<br>
-            One Tree makes .01 oxygen/tick<br>
-            <div>Oxygen Produced: <div id="oxygenGain"></div></div><br>
+            Total Plants equilibrium is equal to Soil amount.<br>
+            If you have less equilibrium, smaller plants die first.<br>
+            Ferns grow slower the closer the Total Plants are to equilibrium.<br>
             .1% of Water per tick goes back to the Lake.<br>
         </div>
     </div>
 
-    <div id="foodContainer" class="container showthat" style="left:750px;top:250px;">
+    <div id="foodContainer" class="container showthat" style="left:690px;top:260px;">
         <div class="title">Farm</div>
         <div class="waterIcon showthat2"><img src='img/water.png' class='superLargeIcon'>
             <div class="showthis2">

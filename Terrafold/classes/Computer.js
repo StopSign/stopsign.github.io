@@ -111,13 +111,13 @@ function Computer() {
             finish:function() { game.sellWater(10) },
             showing: function() { return true; }
         },
-        { //Improve House Design
+        { //Improve Farms
             currentTicks: 0,
             ticksNeeded: 300,
             threads: 0,
             cost:0,
             costType:"",
-            finish:function() { game.population.improveHouse(); this.ticksNeeded += 30; },
+            finish:function() { game.farms.improve(); this.ticksNeeded += 150; },
             showing: function() { return true; }
         },
         { //Find more Ice Sellers
@@ -135,7 +135,7 @@ function Computer() {
             threads: 0,
             cost: 2,
             costType:"science",
-            finish:function() { game.clouds.gainStormDuration(5); this.cost += 1; this.ticksNeeded += 100; },
+            finish:function() { game.clouds.gainStormDuration(5); this.cost += .5; this.ticksNeeded += 50; },
             done:function() { return game.clouds.initialStormDuration >= 300; },
             showing: function() { return true; }
         },
@@ -146,7 +146,8 @@ function Computer() {
             cost:.1,
             costType:"metal",
             finish:function() { game.robots.gainRobots(1) },
-            showing: function() { return game.robots.unlocked; }
+            showing: function() { return game.robots.unlocked; },
+            done:function() { return game.robots.robots >= game.robots.robotMax; }
         },
         { //More Robot Storage
             currentTicks: 0,
@@ -157,13 +158,13 @@ function Computer() {
             finish:function() { game.robots.gainStorage(10); this.cost += 1; },
             showing: function() { return game.robots.unlocked; }
         },
-        { //Improve Farms
+        { //Improve House Design
             currentTicks: 0,
             ticksNeeded: 3000,
             threads: 0,
             cost:.5,
             costType:"wood",
-            finish:function() { game.farms.improve(); this.cost += .5; },
+            finish:function() { game.population.improveHouse(); this.ticksNeeded += 500; },
             showing: function() { return game.robots.unlocked; }
         }
     ];
@@ -184,8 +185,8 @@ var processesView = [
         tooltip:"Sells up to 10 water"
     },
     {
-        text:"Improve House Design",
-        tooltip:"Improves base happiness modifier by .1"
+        text:"Improve Farms",
+        tooltip:"Farm efficiency increases by 50%"
     },
     {
         text:"Find more Ice Sellers",
@@ -204,7 +205,7 @@ var processesView = [
         tooltip:"Can hold 10 more robots"
     },
     {
-        text:"Improve Farms",
-        tooltip:"Farm efficiency increases by 50%"
+        text:"Improve House Design",
+        tooltip:"Improves base happiness modifier by .1"
     }
 ];
