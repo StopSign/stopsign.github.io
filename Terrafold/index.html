@@ -143,7 +143,7 @@
         </div>
     </div>
 
-    <div id="treesContainer" class="container showthat" style="left:640px;top:80px;">
+    <div id="treesContainer" class="container showthat" style="left:660px;top:80px;">
         <div class="title">Forest</div>
         <div class="waterIcon showthat2"><img src='img/water.png' class='superLargeIcon'>
             <div class="showthis2">
@@ -222,24 +222,32 @@
         </div>
     </div>
 
-    <div id="populationContainer" class="container" style="left:1000px;top:250px;">
+    <div id="populationContainer" class="container showthat" style="left:960px;top:130px;">
+        <div class="title">City</div>
+        <div class="waterIcon showthat2"><img src='img/happy.jpg' class='superLargeIcon'>
+            <div class="showthis2">
+                <div>Food Eaten: <div id="foodEaten"></div></div><br>
+                <div>Population Growth: <div id="populationGrowth"></div></div><br>
+                <div>Dying from Starvation: <div id="starving"></div></div><br>
+                <div>Base Happiness From House: <div id="happinessFromHouse"></div></div><br>
+                <div>Happiness From Trees: <div id="happinessFromTrees"></div></div><br>
+                <div>Happiness From Oxygen: <div id="happinessFromOxygen"></div></div><br>
+            </div>
+        </div>
         <div>Population: <div id="population"></div></div><br>
-        <div>Food Eaten: <div id="foodEaten"></div></div><br>
-        <div>Population Growth: <div id="populationGrowth"></div></div><br>
-        <div>Dying from Starvation: <div id="starving"></div></div><br>
-        One person eats .01 food / tick.<br>
-        People die faster if there is no food.<br>
         <div>Happiness: <div id="happiness"></div></div><br>
-        <div>Base Happiness From House: <div id="happinessFromHouse"></div></div><br>
-        <div>Happiness From Trees: <div id="happinessFromTrees"></div></div><br>
-        <div>Happiness From Oxygen: <div id="happinessFromOxygen"></div></div><br>
-        People work harder if they are happier<br>
-        <div id="sliderContainer" style="width:100px;">
+        <div id="sliderContainer" style="width:150px;">
             <input type="range" min="0" max="100" value="0" class="slider" id="scienceSlider">
-        </div><div> <div id="scienceRatio"></div> science</div><br>
-        Choose whether people create science or cash<br>
+        </div><br>
+        <div><div id="scienceRatio"></div> science</div><br>
         <div>Science created: <div id="scienceDelta"></div></div><br>
         <div>Cash created: <div id="cashDelta"></div></div><br>
+        <div class="showthis">
+            One person eats .01 food / tick.<br>
+            People die faster if there is 0 food.<br>
+            People work harder if they are happier.<br>
+            Choose whether people create science or cash.<br>
+        </div>
     </div>
 
     <div id="computerContainer" class="container" style="left:1300px;top:25px;">
