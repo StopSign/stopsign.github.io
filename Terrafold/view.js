@@ -29,6 +29,7 @@ function View() {
         document.getElementById('ice').innerHTML = intToString(game.ice.ice);
         document.getElementById('buyableIce').innerHTML = intToString(game.ice.buyable);
         document.getElementById('iceTransferred').innerHTML = intToString(game.ice.transferred, 4);
+        document.getElementById('indoorWaterReceived').innerHTML = intToString(game.ice.transferred, 4);
         document.getElementById('iceBuyerAmount').innerHTML = game.ice.gain+"";
     };
 
@@ -36,9 +37,11 @@ function View() {
         document.getElementById('indoorWater').innerHTML = intToString(game.water.indoor);
         document.getElementById('indoorWaterMax').innerHTML = intToString(game.water.maxIndoor);
         document.getElementById('excessWater').innerHTML = intToString(game.water.excess, 4);
+        document.getElementById('lakeWaterFromStorage').innerHTML = intToString(game.water.excess, 4);
 
         document.getElementById('outdoorWater').innerHTML = intToString(game.water.outdoor);
         document.getElementById('waterTransferred').innerHTML = intToString(game.water.transferred, 4);
+        document.getElementById('cloudsReceived').innerHTML = intToString(game.water.transferred, 4);
     };
 
     this.updateClouds = function() {
@@ -48,6 +51,7 @@ function View() {
         document.getElementById('intensityPB').style.height = game.clouds.stormRate+"%";
         document.getElementById('stormDuration').innerHTML = game.clouds.stormDuration+"";
         document.getElementById('rain').innerHTML = intToString(game.clouds.transferred, 4);
+        document.getElementById('landReceived').innerHTML = intToString(game.clouds.transferred, 4);
         document.getElementById('lightningChance').innerHTML = intToString(game.clouds.lightningChance);
         document.getElementById('lightningStrength').innerHTML = intToString(game.clouds.lightningStrength);
     };
@@ -59,14 +63,16 @@ function View() {
         document.getElementById('land').innerHTML = intToString(game.land.land);
         document.getElementById('soil').innerHTML = intToString(game.land.soil);
         document.getElementById('landConverted').innerHTML = intToString(game.land.convertedLand, 4);
-        document.getElementById('soilWaterTransferred').innerHTML = intToString(game.land.transferred, 4);
+        document.getElementById('landWaterToForest').innerHTML = intToString(game.land.transferred, 4);
+        document.getElementById('forestReceived').innerHTML = intToString(game.land.transferred, 4);
+        document.getElementById('landWaterToFarm').innerHTML = intToString(game.land.transferred, 4);
+        document.getElementById('farmReceived').innerHTML = intToString(game.land.transferred, 4);
     };
 
     this.updateTrees = function() {
-        document.getElementById('treesWater').innerHTML = intToString(game.trees.water);
+        document.getElementById('forestWater').innerHTML = intToString(game.trees.water);
         document.getElementById('ferns').innerHTML = intToString(game.trees.ferns);
         document.getElementById('fernsDelta').innerHTML = intToString(game.trees.fernsDelta, 4);
-        document.getElementById('fernsDying').innerHTML = intToString(game.trees.fernsDying, 4);
         document.getElementById('trees').innerHTML = intToString(game.trees.trees);
         document.getElementById('treesDelta').innerHTML = intToString(game.trees.treesDelta, 4);
         document.getElementById('treesDying').innerHTML = intToString(game.trees.treesDying, 4);
@@ -74,15 +80,21 @@ function View() {
         document.getElementById('co2').innerHTML = intToString(game.trees.co2, 4);
         document.getElementById('oxygenGain').innerHTML = intToString(game.trees.oxygenGain, 4);
         document.getElementById('oxygenLeak').innerHTML = intToString(game.oxygenLeak, 4);
-
+        document.getElementById('forestWaterToLake').innerHTML = intToString(game.trees.transferred, 4);
+        document.getElementById('lakeWaterFromForest').innerHTML = intToString(game.trees.transferred, 4);
+        document.getElementById('fernWater').innerHTML = intToString(game.trees.fernsDelta > 0 ? game.trees.fernsDelta : 0, 4);
+        document.getElementById('treesWater').innerHTML = intToString(game.trees.treesDelta, 4);
     };
 
     this.updateFarms = function() {
         document.getElementById('farmsWater').innerHTML = intToString(game.farms.water);
         document.getElementById('farms').innerHTML = intToString(game.farms.farms);
         document.getElementById('food').innerHTML = intToString(game.farms.food);
-        document.getElementById('foodCreated').innerHTML = intToString(game.farms.foodCreated);
-        document.getElementById('efficiency').innerHTML = intToString(game.farms.efficiency);
+        document.getElementById('foodCreated').innerHTML = intToString(game.farms.foodCreated, 4);
+        document.getElementById('farmFoodEaten').innerHTML = intToString(game.population.foodEaten, 4);
+        document.getElementById('efficiency').innerHTML = intToString(game.farms.efficiency*100);
+        document.getElementById('farmWaterToLake').innerHTML = intToString(game.farms.transferred, 4);
+        document.getElementById('lakeWaterFromFarm').innerHTML = intToString(game.farms.transferred, 4);
     };
 
     this.updatePopulation = function() {
@@ -116,10 +128,18 @@ function View() {
             document.getElementById('unlockedRobots').style.display = "inline-block";
             document.getElementById('unlockRobots').style.display = "none";
             document.getElementById('lightningContainer').style.display = "inline-block";
+            document.getElementById('lightningTooltip').style.display = "inline-block";
+            document.getElementById('energyContainer').style.display = "inline-block";
+            document.getElementById('woodContainer').style.display = "inline-block";
+            document.getElementById('metalContainer').style.display = "inline-block";
         } else {
             document.getElementById('unlockedRobots').style.display = "none";
             document.getElementById('unlockRobots').style.display = "inline-block";
             document.getElementById('lightningContainer').style.display = "none";
+            document.getElementById('lightningTooltip').style.display = "none";
+            document.getElementById('energyContainer').style.display = "none";
+            document.getElementById('woodContainer').style.display = "none";
+            document.getElementById('metalContainer').style.display = "none";
         }
     };
 
@@ -144,8 +164,8 @@ function View() {
         document.getElementById('freeThreads').innerHTML = game.computer.freeThreads+"";
         document.getElementById('threads').innerHTML = game.computer.threads+"";
         document.getElementById('speed').innerHTML = game.computer.speed+"";
-        document.getElementById('threadCost').innerHTML = intToString(game.computer.getThreadCost());
-        document.getElementById('speedCost').innerHTML = intToString(game.computer.getSpeedCost());
+        document.getElementById('threadCost').innerHTML = intToString(game.computer.getThreadCost(), 1);
+        document.getElementById('speedCost').innerHTML = intToString(game.computer.getSpeedCost(), 1);
         for(var i = 0; i < game.computer.processes.length; i++) {
             var row = game.computer.processes[i];
             document.getElementById('computerRow'+i+'Threads').innerHTML = row.threads;

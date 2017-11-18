@@ -28,6 +28,7 @@ function Computer() {
         if(row.currentTicks >= row.ticksNeeded) {
             var overflow = row.currentTicks - row.ticksNeeded;
             row.currentTicks = 0;
+            row.completions++;
             row.finish();
             this.tickRow(row, overflow); //recursive, but on the new cost
         }

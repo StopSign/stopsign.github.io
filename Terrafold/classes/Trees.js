@@ -52,6 +52,9 @@ function Trees() {
         if(this.fernsDelta > this.water) {
             this.fernsDelta = this.water;
         }
+        if(this.fernsDelta < 0) {
+            this.compost += this.fernsDelta;
+        }
         this.ferns += this.fernsDelta;
         if(this.ferns < 0) {
             this.treesDying = 0 - this.ferns;
@@ -61,7 +64,9 @@ function Trees() {
         } else {
             this.treesDying = 0;
         }
-        this.water -= this.fernsDelta;
+        if(this.fernsDelta) {
+            this.water -= this.fernsDelta;
+        }
     }
 
 }

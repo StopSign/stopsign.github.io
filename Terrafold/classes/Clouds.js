@@ -18,7 +18,7 @@ function Clouds() {
 
     this.tickLightning = function() {
         this.lightningChance += .01 * this.stormRate / 100;
-        this.lightningStrength = Math.log2(this.water+1);
+        this.lightningStrength = Math.pow(this.water, .5);
         if(this.stormRate === 100 && this.lightningChance > Math.random()*100) {
             this.lightningChance = 0;
             game.energy.energy += this.lightningStrength;

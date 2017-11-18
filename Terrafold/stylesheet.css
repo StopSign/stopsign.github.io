@@ -26,7 +26,7 @@ body {
     background-color: #b4b3e4;
     border:1px solid;
     padding:3px 5px;
-    min-width:200px;
+    min-width:300px;
     border-radius:4px;
     margin-top:5px;
     z-index:999;
@@ -35,6 +35,7 @@ body {
 
 .showthis2 {
     z-index:1000;
+    min-width:200px;
 }
 
 .waterIcon {
@@ -158,11 +159,12 @@ input, label {
     background-color:white;
     top:0;
     padding:2px;
+    z-index:998;
 }
 
 .rowTooltip {
     display:block;
-    width:200px;
+    width:250px;
 }
 
 .rowProgressBarOuter {

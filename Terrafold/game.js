@@ -1,9 +1,9 @@
 //All things related to cash should be in this class
 function Game() {
     this.totalLand = 1000;
-    this.cash = 1000; //Actual default: 1000
+    this.cash = 10000; //Actual default: 1000
     this.oxygen = 0;
-    this.science = 0; //Actual default: 0
+    this.science = 8000; //Actual default: 0
     this.wood = 0;
     this.metal = 0;
 
@@ -42,10 +42,11 @@ function Game() {
         for(var i = 0; i < this.computer.processes.length; i++) {
             view.addComputerRow(i);
             this.computer.processes[i].isMoving = 0;
+            this.computer.processes[i].completions = 0;
         }
         for(i = 0; i < this.robots.jobs.length; i++) {
             view.addRobotRow(i);
-            this.robots.jobs[i].isMoving = 0;
+            this.robots.jobs[i].completions = 0;
         }
     };
 
@@ -78,16 +79,12 @@ function Game() {
 
     this.buyFarms = function() {
         var toBuy = Number(document.getElementById('buyFarmAmount').value);
-        if(toBuy * 50 > this.oxygen) {
-            toBuy = Math.floor(this.oxygen/50);
-        }
         if(toBuy * 50 > this.land.soil) {
             toBuy = Math.floor(this.land.soil/50);
         }
         if(toBuy <= 0) {
             return;
         }
-        this.oxygen -= toBuy * 50;
         this.land.soil -= toBuy * 50;
         this.farms.addFarm(toBuy);
     };
