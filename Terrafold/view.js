@@ -12,6 +12,7 @@ function View() {
         this.updateComputerRowProgress();
         this.updateRobotsRowProgress();
         this.updateEnergy();
+        this.updateSpaceport();
         this.progressBar1.tick(game.clouds.initialStormTimer - game.clouds.stormTimer, game.clouds.initialStormTimer);
         this.progressBar2.tick(game.clouds.stormDuration, game.clouds.initialStormDuration);
     };
@@ -187,7 +188,7 @@ function View() {
         var text = "<div>" + processesView[dataPos].text + "</div>";
         var progressBar = "<div class='rowProgressBarOuter'><div class='rowProgressBarInner' id='"+baseId+"PB'></div></div>";
 
-        var tooltip = "<div id='"+baseId+"CurrentTicks'></div> ticks needed<br>" +
+        var tooltip = "<div id='"+baseId+"CurrentTicks'></div> ticks<br>" +
             "<div id='"+baseId+"TicksNeeded'></div> ticks needed<br>" +
             "<div id='"+baseId+"Cost'></div><br>";
         var tooltipContainer = "<div class='computerTooltipContainer' id='"+baseId+"Tooltip'><div class='rowTooltip'>" + tooltip +  processesView[dataPos].tooltip + "</div></div>";
@@ -246,7 +247,7 @@ function View() {
         var text = "<div>" + jobsView[dataPos].text + "</div>";
 
         if(game.robots.jobs[dataPos].ticksNeeded) {
-            var tooltip = "<div id='"+baseId+"CurrentTicks'></div> ticks needed<br>" +
+            var tooltip = "<div id='"+baseId+"CurrentTicks'></div> ticks<br>" +
                 "<div id='"+baseId+"TicksNeeded'></div> ticks needed<br>" +
                 "<div id='"+baseId+"Cost'></div><br>";
             var progressBar = "<div class='rowProgressBarOuter'><div class='rowProgressBarInner' id='" + baseId + "PB'></div></div>";
@@ -267,8 +268,47 @@ function View() {
         containerDiv.appendChild(rowContainer);
     };
 
+    this.checkEnergyUnlocked = function() {
+        if(game.energy.unlocked) {
+            document.getElementById('unlockedEnergy').style.display = "inline-block";
+            document.getElementById('unlockEnergy').style.display = "none";
+            if(document.getElementById('spaceStationContainer').classList.contains("disabled")) {
+                document.getElementById('spaceStationContainer').classList.remove("disabled");
+            }
+        } else {
+            document.getElementById('unlockedEnergy').style.display = "none";
+            document.getElementById('unlockEnergy').style.display = "inline-block";
+            if(!document.getElementById('spaceStationContainer').classList.contains("disabled")) {
+                document.getElementById('spaceStationContainer').classList.add("disabled");
+            }
+        }
+    };
+
     this.updateEnergy = function() {
         document.getElementById('energy').innerHTML = intToString(game.energy.energy);
+        document.getElementById('battery').innerHTML = intToString(game.energy.battery);
+
+    };
+
+    this.tractorBeam = function() {
+
+        var container = document.getElementById("allPassing");
+        var text = "";
+        var comets = game.spaceport.comets;
+        for(var i = 0; i < comets.length; i++) {
+            text += comets[i].name + " with " +
+                intToString(comets[i].amount, 1) +
+                " " + comets[i].amountType +
+                " passing in " + comets[i].duration + "\n";
+        }
+        container.innerHTML = text;
+    };
+
+    this.updateSpaceport = function() {
+
+
+        document.getElementById('spaceportEnergy').innerHTML = intToString(game.spaceport.energy, 1);
+        // document.getElementById('spaceportEnergyNeeded').innerHTML = intToString(game.spaceport.energyNeeded, 1);
     };
 
     this.progressBar1 = new ProgressBar('nextStormProgress', '#21276a');

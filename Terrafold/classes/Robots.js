@@ -1,7 +1,7 @@
 function Robots() {
     this.robots = 0;
     this.robotsFree = 0;
-    this.robotMax = 10;
+    this.robotMax = 5;
     this.unlocked = 0;
     this.ore = 0;
     this.mines = 0;

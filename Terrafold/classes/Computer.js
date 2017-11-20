@@ -124,7 +124,7 @@ function Computer() {
             currentTicks: 0,
             ticksNeeded: 2000,
             threads: 0,
-            cost: .1,
+            cost: .5,
             costType:"cash",
             finish:function() { game.ice.findIceSeller(1) },
             showing: function() { return true; }
@@ -155,7 +155,7 @@ function Computer() {
             threads: 0,
             cost:2,
             costType:"science",
-            finish:function() { game.robots.gainStorage(10); this.cost += 1; },
+            finish:function() { game.robots.gainStorage(5); this.cost += 1; },
             showing: function() { return game.robots.unlocked; }
         },
         { //Improve House Design
@@ -186,11 +186,11 @@ var processesView = [
     },
     {
         text:"Improve Farms",
-        tooltip:"Farm efficiency increases by 50%"
+        tooltip:"Farm efficiency increases by 20%"
     },
     {
         text:"Find more Ice Sellers",
-        tooltip:"Gain 100 buyable ice and 1 more per tick"
+        tooltip:"Gain 200 buyable ice and 1 more per tick"
     },
     {
         text:"Bigger Storms",
@@ -202,7 +202,7 @@ var processesView = [
     },
     {
         text:"More Robot Storage",
-        tooltip:"Can hold 10 more robots"
+        tooltip:"Can hold 5 more robots"
     },
     {
         text:"Improve House Design",

@@ -15,7 +15,7 @@
 </head>
 <body>
 
-<div id="info" style="position:fixed;border-bottom:1px solid;background-color:white;z-index:1001" class="medium">
+<div id="info" style="position:fixed;border-bottom:1px solid;background-color:white;z-index:1001;padding:0 10px;border-right:1px solid;" class="medium">
     <div class="showthat2"> <img src='img/water.png' class='largeIcon'>: <div id="totalWater"></div><div class="showthis2">Total Water from anywhere</div></div>
     <div class="showthat2"> <img src='img/cash.png' class='largeIcon'>: <div id="cash"></div><div class="showthis2">Cash</div></div>
     <div class="showthat2"> <img src='img/oxygen.png' class='largeIcon'>: <div id="oxygen"></div>
@@ -100,11 +100,11 @@
             <canvas id='nextStormProgress' class='progress-active' height='80px' width='80px'></canvas>
         </div>
         <div class='progress-bar'>
-            <div>Storm Duration: <div id="stormDuration"></div></div><br>
+            <div>Duration:<br><div id="stormDuration"></div></div><br>
             <canvas id='stormDurationProgress' class='progress-active' height='80px' width='80px'></canvas>
         </div><br>
         <div>Intensity: <div id="stormRate"></div></div><br>
-        <div class="verticalProgress" style="left:89px;top:88px;">
+        <div class="verticalProgress" style="left:94px;top:88px;">
             <div class="verticalProgressInner" id="intensityPB"></div>
         </div>
         <div id="lightningContainer">
@@ -251,6 +251,7 @@
     </div>
 
     <div id="computerContainer" class="container" style="left:1300px;top:25px;">
+        <div class="title">Computer</div>
         <div id="unlockComputer" class="button" onclick="game.computer.unlockComputer()">Build Computer (1000 science)</div>
         <div id="unlockedComputer" style="display:none;">
             <div>Threads: <div id="freeThreads"></div>/<div id="threads"></div></div> Speed: <div id="speed"></div><br>
@@ -261,22 +262,57 @@
         </div>
     </div>
 
-    <div id="robotsContainer" class="container" style="left:1300px;top:400px;">
+    <div id="robotsContainer" class="container" style="left:905px;top:305px;">
+        <div class="title">Robots</div>
         <div id="unlockRobots" class="button" onclick="game.robots.unlockRobots()">Special deal! Buy first robot for $3000</div>
         <div id="unlockedRobots">
-            <div>Total Robots: <div id="robots"></div></div><br>
-            <div>Robots Free: <div id="robotsFree"></div></div><br>
-            <div>Robot Max: <div id="robotMax"></div></div><br>
+            <div>Free: <div id="robotsFree"></div>, Total: <div id="robots"></div>, Max: <div id="robotMax"></div></div><br>
             <div>Ore: <div id="ore"></div></div><br>
             <div id="robotRows" style="text-align:left;">
             </div>
         </div>
     </div>
-    <div id="energyContainer" class="container" style="left:350px;top:350px;">
-        <div>Energy: <div id="energy"></div></div>
+
+    <div id="energyContainer" class="container showthat" style="left:350px;top:350px;">
+        <div class="title">Energy</div>
+        <div id="unlockEnergy" class="button" onclick="game.energy.unlockEnergy()">Build lightning rod for 500 metal</div>
+        <div id="unlockedEnergy">
+            <div>Energy: <div id="energy"></div></div><br>
+            <div>Battery: <div id="battery"></div></div><br>
+            <input id="buyBattery" type="number" value="1"><br>
+            <div class="button" onclick="game.buyBattery()">+50 battery for <br><div id="batteryCost">500k oxygen, 250 metal, 50k science</div></div><br>
+        </div><br>
+        <div class="showthis">
+            Drains 2% of energy past the battery per tick
+        </div>
     </div>
-    <div id="spaceportContainer" class="container" style="left:1700px;top:100px;">
-        <div>Spaceport</div>
+
+    <div id="spaceStationContainer" class="container showthat disabled" style="left:70px;top:500px;">
+        <div class="title">Spaceport</div>
+        Energy: <div id="spaceportEnergy"></div>
+        <input id="buyBattleshipAmount" type="number" value="1"><br>
+        <div class="button" onclick="game.buyBattleship()">Build Battleship for <div id="battleshipCost">10m oxygen, 10 robots, 10m cash</div></div><br>
+
+
+        <div class="showthis">
+
+            <label for="buyBattleshipAmount">Set how much you want to buy with the input.</label><br>
+        </div>
+    </div>
+
+
+    <div id="tractorBeamContainer" class="container" style="left:1700px;top:100px;">
+        <div class="title">Tractor Beam</div>
+        Energy: <div id="tractorBeamEnergy"></div> out of <div id="tractorBeamEnergyNeeded"></div><br><br>
+
+        Catch Rate
+
+        <div id="spaceportAllOrbiting"></div>
+
+        <div class="showthis">
+            Pulls passing debris into orbit
+            <label for="buyBattleshipAmount">Set how much you want to buy with the input.</label><br>
+        </div>
     </div>
 </div>
 <div id="ground" style="width:50%;display:none;">
@@ -302,5 +338,6 @@
 <script src="classes/Trees.js"></script>
 <script src="classes/Water.js"></script>
 <script src="UIClasses/ProgressBar.js"></script>
+<script src="hotkeys.js"></script>
 <script src="saving.js"></script>
 </html>

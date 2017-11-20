@@ -13,7 +13,7 @@ function Clouds() {
     this.tick = function(gained) {
         this.water += gained;
         this.nextStormTimer();
-        this.tickLightning();
+        return this.tickLightning();
     };
 
     this.tickLightning = function() {
@@ -21,7 +21,7 @@ function Clouds() {
         this.lightningStrength = Math.pow(this.water, .5);
         if(this.stormRate === 100 && this.lightningChance > Math.random()*100) {
             this.lightningChance = 0;
-            game.energy.energy += this.lightningStrength;
+            game.energy.gainEnergy(this.lightningStrength);
         }
     };
 

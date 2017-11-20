@@ -1,11 +1,11 @@
 //All things related to cash should be in this class
 function Game() {
     this.totalLand = 1000;
-    this.cash = 10000; //Actual default: 1000
+    this.cash = 100000; //Actual default: 1000
     this.oxygen = 0;
-    this.science = 0; //Actual default: 0
+    this.science = 80000; //Actual default: 0
     this.wood = 0;
-    this.metal = 0;
+    this.metal = 10000;
 
     this.tick = function() {
         this.ice.tick();
@@ -19,7 +19,9 @@ function Game() {
         this.water.outdoor += this.trees.transferWater();
         this.land.tick(this.clouds.transferWater());
         this.clouds.tick(this.water.transferWater());
+        this.energy.tick();
         this.water.tick(this.ice.transferWater());
+        this.spaceport.tick();
 
         this.oxygenLeak = this.oxygen / 100000;
         this.oxygen -= this.oxygenLeak;
@@ -88,5 +90,26 @@ function Game() {
         this.land.soil -= toBuy * 50;
         this.farms.addFarm(toBuy);
     };
+
+    this.buyBattleship = function() {
+        var toBuy = Number(document.getElementById('buyBattleshipAmount').value);
+        if(toBuy * 1e7 > this.land.oxygen) {
+            toBuy = Math.floor(this.land.oxygen / 1e7);
+        }
+        if(toBuy <= 0) {
+            return;
+        }
+        this.spaceport.addBattleship(toBuy);
+    };
+
+    this.buyBattery = function() {
+        var toBuy = Number(document.getElementById('buyBattery').value);
+        if(toBuy * 50 > this.land.soil) {
+            toBuy = Math.floor(this.land.soil/50);
+        }
+        if(toBuy <= 0) {
+            return;
+        }
+    }
 
 }

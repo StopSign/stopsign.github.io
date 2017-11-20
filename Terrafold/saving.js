@@ -21,6 +21,7 @@ function loadDefaults() {
     view = new View();
     game = new Game();
     game.initialize();
+    view.checkEnergyUnlocked();
     view.checkComputerUnlocked();
     view.checkRobotsUnlocked();
 }

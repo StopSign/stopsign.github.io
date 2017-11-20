@@ -13,7 +13,7 @@ body {
     font-size:14px;
     height:100%;
     margin:0;
-    background-color:white;
+    background-color: #ececec;
     cursor:default;
 }
 
@@ -109,6 +109,11 @@ input, label {
     border-radius:5px;
     text-align:center;
     min-width:100px;
+    opacity:.7;
+    background-color: #c3d2ff;
+}
+.container:hover {
+    opacity:1;
 }
 
 .slider {
@@ -196,12 +201,7 @@ input, label {
 
 .progress-bar .progress-active {
     position: absolute;
-    left:0;
-}
-
-.progress-bar .progress-inactive {
-    position: absolute;
-    left:0;
+    left:5px;
 }
 
 .verticalProgress {
@@ -229,4 +229,9 @@ input, label {
     border:1px solid;
     border-radius:3px;
     width:45px;
+}
+
+.disabled {
+    pointer-events:none;
+    opacity:.2;
 }
