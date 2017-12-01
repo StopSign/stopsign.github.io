@@ -19,10 +19,14 @@ function Trees() {
     };
 
     this.plantGrowth = function() {
-        this.totalPlants = this.ferns+this.smallTrees+this.trees;
+        this.totalPlants = this.ferns + this.smallTrees + this.trees;
         this.treesDelta = this.smallTrees / 1000;
         this.smallTreesDelta = this.ferns / 1000 - this.treesDelta;
         this.fernsDelta = (game.land.soil - this.totalPlants) / 1000 - this.ferns / 1000;
+
+        this.fernsWaterUse = (game.land.soil - this.totalPlants) / 1000;
+        this.smallTreesWaterUse = this.ferns / 1000;
+        this.treesWaterUse = this.smallTrees / 1000;
 
         if(this.fernsDelta < 0) {
             var excessDying = 0;
@@ -38,26 +42,26 @@ function Trees() {
             }
             this.treesDelta += excessDying;
         }
-
-        if(this.water < this.treesDelta) {
-            this.treesDelta = this.water;
+        if(this.water < this.treesWaterUse) {
+            this.treesDelta = this.treesDelta > 0 ? this.water : this.treesDelta;
+            this.treesWaterUse = this.water;
         }
         this.trees += this.treesDelta;
-        this.water -= this.treesDelta > 0 ? this.treesDelta : 0;
+        this.water -= this.treesWaterUse;
 
-        if(this.water < this.smallTreesDelta) {
-            this.smallTreesDelta = this.water;
+        if(this.water < this.smallTreesWaterUse) {
+            this.smallTreesDelta = this.smallTreesDelta > 0 ? this.water : this.smallTreesDelta;
+            this.smallTreesWaterUse = this.water;
         }
         this.smallTrees += this.smallTreesDelta;
-        this.water -= this.smallTreesDelta > 0 ? this.smallTreesDelta : 0;
+        this.water -= this.smallTreesWaterUse;
 
-        if(this.water < this.fernsDelta) {
-            this.fernsDelta = this.water;
+        if(this.water < this.fernsWaterUse) {
+            this.fernsDelta = this.fernsDelta > 0 ? this.water : this.fernsDelta;
+            this.fernsWaterUse = this.water;
         }
         this.ferns += this.fernsDelta;
-        this.water -= this.fernsDelta > 0 ? this.fernsDelta : 0;
-
-
+        this.water -= this.fernsWaterUse;
     };
 
     this.transferWater = function() {

@@ -83,9 +83,9 @@ function View() {
         document.getElementById('oxygenGain').innerHTML = intToString(game.trees.oxygenGain, 4);
         document.getElementById('forestWaterToLake').innerHTML = intToString(game.trees.transferred, 4);
         document.getElementById('lakeWaterFromForest').innerHTML = intToString(game.trees.transferred, 4);
-        document.getElementById('fernWater').innerHTML = intToString(game.trees.fernsDelta > 0 ? game.trees.fernsDelta : 0, 4);
-        document.getElementById('smallTreesWater').innerHTML = intToString(game.trees.smallTreesDelta > 0 ? game.trees.smallTreesDelta : 0, 4);
-        document.getElementById('treesWater').innerHTML = intToString(game.trees.treesDelta > 0 ? game.trees.treesDelta : 0, 4);
+        document.getElementById('fernWater').innerHTML = intToString(game.trees.fernsWaterUse, 4);
+        document.getElementById('smallTreesWater').innerHTML = intToString(game.trees.smallTreesWaterUse, 4);
+        document.getElementById('treesWater').innerHTML = intToString(game.trees.treesWaterUse, 4);
     };
 
     this.updateFarms = function() {
@@ -147,6 +147,7 @@ function View() {
 
     this.updateComputerRowProgress = function() {
         for(var i = 0; i < game.computer.processes.length; i++) {
+
             var row = game.computer.processes[i];
             var baseId = "computerRow" + i;
             document.getElementById(baseId+"PB").style.width = (row.currentTicks / row.ticksNeeded)*100 + "%";
@@ -305,7 +306,6 @@ function View() {
     };
 
     this.updateSpaceport = function() {
-
 
         document.getElementById('spaceportEnergy').innerHTML = intToString(game.spaceport.energy, 1);
         // document.getElementById('spaceportEnergyNeeded').innerHTML = intToString(game.spaceport.energyNeeded, 1);
