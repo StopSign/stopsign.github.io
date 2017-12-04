@@ -12,7 +12,8 @@ function View() {
         this.updateComputerRowProgress();
         this.updateRobotsRowProgress();
         this.updateEnergy();
-        this.updateSpaceport();
+        this.updateSpaceStation();
+        this.updateTractorBeam();
         this.progressBar1.tick(game.clouds.initialStormTimer - game.clouds.stormTimer, game.clouds.initialStormTimer);
         this.progressBar2.tick(game.clouds.stormDuration, game.clouds.initialStormDuration);
     };
@@ -273,14 +274,14 @@ function View() {
         if(game.energy.unlocked) {
             document.getElementById('unlockedEnergy').style.display = "inline-block";
             document.getElementById('unlockEnergy').style.display = "none";
-            if(document.getElementById('spaceStationContainer').classList.contains("disabled")) {
-                document.getElementById('spaceStationContainer').classList.remove("disabled");
+            if(document.getElementById('spaceDockContainer').classList.contains("disabled")) {
+                document.getElementById('spaceDockContainer').classList.remove("disabled");
             }
         } else {
             document.getElementById('unlockedEnergy').style.display = "none";
             document.getElementById('unlockEnergy').style.display = "inline-block";
-            if(!document.getElementById('spaceStationContainer').classList.contains("disabled")) {
-                document.getElementById('spaceStationContainer').classList.add("disabled");
+            if(!document.getElementById('spaceDockContainer').classList.contains("disabled")) {
+                document.getElementById('spaceDockContainer').classList.add("disabled");
             }
         }
     };
@@ -291,25 +292,70 @@ function View() {
 
     };
 
-    this.tractorBeam = function() {
+    this.checkSpaceStationUnlocked = function() {
+        if(game.energy.unlocked) {
+            document.getElementById('spaceStationContainer').style.display = "inline-block";
+        } else {
+            document.getElementById('spaceStationContainer').style.display = "none";
+        }
+
+        if(game.spaceStation.unlocked) {
+            document.getElementById('unlockedSpaceStation').style.display = "inline-block";
+            document.getElementById('unlockSpaceStation').style.display = "none";
+        } else {
+            document.getElementById('unlockedSpaceStation').style.display = "none";
+            document.getElementById('unlockSpaceStation').style.display = "inline-block";
+        }
+    };
+
+    this.updateSpaceStation = function() {
+        var orbitString = "";
+        var orbitSendString = "";
+        for(var i = 0; i < game.spaceStation.orbiting.length; i++) {
+            orbitString += intToString(game.spaceStation.orbiting[i].amount) + " " + game.spaceStation.orbiting[i].type;
+            orbitSendString += intToString(game.spaceStation.orbiting[i].amount / 10000) + " " + game.spaceStation.orbiting[i].type;
+            if(i !== game.spaceStation.orbiting.length - 1) {
+                orbitString += ", ";
+                orbitSendString += ", ";
+            }
+        }
+        document.getElementById('orbitingResources').innerHTML = orbitString;
+        document.getElementById('orbitSending').innerHTML = orbitSendString;
+
+    };
+
+    this.checkTractorBeamUnlocked = function() {
+        if(game.spaceStation.unlocked) {
+            document.getElementById('tractorBeamContainer').style.display = "inline-block";
+        } else {
+            document.getElementById('tractorBeamContainer').style.display = "none";
+        }
+
+        if(game.tractorBeam.unlocked) {
+            document.getElementById('unlockedTractorBeam').style.display = "inline-block";
+            document.getElementById('unlockTractorBeam').style.display = "none";
+        } else {
+            document.getElementById('unlockedTractorBeam').style.display = "none";
+            document.getElementById('unlockTractorBeam').style.display = "inline-block";
+        }
+    };
+
+    this.updateTractorBeam = function() {
+        document.getElementById('tractorBeamEnergy').innerHTML = intToString(game.tractorBeam.energy, 1);
+        document.getElementById('tractorBeamEnergyNeeded').innerHTML = intToString(game.tractorBeam.energyNeeded, 1);
 
         var container = document.getElementById("allPassing");
         var text = "";
-        var comets = game.spaceport.comets;
+        var comets = game.tractorBeam.comets;
         for(var i = 0; i < comets.length; i++) {
             text += comets[i].name + " with " +
                 intToString(comets[i].amount, 1) +
                 " " + comets[i].amountType +
-                " passing in " + comets[i].duration + "\n";
+                " passing in " + comets[i].duration + "<br>";
         }
         container.innerHTML = text;
     };
 
-    this.updateSpaceport = function() {
-
-        document.getElementById('spaceportEnergy').innerHTML = intToString(game.spaceport.energy, 1);
-        // document.getElementById('spaceportEnergyNeeded').innerHTML = intToString(game.spaceport.energyNeeded, 1);
-    };
 
     this.progressBar1 = new ProgressBar('nextStormProgress', '#21276a');
     this.progressBar2 = new ProgressBar('stormDurationProgress', '#1c7682');

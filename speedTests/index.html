@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<div id="a"></div><br>
+
+<div>Here we have <div id="b"></div>, <div id="c"></div>, <div id="d"></div>, <div id="e"></div>, and <div id="f"></div></div>
+
+</body>
+</html>
+
+<script>
+    var b = 2;
+    var c = 3;
+    var d = 4;
+    var e = 5;
+    var f = 6;
+    var startTime = new Date().getTime();
+    for(var i = 0; i < 100000; i++) {
+        // document.getElementById("a").innerHTML = "Here we have Here we have Here we have Here we have Here we have Here we have Here we have Here we have Here we have Here we have Here we have Here we have Here we have Here we have Here we have Here we have " +
+        //     "Here we have Here we have Here we have Here we have Here we have Here we have Here we have Here we have Here we have Here we have Here we have Here we have Here we have Here we have Here we have Here we have Here we have Here we have Here we have Here we have Here we have Here we have Here we have " +
+        //     "Here we have Here we have Here we have Here we have Here we have Here we have Here we have Here we have Here we have Here we have Here we have Here we have Here we have Here we have Here we have Here we have Here we have Here we have Here we have Here we have Here we have Here we have Here we have Here we have " +
+        //     "Here we have Here we have Here we have Here we have Here we have Here we have Here we have Here we have Here we have Here we have Here we have " + b + ", " + c + ", " + d + ", " + e + ", and " + f;
+        document.getElementById("b").innerHTML = b;
+        document.getElementById("c").innerHTML = c;
+        document.getElementById("d").innerHTML = d;
+        document.getElementById("e").innerHTML = e;
+        document.getElementById("f").innerHTML = f;
+    }
+    var duration = new Date().getTime() - startTime;
+    console.log("It took " + duration);
+</script>
+
+<style>
+    div {
+        display:inline-block;
+    }
+</style>

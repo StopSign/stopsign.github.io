@@ -32,7 +32,8 @@
 
 <div id="sky" style="position:absolute;">
 </div>
-<div style="position:absolute;width:2000px;" class="small">
+
+<div style="position:absolute;width:2500px;" class="small">
 
     <div id="iceContainer" class="container showthat" style="left:0;top:25px;width:130px;">
         <div class="title">Ice</div>
@@ -284,37 +285,50 @@
             <div class="button" onclick="game.buyBattery()">+50 battery for <br><div id="batteryCost">500k oxygen, 250 metal, 50k science</div></div><br>
         </div><br>
         <div class="showthis">
-            Drains 2% of energy past the battery per tick
+            Loses 2% of energy past the battery per tick
         </div>
     </div>
 
-    <div id="spaceStationContainer" class="container showthat disabled" style="left:70px;top:500px;">
-        <div class="title">Spaceport</div>
+    <div id="spaceStationContainer" class="container showthat" style="left:1700px;top:100px;">
+        <div class="title">Space Station</div>
+        <div id="unlockSpaceStation" class="button" onclick="game.spaceStation.unlockSpaceStation()">Build Space Station for 2m oxygen, 10k metal</div>
+        <div id="unlockedSpaceStation">
+            <div>You have <div id="orbitingResources"></div></div> in orbit.<br>
+            <div>Sending <div id="orbitSending"></div></div> to the planet.<br>
+        </div>
+
+        <div class="showthis">
+            Sends .01% of orbiting resources down to the planet.<br>
+            Dirt gets added to base land, dry land, and total land.<br>
+        </div>
+    </div>
+
+    <div id="tractorBeamContainer" class="container" style="left:1700px;top:200px;">
+        <div class="title">Tractor Beam</div>
+        <div id="unlockTractorBeam" class="button" onclick="game.tractorBeam.unlockTractorBeam()">Build Tractor Beam for 5m oxygen, 500k science</div>
+        <div id="unlockedTractorBeam">
+        Energy: <div id="tractorBeamEnergy"></div> out of <div id="tractorBeamEnergyNeeded"></div><br><br>
+
+        Catch Rate: 3% per tick to find new celestial object.<br>
+            <div id="allPassing"></div>
+        </div>
+        
+        <div class="showthis">
+            Pulls passing debris into orbit
+        </div>
+    </div>
+
+    <div id="spaceDockContainer" class="container showthat" style="left:150px;top:800px;">
+        <div class="title">Space Dock</div>
         Energy: <div id="spaceportEnergy"></div>
         <input id="buyBattleshipAmount" type="number" value="1"><br>
         <div class="button" onclick="game.buyBattleship()">Build Battleship for <div id="battleshipCost">10m oxygen, 10 robots, 10m cash</div></div><br>
-
-
         <div class="showthis">
 
             <label for="buyBattleshipAmount">Set how much you want to buy with the input.</label><br>
         </div>
     </div>
 
-
-    <div id="tractorBeamContainer" class="container" style="left:1700px;top:100px;">
-        <div class="title">Tractor Beam</div>
-        Energy: <div id="tractorBeamEnergy"></div> out of <div id="tractorBeamEnergyNeeded"></div><br><br>
-
-        Catch Rate
-
-        <div id="spaceportAllOrbiting"></div>
-
-        <div class="showthis">
-            Pulls passing debris into orbit
-            <label for="buyBattleshipAmount">Set how much you want to buy with the input.</label><br>
-        </div>
-    </div>
 </div>
 <div id="ground" style="width:50%;display:none;">
 </div>
@@ -335,7 +349,8 @@
 <script src="classes/Land.js"></script>
 <script src="classes/Population.js"></script>
 <script src="classes/Robots.js"></script>
-<script src="classes/Spaceport.js"></script>
+<script src="classes/SpaceStation.js"></script>
+<script src="classes/TractorBeam.js"></script>
 <script src="classes/Trees.js"></script>
 <script src="classes/Water.js"></script>
 <script src="UIClasses/ProgressBar.js"></script>

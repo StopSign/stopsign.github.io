@@ -8,6 +8,7 @@ function Energy() {
             game.metal -= 500;
             this.unlocked = 1;
             view.checkEnergyUnlocked();
+            view.checkSpaceStationUnlocked();
         }
         view.updateEnergy();
     };

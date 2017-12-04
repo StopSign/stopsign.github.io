@@ -2,10 +2,10 @@
 function Game() {
     this.totalLand = 1000;
     this.cash = 100000; //Actual default: 1000
-    this.oxygen = 0;
-    this.science = 80000; //Actual default: 0
+    this.oxygen = 1e7;
+    this.science = 800000; //Actual default: 0
     this.wood = 0;
-    this.metal = 10000;
+    this.metal = 12000;
 
     this.tick = function() {
         this.ice.tick();
@@ -21,7 +21,10 @@ function Game() {
         this.clouds.tick(this.water.transferWater());
         this.energy.tick();
         this.water.tick(this.ice.transferWater());
-        this.spaceport.tick();
+
+        this.tractorBeam.tick();
+        this.spaceStation.tick();
+
 
         this.oxygenLeak = this.oxygen / 100000;
         this.oxygen -= this.oxygenLeak;
@@ -38,7 +41,8 @@ function Game() {
         this.computer = new Computer();
         this.robots = new Robots();
         this.energy = new Energy();
-        this.spaceport = new Spaceport();
+        this.spaceStation = new SpaceStation();
+        this.tractorBeam = new TractorBeam();
 
 
         for(var i = 0; i < this.computer.processes.length; i++) {
@@ -91,17 +95,6 @@ function Game() {
         this.farms.addFarm(toBuy);
     };
 
-    this.buyBattleship = function() {
-        var toBuy = Number(document.getElementById('buyBattleshipAmount').value);
-        if(toBuy * 1e7 > this.land.oxygen) {
-            toBuy = Math.floor(this.land.oxygen / 1e7);
-        }
-        if(toBuy <= 0) {
-            return;
-        }
-        this.spaceport.addBattleship(toBuy);
-    };
-
     this.buyBattery = function() {
         var toBuy = Number(document.getElementById('buyBattery').value);
         if(toBuy * 50 > this.land.soil) {
@@ -110,6 +103,18 @@ function Game() {
         if(toBuy <= 0) {
             return;
         }
-    }
+
+    };
+
+    // this.buyBattleship = function() {
+    //     var toBuy = Number(document.getElementById('buyBattleshipAmount').value);
+    //     if(toBuy * 1e7 > this.land.oxygen) {
+    //         toBuy = Math.floor(this.land.oxygen / 1e7);
+    //     }
+    //     if(toBuy <= 0) {
+    //         return;
+    //     }
+    //     this.spaceStation.addBattleship(toBuy);
+    // };
 
 }

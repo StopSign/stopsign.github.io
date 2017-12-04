@@ -2,10 +2,13 @@ function Trees() {
     this.water = 0;
     this.ferns = 0;
     this.fernsDelta = 0;
+    this.fernsWaterUse = 0;
     this.smallTrees = 0;
     this.smallTreesDelta = 0;
+    this.smallTreesWaterUse = 0;
     this.trees = 0;
     this.treesDelta = 0;
+    this.treesWaterUse = 0;
     this.totalPlants = 0;
 
 

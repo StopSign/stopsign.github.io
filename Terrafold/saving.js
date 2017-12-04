@@ -21,6 +21,8 @@ function loadDefaults() {
     view = new View();
     game = new Game();
     game.initialize();
+    view.checkTractorBeamUnlocked();
+    view.checkSpaceStationUnlocked();
     view.checkEnergyUnlocked();
     view.checkComputerUnlocked();
     view.checkRobotsUnlocked();
