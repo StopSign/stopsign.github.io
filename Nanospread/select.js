@@ -115,10 +115,6 @@ function Select() {
     };
 }
 
-function pxToInt(num) {
-    return parseFloat(num.substring(0, num.indexOf('px')));
-}
-
 function doOverlap(l1, r1, l2, r2) {
     return l1.x < r2.x && r1.x > l2.x && l1.y < r2.y && r1.y > l2.y;
 }

@@ -1,6 +1,6 @@
 function TractorBeam() {
     this.unlocked = 0;
-    this.cometSpotChance = 0.03;
+    this.cometSpotChance = 0.02;
     this.energy = 0;
     this.energyNeeded = 100;
 
@@ -50,9 +50,9 @@ function TractorBeam() {
 
     this.checkForNewAsteroids = function() {
         var discoverChance = Math.random();
-        if(discoverChance < this.cometSpotChance) {
+        // if(discoverChance < this.cometSpotChance) {
             this.addComet();
-        }
+        // }
     };
 
     this.removeAsteroidIfDone = function() {
@@ -60,35 +60,45 @@ function TractorBeam() {
             var asteroid = this.comets[i];
             asteroid.duration--;
             if(asteroid.duration <= 0) {
-                this.comets.splice(i, i+1);
+                view.removeComet(this.comets.splice(i, i+1));
             }
         }
         view.updateSpaceStation();
     };
 
     this.addComet = function() {
+        if(this.comets.length > 0) {
+            return;
+        }
         var typeRoll = Math.random();
+        var amountRoll = Math.random() * 400 + 200;
+        var durationRoll = Math.floor(Math.random() * 750 + 250);
+        var speedRoll = Math.random() * 2 + 1;
         var comet = {};
 
-        if(typeRoll < .5) {
+        if(typeRoll < .6666) {
             comet = {
                 name: "Comet",
                 amountType: "ice",
-                amount:4000,
-                duration:1000,
-                speed:5,
+                amount:amountRoll * 100,
+                duration:durationRoll,
+                speed:speedRoll,
                 size:20
             };
         } else {
             comet = {
                 name: "Asteroid",
                 amountType: "dirt",
-                amount:400,
-                duration:1000,
-                speed:5,
+                amount:amountRoll,
+                duration:durationRoll * 2,
+                speed:speedRoll,
                 size:20
             };
         }
+        comet.speed = speedRoll;
+        comet.id = cometId++;
+
+
         this.comets.push(comet);
 
     };

@@ -235,3 +235,12 @@ input, label {
     pointer-events:none;
     opacity:.2;
 }
+
+.comet {
+    position:absolute;
+    width:10px;
+    height:10px;
+    background-color:red;
+    opacity:.5;
+    border-radius:5px;
+}

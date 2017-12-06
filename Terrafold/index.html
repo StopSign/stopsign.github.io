@@ -30,10 +30,11 @@
     <div class="showthat2" id="metalContainer"> <img src='img/metal.png' class='largeIcon'>: <div id="metal"></div><div class="showthis2">Metal</div></div>
 </div><br>
 
-<div id="sky" style="position:absolute;">
-</div>
 
 <div style="position:absolute;width:2500px;" class="small">
+
+    <div id="cometsContainer" style="position:absolute;">
+    </div>
 
     <div id="iceContainer" class="container showthat" style="left:0;top:25px;width:130px;">
         <div class="title">Ice</div>
@@ -307,12 +308,12 @@
         <div class="title">Tractor Beam</div>
         <div id="unlockTractorBeam" class="button" onclick="game.tractorBeam.unlockTractorBeam()">Build Tractor Beam for 5m oxygen, 500k science</div>
         <div id="unlockedTractorBeam">
-        Energy: <div id="tractorBeamEnergy"></div> out of <div id="tractorBeamEnergyNeeded"></div><br><br>
+            Energy: <div id="tractorBeamEnergy"></div> out of <div id="tractorBeamEnergyNeeded"></div><br><br>
 
-        Catch Rate: 3% per tick to find new celestial object.<br>
+            Catch Rate: 2% per tick to find new celestial object.<br>
             <div id="allPassing"></div>
         </div>
-        
+
         <div class="showthis">
             Pulls passing debris into orbit
         </div>

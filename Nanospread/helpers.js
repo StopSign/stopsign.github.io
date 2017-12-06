@@ -17,6 +17,10 @@ function precision2(num) {
     return Number(num.toPrecision(2));
 }
 
+function pxToInt(num) {
+    return parseFloat(num.substring(0, num.indexOf('px')));
+}
+
 function round(num) {
     return formatNumber(num);
 } function formatNumber(num) {

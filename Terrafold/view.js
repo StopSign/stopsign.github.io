@@ -147,8 +147,10 @@ function View() {
     };
 
     this.updateComputerRowProgress = function() {
+        if(!game.computer.unlocked) {
+            return;
+        }
         for(var i = 0; i < game.computer.processes.length; i++) {
-
             var row = game.computer.processes[i];
             var baseId = "computerRow" + i;
             document.getElementById(baseId+"PB").style.width = (row.currentTicks / row.ticksNeeded)*100 + "%";
@@ -340,6 +342,7 @@ function View() {
         }
     };
 
+
     this.updateTractorBeam = function() {
         document.getElementById('tractorBeamEnergy').innerHTML = intToString(game.tractorBeam.energy, 1);
         document.getElementById('tractorBeamEnergyNeeded').innerHTML = intToString(game.tractorBeam.energyNeeded, 1);
@@ -352,8 +355,43 @@ function View() {
                 intToString(comets[i].amount, 1) +
                 " " + comets[i].amountType +
                 " passing in " + comets[i].duration + "<br>";
+            this.drawComet(comets[i]);
         }
         container.innerHTML = text;
+    };
+
+    this.drawComet = function(cometData) {
+        var cometDivName = 'comet'+cometData.id;
+        var cometDiv = document.getElementById(cometDivName);
+        if(!cometDiv) {
+            cometDiv = document.createElement("div");
+            cometDiv.className = "comet";
+            cometDiv.id = cometDivName;
+
+            var totalDistance = cometData.speed * cometData.duration;
+            var endingX = Math.random() * 2300 + 100;
+            cometData.left = 0;
+            cometData.top = Math.pow(Math.abs(Math.pow(totalDistance, 2) - Math.pow(endingX, 2)), .5); //c^2 = a^2 + b^2, a = sqrt(c^2 - b^2)
+            cometData.slope = (endingX) / (0 - cometData.top);
+            console.log("starting: (0, "+cometData.top+") and ending: ("+endingX+", 0)");
+            document.getElementById('cometsContainer').appendChild(cometDiv);
+        }
+        console.log("speed: " + cometData.speed + ", duration: " + cometData.duration + ", slope: " + cometData.slope);
+        cometData.top += cometData.slope * cometData.speed;
+        cometData.left += -1 * cometData.slope * cometData.speed;
+        cometDiv.style.left = cometData.left + "px";
+        cometDiv.style.top = cometData.top + "px";
+
+        console.log(cometDiv.style.left + ", " + cometDiv.style.top);
+
+    };
+
+    this.removeComet = function(cometData) {
+        var cometDivName = 'comet'+cometData.id;
+        var cometDiv = document.getElementById(cometDivName);
+        if(cometDiv) {
+            document.getElementById('cometsContainer').removeChild(cometDiv);
+        }
     };
 
 
