@@ -39,6 +39,8 @@ function View() {
     this.updateWater = function() {
         document.getElementById('indoorWater').innerHTML = intToString(game.water.indoor);
         document.getElementById('indoorWaterMax').innerHTML = intToString(game.water.maxIndoor);
+        document.getElementById('indoorWaterSelling').innerHTML = intToString(game.water.selling);
+        document.getElementById('indoorWaterProfits').innerHTML = intToString(game.water.gain);
         document.getElementById('excessWater').innerHTML = intToString(game.water.excess, 4);
         document.getElementById('lakeWaterFromStorage').innerHTML = intToString(game.water.excess, 4);
 
@@ -107,7 +109,9 @@ function View() {
         document.getElementById('starving').innerHTML = intToString(game.population.starving, 4);
         document.getElementById('scienceDelta').innerHTML = intToString(game.population.scienceDelta, 4);
         document.getElementById('cashDelta').innerHTML = intToString(game.population.cashDelta, 4);
-        document.getElementById('scienceRatio').innerHTML = game.population.scienceRatio+"%";
+        document.getElementById('scienceRatio').innerHTML = game.population.scienceRatio+"% science";
+        document.getElementById('scienceRatio').innerHTML = game.population.scienceRatio < 50 ? 100-game.population.scienceRatio+"% science" : game.population.scienceRatio+"% cash";
+
         document.getElementById('happiness').innerHTML = intToString(game.population.happiness, 4);
         document.getElementById('happinessFromHouse').innerHTML = intToString(game.population.houseBonus);
         document.getElementById('happinessFromTrees').innerHTML = intToString(game.population.happinessFromTrees, 4);

@@ -13,7 +13,6 @@ function processKeyQueue() {
     } else if(key === 13 || key === 32) { //enter / space
     } else if(key === 38 || key === 87) { //w
     } else if(key === 40 || key === 83) { //s
-        game.sellWater()
     } else if(key === 37 || key === 65) { //a
     } else if(key === 39 || key === 68) { //d
     } else if(key === 66) { //b

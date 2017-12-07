@@ -2,10 +2,13 @@ function Water() {
     this.indoor = 0;
     this.outdoor = 0;
     this.maxIndoor = 50;
+    this.selling = 0;
     this.excess = 0;
+    this.gain = 0;
 
     this.tick = function(gained) {
         this.indoor += gained;
+
         this.excess = this.indoor - this.maxIndoor;
         if(this.excess > 0) {
             this.indoor = this.maxIndoor;
@@ -13,6 +16,11 @@ function Water() {
         } else {
             this.excess = 0;
         }
+
+        this.selling = this.indoor / 100;
+        this.indoor -= this.selling;
+        this.gain = this.selling * 2;
+        game.cash += this.gain;
 
     };
 

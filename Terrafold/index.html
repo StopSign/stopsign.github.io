@@ -16,6 +16,30 @@
 <body>
 
 <div id="info" style="position:fixed;z-index:1001;" class="medium">
+    <div class="showthat infoText">S<div class="showthis">
+        Story<br>
+        <div class="small">
+            The Kutchian Horde had targeted your planet's rich resources. They were coming, and you didn't stop them. You knew you couldn't, but you had a different plan.
+            With the last of the planet's reserves, you had directed your people to build a planetship.
+            It is barely large enough to keep an atmosphere, but you know you can figure out how to make it grow.
+            You escaped with your people in crystorage, and it'll be hard work to get the resources to sustain them.
+            You consider yourself lucky your connection to the water market is working well enough.<br><br>
+            But your species live a long time, and you won't forget what the Kutchians did.<br>
+        </div>
+    </div></div>
+    <div class="showthat infoText">?<div class="showthis">
+        Help Menu<br><br>
+        <div class="small">
+            Get some more water and build some farms. Then build a spaceship and explore the universe.<br>
+        </div>
+    </div></div>
+    <div class="showthat infoText">O<div class="showthis">
+        Options Menu<br><br>
+        <div class="small">
+            You did't have a choice.<br>
+            <div class="button" onclick="clearSave()">Hard Reset</div>
+        </div>
+    </div></div>
     <div id="resources" class="infoText" style="padding:0 10px;">
         <div class="showthat2"> <img src='img/water.png' class='largeIcon'>: <div id="totalWater"></div><div class="showthis2">Total Water from anywhere</div></div>
         <div class="showthat2"> <img src='img/cash.png' class='largeIcon'>: <div id="cash"></div><div class="showthis2">Cash</div></div>
@@ -30,25 +54,6 @@
         <div class="showthat2" id="woodContainer"> <img src='img/wood.png' class='largeIcon'>: <div id="wood"></div><div class="showthis2">Wood</div></div>
         <div class="showthat2" id="metalContainer"> <img src='img/metal.png' class='largeIcon'>: <div id="metal"></div><div class="showthis2">Metal</div></div>
     </div>
-    <div class="showthat infoText">?<div class="showthis">
-        Help Menu<br>
-        Get some more water and build some farms. Then build a spaceship and explore the universe.<br>
-    </div></div>
-    <div class="showthat infoText">O<div class="showthis">
-        Options Menu<br>
-        You did't have a choice.<br>
-    </div></div>
-    <div class="showthat infoText">S<div class="showthis">
-        Story<br>
-        <div class="small">
-        The Kutchian Horde had targeted your planet's rich resources. They were coming, and you didn't stop them. You knew you couldn't, but you had a different plan.
-        With the last of the planet's reserves, you had directed your people to build a planetship.
-        It is barely large enough to keep an atmosphere, but you know you can figure out how to make it grow.
-        You escaped with your people in crystorage, and it'll be hard work to get the resources to sustain them.
-        You consider yourself lucky your connection to the water market is working well enough.<br><br>
-        But your species live a long time, and you won't forget what the Kutchians did.<br>
-        </div>
-    </div></div>
 </div><br>
 
 
@@ -84,13 +89,12 @@
             </div>
         </div>
         <div><img src='img/water.png' class='smallIcon'>: <div id="indoorWater"></div></div><br>
-        <input id="sellIndoorWaterAmount" type="number" value="50"><br>
-        <div class="button" onclick="game.sellWater()">Sell <img src='img/water.png' class='smallIcon'> for $2</div><br>
+        <div> Selling: <div id="indoorWaterSelling"></div></div><br>
+        <div> Profits: <div id="indoorWaterProfits"></div></div><br>
         <div> Max: <div id="indoorWaterMax"></div></div><br>
         <div class="showthis">
-            When <img src='img/water.png' class='smallIcon'> is at max,<br> extra water spills to the lake.<br>
-            Sells 1% of max per tick.<br>
-            <label for="sellIndoorWaterAmount">Set how much you want to sell with the input.</label><br>
+            When <img src='img/water.png' class='smallIcon'> is at max, extra water spills into the lake.<br>
+            Sells 1% of max per tick. Sells for $2 per 1.<br>
         </div>
     </div>
 
@@ -264,7 +268,7 @@
         <div id="sliderContainer" style="width:150px;">
             <input type="range" min="0" max="100" value="0" class="slider" id="scienceSlider">
         </div><br>
-        <div><div id="scienceRatio"></div> science</div><br>
+        <div id="scienceRatio"></div><br>
         <div>Science created: <div id="scienceDelta"></div></div><br>
         <div>Cash created: <div id="cashDelta"></div></div><br>
         <div class="showthis">

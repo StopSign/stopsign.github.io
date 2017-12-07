@@ -1,11 +1,11 @@
 //All things related to cash should be in this class
 function Game() {
     this.totalLand = 1000;
-    this.cash = 100000; //Actual default: 1000
-    this.oxygen = 1e7;
-    this.science = 800000; //Actual default: 0
+    this.cash = 100; //Actual default: 100
+    this.oxygen = 0;
+    this.science = 0; //Actual default: 0
     this.wood = 0;
-    this.metal = 12000;
+    this.metal = 0;
 
     this.tick = function() {
         this.ice.tick();
@@ -73,7 +73,6 @@ function Game() {
 
     this.sellWater = function(toSell) {
         if(toSell === undefined) {
-            toSell = Number(document.getElementById('sellIndoorWaterAmount').value);
         }
         if(toSell <= 0) {
             return;

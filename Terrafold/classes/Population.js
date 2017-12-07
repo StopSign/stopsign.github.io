@@ -29,8 +29,8 @@ function Population() {
     };
 
     this.tickRatio = function() {
-        this.scienceDelta = this.people / 100 * this.scienceRatio / 100 * this.happiness;
-        this.cashDelta = this.people / 100 * (100 - this.scienceRatio) / 100 * this.happiness;
+        this.scienceDelta = this.people / 100 * (100 - this.scienceRatio) / 100 * this.happiness;
+        this.cashDelta = this.people / 100 * this.scienceRatio / 100 * this.happiness;
         game.science += this.scienceDelta;
         game.cash += this.cashDelta;
     };

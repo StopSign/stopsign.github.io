@@ -108,7 +108,7 @@ function Computer() {
             threads: 0,
             cost:0,
             costType:"",
-            finish:function() { game.sellWater(10) },
+            finish:function() { game.sellWater(5) },
             showing: function() { return true; }
         },
         { //Improve Farms
@@ -182,7 +182,7 @@ var processesView = [
     },
     {
         text:"Sell Water",
-        tooltip:"Sells up to 10 water"
+        tooltip:"Sells up to 5 water"
     },
     {
         text:"Improve Farms",

@@ -28,6 +28,7 @@ function Trees() {
         this.fernsDelta = (game.land.soil - this.totalPlants) / 1000 - this.ferns / 1000;
 
         this.fernsWaterUse = (game.land.soil - this.totalPlants) / 1000;
+        this.fernsWaterUse = this.fernsWaterUse < 0 ? 0 : this.fernsWaterUse;
         this.smallTreesWaterUse = this.ferns / 1000;
         this.treesWaterUse = this.smallTrees / 1000;
 
