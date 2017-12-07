@@ -32,3 +32,6 @@ function handleFPSDifference() {
         //$scope.fps = "...";
     }
 }
+function pauseGame() {
+    stop = !stop;
+}

@@ -38,6 +38,7 @@
         <div class="small">
             You did't have a choice.<br>
             <div class="button" onclick="clearSave()">Hard Reset</div>
+            <div class="button" onclick="pauseGame()">Toggle Pause</div>
         </div>
     </div></div>
     <div id="resources" class="infoText" style="padding:0 10px;">
@@ -54,7 +55,7 @@
         <div class="showthat2" id="woodContainer"> <img src='img/wood.png' class='largeIcon'>: <div id="wood"></div><div class="showthis2">Wood</div></div>
         <div class="showthat2" id="metalContainer"> <img src='img/metal.png' class='largeIcon'>: <div id="metal"></div><div class="showthis2">Metal</div></div>
     </div>
-</div><br>
+</div>
 
 
 <div style="position:absolute;width:2500px;" class="small">
@@ -62,7 +63,7 @@
     <div id="cometsContainer" style="position:absolute;">
     </div>
 
-    <div id="iceContainer" class="container showthat" style="left:0;top:25px;width:130px;">
+    <div id="iceContainer" class="container showthat" style="left:0;top:35px;width:130px;">
         <div class="title">Ice</div>
         <div class="waterIcon showthat2"><img src='img/water.png' class='superLargeIcon'>
             <div class="showthis2">
@@ -80,7 +81,7 @@
         </div>
     </div>
 
-    <div id="indoorWaterContainer" class="container showthat" style="left:0;top:200px;">
+    <div id="indoorWaterContainer" class="container showthat" style="left:0;top:210px;">
         <div class="title">Storage</div>
         <div class="waterIcon showthat2"><img src='img/water.png' class='superLargeIcon'>
             <div class="showthis2">
@@ -98,7 +99,7 @@
         </div>
     </div>
 
-    <div id="outdoorWaterContainer" class="container showthat" style="left:180px;top:255px;">
+    <div id="outdoorWaterContainer" class="container showthat" style="left:180px;top:265px;">
         <div class="title">Lake</div>
         <div class="waterIcon showthat2"><img src='img/water.png' class='superLargeIcon'>
             <div class="showthis2">
@@ -114,7 +115,7 @@
         </div>
     </div>
 
-    <div id="cloudsContainer" class="container showthat" style="left:300px;top:10px;">
+    <div id="cloudsContainer" class="container showthat" style="left:300px;top:20px;">
         <div class="title">Clouds</div>
         <div class="waterIcon showthat2"><img src='img/water.png' class='superLargeIcon'>
             <div class="showthis2">
@@ -336,7 +337,7 @@
         <div id="unlockedTractorBeam">
             Energy: <div id="tractorBeamEnergy"></div> out of <div id="tractorBeamEnergyNeeded"></div><br><br>
 
-            Catch Rate: 2% per tick to find new celestial object.<br>
+            Catch Rate: 1% per tick to find new celestial object.<br>
             <div id="allPassing"></div>
         </div>
 

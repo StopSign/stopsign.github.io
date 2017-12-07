@@ -238,9 +238,18 @@ input, label {
 
 .comet {
     position:absolute;
+    width:20px;
+    height:20px;
+    background-color:blue;
+    opacity:.5;
+    border-radius:10px;
+}
+
+.asteroid {
+    position:absolute;
     width:10px;
     height:10px;
-    background-color:red;
+    background-color:brown;
     opacity:.5;
     border-radius:5px;
 }

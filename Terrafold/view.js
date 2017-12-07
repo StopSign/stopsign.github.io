@@ -319,7 +319,7 @@ function View() {
         var orbitSendString = "";
         for(var i = 0; i < game.spaceStation.orbiting.length; i++) {
             orbitString += intToString(game.spaceStation.orbiting[i].amount) + " " + game.spaceStation.orbiting[i].type;
-            orbitSendString += intToString(game.spaceStation.orbiting[i].amount / 10000) + " " + game.spaceStation.orbiting[i].type;
+            orbitSendString += intToString(game.spaceStation.orbiting[i].amount / 10000, 4) + " " + game.spaceStation.orbiting[i].type;
             if(i !== game.spaceStation.orbiting.length - 1) {
                 orbitString += ", ";
                 orbitSendString += ", ";
@@ -327,7 +327,6 @@ function View() {
         }
         document.getElementById('orbitingResources').innerHTML = orbitString;
         document.getElementById('orbitSending').innerHTML = orbitSendString;
-
     };
 
     this.checkTractorBeamUnlocked = function() {
@@ -364,29 +363,32 @@ function View() {
         container.innerHTML = text;
     };
 
+    this.maxY = 0;
     this.drawComet = function(cometData) {
         var cometDivName = 'comet'+cometData.id;
         var cometDiv = document.getElementById(cometDivName);
         if(!cometDiv) {
             cometDiv = document.createElement("div");
-            cometDiv.className = "comet";
+            cometDiv.className = cometData.name.toLowerCase();
             cometDiv.id = cometDivName;
 
             var totalDistance = cometData.speed * cometData.duration;
-            var endingX = Math.random() * 2300 + 100;
+            cometData.startingY = Math.random() * (totalDistance * .4) + totalDistance * .1;
+
             cometData.left = 0;
-            cometData.top = Math.pow(Math.abs(Math.pow(totalDistance, 2) - Math.pow(endingX, 2)), .5); //c^2 = a^2 + b^2, a = sqrt(c^2 - b^2)
-            cometData.slope = (endingX) / (0 - cometData.top);
-            console.log("starting: (0, "+cometData.top+") and ending: ("+endingX+", 0)");
+            cometData.top = cometData.endingX = Math.pow(Math.pow(totalDistance, 2) - Math.pow(cometData.startingY, 2), .5); //c^2 = a^2 + b^2, a = sqrt(c^2 - b^2)
+            if(cometData.startingY > this.maxY) {
+                this.maxY = cometData.startingY;
+                console.log("starting: (0, "+cometData.startingY+") and ending: ("+cometData.endingX+", 0) with distance "+totalDistance);
+            }
+            //y = mx + b, m = (y-b)/x
+            cometData.slope = (0 - cometData.startingY) / (cometData.endingX);
             document.getElementById('cometsContainer').appendChild(cometDiv);
         }
-        console.log("speed: " + cometData.speed + ", duration: " + cometData.duration + ", slope: " + cometData.slope);
-        cometData.top += cometData.slope * cometData.speed;
-        cometData.left += -1 * cometData.slope * cometData.speed;
+        cometData.left = (cometData.initialDuration - cometData.duration) / cometData.initialDuration * cometData.endingX;
+        cometData.top = cometData.slope * cometData.left + cometData.startingY;
         cometDiv.style.left = cometData.left + "px";
         cometDiv.style.top = cometData.top + "px";
-
-        console.log(cometDiv.style.left + ", " + cometDiv.style.top);
 
     };
 
@@ -395,6 +397,8 @@ function View() {
         var cometDiv = document.getElementById(cometDivName);
         if(cometDiv) {
             document.getElementById('cometsContainer').removeChild(cometDiv);
+        } else {
+            console.log('not found: '+cometData.id);
         }
     };
 
