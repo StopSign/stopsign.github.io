@@ -26,7 +26,7 @@ function Clouds() {
     };
 
     this.transferWater = function() {
-        this.transferred = this.water / 1000 * this.stormRate / 100;
+        this.transferred = this.water / 500 * this.stormRate / 100;
         this.water -= this.transferred;
         return this.transferred;
     };

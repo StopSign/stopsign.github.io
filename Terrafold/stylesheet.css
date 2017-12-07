@@ -244,3 +244,12 @@ input, label {
     opacity:.5;
     border-radius:5px;
 }
+
+.infoText {
+    background-color:white;
+    border:1px solid;
+    border-top:0;
+    padding:0 5px;
+    height:23px;
+    vertical-align:top;
+}

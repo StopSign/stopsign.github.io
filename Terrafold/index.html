@@ -15,19 +15,40 @@
 </head>
 <body>
 
-<div id="info" style="position:fixed;border-bottom:1px solid;background-color:white;z-index:1001;padding:0 10px;border-right:1px solid;" class="medium">
-    <div class="showthat2"> <img src='img/water.png' class='largeIcon'>: <div id="totalWater"></div><div class="showthis2">Total Water from anywhere</div></div>
-    <div class="showthat2"> <img src='img/cash.png' class='largeIcon'>: <div id="cash"></div><div class="showthis2">Cash</div></div>
-    <div class="showthat2"> <img src='img/oxygen.png' class='largeIcon'>: <div id="oxygen"></div>
-        <div class="showthis2 small">
-            Oxygen<br>
-            .0001% of Oxygen leaks into space<br>
-            <div>Oxygen Leaked: <div id="oxygenLeak"></div></div> per tick.<br>
+<div id="info" style="position:fixed;z-index:1001;" class="medium">
+    <div id="resources" class="infoText" style="padding:0 10px;">
+        <div class="showthat2"> <img src='img/water.png' class='largeIcon'>: <div id="totalWater"></div><div class="showthis2">Total Water from anywhere</div></div>
+        <div class="showthat2"> <img src='img/cash.png' class='largeIcon'>: <div id="cash"></div><div class="showthis2">Cash</div></div>
+        <div class="showthat2"> <img src='img/oxygen.png' class='largeIcon'>: <div id="oxygen"></div>
+            <div class="showthis2 small">
+                Oxygen<br>
+                .0001% of Oxygen leaks into space<br>
+                <div>Oxygen Leaked: <div id="oxygenLeak"></div></div> per tick.<br>
+            </div>
         </div>
+        <div class="showthat2"> <img src='img/science.png' class='largeIcon'>: <div id="science"></div><div class="showthis2">Science</div></div>
+        <div class="showthat2" id="woodContainer"> <img src='img/wood.png' class='largeIcon'>: <div id="wood"></div><div class="showthis2">Wood</div></div>
+        <div class="showthat2" id="metalContainer"> <img src='img/metal.png' class='largeIcon'>: <div id="metal"></div><div class="showthis2">Metal</div></div>
     </div>
-    <div class="showthat2"> <img src='img/science.png' class='largeIcon'>: <div id="science"></div><div class="showthis2">Science</div></div>
-    <div class="showthat2" id="woodContainer"> <img src='img/wood.png' class='largeIcon'>: <div id="wood"></div><div class="showthis2">Wood</div></div>
-    <div class="showthat2" id="metalContainer"> <img src='img/metal.png' class='largeIcon'>: <div id="metal"></div><div class="showthis2">Metal</div></div>
+    <div class="showthat infoText">?<div class="showthis">
+        Help Menu<br>
+        Get some more water and build some farms. Then build a spaceship and explore the universe.<br>
+    </div></div>
+    <div class="showthat infoText">O<div class="showthis">
+        Options Menu<br>
+        You did't have a choice.<br>
+    </div></div>
+    <div class="showthat infoText">S<div class="showthis">
+        Story<br>
+        <div class="small">
+        The Kutchian Horde had targeted your planet's rich resources. They were coming, and you didn't stop them. You knew you couldn't, but you had a different plan.
+        With the last of the planet's reserves, you had directed your people to build a planetship.
+        It is barely large enough to keep an atmosphere, but you know you can figure out how to make it grow.
+        You escaped with your people in crystorage, and it'll be hard work to get the resources to sustain them.
+        You consider yourself lucky your connection to the water market is working well enough.<br><br>
+        But your species live a long time, and you won't forget what the Kutchians did.<br>
+        </div>
+    </div></div>
 </div><br>
 
 
@@ -68,6 +89,7 @@
         <div> Max: <div id="indoorWaterMax"></div></div><br>
         <div class="showthis">
             When <img src='img/water.png' class='smallIcon'> is at max,<br> extra water spills to the lake.<br>
+            Sells 1% of max per tick.<br>
             <label for="sellIndoorWaterAmount">Set how much you want to sell with the input.</label><br>
         </div>
     </div>
@@ -114,7 +136,7 @@
         </div>
         <div class="showthis">
             Rain falls on land, but only when storming.<br>
-            Rain falls at a rate of (water / 1000) * intensity.<br>
+            Rain falls at a rate of (water / 500) * intensity.<br>
             <div id="lightningTooltip">
                 Chance for a lightning strike per tick.<br>
                 Only strikes with a full storm.<br>

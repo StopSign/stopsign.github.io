@@ -20,7 +20,7 @@
     var e = 5;
     var f = 6;
     var startTime = new Date().getTime();
-    for(var i = 0; i < 100000; i++) {
+    // for(var i = 0; i < 100000; i++) {
         // document.getElementById("a").innerHTML = "Here we have Here we have Here we have Here we have Here we have Here we have Here we have Here we have Here we have Here we have Here we have Here we have Here we have Here we have Here we have Here we have " +
         //     "Here we have Here we have Here we have Here we have Here we have Here we have Here we have Here we have Here we have Here we have Here we have Here we have Here we have Here we have Here we have Here we have Here we have Here we have Here we have Here we have Here we have Here we have Here we have " +
         //     "Here we have Here we have Here we have Here we have Here we have Here we have Here we have Here we have Here we have Here we have Here we have Here we have Here we have Here we have Here we have Here we have Here we have Here we have Here we have Here we have Here we have Here we have Here we have Here we have " +
@@ -30,9 +30,19 @@
         document.getElementById("d").innerHTML = d;
         document.getElementById("e").innerHTML = e;
         document.getElementById("f").innerHTML = f;
-    }
+    // }
     var duration = new Date().getTime() - startTime;
-    console.log("It took " + duration);
+    // console.log("It took " + duration);
+
+    var a = 1000;
+    var b = 0;
+    var c = 0;
+    for(var i = 0; i < 15; i++) {
+        b += (a - b)/2;
+
+        c++;
+    }
+    console.log("c: "+c + ", b:"+b+", answer: " + (a === b));
 </script>
 
 <style>
