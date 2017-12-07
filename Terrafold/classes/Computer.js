@@ -174,7 +174,7 @@ function Computer() {
 var processesView = [
     {
         text:"Optimize Land",
-        tooltip:"Improve 1% of unimproved land.<br>Max to improve is ( 10 x base land )<br>Percent Optimized: <div id='landOptimized'></div>"
+        tooltip:"Improve 1% of unimproved land.<br>Max to improve to is ( 10 x base land )<br>Percent Optimized: <div id='landOptimized'></div>"
     },
     {
         text:"Buy Ice",

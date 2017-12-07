@@ -97,7 +97,7 @@ function View() {
         document.getElementById('food').innerHTML = intToString(game.farms.food);
         document.getElementById('foodCreated').innerHTML = intToString(game.farms.foodCreated, 4);
         document.getElementById('farmFoodEaten').innerHTML = intToString(game.population.foodEaten, 4);
-        document.getElementById('efficiency').innerHTML = intToString(game.farms.efficiency*100);
+        document.getElementById('efficiency').innerHTML = intToString(game.farms.efficiency*100, 1);
         document.getElementById('farmWaterToLake').innerHTML = intToString(game.farms.transferred, 4);
         document.getElementById('lakeWaterFromFarm').innerHTML = intToString(game.farms.transferred, 4);
     };
