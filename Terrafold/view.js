@@ -132,13 +132,19 @@ function View() {
 
     this.checkRobotsUnlocked = function() {
         if(game.robots.unlocked) {
-            document.getElementById('unlockedRobots').style.display = "inline-block";
-            document.getElementById('unlockRobots').style.display = "none";
-            document.getElementById('lightningContainer').style.display = "inline-block";
-            document.getElementById('lightningTooltip').style.display = "inline-block";
-            document.getElementById('energyContainer').style.display = "inline-block";
-            document.getElementById('woodContainer').style.display = "inline-block";
-            document.getElementById('metalContainer').style.display = "inline-block";
+            if(game.robots.failed) {
+                document.getElementById('unlockedRobots').style.display = "none";
+                document.getElementById('failRobots').style.display = "inline-block";
+            } else {
+                document.getElementById('unlockedRobots').style.display = "inline-block";
+                document.getElementById('unlockRobots').style.display = "none";
+                document.getElementById('failRobots').style.display = "none";
+                document.getElementById('lightningContainer').style.display = "inline-block";
+                document.getElementById('lightningTooltip').style.display = "inline-block";
+                document.getElementById('energyContainer').style.display = "inline-block";
+                document.getElementById('woodContainer').style.display = "inline-block";
+                document.getElementById('metalContainer').style.display = "inline-block";
+            }
         } else {
             document.getElementById('unlockedRobots').style.display = "none";
             document.getElementById('unlockRobots').style.display = "inline-block";
@@ -297,7 +303,8 @@ function View() {
 
     this.updateEnergy = function() {
         document.getElementById('energy').innerHTML = intToString(game.power);
-        document.getElementById('battery').innerHTML = intToString(game.energy.battery);
+        document.getElementById('battery').innerHTML = intToString(game.energy.battery, 1);
+        document.getElementById('spaceBattery').innerHTML = intToString(game.energy.battery, 1);
         document.getElementById('drain').innerHTML = intToString(game.energy.drain);
     };
 
@@ -398,6 +405,19 @@ function View() {
             document.getElementById('cometsContainer').removeChild(cometDiv);
         } else {
             console.log('not found: '+cometData.id);
+        }
+    };
+
+    this.updateSpaceDock = function() {
+        document.getElementById('battleships').innerHTML = game.spaceDock.battleships+"";
+        document.getElementById('battleships').innerHTML = game.spaceDock.battleships+"";
+    };
+
+    this.checkSpaceDockUnlocked = function() {
+        if(game.spaceDock.unlocked) {
+            document.getElementById('spaceDockContainer').style.display = "inline-block";
+        } else {
+            document.getElementById('spaceDockContainer').style.display = "none";
         }
     };
 

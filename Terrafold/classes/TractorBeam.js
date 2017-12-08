@@ -27,6 +27,8 @@ function TractorBeam() {
             game.oxygen -= 2e6;
             this.unlocked = 1;
             view.checkTractorBeamUnlocked();
+            game.spaceDock.unlocked = 1;
+            view.checkSpaceDockUnlocked();
         }
         view.updateTractorBeam();
     };

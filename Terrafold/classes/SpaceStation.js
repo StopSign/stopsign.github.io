@@ -1,5 +1,4 @@
 function SpaceStation() {
-    // this.battleships = 0;
     this.unlocked = 0;
     this.orbiting = [
         {
@@ -38,10 +37,5 @@ function SpaceStation() {
             }
         }
     };
-
-    // this.addBattleship = function(amount) {
-    //     this.battleships += amount;
-    //     view.updateSpaceStation();
-    // };
 
 }

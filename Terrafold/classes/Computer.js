@@ -108,7 +108,7 @@ function Computer() {
             threads: 0,
             cost:0,
             costType:"",
-            finish:function() { game.sellWater(5) },
+            finish:function() { game.water.sellWater(5) },
             showing: function() { return true; }
         },
         { //Improve Farms

@@ -44,6 +44,7 @@ function Game() {
         this.energy = new Energy();
         this.spaceStation = new SpaceStation();
         this.tractorBeam = new TractorBeam();
+        this.spaceDock = new SpaceDock();
 
 
         for(var i = 0; i < this.computer.processes.length; i++) {
@@ -61,25 +62,13 @@ function Game() {
         if(toBuy === undefined) {
             toBuy = Number(document.getElementById('buyIceAmount').value);
         }
+        if(toBuy > this.cash) {
+            toBuy = this.cash;
+        }
         if(toBuy <= 0) {
             return;
         }
-
-        if(toBuy >= this.cash) {
-            toBuy = this.cash;
-        }
         this.cash -= this.ice.buyIce(toBuy);
-        view.update();
-    };
-
-    this.sellWater = function(toSell) {
-        if(toSell === undefined) {
-        }
-        if(toSell <= 0) {
-            return;
-        }
-        var waterSold = this.water.sellWater(toSell);
-        this.cash += this.water.getPrice(waterSold);
         view.update();
     };
 
@@ -93,14 +82,15 @@ function Game() {
         }
         this.land.soil -= toBuy * 50;
         this.farms.addFarm(toBuy);
+        view.update();
     };
 
     this.buyBattery = function() {
         var toBuy = Number(document.getElementById('buyBattery').value);
-        if(toBuy * 5e5 >= this.oxygen) {
+        if(toBuy * 5e5 > this.oxygen) {
             toBuy = Math.floor(this.oxygen/5e5);
         }
-        if(toBuy * 50000 >= this.science) {
+        if(toBuy * 50000 > this.science) {
             toBuy = Math.floor(this.science/50000);
         }
         if(toBuy <= 0) {
@@ -109,17 +99,24 @@ function Game() {
         this.oxygen -= toBuy * 5e5;
         this.science -= toBuy * 50000;
         this.energy.buyBattery(toBuy);
+        view.update();
     };
 
-    // this.buyBattleship = function() {
-    //     var toBuy = Number(document.getElementById('buyBattleshipAmount').value);
-    //     if(toBuy * 1e7 > this.land.oxygen) {
-    //         toBuy = Math.floor(this.land.oxygen / 1e7);
-    //     }
-    //     if(toBuy <= 0) {
-    //         return;
-    //     }
-    //     this.spaceStation.addBattleship(toBuy);
-    // };
+    this.buyBattleship = function() {
+        var toBuy = Number(document.getElementById('buyBattleshipAmount').value);
+        if(toBuy * 1e7 > this.oxygen) {
+            toBuy = Math.floor(this.oxygen / 1e7);
+        }
+        if(toBuy * 5e6 > this.science) {
+            toBuy = Math.floor(this.science / 5e6);
+        }
+        if(toBuy <= 0) {
+            return;
+        }
+        this.oxygen -= 1e7;
+        this.science -= 5e6;
+        this.spaceDock.addBattleship(toBuy);
+        view.update();
+    };
 
 }

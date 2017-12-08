@@ -10,7 +10,7 @@ function tick() {
     game.tick();
     view.update();
 
-    if(timer % 10 === 0) {
+    if(timer % 50 === 0) {
         save();
     }
 }

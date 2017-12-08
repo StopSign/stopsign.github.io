@@ -5,6 +5,7 @@ function Robots() {
     this.unlocked = 0;
     this.ore = 0;
     this.mines = 0;
+    this.failed = 0;
 
     this.tick = function() {
         for(var i = 0; i < this.jobs.length; i++) {
@@ -71,6 +72,16 @@ function Robots() {
             this.gainRobots(1);
         }
         view.updateComputer();
+        view.updateRobots();
+    };
+
+    this.failedRobots = function() {
+        if(game.cash >= 1e6) {
+            game.cash -= 1e6;
+            this.failed = 0;
+            view.checkRobotsUnlocked();
+            this.gainRobots(1);
+        }
         view.updateRobots();
     };
 

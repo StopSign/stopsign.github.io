@@ -25,6 +25,8 @@ function loadDefaults() {
 }
 
 function setInitialView() {
+    view.checkSpaceDockUnlocked();
+    view.updateSpaceDock();
     view.checkTractorBeamUnlocked();
     view.checkSpaceStationUnlocked();
     view.checkEnergyUnlocked();
@@ -58,6 +60,7 @@ function load() {
     loadGameVar(toLoad, "energy");
     loadGameVar(toLoad, "spaceStation");
     loadGameVar(toLoad, "tractorBeam");
+    loadGameVar(toLoad, "spaceDock");
 
     game.computer.unlocked = toLoad.game.computer.unlocked;
     game.computer.threads = toLoad.game.computer.threads;
@@ -90,6 +93,8 @@ function load() {
         row.isMoving = rowData.isMoving;
         row.completions = rowData.completions;
     }
+
+    document.getElementById('scienceSlider').value = game.population.scienceRatio;
 
     setInitialView();
     recalcInterval(10);

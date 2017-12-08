@@ -35,7 +35,7 @@ function Water() {
             toSell = this.indoor;
         }
         this.indoor -= toSell;
-        return toSell;
+        game.cash += this.getPrice(toSell);
     };
 
     this.getPrice = function(toSell) {
