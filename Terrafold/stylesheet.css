@@ -262,3 +262,8 @@ input, label {
     height:23px;
     vertical-align:top;
 }
+
+.globalResourceInfo {
+    width:84px;
+    text-align:center;
+}

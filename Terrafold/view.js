@@ -364,6 +364,7 @@ function View() {
             this.drawComet(comets[i]);
         }
         container.innerHTML = text;
+        document.getElementById('takeAmount').innerHTML = game.tractorBeam.takeAmount;
     };
 
     this.drawComet = function(cometData) {

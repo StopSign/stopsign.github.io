@@ -3,6 +3,7 @@ function TractorBeam() {
     this.cometSpotChance = 0.01;
     this.energy = 0;
     this.energyNeeded = 100;
+    this.takeAmount = "";
 
     this.comets = [
     ];
@@ -33,16 +34,22 @@ function TractorBeam() {
     this.pullIntoOrbit = function() {
         if(this.energy >= this.energyNeeded) {
             this.energy -= this.energyNeeded;
-
-            for(var i = 0; i < this.comets.length; i++) {
-                var comet = this.comets[i];
-                for(var j = 0; j < game.spaceStation.orbiting.length; j++) {
-                    var orbiting = game.spaceStation.orbiting[j];
+            this.takeAmount = "";
+            for(var j = 0; j < game.spaceStation.orbiting.length; j++) {
+                var orbiting = game.spaceStation.orbiting[j];
+                var totalAmount = 0;
+                for(var i = 0; i < this.comets.length; i++) {
+                    var comet = this.comets[i];
                     if(comet.amountType === orbiting.type) {
                         var taken = comet.amount / 100;
                         comet.amount -= taken;
-                        orbiting.amount += taken;
+                        totalAmount += taken;
                     }
+                }
+                orbiting.amount += totalAmount;
+                this.takeAmount += intToString(totalAmount, 2) + " " + orbiting.type;
+                if(j < game.spaceStation.orbiting.length -1 ) {
+                    this.takeAmount += ", "
                 }
             }
         }
@@ -60,7 +67,7 @@ function TractorBeam() {
         for(var i = length; i >= 0; i--) {
             var comet = this.comets[i];
             comet.duration--;
-            if(comet.duration < 0) {
+            if(comet.duration < 0 || comet.amount < 1) {
                 view.removeComet(comet);
                 this.comets.splice(i, 1);
             }

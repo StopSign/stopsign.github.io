@@ -58,7 +58,6 @@ function load() {
     loadGameVar(toLoad, "energy");
     loadGameVar(toLoad, "spaceStation");
     loadGameVar(toLoad, "tractorBeam");
-    game.tractorBeam.comets = [];
 
     game.computer.unlocked = toLoad.game.computer.unlocked;
     game.computer.threads = toLoad.game.computer.threads;

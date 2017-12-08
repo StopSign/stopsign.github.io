@@ -100,9 +100,6 @@ function Game() {
         if(toBuy * 5e5 >= this.oxygen) {
             toBuy = Math.floor(this.oxygen/5e5);
         }
-        if(toBuy * 250 >= this.metal) {
-            toBuy = Math.floor(this.metal/250);
-        }
         if(toBuy * 50000 >= this.science) {
             toBuy = Math.floor(this.science/50000);
         }
@@ -110,7 +107,6 @@ function Game() {
             return;
         }
         this.oxygen -= toBuy * 5e5;
-        this.metal -= toBuy * 250;
         this.science -= toBuy * 50000;
         this.energy.buyBattery(toBuy);
     };

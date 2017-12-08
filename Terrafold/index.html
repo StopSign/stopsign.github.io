@@ -13,7 +13,7 @@
     <link rel="stylesheet" href="stylesheet.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
-<body>
+<body id="theBody">
 
 <div id="info" style="position:fixed;z-index:1001;" class="medium">
     <div class="showthat infoText">S<div class="showthis">
@@ -31,34 +31,35 @@
         Help Menu<br><br>
         <div class="small">
             Get some more water and build some farms. Then build a spaceship and explore the universe.<br>
+            Right click and drag to move the screen around.<br>
         </div>
     </div></div>
     <div class="showthat infoText">O<div class="showthis">
         Options Menu<br><br>
         <div class="small">
             You did't have a choice.<br>
-            <div class="button" onclick="clearSave()">Hard Reset</div>
+            <div class="button" onclick="clearSave()">Hard Reset</div><br>
             <div class="button" onclick="pauseGame()">Toggle Pause</div>
         </div>
     </div></div>
     <div id="resources" class="infoText" style="padding:0 10px;">
-        <div class="showthat2"> <img src='img/water.png' class='largeIcon'>: <div id="totalWater"></div><div class="showthis2">Total Water from anywhere</div></div>
-        <div class="showthat2"> <img src='img/cash.png' class='largeIcon'>: <div id="cash"></div><div class="showthis2">Cash</div></div>
-        <div class="showthat2"> <img src='img/oxygen.png' class='largeIcon'>: <div id="oxygen"></div>
+        <div class="showthat2 globalResourceInfo"> <img src='img/water.png' class='largeIcon'>: <div id="totalWater"></div><div class="showthis2">Total Water from anywhere</div></div>
+        <div class="showthat2 globalResourceInfo"> <img src='img/cash.png' class='largeIcon'>: <div id="cash"></div><div class="showthis2">Cash</div></div>
+        <div class="showthat2 globalResourceInfo"> <img src='img/oxygen.png' class='largeIcon'>: <div id="oxygen"></div>
             <div class="showthis2 small">
                 Oxygen<br>
                 .0001% of Oxygen leaks into space<br>
                 <div>Oxygen Leaked: <div id="oxygenLeak"></div></div> per tick.<br>
             </div>
         </div>
-        <div class="showthat2"> <img src='img/science.png' class='largeIcon'>: <div id="science"></div><div class="showthis2">Science</div></div>
-        <div class="showthat2" id="woodContainer"> <img src='img/wood.png' class='largeIcon'>: <div id="wood"></div><div class="showthis2">Wood</div></div>
-        <div class="showthat2" id="metalContainer"> <img src='img/metal.png' class='largeIcon'>: <div id="metal"></div><div class="showthis2">Metal</div></div>
+        <div class="showthat2 globalResourceInfo"> <img src='img/science.png' class='largeIcon'>: <div id="science"></div><div class="showthis2">Science</div></div>
+        <div class="showthat2 globalResourceInfo" id="woodContainer"> <img src='img/wood.png' class='largeIcon'>: <div id="wood"></div><div class="showthis2">Wood</div></div>
+        <div class="showthat2 globalResourceInfo" id="metalContainer"> <img src='img/metal.png' class='largeIcon'>: <div id="metal"></div><div class="showthis2">Metal</div></div>
     </div>
 </div>
 
 
-<div style="position:absolute;width:2500px;" class="small">
+<div id="mainContainer" style="position:absolute;width:2500px;height:900px;overflow:hidden;" class="small" oncontextmenu="return false;">
 
     <div id="cometsContainer" style="position:absolute;">
     </div>
@@ -280,7 +281,7 @@
         </div>
     </div>
 
-    <div id="computerContainer" class="container" style="left:1300px;top:25px;">
+    <div id="computerContainer" class="container" style="left:0;top:400px;">
         <div class="title">Computer</div>
         <div id="unlockComputer" class="button" onclick="game.computer.unlockComputer()">Build Computer (1000 science)</div>
         <div id="unlockedComputer" style="display:none;">
@@ -292,7 +293,7 @@
         </div>
     </div>
 
-    <div id="robotsContainer" class="container" style="left:905px;top:305px;">
+    <div id="robotsContainer" class="container" style="left:380px;top:515px;">
         <div class="title">Robots</div>
         <div id="unlockRobots" class="button" onclick="game.robots.unlockRobots()">Special deal! Buy first robot for $3000</div>
         <div id="unlockedRobots">
@@ -303,22 +304,22 @@
         </div>
     </div>
 
-    <div id="energyContainer" class="container showthat" style="left:350px;top:350px;">
+    <div id="energyContainer" class="container showthat" style="left:380px;top:365px;">
         <div class="title">Energy</div>
         <div id="unlockEnergy" class="button" onclick="game.energy.unlockEnergy()">Build lightning rod for 500 metal</div>
         <div id="unlockedEnergy">
             <div>Energy: <div id="energy"></div></div><br>
             <div>Battery: <div id="battery"></div></div><br>
-            <div>Draining: <div id="drain"></div></div><br>
             <input id="buyBattery" type="number" value="1"><br>
-            <div class="button" onclick="game.buyBattery()">+50 battery for <br><div id="batteryCost">500k oxygen, 250 metal, 50k science</div></div><br>
+            <div class="button" onclick="game.buyBattery()">+50 battery for <br><div id="batteryCost">500k oxygen, 50k science</div></div><br>
         </div><br>
         <div class="showthis">
-            Loses 2% of energy past the battery per tick
+            Loses 2% of energy past the battery per tick<br>
+            <div>Draining: <div id="drain"></div></div><br>
         </div>
     </div>
 
-    <div id="spaceStationContainer" class="container showthat" style="left:1700px;top:100px;">
+    <div id="spaceStationContainer" class="container showthat" style="left:1220px;top:30px;">
         <div class="title">Space Station</div>
         <div id="unlockSpaceStation" class="button" onclick="game.spaceStation.unlockSpaceStation()">Build Space Station for 2000 metal, 20k wood</div>
         <div id="unlockedSpaceStation">
@@ -332,24 +333,24 @@
         </div>
     </div>
 
-    <div id="tractorBeamContainer" class="container" style="left:1700px;top:200px;">
+    <div id="tractorBeamContainer" class="container showthat" style="left:1220px;top:140px;">
         <div class="title">Tractor Beam</div>
         <div id="unlockTractorBeam" class="button" onclick="game.tractorBeam.unlockTractorBeam()">Build Tractor Beam for 5m oxygen, 500k science</div>
         <div id="unlockedTractorBeam">
             Energy: <div id="tractorBeamEnergy"></div> out of <div id="tractorBeamEnergyNeeded"></div><br><br>
 
-            Catch Rate: 1% per tick to find new celestial object.<br>
             <div id="allPassing"></div>
         </div>
 
         <div class="showthis">
-            Pulls 1% of all total passing debris into orbit
+            Pulls 1% of total passing debris into orbit when charged<br>
+            Brought <div id="takeAmount"></div> into orbit last charge
         </div>
     </div>
 
-    <div id="spaceDockContainer" class="container showthat" style="left:150px;top:800px;">
+    <div id="spaceDockContainer" class="container showthat" style="left:1540px;top:30px;">
         <div class="title">Space Dock</div>
-        Energy: <div id="spaceportEnergy"></div>
+        Energy: <div id="spaceportEnergy"></div><br>
         <input id="buyBattleshipAmount" type="number" value="1"><br>
         <div class="button" onclick="game.buyBattleship()">Build Battleship for <div id="battleshipCost">10m oxygen, 10 robots, 10m cash</div></div><br>
         <div class="showthis">

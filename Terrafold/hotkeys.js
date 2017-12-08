@@ -54,3 +54,30 @@ function disableScroll() {
     document.onkeydown  = preventDefaultForScrollKeys;
 }
 disableScroll();
+
+
+
+backgroundGrid = document.getElementById('mainContainer');
+var rclickStartingPoint;
+
+backgroundGrid.onmousedown  = function(e) {
+    if((e.which && e.which === 3) || (e.buttons && e.buttons === 2)) { //Right click
+        rclickStartingPoint = {x:e.pageX, y:e.pageY};
+    }
+};
+
+backgroundGrid.onmousemove = function(e) {
+    if((e.which && e.which === 3) || (e.buttons && e.buttons === 2)) {
+        var dragToPoint = {x:e.pageX, y:e.pageY};
+        var offsetx = Math.ceil((dragToPoint.x - rclickStartingPoint.x)/2);
+        var offsety = Math.ceil((dragToPoint.y - rclickStartingPoint.y)/2);
+        window.scrollBy(offsetx, offsety);
+        rclickStartingPoint = dragToPoint;
+    }
+};
+
+backgroundGrid.onmouseup  = function(e) {
+    if((e.which && e.which === 3) || (e.buttons && e.buttons === 2)) {
+        return;
+    }
+};
