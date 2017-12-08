@@ -350,7 +350,7 @@ function View() {
 
 
     this.updateTractorBeam = function() {
-        document.getElementById('tractorBeamEnergy').innerHTML = intToString(game.tractorBeam.energy, 1);
+        document.getElementById('tractorBeamEnergy').innerHTML = intToString(game.tractorBeam.energy, 2);
         document.getElementById('tractorBeamEnergyNeeded').innerHTML = intToString(game.tractorBeam.energyNeeded, 1);
 
         var container = document.getElementById("allPassing");
@@ -366,7 +366,6 @@ function View() {
         container.innerHTML = text;
     };
 
-    this.maxY = 0;
     this.drawComet = function(cometData) {
         var cometDivName = 'comet'+cometData.id;
         var cometDiv = document.getElementById(cometDivName);
@@ -380,10 +379,6 @@ function View() {
 
             cometData.left = 0;
             cometData.top = cometData.endingX = Math.pow(Math.pow(totalDistance, 2) - Math.pow(cometData.startingY, 2), .5); //c^2 = a^2 + b^2, a = sqrt(c^2 - b^2)
-            if(cometData.startingY > this.maxY) {
-                this.maxY = cometData.startingY;
-                console.log("starting: (0, "+cometData.startingY+") and ending: ("+cometData.endingX+", 0) with distance "+totalDistance);
-            }
             //y = mx + b, m = (y-b)/x
             cometData.slope = (0 - cometData.startingY) / (cometData.endingX);
             document.getElementById('cometsContainer').appendChild(cometDiv);

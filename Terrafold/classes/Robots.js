@@ -164,7 +164,7 @@ function Robots() {
                 }
                 return false;
             },
-            finish: function() { game.land.addLand(1); },
+            finish: function() { game.land.addLand(5); },
             showing: function() { return game.energy.unlocked; }
         }
     ];

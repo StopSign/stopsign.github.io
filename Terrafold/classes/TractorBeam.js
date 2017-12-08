@@ -14,9 +14,9 @@ function TractorBeam() {
         this.removeAsteroidIfDone();
         this.checkForNewAsteroids();
 
-        var transferred = game.energy.energy / 1000;
-        game.energy.energy -= transferred;
-        // this.energy += transferred + 1;
+        var transferred = game.power / 1000;
+        game.power -= transferred;
+        this.energy += transferred;
         this.pullIntoOrbit();
     };
 
@@ -39,7 +39,7 @@ function TractorBeam() {
                 for(var j = 0; j < game.spaceStation.orbiting.length; j++) {
                     var orbiting = game.spaceStation.orbiting[j];
                     if(comet.amountType === orbiting.type) {
-                        var taken = comet.amount / 1000;
+                        var taken = comet.amount / 100;
                         comet.amount -= taken;
                         orbiting.amount += taken;
                     }
