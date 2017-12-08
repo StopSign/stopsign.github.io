@@ -1,5 +1,4 @@
 function Energy() {
-    this.energy = 0;
     this.unlocked = 0;
     this.battery = 100;
 
@@ -14,14 +13,20 @@ function Energy() {
     };
 
     this.tick = function() {
-        var excess = this.energy - this.battery;
+        var excess = game.power - this.battery;
+        this.drain = 0;
         if(excess > 0) {
-            this.energy -= excess / 500;
+            this.drain = excess/500;
+            game.power -= this.drain;
         }
     };
 
     this.gainEnergy = function(amount) {
-        this.energy += amount;
+        game.power += amount;
     };
+
+    this.buyBattery = function(amount) {
+        this.battery += amount * 50;
+    }
 
 }

@@ -8,14 +8,14 @@ function SpaceStation() {
         },
         {
             type:"dirt",
-            amount:0 //4000
+            amount:500
         }
     ];
 
     this.unlockSpaceStation = function() {
-        if(game.metal >= 10000 && game.oxygen >= 2e6) {
-            game.metal -= 10000;
-            game.oxygen -= 2e6;
+        if(game.metal >= 2000 && game.wood >= 20000) {
+            game.metal -= 2000;
+            game.wood -= 20000;
             this.unlocked = 1;
             view.checkSpaceStationUnlocked();
             view.checkTractorBeamUnlocked();
@@ -28,7 +28,7 @@ function SpaceStation() {
             return;
         }
         for(var i = 0; i < this.orbiting.length; i++) {
-            var take = this.orbiting[i].amount / 10000;
+            var take = this.orbiting[i].amount / 100000;
             this.orbiting[i].amount -= take;
             var type = this.orbiting[i].type;
             if(type === "ice") {

@@ -6,6 +6,7 @@ function Game() {
     this.science = 0; //Actual default: 0
     this.wood = 0;
     this.metal = 0;
+    this.power = 0;
 
     this.tick = function() {
         this.ice.tick();
@@ -96,13 +97,22 @@ function Game() {
 
     this.buyBattery = function() {
         var toBuy = Number(document.getElementById('buyBattery').value);
-        if(toBuy * 50 > this.land.soil) {
-            toBuy = Math.floor(this.land.soil/50);
+        if(toBuy * 5e5 >= this.oxygen) {
+            toBuy = Math.floor(this.oxygen/5e5);
+        }
+        if(toBuy * 250 >= this.metal) {
+            toBuy = Math.floor(this.metal/250);
+        }
+        if(toBuy * 50000 >= this.science) {
+            toBuy = Math.floor(this.science/50000);
         }
         if(toBuy <= 0) {
             return;
         }
-
+        this.oxygen -= toBuy * 5e5;
+        this.metal -= toBuy * 250;
+        this.science -= toBuy * 50000;
+        this.energy.buyBattery(toBuy);
     };
 
     // this.buyBattleship = function() {

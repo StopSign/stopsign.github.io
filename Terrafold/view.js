@@ -233,10 +233,12 @@ function View() {
             document.getElementById(baseId+"PB").style.width = (row.currentTicks / row.ticksNeeded)*100 + "%";
             document.getElementById(baseId+"PB").style.backgroundColor = row.isMoving ? "yellow" : "red";
             document.getElementById(baseId+"CurrentTicks").innerHTML = row.currentTicks+"";
-            document.getElementById(baseId+"TicksNeeded").innerHTML = row.ticksNeeded+"";
-            if(row.cost !== 0) {
+            document.getElementById(baseId+"TicksNeeded").innerHTML = intToString(row.ticksNeeded,1);
+            if(row.cost) {
                 document.getElementById(baseId+"Cost").style.display = "block";
-                document.getElementById(baseId+"Cost").innerHTML = "Each tick costs "+intToString(row.cost) + " "+row.costType;
+                var costString = "Each tick costs "+intToString(row.cost[0]) + " "+row.costType[0];
+                costString += row.cost.length > 1 ? " and " + intToString(row.cost[1]) + " " + row.costType[1] : "";
+                document.getElementById(baseId+"Cost").innerHTML = costString;
             } else {
                 document.getElementById(baseId+"Cost").style.display = "none";
             }
@@ -283,6 +285,7 @@ function View() {
             if(document.getElementById('spaceDockContainer').classList.contains("disabled")) {
                 document.getElementById('spaceDockContainer').classList.remove("disabled");
             }
+            this.updateRobots();
         } else {
             document.getElementById('unlockedEnergy').style.display = "none";
             document.getElementById('unlockEnergy').style.display = "inline-block";
@@ -293,9 +296,9 @@ function View() {
     };
 
     this.updateEnergy = function() {
-        document.getElementById('energy').innerHTML = intToString(game.energy.energy);
+        document.getElementById('energy').innerHTML = intToString(game.power);
         document.getElementById('battery').innerHTML = intToString(game.energy.battery);
-
+        document.getElementById('drain').innerHTML = intToString(game.energy.drain);
     };
 
     this.checkSpaceStationUnlocked = function() {

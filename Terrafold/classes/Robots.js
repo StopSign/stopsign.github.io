@@ -21,14 +21,26 @@ function Robots() {
             row.finish();
             return;
         }
-        var cost = ticksGained * row.cost;
-        if (row.costType) {
-            if (game[row.costType] < cost) {
-                row.isMoving = 0;
-                return;
-            }
-            game[row.costType] -= cost;
+        if(row.during && !row.during()) {
+            row.isMoving = 0;
+            return;
         }
+        if(row.cost) {
+            for(var i = 0; i < row.cost.length; i++) {
+                var cost = ticksGained * row.cost[i];
+                if (row.costType[i]) {
+                    if (game[row.costType[i]] < cost) {
+                        row.isMoving = 0;
+                        return;
+                    }
+                }
+            }
+            for(i = 0; i < row.cost.length; i++) {
+                game[row.costType[i]] -= ticksGained * row.cost[i];
+            }
+        }
+
+
         row.currentTicks += ticksGained;
         row.isMoving = 1;
         if (row.currentTicks >= row.ticksNeeded) {
@@ -97,6 +109,14 @@ function Robots() {
         }
     };
 
+    this.oreToDirt = function(mult) {
+        if(game.power >= .1 * mult && this.ore >= mult) {
+            game.power -= .1 * mult;
+            this.ore -= mult;
+            game.land.addLand(1);
+        }
+    };
+
     this.jobs = [
         { //Cut Trees
             workers:0,
@@ -107,8 +127,8 @@ function Robots() {
             currentTicks: 0,
             ticksNeeded: 3000,
             workers:0,
-            cost:.1,
-            costType:"metal",
+            cost:[.1],
+            costType:["metal"],
             finish: function() { this.ticksNeeded += 1000; game.water.maxIndoor+= 50; },
             showing: function() { return true; }
         },
@@ -116,9 +136,9 @@ function Robots() {
             currentTicks: 0,
             ticksNeeded: 1000,
             workers:0,
-            cost:1,
-            costType:"wood",
-            finish: function() { game.robots.mines++; },
+            cost:[1],
+            costType:["wood"],
+            finish: function() { game.robots.mines++; this.cost[0]+=.1; },
             done: function() { return game.robots.mines*1000 >= game.land.optimizedLand; },
             showing: function() { return true; }
         },
@@ -131,6 +151,21 @@ function Robots() {
             workers:0,
             finish: function() { game.robots.smeltOre(this.workers); },
             showing: function() { return true; }
+        },
+        { //Turn ore into dirt
+            currentTicks: 0,
+            ticksNeeded: 10000,
+            workers:0,
+            during:function() {
+                if(game.power >= .1 * this.workers && game.robots.ore >= this.workers) {
+                    game.power -= .1 * this.workers;
+                    game.robots.ore -= this.workers;
+                    return true;
+                }
+                return false;
+            },
+            finish: function() { game.land.addLand(1); },
+            showing: function() { return game.energy.unlocked; }
         }
     ];
 }
@@ -155,5 +190,9 @@ var jobsView = [
     {
         text:"Smelt Ore",
         tooltip:"Each tick costs 5 wood, 1 ore, and 1000 oxygen<br>Gain 1 metal"
+    },
+    {
+        text:"Turn ore into dirt",
+        tooltip:"Each tick costs 0.10 energy and 1 ore<br>Gain 5 Base Land"
     }
 ];

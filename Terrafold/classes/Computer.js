@@ -90,7 +90,7 @@ function Computer() {
             threads: 0,
             cost:0,
             costType:"",
-            finish:function() { game.land.improveLand(); },
+            finish:function() { game.land.improveLand(); this.ticksNeeded = Math.floor(game.land.baseLand); },
             showing: function() { return true; }
         },
         { //Buy Ice
@@ -117,7 +117,7 @@ function Computer() {
             threads: 0,
             cost:0,
             costType:"",
-            finish:function() { game.farms.improve(); this.ticksNeeded += 150; },
+            finish:function() { game.farms.improve(); this.ticksNeeded += 300; },
             showing: function() { return true; }
         },
         { //Find more Ice Sellers
@@ -151,11 +151,11 @@ function Computer() {
         },
         { //More Robot Storage
             currentTicks: 0,
-            ticksNeeded: 6000,
+            ticksNeeded: 20000,
             threads: 0,
-            cost:2,
+            cost:5,
             costType:"science",
-            finish:function() { game.robots.gainStorage(5); this.cost += 1; },
+            finish:function() { game.robots.gainStorage(5); this.cost += 5; },
             showing: function() { return game.robots.unlocked; }
         },
         { //Improve House Design
