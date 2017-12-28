@@ -1,6 +1,6 @@
 function TractorBeam() {
     this.unlocked = 0;
-    this.cometSpotChance = 0.01;
+    this.cometSpotChance = 0.004;
     this.energy = 0;
     this.energyNeeded = 100;
     this.takeAmount = "";

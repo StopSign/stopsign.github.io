@@ -16,6 +16,7 @@ function View() {
         this.updateTractorBeam();
         this.progressBar1.tick(game.clouds.initialStormTimer - game.clouds.stormTimer, game.clouds.initialStormTimer);
         this.progressBar2.tick(game.clouds.stormDuration, game.clouds.initialStormDuration);
+        updateSpace();
     };
 
     this.updateInfo = function() {
@@ -409,7 +410,6 @@ function View() {
     };
 
     this.updateSpaceDock = function() {
-        document.getElementById('battleships').innerHTML = game.spaceDock.battleships+"";
         document.getElementById('battleships').innerHTML = game.spaceDock.battleships+"";
     };
 

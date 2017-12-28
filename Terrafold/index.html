@@ -64,8 +64,15 @@
 
 <div id="mainContainer" style="position:absolute;width:2500px;height:900px;overflow:hidden;" class="small" oncontextmenu="return false;">
 
+    <div id="spaceTransition"></div>
+
+    <div id="spaceContainer">
+    </div>
+
     <div id="cometsContainer" style="position:absolute;">
     </div>
+
+    <canvas id="spaceCanvas" width="800" height="900" style="position:absolute;left:1600px;"></canvas>
 
     <div id="iceContainer" class="container showthat" style="left:0;top:35px;width:130px;">
         <div class="title">Ice</div>
@@ -366,15 +373,14 @@
         </div>
     </div>
 
+
 </div>
-<div id="ground" style="width:50%;display:none;">
-</div>
-<div id="factory" style="vertical-align:top;display:none;">
-</div>
+
 
 </body>
 <script src="helpers.js"></script>
 <script src="interval.js"></script>
+<script src="spaceView.js"></script>
 <script src="view.js"></script>
 <script src="driver.js"></script>
 <script src="game.js"></script>
