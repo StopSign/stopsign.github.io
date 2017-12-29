@@ -183,7 +183,7 @@
         </div>
     </div>
 
-    <div id="treesContainer" class="container showthat" style="left:660px;top:80px;">
+    <div id="treesContainer" class="container showthat" style="left:760px;top:40px;">
         <div class="title">Forest</div>
         <div class="waterIcon showthat2"><img src='img/water.png' class='superLargeIcon'>
             <div class="showthis2">
@@ -239,7 +239,7 @@
         </div>
     </div>
 
-    <div id="foodContainer" class="container showthat" style="left:690px;top:260px;">
+    <div id="foodContainer" class="container showthat" style="left:680px;top:210px;">
         <div class="title">Farm</div>
         <div class="waterIcon showthat2"><img src='img/water.png' class='superLargeIcon'>
             <div class="showthis2">
@@ -263,7 +263,7 @@
         </div>
     </div>
 
-    <div id="populationContainer" class="container showthat" style="left:960px;top:130px;">
+    <div id="populationContainer" class="container showthat" style="left:920px;top:370px;">
         <div class="title">City</div>
         <div class="waterIcon showthat2"><img src='img/happy.jpg' class='superLargeIcon'>
             <div class="showthis2">
@@ -316,13 +316,13 @@
     </div>
 
     <div id="energyContainer" class="container showthat" style="left:380px;top:365px;">
-        <div class="title">Energy</div>
+        <div class="title">Power Plant</div>
         <div id="unlockEnergy" class="button" onclick="game.energy.unlockEnergy()">Build lightning rod for 500 metal</div>
         <div id="unlockedEnergy">
             <div>Energy: <div id="energy"></div></div><br>
             <div>Battery: <div id="battery"></div></div><br>
             <input id="buyBattery" type="number" value="1"><br>
-            <div class="button" onclick="game.buyBattery()">+50 battery for <br><div id="batteryCost">500k oxygen, 50k science</div></div><br>
+            <div class="button" onclick="game.buyBattery()">+10 battery for <br><div id="batteryCost">200k oxygen, 100k science</div></div><br>
         </div><br>
         <div class="showthis">
             Loses 2% of energy past the battery per tick<br>
@@ -330,7 +330,7 @@
         </div>
     </div>
 
-    <div id="spaceStationContainer" class="container showthat" style="left:1220px;top:30px;">
+    <div id="spaceStationContainer" class="container showthat" style="left:1100px;top:30px;">
         <div class="title">Space Station</div>
         <div id="unlockSpaceStation" class="button" onclick="game.spaceStation.unlockSpaceStation()">Build Space Station for 2000 metal, 20k wood</div>
         <div id="unlockedSpaceStation">
@@ -339,12 +339,12 @@
         </div>
 
         <div class="showthis">
-            Sends .01% of orbiting resources down to the planet.<br>
-            Dirt gets added to base land, dry land, and total land.<br>
+            Sends .01% of orbiting resources to the planet.<br>
+            Dirt gets added to base land.<br>
         </div>
     </div>
 
-    <div id="tractorBeamContainer" class="container showthat" style="left:1220px;top:140px;">
+    <div id="tractorBeamContainer" class="container showthat" style="left:1100px;top:140px;">
         <div class="title">Tractor Beam</div>
         <div id="unlockTractorBeam" class="button" onclick="game.tractorBeam.unlockTractorBeam()">Build Tractor Beam for 5m oxygen, 500k science</div>
         <div id="unlockedTractorBeam">
@@ -354,12 +354,15 @@
         </div>
 
         <div class="showthis">
-            Pulls 1% of total passing debris into orbit when charged<br>
+            Charges using 1% energy from Power Plant per tick.<br>
+            Pulls 1% of passing debris into orbit when charged<br>
+            2/3rd chance to find new comet per tick.<br>
+            1/3rd chance to find new asteroid per tick.<br>
             Brought <div id="takeAmount"></div> into orbit last charge
         </div>
     </div>
 
-    <div id="spaceDockContainer" class="container showthat" style="left:1540px;top:30px;">
+    <div id="spaceDockContainer" class="container showthat" style="left:1420px;top:30px;">
         <div class="title">Space Dock</div>
         <input id="buyBattleshipAmount" type="number" value="1"><br>
         <div class="button" onclick="game.buyBattleship()">Build Battleship for <br><div id="battleshipCost">10m oxygen, 5m science</div></div><br>

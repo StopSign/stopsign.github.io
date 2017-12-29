@@ -26,7 +26,7 @@ function Energy() {
     };
 
     this.buyBattery = function(amount) {
-        this.battery += amount * 50;
+        this.battery += amount * 10;
     }
 
 }

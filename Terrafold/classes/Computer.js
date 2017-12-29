@@ -141,7 +141,7 @@ function Computer() {
         },
         { //Build Robots
             currentTicks: 0,
-            ticksNeeded: 400,
+            ticksNeeded: 1000,
             threads: 0,
             cost:.1,
             costType:"metal",
@@ -155,7 +155,7 @@ function Computer() {
             threads: 0,
             cost:5,
             costType:"science",
-            finish:function() { game.robots.gainStorage(5); this.cost += 5; },
+            finish:function() { game.robots.gainStorage(5); this.cost += 5; this.ticksNeeded+=2000; },
             showing: function() { return game.robots.unlocked; }
         },
         { //Improve House Design

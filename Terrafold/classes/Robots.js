@@ -204,6 +204,6 @@ var jobsView = [
     },
     {
         text:"Turn ore into dirt",
-        tooltip:"Each tick costs 0.10 energy and 1 ore<br>Gain 5 Base Land"
+        tooltip:"Each tick costs 0.10 energy and 1 ore<br>Gain 5 Base Land<br>Total land gained: <div id='totalDirtFromOre'></div>"
     }
 ];

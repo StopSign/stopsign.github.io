@@ -87,17 +87,17 @@ function Game() {
 
     this.buyBattery = function() {
         var toBuy = Number(document.getElementById('buyBattery').value);
-        if(toBuy * 5e5 > this.oxygen) {
-            toBuy = Math.floor(this.oxygen/5e5);
+        if(toBuy * 2e5 > this.oxygen) {
+            toBuy = Math.floor(this.oxygen/2e5);
         }
-        if(toBuy * 50000 > this.science) {
-            toBuy = Math.floor(this.science/50000);
+        if(toBuy * 1e5 > this.science) {
+            toBuy = Math.floor(this.science/1e5);
         }
         if(toBuy <= 0) {
             return;
         }
-        this.oxygen -= toBuy * 5e5;
-        this.science -= toBuy * 50000;
+        this.oxygen -= toBuy * 2e5;
+        this.science -= toBuy * 1e5;
         this.energy.buyBattery(toBuy);
         view.update();
     };

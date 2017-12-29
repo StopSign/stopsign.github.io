@@ -250,6 +250,8 @@ function View() {
                 document.getElementById(baseId+"Cost").style.display = "none";
             }
         }
+        document.getElementById('totalDirtFromOre').innerHTML = intToString(game.robots.jobs[5].completions * 5);
+
     };
 
     this.addRobotRow = function(dataPos) {
