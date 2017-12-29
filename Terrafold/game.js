@@ -63,9 +63,10 @@ function Game() {
             view.addRobotRow(i);
             this.robots.jobs[i].completions = 0;
         }
-        for(i = 0; i < this.hangars.length; i++) {
+        for(i = 0; i < 1; i++) {
             this.hangars[i] = new Hangar(i);
         }
+
 
         newLevel();
     };

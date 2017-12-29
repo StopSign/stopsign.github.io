@@ -34,7 +34,7 @@ function TractorBeam() {
     };
 
     this.pullIntoOrbit = function() {
-        if(this.energy >= this.energyNeeded) {
+        while(this.energy >= this.energyNeeded) {
             this.energy -= this.energyNeeded;
             this.takeAmount = "";
             for(var j = 0; j < game.spaceStation.orbiting.length; j++) {
