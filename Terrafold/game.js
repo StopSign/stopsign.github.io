@@ -7,6 +7,7 @@ function Game() {
     this.wood = 0;
     this.metal = 0;
     this.power = 0;
+    this.hangars = [];
 
     this.tick = function() {
         this.ice.tick();
@@ -29,6 +30,12 @@ function Game() {
 
         this.oxygenLeak = this.oxygen / 100000;
         this.oxygen -= this.oxygenLeak;
+        for(var i = 0; i < spacePlanets.length; i++) {
+            spacePlanets[i].tick();
+        }
+        for(i = 0; i < this.hangars.length; i++) {
+            this.hangars[i].tick();
+        }
     };
 
     this.initialize = function() {
@@ -56,6 +63,11 @@ function Game() {
             view.addRobotRow(i);
             this.robots.jobs[i].completions = 0;
         }
+        for(i = 0; i < this.hangars.length; i++) {
+            this.hangars[i] = new Hangar(i);
+        }
+
+        newLevel();
     };
 
     this.buyIce = function(toBuy) {
@@ -87,34 +99,34 @@ function Game() {
 
     this.buyBattery = function() {
         var toBuy = Number(document.getElementById('buyBattery').value);
-        if(toBuy * 2e5 > this.oxygen) {
-            toBuy = Math.floor(this.oxygen/2e5);
+        if(toBuy * 3e4 > this.oxygen) {
+            toBuy = Math.floor(this.oxygen/3e4);
         }
-        if(toBuy * 1e5 > this.science) {
-            toBuy = Math.floor(this.science/1e5);
+        if(toBuy * 2e4 > this.science) {
+            toBuy = Math.floor(this.science/2e4);
         }
         if(toBuy <= 0) {
             return;
         }
-        this.oxygen -= toBuy * 2e5;
-        this.science -= toBuy * 1e5;
+        this.oxygen -= toBuy * 3e4;
+        this.science -= toBuy * 2e4;
         this.energy.buyBattery(toBuy);
         view.update();
     };
 
     this.buyBattleship = function() {
         var toBuy = Number(document.getElementById('buyBattleshipAmount').value);
-        if(toBuy * 1e7 > this.oxygen) {
-            toBuy = Math.floor(this.oxygen / 1e7);
+        if(toBuy * 3e7 > this.oxygen) {
+            toBuy = Math.floor(this.oxygen / 3e7);
         }
-        if(toBuy * 5e6 > this.science) {
-            toBuy = Math.floor(this.science / 5e6);
+        if(toBuy * 1.5e7 > this.science) {
+            toBuy = Math.floor(this.science / 1.5e7);
         }
         if(toBuy <= 0) {
             return;
         }
-        this.oxygen -= 1e7;
-        this.science -= 5e6;
+        this.oxygen -= 3e7;
+        this.science -= 1.5e7;
         this.spaceDock.addBattleship(toBuy);
         view.update();
     };

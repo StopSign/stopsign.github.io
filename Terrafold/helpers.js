@@ -12,6 +12,9 @@ function round2(num) {
 function precision2(num) {
     return Number(num.toPrecision(2));
 }
+function precision3(num) {
+    return Number(num.toPrecision(3));
+}
 
 function pxToInt(num) {
     return parseFloat(num.substring(0, num.indexOf('px')));
@@ -21,6 +24,11 @@ function round(num) {
     return formatNumber(num);
 } function formatNumber(num) {
     return Math.floor(num).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
+function withinDistance(x1, y1, x2, y2, radius) {
+    var distance = Math.sqrt(Math.pow(Math.abs(x1-x2), 2) + Math.pow(Math.abs(y1-y2), 2));
+    return distance < radius;
 }
 
 function intToStringNegative(value, amount) {

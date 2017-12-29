@@ -17,6 +17,7 @@ function View() {
         this.progressBar1.tick(game.clouds.initialStormTimer - game.clouds.stormTimer, game.clouds.initialStormTimer);
         this.progressBar2.tick(game.clouds.stormDuration, game.clouds.initialStormDuration);
         updateSpace();
+        this.updateHangar();
     };
 
     this.updateInfo = function() {
@@ -421,6 +422,10 @@ function View() {
         } else {
             document.getElementById('spaceDockContainer').style.display = "none";
         }
+    };
+
+    this.updateHangar = function() {
+        document.getElementById("hangar0Sending").innerHTML = game.hangars[0].sendRate + " in "+game.hangars[0].timeRemaining +" seconds.";
     };
 
 

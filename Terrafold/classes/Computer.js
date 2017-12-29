@@ -113,11 +113,11 @@ function Computer() {
         },
         { //Improve Farms
             currentTicks: 0,
-            ticksNeeded: 300,
+            ticksNeeded: 40,
             threads: 0,
             cost:0,
             costType:"",
-            finish:function() { game.farms.improve(); this.ticksNeeded += 300; },
+            finish:function() { game.farms.improve(); this.ticksNeeded = precision3(20*(this.completions+2 )+ Math.pow(this.completions, 2)/10); },
             showing: function() { return true; }
         },
         { //Find more Ice Sellers
@@ -141,9 +141,9 @@ function Computer() {
         },
         { //Build Robots
             currentTicks: 0,
-            ticksNeeded: 1000,
+            ticksNeeded: 10000,
             threads: 0,
-            cost:.1,
+            cost:.01,
             costType:"metal",
             finish:function() { game.robots.gainRobots(1) },
             showing: function() { return game.robots.unlocked; },
@@ -153,9 +153,9 @@ function Computer() {
             currentTicks: 0,
             ticksNeeded: 20000,
             threads: 0,
-            cost:5,
+            cost:10,
             costType:"science",
-            finish:function() { game.robots.gainStorage(5); this.cost += 5; this.ticksNeeded+=2000; },
+            finish:function() { game.robots.gainStorage(5); this.cost = precision3(20*(this.completions+2 )+ Math.pow(this.completions, 2)); this.ticksNeeded+=2000; },
             showing: function() { return game.robots.unlocked; }
         },
         { //Improve House Design
@@ -165,7 +165,8 @@ function Computer() {
             cost:.5,
             costType:"wood",
             finish:function() { game.population.improveHouse(); this.ticksNeeded += 500; },
-            showing: function() { return game.robots.unlocked; }
+            showing: function() { return game.robots.unlocked; },
+            done:function() { return this.completions >= 100; }
         }
     ];
 }
@@ -186,7 +187,7 @@ var processesView = [
     },
     {
         text:"Improve Farms",
-        tooltip:"Farm efficiency increases by 20%"
+        tooltip:"Farm efficiency increases by 2%"
     },
     {
         text:"Find more Ice Sellers",

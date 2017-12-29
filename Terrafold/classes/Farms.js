@@ -30,6 +30,6 @@ function Farms() {
     };
 
     this.improve = function() {
-        this.efficiency += .2;
+        this.efficiency += .02;
     };
 }

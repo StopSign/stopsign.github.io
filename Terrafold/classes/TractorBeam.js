@@ -49,7 +49,7 @@ function TractorBeam() {
                     }
                 }
                 orbiting.amount += totalAmount;
-                this.takeAmount += intToString(totalAmount, 2) + " " + orbiting.type;
+                this.takeAmount += intToString(totalAmount, 3) + " " + orbiting.type;
                 if(j < game.spaceStation.orbiting.length -1 ) {
                     this.takeAmount += ", "
                 }
@@ -59,7 +59,7 @@ function TractorBeam() {
 
     this.checkForNewAsteroids = function() {
         var discoverChance = Math.random();
-        if(discoverChance < this.cometSpotChance) {
+        if(discoverChance < this.cometSpotChance || this.comets.length === 0) {
             this.addComet();
         }
     };

@@ -30,11 +30,13 @@
     <div class="showthat infoText">?<div class="showthis">
         Help Menu<br><br>
         <div class="small">
-            Get some more water and build some farms. Then build a spaceship and explore the universe.<br>
+            Get some more water and build some farms, <br>
+            then build a spaceship and explore the universe.<br>
             There are 10 ticks per second.<br>
             The game works at full speed while in a hidden tab.<br>
             Saving happens every 50 ticks.<br>
             Right click and drag to move the screen around.<br>
+            You can use scientific numbers like 1e12 in the inputs<br>
         </div>
     </div></div>
     <div class="showthat infoText">O<div class="showthis">
@@ -43,6 +45,7 @@
             <div class="button" onclick="clearSave()">Hard Reset</div><br>
             <div class="button" onclick="pauseGame()">Toggle Pause</div><br>
             <div class="button" onclick="game.cash+=.1">Beg for Money<br>(+$.1 for if you get stuck)</div>
+            <div class="button" onclick="save()">Save</div>
         </div>
     </div></div>
     <div id="resources" class="infoText" style="padding:0 10px;">
@@ -72,7 +75,7 @@
     <div id="cometsContainer" style="position:absolute;">
     </div>
 
-    <canvas id="spaceCanvas" width="800" height="900" style="position:absolute;left:1600px;"></canvas>
+    <canvas id="spaceCanvas" width="1000" height="900" style="position:absolute;left:1600px;"></canvas>
 
     <div id="iceContainer" class="container showthat" style="left:0;top:35px;width:130px;">
         <div class="title">Ice</div>
@@ -365,7 +368,7 @@
     <div id="spaceDockContainer" class="container showthat" style="left:1420px;top:30px;">
         <div class="title">Space Dock</div>
         <input id="buyBattleshipAmount" type="number" value="1"><br>
-        <div class="button" onclick="game.buyBattleship()">Build Battleship for <br><div id="battleshipCost">10m oxygen, 5m science</div></div><br>
+        <div class="button" onclick="game.buyBattleship()">Build Battleship for <br><div id="battleshipCost">30m oxygen, 15m science</div></div><br>
         Battleships: <div id="battleships"></div><br>
         Energy: <div id="spaceportEnergy"></div><br>
         Battery: <div id="spaceBattery"></div>
@@ -376,6 +379,11 @@
         </div>
     </div>
 
+    <div id="hangarContainer" class="container showthat" style="">
+        <div class="title">Hangar</div>
+        Sending <div id="hangar0Sending"></div>
+    </div>
+
 
 </div>
 
@@ -383,7 +391,6 @@
 </body>
 <script src="helpers.js"></script>
 <script src="interval.js"></script>
-<script src="spaceView.js"></script>
 <script src="view.js"></script>
 <script src="driver.js"></script>
 <script src="game.js"></script>
@@ -391,6 +398,7 @@
 <script src="classes/Computer.js"></script>
 <script src="classes/Energy.js"></script>
 <script src="classes/Farms.js"></script>
+<script src="classes/Hangar.js"></script>
 <script src="classes/Ice.js"></script>
 <script src="classes/Land.js"></script>
 <script src="classes/Population.js"></script>
@@ -400,6 +408,8 @@
 <script src="classes/TractorBeam.js"></script>
 <script src="classes/Trees.js"></script>
 <script src="classes/Water.js"></script>
+<script src="UIClasses/Planet.js"></script>
+<script src="UIClasses/spaceView.js"></script>
 <script src="UIClasses/ProgressBar.js"></script>
 <script src="hotkeys.js"></script>
 <script src="saving.js"></script>

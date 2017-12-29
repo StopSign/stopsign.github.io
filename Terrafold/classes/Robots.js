@@ -101,8 +101,8 @@ function Robots() {
     };
 
     this.cutTrees = function(mult) {
-        if(game.trees.trees >= 1 * mult) {
-            game.trees.trees -= 1 * mult;
+        if(game.trees.trees >= 2 * mult) {
+            game.trees.trees -= 2 * mult;
             game.wood += mult;
         }
     };
@@ -117,14 +117,6 @@ function Robots() {
             this.ore -= mult;
             game.oxygen -= 1000*mult;
             game.metal += mult;
-        }
-    };
-
-    this.oreToDirt = function(mult) {
-        if(game.power >= .1 * mult && this.ore >= mult) {
-            game.power -= .1 * mult;
-            this.ore -= mult;
-            game.land.addLand(1);
         }
     };
 
@@ -145,11 +137,11 @@ function Robots() {
         },
         { //Build Mines
             currentTicks: 0,
-            ticksNeeded: 1000,
+            ticksNeeded: 300,
             workers:0,
             cost:[1],
             costType:["wood"],
-            finish: function() { game.robots.mines++; this.cost[0]+=.1; },
+            finish: function() { game.robots.mines++; this.ticksNeeded += 30; this.cost[0] = precision3(.1 * this.completions + Math.pow(this.completions, 2)/500); },
             done: function() { return game.robots.mines*1000 >= game.land.optimizedLand; },
             showing: function() { return true; }
         },
@@ -165,17 +157,17 @@ function Robots() {
         },
         { //Turn ore into dirt
             currentTicks: 0,
-            ticksNeeded: 10000,
+            ticksNeeded: 1000,
             workers:0,
             during:function() {
-                if(game.power >= .1 * this.workers && game.robots.ore >= this.workers) {
-                    game.power -= .1 * this.workers;
-                    game.robots.ore -= this.workers;
+                if(game.power >= 1 * this.workers && game.robots.ore >= this.workers * 1000) {
+                    game.power -= 1 * this.workers;
+                    game.robots.ore -= this.workers * 1000;
                     return true;
                 }
                 return false;
             },
-            finish: function() { game.land.addLand(5); },
+            finish: function() { game.land.addLand(50); },
             showing: function() { return game.energy.unlocked; }
         }
     ];
@@ -184,7 +176,7 @@ function Robots() {
 var jobsView = [
     {
         text:"Cut Trees",
-        tooltip:"Cut down 1 tree for 1 wood"
+        tooltip:"Cut down 2 trees for 1 wood"
     },
     {
         text:"Expand indoor water storage",
@@ -204,6 +196,6 @@ var jobsView = [
     },
     {
         text:"Turn ore into dirt",
-        tooltip:"Each tick costs 0.10 energy and 1 ore<br>Gain 5 Base Land<br>Total land gained: <div id='totalDirtFromOre'></div>"
+        tooltip:"Each tick costs 1 energy and 1000 ore<br>Gain 5 Base Land<br>Total land gained: <div id='totalDirtFromOre'></div>"
     }
 ];

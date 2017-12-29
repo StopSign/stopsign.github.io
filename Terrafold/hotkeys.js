@@ -69,8 +69,8 @@ backgroundGrid.onmousedown  = function(e) {
 backgroundGrid.onmousemove = function(e) {
     if((e.which && e.which === 3) || (e.buttons && e.buttons === 2)) {
         var dragToPoint = {x:e.pageX, y:e.pageY};
-        var offsetx = Math.ceil((dragToPoint.x - rclickStartingPoint.x)/2);
-        var offsety = Math.ceil((dragToPoint.y - rclickStartingPoint.y)/2);
+        var offsetx = Math.ceil((dragToPoint.x - rclickStartingPoint.x)/1.5);
+        var offsety = Math.ceil((dragToPoint.y - rclickStartingPoint.y)/1.5);
         window.scrollBy(offsetx, offsety);
         rclickStartingPoint = dragToPoint;
     }
