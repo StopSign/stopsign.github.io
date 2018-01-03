@@ -68,6 +68,31 @@ function Game() {
 
 
         this.space.newLevel();
+
+        game.space.spawnShip(new Ship("Battleship", 2));
+        game.space.ships[0].x = 300;
+        game.space.ships[0].y = 200;
+        game.space.spawnShip(new Ship("Battleship", 2));
+        game.space.ships[1].x = 100;
+        game.space.ships[1].y = 200;
+        game.space.spawnShip(new Ship("Battleship", 2));
+        game.space.ships[2].x = 200;
+        game.space.ships[2].y = 300;
+        game.space.spawnShip(new Ship("Battleship", 2));
+        game.space.ships[3].x = 200;
+        game.space.ships[3].y = 100;
+        game.space.spawnShip(new Ship("Battleship", 2));
+        game.space.ships[4].x = 250;
+        game.space.ships[4].y = 250;
+        game.space.spawnShip(new Ship("Battleship", 2));
+        game.space.ships[5].x = 150;
+        game.space.ships[5].y = 250;
+        game.space.spawnShip(new Ship("Battleship", 2));
+        game.space.ships[6].x = 250;
+        game.space.ships[6].y = 150;
+        game.space.spawnShip(new Ship("Battleship", 2));
+        game.space.ships[7].x = 150;
+        game.space.ships[7].y = 150;
     };
 
     this.buyIce = function(toBuy) {

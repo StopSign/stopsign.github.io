@@ -3,9 +3,10 @@ var ctx = canvas.getContext("2d");
 var xOffset = 200;
 
 function updateSpace() {
-    drawBattleships();
-    drawTargets();
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
     drawBorders();
+    drawTargets();
+    drawBattleships();
 }
 
 function drawBattleships() {
@@ -26,10 +27,15 @@ function drawBorders() {
 }
 
 function drawShip(ship) {
-    var point1 = {x:ship.x, y:ship.y};
-    var point2 = {x:ship.x+30, y:ship.y+15};
-    var point3 = {x:ship.x, y:ship.y+30};
-    var point4 = {x:ship.x+5, y:ship.y+15};
+    var offsetX = ship.x + 200;
+
+    ctx.translate(offsetX+25, ship.y+25);
+    ctx.rotate(ship.direction);
+
+    var point1 = {x:-10, y:-10};
+    var point2 = {x:10, y:0};
+    var point3 = {x:-10, y:10};
+    var point4 = {x:-7, y:0};
 
     ctx.beginPath();
     ctx.fillStyle="#008080";
@@ -40,19 +46,24 @@ function drawShip(ship) {
     ctx.lineTo(point4.x, point4.y);
     // ctx.stroke();
     ctx.fill();
+    ctx.rotate(-1*ship.direction);
+    ctx.translate((offsetX+25)*-1, (ship.y+25)*-1);
 }
 
 function drawPlanet(planet) {
     var size = planet.isBoss ? 40 : 25;
-    var atmosphere = ctx.createRadialGradient(planet.x+xOffset, planet.y, size, planet.x+xOffset, planet.y, size/2);
+    var offsetX = planet.x + xOffset;
+    ctx.translate(offsetX+size, planet.y+size);
+
+    var atmosphere = ctx.createRadialGradient(0, 0, size, 0, 0, size/2);
     atmosphere.addColorStop(0, 'black');
     atmosphere.addColorStop(1, 'blue');
     ctx.fillStyle = atmosphere;
-    ctx.fillRect(planet.x+xOffset-size,planet.y-size,size*2,size*2);
+    ctx.fillRect(-size,-size,size*2,size*2);
 
     ctx.beginPath();
     ctx.fillStyle="green";
-    ctx.arc(planet.x+xOffset,planet.y,size/2,0,2*Math.PI);
+    ctx.arc(0,0,size/2,0,2*Math.PI);
     ctx.fill();
 
     drawPlanetShields(planet, size);
@@ -62,13 +73,15 @@ function drawPlanet(planet) {
     // gradient.addColorStop(1,"blue");
     // ctx.fillStyle = gradient;
     // ctx.fillRect(200,0,400,200);
+
+    ctx.translate((offsetX+size)*-1, (planet.y+size)*-1);
 }
 
 function drawPlanetShields(planet, size) {
     ctx.beginPath();
     ctx.strokeStyle="#008080";
     ctx.lineWidth = 3;
-    ctx.arc(planet.x+xOffset,planet.y,size-4,0,2*Math.PI * (planet.shields / planet.maxShields));
+    ctx.arc(0,0,size-4,0,2*Math.PI * (planet.shields / planet.maxShields));
     ctx.stroke();
     // console.log(2*Math.PI * (planet.shields / planet.maxShields))
 }
@@ -77,8 +90,8 @@ function drawPlanetHealth(planet, size) {
     ctx.beginPath();
     ctx.strokeStyle="#b6000b";
     ctx.lineWidth = 3;
-    ctx.moveTo(planet.x - size*2/3 + xOffset, planet.y - size);
-    ctx.lineTo(planet.x - size*2/3 + (size*4/3 * (planet.health / planet.maxHealth)) + xOffset, planet.y - size);
+    ctx.moveTo(-size*2/3, -size);
+    ctx.lineTo(-size*2/3 + (size*4/3 * (planet.health / planet.maxHealth)), -size);
     // ctx.arc(planet.x+xOffset,planet.y,22,0,2*Math.PI * (planet.shields / planet.maxShields));
     ctx.stroke();
 }

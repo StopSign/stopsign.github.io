@@ -46,10 +46,17 @@ function Planet() {
     this.power = Math.sqrt(this.id);
     this.shields = this.maxShields = Math.sqrt(this.id)*100;
     this.health = this.maxHealth = Math.sqrt(this.id)*1000;
+    this.dirt = (this.power+1)*1000;
     this.tick = function() {
         this.shields += this.shields / 100;
         if(this.shields > this.maxShields) {
             this.shields = this.maxShields;
         }
-    }
+    };
+    this.empty = function() {
+        return this.dirt <= 0;
+    };
+    this.alive = function() {
+        return this.health > 0;
+    };
 }
