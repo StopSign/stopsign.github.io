@@ -425,7 +425,7 @@ function View() {
     };
 
     this.updateHangar = function() {
-        document.getElementById("hangar0Sending").innerHTML = game.hangars[0].sendRate + " in "+game.hangars[0].timeRemaining +" seconds.";
+        document.getElementById("hangar0Sending").innerHTML = game.hangars[0].sendRate + " in "+round1(game.hangars[0].timeRemaining/10) +" seconds.";
     };
 
 

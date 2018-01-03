@@ -1,9 +1,10 @@
 var planetIds = 1;
 function Planet() {
     this.id = planetIds++;
+    this.isBoss = 0;
     this.findArea = function() {
-        for(var i = 0; i < spacePlanets.length; i++) {
-            var target = spacePlanets[i];
+        for(var i = 0; i < game.space.planets.length; i++) {
+            var target = game.space.planets[i];
             if(target === this) {
                 continue;
             }
@@ -26,8 +27,8 @@ function Planet() {
         return Math.random() * 300 + 50;
     };
     this.withinDistance = function(x1, y1, radius) {
-        for(var i = 0; i < spacePlanets.length; i++) {
-            var target = spacePlanets[i];
+        for(var i = 0; i < game.space.planets.length; i++) {
+            var target = game.space.planets[i];
             if(target === this) {
                 continue;
             }

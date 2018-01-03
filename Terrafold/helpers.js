@@ -27,8 +27,11 @@ function round(num) {
 }
 
 function withinDistance(x1, y1, x2, y2, radius) {
-    var distance = Math.sqrt(Math.pow(Math.abs(x1-x2), 2) + Math.pow(Math.abs(y1-y2), 2));
-    return distance < radius;
+    return getDistance(x1, y1, x2, y2) < radius;
+}
+
+function getDistance(x1, y1, x2, y2) {
+    return Math.sqrt(Math.pow(Math.abs(x1-x2), 2) + Math.pow(Math.abs(y1-y2), 2));
 }
 
 function intToStringNegative(value, amount) {

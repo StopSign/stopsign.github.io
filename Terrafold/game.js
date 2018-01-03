@@ -26,19 +26,18 @@ function Game() {
 
         this.tractorBeam.tick();
         this.spaceStation.tick();
+        this.space.tick();
 
 
         this.oxygenLeak = this.oxygen / 100000;
         this.oxygen -= this.oxygenLeak;
-        for(var i = 0; i < spacePlanets.length; i++) {
-            spacePlanets[i].tick();
-        }
         for(i = 0; i < this.hangars.length; i++) {
             this.hangars[i].tick();
         }
     };
 
     this.initialize = function() {
+        this.space = new Space();
         this.ice = new Ice();
         this.water = new Water();
         this.clouds = new Clouds();
@@ -68,7 +67,7 @@ function Game() {
         }
 
 
-        newLevel();
+        this.space.newLevel();
     };
 
     this.buyIce = function(toBuy) {
