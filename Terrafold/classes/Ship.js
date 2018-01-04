@@ -1,17 +1,40 @@
 function Ship(name, amount) {
     this.name = name;
     this.amount = amount;
-    this.health = 20;
-    this.shield = 10;
+    this.health = this.maxHealth = 20;
+    this.shield = this.maxShield = 10;
     this.shieldRegen = 1;
     this.attack = 1;
+    this.attackSpeed = 40;
+    this.attackCounter = 0;
     this.energy = 0;
-    this.speed = 1;
+    this.speed = 5;
 
     this.tick = function() {
         this.moveToNearestTarget();
+        this.checkJoinFleet();
         this.attackTarget();
-        this.joinMining(); //If engaged and planet is empty
+        this.mineTarget(); //If engaged and planet is empty
+    };
+
+    this.checkJoinFleet = function() {
+        if(!this.engaged) {
+            return;
+        }
+        for(var i = game.space.ships.length-1; i >= 0; i--) {
+            var ship = game.space.ships[i];
+            if(ship === this || ship.name !== this.name) { //only join on same types
+                continue;
+            }
+            if(withinDistance(this.x, this.y, ship.x, ship.y, 10)) { //COMBINE SHIPS
+                this.amount += ship.amount;
+                this.energy += ship.energy;
+                if(ship.attackCounter > this.attackCounter) {
+                    this.attackCounter = ship.attackCounter;
+                }
+                game.space.ships.splice(i, 1);
+            }
+        }
     };
 
     this.findClosestTarget = function() {
@@ -54,14 +77,20 @@ function Ship(name, amount) {
     };
 
     this.attackTarget = function() {
-        if(!this.target || !this.engaged || !this.target.alive() || this.target.empty()) { //if not attacking a valid target
+        if(!this.target || !this.engaged || !this.target.alive()) { //if not attacking a valid target
             return;
+        }
+        this.attackCounter++;
+        if(this.attackCounter >= this.attackSpeed) {
+            this.attackCounter = 0;
+            this.target.takeDamage(this.attack * this.amount);
         }
     };
 
-    this.joinMining = function() {
-        if(!this.target || !this.engaged || this.target.alive() || !this.target.empty()) {
+    this.mineTarget = function() {
+        if(!this.target || !this.engaged || this.target.alive() || this.target.empty()) {
             return;
         }
+        console.log(this.target.dirt);
     };
 }

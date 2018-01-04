@@ -1,12 +1,25 @@
 var canvas = document.getElementById("spaceCanvas");
 var ctx = canvas.getContext("2d");
+ctx.font = "11px Arial";
 var xOffset = 200;
+var mousePos = {};
+
+canvas.addEventListener('mousemove', function(e) {
+    mousePos = {x:e.offsetX - xOffset, y:e.offsetY};
+});
 
 function updateSpace() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     drawBorders();
     drawTargets();
     drawBattleships();
+    drawTooltips();
+}
+
+function drawTooltips() {
+    for(var i = 0; i < game.space.planets.length; i++) {
+        drawPlanetTooltip(game.space.planets[i]);
+    }
 }
 
 function drawBattleships() {
@@ -17,7 +30,8 @@ function drawBattleships() {
 
 function drawTargets() {
     for(var i = 0; i < game.space.planets.length; i++) {
-        drawPlanet(game.space.planets[i]);
+        var planet = game.space.planets[i];
+        drawPlanet(planet, planet.isBoss ? "B" : i+1);
     }
 }
 
@@ -47,11 +61,16 @@ function drawShip(ship) {
     // ctx.stroke();
     ctx.fill();
     ctx.rotate(-1*ship.direction);
+
+    ctx.strokeStyle = "white";
+    ctx.lineWidth = 1;
+    ctx.strokeText(ship.amount,-4,25);
+
     ctx.translate((offsetX+25)*-1, (ship.y+25)*-1);
 }
 
-function drawPlanet(planet) {
-    var size = planet.isBoss ? 40 : 25;
+function drawPlanet(planet, text) {
+    var size = getPlanetSize(planet.isBoss);
     var offsetX = planet.x + xOffset;
     ctx.translate(offsetX+size, planet.y+size);
 
@@ -68,11 +87,31 @@ function drawPlanet(planet) {
 
     drawPlanetShields(planet, size);
     drawPlanetHealth(planet, size);
-    // var gradient = ctx.createRadialGradient(300,100,100,300,100,0);
-    // gradient.addColorStop(0,"black");
-    // gradient.addColorStop(1,"blue");
-    // ctx.fillStyle = gradient;
-    // ctx.fillRect(200,0,400,200);
+
+    ctx.strokeStyle = "black";
+    ctx.lineWidth = 1;
+    ctx.strokeText(text,-3,4);
+
+    ctx.translate((offsetX+size)*-1, (planet.y+size)*-1);
+}
+
+function drawPlanetTooltip(planet) {
+    var size = getPlanetSize(planet.isBoss);
+    var offsetX = planet.x + xOffset;
+
+    planet.showTooltip = withinDistance(mousePos.x, mousePos.y, planet.x+size, planet.y+size, 50);
+    if(!planet.showTooltip) {
+        return;
+    }
+
+    ctx.translate(offsetX+size, planet.y+size);
+
+    ctx.strokeStyle = "white";
+    ctx.lineWidth = 1;
+    ctx.strokeText("Shields: " + intToString(planet.shields, 2),-15,size);
+    ctx.strokeText("Reduction: "+intToString(planet.getShieldReduction()*100, 1)+"%",-15,size+10);
+    ctx.strokeText("Health: "+intToString(planet.health, 2),-15,size+20);
+    ctx.strokeText("Dirt: "+intToString(planet.dirt, 2),-15,size+30);
 
     ctx.translate((offsetX+size)*-1, (planet.y+size)*-1);
 }
@@ -94,4 +133,8 @@ function drawPlanetHealth(planet, size) {
     ctx.lineTo(-size*2/3 + (size*4/3 * (planet.health / planet.maxHealth)), -size);
     // ctx.arc(planet.x+xOffset,planet.y,22,0,2*Math.PI * (planet.shields / planet.maxShields));
     ctx.stroke();
+}
+
+function getPlanetSize(isBoss) {
+    return isBoss ? 40 : 25;
 }

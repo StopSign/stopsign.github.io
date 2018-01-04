@@ -1,7 +1,7 @@
-var planetIds = 1;
+
 function Planet() {
-    this.id = planetIds++;
     this.isBoss = 0;
+
     this.findArea = function() {
         for(var i = 0; i < game.space.planets.length; i++) {
             var target = game.space.planets[i];
@@ -21,10 +21,10 @@ function Planet() {
         }
     };
     this.xAreaAllowed = function() {
-        return Math.random() * 650;
+        return Math.random() * 620;
     };
     this.yAreaAllowed = function() {
-        return Math.random() * 300 + 50;
+        return Math.random() * 300 + 25;
     };
     this.withinDistance = function(x1, y1, radius) {
         for(var i = 0; i < game.space.planets.length; i++) {
@@ -43,15 +43,9 @@ function Planet() {
     this.y = this.yAreaAllowed();
     this.findArea();
 
-    this.power = Math.sqrt(this.id);
-    this.shields = this.maxShields = Math.sqrt(this.id)*100;
-    this.health = this.maxHealth = Math.sqrt(this.id)*1000;
-    this.dirt = (this.power+1)*1000;
+
     this.tick = function() {
-        this.shields += this.shields / 100;
-        if(this.shields > this.maxShields) {
-            this.shields = this.maxShields;
-        }
+        this.regenShields()
     };
     this.empty = function() {
         return this.dirt <= 0;
@@ -59,4 +53,39 @@ function Planet() {
     this.alive = function() {
         return this.health > 0;
     };
+    this.calcPower = function(id) {
+        this.id = id;
+        this.power = Math.sqrt(this.id+1);
+        this.shields = this.maxShields = precision3(this.power*100);
+        this.health = this.maxHealth = precision3(this.power*1000);
+        this.dirt = precision3(this.power*2000);
+    };
+
+    this.regenShields = function() {
+        if(!this.alive()) {
+            this.shields = 0;
+            return;
+        }
+        this.shields += (this.maxShields - this.shields) / 100;
+        if(this.shields > this.maxShields) {
+            this.shields = this.maxShields;
+        }
+    };
+    this.getShieldReduction = function() {
+        return this.shields / this.maxShields;
+    };
+    this.takeDamage = function(damage) {
+        var healthDamage = damage * (1 - this.getShieldReduction());
+        this.shields -= damage * this.getShieldReduction();
+        var extraDamage = 0;
+        if(this.shields < 0) {
+            extraDamage = this.shields * -1;
+            this.shields = 0;
+        }
+
+        this.health -= healthDamage + extraDamage;
+        if(this.health < 0) {
+            this.health = 0;
+        }
+    }
 }

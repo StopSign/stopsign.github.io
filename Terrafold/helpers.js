@@ -121,6 +121,26 @@ function factorial(n) {
     return factorials[n] = factorial(n-1) * n;
 }
 
+function sortArrayObjectsByValue(arr, valueName) {
+    var n = arr.length;
+
+    // One by one move boundary of unsorted subarray
+    for (var i = 0; i < n-1; i++) {
+        // Find the minimum element in unsorted array
+        var min_idx = i;
+        for (var j = i+1; j < n; j++) {
+            if (arr[j][valueName] < arr[min_idx][valueName])
+                min_idx = j;
+        }
+
+        // Swap the found minimum element with the first
+        // element
+        var temp = arr[min_idx];
+        arr[min_idx] = arr[i];
+        arr[i] = temp;
+    }
+}
+
 function encode(theSave) {
     return Base64.encode(lzw_encode(theSave));
 }
@@ -128,7 +148,6 @@ function encode(theSave) {
 function decode(encodedSave) {
     return lzw_decode(Base64.decode(encodedSave))
 }
-
 
 // LZW-compress a string
 function lzw_encode(s) {

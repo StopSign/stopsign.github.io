@@ -1,6 +1,7 @@
 function Space() {
     this.planets = [];
     this.ships = [];
+    this.sector = 0;
     this.tick = function() {
         for(var i = 0; i < this.planets.length; i++) {
             this.planets[i].tick();
@@ -10,26 +11,22 @@ function Space() {
         }
     };
 
-    this.spawnShip = function(ship) {
+    this.spawnShip = function(ship, y) {
         ship.x = -120;
-        ship.y = 275;
+        ship.y = y;
         this.ships.push(ship);
     };
 
     this.newLevel = function() {
-        this.planets.push(new Planet());
-        this.planets[0].x = 200;
-        this.planets[0].y = 200;
+        for(var i = 0; i < 10; i++) {
+            this.planets.push(new Planet());
+        }
+        sortArrayObjectsByValue(this.planets, "x");
+        this.planets[this.planets.length - 1].isBoss = true; //rightmost planet
 
-        // for(var i = 0; i < 11; i++) {
-        //     this.planets.push(new Planet());
-        // }
-        // var pos = 0;
-        // for(i = 0; i < this.planets.length; i++) {
-        //     if(this.planets[pos].x < this.planets[i].x) {
-        //         pos = i;
-        //     }
-        // }
-        // this.planets[pos].isBoss = true; //rightmost planet
+        for(i = 0; i < this.planets.length; i++) {
+            this.planets[i].calcPower(i + this.sector * 10);
+        }
     };
 }
+
