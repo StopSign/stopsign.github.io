@@ -283,3 +283,16 @@ input, label {
     background-color:black;
     height:100%;
 }
+
+.shipSpawnSlider {
+    position:absolute;
+    top:25px;
+    width:18px;
+    height:8px;
+    background-color:red;
+    border-radius:5px;
+    opacity:.7;
+}
+.shipSpawnSlider:hover {
+    opacity:1;
+}
