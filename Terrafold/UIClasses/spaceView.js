@@ -36,8 +36,8 @@ function drawTargets() {
 }
 
 function drawBorders() {
-    ctx.fillStyle = "red";
-    ctx.fillRect(200,0,800,10);
+    ctx.fillStyle = "yellow";
+    ctx.fillRect(100,400,800,1);
 }
 
 function drawShip(ship) {

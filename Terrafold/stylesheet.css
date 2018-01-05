@@ -284,15 +284,41 @@ input, label {
     height:100%;
 }
 
-.shipSpawnSlider {
-    position:absolute;
-    top:25px;
-    width:18px;
-    height:8px;
-    background-color:red;
-    border-radius:5px;
-    opacity:.7;
+.sliderWrapper {
+    display: inline-block;
+    width: 20px;
+    padding: 0;
 }
+.sliderWrapper input {
+    width: 360px;
+    height: 20px;
+    margin: 0;
+    transform-origin: 75px 75px;
+    transform: rotate(-90deg);
+}
+.shipSpawnSlider {
+    -webkit-appearance: none;  /* Override default CSS styles */
+    appearance: none;
+    width: 100%; /* Full-width */
+    height: 25px; /* Specified height */
+    background: transparent; /* Grey background */
+    outline: none; /* Remove outline */
+    opacity: 0.7; /* Set transparency (for mouse-over effects on hover) */
+    -webkit-transition: .2s; /* 0.2 seconds transition on hover */
+    transition: opacity .2s;
+}
+
 .shipSpawnSlider:hover {
-    opacity:1;
+    opacity: 1; /* Fully shown on mouse-over */
+}
+
+.shipSpawnSlider::-webkit-slider-thumb {
+    -webkit-appearance: none; /* Override default look */
+    appearance: none;
+    width: 12px; /* Set a specific slider handle width */
+    height: 25px; /* Slider handle height */
+    background: #ee8b44; /* Green background */
+    cursor: pointer; /* Cursor on hover */
+    border-bottom-left-radius:8px;
+    border-bottom-right-radius:8px;
 }

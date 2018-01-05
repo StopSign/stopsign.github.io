@@ -31,7 +31,7 @@ function Game() {
 
         this.oxygenLeak = this.oxygen / 100000;
         this.oxygen -= this.oxygenLeak;
-        for(i = 0; i < this.hangars.length; i++) {
+        for(var i = 0; i < this.hangars.length; i++) {
             this.hangars[i].tick();
         }
     };
@@ -68,7 +68,7 @@ function Game() {
 
 
         this.space.newLevel();
-        game.space.spawnShip(new Ship("Battleship", 100), 275);
+        game.space.spawnShip(new Ship("Battleship", 100), 350);
     };
 
     this.buyIce = function(toBuy) {

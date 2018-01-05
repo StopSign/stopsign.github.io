@@ -24,7 +24,7 @@ function Planet() {
         return Math.random() * 620;
     };
     this.yAreaAllowed = function() {
-        return Math.random() * 300 + 25;
+        return Math.random() * 330 + 5;
     };
     this.withinDistance = function(x1, y1, radius) {
         for(var i = 0; i < game.space.planets.length; i++) {

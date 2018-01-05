@@ -57,7 +57,7 @@ disableScroll();
 
 
 
-backgroundGrid = document.getElementById('mainContainer');
+var backgroundGrid = document.getElementById('mainContainer');
 var rclickStartingPoint;
 
 backgroundGrid.onmousedown  = function(e) {
@@ -80,4 +80,9 @@ backgroundGrid.onmouseup  = function(e) {
     if((e.which && e.which === 3) || (e.buttons && e.buttons === 2)) {
         return;
     }
+};
+
+
+document.getElementById('shipSpawnSlider1').oninput = function() {
+    game.hangars[0].y = (100 - this.value) * 3.5;
 };

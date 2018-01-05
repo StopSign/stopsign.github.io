@@ -91,6 +91,6 @@ function Ship(name, amount) {
         if(!this.target || !this.engaged || this.target.alive() || this.target.empty()) {
             return;
         }
-        console.log(this.target.dirt);
+        // console.log(this.target.dirt);
     };
 }
