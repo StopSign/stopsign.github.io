@@ -56,31 +56,31 @@ function Planet() {
     this.calcPower = function(id) {
         this.id = id;
         this.power = Math.sqrt(this.id+1);
-        this.shields = this.maxShields = precision3(this.power*100);
+        this.atmo = this.maxAtmo = precision3(this.power*100);
         this.health = this.maxHealth = precision3(this.power*1000);
         this.dirt = precision3(this.power*2000);
     };
 
     this.regenShields = function() {
         if(!this.alive()) {
-            this.shields = 0;
+            this.atmo = 0;
             return;
         }
-        this.shields += (this.maxShields - this.shields) / 100;
-        if(this.shields > this.maxShields) {
-            this.shields = this.maxShields;
+        this.atmo += (this.maxAtmo - this.atmo) / 100;
+        if(this.atmo > this.maxAtmo) {
+            this.atmo = this.maxAtmo;
         }
     };
     this.getShieldReduction = function() {
-        return this.shields / this.maxShields;
+        return this.atmo / this.maxAtmo;
     };
     this.takeDamage = function(damage) {
         var healthDamage = damage * (1 - this.getShieldReduction());
-        this.shields -= damage * this.getShieldReduction();
+        this.atmo -= damage * this.getShieldReduction();
         var extraDamage = 0;
-        if(this.shields < 0) {
-            extraDamage = this.shields * -1;
-            this.shields = 0;
+        if(this.atmo < 0) {
+            extraDamage = this.atmo * -1;
+            this.atmo = 0;
         }
 
         this.health -= healthDamage + extraDamage;

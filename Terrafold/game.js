@@ -44,7 +44,7 @@ function Game() {
         this.land = new Land(this.totalLand);
         this.trees = new Trees();
         this.farms = new Farms();
-        this.population = new Population();
+        this.population = new City();
         this.computer = new Computer();
         this.robots = new Robots();
         this.energy = new Energy();

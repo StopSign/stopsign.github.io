@@ -291,7 +291,7 @@ input, label {
 }
 .sliderWrapper input {
     width: 360px;
-    height: 20px;
+    height: 1px;
     margin: 0;
     transform-origin: 75px 75px;
     transform: rotate(-90deg);
@@ -301,7 +301,7 @@ input, label {
     appearance: none;
     width: 100%; /* Full-width */
     height: 25px; /* Specified height */
-    background: transparent; /* Grey background */
+    /*background: transparent; !* Grey background *!*/
     outline: none; /* Remove outline */
     opacity: 0.7; /* Set transparency (for mouse-over effects on hover) */
     -webkit-transition: .2s; /* 0.2 seconds transition on hover */

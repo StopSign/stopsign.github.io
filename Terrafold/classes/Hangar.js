@@ -1,7 +1,7 @@
 function Hangar(num) {
     this.num = num;
     this.sendRate = 1;
-    this.timeRemaining = this.totalTime = 100;
+    this.timeRemaining = this.totalTime = 30;
     this.y = 350;
 
     this.tick = function() {

@@ -1,4 +1,4 @@
-function Population() {
+function City() {
     this.people = 0;
     this.foodEaten = 0;
     this.popGrowth = 0;

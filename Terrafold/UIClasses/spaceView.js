@@ -74,18 +74,9 @@ function drawPlanet(planet, text) {
     var offsetX = planet.x + xOffset;
     ctx.translate(offsetX+size, planet.y+size);
 
-    var atmosphere = ctx.createRadialGradient(0, 0, size, 0, 0, size/2);
-    atmosphere.addColorStop(0, 'black');
-    atmosphere.addColorStop(1, 'blue');
-    ctx.fillStyle = atmosphere;
-    ctx.fillRect(-size,-size,size*2,size*2);
+    drawPlanetAtmo(planet, size);
 
-    ctx.beginPath();
-    ctx.fillStyle="green";
-    ctx.arc(0,0,size/2,0,2*Math.PI);
-    ctx.fill();
 
-    drawPlanetShields(planet, size);
     drawPlanetHealth(planet, size);
 
     ctx.strokeStyle = "black";
@@ -108,7 +99,7 @@ function drawPlanetTooltip(planet) {
 
     ctx.strokeStyle = "white";
     ctx.lineWidth = 1;
-    ctx.strokeText("Shields: " + intToString(planet.shields, 2),-15,size);
+    ctx.strokeText("Atmosphere: " + intToString(planet.atmo, 2),-15,size);
     ctx.strokeText("Reduction: "+intToString(planet.getShieldReduction()*100, 1)+"%",-15,size+10);
     ctx.strokeText("Health: "+intToString(planet.health, 2),-15,size+20);
     ctx.strokeText("Dirt: "+intToString(planet.dirt, 2),-15,size+30);
@@ -116,23 +107,35 @@ function drawPlanetTooltip(planet) {
     ctx.translate((offsetX+size)*-1, (planet.y+size)*-1);
 }
 
-function drawPlanetShields(planet, size) {
+function drawPlanetAtmo(planet, size) {
+    var atmoRatio = size * (planet.atmo / planet.maxAtmo / 2 + .5);
+    var atmosphere = ctx.createRadialGradient(0, 0, atmoRatio*1.2, 0, 0, atmoRatio/3);
+    atmosphere.addColorStop(0, 'black');
+    atmosphere.addColorStop(1, 'blue');
+    ctx.fillStyle = atmosphere;
+    ctx.fillRect(-size,-size,size*2,size*2);
+
     ctx.beginPath();
     ctx.strokeStyle="#008080";
     ctx.lineWidth = 3;
-    ctx.arc(0,0,size-4,0,2*Math.PI * (planet.shields / planet.maxShields));
+    ctx.arc(0,0,size-4,0,2*Math.PI * (planet.atmo / planet.maxAtmo));
     ctx.stroke();
-    // console.log(2*Math.PI * (planet.shields / planet.maxShields))
 }
 
 function drawPlanetHealth(planet, size) {
+    ctx.beginPath();
+    ctx.fillStyle="green";
+    ctx.arc(0,0,size/2,0,2*Math.PI);
+    ctx.fill();
+
     ctx.beginPath();
     ctx.strokeStyle="#b6000b";
     ctx.lineWidth = 3;
     ctx.moveTo(-size*2/3, -size);
     ctx.lineTo(-size*2/3 + (size*4/3 * (planet.health / planet.maxHealth)), -size);
-    // ctx.arc(planet.x+xOffset,planet.y,22,0,2*Math.PI * (planet.shields / planet.maxShields));
     ctx.stroke();
+
+
 }
 
 function getPlanetSize(isBoss) {
