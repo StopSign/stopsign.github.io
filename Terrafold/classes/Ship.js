@@ -61,7 +61,7 @@ function Ship(name, amount, foodAmount) {
             return;
         }
         this.foodAmount = 0;
-        this.speed = .2;
+        this.speed = .1;
         this.target = this.targetHome();
         this.engaged = false;
     };
@@ -71,7 +71,7 @@ function Ship(name, amount, foodAmount) {
     };
     this.returnHome = function() {
         game.spaceDock.battleships += this.amount;
-        game.farms.food += this.foodAmount * 1000;
+        game.farms.food += this.foodAmount * 20;
         for(var i = game.space.ships.length-1; i >= 0; i--) {
             var ship = game.space.ships[i];
             if(ship === this) {

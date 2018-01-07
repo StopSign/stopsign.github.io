@@ -108,7 +108,7 @@ function View() {
     this.updatePopulation = function() {
         document.getElementById('population').innerHTML = intToString(game.population.people);
         document.getElementById('foodEaten').innerHTML = intToString(game.population.foodEaten, 4);
-        document.getElementById('populationGrowth').innerHTML = intToString(game.population.popGrowth, 4);
+        document.getElementById('populationGrowth').innerHTML = intToStringNegative(game.population.popGrowth, 4);
         document.getElementById('starving').innerHTML = intToString(game.population.starving, 4);
         document.getElementById('scienceDelta').innerHTML = intToString(game.population.scienceDelta, 4);
         document.getElementById('cashDelta').innerHTML = intToString(game.population.cashDelta, 4);
