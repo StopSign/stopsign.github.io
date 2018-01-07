@@ -68,12 +68,13 @@ function Game() {
 
 
         this.space.newLevel();
-        game.space.spawnShip(new Ship("Battleship", 100), 350);
+        // game.space.spawnShip(new Ship("Battleship", 200, 1e9), 350);
     };
 
     this.buyIce = function(toBuy) {
         if(toBuy === undefined) {
             toBuy = Number(document.getElementById('buyIceAmount').value);
+            var shouldUpdate = true;
         }
         if(toBuy > this.cash) {
             toBuy = this.cash;
@@ -82,7 +83,9 @@ function Game() {
             return;
         }
         this.cash -= this.ice.buyIce(toBuy);
-        view.update();
+        if(shouldUpdate) {
+            view.update();
+        }
     };
 
     this.buyFarms = function() {

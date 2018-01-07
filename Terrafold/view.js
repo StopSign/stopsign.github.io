@@ -1,6 +1,7 @@
 function View() {
 
     this.update = function() {
+        //should run no more than once per frame
         this.updateInfo();
         this.updateIce();
         this.updateWater();

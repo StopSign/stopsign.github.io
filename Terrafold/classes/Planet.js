@@ -45,7 +45,8 @@ function Planet() {
 
 
     this.tick = function() {
-        this.regenShields()
+        this.regenShields();
+        this.tickResources();
     };
     this.empty = function() {
         return this.dirt <= 0;
@@ -53,14 +54,6 @@ function Planet() {
     this.alive = function() {
         return this.health > 0;
     };
-    this.calcPower = function(id) {
-        this.id = id;
-        this.power = Math.sqrt(this.id+1);
-        this.atmo = this.maxAtmo = precision3(this.power*100);
-        this.health = this.maxHealth = precision3(this.power*1000);
-        this.dirt = precision3(this.power*2000);
-    };
-
     this.regenShields = function() {
         if(!this.alive()) {
             this.atmo = 0;
@@ -87,5 +80,116 @@ function Planet() {
         if(this.health < 0) {
             this.health = 0;
         }
-    }
+    };
+
+    this.calcPower = function(id, difficulty) { //difficulty starts at 1
+        this.id = id;
+        this.power = Math.sqrt(this.id+1);
+        this.atmo = this.maxAtmo = precision3(this.power*100 * difficulty);
+        this.health = this.maxHealth = precision3(this.power*1000 * difficulty);
+        this.dirt = precision3(this.power*2000);
+
+        this.mineTicksMax = Math.floor(Math.sqrt(this.dirt)*20);
+        this.factoryTicksMax = Math.floor(Math.sqrt(this.dirt)*40);
+        this.maxMines = Math.floor((this.dirt+.1) / 1000);
+        this.solarTicksMax = 1000;
+        this.coilgunTicksMax = Math.floor(Math.sqrt(this.dirt)*40);
+    };
+
+    this.workConstruction = function(amount) { //Comes from ships
+        if(!this.doneFactory()) {
+            this.workOnFactory(amount);
+            return;
+        }
+        if(!this.doneCoilgun()) {
+            this.workOnCoilgun(amount);
+            return;
+        }
+        this.workOnMine(amount);
+    };
+    this.tickResources = function() {
+        if(this.empty()) {
+            return;
+        }
+        this.tickMines();
+        this.tickBots();
+        this.tickFactory();
+        this.tickSolar();
+        this.tickCoilgun();
+    };
+
+
+    this.mines = 0;
+    this.mineTicks = 0;
+    this.ore = 0;
+    this.doneBuilding = function() {
+        return this.mines >= this.maxMines;
+    };
+    this.workOnMine = function(amount) {
+        this.mineTicks += amount;
+        if(this.mineTicks >= this.mineTicksMax) {
+            this.mines++;
+            this.mineTicks -= this.mineTicksMax;
+        }
+    };
+    this.tickMines = function() {
+        this.ore += precision2(this.mines/10);
+    };
+
+    this.bots = 0;
+    this.tickBots = function() {
+        var botWork = precision2(this.bots/10);
+        this.ore -= botWork;
+        this.workOnSolar(botWork);
+    };
+
+    this.factoryTicks = 0;
+    this.doneFactory = function() {
+        return this.factoryTicks >= this.factoryTicksMax;
+    };
+    this.workOnFactory = function(amount) {
+        this.factoryTicks += amount;
+    };
+    this.tickFactory = function() {
+        if(this.ore >= 1000) {
+            this.ore -= 1000;
+            this.bots++;
+        }
+    };
+
+    this.solarTicks = 0;
+    this.solar = 0;
+    this.workOnSolar = function(amount) {
+        this.solarTicks += amount;
+        while(this.solarTicks >= this.solarTicksMax) {
+            this.solarTicks -= this.solarTicksMax;
+            this.solar++;
+        }
+    };
+    this.tickSolar = function() {
+        this.coilgunCharge += precision2(this.solar/10);
+    };
+
+    this.energy = 0;
+    this.coilgunTicks = 0;
+    this.coilgunCharge = 0;
+    this.coilgunChargeMax = 1000;
+    this.doneCoilgun = function() {
+        return this.coilgunTicks >= this.coilgunTicksMax;
+    };
+    this.workOnCoilgun = function(amount) {
+        this.coilgunTicks += amount;
+    };
+    this.tickCoilgun = function() {
+        if(this.coilgunCharge >= this.coilgunChargeMax) {
+            this.coilgunCharge -= this.coilgunChargeMax;
+            var loadSize = 500;
+            if(this.dirt <= loadSize) {
+                loadSize = this.dirt;
+            }
+            this.dirt -= loadSize;
+            //TODO create a meteorite and launch it instead
+            game.land.addLand(loadSize);
+        }
+    };
 }
