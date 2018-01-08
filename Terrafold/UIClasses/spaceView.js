@@ -77,7 +77,6 @@ function drawPlanet(planet, text) {
 
     drawPlanetAtmo(planet, size);
 
-
     drawPlanetHealth(planet, size);
 
     ctx.strokeStyle = "black";
@@ -119,7 +118,7 @@ function drawPlanetTooltip(planet) {
 
 function drawPlanetAtmo(planet, size) {
     var atmoRatio = size * (planet.atmo / planet.maxAtmo / 2 + .5);
-    var atmosphere = ctx.createRadialGradient(0, 0, atmoRatio*1.2, 0, 0, atmoRatio/3);
+    var atmosphere = ctx.createRadialGradient(0, 0, atmoRatio*1.1, 0, 0, atmoRatio/3.3);
     atmosphere.addColorStop(0, 'black');
     atmosphere.addColorStop(1, 'blue');
     ctx.fillStyle = atmosphere;

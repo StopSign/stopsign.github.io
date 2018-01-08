@@ -9,7 +9,7 @@ function Hangar(num) {
         if(this.timeRemaining < 0) {
             if (game.spaceDock.battleships >= this.sendRate) {
                 var foodTaken = game.farms.food * .05; // Take 5% food per launch
-                // game.farms.food -= foodTaken;
+                game.farms.food -= foodTaken;
                 game.space.spawnShip(new Ship("Battleship", this.sendRate, foodTaken), this.y);
                 game.spaceDock.battleships -= this.sendRate;
                 this.timeRemaining = this.totalTime;

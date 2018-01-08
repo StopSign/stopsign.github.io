@@ -5,8 +5,7 @@ function TractorBeam() {
     this.energyNeeded = 100;
     this.takeAmount = "";
 
-    this.comets = [
-    ];
+    this.comets = [];
 
     this.tick = function() {
         if(!this.unlocked) {
@@ -43,7 +42,7 @@ function TractorBeam() {
                 for(var i = 0; i < this.comets.length; i++) {
                     var comet = this.comets[i];
                     if(comet.amountType === orbiting.type) {
-                        var taken = comet.amount / 100;
+                        var taken = comet.amount / 100 + 10;
                         comet.amount -= taken;
                         totalAmount += taken;
                     }
@@ -87,11 +86,11 @@ function TractorBeam() {
         var speedRoll = Math.random() * 2 + 1;
         var comet = {};
 
-        if(typeRoll < .6666) {
+        if(typeRoll < .9) {
             comet = {
                 name: "Comet",
                 amountType: "ice",
-                amount:amountRoll * 100,
+                amount:amountRoll * 1000,
                 duration:durationRoll,
                 initialDuration:durationRoll,
                 speed:speedRoll,

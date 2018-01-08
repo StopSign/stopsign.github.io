@@ -84,16 +84,16 @@ function Planet() {
 
     this.calcPower = function(id, difficulty) { //difficulty starts at 1
         this.id = id;
-        this.power = Math.sqrt(this.id+1);
+        this.power = Math.sqrt((this.id+1)*this.isBoss?1.5:1);
         this.atmo = this.maxAtmo = precision3(this.power*100 * difficulty);
         this.health = this.maxHealth = precision3(this.power*1000 * difficulty);
         this.dirt = precision3(this.power*2000);
 
-        this.mineTicksMax = Math.floor(Math.sqrt(this.dirt)*20);
-        this.factoryTicksMax = Math.floor(Math.sqrt(this.dirt)*40);
+        this.mineTicksMax = Math.floor(Math.sqrt(this.dirt)*40);
+        this.factoryTicksMax = Math.floor(Math.sqrt(this.dirt)*200);
         this.maxMines = Math.floor((this.dirt+.1) / 1000);
         this.solarTicksMax = 1000;
-        this.coilgunTicksMax = Math.floor(Math.sqrt(this.dirt)*40);
+        this.coilgunTicksMax = Math.floor(Math.sqrt(this.dirt)*100);
     };
 
     this.workConstruction = function(amount) { //Comes from ships
@@ -151,8 +151,8 @@ function Planet() {
         this.factoryTicks += amount;
     };
     this.tickFactory = function() {
-        if(this.ore >= 1000) {
-            this.ore -= 1000;
+        if(this.ore >= 200) {
+            this.ore -= 200;
             this.bots++;
         }
     };
@@ -189,7 +189,7 @@ function Planet() {
             }
             this.dirt -= loadSize;
             //TODO create a meteorite and launch it instead
-            game.land.addLand(loadSize);
+            game.spaceStation.orbiting[1].amount += loadSize
         }
     };
 }

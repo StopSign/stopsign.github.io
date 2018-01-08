@@ -9,7 +9,7 @@ function Ship(name, amount, foodAmount) {
     this.actionSpeed = 40;
     this.actionCounter = 0;
     this.energy = 0;
-    this.speed = 1;
+    this.speed = .5;
 
     this.tick = function() {
         this.checkEmpty();
@@ -25,7 +25,7 @@ function Ship(name, amount, foodAmount) {
         }
         for(var i = game.space.ships.length-1; i >= 0; i--) {
             var ship = game.space.ships[i];
-            if(ship === this || ship.name !== this.name) { //only join on same types
+            if(ship === this || ship.name !== this.name || ship.isEmpty()) { //only join on same types
                 continue;
             }
             if(withinDistance(this.x, this.y, ship.x, ship.y, 10)) {
@@ -61,7 +61,7 @@ function Ship(name, amount, foodAmount) {
             return;
         }
         this.foodAmount = 0;
-        this.speed = .1;
+        this.speed = .05;
         this.target = this.targetHome();
         this.engaged = false;
     };
