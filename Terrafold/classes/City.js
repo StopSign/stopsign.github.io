@@ -14,6 +14,8 @@ function City() {
         if(this.foodEaten > game.farms.food) {
             this.starving = this.foodEaten - game.farms.food;
             this.foodEaten = game.farms.food;
+        } else {
+            this.starving = 0;
         }
         game.farms.food -= this.foodEaten;
         this.popGrowth = (game.farms.food - this.people) / 1000 - this.starving / 100;
@@ -24,7 +26,7 @@ function City() {
 
     this.updateHappiness = function() {
         this.happinessFromTrees = Math.log10((game.trees.trees+1))/10;
-        this.happinessFromOxygen = Math.log10((game.oxygen+1))/50;
+        this.happinessFromOxygen = Math.log10((game.oxygen+1))/20;
         this.happiness = this.houseBonus * (1 + this.happinessFromTrees + this.happinessFromOxygen);
     };
 

@@ -1,0 +1,23 @@
+Add planet graphics 
+	show factory, on the planet 
+	show solar, around the edges 
+	show coilgun, on the middle and always pointed west
+	circle for building factory
+	different color for building coilgun 
+	different color for building solar 
+	when empty, cannon rotates with planet 
+	
+Add meteor graphics back
+Add ship laser animation 
+Next System
+	enabled when boss planet has 0 health
+	10% difficulty increase to 1000%
+	Auto next when complete
+		Complete when all planets have 0 dirt and no ships or meteors exist 
+Next Sector
+	enabled when at least 5 systems have been completed
+	resets difficulty to 0
+	powerMult is 3^sector
+	artifact gain is sector+1
+Killing bosses give void crystals 
+Unused void crystals increase hangar capacity

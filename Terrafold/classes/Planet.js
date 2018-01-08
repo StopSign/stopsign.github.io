@@ -1,6 +1,11 @@
 
 function Planet() {
     this.isBoss = 0;
+    this.view = {};
+    this.view.rotation = 0;
+    this.view.rotationSpeed = Math.random();
+    this.view.color = Math.floor(Math.random() * 360);
+    this.view.light = Math.floor(Math.random() * 15 + 40);
 
     this.findArea = function() {
         for(var i = 0; i < game.space.planets.length; i++) {
@@ -47,6 +52,7 @@ function Planet() {
     this.tick = function() {
         this.regenShields();
         this.tickResources();
+        rotatePlanet(this);
     };
     this.empty = function() {
         return this.dirt <= 0;

@@ -76,8 +76,8 @@ function drawPlanet(planet, text) {
     ctx.translate(offsetX+size, planet.y+size);
 
     drawPlanetAtmo(planet, size);
-
     drawPlanetHealth(planet, size);
+    drawPlanetObjects(planet, size);
 
     ctx.strokeStyle = "black";
     ctx.lineWidth = 1;
@@ -120,7 +120,8 @@ function drawPlanetAtmo(planet, size) {
     var atmoRatio = size * (planet.atmo / planet.maxAtmo / 2 + .5);
     var atmosphere = ctx.createRadialGradient(0, 0, atmoRatio*1.1, 0, 0, atmoRatio/3.3);
     atmosphere.addColorStop(0, 'black');
-    atmosphere.addColorStop(1, 'blue');
+    var color = "hsl("+ (planet.view.color+120) +",90%,60%)";
+    atmosphere.addColorStop(1, color);
     ctx.fillStyle = atmosphere;
     ctx.fillRect(-size,-size,size*2,size*2);
 
@@ -133,7 +134,8 @@ function drawPlanetAtmo(planet, size) {
 
 function drawPlanetHealth(planet, size) {
     ctx.beginPath();
-    ctx.fillStyle="green";
+    var saturation = Math.floor(planet.health / planet.maxHealth * 70 + 10); //10-80
+    ctx.fillStyle = "hsl("+ planet.view.color +","+saturation+"%,"+planet.view.light+"%)";
     ctx.arc(0,0,size/2,0,2*Math.PI);
     ctx.fill();
 
@@ -143,8 +145,23 @@ function drawPlanetHealth(planet, size) {
     ctx.moveTo(-size*2/3, -size);
     ctx.lineTo(-size*2/3 + (size*4/3 * (planet.health / planet.maxHealth)), -size);
     ctx.stroke();
+}
+
+function drawPlanetObjects(planet, size) {
+    ctx.rotate(planet.view.rotation);
 
 
+
+
+
+    ctx.rotate(-1*planet.view.rotation);
+}
+
+function rotatePlanet(planet) { //Done on planet's tick
+    planet.view.rotation += planet.view.rotationSpeed/10+.01;
+    if(planet.view.rotation >= Math.PI * 2) {
+        planet.view.rotation -= Math.PI * 2;
+    }
 }
 
 function getPlanetSize(isBoss) {

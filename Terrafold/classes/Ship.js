@@ -1,9 +1,10 @@
+var foodPerShip = 20;
 function Ship(name, amount, foodAmount) {
     this.name = name;
     this.amount = amount;
     this.health = this.maxHealth = 20;
     this.shield = this.maxShield = 10;
-    this.foodAmount = foodAmount/20;
+    this.foodAmount = foodAmount/foodPerShip;
     this.shieldRegen = 1;
     this.actionRate = 1;
     this.actionSpeed = 40;
@@ -71,7 +72,7 @@ function Ship(name, amount, foodAmount) {
     };
     this.returnHome = function() {
         game.spaceDock.battleships += this.amount;
-        game.farms.food += this.foodAmount * 20;
+        game.farms.food += this.foodAmount * foodPerShip;
         for(var i = game.space.ships.length-1; i >= 0; i--) {
             var ship = game.space.ships[i];
             if(ship === this) {
