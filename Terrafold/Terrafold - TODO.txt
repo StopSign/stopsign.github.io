@@ -21,3 +21,81 @@ Next Sector
 	artifact gain is sector+1
 Killing bosses give void crystals 
 Unused void crystals increase hangar capacity
+
+collect ships when sector is done
+	if target is home and fuel is positive,
+	don't take fuel, hide the timer
+	can't change sectors without having all ships collected
+
+Potential later upgrades:
+	Increase max # of mines per planet, make it choosable down to 1
+	
+1/10/100/custom options for threads and robots
+
+
+	
+Computer
+	Optimize Land - as is
+	Modify Buy Ice 
+		Every 1000 bought, ticks += 4, ice bought += 1
+		Initial changed to 40
+	Remove sell water
+	Have better late-game scaling for find more ice sellers
+		Every 1000 bought, cost/ticks *= 4, gain *= 5
+	Find more Water Buyers
+		Quadratically scaling science cost
+		Shortish tick time
+	Modify Bigger Storms
+		Disappears when complete
+		Unlocks Targetted Sunlight
+			Improves ice melting rate, 10% at a time up to 100%
+			Disappears when Complete
+			Unlocks Targetted Humidity
+				Grow ferns faster, 10% at a time up to 100%
+				Disappears when complete
+	Remove Build Robots
+	Remove More Robot Storage
+	Improve House Design Rework
+		Double happiness bonus, cost increase 10x, ticks increase 3x
+		Costs wood 
+	Improve Saws
+		Improve Cut Trees rate by 10%
+		Takes lots of ticks, tiny amount of metal
+
+Robots
+	Build Robots
+		requires 10 * # metal, 5k science * # of robots, linear tick increase
+	Cut Trees 
+		2 trees for 1 wood 
+	Remove Modify Expand indoor water storage
+	More Robot Storage - 
+		Costs 250 land, Metal
+		Stores 1 robot
+	Modify Build Mines
+		faster tick cost increase
+		lower limit - floor(square(land)/10)
+		Show how many there are
+	Remove Turn Ore into Dirt
+	Stuff Ore Into Compactor
+		Expensive on ticks, no cost otherwise
+		Puts 1% of ore into compacted storage
+	Has Compacted Ore
+	Grind Ore
+		Takes flat compacted ore #
+		Light on ticks, heavy on flat energy required
+		Produces little dirt, littler gems
+
+Tractor Beam
+	Uses flat 1 energy for 1 charge
+	At 100 charges, takes 1%+10 from passing objects,
+	takes 10% from 
+	has on/off switch
+
+Battleships
+	Rename Terraformers
+	cost -> 30m oxygen+100k*#, 3000+200*# metal
+
+Lake
+	Morphs into Ocean at 1T water
+	Ocean
+		Plankton, 
