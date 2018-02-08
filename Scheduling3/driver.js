@@ -118,5 +118,5 @@ $scope.intToStringRound = function(value) {
 	var msWaitTime = 100; //one second
   var ticksPerSecond = 1000 / msWaitTime;
   var curTick = 0;
-	$interval(function() { if(!stop) $scope.tick(); }, 10); //msWaitTime);
+	$interval(function() { if(!stop) $scope.tick(); }, msWaitTime);
 });
