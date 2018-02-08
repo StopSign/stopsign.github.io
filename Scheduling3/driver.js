@@ -58,7 +58,7 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
   }
   $scope.addGarden = function() {
     var garden = $scope.gardenWall.addNewGarden();
-    $scope.addDiv(garden.div, '#gardenWall');
+    // $scope.addDiv(garden.div, '#gardenWall');
   }
   
   $scope.addDiv = function(div, id) {
@@ -95,8 +95,8 @@ app.controller('myCtrl', function($scope, $interval, $compile) {
   //Game start
   $scope.addCellColumn();
   $scope.addGarden();
-  $scope.addGarden();
-  $scope.addGarden();
+  // $scope.addGarden();
+  // $scope.addGarden();
   
   //
 $scope.intToStringRound = function(value) {
@@ -114,9 +114,9 @@ $scope.intToStringRound = function(value) {
   }
 };
   
-  stop = 0
-	var msWaitTime = 100 //one second
-  var ticksPerSecond = 1000 / msWaitTime
+  stop = 0;
+	var msWaitTime = 100; //one second
+  var ticksPerSecond = 1000 / msWaitTime;
   var curTick = 0;
-	$interval(function() { if(!stop) $scope.tick(); }, msWaitTime);
+	$interval(function() { if(!stop) $scope.tick(); }, 10); //msWaitTime);
 });
