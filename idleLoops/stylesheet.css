@@ -1,0 +1,146 @@
+div {
+    display:inline-block;
+}
+
+body {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    font-family:Arial, Helvetica, serif;
+    color:black;
+    font-size:14px;
+    height:100%;
+    margin:0;
+    background-color: #e4ece5;
+    cursor:default;
+}
+
+.showthat:hover .showthis, .showthat2:hover .showthis2 {
+    display:block;
+}
+.showthis, .showthis2 {
+    display:none;
+    position:absolute;
+    background-color: #c0e4c7;
+    border:1px solid;
+    padding:3px 5px;
+    border-radius:4px;
+    margin-top:5px;
+    z-index:999;
+    text-align:left;
+}
+
+.showthis2 {
+    z-index:1000;
+    min-width:200px;
+}
+
+.title {
+    font-size:16px;
+    font-weight:bold;
+    display:block;
+    text-align:center;
+}
+
+
+.large {
+    font-size:16px;
+}
+.medium {
+    font-size:14px;
+}
+.small {
+    font-size:12px;
+}
+.bold {
+    font-weight:bold;
+}
+
+.superLargeIcon {
+    width:30px;
+    height:30px;
+}
+.largeIcon {
+    width:20px;
+    height:20px;
+}
+.smallIcon {
+    width:16px;
+    height:16px;
+}
+
+input, label {
+    cursor:pointer;
+}
+
+.button {
+    border:2px white solid;
+    background-color: #bde0b7;
+    padding:3px 5px;
+    cursor:pointer;
+    border-radius:10px;
+    min-width:9px;
+    text-align:center;
+    vertical-align:center;
+}
+.button:hover {
+    border:2px blue solid;
+}
+
+.container {
+    border:1px solid black;
+    margin:10px;
+    padding:3px 8px;
+    position:absolute;
+    border-radius:5px;
+    text-align:center;
+    min-width:100px;
+    opacity:.7;
+    background-color: #c3d2ff;
+}
+.container:hover {
+    opacity:1;
+}
+
+.statContainer {
+    width:100%;
+}
+.statLabel {
+    margin-left:5px;
+    float:left;
+}
+.statNum {
+    margin-right:5px;
+    float:right;
+}
+
+.thinProgressBarOuter {
+    height:2px;
+    width:90%;
+    background-color:white;
+    display:block;
+    margin:0 auto 4px auto;
+}
+.statBar {
+    height:100%;
+    width:60%;
+    display:block;
+}
+.statLevelBar {
+    background-color:yellowgreen;
+}
+.statTalentBar {
+    background-color: #cdbf56;
+}
+.actionContainer {
+    width:100%;
+    height:20px;
+}
+.townStatContainer {
+    width:100%;
+    height:18px;
+    text-align:left;
+    padding:0 10px 0;
+}
