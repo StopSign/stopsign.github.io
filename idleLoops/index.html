@@ -28,7 +28,14 @@
 
 <div id="statsColumn" style="width:200px;vertical-align:top;">
     <div id="statsWindow" style="width:90%;margin:5%;text-align:center;">
-        <div class="large bold">Stats</div><br>
+        <div class="showthat">
+            <div class="large bold">Stats</div>
+            <div class="showthis">
+                Talent gains 1% exp.<br>
+                Talent exp keeps through resets.<br>
+                Each talent level increases exp gain of skill by 1%.
+            </div>
+        </div><br>
         <div id="statList" style="width:100%;border:1px solid;height:300px;">
             <div class="statContainer showthat">
                 <div class="statLabel medium bold">Strength</div>
@@ -129,23 +136,48 @@
         </div>
     </div>
 </div>
-<div id="actionsColumn" style="width:300px;vertical-align:top;">
-    <div id="actionsWindow" style="width:100%;text-align:center;">
-        <div class="large bold showthat">
-            Actions
-            <div class="showthis">
 
+<div id="actionsColumn" style="width:300px;vertical-align:top;">
+    <div id="actionList" style="width:100%;text-align:center;">
+
+        <div class="showthat">
+            <div class="large bold">Action List</div>
+            <div class="showthis">
+                <i class='actionIcon fa fa-plus'></i> Add one loop<br>
+                <i class='actionIcon fa fa-minus'></i> Subtract one loop<br>
+                <i class='actionIcon fa fa-arrows-h'></i> Split action<br>
+                <i class='actionIcon fa fa-sort-up'></i> Move action up<br>
+                <i class='actionIcon fa fa-sort-down'></i> Move action down<br>
+                <i class='actionIcon fa fa-times'></i> Remove action<br>
+                The next list becomes the current list every restart.<br>
             </div>
         </div><br>
-        <div id="actionList" style="width:100%;border:1px solid;height:400px;">
-            <div class="actionContainer showthat">
+
+        <div style="width:30%;height:300px;background-color:#d0d6d0;text-align:center;vertical-align:top;">
+            <div id="currentActionsList" style="border:1px solid;margin-top:10px;">
+            </div>
+        </div><div style="width:70%;height:300px;background-color:#bfeacb;text-align:center;vertical-align:top;">
+            <div id="nextActionsList" style="margin-top:10px;width:100%;text-align:left;max-height:270px;overflow:auto;">
+            </div>
+        </div>
+
+    </div>
+
+    <div id="actionOptions" style="width:100%;text-align:center;margin-top:10px;">
+        <div class="showthat">
+            <div class="large bold">Action Options</div>
+            <div class="showthis">
+            </div>
+        </div><br>
+        <div style="width:100%;border:1px solid;height:200px;">
+            <div class="actionContainer showthat" onclick="addAction('wander')">
                 Wander
                 <div class="showthis">
                     Explore the town, look for hidden areas and treasures.
                     Gets harder fast!
                 </div>
             </div>
-            <div class="actionContainer showthat">
+            <div class="actionContainer showthat" onclick="addAction('smashPots')">
                 Smash Pots
                 <div class="showthis">
                     Smashes unchecked pots first, then pots you know have the loot.<br>
@@ -156,7 +188,9 @@
             </div>
         </div>
     </div>
+
 </div>
+
 <div id="townColumn" style="width:500px;vertical-align:top;">
     <div id="townWindow" style="width:100%;text-align:center;height:400px;">
         <div class="large bold">Town Menu</div><br>

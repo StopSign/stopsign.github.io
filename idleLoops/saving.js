@@ -9,10 +9,10 @@ let timer = 0;
 let timeNeeded = 20 * 50;
 let stop = false;
 const view = new View();
+const actions = new Actions();
 
 let statList = ["Str", "Dex", "Con", "Per", "Int", "Spd", "Luck", "Soul"];
 const stats = {};
-const actions = new Actions();
 let prevState = {};
 
 

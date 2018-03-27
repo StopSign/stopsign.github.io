@@ -5,6 +5,7 @@ function View() {
             this.updateStat(stat);
         });
         this.updateTime();
+        this.updateActions();
     };
 
     this.update = function() {
@@ -33,7 +34,36 @@ function View() {
         document.getElementById("timer").innerHTML = intToString((timeNeeded - timer)/50, 2);
 
     };
+
+    this.updateActions = function() {
+        while (nextActionsDiv.firstChild) {
+            nextActionsDiv.removeChild(nextActionsDiv.firstChild);
+        }
+        let actionsDiv = document.createElement("div");
+        let totalDivText = "";
+
+        actions.next.forEach((action, index) => {
+            totalDivText +=
+                "<div class='listedActionContainer small'>" +
+                    action.loops + " x " +
+                    action.name + "" +
+                    "<div style='float:right'>"+
+                        "<i onclick='actions.addLoop("+index+")' class='actionIcon fa fa-plus'></i>" +
+                        "<i onclick='actions.removeLoop("+index+")' class='actionIcon fa fa-minus'></i>" +
+                        "<i onclick='actions.split("+index+")' class='actionIcon fa fa-arrows-h'></i>" +
+                        "<i onclick='actions.moveUp("+index+")' class='actionIcon fa fa-sort-up'></i>" +
+                        "<i onclick='actions.moveDown("+index+")' class='actionIcon fa fa-sort-down'></i>" +
+                        "<i onclick='actions.removeAction("+index+")' class='actionIcon fa fa-times'></i>" +
+                    "</div>"+
+                "</div>";
+        });
+
+        actionsDiv.innerHTML = totalDivText;
+        nextActionsDiv.appendChild(actionsDiv);
+    };
 }
+
+const nextActionsDiv = document.getElementById("nextActionsList");
 
 
 function expEquals(stat) {

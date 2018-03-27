@@ -134,13 +134,37 @@ input, label {
 .statTalentBar {
     background-color: #cdbf56;
 }
-.actionContainer {
-    width:100%;
-    height:20px;
-}
+
 .townStatContainer {
     width:100%;
     height:18px;
     text-align:left;
     padding:0 10px 0;
+}
+
+.actionContainer {
+    cursor:pointer;
+    width:50px;
+    height:40px;
+    vertical-align:top;
+}
+.actionContainer:hover {
+    background-color: #bef8ff;
+}
+.listedActionContainer {
+    background-color:#f8ffe7;
+    margin-left:3px;
+    width:188px;
+    margin-bottom:2px;
+    display:block;
+}
+
+.actionIcon {
+    text-align:center;
+    width:12px;
+}
+.actionIcon:hover {
+    color:red;
+    cursor:pointer;
+    background-color:#b3b3b3;
 }

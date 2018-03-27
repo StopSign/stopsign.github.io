@@ -39,5 +39,11 @@ function pauseGame() {
 
 function restart() {
     timer = 0;
+    actions.restart();
     restartStats();
+}
+
+function addAction(action) {
+    actions.addAction(action);
+    view.updateActions();
 }
