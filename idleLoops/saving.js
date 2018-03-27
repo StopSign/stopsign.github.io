@@ -6,12 +6,12 @@ doWork.onmessage = function (event) {
 };
 
 let timer = 0;
-let timeNeeded = 20 * 50;
+let timeNeeded = 5 * 50;
 let stop = false;
 const view = new View();
 const actions = new Actions();
 
-let statList = ["Str", "Dex", "Con", "Per", "Int", "Spd", "Luck", "Soul"];
+let statList = ["Str", "Dex", "Con", "Per", "Int", "Cha", "Spd", "Luck", "Soul"];
 const stats = {};
 let prevState = {};
 
@@ -30,6 +30,9 @@ function load() {
     loadDefaults();
     if (!window.localStorage.idleLoops1) { //New players to the game
         recalcInterval(50);
+        stop = true;
+        //tutorial
+        view.initalize();
         return;
     }
     let toLoad = JSON.parse(window.localStorage.idleLoops1);

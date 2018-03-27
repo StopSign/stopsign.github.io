@@ -151,12 +151,21 @@ input, label {
 .actionContainer:hover {
     background-color: #bef8ff;
 }
-.listedActionContainer {
+
+.nextActionContainer {
     background-color:#f8ffe7;
     margin-left:3px;
     width:188px;
     margin-bottom:2px;
     display:block;
+}
+.curActionContainer {
+    background-color:#f8ffe7;
+    margin-left:3px;
+    width:102px;
+    margin-bottom:2px;
+    display:block;
+    position:relative;
 }
 
 .actionIcon {
@@ -167,4 +176,12 @@ input, label {
     color:red;
     cursor:pointer;
     background-color:#b3b3b3;
+}
+
+.curActionBar {
+    height:100%;
+    width:0;
+    background-color:red;
+    position:absolute;
+    opacity:.5;
 }

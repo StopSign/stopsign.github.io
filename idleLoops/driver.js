@@ -6,10 +6,10 @@ function tick() {
     }
     timer++;
 
-    prevState.stats = stats;
+    prevState.stats = JSON.parse(JSON.stringify(stats));
     actions.tick();
 
-    if(timer > timeNeeded) {
+    if(timer >= timeNeeded) {
         if(document.getElementById("pauseBeforeRestart").checked) {
             pauseGame();
         } else {
@@ -20,7 +20,7 @@ function tick() {
     view.update();
 
     if(timer % 100 === 0) {
-        save();
+        // save();
     }
 }
 
@@ -32,18 +32,19 @@ function recalcInterval(newSpeed) {
 function pauseGame() {
     stop = !stop;
     document.getElementById("pausePlay").innerHTML = stop ? "Play" : "Pause";
-    if(!stop && timer > timeNeeded) {
+    if(!stop && timer >= timeNeeded) {
         restart();
     }
 }
 
 function restart() {
     timer = 0;
-    actions.restart();
     restartStats();
+    actions.restart();
+    view.updateCurrentActionsDivs();
 }
 
 function addAction(action) {
     actions.addAction(action);
-    view.updateActions();
+    view.updateNextActions();
 }

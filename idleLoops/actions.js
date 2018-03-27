@@ -1,34 +1,91 @@
 function Actions() {
-
     this.current = [];
     this.next = [];
     this.addAmount = 1;
 
-    this.tick = function() {
+    this.totalNeeded = 0;
+    this.completedTicks = 0;
+    this.currentPos = 0;
 
+    this.tick = function() {
+        let curAction = this.current[this.currentPos];
+        if(!curAction) { //out of actions
+            return;
+        }
+
+        addExpFromAction(curAction);
+        curAction.ticks++;
+        if(curAction.ticks >= curAction.adjustedTicks) {
+            curAction.ticks = 0;
+            curAction.loopsLeft--;
+            this.completedTicks += curAction.adjustedTicks;
+            this.adjustTicksNeeded();
+            view.updateCurrentActionLoops(this.currentPos);
+        }
+        view.updateCurrentActionBar(this.currentPos);
+        if(curAction.loopsLeft === 0) {
+            this.currentPos++;
+        }
     };
 
     this.restart = function() {
-        this.current = this.next;
+        this.current = [];
+        this.currentPos = 0;
+        this.completedTicks = 0;
+
+        this.next.forEach((action) => {
+            let toAdd;
+            if(action.loops === 0) { //don't add blank ones
+                return;
+            }
+            if(action.name === "Wander") {
+                toAdd = new Wander();
+            } else if(action.name === "Smash Pots") {
+                toAdd = new SmashPots();
+            }
+
+            toAdd.loops = action.loops;
+            toAdd.loopsLeft = action.loops;
+            toAdd.ticks = 0;
+
+            this.current.push(toAdd);
+        });
+        this.adjustTicksNeeded();
+        view.updateNextActions();
+    };
+
+    this.adjustTicksNeeded = function() {
+        let remainingTicks = 0;
+        this.current.forEach((action, index) => {
+            if(index < this.currentPos) {
+                return;
+            }
+            setAdjustedTicks(action);
+            remainingTicks += action.loopsLeft * action.adjustedTicks;
+        });
+        const prevNeeded = this.totalNeeded;
+        this.totalNeeded = this.completedTicks + remainingTicks;
+        if(prevNeeded !== this.totalNeeded) {
+            view.updateTotalTicks();
+        }
     };
 
     this.addLoop = function(index) {
         this.next[index].loops += this.addAmount;
-        view.updateActions();
+        view.updateNextActions();
     };
     this.removeLoop = function(index) {
         this.next[index].loops -= this.addAmount;
         if(this.next[index].loops < 0) {
             this.next[index].loops = 0;
         }
-        view.updateActions();
+        view.updateNextActions();
     };
     this.split = function(index) {
         const toSplit = this.next[index];
-        console.log(index);
-        this.addAction(camelize(toSplit.name), Math.ceil(toSplit.loops/2), index);
+        this.addAction(toSplit.name, Math.ceil(toSplit.loops/2), index);
         toSplit.loops = Math.floor(toSplit.loops/2);
-        view.updateActions();
+        view.updateNextActions();
     };
     this.moveUp = function(index) {
         if(index <= 0) {
@@ -37,7 +94,7 @@ function Actions() {
         const temp = this.next[index-1];
         this.next[index-1] = this.next[index];
         this.next[index] = temp;
-        view.updateActions();
+        view.updateNextActions();
     };
     this.moveDown = function(index) {
         if(index >= this.next.length - 1) {
@@ -46,23 +103,18 @@ function Actions() {
         const temp = this.next[index+1];
         this.next[index+1] = this.next[index];
         this.next[index] = temp;
-        view.updateActions();
+        view.updateNextActions();
     };
     this.removeAction = function(index) {
         this.next.splice(index, 1);
-        view.updateActions();
+        view.updateNextActions();
     };
 
     this.addAction = function(action, loops, initialOrder) {
-        let toAdd;
-        if(action === "wander") {
-            toAdd = new Wander()
-        } else if(action === "smashPots") {
-            toAdd = new SmashPots()
-        }
+        let toAdd = {};
+        toAdd.name = action;
 
         toAdd.loops = loops !== undefined ? loops : 1;
-        toAdd.curTicks = 0;
 
 
         if(initialOrder !== undefined) {
@@ -74,32 +126,20 @@ function Actions() {
     };
 }
 
-function Wander() {
-    this.name = "Wander";
-    this.stats = {
-
-    };
-    this.ticksNeeded = function() {
-        return 20;
-    };
-    this.finish = function() {
-
-    }
+function setAdjustedTicks(action) {
+    let statMult = 0;
+    statList.forEach((statName) => {
+        if(action.stats[statName]) {
+            statMult += action.stats[statName] * (1 + getLevel(statName)/100);
+        }
+    });
+    action.adjustedTicks = Math.ceil(action.ticksNeeded / statMult);
 }
 
-function SmashPots() {
-    this.name = "Smash Pots";
-    this.stats = {
-        Str:.2,
-        Per:.2,
-        Spd:.6,
-        expMult:1
-    };
-    this.ticksNeeded = function() {
-        return 20;
-    };
-    this.finish = function() {
-
-    }
-
+function addExpFromAction(action) {
+    statList.forEach((statName) => {
+        if(action.stats[statName]) {
+            addExp(statName, action.stats[statName] * action.expMult);
+        }
+    });
 }

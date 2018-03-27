@@ -20,7 +20,7 @@
         <div id="timeBar" style="height:100%;width:20%;background-color:#8293ff;overflow:visible">
         </div>
     </div>
-    <div style="">Time resets in <div id="timer">5</div></div>
+    <div id="timer">5</div>
     <div id="pausePlay" onclick="pauseGame()" class="button">Pause</div>
     <label for="pauseBeforeRestart">Pause before restart</label>
     <input type="checkbox" checked="checked" id="pauseBeforeRestart">
@@ -31,6 +31,7 @@
         <div class="showthat">
             <div class="large bold">Stats</div>
             <div class="showthis">
+                Each skill level reduces relevant actions by 1%.<br>
                 Talent gains 1% exp.<br>
                 Talent exp keeps through resets.<br>
                 Each talent level increases exp gain of skill by 1%.
@@ -98,6 +99,18 @@
                 </div>
             </div>
             <div class="statContainer showthat">
+                <div class="statLabel medium bold">Charisma</div>
+                <div class="statNum medium"><div id="statChaLevel">5</div>(<div id="statChaTalent">6</div>)</div>
+                <div style="margin-top:18px;"></div>
+                <div class="thinProgressBarOuter"><div class="statBar statLevelBar" id="statChaLevelBar"></div></div>
+                <div class="thinProgressBarOuter"><div class="statBar statTalentBar" id="statChaTalentBar"></div></div>
+                <div class="showthis">
+                    Conversation is a battle.<br>
+                    <div class="medium bold">Level Progress: </div><div id="statChaLevelProgress"></div><br>
+                    <div class="medium bold">Talent Progress: </div><div id="statChaTalentProgress"></div>
+                </div>
+            </div>
+            <div class="statContainer showthat">
                 <div class="statLabel medium bold">Speed</div>
                 <div class="statNum medium"><div id="statSpdLevel">5</div>(<div id="statSpdTalent">6</div>)</div>
                 <div style="margin-top:18px;"></div>
@@ -137,7 +150,7 @@
     </div>
 </div>
 
-<div id="actionsColumn" style="width:300px;vertical-align:top;">
+<div id="actionsColumn" style="width:350px;vertical-align:top;">
     <div id="actionList" style="width:100%;text-align:center;">
 
         <div class="showthat">
@@ -150,13 +163,22 @@
                 <i class='actionIcon fa fa-sort-down'></i> Move action down<br>
                 <i class='actionIcon fa fa-times'></i> Remove action<br>
                 The next list becomes the current list every restart.<br>
+                One second = 50 ticks.<br>
+                Minimum 1 tick per action.
             </div>
         </div><br>
 
-        <div style="width:30%;height:300px;background-color:#d0d6d0;text-align:center;vertical-align:top;">
-            <div id="currentActionsList" style="border:1px solid;margin-top:10px;">
+        <div style="width:35%;height:300px;background-color:#d0d6d0;text-align:center;vertical-align:top;position:relative;">
+            <div id="curActionsList" style="margin-top:10px;text-align:left;max-height:270px;overflow:auto;"></div>
+            <div class="showthat" style="position:absolute;bottom:0;left:0;width:100%;">
+                <div class="bold">Total Ticks</div><div id="totalTicks"></div>
+                <div class="showthis">
+                    Shows stat gain affecting speed<br>
+                    Updates every completed action<br>
+                    Accurate at end of run<br>
+                </div>
             </div>
-        </div><div style="width:70%;height:300px;background-color:#bfeacb;text-align:center;vertical-align:top;">
+        </div><div style="width:65%;height:300px;background-color:#bfeacb;text-align:center;vertical-align:top;">
             <div id="nextActionsList" style="margin-top:10px;width:100%;text-align:left;max-height:270px;overflow:auto;">
             </div>
         </div>
@@ -167,17 +189,24 @@
         <div class="showthat">
             <div class="large bold">Action Options</div>
             <div class="showthis">
+                Speed of action and exp gain is based on ratio of stat %s.<br>
+                Exp is gained every tick.<br>
             </div>
         </div><br>
         <div style="width:100%;border:1px solid;height:200px;">
-            <div class="actionContainer showthat" onclick="addAction('wander')">
+            <div class="actionContainer showthat" onclick="addAction('Wander')">
                 Wander
                 <div class="showthis">
-                    Explore the town, look for hidden areas and treasures.
-                    Gets harder fast!
+                    Explore the town, look for hidden areas and treasures.<br>
+                    Gets harder fast!<br>
+                    <div class="bold">Per</div> 20%<br>
+                    <div class="bold">Con</div> 20%<br>
+                    <div class="bold">Cha</div> 20%<br>
+                    <div class="bold">Spd</div> 30%<br>
+                    <div class="bold">Luck</div> 10%<br>
                 </div>
             </div>
-            <div class="actionContainer showthat" onclick="addAction('smashPots')">
+            <div class="actionContainer showthat" onclick="addAction('Smash Pots')">
                 Smash Pots
                 <div class="showthis">
                     Smashes unchecked pots first, then pots you know have the loot.<br>
@@ -204,7 +233,7 @@
             <div class="townStatContainer showthat">
                 <div class="bold">Pots Smashed </div> <div>0</div> / <div>0</div> / <div>0</div> / <div>0</div>
                 <div class="showthis">
-                    Pots looted / Pots with loot / Pots to check / Total pots
+                    Loot from pots / Pots with loot / Pots to check / Total pots
                 </div>
             </div>
         </div>
@@ -219,6 +248,7 @@
 <script src="stats.js"></script>
 <script src="view.js"></script>
 <script src="actions.js"></script>
+<script src="actionList.js"></script>
 
 <script src="saving.js"></script>
 </html>

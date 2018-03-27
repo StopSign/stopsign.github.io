@@ -5,7 +5,8 @@ function View() {
             this.updateStat(stat);
         });
         this.updateTime();
-        this.updateActions();
+        this.updateNextActions();
+        this.updateCurrentActionsDivs();
     };
 
     this.update = function() {
@@ -31,11 +32,13 @@ function View() {
 
     this.updateTime = function() {
         document.getElementById("timeBar").style.width = (100 - timer / timeNeeded * 100) + "%";
-        document.getElementById("timer").innerHTML = intToString((timeNeeded - timer)/50, 2);
+        document.getElementById("timer").innerHTML = "<div class='bold'>Mana</div> "
+            + intToString((timeNeeded - timer), 1) + " | " +
+            intToString((timeNeeded - timer)/50, 2) + "s";
 
     };
 
-    this.updateActions = function() {
+    this.updateNextActions = function() {
         while (nextActionsDiv.firstChild) {
             nextActionsDiv.removeChild(nextActionsDiv.firstChild);
         }
@@ -44,7 +47,7 @@ function View() {
 
         actions.next.forEach((action, index) => {
             totalDivText +=
-                "<div class='listedActionContainer small'>" +
+                "<div class='nextActionContainer small'>" +
                     action.loops + " x " +
                     action.name + "" +
                     "<div style='float:right'>"+
@@ -61,8 +64,48 @@ function View() {
         actionsDiv.innerHTML = totalDivText;
         nextActionsDiv.appendChild(actionsDiv);
     };
+
+    this.updateTotalTicks = function() {
+        document.getElementById("totalTicks").innerHTML = actions.totalNeeded;
+    };
+
+    this.updateCurrentActionsDivs = function() {
+        while (curActionsDiv.firstChild) {
+            curActionsDiv.removeChild(curActionsDiv.firstChild);
+        }
+        let actionsDiv = document.createElement("div");
+        let totalDivText = "";
+
+        actions.current.forEach((action, index) => {
+            totalDivText +=
+                "<div class='curActionContainer small'>" +
+                    "<div class='curActionBar' id='action"+index+"Bar'></div>" +
+                    "<div id='action"+index+"Loops'>"+ action.loopsLeft+"</div>(" + action.loops + ")" + " x " +
+                    action.name + "" +
+                    "</div>"+
+                "</div>";
+        });
+
+        actionsDiv.innerHTML = totalDivText;
+        curActionsDiv.appendChild(actionsDiv);
+    };
+
+    this.updateCurrentActionBar = function(index) {
+        const action = actions.current[index];
+        const div = document.getElementById("action"+index+"Bar");
+        div.style.width = (100 * action.ticks / action.ticksNeeded) + "%";
+        if(action.loopsLeft === 0) {
+            div.style.width = "100%";
+            div.style.backgroundColor = "#565656";
+        }
+    };
+
+    this.updateCurrentActionLoops = function(index) {
+        document.getElementById("action"+index+"Loops").innerHTML = actions.current[index].loopsLeft;
+    };
 }
 
+const curActionsDiv = document.getElementById("curActionsList");
 const nextActionsDiv = document.getElementById("nextActionsList");
 
 
