@@ -22,11 +22,11 @@ function View() {
         const levelPrc = getPrcToNextLevel(stat)+"%";
         document.getElementById("stat"+stat+"Level").innerHTML = getLevel(stat);
         document.getElementById("stat"+stat+"LevelBar").style.width = levelPrc;
-        document.getElementById("stat"+stat+"LevelProgress").innerHTML = intToString(levelPrc, 1);
+        document.getElementById("stat"+stat+"LevelProgress").innerHTML = intToString(levelPrc, 2);
         const talentPrc = getPrcToNextTalent(stat)+"%";
         document.getElementById("stat"+stat+"Talent").innerHTML = getTalent(stat);
         document.getElementById("stat"+stat+"TalentBar").style.width = talentPrc;
-        document.getElementById("stat"+stat+"TalentProgress").innerHTML = intToString(talentPrc, 1);
+        document.getElementById("stat"+stat+"TalentProgress").innerHTML = intToString(talentPrc, 2);
         this["update"+stat] = false;
     };
 

@@ -10,6 +10,8 @@ let timeNeeded = 5 * 50;
 let stop = false;
 const view = new View();
 const actions = new Actions();
+const towns = {};
+let townNum = 0;
 
 let statList = ["Str", "Dex", "Con", "Per", "Int", "Cha", "Spd", "Luck", "Soul"];
 const stats = {};
@@ -31,6 +33,7 @@ function load() {
     if (!window.localStorage.idleLoops1) { //New players to the game
         recalcInterval(50);
         stop = true;
+        towns.push(new Town(0));
         //tutorial
         view.initalize();
         return;

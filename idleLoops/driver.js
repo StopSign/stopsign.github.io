@@ -41,6 +41,9 @@ function restart() {
     timer = 0;
     restartStats();
     actions.restart();
+    towns.forEach((town) => {
+        town.restart();
+    });
     view.updateCurrentActionsDivs();
 }
 
