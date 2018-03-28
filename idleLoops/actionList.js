@@ -10,7 +10,7 @@ function Wander() {
         Luck:.1
     };
     this.finish = function() {
-
+        towns[curTown].wander();
     }
 }
 
@@ -24,7 +24,8 @@ function SmashPots() {
         Spd:.6
     };
     this.finish = function() {
-
+        const town = towns[curTown];
+        town.smashPots();
     }
 
 }

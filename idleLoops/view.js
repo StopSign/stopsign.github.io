@@ -7,6 +7,7 @@ function View() {
         this.updateTime();
         this.updateNextActions();
         this.updateCurrentActionsDivs();
+        this.updateExplored();
     };
 
     this.update = function() {
@@ -48,7 +49,7 @@ function View() {
         actions.next.forEach((action, index) => {
             totalDivText +=
                 "<div class='nextActionContainer small'>" +
-                    action.loops + " x " +
+                    "<div class='bold'>" + action.loops +"</div> x " +
                     action.name + "" +
                     "<div style='float:right'>"+
                         "<i onclick='actions.addLoop("+index+")' class='actionIcon fa fa-plus'></i>" +
@@ -103,6 +104,25 @@ function View() {
     this.updateCurrentActionLoops = function(index) {
         document.getElementById("action"+index+"Loops").innerHTML = actions.current[index].loopsLeft;
     };
+
+    this.updateExplored = function() {
+        const town = towns[curTown];
+        const explored = town.explored();
+        const levelPrc = town.getPrcToNext() + "%";
+        document.getElementById("explored").innerHTML = explored;
+        document.getElementById("exploredExpBar").style.width = levelPrc;
+        document.getElementById("exploredLevelProgress").innerHTML = intToString(levelPrc, 2);
+        document.getElementById("exploredBar").style.width = explored + "%";
+    };
+
+    this.updatePots = function() {
+        const town = towns[curTown];
+        document.getElementById("totalPots").innerHTML = town.totalPots;
+        document.getElementById("checkedPots").innerHTML = town.totalPots - town.checkedPots+"";
+        document.getElementById("potsWithLoot").innerHTML = town.potsWithLoot+"";
+        document.getElementById("potLoot").innerHTML = town.potLoot+"";
+    };
+
 }
 
 const curActionsDiv = document.getElementById("curActionsList");

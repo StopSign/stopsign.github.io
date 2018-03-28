@@ -19,6 +19,8 @@ function Actions() {
             curAction.ticks = 0;
             curAction.loopsLeft--;
             this.completedTicks += curAction.adjustedTicks;
+            curAction.finish();
+
             this.adjustTicksNeeded();
             view.updateCurrentActionLoops(this.currentPos);
         }

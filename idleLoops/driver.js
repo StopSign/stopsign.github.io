@@ -39,10 +39,14 @@ function pauseGame() {
 
 function restart() {
     timer = 0;
+    timeNeeded = timeNeededInitial;
     restartStats();
     actions.restart();
     towns.forEach((town) => {
         town.restart();
+    });
+    statList.forEach((stat) => {
+        view.updateStat(stat);
     });
     view.updateCurrentActionsDivs();
 }
@@ -50,4 +54,8 @@ function restart() {
 function addAction(action) {
     actions.addAction(action);
     view.updateNextActions();
+}
+
+function addMana(amount) {
+    timeNeeded += amount;
 }

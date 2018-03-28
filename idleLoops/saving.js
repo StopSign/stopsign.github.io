@@ -5,13 +5,14 @@ doWork.onmessage = function (event) {
     }
 };
 
-let timer = 0;
-let timeNeeded = 5 * 50;
+let timeNeededInitial = 5 * 50;
+let timer = timeNeededInitial;
+let timeNeeded = timeNeededInitial;
 let stop = false;
 const view = new View();
 const actions = new Actions();
-const towns = {};
-let townNum = 0;
+const towns = [];
+let curTown = 0;
 
 let statList = ["Str", "Dex", "Con", "Per", "Int", "Cha", "Spd", "Luck", "Soul"];
 const stats = {};
@@ -32,9 +33,9 @@ function load() {
     loadDefaults();
     if (!window.localStorage.idleLoops1) { //New players to the game
         recalcInterval(50);
-        stop = true;
         towns.push(new Town(0));
-        //tutorial
+        pauseGame();
+        //tutorial here
         view.initalize();
         return;
     }
