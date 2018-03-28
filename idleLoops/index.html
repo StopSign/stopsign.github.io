@@ -23,6 +23,7 @@
     <div id="pausePlay" onclick="pauseGame()" class="button">Pause</div>
     <label for="pauseBeforeRestart">Pause before restart</label>
     <input type="checkbox" checked="checked" id="pauseBeforeRestart">
+    <div onclick="restart()" class="button">Restart</div>
 </div>
 
 <div id="statsColumn" style="width:200px;vertical-align:top;">
@@ -36,13 +37,13 @@
                 Each talent level increases exp gain of skill by 1%.
             </div>
         </div><br>
-        <div id="statList" style="width:100%;border:1px solid;height:300px;">
+        <div id="statList" style="width:100%;">
             <div class="statContainer showthat">
                 <div class="statLabel medium bold">Strength</div>
                 <div class="statNum medium"><div id="statStrLevel">5</div>(<div id="statStrTalent">6</div>)</div>
                 <div style="margin-top:18px;"></div>
-                <div class="thinProgressBarOuter"><div class="statBar statLevelBar" id="statStrLevelBar"></div></div>
-                <div class="thinProgressBarOuter"><div class="statBar statTalentBar" id="statStrTalentBar"></div></div>
+                <div class="thinProgressBarUpper"><div class="statBar statLevelBar" id="statStrLevelBar"></div></div>
+                <div class="thinProgressBarLower"><div class="statBar statTalentBar" id="statStrTalentBar"></div></div>
                 <div class="showthis">
                     Train your body.<br>
                     <div class="medium bold">Level</div> <div id="statStrLevelProgress"></div>%<br>
@@ -53,8 +54,8 @@
                 <div class="statLabel medium bold">Dexterity</div>
                 <div class="statNum medium"><div id="statDexLevel">5</div>(<div id="statDexTalent">6</div>)</div>
                 <div style="margin-top:18px;"></div>
-                <div class="thinProgressBarOuter"><div class="statBar statLevelBar" id="statDexLevelBar"></div></div>
-                <div class="thinProgressBarOuter"><div class="statBar statTalentBar" id="statDexTalentBar"></div></div>
+                <div class="thinProgressBarUpper"><div class="statBar statLevelBar" id="statDexLevelBar"></div></div>
+                <div class="thinProgressBarLower"><div class="statBar statTalentBar" id="statDexTalentBar"></div></div>
                 <div class="showthis">
                     Know your body.<br>
                     <div class="medium bold">Level</div> <div id="statDexLevelProgress"></div>%<br>
@@ -65,8 +66,8 @@
                 <div class="statLabel medium bold">Constitution</div>
                 <div class="statNum medium"><div id="statConLevel">5</div>(<div id="statConTalent">6</div>)</div>
                 <div style="margin-top:18px;"></div>
-                <div class="thinProgressBarOuter"><div class="statBar statLevelBar" id="statConLevelBar"></div></div>
-                <div class="thinProgressBarOuter"><div class="statBar statTalentBar" id="statConTalentBar"></div></div>
+                <div class="thinProgressBarUpper"><div class="statBar statLevelBar" id="statConLevelBar"></div></div>
+                <div class="thinProgressBarLower"><div class="statBar statTalentBar" id="statConTalentBar"></div></div>
                 <div class="showthis">
                     Take hits before going down.<br>
                     <div class="medium bold">Level</div> <div id="statConLevelProgress"></div>%<br>
@@ -77,8 +78,8 @@
                 <div class="statLabel medium bold">Perception</div>
                 <div class="statNum medium"><div id="statPerLevel">5</div>(<div id="statPerTalent">6</div>)</div>
                 <div style="margin-top:18px;"></div>
-                <div class="thinProgressBarOuter"><div class="statBar statLevelBar" id="statPerLevelBar"></div></div>
-                <div class="thinProgressBarOuter"><div class="statBar statTalentBar" id="statPerTalentBar"></div></div>
+                <div class="thinProgressBarUpper"><div class="statBar statLevelBar" id="statPerLevelBar"></div></div>
+                <div class="thinProgressBarLower"><div class="statBar statTalentBar" id="statPerTalentBar"></div></div>
                 <div class="showthis">
                     Look a little closer ...<br>
                     <div class="medium bold">Level</div> <div id="statPerLevelProgress"></div>%<br>
@@ -89,8 +90,8 @@
                 <div class="statLabel medium bold">Intelligence</div>
                 <div class="statNum medium"><div id="statIntLevel">5</div>(<div id="statIntTalent">6</div>)</div>
                 <div style="margin-top:18px;"></div>
-                <div class="thinProgressBarOuter"><div class="statBar statLevelBar" id="statIntLevelBar"></div></div>
-                <div class="thinProgressBarOuter"><div class="statBar statTalentBar" id="statIntTalentBar"></div></div>
+                <div class="thinProgressBarUpper"><div class="statBar statLevelBar" id="statIntLevelBar"></div></div>
+                <div class="thinProgressBarLower"><div class="statBar statTalentBar" id="statIntTalentBar"></div></div>
                 <div class="showthis">
                     Learning to learn.<br>
                     <div class="medium bold">Level</div> <div id="statIntLevelProgress"></div>%<br>
@@ -101,8 +102,8 @@
                 <div class="statLabel medium bold">Charisma</div>
                 <div class="statNum medium"><div id="statChaLevel">5</div>(<div id="statChaTalent">6</div>)</div>
                 <div style="margin-top:18px;"></div>
-                <div class="thinProgressBarOuter"><div class="statBar statLevelBar" id="statChaLevelBar"></div></div>
-                <div class="thinProgressBarOuter"><div class="statBar statTalentBar" id="statChaTalentBar"></div></div>
+                <div class="thinProgressBarUpper"><div class="statBar statLevelBar" id="statChaLevelBar"></div></div>
+                <div class="thinProgressBarLower"><div class="statBar statTalentBar" id="statChaTalentBar"></div></div>
                 <div class="showthis">
                     Conversation is a battle.<br>
                     <div class="medium bold">Level</div> <div id="statChaLevelProgress"></div>%<br>
@@ -113,8 +114,8 @@
                 <div class="statLabel medium bold">Speed</div>
                 <div class="statNum medium"><div id="statSpdLevel">5</div>(<div id="statSpdTalent">6</div>)</div>
                 <div style="margin-top:18px;"></div>
-                <div class="thinProgressBarOuter"><div class="statBar statLevelBar" id="statSpdLevelBar"></div></div>
-                <div class="thinProgressBarOuter"><div class="statBar statTalentBar" id="statSpdTalentBar"></div></div>
+                <div class="thinProgressBarUpper"><div class="statBar statLevelBar" id="statSpdLevelBar"></div></div>
+                <div class="thinProgressBarLower"><div class="statBar statTalentBar" id="statSpdTalentBar"></div></div>
                 <div class="showthis">
                     Gotta go fast.<br>
                     <div class="medium bold">Level</div> <div id="statSpdLevelProgress"></div>%<br>
@@ -125,8 +126,8 @@
                 <div class="statLabel medium bold">Luck</div>
                 <div class="statNum medium"><div id="statLuckLevel">5</div>(<div id="statLuckTalent">6</div>)</div>
                 <div style="margin-top:18px;"></div>
-                <div class="thinProgressBarOuter"><div class="statBar statLevelBar" id="statLuckLevelBar"></div></div>
-                <div class="thinProgressBarOuter"><div class="statBar statTalentBar" id="statLuckTalentBar"></div></div>
+                <div class="thinProgressBarUpper"><div class="statBar statLevelBar" id="statLuckLevelBar"></div></div>
+                <div class="thinProgressBarLower"><div class="statBar statTalentBar" id="statLuckTalentBar"></div></div>
                 <div class="showthis">
                     Opportunity favors the fortunate.<br>
                     <div class="medium bold">Level</div> <div id="statLuckLevelProgress"></div>%<br>
@@ -137,8 +138,8 @@
                 <div class="statLabel medium bold">Soul</div>
                 <div class="statNum medium"><div id="statSoulLevel">5</div>(<div id="statSoulTalent">6</div>)</div>
                 <div style="margin-top:18px;"></div>
-                <div class="thinProgressBarOuter"><div class="statBar statLevelBar" id="statSoulLevelBar"></div></div>
-                <div class="thinProgressBarOuter"><div class="statBar statTalentBar" id="statSoulTalentBar"></div></div>
+                <div class="thinProgressBarUpper"><div class="statBar statLevelBar" id="statSoulLevelBar"></div></div>
+                <div class="thinProgressBarLower"><div class="statBar statTalentBar" id="statSoulTalentBar"></div></div>
                 <div class="showthis">
                     You are the captain.<br>
                     <div class="medium bold">Level</div> <div id="statSoulLevelProgress"></div>%<br>
@@ -163,22 +164,28 @@
                 <i class='actionIcon fa fa-times'></i> Remove action<br>
                 The next list becomes the current list every restart.<br>
                 One second = 50 ticks.<br>
-                Minimum 1 tick per action.
+                Minimum 1 tick per action.<br>
+                Restarts automatically upon no actions left.<br>
             </div>
         </div><br>
 
-        <div style="width:35%;height:300px;background-color:#d0d6d0;text-align:center;vertical-align:top;position:relative;">
+        <div style="width:35%;height:300px;background-color:#c2e6cc;text-align:center;vertical-align:top;position:relative;">
             <div id="curActionsList" style="margin-top:10px;text-align:left;max-height:270px;overflow:auto;"></div>
             <div class="showthat" style="position:absolute;bottom:0;left:0;width:100%;">
-                <div class="bold">Total Mana</div> <div id="totalTicks"></div>
+                <div class="bold">Mana Used</div> <div id="totalTicks"></div>
                 <div class="showthis">
                     Shows stat gain affecting speed.<br>
                     Updates every completed action.<br>
                     Accurate at end of run.
                 </div>
             </div>
-        </div><div style="width:65%;height:300px;background-color:#bfeacb;text-align:center;vertical-align:top;">
-            <div id="nextActionsList" style="margin-top:10px;width:100%;text-align:left;max-height:270px;overflow:auto;">
+        </div><div style="width:65%;height:300px;background-color:#cdded2;text-align:center;vertical-align:top;position:relative;">
+            <div id="nextActionsList" style="margin-top:10px;width:100%;text-align:left;max-height:270px;overflow:auto;"></div>
+            <div style="position:absolute;bottom:0;left:0;width:100%;">
+                <div class="bold">Amount</div> <div id="addAmount">1</div>
+                <div class="button" onclick="changeActionAmount(1)">1</div>
+                <div class="button" onclick="changeActionAmount(5)">5</div>
+                <div class="button" onclick="changeActionAmount(10)">10</div>
             </div>
         </div>
 
@@ -194,9 +201,10 @@
                 Nothing happens when there's no action.<br>
             </div>
         </div><br>
-        <div style="width:100%;border:1px solid;height:200px;">
+        <div style="width:100%;padding-top:5px;">
             <div class="actionContainer showthat" onclick="addAction('Wander')">
-                Wander
+                Wander<br>
+                <img src='img/wander.svg' class='superLargeIcon'><br>
                 <div class="showthis">
                     Explore the town, look for hidden areas and treasures.<br>
                     <div class="bold">Per</div> 20%<br>
@@ -208,7 +216,8 @@
                 </div>
             </div>
             <div class="actionContainer showthat" onclick="addAction('Smash Pots')">
-                Smash Pots
+                Smash Pots<br>
+                <img src='img/smashPots.svg' class='superLargeIcon'><br>
                 <div class="showthis">
                     Smashes unchecked pots first, then pots you know have the loot.<br>
                     <div class="bold">Str</div> 20%<br>
@@ -225,11 +234,11 @@
 <div id="townColumn" style="width:500px;vertical-align:top;">
     <div id="townWindow" style="width:100%;text-align:center;height:400px;">
         <div class="large bold">Town Menu</div><br>
-        <div style="width:100%;border:1px solid;height:400px;">
+        <div style="width:100%;height:400px;">
             <div class="townStatContainer showthat">
-                <div class="bold">Explored </div> <div id="explored">5</div>%
-                <div class="thinProgressBarOuter"><div id="exploredExpBar" class="statBar townExpBar"></div></div>
-                <div class="thinProgressBarOuter"><div id="exploredBar" class="statBar townBar"></div></div>
+                <div class="bold townLabel">Explored </div> <div id="explored">5</div>%
+                <div class="thinProgressBarUpper"><div id="exploredExpBar" class="statBar townExpBar"></div></div>
+                <div class="thinProgressBarLower"><div id="exploredBar" class="statBar townBar"></div></div>
 
                 <div class="showthis">
                     You can find more stuff with higher %.<br>
@@ -237,7 +246,7 @@
                 </div>
             </div>
             <div class="townStatContainer showthat">
-                <div class="bold">Pots Smashed </div> <div id="potLoot">0</div> / <div id="potsWithLoot">0</div> / <div id="checkedPots">0</div> / <div id="totalPots">0</div>
+                <div class="bold townLabel">Pots Smashed </div> <div id="potLoot">0</div> / <div id="potsWithLoot">0</div> / <div id="checkedPots">0</div> / <div id="totalPots">0</div>
                 <div class="showthis">
                     Loot from pots / Pots with loot / Pots to check / Total pots
                 </div>

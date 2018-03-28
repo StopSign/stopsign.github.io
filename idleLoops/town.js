@@ -54,7 +54,7 @@ function Town(difficulty) {
         this.potLoot += 100;
     };
     this.updatePots = function() {
-        this.totalPots = this.explored() * 20 * (this.difficulty + 1);
+        this.totalPots = this.explored() * 10 * (this.difficulty + 1);
         view.updatePots();
     };
 

@@ -8,6 +8,8 @@ function View() {
         this.updateNextActions();
         this.updateCurrentActionsDivs();
         this.updateExplored();
+        this.updateTotalTicks();
+        this.updateAddAmount();
     };
 
     this.update = function() {
@@ -50,7 +52,7 @@ function View() {
             totalDivText +=
                 "<div class='nextActionContainer small'>" +
                     "<div class='bold'>" + action.loops +"</div> x " +
-                    action.name + "" +
+                    "<img src='img/"+camelize(action.name)+".svg' class='smallIcon'>" +
                     "<div style='float:right'>"+
                         "<i onclick='actions.addLoop("+index+")' class='actionIcon fa fa-plus'></i>" +
                         "<i onclick='actions.removeLoop("+index+")' class='actionIcon fa fa-minus'></i>" +
@@ -67,7 +69,7 @@ function View() {
     };
 
     this.updateTotalTicks = function() {
-        document.getElementById("totalTicks").innerHTML = actions.totalNeeded;
+        document.getElementById("totalTicks").innerHTML = actions.completedTicks;
     };
 
     this.updateCurrentActionsDivs = function() {
@@ -82,7 +84,7 @@ function View() {
                 "<div class='curActionContainer small'>" +
                     "<div class='curActionBar' id='action"+index+"Bar'></div>" +
                     "<div id='action"+index+"Loops'>"+ action.loopsLeft+"</div>(" + action.loops + ")" + " x " +
-                    action.name + "" +
+                    "<img src='img/"+camelize(action.name)+".svg' class='smallIcon'>" +
                     "</div>"+
                 "</div>";
         });
@@ -97,7 +99,7 @@ function View() {
         div.style.width = (100 * action.ticks / action.ticksNeeded) + "%";
         if(action.loopsLeft === 0) {
             div.style.width = "100%";
-            div.style.backgroundColor = "#565656";
+            div.style.backgroundColor = "#6d6d6d";
         }
     };
 
@@ -123,6 +125,9 @@ function View() {
         document.getElementById("potLoot").innerHTML = town.potLoot+"";
     };
 
+    this.updateAddAmount = function() {
+        document.getElementById("addAmount").innerHTML = actions.addAmount;
+    }
 }
 
 const curActionsDiv = document.getElementById("curActionsList");

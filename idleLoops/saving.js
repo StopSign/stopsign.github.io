@@ -17,6 +17,7 @@ let curTown = 0;
 let statList = ["Str", "Dex", "Con", "Per", "Int", "Cha", "Spd", "Luck", "Soul"];
 const stats = {};
 let prevState = {};
+let shouldRestart = true;
 
 
 
@@ -27,6 +28,7 @@ function clearSave() {
 
 function loadDefaults() {
     initializeStats();
+    prevState.stats = JSON.parse(JSON.stringify(stats));
 }
 
 function load() {

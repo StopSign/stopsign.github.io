@@ -75,18 +75,43 @@ input, label {
     cursor:pointer;
 }
 
+/*.button {*/
+    /*border:2px white solid;*/
+    /*background-color: #bde0b7;*/
+    /*padding:3px 5px;*/
+    /*cursor:pointer;*/
+    /*border-radius:10px;*/
+    /*min-width:9px;*/
+    /*text-align:center;*/
+    /*vertical-align:center;*/
+/*}*/
+/*.button:hover {*/
+    /*border:2px blue solid;*/
+/*}*/
+
+
 .button {
-    border:2px white solid;
-    background-color: #bde0b7;
-    padding:3px 5px;
-    cursor:pointer;
-    border-radius:10px;
-    min-width:9px;
-    text-align:center;
+    padding: 1px 5px;
+    text-align: center;
     vertical-align:center;
+    min-width:9px;
+    cursor: pointer;
+    outline: none;
+    color: #fff;
+    background-color: #4CAF50;
+    border: none;
+    border-radius: 6px;
+    box-shadow: 0 3px #999;
+    transform: translateY(-2px);
+    margin-bottom:2px;
 }
-.button:hover {
-    border:2px blue solid;
+
+.button:hover {background-color: #3e8e41}
+
+.button:active {
+    background-color: #3e8e41;
+    box-shadow: 0 1px #666;
+    transform: translateY(0px);
 }
 
 .container {
@@ -115,27 +140,28 @@ input, label {
     margin-right:5px;
     float:right;
 }
-
-.thinProgressBarOuter {
-    height:2px;
+.thinProgressBarUpper, .thinProgressBarLower {
     width:90%;
     background-color:white;
     display:block;
-    margin:0 auto 4px auto;
+    margin:0 auto 2px auto;
 }
+.thinProgressBarUpper { height:4px; }
+.thinProgressBarLower { height:3px; }
+
 .statBar {
     height:100%;
     width:60%;
     display:block;
 }
 .statLevelBar, .townExpBar {
-    background-color:yellowgreen;
+    background-color: #9d67cd;
 }
 .statTalentBar {
-    background-color: #cdbf56;
+    background-color: #ffb45b;
 }
 .townBar {
-    background-color: #8293ff;
+    background-color: #95afff;
 }
 
 .townStatContainer {
@@ -143,32 +169,32 @@ input, label {
     height:26px;
     text-align:left;
     padding:0 10px 0;
+    margin-bottom:4px;
 }
 
 .actionContainer {
     cursor:pointer;
-    width:50px;
-    height:40px;
+    width:90px;
+    height:50px;
     vertical-align:top;
 }
 .actionContainer:hover {
     background-color: #bef8ff;
 }
 
-.nextActionContainer {
-    background-color:#f8ffe7;
+.nextActionContainer, .curActionContainer {
     margin-left:3px;
-    width:188px;
     margin-bottom:2px;
     display:block;
+    padding-top:1px;
+    border-bottom:1px solid #b9b9b9;
+    position:relative;
+}
+.nextActionContainer {
+    width:188px;
 }
 .curActionContainer {
-    background-color:#f8ffe7;
-    margin-left:3px;
     width:102px;
-    margin-bottom:2px;
-    display:block;
-    position:relative;
 }
 
 .actionIcon {
@@ -187,4 +213,8 @@ input, label {
     background-color: #ff907d;
     position:absolute;
     opacity:.5;
+}
+
+.townLabel {
+    margin-left:25px;
 }

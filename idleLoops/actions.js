@@ -10,6 +10,7 @@ function Actions() {
     this.tick = function() {
         let curAction = this.current[this.currentPos];
         if(!curAction) { //out of actions
+            shouldRestart = true;
             return;
         }
 
@@ -65,11 +66,8 @@ function Actions() {
             setAdjustedTicks(action);
             remainingTicks += action.loopsLeft * action.adjustedTicks;
         });
-        const prevNeeded = this.totalNeeded;
         this.totalNeeded = this.completedTicks + remainingTicks;
-        if(prevNeeded !== this.totalNeeded) {
-            view.updateTotalTicks();
-        }
+        view.updateTotalTicks();
     };
 
     this.addLoop = function(index) {
@@ -116,7 +114,7 @@ function Actions() {
         let toAdd = {};
         toAdd.name = action;
 
-        toAdd.loops = loops !== undefined ? loops : 1;
+        toAdd.loops = loops !== undefined ? loops : this.addAmount;
 
 
         if(initialOrder !== undefined) {

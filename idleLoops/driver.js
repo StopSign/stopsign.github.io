@@ -9,12 +9,8 @@ function tick() {
     prevState.stats = JSON.parse(JSON.stringify(stats));
     actions.tick();
 
-    if(timer >= timeNeeded) {
-        if(document.getElementById("pauseBeforeRestart").checked) {
-            pauseGame();
-        } else {
-            restart();
-        }
+    if(shouldRestart || timer >= timeNeeded) {
+        prepareRestart();
     }
 
     view.update();
@@ -32,12 +28,21 @@ function recalcInterval(newSpeed) {
 function pauseGame() {
     stop = !stop;
     document.getElementById("pausePlay").innerHTML = stop ? "Play" : "Pause";
-    if(!stop && timer >= timeNeeded) {
+    if(!stop && (shouldRestart || timer >= timeNeeded)) {
+        restart();
+    }
+}
+
+function prepareRestart() {
+    if(document.getElementById("pauseBeforeRestart").checked) {
+        pauseGame();
+    } else {
         restart();
     }
 }
 
 function restart() {
+    shouldRestart = false;
     timer = 0;
     timeNeeded = timeNeededInitial;
     restartStats();
@@ -49,6 +54,7 @@ function restart() {
         view.updateStat(stat);
     });
     view.updateCurrentActionsDivs();
+    view.update();
 }
 
 function addAction(action) {
@@ -58,4 +64,9 @@ function addAction(action) {
 
 function addMana(amount) {
     timeNeeded += amount;
+}
+
+function changeActionAmount(amount) {
+    actions.addAmount = amount;
+    view.updateAddAmount();
 }
