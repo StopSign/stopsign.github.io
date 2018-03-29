@@ -30,7 +30,7 @@ function Town(difficulty) {
         if(explored !== prevExplored) {
             //level up explored
             this.totalPots = this.explored() * 5 * (this.difficulty + 1);
-            this.totalLocks = this.explored() * 2 * (this.difficulty + 1);
+            this.totalLocks = this.explored() * (this.difficulty + 1);
             this.varNames.forEach((varName) => {
                 view.updateRegular(varName);
             });

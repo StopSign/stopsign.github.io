@@ -47,7 +47,7 @@ function Actions() {
                 toAdd = new SmashPots();
             } else if(action.name === "Pick Locks") {
                 toAdd = new PickLocks();
-            } else if(action.name === "Pick Locks") {
+            } else if(action.name === "Sell Gold") {
                 toAdd = new SellGold();
             }
 

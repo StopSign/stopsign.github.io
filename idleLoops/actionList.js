@@ -19,9 +19,9 @@ function Wander() {
 
 function SellGold() {
     this.name = "Sell Gold";
-    this.manaCost = 300;
+    this.manaCost = 200;
     this.expMult = 1;
-    this.tooltip = "1 gold = 50 mana";
+    this.tooltip = "1 gold = 50 mana. Sells all gold";
     this.stats = {
         Cha:.7,
         Int:.2,
@@ -73,7 +73,7 @@ function PickLocks() {
         Luck:.1
     };
     this.finish = function() {
-        towns[curTown].finishRegular(this.varName, 5, function() {
+        towns[curTown].finishRegular(this.varName, 10, function() {
             addGold(5);
             return 5;
         })
