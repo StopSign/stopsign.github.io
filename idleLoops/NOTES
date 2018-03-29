@@ -1,0 +1,13 @@
+To add a new regular action:
+    New class in actionList.js
+    End of town.js, this.createVars("New");
+    in view.js, createTownActions()
+    in actions.js, restart(), add the translation
+    set the total somewhere, actions.totalNew = <formula>;
+    get an svg
+
+Add a new basic action:
+    New class in actionList.js
+    in view.js, createTownActions()
+    in actions.js, restart(), add the translation
+    get an svg

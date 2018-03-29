@@ -45,6 +45,10 @@ function Actions() {
                 toAdd = new Wander();
             } else if(action.name === "Smash Pots") {
                 toAdd = new SmashPots();
+            } else if(action.name === "Pick Locks") {
+                toAdd = new PickLocks();
+            } else if(action.name === "Pick Locks") {
+                toAdd = new SellGold();
             }
 
             toAdd.loops = action.loops;
@@ -133,7 +137,7 @@ function setAdjustedTicks(action) {
             statMult += action.stats[statName] * (1 + getLevel(statName)/100);
         }
     });
-    action.adjustedTicks = Math.ceil(action.ticksNeeded / statMult);
+    action.adjustedTicks = Math.ceil(action.manaCost / statMult);
 }
 
 function addExpFromAction(action) {

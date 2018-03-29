@@ -19,7 +19,8 @@
     <div style="width:100%;height:10px;background:white;text-align:center;position:relative;">
         <div id="timeBar" style="height:100%;width:20%;background-color:#8293ff;display:block;margin:auto;"></div>
     </div>
-    <div id="timer">5</div>
+    <div class='bold'>Mana</div> <div id="timer">5</div>
+    <div class='bold'>Gold</div> <div id="gold">5</div>
     <div id="pausePlay" onclick="pauseGame()" class="button">Pause</div>
     <label for="pauseBeforeRestart">Pause before restart</label>
     <input type="checkbox" checked="checked" id="pauseBeforeRestart">
@@ -163,7 +164,7 @@
                 <i class='actionIcon fa fa-sort-down'></i> Move action down<br>
                 <i class='actionIcon fa fa-times'></i> Remove action<br>
                 The next list becomes the current list every restart.<br>
-                One second = 50 ticks.<br>
+                One second = 50 mana.<br>
                 Minimum 1 tick per action.<br>
                 Restarts automatically upon no actions left.<br>
             </div>
@@ -191,67 +192,45 @@
 
     </div>
 
-    <div id="actionOptions" style="width:100%;text-align:center;margin-top:10px;">
+    <div id="actionOptions" style="width:100%;text-align:center;margin-top:10px;display:none">
         <div class="showthat">
-            <div class="large bold">Action Options</div>
+            <div class="large bold">Spells</div>
             <div class="showthis">
-                Mana cost is based on ratio of stat %s.<br>
-                Gained exp is proportional too.<br>
-                Exp is gained every tick.<br>
-                Nothing happens when there's no action.<br>
             </div>
         </div><br>
         <div style="width:100%;padding-top:5px;">
-            <div class="actionContainer showthat" onclick="addAction('Wander')">
-                Wander<br>
-                <img src='img/wander.svg' class='superLargeIcon'><br>
-                <div class="showthis">
-                    Explore the town, look for hidden areas and treasures.<br>
-                    <div class="bold">Per</div> 20%<br>
-                    <div class="bold">Con</div> 20%<br>
-                    <div class="bold">Cha</div> 20%<br>
-                    <div class="bold">Spd</div> 30%<br>
-                    <div class="bold">Luck</div> 10%<br>
-                    <div class="bold">Mana Cost</div> 250<br>
-                </div>
-            </div>
-            <div class="actionContainer showthat" onclick="addAction('Smash Pots')">
-                Smash Pots<br>
-                <img src='img/smashPots.svg' class='superLargeIcon'><br>
-                <div class="showthis">
-                    Smashes unchecked pots first, then pots you know have the loot.<br>
-                    <div class="bold">Str</div> 20%<br>
-                    <div class="bold">Per</div> 20%<br>
-                    <div class="bold">Spd</div> 60%<br>
-                    <div class="bold">Mana Cost</div> 50<br>
-                </div>
-            </div>
         </div>
     </div>
 
 </div>
 
 <div id="townColumn" style="width:500px;vertical-align:top;">
-    <div id="townWindow" style="width:100%;text-align:center;height:400px;">
-        <div class="large bold">Town Menu</div><br>
-        <div style="width:100%;height:400px;">
-            <div class="townStatContainer showthat">
-                <div class="bold townLabel">Explored </div> <div id="explored">5</div>%
-                <div class="thinProgressBarUpper"><div id="exploredExpBar" class="statBar townExpBar"></div></div>
-                <div class="thinProgressBarLower"><div id="exploredBar" class="statBar townBar"></div></div>
-
-                <div class="showthis">
-                    You can find more stuff with higher %.<br>
-                    <div class="bold">Progress</div> <div id="exploredLevelProgress"></div>
-                </div>
-            </div>
-            <div class="townStatContainer showthat">
-                <div class="bold townLabel">Pots Smashed </div> <div id="potLoot">0</div> / <div id="potsWithLoot">0</div> / <div id="checkedPots">0</div> / <div id="totalPots">0</div>
-                <div class="showthis">
-                    Loot from pots / Pots with loot / Pots to check / Total pots
-                </div>
+    <div id="townWindow" style="width:100%;text-align:center;">
+        <div class="showthat">
+            <div class="large bold">Town</div>
+            <div class="showthis">
+                Mana cost is based on ratio of stat %s.<br>
+                Gained exp is proportional too.<br>
+                Exp is gained every tick.<br>
+                Actions will target unchecked objects before known lootable objects.<br>
             </div>
         </div>
+    </div><br>
+    <div style="width:100%;text-align:center;">
+        <div class="townStatContainer showthat">
+            <div class="bold townLabel">Explored </div> <div id="explored">5</div>%
+            <div class="thinProgressBarUpper"><div id="exploredExpBar" class="statBar townExpBar"></div></div>
+            <div class="thinProgressBarLower"><div id="exploredBar" class="statBar townBar"></div></div>
+
+            <div class="showthis">
+                You can find more stuff with higher %.<br>
+                <div class="bold">Progress</div> <div id="exploredLevelProgress"></div>
+            </div>
+        </div>
+        <div id="generatedTownInfo" style="display:block;text-align:left;"></div>
+
+        <div class="large bold" style="margin-bottom:5px;margin-top:5px;">Action Options</div><br>
+        <div id="generatedActionOptions" style="text-align:center"></div>
     </div>
 </div>
 

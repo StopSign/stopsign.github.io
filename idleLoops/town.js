@@ -1,6 +1,7 @@
 function Town(difficulty) {
     this.exploredExp = 0;
     this.difficulty = difficulty;
+    this.varNames = [];
 
     this.explored = function() {
         return Math.floor((Math.sqrt(8*this.exploredExp/(this.difficulty+1)/100+1)-1)/2);
@@ -10,9 +11,11 @@ function Town(difficulty) {
     };
 
     this.restart = function() {
-        this.potsWithLoot = this.totalLootPots;
-        this.potLoot = 0;
-        view.updatePots();
+        this.varNames.forEach((varName) => {
+            this["goodTemp"+varName] = this["good"+varName];
+            this["lootFrom"+varName] = 0;
+            view.updateRegular(varName);
+        });
     };
 
     this.wander = function() {
@@ -25,44 +28,59 @@ function Town(difficulty) {
         }
 
         if(explored !== prevExplored) {
-            //level up
-            this.updatePots();
+            //level up explored
+            this.totalPots = this.explored() * 5 * (this.difficulty + 1);
+            this.totalLocks = this.explored() * 2 * (this.difficulty + 1);
+            this.varNames.forEach((varName) => {
+                view.updateRegular(varName);
+            });
         }
         view.updateExplored();
     };
-
-    this.totalPots = 0;
-    this.checkedPots = 0;
-    this.potsWithLoot = 0;
-    this.totalLootPots = 0;
-    this.potLoot = 0;
-    this.smashPots = function() {
-        if(this.totalPots - this.checkedPots > 0) {
-            this.checkedPots++;
-            if(this.checkedPots % 10 === 0) {
-                this.potsWithLoot++;
-                this.totalLootPots++;
-            }
-        } else if(this.potsWithLoot > 0) {
-            this.potsWithLoot--;
-            this.getManaFromPots();
-        }
-        view.updatePots();
-    };
-    this.getManaFromPots = function() {
-        addMana(100);
-        this.potLoot += 100;
-    };
-    this.updatePots = function() {
-        this.totalPots = this.explored() * 10 * (this.difficulty + 1);
-        view.updatePots();
-    };
-
     this.getPrcToNext = function() {
         let exploredLevel = this.explored();
         let expOfCurLevel = this.expFromLevel(exploredLevel);
         let curLevelProgress = this.exploredExp - expOfCurLevel;
         let nextLevelNeeds = this.expFromLevel(exploredLevel+1) - expOfCurLevel;
         return curLevelProgress / nextLevelNeeds * 100;
-    }
+    };
+
+    this.finishRegular = function(varName, rewardRatio, rewardFunc) {
+        if(this["total"+varName] - this["checked"+varName] > 0) {
+            this["checked"+varName]++;
+            if(this["checked"+varName] % rewardRatio === 0) {
+                this["lootFrom"+varName] += rewardFunc();
+                this["good"+varName]++;
+            }
+        } else if(this["goodTemp"+varName] > 0) {
+            this["goodTemp"+varName]--;
+            this["lootFrom"+varName] += rewardFunc();
+        }
+        view.updateRegular(varName);
+    };
+
+    this.createVars = function(varName) {
+        if(this["checked"+varName] === undefined) {
+            this["checked"+varName] = 0;
+        }
+        if(this["goodTemp"+varName] === undefined) {
+            this["goodTemp"+varName] = 0;
+        }
+        if(this["good"+varName] === undefined) {
+            this["good"+varName] = 0;
+        }
+        if(this["lootFrom"+varName] === undefined) {
+            this["lootFrom"+varName] = 0;
+        }
+        if(this["total"+varName] === undefined) {
+            this["total"+varName] = 0;
+        }
+        if(this.varNames.indexOf(varName) === -1) {
+            this.varNames.push(varName);
+        }
+    };
+
+    this.createVars("Pots");
+    this.createVars("Locks");
+
 }

@@ -18,6 +18,7 @@ let statList = ["Str", "Dex", "Con", "Per", "Int", "Cha", "Spd", "Luck", "Soul"]
 const stats = {};
 let prevState = {};
 let shouldRestart = true;
+let gold = 0;
 
 
 

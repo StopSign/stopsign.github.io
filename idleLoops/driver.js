@@ -45,6 +45,7 @@ function restart() {
     shouldRestart = false;
     timer = 0;
     timeNeeded = timeNeededInitial;
+    addGold(-gold);
     restartStats();
     actions.restart();
     towns.forEach((town) => {
@@ -53,6 +54,7 @@ function restart() {
     statList.forEach((stat) => {
         view.updateStat(stat);
     });
+
     view.updateCurrentActionsDivs();
     view.update();
 }
@@ -64,6 +66,11 @@ function addAction(action) {
 
 function addMana(amount) {
     timeNeeded += amount;
+}
+
+function addGold(amount) {
+    gold += amount;
+    view.updateGold();
 }
 
 function changeActionAmount(amount) {
