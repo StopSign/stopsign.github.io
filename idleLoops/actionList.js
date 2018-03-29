@@ -74,8 +74,8 @@ function PickLocks() {
     };
     this.finish = function() {
         towns[curTown].finishRegular(this.varName, 10, function() {
-            addGold(5);
-            return 5;
+            addGold(10);
+            return 10;
         })
     };
 
