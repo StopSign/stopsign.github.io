@@ -148,6 +148,17 @@ function sortArrayObjectsByValue(arr, valueName) {
     }
 }
 
+function addClassToDiv(div, className) {
+    const arr = div.className.split(" ");
+    if (arr.indexOf(className) === -1) {
+        div.className += " " + className;
+    }
+}
+
+function removeClassFromDiv(div, className) {
+    div.classList.remove(className);
+}
+
 function encode(theSave) {
     return Base64.encode(lzw_encode(theSave));
 }

@@ -15,8 +15,8 @@ function tick() {
 
     view.update();
 
-    if(timer % 100 === 0) {
-        // save();
+    if(timer % 300 === 0) {
+        save();
     }
 }
 
@@ -57,10 +57,17 @@ function restart() {
 
     view.updateCurrentActionsDivs();
     view.update();
+    save();
 }
 
-function addAction(action) {
-    actions.addAction(action);
+function addAction(name) {
+    view.totalActionList.forEach((action) => {
+        if(action.name === name) {
+            if(action.visible() && action.unlocked()) {
+                actions.addAction(name);
+            }
+        }
+    });
     view.updateNextActions();
 }
 

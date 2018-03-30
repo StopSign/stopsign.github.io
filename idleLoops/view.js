@@ -1,4 +1,5 @@
 function View() {
+    this.totalActionList = [];
 
     this.initalize = function() {
         statList.forEach((stat) => {
@@ -121,6 +122,23 @@ function View() {
             document.getElementById("progress"+varName).innerHTML = intToString(levelPrc, 2);
             document.getElementById("bar"+varName).style.width = level + "%";
         });
+        this.updateLockedHidden();
+    };
+
+    this.updateLockedHidden = function() {
+        this.totalActionList.forEach((action) => {
+            const theDiv = document.getElementById("container"+action.varName);
+            if(!action.unlocked()) {
+                addClassToDiv(theDiv, "locked");
+            } else {
+                removeClassFromDiv(theDiv, "locked");
+            }
+            if(!action.visible()) {
+                addClassToDiv(theDiv, "hidden");
+            } else {
+                removeClassFromDiv(theDiv, "hidden");
+            }
+        });
     };
 
     this.updateRegular = function(varName) {
@@ -143,7 +161,6 @@ function View() {
         let tempObj = new Wander();
         this.createTownAction(tempObj);
         this.createActionProgress(tempObj);
-
         tempObj = new SmashPots();
         this.createTownAction(tempObj);
         this.createTownInfo(tempObj);
@@ -166,7 +183,7 @@ function View() {
 
             "<div class='showthis'>"+
                 "You can find more stuff with higher %.<br>"+
-                "<div class='bold'>Progress</div> <div id='progress"+action.varName+"'>%</div>"+
+                "<div class='bold'>Progress</div> <div id='progress"+action.varName+"'></div>%"+
             "</div>"+
         "</div>";
         let progressDiv = document.createElement("div");
@@ -184,7 +201,7 @@ function View() {
         });
 
         const totalDivText =
-            "<div class='actionContainer showthat' onclick='addAction(\""+action.name+"\")'>" +
+            "<div id='container"+action.varName+"' class='actionContainer showthat' onclick='addAction(\""+action.name+"\")'>" +
                 action.name + "<br>" +
                 "<img src='img/"+camelize(action.name)+".svg' class='superLargeIcon'><br>" +
                 "<div class='showthis'>" +
@@ -198,6 +215,7 @@ function View() {
         let actionsDiv = document.createElement("div");
         actionsDiv.innerHTML = totalDivText;
         actionOptionsDiv.appendChild(actionsDiv);
+        this.totalActionList.push(action);
     };
 
     this.createTownInfo = function(action) {

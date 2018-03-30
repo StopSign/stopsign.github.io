@@ -43,20 +43,54 @@ function load() {
         return;
     }
     let toLoad = JSON.parse(window.localStorage.idleLoops1);
-    // for(let property in toLoad.stats) {
-    //     if (toLoad.stats.hasOwnProperty(property) && typeof toLoad.stats[property] !== 'object') {
-    //         stats[property] = toLoad.stats[property];
-    //     }
-    // }
+    for(let property in toLoad.stats) {
+        if (toLoad.stats.hasOwnProperty(property)) {
+            stats[property].talent = toLoad.stats[property].talent;
+        }
+    }
+    towns.push(new Town(0));
+    const town = towns[curTown];
 
+    town.expWander = toLoad.expWander;
+    town.expMet = toLoad.expMet;
 
     recalcInterval(50);
+    pauseGame();
     view.initalize();
+    view.totalActionList.forEach((action) => {
+        if(town.varNames.indexOf(action.varName) !== -1) {
+            const varName = action.varName;
+            town["total" + varName] = toLoad["total" + varName];
+            town["checked" + varName] = toLoad["checked" + varName];
+            town["good" + varName] = toLoad["good" + varName];
+            town["goodTemp" + varName] = toLoad["good" + varName];
+        }
+    });
+    view.totalActionList.forEach((action) => {
+        if(town.varNames.indexOf(action.varName) !== -1) {
+            view.updateRegular(action.varName);
+        }
+    });
+    view.update();
 }
 
 function save() {
     let toSave = {};
+    const town = towns[curTown];
     toSave.stats = stats;
+    toSave.expWander = town.expWander;
+    toSave.expMet = town.expMet;
+
+    view.totalActionList.forEach((action) => {
+        if(town.varNames.indexOf(action.varName) !== -1) {
+            const varName = action.varName;
+            toSave["total"+varName] = town["total"+varName];
+            toSave["checked"+varName] = town["checked"+varName];
+            toSave["good"+varName] = town["good"+varName];
+            toSave["good"+varName] = town["goodTemp"+varName];
+        }
+    });
+
     window.localStorage.idleLoops1 = JSON.stringify(toSave);
 }
 

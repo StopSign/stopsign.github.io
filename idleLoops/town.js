@@ -3,9 +3,6 @@ function Town(difficulty) {
     this.varNames = [];
     this.progressVars = [];
 
-    this.explored = function() {
-        return Math.floor((Math.sqrt(8*this.expWander/(this.difficulty+1)/100+1)-1)/2);
-    };
     this.expFromLevel = function(level) {
         return level * (level + 1) * 50 / (this.difficulty + 1);
     };
@@ -34,6 +31,11 @@ function Town(difficulty) {
         if(level !== prevLevel) {
             //level up
             levelUpReward();
+            view.totalActionList.forEach((action) => {
+                if(towns[curTown].varNames.indexOf(action.varName) !== -1) {
+                    view.updateRegular(action.varName);
+                }
+            });
         }
         view.updateProgressActions();
     };
@@ -92,8 +94,7 @@ function Town(difficulty) {
 
     this.createVars("Pots");
     this.createVars("Locks");
-    this.createProgressVars("Met");
     this.createProgressVars("Wander");
-
+    this.createProgressVars("Met");
 
 }

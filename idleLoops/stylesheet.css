@@ -177,6 +177,7 @@ input, label {
     width:90px;
     height:50px;
     vertical-align:top;
+    margin:0 2px;
 }
 .actionContainer:hover {
     background-color: #bef8ff;
@@ -217,4 +218,17 @@ input, label {
 
 .townLabel {
     margin-left:25px;
+}
+
+.hidden {
+    display:none;
+}
+
+.locked {
+    background-color: #bfbfbf;
+    cursor:default;
+    border-radius:10px;
+}
+.locked:hover {
+    background-color: #a8a8a8;
 }

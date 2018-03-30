@@ -41,15 +41,7 @@ function Actions() {
             if(action.loops === 0) { //don't add blank ones
                 return;
             }
-            if(action.name === "Wander") {
-                toAdd = new Wander();
-            } else if(action.name === "Smash Pots") {
-                toAdd = new SmashPots();
-            } else if(action.name === "Pick Locks") {
-                toAdd = new PickLocks();
-            } else if(action.name === "Sell Gold") {
-                toAdd = new SellGold();
-            }
+            toAdd = translateClassNames(action.name);
 
             toAdd.loops = action.loops;
             toAdd.loopsLeft = action.loops;
