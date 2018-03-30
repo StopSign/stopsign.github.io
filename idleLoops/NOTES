@@ -11,3 +11,5 @@ Add a new basic action:
     in view.js, createTownActions()
     in actions.js, restart(), add the translation
     get an svg
+
+Add a new progress bar action:

@@ -8,10 +8,10 @@ function View() {
         this.updateGold();
         this.updateNextActions();
         this.updateCurrentActionsDivs();
-        this.updateExplored();
         this.updateTotalTicks();
         this.updateAddAmount();
         this.createTownActions();
+        this.updateProgressActions();
     };
 
     this.update = function() {
@@ -111,23 +111,25 @@ function View() {
         document.getElementById("action"+index+"Loops").innerHTML = actions.current[index].loopsLeft;
     };
 
-    this.updateExplored = function() {
+    this.updateProgressActions = function() {
         const town = towns[curTown];
-        const explored = town.explored();
-        const levelPrc = town.getPrcToNext() + "%";
-        document.getElementById("explored").innerHTML = explored;
-        document.getElementById("exploredExpBar").style.width = levelPrc;
-        document.getElementById("exploredLevelProgress").innerHTML = intToString(levelPrc, 2);
-        document.getElementById("exploredBar").style.width = explored + "%";
+        town.progressVars.forEach((varName) => {
+            let level = town.getLevel(varName);
+            let levelPrc = town.getPrcToNext(varName) + "%";
+            document.getElementById("prc"+varName).innerHTML = level;
+            document.getElementById("expBar"+varName).style.width = levelPrc;
+            document.getElementById("progress"+varName).innerHTML = intToString(levelPrc, 2);
+            document.getElementById("bar"+varName).style.width = level + "%";
+        });
     };
 
     this.updateRegular = function(varName) {
         const town = towns[curTown];
-        document.getElementById("total"+varName).innerHTML = town["total"+varName];
+        document.getElementById("total"+varName).innerHTML = town["total"+varName]+"";
         document.getElementById("checked"+varName).innerHTML = town["total"+varName] - town["checked"+varName]+"";
         document.getElementById("goodTemp"+varName).innerHTML = town["goodTemp"+varName]+"";
         document.getElementById("good"+varName).innerHTML = town["good"+varName]+"";
-        document.getElementById("lootFrom"+varName).innerHTML = town["lootFrom"+varName]+"";
+        // document.getElementById("lootFrom"+varName).innerHTML = town["lootFrom"+varName]+"";
     };
 
     this.updateAddAmount = function() {
@@ -138,14 +140,40 @@ function View() {
         while (actionOptionsDiv.firstChild) {
             actionOptionsDiv.removeChild(actionOptionsDiv.firstChild);
         }
-        this.createTownAction(new Wander());
-        let tempObj = new SmashPots();
+        let tempObj = new Wander();
+        this.createTownAction(tempObj);
+        this.createActionProgress(tempObj);
+
+        tempObj = new SmashPots();
         this.createTownAction(tempObj);
         this.createTownInfo(tempObj);
         tempObj = new PickLocks();
         this.createTownAction(tempObj);
         this.createTownInfo(tempObj);
         this.createTownAction(new SellGold());
+
+        tempObj = new MeetPeople();
+        this.createTownAction(tempObj);
+        this.createActionProgress(tempObj);
+    };
+
+    this.createActionProgress = function(action) {
+        const totalDivText =
+        "<div class='townStatContainer showthat'>"+
+            "<div class='bold townLabel'>"+action.infoName+" </div> <div id='prc"+action.varName+"'>5</div>%"+
+            "<div class='thinProgressBarUpper'><div id='expBar"+action.varName+"' class='statBar townExpBar'></div></div>"+
+            "<div class='thinProgressBarLower'><div id='bar"+action.varName+"' class='statBar townBar'></div></div>"+
+
+            "<div class='showthis'>"+
+                "You can find more stuff with higher %.<br>"+
+                "<div class='bold'>Progress</div> <div id='progress"+action.varName+"'>%</div>"+
+            "</div>"+
+        "</div>";
+        let progressDiv = document.createElement("div");
+        progressDiv.style.display = "block";
+        progressDiv.style.marginTop = "10px";
+        progressDiv.innerHTML = totalDivText;
+        townInfoDiv.appendChild(progressDiv);
     };
 
     this.createTownAction = function(action) {
@@ -155,8 +183,7 @@ function View() {
             actionStats += "<div class='bold'>" + statName + "</div> " + (action.stats[statName]*100)+"%<br>";
         });
 
-        let totalDivText = "";
-        totalDivText +=
+        const totalDivText =
             "<div class='actionContainer showthat' onclick='addAction(\""+action.name+"\")'>" +
                 action.name + "<br>" +
                 "<img src='img/"+camelize(action.name)+".svg' class='superLargeIcon'><br>" +
@@ -176,7 +203,10 @@ function View() {
     this.createTownInfo = function(action) {
         let totalInfoText =
             "<div class='townStatContainer showthat'>" +
-                "<div class='bold townLabel'>"+action.infoName+"</div> <div id='lootFrom"+action.varName+"'>0</div> / <div id='goodTemp"+action.varName+"'>0</div> / <div id='good"+action.varName+"'>0</div> / <div id='checked"+action.varName+"'>0</div> / <div id='total"+action.varName+"'>0</div>" +
+                "<div class='bold townLabel'>"+action.infoName+"</div> " +
+            "<div id='goodTemp"+action.varName+"'>0</div> <i class='fa fa-arrow-left'></i> " +
+            "<div id='good"+action.varName+"'>0</div> <i class='fa fa-arrow-left'></i> " +
+            "<div id='checked"+action.varName+"'>0</div>" +
                 "<div class='showthis'>" +
                     action.infoText +
                 "</div>" +

@@ -1,13 +1,17 @@
 function Town(difficulty) {
-    this.exploredExp = 0;
     this.difficulty = difficulty;
     this.varNames = [];
+    this.progressVars = [];
 
     this.explored = function() {
-        return Math.floor((Math.sqrt(8*this.exploredExp/(this.difficulty+1)/100+1)-1)/2);
+        return Math.floor((Math.sqrt(8*this.expWander/(this.difficulty+1)/100+1)-1)/2);
     };
     this.expFromLevel = function(level) {
         return level * (level + 1) * 50 / (this.difficulty + 1);
+    };
+
+    this.getLevel = function(varName) {
+        return Math.floor((Math.sqrt(8*this["exp"+varName]/(this.difficulty+1)/100+1)-1)/2);
     };
 
     this.restart = function() {
@@ -18,30 +22,27 @@ function Town(difficulty) {
         });
     };
 
-    this.wander = function() {
-        const prevExplored = this.explored();
+    this.finishProgress = function(varName, levelUpReward) {
+        const prevLevel = this.getLevel(varName);
         const expGain = 100;
-        this.exploredExp += expGain;
-        let explored = this.explored();
-        if(explored > 100) { //cap explored %
-            this.exploredExp -= expGain;
+        this["exp"+varName] += expGain;
+        let level = this.getLevel(varName);
+        if(level > 100) { //cap explored %
+            this["exp"+varName] -= expGain;
         }
 
-        if(explored !== prevExplored) {
-            //level up explored
-            this.totalPots = this.explored() * 5 * (this.difficulty + 1);
-            this.totalLocks = this.explored() * (this.difficulty + 1);
-            this.varNames.forEach((varName) => {
-                view.updateRegular(varName);
-            });
+        if(level !== prevLevel) {
+            //level up
+            levelUpReward();
         }
-        view.updateExplored();
+        view.updateProgressActions();
     };
-    this.getPrcToNext = function() {
-        let exploredLevel = this.explored();
-        let expOfCurLevel = this.expFromLevel(exploredLevel);
-        let curLevelProgress = this.exploredExp - expOfCurLevel;
-        let nextLevelNeeds = this.expFromLevel(exploredLevel+1) - expOfCurLevel;
+
+    this.getPrcToNext = function(varName) {
+        let level = this.getLevel(varName);
+        let expOfCurLevel = this.expFromLevel(level);
+        let curLevelProgress = this["exp"+varName] - expOfCurLevel;
+        let nextLevelNeeds = this.expFromLevel(level+1) - expOfCurLevel;
         return curLevelProgress / nextLevelNeeds * 100;
     };
 
@@ -80,7 +81,19 @@ function Town(difficulty) {
         }
     };
 
+    this.createProgressVars = function(varName) {
+        if(this["exp"+varName] === undefined) {
+            this["exp"+varName] = 0;
+        }
+        if(this.progressVars.indexOf(varName) === -1) {
+            this.progressVars.push(varName);
+        }
+    };
+
     this.createVars("Pots");
     this.createVars("Locks");
+    this.createProgressVars("Met");
+    this.createProgressVars("Wander");
+
 
 }
