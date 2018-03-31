@@ -49,7 +49,7 @@ function Wander() {
 
 function MeetPeople() {
     this.name = "Meet People";
-    this.manaCost = 1000;
+    this.manaCost = 800;
     this.expMult = 1;
     this.tooltip = "They won't let you get away with a simple chat.<br>Unlocked at 20% Explored";
 

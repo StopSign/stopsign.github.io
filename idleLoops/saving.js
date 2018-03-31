@@ -87,7 +87,7 @@ function save() {
             toSave["total"+varName] = town["total"+varName];
             toSave["checked"+varName] = town["checked"+varName];
             toSave["good"+varName] = town["good"+varName];
-            toSave["good"+varName] = town["goodTemp"+varName];
+            toSave["goodTemp"+varName] = town["good"+varName];
         }
     });
 
