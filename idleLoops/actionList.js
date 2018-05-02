@@ -51,7 +51,7 @@ function MeetPeople() {
     this.name = "Meet People";
     this.manaCost = 800;
     this.expMult = 1;
-    this.tooltip = "They won't let you get away with a simple chat.<br>Unlocked at 20% Explored";
+    this.tooltip = "They won't let you get away with a simple chat.<br>Unlocked at 22% Explored";
 
     this.infoName = "People Met";
     this.varName = "Met";
@@ -64,7 +64,7 @@ function MeetPeople() {
         return true;
     };
     this.unlocked = function() {
-        return towns[curTown].getLevel("Wander") >= 20;
+        return towns[curTown].getLevel("Wander") >= 22;
     };
     this.finish = function() {
         towns[curTown].finishProgress(this.varName, function() {
@@ -79,7 +79,7 @@ function SellGold() {
     this.name = "Sell Gold";
     this.manaCost = 200;
     this.expMult = 1;
-    this.tooltip = "1 gold = 50 mana. Sells all gold<br>Unlocked at 20% Explored";
+    this.tooltip = "1 gold = 50 mana. Sells all gold<br>Unlocked at 10% Explored";
     this.varName = "Gold";
     this.stats = {
         Cha:.7,
@@ -90,7 +90,7 @@ function SellGold() {
         return true;
     };
     this.unlocked = function() {
-        return towns[curTown].getLevel("Wander") >= 20;
+        return towns[curTown].getLevel("Wander") >= 10;
     };
     this.finish = function() {
         addMana(gold * 50);
@@ -135,7 +135,7 @@ function PickLocks() {
     this.expMult = 1;
     this.varName = "Locks";
 
-    this.tooltip = "Don't worry; they won't remember.<br>Houses with loot in them have 10 gold.<br>Unlocked at 20% Explored";
+    this.tooltip = "Don't worry; they won't remember.<br>Houses with loot in them have 10 gold.<br>Unlocked at 30% Explored";
     this.infoName = "Locks Picked";
     this.infoText = "Houses with loot left <i class='fa fa-arrow-left'></i> Houses with loot total <i class='fa fa-arrow-left'></i> Houses to check for loot<br><div class='bold'>Total Found</div> <div id='totalLocks'></div>";
     this.stats = {
@@ -148,7 +148,7 @@ function PickLocks() {
         return true;
     };
     this.unlocked = function() {
-        return towns[curTown].getLevel("Wander") >= 20;
+        return towns[curTown].getLevel("Wander") >= 30;
     };
     this.finish = function() {
         towns[curTown].finishRegular(this.varName, 10, function() {
