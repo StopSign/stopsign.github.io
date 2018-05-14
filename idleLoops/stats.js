@@ -42,6 +42,7 @@ function getPrcToNextTalent(stat) {
 }
 
 function addExp(name, amount) {
+    amount *= (1+getTalent(name)/100);
     stats[name].exp += amount;
     stats[name].talent += amount / 100;
 }

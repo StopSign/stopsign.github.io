@@ -101,7 +101,7 @@ function View() {
     this.updateCurrentActionBar = function(index) {
         const action = actions.current[index];
         const div = document.getElementById("action"+index+"Bar");
-        div.style.width = (100 * action.ticks / action.manaCost) + "%";
+        div.style.width = (100 * action.ticks / action.adjustedTicks) + "%";
         if(action.loopsLeft === 0) {
             div.style.width = "100%";
             div.style.backgroundColor = "#6d6d6d";
