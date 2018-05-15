@@ -94,6 +94,7 @@ function Town(difficulty) {
 
     this.createVars("Pots");
     this.createVars("Locks");
+    this.createVars("SQuests");
     this.createProgressVars("Wander");
     this.createProgressVars("Met");
 

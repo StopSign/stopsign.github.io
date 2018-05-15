@@ -3,13 +3,12 @@ To add a new regular action:
     End of town.js, this.createVars("New");
     in view.js, createTownActions()
     in actionList.js, translateClassNames(), add the translation
-    set the total somewhere, actions.totalNew = <formula>;
+    in actionList.js, in the parent progress class, finish(), towns[curTown].total<var>
     get an svg
 
 Add a new basic action:
     New class in actionList.js
-    in view.js, createTotalNames()
-    End of town.js, this.createVars("New");
+    in view.js, createTownActions()
     in actionList.js, translateClassNames(), add the translation
     get an svg
 

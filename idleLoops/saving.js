@@ -60,10 +60,14 @@ function load() {
     view.totalActionList.forEach((action) => {
         if(town.varNames.indexOf(action.varName) !== -1) {
             const varName = action.varName;
-            town["total" + varName] = toLoad["total" + varName];
-            town["checked" + varName] = toLoad["checked" + varName];
-            town["good" + varName] = toLoad["good" + varName];
-            town["goodTemp" + varName] = toLoad["good" + varName];
+            if(toLoad["total" + varName])
+                town["total" + varName] = toLoad["total" + varName];
+            if(toLoad["checked" + varName])
+                town["checked" + varName] = toLoad["checked" + varName];
+            if(toLoad["good" + varName])
+                town["good" + varName] = toLoad["good" + varName];
+            if(toLoad["good" + varName])
+                town["goodTemp" + varName] = toLoad["good" + varName];
         }
     });
     view.totalActionList.forEach((action) => {

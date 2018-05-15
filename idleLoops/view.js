@@ -167,11 +167,20 @@ function View() {
         tempObj = new PickLocks();
         this.createTownAction(tempObj);
         this.createTownInfo(tempObj);
+
         this.createTownAction(new SellGold());
 
         tempObj = new MeetPeople();
         this.createTownAction(tempObj);
         this.createActionProgress(tempObj);
+
+        this.createTownAction(new TrainStr());
+        this.createTownAction(new TrainDex());
+        this.createTownAction(new TrainSpd());
+
+        tempObj = new ShortQuest();
+        this.createTownAction(tempObj);
+        this.createTownInfo(tempObj);
     };
 
     this.createActionProgress = function(action) {
