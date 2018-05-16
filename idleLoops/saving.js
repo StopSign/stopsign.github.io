@@ -21,6 +21,9 @@ let shouldRestart = true;
 let gold = 0;
 
 
+function closeTutorial() {
+    document.getElementById("tutorial").style.display="none";
+}
 
 function clearSave() {
     window.localStorage.idleLoops1 = "";
@@ -42,6 +45,7 @@ function load() {
         view.initalize();
         return;
     }
+    closeTutorial();
     let toLoad = JSON.parse(window.localStorage.idleLoops1);
     for(let property in toLoad.stats) {
         if (toLoad.stats.hasOwnProperty(property)) {
