@@ -424,12 +424,14 @@ function View() {
             document.getElementById('spaceCanvas').style.display = "inline-block";
             document.getElementById('spaceContainer').style.display = "inline-block";
             document.getElementById('spaceTransition').style.display = "inline-block";
+            document.getElementById('shipSpawnSlidersContainer').style.display = "inline-block";
         } else {
             document.getElementById('spaceDockContainer').style.display = "none";
             document.getElementById('hangarContainer').style.display = "none";
             document.getElementById('spaceCanvas').style.display = "none";
             document.getElementById('spaceContainer').style.display = "none";
             document.getElementById('spaceTransition').style.display = "none";
+            document.getElementById('shipSpawnSlidersContainer').style.display = "none";
         }
     };
 
