@@ -1,6 +1,6 @@
 function Hangar(num) {
     this.num = num;
-    this.sendRate = 5;
+    this.sendRate = 1;
     this.timeRemaining = this.totalTime = 40;
     this.y = 350;
 

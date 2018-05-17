@@ -308,8 +308,8 @@
 
     <div id="robotsContainer" class="container" style="left:380px;top:515px;">
         <div class="title">Robots</div>
-        <div id="unlockRobots" class="button" onclick="game.robots.unlockRobots()">Special deal! Buy first robot for $3000</div>
-        <div id="failRobots" class="button" onclick="game.robots.failedRobots()">You idiot! Buy robot for $1m</div>
+        <div id="unlockRobots" class="button" onclick="game.robots.unlockRobots()">Special deal! Buy first robot for $3000</div><br>
+        <!--<div id="failRobots" class="button" onclick="game.robots.failedRobots()">Buy robot for $1m</div>-->
         <div id="unlockedRobots">
             <div>Free: <div id="robotsFree"></div>, Total: <div id="robots"></div>, Max: <div id="robotMax"></div></div><br>
             <div>Ore: <div id="ore"></div></div><br>
@@ -374,7 +374,6 @@
         Battery: <div id="spaceBattery"></div>
 
         <div class="showthis">
-
             <label for="buyBattleshipAmount">Set how much you want to buy with the input.</label><br>
         </div>
     </div>
@@ -382,6 +381,14 @@
     <div id="hangarContainer" class="container showthat" style="left:1460px;top:260px;">
         <div class="title">Hangar 1</div>
         Sending <div id="hangar0Sending"></div>
+        <div class="showthis">
+            Takes 5% of your current food. The more food a ship takes the longer it lasts<br>
+            When a ship is out of food it comes back to base.<br>
+            Adjust where ships spawn - they'll target the nearest planet.<br>
+            Ships destroy atmosphere, destroy health, and build buidings before moving on.<br>
+            The buildings add dirt directly to your space station.<br>
+            WARNING - there is no saving for battleships in flight or the state of planets. You can refresh for a new set of planets for now. Working on it ...
+        </div>
     </div>
 
     <div id="shipSpawnSlidersContainer" style="left:1685px;top:220px;position:absolute;">

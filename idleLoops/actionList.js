@@ -230,7 +230,7 @@ function PickLocks() {
 
 function ShortQuest() {
     this.name = "Short Quest";
-    this.manaCost = 500;
+    this.manaCost = 600;
     this.expMult = 1;
     this.varName = "SQuests";
 
@@ -257,5 +257,4 @@ function ShortQuest() {
             return 10;
         })
     };
-
 }
