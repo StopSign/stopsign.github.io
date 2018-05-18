@@ -12,7 +12,7 @@ function translateClassNames(name) {
         return new MeetPeople();
     } else if(name === "Train Strength") {
         return new TrainStr();
-    } else if(name === "Train Dext") {
+    } else if(name === "Train Dex") {
         return new TrainDex();
     } else if(name === "Train Speed") {
         return new TrainSpd();
