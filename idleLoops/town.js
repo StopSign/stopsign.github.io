@@ -21,12 +21,8 @@ function Town(difficulty) {
 
     this.finishProgress = function(varName, levelUpReward) {
         const prevLevel = this.getLevel(varName);
-        const expGain = 100;
-        this["exp"+varName] += expGain;
+        this["exp"+varName] += this.getLevel(varName) >= 100 ? 0 : 100;
         let level = this.getLevel(varName);
-        if(level > 100) { //cap explored %
-            this["exp"+varName] -= expGain;
-        }
 
         if(level !== prevLevel) {
             //level up

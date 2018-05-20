@@ -1,6 +1,7 @@
 function Actions() {
     this.current = [];
     this.next = [];
+    this.curNext = [];
     this.addAmount = 1;
 
     this.totalNeeded = 0;
@@ -32,23 +33,31 @@ function Actions() {
     };
 
     this.restart = function() {
-        this.current = [];
         this.currentPos = 0;
         this.completedTicks = 0;
+        if(document.getElementById("currentListActive").checked) {
+            this.currentPos = 0;
+            this.completedTicks = 0;
 
-        this.next.forEach((action) => {
-            let toAdd;
-            if(action.loops === 0) { //don't add blank ones
-                return;
-            }
-            toAdd = translateClassNames(action.name);
+            this.current.forEach((action) => {
+                action.loopsLeft = action.loops;
+                action.ticks = 0;
+            });
+        } else {
+            this.current = [];
+            this.next.forEach((action) => {
+                if (action.loops === 0) { //don't add blank ones
+                    return;
+                }
+                let toAdd = translateClassNames(action.name);
 
-            toAdd.loops = action.loops;
-            toAdd.loopsLeft = action.loops;
-            toAdd.ticks = 0;
+                toAdd.loops = action.loops;
+                toAdd.loopsLeft = action.loops;
+                toAdd.ticks = 0;
 
-            this.current.push(toAdd);
-        });
+                this.current.push(toAdd);
+            });
+        }
         this.adjustTicksNeeded();
         view.updateNextActions();
     };

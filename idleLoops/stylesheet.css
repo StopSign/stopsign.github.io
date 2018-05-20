@@ -74,6 +74,9 @@ body {
 input, label {
     cursor:pointer;
 }
+input {
+    margin-right:0;
+}
 
 /*.button {*/
     /*border:2px white solid;*/
@@ -97,7 +100,7 @@ input, label {
     min-width:9px;
     cursor: pointer;
     outline: none;
-    color: #fff;
+    color: #e1e1e1;
     background-color: #4CAF50;
     border: none;
     border-radius: 6px;
@@ -112,6 +115,10 @@ input, label {
     background-color: #3e8e41;
     box-shadow: 0 1px #666;
     transform: translateY(0px);
+}
+
+.unused {
+    background-color: #99c193;
 }
 
 .container {

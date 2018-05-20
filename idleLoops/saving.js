@@ -19,6 +19,8 @@ const stats = {};
 let prevState = {};
 let shouldRestart = true;
 let gold = 0;
+let curLoadout = 0;
+let loadouts = [];
 
 
 function closeTutorial() {
@@ -79,6 +81,9 @@ function load() {
             view.updateRegular(action.varName);
         }
     });
+    actions.next = toLoad.nextList ? toLoad.nextList : actions.next;
+    loadouts = toLoad.loadouts ? toLoad.loadouts : loadouts;
+    view.updateNextActions();
     view.update();
 }
 
@@ -98,6 +103,8 @@ function save() {
             toSave["goodTemp"+varName] = town["good"+varName];
         }
     });
+    toSave.nextList = actions.next;
+    toSave.loadouts = loadouts;
 
     window.localStorage.idleLoops1 = JSON.stringify(toSave);
 }

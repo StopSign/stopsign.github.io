@@ -10,7 +10,7 @@ function View() {
         this.updateNextActions();
         this.updateCurrentActionsDivs();
         this.updateTotalTicks();
-        this.updateAddAmount();
+        this.updateAddAmount(1);
         this.createTownActions();
         this.updateProgressActions();
     };
@@ -150,8 +150,27 @@ function View() {
         // document.getElementById("lootFrom"+varName).innerHTML = town["lootFrom"+varName]+"";
     };
 
-    this.updateAddAmount = function() {
-        document.getElementById("addAmount").innerHTML = actions.addAmount;
+    this.updateAddAmount = function(num) {
+        for(let i = 0; i < 5; i++) {
+            let elem = document.getElementById("amount" + i);
+            if(elem) {
+                addClassToDiv(elem, "unused");
+            }
+        }
+        removeClassFromDiv(document.getElementById("amount"+num), "unused");
+    };
+
+    this.updateLoadout = function(num) {
+        for(let i = 0; i < 5; i++) {
+            let elem = document.getElementById("load" + i);
+            if(elem) {
+                addClassToDiv(elem, "unused");
+            }
+        }
+        let elem = document.getElementById("load"+num);
+        if(elem) {
+            removeClassFromDiv(document.getElementById("load" + num), "unused");
+        }
     };
 
     this.createTownActions = function() {

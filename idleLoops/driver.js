@@ -80,7 +80,37 @@ function addGold(amount) {
     view.updateGold();
 }
 
-function changeActionAmount(amount) {
+function changeActionAmount(amount, num) {
     actions.addAmount = amount;
-    view.updateAddAmount();
+    view.updateAddAmount(num);
+}
+
+function selectLoadout(num) {
+    if(curLoadout === num) {
+        curLoadout = 0;
+    } else {
+        curLoadout = num;
+    }
+    view.updateLoadout(curLoadout);
+}
+
+function saveList() {
+    if(curLoadout === 0) {
+        return;
+    }
+    loadouts[curLoadout] = copyArray(actions.next);
+    save();
+}
+
+function loadList() {
+    if(curLoadout === 0) {
+        return;
+    }
+    if(!loadouts[curLoadout]) {
+        actions.next = [];
+    } else {
+        actions.next = copyArray(loadouts[curLoadout]);
+    }
+    // view.updateCurrentActionsDivs();
+    view.updateNextActions();
 }

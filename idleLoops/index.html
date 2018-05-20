@@ -22,8 +22,8 @@
     <div class='bold'>Mana</div> <div id="timer">5</div>
     <div class='bold'>Gold</div> <div id="gold">5</div>
     <div id="pausePlay" onclick="pauseGame()" class="button">Pause</div>
-    <label for="pauseBeforeRestart">Pause before restart</label>
     <input type="checkbox" id="pauseBeforeRestart">
+    <label for="pauseBeforeRestart">Pause before restart</label>
     <div onclick="restart()" class="button">Restart</div>
 </div>
 
@@ -181,18 +181,30 @@
                 </div>
             </div>
         </div><div style="width:65%;height:300px;background-color:#cdded2;text-align:center;vertical-align:top;position:relative;">
-            <div id="nextActionsList" style="margin-top:10px;width:100%;text-align:left;max-height:270px;overflow:auto;"></div>
+            <div id="nextActionsList" style="margin-top:10px;width:100%;text-align:left;max-height:247px;overflow:auto;"></div>
             <div style="position:absolute;bottom:0;left:0;width:100%;">
-                <div class="bold">Amount</div> <div id="addAmount">1</div>
-                <div class="button" onclick="changeActionAmount(1)">1</div>
-                <div class="button" onclick="changeActionAmount(5)">5</div>
-                <div class="button" onclick="changeActionAmount(10)">10</div>
+                <div class="bold">Amount</div>
+                <div class="button" id="amount1" onclick="changeActionAmount(1, 1)">1</div>
+                <div class="button" id="amount2" onclick="changeActionAmount(5, 2)">5</div>
+                <div class="button" id="amount3" onclick="changeActionAmount(10, 3)">10</div><br>
+                <div class="bold" style="margin-top:3px;">Loadouts</div>
+                <div class="button unused" id="load1" onclick="selectLoadout(1)">1</div>
+                <div class="button unused" id="load2" onclick="selectLoadout(2)">2</div>
+                <div class="button unused" id="load3" onclick="selectLoadout(3)">3</div>
+                <div class="button unused" id="load4" onclick="selectLoadout(4)">4</div>
             </div>
         </div>
-
+        <div id="actionChanges" style="text-align:left;width:100%;margin-top:5px;">
+            <input type="checkbox" id="currentListActive">
+            <label for="currentListActive">Keep current list active</label>
+            <div style="float:right;text-align:right;">
+                <div class="button" style="margin-bottom:5px;" onclick="saveList()">Save List</div><br>
+                <div class="button" onclick="loadList()">Load Selected List</div>
+            </div>
+        </div>
     </div>
 
-    <div id="actionOptions" style="width:100%;text-align:center;margin-top:10px;display:none">
+    <div id="spells" style="width:100%;text-align:center;margin-top:10px;display:none">
         <div class="showthat">
             <div class="large bold">Spells</div>
             <div class="showthis">

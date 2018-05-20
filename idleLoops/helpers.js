@@ -26,6 +26,10 @@ function round(num) {
     return Math.floor(num).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
 
+function copyArray(arr) {
+    return JSON.parse(JSON.stringify(arr));
+}
+
 function withinDistance(x1, y1, x2, y2, radius) {
     return getDistance(x1, y1, x2, y2) < radius;
 }
