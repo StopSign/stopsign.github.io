@@ -40,3 +40,16 @@ chance 'recovers' .001% per tick
 
 soulstones let you improve stats, choose where to put them in stats
 resettable w/ mana spent cooldown
+
+Investigate, 1k mana, requires 20% people met, learn secrets about the town. Each secret learned gives a long quest available
+Long Quest, 2k mana, get 20 gold and 1 reputation, which resets on loop restart
+Warrior lessons, 1k mana, costs 1 reputation, improves combat skill
+Mage lessons, 1k mana, costs 1 reputation, improves magic skill
+Guided tour, 500 mana, costs 1 reputation, gives 4x explored rate
+Throw Party, 1.5k mana, requires 3 reputation, gives 4x people met rate
+Heal the Sick, 2k mana, requires 10 magic skill, gives 3 reputation
+Fight monsters, 2k mana, requires 10 combat skill, gives 50 gold
+Clear small dungeon, 4k mana, requires 15 combined warrior/mage levels, gives decreasing chance for soulstones, which let you improve what stats you want manually and last through loops
+Buy supplies, 500 mana, costs 200 gold, required to travel
+Haggle, 250 mana, reduce supplies cost by 5
+Travel to next town, 6k mana, requires supplies, resets wander/met % and reputation, making the relevant skills unable for the new town

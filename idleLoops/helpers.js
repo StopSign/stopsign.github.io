@@ -123,6 +123,10 @@ function camelize(str) {
     });
 }
 
+function isVisible(obj) {
+    return obj.offsetWidth > 0 && obj.offsetHeight > 0;
+}
+
 let factorials = [];
 function factorial(n) {
     if (n === 0 || n === 1)

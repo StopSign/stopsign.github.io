@@ -239,3 +239,8 @@ input {
 .locked:hover {
     background-color: #a8a8a8;
 }
+
+.statTooltipPerc {
+    float:right;
+    margin-left:3px;
+}

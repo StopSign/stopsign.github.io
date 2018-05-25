@@ -17,22 +17,33 @@ function View() {
 
     this.update = function() {
         statList.forEach((stat) => {
-            if(!expEquals(stat) || !talentEquals(stat)) {
-                this.updateStat(stat);
-            }
+            this.updateStat(stat);
         });
         this.updateTime();
     };
 
     this.updateStat = function(stat) {
         const levelPrc = getPrcToNextLevel(stat)+"%";
-        document.getElementById("stat"+stat+"Level").innerHTML = getLevel(stat);
-        document.getElementById("stat"+stat+"LevelBar").style.width = levelPrc;
-        document.getElementById("stat"+stat+"LevelProgress").innerHTML = intToString(levelPrc, 2);
         const talentPrc = getPrcToNextTalent(stat)+"%";
-        document.getElementById("stat"+stat+"Talent").innerHTML = getTalent(stat);
-        document.getElementById("stat"+stat+"TalentBar").style.width = talentPrc;
-        document.getElementById("stat"+stat+"TalentProgress").innerHTML = intToString(talentPrc, 2);
+        if(!expEquals(stat) || !talentEquals(stat)) {
+            document.getElementById("stat" + stat + "Level").innerHTML = getLevel(stat);
+            document.getElementById("stat" + stat + "LevelBar").style.width = levelPrc;
+
+            document.getElementById("stat" + stat + "Talent").innerHTML = getTalent(stat);
+            document.getElementById("stat" + stat + "TalentBar").style.width = talentPrc;
+        }
+
+        if(isVisible(document.getElementById("stat"+stat+"Tooltip")) || document.getElementById("stat" + stat + "LevelExp").innerHTML === "") {
+            let expOfLevel = getExpOfLevel(getLevel(stat));
+            document.getElementById("stat" + stat + "LevelExp").innerHTML = intToString(stats[stat].exp - expOfLevel, 1);
+            document.getElementById("stat" + stat + "LevelExpNeeded").innerHTML = intToString(getExpOfLevel(getLevel(stat)+1) - expOfLevel+"", 1);
+            document.getElementById("stat" + stat + "LevelProgress").innerHTML = intToString(levelPrc, 2);
+
+            let expOfTalent = getExpOfLevel(getTalent(stat));
+            document.getElementById("stat" + stat + "TalentExp").innerHTML = intToString(stats[stat].talent - expOfTalent, 1);
+            document.getElementById("stat" + stat + "TalentExpNeeded").innerHTML = intToString(getExpOfLevel(getTalent(stat)+1) - expOfTalent+"", 1);
+            document.getElementById("stat" + stat + "TalentProgress").innerHTML = intToString(talentPrc, 2);
+        }
         this["update"+stat] = false;
     };
 

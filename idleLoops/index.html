@@ -33,9 +33,14 @@
             <div class="large bold">Stats</div>
             <div class="showthis">
                 Each skill level reduces relevant actions by 1%.<br>
-                Talent gains 1% exp.<br>
-                Talent exp keeps through resets.<br>
-                Each talent level increases exp gain of skill by 1%.
+                Talent gets 1% of all level progress, and keeps through resets.<br>
+                Each talent level increases exp gain of skill by 1%.<br><br>
+                Exp gain over the whole action is original mana cost * talent %.<br>
+
+                e.g. Meet People costs 800 mana and has a breakdown of <div class="bold">Int</div> 10% <div class="bold">Cha</div> 80% <div class="bold">Soul</div> 10%.<br>
+                This effectively means 80 of the mana is controlled by <div class="bold">Int</div>, another 80 by <div class="bold">Soul</div>, and the remaining 640 by <div class="bold">Cha</div>.<br>
+                If your <div class="bold">Cha</div> is level 20 when the action is started, it'd be 640 / (1.2) = 533.<br>
+                Adding back the 160 from <div class="bold">Soul</div>/<div class="bold">Int</div>, the total mana the action takes is now 693, so ~15% less mana.<br>
             </div>
         </div><br>
         <div id="statList" style="width:100%;">
@@ -45,10 +50,10 @@
                 <div style="margin-top:18px;"></div>
                 <div class="thinProgressBarUpper"><div class="statBar statLevelBar" id="statStrLevelBar"></div></div>
                 <div class="thinProgressBarLower"><div class="statBar statTalentBar" id="statStrTalentBar"></div></div>
-                <div class="showthis">
+                <div class="showthis" id="statStrTooltip">
                     Train your body.<br>
-                    <div class="medium bold">Level</div> <div id="statStrLevelProgress"></div>%<br>
-                    <div class="medium bold">Talent</div> <div id="statStrTalentProgress"></div>%
+                    <div class="medium bold">Level</div> <div id="statStrLevelExp"></div>/<div id="statStrLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="statStrLevelProgress"></div>%)</div><br>
+                    <div class="medium bold">Talent</div> <div id="statStrTalentExp"></div>/<div id="statStrTalentExpNeeded"></div> <div class="statTooltipPerc">(<div id="statStrTalentProgress"></div>%)</div>
                 </div>
             </div>
             <div class="statContainer showthat">
@@ -57,10 +62,10 @@
                 <div style="margin-top:18px;"></div>
                 <div class="thinProgressBarUpper"><div class="statBar statLevelBar" id="statDexLevelBar"></div></div>
                 <div class="thinProgressBarLower"><div class="statBar statTalentBar" id="statDexTalentBar"></div></div>
-                <div class="showthis">
+                <div class="showthis" id="statDexTooltip">
                     Know your body.<br>
-                    <div class="medium bold">Level</div> <div id="statDexLevelProgress"></div>%<br>
-                    <div class="medium bold">Talent</div> <div id="statDexTalentProgress"></div>%
+                    <div class="medium bold">Level</div> <div id="statDexLevelExp"></div>/<div id="statDexLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="statDexLevelProgress"></div>%)</div><br>
+                    <div class="medium bold">Talent</div> <div id="statDexTalentExp"></div>/<div id="statDexTalentExpNeeded"></div> <div class="statTooltipPerc">(<div id="statDexTalentProgress"></div>%)</div>
                 </div>
             </div>
             <div class="statContainer showthat">
@@ -69,10 +74,10 @@
                 <div style="margin-top:18px;"></div>
                 <div class="thinProgressBarUpper"><div class="statBar statLevelBar" id="statConLevelBar"></div></div>
                 <div class="thinProgressBarLower"><div class="statBar statTalentBar" id="statConTalentBar"></div></div>
-                <div class="showthis">
+                <div class="showthis" id="statConTooltip">
                     Take hits before going down.<br>
-                    <div class="medium bold">Level</div> <div id="statConLevelProgress"></div>%<br>
-                    <div class="medium bold">Talent</div> <div id="statConTalentProgress"></div>%
+                    <div class="medium bold">Level</div> <div id="statConLevelExp"></div>/<div id="statConLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="statConLevelProgress"></div>%)</div><br>
+                    <div class="medium bold">Talent</div> <div id="statConTalentExp"></div>/<div id="statConTalentExpNeeded"></div> <div class="statTooltipPerc">(<div id="statConTalentProgress"></div>%)</div>
                 </div>
             </div>
             <div class="statContainer showthat">
@@ -81,10 +86,10 @@
                 <div style="margin-top:18px;"></div>
                 <div class="thinProgressBarUpper"><div class="statBar statLevelBar" id="statPerLevelBar"></div></div>
                 <div class="thinProgressBarLower"><div class="statBar statTalentBar" id="statPerTalentBar"></div></div>
-                <div class="showthis">
+                <div class="showthis" id="statPerTooltip">
                     Look a little closer ...<br>
-                    <div class="medium bold">Level</div> <div id="statPerLevelProgress"></div>%<br>
-                    <div class="medium bold">Talent</div> <div id="statPerTalentProgress"></div>%
+                    <div class="medium bold">Level</div> <div id="statPerLevelExp"></div>/<div id="statPerLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="statPerLevelProgress"></div>%)</div><br>
+                    <div class="medium bold">Talent</div> <div id="statPerTalentExp"></div>/<div id="statPerTalentExpNeeded"></div> <div class="statTooltipPerc">(<div id="statPerTalentProgress"></div>%)</div>
                 </div>
             </div>
             <div class="statContainer showthat">
@@ -93,10 +98,10 @@
                 <div style="margin-top:18px;"></div>
                 <div class="thinProgressBarUpper"><div class="statBar statLevelBar" id="statIntLevelBar"></div></div>
                 <div class="thinProgressBarLower"><div class="statBar statTalentBar" id="statIntTalentBar"></div></div>
-                <div class="showthis">
+                <div class="showthis" id="statIntTooltip">
                     Learning to learn.<br>
-                    <div class="medium bold">Level</div> <div id="statIntLevelProgress"></div>%<br>
-                    <div class="medium bold">Talent</div> <div id="statIntTalentProgress"></div>%
+                    <div class="medium bold">Level</div> <div id="statIntLevelExp"></div>/<div id="statIntLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="statIntLevelProgress"></div>%)</div><br>
+                    <div class="medium bold">Talent</div> <div id="statIntTalentExp"></div>/<div id="statIntTalentExpNeeded"></div> <div class="statTooltipPerc">(<div id="statIntTalentProgress"></div>%)</div>
                 </div>
             </div>
             <div class="statContainer showthat">
@@ -105,10 +110,10 @@
                 <div style="margin-top:18px;"></div>
                 <div class="thinProgressBarUpper"><div class="statBar statLevelBar" id="statChaLevelBar"></div></div>
                 <div class="thinProgressBarLower"><div class="statBar statTalentBar" id="statChaTalentBar"></div></div>
-                <div class="showthis">
+                <div class="showthis" id="statChaTooltip">
                     Conversation is a battle.<br>
-                    <div class="medium bold">Level</div> <div id="statChaLevelProgress"></div>%<br>
-                    <div class="medium bold">Talent</div> <div id="statChaTalentProgress"></div>%
+                    <div class="medium bold">Level</div> <div id="statChaLevelExp"></div>/<div id="statChaLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="statChaLevelProgress"></div>%)</div><br>
+                    <div class="medium bold">Talent</div> <div id="statChaTalentExp"></div>/<div id="statChaTalentExpNeeded"></div> <div class="statTooltipPerc">(<div id="statChaTalentProgress"></div>%)</div>
                 </div>
             </div>
             <div class="statContainer showthat">
@@ -117,10 +122,10 @@
                 <div style="margin-top:18px;"></div>
                 <div class="thinProgressBarUpper"><div class="statBar statLevelBar" id="statSpdLevelBar"></div></div>
                 <div class="thinProgressBarLower"><div class="statBar statTalentBar" id="statSpdTalentBar"></div></div>
-                <div class="showthis">
+                <div class="showthis" id="statSpdTooltip">
                     Gotta go fast.<br>
-                    <div class="medium bold">Level</div> <div id="statSpdLevelProgress"></div>%<br>
-                    <div class="medium bold">Talent</div> <div id="statSpdTalentProgress"></div>%
+                    <div class="medium bold">Level</div> <div id="statSpdLevelExp"></div>/<div id="statSpdLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="statSpdLevelProgress"></div>%)</div><br>
+                    <div class="medium bold">Talent</div> <div id="statSpdTalentExp"></div>/<div id="statSpdTalentExpNeeded"></div> <div class="statTooltipPerc">(<div id="statSpdTalentProgress"></div>%)</div>
                 </div>
             </div>
             <div class="statContainer showthat">
@@ -129,10 +134,10 @@
                 <div style="margin-top:18px;"></div>
                 <div class="thinProgressBarUpper"><div class="statBar statLevelBar" id="statLuckLevelBar"></div></div>
                 <div class="thinProgressBarLower"><div class="statBar statTalentBar" id="statLuckTalentBar"></div></div>
-                <div class="showthis">
+                <div class="showthis" id="statLuckTooltip">
                     Opportunity favors the fortunate.<br>
-                    <div class="medium bold">Level</div> <div id="statLuckLevelProgress"></div>%<br>
-                    <div class="medium bold">Talent</div> <div id="statLuckTalentProgress"></div>%
+                    <div class="medium bold">Level</div> <div id="statLuckLevelExp"></div>/<div id="statLuckLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="statLuckLevelProgress"></div>%)</div><br>
+                    <div class="medium bold">Talent</div> <div id="statLuckTalentExp"></div>/<div id="statLuckTalentExpNeeded"></div> <div class="statTooltipPerc">(<div id="statLuckTalentProgress"></div>%)</div>
                 </div>
             </div>
             <div class="statContainer showthat">
@@ -141,10 +146,10 @@
                 <div style="margin-top:18px;"></div>
                 <div class="thinProgressBarUpper"><div class="statBar statLevelBar" id="statSoulLevelBar"></div></div>
                 <div class="thinProgressBarLower"><div class="statBar statTalentBar" id="statSoulTalentBar"></div></div>
-                <div class="showthis">
+                <div class="showthis" id="statSoulTooltip">
                     You are the captain.<br>
-                    <div class="medium bold">Level</div> <div id="statSoulLevelProgress"></div>%<br>
-                    <div class="medium bold">Talent</div> <div id="statSoulTalentProgress"></div>%
+                    <div class="medium bold">Level</div> <div id="statSoulLevelExp"></div>/<div id="statSoulLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="statSoulLevelProgress"></div>%)</div><br>
+                    <div class="medium bold">Talent</div> <div id="statSoulTalentExp"></div>/<div id="statSoulTalentExpNeeded"></div> <div class="statTooltipPerc">(<div id="statSoulTalentProgress"></div>%)</div>
                 </div>
             </div>
         </div>
