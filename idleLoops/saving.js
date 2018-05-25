@@ -19,8 +19,11 @@ const stats = {};
 let prevState = {};
 let shouldRestart = true;
 let gold = 0;
+let reputation = 0;
 let curLoadout = 0;
 let loadouts = [];
+let skillList = ["Combat", "Magic"];
+let skills = {};
 
 
 function closeTutorial() {
@@ -35,6 +38,7 @@ function clearSave() {
 function loadDefaults() {
     initializeStats();
     prevState.stats = JSON.parse(JSON.stringify(stats));
+    initializeSkills();
 }
 
 function load() {
@@ -54,11 +58,17 @@ function load() {
             stats[property].talent = toLoad.stats[property].talent;
         }
     }
+    for(let property in toLoad.skills) {
+        if (toLoad.skills.hasOwnProperty(property)) {
+            skills[property].exp = toLoad.skills[property].exp;
+        }
+    }
     towns.push(new Town(0));
     const town = towns[curTown];
 
     town.expWander = toLoad.expWander;
     town.expMet = toLoad.expMet;
+    town.expSecrets = toLoad.expSecrets ? toLoad.expSecrets : 0;
 
     recalcInterval(50);
     pauseGame();
@@ -91,8 +101,10 @@ function save() {
     let toSave = {};
     const town = towns[curTown];
     toSave.stats = stats;
+    toSave.skills = skills;
     toSave.expWander = town.expWander;
     toSave.expMet = town.expMet;
+    toSave.expSecrets = town.expSecrets;
 
     view.totalActionList.forEach((action) => {
         if(town.varNames.indexOf(action.varName) !== -1) {

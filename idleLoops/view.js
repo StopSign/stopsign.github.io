@@ -47,6 +47,12 @@ function View() {
         this["update"+stat] = false;
     };
 
+    this.updateSkill = function(skill) {
+        const levelPrc = getPrcToNextSkillLevel(skill);
+        document.getElementById("skill" + skill + "Level").innerHTML = getSkillLevel(skill);
+        document.getElementById("skill" + skill + "LevelBar").style.width = levelPrc;
+    };
+
     this.updateTime = function() {
         document.getElementById("timeBar").style.width = (100 - timer / timeNeeded * 100) + "%";
         document.getElementById("timer").innerHTML =
@@ -55,6 +61,9 @@ function View() {
     };
     this.updateGold = function() {
         document.getElementById("gold").innerHTML = gold;
+    };
+    this.updateReputation = function() {
+        document.getElementById("reputation").innerHTML = reputation;
     };
 
     this.updateNextActions = function() {
@@ -140,16 +149,23 @@ function View() {
 
     this.updateLockedHidden = function() {
         this.totalActionList.forEach((action) => {
-            const theDiv = document.getElementById("container"+action.varName);
+            const actionDiv = document.getElementById("container"+action.varName);
+            const infoDiv = document.getElementById("infoContainer"+action.varName);
             if(!action.unlocked()) {
-                addClassToDiv(theDiv, "locked");
+                addClassToDiv(actionDiv, "locked");
+                if(infoDiv) {
+                    addClassToDiv(infoDiv, "hidden");
+                }
             } else {
-                removeClassFromDiv(theDiv, "locked");
+                if(infoDiv) {
+                    removeClassFromDiv(infoDiv, "hidden");
+                }
+                removeClassFromDiv(actionDiv, "locked");
             }
             if(!action.visible()) {
-                addClassToDiv(theDiv, "hidden");
+                addClassToDiv(actionDiv, "hidden");
             } else {
-                removeClassFromDiv(theDiv, "hidden");
+                removeClassFromDiv(actionDiv, "hidden");
             }
         });
     };
@@ -213,11 +229,19 @@ function View() {
         tempObj = new ShortQuest();
         this.createTownAction(tempObj);
         this.createTownInfo(tempObj);
+
+        tempObj = new Investigate();
+        this.createTownAction(tempObj);
+        this.createActionProgress(tempObj);
+
+        tempObj = new LongQuest();
+        this.createTownAction(tempObj);
+        this.createTownInfo(tempObj);
     };
 
     this.createActionProgress = function(action) {
         const totalDivText =
-        "<div class='townStatContainer showthat'>"+
+        "<div class='townStatContainer showthat' id='infoContainer"+action.varName+"'>"+
             "<div class='bold townLabel'>"+action.infoName+" </div> <div id='prc"+action.varName+"'>5</div>%"+
             "<div class='thinProgressBarUpper'><div id='expBar"+action.varName+"' class='statBar townExpBar'></div></div>"+
             "<div class='thinProgressBarLower'><div id='bar"+action.varName+"' class='statBar townBar'></div></div>"+

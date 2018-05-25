@@ -161,7 +161,7 @@ input {
     width:0;
     display:block;
 }
-.statLevelBar, .townExpBar {
+.statLevelBar, .townExpBar, .skillExpBar {
     background-color: #9d67cd;
 }
 .statTalentBar {

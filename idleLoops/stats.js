@@ -11,6 +11,17 @@ function addNewStat(name) {
     stats[name].talent = 0;
 }
 
+function initializeSkills() {
+    skillList.forEach((skill) => {
+        addNewSkill(skill);
+    })
+}
+
+function addNewSkill(name) {
+    skills[name] = {};
+    skills[name].exp = 0;
+}
+
 function getLevel(stat) {
     return getLevelFromExp(stats[stat].exp);
 }
@@ -39,6 +50,21 @@ function getPrcToNextTalent(stat) {
     let curLevelProgress = stats[stat].talent - expOfCurLevel;
     let nextLevelNeeds = getExpOfLevel(getTalent(stat)+1) - expOfCurLevel;
     return curLevelProgress / nextLevelNeeds * 100;
+}
+
+function getSkillLevel(skill) {
+    return getLevelFromExp(skills[skill].exp);
+}
+
+function getPrcToNextSkillLevel(skill) {
+    let expOfCurLevel = getExpOfLevel(getSkillLevel(skill));
+    let curLevelProgress = skills[skill].exp - expOfCurLevel;
+    let nextLevelNeeds = getExpOfLevel(getSkillLevel(skill)+1) - expOfCurLevel;
+    return curLevelProgress / nextLevelNeeds * 100;
+}
+
+function addSkillExp(name, amount) {
+    skills[name].exp += amount;
 }
 
 function addExp(name, amount) {

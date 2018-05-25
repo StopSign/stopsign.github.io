@@ -19,9 +19,9 @@ function Town(difficulty) {
         });
     };
 
-    this.finishProgress = function(varName, levelUpReward) {
+    this.finishProgress = function(varName, expGain, levelUpReward) {
         const prevLevel = this.getLevel(varName);
-        this["exp"+varName] += this.getLevel(varName) >= 100 ? 0 : 100;
+        this["exp"+varName] += this.getLevel(varName) >= 100 ? 0 : expGain;
         let level = this.getLevel(varName);
 
         if(level !== prevLevel) {
@@ -91,7 +91,9 @@ function Town(difficulty) {
     this.createVars("Pots");
     this.createVars("Locks");
     this.createVars("SQuests");
+    this.createVars("LQuests");
     this.createProgressVars("Wander");
     this.createProgressVars("Met");
+    this.createProgressVars("Secrets");
 
 }

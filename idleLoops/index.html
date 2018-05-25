@@ -19,8 +19,18 @@
     <div style="width:100%;height:10px;background:white;text-align:center;position:relative;">
         <div id="timeBar" style="height:100%;width:20%;background-color:#8293ff;display:block;margin:auto;"></div>
     </div>
-    <div class='bold'>Mana</div> <div id="timer">5</div>
-    <div class='bold'>Gold</div> <div id="gold">5</div>
+    <div class="showthat">
+        <div class='bold'>Mana</div> <div id="timer">0</div>
+        <div class="showthis">Your main resource. The higher your mana, the more you can do before reset.</div>
+    </div>
+    <div class="showthat">
+        <div class='bold'>Gold</div> <div id="gold">0</div>
+        <div class="showthis">Sell for mana, or use for actions.<br>Resets when the loop restarts.</div>
+    </div>
+    <div class="showthat">
+        <div class='bold'>Reputation</div> <div id="reputation">0</div>
+        <div class="showthis">The influence you have over the people in town.<br>Resets when the loop restarts.</div>
+    </div>
     <div id="pausePlay" onclick="pauseGame()" class="button">Pause</div>
     <input type="checkbox" id="pauseBeforeRestart">
     <label for="pauseBeforeRestart">Pause before restart</label>
@@ -40,8 +50,8 @@
             <div class="showthis">
                 Each skill level reduces relevant actions by 1%.<br>
                 Talent gets 1% of all level progress, and keeps through resets.<br>
-                Each talent level increases exp gain of skill by 1%.<br><br>
-                Exp gain over the whole action is original mana cost * talent %.<br>
+                Each talent level increases exp gain of skill by 1%.<br>
+                Exp gain from an action is original mana cost * talent %.<br><br>
 
                 e.g. Meet People costs 800 mana and has a breakdown of <div class="bold">Int</div> 10% <div class="bold">Cha</div> 80% <div class="bold">Soul</div> 10%.<br>
                 This effectively means 80 of the mana is controlled by <div class="bold">Int</div>, another 80 by <div class="bold">Soul</div>, and the remaining 640 by <div class="bold">Cha</div>.<br>
@@ -81,7 +91,7 @@
                 <div class="thinProgressBarUpper"><div class="statBar statLevelBar" id="statConLevelBar"></div></div>
                 <div class="thinProgressBarLower"><div class="statBar statTalentBar" id="statConTalentBar"></div></div>
                 <div class="showthis" id="statConTooltip">
-                    Take hits before going down.<br>
+                    Just a little longer. Just a little more.<br>
                     <div class="medium bold">Level</div> <div id="statConLevelExp"></div>/<div id="statConLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="statConLevelProgress"></div>%)</div><br>
                     <div class="medium bold">Talent</div> <div id="statConTalentExp"></div>/<div id="statConTalentExpNeeded"></div> <div class="statTooltipPerc">(<div id="statConTalentProgress"></div>%)</div>
                 </div>
@@ -156,6 +166,34 @@
                     You are the captain.<br>
                     <div class="medium bold">Level</div> <div id="statSoulLevelExp"></div>/<div id="statSoulLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="statSoulLevelProgress"></div>%)</div><br>
                     <div class="medium bold">Talent</div> <div id="statSoulTalentExp"></div>/<div id="statSoulTalentExpNeeded"></div> <div class="statTooltipPerc">(<div id="statSoulTalentProgress"></div>%)</div>
+                </div>
+            </div>
+        </div><br>
+        <div id="skillList" style="width:100%;"> <!-- display:none -->
+            <div class="showthat">
+                <div class="large bold">Skills</div>
+                <div class="showthis">
+                    Skills last through resets.<br>
+                </div>
+            </div><br>
+            <div class="statContainer showthat">
+                <div class="statLabel medium bold">Combat</div>
+                <div class="statNum medium"><div id="skillCombatLevel">0</div></div>
+                <div style="margin-top:18px;"></div>
+                <div class="thinProgressBarUpper"><div class="statBar skillExpBar townExpBar" id="skillCombatExp"></div></div>
+                <div class="showthis">
+                    Fight for your lives.<br>
+                    <div class="medium bold">Level</div> <div id="skillCombatLevelExp"></div>/<div id="skillCombatLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="skillCombatLevelProgress"></div>%)</div><br>
+                </div>
+            </div>
+            <div class="statContainer showthat">
+                <div class="statLabel medium bold">Magic</div>
+                <div class="statNum medium"><div id="skillMagicLevel">0</div></div>
+                <div style="margin-top:18px;"></div>
+                <div class="thinProgressBarUpper"><div class="statBar skillExpBar townExpBar" id="skillMagicExp"></div></div>
+                <div class="showthis">
+                    Control the aether to cast and conjure.<br>
+                    <div class="medium bold">Level</div> <div id="skillMagicLevelExp"></div>/<div id="skillMagicLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="skillMagicLevelProgress"></div>%)</div><br>
                 </div>
             </div>
         </div>

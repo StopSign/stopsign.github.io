@@ -18,6 +18,10 @@ function translateClassNames(name) {
         return new TrainSpd();
     } else if(name === "Short Quest") {
         return new ShortQuest();
+    } else if(name === "Investigate") {
+        return new Investigate();
+    } else if(name === "Long Quest") {
+        return new LongQuest();
     }
 
     console.log('error trying to create ' + name);
@@ -49,7 +53,7 @@ function Wander() {
         return true;
     };
     this.finish = function() {
-        towns[curTown].finishProgress(this.varName, function() {
+        towns[curTown].finishProgress(this.varName, 100, function() {
             towns[curTown].totalPots = towns[curTown].getLevel("Wander") * 5 * (towns[curTown].difficulty + 1);
             towns[curTown].totalLocks = towns[curTown].getLevel("Wander") * (towns[curTown].difficulty + 1);
         });
@@ -76,8 +80,35 @@ function MeetPeople() {
         return towns[curTown].getLevel("Wander") >= 22;
     };
     this.finish = function() {
-        towns[curTown].finishProgress(this.varName, function() {
+        towns[curTown].finishProgress(this.varName, 200, function() {
             towns[curTown].totalSQuests = towns[curTown].getLevel("Met") * (towns[curTown].difficulty + 1);
+        });
+    };
+}
+
+function Investigate() {
+    this.name = "Investigate";
+    this.manaCost = 1000;
+    this.expMult = 1;
+    this.tooltip = "You've been hearing some rumors...<br>Unlocked at 25% People Met";
+
+    this.infoName = "Investigated";
+    this.varName = "Secrets";
+    this.stats = {
+        Per:.3,
+        Cha:.4,
+        Spd:.2,
+        Luck:.1
+    };
+    this.visible = function() {
+        return towns[curTown].getLevel("Met") >= 10;
+    };
+    this.unlocked = function() {
+        return towns[curTown].getLevel("Met") >= 25;
+    };
+    this.finish = function() {
+        towns[curTown].finishProgress(this.varName, 1000, function() {
+            towns[curTown].totalLQuests = towns[curTown].getLevel("Secrets") * (towns[curTown].difficulty + 1);
         });
     };
 }
@@ -168,6 +199,60 @@ function TrainSpd() {
     };
 }
 
+function WarriorLessons() {
+    this.name = "Warrior Lessons";
+    this.manaCost = 1000;
+    this.expMult = 1;
+    this.tooltip = "Learning to fight is probably important; you have a long journey ahead of you.";
+    this.varName = "trCombat";
+    this.stats = {
+        Str:.5,
+        Dex:.3,
+        Con:.2
+    };
+    this.canStart = function() {
+        return reputation >= 1;
+    };
+    this.cost = function() {
+        addReputation(-1);
+    };
+    this.visible = function() {
+        return towns[curTown].getLevel("Secrets") >= 8;
+    };
+    this.unlocked = function() {
+        return towns[curTown].getLevel("Secrets") >= 10;
+    };
+    this.finish = function() {
+    };
+}
+
+function MageLessons() {
+    this.name = "Mage Lessons";
+    this.manaCost = 1000;
+    this.expMult = 1;
+    this.tooltip = "The mystic got you into this mess, maybe it can help you get out of it.";
+    this.varName = "trMagic";
+    this.stats = {
+        Per:.3,
+        Int:.5,
+        Con:.2
+    };
+    this.canStart = function() {
+        return reputation >= 1;
+    };
+    this.cost = function() {
+        addReputation(-1);
+    };
+    this.visible = function() {
+        return towns[curTown].getLevel("Secrets") >= 8;
+    };
+    this.unlocked = function() {
+        return towns[curTown].getLevel("Secrets") >= 10;
+    };
+    this.finish = function() {
+    };
+}
+
 //Regular Actions
 //Regular actions have varName, infoName, infoText
 
@@ -235,7 +320,7 @@ function ShortQuest() {
     this.varName = "SQuests";
 
     this.tooltip = "Be a hero! ...If the reward is good and it doesn't take too long.<br>Short Quests with loot give 10 gold as a reward.<br>Every 5 Short Quests have loot.<br>Unlocked at 5% People Met";
-    this.infoName = "Quests Accomplished";
+    this.infoName = "Short Quests Accomplished";
     this.infoText = "Quests with loot left <i class='fa fa-arrow-left'></i> Quests with loot total <i class='fa fa-arrow-left'></i> Quests to finish<br><div class='bold'>Total Found</div> <div id='totalSQuests'></div>";
     this.stats = {
         Str:.2,
@@ -255,6 +340,40 @@ function ShortQuest() {
         towns[curTown].finishRegular(this.varName, 5, function() {
             addGold(10);
             return 10;
+        })
+    };
+}
+
+function LongQuest() {
+    this.name = "Long Quest";
+    this.manaCost = 2000;
+    this.expMult = 1;
+    this.varName = "LQuests";
+
+    this.tooltip = "Be a more impressive hero! ...As long as someone is watching.<br>Long Quests with loot give 20 gold and 1 reputation as a reward.<br>Every 10 Long Quests have loot.<br>Unlocked at 10% Investigated.";
+    this.infoName = "Long Quests Accomplished";
+    this.infoText = "Quests with loot left <i class='fa fa-arrow-left'></i> Quests with loot total <i class='fa fa-arrow-left'></i> Quests to finish<br><div class='bold'>Total Found</div> <div id='totalLQuests'></div>";
+    this.stats = {
+        Str:.2,
+        Int:.2,
+        Con:.4,
+        Spd:.2
+    };
+    this.visible = function() {
+        return towns[curTown].getLevel("Secrets") >= 1;
+    };
+    this.unlocked = function() {
+        let toUnlock = towns[curTown].getLevel("Secrets") >= 10;
+        if(toUnlock && !isVisible(document.getElementById("skillList"))) {
+            document.getElementById("skillList").style.display = "inline-block";
+        }
+        return toUnlock;
+    };
+    this.finish = function() {
+        towns[curTown].finishRegular(this.varName, 10, function() {
+            addReputation(1);
+            addGold(20);
+            return 20;
         })
     };
 }
