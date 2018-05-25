@@ -97,10 +97,11 @@ function View() {
 
         actions.current.forEach((action, index) => {
             totalDivText +=
-                "<div class='curActionContainer small'>" +
+                "<div class='curActionContainer small showthat'>" +
                     "<div class='curActionBar' id='action"+index+"Bar'></div>" +
                     "<div id='action"+index+"Loops'>"+ action.loopsLeft+"</div>(" + action.loops + ")" + " x " +
                     "<img src='img/"+camelize(action.name)+".svg' class='smallIcon'>" +
+                    "<div style='position:absolute'><div class='showthis' style='position:fixed;'><div class='bold'>Mana Used</div> <div id='action"+index+"ManaUsed'>0</div></div></div>" +
                     "</div>"+
                 "</div>";
         });
@@ -117,6 +118,7 @@ function View() {
             div.style.width = "100%";
             div.style.backgroundColor = "#6d6d6d";
         }
+        document.getElementById("action"+index+"ManaUsed").innerHTML = action.manaUsed+"";
     };
 
     this.updateCurrentActionLoops = function(index) {

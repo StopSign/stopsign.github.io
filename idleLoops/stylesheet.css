@@ -158,7 +158,7 @@ input {
 
 .statBar {
     height:100%;
-    width:60%;
+    width:0;
     display:block;
 }
 .statLevelBar, .townExpBar {

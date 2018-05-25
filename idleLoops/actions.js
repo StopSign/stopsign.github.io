@@ -17,9 +17,11 @@ function Actions() {
 
         addExpFromAction(curAction);
         curAction.ticks++;
+        curAction.manaUsed++;
         if(curAction.ticks >= curAction.adjustedTicks) {
             curAction.ticks = 0;
             curAction.loopsLeft--;
+
             this.completedTicks += curAction.adjustedTicks;
             curAction.finish();
 
@@ -42,6 +44,7 @@ function Actions() {
             this.current.forEach((action) => {
                 action.loopsLeft = action.loops;
                 action.ticks = 0;
+                action.manaUsed = 0;
             });
         } else {
             this.current = [];
@@ -54,6 +57,7 @@ function Actions() {
                 toAdd.loops = action.loops;
                 toAdd.loopsLeft = action.loops;
                 toAdd.ticks = 0;
+                toAdd.manaUsed = 0;
 
                 this.current.push(toAdd);
             });
