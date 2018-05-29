@@ -5,6 +5,9 @@ function View() {
         statList.forEach((stat) => {
             this.updateStat(stat);
         });
+        skillList.forEach((skill) => {
+            this.updateSkill(skill);
+        });
         this.updateTime();
         this.updateGold();
         this.updateNextActions();
@@ -50,7 +53,12 @@ function View() {
     this.updateSkill = function(skill) {
         const levelPrc = getPrcToNextSkillLevel(skill);
         document.getElementById("skill" + skill + "Level").innerHTML = getSkillLevel(skill);
-        document.getElementById("skill" + skill + "LevelBar").style.width = levelPrc;
+        document.getElementById("skill" + skill + "LevelBar").style.width = levelPrc + "%";
+
+        let expOfLevel = getExpOfLevel(getSkillLevel(skill));
+        document.getElementById("skill" + skill + "LevelExp").innerHTML = intToString(skills[skill].exp - expOfLevel, 1);
+        document.getElementById("skill" + skill + "LevelExpNeeded").innerHTML = intToString(getExpOfLevel(getSkillLevel(skill)+1) - expOfLevel+"", 1);
+        document.getElementById("skill" + skill + "LevelProgress").innerHTML = intToString(levelPrc, 2);
     };
 
     this.updateTime = function() {
@@ -237,6 +245,9 @@ function View() {
         tempObj = new LongQuest();
         this.createTownAction(tempObj);
         this.createTownInfo(tempObj);
+
+        this.createTownAction(new WarriorLessons());
+        this.createTownAction(new MageLessons());
     };
 
     this.createActionProgress = function(action) {

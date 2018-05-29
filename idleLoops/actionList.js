@@ -22,6 +22,10 @@ function translateClassNames(name) {
         return new Investigate();
     } else if(name === "Long Quest") {
         return new LongQuest();
+    } else if(name === "Warrior Lessons") {
+        return new WarriorLessons();
+    } else if(name === "Mage Lessons") {
+        return new MageLessons();
     }
 
     console.log('error trying to create ' + name);
@@ -107,7 +111,7 @@ function Investigate() {
         return towns[curTown].getLevel("Met") >= 25;
     };
     this.finish = function() {
-        towns[curTown].finishProgress(this.varName, 1000, function() {
+        towns[curTown].finishProgress(this.varName, 500, function() {
             towns[curTown].totalLQuests = towns[curTown].getLevel("Secrets") * (towns[curTown].difficulty + 1);
         });
     };
@@ -142,8 +146,8 @@ function SellGold() {
 function TrainStr() {
     this.name = "Train Strength";
     this.manaCost = 500;
-    this.expMult = 2;
-    this.tooltip = "Today is leg day. Has double exp/talent gain.<br>Unlocked at 5% People Met";
+    this.expMult = 3;
+    this.tooltip = "Today is leg day. Has triple exp/talent gain.<br>Unlocked at 5% People Met";
     this.varName = "trStr";
     this.stats = {
         Str:.8,
@@ -162,8 +166,8 @@ function TrainStr() {
 function TrainDex() {
     this.name = "Train Dex";
     this.manaCost = 500;
-    this.expMult = 2;
-    this.tooltip = "The kids are a little mad you're taking their playground. They'll get over it.<br>Has double exp/talent gain.<br>Unlocked at 15% People Met";
+    this.expMult = 3;
+    this.tooltip = "The kids are a little mad you're taking their playground. They'll get over it.<br>Has triple exp/talent gain.<br>Unlocked at 15% People Met";
     this.varName = "trDex";
     this.stats = {
         Dex:.8,
@@ -182,8 +186,8 @@ function TrainDex() {
 function TrainSpd() {
     this.name = "Train Speed";
     this.manaCost = 500;
-    this.expMult = 2;
-    this.tooltip = "A new friend has a magical treadmill. Has double exp/talent gain.<br>Unlocked at 30% People Met";
+    this.expMult = 3;
+    this.tooltip = "A new friend has a magical treadmill. Has triple exp/talent gain.<br>Unlocked at 30% People Met";
     this.varName = "trSpd";
     this.stats = {
         Spd:.8,
@@ -203,7 +207,7 @@ function WarriorLessons() {
     this.name = "Warrior Lessons";
     this.manaCost = 1000;
     this.expMult = 1;
-    this.tooltip = "Learning to fight is probably important; you have a long journey ahead of you.";
+    this.tooltip = "Learning to fight is probably important; you have a long journey ahead of you.<br>Requires 2 reputation.";
     this.varName = "trCombat";
     this.stats = {
         Str:.5,
@@ -211,18 +215,19 @@ function WarriorLessons() {
         Con:.2
     };
     this.canStart = function() {
-        return reputation >= 1;
+        return reputation >= 2;
     };
     this.cost = function() {
-        addReputation(-1);
+        addReputation(-2);
     };
     this.visible = function() {
-        return towns[curTown].getLevel("Secrets") >= 8;
-    };
-    this.unlocked = function() {
         return towns[curTown].getLevel("Secrets") >= 10;
     };
+    this.unlocked = function() {
+        return towns[curTown].getLevel("Secrets") >= 20;
+    };
     this.finish = function() {
+        addSkillExp("Combat", 50);
     };
 }
 
@@ -230,7 +235,7 @@ function MageLessons() {
     this.name = "Mage Lessons";
     this.manaCost = 1000;
     this.expMult = 1;
-    this.tooltip = "The mystic got you into this mess, maybe it can help you get out of it.";
+    this.tooltip = "The mystic got you into this mess, maybe it can help you get out of it.<br>Requires 2 reputation.";
     this.varName = "trMagic";
     this.stats = {
         Per:.3,
@@ -238,18 +243,19 @@ function MageLessons() {
         Con:.2
     };
     this.canStart = function() {
-        return reputation >= 1;
+        return reputation >= 2;
     };
     this.cost = function() {
-        addReputation(-1);
+        addReputation(-2);
     };
     this.visible = function() {
-        return towns[curTown].getLevel("Secrets") >= 8;
-    };
-    this.unlocked = function() {
         return towns[curTown].getLevel("Secrets") >= 10;
     };
+    this.unlocked = function() {
+        return towns[curTown].getLevel("Secrets") >= 20;
+    };
     this.finish = function() {
+        addSkillExp("Magic", 50);
     };
 }
 
@@ -315,11 +321,11 @@ function PickLocks() {
 
 function ShortQuest() {
     this.name = "Short Quest";
-    this.manaCost = 600;
+    this.manaCost = 800;
     this.expMult = 1;
     this.varName = "SQuests";
 
-    this.tooltip = "Be a hero! ...If the reward is good and it doesn't take too long.<br>Short Quests with loot give 10 gold as a reward.<br>Every 5 Short Quests have loot.<br>Unlocked at 5% People Met";
+    this.tooltip = "Be a hero! ...If the reward is good and it doesn't take too long.<br>Short Quests with loot give 20 gold as a reward.<br>Every 5 Short Quests have loot.<br>Unlocked at 5% People Met";
     this.infoName = "Short Quests Accomplished";
     this.infoText = "Quests with loot left <i class='fa fa-arrow-left'></i> Quests with loot total <i class='fa fa-arrow-left'></i> Quests to finish<br><div class='bold'>Total Found</div> <div id='totalSQuests'></div>";
     this.stats = {

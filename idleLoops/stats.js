@@ -65,6 +65,7 @@ function getPrcToNextSkillLevel(skill) {
 
 function addSkillExp(name, amount) {
     skills[name].exp += amount;
+    view.updateSkill(name);
 }
 
 function addExp(name, amount) {

@@ -105,6 +105,7 @@ function selectLoadout(num) {
 
 function saveList() {
     if(curLoadout === 0) {
+        save();
         return;
     }
     loadouts[curLoadout] = copyArray(actions.next);
