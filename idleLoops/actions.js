@@ -9,13 +9,13 @@ function Actions() {
     this.currentPos = 0;
 
     this.tick = function() {
-        let curAction = this.current[this.currentPos];
+        let curAction = this.getNextValidAction();
         if(!curAction) { //out of actions
             shouldRestart = true;
             return;
         }
-
         addExpFromAction(curAction);
+
         curAction.ticks++;
         curAction.manaUsed++;
         if(curAction.ticks >= curAction.adjustedTicks) {
@@ -25,6 +25,10 @@ function Actions() {
             this.completedTicks += curAction.adjustedTicks;
             curAction.finish();
 
+            if(curAction.loopsLeft && curAction.cost) {
+                curAction.cost();
+            }
+
             this.adjustTicksNeeded();
             view.updateCurrentActionLoops(this.currentPos);
         }
@@ -32,6 +36,18 @@ function Actions() {
         if(curAction.loopsLeft === 0) {
             this.currentPos++;
         }
+    };
+
+    this.getNextValidAction = function() {
+        let curAction = this.current[this.currentPos];
+        if(curAction && curAction.canStart && !curAction.canStart()) {
+            curAction.loopsFailed = curAction.loopsLeft;
+            curAction.loopsLeft = 0;
+            view.updateCurrentActionBar(this.currentPos);
+            this.currentPos++;
+            curAction = this.current[this.currentPos];
+        }
+        return curAction;
     };
 
     this.restart = function() {

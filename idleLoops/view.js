@@ -118,7 +118,10 @@ function View() {
                     "<div class='curActionBar' id='action"+index+"Bar'></div>" +
                     "<div id='action"+index+"Loops'>"+ action.loopsLeft+"</div>(" + action.loops + ")" + " x " +
                     "<img src='img/"+camelize(action.name)+".svg' class='smallIcon'>" +
-                    "<div style='position:absolute'><div class='showthis' style='position:fixed;'><div class='bold'>Mana Used</div> <div id='action"+index+"ManaUsed'>0</div></div></div>" +
+                    "<div style='position:absolute'><div class='showthis' style='position:fixed;'>" +
+                        "<div class='bold'>Mana Used</div> <div id='action"+index+"ManaUsed'>0</div>" +
+                        "<div id='action"+index+"HasFailed' style='display:none'><div class='bold'>Failed Attempts</div> <div id='action"+index+"Failed'>0</div></div>" +
+                    "</div></div>" +
                     "</div>"+
                 "</div>";
         });
@@ -131,7 +134,14 @@ function View() {
         const action = actions.current[index];
         const div = document.getElementById("action"+index+"Bar");
         div.style.width = (100 * action.ticks / action.adjustedTicks) + "%";
-        if(action.loopsLeft === 0) {
+        if(action.loopsFailed) {
+            document.getElementById("action" + index + "Failed").innerHTML = action.loopsFailed + "";
+            document.getElementById("action"+index+"HasFailed").style.display = "block";
+            div.style.width = "100%";
+            div.style.backgroundColor = "#ff0000";
+            div.style.height = "30%";
+            div.style.marginTop = "5px";
+        } else if(action.loopsLeft === 0) {
             div.style.width = "100%";
             div.style.backgroundColor = "#6d6d6d";
         }
@@ -246,6 +256,8 @@ function View() {
         this.createTownAction(tempObj);
         this.createTownInfo(tempObj);
 
+        this.createTownAction(new GuidedTour());
+        this.createTownAction(new ThrowParty());
         this.createTownAction(new WarriorLessons());
         this.createTownAction(new MageLessons());
     };

@@ -26,6 +26,10 @@ function translateClassNames(name) {
         return new WarriorLessons();
     } else if(name === "Mage Lessons") {
         return new MageLessons();
+    } else if(name === "Guided Tour") {
+        return new GuidedTour();
+    } else if(name === "Throw Party") {
+        return new ThrowParty();
     }
 
     console.log('error trying to create ' + name);
@@ -200,6 +204,67 @@ function TrainSpd() {
         return towns[curTown].getLevel("Met") >= 30;
     };
     this.finish = function() {
+    };
+}
+
+function GuidedTour() {
+    this.name = "Guided Tour";
+    this.manaCost = 500;
+    this.expMult = 3;
+    this.tooltip = "After what you did, they're glad to help show you around.<br>4x explored % over Wander for equivalent mana cost.<br>Costs 1 reputation.<br>Unlocked at 10% Investigated";
+    this.varName = "Tour";
+    this.stats = {
+        Spd:.4,
+        Cha:.3,
+        Con:.2,
+        Soul:.1
+    };
+    this.canStart = function() {
+        return reputation >= 1;
+    };
+    this.cost = function() {
+        addReputation(-1);
+    };
+    this.visible = function() {
+        return towns[curTown].getLevel("Secrets") >= 5;
+    };
+    this.unlocked = function() {
+        return towns[curTown].getLevel("Secrets") >= 10;
+    };
+    this.finish = function() {
+        towns[curTown].finishProgress(this.varName, 800, function() {
+            towns[curTown].totalPots = towns[curTown].getLevel("Wander") * 5 * (towns[curTown].difficulty + 1);
+            towns[curTown].totalLocks = towns[curTown].getLevel("Wander") * (towns[curTown].difficulty + 1);
+        });
+    };
+}
+
+function ThrowParty() {
+    this.name = "Throw Party";
+    this.manaCost = 1600;
+    this.expMult = 3;
+    this.tooltip = "Take a break and socialize.<br>4x people met % over Meet People for equivalent mana cost.<br>Costs 3 reputation.<br>Unlocked at 30% Investigated";
+    this.varName = "Party";
+    this.stats = {
+        Cha:.8,
+        Soul:.2
+    };
+    this.canStart = function() {
+        return reputation >= 3;
+    };
+    this.cost = function() {
+        addReputation(-3);
+    };
+    this.visible = function() {
+        return towns[curTown].getLevel("Secrets") >= 20;
+    };
+    this.unlocked = function() {
+        return towns[curTown].getLevel("Secrets") >= 30;
+    };
+    this.finish = function() {
+        towns[curTown].finishProgress(this.varName, 1600, function() {
+            towns[curTown].totalSQuests = towns[curTown].getLevel("Met") * (towns[curTown].difficulty + 1);
+        });
     };
 }
 
@@ -378,8 +443,8 @@ function LongQuest() {
     this.finish = function() {
         towns[curTown].finishRegular(this.varName, 10, function() {
             addReputation(1);
-            addGold(20);
-            return 20;
+            addGold(25);
+            return 25;
         })
     };
 }
