@@ -35,6 +35,10 @@ function translateClassNames(name) {
     console.log('error trying to create ' + name);
 }
 
+function hasCap(name) {
+    return (name === "Smash Pots" || name === "Pick Locks" || name === "Short Quest" || name === "Long Quest");
+}
+
 
 //Progress actions
 //Progress actions have a progress bar and use 100,200,300,etc. leveling system
@@ -341,6 +345,9 @@ function SmashPots() {
         Per:.2,
         Spd:.6
     };
+    this.cap = function() {
+        return towns[0].goodPots;
+    };
     this.visible = function() {
         return true;
     };
@@ -369,6 +376,9 @@ function PickLocks() {
         Per:.3,
         Spd:.1,
         Luck:.1
+    };
+    this.cap = function() {
+        return towns[0].goodLocks;
     };
     this.visible = function() {
         return towns[curTown].getLevel("Wander") >= 3;
@@ -401,6 +411,9 @@ function ShortQuest() {
         Luck:.1,
         Soul:.1
     };
+    this.cap = function() {
+        return towns[0].goodSQuests;
+    };
     this.visible = function() {
         return towns[curTown].getLevel("Met") >= 1;
     };
@@ -429,6 +442,9 @@ function LongQuest() {
         Int:.2,
         Con:.4,
         Spd:.2
+    };
+    this.cap = function() {
+        return towns[0].goodLQuests;
     };
     this.visible = function() {
         return towns[curTown].getLevel("Secrets") >= 1;

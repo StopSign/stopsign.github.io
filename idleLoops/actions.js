@@ -95,6 +95,10 @@ function Actions() {
         view.updateTotalTicks();
     };
 
+    this.capAmount = function(index) {
+        this.next[index].loops = translateClassNames(this.next[index].name).cap();
+        view.updateNextActions();
+    };
     this.addLoop = function(index) {
         this.next[index].loops += this.addAmount;
         view.updateNextActions();

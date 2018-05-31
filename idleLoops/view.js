@@ -82,11 +82,16 @@ function View() {
         let totalDivText = "";
 
         actions.next.forEach((action, index) => {
+            let capButton = "";
+            if(hasCap(action.name)) {
+                capButton = "<i onclick='actions.capAmount("+index+")' class='actionIcon fa fa-circle-thin'></i>";
+            }
             totalDivText +=
                 "<div class='nextActionContainer small'>" +
                     "<div class='bold'>" + action.loops +"</div> x " +
                     "<img src='img/"+camelize(action.name)+".svg' class='smallIcon'>" +
                     "<div style='float:right'>"+
+                        capButton +
                         "<i onclick='actions.addLoop("+index+")' class='actionIcon fa fa-plus'></i>" +
                         "<i onclick='actions.removeLoop("+index+")' class='actionIcon fa fa-minus'></i>" +
                         "<i onclick='actions.split("+index+")' class='actionIcon fa fa-arrows-h'></i>" +
