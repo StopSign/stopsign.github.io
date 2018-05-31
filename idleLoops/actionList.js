@@ -434,7 +434,7 @@ function LongQuest() {
     this.expMult = 1;
     this.varName = "LQuests";
 
-    this.tooltip = "Be a more impressive hero! ...As long as someone is watching.<br>Long Quests with loot give 20 gold and 1 reputation as a reward.<br>Every 10 Long Quests have loot.<br>Unlocked at 10% Investigated.";
+    this.tooltip = "Be a more impressive hero! ...As long as someone is watching.<br>Long Quests with loot give 25 gold and 1 reputation as a reward.<br>Every 10 Long Quests have loot.<br>Unlocked at 10% Investigated.";
     this.infoName = "Long Quests Accomplished";
     this.infoText = "Quests with loot left <i class='fa fa-arrow-left'></i> Quests with loot total <i class='fa fa-arrow-left'></i> Quests to finish<br><div class='bold'>Total Found</div> <div id='totalLQuests'></div>";
     this.stats = {
