@@ -34,7 +34,11 @@ function Actions() {
         }
         view.updateCurrentActionBar(this.currentPos);
         if(curAction.loopsLeft === 0) {
-            this.currentPos++;
+            if(!this.current[this.currentPos + 1] && document.getElementById("repeatLastAction").checked) { //no more last action
+                curAction.loopsLeft++;
+            } else {
+                this.currentPos++;
+            }
         }
     };
 

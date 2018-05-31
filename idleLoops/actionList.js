@@ -155,7 +155,7 @@ function TrainStr() {
     this.name = "Train Strength";
     this.manaCost = 500;
     this.expMult = 3;
-    this.tooltip = "Today is leg day. Has triple exp/talent gain.<br>Unlocked at 5% People Met";
+    this.tooltip = "Build up those muscles. Again.<br>Has triple exp/talent gain.<br>Unlocked at 5% People Met";
     this.varName = "trStr";
     this.stats = {
         Str:.8,
@@ -195,7 +195,7 @@ function TrainSpd() {
     this.name = "Train Speed";
     this.manaCost = 500;
     this.expMult = 3;
-    this.tooltip = "A new friend has a magical treadmill. Has triple exp/talent gain.<br>Unlocked at 30% People Met";
+    this.tooltip = "A new friend has a magical treadmill. Gotta go fast.<br>Has triple exp/talent gain.<br>Unlocked at 30% People Met";
     this.varName = "trSpd";
     this.stats = {
         Spd:.8,
