@@ -422,8 +422,8 @@ function ShortQuest() {
     };
     this.finish = function() {
         towns[curTown].finishRegular(this.varName, 5, function() {
-            addGold(10);
-            return 10;
+            addGold(20);
+            return 20;
         })
     };
 }
