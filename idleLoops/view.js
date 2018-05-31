@@ -281,7 +281,6 @@ function View() {
         "</div>";
         let progressDiv = document.createElement("div");
         progressDiv.style.display = "block";
-        progressDiv.style.marginTop = "10px";
         progressDiv.innerHTML = totalDivText;
         townInfoDiv.appendChild(progressDiv);
     };
@@ -313,7 +312,7 @@ function View() {
 
     this.createTownInfo = function(action) {
         let totalInfoText =
-            "<div class='townStatContainer showthat' id='infoContainer"+action.varName+"'>" +
+            "<div class='townInfoContainer showthat' id='infoContainer"+action.varName+"'>" +
                 "<div class='bold townLabel'>"+action.infoName+"</div> " +
             "<div id='goodTemp"+action.varName+"'>0</div> <i class='fa fa-arrow-left'></i> " +
             "<div id='good"+action.varName+"'>0</div> <i class='fa fa-arrow-left'></i> " +

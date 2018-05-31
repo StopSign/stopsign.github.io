@@ -173,10 +173,18 @@ input {
 
 .townStatContainer {
     width:100%;
-    height:26px;
+    height:23px;
     text-align:left;
     padding:0 10px 0;
-    margin-bottom:4px;
+    margin-bottom:5px;
+    margin-top:10px;
+}
+
+.townInfoContainer {
+    width:100%;
+    height:15px;
+    text-align:left;
+    padding:0 10px 0;
 }
 
 .actionContainer {
