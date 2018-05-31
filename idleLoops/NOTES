@@ -46,8 +46,8 @@ Throw Party, 1.5k mana, requires 3 reputation, gives 4x people met rate
 Heal the Sick, 2.5k mana, requires 10 magic skill, gives 3 reputation
 Fight monsters, 2k mana, requires 10 combat skill, gives 50 gold
 Clear small dungeon, 4k mana, requires 15 combined warrior/mage levels, gives decreasing chance for soulstones, which let you improve what stats you want manually and last through loops
-Buy supplies, 500 mana, costs 200 gold, required to travel
-Haggle, 250 mana, reduce supplies cost by 5
+Buy supplies, 500 mana, costs 400 gold, required to travel
+Haggle, 250 mana and 1 reputation, reduce supplies cost by 20
 
 Travel to next town, 6k mana, requires supplies, resets wander/met % and reputation, making the relevant skills unable for the new town
 
