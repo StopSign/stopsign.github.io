@@ -22,26 +22,16 @@ Add a new progress bar action:
 	
 	
 TODO:
-
-C O N T E N T
-actions that do the same thing as before, but faster (guided tour)
-fight creatures
-Skills
-    Combat
-    Magic
-
-decreasing chance for soulstones as you win against monsters 90%, 81%, etc.
+decreasing chance for soulstones as you clear dungeons 100%, 90%, 81%, etc.
 chance 'recovers' .001% per tick
 
-soulstones let you improve stats, choose where to put them in stats
-resettable w/ mana spent cooldown
 
-Investigate, 1k mana, requires 20% people met, learn secrets about the town. Each secret learned gives a long quest available
-Long Quest, 2k mana, get 30 gold and 1 reputation, which resets on loop restart
-Warrior lessons, 1k mana, costs 2 reputation, improves combat skill
-Mage lessons, 1k mana, costs 2 reputation, improves magic skill
-Guided tour, 500 mana, costs 1 reputation, gives 4x explored rate
-Throw Party, 1.5k mana, requires 3 reputation, gives 4x people met rate
+Heal the Sick - 2.5k mana, requires 20 magic skill. 3 segments of Diagnose (Per), Treat (Int), Inform (Cha), giving 3 reputation when 3rd segment is done. Gives magic skill * (1 + stat level/100) * (1 + timesCompleted / 20) progress points per tick, requires 20k per segment
+Fight monsters - roughly require combat skill, Str, Spd, Con for gold
+Clear small dungeon - roughly require magic+combat skill, Dex, Luck for permanent exp gains (like a 2nd talent)
+buy supplies - 500 mana, costs 400 gold, required to travel
+haggle - 250 mana and 1 reputation, reduce supplies cost by 20
+travel to next town - 6k mana, requires supplies, can no longer use any of the 25 actions of town 1
 
 Heal the Sick, 2.5k mana, requires 10 magic skill, gives 3 reputation
 Fight monsters, 2k mana, requires 10 combat skill, gives 50 gold

@@ -167,6 +167,25 @@ function removeClassFromDiv(div, className) {
     div.classList.remove(className);
 }
 
+let numbers = "zero one two three four five six seven eight nine ten eleven twelve thirteen fourteen fifteen sixteen seventeen eighteen nineteen".split(" ");
+let tens = "twenty thirty forty fifty sixty seventy eighty ninety".split(" ");
+
+function number2Words(n) {
+    if (n < 20) return numbers[n];
+    let digit = n%10;
+    if (n < 100) return tens[~~(n/10)-2] + (digit? "-" + numbers[digit]: "");
+    if (n < 1000) return numbers[~~(n/100)] +" hundred" + (n%100 === 0? "": " " + number2Words(n%100));
+    return number2Words(~~(n/1000)) + " thousand" + (n%1000 !== 0? " " + number2Words(n%1000): "");
+}
+
+function capitalizeFirst(s) {
+    return s.charAt(0).toUpperCase() + s.substr(1)
+}
+
+function numberToWords(n) {
+    return capitalizeFirst(number2Words(n));
+}
+
 function encode(theSave) {
     return Base64.encode(lzw_encode(theSave));
 }

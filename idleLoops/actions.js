@@ -18,6 +18,29 @@ function Actions() {
 
         curAction.ticks++;
         curAction.manaUsed++;
+        if(curAction.loopStats) { //only for multi-part progress bars
+            let segment = 0;
+            let curProgress = towns[0][curAction.varName];
+            while(curProgress >= curAction.loopCost(segment)) {
+                curProgress -= curAction.loopCost(segment);
+                segment++;
+            }
+            //segment is 0,1,2
+            let toAdd = curAction.tickProgress(segment) * (curAction.manaCost / curAction.adjustedTicks);
+            // console.log("adding: " + toAdd + " to segment: " + segment + " of progress " + curProgress + " which costs: " + curAction.loopCost(segment));
+            towns[0][curAction.varName] += toAdd;
+            curProgress += toAdd;
+            if((segment === curAction.segments-1) && curProgress >= curAction.loopCost(segment)) {
+                // console.log("finished");
+                //part finished
+                towns[0][curAction.varName] = 0;
+                towns[0][curAction.varName+"LoopCounter"] += curAction.segments;
+                towns[0].totalHeal++;
+                curAction.loopsFinished();
+                view.updateMultiPart(curAction);
+            }
+            view.updateMultiPartSegments(curAction);
+        }
         if(curAction.ticks >= curAction.adjustedTicks) {
             curAction.ticks = 0;
             curAction.loopsLeft--;
@@ -84,6 +107,8 @@ function Actions() {
         }
         this.adjustTicksNeeded();
         view.updateNextActions();
+        towns[0]["Heal"] = 0;
+        view.updateMultiPartActions();
     };
 
     this.adjustTicksNeeded = function() {
@@ -172,7 +197,7 @@ function setAdjustedTicks(action) {
 function addExpFromAction(action) {
     statList.forEach((statName) => {
         if(action.stats[statName]) {
-            addExp(statName, action.stats[statName] * action.expMult);
+            addExp(statName, action.stats[statName] * action.expMult * (action.manaCost / action.adjustedTicks) * (1+getTalent(statName)/100));
         }
     });
 }

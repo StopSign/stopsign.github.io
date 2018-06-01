@@ -88,6 +88,7 @@ function Town(difficulty) {
         }
     };
 
+
     this.createVars("Pots");
     this.createVars("Locks");
     this.createVars("SQuests");
@@ -95,5 +96,7 @@ function Town(difficulty) {
     this.createProgressVars("Wander");
     this.createProgressVars("Met");
     this.createProgressVars("Secrets");
+    this.Heal = 0;
+    this.HealLoopCounter = 0;
 
 }

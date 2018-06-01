@@ -156,6 +156,13 @@ input {
 .thinProgressBarUpper { height:4px; }
 .thinProgressBarLower { height:3px; }
 
+.thickProgressBar {
+    background-color:white;
+    display:inline-block;
+    margin:0 2px 2px 2px;
+    height:8px;
+}
+
 .statBar {
     height:100%;
     width:0;
@@ -169,6 +176,12 @@ input {
 }
 .townBar {
     background-color: #95afff;
+}
+.segmentBar {
+    height:100%;
+    display:block;
+    width:100%;
+    float:right;
 }
 
 .townStatContainer {
@@ -233,6 +246,11 @@ input {
 
 .townLabel {
     margin-left:25px;
+}
+
+.completedInfo {
+    margin-right:25px;
+    float:right;
 }
 
 .hidden {

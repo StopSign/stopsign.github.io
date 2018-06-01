@@ -124,7 +124,8 @@ function View() {
                     "<div id='action"+index+"Loops'>"+ action.loopsLeft+"</div>(" + action.loops + ")" + " x " +
                     "<img src='img/"+camelize(action.name)+".svg' class='smallIcon'>" +
                     "<div style='position:absolute'><div class='showthis' style='position:fixed;'>" +
-                        "<div class='bold'>Mana Used</div> <div id='action"+index+"ManaUsed'>0</div>" +
+                        action.name+"<br>" +
+                        "<div class='bold'>Mana Used</div> <div id='action"+index+"ManaUsed'>0</div><br>" +
                         "<div id='action"+index+"HasFailed' style='display:none'><div class='bold'>Failed Attempts</div> <div id='action"+index+"Failed'>0</div></div>" +
                     "</div></div>" +
                     "</div>"+
@@ -265,6 +266,10 @@ function View() {
         this.createTownAction(new ThrowParty());
         this.createTownAction(new WarriorLessons());
         this.createTownAction(new MageLessons());
+
+        tempObj = new HealTheSick();
+        this.createTownAction(tempObj);
+        this.createMultiPartPBar(tempObj);
     };
 
     this.createActionProgress = function(action) {
@@ -314,9 +319,9 @@ function View() {
         let totalInfoText =
             "<div class='townInfoContainer showthat' id='infoContainer"+action.varName+"'>" +
                 "<div class='bold townLabel'>"+action.infoName+"</div> " +
-            "<div id='goodTemp"+action.varName+"'>0</div> <i class='fa fa-arrow-left'></i> " +
-            "<div id='good"+action.varName+"'>0</div> <i class='fa fa-arrow-left'></i> " +
-            "<div id='checked"+action.varName+"'>0</div>" +
+                "<div id='goodTemp"+action.varName+"'>0</div> <i class='fa fa-arrow-left'></i> " +
+                "<div id='good"+action.varName+"'>0</div> <i class='fa fa-arrow-left'></i> " +
+                "<div id='checked"+action.varName+"'>0</div>" +
                 "<div class='showthis'>" +
                     action.infoText +
                 "</div>" +
@@ -327,6 +332,87 @@ function View() {
         infoDiv.style.display = "block";
         infoDiv.innerHTML = totalInfoText;
         townInfoDiv.appendChild(infoDiv);
+    };
+
+    this.createMultiPartPBar = function(action, parts) {
+        let pbars = "";
+        let width = "style='width:"+(90/action.segments)+"%'";
+        for(let i = 0; i < action.segments; i++) {
+            pbars += "<div class='thickProgressBar showthat' "+width+">" +
+                        "<div id='expBar"+i+action.varName+"' class='segmentBar'></div>" +
+                        "<div class='showthis' id='tooltip"+i+action.varName+"'>" +
+                            "<div id='segmentName"+i+action.varName+"'></div><br>" +
+                            "<div class='bold'>Main Stat</div> <div id='mainStat"+i+action.varName+"'></div><br>" +
+                            "<div class='bold'>Progress</div> <div id='progress"+i+action.varName+"'></div> / <div id='progressNeeded"+i+action.varName+"'></div>" +
+                        "</div>" +
+                    "</div>";
+        }
+        const totalDivText =
+            "<div class='townStatContainer' style='text-align:center' id='infoContainer"+action.varName+"'>"+
+                "<div class='bold townLabel' style='float:left' id='multiPartName"+action.varName+"'></div>"+
+                "<div class='completedInfo' id='completed"+action.varName+"'></div><br>"+
+                pbars +
+            "</div>";
+
+        let progressDiv = document.createElement("div");
+        progressDiv.style.display = "block";
+        progressDiv.innerHTML = totalDivText;
+        townInfoDiv.appendChild(progressDiv);
+    };
+
+    this.updateMultiPartActions = function() {
+        let tempObj = new HealTheSick();
+        this.updateMultiPart(tempObj);
+        this.updateMultiPartSegments(tempObj);
+    };
+
+    this.updateMultiPartSegments = function(action) { //happens every tick
+        let segment = 0;
+        let curProgress = towns[0][action.varName];
+        //update previous segments
+        let loopCost = action.loopCost(segment);
+        while(curProgress >= loopCost) {
+            document.getElementById("expBar"+segment+action.varName).style.width = "0";
+            if(document.getElementById("progress"+segment+action.varName).innerHTML !== loopCost) {
+                document.getElementById("progress"+segment+action.varName).innerHTML = intToStringRound(loopCost);
+                document.getElementById("progressNeeded"+segment+action.varName).innerHTML = intToStringRound(loopCost);
+            }
+
+            segment++;
+            loopCost = action.loopCost(segment);
+            curProgress -= loopCost;
+        }
+
+        //update current segments
+        if(document.getElementById("progress"+segment+action.varName).innerHTML !== curProgress) {
+            document.getElementById("expBar"+segment+action.varName).style.width = (100-100*curProgress/loopCost)+"%";
+            document.getElementById("progress"+segment+action.varName).innerHTML = intToStringRound(curProgress);
+            document.getElementById("progressNeeded"+segment+action.varName).innerHTML = intToStringRound(loopCost);
+        }
+
+        //update later segments
+        for(let i = segment+1; i < action.segments; i++) {
+            document.getElementById("expBar"+i+action.varName).style.width = "100%";
+            if(document.getElementById("progress"+i+action.varName).innerHTML !== "0") {
+                document.getElementById("progress"+i+action.varName).innerHTML = "0";
+                document.getElementById("progressNeeded"+i+action.varName).innerHTML = intToStringRound(action.loopCost(i));
+            }
+        }
+    };
+
+    this.updateMultiPart = function(action) {
+        document.getElementById("multiPartName"+action.varName).innerHTML = action.getPartName();
+        document.getElementById("completed"+action.varName).innerHTML = "<div class='bold'>Completed</div> " + towns[curTown]["total"+action.varName];
+        for(let i = 0; i < action.segments; i++) {
+            let expBar = document.getElementById("expBar"+i+action.varName);
+            if(!expBar) {
+                continue;
+            }
+            let mainStat = action.loopStats[(towns[0][action.varName+"LoopCounter"]+i) % action.loopStats.length];
+            document.getElementById("mainStat"+i+action.varName).innerHTML = mainStat;
+            addStatColors(expBar, mainStat);
+            document.getElementById("segmentName"+i+action.varName).innerHTML = action.getSegmentName(towns[0][action.varName+"LoopCounter"]+i);
+        }
     };
 }
 
@@ -342,4 +428,26 @@ function expEquals(stat) {
 
 function talentEquals(stat) {
     return prevState.stats[stat].talent === stats[stat].talent;
+}
+
+function addStatColors(theDiv, stat) {
+    if(stat === "Str") {
+        theDiv.style.backgroundColor = "#d70037";
+    } else if(stat === "Dex") {
+        theDiv.style.backgroundColor = "#eec42f";
+    } else if(stat === "Con") {
+        theDiv.style.backgroundColor = "#b06f37";
+    } else if(stat === "Per") {
+        theDiv.style.backgroundColor = "#4ce2e9";
+    } else if(stat === "Int") {
+        theDiv.style.backgroundColor = "#2640b2";
+    } else if(stat === "Cha") {
+        theDiv.style.backgroundColor = "#ede356";
+    } else if(stat === "Spd") {
+        theDiv.style.backgroundColor = "#dd51db";
+    } else if(stat === "Luck") {
+        theDiv.style.backgroundColor = "#3feb53";
+    } else if(stat === "Soul") {
+        theDiv.style.backgroundColor = "#737388";
+    }
 }

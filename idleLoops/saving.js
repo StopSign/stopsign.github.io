@@ -69,6 +69,7 @@ function load() {
     town.expWander = toLoad.expWander;
     town.expMet = toLoad.expMet;
     town.expSecrets = toLoad.expSecrets ? toLoad.expSecrets : 0;
+    town.totalHeal = toLoad.totalHeal ? toLoad.totalHeal : 0;
 
     recalcInterval(50);
     pauseGame();
@@ -93,6 +94,7 @@ function load() {
     });
     actions.next = toLoad.nextList ? toLoad.nextList : actions.next;
     loadouts = toLoad.loadouts ? toLoad.loadouts : loadouts;
+
     view.updateNextActions();
     view.update();
 }
@@ -105,6 +107,7 @@ function save() {
     toSave.expWander = town.expWander;
     toSave.expMet = town.expMet;
     toSave.expSecrets = town.expSecrets;
+    toSave.totalHeal = town.totalHeal;
 
     view.totalActionList.forEach((action) => {
         if(town.varNames.indexOf(action.varName) !== -1) {

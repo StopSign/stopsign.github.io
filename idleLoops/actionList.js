@@ -30,6 +30,8 @@ function translateClassNames(name) {
         return new GuidedTour();
     } else if(name === "Throw Party") {
         return new ThrowParty();
+    } else if(name === "Heal The Sick") {
+        return new HealTheSick();
     }
 
     console.log('error trying to create ' + name);
@@ -462,5 +464,48 @@ function LongQuest() {
             addGold(25);
             return 25;
         })
+    };
+}
+
+//Three part actions
+//three part actions have 3 distinct parts to get through before repeating
+//They also get a bonus depending on how often you complete them
+
+function HealTheSick() {
+    this.name = "Heal The Sick";
+    this.manaCost = 2500;
+    this.expMult = 1;
+    this.tooltip = "You won't be able to heal them all, but they'll be thankful for doing what you can.<br>Healing is always 3 parts, each with a main stat - Diagnose (Per), Treat (Int), Inform (Cha).<br>Gives (magic skill) * (1 + main stat / 100) * (1 + times completed / 100) * (actual mana cost / original mana cost) progress points per mana.<br>Requires 20 Magic skill.<br>Gives 3 reputation upon patient completion.";
+    this.varName = "Heal";
+    this.stats = {
+        Per:.2,
+        Int:.2,
+        Cha:.2,
+        Soul:.4
+    };
+    this.loopStats = ["Per", "Int", "Cha"];
+    this.segments = 3;
+    this.loopCost = function(segment) {
+        return (2+Math.floor((towns[0].HealLoopCounter+segment)/this.segments+.0000001)) * 10000;
+    };
+    this.tickProgress = function(offset) {
+        return getSkillLevel("Magic") * (1 + getLevel(this.loopStats[(towns[0].HealLoopCounter+offset) % this.loopStats.length])/100) * (1 + towns[0].totalHeal/100);
+    };
+    this.loopsFinished = function() {
+        addReputation(3);
+    };
+    this.getPartName = function() {
+        return "Patient " + numberToWords(Math.floor((towns[0].HealLoopCounter+.0001)/this.segments+1));
+    };
+    this.getSegmentName = function(segment) {
+        return ["Diagnose", "Treat", "Inform"][segment % 3];
+    };
+    this.visible = function() {
+        return getSkillLevel("Magic") >= 5;
+    };
+    this.unlocked = function() {
+        return getSkillLevel("Magic") >= 20;
+    };
+    this.finish = function() {
     };
 }
