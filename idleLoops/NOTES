@@ -25,8 +25,6 @@ TODO:
 decreasing chance for soulstones as you clear dungeons 100%, 90%, 81%, etc.
 chance 'recovers' .001% per tick
 
-
-Heal the Sick - 2.5k mana, requires 20 magic skill. 3 segments of Diagnose (Per), Treat (Int), Inform (Cha), giving 3 reputation when 3rd segment is done. Gives magic skill * (1 + stat level/100) * (1 + timesCompleted / 20) progress points per tick, requires 20k per segment
 Fight monsters - roughly require combat skill, Str, Spd, Con for gold
 Clear small dungeon - roughly require magic+combat skill, Dex, Luck for permanent exp gains (like a 2nd talent)
 buy supplies - 500 mana, costs 400 gold, required to travel
