@@ -27,17 +27,22 @@ function Actions() {
             }
             //segment is 0,1,2
             let toAdd = curAction.tickProgress(segment) * (curAction.manaCost / curAction.adjustedTicks);
-            // console.log("adding: " + toAdd + " to segment: " + segment + " of progress " + curProgress + " which costs: " + curAction.loopCost(segment));
+            console.log("adding: " + toAdd + " to segment: " + segment + " of progress " + curProgress + " which costs: " + curAction.loopCost(segment));
             towns[0][curAction.varName] += toAdd;
             curProgress += toAdd;
-            if((segment === curAction.segments-1) && curProgress >= curAction.loopCost(segment)) {
-                // console.log("finished");
-                //part finished
-                towns[0][curAction.varName] = 0;
-                towns[0][curAction.varName+"LoopCounter"] += curAction.segments;
-                towns[0].totalHeal++;
-                curAction.loopsFinished();
-                view.updateMultiPart(curAction);
+            if(curProgress >= curAction.loopCost(segment)) {
+                //segment finished
+                if(curAction.segmentFinished) {
+                    curAction.segmentFinished();
+                }
+                if (segment === curAction.segments - 1) {
+                    //part finished
+                    towns[0][curAction.varName] = 0;
+                    towns[0][curAction.varName + "LoopCounter"] += curAction.segments;
+                    towns[0]["total"+curAction.varName]++;
+                    curAction.loopsFinished();
+                    view.updateMultiPart(curAction);
+                }
             }
             view.updateMultiPartSegments(curAction);
         }
@@ -107,7 +112,6 @@ function Actions() {
         }
         this.adjustTicksNeeded();
         view.updateNextActions();
-        towns[0]["Heal"] = 0;
         view.updateMultiPartActions();
     };
 

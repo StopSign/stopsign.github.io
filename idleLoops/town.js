@@ -12,6 +12,8 @@ function Town(difficulty) {
     };
 
     this.restart = function() {
+        towns[0]["Heal"] = 0;
+        towns[0]["Combat"] = 0;
         this.varNames.forEach((varName) => {
             this["goodTemp"+varName] = this["good"+varName];
             this["lootFrom"+varName] = 0;
@@ -98,5 +100,7 @@ function Town(difficulty) {
     this.createProgressVars("Secrets");
     this.Heal = 0;
     this.HealLoopCounter = 0;
+    this.Fight = 0;
+    this.FightLoopCounter = 0;
 
 }

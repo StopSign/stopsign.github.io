@@ -5,7 +5,7 @@ doWork.onmessage = function (event) {
     }
 };
 
-let timeNeededInitial = 5 * 50;
+let timeNeededInitial = 5 * 50 * 100;
 let timer = timeNeededInitial;
 let timeNeeded = timeNeededInitial;
 let stop = false;
@@ -70,6 +70,7 @@ function load() {
     town.expMet = toLoad.expMet;
     town.expSecrets = toLoad.expSecrets ? toLoad.expSecrets : 0;
     town.totalHeal = toLoad.totalHeal ? toLoad.totalHeal : 0;
+    town.totalFight = toLoad.totalFight ? toLoad.totalFight : 0;
 
     recalcInterval(50);
     pauseGame();
@@ -97,6 +98,7 @@ function load() {
 
     view.updateNextActions();
     view.update();
+    view.updateMultiPartActions();
 }
 
 function save() {
@@ -108,6 +110,7 @@ function save() {
     toSave.expMet = town.expMet;
     toSave.expSecrets = town.expSecrets;
     toSave.totalHeal = town.totalHeal;
+    toSave.totalFight = town.totalFight;
 
     view.totalActionList.forEach((action) => {
         if(town.varNames.indexOf(action.varName) !== -1) {

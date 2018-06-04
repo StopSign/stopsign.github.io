@@ -32,6 +32,8 @@ function translateClassNames(name) {
         return new ThrowParty();
     } else if(name === "Heal The Sick") {
         return new HealTheSick();
+    } else if(name === "Fight Monsters") {
+        return new FightMonsters();
     }
 
     console.log('error trying to create ' + name);
@@ -515,37 +517,56 @@ function FightMonsters() {
     this.name = "Fight Monsters";
     this.manaCost = 2000;
     this.expMult = 1;
-    this.tooltip = "You won't be able to heal them all, but they'll be thankful for doing what you can.<br>Healing is always 3 parts, each with a main stat - Diagnose (Per), Treat (Int), Inform (Cha).<br>Gives (magic skill) * (1 + main stat / 100) * (1 + times completed / 100) * (actual mana cost / original mana cost) progress points per mana.<br>Requires 24 Magic skill.<br>Gives 3 reputation upon patient completion.";
-    this.varName = "Heal";
+    this.tooltip = "Slowly, you're figuring out their patterns.<br>Fighting rotates between 3 types of battles, each with a main stat - Quick (Spd), Defensive (Str), Aggressive (Con).<br>Gives (combat skill) * (1 + main stat / 100) * (1 + times completed / 100) * (actual mana cost / original mana cost) progress points per mana.<br>Requires 20 Combat skill.<br>Gives 30 gold per fight segment completion.";
+    this.varName = "Fight";
     this.stats = {
-        Per:.2,
-        Int:.2,
-        Cha:.2,
-        Soul:.4
+        Str:.3,
+        Spd:.3,
+        Con:.3,
+        Luck:.1
     };
-    this.loopStats = ["Str", "Str", "Str", "Spd", "Spd", "Spd", "Con", "Con", "Con"];
+    this.loopStats = ["Spd", "Spd", "Spd", "Str", "Str", "Str", "Con", "Con", "Con"];
     this.segments = 3;
     this.loopCost = function(segment) {
-        return (2+Math.floor((towns[0].HealLoopCounter+segment)/this.segments+.0000001)) * 10000;
+        return fibonacci(Math.floor((towns[0].FightLoopCounter+segment) - towns[0].FightLoopCounter/3+.0000001)) * 20000;
     };
     this.tickProgress = function(offset) {
-        return getSkillLevel("Magic") * (1 + getLevel(this.loopStats[(towns[0].HealLoopCounter+offset) % this.loopStats.length])/100) * (1 + towns[0].totalHeal/100);
+        return getSkillLevel("Combat") * (1 + getLevel(this.loopStats[(towns[0].FightLoopCounter+offset) % this.loopStats.length])/100) * (1 + towns[0].totalFight/100);
     };
     this.loopsFinished = function() {
-        addGold(50);
+    };
+    this.segmentFinished = function() {
+        addGold(30);
     };
     this.getPartName = function() {
-        return "Patient " + numberToWords(Math.floor((towns[0].HealLoopCounter+.0001)/this.segments+1));
+        let name = monsterNames()[Math.floor(towns[0].FightLoopCounter/3+.0000001)];
+        if(!name) {
+            name = ["Speedy Monsters", "Tough Monsters", "Scary Monsters"][Math.floor(towns[0].FightLoopCounter/3+.0000001) % 3]
+        }
+        return name;
     };
     this.getSegmentName = function(segment) {
-        return ["Diagnose", "Treat", "Inform"][segment % 3];
+        let name = monsterNames()[Math.floor(towns[0].FightLoopCounter/3+.0000001)];
+        if(!name) {
+            name = ["Speedy Monsters", "Tough Monsters", "Scary Monsters"][Math.floor(towns[0].FightLoopCounter/3+.0000001) % 3]
+        }
+        if(segment === 0) {
+            return "A couple "+name;
+        } else if(segment === 1) {
+            return "A few "+name;
+        }
+        return "A bunch of "+name;
     };
     this.visible = function() {
         return getSkillLevel("Magic") >= 5;
     };
     this.unlocked = function() {
-        return getSkillLevel("Magic") >= 24;
+        return getSkillLevel("Magic") >= 20;
     };
     this.finish = function() {
     };
+}
+
+function monsterNames() { //spd, defensive, aggressive
+    return ["Deer", "Giant Turtles", "Goblins", "Demon Rabbits", "Giant Honeybadgers", "Venemous Snakes", "Angry Monkeys", "Trolls", "Ogres", "Pixies", "Treants", "Gelatanous Cubes", "Fairies", "Orcs", "Beholders", "Spectres", "Shambling Mound", "Corrupted Mushroomfolk", "Giant Owls", "Blood Trolls", "Small Wyrms", "Pikachus", "Machokes", "Alakazams"];
 }

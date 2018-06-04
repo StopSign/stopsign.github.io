@@ -272,6 +272,10 @@ function View() {
         tempObj = new HealTheSick();
         this.createTownAction(tempObj);
         this.createMultiPartPBar(tempObj);
+
+        tempObj = new FightMonsters();
+        this.createTownAction(tempObj);
+        this.createMultiPartPBar(tempObj);
     };
 
     this.createActionProgress = function(action) {
@@ -366,6 +370,10 @@ function View() {
         let tempObj = new HealTheSick();
         this.updateMultiPart(tempObj);
         this.updateMultiPartSegments(tempObj);
+
+        tempObj = new FightMonsters();
+        this.updateMultiPart(tempObj);
+        this.updateMultiPartSegments(tempObj);
     };
 
     this.updateMultiPartSegments = function(action) { //happens every tick
@@ -380,9 +388,9 @@ function View() {
                 document.getElementById("progressNeeded"+segment+action.varName).innerHTML = intToStringRound(loopCost);
             }
 
+            curProgress -= loopCost;
             segment++;
             loopCost = action.loopCost(segment);
-            curProgress -= loopCost;
         }
 
         //update current segments

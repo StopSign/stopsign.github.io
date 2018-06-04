@@ -18,7 +18,18 @@ Add a new progress bar action:
     in view.js, this.createTownAction(tempObj); this.createActionProgress(tempObj);
     in actionList.js, translateClassNames(), add the translation
     get an svg
-    add to save()
+    add to save() and load()
+
+Add a new multipart progress bar action:
+    New class in actionList.js
+    in actionList.js, translateClassNames(), add the translation
+    get an svg
+    add to save() and load()
+    in view.js, this.createTownAction(tempObj); this.createMultiPartPBar(tempObj); and updateMultiPartActions();
+    End of town.js, this.createProgressVars("New");
+    town.js restart()
+
+
 	
 	
 TODO:

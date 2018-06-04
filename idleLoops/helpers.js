@@ -136,6 +136,16 @@ function factorial(n) {
     return factorials[n] = factorial(n-1) * n;
 }
 
+
+let fibonaccis = [];
+function fibonacci(n) {
+    if (n === 0 || n === 1)
+        return 1;
+    if (fibonaccis[n] > 0)
+        return fibonaccis[n];
+    return fibonaccis[n] = fibonacci(n-1) + fibonacci(n-2);
+}
+
 function sortArrayObjectsByValue(arr, valueName) {
     let n = arr.length;
 
