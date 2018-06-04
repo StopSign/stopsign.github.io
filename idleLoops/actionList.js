@@ -558,10 +558,10 @@ function FightMonsters() {
         return "A bunch of "+name;
     };
     this.visible = function() {
-        return getSkillLevel("Magic") >= 5;
+        return getSkillLevel("Combat") >= 5;
     };
     this.unlocked = function() {
-        return getSkillLevel("Magic") >= 20;
+        return getSkillLevel("Combat") >= 20;
     };
     this.finish = function() {
     };
