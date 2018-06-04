@@ -127,6 +127,7 @@ function View() {
                         action.name+"<br>" +
                         "<div class='bold'>Mana Used</div> <div id='action"+index+"ManaUsed'>0</div><br>" +
                         "<div class='bold'>Remaining</div> <div id='action"+index+"Remaining'></div><br>" +
+                        "<div id='action"+index+"ExpGain'></div>" +
                         "<div id='action"+index+"HasFailed' style='display:none'><div class='bold'>Failed Attempts</div> <div id='action"+index+"Failed'>0</div></div>" +
                     "</div></div>" +
                     "</div>"+
@@ -154,6 +155,13 @@ function View() {
         }
         document.getElementById("action"+index+"ManaUsed").innerHTML = action.manaUsed+"";
         document.getElementById("action"+index+"Remaining").innerHTML = (timeNeeded - timer)+"";
+        let statExpGain = "";
+        statList.forEach((statName) => {
+            if(action["statExp"+statName]) {
+                statExpGain += "<div class='bold'>"+statName+"</div> " + intToString(action["statExp"+statName], 2) + "<br>";
+            }
+        });
+        document.getElementById("action"+index+"ExpGain").innerHTML = statExpGain;
     };
 
     this.updateCurrentActionLoops = function(index) {

@@ -205,7 +205,12 @@ function setAdjustedTicks(action) {
 function addExpFromAction(action) {
     statList.forEach((statName) => {
         if(action.stats[statName]) {
-            addExp(statName, action.stats[statName] * action.expMult * (action.manaCost / action.adjustedTicks) * (1+getTalent(statName)/100));
+            let expToAdd = action.stats[statName] * action.expMult * (action.manaCost / action.adjustedTicks) * (1+getTalent(statName)/100);
+            if(!action["statExp"+statName]) {
+                action["statExp"+statName] = 0;
+            }
+            action["statExp"+statName] += expToAdd;
+            addExp(statName, expToAdd);
         }
     });
 }
