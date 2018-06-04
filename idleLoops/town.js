@@ -12,13 +12,12 @@ function Town(difficulty) {
     };
 
     this.restart = function() {
-        towns[0]["Heal"] = 0;
-        towns[0]["Fight"] = 0;
         this.varNames.forEach((varName) => {
             this["goodTemp"+varName] = this["good"+varName];
             this["lootFrom"+varName] = 0;
             view.updateRegular(varName);
         });
+        view.updateMultiPartActions();
     };
 
     this.finishProgress = function(varName, expGain, levelUpReward) {

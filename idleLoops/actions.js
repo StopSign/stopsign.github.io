@@ -110,9 +110,12 @@ function Actions() {
                 this.current.push(toAdd);
             });
         }
+        towns[0]["Heal"] = 0;
+        towns[0]["Fight"] = 0;
+        towns[0].HealLoopCounter = 0;
+        towns[0].FightLoopCounter = 0;
         this.adjustTicksNeeded();
         view.updateNextActions();
-        view.updateMultiPartActions();
     };
 
     this.adjustTicksNeeded = function() {
