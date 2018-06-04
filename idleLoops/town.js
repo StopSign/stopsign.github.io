@@ -13,7 +13,7 @@ function Town(difficulty) {
 
     this.restart = function() {
         towns[0]["Heal"] = 0;
-        towns[0]["Combat"] = 0;
+        towns[0]["Fight"] = 0;
         this.varNames.forEach((varName) => {
             this["goodTemp"+varName] = this["good"+varName];
             this["lootFrom"+varName] = 0;

@@ -27,7 +27,7 @@ function Actions() {
             }
             //segment is 0,1,2
             let toAdd = curAction.tickProgress(segment) * (curAction.manaCost / curAction.adjustedTicks);
-            console.log("adding: " + toAdd + " to segment: " + segment + " of progress " + curProgress + " which costs: " + curAction.loopCost(segment));
+            // console.log("adding: " + toAdd + " to segment: " + segment + " of progress " + curProgress + " which costs: " + curAction.loopCost(segment));
             towns[0][curAction.varName] += toAdd;
             curProgress += toAdd;
             if(curProgress >= curAction.loopCost(segment)) {
