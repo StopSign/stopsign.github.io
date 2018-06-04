@@ -17,7 +17,6 @@ function Town(difficulty) {
             this["lootFrom"+varName] = 0;
             view.updateRegular(varName);
         });
-        view.updateMultiPartActions();
     };
 
     this.finishProgress = function(varName, expGain, levelUpReward) {

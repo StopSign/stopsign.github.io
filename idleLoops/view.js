@@ -405,8 +405,8 @@ function View() {
             document.getElementById("expBar"+i+action.varName).style.width = "100%";
             if(document.getElementById("progress"+i+action.varName).innerHTML !== "0") {
                 document.getElementById("progress"+i+action.varName).innerHTML = "0";
-                document.getElementById("progressNeeded"+i+action.varName).innerHTML = intToStringRound(action.loopCost(i));
             }
+            document.getElementById("progressNeeded"+i+action.varName).innerHTML = intToStringRound(action.loopCost(i));
         }
     };
 

@@ -85,6 +85,10 @@ function Actions() {
     this.restart = function() {
         this.currentPos = 0;
         this.completedTicks = 0;
+        towns[0]["Heal"] = 0;
+        towns[0]["Fight"] = 0;
+        towns[0].HealLoopCounter = 0;
+        towns[0].FightLoopCounter = 0;
         if(document.getElementById("currentListActive").checked) {
             this.currentPos = 0;
             this.completedTicks = 0;
@@ -110,11 +114,8 @@ function Actions() {
                 this.current.push(toAdd);
             });
         }
-        towns[0]["Heal"] = 0;
-        towns[0]["Fight"] = 0;
-        towns[0].HealLoopCounter = 0;
-        towns[0].FightLoopCounter = 0;
         this.adjustTicksNeeded();
+        view.updateMultiPartActions();
         view.updateNextActions();
     };
 
