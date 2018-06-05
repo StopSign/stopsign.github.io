@@ -133,7 +133,16 @@ function Actions() {
     };
 
     this.capAmount = function(index) {
-        this.next[index].loops = translateClassNames(this.next[index].name).cap();
+        let varName = "good"+translateClassNames(this.next[index].name).varName;
+        let alreadyExisting = 0;
+        for(let i = 0; i < this.next.length; i++) {
+            if(i === index || this.next[index].name !== this.next[i].name) {
+                continue;
+            }
+            alreadyExisting += this.next[i].loops;
+        }
+        let newLoops = towns[0][varName] - alreadyExisting;
+        this.next[index].loops = newLoops < 0 ? 0 : newLoops;
         view.updateNextActions();
     };
     this.addLoop = function(index) {

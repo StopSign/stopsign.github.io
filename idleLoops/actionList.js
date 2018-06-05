@@ -301,6 +301,7 @@ function WarriorLessons() {
     };
     this.finish = function() {
         addSkillExp("Combat", 50);
+        view.updateProgressActions();
     };
 }
 
@@ -329,6 +330,7 @@ function MageLessons() {
     };
     this.finish = function() {
         addSkillExp("Magic", 50);
+        view.updateProgressActions();
     };
 }
 
@@ -348,9 +350,6 @@ function SmashPots() {
         Str:.2,
         Per:.2,
         Spd:.6
-    };
-    this.cap = function() {
-        return towns[0].goodPots;
     };
     this.visible = function() {
         return true;
@@ -380,9 +379,6 @@ function PickLocks() {
         Per:.3,
         Spd:.1,
         Luck:.1
-    };
-    this.cap = function() {
-        return towns[0].goodLocks;
     };
     this.visible = function() {
         return towns[curTown].getLevel("Wander") >= 3;
@@ -415,9 +411,6 @@ function ShortQuest() {
         Luck:.1,
         Soul:.1
     };
-    this.cap = function() {
-        return towns[0].goodSQuests;
-    };
     this.visible = function() {
         return towns[curTown].getLevel("Met") >= 1;
     };
@@ -446,9 +439,6 @@ function LongQuest() {
         Int:.2,
         Con:.4,
         Spd:.2
-    };
-    this.cap = function() {
-        return towns[0].goodLQuests;
     };
     this.visible = function() {
         return towns[curTown].getLevel("Secrets") >= 1;

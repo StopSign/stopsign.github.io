@@ -88,7 +88,6 @@ function Town(difficulty) {
         }
     };
 
-
     this.createVars("Pots");
     this.createVars("Locks");
     this.createVars("SQuests");

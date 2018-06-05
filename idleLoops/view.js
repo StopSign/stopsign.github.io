@@ -348,7 +348,7 @@ function View() {
         townInfoDiv.appendChild(infoDiv);
     };
 
-    this.createMultiPartPBar = function(action, parts) {
+    this.createMultiPartPBar = function(action) {
         let pbars = "";
         let width = "style='width:"+(90/action.segments)+"%'";
         for(let i = 0; i < action.segments; i++) {
