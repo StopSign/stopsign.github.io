@@ -34,6 +34,8 @@ function translateClassNames(name) {
         return new HealTheSick();
     } else if(name === "Fight Monsters") {
         return new FightMonsters();
+    } else if(name === "Small Dungeon") {
+        return new SmallDungeon();
     }
 
     console.log('error trying to create ' + name);
@@ -300,7 +302,7 @@ function WarriorLessons() {
         return towns[curTown].getLevel("Secrets") >= 20;
     };
     this.finish = function() {
-        addSkillExp("Combat", 50);
+        addSkillExp("Combat", 100);
         view.updateProgressActions();
     };
 }
@@ -329,7 +331,7 @@ function MageLessons() {
         return towns[curTown].getLevel("Secrets") >= 20;
     };
     this.finish = function() {
-        addSkillExp("Magic", 50);
+        addSkillExp("Magic", 100);
         view.updateProgressActions();
     };
 }
@@ -559,4 +561,52 @@ function FightMonsters() {
 
 function monsterNames() { //spd, defensive, aggressive
     return ["Deer", "Giant Turtles", "Goblins", "Demon Rabbits", "Giant Honeybadgers", "Venemous Snakes", "Angry Monkeys", "Trolls", "Ogres", "Pixies", "Treants", "Gelatanous Cubes", "Fairies", "Orcs", "Beholders", "Spectres", "Shambling Mound", "Corrupted Mushroomfolk", "Giant Owls", "Blood Trolls", "Small Wyrms", "Pikachus", "Machokes", "Alakazams"];
+}
+
+
+function SmallDungeon() {
+    this.name = "Small Dungeon";
+    this.manaCost = 2000;
+    this.expMult = 1;
+    this.tooltip = "There are small changes each time; it's harder to get used to. The soulstones at the end last through loops, but they're not always in the dungeon... Strange.<br>The dungeon requires different skills at different points.<br>Gives (magic + combat skill) * (1 + main stat / 100) * (1 + times completed / 200) * (actual mana cost / original mana cost) progress points per mana.<br>Requires a combined skill of 47.<br>Gives 1 soulstone per completion - hover over Completed for info.";
+    this.varName = "SDungeon";
+    this.stats = {
+        Dex:.5,
+        Con:.3,
+        Str:.1,
+        Luck:.1
+    };
+    this.loopStats = ["Dex", "Con", "Dex", "Cha", "Dex", "Str", "Luck"];
+    this.segments = 7;
+    this.completedTooltip = "Each soulstone improves a random stat's exp gain by 10%. Each soulstone reduces the chance you'll get the next one by 10%. Soulstone chance recovers at .0001% per mana.<br><div class='bold'>Chance </div> <div id='soulstoneChance'></div>%<br><div class='bold'>Last Stat</div> <div id='soulstonePrevious'>NA</div>";
+    this.loopCost = function(segment) {
+        return (1+Math.floor((towns[0].SDungeonLoopCounter+segment)/this.segments+.0000001)) * 20000;
+    };
+    this.tickProgress = function(offset) {
+        return (getSkillLevel("Combat")+getSkillLevel("Magic")) * (1 + getLevel(this.loopStats[(towns[0].SDungeonLoopCounter+offset) % this.loopStats.length])/100) * (1 + towns[0].totalSDungeon/200);
+    };
+    this.loopsFinished = function() {
+        let rand = Math.random();
+        if(rand <= soulstoneChance) {
+            let statToAdd = statList[Math.floor(Math.random() * statList.length)];
+            document.getElementById('soulstonePrevious').innerHTML = statToAdd;
+            stats[statToAdd].soulstone = stats[statToAdd].soulstone ? stats[statToAdd].soulstone+1 : 1;
+            soulstoneChance *= .9;
+            view.updateSoulstones();
+        }
+    };
+    this.getPartName = function() {
+        return "Small Dungeon " + numberToWords(Math.floor((towns[0].SDungeonLoopCounter+.0001)/this.segments+1));
+    };
+    this.getSegmentName = function(segment) {
+        return ["Spike Traps", "Long Hallways", "Arrow Traps", "Riddle Guardian", "Swinging Axes", "Boss", "Loot"][segment % this.segments];
+    };
+    this.visible = function() {
+        return (getSkillLevel("Combat") + getSkillLevel("Magic")) >= 20;
+    };
+    this.unlocked = function() {
+        return (getSkillLevel("Combat") + getSkillLevel("Magic")) >= 47;
+    };
+    this.finish = function() {
+    };
 }

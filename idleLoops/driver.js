@@ -8,6 +8,13 @@ function tick() {
 
     prevState.stats = JSON.parse(JSON.stringify(stats));
     actions.tick();
+    if(soulstoneChance < 1) {
+        soulstoneChance += .000001;
+        if(soulstoneChance > 1) {
+            soulstoneChance = 1;
+        }
+    }
+
 
     if(shouldRestart || timer >= timeNeeded) {
         prepareRestart();

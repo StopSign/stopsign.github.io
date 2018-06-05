@@ -16,6 +16,7 @@ function View() {
         this.updateAddAmount(1);
         this.createTownActions();
         this.updateProgressActions();
+        this.updateSoulstones();
     };
 
     this.update = function() {
@@ -23,6 +24,7 @@ function View() {
             this.updateStat(stat);
         });
         this.updateTime();
+        this.updateSoulstoneChance();
     };
 
     this.updateStat = function(stat) {
@@ -34,6 +36,8 @@ function View() {
 
             document.getElementById("stat" + stat + "Talent").innerHTML = getTalent(stat);
             document.getElementById("stat" + stat + "TalentBar").style.width = talentPrc;
+
+            document.getElementById("stat" + stat + "SSBonus").innerHTML = (stats[stat].soulstone ? stats[stat].soulstone : 0) * 10+"%";
         }
 
         if(isVisible(document.getElementById("stat"+stat+"Tooltip")) || document.getElementById("stat" + stat + "LevelExp").innerHTML === "") {
@@ -284,6 +288,10 @@ function View() {
         tempObj = new FightMonsters();
         this.createTownAction(tempObj);
         this.createMultiPartPBar(tempObj);
+
+        tempObj = new SmallDungeon();
+        this.createTownAction(tempObj);
+        this.createMultiPartPBar(tempObj);
     };
 
     this.createActionProgress = function(action) {
@@ -361,10 +369,14 @@ function View() {
                         "</div>" +
                     "</div>";
         }
+        let completedTooltip = action.completedTooltip ? action.completedTooltip : "";
         const totalDivText =
             "<div class='townStatContainer' style='text-align:center' id='infoContainer"+action.varName+"'>"+
                 "<div class='bold townLabel' style='float:left' id='multiPartName"+action.varName+"'></div>"+
-                "<div class='completedInfo' id='completed"+action.varName+"'></div><br>"+
+                "<div class='completedInfo showthat' id='completedContainer"+action.varName+"' onmouseover='view.updateSoulstoneChance()'>" +
+                    "<div class='bold'>Completed</div> <div id='completed"+action.varName+"'></div>" +
+                    "<div class='showthis'>"+completedTooltip+"</div>" +
+                "</div><br>"+
                 pbars +
             "</div>";
 
@@ -380,6 +392,10 @@ function View() {
         this.updateMultiPartSegments(tempObj);
 
         tempObj = new FightMonsters();
+        this.updateMultiPart(tempObj);
+        this.updateMultiPartSegments(tempObj);
+
+        tempObj = new SmallDungeon();
         this.updateMultiPart(tempObj);
         this.updateMultiPartSegments(tempObj);
     };
@@ -418,9 +434,26 @@ function View() {
         }
     };
 
+    this.updateSoulstoneChance = function() {
+        if(isVisible(document.getElementById("completedContainerSDungeon"))) {
+            document.getElementById('soulstoneChance').innerHTML = intToString(soulstoneChance * 100, 4);
+        }
+    };
+
+    this.updateSoulstones = function() {
+        statList.forEach((stat) => {
+            if(stats[stat].soulstone) {
+                if (!isVisible(document.getElementById("ss" + stat + "Container"))) {
+                    document.getElementById("ss" + stat + "Container").style.display = "inline-block";
+                }
+                document.getElementById("ss"+stat).innerHTML = stats[stat].soulstone;
+            }
+        });
+    };
+
     this.updateMultiPart = function(action) {
         document.getElementById("multiPartName"+action.varName).innerHTML = action.getPartName();
-        document.getElementById("completed"+action.varName).innerHTML = "<div class='bold'>Completed</div> " + towns[curTown]["total"+action.varName];
+        document.getElementById("completed"+action.varName).innerHTML = " " + towns[curTown]["total"+action.varName];
         for(let i = 0; i < action.segments; i++) {
             let expBar = document.getElementById("expBar"+i+action.varName);
             if(!expBar) {
@@ -452,7 +485,7 @@ function addStatColors(theDiv, stat) {
     if(stat === "Str") {
         theDiv.style.backgroundColor = "#d70037";
     } else if(stat === "Dex") {
-        theDiv.style.backgroundColor = "#eec42f";
+        theDiv.style.backgroundColor = "#9fd430";
     } else if(stat === "Con") {
         theDiv.style.backgroundColor = "#b06f37";
     } else if(stat === "Per") {
@@ -460,9 +493,9 @@ function addStatColors(theDiv, stat) {
     } else if(stat === "Int") {
         theDiv.style.backgroundColor = "#2640b2";
     } else if(stat === "Cha") {
-        theDiv.style.backgroundColor = "#ede356";
+        theDiv.style.backgroundColor = "#ea9ce0";
     } else if(stat === "Spd") {
-        theDiv.style.backgroundColor = "#dd51db";
+        theDiv.style.backgroundColor = "#f6e300";
     } else if(stat === "Luck") {
         theDiv.style.backgroundColor = "#3feb53";
     } else if(stat === "Soul") {

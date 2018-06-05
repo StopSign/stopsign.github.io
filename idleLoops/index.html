@@ -63,110 +63,119 @@
         <div id="statList" style="width:100%;">
             <div class="statContainer showthat" onmouseover="view.updateStat('Str')">
                 <div class="statLabel medium bold">Strength</div>
-                <div class="statNum medium"><div id="statStrLevel">0</div>(<div id="statStrTalent">0</div>)</div>
+                <div class="statNum medium"><div id="statStrLevel">0</div>(<div id="statStrTalent">0</div>)<div id="ssStrContainer" class="ssContainer">(<div id="ssStr"></div>)</div></div>
                 <div style="margin-top:18px;"></div>
                 <div class="thinProgressBarUpper"><div class="statBar statLevelBar" id="statStrLevelBar"></div></div>
                 <div class="thinProgressBarLower"><div class="statBar statTalentBar" id="statStrTalentBar"></div></div>
                 <div class="showthis" id="statStrTooltip">
                     Train your body.<br>
                     <div class="medium bold">Level</div> <div id="statStrLevelExp"></div>/<div id="statStrLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="statStrLevelProgress"></div>%)</div><br>
-                    <div class="medium bold">Talent</div> <div id="statStrTalentExp"></div>/<div id="statStrTalentExpNeeded"></div> <div class="statTooltipPerc">(<div id="statStrTalentProgress"></div>%)</div>
+                    <div class="medium bold">Talent</div> <div id="statStrTalentExp"></div>/<div id="statStrTalentExpNeeded"></div> <div class="statTooltipPerc">(<div id="statStrTalentProgress"></div>%)</div><br>
+                    <div class="medium bold">Soulstone Bonus</div> <div id="statStrSSBonus"></div>
                 </div>
             </div>
             <div class="statContainer showthat" onmouseover="view.updateStat('Dex')">
                 <div class="statLabel medium bold">Dexterity</div>
-                <div class="statNum medium"><div id="statDexLevel">0</div>(<div id="statDexTalent">0</div>)</div>
+                <div class="statNum medium"><div id="statDexLevel">0</div>(<div id="statDexTalent">0</div>)<div id="ssDexContainer" class="ssContainer">(<div id="ssDex"></div>)</div></div>
                 <div style="margin-top:18px;"></div>
                 <div class="thinProgressBarUpper"><div class="statBar statLevelBar" id="statDexLevelBar"></div></div>
                 <div class="thinProgressBarLower"><div class="statBar statTalentBar" id="statDexTalentBar"></div></div>
                 <div class="showthis" id="statDexTooltip">
                     Know your body.<br>
                     <div class="medium bold">Level</div> <div id="statDexLevelExp"></div>/<div id="statDexLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="statDexLevelProgress"></div>%)</div><br>
-                    <div class="medium bold">Talent</div> <div id="statDexTalentExp"></div>/<div id="statDexTalentExpNeeded"></div> <div class="statTooltipPerc">(<div id="statDexTalentProgress"></div>%)</div>
+                    <div class="medium bold">Talent</div> <div id="statDexTalentExp"></div>/<div id="statDexTalentExpNeeded"></div> <div class="statTooltipPerc">(<div id="statDexTalentProgress"></div>%)</div><br>
+                    <div class="medium bold">Soulstone Bonus</div> <div id="statDexSSBonus"></div>
                 </div>
             </div>
             <div class="statContainer showthat" onmouseover="view.updateStat('Con')">
                 <div class="statLabel medium bold">Constitution</div>
-                <div class="statNum medium"><div id="statConLevel">0</div>(<div id="statConTalent">0</div>)</div>
+                <div class="statNum medium"><div id="statConLevel">0</div>(<div id="statConTalent">0</div>)<div id="ssConContainer" class="ssContainer">(<div id="ssCon"></div>)</div></div>
                 <div style="margin-top:18px;"></div>
                 <div class="thinProgressBarUpper"><div class="statBar statLevelBar" id="statConLevelBar"></div></div>
                 <div class="thinProgressBarLower"><div class="statBar statTalentBar" id="statConTalentBar"></div></div>
                 <div class="showthis" id="statConTooltip">
                     Just a little longer. Just a little more.<br>
                     <div class="medium bold">Level</div> <div id="statConLevelExp"></div>/<div id="statConLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="statConLevelProgress"></div>%)</div><br>
-                    <div class="medium bold">Talent</div> <div id="statConTalentExp"></div>/<div id="statConTalentExpNeeded"></div> <div class="statTooltipPerc">(<div id="statConTalentProgress"></div>%)</div>
+                    <div class="medium bold">Talent</div> <div id="statConTalentExp"></div>/<div id="statConTalentExpNeeded"></div> <div class="statTooltipPerc">(<div id="statConTalentProgress"></div>%)</div><br>
+                    <div class="medium bold">Soulstone Bonus</div> <div id="statConSSBonus"></div>
                 </div>
             </div>
             <div class="statContainer showthat" onmouseover="view.updateStat('Per')">
                 <div class="statLabel medium bold">Perception</div>
-                <div class="statNum medium"><div id="statPerLevel">0</div>(<div id="statPerTalent">0</div>)</div>
+                <div class="statNum medium"><div id="statPerLevel">0</div>(<div id="statPerTalent">0</div>)<div id="ssPerContainer" class="ssContainer">(<div id="ssPer"></div>)</div></div>
                 <div style="margin-top:18px;"></div>
                 <div class="thinProgressBarUpper"><div class="statBar statLevelBar" id="statPerLevelBar"></div></div>
                 <div class="thinProgressBarLower"><div class="statBar statTalentBar" id="statPerTalentBar"></div></div>
                 <div class="showthis" id="statPerTooltip">
                     Look a little closer ...<br>
                     <div class="medium bold">Level</div> <div id="statPerLevelExp"></div>/<div id="statPerLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="statPerLevelProgress"></div>%)</div><br>
-                    <div class="medium bold">Talent</div> <div id="statPerTalentExp"></div>/<div id="statPerTalentExpNeeded"></div> <div class="statTooltipPerc">(<div id="statPerTalentProgress"></div>%)</div>
+                    <div class="medium bold">Talent</div> <div id="statPerTalentExp"></div>/<div id="statPerTalentExpNeeded"></div> <div class="statTooltipPerc">(<div id="statPerTalentProgress"></div>%)</div><br>
+                    <div class="medium bold">Soulstone Bonus</div> <div id="statPerSSBonus"></div>
                 </div>
             </div>
             <div class="statContainer showthat" onmouseover="view.updateStat('Int')">
                 <div class="statLabel medium bold">Intelligence</div>
-                <div class="statNum medium"><div id="statIntLevel">0</div>(<div id="statIntTalent">0</div>)</div>
+                <div class="statNum medium"><div id="statIntLevel">0</div>(<div id="statIntTalent">0</div>)<div id="ssIntContainer" class="ssContainer">(<div id="ssInt"></div>)</div></div>
                 <div style="margin-top:18px;"></div>
                 <div class="thinProgressBarUpper"><div class="statBar statLevelBar" id="statIntLevelBar"></div></div>
                 <div class="thinProgressBarLower"><div class="statBar statTalentBar" id="statIntTalentBar"></div></div>
                 <div class="showthis" id="statIntTooltip">
                     Learning to learn.<br>
                     <div class="medium bold">Level</div> <div id="statIntLevelExp"></div>/<div id="statIntLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="statIntLevelProgress"></div>%)</div><br>
-                    <div class="medium bold">Talent</div> <div id="statIntTalentExp"></div>/<div id="statIntTalentExpNeeded"></div> <div class="statTooltipPerc">(<div id="statIntTalentProgress"></div>%)</div>
+                    <div class="medium bold">Talent</div> <div id="statIntTalentExp"></div>/<div id="statIntTalentExpNeeded"></div> <div class="statTooltipPerc">(<div id="statIntTalentProgress"></div>%)</div><br>
+                    <div class="medium bold">Soulstone Bonus</div> <div id="statIntSSBonus"></div>
                 </div>
             </div>
             <div class="statContainer showthat" onmouseover="view.updateStat('Cha')">
                 <div class="statLabel medium bold">Charisma</div>
-                <div class="statNum medium"><div id="statChaLevel">0</div>(<div id="statChaTalent">0</div>)</div>
+                <div class="statNum medium"><div id="statChaLevel">0</div>(<div id="statChaTalent">0</div>)<div id="ssChaContainer" class="ssContainer">(<div id="ssCha"></div>)</div></div>
                 <div style="margin-top:18px;"></div>
                 <div class="thinProgressBarUpper"><div class="statBar statLevelBar" id="statChaLevelBar"></div></div>
                 <div class="thinProgressBarLower"><div class="statBar statTalentBar" id="statChaTalentBar"></div></div>
                 <div class="showthis" id="statChaTooltip">
                     Conversation is a battle.<br>
                     <div class="medium bold">Level</div> <div id="statChaLevelExp"></div>/<div id="statChaLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="statChaLevelProgress"></div>%)</div><br>
-                    <div class="medium bold">Talent</div> <div id="statChaTalentExp"></div>/<div id="statChaTalentExpNeeded"></div> <div class="statTooltipPerc">(<div id="statChaTalentProgress"></div>%)</div>
+                    <div class="medium bold">Talent</div> <div id="statChaTalentExp"></div>/<div id="statChaTalentExpNeeded"></div> <div class="statTooltipPerc">(<div id="statChaTalentProgress"></div>%)</div><br>
+                    <div class="medium bold">Soulstone Bonus</div> <div id="statChaSSBonus"></div>
                 </div>
             </div>
             <div class="statContainer showthat" onmouseover="view.updateStat('Spd')">
                 <div class="statLabel medium bold">Speed</div>
-                <div class="statNum medium"><div id="statSpdLevel">0</div>(<div id="statSpdTalent">0</div>)</div>
+                <div class="statNum medium"><div id="statSpdLevel">0</div>(<div id="statSpdTalent">0</div>)<div id="ssSpdContainer" class="ssContainer">(<div id="ssSpd"></div>)</div></div>
                 <div style="margin-top:18px;"></div>
                 <div class="thinProgressBarUpper"><div class="statBar statLevelBar" id="statSpdLevelBar"></div></div>
                 <div class="thinProgressBarLower"><div class="statBar statTalentBar" id="statSpdTalentBar"></div></div>
                 <div class="showthis" id="statSpdTooltip">
                     Gotta go fast.<br>
                     <div class="medium bold">Level</div> <div id="statSpdLevelExp"></div>/<div id="statSpdLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="statSpdLevelProgress"></div>%)</div><br>
-                    <div class="medium bold">Talent</div> <div id="statSpdTalentExp"></div>/<div id="statSpdTalentExpNeeded"></div> <div class="statTooltipPerc">(<div id="statSpdTalentProgress"></div>%)</div>
+                    <div class="medium bold">Talent</div> <div id="statSpdTalentExp"></div>/<div id="statSpdTalentExpNeeded"></div> <div class="statTooltipPerc">(<div id="statSpdTalentProgress"></div>%)</div><br>
+                    <div class="medium bold">Soulstone Bonus</div> <div id="statSpdSSBonus"></div>
                 </div>
             </div>
             <div class="statContainer showthat" onmouseover="view.updateStat('Luck')">
                 <div class="statLabel medium bold">Luck</div>
-                <div class="statNum medium"><div id="statLuckLevel">0</div>(<div id="statLuckTalent">0</div>)</div>
+                <div class="statNum medium"><div id="statLuckLevel">0</div>(<div id="statLuckTalent">0</div>)<div id="ssLuckContainer" class="ssContainer">(<div id="ssLuck"></div>)</div></div>
                 <div style="margin-top:18px;"></div>
                 <div class="thinProgressBarUpper"><div class="statBar statLevelBar" id="statLuckLevelBar"></div></div>
                 <div class="thinProgressBarLower"><div class="statBar statTalentBar" id="statLuckTalentBar"></div></div>
                 <div class="showthis" id="statLuckTooltip">
                     Opportunity favors the fortunate.<br>
                     <div class="medium bold">Level</div> <div id="statLuckLevelExp"></div>/<div id="statLuckLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="statLuckLevelProgress"></div>%)</div><br>
-                    <div class="medium bold">Talent</div> <div id="statLuckTalentExp"></div>/<div id="statLuckTalentExpNeeded"></div> <div class="statTooltipPerc">(<div id="statLuckTalentProgress"></div>%)</div>
+                    <div class="medium bold">Talent</div> <div id="statLuckTalentExp"></div>/<div id="statLuckTalentExpNeeded"></div> <div class="statTooltipPerc">(<div id="statLuckTalentProgress"></div>%)</div><br>
+                    <div class="medium bold">Soulstone Bonus</div> <div id="statLuckSSBonus"></div>
                 </div>
             </div>
             <div class="statContainer showthat" onmouseover="view.updateStat('Soul')">
                 <div class="statLabel medium bold">Soul</div>
-                <div class="statNum medium"><div id="statSoulLevel">0</div>(<div id="statSoulTalent">0</div>)</div>
+                <div class="statNum medium"><div id="statSoulLevel">0</div>(<div id="statSoulTalent">0</div>)<div id="ssSoulContainer" class="ssContainer">(<div id="ssSoul"></div>)</div></div>
                 <div style="margin-top:18px;"></div>
                 <div class="thinProgressBarUpper"><div class="statBar statLevelBar" id="statSoulLevelBar"></div></div>
                 <div class="thinProgressBarLower"><div class="statBar statTalentBar" id="statSoulTalentBar"></div></div>
                 <div class="showthis" id="statSoulTooltip">
                     You are the captain.<br>
                     <div class="medium bold">Level</div> <div id="statSoulLevelExp"></div>/<div id="statSoulLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="statSoulLevelProgress"></div>%)</div><br>
-                    <div class="medium bold">Talent</div> <div id="statSoulTalentExp"></div>/<div id="statSoulTalentExpNeeded"></div> <div class="statTooltipPerc">(<div id="statSoulTalentProgress"></div>%)</div>
+                    <div class="medium bold">Talent</div> <div id="statSoulTalentExp"></div>/<div id="statSoulTalentExpNeeded"></div> <div class="statTooltipPerc">(<div id="statSoulTalentProgress"></div>%)</div><br>
+                    <div class="medium bold">Soulstone Bonus</div> <div id="statSoulSSBonus"></div>
                 </div>
             </div>
         </div><br>

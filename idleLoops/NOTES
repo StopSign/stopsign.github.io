@@ -26,8 +26,8 @@ Add a new multipart progress bar action:
     get an svg
     add to save() and load()
     in view.js, this.createTownAction(tempObj); this.createMultiPartPBar(tempObj); and updateMultiPartActions();
-    End of town.js, this.createProgressVars("New");
-    town.js restart()
+    End of town.js, new vars
+    actions.js restart()
 
 
 	

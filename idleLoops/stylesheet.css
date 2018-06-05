@@ -270,3 +270,8 @@ input {
     float:right;
     margin-left:3px;
 }
+
+.ssContainer {
+    color:#a3a3a3;
+    display:none;
+}
