@@ -213,9 +213,9 @@ input {
 
 .nextActionContainer, .curActionContainer {
     margin-left:3px;
-    margin-bottom:2px;
     display:block;
     padding-top:1px;
+    padding-bottom:1px;
     border-bottom:1px solid #b9b9b9;
     position:relative;
 }
@@ -242,6 +242,14 @@ input {
     background-color: #ff907d;
     position:absolute;
     opacity:.5;
+}
+
+.actionSelectedIndicator {
+    position:absolute;
+    opacity:0;
+    background-color: #0900e2;
+    width:3px;
+    height:100%;
 }
 
 .townLabel {

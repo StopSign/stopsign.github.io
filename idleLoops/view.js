@@ -123,23 +123,33 @@ function View() {
 
         actions.current.forEach((action, index) => {
             totalDivText +=
-                "<div class='curActionContainer small showthat'>" +
+                "<div class='curActionContainer small' onmouseover='view.mouseoverAction("+index+", true)' onmouseleave='view.mouseoverAction("+index+", false)'>" +
                     "<div class='curActionBar' id='action"+index+"Bar'></div>" +
-                    "<div id='action"+index+"Loops'>"+ action.loopsLeft+"</div>(" + action.loops + ")" + " x " +
+                    "<div class='actionSelectedIndicator' id='action"+index+"Selected'></div>" +
+                    "<div id='action"+index+"Loops' style='margin-left:3px'>"+ action.loopsLeft+"</div>(" + action.loops + ")" + " x " +
                     "<img src='img/"+camelize(action.name)+".svg' class='smallIcon'>" +
-                    "<div style='position:absolute'><div class='showthis' style='position:fixed;'>" +
-                        action.name+"<br>" +
-                        "<div class='bold'>Mana Used</div> <div id='action"+index+"ManaUsed'>0</div><br>" +
-                        "<div class='bold'>Remaining</div> <div id='action"+index+"Remaining'></div><br>" +
-                        "<div id='action"+index+"ExpGain'></div>" +
-                        "<div id='action"+index+"HasFailed' style='display:none'><div class='bold'>Failed Attempts</div> <div id='action"+index+"Failed'>0</div></div>" +
-                    "</div></div>" +
-                    "</div>"+
                 "</div>";
         });
 
         actionsDiv.innerHTML = totalDivText;
         curActionsDiv.appendChild(actionsDiv);
+
+        let tooltipDiv = document.createElement("div");
+        totalDivText = "";
+
+        actions.current.forEach((action, index) => {
+            totalDivText +=
+                "<div id='actionTooltip"+index+"' style='display:none;'>" +
+                    action.name+"<br>" +
+                    "<div class='bold'>Mana Used</div> <div id='action"+index+"ManaUsed'>0</div><br>" +
+                    "<div class='bold'>Remaining</div> <div id='action"+index+"Remaining'></div><br>" +
+                    "<div id='action"+index+"ExpGain'></div>" +
+                    "<div id='action"+index+"HasFailed' style='display:none'><div class='bold'>Failed Attempts</div> <div id='action"+index+"Failed'>0</div></div>" +
+                "</div>";
+        });
+
+        tooltipDiv.innerHTML = totalDivText;
+        document.getElementById("actionTooltipContainer").appendChild(tooltipDiv);
     };
 
     this.updateCurrentActionBar = function(index) {
@@ -157,6 +167,7 @@ function View() {
             div.style.width = "100%";
             div.style.backgroundColor = "#6d6d6d";
         }
+
         document.getElementById("action"+index+"ManaUsed").innerHTML = action.manaUsed+"";
         document.getElementById("action"+index+"Remaining").innerHTML = (timeNeeded - timer)+"";
         let statExpGain = "";
@@ -166,6 +177,14 @@ function View() {
             }
         });
         document.getElementById("action"+index+"ExpGain").innerHTML = statExpGain;
+    };
+
+    this.mouseoverAction = function(index, isShowing) {
+        const div = document.getElementById("action"+index+"Selected");
+        div.style.opacity = isShowing ? "1" : "0";
+        nextActionsDiv.style.display = isShowing ? "none" : "inline-block";
+        document.getElementById("actionTooltipContainer").style.display = isShowing ? "inline-block" : "none";
+        document.getElementById("actionTooltip"+index).style.display = isShowing ? "inline-block" : "none";
     };
 
     this.updateCurrentActionLoops = function(index) {
