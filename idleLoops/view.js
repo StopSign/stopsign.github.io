@@ -134,13 +134,16 @@ function View() {
         actionsDiv.innerHTML = totalDivText;
         curActionsDiv.appendChild(actionsDiv);
 
+        while (document.getElementById("actionTooltipContainer").firstChild) {
+            document.getElementById("actionTooltipContainer").removeChild(document.getElementById("actionTooltipContainer").firstChild);
+        }
         let tooltipDiv = document.createElement("div");
         totalDivText = "";
 
         actions.current.forEach((action, index) => {
             totalDivText +=
-                "<div id='actionTooltip"+index+"' style='display:none;'>" +
-                    action.name+"<br>" +
+                "<div id='actionTooltip"+index+"' style='display:none;padding-left:10px;width:90%'>" +
+                    "<div style='text-align:center;width:100%'>"+action.name+"</div><br><br>" +
                     "<div class='bold'>Mana Used</div> <div id='action"+index+"ManaUsed'>0</div><br>" +
                     "<div class='bold'>Remaining</div> <div id='action"+index+"Remaining'></div><br>" +
                     "<div id='action"+index+"ExpGain'></div>" +
@@ -148,8 +151,10 @@ function View() {
                 "</div>";
         });
 
+        tooltipDiv.style.width = "100%";
         tooltipDiv.innerHTML = totalDivText;
         document.getElementById("actionTooltipContainer").appendChild(tooltipDiv);
+        this.mouseoverAction(0, false);
     };
 
     this.updateCurrentActionBar = function(index) {
@@ -181,10 +186,12 @@ function View() {
 
     this.mouseoverAction = function(index, isShowing) {
         const div = document.getElementById("action"+index+"Selected");
-        div.style.opacity = isShowing ? "1" : "0";
+        if(div) {
+            div.style.opacity = isShowing ? "1" : "0";
+            document.getElementById("actionTooltip"+index).style.display = isShowing ? "inline-block" : "none";
+        }
         nextActionsDiv.style.display = isShowing ? "none" : "inline-block";
         document.getElementById("actionTooltipContainer").style.display = isShowing ? "inline-block" : "none";
-        document.getElementById("actionTooltip"+index).style.display = isShowing ? "inline-block" : "none";
     };
 
     this.updateCurrentActionLoops = function(index) {
