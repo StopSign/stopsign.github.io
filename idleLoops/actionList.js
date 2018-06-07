@@ -69,7 +69,7 @@ function Wander() {
         return true;
     };
     this.finish = function() {
-        towns[curTown].finishProgress(this.varName, 100, function() {
+        towns[curTown].finishProgress(this.varName, 200, function() {
             towns[curTown].totalPots = towns[curTown].getLevel("Wander") * 5 * (towns[curTown].difficulty + 1);
             towns[curTown].totalLocks = towns[curTown].getLevel("Wander") * (towns[curTown].difficulty + 1);
         });
@@ -240,7 +240,7 @@ function GuidedTour() {
         return towns[curTown].getLevel("Secrets") >= 10;
     };
     this.finish = function() {
-        towns[curTown].finishProgress(this.varName, 800, function() {
+        towns[curTown].finishProgress(this.varName, 1600, function() {
             towns[curTown].totalPots = towns[curTown].getLevel("Wander") * 5 * (towns[curTown].difficulty + 1);
             towns[curTown].totalLocks = towns[curTown].getLevel("Wander") * (towns[curTown].difficulty + 1);
         });
