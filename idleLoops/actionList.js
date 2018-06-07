@@ -282,7 +282,7 @@ function WarriorLessons() {
     this.name = "Warrior Lessons";
     this.manaCost = 1000;
     this.expMult = 1;
-    this.tooltip = "Learning to fight is probably important; you have a long journey ahead of you.<br>Requires 2 reputation.";
+    this.tooltip = "Learning to fight is probably important; you have a long journey ahead of you.<br>Requires 2 reputation.<br>Unlocked at 20% Investigated.";
     this.varName = "trCombat";
     this.stats = {
         Str:.5,
@@ -311,7 +311,7 @@ function MageLessons() {
     this.name = "Mage Lessons";
     this.manaCost = 1000;
     this.expMult = 1;
-    this.tooltip = "The mystic got you into this mess, maybe it can help you get out of it.<br>Requires 2 reputation.";
+    this.tooltip = "The mystic got you into this mess, maybe it can help you get out of it.<br>Requires 2 reputation.<br>Unlocked at 20% Investigated.";
     this.varName = "trMagic";
     this.stats = {
         Per:.3,
