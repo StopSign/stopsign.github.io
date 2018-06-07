@@ -160,8 +160,8 @@ function SellGold() {
 function TrainStr() {
     this.name = "Train Strength";
     this.manaCost = 500;
-    this.expMult = 3;
-    this.tooltip = "Build up those muscles. Again.<br>Has triple exp/talent gain.<br>Unlocked at 5% People Met";
+    this.expMult = 4;
+    this.tooltip = "Build up those muscles. Again.<br>Has 4x exp/talent gain.<br>Unlocked at 5% People Met";
     this.varName = "trStr";
     this.stats = {
         Str:.8,
@@ -180,8 +180,8 @@ function TrainStr() {
 function TrainDex() {
     this.name = "Train Dex";
     this.manaCost = 500;
-    this.expMult = 3;
-    this.tooltip = "The kids are a little mad you're taking their playground. They'll get over it.<br>Has triple exp/talent gain.<br>Unlocked at 15% People Met";
+    this.expMult = 4;
+    this.tooltip = "The kids are a little mad you're taking their playground. They'll get over it.<br>Has 4x exp/talent gain.<br>Unlocked at 15% People Met";
     this.varName = "trDex";
     this.stats = {
         Dex:.8,
@@ -200,8 +200,8 @@ function TrainDex() {
 function TrainSpd() {
     this.name = "Train Speed";
     this.manaCost = 500;
-    this.expMult = 3;
-    this.tooltip = "A new friend has a magical treadmill. Gotta go fast.<br>Has triple exp/talent gain.<br>Unlocked at 30% People Met";
+    this.expMult = 4;
+    this.tooltip = "A new friend has a magical treadmill. Gotta go fast.<br>Has 4x exp/talent gain.<br>Unlocked at 30% People Met";
     this.varName = "trSpd";
     this.stats = {
         Spd:.8,
@@ -220,8 +220,8 @@ function TrainSpd() {
 function GuidedTour() {
     this.name = "Guided Tour";
     this.manaCost = 500;
-    this.expMult = 3;
-    this.tooltip = "After what you did, they're glad to help show you around.<br>4x explored % over Wander for equivalent mana cost.<br>Costs 1 reputation.<br>Unlocked at 10% Investigated";
+    this.expMult = 2;
+    this.tooltip = "After what you did, they're glad to help show you around.<br>8x explored % over Wander for equivalent mana cost.<br>Costs 1 reputation.<br>Unlocked at 10% Investigated";
     this.varName = "Tour";
     this.stats = {
         Spd:.4,
@@ -242,7 +242,7 @@ function GuidedTour() {
         return towns[curTown].getLevel("Secrets") >= 10;
     };
     this.finish = function() {
-        towns[curTown].finishProgress(this.varName, 1600, function() {
+        towns[curTown].finishProgress(this.varName, 3200, function() {
             towns[curTown].totalPots = towns[curTown].getLevel("Wander") * 5 * (towns[curTown].difficulty + 1);
             towns[curTown].totalLocks = towns[curTown].getLevel("Wander") * (towns[curTown].difficulty + 1);
         });
@@ -252,8 +252,8 @@ function GuidedTour() {
 function ThrowParty() {
     this.name = "Throw Party";
     this.manaCost = 1600;
-    this.expMult = 3;
-    this.tooltip = "Take a break and socialize.<br>4x people met % over Meet People for equivalent mana cost.<br>Costs 3 reputation.<br>Unlocked at 30% Investigated";
+    this.expMult = 2;
+    this.tooltip = "Take a break and socialize.<br>8x people met % over Meet People for equivalent mana cost.<br>Costs 3 reputation.<br>Unlocked at 30% Investigated";
     this.varName = "Party";
     this.stats = {
         Cha:.8,
@@ -272,7 +272,7 @@ function ThrowParty() {
         return towns[curTown].getLevel("Secrets") >= 30;
     };
     this.finish = function() {
-        towns[curTown].finishProgress(this.varName, 1600, function() {
+        towns[curTown].finishProgress(this.varName, 3200, function() {
             towns[curTown].totalSQuests = towns[curTown].getLevel("Met") * (towns[curTown].difficulty + 1);
         });
     };
