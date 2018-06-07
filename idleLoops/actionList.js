@@ -136,7 +136,7 @@ function Investigate() {
 
 function SellGold() {
     this.name = "Sell Gold";
-    this.manaCost = 200;
+    this.manaCost = 100;
     this.expMult = 1;
     this.tooltip = "1 gold = 50 mana. Sells all gold<br>Unlocked at 20% Explored";
     this.varName = "Gold";
