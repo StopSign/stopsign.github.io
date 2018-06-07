@@ -24,6 +24,7 @@ let curLoadout = 0;
 let loadouts = [];
 let skillList = ["Combat", "Magic"];
 let skills = {};
+let soulstoneChance = 1;
 
 
 function closeTutorial() {
@@ -56,6 +57,7 @@ function load() {
     for(let property in toLoad.stats) {
         if (toLoad.stats.hasOwnProperty(property)) {
             stats[property].talent = toLoad.stats[property].talent;
+            stats[property].soulstone = toLoad.stats[property].soulstone;
         }
     }
     for(let property in toLoad.skills) {
@@ -71,6 +73,8 @@ function load() {
     town.expSecrets = toLoad.expSecrets ? toLoad.expSecrets : 0;
     town.totalHeal = toLoad.totalHeal ? toLoad.totalHeal : 0;
     town.totalFight = toLoad.totalFight ? toLoad.totalFight : 0;
+    town.totalSDungeon = toLoad.totalSDungeon ? toLoad.totalSDungeon : 0;
+    soulstoneChance = toLoad.soulstoneChance ? toLoad.soulstoneChance : 1;
 
     recalcInterval(50);
     pauseGame();
@@ -111,6 +115,8 @@ function save() {
     toSave.expSecrets = town.expSecrets;
     toSave.totalHeal = town.totalHeal;
     toSave.totalFight = town.totalFight;
+    toSave.totalSDungeon = town.totalSDungeon;
+    toSave.soulstoneChance = soulstoneChance;
 
     view.totalActionList.forEach((action) => {
         if(town.varNames.indexOf(action.varName) !== -1) {

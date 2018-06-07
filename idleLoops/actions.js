@@ -85,10 +85,12 @@ function Actions() {
     this.restart = function() {
         this.currentPos = 0;
         this.completedTicks = 0;
-        towns[0]["Heal"] = 0;
-        towns[0]["Fight"] = 0;
+        towns[0].Heal = 0;
         towns[0].HealLoopCounter = 0;
+        towns[0].Fight = 0;
         towns[0].FightLoopCounter = 0;
+        towns[0].SDungeon = 0;
+        towns[0].SDungeonLoopCounter = 0;
         if(document.getElementById("currentListActive").checked) {
             this.currentPos = 0;
             this.completedTicks = 0;
@@ -214,7 +216,8 @@ function setAdjustedTicks(action) {
 function addExpFromAction(action) {
     statList.forEach((statName) => {
         if(action.stats[statName]) {
-            let expToAdd = action.stats[statName] * action.expMult * (action.manaCost / action.adjustedTicks) * (1+getTalent(statName)/100);
+            let soulstoneBonus = stats[statName].soulstone ? (1 + stats[statName].soulstone/10) : 1;
+            let expToAdd = soulstoneBonus * action.stats[statName] * action.expMult * (action.manaCost / action.adjustedTicks) * (1+getTalent(statName)/100);
             if(!action["statExp"+statName]) {
                 action["statExp"+statName] = 0;
             }

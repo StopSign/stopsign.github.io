@@ -99,5 +99,7 @@ function Town(difficulty) {
     this.HealLoopCounter = 0;
     this.Fight = 0;
     this.FightLoopCounter = 0;
+    this.SDungeon = 0;
+    this.SDungeonLoopCounter = 0;
 
 }

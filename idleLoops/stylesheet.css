@@ -213,9 +213,9 @@ input {
 
 .nextActionContainer, .curActionContainer {
     margin-left:3px;
-    margin-bottom:2px;
     display:block;
     padding-top:1px;
+    padding-bottom:1px;
     border-bottom:1px solid #b9b9b9;
     position:relative;
 }
@@ -244,6 +244,14 @@ input {
     opacity:.5;
 }
 
+.actionSelectedIndicator {
+    position:absolute;
+    opacity:0;
+    background-color: #0900e2;
+    width:3px;
+    height:100%;
+}
+
 .townLabel {
     margin-left:25px;
 }
@@ -269,4 +277,9 @@ input {
 .statTooltipPerc {
     float:right;
     margin-left:3px;
+}
+
+.ssContainer {
+    color:#a3a3a3;
+    display:none;
 }
