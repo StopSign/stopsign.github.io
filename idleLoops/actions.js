@@ -115,14 +115,17 @@ function Actions() {
             this.currentPos = 0;
             this.completedTicks = 0;
 
-            this.current.forEach((action) => {
+            for(let i = 0; i < this.current.length; i++) {
+                let action = this.current[i];
                 action.loopsLeft = action.loops;
                 action.ticks = 0;
                 action.manaUsed = 0;
-            });
+            }
+
         } else {
             this.current = [];
-            this.next.forEach((action) => {
+            for(let i = 0; i < this.next.length; i++) {
+                let action = this.next[i];
                 if (action.loops === 0) { //don't add blank ones
                     return;
                 }
@@ -134,7 +137,7 @@ function Actions() {
                 toAdd.manaUsed = 0;
 
                 this.current.push(toAdd);
-            });
+            }
         }
         this.adjustTicksNeeded();
         view.updateMultiPartActions();
@@ -143,13 +146,14 @@ function Actions() {
 
     this.adjustTicksNeeded = function() {
         let remainingTicks = 0;
-        this.current.forEach((action, index) => {
-            if(index < this.currentPos) {
+        for(let i = 0; i < this.current.length; i++) {
+            let action = this.current[i];
+            if(i < this.currentPos) {
                 return;
             }
             setAdjustedTicks(action);
             remainingTicks += action.loopsLeft * action.adjustedTicks;
-        });
+        }
         this.totalNeeded = this.completedTicks + remainingTicks;
         view.updateTotalTicks();
     };
@@ -228,16 +232,18 @@ function Actions() {
 
 function setAdjustedTicks(action) {
     let statMult = 0;
-    statList.forEach((statName) => {
+    for(let i = 0; i < statList.length; i++) {
+        let statName = statList[i];
         if(action.stats[statName]) {
             statMult += action.stats[statName] * (1 + getLevel(statName)/100);
         }
-    });
+    }
     action.adjustedTicks = Math.ceil(action.manaCost / statMult);
 }
 
 function addExpFromAction(action) {
-    statList.forEach((statName) => {
+    for(let i = 0; i < statList.length; i++) {
+        let statName = statList[i];
         if(action.stats[statName]) {
             let soulstoneBonus = stats[statName].soulstone ? (1 + stats[statName].soulstone/10) : 1;
             let expToAdd = soulstoneBonus * action.stats[statName] * action.expMult * (action.manaCost / action.adjustedTicks) * (1+getTalent(statName)/100);
@@ -247,5 +253,5 @@ function addExpFromAction(action) {
             action["statExp"+statName] += expToAdd;
             addExp(statName, expToAdd);
         }
-    });
+    }
 }

@@ -13,11 +13,12 @@ function Town(index) {
     };
 
     this.restart = function() {
-        this.varNames.forEach((varName) => {
+        for(let i = 0; i < this.varNames.length; i++) {
+            let varName = this.varNames[i];
             this["goodTemp"+varName] = this["good"+varName];
             this["lootFrom"+varName] = 0;
             view.updateRegular(varName);
-        });
+        }
     };
 
     this.finishProgress = function(varName, expGain, levelUpReward) {
@@ -28,11 +29,13 @@ function Town(index) {
         if(level !== prevLevel) {
             //level up
             levelUpReward();
-            view.totalActionList.forEach((action) => {
+
+            for(let i = 0; i < view.totalActionList.length; i++) {
+                let action = view.totalActionList[i];
                 if(towns[curTown].varNames.indexOf(action.varName) !== -1) {
                     view.updateRegular(action.varName);
                 }
-            });
+            }
         }
         view.updateProgressActions();
     };

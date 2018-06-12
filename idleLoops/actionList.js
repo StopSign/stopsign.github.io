@@ -1,4 +1,3 @@
-
 function translateClassNames(name) {
     if(name === "Wander") {
         return new Wander();
@@ -59,8 +58,6 @@ function getTravelNum(name) {
 }
 
 townNames = ["Beginnersville", "Forest Path", "Merchantville"];
-
-
 
 
 //Progress actions
@@ -153,7 +150,7 @@ function Investigate() {
 
 function ExploreForest() {
     this.name = "Explore Forest";
-    this.manaCost = 250;
+    this.manaCost = 400;
     this.expMult = 1;
     this.tooltip = "What a pleasant area.";
     this.townNum = 1;
@@ -400,7 +397,7 @@ function MageLessons() {
 
 function BuySupplies() {
     this.name = "Buy Supplies";
-    this.manaCost = 250;
+    this.manaCost = 200;
     this.expMult = 1;
     this.tooltip = "Prepare to move on.<br>Costs <div id='suppliesCost'></div> gold.<br>You only need one set of supplies.<br>Unlocks at a combined skill of 35.";
     this.townNum = 0;
@@ -430,7 +427,7 @@ function BuySupplies() {
 
 function Haggle() {
     this.name = "Haggle";
-    this.manaCost = 250;
+    this.manaCost = 100;
     this.expMult = 1;
     this.tooltip = "They won't like you as much, but hey - you're leaving.<br>Costs 1 reputation to reduce the price of supplies by 20. <br>Unlocks at a combined skill of 35.";
     this.townNum = 0;
@@ -464,7 +461,7 @@ function Haggle() {
 
 function StartJourney() {
     this.name = "Start Journey";
-    this.manaCost = 250;
+    this.manaCost = 1000;
     this.expMult = 2;
     this.tooltip = "Follow the trail to end up at the next town. You need to keep moving until you can learn how to shut these loops off.<br>Costs 1 supplies. Finish once to unlock the next area's actions.<br>Unlocks at a combined skill of 35.";
     this.townNum = 0;

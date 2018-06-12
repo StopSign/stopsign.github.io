@@ -57,19 +57,20 @@ function restart() {
     addSupplies(-supplies);
     restartStats();
     actions.restart();
-    towns.forEach((town) => {
-        town.restart();
-    });
-    skillList.forEach((skill) => {
-        view.updateSkill(skill);
-    });
+    for(let i = 0; i < towns.length; i++) {
+        towns[i].restart();
+    }
+    for(let i = 0; i < skillList.length; i++) {
+        view.updateSkill(skillList[i]);
+    }
 
     view.updateCurrentActionsDivs();
     save();
 }
 
 function addActionToList(name, townNum, isTravelAction) {
-    towns[townNum].totalActionList.forEach((action) => {
+    for(let i = 0; i < towns[townNum].totalActionList.length; i++) {
+        let action = towns[townNum].totalActionList[i];
         if(action.name === name) {
             if(action.visible() && action.unlocked()) {
                 if(isTravelAction) {
@@ -80,7 +81,7 @@ function addActionToList(name, townNum, isTravelAction) {
                 }
             }
         }
-    });
+    }
     view.updateNextActions();
 }
 

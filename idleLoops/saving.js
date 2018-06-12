@@ -49,16 +49,13 @@ function loadDefaults() {
 
 function load() {
     loadDefaults();
-    if (!window.localStorage.idleLoops1) { //New players to the game
-        recalcInterval(50);
-        towns.push(new Town(0));
-        pauseGame();
-        //tutorial here
-        view.initalize();
-        return;
+
+    let toLoad = {};
+    if(window.localStorage.idleLoops1) { //has a save file
+        closeTutorial();
+        toLoad = JSON.parse(window.localStorage.idleLoops1);
     }
-    closeTutorial();
-    let toLoad = JSON.parse(window.localStorage.idleLoops1);
+
     for(let property in toLoad.stats) {
         if (toLoad.stats.hasOwnProperty(property)) {
             stats[property].talent = toLoad.stats[property].talent;
@@ -77,8 +74,8 @@ function load() {
 
     towns.push(new Town(0));
     let town = towns[0];
-    town.expWander = toLoad.expWander;
-    town.expMet = toLoad.expMet;
+    town.expWander = toLoad.expWander ? toLoad.expWander : 0;
+    town.expMet = toLoad.expMet ? toLoad.expMet : 0;
     town.expSecrets = toLoad.expSecrets ? toLoad.expSecrets : 0;
     town.totalHeal = toLoad.totalHeal ? toLoad.totalHeal : 0;
     town.totalFight = toLoad.totalFight ? toLoad.totalFight : 0;
@@ -94,7 +91,8 @@ function load() {
 
     for(let i = 0; i < towns.length; i++) {
         town = towns[i];
-        towns[i].totalActionList.forEach((action) => {
+        for(let j = 0; j < town.totalActionList.length; j++) {
+            let action = town.totalActionList[j];
             if (town.varNames.indexOf(action.varName) !== -1) {
                 const varName = action.varName;
                 if (toLoad["total" + varName])
@@ -105,13 +103,9 @@ function load() {
                     town["good" + varName] = toLoad["good" + varName];
                 if (toLoad["good" + varName])
                     town["goodTemp" + varName] = toLoad["good" + varName];
-            }
-        });
-        towns[i].totalActionList.forEach((action) => {
-            if (town.varNames.indexOf(action.varName) !== -1) {
                 view.updateRegular(action.varName);
             }
-        });
+        }
     }
 
 
@@ -144,7 +138,8 @@ function save() {
 
     for(let i = 0; i < towns.length; i++) {
         town = towns[i];
-        town.totalActionList.forEach((action) => {
+        for(let j = 0; j < town.totalActionList.length; j++) {
+            let action = town.totalActionList[j];
             if (town.varNames.indexOf(action.varName) !== -1) {
                 const varName = action.varName;
                 toSave["total" + varName] = town["total" + varName];
@@ -152,7 +147,7 @@ function save() {
                 toSave["good" + varName] = town["good" + varName];
                 toSave["goodTemp" + varName] = town["good" + varName];
             }
-        });
+        }
     }
     toSave.nextList = actions.next;
     toSave.loadouts = loadouts;

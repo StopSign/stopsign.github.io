@@ -1,8 +1,8 @@
 
 function initializeStats() {
-    statList.forEach((stat) => {
-        addNewStat(stat);
-    });
+    for(let i = 0; i < statList.length; i++) {
+        addNewStat(statList[i]);
+    }
 }
 
 function addNewStat(name) {
@@ -12,9 +12,9 @@ function addNewStat(name) {
 }
 
 function initializeSkills() {
-    skillList.forEach((skill) => {
-        addNewSkill(skill);
-    })
+    for(let i = 0; i < skillList.length; i++) {
+        addNewSkill(skillList[i]);
+    }
 }
 
 function addNewSkill(name) {
@@ -74,7 +74,7 @@ function addExp(name, amount) {
 }
 
 function restartStats() {
-    statList.forEach((stat) => {
-        stats[stat].exp = 0;
-    });
+    for(let i = 0; i < statList.length; i++) {
+        stats[statList[i]].exp = 0;
+    }
 }

@@ -2,12 +2,12 @@ function View() {
     this.totalActionList = [];
 
     this.initalize = function() {
-        statList.forEach((stat) => {
-            this.updateStat(stat);
-        });
-        skillList.forEach((skill) => {
-            this.updateSkill(skill);
-        });
+        for(let i = 0; i < statList.length; i++) {
+            this.updateStat(statList[i]);
+        }
+        for(let i = 0; i < skillList.length; i++) {
+            this.updateSkill(skillList[i]);
+        }
         this.updateTime();
         this.updateGold();
         this.updateNextActions();
@@ -22,9 +22,10 @@ function View() {
     };
 
     this.update = function() {
-        statList.forEach((stat) => {
-            this.updateStat(stat);
-        });
+        for(let i = 0; i < statList.length; i++) {
+            let statName = statList[i];
+            this.updateStat(statName);
+        }
         this.updateTime();
         this.updateSoulstoneChance();
     };
@@ -99,10 +100,11 @@ function View() {
         let actionsDiv = document.createElement("div");
         let totalDivText = "";
 
-        actions.next.forEach((action, index) => {
+        for(let i = 0; i < actions.next.length; i++) {
+            let action = actions.next[i];
             let capButton = "";
             if(hasCap(action.name)) {
-                capButton = "<i onclick='actions.capAmount("+index+")' class='actionIcon fa fa-circle-thin'></i>";
+                capButton = "<i onclick='actions.capAmount("+i+")' class='actionIcon fa fa-circle-thin'></i>";
             }
             let isTravel = getTravelNum(action.name);
             totalDivText +=
@@ -111,15 +113,15 @@ function View() {
                     "<img src='img/"+camelize(action.name)+".svg' class='smallIcon'>" +
                     "<div style='float:right'>"+
                         capButton +
-                (isTravel ? "" : "<i onclick='actions.addLoop("+index+")' class='actionIcon fa fa-plus'></i>")+
-                (isTravel ? "" : "<i onclick='actions.removeLoop("+index+")' class='actionIcon fa fa-minus'></i>")+
-                (isTravel ? "" : "<i onclick='actions.split("+index+")' class='actionIcon fa fa-arrows-h'></i>")+
-                        "<i onclick='actions.moveUp("+index+")' class='actionIcon fa fa-sort-up'></i>" +
-                        "<i onclick='actions.moveDown("+index+")' class='actionIcon fa fa-sort-down'></i>" +
-                        "<i onclick='actions.removeAction("+index+")' class='actionIcon fa fa-times'></i>" +
+                (isTravel ? "" : "<i onclick='actions.addLoop("+i+")' class='actionIcon fa fa-plus'></i>")+
+                (isTravel ? "" : "<i onclick='actions.removeLoop("+i+")' class='actionIcon fa fa-minus'></i>")+
+                (isTravel ? "" : "<i onclick='actions.split("+i+")' class='actionIcon fa fa-arrows-h'></i>")+
+                        "<i onclick='actions.moveUp("+i+")' class='actionIcon fa fa-sort-up'></i>" +
+                        "<i onclick='actions.moveDown("+i+")' class='actionIcon fa fa-sort-down'></i>" +
+                        "<i onclick='actions.removeAction("+i+")' class='actionIcon fa fa-times'></i>" +
                     "</div>"+
                 "</div>";
-        });
+        }
 
         actionsDiv.innerHTML = totalDivText;
         nextActionsDiv.appendChild(actionsDiv);
@@ -132,15 +134,16 @@ function View() {
         let actionsDiv = document.createElement("div");
         let totalDivText = "";
 
-        actions.current.forEach((action, index) => {
+        for(let i = 0; i < actions.current.length; i++) {
+            let action = actions.current[i];
             totalDivText +=
-                "<div class='curActionContainer small' onmouseover='view.mouseoverAction("+index+", true)' onmouseleave='view.mouseoverAction("+index+", false)'>" +
-                    "<div class='curActionBar' id='action"+index+"Bar'></div>" +
-                    "<div class='actionSelectedIndicator' id='action"+index+"Selected'></div>" +
-                    "<div id='action"+index+"Loops' style='margin-left:3px'>"+ action.loopsLeft+"</div>(" + action.loops + ")" + " x " +
+                "<div class='curActionContainer small' onmouseover='view.mouseoverAction("+i+", true)' onmouseleave='view.mouseoverAction("+i+", false)'>" +
+                    "<div class='curActionBar' id='action"+i+"Bar'></div>" +
+                    "<div class='actionSelectedIndicator' id='action"+i+"Selected'></div>" +
+                    "<div id='action"+i+"Loops' style='margin-left:3px'>"+ action.loopsLeft+"</div>(" + action.loops + ")" + " x " +
                     "<img src='img/"+camelize(action.name)+".svg' class='smallIcon'>" +
                 "</div>";
-        });
+        }
 
         actionsDiv.innerHTML = totalDivText;
         curActionsDiv.appendChild(actionsDiv);
@@ -151,19 +154,20 @@ function View() {
         let tooltipDiv = document.createElement("div");
         totalDivText = "";
 
-        actions.current.forEach((action, index) => {
+        for(let i = 0; i < actions.current.length; i++) {
+            let action = actions.current[i];
             totalDivText +=
-                "<div id='actionTooltip"+index+"' style='display:none;padding-left:10px;width:90%'>" +
+                "<div id='actionTooltip"+i+"' style='display:none;padding-left:10px;width:90%'>" +
                     "<div style='text-align:center;width:100%'>"+action.name+"</div><br><br>" +
-                    "<div class='bold'>Mana Used</div> <div id='action"+index+"ManaUsed'>0</div><br>" +
-                    "<div class='bold'>Remaining</div> <div id='action"+index+"Remaining'></div><br>" +
-                    "<div id='action"+index+"ExpGain'></div>" +
-                    "<div id='action"+index+"HasFailed' style='display:none'>" +
-                        "<div class='bold'>Failed Attempts</div> <div id='action"+index+"Failed'>0</div><br>" +
-                        "<div class='bold'>Error</div> <div id='action"+index+"Error'></div>" +
+                    "<div class='bold'>Mana Used</div> <div id='action"+i+"ManaUsed'>0</div><br>" +
+                    "<div class='bold'>Remaining</div> <div id='action"+i+"Remaining'></div><br>" +
+                    "<div id='action"+i+"ExpGain'></div>" +
+                    "<div id='action"+i+"HasFailed' style='display:none'>" +
+                        "<div class='bold'>Failed Attempts</div> <div id='action"+i+"Failed'>0</div><br>" +
+                        "<div class='bold'>Error</div> <div id='action"+i+"Error'></div>" +
                     "</div>" +
                 "</div>";
-        });
+        }
 
         tooltipDiv.style.width = "100%";
         tooltipDiv.innerHTML = totalDivText;
@@ -195,11 +199,12 @@ function View() {
         while (expGainDiv.firstChild) {
             expGainDiv.removeChild(expGainDiv.firstChild);
         }
-        statList.forEach((statName) => {
+        for(let i = 0; i < statList.length; i++) {
+            let statName = statList[i];
             if(action["statExp"+statName]) {
                 statExpGain += "<div class='bold'>"+statName+"</div> " + intToString(action["statExp"+statName], 2) + "<br>";
             }
-        });
+        }
         document.getElementById("action"+index+"ExpGain").innerHTML = statExpGain;
     };
 
@@ -218,21 +223,24 @@ function View() {
     };
 
     this.updateProgressActions = function() {
-        towns.forEach((town) => {
-            town.progressVars.forEach((varName) => {
+        for(let i = 0; i < towns.length; i++) {
+            let town = towns[i];
+            for(let j = 0; j < town.progressVars.length; j++) {
+                let varName = towns[i].progressVars[j];
                 let level = town.getLevel(varName);
                 let levelPrc = town.getPrcToNext(varName) + "%";
                 document.getElementById("prc"+varName).innerHTML = level;
                 document.getElementById("expBar"+varName).style.width = levelPrc;
                 document.getElementById("progress"+varName).innerHTML = intToString(levelPrc, 2);
                 document.getElementById("bar"+varName).style.width = level + "%";
-            });
-        });
+            }
+        }
         this.updateLockedHidden();
     };
 
     this.updateLockedHidden = function() {
-        this.totalActionList.forEach((action) => {
+        for(let i = 0; i < this.totalActionList.length; i++) {
+            let action = this.totalActionList[i];
             const actionDiv = document.getElementById("container"+action.varName);
             const infoDiv = document.getElementById("infoContainer"+action.varName);
             if(!action.unlocked()) {
@@ -251,7 +259,7 @@ function View() {
             } else {
                 removeClassFromDiv(actionDiv, "hidden");
             }
-        });
+        }
     };
 
     this.showTown = function(townNum) {
@@ -394,9 +402,10 @@ function View() {
     this.createTownAction = function(action) {
         let actionStats = "";
         let keyNames = Object.keys(action.stats);
-        keyNames.forEach((statName) => {
+        for(let i = 0; i < keyNames.length; i++) {
+            let statName = keyNames[i];
             actionStats += "<div class='bold'>" + statName + "</div> " + (action.stats[statName]*100)+"%<br>";
-        });
+        }
 
         const totalDivText =
             "<div id='container"+action.varName+"' class='actionContainer showthat' onclick='addActionToList(\""+action.name+"\", "+action.townNum+")'>" +
@@ -420,9 +429,10 @@ function View() {
     this.createTravelAction = function(action) {
         let actionStats = "";
         let keyNames = Object.keys(action.stats);
-        keyNames.forEach((statName) => {
+        for(let i = 0; i < keyNames.length; i++) {
+            let statName = keyNames[i];
             actionStats += "<div class='bold'>" + statName + "</div> " + (action.stats[statName]*100)+"%<br>";
-        });
+        }
 
         const totalDivText =
             "<div id='container"+action.varName+"' class='travelContainer showthat' onclick='addActionToList(\""+action.name+"\", "+action.townNum+", true)'>" +
@@ -547,14 +557,15 @@ function View() {
     };
 
     this.updateSoulstones = function() {
-        statList.forEach((stat) => {
-            if(stats[stat].soulstone) {
-                if (!isVisible(document.getElementById("ss" + stat + "Container"))) {
-                    document.getElementById("ss" + stat + "Container").style.display = "inline-block";
+        for(let i = 0; i < statList.length; i++) {
+            let statName = statList[i];
+            if(stats[statName].soulstone) {
+                if (!isVisible(document.getElementById("ss" + statName + "Container"))) {
+                    document.getElementById("ss" + statName + "Container").style.display = "inline-block";
                 }
-                document.getElementById("ss"+stat).innerHTML = stats[stat].soulstone;
+                document.getElementById("ss"+statName).innerHTML = stats[statName].soulstone;
             }
-        });
+        }
     };
 
     this.updateMultiPart = function(action) {
