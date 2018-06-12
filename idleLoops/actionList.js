@@ -36,6 +36,16 @@ function translateClassNames(name) {
         return new FightMonsters();
     } else if(name === "Small Dungeon") {
         return new SmallDungeon();
+    } else if(name === "Buy Supplies") {
+        return new BuySupplies();
+    } else if(name === "Haggle") {
+        return new Haggle();
+    } else if(name === "Start Journey") {
+        return new StartJourney();
+    }
+    //town 2
+    if(name === "Explore Forest") {
+        return new ExploreForest();
     }
 
     console.log('error trying to create ' + name);
@@ -44,6 +54,13 @@ function translateClassNames(name) {
 function hasCap(name) {
     return (name === "Smash Pots" || name === "Pick Locks" || name === "Short Quest" || name === "Long Quest");
 }
+function getTravelNum(name) {
+    return name === "Start Journey" ? 1 : 0;
+}
+
+townNames = ["Beginnersville", "Forest Path", "Merchantville"];
+
+
 
 
 //Progress actions
@@ -54,6 +71,7 @@ function Wander() {
     this.manaCost = 250;
     this.expMult = 1;
     this.tooltip = "Explore the town, look for hidden areas and treasures.";
+    this.townNum = 0;
 
     this.infoName = "Explored";
     this.varName = "Wander";
@@ -71,9 +89,9 @@ function Wander() {
         return true;
     };
     this.finish = function() {
-        towns[curTown].finishProgress(this.varName, 200, function() {
-            towns[curTown].totalPots = towns[curTown].getLevel("Wander") * 5 * (towns[curTown].difficulty + 1);
-            towns[curTown].totalLocks = towns[curTown].getLevel("Wander") * (towns[curTown].difficulty + 1);
+        towns[0].finishProgress(this.varName, 200, function() {
+            towns[0].totalPots = towns[0].getLevel("Wander") * 5;
+            towns[0].totalLocks = towns[0].getLevel("Wander");
         });
     };
 }
@@ -83,6 +101,7 @@ function MeetPeople() {
     this.manaCost = 800;
     this.expMult = 1;
     this.tooltip = "They won't let you get away with a simple chat.<br>Unlocked at 22% Explored";
+    this.townNum = 0;
 
     this.infoName = "People Met";
     this.varName = "Met";
@@ -92,14 +111,14 @@ function MeetPeople() {
         Soul:.1
     };
     this.visible = function() {
-        return towns[curTown].getLevel("Wander") >= 10;
+        return towns[0].getLevel("Wander") >= 10;
     };
     this.unlocked = function() {
-        return towns[curTown].getLevel("Wander") >= 22;
+        return towns[0].getLevel("Wander") >= 22;
     };
     this.finish = function() {
-        towns[curTown].finishProgress(this.varName, 200, function() {
-            towns[curTown].totalSQuests = towns[curTown].getLevel("Met") * (towns[curTown].difficulty + 1);
+        towns[0].finishProgress(this.varName, 200, function() {
+            towns[0].totalSQuests = towns[0].getLevel("Met");
         });
     };
 }
@@ -109,6 +128,7 @@ function Investigate() {
     this.manaCost = 1000;
     this.expMult = 1;
     this.tooltip = "You've been hearing some rumors...<br>Unlocked at 25% People Met";
+    this.townNum = 0;
 
     this.infoName = "Investigated";
     this.varName = "Secrets";
@@ -119,14 +139,42 @@ function Investigate() {
         Luck:.1
     };
     this.visible = function() {
-        return towns[curTown].getLevel("Met") >= 10;
+        return towns[0].getLevel("Met") >= 10;
     };
     this.unlocked = function() {
-        return towns[curTown].getLevel("Met") >= 25;
+        return towns[0].getLevel("Met") >= 25;
     };
     this.finish = function() {
-        towns[curTown].finishProgress(this.varName, 500, function() {
-            towns[curTown].totalLQuests = towns[curTown].getLevel("Secrets") * (towns[curTown].difficulty + 1);
+        towns[0].finishProgress(this.varName, 500, function() {
+            towns[0].totalLQuests = Math.floor(towns[0].getLevel("Secrets")/2);
+        });
+    };
+}
+
+function ExploreForest() {
+    this.name = "Explore Forest";
+    this.manaCost = 250;
+    this.expMult = 1;
+    this.tooltip = "What a pleasant area.";
+    this.townNum = 1;
+
+    this.infoName = "Forest Explored";
+    this.varName = "Forest";
+    this.stats = {
+        Per:.4,
+        Con:.2,
+        Spd:.2,
+        Luck:.2
+    };
+    this.visible = function() {
+        return true;
+    };
+    this.unlocked = function() {
+        return true;
+    };
+    this.finish = function() {
+        towns[1].finishProgress(this.varName, 200, function() {
+            towns[1].totalWildMana = towns[1].getLevel("Explored") * 5;
         });
     };
 }
@@ -139,6 +187,8 @@ function SellGold() {
     this.manaCost = 100;
     this.expMult = 1;
     this.tooltip = "1 gold = 50 mana. Sells all gold<br>Unlocked at 20% Explored";
+    this.townNum = 0;
+
     this.varName = "Gold";
     this.stats = {
         Cha:.7,
@@ -146,10 +196,10 @@ function SellGold() {
         Luck:.1
     };
     this.visible = function() {
-        return towns[curTown].getLevel("Wander") >= 3;
+        return towns[0].getLevel("Wander") >= 3;
     };
     this.unlocked = function() {
-        return towns[curTown].getLevel("Wander") >= 20;
+        return towns[0].getLevel("Wander") >= 20;
     };
     this.finish = function() {
         addMana(gold * 50);
@@ -162,16 +212,18 @@ function TrainStr() {
     this.manaCost = 500;
     this.expMult = 4;
     this.tooltip = "Build up those muscles. Again.<br>Has 4x exp/talent gain.<br>Unlocked at 5% People Met";
+    this.townNum = 0;
+
     this.varName = "trStr";
     this.stats = {
         Str:.8,
         Con:.2
     };
     this.visible = function() {
-        return towns[curTown].getLevel("Met") >= 1;
+        return towns[0].getLevel("Met") >= 1;
     };
     this.unlocked = function() {
-        return towns[curTown].getLevel("Met") >= 5;
+        return towns[0].getLevel("Met") >= 5;
     };
     this.finish = function() {
     };
@@ -182,16 +234,18 @@ function TrainDex() {
     this.manaCost = 500;
     this.expMult = 4;
     this.tooltip = "The kids are a little mad you're taking their playground. They'll get over it.<br>Has 4x exp/talent gain.<br>Unlocked at 15% People Met";
+    this.townNum = 0;
+
     this.varName = "trDex";
     this.stats = {
         Dex:.8,
         Con:.2
     };
     this.visible = function() {
-        return towns[curTown].getLevel("Met") >= 5;
+        return towns[0].getLevel("Met") >= 5;
     };
     this.unlocked = function() {
-        return towns[curTown].getLevel("Met") >= 15;
+        return towns[0].getLevel("Met") >= 15;
     };
     this.finish = function() {
     };
@@ -202,16 +256,18 @@ function TrainSpd() {
     this.manaCost = 500;
     this.expMult = 4;
     this.tooltip = "A new friend has a magical treadmill. Gotta go fast.<br>Has 4x exp/talent gain.<br>Unlocked at 30% People Met";
+    this.townNum = 0;
+
     this.varName = "trSpd";
     this.stats = {
         Spd:.8,
         Con:.2
     };
     this.visible = function() {
-        return towns[curTown].getLevel("Met") >= 15;
+        return towns[0].getLevel("Met") >= 15;
     };
     this.unlocked = function() {
-        return towns[curTown].getLevel("Met") >= 30;
+        return towns[0].getLevel("Met") >= 30;
     };
     this.finish = function() {
     };
@@ -222,6 +278,8 @@ function GuidedTour() {
     this.manaCost = 500;
     this.expMult = 2;
     this.tooltip = "After what you did, they're glad to help show you around.<br>8x explored % over Wander for equivalent mana cost.<br>Costs 1 reputation.<br>Unlocked at 10% Investigated";
+    this.townNum = 0;
+
     this.varName = "Tour";
     this.stats = {
         Spd:.4,
@@ -236,15 +294,15 @@ function GuidedTour() {
         addReputation(-1);
     };
     this.visible = function() {
-        return towns[curTown].getLevel("Secrets") >= 5;
+        return towns[0].getLevel("Secrets") >= 5;
     };
     this.unlocked = function() {
-        return towns[curTown].getLevel("Secrets") >= 10;
+        return towns[0].getLevel("Secrets") >= 10;
     };
     this.finish = function() {
-        towns[curTown].finishProgress(this.varName, 3200, function() {
-            towns[curTown].totalPots = towns[curTown].getLevel("Wander") * 5 * (towns[curTown].difficulty + 1);
-            towns[curTown].totalLocks = towns[curTown].getLevel("Wander") * (towns[curTown].difficulty + 1);
+        towns[0].finishProgress("Wander", 3200, function() {
+            towns[0].totalPots = towns[0].getLevel("Wander") * 5;
+            towns[0].totalLocks = towns[0].getLevel("Wander");
         });
     };
 }
@@ -254,6 +312,8 @@ function ThrowParty() {
     this.manaCost = 1600;
     this.expMult = 2;
     this.tooltip = "Take a break and socialize.<br>8x people met % over Meet People for equivalent mana cost.<br>Costs 3 reputation.<br>Unlocked at 30% Investigated";
+    this.townNum = 0;
+
     this.varName = "Party";
     this.stats = {
         Cha:.8,
@@ -266,14 +326,14 @@ function ThrowParty() {
         addReputation(-3);
     };
     this.visible = function() {
-        return towns[curTown].getLevel("Secrets") >= 20;
+        return towns[0].getLevel("Secrets") >= 20;
     };
     this.unlocked = function() {
-        return towns[curTown].getLevel("Secrets") >= 30;
+        return towns[0].getLevel("Secrets") >= 30;
     };
     this.finish = function() {
-        towns[curTown].finishProgress(this.varName, 3200, function() {
-            towns[curTown].totalSQuests = towns[curTown].getLevel("Met") * (towns[curTown].difficulty + 1);
+        towns[0].finishProgress("Met", 3200, function() {
+            towns[0].totalSQuests = towns[0].getLevel("Met");
         });
     };
 }
@@ -283,6 +343,8 @@ function WarriorLessons() {
     this.manaCost = 1000;
     this.expMult = 1;
     this.tooltip = "Learning to fight is probably important; you have a long journey ahead of you.<br>Requires 2 reputation.<br>Unlocked at 20% Investigated.";
+    this.townNum = 0;
+
     this.varName = "trCombat";
     this.stats = {
         Str:.5,
@@ -293,13 +355,12 @@ function WarriorLessons() {
         return reputation >= 2;
     };
     this.cost = function() {
-        addReputation(-2);
     };
     this.visible = function() {
-        return towns[curTown].getLevel("Secrets") >= 10;
+        return towns[0].getLevel("Secrets") >= 10;
     };
     this.unlocked = function() {
-        return towns[curTown].getLevel("Secrets") >= 20;
+        return towns[0].getLevel("Secrets") >= 20;
     };
     this.finish = function() {
         addSkillExp("Combat", 100);
@@ -312,6 +373,8 @@ function MageLessons() {
     this.manaCost = 1000;
     this.expMult = 1;
     this.tooltip = "The mystic got you into this mess, maybe it can help you get out of it.<br>Requires 2 reputation.<br>Unlocked at 20% Investigated.";
+    this.townNum = 0;
+
     this.varName = "trMagic";
     this.stats = {
         Per:.3,
@@ -322,17 +385,110 @@ function MageLessons() {
         return reputation >= 2;
     };
     this.cost = function() {
-        addReputation(-2);
     };
     this.visible = function() {
-        return towns[curTown].getLevel("Secrets") >= 10;
+        return towns[0].getLevel("Secrets") >= 10;
     };
     this.unlocked = function() {
-        return towns[curTown].getLevel("Secrets") >= 20;
+        return towns[0].getLevel("Secrets") >= 20;
     };
     this.finish = function() {
         addSkillExp("Magic", 100);
         view.updateProgressActions();
+    };
+}
+
+function BuySupplies() {
+    this.name = "Buy Supplies";
+    this.manaCost = 250;
+    this.expMult = 1;
+    this.tooltip = "Prepare to move on.<br>Costs <div id='suppliesCost'></div> gold.<br>You only need one set of supplies.<br>Unlocks at a combined skill of 35.";
+    this.townNum = 0;
+
+    this.varName = "Supplies";
+    this.stats = {
+        Cha:.8,
+        Luck:.1,
+        Soul:.1
+    };
+    this.canStart = function() {
+        return gold >= towns[0].suppliesCost && supplies === 0;
+    };
+    this.cost = function() {
+        addGold(-towns[0].suppliesCost);
+    };
+    this.visible = function() {
+        return (getSkillLevel("Combat") + getSkillLevel("Magic")) >= 15;
+    };
+    this.unlocked = function() {
+        return (getSkillLevel("Combat") + getSkillLevel("Magic")) >= 35;
+    };
+    this.finish = function() {
+        addSupplies(1);
+    };
+}
+
+function Haggle() {
+    this.name = "Haggle";
+    this.manaCost = 250;
+    this.expMult = 1;
+    this.tooltip = "They won't like you as much, but hey - you're leaving.<br>Costs 1 reputation to reduce the price of supplies by 20. <br>Unlocks at a combined skill of 35.";
+    this.townNum = 0;
+
+    this.varName = "Haggle";
+    this.stats = {
+        Cha:.8,
+        Luck:.1,
+        Soul:.1
+    };
+    this.canStart = function() {
+        return reputation >= 1;
+    };
+    this.cost = function() {
+        addReputation(-1);
+    };
+    this.visible = function() {
+        return (getSkillLevel("Combat") + getSkillLevel("Magic")) >= 15;
+    };
+    this.unlocked = function() {
+        return (getSkillLevel("Combat") + getSkillLevel("Magic")) >= 35;
+    };
+    this.finish = function() {
+        towns[0].suppliesCost -= 20;
+        if(towns[0].suppliesCost < 0 ) {
+            towns[0].suppliesCost = 0;
+        }
+        view.updateSupplies();
+    };
+}
+
+function StartJourney() {
+    this.name = "Start Journey";
+    this.manaCost = 250;
+    this.expMult = 2;
+    this.tooltip = "Follow the trail to end up at the next town. You need to keep moving until you can learn how to shut these loops off.<br>Costs 1 supplies. Finish once to unlock the next area's actions.<br>Unlocks at a combined skill of 35.";
+    this.townNum = 0;
+
+    this.varName = "Journey";
+    this.stats = {
+        Con:.4,
+        Per:.3,
+        Spd:.3
+    };
+    this.canStart = function() {
+        return supplies === 1;
+    };
+    this.cost = function() {
+        addSupplies(-1);
+    };
+    this.visible = function() {
+        return (getSkillLevel("Combat") + getSkillLevel("Magic")) >= 15;
+    };
+    this.unlocked = function() {
+        return (getSkillLevel("Combat") + getSkillLevel("Magic")) >= 35;
+    };
+    this.finish = function() {
+        unlockTown(1);
     };
 }
 
@@ -344,6 +500,7 @@ function SmashPots() {
     this.manaCost = 50;
     this.expMult = 1;
     this.tooltip = "They're just sitting there, unbroken, full of potential.<br>Pots with loot in them have 100 mana.<br>Every 10 pots have mana.";
+    this.townNum = 0;
 
     this.varName = "Pots";
     this.infoName = "Pots Smashed";
@@ -360,7 +517,7 @@ function SmashPots() {
         return true;
     };
     this.finish = function() {
-        towns[curTown].finishRegular(this.varName, 10, function() {
+        towns[0].finishRegular(this.varName, 10, function() {
             addMana(100);
             return 100;
         })
@@ -372,8 +529,9 @@ function PickLocks() {
     this.manaCost = 400;
     this.expMult = 1;
     this.varName = "Locks";
-
     this.tooltip = "Don't worry; they won't remember.<br>Houses with loot in them have 10 gold.<br>Every 10 houses have gold.<br>Unlocked at 20% Explored";
+    this.townNum = 0;
+
     this.infoName = "Locks Picked";
     this.infoText = "Houses with loot left <i class='fa fa-arrow-left'></i> Houses with loot total <i class='fa fa-arrow-left'></i> Houses to check for loot<br><div class='bold'>Total Found</div> <div id='totalLocks'></div>";
     this.stats = {
@@ -383,13 +541,13 @@ function PickLocks() {
         Luck:.1
     };
     this.visible = function() {
-        return towns[curTown].getLevel("Wander") >= 3;
+        return towns[0].getLevel("Wander") >= 3;
     };
     this.unlocked = function() {
-        return towns[curTown].getLevel("Wander") >= 20;
+        return towns[0].getLevel("Wander") >= 20;
     };
     this.finish = function() {
-        towns[curTown].finishRegular(this.varName, 10, function() {
+        towns[0].finishRegular(this.varName, 10, function() {
             addGold(10);
             return 10;
         })
@@ -401,8 +559,9 @@ function ShortQuest() {
     this.manaCost = 800;
     this.expMult = 1;
     this.varName = "SQuests";
-
     this.tooltip = "Be a hero! ...If the reward is good and it doesn't take too long.<br>Short Quests with loot give 20 gold as a reward.<br>Every 5 Short Quests have loot.<br>Unlocked at 5% People Met";
+    this.townNum = 0;
+
     this.infoName = "Short Quests Accomplished";
     this.infoText = "Quests with loot left <i class='fa fa-arrow-left'></i> Quests with loot total <i class='fa fa-arrow-left'></i> Quests to finish<br><div class='bold'>Total Found</div> <div id='totalSQuests'></div>";
     this.stats = {
@@ -414,13 +573,13 @@ function ShortQuest() {
         Soul:.1
     };
     this.visible = function() {
-        return towns[curTown].getLevel("Met") >= 1;
+        return towns[0].getLevel("Met") >= 1;
     };
     this.unlocked = function() {
-        return towns[curTown].getLevel("Met") >= 5;
+        return towns[0].getLevel("Met") >= 5;
     };
     this.finish = function() {
-        towns[curTown].finishRegular(this.varName, 5, function() {
+        towns[0].finishRegular(this.varName, 5, function() {
             addGold(20);
             return 20;
         })
@@ -432,8 +591,9 @@ function LongQuest() {
     this.manaCost = 2000;
     this.expMult = 1;
     this.varName = "LQuests";
+    this.tooltip = "Be a more impressive hero! ...As long as someone is watching.<br>Long Quests with loot give 25 gold and 1 reputation as a reward.<br>Every 5 Long Quests have loot.<br>Unlocked at 10% Investigated.";
+    this.townNum = 0;
 
-    this.tooltip = "Be a more impressive hero! ...As long as someone is watching.<br>Long Quests with loot give 25 gold and 1 reputation as a reward.<br>Every 10 Long Quests have loot.<br>Unlocked at 10% Investigated.";
     this.infoName = "Long Quests Accomplished";
     this.infoText = "Quests with loot left <i class='fa fa-arrow-left'></i> Quests with loot total <i class='fa fa-arrow-left'></i> Quests to finish<br><div class='bold'>Total Found</div> <div id='totalLQuests'></div>";
     this.stats = {
@@ -443,17 +603,17 @@ function LongQuest() {
         Spd:.2
     };
     this.visible = function() {
-        return towns[curTown].getLevel("Secrets") >= 1;
+        return towns[0].getLevel("Secrets") >= 1;
     };
     this.unlocked = function() {
-        let toUnlock = towns[curTown].getLevel("Secrets") >= 10;
+        let toUnlock = towns[0].getLevel("Secrets") >= 10;
         if(toUnlock && !isVisible(document.getElementById("skillList"))) {
             document.getElementById("skillList").style.display = "inline-block";
         }
         return toUnlock;
     };
     this.finish = function() {
-        towns[curTown].finishRegular(this.varName, 10, function() {
+        towns[0].finishRegular(this.varName, 5, function() {
             addReputation(1);
             addGold(25);
             return 25;
@@ -469,7 +629,9 @@ function HealTheSick() {
     this.name = "Heal The Sick";
     this.manaCost = 2500;
     this.expMult = 1;
-    this.tooltip = "You won't be able to heal them all, but they'll be thankful for doing what you can.<br>Healing is always 3 parts, each with a main stat - Diagnose (Per), Treat (Int), Inform (Cha).<br>Gives (magic skill) * (1 + main stat / 100) * (1 + times completed / 100) * (actual mana cost / original mana cost) progress points per mana.<br>Requires 24 Magic skill.<br>Gives 3 reputation upon patient completion.";
+    this.tooltip = "You won't be able to heal them all, but they'll be thankful for doing what you can.<br>Healing is always 3 parts, each with a main stat - Diagnose (Per), Treat (Int), Inform (Cha).<br>Gives (magic skill) * (1 + main stat / 100) * (1 + times completed / 100) * (actual mana cost / original mana cost) progress points per mana.<br>Requires 12 Magic skill.<br>Gives 3 reputation upon patient completion.";
+    this.townNum = 0;
+
     this.varName = "Heal";
     this.stats = {
         Per:.2,
@@ -480,7 +642,7 @@ function HealTheSick() {
     this.loopStats = ["Per", "Int", "Cha"];
     this.segments = 3;
     this.loopCost = function(segment) {
-        return (2+Math.floor((towns[0].HealLoopCounter+segment)/this.segments+.0000001)) * 10000;
+        return (2+Math.floor((towns[0].HealLoopCounter+segment)/this.segments+.0000001)) * 5000;
     };
     this.tickProgress = function(offset) {
         return getSkillLevel("Magic") * (1 + getLevel(this.loopStats[(towns[0].HealLoopCounter+offset) % this.loopStats.length])/100) * (1 + towns[0].totalHeal/100);
@@ -495,21 +657,22 @@ function HealTheSick() {
         return ["Diagnose", "Treat", "Inform"][segment % 3];
     };
     this.visible = function() {
-        return getSkillLevel("Magic") >= 5;
+        return getSkillLevel("Magic") >= 3;
     };
     this.unlocked = function() {
-        return getSkillLevel("Magic") >= 24;
+        return getSkillLevel("Magic") >= 12;
     };
     this.finish = function() {
     };
 }
 
-
 function FightMonsters() {
     this.name = "Fight Monsters";
     this.manaCost = 2000;
     this.expMult = 1;
-    this.tooltip = "Slowly, you're figuring out their patterns.<br>Fighting rotates between 3 types of battles, each with a main stat - Quick (Spd), Defensive (Str), Aggressive (Con).<br>Gives (combat skill) * (1 + main stat / 100) * (1 + times completed / 100) * (actual mana cost / original mana cost) progress points per mana.<br>Requires 20 Combat skill.<br>Gives 30 gold per fight segment completion.";
+    this.tooltip = "Slowly, you're figuring out their patterns.<br>Fighting rotates between 3 types of battles, each with a main stat - Quick (Spd), Defensive (Str), Aggressive (Con).<br>Gives (combat skill) * (1 + main stat / 100) * (1 + times completed / 100) * (actual mana cost / original mana cost) progress points per mana.<br>Requires 10 Combat skill.<br>Gives 30 gold per fight segment completion.";
+    this.townNum = 0;
+
     this.varName = "Fight";
     this.stats = {
         Str:.3,
@@ -520,7 +683,7 @@ function FightMonsters() {
     this.loopStats = ["Spd", "Spd", "Spd", "Str", "Str", "Str", "Con", "Con", "Con"];
     this.segments = 3;
     this.loopCost = function(segment) {
-        return fibonacci(Math.floor((towns[0].FightLoopCounter+segment) - towns[0].FightLoopCounter/3+.0000001)) * 20000;
+        return fibonacci(Math.floor((towns[0].FightLoopCounter+segment) - towns[0].FightLoopCounter/3+.0000001)) * 10000;
     };
     this.tickProgress = function(offset) {
         return getSkillLevel("Combat") * (1 + getLevel(this.loopStats[(towns[0].FightLoopCounter+offset) % this.loopStats.length])/100) * (1 + towns[0].totalFight/100);
@@ -550,10 +713,10 @@ function FightMonsters() {
         return "A bunch of "+name;
     };
     this.visible = function() {
-        return getSkillLevel("Combat") >= 5;
+        return getSkillLevel("Combat") >= 3;
     };
     this.unlocked = function() {
-        return getSkillLevel("Combat") >= 20;
+        return getSkillLevel("Combat") >= 10;
     };
     this.finish = function() {
     };
@@ -563,12 +726,13 @@ function monsterNames() { //spd, defensive, aggressive
     return ["Deer", "Giant Turtles", "Goblins", "Demon Rabbits", "Giant Honeybadgers", "Venemous Snakes", "Angry Monkeys", "Trolls", "Ogres", "Pixies", "Treants", "Gelatanous Cubes", "Fairies", "Orcs", "Beholders", "Spectres", "Shambling Mound", "Corrupted Mushroomfolk", "Giant Owls", "Blood Trolls", "Small Wyrms", "Pikachus", "Machokes", "Alakazams"];
 }
 
-
 function SmallDungeon() {
     this.name = "Small Dungeon";
-    this.manaCost = 2000;
+    this.manaCost = 3000;
     this.expMult = 1;
-    this.tooltip = "There are small changes each time; it's harder to get used to. The soulstones at the end last through loops, but they're not always in the dungeon... Strange.<br>The dungeon requires different skills at different points.<br>Gives (magic + combat skill) * (1 + main stat / 100) * (1 + times completed / 200) * (actual mana cost / original mana cost) progress points per mana.<br>Requires a combined skill of 47.<br>Gives 1 soulstone per completion - hover over Completed for info.";
+    this.tooltip = "There are small changes each time; it's harder to get used to. The soulstones at the end last through loops, but they're not always in the dungeon... Strange.<br>The dungeon requires different skills at different points.<br>Gives (magic + combat skill) * (1 + main stat / 100) * (1 + times completed / 200) * (actual mana cost / original mana cost) progress points per mana.<br>Requires a combined skill of 35.<br>Gives 1 soulstone per completion - hover over Completed for info.";
+    this.townNum = 0;
+
     this.varName = "SDungeon";
     this.stats = {
         Dex:.5,
@@ -580,7 +744,7 @@ function SmallDungeon() {
     this.segments = 7;
     this.completedTooltip = "Each soulstone improves a random stat's exp gain by 10%. Each soulstone reduces the chance you'll get the next one by 10%. Soulstone chance recovers at .0001% per mana.<br><div class='bold'>Chance </div> <div id='soulstoneChance'></div>%<br><div class='bold'>Last Stat</div> <div id='soulstonePrevious'>NA</div>";
     this.loopCost = function(segment) {
-        return (1+Math.floor((towns[0].SDungeonLoopCounter+segment)/this.segments+.0000001)) * 20000;
+        return (1+Math.floor((towns[0].SDungeonLoopCounter+segment)/this.segments+.0000001)) * 15000;
     };
     this.tickProgress = function(offset) {
         return (getSkillLevel("Combat")+getSkillLevel("Magic")) * (1 + getLevel(this.loopStats[(towns[0].SDungeonLoopCounter+offset) % this.loopStats.length])/100) * (1 + towns[0].totalSDungeon/200);
@@ -602,10 +766,10 @@ function SmallDungeon() {
         return ["Spike Traps", "Long Hallways", "Arrow Traps", "Riddle Guardian", "Swinging Axes", "Boss", "Loot"][segment % this.segments];
     };
     this.visible = function() {
-        return (getSkillLevel("Combat") + getSkillLevel("Magic")) >= 20;
+        return (getSkillLevel("Combat") + getSkillLevel("Magic")) >= 15;
     };
     this.unlocked = function() {
-        return (getSkillLevel("Combat") + getSkillLevel("Magic")) >= 47;
+        return (getSkillLevel("Combat") + getSkillLevel("Magic")) >= 35;
     };
     this.finish = function() {
     };

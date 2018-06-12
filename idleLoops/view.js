@@ -17,6 +17,8 @@ function View() {
         this.createTownActions();
         this.updateProgressActions();
         this.updateSoulstones();
+        this.updateSupplies();
+        this.showTown(0);
     };
 
     this.update = function() {
@@ -25,6 +27,11 @@ function View() {
         });
         this.updateTime();
         this.updateSoulstoneChance();
+    };
+
+    this.showStat = function(stat) {
+        statShowing = stat;
+        this.updateStat(stat);
     };
 
     this.updateStat = function(stat) {
@@ -40,7 +47,7 @@ function View() {
             document.getElementById("stat" + stat + "SSBonus").innerHTML = (stats[stat].soulstone ? stats[stat].soulstone : 0) * 10+"%";
         }
 
-        if(isVisible(document.getElementById("stat"+stat+"Tooltip")) || document.getElementById("stat" + stat + "LevelExp").innerHTML === "") {
+        if(statShowing === stat || document.getElementById("stat" + stat + "LevelExp").innerHTML === "") {
             let expOfLevel = getExpOfLevel(getLevel(stat));
             document.getElementById("stat" + stat + "LevelExp").innerHTML = intToString(stats[stat].exp - expOfLevel, 1);
             document.getElementById("stat" + stat + "LevelExpNeeded").innerHTML = intToString(getExpOfLevel(getLevel(stat)+1) - expOfLevel+"", 1);
@@ -77,6 +84,13 @@ function View() {
     this.updateReputation = function() {
         document.getElementById("reputation").innerHTML = reputation;
     };
+    this.updateSupplies = function() {
+        document.getElementById("suppliesCost").innerHTML = towns[0].suppliesCost+"";
+        document.getElementById("supplies").innerHTML = supplies;
+    };
+    this.updateTotalTicks = function() {
+        document.getElementById("totalTicks").innerHTML = actions.completedTicks;
+    };
 
     this.updateNextActions = function() {
         while (nextActionsDiv.firstChild) {
@@ -90,15 +104,16 @@ function View() {
             if(hasCap(action.name)) {
                 capButton = "<i onclick='actions.capAmount("+index+")' class='actionIcon fa fa-circle-thin'></i>";
             }
+            let isTravel = getTravelNum(action.name);
             totalDivText +=
                 "<div class='nextActionContainer small'>" +
                     "<div class='bold'>" + action.loops +"</div> x " +
                     "<img src='img/"+camelize(action.name)+".svg' class='smallIcon'>" +
                     "<div style='float:right'>"+
                         capButton +
-                        "<i onclick='actions.addLoop("+index+")' class='actionIcon fa fa-plus'></i>" +
-                        "<i onclick='actions.removeLoop("+index+")' class='actionIcon fa fa-minus'></i>" +
-                        "<i onclick='actions.split("+index+")' class='actionIcon fa fa-arrows-h'></i>" +
+                (isTravel ? "" : "<i onclick='actions.addLoop("+index+")' class='actionIcon fa fa-plus'></i>")+
+                (isTravel ? "" : "<i onclick='actions.removeLoop("+index+")' class='actionIcon fa fa-minus'></i>")+
+                (isTravel ? "" : "<i onclick='actions.split("+index+")' class='actionIcon fa fa-arrows-h'></i>")+
                         "<i onclick='actions.moveUp("+index+")' class='actionIcon fa fa-sort-up'></i>" +
                         "<i onclick='actions.moveDown("+index+")' class='actionIcon fa fa-sort-down'></i>" +
                         "<i onclick='actions.removeAction("+index+")' class='actionIcon fa fa-times'></i>" +
@@ -108,10 +123,6 @@ function View() {
 
         actionsDiv.innerHTML = totalDivText;
         nextActionsDiv.appendChild(actionsDiv);
-    };
-
-    this.updateTotalTicks = function() {
-        document.getElementById("totalTicks").innerHTML = actions.completedTicks;
     };
 
     this.updateCurrentActionsDivs = function() {
@@ -147,7 +158,10 @@ function View() {
                     "<div class='bold'>Mana Used</div> <div id='action"+index+"ManaUsed'>0</div><br>" +
                     "<div class='bold'>Remaining</div> <div id='action"+index+"Remaining'></div><br>" +
                     "<div id='action"+index+"ExpGain'></div>" +
-                    "<div id='action"+index+"HasFailed' style='display:none'><div class='bold'>Failed Attempts</div> <div id='action"+index+"Failed'>0</div></div>" +
+                    "<div id='action"+index+"HasFailed' style='display:none'>" +
+                        "<div class='bold'>Failed Attempts</div> <div id='action"+index+"Failed'>0</div><br>" +
+                        "<div class='bold'>Error</div> <div id='action"+index+"Error'></div>" +
+                    "</div>" +
                 "</div>";
         });
 
@@ -163,6 +177,7 @@ function View() {
         div.style.width = (100 * action.ticks / action.adjustedTicks) + "%";
         if(action.loopsFailed) {
             document.getElementById("action" + index + "Failed").innerHTML = action.loopsFailed + "";
+            document.getElementById("action" + index + "Error").innerHTML = action.errorMessage + "";
             document.getElementById("action"+index+"HasFailed").style.display = "block";
             div.style.width = "100%";
             div.style.backgroundColor = "#ff0000";
@@ -176,6 +191,10 @@ function View() {
         document.getElementById("action"+index+"ManaUsed").innerHTML = action.manaUsed+"";
         document.getElementById("action"+index+"Remaining").innerHTML = (timeNeeded - timer)+"";
         let statExpGain = "";
+        let expGainDiv = document.getElementById("action"+index+"ExpGain");
+        while (expGainDiv.firstChild) {
+            expGainDiv.removeChild(expGainDiv.firstChild);
+        }
         statList.forEach((statName) => {
             if(action["statExp"+statName]) {
                 statExpGain += "<div class='bold'>"+statName+"</div> " + intToString(action["statExp"+statName], 2) + "<br>";
@@ -199,14 +218,15 @@ function View() {
     };
 
     this.updateProgressActions = function() {
-        const town = towns[curTown];
-        town.progressVars.forEach((varName) => {
-            let level = town.getLevel(varName);
-            let levelPrc = town.getPrcToNext(varName) + "%";
-            document.getElementById("prc"+varName).innerHTML = level;
-            document.getElementById("expBar"+varName).style.width = levelPrc;
-            document.getElementById("progress"+varName).innerHTML = intToString(levelPrc, 2);
-            document.getElementById("bar"+varName).style.width = level + "%";
+        towns.forEach((town) => {
+            town.progressVars.forEach((varName) => {
+                let level = town.getLevel(varName);
+                let levelPrc = town.getPrcToNext(varName) + "%";
+                document.getElementById("prc"+varName).innerHTML = level;
+                document.getElementById("expBar"+varName).style.width = levelPrc;
+                document.getElementById("progress"+varName).innerHTML = intToString(levelPrc, 2);
+                document.getElementById("bar"+varName).style.width = level + "%";
+            });
         });
         this.updateLockedHidden();
     };
@@ -234,13 +254,35 @@ function View() {
         });
     };
 
+    this.showTown = function(townNum) {
+        if(townNum <= 0) {
+            townNum = 0;
+            document.getElementById("townViewLeft").style.visibility = "hidden";
+        } else {
+            document.getElementById("townViewLeft").style.visibility = "visible";
+        }
+
+        if(townNum >= maxTown) {
+            townNum = maxTown;
+            document.getElementById("townViewRight").style.visibility = "hidden";
+        } else {
+            document.getElementById("townViewRight").style.visibility = "visible";
+        }
+        for(let i = 0; i < actionOptionsTown.length; i++) {
+            actionOptionsTown[i].style.display = "none";
+            townInfos[i].style.display = "none";
+        }
+        actionOptionsTown[townNum].style.display = "block";
+        townInfos[townNum].style.display = "block";
+        document.getElementById("townName").innerHTML = townNames[townNum];
+    };
+
     this.updateRegular = function(varName) {
         const town = towns[curTown];
         document.getElementById("total"+varName).innerHTML = town["total"+varName]+"";
         document.getElementById("checked"+varName).innerHTML = town["total"+varName] - town["checked"+varName]+"";
         document.getElementById("goodTemp"+varName).innerHTML = town["goodTemp"+varName]+"";
         document.getElementById("good"+varName).innerHTML = town["good"+varName]+"";
-        // document.getElementById("lootFrom"+varName).innerHTML = town["lootFrom"+varName]+"";
     };
 
     this.updateAddAmount = function(num) {
@@ -267,8 +309,8 @@ function View() {
     };
 
     this.createTownActions = function() {
-        while (actionOptionsDiv.firstChild) {
-            actionOptionsDiv.removeChild(actionOptionsDiv.firstChild);
+        while (actionOptionsTown[0].firstChild) {
+            actionOptionsTown[0].removeChild(actionOptionsTown[0].firstChild);
         }
         let tempObj = new Wander();
         this.createTownAction(tempObj);
@@ -318,6 +360,17 @@ function View() {
         tempObj = new SmallDungeon();
         this.createTownAction(tempObj);
         this.createMultiPartPBar(tempObj);
+
+        this.createTownAction(new BuySupplies());
+        this.createTownAction(new Haggle());
+        this.createTravelAction(new StartJourney());
+
+        while (actionOptionsTown[1].firstChild) {
+            actionOptionsTown[1].removeChild(actionOptionsTown[1].firstChild);
+        }
+        tempObj = new ExploreForest();
+        this.createTownAction(tempObj);
+        this.createActionProgress(tempObj);
     };
 
     this.createActionProgress = function(action) {
@@ -335,7 +388,7 @@ function View() {
         let progressDiv = document.createElement("div");
         progressDiv.style.display = "block";
         progressDiv.innerHTML = totalDivText;
-        townInfoDiv.appendChild(progressDiv);
+        townInfos[action.townNum].appendChild(progressDiv);
     };
 
     this.createTownAction = function(action) {
@@ -346,7 +399,7 @@ function View() {
         });
 
         const totalDivText =
-            "<div id='container"+action.varName+"' class='actionContainer showthat' onclick='addAction(\""+action.name+"\")'>" +
+            "<div id='container"+action.varName+"' class='actionContainer showthat' onclick='addActionToList(\""+action.name+"\", "+action.townNum+")'>" +
                 action.name + "<br>" +
                 "<img src='img/"+camelize(action.name)+".svg' class='superLargeIcon'><br>" +
                 "<div class='showthis'>" +
@@ -359,7 +412,34 @@ function View() {
 
         let actionsDiv = document.createElement("div");
         actionsDiv.innerHTML = totalDivText;
-        actionOptionsDiv.appendChild(actionsDiv);
+        actionOptionsTown[action.townNum].appendChild(actionsDiv);
+        towns[action.townNum].totalActionList.push(action);
+        this.totalActionList.push(action);
+    };
+
+    this.createTravelAction = function(action) {
+        let actionStats = "";
+        let keyNames = Object.keys(action.stats);
+        keyNames.forEach((statName) => {
+            actionStats += "<div class='bold'>" + statName + "</div> " + (action.stats[statName]*100)+"%<br>";
+        });
+
+        const totalDivText =
+            "<div id='container"+action.varName+"' class='travelContainer showthat' onclick='addActionToList(\""+action.name+"\", "+action.townNum+", true)'>" +
+            action.name + "<br>" +
+            "<img src='img/"+camelize(action.name)+".svg' class='superLargeIcon'><br>" +
+            "<div class='showthis'>" +
+            action.tooltip + "<br>" +
+            actionStats +
+            "<div class='bold'>Mana Cost</div> "+action.manaCost+"<br>" +
+            "<div class='bold'>Exp Multiplier</div> "+(action.expMult*100)+"%<br>" +
+            "</div>" +
+            "</div>";
+
+        let actionsDiv = document.createElement("div");
+        actionsDiv.innerHTML = totalDivText;
+        actionOptionsTown[action.townNum].appendChild(actionsDiv);
+        towns[action.townNum].totalActionList.push(action);
         this.totalActionList.push(action);
     };
 
@@ -379,7 +459,7 @@ function View() {
         let infoDiv = document.createElement("div");
         infoDiv.style.display = "block";
         infoDiv.innerHTML = totalInfoText;
-        townInfoDiv.appendChild(infoDiv);
+        townInfos[action.townNum].appendChild(infoDiv);
     };
 
     this.createMultiPartPBar = function(action) {
@@ -409,7 +489,7 @@ function View() {
         let progressDiv = document.createElement("div");
         progressDiv.style.display = "block";
         progressDiv.innerHTML = totalDivText;
-        townInfoDiv.appendChild(progressDiv);
+        townInfos[action.townNum].appendChild(progressDiv);
     };
 
     this.updateMultiPartActions = function() {
@@ -495,8 +575,12 @@ function View() {
 
 const curActionsDiv = document.getElementById("curActionsList");
 const nextActionsDiv = document.getElementById("nextActionsList");
-const actionOptionsDiv = document.getElementById("generatedActionOptions");
-const townInfoDiv = document.getElementById("generatedTownInfo");
+const actionOptionsTown = [];
+const townInfos = [];
+for(let i = 0; i < 2; i++) {
+    actionOptionsTown[i] = document.getElementById("actionOptionsTown"+i);
+    townInfos[i] = document.getElementById("townInfo"+i);
+}
 
 
 function expEquals(stat) {

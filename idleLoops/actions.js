@@ -53,7 +53,7 @@ function Actions() {
             this.completedTicks += curAction.adjustedTicks;
             curAction.finish();
 
-            if(curAction.loopsLeft && curAction.cost) {
+            if(curAction.cost) {
                 curAction.cost();
             }
 
@@ -62,7 +62,8 @@ function Actions() {
         }
         view.updateCurrentActionBar(this.currentPos);
         if(curAction.loopsLeft === 0) {
-            if(!this.current[this.currentPos + 1] && document.getElementById("repeatLastAction").checked) { //no more last action
+            if(!this.current[this.currentPos + 1] && document.getElementById("repeatLastAction").checked &&
+                (!curAction.canStart || curAction.canStart()) && curAction.townNum === curTown) {
                 curAction.loopsLeft++;
             } else {
                 this.currentPos++;
@@ -72,7 +73,14 @@ function Actions() {
 
     this.getNextValidAction = function() {
         let curAction = this.current[this.currentPos];
-        if(curAction && curAction.canStart && !curAction.canStart()) {
+        if(!curAction) {
+            return curAction;
+        }
+        if(getTravelNum(curAction.name) && curAction.canStart()) {
+            return curAction;
+        }
+        if((curAction.canStart && !curAction.canStart()) || curAction.townNum !== curTown) {
+            curAction.errorMessage = this.getErrorMessage(curAction);
             curAction.loopsFailed = curAction.loopsLeft;
             curAction.loopsLeft = 0;
             view.updateCurrentActionBar(this.currentPos);
@@ -82,15 +90,27 @@ function Actions() {
         return curAction;
     };
 
+    this.getErrorMessage = function(action) {
+        if(action.townNum !== curTown) {
+            return "You were in area " + (curTown+1) + " when you tried this action, and needed to be in " + (action.townNum+1);
+        }
+        if(action.canStart && !action.canStart()) {
+            return "You could not make the cost for the action."
+        }
+        return "??";
+    };
+
     this.restart = function() {
         this.currentPos = 0;
         this.completedTicks = 0;
+        curTown = 0;
         towns[0].Heal = 0;
         towns[0].HealLoopCounter = 0;
         towns[0].Fight = 0;
         towns[0].FightLoopCounter = 0;
         towns[0].SDungeon = 0;
         towns[0].SDungeonLoopCounter = 0;
+        towns[0].suppliesCost = 400;
         if(document.getElementById("currentListActive").checked) {
             this.currentPos = 0;
             this.completedTicks = 0;
@@ -183,6 +203,10 @@ function Actions() {
         view.updateNextActions();
     };
     this.removeAction = function(index) {
+        let travelNum = getTravelNum(this.next[index].name);
+        if(travelNum) {
+            actionTownNum = travelNum - 1;
+        }
         this.next.splice(index, 1);
         view.updateNextActions();
     };
@@ -192,7 +216,6 @@ function Actions() {
         toAdd.name = action;
 
         toAdd.loops = loops !== undefined ? loops : this.addAmount;
-
 
         if(initialOrder !== undefined) {
             this.next.splice(initialOrder, 0, toAdd) //insert at index
