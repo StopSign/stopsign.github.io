@@ -54,28 +54,30 @@ function restart() {
     timeNeeded = timeNeededInitial;
     addGold(-gold);
     addReputation(-reputation);
+    addSupplies(-supplies);
     restartStats();
     actions.restart();
     towns.forEach((town) => {
         town.restart();
-    });
-    statList.forEach((stat) => {
-        view.updateStat(stat);
     });
     skillList.forEach((skill) => {
         view.updateSkill(skill);
     });
 
     view.updateCurrentActionsDivs();
-    view.update();
     save();
 }
 
-function addAction(name) {
-    view.totalActionList.forEach((action) => {
+function addActionToList(name, townNum, isTravelAction) {
+    towns[townNum].totalActionList.forEach((action) => {
         if(action.name === name) {
             if(action.visible() && action.unlocked()) {
-                actions.addAction(name);
+                if(isTravelAction) {
+                    actionTownNum = townNum+1;
+                    actions.addAction(name, 1);
+                } else {
+                    actions.addAction(name);
+                }
             }
         }
     });
@@ -94,6 +96,11 @@ function addGold(amount) {
 function addReputation(amount) {
     reputation += amount;
     view.updateReputation();
+}
+
+function addSupplies(amount) {
+    supplies += amount;
+    view.updateSupplies();
 }
 
 function changeActionAmount(amount, num) {
@@ -130,4 +137,12 @@ function loadList() {
     }
     // view.updateCurrentActionsDivs();
     view.updateNextActions();
+}
+
+function unlockTown(townNum) {
+    if(townNum > maxTown) {
+        maxTown = townNum;
+        view.showTown(townNum); //refresh current
+    }
+    curTown = townNum;
 }

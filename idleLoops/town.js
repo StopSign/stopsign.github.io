@@ -1,14 +1,15 @@
-function Town(difficulty) {
-    this.difficulty = difficulty;
+function Town(index) {
+    this.index = index;
     this.varNames = [];
     this.progressVars = [];
+    this.totalActionList = [];
 
     this.expFromLevel = function(level) {
-        return level * (level + 1) * 50 / (this.difficulty + 1);
+        return level * (level + 1) * 50;
     };
 
     this.getLevel = function(varName) {
-        return Math.floor((Math.sqrt(8*this["exp"+varName]/(this.difficulty+1)/100+1)-1)/2);
+        return Math.floor((Math.sqrt(8*this["exp"+varName]/100+1)-1)/2);
     };
 
     this.restart = function() {
@@ -87,19 +88,23 @@ function Town(difficulty) {
             this.progressVars.push(varName);
         }
     };
-
-    this.createVars("Pots");
-    this.createVars("Locks");
-    this.createVars("SQuests");
-    this.createVars("LQuests");
-    this.createProgressVars("Wander");
-    this.createProgressVars("Met");
-    this.createProgressVars("Secrets");
-    this.Heal = 0;
-    this.HealLoopCounter = 0;
-    this.Fight = 0;
-    this.FightLoopCounter = 0;
-    this.SDungeon = 0;
-    this.SDungeonLoopCounter = 0;
+    if(this.index === 0) {
+        this.createVars("Pots");
+        this.createVars("Locks");
+        this.createVars("SQuests");
+        this.createVars("LQuests");
+        this.createProgressVars("Wander");
+        this.createProgressVars("Met");
+        this.createProgressVars("Secrets");
+        this.Heal = 0;
+        this.HealLoopCounter = 0;
+        this.Fight = 0;
+        this.FightLoopCounter = 0;
+        this.SDungeon = 0;
+        this.SDungeonLoopCounter = 0;
+        this.suppliesCost = 400;
+    } else if(this.index === 1) {
+        this.createProgressVars("Forest");
+    }
 
 }

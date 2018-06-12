@@ -34,7 +34,7 @@ body {
 
 .showthis2 {
     z-index:1000;
-    min-width:200px;
+    min-width:300px;
 }
 
 .title {
@@ -200,6 +200,16 @@ input {
     padding:0 10px 0;
 }
 
+.townInfo {
+    display:block;
+    text-align:left;
+}
+
+.actionOptions {
+    text-align:center;
+    min-height:470px;
+}
+
 .actionContainer {
     cursor:pointer;
     width:102px;
@@ -207,9 +217,19 @@ input {
     vertical-align:top;
     margin:0 2px;
 }
-.actionContainer:hover {
+.actionContainer:hover, .travelContainer:hover {
     background-color: #bef8ff;
 }
+
+.travelContainer {
+    cursor:pointer;
+    display:block;
+    width:100%;
+    height:50px;
+    vertical-align:top;
+    margin:0 2px;
+}
+
 
 .nextActionContainer, .curActionContainer {
     margin-left:3px;

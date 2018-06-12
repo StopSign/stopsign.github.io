@@ -3,7 +3,7 @@ To add a new regular action:
     End of town.js, this.createVars("New");
     in view.js, createTownActions()
     in actionList.js, translateClassNames(), add the translation
-    in actionList.js, in the parent progress class, finish(), towns[curTown].total<var>
+    in actionList.js, in the parent progress class, finish(), towns[X].total<var>
     get an svg
 
 Add a new basic action:
@@ -33,20 +33,58 @@ Add a new multipart progress bar action:
 	
 	
 TODO:
-decreasing chance for soulstones as you clear dungeons 100%, 90%, 81%, etc.
-chance 'recovers' .001% per tick
+show mana in previous run
+Adding actions group if same type
+change isVisible for stats to use data instead
 
-Fight monsters - roughly require combat skill, Str, Spd, Con for gold
-Clear small dungeon - roughly require magic+combat skill, Dex, Luck for permanent exp gains (like a 2nd talent)
-buy supplies - 500 mana, costs 400 gold, required to travel
-haggle - 250 mana and 1 reputation, reduce supplies cost by 20
-travel to next town - 6k mana, requires supplies, can no longer use any of the 25 actions of town 1
-
-Heal the Sick, 2.5k mana, requires 10 magic skill, gives 3 reputation
-Fight monsters, 2k mana, requires 10 combat skill, gives 50 gold
-Clear small dungeon, 4k mana, requires 15 combined warrior/mage levels, gives decreasing chance for soulstones, which let you improve what stats you want manually and last through loops
 Buy supplies, 500 mana, costs 400 gold, required to travel
 Haggle, 250 mana and 1 reputation, reduce supplies cost by 20
 
-Travel to next town, 6k mana, requires supplies, resets wander/met % and reputation, making the relevant skills unable for the new town
+Leave Town, 1k mana, requires supplies, resets wander/met % and reputation, making the relevant skills unable for the new town
 
+town 2 - forest road
+    go to next town
+    Explore Wilderness
+        gather wild mana
+        gather herbs
+        hunt
+        fish
+    Abandoned Shortcut
+        talk to hermit
+        practical magic
+        learn alchemy
+        brew potions
+    Follow Flower Trail
+        Clear thicket
+        talk to witch
+        learn dark magic
+        buy ingredients
+
+town 3 - guilds and stuff
+    gamble
+    explore
+    get drunk
+    sell gold for mana
+    sell potions
+    merchants guild
+        apprentice
+        start a business / hire employees
+        promote business
+        manage business
+    adventurers guild
+        find a team / team building
+        large dungeon
+        identify items
+        join tournament
+    thieves guild
+        tail a target
+        rob a shop
+        talk to leader
+        assassinate
+    read books
+
+    haggle
+    buy supplies
+
+
+    travel to next town
