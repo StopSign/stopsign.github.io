@@ -113,7 +113,8 @@ function View() {
             let action = actions.next[i];
             let capButton = "";
             if(hasCap(action.name)) {
-                capButton = "<i onclick='actions.capAmount("+i+")' class='actionIcon fa fa-circle-thin'></i>";
+                let townNum = translateClassNames(action.name).townNum;
+                capButton = "<i onclick='actions.capAmount("+i+", "+townNum+")' class='actionIcon fa fa-circle-thin'></i>";
             }
             let isTravel = getTravelNum(action.name);
             totalDivText +=

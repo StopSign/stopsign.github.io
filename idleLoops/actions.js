@@ -158,7 +158,7 @@ function Actions() {
         view.updateTotalTicks();
     };
 
-    this.capAmount = function(index) {
+    this.capAmount = function(index, townNum) {
         let varName = "good"+translateClassNames(this.next[index].name).varName;
         let alreadyExisting = 0;
         for(let i = 0; i < this.next.length; i++) {
@@ -167,7 +167,7 @@ function Actions() {
             }
             alreadyExisting += this.next[i].loops;
         }
-        let newLoops = towns[0][varName] - alreadyExisting;
+        let newLoops = towns[townNum][varName] - alreadyExisting;
         this.next[index].loops = newLoops < 0 ? 0 : newLoops;
         view.updateNextActions();
     };
