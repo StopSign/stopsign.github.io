@@ -45,13 +45,21 @@ function translateClassNames(name) {
     //town 2
     if(name === "Explore Forest") {
         return new ExploreForest();
+    } else if(name === "Wild Mana") {
+        return new WildMana();
+    } else if(name === "Gather Herbs") {
+        return new GatherHerbs();
+    } else if(name === "Hunt") {
+        return new Hunt();
+    } else if(name === "Sit By Waterfall") {
+        return new SitByWaterfall();
     }
 
     console.log('error trying to create ' + name);
 }
 
 function hasCap(name) {
-    return (name === "Smash Pots" || name === "Pick Locks" || name === "Short Quest" || name === "Long Quest");
+    return (name === "Smash Pots" || name === "Pick Locks" || name === "Short Quest" || name === "Long Quest" || name === "Gather Herbs" || name === "Wild Mana" || name === "Hunt");
 }
 function getTravelNum(name) {
     return name === "Start Journey" ? 1 : 0;
@@ -170,10 +178,16 @@ function ExploreForest() {
         return true;
     };
     this.finish = function() {
-        towns[1].finishProgress(this.varName, 200, function() {
-            towns[1].totalWildMana = towns[1].getLevel("Explored") * 5;
+        towns[1].finishProgress(this.varName, 100, function() {
+            towns[1].totalWildMana = towns[1].getLevel("Forest") * 5;
+            towns[1].totalHunt = towns[1].getLevel("Forest") * 2;
+            adjustHerbs();
         });
     };
+}
+
+function adjustHerbs() {
+    towns[1].totalHerbs = towns[1].getLevel("Forest") * 5;
 }
 
 //Basic actions
@@ -489,6 +503,27 @@ function StartJourney() {
     };
 }
 
+function SitByWaterfall() {
+    this.name = "Sit By Waterfall";
+    this.manaCost = 800;
+    this.expMult = 4;
+    this.tooltip = "It's peaceful here. Loud, but peaceful.<br>Has 4x exp/talent gain.<br>Unlocked at 70% Forest Explored.";
+    this.townNum = 1;
+
+    this.varName = "Waterfall";
+    this.stats = {
+        Con:.2,
+        Soul:.8
+    };
+    this.visible = function() {
+        return towns[1].getLevel("Forest") >= 10;
+    };
+    this.unlocked = function() {
+        return towns[1].getLevel("Forest") >= 70;
+    };
+    this.finish = function() {
+    };
+}
 //Regular Actions
 //Regular actions have varName, infoName, infoText
 
@@ -614,6 +649,94 @@ function LongQuest() {
             addReputation(1);
             addGold(25);
             return 25;
+        })
+    };
+}
+
+function WildMana() {
+    this.name = "Wild Mana";
+    this.manaCost = 150;
+    this.expMult = 1;
+    this.tooltip = "They're out of sight of most travellers, but you have time to find and harvest them.<br>Every good mana spot has 200 mana.<br>Every 10 mana spots have good mana.";
+    this.townNum = 1;
+
+    this.varName = "WildMana";
+    this.infoName = "Mana Sources Tapped";
+    this.infoText = "Sources with loot left <i class='fa fa-arrow-left'></i> Sources with loot total <i class='fa fa-arrow-left'></i> Sources to check for loot<br><div class='bold'>Total Found</div> <div id='totalWildMana'></div>";
+    this.stats = {
+        Con:.2,
+        Int:.6,
+        Soul:.2
+    };
+    this.visible = function() {
+        return true;
+    };
+    this.unlocked = function() {
+        return towns[1].getLevel("Forest") >= 2;
+    };
+    this.finish = function() {
+        towns[1].finishRegular(this.varName, 10, function() {
+            addMana(200);
+            return 200;
+        })
+    };
+}
+
+function GatherHerbs() {
+    this.name = "Gather Herbs";
+    this.manaCost = 200;
+    this.expMult = 1;
+    this.tooltip = "Might as well dig up anything useful you find.<br>Every 10 funny plants are herbs.<br>Unlocked at 10% Forest Explored.";
+    this.townNum = 1;
+
+    this.varName = "Herbs";
+    this.infoName = "Funny Plants Uprooted";
+    this.infoText = "Plants with loot left <i class='fa fa-arrow-left'></i> Plants with loot total <i class='fa fa-arrow-left'></i> Plants to check for loot<br><div class='bold'>Total Found</div> <div id='totalHerbs'></div>";
+    this.stats = {
+        Str:.4,
+        Dex:.3,
+        Int:.3
+    };
+    this.visible = function() {
+        return towns[1].getLevel("Forest") >= 2;
+    };
+    this.unlocked = function() {
+        return towns[1].getLevel("Forest") >= 10;
+    };
+    this.finish = function() {
+        towns[1].finishRegular(this.varName, 10, function() {
+            addHerbs(1);
+            return 1;
+        })
+    };
+}
+
+function Hunt() {
+    this.name = "Hunt";
+    this.manaCost = 800;
+    this.expMult = 1;
+    this.tooltip = "The forest provides.<br>Every 10 animals have good hides.<br>Unlocked at 40% Forest Explored.";
+    this.townNum = 1;
+
+    this.varName = "Hunt";
+    this.infoName = "Animals Skinned";
+    this.infoText = "Animals with loot left <i class='fa fa-arrow-left'></i> Animals with loot total <i class='fa fa-arrow-left'></i> Animals to check for loot<br><div class='bold'>Total Found</div> <div id='totalHunt'></div>";
+    this.stats = {
+        Dex:.2,
+        Con:.2,
+        Per:.2,
+        Spd:.4
+    };
+    this.visible = function() {
+        return towns[1].getLevel("Forest") >= 10;
+    };
+    this.unlocked = function() {
+        return towns[1].getLevel("Forest") >= 40;
+    };
+    this.finish = function() {
+        towns[1].finishRegular(this.varName, 10, function() {
+            addHide(1);
+            return 1;
         })
     };
 }

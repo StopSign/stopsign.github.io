@@ -23,6 +23,14 @@
         Changelog
         <div class="showthis">
             <div class="showthat2">
+                Version .62
+                <div class="showthis2">
+                    * Added Gather Wild Mana, Gather Herbs, Hunt, and Sit Under Waterfall<br>
+                    * Hide supplies/herbs/hide if you have 0<br>
+                    * You'll need to complete 1 more % on Forest Explored to update Mana Sources<br>
+                </div>
+            </div><br>
+            <div class="showthat2">
                 Version .61
                 <div class="showthis2">
                     * Removed beautiful forEach loops because IE can't handle them<br>
@@ -60,9 +68,17 @@
         <div class='bold'>Reputation</div> <div id="reputation">0</div>
         <div class="showthis">The influence you have over the people in town.<br>Resets when the loop restarts.</div>
     </div>
-    <div class="showthat">
+    <div class="showthat" id="suppliesDiv">
         <div class='bold'>Supplies</div> <div id="supplies">0</div>
         <div class="showthis">Needed to go to the next town.<br>Resets when the loop restarts.</div>
+    </div>
+    <div class="showthat" id="herbsDiv">
+        <div class='bold'>Supplies</div> <div id="herbs">0</div>
+        <div class="showthis">The beneficial plants you've found.<br>Resets when the loop restarts.</div>
+    </div>
+    <div class="showthat" id="hideDiv">
+        <div class='bold'>Supplies</div> <div id="hide">0</div>
+        <div class="showthis">Results of successful hunting.<br>Resets when the loop restarts.</div>
     </div><br>
     <div id="pausePlay" onclick="pauseGame()" class="button">Pause</div>
     <input type="checkbox" id="pauseBeforeRestart">

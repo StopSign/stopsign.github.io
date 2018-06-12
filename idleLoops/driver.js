@@ -55,6 +55,8 @@ function restart() {
     addGold(-gold);
     addReputation(-reputation);
     addSupplies(-supplies);
+    addHerbs(-herbs);
+    addHide(-hide);
     restartStats();
     actions.restart();
     for(let i = 0; i < towns.length; i++) {
@@ -102,6 +104,16 @@ function addReputation(amount) {
 function addSupplies(amount) {
     supplies += amount;
     view.updateSupplies();
+}
+
+function addHerbs(amount) {
+    herbs += amount;
+    view.updateHerbs();
+}
+
+function addHide(amount) {
+    hide += amount;
+    view.updateHide();
 }
 
 function changeActionAmount(amount, num) {

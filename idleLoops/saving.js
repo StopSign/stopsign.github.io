@@ -18,9 +18,13 @@ let statList = ["Str", "Dex", "Con", "Per", "Int", "Cha", "Spd", "Luck", "Soul"]
 const stats = {};
 let prevState = {};
 let shouldRestart = true;
+
 let gold = 0;
 let reputation = 0;
 let supplies = 0;
+let herbs = 0;
+let hide = 0;
+
 let curLoadout = 0;
 let loadouts = [];
 let skillList = ["Combat", "Magic"];
@@ -103,7 +107,7 @@ function load() {
                     town["good" + varName] = toLoad["good" + varName];
                 if (toLoad["good" + varName])
                     town["goodTemp" + varName] = toLoad["good" + varName];
-                view.updateRegular(action.varName);
+                view.updateRegular(action.varName, i);
             }
         }
     }

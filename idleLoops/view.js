@@ -79,6 +79,9 @@ function View() {
             intToString((timeNeeded - timer), 1) + " | " +
             intToString((timeNeeded - timer)/50, 2) + "s";
     };
+    this.updateTotalTicks = function() {
+        document.getElementById("totalTicks").innerHTML = actions.completedTicks;
+    };
     this.updateGold = function() {
         document.getElementById("gold").innerHTML = gold;
     };
@@ -86,11 +89,17 @@ function View() {
         document.getElementById("reputation").innerHTML = reputation;
     };
     this.updateSupplies = function() {
+        document.getElementById("suppliesDiv").style.display = supplies ? "inline-block" : "none";
         document.getElementById("suppliesCost").innerHTML = towns[0].suppliesCost+"";
         document.getElementById("supplies").innerHTML = supplies;
     };
-    this.updateTotalTicks = function() {
-        document.getElementById("totalTicks").innerHTML = actions.completedTicks;
+    this.updateHerbs = function() {
+        document.getElementById("herbsDiv").style.display = herbs ? "inline-block" : "none";
+        document.getElementById("herbs").innerHTML = herbs;
+    };
+    this.updateHide = function() {
+        document.getElementById("hideDiv").style.display = herbs ? "inline-block" : "none";
+        document.getElementById("hide").innerHTML = hide;
     };
 
     this.updateNextActions = function() {
@@ -285,8 +294,8 @@ function View() {
         document.getElementById("townName").innerHTML = townNames[townNum];
     };
 
-    this.updateRegular = function(varName) {
-        const town = towns[curTown];
+    this.updateRegular = function(varName, index) {
+        const town = towns[index];
         document.getElementById("total"+varName).innerHTML = town["total"+varName]+"";
         document.getElementById("checked"+varName).innerHTML = town["total"+varName] - town["checked"+varName]+"";
         document.getElementById("goodTemp"+varName).innerHTML = town["goodTemp"+varName]+"";
@@ -379,6 +388,20 @@ function View() {
         tempObj = new ExploreForest();
         this.createTownAction(tempObj);
         this.createActionProgress(tempObj);
+
+        tempObj = new WildMana();
+        this.createTownAction(tempObj);
+        this.createTownInfo(tempObj);
+
+        tempObj = new GatherHerbs();
+        this.createTownAction(tempObj);
+        this.createTownInfo(tempObj);
+
+        tempObj = new Hunt();
+        this.createTownAction(tempObj);
+        this.createTownInfo(tempObj);
+
+        this.createTownAction(new SitByWaterfall());
     };
 
     this.createActionProgress = function(action) {

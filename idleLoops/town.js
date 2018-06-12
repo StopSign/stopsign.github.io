@@ -17,7 +17,7 @@ function Town(index) {
             let varName = this.varNames[i];
             this["goodTemp"+varName] = this["good"+varName];
             this["lootFrom"+varName] = 0;
-            view.updateRegular(varName);
+            view.updateRegular(varName, this.index);
         }
     };
 
@@ -33,7 +33,7 @@ function Town(index) {
             for(let i = 0; i < view.totalActionList.length; i++) {
                 let action = view.totalActionList[i];
                 if(towns[curTown].varNames.indexOf(action.varName) !== -1) {
-                    view.updateRegular(action.varName);
+                    view.updateRegular(action.varName, action.townNum);
                 }
             }
         }
@@ -59,7 +59,7 @@ function Town(index) {
             this["goodTemp"+varName]--;
             this["lootFrom"+varName] += rewardFunc();
         }
-        view.updateRegular(varName);
+        view.updateRegular(varName, this.index);
     };
 
     this.createVars = function(varName) {
@@ -107,6 +107,9 @@ function Town(index) {
         this.SDungeonLoopCounter = 0;
         this.suppliesCost = 400;
     } else if(this.index === 1) {
+        this.createVars("WildMana");
+        this.createVars("Herbs");
+        this.createVars("Hunt");
         this.createProgressVars("Forest");
     }
 
