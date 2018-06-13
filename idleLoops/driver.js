@@ -159,3 +159,13 @@ function unlockTown(townNum) {
     }
     curTown = townNum;
 }
+
+function adjustAll() {
+    adjustPots();
+    adjustLocks();
+    adjustSQuests();
+    adjustLQuests();
+    adjustWildMana();
+    adjustHerbs();
+    adjustHunt();
+}

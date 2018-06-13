@@ -91,6 +91,7 @@ function load() {
 
     recalcInterval(50);
     pauseGame();
+    adjustAll();
     view.initalize();
 
     for(let i = 0; i < towns.length; i++) {

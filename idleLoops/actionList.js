@@ -95,10 +95,16 @@ function Wander() {
     };
     this.finish = function() {
         towns[0].finishProgress(this.varName, 200, function() {
-            towns[0].totalPots = towns[0].getLevel("Wander") * 5;
-            towns[0].totalLocks = towns[0].getLevel("Wander");
+            adjustPots();
+            adjustLocks();
         });
     };
+}
+function adjustPots() {
+    towns[0].totalPots = towns[0].getLevel("Wander") * 5;
+}
+function adjustLocks() {
+    towns[0].totalLocks = towns[0].getLevel("Wander");
 }
 
 function MeetPeople() {
@@ -123,9 +129,12 @@ function MeetPeople() {
     };
     this.finish = function() {
         towns[0].finishProgress(this.varName, 200, function() {
-            towns[0].totalSQuests = towns[0].getLevel("Met");
+            adjustSQuests();
         });
     };
+}
+function adjustSQuests() {
+    towns[0].totalSQuests = towns[0].getLevel("Met");
 }
 
 function Investigate() {
@@ -151,9 +160,12 @@ function Investigate() {
     };
     this.finish = function() {
         towns[0].finishProgress(this.varName, 500, function() {
-            towns[0].totalLQuests = Math.floor(towns[0].getLevel("Secrets")/2);
+            adjustLQuests();
         });
     };
+}
+function adjustLQuests() {
+    towns[0].totalLQuests = Math.floor(towns[0].getLevel("Secrets")/2);
 }
 
 function ExploreForest() {
@@ -179,13 +191,18 @@ function ExploreForest() {
     };
     this.finish = function() {
         towns[1].finishProgress(this.varName, 100, function() {
-            towns[1].totalWildMana = towns[1].getLevel("Forest") * 5;
-            towns[1].totalHunt = towns[1].getLevel("Forest") * 2;
+            adjustWildMana();
+            adjustHunt();
             adjustHerbs();
         });
     };
 }
-
+function adjustWildMana() {
+    towns[1].totalWildMana = towns[1].getLevel("Forest") * 5;
+}
+function adjustHunt() {
+    towns[1].totalHunt = towns[1].getLevel("Forest") * 2;
+}
 function adjustHerbs() {
     towns[1].totalHerbs = towns[1].getLevel("Forest") * 5;
 }
