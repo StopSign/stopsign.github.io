@@ -52,7 +52,12 @@ function restart() {
     shouldRestart = false;
     timer = 0;
     timeNeeded = timeNeededInitial;
-    addGold(-gold);
+    if(initialGold) { //debugging only
+        gold = initialGold;
+        addGold(0);
+    } else {
+        addGold(-gold);
+    }
     addReputation(-reputation);
     addSupplies(-supplies);
     addHerbs(-herbs);

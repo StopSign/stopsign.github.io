@@ -19,7 +19,7 @@ const stats = {};
 let prevState = {};
 let shouldRestart = true;
 
-let gold = 0;
+let gold = 0, initialGold = 0;
 let reputation = 0;
 let supplies = 0;
 let herbs = 0;
@@ -27,7 +27,7 @@ let hide = 0;
 
 let curLoadout = 0;
 let loadouts = [];
-let skillList = ["Combat", "Magic"];
+let skillList = ["Combat", "Magic", "Practical"];
 let skills = {};
 let soulstoneChance = 1;
 let townShowing = 0;
@@ -88,6 +88,8 @@ function load() {
     towns.push(new Town(1));
     town = towns[1];
     town.expForest = toLoad.expForest ? toLoad.expForest : 0;
+    town.expShortcut = toLoad.expShortcut ? toLoad.expShortcut : 0;
+    town.expHermit = toLoad.expHermit ? toLoad.expHermit : 0;
 
     recalcInterval(50);
     pauseGame();
@@ -140,6 +142,8 @@ function save() {
 
     town = towns[1];
     toSave.expForest = town.expForest;
+    toSave.expShortcut = town.expShortcut;
+    toSave.expHermit = town.expHermit;
 
     for(let i = 0; i < towns.length; i++) {
         town = towns[i];

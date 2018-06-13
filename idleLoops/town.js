@@ -111,6 +111,8 @@ function Town(index) {
         this.createVars("Herbs");
         this.createVars("Hunt");
         this.createProgressVars("Forest");
+        this.createProgressVars("Shortcut");
+        this.createProgressVars("Hermit");
     }
 
 }

@@ -23,6 +23,15 @@
         Changelog
         <div class="showthis">
             <div class="showthat2">
+                Version .64
+                <div class="showthis2">
+                    * Start Journey costs 2k mana from 1k<br>
+                    * Added Old Shortcut, Talk to Hermit, and Practical Magic actions<br>
+                    * Added Practical Magic skill<br>
+                    * Widened version tooltips
+                </div>
+            </div><br>
+            <div class="showthat2">
                 Version .63
                 <div class="showthis2">
                     * Made Heal the Sick, Fight Monster, and Clear Dungeon more difficult<br>
@@ -36,7 +45,7 @@
                 <div class="showthis2">
                     * Added Gather Wild Mana, Gather Herbs, Hunt, and Sit Under Waterfall<br>
                     * Hide supplies/herbs/hide if you have 0<br>
-                    * You'll need to complete 1 more % on Forest Explored to update Mana Sources<br>
+                    * You'll need to complete 1 more % on Forest Explored to update Mana Sources (NOTE: not anymore)<br>
                 </div>
             </div><br>
             <div class="showthat2">
@@ -264,6 +273,18 @@
                     <div class="medium bold">Level</div> <div id="skillMagicLevelExp"></div>/<div id="skillMagicLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="skillMagicLevelProgress"></div>%)</div><br>
                 </div>
             </div>
+            <div class="statContainer showthat">
+                <div class="statLabel medium bold">Practical Magic</div>
+                <div class="statNum medium"><div id="skillPracticalLevel">0</div></div>
+                <div style="margin-top:18px;"></div>
+                <div class="thinProgressBarUpper"><div class="statBar skillExpBar townExpBar" id="skillPracticalLevelBar"></div></div>
+                <div class="showthis">
+                    Mage Hand, Prestidigitation, Detect Magic, and other useful tricks to help out.<br>
+                    <div class="medium bold">Level</div> <div id="skillPracticalLevelExp"></div>/<div id="skillPracticalLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="skillPracticalLevelProgress"></div>%)</div><br>
+                    Smash Pots and Gather Wild Mana have 1% reduced mana cost per level (rounded up).<br>
+                    Pick Locks, Short Quests, and Long Quests get 1% more gold per level (rounded down).<br>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -386,13 +407,13 @@
 
 </script>
 
-<script src="helpers.js?1"></script>
-<script src="interval.js?1"></script>
-<script src="driver.js?1"></script>
-<script src="stats.js?1"></script>
-<script src="view.js?1"></script>
-<script src="actions.js?1"></script>
-<script src="actionList.js?1"></script>
-<script src="town.js?1"></script>
-<script src="saving.js?1"></script>
+<script src="helpers.js?2"></script>
+<script src="interval.js?2"></script>
+<script src="driver.js?2"></script>
+<script src="stats.js?2"></script>
+<script src="view.js?2"></script>
+<script src="actions.js?2"></script>
+<script src="actionList.js?2"></script>
+<script src="town.js?2"></script>
+<script src="saving.js?2"></script>
 </html>

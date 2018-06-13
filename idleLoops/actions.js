@@ -26,7 +26,7 @@ function Actions() {
                 segment++;
             }
             //segment is 0,1,2
-            let toAdd = curAction.tickProgress(segment) * (curAction.manaCost / curAction.adjustedTicks);
+            let toAdd = curAction.tickProgress(segment) * (curAction.manaCost() / curAction.adjustedTicks);
             // console.log("adding: " + toAdd + " to segment: " + segment + " of progress " + curProgress + " which costs: " + curAction.loopCost(segment));
             towns[0][curAction.varName] += toAdd;
             curProgress += toAdd;
@@ -238,7 +238,7 @@ function setAdjustedTicks(action) {
             statMult += action.stats[statName] * (1 + getLevel(statName)/100);
         }
     }
-    action.adjustedTicks = Math.ceil(action.manaCost / statMult);
+    action.adjustedTicks = Math.ceil(action.manaCost() / statMult);
 }
 
 function addExpFromAction(action) {
@@ -246,7 +246,7 @@ function addExpFromAction(action) {
         let statName = statList[i];
         if(action.stats[statName]) {
             let soulstoneBonus = stats[statName].soulstone ? (1 + stats[statName].soulstone/10) : 1;
-            let expToAdd = soulstoneBonus * action.stats[statName] * action.expMult * (action.manaCost / action.adjustedTicks) * (1+getTalent(statName)/100);
+            let expToAdd = soulstoneBonus * action.stats[statName] * action.expMult * (action.manaCost() / action.adjustedTicks) * (1+getTalent(statName)/100);
             if(!action["statExp"+statName]) {
                 action["statExp"+statName] = 0;
             }

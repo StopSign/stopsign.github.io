@@ -29,7 +29,9 @@ Add a new multipart progress bar action:
     End of town.js, new vars
     actions.js restart()
 
-
+New Skill
+    New divs in index.html
+    add to skill list in saving.js
 	
 	
 TODO:
@@ -43,23 +45,21 @@ Haggle, 250 mana and 1 reputation, reduce supplies cost by 20
 Leave Town, 1k mana, requires supplies, resets wander/met % and reputation, making the relevant skills unable for the new town
 
 town 2 - forest road
-    Explore Wilderness
-        gather wild mana - 200 mana
-        Gather Herbs - Req 10%, get herbs
-        Hunt - Req 40%, MPBA gives hide
-        Sit Under Waterfall - Req 70%, basically Train Soul
+
     Abandoned Shortcut - progress bar action, gives more herbs and improves rate of chat w/ hermit
         talk to hermit - progress bar action, improves rate of practical magic, rate of gather herbs
         practical magic - Req 20 magic, 20% hermit, improves Practical Magic skill
             Pratical Magic skill -
-                Smash pots and pick locks 1% faster per level.
-                short & long quest give 1% more gold per level (rounded down)
+                Smash pots and wild mana 1% faster per level.
+                pick locks, short & long quest give 1% more gold per level (rounded down)
         learn alchemy - Req 30 magic, 60% hermit, 10 herbs, improves Alchemy skill, improves mage lessons by 1%
-        brew potions - Req 35 magic, 10 alchemy skill, 10 herbs, slightly improves alchemy skill, slightly improves magic skill, get one potion, req rep >= 3
+        brew potions - Req 35 magic, 10 alchemy skill, 10 herbs, slightly improves magic skill, get one potion, req rep >= 3
     Follow Flower Trail - PBA, more herbs
         Clear thicket - PBA, more wild mana
         talk to witch - PBA, slightly improve mage lessons, improve gather wild mana
         learn dark magic - improves dark magic skill, costs reputation, req rep < 3
+            Dark Magic Skill -
+                Smash pots and wild mana 1% more reward per level.
         Perform ritual - req rep < 0, MPBA, gives perm +initial mana
     go to next town
 

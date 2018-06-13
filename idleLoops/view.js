@@ -403,6 +403,16 @@ function View() {
         this.createTownInfo(tempObj);
 
         this.createTownAction(new SitByWaterfall());
+
+        tempObj = new OldShortcut();
+        this.createTownAction(tempObj);
+        this.createActionProgress(tempObj);
+
+        tempObj = new TalkToHermit();
+        this.createTownAction(tempObj);
+        this.createActionProgress(tempObj);
+
+        this.createTownAction(new PracticalMagic());
     };
 
     this.createActionProgress = function(action) {
@@ -438,7 +448,7 @@ function View() {
                 "<div class='showthis'>" +
                     action.tooltip + "<br>" +
                     actionStats +
-                    "<div class='bold'>Mana Cost</div> "+action.manaCost+"<br>" +
+                    "<div class='bold'>Mana Cost</div> <div id='manaCost"+action.varName+"'>"+action.manaCost()+"</div><br>" +
                     "<div class='bold'>Exp Multiplier</div> "+(action.expMult*100)+"%<br>" +
                 "</div>" +
             "</div>";
@@ -465,7 +475,7 @@ function View() {
             "<div class='showthis'>" +
             action.tooltip + "<br>" +
             actionStats +
-            "<div class='bold'>Mana Cost</div> "+action.manaCost+"<br>" +
+            "<div class='bold'>Mana Cost</div> <div id='manaCost"+action.varName+"'>"+action.manaCost()+"</div><br>" +
             "<div class='bold'>Exp Multiplier</div> "+(action.expMult*100)+"%<br>" +
             "</div>" +
             "</div>";
@@ -475,6 +485,11 @@ function View() {
         actionOptionsTown[action.townNum].appendChild(actionsDiv);
         towns[action.townNum].totalActionList.push(action);
         this.totalActionList.push(action);
+    };
+
+    this.adjustManaCost = function(actionName) {
+        let action = translateClassNames(actionName);
+        document.getElementById("manaCost"+action.varName).innerHTML = action.manaCost();
     };
 
     this.createTownInfo = function(action) {
