@@ -27,7 +27,7 @@ let hide = 0;
 
 let curLoadout = 0;
 let loadouts = [];
-let skillList = ["Combat", "Magic", "Practical"];
+let skillList = ["Combat", "Magic", "Practical", "Alchemy"];
 let skills = {};
 let soulstoneChance = 1;
 let townShowing = 0;

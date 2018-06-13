@@ -63,6 +63,12 @@ function View() {
     };
 
     this.updateSkill = function(skill) {
+        if(skills[skill].exp === 0) {
+            document.getElementById("skill" + skill + "Container").style.display = "none";
+            return;
+        } else {
+            document.getElementById("skill" + skill + "Container").style.display = "inline-block";
+        }
         const levelPrc = getPrcToNextSkillLevel(skill);
         document.getElementById("skill" + skill + "Level").innerHTML = getSkillLevel(skill);
         document.getElementById("skill" + skill + "LevelBar").style.width = levelPrc + "%";
@@ -413,6 +419,8 @@ function View() {
         this.createActionProgress(tempObj);
 
         this.createTownAction(new PracticalMagic());
+        this.createTownAction(new LearnAlchemy());
+        // this.createTownAction(new BrewPotions());
     };
 
     this.createActionProgress = function(action) {

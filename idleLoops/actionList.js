@@ -59,6 +59,10 @@ function translateClassNames(name) {
         return new TalkToHermit();
     } else if(name === "Practical Magic") {
         return new PracticalMagic();
+    } else if(name === "Learn Alchemy") {
+        return new LearnAlchemy();
+    } else if(name === "Brew Potions") {
+        return new BrewPotions();
     }
 
     console.log('error trying to create ' + name);
@@ -254,7 +258,7 @@ function OldShortcut() {
 function TalkToHermit() {
     this.name = "Talk To Hermit";
     this.expMult = 1;
-    this.tooltip = "This old man is happy to have a listening ear, surely he has some useful knowledge. You hope.<br>Improves speed of Gather Herbs and Practical Magic by 1% per 1%.<br>Unlocked with both 20% Shortcut Explored and 40 Magic";
+    this.tooltip = "This old man is happy to have a listening ear, surely he has some useful knowledge. You hope.<br>Improves speed of Gather Herbs, Practical Magic, and Learn Alchemy by 1% per 1%.<br>Unlocked with both 20% Shortcut Explored and 40 Magic";
     this.townNum = 1;
 
     this.infoName = "Hermit Knowledge Learned";
@@ -511,7 +515,7 @@ function MageLessons() {
         return towns[0].getLevel("Secrets") >= 20;
     };
     this.finish = function() {
-        addSkillExp("Magic", 100);
+        addSkillExp("Magic", 100 * (1 + getSkillLevel("Alchemy")/100));
         view.updateProgressActions();
     };
 }
@@ -649,8 +653,8 @@ function PracticalMagic() {
     this.varName = "trPractical";
     this.stats = {
         Per:.3,
-        Int:.5,
-        Con:.2
+        Con:.2,
+        Int:.5
     };
     this.manaCost = function() {
         return Math.ceil(4000 / (1 + towns[1].getLevel("Hermit")/100));
@@ -666,6 +670,66 @@ function PracticalMagic() {
         view.adjustManaCost("Wild Mana");
         view.adjustManaCost("Smash Pots");
         view.updateProgressActions();
+    };
+}
+
+function LearnAlchemy() {
+    this.name = "Learn Alchemy";
+    this.expMult = 1;
+    this.tooltip = "You can listen to him yammer while making light healing and remedy potions.<br>You're starting to think the potion that caused you to loop time was a complex one.<br>You provide the ingredients; costs 10 herbs.<br>Unlocked with both 40% Hermit Knowledge and 60 Magic.";
+    this.townNum = 1;
+
+    this.varName = "trAlchemy";
+    this.stats = {
+        Per:.1,
+        Con:.3,
+        Int:.6
+    };
+    this.canStart = function() {
+        return herbs >= 10;
+    };
+    this.cost = function() {
+        addHerbs(-10);
+    };
+    this.manaCost = function() {
+        return Math.ceil(5000 / (1 + towns[1].getLevel("Hermit")/100));
+    };
+    this.visible = function() {
+        return towns[1].getLevel("Hermit") >= 10;
+    };
+    this.unlocked = function() {
+        return towns[1].getLevel("Hermit") >= 40 && getSkillLevel("Magic") >= 60;
+    };
+    this.finish = function() {
+        addSkillExp("Alchemy", 50);
+        addSkillExp("Magic", 50);
+    };
+}
+
+function BrewPotions() {
+    this.name = "Learn Alchemy";
+    this.expMult = 1;
+    this.tooltip = "Bubbles and Flasks. Potions and Magic.<br>Unlocked with 10 Alchemy.";
+    this.townNum = 1;
+
+    this.varName = "trAlchemy";
+    this.stats = {
+        Per:.1,
+        Con:.3,
+        Int:.6
+    };
+    this.manaCost = function() {
+        return Math.ceil(2000);
+    };
+    this.visible = function() {
+        return getSkillLevel("Alchemy") >= 1;
+    };
+    this.unlocked = function() {
+        return getSkillLevel("Alchemy") >= 5;
+    };
+    this.finish = function() {
+        addSkillExp("Alchemy", 25);
+        addSkillExp("Magic", 50);
     };
 }
 
