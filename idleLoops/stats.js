@@ -76,5 +76,6 @@ function addExp(name, amount) {
 function restartStats() {
     for(let i = 0; i < statList.length; i++) {
         stats[statList[i]].exp = 0;
+        view.updateStat(statList[i]);
     }
 }

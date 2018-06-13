@@ -127,7 +127,7 @@ function Actions() {
             for(let i = 0; i < this.next.length; i++) {
                 let action = this.next[i];
                 if (action.loops === 0) { //don't add blank ones
-                    return;
+                    continue;
                 }
                 let toAdd = translateClassNames(action.name);
 
@@ -149,7 +149,7 @@ function Actions() {
         for(let i = 0; i < this.current.length; i++) {
             let action = this.current[i];
             if(i < this.currentPos) {
-                return;
+                continue;
             }
             setAdjustedTicks(action);
             remainingTicks += action.loopsLeft * action.adjustedTicks;

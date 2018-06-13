@@ -749,7 +749,7 @@ function HealTheSick() {
     this.name = "Heal The Sick";
     this.manaCost = 2500;
     this.expMult = 1;
-    this.tooltip = "You won't be able to heal them all, but they'll be thankful for doing what you can.<br>Healing is always 3 parts, each with a main stat - Diagnose (Per), Treat (Int), Inform (Cha).<br>Gives (magic skill) * (1 + main stat / 100) * (1 + times completed / 100) * (actual mana cost / original mana cost) progress points per mana.<br>Requires 12 Magic skill.<br>Gives 3 reputation upon patient completion.";
+    this.tooltip = "You won't be able to heal them all, but they'll be thankful for doing what you can.<br>Healing is always 3 parts, each with a main stat - Diagnose (Per), Treat (Int), Inform (Cha).<br>Gives (magic skill) * (1 + main stat / 100) * sqrt(1 + times completed / 100) * (actual mana cost / original mana cost) progress points per mana.<br>Requires 12 Magic skill.<br>Gives 3 reputation upon patient completion.";
     this.townNum = 0;
 
     this.varName = "Heal";
@@ -762,10 +762,10 @@ function HealTheSick() {
     this.loopStats = ["Per", "Int", "Cha"];
     this.segments = 3;
     this.loopCost = function(segment) {
-        return (2+Math.floor((towns[0].HealLoopCounter+segment)/this.segments+.0000001)) * 5000;
+        return fibonacci(2+Math.floor((towns[0].HealLoopCounter+segment)/this.segments+.0000001)) * 5000;
     };
     this.tickProgress = function(offset) {
-        return getSkillLevel("Magic") * (1 + getLevel(this.loopStats[(towns[0].HealLoopCounter+offset) % this.loopStats.length])/100) * (1 + towns[0].totalHeal/100);
+        return getSkillLevel("Magic") * (1 + getLevel(this.loopStats[(towns[0].HealLoopCounter+offset) % this.loopStats.length])/100) * Math.sqrt(1 + towns[0].totalHeal/100);
     };
     this.loopsFinished = function() {
         addReputation(3);
@@ -790,7 +790,7 @@ function FightMonsters() {
     this.name = "Fight Monsters";
     this.manaCost = 2000;
     this.expMult = 1;
-    this.tooltip = "Slowly, you're figuring out their patterns.<br>Fighting rotates between 3 types of battles, each with a main stat - Quick (Spd), Defensive (Str), Aggressive (Con).<br>Gives (combat skill) * (1 + main stat / 100) * (1 + times completed / 100) * (actual mana cost / original mana cost) progress points per mana.<br>Requires 10 Combat skill.<br>Gives 30 gold per fight segment completion.";
+    this.tooltip = "Slowly, you're figuring out their patterns.<br>Fighting rotates between 3 types of battles, each with a main stat - Quick (Spd), Defensive (Str), Aggressive (Con).<br>Gives (combat skill) * (1 + main stat / 100) * sqrt(1 + times completed / 100) * (actual mana cost / original mana cost) progress points per mana.<br>Requires 10 Combat skill.<br>Gives 30 gold per fight segment completion.";
     this.townNum = 0;
 
     this.varName = "Fight";
@@ -806,12 +806,12 @@ function FightMonsters() {
         return fibonacci(Math.floor((towns[0].FightLoopCounter+segment) - towns[0].FightLoopCounter/3+.0000001)) * 10000;
     };
     this.tickProgress = function(offset) {
-        return getSkillLevel("Combat") * (1 + getLevel(this.loopStats[(towns[0].FightLoopCounter+offset) % this.loopStats.length])/100) * (1 + towns[0].totalFight/100);
+        return getSkillLevel("Combat") * (1 + getLevel(this.loopStats[(towns[0].FightLoopCounter+offset) % this.loopStats.length])/100) * Math.sqrt(1 + towns[0].totalFight/100);
     };
     this.loopsFinished = function() {
     };
     this.segmentFinished = function() {
-        addGold(30);
+        addGold(20);
     };
     this.getPartName = function() {
         let name = monsterNames()[Math.floor(towns[0].FightLoopCounter/3+.0000001)];
@@ -850,7 +850,7 @@ function SmallDungeon() {
     this.name = "Small Dungeon";
     this.manaCost = 3000;
     this.expMult = 1;
-    this.tooltip = "There are small changes each time; it's harder to get used to. The soulstones at the end last through loops, but they're not always in the dungeon... Strange.<br>The dungeon requires different skills at different points.<br>Gives (magic + combat skill) * (1 + main stat / 100) * (1 + times completed / 200) * (actual mana cost / original mana cost) progress points per mana.<br>Requires a combined skill of 35.<br>Gives 1 soulstone per completion - hover over Completed for info.";
+    this.tooltip = "There are small changes each time; it's harder to get used to. The soulstones at the end last through loops, but they're not always in the dungeon... Strange.<br>The dungeon requires different skills at different points.<br>Gives (magic + combat skill) * (1 + main stat / 100) * sqrt(1 + times completed / 200) * (actual mana cost / original mana cost) progress points per mana.<br>Requires a combined skill of 35.<br>Gives 1 soulstone per completion - hover over Completed for info.";
     this.townNum = 0;
 
     this.varName = "SDungeon";
@@ -864,10 +864,10 @@ function SmallDungeon() {
     this.segments = 7;
     this.completedTooltip = "Each soulstone improves a random stat's exp gain by 10%. Each soulstone reduces the chance you'll get the next one by 10%. Soulstone chance recovers at .0001% per mana.<br><div class='bold'>Chance </div> <div id='soulstoneChance'></div>%<br><div class='bold'>Last Stat</div> <div id='soulstonePrevious'>NA</div>";
     this.loopCost = function(segment) {
-        return (1+Math.floor((towns[0].SDungeonLoopCounter+segment)/this.segments+.0000001)) * 15000;
+        return fibonacci(1+Math.floor((towns[0].SDungeonLoopCounter+segment)/this.segments+.0000001)) * 15000;
     };
     this.tickProgress = function(offset) {
-        return (getSkillLevel("Combat")+getSkillLevel("Magic")) * (1 + getLevel(this.loopStats[(towns[0].SDungeonLoopCounter+offset) % this.loopStats.length])/100) * (1 + towns[0].totalSDungeon/200);
+        return (getSkillLevel("Combat")+getSkillLevel("Magic")) * (1 + getLevel(this.loopStats[(towns[0].SDungeonLoopCounter+offset) % this.loopStats.length])/100) * Math.sqrt(1 + towns[0].totalSDungeon/200);
     };
     this.loopsFinished = function() {
         let rand = Math.random();
