@@ -164,4 +164,18 @@ function save() {
     window.localStorage.idleLoops1 = JSON.stringify(toSave);
 }
 
+function exportSave() {
+    save();
+    document.getElementById("exportImport").value = encode(window.localStorage.idleLoops1);
+    document.getElementById("exportImport").select();
+    document.execCommand('copy');
+    document.getElementById("exportImport").value = "";
+}
+
+function importSave() {
+    window.localStorage.idleLoops1 = decode(document.getElementById("exportImport").value);
+    load();
+    stop = true;
+}
+
 load();
