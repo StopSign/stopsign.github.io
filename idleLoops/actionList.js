@@ -163,7 +163,7 @@ function Investigate() {
         Per:.3,
         Cha:.4,
         Spd:.2,
-        // Luck:.1
+        Luck:.1
     };
     this.manaCost = function() {
         return 1000;
