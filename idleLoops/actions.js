@@ -139,6 +139,9 @@ function Actions() {
                 this.current.push(toAdd);
             }
         }
+        if(this.current.length === 0) {
+            pauseGame();
+        }
         this.adjustTicksNeeded();
         view.updateMultiPartActions();
         view.updateNextActions();
