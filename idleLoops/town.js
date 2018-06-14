@@ -49,6 +49,12 @@ function Town(index) {
     };
 
     this.finishRegular = function(varName, rewardRatio, rewardFunc) {
+        if(this["total"+varName] - this["checked"+varName] < 0) { //error state, negative numbers
+            this["checked"+varName] = this["total"+varName];
+            this["good"+varName] = Math.floor(this["total"+varName] / rewardRatio);
+            this["goodTemp"+varName] = this["good"+varName];
+            console.log("Error state fixed");
+        }
         if(this["total"+varName] - this["checked"+varName] > 0) {
             this["checked"+varName]++;
             if(this["checked"+varName] % rewardRatio === 0) {
