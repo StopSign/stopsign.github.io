@@ -76,7 +76,7 @@ function load() {
     maxTown = toLoad.maxTown ? toLoad.maxTown : 0;
     actionTownNum = toLoad.actionTownNum ? toLoad.actionTownNum : 0;
 
-    towns.push(new Town(0));
+    towns[0] = new Town(0);
     let town = towns[0];
     town.expWander = toLoad.expWander ? toLoad.expWander : 0;
     town.expMet = toLoad.expMet ? toLoad.expMet : 0;
@@ -85,15 +85,18 @@ function load() {
     town.totalFight = toLoad.totalFight ? toLoad.totalFight : 0;
     town.totalSDungeon = toLoad.totalSDungeon ? toLoad.totalSDungeon : 0;
 
-    towns.push(new Town(1));
+    towns[1] = new Town(1);
     town = towns[1];
     town.expForest = toLoad.expForest ? toLoad.expForest : 0;
     town.expShortcut = toLoad.expShortcut ? toLoad.expShortcut : 0;
     town.expHermit = toLoad.expHermit ? toLoad.expHermit : 0;
 
+
+    actions.next = toLoad.nextList ? toLoad.nextList : actions.next;
+    loadouts = toLoad.loadouts ? toLoad.loadouts : loadouts;
+
     recalcInterval(50);
     pauseGame();
-    adjustAll();
     view.initalize();
 
     for(let i = 0; i < towns.length; i++) {
@@ -115,13 +118,12 @@ function load() {
         }
     }
 
+    adjustAll();
 
-    actions.next = toLoad.nextList ? toLoad.nextList : actions.next;
-    loadouts = toLoad.loadouts ? toLoad.loadouts : loadouts;
 
     view.updateNextActions();
-    view.update();
     view.updateMultiPartActions();
+    view.update();
 }
 
 function save() {
@@ -174,8 +176,11 @@ function exportSave() {
 
 function importSave() {
     window.localStorage.idleLoops1 = decode(document.getElementById("exportImport").value);
+    console.log(window.localStorage.idleLoops1);
+    actions.next = [];
+    actions.current = [];
     load();
-    stop = true;
+    pauseGame();
 }
 
 load();

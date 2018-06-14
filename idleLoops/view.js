@@ -38,7 +38,7 @@ function View() {
     this.updateStat = function(stat) {
         const levelPrc = getPrcToNextLevel(stat)+"%";
         const talentPrc = getPrcToNextTalent(stat)+"%";
-        if(!expEquals(stat) || !talentEquals(stat)) {
+        if(!expEquals(stat) || !talentEquals(stat) || statShowing === stat) {
             document.getElementById("stat" + stat + "Level").innerHTML = getLevel(stat);
             document.getElementById("stat" + stat + "LevelBar").style.width = levelPrc;
 
@@ -336,6 +336,9 @@ function View() {
         while (actionOptionsTown[0].firstChild) {
             actionOptionsTown[0].removeChild(actionOptionsTown[0].firstChild);
         }
+        while(townInfos[0].firstChild) {
+            townInfos[0].removeChild(townInfos[0].firstChild);
+        }
         let tempObj = new Wander();
         this.createTownAction(tempObj);
         this.createActionProgress(tempObj);
@@ -391,6 +394,9 @@ function View() {
 
         while (actionOptionsTown[1].firstChild) {
             actionOptionsTown[1].removeChild(actionOptionsTown[1].firstChild);
+        }
+        while(townInfos[1].firstChild) {
+            townInfos[1].removeChild(townInfos[1].firstChild);
         }
         tempObj = new ExploreForest();
         this.createTownAction(tempObj);
@@ -611,6 +617,8 @@ function View() {
                     document.getElementById("ss" + statName + "Container").style.display = "inline-block";
                 }
                 document.getElementById("ss"+statName).innerHTML = stats[statName].soulstone;
+            } else {
+                document.getElementById("ss" + statName + "Container").style.display = "none";
             }
         }
     };

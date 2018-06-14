@@ -169,7 +169,7 @@ function Investigate() {
         return 1000;
     };
     this.visible = function() {
-        return towns[0].getLevel("Met") >= 10;
+        return towns[0].getLevel("Met") >= 5;
     };
     this.unlocked = function() {
         return towns[0].getLevel("Met") >= 25;
@@ -236,7 +236,7 @@ function OldShortcut() {
     this.stats = {
         Per:.3,
         Con:.4,
-        Spd:.3,
+        Spd:.2,
         Luck:.1
     };
     this.manaCost = function() {
