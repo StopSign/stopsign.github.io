@@ -303,3 +303,21 @@ input {
     color:#a3a3a3;
     display:none;
 }
+
+#expandableList {
+    position:relative;
+    height:300px;
+    cursor:s-resize;
+    width:100%;
+    border-bottom:2px solid purple;
+}
+
+.resizable {
+    width: 10px;
+    height: 10px;
+    background: blue;
+    position:absolute;
+    right: 0;
+    bottom: 0;
+    cursor: se-resize;
+}

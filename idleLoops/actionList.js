@@ -390,7 +390,7 @@ function TrainSpd() {
 function GuidedTour() {
     this.name = "Guided Tour";
     this.expMult = 2;
-    this.tooltip = "After what you did, they're glad to help show you around.<br>8x explored % over Wander for equivalent mana cost.<br>Costs 1 reputation.<br>Unlocked at 10% Investigated";
+    this.tooltip = "After what you did, they're glad to help show you around.<br>Gives progress equal to wandering 32 times.<br>Costs 1 reputation.<br>Unlocked at 10% Investigated";
     this.townNum = 0;
 
     this.varName = "Tour";
@@ -416,7 +416,7 @@ function GuidedTour() {
         return towns[0].getLevel("Secrets") >= 10;
     };
     this.finish = function() {
-        towns[0].finishProgress("Wander", 3200, function() {
+        towns[0].finishProgress("Wander", 6400, function() {
             towns[0].totalPots = towns[0].getLevel("Wander") * 5;
             towns[0].totalLocks = towns[0].getLevel("Wander");
         });
@@ -1006,7 +1006,7 @@ function HealTheSick() {
         return ["Diagnose", "Treat", "Inform"][segment % 3];
     };
     this.visible = function() {
-        return getSkillLevel("Magic") >= 3;
+        return getSkillLevel("Magic") >= 1;
     };
     this.unlocked = function() {
         return getSkillLevel("Magic") >= 12;
@@ -1064,7 +1064,7 @@ function FightMonsters() {
         return "A bunch of "+name;
     };
     this.visible = function() {
-        return getSkillLevel("Combat") >= 3;
+        return getSkillLevel("Combat") >= 1;
     };
     this.unlocked = function() {
         return getSkillLevel("Combat") >= 10;
