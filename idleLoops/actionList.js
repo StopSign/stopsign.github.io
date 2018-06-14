@@ -228,7 +228,7 @@ function adjustHerbs() {
 function OldShortcut() {
     this.name = "Old Shortcut";
     this.expMult = 1;
-    this.tooltip = "No one has come down this way in quite some time.<br>Gives some additional herbs.<br>Gives something to talk about with the Hermit, improving Talk to Hermit result by 1% per 1%.<br>Unlocked at 20% Forest Explored.";
+    this.tooltip = "No one has come down this way in quite some time.<br>Gives some additional herbs.<br>Gives something to talk about with the Hermit. Get 1% reward from Talk to Hermit result per 1% Shortcut Explored.<br>Unlocked at 20% Forest Explored.";
     this.townNum = 1;
 
     this.infoName = "Shortcut Explored";
@@ -258,7 +258,7 @@ function OldShortcut() {
 function TalkToHermit() {
     this.name = "Talk To Hermit";
     this.expMult = 1;
-    this.tooltip = "This old man is happy to have a listening ear, surely he has some useful knowledge. You hope.<br>Improves speed of Gather Herbs, Practical Magic, and Learn Alchemy by 1% per 1%.<br>Unlocked with both 20% Shortcut Explored and 40 Magic";
+    this.tooltip = "This old man is happy to have a listening ear, surely he has some useful knowledge. You hope.<br>Speed is 1% faster for Gather Herbs, Practical Magic, and Learn Alchemy per 1% of Hermit Knowledge.<br>Unlocked with both 20% Shortcut Explored and 40 Magic";
     this.townNum = 1;
 
     this.infoName = "Hermit Knowledge Learned";

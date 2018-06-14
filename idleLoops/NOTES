@@ -39,6 +39,8 @@ show mana in previous run
 Adding actions group if same type
 change isVisible for stats to use data instead
 drag/drop actions
+show mana/gold/resources gain per action in tooltip
+actions fail if they don't do anything useful
 
 Buy supplies, 500 mana, costs 400 gold, required to travel
 Haggle, 250 mana and 1 reputation, reduce supplies cost by 20
