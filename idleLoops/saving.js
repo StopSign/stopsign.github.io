@@ -72,28 +72,28 @@ function load() {
         }
     }
 
-    soulstoneChance = toLoad.soulstoneChance ? toLoad.soulstoneChance : 1;
-    maxTown = toLoad.maxTown ? toLoad.maxTown : 0;
-    actionTownNum = toLoad.actionTownNum ? toLoad.actionTownNum : 0;
+    soulstoneChance = toLoad.soulstoneChance !== undefined ? toLoad.soulstoneChance : 1;
+    maxTown = toLoad.maxTown !== undefined ? toLoad.maxTown : 0;
+    actionTownNum = toLoad.actionTownNum !== undefined ? toLoad.actionTownNum : 0;
 
     towns[0] = new Town(0);
     let town = towns[0];
-    town.expWander = toLoad.expWander ? toLoad.expWander : 0;
-    town.expMet = toLoad.expMet ? toLoad.expMet : 0;
-    town.expSecrets = toLoad.expSecrets ? toLoad.expSecrets : 0;
-    town.totalHeal = toLoad.totalHeal ? toLoad.totalHeal : 0;
-    town.totalFight = toLoad.totalFight ? toLoad.totalFight : 0;
-    town.totalSDungeon = toLoad.totalSDungeon ? toLoad.totalSDungeon : 0;
+    town.expWander = toLoad.expWander !== undefined ? toLoad.expWander : 0;
+    town.expMet = toLoad.expMet !== undefined ? toLoad.expMet : 0;
+    town.expSecrets = toLoad.expSecrets !== undefined ? toLoad.expSecrets : 0;
+    town.totalHeal = toLoad.totalHeal !== undefined ? toLoad.totalHeal : 0;
+    town.totalFight = toLoad.totalFight !== undefined ? toLoad.totalFight : 0;
+    town.totalSDungeon = toLoad.totalSDungeon !== undefined ? toLoad.totalSDungeon : 0;
 
     towns[1] = new Town(1);
     town = towns[1];
-    town.expForest = toLoad.expForest ? toLoad.expForest : 0;
-    town.expShortcut = toLoad.expShortcut ? toLoad.expShortcut : 0;
-    town.expHermit = toLoad.expHermit ? toLoad.expHermit : 0;
+    town.expForest = toLoad.expForest !== undefined ? toLoad.expForest : 0;
+    town.expShortcut = toLoad.expShortcut !== undefined ? toLoad.expShortcut : 0;
+    town.expHermit = toLoad.expHermit !== undefined ? toLoad.expHermit : 0;
 
 
-    actions.next = toLoad.nextList ? toLoad.nextList : actions.next;
-    loadouts = toLoad.loadouts ? toLoad.loadouts : loadouts;
+    actions.next = toLoad.nextList !== undefined ? toLoad.nextList : actions.next;
+    loadouts = toLoad.loadouts !== undefined ? toLoad.loadouts : loadouts;
 
     recalcInterval(50);
     pauseGame();
@@ -105,13 +105,13 @@ function load() {
             let action = town.totalActionList[j];
             if (town.varNames.indexOf(action.varName) !== -1) {
                 const varName = action.varName;
-                if (toLoad["total" + varName])
+                if (toLoad["total" + varName] !== undefined)
                     town["total" + varName] = toLoad["total" + varName];
-                if (toLoad["checked" + varName])
+                if (toLoad["checked" + varName] !== undefined)
                     town["checked" + varName] = toLoad["checked" + varName];
-                if (toLoad["good" + varName])
+                if (toLoad["good" + varName] !== undefined)
                     town["good" + varName] = toLoad["good" + varName];
-                if (toLoad["good" + varName])
+                if (toLoad["good" + varName] !== undefined)
                     town["goodTemp" + varName] = toLoad["good" + varName];
                 view.updateRegular(action.varName, i);
             }
