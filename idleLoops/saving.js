@@ -1,3 +1,4 @@
+'use strict';
 // let doWork = new Worker('interval.js');
 // doWork.onmessage = function (event) {
 //     if (event.data === 'interval.start') {
@@ -95,7 +96,7 @@ function load() {
     actions.next = toLoad.nextList !== undefined ? toLoad.nextList : actions.next;
     loadouts = toLoad.loadouts !== undefined ? toLoad.loadouts : loadouts;
 
-    recalcInterval(50);
+    // recalcInterval(50);
     pauseGame();
     view.initalize();
 
@@ -177,7 +178,6 @@ function exportSave() {
 
 function importSave() {
     window.localStorage.idleLoops1 = decode(document.getElementById("exportImport").value);
-    console.log(window.localStorage.idleLoops1);
     actions.next = [];
     actions.current = [];
     load();
@@ -186,4 +186,4 @@ function importSave() {
 
 load();
 
-setInterval(tick(), 20);
+setInterval(tick, 10);

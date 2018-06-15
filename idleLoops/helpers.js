@@ -1,3 +1,5 @@
+'use strict';
+
 //because I hate IE so much
 Math.log2 = Math.log2 || function(x){return Math.log(x)*Math.LOG2E;};
 Math.log10 = Math.log10 || function(x) { return Math.log(x) * Math.LOG10E; };
@@ -84,31 +86,32 @@ function toSuffix(value) {
     return shortValue+suffixes[suffixNum];
 }
 
+let si = [
+    { value: 1E63, symbol: "V" },
+    { value: 1E60, symbol: "Nd" },
+    { value: 1E57, symbol: "Od" },
+    { value: 1E54, symbol: "Sd" },
+    { value: 1E51, symbol: "sd" },
+    { value: 1E48, symbol: "Qd" },
+    { value: 1E45, symbol: "qd" },
+    { value: 1E42, symbol: "Td" },
+    { value: 1E39, symbol: "Dd" },
+    { value: 1E36, symbol: "Ud" },
+    { value: 1E33, symbol: "Dc" },
+    { value: 1E30, symbol: "N" },
+    { value: 1E27, symbol: "O" },
+    { value: 1E24, symbol: "Sp" },
+    { value: 1E21, symbol: "Sx" },
+    { value: 1E18, symbol: "Qi" },
+    { value: 1E15, symbol: "Qa" },
+    { value: 1E12, symbol: "T" },
+    { value: 1E9,  symbol: "B" },
+    { value: 1E6,  symbol: "M" },
+    { value: 1E3,  symbol: "K" }
+], rx = /\.0+$|(\.[0-9]*[1-9])0+$/;
+
 function nFormatter(num, digits) {
-    let si = [
-        { value: 1E63, symbol: "V" },
-        { value: 1E60, symbol: "Nd" },
-        { value: 1E57, symbol: "Od" },
-        { value: 1E54, symbol: "Sd" },
-        { value: 1E51, symbol: "sd" },
-        { value: 1E48, symbol: "Qd" },
-        { value: 1E45, symbol: "qd" },
-        { value: 1E42, symbol: "Td" },
-        { value: 1E39, symbol: "Dd" },
-        { value: 1E36, symbol: "Ud" },
-        { value: 1E33, symbol: "Dc" },
-        { value: 1E30, symbol: "N" },
-        { value: 1E27, symbol: "O" },
-        { value: 1E24, symbol: "Sp" },
-        { value: 1E21, symbol: "Sx" },
-        { value: 1E18, symbol: "Qi" },
-        { value: 1E15, symbol: "Qa" },
-        { value: 1E12, symbol: "T" },
-        { value: 1E9,  symbol: "B" },
-        { value: 1E6,  symbol: "M" },
-        { value: 1E3,  symbol: "K" }
-    ], rx = /\.0+$|(\.[0-9]*[1-9])0+$/, i;
-    for (i = 0; i < si.length; i++) {
+    for (let i = 0; i < si.length; i++) {
         if ((num) >= si[i].value / 1.000501) { // /1.000501 to handle rounding
             return (num / si[i].value).toPrecision(digits).replace(rx, "$1") + si[i].symbol;
         }
@@ -350,7 +353,7 @@ let Base64 = {
     _utf8_decode : function (utftext) {
         let string = "";
         let i = 0;
-        let c = c1 = c2 = 0;
+        let c = 0, c2 = 0;
         while ( i < utftext.length ) {
             c = utftext.charCodeAt(i);
             if (c < 128) {
@@ -364,7 +367,7 @@ let Base64 = {
             }
             else {
                 c2 = utftext.charCodeAt(i+1);
-                c3 = utftext.charCodeAt(i+2);
+                let c3 = utftext.charCodeAt(i+2);
                 string += String.fromCharCode(((c & 15) << 12) | ((c2 & 63) << 6) | (c3 & 63));
                 i += 3;
             }

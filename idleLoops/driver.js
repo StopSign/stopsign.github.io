@@ -1,4 +1,4 @@
-
+'use strict';
 
 function tick() {
     if(stop) {

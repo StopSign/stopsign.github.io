@@ -1,3 +1,4 @@
+'use strict';
 function Town(index) {
     this.index = index;
     this.varNames = [];

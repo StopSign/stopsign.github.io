@@ -1,3 +1,5 @@
+'use strict';
+
 function Actions() {
     this.current = [];
     this.next = [];
@@ -229,7 +231,6 @@ function Actions() {
         } else {
             this.next.push(toAdd);
         }
-
     };
 }
 
