@@ -2,7 +2,6 @@ div {
     display:inline-block;
 }
 
-
 body {
     -webkit-touch-callout: none;
     -webkit-user-select: none;
@@ -38,35 +37,13 @@ body {
     min-width:400px;
 }
 
-#logo {
-    background-image: url("./img/wander.svg");
-    background-position: center; 
-    background-repeat: no-repeat;
-    width:100%;
-    text-align:center;
-    height:100px;
-}
 .title {
-    display:block;
-    height:30px;
     font-size:16px;
+    font-weight:bold;
+    display:block;
     text-align:center;
-    vertical-align: middle;
-    margin:5px 10px;
-    padding: 0px 10px;
 }
-.title-left {
-    float:left;
-}
-.title-center {
-    float: center;
-}
-.title-right {
-    float:right;
-}
-.resource {
-    padding: 0px 10px;
-}
+
 
 .large {
     font-size:16px;
