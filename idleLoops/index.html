@@ -19,413 +19,435 @@
     <div style="width:100%;height:10px;background:white;text-align:center;position:relative;">
         <div id="timeBar" style="height:100%;width:20%;background-color:#8293ff;display:block;margin:auto;"></div>
     </div>
-    <div style="float:left;height:30px;margin-right:5px;" class="showthat">
-        Changelog
-        <div class="showthis">
-            <div class="showthat2">
-                Version .66
-                <div class="showthis2">
-                    * Mostly fixed import being all weird<br>
-                    * Changed investigate to be visible earlier<br>
-                    * Fixed Old Shortcut to be 100% from 110%<br>
-                    * Fixed Investigate to be 100% from 90%<br>
-                    * Rewording old shortcut and hermit<br>
-                    * Game autopauses if current list is empty<br>
-                    * Saves variables even if they're 0 (fixes some incorrect negative values)<br>
-                    * Fixes your save if your variables were negative.
-                </div>
-            </div><br>
-            <div class="showthat2">
-                Version .65
-                <div class="showthis2">
-                    * Added Learn Alchemy action and Alchemy skill<br>
-                    * Made a reddit post and discord<br>
-                    * Hid Skills that are at 0 exp<br>
-                    * Import/export
-                </div>
-            </div><br>
-            <div class="showthat2">
-                Version .64
-                <div class="showthis2">
-                    * Start Journey costs 2k mana from 1k<br>
-                    * Added Old Shortcut, Talk to Hermit, and Practical Magic actions<br>
-                    * Added Practical Magic skill<br>
-                    * Widened version tooltips
-                </div>
-            </div><br>
-            <div class="showthat2">
-                Version .63
-                <div class="showthis2">
-                    * Made Heal the Sick, Fight Monster, and Clear Dungeon more difficult<br>
-                    * Changing forEach to for loops, I forgot to change return to continue, causing multiple large issues<br>
-                    * Made stat window a little larger<br>
-                    * Changed town numbers to update on reload, instead of just on a new %
-                </div>
-            </div><br>
-            <div class="showthat2">
-                Version .62
-                <div class="showthis2">
-                    * Added Gather Wild Mana, Gather Herbs, Hunt, and Sit Under Waterfall<br>
-                    * Hide supplies/herbs/hide if you have 0<br>
-                    * You'll need to complete 1 more % on Forest Explored to update Mana Sources (NOTE: not anymore)<br>
-                </div>
-            </div><br>
-            <div class="showthat2">
-                Version .61
-                <div class="showthis2">
-                    * Removed beautiful forEach loops because IE can't handle them<br>
-                    * Possibly fixes game not working on iPads too (tell me if so)<br>
-                    * Fixed errors for players with no save file<br>
-                    * Adjusted mana costs for new actions
-                </div>
-            </div><br>
-            <div class="showthat2">
-                Version .6
-                <div class="showthis2">
-                    * Added version info<br>
-                    * Added Haggle, Buy Supplies, Start Journey, Explore Forest<br>
-                    * Added switching towns and town names<br>
-                    * Added error messages when an action fails (red bar)<br>
-                    * Require reputation now requires, instead of costs<br>
-                    * Fixed repeating a last action with a cost bug<br>
-                    * Visually separated resources and main actions<br>
-                    * Reduced requirements/difficulty for heal/fight/dungeon<br>
-                    * WARNING: adblock caused game to freeze. This has no ads, disable if you also freeze<br>
-                    * Improved performance (since I was looking anyway)
+
+</div>
+
+<div id="logo" class="showthat">
+    <div class="showthis">Welcome to Idle Loops. Watch your step</div>
+</div>
+
+<div style="width:100%;text-align:center;">
+    <div class = "title title-center">
+        <div class="resource showthat">
+            <div class='bold'>Mana</div> <div id="timer">0</div>
+            <div class="showthis">Your main resource. The higher your mana, the more you can do before reset.</div>
+        </div>
+        <div class="resource showthat" >
+            <div class='bold'>Gold</div> <div id="gold">0</div>
+            <div class="showthis">Sell for mana, or use for actions.<br>Resets when the loop restarts.</div>
+        </div>
+        <div class="resource showthat">
+            <div class='bold'>Reputation</div> <div id="reputation">0</div>
+            <div class="showthis">The influence you have over the people in town.<br>Resets when the loop restarts.</div>
+        </div>
+        <div class="resource showthat" id="suppliesDiv" style="display:none">
+            <div class='bold'>Supplies</div> <div id="supplies">0</div>
+            <div class="showthis">Needed to go to the next town.<br>Resets when the loop restarts.</div>
+        </div>
+        <div class="resource showthat" id="herbsDiv" style="display:none">
+            <div class='bold'>Herbs</div> <div id="herbs">0</div>
+            <div class="showthis">The beneficial plants you've found.<br>Resets when the loop restarts.</div>
+        </div>
+        <div class="resource showthat" id="hideDiv" style="display:none">
+            <div class='bold'>Hide</div> <div id="hide">0</div>
+            <div class="showthis">Results of successful hunting.<br>Resets when the loop restarts.</div>
+        </div>
+    </div>
+    
+    <div class='title title-right'>
+        <div id="pausePlay" onclick="pauseGame()" class="button">Pause</div>
+        <div onclick="restart()" class="button">Restart</div>
+        <input type="checkbox" id="pauseBeforeRestart" >
+        <label for="pauseBeforeRestart">Pause before restart</label>
+    </div>
+
+    <div class='title title-left'>
+        <div style="float:left;padding: 5px 10px;" class="showthat">
+            Story
+            <div class="showthis" style="width:300px;">
+                You're a simple courier, on a long trip to deliver a high priority package. Just as you entered town, you tripped, and the package burst open, spilling a strange liquid on you. Immediately, your meager amount of mana started draining rapidly. Right as your mana became empty, you found yourself back in the moment the liquid was absorbed into your skin, with your tiny reserves filled... yet draining just as before. This happened again and again, the world resetting with you, until you decided you had to figure out a way to prolong how long these 'loops' were. Mana crystals are often stored in pottery around town, perhaps you'll start there ...
+            </div>
+            &nbsp;
+        </div>
+        <div style="float:left;padding: 5px 10px" class="showthat">
+            Export
+            <div class="showthis">
+                <div class="button" onclick="save()">Save Manually</div><br>
+                <input id="exportImport"><label for="exportImport">Export/Import</label><br>
+                <div class="button" onclick="exportSave()">Export</div><br>
+                Click Export to export to your clipboard (ctrl-v somewhere else).<br>
+                Paste a save and click Import to import.<br>
+                <div class="button" onclick="importSave()">Import</div><br>
+                WARNING: Import will break the game if invalid save. Empty import will hard clear the game<br>
+                If you reaaallly want to edit your save file, <div class="showthat2">hover me<div class="showthis2">In the console, use decode("pasted savefile"), edit, then encode('pasted savefile'), then import it<br>This is mainly for fixing broken savefiles - don't be a cheater.</div></div>
+            </div>
+            &nbsp;
+        </div>
+        
+        <div style="float:left;padding: 5px 10px" class="showthat">
+            Changelog
+            <div class="showthis">
+                <div class="showthat2">
+                    Version .66
+                    <div class="showthis2">
+                        * Mostly fixed import being all weird<br>
+                        * Changed investigate to be visible earlier<br>
+                        * Fixed Old Shortcut to be 100% from 110%<br>
+                        * Fixed Investigate to be 100% from 90%<br>
+                        * Rewording old shortcut and hermit<br>
+                        * Game autopauses if current list is empty
+                    </div>
+                </div><br>
+                <div class="showthat2">
+                    Version .65
+                    <div class="showthis2">
+                        * Added Learn Alchemy action and Alchemy skill<br>
+                        * Made a reddit post and discord<br>
+                        * Hid Skills that are at 0 exp<br>
+                        * Import/export
+                    </div>
+                </div><br>
+                <div class="showthat2">
+                    Version .64
+                    <div class="showthis2">
+                        * Start Journey costs 2k mana from 1k<br>
+                        * Added Old Shortcut, Talk to Hermit, and Practical Magic actions<br>
+                        * Added Practical Magic skill<br>
+                        * Widened version tooltips
+                    </div>
+                </div><br>
+                <div class="showthat2">
+                    Version .63
+                    <div class="showthis2">
+                        * Made Heal the Sick, Fight Monster, and Clear Dungeon more difficult<br>
+                        * Changing forEach to for loops, I forgot to change return to continue, causing multiple large issues<br>
+                        * Made stat window a little larger<br>
+                        * Changed town numbers to update on reload, instead of just on a new %
+                    </div>
+                </div><br>
+                <div class="showthat2">
+                    Version .62
+                    <div class="showthis2">
+                        * Added Gather Wild Mana, Gather Herbs, Hunt, and Sit Under Waterfall<br>
+                        * Hide supplies/herbs/hide if you have 0<br>
+                        * You'll need to complete 1 more % on Forest Explored to update Mana Sources (NOTE: not anymore)<br>
+                    </div>
+                </div><br>
+                <div class="showthat2">
+                    Version .61
+                    <div class="showthis2">
+                        * Removed beautiful forEach loops because IE can't handle them<br>
+                        * Possibly fixes game not working on iPads too (tell me if so)<br>
+                        * Fixed errors for players with no save file<br>
+                        * Adjusted mana costs for new actions
+                    </div>
+                </div><br>
+                <div class="showthat2">
+                    Version .6
+                    <div class="showthis2">
+                        * Added version info<br>
+                        * Added Haggle, Buy Supplies, Start Journey, Explore Forest<br>
+                        * Added switching towns and town names<br>
+                        * Added error messages when an action fails (red bar)<br>
+                        * Require reputation now requires, instead of costs<br>
+                        * Fixed repeating a last action with a cost bug<br>
+                        * Visually separated resources and main actions<br>
+                        * Reduced requirements/difficulty for heal/fight/dungeon<br>
+                        * WARNING: adblock caused game to freeze. This has no ads, disable if you also freeze<br>
+                        * Improved performance (since I was looking anyway)
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>
-    <div style="float:left;height:30px" class="showthat">
-        | Saving
-        <div class="showthis">
-            <div class="button" onclick="save()">Save Manually</div><br>
-            <input id="exportImport"><label for="exportImport">Export/Import</label><br>
-            <div class="button" onclick="exportSave()">Export</div><br>
-            Click Export to export to your clipboard (ctrl-v somewhere else).<br>
-            Paste a save and click Import to import.<br>
-            <div class="button" onclick="importSave()">Import</div><br>
-            WARNING: Import will break the game if invalid save. Empty import will hard clear the game<br>
-            If you reaaallly want to edit your save file, <div class="showthat2">hover me<div class="showthis2">In the console, use decode("pasted savefile"), edit, then encode('pasted savefile'), then import it<br>This is mainly for fixing broken savefiles - don't be a cheater.</div></div>
-        </div>
-    </div>
-    <div class="showthat">
-        <div class='bold'>Mana</div> <div id="timer">0</div>
-        <div class="showthis">Your main resource. The higher your mana, the more you can do before reset.</div>
-    </div>
-    <div class="showthat">
-        <div class='bold'>Gold</div> <div id="gold">0</div>
-        <div class="showthis">Sell for mana, or use for actions.<br>Resets when the loop restarts.</div>
-    </div>
-    <div class="showthat">
-        <div class='bold'>Reputation</div> <div id="reputation">0</div>
-        <div class="showthis">The influence you have over the people in town.<br>Resets when the loop restarts.</div>
-    </div>
-    <div class="showthat" id="suppliesDiv" style="display:none">
-        <div class='bold'>Supplies</div> <div id="supplies">0</div>
-        <div class="showthis">Needed to go to the next town.<br>Resets when the loop restarts.</div>
-    </div>
-    <div class="showthat" id="herbsDiv" style="display:none">
-        <div class='bold'>Herbs</div> <div id="herbs">0</div>
-        <div class="showthis">The beneficial plants you've found.<br>Resets when the loop restarts.</div>
-    </div>
-    <div class="showthat" id="hideDiv" style="display:none">
-        <div class='bold'>Hide</div> <div id="hide">0</div>
-        <div class="showthis">Results of successful hunting.<br>Resets when the loop restarts.</div>
-    </div><br>
-    <div id="pausePlay" onclick="pauseGame()" class="button">Pause</div>
-    <input type="checkbox" id="pauseBeforeRestart">
-    <label for="pauseBeforeRestart">Pause before restart</label>
-    <div onclick="restart()" class="button">Restart</div>
-    <div class="showthat">
-        <div class="large bold">Story</div>
-        <div class="showthis" style="width:300px;">
-            You're a simple courier, on a long trip to deliver a high priority package. Just as you entered town, you tripped, and the package burst open, spilling a strange liquid on you. Immediately, your meager amount of mana started draining rapidly. Right as your mana became empty, you found yourself back in the moment the liquid was absorbed into your skin, with your tiny reserves filled... yet draining just as before. This happened again and again, the world resetting with you, until you decided you had to figure out a way to prolong how long these 'loops' were. Mana crystals are often stored in pottery around town, perhaps you'll start there ...
         </div>
     </div>
 </div>
 
-<div id="statsColumn" style="width:230px;vertical-align:top;">
-    <div id="statsWindow" style="width:90%;margin:5%;text-align:center;">
-        <div class="showthat">
-            <div class="large bold">Stats</div>
-            <div class="showthis">
-                Each skill level reduces relevant actions by 1%.<br>
-                Talent gets 1% of all level progress, and keeps through resets.<br>
-                Each talent level increases exp gain of skill by 1%.<br>
-                Exp gain from an action is original mana cost * talent %.<br><br>
-
-                e.g. Meet People costs 800 mana and has a breakdown of <div class="bold">Int</div> 10% <div class="bold">Cha</div> 80% <div class="bold">Soul</div> 10%.<br>
-                This effectively means 80 of the mana is controlled by <div class="bold">Int</div>, another 80 by <div class="bold">Soul</div>, and the remaining 640 by <div class="bold">Cha</div>.<br>
-                If your <div class="bold">Cha</div> is level 20 when the action is started, it'd be 640 / (1.2) = 533.<br>
-                Adding back the 160 from <div class="bold">Soul</div>/<div class="bold">Int</div>, the total mana the action takes is now 693, so ~15% less mana.<br>
-                The action would give (800/693)*(1+talent/100) level exp per mana for the 693 mana.
-            </div>
-        </div><br>
-        <div id="statList" style="width:100%;">
-            <div class="statContainer showthat" onmouseover="view.showStat('Str')">
-                <div class="statLabel medium bold">Strength</div>
-                <div class="statNum medium"><div id="statStrLevel">0</div>(<div id="statStrTalent">0</div>)<div id="ssStrContainer" class="ssContainer">(<div id="ssStr"></div>)</div></div>
-                <div style="margin-top:18px;"></div>
-                <div class="thinProgressBarUpper"><div class="statBar statLevelBar" id="statStrLevelBar"></div></div>
-                <div class="thinProgressBarLower"><div class="statBar statTalentBar" id="statStrTalentBar"></div></div>
-                <div class="showthis" id="statStrTooltip" >
-                    Train your body.<br>
-                    <div class="medium bold">Level</div> <div id="statStrLevelExp"></div>/<div id="statStrLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="statStrLevelProgress"></div>%)</div><br>
-                    <div class="medium bold">Talent</div> <div id="statStrTalentExp"></div>/<div id="statStrTalentExpNeeded"></div> <div class="statTooltipPerc">(<div id="statStrTalentProgress"></div>%)</div><br>
-                    <div class="medium bold">Soulstone Bonus</div> <div id="statStrSSBonus"></div>
-                </div>
-            </div>
-            <div class="statContainer showthat" onmouseover="view.showStat('Dex')">
-                <div class="statLabel medium bold">Dexterity</div>
-                <div class="statNum medium"><div id="statDexLevel">0</div>(<div id="statDexTalent">0</div>)<div id="ssDexContainer" class="ssContainer">(<div id="ssDex"></div>)</div></div>
-                <div style="margin-top:18px;"></div>
-                <div class="thinProgressBarUpper"><div class="statBar statLevelBar" id="statDexLevelBar"></div></div>
-                <div class="thinProgressBarLower"><div class="statBar statTalentBar" id="statDexTalentBar"></div></div>
-                <div class="showthis" id="statDexTooltip" >
-                    Know your body.<br>
-                    <div class="medium bold">Level</div> <div id="statDexLevelExp"></div>/<div id="statDexLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="statDexLevelProgress"></div>%)</div><br>
-                    <div class="medium bold">Talent</div> <div id="statDexTalentExp"></div>/<div id="statDexTalentExpNeeded"></div> <div class="statTooltipPerc">(<div id="statDexTalentProgress"></div>%)</div><br>
-                    <div class="medium bold">Soulstone Bonus</div> <div id="statDexSSBonus"></div>
-                </div>
-            </div>
-            <div class="statContainer showthat" onmouseover="view.showStat('Con')">
-                <div class="statLabel medium bold">Constitution</div>
-                <div class="statNum medium"><div id="statConLevel">0</div>(<div id="statConTalent">0</div>)<div id="ssConContainer" class="ssContainer">(<div id="ssCon"></div>)</div></div>
-                <div style="margin-top:18px;"></div>
-                <div class="thinProgressBarUpper"><div class="statBar statLevelBar" id="statConLevelBar"></div></div>
-                <div class="thinProgressBarLower"><div class="statBar statTalentBar" id="statConTalentBar"></div></div>
-                <div class="showthis" id="statConTooltip" >
-                    Just a little longer. Just a little more.<br>
-                    <div class="medium bold">Level</div> <div id="statConLevelExp"></div>/<div id="statConLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="statConLevelProgress"></div>%)</div><br>
-                    <div class="medium bold">Talent</div> <div id="statConTalentExp"></div>/<div id="statConTalentExpNeeded"></div> <div class="statTooltipPerc">(<div id="statConTalentProgress"></div>%)</div><br>
-                    <div class="medium bold">Soulstone Bonus</div> <div id="statConSSBonus"></div>
-                </div>
-            </div>
-            <div class="statContainer showthat" onmouseover="view.showStat('Per')">
-                <div class="statLabel medium bold">Perception</div>
-                <div class="statNum medium"><div id="statPerLevel">0</div>(<div id="statPerTalent">0</div>)<div id="ssPerContainer" class="ssContainer">(<div id="ssPer"></div>)</div></div>
-                <div style="margin-top:18px;"></div>
-                <div class="thinProgressBarUpper"><div class="statBar statLevelBar" id="statPerLevelBar"></div></div>
-                <div class="thinProgressBarLower"><div class="statBar statTalentBar" id="statPerTalentBar"></div></div>
-                <div class="showthis" id="statPerTooltip">
-                    Look a little closer ...<br>
-                    <div class="medium bold">Level</div> <div id="statPerLevelExp"></div>/<div id="statPerLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="statPerLevelProgress"></div>%)</div><br>
-                    <div class="medium bold">Talent</div> <div id="statPerTalentExp"></div>/<div id="statPerTalentExpNeeded"></div> <div class="statTooltipPerc">(<div id="statPerTalentProgress"></div>%)</div><br>
-                    <div class="medium bold">Soulstone Bonus</div> <div id="statPerSSBonus"></div>
-                </div>
-            </div>
-            <div class="statContainer showthat" onmouseover="view.showStat('Int')">
-                <div class="statLabel medium bold">Intelligence</div>
-                <div class="statNum medium"><div id="statIntLevel">0</div>(<div id="statIntTalent">0</div>)<div id="ssIntContainer" class="ssContainer">(<div id="ssInt"></div>)</div></div>
-                <div style="margin-top:18px;"></div>
-                <div class="thinProgressBarUpper"><div class="statBar statLevelBar" id="statIntLevelBar"></div></div>
-                <div class="thinProgressBarLower"><div class="statBar statTalentBar" id="statIntTalentBar"></div></div>
-                <div class="showthis" id="statIntTooltip" >
-                    Learning to learn.<br>
-                    <div class="medium bold">Level</div> <div id="statIntLevelExp"></div>/<div id="statIntLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="statIntLevelProgress"></div>%)</div><br>
-                    <div class="medium bold">Talent</div> <div id="statIntTalentExp"></div>/<div id="statIntTalentExpNeeded"></div> <div class="statTooltipPerc">(<div id="statIntTalentProgress"></div>%)</div><br>
-                    <div class="medium bold">Soulstone Bonus</div> <div id="statIntSSBonus"></div>
-                </div>
-            </div>
-            <div class="statContainer showthat" onmouseover="view.showStat('Cha')">
-                <div class="statLabel medium bold">Charisma</div>
-                <div class="statNum medium"><div id="statChaLevel">0</div>(<div id="statChaTalent">0</div>)<div id="ssChaContainer" class="ssContainer">(<div id="ssCha"></div>)</div></div>
-                <div style="margin-top:18px;"></div>
-                <div class="thinProgressBarUpper"><div class="statBar statLevelBar" id="statChaLevelBar"></div></div>
-                <div class="thinProgressBarLower"><div class="statBar statTalentBar" id="statChaTalentBar"></div></div>
-                <div class="showthis" id="statChaTooltip" >
-                    Conversation is a battle.<br>
-                    <div class="medium bold">Level</div> <div id="statChaLevelExp"></div>/<div id="statChaLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="statChaLevelProgress"></div>%)</div><br>
-                    <div class="medium bold">Talent</div> <div id="statChaTalentExp"></div>/<div id="statChaTalentExpNeeded"></div> <div class="statTooltipPerc">(<div id="statChaTalentProgress"></div>%)</div><br>
-                    <div class="medium bold">Soulstone Bonus</div> <div id="statChaSSBonus"></div>
-                </div>
-            </div>
-            <div class="statContainer showthat" onmouseover="view.showStat('Spd')">
-                <div class="statLabel medium bold">Speed</div>
-                <div class="statNum medium"><div id="statSpdLevel">0</div>(<div id="statSpdTalent">0</div>)<div id="ssSpdContainer" class="ssContainer">(<div id="ssSpd"></div>)</div></div>
-                <div style="margin-top:18px;"></div>
-                <div class="thinProgressBarUpper"><div class="statBar statLevelBar" id="statSpdLevelBar"></div></div>
-                <div class="thinProgressBarLower"><div class="statBar statTalentBar" id="statSpdTalentBar"></div></div>
-                <div class="showthis" id="statSpdTooltip" >
-                    Gotta go fast.<br>
-                    <div class="medium bold">Level</div> <div id="statSpdLevelExp"></div>/<div id="statSpdLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="statSpdLevelProgress"></div>%)</div><br>
-                    <div class="medium bold">Talent</div> <div id="statSpdTalentExp"></div>/<div id="statSpdTalentExpNeeded"></div> <div class="statTooltipPerc">(<div id="statSpdTalentProgress"></div>%)</div><br>
-                    <div class="medium bold">Soulstone Bonus</div> <div id="statSpdSSBonus"></div>
-                </div>
-            </div>
-            <div class="statContainer showthat" onmouseover="view.showStat('Luck')">
-                <div class="statLabel medium bold">Luck</div>
-                <div class="statNum medium"><div id="statLuckLevel">0</div>(<div id="statLuckTalent">0</div>)<div id="ssLuckContainer" class="ssContainer">(<div id="ssLuck"></div>)</div></div>
-                <div style="margin-top:18px;"></div>
-                <div class="thinProgressBarUpper"><div class="statBar statLevelBar" id="statLuckLevelBar"></div></div>
-                <div class="thinProgressBarLower"><div class="statBar statTalentBar" id="statLuckTalentBar"></div></div>
-                <div class="showthis" id="statLuckTooltip">
-                    Opportunity favors the fortunate.<br>
-                    <div class="medium bold">Level</div> <div id="statLuckLevelExp"></div>/<div id="statLuckLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="statLuckLevelProgress"></div>%)</div><br>
-                    <div class="medium bold">Talent</div> <div id="statLuckTalentExp"></div>/<div id="statLuckTalentExpNeeded"></div> <div class="statTooltipPerc">(<div id="statLuckTalentProgress"></div>%)</div><br>
-                    <div class="medium bold">Soulstone Bonus</div> <div id="statLuckSSBonus"></div>
-                </div>
-            </div>
-            <div class="statContainer showthat" onmouseover="view.showStat('Soul')">
-                <div class="statLabel medium bold">Soul</div>
-                <div class="statNum medium"><div id="statSoulLevel">0</div>(<div id="statSoulTalent">0</div>)<div id="ssSoulContainer" class="ssContainer">(<div id="ssSoul"></div>)</div></div>
-                <div style="margin-top:18px;"></div>
-                <div class="thinProgressBarUpper"><div class="statBar statLevelBar" id="statSoulLevelBar"></div></div>
-                <div class="thinProgressBarLower"><div class="statBar statTalentBar" id="statSoulTalentBar"></div></div>
-                <div class="showthis" id="statSoulTooltip" >
-                    You are the captain.<br>
-                    <div class="medium bold">Level</div> <div id="statSoulLevelExp"></div>/<div id="statSoulLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="statSoulLevelProgress"></div>%)</div><br>
-                    <div class="medium bold">Talent</div> <div id="statSoulTalentExp"></div>/<div id="statSoulTalentExpNeeded"></div> <div class="statTooltipPerc">(<div id="statSoulTalentProgress"></div>%)</div><br>
-                    <div class="medium bold">Soulstone Bonus</div> <div id="statSoulSSBonus"></div>
-                </div>
-            </div>
-        </div><br>
-        <div id="skillList" style="width:100%;margin-top:5px;display:none">
+<div style="width:100%;text-align:center;">
+    <div id="statsColumn" style="width:230px;vertical-align:top;">
+        <div id="statsWindow" style="width:90%;margin:5%;text-align:center;">
             <div class="showthat">
-                <div class="large bold">Skills</div>
+                <div class="large bold">Stats</div>
                 <div class="showthis">
-                    Skills last through resets.<br>
+                    Each skill level reduces relevant actions by 1%.<br>
+                    Talent gets 1% of all level progress, and keeps through resets.<br>
+                    Each talent level increases exp gain of skill by 1%.<br>
+                    Exp gain from an action is original mana cost * talent %.<br><br>
+
+                    e.g. Meet People costs 800 mana and has a breakdown of <div class="bold">Int</div> 10% <div class="bold">Cha</div> 80% <div class="bold">Soul</div> 10%.<br>
+                    This effectively means 80 of the mana is controlled by <div class="bold">Int</div>, another 80 by <div class="bold">Soul</div>, and the remaining 640 by <div class="bold">Cha</div>.<br>
+                    If your <div class="bold">Cha</div> is level 20 when the action is started, it'd be 640 / (1.2) = 533.<br>
+                    Adding back the 160 from <div class="bold">Soul</div>/<div class="bold">Int</div>, the total mana the action takes is now 693, so ~15% less mana.<br>
+                    The action would give (800/693)*(1+talent/100) level exp per mana for the 693 mana.
                 </div>
             </div><br>
-            <div class="statContainer showthat" id="skillCombatContainer">
-                <div class="statLabel medium bold">Combat</div>
-                <div class="statNum medium"><div id="skillCombatLevel">0</div></div>
-                <div style="margin-top:18px;"></div>
-                <div class="thinProgressBarUpper"><div class="statBar skillExpBar townExpBar" id="skillCombatLevelBar"></div></div>
-                <div class="showthis">
-                    Fight for your lives.<br>
-                    <div class="medium bold">Level</div> <div id="skillCombatLevelExp"></div>/<div id="skillCombatLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="skillCombatLevelProgress"></div>%)</div><br>
+            <div id="statList" style="width:100%;">
+                <div class="statContainer showthat" onmouseover="view.showStat('Str')">
+                    <div class="statLabel medium bold">Strength</div>
+                    <div class="statNum medium"><div id="statStrLevel">0</div>(<div id="statStrTalent">0</div>)<div id="ssStrContainer" class="ssContainer">(<div id="ssStr"></div>)</div></div>
+                    <div style="margin-top:18px;"></div>
+                    <div class="thinProgressBarUpper"><div class="statBar statLevelBar" id="statStrLevelBar"></div></div>
+                    <div class="thinProgressBarLower"><div class="statBar statTalentBar" id="statStrTalentBar"></div></div>
+                    <div class="showthis" id="statStrTooltip" >
+                        Train your body.<br>
+                        <div class="medium bold">Level</div> <div id="statStrLevelExp"></div>/<div id="statStrLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="statStrLevelProgress"></div>%)</div><br>
+                        <div class="medium bold">Talent</div> <div id="statStrTalentExp"></div>/<div id="statStrTalentExpNeeded"></div> <div class="statTooltipPerc">(<div id="statStrTalentProgress"></div>%)</div><br>
+                        <div class="medium bold">Soulstone Bonus</div> <div id="statStrSSBonus"></div>
+                    </div>
                 </div>
-            </div>
-            <div class="statContainer showthat" id="skillMagicContainer">
-                <div class="statLabel medium bold">Magic</div>
-                <div class="statNum medium"><div id="skillMagicLevel">0</div></div>
-                <div style="margin-top:18px;"></div>
-                <div class="thinProgressBarUpper"><div class="statBar skillExpBar townExpBar" id="skillMagicLevelBar"></div></div>
-                <div class="showthis">
-                    Control the aether to cast and conjure.<br>
-                    <div class="medium bold">Level</div> <div id="skillMagicLevelExp"></div>/<div id="skillMagicLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="skillMagicLevelProgress"></div>%)</div><br>
+                <div class="statContainer showthat" onmouseover="view.showStat('Dex')">
+                    <div class="statLabel medium bold">Dexterity</div>
+                    <div class="statNum medium"><div id="statDexLevel">0</div>(<div id="statDexTalent">0</div>)<div id="ssDexContainer" class="ssContainer">(<div id="ssDex"></div>)</div></div>
+                    <div style="margin-top:18px;"></div>
+                    <div class="thinProgressBarUpper"><div class="statBar statLevelBar" id="statDexLevelBar"></div></div>
+                    <div class="thinProgressBarLower"><div class="statBar statTalentBar" id="statDexTalentBar"></div></div>
+                    <div class="showthis" id="statDexTooltip" >
+                        Know your body.<br>
+                        <div class="medium bold">Level</div> <div id="statDexLevelExp"></div>/<div id="statDexLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="statDexLevelProgress"></div>%)</div><br>
+                        <div class="medium bold">Talent</div> <div id="statDexTalentExp"></div>/<div id="statDexTalentExpNeeded"></div> <div class="statTooltipPerc">(<div id="statDexTalentProgress"></div>%)</div><br>
+                        <div class="medium bold">Soulstone Bonus</div> <div id="statDexSSBonus"></div>
+                    </div>
                 </div>
-            </div>
-            <div class="statContainer showthat" id="skillPracticalContainer">
-                <div class="statLabel medium bold">Practical Magic</div>
-                <div class="statNum medium"><div id="skillPracticalLevel">0</div></div>
-                <div style="margin-top:18px;"></div>
-                <div class="thinProgressBarUpper"><div class="statBar skillExpBar townExpBar" id="skillPracticalLevelBar"></div></div>
-                <div class="showthis">
-                    Mage Hand, Prestidigitation, Detect Magic, and other useful tricks to help out.<br>
-                    <div class="medium bold">Level</div> <div id="skillPracticalLevelExp"></div>/<div id="skillPracticalLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="skillPracticalLevelProgress"></div>%)</div><br>
-                    Smash Pots and Gather Wild Mana have 1% reduced mana cost per level (rounded up).<br>
-                    Pick Locks, Short Quests, and Long Quests get 1% more gold per level (rounded down).<br>
+                <div class="statContainer showthat" onmouseover="view.showStat('Con')">
+                    <div class="statLabel medium bold">Constitution</div>
+                    <div class="statNum medium"><div id="statConLevel">0</div>(<div id="statConTalent">0</div>)<div id="ssConContainer" class="ssContainer">(<div id="ssCon"></div>)</div></div>
+                    <div style="margin-top:18px;"></div>
+                    <div class="thinProgressBarUpper"><div class="statBar statLevelBar" id="statConLevelBar"></div></div>
+                    <div class="thinProgressBarLower"><div class="statBar statTalentBar" id="statConTalentBar"></div></div>
+                    <div class="showthis" id="statConTooltip" >
+                        Just a little longer. Just a little more.<br>
+                        <div class="medium bold">Level</div> <div id="statConLevelExp"></div>/<div id="statConLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="statConLevelProgress"></div>%)</div><br>
+                        <div class="medium bold">Talent</div> <div id="statConTalentExp"></div>/<div id="statConTalentExpNeeded"></div> <div class="statTooltipPerc">(<div id="statConTalentProgress"></div>%)</div><br>
+                        <div class="medium bold">Soulstone Bonus</div> <div id="statConSSBonus"></div>
+                    </div>
                 </div>
-            </div>
-            <div class="statContainer showthat" id="skillAlchemyContainer">
-                <div class="statLabel medium bold">Alchemy</div>
-                <div class="statNum medium"><div id="skillAlchemyLevel">0</div></div>
-                <div style="margin-top:18px;"></div>
-                <div class="thinProgressBarUpper"><div class="statBar skillExpBar townExpBar" id="skillAlchemyLevelBar"></div></div>
-                <div class="showthis">
-                    Brewing potions is hard work! It's a good thing you found a teacher.<br>
-                    <div class="medium bold">Level</div> <div id="skillAlchemyLevelExp"></div>/<div id="skillAlchemyLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="skillAlchemyLevelProgress"></div>%)</div><br>
-                    The Magic teacher in Beginnersville adores alchemists. +1% to Mage Lessons (rounded down) per level.<br>
+                <div class="statContainer showthat" onmouseover="view.showStat('Per')">
+                    <div class="statLabel medium bold">Perception</div>
+                    <div class="statNum medium"><div id="statPerLevel">0</div>(<div id="statPerTalent">0</div>)<div id="ssPerContainer" class="ssContainer">(<div id="ssPer"></div>)</div></div>
+                    <div style="margin-top:18px;"></div>
+                    <div class="thinProgressBarUpper"><div class="statBar statLevelBar" id="statPerLevelBar"></div></div>
+                    <div class="thinProgressBarLower"><div class="statBar statTalentBar" id="statPerTalentBar"></div></div>
+                    <div class="showthis" id="statPerTooltip">
+                        Look a little closer ...<br>
+                        <div class="medium bold">Level</div> <div id="statPerLevelExp"></div>/<div id="statPerLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="statPerLevelProgress"></div>%)</div><br>
+                        <div class="medium bold">Talent</div> <div id="statPerTalentExp"></div>/<div id="statPerTalentExpNeeded"></div> <div class="statTooltipPerc">(<div id="statPerTalentProgress"></div>%)</div><br>
+                        <div class="medium bold">Soulstone Bonus</div> <div id="statPerSSBonus"></div>
+                    </div>
+                </div>
+                <div class="statContainer showthat" onmouseover="view.showStat('Int')">
+                    <div class="statLabel medium bold">Intelligence</div>
+                    <div class="statNum medium"><div id="statIntLevel">0</div>(<div id="statIntTalent">0</div>)<div id="ssIntContainer" class="ssContainer">(<div id="ssInt"></div>)</div></div>
+                    <div style="margin-top:18px;"></div>
+                    <div class="thinProgressBarUpper"><div class="statBar statLevelBar" id="statIntLevelBar"></div></div>
+                    <div class="thinProgressBarLower"><div class="statBar statTalentBar" id="statIntTalentBar"></div></div>
+                    <div class="showthis" id="statIntTooltip" >
+                        Learning to learn.<br>
+                        <div class="medium bold">Level</div> <div id="statIntLevelExp"></div>/<div id="statIntLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="statIntLevelProgress"></div>%)</div><br>
+                        <div class="medium bold">Talent</div> <div id="statIntTalentExp"></div>/<div id="statIntTalentExpNeeded"></div> <div class="statTooltipPerc">(<div id="statIntTalentProgress"></div>%)</div><br>
+                        <div class="medium bold">Soulstone Bonus</div> <div id="statIntSSBonus"></div>
+                    </div>
+                </div>
+                <div class="statContainer showthat" onmouseover="view.showStat('Cha')">
+                    <div class="statLabel medium bold">Charisma</div>
+                    <div class="statNum medium"><div id="statChaLevel">0</div>(<div id="statChaTalent">0</div>)<div id="ssChaContainer" class="ssContainer">(<div id="ssCha"></div>)</div></div>
+                    <div style="margin-top:18px;"></div>
+                    <div class="thinProgressBarUpper"><div class="statBar statLevelBar" id="statChaLevelBar"></div></div>
+                    <div class="thinProgressBarLower"><div class="statBar statTalentBar" id="statChaTalentBar"></div></div>
+                    <div class="showthis" id="statChaTooltip" >
+                        Conversation is a battle.<br>
+                        <div class="medium bold">Level</div> <div id="statChaLevelExp"></div>/<div id="statChaLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="statChaLevelProgress"></div>%)</div><br>
+                        <div class="medium bold">Talent</div> <div id="statChaTalentExp"></div>/<div id="statChaTalentExpNeeded"></div> <div class="statTooltipPerc">(<div id="statChaTalentProgress"></div>%)</div><br>
+                        <div class="medium bold">Soulstone Bonus</div> <div id="statChaSSBonus"></div>
+                    </div>
+                </div>
+                <div class="statContainer showthat" onmouseover="view.showStat('Spd')">
+                    <div class="statLabel medium bold">Speed</div>
+                    <div class="statNum medium"><div id="statSpdLevel">0</div>(<div id="statSpdTalent">0</div>)<div id="ssSpdContainer" class="ssContainer">(<div id="ssSpd"></div>)</div></div>
+                    <div style="margin-top:18px;"></div>
+                    <div class="thinProgressBarUpper"><div class="statBar statLevelBar" id="statSpdLevelBar"></div></div>
+                    <div class="thinProgressBarLower"><div class="statBar statTalentBar" id="statSpdTalentBar"></div></div>
+                    <div class="showthis" id="statSpdTooltip" >
+                        Gotta go fast.<br>
+                        <div class="medium bold">Level</div> <div id="statSpdLevelExp"></div>/<div id="statSpdLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="statSpdLevelProgress"></div>%)</div><br>
+                        <div class="medium bold">Talent</div> <div id="statSpdTalentExp"></div>/<div id="statSpdTalentExpNeeded"></div> <div class="statTooltipPerc">(<div id="statSpdTalentProgress"></div>%)</div><br>
+                        <div class="medium bold">Soulstone Bonus</div> <div id="statSpdSSBonus"></div>
+                    </div>
+                </div>
+                <div class="statContainer showthat" onmouseover="view.showStat('Luck')">
+                    <div class="statLabel medium bold">Luck</div>
+                    <div class="statNum medium"><div id="statLuckLevel">0</div>(<div id="statLuckTalent">0</div>)<div id="ssLuckContainer" class="ssContainer">(<div id="ssLuck"></div>)</div></div>
+                    <div style="margin-top:18px;"></div>
+                    <div class="thinProgressBarUpper"><div class="statBar statLevelBar" id="statLuckLevelBar"></div></div>
+                    <div class="thinProgressBarLower"><div class="statBar statTalentBar" id="statLuckTalentBar"></div></div>
+                    <div class="showthis" id="statLuckTooltip">
+                        Opportunity favors the fortunate.<br>
+                        <div class="medium bold">Level</div> <div id="statLuckLevelExp"></div>/<div id="statLuckLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="statLuckLevelProgress"></div>%)</div><br>
+                        <div class="medium bold">Talent</div> <div id="statLuckTalentExp"></div>/<div id="statLuckTalentExpNeeded"></div> <div class="statTooltipPerc">(<div id="statLuckTalentProgress"></div>%)</div><br>
+                        <div class="medium bold">Soulstone Bonus</div> <div id="statLuckSSBonus"></div>
+                    </div>
+                </div>
+                <div class="statContainer showthat" onmouseover="view.showStat('Soul')">
+                    <div class="statLabel medium bold">Soul</div>
+                    <div class="statNum medium"><div id="statSoulLevel">0</div>(<div id="statSoulTalent">0</div>)<div id="ssSoulContainer" class="ssContainer">(<div id="ssSoul"></div>)</div></div>
+                    <div style="margin-top:18px;"></div>
+                    <div class="thinProgressBarUpper"><div class="statBar statLevelBar" id="statSoulLevelBar"></div></div>
+                    <div class="thinProgressBarLower"><div class="statBar statTalentBar" id="statSoulTalentBar"></div></div>
+                    <div class="showthis" id="statSoulTooltip" >
+                        You are the captain.<br>
+                        <div class="medium bold">Level</div> <div id="statSoulLevelExp"></div>/<div id="statSoulLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="statSoulLevelProgress"></div>%)</div><br>
+                        <div class="medium bold">Talent</div> <div id="statSoulTalentExp"></div>/<div id="statSoulTalentExpNeeded"></div> <div class="statTooltipPerc">(<div id="statSoulTalentProgress"></div>%)</div><br>
+                        <div class="medium bold">Soulstone Bonus</div> <div id="statSoulSSBonus"></div>
+                    </div>
+                </div>
+            </div><br>
+            <div id="skillList" style="width:100%;margin-top:5px;display:none">
+                <div class="showthat">
+                    <div class="large bold">Skills</div>
+                    <div class="showthis">
+                        Skills last through resets.<br>
+                    </div>
+                </div><br>
+                <div class="statContainer showthat" id="skillCombatContainer">
+                    <div class="statLabel medium bold">Combat</div>
+                    <div class="statNum medium"><div id="skillCombatLevel">0</div></div>
+                    <div style="margin-top:18px;"></div>
+                    <div class="thinProgressBarUpper"><div class="statBar skillExpBar townExpBar" id="skillCombatLevelBar"></div></div>
+                    <div class="showthis">
+                        Fight for your lives.<br>
+                        <div class="medium bold">Level</div> <div id="skillCombatLevelExp"></div>/<div id="skillCombatLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="skillCombatLevelProgress"></div>%)</div><br>
+                    </div>
+                </div>
+                <div class="statContainer showthat" id="skillMagicContainer">
+                    <div class="statLabel medium bold">Magic</div>
+                    <div class="statNum medium"><div id="skillMagicLevel">0</div></div>
+                    <div style="margin-top:18px;"></div>
+                    <div class="thinProgressBarUpper"><div class="statBar skillExpBar townExpBar" id="skillMagicLevelBar"></div></div>
+                    <div class="showthis">
+                        Control the aether to cast and conjure.<br>
+                        <div class="medium bold">Level</div> <div id="skillMagicLevelExp"></div>/<div id="skillMagicLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="skillMagicLevelProgress"></div>%)</div><br>
+                    </div>
+                </div>
+                <div class="statContainer showthat" id="skillPracticalContainer">
+                    <div class="statLabel medium bold">Practical Magic</div>
+                    <div class="statNum medium"><div id="skillPracticalLevel">0</div></div>
+                    <div style="margin-top:18px;"></div>
+                    <div class="thinProgressBarUpper"><div class="statBar skillExpBar townExpBar" id="skillPracticalLevelBar"></div></div>
+                    <div class="showthis">
+                        Mage Hand, Prestidigitation, Detect Magic, and other useful tricks to help out.<br>
+                        <div class="medium bold">Level</div> <div id="skillPracticalLevelExp"></div>/<div id="skillPracticalLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="skillPracticalLevelProgress"></div>%)</div><br>
+                        Smash Pots and Gather Wild Mana have 1% reduced mana cost per level (rounded up).<br>
+                        Pick Locks, Short Quests, and Long Quests get 1% more gold per level (rounded down).<br>
+                    </div>
+                </div>
+                <div class="statContainer showthat" id="skillAlchemyContainer">
+                    <div class="statLabel medium bold">Alchemy</div>
+                    <div class="statNum medium"><div id="skillAlchemyLevel">0</div></div>
+                    <div style="margin-top:18px;"></div>
+                    <div class="thinProgressBarUpper"><div class="statBar skillExpBar townExpBar" id="skillAlchemyLevelBar"></div></div>
+                    <div class="showthis">
+                        Brewing potions is hard work! It's a good thing you found a teacher.<br>
+                        <div class="medium bold">Level</div> <div id="skillAlchemyLevelExp"></div>/<div id="skillAlchemyLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="skillAlchemyLevelProgress"></div>%)</div><br>
+                        The Magic teacher in Beginnersville adores alchemists. +1% to Mage Lessons (rounded down) per level.<br>
+                    </div>
                 </div>
             </div>
         </div>
+    </div>
+
+
+    <div id="actionsColumn" style="width:350px;vertical-align:top;">
+        <div id="actionList" style="width:100%;text-align:center;">
+
+            <div class="showthat">
+                <div class="large bold">Action List</div>
+                <div class="showthis">
+                    <i class='actionIcon fa fa-circle-thin'></i> Cap to current max<br>
+                    <i class='actionIcon fa fa-plus'></i> Add one loop<br>
+                    <i class='actionIcon fa fa-minus'></i> Subtract one loop<br>
+                    <i class='actionIcon fa fa-arrows-h'></i> Split action<br>
+                    <i class='actionIcon fa fa-sort-up'></i> Move action up<br>
+                    <i class='actionIcon fa fa-sort-down'></i> Move action down<br>
+                    <i class='actionIcon fa fa-times'></i> Remove action<br>
+                    The next list becomes the current list every restart.<br>
+                    One second = 50 mana.<br>
+                    Minimum 1 tick per action.<br>
+                    Restarts automatically upon no actions left.<br>
+                </div>
+            </div><br>
+
+            <div style="width:35%;height:300px;background-color:#c2e6cc;text-align:center;vertical-align:top;position:relative;">
+                <div id="curActionsList" style="margin-top:10px;text-align:left;max-height:270px;overflow:auto;"></div>
+                <div class="showthat" style="position:absolute;bottom:0;left:0;width:100%;">
+                    <div class="bold">Mana Used</div> <div id="totalTicks"></div>
+                    <div class="showthis">
+                        Shows stat gain affecting speed.<br>
+                        Updates every completed action.<br>
+                        Accurate at end of run.
+                    </div>
+                </div>
+            </div><div style="width:65%;height:300px;background-color:#cdded2;text-align:center;vertical-align:top;position:relative;">
+                <div id="nextActionsList" style="margin-top:10px;width:100%;text-align:left;max-height:247px;overflow:auto;"></div>
+                <div id="actionTooltipContainer" style="margin-top:10px;width:100%;text-align:left;max-height:247px;overflow:auto;"></div>
+                <div style="position:absolute;bottom:0;left:0;width:100%;">
+                    <div class="bold">Amount</div>
+                    <div class="button" id="amount1" onclick="changeActionAmount(1, 1)">1</div>
+                    <div class="button" id="amount2" onclick="changeActionAmount(5, 2)">5</div>
+                    <div class="button" id="amount3" onclick="changeActionAmount(10, 3)">10</div>
+                </div>
+            </div>
+            <div id="actionChanges" style="text-align:left;width:100%;margin-top:5px;">
+                <div>
+                    <input type="checkbox" id="currentListActive">
+                    <label for="currentListActive">Keep current list active</label><br>
+                    <input type="checkbox" id="repeatLastAction">
+                    <label for="repeatLastAction">Repeat last action on list</label>
+                </div>
+                <div style="float:right;text-align:right;">
+                    <div class="bold" style="margin-top:3px;">Loadouts</div>
+                    <div class="button unused" id="load1" onclick="selectLoadout(1)">1</div>
+                    <div class="button unused" id="load2" onclick="selectLoadout(2)">2</div>
+                    <div class="button unused" id="load3" onclick="selectLoadout(3)">3</div>
+                    <div class="button unused" id="load4" onclick="selectLoadout(4)">4</div><br>
+                    <div class="button" style="margin-bottom:5px;margin-top:5px;" onclick="saveList()">Save List</div><br>
+                    <div class="button" onclick="loadList()">Load Selected List</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="spells" style="width:100%;text-align:center;margin-top:10px;display:none">
+            <div class="showthat">
+                <div class="large bold">Spells</div>
+                <div class="showthis">
+                </div>
+            </div><br>
+            <div style="width:100%;padding-top:5px;">
+            </div>
+        </div>
+
     </div>
 </div>
 
-<div id="actionsColumn" style="width:350px;vertical-align:top;">
-    <div id="actionList" style="width:100%;text-align:center;">
-
-        <div class="showthat">
-            <div class="large bold">Action List</div>
-            <div class="showthis">
-                <i class='actionIcon fa fa-circle-thin'></i> Cap to current max<br>
-                <i class='actionIcon fa fa-plus'></i> Add one loop<br>
-                <i class='actionIcon fa fa-minus'></i> Subtract one loop<br>
-                <i class='actionIcon fa fa-arrows-h'></i> Split action<br>
-                <i class='actionIcon fa fa-sort-up'></i> Move action up<br>
-                <i class='actionIcon fa fa-sort-down'></i> Move action down<br>
-                <i class='actionIcon fa fa-times'></i> Remove action<br>
-                The next list becomes the current list every restart.<br>
-                One second = 50 mana.<br>
-                Minimum 1 tick per action.<br>
-                Restarts automatically upon no actions left.<br>
-            </div>
-        </div><br>
-
-        <div style="width:35%;height:300px;background-color:#c2e6cc;text-align:center;vertical-align:top;position:relative;">
-            <div id="curActionsList" style="margin-top:10px;text-align:left;max-height:270px;overflow:auto;"></div>
-            <div class="showthat" style="position:absolute;bottom:0;left:0;width:100%;">
-                <div class="bold">Mana Used</div> <div id="totalTicks"></div>
+<div style="width:100%;text-align:center;">
+    <div id="townColumn" style="width:535px;vertical-align:top;">
+        <div id="townWindow" style="width:100%;text-align:center;">
+            <div style="float:left;margin-left:150px;" class="actionIcon fa fa-arrow-left" id="townViewLeft" onclick="view.showTown(townShowing-1)"></div>
+            <div class="showthat">
+                <div class="large bold"><div class="bold" id="townName"></div></div>
                 <div class="showthis">
-                    Shows stat gain affecting speed.<br>
-                    Updates every completed action.<br>
-                    Accurate at end of run.
+                    Mana cost is based on ratio of stat %s.<br>
+                    Gained exp is proportional too.<br>
+                    Exp is gained every tick.<br>
+                    Actions will target unchecked objects before known lootable objects.<br>
                 </div>
             </div>
-        </div><div style="width:65%;height:300px;background-color:#cdded2;text-align:center;vertical-align:top;position:relative;">
-            <div id="nextActionsList" style="margin-top:10px;width:100%;text-align:left;max-height:247px;overflow:auto;"></div>
-            <div id="actionTooltipContainer" style="margin-top:10px;width:100%;text-align:left;max-height:247px;overflow:auto;"></div>
-            <div style="position:absolute;bottom:0;left:0;width:100%;">
-                <div class="bold">Amount</div>
-                <div class="button" id="amount1" onclick="changeActionAmount(1, 1)">1</div>
-                <div class="button" id="amount2" onclick="changeActionAmount(5, 2)">5</div>
-                <div class="button" id="amount3" onclick="changeActionAmount(10, 3)">10</div>
-            </div>
-        </div>
-        <div id="actionChanges" style="text-align:left;width:100%;margin-top:5px;">
-            <div>
-                <input type="checkbox" id="currentListActive">
-                <label for="currentListActive">Keep current list active</label><br>
-                <input type="checkbox" id="repeatLastAction">
-                <label for="repeatLastAction">Repeat last action on list</label>
-            </div>
-            <div style="float:right;text-align:right;">
-                <div class="bold" style="margin-top:3px;">Loadouts</div>
-                <div class="button unused" id="load1" onclick="selectLoadout(1)">1</div>
-                <div class="button unused" id="load2" onclick="selectLoadout(2)">2</div>
-                <div class="button unused" id="load3" onclick="selectLoadout(3)">3</div>
-                <div class="button unused" id="load4" onclick="selectLoadout(4)">4</div><br>
-                <div class="button" style="margin-bottom:5px;margin-top:5px;" onclick="saveList()">Save List</div><br>
-                <div class="button" onclick="loadList()">Load Selected List</div>
-            </div>
-        </div>
-    </div>
-
-    <div id="spells" style="width:100%;text-align:center;margin-top:10px;display:none">
-        <div class="showthat">
-            <div class="large bold">Spells</div>
-            <div class="showthis">
-            </div>
+            <div style="float:right;margin-right:150px;" class="actionIcon fa fa-arrow-right" id="townViewRight" onclick="view.showTown(townShowing+1)"></div>
         </div><br>
-        <div style="width:100%;padding-top:5px;">
-        </div>
+        <div id="townInfo0" class='townInfo'></div>
+        <div id="townInfo1" class='townInfo' style="display:none;"></div>
+
+        <div class="large bold" style="display:block;margin:10px auto 2px auto;text-align:center;">Action Options</div>
+        <div id="actionOptionsTown0" class='actionOptions'></div>
+        <div id="actionOptionsTown1" class='actionOptions' style="display:none;"></div>
     </div>
-
-</div>
-
-<div id="townColumn" style="width:535px;vertical-align:top;">
-    <div id="townWindow" style="width:100%;text-align:center;">
-        <div style="float:left;margin-left:150px;" class="actionIcon fa fa-arrow-left" id="townViewLeft" onclick="view.showTown(townShowing-1)"></div>
-        <div class="showthat">
-            <div class="large bold"><div class="bold" id="townName"></div></div>
-            <div class="showthis">
-                Mana cost is based on ratio of stat %s.<br>
-                Gained exp is proportional too.<br>
-                Exp is gained every tick.<br>
-                Actions will target unchecked objects before known lootable objects.<br>
-            </div>
-        </div>
-        <div style="float:right;margin-right:150px;" class="actionIcon fa fa-arrow-right" id="townViewRight" onclick="view.showTown(townShowing+1)"></div>
-    </div><br>
-    <div id="townInfo0" class='townInfo'></div>
-    <div id="townInfo1" class='townInfo' style="display:none;"></div>
-
-    <div class="large bold" style="display:block;margin:10px auto 2px auto;text-align:center;">Action Options</div>
-    <div id="actionOptionsTown0" class='actionOptions'></div>
-    <div id="actionOptionsTown1" class='actionOptions' style="display:none;"></div>
 </div>
 
 <div id="tutorial" style="position:absolute;width:100%;height:100%;left:0;top:0;">
