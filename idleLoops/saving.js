@@ -177,7 +177,7 @@ function exportSave() {
 
 function importSave() {
     window.localStorage.idleLoops1 = decode(document.getElementById("exportImport").value);
-    console.log(window.localStorage.idleLoops1);
+    // console.log(window.localStorage.idleLoops1);
     actions.next = [];
     actions.current = [];
     load();
@@ -186,4 +186,4 @@ function importSave() {
 
 load();
 
-setInterval(tick(), 20);
+setInterval(tick, 20);
