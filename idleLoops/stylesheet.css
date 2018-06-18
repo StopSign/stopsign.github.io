@@ -16,11 +16,13 @@ body {
     background-color: #e4ece5;
     cursor:default;
 }
-
+.showthatH:hover .showthisH {
+    display:block;
+}
 .showthat:hover .showthis, .showthat2:hover .showthis2 {
     display:block;
 }
-.showthis, .showthis2 {
+.showthis, .showthis2, .showthisH {
     display:none;
     position:absolute;
     background-color: #c0e4c7;
@@ -302,4 +304,21 @@ input {
 .ssContainer {
     color:#a3a3a3;
     display:none;
+}
+
+#expandableList {
+    position:relative;
+    height:400px;
+    width:100%;
+    /*border-bottom:2px solid purple;*/
+}
+
+.resizable {
+    width: 10px;
+    height: 10px;
+    background: blue;
+    position:absolute;
+    right: 0;
+    bottom: 0;
+    cursor: se-resize;
 }

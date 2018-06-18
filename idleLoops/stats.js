@@ -1,4 +1,4 @@
-
+'use strict';
 function initializeStats() {
     for(let i = 0; i < statList.length; i++) {
         addNewStat(statList[i]);

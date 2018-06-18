@@ -1,3 +1,5 @@
+'use strict';
+
 function Actions() {
     this.current = [];
     this.next = [];
@@ -27,10 +29,12 @@ function Actions() {
             }
             //segment is 0,1,2
             let toAdd = curAction.tickProgress(segment) * (curAction.manaCost() / curAction.adjustedTicks);
-            // console.log("adding: " + toAdd + " to segment: " + segment + " of progress " + curProgress + " which costs: " + curAction.loopCost(segment));
+            // console.log("using: "+curAction.loopStats[(towns[0].FightLoopCounter+segment) % curAction.loopStats.length]+" to add: " + toAdd + " to segment: " + segment + " and part " +towns[0][curAction.varName + "LoopCounter"]+" of progress " + curProgress + " which costs: " + curAction.loopCost(segment));
+            // console.log(curAction.loopCost(segment) + ", " + segment + ", " + monsterNames()[Math.floor((towns[0].FightLoopCounter+segment+.0001)/3)] + ", " + (towns[0].FightLoopCounter+segment)/3 + ", " + (curAction.loopStats[(towns[curAction.townNum][curAction.varName+"LoopCounter"]+segment) % curAction.loopStats.length]));
             towns[0][curAction.varName] += toAdd;
             curProgress += toAdd;
-            if(curProgress >= curAction.loopCost(segment)) {
+            while(curProgress >= curAction.loopCost(segment)) {
+                curProgress -= curAction.loopCost(segment);
                 //segment finished
                 if(curAction.segmentFinished) {
                     curAction.segmentFinished();
@@ -40,9 +44,12 @@ function Actions() {
                     towns[0][curAction.varName] = 0;
                     towns[0][curAction.varName + "LoopCounter"] += curAction.segments;
                     towns[0]["total"+curAction.varName]++;
+                    segment -= curAction.segments;
                     curAction.loopsFinished();
                     view.updateMultiPart(curAction);
                 }
+                segment++;
+
             }
             view.updateMultiPartSegments(curAction);
         }
@@ -161,62 +168,6 @@ function Actions() {
         view.updateTotalTicks();
     };
 
-    this.capAmount = function(index, townNum) {
-        let varName = "good"+translateClassNames(this.next[index].name).varName;
-        let alreadyExisting = 0;
-        for(let i = 0; i < this.next.length; i++) {
-            if(i === index || this.next[index].name !== this.next[i].name) {
-                continue;
-            }
-            alreadyExisting += this.next[i].loops;
-        }
-        let newLoops = towns[townNum][varName] - alreadyExisting;
-        this.next[index].loops = newLoops < 0 ? 0 : newLoops;
-        view.updateNextActions();
-    };
-    this.addLoop = function(index) {
-        this.next[index].loops += this.addAmount;
-        view.updateNextActions();
-    };
-    this.removeLoop = function(index) {
-        this.next[index].loops -= this.addAmount;
-        if(this.next[index].loops < 0) {
-            this.next[index].loops = 0;
-        }
-        view.updateNextActions();
-    };
-    this.split = function(index) {
-        const toSplit = this.next[index];
-        this.addAction(toSplit.name, Math.ceil(toSplit.loops/2), index);
-        toSplit.loops = Math.floor(toSplit.loops/2);
-        view.updateNextActions();
-    };
-    this.moveUp = function(index) {
-        if(index <= 0) {
-            return;
-        }
-        const temp = this.next[index-1];
-        this.next[index-1] = this.next[index];
-        this.next[index] = temp;
-        view.updateNextActions();
-    };
-    this.moveDown = function(index) {
-        if(index >= this.next.length - 1) {
-            return;
-        }
-        const temp = this.next[index+1];
-        this.next[index+1] = this.next[index];
-        this.next[index] = temp;
-        view.updateNextActions();
-    };
-    this.removeAction = function(index) {
-        let travelNum = getTravelNum(this.next[index].name);
-        if(travelNum) {
-            actionTownNum = travelNum - 1;
-        }
-        this.next.splice(index, 1);
-        view.updateNextActions();
-    };
 
     this.addAction = function(action, loops, initialOrder) {
         let toAdd = {};
@@ -229,7 +180,6 @@ function Actions() {
         } else {
             this.next.push(toAdd);
         }
-
     };
 }
 

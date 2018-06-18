@@ -1,3 +1,5 @@
+'use strict';
+
 function View() {
     this.totalActionList = [];
 
@@ -109,10 +111,29 @@ function View() {
     };
 
     this.updateNextActions = function() {
+        let count = 0;
         while (nextActionsDiv.firstChild) {
+            if(document.getElementById("capButton"+count)) {
+                document.getElementById("capButton"+count).removeAttribute("onclick");
+            }
+            if(document.getElementById("plusButton"+count)) { //not for journey
+                document.getElementById("plusButton" + count).removeAttribute("onclick");
+                document.getElementById("minusButton" + count).removeAttribute("onclick");
+                document.getElementById("splitButton" + count).removeAttribute("onclick");
+            }
+            document.getElementById("upButton"+count).removeAttribute("onclick");
+            document.getElementById("downButton"+count).removeAttribute("onclick");
+            document.getElementById("removeButton"+count).removeAttribute("onclick");
+            while(nextActionsDiv.firstChild.firstChild) {
+                if(nextActionsDiv.firstChild.firstChild instanceof HTMLImageElement) {
+                    nextActionsDiv.firstChild.firstChild.src = '';
+                }
+                nextActionsDiv.firstChild.removeChild(nextActionsDiv.firstChild.firstChild);
+            }
+            count++;
             nextActionsDiv.removeChild(nextActionsDiv.firstChild);
         }
-        let actionsDiv = document.createElement("div");
+        // let actionsDiv = document.createElement("div");
         let totalDivText = "";
 
         for(let i = 0; i < actions.next.length; i++) {
@@ -120,7 +141,7 @@ function View() {
             let capButton = "";
             if(hasCap(action.name)) {
                 let townNum = translateClassNames(action.name).townNum;
-                capButton = "<i onclick='actions.capAmount("+i+", "+townNum+")' class='actionIcon fa fa-circle-thin'></i>";
+                capButton = "<i id='capButton"+i+"' onclick='capAmount("+i+", "+townNum+")' class='actionIcon fa fa-circle-thin'></i>";
             }
             let isTravel = getTravelNum(action.name);
             totalDivText +=
@@ -129,28 +150,23 @@ function View() {
                     "<img src='img/"+camelize(action.name)+".svg' class='smallIcon'>" +
                     "<div style='float:right'>"+
                         capButton +
-                (isTravel ? "" : "<i onclick='actions.addLoop("+i+")' class='actionIcon fa fa-plus'></i>")+
-                (isTravel ? "" : "<i onclick='actions.removeLoop("+i+")' class='actionIcon fa fa-minus'></i>")+
-                (isTravel ? "" : "<i onclick='actions.split("+i+")' class='actionIcon fa fa-arrows-h'></i>")+
-                        "<i onclick='actions.moveUp("+i+")' class='actionIcon fa fa-sort-up'></i>" +
-                        "<i onclick='actions.moveDown("+i+")' class='actionIcon fa fa-sort-down'></i>" +
-                        "<i onclick='actions.removeAction("+i+")' class='actionIcon fa fa-times'></i>" +
+                (isTravel ? "" : "<i id='plusButton"+i+"' onclick='addLoop("+i+")' class='actionIcon fa fa-plus'></i>")+
+                (isTravel ? "" : "<i id='minusButton"+i+"' onclick='removeLoop("+i+")' class='actionIcon fa fa-minus'></i>")+
+                (isTravel ? "" : "<i id='splitButton"+i+"' onclick='split("+i+")' class='actionIcon fa fa-arrows-h'></i>")+
+                        "<i id='upButton"+i+"' onclick='moveUp("+i+")' class='actionIcon fa fa-sort-up'></i>" +
+                        "<i id='downButton"+i+"' onclick='moveDown("+i+")' class='actionIcon fa fa-sort-down'></i>" +
+                        "<i id='removeButton"+i+"' onclick='removeAction("+i+")' class='actionIcon fa fa-times'></i>" +
                     "</div>"+
                 "</div>";
         }
 
-        actionsDiv.innerHTML = totalDivText;
-        nextActionsDiv.appendChild(actionsDiv);
+        nextActionsDiv.innerHTML = totalDivText;
     };
 
     this.updateCurrentActionsDivs = function() {
-        while (curActionsDiv.firstChild) {
-            curActionsDiv.removeChild(curActionsDiv.firstChild);
-        }
-        let actionsDiv = document.createElement("div");
         let totalDivText = "";
 
-        for(let i = 0; i < actions.current.length; i++) {
+        for(let i = 0; i < actions.current.length; i++) { //definite leak - need to remove listeners and image
             let action = actions.current[i];
             totalDivText +=
                 "<div class='curActionContainer small' onmouseover='view.mouseoverAction("+i+", true)' onmouseleave='view.mouseoverAction("+i+", false)'>" +
@@ -161,13 +177,8 @@ function View() {
                 "</div>";
         }
 
-        actionsDiv.innerHTML = totalDivText;
-        curActionsDiv.appendChild(actionsDiv);
+        curActionsDiv.innerHTML = totalDivText;
 
-        while (document.getElementById("actionTooltipContainer").firstChild) {
-            document.getElementById("actionTooltipContainer").removeChild(document.getElementById("actionTooltipContainer").firstChild);
-        }
-        let tooltipDiv = document.createElement("div");
         totalDivText = "";
 
         for(let i = 0; i < actions.current.length; i++) {
@@ -176,7 +187,7 @@ function View() {
                 "<div id='actionTooltip"+i+"' style='display:none;padding-left:10px;width:90%'>" +
                     "<div style='text-align:center;width:100%'>"+action.name+"</div><br><br>" +
                     "<div class='bold'>Mana Used</div> <div id='action"+i+"ManaUsed'>0</div><br>" +
-                    "<div class='bold'>Remaining</div> <div id='action"+i+"Remaining'></div><br>" +
+                    "<div class='bold'>Remaining</div> <div id='action"+i+"Remaining'></div><br><br>" +
                     "<div id='action"+i+"ExpGain'></div>" +
                     "<div id='action"+i+"HasFailed' style='display:none'>" +
                         "<div class='bold'>Failed Attempts</div> <div id='action"+i+"Failed'>0</div><br>" +
@@ -185,9 +196,7 @@ function View() {
                 "</div>";
         }
 
-        tooltipDiv.style.width = "100%";
-        tooltipDiv.innerHTML = totalDivText;
-        document.getElementById("actionTooltipContainer").appendChild(tooltipDiv);
+        document.getElementById("actionTooltipContainer").innerHTML = totalDivText;
         this.mouseoverAction(0, false);
     };
 
@@ -207,8 +216,7 @@ function View() {
             div.style.width = "100%";
             div.style.backgroundColor = "#6d6d6d";
         }
-
-        document.getElementById("action"+index+"ManaUsed").innerHTML = action.manaUsed+"";
+        document.getElementById("action" + index + "ManaUsed").innerHTML = action.manaUsed + "";
         document.getElementById("action"+index+"Remaining").innerHTML = (timeNeeded - timer)+"";
         let statExpGain = "";
         let expGainDiv = document.getElementById("action"+index+"ExpGain");
@@ -221,7 +229,7 @@ function View() {
                 statExpGain += "<div class='bold'>"+statName+"</div> " + intToString(action["statExp"+statName], 2) + "<br>";
             }
         }
-        document.getElementById("action"+index+"ExpGain").innerHTML = statExpGain;
+        expGainDiv.innerHTML = statExpGain;
     };
 
     this.mouseoverAction = function(index, isShowing) {
@@ -513,6 +521,8 @@ function View() {
                 "<div id='goodTemp"+action.varName+"'>0</div> <i class='fa fa-arrow-left'></i> " +
                 "<div id='good"+action.varName+"'>0</div> <i class='fa fa-arrow-left'></i> " +
                 "<div id='checked"+action.varName+"'>0</div>" +
+                "<input type='checkbox' id='searchToggler"+action.varName+"' style='margin-left:10px;'>" +
+                "<label for='searchToggler"+action.varName+"'> Lootable first</label>"+
                 "<div class='showthis'>" +
                     action.infoText +
                 "</div>" +
@@ -574,7 +584,7 @@ function View() {
         let curProgress = towns[0][action.varName];
         //update previous segments
         let loopCost = action.loopCost(segment);
-        while(curProgress >= loopCost) {
+        while(curProgress >= loopCost && segment < action.segments) {
             document.getElementById("expBar"+segment+action.varName).style.width = "0";
             if(document.getElementById("progress"+segment+action.varName).innerHTML !== loopCost) {
                 document.getElementById("progress"+segment+action.varName).innerHTML = intToStringRound(loopCost);
@@ -587,7 +597,7 @@ function View() {
         }
 
         //update current segments
-        if(document.getElementById("progress"+segment+action.varName).innerHTML !== curProgress) {
+        if(document.getElementById("progress"+segment+action.varName) && document.getElementById("progress"+segment+action.varName).innerHTML !== curProgress) {
             document.getElementById("expBar"+segment+action.varName).style.width = (100-100*curProgress/loopCost)+"%";
             document.getElementById("progress"+segment+action.varName).innerHTML = intToStringRound(curProgress);
             document.getElementById("progressNeeded"+segment+action.varName).innerHTML = intToStringRound(loopCost);
@@ -625,16 +635,16 @@ function View() {
 
     this.updateMultiPart = function(action) {
         document.getElementById("multiPartName"+action.varName).innerHTML = action.getPartName();
-        document.getElementById("completed"+action.varName).innerHTML = " " + towns[curTown]["total"+action.varName];
+        document.getElementById("completed"+action.varName).innerHTML = " " + towns[action.townNum]["total"+action.varName];
         for(let i = 0; i < action.segments; i++) {
             let expBar = document.getElementById("expBar"+i+action.varName);
             if(!expBar) {
                 continue;
             }
-            let mainStat = action.loopStats[(towns[0][action.varName+"LoopCounter"]+i) % action.loopStats.length];
+            let mainStat = action.loopStats[(towns[action.townNum][action.varName+"LoopCounter"]+i) % action.loopStats.length];
             document.getElementById("mainStat"+i+action.varName).innerHTML = mainStat;
             addStatColors(expBar, mainStat);
-            document.getElementById("segmentName"+i+action.varName).innerHTML = action.getSegmentName(towns[0][action.varName+"LoopCounter"]+i);
+            document.getElementById("segmentName"+i+action.varName).innerHTML = action.getSegmentName(towns[action.townNum][action.varName+"LoopCounter"]+i);
         }
     };
 }

@@ -1,3 +1,4 @@
+'use strict';
 function translateClassNames(name) {
     if(name === "Wander") {
         return new Wander();
@@ -75,7 +76,7 @@ function getTravelNum(name) {
     return name === "Start Journey" ? 1 : 0;
 }
 
-townNames = ["Beginnersville", "Forest Path", "Merchantville"];
+let townNames = ["Beginnersville", "Forest Path", "Merchantville"];
 
 
 //Progress actions
@@ -228,7 +229,7 @@ function adjustHerbs() {
 function OldShortcut() {
     this.name = "Old Shortcut";
     this.expMult = 1;
-    this.tooltip = "No one has come down this way in quite some time.<br>Gives some additional herbs.<br>Gives something to talk about with the Hermit. Get 1% reward from Talk to Hermit result per 1% Shortcut Explored.<br>Unlocked at 20% Forest Explored.";
+    this.tooltip = "No one has come down this way in quite some time.<br>Gives some additional herbs.<br>Gives something to talk about with the Hermit. Get 1% reward for Talk to Hermit result per 1% Shortcut Explored.<br>Unlocked at 20% Forest Explored.";
     this.townNum = 1;
 
     this.infoName = "Shortcut Explored";
@@ -390,7 +391,7 @@ function TrainSpd() {
 function GuidedTour() {
     this.name = "Guided Tour";
     this.expMult = 2;
-    this.tooltip = "After what you did, they're glad to help show you around.<br>8x explored % over Wander for equivalent mana cost.<br>Costs 1 reputation.<br>Unlocked at 10% Investigated";
+    this.tooltip = "After what you did, they're glad to help show you around.<br>Gives progress equal to wandering 32 times.<br>Costs 1 reputation.<br>Unlocked at 10% Investigated";
     this.townNum = 0;
 
     this.varName = "Tour";
@@ -416,7 +417,7 @@ function GuidedTour() {
         return towns[0].getLevel("Secrets") >= 10;
     };
     this.finish = function() {
-        towns[0].finishProgress("Wander", 3200, function() {
+        towns[0].finishProgress("Wander", 6400, function() {
             towns[0].totalPots = towns[0].getLevel("Wander") * 5;
             towns[0].totalLocks = towns[0].getLevel("Wander");
         });
@@ -591,7 +592,7 @@ function Haggle() {
 function StartJourney() {
     this.name = "Start Journey";
     this.expMult = 2;
-    this.tooltip = "Follow the trail to end up at the next town. You need to keep moving until you can learn how to shut these loops off.<br>Costs 1 supplies. Finish once to unlock the next area's actions.<br>Unlocks at a combined skill of 35.";
+    this.tooltip = "Follow the trail to end up at the next town. You need to keep moving until you can learn how to shut these loops off.<br>Costs 1 supplies. Finish once to unlock Forest Path's actions, then finish this in order to use Forest Path's actions.<br>Unlocks at a combined skill of 35.";
     this.townNum = 0;
 
     this.varName = "Journey";
@@ -1006,7 +1007,7 @@ function HealTheSick() {
         return ["Diagnose", "Treat", "Inform"][segment % 3];
     };
     this.visible = function() {
-        return getSkillLevel("Magic") >= 3;
+        return towns[0].getLevel("Secrets") >= 20;
     };
     this.unlocked = function() {
         return getSkillLevel("Magic") >= 12;
@@ -1064,7 +1065,7 @@ function FightMonsters() {
         return "A bunch of "+name;
     };
     this.visible = function() {
-        return getSkillLevel("Combat") >= 3;
+        return towns[0].getLevel("Secrets") >= 20;
     };
     this.unlocked = function() {
         return getSkillLevel("Combat") >= 10;

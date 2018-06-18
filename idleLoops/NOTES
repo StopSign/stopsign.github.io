@@ -36,29 +36,29 @@ New Skill
 	
 TODO:
 show mana in previous run
+show mana saved by skills
 Adding actions group if same type
 change isVisible for stats to use data instead
 drag/drop actions
 show mana/gold/resources gain per action in tooltip
 actions fail if they don't do anything useful
 import/export just action list
+draggable action list size
+change tab title when pause
+graphics to show when to-check decreases
+modifier for highest achieved
+hard numbers for wander progress
+custom input numbers for action list
+hover -> focus
+FAQ
+Icon for window tab
 
-Buy supplies, 500 mana, costs 400 gold, required to travel
-Haggle, 250 mana and 1 reputation, reduce supplies cost by 20
+buy glasses - 10 gold
+    wander exp x4 rest of reset
 
-Leave Town, 1k mana, requires supplies, resets wander/met % and reputation, making the relevant skills unable for the new town
 
 town 2 - forest road
 
-    Abandoned Shortcut - progress bar action, gives more herbs and improves rate of chat w/ hermit
-        talk to hermit - progress bar action, improves rate of practical magic, rate of gather herbs
-        practical magic - Req 20 magic, 20% hermit, improves Practical Magic skill
-            Pratical Magic skill -
-                Smash pots and wild mana 1% faster per level.
-                pick locks, short & long quest give 1% more gold per level (rounded down)
-
-
-        learn alchemy - Req 30 magic, 60% hermit, 10 herbs, improves Alchemy skill, improves mage lessons by 1%
         brew potions - Req 35 magic, 10 alchemy skill, 10 herbs, slightly improves magic skill, get one potion, req rep >= 5
     Follow Flower Trail - PBA, more herbs
         Clear thicket - PBA, more wild mana
