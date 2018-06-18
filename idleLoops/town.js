@@ -48,14 +48,21 @@ function Town(index) {
         return curLevelProgress / nextLevelNeeds * 100;
     };
 
+    // finishes actions that have checkable aspects
     this.finishRegular = function(varName, rewardRatio, rewardFunc) {
-        if(this["total"+varName] - this["checked"+varName] < 0) { //error state, negative numbers
+        if(this["total"+varName] - this["checked"+varName] < 0) { //error state, negative numbers.
             this["checked"+varName] = this["total"+varName];
             this["good"+varName] = Math.floor(this["total"+varName] / rewardRatio);
             this["goodTemp"+varName] = this["good"+varName];
             console.log("Error state fixed");
         }
-        if(this["total"+varName] - this["checked"+varName] > 0) {
+
+        // only checks unchecked items 
+        // IF there are unchecked items 
+        // AND the user has not disabled checking unchecked items OR there are no checked items left
+        if (this["total" + varName] - this["checked" + varName] > 0
+            && (this["search" + varName] || this["goodTemp" + varName] <= 0)) {
+
             this["checked"+varName]++;
             if(this["checked"+varName] % rewardRatio === 0) {
                 this["lootFrom"+varName] += rewardFunc();
@@ -83,6 +90,9 @@ function Town(index) {
         }
         if(this["total"+varName] === undefined) {
             this["total"+varName] = 0;
+        }
+        if (this["search"+varName] === undefined) {
+            this["search"+varName] = true;
         }
         if(this.varNames.indexOf(varName) === -1) {
             this.varNames.push(varName);

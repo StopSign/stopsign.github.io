@@ -507,12 +507,15 @@ function View() {
     };
 
     this.createTownInfo = function(action) {
+        let onchangeFunc = "towns["+action.townNum+"].search"+action.varName+"=!this.checked";
         let totalInfoText =
             "<div class='townInfoContainer showthat' id='infoContainer"+action.varName+"'>" +
                 "<div class='bold townLabel'>"+action.infoName+"</div> " +
                 "<div id='goodTemp"+action.varName+"'>0</div> <i class='fa fa-arrow-left'></i> " +
                 "<div id='good"+action.varName+"'>0</div> <i class='fa fa-arrow-left'></i> " +
                 "<div id='checked"+action.varName+"'>0</div>" +
+                "<input onchange='"+onchangeFunc+"' type='checkbox' id='searchToggler"+action.varName+"'>" +
+                "<label for='searchToggler"+action.varName+"'>Ignore unchecked</label>"+
                 "<div class='showthis'>" +
                     action.infoText +
                 "</div>" +
