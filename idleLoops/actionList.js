@@ -6,6 +6,8 @@ function translateClassNames(name) {
         return new SmashPots();
     } else if(name === "Pick Locks") {
         return new PickLocks();
+    } else if(name === "Buy Glasses") {
+        return new BuyGlasses();
     } else if(name === "Sell Gold") {
         return new SellGold();
     } else if(name === "Meet People") {
@@ -26,8 +28,6 @@ function translateClassNames(name) {
         return new WarriorLessons();
     } else if(name === "Mage Lessons") {
         return new MageLessons();
-    } else if(name === "Guided Tour") {
-        return new GuidedTour();
     } else if(name === "Throw Party") {
         return new ThrowParty();
     } else if(name === "Heal The Sick") {
@@ -107,7 +107,7 @@ function Wander() {
         return true;
     };
     this.finish = function() {
-        towns[0].finishProgress(this.varName, 200, function() {
+        towns[0].finishProgress(this.varName, 200 * (glasses ? 4 : 1), function() {
             adjustPots();
             adjustLocks();
         });
@@ -289,6 +289,40 @@ function TalkToHermit() {
 //Basic actions
 //Basic actions have no additional UI
 
+function BuyGlasses() {
+    this.name = "Buy Glasses";
+    this.expMult = 1;
+    this.tooltip = "That's not fair. There was time now. There was all the time I needed.<br>Now you have to get new glasses again.<br>Causes Wander to be 4x as effective for the rest of the loop.<br>Can only have 1 Buy Glasses action.<br>Unlocked at 20% explored";
+    this.townNum = 0;
+
+    this.varName = "Glasses";
+    this.stats = {
+        Cha:.7,
+        Spd:.3
+    };
+    this.allowed = function() {
+        return getNumOnList("Buy Glasses") === 0;
+    };
+    this.canStart = function() {
+        return gold >= 10;
+    };
+    this.cost = function() {
+        addGold(-10);
+    };
+    this.manaCost = function() {
+        return 50;
+    };
+    this.visible = function() {
+        return towns[0].getLevel("Wander") >= 3;
+    };
+    this.unlocked = function() {
+        return towns[0].getLevel("Wander") >= 20 && this.allowed();
+    };
+    this.finish = function() {
+        addGlasses(1);
+    };
+}
+
 function SellGold() {
     this.name = "Sell Gold";
     this.expMult = 1;
@@ -388,42 +422,6 @@ function TrainSpd() {
     };
 }
 
-function GuidedTour() {
-    this.name = "Guided Tour";
-    this.expMult = 2;
-    this.tooltip = "After what you did, they're glad to help show you around.<br>Gives progress equal to wandering 32 times.<br>Costs 1 reputation.<br>Unlocked at 10% Investigated";
-    this.townNum = 0;
-
-    this.varName = "Tour";
-    this.stats = {
-        Spd:.4,
-        Cha:.3,
-        Con:.2,
-        Soul:.1
-    };
-    this.manaCost = function() {
-        return 500;
-    };
-    this.canStart = function() {
-        return reputation >= 1;
-    };
-    this.cost = function() {
-        addReputation(-1);
-    };
-    this.visible = function() {
-        return towns[0].getLevel("Secrets") >= 5;
-    };
-    this.unlocked = function() {
-        return towns[0].getLevel("Secrets") >= 10;
-    };
-    this.finish = function() {
-        towns[0].finishProgress("Wander", 6400, function() {
-            towns[0].totalPots = towns[0].getLevel("Wander") * 5;
-            towns[0].totalLocks = towns[0].getLevel("Wander");
-        });
-    };
-}
-
 function ThrowParty() {
     this.name = "Throw Party";
     this.expMult = 2;
@@ -439,10 +437,10 @@ function ThrowParty() {
         return 1600;
     };
     this.canStart = function() {
-        return reputation >= 3;
+        return reputation >= 2;
     };
     this.cost = function() {
-        addReputation(-3);
+        addReputation(-2);
     };
     this.visible = function() {
         return towns[0].getLevel("Secrets") >= 20;
@@ -602,7 +600,7 @@ function StartJourney() {
         Spd:.3
     };
     this.manaCost = function() {
-        return 2000;
+        return 1000;
     };
     this.canStart = function() {
         return supplies === 1;
@@ -1057,9 +1055,9 @@ function FightMonsters() {
         if(!name) {
             name = ["Speedy Monsters", "Tough Monsters", "Scary Monsters"][Math.floor(towns[0].FightLoopCounter/3+.0000001) % 3]
         }
-        if(segment === 0) {
+        if(segment % 3 === 0) {
             return "A couple "+name;
-        } else if(segment === 1) {
+        } else if(segment % 3 === 1) {
             return "A few "+name;
         }
         return "A bunch of "+name;
@@ -1092,7 +1090,7 @@ function SmallDungeon() {
     };
     this.loopStats = ["Dex", "Con", "Dex", "Cha", "Dex", "Str", "Luck"];
     this.segments = 7;
-    this.completedTooltip = "Each soulstone improves a random stat's exp gain by 10%. Each soulstone reduces the chance you'll get the next one by 10%. Soulstone chance recovers at .0001% per mana.<br><div class='bold'>Chance </div> <div id='soulstoneChance'></div>%<br><div class='bold'>Last Stat</div> <div id='soulstonePrevious'>NA</div>";
+    this.completedTooltip = "Each soulstone improves a random stat's exp gain by (5% * soulstones)^.9. Each soulstone reduces the chance you'll get the next one by 2%. Soulstone chance recovers at .00001% per mana.<br><div class='bold'>Chance </div> <div id='soulstoneChance'></div>%<br><div class='bold'>Last Stat</div> <div id='soulstonePrevious'>NA</div>";
     this.manaCost = function() {
         return 3000;
     };
@@ -1108,7 +1106,7 @@ function SmallDungeon() {
             let statToAdd = statList[Math.floor(Math.random() * statList.length)];
             document.getElementById('soulstonePrevious').innerHTML = statToAdd;
             stats[statToAdd].soulstone = stats[statToAdd].soulstone ? stats[statToAdd].soulstone+1 : 1;
-            soulstoneChance *= .9;
+            soulstoneChance *= .98;
             view.updateSoulstones();
         }
     };

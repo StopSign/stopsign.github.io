@@ -194,12 +194,17 @@ function setAdjustedTicks(action) {
     action.adjustedTicks = Math.ceil(action.manaCost() / statMult);
 }
 
+function calcSoulstoneMult(soulstones) {
+    return Math.pow((1 + soulstones/5), .9);
+}
+
 function addExpFromAction(action) {
     for(let i = 0; i < statList.length; i++) {
         let statName = statList[i];
         if(action.stats[statName]) {
-            let soulstoneBonus = stats[statName].soulstone ? (1 + stats[statName].soulstone/10) : 1;
-            let expToAdd = soulstoneBonus * action.stats[statName] * action.expMult * (action.manaCost() / action.adjustedTicks) * (1+getTalent(statName)/100);
+            let soulstoneBonus = stats[statName].soulstone ? calcSoulstoneMult(stats[statName].soulstone) : 1;
+            let heartstoneBonus = stats[statName].heartstone ? (1 + stats[statName].heartstone/100) : 1;
+            let expToAdd = soulstoneBonus * heartstoneBonus * action.stats[statName] * action.expMult * (action.manaCost() / action.adjustedTicks) * (1+getTalent(statName)/100);
             if(!action["statExp"+statName]) {
                 action["statExp"+statName] = 0;
             }
@@ -207,4 +212,14 @@ function addExpFromAction(action) {
             addExp(statName, expToAdd);
         }
     }
+}
+
+function getNumOnList(actionName) {
+    let count = 0;
+    for(let i = 0; i < actions.next.length; i++) {
+        if(actions.next[i].name === actionName) {
+            count += actions.next[i].loops;
+        }
+    }
+    return count;
 }

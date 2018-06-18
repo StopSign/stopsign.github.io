@@ -9,7 +9,7 @@ function tick() {
     prevState.stats = JSON.parse(JSON.stringify(stats));
     actions.tick();
     if(soulstoneChance < 1) {
-        soulstoneChance += .000001;
+        soulstoneChance += .0000001;
         if(soulstoneChance > 1) {
             soulstoneChance = 1;
         }
@@ -58,6 +58,7 @@ function restart() {
     } else {
         addGold(-gold);
     }
+    addGlasses(-glasses);
     addReputation(-reputation);
     addSupplies(-supplies);
     addHerbs(-herbs);
@@ -89,6 +90,7 @@ function addActionToList(name, townNum, isTravelAction) {
         }
     }
     view.updateNextActions();
+    view.updateLockedHidden();
 }
 
 function addMana(amount) {
@@ -98,6 +100,11 @@ function addMana(amount) {
 function addGold(amount) {
     gold += amount;
     view.updateGold();
+}
+
+function addGlasses(amount) {
+    glasses += amount;
+    view.updateGlasses();
 }
 
 function addReputation(amount) {
@@ -189,8 +196,12 @@ function capAmount(index, townNum) {
 }
 
 function addLoop(index) {
-    actions.next[index].loops += actions.addAmount;
-    view.updateNextActions();
+    let theClass = translateClassNames(actions.next[index].name);
+    if(!theClass.allowed || theClass.allowed()) {
+        actions.next[index].loops += actions.addAmount;
+        view.updateNextActions();
+        view.updateLockedHidden();
+    }
 }
 function removeLoop(index) {
     actions.next[index].loops -= actions.addAmount;
@@ -198,6 +209,7 @@ function removeLoop(index) {
         actions.next[index].loops = 0;
     }
     view.updateNextActions();
+    view.updateLockedHidden();
 }
 function split(index) {
     const toSplit = actions.next[index];
@@ -231,4 +243,5 @@ function removeAction(index) {
 
     actions.next.splice(index, 1);
     view.updateNextActions();
+    view.updateLockedHidden();
 }

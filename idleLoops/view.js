@@ -47,7 +47,7 @@ function View() {
             document.getElementById("stat" + stat + "Talent").innerHTML = getTalent(stat);
             document.getElementById("stat" + stat + "TalentBar").style.width = talentPrc;
 
-            document.getElementById("stat" + stat + "SSBonus").innerHTML = (stats[stat].soulstone ? stats[stat].soulstone : 0) * 10+"%";
+            document.getElementById("stat" + stat + "SSBonus").innerHTML = intToString(stats[stat].soulstone ? calcSoulstoneMult(stats[stat].soulstone)*10 : 0) +"%";
         }
 
         if(statShowing === stat || document.getElementById("stat" + stat + "LevelExp").innerHTML === "") {
@@ -92,6 +92,9 @@ function View() {
     };
     this.updateGold = function() {
         document.getElementById("gold").innerHTML = gold;
+    };
+    this.updateGlasses = function() {
+        document.getElementById("glasses").style.display = glasses ? "inline-block" : "none";
     };
     this.updateReputation = function() {
         document.getElementById("reputation").innerHTML = reputation;
@@ -357,6 +360,7 @@ function View() {
         this.createTownAction(tempObj);
         this.createTownInfo(tempObj);
 
+        this.createTownAction(new BuyGlasses());
         this.createTownAction(new SellGold());
 
         tempObj = new MeetPeople();
@@ -379,7 +383,6 @@ function View() {
         this.createTownAction(tempObj);
         this.createTownInfo(tempObj);
 
-        this.createTownAction(new GuidedTour());
         this.createTownAction(new ThrowParty());
         this.createTownAction(new WarriorLessons());
         this.createTownAction(new MageLessons());

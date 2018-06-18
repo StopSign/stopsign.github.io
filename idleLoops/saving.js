@@ -20,6 +20,7 @@ let prevState = {};
 let shouldRestart = true;
 
 let gold = 0, initialGold = 0;
+let glasses = 0;
 let reputation = 0;
 let supplies = 0;
 let herbs = 0;
@@ -92,8 +93,29 @@ function load() {
     town.expHermit = toLoad.expHermit !== undefined ? toLoad.expHermit : 0;
 
 
-    actions.next = toLoad.nextList !== undefined ? toLoad.nextList : actions.next;
-    loadouts = toLoad.loadouts !== undefined ? toLoad.loadouts : loadouts;
+    actions.next = [];
+    if(toLoad.nextList) {
+        for (let i = 0; i < toLoad.nextList.length; i++) {
+            let action = toLoad.nextList[i];
+            if (action.name !== "Guided Tour") {// && action.name !== "Throw Party") {
+                actions.next.push(action);
+            }
+        }
+    }
+    loadouts = [[],[],[],[],[]];
+    if(toLoad.loadouts) {
+        for (let i = 0; i < toLoad.loadouts.length; i++) {
+            if(!toLoad.loadouts[i]) {
+                continue;
+            }
+            for (let j = 0; j < toLoad.loadouts[i].length; j++) {
+                let action = toLoad.loadouts[i][j];
+                if (action.name !== "Guided Tour") { // && action.name !== "Throw Party") {
+                    loadouts[i].push(action);
+                }
+            }
+        }
+    }
 
     recalcInterval(50);
     pauseGame();
