@@ -111,23 +111,25 @@ function View() {
     this.updateNextActions = function() {
         let count = 0;
         while (nextActionsDiv.firstChild) {
-            while(nextActionsDiv.firstChild.firstChild) {
-                if(document.getElementById("capButton"+count)) {
-                    document.getElementById("capButton"+count).removeAttribute("onclick");
-                }
-                document.getElementById("plusButton"+count).removeAttribute("onclick");
-                document.getElementById("minusButton"+count).removeAttribute("onclick");
-                document.getElementById("splitButton"+count).removeAttribute("onclick");
-                document.getElementById("upButton"+count).removeAttribute("onclick");
-                document.getElementById("downButton"+count).removeAttribute("onclick");
-                document.getElementById("removeButton"+count).removeAttribute("onclick");
-
-                nextActionsDiv.firstChild.removeChild(nextActionsDiv.firstChild.firstChild);
-                count++;
+            if(document.getElementById("capButton"+count)) {
+                document.getElementById("capButton"+count).removeAttribute("onclick");
             }
+            document.getElementById("plusButton"+count).removeAttribute("onclick");
+            document.getElementById("minusButton"+count).removeAttribute("onclick");
+            document.getElementById("splitButton"+count).removeAttribute("onclick");
+            document.getElementById("upButton"+count).removeAttribute("onclick");
+            document.getElementById("downButton"+count).removeAttribute("onclick");
+            document.getElementById("removeButton"+count).removeAttribute("onclick");
+            while(nextActionsDiv.firstChild.firstChild) {
+                if(nextActionsDiv.firstChild.firstChild instanceof HTMLImageElement) {
+                    nextActionsDiv.firstChild.firstChild = null;
+                }
+                nextActionsDiv.firstChild.removeChild(nextActionsDiv.firstChild.firstChild);
+            }
+            count++;
             nextActionsDiv.removeChild(nextActionsDiv.firstChild);
         }
-        let actionsDiv = document.createElement("div");
+        // let actionsDiv = document.createElement("div");
         let totalDivText = "";
 
         for(let i = 0; i < actions.next.length; i++) {
@@ -154,15 +156,14 @@ function View() {
                 "</div>";
         }
 
-        actionsDiv.innerHTML = totalDivText;
-        nextActionsDiv.appendChild(actionsDiv);
+        nextActionsDiv.innerHTML = totalDivText;
     };
 
     this.updateCurrentActionsDivs = function() {
-        while (curActionsDiv.firstChild) {
-            curActionsDiv.removeChild(curActionsDiv.firstChild);
-        }
-        let actionsDiv = document.createElement("div");
+        // while (curActionsDiv.firstChild) {
+        //     curActionsDiv.removeChild(curActionsDiv.firstChild);
+        // }
+        // let actionsDiv = document.createElement("div");
         let totalDivText = "";
 
         for(let i = 0; i < actions.current.length; i++) { //potential leak
@@ -176,14 +177,9 @@ function View() {
                 "</div>";
         }
 
-        actionsDiv.innerHTML = totalDivText;
-        curActionsDiv.appendChild(actionsDiv);
+        // actionsDiv.innerHTML = totalDivText;
+        curActionsDiv.innerHTML = totalDivText;
 
-        let tooltipContainerDiv = document.getElementById("actionTooltipContainer");
-        while (tooltipContainerDiv.firstChild) {
-            tooltipContainerDiv.removeChild(tooltipContainerDiv.firstChild);
-        }
-        let tooltipDiv = document.createElement("div");
         totalDivText = "";
 
         for(let i = 0; i < actions.current.length; i++) { //potential leak
@@ -201,9 +197,7 @@ function View() {
                 "</div>";
         }
 
-        tooltipDiv.style.width = "100%";
-        tooltipDiv.innerHTML = totalDivText;
-        tooltipContainerDiv.appendChild(tooltipDiv);
+        document.getElementById("actionTooltipContainer").innerHTML = totalDivText;
         this.mouseoverAction(0, false);
     };
 

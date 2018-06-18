@@ -751,7 +751,7 @@ function SmashPots() {
         Spd:.6
     };
     this.manaCost = function() {
-        return Math.ceil(50 / (1 + getSkillLevel("Practical")/100));
+        return Math.ceil(1 / (1 + getSkillLevel("Practical")/100));
     };
     this.visible = function() {
         return true;

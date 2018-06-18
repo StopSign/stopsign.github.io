@@ -145,10 +145,10 @@ function Actions() {
             }
         }
         if(this.current.length === 0) {
-            pauseGame();
+            // pauseGame();
         }
         this.adjustTicksNeeded();
-        view.updateMultiPartActions();
+        // view.updateMultiPartActions();
         view.updateNextActions();
     };
 

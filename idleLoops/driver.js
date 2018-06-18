@@ -71,7 +71,7 @@ function restart() {
     }
     actions.restart();
     view.updateCurrentActionsDivs();
-    save();
+    // save();
 }
 
 function addActionToList(name, townNum, isTravelAction) {

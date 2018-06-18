@@ -5,7 +5,7 @@
 //     }
 // };
 
-let timeNeededInitial = 5 * 50;
+let timeNeededInitial = 5 * 50 * 100;
 let timer = timeNeededInitial;
 let timeNeeded = timeNeededInitial;
 let stop = false;
