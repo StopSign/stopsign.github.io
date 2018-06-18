@@ -164,13 +164,9 @@ function View() {
     };
 
     this.updateCurrentActionsDivs = function() {
-        // while (curActionsDiv.firstChild) {
-        //     curActionsDiv.removeChild(curActionsDiv.firstChild);
-        // }
-        // let actionsDiv = document.createElement("div");
         let totalDivText = "";
 
-        for(let i = 0; i < actions.current.length; i++) { //potential leak
+        for(let i = 0; i < actions.current.length; i++) { //definite leak - need to remove listeners and image
             let action = actions.current[i];
             totalDivText +=
                 "<div class='curActionContainer small' onmouseover='view.mouseoverAction("+i+", true)' onmouseleave='view.mouseoverAction("+i+", false)'>" +
@@ -181,12 +177,11 @@ function View() {
                 "</div>";
         }
 
-        // actionsDiv.innerHTML = totalDivText;
         curActionsDiv.innerHTML = totalDivText;
 
         totalDivText = "";
 
-        for(let i = 0; i < actions.current.length; i++) { //potential leak
+        for(let i = 0; i < actions.current.length; i++) {
             let action = actions.current[i];
             totalDivText +=
                 "<div id='actionTooltip"+i+"' style='display:none;padding-left:10px;width:90%'>" +
@@ -693,38 +688,3 @@ function addStatColors(theDiv, stat) {
         theDiv.style.backgroundColor = "#737388";
     }
 }
-
-// let minHeight = 300;
-// let onBottomEdge;
-// let p = document.getElementById("expandableList");
-// let pane = document.getElementById("expandableList");
-// pane.className = 'resizable';
-//
-// p.addEventListener('click', function init() {
-//     p.removeEventListener('click', init, false);
-//     p.className = p.className + ' resizable';
-//     let resizer = document.createElement('div');
-//     resizer.className = 'resizer';
-//     p.appendChild(resizer);
-//     resizer.addEventListener('mousedown', initDrag, false);
-// }, false);
-//
-// let startX, startY, startWidth, startHeight;
-//
-// function initDrag(e) {
-//     startX = e.clientX;
-//     startY = e.clientY;
-//     startWidth = parseInt(document.defaultView.getComputedStyle(p).width, 10);
-//     startHeight = parseInt(document.defaultView.getComputedStyle(p).height, 10);
-//     document.documentElement.addEventListener('mousemove', doDrag, false);
-//     document.documentElement.addEventListener('mouseup', stopDrag, false);
-// }
-//
-// function doDrag(e) {
-//     p.style.width = (startWidth + e.clientX - startX) + 'px';
-//     p.style.height = (startHeight + e.clientY - startY) + 'px';
-// }
-//
-// function stopDrag(e) {
-//     document.documentElement.removeEventListener('mousemove', doDrag, false);    document.documentElement.removeEventListener('mouseup', stopDrag, false);
-// }
