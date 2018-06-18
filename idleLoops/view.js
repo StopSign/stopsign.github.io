@@ -116,15 +116,17 @@ function View() {
             if(document.getElementById("capButton"+count)) {
                 document.getElementById("capButton"+count).removeAttribute("onclick");
             }
-            document.getElementById("plusButton"+count).removeAttribute("onclick");
-            document.getElementById("minusButton"+count).removeAttribute("onclick");
-            document.getElementById("splitButton"+count).removeAttribute("onclick");
+            if(document.getElementById("plusButton"+count)) { //not for journey
+                document.getElementById("plusButton" + count).removeAttribute("onclick");
+                document.getElementById("minusButton" + count).removeAttribute("onclick");
+                document.getElementById("splitButton" + count).removeAttribute("onclick");
+            }
             document.getElementById("upButton"+count).removeAttribute("onclick");
             document.getElementById("downButton"+count).removeAttribute("onclick");
             document.getElementById("removeButton"+count).removeAttribute("onclick");
             while(nextActionsDiv.firstChild.firstChild) {
                 if(nextActionsDiv.firstChild.firstChild instanceof HTMLImageElement) {
-                    nextActionsDiv.firstChild.firstChild = null;
+                    nextActionsDiv.firstChild.firstChild.src = '';
                 }
                 nextActionsDiv.firstChild.removeChild(nextActionsDiv.firstChild.firstChild);
             }
@@ -518,15 +520,14 @@ function View() {
     };
 
     this.createTownInfo = function(action) {
-        let onchangeFunc = "towns["+action.townNum+"].search"+action.varName+"=!this.checked";
         let totalInfoText =
             "<div class='townInfoContainer showthat' id='infoContainer"+action.varName+"'>" +
                 "<div class='bold townLabel'>"+action.infoName+"</div> " +
                 "<div id='goodTemp"+action.varName+"'>0</div> <i class='fa fa-arrow-left'></i> " +
                 "<div id='good"+action.varName+"'>0</div> <i class='fa fa-arrow-left'></i> " +
                 "<div id='checked"+action.varName+"'>0</div>" +
-                "<input onchange='"+onchangeFunc+"' type='checkbox' id='searchToggler"+action.varName+"'>" +
-                "<label for='searchToggler"+action.varName+"'>Ignore unchecked</label>"+
+                "<input type='checkbox' id='searchToggler"+action.varName+"' style='margin-left:10px;'>" +
+                "<label for='searchToggler"+action.varName+"'> Lootable first</label>"+
                 "<div class='showthis'>" +
                     action.infoText +
                 "</div>" +

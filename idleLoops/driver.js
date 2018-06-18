@@ -28,8 +28,8 @@ function tick() {
 }
 
 function recalcInterval(newSpeed) {
-    // doWork.postMessage({stop:true});
-    // doWork.postMessage({start:true,ms:(1000 / newSpeed)});
+    doWork.postMessage({stop:true});
+    doWork.postMessage({start:true,ms:(1000 / newSpeed)});
 }
 
 function pauseGame() {
@@ -174,7 +174,7 @@ function adjustAll() {
     adjustHunt();
 }
 
-capAmount = function(index, townNum) {
+function capAmount(index, townNum) {
     let varName = "good"+translateClassNames(actions.next[index].name).varName;
     let alreadyExisting = 0;
     for(let i = 0; i < actions.next.length; i++) {
@@ -186,25 +186,26 @@ capAmount = function(index, townNum) {
     let newLoops = towns[townNum][varName] - alreadyExisting;
     actions.next[index].loops = newLoops < 0 ? 0 : newLoops;
     view.updateNextActions();
-};
-addLoop = function(index) {
+}
+
+function addLoop(index) {
     actions.next[index].loops += actions.addAmount;
     view.updateNextActions();
-};
-removeLoop = function(index) {
+}
+function removeLoop(index) {
     actions.next[index].loops -= actions.addAmount;
     if(actions.next[index].loops < 0) {
         actions.next[index].loops = 0;
     }
     view.updateNextActions();
-};
-split = function(index) {
+}
+function split(index) {
     const toSplit = actions.next[index];
     actions.addAction(toSplit.name, Math.ceil(toSplit.loops/2), index);
     toSplit.loops = Math.floor(toSplit.loops/2);
     view.updateNextActions();
-};
-moveUp = function(index) {
+}
+function moveUp(index) {
     if(index <= 0) {
         return;
     }
@@ -212,8 +213,8 @@ moveUp = function(index) {
     actions.next[index-1] = actions.next[index];
     actions.next[index] = temp;
     view.updateNextActions();
-};
-moveDown = function(index) {
+}
+function moveDown(index) {
     if(index >= actions.next.length - 1) {
         return;
     }
@@ -221,8 +222,8 @@ moveDown = function(index) {
     actions.next[index+1] = actions.next[index];
     actions.next[index] = temp;
     view.updateNextActions();
-};
-removeAction = function(index) {
+}
+function removeAction(index) {
     let travelNum = getTravelNum(actions.next[index].name);
     if(travelNum) {
         actionTownNum = travelNum - 1;
@@ -230,4 +231,4 @@ removeAction = function(index) {
 
     actions.next.splice(index, 1);
     view.updateNextActions();
-};
+}

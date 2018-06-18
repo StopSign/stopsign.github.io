@@ -1,11 +1,11 @@
-// let doWork = new Worker('interval.js');
-// doWork.onmessage = function (event) {
-//     if (event.data === 'interval.start') {
-//         tick();
-//     }
-// };
+let doWork = new Worker('interval.js');
+doWork.onmessage = function (event) {
+    if (event.data === 'interval.start') {
+        tick();
+    }
+};
 
-let timeNeededInitial = 5 * 50 * 100;
+let timeNeededInitial = 5 * 50;
 let timer = timeNeededInitial;
 let timeNeeded = timeNeededInitial;
 let stop = false;
@@ -186,4 +186,4 @@ function importSave() {
 
 load();
 
-setInterval(tick, 20);
+// setInterval(tick, 20);

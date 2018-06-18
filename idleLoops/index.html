@@ -19,15 +19,18 @@
     <div style="width:100%;height:10px;background:white;text-align:center;position:relative;">
         <div id="timeBar" style="height:100%;width:20%;background-color:#8293ff;display:block;margin:auto;"></div>
     </div>
-    <div style="float:left;height:30px;margin-right:5px;" class="showthat">
+    <div style="float:left;height:30px;margin-left:10px;" class="showthatH">
         Changelog
-        <div class="showthis">
+        <div class="showthisH">
             <div class="showthat2">
                 Version .67
                 <div class="showthis2">
                     * Added FAQ<br>
                     * Doubled effectiveness of Guided Tour<br>
-                    *
+                    * Fixed majority of memory leaks (not all)<br>
+                    * Made Heal/Fight requirements visible with training unlock<br>
+                    * Lengthened action list div<br>
+                    * Changed some wording of descriptions for clarity
                 </div>
             </div><br>
             <div class="showthat2">
@@ -104,9 +107,9 @@
             </div>
         </div>
     </div>
-    <div style="float:left;height:30px" class="showthat">
-        | Saving
-        <div class="showthis">
+    <div style="float:left;height:30px;margin-left:10px;" class="showthatH">
+        Saving
+        <div class="showthisH">
             <div class="button" onclick="save()">Save Manually</div><br>
             <input id="exportImport"><label for="exportImport">Export/Import</label><br>
             <div class="button" onclick="exportSave()">Export</div><br>
@@ -117,13 +120,13 @@
             If you reaaallly want to edit your save file, <div class="showthat2">hover me<div class="showthis2">In the console, use decode("pasted savefile"), edit, then encode('pasted savefile'), then import it<br>This is mainly for fixing broken savefiles - don't be a cheater.</div></div>
         </div>
     </div>
-    <div style="float:left;height:30px" class="showthat">
-        | FAQ
-        <div class="showthis">
+    <div style="float:left;height:30px;margin-left:10px;" class="showthatH">
+        FAQ
+        <div class="showthisH">
             Q: What do stats do?<br>
             A: Hover over "Stats" for how they work. What stats are important depend on what actions you need that uses them.<br><br>
             Q: Short runs seem better<br>
-            A: They are, for the early game. I plan to adjust balance to help out with that.<br><br>
+            A: They are, for the early game. As your runs get longer and you accrue talent and soulstones they become more useful.<br><br>
             Q: What should my goal be?<br>
             A: Build up mana mostly via Wander and try to get to Combat Training for Fight Monster<br>
         </div>
@@ -373,7 +376,7 @@
                 Restarts automatically upon no actions left.<br>
             </div>
         </div><br>
-        <div id="expandableList" style="height:300px;cursor:s-resize;width:100%;">
+        <div id="expandableList">
             <div style="width:35%;height:100%;background-color:#c2e6cc;text-align:center;vertical-align:top;position:relative;">
                 <div id="curActionsList" style="margin-top:10px;text-align:left;max-height:270px;overflow:auto;"></div>
                 <div class="showthat" style="position:absolute;bottom:0;left:0;width:100%;">
@@ -472,14 +475,14 @@
 <script src="actionList.js?2"></script>
 <script src="town.js?2"></script>
 <script src="saving.js?2"></script>
-<!--<script>-->
-    <!--(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){-->
-        <!--(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),-->
-        <!--m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)-->
-    <!--})(window,document,'script','//www.google-analytics.com/analytics.js','ga');-->
+<script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-    <!--ga('create', 'UA-60978932-1', 'auto');-->
-    <!--ga('send', 'pageview');-->
+    ga('create', 'UA-60978932-1', 'auto');
+    ga('send', 'pageview');
 
-<!--</script>-->
+</script>
 </html>

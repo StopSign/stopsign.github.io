@@ -16,11 +16,13 @@ body {
     background-color: #e4ece5;
     cursor:default;
 }
-
+.showthatH:hover .showthisH {
+    display:block;
+}
 .showthat:hover .showthis, .showthat2:hover .showthis2 {
     display:block;
 }
-.showthis, .showthis2 {
+.showthis, .showthis2, .showthisH {
     display:none;
     position:absolute;
     background-color: #c0e4c7;
@@ -306,10 +308,9 @@ input {
 
 #expandableList {
     position:relative;
-    height:300px;
-    cursor:s-resize;
+    height:400px;
     width:100%;
-    border-bottom:2px solid purple;
+    /*border-bottom:2px solid purple;*/
 }
 
 .resizable {

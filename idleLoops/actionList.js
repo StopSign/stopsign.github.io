@@ -752,7 +752,7 @@ function SmashPots() {
         Spd:.6
     };
     this.manaCost = function() {
-        return Math.ceil(1 / (1 + getSkillLevel("Practical")/100));
+        return Math.ceil(50 / (1 + getSkillLevel("Practical")/100));
     };
     this.visible = function() {
         return true;
@@ -1007,7 +1007,7 @@ function HealTheSick() {
         return ["Diagnose", "Treat", "Inform"][segment % 3];
     };
     this.visible = function() {
-        return getSkillLevel("Magic") >= 1;
+        return towns[0].getLevel("Secrets") >= 20;
     };
     this.unlocked = function() {
         return getSkillLevel("Magic") >= 12;
@@ -1065,7 +1065,7 @@ function FightMonsters() {
         return "A bunch of "+name;
     };
     this.visible = function() {
-        return getSkillLevel("Combat") >= 1;
+        return towns[0].getLevel("Secrets") >= 20;
     };
     this.unlocked = function() {
         return getSkillLevel("Combat") >= 10;
