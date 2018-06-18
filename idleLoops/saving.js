@@ -1,4 +1,3 @@
-'use strict';
 // let doWork = new Worker('interval.js');
 // doWork.onmessage = function (event) {
 //     if (event.data === 'interval.start') {
@@ -6,7 +5,7 @@
 //     }
 // };
 
-let timeNeededInitial = 5 * 50;
+let timeNeededInitial = 5 * 50 * 100;
 let timer = timeNeededInitial;
 let timeNeeded = timeNeededInitial;
 let stop = false;
@@ -96,7 +95,7 @@ function load() {
     actions.next = toLoad.nextList !== undefined ? toLoad.nextList : actions.next;
     loadouts = toLoad.loadouts !== undefined ? toLoad.loadouts : loadouts;
 
-    // recalcInterval(50);
+    recalcInterval(50);
     pauseGame();
     view.initalize();
 
@@ -178,6 +177,7 @@ function exportSave() {
 
 function importSave() {
     window.localStorage.idleLoops1 = decode(document.getElementById("exportImport").value);
+    // console.log(window.localStorage.idleLoops1);
     actions.next = [];
     actions.current = [];
     load();
@@ -186,4 +186,4 @@ function importSave() {
 
 load();
 
-setInterval(tick, 10);
+setInterval(tick, 20);
