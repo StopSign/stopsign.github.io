@@ -1,3 +1,4 @@
+'use strict';
 function Town(index) {
     this.index = index;
     this.varNames = [];
@@ -61,7 +62,7 @@ function Town(index) {
         // IF there are unchecked items 
         // AND the user has not disabled checking unchecked items OR there are no checked items left
         if (this["total" + varName] - this["checked" + varName] > 0
-            && (this["search" + varName] || this["goodTemp" + varName] <= 0)) {
+            && ((document.getElementById("searchToggler"+varName) && !document.getElementById("searchToggler"+varName).checked) || this["goodTemp" + varName] <= 0)) {
 
             this["checked"+varName]++;
             if(this["checked"+varName] % rewardRatio === 0) {
@@ -90,9 +91,6 @@ function Town(index) {
         }
         if(this["total"+varName] === undefined) {
             this["total"+varName] = 0;
-        }
-        if (this["search"+varName] === undefined) {
-            this["search"+varName] = true;
         }
         if(this.varNames.indexOf(varName) === -1) {
             this.varNames.push(varName);

@@ -20,6 +20,7 @@ let prevState = {};
 let shouldRestart = true;
 
 let gold = 0, initialGold = 0;
+let glasses = 0;
 let reputation = 0;
 let supplies = 0;
 let herbs = 0;
@@ -76,11 +77,12 @@ function load() {
     maxTown = toLoad.maxTown !== undefined ? toLoad.maxTown : 0;
     actionTownNum = toLoad.actionTownNum !== undefined ? toLoad.actionTownNum : 0;
 
+    let expLimit = 505000;
     towns[0] = new Town(0);
     let town = towns[0];
-    town.expWander = toLoad.expWander !== undefined ? toLoad.expWander : 0;
-    town.expMet = toLoad.expMet !== undefined ? toLoad.expMet : 0;
-    town.expSecrets = toLoad.expSecrets !== undefined ? toLoad.expSecrets : 0;
+    town.expWander = toLoad.expWander !== undefined ? (toLoad.expWander > expLimit ? expLimit : toLoad.expWander) : 0;
+    town.expMet = toLoad.expMet !== undefined ? (toLoad.expMet > expLimit ? expLimit : toLoad.expMet) : 0;
+    town.expSecrets = toLoad.expSecrets !== undefined ? (toLoad.expSecrets > expLimit ? expLimit : toLoad.expSecrets): 0;
     town.totalHeal = toLoad.totalHeal !== undefined ? toLoad.totalHeal : 0;
     town.totalFight = toLoad.totalFight !== undefined ? toLoad.totalFight : 0;
     town.totalSDungeon = toLoad.totalSDungeon !== undefined ? toLoad.totalSDungeon : 0;
@@ -92,8 +94,37 @@ function load() {
     town.expHermit = toLoad.expHermit !== undefined ? toLoad.expHermit : 0;
 
 
-    actions.next = toLoad.nextList !== undefined ? toLoad.nextList : actions.next;
-    loadouts = toLoad.loadouts !== undefined ? toLoad.loadouts : loadouts;
+    actions.next = [];
+    if(toLoad.nextList) {
+        for (let i = 0; i < toLoad.nextList.length; i++) {
+            let action = toLoad.nextList[i];
+            if (action.name === "Guided Tour") {// && action.name !== "Throw Party") {
+                continue;
+            }
+            if(action.name === "Sell Gold") {
+                action.name = "Buy Mana";
+            }
+            actions.next.push(action);
+        }
+    }
+    loadouts = [[],[],[],[],[]];
+    if(toLoad.loadouts) {
+        for (let i = 0; i < toLoad.loadouts.length; i++) {
+            if(!toLoad.loadouts[i]) {
+                continue;
+            }
+            for (let j = 0; j < toLoad.loadouts[i].length; j++) {
+                let action = toLoad.loadouts[i][j];
+                if (action.name === "Guided Tour") { // && action.name !== "Throw Party") {
+                    continue;
+                }
+                if(action.name === "Sell Gold") {
+                    action.name = "Buy Mana";
+                }
+                loadouts[i].push(action);
+            }
+        }
+    }
 
     recalcInterval(50);
     pauseGame();
@@ -124,6 +155,7 @@ function load() {
     view.updateNextActions();
     view.updateMultiPartActions();
     view.update();
+
 }
 
 function save() {
@@ -176,7 +208,7 @@ function exportSave() {
 
 function importSave() {
     window.localStorage.idleLoops1 = decode(document.getElementById("exportImport").value);
-    console.log(window.localStorage.idleLoops1);
+    // console.log(window.localStorage.idleLoops1);
     actions.next = [];
     actions.current = [];
     load();
@@ -184,3 +216,5 @@ function importSave() {
 }
 
 load();
+
+// setInterval(tick, 20);
