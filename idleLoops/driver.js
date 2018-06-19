@@ -34,6 +34,7 @@ function recalcInterval(newSpeed) {
 
 function pauseGame() {
     stop = !stop;
+    document.title = "Idle Loops *PAUSED*";
     document.getElementById("pausePlay").innerHTML = stop ? "Play" : "Pause";
     if(!stop && (shouldRestart || timer >= timeNeeded)) {
         restart();
@@ -43,6 +44,10 @@ function pauseGame() {
 function prepareRestart() {
     if(document.getElementById("pauseBeforeRestart").checked) {
         pauseGame();
+        if (document.getElementById("audioCueToggle").checked) {
+            beep(250);
+            setTimeout(function () {beep(250)},500)
+        }
     } else {
         restart();
     }
@@ -52,6 +57,7 @@ function restart() {
     shouldRestart = false;
     timer = 0;
     timeNeeded = timeNeededInitial;
+    document.title = "Idle Loops";
     if(initialGold) { //debugging only
         gold = initialGold;
         addGold(0);
