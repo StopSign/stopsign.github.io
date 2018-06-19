@@ -195,7 +195,7 @@ function setAdjustedTicks(action) {
 }
 
 function calcSoulstoneMult(soulstones) {
-    return 1+Math.pow(soulstones, .9)/20;
+    return 1+Math.pow(soulstones, .8)/10;
 }
 
 function addExpFromAction(action) {
