@@ -794,7 +794,7 @@ function PickLocks() {
         towns[0].finishRegular(this.varName, 10, function() {
             let practical = getSkillLevel("Practical");
             practical = practical <= 200 ? practical : 200;
-            let goldGain = Math.floor(10 * (1 + practical));
+            let goldGain = Math.floor(10 * (1 + practical/100));
             addGold(goldGain);
             return goldGain;
         })
