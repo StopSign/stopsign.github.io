@@ -220,7 +220,7 @@ function View() {
     this.updateCurrentActionBarRequests = Array(50).fill(false);
     this.updateCurrentActionBarRequest = function f(index) {
         this.updateCurrentActionBarRequests[index] = true;
-    }
+    };
     
     this.updateCurrentActionBar = function(index) {
         const action = actions.current[index];
@@ -290,7 +290,7 @@ function View() {
             let action = this.totalActionList[i];
             const actionDiv = document.getElementById("container"+action.varName);
             const infoDiv = document.getElementById("infoContainer"+action.varName);
-            if(!action.unlocked()) {
+            if(!action.unlocked() || (action.allowed && getNumOnList(action.name) >= action.allowed())) {
                 addClassToDiv(actionDiv, "locked");
                 if(infoDiv) {
                     addClassToDiv(infoDiv, "hidden");
@@ -462,13 +462,14 @@ function View() {
         this.createTravelAction(new ContinueOn());
 
         while (actionOptionsTown[2].firstChild) {
-            actionOptionsTown[2].removeChild(actionOptionsTown[1].firstChild);
+            actionOptionsTown[2].removeChild(actionOptionsTown[2].firstChild);
         }
         while(townInfos[2].firstChild) {
             townInfos[2].removeChild(townInfos[1].firstChild);
         }
 
         this.createTownAction(new PurchaseMana());
+        this.createTownAction(new SellPotions());
 
     };
 
@@ -688,7 +689,7 @@ const curActionsDiv = document.getElementById("curActionsList");
 const nextActionsDiv = document.getElementById("nextActionsList");
 const actionOptionsTown = [];
 const townInfos = [];
-for(let i = 0; i < 2; i++) {
+for(let i = 0; i < 3; i++) {
     actionOptionsTown[i] = document.getElementById("actionOptionsTown"+i);
     townInfos[i] = document.getElementById("townInfo"+i);
 }

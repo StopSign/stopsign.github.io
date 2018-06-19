@@ -102,7 +102,7 @@ function addActionToList(name, townNum, isTravelAction) {
     for(let i = 0; i < towns[townNum].totalActionList.length; i++) {
         let action = towns[townNum].totalActionList[i];
         if(action.name === name) {
-            if(action.visible() && action.unlocked()) {
+            if(action.visible() && action.unlocked() && (!action.allowed || getNumOnList(action.name) < action.allowed())) {
                 let addAmount = actions.addAmount;
                 if(action.allowed) {
                     let numMax = action.allowed();

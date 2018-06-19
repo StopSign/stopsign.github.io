@@ -80,7 +80,7 @@ function hasCap(name) {
     return (name === "Smash Pots" || name === "Pick Locks" || name === "Short Quest" || name === "Long Quest" || name === "Gather Herbs" || name === "Wild Mana" || name === "Hunt");
 }
 function getTravelNum(name) {
-    return name === "Start Journey" ? 1 : 0;
+    return (name === "Start Journey" || name === "Continue On") ? 1 : 0;
 }
 
 let townNames = ["Beginnersville", "Forest Path", "Merchantville"];
@@ -323,7 +323,7 @@ function BuyGlasses() {
         return towns[0].getLevel("Wander") >= 3;
     };
     this.unlocked = function() {
-        return towns[0].getLevel("Wander") >= 20 && getNumOnList(this.name) < this.allowed();
+        return towns[0].getLevel("Wander") >= 20;
     };
     this.finish = function() {
         addGlasses(1);
@@ -606,6 +606,9 @@ function StartJourney() {
         Per:.3,
         Spd:.3
     };
+    this.allowed = function() {
+        return 1;
+    };
     this.manaCost = function() {
         return 1000;
     };
@@ -687,8 +690,8 @@ function LearnAlchemy() {
 
     this.varName = "trAlchemy";
     this.stats = {
-        Per:.1,
         Con:.3,
+        Per:.1,
         Int:.6
     };
     this.canStart = function() {
@@ -713,16 +716,22 @@ function LearnAlchemy() {
 }
 
 function BrewPotions() {
-    this.name = "Learn Alchemy";
+    this.name = "Brew Potions";
     this.expMult = 1;
     this.tooltip = "Bubbles and Flasks. Potions and Magic.<br>Creates a potion from 10 herbs to sell at the next town.<br>Unlocked with 10 Alchemy.";
     this.townNum = 1;
 
     this.varName = "Potions";
     this.stats = {
-        Per:.1,
-        Con:.3,
-        Int:.6
+        Dex:.3,
+        Int:.6,
+        Luck:.1,
+    };
+    this.canStart = function() {
+        return herbs >= 10;
+    };
+    this.cost = function() {
+        addHerbs(-10);
     };
     this.manaCost = function() {
         return Math.ceil(4000);
@@ -741,29 +750,32 @@ function BrewPotions() {
 }
 
 function ContinueOn() {
-        this.name = "Continue On";
-        this.expMult = 2;
-        this.tooltip = "Follow the trail to end up at the next town. You need to keep moving until you can learn how to shut these loops off.<br>Costs 1 supplies. Finish once to unlock Forest Path's actions, then finish this in order to use Forest Path's actions.<br>Unlocks at a combined skill of 35.";
-        this.townNum = 1;
+    this.name = "Continue On";
+    this.expMult = 2;
+    this.tooltip = "Keep walking to the next town, Merchanton.<br>Mana cost reduced by 4% per Old Shortcut";
+    this.townNum = 1;
 
-        this.varName = "Continue";
-        this.stats = {
-            Con:.4,
-            Per:.2,
-            Spd:.4
-        };
-        this.manaCost = function() {
-            return 2000;
-        };
-        this.visible = function() {
-            return true;
-        };
-        this.unlocked = function() {
-            return true;
-        };
-        this.finish = function() {
-            unlockTown(2);
-        };
+    this.varName = "Continue";
+    this.stats = {
+        Con:.4,
+        Per:.2,
+        Spd:.4
+    };
+    this.allowed = function() {
+        return 1;
+    };
+    this.manaCost = function() {
+        return Math.ceil(8000 / (1 + towns[1].getLevel("Shortcut")/25));
+    };
+    this.visible = function() {
+        return true;
+    };
+    this.unlocked = function() {
+        return true;
+    };
+    this.finish = function() {
+        unlockTown(2);
+    };
 }
 
 function PurchaseMana() {

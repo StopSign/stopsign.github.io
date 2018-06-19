@@ -83,7 +83,7 @@ function Actions() {
         if(!curAction) {
             return curAction;
         }
-        if(getTravelNum(curAction.name) && curAction.canStart()) {
+        if(getTravelNum(curAction.name) && (!curAction.canStart || curAction.canStart())) {
             return curAction;
         }
         if((curAction.canStart && !curAction.canStart()) || curAction.townNum !== curTown) {
