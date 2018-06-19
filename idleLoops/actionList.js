@@ -292,7 +292,7 @@ function TalkToHermit() {
 function BuyGlasses() {
     this.name = "Buy Glasses";
     this.expMult = 1;
-    this.tooltip = "That's not fair. There was time now. There was all the time I needed.<br>Now you have to get new glasses again.<br>Causes Wander to be 4x as effective for the rest of the loop.<br>Can only have 1 Buy Glasses action.<br>Unlocked at 20% explored";
+    this.tooltip = "That's not fair. There was time now. There was all the time I needed.<br>Now you have to get new glasses again for 10 gold!<br>Causes Wander to be 4x as effective for the rest of the loop.<br>Can only have 1 Buy Glasses action.<br>Unlocked at 20% explored";
     this.townNum = 0;
 
     this.varName = "Glasses";
@@ -425,7 +425,7 @@ function TrainSpd() {
 function ThrowParty() {
     this.name = "Throw Party";
     this.expMult = 2;
-    this.tooltip = "Take a break and socialize.<br>8x people met % over Meet People for equivalent mana cost.<br>Costs 3 reputation.<br>Unlocked at 30% Investigated";
+    this.tooltip = "Take a break and socialize.<br>8x people met % over Meet People for equivalent mana cost.<br>Costs 2 reputation.<br>Unlocked at 30% Investigated";
     this.townNum = 0;
 
     this.varName = "Party";
@@ -1083,14 +1083,15 @@ function SmallDungeon() {
 
     this.varName = "SDungeon";
     this.stats = {
-        Dex:.5,
-        Con:.3,
         Str:.1,
+        Dex:.4,
+        Con:.3,
+        Cha:.1,
         Luck:.1
     };
     this.loopStats = ["Dex", "Con", "Dex", "Cha", "Dex", "Str", "Luck"];
     this.segments = 7;
-    this.completedTooltip = "Each soulstone improves a random stat's exp gain by (5% * soulstones)^.9. Each soulstone reduces the chance you'll get the next one by 2%. Soulstone chance recovers at .00001% per mana.<br><div class='bold'>Chance </div> <div id='soulstoneChance'></div>%<br><div class='bold'>Last Stat</div> <div id='soulstonePrevious'>NA</div>";
+    this.completedTooltip = "Each soulstone improves a random stat's exp gain by (1+(soulstones)^.9/20). Each soulstone reduces the chance you'll get the next one by 2%. Soulstone chance recovers at .00001% per mana.<br><div class='bold'>Chance </div> <div id='soulstoneChance'></div>%<br><div class='bold'>Last Stat</div> <div id='soulstonePrevious'>NA</div>";
     this.manaCost = function() {
         return 3000;
     };

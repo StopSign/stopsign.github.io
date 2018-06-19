@@ -25,6 +25,15 @@
         Changelog
         <div class="showthisH">
             <div class="showthat2">
+                Version .69
+                <div class="showthis2">
+                    * Nerfed the soulstone nerf<br>
+                    * Cleared additional purple bars on exp<br>
+                    * Corrected glasses/throw party tooltips<br>
+                    * Actually nerfed skill growth - it's cheaper than before for level 2 - 23, and about 4x harder at level 100
+                </div>
+            </div><br>
+            <div class="showthat2">
                 Version .68
                 <div class="showthis2">
                     * Added tab icon<br>
@@ -225,7 +234,7 @@
                     Train your body.<br>
                     <div class="medium bold">Level</div> <div id="statStrLevelExp"></div>/<div id="statStrLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="statStrLevelProgress"></div>%)</div><br>
                     <div class="medium bold">Talent</div> <div id="statStrTalentExp"></div>/<div id="statStrTalentExpNeeded"></div> <div class="statTooltipPerc">(<div id="statStrTalentProgress"></div>%)</div><br>
-                    <div class="medium bold">Soulstone Bonus</div> <div id="statStrSSBonus"></div>
+                    <div class="medium bold">Soulstone Mult</div> x<div id="statStrSSBonus"></div>
                 </div>
             </div>
             <div class="statContainer showthat" onmouseover="view.showStat('Dex')">
@@ -238,7 +247,7 @@
                     Know your body.<br>
                     <div class="medium bold">Level</div> <div id="statDexLevelExp"></div>/<div id="statDexLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="statDexLevelProgress"></div>%)</div><br>
                     <div class="medium bold">Talent</div> <div id="statDexTalentExp"></div>/<div id="statDexTalentExpNeeded"></div> <div class="statTooltipPerc">(<div id="statDexTalentProgress"></div>%)</div><br>
-                    <div class="medium bold">Soulstone Bonus</div> <div id="statDexSSBonus"></div>
+                    <div class="medium bold">Soulstone Mult</div> x<div id="statDexSSBonus"></div>
                 </div>
             </div>
             <div class="statContainer showthat" onmouseover="view.showStat('Con')">
@@ -251,7 +260,7 @@
                     Just a little longer. Just a little more.<br>
                     <div class="medium bold">Level</div> <div id="statConLevelExp"></div>/<div id="statConLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="statConLevelProgress"></div>%)</div><br>
                     <div class="medium bold">Talent</div> <div id="statConTalentExp"></div>/<div id="statConTalentExpNeeded"></div> <div class="statTooltipPerc">(<div id="statConTalentProgress"></div>%)</div><br>
-                    <div class="medium bold">Soulstone Bonus</div> <div id="statConSSBonus"></div>
+                    <div class="medium bold">Soulstone Mult</div> x<div id="statConSSBonus"></div>
                 </div>
             </div>
             <div class="statContainer showthat" onmouseover="view.showStat('Per')">
@@ -264,7 +273,7 @@
                     Look a little closer ...<br>
                     <div class="medium bold">Level</div> <div id="statPerLevelExp"></div>/<div id="statPerLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="statPerLevelProgress"></div>%)</div><br>
                     <div class="medium bold">Talent</div> <div id="statPerTalentExp"></div>/<div id="statPerTalentExpNeeded"></div> <div class="statTooltipPerc">(<div id="statPerTalentProgress"></div>%)</div><br>
-                    <div class="medium bold">Soulstone Bonus</div> <div id="statPerSSBonus"></div>
+                    <div class="medium bold">Soulstone Mult</div> x<div id="statPerSSBonus"></div>
                 </div>
             </div>
             <div class="statContainer showthat" onmouseover="view.showStat('Int')">
@@ -277,7 +286,7 @@
                     Learning to learn.<br>
                     <div class="medium bold">Level</div> <div id="statIntLevelExp"></div>/<div id="statIntLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="statIntLevelProgress"></div>%)</div><br>
                     <div class="medium bold">Talent</div> <div id="statIntTalentExp"></div>/<div id="statIntTalentExpNeeded"></div> <div class="statTooltipPerc">(<div id="statIntTalentProgress"></div>%)</div><br>
-                    <div class="medium bold">Soulstone Bonus</div> <div id="statIntSSBonus"></div>
+                    <div class="medium bold">Soulstone Mult</div> x<div id="statIntSSBonus"></div>
                 </div>
             </div>
             <div class="statContainer showthat" onmouseover="view.showStat('Cha')">
@@ -290,7 +299,7 @@
                     Conversation is a battle.<br>
                     <div class="medium bold">Level</div> <div id="statChaLevelExp"></div>/<div id="statChaLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="statChaLevelProgress"></div>%)</div><br>
                     <div class="medium bold">Talent</div> <div id="statChaTalentExp"></div>/<div id="statChaTalentExpNeeded"></div> <div class="statTooltipPerc">(<div id="statChaTalentProgress"></div>%)</div><br>
-                    <div class="medium bold">Soulstone Bonus</div> <div id="statChaSSBonus"></div>
+                    <div class="medium bold">Soulstone Mult</div> x<div id="statChaSSBonus"></div>
                 </div>
             </div>
             <div class="statContainer showthat" onmouseover="view.showStat('Spd')">
@@ -303,7 +312,7 @@
                     Gotta go fast.<br>
                     <div class="medium bold">Level</div> <div id="statSpdLevelExp"></div>/<div id="statSpdLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="statSpdLevelProgress"></div>%)</div><br>
                     <div class="medium bold">Talent</div> <div id="statSpdTalentExp"></div>/<div id="statSpdTalentExpNeeded"></div> <div class="statTooltipPerc">(<div id="statSpdTalentProgress"></div>%)</div><br>
-                    <div class="medium bold">Soulstone Bonus</div> <div id="statSpdSSBonus"></div>
+                    <div class="medium bold">Soulstone Mult</div> x<div id="statSpdSSBonus"></div>
                 </div>
             </div>
             <div class="statContainer showthat" onmouseover="view.showStat('Luck')">
@@ -316,7 +325,7 @@
                     Opportunity favors the fortunate.<br>
                     <div class="medium bold">Level</div> <div id="statLuckLevelExp"></div>/<div id="statLuckLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="statLuckLevelProgress"></div>%)</div><br>
                     <div class="medium bold">Talent</div> <div id="statLuckTalentExp"></div>/<div id="statLuckTalentExpNeeded"></div> <div class="statTooltipPerc">(<div id="statLuckTalentProgress"></div>%)</div><br>
-                    <div class="medium bold">Soulstone Bonus</div> <div id="statLuckSSBonus"></div>
+                    <div class="medium bold">Soulstone Mult</div> x<div id="statLuckSSBonus"></div>
                 </div>
             </div>
             <div class="statContainer showthat" onmouseover="view.showStat('Soul')">
@@ -329,7 +338,7 @@
                     You are the captain.<br>
                     <div class="medium bold">Level</div> <div id="statSoulLevelExp"></div>/<div id="statSoulLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="statSoulLevelProgress"></div>%)</div><br>
                     <div class="medium bold">Talent</div> <div id="statSoulTalentExp"></div>/<div id="statSoulTalentExpNeeded"></div> <div class="statTooltipPerc">(<div id="statSoulTalentProgress"></div>%)</div><br>
-                    <div class="medium bold">Soulstone Bonus</div> <div id="statSoulSSBonus"></div>
+                    <div class="medium bold">Soulstone Mult</div> x<div id="statSoulSSBonus"></div>
                 </div>
             </div>
         </div><br>
@@ -496,15 +505,15 @@
 </body>
 
 
-<script src="helpers.js?2"></script>
-<script src="interval.js?2"></script>
-<script src="driver.js?2"></script>
-<script src="stats.js?2"></script>
-<script src="view.js?2"></script>
-<script src="actions.js?2"></script>
-<script src="actionList.js?2"></script>
-<script src="town.js?2"></script>
-<script src="saving.js?2"></script>
+<script src="helpers.js?3"></script>
+<script src="interval.js?3"></script>
+<script src="driver.js?3"></script>
+<script src="stats.js?3"></script>
+<script src="view.js?3"></script>
+<script src="actions.js?3"></script>
+<script src="actionList.js?3"></script>
+<script src="town.js?3"></script>
+<script src="saving.js?3"></script>
 <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
         (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
