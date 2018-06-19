@@ -9,7 +9,7 @@ function tick() {
     prevState.stats = JSON.parse(JSON.stringify(stats));
     actions.tick();
     if(soulstoneChance < 1) {
-        soulstoneChance += .0000001;
+        soulstoneChance += .0000002;
         if(soulstoneChance > 1) {
             soulstoneChance = 1;
         }
@@ -80,11 +80,19 @@ function addActionToList(name, townNum, isTravelAction) {
         let action = towns[townNum].totalActionList[i];
         if(action.name === name) {
             if(action.visible() && action.unlocked()) {
+                let addAmount = actions.addAmount;
+                if(action.allowed) {
+                    let numMax = action.allowed();
+                    let numHave = getNumOnList(action.name);
+                    if((numMax - numHave) < addAmount) {
+                        addAmount = numMax - numHave;
+                    }
+                }
                 if(isTravelAction) {
                     actionTownNum = townNum+1;
                     actions.addAction(name, 1);
                 } else {
-                    actions.addAction(name);
+                    actions.addAction(name, addAmount);
                 }
             }
         }
@@ -197,11 +205,17 @@ function capAmount(index, townNum) {
 
 function addLoop(index) {
     let theClass = translateClassNames(actions.next[index].name);
-    if(!theClass.allowed || theClass.allowed()) {
-        actions.next[index].loops += actions.addAmount;
-        view.updateNextActions();
-        view.updateLockedHidden();
+    let addAmount = actions.addAmount;
+    if(theClass.allowed) {
+        let numMax = theClass.allowed();
+        let numHave = getNumOnList(theClass.name);
+        if((numMax - numHave) < addAmount) {
+            addAmount = numMax - numHave;
+        }
     }
+    actions.next[index].loops += addAmount;
+    view.updateNextActions();
+    view.updateLockedHidden();
 }
 function removeLoop(index) {
     actions.next[index].loops -= actions.addAmount;

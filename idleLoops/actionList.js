@@ -8,8 +8,8 @@ function translateClassNames(name) {
         return new PickLocks();
     } else if(name === "Buy Glasses") {
         return new BuyGlasses();
-    } else if(name === "Sell Gold") {
-        return new SellGold();
+    } else if(name === "Buy Mana") {
+        return new BuyMana();
     } else if(name === "Meet People") {
         return new MeetPeople();
     } else if(name === "Train Strength") {
@@ -301,7 +301,7 @@ function BuyGlasses() {
         Spd:.3
     };
     this.allowed = function() {
-        return getNumOnList("Buy Glasses") === 0;
+        return 1;
     };
     this.canStart = function() {
         return gold >= 10;
@@ -316,17 +316,17 @@ function BuyGlasses() {
         return towns[0].getLevel("Wander") >= 3;
     };
     this.unlocked = function() {
-        return towns[0].getLevel("Wander") >= 20 && this.allowed();
+        return towns[0].getLevel("Wander") >= 20 && getNumOnList(this.name) < this.allowed();
     };
     this.finish = function() {
         addGlasses(1);
     };
 }
 
-function SellGold() {
-    this.name = "Sell Gold";
+function BuyMana() {
+    this.name = "Buy Mana";
     this.expMult = 1;
-    this.tooltip = "1 gold = 50 mana. Sells all gold<br>Unlocked at 20% Explored";
+    this.tooltip = "1 gold = 50 mana. Buys all the mana you can.<br>Unlocked at 20% Explored";
     this.townNum = 0;
 
     this.varName = "Gold";
@@ -792,8 +792,9 @@ function PickLocks() {
     };
     this.finish = function() {
         towns[0].finishRegular(this.varName, 10, function() {
-
-            let goldGain = Math.floor(10 * (1 + getSkillLevel("Practical")/100));
+            let practical = getSkillLevel("Practical");
+            practical = practical <= 200 ? practical : 200;
+            let goldGain = Math.floor(10 * (1 + practical));
             addGold(goldGain);
             return goldGain;
         })
@@ -828,7 +829,9 @@ function ShortQuest() {
     };
     this.finish = function() {
         towns[0].finishRegular(this.varName, 5, function() {
-            let goldGain = Math.floor(20 * (1 + getSkillLevel("Practical")/100));
+            let practical = getSkillLevel("Practical") - 100;
+            practical = practical <= 200 ? (practical >= 0 ? practical : 0) : 200;
+            let goldGain = Math.floor(20 * (1 + practical/100));
             addGold(goldGain);
             return goldGain;
         })
@@ -866,7 +869,9 @@ function LongQuest() {
     this.finish = function() {
         towns[0].finishRegular(this.varName, 5, function() {
             addReputation(1);
-            let goldGain = Math.floor(25 * (1 + getSkillLevel("Practical")/100));
+            let practical = getSkillLevel("Practical") - 200;
+            practical = practical <= 200 ? (practical >= 0 ? practical : 0) : 200;
+            let goldGain = Math.floor(25 * (1 + practical/100));
             addGold(goldGain);
             return goldGain;
         })
@@ -1091,7 +1096,7 @@ function SmallDungeon() {
     };
     this.loopStats = ["Dex", "Con", "Dex", "Cha", "Dex", "Str", "Luck"];
     this.segments = 7;
-    this.completedTooltip = "Each soulstone improves a random stat's exp gain by (1+(soulstones)^.8/10). Each soulstone reduces the chance you'll get the next one by 2%. Soulstone chance recovers at .00001% per mana.<br><div class='bold'>Chance </div> <div id='soulstoneChance'></div>%<br><div class='bold'>Last Stat</div> <div id='soulstonePrevious'>NA</div>";
+    this.completedTooltip = "Each soulstone improves a random stat's exp gain by (1+(soulstones)^.8/10). Each soulstone reduces the chance you'll get the next one by 2%. Soulstone chance recovers at .00002% per mana.<br><div class='bold'>Chance </div> <div id='soulstoneChance'></div>%<br><div class='bold'>Last Stat</div> <div id='soulstonePrevious'>NA</div>";
     this.manaCost = function() {
         return 3000;
     };

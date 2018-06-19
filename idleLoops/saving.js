@@ -98,9 +98,13 @@ function load() {
     if(toLoad.nextList) {
         for (let i = 0; i < toLoad.nextList.length; i++) {
             let action = toLoad.nextList[i];
-            if (action.name !== "Guided Tour") {// && action.name !== "Throw Party") {
-                actions.next.push(action);
+            if (action.name === "Guided Tour") {// && action.name !== "Throw Party") {
+                continue;
             }
+            if(action.name === "Sell Gold") {
+                action.name = "Buy Mana";
+            }
+            actions.next.push(action);
         }
     }
     loadouts = [[],[],[],[],[]];
@@ -111,9 +115,13 @@ function load() {
             }
             for (let j = 0; j < toLoad.loadouts[i].length; j++) {
                 let action = toLoad.loadouts[i][j];
-                if (action.name !== "Guided Tour") { // && action.name !== "Throw Party") {
-                    loadouts[i].push(action);
+                if (action.name === "Guided Tour") { // && action.name !== "Throw Party") {
+                    continue;
                 }
+                if(action.name === "Sell Gold") {
+                    action.name = "Buy Mana";
+                }
+                loadouts[i].push(action);
             }
         }
     }

@@ -41,21 +41,23 @@ function View() {
         const levelPrc = getPrcToNextLevel(stat)+"%";
         const talentPrc = getPrcToNextTalent(stat)+"%";
         if(!expEquals(stat) || !talentEquals(stat) || statShowing === stat) {
-            document.getElementById("stat" + stat + "Level").innerHTML = getLevel(stat);
+            document.getElementById("stat" + stat + "Level").innerHTML = intToString(getLevel(stat), 1);
             document.getElementById("stat" + stat + "LevelBar").style.width = levelPrc;
 
-            document.getElementById("stat" + stat + "Talent").innerHTML = getTalent(stat);
+            document.getElementById("stat" + stat + "Talent").innerHTML = intToString(getTalent(stat), 1);
             document.getElementById("stat" + stat + "TalentBar").style.width = talentPrc;
 
             document.getElementById("stat" + stat + "SSBonus").innerHTML = intToString(stats[stat].soulstone ? calcSoulstoneMult(stats[stat].soulstone) : 0);
         }
 
         if(statShowing === stat || document.getElementById("stat" + stat + "LevelExp").innerHTML === "") {
+            document.getElementById("stat" + stat + "Level2").innerHTML = getLevel(stat);
             let expOfLevel = getExpOfLevel(getLevel(stat));
             document.getElementById("stat" + stat + "LevelExp").innerHTML = intToString(stats[stat].exp - expOfLevel, 1);
             document.getElementById("stat" + stat + "LevelExpNeeded").innerHTML = intToString(getExpOfLevel(getLevel(stat)+1) - expOfLevel+"", 1);
             document.getElementById("stat" + stat + "LevelProgress").innerHTML = intToString(levelPrc, 2);
 
+            document.getElementById("stat" + stat + "Talent2").innerHTML = getTalent(stat);
             let expOfTalent = getExpOfLevel(getTalent(stat));
             document.getElementById("stat" + stat + "TalentExp").innerHTML = intToString(stats[stat].talent - expOfTalent, 1);
             document.getElementById("stat" + stat + "TalentExpNeeded").innerHTML = intToString(getExpOfLevel(getTalent(stat)+1) - expOfTalent+"", 1);
@@ -361,7 +363,7 @@ function View() {
         this.createTownInfo(tempObj);
 
         this.createTownAction(new BuyGlasses());
-        this.createTownAction(new SellGold());
+        this.createTownAction(new BuyMana());
 
         tempObj = new MeetPeople();
         this.createTownAction(tempObj);

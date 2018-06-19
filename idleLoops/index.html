@@ -25,6 +25,16 @@
         Changelog
         <div class="showthisH">
             <div class="showthat2">
+                Version .70
+                <div class="showthis2">
+                    * Reverted skill nerf (too harsh)<br>
+                    * Actually capped glasses<br>
+                    * Sell Gold -> Buy Mana<br>
+                    * Double soulstone recovery<br>
+                    * Nerfed practical magic (more uses for it later)
+                </div>
+            </div><br>
+            <div class="showthat2">
                 Version .69
                 <div class="showthis2">
                     * Nerfed the soulstone nerf<br>
@@ -163,7 +173,7 @@
     <div style="float:left;height:30px;margin-left:10px;" class="showthatH">
         Options
         <div class="showthisH">
-            <a href="https://discord.gg/EmRuWPp">Discord Link</a>
+            <a href="https://discord.gg/EmRuWPp" target="_blank">Discord Link</a>
         </div>
     </div>
     <div class="showthat">
@@ -233,8 +243,10 @@
                 <div class="thinProgressBarLower"><div class="statBar statTalentBar" id="statStrTalentBar"></div></div>
                 <div class="showthis" id="statStrTooltip" >
                     Train your body.<br>
-                    <div class="medium bold">Level</div> <div id="statStrLevelExp"></div>/<div id="statStrLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="statStrLevelProgress"></div>%)</div><br>
-                    <div class="medium bold">Talent</div> <div id="statStrTalentExp"></div>/<div id="statStrTalentExpNeeded"></div> <div class="statTooltipPerc">(<div id="statStrTalentProgress"></div>%)</div><br>
+                    <div class="medium bold">Level</div> <div id="statStrLevel2"></div><br>
+                    <div class="medium bold">Level Exp</div> <div id="statStrLevelExp"></div>/<div id="statStrLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="statStrLevelProgress"></div>%)</div><br>
+                    <div class="medium bold">Talent</div> <div id="statStrTalent2"></div><br>
+                    <div class="medium bold">Talent Exp</div> <div id="statStrTalentExp"></div>/<div id="statStrTalentExpNeeded"></div> <div class="statTooltipPerc">(<div id="statStrTalentProgress"></div>%)</div><br>
                     <div class="medium bold">Soulstone Mult</div> x<div id="statStrSSBonus"></div>
                 </div>
             </div>
@@ -246,8 +258,10 @@
                 <div class="thinProgressBarLower"><div class="statBar statTalentBar" id="statDexTalentBar"></div></div>
                 <div class="showthis" id="statDexTooltip" >
                     Know your body.<br>
-                    <div class="medium bold">Level</div> <div id="statDexLevelExp"></div>/<div id="statDexLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="statDexLevelProgress"></div>%)</div><br>
-                    <div class="medium bold">Talent</div> <div id="statDexTalentExp"></div>/<div id="statDexTalentExpNeeded"></div> <div class="statTooltipPerc">(<div id="statDexTalentProgress"></div>%)</div><br>
+                    <div class="medium bold">Level</div> <div id="statDexLevel2"></div><br>
+                    <div class="medium bold">Level Exp</div> <div id="statDexLevelExp"></div>/<div id="statDexLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="statDexLevelProgress"></div>%)</div><br>
+                    <div class="medium bold">Talent</div> <div id="statDexTalent2"></div><br>
+                    <div class="medium bold">Talent Exp</div> <div id="statDexTalentExp"></div>/<div id="statDexTalentExpNeeded"></div> <div class="statTooltipPerc">(<div id="statDexTalentProgress"></div>%)</div><br>
                     <div class="medium bold">Soulstone Mult</div> x<div id="statDexSSBonus"></div>
                 </div>
             </div>
@@ -259,8 +273,10 @@
                 <div class="thinProgressBarLower"><div class="statBar statTalentBar" id="statConTalentBar"></div></div>
                 <div class="showthis" id="statConTooltip" >
                     Just a little longer. Just a little more.<br>
-                    <div class="medium bold">Level</div> <div id="statConLevelExp"></div>/<div id="statConLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="statConLevelProgress"></div>%)</div><br>
-                    <div class="medium bold">Talent</div> <div id="statConTalentExp"></div>/<div id="statConTalentExpNeeded"></div> <div class="statTooltipPerc">(<div id="statConTalentProgress"></div>%)</div><br>
+                    <div class="medium bold">Level</div> <div id="statConLevel2"></div><br>
+                    <div class="medium bold">Level Exp</div> <div id="statConLevelExp"></div>/<div id="statConLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="statConLevelProgress"></div>%)</div><br>
+                    <div class="medium bold">Talent</div> <div id="statConTalent2"></div><br>
+                    <div class="medium bold">Talent Exp</div> <div id="statConTalentExp"></div>/<div id="statConTalentExpNeeded"></div> <div class="statTooltipPerc">(<div id="statConTalentProgress"></div>%)</div><br>
                     <div class="medium bold">Soulstone Mult</div> x<div id="statConSSBonus"></div>
                 </div>
             </div>
@@ -272,8 +288,10 @@
                 <div class="thinProgressBarLower"><div class="statBar statTalentBar" id="statPerTalentBar"></div></div>
                 <div class="showthis" id="statPerTooltip">
                     Look a little closer ...<br>
-                    <div class="medium bold">Level</div> <div id="statPerLevelExp"></div>/<div id="statPerLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="statPerLevelProgress"></div>%)</div><br>
-                    <div class="medium bold">Talent</div> <div id="statPerTalentExp"></div>/<div id="statPerTalentExpNeeded"></div> <div class="statTooltipPerc">(<div id="statPerTalentProgress"></div>%)</div><br>
+                    <div class="medium bold">Level</div> <div id="statPerLevel2"></div><br>
+                    <div class="medium bold">Level Exp</div> <div id="statPerLevelExp"></div>/<div id="statPerLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="statPerLevelProgress"></div>%)</div><br>
+                    <div class="medium bold">Talent</div> <div id="statPerTalent2"></div><br>
+                    <div class="medium bold">Talent Exp</div> <div id="statPerTalentExp"></div>/<div id="statPerTalentExpNeeded"></div> <div class="statTooltipPerc">(<div id="statPerTalentProgress"></div>%)</div><br>
                     <div class="medium bold">Soulstone Mult</div> x<div id="statPerSSBonus"></div>
                 </div>
             </div>
@@ -285,8 +303,10 @@
                 <div class="thinProgressBarLower"><div class="statBar statTalentBar" id="statIntTalentBar"></div></div>
                 <div class="showthis" id="statIntTooltip" >
                     Learning to learn.<br>
-                    <div class="medium bold">Level</div> <div id="statIntLevelExp"></div>/<div id="statIntLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="statIntLevelProgress"></div>%)</div><br>
-                    <div class="medium bold">Talent</div> <div id="statIntTalentExp"></div>/<div id="statIntTalentExpNeeded"></div> <div class="statTooltipPerc">(<div id="statIntTalentProgress"></div>%)</div><br>
+                    <div class="medium bold">Level</div> <div id="statIntLevel2"></div><br>
+                    <div class="medium bold">Level Exp</div> <div id="statIntLevelExp"></div>/<div id="statIntLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="statIntLevelProgress"></div>%)</div><br>
+                    <div class="medium bold">Talent</div> <div id="statIntTalent2"></div><br>
+                    <div class="medium bold">Talent Exp</div> <div id="statIntTalentExp"></div>/<div id="statIntTalentExpNeeded"></div> <div class="statTooltipPerc">(<div id="statIntTalentProgress"></div>%)</div><br>
                     <div class="medium bold">Soulstone Mult</div> x<div id="statIntSSBonus"></div>
                 </div>
             </div>
@@ -298,8 +318,10 @@
                 <div class="thinProgressBarLower"><div class="statBar statTalentBar" id="statChaTalentBar"></div></div>
                 <div class="showthis" id="statChaTooltip" >
                     Conversation is a battle.<br>
-                    <div class="medium bold">Level</div> <div id="statChaLevelExp"></div>/<div id="statChaLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="statChaLevelProgress"></div>%)</div><br>
-                    <div class="medium bold">Talent</div> <div id="statChaTalentExp"></div>/<div id="statChaTalentExpNeeded"></div> <div class="statTooltipPerc">(<div id="statChaTalentProgress"></div>%)</div><br>
+                    <div class="medium bold">Level</div> <div id="statChaLevel2"></div><br>
+                    <div class="medium bold">Level Exp</div> <div id="statChaLevelExp"></div>/<div id="statChaLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="statChaLevelProgress"></div>%)</div><br>
+                    <div class="medium bold">Talent</div> <div id="statChaTalent2"></div><br>
+                    <div class="medium bold">Talent Exp</div> <div id="statChaTalentExp"></div>/<div id="statChaTalentExpNeeded"></div> <div class="statTooltipPerc">(<div id="statChaTalentProgress"></div>%)</div><br>
                     <div class="medium bold">Soulstone Mult</div> x<div id="statChaSSBonus"></div>
                 </div>
             </div>
@@ -311,8 +333,10 @@
                 <div class="thinProgressBarLower"><div class="statBar statTalentBar" id="statSpdTalentBar"></div></div>
                 <div class="showthis" id="statSpdTooltip" >
                     Gotta go fast.<br>
-                    <div class="medium bold">Level</div> <div id="statSpdLevelExp"></div>/<div id="statSpdLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="statSpdLevelProgress"></div>%)</div><br>
-                    <div class="medium bold">Talent</div> <div id="statSpdTalentExp"></div>/<div id="statSpdTalentExpNeeded"></div> <div class="statTooltipPerc">(<div id="statSpdTalentProgress"></div>%)</div><br>
+                    <div class="medium bold">Level</div> <div id="statSpdLevel2"></div><br>
+                    <div class="medium bold">Level Exp</div> <div id="statSpdLevelExp"></div>/<div id="statSpdLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="statSpdLevelProgress"></div>%)</div><br>
+                    <div class="medium bold">Talent</div> <div id="statSpdTalent2"></div><br>
+                    <div class="medium bold">Talent Exp</div> <div id="statSpdTalentExp"></div>/<div id="statSpdTalentExpNeeded"></div> <div class="statTooltipPerc">(<div id="statSpdTalentProgress"></div>%)</div><br>
                     <div class="medium bold">Soulstone Mult</div> x<div id="statSpdSSBonus"></div>
                 </div>
             </div>
@@ -324,8 +348,10 @@
                 <div class="thinProgressBarLower"><div class="statBar statTalentBar" id="statLuckTalentBar"></div></div>
                 <div class="showthis" id="statLuckTooltip">
                     Opportunity favors the fortunate.<br>
-                    <div class="medium bold">Level</div> <div id="statLuckLevelExp"></div>/<div id="statLuckLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="statLuckLevelProgress"></div>%)</div><br>
-                    <div class="medium bold">Talent</div> <div id="statLuckTalentExp"></div>/<div id="statLuckTalentExpNeeded"></div> <div class="statTooltipPerc">(<div id="statLuckTalentProgress"></div>%)</div><br>
+                    <div class="medium bold">Level</div> <div id="statLuckLevel2"></div><br>
+                    <div class="medium bold">Level Exp</div> <div id="statLuckLevelExp"></div>/<div id="statLuckLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="statLuckLevelProgress"></div>%)</div><br>
+                    <div class="medium bold">Talent</div> <div id="statLuckTalent2"></div><br>
+                    <div class="medium bold">Talent Exp</div> <div id="statLuckTalentExp"></div>/<div id="statLuckTalentExpNeeded"></div> <div class="statTooltipPerc">(<div id="statLuckTalentProgress"></div>%)</div><br>
                     <div class="medium bold">Soulstone Mult</div> x<div id="statLuckSSBonus"></div>
                 </div>
             </div>
@@ -337,8 +363,10 @@
                 <div class="thinProgressBarLower"><div class="statBar statTalentBar" id="statSoulTalentBar"></div></div>
                 <div class="showthis" id="statSoulTooltip" >
                     You are the captain.<br>
-                    <div class="medium bold">Level</div> <div id="statSoulLevelExp"></div>/<div id="statSoulLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="statSoulLevelProgress"></div>%)</div><br>
-                    <div class="medium bold">Talent</div> <div id="statSoulTalentExp"></div>/<div id="statSoulTalentExpNeeded"></div> <div class="statTooltipPerc">(<div id="statSoulTalentProgress"></div>%)</div><br>
+                    <div class="medium bold">Level</div> <div id="statSoulLevel2"></div><br>
+                    <div class="medium bold">Level Exp</div> <div id="statSoulLevelExp"></div>/<div id="statSoulLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="statSoulLevelProgress"></div>%)</div><br>
+                    <div class="medium bold">Talent</div> <div id="statSoulTalent2"></div><br>
+                    <div class="medium bold">Talent Exp</div> <div id="statSoulTalentExp"></div>/<div id="statSoulTalentExpNeeded"></div> <div class="statTooltipPerc">(<div id="statSoulTalentProgress"></div>%)</div><br>
                     <div class="medium bold">Soulstone Mult</div> x<div id="statSoulSSBonus"></div>
                 </div>
             </div>
@@ -379,7 +407,9 @@
                     Mage Hand, Prestidigitation, Detect Magic, and other useful tricks to help out.<br>
                     <div class="medium bold">Level</div> <div id="skillPracticalLevelExp"></div>/<div id="skillPracticalLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="skillPracticalLevelProgress"></div>%)</div><br>
                     Smash Pots and Gather Wild Mana have 1% reduced mana cost per level (rounded up).<br>
-                    Pick Locks, Short Quests, and Long Quests get 1% more gold per level (rounded down).<br>
+                    Pick Locks get 1% more gold per level from 1-200 (rounded down).<br>
+                    Short Quests get 1% more gold per level from 101-300 (rounded down).<br>
+                    Long Quests get 1% more gold per level from 201-400 (rounded down).
                 </div>
             </div>
             <div class="statContainer showthat" id="skillAlchemyContainer">
