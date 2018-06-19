@@ -178,7 +178,11 @@ function Actions() {
         if(initialOrder !== undefined) {
             this.next.splice(initialOrder, 0, toAdd) //insert at index
         } else {
-            this.next.push(toAdd);
+            if(!loops && document.getElementById("addActionTop").checked) {
+                this.next.splice(0, 0, toAdd);
+            } else {
+                this.next.push(toAdd);
+            }
         }
     };
 }
