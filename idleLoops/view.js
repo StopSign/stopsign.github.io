@@ -30,6 +30,12 @@ function View() {
         }
         this.updateTime();
         this.updateSoulstoneChance();
+        for (let i=0; i < this.updateCurrentActionBarRequests.length; i++) {
+            if (this.updateCurrentActionBarRequests[i]) {
+                this.updateCurrentActionBarRequests[i] = false;
+                this.updateCurrentActionBar(i);
+            }
+        }
     };
 
     this.showStat = function(stat) {
@@ -205,6 +211,12 @@ function View() {
         this.mouseoverAction(0, false);
     };
 
+    
+    this.updateCurrentActionBarRequests = Array(50).fill(false);
+    this.updateCurrentActionBarRequest = function f(index) {
+        this.updateCurrentActionBarRequests[index] = true;
+    }
+    
     this.updateCurrentActionBar = function(index) {
         const action = actions.current[index];
         const div = document.getElementById("action"+index+"Bar");
