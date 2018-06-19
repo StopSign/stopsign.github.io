@@ -114,6 +114,10 @@ function View() {
         document.getElementById("hideDiv").style.display = herbs ? "inline-block" : "none";
         document.getElementById("hide").innerHTML = hide;
     };
+    this.updatePotions = function() {
+        document.getElementById("potionsDiv").style.display = herbs ? "inline-block" : "none";
+        document.getElementById("potions").innerHTML = hide;
+    };
 
     this.updateNextActions = function() {
         let count = 0;
@@ -191,6 +195,7 @@ function View() {
             totalDivText +=
                 "<div id='actionTooltip"+i+"' style='display:none;padding-left:10px;width:90%'>" +
                     "<div style='text-align:center;width:100%'>"+action.name+"</div><br><br>" +
+                    "<div class='bold'>Mana Original</div> <div id='action"+i+"ManaOrig'>0</div><br>" +
                     "<div class='bold'>Mana Used</div> <div id='action"+i+"ManaUsed'>0</div><br>" +
                     "<div class='bold'>Remaining</div> <div id='action"+i+"Remaining'></div><br><br>" +
                     "<div id='action"+i+"ExpGain'></div>" +
@@ -221,6 +226,7 @@ function View() {
             div.style.width = "100%";
             div.style.backgroundColor = "#6d6d6d";
         }
+        document.getElementById("action" + index + "ManaOrig").innerHTML = action.manaCost() + "";
         document.getElementById("action" + index + "ManaUsed").innerHTML = action.manaUsed + "";
         document.getElementById("action"+index+"Remaining").innerHTML = (timeNeeded - timer)+"";
         let statExpGain = "";
@@ -439,7 +445,19 @@ function View() {
 
         this.createTownAction(new PracticalMagic());
         this.createTownAction(new LearnAlchemy());
-        // this.createTownAction(new BrewPotions());
+        this.createTownAction(new BrewPotions());
+
+        this.createTravelAction(new ContinueOn());
+
+        while (actionOptionsTown[2].firstChild) {
+            actionOptionsTown[2].removeChild(actionOptionsTown[1].firstChild);
+        }
+        while(townInfos[2].firstChild) {
+            townInfos[2].removeChild(townInfos[1].firstChild);
+        }
+
+        this.createTownAction(new PurchaseMana());
+
     };
 
     this.createActionProgress = function(action) {

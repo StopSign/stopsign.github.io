@@ -64,8 +64,15 @@ function translateClassNames(name) {
         return new LearnAlchemy();
     } else if(name === "Brew Potions") {
         return new BrewPotions();
+    } else if(name === "Continue On") {
+        return new ContinueOn();
     }
-
+    //town 3
+    if(name === "Purchase Mana") {
+        return new PurchaseMana();
+    } else if(name === "Sell Potions") {
+        return new SellPotions();
+    }
     console.log('error trying to create ' + name);
 }
 
@@ -188,7 +195,7 @@ function adjustLQuests() {
 function ExploreForest() {
     this.name = "Explore Forest";
     this.expMult = 1;
-    this.tooltip = "What a pleasant area.";
+    this.tooltip = "What a pleasant area.<br>2x progress with glasses";
     this.townNum = 1;
 
     this.infoName = "Forest Explored";
@@ -209,7 +216,7 @@ function ExploreForest() {
         return true;
     };
     this.finish = function() {
-        towns[1].finishProgress(this.varName, 100, function() {
+        towns[1].finishProgress(this.varName, 100 * (glasses ? 2 : 1), function() {
             adjustWildMana();
             adjustHunt();
             adjustHerbs();
@@ -708,27 +715,108 @@ function LearnAlchemy() {
 function BrewPotions() {
     this.name = "Learn Alchemy";
     this.expMult = 1;
-    this.tooltip = "Bubbles and Flasks. Potions and Magic.<br>Unlocked with 10 Alchemy.";
+    this.tooltip = "Bubbles and Flasks. Potions and Magic.<br>Creates a potion from 10 herbs to sell at the next town.<br>Unlocked with 10 Alchemy.";
     this.townNum = 1;
 
-    this.varName = "trAlchemy";
+    this.varName = "Potions";
     this.stats = {
         Per:.1,
         Con:.3,
         Int:.6
     };
     this.manaCost = function() {
-        return Math.ceil(2000);
+        return Math.ceil(4000);
     };
     this.visible = function() {
         return getSkillLevel("Alchemy") >= 1;
     };
     this.unlocked = function() {
-        return getSkillLevel("Alchemy") >= 5;
+        return getSkillLevel("Alchemy") >= 10;
     };
     this.finish = function() {
+        addPotions(1);
         addSkillExp("Alchemy", 25);
         addSkillExp("Magic", 50);
+    };
+}
+
+function ContinueOn() {
+        this.name = "Continue On";
+        this.expMult = 2;
+        this.tooltip = "Follow the trail to end up at the next town. You need to keep moving until you can learn how to shut these loops off.<br>Costs 1 supplies. Finish once to unlock Forest Path's actions, then finish this in order to use Forest Path's actions.<br>Unlocks at a combined skill of 35.";
+        this.townNum = 1;
+
+        this.varName = "Continue";
+        this.stats = {
+            Con:.4,
+            Per:.2,
+            Spd:.4
+        };
+        this.manaCost = function() {
+            return 2000;
+        };
+        this.visible = function() {
+            return true;
+        };
+        this.unlocked = function() {
+            return true;
+        };
+        this.finish = function() {
+            unlockTown(2);
+        };
+}
+
+function PurchaseMana() {
+    this.name = "Purchase Mana";
+    this.expMult = 1;
+    this.tooltip = "1 gold = 50 mana. Buys all the mana you can.";
+    this.townNum = 2;
+
+    this.varName = "Gold2";
+    this.stats = {
+        Cha:.7,
+        Int:.2,
+        Luck:.1
+    };
+    this.manaCost = function() {
+        return 100;
+    };
+    this.visible = function() {
+        return true;
+    };
+    this.unlocked = function() {
+        return true;
+    };
+    this.finish = function() {
+        addMana(gold * 50);
+        addGold(-gold);
+    };
+}
+
+function SellPotions() {
+    this.name = "Sell Potions";
+    this.expMult = 1;
+    this.tooltip = "Potions are worth 1 gold per alchemy skill, but it takes a bit to find a seller.";
+    this.townNum = 2;
+
+    this.varName = "SellPotions";
+    this.stats = {
+        Cha:.7,
+        Int:.2,
+        Luck:.1
+    };
+    this.manaCost = function() {
+        return 1000;
+    };
+    this.visible = function() {
+        return true;
+    };
+    this.unlocked = function() {
+        return true;
+    };
+    this.finish = function() {
+        addGold(potions * getSkillLevel("Alchemy"));
+        addPotions(-potions);
     };
 }
 

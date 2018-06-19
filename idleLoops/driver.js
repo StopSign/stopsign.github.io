@@ -63,6 +63,7 @@ function restart() {
     addSupplies(-supplies);
     addHerbs(-herbs);
     addHide(-hide);
+    addPotions(-potions);
     restartStats();
     for(let i = 0; i < towns.length; i++) {
         towns[i].restart();
@@ -133,6 +134,11 @@ function addHerbs(amount) {
 function addHide(amount) {
     hide += amount;
     view.updateHide();
+}
+
+function addPotions(amount) {
+    potions += amount;
+    view.updatePotions();
 }
 
 function changeActionAmount(amount, num) {

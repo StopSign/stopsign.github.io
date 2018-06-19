@@ -5,7 +5,7 @@ doWork.onmessage = function (event) {
     }
 };
 
-let timeNeededInitial = 5 * 50;
+let timeNeededInitial = 5 * 50 * 100;
 let timer = timeNeededInitial;
 let timeNeeded = timeNeededInitial;
 let stop = false;
@@ -25,6 +25,7 @@ let reputation = 0;
 let supplies = 0;
 let herbs = 0;
 let hide = 0;
+let potions = 0;
 
 let curLoadout = 0;
 let loadouts = [];
@@ -93,6 +94,7 @@ function load() {
     town.expShortcut = toLoad.expShortcut !== undefined ? toLoad.expShortcut : 0;
     town.expHermit = toLoad.expHermit !== undefined ? toLoad.expHermit : 0;
 
+    towns[2] = new Town(2);
 
     actions.next = [];
     if(toLoad.nextList) {
@@ -178,6 +180,8 @@ function save() {
     toSave.expForest = town.expForest;
     toSave.expShortcut = town.expShortcut;
     toSave.expHermit = town.expHermit;
+
+    town = towns[2];
 
     for(let i = 0; i < towns.length; i++) {
         town = towns[i];
