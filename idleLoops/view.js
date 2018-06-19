@@ -47,7 +47,7 @@ function View() {
             document.getElementById("stat" + stat + "Talent").innerHTML = getTalent(stat);
             document.getElementById("stat" + stat + "TalentBar").style.width = talentPrc;
 
-            document.getElementById("stat" + stat + "SSBonus").innerHTML = intToString(stats[stat].soulstone ? calcSoulstoneMult(stats[stat].soulstone)*10 : 0) +"%";
+            document.getElementById("stat" + stat + "SSBonus").innerHTML = intToString(stats[stat].soulstone ? calcSoulstoneMult(stats[stat].soulstone) : 0);
         }
 
         if(statShowing === stat || document.getElementById("stat" + stat + "LevelExp").innerHTML === "") {
@@ -75,9 +75,9 @@ function View() {
         document.getElementById("skill" + skill + "Level").innerHTML = getSkillLevel(skill);
         document.getElementById("skill" + skill + "LevelBar").style.width = levelPrc + "%";
 
-        let expOfLevel = getExpOfLevel(getSkillLevel(skill));
+        let expOfLevel = getExpOfSkillLevel(getSkillLevel(skill));
         document.getElementById("skill" + skill + "LevelExp").innerHTML = intToString(skills[skill].exp - expOfLevel, 1);
-        document.getElementById("skill" + skill + "LevelExpNeeded").innerHTML = intToString(getExpOfLevel(getSkillLevel(skill)+1) - expOfLevel+"", 1);
+        document.getElementById("skill" + skill + "LevelExpNeeded").innerHTML = intToString(getExpOfSkillLevel(getSkillLevel(skill)+1) - expOfLevel+"", 1);
         document.getElementById("skill" + skill + "LevelProgress").innerHTML = intToString(levelPrc, 2);
     };
 
