@@ -12,6 +12,7 @@ function tick() {
 
     window.gameTickLeft += gameSpeed / fps * 50;
 
+    if (gameTickLeft > 0)
     while (window.gameTickLeft-- > 0) {
         if(window.gameTickLeft > 1000) {
             pauseGame();
