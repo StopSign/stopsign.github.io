@@ -77,12 +77,11 @@ function load() {
     maxTown = toLoad.maxTown !== undefined ? toLoad.maxTown : 0;
     actionTownNum = toLoad.actionTownNum !== undefined ? toLoad.actionTownNum : 0;
 
-    let expLimit = 505000;
     towns[0] = new Town(0);
     let town = towns[0];
-    town.expWander = toLoad.expWander !== undefined ? (toLoad.expWander > expLimit ? expLimit : toLoad.expWander) : 0;
-    town.expMet = toLoad.expMet !== undefined ? (toLoad.expMet > expLimit ? expLimit : toLoad.expMet) : 0;
-    town.expSecrets = toLoad.expSecrets !== undefined ? (toLoad.expSecrets > expLimit ? expLimit : toLoad.expSecrets): 0;
+    town.expWander = toLoad.expWander !== undefined ? toLoad.expWander : 0;
+    town.expMet = toLoad.expMet !== undefined ? toLoad.expMet : 0;
+    town.expSecrets = toLoad.expSecrets !== undefined ? toLoad.expSecrets : 0;
     town.totalHeal = toLoad.totalHeal !== undefined ? toLoad.totalHeal : 0;
     town.totalFight = toLoad.totalFight !== undefined ? toLoad.totalFight : 0;
     town.totalSDungeon = toLoad.totalSDungeon !== undefined ? toLoad.totalSDungeon : 0;
