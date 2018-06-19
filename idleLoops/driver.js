@@ -27,7 +27,7 @@ function tick() {
 
         actions.tick();
         if(soulstoneChance < 1) {
-            soulstoneChance += .0000001;
+            soulstoneChance += .0000002;
             if(soulstoneChance > 1) {
                 soulstoneChance = 1;
             }
