@@ -67,7 +67,7 @@ function Actions() {
             this.adjustTicksNeeded();
             view.updateCurrentActionLoops(this.currentPos);
         }
-        view.updateCurrentActionBar(this.currentPos);
+        view.updateCurrentActionBarRequest(this.currentPos);
         if(curAction.loopsLeft === 0) {
             if(!this.current[this.currentPos + 1] && document.getElementById("repeatLastAction").checked &&
                 (!curAction.canStart || curAction.canStart()) && curAction.townNum === curTown) {
