@@ -195,7 +195,7 @@ function setAdjustedTicks(action) {
 }
 
 function calcSoulstoneMult(soulstones) {
-    return 1+Math.pow(soulstones*5, .9)/100;
+    return 1+Math.pow(soulstones, .9)/20;
 }
 
 function addExpFromAction(action) {
@@ -203,8 +203,8 @@ function addExpFromAction(action) {
         let statName = statList[i];
         if(action.stats[statName]) {
             let soulstoneBonus = stats[statName].soulstone ? calcSoulstoneMult(stats[statName].soulstone) : 1;
-            let heartstoneBonus = stats[statName].heartstone ? (1 + stats[statName].heartstone/100) : 1;
-            let expToAdd = soulstoneBonus * heartstoneBonus * action.stats[statName] * action.expMult * (action.manaCost() / action.adjustedTicks) * (1+getTalent(statName)/100);
+            let expToAdd = soulstoneBonus * action.stats[statName] * action.expMult * (action.manaCost() / action.adjustedTicks) * (1+getTalent(statName)/100);
+            // console.log("toAdd " + expToAdd + " soulstone " + soulstoneBonus + " action stats " + action.stats[statName] + " exp mult " + action.expMult + " mana cost mult " + (action.manaCost() / action.adjustedTicks) + " talent mult " + (1+getTalent(statName)/100));
             if(!action["statExp"+statName]) {
                 action["statExp"+statName] = 0;
             }

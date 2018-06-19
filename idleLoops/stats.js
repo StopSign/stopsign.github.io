@@ -53,7 +53,7 @@ function getPrcToNextTalent(stat) {
 }
 
 function getSkillLevelFromExp(exp) {
-    return Math.floor(.00000001 + (Math.pow(6,(1/3)) * Math.pow((Math.sqrt(81 * Math.pow(exp, 2) - 16200*exp + 809952) + 9*exp - 900),(1/3)) + (2 * Math.pow(6,(2/3)))/Math.pow((Math.sqrt(81 * Math.pow(exp, 2) - 16200 * exp + 809952) + 9 * exp - 900),(1/3)) - 6) / 6);
+    return exp < 101 ? 0 : Math.floor(.00000001 + (Math.pow(6,(1/3)) * Math.pow((Math.sqrt(81 * Math.pow(exp, 2) - 16200*exp + 809952) + 9*exp - 900),(1/3)) + (2 * Math.pow(6,(2/3)))/Math.pow((Math.sqrt(81 * Math.pow(exp, 2) - 16200 * exp + 809952) + 9 * exp - 900),(1/3)) - 6) / 6);
 }
 
 function getExpOfSkillLevel(level) {
