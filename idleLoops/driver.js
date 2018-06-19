@@ -1,6 +1,6 @@
 'use strict';
 
-window.gameSpeed = 10;
+window.gameSpeed = 1;
 window.gameTickLeft = 0;
 
 function tick() {
