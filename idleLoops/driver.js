@@ -9,7 +9,7 @@ function tick() {
     prevState.stats = JSON.parse(JSON.stringify(stats));
     actions.tick();
     if(soulstoneChance < 1) {
-        soulstoneChance += .000001;
+        soulstoneChance += .0000002;
         if(soulstoneChance > 1) {
             soulstoneChance = 1;
         }
@@ -58,6 +58,7 @@ function restart() {
     } else {
         addGold(-gold);
     }
+    addGlasses(-glasses);
     addReputation(-reputation);
     addSupplies(-supplies);
     addHerbs(-herbs);
@@ -79,16 +80,25 @@ function addActionToList(name, townNum, isTravelAction) {
         let action = towns[townNum].totalActionList[i];
         if(action.name === name) {
             if(action.visible() && action.unlocked()) {
+                let addAmount = actions.addAmount;
+                if(action.allowed) {
+                    let numMax = action.allowed();
+                    let numHave = getNumOnList(action.name);
+                    if((numMax - numHave) < addAmount) {
+                        addAmount = numMax - numHave;
+                    }
+                }
                 if(isTravelAction) {
                     actionTownNum = townNum+1;
                     actions.addAction(name, 1);
                 } else {
-                    actions.addAction(name);
+                    actions.addAction(name, addAmount);
                 }
             }
         }
     }
     view.updateNextActions();
+    view.updateLockedHidden();
 }
 
 function addMana(amount) {
@@ -98,6 +108,11 @@ function addMana(amount) {
 function addGold(amount) {
     gold += amount;
     view.updateGold();
+}
+
+function addGlasses(amount) {
+    glasses += amount;
+    view.updateGlasses();
 }
 
 function addReputation(amount) {
@@ -189,8 +204,18 @@ function capAmount(index, townNum) {
 }
 
 function addLoop(index) {
-    actions.next[index].loops += actions.addAmount;
+    let theClass = translateClassNames(actions.next[index].name);
+    let addAmount = actions.addAmount;
+    if(theClass.allowed) {
+        let numMax = theClass.allowed();
+        let numHave = getNumOnList(theClass.name);
+        if((numMax - numHave) < addAmount) {
+            addAmount = numMax - numHave;
+        }
+    }
+    actions.next[index].loops += addAmount;
     view.updateNextActions();
+    view.updateLockedHidden();
 }
 function removeLoop(index) {
     actions.next[index].loops -= actions.addAmount;
@@ -198,6 +223,7 @@ function removeLoop(index) {
         actions.next[index].loops = 0;
     }
     view.updateNextActions();
+    view.updateLockedHidden();
 }
 function split(index) {
     const toSplit = actions.next[index];
@@ -231,4 +257,5 @@ function removeAction(index) {
 
     actions.next.splice(index, 1);
     view.updateNextActions();
+    view.updateLockedHidden();
 }

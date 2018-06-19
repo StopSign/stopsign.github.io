@@ -52,14 +52,22 @@ function getPrcToNextTalent(stat) {
     return curLevelProgress / nextLevelNeeds * 100;
 }
 
+function getSkillLevelFromExp(exp) {
+    return Math.floor((Math.sqrt(8*exp/100+1)-1)/2);
+}
+
+function getExpOfSkillLevel(level) {
+    return level * (level + 1) * 50;
+}
+
 function getSkillLevel(skill) {
-    return getLevelFromExp(skills[skill].exp);
+    return getSkillLevelFromExp(skills[skill].exp);
 }
 
 function getPrcToNextSkillLevel(skill) {
-    let expOfCurLevel = getExpOfLevel(getSkillLevel(skill));
+    let expOfCurLevel = getExpOfSkillLevel(getSkillLevel(skill));
     let curLevelProgress = skills[skill].exp - expOfCurLevel;
-    let nextLevelNeeds = getExpOfLevel(getSkillLevel(skill)+1) - expOfCurLevel;
+    let nextLevelNeeds = getExpOfSkillLevel(getSkillLevel(skill)+1) - expOfCurLevel;
     return curLevelProgress / nextLevelNeeds * 100;
 }
 
