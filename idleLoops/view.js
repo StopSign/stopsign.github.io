@@ -30,6 +30,12 @@ function View() {
         }
         this.updateTime();
         this.updateSoulstoneChance();
+        for (let i=0; i < this.updateCurrentActionBarRequests.length; i++) {
+            if (this.updateCurrentActionBarRequests[i]) {
+                this.updateCurrentActionBarRequests[i] = false;
+                this.updateCurrentActionBar(i);
+            }
+        }
     };
 
     this.showStat = function(stat) {
@@ -114,6 +120,10 @@ function View() {
         document.getElementById("hideDiv").style.display = herbs ? "inline-block" : "none";
         document.getElementById("hide").innerHTML = hide;
     };
+    this.updatePotions = function() {
+        document.getElementById("potionsDiv").style.display = herbs ? "inline-block" : "none";
+        document.getElementById("potions").innerHTML = hide;
+    };
 
     this.updateNextActions = function() {
         let count = 0;
@@ -191,6 +201,7 @@ function View() {
             totalDivText +=
                 "<div id='actionTooltip"+i+"' style='display:none;padding-left:10px;width:90%'>" +
                     "<div style='text-align:center;width:100%'>"+action.name+"</div><br><br>" +
+                    "<div class='bold'>Mana Original</div> <div id='action"+i+"ManaOrig'>0</div><br>" +
                     "<div class='bold'>Mana Used</div> <div id='action"+i+"ManaUsed'>0</div><br>" +
                     "<div class='bold'>Remaining</div> <div id='action"+i+"Remaining'></div><br><br>" +
                     "<div id='action"+i+"ExpGain'></div>" +
@@ -205,6 +216,12 @@ function View() {
         this.mouseoverAction(0, false);
     };
 
+    
+    this.updateCurrentActionBarRequests = Array(50).fill(false);
+    this.updateCurrentActionBarRequest = function f(index) {
+        this.updateCurrentActionBarRequests[index] = true;
+    };
+    
     this.updateCurrentActionBar = function(index) {
         const action = actions.current[index];
         const div = document.getElementById("action"+index+"Bar");
@@ -221,6 +238,7 @@ function View() {
             div.style.width = "100%";
             div.style.backgroundColor = "#6d6d6d";
         }
+        document.getElementById("action" + index + "ManaOrig").innerHTML = action.manaCost() + "";
         document.getElementById("action" + index + "ManaUsed").innerHTML = action.manaUsed + "";
         document.getElementById("action"+index+"Remaining").innerHTML = (timeNeeded - timer)+"";
         let statExpGain = "";
@@ -272,7 +290,7 @@ function View() {
             let action = this.totalActionList[i];
             const actionDiv = document.getElementById("container"+action.varName);
             const infoDiv = document.getElementById("infoContainer"+action.varName);
-            if(!action.unlocked()) {
+            if(!action.unlocked() || (action.allowed && getNumOnList(action.name) >= action.allowed())) {
                 addClassToDiv(actionDiv, "locked");
                 if(infoDiv) {
                     addClassToDiv(infoDiv, "hidden");
@@ -439,7 +457,20 @@ function View() {
 
         this.createTownAction(new PracticalMagic());
         this.createTownAction(new LearnAlchemy());
-        // this.createTownAction(new BrewPotions());
+        this.createTownAction(new BrewPotions());
+
+        this.createTravelAction(new ContinueOn());
+
+        while (actionOptionsTown[2].firstChild) {
+            actionOptionsTown[2].removeChild(actionOptionsTown[2].firstChild);
+        }
+        while(townInfos[2].firstChild) {
+            townInfos[2].removeChild(townInfos[1].firstChild);
+        }
+
+        this.createTownAction(new PurchaseMana());
+        this.createTownAction(new SellPotions());
+
     };
 
     this.createActionProgress = function(action) {
@@ -658,7 +689,7 @@ const curActionsDiv = document.getElementById("curActionsList");
 const nextActionsDiv = document.getElementById("nextActionsList");
 const actionOptionsTown = [];
 const townInfos = [];
-for(let i = 0; i < 2; i++) {
+for(let i = 0; i < 3; i++) {
     actionOptionsTown[i] = document.getElementById("actionOptionsTown"+i);
     townInfos[i] = document.getElementById("townInfo"+i);
 }

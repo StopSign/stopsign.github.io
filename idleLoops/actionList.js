@@ -64,8 +64,15 @@ function translateClassNames(name) {
         return new LearnAlchemy();
     } else if(name === "Brew Potions") {
         return new BrewPotions();
+    } else if(name === "Continue On") {
+        return new ContinueOn();
     }
-
+    //town 3
+    if(name === "Purchase Mana") {
+        return new PurchaseMana();
+    } else if(name === "Sell Potions") {
+        return new SellPotions();
+    }
     console.log('error trying to create ' + name);
 }
 
@@ -73,7 +80,7 @@ function hasCap(name) {
     return (name === "Smash Pots" || name === "Pick Locks" || name === "Short Quest" || name === "Long Quest" || name === "Gather Herbs" || name === "Wild Mana" || name === "Hunt");
 }
 function getTravelNum(name) {
-    return name === "Start Journey" ? 1 : 0;
+    return (name === "Start Journey" || name === "Continue On") ? 1 : 0;
 }
 
 let townNames = ["Beginnersville", "Forest Path", "Merchantville"];
@@ -188,7 +195,7 @@ function adjustLQuests() {
 function ExploreForest() {
     this.name = "Explore Forest";
     this.expMult = 1;
-    this.tooltip = "What a pleasant area.";
+    this.tooltip = "What a pleasant area.<br>2x progress with glasses";
     this.townNum = 1;
 
     this.infoName = "Forest Explored";
@@ -209,7 +216,7 @@ function ExploreForest() {
         return true;
     };
     this.finish = function() {
-        towns[1].finishProgress(this.varName, 100, function() {
+        towns[1].finishProgress(this.varName, 100 * (glasses ? 2 : 1), function() {
             adjustWildMana();
             adjustHunt();
             adjustHerbs();
@@ -316,7 +323,7 @@ function BuyGlasses() {
         return towns[0].getLevel("Wander") >= 3;
     };
     this.unlocked = function() {
-        return towns[0].getLevel("Wander") >= 20 && getNumOnList(this.name) < this.allowed();
+        return towns[0].getLevel("Wander") >= 20;
     };
     this.finish = function() {
         addGlasses(1);
@@ -599,6 +606,9 @@ function StartJourney() {
         Per:.3,
         Spd:.3
     };
+    this.allowed = function() {
+        return 1;
+    };
     this.manaCost = function() {
         return 1000;
     };
@@ -680,8 +690,8 @@ function LearnAlchemy() {
 
     this.varName = "trAlchemy";
     this.stats = {
-        Per:.1,
         Con:.3,
+        Per:.1,
         Int:.6
     };
     this.canStart = function() {
@@ -706,29 +716,119 @@ function LearnAlchemy() {
 }
 
 function BrewPotions() {
-    this.name = "Learn Alchemy";
+    this.name = "Brew Potions";
     this.expMult = 1;
-    this.tooltip = "Bubbles and Flasks. Potions and Magic.<br>Unlocked with 10 Alchemy.";
+    this.tooltip = "Bubbles and Flasks. Potions and Magic.<br>Creates a potion from 10 herbs to sell at the next town.<br>Unlocked with 10 Alchemy.";
     this.townNum = 1;
 
-    this.varName = "trAlchemy";
+    this.varName = "Potions";
     this.stats = {
-        Per:.1,
-        Con:.3,
-        Int:.6
+        Dex:.3,
+        Int:.6,
+        Luck:.1,
+    };
+    this.canStart = function() {
+        return herbs >= 10;
+    };
+    this.cost = function() {
+        addHerbs(-10);
     };
     this.manaCost = function() {
-        return Math.ceil(2000);
+        return Math.ceil(4000);
     };
     this.visible = function() {
         return getSkillLevel("Alchemy") >= 1;
     };
     this.unlocked = function() {
-        return getSkillLevel("Alchemy") >= 5;
+        return getSkillLevel("Alchemy") >= 10;
     };
     this.finish = function() {
+        addPotions(1);
         addSkillExp("Alchemy", 25);
         addSkillExp("Magic", 50);
+    };
+}
+
+function ContinueOn() {
+    this.name = "Continue On";
+    this.expMult = 2;
+    this.tooltip = "Keep walking to the next town, Merchanton.<br>Mana cost reduced by 4% per Old Shortcut";
+    this.townNum = 1;
+
+    this.varName = "Continue";
+    this.stats = {
+        Con:.4,
+        Per:.2,
+        Spd:.4
+    };
+    this.allowed = function() {
+        return 1;
+    };
+    this.manaCost = function() {
+        return Math.ceil(8000 / (1 + towns[1].getLevel("Shortcut")/25));
+    };
+    this.visible = function() {
+        return true;
+    };
+    this.unlocked = function() {
+        return true;
+    };
+    this.finish = function() {
+        unlockTown(2);
+    };
+}
+
+function PurchaseMana() {
+    this.name = "Purchase Mana";
+    this.expMult = 1;
+    this.tooltip = "1 gold = 50 mana. Buys all the mana you can.";
+    this.townNum = 2;
+
+    this.varName = "Gold2";
+    this.stats = {
+        Cha:.7,
+        Int:.2,
+        Luck:.1
+    };
+    this.manaCost = function() {
+        return 100;
+    };
+    this.visible = function() {
+        return true;
+    };
+    this.unlocked = function() {
+        return true;
+    };
+    this.finish = function() {
+        addMana(gold * 50);
+        addGold(-gold);
+    };
+}
+
+function SellPotions() {
+    this.name = "Sell Potions";
+    this.expMult = 1;
+    this.tooltip = "Potions are worth 1 gold per alchemy skill, but it takes a bit to find a seller.";
+    this.townNum = 2;
+
+    this.varName = "SellPotions";
+    this.stats = {
+        Cha:.7,
+        Int:.2,
+        Luck:.1
+    };
+    this.manaCost = function() {
+        return 1000;
+    };
+    this.visible = function() {
+        return true;
+    };
+    this.unlocked = function() {
+        return true;
+    };
+    this.finish = function() {
+        addGold(potions * getSkillLevel("Alchemy"));
+        addPotions(-potions);
     };
 }
 

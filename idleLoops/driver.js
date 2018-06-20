@@ -1,35 +1,57 @@
 'use strict';
 
+window.gameSpeed = 1;
+window.gameTickLeft = 0;
+
 function tick() {
     if(stop) {
+        window.gameTickLeft = 0;
         return;
     }
-    timer++;
-
     prevState.stats = JSON.parse(JSON.stringify(stats));
-    actions.tick();
-    if(soulstoneChance < 1) {
-        soulstoneChance += .0000002;
-        if(soulstoneChance > 1) {
-            soulstoneChance = 1;
+
+    window.gameTickLeft += gameSpeed / fps * 50;
+
+    if (gameTickLeft > 0)
+    while (window.gameTickLeft-- > 0) {
+        if(window.gameTickLeft > 1000) {
+            pauseGame();
+            console.warn(`too many ticks! (${gameTickLeft})`);
+            window.gameTickLeft = 0;
         }
-    }
+        if(stop) {
+            window.gameTickLeft = 0;
+            view.update();
+            return;
+        }
+        timer++;
+
+        actions.tick();
+        if(soulstoneChance < 1) {
+            soulstoneChance += .0000002;
+            if(soulstoneChance > 1) {
+                soulstoneChance = 1;
+            }
+        }
 
 
-    if(shouldRestart || timer >= timeNeeded) {
-        prepareRestart();
+        if(shouldRestart || timer >= timeNeeded) {
+            prepareRestart();
+        }
+        
+        if(timer % (300*gameSpeed) === 0) {
+            save();
+        }
     }
 
     view.update();
 
-    if(timer % 300 === 0) {
-        save();
-    }
 }
 
-function recalcInterval(newSpeed) {
+function recalcInterval(fps) {
+    window.fps = fps;
     doWork.postMessage({stop:true});
-    doWork.postMessage({start:true,ms:(1000 / newSpeed)});
+    doWork.postMessage({start:true,ms:(1000 / fps)});
 }
 
 function pauseGame() {
@@ -69,6 +91,7 @@ function restart() {
     addSupplies(-supplies);
     addHerbs(-herbs);
     addHide(-hide);
+    addPotions(-potions);
     restartStats();
     for(let i = 0; i < towns.length; i++) {
         towns[i].restart();
@@ -85,7 +108,7 @@ function addActionToList(name, townNum, isTravelAction) {
     for(let i = 0; i < towns[townNum].totalActionList.length; i++) {
         let action = towns[townNum].totalActionList[i];
         if(action.name === name) {
-            if(action.visible() && action.unlocked()) {
+            if(action.visible() && action.unlocked() && (!action.allowed || getNumOnList(action.name) < action.allowed())) {
                 let addAmount = actions.addAmount;
                 if(action.allowed) {
                     let numMax = action.allowed();
@@ -139,6 +162,11 @@ function addHerbs(amount) {
 function addHide(amount) {
     hide += amount;
     view.updateHide();
+}
+
+function addPotions(amount) {
+    potions += amount;
+    view.updatePotions();
 }
 
 function changeActionAmount(amount, num) {
