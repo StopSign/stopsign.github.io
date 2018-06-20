@@ -25,6 +25,17 @@
         Changelog
         <div class="showthisH">
             <div class="showthat2">
+                Version .71
+                <div class="showthis2">
+                    * Tooltip on reset button<br>
+                    * Glasses give x2 to forest<br>
+                    * Mana cost reflects the tooltips now rather than an average of stat reduction<br>
+                    * Trainings are capped at 10 per loop<br>
+                    * New actions! Brew Potions, Continue On, Explore City, Gamble, Get Drunk, Purchase Mana, Sell Potions<br>
+                    * Some new actions are usless at the moment.
+                </div>
+            </div><br>
+            <div class="showthat2">
                 Version .70
                 <div class="showthis2">
                     * Reverted skill nerf (too harsh)<br>
@@ -173,7 +184,8 @@
     <div style="float:left;height:30px;margin-left:10px;" class="showthatH">
         Options
         <div class="showthisH">
-            <a href="https://discord.gg/EmRuWPp" target="_blank">Discord Link</a>
+            <a href="https://discord.gg/EmRuWPp" target="_blank">Discord Link</a><br>
+            WARNING: for some reason Adblock Plus can cause massive lag. I won't ever have ads so if your game is freezing frequently please disable for this page.<br>
         </div>
     </div>
     <div class="showthat">
@@ -212,7 +224,12 @@
     <div id="pausePlay" onclick="pauseGame()" class="button">Pause</div>
     <input type="checkbox" id="pauseBeforeRestart">
     <label for="pauseBeforeRestart">Pause before restart</label>
-    <div onclick="restart()" class="button">Restart</div>
+    <div onclick="restart()" class="button showthat">
+        Restart
+        <div class="showthis">
+            Resets the loop. Not a hard reset.
+        </div>
+    </div>
     <div class="showthat">
         <div class="large bold">Story</div>
         <div class="showthis" style="width:300px;">
@@ -233,9 +250,9 @@
 
                 e.g. Meet People costs 800 mana and has a breakdown of <div class="bold">Int</div> 10% <div class="bold">Cha</div> 80% <div class="bold">Soul</div> 10%.<br>
                 This effectively means 80 of the mana is controlled by <div class="bold">Int</div>, another 80 by <div class="bold">Soul</div>, and the remaining 640 by <div class="bold">Cha</div>.<br>
-                If your <div class="bold">Cha</div> is level 20 when the action is started, it'd be 640 / (1.2) = 533.<br>
-                Adding back the 160 from <div class="bold">Soul</div>/<div class="bold">Int</div>, the total mana the action takes is now 693, so ~15% less mana.<br>
-                The action would give (800/693)*(1+talent/100) level exp per mana for the 693 mana.
+                If your <div class="bold">Cha</div> is level 20 when the action is started, it'd be 640 / 1.2 = 533.333<br>
+                Adding back the 160 from <div class="bold">Soul</div> and <div class="bold">Int</div>, the total mana the action takes (rounded up) is now 694, so ~15% less mana.<br>
+                The action would give (800/694)*(1+talent/100) level exp per mana for the 694 mana.
             </div>
         </div><br>
         <div id="statList" style="width:100%;">

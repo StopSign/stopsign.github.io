@@ -330,6 +330,7 @@ function View() {
         actionOptionsTown[townNum].style.display = "block";
         townInfos[townNum].style.display = "block";
         document.getElementById("townName").innerHTML = townNames[townNum];
+        townShowing = townNum;
     };
 
     this.updateRegular = function(varName, index) {
@@ -467,6 +468,17 @@ function View() {
         while(townInfos[2].firstChild) {
             townInfos[2].removeChild(townInfos[1].firstChild);
         }
+        tempObj = new ExploreCity();
+        this.createTownAction(tempObj);
+        this.createActionProgress(tempObj);
+
+        tempObj = new Gamble();
+        this.createTownAction(tempObj);
+        this.createTownInfo(tempObj);
+
+        tempObj = new GetDrunk();
+        this.createTownAction(tempObj);
+        this.createActionProgress(tempObj);
 
         this.createTownAction(new PurchaseMana());
         this.createTownAction(new SellPotions());

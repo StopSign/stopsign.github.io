@@ -188,14 +188,14 @@ function Actions() {
 }
 
 function setAdjustedTicks(action) {
-    let statMult = 0;
+    let newCost = 0;
     for(let i = 0; i < statList.length; i++) {
         let statName = statList[i];
         if(action.stats[statName]) {
-            statMult += action.stats[statName] * (1 + getLevel(statName)/100);
+            newCost += action.stats[statName] / (1 + getLevel(statName)/100);
         }
     }
-    action.adjustedTicks = Math.ceil(action.manaCost() / statMult);
+    action.adjustedTicks = Math.ceil(action.manaCost() * newCost);
 }
 
 function calcSoulstoneMult(soulstones) {

@@ -54,15 +54,13 @@ hover -> focus
 
 town 2 - forest road
 
-        brew potions - Req 35 magic, 10 alchemy skill, 10 herbs, slightly improves magic skill, get one potion, req rep >= 5
-    Follow Flower Trail - PBA, more herbs
+    Follow Flowers - PBA, more herbs
         Clear thicket - PBA, more wild mana
         talk to witch - PBA, slightly improve mage lessons, improve gather wild mana
         learn dark magic - improves dark magic skill, costs reputation, req rep < 3
             Dark Magic Skill -
                 Smash pots and wild mana 1% more reward per level.
         Perform ritual - req rep < 0, MPBA, gives perm +initial mana
-    go to next town
 
 town 3 - guilds and stuff
     gamble
