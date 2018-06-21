@@ -171,8 +171,8 @@ function View() {
             let isTravel = getTravelNum(action.name);
             totalDivText +=
                 "<div id='nextActionContainer" + i + "' class='nextActionContainer small' ondragover='handleDragOver(event)' ondrop='handleDragDrop(event)' ondragstart='handleDragStart(event)' ondragend='draggedUndecorate(" + i + ")' ondragenter='dragOverDecorate(" + i +")' ondragleave='dragExitUndecorate("+i+")' draggable='true' data-index='"+i+"'>" +
-                "<div class='bold'>" + action.loops + "</div> x " +
-                "<img src='img/" + camelize(action.name) + ".svg' class='smallIcon imageDragFix'>" +
+                "<img src='img/" + camelize(action.name) + ".svg' class='smallIcon imageDragFix'> x " +
+                "<div class='bold'>" + action.loops + "</div>" +
                 "<div style='float:right'>" +
                 capButton +
                 (isTravel ? "" : "<i id='plusButton" + i + "' onclick='addLoop(" + i + ")' class='actionIcon fa fa-plus'></i>") +
@@ -197,8 +197,8 @@ function View() {
                 "<div class='curActionContainer small' onmouseover='view.mouseoverAction("+i+", true)' onmouseleave='view.mouseoverAction("+i+", false)'>" +
                     "<div class='curActionBar' id='action"+i+"Bar'></div>" +
                     "<div class='actionSelectedIndicator' id='action"+i+"Selected'></div>" +
-                    "<div id='action"+i+"Loops' style='margin-left:3px'>"+ action.loopsLeft+"</div>(" + action.loops + ")" + " x " +
-                    "<img src='img/"+camelize(action.name)+".svg' class='smallIcon'>" +
+                    "<img src='img/"+camelize(action.name)+".svg' class='smallIcon'> x " +
+                "<div id='action"+i+"Loops' style='margin-left:3px'>"+ action.loopsLeft+"</div>(" + action.loops + ")" +
                 "</div>";
         }
 
@@ -714,6 +714,39 @@ function View() {
                 trainingDiv.innerHTML = trainingLimits;
             }
         }
+    };
+
+    this.updateStory = function(num) { //when you mouseover Story
+        document.getElementById("newStory").style.display = "none";
+        if(num <= 0) {
+            num = 0;
+            document.getElementById("storyLeft").style.visibility = "hidden";
+        } else {
+            document.getElementById("storyLeft").style.visibility = "visible";
+        }
+
+        if(num >= storyMax) {
+            num = storyMax;
+            document.getElementById("storyRight").style.visibility = "hidden";
+        } else {
+            document.getElementById("storyRight").style.visibility = "visible";
+        }
+        for(let i = 0; i < 10; i++) {
+            let storyDiv = document.getElementById("story"+i);
+            if(storyDiv) {
+                storyDiv.style.display = "none";
+            }
+        }
+        storyShowing = num;
+        document.getElementById("storyPage").innerHTML = storyShowing+1;
+        document.getElementById("story"+num).style.display = "inline-block";
+    }
+}
+
+function unlockStory(num) {
+    if(num > storyMax) {
+        document.getElementById("newStory").style.display = "inline-block";
+        storyMax = num;
     }
 }
 

@@ -354,7 +354,7 @@ function GetDrunk() {
     };
     this.cost = function() {
         addReputation(-1);
-        addGold(2);
+        addGold(-2);
     };
     this.manaCost = function() {
         return 1000;
@@ -842,7 +842,7 @@ function BrewPotions() {
 function ContinueOn() {
     this.name = "Continue On";
     this.expMult = 2;
-    this.tooltip = "Keep walking to the next town, Merchanton.<br>Mana cost reduced by 4% per Old Shortcut";
+    this.tooltip = "Keep walking to the next town, Merchanton.<br>Mana cost reduced by 60 per Old Shortcut %";
     this.townNum = 1;
 
     this.varName = "Continue";
@@ -855,7 +855,7 @@ function ContinueOn() {
         return 1;
     };
     this.manaCost = function() {
-        return Math.ceil(8000 / (1 + towns[1].getLevel("Shortcut")/25));
+        return Math.ceil(8000 - (60 * towns[1].getLevel("Shortcut")));
     };
     this.visible = function() {
         return true;
@@ -1179,7 +1179,7 @@ function Hunt() {
         return 800;
     };
     this.visible = function() {
-        return towns[1].getLevel("Forest") >= 10;
+        return false;
     };
     this.unlocked = function() {
         return towns[1].getLevel("Forest") >= 40;
@@ -1371,6 +1371,11 @@ function SmallDungeon() {
             stats[statToAdd].soulstone = stats[statToAdd].soulstone ? stats[statToAdd].soulstone+1 : 1;
             soulstoneChance *= .98;
             view.updateSoulstones();
+            if(storyMax <= 1) {
+                unlockStory(1);
+            }
+        } else if(storyMax <= 2) {
+            unlockStory(2);
         }
     };
     this.getPartName = function() {
