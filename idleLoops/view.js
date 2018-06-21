@@ -140,6 +140,15 @@ function View() {
             document.getElementById("upButton" + count).removeAttribute("onclick");
             document.getElementById("downButton" + count).removeAttribute("onclick");
             document.getElementById("removeButton" + count).removeAttribute("onclick");
+            
+            let dragAndDropDiv = document.getElementById("nextActionContainer"+count);
+            dragAndDropDiv.removeAttribute("ondragover");
+            dragAndDropDiv.removeAttribute("ondrop");
+            dragAndDropDiv.removeAttribute("ondragstart");
+            dragAndDropDiv.removeAttribute("ondragend");
+            dragAndDropDiv.removeAttribute("ondragenter");
+            dragAndDropDiv.removeAttribute("ondragleave");
+
             while (nextActionsDiv.firstChild.firstChild) {
                 if (nextActionsDiv.firstChild.firstChild instanceof HTMLImageElement) {
                     nextActionsDiv.firstChild.firstChild.src = '';
