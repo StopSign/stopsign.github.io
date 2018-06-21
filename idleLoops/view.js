@@ -758,17 +758,21 @@ function addStatColors(theDiv, stat) {
 }
 
 function dragOverDecorate(i) {
+    if(document.getElementById("nextActionContainer" + i))
     document.getElementById("nextActionContainer" + i).classList.add("draggedOverAction");
 }
 
 function dragExitUndecorate(i) {
+    if(document.getElementById("nextActionContainer" + i))
     document.getElementById("nextActionContainer" + i).classList.remove("draggedOverAction");
 }
 
 function draggedDecorate(i) {
+    if(document.getElementById("nextActionContainer" + i))
     document.getElementById("nextActionContainer" + i).classList.add("draggedAction");
 }
 
 function draggedUndecorate(i) {
+    if(document.getElementById("nextActionContainer" + i))
     document.getElementById("nextActionContainer" + i).classList.remove("draggedAction");
 }
