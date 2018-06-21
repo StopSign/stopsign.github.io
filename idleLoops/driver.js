@@ -56,7 +56,7 @@ function recalcInterval(fps) {
 
 function pauseGame() {
     stop = !stop;
-    document.title = "Idle Loops *PAUSED*";
+    document.title = "*PAUSED* Idle Loops";
     document.getElementById("pausePlay").innerHTML = stop ? "Play" : "Pause";
     if(!stop && (shouldRestart || timer >= timeNeeded)) {
         restart();
