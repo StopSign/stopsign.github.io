@@ -335,49 +335,13 @@ function adjustSuckers() {
     towns[2].totalHerbs = towns[2].getLevel("City") * 10;
 }
 
-function Gamble() {
-    this.name = "Gamble";
-    this.expMult = 2;
-    this.tooltip = "The cards still somehow come out different every time.<br>Has 2x exp/talent gain<br>Costs 20 gold and 1 reputation.<br>Requires at least -5 reputation.<br>You win against every 10 suckers, and get 60 gold for winning";
-    this.townNum = 2;
-
-    this.varName = "Gamble";
-    this.infoName = "Suckers Swindled";
-    this.infoText = "Suckers left <i class='fa fa-arrow-left'></i> Suckers total <i class='fa fa-arrow-left'></i> People to check if they're suckers<br><div class='bold'>Total Found</div> <div id='totalGamble'></div>";
-    this.stats = {
-        Cha:.2,
-        Luck:.8
-    };
-    this.canStart = function() {
-        return gold >= 20 && reputation >= -5;
-    };
-    this.cost = function() {
-        addGold(-20);
-        addReputation(-1);
-    };
-    this.manaCost = function() {
-        return 1000;
-    };
-    this.visible = function() {
-        return true;
-    };
-    this.unlocked = function() {
-        return towns[2].getLevel("City") >= 10;
-    };
-    this.finish = function() {
-        towns[2].finishRegular(this.varName, 10, function() {
-            addGold(60);
-            return 60;
-        })
-    };
-}
-
 function GetDrunk() {
     this.name = "Get Drunk";
     this.expMult = 1;
-    this.tooltip = "Sometimes you just need a drink.<br>Costs 2 gold and requires -3 reputation.<br>Costs 1 reputation.<br>Unlocked at 20% City Explored.";
+    this.tooltip = "Sometimes you just need a drink.<br>Costs 2 gold and requires reputation greater than -3.<br>Costs 1 reputation.<br>Unlocked at 20% City Explored.";
     this.townNum = 2;
 
+    this.infoName = "Rumors Heard";
     this.varName = "Drunk";
     this.stats = {
         Str:.1,
@@ -1224,6 +1188,43 @@ function Hunt() {
         towns[1].finishRegular(this.varName, 10, function() {
             addHide(1);
             return 1;
+        })
+    };
+}
+
+function Gamble() {
+    this.name = "Gamble";
+    this.expMult = 2;
+    this.tooltip = "The cards still somehow come out different every time.<br>Has 2x exp/talent gain<br>Costs 20 gold and 1 reputation.<br>Requires reputation greater than -5.<br>You win against every 10 suckers, and get 60 gold for winning";
+    this.townNum = 2;
+
+    this.varName = "Gamble";
+    this.infoName = "Suckers Swindled";
+    this.infoText = "Suckers left <i class='fa fa-arrow-left'></i> Suckers total <i class='fa fa-arrow-left'></i> People to check if they're suckers<br><div class='bold'>Total Found</div> <div id='totalGamble'></div>";
+    this.stats = {
+        Cha:.2,
+        Luck:.8
+    };
+    this.canStart = function() {
+        return gold >= 20 && reputation >= -5;
+    };
+    this.cost = function() {
+        addGold(-20);
+        addReputation(-1);
+    };
+    this.manaCost = function() {
+        return 1000;
+    };
+    this.visible = function() {
+        return true;
+    };
+    this.unlocked = function() {
+        return towns[2].getLevel("City") >= 10;
+    };
+    this.finish = function() {
+        towns[2].finishRegular(this.varName, 10, function() {
+            addGold(60);
+            return 60;
         })
     };
 }
