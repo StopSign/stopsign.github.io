@@ -36,6 +36,7 @@ let townShowing = 0;
 let maxTown;
 let statShowing;
 let actionTownNum;
+let trainingLimits = 50;
 
 
 function closeTutorial() {

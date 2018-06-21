@@ -21,6 +21,7 @@ function View() {
         this.updateSoulstones();
         this.updateSupplies();
         this.showTown(0);
+        this.updateTrainingLimits();
     };
 
     this.update = function() {
@@ -238,7 +239,7 @@ function View() {
             div.style.width = "100%";
             div.style.backgroundColor = "#6d6d6d";
         }
-        document.getElementById("action" + index + "ManaOrig").innerHTML = action.manaCost() + "";
+        document.getElementById("action" + index + "ManaOrig").innerHTML = action.manaCost() * action.loops + "";
         document.getElementById("action" + index + "ManaUsed").innerHTML = action.manaUsed + "";
         document.getElementById("action"+index+"Remaining").innerHTML = (timeNeeded - timer)+"";
         let statExpGain = "";
@@ -552,6 +553,7 @@ function View() {
 
         let actionsDiv = document.createElement("div");
         actionsDiv.innerHTML = totalDivText;
+        actionsDiv.style.width = "100%";
         actionOptionsTown[action.townNum].appendChild(actionsDiv);
         towns[action.townNum].totalActionList.push(action);
         this.totalActionList.push(action);
@@ -695,6 +697,15 @@ function View() {
             document.getElementById("segmentName"+i+action.varName).innerHTML = action.getSegmentName(towns[action.townNum][action.varName+"LoopCounter"]+i);
         }
     };
+
+    this.updateTrainingLimits = function() {
+        for(let i = 0; i < statList.length; i++) {
+            let trainingDiv = document.getElementById("trainingLimit"+statList[i]);
+            if(trainingDiv) {
+                trainingDiv.innerHTML = trainingLimits;
+            }
+        }
+    }
 }
 
 const curActionsDiv = document.getElementById("curActionsList");

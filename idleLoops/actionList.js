@@ -474,7 +474,7 @@ function BuyMana() {
 function TrainStr() {
     this.name = "Train Strength";
     this.expMult = 4;
-    this.tooltip = "Build up those muscles. Again.<br>Has 4x exp/talent gain, and can only be done 10 times per reset<br>Unlocked at 5% People Met";
+    this.tooltip = "Build up those muscles. Again.<br>Has 4x exp/talent gain, and can only be done <div id='trainingLimitStr'></div> times per reset<br>Unlocked at 5% People Met";
     this.townNum = 0;
 
     this.varName = "trStr";
@@ -483,7 +483,7 @@ function TrainStr() {
         Con:.2
     };
     this.allowed = function() {
-        return 10;
+        return trainingLimits;
     };
     this.manaCost = function() {
         return 500;
@@ -501,7 +501,7 @@ function TrainStr() {
 function TrainDex() {
     this.name = "Train Dex";
     this.expMult = 4;
-    this.tooltip = "The kids are a little mad you're taking their playground. They'll get over it.<br>Has 4x exp/talent gain, and can only be done 10 times per reset<br>Unlocked at 15% People Met";
+    this.tooltip = "The kids are a little mad you're taking their playground. They'll get over it.<br>Has 4x exp/talent gain, and can only be done <div id='trainingLimitDex'></div> times per reset<br>Unlocked at 15% People Met";
     this.townNum = 0;
 
     this.varName = "trDex";
@@ -510,7 +510,7 @@ function TrainDex() {
         Con:.2
     };
     this.allowed = function() {
-        return 10;
+        return trainingLimits;
     };
     this.manaCost = function() {
         return 500;
@@ -528,7 +528,7 @@ function TrainDex() {
 function TrainSpd() {
     this.name = "Train Speed";
     this.expMult = 4;
-    this.tooltip = "A new friend has a magical treadmill. Gotta go fast.<br>Has 4x exp/talent gain, and can only be done 10 times per reset<br>Unlocked at 30% People Met";
+    this.tooltip = "A new friend has a magical treadmill. Gotta go fast.<br>Has 4x exp/talent gain, and can only be done <div id='trainingLimitSpd'></div> times per reset<br>Unlocked at 30% People Met";
     this.townNum = 0;
 
     this.varName = "trSpd";
@@ -537,7 +537,7 @@ function TrainSpd() {
         Con:.2
     };
     this.allowed = function() {
-        return 10;
+        return trainingLimits;
     };
     this.manaCost = function() {
         return 500;
@@ -755,7 +755,7 @@ function StartJourney() {
 function SitByWaterfall() {
     this.name = "Sit By Waterfall";
     this.expMult = 4;
-    this.tooltip = "It's peaceful here. Loud, but peaceful.<br>Has 4x exp/talent gain, and can only be done 10 times per reset<br>Unlocked at 70% Forest Explored.";
+    this.tooltip = "It's peaceful here. Loud, but peaceful.<br>Has 4x exp/talent gain, and can only be done <div id='trainingLimitSoul'></div> times per reset<br>Unlocked at 70% Forest Explored.";
     this.townNum = 1;
 
     this.varName = "Waterfall";
@@ -764,7 +764,7 @@ function SitByWaterfall() {
         Soul:.8
     };
     this.allowed = function() {
-        return 10;
+        return trainingLimits;
     };
     this.manaCost = function() {
         return 800;
@@ -961,7 +961,7 @@ function SellPotions() {
 function ReadBooks() {
     this.name = "Sell Potions";
     this.expMult = 4;
-    this.tooltip = "There's a library! You always loved reading.<br>Discover new worlds and perspectives, get ideas from fiction characters, and empathize with the desire to be stronger.<br>Requires glasses.<br>Has 4x exp/talent gain, and can only be done 10 times per reset<br>Unlocks at 50% city explored";
+    this.tooltip = "There's a library! You always loved reading.<br>Discover new worlds and perspectives, get ideas from fiction characters, and empathize with the desire to be stronger.<br>Requires glasses.<br>Has 4x exp/talent gain, and can only be done <div id='trainingLimitInt'></div> times per reset<br>Unlocks at 50% city explored";
     this.townNum = 2;
 
     this.varName = "SellPotions";
@@ -970,7 +970,7 @@ function ReadBooks() {
         Soul:.2
     };
     this.allowed = function() {
-        return 10;
+        return trainingLimits;
     };
     this.canStart = function() {
         return glasses;

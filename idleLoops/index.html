@@ -17,143 +17,153 @@
 </head>
 <body id="theBody">
 
-<div id="timeInfo" style="width:100%;text-align:center;">
-    <div style="width:100%;height:10px;background:white;text-align:center;position:relative;">
-        <div id="timeBar" style="height:100%;width:20%;background-color:#8293ff;display:block;margin:auto;"></div>
-    </div>
-    <div style="float:left;height:30px;margin-left:10px;" class="showthatH">
-        Changelog
-        <div class="showthisH">
-            <div class="showthat2">
-                Version .71
-                <div class="showthis2">
-                    * Tooltip on reset button<br>
-                    * Glasses give x2 to forest<br>
-                    * Mana cost reflects the tooltips now rather than an average of stat reduction<br>
-                    * Trainings are capped at 10 per loop<br>
-                    * New actions! Brew Potions, Continue On, Explore City, Gamble, Get Drunk, Purchase Mana, Sell Potions<br>
-                    * Some new actions are usless at the moment.
-                </div>
-            </div><br>
-            <div class="showthat2">
-                Version .70
-                <div class="showthis2">
-                    * Reverted skill nerf (too harsh)<br>
-                    * Actually capped glasses<br>
-                    * Sell Gold -> Buy Mana<br>
-                    * Double soulstone recovery<br>
-                    * Nerfed practical magic (more uses for it later)
-                </div>
-            </div><br>
-            <div class="showthat2">
-                Version .69
-                <div class="showthis2">
-                    * Nerfed the soulstone nerf<br>
-                    * Cleared additional purple bars on exp<br>
-                    * Corrected glasses/throw party tooltips<br>
-                    * Actually nerfed skill growth - it's cheaper than before for level 2 - 23, and about 4x harder at level 100<br>
-                    * Add action to top of list option
-                </div>
-            </div><br>
-            <div class="showthat2">
-                Version .68
-                <div class="showthis2">
-                    * Added tab icon<br>
-                    * Throw Party costs 2 reputation from 3<br>
-                    * Removed Guided Tour<br>
-                    * Added Buy Glasses<br>
-                    * Fixed later segment names for Fight<br>
-                    * Nerfed soulstones<br>
-                    * Changed soulstone gathering, equalling about half previous rate but more initially<br>
-                    * Nerfed skill growth<br>
-                    * Added Options and Discord Link (to be expanded)<br>
-                    * Start Journey cost 2k -> 1k
-                </div>
-            </div><br>
-            <div class="showthat2">
-                Version .67
-                <div class="showthis2">
-                    * Added FAQ<br>
-                    * Doubled effectiveness of Guided Tour<br>
-                    * Fixed majority of memory leaks (not all)<br>
-                    * Made Heal/Fight requirements visible with training unlock<br>
-                    * Lengthened action list div<br>
-                    * Changed some wording of descriptions for clarity<br>
-                    * Added "lootable first" option, credit to Hunter<br>
-                    * Fixed a bug with extreme gain on Heal
-                </div>
-            </div><br>
-            <div class="showthat2">
-                Version .66
-                <div class="showthis2">
-                    * Mostly fixed import being all weird<br>
-                    * Changed investigate to be visible earlier<br>
-                    * Fixed Old Shortcut to be 100% from 110%<br>
-                    * Fixed Investigate to be 100% from 90%<br>
-                    * Rewording old shortcut and hermit<br>
-                    * Game autopauses if current list is empty<br>
-                    * Saves variables even if they're 0 (fixes some incorrect negative values)<br>
-                    * Fixes your save if your variables were negative.
-                </div>
-            </div><br>
-            <div class="showthat2">
-                Version .65
-                <div class="showthis2">
-                    * Added Learn Alchemy action and Alchemy skill<br>
-                    * Made a reddit post and discord<br>
-                    * Hid Skills that are at 0 exp<br>
-                    * Import/export
-                </div>
-            </div><br>
-            <div class="showthat2">
-                Version .64
-                <div class="showthis2">
-                    * Start Journey costs 2k mana from 1k<br>
-                    * Added Old Shortcut, Talk to Hermit, and Practical Magic actions<br>
-                    * Added Practical Magic skill<br>
-                    * Widened version tooltips
-                </div>
-            </div><br>
-            <div class="showthat2">
-                Version .63
-                <div class="showthis2">
-                    * Made Heal the Sick, Fight Monster, and Clear Dungeon more difficult<br>
-                    * Changing forEach to for loops, I forgot to change return to continue, causing multiple large issues<br>
-                    * Made stat window a little larger<br>
-                    * Changed town numbers to update on reload, instead of just on a new %
-                </div>
-            </div><br>
-            <div class="showthat2">
-                Version .62
-                <div class="showthis2">
-                    * Added Gather Wild Mana, Gather Herbs, Hunt, and Sit Under Waterfall<br>
-                    * Hide supplies/herbs/hide if you have 0<br>
-                    * You'll need to complete 1 more % on Forest Explored to update Mana Sources (NOTE: not anymore)<br>
-                </div>
-            </div><br>
-            <div class="showthat2">
-                Version .61
-                <div class="showthis2">
-                    * Removed beautiful forEach loops because IE can't handle them<br>
-                    * Possibly fixes game not working on iPads too (tell me if so)<br>
-                    * Fixed errors for players with no save file<br>
-                    * Adjusted mana costs for new actions
-                </div>
-            </div><br>
-            <div class="showthat2">
-                Version .6
-                <div class="showthis2">
-                    * Added version info<br>
-                    * Added Haggle, Buy Supplies, Start Journey, Explore Forest<br>
-                    * Added switching towns and town names<br>
-                    * Added error messages when an action fails (red bar)<br>
-                    * Require reputation now requires, instead of costs<br>
-                    * Fixed repeating a last action with a cost bug<br>
-                    * Visually separated resources and main actions<br>
-                    * Reduced requirements/difficulty for heal/fight/dungeon<br>
-                    * WARNING: adblock caused game to freeze. This has no ads, disable if you also freeze<br>
-                    * Improved performance (since I was looking anyway)
+    <div id="timeInfo" style="width:100%;text-align:center;">
+        <div style="width:100%;height:10px;background:white;text-align:center;position:relative;">
+            <div id="timeBar" style="height:100%;width:20%;background-color:#8293ff;display:block;margin:auto;"></div>
+        </div>
+        <div style="float:left;height:30px;margin-left:10px;" class="showthatH">
+            Changelog
+            <div class="showthisH">
+                <div class="showthat2">
+                    Version .72
+                    <div class="showthis2">
+                        * Sound on pause available in options<br>
+                        * training limit set to 50 from 10 (for now)<br>
+                        * Mana Original is multipled by # loops<br>
+                        * Travel Action styling change
+                    </div>
+                </div><br>
+                <div class="showthat2">
+                    Version .71
+                    <div class="showthis2">
+                        * Tooltip on reset button<br>
+                        * Glasses give x2 to forest<br>
+                        * Mana cost reflects the tooltips now rather than an average of stat reduction<br>
+                        * Trainings are capped at 10 per loop<br>
+                        * New actions! Brew Potions, Continue On, Explore City, Gamble, Get Drunk, Purchase Mana, Sell Potions<br>
+                        * Some new actions are usless at the moment.
+                    </div>
+                </div><br>
+                <div class="showthat2">
+                    Version .70
+                    <div class="showthis2">
+                        * Reverted skill nerf (too harsh)<br>
+                        * Actually capped glasses<br>
+                        * Sell Gold -> Buy Mana<br>
+                        * Double soulstone recovery<br>
+                        * Nerfed practical magic (more uses for it later)
+                    </div>
+                </div><br>
+                <div class="showthat2">
+                    Version .69
+                    <div class="showthis2">
+                        * Nerfed the soulstone nerf<br>
+                        * Cleared additional purple bars on exp<br>
+                        * Corrected glasses/throw party tooltips<br>
+                        * Actually nerfed skill growth - it's cheaper than before for level 2 - 23, and about 4x harder at level 100<br>
+                        * Add action to top of list option
+                    </div>
+                </div><br>
+                <div class="showthat2">
+                    Version .68
+                    <div class="showthis2">
+                        * Added tab icon<br>
+                        * Throw Party costs 2 reputation from 3<br>
+                        * Removed Guided Tour<br>
+                        * Added Buy Glasses<br>
+                        * Fixed later segment names for Fight<br>
+                        * Nerfed soulstones<br>
+                        * Changed soulstone gathering, equalling about half previous rate but more initially<br>
+                        * Nerfed skill growth<br>
+                        * Added Options and Discord Link (to be expanded)<br>
+                        * Start Journey cost 2k -> 1k
+                    </div>
+                </div><br>
+                <div class="showthat2">
+                    Version .67
+                    <div class="showthis2">
+                        * Added FAQ<br>
+                        * Doubled effectiveness of Guided Tour<br>
+                        * Fixed majority of memory leaks (not all)<br>
+                        * Made Heal/Fight requirements visible with training unlock<br>
+                        * Lengthened action list div<br>
+                        * Changed some wording of descriptions for clarity<br>
+                        * Added "lootable first" option, credit to Hunter<br>
+                        * Fixed a bug with extreme gain on Heal
+                    </div>
+                </div><br>
+                <div class="showthat2">
+                    Version .66
+                    <div class="showthis2">
+                        * Mostly fixed import being all weird<br>
+                        * Changed investigate to be visible earlier<br>
+                        * Fixed Old Shortcut to be 100% from 110%<br>
+                        * Fixed Investigate to be 100% from 90%<br>
+                        * Rewording old shortcut and hermit<br>
+                        * Game autopauses if current list is empty<br>
+                        * Saves variables even if they're 0 (fixes some incorrect negative values)<br>
+                        * Fixes your save if your variables were negative.
+                    </div>
+                </div><br>
+                <div class="showthat2">
+                    Version .65
+                    <div class="showthis2">
+                        * Added Learn Alchemy action and Alchemy skill<br>
+                        * Made a reddit post and discord<br>
+                        * Hid Skills that are at 0 exp<br>
+                        * Import/export
+                    </div>
+                </div><br>
+                <div class="showthat2">
+                    Version .64
+                    <div class="showthis2">
+                        * Start Journey costs 2k mana from 1k<br>
+                        * Added Old Shortcut, Talk to Hermit, and Practical Magic actions<br>
+                        * Added Practical Magic skill<br>
+                        * Widened version tooltips
+                    </div>
+                </div><br>
+                <div class="showthat2">
+                    Version .63
+                    <div class="showthis2">
+                        * Made Heal the Sick, Fight Monster, and Clear Dungeon more difficult<br>
+                        * Changing forEach to for loops, I forgot to change return to continue, causing multiple large issues<br>
+                        * Made stat window a little larger<br>
+                        * Changed town numbers to update on reload, instead of just on a new %
+                    </div>
+                </div><br>
+                <div class="showthat2">
+                    Version .62
+                    <div class="showthis2">
+                        * Added Gather Wild Mana, Gather Herbs, Hunt, and Sit Under Waterfall<br>
+                        * Hide supplies/herbs/hide if you have 0<br>
+                        * You'll need to complete 1 more % on Forest Explored to update Mana Sources (NOTE: not anymore)<br>
+                    </div>
+                </div><br>
+                <div class="showthat2">
+                    Version .61
+                    <div class="showthis2">
+                        * Removed beautiful forEach loops because IE can't handle them<br>
+                        * Possibly fixes game not working on iPads too (tell me if so)<br>
+                        * Fixed errors for players with no save file<br>
+                        * Adjusted mana costs for new actions
+                    </div>
+                </div><br>
+                <div class="showthat2">
+                    Version .6
+                    <div class="showthis2">
+                        * Added version info<br>
+                        * Added Haggle, Buy Supplies, Start Journey, Explore Forest<br>
+                        * Added switching towns and town names<br>
+                        * Added error messages when an action fails (red bar)<br>
+                        * Require reputation now requires, instead of costs<br>
+                        * Fixed repeating a last action with a cost bug<br>
+                        * Visually separated resources and main actions<br>
+                        * Reduced requirements/difficulty for heal/fight/dungeon<br>
+                        * WARNING: adblock caused game to freeze. This has no ads, disable if you also freeze<br>
+                        * Improved performance (since I was looking anyway)
 
+                    </div>
                 </div>
             </div>
         </div>
@@ -181,62 +191,62 @@
                 A: Start with wandering until you have ways of getting mana back. Then try to find how to get some combat training which gives you a permanent boost, and then try fighting monsters!<br>
             </div>
         </div>
-    </div>
-    <div style="float:left;height:30px;margin-left:10px;" class="showthatH">
-        Options
-        <div class="showthisH">
-            <a href="https://discord.gg/EmRuWPp" target="_blank">Discord Link</a><br>
-            WARNING: for some reason Adblock Plus can cause massive lag. I won't ever have ads so if your game is freezing frequently please disable for this page.<br>
-                <input id="audioCueToggle" type="checkbox" />
-                <label for="audioCueToggle">Ping on pause</label>
+        <div style="float:left;height:30px;margin-left:10px;" class="showthatH">
+            Options
+            <div class="showthisH">
+                <a href="https://discord.gg/EmRuWPp" target="_blank">Discord Link</a><br>
+                WARNING: for some reason Adblock Plus can cause massive lag. I won't ever have ads so if your game is freezing frequently please disable for this page.<br>
+                    <input id="audioCueToggle" type="checkbox" />
+                    <label for="audioCueToggle">Ping on pause</label>
+            </div>
         </div>
-    </div>
-    <div class="showthat">
-        <div class='bold'>Mana</div> <div id="timer">0</div>
-        <div class="showthis">Your main resource. The higher your mana, the more you can do before reset.</div>
-    </div>
-    <div class="showthat">
-        <div class='bold'>Gold</div> <div id="gold">0</div>
-        <div class="showthis">Sell for mana, or use for actions.<br>Resets when the loop restarts.</div>
-    </div>
-    <div class="showthat">
-        <div class='bold'>Reputation</div> <div id="reputation">0</div>
-        <div class="showthis">The influence you have over the people in town.<br>Resets when the loop restarts.</div>
-    </div>
-    <div class="showthat" id="suppliesDiv" style="display:none">
-        <div class='bold'>Supplies</div> <div id="supplies">0</div>
-        <div class="showthis">Needed to go to the next town.<br>Resets when the loop restarts.</div>
-    </div>
-    <div class="showthat" id="herbsDiv" style="display:none">
-        <div class='bold'>Herbs</div> <div id="herbs">0</div>
-        <div class="showthis">The beneficial plants you've found.<br>Resets when the loop restarts.</div>
-    </div>
-    <div class="showthat" id="hideDiv" style="display:none">
-        <div class='bold'>Hide</div> <div id="hide">0</div>
-        <div class="showthis">Results of successful hunting.<br>Resets when the loop restarts.</div>
-    </div>
-    <div class="showthat" id="potionsDiv" style="display:none">
-        <div class='bold'>Potions</div> <div id="potions">0</div>
-        <div class="showthis">Rare, but not complex. Worth some money.<br>Resets when the loop restarts.</div>
-    </div>
-    <div class="showthat" id="glasses" style="display:none;">
-        <div class='bold'>Glasses</div>
-        <div class="showthis">Woah, trees have so many leaves on them.<br>Resets when the loop restarts.</div>
-    </div>
-    <br>
-    <div id="pausePlay" onclick="pauseGame()" class="button">Pause</div>
-    <input type="checkbox" id="pauseBeforeRestart">
-    <label for="pauseBeforeRestart">Pause before restart</label>
-    <div onclick="restart()" class="button showthat">
-        Restart
-        <div class="showthis" style="color:black;width:230px;">
-            Resets the loop. Not a hard reset.
+        <div class="showthat">
+            <div class='bold'>Mana</div> <div id="timer">0</div>
+            <div class="showthis">Your main resource. The higher your mana, the more you can do before reset.</div>
         </div>
-    </div>
-    <div class="showthat">
-        <div class="large bold">Story</div>
-        <div class="showthis" style="width:300px;">
-            You're a simple courier, on a long trip to deliver a high priority package. Just as you entered town, you tripped - breaking your glasses - and the package burst open, spilling a strange liquid on you. Immediately, your meager amount of mana started draining rapidly. Right as your mana became empty, you found yourself back in the moment the liquid was absorbed into your skin, with your tiny reserves filled... yet draining just as before. This happened again and again, the world resetting with you, until you decided you had to figure out a way to prolong how long these 'loops' were. Mana crystals are often stored in pottery around town, perhaps you'll start there ...
+        <div class="showthat">
+            <div class='bold'>Gold</div> <div id="gold">0</div>
+            <div class="showthis">Sell for mana, or use for actions.<br>Resets when the loop restarts.</div>
+        </div>
+        <div class="showthat">
+            <div class='bold'>Reputation</div> <div id="reputation">0</div>
+            <div class="showthis">The influence you have over the people in town.<br>Resets when the loop restarts.</div>
+        </div>
+        <div class="showthat" id="suppliesDiv" style="display:none">
+            <div class='bold'>Supplies</div> <div id="supplies">0</div>
+            <div class="showthis">Needed to go to the next town.<br>Resets when the loop restarts.</div>
+        </div>
+        <div class="showthat" id="herbsDiv" style="display:none">
+            <div class='bold'>Herbs</div> <div id="herbs">0</div>
+            <div class="showthis">The beneficial plants you've found.<br>Resets when the loop restarts.</div>
+        </div>
+        <div class="showthat" id="hideDiv" style="display:none">
+            <div class='bold'>Hide</div> <div id="hide">0</div>
+            <div class="showthis">Results of successful hunting.<br>Resets when the loop restarts.</div>
+        </div>
+        <div class="showthat" id="potionsDiv" style="display:none">
+            <div class='bold'>Potions</div> <div id="potions">0</div>
+            <div class="showthis">Rare, but not complex. Worth some money.<br>Resets when the loop restarts.</div>
+        </div>
+        <div class="showthat" id="glasses" style="display:none;">
+            <div class='bold'>Glasses</div>
+            <div class="showthis">Woah, trees have so many leaves on them.<br>Resets when the loop restarts.</div>
+        </div>
+        <br>
+        <div id="pausePlay" onclick="pauseGame()" class="button">Pause</div>
+        <input type="checkbox" id="pauseBeforeRestart">
+        <label for="pauseBeforeRestart">Pause before restart</label>
+        <div onclick="restart()" class="button showthat">
+            Restart
+            <div class="showthis" style="color:black;width:230px;">
+                Resets the loop. Not a hard reset.
+            </div>
+        </div>
+        <div class="showthat">
+            <div class="large bold">Story</div>
+            <div class="showthis" style="width:300px;">
+                You're a simple courier, on a long trip to deliver a high priority package. Just as you entered town, you tripped - breaking your glasses - and the package burst open, spilling a strange liquid on you. Immediately, your meager amount of mana started draining rapidly. Right as your mana became empty, you found yourself back in the moment the liquid was absorbed into your skin, with your tiny reserves filled... yet draining just as before. This happened again and again, the world resetting with you, until you decided you had to figure out a way to prolong how long these 'loops' were. Mana crystals are often stored in pottery around town, perhaps you'll start there ...
+            </div>
         </div>
     </div>
 
@@ -249,27 +259,11 @@
                     Talent gets 1% of all level progress, and keeps through resets.<br>
                     Each talent level increases exp gain of skill by 1%.<br>
                     Exp gain from an action is original mana cost * talent %.<br><br>
-                e.g. Meet People costs 800 mana and has a breakdown of <div class="bold">Int</div> 10% <div class="bold">Cha</div> 80% <div class="bold">Soul</div> 10%.<br>
-                This effectively means 80 of the mana is controlled by <div class="bold">Int</div>, another 80 by <div class="bold">Soul</div>, and the remaining 640 by <div class="bold">Cha</div>.<br>
-                If your <div class="bold">Cha</div> is level 20 when the action is started, it'd be 640 / 1.2 = 533.333<br>
-                Adding back the 160 from <div class="bold">Soul</div> and <div class="bold">Int</div>, the total mana the action takes (rounded up) is now 694, so ~15% less mana.<br>
-                The action would give (800/694)*(1+talent/100) level exp per mana for the 694 mana.
-            </div>
-        </div><br>
-        <div id="statList" style="width:100%;">
-            <div class="statContainer showthat" onmouseover="view.showStat('Str')">
-                <div class="statLabel medium bold">Strength</div>
-                <div class="statNum medium"><div id="statStrLevel">0</div>(<div id="statStrTalent">0</div>)<div id="ssStrContainer" class="ssContainer">(<div id="ssStr"></div>)</div></div>
-                <div style="margin-top:18px;"></div>
-                <div class="thinProgressBarUpper"><div class="statBar statLevelBar" id="statStrLevelBar"></div></div>
-                <div class="thinProgressBarLower"><div class="statBar statTalentBar" id="statStrTalentBar"></div></div>
-                <div class="showthis" id="statStrTooltip" >
-                    Train your body.<br>
-                    <div class="medium bold">Level</div> <div id="statStrLevel2"></div><br>
-                    <div class="medium bold">Level Exp</div> <div id="statStrLevelExp"></div>/<div id="statStrLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="statStrLevelProgress"></div>%)</div><br>
-                    <div class="medium bold">Talent</div> <div id="statStrTalent2"></div><br>
-                    <div class="medium bold">Talent Exp</div> <div id="statStrTalentExp"></div>/<div id="statStrTalentExpNeeded"></div> <div class="statTooltipPerc">(<div id="statStrTalentProgress"></div>%)</div><br>
-                    <div class="medium bold">Soulstone Mult</div> x<div id="statStrSSBonus"></div>
+                    e.g. Meet People costs 800 mana and has a breakdown of <div class="bold">Int</div> 10% <div class="bold">Cha</div> 80% <div class="bold">Soul</div> 10%.<br>
+                    This effectively means 80 of the mana is controlled by <div class="bold">Int</div>, another 80 by <div class="bold">Soul</div>, and the remaining 640 by <div class="bold">Cha</div>.<br>
+                    If your <div class="bold">Cha</div> is level 20 when the action is started, it'd be 640 / 1.2 = 533.333<br>
+                    Adding back the 160 from <div class="bold">Soul</div> and <div class="bold">Int</div>, the total mana the action takes (rounded up) is now 694, so ~15% less mana.<br>
+                    The action would give (800/694)*(1+talent/100) level exp per mana for the 694 mana.
                 </div>
             </div><br>
             <div id="statList" style="width:100%;">
@@ -554,10 +548,12 @@
         </div><br>
         <div id="townInfo0" class='townInfo'></div>
         <div id="townInfo1" class='townInfo' style="display:none;"></div>
+        <div id="townInfo2" class='townInfo' style="display:none;"></div>
 
         <div class="large bold" style="display:block;margin:10px auto 2px auto;text-align:center;">Action Options</div>
         <div id="actionOptionsTown0" class='actionOptions'></div>
         <div id="actionOptionsTown1" class='actionOptions' style="display:none;"></div>
+        <div id="actionOptionsTown2" class='actionOptions' style="display:none;"></div>
     </div>
 
     <div id="tutorial" style="position:absolute;width:100%;height:100%;left:0;top:0;">

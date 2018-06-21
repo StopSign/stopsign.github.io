@@ -226,10 +226,10 @@ input {
 .travelContainer {
     cursor:pointer;
     display:block;
-    width:100%;
+    width:200px;
     height:50px;
     vertical-align:top;
-    margin:0 2px;
+    margin:2px auto;
 }
 
 
