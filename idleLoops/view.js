@@ -467,7 +467,7 @@ function View() {
             actionOptionsTown[2].removeChild(actionOptionsTown[2].firstChild);
         }
         while(townInfos[2].firstChild) {
-            townInfos[2].removeChild(townInfos[1].firstChild);
+            townInfos[2].removeChild(townInfos[2].firstChild);
         }
         tempObj = new ExploreCity();
         this.createTownAction(tempObj);

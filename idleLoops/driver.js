@@ -221,6 +221,7 @@ function adjustAll() {
     adjustWildMana();
     adjustHerbs();
     adjustHunt();
+    adjustSuckers();
 }
 
 function capAmount(index, townNum) {
