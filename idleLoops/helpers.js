@@ -410,3 +410,23 @@ function roughSizeOfObject( object ) {
     }
     return bytes;
 }
+// modified from: https://stackoverflow.com/questions/879152/how-do-i-make-javascript-beep/13194087#13194087
+var beep = (function () {
+    var ctxClass = window.audioContext || window.AudioContext || window.AudioContext || window.webkitAudioContext
+    var ctx = new ctxClass();
+    return function (duration) {
+        if (duration <= 0) return;
+        
+        var osc = ctx.createOscillator();
+        osc.type = "sine";
+
+        osc.connect(ctx.destination);
+        if (osc.noteOn) osc.noteOn(0);
+        if (osc.start) osc.start();
+
+        setTimeout(function () {
+            if (osc.noteOff) osc.noteOff(0);
+            if (osc.stop) osc.stop();
+        }, duration);
+    };
+})();
