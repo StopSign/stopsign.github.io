@@ -127,6 +127,10 @@ function Town(index) {
         this.createProgressVars("Forest");
         this.createProgressVars("Shortcut");
         this.createProgressVars("Hermit");
+    } else if(this.index === 2) {
+        this.createVars("Gamble");
+        this.createProgressVars("City");
+        this.createProgressVars("Drunk");
     }
 
 }
