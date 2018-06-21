@@ -1,26 +1,25 @@
 'use strict';
 
-window.gameSpeed = 1;
-window.gameTickLeft = 0;
+let gameSpeed = 1;
+let gameTickLeft = 0;
 
 function tick() {
     if(stop) {
-        window.gameTickLeft = 0;
+        gameTickLeft = 0;
         return;
     }
     prevState.stats = JSON.parse(JSON.stringify(stats));
 
-    window.gameTickLeft += gameSpeed / fps * 50;
+    gameTickLeft += gameSpeed / fps * 50;
 
-    if (gameTickLeft > 0)
-    while (window.gameTickLeft-- > 0) {
-        if(window.gameTickLeft > 1000) {
+    while (gameTickLeft > 0) {
+        if(gameTickLeft > 1000) {
             pauseGame();
             console.warn(`too many ticks! (${gameTickLeft})`);
-            window.gameTickLeft = 0;
+            gameTickLeft = 0;
         }
         if(stop) {
-            window.gameTickLeft = 0;
+            gameTickLeft = 0;
             view.update();
             return;
         }
@@ -38,10 +37,11 @@ function tick() {
         if(shouldRestart || timer >= timeNeeded) {
             prepareRestart();
         }
-        
+
         if(timer % (300*gameSpeed) === 0) {
             save();
         }
+        gameTickLeft--;
     }
 
     view.update();
