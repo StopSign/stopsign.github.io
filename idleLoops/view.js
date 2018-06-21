@@ -118,12 +118,12 @@ function View() {
         document.getElementById("herbs").innerHTML = herbs;
     };
     this.updateHide = function() {
-        document.getElementById("hideDiv").style.display = herbs ? "inline-block" : "none";
+        document.getElementById("hideDiv").style.display = hide ? "inline-block" : "none";
         document.getElementById("hide").innerHTML = hide;
     };
     this.updatePotions = function() {
-        document.getElementById("potionsDiv").style.display = herbs ? "inline-block" : "none";
-        document.getElementById("potions").innerHTML = hide;
+        document.getElementById("potionsDiv").style.display = potions ? "inline-block" : "none";
+        document.getElementById("potions").innerHTML = potions;
     };
 
     this.updateNextActions = function () {
