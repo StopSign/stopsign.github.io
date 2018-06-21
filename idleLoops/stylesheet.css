@@ -322,3 +322,20 @@ input {
     bottom: 0;
     cursor: se-resize;
 }
+
+.draggedOverAction {
+    background:lightblue;
+}
+
+.draggedAction{
+    opacity:0.4;
+}
+
+.imageDragFix {
+    user-drag: none;
+    user-select: none;
+    -moz-user-select: none;
+    -webkit-user-drag: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+}

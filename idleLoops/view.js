@@ -125,22 +125,22 @@ function View() {
         document.getElementById("potions").innerHTML = hide;
     };
 
-    this.updateNextActions = function() {
+    this.updateNextActions = function () {
         let count = 0;
         while (nextActionsDiv.firstChild) {
-            if(document.getElementById("capButton"+count)) {
-                document.getElementById("capButton"+count).removeAttribute("onclick");
+            if (document.getElementById("capButton" + count)) {
+                document.getElementById("capButton" + count).removeAttribute("onclick");
             }
-            if(document.getElementById("plusButton"+count)) { //not for journey
+            if (document.getElementById("plusButton" + count)) { //not for journey
                 document.getElementById("plusButton" + count).removeAttribute("onclick");
                 document.getElementById("minusButton" + count).removeAttribute("onclick");
                 document.getElementById("splitButton" + count).removeAttribute("onclick");
             }
-            document.getElementById("upButton"+count).removeAttribute("onclick");
-            document.getElementById("downButton"+count).removeAttribute("onclick");
-            document.getElementById("removeButton"+count).removeAttribute("onclick");
-            while(nextActionsDiv.firstChild.firstChild) {
-                if(nextActionsDiv.firstChild.firstChild instanceof HTMLImageElement) {
+            document.getElementById("upButton" + count).removeAttribute("onclick");
+            document.getElementById("downButton" + count).removeAttribute("onclick");
+            document.getElementById("removeButton" + count).removeAttribute("onclick");
+            while (nextActionsDiv.firstChild.firstChild) {
+                if (nextActionsDiv.firstChild.firstChild instanceof HTMLImageElement) {
                     nextActionsDiv.firstChild.firstChild.src = '';
                 }
                 nextActionsDiv.firstChild.removeChild(nextActionsDiv.firstChild.firstChild);
@@ -151,27 +151,27 @@ function View() {
         // let actionsDiv = document.createElement("div");
         let totalDivText = "";
 
-        for(let i = 0; i < actions.next.length; i++) {
+        for (let i = 0; i < actions.next.length; i++) {
             let action = actions.next[i];
             let capButton = "";
-            if(hasCap(action.name)) {
+            if (hasCap(action.name)) {
                 let townNum = translateClassNames(action.name).townNum;
-                capButton = "<i id='capButton"+i+"' onclick='capAmount("+i+", "+townNum+")' class='actionIcon fa fa-circle-thin'></i>";
+                capButton = "<i id='capButton" + i + "' onclick='capAmount(" + i + ", " + townNum + ")' class='actionIcon fa fa-circle-thin'></i>";
             }
             let isTravel = getTravelNum(action.name);
             totalDivText +=
-                "<div class='nextActionContainer small'>" +
-                    "<div class='bold'>" + action.loops +"</div> x " +
-                    "<img src='img/"+camelize(action.name)+".svg' class='smallIcon'>" +
-                    "<div style='float:right'>"+
-                        capButton +
-                (isTravel ? "" : "<i id='plusButton"+i+"' onclick='addLoop("+i+")' class='actionIcon fa fa-plus'></i>")+
-                (isTravel ? "" : "<i id='minusButton"+i+"' onclick='removeLoop("+i+")' class='actionIcon fa fa-minus'></i>")+
-                (isTravel ? "" : "<i id='splitButton"+i+"' onclick='split("+i+")' class='actionIcon fa fa-arrows-h'></i>")+
-                        "<i id='upButton"+i+"' onclick='moveUp("+i+")' class='actionIcon fa fa-sort-up'></i>" +
-                        "<i id='downButton"+i+"' onclick='moveDown("+i+")' class='actionIcon fa fa-sort-down'></i>" +
-                        "<i id='removeButton"+i+"' onclick='removeAction("+i+")' class='actionIcon fa fa-times'></i>" +
-                    "</div>"+
+                "<div id='nextActionContainer" + i + "' class='nextActionContainer small' ondragover='handleDragOver(event)' ondrop='handleDragDrop(event)' ondragstart='handleDragStart(event)' ondragend='draggedUndecorate(" + i + ")' ondragenter='dragOverDecorate(" + i +")' ondragleave='dragExitUndecorate("+i+")' draggable='true' data-index='"+i+"'>" +
+                "<div class='bold'>" + action.loops + "</div> x " +
+                "<img src='img/" + camelize(action.name) + ".svg' class='smallIcon imageDragFix'>" +
+                "<div style='float:right'>" +
+                capButton +
+                (isTravel ? "" : "<i id='plusButton" + i + "' onclick='addLoop(" + i + ")' class='actionIcon fa fa-plus'></i>") +
+                (isTravel ? "" : "<i id='minusButton" + i + "' onclick='removeLoop(" + i + ")' class='actionIcon fa fa-minus'></i>") +
+                (isTravel ? "" : "<i id='splitButton" + i + "' onclick='split(" + i + ")' class='actionIcon fa fa-arrows-h'></i>") +
+                "<i id='upButton" + i + "' onclick='moveUp(" + i + ")' class='actionIcon fa fa-sort-up'></i>" +
+                "<i id='downButton" + i + "' onclick='moveDown(" + i + ")' class='actionIcon fa fa-sort-down'></i>" +
+                "<i id='removeButton" + i + "' onclick='removeAction(" + i + ")' class='actionIcon fa fa-times'></i>" +
+                "</div>" +
                 "</div>";
         }
 
@@ -735,4 +735,20 @@ function addStatColors(theDiv, stat) {
     } else if(stat === "Soul") {
         theDiv.style.backgroundColor = "#737388";
     }
+}
+
+function dragOverDecorate(i) {
+    document.getElementById("nextActionContainer" + i).classList.add("draggedOverAction");
+}
+
+function dragExitUndecorate(i) {
+    document.getElementById("nextActionContainer" + i).classList.remove("draggedOverAction");
+}
+
+function draggedDecorate(i) {
+    document.getElementById("nextActionContainer" + i).classList.add("draggedAction");
+}
+
+function draggedUndecorate(i) {
+    document.getElementById("nextActionContainer" + i).classList.remove("draggedAction");
 }
