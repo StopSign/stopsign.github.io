@@ -332,7 +332,7 @@ function ExploreCity() {
     };
 }
 function adjustSuckers() {
-    towns[2].totalSuckers = towns[2].getLevel("City") * 10;
+    towns[2].totalGamble = towns[2].getLevel("City") * 10;
 }
 
 function GetDrunk() {
