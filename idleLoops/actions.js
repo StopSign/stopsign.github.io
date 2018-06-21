@@ -195,7 +195,7 @@ function setAdjustedTicks(action) {
             newCost += action.stats[statName] / (1 + getLevel(statName)/100);
         }
     }
-    action.adjustedTicks = Math.ceil(action.manaCost() * newCost);
+    action.adjustedTicks = Math.ceil(action.manaCost() * newCost - .000001);
 }
 
 function calcSoulstoneMult(soulstones) {
