@@ -96,6 +96,9 @@ function load() {
     town.expHermit = toLoad.expHermit !== undefined ? toLoad.expHermit : 0;
 
     towns[2] = new Town(2);
+    town = towns[2];
+    town.expCity = toLoad.expCity !== undefined ? toLoad.expCity : 0;
+    town.expDrunk = toLoad.expDrunk !== undefined ? toLoad.expDrunk : 0;
 
     actions.next = [];
     if(toLoad.nextList) {
@@ -183,6 +186,8 @@ function save() {
     toSave.expHermit = town.expHermit;
 
     town = towns[2];
+    toSave.expCity = town.expCity;
+    toSave.expDrunk = town.expDrunk;
 
     for(let i = 0; i < towns.length; i++) {
         town = towns[i];
