@@ -21,6 +21,7 @@ function View() {
         this.updateSoulstones();
         this.updateSupplies();
         this.showTown(0);
+        this.updateTrainingLimits();
     };
 
     this.update = function() {
@@ -120,23 +121,36 @@ function View() {
         document.getElementById("hideDiv").style.display = herbs ? "inline-block" : "none";
         document.getElementById("hide").innerHTML = hide;
     };
+    this.updatePotions = function() {
+        document.getElementById("potionsDiv").style.display = herbs ? "inline-block" : "none";
+        document.getElementById("potions").innerHTML = hide;
+    };
 
-    this.updateNextActions = function() {
+    this.updateNextActions = function () {
         let count = 0;
         while (nextActionsDiv.firstChild) {
-            if(document.getElementById("capButton"+count)) {
-                document.getElementById("capButton"+count).removeAttribute("onclick");
+            if (document.getElementById("capButton" + count)) {
+                document.getElementById("capButton" + count).removeAttribute("onclick");
             }
-            if(document.getElementById("plusButton"+count)) { //not for journey
+            if (document.getElementById("plusButton" + count)) { //not for journey
                 document.getElementById("plusButton" + count).removeAttribute("onclick");
                 document.getElementById("minusButton" + count).removeAttribute("onclick");
                 document.getElementById("splitButton" + count).removeAttribute("onclick");
             }
-            document.getElementById("upButton"+count).removeAttribute("onclick");
-            document.getElementById("downButton"+count).removeAttribute("onclick");
-            document.getElementById("removeButton"+count).removeAttribute("onclick");
-            while(nextActionsDiv.firstChild.firstChild) {
-                if(nextActionsDiv.firstChild.firstChild instanceof HTMLImageElement) {
+            document.getElementById("upButton" + count).removeAttribute("onclick");
+            document.getElementById("downButton" + count).removeAttribute("onclick");
+            document.getElementById("removeButton" + count).removeAttribute("onclick");
+            
+            let dragAndDropDiv = document.getElementById("nextActionContainer"+count);
+            dragAndDropDiv.removeAttribute("ondragover");
+            dragAndDropDiv.removeAttribute("ondrop");
+            dragAndDropDiv.removeAttribute("ondragstart");
+            dragAndDropDiv.removeAttribute("ondragend");
+            dragAndDropDiv.removeAttribute("ondragenter");
+            dragAndDropDiv.removeAttribute("ondragleave");
+
+            while (nextActionsDiv.firstChild.firstChild) {
+                if (nextActionsDiv.firstChild.firstChild instanceof HTMLImageElement) {
                     nextActionsDiv.firstChild.firstChild.src = '';
                 }
                 nextActionsDiv.firstChild.removeChild(nextActionsDiv.firstChild.firstChild);
@@ -147,27 +161,27 @@ function View() {
         // let actionsDiv = document.createElement("div");
         let totalDivText = "";
 
-        for(let i = 0; i < actions.next.length; i++) {
+        for (let i = 0; i < actions.next.length; i++) {
             let action = actions.next[i];
             let capButton = "";
-            if(hasCap(action.name)) {
+            if (hasCap(action.name)) {
                 let townNum = translateClassNames(action.name).townNum;
-                capButton = "<i id='capButton"+i+"' onclick='capAmount("+i+", "+townNum+")' class='actionIcon fa fa-circle-thin'></i>";
+                capButton = "<i id='capButton" + i + "' onclick='capAmount(" + i + ", " + townNum + ")' class='actionIcon fa fa-circle-thin'></i>";
             }
             let isTravel = getTravelNum(action.name);
             totalDivText +=
-                "<div class='nextActionContainer small'>" +
-                    "<div class='bold'>" + action.loops +"</div> x " +
-                    "<img src='img/"+camelize(action.name)+".svg' class='smallIcon'>" +
-                    "<div style='float:right'>"+
-                        capButton +
-                (isTravel ? "" : "<i id='plusButton"+i+"' onclick='addLoop("+i+")' class='actionIcon fa fa-plus'></i>")+
-                (isTravel ? "" : "<i id='minusButton"+i+"' onclick='removeLoop("+i+")' class='actionIcon fa fa-minus'></i>")+
-                (isTravel ? "" : "<i id='splitButton"+i+"' onclick='split("+i+")' class='actionIcon fa fa-arrows-h'></i>")+
-                        "<i id='upButton"+i+"' onclick='moveUp("+i+")' class='actionIcon fa fa-sort-up'></i>" +
-                        "<i id='downButton"+i+"' onclick='moveDown("+i+")' class='actionIcon fa fa-sort-down'></i>" +
-                        "<i id='removeButton"+i+"' onclick='removeAction("+i+")' class='actionIcon fa fa-times'></i>" +
-                    "</div>"+
+                "<div id='nextActionContainer" + i + "' class='nextActionContainer small' ondragover='handleDragOver(event)' ondrop='handleDragDrop(event)' ondragstart='handleDragStart(event)' ondragend='draggedUndecorate(" + i + ")' ondragenter='dragOverDecorate(" + i +")' ondragleave='dragExitUndecorate("+i+")' draggable='true' data-index='"+i+"'>" +
+                "<div class='bold'>" + action.loops + "</div> x " +
+                "<img src='img/" + camelize(action.name) + ".svg' class='smallIcon imageDragFix'>" +
+                "<div style='float:right'>" +
+                capButton +
+                (isTravel ? "" : "<i id='plusButton" + i + "' onclick='addLoop(" + i + ")' class='actionIcon fa fa-plus'></i>") +
+                (isTravel ? "" : "<i id='minusButton" + i + "' onclick='removeLoop(" + i + ")' class='actionIcon fa fa-minus'></i>") +
+                (isTravel ? "" : "<i id='splitButton" + i + "' onclick='split(" + i + ")' class='actionIcon fa fa-arrows-h'></i>") +
+                "<i id='upButton" + i + "' onclick='moveUp(" + i + ")' class='actionIcon fa fa-sort-up'></i>" +
+                "<i id='downButton" + i + "' onclick='moveDown(" + i + ")' class='actionIcon fa fa-sort-down'></i>" +
+                "<i id='removeButton" + i + "' onclick='removeAction(" + i + ")' class='actionIcon fa fa-times'></i>" +
+                "</div>" +
                 "</div>";
         }
 
@@ -197,6 +211,7 @@ function View() {
             totalDivText +=
                 "<div id='actionTooltip"+i+"' style='display:none;padding-left:10px;width:90%'>" +
                     "<div style='text-align:center;width:100%'>"+action.name+"</div><br><br>" +
+                    "<div class='bold'>Mana Original</div> <div id='action"+i+"ManaOrig'>0</div><br>" +
                     "<div class='bold'>Mana Used</div> <div id='action"+i+"ManaUsed'>0</div><br>" +
                     "<div class='bold'>Remaining</div> <div id='action"+i+"Remaining'></div><br><br>" +
                     "<div id='action"+i+"ExpGain'></div>" +
@@ -215,7 +230,7 @@ function View() {
     this.updateCurrentActionBarRequests = Array(50).fill(false);
     this.updateCurrentActionBarRequest = function f(index) {
         this.updateCurrentActionBarRequests[index] = true;
-    }
+    };
     
     this.updateCurrentActionBar = function(index) {
         const action = actions.current[index];
@@ -233,6 +248,7 @@ function View() {
             div.style.width = "100%";
             div.style.backgroundColor = "#6d6d6d";
         }
+        document.getElementById("action" + index + "ManaOrig").innerHTML = action.manaCost() * action.loops + "";
         document.getElementById("action" + index + "ManaUsed").innerHTML = action.manaUsed + "";
         document.getElementById("action"+index+"Remaining").innerHTML = (timeNeeded - timer)+"";
         let statExpGain = "";
@@ -284,7 +300,7 @@ function View() {
             let action = this.totalActionList[i];
             const actionDiv = document.getElementById("container"+action.varName);
             const infoDiv = document.getElementById("infoContainer"+action.varName);
-            if(!action.unlocked()) {
+            if(!action.unlocked() || (action.allowed && getNumOnList(action.name) >= action.allowed())) {
                 addClassToDiv(actionDiv, "locked");
                 if(infoDiv) {
                     addClassToDiv(infoDiv, "hidden");
@@ -324,6 +340,7 @@ function View() {
         actionOptionsTown[townNum].style.display = "block";
         townInfos[townNum].style.display = "block";
         document.getElementById("townName").innerHTML = townNames[townNum];
+        townShowing = townNum;
     };
 
     this.updateRegular = function(varName, index) {
@@ -451,7 +468,31 @@ function View() {
 
         this.createTownAction(new PracticalMagic());
         this.createTownAction(new LearnAlchemy());
-        // this.createTownAction(new BrewPotions());
+        this.createTownAction(new BrewPotions());
+
+        this.createTravelAction(new ContinueOn());
+
+        while (actionOptionsTown[2].firstChild) {
+            actionOptionsTown[2].removeChild(actionOptionsTown[2].firstChild);
+        }
+        while(townInfos[2].firstChild) {
+            townInfos[2].removeChild(townInfos[2].firstChild);
+        }
+        tempObj = new ExploreCity();
+        this.createTownAction(tempObj);
+        this.createActionProgress(tempObj);
+
+        tempObj = new Gamble();
+        this.createTownAction(tempObj);
+        this.createTownInfo(tempObj);
+
+        tempObj = new GetDrunk();
+        this.createTownAction(tempObj);
+        this.createActionProgress(tempObj);
+
+        this.createTownAction(new PurchaseMana());
+        this.createTownAction(new SellPotions());
+
     };
 
     this.createActionProgress = function(action) {
@@ -521,6 +562,7 @@ function View() {
 
         let actionsDiv = document.createElement("div");
         actionsDiv.innerHTML = totalDivText;
+        actionsDiv.style.width = "100%";
         actionOptionsTown[action.townNum].appendChild(actionsDiv);
         towns[action.townNum].totalActionList.push(action);
         this.totalActionList.push(action);
@@ -664,13 +706,22 @@ function View() {
             document.getElementById("segmentName"+i+action.varName).innerHTML = action.getSegmentName(towns[action.townNum][action.varName+"LoopCounter"]+i);
         }
     };
+
+    this.updateTrainingLimits = function() {
+        for(let i = 0; i < statList.length; i++) {
+            let trainingDiv = document.getElementById("trainingLimit"+statList[i]);
+            if(trainingDiv) {
+                trainingDiv.innerHTML = trainingLimits;
+            }
+        }
+    }
 }
 
 const curActionsDiv = document.getElementById("curActionsList");
 const nextActionsDiv = document.getElementById("nextActionsList");
 const actionOptionsTown = [];
 const townInfos = [];
-for(let i = 0; i < 2; i++) {
+for(let i = 0; i < 3; i++) {
     actionOptionsTown[i] = document.getElementById("actionOptionsTown"+i);
     townInfos[i] = document.getElementById("townInfo"+i);
 }
@@ -704,4 +755,20 @@ function addStatColors(theDiv, stat) {
     } else if(stat === "Soul") {
         theDiv.style.backgroundColor = "#737388";
     }
+}
+
+function dragOverDecorate(i) {
+    document.getElementById("nextActionContainer" + i).classList.add("draggedOverAction");
+}
+
+function dragExitUndecorate(i) {
+    document.getElementById("nextActionContainer" + i).classList.remove("draggedOverAction");
+}
+
+function draggedDecorate(i) {
+    document.getElementById("nextActionContainer" + i).classList.add("draggedAction");
+}
+
+function draggedUndecorate(i) {
+    document.getElementById("nextActionContainer" + i).classList.remove("draggedAction");
 }

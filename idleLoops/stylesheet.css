@@ -226,10 +226,10 @@ input {
 .travelContainer {
     cursor:pointer;
     display:block;
-    width:100%;
+    width:200px;
     height:50px;
     vertical-align:top;
-    margin:0 2px;
+    margin:2px auto;
 }
 
 
@@ -321,4 +321,21 @@ input {
     right: 0;
     bottom: 0;
     cursor: se-resize;
+}
+
+.draggedOverAction {
+    background:lightblue;
+}
+
+.draggedAction{
+    opacity:0.4;
+}
+
+.imageDragFix {
+    user-drag: none;
+    user-select: none;
+    -moz-user-select: none;
+    -webkit-user-drag: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
 }

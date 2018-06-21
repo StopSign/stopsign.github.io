@@ -25,6 +25,7 @@ let reputation = 0;
 let supplies = 0;
 let herbs = 0;
 let hide = 0;
+let potions = 0;
 
 let curLoadout = 0;
 let loadouts = [];
@@ -35,6 +36,7 @@ let townShowing = 0;
 let maxTown;
 let statShowing;
 let actionTownNum;
+let trainingLimits = 50;
 
 
 function closeTutorial() {
@@ -93,6 +95,10 @@ function load() {
     town.expShortcut = toLoad.expShortcut !== undefined ? toLoad.expShortcut : 0;
     town.expHermit = toLoad.expHermit !== undefined ? toLoad.expHermit : 0;
 
+    towns[2] = new Town(2);
+    town = towns[2];
+    town.expCity = toLoad.expCity !== undefined ? toLoad.expCity : 0;
+    town.expDrunk = toLoad.expDrunk !== undefined ? toLoad.expDrunk : 0;
 
     actions.next = [];
     if(toLoad.nextList) {
@@ -178,6 +184,10 @@ function save() {
     toSave.expForest = town.expForest;
     toSave.expShortcut = town.expShortcut;
     toSave.expHermit = town.expHermit;
+
+    town = towns[2];
+    toSave.expCity = town.expCity;
+    toSave.expDrunk = town.expDrunk;
 
     for(let i = 0; i < towns.length; i++) {
         town = towns[i];

@@ -1,26 +1,25 @@
 'use strict';
 
-window.gameSpeed = 1;
-window.gameTickLeft = 0;
+let gameSpeed = 1;
+let gameTickLeft = 0;
 
 function tick() {
     if(stop) {
-        window.gameTickLeft = 0;
+        gameTickLeft = 0;
         return;
     }
     prevState.stats = JSON.parse(JSON.stringify(stats));
 
-    window.gameTickLeft += gameSpeed / fps * 50;
+    gameTickLeft += gameSpeed / fps * 50;
 
-    if (gameTickLeft > 0)
-    while (window.gameTickLeft-- > 0) {
-        if(window.gameTickLeft > 1000) {
+    while (gameTickLeft > 0) {
+        if(gameTickLeft > 1000) {
             pauseGame();
             console.warn(`too many ticks! (${gameTickLeft})`);
-            window.gameTickLeft = 0;
+            gameTickLeft = 0;
         }
         if(stop) {
-            window.gameTickLeft = 0;
+            gameTickLeft = 0;
             view.update();
             return;
         }
@@ -38,10 +37,11 @@ function tick() {
         if(shouldRestart || timer >= timeNeeded) {
             prepareRestart();
         }
-        
+
         if(timer % (300*gameSpeed) === 0) {
             save();
         }
+        gameTickLeft--;
     }
 
     view.update();
@@ -56,6 +56,7 @@ function recalcInterval(fps) {
 
 function pauseGame() {
     stop = !stop;
+    document.title = "*PAUSED* Idle Loops";
     document.getElementById("pausePlay").innerHTML = stop ? "Play" : "Pause";
     if(!stop && (shouldRestart || timer >= timeNeeded)) {
         restart();
@@ -65,6 +66,10 @@ function pauseGame() {
 function prepareRestart() {
     if(document.getElementById("pauseBeforeRestart").checked) {
         pauseGame();
+        if (document.getElementById("audioCueToggle").checked) {
+            beep(250);
+            setTimeout(function () {beep(250)},500)
+        }
     } else {
         restart();
     }
@@ -74,6 +79,7 @@ function restart() {
     shouldRestart = false;
     timer = 0;
     timeNeeded = timeNeededInitial;
+    document.title = "Idle Loops";
     if(initialGold) { //debugging only
         gold = initialGold;
         addGold(0);
@@ -85,6 +91,7 @@ function restart() {
     addSupplies(-supplies);
     addHerbs(-herbs);
     addHide(-hide);
+    addPotions(-potions);
     restartStats();
     for(let i = 0; i < towns.length; i++) {
         towns[i].restart();
@@ -101,7 +108,7 @@ function addActionToList(name, townNum, isTravelAction) {
     for(let i = 0; i < towns[townNum].totalActionList.length; i++) {
         let action = towns[townNum].totalActionList[i];
         if(action.name === name) {
-            if(action.visible() && action.unlocked()) {
+            if(action.visible() && action.unlocked() && (!action.allowed || getNumOnList(action.name) < action.allowed())) {
                 let addAmount = actions.addAmount;
                 if(action.allowed) {
                     let numMax = action.allowed();
@@ -157,6 +164,11 @@ function addHide(amount) {
     view.updateHide();
 }
 
+function addPotions(amount) {
+    potions += amount;
+    view.updatePotions();
+}
+
 function changeActionAmount(amount, num) {
     actions.addAmount = amount;
     view.updateAddAmount(num);
@@ -209,6 +221,7 @@ function adjustAll() {
     adjustWildMana();
     adjustHerbs();
     adjustHunt();
+    adjustSuckers();
 }
 
 function capAmount(index, townNum) {
@@ -253,6 +266,53 @@ function split(index) {
     toSplit.loops = Math.floor(toSplit.loops/2);
     view.updateNextActions();
 }
+function handleDragStart(event) {
+    let index = event.target.getAttribute("data-index")
+    draggedDecorate(index);
+    event.dataTransfer.setData('Text/html', index);
+}
+
+function handleDragOver(event) {
+    event.preventDefault();
+}
+
+function handleDragDrop(event) {
+    let indexOfDroppedOverElement = event.target.getAttribute("data-index")
+    dragExitUndecorate(indexOfDroppedOverElement);
+    let initialIndex = event.dataTransfer.getData("text/html")
+    moveQueuedAction(initialIndex, indexOfDroppedOverElement);
+}
+
+function moveQueuedAction(initialIndex, resultingIndex) {
+    initialIndex = Number(initialIndex);
+    resultingIndex = Number(resultingIndex);
+    if (initialIndex < 0 || initialIndex > actions.next.length || resultingIndex < 0 || resultingIndex > actions.next.length - 1) {
+        return;
+    }
+    let difference = initialIndex - resultingIndex;
+    if (difference == 0) {
+        return;
+    }
+
+    let delta = Math.abs(difference);
+   
+    if (difference > 0) {
+        for (let i = 0; i < delta; i++) {
+            const temp = actions.next[initialIndex-i-1];
+            actions.next[initialIndex-i-1] = actions.next[initialIndex-i];
+            actions.next[initialIndex-i] = temp;
+        }
+    } else {
+        for (let i = 0; i < delta; i++) {
+            const temp = actions.next[initialIndex+i+1];
+            actions.next[initialIndex+i+1] = actions.next[initialIndex+i];
+            actions.next[initialIndex+i] = temp;
+        }
+    }
+    
+    view.updateNextActions();
+}
+
 function moveUp(index) {
     if(index <= 0) {
         return;

@@ -83,7 +83,7 @@ function Actions() {
         if(!curAction) {
             return curAction;
         }
-        if(getTravelNum(curAction.name) && curAction.canStart()) {
+        if(getTravelNum(curAction.name) && (!curAction.canStart || curAction.canStart())) {
             return curAction;
         }
         if((curAction.canStart && !curAction.canStart()) || curAction.townNum !== curTown) {
@@ -178,7 +178,7 @@ function Actions() {
         if(initialOrder !== undefined) {
             this.next.splice(initialOrder, 0, toAdd) //insert at index
         } else {
-            if(!loops && document.getElementById("addActionTop").checked) {
+            if(document.getElementById("addActionTop").checked) {
                 this.next.splice(0, 0, toAdd);
             } else {
                 this.next.push(toAdd);
@@ -188,14 +188,14 @@ function Actions() {
 }
 
 function setAdjustedTicks(action) {
-    let statMult = 0;
+    let newCost = 0;
     for(let i = 0; i < statList.length; i++) {
         let statName = statList[i];
         if(action.stats[statName]) {
-            statMult += action.stats[statName] * (1 + getLevel(statName)/100);
+            newCost += action.stats[statName] / (1 + getLevel(statName)/100);
         }
     }
-    action.adjustedTicks = Math.ceil(action.manaCost() / statMult);
+    action.adjustedTicks = Math.ceil(action.manaCost() * newCost);
 }
 
 function calcSoulstoneMult(soulstones) {
