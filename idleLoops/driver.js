@@ -265,6 +265,53 @@ function split(index) {
     toSplit.loops = Math.floor(toSplit.loops/2);
     view.updateNextActions();
 }
+function handleDragStart(event) {
+    let index = event.target.getAttribute("data-index")
+    draggedDecorate(index);
+    event.dataTransfer.setData('Text/html', index);
+}
+
+function handleDragOver(event) {
+    event.preventDefault();
+}
+
+function handleDragDrop(event) {
+    let indexOfDroppedOverElement = event.target.getAttribute("data-index")
+    dragExitUndecorate(indexOfDroppedOverElement);
+    let initialIndex = event.dataTransfer.getData("text/html")
+    moveQueuedAction(initialIndex, indexOfDroppedOverElement);
+}
+
+function moveQueuedAction(initialIndex, resultingIndex) {
+    initialIndex = Number(initialIndex);
+    resultingIndex = Number(resultingIndex);
+    if (initialIndex < 0 || initialIndex > actions.next.length || resultingIndex < 0 || resultingIndex > actions.next.length - 1) {
+        return;
+    }
+    let difference = initialIndex - resultingIndex;
+    if (difference == 0) {
+        return;
+    }
+
+    let delta = Math.abs(difference);
+   
+    if (difference > 0) {
+        for (let i = 0; i < delta; i++) {
+            const temp = actions.next[initialIndex-i-1];
+            actions.next[initialIndex-i-1] = actions.next[initialIndex-i];
+            actions.next[initialIndex-i] = temp;
+        }
+    } else {
+        for (let i = 0; i < delta; i++) {
+            const temp = actions.next[initialIndex+i+1];
+            actions.next[initialIndex+i+1] = actions.next[initialIndex+i];
+            actions.next[initialIndex+i] = temp;
+        }
+    }
+    
+    view.updateNextActions();
+}
+
 function moveUp(index) {
     if(index <= 0) {
         return;
