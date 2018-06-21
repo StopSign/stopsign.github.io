@@ -1,3 +1,5 @@
+'use strict';
+
 function View() {
     this.totalActionList = [];
 
@@ -28,6 +30,12 @@ function View() {
         }
         this.updateTime();
         this.updateSoulstoneChance();
+        for (let i=0; i < this.updateCurrentActionBarRequests.length; i++) {
+            if (this.updateCurrentActionBarRequests[i]) {
+                this.updateCurrentActionBarRequests[i] = false;
+                this.updateCurrentActionBar(i);
+            }
+        }
     };
 
     this.showStat = function(stat) {
@@ -39,21 +47,23 @@ function View() {
         const levelPrc = getPrcToNextLevel(stat)+"%";
         const talentPrc = getPrcToNextTalent(stat)+"%";
         if(!expEquals(stat) || !talentEquals(stat) || statShowing === stat) {
-            document.getElementById("stat" + stat + "Level").innerHTML = getLevel(stat);
+            document.getElementById("stat" + stat + "Level").innerHTML = intToString(getLevel(stat), 1);
             document.getElementById("stat" + stat + "LevelBar").style.width = levelPrc;
 
-            document.getElementById("stat" + stat + "Talent").innerHTML = getTalent(stat);
+            document.getElementById("stat" + stat + "Talent").innerHTML = intToString(getTalent(stat), 1);
             document.getElementById("stat" + stat + "TalentBar").style.width = talentPrc;
 
-            document.getElementById("stat" + stat + "SSBonus").innerHTML = (stats[stat].soulstone ? stats[stat].soulstone : 0) * 10+"%";
+            document.getElementById("stat" + stat + "SSBonus").innerHTML = intToString(stats[stat].soulstone ? calcSoulstoneMult(stats[stat].soulstone) : 0);
         }
 
         if(statShowing === stat || document.getElementById("stat" + stat + "LevelExp").innerHTML === "") {
+            document.getElementById("stat" + stat + "Level2").innerHTML = getLevel(stat);
             let expOfLevel = getExpOfLevel(getLevel(stat));
             document.getElementById("stat" + stat + "LevelExp").innerHTML = intToString(stats[stat].exp - expOfLevel, 1);
             document.getElementById("stat" + stat + "LevelExpNeeded").innerHTML = intToString(getExpOfLevel(getLevel(stat)+1) - expOfLevel+"", 1);
             document.getElementById("stat" + stat + "LevelProgress").innerHTML = intToString(levelPrc, 2);
 
+            document.getElementById("stat" + stat + "Talent2").innerHTML = getTalent(stat);
             let expOfTalent = getExpOfLevel(getTalent(stat));
             document.getElementById("stat" + stat + "TalentExp").innerHTML = intToString(stats[stat].talent - expOfTalent, 1);
             document.getElementById("stat" + stat + "TalentExpNeeded").innerHTML = intToString(getExpOfLevel(getTalent(stat)+1) - expOfTalent+"", 1);
@@ -73,9 +83,9 @@ function View() {
         document.getElementById("skill" + skill + "Level").innerHTML = getSkillLevel(skill);
         document.getElementById("skill" + skill + "LevelBar").style.width = levelPrc + "%";
 
-        let expOfLevel = getExpOfLevel(getSkillLevel(skill));
+        let expOfLevel = getExpOfSkillLevel(getSkillLevel(skill));
         document.getElementById("skill" + skill + "LevelExp").innerHTML = intToString(skills[skill].exp - expOfLevel, 1);
-        document.getElementById("skill" + skill + "LevelExpNeeded").innerHTML = intToString(getExpOfLevel(getSkillLevel(skill)+1) - expOfLevel+"", 1);
+        document.getElementById("skill" + skill + "LevelExpNeeded").innerHTML = intToString(getExpOfSkillLevel(getSkillLevel(skill)+1) - expOfLevel+"", 1);
         document.getElementById("skill" + skill + "LevelProgress").innerHTML = intToString(levelPrc, 2);
     };
 
@@ -90,6 +100,9 @@ function View() {
     };
     this.updateGold = function() {
         document.getElementById("gold").innerHTML = gold;
+    };
+    this.updateGlasses = function() {
+        document.getElementById("glasses").style.display = glasses ? "inline-block" : "none";
     };
     this.updateReputation = function() {
         document.getElementById("reputation").innerHTML = reputation;
@@ -107,6 +120,10 @@ function View() {
         document.getElementById("hideDiv").style.display = herbs ? "inline-block" : "none";
         document.getElementById("hide").innerHTML = hide;
     };
+    this.updatePotions = function() {
+        document.getElementById("potionsDiv").style.display = herbs ? "inline-block" : "none";
+        document.getElementById("potions").innerHTML = hide;
+    };
 
     this.updateNextActions = function() {
         let count = 0;
@@ -114,15 +131,17 @@ function View() {
             if(document.getElementById("capButton"+count)) {
                 document.getElementById("capButton"+count).removeAttribute("onclick");
             }
-            document.getElementById("plusButton"+count).removeAttribute("onclick");
-            document.getElementById("minusButton"+count).removeAttribute("onclick");
-            document.getElementById("splitButton"+count).removeAttribute("onclick");
+            if(document.getElementById("plusButton"+count)) { //not for journey
+                document.getElementById("plusButton" + count).removeAttribute("onclick");
+                document.getElementById("minusButton" + count).removeAttribute("onclick");
+                document.getElementById("splitButton" + count).removeAttribute("onclick");
+            }
             document.getElementById("upButton"+count).removeAttribute("onclick");
             document.getElementById("downButton"+count).removeAttribute("onclick");
             document.getElementById("removeButton"+count).removeAttribute("onclick");
             while(nextActionsDiv.firstChild.firstChild) {
                 if(nextActionsDiv.firstChild.firstChild instanceof HTMLImageElement) {
-                    nextActionsDiv.firstChild.firstChild = null;
+                    nextActionsDiv.firstChild.firstChild.src = '';
                 }
                 nextActionsDiv.firstChild.removeChild(nextActionsDiv.firstChild.firstChild);
             }
@@ -160,13 +179,9 @@ function View() {
     };
 
     this.updateCurrentActionsDivs = function() {
-        // while (curActionsDiv.firstChild) {
-        //     curActionsDiv.removeChild(curActionsDiv.firstChild);
-        // }
-        // let actionsDiv = document.createElement("div");
         let totalDivText = "";
 
-        for(let i = 0; i < actions.current.length; i++) { //potential leak
+        for(let i = 0; i < actions.current.length; i++) { //definite leak - need to remove listeners and image
             let action = actions.current[i];
             totalDivText +=
                 "<div class='curActionContainer small' onmouseover='view.mouseoverAction("+i+", true)' onmouseleave='view.mouseoverAction("+i+", false)'>" +
@@ -177,16 +192,16 @@ function View() {
                 "</div>";
         }
 
-        // actionsDiv.innerHTML = totalDivText;
         curActionsDiv.innerHTML = totalDivText;
 
         totalDivText = "";
 
-        for(let i = 0; i < actions.current.length; i++) { //potential leak
+        for(let i = 0; i < actions.current.length; i++) {
             let action = actions.current[i];
             totalDivText +=
                 "<div id='actionTooltip"+i+"' style='display:none;padding-left:10px;width:90%'>" +
                     "<div style='text-align:center;width:100%'>"+action.name+"</div><br><br>" +
+                    "<div class='bold'>Mana Original</div> <div id='action"+i+"ManaOrig'>0</div><br>" +
                     "<div class='bold'>Mana Used</div> <div id='action"+i+"ManaUsed'>0</div><br>" +
                     "<div class='bold'>Remaining</div> <div id='action"+i+"Remaining'></div><br><br>" +
                     "<div id='action"+i+"ExpGain'></div>" +
@@ -201,6 +216,12 @@ function View() {
         this.mouseoverAction(0, false);
     };
 
+    
+    this.updateCurrentActionBarRequests = Array(50).fill(false);
+    this.updateCurrentActionBarRequest = function f(index) {
+        this.updateCurrentActionBarRequests[index] = true;
+    };
+    
     this.updateCurrentActionBar = function(index) {
         const action = actions.current[index];
         const div = document.getElementById("action"+index+"Bar");
@@ -217,6 +238,7 @@ function View() {
             div.style.width = "100%";
             div.style.backgroundColor = "#6d6d6d";
         }
+        document.getElementById("action" + index + "ManaOrig").innerHTML = action.manaCost() + "";
         document.getElementById("action" + index + "ManaUsed").innerHTML = action.manaUsed + "";
         document.getElementById("action"+index+"Remaining").innerHTML = (timeNeeded - timer)+"";
         let statExpGain = "";
@@ -268,7 +290,7 @@ function View() {
             let action = this.totalActionList[i];
             const actionDiv = document.getElementById("container"+action.varName);
             const infoDiv = document.getElementById("infoContainer"+action.varName);
-            if(!action.unlocked()) {
+            if(!action.unlocked() || (action.allowed && getNumOnList(action.name) >= action.allowed())) {
                 addClassToDiv(actionDiv, "locked");
                 if(infoDiv) {
                     addClassToDiv(infoDiv, "hidden");
@@ -308,6 +330,7 @@ function View() {
         actionOptionsTown[townNum].style.display = "block";
         townInfos[townNum].style.display = "block";
         document.getElementById("townName").innerHTML = townNames[townNum];
+        townShowing = townNum;
     };
 
     this.updateRegular = function(varName, index) {
@@ -358,7 +381,8 @@ function View() {
         this.createTownAction(tempObj);
         this.createTownInfo(tempObj);
 
-        this.createTownAction(new SellGold());
+        this.createTownAction(new BuyGlasses());
+        this.createTownAction(new BuyMana());
 
         tempObj = new MeetPeople();
         this.createTownAction(tempObj);
@@ -380,7 +404,6 @@ function View() {
         this.createTownAction(tempObj);
         this.createTownInfo(tempObj);
 
-        this.createTownAction(new GuidedTour());
         this.createTownAction(new ThrowParty());
         this.createTownAction(new WarriorLessons());
         this.createTownAction(new MageLessons());
@@ -435,7 +458,31 @@ function View() {
 
         this.createTownAction(new PracticalMagic());
         this.createTownAction(new LearnAlchemy());
-        // this.createTownAction(new BrewPotions());
+        this.createTownAction(new BrewPotions());
+
+        this.createTravelAction(new ContinueOn());
+
+        while (actionOptionsTown[2].firstChild) {
+            actionOptionsTown[2].removeChild(actionOptionsTown[2].firstChild);
+        }
+        while(townInfos[2].firstChild) {
+            townInfos[2].removeChild(townInfos[1].firstChild);
+        }
+        tempObj = new ExploreCity();
+        this.createTownAction(tempObj);
+        this.createActionProgress(tempObj);
+
+        tempObj = new Gamble();
+        this.createTownAction(tempObj);
+        this.createTownInfo(tempObj);
+
+        tempObj = new GetDrunk();
+        this.createTownAction(tempObj);
+        this.createActionProgress(tempObj);
+
+        this.createTownAction(new PurchaseMana());
+        this.createTownAction(new SellPotions());
+
     };
 
     this.createActionProgress = function(action) {
@@ -522,6 +569,8 @@ function View() {
                 "<div id='goodTemp"+action.varName+"'>0</div> <i class='fa fa-arrow-left'></i> " +
                 "<div id='good"+action.varName+"'>0</div> <i class='fa fa-arrow-left'></i> " +
                 "<div id='checked"+action.varName+"'>0</div>" +
+                "<input type='checkbox' id='searchToggler"+action.varName+"' style='margin-left:10px;'>" +
+                "<label for='searchToggler"+action.varName+"'> Lootable first</label>"+
                 "<div class='showthis'>" +
                     action.infoText +
                 "</div>" +
@@ -652,7 +701,7 @@ const curActionsDiv = document.getElementById("curActionsList");
 const nextActionsDiv = document.getElementById("nextActionsList");
 const actionOptionsTown = [];
 const townInfos = [];
-for(let i = 0; i < 2; i++) {
+for(let i = 0; i < 3; i++) {
     actionOptionsTown[i] = document.getElementById("actionOptionsTown"+i);
     townInfos[i] = document.getElementById("townInfo"+i);
 }
@@ -687,38 +736,3 @@ function addStatColors(theDiv, stat) {
         theDiv.style.backgroundColor = "#737388";
     }
 }
-
-// let minHeight = 300;
-// let onBottomEdge;
-// let p = document.getElementById("expandableList");
-// let pane = document.getElementById("expandableList");
-// pane.className = 'resizable';
-//
-// p.addEventListener('click', function init() {
-//     p.removeEventListener('click', init, false);
-//     p.className = p.className + ' resizable';
-//     let resizer = document.createElement('div');
-//     resizer.className = 'resizer';
-//     p.appendChild(resizer);
-//     resizer.addEventListener('mousedown', initDrag, false);
-// }, false);
-//
-// let startX, startY, startWidth, startHeight;
-//
-// function initDrag(e) {
-//     startX = e.clientX;
-//     startY = e.clientY;
-//     startWidth = parseInt(document.defaultView.getComputedStyle(p).width, 10);
-//     startHeight = parseInt(document.defaultView.getComputedStyle(p).height, 10);
-//     document.documentElement.addEventListener('mousemove', doDrag, false);
-//     document.documentElement.addEventListener('mouseup', stopDrag, false);
-// }
-//
-// function doDrag(e) {
-//     p.style.width = (startWidth + e.clientX - startX) + 'px';
-//     p.style.height = (startHeight + e.clientY - startY) + 'px';
-// }
-//
-// function stopDrag(e) {
-//     document.documentElement.removeEventListener('mousemove', doDrag, false);    document.documentElement.removeEventListener('mouseup', stopDrag, false);
-// }

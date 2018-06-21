@@ -1,4 +1,6 @@
-Add planet graphics 
+the space station gives me way less ice/dirt then it actually says it does
+
+Add planet graphics
 	show factory, on the planet 
 	show solar, around the edges 
 	show coilgun, on the middle and always pointed west

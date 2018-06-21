@@ -1,3 +1,5 @@
+'use strict';
+
 function Actions() {
     this.current = [];
     this.next = [];
@@ -65,7 +67,7 @@ function Actions() {
             this.adjustTicksNeeded();
             view.updateCurrentActionLoops(this.currentPos);
         }
-        view.updateCurrentActionBar(this.currentPos);
+        view.updateCurrentActionBarRequest(this.currentPos);
         if(curAction.loopsLeft === 0) {
             if(!this.current[this.currentPos + 1] && document.getElementById("repeatLastAction").checked &&
                 (!curAction.canStart || curAction.canStart()) && curAction.townNum === curTown) {
@@ -81,7 +83,7 @@ function Actions() {
         if(!curAction) {
             return curAction;
         }
-        if(getTravelNum(curAction.name) && curAction.canStart()) {
+        if(getTravelNum(curAction.name) && (!curAction.canStart || curAction.canStart())) {
             return curAction;
         }
         if((curAction.canStart && !curAction.canStart()) || curAction.townNum !== curTown) {
@@ -145,10 +147,10 @@ function Actions() {
             }
         }
         if(this.current.length === 0) {
-            // pauseGame();
+            pauseGame();
         }
         this.adjustTicksNeeded();
-        // view.updateMultiPartActions();
+        view.updateMultiPartActions();
         view.updateNextActions();
     };
 
@@ -176,29 +178,37 @@ function Actions() {
         if(initialOrder !== undefined) {
             this.next.splice(initialOrder, 0, toAdd) //insert at index
         } else {
-            this.next.push(toAdd);
+            if(!loops && document.getElementById("addActionTop").checked) {
+                this.next.splice(0, 0, toAdd);
+            } else {
+                this.next.push(toAdd);
+            }
         }
-
     };
 }
 
 function setAdjustedTicks(action) {
-    let statMult = 0;
+    let newCost = 0;
     for(let i = 0; i < statList.length; i++) {
         let statName = statList[i];
         if(action.stats[statName]) {
-            statMult += action.stats[statName] * (1 + getLevel(statName)/100);
+            newCost += action.stats[statName] / (1 + getLevel(statName)/100);
         }
     }
-    action.adjustedTicks = Math.ceil(action.manaCost() / statMult);
+    action.adjustedTicks = Math.ceil(action.manaCost() * newCost);
+}
+
+function calcSoulstoneMult(soulstones) {
+    return 1+Math.pow(soulstones, .8)/10;
 }
 
 function addExpFromAction(action) {
     for(let i = 0; i < statList.length; i++) {
         let statName = statList[i];
         if(action.stats[statName]) {
-            let soulstoneBonus = stats[statName].soulstone ? (1 + stats[statName].soulstone/10) : 1;
+            let soulstoneBonus = stats[statName].soulstone ? calcSoulstoneMult(stats[statName].soulstone) : 1;
             let expToAdd = soulstoneBonus * action.stats[statName] * action.expMult * (action.manaCost() / action.adjustedTicks) * (1+getTalent(statName)/100);
+            // console.log("toAdd " + expToAdd + " soulstone " + soulstoneBonus + " action stats " + action.stats[statName] + " exp mult " + action.expMult + " mana cost mult " + (action.manaCost() / action.adjustedTicks) + " talent mult " + (1+getTalent(statName)/100));
             if(!action["statExp"+statName]) {
                 action["statExp"+statName] = 0;
             }
@@ -206,4 +216,14 @@ function addExpFromAction(action) {
             addExp(statName, expToAdd);
         }
     }
+}
+
+function getNumOnList(actionName) {
+    let count = 0;
+    for(let i = 0; i < actions.next.length; i++) {
+        if(actions.next[i].name === actionName) {
+            count += actions.next[i].loops;
+        }
+    }
+    return count;
 }

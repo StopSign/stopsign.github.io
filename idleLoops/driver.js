@@ -1,35 +1,57 @@
+'use strict';
 
+let gameSpeed = 1;
+let gameTickLeft = 0;
 
 function tick() {
     if(stop) {
+        gameTickLeft = 0;
         return;
     }
-    timer++;
-
     prevState.stats = JSON.parse(JSON.stringify(stats));
-    actions.tick();
-    if(soulstoneChance < 1) {
-        soulstoneChance += .000001;
-        if(soulstoneChance > 1) {
-            soulstoneChance = 1;
+
+    gameTickLeft += gameSpeed / fps * 50;
+
+    while (gameTickLeft > 0) {
+        if(gameTickLeft > 1000) {
+            pauseGame();
+            console.warn(`too many ticks! (${gameTickLeft})`);
+            gameTickLeft = 0;
         }
-    }
+        if(stop) {
+            gameTickLeft = 0;
+            view.update();
+            return;
+        }
+        timer++;
+
+        actions.tick();
+        if(soulstoneChance < 1) {
+            soulstoneChance += .0000002;
+            if(soulstoneChance > 1) {
+                soulstoneChance = 1;
+            }
+        }
 
 
-    if(shouldRestart || timer >= timeNeeded) {
-        prepareRestart();
+        if(shouldRestart || timer >= timeNeeded) {
+            prepareRestart();
+        }
+
+        if(timer % (300*gameSpeed) === 0) {
+            save();
+        }
+        gameTickLeft--;
     }
 
     view.update();
 
-    if(timer % 300 === 0) {
-        save();
-    }
 }
 
-function recalcInterval(newSpeed) {
-    // doWork.postMessage({stop:true});
-    // doWork.postMessage({start:true,ms:(1000 / newSpeed)});
+function recalcInterval(fps) {
+    window.fps = fps;
+    doWork.postMessage({stop:true});
+    doWork.postMessage({start:true,ms:(1000 / fps)});
 }
 
 function pauseGame() {
@@ -58,10 +80,12 @@ function restart() {
     } else {
         addGold(-gold);
     }
+    addGlasses(-glasses);
     addReputation(-reputation);
     addSupplies(-supplies);
     addHerbs(-herbs);
     addHide(-hide);
+    addPotions(-potions);
     restartStats();
     for(let i = 0; i < towns.length; i++) {
         towns[i].restart();
@@ -78,17 +102,26 @@ function addActionToList(name, townNum, isTravelAction) {
     for(let i = 0; i < towns[townNum].totalActionList.length; i++) {
         let action = towns[townNum].totalActionList[i];
         if(action.name === name) {
-            if(action.visible() && action.unlocked()) {
+            if(action.visible() && action.unlocked() && (!action.allowed || getNumOnList(action.name) < action.allowed())) {
+                let addAmount = actions.addAmount;
+                if(action.allowed) {
+                    let numMax = action.allowed();
+                    let numHave = getNumOnList(action.name);
+                    if((numMax - numHave) < addAmount) {
+                        addAmount = numMax - numHave;
+                    }
+                }
                 if(isTravelAction) {
                     actionTownNum = townNum+1;
                     actions.addAction(name, 1);
                 } else {
-                    actions.addAction(name);
+                    actions.addAction(name, addAmount);
                 }
             }
         }
     }
     view.updateNextActions();
+    view.updateLockedHidden();
 }
 
 function addMana(amount) {
@@ -98,6 +131,11 @@ function addMana(amount) {
 function addGold(amount) {
     gold += amount;
     view.updateGold();
+}
+
+function addGlasses(amount) {
+    glasses += amount;
+    view.updateGlasses();
 }
 
 function addReputation(amount) {
@@ -118,6 +156,11 @@ function addHerbs(amount) {
 function addHide(amount) {
     hide += amount;
     view.updateHide();
+}
+
+function addPotions(amount) {
+    potions += amount;
+    view.updatePotions();
 }
 
 function changeActionAmount(amount, num) {
@@ -174,7 +217,7 @@ function adjustAll() {
     adjustHunt();
 }
 
-capAmount = function(index, townNum) {
+function capAmount(index, townNum) {
     let varName = "good"+translateClassNames(actions.next[index].name).varName;
     let alreadyExisting = 0;
     for(let i = 0; i < actions.next.length; i++) {
@@ -186,25 +229,37 @@ capAmount = function(index, townNum) {
     let newLoops = towns[townNum][varName] - alreadyExisting;
     actions.next[index].loops = newLoops < 0 ? 0 : newLoops;
     view.updateNextActions();
-};
-addLoop = function(index) {
-    actions.next[index].loops += actions.addAmount;
+}
+
+function addLoop(index) {
+    let theClass = translateClassNames(actions.next[index].name);
+    let addAmount = actions.addAmount;
+    if(theClass.allowed) {
+        let numMax = theClass.allowed();
+        let numHave = getNumOnList(theClass.name);
+        if((numMax - numHave) < addAmount) {
+            addAmount = numMax - numHave;
+        }
+    }
+    actions.next[index].loops += addAmount;
     view.updateNextActions();
-};
-removeLoop = function(index) {
+    view.updateLockedHidden();
+}
+function removeLoop(index) {
     actions.next[index].loops -= actions.addAmount;
     if(actions.next[index].loops < 0) {
         actions.next[index].loops = 0;
     }
     view.updateNextActions();
-};
-split = function(index) {
+    view.updateLockedHidden();
+}
+function split(index) {
     const toSplit = actions.next[index];
     actions.addAction(toSplit.name, Math.ceil(toSplit.loops/2), index);
     toSplit.loops = Math.floor(toSplit.loops/2);
     view.updateNextActions();
-};
-moveUp = function(index) {
+}
+function moveUp(index) {
     if(index <= 0) {
         return;
     }
@@ -212,8 +267,8 @@ moveUp = function(index) {
     actions.next[index-1] = actions.next[index];
     actions.next[index] = temp;
     view.updateNextActions();
-};
-moveDown = function(index) {
+}
+function moveDown(index) {
     if(index >= actions.next.length - 1) {
         return;
     }
@@ -221,8 +276,8 @@ moveDown = function(index) {
     actions.next[index+1] = actions.next[index];
     actions.next[index] = temp;
     view.updateNextActions();
-};
-removeAction = function(index) {
+}
+function removeAction(index) {
     let travelNum = getTravelNum(actions.next[index].name);
     if(travelNum) {
         actionTownNum = travelNum - 1;
@@ -230,4 +285,5 @@ removeAction = function(index) {
 
     actions.next.splice(index, 1);
     view.updateNextActions();
-};
+    view.updateLockedHidden();
+}
