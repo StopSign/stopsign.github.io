@@ -41,6 +41,9 @@ let maxTown;
 let statShowing;
 let actionTownNum;
 let trainingLimits = 50;
+let storyShowing = 0;
+let storyMax = 0;
+
 
 
 function closeTutorial() {
@@ -154,10 +157,17 @@ function load() {
                     town["good" + varName] = toLoad["good" + varName];
                 if (toLoad["good" + varName] !== undefined)
                     town["goodTemp" + varName] = toLoad["good" + varName];
+                if(toLoad["searchToggler" + varName] !== undefined) {
+                    document.getElementById("searchToggler" + varName).checked = toLoad["searchToggler" + varName];
+                }
                 view.updateRegular(action.varName, i);
             }
         }
     }
+
+    document.getElementById("repeatLastAction").checked = toLoad.repeatLast;
+    storyShowing = toLoad.storyShowing !== undefined ? toLoad.storyShowing : 0;
+    storyMax = toLoad.storyMax !== undefined ? toLoad.storyMax : 0;
 
     adjustAll();
 
