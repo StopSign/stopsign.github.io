@@ -24,21 +24,29 @@ function View() {
 
     this.statBlurbs = ["Train your body.", "Know your body.", "Just a little longer. Just a little more.", "Look a little closer...", "Learning to learn.", "Conversation is a battle.", "Gotta go fast.", "Opportunity favors the fortunate.", "You are the captain."];
     this.createStats = function() {
-        var statChartCtx = document.getElementById("statChartCtx");
-        var dataset = this.getGraphDatasets();
+        let statChartCtx = document.getElementById("statChartCtx");
+        let dataset = this.getGraphDatasets();
         window.statChart = new Chart(statChartCtx, {
             type: 'radar',
             options: {
-              elements: {
-                line: {
-                  tension:0,
-                  borderWidth:3
+                responsive: false,
+                maintainAspectRatio: true,
+                elements: {
+                    line: {
+                        tension: 0,
+                        borderWidth: 3
+                    }
+                },
+                scale: {
+                    ticks: {
+                        beginAtZero: true,
+                        display:false
+                    },
                 }
-              }
             },
             data: {
-                labels : statList,
-                datasets : dataset,
+                labels: statList,
+                datasets: dataset,
             }
         });
 
@@ -75,35 +83,41 @@ function View() {
     };
 
     this.getGraphDatasets = function(){
-      var dataset = [
-        {
-          label : "Level",
-          data : [],
-          fill:true,
-          backgroundColor:"rgba(255, 99, 132, 0.2)",
-          borderColor:"rgb(255, 99, 132)",
-          pointBackgroundColor:"rgb(255, 99, 132)",
-          pointBorderColor:"#fff",
-          pointHoverBackgroundColor:"#fff",
-          pointHoverBorderColor:"rgb(255, 99, 132)"
-        },
-        {
-          label : "Talent",
-          data : [],
-          backgroundColor:"rgba(54, 162, 235, 0.2)",
-          borderColor:"rgb(54, 162, 235)",
-          pointBackgroundColor:"rgb(54, 162, 235)",
-          pointBorderColor:"#fff",
-          pointHoverBackgroundColor:"#fff",
-          pointHoverBorderColor:"rgb(54, 162, 235)"
-        }
-      ];
-      for(let i = 0; i < statList.length; i++) {
+        let dataset = [
+            {
+                label : "Level",
+                data : [],
+                fill:true,
+                borderWidth:2,
+                backgroundColor:"rgba(255, 99, 132, 0.2)",
+                borderColor:"rgb(255, 99, 132)",
+                pointBackgroundColor:"rgb(255, 99, 132)",
+                pointBorderColor:"#fff",
+                pointHoverBackgroundColor:"#fff",
+                pointHoverBorderColor:"rgb(255, 99, 132)",
+                pointBorderWidth:1,
+                pointRadius:6
+            },
+            {
+                label : "Talent",
+                data : [],
+                borderWidth:2,
+                backgroundColor:"rgba(54, 162, 235, 0.2)",
+                borderColor:"rgb(54, 162, 235)",
+                pointBackgroundColor:"rgb(54, 162, 235)",
+                pointBorderColor:"#fff",
+                pointHoverBackgroundColor:"#fff",
+                pointHoverBorderColor:"rgb(54, 162, 235)",
+                pointBorderWidth:1,
+                pointRadius:6
+            }
+        ];
+        for(let i = 0; i < statList.length; i++) {
           dataset[0].data.push(getLevel(statList[i]));
           dataset[1].data.push(getTalent(statList[i]));
-      };
-      return dataset;
-    }
+        }
+        return dataset;
+    };
 
     this.update = function() {
         for(let i = 0; i < statList.length; i++) {
@@ -129,7 +143,7 @@ function View() {
 
     this.updateStatGraphNeeded = false;
     this.updateStatGraph = function () {
-        var newDatasets = this.getGraphDatasets();
+        let newDatasets = this.getGraphDatasets();
         statChart.data.datasets.forEach((dataset,x) => {
             dataset.data = newDatasets[x].data;
         });
