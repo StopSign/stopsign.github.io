@@ -42,6 +42,10 @@ function tick() {
             save();
         }
         gameTickLeft--;
+
+        if (timer % fps === 0)
+          view.updateStatGraphNeeded = true;
+
     }
 
     view.update();

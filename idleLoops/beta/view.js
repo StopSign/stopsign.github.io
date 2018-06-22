@@ -24,6 +24,24 @@ function View() {
 
     this.statBlurbs = ["Train your body.", "Know your body.", "Just a little longer. Just a little more.", "Look a little closer...", "Learning to learn.", "Conversation is a battle.", "Gotta go fast.", "Opportunity favors the fortunate.", "You are the captain."];
     this.createStats = function() {
+        var statChartCtx = document.getElementById("statChartCtx");
+        var dataset = this.getGraphDatasets();
+        window.statChart = new Chart(statChartCtx, {
+            type: 'radar',
+            options: {
+              elements: {
+                line: {
+                  tension:0,
+                  borderWidth:3
+                }
+              }
+            },
+            data: {
+                labels : statList,
+                datasets : dataset,
+            }
+        });
+
         let statContainer = document.getElementById("statContainer");
         while (statContainer.firstChild) {
             statContainer.removeChild(statContainer.firstChild);
@@ -56,6 +74,37 @@ function View() {
         statContainer.innerHTML = totalStatDiv;
     };
 
+    this.getGraphDatasets = function(){
+      var dataset = [
+        {
+          label : "Level",
+          data : [],
+          fill:true,
+          backgroundColor:"rgba(255, 99, 132, 0.2)",
+          borderColor:"rgb(255, 99, 132)",
+          pointBackgroundColor:"rgb(255, 99, 132)",
+          pointBorderColor:"#fff",
+          pointHoverBackgroundColor:"#fff",
+          pointHoverBorderColor:"rgb(255, 99, 132)"
+        },
+        {
+          label : "Talent",
+          data : [],
+          backgroundColor:"rgba(54, 162, 235, 0.2)",
+          borderColor:"rgb(54, 162, 235)",
+          pointBackgroundColor:"rgb(54, 162, 235)",
+          pointBorderColor:"#fff",
+          pointHoverBackgroundColor:"#fff",
+          pointHoverBorderColor:"rgb(54, 162, 235)"
+        }
+      ];
+      for(let i = 0; i < statList.length; i++) {
+          dataset[0].data.push(getLevel(statList[i]));
+          dataset[1].data.push(getTalent(statList[i]));
+      };
+      return dataset;
+    }
+
     this.update = function() {
         for(let i = 0; i < statList.length; i++) {
             let statName = statList[i];
@@ -69,11 +118,23 @@ function View() {
                 this.updateCurrentActionBar(i);
             }
         }
+        if (this.updateStatGraphNeeded)
+          this.updateStatGraph();
     };
 
     this.showStat = function(stat) {
         statShowing = stat;
         this.updateStat(stat);
+    };
+
+    this.updateStatGraphNeeded = false;
+    this.updateStatGraph = function () {
+        var newDatasets = this.getGraphDatasets();
+        statChart.data.datasets.forEach((dataset,x) => {
+            dataset.data = newDatasets[x].data;
+        });
+        statChart.update();
+        this.updateStatGraphNeeded = false;
     };
 
     this.updateStat = function(stat) {
