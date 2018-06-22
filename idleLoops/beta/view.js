@@ -35,6 +35,12 @@ function View() {
                   borderWidth:3
                 }
               },
+              scale: {
+                  ticks: {
+                      beginAtZero: true,
+                      display:false
+                  },
+              },
               tooltips: {
                   callbacks: {
                       label: function(tooltipItem, data) {
