@@ -112,6 +112,7 @@ function Wander() {
         Spd:.3,
         Luck:.1
     };
+    this.affectedBy = ["Buy Glasses"];
     this.manaCost = function() {
         return 250;
     };
@@ -214,6 +215,7 @@ function ExploreForest() {
         Spd:.2,
         Luck:.2
     };
+    this.affectedBy = ["Buy Glasses"];
     this.manaCost = function() {
         return 400;
     };
@@ -316,6 +318,7 @@ function ExploreCity() {
         Spd:.3,
         Luck:.1
     };
+    this.affectedBy = ["Buy Glasses"];
     this.manaCost = function() {
         return 750;
     };
@@ -377,7 +380,7 @@ function GetDrunk() {
 function BuyGlasses() {
     this.name = "Buy Glasses";
     this.expMult = 1;
-    this.tooltip = "That's not fair. There was time now. There was all the time I needed.<br>Now you have to get new glasses again for 10 gold!<br>Causes Wander to be 4x as effective for the rest of the loop.<br>Can only have 1 Buy Glasses action.<br>Unlocked at 20% explored";
+    this.tooltip = "That's not fair. There was time now. There was all the time I needed.<br>Now you have to get new glasses again for 10 gold!<br>Causes Wander to be 4x as effective for the rest of the loop.<br>Causes other explore actions to be 2x (read their tooltips).<br>Can only have 1 Buy Glasses action.<br>Unlocked at 20% explored";
     this.townNum = 0;
 
     this.varName = "Glasses";
@@ -933,6 +936,7 @@ function ReadBooks() {
         Int:.8,
         Soul:.2
     };
+    this.affectedBy = ["Buy Glasses"];
     this.allowed = function() {
         return trainingLimits;
     };

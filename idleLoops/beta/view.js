@@ -544,9 +544,15 @@ function View() {
             let statName = keyNames[i];
             actionStats += "<div class='bold'>" + statName + "</div> " + (action.stats[statName]*100)+"%<br>";
         }
-
+        let extraImage = "";
+        if(action.affectedBy) {
+            for(let i = 0; i < action.affectedBy.length; i++) {
+                extraImage += "<img src='img/"+camelize(action.affectedBy[i])+".svg' class='smallIcon' style='position:absolute;right:0;bottom:0;'>";
+            }
+        }
         const totalDivText =
             "<div id='container"+action.varName+"' class='actionContainer showthat' onclick='addActionToList(\""+action.name+"\", "+action.townNum+")'>" +
+                extraImage +
                 action.name + "<br>" +
                 "<img src='img/"+camelize(action.name)+".svg' class='superLargeIcon'><br>" +
                 "<div class='showthis'>" +

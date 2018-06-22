@@ -218,6 +218,7 @@ input {
     height:50px;
     vertical-align:top;
     margin:0 2px;
+    position:relative;
 }
 .actionContainer:hover, .travelContainer:hover {
     background-color: #bef8ff;
