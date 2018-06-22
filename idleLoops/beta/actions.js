@@ -70,8 +70,10 @@ function Actions() {
         view.updateCurrentActionBarRequest(this.currentPos);
         if(curAction.loopsLeft === 0) {
             if(!this.current[this.currentPos + 1] && document.getElementById("repeatLastAction").checked &&
-                (!curAction.canStart || curAction.canStart()) && curAction.townNum === curTown) {
+                (!curAction.canStart || curAction.canStart()) && curAction.townNum === curTown
+                 && (!curAction.allowed || getNumOnCurList(curAction.name) < curAction.allowed())) {
                 curAction.loopsLeft++;
+                curAction.loops++;
             } else {
                 this.currentPos++;
             }
@@ -225,5 +227,16 @@ function getNumOnList(actionName) {
             count += actions.next[i].loops;
         }
     }
+    return count;
+}
+
+function getNumOnCurList(actionName) {
+    let count = 0;
+    for(let i = 0; i < actions.curNext.length; i++) {
+        if(actions.curNext[i].name === actionName) {
+            count += actions.curNext[i].loops;
+        }
+    }
+    console.log(count);
     return count;
 }

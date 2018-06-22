@@ -145,7 +145,7 @@ input {
 .statLabel {
     vertical-align: top;
     position:absolute;
-    left:35px;
+    left:40px;
 }
 .statNum {
     float:right;

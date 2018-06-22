@@ -235,7 +235,7 @@ function View() {
                     "<div class='curActionBar' id='action"+i+"Bar'></div>" +
                     "<div class='actionSelectedIndicator' id='action"+i+"Selected'></div>" +
                     "<img src='img/"+camelize(action.name)+".svg' class='smallIcon'> x " +
-                    "<div id='action"+i+"Loops' style='margin-left:3px'>"+ action.loopsLeft+"</div>(" + action.loops + ")" +
+                    "<div id='action"+i+"LoopsLeft' style='margin-left:3px'>"+ action.loopsLeft+"</div>(" + "<div id='action"+i+"Loops'>" + action.loops + "</div>" + ")" +
                 "</div>";
         }
 
@@ -263,7 +263,6 @@ function View() {
         this.mouseoverAction(0, false);
     };
 
-    
     this.updateCurrentActionBarRequests = Array(50).fill(false);
     this.updateCurrentActionBarRequest = function f(index) {
         this.updateCurrentActionBarRequests[index] = true;
@@ -313,7 +312,10 @@ function View() {
     };
 
     this.updateCurrentActionLoops = function(index) {
-        document.getElementById("action"+index+"Loops").innerHTML = actions.current[index].loopsLeft;
+        document.getElementById("action" + index + "Loops").innerHTML = actions.current[index].loopsLeft;
+        if(index === (actions.current.length - 1)) {
+            document.getElementById("action" + index + "LoopsLeft").innerHTML = actions.current[index].loops;
+        }
     };
 
     this.updateProgressActions = function() {
