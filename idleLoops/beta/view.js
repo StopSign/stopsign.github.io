@@ -24,28 +24,36 @@ function View() {
 
     this.statBlurbs = ["Train your body.", "Know your body.", "Just a little longer. Just a little more.", "Look a little closer...", "Learning to learn.", "Conversation is a battle.", "Gotta go fast.", "Opportunity favors the fortunate.", "You are the captain."];
     this.createStats = function() {
+        let statContainer = document.getElementById("statContainer");
+        while (statContainer.firstChild) {
+            statContainer.removeChild(statContainer.firstChild);
+        }
+
         let totalStatDiv = "";
         for(let i = 0; i < statList.length; i++) {
             let stat = statList[i];
             totalStatDiv +=
                 "<div class=\"statContainer showthat\" onmouseover=\"view.showStat('"+stat+"')\">" +
-                "<div class=\"statLabel medium bold\">"+statsLongForm(stat)+"</div>" +
-                "<div class=\"statNum medium\"><div id=\"stat"+stat+"Level\">0</div>(<div id=\"stat"+stat+"Talent\">0</div>)<div id=\"ss"+stat+"Container\" class=\"ssContainer\">(<div id=\"ss"+stat+"\"></div>)</div></div>" +
-                "<div style=\"margin-top:18px;\"></div>" +
-                "<div class=\"thinProgressBarUpper\"><div class=\"statBar statLevelBar\" id=\"stat"+stat+"LevelBar\"></div></div>" +
-                "<div class=\"thinProgressBarLower\"><div class=\"statBar statTalentBar\" id=\"stat"+stat+"TalentBar\"></div></div>" +
-                "<div class=\"showthis\" id=\"stat"+stat+"Tooltip\">" +
-                this.statBlurbs[i] + "<br>" +
-                "<div class=\"medium bold\">Level</div> <div id=\"stat"+stat+"Level2\"></div><br>" +
-                "<div class=\"medium bold\">Level Exp</div> <div id=\"stat"+stat+"LevelExp\"></div>/<div id=\"stat"+stat+"LevelExpNeeded\"></div> <div class=\"statTooltipPerc\">(<div id=\"stat"+stat+"LevelProgress\"></div>%)</div><br>" +
-                "<div class=\"medium bold\">Talent</div> <div id=\"stat"+stat+"Talent2\"></div><br>" +
-                "<div class=\"medium bold\">Talent Exp</div> <div id=\"stat"+stat+"TalentExp\"></div>/<div id=\"stat"+stat+"TalentExpNeeded\"></div> <div class=\"statTooltipPerc\">(<div id=\"stat"+stat+"TalentProgress\"></div>%)</div><br>" +
-                "<div class=\"medium bold\">Soulstone Mult</div> x<div id=\"stat"+stat+"SSBonus\"></div>" +
-                "</div>" +
+                    "<div class=\"statLabel medium bold\">"+statsLongForm(stat)+"</div>" +
+                    "<div class='statLevelNum' id=\"stat"+stat+"Level\">0</div>" +
+                    "<div class=\"statNum medium\">" +
+                        "<div id=\"stat"+stat+"Talent\">0</div>" +
+                        "<div id=\"ss"+stat+"Container\" class=\"ssContainer\">(<div id=\"ss"+stat+"\"></div>)</div></div>" +
+                    "<div style=\"margin-top:18px;\"></div>" +
+                    "<div class=\"thinProgressBarUpper\"><div class=\"statBar statLevelBar\" id=\"stat"+stat+"LevelBar\"></div></div>" +
+                    "<div class=\"thinProgressBarLower\"><div class=\"statBar statTalentBar\" id=\"stat"+stat+"TalentBar\"></div></div>" +
+                    "<div class=\"showthis\" id=\"stat"+stat+"Tooltip\">" +
+                        this.statBlurbs[i] + "<br>" +
+                        "<div class=\"medium bold\">Level</div> <div id=\"stat"+stat+"Level2\"></div><br>" +
+                        "<div class=\"medium bold\">Level Exp</div> <div id=\"stat"+stat+"LevelExp\"></div>/<div id=\"stat"+stat+"LevelExpNeeded\"></div> <div class=\"statTooltipPerc\">(<div id=\"stat"+stat+"LevelProgress\"></div>%)</div><br>" +
+                        "<div class=\"medium bold\">Talent</div> <div id=\"stat"+stat+"Talent2\"></div><br>" +
+                        "<div class=\"medium bold\">Talent Exp</div> <div id=\"stat"+stat+"TalentExp\"></div>/<div id=\"stat"+stat+"TalentExpNeeded\"></div> <div class=\"statTooltipPerc\">(<div id=\"stat"+stat+"TalentProgress\"></div>%)</div><br>" +
+                        "<div class=\"medium bold\">Soulstone Mult</div> x<div id=\"stat"+stat+"SSBonus\"></div>" +
+                    "</div>" +
                 "</div>"
         }
 
-        document.getElementById("statContainer").innerHTML = totalStatDiv;
+        statContainer.innerHTML = totalStatDiv;
     };
 
     this.update = function() {
