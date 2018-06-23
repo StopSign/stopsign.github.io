@@ -87,3 +87,8 @@ function restartStats() {
         view.updateStat(statList[i]);
     }
 }
+
+function getTotalBonusXP(statName) {
+    let soulstoneBonus = stats[statName].soulstone ? calcSoulstoneMult(stats[statName].soulstone) : 1;
+    return soulstoneBonus * (1+getTalent(statName)/100);
+}

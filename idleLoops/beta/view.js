@@ -22,33 +22,33 @@ function View() {
         this.updateTrainingLimits();
     };
 
-    this.statBlurbs = ["Train your body.", "Know your body.", "Just a little longer. Just a little more.", "Look a little closer...", "Learning to learn.", "Conversation is a battle.", "Gotta go fast.", "Opportunity favors the fortunate.", "You are the captain."];
+    this.statBlurbs = ["Know your body.", "Train your body.", "Just a little longer. Just a little more.", "Gotta go fast.", "Look a little closer...", "Conversation is a battle.", "Learning to learn.", "Opportunity favors the fortunate.", "You are the captain."];
+    this.statLocs = [{x:165, y:43}, {x:272, y:79}, {x:325, y:170}, {x:305, y:284}, {x:223, y:352}, {x:102, y:352}, {x:24, y:284}, {x:2, y:170}, {x:56, y:79}];
     this.createStats = function() {
+        statGraph.init();
         let statContainer = document.getElementById("statContainer");
         while (statContainer.firstChild) {
             statContainer.removeChild(statContainer.firstChild);
         }
-
         let totalStatDiv = "";
         for(let i = 0; i < statList.length; i++) {
             let stat = statList[i];
+            let loc = this.statLocs[i];
             totalStatDiv +=
-                "<div class=\"statContainer showthat\" onmouseover=\"view.showStat('"+stat+"')\">" +
-                    "<div class=\"statLabel medium bold\">"+statsLongForm(stat)+"</div>" +
-                    "<div class='statLevelNum' id=\"stat"+stat+"Level\">0</div>" +
-                    "<div class=\"statNum medium\">" +
-                        "<div id=\"stat"+stat+"Talent\">0</div>" +
-                        "<div id=\"ss"+stat+"Container\" class=\"ssContainer\">(<div id=\"ss"+stat+"\"></div>)</div></div>" +
-                    "<div style=\"margin-top:18px;\"></div>" +
-                    "<div class=\"thinProgressBarUpper\"><div class=\"statBar statLevelBar\" id=\"stat"+stat+"LevelBar\"></div></div>" +
-                    "<div class=\"thinProgressBarLower\"><div class=\"statBar statTalentBar\" id=\"stat"+stat+"TalentBar\"></div></div>" +
-                    "<div class=\"showthis\" id=\"stat"+stat+"Tooltip\">" +
+                "<div class='statContainer showthat' style='left:"+loc.x+"px;top:"+loc.y+"px;' onmouseover='view.showStat(\""+stat+"\")'>" +
+                    "<div class='thinProgressBarUpper'><div class='statBar statLevelBar' id='stat"+stat+"LevelBar'></div></div>" +
+                    "<div class='thinProgressBarLower'><div class='statBar statTalentBar' id='stat"+stat+"TalentBar'></div></div>" +
+                    "<div class='showthis' id='stat"+stat+"Tooltip' style='width:225px;'>" +
+                        "<div class='medium bold'>"+statsLongForm(stat)+"</div><br>" +
                         this.statBlurbs[i] + "<br>" +
-                        "<div class=\"medium bold\">Level</div> <div id=\"stat"+stat+"Level2\"></div><br>" +
-                        "<div class=\"medium bold\">Level Exp</div> <div id=\"stat"+stat+"LevelExp\"></div>/<div id=\"stat"+stat+"LevelExpNeeded\"></div> <div class=\"statTooltipPerc\">(<div id=\"stat"+stat+"LevelProgress\"></div>%)</div><br>" +
-                        "<div class=\"medium bold\">Talent</div> <div id=\"stat"+stat+"Talent2\"></div><br>" +
-                        "<div class=\"medium bold\">Talent Exp</div> <div id=\"stat"+stat+"TalentExp\"></div>/<div id=\"stat"+stat+"TalentExpNeeded\"></div> <div class=\"statTooltipPerc\">(<div id=\"stat"+stat+"TalentProgress\"></div>%)</div><br>" +
-                        "<div class=\"medium bold\">Soulstone Mult</div> x<div id=\"stat"+stat+"SSBonus\"></div>" +
+                        "<div class='medium bold'>Level</div> <div id='stat"+stat+"Level2'></div><br>" +
+                        "<div class='medium bold'>Level Exp</div> <div id='stat"+stat+"LevelExp'></div>/<div id='stat"+stat+"LevelExpNeeded'></div> <div class='statTooltipPerc'>(<div id='stat"+stat+"LevelProgress'></div>%)</div><br>" +
+                        "<div class='medium bold'>Talent</div> <div id='stat"+stat+"Talent2'></div><br>" +
+                        "<div class='medium bold'>Talent Exp</div> <div id='stat"+stat+"TalentExp'></div>/<div id='stat"+stat+"TalentExpNeeded'></div> <div class='statTooltipPerc'>(<div id='stat"+stat+"TalentProgress'></div>%)</div><br>" +
+                        "<div id='ss"+stat+"Container' class='ssContainer'>" +
+                            "<div class='bold'>Soulstones</div> <div id='ss"+stat+"'></div><br>" +
+                            "<div class='medium bold'>Soulstone Mult</div> x<div id='stat"+stat+"SSBonus'></div>" +
+                        "</div>" +
                     "</div>" +
                 "</div>"
         }
@@ -69,6 +69,8 @@ function View() {
                 this.updateCurrentActionBar(i);
             }
         }
+        if (this.updateStatGraphNeeded)
+          statGraph.update();
     };
 
     this.showStat = function(stat) {
@@ -76,17 +78,15 @@ function View() {
         this.updateStat(stat);
     };
 
+    this.updateStatGraphNeeded = false;
+
     this.updateStat = function(stat) {
         const levelPrc = getPrcToNextLevel(stat)+"%";
         const talentPrc = getPrcToNextTalent(stat)+"%";
         if(!expEquals(stat) || !talentEquals(stat) || statShowing === stat) {
-            document.getElementById("stat" + stat + "Level").innerHTML = intToString(getLevel(stat), 1);
             document.getElementById("stat" + stat + "LevelBar").style.width = levelPrc;
-
-            document.getElementById("stat" + stat + "Talent").innerHTML = intToString(getTalent(stat), 1);
             document.getElementById("stat" + stat + "TalentBar").style.width = talentPrc;
 
-            document.getElementById("stat" + stat + "SSBonus").innerHTML = intToString(stats[stat].soulstone ? calcSoulstoneMult(stats[stat].soulstone) : 0);
         }
 
         if(statShowing === stat || document.getElementById("stat" + stat + "LevelExp").innerHTML === "") {
@@ -230,7 +230,7 @@ function View() {
                     "<div class='curActionBar' id='action"+i+"Bar'></div>" +
                     "<div class='actionSelectedIndicator' id='action"+i+"Selected'></div>" +
                     "<img src='img/"+camelize(action.name)+".svg' class='smallIcon'> x " +
-                    "<div id='action"+i+"Loops' style='margin-left:3px'>"+ action.loopsLeft+"</div>(" + action.loops + ")" +
+                    "<div id='action"+i+"LoopsLeft' style='margin-left:3px'>"+ action.loopsLeft+"</div>(" + "<div id='action"+i+"Loops'>" + action.loops + "</div>" + ")" +
                 "</div>";
         }
 
@@ -258,7 +258,6 @@ function View() {
         this.mouseoverAction(0, false);
     };
 
-    
     this.updateCurrentActionBarRequests = Array(50).fill(false);
     this.updateCurrentActionBarRequest = function f(index) {
         this.updateCurrentActionBarRequests[index] = true;
@@ -308,7 +307,10 @@ function View() {
     };
 
     this.updateCurrentActionLoops = function(index) {
-        document.getElementById("action"+index+"Loops").innerHTML = actions.current[index].loopsLeft;
+        document.getElementById("action" + index + "Loops").innerHTML = actions.current[index].loopsLeft;
+        if(index === (actions.current.length - 1)) {
+            document.getElementById("action" + index + "LoopsLeft").innerHTML = actions.current[index].loops;
+        }
     };
 
     this.updateProgressActions = function() {
@@ -722,10 +724,9 @@ function View() {
         for(let i = 0; i < statList.length; i++) {
             let statName = statList[i];
             if(stats[statName].soulstone) {
-                if (!isVisible(document.getElementById("ss" + statName + "Container"))) {
-                    document.getElementById("ss" + statName + "Container").style.display = "inline-block";
-                }
+                document.getElementById("ss" + statName + "Container").style.display = "inline-block";
                 document.getElementById("ss"+statName).innerHTML = stats[statName].soulstone;
+                document.getElementById("stat" + statName + "SSBonus").innerHTML = intToString(stats[statName].soulstone ? calcSoulstoneMult(stats[statName].soulstone) : 0);
             } else {
                 document.getElementById("ss" + statName + "Container").style.display = "none";
             }
