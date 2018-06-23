@@ -18,18 +18,7 @@ let statGraph = {
                     },
                 },
                 tooltips: {
-                    callbacks: {
-                        label: function (tooltipItem, data) {
-                            let label = data.datasets[tooltipItem.datasetIndex].label || '';
-
-                            if (label) {
-                                label += ': ';
-                            }
-                            label += intToString(tooltipItem.yLabel, 1);
-                            label += data.datasets[tooltipItem.datasetIndex].tooltipComplement || '';
-                            return label;
-                        }
-                    }
+                    enabled: false,
                 }
             },
             data: {
