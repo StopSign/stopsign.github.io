@@ -22,7 +22,7 @@ function View() {
         this.updateTrainingLimits();
     };
 
-    this.statBlurbs = ["Know your body.", "Train your body.", "Just a little longer. Just a little more.", "Gotta go fast.", "Look a little closer...", "Learning to learn.", "Conversation is a battle.", "Opportunity favors the fortunate.", "You are the captain."];
+    this.statBlurbs = ["Know your body.", "Train your body.", "Just a little longer. Just a little more.", "Gotta go fast.", "Look a little closer...", "Conversation is a battle.", "Learning to learn.", "Opportunity favors the fortunate.", "You are the captain."];
     this.statLocs = [{x:165, y:43}, {x:272, y:79}, {x:325, y:170}, {x:305, y:284}, {x:223, y:352}, {x:102, y:352}, {x:24, y:284}, {x:2, y:170}, {x:56, y:79}];
     this.createStats = function() {
         statGraph.init();

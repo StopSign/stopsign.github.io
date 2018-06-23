@@ -5,18 +5,18 @@ let statGraph = {
         this.graphObject = new Chart(statChartCtx, {
             type: 'radar',
             options: {
-              elements: {
-                line: {
-                  tension:0,
-                  borderWidth:3
-                }
-              },
-              scale: {
-                  ticks: {
-                      beginAtZero: true,
-                      display:false,
-                  },
-              },
+                elements: {
+                    line: {
+                        tension: 0,
+                        borderWidth: 3
+                    }
+                },
+                scale: {
+                    ticks: {
+                        beginAtZero: true,
+                        display: false,
+                    },
+                },
                 tooltips: {
                     callbacks: {
                         label: function (tooltipItem, data) {
@@ -40,39 +40,39 @@ let statGraph = {
     },
     graphObject : null,
     getGraphDatasets : function() {
-          let dataset = [
+        let dataset = [
             {
-              label : "Level",
-              data : [],
-              fill:true,
-              backgroundColor:"rgba(157, 103, 205, 0.2)",
-              borderColor:"rgb(157, 103, 205)",
-              pointBackgroundColor:"rgb(157, 103, 205)",
-              pointBorderColor:"#fff",
-              pointHoverBackgroundColor:"#fff",
-              pointHoverBorderColor:"rgb(157, 103, 205)"
+                label: "Level",
+                data: [],
+                fill: true,
+                backgroundColor: "rgba(157, 103, 205, 0.2)",
+                borderColor: "rgb(157, 103, 205)",
+                pointBackgroundColor: "rgb(157, 103, 205)",
+                pointBorderColor: "#fff",
+                pointHoverBackgroundColor: "#fff",
+                pointHoverBorderColor: "rgb(157, 103, 205)"
             },
             {
-              label : "Bonus XP",
-              data : [],
-              backgroundColor:"rgba(255, 180, 91, 0.2)",
-              borderColor:"rgb(255, 180, 91)",
-              pointBackgroundColor:"rgb(255, 180, 91)",
-              pointBorderColor:"#fff",
-              pointHoverBackgroundColor:"#fff",
-              pointHoverBorderColor:"rgb(255, 180, 91)",
-              tooltipComplement : "%",
+                label: "Bonus XP",
+                data: [],
+                backgroundColor: "rgba(255, 180, 91, 0.2)",
+                borderColor: "rgb(255, 180, 91)",
+                pointBackgroundColor: "rgb(255, 180, 91)",
+                pointBorderColor: "#fff",
+                pointHoverBackgroundColor: "#fff",
+                pointHoverBorderColor: "rgb(255, 180, 91)",
+                tooltipComplement: "%",
             }
-          ];
-          for(let i = 0; i < statList.length; i++) {
-              dataset[0].data.push(getLevel(statList[i]));
-              dataset[1].data.push(getTotalBonusXP(statList[i]));
-          }
-          return dataset;
+        ];
+        for (let i = 0; i < statList.length; i++) {
+            dataset[0].data.push(getLevel(statList[i]));
+            dataset[1].data.push((getTotalBonusXP(statList[i])-1)*100);
+        }
+        return dataset;
     },
-    update : function () {
+    update: function () {
         let newDatasets = this.getGraphDatasets();
-        this.graphObject.data.datasets.forEach((dataset,x) => {
+        this.graphObject.data.datasets.forEach((dataset, x) => {
             dataset.data = newDatasets[x].data;
         });
         this.graphObject.update();
