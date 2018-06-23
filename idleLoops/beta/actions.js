@@ -208,9 +208,7 @@ function addExpFromAction(action) {
     for(let i = 0; i < statList.length; i++) {
         let statName = statList[i];
         if(action.stats[statName]) {
-            let soulstoneBonus = stats[statName].soulstone ? calcSoulstoneMult(stats[statName].soulstone) : 1;
-            let expToAdd = soulstoneBonus * action.stats[statName] * action.expMult * (action.manaCost() / action.adjustedTicks) * (1+getTalent(statName)/100);
-            // console.log("toAdd " + expToAdd + " soulstone " + soulstoneBonus + " action stats " + action.stats[statName] + " exp mult " + action.expMult + " mana cost mult " + (action.manaCost() / action.adjustedTicks) + " talent mult " + (1+getTalent(statName)/100));
+            let expToAdd = action.stats[statName] * action.expMult * (action.manaCost() / action.adjustedTicks) * getTotalBonusXP(statName);
             if(!action["statExp"+statName]) {
                 action["statExp"+statName] = 0;
             }

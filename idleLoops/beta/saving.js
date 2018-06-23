@@ -18,7 +18,7 @@ const actions = new Actions();
 const towns = [];
 let curTown = 0;
 
-let statList = ["Str", "Dex", "Con", "Per", "Int", "Cha", "Spd", "Luck", "Soul"];
+let statList = ["Dex", "Str", "Con", "Spd", "Per", "Int", "Cha", "Luck", "Soul"];
 const stats = {};
 let prevState = {};
 let shouldRestart = true;

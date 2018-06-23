@@ -88,8 +88,7 @@ function restartStats() {
     }
 }
 
-function getTotalBonusXP(statName,precision) { // by default, rounded to %. set precision to 1+ for higher precision
-    precision = typeof(precision != "undefined") ? precision : 0;
-    var soulstoneBonus = stats[statName].soulstone ? calcSoulstoneMult(stats[statName].soulstone) : 1;
-    return (Math.floor(soulstoneBonus * (1+getTalent(statName)/100)*100*10^precision))/10^precision;
+function getTotalBonusXP(statName) {
+    let soulstoneBonus = stats[statName].soulstone ? calcSoulstoneMult(stats[statName].soulstone) : 1;
+    return soulstoneBonus * (1+getTalent(statName)/100);
 }

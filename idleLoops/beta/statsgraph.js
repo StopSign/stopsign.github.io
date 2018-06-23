@@ -1,7 +1,7 @@
 let statGraph = {
     init : function () {
-        var statChartCtx = document.getElementById("statChartCtx");
-        var dataset = this.getGraphDatasets();
+        let statChartCtx = document.getElementById("statChartCtx");
+        let dataset = this.getGraphDatasets();
         this.graphObject = new Chart(statChartCtx, {
             type: 'radar',
             options: {
@@ -14,23 +14,23 @@ let statGraph = {
               scale: {
                   ticks: {
                       beginAtZero: true,
-                      display:false
+                      display:false,
                   },
               },
-              tooltips: {
-                  callbacks: {
-                      label: function(tooltipItem, data) {
-                          var label = data.datasets[tooltipItem.datasetIndex].label || '';
+                tooltips: {
+                    callbacks: {
+                        label: function (tooltipItem, data) {
+                            let label = data.datasets[tooltipItem.datasetIndex].label || '';
 
-                          if (label) {
-                              label += ': ';
-                          }
-                          label += Math.round(tooltipItem.yLabel * 100) / 100;
-                          label += data.datasets[tooltipItem.datasetIndex].tooltipComplement || '';
-                          return label;
-                      }
-                  }
-              }
+                            if (label) {
+                                label += ': ';
+                            }
+                            label += intToString(tooltipItem.yLabel, 1);
+                            label += data.datasets[tooltipItem.datasetIndex].tooltipComplement || '';
+                            return label;
+                        }
+                    }
+                }
             },
             data: {
                 labels : statList,
@@ -40,42 +40,42 @@ let statGraph = {
     },
     graphObject : null,
     getGraphDatasets : function() {
-          var dataset = [
+          let dataset = [
             {
               label : "Level",
               data : [],
               fill:true,
-              backgroundColor:"rgba(255, 99, 132, 0.2)",
-              borderColor:"rgb(255, 99, 132)",
-              pointBackgroundColor:"rgb(255, 99, 132)",
+              backgroundColor:"rgba(157, 103, 205, 0.2)",
+              borderColor:"rgb(157, 103, 205)",
+              pointBackgroundColor:"rgb(157, 103, 205)",
               pointBorderColor:"#fff",
               pointHoverBackgroundColor:"#fff",
-              pointHoverBorderColor:"rgb(255, 99, 132)"
+              pointHoverBorderColor:"rgb(157, 103, 205)"
             },
             {
               label : "Bonus XP",
               data : [],
-              backgroundColor:"rgba(54, 162, 235, 0.2)",
-              borderColor:"rgb(54, 162, 235)",
-              pointBackgroundColor:"rgb(54, 162, 235)",
+              backgroundColor:"rgba(255, 180, 91, 0.2)",
+              borderColor:"rgb(255, 180, 91)",
+              pointBackgroundColor:"rgb(255, 180, 91)",
               pointBorderColor:"#fff",
               pointHoverBackgroundColor:"#fff",
-              pointHoverBorderColor:"rgb(54, 162, 235)",
+              pointHoverBorderColor:"rgb(255, 180, 91)",
               tooltipComplement : "%",
             }
           ];
           for(let i = 0; i < statList.length; i++) {
               dataset[0].data.push(getLevel(statList[i]));
-              dataset[1].data.push(getTotalBonusXP(statList[i],2));
-          };
+              dataset[1].data.push(getTotalBonusXP(statList[i]));
+          }
           return dataset;
     },
     update : function () {
-        var newDatasets = this.getGraphDatasets();
+        let newDatasets = this.getGraphDatasets();
         this.graphObject.data.datasets.forEach((dataset,x) => {
             dataset.data = newDatasets[x].data;
         });
         this.graphObject.update();
         view.updateStatGraphNeeded = false;
     }
-}
+};

@@ -138,21 +138,17 @@ input {
     opacity:1;
 }
 
-.statContainer {
+.skillContainer {
     width:100%;
     position:relative;
 }
-.statLabel {
-    vertical-align: top;
+
+.statContainer {
+    width:40px;
+    padding-top:20px;
     position:absolute;
-    left:40px;
 }
-.statNum {
-    float:right;
-}
-.statLevelNum {
-    float:left;
-}
+
 .thinProgressBarUpper, .thinProgressBarLower {
     width:90%;
     background-color:white;
@@ -306,7 +302,6 @@ input {
 }
 
 .ssContainer {
-    color:#a3a3a3;
     display:none;
 }
 

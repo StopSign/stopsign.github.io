@@ -285,11 +285,11 @@
         </div>
     </div>
 
-    <div id="statsColumn" style="width:445px;vertical-align:top;">
-        <div id="statsWindow" style="width:90%;margin-left:12px;text-align:center;">
+    <div id="statsColumn" style="width:410px;vertical-align:top;">
+        <div id="statsWindow" style="width:90%;margin-left:12px;text-align:center;position:relative;">
             <div class="showthat">
                 <div class="large bold">Stats</div>
-                <div class="showthis">
+                <div class="showthis" style="width:550px;">
                     Each skill level reduces relevant action's mana cost by 1%.<br>
                     Talent gets 1% of all level progress, and keeps through resets.<br>
                     Each talent level increases exp gain of skill by 1%.<br>
@@ -301,17 +301,21 @@
                     The action would give (800/694)*(1+talent/100) level exp per mana for the 694 mana.
                 </div>
             </div><br>
-            <canvas id="statChartCtx" width="400" height="400"></canvas>
-            <div id="statContainer" style="width:100%;">
-            </div><br>
-            <div id="skillList" style="width:100%;margin-top:5px;display:none">
+            <div class="showthat">
+                <canvas id="statChartCtx" width="350" height="350"></canvas>
+                <div class="showthis" style="margin-top:20px;">
+                    Click the legend to show/hide each
+                </div>
+            </div>
+            <div id="statContainer" style="width:100%;position:absolute;top:0;left:0;"></div><br>
+            <div id="skillList" style="width:100%;margin-top:15px;display:none">
                 <div class="showthat">
                     <div class="large bold">Skills</div>
                     <div class="showthis">
                         Skills last through resets.<br>
                     </div>
                 </div><br>
-                <div class="statContainer showthat" id="skillCombatContainer">
+                <div class="skillContainer showthat" id="skillCombatContainer">
                     <div class="statLabel medium bold">Combat</div>
                     <div class="statNum medium"><div id="skillCombatLevel">0</div></div>
                     <div style="margin-top:18px;"></div>
@@ -321,7 +325,7 @@
                         <div class="medium bold">Level</div> <div id="skillCombatLevelExp"></div>/<div id="skillCombatLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="skillCombatLevelProgress"></div>%)</div><br>
                     </div>
                 </div>
-                <div class="statContainer showthat" id="skillMagicContainer">
+                <div class="skillContainer showthat" id="skillMagicContainer">
                     <div class="statLabel medium bold">Magic</div>
                     <div class="statNum medium"><div id="skillMagicLevel">0</div></div>
                     <div style="margin-top:18px;"></div>
@@ -331,7 +335,7 @@
                         <div class="medium bold">Level</div> <div id="skillMagicLevelExp"></div>/<div id="skillMagicLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="skillMagicLevelProgress"></div>%)</div><br>
                     </div>
                 </div>
-                <div class="statContainer showthat" id="skillPracticalContainer">
+                <div class="skillContainer showthat" id="skillPracticalContainer">
                     <div class="statLabel medium bold">Practical Magic</div>
                     <div class="statNum medium"><div id="skillPracticalLevel">0</div></div>
                     <div style="margin-top:18px;"></div>
@@ -345,7 +349,7 @@
                         Long Quests get 1% more gold per level from 201-400 (rounded down).
                     </div>
                 </div>
-                <div class="statContainer showthat" id="skillAlchemyContainer">
+                <div class="skillContainer showthat" id="skillAlchemyContainer">
                     <div class="statLabel medium bold">Alchemy</div>
                     <div class="statNum medium"><div id="skillAlchemyLevel">0</div></div>
                     <div style="margin-top:18px;"></div>
