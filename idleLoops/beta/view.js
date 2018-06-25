@@ -802,7 +802,7 @@ function View() {
                 addClassToDiv(node, "statRegularContainer");
                 node.firstChild.style.display = "inline-block";
             });
-            document.getElementById("statsColumn").style.width = "312px";
+            document.getElementById("statsColumn").style.width = "316px";
         } else {
             document.getElementById("radarChart").style.display = "inline-block";
             statContainer.style.position = "absolute";
