@@ -141,6 +141,7 @@ input {
 .skillContainer {
     width:100%;
     position:relative;
+    text-align:left;
 }
 
 .statRadarContainer {
@@ -165,6 +166,10 @@ input {
     text-align:right;
     margin:0 10px;
     float:right;
+}
+
+.skillLabel {
+    margin-left:18px;
 }
 
 .thinProgressBarUpper, .thinProgressBarLower {
