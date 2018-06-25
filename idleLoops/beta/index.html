@@ -26,6 +26,15 @@
             Changelog
             <div class="showthisH">
                 <div class="showthat2">
+                    Version .74
+                    <div class="showthis2">
+                        * Radar chart - different and confusing way to visualize your data!<br>
+                        * Some tooltip changes<br>
+                        * Glasses icons on relevant actions<br>
+                        * Offline progress!
+                    </div>
+                </div><br>
+                <div class="showthat2">
                     Version .73
                     <div class="showthis2">
                         * Changed formula for how Old Shortcut reduces Continue On<br>
@@ -280,6 +289,15 @@
                         You reach the end of the dungeon again, but for the first time the core isn't glowing. It's always been thought that dungeon cores build based on the mana spent around them, but you're beginning to think the essence of it's previous incarnations drains it somehow. It doesn't always happen, but you'll need to put more mana into the world to take the core's benefits out of it. You shrug, accepting yet another oddity of the loops.
                     </div>
                 </div>
+            </div>
+        </div>
+        <div class="button showthat" onclick="toggleOffline()">
+            Bonus Seconds
+            <div class="showthis" style="width:230px;color:black;">
+                When bonus is on, you get 3 extra seconds per second (4x faster).<br>
+                Accrue .5 bonus seconds per second when paused or offline.<br>
+                Bonus is <div class='bold' id="isBonusOn">OFF</div><br>
+                <div class="bold">Total Bonus Seconds</div> <div id="bonusSeconds"></div>
             </div>
         </div>
     </div>

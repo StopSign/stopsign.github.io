@@ -9,7 +9,7 @@ let isBeta = !!location.href.match(/beta/i);
 let saveName = isBeta ? "idleLoops1" :  "idleLoopsBeta";
 displayBetaSaveNote();
 
-let timeNeededInitial = 5 * 50;
+let timeNeededInitial = 5 * 50 * 100;
 let timer = timeNeededInitial;
 let timeNeeded = timeNeededInitial;
 let stop = false;
@@ -43,6 +43,10 @@ let actionTownNum;
 let trainingLimits = 50;
 let storyShowing = 0;
 let storyMax = 0;
+
+let curDate = new Date();
+let totalOfflineMs = 0;
+let bonusSpeed = 1;
 
 
 
@@ -169,9 +173,12 @@ function load() {
     storyShowing = toLoad.storyShowing !== undefined ? toLoad.storyShowing : 0;
     storyMax = toLoad.storyMax !== undefined ? toLoad.storyMax : 0;
 
+    totalOfflineMs = toLoad.totalOfflineMs !== undefined ? toLoad.totalOfflineMs : 0;
+    addOffline(Math.floor((new Date() - new Date(toLoad.date))/2));
+
     adjustAll();
 
-
+    view.changeStatView();
     view.updateNextActions();
     view.updateMultiPartActions();
     view.update();
@@ -213,11 +220,19 @@ function save() {
                 toSave["checked" + varName] = town["checked" + varName];
                 toSave["good" + varName] = town["good" + varName];
                 toSave["goodTemp" + varName] = town["good" + varName];
+                if(document.getElementById("searchToggler" + varName)) {
+                    toSave["searchToggler"+varName] = document.getElementById("searchToggler" + varName).checked;
+                }
             }
         }
     }
     toSave.nextList = actions.next;
     toSave.loadouts = loadouts;
+    toSave.repeatLast = document.getElementById("repeatLastAction").checked;
+    toSave.storyShowing = storyShowing;
+    toSave.storyMax = storyMax;
+    toSave.date = new Date();
+    toSave.totalOfflineMs = totalOfflineMs;
 
     window.localStorage[saveName] = JSON.stringify(toSave);
 }

@@ -76,8 +76,9 @@ function View() {
                 this.updateCurrentActionBar(i);
             }
         }
-        if (this.updateStatGraphNeeded)
-          statGraph.update();
+        if (this.updateStatGraphNeeded) {
+            statGraph.update();
+        }
     };
 
     this.showStat = function(stat) {
