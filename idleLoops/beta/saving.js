@@ -47,6 +47,7 @@ let storyMax = 0;
 let curDate = new Date();
 let totalOfflineMs = 0;
 let bonusSpeed = 1;
+let offlineRatio = .8;
 
 
 
@@ -174,7 +175,7 @@ function load() {
     storyMax = toLoad.storyMax !== undefined ? toLoad.storyMax : 0;
 
     totalOfflineMs = toLoad.totalOfflineMs !== undefined ? toLoad.totalOfflineMs : 0;
-    addOffline(Math.floor((new Date() - new Date(toLoad.date))/2));
+    addOffline(Math.floor((new Date() - new Date(toLoad.date)) * offlineRatio));
 
     adjustAll();
 

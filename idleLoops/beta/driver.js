@@ -10,7 +10,7 @@ function tick() {
     gameTicksLeft += new Date() - curTime;
     curTime = newTime;
     if(stop) {
-        addOffline(gameTicksLeft / 2);
+        addOffline(gameTicksLeft * offlineRatio);
         gameTicksLeft = 0;
         return;
     }
@@ -357,7 +357,6 @@ function addOffline(num) {
         }
         totalOfflineMs += num;
         document.getElementById("bonusSeconds").innerHTML = intToString(totalOfflineMs / 1000, 2);
-        // console.log("Adding " + num + " ms of offline bonus. Total is " + totalOfflineMs);
     }
 }
 
