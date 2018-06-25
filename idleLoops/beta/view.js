@@ -20,6 +20,7 @@ function View() {
         this.updateSupplies();
         this.showTown(0);
         this.updateTrainingLimits();
+        this.changeStatView();
     };
 
     this.statBlurbs = ["Know your body.", "Train your body.", "Just a little longer. Just a little more.", "Gotta go fast.", "Look a little closer...", "Conversation is a battle.", "Learning to learn.", "Opportunity favors the fortunate.", "You are the captain."];
@@ -35,7 +36,13 @@ function View() {
             let stat = statList[i];
             let loc = this.statLocs[i];
             totalStatDiv +=
-                "<div class='statContainer showthat' style='left:"+loc.x+"px;top:"+loc.y+"px;' onmouseover='view.showStat(\""+stat+"\")'>" +
+                "<div class='statRadarContainer showthat' style='left:"+loc.x+"px;top:"+loc.y+"px;' onmouseover='view.showStat(\""+stat+"\")'>" +
+                    "<div class='statLabelContainer'>" +
+                        "<div class='medium bold' style='margin-left:18px'>"+statsLongForm(stat)+"</div>" +
+                        "<div style='color:#737373;' class='statNum'><div class='medium' id='stat"+stat+"ss'></div></div>" +
+                        "<div class='statNum'><div class='medium' id='stat"+stat+"Talent'></div></div> " +
+                        "<div class='medium statNum bold' id='stat"+stat+"Level'></div> " +
+                    "</div>" +
                     "<div class='thinProgressBarUpper'><div class='statBar statLevelBar' id='stat"+stat+"LevelBar'></div></div>" +
                     "<div class='thinProgressBarLower'><div class='statBar statTalentBar' id='stat"+stat+"TalentBar'></div></div>" +
                     "<div class='showthis' id='stat"+stat+"Tooltip' style='width:225px;'>" +
@@ -86,7 +93,8 @@ function View() {
         if(!expEquals(stat) || !talentEquals(stat) || statShowing === stat) {
             document.getElementById("stat" + stat + "LevelBar").style.width = levelPrc;
             document.getElementById("stat" + stat + "TalentBar").style.width = talentPrc;
-
+            document.getElementById("stat" + stat + "Level").innerHTML = intToString(getLevel(stat), 1);
+            document.getElementById("stat" + stat + "Talent").innerHTML = intToString(getTalent(stat), 1);
         }
 
         if(statShowing === stat || document.getElementById("stat" + stat + "LevelExp").innerHTML === "") {
@@ -727,6 +735,7 @@ function View() {
                 document.getElementById("ss" + statName + "Container").style.display = "inline-block";
                 document.getElementById("ss"+statName).innerHTML = stats[statName].soulstone;
                 document.getElementById("stat" + statName + "SSBonus").innerHTML = intToString(stats[statName].soulstone ? calcSoulstoneMult(stats[statName].soulstone) : 0);
+                document.getElementById("stat" + statName + "ss").innerHTML = intToString(stats[statName].soulstone, 1);
             } else {
                 document.getElementById("ss" + statName + "Container").style.display = "none";
             }
@@ -781,6 +790,27 @@ function View() {
         storyShowing = num;
         document.getElementById("storyPage").innerHTML = storyShowing+1;
         document.getElementById("story"+num).style.display = "inline-block";
+    };
+
+    this.changeStatView = function() {
+        let statContainer = document.getElementById("statContainer");
+        if(document.getElementById("regularStats").checked) {
+            document.getElementById("radarChart").style.display = "none";
+            statContainer.style.position = "relative";
+            statContainer.childNodes.forEach(function(node) {
+                removeClassFromDiv(node, "statRadarContainer");
+                addClassToDiv(node, "statRegularContainer");
+                node.firstChild.style.display = "inline-block";
+            });
+        } else {
+            document.getElementById("radarChart").style.display = "inline-block";
+            statContainer.style.position = "absolute";
+            statContainer.childNodes.forEach(function(node) {
+                addClassToDiv(node, "statRadarContainer");
+                removeClassFromDiv(node, "statRegularContainer");
+                node.firstChild.style.display = "none";
+            });
+        }
     };
 }
 

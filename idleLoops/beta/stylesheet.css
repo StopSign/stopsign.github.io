@@ -143,10 +143,28 @@ input {
     position:relative;
 }
 
-.statContainer {
+.statRadarContainer {
     width:40px;
     padding-top:20px;
     position:absolute;
+}
+.statRegularContainer {
+    width:100%;
+    margin-bottom:5px
+}
+.statRegularContainer:hover {
+    background-color: #ccded1;
+}
+.statLabelContainer {
+    width:100%;
+    position:relative;
+    text-align:left;
+}
+.statNum {
+    width:40px;
+    text-align:right;
+    margin:0 10px;
+    float:right;
 }
 
 .thinProgressBarUpper, .thinProgressBarLower {

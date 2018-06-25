@@ -302,7 +302,11 @@
                     The action would give (800/694)*(1+talent/100) level exp per mana for the 694 mana.
                 </div>
             </div><br>
-            <div class="showthat">
+            <input type="radio" id="regularStats" name="statView" onclick="view.changeStatView()" checked />
+            <label for="regularStats">Regular View</label>
+            <input type="radio" id="radarStats" name="statView" onclick="view.changeStatView()" />
+            <label for="radarStats">Radar Chart</label>
+            <div class="showthat" id="radarChart">
                 <canvas id="statChartCtx" width="350" height="350"></canvas>
                 <div class="showthis" style="margin-top:20px;width:375px">
                     Click the legend to show/hide each.<br>
@@ -310,8 +314,8 @@
                     Hover Stats for more info.
                 </div>
             </div>
-            <div id="statContainer" style="width:100%;position:absolute;top:0;left:0;"></div><br>
-            <div id="skillList" style="width:100%;margin-top:15px;display:none">
+            <div id="statContainer" style="width:100%;position:absolute;top:18px;left:0;"></div><br>
+            <div id="skillList" style="width:100%;margin-top:25px;display:none">
                 <div class="showthat">
                     <div class="large bold">Skills</div>
                     <div class="showthis">
