@@ -6,7 +6,7 @@ doWork.onmessage = function (event) {
 };
 
 let isBeta = !!location.href.match(/beta/i);
-let saveName = isBeta ? "idleLoops1" :  "idleLoopsBeta";
+let saveName = !isBeta ? "idleLoops1" :  "idleLoopsBeta";
 displayBetaSaveNote();
 
 let timeNeededInitial = 5 * 50;
