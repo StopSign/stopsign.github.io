@@ -1,28 +1,26 @@
 'use strict';
 
 let gameSpeed = 1;
-
-let curTime = new Date();
-let gameTicksLeft = 0;
+let gameTickLeft = 0;
 
 function tick() {
-    let newTime = new Date();
-    gameTicksLeft += new Date() - curTime;
-    curTime = newTime;
     if(stop) {
-        addOffline(gameTicksLeft * offlineRatio);
-        gameTicksLeft = 0;
+        gameTickLeft = 0;
         return;
     }
     prevState.stats = JSON.parse(JSON.stringify(stats));
 
-    while (gameTicksLeft > (1000 / fps)) {
-        if(gameTicksLeft > 1000) {
+    gameTickLeft += gameSpeed / fps * 50;
+
+    while (gameTickLeft > 0) {
+        if(gameTickLeft > 1000) {
             pauseGame();
-            console.warn(`too fast! (${gameTicksLeft})`);
-            gameTicksLeft = 0;
+            console.warn(`too many ticks! (${gameTickLeft})`);
+            gameTickLeft = 0;
         }
         if(stop) {
+            gameTickLeft = 0;
+            view.update();
             return;
         }
         timer++;
@@ -35,6 +33,7 @@ function tick() {
             }
         }
 
+
         if(shouldRestart || timer >= timeNeeded) {
             prepareRestart();
         }
@@ -42,14 +41,7 @@ function tick() {
         if(timer % (300*gameSpeed) === 0) {
             save();
         }
-        gameTicksLeft -= (1000 / fps) / gameSpeed / bonusSpeed;
-        if(bonusSpeed > 1) {
-            addOffline(-1 * gameTicksLeft * ((bonusSpeed - 1)/bonusSpeed));
-        }
-
-        if (timer % (gameSpeed * fps) === 0) {
-            view.updateStatGraphNeeded = true;
-        }
+        gameTickLeft--;
     }
 
     view.update();
@@ -298,7 +290,7 @@ function moveQueuedAction(initialIndex, resultingIndex) {
         return;
     }
     let difference = initialIndex - resultingIndex;
-    if (difference === 0) {
+    if (difference == 0) {
         return;
     }
 
@@ -348,24 +340,4 @@ function removeAction(index) {
     actions.next.splice(index, 1);
     view.updateNextActions();
     view.updateLockedHidden();
-}
-
-function addOffline(num) {
-    if(num) {
-        if(totalOfflineMs + num < 0 && bonusSpeed > 1) {
-            toggleOffline();
-        }
-        totalOfflineMs += num;
-        document.getElementById("bonusSeconds").innerHTML = intToString(totalOfflineMs / 1000, 2);
-    }
-}
-
-function toggleOffline() {
-    if(bonusSpeed === 1) { //go fast
-        document.getElementById("isBonusOn").innerHTML = "ON";
-        bonusSpeed = 4;
-    } else { //take it slow
-        document.getElementById("isBonusOn").innerHTML = "OFF";
-        bonusSpeed = 1;
-    }
 }
