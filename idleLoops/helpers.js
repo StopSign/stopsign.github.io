@@ -17,9 +17,6 @@ function precision2(num) {
 function precision3(num) {
     return Number(num.toPrecision(3));
 }
-function precision4(num) {
-    return Number(num.toPrecision(4));
-}
 
 function pxToInt(num) {
     return parseFloat(num.substring(0, num.indexOf('px')));

@@ -5,10 +5,6 @@ doWork.onmessage = function (event) {
     }
 };
 
-let isBeta = !!location.href.match(/beta/i);
-let saveName = isBeta ? "idleLoops1" :  "idleLoopsBeta";
-displayBetaSaveNote();
-
 let timeNeededInitial = 5 * 50;
 let timer = timeNeededInitial;
 let timeNeeded = timeNeededInitial;
@@ -18,7 +14,7 @@ const actions = new Actions();
 const towns = [];
 let curTown = 0;
 
-let statList = ["Dex", "Str", "Con", "Spd", "Per", "Cha", "Int", "Luck", "Soul"];
+let statList = ["Str", "Dex", "Con", "Per", "Int", "Cha", "Spd", "Luck", "Soul"];
 const stats = {};
 let prevState = {};
 let shouldRestart = true;
@@ -44,19 +40,13 @@ let trainingLimits = 50;
 let storyShowing = 0;
 let storyMax = 0;
 
-let curDate = new Date();
-let totalOfflineMs = 0;
-let bonusSpeed = 1;
-let offlineRatio = .8;
-
-
 
 function closeTutorial() {
     document.getElementById("tutorial").style.display="none";
 }
 
 function clearSave() {
-    window.localStorage[saveName] = "";
+    window.localStorage.idleLoops1 = "";
     load();
 }
 
@@ -70,9 +60,9 @@ function load() {
     loadDefaults();
 
     let toLoad = {};
-    if(window.localStorage[saveName]) { //has a save file
+    if(window.localStorage.idleLoops1) { //has a save file
         closeTutorial();
-        toLoad = JSON.parse(window.localStorage[saveName]);
+        toLoad = JSON.parse(window.localStorage.idleLoops1);
     }
 
     for(let property in toLoad.stats) {
@@ -174,12 +164,9 @@ function load() {
     storyShowing = toLoad.storyShowing !== undefined ? toLoad.storyShowing : 0;
     storyMax = toLoad.storyMax !== undefined ? toLoad.storyMax : 0;
 
-    totalOfflineMs = toLoad.totalOfflineMs !== undefined ? toLoad.totalOfflineMs : 0;
-    addOffline(Math.floor((new Date() - new Date(toLoad.date)) * offlineRatio));
-
     adjustAll();
 
-    view.changeStatView();
+
     view.updateNextActions();
     view.updateMultiPartActions();
     view.update();
@@ -232,23 +219,21 @@ function save() {
     toSave.repeatLast = document.getElementById("repeatLastAction").checked;
     toSave.storyShowing = storyShowing;
     toSave.storyMax = storyMax;
-    toSave.date = new Date();
-    toSave.totalOfflineMs = totalOfflineMs;
 
-    window.localStorage[saveName] = JSON.stringify(toSave);
+    window.localStorage.idleLoops1 = JSON.stringify(toSave);
 }
 
 function exportSave() {
     save();
-    document.getElementById("exportImport").value = encode(window.localStorage[saveName]);
+    document.getElementById("exportImport").value = encode(window.localStorage.idleLoops1);
     document.getElementById("exportImport").select();
     document.execCommand('copy');
     document.getElementById("exportImport").value = "";
 }
 
 function importSave() {
-    window.localStorage[saveName] = decode(document.getElementById("exportImport").value);
-    // console.log(window.localStorage[saveName]);
+    window.localStorage.idleLoops1 = decode(document.getElementById("exportImport").value);
+    // console.log(window.localStorage.idleLoops1);
     actions.next = [];
     actions.current = [];
     load();
@@ -256,22 +241,5 @@ function importSave() {
 }
 
 load();
-
-function displayBetaSaveNote() {
-    if(!isBeta) return;
-    document.addEventListener("DOMContentLoaded", function() {
-        document.getElementById("betaSave").style.display = "block";
-    });
-}
-
-function moveSaveToBeta() {
-    window.localStorage[saveName] = window.localStorage.idleLoops1;
-    location.reload();
-}
-
-function moveSaveFromBeta() {
-    save();
-    window.localStorage.idleLoops1 = window.localStorage[saveName];
-}
 
 // setInterval(tick, 20);
