@@ -4,9 +4,7 @@ function View() {
     this.totalActionList = [];
 
     this.initalize = function() {
-        for(let i = 0; i < statList.length; i++) {
-            this.updateStat(statList[i]);
-        }
+        this.createStats();
         for(let i = 0; i < skillList.length; i++) {
             this.updateSkill(skillList[i]);
         }
@@ -22,6 +20,47 @@ function View() {
         this.updateSupplies();
         this.showTown(0);
         this.updateTrainingLimits();
+        this.changeStatView();
+    };
+
+    this.statBlurbs = ["Know your body.", "Train your body.", "Just a little longer. Just a little more.", "Gotta go fast.", "Look a little closer...", "Conversation is a battle.", "Learning to learn.", "Opportunity favors the fortunate.", "You are the captain."];
+    this.statLocs = [{x:165, y:43}, {x:270, y:79}, {x:325, y:170}, {x:306, y:284}, {x:225, y:352}, {x:102, y:352}, {x:26, y:284}, {x:2, y:170}, {x:56, y:79}];
+    this.createStats = function() {
+        statGraph.init();
+        let statContainer = document.getElementById("statContainer");
+        while (statContainer.firstChild) {
+            statContainer.removeChild(statContainer.firstChild);
+        }
+        let totalStatDiv = "";
+        for(let i = 0; i < statList.length; i++) {
+            let stat = statList[i];
+            let loc = this.statLocs[i];
+            totalStatDiv +=
+                "<div class='statRadarContainer showthat' style='left:"+loc.x+"px;top:"+loc.y+"px;' onmouseover='view.showStat(\""+stat+"\")'>" +
+                    "<div class='statLabelContainer'>" +
+                        "<div class='medium bold' style='margin-left:18px'>"+statsLongForm(stat)+"</div>" +
+                        "<div style='color:#737373;' class='statNum'><div class='medium' id='stat"+stat+"ss'></div></div>" +
+                        "<div class='statNum'><div class='medium' id='stat"+stat+"Talent'></div></div> " +
+                        "<div class='medium statNum bold' id='stat"+stat+"Level'></div> " +
+                    "</div>" +
+                    "<div class='thinProgressBarUpper'><div class='statBar statLevelBar' id='stat"+stat+"LevelBar'></div></div>" +
+                    "<div class='thinProgressBarLower'><div class='statBar statTalentBar' id='stat"+stat+"TalentBar'></div></div>" +
+                    "<div class='showthis' id='stat"+stat+"Tooltip' style='width:225px;'>" +
+                        "<div class='medium bold'>"+statsLongForm(stat)+"</div><br>" +
+                        this.statBlurbs[i] + "<br>" +
+                        "<div class='medium bold'>Level</div> <div id='stat"+stat+"Level2'></div><br>" +
+                        "<div class='medium bold'>Level Exp</div> <div id='stat"+stat+"LevelExp'></div>/<div id='stat"+stat+"LevelExpNeeded'></div> <div class='statTooltipPerc'>(<div id='stat"+stat+"LevelProgress'></div>%)</div><br>" +
+                        "<div class='medium bold'>Talent</div> <div id='stat"+stat+"Talent2'></div><br>" +
+                        "<div class='medium bold'>Talent Exp</div> <div id='stat"+stat+"TalentExp'></div>/<div id='stat"+stat+"TalentExpNeeded'></div> <div class='statTooltipPerc'>(<div id='stat"+stat+"TalentProgress'></div>%)</div><br>" +
+                        "<div id='ss"+stat+"Container' class='ssContainer'>" +
+                            "<div class='bold'>Soulstones</div> <div id='ss"+stat+"'></div><br>" +
+                            "<div class='medium bold'>Soulstone Mult</div> x<div id='stat"+stat+"SSBonus'></div>" +
+                        "</div>" +
+                    "</div>" +
+                "</div>"
+        }
+
+        statContainer.innerHTML = totalStatDiv;
     };
 
     this.update = function() {
@@ -37,6 +76,9 @@ function View() {
                 this.updateCurrentActionBar(i);
             }
         }
+        if (this.updateStatGraphNeeded) {
+            statGraph.update();
+        }
     };
 
     this.showStat = function(stat) {
@@ -44,17 +86,16 @@ function View() {
         this.updateStat(stat);
     };
 
+    this.updateStatGraphNeeded = false;
+
     this.updateStat = function(stat) {
         const levelPrc = getPrcToNextLevel(stat)+"%";
         const talentPrc = getPrcToNextTalent(stat)+"%";
         if(!expEquals(stat) || !talentEquals(stat) || statShowing === stat) {
-            document.getElementById("stat" + stat + "Level").innerHTML = intToString(getLevel(stat), 1);
             document.getElementById("stat" + stat + "LevelBar").style.width = levelPrc;
-
-            document.getElementById("stat" + stat + "Talent").innerHTML = intToString(getTalent(stat), 1);
             document.getElementById("stat" + stat + "TalentBar").style.width = talentPrc;
-
-            document.getElementById("stat" + stat + "SSBonus").innerHTML = intToString(stats[stat].soulstone ? calcSoulstoneMult(stats[stat].soulstone) : 0);
+            document.getElementById("stat" + stat + "Level").innerHTML = intToString(getLevel(stat), 1);
+            document.getElementById("stat" + stat + "Talent").innerHTML = intToString(getTalent(stat), 1);
         }
 
         if(statShowing === stat || document.getElementById("stat" + stat + "LevelExp").innerHTML === "") {
@@ -198,7 +239,7 @@ function View() {
                     "<div class='curActionBar' id='action"+i+"Bar'></div>" +
                     "<div class='actionSelectedIndicator' id='action"+i+"Selected'></div>" +
                     "<img src='img/"+camelize(action.name)+".svg' class='smallIcon'> x " +
-                "<div id='action"+i+"Loops' style='margin-left:3px'>"+ action.loopsLeft+"</div>(" + action.loops + ")" +
+                    "<div id='action"+i+"LoopsLeft' style='margin-left:3px'>"+ action.loopsLeft+"</div>(" + "<div id='action"+i+"Loops'>" + action.loops + "</div>" + ")" +
                 "</div>";
         }
 
@@ -226,7 +267,6 @@ function View() {
         this.mouseoverAction(0, false);
     };
 
-    
     this.updateCurrentActionBarRequests = Array(50).fill(false);
     this.updateCurrentActionBarRequest = function f(index) {
         this.updateCurrentActionBarRequests[index] = true;
@@ -276,7 +316,10 @@ function View() {
     };
 
     this.updateCurrentActionLoops = function(index) {
-        document.getElementById("action"+index+"Loops").innerHTML = actions.current[index].loopsLeft;
+        document.getElementById("action" + index + "Loops").innerHTML = actions.current[index].loopsLeft;
+        if(index === (actions.current.length - 1)) {
+            document.getElementById("action" + index + "LoopsLeft").innerHTML = actions.current[index].loops;
+        }
     };
 
     this.updateProgressActions = function() {
@@ -520,11 +563,19 @@ function View() {
             let statName = keyNames[i];
             actionStats += "<div class='bold'>" + statName + "</div> " + (action.stats[statName]*100)+"%<br>";
         }
-
+        let extraImage = "";
+        if(action.affectedBy) {
+            for(let i = 0; i < action.affectedBy.length; i++) {
+                extraImage += "<img src='img/"+camelize(action.affectedBy[i])+".svg' class='smallIcon' style='position:absolute;margin-top:17px;margin-left:2px;'>";
+            }
+        }
         const totalDivText =
             "<div id='container"+action.varName+"' class='actionContainer showthat' onclick='addActionToList(\""+action.name+"\", "+action.townNum+")'>" +
                 action.name + "<br>" +
-                "<img src='img/"+camelize(action.name)+".svg' class='superLargeIcon'><br>" +
+                "<div style='position:relative'>" +
+                    "<img src='img/"+camelize(action.name)+".svg' class='superLargeIcon'>" +
+                    extraImage +
+                "</div>" +
                 "<div class='showthis'>" +
                     action.tooltip + "<br>" +
                     actionStats +
@@ -682,10 +733,10 @@ function View() {
         for(let i = 0; i < statList.length; i++) {
             let statName = statList[i];
             if(stats[statName].soulstone) {
-                if (!isVisible(document.getElementById("ss" + statName + "Container"))) {
-                    document.getElementById("ss" + statName + "Container").style.display = "inline-block";
-                }
+                document.getElementById("ss" + statName + "Container").style.display = "inline-block";
                 document.getElementById("ss"+statName).innerHTML = stats[statName].soulstone;
+                document.getElementById("stat" + statName + "SSBonus").innerHTML = intToString(stats[statName].soulstone ? calcSoulstoneMult(stats[statName].soulstone) : 0);
+                document.getElementById("stat" + statName + "ss").innerHTML = intToString(stats[statName].soulstone, 1);
             } else {
                 document.getElementById("ss" + statName + "Container").style.display = "none";
             }
@@ -740,7 +791,49 @@ function View() {
         storyShowing = num;
         document.getElementById("storyPage").innerHTML = storyShowing+1;
         document.getElementById("story"+num).style.display = "inline-block";
+    };
+
+    this.changeStatView = function() {
+        let statContainer = document.getElementById("statContainer");
+        if(document.getElementById("regularStats").checked) {
+            document.getElementById("radarChart").style.display = "none";
+            statContainer.style.position = "relative";
+            statContainer.childNodes.forEach(function(node) {
+                removeClassFromDiv(node, "statRadarContainer");
+                addClassToDiv(node, "statRegularContainer");
+                node.firstChild.style.display = "inline-block";
+            });
+            document.getElementById("statsColumn").style.width = "316px";
+        } else {
+            document.getElementById("radarChart").style.display = "inline-block";
+            statContainer.style.position = "absolute";
+            statContainer.childNodes.forEach(function(node) {
+                addClassToDiv(node, "statRadarContainer");
+                removeClassFromDiv(node, "statRegularContainer");
+                node.firstChild.style.display = "none";
+            });
+            document.getElementById("statsColumn").style.width = "410px";
+        }
+    };
+}
+
+function statsLongForm(stat) {
+    if(stat === "Str") {
+        return "Strength";
+    } else if(stat === "Dex") {
+        return "Dexterity";
+    } else if(stat === "Con") {
+        return "Constitution";
+    } else if(stat === "Per") {
+        return "Perception";
+    } else if(stat === "Int") {
+        return "Intelligence";
+    } else if(stat === "Cha") {
+        return "Charisma";
+    } else if(stat === "Spd") {
+        return "Speed";
     }
+    return stat;
 }
 
 function unlockStory(num) {
@@ -758,7 +851,6 @@ for(let i = 0; i < 3; i++) {
     actionOptionsTown[i] = document.getElementById("actionOptionsTown"+i);
     townInfos[i] = document.getElementById("townInfo"+i);
 }
-
 
 function expEquals(stat) {
     return prevState.stats[stat].exp === stats[stat].exp;
