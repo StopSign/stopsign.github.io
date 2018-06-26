@@ -21,7 +21,7 @@ function tick() {
     while (gameTicksLeft > (1000 / 50)) {
         if(gameTicksLeft > 2000) {
             window.fps /= 2;
-            console.warn(`too fast! (${gameTicksLeft})`);
+            console.warn('too fast! (${gameTicksLeft})');
             statGraph.graphObject.options.animation.duration = 0;
             gameTicksLeft = 0;
         }
