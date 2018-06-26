@@ -38,6 +38,11 @@ window.Localization = {
     }
     return txt;
   },
+  txtsObj : function(path,lib) { // lib can be ignored to use the last used lib. returns the texts for the given key as objects
+    if (typeof(lib) == "undefined")
+      lib = Localization.lastLib;
+    return $(Localization.libs[lib]).find(path);
+  },
 
   // ====== PRIVATE ======
   saveLib : function(libName,xmlData) {
