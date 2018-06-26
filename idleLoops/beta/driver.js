@@ -4,10 +4,12 @@ let gameSpeed = 1;
 
 let curTime = new Date();
 let gameTicksLeft = 0;
+let radarUpdateTime = 0;
 
 function tick() {
     let newTime = new Date();
-    gameTicksLeft += new Date() - curTime;
+    gameTicksLeft += newTime - curTime;
+    radarUpdateTime += newTime - curTime;
     curTime = newTime;
     if(stop) {
         addOffline(gameTicksLeft * offlineRatio);
@@ -18,8 +20,9 @@ function tick() {
 
     while (gameTicksLeft > (1000 / fps)) {
         if(gameTicksLeft > 1000) {
-            pauseGame();
+            fps /= 2;
             console.warn(`too fast! (${gameTicksLeft})`);
+            statGraph.graphObject.options.animation.duration = 0;
             gameTicksLeft = 0;
         }
         if(stop) {
@@ -46,10 +49,11 @@ function tick() {
         if(bonusSpeed > 1) {
             addOffline(-1 * gameTicksLeft * ((bonusSpeed - 1)/bonusSpeed));
         }
+    }
 
-        if (timer % (gameSpeed * fps) === 0) {
-            view.updateStatGraphNeeded = true;
-        }
+    if(radarUpdateTime > 1000) {
+        view.updateStatGraphNeeded = true;
+        radarUpdateTime -= 1000;
     }
 
     view.update();
