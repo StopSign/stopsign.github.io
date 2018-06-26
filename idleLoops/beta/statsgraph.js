@@ -25,7 +25,7 @@ let statGraph = {
                             if (label) {
                                 label += ': ';
                             }
-                            label += intToString(tooltipItem.yLabel, 1);
+                            label += intToString(tooltipItem.yLabel / radarModifier, 1);
                             label += data.datasets[tooltipItem.datasetIndex].tooltipComplement || '';
                             return label;
                         }
@@ -64,9 +64,26 @@ let statGraph = {
                 tooltipComplement: "%",
             }
         ];
+        let highestLevel = 0;
+        let highestXP = 0;
+        for(let i = 0; i < statList.length; i++) {
+            let newLevel = getLevel(statList[i]);
+            let newXP = (getTotalBonusXP(statList[i])-1)*100;
+            if(newLevel > highestLevel) {
+                highestLevel = newLevel;
+            }
+            if(newXP > highestXP) {
+                highestXP = newXP;
+            }
+        }
+        if(highestLevel === 0 || highestXP === 0) {
+            radarModifier = 1;
+        } else {
+            radarModifier = highestLevel / highestXP;
+        }
         for (let i = 0; i < statList.length; i++) {
             dataset[0].data.push(getLevel(statList[i]));
-            dataset[1].data.push((getTotalBonusXP(statList[i])-1)*100);
+            dataset[1].data.push((getTotalBonusXP(statList[i])-1)*100 * radarModifier);
         }
         return dataset;
     },
@@ -79,3 +96,5 @@ let statGraph = {
         view.updateStatGraphNeeded = false;
     }
 };
+
+let radarModifier;
