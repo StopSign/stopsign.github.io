@@ -25,7 +25,7 @@ let statGraph = {
                             if (label) {
                                 label += ': ';
                             }
-                            label += intToString(tooltipItem.yLabel / radarModifier, 1);
+                            label += intToString(tooltipItem.yLabel / (tooltipItem.datasetIndex === "Bonus XP" ? radarModifier : 1), 1);
                             label += data.datasets[tooltipItem.datasetIndex].tooltipComplement || '';
                             return label;
                         }
