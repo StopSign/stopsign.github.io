@@ -1,13 +1,16 @@
-let doWork = new Worker('interval.js');
-doWork.onmessage = function (event) {
-    if (event.data === 'interval.start') {
-        tick();
-    }
-};
+function startGame () {
+  window.doWork = new Worker('interval.js');
+  window.doWork.onmessage = function (event) {
+      if (event.data === 'interval.start') {
+          tick();
+      }
+  };
+  displayBetaSaveNote();
+  load();
+}
 
 let isBeta = !!location.href.match(/beta/i);
 let saveName = !isBeta ? "idleLoops1" :  "idleLoopsBeta";
-displayBetaSaveNote();
 
 let timeNeededInitial = 5 * 50;
 let timer = timeNeededInitial;
@@ -254,8 +257,6 @@ function importSave() {
     load();
     pauseGame();
 }
-
-load();
 
 function displayBetaSaveNote() {
     if(!isBeta) return;

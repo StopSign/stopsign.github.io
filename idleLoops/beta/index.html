@@ -16,6 +16,7 @@
     <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
     
     <script type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.min.js'></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.0/jquery.min.js"></script>
 </head>
 <body id="theBody" style="min-width:1210px">
     <div id="timeInfo" style="width:100%;text-align:center;">
@@ -521,4 +522,17 @@
     ga('create', 'UA-60978932-1', 'auto');
     ga('send', 'pageview');
 
+</script>
+<script src="localization.js?11"></script>
+<script>
+  $(function() {
+    Localization.init();
+    window._txt = Localization.txt; // binding the _txt function for simplier use
+    Localization.loadLib('game',function() { // we load the "game.xml" library, then startup the game.
+      startGame();
+    });
+    Localization.loadLib('page',function() { // we load the "page.xml" library, and complete the page textes
+      Localization.initPage();
+    })
+  })
 </script>
