@@ -40,8 +40,8 @@ function View() {
                     "<div class='statLabelContainer'>" +
                         "<div class='medium bold' style='margin-left:18px'>"+statsLongForm(stat)+"</div>" +
                         "<div style='color:#737373;' class='statNum'><div class='medium' id='stat"+stat+"ss'></div></div>" +
-                        "<div class='statNum'><div class='medium' id='stat"+stat+"Talent'></div></div> " +
-                        "<div class='medium statNum bold' id='stat"+stat+"Level'></div> " +
+                        "<div class='statNum'><div class='medium' id='stat"+stat+"Talent'>0</div></div> " +
+                        "<div class='medium statNum bold' id='stat"+stat+"Level'>0</div> " +
                     "</div>" +
                     "<div class='thinProgressBarUpper'><div class='statBar statLevelBar' id='stat"+stat+"LevelBar'></div></div>" +
                     "<div class='thinProgressBarLower'><div class='statBar statTalentBar' id='stat"+stat+"TalentBar'></div></div>" +
