@@ -112,6 +112,7 @@ function Wander() {
         Spd:.3,
         Luck:.1
     };
+    this.affectedBy = ["Buy Glasses"];
     this.manaCost = function() {
         return 250;
     };
@@ -214,6 +215,7 @@ function ExploreForest() {
         Spd:.2,
         Luck:.2
     };
+    this.affectedBy = ["Buy Glasses"];
     this.manaCost = function() {
         return 400;
     };
@@ -316,6 +318,7 @@ function ExploreCity() {
         Spd:.3,
         Luck:.1
     };
+    this.affectedBy = ["Buy Glasses"];
     this.manaCost = function() {
         return 750;
     };
@@ -377,7 +380,7 @@ function GetDrunk() {
 function BuyGlasses() {
     this.name = "Buy Glasses";
     this.expMult = 1;
-    this.tooltip = "That's not fair. There was time now. There was all the time I needed.<br>Now you have to get new glasses again for 10 gold!<br>Causes Wander to be 4x as effective for the rest of the loop.<br>Can only have 1 Buy Glasses action.<br>Unlocked at 20% explored";
+    this.tooltip = "That's not fair. There was time now. There was all the time I needed.<br>Now you have to get new glasses again for 10 gold!<br>Causes Wander to be 4x as effective for the rest of the loop.<br>Affects any action with the glasses icon<br>Can only have 1 Buy Glasses action.<br>Unlocked at 20% explored";
     this.townNum = 0;
 
     this.varName = "Glasses";
@@ -933,6 +936,7 @@ function ReadBooks() {
         Int:.8,
         Soul:.2
     };
+    this.affectedBy = ["Buy Glasses"];
     this.allowed = function() {
         return trainingLimits;
     };
@@ -1163,7 +1167,7 @@ function GatherHerbs() {
 function Hunt() {
     this.name = "Hunt";
     this.expMult = 1;
-    this.tooltip = "The forest provides.<br>Every 10 animals have good hides.<br>Unlocked at 40% Forest Explored.";
+    this.tooltip = "The forest provides.<br>Every 10 animals have good hides.<br>Unlocked at 40% Forest Explored.<br>NOTE: Using hide is not implemented yet. I'll remove this note when it is.";
     this.townNum = 1;
 
     this.varName = "Hunt";
@@ -1179,7 +1183,7 @@ function Hunt() {
         return 800;
     };
     this.visible = function() {
-        return false;
+        return towns[1].getLevel("Forest") >= 10;
     };
     this.unlocked = function() {
         return towns[1].getLevel("Forest") >= 40;
@@ -1340,7 +1344,7 @@ function monsterNames() { //spd, defensive, aggressive
 function SmallDungeon() {
     this.name = "Small Dungeon";
     this.expMult = 1;
-    this.tooltip = "There are small changes each time; it's harder to get used to. The soulstones at the end last through loops, but they're not always in the dungeon... Strange.<br>The dungeon requires different skills at different points.<br>Gives (magic + combat skill) * (1 + main stat / 100) * sqrt(1 + times completed / 200) * (original mana cost / actual mana cost) progress points per mana.<br>Requires a combined skill of 35.<br>Gives 1 soulstone per completion - hover over Completed for info.";
+    this.tooltip = "There are small changes each time; it's harder to get used to. The soulstones at the end last through loops, but they're not always in the dungeon... Strange.<br>The dungeon requires different skills at different points.<br>One action can clear multiple dungeons if your stats are high enough.<br>Gives (magic + combat skill) * (1 + main stat / 100) * sqrt(1 + times completed / 200) * (original mana cost / actual mana cost) progress points per mana.<br>Requires a combined skill of 35.<br>Gives 1 soulstone per completion - hover over Completed for info.";
     this.townNum = 0;
 
     this.varName = "SDungeon";

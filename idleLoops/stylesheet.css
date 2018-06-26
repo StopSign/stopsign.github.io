@@ -138,17 +138,40 @@ input {
     opacity:1;
 }
 
-.statContainer {
+.skillContainer {
     width:100%;
+    position:relative;
+    text-align:left;
 }
-.statLabel {
-    margin-left:5px;
-    float:left;
+
+.statRadarContainer {
+    width:40px;
+    padding-top:20px;
+    position:absolute;
+}
+.statRegularContainer {
+    width:100%;
+    margin-bottom:5px
+}
+.statRegularContainer:hover {
+    background-color: #ccded1;
+}
+.statLabelContainer {
+    width:100%;
+    position:relative;
+    text-align:left;
 }
 .statNum {
-    margin-right:5px;
+    width:40px;
+    text-align:right;
+    margin:0 10px;
     float:right;
 }
+
+.skillLabel {
+    margin-left:18px;
+}
+
 .thinProgressBarUpper, .thinProgressBarLower {
     width:90%;
     background-color:white;
@@ -302,7 +325,6 @@ input {
 }
 
 .ssContainer {
-    color:#a3a3a3;
     display:none;
 }
 
