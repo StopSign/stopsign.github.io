@@ -144,7 +144,7 @@ function load() {
         }
     }
 
-    recalcInterval(2);
+    recalcInterval(50);
     pauseGame();
     view.initalize();
 
