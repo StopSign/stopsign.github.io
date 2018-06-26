@@ -267,7 +267,7 @@ function View() {
         this.mouseoverAction(0, false);
     };
 
-    this.updateCurrentActionBarRequests = Array(50).fill(false);
+    this.updateCurrentActionBarRequests = [];
     this.updateCurrentActionBarRequest = function f(index) {
         this.updateCurrentActionBarRequests[index] = true;
     };
@@ -798,20 +798,22 @@ function View() {
         if(document.getElementById("regularStats").checked) {
             document.getElementById("radarChart").style.display = "none";
             statContainer.style.position = "relative";
-            statContainer.childNodes.forEach(function(node) {
+            for(let i = 0; i < statContainer.childNodes.length; i++) {
+                let node = statContainer.childNodes[i];
                 removeClassFromDiv(node, "statRadarContainer");
                 addClassToDiv(node, "statRegularContainer");
                 node.firstChild.style.display = "inline-block";
-            });
+            }
             document.getElementById("statsColumn").style.width = "316px";
         } else {
             document.getElementById("radarChart").style.display = "inline-block";
             statContainer.style.position = "absolute";
-            statContainer.childNodes.forEach(function(node) {
+            for(let i = 0; i < statContainer.childNodes.length; i++) {
+                let node = statContainer.childNodes[i];
                 addClassToDiv(node, "statRadarContainer");
                 removeClassFromDiv(node, "statRegularContainer");
                 node.firstChild.style.display = "none";
-            });
+            }
             document.getElementById("statsColumn").style.width = "410px";
         }
     };

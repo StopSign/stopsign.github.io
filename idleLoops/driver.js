@@ -18,9 +18,9 @@ function tick() {
     }
     prevState.stats = JSON.parse(JSON.stringify(stats));
 
-    while (gameTicksLeft > (1000 / fps)) {
-        if(gameTicksLeft > 1000) {
-            fps /= 2;
+    while (gameTicksLeft > (1000 / 50)) {
+        if(gameTicksLeft > 2000) {
+            window.fps /= 2;
             console.warn(`too fast! (${gameTicksLeft})`);
             statGraph.graphObject.options.animation.duration = 0;
             gameTicksLeft = 0;
@@ -45,7 +45,7 @@ function tick() {
         if(timer % (300*gameSpeed) === 0) {
             save();
         }
-        gameTicksLeft -= (1000 / fps) / gameSpeed / bonusSpeed;
+        gameTicksLeft -= (1000 / 50) / gameSpeed / bonusSpeed;
         if(bonusSpeed > 1) {
             addOffline(-1 * gameTicksLeft * ((bonusSpeed - 1)/bonusSpeed));
         }

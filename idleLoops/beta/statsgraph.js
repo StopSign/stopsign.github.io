@@ -89,7 +89,7 @@ let statGraph = {
     },
     update: function () {
         let newDatasets = this.getGraphDatasets();
-        this.graphObject.data.datasets.forEach((dataset, x) => {
+        this.graphObject.data.datasets.forEach(function(dataset, x) {
             dataset.data = newDatasets[x].data;
         });
         this.graphObject.update();
