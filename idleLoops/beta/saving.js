@@ -9,7 +9,7 @@ let isBeta = !!location.href.match(/beta/i);
 let saveName = !isBeta ? "idleLoops1" :  "idleLoopsBeta";
 displayBetaSaveNote();
 
-let timeNeededInitial = 5 * 50 * 100;
+let timeNeededInitial = 5 * 50;
 let timer = timeNeededInitial;
 let timeNeeded = timeNeededInitial;
 let stop = false;
