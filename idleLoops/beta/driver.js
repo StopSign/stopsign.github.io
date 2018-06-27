@@ -69,7 +69,7 @@ function recalcInterval(fps) {
 function pauseGame() {
     stop = !stop;
     document.title = stop ? "*PAUSED* Idle Loops" : "Idle Loops";
-    timeControlsView.switchPausePlayUI(stop);
+    Views.timeControls.switchPausePlayUI(stop);
     if(!stop && (shouldRestart || timer >= timeNeeded)) {
         restart();
     }
@@ -371,5 +371,5 @@ function toggleOffline() {
     } else { //take it slow
         bonusSpeed = 1;
     }
-    timeControlsView.switchBonusSecondsUI(goingFast);
+    Views.timeControls.switchBonusSecondsUI(goingFast);
 }

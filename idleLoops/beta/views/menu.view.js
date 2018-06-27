@@ -1,14 +1,11 @@
-let menuView = {
+Views.registerView('menu',{
    selector : '#menu',
-   display : function () {
-     $(menuView.selector).html(menuView.html());
-   },
    html : function () {
       var html = "";
-      html += menuView.htmlChangelog();
-      html += menuView.htmlSaveMenu();
-      html += menuView.htmlFAQMenu();
-      html += menuView.htmlOptionsMenu();
+      html += Views.menu.htmlChangelog();
+      html += Views.menu.htmlSaveMenu();
+      html += Views.menu.htmlFAQMenu();
+      html += Views.menu.htmlOptionsMenu();
       return html;
    },
    htmlChangelog : function () {
@@ -63,7 +60,7 @@ let menuView = {
      html += "<div class='showthisH'>";
       html += "<a href='_blank' href='"+_txt("menu>options>discord>link")+"'>"+_txt("menu>options>discord>title")+"</a><br>";
       if (Object.keys(Localization.supportedLang).length>1)
-        html += menuView.htmlLocalizationMenu();
+        html += Views.menu.htmlLocalizationMenu();
       html += _txt("menu>options>adblock_warning")+"<br>";
       html += "<input id='audioCueToggle' type='checkbox' /><label for='audioCueToggle'>"+_txt("menu>options>pause_audio_cue")+"</label><br>";
      html += "</div>";
@@ -79,4 +76,4 @@ let menuView = {
      html += "</select><br>";
      return html;
    },
-};
+});

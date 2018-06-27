@@ -1,8 +1,5 @@
-let trackedResourcesView = {
+Views.registerView('trackedResources',{
    selector : '#trackedResources',
-   display : function () {
-     $(trackedResourcesView.selector).html(trackedResourcesView.html());
-   },
    html : function () {
      var html = "";
      var resources = _txtsObj("tracked_resources>resource");
@@ -21,4 +18,4 @@ let trackedResourcesView = {
      });
      return html;
    },
-};
+});

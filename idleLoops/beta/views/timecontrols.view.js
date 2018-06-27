@@ -1,8 +1,5 @@
-let timeControlsView = {
+Views.registerView('timeControls',{
    selector : '#timeControls',
-   display : function () {
-     $(timeControlsView.selector).html(timeControlsView.html());
-   },
    html : function () {
       var html = "";
 
@@ -51,4 +48,4 @@ let timeControlsView = {
    switchBonusSecondsUI : function (state) {
      $('#isBonusOn').html(_txt("time_controls>bonus_seconds>state>"+ (state ? 'on' : 'off')));
    },
-};
+});

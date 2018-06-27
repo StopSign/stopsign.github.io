@@ -249,6 +249,7 @@
 
 </script>
 <script src="localization.js?11"></script>
+<script src="views/views.js?11"></script>
 <script src="views/menu.view.js?11"></script>
 <script src="views/trackedresources.view.js?11"></script>
 <script src="views/timecontrols.view.js?11"></script>
@@ -258,9 +259,7 @@
     window._txt = Localization.txt; // binding the _txt function for simplier use
     window._txtsObj = Localization.txtsObj; // binding the _txt function for simplier use
     Localization.loadLib('game',function() { // we load the "game.xml" library, then startup the game.
-      menuView.display();
-      trackedResourcesView.display();
-      timeControlsView.display();
+      Views.draw();
       startGame();
     });
   })
