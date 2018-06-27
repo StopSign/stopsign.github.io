@@ -365,7 +365,7 @@ function addOffline(num) {
 }
 
 function toggleOffline() {
-    var goingFast = bonusSpeed === 1;
+    let goingFast = bonusSpeed === 1;
     if(goingFast) { //go fast
         bonusSpeed = 4;
     } else { //take it slow

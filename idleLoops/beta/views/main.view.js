@@ -536,6 +536,9 @@ function View() {
         this.createTownAction(new PurchaseMana());
         this.createTownAction(new SellPotions());
 
+        tempObj = new JoinAdvGuild();
+        this.createTownAction(tempObj);
+        this.createMultiPartPBar(tempObj);
     };
 
     this.createActionProgress = function(action) {
@@ -685,6 +688,10 @@ function View() {
         this.updateMultiPartSegments(tempObj);
 
         tempObj = new SmallDungeon();
+        this.updateMultiPart(tempObj);
+        this.updateMultiPartSegments(tempObj);
+
+        tempObj = new JoinAdvGuild();
         this.updateMultiPart(tempObj);
         this.updateMultiPartSegments(tempObj);
     };

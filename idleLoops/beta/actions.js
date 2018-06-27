@@ -36,9 +36,6 @@ function Actions() {
             while(curProgress >= curAction.loopCost(segment)) {
                 curProgress -= curAction.loopCost(segment);
                 //segment finished
-                if(curAction.segmentFinished) {
-                    curAction.segmentFinished();
-                }
                 if (segment === curAction.segments - 1) {
                     //part finished
                     towns[0][curAction.varName] = 0;
@@ -46,6 +43,12 @@ function Actions() {
                     towns[0]["total"+curAction.varName]++;
                     segment -= curAction.segments;
                     curAction.loopsFinished();
+                    if(!curAction.segmentFinished) {
+                        view.updateMultiPart(curAction);
+                    }
+                }
+                if(curAction.segmentFinished) {
+                    curAction.segmentFinished();
                     view.updateMultiPart(curAction);
                 }
                 segment++;
@@ -120,6 +123,8 @@ function Actions() {
         towns[0].SDungeon = 0;
         towns[0].SDungeonLoopCounter = 0;
         towns[0].suppliesCost = 400;
+        towns[2].AdvGuildLoopCounter = 0;
+        window.curAdvGuildSegment = 0;
         if(document.getElementById("currentListActive").checked) {
             this.currentPos = 0;
             this.completedTicks = 0;
