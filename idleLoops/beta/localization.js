@@ -31,7 +31,7 @@ window.Localization = {
       lib = Localization.lastLib;
     var libObject = $(Localization.libs[lib]);
     if (libObject.length )
-    var txt = $(Localization.libs[lib]).find(path).html();
+    var txt = $(Localization.libs[lib]).find(path).text();
     if (typeof(txt)=="undefined") {
       console.warn("Missing translation in lang '"+ Localization.currentLang + "' for key "+path+" in lib "+lib);
       txt = "["+path+"]";
@@ -57,7 +57,7 @@ window.Localization = {
     window.location.href=window.location.origin+window.location.pathname+'?'+$.param(vars);
   },
   loadXML : function(libName,callback) {
-      $.get('lang/'+Localization.currentLang+'/'+libName+'.xml',null,callback);
+      $.get('lang/'+Localization.currentLang+'/'+libName+'.xml',null,callback,'xml');
   },
   getUrlVars : function() {
       var vars = {};

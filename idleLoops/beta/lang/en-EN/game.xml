@@ -132,7 +132,9 @@
               <import_button>Import</import_button>
               <import_comment><![CDATA[
               WARNING: Import will break the game if invalid save. Empty import will hard clear the game<br>
-              If you reaaallly want to edit your save file, <div class="showthat2">hover me<div class="showthis2">In the console, use decode("pasted savefile"), edit, then encode('pasted savefile'), then import it<br>This is mainly for fixing broken savefiles - don't be a cheater.</div></div>]]></import_comment>
+              If you reaaallly want to edit your save file, ]]></import_comment>
+              <import_hover_special>hover me</import_hover_special>
+              <import_hover_special_tooltip><![CDATA[In the console, use decode("pasted savefile"), edit, then encode('pasted savefile'), then import it<br>This is mainly for fixing broken savefiles - don't be a cheater.]]></import_hover_special_tooltip>
     </save>
     <faq>
       <meta>

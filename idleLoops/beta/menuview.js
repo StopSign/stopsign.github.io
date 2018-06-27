@@ -21,7 +21,7 @@ let menuView = {
          html +=  "<div class='showthat2'>";
          html +=    Localization.txt("menu>changelog>meta>version_prefix")+" "+$(version).attr('verNum');
          html +=    "<div class='showthis2'>";
-         html +=      $(version).html();
+         html +=      $(version).text();
          html +=   "</div>";
          html +=  "</div><br>";
        });
@@ -37,7 +37,8 @@ let menuView = {
       html += "<div class='button' onclick='exportSave()'>"+Localization.txt("menu>save>export_button")+"</div><br>";
       html += Localization.txt("menu>save>export_comment")+"<br>";
       html += "<div class='button' onclick='importSave()'>"+Localization.txt("menu>save>import_button")+"</div><br>";
-      html += Localization.txt("menu>save>import_comment")+"<br>";
+      html += Localization.txt("menu>save>import_comment");
+      html += "<div class='showthat2'>"+Localization.txt("menu>save>import_hover_special")+"<div class='showthis2'>"+Localization.txt("menu>save>import_hover_special_tooltip")+"</div></div><br>";
      html += "</div>";
      html += "</div>";
      return html;
