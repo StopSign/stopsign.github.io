@@ -33,7 +33,7 @@ let menuView = {
      html += _txt("menu>save>meta>title");
      html += "<div class='showthisH'>";
       html += "<div class='button' onclick='save()'>"+_txt("menu>save>manual_save")+"</div><br>";
-      html += "<input id='exportImport'><label for='exportImport'>"+_txt("menu>save>input_label")+"</label><br>";
+      html += "<input id='exportImport'><label for='exportImport'> "+_txt("menu>save>input_label")+"</label><br>";
       html += "<div class='button' onclick='exportSave()'>"+_txt("menu>save>export_button")+"</div><br>";
       html += _txt("menu>save>export_comment")+"<br>";
       html += "<div class='button' onclick='importSave()'>"+_txt("menu>save>import_button")+"</div><br>";
@@ -72,11 +72,11 @@ let menuView = {
    },
    htmlLocalizationMenu : function() {
      var lg = Localization.supportedLang;
-     var html = "<select id='localization_menu'>";
+     var html = _txt("menu>options>localization_title")+" : <select id='localization_menu' onchange='Localization.change();'>";
      $.each(lg,function(val,str) {
        html += "<option value='"+val+"' "+(Localization.currentLang == val ? "selected" : "")+">"+str+"</option>"
      })
-     html += "</select>";
+     html += "</select><br>";
      return html;
    },
 };

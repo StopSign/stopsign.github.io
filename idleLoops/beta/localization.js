@@ -51,9 +51,9 @@ window.Localization = {
     Localization.libs[libName] = xmlData;
     Localization.lastLib = Localization.lastLib === null ? libName : Localization.lastLib;
   },
-  change : function (ev) { // function triggered by the localization menu
+  change : function () { // function triggered by the localization menu
     var vars = Localization.getUrlVars();
-    vars['lg'] = $(ev.target).val();
+    vars['lg'] = $(Localization.handle).val();
     window.location.href=window.location.origin+window.location.pathname+'?'+$.param(vars);
   },
   loadXML : function(libName,callback) {

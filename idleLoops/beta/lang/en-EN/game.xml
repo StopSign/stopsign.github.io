@@ -140,7 +140,7 @@
       <meta>
         <title>FAQ</title>
         <q_prefix>Q</q_prefix>
-        <a_prefix>Q</a_prefix>
+        <a_prefix>A</a_prefix>
       </meta>
         <q_a>
           <q>What do stats do?</q>
@@ -148,7 +148,7 @@
         </q_a>
         <q_a>
           <q>Short runs seem better.</q>
-          <a> Short runs are better, for the early game and current balance. As your runs get longer and you accrue talent and soulstones they become more useful.</a>
+          <a>Short runs are better, for the early game and current balance. As your runs get longer and you accrue talent and soulstones they become more useful.</a>
         </q_a>
         <q_a>
           <q>What should my first goal be?</q>
@@ -159,6 +159,7 @@
       <meta>
         <title>Options</title>
       </meta>
+      <localization_title>Language</localization_title>
       <discord>
         <link>https://discord.gg/EmRuWPp</link>
         <title>Discord Link</title>
