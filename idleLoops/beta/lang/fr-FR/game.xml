@@ -131,7 +131,8 @@
               Collez une sauvegarde et cliquez sur Importer pour importer.]]></export_comment>
               <import_button>Importer</import_button>
               <import_comment><![CDATA[
-                ATTENTION : Importer cassera votre sauvegarde si cette sauvegarde est invalide. Un import vide permet de recommencer le jeu à 0, pour de vrai.<br>
+                ATTENTION : Importer cassera votre sauvegarde si cette sauvegarde est invalide.<br>
+                Un import vide permet de recommencer le jeu à 0, pour de vrai.<br>
                 Si vous voulez vraiiiiiiiment éditer votre sauvegarde, ]]></import_comment>
               <import_hover_special>survolez-moi ;)</import_hover_special>
               <import_hover_special_tooltip><![CDATA[In the console, use decode("pasted savefile"), edit, then encode('pasted savefile'), then import it<br>This is mainly for fixing broken savefiles - don't be a cheater.]]></import_hover_special_tooltip>
@@ -164,7 +165,7 @@
         <link>https://discord.gg/EmRuWPp</link>
         <title>Lien Discord</title>
       </discord>
-      <adblock_warning>ATTENTION : pour une raison inconnue, Adblock Plus peut créer des lags gênants. Je n'ajouterai jamais de publicités, donc si votre jeu se fige régulièrement, essayez de le désactiver sur cette page.</adblock_warning>
+      <adblock_warning><![CDATA[ATTENTION : pour une raison inconnue, Adblock Plus peut créer des lags gênants.<br>Je n'ajouterai jamais de publicités, donc si votre jeu se fige régulièrement, essayez de le désactiver sur cette page.]]></adblock_warning>
       <pause_audio_cue>Emmetre un son quand le jeu passe en pause</pause_audio_cue>
     </options>
   </menu>
@@ -220,27 +221,27 @@
     <story_title>Histoire</story_title>
     <stories>
       <story num="0">
-        You're a simple courier, on a long trip to deliver a high priority package. Just as you entered town, you tripped - breaking your glasses - and the package burst open, spilling a strange liquid on you. Immediately, your meager amount of mana started draining rapidly. Right as your mana became empty, you found yourself back in the moment the liquid was absorbed into your skin, with your tiny reserves filled... yet draining just as before. This happened again and again, the world resetting with you, until you decided you had to figure out a way to prolong how long these 'loops' were. Mana crystals are often stored in pottery around town, perhaps you'll start there ...
+        Vous êtes un simple messager, en long voyage pour livre un colis prioritaire. A l'instant où vous arrivez en ville, vous trébuchez - cassant vos lunettes au passage - et le colis s'éventre, vous recouvrant d'un liquide étrange. Imméditament, votre maigre quantité de mana commence à s'évaporer à une vitesse folle. Alors que la dernière goute de mana disparait, vous vous retrouvez quelques instant plus tôt, alors que le liquide s'imprégnait dans votre peau, vos "réserves" remplies,... mais s'écoulant de nouveau rapidement. Ces quelques secondes se déroulent de nouveau, et de nouveau, et encore. Le monde autour redémarre avec vous, jusqu'à ce que vous décidiez de trouver une manière de prolonger ces "boucles". Des cristaux de mana sont souvent présent dans les poteries en ville, peut être que vous devriez commencer par là....
       </story>
       <story num="1">
-        You reach the end of the dungeon, where a softly glowing orb floats on a pedastal. You've found the dungeon core - for the first level of the dungeon, at least. As you grasp it, the essence dives into you, infusing your very being with the power it holds. It is a small amount of power, but this is a small dungeon. You'll be back to take this power again, knowing with the foreign knowledge implanted that it will stay with you no matter when you are.
+        Vous arrivez au bout du donjon. Flotant sur un piédestal, une orbe brille doucement. Vous avez trouvé le coeur du donjon, du premier niveau du donjon en tous cas. Alors que vous vous en emparez, son essense vous pénêtre, imprégnant votre être de son pouvoir. C'est une petite quantité d'énergie, mais c'est un petit donjon. Vous reviendrez prendre ce pouvoir encore et encore, sachant qu'il restera en vous au travers des redémarrages de la boucle.
       </story>
       <story num="2">
-        You reach the end of the dungeon again, but for the first time the core isn't glowing. It's always been thought that dungeon cores build based on the mana spent around them, but you're beginning to think the essence of it's previous incarnations drains it somehow. It doesn't always happen, but you'll need to put more mana into the world to take the core's benefits out of it. You shrug, accepting yet another oddity of the loops.
+        Vous arrivez de nouveau au fond du donjon, mais pour la première fois, le coeur ne brille plus. De tout temps, il s'est murmuré que les coeurs de donjons se régénérent en utilisant le mana qui les entoure, mais vous commencez à vous demander si l'essence de ses précédents incarantions ne le draine pas d'une manière ou d'une autre. Ce n'est pas systématique, mais vous devrez disséminer plus de mana dans le monde pour pouvoir bénéficier de la puissance du coeur. Vous levez les épaules, ne pouvant qu'accepter cette nouvelle originalité de la boucle.
       </story>
     </stories>
     <bonus_seconds>
-        <title>Bonus Seconds</title>
+        <title>Secondes bonus</title>
         <main_text><![CDATA[
-          When bonus is on, you get 3 extra seconds per second (4x faster).<br>
-          Accrue .8 bonus seconds per second when paused or offline.<br>
-          Bonus is
+          Quand le bonus est actif, vous avez 3 secondes bonus par seconde (4 fois plus rapide).<br>
+          Accumulez 0.8 secondes bonus par seconde quand vous activez la pause, ou que vous êtes hors ligne.<br>
+          Le bonus est
         ]]></main_text>
         <state>
-          <on>ON</on>
-          <off>OFF</off>
+          <on>ACTIF</on>
+          <off>INACTIF</off>
         </state>
-        <counter_text>Total Bonus Seconds</counter_text>
+        <counter_text>Secondes bonus en stock</counter_text>
     </bonus_seconds>
   </time_controls>
 </body>
