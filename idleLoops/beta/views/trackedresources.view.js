@@ -5,7 +5,7 @@ let trackedResourcesView = {
    },
    html : function () {
      var html = "";
-     var resources = Localization.txtsObj("tracked_resources>resource");
+     var resources = _txtsObj("tracked_resources>resource");
      $(resources).each(function(x,resource) {
        html += "<div class='showthat resource'";
        if ($(resource).attr('initialy_hidden'))
@@ -16,7 +16,7 @@ let trackedResourcesView = {
           html += " <div id='"+$(resource).find('id').text()+"'>0</div>";
        html += "<div class='showthis'>"+$(resource).find('desc').text();
        if (!$(resource).attr('no_reset_on_restart'))
-           html += "<br>"+Localization.txt("tracked_resources>reset_on_restart_txt");
+           html += "<br>"+_txt("tracked_resources>reset_on_restart_txt");
        html += "</div></div>";
      });
      return html;

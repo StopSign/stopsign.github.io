@@ -291,6 +291,7 @@
   $(function() {
     Localization.init();
     window._txt = Localization.txt; // binding the _txt function for simplier use
+    window._txtsObj = Localization.txtsObj; // binding the _txt function for simplier use
     Localization.loadLib('game',function() { // we load the "game.xml" library, then startup the game.
       menuView.display();
       trackedResourcesView.display();
