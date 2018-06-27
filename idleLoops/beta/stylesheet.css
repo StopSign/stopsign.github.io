@@ -363,6 +363,6 @@ input {
     -ms-user-select: none;
 }
 
-#trackedResources .resource {
+#trackedResources .resource, #timeControls .control {
   margin-right : 5px;
 }
