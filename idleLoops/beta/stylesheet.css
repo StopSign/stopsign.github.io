@@ -362,3 +362,7 @@ input {
     -webkit-user-select: none;
     -ms-user-select: none;
 }
+
+#trackedResources .resource, #timeControls .control {
+  margin-right : 5px;
+}
