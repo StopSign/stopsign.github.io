@@ -144,7 +144,7 @@ function View() {
         document.getElementById("gold").innerHTML = gold;
     };
     this.updateGlasses = function() {
-        document.getElementById("glasses").style.display = glasses ? "inline-block" : "none";
+        document.getElementById("glassesDiv").style.display = glasses ? "inline-block" : "none";
     };
     this.updateReputation = function() {
         document.getElementById("reputation").innerHTML = reputation;
@@ -181,7 +181,7 @@ function View() {
             document.getElementById("upButton" + count).removeAttribute("onclick");
             document.getElementById("downButton" + count).removeAttribute("onclick");
             document.getElementById("removeButton" + count).removeAttribute("onclick");
-            
+
             let dragAndDropDiv = document.getElementById("nextActionContainer"+count);
             dragAndDropDiv.removeAttribute("ondragover");
             dragAndDropDiv.removeAttribute("ondrop");
@@ -271,7 +271,7 @@ function View() {
     this.updateCurrentActionBarRequest = function f(index) {
         this.updateCurrentActionBarRequests[index] = true;
     };
-    
+
     this.updateCurrentActionBar = function(index) {
         const action = actions.current[index];
         const div = document.getElementById("action"+index+"Bar");

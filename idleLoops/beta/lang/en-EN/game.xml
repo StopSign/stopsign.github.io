@@ -167,4 +167,47 @@
       <pause_audio_cue>Ping on pause</pause_audio_cue>
     </options>
   </menu>
+  <tracked_resources>
+    <reset_on_restart_txt>Resets when the loop restarts.</reset_on_restart_txt>
+    <resource no_reset_on_restart="true">
+      <title>Mana</title>
+      <id>timer</id>
+      <desc>Your main resource. The higher your mana, the more you can do before reset.</desc>
+    </resource>
+    <resource>
+      <title>Gold</title>
+      <id>gold</id>
+      <desc>Sell for mana, or use for actions.</desc>
+    </resource>
+    <resource>
+      <title>Reputation</title>
+      <id>reputation</id>
+      <desc>The influence you have over the people in town.</desc>
+    </resource>
+    <resource initialy_hidden="true">
+      <title>Supplies</title>
+      <id>supplies</id>
+      <desc>Needed to go to the next town.</desc>
+    </resource>
+    <resource initialy_hidden="true">
+      <title>Herbs</title>
+      <id>herbs</id>
+      <desc>The beneficial plants you've found.</desc>
+    </resource>
+    <resource initialy_hidden="true">
+      <title>Hide</title>
+      <id>hide</id>
+      <desc>Results of successful hunting.</desc>
+    </resource>
+    <resource initialy_hidden="true">
+      <title>Potions</title>
+      <id>potions</id>
+      <desc>Rare, but not complex. Worth some money.</desc>
+    </resource>
+    <resource initialy_hidden="true" no_count="true">
+      <title>Glasses</title>
+      <id>glasses</id>
+      <desc>Woah, trees have so many leaves on them.</desc>
+    </resource>
+  </tracked_resources>
 </body>
