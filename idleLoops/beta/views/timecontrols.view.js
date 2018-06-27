@@ -42,10 +42,4 @@ Views.registerView('timeControls',{
 
       return html;
    },
-   switchPausePlayUI : function(stop) {
-     $('#pausePlay').html(_txt("time_controls>"+ (stop ? 'play_button' : 'pause_button')));
-   },
-   switchBonusSecondsUI : function (state) {
-     $('#isBonusOn').html(_txt("time_controls>bonus_seconds>state>"+ (state ? 'on' : 'off')));
-   },
 });
