@@ -106,8 +106,8 @@ function Wander() {
     this.tooltip = _txt("actions>wander>tooltip");
     this.label = _txt("actions>wander>label");
     this.labelDone = _txt("actions>wander>label_done");
+    this.infoName = _txt("actions>wander>collectible_label");
     
-    this.infoName = "Explored";
     this.varName = "Wander";
     this.stats = {
         Per:.2,
@@ -147,8 +147,8 @@ function MeetPeople() {
     this.tooltip = _txt("actions>meet_people>tooltip");
     this.label = _txt("actions>meet_people>label");
     this.labelDone = _txt("actions>meet_people>label_done");
+    this.infoName = _txt("actions>meet_people>collectible_label");
 
-    this.infoName = "People Met";
     this.varName = "Met";
     this.stats = {
         Int:.1,
@@ -181,8 +181,8 @@ function Investigate() {
     this.tooltip = _txt("actions>investigate>tooltip");
     this.label = _txt("actions>investigate>label");
     this.labelDone = _txt("actions>investigate>label_done");
+    this.infoName = _txt("actions>investigate>collectible_label");
 
-    this.infoName = "Investigated";
     this.varName = "Secrets";
     this.stats = {
         Per:.3,
@@ -216,8 +216,8 @@ function ExploreForest() {
     this.tooltip = _txt("actions>explore_forest>tooltip");
     this.label = _txt("actions>explore_forest>label");
     this.labelDone = _txt("actions>explore_forest>label_done");
+    this.infoName = _txt("actions>explore_forest>collectible_label");
 
-    this.infoName = "Forest Explored";
     this.varName = "Forest";
     this.stats = {
         Per:.4,
@@ -260,9 +260,8 @@ function OldShortcut() {
     this.tooltip = _txt("actions>old_shortcut>tooltip");
     this.label = _txt("actions>old_shortcut>label");
     this.labelDone = _txt("actions>old_shortcut>label_done");
+    this.infoName = _txt("actions>old_shortcut>collectible_label");
 
-
-    this.infoName = "Shortcut Explored";
     this.varName = "Shortcut";
     this.stats = {
         Per:.3,
@@ -293,8 +292,8 @@ function TalkToHermit() {
     this.tooltip = _txt("actions>hermit>tooltip");
     this.label = _txt("actions>hermit>label");
     this.labelDone = _txt("actions>hermit>label_done");
+    this.infoName = _txt("actions>hermit>collectible_label");
 
-    this.infoName = "Hermit Knowledge Learned";
     this.varName = "Hermit";
     this.stats = {
         Con:.5,
@@ -324,9 +323,8 @@ function ExploreCity() {
     this.townNum = 2;
     this.tooltip = _txt("actions>explore_city>tooltip");
     this.label = _txt("actions>explore_city>label");
-    this.labelDone = _txt("actions>explore_city>label_done");
+    this.infoName = _txt("actions>explore_city>collectible_label");
 
-    this.infoName = "City Explored";
     this.varName = "City";
     this.stats = {
         Con:.1,
@@ -362,8 +360,8 @@ function GetDrunk() {
     this.tooltip = _txt("actions>get_drunk>tooltip");
     this.label = _txt("actions>get_drunk>label");
     this.labelDone = _txt("actions>get_drunk>label_done");
+    this.infoName = _txt("actions>get_drunk>collectible_label");
 
-    this.infoName = "Rumors Heard";
     this.varName = "Drunk";
     this.stats = {
         Str:.1,
@@ -1003,9 +1001,9 @@ function SmashPots() {
     this.townNum = 0;
     this.tooltip = _txt("actions>smash_pots>tooltip");
     this.label = _txt("actions>smash_pots>label");
+    this.infoName = _txt("actions>smash_pots>collectible_label");
 
     this.varName = "Pots";
-    this.infoName = "Pots Smashed";
     this.infoText = "Pots with loot left <i class='fa fa-arrow-left'></i> Pots with loot total <i class='fa fa-arrow-left'></i> Pots to check for loot<br><div class='bold'>Total Found</div> <div id='totalPots'></div>";
     this.stats = {
         Str:.2,
@@ -1036,8 +1034,8 @@ function PickLocks() {
     this.townNum = 0;
     this.tooltip = _txt("actions>locks>tooltip");
     this.label = _txt("actions>locks>label");
+    this.infoName = _txt("actions>locks>collectible_label");
 
-    this.infoName = "Locks Picked";
     this.infoText = "Houses with loot left <i class='fa fa-arrow-left'></i> Houses with loot total <i class='fa fa-arrow-left'></i> Houses to check for loot<br><div class='bold'>Total Found</div> <div id='totalLocks'></div>";
     this.stats = {
         Dex:.5,
@@ -1072,8 +1070,8 @@ function ShortQuest() {
     this.townNum = 0;
     this.tooltip = _txt("actions>short_quest>tooltip");
     this.label = _txt("actions>short_quest>label");
+    this.infoName = _txt("actions>short_quest>collectible_label");
 
-    this.infoName = "Short Quests Accomplished";
     this.infoText = "Quests with loot left <i class='fa fa-arrow-left'></i> Quests with loot total <i class='fa fa-arrow-left'></i> Quests to finish<br><div class='bold'>Total Found</div> <div id='totalSQuests'></div>";
     this.stats = {
         Str:.2,
@@ -1110,8 +1108,8 @@ function LongQuest() {
     this.townNum = 0;
     this.tooltip = _txt("actions>long_quest>tooltip");
     this.label = _txt("actions>long_quest>label");
+    this.infoName = _txt("actions>long_quest>collectible_label");
 
-    this.infoName = "Long Quests Accomplished";
     this.infoText = "Quests with loot left <i class='fa fa-arrow-left'></i> Quests with loot total <i class='fa fa-arrow-left'></i> Quests to finish<br><div class='bold'>Total Found</div> <div id='totalLQuests'></div>";
     this.stats = {
         Str:.2,
@@ -1150,9 +1148,9 @@ function WildMana() {
     this.townNum = 1;
     this.tooltip = _txt("actions>wild_mana>tooltip");
     this.label = _txt("actions>wild_mana>label");
+    this.infoName = _txt("actions>wild_mana>collectible_label");
 
     this.varName = "WildMana";
-    this.infoName = "Mana Sources Tapped";
     this.infoText = "Sources with loot left <i class='fa fa-arrow-left'></i> Sources with loot total <i class='fa fa-arrow-left'></i> Sources to check for loot<br><div class='bold'>Total Found</div> <div id='totalWildMana'></div>";
     this.stats = {
         Con:.2,
@@ -1182,9 +1180,9 @@ function GatherHerbs() {
     this.townNum = 1;
     this.tooltip = _txt("actions>gather_herbs>tooltip");
     this.label = _txt("actions>gather_herbs>label");
+    this.infoName = _txt("actions>gather_herbs>collectible_label");
 
     this.varName = "Herbs";
-    this.infoName = "Funny Plants Uprooted";
     this.infoText = "Plants with loot left <i class='fa fa-arrow-left'></i> Plants with loot total <i class='fa fa-arrow-left'></i> Plants to check for loot<br><div class='bold'>Total Found</div> <div id='totalHerbs'></div>";
     this.stats = {
         Str:.4,
@@ -1214,9 +1212,9 @@ function Hunt() {
     this.townNum = 1;
     this.tooltip = _txt("actions>hunt>tooltip");
     this.label = _txt("actions>hunt>label");
+    this.infoName = _txt("actions>hunt>collectible_label");
 
     this.varName = "Hunt";
-    this.infoName = "Animals Skinned";
     this.infoText = "Animals with loot left <i class='fa fa-arrow-left'></i> Animals with loot total <i class='fa fa-arrow-left'></i> Animals to check for loot<br><div class='bold'>Total Found</div> <div id='totalHunt'></div>";
     this.stats = {
         Dex:.2,
@@ -1247,9 +1245,9 @@ function Gamble() {
     this.townNum = 2;
     this.tooltip = _txt("actions>gamble>tooltip");
     this.label = _txt("actions>gamble>label");
+    this.infoName = _txt("actions>gamble>collectible_label");
 
     this.varName = "Gamble";
-    this.infoName = "Suckers Swindled";
     this.infoText = "Suckers left <i class='fa fa-arrow-left'></i> Suckers total <i class='fa fa-arrow-left'></i> People to check if they're suckers<br><div class='bold'>Total Found</div> <div id='totalGamble'></div>";
     this.stats = {
         Cha:.2,

@@ -373,11 +373,13 @@
     <wander>
       <label>Wander</label>
       <label_done>Explored</label_done>
+      <collectible_label>Explored</collectible_label>
       <tooltip>Explore the town, look for hidden areas and treasures.</tooltip>
     </wander>
     <meet_people>
       <label>Meet People</label>
       <label_done>People Met</label_done>
+      <collectible_label>People Met</collectible_label>
       <tooltip><![CDATA[
         They won't let you get away with a simple chat.<br>Unlocked at 22% Explored.
       ]]></tooltip>
@@ -385,6 +387,7 @@
     <investigate>
       <label>Investigate</label>
       <label_done>Investigated</label_done>
+      <collectible_label>Investigated</collectible_label>
       <tooltip><![CDATA[
         You've been hearing some rumors...<br>Unlocked at 25% People Met.
       ]]></tooltip>
@@ -392,6 +395,7 @@
     <explore_forest>
       <label>Explore Forest</label>
       <label_done>Forest Explored</label_done>
+      <collectible_label>Forest Explored</collectible_label>
       <tooltip><![CDATA[
         What a pleasant area.<br>2x progress with glasses.
       ]]></tooltip>
@@ -399,6 +403,7 @@
     <old_shortcut>
       <label>Old Shortcut</label>
       <label_done>Shortcut Explored</label_done>
+      <collectible_label>Shortcut Explored</collectible_label>
       <tooltip><![CDATA[
         No one has come down this way in quite some time.<br>Gives some additional herbs.<br>Gives something to talk about with the Hermit. Get 1% reward for Talk to Hermit result per 1% Shortcut Explored.<br>Unlocked at 20% Forest Explored.
       ]]></tooltip>
@@ -406,6 +411,7 @@
     <hermit>
       <label>Talk To Hermit</label>
       <label_done>Hermit Knowledge Learned</label_done>
+      <collectible_label>Hermit Knowledge Learned</collectible_label>
       <tooltip><![CDATA[
         This old man is happy to have a listening ear, surely he has some useful knowledge. You hope.<br>Speed is 1% faster for Gather Herbs, Practical Magic, and Learn Alchemy per 1% of Hermit Knowledge.<br>Unlocked with both 20% Shortcut Explored and 40 Magic.
       ]]></tooltip>
@@ -413,6 +419,7 @@
     <explore_city>
       <label>Explore City</label>
       <label_done>City Explored</label_done>
+      <collectible_label>City Explored</collectible_label>
       <tooltip><![CDATA[
         Everyone is so busy, and there's so much to do.<br>2x progress with glasses.
       ]]></tooltip>
@@ -420,6 +427,7 @@
     <get_drunk>
       <label>Get Drunk</label>
       <label_done>Rumors Heard</label_done>
+      <collectible_label>Rumors Heard</collectible_label>
       <tooltip><![CDATA[
         Sometimes you just need a drink.<br>Costs 2 gold and requires reputation greater than -3.<br>Costs 1 reputation.<br>Unlocked at 20% City Explored.
       ]]></tooltip>
@@ -540,48 +548,56 @@
     </read_books>
     <smash_pots>
       <label>Smash Pots</label>
+      <collectible_label>Pots Smashed</collectible_label>
       <tooltip><![CDATA[
           They're just sitting there, unbroken, full of potential.<br>Pots with loot in them have 100 mana.<br>Every 10 pots have mana.
       ]]></tooltip>
     </smash_pots>
     <locks>
       <label>Pick Locks</label>
+      <collectible_label>Locks Picked</collectible_label>
       <tooltip><![CDATA[
           Don't worry; they won't remember.<br>Houses with loot in them have 10 gold.<br>Every 10 houses have gold.<br>Unlocked at 20% Explored.
       ]]></tooltip>
     </locks>
     <short_quest>
       <label>Short Quest</label>
+      <collectible_label>Short Quests Accomplished</collectible_label>
       <tooltip><![CDATA[
           Be a hero! ...If the reward is good and it doesn't take too long.<br>Short Quests with loot give 20 gold as a reward.<br>Every 5 Short Quests have loot.<br>Unlocked at 5% People Met.
       ]]></tooltip>
     </short_quest>
     <long_quest>
       <label>Long Quest</label>
+      <collectible_label>Long Quests Accomplished</collectible_label>
       <tooltip><![CDATA[
           Be a more impressive hero! ...As long as someone is watching.<br>Long Quests with loot give 25 gold and 1 reputation as a reward.<br>Every 5 Long Quests have loot.<br>Unlocked at 10% Investigated.
       ]]></tooltip>
     </long_quest>
     <wild_mana>
       <label>Wild Mana</label>
+      <collectible_label>Mana Sources Tapped</collectible_label>
       <tooltip><![CDATA[
           They're out of sight of most travellers, but you have time to find and harvest them.<br>Every good mana spot has 200 mana.<br>Every 10 mana spots have good mana.
       ]]></tooltip>
     </wild_mana>
     <gather_herbs>
       <label>Gather Herbs</label>
+      <collectible_label>Funny Plants Uprooted</collectible_label>
       <tooltip><![CDATA[
           Might as well dig up anything useful you find.<br>Every 10 funny plants are herbs.<br>Unlocked at 10% Forest Explored.
       ]]></tooltip>
     </gather_herbs>
     <hunt>
       <label>Hunt</label>
+      <collectible_label>Animals Skinned</collectible_label>
       <tooltip><![CDATA[
           The forest provides.<br>Every 10 animals have good hides.<br>Unlocked at 40% Forest Explored.<br>NOTE: Using hide is not implemented yet. I'll remove this note when it is.
       ]]></tooltip>
     </hunt>
     <gamble>
       <label>Gamble</label>
+      <collectible_label>Suckers Swindled</collectible_label>
       <tooltip><![CDATA[
           The cards still somehow come out different every time.<br>Has 2x exp/talent gain<br>Costs 20 gold and 1 reputation.<br>Requires reputation greater than -5.<br>You win against every 10 suckers, and get 60 gold for winning.
       ]]></tooltip>
