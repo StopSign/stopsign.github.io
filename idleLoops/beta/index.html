@@ -32,24 +32,13 @@
     <div id="statsColumn" style="width:410px;vertical-align:top;">
         <div id="statsWindow" style="width:90%;margin-left:12px;text-align:center;position:relative;">
             <div class="showthat">
-                <div class="large bold">Stats</div>
-                <div class="showthis" style="width:550px;">
-                    Each stat level reduces the relevant part of an action's mana cost by 1%.<br>
-                    Talent gets 1% of all level progress, and keeps through loops.<br>
-                    Each talent level increases Bonus XP of its skill by 1%.<br>
-                    XP gain towards an stat per action is (actual mana / original mana) * (talent %) per tick.<br>
-                    Bonus XP is a combination of talent and soulstone bonuses.<br><br>
-                    e.g. Meet People costs 800 mana and has a breakdown of <div class="bold">Int</div> 10% <div class="bold">Cha</div> 80% <div class="bold">Soul</div> 10%.<br>
-                    This effectively means 80 of the mana is controlled by <div class="bold">Int</div>, another 80 by <div class="bold">Soul</div>, and the remaining 640 by <div class="bold">Cha</div>.<br>
-                    If your <div class="bold">Cha</div> is level 20 when the action is started, it'd be 640 / 1.2 = 533.333<br>
-                    Adding back the 160 from <div class="bold">Soul</div> and <div class="bold">Int</div>, the total mana the action takes (rounded up) is now 694, so ~15% less mana.<br>
-                    The action would give (800/694)*(1+talent/100) level exp per mana for the 694 mana.
-                </div>
+                <div class="large bold localized" data-lockey="stats>title"></div>
+                <div class="showthis localized" data-lockey="stats>tooltip>explanation" style="width:550px;"></div>
             </div><br>
             <input type="radio" id="regularStats" name="statView" onclick="view.changeStatView()" checked />
-            <label for="regularStats">Regular View</label>
+            <label for="regularStats" class="localized" data-lockey="stats>view>regular"></label>
             <input type="radio" id="radarStats" name="statView" onclick="view.changeStatView()" />
-            <label for="radarStats">Radar Chart</label>
+            <label for="radarStats" class="localized" data-lockey="stats>view>radar"></label>
             <div class="showthat" id="radarChart">
                 <canvas id="statChartCtx" width="350" height="350"></canvas>
                 <div class="showthis" style="margin-top:20px;width:375px">
@@ -61,54 +50,51 @@
             <div id="statContainer" style="width:100%;position:absolute;top:18px;left:0;"></div><br>
             <div id="skillList" style="width:100%;margin-top:25px;display:none">
                 <div class="showthat">
-                    <div class="large bold">Skills</div>
-                    <div class="showthis">
-                        Skills last through resets.<br>
-                    </div>
+                    <div class="large bold localized" data-lockey="skills>title"></div>
+                    <div class="showthis localized" data-lockey="skills>tooltip>no_reset_on_restart"></div>
                 </div><br>
                 <div class="skillContainer showthat" id="skillCombatContainer">
-                    <div class="skillLabel medium bold">Combat</div>
+                    <div class="skillLabel medium bold localized" data-lockey="skills>combat>label"></div>
                     <div class="statNum medium"><div id="skillCombatLevel">0</div></div>
                     <div style="margin-top:18px;"></div>
                     <div class="thinProgressBarUpper"><div class="statBar skillExpBar townExpBar" id="skillCombatLevelBar"></div></div>
                     <div class="showthis">
-                        Fight for your lives.<br>
-                        <div class="medium bold">Level</div> <div id="skillCombatLevelExp"></div>/<div id="skillCombatLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="skillCombatLevelProgress"></div>%)</div><br>
+                        <span class="localized" data-lockey="skills>combat>desc"></span><br>
+                        <div class="medium bold localized" data-lockey="skills>tooltip>level"></div> <div id="skillCombatLevelExp"></div>/<div id="skillCombatLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="skillCombatLevelProgress"></div>%)</div><br>
                     </div>
                 </div>
                 <div class="skillContainer showthat" id="skillMagicContainer">
-                    <div class="skillLabel medium bold">Magic</div>
+                    <div class="skillLabel medium bold localized" data-lockey="skills>magic>label"></div>
                     <div class="statNum medium"><div id="skillMagicLevel">0</div></div>
                     <div style="margin-top:18px;"></div>
                     <div class="thinProgressBarUpper"><div class="statBar skillExpBar townExpBar" id="skillMagicLevelBar"></div></div>
                     <div class="showthis">
-                        Control the aether to cast and conjure.<br>
-                        <div class="medium bold">Level</div> <div id="skillMagicLevelExp"></div>/<div id="skillMagicLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="skillMagicLevelProgress"></div>%)</div><br>
+                        <span class="localized" data-lockey="skills>magic>desc"></span><br>
+                        <div class="medium bold localized" data-lockey="skills>tooltip>level"></div> <div id="skillMagicLevelExp"></div>/<div id="skillMagicLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="skillMagicLevelProgress"></div>%)</div><br>
                     </div>
                 </div>
                 <div class="skillContainer showthat" id="skillPracticalContainer">
-                    <div class="skillLabel medium bold">Practical Magic</div>
+                    <div class="skillLabel medium bold localized" data-lockey="skills>practical_magic>label"></div>
                     <div class="statNum medium"><div id="skillPracticalLevel">0</div></div>
                     <div style="margin-top:18px;"></div>
                     <div class="thinProgressBarUpper"><div class="statBar skillExpBar townExpBar" id="skillPracticalLevelBar"></div></div>
+
                     <div class="showthis" style="width:490px">
-                        Mage Hand, Prestidigitation, Detect Magic, and other useful tricks to help out.<br>
-                        <div class="medium bold">Level</div> <div id="skillPracticalLevelExp"></div>/<div id="skillPracticalLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="skillPracticalLevelProgress"></div>%)</div><br>
-                        Smash Pots and Gather Wild Mana have 1% reduced mana cost per level (rounded up).<br>
-                        Pick Locks get 1% more gold per level from 1-200 (rounded down).<br>
-                        Short Quests get 1% more gold per level from 101-300 (rounded down).<br>
-                        Long Quests get 1% more gold per level from 201-400 (rounded down).
+                        <span class="localized" data-lockey="skills>practical_magic>desc"></span><br><br>
+                        <div class="medium bold localized" data-lockey="skills>tooltip>level"></div> <div id="skillPracticalLevelExp"></div>/<div id="skillPracticalLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="skillPracticalLevelProgress"></div>%)</div><br>
+                        <span class="localized" data-lockey="skills>practical_magic>desc2"></span>
+
                     </div>
                 </div>
                 <div class="skillContainer showthat" id="skillAlchemyContainer">
-                    <div class="skillLabel medium bold">Alchemy</div>
+                    <div class="skillLabel medium bold localized" data-lockey="skills>alchemy>label">Alchemy</div>
                     <div class="statNum medium"><div id="skillAlchemyLevel">0</div></div>
                     <div style="margin-top:18px;"></div>
                     <div class="thinProgressBarUpper"><div class="statBar skillExpBar townExpBar" id="skillAlchemyLevelBar"></div></div>
                     <div class="showthis">
-                        Brewing potions is hard work! It's a good thing you found a teacher.<br>
-                        <div class="medium bold">Level</div> <div id="skillAlchemyLevelExp"></div>/<div id="skillAlchemyLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="skillAlchemyLevelProgress"></div>%)</div><br>
-                        The Magic teacher in Beginnersville adores alchemists. +1% to Mage Lessons (rounded down) per level.<br>
+                        <span class="localized" data-lockey="skills>alchemy>desc"></span><br>
+                        <div class="medium bold localized" data-lockey="skills>tooltip>level"></div> <div id="skillAlchemyLevelExp"></div>/<div id="skillAlchemyLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="skillAlchemyLevelProgress"></div>%)</div><br>
+                        <span class="localized" data-lockey="skills>alchemy>desc2"></span><br>
                     </div>
                 </div>
             </div>
@@ -194,12 +180,7 @@
             <div style="float:left;margin-left:150px;" class="actionIcon fa fa-arrow-left" id="townViewLeft" onclick="view.showTown(townShowing-1)"></div>
             <div class="showthat">
                 <div class="large bold"><div class="bold" id="townName"></div></div>
-                <div class="showthis">
-                    Mana cost is based on ratio of stat %s.<br>
-                    Gained exp is proportional too.<br>
-                    Exp is gained every tick.<br>
-                    Actions will target unchecked objects before known lootable objects.<br>
-                </div>
+                <div id='townDesc' class='showthis'></div>
             </div>
             <div style="float:right;margin-right:150px;" class="actionIcon fa fa-arrow-right" id="townViewRight" onclick="view.showTown(townShowing+1)"></div>
         </div><br>
@@ -207,7 +188,10 @@
         <div id="townInfo1" class='townInfo' style="display:none;"></div>
         <div id="townInfo2" class='townInfo' style="display:none;"></div>
 
-        <div class="large bold" style="display:block;margin:10px auto 2px auto;text-align:center;">Action Options</div>
+        <div class="showthat" style="display:block;margin:10px auto 2px auto;text-align:center;">
+            <span class='large bold localized' data-lockey="actions>title"></span>
+            <div class='showthis localized' data-lockey="actions>tooltip>desc"></div>
+        </div>
         <div id="actionOptionsTown0" class='actionOptions'></div>
         <div id="actionOptionsTown1" class='actionOptions' style="display:none;"></div>
         <div id="actionOptionsTown2" class='actionOptions' style="display:none;"></div>
@@ -260,6 +244,7 @@
     window._txtsObj = Localization.txtsObj; // binding the _txt function for simplier use
     Localization.loadLib('game',function() { // we load the "game.xml" library, then startup the game.
       Views.draw();
+      Localization.localizePage("game");
       startGame();
     });
   })
