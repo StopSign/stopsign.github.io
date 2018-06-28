@@ -544,13 +544,13 @@ function View() {
     this.createActionProgress = function(action) {
         const totalDivText =
         "<div class='townStatContainer showthat' id='infoContainer"+action.varName+"'>"+
-            "<div class='bold townLabel'>"+action.infoName+" </div> <div id='prc"+action.varName+"'>5</div>%"+
+            "<div class='bold townLabel'>"+action.labelDone+" </div> <div id='prc"+action.varName+"'>5</div>%"+
             "<div class='thinProgressBarUpper'><div id='expBar"+action.varName+"' class='statBar townExpBar'></div></div>"+
             "<div class='thinProgressBarLower'><div id='bar"+action.varName+"' class='statBar townBar'></div></div>"+
 
             "<div class='showthis'>"+
-                "You can find more stuff with higher %.<br>"+
-                "<div class='bold'>Progress</div> <div id='progress"+action.varName+"'></div>%"+
+                _txt("actions>tooltip>higher_done_percent_benefic")+"<br>"+
+                "<div class='bold'>"+_txt("actions>tooltip>progress_label")+"</div> <div id='progress"+action.varName+"'></div>%"+
             "</div>"+
         "</div>";
         let progressDiv = document.createElement("div");
@@ -575,7 +575,7 @@ function View() {
         }
         const totalDivText =
             "<div id='container"+action.varName+"' class='actionContainer showthat' onclick='addActionToList(\""+action.name+"\", "+action.townNum+")'>" +
-                action.name + "<br>" +
+                action.label + "<br>" +
                 "<div style='position:relative'>" +
                     "<img src='img/"+camelize(action.name)+".svg' class='superLargeIcon'>" +
                     extraImage +
@@ -583,8 +583,8 @@ function View() {
                 "<div class='showthis'>" +
                     action.tooltip + "<br>" +
                     actionStats +
-                    "<div class='bold'>Mana Cost</div> <div id='manaCost"+action.varName+"'>"+action.manaCost()+"</div><br>" +
-                    "<div class='bold'>Exp Multiplier</div> "+(action.expMult*100)+"%<br>" +
+                    "<div class='bold'>"+_txt("actions>tooltip>mana_cost")+"</div> <div id='manaCost"+action.varName+"'>"+action.manaCost()+"</div><br>" +
+                    "<div class='bold'>"+_txt("actions>tooltip>exp_multiplier")+"</div> "+(action.expMult*100)+"%<br>" +
                 "</div>" +
             "</div>";
 
@@ -610,8 +610,8 @@ function View() {
             "<div class='showthis'>" +
             action.tooltip + "<br>" +
             actionStats +
-            "<div class='bold'>Mana Cost</div> <div id='manaCost"+action.varName+"'>"+action.manaCost()+"</div><br>" +
-            "<div class='bold'>Exp Multiplier</div> "+(action.expMult*100)+"%<br>" +
+            "<div class='bold'>"+_txt("actions>tooltip>mana_cost")+"</div> <div id='manaCost"+action.varName+"'>"+action.manaCost()+"</div><br>" +
+            "<div class='bold'>"+_txt("actions>tooltip>exp_multiplier")+"</div> "+(action.expMult*100)+"%<br>" +
             "</div>" +
             "</div>";
 

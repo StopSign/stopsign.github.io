@@ -31,10 +31,11 @@ window.Localization = {
     if (typeof(lib) == "undefined")
       lib = Localization.lastLib;
     var libObject = $(Localization.libs[lib]);
-    if (libObject.length )
-    var txt = $(Localization.libs[lib]).find(path).text();
-    if (typeof(txt)=="undefined") {
-      console.warn("Missing translation in lang '"+ Localization.currentLang + "' for key "+path+" in lib "+lib);
+    if (libObject.length)
+      var txt = $(Localization.libs[lib]).find(path).text();
+
+    if (txt=="") {
+      console.warn("Missing text in lang '"+ Localization.currentLang + "' for key "+path+" in lib "+lib);
       txt = "["+path+"]";
     }
     return txt;

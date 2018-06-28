@@ -366,6 +366,250 @@
         Le gain d'XP est proportionnel aussi.<br>
         L'expérience est gagnée à chaque tick.<br>
         Les actions utiliserons les objets non vérifiés avant les objets vérifiés.]]></desc>
+      <mana_cost>Coût en Mana</mana_cost>
+      <exp_multiplier>Multiplicateur d'XP</exp_multiplier>
+      <higher_done_percent_benefic>Vous pouvez trouver plus de choses avec un meilleur %.</higher_done_percent_benefic>
+      <progress_label>Progrès</progress_label>
     </tooltip>
+    <wander>
+      <label>Vagabonder</label>
+      <label_done>Exploré</label_done>
+      <tooltip>Explorez la ville, à la recherche de secrets et trésors.</tooltip>
+    </wander>
+    <meet_people>
+      <label>Sociabiliser</label>
+      <label_done>Personnes rencontrées</label_done>
+      <tooltip><![CDATA[
+        Ils ne vous laisseront pas partir avec un simple bonjour.<br>Débloqué à 22% d'exploration.
+      ]]></tooltip>
+    </meet_people>
+    <investigate>
+      <label>Enquêter</label>
+      <label_done>Enquête menée</label_done>
+      <tooltip><![CDATA[
+        Vous avez entendu des rumeurs...<br>Débloqué à 22% de personnes rencontrées.
+      ]]></tooltip>
+    </investigate>
+    <explore_forest>
+      <label>Explorer le bois</label>
+      <label_done>Bois exploré</label_done>
+      <tooltip><![CDATA[
+        Quel endroit plaisant.<br>2x progrès avec des lunettes.
+      ]]></tooltip>
+    </explore_forest>
+    <old_shortcut>
+      <label>Vieux raccourci</label>
+      <label_done>Raccourci Exploré</label_done>
+      <tooltip><![CDATA[
+        Personne n'est passé par ici depuis longtemps.<br>Donne des herbes supplémentaires.<br>Donne des sujets de discussion pour l'hermite. Recevez 1% de récompense pour Parle à l'hermite pour chaque % de raccourci exploré.<br>Débloqué à 20% de bois exploré.
+      ]]></tooltip>
+    </old_shortcut>
+    <hermit>
+      <label>Talk To Hermit</label>
+      <label_done>Hermit Knowledge Learned</label_done>
+      <tooltip><![CDATA[
+        This old man is happy to have a listening ear, surely he has some useful knowledge. You hope.<br>Speed is 1% faster for Gather Herbs, Practical Magic, and Learn Alchemy per 1% of Hermit Knowledge.<br>Unlocked with both 20% Shortcut Explored and 40 Magic.
+      ]]></tooltip>
+    </hermit>
+    <explore_city>
+      <label>Explore City</label>
+      <label_done>City Explored</label_done>
+      <tooltip><![CDATA[
+        Everyone is so busy, and there's so much to do.<br>2x progress with glasses.
+      ]]></tooltip>
+    </explore_city>
+    <get_drunk>
+      <label>Get Drunk</label>
+      <label_done>Rumors Heard</label_done>
+      <tooltip><![CDATA[
+        Sometimes you just need a drink.<br>Costs 2 gold and requires reputation greater than -3.<br>Costs 1 reputation.<br>Unlocked at 20% City Explored.
+      ]]></tooltip>
+    </get_drunk>
+    <buy_glasses>
+      <label>Buy Glasses</label>
+      <tooltip><![CDATA[
+        That's not fair. There was time now. There was all the time I needed.<br>Now you have to get new glasses again for 10 gold!<br>Causes Wander to be 4x as effective for the rest of the loop.<br>Affects any action with the glasses icon<br>Can only have 1 Buy Glasses action.<br>Unlocked at 20% explored.
+      ]]></tooltip>
+    </buy_glasses>
+    <buy_mana>
+      <label>Buy Mana</label>
+      <tooltip><![CDATA[
+        1 gold = 50 mana. Buys all the mana you can.<br>Unlocked at 20% Explored.
+      ]]></tooltip>
+    </buy_mana>
+    <train_str>
+      <label>Train Strengt</label>
+      <tooltip><![CDATA[
+        Build up those muscles. Again.<br>Has 4x exp/talent gain, and can only be done <div id='trainingLimitStr'></div> times per reset<br>Unlocked at 5% People Met.
+      ]]></tooltip>
+    </train_str>
+    <train_dex>
+      <label>Train Dex</label>
+      <tooltip><![CDATA[
+        The kids are a little mad you're taking their playground. They'll get over it.<br>Has 4x exp/talent gain, and can only be done <div id='trainingLimitDex'></div> times per reset<br>Unlocked at 15% People Met.
+      ]]></tooltip>
+    </train_dex>
+    <train_spd>
+      <label>Train Speed</label>
+      <tooltip><![CDATA[
+        A new friend has a magical treadmill. Gotta go fast.<br>Has 4x exp/talent gain, and can only be done <div id='trainingLimitSpd'></div> times per reset<br>Unlocked at 30% People Met.
+      ]]></tooltip>
+    </train_spd>
+    <throw_party>
+      <label>Throw Party</label>
+      <tooltip><![CDATA[
+        Take a break and socialize.<br>8x people met % over Meet People for equivalent mana cost.<br>Costs 2 reputation.<br>Unlocked at 30% Investigated.
+      ]]></tooltip>
+    </throw_party>
+    <warrior_lesson>
+      <label>Warrior Lessons</label>
+      <tooltip><![CDATA[
+        Learning to fight is probably important; you have a long journey ahead of you.<br>Requires 2 reputation.<br>Unlocked at 20% Investigated.
+      ]]></tooltip>
+    </warrior_lesson>
+    <mage_lesson>
+      <label>Mage Lessons</label>
+      <tooltip><![CDATA[
+        The mystic got you into this mess, maybe it can help you get out of it.<br>Requires 2 reputation.<br>Unlocked at 20% Investigated.
+      ]]></tooltip>
+    </mage_lesson>
+    <buy_supplies>
+      <label>Buy Supplies</label>
+      <tooltip><![CDATA[
+          Prepare to move on.<br>Costs <div id='suppliesCost'></div> gold.<br>You only need one set of supplies.<br>Unlocks at a combined skill of 35.
+      ]]></tooltip>
+    </buy_supplies>
+    <haggle>
+      <label>Haggle</label>
+      <tooltip><![CDATA[
+          They won't like you as much, but hey - you're leaving.<br>Costs 1 reputation to reduce the price of supplies by 20. <br>Unlocks at a combined skill of 35.
+      ]]></tooltip>
+    </haggle>
+    <start_journey>
+      <label>Start Journey</label>
+      <tooltip><![CDATA[
+          Follow the trail to end up at the next town. You need to keep moving until you can learn how to shut these loops off.<br>Costs 1 supplies. Finish once to unlock Forest Path's actions, then finish this in order to use Forest Path's actions.<br>Unlocks at a combined skill of 35.
+      ]]></tooltip>
+    </start_journey>
+    <train_soul>
+      <label>Sit By Waterfall</label>
+      <tooltip><![CDATA[
+        It's peaceful here. Loud, but peaceful.<br>Has 4x exp/talent gain, and can only be done <div id='trainingLimitSoul'></div> times per reset<br>Unlocked at 70% Forest Explored.
+      ]]></tooltip>
+    </train_soul>
+    <practical_magic>
+      <label>Practical Magic</label>
+      <tooltip><![CDATA[
+        Such simple uses to help out with everyday tasks. Genius, really. It's like pulling teeth getting this knowledge from the Hermit though.<br>Unlocked with both 20% Hermit Knowledge and 50 Magic.
+      ]]></tooltip>
+    </practical_magic>
+    <learn_alchemy>
+      <label>Learn Alchemy</label>
+      <tooltip><![CDATA[
+          You can listen to him yammer while making light healing and remedy potions.<br>You're starting to think the potion that caused you to loop time was a complex one.<br>You provide the ingredients; costs 10 herbs.<br>Gives alchemy and magic skill.<br>Unlocked with both 40% Hermit Knowledge and 60 Magic.
+      ]]></tooltip>
+    </learn_alchemy>
+    <brew_potions>
+      <label>Brew Potions</label>
+      <tooltip><![CDATA[
+          Bubbles and Flasks. Potions and Magic.<br>Requires 5 reputation or he won't let you near his stuff.<br>Creates a potion from 10 herbs to sell at the next town.<br>Gives alchemy and magic skill.<br>Unlocked with 10 Alchemy.
+      ]]></tooltip>
+    </brew_potions>
+    <continue_on>
+      <label>Continue On</label>
+      <tooltip><![CDATA[
+          Keep walking to the next town, Merchanton.<br>Mana cost reduced by 60 per Old Shortcut %.
+      ]]></tooltip>
+    </continue_on>
+    <purchase_mana>
+      <label>Purchase Mana</label>
+      <tooltip><![CDATA[
+          1 gold = 50 mana. Buys all the mana you can.
+      ]]></tooltip>
+    </purchase_mana>
+    <sell_potions>
+      <label>Sell Potions</label>
+      <tooltip><![CDATA[
+        Potions are worth 1 gold per alchemy skill, but it takes a bit to find a seller.
+    ]]></tooltip>
+    </sell_potions>
+    <read_books>
+      <label>Read Books</label>
+      <tooltip><![CDATA[
+        There's a library! You always loved reading.<br>Discover new worlds and perspectives, get ideas from fiction characters, and empathize with the desire to be stronger.<br>Requires glasses.<br>Has 4x exp/talent gain, and can only be done <div id='trainingLimitInt'></div> times per reset<br>Unlocks at 50% city explored.
+      ]]></tooltip>
+    </read_books>
+    <smash_pots>
+      <label>Smash Pots</label>
+      <tooltip><![CDATA[
+          They're just sitting there, unbroken, full of potential.<br>Pots with loot in them have 100 mana.<br>Every 10 pots have mana.
+      ]]></tooltip>
+    </smash_pots>
+    <locks>
+      <label>Pick Locks</label>
+      <tooltip><![CDATA[
+          Don't worry; they won't remember.<br>Houses with loot in them have 10 gold.<br>Every 10 houses have gold.<br>Unlocked at 20% Explored.
+      ]]></tooltip>
+    </locks>
+    <short_quest>
+      <label>Short Quest</label>
+      <tooltip><![CDATA[
+          Be a hero! ...If the reward is good and it doesn't take too long.<br>Short Quests with loot give 20 gold as a reward.<br>Every 5 Short Quests have loot.<br>Unlocked at 5% People Met.
+      ]]></tooltip>
+    </short_quest>
+    <long_quest>
+      <label>Long Quest</label>
+      <tooltip><![CDATA[
+          Be a more impressive hero! ...As long as someone is watching.<br>Long Quests with loot give 25 gold and 1 reputation as a reward.<br>Every 5 Long Quests have loot.<br>Unlocked at 10% Investigated.
+      ]]></tooltip>
+    </long_quest>
+    <wild_mana>
+      <label>Wild Mana</label>
+      <tooltip><![CDATA[
+          They're out of sight of most travellers, but you have time to find and harvest them.<br>Every good mana spot has 200 mana.<br>Every 10 mana spots have good mana.
+      ]]></tooltip>
+    </wild_mana>
+    <gather_herbs>
+      <label>Gather Herbs</label>
+      <tooltip><![CDATA[
+          Might as well dig up anything useful you find.<br>Every 10 funny plants are herbs.<br>Unlocked at 10% Forest Explored.
+      ]]></tooltip>
+    </gather_herbs>
+    <hunt>
+      <label>Hunt</label>
+      <tooltip><![CDATA[
+          The forest provides.<br>Every 10 animals have good hides.<br>Unlocked at 40% Forest Explored.<br>NOTE: Using hide is not implemented yet. I'll remove this note when it is.
+      ]]></tooltip>
+    </hunt>
+    <gamble>
+      <label>Gamble</label>
+      <tooltip><![CDATA[
+          The cards still somehow come out different every time.<br>Has 2x exp/talent gain<br>Costs 20 gold and 1 reputation.<br>Requires reputation greater than -5.<br>You win against every 10 suckers, and get 60 gold for winning.
+      ]]></tooltip>
+    </gamble>
+    <heal_sick>
+      <label>Heal The Sick</label>
+      <tooltip><![CDATA[
+          You won't be able to heal them all, but they'll be thankful for doing what you can.<br>Healing is always 3 parts, each with a main stat - Diagnose (Per), Treat (Int), Inform (Cha).<br>Gives (magic skill) * (1 + main stat / 100) * sqrt(1 + times completed / 100) * (original mana cost / actual mana cost) progress points per mana.<br>Requires 12 Magic skill.<br>Gives 3 reputation upon patient completion.
+      ]]></tooltip>
+    </heal_sick>
+    <fight_monsters>
+      <label>Fight Monsters</label>
+      <tooltip><![CDATA[
+          Slowly, you're figuring out their patterns.<br>Fighting rotates between 3 types of battles, each with a main stat - Quick (Spd), Defensive (Str), Aggressive (Con).<br>Gives (combat skill) * (1 + main stat / 100) * sqrt(1 + times completed / 100) * (original mana cost / actual mana cost) progress points per mana.<br>Requires 10 Combat skill.<br>Gives 20 gold per fight segment completion.
+      ]]></tooltip>
+    </fight_monsters>
+    <small_dungeon>
+      <label>Small Dungeon</label>
+      <tooltip><![CDATA[
+          There are small changes each time; it's harder to get used to. The soulstones at the end last through loops, but they're not always in the dungeon... Strange.<br>The dungeon requires different skills at different points.<br>One action can clear multiple dungeons if your stats are high enough.<br>Gives (magic + combat skill) * (1 + main stat / 100) * sqrt(1 + times completed / 200) * (original mana cost / actual mana cost) progress points per mana.<br>Requires a combined skill of 35.<br>Gives 1 soulstone per completion - hover over Completed for info.
+      ]]></tooltip>
+    </small_dungeon>
+    <adventure_guild>
+      <label>Adventure Guild</label>
+      <tooltip><![CDATA[
+          The one stop shop for all your adventuring needs.<br>Take their tests and get a rank!<br>You can only join 1 guild at a time, and only try once.<br>Gives 200 mana per rank.<br>Gives ((magic skill)/2 + (combat skill)) * (1 + main stat / 100) * sqrt(1 + times completed / 400) * (original mana cost / actual mana cost) progress points per mana.<br>Unlocks at 20% rumors heard.
+      ]]></tooltip>
+    </adventure_guild>
   </actions>
 </body>
