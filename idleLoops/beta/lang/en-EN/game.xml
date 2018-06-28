@@ -243,4 +243,60 @@
         <counter_text>Total Bonus Seconds</counter_text>
     </bonus_seconds>
   </time_controls>
+  <stats>
+    <dex>
+      <blurb>Know your body.</blurb>
+      <long_form>Dexterity</long_form>
+      <short_form>dex</short_form>
+    </dex>
+    <str>
+      <blurb>Train your body.</blurb>
+      <long_form>Strength</long_form>
+      <short_form>str</short_form>
+    </str>
+    <con>
+      <blurb>Just a little longer. Just a little more.</blurb>
+      <long_form>Constitution</long_form>
+      <short_form>con</short_form>
+    </con>
+    <spd>
+      <blurb>Gotta go fast.</blurb>
+      <long_form>Speed</long_form>
+      <short_form>spd</short_form>
+    </spd>
+    <per>
+      <blurb>Look a little closer...</blurb>
+      <long_form>Perception</long_form>
+      <short_form>per</short_form>
+    </per>
+    <cha>
+      <blurb>Conversation is a battle.</blurb>
+      <long_form>Charisma</long_form>
+      <short_form>cha</short_form>
+    </cha>
+    <int>
+      <blurb>Learning to learn.</blurb>
+      <long_form>Intelligence</long_form>
+      <short_form>int</short_form>
+    </int>
+    <luck>
+      <blurb>Opportunity favors the fortunate.</blurb>
+      <long_form>Luck</long_form>
+      <short_form>luck</short_form>
+    </luck>
+    <soul>
+      <blurb>You are the captain.</blurb>
+      <long_form>Soul</long_form>
+      <short_form>soul</short_form>
+    </soul>
+    <tooltip>
+      <level>Level</level>
+      <level_exp>Level Exp</level_exp>
+      <talent>Talent</talent>
+      <talent_exp>Talent Exp</talent_exp>
+      <soulstone>Soulstone</soulstone>
+      <soulstone_multiplier>Soulstone Mult</soulstone_multiplier>
+      <bonus_xp>Bonus XP</bonus_xp>
+    </tooltip>
+  </stats>
 </body>

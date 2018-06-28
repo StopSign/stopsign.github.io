@@ -23,7 +23,6 @@ function View() {
         this.changeStatView();
     };
 
-    this.statBlurbs = ["Know your body.", "Train your body.", "Just a little longer. Just a little more.", "Gotta go fast.", "Look a little closer...", "Conversation is a battle.", "Learning to learn.", "Opportunity favors the fortunate.", "You are the captain."];
     this.statLocs = [{x:165, y:43}, {x:270, y:79}, {x:325, y:170}, {x:306, y:284}, {x:225, y:352}, {x:102, y:352}, {x:26, y:284}, {x:2, y:170}, {x:56, y:79}];
     this.createStats = function() {
         statGraph.init();
@@ -38,7 +37,7 @@ function View() {
             totalStatDiv +=
                 "<div class='statRadarContainer showthat' style='left:"+loc.x+"px;top:"+loc.y+"px;' onmouseover='view.showStat(\""+stat+"\")'>" +
                     "<div class='statLabelContainer'>" +
-                        "<div class='medium bold' style='margin-left:18px'>"+statsLongForm(stat)+"</div>" +
+                        "<div class='medium bold' style='margin-left:18px'>"+_txt("stats>"+stat+">long_form")+"</div>" +
                         "<div style='color:#737373;' class='statNum'><div class='medium' id='stat"+stat+"ss'></div></div>" +
                         "<div class='statNum'><div class='medium' id='stat"+stat+"Talent'>0</div></div> " +
                         "<div class='medium statNum bold' id='stat"+stat+"Level'>0</div> " +
@@ -46,15 +45,15 @@ function View() {
                     "<div class='thinProgressBarUpper'><div class='statBar statLevelBar' id='stat"+stat+"LevelBar'></div></div>" +
                     "<div class='thinProgressBarLower'><div class='statBar statTalentBar' id='stat"+stat+"TalentBar'></div></div>" +
                     "<div class='showthis' id='stat"+stat+"Tooltip' style='width:225px;'>" +
-                        "<div class='medium bold'>"+statsLongForm(stat)+"</div><br>" +
-                        this.statBlurbs[i] + "<br>" +
-                        "<div class='medium bold'>Level</div> <div id='stat"+stat+"Level2'></div><br>" +
-                        "<div class='medium bold'>Level Exp</div> <div id='stat"+stat+"LevelExp'></div>/<div id='stat"+stat+"LevelExpNeeded'></div> <div class='statTooltipPerc'>(<div id='stat"+stat+"LevelProgress'></div>%)</div><br>" +
-                        "<div class='medium bold'>Talent</div> <div id='stat"+stat+"Talent2'></div><br>" +
-                        "<div class='medium bold'>Talent Exp</div> <div id='stat"+stat+"TalentExp'></div>/<div id='stat"+stat+"TalentExpNeeded'></div> <div class='statTooltipPerc'>(<div id='stat"+stat+"TalentProgress'></div>%)</div><br>" +
+                        "<div class='medium bold'>"+_txt("stats>"+stat+">long_form")+"</div><br>" +
+                        _txt("stats>"+stat+">blurb") + "<br>" +
+                        "<div class='medium bold'>"+_txt("stats>tooltip>level")+"</div> <div id='stat"+stat+"Level2'></div><br>" +
+                        "<div class='medium bold'>"+_txt("stats>tooltip>level_exp")+"</div> <div id='stat"+stat+"LevelExp'></div>/<div id='stat"+stat+"LevelExpNeeded'></div> <div class='statTooltipPerc'>(<div id='stat"+stat+"LevelProgress'></div>%)</div><br>" +
+                        "<div class='medium bold'>"+_txt("stats>tooltip>talent")+"</div> <div id='stat"+stat+"Talent2'></div><br>" +
+                        "<div class='medium bold'>"+_txt("stats>tooltip>talent_exp")+"</div> <div id='stat"+stat+"TalentExp'></div>/<div id='stat"+stat+"TalentExpNeeded'></div> <div class='statTooltipPerc'>(<div id='stat"+stat+"TalentProgress'></div>%)</div><br>" +
                         "<div id='ss"+stat+"Container' class='ssContainer'>" +
-                            "<div class='bold'>Soulstones</div> <div id='ss"+stat+"'></div><br>" +
-                            "<div class='medium bold'>Soulstone Mult</div> x<div id='stat"+stat+"SSBonus'></div>" +
+                            "<div class='bold'>"+_txt("stats>tooltip>soulstone")+"</div> <div id='ss"+stat+"'></div><br>" +
+                            "<div class='medium bold'>"+_txt("stats>tooltip>soulstone_multiplier")+"</div> x<div id='stat"+stat+"SSBonus'></div>" +
                         "</div>" +
                     "</div>" +
                 "</div>"
@@ -299,7 +298,7 @@ function View() {
         for(let i = 0; i < statList.length; i++) {
             let statName = statList[i];
             if(action["statExp"+statName]) {
-                statExpGain += "<div class='bold'>"+statName+"</div> " + intToString(action["statExp"+statName], 2) + "<br>";
+                statExpGain += "<div class='bold'>"+_txt("stats>"+statName+">short_form")+"</div> " + intToString(action["statExp"+statName], 2) + "<br>";
             }
         }
         expGainDiv.innerHTML = statExpGain;
@@ -564,7 +563,8 @@ function View() {
         let keyNames = Object.keys(action.stats);
         for(let i = 0; i < keyNames.length; i++) {
             let statName = keyNames[i];
-            actionStats += "<div class='bold'>" + statName + "</div> " + (action.stats[statName]*100)+"%<br>";
+            let statLabel = _txt("stats>"+statName+">short_form");
+            actionStats += "<div class='bold'>" + statLabel + "</div> " + (action.stats[statName]*100)+"%<br>";
         }
         let extraImage = "";
         if(action.affectedBy) {
@@ -667,7 +667,7 @@ function View() {
                 "<div class='bold townLabel' style='float:left' id='multiPartName"+action.varName+"'></div>"+
                 "<div class='completedInfo showthat' id='completedContainer"+action.varName+"' onmouseover='view.updateSoulstoneChance()'>" +
                     "<div class='bold'>Completed</div> <div id='completed"+action.varName+"'></div>" +
-                    "<div class='showthis'>"+completedTooltip+"</div>" +
+                    (completedTooltip === "" ? "" :"<div class='showthis'>"+completedTooltip+"</div>") + // to prevent an empty tooltip, was reported as bug on discord
                 "</div><br>"+
                 pbars +
             "</div>";
@@ -759,7 +759,7 @@ function View() {
                 continue;
             }
             let mainStat = action.loopStats[(towns[action.townNum][action.varName+"LoopCounter"]+i) % action.loopStats.length];
-            document.getElementById("mainStat"+i+action.varName).innerHTML = mainStat;
+            document.getElementById("mainStat"+i+action.varName).innerHTML = _txt("stats>"+mainStat+">short_form");
             addStatColors(expBar, mainStat);
             document.getElementById("segmentName"+i+action.varName).innerHTML = action.getSegmentName(towns[action.townNum][action.varName+"LoopCounter"]+i);
         }
@@ -824,25 +824,6 @@ function View() {
             document.getElementById("statsColumn").style.width = "410px";
         }
     };
-}
-
-function statsLongForm(stat) {
-    if(stat === "Str") {
-        return "Strength";
-    } else if(stat === "Dex") {
-        return "Dexterity";
-    } else if(stat === "Con") {
-        return "Constitution";
-    } else if(stat === "Per") {
-        return "Perception";
-    } else if(stat === "Int") {
-        return "Intelligence";
-    } else if(stat === "Cha") {
-        return "Charisma";
-    } else if(stat === "Spd") {
-        return "Speed";
-    }
-    return stat;
 }
 
 function unlockStory(num) {
