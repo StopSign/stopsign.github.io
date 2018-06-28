@@ -315,4 +315,32 @@
       <radar>Radar Chart</radar>
     </view>
   </stats>
+  <skills>
+    <title>Skills</title>
+    <combat>
+      <label>Combat</label>
+      <desc>Fight for your lives.</desc>
+    </combat>
+    <magic>
+      <label>Magic</label>
+      <desc>Control the aether to cast and conjure.</desc>
+    </magic>
+    <practical_magic>
+      <label>Practical Magic</label>
+      <desc>Mage Hand, Prestidigitation, Detect Magic, and other useful tricks to help out.</desc>
+      <desc2><![CDATA[Smash Pots and Gather Wild Mana have 1% reduced mana cost per level (rounded up).<br>
+      Pick Locks get 1% more gold per level from 1-200 (rounded down).<br>
+      Short Quests get 1% more gold per level from 101-300 (rounded down).<br>
+      Long Quests get 1% more gold per level from 201-400 (rounded down).]]></desc2>
+    </practical_magic>
+    <alchemy>
+      <label>Alchemy</label>
+      <desc>Brewing potions is hard work! It's a good thing you found a teacher.</desc>
+      <desc2>The Magic teacher in Beginnersville adores alchemists. +1% to Mage Lessons (rounded down) per level.</desc2>
+    </alchemy>
+    <tooltip>
+      <level>Level</level>
+      <no_reset_on_restart>Skills last through resets.</no_reset_on_restart>
+    </tooltip>
+  </skills>
 </body>

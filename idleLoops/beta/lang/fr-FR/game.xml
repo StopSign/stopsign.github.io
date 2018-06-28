@@ -316,4 +316,32 @@
       <radar>Vue radar</radar>
     </view>
   </stats>
+  <skills>
+    <title>Compétences</title>
+    <combat>
+      <label>Combat</label>
+      <desc>Battez vous pour votre vie.</desc>
+    </combat>
+    <magic>
+      <label>Magie</label>
+      <desc>Le contrôle de l'aether pour lancer des sorts et des invocations.</desc>
+    </magic>
+    <practical_magic>
+      <label>Magie Utilitaire</label>
+      <desc>Main de mage, magie de rue, détection de la magie, et d'autre tours utiles.</desc>
+      <desc2><![CDATA[Briser des pots et récolter du mana sauvage ont un coût en mana réduit de 1% par niveau (arrondi au supérieur).<br>
+        Crocheter des serrures rapporte 1% d'or supplémentaire par niveau de 1 à 200 (arrondi à l'inférieur).<br>
+        Courte quête rapporte 1% d'or supplémentaire par niveau de 201 à 300 (arrondi à l'inférieur).<br>
+        Longue quête rapporte 1% d'or supplémentaire par niveau de 201 à 400 (arrondi à l'inférieur).]]></desc2>
+    </practical_magic>
+    <alchemy>
+      <label>Alchimie</label>
+      <desc>Fabriquer des potions est une tâche pas évidente ! C'est une bonne chose que vous ayez trouvé un professeur.</desc>
+      <desc2>L'enseignant en Magie de la Ville du débutant adore l'alchimie. +1% à Leçon de magie (arrondi à l'inférieur) par niveau.</desc2>
+    </alchemy>
+    <tooltip>
+      <level>Niveau</level>
+      <no_reset_on_restart>Conservé lors des redémarrages</no_reset_on_restart>
+    </tooltip>
+  </skills>
 </body>
