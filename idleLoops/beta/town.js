@@ -131,6 +131,7 @@ function Town(index) {
         this.createVars("Gamble");
         this.createProgressVars("City");
         this.createProgressVars("Drunk");
+        this.AdvGuildLoopCounter = 0;
     }
 
 }

@@ -114,6 +114,7 @@ function load() {
     town = towns[2];
     town.expCity = toLoad.expCity !== undefined ? toLoad.expCity : 0;
     town.expDrunk = toLoad.expDrunk !== undefined ? toLoad.expDrunk : 0;
+    town.totalAdvGuild = toLoad.totalAdvGuild !== undefined ? toLoad.totalAdvGuild : 0;
 
     actions.next = [];
     if(toLoad.nextList) {
@@ -213,6 +214,7 @@ function save() {
     town = towns[2];
     toSave.expCity = town.expCity;
     toSave.expDrunk = town.expDrunk;
+    toSave.totalAdvGuild = town.totalAdvGuild;
 
     for(let i = 0; i < towns.length; i++) {
         town = towns[i];

@@ -80,6 +80,8 @@ function translateClassNames(name) {
         return new SellPotions();
     } else if(name === "Read Books") {
         return new ReadBooks();
+    } else if(name === "Adventure Guild") {
+        return new JoinAdvGuild();
     }
     console.log('error trying to create ' + name);
 }
@@ -335,7 +337,7 @@ function ExploreCity() {
     };
 }
 function adjustSuckers() {
-    towns[2].totalGamble = towns[2].getLevel("City") * 10;
+    towns[2].totalGamble = towns[2].getLevel("City") * 3;
 }
 
 function GetDrunk() {
@@ -1397,3 +1399,68 @@ function SmallDungeon() {
     this.finish = function() {
     };
 }
+
+function JoinAdvGuild() {
+    this.name = "Adventure Guild";
+    this.expMult = 1;
+    this.tooltip = "The one stop shop for all your adventuring needs.<br>Take their tests and get a rank!<br>You can only join 1 guild at a time, and only try once.<br>Gives 200 mana per rank.<br>Gives ((magic skill)/2 + (combat skill)) * (1 + main stat / 100) * sqrt(1 + times completed / 400) * (original mana cost / actual mana cost) progress points per mana.<br>Unlocks at 20% rumors heard";
+    this.townNum = 2;
+
+    this.varName = "AdvGuild";
+    this.stats = {
+        Str:.4,
+        Dex:.3,
+        Con:.3
+    };
+    this.loopStats = ["Str", "Dex", "Con"];
+    this.segments = 3;
+    this.manaCost = function() {
+        return 3000;
+    };
+    this.allowed = function() {
+        return 1;
+    };
+    this.loopCost = function(segment) {
+        return precision3(Math.pow(window.curAdvGuildSegment + segment, 1.3)) * 100000;
+    };
+    this.tickProgress = function(offset) {
+        return (getSkillLevel("Magic")/2 + getSelfCombat("Combat")) * (1 + getLevel(this.loopStats[(towns[2].AdvGuildLoopCounter+offset) % this.loopStats.length])/100) * Math.sqrt(1 + towns[2].totalAdvGuild/400);
+    };
+    this.loopsFinished = function() {
+    };
+    this.segmentFinished = function() {
+        window.curAdvGuildSegment++;
+        addMana(200);
+    };
+    this.getPartName = function() {
+        return "Rank " + getAdvGuildRank().name;
+    };
+    this.getSegmentName = function(segment) {
+        return "Rank " + getAdvGuildRank(segment).name;
+    };
+    this.visible = function() {
+        return towns[2].getLevel("Drunk") >= 5;
+    };
+    this.unlocked = function() {
+        return towns[2].getLevel("Drunk") >= 20
+    };
+    this.finish = function() {
+    };
+}
+function getAdvGuildRank(offset) {
+    let name = ["E", "F", "D", "C", "B", "A", "S", "SS", "SSS", "SSSS", "U", "UU", "UUU", "UUUU"][Math.floor(window.curAdvGuildSegment/3+.00001)];
+
+    let bonus = Math.floor(10 + (window.curAdvGuildSegment ** 2)/30);
+    if(!name) {
+        name = "Godlike";
+        bonus = Math.floor(10 + (45 ** 2)/30);
+    } else {
+        if(offset) {
+            name += ["-", "", "+"][offset % 3];
+        } else {
+            name += ["-", "", "+"][window.curAdvGuildSegment % 3];
+        }
+    }
+    return {name:name,bonus:bonus};
+}
+
