@@ -245,6 +245,7 @@
     </bonus_seconds>
   </time_controls>
   <stats>
+    <title>Statistiques</title>
     <dex>
       <blurb>Maîtrise ton corps.</blurb>
       <long_form>Dextérité</long_form>
@@ -298,6 +299,21 @@
       <soulstone>Pierre d'âme</soulstone>
       <soulstone_multiplier>Mult. de pierre d'âme</soulstone_multiplier>
       <bonus_xp>Bonus d'XP</bonus_xp>
+      <explanation><![CDATA[
+          Chaque niveau dans une statistique réduit pour une action la portion du coût correspondant à la statistique d'autant de % que le niveau.
+          Le talent reçoit 1% de l'expérience du niveau, et est conservé au travers des redémarrages.
+          Chaque point de talent augmente les gains d'XP de niveau de la statistique correspondante de 1%.
+          L'XP de niveau gagnée pour une statistique donnée pour une action est (coût réel de mana/coût initial de mana) * (talent %) par tick.
+          Le bonus d'XP est la combinaison du bonus des points de talents et des pierres d'âme.<br><br>
+          Par exemple, Rencontrer des gens coûte 800 mana, et est répartit sur les statistiques <div class="bold">Int</div> 10% <div class="bold">Char</div> 80% <div class="bold">Âme</div> 10%.<br>
+          Ce qui signifie que 80 points de mana sont attribués à <div class="bold">Int</div>, 80 à <div class="bold">Soul</div> et les 640 manas restant à <div class="bold">Char</div>.<br>
+          So vous être niveau 20 en <div class="bold">Char</div> quand l'action débute, le coût réel en mana pour le charise est de 640 / 1.2 = 533.333<br>
+          En ajoutant les 160 manas de <div class="bold">Âme</div> et <div class="bold">Int</div>, le coût réel totla de l'action est (arrondi au supérieur) de 694, soit environ 15% de moins que le coût de base.<br>
+          L'action donnerait (800/694)*(1+talent/100) XP de niveau par mana pour chaqu'un des 694 manas.]]></explanation>
     </tooltip>
+    <view>
+      <regular>Vue classique</regular>
+      <radar>Vue radar</radar>
+    </view>
   </stats>
 </body>

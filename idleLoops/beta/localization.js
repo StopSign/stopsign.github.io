@@ -44,6 +44,11 @@ window.Localization = {
       lib = Localization.lastLib;
     return $(Localization.libs[lib]).find(path);
   },
+  localizePage : function (lib) { // will update every dom element using the .localized class, with a valid js-data "lockey"
+    $(".localized").each(function(x,localizedElement) {
+      $(localizedElement).html(Localization.txt($(localizedElement).data('lockey'),lib));
+    }) 
+  },
 
   // ====== PRIVATE ======
   saveLib : function(libName,xmlData) {

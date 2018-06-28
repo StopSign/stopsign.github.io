@@ -244,6 +244,7 @@
     </bonus_seconds>
   </time_controls>
   <stats>
+    <title>Stats</title>
     <dex>
       <blurb>Know your body.</blurb>
       <long_form>Dexterity</long_form>
@@ -297,6 +298,21 @@
       <soulstone>Soulstone</soulstone>
       <soulstone_multiplier>Soulstone Mult</soulstone_multiplier>
       <bonus_xp>Bonus XP</bonus_xp>
+      <explanation><![CDATA[
+          Each stat level reduces the relevant part of an action's mana cost by 1%.<br>
+          Talent gets 1% of all level progress, and keeps through loops.<br>
+          Each talent level increases Bonus XP of its skill by 1%.<br>
+          XP gain towards an stat per action is (actual mana / original mana) * (talent %) per tick.<br>
+          Bonus XP is a combination of talent and soulstone bonuses.<br><br>
+          e.g. Meet People costs 800 mana and has a breakdown of <div class="bold">Int</div> 10% <div class="bold">Cha</div> 80% <div class="bold">Soul</div> 10%.<br>
+          This effectively means 80 of the mana is controlled by <div class="bold">Int</div>, another 80 by <div class="bold">Soul</div>, and the remaining 640 by <div class="bold">Cha</div>.<br>
+          If your <div class="bold">Cha</div> is level 20 when the action is started, it'd be 640 / 1.2 = 533.333<br>
+          Adding back the 160 from <div class="bold">Soul</div> and <div class="bold">Int</div>, the total mana the action takes (rounded up) is now 694, so ~15% less mana.<br>
+          The action would give (800/694)*(1+talent/100) level exp per mana for the 694 mana.]]></explanation>
     </tooltip>
+    <view>
+      <regular>Regular View</regular>
+      <radar>Radar Chart</radar>
+    </view>
   </stats>
 </body>
