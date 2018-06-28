@@ -1,0 +1,247 @@
+<?xml version="1.0"?>
+<body>
+  <menu>
+    <changelog>
+      <meta>
+        <title>Mises à jour</title>
+        <version_prefix>Version</version_prefix>
+      </meta>
+      <version verNum=".73"><![CDATA[
+          * Changed formula for how Old Shortcut reduces Continue On<br>
+          * Repeat last action on list saves now<br>
+          * Lootable first checkboxes save now<br>
+          * Window title switches when paused correctly<br>
+          * Dragging an action image doesn't change the URL in firefox<br>
+          * 2 more story parts, unlocked at Small Dungeon completion<br>
+          * Re-arrange icon/loop count order on lists<br>
+          * Get Drunk removes 2 gold instead of adding it
+        ]]></version>
+        <version verNum=".72"><![CDATA[
+            * Sound on pause available in options<br>
+            * training limit set to 50 from 10 (for now)<br>
+            * Mana Original is multipled by # loops<br>
+            * Travel Action styling change<br>
+            * Saving in town 3<br>
+            * DRAG AND DROP (Thanks to Hunter)
+      ]]></version>
+        <version verNum=".71"><![CDATA[
+            * Tooltip on reset button<br>
+            * Glasses give x2 to forest<br>
+            * Mana cost reflects the tooltips now rather than an average of stat reduction<br>
+            * Trainings are capped at 10 per loop<br>
+            * New actions! Brew Potions, Continue On, Explore City, Gamble, Get Drunk, Purchase Mana, Sell Potions<br>
+            * Some new actions are usless at the moment.
+      ]]></version>
+        <version verNum=".70"><![CDATA[
+            * Reverted skill nerf (too harsh)<br>
+            * Actually capped glasses<br>
+            * Sell Gold -> Buy Mana<br>
+            * Double soulstone recovery<br>
+            * Nerfed practical magic (more uses for it later)
+      ]]></version>
+        <version verNum=".69"><![CDATA[
+            * Nerfed the soulstone nerf<br>
+            * Cleared additional purple bars on exp<br>
+            * Corrected glasses/throw party tooltips<br>
+            * Actually nerfed skill growth - it's cheaper than before for level 2 - 23, and about 4x harder at level 100<br>
+            * Add action to top of list option
+      ]]></version>
+        <version verNum=".68"><![CDATA[
+            * Added tab icon<br>
+            * Throw Party costs 2 reputation from 3<br>
+            * Removed Guided Tour<br>
+            * Added Buy Glasses<br>
+            * Fixed later segment names for Fight<br>
+            * Nerfed soulstones<br>
+            * Changed soulstone gathering, equalling about half previous rate but more initially<br>
+            * Nerfed skill growth<br>
+            * Added Options and Discord Link (to be expanded)<br>
+            * Start Journey cost 2k -> 1k
+      ]]></version>
+        <version verNum=".67"><![CDATA[
+            * Added FAQ<br>
+            * Doubled effectiveness of Guided Tour<br>
+            * Fixed majority of memory leaks (not all)<br>
+            * Made Heal/Fight requirements visible with training unlock<br>
+            * Lengthened action list div<br>
+            * Changed some wording of descriptions for clarity<br>
+            * Added "lootable first" option, credit to Hunter<br>
+            * Fixed a bug with extreme gain on Heal
+      ]]></version>
+        <version verNum=".66"><![CDATA[
+            * Mostly fixed import being all weird<br>
+            * Changed investigate to be visible earlier<br>
+            * Fixed Old Shortcut to be 100% from 110%<br>
+            * Fixed Investigate to be 100% from 90%<br>
+            * Rewording old shortcut and hermit<br>
+            * Game autopauses if current list is empty<br>
+            * Saves variables even if they're 0 (fixes some incorrect negative values)<br>
+            * Fixes your save if your variables were negative.
+      ]]></version>
+        <version verNum=".65"><![CDATA[
+            * Added Learn Alchemy action and Alchemy skill<br>
+            * Made a reddit post and discord<br>
+            * Hid Skills that are at 0 exp<br>
+            * Import/export
+      ]]></version>
+        <version verNum=".64"><![CDATA[
+            * Start Journey costs 2k mana from 1k<br>
+            * Added Old Shortcut, Talk to Hermit, and Practical Magic actions<br>
+            * Added Practical Magic skill<br>
+            * Widened version tooltips
+      ]]></version>
+        <version verNum=".63"><![CDATA[
+            * Made Heal the Sick, Fight Monster, and Clear Dungeon more difficult<br>
+            * Changing forEach to for loops, I forgot to change return to continue, causing multiple large issues<br>
+            * Made stat window a little larger<br>
+            * Changed town numbers to update on reload, instead of just on a new %
+      ]]></version>
+        <version verNum=".62"><![CDATA[
+            * Added Gather Wild Mana, Gather Herbs, Hunt, and Sit Under Waterfall<br>
+            * Hide supplies/herbs/hide if you have 0<br>
+            * You'll need to complete 1 more % on Forest Explored to update Mana Sources (NOTE: not anymore)<br>
+      ]]></version>
+        <version verNum=".61"><![CDATA[
+            * Removed beautiful forEach loops because IE can't handle them<br>
+            * Possibly fixes game not working on iPads too (tell me if so)<br>
+            * Fixed errors for players with no save file<br>
+            * Adjusted mana costs for new actions
+      ]]></version>
+        <version verNum=".6"><![CDATA[
+            * Added version info<br>
+            * Added Haggle, Buy Supplies, Start Journey, Explore Forest<br>
+            * Added switching towns and town names<br>
+            * Added error messages when an action fails (red bar)<br>
+            * Require reputation now requires, instead of costs<br>
+            * Fixed repeating a last action with a cost bug<br>
+            * Visually separated resources and main actions<br>
+            * Reduced requirements/difficulty for heal/fight/dungeon<br>
+            * WARNING: adblock caused game to freeze. This has no ads, disable if you also freeze<br>
+            * Improved performance (since I was looking anyway)
+      ]]></version>
+    </changelog>
+    <save>
+      <meta>
+        <title>Sauvegarde</title>
+      </meta>
+      <manual_save>Sauvegarde manuelle</manual_save>
+      <input_label>Importer/Exporter</input_label>
+      <export_button>Exporter</export_button>
+      <export_comment><![CDATA[Cliquez sur Exporter pour exporter votre sauvegarde dans le presse-papier (collez avec ctrl-v ailleurs).<br>
+              Collez une sauvegarde et cliquez sur Importer pour importer.]]></export_comment>
+              <import_button>Importer</import_button>
+              <import_comment><![CDATA[
+                ATTENTION : Importer cassera votre sauvegarde si cette sauvegarde est invalide.<br>
+                Un import vide permet de recommencer le jeu à 0, pour de vrai.<br>
+                Si vous voulez vraiiiiiiiment éditer votre sauvegarde, ]]></import_comment>
+              <import_hover_special>survolez-moi ;)</import_hover_special>
+              <import_hover_special_tooltip><![CDATA[In the console, use decode("pasted savefile"), edit, then encode('pasted savefile'), then import it<br>This is mainly for fixing broken savefiles - don't be a cheater.]]></import_hover_special_tooltip>
+    </save>
+    <faq>
+      <meta>
+        <title>FAQ</title>
+        <q_prefix>Q</q_prefix>
+        <a_prefix>R</a_prefix>
+      </meta>
+        <q_a>
+          <q>A quoi servent les statistiques ?</q>
+          <a>Survolez le titre "Statistiques" pour savoir comment elles fonctionnent. Les statistiques importantes dépendent des actions que vous souhaitez faire et qui les utilisent.</a>
+        </q_a>
+        <q_a>
+          <q>Les boucles courtes semblent meilleures.</q>
+          <a>Les boucles courtes sont meilleurs, au début de la partie, avec l'équilibrage actuel. Au fur et à mesure du jeu, en accumulant des points de talents et des pierres d'âme, les boucles plus longues deviennt plus utiles.</a>
+        </q_a>
+        <q_a>
+          <q>Quel devrait être mon premier objectif ?</q>
+          <a>Commencez par vagabonder jusqu'à trouver des façons de regagner du mana. Ensuite, essayez de trouver comment vous entraîner au combat, ce qui vous donne un bonus permanet, et frottez vous à quelques monstres !</a>
+        </q_a>
+      </faq>
+    <options>
+      <meta>
+        <title>Options</title>
+      </meta>
+      <localization_title>Langue</localization_title>
+      <discord>
+        <link>https://discord.gg/EmRuWPp</link>
+        <title>Lien Discord</title>
+      </discord>
+      <adblock_warning><![CDATA[ATTENTION : pour une raison inconnue, Adblock Plus peut créer des lags gênants.<br>Je n'ajouterai jamais de publicités, donc si votre jeu se fige régulièrement, essayez de le désactiver sur cette page.]]></adblock_warning>
+      <pause_audio_cue>Emmetre un son quand le jeu passe en pause</pause_audio_cue>
+    </options>
+  </menu>
+  <tracked_resources>
+    <reset_on_restart_txt>Se réinitialise quand la boucle redémarre.</reset_on_restart_txt>
+    <resource no_reset_on_restart="true">
+      <title>Mana</title>
+      <id>timer</id>
+      <desc>Votre principale ressource. Plus vous avez de mana, plus vous pouvez faire de chose avant que la boucle redémarre.</desc>
+    </resource>
+    <resource>
+      <title>Pièces d'or</title>
+      <id>gold</id>
+      <desc>A vendre pour acheter du mana, ou d'autres actions.</desc>
+    </resource>
+    <resource>
+      <title>Réputation</title>
+      <id>reputation</id>
+      <desc>L'influence que vous avez sur les gens en ville.</desc>
+    </resource>
+    <resource initialy_hidden="true">
+      <title>Provisions</title>
+      <id>supplies</id>
+      <desc>Nécessaire pour aller à la ville suivante.</desc>
+    </resource>
+    <resource initialy_hidden="true">
+      <title>Herbes</title>
+      <id>herbs</id>
+      <desc>Les plantes bénéfiques que vous avez récolté.</desc>
+    </resource>
+    <resource initialy_hidden="true">
+      <title>Peaux</title>
+      <id>hide</id>
+      <desc>Le résultat d'une chasse fructueuse.</desc>
+    </resource>
+    <resource initialy_hidden="true">
+      <title>Potions</title>
+      <id>potions</id>
+      <desc>Rare, mais pas complexe. Vaux quelques pièces d'or.</desc>
+    </resource>
+    <resource initialy_hidden="true" no_count="true">
+      <title>Lunettes</title>
+      <id>glasses</id>
+      <desc>Hooooooo, ces arbres ont tellement de feuilles !</desc>
+    </resource>
+  </tracked_resources>
+  <time_controls>
+    <play_button>Lecture</play_button>
+    <pause_button>Pause</pause_button>
+    <pause_before_restart>Pause avant que la boucle redémarre</pause_before_restart>
+    <restart_button>Redémarrer</restart_button>
+    <restart_text>Redémarre la boucle. N'efface pas la sauvegarde.</restart_text>
+    <story_title>Histoire</story_title>
+    <stories>
+      <story num="0">
+        Vous êtes un simple messager, en long voyage pour livre un colis prioritaire. A l'instant où vous arrivez en ville, vous trébuchez - cassant vos lunettes au passage - et le colis s'éventre, vous recouvrant d'un liquide étrange. Imméditament, votre maigre quantité de mana commence à s'évaporer à une vitesse folle. Alors que la dernière goute de mana disparait, vous vous retrouvez quelques instant plus tôt, alors que le liquide s'imprégnait dans votre peau, vos "réserves" remplies,... mais s'écoulant de nouveau rapidement. Ces quelques secondes se déroulent de nouveau, et de nouveau, et encore. Le monde autour redémarre avec vous, jusqu'à ce que vous décidiez de trouver une manière de prolonger ces "boucles". Des cristaux de mana sont souvent présent dans les poteries en ville, peut être que vous devriez commencer par là....
+      </story>
+      <story num="1">
+        Vous arrivez au bout du donjon. Flotant sur un piédestal, une orbe brille doucement. Vous avez trouvé le coeur du donjon, du premier niveau du donjon en tous cas. Alors que vous vous en emparez, son essense vous pénêtre, imprégnant votre être de son pouvoir. C'est une petite quantité d'énergie, mais c'est un petit donjon. Vous reviendrez prendre ce pouvoir encore et encore, sachant qu'il restera en vous au travers des redémarrages de la boucle.
+      </story>
+      <story num="2">
+        Vous arrivez de nouveau au fond du donjon, mais pour la première fois, le coeur ne brille plus. De tout temps, il s'est murmuré que les coeurs de donjons se régénérent en utilisant le mana qui les entoure, mais vous commencez à vous demander si l'essence de ses précédents incarantions ne le draine pas d'une manière ou d'une autre. Ce n'est pas systématique, mais vous devrez disséminer plus de mana dans le monde pour pouvoir bénéficier de la puissance du coeur. Vous levez les épaules, ne pouvant qu'accepter cette nouvelle originalité de la boucle.
+      </story>
+    </stories>
+    <bonus_seconds>
+        <title>Secondes bonus</title>
+        <main_text><![CDATA[
+          Quand le bonus est actif, vous avez 3 secondes bonus par seconde (4 fois plus rapide).<br>
+          Accumulez 0.8 secondes bonus par seconde quand vous activez la pause, ou que vous êtes hors ligne.<br>
+          Le bonus est
+        ]]></main_text>
+        <state>
+          <on>ACTIF</on>
+          <off>INACTIF</off>
+        </state>
+        <counter_text>Secondes bonus en stock</counter_text>
+    </bonus_seconds>
+  </time_controls>
+</body>

@@ -64,6 +64,14 @@ function getSkillLevel(skill) {
     return getSkillLevelFromExp(skills[skill].exp);
 }
 
+function getSelfCombat() {
+    return getSkillLevel("Combat");
+}
+
+function getTeamCombat() {
+    return getSkillLevel("Combat");
+}
+
 function getPrcToNextSkillLevel(skill) {
     let expOfCurLevel = getExpOfSkillLevel(getSkillLevel(skill));
     let curLevelProgress = skills[skill].exp - expOfCurLevel;

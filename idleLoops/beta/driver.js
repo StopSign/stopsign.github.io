@@ -69,7 +69,7 @@ function recalcInterval(fps) {
 function pauseGame() {
     stop = !stop;
     document.title = stop ? "*PAUSED* Idle Loops" : "Idle Loops";
-    document.getElementById("pausePlay").innerHTML = stop ? "Play" : "Pause";
+    Views.timeControls.switchPausePlayUI(stop);
     if(!stop && (shouldRestart || timer >= timeNeeded)) {
         restart();
     }
@@ -365,11 +365,11 @@ function addOffline(num) {
 }
 
 function toggleOffline() {
-    if(bonusSpeed === 1) { //go fast
-        document.getElementById("isBonusOn").innerHTML = "ON";
+    let goingFast = bonusSpeed === 1;
+    if(goingFast) { //go fast
         bonusSpeed = 4;
     } else { //take it slow
-        document.getElementById("isBonusOn").innerHTML = "OFF";
         bonusSpeed = 1;
     }
+    Views.timeControls.switchBonusSecondsUI(goingFast);
 }

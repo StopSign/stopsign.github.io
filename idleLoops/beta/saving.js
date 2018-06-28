@@ -1,13 +1,16 @@
-let doWork = new Worker('interval.js');
-doWork.onmessage = function (event) {
-    if (event.data === 'interval.start') {
-        tick();
-    }
-};
+function startGame () {
+  window.doWork = new Worker('interval.js');
+  window.doWork.onmessage = function (event) {
+      if (event.data === 'interval.start') {
+          tick();
+      }
+  };
+  displayBetaSaveNote();
+  load();
+}
 
 let isBeta = !!location.href.match(/beta/i);
 let saveName = !isBeta ? "idleLoops1" :  "idleLoopsBeta";
-displayBetaSaveNote();
 
 let timeNeededInitial = 5 * 50;
 let timer = timeNeededInitial;
@@ -48,6 +51,8 @@ let curDate = new Date();
 let totalOfflineMs = 0;
 let bonusSpeed = 1;
 let offlineRatio = .8;
+
+window.curAdvGuildSegment = 0;
 
 
 
@@ -111,6 +116,7 @@ function load() {
     town = towns[2];
     town.expCity = toLoad.expCity !== undefined ? toLoad.expCity : 0;
     town.expDrunk = toLoad.expDrunk !== undefined ? toLoad.expDrunk : 0;
+    town.totalAdvGuild = toLoad.totalAdvGuild !== undefined ? toLoad.totalAdvGuild : 0;
 
     actions.next = [];
     if(toLoad.nextList) {
@@ -171,6 +177,7 @@ function load() {
     }
 
     document.getElementById("repeatLastAction").checked = toLoad.repeatLast;
+    document.getElementById("audioCueToggle").checked = toLoad.pingOnPause !== undefined ? toLoad.pingOnPause : false;
     storyShowing = toLoad.storyShowing !== undefined ? toLoad.storyShowing : 0;
     storyMax = toLoad.storyMax !== undefined ? toLoad.storyMax : 0;
 
@@ -210,6 +217,7 @@ function save() {
     town = towns[2];
     toSave.expCity = town.expCity;
     toSave.expDrunk = town.expDrunk;
+    toSave.totalAdvGuild = town.totalAdvGuild;
 
     for(let i = 0; i < towns.length; i++) {
         town = towns[i];
@@ -230,6 +238,7 @@ function save() {
     toSave.nextList = actions.next;
     toSave.loadouts = loadouts;
     toSave.repeatLast = document.getElementById("repeatLastAction").checked;
+    toSave.pingOnPause = document.getElementById("audioCueToggle").checked;
     toSave.storyShowing = storyShowing;
     toSave.storyMax = storyMax;
     toSave.date = new Date();
@@ -254,8 +263,6 @@ function importSave() {
     load();
     pauseGame();
 }
-
-load();
 
 function displayBetaSaveNote() {
     if(!isBeta) return;
