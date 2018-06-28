@@ -577,7 +577,8 @@ function ThrowParty() {
 
 function WarriorLessons() {
     this.name = "Warrior Lessons";
-    this.expMult = 1;
+    this.expMult = 1.5;
+    this.tooltip = "Learning to fight is probably important; you have a long journey ahead of you.<br>Requires 2 reputation.<br>Unlocked at 20% Investigated.";
     this.townNum = 0;
     this.tooltip = _txt("actions>warrior_lesson>tooltip");
     this.label = _txt("actions>warrior_lesson>label");
@@ -610,7 +611,8 @@ function WarriorLessons() {
 
 function MageLessons() {
     this.name = "Mage Lessons";
-    this.expMult = 1;
+    this.expMult = 1.5;
+    this.tooltip = "The mystic got you into this mess, maybe it can help you get out of it.<br>Requires 2 reputation.<br>Unlocked at 20% Investigated.";
     this.townNum = 0;
     this.tooltip = _txt("actions>mage_lesson>tooltip");
     this.label = _txt("actions>mage_lesson>label");
@@ -653,6 +655,9 @@ function BuySupplies() {
         Cha:.8,
         Luck:.1,
         Soul:.1
+    };
+    this.allowed = function() {
+        return 1;
     };
     this.manaCost = function() {
         return 200;
@@ -777,7 +782,8 @@ function SitByWaterfall() {
 
 function PracticalMagic() {
     this.name = "Practical Magic";
-    this.expMult = 1;
+    this.expMult = 1.5;
+    this.tooltip = "Such simple uses to help out with everyday tasks. Genius, really. It's like pulling teeth getting this knowledge from the Hermit though.<br>Unlocked with both 20% Hermit Knowledge and 50 Magic.";
     this.townNum = 1;
     this.tooltip = _txt("actions>practical_magic>tooltip");
     this.label = _txt("actions>practical_magic>label");
@@ -801,13 +807,15 @@ function PracticalMagic() {
         addSkillExp("Practical", 100);
         view.adjustManaCost("Wild Mana");
         view.adjustManaCost("Smash Pots");
+        view.adjustGoldCosts();
         view.updateProgressActions();
     };
 }
 
 function LearnAlchemy() {
     this.name = "Learn Alchemy";
-    this.expMult = 1;
+    this.expMult = 1.5;
+    this.tooltip = "You can listen to him yammer while making light healing and remedy potions.<br>You're starting to think the potion that caused you to loop time was a complex one.<br>You provide the ingredients; costs 10 herbs.<br>Gives alchemy and magic skill.<br>Unlocked with both 40% Hermit Knowledge and 60 Magic.";
     this.townNum = 1;
     this.tooltip = _txt("actions>learn_alchemy>tooltip");
     this.label = _txt("actions>learn_alchemy>label");
@@ -841,7 +849,8 @@ function LearnAlchemy() {
 
 function BrewPotions() {
     this.name = "Brew Potions";
-    this.expMult = 1;
+    this.expMult = 1.5;
+    this.tooltip = "Bubbles and Flasks. Potions and Magic.<br>Requires 5 reputation or he won't let you near his stuff.<br>Creates a potion from 10 herbs to sell at the next town.<br>Gives alchemy and magic skill.<br>Unlocked with 10 Alchemy.";
     this.townNum = 1;
     this.tooltip = _txt("actions>brew_potions>tooltip");
     this.label = _txt("actions>brew_potions>label");
@@ -1031,6 +1040,7 @@ function PickLocks() {
     this.name = "Pick Locks";
     this.expMult = 1;
     this.varName = "Locks";
+    this.tooltip = "Don't worry; they won't remember.<br>Houses with loot in them have <div id='goldCostLocks'>10</div> gold.<br>Every 10 houses have gold.<br>Unlocked at 20% Explored";
     this.townNum = 0;
     this.tooltip = _txt("actions>locks>tooltip");
     this.label = _txt("actions>locks>label");
@@ -1054,19 +1064,23 @@ function PickLocks() {
     };
     this.finish = function() {
         towns[0].finishRegular(this.varName, 10, function() {
-            let practical = getSkillLevel("Practical");
-            practical = practical <= 200 ? practical : 200;
-            let goldGain = Math.floor(10 * (1 + practical/100));
+            let goldGain = goldCostLocks();
             addGold(goldGain);
             return goldGain;
         })
     };
+}
+function goldCostLocks() {
+    let practical = getSkillLevel("Practical");
+    practical = practical <= 200 ? practical : 200;
+    return Math.floor(10 * (1 + practical/100));
 }
 
 function ShortQuest() {
     this.name = "Short Quest";
     this.expMult = 1;
     this.varName = "SQuests";
+    this.tooltip = "Be a hero! ...If the reward is good and it doesn't take too long.<br>Short Quests with loot give <div id='goldCostSQuests'>20</div> gold as a reward.<br>Every 5 Short Quests have loot.<br>Unlocked at 5% People Met";
     this.townNum = 0;
     this.tooltip = _txt("actions>short_quest>tooltip");
     this.label = _txt("actions>short_quest>label");
@@ -1092,19 +1106,23 @@ function ShortQuest() {
     };
     this.finish = function() {
         towns[0].finishRegular(this.varName, 5, function() {
-            let practical = getSkillLevel("Practical") - 100;
-            practical = practical <= 200 ? (practical >= 0 ? practical : 0) : 200;
-            let goldGain = Math.floor(20 * (1 + practical/100));
+            let goldGain = goldCostSQuests();
             addGold(goldGain);
             return goldGain;
         })
     };
+}
+function goldCostSQuests() {
+    let practical = getSkillLevel("Practical") - 100;
+    practical = practical <= 200 ? (practical >= 0 ? practical : 0) : 200;
+    return Math.floor(20 * (1 + practical/100));
 }
 
 function LongQuest() {
     this.name = "Long Quest";
     this.expMult = 1;
     this.varName = "LQuests";
+    this.tooltip = "Be a more impressive hero! ...As long as someone is watching.<br>Long Quests with loot give <div id='goldCostLQuests'>25</div> gold and 1 reputation as a reward.<br>Every 5 Long Quests have loot.<br>Unlocked at 10% Investigated.";
     this.townNum = 0;
     this.tooltip = _txt("actions>long_quest>tooltip");
     this.label = _txt("actions>long_quest>label");
@@ -1133,13 +1151,16 @@ function LongQuest() {
     this.finish = function() {
         towns[0].finishRegular(this.varName, 5, function() {
             addReputation(1);
-            let practical = getSkillLevel("Practical") - 200;
-            practical = practical <= 200 ? (practical >= 0 ? practical : 0) : 200;
-            let goldGain = Math.floor(25 * (1 + practical/100));
+            let goldGain = goldCostLQuests();
             addGold(goldGain);
             return goldGain;
         })
     };
+}
+function goldCostLQuests() {
+    let practical = getSkillLevel("Practical") - 200;
+    practical = practical <= 200 ? (practical >= 0 ? practical : 0) : 200;
+    return Math.floor(25 * (1 + practical/100));
 }
 
 function WildMana() {
@@ -1448,6 +1469,7 @@ function SmallDungeon() {
 function JoinAdvGuild() {
     this.name = "Adventure Guild";
     this.expMult = 1;
+    this.tooltip = "The one stop shop for all your adventuring needs.<br>Take their tests and get a rank!<br>You can only join 1 guild at a time, and only try once.<br>Gives 200 mana per rank.<br>Gives ((magic skill)/2 + (combat skill)) * (1 + main stat / 100) * sqrt(1 + times completed / 1000) * (original mana cost / actual mana cost) progress points per mana.<br>Unlocks at 20% rumors heard";
     this.townNum = 2;
     this.tooltip = _txt("actions>adventure_guild>tooltip");
     this.label = _txt("actions>adventure_guild>label");
@@ -1467,15 +1489,16 @@ function JoinAdvGuild() {
         return 1;
     };
     this.loopCost = function(segment) {
-        return precision3(Math.pow(window.curAdvGuildSegment + segment, 1.3)) * 100000;
+        return precision3(Math.pow(1.2, towns[2].AdvGuildLoopCounter + segment)) * 5e6;
     };
     this.tickProgress = function(offset) {
-        return (getSkillLevel("Magic")/2 + getSelfCombat("Combat")) * (1 + getLevel(this.loopStats[(towns[2].AdvGuildLoopCounter+offset) % this.loopStats.length])/100) * Math.sqrt(1 + towns[2].totalAdvGuild/400);
+        return (getSkillLevel("Magic")/2 + getSelfCombat("Combat")) * (1 + getLevel(this.loopStats[(towns[2].AdvGuildLoopCounter+offset) % this.loopStats.length])/100) * Math.sqrt(1 + towns[2].totalAdvGuild/1000);
     };
     this.loopsFinished = function() {
     };
     this.segmentFinished = function() {
         window.curAdvGuildSegment++;
+        console.log(window.curAdvGuildSegment);
         addMana(200);
     };
     this.getPartName = function() {
@@ -1488,7 +1511,7 @@ function JoinAdvGuild() {
         return towns[2].getLevel("Drunk") >= 5;
     };
     this.unlocked = function() {
-        return towns[2].getLevel("Drunk") >= 20
+        return towns[2].getLevel("Drunk") >= 20;
     };
     this.finish = function() {
     };
@@ -1501,7 +1524,7 @@ function getAdvGuildRank(offset) {
         name = "Godlike";
         bonus = Math.floor(10 + (45 ** 2)/30);
     } else {
-        if(offset) {
+        if(offset !== undefined) {
             name += ["-", "", "+"][offset % 3];
         } else {
             name += ["-", "", "+"][window.curAdvGuildSegment % 3];
