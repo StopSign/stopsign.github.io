@@ -323,7 +323,7 @@ function ExploreCity() {
     this.townNum = 2;
     this.tooltip = _txt("actions>explore_city>tooltip");
     this.label = _txt("actions>explore_city>label");
-    this.infoName = _txt("actions>explore_city>collectible_label");
+    this.labelDone = _txt("actions>explore_city>collectible_label");
 
     this.varName = "City";
     this.stats = {

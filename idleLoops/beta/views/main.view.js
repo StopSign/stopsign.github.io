@@ -605,7 +605,7 @@ function View() {
 
         const totalDivText =
             "<div id='container"+action.varName+"' class='travelContainer showthat' onclick='addActionToList(\""+action.name+"\", "+action.townNum+", true)'>" +
-            action.name + "<br>" +
+            action.label + "<br>" +
             "<img src='img/"+camelize(action.name)+".svg' class='superLargeIcon'><br>" +
             "<div class='showthis'>" +
             action.tooltip + "<br>" +

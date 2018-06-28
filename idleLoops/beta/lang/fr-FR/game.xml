@@ -420,7 +420,7 @@
     <explore_city>
       <label>Explorer la Ville</label>
       <label_done>Ville explorée</label_done>
-      <collectible_label>City Explored</collectible_label>
+      <collectible_label>Ville explorée</collectible_label>
       <tooltip><![CDATA[
         Everyone is so busy, and there's so much to do.<br>2x progress with glasses.
       ]]></tooltip>
@@ -556,49 +556,49 @@
     </smash_pots>
     <locks>
       <label>Crocheter</label>
-      <collectible_label>Locks Picked</collectible_label>
+      <collectible_label>Serrures Crochetées</collectible_label>
       <tooltip><![CDATA[
           Don't worry; they won't remember.<br>Houses with loot in them have 10 gold.<br>Every 10 houses have gold.<br>Unlocked at 20% Explored.
       ]]></tooltip>
     </locks>
     <short_quest>
       <label>Quête Courte</label>
-      <collectible_label>Short Quests Accomplished</collectible_label>
+      <collectible_label>Quêtes Courtes Accomplies</collectible_label>
       <tooltip><![CDATA[
           Be a hero! ...If the reward is good and it doesn't take too long.<br>Short Quests with loot give 20 gold as a reward.<br>Every 5 Short Quests have loot.<br>Unlocked at 5% People Met.
       ]]></tooltip>
     </short_quest>
     <long_quest>
       <label>Quête Longue</label>
-      <collectible_label>Long Quests Accomplished</collectible_label>
+      <collectible_label>Quêtes Longues Accomplies</collectible_label>
       <tooltip><![CDATA[
           Be a more impressive hero! ...As long as someone is watching.<br>Long Quests with loot give 25 gold and 1 reputation as a reward.<br>Every 5 Long Quests have loot.<br>Unlocked at 10% Investigated.
       ]]></tooltip>
     </long_quest>
     <wild_mana>
       <label>Mana Sauvage</label>
-      <collectible_label>Mana Sources Tapped</collectible_label>
+      <collectible_label>Sources de Mana récoltées</collectible_label>
       <tooltip><![CDATA[
           They're out of sight of most travellers, but you have time to find and harvest them.<br>Every good mana spot has 200 mana.<br>Every 10 mana spots have good mana.
       ]]></tooltip>
     </wild_mana>
     <gather_herbs>
       <label>Récolter Herbes</label>
-      <collectible_label>Funny Plants Uprooted</collectible_label>
+      <collectible_label>Drôles de plantes arrachées</collectible_label>
       <tooltip><![CDATA[
           Might as well dig up anything useful you find.<br>Every 10 funny plants are herbs.<br>Unlocked at 10% Forest Explored.
       ]]></tooltip>
     </gather_herbs>
     <hunt>
       <label>Chasser</label>
-      <collectible_label>Animals Skinned</collectible_label>
+      <collectible_label>Animaux dépecés</collectible_label>
       <tooltip><![CDATA[
           The forest provides.<br>Every 10 animals have good hides.<br>Unlocked at 40% Forest Explored.<br>NOTE: Using hide is not implemented yet. I'll remove this note when it is.
       ]]></tooltip>
     </hunt>
     <gamble>
       <label>Parier</label>
-      <collectible_label>Suckers Swindled</collectible_label>
+      <collectible_label>Badauds arnaqués</collectible_label>
       <tooltip><![CDATA[
           The cards still somehow come out different every time.<br>Has 2x exp/talent gain<br>Costs 20 gold and 1 reputation.<br>Requires reputation greater than -5.<br>You win against every 10 suckers, and get 60 gold for winning.
       ]]></tooltip>
