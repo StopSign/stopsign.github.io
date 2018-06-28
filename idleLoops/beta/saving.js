@@ -36,7 +36,7 @@ let potions = 0;
 
 let curLoadout = 0;
 let loadouts = [];
-let skillList = ["Combat", "Magic", "Practical", "Alchemy"];
+let skillList = ["Combat", "Magic", "Practical", "Alchemy", "Crafting"];
 let skills = {};
 let soulstoneChance = 1;
 let townShowing = 0;
@@ -53,6 +53,7 @@ let bonusSpeed = 1;
 let offlineRatio = .8;
 
 window.curAdvGuildSegment = 0;
+window.curCraftGuildSegment = 0;
 
 
 
@@ -117,6 +118,7 @@ function load() {
     town.expCity = toLoad.expCity !== undefined ? toLoad.expCity : 0;
     town.expDrunk = toLoad.expDrunk !== undefined ? toLoad.expDrunk : 0;
     town.totalAdvGuild = toLoad.totalAdvGuild !== undefined ? toLoad.totalAdvGuild : 0;
+    town.totalCraftGuild = toLoad.totalCraftGuild !== undefined ? toLoad.totalCraftGuild : 0;
 
     actions.next = [];
     if(toLoad.nextList) {
@@ -218,6 +220,7 @@ function save() {
     toSave.expCity = town.expCity;
     toSave.expDrunk = town.expDrunk;
     toSave.totalAdvGuild = town.totalAdvGuild;
+    toSave.totalCraftGuild = town.totalCraftGuild;
 
     for(let i = 0; i < towns.length; i++) {
         town = towns[i];
