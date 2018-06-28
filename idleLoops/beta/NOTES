@@ -90,6 +90,7 @@ hover -> focus
     fight req 2 rep
     trainStr to zone 3
     trainDex/Spd to zone 2
+    wild mana higher initial, worse ratio, 25
     Read Manuals - very hard PBA, improves train combat/magic
     <hidden until dark magic> - Sacrifice - Costs 50 more soulstones each time, gives permanent +10% time modifier in zone 1, max 200%
 

@@ -21,6 +21,7 @@ function View() {
         this.showTown(0);
         this.updateTrainingLimits();
         this.changeStatView();
+        this.adjustGoldCosts();
     };
 
     this.statBlurbs = ["Know your body.", "Train your body.", "Just a little longer. Just a little more.", "Gotta go fast.", "Look a little closer...", "Conversation is a battle.", "Learning to learn.", "Opportunity favors the fortunate.", "You are the captain."];
@@ -254,7 +255,8 @@ function View() {
                     "<div style='text-align:center;width:100%'>"+action.name+"</div><br><br>" +
                     "<div class='bold'>Mana Original</div> <div id='action"+i+"ManaOrig'>0</div><br>" +
                     "<div class='bold'>Mana Used</div> <div id='action"+i+"ManaUsed'>0</div><br>" +
-                    "<div class='bold'>Remaining</div> <div id='action"+i+"Remaining'></div><br><br>" +
+                    "<div class='bold'>Mana Remaining</div> <div id='action"+i+"Remaining'></div><br>" +
+                    "<div class='bold'>Gold Remaining</div> <div id='action"+i+"GoldRemaining'></div><br><br>" +
                     "<div id='action"+i+"ExpGain'></div>" +
                     "<div id='action"+i+"HasFailed' style='display:none'>" +
                         "<div class='bold'>Failed Attempts</div> <div id='action"+i+"Failed'>0</div><br>" +
@@ -291,6 +293,7 @@ function View() {
         document.getElementById("action" + index + "ManaOrig").innerHTML = action.manaCost() * action.loops + "";
         document.getElementById("action" + index + "ManaUsed").innerHTML = action.manaUsed + "";
         document.getElementById("action"+index+"Remaining").innerHTML = (timeNeeded - timer)+"";
+        document.getElementById("action"+index+"GoldRemaining").innerHTML = (gold)+"";
         let statExpGain = "";
         let expGainDiv = document.getElementById("action"+index+"ExpGain");
         while (expGainDiv.firstChild) {
@@ -353,6 +356,9 @@ function View() {
                     removeClassFromDiv(infoDiv, "hidden");
                 }
                 removeClassFromDiv(actionDiv, "locked");
+            }
+            if(action.unlocked() && infoDiv) {
+                removeClassFromDiv(infoDiv, "hidden");
             }
             if(!action.visible()) {
                 addClassToDiv(actionDiv, "hidden");
@@ -627,6 +633,15 @@ function View() {
         document.getElementById("manaCost"+action.varName).innerHTML = action.manaCost();
     };
 
+    this.adjustGoldCost = function(varName, amount) {
+        document.getElementById("goldCost"+varName).innerHTML = amount;
+    };
+    this.adjustGoldCosts = function() {
+        this.adjustGoldCost("Locks", goldCostLocks());
+        this.adjustGoldCost("SQuests", goldCostSQuests());
+        this.adjustGoldCost("LQuests", goldCostLQuests());
+    };
+
     this.createTownInfo = function(action) {
         let totalInfoText =
             "<div class='townInfoContainer showthat' id='infoContainer"+action.varName+"'>" +
@@ -698,7 +713,7 @@ function View() {
 
     this.updateMultiPartSegments = function(action) { //happens every tick
         let segment = 0;
-        let curProgress = towns[0][action.varName];
+        let curProgress = towns[action.townNum][action.varName];
         //update previous segments
         let loopCost = action.loopCost(segment);
         while(curProgress >= loopCost && segment < action.segments) {

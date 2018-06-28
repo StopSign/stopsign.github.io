@@ -52,6 +52,8 @@ let totalOfflineMs = 0;
 let bonusSpeed = 1;
 let offlineRatio = .8;
 
+window.curAdvGuildSegment = 0;
+
 
 
 function closeTutorial() {
@@ -175,6 +177,7 @@ function load() {
     }
 
     document.getElementById("repeatLastAction").checked = toLoad.repeatLast;
+    document.getElementById("audioCueToggle").checked = toLoad.pingOnPause !== undefined ? toLoad.pingOnPause : false;
     storyShowing = toLoad.storyShowing !== undefined ? toLoad.storyShowing : 0;
     storyMax = toLoad.storyMax !== undefined ? toLoad.storyMax : 0;
 
@@ -235,6 +238,7 @@ function save() {
     toSave.nextList = actions.next;
     toSave.loadouts = loadouts;
     toSave.repeatLast = document.getElementById("repeatLastAction").checked;
+    toSave.pingOnPause = document.getElementById("audioCueToggle").checked;
     toSave.storyShowing = storyShowing;
     toSave.storyMax = storyMax;
     toSave.date = new Date();
