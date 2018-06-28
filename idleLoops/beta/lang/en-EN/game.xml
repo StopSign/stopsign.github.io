@@ -343,4 +343,28 @@
       <no_reset_on_restart>Skills last through resets.</no_reset_on_restart>
     </tooltip>
   </skills>
+  <towns>
+    <town0>
+      <name>Beginnersville</name>
+      <desc>The town where every story has a beguining.</desc>
+    </town0>
+    <town1>
+      <name>Forest Path</name>
+      <desc>A forever green forest. You feel mana flowing around...</desc>
+    </town1>
+    <town2>
+      <name>Merchanton</name>
+      <desc>A town that would need a better description.</desc>
+    </town2>
+  </towns>
+  <actions>
+    <title>Action Options</title>
+    <tooltip>
+      <desc><![CDATA[
+          Mana cost is based on ratio of stat %s.<br>
+          Gained exp is proportional too.<br>
+          Exp is gained every tick.<br>
+          Actions will target unchecked objects before known lootable objects.]]></desc>
+    </tooltip>
+  </actions>
 </body>

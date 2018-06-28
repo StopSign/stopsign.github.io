@@ -381,7 +381,8 @@ function View() {
         }
         actionOptionsTown[townNum].style.display = "block";
         townInfos[townNum].style.display = "block";
-        document.getElementById("townName").innerHTML = townNames[townNum];
+        document.getElementById("townName").innerHTML = _txt("towns>town"+townNum+">name");
+        document.getElementById("townDesc").innerHTML = _txt("towns>town"+townNum+">desc");
         townShowing = townNum;
     };
 

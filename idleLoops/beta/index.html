@@ -178,12 +178,7 @@
             <div style="float:left;margin-left:150px;" class="actionIcon fa fa-arrow-left" id="townViewLeft" onclick="view.showTown(townShowing-1)"></div>
             <div class="showthat">
                 <div class="large bold"><div class="bold" id="townName"></div></div>
-                <div class="showthis">
-                    Mana cost is based on ratio of stat %s.<br>
-                    Gained exp is proportional too.<br>
-                    Exp is gained every tick.<br>
-                    Actions will target unchecked objects before known lootable objects.<br>
-                </div>
+                <div id='townDesc' class='showthis'></div>
             </div>
             <div style="float:right;margin-right:150px;" class="actionIcon fa fa-arrow-right" id="townViewRight" onclick="view.showTown(townShowing+1)"></div>
         </div><br>
@@ -191,7 +186,10 @@
         <div id="townInfo1" class='townInfo' style="display:none;"></div>
         <div id="townInfo2" class='townInfo' style="display:none;"></div>
 
-        <div class="large bold" style="display:block;margin:10px auto 2px auto;text-align:center;">Action Options</div>
+        <div class="showthat" style="display:block;margin:10px auto 2px auto;text-align:center;">
+            <span class='large bold localized' data-lockey="actions>title"></span>
+            <div class='showthis localized' data-lockey="actions>tooltip>desc"></div>
+        </div>
         <div id="actionOptionsTown0" class='actionOptions'></div>
         <div id="actionOptionsTown1" class='actionOptions' style="display:none;"></div>
         <div id="actionOptionsTown2" class='actionOptions' style="display:none;"></div>

@@ -344,4 +344,28 @@
       <no_reset_on_restart>Conservé lors des redémarrages</no_reset_on_restart>
     </tooltip>
   </skills>
+  <towns>
+    <town0>
+      <name>Ville du débutant</name>
+      <desc>La ville où toute histoire a un commencement.</desc>
+    </town0>
+    <town1>
+      <name>La forêt parsemée</name>
+      <desc>Une forêt éternellement verte. Vous sentez le mana affluer autour de vous...</desc>
+    </town1>
+    <town2>
+      <name>Marchanville</name>
+      <desc>Une ville qui mériterait une meilleur description.</desc>
+    </town2>
+  </towns>
+  <actions>
+    <title>Actions possibles</title>
+    <tooltip>
+      <desc><![CDATA[
+        Le coût en mana est basé sur un ratio du % de stats.<br>
+        Le gain d'XP est proportionnel aussi.<br>
+        L'expérience est gagnée à chaque tick.<br>
+        Les actions utiliserons les objets non vérifiés avant les objets vérifiés.]]></desc>
+    </tooltip>
+  </actions>
 </body>
