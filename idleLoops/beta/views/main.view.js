@@ -545,6 +545,12 @@ function View() {
         tempObj = new JoinAdvGuild();
         this.createTownAction(tempObj);
         this.createMultiPartPBar(tempObj);
+
+        tempObj = new CraftingGuild();
+        this.createTownAction(tempObj);
+        this.createMultiPartPBar(tempObj);
+
+        this.createTownAction(new ReadBooks());
     };
 
     this.createActionProgress = function(action) {
@@ -709,6 +715,10 @@ function View() {
         this.updateMultiPartSegments(tempObj);
 
         tempObj = new JoinAdvGuild();
+        this.updateMultiPart(tempObj);
+        this.updateMultiPartSegments(tempObj);
+
+        tempObj = new CraftingGuild();
         this.updateMultiPart(tempObj);
         this.updateMultiPartSegments(tempObj);
     };

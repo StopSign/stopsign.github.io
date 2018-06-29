@@ -28,7 +28,7 @@ function Actions() {
             }
             //segment is 0,1,2
             let toAdd = curAction.tickProgress(segment) * (curAction.manaCost() / curAction.adjustedTicks);
-            console.log("using: "+curAction.loopStats[(towns[curAction.townNum][curAction.varName + "LoopCounter"]+segment) % curAction.loopStats.length]+" to add: " + toAdd + " to segment: " + segment + " and part " +towns[curAction.townNum][curAction.varName + "LoopCounter"]+" of progress " + curProgress + " which costs: " + curAction.loopCost(segment));
+            // console.log("using: "+curAction.loopStats[(towns[curAction.townNum][curAction.varName + "LoopCounter"]+segment) % curAction.loopStats.length]+" to add: " + toAdd + " to segment: " + segment + " and part " +towns[curAction.townNum][curAction.varName + "LoopCounter"]+" of progress " + curProgress + " which costs: " + curAction.loopCost(segment));
             towns[curAction.townNum][curAction.varName] += toAdd;
             curProgress += toAdd;
             while(curProgress >= curAction.loopCost(segment)) {
@@ -129,6 +129,9 @@ function Actions() {
         towns[2].AdvGuild = 0;
         towns[2].AdvGuildLoopCounter = 0;
         window.curAdvGuildSegment = 0;
+        towns[2].CraftGuild = 0;
+        towns[2].CraftGuildLoopCounter = 0;
+        window.curCraftGuildSegment = 0;
         if(document.getElementById("currentListActive").checked) {
             this.currentPos = 0;
             this.completedTicks = 0;

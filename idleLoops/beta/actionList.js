@@ -962,8 +962,8 @@ function SellPotions() {
 }
 
 function ReadBooks() {
-    this.varName = "SellPotions";
-    this.name = "Sell Potions";
+    this.varName = "ReadBooks";
+    this.name = "Read Books";
     this.expMult = 4;
     this.townNum = 2;
     this.tooltip = _txt("actions>read_books>tooltip");
@@ -1552,7 +1552,7 @@ function JoinAdvGuild() {
         return 3000;
     };
     this.allowed = function() {
-        return 1;
+        return window.curCraftGuildSegment === 0 ? 0 : 1
     };
     this.loopCost = function(segment) {
         return precision3(Math.pow(1.2, towns[2].AdvGuildLoopCounter + segment)) * 5e6;
@@ -1564,7 +1564,6 @@ function JoinAdvGuild() {
     };
     this.segmentFinished = function() {
         window.curAdvGuildSegment++;
-        console.log(window.curAdvGuildSegment);
         addMana(200);
     };
     this.getPartName = function() {
@@ -1596,6 +1595,74 @@ function getAdvGuildRank(offset) {
             name += ["-", "", "+"][window.curAdvGuildSegment % 3];
         }
     }
+    name += ", Rank Bonus " + bonus;
     return {name:name,bonus:bonus};
 }
+
+function CraftingGuild() {
+    this.name = "Crafting Guild";
+    this.expMult = 1;
+    this.tooltip = "Learn to use your hands to build big structures.<br>Take their tests and get a rank!<br>You can only join 1 guild at a time, and only try once.<br>Gives 100 Crafting exp per rank.<br>Gives ((magic skill)/2 + (crafting skill)) * (1 + main stat / 100) * sqrt(1 + times completed / 1000) * (original mana cost / actual mana cost) progress points per mana.<br>Unlocks at 20% rumors heard";
+    this.townNum = 2;
+
+    this.varName = "CraftGuild";
+    this.stats = {
+        Dex:.3,
+        Per:.3,
+        Int:.4
+    };
+    this.loopStats = ["Int", "Per", "Dex"];
+    this.segments = 3;
+    this.manaCost = function() {
+        return 3000;
+    };
+    this.allowed = function() {
+        return window.curAdvGuildSegment === 0 ? 0 : 1;
+    };
+    this.loopCost = function(segment) {
+        return precision3(Math.pow(1.2, towns[2].CraftGuildLoopCounter + segment)) * 5e6;
+    };
+    this.tickProgress = function(offset) {
+        return (getSkillLevel("Magic")/2 + getSkillLevel("Crafting")) * (1 + getLevel(this.loopStats[(towns[2].CraftGuildLoopCounter+offset) % this.loopStats.length])/100) * Math.sqrt(1 + towns[2].totalCraftGuild/1000);
+    };
+    this.loopsFinished = function() {
+    };
+    this.segmentFinished = function() {
+        window.curCraftGuildSegment++;
+        addSkillExp("Crafting", 100);
+        addGold(10);
+    };
+    this.getPartName = function() {
+        return "Rank " + getCraftGuildRank().name;
+    };
+    this.getSegmentName = function(segment) {
+        return "Rank " + getCraftGuildRank(segment).name;
+    };
+    this.visible = function() {
+        return towns[2].getLevel("Drunk") >= 5;
+    };
+    this.unlocked = function() {
+        return towns[2].getLevel("Drunk") >= 20;
+    };
+    this.finish = function() {
+    };
+}
+function getCraftGuildRank(offset) {
+    let name = ["E", "F", "D", "C", "B", "A", "S", "SS", "SSS", "SSSS", "U", "UU", "UUU", "UUUU"][Math.floor(window.curCraftGuildSegment/3+.00001)];
+
+    let bonus = Math.floor(10 + (window.curCraftGuildSegment ** 2)/30);
+    if(!name) {
+        name = "Godlike";
+        bonus = Math.floor(10 + (45 ** 2)/30);
+    } else {
+        if(offset !== undefined) {
+            name += ["-", "", "+"][offset % 3];
+        } else {
+            name += ["-", "", "+"][window.curCraftGuildSegment % 3];
+        }
+    }
+    name += ", Rank Bonus " + bonus;
+    return {name:name,bonus:bonus};
+}
+
 
