@@ -401,6 +401,7 @@
       <exp_multiplier>Exp Multiplier</exp_multiplier>
       <higher_done_percent_benefic>You can find more stuff with higher %.</higher_done_percent_benefic>
       <progress_label>Progress</progress_label>
+      <total_found>Total Found</total_found>
     </tooltip>
     <wander>
       <label>Wander</label>
@@ -573,6 +574,9 @@
     <smash_pots>
       <label>Smash Pots</label>
       <label_done>Pots Smashed</label_done>
+      <info_text1>Pots with loot left</info_text1>
+      <info_text2>Pots with loot total</info_text2>
+      <info_text3>Pots to check for loot</info_text3>
       <tooltip><![CDATA[
           They're just sitting there, unbroken, full of potential.<br>Pots with loot in them have 100 mana.<br>Every 10 pots have mana.
       ]]></tooltip>
@@ -580,6 +584,9 @@
     <locks>
       <label>Pick Locks</label>
       <label_done>Locks Picked</label_done>
+      <info_text1>Houses with loot left</info_text1>
+      <info_text2>Houses with loot total</info_text2>
+      <info_text3>Houses to check for loot</info_text3>
       <tooltip><![CDATA[
           Don't worry; they won't remember.<br>Houses with loot in them have 
       ]]></tooltip>
@@ -590,6 +597,9 @@
     <short_quest>
       <label>Short Quest</label>
       <label_done>Short Quests Accomplished</label_done>
+      <info_text1>Quests with loot left</info_text1>
+      <info_text2>Quests with loot total</info_text2>
+      <info_text3>Quests to finish</info_text3>
       <tooltip><![CDATA[
           Be a hero! ...If the reward is good and it doesn't take too long.<br>Short Quests with loot give 
       ]]></tooltip>
@@ -600,6 +610,9 @@
     <long_quest>
       <label>Long Quest</label>
       <label_done>Long Quests Accomplished</label_done>
+      <info_text1>Quests with loot left</info_text1>
+      <info_text2>Quests with loot total</info_text2>
+      <info_text3>Quests to finish</info_text3>
       <tooltip><![CDATA[
           Be a more impressive hero! ...As long as someone is watching.<br>Long Quests with loot give 
       ]]></tooltip>
@@ -610,6 +623,9 @@
     <wild_mana>
       <label>Wild Mana</label>
       <label_done>Mana Sources Tapped</label_done>
+      <info_text1>Sources with loot left</info_text1>
+      <info_text2>Sources with loot total</info_text2>
+      <info_text3>Sources to check for loot</info_text3>
       <tooltip><![CDATA[
           They're out of sight of most travellers, but you have time to find and harvest them.<br>Every good mana spot has 200 mana.<br>Every 10 mana spots have good mana.
       ]]></tooltip>
@@ -617,6 +633,9 @@
     <gather_herbs>
       <label>Gather Herbs</label>
       <label_done>Funny Plants Uprooted</label_done>
+      <info_text1>Plants with loot left</info_text1>
+      <info_text2>Plants with loot total</info_text2>
+      <info_text3>Plants to check for loot</info_text3>
       <tooltip><![CDATA[
           Might as well dig up anything useful you find.<br>Every 10 funny plants are herbs.<br>Unlocked at 10% Forest Explored.
       ]]></tooltip>
@@ -624,6 +643,9 @@
     <hunt>
       <label>Hunt</label>
       <label_done>Animals Skinned</label_done>
+      <info_text1>Animals with loot left</info_text1>
+      <info_text2>Animals with loot total</info_text2>
+      <info_text3>Animals to check for loot</info_text3>
       <tooltip><![CDATA[
           The forest provides.<br>Every 10 animals have good hides.<br>Unlocked at 40% Forest Explored.<br>NOTE: Using hide is not implemented yet. I'll remove this note when it is.
       ]]></tooltip>
@@ -631,6 +653,9 @@
     <gamble>
       <label>Gamble</label>
       <label_done>Suckers Swindled</label_done>
+      <info_text1>Suckers left</info_text1>
+      <info_text2>Suckers total</info_text2>
+      <info_text3>People to check if they're suckers</info_text3>
       <tooltip><![CDATA[
           The cards still somehow come out different every time.<br>Has 2x exp/talent gain<br>Costs 20 gold and 1 reputation.<br>Requires reputation greater than -5.<br>You win against every 10 suckers, and get 60 gold for winning.
       ]]></tooltip>

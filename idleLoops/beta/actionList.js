@@ -841,14 +841,13 @@ function LearnAlchemy() {
 }
 
 function BrewPotions() {
+    this.varName = "Potions";
     this.name = "Brew Potions";
     this.expMult = 1.5;
-    this.tooltip = "Bubbles and Flasks. Potions and Magic.<br>Requires 5 reputation or he won't let you near his stuff.<br>Creates a potion from 10 herbs to sell at the next town.<br>Gives alchemy and magic skill.<br>Unlocked with 10 Alchemy.";
     this.townNum = 1;
     this.tooltip = _txt("actions>brew_potions>tooltip");
     this.label = _txt("actions>brew_potions>label");
 
-    this.varName = "Potions";
     this.stats = {
         Dex:.3,
         Int:.6,
@@ -877,13 +876,13 @@ function BrewPotions() {
 }
 
 function ContinueOn() {
+    this.varName = "Continue";
     this.name = "Continue On";
     this.expMult = 2;
     this.townNum = 1;
     this.tooltip = _txt("actions>continue_on>tooltip");
     this.label = _txt("actions>continue_on>label");
 
-    this.varName = "Continue";
     this.stats = {
         Con:.4,
         Per:.2,
@@ -907,13 +906,13 @@ function ContinueOn() {
 }
 
 function PurchaseMana() {
+    this.varName = "Gold2";
     this.name = "Purchase Mana";
     this.expMult = 1;
     this.townNum = 2;
     this.tooltip = _txt("actions>purchase_mana>tooltip");
     this.label = _txt("actions>purchase_mana>label");
 
-    this.varName = "Gold2";
     this.stats = {
         Cha:.7,
         Int:.2,
@@ -935,13 +934,13 @@ function PurchaseMana() {
 }
 
 function SellPotions() {
+    this.varName = "SellPotions";
     this.name = "Sell Potions";
     this.expMult = 1;
     this.townNum = 2;
     this.tooltip = _txt("actions>sell_potions>tooltip");
     this.label = _txt("actions>sell_potions>label");
 
-    this.varName = "SellPotions";
     this.stats = {
         Cha:.7,
         Int:.2,
@@ -963,13 +962,13 @@ function SellPotions() {
 }
 
 function ReadBooks() {
+    this.varName = "SellPotions";
     this.name = "Sell Potions";
     this.expMult = 4;
     this.townNum = 2;
     this.tooltip = _txt("actions>read_books>tooltip");
     this.label = _txt("actions>read_books>label");
 
-    this.varName = "SellPotions";
     this.stats = {
         Int:.8,
         Soul:.2
@@ -998,15 +997,22 @@ function ReadBooks() {
 //Regular actions have varName, infoName, infoText
 
 function SmashPots() {
+    this.varName = "Pots";
     this.name = "Smash Pots";
     this.expMult = 1;
     this.townNum = 0;
     this.tooltip = _txt("actions>smash_pots>tooltip");
     this.label = _txt("actions>smash_pots>label");
     this.labelDone = _txt("actions>smash_pots>label_done");
+    this.infoText = _txt("actions>smash_pots>info_text1") +
+      " <i class='fa fa-arrow-left'></i> " +
+      _txt("actions>smash_pots>info_text2") +
+      " <i class='fa fa-arrow-left'></i> " +
+      _txt("actions>smash_pots>info_text3") +
+      "<br><div class='bold'>" +
+      _txt("actions>tooltip>total_found") +
+       "</div> <div id='total"+this.varName+"'></div>";
 
-    this.varName = "Pots";
-    this.infoText = "Pots with loot left <i class='fa fa-arrow-left'></i> Pots with loot total <i class='fa fa-arrow-left'></i> Pots to check for loot<br><div class='bold'>Total Found</div> <div id='totalPots'></div>";
     this.stats = {
         Str:.2,
         Per:.2,
@@ -1030,16 +1036,23 @@ function SmashPots() {
 }
 
 function PickLocks() {
+    this.varName = "Locks";
     this.name = "Pick Locks";
     this.expMult = 1;
-    this.varName = "Locks";
     this.townNum = 0;
     this.tooltip = _txt("actions>locks>tooltip");
     this.tooltip2 = _txt("actions>locks>tooltip2");
     this.label = _txt("actions>locks>label");
     this.labelDone = _txt("actions>locks>label_done");
+    this.infoText = _txt("actions>locks>info_text1") +
+      " <i class='fa fa-arrow-left'></i> " +
+      _txt("actions>locks>info_text2") +
+      " <i class='fa fa-arrow-left'></i> " +
+      _txt("actions>locks>info_text3") +
+      "<br><div class='bold'>" +
+      _txt("actions>tooltip>total_found") +
+       "</div> <div id='total"+this.varName+"'></div>";
 
-    this.infoText = "Houses with loot left <i class='fa fa-arrow-left'></i> Houses with loot total <i class='fa fa-arrow-left'></i> Houses to check for loot<br><div class='bold'>Total Found</div> <div id='totalLocks'></div>";
     this.stats = {
         Dex:.5,
         Per:.3,
@@ -1070,16 +1083,23 @@ function goldCostLocks() {
 }
 
 function ShortQuest() {
+    this.varName = "SQuests";
     this.name = "Short Quest";
     this.expMult = 1;
-    this.varName = "SQuests";
     this.townNum = 0;
     this.tooltip = _txt("actions>short_quest>tooltip");
     this.tooltip2 = _txt("actions>short_quest>tooltip2");
     this.label = _txt("actions>short_quest>label");
     this.labelDone = _txt("actions>short_quest>label_done");
+    this.infoText = _txt("actions>short_quest>info_text1") +
+      " <i class='fa fa-arrow-left'></i> " +
+      _txt("actions>short_quest>info_text2") +
+      " <i class='fa fa-arrow-left'></i> " +
+      _txt("actions>short_quest>info_text3") +
+      "<br><div class='bold'>" +
+      _txt("actions>tooltip>total_found") +
+       "</div> <div id='total"+this.varName+"'></div>";
 
-    this.infoText = "Quests with loot left <i class='fa fa-arrow-left'></i> Quests with loot total <i class='fa fa-arrow-left'></i> Quests to finish<br><div class='bold'>Total Found</div> <div id='totalSQuests'></div>";
     this.stats = {
         Str:.2,
         Dex:.1,
@@ -1112,16 +1132,23 @@ function goldCostSQuests() {
 }
 
 function LongQuest() {
+    this.varName = "LQuests";
     this.name = "Long Quest";
     this.expMult = 1;
-    this.varName = "LQuests";
     this.townNum = 0;
     this.tooltip = _txt("actions>long_quest>tooltip");
     this.tooltip2 = _txt("actions>long_quest>tooltip2");
     this.label = _txt("actions>long_quest>label");
     this.labelDone = _txt("actions>long_quest>label_done");
+    this.infoText = _txt("actions>long_quest>info_text1") +
+      " <i class='fa fa-arrow-left'></i> " +
+      _txt("actions>long_quest>info_text2") +
+      " <i class='fa fa-arrow-left'></i> " +
+      _txt("actions>long_quest>info_text3") +
+      "<br><div class='bold'>" +
+      _txt("actions>tooltip>total_found") +
+       "</div> <div id='total"+this.varName+"'></div>";
 
-    this.infoText = "Quests with loot left <i class='fa fa-arrow-left'></i> Quests with loot total <i class='fa fa-arrow-left'></i> Quests to finish<br><div class='bold'>Total Found</div> <div id='totalLQuests'></div>";
     this.stats = {
         Str:.2,
         Int:.2,
@@ -1157,15 +1184,22 @@ function goldCostLQuests() {
 }
 
 function WildMana() {
+    this.varName = "WildMana";
     this.name = "Wild Mana";
     this.expMult = 1;
     this.townNum = 1;
     this.tooltip = _txt("actions>wild_mana>tooltip");
     this.label = _txt("actions>wild_mana>label");
     this.labelDone = _txt("actions>wild_mana>label_done");
+    this.infoText = _txt("actions>wild_mana>info_text1") +
+      " <i class='fa fa-arrow-left'></i> " +
+      _txt("actions>wild_mana>info_text2") +
+      " <i class='fa fa-arrow-left'></i> " +
+      _txt("actions>wild_mana>info_text3") +
+      "<br><div class='bold'>" +
+      _txt("actions>tooltip>total_found") +
+       "</div> <div id='total"+this.varName+"'></div>";
 
-    this.varName = "WildMana";
-    this.infoText = "Sources with loot left <i class='fa fa-arrow-left'></i> Sources with loot total <i class='fa fa-arrow-left'></i> Sources to check for loot<br><div class='bold'>Total Found</div> <div id='totalWildMana'></div>";
     this.stats = {
         Con:.2,
         Int:.6,
@@ -1189,15 +1223,22 @@ function WildMana() {
 }
 
 function GatherHerbs() {
+    this.varName = "Herbs";
     this.name = "Gather Herbs";
     this.expMult = 1;
     this.townNum = 1;
     this.tooltip = _txt("actions>gather_herbs>tooltip");
     this.label = _txt("actions>gather_herbs>label");
     this.labelDone = _txt("actions>gather_herbs>label_done");
+    this.infoText = _txt("actions>gather_herbs>info_text1") +
+      " <i class='fa fa-arrow-left'></i> " +
+      _txt("actions>gather_herbs>info_text2") +
+      " <i class='fa fa-arrow-left'></i> " +
+      _txt("actions>gather_herbs>info_text3") +
+      "<br><div class='bold'>" +
+      _txt("actions>tooltip>total_found") +
+       "</div> <div id='total"+this.varName+"'></div>";
 
-    this.varName = "Herbs";
-    this.infoText = "Plants with loot left <i class='fa fa-arrow-left'></i> Plants with loot total <i class='fa fa-arrow-left'></i> Plants to check for loot<br><div class='bold'>Total Found</div> <div id='totalHerbs'></div>";
     this.stats = {
         Str:.4,
         Dex:.3,
@@ -1221,15 +1262,22 @@ function GatherHerbs() {
 }
 
 function Hunt() {
+    this.varName = "Hunt";
     this.name = "Hunt";
     this.expMult = 1;
     this.townNum = 1;
     this.tooltip = _txt("actions>hunt>tooltip");
     this.label = _txt("actions>hunt>label");
     this.labelDone = _txt("actions>hunt>label_done");
+    this.infoText = _txt("actions>hunt>info_text1") +
+      " <i class='fa fa-arrow-left'></i> " +
+      _txt("actions>hunt>info_text2") +
+      " <i class='fa fa-arrow-left'></i> " +
+      _txt("actions>hunt>info_text3") +
+      "<br><div class='bold'>" +
+      _txt("actions>tooltip>total_found") +
+       "</div> <div id='total"+this.varName+"'></div>";
 
-    this.varName = "Hunt";
-    this.infoText = "Animals with loot left <i class='fa fa-arrow-left'></i> Animals with loot total <i class='fa fa-arrow-left'></i> Animals to check for loot<br><div class='bold'>Total Found</div> <div id='totalHunt'></div>";
     this.stats = {
         Dex:.2,
         Con:.2,
@@ -1254,15 +1302,22 @@ function Hunt() {
 }
 
 function Gamble() {
+    this.varName = "Gamble";
     this.name = "Gamble";
     this.expMult = 2;
     this.townNum = 2;
     this.tooltip = _txt("actions>gamble>tooltip");
     this.label = _txt("actions>gamble>label");
     this.labelDone = _txt("actions>gamble>label_done");
+    this.infoText = _txt("actions>gamble>info_text1") +
+      " <i class='fa fa-arrow-left'></i> " +
+      _txt("actions>gamble>info_text2") +
+      " <i class='fa fa-arrow-left'></i> " +
+      _txt("actions>gamble>info_text3") +
+      "<br><div class='bold'>" +
+      _txt("actions>tooltip>total_found") +
+       "</div> <div id='total"+this.varName+"'></div>";
 
-    this.varName = "Gamble";
-    this.infoText = "Suckers left <i class='fa fa-arrow-left'></i> Suckers total <i class='fa fa-arrow-left'></i> People to check if they're suckers<br><div class='bold'>Total Found</div> <div id='totalGamble'></div>";
     this.stats = {
         Cha:.2,
         Luck:.8
@@ -1296,13 +1351,13 @@ function Gamble() {
 //They also get a bonus depending on how often you complete them
 
 function HealTheSick() {
+    this.varName = "Heal";
     this.name = "Heal The Sick";
     this.expMult = 1;
     this.townNum = 0;
     this.tooltip = _txt("actions>heal_sick>tooltip");
     this.label = _txt("actions>heal_sick>label");
 
-    this.varName = "Heal";
     this.stats = {
         Per:.2,
         Int:.2,
@@ -1340,13 +1395,13 @@ function HealTheSick() {
 }
 
 function FightMonsters() {
+    this.varName = "Fight";
     this.name = "Fight Monsters";
     this.expMult = 1;
     this.townNum = 0;
     this.tooltip = _txt("actions>fight_monsters>tooltip");
     this.label = _txt("actions>fight_monsters>label");
 
-    this.varName = "Fight";
     this.stats = {
         Str:.3,
         Spd:.3,
@@ -1402,13 +1457,13 @@ function monsterNames() { //spd, defensive, aggressive
 }
 
 function SmallDungeon() {
+    this.varName = "SDungeon";
     this.name = "Small Dungeon";
     this.expMult = 1;
     this.townNum = 0;
     this.tooltip = _txt("actions>small_dungeon>tooltip");
     this.label = _txt("actions>small_dungeon>label");
 
-    this.varName = "SDungeon";
     this.stats = {
         Str:.1,
         Dex:.4,
@@ -1460,6 +1515,7 @@ function SmallDungeon() {
 }
 
 function JoinAdvGuild() {
+    this.varName = "AdvGuild";
     this.name = "Adventure Guild";
     this.expMult = 1;
     this.tooltip = "The one stop shop for all your adventuring needs.<br>Take their tests and get a rank!<br>You can only join 1 guild at a time, and only try once.<br>Gives 200 mana per rank.<br>Gives ((magic skill)/2 + (combat skill)) * (1 + main stat / 100) * sqrt(1 + times completed / 1000) * (original mana cost / actual mana cost) progress points per mana.<br>Unlocks at 20% rumors heard";
@@ -1467,7 +1523,6 @@ function JoinAdvGuild() {
     this.tooltip = _txt("actions>adventure_guild>tooltip");
     this.label = _txt("actions>adventure_guild>label");
 
-    this.varName = "AdvGuild";
     this.stats = {
         Str:.4,
         Dex:.3,
