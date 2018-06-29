@@ -169,6 +169,13 @@
       <pause_audio_cue>Emmetre un son quand le jeu passe en pause</pause_audio_cue>
     </options>
   </menu>
+  <tutorial><![CDATA[
+    TUTORIAL<br>
+    Click the Wander action and click Play to start.<br>
+    Wander for a bit, then smash pots.<br>
+    Watch the numbers change, read all the tooltips.<br>
+    Complete the town, go to the next one.<br><br>
+    ]]></tutorial>
   <tracked_resources>
     <reset_on_restart_txt>Se réinitialise quand la boucle redémarre.</reset_on_restart_txt>
     <resource no_reset_on_restart="true">
@@ -310,6 +317,10 @@
           So vous être niveau 20 en <div class="bold">Char</div> quand l'action débute, le coût réel en mana pour le charise est de 640 / 1.2 = 533.333<br>
           En ajoutant les 160 manas de <div class="bold">Âme</div> et <div class="bold">Int</div>, le coût réel totla de l'action est (arrondi au supérieur) de 694, soit environ 15% de moins que le coût de base.<br>
           L'action donnerait (800/694)*(1+talent/100) XP de niveau par mana pour chaqu'un des 694 manas.]]></explanation>
+        <graph_legend><![CDATA[
+          Click the legend to show/hide each.<br>
+          Upon freshly starting, Levels and Talent won't change much.<br>
+          Hover Stats for more info.]]></graph_legend>
     </tooltip>
     <view>
       <regular>Vue classique</regular>
@@ -360,6 +371,8 @@
   </towns>
   <actions>
     <title>Actions possibles</title>
+    <title_list>Action List</title_list>
+    <title_loadout>Loadouts</title_loadout>
     <tooltip>
       <desc><![CDATA[
         Le coût en mana est basé sur un ratio du % de stats.<br>
@@ -370,7 +383,42 @@
       <exp_multiplier>Multiplicateur d'XP</exp_multiplier>
       <higher_done_percent_benefic>Vous pouvez trouver plus de choses avec un meilleur %.</higher_done_percent_benefic>
       <progress_label>Progrès</progress_label>
+      <mana_used>Mana Used</mana_used>
+      <mana_used_explanation><![CDATA[
+          Shows stat gain affecting speed.<br>
+          Updates every completed action.<br>
+          Accurate at end of run.]]></mana_used_explanation>
+      <amount>Amount</amount>
+      <current_list_active>Keep current list active</current_list_active>
+      <repeat_last_action>Repeat last action on list</repeat_last_action>
+      <add_action_top>Add action to top of list</add_action_top>
+      <save_loadout>Save List</save_loadout>
+      <load_loadout>Load Selected List</load_loadout>
+      <total_found>Total Found</total_found>
+      <icons>
+        <circle_thin>Cap to current max</circle_thin>
+        <plus>Add one loop</plus>
+        <minus>Subtract one loop</minus>
+        <arrows_h>Split action</arrows_h>
+        <sort_up>Move action up</sort_up>
+        <sort_down>Move action down</sort_down>
+        <times>Remove action</times>
+      </icons>
+      <list_explanation><![CDATA[
+      Drag and drop the actions to re-arrange them.<br>
+      The next list becomes the current list every restart.<br>
+      One second = 50 mana.<br>
+      Minimum 1 tick per action.<br>
+      Restarts automatically upon no actions left.]]></list_explanation>
     </tooltip>
+    <current_action>
+        <mana_original>Mana Original</mana_original>
+        <mana_used>Mana Used</mana_used>
+        <mana_remaining>Mana Remaining</mana_remaining>
+        <gold_remaining>Gold Remaining</gold_remaining>
+        <failed_attempts>Failed Attempts</failed_attempts>
+        <error>Error</error>
+    </current_action>
     <wander>
       <label>Vagabonder</label>
       <label_done>Exploré</label_done>
@@ -542,6 +590,9 @@
     <smash_pots>
       <label>Casser Pots</label>
       <label_done>Pots Cassés</label_done>
+      <info_text1>Pots with loot left</info_text1>
+      <info_text2>Pots with loot total</info_text2>
+      <info_text3>Pots to check for loot</info_text3>
       <tooltip><![CDATA[
           They're just sitting there, unbroken, full of potential.<br>Pots with loot in them have 100 mana.<br>Every 10 pots have mana.
       ]]></tooltip>
@@ -549,6 +600,9 @@
     <locks>
       <label>Crocheter</label>
       <label_done>Serrures Crochetées</label_done>
+      <info_text1>Houses with loot left</info_text1>
+      <info_text2>Houses with loot total</info_text2>
+      <info_text3>Houses to check for loot</info_text3>
       <tooltip><![CDATA[
           Don't worry; they won't remember.<br>Houses with loot in them have 
       ]]></tooltip>
@@ -559,6 +613,9 @@
     <short_quest>
       <label>Quête Courte</label>
       <label_done>Quêtes Courtes Accomplies</label_done>
+      <info_text1>Quests with loot left</info_text1>
+      <info_text2>Quests with loot total</info_text2>
+      <info_text3>Quests to finish</info_text3>
       <tooltip><![CDATA[
           Be a hero! ...If the reward is good and it doesn't take too long.<br>Short Quests with loot give 
       ]]></tooltip>
@@ -569,6 +626,9 @@
     <long_quest>
       <label>Quête Longue</label>
       <label_done>Quêtes Longues Accomplies</label_done>
+      <info_text1>Quests with loot left</info_text1>
+      <info_text2>Quests with loot total</info_text2>
+      <info_text3>Quests to finish</info_text3>
       <tooltip><![CDATA[
           Be a more impressive hero! ...As long as someone is watching.<br>Long Quests with loot give 
       ]]></tooltip>
@@ -579,6 +639,9 @@
     <wild_mana>
       <label>Mana Sauvage</label>
       <label_done>Sources de Mana récoltées</label_done>
+      <info_text1>Sources with loot left</info_text1>
+      <info_text2>Sources with loot total</info_text2>
+      <info_text3>Sources to check for loot</info_text3>
       <tooltip><![CDATA[
           They're out of sight of most travellers, but you have time to find and harvest them.<br>Every good mana spot has 200 mana.<br>Every 10 mana spots have good mana.
       ]]></tooltip>
@@ -586,6 +649,9 @@
     <gather_herbs>
       <label>Récolter Herbes</label>
       <label_done>Drôles de plantes arrachées</label_done>
+      <info_text1>Plants with loot left</info_text1>
+      <info_text2>Plants with loot total</info_text2>
+      <info_text3>Plants to check for loot</info_text3>
       <tooltip><![CDATA[
           Might as well dig up anything useful you find.<br>Every 10 funny plants are herbs.<br>Unlocked at 10% Forest Explored.
       ]]></tooltip>
@@ -593,6 +659,9 @@
     <hunt>
       <label>Chasser</label>
       <label_done>Animaux dépecés</label_done>
+      <info_text1>Animals with loot left</info_text1>
+      <info_text2>Animals with loot total</info_text2>
+      <info_text3>Animals to check for loot</info_text3>
       <tooltip><![CDATA[
           The forest provides.<br>Every 10 animals have good hides.<br>Unlocked at 40% Forest Explored.<br>NOTE: Using hide is not implemented yet. I'll remove this note when it is.
       ]]></tooltip>
@@ -600,27 +669,88 @@
     <gamble>
       <label>Parier</label>
       <label_done>Badauds arnaqués</label_done>
+      <info_text1>Suckers left</info_text1>
+      <info_text2>Suckers total</info_text2>
+      <info_text3>People to check if they're suckers</info_text3>
       <tooltip><![CDATA[
           The cards still somehow come out different every time.<br>Has 2x exp/talent gain<br>Costs 20 gold and 1 reputation.<br>Requires reputation greater than -5.<br>You win against every 10 suckers, and get 60 gold for winning.
       ]]></tooltip>
     </gamble>
     <heal_sick>
       <label>Soigner Gens</label>
+      <label_done>Healed</label_done>
+      <label_part>Patient</label_part>
       <tooltip><![CDATA[
           You won't be able to heal them all, but they'll be thankful for doing what you can.<br>Healing is always 3 parts, each with a main stat - Diagnose (Per), Treat (Int), Inform (Cha).<br>Gives (magic skill) * (1 + main stat / 100) * sqrt(1 + times completed / 100) * (original mana cost / actual mana cost) progress points per mana.<br>Requires 12 Magic skill.<br>Gives 3 reputation upon patient completion.
       ]]></tooltip>
+      <segment_names>
+        <name>Diagnose</name>
+        <name>Treat</name>
+        <name>Inform</name>
+      </segment_names>
     </heal_sick>
     <fight_monsters>
       <label>Tuer Monstres</label>
+      <label_done>Killed</label_done>
       <tooltip><![CDATA[
           Slowly, you're figuring out their patterns.<br>Fighting rotates between 3 types of battles, each with a main stat - Quick (Spd), Defensive (Str), Aggressive (Con).<br>Gives (combat skill) * (1 + main stat / 100) * sqrt(1 + times completed / 100) * (original mana cost / actual mana cost) progress points per mana.<br>Requires 10 Combat skill.<br>Gives 20 gold per fight segment completion.
       ]]></tooltip>
+      <segment_names>
+        <name>Deer</name>
+        <name>Giant Turtles</name>
+        <name>Goblins</name>
+        <name>Demon Rabbits</name>
+        <name>Giant Honeybadgers</name>
+        <name>Venemous Snakes</name>
+        <name>Angry Monkeys</name>
+        <name>Trolls</name>
+        <name>Ogres</name>
+        <name>Pixies</name>
+        <name>Treants</name>
+        <name>Gelatanous Cubes</name>
+        <name>Fairies</name>
+        <name>Orcs</name>
+        <name>Beholders</name>
+        <name>Spectres</name>
+        <name>Shambling Mound</name>
+        <name>Corrupted Mushroomfolk</name>
+        <name>Giant Owls</name>
+        <name>Blood Trolls</name>
+        <name>Small Wyrms</name>
+        <name>Pikachus</name>
+        <name>Machokes</name>
+        <name>Alakazams</name>
+      </segment_names>
+      <segment_alt_names>
+        <name>Speedy Monsters</name>
+        <name>Tough Monsters</name>
+        <name>Scary Monsters</name>
+      </segment_alt_names>
+      <segment_modifier_1>A couple</segment_modifier_1>
+      <segment_modifier_2>A few</segment_modifier_2>
+      <segment_modifier_3>A bunch of</segment_modifier_3>
     </fight_monsters>
     <small_dungeon>
       <label>Petit Donjon</label>
+      <label_done>Looted</label_done>
+      <label_part>Small Dungeon</label_part>
       <tooltip><![CDATA[
           There are small changes each time; it's harder to get used to. The soulstones at the end last through loops, but they're not always in the dungeon... Strange.<br>The dungeon requires different skills at different points.<br>One action can clear multiple dungeons if your stats are high enough.<br>Gives (magic + combat skill) * (1 + main stat / 100) * sqrt(1 + times completed / 200) * (original mana cost / actual mana cost) progress points per mana.<br>Requires a combined skill of 35.<br>Gives 1 soulstone per completion - hover over Completed for info.
       ]]></tooltip>
+      <completed_tooltip><![CDATA[
+        Each soulstone improves a random stat's exp gain by (1+(soulstones)^.8/10). Each soulstone reduces the chance you'll get the next one by 2%.<br>Chance to receive a soulstone recovers at .00002% per mana.
+      ]]></completed_tooltip>
+      <chance_label>Chance</chance_label>
+      <last_stat_label>Last Stat</last_stat_label>
+      <segment_names>
+        <name>Spike Traps</name>
+        <name>Long Hallways</name>
+        <name>Arrow Traps</name>
+        <name>Riddle Guardian</name>
+        <name>Swinging Axes</name>
+        <name>Boss</name>
+        <name>Loot</name>
+      </segment_names>
     </small_dungeon>
     <adventure_guild>
       <label>Guilde</label>
@@ -629,4 +759,7 @@
       ]]></tooltip>
     </adventure_guild>
   </actions>
+  <spells>
+    <title>Spells</title>
+  </spells>
 </body>
