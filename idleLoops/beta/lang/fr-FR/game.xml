@@ -374,13 +374,11 @@
     <wander>
       <label>Vagabonder</label>
       <label_done>Exploré</label_done>
-      <collectible_label>Explored</collectible_label>
       <tooltip>Explorez la ville, à la recherche de secrets et trésors.</tooltip>
     </wander>
     <meet_people>
       <label>Sociabiliser</label>
       <label_done>Personnes rencontrées</label_done>
-      <collectible_label>Personnes rencontrées</collectible_label>
       <tooltip><![CDATA[
         Ils ne vous laisseront pas partir avec un simple bonjour.<br>Débloqué à 22% d'exploration.
       ]]></tooltip>
@@ -388,7 +386,6 @@
     <investigate>
       <label>Enquêter</label>
       <label_done>Enquête menée</label_done>
-      <collectible_label>Investigated</collectible_label>
       <tooltip><![CDATA[
         Vous avez entendu des rumeurs...<br>Débloqué à 22% de personnes rencontrées.
       ]]></tooltip>
@@ -396,7 +393,6 @@
     <explore_forest>
       <label>Explorer le bois</label>
       <label_done>Bois exploré</label_done>
-      <collectible_label>Forest Explored</collectible_label>
       <tooltip><![CDATA[
         Quel endroit plaisant.<br>2x progrès avec des lunettes.
       ]]></tooltip>
@@ -404,7 +400,6 @@
     <old_shortcut>
       <label>Vieux raccourci</label>
       <label_done>Raccourci Exploré</label_done>
-      <collectible_label>Shortcut Explored</collectible_label>
       <tooltip><![CDATA[
         Personne n'est passé par ici depuis longtemps.<br>Donne des herbes supplémentaires.<br>Donne des sujets de discussion pour l'hermite. Recevez 1% de récompense pour Parle à l'hermite pour chaque % de raccourci exploré.<br>Débloqué à 20% de bois exploré.
       ]]></tooltip>
@@ -412,7 +407,6 @@
     <hermit>
       <label>Parler Hermite</label>
       <label_done>Savoir de l'hermite appris</label_done>
-      <collectible_label>Hermit Knowledge Learned</collectible_label>
       <tooltip><![CDATA[
         This old man is happy to have a listening ear, surely he has some useful knowledge. You hope.<br>Speed is 1% faster for Gather Herbs, Practical Magic, and Learn Alchemy per 1% of Hermit Knowledge.<br>Unlocked with both 20% Shortcut Explored and 40 Magic.
       ]]></tooltip>
@@ -420,7 +414,6 @@
     <explore_city>
       <label>Explorer la Ville</label>
       <label_done>Ville explorée</label_done>
-      <collectible_label>Ville explorée</collectible_label>
       <tooltip><![CDATA[
         Everyone is so busy, and there's so much to do.<br>2x progress with glasses.
       ]]></tooltip>
@@ -428,7 +421,6 @@
     <get_drunk>
       <label>Se Saouler</label>
       <label_done>Rumeures entendues</label_done>
-      <collectible_label>Rumors Heard</collectible_label>
       <tooltip><![CDATA[
         Sometimes you just need a drink.<br>Costs 2 gold and requires reputation greater than -3.<br>Costs 1 reputation.<br>Unlocked at 20% City Explored.
       ]]></tooltip>
@@ -549,56 +541,65 @@
     </read_books>
     <smash_pots>
       <label>Casser Pots</label>
-      <collectible_label>Pots Cassés</collectible_label>
+      <label_done>Pots Cassés</label_done>
       <tooltip><![CDATA[
           They're just sitting there, unbroken, full of potential.<br>Pots with loot in them have 100 mana.<br>Every 10 pots have mana.
       ]]></tooltip>
     </smash_pots>
     <locks>
       <label>Crocheter</label>
-      <collectible_label>Serrures Crochetées</collectible_label>
+      <label_done>Serrures Crochetées</label_done>
       <tooltip><![CDATA[
-          Don't worry; they won't remember.<br>Houses with loot in them have 10 gold.<br>Every 10 houses have gold.<br>Unlocked at 20% Explored.
+          Don't worry; they won't remember.<br>Houses with loot in them have 
       ]]></tooltip>
+      <tooltip2><![CDATA[
+           gold.<br>Every 10 houses have gold.<br>Unlocked at 20% Explored.
+      ]]></tooltip2>
     </locks>
     <short_quest>
       <label>Quête Courte</label>
-      <collectible_label>Quêtes Courtes Accomplies</collectible_label>
+      <label_done>Quêtes Courtes Accomplies</label_done>
       <tooltip><![CDATA[
-          Be a hero! ...If the reward is good and it doesn't take too long.<br>Short Quests with loot give 20 gold as a reward.<br>Every 5 Short Quests have loot.<br>Unlocked at 5% People Met.
+          Be a hero! ...If the reward is good and it doesn't take too long.<br>Short Quests with loot give 
       ]]></tooltip>
+      <tooltip2><![CDATA[
+           gold as a reward.<br>Every 5 Short Quests have loot.<br>Unlocked at 5% People Met.
+      ]]></tooltip2>
     </short_quest>
     <long_quest>
       <label>Quête Longue</label>
-      <collectible_label>Quêtes Longues Accomplies</collectible_label>
+      <label_done>Quêtes Longues Accomplies</label_done>
       <tooltip><![CDATA[
-          Be a more impressive hero! ...As long as someone is watching.<br>Long Quests with loot give 25 gold and 1 reputation as a reward.<br>Every 5 Long Quests have loot.<br>Unlocked at 10% Investigated.
+          Be a more impressive hero! ...As long as someone is watching.<br>Long Quests with loot give 
       ]]></tooltip>
+      <tooltip2><![CDATA[
+           gold and 1 reputation as a reward.<br>Every 5 Long Quests have loot.<br>Unlocked at 10% Investigated.
+      ]]></tooltip2>
     </long_quest>
     <wild_mana>
       <label>Mana Sauvage</label>
-      <collectible_label>Sources de Mana récoltées</collectible_label>
+      <label_done>Sources de Mana récoltées</label_done>
       <tooltip><![CDATA[
           They're out of sight of most travellers, but you have time to find and harvest them.<br>Every good mana spot has 200 mana.<br>Every 10 mana spots have good mana.
       ]]></tooltip>
     </wild_mana>
     <gather_herbs>
       <label>Récolter Herbes</label>
-      <collectible_label>Drôles de plantes arrachées</collectible_label>
+      <label_done>Drôles de plantes arrachées</label_done>
       <tooltip><![CDATA[
           Might as well dig up anything useful you find.<br>Every 10 funny plants are herbs.<br>Unlocked at 10% Forest Explored.
       ]]></tooltip>
     </gather_herbs>
     <hunt>
       <label>Chasser</label>
-      <collectible_label>Animaux dépecés</collectible_label>
+      <label_done>Animaux dépecés</label_done>
       <tooltip><![CDATA[
           The forest provides.<br>Every 10 animals have good hides.<br>Unlocked at 40% Forest Explored.<br>NOTE: Using hide is not implemented yet. I'll remove this note when it is.
       ]]></tooltip>
     </hunt>
     <gamble>
       <label>Parier</label>
-      <collectible_label>Badauds arnaqués</collectible_label>
+      <label_done>Badauds arnaqués</label_done>
       <tooltip><![CDATA[
           The cards still somehow come out different every time.<br>Has 2x exp/talent gain<br>Costs 20 gold and 1 reputation.<br>Requires reputation greater than -5.<br>You win against every 10 suckers, and get 60 gold for winning.
       ]]></tooltip>
