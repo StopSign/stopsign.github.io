@@ -1536,7 +1536,6 @@ function JoinAdvGuild() {
     this.varName = "AdvGuild";
     this.name = "Adventure Guild";
     this.expMult = 1;
-    this.tooltip = "The one stop shop for all your adventuring needs.<br>Take their tests and get a rank!<br>You can only join 1 guild at a time, and only try once.<br>Gives 200 mana per rank.<br>Gives ((magic skill)/2 + (combat skill)) * (1 + main stat / 100) * sqrt(1 + times completed / 1000) * (original mana cost / actual mana cost) progress points per mana.<br>Unlocks at 20% rumors heard";
     this.townNum = 2;
     this.tooltip = _txt("actions>adventure_guild>tooltip");
     this.label = _txt("actions>adventure_guild>label");
@@ -1605,6 +1604,8 @@ function CraftingGuild() {
     this.tooltip = "Learn to use your hands to build big structures.<br>Take their tests and get a rank!<br>You can only join 1 guild at a time, and only try once.<br>Gives 100 Crafting exp per rank.<br>Gives ((magic skill)/2 + (crafting skill)) * (1 + main stat / 100) * sqrt(1 + times completed / 1000) * (original mana cost / actual mana cost) progress points per mana.<br>Unlocks at 20% rumors heard";
     this.townNum = 2;
 
+    this.label = _txt("actions>craft_guild>label"); // this is the displayed name of the action. You use the english name in the code, so I was obligated to create a new var for the displayed name in order to localize
+    // this.label = his.name // this is the easiest (instead of previous line) way to have a correct display if you prefer to not go into the XML while coding/
     this.varName = "CraftGuild";
     this.stats = {
         Dex:.3,
