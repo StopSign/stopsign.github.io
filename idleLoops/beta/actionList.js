@@ -1040,9 +1040,9 @@ function PickLocks() {
     this.name = "Pick Locks";
     this.expMult = 1;
     this.varName = "Locks";
-    this.tooltip = "Don't worry; they won't remember.<br>Houses with loot in them have <div id='goldCostLocks'>10</div> gold.<br>Every 10 houses have gold.<br>Unlocked at 20% Explored";
     this.townNum = 0;
     this.tooltip = _txt("actions>locks>tooltip");
+    this.tooltip2 = _txt("actions>locks>tooltip2");
     this.label = _txt("actions>locks>label");
     this.infoName = _txt("actions>locks>collectible_label");
 
@@ -1080,9 +1080,9 @@ function ShortQuest() {
     this.name = "Short Quest";
     this.expMult = 1;
     this.varName = "SQuests";
-    this.tooltip = "Be a hero! ...If the reward is good and it doesn't take too long.<br>Short Quests with loot give <div id='goldCostSQuests'>20</div> gold as a reward.<br>Every 5 Short Quests have loot.<br>Unlocked at 5% People Met";
     this.townNum = 0;
     this.tooltip = _txt("actions>short_quest>tooltip");
+    this.tooltip2 = _txt("actions>short_quest>tooltip2");
     this.label = _txt("actions>short_quest>label");
     this.infoName = _txt("actions>short_quest>collectible_label");
 
@@ -1122,9 +1122,9 @@ function LongQuest() {
     this.name = "Long Quest";
     this.expMult = 1;
     this.varName = "LQuests";
-    this.tooltip = "Be a more impressive hero! ...As long as someone is watching.<br>Long Quests with loot give <div id='goldCostLQuests'>25</div> gold and 1 reputation as a reward.<br>Every 5 Long Quests have loot.<br>Unlocked at 10% Investigated.";
     this.townNum = 0;
     this.tooltip = _txt("actions>long_quest>tooltip");
+    this.tooltip2 = _txt("actions>long_quest>tooltip2");
     this.label = _txt("actions>long_quest>label");
     this.infoName = _txt("actions>long_quest>collectible_label");
 

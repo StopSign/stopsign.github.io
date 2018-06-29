@@ -587,7 +587,8 @@ function View() {
                     extraImage +
                 "</div>" +
                 "<div class='showthis'>" +
-                    action.tooltip + "<br>" +
+                    action.tooltip + "<span id='goldCost"+action.varName+"'></span>" +
+                    ((typeof(action.tooltip2) === "string") ? action.tooltip2 : "")+"<br>"+
                     actionStats +
                     "<div class='bold'>"+_txt("actions>tooltip>mana_cost")+"</div> <div id='manaCost"+action.varName+"'>"+action.manaCost()+"</div><br>" +
                     "<div class='bold'>"+_txt("actions>tooltip>exp_multiplier")+"</div> "+(action.expMult*100)+"%<br>" +
