@@ -442,6 +442,14 @@
       Minimum 1 tick per action.<br>
       Restarts automatically upon no actions left.]]></list_explanation>
     </tooltip>
+    <current_action>
+        <mana_original>Mana Original</mana_original>
+        <mana_used>Mana Used</mana_used>
+        <mana_remaining>Mana Remaining</mana_remaining>
+        <gold_remaining>Gold Remaining</gold_remaining>
+        <failed_attempts>Failed Attempts</failed_attempts>
+        <error>Error</error>
+    </current_action>
     <wander>
       <label>Wander</label>
       <label_done>Explored</label_done>

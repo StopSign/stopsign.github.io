@@ -251,15 +251,15 @@ function View() {
             let action = actions.current[i];
             totalDivText +=
                 "<div id='actionTooltip"+i+"' style='display:none;padding-left:10px;width:90%'>" +
-                    "<div style='text-align:center;width:100%'>"+action.name+"</div><br><br>" +
-                    "<div class='bold'>Mana Original</div> <div id='action"+i+"ManaOrig'>0</div><br>" +
-                    "<div class='bold'>Mana Used</div> <div id='action"+i+"ManaUsed'>0</div><br>" +
-                    "<div class='bold'>Mana Remaining</div> <div id='action"+i+"Remaining'></div><br>" +
-                    "<div class='bold'>Gold Remaining</div> <div id='action"+i+"GoldRemaining'></div><br><br>" +
+                    "<div style='text-align:center;width:100%'>"+action.label+"</div><br><br>" +
+                    "<div class='bold'>"+_txt("actions>current_action>mana_original")+"</div> <div id='action"+i+"ManaOrig'>0</div><br>" +
+                    "<div class='bold'>"+_txt("actions>current_action>mana_used")+"</div> <div id='action"+i+"ManaUsed'>0</div><br>" +
+                    "<div class='bold'>"+_txt("actions>current_action>mana_remaining")+"</div> <div id='action"+i+"Remaining'></div><br>" +
+                    "<div class='bold'>"+_txt("actions>current_action>gold_remaining")+"</div> <div id='action"+i+"GoldRemaining'></div><br><br>" +
                     "<div id='action"+i+"ExpGain'></div>" +
                     "<div id='action"+i+"HasFailed' style='display:none'>" +
-                        "<div class='bold'>Failed Attempts</div> <div id='action"+i+"Failed'>0</div><br>" +
-                        "<div class='bold'>Error</div> <div id='action"+i+"Error'></div>" +
+                        "<div class='bold'>"+_txt("actions>current_action>failed_attempts")+"</div> <div id='action"+i+"Failed'>0</div><br>" +
+                        "<div class='bold'>"+_txt("actions>current_action>error")+"</div> <div id='action"+i+"Error'></div>" +
                     "</div>" +
                 "</div>";
         }
