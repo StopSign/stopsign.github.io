@@ -186,6 +186,13 @@
             <pause_audio_cue>Ping on pause</pause_audio_cue>
         </options>
     </menu>
+    <tutorial><![CDATA[
+      TUTORIAL<br>
+      Click the Wander action and click Play to start.<br>
+      Wander for a bit, then smash pots.<br>
+      Watch the numbers change, read all the tooltips.<br>
+      Complete the town, go to the next one.<br><br>
+      ]]></tutorial>
     <tracked_resources>
         <reset_on_restart_txt>Resets when the loop restarts.</reset_on_restart_txt>
         <resource no_reset_on_restart="true">
@@ -341,6 +348,10 @@
           If your <div class="bold">Cha</div> is level 20 when the action is started, it'd be 640 / 1.2 = 533.333<br>
           Adding back the 160 from <div class="bold">Soul</div> and <div class="bold">Int</div>, the total mana the action takes (rounded up) is now 694, so ~15% less mana.<br>
           The action would give (800/694)*(1+talent/100) level exp per mana for the 694 mana.]]></explanation>
+        <graph_legend><![CDATA[
+          Click the legend to show/hide each.<br>
+          Upon freshly starting, Levels and Talent won't change much.<br>
+          Hover Stats for more info.]]></graph_legend>
     </tooltip>
     <view>
       <regular>Regular View</regular>
@@ -391,6 +402,8 @@
   </towns>
   <actions>
     <title>Action Options</title>
+    <title_list>Action List</title_list>
+    <title_loadout>Loadouts</title_loadout>
     <tooltip>
       <desc><![CDATA[
           Mana cost is based on ratio of stat %s.<br>
@@ -399,9 +412,35 @@
           Actions will target unchecked objects before known lootable objects.]]></desc>
       <mana_cost>Mana Cost</mana_cost>
       <exp_multiplier>Exp Multiplier</exp_multiplier>
+      <mana_used>Mana Used</mana_used>
+      <mana_used_explanation><![CDATA[
+          Shows stat gain affecting speed.<br>
+          Updates every completed action.<br>
+          Accurate at end of run.]]></mana_used_explanation>
+      <amount>Amount</amount>
+      <current_list_active>Keep current list active</current_list_active>
+      <repeat_last_action>Repeat last action on list</repeat_last_action>
+      <add_action_top>Add action to top of list</add_action_top>
+      <save_loadout>Save List</save_loadout>
+      <load_loadout>Load Selected List</load_loadout>
       <higher_done_percent_benefic>You can find more stuff with higher %.</higher_done_percent_benefic>
       <progress_label>Progress</progress_label>
       <total_found>Total Found</total_found>
+      <icons>
+        <circle_thin>Cap to current max</circle_thin>
+        <plus>Add one loop</plus>
+        <minus>Subtract one loop</minus>
+        <arrows_h>Split action</arrows_h>
+        <sort_up>Move action up</sort_up>
+        <sort_down>Move action down</sort_down>
+        <times>Remove action</times>
+      </icons>
+      <list_explanation><![CDATA[
+      Drag and drop the actions to re-arrange them.<br>
+      The next list becomes the current list every restart.<br>
+      One second = 50 mana.<br>
+      Minimum 1 tick per action.<br>
+      Restarts automatically upon no actions left.]]></list_explanation>
     </tooltip>
     <wander>
       <label>Wander</label>
@@ -685,4 +724,7 @@
       ]]></tooltip>
     </adventure_guild>
   </actions>
+  <spells>
+    <title>Spells</title>
+  </spells>
 </body>
