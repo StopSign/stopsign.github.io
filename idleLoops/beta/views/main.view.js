@@ -24,7 +24,6 @@ function View() {
         this.adjustGoldCosts();
     };
 
-    this.statBlurbs = ["Know your body.", "Train your body.", "Just a little longer. Just a little more.", "Gotta go fast.", "Look a little closer...", "Conversation is a battle.", "Learning to learn.", "Opportunity favors the fortunate.", "You are the captain."];
     this.statLocs = [{x:165, y:43}, {x:270, y:79}, {x:325, y:170}, {x:306, y:284}, {x:225, y:352}, {x:102, y:352}, {x:26, y:284}, {x:2, y:170}, {x:56, y:79}];
     this.createStats = function() {
         statGraph.init();
@@ -39,7 +38,7 @@ function View() {
             totalStatDiv +=
                 "<div class='statRadarContainer showthat' style='left:"+loc.x+"px;top:"+loc.y+"px;' onmouseover='view.showStat(\""+stat+"\")'>" +
                     "<div class='statLabelContainer'>" +
-                        "<div class='medium bold' style='margin-left:18px'>"+statsLongForm(stat)+"</div>" +
+                        "<div class='medium bold' style='margin-left:18px'>"+_txt("stats>"+stat+">long_form")+"</div>" +
                         "<div style='color:#737373;' class='statNum'><div class='medium' id='stat"+stat+"ss'></div></div>" +
                         "<div class='statNum'><div class='medium' id='stat"+stat+"Talent'>0</div></div> " +
                         "<div class='medium statNum bold' id='stat"+stat+"Level'>0</div> " +
@@ -47,15 +46,15 @@ function View() {
                     "<div class='thinProgressBarUpper'><div class='statBar statLevelBar' id='stat"+stat+"LevelBar'></div></div>" +
                     "<div class='thinProgressBarLower'><div class='statBar statTalentBar' id='stat"+stat+"TalentBar'></div></div>" +
                     "<div class='showthis' id='stat"+stat+"Tooltip' style='width:225px;'>" +
-                        "<div class='medium bold'>"+statsLongForm(stat)+"</div><br>" +
-                        this.statBlurbs[i] + "<br>" +
-                        "<div class='medium bold'>Level</div> <div id='stat"+stat+"Level2'></div><br>" +
-                        "<div class='medium bold'>Level Exp</div> <div id='stat"+stat+"LevelExp'></div>/<div id='stat"+stat+"LevelExpNeeded'></div> <div class='statTooltipPerc'>(<div id='stat"+stat+"LevelProgress'></div>%)</div><br>" +
-                        "<div class='medium bold'>Talent</div> <div id='stat"+stat+"Talent2'></div><br>" +
-                        "<div class='medium bold'>Talent Exp</div> <div id='stat"+stat+"TalentExp'></div>/<div id='stat"+stat+"TalentExpNeeded'></div> <div class='statTooltipPerc'>(<div id='stat"+stat+"TalentProgress'></div>%)</div><br>" +
+                        "<div class='medium bold'>"+_txt("stats>"+stat+">long_form")+"</div><br>" +
+                        _txt("stats>"+stat+">blurb") + "<br>" +
+                        "<div class='medium bold'>"+_txt("stats>tooltip>level")+"</div> <div id='stat"+stat+"Level2'></div><br>" +
+                        "<div class='medium bold'>"+_txt("stats>tooltip>level_exp")+"</div> <div id='stat"+stat+"LevelExp'></div>/<div id='stat"+stat+"LevelExpNeeded'></div> <div class='statTooltipPerc'>(<div id='stat"+stat+"LevelProgress'></div>%)</div><br>" +
+                        "<div class='medium bold'>"+_txt("stats>tooltip>talent")+"</div> <div id='stat"+stat+"Talent2'></div><br>" +
+                        "<div class='medium bold'>"+_txt("stats>tooltip>talent_exp")+"</div> <div id='stat"+stat+"TalentExp'></div>/<div id='stat"+stat+"TalentExpNeeded'></div> <div class='statTooltipPerc'>(<div id='stat"+stat+"TalentProgress'></div>%)</div><br>" +
                         "<div id='ss"+stat+"Container' class='ssContainer'>" +
-                            "<div class='bold'>Soulstones</div> <div id='ss"+stat+"'></div><br>" +
-                            "<div class='medium bold'>Soulstone Mult</div> x<div id='stat"+stat+"SSBonus'></div>" +
+                            "<div class='bold'>"+_txt("stats>tooltip>soulstone")+"</div> <div id='ss"+stat+"'></div><br>" +
+                            "<div class='medium bold'>"+_txt("stats>tooltip>soulstone_multiplier")+"</div> x<div id='stat"+stat+"SSBonus'></div>" +
                         "</div>" +
                     "</div>" +
                 "</div>"
@@ -252,15 +251,15 @@ function View() {
             let action = actions.current[i];
             totalDivText +=
                 "<div id='actionTooltip"+i+"' style='display:none;padding-left:10px;width:90%'>" +
-                    "<div style='text-align:center;width:100%'>"+action.name+"</div><br><br>" +
-                    "<div class='bold'>Mana Original</div> <div id='action"+i+"ManaOrig'>0</div><br>" +
-                    "<div class='bold'>Mana Used</div> <div id='action"+i+"ManaUsed'>0</div><br>" +
-                    "<div class='bold'>Mana Remaining</div> <div id='action"+i+"Remaining'></div><br>" +
-                    "<div class='bold'>Gold Remaining</div> <div id='action"+i+"GoldRemaining'></div><br><br>" +
+                    "<div style='text-align:center;width:100%'>"+action.label+"</div><br><br>" +
+                    "<div class='bold'>"+_txt("actions>current_action>mana_original")+"</div> <div id='action"+i+"ManaOrig'>0</div><br>" +
+                    "<div class='bold'>"+_txt("actions>current_action>mana_used")+"</div> <div id='action"+i+"ManaUsed'>0</div><br>" +
+                    "<div class='bold'>"+_txt("actions>current_action>mana_remaining")+"</div> <div id='action"+i+"Remaining'></div><br>" +
+                    "<div class='bold'>"+_txt("actions>current_action>gold_remaining")+"</div> <div id='action"+i+"GoldRemaining'></div><br><br>" +
                     "<div id='action"+i+"ExpGain'></div>" +
                     "<div id='action"+i+"HasFailed' style='display:none'>" +
-                        "<div class='bold'>Failed Attempts</div> <div id='action"+i+"Failed'>0</div><br>" +
-                        "<div class='bold'>Error</div> <div id='action"+i+"Error'></div>" +
+                        "<div class='bold'>"+_txt("actions>current_action>failed_attempts")+"</div> <div id='action"+i+"Failed'>0</div><br>" +
+                        "<div class='bold'>"+_txt("actions>current_action>error")+"</div> <div id='action"+i+"Error'></div>" +
                     "</div>" +
                 "</div>";
         }
@@ -302,7 +301,7 @@ function View() {
         for(let i = 0; i < statList.length; i++) {
             let statName = statList[i];
             if(action["statExp"+statName]) {
-                statExpGain += "<div class='bold'>"+statName+"</div> " + intToString(action["statExp"+statName], 2) + "<br>";
+                statExpGain += "<div class='bold'>"+_txt("stats>"+statName+">short_form")+"</div> " + intToString(action["statExp"+statName], 2) + "<br>";
             }
         }
         expGainDiv.innerHTML = statExpGain;
@@ -388,7 +387,8 @@ function View() {
         }
         actionOptionsTown[townNum].style.display = "block";
         townInfos[townNum].style.display = "block";
-        document.getElementById("townName").innerHTML = townNames[townNum];
+        document.getElementById("townName").innerHTML = _txt("towns>town"+townNum+">name");
+        document.getElementById("townDesc").innerHTML = _txt("towns>town"+townNum+">desc");
         townShowing = townNum;
     };
 
@@ -556,13 +556,13 @@ function View() {
     this.createActionProgress = function(action) {
         const totalDivText =
         "<div class='townStatContainer showthat' id='infoContainer"+action.varName+"'>"+
-            "<div class='bold townLabel'>"+action.infoName+" </div> <div id='prc"+action.varName+"'>5</div>%"+
+            "<div class='bold townLabel'>"+action.labelDone+" </div> <div id='prc"+action.varName+"'>5</div>%"+
             "<div class='thinProgressBarUpper'><div id='expBar"+action.varName+"' class='statBar townExpBar'></div></div>"+
             "<div class='thinProgressBarLower'><div id='bar"+action.varName+"' class='statBar townBar'></div></div>"+
 
             "<div class='showthis'>"+
-                "You can find more stuff with higher %.<br>"+
-                "<div class='bold'>Progress</div> <div id='progress"+action.varName+"'></div>%"+
+                _txt("actions>tooltip>higher_done_percent_benefic")+"<br>"+
+                "<div class='bold'>"+_txt("actions>tooltip>progress_label")+"</div> <div id='progress"+action.varName+"'></div>%"+
             "</div>"+
         "</div>";
         let progressDiv = document.createElement("div");
@@ -576,7 +576,8 @@ function View() {
         let keyNames = Object.keys(action.stats);
         for(let i = 0; i < keyNames.length; i++) {
             let statName = keyNames[i];
-            actionStats += "<div class='bold'>" + statName + "</div> " + (action.stats[statName]*100)+"%<br>";
+            let statLabel = _txt("stats>"+statName+">short_form");
+            actionStats += "<div class='bold'>" + statLabel + "</div> " + (action.stats[statName]*100)+"%<br>";
         }
         let extraImage = "";
         if(action.affectedBy) {
@@ -586,16 +587,17 @@ function View() {
         }
         const totalDivText =
             "<div id='container"+action.varName+"' class='actionContainer showthat' onclick='addActionToList(\""+action.name+"\", "+action.townNum+")'>" +
-                action.name + "<br>" +
+                action.label + "<br>" +
                 "<div style='position:relative'>" +
                     "<img src='img/"+camelize(action.name)+".svg' class='superLargeIcon'>" +
                     extraImage +
                 "</div>" +
                 "<div class='showthis'>" +
-                    action.tooltip + "<br>" +
+                    action.tooltip + "<span id='goldCost"+action.varName+"'></span>" +
+                    ((typeof(action.tooltip2) === "string") ? action.tooltip2 : "")+"<br>"+
                     actionStats +
-                    "<div class='bold'>Mana Cost</div> <div id='manaCost"+action.varName+"'>"+action.manaCost()+"</div><br>" +
-                    "<div class='bold'>Exp Multiplier</div> "+(action.expMult*100)+"%<br>" +
+                    "<div class='bold'>"+_txt("actions>tooltip>mana_cost")+"</div> <div id='manaCost"+action.varName+"'>"+action.manaCost()+"</div><br>" +
+                    "<div class='bold'>"+_txt("actions>tooltip>exp_multiplier")+"</div> "+(action.expMult*100)+"%<br>" +
                 "</div>" +
             "</div>";
 
@@ -616,13 +618,13 @@ function View() {
 
         const totalDivText =
             "<div id='container"+action.varName+"' class='travelContainer showthat' onclick='addActionToList(\""+action.name+"\", "+action.townNum+", true)'>" +
-            action.name + "<br>" +
+            action.label + "<br>" +
             "<img src='img/"+camelize(action.name)+".svg' class='superLargeIcon'><br>" +
             "<div class='showthis'>" +
             action.tooltip + "<br>" +
             actionStats +
-            "<div class='bold'>Mana Cost</div> <div id='manaCost"+action.varName+"'>"+action.manaCost()+"</div><br>" +
-            "<div class='bold'>Exp Multiplier</div> "+(action.expMult*100)+"%<br>" +
+            "<div class='bold'>"+_txt("actions>tooltip>mana_cost")+"</div> <div id='manaCost"+action.varName+"'>"+action.manaCost()+"</div><br>" +
+            "<div class='bold'>"+_txt("actions>tooltip>exp_multiplier")+"</div> "+(action.expMult*100)+"%<br>" +
             "</div>" +
             "</div>";
 
@@ -651,7 +653,7 @@ function View() {
     this.createTownInfo = function(action) {
         let totalInfoText =
             "<div class='townInfoContainer showthat' id='infoContainer"+action.varName+"'>" +
-                "<div class='bold townLabel'>"+action.infoName+"</div> " +
+                "<div class='bold townLabel'>"+action.labelDone+"</div> " +
                 "<div id='goodTemp"+action.varName+"'>0</div> <i class='fa fa-arrow-left'></i> " +
                 "<div id='good"+action.varName+"'>0</div> <i class='fa fa-arrow-left'></i> " +
                 "<div id='checked"+action.varName+"'>0</div>" +
@@ -687,8 +689,8 @@ function View() {
             "<div class='townStatContainer' style='text-align:center' id='infoContainer"+action.varName+"'>"+
                 "<div class='bold townLabel' style='float:left' id='multiPartName"+action.varName+"'></div>"+
                 "<div class='completedInfo showthat' id='completedContainer"+action.varName+"' onmouseover='view.updateSoulstoneChance()'>" +
-                    "<div class='bold'>Completed</div> <div id='completed"+action.varName+"'></div>" +
-                    "<div class='showthis'>"+completedTooltip+"</div>" +
+                    "<div class='bold'>"+action.labelDone+"</div> <div id='completed"+action.varName+"'></div>" +
+                    (completedTooltip === "" ? "" :"<div class='showthis'>"+completedTooltip+"</div>") + // to prevent an empty tooltip, was reported as bug on discord
                 "</div><br>"+
                 pbars +
             "</div>";
@@ -784,7 +786,7 @@ function View() {
                 continue;
             }
             let mainStat = action.loopStats[(towns[action.townNum][action.varName+"LoopCounter"]+i) % action.loopStats.length];
-            document.getElementById("mainStat"+i+action.varName).innerHTML = mainStat;
+            document.getElementById("mainStat"+i+action.varName).innerHTML = _txt("stats>"+mainStat+">short_form");
             addStatColors(expBar, mainStat);
             document.getElementById("segmentName"+i+action.varName).innerHTML = action.getSegmentName(towns[action.townNum][action.varName+"LoopCounter"]+i);
         }
@@ -849,25 +851,6 @@ function View() {
             document.getElementById("statsColumn").style.width = "410px";
         }
     };
-}
-
-function statsLongForm(stat) {
-    if(stat === "Str") {
-        return "Strength";
-    } else if(stat === "Dex") {
-        return "Dexterity";
-    } else if(stat === "Con") {
-        return "Constitution";
-    } else if(stat === "Per") {
-        return "Perception";
-    } else if(stat === "Int") {
-        return "Intelligence";
-    } else if(stat === "Cha") {
-        return "Charisma";
-    } else if(stat === "Spd") {
-        return "Speed";
-    }
-    return stat;
 }
 
 function unlockStory(num) {

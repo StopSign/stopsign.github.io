@@ -2,6 +2,10 @@ let statGraph = {
     init : function () {
         let statChartCtx = document.getElementById("statChartCtx");
         let dataset = this.getGraphDatasets();
+        var statLabels = [];
+        $(statList).each(function(x,stat) {
+          statLabels.push(_txt("stats>"+stat+">short_form"))
+        })
         this.graphObject = new Chart(statChartCtx, {
             type: 'radar',
             options: {
@@ -33,7 +37,7 @@ let statGraph = {
                 }
             },
             data: {
-                labels : statList,
+                labels : statLabels,
                 datasets : dataset,
             }
         });
@@ -42,7 +46,7 @@ let statGraph = {
     getGraphDatasets : function() {
         let dataset = [
             {
-                label: "Level",
+                label: _txt("stats>tooltip>level"),
                 data: [],
                 fill: true,
                 backgroundColor: "rgba(157, 103, 205, 0.2)",
@@ -53,7 +57,7 @@ let statGraph = {
                 pointHoverBorderColor: "rgb(157, 103, 205)"
             },
             {
-                label: "Bonus XP",
+                label: _txt("stats>tooltip>bonus_xp"),
                 data: [],
                 backgroundColor: "rgba(255, 180, 91, 0.2)",
                 borderColor: "rgb(255, 180, 91)",
