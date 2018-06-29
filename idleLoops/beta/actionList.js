@@ -1357,6 +1357,7 @@ function HealTheSick() {
     this.townNum = 0;
     this.tooltip = _txt("actions>heal_sick>tooltip");
     this.label = _txt("actions>heal_sick>label");
+    this.labelDone = _txt("actions>heal_sick>label_done");
 
     this.stats = {
         Per:.2,
@@ -1379,10 +1380,14 @@ function HealTheSick() {
         addReputation(3);
     };
     this.getPartName = function() {
-        return "Patient " + numberToWords(Math.floor((towns[0].HealLoopCounter+.0001)/this.segments+1));
+        return _txt("actions>heal_sick>label_part") + " " + numberToWords(Math.floor((towns[0].HealLoopCounter+.0001)/this.segments+1));
     };
     this.getSegmentName = function(segment) {
-        return ["Diagnose", "Treat", "Inform"][segment % 3];
+        let segments = [];
+        $(_txtsObj("actions>heal_sick>segment_names>name")).each(function(x,segmentName) {
+          segments.push($(segmentName).text());
+        })
+        return segments[segment % 3];
     };
     this.visible = function() {
         return towns[0].getLevel("Secrets") >= 20;
@@ -1401,6 +1406,7 @@ function FightMonsters() {
     this.townNum = 0;
     this.tooltip = _txt("actions>fight_monsters>tooltip");
     this.label = _txt("actions>fight_monsters>label");
+    this.labelDone = _txt("actions>fight_monsters>label_done");
 
     this.stats = {
         Str:.3,
@@ -1425,23 +1431,16 @@ function FightMonsters() {
         addGold(20);
     };
     this.getPartName = function() {
-        let name = monsterNames()[Math.floor(towns[0].FightLoopCounter/3+.0000001)];
-        if(!name) {
-            name = ["Speedy Monsters", "Tough Monsters", "Scary Monsters"][Math.floor(towns[0].FightLoopCounter/3+.0000001) % 3]
-        }
-        return name;
+        return monsterNames(towns[0].FightLoopCounter);
     };
     this.getSegmentName = function(segment) {
-        let name = monsterNames()[Math.floor(towns[0].FightLoopCounter/3+.0000001)];
-        if(!name) {
-            name = ["Speedy Monsters", "Tough Monsters", "Scary Monsters"][Math.floor(towns[0].FightLoopCounter/3+.0000001) % 3]
-        }
+        let name = monsterNames(towns[0].FightLoopCounter);
         if(segment % 3 === 0) {
-            return "A couple "+name;
+            return _txt("actions>fight_monsters>segment_modifier_1")+" "+name;
         } else if(segment % 3 === 1) {
-            return "A few "+name;
+            return _txt("actions>fight_monsters>segment_modifier_2")+" "+name;
         }
-        return "A bunch of "+name;
+        return _txt("actions>fight_monsters>segment_modifier_3")+" "+name;
     };
     this.visible = function() {
         return towns[0].getLevel("Secrets") >= 20;
@@ -1452,8 +1451,20 @@ function FightMonsters() {
     this.finish = function() {
     };
 }
-function monsterNames() { //spd, defensive, aggressive
-    return ["Deer", "Giant Turtles", "Goblins", "Demon Rabbits", "Giant Honeybadgers", "Venemous Snakes", "Angry Monkeys", "Trolls", "Ogres", "Pixies", "Treants", "Gelatanous Cubes", "Fairies", "Orcs", "Beholders", "Spectres", "Shambling Mound", "Corrupted Mushroomfolk", "Giant Owls", "Blood Trolls", "Small Wyrms", "Pikachus", "Machokes", "Alakazams"];
+function monsterNames(FightLoopCounter) { //spd, defensive, aggressive
+    let names = [];
+    $(_txtsObj("actions>fight_monsters>segment_names>name")).each(function(x,monsterName) {
+      names.push($(monsterName).text());
+    })
+    let altNames = [];
+    $(_txtsObj("actions>fight_monsters>segment_alt_names>name")).each(function(x,monsterName) {
+      altNames.push($(monsterName).text());
+    })
+    let name = names[Math.floor(FightLoopCounter/3+.0000001)];
+    if(!name) {
+        name = altNames[Math.floor(FightLoopCounter/3+.0000001) % 3]
+    }
+    return name;
 }
 
 function SmallDungeon() {
@@ -1463,6 +1474,7 @@ function SmallDungeon() {
     this.townNum = 0;
     this.tooltip = _txt("actions>small_dungeon>tooltip");
     this.label = _txt("actions>small_dungeon>label");
+    this.labelDone = _txt("actions>small_dungeon>label_done");
 
     this.stats = {
         Str:.1,
@@ -1473,7 +1485,9 @@ function SmallDungeon() {
     };
     this.loopStats = ["Dex", "Con", "Dex", "Cha", "Dex", "Str", "Luck"];
     this.segments = 7;
-    this.completedTooltip = "Each soulstone improves a random stat's exp gain by (1+(soulstones)^.8/10). Each soulstone reduces the chance you'll get the next one by 2%.<br>Chance to receive a soulstone recovers at .00002% per mana.<br><div class='bold'>Chance </div> <div id='soulstoneChance'></div>%<br><div class='bold'>Last Stat</div> <div id='soulstonePrevious'>NA</div>";
+    this.completedTooltip = _txt("actions>small_dungeon>completed_tooltip") +
+      "<br><div class='bold'>"+_txt("actions>small_dungeon>chance_label")+" </div> <div id='soulstoneChance'></div>%<br>"+
+      "<div class='bold'>"+_txt("actions>small_dungeon>last_stat_label")+" </div> <div id='soulstonePrevious'>NA</div>";
     this.manaCost = function() {
         return 3000;
     };
@@ -1499,10 +1513,14 @@ function SmallDungeon() {
         }
     };
     this.getPartName = function() {
-        return "Small Dungeon " + numberToWords(Math.floor((towns[0].SDungeonLoopCounter+.0001)/this.segments+1));
+        return _txt("actions>small_dungeon>label_part") + " " + numberToWords(Math.floor((towns[0].SDungeonLoopCounter+.0001)/this.segments+1));
     };
     this.getSegmentName = function(segment) {
-        return ["Spike Traps", "Long Hallways", "Arrow Traps", "Riddle Guardian", "Swinging Axes", "Boss", "Loot"][segment % this.segments];
+        let segments = [];
+        $(_txtsObj("actions>small_dungeon>segment_names>name")).each(function(x,segmentName) {
+          segments.push($(segmentName).text());
+        })
+        return segments[segment % segments.length];
     };
     this.visible = function() {
         return (getSkillLevel("Combat") + getSkillLevel("Magic")) >= 15;

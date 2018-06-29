@@ -709,21 +709,79 @@
     </gamble>
     <heal_sick>
       <label>Heal The Sick</label>
+      <label_done>Healed</label_done>
+      <label_part>Patient</label_part>
       <tooltip><![CDATA[
           You won't be able to heal them all, but they'll be thankful for doing what you can.<br>Healing is always 3 parts, each with a main stat - Diagnose (Per), Treat (Int), Inform (Cha).<br>Gives (magic skill) * (1 + main stat / 100) * sqrt(1 + times completed / 100) * (original mana cost / actual mana cost) progress points per mana.<br>Requires 12 Magic skill.<br>Gives 3 reputation upon patient completion.
       ]]></tooltip>
+      <segment_names>
+        <name>Diagnose</name>
+        <name>Treat</name>
+        <name>Inform</name>
+      </segment_names>
     </heal_sick>
     <fight_monsters>
       <label>Fight Monsters</label>
+      <label_done>Killed</label_done>
       <tooltip><![CDATA[
           Slowly, you're figuring out their patterns.<br>Fighting rotates between 3 types of battles, each with a main stat - Quick (Spd), Defensive (Str), Aggressive (Con).<br>Gives (combat skill) * (1 + main stat / 100) * sqrt(1 + times completed / 100) * (original mana cost / actual mana cost) progress points per mana.<br>Requires 10 Combat skill.<br>Gives 20 gold per fight segment completion.
       ]]></tooltip>
+      <segment_names>
+        <name>Deer</name>
+        <name>Giant Turtles</name>
+        <name>Goblins</name>
+        <name>Demon Rabbits</name>
+        <name>Giant Honeybadgers</name>
+        <name>Venemous Snakes</name>
+        <name>Angry Monkeys</name>
+        <name>Trolls</name>
+        <name>Ogres</name>
+        <name>Pixies</name>
+        <name>Treants</name>
+        <name>Gelatanous Cubes</name>
+        <name>Fairies</name>
+        <name>Orcs</name>
+        <name>Beholders</name>
+        <name>Spectres</name>
+        <name>Shambling Mound</name>
+        <name>Corrupted Mushroomfolk</name>
+        <name>Giant Owls</name>
+        <name>Blood Trolls</name>
+        <name>Small Wyrms</name>
+        <name>Pikachus</name>
+        <name>Machokes</name>
+        <name>Alakazams</name>
+      </segment_names>
+      <segment_alt_names>
+        <name>Speedy Monsters</name>
+        <name>Tough Monsters</name>
+        <name>Scary Monsters</name>
+      </segment_alt_names>
+      <segment_modifier_1>A couple</segment_modifier_1>
+      <segment_modifier_2>A few</segment_modifier_2>
+      <segment_modifier_3>A bunch of</segment_modifier_3>
     </fight_monsters>
     <small_dungeon>
       <label>Small Dungeon</label>
+      <label_done>Looted</label_done>
+      <label_part>Small Dungeon</label_part>
       <tooltip><![CDATA[
           There are small changes each time; it's harder to get used to. The soulstones at the end last through loops, but they're not always in the dungeon... Strange.<br>The dungeon requires different skills at different points.<br>One action can clear multiple dungeons if your stats are high enough.<br>Gives (magic + combat skill) * (1 + main stat / 100) * sqrt(1 + times completed / 200) * (original mana cost / actual mana cost) progress points per mana.<br>Requires a combined skill of 35.<br>Gives 1 soulstone per completion - hover over Completed for info.
       ]]></tooltip>
+      <completed_tooltip><![CDATA[
+        Each soulstone improves a random stat's exp gain by (1+(soulstones)^.8/10). Each soulstone reduces the chance you'll get the next one by 2%.<br>Chance to receive a soulstone recovers at .00002% per mana.
+      ]]></completed_tooltip>
+      <chance_label>Chance</chance_label>
+      <last_stat_label>Last Stat</last_stat_label>
+      <segment_names>
+        <name>Spike Traps</name>
+        <name>Long Hallways</name>
+        <name>Arrow Traps</name>
+        <name>Riddle Guardian</name>
+        <name>Swinging Axes</name>
+        <name>Boss</name>
+        <name>Loot</name>
+      </segment_names>
     </small_dungeon>
     <adventure_guild>
       <label>Adventure Guild</label>
