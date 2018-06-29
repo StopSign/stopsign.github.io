@@ -647,7 +647,7 @@ function View() {
     this.createTownInfo = function(action) {
         let totalInfoText =
             "<div class='townInfoContainer showthat' id='infoContainer"+action.varName+"'>" +
-                "<div class='bold townLabel'>"+action.infoName+"</div> " +
+                "<div class='bold townLabel'>"+action.labelDone+"</div> " +
                 "<div id='goodTemp"+action.varName+"'>0</div> <i class='fa fa-arrow-left'></i> " +
                 "<div id='good"+action.varName+"'>0</div> <i class='fa fa-arrow-left'></i> " +
                 "<div id='checked"+action.varName+"'>0</div>" +
