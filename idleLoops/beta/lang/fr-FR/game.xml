@@ -256,47 +256,47 @@
     <dex>
       <blurb>Maîtrise ton corps.</blurb>
       <long_form>Dextérité</long_form>
-      <short_form>dex</short_form>
+      <short_form>Dex</short_form>
     </dex>
     <str>
       <blurb>Entraîne ton corps.</blurb>
       <long_form>Force</long_form>
-      <short_form>for</short_form>
+      <short_form>For</short_form>
     </str>
     <con>
       <blurb>Un peu plus longtemps, un peu plus...</blurb>
       <long_form>Constitution</long_form>
-      <short_form>cons</short_form>
+      <short_form>Cons</short_form>
     </con>
     <spd>
       <blurb>If faut aller vite.</blurb>
       <long_form>Vitesse</long_form>
-      <short_form>vit</short_form>
+      <short_form>Vit</short_form>
     </spd>
     <per>
       <blurb>Regardez de plus près ...</blurb>
       <long_form>Perception</long_form>
-      <short_form>per</short_form>
+      <short_form>Per</short_form>
     </per>
     <cha>
       <blurb>Le dialogue est une bataille.</blurb>
       <long_form>Charisme</long_form>
-      <short_form>char</short_form>
+      <short_form>Char</short_form>
     </cha>
     <int>
       <blurb>Apprendre à apprendre.</blurb>
       <long_form>Intelligence</long_form>
-      <short_form>int</short_form>
+      <short_form>Int</short_form>
     </int>
     <luck>
       <blurb>L'opportunité sourit aux chanceux.</blurb>
       <long_form>Chance</long_form>
-      <short_form>chan</short_form>
+      <short_form>Chan</short_form>
     </luck>
     <soul>
       <blurb>Vous êtes le capitaine.</blurb>
       <long_form>Âme</long_form>
-      <short_form>âme</short_form>
+      <short_form>Âme</short_form>
     </soul>
     <tooltip>
       <level>Niveau</level>

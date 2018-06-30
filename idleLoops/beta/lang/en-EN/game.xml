@@ -287,47 +287,47 @@
     <dex>
       <blurb>Know your body.</blurb>
       <long_form>Dexterity</long_form>
-      <short_form>dex</short_form>
+      <short_form>Dex</short_form>
     </dex>
     <str>
       <blurb>Train your body.</blurb>
       <long_form>Strength</long_form>
-      <short_form>str</short_form>
+      <short_form>Str</short_form>
     </str>
     <con>
       <blurb>Just a little longer. Just a little more.</blurb>
       <long_form>Constitution</long_form>
-      <short_form>con</short_form>
+      <short_form>Con</short_form>
     </con>
     <spd>
       <blurb>Gotta go fast.</blurb>
       <long_form>Speed</long_form>
-      <short_form>spd</short_form>
+      <short_form>Spd</short_form>
     </spd>
     <per>
       <blurb>Look a little closer...</blurb>
       <long_form>Perception</long_form>
-      <short_form>per</short_form>
+      <short_form>Per</short_form>
     </per>
     <cha>
       <blurb>Conversation is a battle.</blurb>
       <long_form>Charisma</long_form>
-      <short_form>cha</short_form>
+      <short_form>Cha</short_form>
     </cha>
     <int>
       <blurb>Learning to learn.</blurb>
       <long_form>Intelligence</long_form>
-      <short_form>int</short_form>
+      <short_form>Int</short_form>
     </int>
     <luck>
       <blurb>Opportunity favors the fortunate.</blurb>
       <long_form>Luck</long_form>
-      <short_form>luck</short_form>
+      <short_form>Luck</short_form>
     </luck>
     <soul>
       <blurb>You are the captain.</blurb>
       <long_form>Soul</long_form>
-      <short_form>soul</short_form>
+      <short_form>Soul</short_form>
     </soul>
     <tooltip>
       <level>Level</level>
