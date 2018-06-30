@@ -251,15 +251,15 @@ function View() {
             let action = actions.current[i];
             totalDivText +=
                 "<div id='actionTooltip"+i+"' style='display:none;padding-left:10px;width:90%'>" +
-                    "<div style='text-align:center;width:100%'>"+action.name+"</div><br><br>" +
-                    "<div class='bold'>Mana Original</div> <div id='action"+i+"ManaOrig'>0</div><br>" +
-                    "<div class='bold'>Mana Used</div> <div id='action"+i+"ManaUsed'>0</div><br>" +
-                    "<div class='bold'>Mana Remaining</div> <div id='action"+i+"Remaining'></div><br>" +
-                    "<div class='bold'>Gold Remaining</div> <div id='action"+i+"GoldRemaining'></div><br><br>" +
+                    "<div style='text-align:center;width:100%'>"+action.label+"</div><br><br>" +
+                    "<div class='bold'>"+_txt("actions>current_action>mana_original")+"</div> <div id='action"+i+"ManaOrig'>0</div><br>" +
+                    "<div class='bold'>"+_txt("actions>current_action>mana_used")+"</div> <div id='action"+i+"ManaUsed'>0</div><br>" +
+                    "<div class='bold'>"+_txt("actions>current_action>mana_remaining")+"</div> <div id='action"+i+"Remaining'></div><br>" +
+                    "<div class='bold'>"+_txt("actions>current_action>gold_remaining")+"</div> <div id='action"+i+"GoldRemaining'></div><br><br>" +
                     "<div id='action"+i+"ExpGain'></div>" +
                     "<div id='action"+i+"HasFailed' style='display:none'>" +
-                        "<div class='bold'>Failed Attempts</div> <div id='action"+i+"Failed'>0</div><br>" +
-                        "<div class='bold'>Error</div> <div id='action"+i+"Error'></div>" +
+                        "<div class='bold'>"+_txt("actions>current_action>failed_attempts")+"</div> <div id='action"+i+"Failed'>0</div><br>" +
+                        "<div class='bold'>"+_txt("actions>current_action>error")+"</div> <div id='action"+i+"Error'></div>" +
                     "</div>" +
                 "</div>";
         }
@@ -545,6 +545,12 @@ function View() {
         tempObj = new JoinAdvGuild();
         this.createTownAction(tempObj);
         this.createMultiPartPBar(tempObj);
+
+        tempObj = new CraftingGuild();
+        this.createTownAction(tempObj);
+        this.createMultiPartPBar(tempObj);
+
+        this.createTownAction(new ReadBooks());
     };
 
     this.createActionProgress = function(action) {
@@ -587,7 +593,8 @@ function View() {
                     extraImage +
                 "</div>" +
                 "<div class='showthis'>" +
-                    action.tooltip + "<br>" +
+                    action.tooltip + "<span id='goldCost"+action.varName+"'></span>" +
+                    ((typeof(action.tooltip2) === "string") ? action.tooltip2 : "")+"<br>"+
                     actionStats +
                     "<div class='bold'>"+_txt("actions>tooltip>mana_cost")+"</div> <div id='manaCost"+action.varName+"'>"+action.manaCost()+"</div><br>" +
                     "<div class='bold'>"+_txt("actions>tooltip>exp_multiplier")+"</div> "+(action.expMult*100)+"%<br>" +
@@ -646,7 +653,7 @@ function View() {
     this.createTownInfo = function(action) {
         let totalInfoText =
             "<div class='townInfoContainer showthat' id='infoContainer"+action.varName+"'>" +
-                "<div class='bold townLabel'>"+action.infoName+"</div> " +
+                "<div class='bold townLabel'>"+action.labelDone+"</div> " +
                 "<div id='goodTemp"+action.varName+"'>0</div> <i class='fa fa-arrow-left'></i> " +
                 "<div id='good"+action.varName+"'>0</div> <i class='fa fa-arrow-left'></i> " +
                 "<div id='checked"+action.varName+"'>0</div>" +
@@ -682,7 +689,7 @@ function View() {
             "<div class='townStatContainer' style='text-align:center' id='infoContainer"+action.varName+"'>"+
                 "<div class='bold townLabel' style='float:left' id='multiPartName"+action.varName+"'></div>"+
                 "<div class='completedInfo showthat' id='completedContainer"+action.varName+"' onmouseover='view.updateSoulstoneChance()'>" +
-                    "<div class='bold'>Completed</div> <div id='completed"+action.varName+"'></div>" +
+                    "<div class='bold'>"+action.labelDone+"</div> <div id='completed"+action.varName+"'></div>" +
                     (completedTooltip === "" ? "" :"<div class='showthis'>"+completedTooltip+"</div>") + // to prevent an empty tooltip, was reported as bug on discord
                 "</div><br>"+
                 pbars +
@@ -708,6 +715,10 @@ function View() {
         this.updateMultiPartSegments(tempObj);
 
         tempObj = new JoinAdvGuild();
+        this.updateMultiPart(tempObj);
+        this.updateMultiPartSegments(tempObj);
+
+        tempObj = new CraftingGuild();
         this.updateMultiPart(tempObj);
         this.updateMultiPartSegments(tempObj);
     };

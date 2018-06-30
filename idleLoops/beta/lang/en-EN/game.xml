@@ -186,6 +186,13 @@
             <pause_audio_cue>Ping on pause</pause_audio_cue>
         </options>
     </menu>
+    <tutorial><![CDATA[
+      TUTORIAL<br>
+      Click the Wander action and click Play to start.<br>
+      Wander for a bit, then smash pots.<br>
+      Watch the numbers change, read all the tooltips.<br>
+      Complete the town, go to the next one.<br><br>
+      ]]></tutorial>
     <tracked_resources>
         <reset_on_restart_txt>Resets when the loop restarts.</reset_on_restart_txt>
         <resource no_reset_on_restart="true">
@@ -341,6 +348,10 @@
           If your <div class="bold">Cha</div> is level 20 when the action is started, it'd be 640 / 1.2 = 533.333<br>
           Adding back the 160 from <div class="bold">Soul</div> and <div class="bold">Int</div>, the total mana the action takes (rounded up) is now 694, so ~15% less mana.<br>
           The action would give (800/694)*(1+talent/100) level exp per mana for the 694 mana.]]></explanation>
+        <graph_legend><![CDATA[
+          Click the legend to show/hide each.<br>
+          Upon freshly starting, Levels and Talent won't change much.<br>
+          Hover Stats for more info.]]></graph_legend>
     </tooltip>
     <view>
       <regular>Regular View</regular>
@@ -391,6 +402,8 @@
   </towns>
   <actions>
     <title>Action Options</title>
+    <title_list>Action List</title_list>
+    <title_loadout>Loadouts</title_loadout>
     <tooltip>
       <desc><![CDATA[
           Mana cost is based on ratio of stat %s.<br>
@@ -399,19 +412,52 @@
           Actions will target unchecked objects before known lootable objects.]]></desc>
       <mana_cost>Mana Cost</mana_cost>
       <exp_multiplier>Exp Multiplier</exp_multiplier>
+      <mana_used>Mana Used</mana_used>
+      <mana_used_explanation><![CDATA[
+          Shows stat gain affecting speed.<br>
+          Updates every completed action.<br>
+          Accurate at end of run.]]></mana_used_explanation>
+      <amount>Amount</amount>
+      <current_list_active>Keep current list active</current_list_active>
+      <repeat_last_action>Repeat last action on list</repeat_last_action>
+      <add_action_top>Add action to top of list</add_action_top>
+      <save_loadout>Save List</save_loadout>
+      <load_loadout>Load Selected List</load_loadout>
       <higher_done_percent_benefic>You can find more stuff with higher %.</higher_done_percent_benefic>
       <progress_label>Progress</progress_label>
+      <total_found>Total Found</total_found>
+      <icons>
+        <circle_thin>Cap to current max</circle_thin>
+        <plus>Add one loop</plus>
+        <minus>Subtract one loop</minus>
+        <arrows_h>Split action</arrows_h>
+        <sort_up>Move action up</sort_up>
+        <sort_down>Move action down</sort_down>
+        <times>Remove action</times>
+      </icons>
+      <list_explanation><![CDATA[
+      Drag and drop the actions to re-arrange them.<br>
+      The next list becomes the current list every restart.<br>
+      One second = 50 mana.<br>
+      Minimum 1 tick per action.<br>
+      Restarts automatically upon no actions left.]]></list_explanation>
     </tooltip>
+    <current_action>
+        <mana_original>Mana Original</mana_original>
+        <mana_used>Mana Used</mana_used>
+        <mana_remaining>Mana Remaining</mana_remaining>
+        <gold_remaining>Gold Remaining</gold_remaining>
+        <failed_attempts>Failed Attempts</failed_attempts>
+        <error>Error</error>
+    </current_action>
     <wander>
       <label>Wander</label>
       <label_done>Explored</label_done>
-      <collectible_label>Explored</collectible_label>
       <tooltip>Explore the town, look for hidden areas and treasures.</tooltip>
     </wander>
     <meet_people>
       <label>Meet People</label>
       <label_done>People Met</label_done>
-      <collectible_label>People Met</collectible_label>
       <tooltip><![CDATA[
         They won't let you get away with a simple chat.<br>Unlocked at 22% Explored.
       ]]></tooltip>
@@ -419,7 +465,6 @@
     <investigate>
       <label>Investigate</label>
       <label_done>Investigated</label_done>
-      <collectible_label>Investigated</collectible_label>
       <tooltip><![CDATA[
         You've been hearing some rumors...<br>Unlocked at 25% People Met.
       ]]></tooltip>
@@ -427,7 +472,6 @@
     <explore_forest>
       <label>Explore Forest</label>
       <label_done>Forest Explored</label_done>
-      <collectible_label>Forest Explored</collectible_label>
       <tooltip><![CDATA[
         What a pleasant area.<br>2x progress with glasses.
       ]]></tooltip>
@@ -435,7 +479,6 @@
     <old_shortcut>
       <label>Old Shortcut</label>
       <label_done>Shortcut Explored</label_done>
-      <collectible_label>Shortcut Explored</collectible_label>
       <tooltip><![CDATA[
         No one has come down this way in quite some time.<br>Gives some additional herbs.<br>Gives something to talk about with the Hermit. Get 1% reward for Talk to Hermit result per 1% Shortcut Explored.<br>Unlocked at 20% Forest Explored.
       ]]></tooltip>
@@ -443,7 +486,6 @@
     <hermit>
       <label>Talk To Hermit</label>
       <label_done>Hermit Knowledge Learned</label_done>
-      <collectible_label>Hermit Knowledge Learned</collectible_label>
       <tooltip><![CDATA[
         This old man is happy to have a listening ear, surely he has some useful knowledge. You hope.<br>Speed is 1% faster for Gather Herbs, Practical Magic, and Learn Alchemy per 1% of Hermit Knowledge.<br>Unlocked with both 20% Shortcut Explored and 40 Magic.
       ]]></tooltip>
@@ -451,7 +493,6 @@
     <explore_city>
       <label>Explore City</label>
       <label_done>City Explored</label_done>
-      <collectible_label>City Explored</collectible_label>
       <tooltip><![CDATA[
         Everyone is so busy, and there's so much to do.<br>2x progress with glasses.
       ]]></tooltip>
@@ -459,7 +500,6 @@
     <get_drunk>
       <label>Get Drunk</label>
       <label_done>Rumors Heard</label_done>
-      <collectible_label>Rumors Heard</collectible_label>
       <tooltip><![CDATA[
         Sometimes you just need a drink.<br>Costs 2 gold and requires reputation greater than -3.<br>Costs 1 reputation.<br>Unlocked at 20% City Explored.
       ]]></tooltip>
@@ -580,83 +620,180 @@
     </read_books>
     <smash_pots>
       <label>Smash Pots</label>
-      <collectible_label>Pots Smashed</collectible_label>
+      <label_done>Pots Smashed</label_done>
+      <info_text1>Pots with loot left</info_text1>
+      <info_text2>Pots with loot total</info_text2>
+      <info_text3>Pots to check for loot</info_text3>
       <tooltip><![CDATA[
           They're just sitting there, unbroken, full of potential.<br>Pots with loot in them have 100 mana.<br>Every 10 pots have mana.
       ]]></tooltip>
     </smash_pots>
     <locks>
       <label>Pick Locks</label>
-      <collectible_label>Locks Picked</collectible_label>
+      <label_done>Locks Picked</label_done>
+      <info_text1>Houses with loot left</info_text1>
+      <info_text2>Houses with loot total</info_text2>
+      <info_text3>Houses to check for loot</info_text3>
       <tooltip><![CDATA[
-          Don't worry; they won't remember.<br>Houses with loot in them have 10 gold.<br>Every 10 houses have gold.<br>Unlocked at 20% Explored.
+          Don't worry; they won't remember.<br>Houses with loot in them have 
       ]]></tooltip>
+      <tooltip2><![CDATA[
+           gold.<br>Every 10 houses have gold.<br>Unlocked at 20% Explored.
+      ]]></tooltip2>
     </locks>
     <short_quest>
       <label>Short Quest</label>
-      <collectible_label>Short Quests Accomplished</collectible_label>
+      <label_done>Short Quests Accomplished</label_done>
+      <info_text1>Quests with loot left</info_text1>
+      <info_text2>Quests with loot total</info_text2>
+      <info_text3>Quests to finish</info_text3>
       <tooltip><![CDATA[
-          Be a hero! ...If the reward is good and it doesn't take too long.<br>Short Quests with loot give 20 gold as a reward.<br>Every 5 Short Quests have loot.<br>Unlocked at 5% People Met.
+          Be a hero! ...If the reward is good and it doesn't take too long.<br>Short Quests with loot give 
       ]]></tooltip>
+      <tooltip2><![CDATA[
+           gold as a reward.<br>Every 5 Short Quests have loot.<br>Unlocked at 5% People Met.
+      ]]></tooltip2>
     </short_quest>
     <long_quest>
       <label>Long Quest</label>
-      <collectible_label>Long Quests Accomplished</collectible_label>
+      <label_done>Long Quests Accomplished</label_done>
+      <info_text1>Quests with loot left</info_text1>
+      <info_text2>Quests with loot total</info_text2>
+      <info_text3>Quests to finish</info_text3>
       <tooltip><![CDATA[
-          Be a more impressive hero! ...As long as someone is watching.<br>Long Quests with loot give 25 gold and 1 reputation as a reward.<br>Every 5 Long Quests have loot.<br>Unlocked at 10% Investigated.
+          Be a more impressive hero! ...As long as someone is watching.<br>Long Quests with loot give 
       ]]></tooltip>
+      <tooltip2><![CDATA[
+           gold and 1 reputation as a reward.<br>Every 5 Long Quests have loot.<br>Unlocked at 10% Investigated.
+      ]]></tooltip2>
     </long_quest>
     <wild_mana>
       <label>Wild Mana</label>
-      <collectible_label>Mana Sources Tapped</collectible_label>
+      <label_done>Mana Sources Tapped</label_done>
+      <info_text1>Sources with loot left</info_text1>
+      <info_text2>Sources with loot total</info_text2>
+      <info_text3>Sources to check for loot</info_text3>
       <tooltip><![CDATA[
           They're out of sight of most travellers, but you have time to find and harvest them.<br>Every good mana spot has 200 mana.<br>Every 10 mana spots have good mana.
       ]]></tooltip>
     </wild_mana>
     <gather_herbs>
       <label>Gather Herbs</label>
-      <collectible_label>Funny Plants Uprooted</collectible_label>
+      <label_done>Funny Plants Uprooted</label_done>
+      <info_text1>Plants with loot left</info_text1>
+      <info_text2>Plants with loot total</info_text2>
+      <info_text3>Plants to check for loot</info_text3>
       <tooltip><![CDATA[
           Might as well dig up anything useful you find.<br>Every 10 funny plants are herbs.<br>Unlocked at 10% Forest Explored.
       ]]></tooltip>
     </gather_herbs>
     <hunt>
       <label>Hunt</label>
-      <collectible_label>Animals Skinned</collectible_label>
+      <label_done>Animals Skinned</label_done>
+      <info_text1>Animals with loot left</info_text1>
+      <info_text2>Animals with loot total</info_text2>
+      <info_text3>Animals to check for loot</info_text3>
       <tooltip><![CDATA[
           The forest provides.<br>Every 10 animals have good hides.<br>Unlocked at 40% Forest Explored.<br>NOTE: Using hide is not implemented yet. I'll remove this note when it is.
       ]]></tooltip>
     </hunt>
     <gamble>
       <label>Gamble</label>
-      <collectible_label>Suckers Swindled</collectible_label>
+      <label_done>Suckers Swindled</label_done>
+      <info_text1>Suckers left</info_text1>
+      <info_text2>Suckers total</info_text2>
+      <info_text3>People to check if they're suckers</info_text3>
       <tooltip><![CDATA[
           The cards still somehow come out different every time.<br>Has 2x exp/talent gain<br>Costs 20 gold and 1 reputation.<br>Requires reputation greater than -5.<br>You win against every 10 suckers, and get 60 gold for winning.
       ]]></tooltip>
     </gamble>
     <heal_sick>
       <label>Heal The Sick</label>
+      <label_done>Healed</label_done>
+      <label_part>Patient</label_part>
       <tooltip><![CDATA[
           You won't be able to heal them all, but they'll be thankful for doing what you can.<br>Healing is always 3 parts, each with a main stat - Diagnose (Per), Treat (Int), Inform (Cha).<br>Gives (magic skill) * (1 + main stat / 100) * sqrt(1 + times completed / 100) * (original mana cost / actual mana cost) progress points per mana.<br>Requires 12 Magic skill.<br>Gives 3 reputation upon patient completion.
       ]]></tooltip>
+      <segment_names>
+        <name>Diagnose</name>
+        <name>Treat</name>
+        <name>Inform</name>
+      </segment_names>
     </heal_sick>
     <fight_monsters>
       <label>Fight Monsters</label>
+      <label_done>Killed</label_done>
       <tooltip><![CDATA[
           Slowly, you're figuring out their patterns.<br>Fighting rotates between 3 types of battles, each with a main stat - Quick (Spd), Defensive (Str), Aggressive (Con).<br>Gives (combat skill) * (1 + main stat / 100) * sqrt(1 + times completed / 100) * (original mana cost / actual mana cost) progress points per mana.<br>Requires 10 Combat skill.<br>Gives 20 gold per fight segment completion.
       ]]></tooltip>
+      <segment_names>
+        <name>Deer</name>
+        <name>Giant Turtles</name>
+        <name>Goblins</name>
+        <name>Demon Rabbits</name>
+        <name>Giant Honeybadgers</name>
+        <name>Venemous Snakes</name>
+        <name>Angry Monkeys</name>
+        <name>Trolls</name>
+        <name>Ogres</name>
+        <name>Pixies</name>
+        <name>Treants</name>
+        <name>Gelatanous Cubes</name>
+        <name>Fairies</name>
+        <name>Orcs</name>
+        <name>Beholders</name>
+        <name>Spectres</name>
+        <name>Shambling Mound</name>
+        <name>Corrupted Mushroomfolk</name>
+        <name>Giant Owls</name>
+        <name>Blood Trolls</name>
+        <name>Small Wyrms</name>
+        <name>Pikachus</name>
+        <name>Machokes</name>
+        <name>Alakazams</name>
+      </segment_names>
+      <segment_alt_names>
+        <name>Speedy Monsters</name>
+        <name>Tough Monsters</name>
+        <name>Scary Monsters</name>
+      </segment_alt_names>
+      <segment_modifier_1>A couple</segment_modifier_1>
+      <segment_modifier_2>A few</segment_modifier_2>
+      <segment_modifier_3>A bunch of</segment_modifier_3>
     </fight_monsters>
     <small_dungeon>
       <label>Small Dungeon</label>
+      <label_done>Looted</label_done>
+      <label_part>Small Dungeon</label_part>
       <tooltip><![CDATA[
           There are small changes each time; it's harder to get used to. The soulstones at the end last through loops, but they're not always in the dungeon... Strange.<br>The dungeon requires different skills at different points.<br>One action can clear multiple dungeons if your stats are high enough.<br>Gives (magic + combat skill) * (1 + main stat / 100) * sqrt(1 + times completed / 200) * (original mana cost / actual mana cost) progress points per mana.<br>Requires a combined skill of 35.<br>Gives 1 soulstone per completion - hover over Completed for info.
       ]]></tooltip>
+      <completed_tooltip><![CDATA[
+        Each soulstone improves a random stat's exp gain by (1+(soulstones)^.8/10). Each soulstone reduces the chance you'll get the next one by 2%.<br>Chance to receive a soulstone recovers at .00002% per mana.
+      ]]></completed_tooltip>
+      <chance_label>Chance</chance_label>
+      <last_stat_label>Last Stat</last_stat_label>
+      <segment_names>
+        <name>Spike Traps</name>
+        <name>Long Hallways</name>
+        <name>Arrow Traps</name>
+        <name>Riddle Guardian</name>
+        <name>Swinging Axes</name>
+        <name>Boss</name>
+        <name>Loot</name>
+      </segment_names>
     </small_dungeon>
     <adventure_guild>
       <label>Adventure Guild</label>
       <tooltip><![CDATA[
-          The one stop shop for all your adventuring needs.<br>Take their tests and get a rank!<br>You can only join 1 guild at a time, and only try once.<br>Gives 200 mana per rank.<br>Gives ((magic skill)/2 + (combat skill)) * (1 + main stat / 100) * sqrt(1 + times completed / 400) * (original mana cost / actual mana cost) progress points per mana.<br>Unlocks at 20% rumors heard.
+          The one stop shop for all your adventuring needs.<br>Take their tests and get a rank!<br>You can only join 1 guild at a time, and only try once.<br>Gives 200 mana per rank.<br>Gives ((magic skill)/2 + (combat skill)) * (1 + main stat / 100) * sqrt(1 + times completed / 1000) * (original mana cost / actual mana cost) progress points per mana.<br>Unlocks at 20% rumors heard.
       ]]></tooltip>
     </adventure_guild>
+    <craft_guild>
+      <label>Crafting Guild</label>
+    </craft_guild>
   </actions>
+  <spells>
+    <title>Spells</title>
+  </spells>
 </body>

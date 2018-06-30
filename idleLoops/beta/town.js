@@ -133,6 +133,8 @@ function Town(index) {
         this.createProgressVars("Drunk");
         this.AdvGuild = 0;
         this.AdvGuildLoopCounter = 0;
+        this.CraftGuild = 0;
+        this.CraftGuildLoopCounter = 0;
     }
 
 }

@@ -41,11 +41,7 @@
             <label for="radarStats" class="localized" data-lockey="stats>view>radar"></label>
             <div class="showthat" id="radarChart">
                 <canvas id="statChartCtx" width="350" height="350"></canvas>
-                <div class="showthis" style="margin-top:20px;width:375px">
-                    Click the legend to show/hide each.<br>
-                    Upon freshly starting, Levels and Talent won't change much.<br>
-                    Hover Stats for more info.
-                </div>
+                <div class="showthis localized" style="margin-top:20px;width:375px" data-lockey="stats>tooltip>graph_legend"></div>
             </div>
             <div id="statContainer" style="width:100%;position:absolute;top:18px;left:0;"></div><br>
             <div id="skillList" style="width:100%;margin-top:25px;display:none">
@@ -97,6 +93,17 @@
                         <span class="localized" data-lockey="skills>alchemy>desc2"></span><br>
                     </div>
                 </div>
+                <div class="skillContainer showthat" id="skillCraftingContainer">
+                    <div class="skillLabel medium bold">Crafting</div>
+                    <div class="statNum medium"><div id="skillCraftingLevel">0</div></div>
+                    <div style="margin-top:18px;"></div>
+                    <div class="thinProgressBarUpper"><div class="statBar skillExpBar townExpBar" id="skillCraftingLevelBar"></div></div>
+                    <div class="showthis">
+                        Brewing potions is hard work! It's a good thing you found a teacher.<br>
+                        <div class="medium bold">Level</div> <div id="skillCraftingLevelExp"></div>/<div id="skillCraftingLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="skillCraftingLevelProgress"></div>%)</div><br>
+                        The Magic teacher in Beginnersville adores alchemists. +1% to Mage Lessons (rounded down) per level.<br>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -104,38 +111,30 @@
     <div id="actionsColumn" style="width:350px;vertical-align:top;">
         <div id="actionList" style="width:100%;text-align:center;">
             <div class="showthat">
-                <div class="large bold">Action List</div>
+                <div class="large bold localized" data-lockey="actions>title_list"></div>
                 <div class="showthis">
-                    <i class='actionIcon fa fa-circle-thin'></i> Cap to current max<br>
-                    <i class='actionIcon fa fa-plus'></i> Add one loop<br>
-                    <i class='actionIcon fa fa-minus'></i> Subtract one loop<br>
-                    <i class='actionIcon fa fa-arrows-h'></i> Split action<br>
-                    <i class='actionIcon fa fa-sort-up'></i> Move action up<br>
-                    <i class='actionIcon fa fa-sort-down'></i> Move action down<br>
-                    <i class='actionIcon fa fa-times'></i> Remove action<br>
-                    Drag and drop the actions to re-arrange them.<br>
-                    The next list becomes the current list every restart.<br>
-                    One second = 50 mana.<br>
-                    Minimum 1 tick per action.<br>
-                    Restarts automatically upon no actions left.<br>
+                    <i class='actionIcon fa fa-circle-thin'></i> <span class='localized' data-lockey="actions>tooltip>icons>circle_thin"></span><br>
+                    <i class='actionIcon fa fa-plus'></i> <span class='localized' data-lockey="actions>tooltip>icons>plus"></span><br>
+                    <i class='actionIcon fa fa-minus'></i> <span class='localized' data-lockey="actions>tooltip>icons>minus"></span><br>
+                    <i class='actionIcon fa fa-arrows-h'></i> <span class='localized' data-lockey="actions>tooltip>icons>arrows_h"></span><br>
+                    <i class='actionIcon fa fa-sort-up'></i> <span class='localized' data-lockey="actions>tooltip>icons>sort_up"></span><br>
+                    <i class='actionIcon fa fa-sort-down'></i> <span class='localized' data-lockey="actions>tooltip>icons>sort_down"></span><br>
+                    <i class='actionIcon fa fa-times'></i> <span class='localized' data-lockey="actions>tooltip>icons>times"></span><br>
+                    <span class='localized' data-lockey="actions>tooltip>list_explanation"></span>
                 </div>
             </div><br>
             <div id="expandableList">
                 <div style="width:35%;height:100%;background-color:#c2e6cc;text-align:center;vertical-align:top;position:relative;">
                     <div id="curActionsList" style="margin-top:10px;text-align:left;max-height:370px;overflow:auto;width:100%;"></div>
                     <div class="showthat" style="position:absolute;bottom:0;left:0;width:100%;">
-                        <div class="bold">Mana Used</div> <div id="totalTicks"></div>
-                        <div class="showthis">
-                            Shows stat gain affecting speed.<br>
-                            Updates every completed action.<br>
-                            Accurate at end of run.
-                        </div>
+                        <div class="bold localized" data-lockey="actions>tooltip>mana_used"></div> <div id="totalTicks"></div>
+                        <div class="showthis localized" data-lockey="actions>tooltip>mana_used_explanation"></div>
                     </div>
                 </div><div style="width:65%;height:100%;background-color:#cdded2;text-align:center;vertical-align:top;position:relative;">
                     <div id="nextActionsList" style="margin-top:10px;width:100%;text-align:left;max-height:357px;overflow:auto;"></div>
                     <div id="actionTooltipContainer" style="margin-top:10px;width:100%;text-align:left;max-height:357px;overflow:auto;"></div>
                     <div style="position:absolute;bottom:0;left:0;width:100%;">
-                        <div class="bold">Amount</div>
+                        <div class="bold localized" data-lockey="actions>tooltip>amount"></div>
                         <div class="button" id="amount1" onclick="changeActionAmount(1, 1)">1</div>
                         <div class="button" id="amount2" onclick="changeActionAmount(5, 2)">5</div>
                         <div class="button" id="amount3" onclick="changeActionAmount(10, 3)">10</div>
@@ -145,27 +144,27 @@
             <div id="actionChanges" style="text-align:left;width:100%;margin-top:5px;">
                 <div>
                     <input type="checkbox" id="currentListActive">
-                    <label for="currentListActive">Keep current list active</label><br>
+                    <label for="currentListActive" class="localized" data-lockey="actions>tooltip>current_list_active"></label><br>
                     <input type="checkbox" id="repeatLastAction">
-                    <label for="repeatLastAction">Repeat last action on list</label><br>
+                    <label for="repeatLastAction" class="localized" data-lockey="actions>tooltip>repeat_last_action"></label><br>
                     <input type="checkbox" id="addActionTop">
-                    <label for="addActionTop">Add action to top of list</label>
+                    <label for="addActionTop" class="localized" data-lockey="actions>tooltip>add_action_top"></label>
                 </div>
                 <div style="float:right;text-align:right;">
-                    <div class="bold" style="margin-top:3px;">Loadouts</div>
+                    <div class="bold localized" style="margin-top:3px;" data-lockey="actions>title_loadout"></div>
                     <div class="button unused" id="load1" onclick="selectLoadout(1)">1</div>
                     <div class="button unused" id="load2" onclick="selectLoadout(2)">2</div>
                     <div class="button unused" id="load3" onclick="selectLoadout(3)">3</div>
                     <div class="button unused" id="load4" onclick="selectLoadout(4)">4</div><br>
-                    <div class="button" style="margin-bottom:5px;margin-top:5px;" onclick="saveList()">Save List</div><br>
-                    <div class="button" onclick="loadList()">Load Selected List</div>
+                    <div class="button localized" style="margin-bottom:5px;margin-top:5px;" onclick="saveList()" data-lockey="actions>tooltip>save_loadout"></div><br>
+                    <div class="button localized" onclick="loadList()" data-lockey="actions>tooltip>load_loadout"></div>
                 </div>
             </div>
         </div>
 
         <div id="spells" style="width:100%;text-align:center;margin-top:10px;display:none">
             <div class="showthat">
-                <div class="large bold">Spells</div>
+                <div class="large bold localized" data-lockey="spells>title"></div>
                 <div class="showthis">
                 </div>
             </div><br>
@@ -200,11 +199,7 @@
     <div id="tutorial" style="position:absolute;width:100%;height:100%;left:0;top:0;">
         <div style="width:100%;height:100%;background-color:grey;position:relative;opacity:.5"></div>
         <div style="padding:20px;background-color:#e4ece5;border:1px solid black;position:absolute;text-align:left;left:150px;top:150px;">
-            TUTORIAL<br>
-            Click the Wander action and click Play to start.<br>
-            Wander for a bit, then smash pots.<br>
-            Watch the numbers change, read all the tooltips.<br>
-            Complete the town, go to the next one.<br><br>
+            <span class="localized" data-lockey="tutorial"></span>
             <div class="button" onclick="closeTutorial()">OK</div>
         </div>
     </div>
