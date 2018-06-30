@@ -33,6 +33,8 @@ let supplies = 0;
 let herbs = 0;
 let hide = 0;
 let potions = 0;
+let teamNum = 0;
+let guild = "";
 
 let curLoadout = 0;
 let loadouts = [];

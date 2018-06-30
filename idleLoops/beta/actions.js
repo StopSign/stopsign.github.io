@@ -124,7 +124,7 @@ function Actions() {
         towns[0].FightLoopCounter = 0;
         towns[0].SDungeon = 0;
         towns[0].SDungeonLoopCounter = 0;
-        towns[0].suppliesCost = 400;
+        towns[0].suppliesCost = 300;
         view.updateSupplies();
         towns[2].AdvGuild = 0;
         towns[2].AdvGuildLoopCounter = 0;
@@ -132,6 +132,7 @@ function Actions() {
         towns[2].CraftGuild = 0;
         towns[2].CraftGuildLoopCounter = 0;
         window.curCraftGuildSegment = 0;
+        guild = "";
         if(document.getElementById("currentListActive").checked) {
             this.currentPos = 0;
             this.completedTicks = 0;

@@ -82,6 +82,10 @@ function translateClassNames(name) {
         return new ReadBooks();
     } else if(name === "Adventure Guild") {
         return new JoinAdvGuild();
+    } else if(name === "Gather Team") {
+        return new GatherTeam();
+    } else if(name === "Crafting Guild") {
+        return new CraftingGuild();
     }
     console.log('error trying to create ' + name);
 }
@@ -276,6 +280,7 @@ function OldShortcut() {
     this.finish = function() {
         towns[1].finishProgress(this.varName, 100, function() {
             adjustHerbs();
+            view.adjustManaCost("Continue On");
         });
     };
 }
@@ -349,7 +354,7 @@ function adjustSuckers() {
 
 function GetDrunk() {
     this.name = "Get Drunk";
-    this.expMult = 1;
+    this.expMult = 3;
     this.townNum = 2;
     this.tooltip = _txt("actions>get_drunk>tooltip");
     this.label = _txt("actions>get_drunk>label");
@@ -363,11 +368,10 @@ function GetDrunk() {
         Soul:.2
     };
     this.canStart = function() {
-        return reputation >= -3 && gold >= 2
+        return reputation >= -3
     };
     this.cost = function() {
         addReputation(-1);
-        addGold(-2);
     };
     this.manaCost = function() {
         return 1000;
@@ -993,6 +997,44 @@ function ReadBooks() {
     };
 }
 
+function GatherTeam() {
+    this.varName = "GatherTeam";
+    this.name = "Gather Team";
+    this.expMult = 3;
+    this.townNum = 2;
+    this.tooltip = _txt("actions>gather_team>tooltip");
+    this.label = _txt("actions>gather_team>label");
+
+    this.stats = {
+        Per:.2,
+        Cha:.5,
+        Int:.2,
+        Luck:.1
+    };
+    this.affectedBy = ["Adventure Guild"];
+    this.allowed = function() {
+        return 5;
+    };
+    this.canStart = function() {
+        return guild === "Adventure" && gold >= (teamNum+1)*200;
+    };
+    this.cost = function() {
+        addGold(-(teamNum)*200); //cost comes after finish
+    };
+    this.manaCost = function() {
+        return 3000;
+    };
+    this.visible = function() {
+        return towns[2].getLevel("Drunk") >= 10;
+    };
+    this.unlocked = function() {
+        return towns[2].getLevel("Drunk") >= 20;
+    };
+    this.finish = function() {
+        addTeamNum(1);
+    };
+}
+
 //Regular Actions
 //Regular actions have varName, infoName, infoText
 
@@ -1109,7 +1151,7 @@ function ShortQuest() {
         Soul:.1
     };
     this.manaCost = function() {
-        return 800;
+        return 600;
     };
     this.visible = function() {
         return towns[0].getLevel("Met") >= 1;
@@ -1156,7 +1198,7 @@ function LongQuest() {
         Spd:.2
     };
     this.manaCost = function() {
-        return 2000;
+        return 1500;
     };
     this.visible = function() {
         return towns[0].getLevel("Secrets") >= 1;
@@ -1180,7 +1222,7 @@ function LongQuest() {
 function goldCostLQuests() {
     let practical = getSkillLevel("Practical") - 200;
     practical = practical <= 200 ? (practical >= 0 ? practical : 0) : 200;
-    return Math.floor(25 * (1 + practical/100));
+    return Math.floor(30 * (1 + practical/100));
 }
 
 function WildMana() {
@@ -1216,8 +1258,8 @@ function WildMana() {
     };
     this.finish = function() {
         towns[1].finishRegular(this.varName, 10, function() {
-            addMana(200);
-            return 200;
+            addMana(250);
+            return 250;
         })
     };
 }
@@ -1539,6 +1581,7 @@ function JoinAdvGuild() {
     this.townNum = 2;
     this.tooltip = _txt("actions>adventure_guild>tooltip");
     this.label = _txt("actions>adventure_guild>label");
+    this.labelDone = _txt("actions>adventure_guild>label_done");
 
     this.stats = {
         Str:.4,
@@ -1551,7 +1594,7 @@ function JoinAdvGuild() {
         return 3000;
     };
     this.allowed = function() {
-        return window.curCraftGuildSegment === 0 ? 0 : 1
+        return getNumOnList("Crafting Guild") === 0 ? 1 : 0;
     };
     this.loopCost = function(segment) {
         return precision3(Math.pow(1.2, towns[2].AdvGuildLoopCounter + segment)) * 5e6;
@@ -1578,12 +1621,14 @@ function JoinAdvGuild() {
         return towns[2].getLevel("Drunk") >= 20;
     };
     this.finish = function() {
+        guild = "Adventure";
     };
 }
 function getAdvGuildRank(offset) {
     let name = ["E", "F", "D", "C", "B", "A", "S", "SS", "SSS", "SSSS", "U", "UU", "UUU", "UUUU"][Math.floor(window.curAdvGuildSegment/3+.00001)];
 
-    let bonus = Math.floor(10 + (window.curAdvGuildSegment ** 2)/30);
+    let segment = (offset === undefined ? 0 : offset) + window.curAdvGuildSegment;
+    let bonus = precision3(1 + segment/20 + (segment ** 2)/300);
     if(!name) {
         name = "Godlike";
         bonus = Math.floor(10 + (45 ** 2)/30);
@@ -1594,18 +1639,20 @@ function getAdvGuildRank(offset) {
             name += ["-", "", "+"][window.curAdvGuildSegment % 3];
         }
     }
-    name += ", Rank Bonus " + bonus;
+    name += ", Mult x" + bonus;
     return {name:name,bonus:bonus};
 }
 
 function CraftingGuild() {
     this.name = "Crafting Guild";
     this.expMult = 1;
-    this.tooltip = "Learn to use your hands to build big structures.<br>Take their tests and get a rank!<br>You can only join 1 guild at a time, and only try once.<br>Gives 100 Crafting exp per rank.<br>Gives ((magic skill)/2 + (crafting skill)) * (1 + main stat / 100) * sqrt(1 + times completed / 1000) * (original mana cost / actual mana cost) progress points per mana.<br>Unlocks at 20% rumors heard";
     this.townNum = 2;
 
+    this.tooltip = _txt("actions>craft_guild>tooltip");
     this.label = _txt("actions>craft_guild>label"); // this is the displayed name of the action. You use the english name in the code, so I was obligated to create a new var for the displayed name in order to localize
+    this.labelDone = _txt("actions>craft_guild>label_done");
     // this.label = his.name // this is the easiest (instead of previous line) way to have a correct display if you prefer to not go into the XML while coding/
+
     this.varName = "CraftGuild";
     this.stats = {
         Dex:.3,
@@ -1618,7 +1665,7 @@ function CraftingGuild() {
         return 3000;
     };
     this.allowed = function() {
-        return window.curAdvGuildSegment === 0 ? 0 : 1;
+        return getNumOnList("Adventure Guild") === 0 ? 1 : 0;
     };
     this.loopCost = function(segment) {
         return precision3(Math.pow(1.2, towns[2].CraftGuildLoopCounter + segment)) * 5e6;
@@ -1643,15 +1690,17 @@ function CraftingGuild() {
         return towns[2].getLevel("Drunk") >= 5;
     };
     this.unlocked = function() {
-        return towns[2].getLevel("Drunk") >= 20;
+        return towns[2].getLevel("Drunk") >= 30;
     };
     this.finish = function() {
+        guild = "Crafting";
     };
 }
 function getCraftGuildRank(offset) {
     let name = ["E", "F", "D", "C", "B", "A", "S", "SS", "SSS", "SSSS", "U", "UU", "UUU", "UUUU"][Math.floor(window.curCraftGuildSegment/3+.00001)];
 
-    let bonus = Math.floor(10 + (window.curCraftGuildSegment ** 2)/30);
+    let segment = (offset === undefined ? 0 : offset) + window.curCraftGuildSegment;
+    let bonus = precision3(1 + segment/20 + (segment ** 2)/300);
     if(!name) {
         name = "Godlike";
         bonus = Math.floor(10 + (45 ** 2)/30);
@@ -1662,7 +1711,7 @@ function getCraftGuildRank(offset) {
             name += ["-", "", "+"][window.curCraftGuildSegment % 3];
         }
     }
-    name += ", Rank Bonus " + bonus;
+    name += ", Mult x" + bonus;
     return {name:name,bonus:bonus};
 }
 
