@@ -22,6 +22,7 @@ function View() {
         this.updateTrainingLimits();
         this.changeStatView();
         this.adjustGoldCosts();
+        this.updateTeamNum();
     };
 
     this.statLocs = [{x:165, y:43}, {x:270, y:79}, {x:325, y:170}, {x:306, y:284}, {x:225, y:352}, {x:102, y:352}, {x:26, y:284}, {x:2, y:170}, {x:56, y:79}];
@@ -166,6 +167,11 @@ function View() {
         document.getElementById("potionsDiv").style.display = potions ? "inline-block" : "none";
         document.getElementById("potions").innerHTML = potions;
     };
+    this.updateTeamNum = function() {
+        document.getElementById("teamNumDiv").style.display = teamNum ? "inline-block" : "none";
+        document.getElementById("teamNum").innerHTML = teamNum;
+        document.getElementById("teamCost").innerHTML = (teamNum+1)*200+"";
+    };
 
     this.updateNextActions = function () {
         let count = 0;
@@ -276,6 +282,9 @@ function View() {
     this.updateCurrentActionBar = function(index) {
         const action = actions.current[index];
         const div = document.getElementById("action"+index+"Bar");
+        if(!div) {
+            return;
+        }
         div.style.width = (100 * action.ticks / action.adjustedTicks) + "%";
         if(action.loopsFailed) {
             document.getElementById("action" + index + "Failed").innerHTML = action.loopsFailed + "";
@@ -545,6 +554,8 @@ function View() {
         tempObj = new JoinAdvGuild();
         this.createTownAction(tempObj);
         this.createMultiPartPBar(tempObj);
+
+        this.createTownAction(new GatherTeam());
 
         tempObj = new CraftingGuild();
         this.createTownAction(tempObj);

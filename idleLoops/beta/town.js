@@ -119,7 +119,7 @@ function Town(index) {
         this.FightLoopCounter = 0;
         this.SDungeon = 0;
         this.SDungeonLoopCounter = 0;
-        this.suppliesCost = 400;
+        this.suppliesCost = 300;
     } else if(this.index === 1) {
         this.createVars("WildMana");
         this.createVars("Herbs");

@@ -104,6 +104,7 @@ function restart() {
     addHerbs(-herbs);
     addHide(-hide);
     addPotions(-potions);
+    addTeamNum(-teamNum);
     restartStats();
     for(let i = 0; i < towns.length; i++) {
         towns[i].restart();
@@ -181,6 +182,11 @@ function addPotions(amount) {
     view.updatePotions();
 }
 
+function addTeamNum(amount) {
+    teamNum += amount;
+    view.updateTeamNum();
+}
+
 function changeActionAmount(amount, num) {
     actions.addAmount = amount;
     view.updateAddAmount(num);
@@ -234,6 +240,7 @@ function adjustAll() {
     adjustHerbs();
     adjustHunt();
     adjustSuckers();
+    view.adjustManaCost("Continue On");
 }
 
 function capAmount(index, townNum) {
