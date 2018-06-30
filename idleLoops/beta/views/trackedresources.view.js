@@ -5,7 +5,7 @@ Views.registerView('trackedResources',{
      var resources = _txtsObj("tracked_resources>resource");
      $(resources).each(function(x,resource) {
        html += "<div class='showthat resource'";
-       if ($(resource).attr('initialy_hidden'))
+       if ($(resource).attr('initially_hidden'))
           html += " style='display:none' id='"+$(resource).find('id').text()+"Div'";
        html += ">";
        html += "<div class='bold'>"+$(resource).find('title').text()+"</div>";

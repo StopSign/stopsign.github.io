@@ -193,27 +193,27 @@
       <id>reputation</id>
       <desc>L'influence que vous avez sur les gens en ville.</desc>
     </resource>
-    <resource initialy_hidden="true">
+    <resource initially_hidden="true">
       <title>Vivres</title>
       <id>supplies</id>
       <desc>Nécessaire pour aller à la ville suivante.</desc>
     </resource>
-    <resource initialy_hidden="true">
+    <resource initially_hidden="true">
       <title>Herbes</title>
       <id>herbs</id>
       <desc>Les plantes bénéfiques que vous avez récolté.</desc>
     </resource>
-    <resource initialy_hidden="true">
+    <resource initially_hidden="true">
       <title>Peaux</title>
       <id>hide</id>
       <desc>Le résultat d'une chasse fructueuse.</desc>
     </resource>
-    <resource initialy_hidden="true">
+    <resource initially_hidden="true">
       <title>Potions</title>
       <id>potions</id>
       <desc>Rare, mais pas complexe. Vaux quelques pièces d'or.</desc>
     </resource>
-    <resource initialy_hidden="true" no_count="true">
+    <resource initially_hidden="true" no_count="true">
       <title>Lunettes</title>
       <id>glasses</id>
       <desc>Hooooooo, ces arbres ont tellement de feuilles !</desc>
@@ -643,7 +643,7 @@
       <info_text2>Sources with loot total</info_text2>
       <info_text3>Sources to check for loot</info_text3>
       <tooltip><![CDATA[
-          They're out of sight of most travellers, but you have time to find and harvest them.<br>Every good mana spot has 200 mana.<br>Every 10 mana spots have good mana.
+          They're out of sight of most travellers, but you have time to find and harvest them.<br>Every good mana spot has 250 mana.<br>Every 10 mana spots have good mana.
       ]]></tooltip>
     </wild_mana>
     <gather_herbs>
