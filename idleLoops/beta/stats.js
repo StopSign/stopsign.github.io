@@ -64,6 +64,14 @@ function getSkillLevel(skill) {
     return getSkillLevelFromExp(skills[skill].exp);
 }
 
+function getSelfCombat() {
+    return getSkillLevel("Combat");
+}
+
+function getTeamCombat() {
+    return getSkillLevel("Combat");
+}
+
 function getPrcToNextSkillLevel(skill) {
     let expOfCurLevel = getExpOfSkillLevel(getSkillLevel(skill));
     let curLevelProgress = skills[skill].exp - expOfCurLevel;
@@ -86,4 +94,9 @@ function restartStats() {
         stats[statList[i]].exp = 0;
         view.updateStat(statList[i]);
     }
+}
+
+function getTotalBonusXP(statName) {
+    let soulstoneBonus = stats[statName].soulstone ? calcSoulstoneMult(stats[statName].soulstone) : 1;
+    return soulstoneBonus * (1+getTalent(statName)/100);
 }

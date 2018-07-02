@@ -16,343 +16,91 @@
     <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
     
     <script type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.min.js'></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.0/jquery.min.js"></script>
 </head>
-<body id="theBody">
-
+<body id="theBody" style="min-width:1210px">
     <div id="timeInfo" style="width:100%;text-align:center;">
         <div style="width:100%;height:10px;background:white;text-align:center;position:relative;">
             <div id="timeBar" style="height:100%;width:20%;background-color:#8293ff;display:block;margin:auto;"></div>
         </div>
-        <div style="float:left;height:30px;margin-left:10px;" class="showthatH">
-            Changelog
-            <div class="showthisH">
-                <div class="showthat2">
-                    Version .73
-                    <div class="showthis2">
-                        * Changed formula for how Old Shortcut reduces Continue On<br>
-                        * Repeat last action on list saves now<br>
-                        * Lootable first checkboxes save now<br>
-                        * Window title switches when paused correctly<br>
-                        * Dragging an action image doesn't change the URL in firefox<br>
-                        * 2 more story parts, unlocked at Small Dungeon completion<br>
-                        * Re-arrange icon/loop count order on lists<br>
-                        * Get Drunk removes 2 gold instead of adding it
-                    </div>
-                </div><br>
-                <div class="showthat2">
-                    Version .72
-                    <div class="showthis2">
-                        * Sound on pause available in options<br>
-                        * training limit set to 50 from 10 (for now)<br>
-                        * Mana Original is multipled by # loops<br>
-                        * Travel Action styling change<br>
-                        * Saving in town 3<br>
-                        * DRAG AND DROP (Thanks to Hunter)
-                    </div>
-                </div><br>
-                <div class="showthat2">
-                    Version .71
-                    <div class="showthis2">
-                        * Tooltip on reset button<br>
-                        * Glasses give x2 to forest<br>
-                        * Mana cost reflects the tooltips now rather than an average of stat reduction<br>
-                        * Trainings are capped at 10 per loop<br>
-                        * New actions! Brew Potions, Continue On, Explore City, Gamble, Get Drunk, Purchase Mana, Sell Potions<br>
-                        * Some new actions are usless at the moment.
-                    </div>
-                </div><br>
-                <div class="showthat2">
-                    Version .70
-                    <div class="showthis2">
-                        * Reverted skill nerf (too harsh)<br>
-                        * Actually capped glasses<br>
-                        * Sell Gold -> Buy Mana<br>
-                        * Double soulstone recovery<br>
-                        * Nerfed practical magic (more uses for it later)
-                    </div>
-                </div><br>
-                <div class="showthat2">
-                    Version .69
-                    <div class="showthis2">
-                        * Nerfed the soulstone nerf<br>
-                        * Cleared additional purple bars on exp<br>
-                        * Corrected glasses/throw party tooltips<br>
-                        * Actually nerfed skill growth - it's cheaper than before for level 2 - 23, and about 4x harder at level 100<br>
-                        * Add action to top of list option
-                    </div>
-                </div><br>
-                <div class="showthat2">
-                    Version .68
-                    <div class="showthis2">
-                        * Added tab icon<br>
-                        * Throw Party costs 2 reputation from 3<br>
-                        * Removed Guided Tour<br>
-                        * Added Buy Glasses<br>
-                        * Fixed later segment names for Fight<br>
-                        * Nerfed soulstones<br>
-                        * Changed soulstone gathering, equalling about half previous rate but more initially<br>
-                        * Nerfed skill growth<br>
-                        * Added Options and Discord Link (to be expanded)<br>
-                        * Start Journey cost 2k -> 1k
-                    </div>
-                </div><br>
-                <div class="showthat2">
-                    Version .67
-                    <div class="showthis2">
-                        * Added FAQ<br>
-                        * Doubled effectiveness of Guided Tour<br>
-                        * Fixed majority of memory leaks (not all)<br>
-                        * Made Heal/Fight requirements visible with training unlock<br>
-                        * Lengthened action list div<br>
-                        * Changed some wording of descriptions for clarity<br>
-                        * Added "lootable first" option, credit to Hunter<br>
-                        * Fixed a bug with extreme gain on Heal
-                    </div>
-                </div><br>
-                <div class="showthat2">
-                    Version .66
-                    <div class="showthis2">
-                        * Mostly fixed import being all weird<br>
-                        * Changed investigate to be visible earlier<br>
-                        * Fixed Old Shortcut to be 100% from 110%<br>
-                        * Fixed Investigate to be 100% from 90%<br>
-                        * Rewording old shortcut and hermit<br>
-                        * Game autopauses if current list is empty<br>
-                        * Saves variables even if they're 0 (fixes some incorrect negative values)<br>
-                        * Fixes your save if your variables were negative.
-                    </div>
-                </div><br>
-                <div class="showthat2">
-                    Version .65
-                    <div class="showthis2">
-                        * Added Learn Alchemy action and Alchemy skill<br>
-                        * Made a reddit post and discord<br>
-                        * Hid Skills that are at 0 exp<br>
-                        * Import/export
-                    </div>
-                </div><br>
-                <div class="showthat2">
-                    Version .64
-                    <div class="showthis2">
-                        * Start Journey costs 2k mana from 1k<br>
-                        * Added Old Shortcut, Talk to Hermit, and Practical Magic actions<br>
-                        * Added Practical Magic skill<br>
-                        * Widened version tooltips
-                    </div>
-                </div><br>
-                <div class="showthat2">
-                    Version .63
-                    <div class="showthis2">
-                        * Made Heal the Sick, Fight Monster, and Clear Dungeon more difficult<br>
-                        * Changing forEach to for loops, I forgot to change return to continue, causing multiple large issues<br>
-                        * Made stat window a little larger<br>
-                        * Changed town numbers to update on reload, instead of just on a new %
-                    </div>
-                </div><br>
-                <div class="showthat2">
-                    Version .62
-                    <div class="showthis2">
-                        * Added Gather Wild Mana, Gather Herbs, Hunt, and Sit Under Waterfall<br>
-                        * Hide supplies/herbs/hide if you have 0<br>
-                        * You'll need to complete 1 more % on Forest Explored to update Mana Sources (NOTE: not anymore)<br>
-                    </div>
-                </div><br>
-                <div class="showthat2">
-                    Version .61
-                    <div class="showthis2">
-                        * Removed beautiful forEach loops because IE can't handle them<br>
-                        * Possibly fixes game not working on iPads too (tell me if so)<br>
-                        * Fixed errors for players with no save file<br>
-                        * Adjusted mana costs for new actions
-                    </div>
-                </div><br>
-                <div class="showthat2">
-                    Version .6
-                    <div class="showthis2">
-                        * Added version info<br>
-                        * Added Haggle, Buy Supplies, Start Journey, Explore Forest<br>
-                        * Added switching towns and town names<br>
-                        * Added error messages when an action fails (red bar)<br>
-                        * Require reputation now requires, instead of costs<br>
-                        * Fixed repeating a last action with a cost bug<br>
-                        * Visually separated resources and main actions<br>
-                        * Reduced requirements/difficulty for heal/fight/dungeon<br>
-                        * WARNING: adblock caused game to freeze. This has no ads, disable if you also freeze<br>
-                        * Improved performance (since I was looking anyway)
-
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div style="float:left;height:30px;margin-left:10px;" class="showthatH">
-            Saving
-            <div class="showthisH">
-                <div class="button" onclick="save()">Save Manually</div><br>
-                <input id="exportImport"><label for="exportImport">Export/Import</label><br>
-                <div class="button" onclick="exportSave()">Export</div><br>
-                Click Export to export to your clipboard (ctrl-v somewhere else).<br>
-                Paste a save and click Import to import.<br>
-                <div class="button" onclick="importSave()">Import</div><br>
-                WARNING: Import will break the game if invalid save. Empty import will hard clear the game<br>
-                If you reaaallly want to edit your save file, <div class="showthat2">hover me<div class="showthis2">In the console, use decode("pasted savefile"), edit, then encode('pasted savefile'), then import it<br>This is mainly for fixing broken savefiles - don't be a cheater.</div></div>
-                <div style="display:none;border:1px solid brown;border-radius:5px;padding:5px;margin:10px;background:lightyellow;" id="betaSave" hidden>
-                    You are currently playing <b>beta</b> branch of game, which has <i>separate</i> save file.<br><br>
-                    <div class="button" onclick="moveSaveToBeta()">Import from default save</div>
-                    <div class="button" onclick="moveSaveFromBeta()">Export to default save</div>
-                </div>
-            </div>
-        </div>
-        <div style="float:left;height:30px;margin-left:10px;" class="showthatH">
-            FAQ
-            <div class="showthisH">
-                Q: What do stats do?<br>
-                A: Hover over "Stats" for how they work. What stats are important depend on what actions you need that uses them.<br><br>
-                Q: Short runs seem better.<br>
-                A: Short runs are better, for the early game and current balance. As your runs get longer and you accrue talent and soulstones they become more useful.<br><br>
-                Q: What should my first goal be?<br>
-                A: Start with wandering until you have ways of getting mana back. Then try to find how to get some combat training which gives you a permanent boost, and then try fighting monsters!<br>
-            </div>
-        </div>
-        <div style="float:left;height:30px;margin-left:10px;" class="showthatH">
-            Options
-            <div class="showthisH">
-                <a href="https://discord.gg/EmRuWPp" target="_blank">Discord Link</a><br>
-                WARNING: for some reason Adblock Plus can cause massive lag. I won't ever have ads so if your game is freezing frequently please disable for this page.<br>
-                    <input id="audioCueToggle" type="checkbox" />
-                    <label for="audioCueToggle">Ping on pause</label>
-            </div>
-        </div>
-        <div class="showthat">
-            <div class='bold'>Mana</div> <div id="timer">0</div>
-            <div class="showthis">Your main resource. The higher your mana, the more you can do before reset.</div>
-        </div>
-        <div class="showthat">
-            <div class='bold'>Gold</div> <div id="gold">0</div>
-            <div class="showthis">Sell for mana, or use for actions.<br>Resets when the loop restarts.</div>
-        </div>
-        <div class="showthat">
-            <div class='bold'>Reputation</div> <div id="reputation">0</div>
-            <div class="showthis">The influence you have over the people in town.<br>Resets when the loop restarts.</div>
-        </div>
-        <div class="showthat" id="suppliesDiv" style="display:none">
-            <div class='bold'>Supplies</div> <div id="supplies">0</div>
-            <div class="showthis">Needed to go to the next town.<br>Resets when the loop restarts.</div>
-        </div>
-        <div class="showthat" id="herbsDiv" style="display:none">
-            <div class='bold'>Herbs</div> <div id="herbs">0</div>
-            <div class="showthis">The beneficial plants you've found.<br>Resets when the loop restarts.</div>
-        </div>
-        <div class="showthat" id="hideDiv" style="display:none">
-            <div class='bold'>Hide</div> <div id="hide">0</div>
-            <div class="showthis">Results of successful hunting.<br>Resets when the loop restarts.</div>
-        </div>
-        <div class="showthat" id="potionsDiv" style="display:none">
-            <div class='bold'>Potions</div> <div id="potions">0</div>
-            <div class="showthis">Rare, but not complex. Worth some money.<br>Resets when the loop restarts.</div>
-        </div>
-        <div class="showthat" id="glasses" style="display:none;">
-            <div class='bold'>Glasses</div>
-            <div class="showthis">Woah, trees have so many leaves on them.<br>Resets when the loop restarts.</div>
-        </div>
+        <div id='menu' style='float:left;height:30px;'></div>
+        <div id='trackedResources'></div>
         <br>
-        <div id="pausePlay" onclick="pauseGame()" class="button">Pause</div>
-        <input type="checkbox" id="pauseBeforeRestart">
-        <label for="pauseBeforeRestart">Pause before restart</label>
-        <div onclick="restart()" class="button showthat">
-            Restart
-            <div class="showthis" style="color:black;width:230px;">
-                Resets the loop. Not a hard reset.
-            </div>
-        </div>
-        <div class="showthat">
-            <div class="showthat" onmouseover="view.updateStory(storyShowing)" style="height:30px;">
-                <div class="large bold">Story</div><div id="newStory" style="color:red;display:none;">(!)</div>
-                <div class="showthis" style="width:400px;">
-                    <div style="margin-left:175px;" class="actionIcon fa fa-arrow-left" id="storyLeft" onclick="view.updateStory(storyShowing-1)"></div>
-                    <div style="" id="storyPage" class="bold"></div>
-                    <div style="" class="actionIcon fa fa-arrow-right" id="storyRight" onclick="view.updateStory(storyShowing+1)"></div>
-                    <div id="story0">
-                        You're a simple courier, on a long trip to deliver a high priority package. Just as you entered town, you tripped - breaking your glasses - and the package burst open, spilling a strange liquid on you. Immediately, your meager amount of mana started draining rapidly. Right as your mana became empty, you found yourself back in the moment the liquid was absorbed into your skin, with your tiny reserves filled... yet draining just as before. This happened again and again, the world resetting with you, until you decided you had to figure out a way to prolong how long these 'loops' were. Mana crystals are often stored in pottery around town, perhaps you'll start there ...
-                    </div>
-                    <div id="story1" style="display:none">
-                        You reach the end of the dungeon, where a softly glowing orb floats on a pedastal. You've found the dungeon core - for the first level of the dungeon, at least. As you grasp it, the essence dives into you, infusing your very being with the power it holds. It is a small amount of power, but this is a small dungeon. You'll be back to take this power again, knowing with the foreign knowledge implanted that it will stay with you no matter when you are.
-                    </div>
-                    <div id="story2" style="display:none">
-                        You reach the end of the dungeon again, but for the first time the core isn't glowing. It's always been thought that dungeon cores build based on the mana spent around them, but you're beginning to think the essence of it's previous incarnations drains it somehow. It doesn't always happen, but you'll need to put more mana into the world to take the core's benefits out of it. You shrug, accepting yet another oddity of the loops.
-                    </div>
-                </div>
-            </div>
-        </div>
+        <div id='timeControls'></div>
     </div>
 
     <div id="statsColumn" style="width:410px;vertical-align:top;">
-        <div id="statsWindow" style="width:90%;margin-left:12px;text-align:center;margin-top:-10px;">
+        <div id="statsWindow" style="width:90%;margin-left:12px;text-align:center;position:relative;">
             <div class="showthat">
-                <div class="large bold">Stats</div>
-                <div class="showthis">
-                    Each skill level reduces relevant action's mana cost by 1%.<br>
-                    Talent gets 1% of all level progress, and keeps through resets.<br>
-                    Each talent level increases exp gain of skill by 1%.<br>
-                    Exp gain from an action is original mana cost * talent %.<br><br>
-                    e.g. Meet People costs 800 mana and has a breakdown of <div class="bold">Int</div> 10% <div class="bold">Cha</div> 80% <div class="bold">Soul</div> 10%.<br>
-                    This effectively means 80 of the mana is controlled by <div class="bold">Int</div>, another 80 by <div class="bold">Soul</div>, and the remaining 640 by <div class="bold">Cha</div>.<br>
-                    If your <div class="bold">Cha</div> is level 20 when the action is started, it'd be 640 / 1.2 = 533.333<br>
-                    Adding back the 160 from <div class="bold">Soul</div> and <div class="bold">Int</div>, the total mana the action takes (rounded up) is now 694, so ~15% less mana.<br>
-                    The action would give (800/694)*(1+talent/100) level exp per mana for the 694 mana.
-                </div>
+                <div class="large bold localized" data-lockey="stats>title"></div>
+                <div class="showthis localized" data-lockey="stats>tooltip>explanation" style="width:550px;"></div>
             </div><br>
-            <canvas id="statChartCtx" width="350" height="350"></canvas>
-            <div id="statContainer" style="width:100%;">
-            </div><br>
-            <div id="skillList" style="width:100%;margin-top:5px;display:none">
+            <input type="radio" id="regularStats" name="statView" onclick="view.changeStatView()" checked />
+            <label for="regularStats" class="localized" data-lockey="stats>view>regular"></label>
+            <input type="radio" id="radarStats" name="statView" onclick="view.changeStatView()" />
+            <label for="radarStats" class="localized" data-lockey="stats>view>radar"></label>
+            <div class="showthat" id="radarChart">
+                <canvas id="statChartCtx" width="350" height="350"></canvas>
+                <div class="showthis localized" style="margin-top:20px;width:375px" data-lockey="stats>tooltip>graph_legend"></div>
+            </div>
+            <div id="statContainer" style="width:100%;position:absolute;top:18px;left:0;"></div><br>
+            <div id="skillList" style="width:100%;margin-top:25px;display:none">
                 <div class="showthat">
-                    <div class="large bold">Skills</div>
-                    <div class="showthis">
-                        Skills last through resets.<br>
-                    </div>
+                    <div class="large bold localized" data-lockey="skills>title"></div>
+                    <div class="showthis localized" data-lockey="skills>tooltip>no_reset_on_restart"></div>
                 </div><br>
-                <div class="statContainer showthat" id="skillCombatContainer">
-                    <div class="statLabel medium bold">Combat</div>
+                <div class="skillContainer showthat" id="skillCombatContainer">
+                    <div class="skillLabel medium bold localized" data-lockey="skills>combat>label"></div>
                     <div class="statNum medium"><div id="skillCombatLevel">0</div></div>
                     <div style="margin-top:18px;"></div>
                     <div class="thinProgressBarUpper"><div class="statBar skillExpBar townExpBar" id="skillCombatLevelBar"></div></div>
                     <div class="showthis">
-                        Fight for your lives.<br>
-                        <div class="medium bold">Level</div> <div id="skillCombatLevelExp"></div>/<div id="skillCombatLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="skillCombatLevelProgress"></div>%)</div><br>
+                        <span class="localized" data-lockey="skills>combat>desc"></span><br>
+                        <div class="medium bold localized" data-lockey="skills>tooltip>level"></div> <div id="skillCombatLevelExp"></div>/<div id="skillCombatLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="skillCombatLevelProgress"></div>%)</div><br>
                     </div>
                 </div>
-                <div class="statContainer showthat" id="skillMagicContainer">
-                    <div class="statLabel medium bold">Magic</div>
+                <div class="skillContainer showthat" id="skillMagicContainer">
+                    <div class="skillLabel medium bold localized" data-lockey="skills>magic>label"></div>
                     <div class="statNum medium"><div id="skillMagicLevel">0</div></div>
                     <div style="margin-top:18px;"></div>
                     <div class="thinProgressBarUpper"><div class="statBar skillExpBar townExpBar" id="skillMagicLevelBar"></div></div>
                     <div class="showthis">
-                        Control the aether to cast and conjure.<br>
-                        <div class="medium bold">Level</div> <div id="skillMagicLevelExp"></div>/<div id="skillMagicLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="skillMagicLevelProgress"></div>%)</div><br>
+                        <span class="localized" data-lockey="skills>magic>desc"></span><br>
+                        <div class="medium bold localized" data-lockey="skills>tooltip>level"></div> <div id="skillMagicLevelExp"></div>/<div id="skillMagicLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="skillMagicLevelProgress"></div>%)</div><br>
                     </div>
                 </div>
-                <div class="statContainer showthat" id="skillPracticalContainer">
-                    <div class="statLabel medium bold">Practical Magic</div>
+                <div class="skillContainer showthat" id="skillPracticalContainer">
+                    <div class="skillLabel medium bold localized" data-lockey="skills>practical_magic>label"></div>
                     <div class="statNum medium"><div id="skillPracticalLevel">0</div></div>
                     <div style="margin-top:18px;"></div>
                     <div class="thinProgressBarUpper"><div class="statBar skillExpBar townExpBar" id="skillPracticalLevelBar"></div></div>
-                    <div class="showthis">
-                        Mage Hand, Prestidigitation, Detect Magic, and other useful tricks to help out.<br>
-                        <div class="medium bold">Level</div> <div id="skillPracticalLevelExp"></div>/<div id="skillPracticalLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="skillPracticalLevelProgress"></div>%)</div><br>
-                        Smash Pots and Gather Wild Mana have 1% reduced mana cost per level (rounded up).<br>
-                        Pick Locks get 1% more gold per level from 1-200 (rounded down).<br>
-                        Short Quests get 1% more gold per level from 101-300 (rounded down).<br>
-                        Long Quests get 1% more gold per level from 201-400 (rounded down).
+
+                    <div class="showthis" style="width:490px">
+                        <span class="localized" data-lockey="skills>practical_magic>desc"></span><br><br>
+                        <div class="medium bold localized" data-lockey="skills>tooltip>level"></div> <div id="skillPracticalLevelExp"></div>/<div id="skillPracticalLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="skillPracticalLevelProgress"></div>%)</div><br>
+                        <span class="localized" data-lockey="skills>practical_magic>desc2"></span>
+
                     </div>
                 </div>
-                <div class="statContainer showthat" id="skillAlchemyContainer">
-                    <div class="statLabel medium bold">Alchemy</div>
+                <div class="skillContainer showthat" id="skillAlchemyContainer">
+                    <div class="skillLabel medium bold localized" data-lockey="skills>alchemy>label">Alchemy</div>
                     <div class="statNum medium"><div id="skillAlchemyLevel">0</div></div>
                     <div style="margin-top:18px;"></div>
                     <div class="thinProgressBarUpper"><div class="statBar skillExpBar townExpBar" id="skillAlchemyLevelBar"></div></div>
                     <div class="showthis">
+                        <span class="localized" data-lockey="skills>alchemy>desc"></span><br>
+                        <div class="medium bold localized" data-lockey="skills>tooltip>level"></div> <div id="skillAlchemyLevelExp"></div>/<div id="skillAlchemyLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="skillAlchemyLevelProgress"></div>%)</div><br>
+                        <span class="localized" data-lockey="skills>alchemy>desc2"></span><br>
+                    </div>
+                </div>
+                <div class="skillContainer showthat" id="skillCraftingContainer">
+                    <div class="skillLabel medium bold">Crafting</div>
+                    <div class="statNum medium"><div id="skillCraftingLevel">0</div></div>
+                    <div style="margin-top:18px;"></div>
+                    <div class="thinProgressBarUpper"><div class="statBar skillExpBar townExpBar" id="skillCraftingLevelBar"></div></div>
+                    <div class="showthis">
                         Brewing potions is hard work! It's a good thing you found a teacher.<br>
-                        <div class="medium bold">Level</div> <div id="skillAlchemyLevelExp"></div>/<div id="skillAlchemyLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="skillAlchemyLevelProgress"></div>%)</div><br>
+                        <div class="medium bold">Level</div> <div id="skillCraftingLevelExp"></div>/<div id="skillCraftingLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="skillCraftingLevelProgress"></div>%)</div><br>
                         The Magic teacher in Beginnersville adores alchemists. +1% to Mage Lessons (rounded down) per level.<br>
                     </div>
                 </div>
@@ -363,38 +111,30 @@
     <div id="actionsColumn" style="width:350px;vertical-align:top;">
         <div id="actionList" style="width:100%;text-align:center;">
             <div class="showthat">
-                <div class="large bold">Action List</div>
+                <div class="large bold localized" data-lockey="actions>title_list"></div>
                 <div class="showthis">
-                    <i class='actionIcon fa fa-circle-thin'></i> Cap to current max<br>
-                    <i class='actionIcon fa fa-plus'></i> Add one loop<br>
-                    <i class='actionIcon fa fa-minus'></i> Subtract one loop<br>
-                    <i class='actionIcon fa fa-arrows-h'></i> Split action<br>
-                    <i class='actionIcon fa fa-sort-up'></i> Move action up<br>
-                    <i class='actionIcon fa fa-sort-down'></i> Move action down<br>
-                    <i class='actionIcon fa fa-times'></i> Remove action<br>
-                    Drag and drop the actions to re-arrange them.<br>
-                    The next list becomes the current list every restart.<br>
-                    One second = 50 mana.<br>
-                    Minimum 1 tick per action.<br>
-                    Restarts automatically upon no actions left.<br>
+                    <i class='actionIcon fa fa-circle-thin'></i> <span class='localized' data-lockey="actions>tooltip>icons>circle_thin"></span><br>
+                    <i class='actionIcon fa fa-plus'></i> <span class='localized' data-lockey="actions>tooltip>icons>plus"></span><br>
+                    <i class='actionIcon fa fa-minus'></i> <span class='localized' data-lockey="actions>tooltip>icons>minus"></span><br>
+                    <i class='actionIcon fa fa-arrows-h'></i> <span class='localized' data-lockey="actions>tooltip>icons>arrows_h"></span><br>
+                    <i class='actionIcon fa fa-sort-up'></i> <span class='localized' data-lockey="actions>tooltip>icons>sort_up"></span><br>
+                    <i class='actionIcon fa fa-sort-down'></i> <span class='localized' data-lockey="actions>tooltip>icons>sort_down"></span><br>
+                    <i class='actionIcon fa fa-times'></i> <span class='localized' data-lockey="actions>tooltip>icons>times"></span><br>
+                    <span class='localized' data-lockey="actions>tooltip>list_explanation"></span>
                 </div>
             </div><br>
             <div id="expandableList">
                 <div style="width:35%;height:100%;background-color:#c2e6cc;text-align:center;vertical-align:top;position:relative;">
                     <div id="curActionsList" style="margin-top:10px;text-align:left;max-height:370px;overflow:auto;width:100%;"></div>
                     <div class="showthat" style="position:absolute;bottom:0;left:0;width:100%;">
-                        <div class="bold">Mana Used</div> <div id="totalTicks"></div>
-                        <div class="showthis">
-                            Shows stat gain affecting speed.<br>
-                            Updates every completed action.<br>
-                            Accurate at end of run.
-                        </div>
+                        <div class="bold localized" data-lockey="actions>tooltip>mana_used"></div> <div id="totalTicks"></div>
+                        <div class="showthis localized" data-lockey="actions>tooltip>mana_used_explanation"></div>
                     </div>
                 </div><div style="width:65%;height:100%;background-color:#cdded2;text-align:center;vertical-align:top;position:relative;">
                     <div id="nextActionsList" style="margin-top:10px;width:100%;text-align:left;max-height:357px;overflow:auto;"></div>
                     <div id="actionTooltipContainer" style="margin-top:10px;width:100%;text-align:left;max-height:357px;overflow:auto;"></div>
                     <div style="position:absolute;bottom:0;left:0;width:100%;">
-                        <div class="bold">Amount</div>
+                        <div class="bold localized" data-lockey="actions>tooltip>amount"></div>
                         <div class="button" id="amount1" onclick="changeActionAmount(1, 1)">1</div>
                         <div class="button" id="amount2" onclick="changeActionAmount(5, 2)">5</div>
                         <div class="button" id="amount3" onclick="changeActionAmount(10, 3)">10</div>
@@ -404,27 +144,27 @@
             <div id="actionChanges" style="text-align:left;width:100%;margin-top:5px;">
                 <div>
                     <input type="checkbox" id="currentListActive">
-                    <label for="currentListActive">Keep current list active</label><br>
+                    <label for="currentListActive" class="localized" data-lockey="actions>tooltip>current_list_active"></label><br>
                     <input type="checkbox" id="repeatLastAction">
-                    <label for="repeatLastAction">Repeat last action on list</label><br>
+                    <label for="repeatLastAction" class="localized" data-lockey="actions>tooltip>repeat_last_action"></label><br>
                     <input type="checkbox" id="addActionTop">
-                    <label for="addActionTop">Add action to top of list</label>
+                    <label for="addActionTop" class="localized" data-lockey="actions>tooltip>add_action_top"></label>
                 </div>
                 <div style="float:right;text-align:right;">
-                    <div class="bold" style="margin-top:3px;">Loadouts</div>
+                    <div class="bold localized" style="margin-top:3px;" data-lockey="actions>title_loadout"></div>
                     <div class="button unused" id="load1" onclick="selectLoadout(1)">1</div>
                     <div class="button unused" id="load2" onclick="selectLoadout(2)">2</div>
                     <div class="button unused" id="load3" onclick="selectLoadout(3)">3</div>
                     <div class="button unused" id="load4" onclick="selectLoadout(4)">4</div><br>
-                    <div class="button" style="margin-bottom:5px;margin-top:5px;" onclick="saveList()">Save List</div><br>
-                    <div class="button" onclick="loadList()">Load Selected List</div>
+                    <div class="button localized" style="margin-bottom:5px;margin-top:5px;" onclick="saveList()" data-lockey="actions>tooltip>save_loadout"></div><br>
+                    <div class="button localized" onclick="loadList()" data-lockey="actions>tooltip>load_loadout"></div>
                 </div>
             </div>
         </div>
 
         <div id="spells" style="width:100%;text-align:center;margin-top:10px;display:none">
             <div class="showthat">
-                <div class="large bold">Spells</div>
+                <div class="large bold localized" data-lockey="spells>title"></div>
                 <div class="showthis">
                 </div>
             </div><br>
@@ -439,12 +179,7 @@
             <div style="float:left;margin-left:150px;" class="actionIcon fa fa-arrow-left" id="townViewLeft" onclick="view.showTown(townShowing-1)"></div>
             <div class="showthat">
                 <div class="large bold"><div class="bold" id="townName"></div></div>
-                <div class="showthis">
-                    Mana cost is based on ratio of stat %s.<br>
-                    Gained exp is proportional too.<br>
-                    Exp is gained every tick.<br>
-                    Actions will target unchecked objects before known lootable objects.<br>
-                </div>
+                <div id='townDesc' class='showthis'></div>
             </div>
             <div style="float:right;margin-right:150px;" class="actionIcon fa fa-arrow-right" id="townViewRight" onclick="view.showTown(townShowing+1)"></div>
         </div><br>
@@ -452,7 +187,10 @@
         <div id="townInfo1" class='townInfo' style="display:none;"></div>
         <div id="townInfo2" class='townInfo' style="display:none;"></div>
 
-        <div class="large bold" style="display:block;margin:10px auto 2px auto;text-align:center;">Action Options</div>
+        <div class="showthat" style="display:block;margin:10px auto 2px auto;text-align:center;">
+            <span class='large bold localized' data-lockey="actions>title"></span>
+            <div class='showthis localized' data-lockey="actions>tooltip>desc"></div>
+        </div>
         <div id="actionOptionsTown0" class='actionOptions'></div>
         <div id="actionOptionsTown1" class='actionOptions' style="display:none;"></div>
         <div id="actionOptionsTown2" class='actionOptions' style="display:none;"></div>
@@ -461,36 +199,48 @@
     <div id="tutorial" style="position:absolute;width:100%;height:100%;left:0;top:0;">
         <div style="width:100%;height:100%;background-color:grey;position:relative;opacity:.5"></div>
         <div style="padding:20px;background-color:#e4ece5;border:1px solid black;position:absolute;text-align:left;left:150px;top:150px;">
-            TUTORIAL<br>
-            Click the Wander action and click Play to start.<br>
-            Wander for a bit, then smash pots.<br>
-            Watch the numbers change, read all the tooltips.<br>
-            Complete the town, go to the next one.<br><br>
+            <span class="localized" data-lockey="tutorial"></span>
             <div class="button" onclick="closeTutorial()">OK</div>
         </div>
     </div>
 </body>
-
-
-<script src="helpers.js?10"></script>
-<script src="interval.js?10"></script>
-<script src="driver.js?10"></script>
-<script src="stats.js?10"></script>
-<script src="view.js?10"></script>
-<script src="actions.js?10"></script>
-<script src="actionList.js?10"></script>
-<script src="town.js?10"></script>
-<script src="saving.js?10"></script>
+</html>
+<script src="helpers.js?11"></script>
+<script src="interval.js?11"></script>
+<script src="driver.js?11"></script>
+<script src="stats.js?11"></script>
+<script src="statsgraph.js?11"></script>
+<script src="views/main.view.js?11"></script>
+<script src="actions.js?11"></script>
+<script src="actionList.js?11"></script>
+<script src="town.js?11"></script>
+<script src="saving.js?11"></script>
 <script>
     (function (i, s, o, g, r, a, m) {
-    i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function () {
-        (i[r].q = i[r].q || []).push(arguments)
-    }, i[r].l = 1 * new Date(); a = s.createElement(o),
-        m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m)
+        i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function () {
+            (i[r].q = i[r].q || []).push(arguments)
+        }, i[r].l = 1 * new Date(); a = s.createElement(o),
+            m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m)
     })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
 
     ga('create', 'UA-60978932-1', 'auto');
     ga('send', 'pageview');
 
 </script>
-</html>
+<script src="localization.js?11"></script>
+<script src="views/views.js?11"></script>
+<script src="views/menu.view.js?11"></script>
+<script src="views/trackedresources.view.js?11"></script>
+<script src="views/timecontrols.view.js?11"></script>
+<script>
+  $(function() {
+    Localization.init();
+    window._txt = Localization.txt; // binding the _txt function for simplier use
+    window._txtsObj = Localization.txtsObj; // binding the _txt function for simplier use
+    Localization.loadLib('game',function() { // we load the "game.xml" library, then startup the game.
+      Views.draw();
+      Localization.localizePage("game");
+      startGame();
+    });
+  })
+</script>

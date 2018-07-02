@@ -1,26 +1,31 @@
 'use strict';
 
 let gameSpeed = 1;
-let gameTickLeft = 0;
+
+let curTime = new Date();
+let gameTicksLeft = 0;
+let radarUpdateTime = 0;
 
 function tick() {
+    let newTime = new Date();
+    gameTicksLeft += newTime - curTime;
+    radarUpdateTime += newTime - curTime;
+    curTime = newTime;
     if(stop) {
-        gameTickLeft = 0;
+        addOffline(gameTicksLeft * offlineRatio);
+        gameTicksLeft = 0;
         return;
     }
     prevState.stats = JSON.parse(JSON.stringify(stats));
 
-    gameTickLeft += gameSpeed / fps * 50;
-
-    while (gameTickLeft > 0) {
-        if(gameTickLeft > 1000) {
-            pauseGame();
-            console.warn(`too many ticks! (${gameTickLeft})`);
-            gameTickLeft = 0;
+    while (gameTicksLeft > (1000 / 50)) {
+        if(gameTicksLeft > 2000) {
+            window.fps /= 2;
+            console.warn('too fast! (${gameTicksLeft})');
+            statGraph.graphObject.options.animation.duration = 0;
+            gameTicksLeft = 0;
         }
         if(stop) {
-            gameTickLeft = 0;
-            view.update();
             return;
         }
         timer++;
@@ -33,7 +38,6 @@ function tick() {
             }
         }
 
-
         if(shouldRestart || timer >= timeNeeded) {
             prepareRestart();
         }
@@ -41,11 +45,15 @@ function tick() {
         if(timer % (300*gameSpeed) === 0) {
             save();
         }
-        gameTickLeft--;
+        gameTicksLeft -= (1000 / 50) / gameSpeed / bonusSpeed;
+        if(bonusSpeed > 1) {
+            addOffline(-1 * gameTicksLeft * ((bonusSpeed - 1)/bonusSpeed));
+        }
+    }
 
-        if (timer % fps === 0)
-          view.updateStatGraphNeeded = true;
-
+    if(radarUpdateTime > 1000) {
+        view.updateStatGraphNeeded = true;
+        radarUpdateTime -= 1000;
     }
 
     view.update();
@@ -61,7 +69,7 @@ function recalcInterval(fps) {
 function pauseGame() {
     stop = !stop;
     document.title = stop ? "*PAUSED* Idle Loops" : "Idle Loops";
-    document.getElementById("pausePlay").innerHTML = stop ? "Play" : "Pause";
+    document.getElementById('pausePlay').innerHTML = _txt("time_controls>"+ (stop ? 'play_button' : 'pause_button'));
     if(!stop && (shouldRestart || timer >= timeNeeded)) {
         restart();
     }
@@ -96,6 +104,7 @@ function restart() {
     addHerbs(-herbs);
     addHide(-hide);
     addPotions(-potions);
+    addTeamNum(-teamNum);
     restartStats();
     for(let i = 0; i < towns.length; i++) {
         towns[i].restart();
@@ -173,6 +182,11 @@ function addPotions(amount) {
     view.updatePotions();
 }
 
+function addTeamNum(amount) {
+    teamNum += amount;
+    view.updateTeamNum();
+}
+
 function changeActionAmount(amount, num) {
     actions.addAmount = amount;
     view.updateAddAmount(num);
@@ -226,6 +240,7 @@ function adjustAll() {
     adjustHerbs();
     adjustHunt();
     adjustSuckers();
+    view.adjustManaCost("Continue On");
 }
 
 function capAmount(index, townNum) {
@@ -294,7 +309,7 @@ function moveQueuedAction(initialIndex, resultingIndex) {
         return;
     }
     let difference = initialIndex - resultingIndex;
-    if (difference == 0) {
+    if (difference === 0) {
         return;
     }
 
@@ -344,4 +359,24 @@ function removeAction(index) {
     actions.next.splice(index, 1);
     view.updateNextActions();
     view.updateLockedHidden();
+}
+
+function addOffline(num) {
+    if(num) {
+        if(totalOfflineMs + num < 0 && bonusSpeed > 1) {
+            toggleOffline();
+        }
+        totalOfflineMs += num;
+        document.getElementById("bonusSeconds").innerHTML = intToString(totalOfflineMs / 1000, 2);
+    }
+}
+
+function toggleOffline() {
+    if(bonusSpeed === 1) { //go fast
+        bonusSpeed = 4;
+        document.getElementById('isBonusOn').innerHTML = _txt("time_controls>bonus_seconds>state>on");
+    } else { //take it slow
+        bonusSpeed = 1;
+        document.getElementById('isBonusOn').innerHTML = _txt("time_controls>bonus_seconds>state>off");
+    }
 }

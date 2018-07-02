@@ -119,7 +119,7 @@ function Town(index) {
         this.FightLoopCounter = 0;
         this.SDungeon = 0;
         this.SDungeonLoopCounter = 0;
-        this.suppliesCost = 400;
+        this.suppliesCost = 300;
     } else if(this.index === 1) {
         this.createVars("WildMana");
         this.createVars("Herbs");
@@ -131,6 +131,10 @@ function Town(index) {
         this.createVars("Gamble");
         this.createProgressVars("City");
         this.createProgressVars("Drunk");
+        this.AdvGuild = 0;
+        this.AdvGuildLoopCounter = 0;
+        this.CraftGuild = 0;
+        this.CraftGuildLoopCounter = 0;
     }
 
 }

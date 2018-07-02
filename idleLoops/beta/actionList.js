@@ -80,6 +80,12 @@ function translateClassNames(name) {
         return new SellPotions();
     } else if(name === "Read Books") {
         return new ReadBooks();
+    } else if(name === "Adventure Guild") {
+        return new JoinAdvGuild();
+    } else if(name === "Gather Team") {
+        return new GatherTeam();
+    } else if(name === "Crafting Guild") {
+        return new CraftingGuild();
     }
     console.log('error trying to create ' + name);
 }
@@ -100,10 +106,11 @@ let townNames = ["Beginnersville", "Forest Path", "Merchanton"];
 function Wander() {
     this.name = "Wander";
     this.expMult = 1;
-    this.tooltip = "Explore the town, look for hidden areas and treasures.";
     this.townNum = 0;
-
-    this.infoName = "Explored";
+    this.tooltip = _txt("actions>wander>tooltip");
+    this.label = _txt("actions>wander>label");
+    this.labelDone = _txt("actions>wander>label_done");
+    
     this.varName = "Wander";
     this.stats = {
         Per:.2,
@@ -139,10 +146,11 @@ function adjustLocks() {
 function MeetPeople() {
     this.name = "Meet People";
     this.expMult = 1;
-    this.tooltip = "They won't let you get away with a simple chat.<br>Unlocked at 22% Explored";
     this.townNum = 0;
+    this.tooltip = _txt("actions>meet_people>tooltip");
+    this.label = _txt("actions>meet_people>label");
+    this.labelDone = _txt("actions>meet_people>label_done");
 
-    this.infoName = "People Met";
     this.varName = "Met";
     this.stats = {
         Int:.1,
@@ -171,10 +179,11 @@ function adjustSQuests() {
 function Investigate() {
     this.name = "Investigate";
     this.expMult = 1;
-    this.tooltip = "You've been hearing some rumors...<br>Unlocked at 25% People Met";
     this.townNum = 0;
+    this.tooltip = _txt("actions>investigate>tooltip");
+    this.label = _txt("actions>investigate>label");
+    this.labelDone = _txt("actions>investigate>label_done");
 
-    this.infoName = "Investigated";
     this.varName = "Secrets";
     this.stats = {
         Per:.3,
@@ -204,10 +213,11 @@ function adjustLQuests() {
 function ExploreForest() {
     this.name = "Explore Forest";
     this.expMult = 1;
-    this.tooltip = "What a pleasant area.<br>2x progress with glasses";
     this.townNum = 1;
+    this.tooltip = _txt("actions>explore_forest>tooltip");
+    this.label = _txt("actions>explore_forest>label");
+    this.labelDone = _txt("actions>explore_forest>label_done");
 
-    this.infoName = "Forest Explored";
     this.varName = "Forest";
     this.stats = {
         Per:.4,
@@ -246,10 +256,11 @@ function adjustHerbs() {
 function OldShortcut() {
     this.name = "Old Shortcut";
     this.expMult = 1;
-    this.tooltip = "No one has come down this way in quite some time.<br>Gives some additional herbs.<br>Gives something to talk about with the Hermit. Get 1% reward for Talk to Hermit result per 1% Shortcut Explored.<br>Unlocked at 20% Forest Explored.";
     this.townNum = 1;
+    this.tooltip = _txt("actions>old_shortcut>tooltip");
+    this.label = _txt("actions>old_shortcut>label");
+    this.labelDone = _txt("actions>old_shortcut>label_done");
 
-    this.infoName = "Shortcut Explored";
     this.varName = "Shortcut";
     this.stats = {
         Per:.3,
@@ -269,6 +280,7 @@ function OldShortcut() {
     this.finish = function() {
         towns[1].finishProgress(this.varName, 100, function() {
             adjustHerbs();
+            view.adjustManaCost("Continue On");
         });
     };
 }
@@ -276,10 +288,11 @@ function OldShortcut() {
 function TalkToHermit() {
     this.name = "Talk To Hermit";
     this.expMult = 1;
-    this.tooltip = "This old man is happy to have a listening ear, surely he has some useful knowledge. You hope.<br>Speed is 1% faster for Gather Herbs, Practical Magic, and Learn Alchemy per 1% of Hermit Knowledge.<br>Unlocked with both 20% Shortcut Explored and 40 Magic";
     this.townNum = 1;
+    this.tooltip = _txt("actions>hermit>tooltip");
+    this.label = _txt("actions>hermit>label");
+    this.labelDone = _txt("actions>hermit>label_done");
 
-    this.infoName = "Hermit Knowledge Learned";
     this.varName = "Hermit";
     this.stats = {
         Con:.5,
@@ -306,10 +319,11 @@ function TalkToHermit() {
 function ExploreCity() {
     this.name = "Explore City";
     this.expMult = 1;
-    this.tooltip = "Everyone is so busy, and there's so much to do.<br>2x progress with glasses";
     this.townNum = 2;
+    this.tooltip = _txt("actions>explore_city>tooltip");
+    this.label = _txt("actions>explore_city>label");
+    this.labelDone = _txt("actions>explore_city>label_done");
 
-    this.infoName = "City Explored";
     this.varName = "City";
     this.stats = {
         Con:.1,
@@ -335,16 +349,17 @@ function ExploreCity() {
     };
 }
 function adjustSuckers() {
-    towns[2].totalGamble = towns[2].getLevel("City") * 10;
+    towns[2].totalGamble = towns[2].getLevel("City") * 3;
 }
 
 function GetDrunk() {
     this.name = "Get Drunk";
-    this.expMult = 1;
-    this.tooltip = "Sometimes you just need a drink.<br>Costs 2 gold and requires reputation greater than -3.<br>Costs 1 reputation.<br>Unlocked at 20% City Explored.";
+    this.expMult = 3;
     this.townNum = 2;
+    this.tooltip = _txt("actions>get_drunk>tooltip");
+    this.label = _txt("actions>get_drunk>label");
+    this.labelDone = _txt("actions>get_drunk>label_done");
 
-    this.infoName = "Rumors Heard";
     this.varName = "Drunk";
     this.stats = {
         Str:.1,
@@ -353,11 +368,10 @@ function GetDrunk() {
         Soul:.2
     };
     this.canStart = function() {
-        return reputation >= -3 && gold >= 2
+        return reputation >= -3
     };
     this.cost = function() {
         addReputation(-1);
-        addGold(-2);
     };
     this.manaCost = function() {
         return 1000;
@@ -380,8 +394,9 @@ function GetDrunk() {
 function BuyGlasses() {
     this.name = "Buy Glasses";
     this.expMult = 1;
-    this.tooltip = "That's not fair. There was time now. There was all the time I needed.<br>Now you have to get new glasses again for 10 gold!<br>Causes Wander to be 4x as effective for the rest of the loop.<br>Affects any action with the glasses icon<br>Can only have 1 Buy Glasses action.<br>Unlocked at 20% explored";
     this.townNum = 0;
+    this.tooltip = _txt("actions>buy_glasses>tooltip");
+    this.label = _txt("actions>buy_glasses>label");
 
     this.varName = "Glasses";
     this.stats = {
@@ -414,8 +429,9 @@ function BuyGlasses() {
 function BuyMana() {
     this.name = "Buy Mana";
     this.expMult = 1;
-    this.tooltip = "1 gold = 50 mana. Buys all the mana you can.<br>Unlocked at 20% Explored";
     this.townNum = 0;
+    this.tooltip = _txt("actions>buy_mana>tooltip");
+    this.label = _txt("actions>buy_mana>label");
 
     this.varName = "Gold";
     this.stats = {
@@ -441,8 +457,9 @@ function BuyMana() {
 function TrainStr() {
     this.name = "Train Strength";
     this.expMult = 4;
-    this.tooltip = "Build up those muscles. Again.<br>Has 4x exp/talent gain, and can only be done <div id='trainingLimitStr'></div> times per reset<br>Unlocked at 5% People Met";
     this.townNum = 0;
+    this.tooltip = _txt("actions>train_str>tooltip");
+    this.label = _txt("actions>train_str>label");
 
     this.varName = "trStr";
     this.stats = {
@@ -468,8 +485,9 @@ function TrainStr() {
 function TrainDex() {
     this.name = "Train Dex";
     this.expMult = 4;
-    this.tooltip = "The kids are a little mad you're taking their playground. They'll get over it.<br>Has 4x exp/talent gain, and can only be done <div id='trainingLimitDex'></div> times per reset<br>Unlocked at 15% People Met";
     this.townNum = 0;
+    this.tooltip = _txt("actions>train_dex>tooltip");
+    this.label = _txt("actions>train_dex>label");
 
     this.varName = "trDex";
     this.stats = {
@@ -495,8 +513,9 @@ function TrainDex() {
 function TrainSpd() {
     this.name = "Train Speed";
     this.expMult = 4;
-    this.tooltip = "A new friend has a magical treadmill. Gotta go fast.<br>Has 4x exp/talent gain, and can only be done <div id='trainingLimitSpd'></div> times per reset<br>Unlocked at 30% People Met";
     this.townNum = 0;
+    this.tooltip = _txt("actions>train_spd>tooltip");
+    this.label = _txt("actions>train_spd>label");
 
     this.varName = "trSpd";
     this.stats = {
@@ -522,8 +541,9 @@ function TrainSpd() {
 function ThrowParty() {
     this.name = "Throw Party";
     this.expMult = 2;
-    this.tooltip = "Take a break and socialize.<br>8x people met % over Meet People for equivalent mana cost.<br>Costs 2 reputation.<br>Unlocked at 30% Investigated";
     this.townNum = 0;
+    this.tooltip = _txt("actions>throw_party>tooltip");
+    this.label = _txt("actions>throw_party>label");
 
     this.varName = "Party";
     this.stats = {
@@ -554,9 +574,11 @@ function ThrowParty() {
 
 function WarriorLessons() {
     this.name = "Warrior Lessons";
-    this.expMult = 1;
+    this.expMult = 1.5;
     this.tooltip = "Learning to fight is probably important; you have a long journey ahead of you.<br>Requires 2 reputation.<br>Unlocked at 20% Investigated.";
     this.townNum = 0;
+    this.tooltip = _txt("actions>warrior_lesson>tooltip");
+    this.label = _txt("actions>warrior_lesson>label");
 
     this.varName = "trCombat";
     this.stats = {
@@ -586,9 +608,11 @@ function WarriorLessons() {
 
 function MageLessons() {
     this.name = "Mage Lessons";
-    this.expMult = 1;
+    this.expMult = 1.5;
     this.tooltip = "The mystic got you into this mess, maybe it can help you get out of it.<br>Requires 2 reputation.<br>Unlocked at 20% Investigated.";
     this.townNum = 0;
+    this.tooltip = _txt("actions>mage_lesson>tooltip");
+    this.label = _txt("actions>mage_lesson>label");
 
     this.varName = "trMagic";
     this.stats = {
@@ -619,14 +643,18 @@ function MageLessons() {
 function BuySupplies() {
     this.name = "Buy Supplies";
     this.expMult = 1;
-    this.tooltip = "Prepare to move on.<br>Costs <div id='suppliesCost'></div> gold.<br>You only need one set of supplies.<br>Unlocks at a combined skill of 35.";
     this.townNum = 0;
+    this.tooltip = _txt("actions>buy_supplies>tooltip");
+    this.label = _txt("actions>buy_supplies>label");
 
     this.varName = "Supplies";
     this.stats = {
         Cha:.8,
         Luck:.1,
         Soul:.1
+    };
+    this.allowed = function() {
+        return 1;
     };
     this.manaCost = function() {
         return 200;
@@ -651,8 +679,9 @@ function BuySupplies() {
 function Haggle() {
     this.name = "Haggle";
     this.expMult = 1;
-    this.tooltip = "They won't like you as much, but hey - you're leaving.<br>Costs 1 reputation to reduce the price of supplies by 20. <br>Unlocks at a combined skill of 35.";
     this.townNum = 0;
+    this.tooltip = _txt("actions>haggle>tooltip");
+    this.label = _txt("actions>haggle>label");
 
     this.varName = "Haggle";
     this.stats = {
@@ -687,8 +716,9 @@ function Haggle() {
 function StartJourney() {
     this.name = "Start Journey";
     this.expMult = 2;
-    this.tooltip = "Follow the trail to end up at the next town. You need to keep moving until you can learn how to shut these loops off.<br>Costs 1 supplies. Finish once to unlock Forest Path's actions, then finish this in order to use Forest Path's actions.<br>Unlocks at a combined skill of 35.";
     this.townNum = 0;
+    this.tooltip = _txt("actions>start_journey>tooltip");
+    this.label = _txt("actions>start_journey>label");
 
     this.varName = "Journey";
     this.stats = {
@@ -722,8 +752,9 @@ function StartJourney() {
 function SitByWaterfall() {
     this.name = "Sit By Waterfall";
     this.expMult = 4;
-    this.tooltip = "It's peaceful here. Loud, but peaceful.<br>Has 4x exp/talent gain, and can only be done <div id='trainingLimitSoul'></div> times per reset<br>Unlocked at 70% Forest Explored.";
     this.townNum = 1;
+    this.tooltip = _txt("actions>train_soul>tooltip");
+    this.label = _txt("actions>train_soul>label");
 
     this.varName = "Waterfall";
     this.stats = {
@@ -748,9 +779,11 @@ function SitByWaterfall() {
 
 function PracticalMagic() {
     this.name = "Practical Magic";
-    this.expMult = 1;
+    this.expMult = 1.5;
     this.tooltip = "Such simple uses to help out with everyday tasks. Genius, really. It's like pulling teeth getting this knowledge from the Hermit though.<br>Unlocked with both 20% Hermit Knowledge and 50 Magic.";
     this.townNum = 1;
+    this.tooltip = _txt("actions>practical_magic>tooltip");
+    this.label = _txt("actions>practical_magic>label");
 
     this.varName = "trPractical";
     this.stats = {
@@ -771,15 +804,18 @@ function PracticalMagic() {
         addSkillExp("Practical", 100);
         view.adjustManaCost("Wild Mana");
         view.adjustManaCost("Smash Pots");
+        view.adjustGoldCosts();
         view.updateProgressActions();
     };
 }
 
 function LearnAlchemy() {
     this.name = "Learn Alchemy";
-    this.expMult = 1;
+    this.expMult = 1.5;
     this.tooltip = "You can listen to him yammer while making light healing and remedy potions.<br>You're starting to think the potion that caused you to loop time was a complex one.<br>You provide the ingredients; costs 10 herbs.<br>Gives alchemy and magic skill.<br>Unlocked with both 40% Hermit Knowledge and 60 Magic.";
     this.townNum = 1;
+    this.tooltip = _txt("actions>learn_alchemy>tooltip");
+    this.label = _txt("actions>learn_alchemy>label");
 
     this.varName = "trAlchemy";
     this.stats = {
@@ -809,12 +845,13 @@ function LearnAlchemy() {
 }
 
 function BrewPotions() {
-    this.name = "Brew Potions";
-    this.expMult = 1;
-    this.tooltip = "Bubbles and Flasks. Potions and Magic.<br>Requires 5 reputation or he won't let you near his stuff.<br>Creates a potion from 10 herbs to sell at the next town.<br>Gives alchemy and magic skill.<br>Unlocked with 10 Alchemy.";
-    this.townNum = 1;
-
     this.varName = "Potions";
+    this.name = "Brew Potions";
+    this.expMult = 1.5;
+    this.townNum = 1;
+    this.tooltip = _txt("actions>brew_potions>tooltip");
+    this.label = _txt("actions>brew_potions>label");
+
     this.stats = {
         Dex:.3,
         Int:.6,
@@ -843,12 +880,13 @@ function BrewPotions() {
 }
 
 function ContinueOn() {
+    this.varName = "Continue";
     this.name = "Continue On";
     this.expMult = 2;
-    this.tooltip = "Keep walking to the next town, Merchanton.<br>Mana cost reduced by 60 per Old Shortcut %";
     this.townNum = 1;
+    this.tooltip = _txt("actions>continue_on>tooltip");
+    this.label = _txt("actions>continue_on>label");
 
-    this.varName = "Continue";
     this.stats = {
         Con:.4,
         Per:.2,
@@ -872,12 +910,13 @@ function ContinueOn() {
 }
 
 function PurchaseMana() {
+    this.varName = "Gold2";
     this.name = "Purchase Mana";
     this.expMult = 1;
-    this.tooltip = "1 gold = 50 mana. Buys all the mana you can.";
     this.townNum = 2;
+    this.tooltip = _txt("actions>purchase_mana>tooltip");
+    this.label = _txt("actions>purchase_mana>label");
 
-    this.varName = "Gold2";
     this.stats = {
         Cha:.7,
         Int:.2,
@@ -899,12 +938,13 @@ function PurchaseMana() {
 }
 
 function SellPotions() {
+    this.varName = "SellPotions";
     this.name = "Sell Potions";
     this.expMult = 1;
-    this.tooltip = "Potions are worth 1 gold per alchemy skill, but it takes a bit to find a seller.";
     this.townNum = 2;
+    this.tooltip = _txt("actions>sell_potions>tooltip");
+    this.label = _txt("actions>sell_potions>label");
 
-    this.varName = "SellPotions";
     this.stats = {
         Cha:.7,
         Int:.2,
@@ -926,12 +966,13 @@ function SellPotions() {
 }
 
 function ReadBooks() {
-    this.name = "Sell Potions";
+    this.varName = "ReadBooks";
+    this.name = "Read Books";
     this.expMult = 4;
-    this.tooltip = "There's a library! You always loved reading.<br>Discover new worlds and perspectives, get ideas from fiction characters, and empathize with the desire to be stronger.<br>Requires glasses.<br>Has 4x exp/talent gain, and can only be done <div id='trainingLimitInt'></div> times per reset<br>Unlocks at 50% city explored";
     this.townNum = 2;
+    this.tooltip = _txt("actions>read_books>tooltip");
+    this.label = _txt("actions>read_books>label");
 
-    this.varName = "SellPotions";
     this.stats = {
         Int:.8,
         Soul:.2
@@ -956,18 +997,64 @@ function ReadBooks() {
     };
 }
 
+function GatherTeam() {
+    this.varName = "GatherTeam";
+    this.name = "Gather Team";
+    this.expMult = 3;
+    this.townNum = 2;
+    this.tooltip = _txt("actions>gather_team>tooltip");
+    this.label = _txt("actions>gather_team>label");
+
+    this.stats = {
+        Per:.2,
+        Cha:.5,
+        Int:.2,
+        Luck:.1
+    };
+    this.affectedBy = ["Adventure Guild"];
+    this.allowed = function() {
+        return 5;
+    };
+    this.canStart = function() {
+        return guild === "Adventure" && gold >= (teamNum+1)*200;
+    };
+    this.cost = function() {
+        addGold(-(teamNum)*200); //cost comes after finish
+    };
+    this.manaCost = function() {
+        return 3000;
+    };
+    this.visible = function() {
+        return towns[2].getLevel("Drunk") >= 10;
+    };
+    this.unlocked = function() {
+        return towns[2].getLevel("Drunk") >= 20;
+    };
+    this.finish = function() {
+        addTeamNum(1);
+    };
+}
+
 //Regular Actions
 //Regular actions have varName, infoName, infoText
 
 function SmashPots() {
+    this.varName = "Pots";
     this.name = "Smash Pots";
     this.expMult = 1;
-    this.tooltip = "They're just sitting there, unbroken, full of potential.<br>Pots with loot in them have 100 mana.<br>Every 10 pots have mana.";
     this.townNum = 0;
+    this.tooltip = _txt("actions>smash_pots>tooltip");
+    this.label = _txt("actions>smash_pots>label");
+    this.labelDone = _txt("actions>smash_pots>label_done");
+    this.infoText = _txt("actions>smash_pots>info_text1") +
+      " <i class='fa fa-arrow-left'></i> " +
+      _txt("actions>smash_pots>info_text2") +
+      " <i class='fa fa-arrow-left'></i> " +
+      _txt("actions>smash_pots>info_text3") +
+      "<br><div class='bold'>" +
+      _txt("actions>tooltip>total_found") +
+       "</div> <div id='total"+this.varName+"'></div>";
 
-    this.varName = "Pots";
-    this.infoName = "Pots Smashed";
-    this.infoText = "Pots with loot left <i class='fa fa-arrow-left'></i> Pots with loot total <i class='fa fa-arrow-left'></i> Pots to check for loot<br><div class='bold'>Total Found</div> <div id='totalPots'></div>";
     this.stats = {
         Str:.2,
         Per:.2,
@@ -991,14 +1078,23 @@ function SmashPots() {
 }
 
 function PickLocks() {
+    this.varName = "Locks";
     this.name = "Pick Locks";
     this.expMult = 1;
-    this.varName = "Locks";
-    this.tooltip = "Don't worry; they won't remember.<br>Houses with loot in them have 10 gold.<br>Every 10 houses have gold.<br>Unlocked at 20% Explored";
     this.townNum = 0;
+    this.tooltip = _txt("actions>locks>tooltip");
+    this.tooltip2 = _txt("actions>locks>tooltip2");
+    this.label = _txt("actions>locks>label");
+    this.labelDone = _txt("actions>locks>label_done");
+    this.infoText = _txt("actions>locks>info_text1") +
+      " <i class='fa fa-arrow-left'></i> " +
+      _txt("actions>locks>info_text2") +
+      " <i class='fa fa-arrow-left'></i> " +
+      _txt("actions>locks>info_text3") +
+      "<br><div class='bold'>" +
+      _txt("actions>tooltip>total_found") +
+       "</div> <div id='total"+this.varName+"'></div>";
 
-    this.infoName = "Locks Picked";
-    this.infoText = "Houses with loot left <i class='fa fa-arrow-left'></i> Houses with loot total <i class='fa fa-arrow-left'></i> Houses to check for loot<br><div class='bold'>Total Found</div> <div id='totalLocks'></div>";
     this.stats = {
         Dex:.5,
         Per:.3,
@@ -1016,24 +1112,36 @@ function PickLocks() {
     };
     this.finish = function() {
         towns[0].finishRegular(this.varName, 10, function() {
-            let practical = getSkillLevel("Practical");
-            practical = practical <= 200 ? practical : 200;
-            let goldGain = Math.floor(10 * (1 + practical/100));
+            let goldGain = goldCostLocks();
             addGold(goldGain);
             return goldGain;
         })
     };
 }
+function goldCostLocks() {
+    let practical = getSkillLevel("Practical");
+    practical = practical <= 200 ? practical : 200;
+    return Math.floor(10 * (1 + practical/100));
+}
 
 function ShortQuest() {
+    this.varName = "SQuests";
     this.name = "Short Quest";
     this.expMult = 1;
-    this.varName = "SQuests";
-    this.tooltip = "Be a hero! ...If the reward is good and it doesn't take too long.<br>Short Quests with loot give 20 gold as a reward.<br>Every 5 Short Quests have loot.<br>Unlocked at 5% People Met";
     this.townNum = 0;
+    this.tooltip = _txt("actions>short_quest>tooltip");
+    this.tooltip2 = _txt("actions>short_quest>tooltip2");
+    this.label = _txt("actions>short_quest>label");
+    this.labelDone = _txt("actions>short_quest>label_done");
+    this.infoText = _txt("actions>short_quest>info_text1") +
+      " <i class='fa fa-arrow-left'></i> " +
+      _txt("actions>short_quest>info_text2") +
+      " <i class='fa fa-arrow-left'></i> " +
+      _txt("actions>short_quest>info_text3") +
+      "<br><div class='bold'>" +
+      _txt("actions>tooltip>total_found") +
+       "</div> <div id='total"+this.varName+"'></div>";
 
-    this.infoName = "Short Quests Accomplished";
-    this.infoText = "Quests with loot left <i class='fa fa-arrow-left'></i> Quests with loot total <i class='fa fa-arrow-left'></i> Quests to finish<br><div class='bold'>Total Found</div> <div id='totalSQuests'></div>";
     this.stats = {
         Str:.2,
         Dex:.1,
@@ -1043,7 +1151,7 @@ function ShortQuest() {
         Soul:.1
     };
     this.manaCost = function() {
-        return 800;
+        return 600;
     };
     this.visible = function() {
         return towns[0].getLevel("Met") >= 1;
@@ -1053,24 +1161,36 @@ function ShortQuest() {
     };
     this.finish = function() {
         towns[0].finishRegular(this.varName, 5, function() {
-            let practical = getSkillLevel("Practical") - 100;
-            practical = practical <= 200 ? (practical >= 0 ? practical : 0) : 200;
-            let goldGain = Math.floor(20 * (1 + practical/100));
+            let goldGain = goldCostSQuests();
             addGold(goldGain);
             return goldGain;
         })
     };
 }
+function goldCostSQuests() {
+    let practical = getSkillLevel("Practical") - 100;
+    practical = practical <= 200 ? (practical >= 0 ? practical : 0) : 200;
+    return Math.floor(20 * (1 + practical/100));
+}
 
 function LongQuest() {
+    this.varName = "LQuests";
     this.name = "Long Quest";
     this.expMult = 1;
-    this.varName = "LQuests";
-    this.tooltip = "Be a more impressive hero! ...As long as someone is watching.<br>Long Quests with loot give 25 gold and 1 reputation as a reward.<br>Every 5 Long Quests have loot.<br>Unlocked at 10% Investigated.";
     this.townNum = 0;
+    this.tooltip = _txt("actions>long_quest>tooltip");
+    this.tooltip2 = _txt("actions>long_quest>tooltip2");
+    this.label = _txt("actions>long_quest>label");
+    this.labelDone = _txt("actions>long_quest>label_done");
+    this.infoText = _txt("actions>long_quest>info_text1") +
+      " <i class='fa fa-arrow-left'></i> " +
+      _txt("actions>long_quest>info_text2") +
+      " <i class='fa fa-arrow-left'></i> " +
+      _txt("actions>long_quest>info_text3") +
+      "<br><div class='bold'>" +
+      _txt("actions>tooltip>total_found") +
+       "</div> <div id='total"+this.varName+"'></div>";
 
-    this.infoName = "Long Quests Accomplished";
-    this.infoText = "Quests with loot left <i class='fa fa-arrow-left'></i> Quests with loot total <i class='fa fa-arrow-left'></i> Quests to finish<br><div class='bold'>Total Found</div> <div id='totalLQuests'></div>";
     this.stats = {
         Str:.2,
         Int:.2,
@@ -1078,7 +1198,7 @@ function LongQuest() {
         Spd:.2
     };
     this.manaCost = function() {
-        return 2000;
+        return 1500;
     };
     this.visible = function() {
         return towns[0].getLevel("Secrets") >= 1;
@@ -1093,24 +1213,35 @@ function LongQuest() {
     this.finish = function() {
         towns[0].finishRegular(this.varName, 5, function() {
             addReputation(1);
-            let practical = getSkillLevel("Practical") - 200;
-            practical = practical <= 200 ? (practical >= 0 ? practical : 0) : 200;
-            let goldGain = Math.floor(25 * (1 + practical/100));
+            let goldGain = goldCostLQuests();
             addGold(goldGain);
             return goldGain;
         })
     };
 }
+function goldCostLQuests() {
+    let practical = getSkillLevel("Practical") - 200;
+    practical = practical <= 200 ? (practical >= 0 ? practical : 0) : 200;
+    return Math.floor(30 * (1 + practical/100));
+}
 
 function WildMana() {
+    this.varName = "WildMana";
     this.name = "Wild Mana";
     this.expMult = 1;
-    this.tooltip = "They're out of sight of most travellers, but you have time to find and harvest them.<br>Every good mana spot has 200 mana.<br>Every 10 mana spots have good mana.";
     this.townNum = 1;
+    this.tooltip = _txt("actions>wild_mana>tooltip");
+    this.label = _txt("actions>wild_mana>label");
+    this.labelDone = _txt("actions>wild_mana>label_done");
+    this.infoText = _txt("actions>wild_mana>info_text1") +
+      " <i class='fa fa-arrow-left'></i> " +
+      _txt("actions>wild_mana>info_text2") +
+      " <i class='fa fa-arrow-left'></i> " +
+      _txt("actions>wild_mana>info_text3") +
+      "<br><div class='bold'>" +
+      _txt("actions>tooltip>total_found") +
+       "</div> <div id='total"+this.varName+"'></div>";
 
-    this.varName = "WildMana";
-    this.infoName = "Mana Sources Tapped";
-    this.infoText = "Sources with loot left <i class='fa fa-arrow-left'></i> Sources with loot total <i class='fa fa-arrow-left'></i> Sources to check for loot<br><div class='bold'>Total Found</div> <div id='totalWildMana'></div>";
     this.stats = {
         Con:.2,
         Int:.6,
@@ -1127,21 +1258,29 @@ function WildMana() {
     };
     this.finish = function() {
         towns[1].finishRegular(this.varName, 10, function() {
-            addMana(200);
-            return 200;
+            addMana(250);
+            return 250;
         })
     };
 }
 
 function GatherHerbs() {
+    this.varName = "Herbs";
     this.name = "Gather Herbs";
     this.expMult = 1;
-    this.tooltip = "Might as well dig up anything useful you find.<br>Every 10 funny plants are herbs.<br>Unlocked at 10% Forest Explored.";
     this.townNum = 1;
+    this.tooltip = _txt("actions>gather_herbs>tooltip");
+    this.label = _txt("actions>gather_herbs>label");
+    this.labelDone = _txt("actions>gather_herbs>label_done");
+    this.infoText = _txt("actions>gather_herbs>info_text1") +
+      " <i class='fa fa-arrow-left'></i> " +
+      _txt("actions>gather_herbs>info_text2") +
+      " <i class='fa fa-arrow-left'></i> " +
+      _txt("actions>gather_herbs>info_text3") +
+      "<br><div class='bold'>" +
+      _txt("actions>tooltip>total_found") +
+       "</div> <div id='total"+this.varName+"'></div>";
 
-    this.varName = "Herbs";
-    this.infoName = "Funny Plants Uprooted";
-    this.infoText = "Plants with loot left <i class='fa fa-arrow-left'></i> Plants with loot total <i class='fa fa-arrow-left'></i> Plants to check for loot<br><div class='bold'>Total Found</div> <div id='totalHerbs'></div>";
     this.stats = {
         Str:.4,
         Dex:.3,
@@ -1165,14 +1304,22 @@ function GatherHerbs() {
 }
 
 function Hunt() {
+    this.varName = "Hunt";
     this.name = "Hunt";
     this.expMult = 1;
-    this.tooltip = "The forest provides.<br>Every 10 animals have good hides.<br>Unlocked at 40% Forest Explored.<br>NOTE: Using hide is not implemented yet. I'll remove this note when it is.";
     this.townNum = 1;
+    this.tooltip = _txt("actions>hunt>tooltip");
+    this.label = _txt("actions>hunt>label");
+    this.labelDone = _txt("actions>hunt>label_done");
+    this.infoText = _txt("actions>hunt>info_text1") +
+      " <i class='fa fa-arrow-left'></i> " +
+      _txt("actions>hunt>info_text2") +
+      " <i class='fa fa-arrow-left'></i> " +
+      _txt("actions>hunt>info_text3") +
+      "<br><div class='bold'>" +
+      _txt("actions>tooltip>total_found") +
+       "</div> <div id='total"+this.varName+"'></div>";
 
-    this.varName = "Hunt";
-    this.infoName = "Animals Skinned";
-    this.infoText = "Animals with loot left <i class='fa fa-arrow-left'></i> Animals with loot total <i class='fa fa-arrow-left'></i> Animals to check for loot<br><div class='bold'>Total Found</div> <div id='totalHunt'></div>";
     this.stats = {
         Dex:.2,
         Con:.2,
@@ -1197,14 +1344,22 @@ function Hunt() {
 }
 
 function Gamble() {
+    this.varName = "Gamble";
     this.name = "Gamble";
     this.expMult = 2;
-    this.tooltip = "The cards still somehow come out different every time.<br>Has 2x exp/talent gain<br>Costs 20 gold and 1 reputation.<br>Requires reputation greater than -5.<br>You win against every 10 suckers, and get 60 gold for winning";
     this.townNum = 2;
+    this.tooltip = _txt("actions>gamble>tooltip");
+    this.label = _txt("actions>gamble>label");
+    this.labelDone = _txt("actions>gamble>label_done");
+    this.infoText = _txt("actions>gamble>info_text1") +
+      " <i class='fa fa-arrow-left'></i> " +
+      _txt("actions>gamble>info_text2") +
+      " <i class='fa fa-arrow-left'></i> " +
+      _txt("actions>gamble>info_text3") +
+      "<br><div class='bold'>" +
+      _txt("actions>tooltip>total_found") +
+       "</div> <div id='total"+this.varName+"'></div>";
 
-    this.varName = "Gamble";
-    this.infoName = "Suckers Swindled";
-    this.infoText = "Suckers left <i class='fa fa-arrow-left'></i> Suckers total <i class='fa fa-arrow-left'></i> People to check if they're suckers<br><div class='bold'>Total Found</div> <div id='totalGamble'></div>";
     this.stats = {
         Cha:.2,
         Luck:.8
@@ -1238,12 +1393,14 @@ function Gamble() {
 //They also get a bonus depending on how often you complete them
 
 function HealTheSick() {
+    this.varName = "Heal";
     this.name = "Heal The Sick";
     this.expMult = 1;
-    this.tooltip = "You won't be able to heal them all, but they'll be thankful for doing what you can.<br>Healing is always 3 parts, each with a main stat - Diagnose (Per), Treat (Int), Inform (Cha).<br>Gives (magic skill) * (1 + main stat / 100) * sqrt(1 + times completed / 100) * (original mana cost / actual mana cost) progress points per mana.<br>Requires 12 Magic skill.<br>Gives 3 reputation upon patient completion.";
     this.townNum = 0;
+    this.tooltip = _txt("actions>heal_sick>tooltip");
+    this.label = _txt("actions>heal_sick>label");
+    this.labelDone = _txt("actions>heal_sick>label_done");
 
-    this.varName = "Heal";
     this.stats = {
         Per:.2,
         Int:.2,
@@ -1265,10 +1422,14 @@ function HealTheSick() {
         addReputation(3);
     };
     this.getPartName = function() {
-        return "Patient " + numberToWords(Math.floor((towns[0].HealLoopCounter+.0001)/this.segments+1));
+        return _txt("actions>heal_sick>label_part") + " " + numberToWords(Math.floor((towns[0].HealLoopCounter+.0001)/this.segments+1));
     };
     this.getSegmentName = function(segment) {
-        return ["Diagnose", "Treat", "Inform"][segment % 3];
+        let segments = [];
+        $(_txtsObj("actions>heal_sick>segment_names>name")).each(function(x,segmentName) {
+          segments.push($(segmentName).text());
+        })
+        return segments[segment % 3];
     };
     this.visible = function() {
         return towns[0].getLevel("Secrets") >= 20;
@@ -1281,12 +1442,14 @@ function HealTheSick() {
 }
 
 function FightMonsters() {
+    this.varName = "Fight";
     this.name = "Fight Monsters";
     this.expMult = 1;
-    this.tooltip = "Slowly, you're figuring out their patterns.<br>Fighting rotates between 3 types of battles, each with a main stat - Quick (Spd), Defensive (Str), Aggressive (Con).<br>Gives (combat skill) * (1 + main stat / 100) * sqrt(1 + times completed / 100) * (original mana cost / actual mana cost) progress points per mana.<br>Requires 10 Combat skill.<br>Gives 20 gold per fight segment completion.";
     this.townNum = 0;
+    this.tooltip = _txt("actions>fight_monsters>tooltip");
+    this.label = _txt("actions>fight_monsters>label");
+    this.labelDone = _txt("actions>fight_monsters>label_done");
 
-    this.varName = "Fight";
     this.stats = {
         Str:.3,
         Spd:.3,
@@ -1310,23 +1473,16 @@ function FightMonsters() {
         addGold(20);
     };
     this.getPartName = function() {
-        let name = monsterNames()[Math.floor(towns[0].FightLoopCounter/3+.0000001)];
-        if(!name) {
-            name = ["Speedy Monsters", "Tough Monsters", "Scary Monsters"][Math.floor(towns[0].FightLoopCounter/3+.0000001) % 3]
-        }
-        return name;
+        return monsterNames(towns[0].FightLoopCounter);
     };
     this.getSegmentName = function(segment) {
-        let name = monsterNames()[Math.floor(towns[0].FightLoopCounter/3+.0000001)];
-        if(!name) {
-            name = ["Speedy Monsters", "Tough Monsters", "Scary Monsters"][Math.floor(towns[0].FightLoopCounter/3+.0000001) % 3]
-        }
+        let name = monsterNames(towns[0].FightLoopCounter);
         if(segment % 3 === 0) {
-            return "A couple "+name;
+            return _txt("actions>fight_monsters>segment_modifier_1")+" "+name;
         } else if(segment % 3 === 1) {
-            return "A few "+name;
+            return _txt("actions>fight_monsters>segment_modifier_2")+" "+name;
         }
-        return "A bunch of "+name;
+        return _txt("actions>fight_monsters>segment_modifier_3")+" "+name;
     };
     this.visible = function() {
         return towns[0].getLevel("Secrets") >= 20;
@@ -1337,17 +1493,31 @@ function FightMonsters() {
     this.finish = function() {
     };
 }
-function monsterNames() { //spd, defensive, aggressive
-    return ["Deer", "Giant Turtles", "Goblins", "Demon Rabbits", "Giant Honeybadgers", "Venemous Snakes", "Angry Monkeys", "Trolls", "Ogres", "Pixies", "Treants", "Gelatanous Cubes", "Fairies", "Orcs", "Beholders", "Spectres", "Shambling Mound", "Corrupted Mushroomfolk", "Giant Owls", "Blood Trolls", "Small Wyrms", "Pikachus", "Machokes", "Alakazams"];
+function monsterNames(FightLoopCounter) { //spd, defensive, aggressive
+    let names = [];
+    $(_txtsObj("actions>fight_monsters>segment_names>name")).each(function(x,monsterName) {
+      names.push($(monsterName).text());
+    })
+    let altNames = [];
+    $(_txtsObj("actions>fight_monsters>segment_alt_names>name")).each(function(x,monsterName) {
+      altNames.push($(monsterName).text());
+    })
+    let name = names[Math.floor(FightLoopCounter/3+.0000001)];
+    if(!name) {
+        name = altNames[Math.floor(FightLoopCounter/3+.0000001) % 3]
+    }
+    return name;
 }
 
 function SmallDungeon() {
+    this.varName = "SDungeon";
     this.name = "Small Dungeon";
     this.expMult = 1;
-    this.tooltip = "There are small changes each time; it's harder to get used to. The soulstones at the end last through loops, but they're not always in the dungeon... Strange.<br>The dungeon requires different skills at different points.<br>One action can clear multiple dungeons if your stats are high enough.<br>Gives (magic + combat skill) * (1 + main stat / 100) * sqrt(1 + times completed / 200) * (original mana cost / actual mana cost) progress points per mana.<br>Requires a combined skill of 35.<br>Gives 1 soulstone per completion - hover over Completed for info.";
     this.townNum = 0;
+    this.tooltip = _txt("actions>small_dungeon>tooltip");
+    this.label = _txt("actions>small_dungeon>label");
+    this.labelDone = _txt("actions>small_dungeon>label_done");
 
-    this.varName = "SDungeon";
     this.stats = {
         Str:.1,
         Dex:.4,
@@ -1357,7 +1527,9 @@ function SmallDungeon() {
     };
     this.loopStats = ["Dex", "Con", "Dex", "Cha", "Dex", "Str", "Luck"];
     this.segments = 7;
-    this.completedTooltip = "Each soulstone improves a random stat's exp gain by (1+(soulstones)^.8/10). Each soulstone reduces the chance you'll get the next one by 2%.<br>Chance to receive a soulstone recovers at .00002% per mana.<br><div class='bold'>Chance </div> <div id='soulstoneChance'></div>%<br><div class='bold'>Last Stat</div> <div id='soulstonePrevious'>NA</div>";
+    this.completedTooltip = _txt("actions>small_dungeon>completed_tooltip") +
+      "<br><div class='bold'>"+_txt("actions>small_dungeon>chance_label")+" </div> <div id='soulstoneChance'></div>%<br>"+
+      "<div class='bold'>"+_txt("actions>small_dungeon>last_stat_label")+" </div> <div id='soulstonePrevious'>NA</div>";
     this.manaCost = function() {
         return 3000;
     };
@@ -1383,10 +1555,14 @@ function SmallDungeon() {
         }
     };
     this.getPartName = function() {
-        return "Small Dungeon " + numberToWords(Math.floor((towns[0].SDungeonLoopCounter+.0001)/this.segments+1));
+        return _txt("actions>small_dungeon>label_part") + " " + numberToWords(Math.floor((towns[0].SDungeonLoopCounter+.0001)/this.segments+1));
     };
     this.getSegmentName = function(segment) {
-        return ["Spike Traps", "Long Hallways", "Arrow Traps", "Riddle Guardian", "Swinging Axes", "Boss", "Loot"][segment % this.segments];
+        let segments = [];
+        $(_txtsObj("actions>small_dungeon>segment_names>name")).each(function(x,segmentName) {
+          segments.push($(segmentName).text());
+        })
+        return segments[segment % segments.length];
     };
     this.visible = function() {
         return (getSkillLevel("Combat") + getSkillLevel("Magic")) >= 15;
@@ -1397,3 +1573,146 @@ function SmallDungeon() {
     this.finish = function() {
     };
 }
+
+function JoinAdvGuild() {
+    this.varName = "AdvGuild";
+    this.name = "Adventure Guild";
+    this.expMult = 1;
+    this.townNum = 2;
+    this.tooltip = _txt("actions>adventure_guild>tooltip");
+    this.label = _txt("actions>adventure_guild>label");
+    this.labelDone = _txt("actions>adventure_guild>label_done");
+
+    this.stats = {
+        Str:.4,
+        Dex:.3,
+        Con:.3
+    };
+    this.loopStats = ["Str", "Dex", "Con"];
+    this.segments = 3;
+    this.manaCost = function() {
+        return 3000;
+    };
+    this.allowed = function() {
+        return getNumOnList("Crafting Guild") === 0 ? 1 : 0;
+    };
+    this.loopCost = function(segment) {
+        return precision3(Math.pow(1.2, towns[2].AdvGuildLoopCounter + segment)) * 5e6;
+    };
+    this.tickProgress = function(offset) {
+        return (getSkillLevel("Magic")/2 + getSelfCombat("Combat")) * (1 + getLevel(this.loopStats[(towns[2].AdvGuildLoopCounter+offset) % this.loopStats.length])/100) * Math.sqrt(1 + towns[2].totalAdvGuild/1000);
+    };
+    this.loopsFinished = function() {
+    };
+    this.segmentFinished = function() {
+        window.curAdvGuildSegment++;
+        addMana(200);
+    };
+    this.getPartName = function() {
+        return "Rank " + getAdvGuildRank().name;
+    };
+    this.getSegmentName = function(segment) {
+        return "Rank " + getAdvGuildRank(segment).name;
+    };
+    this.visible = function() {
+        return towns[2].getLevel("Drunk") >= 5;
+    };
+    this.unlocked = function() {
+        return towns[2].getLevel("Drunk") >= 20;
+    };
+    this.finish = function() {
+        guild = "Adventure";
+    };
+}
+function getAdvGuildRank(offset) {
+    let name = ["E", "F", "D", "C", "B", "A", "S", "SS", "SSS", "SSSS", "U", "UU", "UUU", "UUUU"][Math.floor(window.curAdvGuildSegment/3+.00001)];
+
+    let segment = (offset === undefined ? 0 : offset) + window.curAdvGuildSegment;
+    let bonus = precision3(1 + segment/20 + (segment ** 2)/300);
+    if(!name) {
+        name = "Godlike";
+        bonus = Math.floor(10 + (45 ** 2)/30);
+    } else {
+        if(offset !== undefined) {
+            name += ["-", "", "+"][offset % 3];
+        } else {
+            name += ["-", "", "+"][window.curAdvGuildSegment % 3];
+        }
+    }
+    name += ", Mult x" + bonus;
+    return {name:name,bonus:bonus};
+}
+
+function CraftingGuild() {
+    this.name = "Crafting Guild";
+    this.expMult = 1;
+    this.townNum = 2;
+
+    this.tooltip = _txt("actions>craft_guild>tooltip");
+    this.label = _txt("actions>craft_guild>label"); // this is the displayed name of the action. You use the english name in the code, so I was obligated to create a new var for the displayed name in order to localize
+    this.labelDone = _txt("actions>craft_guild>label_done");
+    // this.label = his.name // this is the easiest (instead of previous line) way to have a correct display if you prefer to not go into the XML while coding/
+
+    this.varName = "CraftGuild";
+    this.stats = {
+        Dex:.3,
+        Per:.3,
+        Int:.4
+    };
+    this.loopStats = ["Int", "Per", "Dex"];
+    this.segments = 3;
+    this.manaCost = function() {
+        return 3000;
+    };
+    this.allowed = function() {
+        return getNumOnList("Adventure Guild") === 0 ? 1 : 0;
+    };
+    this.loopCost = function(segment) {
+        return precision3(Math.pow(1.2, towns[2].CraftGuildLoopCounter + segment)) * 5e6;
+    };
+    this.tickProgress = function(offset) {
+        return (getSkillLevel("Magic")/2 + getSkillLevel("Crafting")) * (1 + getLevel(this.loopStats[(towns[2].CraftGuildLoopCounter+offset) % this.loopStats.length])/100) * Math.sqrt(1 + towns[2].totalCraftGuild/1000);
+    };
+    this.loopsFinished = function() {
+    };
+    this.segmentFinished = function() {
+        window.curCraftGuildSegment++;
+        addSkillExp("Crafting", 100);
+        addGold(10);
+    };
+    this.getPartName = function() {
+        return "Rank " + getCraftGuildRank().name;
+    };
+    this.getSegmentName = function(segment) {
+        return "Rank " + getCraftGuildRank(segment).name;
+    };
+    this.visible = function() {
+        return towns[2].getLevel("Drunk") >= 5;
+    };
+    this.unlocked = function() {
+        return towns[2].getLevel("Drunk") >= 30;
+    };
+    this.finish = function() {
+        guild = "Crafting";
+    };
+}
+function getCraftGuildRank(offset) {
+    let name = ["E", "F", "D", "C", "B", "A", "S", "SS", "SSS", "SSSS", "U", "UU", "UUU", "UUUU"][Math.floor(window.curCraftGuildSegment/3+.00001)];
+
+    let segment = (offset === undefined ? 0 : offset) + window.curCraftGuildSegment;
+    let bonus = precision3(1 + segment/20 + (segment ** 2)/300);
+    if(!name) {
+        name = "Godlike";
+        bonus = Math.floor(10 + (45 ** 2)/30);
+    } else {
+        if(offset !== undefined) {
+            name += ["-", "", "+"][offset % 3];
+        } else {
+            name += ["-", "", "+"][window.curCraftGuildSegment % 3];
+        }
+    }
+    name += ", Mult x" + bonus;
+    return {name:name,bonus:bonus};
+}
+
+

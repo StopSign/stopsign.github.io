@@ -1,13 +1,16 @@
-let doWork = new Worker('interval.js');
-doWork.onmessage = function (event) {
-    if (event.data === 'interval.start') {
-        tick();
-    }
-};
+function startGame () {
+  window.doWork = new Worker('interval.js');
+  window.doWork.onmessage = function (event) {
+      if (event.data === 'interval.start') {
+          tick();
+      }
+  };
+  displayBetaSaveNote();
+  load();
+}
 
 let isBeta = !!location.href.match(/beta/i);
-let saveName = isBeta ? "idleLoops1" :  "idleLoopsBeta";
-displayBetaSaveNote();
+let saveName = !isBeta ? "idleLoops1" :  "idleLoopsBeta";
 
 let timeNeededInitial = 5 * 50;
 let timer = timeNeededInitial;
@@ -18,7 +21,7 @@ const actions = new Actions();
 const towns = [];
 let curTown = 0;
 
-let statList = ["Str", "Dex", "Con", "Per", "Int", "Cha", "Spd", "Luck", "Soul"];
+let statList = ["Dex", "Str", "Con", "Spd", "Per", "Cha", "Int", "Luck", "Soul"];
 const stats = {};
 let prevState = {};
 let shouldRestart = true;
@@ -30,10 +33,12 @@ let supplies = 0;
 let herbs = 0;
 let hide = 0;
 let potions = 0;
+let teamNum = 0;
+let guild = "";
 
 let curLoadout = 0;
 let loadouts = [];
-let skillList = ["Combat", "Magic", "Practical", "Alchemy"];
+let skillList = ["Combat", "Magic", "Practical", "Alchemy", "Crafting"];
 let skills = {};
 let soulstoneChance = 1;
 let townShowing = 0;
@@ -43,6 +48,14 @@ let actionTownNum;
 let trainingLimits = 50;
 let storyShowing = 0;
 let storyMax = 0;
+
+let curDate = new Date();
+let totalOfflineMs = 0;
+let bonusSpeed = 1;
+let offlineRatio = .8;
+
+window.curAdvGuildSegment = 0;
+window.curCraftGuildSegment = 0;
 
 
 
@@ -106,6 +119,8 @@ function load() {
     town = towns[2];
     town.expCity = toLoad.expCity !== undefined ? toLoad.expCity : 0;
     town.expDrunk = toLoad.expDrunk !== undefined ? toLoad.expDrunk : 0;
+    town.totalAdvGuild = toLoad.totalAdvGuild !== undefined ? toLoad.totalAdvGuild : 0;
+    town.totalCraftGuild = toLoad.totalCraftGuild !== undefined ? toLoad.totalCraftGuild : 0;
 
     actions.next = [];
     if(toLoad.nextList) {
@@ -166,12 +181,16 @@ function load() {
     }
 
     document.getElementById("repeatLastAction").checked = toLoad.repeatLast;
+    document.getElementById("audioCueToggle").checked = toLoad.pingOnPause !== undefined ? toLoad.pingOnPause : false;
     storyShowing = toLoad.storyShowing !== undefined ? toLoad.storyShowing : 0;
     storyMax = toLoad.storyMax !== undefined ? toLoad.storyMax : 0;
 
+    totalOfflineMs = toLoad.totalOfflineMs !== undefined ? toLoad.totalOfflineMs : 0;
+    addOffline(Math.floor((new Date() - new Date(toLoad.date)) * offlineRatio));
+
     adjustAll();
 
-
+    view.changeStatView();
     view.updateNextActions();
     view.updateMultiPartActions();
     view.update();
@@ -202,6 +221,8 @@ function save() {
     town = towns[2];
     toSave.expCity = town.expCity;
     toSave.expDrunk = town.expDrunk;
+    toSave.totalAdvGuild = town.totalAdvGuild;
+    toSave.totalCraftGuild = town.totalCraftGuild;
 
     for(let i = 0; i < towns.length; i++) {
         town = towns[i];
@@ -213,11 +234,20 @@ function save() {
                 toSave["checked" + varName] = town["checked" + varName];
                 toSave["good" + varName] = town["good" + varName];
                 toSave["goodTemp" + varName] = town["good" + varName];
+                if(document.getElementById("searchToggler" + varName)) {
+                    toSave["searchToggler"+varName] = document.getElementById("searchToggler" + varName).checked;
+                }
             }
         }
     }
     toSave.nextList = actions.next;
     toSave.loadouts = loadouts;
+    toSave.repeatLast = document.getElementById("repeatLastAction").checked;
+    toSave.pingOnPause = document.getElementById("audioCueToggle").checked;
+    toSave.storyShowing = storyShowing;
+    toSave.storyMax = storyMax;
+    toSave.date = new Date();
+    toSave.totalOfflineMs = totalOfflineMs;
 
     window.localStorage[saveName] = JSON.stringify(toSave);
 }
@@ -238,8 +268,6 @@ function importSave() {
     load();
     pauseGame();
 }
-
-load();
 
 function displayBetaSaveNote() {
     if(!isBeta) return;

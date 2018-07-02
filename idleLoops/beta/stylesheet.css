@@ -138,21 +138,40 @@ input {
     opacity:1;
 }
 
-.statContainer {
+.skillContainer {
     width:100%;
     position:relative;
+    text-align:left;
 }
-.statLabel {
-    vertical-align: top;
+
+.statRadarContainer {
+    width:40px;
+    padding-top:20px;
     position:absolute;
-    left:40px;
+}
+.statRegularContainer {
+    width:100%;
+    margin-bottom:5px
+}
+.statRegularContainer:hover {
+    background-color: #ccded1;
+}
+.statLabelContainer {
+    width:100%;
+    position:relative;
+    text-align:left;
 }
 .statNum {
+    width:40px;
+    text-align:right;
+    margin:0 10px;
     float:right;
 }
-.statLevelNum {
-    float:left;
+
+.skillLabel {
+    margin-left:18px;
 }
+
 .thinProgressBarUpper, .thinProgressBarLower {
     width:90%;
     background-color:white;
@@ -306,7 +325,6 @@ input {
 }
 
 .ssContainer {
-    color:#a3a3a3;
     display:none;
 }
 
@@ -343,4 +361,8 @@ input {
     -webkit-user-drag: none;
     -webkit-user-select: none;
     -ms-user-select: none;
+}
+
+#trackedResources .resource, #timeControls .control {
+  margin-right : 5px;
 }
