@@ -44,6 +44,11 @@ function Actions() {
                     if(!curAction.segmentFinished) {
                         view.updateMultiPart(curAction);
                     }
+                    if(curAction.canStart && !curAction.canStart()) {
+                        curAction.loopsLeft = 0;
+                        curAction.ticks = 0;
+                        break;
+                    }
                 }
                 if(curAction.segmentFinished) {
                     curAction.segmentFinished();
@@ -85,15 +90,12 @@ function Actions() {
         if(!curAction) {
             return curAction;
         }
-        if(getTravelNum(curAction.name) && (!curAction.canStart || curAction.canStart())) {
-            return curAction;
-        }
         if(curAction.allowed && getNumOnCurList(curAction.name) > curAction.allowed()) {
             curAction.ticks = 0;
             view.updateCurrentActionBar(this.currentPos);
             return undefined;
         }
-        if((curAction.canStart && !curAction.canStart()) || curAction.townNum !== curTown) {
+        if((curAction.canStart && !curAction.canStart() && curAction.townNum === curTown) || curAction.townNum !== curTown) {
             curAction.errorMessage = this.getErrorMessage(curAction);
             curAction.loopsFailed = curAction.loopsLeft;
             curAction.loopsLeft = 0;
@@ -214,7 +216,11 @@ function setAdjustedTicks(action) {
 }
 
 function calcSoulstoneMult(soulstones) {
-    return 1+Math.pow(soulstones, .8)/10;
+    return 1+Math.pow(soulstones, .8)/30;
+}
+
+function calcTalentMult(talent) {
+    return 1+Math.pow(talent, .8)/30;
 }
 
 function addExpFromAction(action) {
