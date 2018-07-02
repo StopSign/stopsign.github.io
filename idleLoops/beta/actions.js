@@ -40,9 +40,12 @@ function Actions() {
                     towns[curAction.townNum][curAction.varName + "LoopCounter"] += curAction.segments;
                     towns[curAction.townNum]["total"+curAction.varName]++;
                     segment -= curAction.segments;
-                    curAction.loopsFinished();
+                    let reaction = curAction.loopsFinished();
                     if(!curAction.segmentFinished) {
                         view.updateMultiPart(curAction);
+                    }
+                    if(curAction.canStart && !curAction.canStart()) {
+                        break;
                     }
                 }
                 if(curAction.segmentFinished) {
@@ -93,7 +96,7 @@ function Actions() {
             view.updateCurrentActionBar(this.currentPos);
             return undefined;
         }
-        if((curAction.canStart && !curAction.canStart()) || curAction.townNum !== curTown) {
+        if((curAction.canStart && !curAction.canStart()) && curAction.townNum !== curTown) {
             curAction.errorMessage = this.getErrorMessage(curAction);
             curAction.loopsFailed = curAction.loopsLeft;
             curAction.loopsLeft = 0;

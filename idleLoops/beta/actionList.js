@@ -84,6 +84,8 @@ function translateClassNames(name) {
         return new JoinAdvGuild();
     } else if(name === "Gather Team") {
         return new GatherTeam();
+    } else if(name === "Large Dungeon") {
+        return new LargeDungeon();
     } else if(name === "Crafting Guild") {
         return new CraftingGuild();
     }
@@ -309,7 +311,7 @@ function TalkToHermit() {
         return towns[1].getLevel("Shortcut") >= 20 && getSkillLevel("Magic") >= 40;
     };
     this.finish = function() {
-        towns[1].finishProgress(this.varName, 50 * (1 + towns[1].getLevel("Shortcut")/100), function() {
+        towns[1].finishProgress(this.varName, 50 * (1 + towns[1].getLevel("Shortcut")/300), function() {
             view.adjustManaCost("Gather Herbs");
             view.adjustManaCost("Practical Magic");
         });
@@ -1497,11 +1499,11 @@ function monsterNames(FightLoopCounter) { //spd, defensive, aggressive
     let names = [];
     $(_txtsObj("actions>fight_monsters>segment_names>name")).each(function(x,monsterName) {
       names.push($(monsterName).text());
-    })
+    });
     let altNames = [];
     $(_txtsObj("actions>fight_monsters>segment_alt_names>name")).each(function(x,monsterName) {
       altNames.push($(monsterName).text());
-    })
+    });
     let name = names[Math.floor(FightLoopCounter/3+.0000001)];
     if(!name) {
         name = altNames[Math.floor(FightLoopCounter/3+.0000001) % 3]
@@ -1514,6 +1516,7 @@ function SmallDungeon() {
     this.name = "Small Dungeon";
     this.expMult = 1;
     this.townNum = 0;
+    this.dungeonNum = 0;
     this.tooltip = _txt("actions>small_dungeon>tooltip");
     this.label = _txt("actions>small_dungeon>label");
     this.labelDone = _txt("actions>small_dungeon>label_done");
@@ -1527,29 +1530,33 @@ function SmallDungeon() {
     };
     this.loopStats = ["Dex", "Con", "Dex", "Cha", "Dex", "Str", "Luck"];
     this.segments = 7;
+    let ssDivContainer = "";
+    for(let i = 0; i < dungeons[this.dungeonNum].length; i++) {
+        ssDivContainer += "Floor " + (i+1) +
+            " | <div class='bold'>"+_txt("actions>small_dungeon>chance_label")+" </div> <div id='soulstoneChance"+this.dungeonNum+"_"+i+"'></div>% - " +
+            "<div class='bold'>"+_txt("actions>small_dungeon>last_stat_label")+" </div> <div id='soulstonePrevious"+this.dungeonNum+"_"+i+"'>NA</div> - " +
+            "<div class='bold'>"+_txt("actions>small_dungeon>label_done")+"</div> <div id='soulstoneCompleted"+this.dungeonNum+"_"+i+"'></div><br>";
+    }
     this.completedTooltip = _txt("actions>small_dungeon>completed_tooltip") +
-      "<br><div class='bold'>"+_txt("actions>small_dungeon>chance_label")+" </div> <div id='soulstoneChance'></div>%<br>"+
-      "<div class='bold'>"+_txt("actions>small_dungeon>last_stat_label")+" </div> <div id='soulstonePrevious'>NA</div>";
+        ssDivContainer;
     this.manaCost = function() {
         return 3000;
     };
+    this.canStart = function() {
+        let curFloor = Math.floor((towns[this.dungeonNum].SDungeonLoopCounter)/this.segments+.0000001 - 1);
+        console.log(curFloor, dungeons[this.dungeonNum].length);
+        return curFloor === dungeons[this.dungeonNum].length;
+    };
     this.loopCost = function(segment) {
-        return fibonacci(1+Math.floor((towns[0].SDungeonLoopCounter+segment)/this.segments+.0000001)) * 15000;
+        return fibonacci(1+Math.floor((towns[this.dungeonNum].SDungeonLoopCounter+segment)/this.segments+.0000001)) * 15000;
     };
     this.tickProgress = function(offset) {
-        return (getSkillLevel("Combat")+getSkillLevel("Magic")) * (1 + getLevel(this.loopStats[(towns[0].SDungeonLoopCounter+offset) % this.loopStats.length])/100) * Math.sqrt(1 + towns[0].totalSDungeon/200);
+        return (getSkillLevel("Combat")+getSkillLevel("Magic")) * (1 + getLevel(this.loopStats[(towns[this.dungeonNum].SDungeonLoopCounter+offset) % this.loopStats.length])/100) * Math.sqrt(1 + towns[this.dungeonNum].totalSDungeon/200);
     };
     this.loopsFinished = function() {
-        let rand = Math.random();
-        if(rand <= soulstoneChance) {
-            let statToAdd = statList[Math.floor(Math.random() * statList.length)];
-            document.getElementById('soulstonePrevious').innerHTML = statToAdd;
-            stats[statToAdd].soulstone = stats[statToAdd].soulstone ? stats[statToAdd].soulstone+1 : 1;
-            soulstoneChance *= .98;
-            view.updateSoulstones();
-            if(storyMax <= 1) {
-                unlockStory(1);
-            }
+        let success = finishDungeon(this.dungeonNum, Math.floor((towns[this.dungeonNum].SDungeonLoopCounter)/this.segments+.0000001-1));
+        if(success && storyMax <= 1) {
+            unlockStory(1);
         } else if(storyMax <= 2) {
             unlockStory(2);
         }
@@ -1561,7 +1568,7 @@ function SmallDungeon() {
         let segments = [];
         $(_txtsObj("actions>small_dungeon>segment_names>name")).each(function(x,segmentName) {
           segments.push($(segmentName).text());
-        })
+        });
         return segments[segment % segments.length];
     };
     this.visible = function() {
@@ -1572,6 +1579,21 @@ function SmallDungeon() {
     };
     this.finish = function() {
     };
+}
+function finishDungeon(dungeonNum, floorNum) {
+    let floor = dungeons[dungeonNum][floorNum];
+    if(!floor) {
+        return;
+    }
+    let rand = Math.random();
+    console.log(dungeonNum, floorNum);
+    if(rand <= floor.ssChance) {
+        let statToAdd = statList[Math.floor(Math.random() * statList.length)];
+        document.getElementById('soulstonePrevious'+dungeonNum+"_"+floorNum).innerHTML = statToAdd;
+        stats[statToAdd].soulstone = stats[statToAdd].soulstone ? stats[statToAdd].soulstone+1 : 1;
+        floor.ssChance *= .98;
+        view.updateSoulstones();
+    }
 }
 
 function JoinAdvGuild() {
@@ -1641,6 +1663,80 @@ function getAdvGuildRank(offset) {
     }
     name += ", Mult x" + bonus;
     return {name:name,bonus:bonus};
+}
+
+function LargeDungeon() {
+    this.varName = "LDungeon";
+    this.name = "Large Dungeon";
+    this.expMult = 2;
+    this.townNum = 2;
+    this.dungeonNum = 1;
+    this.tooltip = _txt("actions>large_dungeon>tooltip");
+    this.label = _txt("actions>large_dungeon>label");
+    this.labelDone = _txt("actions>large_dungeon>label_done");
+
+    this.stats = {
+        Str:.2,
+        Dex:.2,
+        Con:.2,
+        Cha:.3,
+        Luck:.1
+    };
+    this.loopStats = ["Cha", "Spd", "Str", "Cha", "Dex", "Dex", "Str"];
+    this.segments = 7;
+    let ssDivContainer = "";
+    for(let i = 0; i < dungeons[this.dungeonNum].length; i++) {
+        ssDivContainer += "Floor " + (i+1) +
+            " | <div class='bold'>"+_txt("actions>large_dungeon>chance_label")+" </div> <div id='soulstoneChance"+this.dungeonNum+"_"+i+"'></div>% - " +
+        "<div class='bold'>"+_txt("actions>large_dungeon>last_stat_label")+" </div> <div id='soulstonePrevious"+this.dungeonNum+"_"+i+"'>NA</div> - " +
+            "<div class='bold'>"+_txt("actions>large_dungeon>label_done")+"</div> <div id='soulstoneCompleted"+this.dungeonNum+"_"+i+"'></div><br>";
+    }
+    this.completedTooltip = _txt("actions>large_dungeon>completed_tooltip") +
+        ssDivContainer;
+    this.affectedBy = ["Gather Team"];
+    this.manaCost = function() {
+        return 8000;
+    };
+    this.canStart = function() {
+        let curFloor = Math.floor((towns[this.dungeonNum].LDungeonLoopCounter)/this.segments+.0000001 - 1);
+        if(curFloor === dungeons[this.dungeonNum].length) {
+            return false;
+        }
+        return teamNum >= 1;
+    };
+    this.loopCost = function(segment) {
+        return fibonacci(1+Math.floor((towns[this.townNum].LDungeonLoopCounter+segment)/this.segments+.0000001)) * 15000;
+    };
+    this.tickProgress = function(offset) {
+        return (getTeamCombat("Combat")+getSkillLevel("Magic")) * (1 + getLevel(this.loopStats[(towns[this.townNum].LDungeonLoopCounter+offset) % this.loopStats.length])/100) * Math.sqrt(1 + towns[this.townNum].totalLDungeon/300);
+    };
+    this.loopsFinished = function() {
+        let curFloor = Math.floor((towns[this.dungeonNum].LDungeonLoopCounter)/this.segments+.0000001-1);
+        let success = finishDungeon(this.dungeonNum, curFloor);
+        if(success && storyMax <= 1) {
+            // unlockStory(1);
+        } else if(storyMax <= 2) {
+            // unlockStory(2);
+        }
+    };
+    this.getPartName = function() {
+        return _txt("actions>large_dungeon>label_part") + " " + numberToWords(Math.floor((towns[this.townNum].LDungeonLoopCounter+.0001)/this.segments+1));
+    };
+    this.getSegmentName = function(segment) {
+        let segments = [];
+        $(_txtsObj("actions>large_dungeon>segment_names>name")).each(function(x,segmentName) {
+            segments.push($(segmentName).text());
+        });
+        return segments[segment % segments.length];
+    };
+    this.visible = function() {
+        return (getSkillLevel("Combat") + getSkillLevel("Magic")) >= 15;
+    };
+    this.unlocked = function() {
+        return (getSkillLevel("Combat") + getSkillLevel("Magic")) >= 35;
+    };
+    this.finish = function() {
+    };
 }
 
 function CraftingGuild() {
@@ -1714,5 +1810,4 @@ function getCraftGuildRank(offset) {
     name += ", Mult x" + bonus;
     return {name:name,bonus:bonus};
 }
-
 

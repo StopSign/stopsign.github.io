@@ -329,7 +329,9 @@
         <town0>
             <name>Beginnersville</name>
             <desc>Rats in basements, aggressive solo boars, bouncing slimes, and strangers that love exposition are some
-                of the the common things you'll see around Beginnersville. Some people are missing
+                of the the common things you'll see around Beginnersville. Some people are missing helmets or shoes, and
+                the fanciest sword around is still made out of iron. You got lucky with decent towns to start looping at.
+                If only there weren't so many rules not letting you do dangerous things, it'd be perfect.
             </desc>
         </town0>
         <town1>
@@ -421,14 +423,14 @@
             <label>Old Shortcut</label>
             <label_done>Shortcut Explored</label_done>
             <tooltip><![CDATA[
-        No one has come down this way in quite some time.<br>Gives some additional herbs.<br>Gives something to talk about with the Hermit. Get 1% reward for Talk to Hermit result per 1% Shortcut Explored.<br>Unlocked at 20% Forest Explored.
+        No one has come down this way in quite some time.<br>Gives some additional herbs.<br>Old men are a pain unless you know something they care about. Get 1% reward for Talk to Hermit result per 1% Shortcut Explored.<br>Unlocked at 20% Forest Explored.
       ]]></tooltip>
         </old_shortcut>
         <hermit>
             <label>Talk To Hermit</label>
             <label_done>Hermit Knowledge Learned</label_done>
             <tooltip><![CDATA[
-        This old man is happy to have a listening ear, surely he has some useful knowledge. You hope.<br>Speed is 1% faster for Gather Herbs, Practical Magic, and Learn Alchemy per 1% of Hermit Knowledge.<br>Unlocked with both 20% Shortcut Explored and 40 Magic.
+        This old man is happy to have a listening ear, surely he has some useful knowledge. You hope. He's initially confrontational, but opens up once you start talking about the road.<br>Speed is 1% faster for Gather Herbs, Practical Magic, and Learn Alchemy per 1% of Hermit Knowledge.<br>Unlocked with both 20% Shortcut Explored and 40 Magic.
       ]]></tooltip>
         </hermit>
         <explore_city>
@@ -680,7 +682,7 @@
                 <name>Goblins</name>
                 <name>Demon Rabbits</name>
                 <name>Giant Honeybadgers</name>
-                <name>Venemous Snakes</name>
+                <name>Venomous Snakes</name>
                 <name>Angry Monkeys</name>
                 <name>Trolls</name>
                 <name>Ogres</name>
@@ -717,7 +719,7 @@
           There are small changes each time; it's harder to get used to. The soulstones at the end last through loops, but they're not always in the dungeon... Strange.<br>The dungeon requires different skills at different points.<br>One action can clear multiple dungeons if your stats are high enough.<br>Gives (magic + combat skill) * (1 + main stat / 100) * sqrt(1 + times completed / 200) * (original mana cost / actual mana cost) progress points per mana.<br>Requires a combined skill of 35.<br>Gives 1 soulstone per completion - hover over Completed for info.
       ]]></tooltip>
             <completed_tooltip><![CDATA[
-        Each soulstone improves a random stat's exp gain by (1+(soulstones)^.8/10). Each soulstone reduces the chance you'll get the next one by 2%.<br>Chance to receive a soulstone recovers at .00002% per mana.
+        Each soulstone improves a random stat's exp gain by (1+(soulstones)^.8/10).<br>Each floor has a soulstone that, when received, reduces the chance you'll get the next one by 2%.<br>Chance to receive a soulstone recovers per floor at .00002% per mana.<br>
       ]]></completed_tooltip>
             <chance_label>Chance</chance_label>
             <last_stat_label>Last Stat</last_stat_label>
@@ -731,6 +733,28 @@
                 <name>Loot</name>
             </segment_names>
         </small_dungeon>
+        <large_dungeon>
+            <label>Large Dungeon</label>
+            <label_done>Looted</label_done>
+            <label_part>Large Dungeon</label_part>
+            <tooltip><![CDATA[
+          With your party, you set out to accomplish great feats of dungeoneering that you couldn't have done while alone.<br>Gives (magic + combat skill) * (1 + main stat / 100) * sqrt(1 + times completed / 300) * (original mana cost / actual mana cost) progress points per mana.<br>Requires at least one other party member.<br>Gives 10 soulstones per completion - hover over Completed for info.
+      ]]></tooltip>
+            <completed_tooltip><![CDATA[
+        Each soulstone improves a random stat's exp gain by (1+(soulstones)^.8/10).<br>Each floor has a soulstone that, when received, reduces the chance you'll get the next one by 2%.<br>Chance to receive a soulstone recovers per floor at .00002% per mana.
+      ]]></completed_tooltip>
+            <chance_label>Chance</chance_label>
+            <last_stat_label>Last Stat</last_stat_label>
+            <segment_names>
+                <name>Rally Party</name>
+                <name>Journey to the Entrance</name>
+                <name>Fight Door Guardians</name>
+                <name>Argue over Loot</name>
+                <name>Dodge Traps</name>
+                <name>Dodge Friendly Fire</name>
+                <name>Fight Boss</name>
+            </segment_names>
+        </large_dungeon>
         <adventure_guild>
             <label>Adventure Guild</label>
             <label_done>Impressed</label_done>

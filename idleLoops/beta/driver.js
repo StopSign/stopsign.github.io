@@ -31,10 +31,15 @@ function tick() {
         timer++;
 
         actions.tick();
-        if(soulstoneChance < 1) {
-            soulstoneChance += .0000002;
-            if(soulstoneChance > 1) {
-                soulstoneChance = 1;
+        for(let i = 0; i < dungeons.length; i++) {
+            for(let j = 0; j < dungeons[i].length; j++) {
+                let level = dungeons[i][j];
+                if(level.ssChance < 1) {
+                    level.ssChance += .0000002;
+                    if(level.ssChance > 1) {
+                        level.ssChance = 1;
+                    }
+                }
             }
         }
 
@@ -62,8 +67,15 @@ function tick() {
 
 function recalcInterval(fps) {
     window.fps = fps;
-    doWork.postMessage({stop:true});
-    doWork.postMessage({start:true,ms:(1000 / fps)});
+    if(mainTickLoop !== undefined) {
+        clearInterval(mainTickLoop);
+    }
+    if(isFileSystem) {
+        mainTickLoop = setInterval(tick, 1000/fps);
+    } else {
+        doWork.postMessage({stop: true});
+        doWork.postMessage({start: true, ms: (1000 / fps)});
+    }
 }
 
 function pauseGame() {

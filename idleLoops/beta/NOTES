@@ -53,10 +53,9 @@ hover -> focus
 
 
 .75
-    adventurer's guild
-    hire adventurer - each completion costs 100 more gold, max 5, gets a better team w/ rank
+	
     large dungeon - like small dungeon, but uses team combat and gives 10 soulstones and items
-    crafters guild - like adventurer's guild but uses craftsmanship skill
+	
     craft armor - cost 2 hides, gives 20% self combat, faster w/ craftsmanship skill
     apprentice - faster w/ rank, PBA
         craftsmanship skill +

@@ -1,14 +1,19 @@
 function startGame () {
-  window.doWork = new Worker('interval.js');
-  window.doWork.onmessage = function (event) {
-      if (event.data === 'interval.start') {
-          tick();
-      }
-  };
-  displayBetaSaveNote();
-  load();
+    if (isFileSystem) {
+    } else {
+        window.doWork = new Worker('interval.js');
+        window.doWork.onmessage = function (event) {
+            if (event.data === 'interval.start') {
+                tick();
+            }
+        };
+    }
+    displayBetaSaveNote();
+    load();
 }
 
+let mainTickLoop;
+let isFileSystem = !!location.href.match("file");
 let isBeta = !!location.href.match(/beta/i);
 let saveName = !isBeta ? "idleLoops1" :  "idleLoopsBeta";
 
@@ -40,7 +45,6 @@ let curLoadout = 0;
 let loadouts = [];
 let skillList = ["Combat", "Magic", "Practical", "Alchemy", "Crafting"];
 let skills = {};
-let soulstoneChance = 1;
 let townShowing = 0;
 let maxTown;
 let statShowing;
@@ -53,10 +57,10 @@ let curDate = new Date();
 let totalOfflineMs = 0;
 let bonusSpeed = 1;
 let offlineRatio = .8;
+let dungeons;
 
 window.curAdvGuildSegment = 0;
 window.curCraftGuildSegment = 0;
-
 
 
 function closeTutorial() {
@@ -95,7 +99,6 @@ function load() {
         }
     }
 
-    soulstoneChance = toLoad.soulstoneChance !== undefined ? toLoad.soulstoneChance : 1;
     maxTown = toLoad.maxTown !== undefined ? toLoad.maxTown : 0;
     actionTownNum = toLoad.actionTownNum !== undefined ? toLoad.actionTownNum : 0;
 
@@ -121,6 +124,7 @@ function load() {
     town.expDrunk = toLoad.expDrunk !== undefined ? toLoad.expDrunk : 0;
     town.totalAdvGuild = toLoad.totalAdvGuild !== undefined ? toLoad.totalAdvGuild : 0;
     town.totalCraftGuild = toLoad.totalCraftGuild !== undefined ? toLoad.totalCraftGuild : 0;
+    town.totalLDungeon = toLoad.totalLDungeon !== undefined ? toLoad.totalLDungeon : 0;
 
     actions.next = [];
     if(toLoad.nextList) {
@@ -151,6 +155,19 @@ function load() {
                 }
                 loadouts[i].push(action);
             }
+        }
+    }
+
+    dungeons = [[], []];
+    let level = {ssChance:1,completed:0};
+    for(let i = 0; i < dungeons.length; i++) {
+        for(let j = 0; j < 6 + i*3; j++) {
+            if(toLoad.dungeons && toLoad.dungeons[i][j]) {
+                dungeons[i][j] = toLoad.dungeons[i][j];
+            } else {
+                dungeons[i][j] = copyArray(level);
+            }
+            dungeons[i][j].lastStat = "NA";
         }
     }
 
@@ -188,6 +205,8 @@ function load() {
     totalOfflineMs = toLoad.totalOfflineMs !== undefined ? toLoad.totalOfflineMs : 0;
     addOffline(Math.floor((new Date() - new Date(toLoad.date)) * offlineRatio));
 
+
+
     adjustAll();
 
     view.changeStatView();
@@ -199,7 +218,7 @@ function load() {
 
 function save() {
     let toSave = {};
-    toSave.soulstoneChance = soulstoneChance;
+    toSave.dungeons = dungeons;
     toSave.maxTown = maxTown;
     toSave.actionTownNum = actionTownNum;
 
@@ -223,6 +242,8 @@ function save() {
     toSave.expDrunk = town.expDrunk;
     toSave.totalAdvGuild = town.totalAdvGuild;
     toSave.totalCraftGuild = town.totalCraftGuild;
+    toSave.totalLDungeon = town.totalLDungeon;
+
 
     for(let i = 0; i < towns.length; i++) {
         town = towns[i];
@@ -270,6 +291,7 @@ function importSave() {
 }
 
 function displayBetaSaveNote() {
+    // console.log(isBeta);
     if(!isBeta) return;
     document.addEventListener("DOMContentLoaded", function() {
         document.getElementById("betaSave").style.display = "block";

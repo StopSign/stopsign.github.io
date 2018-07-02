@@ -69,7 +69,7 @@ function getSelfCombat() {
 }
 
 function getTeamCombat() {
-    return getSkillLevel("Combat");
+    return getSelfCombat("Combat") + getSkillLevel("Combat")*teamNum/2;
 }
 
 function getPrcToNextSkillLevel(skill) {

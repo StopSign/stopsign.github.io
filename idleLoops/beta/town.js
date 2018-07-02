@@ -24,7 +24,11 @@ function Town(index) {
 
     this.finishProgress = function(varName, expGain, levelUpReward) {
         const prevLevel = this.getLevel(varName);
-        this["exp"+varName] += this.getLevel(varName) >= 100 ? 0 : expGain;
+        if(this["exp"+varName]+expGain > 505000 ) {
+            this["exp"+varName] = 505000;
+        } else {
+            this["exp"+varName] += expGain;
+        }
         let level = this.getLevel(varName);
 
         if(level !== prevLevel) {
@@ -135,6 +139,8 @@ function Town(index) {
         this.AdvGuildLoopCounter = 0;
         this.CraftGuild = 0;
         this.CraftGuildLoopCounter = 0;
+        this.LDungeon = 0;
+        this.LDungeonLoopCounter = 0;
     }
 
 }

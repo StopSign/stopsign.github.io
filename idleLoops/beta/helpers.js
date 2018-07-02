@@ -145,7 +145,7 @@ function factorial(n) {
 
 let fibonaccis = [];
 function fibonacci(n) {
-    if (n === 0 || n === 1)
+    if (n === 0 || n === 1 || n === undefined)
         return 1;
     if (fibonaccis[n] > 0)
         return fibonaccis[n];

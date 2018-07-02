@@ -557,6 +557,10 @@ function View() {
 
         this.createTownAction(new GatherTeam());
 
+        tempObj = new LargeDungeon();
+        this.createTownAction(tempObj);
+        this.createMultiPartPBar(tempObj);
+
         tempObj = new CraftingGuild();
         this.createTownAction(tempObj);
         this.createMultiPartPBar(tempObj);
@@ -699,9 +703,9 @@ function View() {
         const totalDivText =
             "<div class='townStatContainer' style='text-align:center' id='infoContainer"+action.varName+"'>"+
                 "<div class='bold townLabel' style='float:left' id='multiPartName"+action.varName+"'></div>"+
-                "<div class='completedInfo showthat' id='completedContainer"+action.varName+"' onmouseover='view.updateSoulstoneChance()'>" +
+                "<div class='completedInfo showthat' onmouseover='view.updateSoulstoneChance()'>" +
                     "<div class='bold'>"+action.labelDone+"</div> <div id='completed"+action.varName+"'></div>" +
-                    (completedTooltip === "" ? "" :"<div class='showthis'>"+completedTooltip+"</div>") + // to prevent an empty tooltip, was reported as bug on discord
+                    (completedTooltip === "" ? "" :"<div class='showthis' id='completedContainer"+action.varName+"'>"+completedTooltip+"</div>") +
                 "</div><br>"+
                 pbars +
             "</div>";
@@ -726,6 +730,10 @@ function View() {
         this.updateMultiPartSegments(tempObj);
 
         tempObj = new JoinAdvGuild();
+        this.updateMultiPart(tempObj);
+        this.updateMultiPartSegments(tempObj);
+
+        tempObj = new LargeDungeon();
         this.updateMultiPart(tempObj);
         this.updateMultiPartSegments(tempObj);
 
@@ -769,8 +777,20 @@ function View() {
     };
 
     this.updateSoulstoneChance = function() {
-        if(isVisible(document.getElementById("completedContainerSDungeon"))) {
-            document.getElementById('soulstoneChance').innerHTML = intToString(soulstoneChance * 100, 4);
+        let dungeonNum = -1;
+        if(isVisible(document.getElementById("completedContainerLDungeon"))) {
+            dungeonNum = 1;
+        } else if(isVisible(document.getElementById("completedContainerSDungeon"))) {
+            dungeonNum = 0;
+        }
+        if(dungeonNum === -1) {
+            return;
+        }
+        for(let i = 0; i < dungeons[dungeonNum].length; i++) {
+            let level = dungeons[dungeonNum][i];
+            document.getElementById("soulstoneChance"+dungeonNum+"_"+i).innerHTML = intToString(level.ssChance * 100, 4);
+            document.getElementById("soulstonePrevious"+dungeonNum+"_"+i).innerHTML = level.lastStat;
+            document.getElementById("soulstoneCompleted"+dungeonNum+"_"+i).innerHTML = level.completed + "";
         }
     };
 
