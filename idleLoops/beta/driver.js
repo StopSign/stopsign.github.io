@@ -265,14 +265,15 @@ function adjustAll() {
 
 function capAmount(index, townNum) {
     let varName = "good"+translateClassNames(actions.next[index].name).varName;
-    let alreadyExisting = 0;
-    for(let i = 0; i < actions.next.length; i++) {
-        if(i === index || actions.next[index].name !== actions.next[i].name) {
-            continue;
-        }
-        alreadyExisting += actions.next[i].loops;
-    }
+    let alreadyExisting = getNumOnList(actions.next[index].name)- actions.next[index].loops;
     let newLoops = towns[townNum][varName] - alreadyExisting;
+    actions.next[index].loops = newLoops < 0 ? 0 : newLoops;
+    view.updateNextActions();
+}
+
+function capTraining(index) {
+    let alreadyExisting = getNumOnList(actions.next[index].name) - actions.next[index].loops;
+    let newLoops = trainingLimits - alreadyExisting;
     actions.next[index].loops = newLoops < 0 ? 0 : newLoops;
     view.updateNextActions();
 }

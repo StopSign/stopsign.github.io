@@ -101,10 +101,13 @@ function translateClassNames(name) {
 }
 
 function hasCap(name) {
-    return (name === "Smash Pots" || name === "Pick Locks" || name === "Short Quest" || name === "Long Quest" || name === "Gather Herbs" || name === "Wild Mana" || name === "Hunt");
+    return (name === "Smash Pots" || name === "Pick Locks" || name === "Short Quest" || name === "Long Quest" || name === "Gather Herbs" || name === "Wild Mana" || name === "Hunt" || name === "Gamble");
 }
 function getTravelNum(name) {
     return (name === "Start Journey" || name === "Continue On") ? 1 : 0;
+}
+function isTraining(name) {
+    return name === "Train Speed" || name === "Train Strength" || name === "Train Dex" || name === "Sit By Waterfall" || name === "Read Books";
 }
 
 let townNames = ["Beginnersville", "Forest Path", "Merchanton"];
