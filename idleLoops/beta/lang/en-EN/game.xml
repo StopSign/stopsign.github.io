@@ -13,12 +13,19 @@
             * Started French support (thanks to Guizmus)<br>
             * Haggle tooltip updates on reset correctly. Continue On mana reduction tooltip works.<br>
             * Can't use repeat last action to get around training caps<br>
-            * New actions - Adventure Guild, Crafting Guild, Gather Team<br>
+            * New actions - Adventure Guild, Crafting Guild, Gather Team, Craft Armor, Large Dungeon, Apprentice, Mason, Architect<br>
             * Short Quest mana cost 800 -> 600. LQuest mana cost 2k -> 1500, gold reward 25 -> 30<br>
             * Buy Supplies requires 400 -> 300 gold.<br>
             * Wild Mana 200 gain -> 250 gain.<br>
             * Removing old versions as I add new ones now<br>
-            * Removed Get Drunk's gold cost, gave it 3x exp
+            * Removed Get Drunk's gold cost, gave it 3x exp<br>
+            * Reworked dungeons - small dungeon is now capped at 6 floors, with soulstone chances and completed bonuses applying per-floor. Your current completed got split across the first 3 floors.<br>
+            * Small Dungeon mana cost to 2k (until I get an option to short-circuit upon floor completion) and gets harder faster.<br>
+            * Made talent gain scale the same way that soulstone does, made soulstones 1/3rd as effective. This means talent gives 3% at level 1 instead of 1%.<br>
+            * HtS requires (not costs) 1 reputation, Fight Monster and Small Dungeon require 2 reputation.<br>
+            * Training caps reduced to 10 (action coming soon to improve this), and all trainings have 2000 mana cost.<br>
+            * Train Dex/Train Speed to zone 2.<br>
+            * Soulstones recover half as fast (because there's more of them)
       ]]></version>
             <version verNum=".73"><![CDATA[
             * Changed formula for how Old Shortcut reduces Continue On<br>
@@ -172,6 +179,11 @@
             <id>teamNum</id>
             <desc>You know their personalities and fighting style. They don't know your name.</desc>
         </resource>
+        <resource initially_hidden="true">
+            <title>Armor</title>
+            <id>armor</id>
+            <desc>Crafted by your own hand, it protects you from dangers.</desc>
+        </resource>
     </tracked_resources>
     <time_controls>
         <play_button>Play</play_button>
@@ -277,14 +289,14 @@
             <explanation><![CDATA[
           Each stat level reduces the relevant part of an action's mana cost by 1%.<br>
           Talent gets 1% of all level progress, and keeps through loops.<br>
-          Each talent level increases Bonus XP of its skill by 1%.<br>
-          XP gain towards an stat per action is (actual mana / original mana) * (talent %) per tick.<br>
+          Each talent level increases Bonus XP of its skill by (1+(talent)^.8/30).<br>
+          XP gain towards an stat per action is (actual mana / original mana) * (talent bonus) per tick.<br>
           Bonus XP is a combination of talent and soulstone bonuses.<br><br>
           e.g. Meet People costs 800 mana and has a breakdown of <div class="bold">Int</div> 10% <div class="bold">Cha</div> 80% <div class="bold">Soul</div> 10%.<br>
           This effectively means 80 of the mana is controlled by <div class="bold">Int</div>, another 80 by <div class="bold">Soul</div>, and the remaining 640 by <div class="bold">Cha</div>.<br>
-          If your <div class="bold">Cha</div> is level 20 when the action is started, it'd be 640 / 1.2 = 533.333<br>
-          Adding back the 160 from <div class="bold">Soul</div> and <div class="bold">Int</div>, the total mana the action takes (rounded up) is now 694, so ~15% less mana.<br>
-          The action would give (800/694)*(1+talent/100) level exp per mana for the 694 mana.]]></explanation>
+          If your <div class="bold">Cha</div> is level 20 when the action is started, the bonus would be x1.366 it'd be 640 / 1.366 = 468.52<br>
+          Adding back the 160 from <div class="bold">Soul</div> and <div class="bold">Int</div>, the total mana the action takes (rounded up) is now 629, so ~27% less mana.<br>
+          The action would give (800/629)*(1+(talent)^.8/30) level exp per mana for the 629 mana.]]></explanation>
             <graph_legend><![CDATA[
           Click the legend to show/hide each.<br>
           Upon freshly starting, Levels and Talent won't change much.<br>
@@ -297,6 +309,14 @@
     </stats>
     <skills>
         <title>Skills</title>
+        <scombat>
+            <label>Self Combat</label>
+            <desc>Self Combat = Combat skill * (1 + armor * Crafting Guild Rank / 5)</desc>
+        </scombat>
+        <tcombat>
+            <label>Team Combat</label>
+            <desc>Team Combat = Self Combat + Combat Skill * Team Members * Adventure Guild Rank / 2</desc>
+        </tcombat>
         <combat>
             <label>Combat</label>
             <desc>Fight for your lives.</desc>
@@ -447,6 +467,27 @@
         Sometimes you just need a drink.<br>Requires reputation greater than -3.<br>Has 3x exp<br>Costs 1 reputation.<br>Unlocked at 20% City Explored.
       ]]></tooltip>
         </get_drunk>
+        <apprentice>
+            <label>Apprentice</label>
+            <label_done>Books Studied</label_done>
+            <tooltip><![CDATA[
+        You decided that knowing more about construction would help. You use your Crafting Guild license to hit the books.<br>Goes faster with a higher rank bonus.<br>Gives 10-20 exp to Crafting for 0-100%<br>Requires Crafting Guild.<br>Unlocked at 40% Rumors heard.
+      ]]></tooltip>
+        </apprentice>
+        <mason>
+            <label>Mason</label>
+            <label_done>Buildings Built</label_done>
+            <tooltip><![CDATA[
+        You have the theoretical knowledge - now you need to get hands on.<br>Goes faster with a higher rank bonus.<br>Requires Crafting Guild.<br>Gives 20-40 exp to Crafting for 0-100%<br>Unlocked at 60% Rumors heard and 100% Apprentice.
+      ]]></tooltip>
+        </mason>
+        <architect>
+            <label>Architect</label>
+            <label_done>Projects Planned</label_done>
+            <tooltip><![CDATA[
+        Now that you know how things work, it's better to learn how to design them.<br>Goes faster with a higher rank bonus.<br>Requires Crafting Guild.<br>Gives 40-80 exp to Crafting for 0-100%<br>Unlocked at 80% Rumors heard and 100% Mason.
+      ]]></tooltip>
+        </architect>
         <buy_glasses>
             <label>Buy Glasses</label>
             <tooltip><![CDATA[
@@ -465,18 +506,6 @@
         Build up those muscles. Again.<br>Has 4x exp/talent gain, and can only be done <div id='trainingLimitStr'></div> times per reset<br>Unlocked at 5% People Met.
       ]]></tooltip>
         </train_str>
-        <train_dex>
-            <label>Train Dex</label>
-            <tooltip><![CDATA[
-        The kids are a little mad you're taking their playground. They'll get over it.<br>Has 4x exp/talent gain, and can only be done <div id='trainingLimitDex'></div> times per reset<br>Unlocked at 15% People Met.
-      ]]></tooltip>
-        </train_dex>
-        <train_spd>
-            <label>Train Speed</label>
-            <tooltip><![CDATA[
-        A new friend has a magical treadmill. Gotta go fast.<br>Has 4x exp/talent gain, and can only be done <div id='trainingLimitSpd'></div> times per reset<br>Unlocked at 30% People Met.
-      ]]></tooltip>
-        </train_spd>
         <throw_party>
             <label>Throw Party</label>
             <tooltip><![CDATA[
@@ -537,6 +566,18 @@
           Bubbles and Flasks. Potions and Magic.<br>Requires 5 reputation or he won't let you near his stuff.<br>Creates a potion from 10 herbs to sell at the next town.<br>Gives alchemy and magic skill.<br>Unlocked with 10 Alchemy.
       ]]></tooltip>
         </brew_potions>
+        <train_dex>
+            <label>Train Dex</label>
+            <tooltip><![CDATA[
+        There's a nice array of rocks to hop between. It's a lot of fun.<br>Has 4x exp/talent gain, and can only be done <div id='trainingLimitDex'></div> times per reset<br>Unlocked at 60% Forest Explored.
+      ]]></tooltip>
+        </train_dex>
+        <train_spd>
+            <label>Train Speed</label>
+            <tooltip><![CDATA[
+        A forest run is fantastic. You feel like you're learning a lot as you push your limits.<br>Has 4x exp/talent gain, and can only be done <div id='trainingLimitSpd'></div> times per reset<br>Unlocked at 30% People Met.
+      ]]></tooltip>
+        </train_spd>
         <continue_on>
             <label>Continue On</label>
             <tooltip><![CDATA[
@@ -568,6 +609,12 @@
          gold, and the cost goes up by 200 gold per member.<br>Each member adds (Rank Mult) * (Combat Skill + Magic Skill)/2 to your Team Combat.<br>Requires Adventure Guild.<br>Has 3x exp/talent gain.<br>Unlocks at 20% city explored.
       ]]></tooltip>
         </gather_team>
+        <craft_armor>
+            <label>Craft Armor</label>
+            <tooltip><![CDATA[
+        Turn hide into armor through hard work.<br>Gives (20% * Crafting Rank Bonus) to Self Combat per armor.<br>Costs 2 hides.<br>Unlocks at 30% city explored.
+      ]]></tooltip>
+        </craft_armor>
         <smash_pots>
             <label>Smash Pots</label>
             <label_done>Pots Smashed</label_done>
@@ -662,7 +709,7 @@
             <label_done>Healed</label_done>
             <label_part>Patient</label_part>
             <tooltip><![CDATA[
-          You won't be able to heal them all, but they'll be thankful for doing what you can.<br>Healing is always 3 parts, each with a main stat - Diagnose (Per), Treat (Int), Inform (Cha).<br>Gives (magic skill) * (1 + main stat / 100) * sqrt(1 + times completed / 100) * (original mana cost / actual mana cost) progress points per mana.<br>Requires 12 Magic skill.<br>Gives 3 reputation upon patient completion.
+          You won't be able to heal them all, but they'll be thankful for doing what you can.<br>Healing is always 3 parts, each with a main stat - Diagnose (Per), Treat (Int), Inform (Cha).<br>Gives (magic skill) * (1 + main stat / 100) * sqrt(1 + times completed / 100) * (original mana cost / actual mana cost) progress points per mana.<br>Requires 12 Magic skill and 1 reputation.<br>Gives 3 reputation upon patient completion.
       ]]></tooltip>
             <segment_names>
                 <name>Diagnose</name>
@@ -674,7 +721,7 @@
             <label>Fight Monsters</label>
             <label_done>Killed</label_done>
             <tooltip><![CDATA[
-          Slowly, you're figuring out their patterns.<br>Fighting rotates between 3 types of battles, each with a main stat - Quick (Spd), Defensive (Str), Aggressive (Con).<br>Gives (combat skill) * (1 + main stat / 100) * sqrt(1 + times completed / 100) * (original mana cost / actual mana cost) progress points per mana.<br>Requires 10 Combat skill.<br>Gives 20 gold per fight segment completion.
+          Slowly, you're figuring out their patterns.<br>Fighting rotates between 3 types of battles, each with a main stat - Quick (Spd), Defensive (Str), Aggressive (Con).<br>Gives (combat skill) * (1 + main stat / 100) * sqrt(1 + times completed / 100) * (original mana cost / actual mana cost) progress points per mana.<br>Requires 10 Combat skill and 2 reputation.<br>Gives 20 gold per fight segment completion.
       ]]></tooltip>
             <segment_names>
                 <name>Deer</name>
@@ -714,12 +761,13 @@
         <small_dungeon>
             <label>Small Dungeon</label>
             <label_done>Looted</label_done>
+            <label_complete>Completed</label_complete>
             <label_part>Small Dungeon</label_part>
             <tooltip><![CDATA[
-          There are small changes each time; it's harder to get used to. The soulstones at the end last through loops, but they're not always in the dungeon... Strange.<br>The dungeon requires different skills at different points.<br>One action can clear multiple dungeons if your stats are high enough.<br>Gives (magic + combat skill) * (1 + main stat / 100) * sqrt(1 + times completed / 200) * (original mana cost / actual mana cost) progress points per mana.<br>Requires a combined skill of 35.<br>Gives 1 soulstone per completion - hover over Completed for info.
+          There are small changes each time; it's harder to get used to. The soulstones at the end last through loops, but they're not always in the dungeon... Strange.<br>The dungeon requires different skills at different points.<br>One action can clear multiple dungeons if your stats are high enough.<br>Gives (magic + combat skill) * (1 + main stat / 100) * sqrt(1 + times completed / 200) * (original mana cost / actual mana cost) progress points per mana.<br>Requires a combined skill of 35, and 2 reputation.<br>Gives 1 soulstone per completion - hover over Completed for info.
       ]]></tooltip>
             <completed_tooltip><![CDATA[
-        Each soulstone improves a random stat's exp gain by (1+(soulstones)^.8/10).<br>Each floor has a soulstone that, when received, reduces the chance you'll get the next one by 2%.<br>Chance to receive a soulstone recovers per floor at .00002% per mana.<br>
+        Each soulstone improves a random stat's exp gain by (1+(soulstones)^.8/30).<br>Each floor has a soulstone that, when received, reduces the chance you'll get the next one by 2%.<br>Chance to receive a soulstone recovers per floor at .00001% per mana.<br>
       ]]></completed_tooltip>
             <chance_label>Chance</chance_label>
             <last_stat_label>Last Stat</last_stat_label>
@@ -736,12 +784,13 @@
         <large_dungeon>
             <label>Large Dungeon</label>
             <label_done>Looted</label_done>
+            <label_complete>Completed</label_complete>
             <label_part>Large Dungeon</label_part>
             <tooltip><![CDATA[
           With your party, you set out to accomplish great feats of dungeoneering that you couldn't have done while alone.<br>Gives (magic + combat skill) * (1 + main stat / 100) * sqrt(1 + times completed / 300) * (original mana cost / actual mana cost) progress points per mana.<br>Requires at least one other party member.<br>Gives 10 soulstones per completion - hover over Completed for info.
       ]]></tooltip>
             <completed_tooltip><![CDATA[
-        Each soulstone improves a random stat's exp gain by (1+(soulstones)^.8/10).<br>Each floor has a soulstone that, when received, reduces the chance you'll get the next one by 2%.<br>Chance to receive a soulstone recovers per floor at .00002% per mana.
+        Each soulstone improves a random stat's exp gain by (1+(soulstones)^.8/10).<br>Each floor has a soulstone that, when received, reduces the chance you'll get the next one by 2%.<br>Chance to receive a soulstone recovers per floor at .00001% per mana.
       ]]></completed_tooltip>
             <chance_label>Chance</chance_label>
             <last_stat_label>Last Stat</last_stat_label>

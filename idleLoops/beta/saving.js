@@ -40,6 +40,7 @@ let hide = 0;
 let potions = 0;
 let teamNum = 0;
 let guild = "";
+let armor = 0;
 
 let curLoadout = 0;
 let loadouts = [];
@@ -49,7 +50,7 @@ let townShowing = 0;
 let maxTown;
 let statShowing;
 let actionTownNum;
-let trainingLimits = 50;
+let trainingLimits = 10;
 let storyShowing = 0;
 let storyMax = 0;
 
@@ -125,6 +126,9 @@ function load() {
     town.totalAdvGuild = toLoad.totalAdvGuild !== undefined ? toLoad.totalAdvGuild : 0;
     town.totalCraftGuild = toLoad.totalCraftGuild !== undefined ? toLoad.totalCraftGuild : 0;
     town.totalLDungeon = toLoad.totalLDungeon !== undefined ? toLoad.totalLDungeon : 0;
+    town.expApprentice = toLoad.expApprentice !== undefined ? toLoad.expApprentice : 0;
+    town.expMason = toLoad.expMason !== undefined ? toLoad.expMason : 0;
+    town.expArchitect = toLoad.expArchitect !== undefined ? toLoad.expArchitect : 0;
 
     actions.next = [];
     if(toLoad.nextList) {
@@ -205,6 +209,13 @@ function load() {
     totalOfflineMs = toLoad.totalOfflineMs !== undefined ? toLoad.totalOfflineMs : 0;
     addOffline(Math.floor((new Date() - new Date(toLoad.date)) * offlineRatio));
 
+    if(toLoad.version75 === undefined) {
+        let total = towns[0].totalSDungeon;
+        dungeons[0][0].completed = Math.floor(total/3);
+        dungeons[0][1].completed = Math.floor(total/3);
+        dungeons[0][2].completed = Math.ceil(total/3);
+    }
+
 
 
     adjustAll();
@@ -243,7 +254,10 @@ function save() {
     toSave.totalAdvGuild = town.totalAdvGuild;
     toSave.totalCraftGuild = town.totalCraftGuild;
     toSave.totalLDungeon = town.totalLDungeon;
-
+    toSave.version75 = true;
+    toSave.expApprentice = town.expApprentice;
+    toSave.expMason = town.expMason;
+    toSave.expArchitect = town.expArchitect;
 
     for(let i = 0; i < towns.length; i++) {
         town = towns[i];

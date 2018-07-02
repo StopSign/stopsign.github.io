@@ -23,6 +23,7 @@ function View() {
         this.changeStatView();
         this.adjustGoldCosts();
         this.updateTeamNum();
+        this.updateTeamCombat();
     };
 
     this.statLocs = [{x:165, y:43}, {x:270, y:79}, {x:325, y:170}, {x:306, y:284}, {x:225, y:352}, {x:102, y:352}, {x:26, y:284}, {x:2, y:170}, {x:56, y:79}];
@@ -39,7 +40,7 @@ function View() {
             totalStatDiv +=
                 "<div class='statRadarContainer showthat' style='left:"+loc.x+"px;top:"+loc.y+"px;' onmouseover='view.showStat(\""+stat+"\")'>" +
                     "<div class='statLabelContainer'>" +
-                        "<div class='medium bold' style='margin-left:18px'>"+_txt("stats>"+stat+">long_form")+"</div>" +
+                        "<div class='medium bold' style='margin-left:18px;margin-top:5px;'>"+_txt("stats>"+stat+">long_form")+"</div>" +
                         "<div style='color:#737373;' class='statNum'><div class='medium' id='stat"+stat+"ss'></div></div>" +
                         "<div class='statNum'><div class='medium' id='stat"+stat+"Talent'>0</div></div> " +
                         "<div class='medium statNum bold' id='stat"+stat+"Level'>0</div> " +
@@ -107,9 +108,9 @@ function View() {
             document.getElementById("stat" + stat + "LevelProgress").innerHTML = intToString(levelPrc, 2);
 
             document.getElementById("stat" + stat + "Talent2").innerHTML = getTalent(stat);
-            let expOfTalent = getExpOfLevel(getTalent(stat));
+            let expOfTalent = getExpOfTalent(getTalent(stat));
             document.getElementById("stat" + stat + "TalentExp").innerHTML = intToString(stats[stat].talent - expOfTalent, 1);
-            document.getElementById("stat" + stat + "TalentExpNeeded").innerHTML = intToString(getExpOfLevel(getTalent(stat)+1) - expOfTalent+"", 1);
+            document.getElementById("stat" + stat + "TalentExpNeeded").innerHTML = intToString(getExpOfTalent(getTalent(stat)+1) - expOfTalent+"", 1);
             document.getElementById("stat" + stat + "TalentProgress").innerHTML = intToString(talentPrc, 2);
         }
         this["update"+stat] = false;
@@ -121,6 +122,9 @@ function View() {
             return;
         } else {
             document.getElementById("skill" + skill + "Container").style.display = "inline-block";
+        }
+        if(skill === "Combat") {
+            this.updateTeamCombat();
         }
         const levelPrc = getPrcToNextSkillLevel(skill);
         document.getElementById("skill" + skill + "Level").innerHTML = getSkillLevel(skill);
@@ -171,6 +175,21 @@ function View() {
         document.getElementById("teamNumDiv").style.display = teamNum ? "inline-block" : "none";
         document.getElementById("teamNum").innerHTML = teamNum;
         document.getElementById("teamCost").innerHTML = (teamNum+1)*200+"";
+    };
+    this.updateArmor = function() {
+        document.getElementById("armorDiv").style.display = armor ? "inline-block" : "none";
+        document.getElementById("armor").innerHTML = armor;
+    };
+    this.updateTeamCombat = function() {
+        if(maxTown >= 2) {
+            document.getElementById("skillSCombatContainer").style.display = "inline-block";
+            document.getElementById("skillTCombatContainer").style.display = "inline-block";
+            document.getElementById("skillSCombatLevel").innerHTML = getSelfCombat();
+            document.getElementById("skillTCombatLevel").innerHTML = getTeamCombat();
+        } else {
+            document.getElementById("skillSCombatContainer").style.display = "none";
+            document.getElementById("skillTCombatContainer").style.display = "none";
+        }
     };
 
     this.updateNextActions = function () {
@@ -457,8 +476,6 @@ function View() {
         this.createActionProgress(tempObj);
 
         this.createTownAction(new TrainStr());
-        this.createTownAction(new TrainDex());
-        this.createTownAction(new TrainSpd());
 
         tempObj = new ShortQuest();
         this.createTownAction(tempObj);
@@ -528,6 +545,9 @@ function View() {
         this.createTownAction(new LearnAlchemy());
         this.createTownAction(new BrewPotions());
 
+        this.createTownAction(new TrainDex());
+        this.createTownAction(new TrainSpd());
+
         this.createTravelAction(new ContinueOn());
 
         while (actionOptionsTown[2].firstChild) {
@@ -564,6 +584,20 @@ function View() {
         tempObj = new CraftingGuild();
         this.createTownAction(tempObj);
         this.createMultiPartPBar(tempObj);
+
+        this.createTownAction(new CraftArmor());
+
+        tempObj = new Apprentice();
+        this.createTownAction(tempObj);
+        this.createActionProgress(tempObj);
+
+        tempObj = new Mason();
+        this.createTownAction(tempObj);
+        this.createActionProgress(tempObj);
+
+        tempObj = new Architect();
+        this.createTownAction(tempObj);
+        this.createActionProgress(tempObj);
 
         this.createTownAction(new ReadBooks());
     };

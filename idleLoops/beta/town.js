@@ -141,6 +141,9 @@ function Town(index) {
         this.CraftGuildLoopCounter = 0;
         this.LDungeon = 0;
         this.LDungeonLoopCounter = 0;
+        this.createProgressVars("Apprentice");
+        this.createProgressVars("Mason");
+        this.createProgressVars("Architect");
     }
 
 }

@@ -35,7 +35,7 @@ function tick() {
             for(let j = 0; j < dungeons[i].length; j++) {
                 let level = dungeons[i][j];
                 if(level.ssChance < 1) {
-                    level.ssChance += .0000002;
+                    level.ssChance += .0000001;
                     if(level.ssChance > 1) {
                         level.ssChance = 1;
                     }
@@ -117,6 +117,7 @@ function restart() {
     addHide(-hide);
     addPotions(-potions);
     addTeamNum(-teamNum);
+    addArmor(-armor);
     restartStats();
     for(let i = 0; i < towns.length; i++) {
         towns[i].restart();
@@ -197,6 +198,13 @@ function addPotions(amount) {
 function addTeamNum(amount) {
     teamNum += amount;
     view.updateTeamNum();
+    view.updateTeamCombat();
+}
+
+function addArmor(amount) {
+    armor += amount;
+    view.updateArmor();
+    view.updateTeamCombat();
 }
 
 function changeActionAmount(amount, num) {

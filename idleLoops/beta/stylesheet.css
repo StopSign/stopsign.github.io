@@ -151,7 +151,6 @@ input {
 }
 .statRegularContainer {
     width:100%;
-    margin-bottom:5px
 }
 .statRegularContainer:hover {
     background-color: #ccded1;
@@ -164,7 +163,7 @@ input {
 .statNum {
     width:40px;
     text-align:right;
-    margin:0 10px;
+    margin:5px 10px 0;
     float:right;
 }
 
