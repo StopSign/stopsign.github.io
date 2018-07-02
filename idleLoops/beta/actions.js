@@ -222,7 +222,7 @@ function calcSoulstoneMult(soulstones) {
 }
 
 function calcTalentMult(talent) {
-    return 1+Math.pow(talent, .8)/30;
+    return 1+Math.pow(talent, .5)/5;
 }
 
 function addExpFromAction(action) {

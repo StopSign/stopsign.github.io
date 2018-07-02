@@ -289,14 +289,14 @@
             <explanation><![CDATA[
           Each stat level reduces the relevant part of an action's mana cost by 1%.<br>
           Talent gets 1% of all level progress, and keeps through loops.<br>
-          Each talent level increases Bonus XP of its skill by (1+(talent)^.8/30).<br>
+          Each talent level increases Bonus XP of its skill by (1+(talent)^.5/5).<br>
           XP gain towards an stat per action is (actual mana / original mana) * (talent bonus) per tick.<br>
           Bonus XP is a combination of talent and soulstone bonuses.<br><br>
           e.g. Meet People costs 800 mana and has a breakdown of <div class="bold">Int</div> 10% <div class="bold">Cha</div> 80% <div class="bold">Soul</div> 10%.<br>
           This effectively means 80 of the mana is controlled by <div class="bold">Int</div>, another 80 by <div class="bold">Soul</div>, and the remaining 640 by <div class="bold">Cha</div>.<br>
-          If your <div class="bold">Cha</div> is level 20 when the action is started, the bonus would be x1.366 it'd be 640 / 1.366 = 468.52<br>
-          Adding back the 160 from <div class="bold">Soul</div> and <div class="bold">Int</div>, the total mana the action takes (rounded up) is now 629, so ~27% less mana.<br>
-          The action would give (800/629)*(1+(talent)^.8/30) level exp per mana for the 629 mana.]]></explanation>
+          If your <div class="bold">Cha</div> is level 20 when the action is started, the bonus would be x1.894 it'd be 640 / 1.894 = 337.9<br>
+          Adding back the 160 from <div class="bold">Soul</div> and <div class="bold">Int</div>, the total mana the action takes (rounded up) is now 518, so ~65% less mana.<br>
+          The action would give (800/518)*(1+(talent)^.5/5) level exp per mana for the 518 mana.]]></explanation>
             <graph_legend><![CDATA[
           Click the legend to show/hide each.<br>
           Upon freshly starting, Levels and Talent won't change much.<br>
