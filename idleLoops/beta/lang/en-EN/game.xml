@@ -575,7 +575,7 @@
         <train_spd>
             <label>Train Speed</label>
             <tooltip><![CDATA[
-        A forest run is fantastic. You feel like you're learning a lot as you push your limits.<br>Has 4x exp/talent gain, and can only be done <div id='trainingLimitSpd'></div> times per reset<br>Unlocked at 30% People Met.
+        A forest run is fantastic. You feel like you're learning a lot as you push your limits.<br>Has 4x exp/talent gain, and can only be done <div id='trainingLimitSpd'></div> times per reset<br>Unlocked at 80% Forest Explored.
       ]]></tooltip>
         </train_spd>
         <continue_on>

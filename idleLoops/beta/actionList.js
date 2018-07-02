@@ -986,10 +986,10 @@ function TrainSpd() {
         return 2000;
     };
     this.visible = function() {
-        return towns[0].getLevel("Met") >= 20;
+        return towns[1].getLevel("Forest") >= 20;
     };
     this.unlocked = function() {
-        return towns[0].getLevel("Met") >= 80;
+        return towns[1].getLevel("Forest") >= 80;
     };
     this.finish = function() {
     };
@@ -1703,7 +1703,7 @@ function SmallDungeon() {
         return reputation >= 2 && curFloor < dungeons[this.dungeonNum].length;
     };
     this.loopCost = function(segment) {
-        return precision3(Math.pow(3, Math.floor((towns[this.townNum].SDungeonLoopCounter+segment)/this.segments+.0000001)) * 15000);
+        return precision3(Math.pow(2, Math.floor((towns[this.townNum].SDungeonLoopCounter+segment)/this.segments+.0000001)) * 15000);
     };
     this.tickProgress = function(offset) {
         let floor = Math.floor((towns[this.townNum].SDungeonLoopCounter)/this.segments+.0000001);
@@ -1782,7 +1782,7 @@ function JoinAdvGuild() {
         return guild === "";
     };
     this.loopCost = function(segment) {
-        return precision3(Math.pow(1.2, towns[2].AdvGuildLoopCounter + segment)) * 2e6;
+        return precision3(Math.pow(1.2, towns[2].AdvGuildLoopCounter + segment)) * 5e6;
     };
     this.tickProgress = function(offset) {
         return (getSkillLevel("Magic")/2 + getSelfCombat("Combat")) * (1 + getLevel(this.loopStats[(towns[2].AdvGuildLoopCounter+offset) % this.loopStats.length])/100) * Math.sqrt(1 + towns[2].totalAdvGuild/1000);
@@ -1865,7 +1865,7 @@ function LargeDungeon() {
         return teamNum >= 1 && curFloor < dungeons[this.dungeonNum].length;
     };
     this.loopCost = function(segment) {
-        return precision3(Math.pow(3, Math.floor((towns[this.townNum].LDungeonLoopCounter+segment)/this.segments+.0000001)) * 3e5);
+        return precision3(Math.pow(2, Math.floor((towns[this.townNum].LDungeonLoopCounter+segment)/this.segments+.0000001)) * 5e5);
     };
     this.tickProgress = function(offset) {
         let floor = Math.floor((towns[this.townNum].LDungeonLoopCounter)/this.segments+.0000001);
@@ -1929,7 +1929,7 @@ function CraftingGuild() {
         return guild === "";
     };
     this.loopCost = function(segment) {
-        return precision3(Math.pow(1.2, towns[2].CraftGuildLoopCounter + segment)) * 1e6;
+        return precision3(Math.pow(1.2, towns[2].CraftGuildLoopCounter + segment)) * 2e6;
     };
     this.tickProgress = function(offset) {
         return (getSkillLevel("Magic")/2 + getSkillLevel("Crafting")) * (1 + getLevel(this.loopStats[(towns[2].CraftGuildLoopCounter+offset) % this.loopStats.length])/100) * Math.sqrt(1 + towns[2].totalCraftGuild/1000);

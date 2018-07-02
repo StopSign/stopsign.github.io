@@ -388,6 +388,9 @@ function addOffline(num) {
             toggleOffline();
         }
         totalOfflineMs += num;
+        if(totalOfflineMs < 0) {
+            totalOfflineMs = 0;
+        }
         document.getElementById("bonusSeconds").innerHTML = intToString(totalOfflineMs / 1000, 2);
     }
 }
