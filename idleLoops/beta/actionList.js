@@ -443,6 +443,7 @@ function Mason() {
     this.townNum = 2;
     this.tooltip = _txt("actions>mason>tooltip");
     this.label = _txt("actions>mason>label");
+    this.labelDone = _txt("actions>mason>label_done");
 
     this.stats = {
         Dex:.2,
@@ -477,6 +478,7 @@ function Architect() {
     this.townNum = 2;
     this.tooltip = _txt("actions>architect>tooltip");
     this.label = _txt("actions>architect>label");
+    this.labelDone = _txt("actions>architect>label_done");
 
     this.stats = {
         Dex:.2,
@@ -1865,7 +1867,7 @@ function LargeDungeon() {
         return teamNum >= 1 && curFloor < dungeons[this.dungeonNum].length;
     };
     this.loopCost = function(segment) {
-        return precision3(Math.pow(2, Math.floor((towns[this.townNum].LDungeonLoopCounter+segment)/this.segments+.0000001)) * 5e5);
+        return precision3(Math.pow(3, Math.floor((towns[this.townNum].LDungeonLoopCounter+segment)/this.segments+.0000001)) * 5e5);
     };
     this.tickProgress = function(offset) {
         let floor = Math.floor((towns[this.townNum].LDungeonLoopCounter)/this.segments+.0000001);

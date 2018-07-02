@@ -213,10 +213,10 @@ function load() {
         let total = towns[0].totalSDungeon;
         dungeons[0][0].completed = Math.floor(total/2);
         dungeons[0][1].completed = Math.floor(total/4);
-        dungeons[0][2].completed = Math.ceil(total/8);
-        dungeons[0][3].completed = Math.ceil(total/16);
-        dungeons[0][4].completed = Math.ceil(total/32);
-        dungeons[0][5].completed = Math.ceil(total/64);
+        dungeons[0][2].completed = Math.floor(total/8);
+        dungeons[0][3].completed = Math.floor(total/16);
+        dungeons[0][4].completed = Math.floor(total/32);
+        dungeons[0][5].completed = Math.floor(total/64);
         towns[0].totalSDungeon = dungeons[0][0].completed + dungeons[0][1].completed + dungeons[0][2].completed + dungeons[0][3].completed + dungeons[0][4].completed + dungeons[0][5].completed
     }
 
