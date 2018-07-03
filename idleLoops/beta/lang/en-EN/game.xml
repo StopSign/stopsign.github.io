@@ -699,7 +699,7 @@
             <info_text2>Animals with loot total</info_text2>
             <info_text3>Animals to check for loot</info_text3>
             <tooltip><![CDATA[
-          The forest provides.<br>Every 10 animals have good hides.<br>Unlocked at 40% Forest Explored.<br>NOTE: Using hide is not implemented yet. I'll remove this note when it is.
+          The forest provides.<br>Every 10 animals have good hides.<br>Unlocked at 40% Forest Explored.
       ]]></tooltip>
         </hunt>
         <gamble>
