@@ -6,7 +6,7 @@
                 <title>Changelog</title>
                 <version_prefix>Version</version_prefix>
             </meta>
-            <version verNum=".74"><![CDATA[
+            <version verNum=".75"><![CDATA[
             * Skill training actions have 150% exp.<br>
             * Practical magic updates the gold cost tooltip correctly<br>
             * Ping on Pause toggle saves on refresh<br>
@@ -26,6 +26,13 @@
             * Training caps reduced to 10 (action coming soon to improve this), and all trainings have 2000 mana cost.<br>
             * Train Dex/Train Speed to zone 2.<br>
             * Soulstones recover half as fast (because there's more of them)
+      ]]></version>
+            <version verNum=".74"><![CDATA[
+            * Radar chart - different and confusing way to visualize your data!<br>
+            * Some tooltip changes<br>
+            * Glasses icons on relevant actions<br>
+            * Offline progress!<br>
+            * Showing Hunt again (still useless)
       ]]></version>
             <version verNum=".73"><![CDATA[
             * Changed formula for how Old Shortcut reduces Continue On<br>
