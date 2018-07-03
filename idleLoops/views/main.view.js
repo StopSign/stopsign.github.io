@@ -186,8 +186,8 @@ function View() {
         if(maxTown >= 2) {
             document.getElementById("skillSCombatContainer").style.display = "inline-block";
             document.getElementById("skillTCombatContainer").style.display = "inline-block";
-            document.getElementById("skillSCombatLevel").innerHTML = getSelfCombat();
-            document.getElementById("skillTCombatLevel").innerHTML = getTeamCombat();
+            document.getElementById("skillSCombatLevel").innerHTML = intToString(getSelfCombat(), 1);
+            document.getElementById("skillTCombatLevel").innerHTML = intToString(getTeamCombat(), 1);
         } else {
             document.getElementById("skillSCombatContainer").style.display = "none";
             document.getElementById("skillTCombatContainer").style.display = "none";
