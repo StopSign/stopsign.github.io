@@ -283,6 +283,7 @@
             <level_exp>Level Exp</level_exp>
             <talent>Talent</talent>
             <talent_exp>Talent Exp</talent_exp>
+            <talent_multiplier>Talent Mult</talent_multiplier>
             <soulstone>Soulstone</soulstone>
             <soulstone_multiplier>Soulstone Mult</soulstone_multiplier>
             <bonus_xp>Bonus XP</bonus_xp>
