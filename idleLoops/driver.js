@@ -243,6 +243,11 @@ function loadList() {
     view.updateNextActions();
 }
 
+function clearList() {
+    actions.next = [];
+    view.updateNextActions();
+}
+
 function unlockTown(townNum) {
     if(townNum > maxTown) {
         maxTown = townNum;

@@ -117,7 +117,6 @@
                     <div class="showthis">
                         The skill of using your hands and creativity when doing physical work.<br>
                         <div class="medium bold">Level</div> <div id="skillCraftingLevelExp"></div>/<div id="skillCraftingLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="skillCraftingLevelProgress"></div>%)</div><br>
-                        Unlocks XXX at level 10<br>
                     </div>
                 </div>
             </div>
@@ -141,13 +140,13 @@
             </div><br>
             <div id="expandableList">
                 <div style="width:35%;height:100%;background-color:#c2e6cc;text-align:center;vertical-align:top;position:relative;">
-                    <div id="curActionsList" style="margin-top:10px;text-align:left;max-height:370px;overflow:auto;width:100%;"></div>
+                    <div id="curActionsList" style="margin-top:10px;text-align:left;max-height:457px;overflow:auto;width:100%;"></div>
                     <div class="showthat" style="position:absolute;bottom:0;left:0;width:100%;">
                         <div class="bold localized" data-lockey="actions>tooltip>mana_used"></div> <div id="totalTicks"></div>
                         <div class="showthis localized" data-lockey="actions>tooltip>mana_used_explanation"></div>
                     </div>
                 </div><div style="width:65%;height:100%;background-color:#cdded2;text-align:center;vertical-align:top;position:relative;">
-                    <div id="nextActionsList" style="margin-top:10px;width:100%;text-align:left;max-height:357px;overflow:auto;"></div>
+                    <div id="nextActionsList" style="margin-top:10px;width:100%;text-align:left;max-height:457px;overflow:auto;"></div>
                     <div id="actionTooltipContainer" style="margin-top:10px;width:100%;text-align:left;max-height:357px;overflow:auto;"></div>
                     <div style="position:absolute;bottom:0;left:0;width:100%;">
                         <div class="bold localized" data-lockey="actions>tooltip>amount"></div>
@@ -173,7 +172,8 @@
                     <div class="button unused" id="load3" onclick="selectLoadout(3)">3</div>
                     <div class="button unused" id="load4" onclick="selectLoadout(4)">4</div><br>
                     <div class="button localized" style="margin-bottom:5px;margin-top:5px;" onclick="saveList()" data-lockey="actions>tooltip>save_loadout"></div><br>
-                    <div class="button localized" onclick="loadList()" data-lockey="actions>tooltip>load_loadout"></div>
+                    <div class="button localized" onclick="loadList()" data-lockey="actions>tooltip>load_loadout"></div><br>
+                    <div class="button localized" onclick="clearList()" data-lockey="actions>tooltip>clear_list"></div>
                 </div>
             </div>
         </div>

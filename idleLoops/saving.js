@@ -326,4 +326,36 @@ function moveSaveFromBeta() {
     window.localStorage.idleLoops1 = window.localStorage[saveName];
 }
 
+function exportCurrentList() {
+    let toReturn = "";
+    for(let i = 0; i < actions.next.length; i++) {
+        let action = actions.next[i];
+        toReturn += action.loops + "x " + action.name;
+        if(i !== actions.next.length - 1) {
+            toReturn += "\n";
+        }
+    }
+    document.getElementById("exportImportList").value = toReturn;
+    document.getElementById("exportImportList").select();
+    document.execCommand('copy');
+    document.getElementById("exportImportList").value = "";
+}
+
+function importCurrentList() {
+    let toImport = document.getElementById("exportImportList").value.split("\n");
+    actions.next = [];
+    for(let i = 0; i < toImport.length; i++) {
+        if(!toImport[i]) {
+            continue;
+        }
+        let name = toImport[i].substr(toImport[i].indexOf("x")+1).trim();
+        let loops = toImport[i].substr(0, toImport[i].indexOf("x"));
+        let action = translateClassNames(name);
+        if(action && action.unlocked()) {
+            actions.next.push({name:name, loops:Number(loops)})
+        }
+    }
+    view.updateNextActions();
+}
+
 // setInterval(tick, 20);

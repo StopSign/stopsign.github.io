@@ -29,7 +29,11 @@ Views.registerView('menu',{
      var html = "<div style='display:inline-block;height:30px;margin-left:10px;' class='showthatH'>";
      html += _txt("menu>save>meta>title");
      html += "<div class='showthisH'>";
-      html += "<div class='button' onclick='save()'>"+_txt("menu>save>manual_save")+"</div><br>";
+       html += "<div class='button' onclick='save()'>"+_txt("menu>save>manual_save")+"</div><br>";
+       html += "<textarea id='exportImportList'></textarea><label for='exportImportList'> "+_txt("menu>save>list_label")+"</label><br>";
+       html += "<div class='button' onclick='exportCurrentList()'>"+_txt("menu>save>export_button")+"</div>";
+       html += "<div class='button' onclick='importCurrentList()'>"+_txt("menu>save>import_button")+"</div><br>";
+       html += _txt("menu>save>list_comment")+ "<br><br>";
       html += "<input id='exportImport'><label for='exportImport'> "+_txt("menu>save>input_label")+"</label><br>";
       html += "<div class='button' onclick='exportSave()'>"+_txt("menu>save>export_button")+"</div><br>";
       html += _txt("menu>save>export_comment")+"<br>";

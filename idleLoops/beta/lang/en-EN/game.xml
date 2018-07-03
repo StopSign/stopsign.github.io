@@ -80,7 +80,11 @@
                 <title>Saving</title>
             </meta>
             <manual_save>Save Manually</manual_save>
-            <input_label>Export/Import</input_label>
+            <export_list>Export Current List</export_list>
+            <import_list>Import List to Current</import_list>
+            <list_label>Export/Import List</list_label>
+            <list_comment>Export's the current list in a plain-text format you can paste and share with others</list_comment>
+            <input_label>Export/Import Savefile</input_label>
             <export_button>Export</export_button>
             <export_comment><![CDATA[Click Export to export to your clipboard (ctrl-v somewhere else).<br>
               Paste a save and click Import to import.]]></export_comment>
@@ -395,6 +399,7 @@
             <add_action_top>Add action to top of list</add_action_top>
             <save_loadout>Save List</save_loadout>
             <load_loadout>Load Selected List</load_loadout>
+            <clear_list>Clear List</clear_list>
             <higher_done_percent_benefic>You can find more stuff with higher %.</higher_done_percent_benefic>
             <progress_label>Progress</progress_label>
             <total_found>Total Found</total_found>
