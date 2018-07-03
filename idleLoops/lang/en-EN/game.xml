@@ -19,7 +19,7 @@
             * Wild Mana 200 gain -> 250 gain.<br>
             * Removing old versions as I add new ones now<br>
             * Removed Get Drunk's gold cost, gave it 3x exp<br>
-            * Reworked dungeons - small dungeon is now capped at 6 floors, with soulstone chances and completed bonuses applying per-floor. Your current completed got split across the first 3 floors.<br>
+            * Reworked dungeons - small dungeon is now capped at 6 floors, with soulstone chances and completed bonuses applying per-floor. Your existing completions were divided amongst the new floors.<br>
             * Small Dungeon mana cost to 2k (until I get an option to short-circuit upon floor completion) and gets harder faster.<br>
             * Made talent gain scale the same way that soulstone does, made soulstones 1/3rd as effective. This means talent gives 3% at level 1 instead of 1%.<br>
             * HtS requires (not costs) 1 reputation, Fight Monster and Small Dungeon require 2 reputation.<br>
