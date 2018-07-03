@@ -24,7 +24,11 @@ function Town(index) {
 
     this.finishProgress = function(varName, expGain, levelUpReward) {
         const prevLevel = this.getLevel(varName);
-        this["exp"+varName] += this.getLevel(varName) >= 100 ? 0 : expGain;
+        if(this["exp"+varName]+expGain > 505000 ) {
+            this["exp"+varName] = 505000;
+        } else {
+            this["exp"+varName] += expGain;
+        }
         let level = this.getLevel(varName);
 
         if(level !== prevLevel) {
@@ -119,7 +123,7 @@ function Town(index) {
         this.FightLoopCounter = 0;
         this.SDungeon = 0;
         this.SDungeonLoopCounter = 0;
-        this.suppliesCost = 400;
+        this.suppliesCost = 300;
     } else if(this.index === 1) {
         this.createVars("WildMana");
         this.createVars("Herbs");
@@ -131,6 +135,15 @@ function Town(index) {
         this.createVars("Gamble");
         this.createProgressVars("City");
         this.createProgressVars("Drunk");
+        this.AdvGuild = 0;
+        this.AdvGuildLoopCounter = 0;
+        this.CraftGuild = 0;
+        this.CraftGuildLoopCounter = 0;
+        this.LDungeon = 0;
+        this.LDungeonLoopCounter = 0;
+        this.createProgressVars("Apprentice");
+        this.createProgressVars("Mason");
+        this.createProgressVars("Architect");
     }
 
 }

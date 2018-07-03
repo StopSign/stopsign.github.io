@@ -21,7 +21,7 @@ function tick() {
     while (gameTicksLeft > (1000 / 50)) {
         if(gameTicksLeft > 2000) {
             window.fps /= 2;
-            console.warn(`too fast! (${gameTicksLeft})`);
+            console.warn('too fast! (${gameTicksLeft})');
             statGraph.graphObject.options.animation.duration = 0;
             gameTicksLeft = 0;
         }
@@ -31,10 +31,15 @@ function tick() {
         timer++;
 
         actions.tick();
-        if(soulstoneChance < 1) {
-            soulstoneChance += .0000002;
-            if(soulstoneChance > 1) {
-                soulstoneChance = 1;
+        for(let i = 0; i < dungeons.length; i++) {
+            for(let j = 0; j < dungeons[i].length; j++) {
+                let level = dungeons[i][j];
+                if(level.ssChance < 1) {
+                    level.ssChance += .0000001;
+                    if(level.ssChance > 1) {
+                        level.ssChance = 1;
+                    }
+                }
             }
         }
 
@@ -62,14 +67,21 @@ function tick() {
 
 function recalcInterval(fps) {
     window.fps = fps;
-    doWork.postMessage({stop:true});
-    doWork.postMessage({start:true,ms:(1000 / fps)});
+    if(mainTickLoop !== undefined) {
+        clearInterval(mainTickLoop);
+    }
+    if(isFileSystem) {
+        mainTickLoop = setInterval(tick, 1000/fps);
+    } else {
+        doWork.postMessage({stop: true});
+        doWork.postMessage({start: true, ms: (1000 / fps)});
+    }
 }
 
 function pauseGame() {
     stop = !stop;
     document.title = stop ? "*PAUSED* Idle Loops" : "Idle Loops";
-    document.getElementById("pausePlay").innerHTML = stop ? "Play" : "Pause";
+    document.getElementById('pausePlay').innerHTML = _txt("time_controls>"+ (stop ? 'play_button' : 'pause_button'));
     if(!stop && (shouldRestart || timer >= timeNeeded)) {
         restart();
     }
@@ -104,6 +116,8 @@ function restart() {
     addHerbs(-herbs);
     addHide(-hide);
     addPotions(-potions);
+    addTeamNum(-teamNum);
+    addArmor(-armor);
     restartStats();
     for(let i = 0; i < towns.length; i++) {
         towns[i].restart();
@@ -181,6 +195,18 @@ function addPotions(amount) {
     view.updatePotions();
 }
 
+function addTeamNum(amount) {
+    teamNum += amount;
+    view.updateTeamNum();
+    view.updateTeamCombat();
+}
+
+function addArmor(amount) {
+    armor += amount;
+    view.updateArmor();
+    view.updateTeamCombat();
+}
+
 function changeActionAmount(amount, num) {
     actions.addAmount = amount;
     view.updateAddAmount(num);
@@ -234,18 +260,20 @@ function adjustAll() {
     adjustHerbs();
     adjustHunt();
     adjustSuckers();
+    view.adjustManaCost("Continue On");
 }
 
 function capAmount(index, townNum) {
     let varName = "good"+translateClassNames(actions.next[index].name).varName;
-    let alreadyExisting = 0;
-    for(let i = 0; i < actions.next.length; i++) {
-        if(i === index || actions.next[index].name !== actions.next[i].name) {
-            continue;
-        }
-        alreadyExisting += actions.next[i].loops;
-    }
+    let alreadyExisting = getNumOnList(actions.next[index].name)- actions.next[index].loops;
     let newLoops = towns[townNum][varName] - alreadyExisting;
+    actions.next[index].loops = newLoops < 0 ? 0 : newLoops;
+    view.updateNextActions();
+}
+
+function capTraining(index) {
+    let alreadyExisting = getNumOnList(actions.next[index].name) - actions.next[index].loops;
+    let newLoops = trainingLimits - alreadyExisting;
     actions.next[index].loops = newLoops < 0 ? 0 : newLoops;
     view.updateNextActions();
 }
@@ -360,16 +388,19 @@ function addOffline(num) {
             toggleOffline();
         }
         totalOfflineMs += num;
+        if(totalOfflineMs < 0) {
+            totalOfflineMs = 0;
+        }
         document.getElementById("bonusSeconds").innerHTML = intToString(totalOfflineMs / 1000, 2);
     }
 }
 
 function toggleOffline() {
     if(bonusSpeed === 1) { //go fast
-        document.getElementById("isBonusOn").innerHTML = "ON";
         bonusSpeed = 4;
+        document.getElementById('isBonusOn').innerHTML = _txt("time_controls>bonus_seconds>state>on");
     } else { //take it slow
-        document.getElementById("isBonusOn").innerHTML = "OFF";
         bonusSpeed = 1;
+        document.getElementById('isBonusOn').innerHTML = _txt("time_controls>bonus_seconds>state>off");
     }
 }

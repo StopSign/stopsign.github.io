@@ -145,7 +145,7 @@ function factorial(n) {
 
 let fibonaccis = [];
 function fibonacci(n) {
-    if (n === 0 || n === 1)
+    if (n === 0 || n === 1 || n === undefined)
         return 1;
     if (fibonaccis[n] > 0)
         return fibonaccis[n];
@@ -414,13 +414,13 @@ function roughSizeOfObject( object ) {
     return bytes;
 }
 // modified from: https://stackoverflow.com/questions/879152/how-do-i-make-javascript-beep/13194087#13194087
-var beep = (function () {
-    var ctxClass = window.audioContext || window.AudioContext || window.AudioContext || window.webkitAudioContext
-    var ctx = new ctxClass();
+let beep = (function () {
+    let ctxClass = window.audioContext || window.AudioContext || window.AudioContext || window.webkitAudioContext;
+    let ctx = new ctxClass();
     return function (duration) {
         if (duration <= 0) return;
-        
-        var osc = ctx.createOscillator();
+
+        let osc = ctx.createOscillator();
         osc.type = "sine";
 
         osc.connect(ctx.destination);

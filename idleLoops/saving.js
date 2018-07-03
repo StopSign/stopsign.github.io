@@ -1,13 +1,21 @@
-let doWork = new Worker('interval.js');
-doWork.onmessage = function (event) {
-    if (event.data === 'interval.start') {
-        tick();
+function startGame () {
+    if (isFileSystem) {
+    } else {
+        window.doWork = new Worker('interval.js');
+        window.doWork.onmessage = function (event) {
+            if (event.data === 'interval.start') {
+                tick();
+            }
+        };
     }
-};
+    displayBetaSaveNote();
+    load();
+}
 
+let mainTickLoop;
+let isFileSystem = !!location.href.match("file");
 let isBeta = !!location.href.match(/beta/i);
 let saveName = !isBeta ? "idleLoops1" :  "idleLoopsBeta";
-displayBetaSaveNote();
 
 let timeNeededInitial = 5 * 50;
 let timer = timeNeededInitial;
@@ -30,17 +38,19 @@ let supplies = 0;
 let herbs = 0;
 let hide = 0;
 let potions = 0;
+let teamNum = 0;
+let guild = "";
+let armor = 0;
 
 let curLoadout = 0;
 let loadouts = [];
-let skillList = ["Combat", "Magic", "Practical", "Alchemy"];
+let skillList = ["Combat", "Magic", "Practical", "Alchemy", "Crafting"];
 let skills = {};
-let soulstoneChance = 1;
 let townShowing = 0;
 let maxTown;
 let statShowing;
 let actionTownNum;
-let trainingLimits = 50;
+let trainingLimits = 10;
 let storyShowing = 0;
 let storyMax = 0;
 
@@ -48,7 +58,10 @@ let curDate = new Date();
 let totalOfflineMs = 0;
 let bonusSpeed = 1;
 let offlineRatio = .8;
+let dungeons;
 
+window.curAdvGuildSegment = 0;
+window.curCraftGuildSegment = 0;
 
 
 function closeTutorial() {
@@ -87,7 +100,6 @@ function load() {
         }
     }
 
-    soulstoneChance = toLoad.soulstoneChance !== undefined ? toLoad.soulstoneChance : 1;
     maxTown = toLoad.maxTown !== undefined ? toLoad.maxTown : 0;
     actionTownNum = toLoad.actionTownNum !== undefined ? toLoad.actionTownNum : 0;
 
@@ -111,6 +123,12 @@ function load() {
     town = towns[2];
     town.expCity = toLoad.expCity !== undefined ? toLoad.expCity : 0;
     town.expDrunk = toLoad.expDrunk !== undefined ? toLoad.expDrunk : 0;
+    town.totalAdvGuild = toLoad.totalAdvGuild !== undefined ? toLoad.totalAdvGuild : 0;
+    town.totalCraftGuild = toLoad.totalCraftGuild !== undefined ? toLoad.totalCraftGuild : 0;
+    town.totalLDungeon = toLoad.totalLDungeon !== undefined ? toLoad.totalLDungeon : 0;
+    town.expApprentice = toLoad.expApprentice !== undefined ? toLoad.expApprentice : 0;
+    town.expMason = toLoad.expMason !== undefined ? toLoad.expMason : 0;
+    town.expArchitect = toLoad.expArchitect !== undefined ? toLoad.expArchitect : 0;
 
     actions.next = [];
     if(toLoad.nextList) {
@@ -144,6 +162,19 @@ function load() {
         }
     }
 
+    dungeons = [[], []];
+    let level = {ssChance:1,completed:0};
+    for(let i = 0; i < dungeons.length; i++) {
+        for(let j = 0; j < 6 + i*3; j++) {
+            if(toLoad.dungeons && toLoad.dungeons[i][j]) {
+                dungeons[i][j] = toLoad.dungeons[i][j];
+            } else {
+                dungeons[i][j] = copyArray(level);
+            }
+            dungeons[i][j].lastStat = "NA";
+        }
+    }
+
     recalcInterval(50);
     pauseGame();
     view.initalize();
@@ -171,11 +202,25 @@ function load() {
     }
 
     document.getElementById("repeatLastAction").checked = toLoad.repeatLast;
+    document.getElementById("audioCueToggle").checked = toLoad.pingOnPause !== undefined ? toLoad.pingOnPause : false;
     storyShowing = toLoad.storyShowing !== undefined ? toLoad.storyShowing : 0;
     storyMax = toLoad.storyMax !== undefined ? toLoad.storyMax : 0;
 
     totalOfflineMs = toLoad.totalOfflineMs !== undefined ? toLoad.totalOfflineMs : 0;
     addOffline(Math.floor((new Date() - new Date(toLoad.date)) * offlineRatio));
+
+    if(toLoad.version75 === undefined) {
+        let total = towns[0].totalSDungeon;
+        dungeons[0][0].completed = Math.floor(total/2);
+        dungeons[0][1].completed = Math.floor(total/4);
+        dungeons[0][2].completed = Math.floor(total/8);
+        dungeons[0][3].completed = Math.floor(total/16);
+        dungeons[0][4].completed = Math.floor(total/32);
+        dungeons[0][5].completed = Math.floor(total/64);
+        towns[0].totalSDungeon = dungeons[0][0].completed + dungeons[0][1].completed + dungeons[0][2].completed + dungeons[0][3].completed + dungeons[0][4].completed + dungeons[0][5].completed
+    }
+
+
 
     adjustAll();
 
@@ -188,7 +233,7 @@ function load() {
 
 function save() {
     let toSave = {};
-    toSave.soulstoneChance = soulstoneChance;
+    toSave.dungeons = dungeons;
     toSave.maxTown = maxTown;
     toSave.actionTownNum = actionTownNum;
 
@@ -210,6 +255,13 @@ function save() {
     town = towns[2];
     toSave.expCity = town.expCity;
     toSave.expDrunk = town.expDrunk;
+    toSave.totalAdvGuild = town.totalAdvGuild;
+    toSave.totalCraftGuild = town.totalCraftGuild;
+    toSave.totalLDungeon = town.totalLDungeon;
+    toSave.version75 = true;
+    toSave.expApprentice = town.expApprentice;
+    toSave.expMason = town.expMason;
+    toSave.expArchitect = town.expArchitect;
 
     for(let i = 0; i < towns.length; i++) {
         town = towns[i];
@@ -230,6 +282,7 @@ function save() {
     toSave.nextList = actions.next;
     toSave.loadouts = loadouts;
     toSave.repeatLast = document.getElementById("repeatLastAction").checked;
+    toSave.pingOnPause = document.getElementById("audioCueToggle").checked;
     toSave.storyShowing = storyShowing;
     toSave.storyMax = storyMax;
     toSave.date = new Date();
@@ -255,9 +308,8 @@ function importSave() {
     pauseGame();
 }
 
-load();
-
 function displayBetaSaveNote() {
+    // console.log(isBeta);
     if(!isBeta) return;
     document.addEventListener("DOMContentLoaded", function() {
         document.getElementById("betaSave").style.display = "block";

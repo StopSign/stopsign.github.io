@@ -52,28 +52,58 @@ custom input numbers for action list
 hover -> focus
 
 
-town 2 - forest road
+.75
+	
+    large dungeon - like small dungeon, but uses team combat and gives 10 soulstones and items
+	
+    craft armor - cost 2 hides, gives 20% self combat, faster w/ craftsmanship skill
+    apprentice - faster w/ rank, PBA
+        craftsmanship skill +
+    journeyman - faster w/ rank, PBA
+        craftsmanship skill ++
+    architect - faster w/ rank, PBA
+        craftsmanship skill +++
 
+.76
     Follow Flowers - PBA, more herbs
         Clear thicket - PBA, more wild mana
         talk to witch - PBA, slightly improve mage lessons, improve gather wild mana
         learn dark magic - improves dark magic skill, costs reputation, req rep < 3
             Dark Magic Skill -
                 Smash pots and wild mana 1% more reward per level.
-        Perform ritual - req rep < 0, MPBA, gives perm +initial mana
+
+.77
+   rework small/large dungeon
+   checkbox to short-circuit heal/fight/dungeon when complete with a part
+
+.78
+    Perform ritual - req rep < 0, MPBA, gives perm +initial mana
+    initial mana to 100
+    smash pots max to 25, but give double mana
+    pick locks cost 100 less
+    half short quests, cost 600
+    half long quests, cost 1500
+    investigate double price, triple reward
+    buy supplies to 300 gold
+    heal req 1 rep
+    fight req 2 rep
+    trainStr to zone 3
+    trainDex/Spd to zone 2
+    wild mana higher initial, worse ratio, 25
+    Read Manuals - very hard PBA, improves train combat/magic
+    <hidden until dark magic> - Sacrifice - Costs 50 more soulstones each time, gives permanent +10% time modifier in zone 1, max 200%
+
+.79
+    Performance & data management rework
+
+
+town 2 - forest road
+
 
 town 3 - guilds and stuff
-    gamble
-    explore
-    get drunk
 
-    merchants guild
-        apprentice
-        start a business / hire employees
-        promote business
-        manage business
     adventurers guild
-        find a team / team building
+        hire adventurer
         large dungeon
         identify items
         join tournament
@@ -82,6 +112,11 @@ town 3 - guilds and stuff
         apprentice builder -
         journeyman builder -
         architect -
+    merchants guild
+        apprentice
+        start a business / hire employees
+        promote business
+        manage business
 
 
     read books

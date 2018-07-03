@@ -35,7 +35,15 @@ function getExpOfLevel(level) {
 }
 
 function getTalent(stat) {
-    return getLevelFromExp(stats[stat].talent);
+    return getLevelFromTalent(stats[stat].talent);
+}
+
+function getLevelFromTalent(exp) {
+    return Math.floor((Math.sqrt(8*exp/100+1)-1)/2);
+}
+
+function getExpOfTalent(level) {
+    return level * (level + 1) * 50;
 }
 
 function getPrcToNextLevel(stat) {
@@ -46,9 +54,9 @@ function getPrcToNextLevel(stat) {
 }
 
 function getPrcToNextTalent(stat) {
-    let expOfCurLevel = getExpOfLevel(getTalent(stat));
+    let expOfCurLevel = getExpOfTalent(getTalent(stat));
     let curLevelProgress = stats[stat].talent - expOfCurLevel;
-    let nextLevelNeeds = getExpOfLevel(getTalent(stat)+1) - expOfCurLevel;
+    let nextLevelNeeds = getExpOfTalent(getTalent(stat)+1) - expOfCurLevel;
     return curLevelProgress / nextLevelNeeds * 100;
 }
 
@@ -62,6 +70,14 @@ function getExpOfSkillLevel(level) {
 
 function getSkillLevel(skill) {
     return getSkillLevelFromExp(skills[skill].exp);
+}
+
+function getSelfCombat() {
+    return getSkillLevel("Combat") * (1 + (armor * getCraftGuildRank().bonus)/5);
+}
+
+function getTeamCombat() {
+    return getSelfCombat("Combat") + getSkillLevel("Combat")*teamNum/2 * getAdvGuildRank().bonus;
 }
 
 function getPrcToNextSkillLevel(skill) {
@@ -90,5 +106,5 @@ function restartStats() {
 
 function getTotalBonusXP(statName) {
     let soulstoneBonus = stats[statName].soulstone ? calcSoulstoneMult(stats[statName].soulstone) : 1;
-    return soulstoneBonus * (1+getTalent(statName)/100);
+    return soulstoneBonus * calcTalentMult(getTalent(statName));
 }
