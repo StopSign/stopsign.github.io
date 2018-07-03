@@ -80,7 +80,11 @@
                 <title>Saving</title>
             </meta>
             <manual_save>Save Manually</manual_save>
-            <input_label>Export/Import</input_label>
+            <export_list>Export Current List</export_list>
+            <import_list>Import List to Current</import_list>
+            <list_label>Export/Import List</list_label>
+            <list_comment>Export's the current list in a plain-text format you can paste and share with others</list_comment>
+            <input_label>Export/Import Savefile</input_label>
             <export_button>Export</export_button>
             <export_comment><![CDATA[Click Export to export to your clipboard (ctrl-v somewhere else).<br>
               Paste a save and click Import to import.]]></export_comment>
@@ -395,6 +399,7 @@
             <add_action_top>Add action to top of list</add_action_top>
             <save_loadout>Save List</save_loadout>
             <load_loadout>Load Selected List</load_loadout>
+            <clear_list>Clear List</clear_list>
             <higher_done_percent_benefic>You can find more stuff with higher %.</higher_done_percent_benefic>
             <progress_label>Progress</progress_label>
             <total_found>Total Found</total_found>
@@ -473,7 +478,7 @@
             <label>Get Drunk</label>
             <label_done>Rumors Heard</label_done>
             <tooltip><![CDATA[
-        Sometimes you just need a drink.<br>Requires reputation greater than -3.<br>Has 3x exp<br>Costs 1 reputation.<br>Unlocked at 20% City Explored.
+        Sometimes you just need a drink.<br>Requires reputation of at least -3.<br>Has 3x exp<br>Costs 1 reputation.<br>Unlocked at 20% City Explored.
       ]]></tooltip>
         </get_drunk>
         <apprentice>
@@ -824,7 +829,7 @@
             <label>Crafting Guild</label>
             <label_done>Cried From Beauty</label_done>
             <tooltip><![CDATA[
-          Learn to use your hands to build big structures.<br>Take their tests and get a rank!<br>You can only join 1 guild at a time, and only try once.<br>Gives 100 Crafting exp per rank.<br>Gives ((magic skill)/2 + (crafting skill)) * (1 + main stat / 100) * sqrt(1 + times completed / 1000) * (original mana cost / actual mana cost) progress points per mana.<br>Unlocks at 30% rumors heard
+          Learn to use your hands to build big structures.<br>Take their tests and get a rank!<br>You can only join 1 guild at a time, and only try once.<br>Gives 50 Crafting exp and 10 gold per rank.<br>Gives ((magic skill)/2 + (crafting skill)) * (1 + main stat / 100) * sqrt(1 + times completed / 1000) * (original mana cost / actual mana cost) progress points per mana.<br>Unlocks at 30% rumors heard
       ]]></tooltip>
         </craft_guild>
     </actions>

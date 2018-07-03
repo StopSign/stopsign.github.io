@@ -1940,7 +1940,7 @@ function CraftingGuild() {
     };
     this.segmentFinished = function() {
         window.curCraftGuildSegment++;
-        addSkillExp("Crafting", 100);
+        addSkillExp("Crafting", 50);
         addGold(10);
     };
     this.getPartName = function() {
