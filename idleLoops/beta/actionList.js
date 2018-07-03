@@ -1167,7 +1167,7 @@ function CraftArmor() {
         Con:.3,
         Int:.3
     };
-    this.affectedBy = ["Crafting Guild"];
+    // this.affectedBy = ["Crafting Guild"];
     this.canStart = function() {
         return hide >= 2;
     };
