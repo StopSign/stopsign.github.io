@@ -54,11 +54,12 @@ function View() {
                         "<div class='medium bold'>"+_txt("stats>tooltip>level_exp")+"</div> <div id='stat"+stat+"LevelExp'></div>/<div id='stat"+stat+"LevelExpNeeded'></div> <div class='statTooltipPerc'>(<div id='stat"+stat+"LevelProgress'></div>%)</div><br>" +
                         "<div class='medium bold'>"+_txt("stats>tooltip>talent")+"</div> <div id='stat"+stat+"Talent2'></div><br>" +
                         "<div class='medium bold'>"+_txt("stats>tooltip>talent_exp")+"</div> <div id='stat"+stat+"TalentExp'></div>/<div id='stat"+stat+"TalentExpNeeded'></div> <div class='statTooltipPerc'>(<div id='stat"+stat+"TalentProgress'></div>%)</div><br>" +
-                "<div class='medium bold'>"+_txt("stats>tooltip>talent_multiplier")+"</div> x<div id='stat"+stat+"TalentMult'></div>" +
+                "<div class='medium bold'>"+_txt("stats>tooltip>talent_multiplier")+"</div> x<div id='stat"+stat+"TalentMult'></div><br>" +
                         "<div id='ss"+stat+"Container' class='ssContainer'>" +
                             "<div class='bold'>"+_txt("stats>tooltip>soulstone")+"</div> <div id='ss"+stat+"'></div><br>" +
                             "<div class='medium bold'>"+_txt("stats>tooltip>soulstone_multiplier")+"</div> x<div id='stat"+stat+"SSBonus'></div>" +
-                        "</div>" +
+                        "</div><br>" +
+                        "<div class='medium bold'>"+_txt("stats>tooltip>total_multiplier")+"</div> x<div id='stat"+stat+"TotalMult'></div>" +
                     "</div>" +
                 "</div>"
         }
@@ -114,6 +115,7 @@ function View() {
             document.getElementById("stat" + stat + "TalentExpNeeded").innerHTML = intToString(getExpOfTalent(getTalent(stat)+1) - expOfTalent+"", 1);
             document.getElementById("stat" + stat + "TalentMult").innerHTML = intToString(calcTalentMult(getTalent(stat)), 3);
             document.getElementById("stat" + stat + "TalentProgress").innerHTML = intToString(talentPrc, 2);
+            document.getElementById("stat" + stat + "TotalMult").innerHTML = intToString(getTotalBonusXP(stat), 3);
         }
         this["update"+stat] = false;
     };
