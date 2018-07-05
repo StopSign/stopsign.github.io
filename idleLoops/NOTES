@@ -51,6 +51,19 @@ hard numbers for wander progress
 custom input numbers for action list
 hover -> focus
 
+Tutoring - 50 combat, 50 magic, 100% city explored, str 20, dex 20, per 10, int 20, con 30, exp 150%
+
+training soft caps per action - 1000x initial mana cost before 60% exp, trainings 80%.
+
+
+Remove talent
+    everything has a 10 + (90 / (1 + completed/1000)) multiplier to initial mana cost
+
+
+
+breakpoint action
+
+
 
 .75
 	
