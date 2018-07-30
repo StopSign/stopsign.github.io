@@ -314,7 +314,7 @@ function split(index) {
 function handleDragStart(event) {
     let index = event.target.getAttribute("data-index")
     draggedDecorate(index);
-    event.dataTransfer.setData('Text/html', index);
+    event.dataTransfer.setData('text/plain', index);
 }
 
 function handleDragOver(event) {
@@ -324,7 +324,7 @@ function handleDragOver(event) {
 function handleDragDrop(event) {
     let indexOfDroppedOverElement = event.target.getAttribute("data-index")
     dragExitUndecorate(indexOfDroppedOverElement);
-    let initialIndex = event.dataTransfer.getData("text/html")
+    let initialIndex = event.dataTransfer.getData("text/plain")
     moveQueuedAction(initialIndex, indexOfDroppedOverElement);
 }
 
