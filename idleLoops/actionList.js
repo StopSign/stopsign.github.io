@@ -2012,7 +2012,7 @@ function Tournament() {
         return !window.tournyComplete && curFloor <= 5;
     };
     this.loopCost = function(segment) {
-        return precision3(Math.pow(1.1, towns[2].TournamentLoopCounter + segment)) * 5e4;
+        return precision3(Math.pow(1.1, towns[2].TournamentLoopCounter + segment)) * 5e6;
     };
     this.tickProgress = function(offset) {
         return (getSkillLevel("Magic") + getSelfCombat()) * (1 + getLevel(this.loopStats[(towns[2].TournamentLoopCounter+offset) % this.loopStats.length])/100) * Math.sqrt(1 + towns[2].totalTournament/1000);
