@@ -1,0 +1,72 @@
+Game
+    10 mana = 1 second
+    Initial mana is 120 seconds
+    4 lists, they auto-add sleep actions 1s at a time when out of other actions
+    Player actions
+
+Layout
+    Top left is War view. top 2/3rds is war map, bottom 1/3rd is castle
+    top-right is list, right of that is Options
+    Bottom panel is tabbed on the left, tabs are King, Castle, Upgrades, Research, Heroes
+    Lists are King, Units, Castle, Laboratory
+
+King
+    Has exp and a level
+    Split into physical and mental stats
+    Mental stats + physical cap increases per level
+    Physical stats have additional "current", which gets +1 per enemy unit kill until you've reached cap
+    Has Actions, which all take 2 seconds and happen when clicking their icon elsewhere
+    Has talent points, which can be distributed in a talent tree & reset freely
+    Actions
+        Train Strength - recover 1 strength, up to cap
+        Train Dexterity - recover
+        Train Agility - recover
+    Talents
+
+
+
+Castle
+    Has buildings, that can queue in Building List
+    Requires:
+        + Gold, cost gold - Tax Collector. Builds in 10 seconds, adds points to a progress bar, req 100/200/300... points to get gold
+        + wood, cost gold - Woodcutter's Hut
+        + magic, cost wood - Laboratory
+
+
+Research
+    Has "Gather Mana" action, which adds Magic to a progress bar, req 1000/2000/3000... points,
+
+
+Heroes
+    You get 1 hero to start - Archer
+    Heroes level like the King, but faster, w/o talents, and the exp doesn't stick around
+    Tab shows stats
+    Each hero has it's own health, and can be healed if coming back to base
+
+Combat
+    Multiple battles can happen at once
+    Each battle has 2 sides, shown on the map
+    Ranged attacks first, then melee
+    Portions of units can die mid-combat
+    Exp to King + Heroes for every enemy unit killed
+    Damage is spread over both units and heroes
+
+Units list
+    Takes 2 seconds to order a unit to do anything. Unit starts moving at beginning of 2s
+    Units move to target (can be re-routed mid-travel)
+
+
+Buildings list
+
+
+Research list
+
+
+War Map
+    4 camps and 1 fort
+    Each minute, a new camp starts sending to your castle
+
+
+Days
+    When a War Map is completed, you go to Day N+1, starting from a new castle (same initial conditions except heroes and king's physical stats).
+    You can re-do previous days
