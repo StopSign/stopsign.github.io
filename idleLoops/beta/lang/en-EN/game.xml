@@ -6,6 +6,11 @@
                 <title>Changelog</title>
                 <version_prefix>Version</version_prefix>
             </meta>
+            <version verNum=".76"><![CDATA[
+            * Ranks start at F now instead of E<br>
+            * Fixed wild mana tooltip<br>
+            * Added Tournament, which uses self combat.
+      ]]></version>
             <version verNum=".75"><![CDATA[
             * Skill training actions have 150% exp.<br>
             * Practical magic updates the gold cost tooltip correctly<br>
@@ -226,6 +231,10 @@
                 essence of it's previous incarnations drains it somehow. It doesn't always happen, but you'll need to
                 put more mana into the world to take the core's benefits out of it. You shrug, accepting yet another
                 oddity of the loops.
+            </story>
+            <story num="3">
+                You've done it! You've won the tournament and obtained the cure. You can stop looping at any moment.
+                But, there's still a little more you want to do ... (GAME COMPLETE, keep playing if you want).
             </story>
         </stories>
         <bonus_seconds>
@@ -685,7 +694,7 @@
             <info_text2>Sources with loot total</info_text2>
             <info_text3>Sources to check for loot</info_text3>
             <tooltip><![CDATA[
-          They're out of sight of most travellers, but you have time to find and harvest them.<br>Every good mana spot has 250 mana.<br>Every 50 mana spots have good mana.
+          They're out of sight of most travellers, but you have time to find and harvest them.<br>Every good mana spot has 250 mana.<br>Every 10 mana spots have good mana.
       ]]></tooltip>
         </wild_mana>
         <gather_herbs>
@@ -801,7 +810,7 @@
             <label_complete>Completed</label_complete>
             <label_part>Large Dungeon</label_part>
             <tooltip><![CDATA[
-          With your party, you set out to accomplish great feats of dungeoneering that you couldn't have done while alone.<br>Gives (magic + combat skill) * (1 + main stat / 100) * sqrt(1 + times completed / 200) * (original mana cost / actual mana cost) progress points per mana.<br>Requires at least one other party member.<br>Gives 10 soulstones per completion - hover over Completed for info.
+          With your party, you set out to accomplish great feats of dungeoneering that you couldn't have done while alone.<br>Gives (magic + team combat) * (1 + main stat / 100) * sqrt(1 + times completed / 200) * (original mana cost / actual mana cost) progress points per mana.<br>Requires at least one other party member.<br>Gives 10 soulstones per completion - hover over Completed for info.
       ]]></tooltip>
             <completed_tooltip><![CDATA[
         Each soulstone improves a random stat's exp gain by (1+(soulstones)^.8/10).<br>Each floor has a soulstone that, when received, reduces the chance you'll get the next one by 2%.<br>Chance to receive a soulstone recovers per floor at .00001% per mana.
@@ -832,6 +841,13 @@
           Learn to use your hands to build big structures.<br>Take their tests and get a rank!<br>You can only join 1 guild at a time, and only try once.<br>Gives 50 Crafting exp and 10 gold per rank.<br>Gives ((magic skill)/2 + (crafting skill)) * (1 + main stat / 100) * sqrt(1 + times completed / 1000) * (original mana cost / actual mana cost) progress points per mana.<br>Unlocks at 30% rumors heard
       ]]></tooltip>
         </craft_guild>
+        <tournament>
+            <label>Tournament</label>
+            <label_done>Contestants Crushed</label_done>
+            <tooltip><![CDATA[
+          Compete for the ultimate prize, or worse prizes along the way.<br>You can only try once in the tournament.<br>Gives (100 + (5 - Division) * 50) Combat Skill and (40 + (5 - Division) * 20) gold per rank.<br>Gives a universal cure for all magical ailments when you win!<br>Gives (magic + self combat) * (1 + main stat / 100) * sqrt(1 + times completed / 1000) * (original mana cost / actual mana cost) progress points per mana.<br>Unlocks at 40% rumors heard
+      ]]></tooltip>
+        </tournament>
     </actions>
     <spells>
         <title>Spells</title>

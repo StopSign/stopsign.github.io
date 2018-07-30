@@ -58,10 +58,17 @@ training soft caps per action - 1000x initial mana cost before 60% exp, training
 
 Remove talent
     everything has a 10 + (90 / (1 + completed/1000)) multiplier to initial mana cost
+    rebalance mana costs
+    rebalance soulstone effect (maybe)
+
+
+remove clear list, import/export list there
+
 
 
 
 breakpoint action
+folder action
 
 
 

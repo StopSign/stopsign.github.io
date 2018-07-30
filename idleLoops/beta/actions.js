@@ -136,7 +136,11 @@ function Actions() {
         window.curCraftGuildSegment = 0;
         towns[2].LDungeon = 0;
         towns[2].LDungeonLoopCounter = 0;
+        towns[2].Tournament = 0;
+        towns[2].TournamentLoopCounter = 0;
+        window.curTournamentSegment = 0;
         guild = "";
+        window.tournyComplete = false;
         if(document.getElementById("currentListActive").checked) {
             this.currentPos = 0;
             this.completedTicks = 0;

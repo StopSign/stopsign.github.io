@@ -606,6 +606,10 @@ function View() {
         this.createActionProgress(tempObj);
 
         this.createTownAction(new ReadBooks());
+
+        tempObj = new Tournament();
+        this.createTownAction(tempObj);
+        this.createMultiPartPBar(tempObj);
     };
 
     this.createActionProgress = function(action) {
@@ -778,6 +782,10 @@ function View() {
         this.updateMultiPartSegments(tempObj);
 
         tempObj = new CraftingGuild();
+        this.updateMultiPart(tempObj);
+        this.updateMultiPartSegments(tempObj);
+
+        tempObj = new Tournament();
         this.updateMultiPart(tempObj);
         this.updateMultiPartSegments(tempObj);
     };

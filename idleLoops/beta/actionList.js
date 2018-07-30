@@ -96,6 +96,8 @@ function translateClassNames(name) {
         return new Mason();
     } else if(name === "Architect") {
         return new Architect();
+    } else if(name === "Tournament") {
+        return new Tournament();
     }
     console.log('error trying to create ' + name);
 }
@@ -323,6 +325,7 @@ function TalkToHermit() {
     };
     this.finish = function() {
         towns[1].finishProgress(this.varName, 50 * (1 + towns[1].getLevel("Shortcut")/300), function() {
+            view.adjustManaCost("Learn Alchemy");
             view.adjustManaCost("Gather Herbs");
             view.adjustManaCost("Practical Magic");
         });
@@ -1960,7 +1963,7 @@ function CraftingGuild() {
     };
 }
 function getCraftGuildRank(offset) {
-    let name = ["E", "F", "D", "C", "B", "A", "S", "SS", "SSS", "SSSS", "U", "UU", "UUU", "UUUU"][Math.floor(window.curCraftGuildSegment/3+.00001)];
+    let name = ["F", "E", "D", "C", "B", "A", "S", "SS", "SSS", "SSSS", "U", "UU", "UUU", "UUUU"][Math.floor(window.curCraftGuildSegment/3+.00001)];
 
     let segment = (offset === undefined ? 0 : offset) + window.curCraftGuildSegment;
     let bonus = precision3(1 + segment/20 + (segment ** 2)/300);
@@ -1978,3 +1981,86 @@ function getCraftGuildRank(offset) {
     return {name:name,bonus:bonus};
 }
 
+function Tournament() {
+    this.name = "Tournament";
+    this.expMult = 1;
+    this.townNum = 2;
+
+    this.tooltip = _txt("actions>tournament>tooltip");
+    this.label = _txt("actions>tournament>label");
+    this.labelDone = _txt("actions>tournament>label_done");
+
+    this.varName = "Tournament";
+    this.stats = {
+        Str:.2,
+        Dex:.1,
+        Con:.3,
+        Spd:.1,
+        Int:.2,
+        Luck:.1
+    };
+    this.loopStats = ["Str", "Con", "Int"];
+    this.segments = 3;
+    this.manaCost = function() {
+        return 5000;
+    };
+    this.allowed = function() {
+        return 1;
+    };
+    this.canStart = function() {
+        let curFloor = Math.floor(window.curTournamentSegment/3+.00001);
+        return !window.tournyComplete && curFloor <= 5;
+    };
+    this.loopCost = function(segment) {
+        return precision3(Math.pow(1.1, towns[2].TournamentLoopCounter + segment)) * 5e4;
+    };
+    this.tickProgress = function(offset) {
+        return (getSkillLevel("Magic") + getSelfCombat()) * (1 + getLevel(this.loopStats[(towns[2].TournamentLoopCounter+offset) % this.loopStats.length])/100) * Math.sqrt(1 + towns[2].totalTournament/1000);
+    };
+    this.loopsFinished = function() {
+    };
+    this.segmentFinished = function() {
+        getTourneyReward();
+        window.curTournamentSegment++;
+    };
+    this.getPartName = function() {
+        return "Division " + getTournamentRank();
+    };
+    this.getSegmentName = function(segment) {
+        return "Division " + getTournamentRank(segment);
+    };
+    this.visible = function() {
+        return towns[2].getLevel("Drunk") >= 20;
+    };
+    this.unlocked = function() {
+        return towns[2].getLevel("Drunk") >= 40;
+    };
+    this.finish = function() {
+        window.tournyComplete = true;
+        getTourneyReward();
+    };
+}
+function getTournamentRank(offset) {
+    let name = ["5", "4", "3", "2", "1", "Secret"][Math.floor(window.curTournamentSegment/3+.00001)];
+
+    if(!name) {
+        name = "Complete";
+    } else {
+        if(offset !== undefined) {
+            name += [", 3rd", ", 2nd", ", 1st"][offset % 3];
+        } else {
+            name += [", 3rd", ", 2nd", ", 1st"][window.curCraftGuildSegment % 3];
+        }
+    }
+    return name;
+}
+function getTourneyReward() {
+    console.log(window.curTournamentSegment);
+    let curFloor = Math.floor(window.curTournamentSegment/3+.00001);
+
+    addSkillExp("Combat", 100 + curFloor * 50 );
+    addGold(40 + curFloor * 20);
+    if(window.curTournamentSegment === 17) {
+        unlockStory(3);
+    }
+}
