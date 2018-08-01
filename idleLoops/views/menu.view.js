@@ -62,7 +62,7 @@ Views.registerView('menu',{
      var html = "<div style='display:inline-block;height:30px;margin-left:10px;' class='showthatH'>";
      html += _txt("menu>options>meta>title");
      html += "<div class='showthisH'>";
-      html += "<a href='_blank' href='"+_txt("menu>options>discord>link")+"'>"+_txt("menu>options>discord>title")+"</a><br>";
+      html += "<a target='_blank' href='"+_txt("menu>options>discord>link")+"'>"+_txt("menu>options>discord>title")+"</a><br>";
       if (Object.keys(Localization.supportedLang).length>1)
         html += Views.menu.htmlLocalizationMenu();
       html += _txt("menu>options>adblock_warning")+"<br>";
