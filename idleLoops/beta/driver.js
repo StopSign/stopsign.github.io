@@ -312,9 +312,9 @@ function split(index) {
     view.updateNextActions();
 }
 function handleDragStart(event) {
-    let index = event.target.getAttribute("data-index")
+    let index = event.target.getAttribute("data-index");
     draggedDecorate(index);
-    event.dataTransfer.setData('Text/html', index);
+    event.dataTransfer.setData('text/html', index);
 }
 
 function handleDragOver(event) {
@@ -322,9 +322,9 @@ function handleDragOver(event) {
 }
 
 function handleDragDrop(event) {
-    let indexOfDroppedOverElement = event.target.getAttribute("data-index")
+    let indexOfDroppedOverElement = event.target.getAttribute("data-index");
     dragExitUndecorate(indexOfDroppedOverElement);
-    let initialIndex = event.dataTransfer.getData("text/html")
+    let initialIndex = event.dataTransfer.getData("text/html");
     moveQueuedAction(initialIndex, indexOfDroppedOverElement);
 }
 
