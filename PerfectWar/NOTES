@@ -1,3 +1,10 @@
+Colors:
+    King #eaeaca
+    Castle #c9dce6
+    Laboratory #edd4fb
+    Heroes #e6cbc9
+    Upgrades #c2e4c2
+
 Game
     10 mana = 1 second
     Initial mana is 120 seconds
@@ -7,7 +14,7 @@ Game
 Layout
     Top left is War view. top 2/3rds is war map, bottom 1/3rd is castle
     top-right is list, right of that is Options
-    Bottom panel is tabbed on the left, tabs are King, Castle, Upgrades, Research, Heroes
+    Bottom panel is tabbed on the left, tabs are King, Castle, Upgrades, Laboratory, Heroes
     Lists are King, Units, Castle, Laboratory
 
 King
@@ -18,11 +25,23 @@ King
     Has Actions, which all take 2 seconds and happen when clicking their icon elsewhere
     Has talent points, which can be distributed in a talent tree & reset freely
     Actions
-        Train Strength - recover 1 strength, up to cap
-        Train Dexterity - recover
-        Train Agility - recover
-    Talents
+        Train Strength - recover 1 str, up to cap. Takes 2 seconds. Wis improves.
+        Train Constitution - recover 1 con, up to cap. Takes 2 seconds. Wis improves.
+        Train Agility - recover 1 agi, up to cap. Takes 2 seconds. Wis improves.
+        Grow Trees - costs magic, gives trees after time. Takes 5 seconds. Wis improves.
+        Collect taxes - 2x rate until action changes. Takes 2 seconds. Wis improves.
+        Visit Loggers - 2x rate until action changes. Takes 2 seconds. Cha improves.
+        Inspire Troops - temp buff to units around him. Takes 5 seconds. Buff applies at end of 5 seconds. Cha improves.
+        Direct Masons - 1.5x building rate. Cha improves.
+        Wait for... - X seconds have passed, or you have X gold, X wood, X mana
 
+Stats
+    Strength - melee dmg in combat, affects actions
+    Constitution - health in combat, affects actions
+    Agility - map travel speed, affects actions
+    Wisdom - affects actions
+    Charisma - affects actions
+    level up gives 1 to each stat, and +3 to spend wherever
 
 
 Castle
@@ -31,6 +50,19 @@ Castle
         + Gold, cost gold - Tax Collector. Builds in 10 seconds, adds points to a progress bar, req 100/200/300... points to get gold
         + wood, cost gold - Woodcutter's Hut
         + magic, cost wood - Laboratory
+        + ranged units, cost wood -
+        + melee units, cost wood -
+        + siege units, cost wood & magic -
+    Buildings are all selected in the Castle layout area
+    Castle Tab contains information on results of buildings
+        PB of woodcutitng
+        PB of tax collecting
+        PB of unit building
+        Info on units
+        PB on healing
+        Info on remaining resources
+
+
 
 
 Research
