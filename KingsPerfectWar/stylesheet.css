@@ -192,53 +192,53 @@ input {
     padding:5px;
 }
 
-.kingColor, .kingColorH {
+.kingColor, .kingColorH, .kingColorD:hover {
     background-color: rgba(234, 234, 202, 1);
 }
 .kingColor:hover, .kingColorH:hover {
     background-color: rgba(244, 244, 212, 1);
 }
-.kingColor:active {
+.kingColor:active, .kingColorD {
     background-color: rgba(224, 224, 192, 1);
 }
 
-.castleColor, .castleColorH {
+.castleColor, .castleColorH, .castleColorD:hover {
     background-color: rgba(201, 220, 230, 1);
 }
 .castleColor:hover, .castleColorH:hover {
     background-color: rgba(211, 230, 240, 1);
 }
-.castleColor:active {
+.castleColor:active, .castleColorD {
     background-color: rgba(191, 210, 220, 1);
 }
 
-.labColor, .labColorH {
+.labColor, .labColorH, .labColorD:hover {
     background-color: rgba(237, 212, 245, 1);
 }
 .labColor:hover, .labColorH:hover {
     background-color: rgba(247, 222, 255, 1);
 }
-.labColor:active {
+.labColor:active, .labColorD {
     background-color: rgba(227, 202, 235, 1);
 }
 
-.heroColor, .heroColorH {
+.heroColor, .heroColorH, .heroColorD:hover {
     background-color: rgba(230, 203, 201, 1);
 }
 .heroColor:hover, .heroColorH:hover {
     background-color: rgba(240, 213, 211, 1);
 }
-.heroColor:active {
+.heroColor:active, .heroColorD {
     background-color: rgba(220, 193, 191, 1);
 }
 
-.upgradeColor, .upgradeColorH {
+.upgradeColor, .upgradeColorH, .upgradeColorD:hover {
     background-color: rgba(194, 228, 194, 1);
 }
 .upgradeColor:hover, .upgradeColorH:hover {
     background-color: rgba(204, 238, 204, 1);
 }
-.upgradeColor:active {
+.upgradeColor:active, .upgradeColorD {
     background-color: rgba(184, 218, 184, 1);
 }
 
@@ -256,6 +256,53 @@ input {
     display:none;
 }
 
-.actionName {
+.actionListLeft, .actionListRight {
+    height:100%;
+    text-align:center;
+    vertical-align:top;
+    position:relative;
+}
+.actionListLeft {
+    width:35%;
+}
+.actionListRight {
+    width:65%;
+}
 
+.listContainer {
+    display:none;
+    height:100%;
+}
+.listSelector {
+    cursor:pointer;
+    text-align:center;
+    margin-top:-2px;
+    padding:4px 0;
+    width:84px;
+}
+
+.nextActionContainer, .curActionContainer {
+    margin-left:3px;
+    display:block;
+    padding-top:1px;
+    padding-bottom:1px;
+    border-bottom:1px solid #b9b9b9;
+    position:relative;
+    text-align:left;
+}
+.nextActionContainer {
+    width:188px;
+}
+.curActionContainer {
+    width:102px;
+}
+
+.actionIcon {
+    text-align:center;
+    width:12px;
+}
+.actionIcon:hover {
+    color:red;
+    cursor:pointer;
+    background-color:#b3b3b3;
 }

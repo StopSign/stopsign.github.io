@@ -6,10 +6,17 @@ function addCastleAction(action) {
         action.desc = action["desc"+window.language];
     }
 
+    if(!action.unlocked) {
+        action.unlocked = function() { return true; }
+    }
+    if(!action.visible) {
+        action.visible = function() { return true; }
+    }
+
     castle.actions.push(action);
 }
 
-function getCastleByVarName(varName) {
+function getCastleActionByVarName(varName) {
     let found = null;
     castle.actions.forEach(function(action) {
         if(action.varName === varName) {

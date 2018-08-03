@@ -1,6 +1,7 @@
 'use strict';
 
 let gameSpeed = 1;
+let bonusSpeed = 1;
 
 let curTime = new Date();
 let gameTicksLeft = 0;
@@ -24,9 +25,11 @@ function tick() {
         if(stop) {
             return;
         }
+        gameTicksLeft -= (1000 / 50) / gameSpeed / bonusSpeed;
 
     }
 
+    view.updating.update();
 }
 
 function recalcInterval(fps) {

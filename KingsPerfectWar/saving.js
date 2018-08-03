@@ -18,7 +18,9 @@ let saveName = !isBeta ? "perfectWar1" :  "perfectWarBeta";
 
 let stop = false;
 let castle = {};
+let prevState = {};
 let actionsList = {
+    nextNames: ["king", "castle", "units", "lab"],
     next: {
         king:[],
         castle:[],
@@ -44,6 +46,7 @@ function loadDefaults() {
 }
 
 function load() {
+    view.updating.saveCurrentState();
     loadDefaults();
     let toLoad = {};
     if(window.localStorage[saveName]) { //has a save file
@@ -52,7 +55,8 @@ function load() {
     }
 
     recalcInterval(50);
-    pauseGame();
+    // pauseGame();
+
     view.clickable.initial.initialize();
 }
 

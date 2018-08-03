@@ -9,7 +9,7 @@
     <meta http-equiv="expires" content="Tue, 01 Jan 1980 1:00:00 GMT" />
     <meta http-equiv="pragma" content="no-cache" />
 
-    <title>Perfect War</title>
+    <title>King's Perfect War</title>
     <link rel="stylesheet" href="stylesheet.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <!--<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">-->
@@ -37,13 +37,18 @@
             </div>
         </div>
 
-        <div style="width:350px;height:337px;vertical-align:top;">
-            <div class="title">Action List</div>
-            <div style="width:35%;height:100%;background-color:#c2e6cc;text-align:center;vertical-align:top;position:relative;">
-
-            </div><div style="width:65%;height:100%;background-color:#cdded2;text-align:center;vertical-align:top;position:relative;">
-
+        <div style="width:350px;height:318px;vertical-align:top;">
+            <div class="title">Action Lists</div>
+            <div style="width:100%;height:20px;" class="large bold">
+                <div id="kingListSelector" class="listSelector kingColor" onclick="switchListTab(0)">King</div>
+                <div id="castleListSelector" class="listSelector castleColor" onclick="switchListTab(1)">Castle</div>
+                <div id="unitsListSelector" class="listSelector heroColor" onclick="switchListTab(2)">Units</div>
+                <div id="labListSelector" class="listSelector labColor" onclick="switchListTab(3)">Lab</div>
             </div>
+            <div id="kingListContainer" class="listContainer"><div id="kingCurActions" class="actionListLeft kingColorD"></div><div id="kingNextActions" class="actionListRight kingColorH"></div></div>
+            <div id="castleListContainer" class="listContainer" style="display:block;"><div id="castleCurActions" class="actionListLeft castleColorD"></div><div id="castleNextActions" class="actionListRight castleColorH"></div></div>
+            <div id="unitsListContainer" class="listContainer"><div id="unitsCurActions" class="actionListLeft heroColorD"></div><div id="unitsNextActions" class="actionListRight heroColorH"></div></div>
+            <div id="labListContainer" class="listContainer"><div id="labCurActions" class="actionListLeft labColorD"></div><div id="labNextActions" class="actionListRight labColorH"></div></div>
         </div>
 
         <div style="width:250px;height:355px;background-color:#d4d8eb;vertical-align:top;">
@@ -53,12 +58,12 @@
     </div>
 
     <div style="width:1210px;background-color:#c4c9e6;height:204px;margin-top:4px;">
-        <div style="width:200px;vertical-align:top;">
-            <div id="kingSelector" class="tabSelector large bold kingColor" onclick="switchActionsTab(0)">King</div>
-            <div id="castleSelector" class="tabSelector large bold castleColor" onclick="switchActionsTab(1)">Castle</div>
-            <div id="labSelector" class="tabSelector large bold labColor" onclick="switchActionsTab(2)">Laboratory</div>
-            <div id="heroSelector" class="tabSelector large bold heroColor" onclick="switchActionsTab(3)">Heroes</div>
-            <div id="upgradeSelector" class="tabSelector large bold upgradeColor" onclick="switchActionsTab(4)">Upgrades</div>
+        <div style="width:200px;vertical-align:top;" class="large bold">
+            <div id="kingSelector" class="tabSelector kingColor" onclick="switchActionsTab(0)">King</div>
+            <div id="castleSelector" class="tabSelector castleColor" onclick="switchActionsTab(1)">Castle</div>
+            <div id="labSelector" class="tabSelector labColor" onclick="switchActionsTab(2)">Laboratory</div>
+            <div id="heroSelector" class="tabSelector heroColor" onclick="switchActionsTab(3)">Heroes</div>
+            <div id="upgradeSelector" class="tabSelector upgradeColor" onclick="switchActionsTab(4)">Upgrades</div>
         </div><div style="width:1010px;height:100%;vertical-align:top;">
             <div id="kingContainer" class="tabContainer kingColorH" style="display:block;"></div>
             <div id="castleContainer" class="tabContainer castleColorH"></div>
@@ -79,6 +84,7 @@
     <script src="views/mainView.js?1"></script>
     <script src="clickResponses.js?1"></script>
     <script src="saving.js?1"></script>
+    <script src="actions/actions.js?1"></script>
     <script src="actions/castleActions.js?1"></script>
     <script>
         (function (i, s, o, g, r, a, m) {
