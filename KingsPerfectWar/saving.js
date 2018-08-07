@@ -37,6 +37,12 @@ let actionsList = {
 window.language = "eng";
 window.addAmount = 1;
 
+let mana = 1200;
+let maxMana = 1200;
+let totalTime = 0;
+let gold = 0;
+let wood = 0;
+
 function clearSave() {
     window.localStorage[saveName] = "";
     load();
@@ -55,9 +61,9 @@ function load() {
     }
 
     recalcInterval(50);
-    // pauseGame();
+    pauseGame();
 
-    view.clickable.initial.initialize();
+    view.initialize();
 }
 
 function save() {

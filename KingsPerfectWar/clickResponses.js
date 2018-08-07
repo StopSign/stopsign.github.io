@@ -83,9 +83,9 @@ function removeAction(index, listName) {
     theList.splice(index, 1);
 }
 
-function handleDragStart(event) {
+function handleDragStart(event, name) {
     let index = event.target.getAttribute("data-index");
-    draggedDecorate(index);
+    draggedDecorate(index, name);
     event.dataTransfer.setData('text/html', index);
 }
 
@@ -93,17 +93,18 @@ function handleDragOver(event) {
     event.preventDefault();
 }
 
-function handleDragDrop(event) {
+function handleDragDrop(event, name) {
     let indexOfDroppedOverElement = event.target.getAttribute("data-index");
-    dragExitUndecorate(indexOfDroppedOverElement);
+    dragExitUndecorate(indexOfDroppedOverElement, name);
     let initialIndex = event.dataTransfer.getData("text/html");
-    moveQueuedAction(initialIndex, indexOfDroppedOverElement);
+    moveQueuedAction(initialIndex, indexOfDroppedOverElement, name);
 }
 
-function moveQueuedAction(initialIndex, resultingIndex) {
+function moveQueuedAction(initialIndex, resultingIndex, name) {
     initialIndex = Number(initialIndex);
     resultingIndex = Number(resultingIndex);
-    if (initialIndex < 0 || initialIndex > actions.next.length || resultingIndex < 0 || resultingIndex > actions.next.length - 1) {
+    let theList = actionsList.next[name];
+    if (initialIndex < 0 || initialIndex > theList.length || resultingIndex < 0 || resultingIndex > theList.length - 1) {
         return;
     }
     let difference = initialIndex - resultingIndex;
@@ -115,37 +116,39 @@ function moveQueuedAction(initialIndex, resultingIndex) {
 
     if (difference > 0) {
         for (let i = 0; i < delta; i++) {
-            const temp = actions.next[initialIndex-i-1];
-            actions.next[initialIndex-i-1] = actions.next[initialIndex-i];
-            actions.next[initialIndex-i] = temp;
+            const temp = theList[initialIndex-i-1];
+            theList[initialIndex-i-1] = theList[initialIndex-i];
+            theList[initialIndex-i] = temp;
         }
     } else {
         for (let i = 0; i < delta; i++) {
-            const temp = actions.next[initialIndex+i+1];
-            actions.next[initialIndex+i+1] = actions.next[initialIndex+i];
-            actions.next[initialIndex+i] = temp;
+            const temp = theList[initialIndex+i+1];
+            theList[initialIndex+i+1] = theList[initialIndex+i];
+            theList[initialIndex+i] = temp;
         }
     }
-
-    view.updateNextActions();
 }
 
-function dragOverDecorate(i) {
-    if(document.getElementById("nextActionContainer" + i))
-        document.getElementById("nextActionContainer" + i).classList.add("draggedOverAction");
+function dragOverDecorate(i, name) {
+    if (document.getElementById("nextActionContainer" + i + name)) {
+        document.getElementById("nextActionContainer" + i + name).classList.add("draggedOverAction");
+    }
 }
 
-function dragExitUndecorate(i) {
-    if(document.getElementById("nextActionContainer" + i))
-        document.getElementById("nextActionContainer" + i).classList.remove("draggedOverAction");
+function dragExitUndecorate(i, name) {
+    if(document.getElementById("nextActionContainer" + i + name)) {
+        document.getElementById("nextActionContainer" + i + name).classList.remove("draggedOverAction");
+    }
 }
 
-function draggedDecorate(i) {
-    if(document.getElementById("nextActionContainer" + i))
-        document.getElementById("nextActionContainer" + i).classList.add("draggedAction");
+function draggedDecorate(i, name) {
+    if(document.getElementById("nextActionContainer" + i + name)) {
+        document.getElementById("nextActionContainer" + i + name).classList.add("draggedAction");
+    }
 }
 
-function draggedUndecorate(i) {
-    if(document.getElementById("nextActionContainer" + i))
-        document.getElementById("nextActionContainer" + i).classList.remove("draggedAction");
+function draggedUndecorate(i, name) {
+    if(document.getElementById("nextActionContainer" + i + name)) {
+        document.getElementById("nextActionContainer" + i + name).classList.remove("draggedAction");
+    }
 }

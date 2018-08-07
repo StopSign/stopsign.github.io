@@ -1,13 +1,33 @@
 let view = {
+    initialize: function() {
+        view.clickable.initial.createCastleIcons();
+        prevState.mana = -1; //force redraw
+        prevState.gold = -1;
+        prevState.wood = -1;
+    },
     updating: {
         update: function () {
             //compare prevState to current
             //update the view of anything that's changed
             view.updating.updateLists();
+            view.updating.updateResources();
 
             view.updating.saveCurrentState();
         },
+        updateResources: function() {
+            if(prevState.mana !== mana || prevState.maxMana !== maxMana) {
+                document.getElementById("manaBar").style.width = mana / maxMana * 100 + "%";
+                document.getElementById("mana").innerHTML = intToString(mana, 1);
+            }
+            if(prevState.gold !== gold) {
+                document.getElementById("gold").innerHTML = intToString(gold, 1);
+            }
+            if(prevState.wood !== wood) {
+                document.getElementById("wood").innerHTML = intToString(wood, 1);
+            }
+        },
         saveCurrentState: function () {
+            prevState.mana = mana;
             prevState.next = JSON.parse(JSON.stringify(actionsList.next));
             prevState.view = JSON.parse(JSON.stringify(view));
         },
@@ -77,8 +97,8 @@ let view = {
                 // }
 
                 totalDivText +=
-                    "<div id='nextActionContainer" + i + name + "' class='nextActionContainer small' ondragover='handleDragOver(event)' ondrop='handleDragDrop(event)' ondragstart='handleDragStart(event)' ondragend='draggedUndecorate(" + i + ")' ondragenter='dragOverDecorate(" + i +")' ondragleave='dragExitUndecorate("+i+")' draggable='true' data-index='"+i+"'>" +
-                        "<img src='img/" + action.varName + ".svg' class='smallIcon'> x " +
+                    "<div id='nextActionContainer" + i + name + "' class='nextActionContainer small' ondragover='handleDragOver(event)' ondrop='handleDragDrop(event, \""+name+"\")' ondragstart='handleDragStart(event, \""+name+"\")' ondragend='draggedUndecorate(" + i + ", \""+name+"\")' ondragenter='dragOverDecorate(" + i +", \""+name+"\")' ondragleave='dragExitUndecorate("+i+", \""+name+"\")' draggable='true' data-index='"+i+"'>" +
+                        "<img src='img/" + action.varName + ".svg' class='smallIcon imageDragFix'> x " +
                         "<div class='bold'>" + action.loops + "</div>" +
                         "<div style='float:right'>" +
                             capButton +
@@ -97,9 +117,6 @@ let view = {
     },
     clickable: {
         initial: {
-            initialize: function() {
-                view.clickable.initial.createCastleIcons();
-            },
             createCastleIcons: function () {
                 let container = document.getElementById("castleActions");
                 let allDivs = "";

@@ -1,3 +1,11 @@
+let actions = {
+    tick: function() {
+        //get a list of valid actions, moving to next if cost fails
+        //if no actions, create sleep action. If sleep action already, add to it
+        //add tick to each action. if it finishes, get the rewards
+    }
+};
+
 function getActionByVarName(varName, list) {
     if(list === "castle") {
         return getCastleActionByVarName(varName);

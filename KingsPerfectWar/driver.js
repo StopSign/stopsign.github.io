@@ -8,25 +8,35 @@ let gameTicksLeft = 0;
 
 function tick() {
     let newTime = new Date();
+    totalTime += newTime - curTime;
     gameTicksLeft += newTime - curTime;
     curTime = newTime;
     if(stop) {
         // addOffline(gameTicksLeft * offlineRatio);
         gameTicksLeft = 0;
+        view.updating.update();
         return;
     }
 
-    while (gameTicksLeft > (1000 / 50)) {
+    while (gameTicksLeft > (1000 / 10)) {
         if(gameTicksLeft > 2000) {
             window.fps /= 2;
             console.warn('too fast! (${gameTicksLeft})');
             gameTicksLeft = 0;
         }
-        if(stop) {
-            return;
-        }
-        gameTicksLeft -= (1000 / 50) / gameSpeed / bonusSpeed;
+        gameTicksLeft -= (1000 / 10) / gameSpeed / bonusSpeed;
 
+        if(document.getElementById("pauseBeforeRestart").checked && mana === 0 && !stop) {
+            pauseGame();
+            break;
+        }
+
+        mana--;
+
+        //units.tick(); //combat
+        //castle.tick(); //resources
+        //lab.tick(); //buffs
+        actions.tick(); //actions tick last
     }
 
     view.updating.update();
@@ -47,4 +57,10 @@ function recalcInterval(fps) {
 
 function pauseGame() {
     stop = !stop;
+    document.title = stop ? "*PAUSED* King's Perfect War" : "King's Perfect War";
+    document.getElementById('pausePlay').innerHTML = stop ? 'Play' : 'Pause';
+}
+
+function restart() {
+
 }

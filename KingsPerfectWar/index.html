@@ -57,6 +57,34 @@
 
     </div>
 
+    <div style="width:1210px;margin-top:4px;">
+        <div style="width:280px;vertical-align:top">
+            <div onclick='restart()' class='button showthat' style='margin-left:5px'>Restart
+                <div class='showthis' style='color:black;width:230px;'>Restarts the clock and your lists</div>
+            </div>
+            <div id='pausePlay' onclick='pauseGame()' class='button'>Play</div>
+            <div class='control'><input type='checkbox' id='pauseBeforeRestart'><label for='pauseBeforeRestart'>Pause before restart</label></div>
+        </div><div style="width:280px">
+            <div class="showthat" style="width:85px">
+                <img src='img/gold.svg' class='largeIcon imageDragFix' style="vertical-align:bottom">
+                <div id="gold">10.3Qa</div>
+                <div class="showthis">Gold</div>
+            </div>
+            <div class="showthat" style="width:85px">
+                <img src='img/wood.svg' class='largeIcon imageDragFix' style="vertical-align:bottom">
+                <div id="wood">10.3Qa</div>
+                <div class="showthis">Wood</div>
+            </div>
+            <div class="showthat" style="width:85px">
+                <img src='img/mana.svg' class='largeIcon imageDragFix' style="vertical-align:bottom">
+                <div id="mana">10.3Qa</div>
+                <div class="showthis">Mana</div>
+            </div>
+        </div><div style="width:650px;height:10px;background-color:#dbdff3;margin-top:6px;">
+            <div id="manaBar" style="width:80%;height:100%;background-color:rgb(130, 147, 255);vertical-align:top;"></div>
+        </div>
+    </div>
+
     <div style="width:1210px;background-color:#c4c9e6;height:204px;margin-top:4px;">
         <div style="width:200px;vertical-align:top;" class="large bold">
             <div id="kingSelector" class="tabSelector kingColor" onclick="switchActionsTab(0)">King</div>

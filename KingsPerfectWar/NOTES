@@ -47,9 +47,12 @@ Stats
 Castle
     Has buildings, that can queue in Building List
     Requires:
-        + Gold, cost gold - Tax Collector. Builds in 10 seconds, adds points to a progress bar, req 100/200/300... points to get gold
-        + wood, cost gold - Woodcutter's Hut
-        + magic, cost wood - Laboratory
+        + Gold, cost gold - Tax Collector. Builds in 10 seconds, adds 1 points/t to a progress bar, req 100/200/300... points to get 10 gold
+        + wood, cost gold - Woodcutter's Hut. Builds in 10 seconds. costs 5 gold. adds 1 points/t to a pb, req 100/200/300.. points to get 10 wood
+        + magic, cost wood - Laboratory. Builds in 10 seconds, costs 20 gold.
+        Hire General - 5 seconds (0/1) 30 gold - enables barracks, castle hp +300
+        Barracks - 20 seconds (0/X) 20 wood - adds 1 point/t to a pb, req 100 points & 5 wood to get 1 conscript
+        Hire Ranger - 20 seconds (0/1) 100 magic, 10 wood - enables rock slingers, is a hero
         + ranged units, cost wood -
         + melee units, cost wood -
         + siege units, cost wood & magic -
@@ -62,16 +65,24 @@ Castle
         PB on healing
         Info on remaining resources
 
+Laboratory
+    Has "Gather Mana" action by default - adds 1 point/t to a pb, req 1000/2000/3000... points to get 100 mana
+    Completions give ..
+    Research
+        T1
+            unlock melee unit (0/1) 200
+            tax collector +20% (0/5) 100/200/300/400/500
+            logger +20% (0/5) 100/200/300/400/500
+            Establish Directed Wards - (0/1) 1000 - mana collection +100%
+            Infuse magic glyph - (0/1) 2000 - half cost spells
 
 
-
-Research
-    Has "Gather Mana" action, which adds Magic to a progress bar, req 1000/2000/3000... points,
 
 
 Heroes
     You get 1 hero to start - Archer
     Heroes level like the King, but faster, w/o talents, and the exp doesn't stick around
+    They get exp only for the dead units in the battles they're a part of.
     Tab shows stats
     Each hero has it's own health, and can be healed if coming back to base
 
