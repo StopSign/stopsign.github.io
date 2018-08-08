@@ -1598,6 +1598,8 @@ function HealTheSick() {
         return getSkillLevel("Magic") >= 12;
     };
     this.finish = function() {
+        addSkillExp("Magic", 10);
+        view.updateProgressActions();
     };
 }
 
@@ -1654,6 +1656,8 @@ function FightMonsters() {
         return getSkillLevel("Combat") >= 10;
     };
     this.finish = function() {
+        addSkillExp("Combat", 10);
+        view.updateProgressActions();
     };
 }
 function monsterNames(FightLoopCounter) { //spd, defensive, aggressive
@@ -1741,6 +1745,9 @@ function SmallDungeon() {
         return (getSkillLevel("Combat") + getSkillLevel("Magic")) >= 35;
     };
     this.finish = function() {
+        addSkillExp("Magic", 5);
+        addSkillExp("Combat", 5);
+        view.updateProgressActions();
     };
 }
 function finishDungeon(dungeonNum, floorNum) {
@@ -1903,6 +1910,9 @@ function LargeDungeon() {
         return towns[2].getLevel("Drunk") >= 20;
     };
     this.finish = function() {
+        addSkillExp("Magic", 15);
+        addSkillExp("Combat", 15);
+        view.updateProgressActions();
     };
 }
 
