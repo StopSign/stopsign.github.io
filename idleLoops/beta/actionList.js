@@ -324,7 +324,7 @@ function TalkToHermit() {
         return towns[1].getLevel("Shortcut") >= 20 && getSkillLevel("Magic") >= 40;
     };
     this.finish = function() {
-        towns[1].finishProgress(this.varName, 50 * (1 + towns[1].getLevel("Shortcut")/300), function() {
+        towns[1].finishProgress(this.varName, 50 * (1 + towns[1].getLevel("Shortcut")/100), function() {
             view.adjustManaCost("Learn Alchemy");
             view.adjustManaCost("Gather Herbs");
             view.adjustManaCost("Practical Magic");
@@ -857,7 +857,7 @@ function PracticalMagic() {
         Int:.5
     };
     this.manaCost = function() {
-        return Math.ceil(4000 / (1 + towns[1].getLevel("Hermit")/100));
+        return Math.ceil(4000 * (1 - towns[1].getLevel("Hermit") * .005));
     };
     this.visible = function() {
         return towns[1].getLevel("Hermit") >= 10;
@@ -895,7 +895,7 @@ function LearnAlchemy() {
         addHerbs(-10);
     };
     this.manaCost = function() {
-        return Math.ceil(5000 / (1 + towns[1].getLevel("Hermit")/100));
+        return Math.ceil(5000 * (1 - towns[1].getLevel("Hermit") * .005));
     };
     this.visible = function() {
         return towns[1].getLevel("Hermit") >= 10;
@@ -1443,7 +1443,7 @@ function GatherHerbs() {
         Int:.3
     };
     this.manaCost = function() {
-        return Math.ceil(200 / (1 + towns[1].getLevel("Hermit")/100));
+        return Math.ceil(200 * (1 - towns[1].getLevel("Hermit") * .005));
     };
     this.visible = function() {
         return towns[1].getLevel("Forest") >= 2;
