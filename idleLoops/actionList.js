@@ -1822,7 +1822,7 @@ function JoinAdvGuild() {
     };
 }
 function getAdvGuildRank(offset) {
-    let name = ["E", "F", "D", "C", "B", "A", "S", "SS", "SSS", "SSSS", "U", "UU", "UUU", "UUUU"][Math.floor(window.curAdvGuildSegment/3+.00001)];
+    let name = ["F", "E", "D", "C", "B", "A", "S", "SS", "SSS", "SSSS", "U", "UU", "UUU", "UUUU"][Math.floor(window.curAdvGuildSegment/3+.00001)];
 
     let segment = (offset === undefined ? 0 : offset) + window.curAdvGuildSegment;
     let bonus = precision3(1 + segment/20 + (segment ** 2)/300);

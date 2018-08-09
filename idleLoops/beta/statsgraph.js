@@ -57,7 +57,7 @@ let statGraph = {
                 pointHoverBorderColor: "rgb(157, 103, 205)"
             },
             {
-                label: _txt("stats>tooltip>bonus_xp"),
+                label: _txt("stats>tooltip>total_multiplier"),
                 data: [],
                 backgroundColor: "rgba(255, 180, 91, 0.2)",
                 borderColor: "rgb(255, 180, 91)",

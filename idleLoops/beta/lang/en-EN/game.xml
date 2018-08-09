@@ -6,6 +6,15 @@
                 <title>Changelog</title>
                 <version_prefix>Version</version_prefix>
             </meta>
+            <version verNum=".77"><![CDATA[
+            * Ranks start at F now instead of E pt. 2<br>
+            * Fixed drag and drop for firefox<br>
+            * Adding small amounts of exp to Fight Monsters, Heal the Sick, and Small/Large Dungeon<br>
+            * Hermit is properly improved by 1% from shortcut<br>
+            * Hermit's reduction affect made linear<br>
+            * Fixed tooltip for Small Dungeon, Talk to Hermit, Stats, and Gamble<br>
+            * Fixed discord link
+      ]]></version>
             <version verNum=".76"><![CDATA[
             * Ranks start at F now instead of E<br>
             * Fixed wild mana tooltip<br>
@@ -307,18 +316,17 @@
             <soulstone>Soulstone</soulstone>
             <soulstone_multiplier>Soulstone Mult</soulstone_multiplier>
             <total_multiplier>Total Mult</total_multiplier>
-            <bonus_xp>Bonus XP</bonus_xp>
             <explanation><![CDATA[
           Each stat level reduces the relevant part of an action's mana cost by 1%.<br>
-          Talent gets 1% of all level progress, and keeps through loops.<br>
-          Each talent level increases Bonus XP of its skill by (1+(talent)^.5/5).<br>
-          XP gain towards an stat per action is (actual mana / original mana) * (talent bonus) per tick.<br>
-          Bonus XP is a combination of talent and soulstone bonuses.<br><br>
+          Talent gets 1% of all level progress, and persists through loops.<br>
+          Talent multipliers xp by (1+(talentLevel)^.5/5).<br>
+          XP gain towards a stat per action is (original mana / actual mana) * (talent bonus) per tick.<br>
+          Total Mult is a combination of talent and soulstone bonuses.<br><br>
           e.g. Meet People costs 800 mana and has a breakdown of <div class="bold">Int</div> 10% <div class="bold">Cha</div> 80% <div class="bold">Soul</div> 10%.<br>
           This effectively means 80 of the mana is controlled by <div class="bold">Int</div>, another 80 by <div class="bold">Soul</div>, and the remaining 640 by <div class="bold">Cha</div>.<br>
-          If your <div class="bold">Cha</div> is level 20 when the action is started, the bonus would be x1.894 it'd be 640 / 1.894 = 337.9<br>
-          Adding back the 160 from <div class="bold">Soul</div> and <div class="bold">Int</div>, the total mana the action takes (rounded up) is now 518, so ~65% less mana.<br>
-          The action would give (800/518)*(1+(talent)^.5/5) level exp per mana for the 518 mana.]]></explanation>
+          If your <div class="bold">Cha</div> is level 20 when the action is started, the bonus would be x1.2 it'd be 640 / 1.2 = 533.33<br>
+          Adding back the 160 from <div class="bold">Soul</div> and <div class="bold">Int</div>, the total mana the action takes (rounded up) is now 694, so ~87% of the original mana cost.<br>
+          The action would give (800/694)*(1+(talentLevel)^.5/5) level exp per mana for the 694 mana.]]></explanation>
             <graph_legend><![CDATA[
           Click the legend to show/hide each.<br>
           Upon freshly starting, Levels and Talent won't change much.<br>
@@ -724,7 +732,7 @@
             <info_text2>Suckers total</info_text2>
             <info_text3>People to check if they're suckers</info_text3>
             <tooltip><![CDATA[
-          The cards still somehow come out different every time.<br>Has 2x exp/talent gain<br>Costs 20 gold and 1 reputation.<br>Requires reputation greater than -5.<br>You win against every 10 suckers, and get 60 gold for winning.
+          The cards still somehow come out different every time.<br>Has 2x exp/talent gain<br>Costs 20 gold and 1 reputation.<br>Requires reputation of at least -5.<br>You win against every 10 suckers, and get 60 gold for winning.
       ]]></tooltip>
         </gamble>
         <heal_sick>
@@ -732,7 +740,7 @@
             <label_done>Healed</label_done>
             <label_part>Patient</label_part>
             <tooltip><![CDATA[
-          You won't be able to heal them all, but they'll be thankful for doing what you can.<br>Healing is always 3 parts, each with a main stat - Diagnose (Per), Treat (Int), Inform (Cha).<br>Gives (magic skill) * (1 + main stat / 100) * sqrt(1 + times completed / 100) * (original mana cost / actual mana cost) progress points per mana.<br>Requires 12 Magic skill and 1 reputation.<br>Gives 3 reputation upon patient completion.
+          You won't be able to heal them all, but they'll be thankful for doing what you can.<br>Healing is always 3 parts, each with a main stat - Diagnose (Per), Treat (Int), Inform (Cha).<br>Gives (magic skill) * (1 + main stat / 100) * sqrt(1 + times completed / 100) * (original mana cost / actual mana cost) progress points per mana.<br>Requires 12 Magic skill and 1 reputation.<br>Gives 3 reputation upon patient completion.<br>Gives 10 Magic exp upon action completion.
       ]]></tooltip>
             <segment_names>
                 <name>Diagnose</name>
@@ -744,7 +752,7 @@
             <label>Fight Monsters</label>
             <label_done>Killed</label_done>
             <tooltip><![CDATA[
-          Slowly, you're figuring out their patterns.<br>Fighting rotates between 3 types of battles, each with a main stat - Quick (Spd), Defensive (Str), Aggressive (Con).<br>Gives (combat skill) * (1 + main stat / 100) * sqrt(1 + times completed / 100) * (original mana cost / actual mana cost) progress points per mana.<br>Requires 10 Combat skill and 2 reputation.<br>Gives 20 gold per fight segment completion.
+          Slowly, you're figuring out their patterns.<br>Fighting rotates between 3 types of battles, each with a main stat - Quick (Spd), Defensive (Str), Aggressive (Con).<br>Gives (combat skill) * (1 + main stat / 100) * sqrt(1 + times completed / 100) * (original mana cost / actual mana cost) progress points per mana.<br>Requires 10 Combat skill and 2 reputation.<br>Gives 20 gold per fight segment completion.<br>Gives 10 Combat exp upon action completion.
       ]]></tooltip>
             <segment_names>
                 <name>Deer</name>
@@ -787,7 +795,7 @@
             <label_complete>Completed</label_complete>
             <label_part>Small Dungeon</label_part>
             <tooltip><![CDATA[
-          There are small changes each time; it's harder to get used to. The soulstones at the end last through loops, but they're not always in the dungeon... Strange.<br>The dungeon requires different skills at different points.<br>One action can clear multiple floors if your stats are high enough.<br>Gives (magic + combat skill) * (1 + main stat / 100) * sqrt(1 + times floor completed / 200) * (original mana cost / actual mana cost) progress points per mana.<br>Requires a combined skill of 35, and 2 reputation.<br>Gives 1 soulstone per completion - hover over Completed for info.
+          There are small changes each time; it's harder to get used to. The soulstones at the end last through loops, but they're not always in the dungeon... Strange.<br>The dungeon requires different skills at different points.<br>One action can clear multiple floors if your stats are high enough.<br>Gives (magic + combat skill) * (1 + main stat / 100) * sqrt(1 + times floor completed / 200) * (original mana cost / actual mana cost) progress points per mana.<br>Requires a combined skill of 35, and 2 reputation.<br>Gives 1 soulstone per completion - hover over Completed for info.<br>Gives 5 Combat and Magic exp upon action completion.
       ]]></tooltip>
             <completed_tooltip><![CDATA[
         Each soulstone improves a random stat's exp gain by (1+(soulstones)^.8/30).<br>Each floor has a soulstone that, when received, reduces the chance you'll get the next one by 2%.<br>Chance to receive a soulstone recovers per floor at .00001% per mana.<br>
@@ -810,7 +818,7 @@
             <label_complete>Completed</label_complete>
             <label_part>Large Dungeon</label_part>
             <tooltip><![CDATA[
-          With your party, you set out to accomplish great feats of dungeoneering that you couldn't have done while alone.<br>Gives (magic + team combat) * (1 + main stat / 100) * sqrt(1 + times completed / 200) * (original mana cost / actual mana cost) progress points per mana.<br>Requires at least one other party member.<br>Gives 10 soulstones per completion - hover over Completed for info.
+          With your party, you set out to accomplish great feats of dungeoneering that you couldn't have done while alone.<br>Gives (magic + team combat) * (1 + main stat / 100) * sqrt(1 + times completed / 200) * (original mana cost / actual mana cost) progress points per mana.<br>Requires at least one other party member.<br>Gives 10 soulstones per completion - hover over Completed for info.<br>Gives 15 Combat and Magic exp upon action completion.
       ]]></tooltip>
             <completed_tooltip><![CDATA[
         Each soulstone improves a random stat's exp gain by (1+(soulstones)^.8/10).<br>Each floor has a soulstone that, when received, reduces the chance you'll get the next one by 2%.<br>Chance to receive a soulstone recovers per floor at .00001% per mana.
