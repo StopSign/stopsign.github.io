@@ -62,6 +62,7 @@ let dungeons;
 
 window.curAdvGuildSegment = 0;
 window.curCraftGuildSegment = 0;
+window.curTournamentSegment = 0;
 
 
 function closeTutorial() {
