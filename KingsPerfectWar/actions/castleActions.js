@@ -1,6 +1,11 @@
 castle.actions = [];
 castle.resources = {};
 
+castle.tick = function() {
+    wood += castle.resources.logger;
+    gold += castle.resources.tax;
+};
+
 function addCastleAction(action) {
     if(window.language !== "eng") {
         action.name = action["name"+window.language];
@@ -53,12 +58,10 @@ addCastleAction({
         {
             resource:"gold",
             type:"linear",
-            starting:10,
-            growth:10
+            starting:50,
+            growth:50
         }
     ],
-    buy: function() {
-    },
     seconds:10,
     xPos:555,
     yPos:105
@@ -72,13 +75,10 @@ addCastleAction({
         {
             resource:"gold",
             type:"linear",
-            starting:10,
-            growth:10
+            starting:50,
+            growth:50
         }
     ],
-    buy: function() {
-
-    },
     seconds:10,
     xPos:20,
     yPos:10

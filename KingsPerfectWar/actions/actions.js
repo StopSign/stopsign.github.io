@@ -26,8 +26,8 @@ let actions = {
                     action.manaUsed = 0;
                 }
                 if(action.buy) {
-                    action.buy();
                     action.spend();
+                    action.buy();
                 }
             }
         }
@@ -41,12 +41,7 @@ let actions = {
             lab:[]
         };
         for(let i = 0; i < actionsList.nextNames.length; i++) {
-            // let name = actionsList.nextNames[i];
-            // if(actionsList.next[name][0]) {
-            //     addSleepAction(i);
-            // } else {
-                actions.refresh(i);
-            // }
+            actions.refresh(i);
         }
     },
     refresh: function(num) {
@@ -91,6 +86,7 @@ function translateNextToCurrent(action, name, numPrior) {
         }
         action["cost"+cost.resource] = amount;
     }
+    action.buy = actionData.buy;
     action.canBuy = function() {
         return gold >= action.costgold && wood >= action.costwood && mana >= action.costmana;
     };

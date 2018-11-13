@@ -37,11 +37,11 @@ let actionsList = {
 window.language = "eng";
 window.addAmount = 1;
 
-let mana = 120;
-let initialMana = 120;
-let maxMana = 120;
+let mana = 1200;
+let initialMana = 1200;
+let maxMana = 1200;
 let totalTime = 0;
-let gold = 10;
+let gold = 100;
 let wood = 0;
 
 let curList = 1; //castle

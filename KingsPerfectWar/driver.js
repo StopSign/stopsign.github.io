@@ -38,7 +38,7 @@ function tick() {
         mana--;
 
         //units.tick(); //combat
-        //castle.tick(); //resources
+        castle.tick(); //resources
         //lab.tick(); //buffs
         actions.tick(); //actions tick last
 
