@@ -41,6 +41,10 @@ function tick() {
         //castle.tick(); //resources
         //lab.tick(); //buffs
         actions.tick(); //actions tick last
+
+        if(mana === 0) {
+            restart();
+        }
     }
 
     view.updating.update();

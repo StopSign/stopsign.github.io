@@ -1,6 +1,6 @@
 
-function addSleepAction(name) {
-    addActionToList("sleep", name);
+function addSleepAction(num) {
+    addActionToList("sleep", num);
 }
 
 function getSleepAction() {

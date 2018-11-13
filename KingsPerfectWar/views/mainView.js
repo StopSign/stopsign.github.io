@@ -58,13 +58,17 @@ let view = {
                     view.actionList.createCurrentList(i);
                     continue;
                 }
-                for (let j = 0; j < actionsList.current[name].length; j++) {
+                for (let j = 0; j < actionsList.current[name].length; j++) { //TODO only update when varName or loops is different
                     if(!prevState.current[name][j] || JSON.stringify(prevState.current[name][j]) !== JSON.stringify(actionsList.current[name][j])) {
                         view.actionList.createCurrentList(i);
                         break;
                     }
                 }
             }
+        },
+        updateCurrentActions: function() {
+            //if prevState.current[name][j] has a different manaUsed or loopsLeft from actionsList.current[name][j]
+            //update just those numbers
         }
     },
     actionList: {
@@ -85,17 +89,17 @@ let view = {
                 // }
 
                 totalDivText +=
-                    "<div id='nextActionContainer" + i + name + "' class='nextActionContainer small' ondragover='handleDragOver(event)' ondrop='handleDragDrop(event, \""+name+"\")' ondragstart='handleDragStart(event, \""+name+"\")' ondragend='draggedUndecorate(" + i + ", \""+name+"\")' ondragenter='dragOverDecorate(" + i +", \""+name+"\")' ondragleave='dragExitUndecorate("+i+", \""+name+"\")' draggable='true' data-index='"+i+"'>" +
+                    "<div id='nextActionContainer" + i + name + "' class='nextActionContainer small' ondragover='handleDragOver(event)' ondrop='handleDragDrop(event, "+num+")' ondragstart='handleDragStart(event, \""+name+"\")' ondragend='draggedUndecorate(" + i + ", \""+name+"\")' ondragenter='dragOverDecorate(" + i +", \""+name+"\")' ondragleave='dragExitUndecorate("+i+", \""+name+"\")' draggable='true' data-index='"+i+"'>" +
                         "<img src='img/" + action.varName + ".svg' class='smallIcon imageDragFix' style='margin-left:5px'> x " +
                         "<div class='bold'>" + action.loops + "</div>" +
                         "<div style='float:right'>" +
                             capButton +
-                            "<i id='plusButton" + i + name + "' onclick='addLoop(" + i + ",\""+name+"\")' class='actionIcon fa fa-plus'></i>" +
-                            "<i id='minusButton" + i + name + "' onclick='removeLoop(" + i + ",\""+name+"\")' class='actionIcon fa fa-minus'></i>" +
-                            "<i id='splitButton" + i + name + "' onclick='split(" + i + ",\""+name+"\")' class='actionIcon fa fa-arrows-h'></i>" +
-                            "<i id='upButton" + i + name + "' onclick='moveUp(" + i + ",\""+name+"\")' class='actionIcon fa fa-sort-up'></i>" +
-                            "<i id='downButton" + i + name + "' onclick='moveDown(" + i + ",\""+name+"\")' class='actionIcon fa fa-sort-down'></i>" +
-                            "<i id='removeButton" + i + name + "' onclick='removeAction(" + i + ",\""+name+"\")' class='actionIcon fa fa-times'></i>" +
+                            "<i id='plusButton" + i + name + "' onclick='addLoop(" + i + ","+num+")' class='actionIcon fa fa-plus'></i>" +
+                            "<i id='minusButton" + i + name + "' onclick='removeLoop(" + i + ","+num+")' class='actionIcon fa fa-minus'></i>" +
+                            "<i id='splitButton" + i + name + "' onclick='split(" + i + ","+num+")' class='actionIcon fa fa-arrows-h'></i>" +
+                            "<i id='upButton" + i + name + "' onclick='moveUp(" + i + ","+num+")' class='actionIcon fa fa-sort-up'></i>" +
+                            "<i id='downButton" + i + name + "' onclick='moveDown(" + i + ","+num+")' class='actionIcon fa fa-sort-down'></i>" +
+                            "<i id='removeButton" + i + name + "' onclick='removeAction(" + i + ","+num+")' class='actionIcon fa fa-times'></i>" +
                         "</div>" +
                     "</div>";
             }
@@ -112,9 +116,10 @@ let view = {
             let theList = actionsList.current[name];
             for(let i = 0; i < theList.length; i++) {
                 let action = theList[i];
+                let width = 100 * action.manaUsed / (action.costseconds * 10) + "%";
                 totalDivText +=
                     "<div class='curActionContainer small' id='curAction"+i+name+"' onmouseover='view.actionList.showInfoDiv("+i+", \""+name+"\", true)' onmouseleave='view.actionList.showInfoDiv("+i+", \""+name+"\",false)'>" +
-                        "<div class='curActionBar' id='action"+i+name+"Bar'></div>" +
+                        "<div class='curActionBar' style='width:"+width+"' id='action"+i+name+"Bar'></div>" +
                         "<div class='actionSelectedIndicator' id='action"+i+name+"Selected'></div>" +
                         "<img src='img/"+action.varName+".svg' class='smallIcon' style='margin-left:5px'> x " +
                         "<div id='action"+i+"LoopsLeft' style='margin-left:3px'>"+ action.loopsLeft+"</div>(" + "<div id='action"+i+name+"Loops'>" + action.loops + "</div>" + ")" +
@@ -127,7 +132,6 @@ let view = {
 
             for(let i = 0; i < theList.length; i++) {
                 let action = theList[i];
-                console.log(i, name);
                 totalDivText +=
                     "<div id='actionTooltip"+i+name+"' style='display:none;padding-left:10px;width:90%'>" +
                         "<div style='text-align:center;width:100%'>"+getActionByVarName(action.varName, name).name+"</div><br><br>" +
@@ -152,7 +156,6 @@ let view = {
             const div = document.getElementById("action"+i+name+"Selected");
             if(div) {
                 div.style.opacity = isHover ? "1" : "0";
-                console.log(i, name);
                 document.getElementById("actionTooltip"+i+name).style.display = isHover ? "inline-block" : "none";
                 if(isHover) {
                     document.getElementById("action"+i+name+"GoldCost").innerHTML = actionsList.current[name][i].costgold+"";
@@ -237,7 +240,7 @@ let view = {
 
                     let desc = action.desc + "<br>Adds to the building queue.<br>" + costDesc;
                     //add a progress bar
-                    allDivs += '<div id="'+action.varName+'Container" onclick="addActionToList(\''+action.varName+'\', \'castle\')" class="clickable abs showthat" style="left:'+action.xPos+'px;top:'+action.yPos+'px;">' +
+                    allDivs += '<div id="'+action.varName+'Container" onclick="addActionToList(\''+action.varName+'\', 1)" class="clickable abs showthat" style="left:'+action.xPos+'px;top:'+action.yPos+'px;">' +
                             '<img src="img/' + action.varName + '.svg" class="superLargeIcon imageDragFix">' +
                             '<div class="showthis" style="width:250px">' +
                                 '<div class="smallTitle">'+action.name+'</div>' +

@@ -1,4 +1,5 @@
 castle.actions = [];
+castle.resources = {};
 
 function addCastleAction(action) {
     if(window.language !== "eng") {
@@ -11,6 +12,24 @@ function addCastleAction(action) {
     }
     if(!action.visible) {
         action.visible = function() { return true; }
+    }
+
+    if(!action.seconds) {
+        action.seconds = 1;
+    }
+    action.cost.push({
+            resource:"seconds",
+            type:"static",
+            starting:action.seconds
+        });
+
+    if(!castle.resources[action.varName]) {
+        castle.resources[action.varName] = 0;
+    }
+    if(!action.buy) {
+        action.buy = function() {
+            castle.resources[action.varName]++;
+        }
     }
 
     castle.actions.push(action);
@@ -36,13 +55,11 @@ addCastleAction({
             type:"linear",
             starting:10,
             growth:10
-        },
-        {
-            resource:"seconds",
-            type:"static",
-            starting:10
         }
     ],
+    buy: function() {
+    },
+    seconds:10,
     xPos:555,
     yPos:105
 });
@@ -57,13 +74,12 @@ addCastleAction({
             type:"linear",
             starting:10,
             growth:10
-        },
-        {
-            resource:"seconds",
-            type:"static",
-            starting:10
         }
     ],
+    buy: function() {
+
+    },
+    seconds:10,
     xPos:20,
     yPos:10
 });

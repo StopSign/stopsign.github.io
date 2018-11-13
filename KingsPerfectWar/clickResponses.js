@@ -29,7 +29,8 @@ function capAmount(index, townNum) {
     // view.updateNextActions();
 }
 
-function addLoop(index, listName) {
+function addLoop(index, num) {
+    let listName = actionsList.nextNames[num];
     let theList = actionsList.next[listName];
     let theObj = theList[index];
     let action = getActionByVarName(theObj.varName, listName);
@@ -41,28 +42,31 @@ function addLoop(index, listName) {
         }
     }
     theObj.loops += addAmount;
-    actions.refresh();
+    actions.refresh(num);
 }
 
-function removeLoop(index, listName) {
+function removeLoop(index, num) {
+    let listName = actionsList.nextNames[num];
     let theList = actionsList.next[listName];
     let theObj = theList[index];
     theObj.loops -= window.addAmount;
     if(theObj.loops < 0) {
         theObj.loops = 0;
     }
-    actions.refresh();
+    actions.refresh(num);
 }
 
-function split(index, listName) {
+function split(index, num) {
+    let listName = actionsList.nextNames[num];
     let theList = actionsList.next[listName];
     let theObj = theList[index];
-    addAction(theObj, listName, Math.ceil(theObj.loops/2), index);
+    addActionToNext(theObj.varName, listName, Math.ceil(theObj.loops/2), index);
     theObj.loops = Math.floor(theObj.loops/2);
-    actions.refresh();
+    actions.refresh(num);
 }
 
-function moveUp(index, listName) {
+function moveUp(index, num) {
+    let listName = actionsList.nextNames[num];
     if(index <= 0) {
         return;
     }
@@ -70,10 +74,11 @@ function moveUp(index, listName) {
     const temp = theList[index-1];
     theList[index-1] = theList[index];
     theList[index] = temp;
-    actions.refresh();
+    actions.refresh(num);
 }
 
-function moveDown(index, listName) {
+function moveDown(index, num) {
+    let listName = actionsList.nextNames[num];
     let theList = actionsList.next[listName];
     if(index >= theList.length - 1) {
         return;
@@ -81,13 +86,22 @@ function moveDown(index, listName) {
     const temp = theList[index+1];
     theList[index+1] = theList[index];
     theList[index] = temp;
-    actions.refresh();
+    actions.refresh(num);
 }
 
-function removeAction(index, listName) {
-    let theList = actionsList.next[listName];
+function removeAction(index, num) {
+    let name = actionsList.nextNames[num];
+    let theList = actionsList.next[name];
     theList.splice(index, 1);
-    actions.refresh();
+    if(actions.validActions[num] >= theList.length) { //next must be >= than currently running
+        console.log(actions.validActions[num], theList.length);
+        if(theList.length === 0 && actionsList.current[name][0].manaUsed === 0 && actionsList.current[name][0].loopsLeft === actionsList.current[name][0].loops) {
+            actionsList.current[name].splice(0, 1);
+        } else {
+            addActionToNext("sleep", name, 1);
+        }
+    }
+    actions.refresh(num);
 }
 
 function handleDragStart(event, name) {
@@ -100,11 +114,13 @@ function handleDragOver(event) {
     event.preventDefault();
 }
 
-function handleDragDrop(event, name) {
+function handleDragDrop(event, num) {
+    let name = actionsList.nextNames[num];
     let indexOfDroppedOverElement = event.target.getAttribute("data-index");
     dragExitUndecorate(indexOfDroppedOverElement, name);
     let initialIndex = event.dataTransfer.getData("text/html");
     moveQueuedAction(initialIndex, indexOfDroppedOverElement, name);
+    actions.refresh(num);
 }
 
 function moveQueuedAction(initialIndex, resultingIndex, name) {

@@ -51,20 +51,25 @@
             <div id="labListContainer" class="listContainer"><div id="labCurActions" class="actionListLeft labColorD"></div><div id="labNextActions" class="actionListRight labColorH"></div></div>
         </div>
 
-        <div style="width:250px;height:355px;vertical-align:top;" class="extrasColor">
+        <div style="width:250px;height:355px;vertical-align:top;position:relative" class="extrasColor">
             <div class="title">Extras</div>
             <div id="actionInfoDivKing" style="display:none;width:100%"></div>
             <div id="actionInfoDivCastle" style="display:none;width:100%"></div>
             <div id="actionInfoDivUnits" style="display:none;width:100%"></div>
             <div id="actionInfoDivLab" style="display:none;width:100%"></div>
-            <div id="optionsDiv">
+            <div id="optionsDiv" style="position:relative;height:100%;">
                 <input type="checkbox" id="pauseListEmpty">
-                <label for="pauseListEmpty">Pause when next list is empty TODO</label>
-                <div class="clickable showthat" onclick="addSleepAction(actionsList.nextNames[curList])">
+                <label for="pauseListEmpty">Pause when next list is empty TODO</label><br>
+                <input type="checkbox" id="pauseAddSleep">
+                <label for="pauseAddSleep">Auto-add sleep when list is empty TODO</label><br>
+                ------<br>
+                <input type="checkbox" id="restartEmptyLists">
+                <label for="restartEmptyLists">Restart when all lists are empty TODO</label>
+                <div class="clickable showthat abs" style="bottom:26px;left:10px;" onclick="addSleepAction(curList)">
                     <img src='img/sleep.svg' class='superLargeIcon imageDragFix'>
                     <div class="showthis" style="width:250px">
-                    <div class="smallTitle">Sleep</div>
-                    <div class="small">Wait for one second</div>
+                        <div class="smallTitle">Sleep</div>
+                        <div class="small">Wait for one second</div>
                     </div>
                 </div>
             </div>
