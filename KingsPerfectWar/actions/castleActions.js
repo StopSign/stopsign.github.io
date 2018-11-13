@@ -43,7 +43,6 @@ addCastleAction({
             starting:10
         }
     ],
-    time:100,
     xPos:555,
     yPos:105
 });
@@ -67,5 +66,4 @@ addCastleAction({
     ],
     xPos:20,
     yPos:10
-
 });

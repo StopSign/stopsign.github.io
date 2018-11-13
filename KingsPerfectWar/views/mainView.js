@@ -4,6 +4,10 @@ let view = {
         prevState.mana = -1; //force redraw
         prevState.gold = -1;
         prevState.wood = -1;
+        this.actionInfoDiv = {"king":document.getElementById("actionInfoDivKing"),
+            "castle":document.getElementById("actionInfoDivCastle"),
+            "units":document.getElementById("actionInfoDivUnits"),
+            "lab":document.getElementById("actionInfoDivLab")};
     },
     updating: {
         update: function () {
@@ -13,6 +17,14 @@ let view = {
             view.updating.updateResources();
 
             view.updating.saveCurrentState();
+        },
+        saveCurrentState: function () {
+            prevState.mana = mana;
+            prevState.maxMana = maxMana;
+            prevState.gold = gold;
+            prevState.wood = wood;
+            prevState.next = JSON.parse(JSON.stringify(actionsList.next));
+            prevState.current = JSON.parse(JSON.stringify(actionsList.current));
         },
         updateResources: function() {
             if(prevState.mana !== mana || prevState.maxMana !== maxMana) {
@@ -26,11 +38,6 @@ let view = {
                 document.getElementById("wood").innerHTML = intToString(wood, 1);
             }
         },
-        saveCurrentState: function () {
-            prevState.mana = mana;
-            prevState.next = JSON.parse(JSON.stringify(actionsList.next));
-            prevState.view = JSON.parse(JSON.stringify(view));
-        },
         updateLists: function() {
             for (let i = 0; i < actionsList.nextNames.length; i++) {
                 let name = actionsList.nextNames[i];
@@ -38,22 +45,129 @@ let view = {
                     view.actionList.createNextList(i);
                     continue;
                 }
-                let shouldUpdate = false;
                 for (let j = 0; j < actionsList.next[name].length; j++) {
                     if(!prevState.next[name][j] || JSON.stringify(prevState.next[name][j]) !== JSON.stringify(actionsList.next[name][j])) {
-                        shouldUpdate = true;
+                        view.actionList.createNextList(i);
+                        break;
                     }
                 }
-                if(shouldUpdate) {
-                    view.actionList.createNextList(i);
+            }
+            for (let i = 0; i < actionsList.nextNames.length; i++) {
+                let name = actionsList.nextNames[i];
+                if(prevState.current[name].length !== actionsList.current[name].length) {
+                    view.actionList.createCurrentList(i);
+                    continue;
+                }
+                for (let j = 0; j < actionsList.current[name].length; j++) {
+                    if(!prevState.current[name][j] || JSON.stringify(prevState.current[name][j]) !== JSON.stringify(actionsList.current[name][j])) {
+                        view.actionList.createCurrentList(i);
+                        break;
+                    }
                 }
             }
         }
     },
     actionList: {
         createNextList: function(num) {
+            view.performance.clearNextListeners(num);
             let name = actionsList.nextNames[num];
+            let theDiv = document.getElementById(name + "NextActions");
+
+            let totalDivText = "";
+
             let theList = actionsList.next[name];
+            for (let i = 0; i < theList.length; i++) {
+                // let action = getActionByVarName(theList[i].varName, name);
+                let action = theList[i];
+                let capButton = "";
+                // if (action.cap) {
+                //     capButton = "<i id='capButton" + i + "' onclick='capAmount(" + i + ", " + townNum + ")' class='actionIcon fa fa-circle-thin'></i>";
+                // }
+
+                totalDivText +=
+                    "<div id='nextActionContainer" + i + name + "' class='nextActionContainer small' ondragover='handleDragOver(event)' ondrop='handleDragDrop(event, \""+name+"\")' ondragstart='handleDragStart(event, \""+name+"\")' ondragend='draggedUndecorate(" + i + ", \""+name+"\")' ondragenter='dragOverDecorate(" + i +", \""+name+"\")' ondragleave='dragExitUndecorate("+i+", \""+name+"\")' draggable='true' data-index='"+i+"'>" +
+                        "<img src='img/" + action.varName + ".svg' class='smallIcon imageDragFix' style='margin-left:5px'> x " +
+                        "<div class='bold'>" + action.loops + "</div>" +
+                        "<div style='float:right'>" +
+                            capButton +
+                            "<i id='plusButton" + i + name + "' onclick='addLoop(" + i + ",\""+name+"\")' class='actionIcon fa fa-plus'></i>" +
+                            "<i id='minusButton" + i + name + "' onclick='removeLoop(" + i + ",\""+name+"\")' class='actionIcon fa fa-minus'></i>" +
+                            "<i id='splitButton" + i + name + "' onclick='split(" + i + ",\""+name+"\")' class='actionIcon fa fa-arrows-h'></i>" +
+                            "<i id='upButton" + i + name + "' onclick='moveUp(" + i + ",\""+name+"\")' class='actionIcon fa fa-sort-up'></i>" +
+                            "<i id='downButton" + i + name + "' onclick='moveDown(" + i + ",\""+name+"\")' class='actionIcon fa fa-sort-down'></i>" +
+                            "<i id='removeButton" + i + name + "' onclick='removeAction(" + i + ",\""+name+"\")' class='actionIcon fa fa-times'></i>" +
+                        "</div>" +
+                    "</div>";
+            }
+
+            theDiv.innerHTML = totalDivText;
+        },
+        createCurrentList: function(num) {
+            let name = actionsList.nextNames[num];
+            view.performance.clearCurrentListeners(name);
+            let theDiv = document.getElementById(name + "CurActions");
+
+            let totalDivText = "";
+
+            let theList = actionsList.current[name];
+            for(let i = 0; i < theList.length; i++) {
+                let action = theList[i];
+                totalDivText +=
+                    "<div class='curActionContainer small' id='curAction"+i+name+"' onmouseover='view.actionList.showInfoDiv("+i+", \""+name+"\", true)' onmouseleave='view.actionList.showInfoDiv("+i+", \""+name+"\",false)'>" +
+                        "<div class='curActionBar' id='action"+i+name+"Bar'></div>" +
+                        "<div class='actionSelectedIndicator' id='action"+i+name+"Selected'></div>" +
+                        "<img src='img/"+action.varName+".svg' class='smallIcon' style='margin-left:5px'> x " +
+                        "<div id='action"+i+"LoopsLeft' style='margin-left:3px'>"+ action.loopsLeft+"</div>(" + "<div id='action"+i+name+"Loops'>" + action.loops + "</div>" + ")" +
+                    "</div>";
+            }
+
+            theDiv.innerHTML = totalDivText;
+
+            totalDivText = "";
+
+            for(let i = 0; i < theList.length; i++) {
+                let action = theList[i];
+                console.log(i, name);
+                totalDivText +=
+                    "<div id='actionTooltip"+i+name+"' style='display:none;padding-left:10px;width:90%'>" +
+                        "<div style='text-align:center;width:100%'>"+getActionByVarName(action.varName, name).name+"</div><br><br>" +
+                        "<div class='bold'>Next Seconds Needed</div> <div id='action"+i+name+"TimeNeeded'></div><br>" +
+                        "<div class='bold'>Next Mana Cost</div> <div id='action"+i+name+"ManaCost'></div><br>" +
+                        "<div class='bold'>Mana Remaining</div> <div id='action"+i+name+"ManaRemaining'></div><br>" +
+                        "<div class='bold'>Next Gold Cost</div> <div id='action"+i+name+"GoldCost'></div><br>" +
+                        "<div class='bold'>Gold Remaining</div> <div id='action"+i+name+"GoldRemaining'></div><br>" +
+                        "<div class='bold'>Next Wood Cost</div> <div id='action"+i+name+"WoodCost'></div><br>" +
+                        "<div class='bold'>Wood Remaining</div> <div id='action"+i+name+"WoodRemaining'></div><br><br>" +
+                        "<div id='action"+i+name+"HasFailed' style='display:none'>" +
+                            "<div class='bold'>Times Failed</div> <div id='action"+i+name+"Failed'>0</div><br>" +
+                            "<div class='bold'>Error</div> <div id='action"+i+name+"Error'></div>" +
+                        "</div>" +
+                    "</div>";
+            }
+
+            view.actionInfoDiv[name].innerHTML = totalDivText;
+            view.actionList.showInfoDiv(0, name, false);
+        },
+        showInfoDiv: function(i, name, isHover) {
+            const div = document.getElementById("action"+i+name+"Selected");
+            if(div) {
+                div.style.opacity = isHover ? "1" : "0";
+                console.log(i, name);
+                document.getElementById("actionTooltip"+i+name).style.display = isHover ? "inline-block" : "none";
+                if(isHover) {
+                    document.getElementById("action"+i+name+"GoldCost").innerHTML = actionsList.current[name][i].costgold+"";
+                    document.getElementById("action"+i+name+"WoodCost").innerHTML = actionsList.current[name][i].costwood+"";
+                    document.getElementById("action"+i+name+"ManaCost").innerHTML = actionsList.current[name][i].costmana+"";
+                    document.getElementById("action"+i+name+"TimeNeeded").innerHTML = actionsList.current[name][i].costseconds+"";
+                }
+            }
+            view.actionInfoDiv[name].style.display = isHover ? "inline-block" : "none";
+            document.getElementById("optionsDiv").style.display = isHover ? "none" : "inline-block";
+        }
+    },
+    performance: {
+        clearNextListeners: function(num) {
+            let name = actionsList.nextNames[num];
             let theDiv = document.getElementById(name + "NextActions");
 
             let count = 0;
@@ -82,37 +196,21 @@ let view = {
                     }
                     theDiv.firstChild.removeChild(theDiv.firstChild.firstChild);
                 }
-                count++;
                 theDiv.removeChild(theDiv.firstChild);
+                count++;
             }
+        },
+        clearCurrentListeners: function(name) {
+            let theDiv = document.getElementById(name + "CurActions");
 
-            let totalDivText = "";
+            let count = 0;
+            while (theDiv.firstChild) {
+                document.getElementById("curAction" + count + name).removeAttribute("onmouseover");
+                document.getElementById("curAction" + count + name).removeAttribute("onmouseleave");
 
-            for (let i = 0; i < theList.length; i++) {
-                // let action = getActionByVarName(theList[i].varName, name);
-                let action = theList[i];
-                let capButton = "";
-                // if (action.cap) {
-                //     capButton = "<i id='capButton" + i + "' onclick='capAmount(" + i + ", " + townNum + ")' class='actionIcon fa fa-circle-thin'></i>";
-                // }
-
-                totalDivText +=
-                    "<div id='nextActionContainer" + i + name + "' class='nextActionContainer small' ondragover='handleDragOver(event)' ondrop='handleDragDrop(event, \""+name+"\")' ondragstart='handleDragStart(event, \""+name+"\")' ondragend='draggedUndecorate(" + i + ", \""+name+"\")' ondragenter='dragOverDecorate(" + i +", \""+name+"\")' ondragleave='dragExitUndecorate("+i+", \""+name+"\")' draggable='true' data-index='"+i+"'>" +
-                        "<img src='img/" + action.varName + ".svg' class='smallIcon imageDragFix'> x " +
-                        "<div class='bold'>" + action.loops + "</div>" +
-                        "<div style='float:right'>" +
-                            capButton +
-                            "<i id='plusButton" + i + name + "' onclick='addLoop(" + i + ",\""+name+"\")' class='actionIcon fa fa-plus'></i>" +
-                            "<i id='minusButton" + i + name + "' onclick='removeLoop(" + i + ",\""+name+"\")' class='actionIcon fa fa-minus'></i>" +
-                            "<i id='splitButton" + i + name + "' onclick='split(" + i + ",\""+name+"\")' class='actionIcon fa fa-arrows-h'></i>" +
-                            "<i id='upButton" + i + name + "' onclick='moveUp(" + i + ",\""+name+"\")' class='actionIcon fa fa-sort-up'></i>" +
-                            "<i id='downButton" + i + name + "' onclick='moveDown(" + i + ",\""+name+"\")' class='actionIcon fa fa-sort-down'></i>" +
-                            "<i id='removeButton" + i + name + "' onclick='removeAction(" + i + ",\""+name+"\")' class='actionIcon fa fa-times'></i>" +
-                        "</div>" +
-                    "</div>";
+                theDiv.removeChild(theDiv.firstChild);
+                count++;
             }
-
-            theDiv.innerHTML = totalDivText;
         }
     },
     clickable: {

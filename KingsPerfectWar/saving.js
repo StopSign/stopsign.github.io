@@ -38,10 +38,13 @@ window.language = "eng";
 window.addAmount = 1;
 
 let mana = 1200;
+let initialMana = 1200;
 let maxMana = 1200;
 let totalTime = 0;
-let gold = 0;
+let gold = 10;
 let wood = 0;
+
+let curList = 1; //castle
 
 function clearSave() {
     window.localStorage[saveName] = "";
@@ -64,6 +67,7 @@ function load() {
     pauseGame();
 
     view.initialize();
+    restart();
 }
 
 function save() {

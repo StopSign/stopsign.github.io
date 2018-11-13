@@ -242,6 +242,13 @@ input {
     background-color: rgba(184, 218, 184, 1);
 }
 
+.extrasColor {
+    background-color: rgba(212, 216, 235, 1);
+}
+.extrasColor:hover {
+    background-color: rgba(222, 226, 245, 1);
+}
+
 .tabSelector {
     width:100%;
     display:block;
@@ -261,6 +268,7 @@ input {
     text-align:center;
     vertical-align:top;
     position:relative;
+    overflow-y:auto;
 }
 .actionListLeft {
     width:35%;
@@ -295,6 +303,21 @@ input {
 }
 .curActionContainer {
     width:102px;
+}
+
+.curActionBar {
+    height:100%;
+    width:0;
+    background-color: #ff907d;
+    position:absolute;
+    opacity:.5;
+}
+.actionSelectedIndicator {
+    position:absolute;
+    opacity:0;
+    background-color: #0900e2;
+    width:3px;
+    height:100%;
 }
 
 .actionIcon {

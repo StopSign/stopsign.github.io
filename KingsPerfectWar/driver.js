@@ -5,8 +5,12 @@ let bonusSpeed = 1;
 
 let curTime = new Date();
 let gameTicksLeft = 0;
+let sudoStop = false;
 
 function tick() {
+    if(sudoStop) {
+        return;
+    }
     let newTime = new Date();
     totalTime += newTime - curTime;
     gameTicksLeft += newTime - curTime;
@@ -62,5 +66,7 @@ function pauseGame() {
 }
 
 function restart() {
-
+    mana = initialMana;
+    maxMana = initialMana;
+    actions.restart();
 }

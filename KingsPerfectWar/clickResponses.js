@@ -11,6 +11,7 @@ function switchActionsTab(num) {
 
 function switchListTab(num) {
     let ids = ["kingListContainer", "castleListContainer", "unitsListContainer", "labListContainer"];
+    curList = num;
     for(let i = 0; i < ids.length; i++) {
         if(num === i) {
             document.getElementById(ids[i]).style.display = "block";
@@ -40,6 +41,7 @@ function addLoop(index, listName) {
         }
     }
     theObj.loops += addAmount;
+    actions.refresh();
 }
 
 function removeLoop(index, listName) {
@@ -49,6 +51,7 @@ function removeLoop(index, listName) {
     if(theObj.loops < 0) {
         theObj.loops = 0;
     }
+    actions.refresh();
 }
 
 function split(index, listName) {
@@ -56,6 +59,7 @@ function split(index, listName) {
     let theObj = theList[index];
     addAction(theObj, listName, Math.ceil(theObj.loops/2), index);
     theObj.loops = Math.floor(theObj.loops/2);
+    actions.refresh();
 }
 
 function moveUp(index, listName) {
@@ -66,6 +70,7 @@ function moveUp(index, listName) {
     const temp = theList[index-1];
     theList[index-1] = theList[index];
     theList[index] = temp;
+    actions.refresh();
 }
 
 function moveDown(index, listName) {
@@ -76,11 +81,13 @@ function moveDown(index, listName) {
     const temp = theList[index+1];
     theList[index+1] = theList[index];
     theList[index] = temp;
+    actions.refresh();
 }
 
 function removeAction(index, listName) {
     let theList = actionsList.next[listName];
     theList.splice(index, 1);
+    actions.refresh();
 }
 
 function handleDragStart(event, name) {
