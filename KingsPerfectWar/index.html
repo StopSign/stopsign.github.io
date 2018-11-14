@@ -49,55 +49,54 @@
                     <img src='img/sleep.svg' class='superLargeIcon imageDragFix'>
                     <div class="showthis" style="width:250px">
                         <div class="smallTitle">Sleep</div>
-                        <div class="small">Wait for one second</div>
+                        <div class="small">Wait for one second on the current list</div>
                     </div>
                 </div>
             </div>
         </div>
-
-
-    <div style="margin-top:4px;width:100%">
-        <div style="width:280px">
-            <div class="showthat" style="width:85px">
-                <img src='img/gold.svg' class='largeIcon imageDragFix' style="vertical-align:bottom">
-                <div id="gold"></div>
-                <div class="showthis">Gold</div>
+        
+        <div style="margin-top:4px;width:100%">
+            <div style="width:280px">
+                <div class="showthat" style="width:85px">
+                    <img src='img/gold.svg' class='largeIcon imageDragFix' style="vertical-align:bottom">
+                    <div id="gold"></div>
+                    <div class="showthis">Gold</div>
+                </div>
+                <div class="showthat" style="width:85px">
+                    <img src='img/wood.svg' class='largeIcon imageDragFix' style="vertical-align:bottom">
+                    <div id="wood"></div>
+                    <div class="showthis">Wood</div>
+                </div>
+                <div class="showthat" style="width:85px">
+                    <img src='img/mana.svg' class='largeIcon imageDragFix' style="vertical-align:bottom">
+                    <div id="mana"></div>
+                    <div class="showthis">Mana</div>
+                </div>
+            </div><div style="width:565px;height:10px;background-color:#dbdff3;margin-top:6px;">
+                <div id="manaBar" style="width:80%;height:100%;background-color:rgb(130, 147, 255);vertical-align:top;"></div>
             </div>
-            <div class="showthat" style="width:85px">
-                <img src='img/wood.svg' class='largeIcon imageDragFix' style="vertical-align:bottom">
-                <div id="wood"></div>
-                <div class="showthis">Wood</div>
-            </div>
-            <div class="showthat" style="width:85px">
-                <img src='img/mana.svg' class='largeIcon imageDragFix' style="vertical-align:bottom">
-                <div id="mana"></div>
-                <div class="showthis">Mana</div>
-            </div>
-        </div><div style="width:565px;height:10px;background-color:#dbdff3;margin-top:6px;">
-            <div id="manaBar" style="width:80%;height:100%;background-color:rgb(130, 147, 255);vertical-align:top;"></div>
         </div>
-    </div>
 
-    <div style="width:100%;background-color:#c4c9e6;height:204px;margin-top:4px;">
-        <div style="width:160px;vertical-align:top;" class="large bold">
-            <div id="kingSelector" class="tabSelector kingColor" onclick="switchActionsTab(0)">King</div>
-            <div id="castleSelector" class="tabSelector castleColor" onclick="switchActionsTab(1)">Castle</div>
-            <div id="unitsSelector" class="tabSelector unitsColor" onclick="switchActionsTab(2)">Units</div>
-            <div id="labSelector" class="tabSelector labColor" onclick="switchActionsTab(3)">Laboratory</div>
-            <div id="heroSelector" class="tabSelector heroColor" onclick="switchActionsTab(4)">Heroes</div>
-        </div><div style="width:694px;height:100%;vertical-align:top;">
-            <div id="kingContainer" class="tabContainer kingColorH"></div>
-            <div id="castleContainer" class="tabContainer castleColorH" style="display:block;position:relative;">
-                <div class="title abs" style="top:0;left:63px;">Income</div>
-                <div class="title abs" style="top:0;left:300px;">Units</div>
-                <div class="title abs" style="top:0;left:580px;">Labs</div>
-                <div id="castleActions" class="abs" style="left:0;top:0;"></div>
+        <div style="width:100%;background-color:#c4c9e6;height:204px;margin-top:4px;">
+            <div style="width:160px;vertical-align:top;" class="large bold">
+                <div id="kingSelector" class="tabSelector kingColor" onclick="switchActionsTab(0)">King</div>
+                <div id="castleSelector" class="tabSelector castleColor" onclick="switchActionsTab(1)">Castle</div>
+                <div id="unitsSelector" class="tabSelector unitsColor" onclick="switchActionsTab(2)">Units</div>
+                <div id="labSelector" class="tabSelector labColor" onclick="switchActionsTab(3)">Laboratory</div>
+                <div id="heroSelector" class="tabSelector heroColor" onclick="switchActionsTab(4)">Heroes</div>
+            </div><div style="width:694px;height:100%;vertical-align:top;">
+                <div id="kingContainer" class="tabContainer kingColorH"></div>
+                <div id="castleContainer" class="tabContainer castleColorH" style="display:block;position:relative;">
+                    <div class="title abs" style="top:0;left:63px;">Income</div>
+                    <div class="title abs" style="top:0;left:300px;">Units</div>
+                    <div class="title abs" style="top:0;left:580px;">Labs</div>
+                    <div id="castleActions" class="abs" style="left:0;top:0;"></div>
+                </div>
+                <div id="unitsContainer" class="tabContainer unitsColorH"></div>
+                <div id="labContainer" class="tabContainer labColorH"></div>
+                <div id="heroContainer" class="tabContainer heroColorH"></div>
             </div>
-            <div id="unitsContainer" class="tabContainer unitsColorH"></div>
-            <div id="labContainer" class="tabContainer labColorH"></div>
-            <div id="heroContainer" class="tabContainer heroColorH"></div>
         </div>
-    </div>
     </div>
 
     <div style="width:350px;height:550px;vertical-align:top;">
