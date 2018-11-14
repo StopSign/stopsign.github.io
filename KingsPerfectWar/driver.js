@@ -74,9 +74,9 @@ function restart() {
     maxMana = initialMana;
     gold = initialGold;
     wood = initialWood;
-    for (let property in castle.resources) {
-        if (castle.resources.hasOwnProperty(property)) {
-            castle.resources[property] = 0;
+    for (let property in created.castle) {
+        if (created.castle.hasOwnProperty(property)) {
+            created.castle[property] = 0;
         }
     }
     actions.restart();

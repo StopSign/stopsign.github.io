@@ -29,6 +29,27 @@ function capAmount(index, townNum) {
     // view.updateNextActions();
 }
 
+function setLoop(index, num) {
+    let listName = actionsList.nextNames[num];
+    let theList = actionsList.next[listName];
+    let theObj = theList[index];
+    let action = getActionByVarName(theObj.varName, listName);
+    let amount = parseInt(document.getElementById("loopInput"+index+listName).value);
+    if(isNaN(amount)) {
+        amount = 0;
+    } else if(amount > 9999) {
+        amount = 9999;
+    }
+    if(action.allowed) {
+        let numLeft = action.allowed() - getNumOnList(action.varName, listName);
+        if(numLeft < amount) {
+            amount = numLeft;
+        }
+    }
+    theObj.loops = amount;
+    actions.refresh(num);
+}
+
 function addLoop(index, num) {
     let listName = actionsList.nextNames[num];
     let theList = actionsList.next[listName];

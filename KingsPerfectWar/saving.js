@@ -34,6 +34,7 @@ let actionsList = {
         lab:[]
     }
 };
+let created = {};
 window.language = "eng";
 window.addAmount = 1;
 

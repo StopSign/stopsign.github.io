@@ -1,17 +1,17 @@
 castle.actions = [];
-castle.resources = {};
+created.castle = {};
 
 castle.tick = function() {
     let addedWood = 0;
-    addedWood += castle.resources.scavenger;
-    addedWood += castle.resources.logger * 5;
-    addedWood += castle.resources.forester * 25;
+    addedWood += created.castle.scavenger;
+    addedWood += created.castle.logger * 5;
+    addedWood += created.castle.forester * 25;
     wood += addedWood;
 
     let addedGold = 0;
-    addedGold += castle.resources.beg;
-    addedGold += castle.resources.merchant * 5;
-    addedGold += castle.resources.tax * 25;
+    addedGold += created.castle.beg;
+    addedGold += created.castle.merchant * 5;
+    addedGold += created.castle.tax * 25;
     gold += addedGold;
 };
 
@@ -37,12 +37,12 @@ function addCastleAction(action) {
             starting:action.seconds
         });
 
-    if(!castle.resources[action.varName]) {
-        castle.resources[action.varName] = 0;
+    if(!created.castle[action.varName]) {
+        created.castle[action.varName] = 0;
     }
     if(!action.buy) {
         action.buy = function() {
-            castle.resources[action.varName]++;
+            created.castle[action.varName]++;
         }
     }
 

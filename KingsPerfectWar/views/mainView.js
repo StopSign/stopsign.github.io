@@ -15,6 +15,7 @@ let view = {
             //update the view of anything that's changed
             view.updating.updateLists();
             view.updating.updateResources();
+            view.updating.updateCreated();
 
             view.updating.saveCurrentState();
         },
@@ -23,8 +24,9 @@ let view = {
             prevState.maxMana = maxMana;
             prevState.gold = gold;
             prevState.wood = wood;
-            prevState.next = JSON.parse(JSON.stringify(actionsList.next));
-            prevState.current = JSON.parse(JSON.stringify(actionsList.current));
+            prevState.next = copyArray(actionsList.next);
+            prevState.current = copyArray(actionsList.current);
+            prevState.created = copyArray(created);
         },
         updateResources: function() {
             if(prevState.mana !== mana || prevState.maxMana !== maxMana) {
@@ -46,9 +48,14 @@ let view = {
                     continue;
                 }
                 for (let j = 0; j < actionsList.next[name].length; j++) {
-                    if(!prevState.next[name][j] || JSON.stringify(prevState.next[name][j]) !== JSON.stringify(actionsList.next[name][j])) {
+                    let prevAction = prevState.next[name][j];
+                    let nextAction = actionsList.next[name][j];
+                    if(!prevAction ||
+                        prevAction.varName !== nextAction.varName) {
                         view.actionList.createNextList(i);
                         break;
+                    } else if(prevAction.loops !== nextAction.loops) { //keeps tab order as you change loop numbers
+                        document.getElementById("loopInput"+j+name).value = nextAction.loops;
                     }
                 }
             }
@@ -58,7 +65,7 @@ let view = {
                     view.actionList.createCurrentList(i);
                     continue;
                 }
-                for (let j = 0; j < actionsList.current[name].length; j++) { //TODO only update when varName or loops is different
+                for (let j = 0; j < actionsList.current[name].length; j++) {
                     let prevAction = prevState.current[name][j];
                     let curAction = actionsList.current[name][j];
                     if(!prevAction ||
@@ -73,6 +80,20 @@ let view = {
                         document.getElementById("action"+j+name+"Loops").innerHTML = curAction.loops;
                     }
                 }
+                let currentAction = actionsList.current[name][actions.validActions[i]];
+                let nextAction = actionsList.current[name][actions.validActions[i]+1];
+                document.getElementById(name+"TabSleep").style.opacity = (!currentAction || currentAction.varName === "sleep" ||
+                    (currentAction.loopsLeft === 0 && currentAction.manaUsed === currentAction.costseconds*10 && (!nextAction || nextAction.varName === "sleep"))) //pause when next list is empty condition
+                    ? ".5" : "0";
+            }
+        },
+        updateCreated: function() {
+            for (let property in created.castle) {
+                if (created.castle.hasOwnProperty(property) &&
+                    JSON.stringify(created.castle[property]) !== JSON.stringify(prevState.created.castle[property])) {
+                    document.getElementById(property+"Num").innerHTML = created.castle[property];
+                    document.getElementById(property+"Num").style.opacity = created.castle[property] === 0 ? "0" : "1";
+                }
             }
         }
     },
@@ -86,18 +107,14 @@ let view = {
 
             let theList = actionsList.next[name];
             for (let i = 0; i < theList.length; i++) {
-                // let action = getActionByVarName(theList[i].varName, name);
                 let action = theList[i];
                 let capButton = "";
-                // if (action.cap) {
-                //     capButton = "<i id='capButton" + i + "' onclick='capAmount(" + i + ", " + townNum + ")' class='actionIcon fa fa-circle-thin'></i>";
-                // }
 
                 totalDivText +=
                     "<div id='nextActionContainer" + i + name + "' class='nextActionContainer small' ondragover='handleDragOver(event)' ondrop='handleDragDrop(event, "+num+")' ondragstart='handleDragStart(event, \""+name+"\")' ondragend='draggedUndecorate(" + i + ", \""+name+"\")' ondragenter='dragOverDecorate(" + i +", \""+name+"\")' ondragleave='dragExitUndecorate("+i+", \""+name+"\")' draggable='true' data-index='"+i+"'>" +
                         "<img src='img/" + action.varName + ".svg' class='smallIcon imageDragFix' style='margin-left:5px'> x " +
-                        "<div class='bold'>" + action.loops + "</div>" +
-                        "<div style='float:right'>" +
+                        "<input id='loopInput" + i + name + "' type='text' class='listTextInput' value='"+action.loops+"' onchange='setLoop(" + i + ","+num+")' onclick='this.select();'>" +
+                        "<div style='float:right;margin-top:4px;'>" +
                             capButton +
                             "<i id='plusButton" + i + name + "' onclick='addLoop(" + i + ","+num+")' class='actionIcon fa fa-plus'></i>" +
                             "<i id='minusButton" + i + name + "' onclick='removeLoop(" + i + ","+num+")' class='actionIcon fa fa-minus'></i>" +
@@ -247,13 +264,15 @@ let view = {
 
                     let desc = action.desc + "<br>Adds to the Castle queue.<br>" + costDesc;
                     //add a progress bar
-                    allDivs += '<div id="'+action.varName+'Container" onclick="addActionToList(\''+action.varName+'\', 1)" class="clickable abs showthat" style="left:'+action.xPos+'px;top:'+action.yPos+'px;">' +
+                    allDivs +=
+                        '<div id="'+action.varName+'Container" onclick="addActionToList(\''+action.varName+'\', 1)" class="clickable abs showthat" style="left:'+action.xPos+'px;top:'+action.yPos+'px;">' +
                             '<img src="img/' + action.varName + '.svg" class="superLargeIcon imageDragFix">' +
                             '<div class="showthis" style="width:250px">' +
                                 '<div class="smallTitle">'+action.name+'</div>' +
                                 '<div class="small">'+desc+'</div>' +
                             '</div>' +
-                        '</div>';
+                        '</div>' +
+                        '<div id="'+action.varName+'Num" class="createdNum abs" style="left:'+(action.xPos+10)+'px;top:'+(action.yPos+43)+'px;"></div>';
                 });
                 container.innerHTML = allDivs;
             }

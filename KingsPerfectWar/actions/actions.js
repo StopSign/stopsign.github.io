@@ -12,7 +12,6 @@ let actions = {
             }
             while(action && (action.loopsLeft === 0 || (action.manaUsed === 0 && !action.canBuy()))) { //action exists but is invalid, slide
                 this.validActions[i]++;
-                console.log(action.varName, gold, action.manaUsed, action.canBuy(), action.costgold);
                 if(!action.canBuy() && action.loopsLeft !== 0) { //failed to buy
                     action.loops -= action.loopsLeft;
                     action.loopsLeft = 0;

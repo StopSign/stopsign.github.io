@@ -287,6 +287,17 @@ input {
     margin-top:-2px;
     padding:4px 0;
     width:84px;
+    position:relative;
+}
+.listTextInput {
+    width:30px;
+    height:9px;
+}
+
+.tabSleep {
+    position:absolute;
+    right:2px;
+    opacity:.5;
 }
 
 .nextActionContainer, .curActionContainer {
