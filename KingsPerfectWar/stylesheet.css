@@ -222,23 +222,23 @@ input {
     background-color: rgba(227, 202, 235, 1);
 }
 
-.heroColor, .heroColorH, .heroColorD:hover {
+.unitsColor, .unitsColorH, .unitsColorD:hover {
     background-color: rgba(230, 203, 201, 1);
 }
-.heroColor:hover, .heroColorH:hover {
+.unitsColor:hover, .unitsColorH:hover {
     background-color: rgba(240, 213, 211, 1);
 }
-.heroColor:active, .heroColorD {
+.unitsColor:active, .unitsColorD {
     background-color: rgba(220, 193, 191, 1);
 }
 
-.upgradeColor, .upgradeColorH, .upgradeColorD:hover {
+.heroColor, .heroColorH, .heroColorD:hover {
     background-color: rgba(194, 228, 194, 1);
 }
-.upgradeColor:hover, .upgradeColorH:hover {
+.heroColor:hover, .heroColorH:hover {
     background-color: rgba(204, 238, 204, 1);
 }
-.upgradeColor:active, .upgradeColorD {
+.heroColor:active, .heroColorD {
     background-color: rgba(184, 218, 184, 1);
 }
 

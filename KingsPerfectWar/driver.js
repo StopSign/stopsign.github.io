@@ -72,5 +72,12 @@ function pauseGame() {
 function restart() {
     mana = initialMana;
     maxMana = initialMana;
+    gold = initialGold;
+    wood = initialWood;
+    for (let property in castle.resources) {
+        if (castle.resources.hasOwnProperty(property)) {
+            castle.resources[property] = 0;
+        }
+    }
     actions.restart();
 }

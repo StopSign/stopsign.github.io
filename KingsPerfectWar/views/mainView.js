@@ -59,16 +59,21 @@ let view = {
                     continue;
                 }
                 for (let j = 0; j < actionsList.current[name].length; j++) { //TODO only update when varName or loops is different
-                    if(!prevState.current[name][j] || JSON.stringify(prevState.current[name][j]) !== JSON.stringify(actionsList.current[name][j])) {
+                    let prevAction = prevState.current[name][j];
+                    let curAction = actionsList.current[name][j];
+                    if(!prevAction ||
+                        prevAction.varName !== curAction.varName ) {
                         view.actionList.createCurrentList(i);
                         break;
+                    } else if(prevAction.manaUsed !== curAction.manaUsed
+                        || prevAction.loopsLeft !== curAction.loopsLeft
+                        || prevAction.loops !== curAction.loops) {
+                        document.getElementById("action"+j+name+"Bar").style.width = 100 * curAction.manaUsed / (curAction.costseconds * 10) + "%";
+                        document.getElementById("action"+j+name+"LoopsLeft").innerHTML = curAction.loopsLeft;
+                        document.getElementById("action"+j+name+"Loops").innerHTML = curAction.loops;
                     }
                 }
             }
-        },
-        updateCurrentActions: function() {
-            //if prevState.current[name][j] has a different manaUsed or loopsLeft from actionsList.current[name][j]
-            //update just those numbers
         }
     },
     actionList: {
@@ -122,7 +127,7 @@ let view = {
                         "<div class='curActionBar' style='width:"+width+"' id='action"+i+name+"Bar'></div>" +
                         "<div class='actionSelectedIndicator' id='action"+i+name+"Selected'></div>" +
                         "<img src='img/"+action.varName+".svg' class='smallIcon' style='margin-left:5px'> x " +
-                        "<div id='action"+i+"LoopsLeft' style='margin-left:3px'>"+ action.loopsLeft+"</div>(" + "<div id='action"+i+name+"Loops'>" + action.loops + "</div>" + ")" +
+                        "<div id='action"+i+name+"LoopsLeft' style='margin-left:3px'>"+ action.loopsLeft+"</div>(" + "<div id='action"+i+name+"Loops'>" + action.loops + "</div>" + ")" +
                     "</div>";
             }
 
@@ -153,6 +158,7 @@ let view = {
             view.actionList.showInfoDiv(0, name, false);
         },
         showInfoDiv: function(i, name, isHover) {
+            console.log(i, name, isHover);
             const div = document.getElementById("action"+i+name+"Selected");
             if(div) {
                 div.style.opacity = isHover ? "1" : "0";
@@ -165,7 +171,9 @@ let view = {
                 }
             }
             view.actionInfoDiv[name].style.display = isHover ? "inline-block" : "none";
-            document.getElementById("optionsDiv").style.display = isHover ? "none" : "inline-block";
+            if(actionsList.nextNames[curList] === name) {
+                document.getElementById("optionsDiv").style.display = isHover ? "none" : "inline-block";
+            }
         }
     },
     performance: {
@@ -238,7 +246,7 @@ let view = {
                         }
                     });
 
-                    let desc = action.desc + "<br>Adds to the building queue.<br>" + costDesc;
+                    let desc = action.desc + "<br>Adds to the Castle queue.<br>" + costDesc;
                     //add a progress bar
                     allDivs += '<div id="'+action.varName+'Container" onclick="addActionToList(\''+action.varName+'\', 1)" class="clickable abs showthat" style="left:'+action.xPos+'px;top:'+action.yPos+'px;">' +
                             '<img src="img/' + action.varName + '.svg" class="superLargeIcon imageDragFix">' +

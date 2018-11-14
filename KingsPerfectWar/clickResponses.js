@@ -1,5 +1,5 @@
 function switchActionsTab(num) {
-    let ids = ["kingContainer", "castleContainer", "labContainer", "heroContainer", "upgradeContainer"];
+    let ids = ["kingContainer", "castleContainer", "unitsContainer", "labContainer", "heroContainer"];
     for(let i = 0; i < ids.length; i++) {
         if(num === i) {
             document.getElementById(ids[i]).style.display = "block";

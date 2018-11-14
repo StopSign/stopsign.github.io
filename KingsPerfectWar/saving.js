@@ -42,7 +42,9 @@ let initialMana = 1200;
 let maxMana = 1200;
 let totalTime = 0;
 let gold = 100;
+let initialGold = 100;
 let wood = 0;
+let initialWood = 0;
 
 let curList = 1; //castle
 

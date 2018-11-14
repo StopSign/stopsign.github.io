@@ -23,7 +23,7 @@
     <div style="width:1210px">
 
         <div style="width:600px;vertical-align:top;">
-            <div id="warRoom" style="width:100%;height:200px;position:relative;margin-bottom:5px;" class="heroColorH">
+            <div id="warRoom" style="width:100%;height:200px;position:relative;margin-bottom:5px;" class="unitsColorH">
                 <div class="title">War Map</div>
                 <div class="clickable" style="position:absolute;top:70px;left:5px;">
                     <img src='img/castle.svg' class='superLargeIcon imageDragFix'>
@@ -42,12 +42,12 @@
             <div style="width:100%;height:20px;" class="large bold">
                 <div id="kingListSelector" class="listSelector kingColor" onclick="switchListTab(0)">King</div>
                 <div id="castleListSelector" class="listSelector castleColor" onclick="switchListTab(1)">Castle</div>
-                <div id="unitsListSelector" class="listSelector heroColor" onclick="switchListTab(2)">Units</div>
+                <div id="unitsListSelector" class="listSelector unitsColor" onclick="switchListTab(2)">Units</div>
                 <div id="labListSelector" class="listSelector labColor" onclick="switchListTab(3)">Lab</div>
             </div>
             <div id="kingListContainer" class="listContainer"><div id="kingCurActions" class="actionListLeft kingColorD"></div><div id="kingNextActions" class="actionListRight kingColorH"></div></div>
             <div id="castleListContainer" class="listContainer" style="display:block;"><div id="castleCurActions" class="actionListLeft castleColorD"></div><div id="castleNextActions" class="actionListRight castleColorH"></div></div>
-            <div id="unitsListContainer" class="listContainer"><div id="unitsCurActions" class="actionListLeft heroColorD"></div><div id="unitsNextActions" class="actionListRight heroColorH"></div></div>
+            <div id="unitsListContainer" class="listContainer"><div id="unitsCurActions" class="actionListLeft unitsColorD"></div><div id="unitsNextActions" class="actionListRight unitsColorH"></div></div>
             <div id="labListContainer" class="listContainer"><div id="labCurActions" class="actionListLeft labColorD"></div><div id="labNextActions" class="actionListRight labColorH"></div></div>
         </div>
 
@@ -58,13 +58,8 @@
             <div id="actionInfoDivUnits" style="display:none;width:100%"></div>
             <div id="actionInfoDivLab" style="display:none;width:100%"></div>
             <div id="optionsDiv" style="position:relative;height:100%;">
-                <input type="checkbox" id="pauseListEmpty">
-                <label for="pauseListEmpty">Pause when next list is empty TODO</label><br>
-                <input type="checkbox" id="pauseAddSleep">
-                <label for="pauseAddSleep">Auto-add sleep when list is empty TODO</label><br>
-                ------<br>
-                <input type="checkbox" id="restartEmptyLists">
-                <label for="restartEmptyLists">Restart when all lists are empty TODO</label>
+                <input type="checkbox" id="pauseListEmpty" checked>
+                <label for="pauseListEmpty">Pause when next list is empty</label>
                 <div class="clickable showthat abs" style="bottom:26px;left:10px;" onclick="addSleepAction(curList)">
                     <img src='img/sleep.svg' class='superLargeIcon imageDragFix'>
                     <div class="showthis" style="width:250px">
@@ -109,15 +104,15 @@
         <div style="width:200px;vertical-align:top;" class="large bold">
             <div id="kingSelector" class="tabSelector kingColor" onclick="switchActionsTab(0)">King</div>
             <div id="castleSelector" class="tabSelector castleColor" onclick="switchActionsTab(1)">Castle</div>
-            <div id="labSelector" class="tabSelector labColor" onclick="switchActionsTab(2)">Laboratory</div>
-            <div id="heroSelector" class="tabSelector heroColor" onclick="switchActionsTab(3)">Heroes</div>
-            <div id="upgradeSelector" class="tabSelector upgradeColor" onclick="switchActionsTab(4)">Upgrades</div>
+            <div id="unitsSelector" class="tabSelector unitsColor" onclick="switchActionsTab(2)">Units</div>
+            <div id="labSelector" class="tabSelector labColor" onclick="switchActionsTab(3)">Laboratory</div>
+            <div id="heroSelector" class="tabSelector heroColor" onclick="switchActionsTab(4)">Heroes</div>
         </div><div style="width:1010px;height:100%;vertical-align:top;">
             <div id="kingContainer" class="tabContainer kingColorH" style="display:block;"></div>
             <div id="castleContainer" class="tabContainer castleColorH"></div>
+            <div id="unitsContainer" class="tabContainer unitsColorH"></div>
             <div id="labContainer" class="tabContainer labColorH"></div>
             <div id="heroContainer" class="tabContainer heroColorH"></div>
-            <div id="upgradeContainer" class="tabContainer upgradeColorH"></div>
         </div>
 
 
