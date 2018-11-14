@@ -126,6 +126,7 @@ function translateNextToCurrent(action, name) {
     let actionData = getActionByVarName(action.varName, name);
     action.cost = actionData.cost;
     action.buy = actionData.buy;
+    action.unit = actionData.unit;
     action.visible = actionData.visible;
     action.unlocked = actionData.unlocked;
     action.canBuy = function() {

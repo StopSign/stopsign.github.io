@@ -1,6 +1,7 @@
 let view = {
     initialize: function() {
         view.clickable.initial.createCastleIcons();
+        view.clickable.initial.createWarMap();
         prevState.mana = -1; //force redraw
         prevState.gold = -1;
         prevState.wood = -1;
@@ -16,6 +17,7 @@ let view = {
             view.updating.updateLists();
             view.updating.updateResources();
             view.updating.updateCreated();
+            view.updating.updateUnits();
 
             view.updating.saveCurrentState();
         },
@@ -27,6 +29,7 @@ let view = {
             prevState.next = copyArray(actionsList.next);
             prevState.current = copyArray(actionsList.current);
             prevState.created = copyArray(created);
+            prevState.levelData = copyArray(levelData);
         },
         updateResources: function() {
             if(prevState.mana !== mana || prevState.maxMana !== maxMana) {
@@ -95,6 +98,59 @@ let view = {
                     document.getElementById(property+"Num").style.opacity = created.castle[property] === 0 ? "0" : "1";
                 }
             }
+        },
+        updateUnits: function() {
+            let prevLevelDatum = prevState.levelData;
+
+            //update castle
+            if(!prevLevelDatum || JSON.stringify(prevLevelDatum.home) !== JSON.stringify(levelData.home)) {
+                view.updating.createMapTooltipString("Castle", levelData.home, "homeTooltip");
+            }
+
+            //update dungeons
+            for(let i = 0; i < levelData.dungeons.length; i++) {
+                let dungeon = levelData.dungeons[i];
+                if(!prevLevelDatum || !prevLevelDatum.dungeons || JSON.stringify(prevLevelDatum.dungeons[i]) !== JSON.stringify(dungeon)) {
+                    view.updating.createMapTooltipString("Dungeon "+(i+1), dungeon, "dungeonTooltip"+i);
+                }
+            }
+
+            //update hideouts
+            for(let i = 0; i < levelData.hideouts.length; i++) {
+                let hideout = levelData.hideouts[i];
+                if(!prevLevelDatum || !prevLevelDatum.hideouts || JSON.stringify(prevLevelDatum.hideouts[i]) !== JSON.stringify(hideout)) {
+                    view.updating.createMapTooltipString("Hideout "+(i+1), hideout, "hideoutTooltip"+i);
+                }
+            }
+
+            //TODO update travelling
+        },
+        createMapTooltipString: function(titleName, baseData, elementId) {
+            let tooltipDiv = "<div class='mapTooltipRow'><div class='title'>"+titleName+"</div>";
+            let total = { atk: 0, hp: 0 };
+            for (let property in baseData.units) {
+                if (baseData.units.hasOwnProperty(property)) {
+                    let num = baseData.units[property];
+                    let stats = getStatsOfUnit(property);
+                    total.atk += stats.atk * num;
+                    total.hp += stats.hp * num;
+                    tooltipDiv += "<div style='width:20px'><div class='bold'>" + num + "</div></div>" +
+                        "<div style='width:80px'>" + capitalizeFirst(property) + "</div>" +
+                        "<div style='width:60px'>Atk: <div class='bold'>"+ stats.atk + "</div></div>" +
+                        "<div style='width:60px'>HP: <div class='bold'>"+ stats.hp + "</div></div><br>"
+                }
+            }
+            tooltipDiv += "<div style='width:100px'>Total</div>" +
+                "<div style='width:60px'>Atk: <div class='bold'>"+ total.atk + "</div></div>" +
+                "<div style='width:60px'>HP: <div class='bold'>"+ total.hp + "</div></div><br>";
+            if(baseData.reward) {
+                for(let i = 0; i < baseData.reward.length; i++) {
+                    let nextReward = baseData.reward[i];
+                    tooltipDiv += "Gain " + nextReward.amount + " " + nextReward.type + " when cleared. ";
+                }
+            }
+            tooltipDiv += "</div>"; //closing mapTooltipRow
+            document.getElementById(elementId).innerHTML = tooltipDiv;
         }
     },
     actionList: {
@@ -275,8 +331,48 @@ let view = {
                         '<div id="'+action.varName+'Num" class="createdNum abs" style="left:'+(action.xPos+10)+'px;top:'+(action.yPos+43)+'px;"></div>';
                 });
                 container.innerHTML = allDivs;
+            },
+            createWarMap: function() {
+                levelData = createLevel(0);
+                let allDivs = "";
+                let homeCoords = translateToWarMapCoords(levelData.home.coords);
+
+                //create castle
+                allDivs +=
+                    '<div class="clickable showthat" style="position:absolute;left:'+homeCoords.x+'px;top:'+homeCoords.y+'px;">' +
+                        '<img src="img/castle.svg" class="superLargeIcon imageDragFix">' +
+                        '<div class="showthis" id="homeTooltip">King</div>' +
+                    '</div>';
+
+                //create dungeons
+                for(let i = 0; i < levelData.dungeons.length; i++) {
+                    let dungeon = levelData.dungeons[i];
+                    let coords = translateToWarMapCoords(dungeon.coords);
+                    allDivs +=
+                        '<div class="clickable showthat" style="position:absolute;left:'+coords.x+'px;top:'+coords.y+'px;">' +
+                            '<img src="img/dungeon.svg" class="superLargeIcon imageDragFix">' +
+                            '<div class="showthis" id="dungeonTooltip'+i+'"></div>' +
+                        '</div>';
+                }
+
+                //create hideouts
+                for(let i = 0; i < levelData.hideouts.length; i++) {
+                    let hideout = levelData.hideouts[i];
+                    let coords = translateToWarMapCoords(hideout.coords);
+                    allDivs +=
+                        '<div class="clickable showthat" style="position:absolute;left:'+coords.x+'px;top:'+coords.y+'px;">' +
+                            '<img src="img/hideout.svg" class="superLargeIcon imageDragFix">' +
+                            '<div class="showthis" id="hideoutTooltip'+i+'"></div>' +
+                        '</div>';
+                }
+
+                document.getElementById("warMapActions").innerHTML = allDivs;
             }
         }
     }
-
 };
+
+//x,y 0-100, translated to x:10-550 and y:15-300
+function translateToWarMapCoords(coords) {
+    return {x:10+(coords.x / 100 * 540), y:15+(coords.y / 100 * 285)};
+}

@@ -32,6 +32,9 @@ function round(num) {
 }
 
 function copyArray(arr) {
+    if(arr === undefined) {
+        return arr;
+    }
     return JSON.parse(JSON.stringify(arr));
 }
 

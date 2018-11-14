@@ -38,6 +38,7 @@ let created = {};
 window.language = "eng";
 window.addAmount = 1;
 
+let curLevel = 0;
 let mana = 1200;
 let initialMana = 1200;
 let maxMana = 1200;

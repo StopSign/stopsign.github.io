@@ -42,6 +42,9 @@ function addCastleAction(action) {
     }
     if(!action.buy) {
         action.buy = function() {
+            if(action.unit) {
+                createUnit(action.varName, true, "home");
+            }
             created.castle[action.varName]++;
         }
     }
@@ -158,5 +161,56 @@ addCastleAction({
     ],
     seconds:160,
     xPos:120,
+    yPos:25
+});
+
+addCastleAction({
+    varName:"spearman",
+    name:"Equip Spearman",
+    desc:"The meat of your army, they'll take damage before your other units.",
+    cost: [
+        {
+            resource:"wood",
+            type:"static",
+            starting:200
+        }
+    ],
+    unit:true,
+    seconds:3,
+    xPos:250,
+    yPos:25
+});
+
+addCastleAction({
+    varName:"archer",
+    name:"Train Archer",
+    desc:"Elite archers capable of dealing death to your enemies.",
+    cost: [
+        {
+            resource:"wood",
+            type:"static",
+            starting:1000
+        }
+    ],
+    unit:true,
+    seconds:9,
+    xPos:300,
+    yPos:25
+});
+
+addCastleAction({
+    varName:"catapult",
+    name:"Build Catapult",
+    desc:"For when you have a lot of enemies to kill and a lot of resoures to throw at the problem.",
+    cost: [
+        {
+            resource:"wood",
+            type:"static",
+            starting:5000
+        }
+    ],
+    unit:true,
+    seconds:27,
+    xPos:350,
     yPos:25
 });
