@@ -10,8 +10,9 @@ let actions = {
                 action.loopsLeft++;
                 action.manaUsed = 0;
             }
-            while(action && (action.loopsLeft === 0 || !action.canBuy())) { //action exists but is invalid, slide
+            while(action && (action.loopsLeft === 0 || (action.manaUsed === 0 && !action.canBuy()))) { //action exists but is invalid, slide
                 this.validActions[i]++;
+                console.log(action.varName, gold, action.manaUsed, action.canBuy(), action.costgold);
                 if(!action.canBuy() && action.loopsLeft !== 0) { //failed to buy
                     action.loops -= action.loopsLeft;
                     action.loopsLeft = 0;
@@ -30,6 +31,9 @@ let actions = {
         for(let i = 0; i < actionsList.nextNames.length; i++) {
             let name = actionsList.nextNames[i];
             let action = actionsList.current[name][this.validActions[i]];
+            if(action.manaUsed === 0 && action.buy) {
+                action.spend(); //spend as soon as action starts
+            }
             action.manaUsed++;
             if(action.manaUsed / 10 >= action.costseconds) {
                 action.loopsLeft--;
@@ -37,10 +41,10 @@ let actions = {
                     action.manaUsed = 0;
                 }
                 if(action.buy) {
-                    action.spend();
                     action.buy();
+                    adjustCosts(i);
                 }
-                if(action.varName !== "sleep" && !actionsList.current[name][this.validActions[i]+1]) { //no next action after non-sleep
+                if(action.varName !== "sleep" && action.loopsLeft === 0 && !actionsList.current[name][this.validActions[i]+1]) { //no next action after non-sleep
                     shouldPause = true;
                 }
             }
@@ -80,15 +84,24 @@ let actions = {
             currentList.splice(nextList.length, currentList.length - nextList.length);
         }
 
-        let numOnList = {};
-        for(let i = 0; i < currentList.length; i++) {
-            let action = currentList[i];
-            let numPrior = numOnList[action.varName] ? numOnList[action.varName] : 0;
-            setCosts(action, numPrior);
-            numOnList[action.varName] = numPrior + action.loops;
-        }
+        adjustCosts(num);
     }
 };
+
+function adjustCosts(num) {
+    let name = actionsList.nextNames[num];
+    let currentList = actionsList.current[name];
+    let numOnList = {};
+    for(let i = 0; i < currentList.length; i++) {
+        let action = currentList[i];
+        let numPrior = (numOnList[action.varName] ? numOnList[action.varName] : 0);
+        if(actions.validActions[num] === i && action.loopsLeft > 0) {
+            numPrior += action.loops - action.loopsLeft; //also count completed loops in current action
+        }
+        setCosts(action, numPrior);
+        numOnList[action.varName] = numPrior + action.loops;
+    }
+}
 
 function setCosts(action, numPrior) {
     action.costseconds = 0;

@@ -20,35 +20,16 @@
 </head>
 <body id="theBody" style="min-width:1210px">
 
-    <div style="width:1210px">
-
+    <div style="width:854px">
         <div style="width:600px;vertical-align:top;">
-            <div id="warRoom" style="width:100%;height:200px;position:relative;margin-bottom:5px;" class="unitsColorH">
+            <div id="warRoom" style="width:100%;height:355px;position:relative;" class="unitsColorH">
                 <div class="title">War Map</div>
-                <div class="clickable" style="position:absolute;top:70px;left:5px;">
+                <div class="clickable" style="position:absolute;bottom:10px;left:10px;">
                     <img src='img/castle.svg' class='superLargeIcon imageDragFix'>
                 </div>
                 <div id="warRoomActions"></div>
             </div>
 
-            <div id="castle" style="width:100%;height:150px;position:relative;" class="castleColorH">
-                <div class="title">Castle</div>
-                <div id="castleActions" class="abs" style="left:0;top:0;"></div>
-            </div>
-        </div>
-
-        <div style="width:350px;height:318px;vertical-align:top;">
-            <div class="title">Action Lists</div>
-            <div style="width:100%;height:20px;" class="large bold">
-                <div id="kingListSelector" class="listSelector kingColor" onclick="switchListTab(0)">King</div>
-                <div id="castleListSelector" class="listSelector castleColor" onclick="switchListTab(1)">Castle</div>
-                <div id="unitsListSelector" class="listSelector unitsColor" onclick="switchListTab(2)">Units</div>
-                <div id="labListSelector" class="listSelector labColor" onclick="switchListTab(3)">Lab</div>
-            </div>
-            <div id="kingListContainer" class="listContainer"><div id="kingCurActions" class="actionListLeft kingColorD"></div><div id="kingNextActions" class="actionListRight kingColorH"></div></div>
-            <div id="castleListContainer" class="listContainer" style="display:block;"><div id="castleCurActions" class="actionListLeft castleColorD"></div><div id="castleNextActions" class="actionListRight castleColorH"></div></div>
-            <div id="unitsListContainer" class="listContainer"><div id="unitsCurActions" class="actionListLeft unitsColorD"></div><div id="unitsNextActions" class="actionListRight unitsColorH"></div></div>
-            <div id="labListContainer" class="listContainer"><div id="labCurActions" class="actionListLeft labColorD"></div><div id="labNextActions" class="actionListRight labColorH"></div></div>
         </div>
 
         <div style="width:250px;height:355px;vertical-align:top;position:relative" class="extrasColor">
@@ -58,9 +39,16 @@
             <div id="actionInfoDivUnits" style="display:none;width:100%"></div>
             <div id="actionInfoDivLab" style="display:none;width:100%"></div>
             <div id="optionsDiv" style="position:relative;height:100%;">
+                <div style="width:280px;vertical-align:top">
+                    <div onclick='restart()' class='button showthat' style='margin-left:5px'>Restart
+                        <div class='showthis' style='color:black;width:230px;'>Restarts the clock and your lists</div>
+                    </div>
+                    <div id='pausePlay' onclick='pauseGame()' class='button'>Play</div><br>
+                    <div class='control'><input type='checkbox' id='pauseBeforeRestart'><label for='pauseBeforeRestart'> Pause before restart</label></div>
+                </div><br>
                 <input type="checkbox" id="pauseListEmpty" checked>
                 <label for="pauseListEmpty">Pause when next list is empty</label>
-                <div class="clickable showthat abs" style="bottom:26px;left:10px;" onclick="addSleepAction(curList)">
+                <div class="clickable showthat abs" style="bottom:26px;right:38px;" onclick="addSleepAction(curList)">
                     <img src='img/sleep.svg' class='superLargeIcon imageDragFix'>
                     <div class="showthis" style="width:250px">
                         <div class="smallTitle">Sleep</div>
@@ -70,16 +58,9 @@
             </div>
         </div>
 
-    </div>
 
-    <div style="width:1210px;margin-top:4px;">
-        <div style="width:280px;vertical-align:top">
-            <div onclick='restart()' class='button showthat' style='margin-left:5px'>Restart
-                <div class='showthis' style='color:black;width:230px;'>Restarts the clock and your lists</div>
-            </div>
-            <div id='pausePlay' onclick='pauseGame()' class='button'>Play</div>
-            <div class='control'><input type='checkbox' id='pauseBeforeRestart'><label for='pauseBeforeRestart'>Pause before restart</label></div>
-        </div><div style="width:280px">
+    <div style="margin-top:4px;width:100%">
+        <div style="width:280px">
             <div class="showthat" style="width:85px">
                 <img src='img/gold.svg' class='largeIcon imageDragFix' style="vertical-align:bottom">
                 <div id="gold"></div>
@@ -95,29 +76,46 @@
                 <div id="mana"></div>
                 <div class="showthis">Mana</div>
             </div>
-        </div><div style="width:650px;height:10px;background-color:#dbdff3;margin-top:6px;">
+        </div><div style="width:565px;height:10px;background-color:#dbdff3;margin-top:6px;">
             <div id="manaBar" style="width:80%;height:100%;background-color:rgb(130, 147, 255);vertical-align:top;"></div>
         </div>
     </div>
 
-    <div style="width:1210px;background-color:#c4c9e6;height:204px;margin-top:4px;">
-        <div style="width:200px;vertical-align:top;" class="large bold">
+    <div style="width:100%;background-color:#c4c9e6;height:204px;margin-top:4px;">
+        <div style="width:160px;vertical-align:top;" class="large bold">
             <div id="kingSelector" class="tabSelector kingColor" onclick="switchActionsTab(0)">King</div>
             <div id="castleSelector" class="tabSelector castleColor" onclick="switchActionsTab(1)">Castle</div>
             <div id="unitsSelector" class="tabSelector unitsColor" onclick="switchActionsTab(2)">Units</div>
             <div id="labSelector" class="tabSelector labColor" onclick="switchActionsTab(3)">Laboratory</div>
             <div id="heroSelector" class="tabSelector heroColor" onclick="switchActionsTab(4)">Heroes</div>
-        </div><div style="width:1010px;height:100%;vertical-align:top;">
-            <div id="kingContainer" class="tabContainer kingColorH" style="display:block;"></div>
-            <div id="castleContainer" class="tabContainer castleColorH"></div>
+        </div><div style="width:694px;height:100%;vertical-align:top;">
+            <div id="kingContainer" class="tabContainer kingColorH"></div>
+            <div id="castleContainer" class="tabContainer castleColorH" style="display:block;">
+                <div style="width:300px;height:100%;position:relative;">
+                    <div class="title">Income</div>
+                    <div id="castleActions" class="abs" style="left:0;top:0;"></div>
+                </div>
+            </div>
             <div id="unitsContainer" class="tabContainer unitsColorH"></div>
             <div id="labContainer" class="tabContainer labColorH"></div>
             <div id="heroContainer" class="tabContainer heroColorH"></div>
         </div>
-
-
+    </div>
     </div>
 
+    <div style="width:350px;height:550px;vertical-align:top;">
+        <div class="title">Action Lists</div>
+        <div style="width:100%;height:20px;" class="large bold">
+            <div id="kingListSelector" class="listSelector kingColor" onclick="switchListTab(0)">King</div>
+            <div id="castleListSelector" class="listSelector castleColor" onclick="switchListTab(1)">Castle</div>
+            <div id="unitsListSelector" class="listSelector unitsColor" onclick="switchListTab(2)">Units</div>
+            <div id="labListSelector" class="listSelector labColor" onclick="switchListTab(3)">Lab</div>
+        </div>
+        <div id="kingListContainer" class="listContainer"><div id="kingCurActions" class="actionListLeft kingColorD"></div><div id="kingNextActions" class="actionListRight kingColorH"></div></div>
+        <div id="castleListContainer" class="listContainer" style="display:block;"><div id="castleCurActions" class="actionListLeft castleColorD"></div><div id="castleNextActions" class="actionListRight castleColorH"></div></div>
+        <div id="unitsListContainer" class="listContainer"><div id="unitsCurActions" class="actionListLeft unitsColorD"></div><div id="unitsNextActions" class="actionListRight unitsColorH"></div></div>
+        <div id="labListContainer" class="listContainer"><div id="labCurActions" class="actionListLeft labColorD"></div><div id="labNextActions" class="actionListRight labColorH"></div></div>
+    </div>
 
 
 

@@ -73,7 +73,7 @@ addCastleAction({
     ],
     seconds:10,
     xPos:20,
-    yPos:90
+    yPos:110
 });
 
 addCastleAction({
@@ -89,8 +89,8 @@ addCastleAction({
         }
     ],
     seconds:40,
-    xPos:80,
-    yPos:90
+    xPos:70,
+    yPos:110
 });
 
 addCastleAction({
@@ -106,8 +106,8 @@ addCastleAction({
         }
     ],
     seconds:160,
-    xPos:140,
-    yPos:90
+    xPos:120,
+    yPos:110
 });
 
 addCastleAction({
@@ -124,7 +124,7 @@ addCastleAction({
     ],
     seconds:10,
     xPos:20,
-    yPos:15
+    yPos:25
 });
 
 addCastleAction({
@@ -140,8 +140,8 @@ addCastleAction({
         }
     ],
     seconds:40,
-    xPos:80,
-    yPos:15
+    xPos:70,
+    yPos:25
 });
 
 addCastleAction({
@@ -157,6 +157,6 @@ addCastleAction({
         }
     ],
     seconds:160,
-    xPos:140,
-    yPos:15
+    xPos:120,
+    yPos:25
 });
