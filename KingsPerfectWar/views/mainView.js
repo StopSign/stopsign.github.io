@@ -158,7 +158,6 @@ let view = {
             view.actionList.showInfoDiv(0, name, false);
         },
         showInfoDiv: function(i, name, isHover) {
-            console.log(i, name, isHover);
             const div = document.getElementById("action"+i+name+"Selected");
             if(div) {
                 div.style.opacity = isHover ? "1" : "0";
