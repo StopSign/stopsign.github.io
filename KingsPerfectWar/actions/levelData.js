@@ -25,7 +25,7 @@ function createLevel(num) {
             }
         }
     }
-    warMap.units.checkUnitsToJoinBase();
+    warMap.units.checkUnitsToChangeBase();
 }
 
 levelInitials = [{

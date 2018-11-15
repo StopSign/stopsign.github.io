@@ -1,10 +1,9 @@
 let warMapActions = [];
 let warMap = {
     tick: function() {
-        warMap.units.checkUnitsToJoinBase();
+        warMap.units.checkUnitsToChangeBase();
         //TODO check all combat
 
-        //TODO move all travelling units
         levelData.traveling.forEach(function(unit) {
             let target = baseNameToObj(unit.target);
             let newCoords = moveToTarget(unit.coords.x, unit.coords.y, target.coords.x, target.coords.y, (unit.speed/10));
@@ -143,14 +142,46 @@ let warMap = {
                 }
             })
         },
-        checkUnitsToJoinBase: function() {
+        checkUnitsToChangeBase: function() {
+            //join base
             for(let i = levelData.traveling.length - 1; i >= 0; i--) {
                 let unit = levelData.traveling[i];
                 let target = baseNameToObj(unit.target);
                 if (withinDistance(target.coords.x, target.coords.y, unit.coords.x, unit.coords.y, 4)) {
                     levelData.traveling.splice(i, 1);
+                    unit.coords.x = target.coords.x;
+                    unit.coords.y = target.coords.y;
                     target.units.push(unit);
                     warMap.units.checkUnitsForCombineInBase(target);
+                }
+            }
+
+            //leave base
+            for(let i = levelData.home.units.length - 1; i >= 0; i--) {
+                let unit = levelData.home.units[i];
+                if(JSON.stringify(baseNameToObj(unit.target)) !== JSON.stringify(levelData.home)) { //target is not where it sits
+                    levelData.traveling.push(unit);
+                    levelData.home.units.splice(i, 1);
+                }
+            }
+            for(let i = 0; i < levelData.dungeons.length; i++) {
+                let dungeon = levelData.dungeons[i];
+                for (let j = dungeon.units.length - 1; j >= 0; j--) {
+                    let unit = dungeon.units[j];
+                    if (JSON.stringify(baseNameToObj(unit.target)) !== JSON.stringify(dungeon)) { //target is not where it sits
+                        levelData.traveling.push(unit);
+                        dungeon.units.splice(j, 1);
+                    }
+                }
+            }
+            for(let i = 0; i < levelData.hideouts.length; i++) {
+                let hideout = levelData.hideouts[i];
+                for (let j = hideout.units.length - 1; j >= 0; j--) {
+                    let unit = hideout.units[j];
+                    if (JSON.stringify(baseNameToObj(unit.target)) !== JSON.stringify(hideout)) { //target is not where it sits
+                        levelData.traveling.push(unit);
+                        hideout.units.splice(j, 1);
+                    }
                 }
             }
         },
