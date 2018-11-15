@@ -1,9 +1,31 @@
 let levelData = {};
 
 function createLevel(num) {
-    let data = copyArray(levelInitials[num]);
-    data.traveling = [];
-    return data;
+    let curLevel = levelInitials[num];
+    levelData = copyArray(curLevel);
+    levelData.home.units = [];
+    levelData.traveling = [];
+    //turn unit mentions into actual units
+    warMap.units.createUnit("king", true, "home", 1);
+    for(let i = 0; i < curLevel.dungeons.length; i++) {
+        levelData.dungeons[i].units = [];
+        let dungeon = curLevel.dungeons[i];
+        for (let property in dungeon.units) {
+            if (dungeon.units.hasOwnProperty(property)) {
+                warMap.units.createUnit(property, false, "dungeon_"+i, dungeon.units[property]);
+            }
+        }
+    }
+    for(let i = 0; i < curLevel.hideouts.length; i++) {
+        levelData.hideouts[i].units = [];
+        let hideout = curLevel.dungeons[i];
+        for (let property in hideout.units) {
+            if (hideout.units.hasOwnProperty(property)) {
+                warMap.units.createUnit(property, false, "hideout_"+i, hideout.units[property]);
+            }
+        }
+    }
+    warMap.units.checkUnitsToJoinBase()
 }
 
 levelInitials = [{

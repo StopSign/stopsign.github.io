@@ -146,7 +146,7 @@ function getActionByVarName(varName, list) {
     if(list === "castle") {
         return getCastleActionByVarName(varName);
     } else if(list === "units") {
-        return getUnitActionByVarName(varName);
+        return warMap.actions.getWarMapActionByVarName(varName);
     }
     return null;
 }

@@ -43,7 +43,7 @@ function addCastleAction(action) {
     if(!action.buy) {
         action.buy = function() {
             if(action.unit) {
-                createUnit(action.varName, true, "home");
+                warMap.units.createUnit(action.varName, true, "home");
             }
             created.castle[action.varName]++;
         }
