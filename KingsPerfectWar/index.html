@@ -22,8 +22,15 @@
 
     <div style="width:854px">
         <div style="width:600px;vertical-align:top;">
-            <div id="warMap" style="width:100%;height:355px;position:relative;" class="unitsColorH">
-                <div class="title">War Map</div>
+            <div id="warMap" style="width:100%;height:355px;position:relative;text-align:center;" class="unitsColorH">
+                <div class="showthat">
+                    <div class="title">War Map</div>
+                    <div class="showthis">
+                        Select unit types and click a place to queue an action to send those units to that place.<br>
+                        Map is 190 x 100. Coordinates of each place are in the top right of their tooltip.<br>
+                        Units move their speed in distance every second.
+                    </div>
+                </div>
                 <div style="position:absolute;border:1px solid;bottom:2px;right:2px">
                     <div id="kingToMove" class="clickable showthat" style="border:2px solid rgba(255, 255, 0, 0)" onclick="switchMapMoveUnits('king')">
                         <img src='img/king.svg' class='largeIcon imageDragFix'>

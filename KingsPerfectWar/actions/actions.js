@@ -1,4 +1,5 @@
 let actions = {
+    validActions: [0, 0, 0, 0],
     tick: function() {
         //get a list of valid actions, moving to next if cost fails
         for(let i = 0; i < actionsList.nextNames.length; i++) {

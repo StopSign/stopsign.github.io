@@ -2,9 +2,6 @@ let view = {
     initialize: function() {
         view.clickable.initial.createCastleIcons();
         view.clickable.initial.createWarMap();
-        prevState.mana = -1; //force redraw
-        prevState.gold = -1;
-        prevState.wood = -1;
         this.actionInfoDiv = {"king":document.getElementById("actionInfoDivKing"),
             "castle":document.getElementById("actionInfoDivCastle"),
             "units":document.getElementById("actionInfoDivUnits"),
@@ -46,7 +43,7 @@ let view = {
         updateLists: function() {
             for (let i = 0; i < actionsList.nextNames.length; i++) {
                 let name = actionsList.nextNames[i];
-                if(prevState.next[name].length !== actionsList.next[name].length) {
+                if(!prevState.next || prevState.next[name].length !== actionsList.next[name].length) {
                     view.actionList.createNextList(i);
                     continue;
                 }
@@ -64,7 +61,7 @@ let view = {
             }
             for (let i = 0; i < actionsList.nextNames.length; i++) {
                 let name = actionsList.nextNames[i];
-                if(prevState.current[name].length !== actionsList.current[name].length) {
+                if(!prevState.current || prevState.current[name].length !== actionsList.current[name].length) {
                     view.actionList.createCurrentList(i);
                     continue;
                 }
@@ -94,6 +91,9 @@ let view = {
             }
         },
         updateCreated: function() {
+            if(!prevState.created) {
+                return;
+            }
             for (let property in created.castle) {
                 if (created.castle.hasOwnProperty(property) &&
                     JSON.stringify(created.castle[property]) !== JSON.stringify(prevState.created.castle[property])) {
@@ -354,7 +354,8 @@ let view = {
     },
     helpers: {
         createMapTooltipString: function(titleName, baseData, elementId) {
-            let tooltipDiv = "<div class='mapTooltipRow'><div class='title'>"+titleName+"</div>";
+            let tooltipDiv = "<div class='mapTooltipRow'><div class='title'>"+titleName+"</div>"
+                + "<div style='opacity:.7;position:absolute;top:0;right:0'>(" + baseData.coords.x +", "+baseData.coords.y + ")</div>";
             let total = { atk: 0, hp: 0 };
             baseData.units.forEach(function(unit) {
                 let num = unit.amount;
@@ -377,8 +378,8 @@ let view = {
             tooltipDiv += "</div>"; //closing mapTooltipRow
             document.getElementById(elementId).innerHTML = tooltipDiv;
         },
-        translateToWarMapCoords: function(coords) { //x,y 0-100, translated to x:10-550 and y:15-300
-            return {x:10+(coords.x / 100 * 540), y:15+(coords.y / 100 * 285)};
+        translateToWarMapCoords: function(coords) { //x,y 0-190,0-100, translated to x:10-550 and y:15-300
+            return {x:10+(coords.x / 190 * 541), y:15+(coords.y / 100 * 285)};
         },
         getImage: function(action, num) {
             if(num !== 2 || action.varName === "sleep") {

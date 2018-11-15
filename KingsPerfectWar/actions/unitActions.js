@@ -5,6 +5,12 @@ let warMap = {
         //TODO check all combat
 
         //TODO move all travelling units
+        levelData.traveling.forEach(function(unit) {
+            let target = baseNameToObj(unit.target);
+            let newCoords = moveToTarget(unit.coords.x, unit.coords.y, target.coords.x, target.coords.y, (unit.speed/10));
+            unit.coords.x = newCoords.x;
+            unit.coords.y = newCoords.y;
+        });
     },
     actions: {
         createWarMapActions: function() {
@@ -109,25 +115,26 @@ let warMap = {
             }
             unit.isFriendly = isFriendly;
             unit.amount = amount;
-            unit.coords = baseNameToObj(startingLoc).coords;
+            unit.coords = copyArray(baseNameToObj(startingLoc).coords);
             unit.target = startingLoc;
             let stats = warMap.units.getStatsOfUnit(unit.varName);
             unit.atk = stats.atk;
             unit.hp = stats.hp;
+            unit.speed = 2;
             levelData.traveling.push(unit);
         },
         getAllUnits: function() {
             let allUnits = levelData.home.units;
             for(let i = 0; i < levelData.dungeons.length; i++) {
-                allUnits.concat(levelData.dungeons[i].units);
+                allUnits = allUnits.concat(levelData.dungeons[i].units);
             }
             for(let i = 0; i < levelData.hideouts.length; i++) {
-                allUnits.concat(levelData.hideouts[i].units);
+                allUnits = allUnits.concat(levelData.hideouts[i].units);
             }
-            allUnits.concat(levelData.traveling);
+            allUnits = allUnits.concat(levelData.traveling);
             return allUnits;
         },
-        setUnitTargets(action) {
+        setUnitTargets: function(action) {
             let target = action.varName;
             warMap.units.getAllUnits().forEach(function(unit) {
                 if(unit.isFriendly && action.unitsToMove[unit.type]) {
@@ -136,13 +143,26 @@ let warMap = {
                 }
             })
         },
-        checkUnitsToJoinBase() {
+        checkUnitsToJoinBase: function() {
             for(let i = levelData.traveling.length - 1; i >= 0; i--) {
                 let unit = levelData.traveling[i];
                 let target = baseNameToObj(unit.target);
-                if (withinDistance(target.coords.x, target.coords.y, unit.coords.x, unit.coords.y, 2)) {
+                if (withinDistance(target.coords.x, target.coords.y, unit.coords.x, unit.coords.y, 4)) {
                     levelData.traveling.splice(i, 1);
                     target.units.push(unit);
+                    warMap.units.checkUnitsForCombineInBase(target);
+                }
+            }
+        },
+        checkUnitsForCombineInBase: function(base) {
+            for(let i = base.units.length -1; i >= 0; i--) {
+                let unit1 = base.units[i];
+                for(let j = 0; j < i; j++) {
+                    let unit2 = base.units[j];
+                    if(unit1.varName === unit2.varName && unit1.hp === unit2.hp) {
+                        unit2.amount += unit1.amount;
+                        base.units.splice(i, 1);
+                    }
                 }
             }
         }

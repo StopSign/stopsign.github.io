@@ -61,7 +61,6 @@ function loadDefaults() {
 }
 
 function load() {
-    view.updating.saveCurrentState();
     loadDefaults();
     let toLoad = {};
     if(window.localStorage[saveName]) { //has a save file

@@ -25,7 +25,7 @@ function createLevel(num) {
             }
         }
     }
-    warMap.units.checkUnitsToJoinBase()
+    warMap.units.checkUnitsToJoinBase();
 }
 
 levelInitials = [{
@@ -40,7 +40,7 @@ levelInitials = [{
                 type:"mana",
                 amount:600
             }],
-            coords:{x:15, y:50},
+            coords:{x:30, y:50},
         },
         {
             units: { goblin:20, hobgoblin:2 },
@@ -48,7 +48,7 @@ levelInitials = [{
                 type:"mana",
                 amount:600
             }],
-            coords:{x:55, y:90},
+            coords:{x:110, y:90},
         },
         {
             units: { goblin:10, hobgoblin:10 },
@@ -56,7 +56,7 @@ levelInitials = [{
                 type:"mana",
                 amount:1200
             }],
-            coords:{x:85, y:60},
+            coords:{x:165, y:60},
         }
     ],
     hideouts:[
@@ -67,7 +67,7 @@ levelInitials = [{
                 type:"gold",
                 amount:2000
             }],
-            coords:{x:35, y:20},
+            coords:{x:70, y:20},
         },
         {
             units: { thug:30, brigand:5, bandit:2 },
@@ -76,7 +76,7 @@ levelInitials = [{
                 type:"gold",
                 amount:5000
             }],
-            coords:{x:100, y:0},
+            coords:{x:190, y:0},
         }
     ]
 }];

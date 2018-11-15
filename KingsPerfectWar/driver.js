@@ -37,10 +37,11 @@ function tick() {
 
         mana--;
 
-        warMap.tick(); //combat
         castle.tick(); //resources
         //lab.tick(); //buffs
-        actions.tick(); //actions tick last
+        actions.tick(); //actions
+        warMap.tick(); //combat
+
 
         if(mana === 0) {
             restart();
@@ -80,4 +81,6 @@ function restart() {
         }
     }
     actions.restart();
+    view.clickable.initial.createWarMap();
+    prevState = {};
 }

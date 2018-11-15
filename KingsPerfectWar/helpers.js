@@ -46,6 +46,20 @@ function getDistance(x1, y1, x2, y2) {
     return Math.sqrt(Math.pow(Math.abs(x1-x2), 2) + Math.pow(Math.abs(y1-y2), 2));
 }
 
+//x2, y2 is target
+function moveToTarget(x1, y1, x2, y2, magnitude) {
+    let extraTurn = 0;
+    let firstVC = y2 - y1;
+    let secondVC = x2 - x1;
+    if((firstVC >= 0 && secondVC < 0) || (firstVC < 0 && secondVC < 0)) {
+        extraTurn = Math.PI;
+    }
+    let direction = Math.atan(firstVC/secondVC)+extraTurn; //(y2-y1)/(x2-x1)
+    let newX = x1 + magnitude * Math.cos(direction); //||v||cos(theta)
+    let newY = y1 + magnitude * Math.sin(direction);
+    return { x:newX, y:newY };
+}
+
 function intToStringNegative(value, amount) {
     let isPositive = 1;
     if(value < 0) {
