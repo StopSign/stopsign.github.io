@@ -290,11 +290,11 @@ input {
     text-align:center;
     margin-top:-2px;
     padding:4px 0;
-    width:84px;
+    width:91px;
     position:relative;
 }
 .listTextInput {
-    width:30px;
+    width:40px;
     height:9px;
 }
 
@@ -314,10 +314,10 @@ input {
     text-align:left;
 }
 .nextActionContainer {
-    width:188px;
+    width:220px;
 }
 .curActionContainer {
-    width:102px;
+    width:108px;
 }
 
 .curActionBar {

@@ -81,6 +81,9 @@ let view = {
                         document.getElementById("action"+j+name+"Bar").style.width = 100 * curAction.manaUsed / (curAction.costseconds * 10) + "%";
                         document.getElementById("action"+j+name+"LoopsLeft").innerHTML = curAction.loopsLeft;
                         document.getElementById("action"+j+name+"Loops").innerHTML = curAction.loops;
+                        if(curList === i && currentlyHovering === j) { //only update last hovered live
+                            document.getElementById("action"+j+name+"TimeNeeded").innerHTML = intToString((curAction.costseconds*10 - curAction.manaUsed)/10, 2);
+                        }
                     }
                 }
                 let currentAction = actionsList.current[name][actions.validActions[i]];
@@ -165,10 +168,10 @@ let view = {
             for (let i = 0; i < theList.length; i++) {
                 let action = theList[i];
                 let capButton = "";
-
+                let image = getImage(action.varName, num);
                 totalDivText +=
                     "<div id='nextActionContainer" + i + name + "' class='nextActionContainer small' ondragover='handleDragOver(event)' ondrop='handleDragDrop(event, "+num+")' ondragstart='handleDragStart(event, \""+name+"\")' ondragend='draggedUndecorate(" + i + ", \""+name+"\")' ondragenter='dragOverDecorate(" + i +", \""+name+"\")' ondragleave='dragExitUndecorate("+i+", \""+name+"\")' draggable='true' data-index='"+i+"'>" +
-                        "<img src='img/" + action.varName + ".svg' class='smallIcon imageDragFix' style='margin-left:5px'> x " +
+                        image + " x " +
                         "<input id='loopInput" + i + name + "' type='text' class='listTextInput' value='"+action.loops+"' onchange='setLoop(" + i + ","+num+")' onclick='this.select();'>" +
                         "<div style='float:right;margin-top:4px;'>" +
                             capButton +
@@ -195,11 +198,12 @@ let view = {
             for(let i = 0; i < theList.length; i++) {
                 let action = theList[i];
                 let width = 100 * action.manaUsed / (action.costseconds * 10) + "%";
+                let image = getImage(action.varName, num);
                 totalDivText +=
                     "<div class='curActionContainer small' id='curAction"+i+name+"' onmouseover='view.actionList.showInfoDiv("+i+", \""+name+"\", true)' onmouseleave='view.actionList.showInfoDiv("+i+", \""+name+"\",false)'>" +
                         "<div class='curActionBar' style='width:"+width+"' id='action"+i+name+"Bar'></div>" +
                         "<div class='actionSelectedIndicator' id='action"+i+name+"Selected'></div>" +
-                        "<img src='img/"+action.varName+".svg' class='smallIcon' style='margin-left:5px'> x " +
+                        image + " x " +
                         "<div id='action"+i+name+"LoopsLeft' style='margin-left:3px'>"+ action.loopsLeft+"</div>(" + "<div id='action"+i+name+"Loops'>" + action.loops + "</div>" + ")" +
                     "</div>";
             }
@@ -213,13 +217,13 @@ let view = {
                 totalDivText +=
                     "<div id='actionTooltip"+i+name+"' style='display:none;padding-left:10px;width:90%'>" +
                         "<div style='text-align:center;width:100%'>"+getActionByVarName(action.varName, name).name+"</div><br><br>" +
-                        "<div class='bold'>Next Seconds Needed</div> <div id='action"+i+name+"TimeNeeded'></div><br>" +
+                        "<div class='bold'>Seconds Needed</div> <div id='action"+i+name+"TimeNeeded'></div><br>" +
                         "<div class='bold'>Next Mana Cost</div> <div id='action"+i+name+"ManaCost'></div><br>" +
-                        "<div class='bold'>Mana Remaining</div> <div id='action"+i+name+"ManaRemaining'></div><br>" +
+                        // "<div class='bold'>Mana Remaining</div> <div id='action"+i+name+"ManaRemaining'></div><br>" +
                         "<div class='bold'>Next Gold Cost</div> <div id='action"+i+name+"GoldCost'></div><br>" +
-                        "<div class='bold'>Gold Remaining</div> <div id='action"+i+name+"GoldRemaining'></div><br>" +
+                        // "<div class='bold'>Gold Remaining</div> <div id='action"+i+name+"GoldRemaining'></div><br>" +
                         "<div class='bold'>Next Wood Cost</div> <div id='action"+i+name+"WoodCost'></div><br>" +
-                        "<div class='bold'>Wood Remaining</div> <div id='action"+i+name+"WoodRemaining'></div><br><br>" +
+                        // "<div class='bold'>Wood Remaining</div> <div id='action"+i+name+"WoodRemaining'></div><br><br>" +
                         "<div id='action"+i+name+"HasFailed' style='display:none'>" +
                             "<div class='bold'>Times Failed</div> <div id='action"+i+name+"Failed'>0</div><br>" +
                             "<div class='bold'>Error</div> <div id='action"+i+name+"Error'></div>" +
@@ -232,14 +236,16 @@ let view = {
         },
         showInfoDiv: function(i, name, isHover) {
             const div = document.getElementById("action"+i+name+"Selected");
+            currentlyHovering = i;
             if(div) {
                 div.style.opacity = isHover ? "1" : "0";
                 document.getElementById("actionTooltip"+i+name).style.display = isHover ? "inline-block" : "none";
                 if(isHover) {
-                    document.getElementById("action"+i+name+"GoldCost").innerHTML = actionsList.current[name][i].costgold+"";
-                    document.getElementById("action"+i+name+"WoodCost").innerHTML = actionsList.current[name][i].costwood+"";
-                    document.getElementById("action"+i+name+"ManaCost").innerHTML = actionsList.current[name][i].costmana+"";
-                    document.getElementById("action"+i+name+"TimeNeeded").innerHTML = actionsList.current[name][i].costseconds+"";
+                    let curAction = actionsList.current[name][i];
+                    document.getElementById("action"+i+name+"GoldCost").innerHTML = curAction.costgold+"";
+                    document.getElementById("action"+i+name+"WoodCost").innerHTML = curAction.costwood+"";
+                    document.getElementById("action"+i+name+"ManaCost").innerHTML = curAction.costmana+"";
+                    document.getElementById("action"+i+name+"TimeNeeded").innerHTML = intToString((curAction.costseconds*10 - curAction.manaUsed)/10, 2);
                 }
             }
             view.actionInfoDiv[name].style.display = isHover ? "inline-block" : "none";
@@ -258,6 +264,8 @@ let view = {
                 if (document.getElementById("capButton" + count + name)) {
                     document.getElementById("capButton" + count + name).removeAttribute("onclick");
                 }
+                document.getElementById("loopInput" + count + name).removeAttribute("onclick");
+                document.getElementById("loopInput" + count + name).removeAttribute("onchange");
                 document.getElementById("plusButton" + count + name).removeAttribute("onclick");
                 document.getElementById("minusButton" + count + name).removeAttribute("onclick");
                 document.getElementById("splitButton" + count + name).removeAttribute("onclick");
@@ -321,7 +329,7 @@ let view = {
                     let desc = action.desc + "<br>Adds to the Castle queue.<br>" + costDesc;
                     //add a progress bar
                     allDivs +=
-                        '<div id="'+action.varName+'Container" onclick="addActionToList(\''+action.varName+'\', 1)" class="clickable abs showthat" style="left:'+action.xPos+'px;top:'+action.yPos+'px;">' +
+                        '<div id="'+action.varName+'Container" onclick="addActionToList(\''+action.varName+'\', 1, true)" class="clickable abs showthat" style="left:'+action.xPos+'px;top:'+action.yPos+'px;">' +
                             '<img src="img/' + action.varName + '.svg" class="superLargeIcon imageDragFix">' +
                             '<div class="showthis" style="width:250px">' +
                                 '<div class="smallTitle">'+action.name+'</div>' +
@@ -334,12 +342,13 @@ let view = {
             },
             createWarMap: function() {
                 levelData = createLevel(0);
+                createUnitActions(levelData);
                 let allDivs = "";
                 let homeCoords = translateToWarMapCoords(levelData.home.coords);
 
                 //create castle
                 allDivs +=
-                    '<div class="clickable showthat" style="position:absolute;left:'+homeCoords.x+'px;top:'+homeCoords.y+'px;">' +
+                    '<div class="clickable showthat" style="position:absolute;left:'+homeCoords.x+'px;top:'+homeCoords.y+'px;" onclick="addActionToList(\'home\', 2, true)">' +
                         '<img src="img/castle.svg" class="superLargeIcon imageDragFix">' +
                         '<div class="showthis" id="homeTooltip">King</div>' +
                     '</div>';
@@ -349,7 +358,7 @@ let view = {
                     let dungeon = levelData.dungeons[i];
                     let coords = translateToWarMapCoords(dungeon.coords);
                     allDivs +=
-                        '<div class="clickable showthat" style="position:absolute;left:'+coords.x+'px;top:'+coords.y+'px;">' +
+                        '<div class="clickable showthat" style="position:absolute;left:'+coords.x+'px;top:'+coords.y+'px;" onclick="addActionToList(\'dungeon_'+i+'\', 2, true)">' +
                             '<img src="img/dungeon.svg" class="superLargeIcon imageDragFix">' +
                             '<div class="showthis" id="dungeonTooltip'+i+'"></div>' +
                         '</div>';
@@ -360,7 +369,7 @@ let view = {
                     let hideout = levelData.hideouts[i];
                     let coords = translateToWarMapCoords(hideout.coords);
                     allDivs +=
-                        '<div class="clickable showthat" style="position:absolute;left:'+coords.x+'px;top:'+coords.y+'px;">' +
+                        '<div class="clickable showthat" style="position:absolute;left:'+coords.x+'px;top:'+coords.y+'px;" onclick="addActionToList(\'hideout_'+i+'\', 2, true)">' +
                             '<img src="img/hideout.svg" class="superLargeIcon imageDragFix">' +
                             '<div class="showthis" id="hideoutTooltip'+i+'"></div>' +
                         '</div>';
@@ -375,4 +384,25 @@ let view = {
 //x,y 0-100, translated to x:10-550 and y:15-300
 function translateToWarMapCoords(coords) {
     return {x:10+(coords.x / 100 * 540), y:15+(coords.y / 100 * 285)};
+}
+
+function getImage(varName, num) {
+    if(num !== 2 || varName === "sleep") {
+        return "<img src='img/" + varName + ".svg' class='smallIcon' style='margin-left:5px'>";
+    } else {
+        let moveType = "units"; //TODO heroes
+        let images;
+        if(moveType === "units") {
+            images = "<img src='img/army.svg' class='smallIcon' style='margin-left:5px'>";
+        }
+        if(varName === "home") {
+            images += "<img src='img/castle.svg' class='smallIcon' style='margin-left:1px'>";
+        } else {
+            let imageType = varName.split("_")[0];
+            images += "<img src='img/"+imageType+".svg' class='smallIcon' style='margin-left:1px'>";
+            let typeNum = parseInt(varName.split("_")[1]);
+            images += "<div class='bold'>"+(typeNum+1)+"</div>";
+        }
+        return images;
+    }
 }

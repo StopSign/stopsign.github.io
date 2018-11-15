@@ -6,7 +6,6 @@ function createLevel(num) {
     return data;
 }
 
-
 levelInitials = [{
     home: {
         coords: {x: 0, y: 100},

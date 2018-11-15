@@ -169,10 +169,15 @@ addCastleAction({
     name:"Equip Spearman",
     desc:"The meat of your army, they'll take damage before your other units.",
     cost: [
-        {
-            resource:"wood",
+        // {
+        //     resource:"wood",
+        //     type:"static",
+        //     starting:200
+        // }
+        { //debug
+            resource:"gold",
             type:"static",
-            starting:200
+            starting:5
         }
     ],
     unit:true,

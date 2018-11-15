@@ -145,11 +145,16 @@ function getActionByVarName(varName, list) {
     }
     if(list === "castle") {
         return getCastleActionByVarName(varName);
+    } else if(list === "units") {
+        return getUnitActionByVarName(varName);
     }
     return null;
 }
 
-function addActionToList(varName, num) {
+function addActionToList(varName, num, switchLists) {
+    if(switchLists && curList !== num) {
+        switchListTab(num);
+    }
     let listName = actionsList.nextNames[num];
     let action = getActionByVarName(varName, listName);
     if(action && action.visible() && action.unlocked() && (!action.allowed || getNumOnList(action.varName, listName) < action.allowed())) {
