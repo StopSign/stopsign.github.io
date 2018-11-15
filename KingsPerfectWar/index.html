@@ -24,6 +24,27 @@
         <div style="width:600px;vertical-align:top;">
             <div id="warMap" style="width:100%;height:355px;position:relative;" class="unitsColorH">
                 <div class="title">War Map</div>
+                <div style="position:absolute;border:1px solid;bottom:2px;right:2px">
+                    <div id="kingToMove" class="clickable showthat" style="border:2px solid rgba(255, 255, 0, 0)" onclick="switchMapMoveUnits('king')">
+                        <img src='img/king.svg' class='largeIcon imageDragFix'>
+                        <div class="showthis" style="width:250px">
+                            <div class="smallTitle">Select King</div>
+                            <div class="small">Clicking a place with this highlighted queues an action to move the King to that place.</div>
+                        </div>
+                    </div><div id="unitsToMove" class="clickable showthat" style="border:2px solid rgba(255, 255, 0, 1)" onclick="switchMapMoveUnits('units')">
+                        <img src='img/units.svg' class='largeIcon imageDragFix'>
+                        <div class="showthis" style="width:250px">
+                            <div class="smallTitle">Select Units</div>
+                            <div class="small">Clicking a place with this highlighted queues an action to move all Units to that place.</div>
+                        </div>
+                    </div><div id="heroesToMove" class="clickable showthat" style="border:2px solid rgba(255, 255, 0, 0)" onclick="switchMapMoveUnits('heroes')">
+                        <img src='img/heroes.svg' class='largeIcon imageDragFix'>
+                        <div class="showthis" style="width:250px">
+                            <div class="smallTitle">Select Heroes</div>
+                            <div class="small">Clicking a place with this highlighted queues an action to move all Heroes to that place.</div>
+                        </div>
+                    </div>
+                </div>
                 <div id="warMapActions"></div>
             </div>
 

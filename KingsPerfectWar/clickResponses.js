@@ -21,12 +21,13 @@ function switchListTab(num) {
     }
 }
 
-function capAmount(index, townNum) {
-    // let varName = "good"+translateClassNames(actions.next[index].name).varName;
-    // let alreadyExisting = getNumOnList(actions.next[index].name)- actions.next[index].loops;
-    // let newLoops = towns[townNum][varName] - alreadyExisting;
-    // actions.next[index].loops = newLoops < 0 ? 0 : newLoops;
-    // view.updateNextActions();
+function switchMapMoveUnits(name) {
+    unitsSelectedForMove[name] = !unitsSelectedForMove[name];
+    for (let property in unitsSelectedForMove) {
+        if (unitsSelectedForMove.hasOwnProperty(property)) {
+            document.getElementById(property + "ToMove").style.border = "2px solid rgba(255, 255, 0, " + (unitsSelectedForMove[property] ? "1" : "0") + ")";
+        }
+    }
 }
 
 function setLoop(index, num) {
@@ -81,7 +82,7 @@ function split(index, num) {
     let listName = actionsList.nextNames[num];
     let theList = actionsList.next[listName];
     let theObj = theList[index];
-    addActionToNext(theObj.varName, listName, Math.ceil(theObj.loops/2), index);
+    addActionToNext(theObj, listName, Math.ceil(theObj.loops/2), index);
     theObj.loops = Math.floor(theObj.loops/2);
     actions.refresh(num);
 }
@@ -115,11 +116,10 @@ function removeAction(index, num) {
     let theList = actionsList.next[name];
     theList.splice(index, 1);
     if(actions.validActions[num] >= theList.length) { //next must be >= than currently running
-        console.log(actions.validActions[num], theList.length);
         if(theList.length === 0 && actionsList.current[name][0].manaUsed === 0 && actionsList.current[name][0].loopsLeft === actionsList.current[name][0].loops) {
             actionsList.current[name].splice(0, 1);
         } else {
-            addActionToNext("sleep", name, 1);
+            addActionToNext({varName:"sleep"}, name, 1);
         }
     }
     actions.refresh(num);

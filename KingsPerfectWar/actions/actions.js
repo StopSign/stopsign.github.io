@@ -124,9 +124,13 @@ function translateNextToCurrent(action, name) {
     action.manaUsed = 0;
 
     let actionData = getActionByVarName(action.varName, name);
+    action.name = actionData.name;
+    if(actionData.moveAction) {
+        // action.unitsToMove = copyArray(unitsSelectedForMove);
+        action.name = warMap.actions.createNameString(action);
+    }
     action.cost = actionData.cost;
     action.buy = actionData.buy;
-    action.unit = actionData.unit;
     action.visible = actionData.visible;
     action.unlocked = actionData.unlocked;
     action.canBuy = function() {
@@ -155,8 +159,22 @@ function addActionToList(varName, num, switchLists) {
     if(switchLists && curList !== num) {
         switchListTab(num);
     }
+    if(num === 2) {
+        let validAction = false;
+        for (let property in unitsSelectedForMove) {
+            if (unitsSelectedForMove.hasOwnProperty(property)) {
+                validAction = validAction || unitsSelectedForMove[property];
+            }
+        }
+        if(!validAction) {
+            return; //Do nothing if no units are selected for the move action
+        }
+    }
     let listName = actionsList.nextNames[num];
     let action = getActionByVarName(varName, listName);
+    if(action.moveAction) {
+        action.unitsToMove = copyArray(unitsSelectedForMove); //for icons
+    }
     if(action && action.visible() && action.unlocked() && (!action.allowed || getNumOnList(action.varName, listName) < action.allowed())) {
         let addAmount = window.addAmount;
         if(action.allowed) {
@@ -166,15 +184,16 @@ function addActionToList(varName, num, switchLists) {
             }
         }
 
-        addActionToNext(action.varName, listName, addAmount);
+        addActionToNext(action, listName, addAmount);
     }
     actions.refresh(num);
 }
 
-function addActionToNext(varName, listName, addAmount, index) {
+function addActionToNext(action, listName, addAmount, index) {
     let toAdd = {};
     toAdd.loops = addAmount;
-    toAdd.varName = varName;
+    toAdd.varName = action.varName;
+    toAdd.unitsToMove = action.unitsToMove;
 
     if(index !== undefined) {
         actionsList.next[listName].splice(index, 0, toAdd) //insert at index

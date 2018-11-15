@@ -50,6 +50,7 @@ let initialWood = 0;
 
 let curList = 1; //castle
 let currentlyHovering = 0;
+let unitsSelectedForMove = { king:false, units:true, heroes:false };
 
 function clearSave() {
     window.localStorage[saveName] = "";

@@ -141,7 +141,7 @@ let view = {
             for (let i = 0; i < theList.length; i++) {
                 let action = theList[i];
                 let capButton = "";
-                let image = view.helpers.getWarMapImage(action.varName, num);
+                let image = view.helpers.getImage(action, num);
                 totalDivText +=
                     "<div id='nextActionContainer" + i + name + "' class='nextActionContainer small' ondragover='handleDragOver(event)' ondrop='handleDragDrop(event, "+num+")' ondragstart='handleDragStart(event, \""+name+"\")' ondragend='draggedUndecorate(" + i + ", \""+name+"\")' ondragenter='dragOverDecorate(" + i +", \""+name+"\")' ondragleave='dragExitUndecorate("+i+", \""+name+"\")' draggable='true' data-index='"+i+"'>" +
                     image + " x " +
@@ -171,7 +171,7 @@ let view = {
             for(let i = 0; i < theList.length; i++) {
                 let action = theList[i];
                 let width = 100 * action.manaUsed / (action.costseconds * 10) + "%";
-                let image = view.helpers.getWarMapImage(action.varName, num);
+                let image = view.helpers.getImage(action, num);
                 totalDivText +=
                     "<div class='curActionContainer small' id='curAction"+i+name+"' onmouseover='view.actionList.showInfoDiv("+i+", \""+name+"\", true)' onmouseleave='view.actionList.showInfoDiv("+i+", \""+name+"\",false)'>" +
                     "<div class='curActionBar' style='width:"+width+"' id='action"+i+name+"Bar'></div>" +
@@ -189,7 +189,7 @@ let view = {
                 let action = theList[i];
                 totalDivText +=
                     "<div id='actionTooltip"+i+name+"' style='display:none;padding-left:10px;width:90%'>" +
-                    "<div style='text-align:center;width:100%'>"+getActionByVarName(action.varName, name).name+"</div><br><br>" +
+                    "<div style='text-align:center;width:100%'>"+action.name+"</div><br><br>" +
                     "<div class='bold'>Seconds Needed</div> <div id='action"+i+name+"TimeNeeded'></div><br>" +
                     "<div class='bold'>Next Mana Cost</div> <div id='action"+i+name+"ManaCost'></div><br>" +
                     // "<div class='bold'>Mana Remaining</div> <div id='action"+i+name+"ManaRemaining'></div><br>" +
@@ -380,24 +380,30 @@ let view = {
         translateToWarMapCoords: function(coords) { //x,y 0-100, translated to x:10-550 and y:15-300
             return {x:10+(coords.x / 100 * 540), y:15+(coords.y / 100 * 285)};
         },
-        getWarMapImage: function(varName, num) {
-            if(num !== 2 || varName === "sleep") {
-                return "<img src='img/" + varName + ".svg' class='smallIcon' style='margin-left:5px'>";
+        getImage: function(action, num) {
+            if(num !== 2 || action.varName === "sleep") {
+                return "<img src='img/" + action.varName + ".svg' class='smallIcon imageDragFix' style='margin-left:5px'>";
             } else {
-                let moveType = "units"; //TODO heroes
-                let images;
-                if(moveType === "units") {
-                    images = "<img src='img/army.svg' class='smallIcon' style='margin-left:5px'>";
-                }
-                if(varName === "home") {
-                    images += "<img src='img/castle.svg' class='smallIcon' style='margin-left:1px'>";
+                if(action.unitsToMove) {
+                    let images = "";
+                    for (let property in action.unitsToMove) {
+                        if (action.unitsToMove.hasOwnProperty(property) && action.unitsToMove[property]) {
+                            images += "<img src='img/"+property+".svg' class='smallIcon imageDragFix' style='margin-left:1px'>";
+                        }
+                    }
+                    images += "<div class='fa fa-arrow-right'></div>";
+                    if (action.varName === "home") {
+                        images += "<img src='img/castle.svg' class='smallIcon imageDragFix' style='margin-left:1px'>";
+                    } else {
+                        let imageType = action.varName.split("_")[0];
+                        images += "<img src='img/" + imageType + ".svg' class='smallIcon imageDragFix' style='margin-left:1px'>";
+                        let typeNum = parseInt(action.varName.split("_")[1]);
+                        images += "<div class='bold'>" + (typeNum + 1) + "</div>";
+                    }
+                    return images;
                 } else {
-                    let imageType = varName.split("_")[0];
-                    images += "<img src='img/"+imageType+".svg' class='smallIcon' style='margin-left:1px'>";
-                    let typeNum = parseInt(varName.split("_")[1]);
-                    images += "<div class='bold'>"+(typeNum+1)+"</div>";
+                    //hero actions?
                 }
-                return images;
             }
         }
     }

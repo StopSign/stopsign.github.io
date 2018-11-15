@@ -1,7 +1,10 @@
-warMapActions = [];
-warMap = {
+let warMapActions = [];
+let warMap = {
     tick: function() {
         warMap.units.checkUnitsToJoinBase();
+        //TODO check all combat
+
+        //TODO move all travelling units
     },
     actions: {
         createWarMapActions: function() {
@@ -16,7 +19,6 @@ warMap = {
         },
         addWarMapAction: function(varName, num) {
             let action = {};
-            action.name = "Sending units to " + capitalizeFirst(varName) + (num !== undefined ? " "+(num+1) : "" );
             if(num !== undefined) {
                 varName = varName+"_"+num;
             }
@@ -38,8 +40,7 @@ warMap = {
             if(!action.buy) {
                 action.buy = function() {
                     //set target of all units to action
-                    warMap.units.setUnitTargets(action.varName);
-                    console.log(action.varName);
+                    warMap.units.setUnitTargets(action);
                 }
             }
 
@@ -53,6 +54,26 @@ warMap = {
                 }
             });
             return found;
+        },
+        createNameString: function(action) {
+            let sendingString = "Sending ";
+            let firstName = true;
+            for (let property in action.unitsToMove) {
+                if (action.unitsToMove.hasOwnProperty(property)) {
+                    if(action.unitsToMove[property]) {
+                        let name = property === "king" ? "the King" : capitalizeFirst(property);
+                        if(firstName) {
+                            firstName = false;
+                            sendingString += name;
+                        } else {
+                            sendingString += ", "+name;
+                        }
+                    }
+                }
+            }
+            let baseName = action.varName.split("_")[0];
+            let num = action.varName.split("_")[1];
+            return sendingString + " to " + capitalizeFirst(baseName) + (num !== undefined ? " "+(parseInt(num)+1) : "");
         }
     },
     units: {
@@ -79,6 +100,13 @@ warMap = {
         createUnit: function(varName, isFriendly, startingLoc, amount) {
             let unit = {};
             unit.varName = varName;
+            if(varName === "king") {
+                unit.type = "king";
+            } else if(varName === "archerHero") {
+                unit.type = "heroes";
+            } else {
+                unit.type = "units";
+            }
             unit.isFriendly = isFriendly;
             unit.amount = amount;
             unit.coords = baseNameToObj(startingLoc).coords;
@@ -99,10 +127,11 @@ warMap = {
             allUnits.concat(levelData.traveling);
             return allUnits;
         },
-        setUnitTargets(target) {
+        setUnitTargets(action) {
+            let target = action.varName;
             warMap.units.getAllUnits().forEach(function(unit) {
-                if(unit.isFriendly) {
-                    console.log("changing " + unit.varName + " at " + unit.coords + " to " + target);
+                if(unit.isFriendly && action.unitsToMove[unit.type]) {
+                    console.log("changing " + unit.varName + " at " + unit.coords.x + ","+unit.coords.y+" to " + target);
                     unit.target = target;
                 }
             })

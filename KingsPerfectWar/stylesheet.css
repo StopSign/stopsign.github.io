@@ -275,10 +275,10 @@ input {
     overflow-y:auto;
 }
 .actionListLeft {
-    width:35%;
+    width:39%;
 }
 .actionListRight {
-    width:65%;
+    width:61%;
 }
 
 .listContainer {
@@ -294,7 +294,7 @@ input {
     position:relative;
 }
 .listTextInput {
-    width:40px;
+    width:30px;
     height:9px;
 }
 
@@ -314,10 +314,10 @@ input {
     text-align:left;
 }
 .nextActionContainer {
-    width:220px;
+    width:210px;
 }
 .curActionContainer {
-    width:108px;
+    width:123px;
 }
 
 .curActionBar {
