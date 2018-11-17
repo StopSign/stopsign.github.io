@@ -14,6 +14,7 @@ function getSleepAction() {
         }
     ];
     action.varName = "sleep";
+    action.canBuy = function() { return true };
     action.visible = function() { return true };
     action.unlocked = function() { return true };
     return action;

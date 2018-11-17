@@ -42,12 +42,17 @@ function addCastleAction(action) {
     }
     if(!action.buy) {
         action.buy = function() {
-            if(action.unit) {
-                warMap.units.createUnit(action.varName, true, "home", 1);
+            if(this.createdWith) { //is army unit
+                if(created.castle[this.createdWith]) {
+                    warMap.units.createUnit(this.varName, true, "home", created.castle[this.createdWith]);
+                }
             }
-            created.castle[action.varName]++;
+            created.castle[this.varName]++;
         }
     }
+    action.canBuy = function() {
+        return gold >= this.costgold && wood >= this.costwood && mana >= this.costmana && (!this.createdWith || created.castle[this.createdWith] > 0);
+    };
 
     castle.actions.push(action);
 }
@@ -165,6 +170,24 @@ addCastleAction({
 });
 
 addCastleAction({
+    varName:"barracks",
+    name:"Build Barracks",
+    desc:"Recruit some spearmen here to take the hits. Each barracks increases spearman equipped by 1.",
+    cost: [
+        {
+            resource:"gold",
+            type:"linear",
+            starting:500,
+            growth:500
+        }
+    ],
+    unit:true,
+    seconds:10,
+    xPos:250,
+    yPos:25
+});
+
+addCastleAction({
     varName:"spearman",
     name:"Equip Spearman",
     desc:"The meat of your army, they'll take damage before your other units.",
@@ -180,16 +203,33 @@ addCastleAction({
             starting:5
         }
     ],
-    unit:true,
-    seconds:3,
+    createdWith:"barracks",
+    seconds:5,
     xPos:250,
+    yPos:110
+});
+
+addCastleAction({
+    varName:"range",
+    name:"Build Archery Range",
+    desc:"Train archers here to take enemies down from behind the front line. Each archery range increases archers trained by 1.",
+    cost: [
+        {
+            resource:"gold",
+            type:"linear",
+            starting:1500,
+            growth:1500
+        }
+    ],
+    seconds:10,
+    xPos:300,
     yPos:25
 });
 
 addCastleAction({
     varName:"archer",
     name:"Train Archer",
-    desc:"Elite archers capable of dealing death to your enemies.",
+    desc:"Elite archers capable of dealing death to your enemies. Requires archery range.",
     cost: [
         {
             resource:"wood",
@@ -197,16 +237,33 @@ addCastleAction({
             starting:1000
         }
     ],
-    unit:true,
-    seconds:9,
+    createdWith:"range",
+    seconds:10,
     xPos:300,
+    yPos:110
+});
+
+addCastleAction({
+    varName:"designer",
+    name:"Hire Designer",
+    desc:"Designers know the ins and outs of mass production. Each designer increases catapults built by 1.",
+    cost: [
+        {
+            resource:"gold",
+            type:"linear",
+            starting:4500,
+            growth:4500
+        }
+    ],
+    seconds:10,
+    xPos:350,
     yPos:25
 });
 
 addCastleAction({
     varName:"catapult",
     name:"Build Catapult",
-    desc:"For when you have a lot of enemies to kill and a lot of resoures to throw at the problem.",
+    desc:"For when you have a lot of enemies to kill and a lot of resoures to throw at the problem. Requires designer.",
     cost: [
         {
             resource:"wood",
@@ -214,8 +271,8 @@ addCastleAction({
             starting:5000
         }
     ],
-    unit:true,
-    seconds:27,
+    createdWith:"designer",
+    seconds:20,
     xPos:350,
-    yPos:25
+    yPos:110
 });

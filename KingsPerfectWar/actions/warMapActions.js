@@ -14,6 +14,7 @@ let warMap = {
     },
     actions: {
         createWarMapActions: function() {
+            warMapActions = [];
             //create 1 action per base in levelData
             warMap.actions.addWarMapAction("home");
             for(let i = 0; i < levelData.dungeons.length; i++) {
@@ -42,11 +43,11 @@ let warMap = {
                 type:"static",
                 starting:action.seconds
             });
-
+            action.canBuy = function() { return true; }; //no costs yet.
             if(!action.buy) {
                 action.buy = function() {
                     //set target of all units to action
-                    warMap.units.setUnitTargets(action);
+                    warMap.units.setUnitTargets(this);
                 }
             }
 
@@ -59,7 +60,7 @@ let warMap = {
                     found = action;
                 }
             });
-            return found;
+            return Object.assign({}, found); //need a copy but with methods;
         },
         createNameString: function(action) {
             let sendingString = "Sending ";
@@ -256,6 +257,9 @@ let warMap = {
                 let remainingUnits = warMap.bases.getUnitsByAllegiance(base);
                 if(remainingUnits.friendly.length && remainingUnits.enemy.length === 0) {
                     warMap.bases.getReward(base);
+                    if(document.getElementById("pausePlaceCleared").checked && !stop) {
+                        pauseGame();
+                    }
                 }
             });
         },

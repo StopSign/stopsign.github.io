@@ -21,7 +21,7 @@ function createLevel(num) {
     for(let i = 0; i < curLevel.hideouts.length; i++) {
         levelData.hideouts[i].units = [];
         levelData.hideouts[i].fightCounter = 20;
-        let hideout = curLevel.dungeons[i];
+        let hideout = curLevel.hideouts[i];
         if(hideout.creates) {
             levelData.hideouts[i].createCounter = hideout.creates.initialTime;
         }

@@ -10,6 +10,9 @@ let actions = {
                 action.loops++;
                 action.loopsLeft++;
                 action.manaUsed = 0;
+                if(actionsList.next[name][this.validActions[i]].varName === "sleep") {
+                    actionsList.next[name][this.validActions[i]].loops = action.loops;
+                }
             }
             while(action && (action.loopsLeft === 0 || (action.manaUsed === 0 && !action.canBuy()))) { //action exists but is invalid, slide
                 this.validActions[i]++;
@@ -127,16 +130,14 @@ function translateNextToCurrent(action, name) {
     let actionData = getActionByVarName(action.varName, name);
     action.name = actionData.name;
     if(actionData.moveAction) {
-        // action.unitsToMove = copyArray(unitsSelectedForMove);
         action.name = warMap.actions.createNameString(action);
     }
     action.cost = actionData.cost;
     action.buy = actionData.buy;
     action.visible = actionData.visible;
     action.unlocked = actionData.unlocked;
-    action.canBuy = function() {
-        return gold >= action.costgold && wood >= action.costwood && mana >= action.costmana;
-    };
+    action.canBuy = actionData.canBuy;
+    action.createdWith = actionData.createdWith;
     action.spend = function() {
         gold -= action.costgold;
         wood -= action.costwood;

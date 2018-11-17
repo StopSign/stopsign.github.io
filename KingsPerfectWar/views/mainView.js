@@ -92,11 +92,8 @@ let view = {
             }
         },
         updateCreated: function() {
-            if(!prevState.created) {
-                return;
-            }
             for (let property in created.castle) {
-                if (created.castle.hasOwnProperty(property) &&
+                if (!prevState.created || created.castle.hasOwnProperty(property) &&
                     JSON.stringify(created.castle[property]) !== JSON.stringify(prevState.created.castle[property])) {
                     document.getElementById(property+"Num").innerHTML = created.castle[property];
                     document.getElementById(property+"Num").style.opacity = created.castle[property] === 0 ? "0" : "1";
@@ -120,7 +117,7 @@ let view = {
 
             //update castle
             if(prevLevelDatum.home.fightCounter !== levelData.home.fightCounter && document.getElementById("homeFightProgress")) {
-                document.getElementById("homeFightProgress").style.width = levelData.home.fightCounter * 20 + "%";
+                document.getElementById("homeFightProgress").style.width = levelData.home.fightCounter * 5 + "%";
             }
             if(JSON.stringify(prevLevelDatum.home.units) !== JSON.stringify(levelData.home.units)) {
                 view.helpers.createMapTooltipString("Castle", levelData.home, "home");
@@ -130,7 +127,7 @@ let view = {
             for(let i = 0; i < levelData.dungeons.length; i++) {
                 let dungeon = levelData.dungeons[i];
                 if(prevLevelDatum.dungeons[i].fightCounter !== dungeon.fightCounter && document.getElementById("dungeon"+i+"FightProgress")) {
-                    document.getElementById("dungeon"+i+"FightProgress").style.width = dungeon.fightCounter * 20 + "%";
+                    document.getElementById("dungeon"+i+"FightProgress").style.width = dungeon.fightCounter * 5 + "%";
                 }
                 if(JSON.stringify(prevLevelDatum.dungeons[i].units) !== JSON.stringify(dungeon.units)) {
                     view.helpers.createMapTooltipString("Dungeon "+(i+1), dungeon, "dungeon"+i);
@@ -141,7 +138,7 @@ let view = {
             for(let i = 0; i < levelData.hideouts.length; i++) {
                 let hideout = levelData.hideouts[i];
                 if(prevLevelDatum.hideouts[i].fightCounter !== hideout.fightCounter && document.getElementById("hideout"+i+"FightProgress")) {
-                    document.getElementById("hideout"+i+"FightProgress").style.width = hideout.fightCounter * 20 + "%";
+                    document.getElementById("hideout"+i+"FightProgress").style.width = hideout.fightCounter * 5 + "%";
                 }
                 if(JSON.stringify(prevLevelDatum.hideouts[i].units) !== JSON.stringify(hideout.units)) {
                     view.helpers.createMapTooltipString("Hideout "+(i+1), hideout, "hideout"+i);
