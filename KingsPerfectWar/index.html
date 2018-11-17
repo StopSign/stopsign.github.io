@@ -41,8 +41,8 @@
                     </div><div id="unitsToMove" class="clickable showthat" style="border:2px solid rgba(255, 255, 0, 1)" onclick="switchMapMoveUnits('units')">
                         <img src='img/units.svg' class='largeIcon imageDragFix'>
                         <div class="showthis" style="width:250px">
-                            <div class="smallTitle">Select Units</div>
-                            <div class="small">Clicking a place with this highlighted queues an action to move all Units to that place.</div>
+                            <div class="smallTitle">Select Army</div>
+                            <div class="small">Clicking a place with this highlighted queues an action to move all Army to that place.</div>
                         </div>
                     </div><div id="heroesToMove" class="clickable showthat" style="border:2px solid rgba(255, 255, 0, 0)" onclick="switchMapMoveUnits('heroes')">
                         <img src='img/heroes.svg' class='largeIcon imageDragFix'>
@@ -98,7 +98,7 @@
                 <div class="showthat" style="width:85px">
                     <img src='img/mana.svg' class='largeIcon imageDragFix' style="vertical-align:bottom">
                     <div id="mana"></div>
-                    <div class="showthis">Mana</div>
+                    <div id='manaTooltip' class="showthis"></div>
                 </div>
             </div><div style="width:565px;height:10px;background-color:#dbdff3;margin-top:6px;">
                 <div id="manaBar" style="width:80%;height:100%;background-color:rgb(130, 147, 255);vertical-align:top;"></div>
@@ -116,7 +116,7 @@
                 <div id="kingContainer" class="tabContainer kingColorH"></div>
                 <div id="castleContainer" class="tabContainer castleColorH" style="display:block;position:relative;">
                     <div class="title abs" style="top:0;left:63px;">Income</div>
-                    <div class="title abs" style="top:0;left:300px;">Units</div>
+                    <div class="title abs" style="top:0;left:300px;">Army</div>
                     <div class="title abs" style="top:0;left:580px;">Labs</div>
                     <div id="castleActions" class="abs" style="left:0;top:0;"></div>
                 </div>
@@ -152,7 +152,7 @@
     <script src="actions/levelData.js?1"></script>
     <script src="actions/actions.js?1"></script>
     <script src="actions/castleActions.js?1"></script>
-    <script src="actions/unitActions.js?1"></script>
+    <script src="actions/warMapActions.js?1"></script>
     <script src="actions/otherActions.js?1"></script>
     <script>
         (function (i, s, o, g, r, a, m) {

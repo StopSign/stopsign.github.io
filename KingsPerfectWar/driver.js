@@ -42,6 +42,7 @@ function tick() {
         actions.tick(); //actions
         warMap.tick(); //combat
 
+        //TODO check if king is dead or only enemies at home, restart
 
         if(mana === 0) {
             restart();

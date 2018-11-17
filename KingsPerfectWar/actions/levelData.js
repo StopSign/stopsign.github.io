@@ -4,11 +4,13 @@ function createLevel(num) {
     let curLevel = levelInitials[num];
     levelData = copyArray(curLevel);
     levelData.home.units = [];
+    levelData.home.fightCounter = 20;
     levelData.traveling = [];
     //turn unit mentions into actual units
     warMap.units.createUnit("king", true, "home", 1);
     for(let i = 0; i < curLevel.dungeons.length; i++) {
         levelData.dungeons[i].units = [];
+        levelData.dungeons[i].fightCounter = 20;
         let dungeon = curLevel.dungeons[i];
         for (let property in dungeon.units) {
             if (dungeon.units.hasOwnProperty(property)) {
@@ -18,7 +20,11 @@ function createLevel(num) {
     }
     for(let i = 0; i < curLevel.hideouts.length; i++) {
         levelData.hideouts[i].units = [];
+        levelData.hideouts[i].fightCounter = 20;
         let hideout = curLevel.dungeons[i];
+        if(hideout.creates) {
+            levelData.hideouts[i].createCounter = hideout.creates.initialTime;
+        }
         for (let property in hideout.units) {
             if (hideout.units.hasOwnProperty(property)) {
                 warMap.units.createUnit(property, false, "hideout_"+i, hideout.units[property]);

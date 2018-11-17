@@ -2,10 +2,11 @@ let warMapActions = [];
 let warMap = {
     tick: function() {
         warMap.units.checkUnitsToChangeBase();
-        //TODO check all combat
+
+        warMap.bases.fight();
 
         levelData.traveling.forEach(function(unit) {
-            let target = baseNameToObj(unit.target);
+            let target = warMap.bases.baseNameToObj(unit.target);
             let newCoords = moveToTarget(unit.coords.x, unit.coords.y, target.coords.x, target.coords.y, (unit.speed/10));
             unit.coords.x = newCoords.x;
             unit.coords.y = newCoords.y;
@@ -114,23 +115,20 @@ let warMap = {
             }
             unit.isFriendly = isFriendly;
             unit.amount = amount;
-            unit.coords = copyArray(baseNameToObj(startingLoc).coords);
+            unit.coords = copyArray(warMap.bases.baseNameToObj(startingLoc).coords);
             unit.target = startingLoc;
             let stats = warMap.units.getStatsOfUnit(unit.varName);
             unit.atk = stats.atk;
             unit.hp = stats.hp;
-            unit.speed = 2;
+            unit.maxHp = stats.hp;
+            unit.speed = 12; //DEBUG 2
             levelData.traveling.push(unit);
         },
         getAllUnits: function() {
-            let allUnits = levelData.home.units;
-            for(let i = 0; i < levelData.dungeons.length; i++) {
-                allUnits = allUnits.concat(levelData.dungeons[i].units);
-            }
-            for(let i = 0; i < levelData.hideouts.length; i++) {
-                allUnits = allUnits.concat(levelData.hideouts[i].units);
-            }
-            allUnits = allUnits.concat(levelData.traveling);
+            let allUnits = levelData.traveling;
+            warMap.bases.getAllBases().forEach(function(base) {
+                allUnits = allUnits.concat(base.units);
+            });
             return allUnits;
         },
         setUnitTargets: function(action) {
@@ -146,7 +144,7 @@ let warMap = {
             //join base
             for(let i = levelData.traveling.length - 1; i >= 0; i--) {
                 let unit = levelData.traveling[i];
-                let target = baseNameToObj(unit.target);
+                let target = warMap.bases.baseNameToObj(unit.target);
                 if (withinDistance(target.coords.x, target.coords.y, unit.coords.x, unit.coords.y, 4)) {
                     levelData.traveling.splice(i, 1);
                     unit.coords.x = target.coords.x;
@@ -157,33 +155,15 @@ let warMap = {
             }
 
             //leave base
-            for(let i = levelData.home.units.length - 1; i >= 0; i--) {
-                let unit = levelData.home.units[i];
-                if(JSON.stringify(baseNameToObj(unit.target)) !== JSON.stringify(levelData.home)) { //target is not where it sits
-                    levelData.traveling.push(unit);
-                    levelData.home.units.splice(i, 1);
-                }
-            }
-            for(let i = 0; i < levelData.dungeons.length; i++) {
-                let dungeon = levelData.dungeons[i];
-                for (let j = dungeon.units.length - 1; j >= 0; j--) {
-                    let unit = dungeon.units[j];
-                    if (JSON.stringify(baseNameToObj(unit.target)) !== JSON.stringify(dungeon)) { //target is not where it sits
+            warMap.bases.getAllBases().forEach(function(base) {
+                for(let i = base.units.length - 1; i >= 0; i--) {
+                    let unit = base.units[i];
+                    if(JSON.stringify(warMap.bases.baseNameToObj(unit.target)) !== JSON.stringify(base)) { //target is not where it sits
                         levelData.traveling.push(unit);
-                        dungeon.units.splice(j, 1);
+                        base.units.splice(i, 1);
                     }
                 }
-            }
-            for(let i = 0; i < levelData.hideouts.length; i++) {
-                let hideout = levelData.hideouts[i];
-                for (let j = hideout.units.length - 1; j >= 0; j--) {
-                    let unit = hideout.units[j];
-                    if (JSON.stringify(baseNameToObj(unit.target)) !== JSON.stringify(hideout)) { //target is not where it sits
-                        levelData.traveling.push(unit);
-                        hideout.units.splice(j, 1);
-                    }
-                }
-            }
+            });
         },
         checkUnitsForCombineInBase: function(base) {
             for(let i = base.units.length -1; i >= 0; i--) {
@@ -196,15 +176,132 @@ let warMap = {
                     }
                 }
             }
+        },
+        sortHpLowestToHighest: function(unitList) {
+            unitList.sort((unit1,unit2) => unit1.maxHp !== unit2.maxHp ? unit1.maxHp - unit2.maxHp : unit1.hp - unit2.hp );
+        }
+    },
+    bases: {
+        baseNameToObj: function(name) {
+            if(name === "home") {
+                return levelData.home;
+            }
+            let dataType = name.split("_")[0];
+            let num = name.split("_")[1];
+            return levelData[dataType+"s"][num];
+        },
+        getAllBases: function() {
+            let allBases = [];
+            allBases.push(levelData.home);
+            for(let i = 0; i < levelData.dungeons.length; i++) {
+                allBases.push(levelData.dungeons[i]);
+            }
+            for(let i = 0; i < levelData.hideouts.length; i++) {
+                allBases.push(levelData.hideouts[i]);
+            }
+            return allBases;
+        },
+        getUnitsByAllegiance: function(base) {
+            let friendlyUnits = [];
+            let enemyUnits = [];
+            base.units.forEach(function(unit) {
+                if(unit.isFriendly) {
+                    friendlyUnits.push(unit);
+                } else {
+                    enemyUnits.push(unit);
+                }
+            });
+            return { friendly:friendlyUnits, enemy:enemyUnits };
+        },
+        fight: function() {
+            warMap.bases.getAllBases().forEach(function(base) {
+                let unitsByAllegience = warMap.bases.getUnitsByAllegiance(base);
+                if(unitsByAllegience.friendly.length === 0 || unitsByAllegience.enemy.length === 0) {
+                    return;
+                }
+                //fight once a second
+                if(base.fightCounter > 0) {
+                    base.fightCounter--;
+                    return;
+                }
+                base.fightCounter = 20;
+
+                //get damage totals
+                base.friendlyDamage = 0;
+                unitsByAllegience.friendly.forEach(function(unit) {
+                    base.friendlyDamage += unit.amount * unit.atk;
+                });
+                base.enemyDamage = 0;
+                unitsByAllegience.enemy.forEach(function(unit) {
+                    base.enemyDamage += unit.amount * unit.atk;
+                });
+
+                //apply damage
+                let extraUnit = warMap.bases.dealDamage(unitsByAllegience.friendly, base.enemyDamage);
+                if(extraUnit) {
+                    base.units.push(extraUnit);
+                }
+                let extraUnit2 = warMap.bases.dealDamage(unitsByAllegience.enemy, base.friendlyDamage);
+                if(extraUnit2) {
+                    base.units.push(extraUnit2);
+                }
+
+                //clear dead units
+                for(let i = base.units.length - 1; i >= 0; i--) {
+                    if(base.units[i].hp <= 0 || base.units[i].amount <= 0) {
+                        base.units.splice(i, 1);
+                    }
+                }
+
+                let remainingUnits = warMap.bases.getUnitsByAllegiance(base);
+                if(remainingUnits.friendly.length && remainingUnits.enemy.length === 0) {
+                    warMap.bases.getReward(base);
+                }
+            });
+        },
+        dealDamage: function(unitList, damage) {
+            warMap.units.sortHpLowestToHighest(unitList);
+            let extraUnit = null;
+            unitList.forEach(function(unit) {
+                if(damage <= 0) {
+                    return;
+                }
+                // console.log("Dealing " + damage + " damage to " + unit.varName);
+                let amountKilled = Math.floor(damage / unit.hp + .000001);
+                if(amountKilled > unit.amount) {
+                    amountKilled = unit.amount;
+                }
+                unit.amount -= amountKilled;
+                damage -= unit.hp * amountKilled;
+                // console.log("Killed " + amountKilled + " units to take away " + unit.hp * amountKilled + " damage. Remaining units: " + unit.amount + " and remaining damage: " + damage);
+                if(unit.amount === 0) {
+                    unit.hp = 0;
+                    return;
+                }
+                if(damage <= 0) {
+                    return;
+                }
+                //split unit
+                unit.amount--;
+                let remainingHp = unit.hp - damage;
+                // console.log("Did " + damage + " damage to unit. Unit has " + remainingHp + " hp left.");
+                damage = 0;
+                extraUnit = copyArray(unit);
+                extraUnit.amount = 1;
+                extraUnit.hp = remainingHp;
+            });
+            return extraUnit;
+        },
+        getReward: function(base) {
+            if(!base.reward) { //castle
+                return;
+            }
+            base.reward.forEach(function(reward) {
+                let manaReward = reward.type === "mana" ? reward.amount : 0;
+                mana += manaReward;
+                maxMana += manaReward;
+                gold += reward.type === "gold" ? reward.amount : 0;
+            });
         }
     }
 };
-
-function baseNameToObj(name) {
-    if(name === "home") {
-        return levelData.home;
-    }
-    let dataType = name.split("_")[0];
-    let num = name.split("_")[1];
-    return levelData[dataType+"s"][num];
-}

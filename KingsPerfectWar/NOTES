@@ -114,5 +114,4 @@ Days
     When a War Map is completed, you go to Day N+1, starting from a new castle (same initial conditions except heroes and king's physical stats).
     You can re-do previous days
 
-
-TODO turn units into an array not an object. Upon level creation turn all unit mentions into actual units
+show units on war map moving

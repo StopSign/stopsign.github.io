@@ -32,6 +32,7 @@ let view = {
             if(prevState.mana !== mana || prevState.maxMana !== maxMana) {
                 document.getElementById("manaBar").style.width = mana / maxMana * 100 + "%";
                 document.getElementById("mana").innerHTML = intToString(mana, 1);
+                document.getElementById("manaTooltip").innerHTML = "Mana.<br>Start with " + intToString(initialMana, 1) + "<br>Current max is " + intToString(maxMana, 1);
             }
             if(prevState.gold !== gold) {
                 document.getElementById("gold").innerHTML = intToString(gold, 1);
@@ -105,24 +106,45 @@ let view = {
         updateUnits: function() {
             let prevLevelDatum = prevState.levelData;
 
+            //initial
+            if(!prevLevelDatum) {
+                view.helpers.createMapTooltipString("Castle", levelData.home, "home");
+                for(let i = 0; i < levelData.dungeons.length; i++) {
+                    view.helpers.createMapTooltipString("Dungeon "+(i+1), levelData.dungeons[i], "dungeon"+i);
+                }
+                for(let i = 0; i < levelData.hideouts.length; i++) {
+                    view.helpers.createMapTooltipString("Hideout "+(i+1), levelData.hideouts[i], "hideout"+i);
+                }
+                return;
+            }
+
             //update castle
-            if(!prevLevelDatum || JSON.stringify(prevLevelDatum.home) !== JSON.stringify(levelData.home)) {
-                view.helpers.createMapTooltipString("Castle", levelData.home, "homeTooltip");
+            if(prevLevelDatum.home.fightCounter !== levelData.home.fightCounter && document.getElementById("homeFightProgress")) {
+                document.getElementById("homeFightProgress").style.width = levelData.home.fightCounter * 20 + "%";
+            }
+            if(JSON.stringify(prevLevelDatum.home.units) !== JSON.stringify(levelData.home.units)) {
+                view.helpers.createMapTooltipString("Castle", levelData.home, "home");
             }
 
             //update dungeons
             for(let i = 0; i < levelData.dungeons.length; i++) {
                 let dungeon = levelData.dungeons[i];
-                if(!prevLevelDatum || !prevLevelDatum.dungeons || JSON.stringify(prevLevelDatum.dungeons[i]) !== JSON.stringify(dungeon)) {
-                    view.helpers.createMapTooltipString("Dungeon "+(i+1), dungeon, "dungeonTooltip"+i);
+                if(prevLevelDatum.dungeons[i].fightCounter !== dungeon.fightCounter && document.getElementById("dungeon"+i+"FightProgress")) {
+                    document.getElementById("dungeon"+i+"FightProgress").style.width = dungeon.fightCounter * 20 + "%";
+                }
+                if(JSON.stringify(prevLevelDatum.dungeons[i].units) !== JSON.stringify(dungeon.units)) {
+                    view.helpers.createMapTooltipString("Dungeon "+(i+1), dungeon, "dungeon"+i);
                 }
             }
 
             //update hideouts
             for(let i = 0; i < levelData.hideouts.length; i++) {
                 let hideout = levelData.hideouts[i];
-                if(!prevLevelDatum || !prevLevelDatum.hideouts || JSON.stringify(prevLevelDatum.hideouts[i]) !== JSON.stringify(hideout)) {
-                    view.helpers.createMapTooltipString("Hideout "+(i+1), hideout, "hideoutTooltip"+i);
+                if(prevLevelDatum.hideouts[i].fightCounter !== hideout.fightCounter && document.getElementById("hideout"+i+"FightProgress")) {
+                    document.getElementById("hideout"+i+"FightProgress").style.width = hideout.fightCounter * 20 + "%";
+                }
+                if(JSON.stringify(prevLevelDatum.hideouts[i].units) !== JSON.stringify(hideout.units)) {
+                    view.helpers.createMapTooltipString("Hideout "+(i+1), hideout, "hideout"+i);
                 }
             }
 
@@ -333,7 +355,7 @@ let view = {
                     allDivs +=
                         '<div class="clickable showthat" style="position:absolute;left:'+coords.x+'px;top:'+coords.y+'px;" onclick="addActionToList(\'dungeon_'+i+'\', 2, true)">' +
                         '<img src="img/dungeon.svg" class="superLargeIcon imageDragFix">' +
-                        '<div class="showthis" id="dungeonTooltip'+i+'"></div>' +
+                        '<div class="showthis" id="dungeon'+i+'Tooltip"></div>' +
                         '</div>';
                 }
 
@@ -344,7 +366,7 @@ let view = {
                     allDivs +=
                         '<div class="clickable showthat" style="position:absolute;left:'+coords.x+'px;top:'+coords.y+'px;" onclick="addActionToList(\'hideout_'+i+'\', 2, true)">' +
                         '<img src="img/hideout.svg" class="superLargeIcon imageDragFix">' +
-                        '<div class="showthis" id="hideoutTooltip'+i+'"></div>' +
+                        '<div class="showthis" id="hideout'+i+'Tooltip"></div>' +
                         '</div>';
                 }
 
@@ -353,30 +375,56 @@ let view = {
         }
     },
     helpers: {
-        createMapTooltipString: function(titleName, baseData, elementId) {
+        createMapTooltipString: function(titleName, base, elementId) {
             let tooltipDiv = "<div class='mapTooltipRow'><div class='title'>"+titleName+"</div>"
-                + "<div style='opacity:.7;position:absolute;top:0;right:0'>(" + baseData.coords.x +", "+baseData.coords.y + ")</div>";
+                + "<div style='opacity:.7;position:absolute;top:0;right:0'>(" + base.coords.x +", "+base.coords.y + ")</div>";
             let total = { atk: 0, hp: 0 };
-            baseData.units.forEach(function(unit) {
-                let num = unit.amount;
-                total.atk += unit.atk * num;
-                total.hp += unit.hp * num;
-                tooltipDiv += "<div style='width:20px'><div class='bold'>" + num + "</div></div>" +
-                    "<div style='width:80px'>" + capitalizeFirst(unit.varName) + "</div>" +
-                    "<div style='width:60px'>Atk: <div class='bold'>"+ unit.atk + "</div></div>" +
-                    "<div style='width:60px'>HP: <div class='bold'>"+ unit.hp + "</div></div><br>"
-            });
-            tooltipDiv += "<div style='width:100px'>Total</div>" +
-                "<div style='width:60px'>Atk: <div class='bold'>"+ total.atk + "</div></div>" +
-                "<div style='width:60px'>HP: <div class='bold'>"+ total.hp + "</div></div><br>";
-            if(baseData.reward) {
-                for(let i = 0; i < baseData.reward.length; i++) {
-                    let nextReward = baseData.reward[i];
+            let unitsByAllegience = warMap.bases.getUnitsByAllegiance(base);
+            if(unitsByAllegience.friendly.length > 0) {
+                tooltipDiv += "<div>Your Units</div><br>";
+                unitsByAllegience.friendly.forEach(function(unit) {
+                    let num = unit.amount;
+                    total.atk += unit.atk * num;
+                    total.hp += unit.hp * num;
+                    tooltipDiv += "<div style='width:20px'><div class='bold'>" + num + "</div></div>" +
+                        "<div style='width:80px'>" + capitalizeFirst(unit.varName) + "</div>" +
+                        "<div style='width:60px'>Atk: <div class='bold'>"+ unit.atk + "</div></div>" +
+                        "<div style='width:60px'>HP: <div class='bold'>"+ unit.hp + "</div></div><br>"
+                });
+                tooltipDiv += "<div style='width:100px'>Total</div>" +
+                    "<div style='width:60px'>Atk: <div class='bold'>"+ total.atk + "</div></div>" +
+                    "<div style='width:60px'>HP: <div class='bold'>"+ total.hp + "</div></div><br>";
+            }
+            if(unitsByAllegience.friendly.length > 0 && unitsByAllegience.enemy.length > 0) {
+                tooltipDiv += "<div style='display:block;text-align:center;position:relative;'>" +
+                    "Fight!"+
+                    "<div style='position:absolute;background-color:rgba(255,0,0,0.3);height:100%;left:0;' id='"+elementId+"FightProgress'></div>" +
+                    "</div>"
+            }
+            total = { atk: 0, hp: 0 };
+            if(unitsByAllegience.enemy.length > 0) {
+                tooltipDiv += "<div>Enemy Units</div><br>";
+                unitsByAllegience.enemy.forEach(function(unit) {
+                    let num = unit.amount;
+                    total.atk += unit.atk * num;
+                    total.hp += unit.hp * num;
+                    tooltipDiv += "<div style='width:20px'><div class='bold'>" + num + "</div></div>" +
+                        "<div style='width:80px'>" + capitalizeFirst(unit.varName) + "</div>" +
+                        "<div style='width:60px'>Atk: <div class='bold'>"+ unit.atk + "</div></div>" +
+                        "<div style='width:60px'>HP: <div class='bold'>"+ unit.hp + "</div></div><br>"
+                });
+                tooltipDiv += "<div style='width:100px'>Total</div>" +
+                    "<div style='width:60px'>Atk: <div class='bold'>"+ total.atk + "</div></div>" +
+                    "<div style='width:60px'>HP: <div class='bold'>"+ total.hp + "</div></div><br>";
+            }
+            if(base.reward) {
+                for(let i = 0; i < base.reward.length; i++) {
+                    let nextReward = base.reward[i];
                     tooltipDiv += "Gain " + nextReward.amount + " " + nextReward.type + " when cleared. ";
                 }
             }
             tooltipDiv += "</div>"; //closing mapTooltipRow
-            document.getElementById(elementId).innerHTML = tooltipDiv;
+            document.getElementById(elementId + "Tooltip").innerHTML = tooltipDiv;
         },
         translateToWarMapCoords: function(coords) { //x,y 0-190,0-100, translated to x:10-550 and y:15-300
             return {x:10+(coords.x / 190 * 541), y:15+(coords.y / 100 * 285)};
