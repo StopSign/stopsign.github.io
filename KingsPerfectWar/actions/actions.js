@@ -34,6 +34,10 @@ let actions = {
         for(let i = 0; i < actionsList.nextNames.length; i++) {
             let name = actionsList.nextNames[i];
             let action = actionsList.current[name][this.validActions[i]];
+            if(!action) {
+                console.log("????");
+                continue;
+            }
             if(action.manaUsed === 0 && action.buy) {
                 action.spend(); //spend as soon as action starts
             }
@@ -132,7 +136,7 @@ function translateNextToCurrent(action, name) {
     if(actionData.moveAction) {
         action.name = warMap.actions.createNameString(action);
     }
-    if(action.createdWith) {
+    if(actionData.createdWith) {
         action.createdWith = actionData.createdWith;
     }
     action.cost = actionData.cost;
@@ -163,7 +167,7 @@ function addActionToList(varName, num, switchLists) {
     if(switchLists && curList !== num) {
         switchListTab(num);
     }
-    if(num === 2) {
+    if(num === 2 && varName !== "sleep") {
         let validAction = false;
         for (let property in unitsSelectedForMove) {
             if (unitsSelectedForMove.hasOwnProperty(property)) {

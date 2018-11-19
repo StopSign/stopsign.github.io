@@ -43,10 +43,10 @@ let mana = 1200;
 let initialMana = 1200;
 let maxMana = 1200;
 let totalTime = 0;
-let gold = 100;
-let initialGold = 100;
+let gold = 0;
+let initialGold = 600;
 let wood = 0;
-let initialWood = 0;
+let initialWood = 500;
 
 let curList = 1; //castle
 let currentlyHovering = 0;

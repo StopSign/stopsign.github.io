@@ -146,7 +146,8 @@ let view = {
             }
 
             //update traveling objects
-            levelData.traveling.forEach(function(travelObj) {
+            for(let i = 0; i < levelData.traveling.length; i++) {
+                let travelObj = levelData.traveling[i];
                 let viewTravelObj;
                 //get existing div if it exists
                 for(let i = 0; i < viewTravelObjs.length; i++) {
@@ -159,22 +160,30 @@ let view = {
                 //create a new one otherwise
                 if(!viewTravelObj) {
                     viewTravelObj = view.performance.getNewTravelObj();
-                    viewTravelObj.div.innerHTML = 'hello';
+                    viewTravelObj.div.classList.add('showthat');
+                    viewTravelObj.div.style.display = 'block';
+                    viewTravelObj.id = travelObj.id;
+                }
+
+                if(!prevLevelDatum.traveling[i] || JSON.stringify(prevLevelDatum.traveling[i].units) !== JSON.stringify(travelObj.units)) {
+                    let image = view.helpers.getTravelingImage(travelObj);
+                    let unitString = view.helpers.getUnitString(travelObj.units);
+                    viewTravelObj.div.innerHTML = image +
+                        "<div class='showthis'><div class='mapTooltipRow'>"+unitString+"</div></div>";
                     document.getElementById("warMapActions").appendChild(viewTravelObj.div);
                 }
 
-                viewTravelObj.div.style.display = 'block';
                 let coords = view.helpers.translateToWarMapCoords(travelObj.coords);
-                viewTravelObj.div.style.left = (coords.x+5) + "px";
-                viewTravelObj.div.style.top = (coords.y+5) + "px";
-                viewTravelObj.id = travelObj.id;
-            });
+                viewTravelObj.div.style.left = (coords.x+10) + "px";
+                viewTravelObj.div.style.top = (coords.y+10) + "px";
+            }
 
             viewTravelObjs.forEach(function(viewTravelObj) {
                 let found = false;
                 levelData.traveling.forEach(function(travelObj) {
                     if(travelObj.id === viewTravelObj.id) {
                         found = true;
+                        viewTravelObj.inUse = true;
                     }
                 });
                 if(!found) {
@@ -332,7 +341,7 @@ let view = {
             }
         },
         getNewTravelObj: function() {
-            //get one that isn't being used
+            //get one that isn't being used from the pool
             for(let i = 0; i < viewTravelObjs.length; i++) {
                 if(!viewTravelObjs[i].inUse) {
                     return viewTravelObjs[i];
@@ -426,22 +435,10 @@ let view = {
         createMapTooltipString: function(titleName, base, elementId) {
             let tooltipDiv = "<div class='mapTooltipRow'><div class='title'>"+titleName+"</div>"
                 + "<div style='opacity:.7;position:absolute;top:0;right:0'>(" + base.coords.x +", "+base.coords.y + ")</div>";
-            let total = { atk: 0, hp: 0 };
             let unitsByAllegience = warMap.bases.getUnitsByAllegiance(base);
             if(unitsByAllegience.friendly.length > 0) {
                 tooltipDiv += "<div>Your Units</div><br>";
-                unitsByAllegience.friendly.forEach(function(unit) {
-                    let num = unit.amount;
-                    total.atk += unit.atk * num;
-                    total.hp += unit.hp * num;
-                    tooltipDiv += "<div style='width:20px'><div class='bold'>" + num + "</div></div>" +
-                        "<div style='width:80px'>" + capitalizeFirst(unit.varName) + "</div>" +
-                        "<div style='width:60px'>Atk: <div class='bold'>"+ unit.atk + "</div></div>" +
-                        "<div style='width:60px'>HP: <div class='bold'>"+ unit.hp + "</div></div><br>"
-                });
-                tooltipDiv += "<div style='width:100px'>Total</div>" +
-                    "<div style='width:60px'>Atk: <div class='bold'>"+ total.atk + "</div></div>" +
-                    "<div style='width:60px'>HP: <div class='bold'>"+ total.hp + "</div></div><br>";
+                tooltipDiv += view.helpers.getUnitString(unitsByAllegience.friendly);
             }
             if(unitsByAllegience.friendly.length > 0 && unitsByAllegience.enemy.length > 0) {
                 tooltipDiv += "<div style='display:block;text-align:center;position:relative;'>" +
@@ -449,21 +446,9 @@ let view = {
                     "<div style='position:absolute;background-color:rgba(255,0,0,0.3);height:100%;left:0;' id='"+elementId+"FightProgress'></div>" +
                     "</div>"
             }
-            total = { atk: 0, hp: 0 };
             if(unitsByAllegience.enemy.length > 0) {
                 tooltipDiv += "<div>Enemy Units</div><br>";
-                unitsByAllegience.enemy.forEach(function(unit) {
-                    let num = unit.amount;
-                    total.atk += unit.atk * num;
-                    total.hp += unit.hp * num;
-                    tooltipDiv += "<div style='width:20px'><div class='bold'>" + num + "</div></div>" +
-                        "<div style='width:80px'>" + capitalizeFirst(unit.varName) + "</div>" +
-                        "<div style='width:60px'>Atk: <div class='bold'>"+ unit.atk + "</div></div>" +
-                        "<div style='width:60px'>HP: <div class='bold'>"+ unit.hp + "</div></div><br>"
-                });
-                tooltipDiv += "<div style='width:100px'>Total</div>" +
-                    "<div style='width:60px'>Atk: <div class='bold'>"+ total.atk + "</div></div>" +
-                    "<div style='width:60px'>HP: <div class='bold'>"+ total.hp + "</div></div><br>";
+                tooltipDiv += view.helpers.getUnitString(unitsByAllegience.enemy);
             }
             if(base.reward) {
                 for(let i = 0; i < base.reward.length; i++) {
@@ -476,6 +461,23 @@ let view = {
         },
         translateToWarMapCoords: function(coords) { //x,y 0-190,0-100, translated to x:10-550 and y:15-300
             return {x:10+(coords.x / 190 * 541), y:15+(coords.y / 100 * 285)};
+        },
+        getUnitString: function(unitList) {
+            let total = { atk:0, hp:0 };
+            let tooltipDiv = "";
+            unitList.forEach(function(unit) {
+                let num = unit.amount;
+                total.atk += unit.atk * num;
+                total.hp += unit.hp * num;
+                tooltipDiv += "<div style='width:20px'><div class='bold'>" + num + "</div></div>" +
+                    "<div style='width:80px'>" + capitalizeFirst(unit.varName) + "</div>" +
+                    "<div style='width:60px'>Atk: <div class='bold'>"+ unit.atk + "</div></div>" +
+                    "<div style='width:60px'>HP: <div class='bold'>"+ unit.hp + "</div></div><br>"
+            });
+            tooltipDiv += "<div style='width:100px'>Total</div>" +
+                "<div style='width:60px'>Atk: <div class='bold'>"+ total.atk + "</div></div>" +
+                "<div style='width:60px'>HP: <div class='bold'>"+ total.hp + "</div></div><br>";
+            return tooltipDiv;
         },
         getImage: function(action, num) {
             if(num !== 2 || action.varName === "sleep") {
@@ -502,6 +504,20 @@ let view = {
                     //hero actions?
                 }
             }
+        },
+        getTravelingImage: function(travelObj) {
+            // king > heroes > army
+            let imageType = "units";
+            for(let i = 0; i < travelObj.units.length; i++) {
+                if(travelObj.units[i].type === "heroes") {
+                    imageType = "heroes";
+                }
+                if(travelObj.units[i].type === "king") {
+                    imageType = "king";
+                    break;
+                }
+            }
+            return "<img src='img/" + imageType + ".svg' class='largeIcon imageDragFix' style=''>";
         }
     }
 };

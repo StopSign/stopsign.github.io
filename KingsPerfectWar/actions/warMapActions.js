@@ -131,7 +131,7 @@ let warMap = {
         createTravelingUnits: function(action) {
             let target = action.varName;
 
-            //leave from base / travelingObj
+            //leave from base
             warMap.bases.getAllBases().forEach(function(base) {
                 for (let i = base.units.length - 1; i >= 0; i--) {
                     let unit = base.units[i];
@@ -141,6 +141,21 @@ let warMap = {
                     }
                 }
             });
+
+            //change existing travelObj
+            for(let i = levelData.traveling.length - 1; i >= 0; i--) {
+                let travelObj = levelData.traveling[i];
+                for(let j = travelObj.units.length - 1; j >= 0; j--) {
+                    let unit = travelObj.units[j];
+                    if(action.unitsToMove[unit.type]) {
+                        warMap.units.addTravelingObj(unit, target, travelObj.coords);
+                        travelObj.units.splice(j, 1);
+                    }
+                }
+                if(travelObj.units.length === 0) {
+                    levelData.traveling.splice(i, 1);
+                }
+            }
         },
         addTravelingObj: function(unit, target, coords) {
             //find existing traveling obj and add
