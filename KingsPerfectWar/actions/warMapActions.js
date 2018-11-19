@@ -1,16 +1,11 @@
 let warMapActions = [];
 let warMap = {
     tick: function() {
-        warMap.units.checkUnitsToChangeBase();
+        warMap.units.checkUnitsToJoinBase();
 
         warMap.bases.fight();
 
-        levelData.traveling.forEach(function(unit) {
-            let target = warMap.bases.baseNameToObj(unit.target);
-            let newCoords = moveToTarget(unit.coords.x, unit.coords.y, target.coords.x, target.coords.y, (unit.speed/10));
-            unit.coords.x = newCoords.x;
-            unit.coords.y = newCoords.y;
-        });
+        warMap.units.travel();
     },
     actions: {
         createWarMapActions: function() {
@@ -47,7 +42,7 @@ let warMap = {
             if(!action.buy) {
                 action.buy = function() {
                     //set target of all units to action
-                    warMap.units.setUnitTargets(this);
+                    warMap.units.createTravelingUnits(this);
                 }
             }
 
@@ -116,55 +111,86 @@ let warMap = {
             }
             unit.isFriendly = isFriendly;
             unit.amount = amount;
-            unit.coords = copyArray(warMap.bases.baseNameToObj(startingLoc).coords);
-            unit.target = startingLoc;
             let stats = warMap.units.getStatsOfUnit(unit.varName);
             unit.atk = stats.atk;
             unit.hp = stats.hp;
             unit.maxHp = stats.hp;
             unit.speed = 12; //DEBUG 2
-            levelData.traveling.push(unit);
+            warMap.bases.baseNameToObj(startingLoc).units.push(unit);
         },
         getAllUnits: function() {
-            let allUnits = levelData.traveling;
+            let allUnits = [];
+            levelData.traveling.forEach(function(travelObj) {
+                allUnits = allUnits.concat(travelObj.units);
+            });
             warMap.bases.getAllBases().forEach(function(base) {
                 allUnits = allUnits.concat(base.units);
             });
             return allUnits;
         },
-        setUnitTargets: function(action) {
+        createTravelingUnits: function(action) {
             let target = action.varName;
-            warMap.units.getAllUnits().forEach(function(unit) {
-                if(unit.isFriendly && action.unitsToMove[unit.type]) {
-                    console.log("changing " + unit.varName + " at " + unit.coords.x + ","+unit.coords.y+" to " + target);
-                    unit.target = target;
-                }
-            })
-        },
-        checkUnitsToChangeBase: function() {
-            //join base
-            for(let i = levelData.traveling.length - 1; i >= 0; i--) {
-                let unit = levelData.traveling[i];
-                let target = warMap.bases.baseNameToObj(unit.target);
-                if (withinDistance(target.coords.x, target.coords.y, unit.coords.x, unit.coords.y, 4)) {
-                    levelData.traveling.splice(i, 1);
-                    unit.coords.x = target.coords.x;
-                    unit.coords.y = target.coords.y;
-                    target.units.push(unit);
-                    warMap.units.checkUnitsForCombineInBase(target);
-                }
-            }
 
-            //leave base
+            //leave from base / travelingObj
             warMap.bases.getAllBases().forEach(function(base) {
-                for(let i = base.units.length - 1; i >= 0; i--) {
+                for (let i = base.units.length - 1; i >= 0; i--) {
                     let unit = base.units[i];
-                    if(JSON.stringify(warMap.bases.baseNameToObj(unit.target)) !== JSON.stringify(base)) { //target is not where it sits
-                        levelData.traveling.push(unit);
+                    if(unit.isFriendly && action.unitsToMove[unit.type]) {
+                        warMap.units.addTravelingObj(unit, target, base.coords);
                         base.units.splice(i, 1);
                     }
                 }
             });
+        },
+        addTravelingObj: function(unit, target, coords) {
+            //find existing traveling obj and add
+            let found = false;
+            levelData.traveling.forEach(function(travelingObj) {
+                if(travelingObj.target === target && JSON.stringify(travelingObj.coords) === JSON.stringify(coords)) {
+                    found = true;
+                    travelingObj.units.push(unit);
+                }
+            });
+            if(found) {
+                return;
+            }
+            //if none found create new
+            let travelingObj = {units:[unit], target:target, coords:copyArray(coords) , id: travelIds++};
+            levelData.traveling.push(travelingObj);
+        },
+        checkUnitsToJoinBase: function() {
+            for(let i = levelData.traveling.length - 1; i >= 0; i--) {
+                let travelingObj = levelData.traveling[i];
+                for(let j = travelingObj.units.length -1; j >= 0; j--) {
+                    let unit = travelingObj.units[j];
+                    let target = warMap.bases.baseNameToObj(travelingObj.target);
+                    if (withinDistance(target.coords.x, target.coords.y, travelingObj.coords.x, travelingObj.coords.y, 4)) {
+                        travelingObj.units.splice(j, 1);
+                        target.units.push(unit);
+                        warMap.units.checkUnitsForCombineInBase(target);
+                    }
+                }
+                if(travelingObj.units.length === 0) {
+                    levelData.traveling.splice(i, 1);
+                }
+            }
+        },
+        travel: function() {
+            levelData.traveling.forEach(function(travelObj) {
+                let target = warMap.bases.baseNameToObj(travelObj.target);
+                let newCoords = moveToTarget(travelObj.coords.x, travelObj.coords.y, target.coords.x, target.coords.y, (warMap.units.getTravelObjSpeed(travelObj)/10));
+                travelObj.coords.x = newCoords.x;
+                travelObj.coords.y = newCoords.y;
+            });
+        },
+        getTravelObjSpeed: function(travelObj) {
+            let speed = travelObj.units[0].speed;
+            for(let i = 1; i < travelObj.units.length; i++) {
+                if(travelObj.units[i].speed < speed) {
+                    speed = travelObj.units[i].speed;
+                }
+            }
+            return speed;
         },
         checkUnitsForCombineInBase: function(base) {
             for(let i = base.units.length -1; i >= 0; i--) {
@@ -309,3 +335,5 @@ let warMap = {
         }
     }
 };
+
+let travelIds = 0; //used for linking levelData.traveling to divs

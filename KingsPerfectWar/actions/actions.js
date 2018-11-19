@@ -132,12 +132,14 @@ function translateNextToCurrent(action, name) {
     if(actionData.moveAction) {
         action.name = warMap.actions.createNameString(action);
     }
+    if(action.createdWith) {
+        action.createdWith = actionData.createdWith;
+    }
     action.cost = actionData.cost;
     action.buy = actionData.buy;
     action.visible = actionData.visible;
     action.unlocked = actionData.unlocked;
     action.canBuy = actionData.canBuy;
-    action.createdWith = actionData.createdWith;
     action.spend = function() {
         gold -= action.costgold;
         wood -= action.costwood;
@@ -195,7 +197,9 @@ function addActionToNext(action, listName, addAmount, index) {
     let toAdd = {};
     toAdd.loops = addAmount;
     toAdd.varName = action.varName;
-    toAdd.unitsToMove = action.unitsToMove;
+    if(action.unitsToMove) {
+        toAdd.unitsToMove = action.unitsToMove;
+    }
 
     if(index !== undefined) {
         actionsList.next[listName].splice(index, 0, toAdd) //insert at index

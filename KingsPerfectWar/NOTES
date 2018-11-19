@@ -115,4 +115,8 @@ Days
     You can re-do previous days
 
 show units on war map moving
+    traveling object has coords, target, units
+    units don't have coords or target
+    units start inside buildings
+
 saving lists

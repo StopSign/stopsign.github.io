@@ -145,7 +145,43 @@ let view = {
                 }
             }
 
-            //TODO update travelling
+            //update traveling objects
+            levelData.traveling.forEach(function(travelObj) {
+                let viewTravelObj;
+                //get existing div if it exists
+                for(let i = 0; i < viewTravelObjs.length; i++) {
+                    if(travelObj.id === viewTravelObjs[i].id) {
+                        viewTravelObj = viewTravelObjs[i];
+                        break;
+                    }
+                }
+
+                //create a new one otherwise
+                if(!viewTravelObj) {
+                    viewTravelObj = view.performance.getNewTravelObj();
+                    viewTravelObj.div.innerHTML = 'hello';
+                    document.getElementById("warMapActions").appendChild(viewTravelObj.div);
+                }
+
+                viewTravelObj.div.style.display = 'block';
+                let coords = view.helpers.translateToWarMapCoords(travelObj.coords);
+                viewTravelObj.div.style.left = (coords.x+5) + "px";
+                viewTravelObj.div.style.top = (coords.y+5) + "px";
+                viewTravelObj.id = travelObj.id;
+            });
+
+            viewTravelObjs.forEach(function(viewTravelObj) {
+                let found = false;
+                levelData.traveling.forEach(function(travelObj) {
+                    if(travelObj.id === viewTravelObj.id) {
+                        found = true;
+                    }
+                });
+                if(!found) {
+                    viewTravelObj.inUse = false;
+                    viewTravelObj.div.style.display = 'none';
+                }
+            });
         }
     },
     actionList: {
@@ -294,6 +330,21 @@ let view = {
                 theDiv.removeChild(theDiv.firstChild);
                 count++;
             }
+        },
+        getNewTravelObj: function() {
+            //get one that isn't being used
+            for(let i = 0; i < viewTravelObjs.length; i++) {
+                if(!viewTravelObjs[i].inUse) {
+                    return viewTravelObjs[i];
+                }
+            }
+
+            //create a new one
+            let travelDiv = document.createElement("div");
+            travelDiv.style.position = "absolute";
+            let newTravelObj = {inUse:true, div:travelDiv};
+            viewTravelObjs.push(newTravelObj);
+            return newTravelObj;
         }
     },
     clickable: {
@@ -454,3 +505,5 @@ let view = {
         }
     }
 };
+
+let viewTravelObjs = []; //for re-using divs
