@@ -2,6 +2,7 @@ let view = {
     initialize: function() {
         view.clickable.initial.createCastleIcons();
         view.clickable.initial.createWarMap();
+        view.clickable.initial.createKingIcons();
         this.actionInfoDiv = {"king":document.getElementById("actionInfoDivKing"),
             "castle":document.getElementById("actionInfoDivCastle"),
             "units":document.getElementById("actionInfoDivUnits"),
@@ -362,24 +363,10 @@ let view = {
                 let container = document.getElementById("castleActions");
                 let allDivs = "";
                 castle.actions.forEach(function(action) {
-                    let costDesc = "";
-                    let first = true;
-                    action.cost.forEach(function(cost) {
-                        if(first) {
-                            costDesc += "Costs ";
-                            first = false;
-                        } else {
-                            costDesc += " Also takes ";
-                        }
-                        if(cost.type === "linear") {
-                            costDesc += cost.starting + " " + cost.resource + " to start, and " + cost.growth + " more each time after that.";
-                        } else if(cost.type === "static") {
-                            costDesc += cost.starting + " " + cost.resource+"."
-                        }
-                    });
+                    let costDesc = view.helpers.getCostsString(action.cost);
 
                     let desc = action.desc + "<br>Adds to the Castle queue.<br>" + costDesc;
-                    //add a progress bar
+
                     allDivs +=
                         '<div id="'+action.varName+'Container" onclick="addActionToList(\''+action.varName+'\', 1, true)" class="clickable abs showthat" style="left:'+action.xPos+'px;top:'+action.yPos+'px;">' +
                         '<img src="img/' + action.varName + '.svg" class="superLargeIcon imageDragFix">' +
@@ -428,6 +415,26 @@ let view = {
                 }
 
                 document.getElementById("warMapActions").innerHTML = allDivs;
+            },
+            createKingIcons: function() {
+                let container = document.getElementById("kingActions");
+                let allDivs = "";
+                king.actions.forEach(function(action) {
+                    let costDesc = view.helpers.getCostsString(action.cost);
+
+                    let desc = action.desc + "<br>Adds to the King queue.<br>" + costDesc;
+
+                    allDivs +=
+                        '<div id="'+action.varName+'Container" onclick="addActionToList(\''+action.varName+'\', 1, true)" class="clickable abs showthat" style="left:'+action.xPos+'px;top:'+action.yPos+'px;">' +
+                        '<img src="img/' + action.varName + '.svg" class="superLargeIcon imageDragFix">' +
+                        '<div class="showthis" style="width:250px">' +
+                        '<div class="smallTitle">'+action.name+'</div>' +
+                        '<div class="small">'+desc+'</div>' +
+                        '</div>' +
+                        '</div>' +
+                        '<div id="'+action.varName+'Num" class="createdNum abs" style="left:'+(action.xPos+10)+'px;top:'+(action.yPos+43)+'px;"></div>';
+                });
+                container.innerHTML = allDivs;
             }
         }
     },
@@ -518,6 +525,24 @@ let view = {
                 }
             }
             return "<img src='img/" + imageType + ".svg' class='largeIcon imageDragFix' style=''>";
+        },
+        getCostsString: function(costs) {
+            let costDesc = "";
+            let first = true;
+            costs.forEach(function(cost) {
+                if(first) {
+                    costDesc += "Costs ";
+                    first = false;
+                } else {
+                    costDesc += " Also takes ";
+                }
+                if(cost.type === "linear") {
+                    costDesc += cost.starting + " " + cost.resource + " to start, and " + cost.growth + " more each time after that.";
+                } else if(cost.type === "static") {
+                    costDesc += cost.starting + " " + cost.resource+"."
+                }
+            });
+            return costDesc;
         }
     }
 };

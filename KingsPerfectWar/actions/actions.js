@@ -159,6 +159,8 @@ function getActionByVarName(varName, list) {
         return getCastleActionByVarName(varName);
     } else if(list === "units") {
         return warMap.actions.getWarMapActionByVarName(varName);
+    } else if(list === "king") {
+        return getKingActionByVarName(varName);
     }
     return null;
 }

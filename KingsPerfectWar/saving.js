@@ -17,7 +17,6 @@ let isBeta = !!location.href.match(/beta/i);
 let saveName = !isBeta ? "perfectWar1" :  "perfectWarBeta";
 
 let stop = false;
-let castle = {};
 let prevState = {};
 let actionsList = {
     nextNames: ["king", "castle", "units", "lab"],
