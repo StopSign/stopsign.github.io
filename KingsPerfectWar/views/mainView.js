@@ -33,7 +33,7 @@ let view = {
             if(prevState.mana !== mana || prevState.maxMana !== maxMana) {
                 document.getElementById("manaBar").style.width = mana / maxMana * 100 + "%";
                 document.getElementById("mana").innerHTML = intToString(mana, 1);
-                document.getElementById("manaTooltip").innerHTML = "Mana.<br>Start with " + intToString(initialMana, 1) + "<br>Current max is " + intToString(maxMana, 1);
+                document.getElementById("manaTooltip").innerHTML = "Mana.<br>Start with " + intToString(levelData.initial.mana, 1) + "<br>Current max is " + intToString(maxMana, 1);
             }
             if(prevState.gold !== gold) {
                 document.getElementById("gold").innerHTML = intToString(gold, 1);
@@ -380,7 +380,7 @@ let view = {
                 container.innerHTML = allDivs;
             },
             createWarMap: function() {
-                createLevel(0);
+                createLevel(curLevel);
                 warMap.actions.createWarMapActions(levelData);
                 let allDivs = "";
                 let homeCoords = view.helpers.translateToWarMapCoords(levelData.home.coords);
@@ -425,7 +425,7 @@ let view = {
                     let desc = action.desc + "<br>Adds to the King queue.<br>" + costDesc;
 
                     allDivs +=
-                        '<div id="'+action.varName+'Container" onclick="addActionToList(\''+action.varName+'\', 1, true)" class="clickable abs showthat" style="left:'+action.xPos+'px;top:'+action.yPos+'px;">' +
+                        '<div id="'+action.varName+'Container" onclick="addActionToList(\''+action.varName+'\', 0, true)" class="clickable abs showthat" style="left:'+action.xPos+'px;top:'+action.yPos+'px;">' +
                         '<img src="img/' + action.varName + '.svg" class="superLargeIcon imageDragFix">' +
                         '<div class="showthis" style="width:250px">' +
                         '<div class="smallTitle">'+action.name+'</div>' +
@@ -470,20 +470,26 @@ let view = {
             return {x:10+(coords.x / 190 * 541), y:15+(coords.y / 100 * 285)};
         },
         getUnitString: function(unitList) {
-            let total = { atk:0, hp:0 };
+            let total = { atk:0, hp:0, exp:0 };
             let tooltipDiv = "";
             unitList.forEach(function(unit) {
                 let num = unit.amount;
                 total.atk += unit.atk * num;
                 total.hp += unit.hp * num;
+                let exp = (unit.exp ? unit.exp : 0);
+                total.exp += exp;
                 tooltipDiv += "<div style='width:20px'><div class='bold'>" + num + "</div></div>" +
                     "<div style='width:80px'>" + capitalizeFirst(unit.varName) + "</div>" +
                     "<div style='width:60px'>Atk: <div class='bold'>"+ unit.atk + "</div></div>" +
-                    "<div style='width:60px'>HP: <div class='bold'>"+ unit.hp + "</div></div><br>"
+                    "<div style='width:60px'>HP: <div class='bold'>"+ unit.hp + "</div></div>" +
+                    total.exp === 0 ? "" : "<div style='width:60px'>Exp: <div class='bold'>"+ exp + "</div></div>" +
+                    "<br>";
             });
             tooltipDiv += "<div style='width:100px'>Total</div>" +
                 "<div style='width:60px'>Atk: <div class='bold'>"+ total.atk + "</div></div>" +
-                "<div style='width:60px'>HP: <div class='bold'>"+ total.hp + "</div></div><br>";
+                "<div style='width:60px'>HP: <div class='bold'>"+ total.hp + "</div></div>" +
+                total.exp === 0 ? "" : "<div style='width:60px'>Exp: <div class='bold'>"+ total.exp + "</div></div>" +
+                "<br>";
             return tooltipDiv;
         },
         getImage: function(action, num) {

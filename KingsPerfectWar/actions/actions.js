@@ -40,12 +40,17 @@ let actions = {
             }
             if(action.manaUsed === 0 && action.buy) {
                 action.spend(); //spend as soon as action starts
+                if(action.start) {
+                    action.start();
+                }
             }
-            action.manaUsed++;
+            action.manaUsed += king.curData.aura === "build" ? (1.5 + king.savedData.cha / 100) : 1;
             if(action.manaUsed / 10 >= action.costseconds) {
                 action.loopsLeft--;
                 if(action.loopsLeft > 0) {
                     action.manaUsed = 0;
+                } else {
+                    action.manaUsed = action.costseconds; //for graphics
                 }
                 if(action.buy) {
                     action.buy();
@@ -139,6 +144,9 @@ function translateNextToCurrent(action, name) {
     if(actionData.createdWith) {
         action.createdWith = actionData.createdWith;
     }
+    if(actionData.start) {
+        action.start = actionData.start
+    }
     action.cost = actionData.cost;
     action.buy = actionData.buy;
     action.visible = actionData.visible;
@@ -155,6 +163,7 @@ function getActionByVarName(varName, list) {
     if(varName === "sleep") {
         return getSleepAction();
     }
+
     if(list === "castle") {
         return getCastleActionByVarName(varName);
     } else if(list === "units") {

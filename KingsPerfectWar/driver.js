@@ -72,16 +72,24 @@ function pauseGame() {
 }
 
 function restart() {
-    mana = initialMana;
-    maxMana = initialMana;
-    gold = initialGold;
-    wood = initialWood;
     for (let property in created.castle) {
         if (created.castle.hasOwnProperty(property)) {
             created.castle[property] = 0;
         }
     }
+    for (let property in created.king) {
+        if (created.king.hasOwnProperty(property)) {
+            created.king[property] = 0;
+        }
+    }
     actions.restart();
     view.clickable.initial.createWarMap();
+    mana = levelData.initial.mana;
+    maxMana = mana;
+    gold = levelData.initial.gold;
+    wood = levelData.initial.wood;
+
+    king.curData.rflxCur = king.savedData.rflxInitial;
+
     prevState = {};
 }

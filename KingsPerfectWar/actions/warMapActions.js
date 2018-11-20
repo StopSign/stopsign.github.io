@@ -87,16 +87,19 @@ let warMap = {
             catapult: { atk:25, hp: 180 },
 
             //enemy
-            thug: { atk:1, hp:15 },
-            brigand: { atk: 3, hp: 40 },
-            bandit: { atk: 6, hp: 100 },
-            thief: { atk:10, hp: 120 },
+            thug: { atk:1, hp:15, exp:2 },
+            brigand: { atk: 3, hp: 40, exp:4 },
+            bandit: { atk: 6, hp: 100, exp:8 },
+            thief: { atk:10, hp: 120, exp:10 },
 
             //monsters
-            goblin: { atk:1, hp:5 },
-            hobgoblin: { atk:2, hp:30 }
+            goblin: { atk:1, hp:5, exp:1 },
+            hobgoblin: { atk:2, hp:30, exp:3 }
         },
         getStatsOfUnit: function(varName) {
+            if(varName === "king") {
+                return { atk: (king.curData.rflxCur+.00000001), hp: Math.floor(king.curData.rflxCur*10+.0000001) };
+            }
             return warMap.units.unitStats[varName]; //TODO buffs go here
         },
         createUnit: function(varName, isFriendly, startingLoc, amount) {

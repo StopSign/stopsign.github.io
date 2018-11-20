@@ -3,6 +3,11 @@ let levelData = {};
 function createLevel(num) {
     let curLevel = levelInitials[num];
     levelData = copyArray(curLevel);
+
+    levelData.data.people = levelData.initial.people;
+    //TODO override levelData.data with saved data
+
+
     levelData.home.units = [];
     levelData.home.fightCounter = 20;
     levelData.traveling = [];
@@ -34,6 +39,22 @@ function createLevel(num) {
 }
 
 levelInitials = [{
+    data: { //overriden if in save file
+        // people: 30,
+        nextLists:{},
+        uniqueCleared:false,
+        knowledge:0,
+        knowledgeCap:0,
+        rapport:0
+    },
+    initial: {
+        people:30, //5270
+        gold: 100,
+        wood: 0,
+        mana: 1200,
+        peopleDifficulty: 1,
+        rapport: 0
+    },
     home: {
         coords: {x: 0, y: 100},
         units: { king: 1 }
