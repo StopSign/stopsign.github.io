@@ -1,5 +1,6 @@
 TODO
 
+fix people
 king exp
 graphics for king tab
 saving
@@ -8,14 +9,57 @@ saving
     king stats
 enemy attacks
 lab
-    ????
+    2 buildings in castle
+        small shrine 1000 wood/gold, build 10 seconds, gives 1 spirit power
+        large shrine 10000 wood/gold, build 20 seconds, gives 5 spirit power
+    Blessings
+        purpose
+            a feature that uses wood buildup of a run to give sort of temporary bonuses
+        general info
+            each action takes 1 second
+            each action has its own list, contains up to 12 "highest runs". For each, If current level < highest run, -6.25% spirit points needed, max 25%
+            costs 100 wood per spirit power
+        temporary - completions save per level
+            Faerie Enchantments - +20% atk all units, 100 points + 100 each time, 5 max
+            Blessed Feasts - +20% hp all units, 100 points + 100 each time, 5 max
+            Faerie Guidance - +20% spd all units, 300 points + 300 each time, 5 max
+            Peaceful Aura - +10% gold all buildings, levels 5/10/15 unlock buildings. 50+ points, 15 max
+            Nature's Bounty - +10% wood all buildings, levels 5/10/15 unlock buildings. 50+ points, 15 max
+            Forest Champion - 100 * 10 each time, 3 max
+    saving # of completions per
+heroes
+
+Soul Crystals
+    purpose
+        a feature that uses gold buildup of a run
+        extra gold becomes soul crystals (prestige currency), use for super strong units
+    specifics
+        every 1k extra gold becoems 1 soul crystal
+        first units built become highest tier
+        these are king actions that take 20*(tier) seconds each
+        units
+            1000 SC - spearman x10
+            5000 SC - archer x10
+            15k SC - catapult x10
+            100k SC - spearman x100
+            500k SC - archer x100
+            1.5m SC - cata x100
+            etc.
 statistics
     unit
     restart reason/pop-up
 switching levels / level design
+    when all hideouts are cleared, level is complete and "next" arrow appears
+    restart on level clear option, default off
+    levels scale in time from ~1 minute to ~15 minutes over ~20 levels
+    make a random level generator?
+    1 time prizes of WIS/INT on *very* difficult dungeons every few levels, starting at 5
+    increasing gold prizes and EXP for clearing each level to entice players to stay at peak
 offline / pause / bonus seconds
 options tab
     export / import
     discord link
+browsers
+mobile
 tutorial
 

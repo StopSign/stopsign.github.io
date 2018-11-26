@@ -41,6 +41,7 @@ function createLevel(num) {
 levelInitials = [{
     data: { //overriden if in save file
         // people: 30,
+        peopleKnown:0,
         nextLists:{},
         uniqueCleared:false,
         knowledge:0,

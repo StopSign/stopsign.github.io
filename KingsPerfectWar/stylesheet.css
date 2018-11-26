@@ -20,7 +20,7 @@ body {
 .showthatH:hover .showthisH {
     display:block;
 }
-.showthat:hover .showthis, .showthat2:hover .showthis2 {
+.showthat:hover .showthis, .showthat:hover .showthisUp, .showthat2:hover .showthis2 {
     display:block;
 }
 .showthis, .showthis2, .showthisH {
@@ -33,6 +33,18 @@ body {
     margin-top:5px;
     z-index:999;
     text-align:left;
+}
+.showthisUp {
+    display:none;
+    position:absolute;
+    background-color: #BBD6E6;
+    border:1px solid;
+    padding:3px 5px;
+    border-radius:4px;
+    margin-top:5px;
+    z-index:999;
+    text-align:left;
+    bottom:30px;
 }
 
 .showthis2 {

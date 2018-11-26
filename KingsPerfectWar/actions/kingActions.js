@@ -65,7 +65,7 @@ let king = {
                 cost: [],
                 seconds:1,
                 xPos:20,
-                yPos:25,
+                yPos:150,
                 start: function() {
                     king.curData.aura = "gold";
                 }
@@ -78,7 +78,7 @@ let king = {
                 cost: [],
                 seconds:1,
                 xPos:70,
-                yPos:25,
+                yPos:150,
                 start: function() {
                     king.curData.aura = "wood";
                 }
@@ -91,7 +91,7 @@ let king = {
                 cost: [],
                 seconds:1,
                 xPos:120,
-                yPos:25,
+                yPos:150,
                 start: function() {
                     king.curData.aura = "build";
                 }
@@ -101,10 +101,6 @@ let king = {
                 varName:"chat",
                 name:"Chat with Citizens",
                 desc:"Learn to talk to your citizens, and when you have enough rapport, learn about interesting family secrets and books to further study. Hover the (?) for info on numbers.",
-                //Each map has a max number of people to talk to. You gain rapport equal to your CHA until a person has shared their secrets, increasing your knowledge cap.
-                //Each person has a difficulty, and the next person has +.1 difficulty. You need (100 * difficulty) rapport per person. Additionally, if their difficulty is higher than your CHA, you need another (difficulty - CHA)*50)^2 rapport.
-                //Rapport on the current person resets when the map resets. If their difficulty is higher than your CHA, you gain CHA equal to (difficulty - CHA)/10 . CHA used for these calculations is rounded to the nearest tenth - matching what you see.
-                //You gain 200 max knowledge for the first person, and -2 for each subsequent person.
                 cost: [],
                 seconds:2,
                 xPos:250,
@@ -112,16 +108,20 @@ let king = {
                 buy: function() {
                     let personNum = levelData.initial.people - levelData.data.people;
                     let difficulty = levelData.initial.peopleDifficulty + personNum/10;
+                    console.log("difficulty: " + difficulty);
                     let rapportNeeded = 100 * difficulty;
                     if(king.savedData.cha < difficulty) {
-                        rapportNeeded += Math.pow((difficulty - round1(king.savedData.cha))*50, 2)
+                        rapportNeeded += Math.pow((difficulty - king.savedData.cha)*50, 2)
                     }
-                    levelData.data.rapport += round1(king.savedData.cha);
+                    levelData.data.rapport += king.savedData.cha;
                     if(rapportNeeded <= levelData.data.rapport) {
-                        levelData.data.knowledgeCap += 200 - personNum * 2;
+                        if((personNum + 1) > levelData.data.peopleKnown) {
+                            levelData.data.knowledgeCap += 200 - personNum * 2;
+                            levelData.data.peopleKnown++;
+                        }
                         levelData.data.rapport = 0;
                         levelData.data.people--;
-                        king.savedData.cha += (difficulty - round1(king.savedData.cha)) / 10;
+                        king.savedData.cha += Math.ceil((difficulty - king.savedData.cha) / 10 * 100 - .000000001)/100;
                     }
                 },
                 canBuy: function() {

@@ -98,7 +98,7 @@ let warMap = {
         },
         getStatsOfUnit: function(varName) {
             if(varName === "king") {
-                return { atk: (king.curData.rflxCur+.00000001), hp: Math.floor(king.curData.rflxCur*10+.0000001) };
+                return { atk: Math.floor(king.curData.rflxCur+.00000001), hp: Math.floor(king.curData.rflxCur*10+.0000001) };
             }
             return warMap.units.unitStats[varName]; //TODO buffs go here
         },
@@ -118,6 +118,9 @@ let warMap = {
             unit.atk = stats.atk;
             unit.hp = stats.hp;
             unit.maxHp = stats.hp;
+            if(stats.exp) {
+                unit.exp = stats.exp;
+            }
             unit.speed = 12; //DEBUG 2
             warMap.bases.baseNameToObj(startingLoc).units.push(unit);
         },

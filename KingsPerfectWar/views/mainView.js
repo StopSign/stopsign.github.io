@@ -370,7 +370,7 @@ let view = {
                     allDivs +=
                         '<div id="'+action.varName+'Container" onclick="addActionToList(\''+action.varName+'\', 1, true)" class="clickable abs showthat" style="left:'+action.xPos+'px;top:'+action.yPos+'px;">' +
                         '<img src="img/' + action.varName + '.svg" class="superLargeIcon imageDragFix">' +
-                        '<div class="showthis" style="width:250px">' +
+                        '<div class="showthisUp" style="width:250px">' +
                         '<div class="smallTitle">'+action.name+'</div>' +
                         '<div class="small">'+desc+'</div>' +
                         '</div>' +
@@ -427,7 +427,7 @@ let view = {
                     allDivs +=
                         '<div id="'+action.varName+'Container" onclick="addActionToList(\''+action.varName+'\', 0, true)" class="clickable abs showthat" style="left:'+action.xPos+'px;top:'+action.yPos+'px;">' +
                         '<img src="img/' + action.varName + '.svg" class="superLargeIcon imageDragFix">' +
-                        '<div class="showthis" style="width:250px">' +
+                        '<div class="showthisUp" style="width:250px">' +
                         '<div class="smallTitle">'+action.name+'</div>' +
                         '<div class="small">'+desc+'</div>' +
                         '</div>' +
@@ -476,19 +476,19 @@ let view = {
                 let num = unit.amount;
                 total.atk += unit.atk * num;
                 total.hp += unit.hp * num;
-                let exp = (unit.exp ? unit.exp : 0);
+                let exp = (unit.exp ? unit.exp * num : 0);
                 total.exp += exp;
                 tooltipDiv += "<div style='width:20px'><div class='bold'>" + num + "</div></div>" +
                     "<div style='width:80px'>" + capitalizeFirst(unit.varName) + "</div>" +
                     "<div style='width:60px'>Atk: <div class='bold'>"+ unit.atk + "</div></div>" +
                     "<div style='width:60px'>HP: <div class='bold'>"+ unit.hp + "</div></div>" +
-                    total.exp === 0 ? "" : "<div style='width:60px'>Exp: <div class='bold'>"+ exp + "</div></div>" +
+                    (total.exp === 0 ? "" : "<div style='width:60px'>Exp: <div class='bold'>"+ exp + "</div></div>") +
                     "<br>";
             });
             tooltipDiv += "<div style='width:100px'>Total</div>" +
                 "<div style='width:60px'>Atk: <div class='bold'>"+ total.atk + "</div></div>" +
                 "<div style='width:60px'>HP: <div class='bold'>"+ total.hp + "</div></div>" +
-                total.exp === 0 ? "" : "<div style='width:60px'>Exp: <div class='bold'>"+ total.exp + "</div></div>" +
+                (total.exp === 0 ? "" : "<div style='width:60px'>Exp: <div class='bold'>"+ total.exp + "</div></div>") +
                 "<br>";
             return tooltipDiv;
         },
