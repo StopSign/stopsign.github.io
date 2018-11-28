@@ -102,27 +102,40 @@ let king = {
                 name:"Chat with Citizens",
                 desc:"Learn to talk to your citizens, and when you have enough rapport, learn about interesting family secrets and books to further study. Hover the (?) for info on numbers.",
                 cost: [],
-                seconds:2,
+                seconds:5,
                 xPos:250,
                 yPos:25,
                 buy: function() {
-                    let personNum = levelData.initial.people - levelData.data.people;
-                    let difficulty = levelData.initial.peopleDifficulty + personNum/10;
-                    console.log("difficulty: " + difficulty);
-                    let rapportNeeded = 100 * difficulty;
-                    if(king.savedData.cha < difficulty) {
-                        rapportNeeded += Math.pow((difficulty - king.savedData.cha)*50, 2)
+                    //levelData.initial describes things initials of every level reset and the initial numbers of the permanent level data
+                    //levelData.data describes things that are reset every level
+                    //levelSave[curLevel] describes things that are not reset
+
+                    let rapportNeeded = 10 * levelData.data.difficulty;
+                    if(king.savedData.cha < levelData.data.difficulty) {
+                        rapportNeeded += Math.pow((levelData.data.difficulty - king.savedData.cha), 2)*5
                     }
-                    levelData.data.rapport += king.savedData.cha;
-                    if(rapportNeeded <= levelData.data.rapport) {
-                        if((personNum + 1) > levelData.data.peopleKnown) {
-                            levelData.data.knowledgeCap += 200 - personNum * 2;
-                            levelData.data.peopleKnown++;
+
+                    if(levelData.data.person < levelData.initial.people) { //only add if done otherwise
+                        levelData.data.rapport += king.savedData.cha;
+                    }
+                    while(rapportNeeded <= levelData.data.rapport) { //advance a person
+                        levelData.data.person++;
+                        levelData.data.rapport -= rapportNeeded;
+                        if(levelData.data.person > levelSave[curLevel].secrets) {
+                            levelSave[curLevel].knowledgeCap += 200 - levelSave[curLevel].secrets * 2;
+                            levelSave[curLevel].secrets++;
                         }
-                        levelData.data.rapport = 0;
-                        levelData.data.people--;
-                        king.savedData.cha += Math.ceil((difficulty - king.savedData.cha) / 10 * 100 - .000000001)/100;
+                        if(levelData.data.difficulty > king.savedData.cha) {
+                            king.savedData.cha += Math.ceil((levelData.data.difficulty - king.savedData.cha) * 10 - .000000001) / 100;
+                        }
+                        levelData.data.difficulty = round2(levelData.data.difficulty + .1); //handle rounding
+
+                        rapportNeeded = 10 * levelData.data.difficulty;
+                        if(king.savedData.cha < levelData.data.difficulty) {
+                            rapportNeeded += Math.pow((levelData.data.difficulty - king.savedData.cha), 2)*5
+                        }
                     }
+                    levelData.data.rapport = round5(levelData.data.rapport);
                 },
                 canBuy: function() {
                     return levelData.data.people >= 0;
@@ -139,10 +152,10 @@ let king = {
                 yPos:85,
                 buy: function() {
                     let knowledgeGain = king.savedData.wis;
-                    if((knowledgeGain+levelData.savedData.knowledge) > levelData.savedData.knowledgeCap) {
-                        knowledgeGain = levelData.savedData.knowledgeCap - levelData.savedData.knowledge;
+                    if((knowledgeGain + levelSave[curLevel].knowledge) > levelSave[curLevel].knowledgeCap) {
+                        knowledgeGain = levelSave[curLevel].knowledgeCap - levelSave[curLevel].knowledge;
                     }
-                    levelData.savedData.knowledge += knowledgeGain;
+                    levelSave[curLevel].knowledge += knowledgeGain;
                     king.savedData.int += knowledgeGain / 1000;
                 }
             });
@@ -164,11 +177,20 @@ let king = {
     },
     helpers: {
         getLevel: function() { //200, 500, 900, 1400, etc.
-            let level = Math.floor((Math.sqrt(2*king.exp + 225)-25)/10+.0000001);
-            return level < 0 ? 0 : level;
+            let level = Math.floor((Math.sqrt(2*king.savedData.exp + 225)-25)/10+.0000001);
+            return level < 0 ? 0 : level+1;
         },
         getExpOfLevel: function(level) {
             return 50 * (level+2) * (level + 3)-100; //50 *(y+2)* (y + 3)-100
+        },
+        calcRapportBonus: function() {
+            let bonus = 0;
+            for(let i = 0; i < levelSave[curLevel].highestPerson; i++) {
+                if(levelData.data.person < levelSave[curLevel].highestPerson[i]) {
+                    bonus++;
+                }
+            }
+            return 1 + (bonus / 4);
         }
     }
 };

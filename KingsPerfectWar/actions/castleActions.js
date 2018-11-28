@@ -189,15 +189,10 @@ let castle = {
                 name:"Equip Spearman",
                 desc:"The meat of your army, they'll take damage before your other units.",
                 cost: [
-                    // {
-                    //     resource:"wood",
-                    //     type:"static",
-                    //     starting:200
-                    // }
-                    { //debug
-                        resource:"gold",
+                    {
+                        resource:"wood",
                         type:"static",
-                        starting:5
+                        starting:200
                     }
                 ],
                 createdWith:"barracks",

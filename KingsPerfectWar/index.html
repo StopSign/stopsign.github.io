@@ -119,60 +119,58 @@
                     <div id="kingActions" class="abs" style="left:0;top:0;"></div>
                     <div id="kingOtherInfo" class="abs" style="left:0;top:0">
                         <div id='kingStats' class="abs" style="left:18px;top:10px;width:200px">
-                            <div style='font-size:20px'>Level <div id="kingLevel" class="bold">2</div></div>
+                            <div style='font-size:20px'>Level <div id="kingLevel" class="bold"></div></div>
                             <div style="position:relative;width:100%;height:17px;background-color:rgb(223,194,249);margin-bottom:3px;">
-                                <div class="abs" style="left:0;top:0;height:100%;width:20%;background-color:rgba(179,92,249,0.8)"></div>
-                                <div class="abs" style="left:0;top:0;">1133 / 31414 exp</div>
+                                <div class="abs" id="expProgress" style="left:0;top:0;height:100%;width:20%;background-color:rgba(179,92,249,0.8)"></div>
+                                <div class="abs" id="exp" style="left:0;top:0;"></div>
                             </div>
-                            Reflex Cap: <div id="reflexCap" class="bold">10</div><br>
-                            Intelligence: <div id="int" class="bold">0</div><br>
-                            Wisdom: <div id="wis" class="bold">1</div><br>
-                            Charisma: <div id="cha" class="bold">1</div>
+                            Current Reflex: <div id="rflxCur" class="bold"></div><br>
+                            Reflex Cap: <div id="rflxCap" class="bold"></div><br>
+                            Intelligence: <div id="int" class="bold"></div><br>
+                            Wisdom: <div id="wis" class="bold"></div><br>
+                            Charisma: <div id="cha" class="bold"></div>
                         </div>
                         <div id="peopleInfo" class="abs" style='left:300px;top:20px;width:250px;'>
-                            <div class="abs" style='left:0;top:0'>Person <div id="personNum" class="bold">20</div>, Difficulty <div id="personDifficulty" class="bold">2.2</div></div>
+                            <div class="abs" style='left:0;top:0'>Person <div id="personNum" class="bold"></div>, Difficulty <div id="difficulty" class="bold"></div></div>
                             <div class="abs" style="left:0;top:20px;height:17px;width:150px;background-color:rgb(255,247,181);">
-                                <div class="abs" style="left:0;width:20%;height:100%;background-color:rgba(255, 184, 15, .8)"></div>
-                                <div class="abs" style="left:5px" id="rapport">50 / 250 rapport</div>
+                                <div id="rapportProgress" class="abs" style="left:0;width:20%;height:100%;background-color:rgba(255, 184, 15, .8)"></div>
+                                <div id="rapport" class="abs" style="left:5px">50 / 250 rapport</div>
                             </div>
-                            <div class="abs showthat" style='left:0;top:38px;'>
-                                Secrets Learned: <div id="peopleKnown" class="bold">30</div>
-                                <div class="showthis">
-                                    <div id="mapMaxPeople" class="bold">30</div> people total on this map
+                            <div class="abs showthat" style='left:0;top:38px'>
+                                Secrets Learned: <div id="secrets" class="bold"></div>
+                                <div class="showthis" style='width:200px'>
+                                    <div id="mapMaxPeople" class="bold"></div> people total on this map
                                 </div>
                             </div>
                             <div class="abs showthat" style='left:150px;top:20px'>
-                                +<div id="rapportAdded" class="bold">3</div>
+                                +<div id="rapportAdded" class="bold"></div>
                                 <div class="showthis" style="width:130px">
-                                    1st highest: <div id="peopleHighest0" class="bold">19</div><br>
-                                    2nd highest: <div id="peopleHighest1" class="bold">18</div><br>
-                                    3rd highest: <div id="peopleHighest2" class="bold">17</div><br>
-                                    4th highest: <div id="peopleHighest3" class="bold">16</div><br>
-                                    Current bonus: <div id="rapportBonus" class="bold">25</div>%
+                                    1st highest: <div id="personHighest0" class="bold"></div><br>
+                                    2nd highest: <div id="personHighest1" class="bold"></div><br>
+                                    3rd highest: <div id="personHighest2" class="bold"></div><br>
+                                    4th highest: <div id="personHighest3" class="bold"></div><br>
+                                    Current bonus: <div id="rapportBonus" class="bold"></div>%
                                 </div>
                             </div>
                             <div class="abs showthat" style='left:-65px;top:0'>
                                 <i class="fa fa-question-circle" aria-hidden="true" style='font-size:16px'></i>
                                 <div class="showthisUp" style="width:720px">
                                     Each map has a max number of people to talk to. You gain rapport equal to your CHA until a person has shared their secrets, which increases your knowledge cap. You can only get max knowledge from a person once.<br>
-                                    Each person has a difficulty, and the next person has +0.1 difficulty. You need (100 * difficulty) rapport per person. Additionally, if their difficulty is higher than your CHA, you need an additional (difficulty - CHA)*50)^2 rapport.<br>
+                                    Each person has a difficulty, and the next person has +0.1 difficulty. You need (10 * difficulty) rapport per person. Additionally, if their difficulty is higher than your CHA, you need an additional ((difficulty - CHA)^2)*5 rapport.<br>
                                     If the difficulty is higher than your CHA, upon completion you gain CHA equal to (difficulty - CHA)/10, rounded up to the nearest hundredth.<br>
                                     You gain 200 max knowledge for the first secret, and -2 for each subsequent secret.<br>
                                     Additionally, you get better at speaking to people you've already spoken to. Everyone with less difficulty than your highest reached difficulty is 25% easier to talk to. Your highest reached is saved 4 separate times per map.<br>
                                 </div>
                             </div>
                         </div>
-                        <div id="knowledgeInfo" class="abs showthat" style='left:300px;top:82px;width:250px;'>
-                            Knowledge: <div id="knowledge" class="bold">19</div><br>
-                            Knowledge Rate: +<div id="knowledgeRate" class="bold">2</div><br>
-                            Max Knowledge: <div id="knowledgeCap" class="bold">19</div>
+                        <div id="knowledgeInfo" class="abs showthat" style='left:300px;top:98px;width:200px;'>
+                            Knowledge: <div id="knowledge" class="bold"></div> / <div id="knowledgeCap" class="bold"></div> (+<div id="knowledgeRate" class="bold"></div>)<br>
                             <div class="showthis">
                                 Every 1000 knowledge gained gives the king 1 INT
                             </div>
                         </div>
-                        <div id="trainInfo" class="abs showthat" style='left:300px;top:150px;width:250px;'>
-                            Current Reflex: <div id="rflxCur" class="bold">20</div><br>
-                            Reflex to Gain: <div id="rflxGain" class="bold">1.2</div>
+                        <div id="trainInfo" class="abs showthat" style='left:300px;top:158px;width:250px;'>
+                            Reflex to Gain: <div id="rflxGain" class="bold"></div>
                             <div class="showthisUp">
                                 The King's ATK is equal to the current reflex, and HP is equal to current reflex * 10
                             </div>

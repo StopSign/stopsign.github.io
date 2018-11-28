@@ -49,8 +49,6 @@ let actions = {
                 action.loopsLeft--;
                 if(action.loopsLeft > 0) {
                     action.manaUsed = 0;
-                } else {
-                    action.manaUsed = action.costseconds; //for graphics
                 }
                 if(action.buy) {
                     action.buy();

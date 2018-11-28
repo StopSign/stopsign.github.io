@@ -1,32 +1,46 @@
 let levelData = {};
 
 function createLevel(num) {
-    let curLevel = levelInitials[num];
-    levelData = copyArray(curLevel);
+    //levelData.initial describes things initials of every level reset and the initial numbers of the permanent level data
+    //levelData.data describes things that are reset every level
+    //levelSave[curLevel] describes things that are not reset
+    let curLevelData = levelInitials[num];
+    levelData = copyArray(curLevelData);
 
-    levelData.data.people = levelData.initial.people;
-    //TODO override levelData.data with saved data
+    if(!levelSave[num]) {
+        levelSave[num] = {};
+        levelSave[num].nextLists = {}; //TODO whew boy
+        levelSave[num].secrets = 0;
+        levelSave[num].uniqueCleared = false;
+        levelSave[num].knowledge = 0;
+        levelSave[num].knowledgeCap = 0;
+        levelSave[num].highestPerson = [-1, -1, -1, -1];
+    }
 
-
+    levelData.data = {
+        person:0,
+        rapport:0,
+        difficulty:(num+1)
+    };
     levelData.home.units = [];
     levelData.home.fightCounter = 20;
     levelData.traveling = [];
     //turn unit mentions into actual units
     warMap.units.createUnit("king", true, "home", 1);
-    for(let i = 0; i < curLevel.dungeons.length; i++) {
+    for(let i = 0; i < curLevelData.dungeons.length; i++) {
         levelData.dungeons[i].units = [];
         levelData.dungeons[i].fightCounter = 20;
-        let dungeon = curLevel.dungeons[i];
+        let dungeon = curLevelData.dungeons[i];
         for (let property in dungeon.units) {
             if (dungeon.units.hasOwnProperty(property)) {
                 warMap.units.createUnit(property, false, "dungeon_"+i, dungeon.units[property]);
             }
         }
     }
-    for(let i = 0; i < curLevel.hideouts.length; i++) {
+    for(let i = 0; i < curLevelData.hideouts.length; i++) {
         levelData.hideouts[i].units = [];
         levelData.hideouts[i].fightCounter = 20;
-        let hideout = curLevel.hideouts[i];
+        let hideout = curLevelData.hideouts[i];
         if(hideout.creates) {
             levelData.hideouts[i].createCounter = hideout.creates.initialTime;
         }
@@ -39,22 +53,11 @@ function createLevel(num) {
 }
 
 levelInitials = [{
-    data: { //overriden if in save file
-        // people: 30,
-        peopleKnown:0,
-        nextLists:{},
-        uniqueCleared:false,
-        knowledge:0,
-        knowledgeCap:0,
-        rapport:0
-    },
     initial: {
         people:30, //5270
-        gold: 100,
-        wood: 0,
-        mana: 1200,
-        peopleDifficulty: 1,
-        rapport: 0
+        gold: 1000,
+        wood: 1000,
+        mana: 1200
     },
     home: {
         coords: {x: 0, y: 100},

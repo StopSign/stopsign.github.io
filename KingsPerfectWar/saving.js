@@ -14,7 +14,7 @@ function startGame() {
 
 let isFileSystem = !!location.href.match("file");
 let isBeta = !!location.href.match(/beta/i);
-let saveName = !isBeta ? "perfectWar1" :  "perfectWarBeta";
+let saveName = !isBeta ? "KPW1" :  "KPWBeta";
 
 let stop = false;
 let prevState = {};
@@ -48,6 +48,8 @@ let curList = 1; //castle
 let currentlyHovering = 0;
 let unitsSelectedForMove = { king:false, units:true, heroes:false };
 
+let levelSave = [];
+
 function clearSave() {
     window.localStorage[saveName] = "";
     load();
@@ -69,6 +71,7 @@ function load() {
 
     view.initialize();
     restart();
+    save();
 }
 
 function save() {

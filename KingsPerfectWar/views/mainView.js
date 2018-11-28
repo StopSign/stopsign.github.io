@@ -12,10 +12,12 @@ let view = {
         update: function () {
             //compare prevState to current
             //update the view of anything that's changed
+            //order of these is important
             view.updating.updateLists();
             view.updating.updateResources();
             view.updating.updateCreated();
             view.updating.updateUnits();
+            view.updating.updateKingTab();
 
             view.updating.saveCurrentState();
         },
@@ -28,6 +30,10 @@ let view = {
             prevState.current = copyArray(actionsList.current);
             prevState.created = copyArray(created);
             prevState.levelData = copyArray(levelData);
+            prevState.king = {};
+            prevState.king.savedData = copyArray(king.savedData);
+            prevState.king.curData = copyArray(king.curData);
+            prevState.levelSave = copyArray(levelSave[curLevel]);
         },
         updateResources: function() {
             if(prevState.mana !== mana || prevState.maxMana !== maxMana) {
@@ -192,6 +198,77 @@ let view = {
                     viewTravelObj.div.style.display = 'none';
                 }
             });
+        },
+        updateKingTab: function() {
+            let updateRapportGain = false;
+            let noPrevKing = !(prevState.king && prevState.king.savedData && prevState.king.curData);
+            if(noPrevKing || prevState.king.savedData.int !== king.savedData.int) {
+                document.getElementById("int").innerHTML = round5(king.savedData.int);
+            }
+            if(noPrevKing || prevState.king.savedData.wis !== king.savedData.wis) {
+                document.getElementById("wis").innerHTML = king.savedData.wis + "";
+                document.getElementById("knowledgeRate").innerHTML = king.savedData.wis + "";
+            }
+            if(noPrevKing || prevState.king.savedData.cha !== king.savedData.cha) {
+                document.getElementById("cha").innerHTML = king.savedData.cha + "";
+                updateRapportGain = true;
+            }
+            if(noPrevKing || prevState.king.curData.rflxCur !== king.curData.rflxCur) {
+                document.getElementById("rflxCur").innerHTML = king.curData.rflxCur + "";
+            }
+            if(noPrevKing || prevState.king.savedData.exp !== king.savedData.exp) {
+                document.getElementById("kingLevel").innerHTML = king.helpers.getLevel();
+                let expNeeded = king.helpers.getExpOfLevel(king.helpers.getLevel());
+                document.getElementById("exp").innerHTML = "<b>"+king.savedData.exp+"</b> / <b>"+expNeeded+"</b> exp";
+                let expOfPrev = king.helpers.getExpOfLevel(king.helpers.getLevel()-1);
+                document.getElementById("expProgress").style.width = 100 * (king.savedData.exp - expOfPrev) / (expNeeded - expOfPrev) + "%";
+
+                document.getElementById("rflxCap").innerHTML = king.savedData.rflxCap + "";
+                document.getElementById("rflxGain").innerHTML = intToString((king.savedData.rflxCap - king.curData.rflxCur)/100);
+            }
+
+            let noPrevLevelSave = !(prevState.levelSave);
+            if(noPrevLevelSave || prevState.levelSave.knowledgeCap !== levelSave[curLevel].knowledgeCap) {
+                document.getElementById("knowledgeCap").innerHTML = levelSave[curLevel].knowledgeCap;
+            }
+            if(noPrevLevelSave || prevState.levelSave.secrets !== levelSave[curLevel].secrets) {
+                document.getElementById("secrets").innerHTML = levelSave[curLevel].knowledgeCap;
+            }
+            if(noPrevLevelSave || prevState.levelSave.knowledge !== levelSave[curLevel].knowledge) {
+                document.getElementById("knowledge").innerHTML = levelSave[curLevel].knowledge;
+            }
+
+            let noPrevLevelData = !(prevState.levelData && prevState.levelData.data);
+            if(noPrevLevelData || prevState.levelData.data.person !== levelData.data.person) {
+                document.getElementById("personNum").innerHTML = levelData.data.person + "";
+            }
+            if(noPrevLevelData || prevState.levelData.data.difficulty !== levelData.data.difficulty) {
+                document.getElementById("difficulty").innerHTML = levelData.data.difficulty + "";
+            }
+            if(noPrevLevelData || prevState.levelData.data.rapport !== levelData.data.rapport) {
+                let rapportNeeded = 10 * levelData.data.difficulty;
+                if(king.savedData.cha < levelData.data.difficulty) {
+                    rapportNeeded += Math.pow((levelData.data.difficulty - king.savedData.cha), 2)*5
+                }
+                document.getElementById("rapport").innerHTML = levelData.data.rapport + " / " + rapportNeeded + " rapport";
+                document.getElementById("rapportProgress").style.width = (100 * levelData.data.rapport / rapportNeeded) + "%";
+            }
+            if(noPrevLevelData || prevState.levelData.initial.people !== levelData.initial.people) {
+                document.getElementById("mapMaxPeople").innerHTML = levelData.initial.people + "";
+                updateRapportGain = true;
+            }
+            if(updateRapportGain) {
+                for(let i = 0; i < levelSave[curLevel].highestPerson.length; i++) {
+                    let num = levelSave[curLevel].highestPerson[i];
+                    document.getElementById("personHighest"+i).innerHTML = num < 0 ? "NA" : num;
+                }
+
+                let rapportBonus = king.helpers.calcRapportBonus();
+                document.getElementById("rapportBonus").innerHTML = (rapportBonus-1)*100 + "";
+                document.getElementById("rapportAdded").innerHTML = intToString(king.savedData.cha * rapportBonus);
+            }
+
+
         }
     },
     actionList: {
