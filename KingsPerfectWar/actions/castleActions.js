@@ -1,19 +1,9 @@
 let castle = {
     actions:[],
     tick: function() {
-        let addedWood = 0;
-        addedWood += created.castle.scavenger;
-        addedWood += created.castle.logger * 5;
-        addedWood += created.castle.forester * 25;
-        addedWood *= king.curData.aura === "wood" ? (2 + king.savedData.cha / 20) : 1;
-        wood += addedWood;
+        gold += castle.helpers.goldToAdd();
 
-        let addedGold = 0;
-        addedGold += created.castle.beg;
-        addedGold += created.castle.merchant * 5;
-        addedGold += created.castle.tax * 25;
-        addedGold *= king.curData.aura === "gold" ? (2 + king.savedData.cha / 20) : 1;
-        gold += addedGold;
+        wood += castle.helpers.woodToAdd();
     },
     initial: {
         addCastleAction(action) {
@@ -271,6 +261,24 @@ let castle = {
         },
         createLabActions() {
 
+        }
+    },
+    helpers: {
+        woodToAdd: function() {
+            let addedWood = 0;
+            addedWood += created.castle.scavenger;
+            addedWood += created.castle.logger * 5;
+            addedWood += created.castle.forester * 25;
+            addedWood *= king.curData.aura === "wood" ? (2 + king.savedData.cha / 20) : 1;
+            return addedWood;
+        },
+        goldToAdd: function() {
+            let addedGold = 0;
+            addedGold += created.castle.beg;
+            addedGold += created.castle.merchant * 5;
+            addedGold += created.castle.tax * 25;
+            addedGold *= king.curData.aura === "gold" ? (2 + king.savedData.cha / 20) : 1;
+            return addedGold;
         }
     }
 };

@@ -43,9 +43,13 @@ let view = {
             }
             if(prevState.gold !== gold) {
                 document.getElementById("gold").innerHTML = intToString(gold, 1);
+                document.getElementById("actualGold").innerHTML = round5(gold);
+                document.getElementById("goldPerSecond").innerHTML = round5(castle.helpers.goldToAdd());
             }
             if(prevState.wood !== wood) {
                 document.getElementById("wood").innerHTML = intToString(wood, 1);
+                document.getElementById("actualWood").innerHTML = round5(wood);
+                document.getElementById("woodPerSecond").innerHTML = round5(castle.helpers.woodToAdd());
             }
         },
         updateLists: function() {

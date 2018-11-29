@@ -122,7 +122,10 @@ let warMap = {
                 unit.exp = stats.exp;
             }
             unit.speed = 12; //DEBUG 2
-            warMap.bases.baseNameToObj(startingLoc).units.push(unit);
+            let base = warMap.bases.baseNameToObj(startingLoc);
+            base.units.push(unit);
+            warMap.units.checkUnitsForCombineInBase(base);
+            warMap.units.sortHpLowestToHighest(base.units);
         },
         getAllUnits: function() {
             let allUnits = [];

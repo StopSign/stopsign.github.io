@@ -1,9 +1,12 @@
 TODO
 
-connect units when making multiple
 king's auras disabled when he's away from home
+image pooling for lists
+image pooling for map
 pause action
 restart action
+second/mana on action list hoverover
+freeze build value
 enemy attacks
 lab
     2 buildings in castle
@@ -63,4 +66,4 @@ options tab
 browsers
 mobile
 tutorial
-
+polls
