@@ -115,8 +115,8 @@ let king = {
                         rapportNeeded += Math.pow((levelData.data.difficulty - king.savedData.cha), 2)*5
                     }
 
-                    if(levelData.data.person < levelData.initial.people) { //only add if done otherwise
-                        levelData.data.rapport += king.savedData.cha;
+                    if(levelData.data.person < levelData.initial.people) { //only add if not done
+                        levelData.data.rapport += king.savedData.cha * king.helpers.calcRapportBonus();
                     }
                     while(rapportNeeded <= levelData.data.rapport) { //advance a person
                         levelData.data.person++;
@@ -126,7 +126,7 @@ let king = {
                             levelSave[curLevel].secrets++;
                         }
                         if(levelData.data.difficulty > king.savedData.cha) {
-                            king.savedData.cha += Math.ceil((levelData.data.difficulty - king.savedData.cha) * 10 - .000000001) / 100;
+                            king.savedData.cha = round5(king.savedData.cha + Math.ceil((levelData.data.difficulty - king.savedData.cha) * 10 - .000000001) / 100);
                         }
                         levelData.data.difficulty = round2(levelData.data.difficulty + .1); //handle rounding
 
@@ -185,12 +185,17 @@ let king = {
         },
         calcRapportBonus: function() {
             let bonus = 0;
-            for(let i = 0; i < levelSave[curLevel].highestPerson; i++) {
+            for(let i = 0; i < levelSave[curLevel].highestPerson.length; i++) {
                 if(levelData.data.person < levelSave[curLevel].highestPerson[i]) {
                     bonus++;
                 }
             }
             return 1 + (bonus / 4);
+        },
+        saveHighestPerson: function() {
+            levelSave[curLevel].highestPerson.push(levelData.data.person);
+            levelSave[curLevel].highestPerson.sort(function(a, b){ return b-a });
+            levelSave[curLevel].highestPerson.splice(levelSave[curLevel].highestPerson.length - 1, 1);
         }
     }
 };

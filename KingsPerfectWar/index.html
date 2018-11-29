@@ -68,7 +68,7 @@
                     <div onclick='restart()' class='button showthat' style='margin-left:5px'>Restart
                         <div class='showthis' style='color:black;width:230px;'>Restarts the clock and your lists</div>
                     </div>
-                    <div id='pausePlay' onclick='pauseGame()' class='button'>Play</div><br>
+                    <div id='pausePlay' onclick='togglePause()' class='button'>Play</div><br>
                     <div class='control'><input type='checkbox' id='pauseBeforeRestart'><label for='pauseBeforeRestart'> Pause before restart</label></div>
                 </div><br>
                 <input type="checkbox" id="pauseListEmpty" checked>
@@ -144,7 +144,7 @@
                             </div>
                             <div class="abs showthat" style='left:150px;top:20px'>
                                 +<div id="rapportAdded" class="bold"></div>
-                                <div class="showthis" style="width:130px">
+                                <div class="showthis" style="width:150px">
                                     1st highest: <div id="personHighest0" class="bold"></div><br>
                                     2nd highest: <div id="personHighest1" class="bold"></div><br>
                                     3rd highest: <div id="personHighest2" class="bold"></div><br>

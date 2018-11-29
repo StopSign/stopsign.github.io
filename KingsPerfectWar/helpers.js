@@ -96,7 +96,7 @@ function intToStringRound(value) {
     if (value>=10000) {
         return nFormatter(value, 3);
     } else {
-        return Math.floor(value);
+        return round2(value);
     }
 }
 

@@ -250,7 +250,7 @@ let view = {
                 if(king.savedData.cha < levelData.data.difficulty) {
                     rapportNeeded += Math.pow((levelData.data.difficulty - king.savedData.cha), 2)*5
                 }
-                document.getElementById("rapport").innerHTML = levelData.data.rapport + " / " + rapportNeeded + " rapport";
+                document.getElementById("rapport").innerHTML = intToStringRound(levelData.data.rapport) + " / " + intToStringRound(rapportNeeded) + " rapport";
                 document.getElementById("rapportProgress").style.width = (100 * levelData.data.rapport / rapportNeeded) + "%";
             }
             if(noPrevLevelData || prevState.levelData.initial.people !== levelData.initial.people) {
@@ -264,7 +264,7 @@ let view = {
                 }
 
                 let rapportBonus = king.helpers.calcRapportBonus();
-                document.getElementById("rapportBonus").innerHTML = (rapportBonus-1)*100 + "";
+                document.getElementById("rapportBonus").innerHTML = round((rapportBonus-1)*100);
                 document.getElementById("rapportAdded").innerHTML = intToString(king.savedData.cha * rapportBonus);
             }
 

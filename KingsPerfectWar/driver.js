@@ -23,17 +23,15 @@ function tick() {
     }
 
     while (gameTicksLeft > (1000 / 10)) {
+        if(stop) {
+            break;
+        }
         if(gameTicksLeft > 2000) {
             window.fps /= 2;
             console.warn('too fast! (${gameTicksLeft})');
             gameTicksLeft = 0;
         }
         gameTicksLeft -= (1000 / 10) / gameSpeed / bonusSpeed;
-
-        if(document.getElementById("pauseBeforeRestart").checked && mana === 0 && !stop) {
-            pauseGame();
-            break;
-        }
 
         mana--;
 
@@ -44,7 +42,10 @@ function tick() {
 
         //TODO check if king is dead or only enemies at home, restart
 
-        if(mana === 0) {
+        if(document.getElementById("pauseBeforeRestart").checked && mana === 0) {
+            pauseGame();
+        }
+        if(!stop && mana === 0) {
             restart();
         }
     }
@@ -65,13 +66,32 @@ function recalcInterval(fps) {
     }
 }
 
+function togglePause() {
+    if(stop) {
+        unpauseGame();
+    } else {
+        pauseGame();
+    }
+}
+
+
 function pauseGame() {
-    stop = !stop;
-    document.title = stop ? "*PAUSED* King's Perfect War" : "King's Perfect War";
-    document.getElementById('pausePlay').innerHTML = stop ? 'Play' : 'Pause';
+    stop = true;
+    document.title = "*PAUSED* King's Perfect War";
+    document.getElementById('pausePlay').innerHTML = 'Play';
+}
+
+function unpauseGame() {
+    if(mana === 0) {
+        restart();
+    }
+    stop = false;
+    document.title = "King's Perfect War";
+    document.getElementById('pausePlay').innerHTML = 'Pause';
 }
 
 function restart() {
+    king.helpers.saveHighestPerson();
     for (let property in created.castle) {
         if (created.castle.hasOwnProperty(property)) {
             created.castle[property] = 0;
@@ -90,6 +110,7 @@ function restart() {
     wood = levelData.initial.wood;
 
     king.curData.rflxCur = king.savedData.rflxInitial;
+
 
     prevState = {};
 }
