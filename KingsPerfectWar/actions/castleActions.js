@@ -77,7 +77,7 @@ let castle = {
                 ],
                 seconds:10,
                 xPos:20,
-                yPos:110
+                yPos:25
             });
 
             castle.initial.addCastleAction({
@@ -94,7 +94,7 @@ let castle = {
                 ],
                 seconds:40,
                 xPos:70,
-                yPos:110
+                yPos:25
             });
 
             castle.initial.addCastleAction({
@@ -111,7 +111,7 @@ let castle = {
                 ],
                 seconds:160,
                 xPos:120,
-                yPos:110
+                yPos:25
             });
 
             castle.initial.addCastleAction({
@@ -128,7 +128,7 @@ let castle = {
                 ],
                 seconds:10,
                 xPos:20,
-                yPos:25
+                yPos:110
             });
 
             castle.initial.addCastleAction({
@@ -145,7 +145,7 @@ let castle = {
                 ],
                 seconds:40,
                 xPos:70,
-                yPos:25
+                yPos:110
             });
 
             castle.initial.addCastleAction({
@@ -162,7 +162,7 @@ let castle = {
                 ],
                 seconds:160,
                 xPos:120,
-                yPos:25
+                yPos:110
             });
         },
         createArmyActions() {

@@ -324,6 +324,9 @@ let warMap = {
                 }
                 unit.amount -= amountKilled;
                 damage -= unit.hp * amountKilled;
+                if(unit.exp) {
+                    king.savedData.exp += unit.exp * amountKilled;
+                }
                 // console.log("Killed " + amountKilled + " units to take away " + unit.hp * amountKilled + " damage. Remaining units: " + unit.amount + " and remaining damage: " + damage);
                 if(unit.amount === 0) {
                     unit.hp = 0;

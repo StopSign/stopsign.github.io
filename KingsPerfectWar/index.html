@@ -63,18 +63,24 @@
             <div id="actionInfoDivCastle" style="display:none;width:100%"></div>
             <div id="actionInfoDivUnits" style="display:none;width:100%"></div>
             <div id="actionInfoDivLab" style="display:none;width:100%"></div>
-            <div id="optionsDiv" style="position:relative;height:100%;">
-                <div style="width:280px;vertical-align:top">
+            <div id="optionsDiv" style="position:relative;height:100%;width:100%;">
+                <div style="width:100%;vertical-align:top">
                     <div onclick='restart()' class='button showthat' style='margin-left:5px'>Restart
                         <div class='showthis' style='color:black;width:230px;'>Restarts the clock and your lists</div>
                     </div>
                     <div id='pausePlay' onclick='togglePause()' class='button'>Play</div><br>
-                    <div class='control'><input type='checkbox' id='pauseBeforeRestart'><label for='pauseBeforeRestart'> Pause before restart</label></div>
-                </div><br>
-                <input type="checkbox" id="pauseListEmpty" checked>
-                <label for="pauseListEmpty">Pause when next list is empty</label><br>
-                <input type="checkbox" id="pausePlaceCleared" checked>
-                <label for="pausePlaceCleared">Pause when a place is cleared</label><br>
+                    <div class='control'><input type='checkbox' id='pauseBeforeRestart'><label for='pauseBeforeRestart'> Pause before restart</label></div><br>
+                    <input type="checkbox" id="pauseListEmpty" checked>
+                    <label for="pauseListEmpty">Pause when next list is empty</label><br>
+                    <input type="checkbox" id="pausePlaceCleared" checked>
+                    <label for="pausePlaceCleared">Pause when a place is cleared</label><br><br>
+                    <div onclick='clearCurrentList()' class='button showthat'>
+                        Clear Current List
+                        <div class="showthis" style="color:black;width:230px">
+                            Clears the currently showing list of all actions past the active one.
+                        </div>
+                    </div><br>
+                </div>
                 <div class="clickable showthat abs" style="bottom:26px;right:38px;" onclick="addSleepAction(curList)">
                     <img src='img/sleep.svg' class='superLargeIcon imageDragFix'>
                     <div class="showthis" style="width:250px">

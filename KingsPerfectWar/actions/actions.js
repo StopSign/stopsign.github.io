@@ -44,11 +44,13 @@ let actions = {
                     action.start();
                 }
             }
-            action.manaUsed += king.curData.aura === "build" ? (1.5 + king.savedData.cha / 100) : 1;
+            action.manaUsed += (i === 1 && king.curData.aura === "build") ? (1.5 + king.savedData.int / 100) : 1;
             if(action.manaUsed / 10 >= action.costseconds) {
                 action.loopsLeft--;
                 if(action.loopsLeft > 0) {
                     action.manaUsed = 0;
+                } else {
+                    action.manaUsed = action.costseconds * 10;
                 }
                 if(action.buy) {
                     action.buy();
