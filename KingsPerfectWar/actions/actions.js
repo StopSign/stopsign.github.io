@@ -44,7 +44,11 @@ let actions = {
                     action.start();
                 }
             }
-            action.manaUsed += (i === 1 && king.curData.aura === "build") ? (1.5 + king.savedData.int / 100) : 1;
+            if(i === 1) {
+                action.manaUsed += king.helpers.getBonusByAura("build");
+            } else {
+                action.manaUsed++;
+            }
             if(action.manaUsed / 10 >= action.costseconds) {
                 action.loopsLeft--;
                 if(action.loopsLeft > 0) {

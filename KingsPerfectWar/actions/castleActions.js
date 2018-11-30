@@ -269,7 +269,7 @@ let castle = {
             addedWood += created.castle.scavenger;
             addedWood += created.castle.logger * 5;
             addedWood += created.castle.forester * 25;
-            addedWood *= king.curData.aura === "wood" ? (2 + king.savedData.cha / 20) : 1;
+            addedWood *= king.helpers.getBonusByAura("wood");
             return addedWood;
         },
         goldToAdd: function() {
@@ -277,7 +277,7 @@ let castle = {
             addedGold += created.castle.beg;
             addedGold += created.castle.merchant * 5;
             addedGold += created.castle.tax * 25;
-            addedGold *= king.curData.aura === "gold" ? (2 + king.savedData.cha / 20) : 1;
+            addedGold *= king.helpers.getBonusByAura("gold");
             return addedGold;
         }
     }

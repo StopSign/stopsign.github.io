@@ -1,6 +1,5 @@
 TODO
 
-king's auras disabled when he's away from home
 image pooling for lists
 image pooling for map
 pause action
@@ -27,7 +26,6 @@ lab
             Nature's Bounty - +10% wood all buildings, levels 5/10/15 unlock buildings. 50+ points, 15 max
             Forest Champion - 100 * 10 each time, 3 max
     saving # of completions per
-heroes
 
 Soul Crystals
     purpose
@@ -45,6 +43,11 @@ Soul Crystals
             500k SC - archer x100
             1.5m SC - cata x100
             etc.
+heroes
+    purpose
+        Make combat more interesting and less one-dimensional
+        build up over time
+        can't be accessed immediately in the level - requires minimal propagation
 statistics
     unit
     restart reason/pop-up
@@ -60,10 +63,14 @@ saving
     lists
     levelData
     king stats
-options tab
+extras tab
     export / import
     discord link
+    polls
 browsers
 mobile
 tutorial
-polls
+
+
+additional ideas -
+    rally peasants / send mercenaries / send assassins - auto-creates units and sends them at the nearest base w/o a unique reward

@@ -42,14 +42,18 @@ let view = {
                 document.getElementById("manaTooltip").innerHTML = "Mana.<br>Start with " + intToString(levelData.initial.mana, 1) + "<br>Current max is " + intToString(maxMana, 1);
             }
             if(prevState.gold !== gold) {
+                let goldToAdd = castle.helpers.goldToAdd();
                 document.getElementById("gold").innerHTML = intToString(gold, 1);
+                document.getElementById("goldPerTick").innerHTML = intToString(goldToAdd, 1);
                 document.getElementById("actualGold").innerHTML = round5(gold);
-                document.getElementById("goldPerSecond").innerHTML = round5(castle.helpers.goldToAdd());
+                document.getElementById("goldPerSecond").innerHTML = round5(goldToAdd/10);
             }
             if(prevState.wood !== wood) {
+                let woodToAdd = castle.helpers.woodToAdd();
                 document.getElementById("wood").innerHTML = intToString(wood, 1);
+                document.getElementById("woodPerTick").innerHTML = intToString(woodToAdd, 1);
                 document.getElementById("actualWood").innerHTML = round5(wood);
-                document.getElementById("woodPerSecond").innerHTML = round5(castle.helpers.woodToAdd());
+                document.getElementById("woodPerSecond").innerHTML = round5(woodToAdd/10);
             }
         },
         updateLists: function() {
@@ -171,17 +175,18 @@ let view = {
                 //create a new one otherwise
                 if(!viewTravelObj) {
                     viewTravelObj = view.performance.getNewTravelObj();
+                    viewTravelObj.inUse = true;
                     viewTravelObj.div.classList.add('showthat');
                     viewTravelObj.div.style.display = 'block';
                     viewTravelObj.id = travelObj.id;
+                    viewTravelObj.div.id = "travelId" + viewTravelObj.id;
                 }
 
-                if(!prevLevelDatum.traveling[i] || JSON.stringify(prevLevelDatum.traveling[i].units) !== JSON.stringify(travelObj.units)) {
+                if(!prevLevelDatum.traveling[i] || JSON.stringify(prevLevelDatum.traveling[i].units) !== JSON.stringify(travelObj.units) || prevLevelDatum.traveling[i].target !== travelObj.target) {
                     let image = view.helpers.getTravelingImage(travelObj);
                     let unitString = view.helpers.getUnitString(travelObj.units);
                     viewTravelObj.div.innerHTML = image +
                         "<div class='showthis'><div class='mapTooltipRow'>"+unitString+"</div></div>";
-                    document.getElementById("warMapActions").appendChild(viewTravelObj.div);
                 }
 
                 let coords = view.helpers.translateToWarMapCoords(travelObj.coords);
@@ -189,12 +194,15 @@ let view = {
                 viewTravelObj.div.style.top = (coords.y+10) + "px";
             }
 
+            //hide divs that don't have a matching ID but are inUse:true
             viewTravelObjs.forEach(function(viewTravelObj) {
+                if(!viewTravelObj.inUse) {
+                    return;
+                }
                 let found = false;
                 levelData.traveling.forEach(function(travelObj) {
                     if(travelObj.id === viewTravelObj.id) {
                         found = true;
-                        viewTravelObj.inUse = true;
                     }
                 });
                 if(!found) {
@@ -229,6 +237,20 @@ let view = {
 
                 document.getElementById("rflxCap").innerHTML = king.savedData.rflxCap + "";
                 document.getElementById("rflxGain").innerHTML = intToString((king.savedData.rflxCap - king.curData.rflxCur)/100);
+            }
+            if(noPrevKing || prevState.king.curData.aura !== king.curData.aura) {
+                let color = king.helpers.kingIsHome() ? "rgba(255, 255, 0, 1)" : "rgba(255, 255, 0, .4)";
+                let hidden = "rgba(255, 255, 0, 0)";
+                document.getElementById("directContainer").style.border = "2px solid " + hidden;
+                document.getElementById("communeContainer").style.border = "2px solid " + hidden;
+                document.getElementById("marketContainer").style.border = "2px solid " + hidden;
+                if(king.curData.aura === "gold") {
+                    document.getElementById("marketContainer").style.border = "2px solid " + color;
+                } else if(king.curData.aura === "wood") {
+                    document.getElementById("communeContainer").style.border = "2px solid " + color;
+                } else if(king.curData.aura === "build") {
+                    document.getElementById("directContainer").style.border = "2px solid " + color;
+                }
             }
 
             let noPrevLevelSave = !(prevState.levelSave);
@@ -271,7 +293,6 @@ let view = {
                 document.getElementById("rapportBonus").innerHTML = round((rapportBonus-1)*100);
                 document.getElementById("rapportAdded").innerHTML = intToString(king.savedData.cha * rapportBonus);
             }
-
 
         }
     },
@@ -433,8 +454,9 @@ let view = {
             //create a new one
             let travelDiv = document.createElement("div");
             travelDiv.style.position = "absolute";
-            let newTravelObj = {inUse:true, div:travelDiv};
+            let newTravelObj = {div:travelDiv};
             viewTravelObjs.push(newTravelObj);
+            document.getElementById("warMapActions").appendChild(travelDiv);
             return newTravelObj;
         }
     },
