@@ -42,6 +42,19 @@ function switchMapMoveUnits(name) {
     }
 }
 
+function changeBuildValue() {
+    let value = document.getElementById("buildValue").value;
+    let maxValue = 1.5 + king.savedData.int / 100;
+    if(value < 1.5) {
+        buildAuraValue = 1.5;
+    } else if(value > maxValue) {
+        buildAuraValue = maxValue;
+    } else {
+        buildAuraValue = value-0; //convert to int
+    }
+    document.getElementById("buildValue").value = buildAuraValue;
+}
+
 function setLoop(index, num) {
     let listName = actionsList.nextNames[num];
     let theList = actionsList.next[listName];

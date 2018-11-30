@@ -1,12 +1,8 @@
 TODO
 
-image pooling for lists
-image pooling for map
-pause action
-restart action
-second/mana on action list hoverover
-freeze build value
 enemy attacks
+lose condition of empty castle / dead king
+make # of king people lists variable & compressed
 lab
     2 buildings in castle
         small shrine 1000 wood/gold, build 10 seconds, gives 1 spirit power
@@ -67,6 +63,8 @@ extras tab
     export / import
     discord link
     polls
+image pooling for lists
+image pooling for map
 browsers
 mobile
 tutorial

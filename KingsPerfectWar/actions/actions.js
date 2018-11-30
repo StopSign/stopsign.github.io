@@ -17,6 +17,8 @@ let actions = {
             while(action && (action.loopsLeft === 0 || (action.manaUsed === 0 && !action.canBuy()))) { //action exists but is invalid, slide
                 this.validActions[i]++;
                 if(!action.canBuy() && action.loopsLeft !== 0) { //failed to buy
+                    action.failed++;
+                    action.failedReason = "Not enough resources.";
                     action.loops -= action.loopsLeft;
                     action.loopsLeft = 0;
                     actions.refresh(i);
@@ -44,7 +46,7 @@ let actions = {
                     action.start();
                 }
             }
-            if(i === 1) {
+            if(i === 1 && ["sleep", "restart"].indexOf(action.varName) === -1) {
                 action.manaUsed += king.helpers.getBonusByAura("build");
             } else {
                 action.manaUsed++;
@@ -53,14 +55,20 @@ let actions = {
                 action.loopsLeft--;
                 if(action.loopsLeft > 0) {
                     action.manaUsed = 0;
-                } else {
+                } else { //action done
                     action.manaUsed = action.costseconds * 10;
+                    let nextAction = actionsList.current[name][this.validActions[i]+1];
+                    if(nextAction && nextAction.varName === "pause" && nextAction.loopsLeft > 0) {
+                        nextAction.loopsLeft = 0;
+                        this.validActions[i]++;
+                        pauseGame();
+                    }
                 }
                 if(action.buy) {
                     action.buy();
                     adjustCosts(i);
                 }
-                if(action.varName !== "sleep" && action.loopsLeft === 0 && !actionsList.current[name][this.validActions[i]+1]) { //no next action after non-sleep
+                if(["sleep", "restart"].indexOf(action.varName) === -1 && action.loopsLeft === 0 && !actionsList.current[name][this.validActions[i]+1]) { //no next action after non-sleep
                     shouldPause = true;
                 }
             }
@@ -139,6 +147,8 @@ function setCosts(action, numPrior) {
 function translateNextToCurrent(action, name) {
     action.loopsLeft = action.loops;
     action.manaUsed = 0;
+    action.failed = 0;
+    action.failReason = "";
 
     let actionData = getActionByVarName(action.varName, name);
     action.name = actionData.name;
@@ -156,7 +166,7 @@ function translateNextToCurrent(action, name) {
     action.visible = actionData.visible;
     action.unlocked = actionData.unlocked;
     action.canBuy = actionData.canBuy;
-    action.spend = function() {
+    action.spend = function () {
         gold -= action.costgold;
         wood -= action.costwood;
         mana -= action.costmana;
@@ -164,8 +174,8 @@ function translateNextToCurrent(action, name) {
 }
 
 function getActionByVarName(varName, list) {
-    if(varName === "sleep") {
-        return getSleepAction();
+    if(["sleep", "pause", "restart"].indexOf(varName) !== -1) {
+        return getOtherAction(varName);
     }
 
     if(list === "castle") {

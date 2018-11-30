@@ -198,14 +198,14 @@ let king = {
             levelSave[curLevel].highestPerson.splice(levelSave[curLevel].highestPerson.length - 1, 1);
         },
         getBonusByAura: function(auraName) {
-            if(!king.helpers.kingIsHome()) {
+            if(!king.helpers.kingIsHome() || king.curData.aura !== auraName) {
                 return 1;
             }
             if(["gold", "wood"].indexOf(auraName) !== -1) {
                 return 2 + king.savedData.cha / 20;
             }
             if("build" === auraName) {
-                return 1.5 + king.savedData.int / 100;
+                return document.getElementById("keepBuild").checked ? buildAuraValue : 1.5 + king.savedData.int / 100;
             }
             return 1;
         },

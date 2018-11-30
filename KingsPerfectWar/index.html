@@ -73,7 +73,14 @@
                     <input type="checkbox" id="pauseListEmpty" checked>
                     <label for="pauseListEmpty">Pause when next list is empty</label><br>
                     <input type="checkbox" id="pausePlaceCleared" checked>
-                    <label for="pausePlaceCleared">Pause when a place is cleared</label><br><br>
+                    <label for="pausePlaceCleared">Pause when a place is cleared</label><br>
+                    <div class="showthat">
+                        <input type="checkbox" id="keepBuild">
+                        <label for="keepBuild">Keep Direct Worker bonus at</label> <input id="buildValue" type="text" class="listTextInput" value="1.5" onchange="changeBuildValue()" onclick="this.select();">
+                        <div class="showthis">
+                            If you want to improve INT without messing up your action timing, use this option to keep things stable. The valid range is between 1.5 and your max. Uncheck to always use your max.
+                        </div>
+                    </div><br><br>
                     <div onclick='clearCurrentList()' class='button showthat'>
                         Clear Current List
                         <div class="showthis" style="color:black;width:230px">
@@ -81,11 +88,25 @@
                         </div>
                     </div><br>
                 </div>
+                <div class="clickable showthat abs" style="bottom:26px;right:138px;" onclick="addRestartAction(curList)">
+                    <img src='img/restart.svg' class='superLargeIcon imageDragFix'>
+                    <div class="showthis" style="width:250px">
+                        <div class="smallTitle">Restart</div>
+                        <div class="small">Add an action that restarts the map when it's run. Takes 5 seconds to finish.</div>
+                    </div>
+                </div>
+                <div class="clickable showthat abs" style="bottom:26px;right:88px;" onclick="addPauseAction(curList)">
+                    <img src='img/pause.svg' class='superLargeIcon imageDragFix'>
+                    <div class="showthis" style="width:250px">
+                        <div class="smallTitle">Pause</div>
+                        <div class="small">Add an action to the current list that pauses when it's run. Does not interfere with the game otherwise</div>
+                    </div>
+                </div>
                 <div class="clickable showthat abs" style="bottom:26px;right:38px;" onclick="addSleepAction(curList)">
                     <img src='img/sleep.svg' class='superLargeIcon imageDragFix'>
                     <div class="showthis" style="width:250px">
                         <div class="smallTitle">Sleep</div>
-                        <div class="small">Wait for one second on the current list</div>
+                        <div class="small">Add an action to the current list that waits for one second. Auto-added if no other action is available.</div>
                     </div>
                 </div>
             </div>
@@ -113,7 +134,7 @@
                 </div>
                 <div class="showthat" style="width:65px">
                     <img src='img/mana.svg' class='largeIcon imageDragFix' style="vertical-align:bottom">
-                    <div id="mana" class="bold"></div>
+                    <div id="mana"></div>
                     <div id='manaTooltip' class="showthis"></div>
                 </div>
             </div><div style="width:555px;height:10px;background-color:#dbdff3;margin-top:6px;">

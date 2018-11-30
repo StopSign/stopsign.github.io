@@ -91,11 +91,15 @@ let view = {
                     } else if(prevAction.manaUsed !== curAction.manaUsed
                         || prevAction.loopsLeft !== curAction.loopsLeft
                         || prevAction.loops !== curAction.loops) {
-                        document.getElementById("action"+j+name+"Bar").style.width = 100 * curAction.manaUsed / (curAction.costseconds * 10) + "%";
+                        if(curAction.costseconds === 0 && curAction.loopsLeft === 0 && curAction.loops > 0) { //completed pause action
+                            document.getElementById("action"+j+name+"Bar").style.width = "100%";
+                        } else {
+                            document.getElementById("action" + j + name + "Bar").style.width = (100 * curAction.manaUsed / (curAction.costseconds * 10)) + "%";
+                        }
                         document.getElementById("action"+j+name+"LoopsLeft").innerHTML = curAction.loopsLeft;
                         document.getElementById("action"+j+name+"Loops").innerHTML = curAction.loops;
                         if(curList === i && currentlyHovering === j) { //only update last hovered live
-                            document.getElementById("action"+j+name+"TimeNeeded").innerHTML = intToString((curAction.costseconds*10 - curAction.manaUsed)/10, 2);
+                            view.updating.updateInfoDiv(name, j);
                         }
                     }
                 }
@@ -105,6 +109,26 @@ let view = {
                     (currentAction.loopsLeft === 0 && currentAction.manaUsed === currentAction.costseconds*10 && (!nextAction || nextAction.varName === "sleep"))) //pause when next list is empty condition
                     ? ".5" : "0";
             }
+        },
+        updateInfoDiv: function(name, i) {
+            let curAction = actionsList.current[name][i];
+            let costsDiv = "";
+            costsDiv += "Mana Needed <div class='bold'>"+round1(curAction.costseconds*10 - curAction.manaUsed)+"</div><br>"+
+                "In Seconds <div class='bold'>"+round1(curAction.costseconds - curAction.manaUsed/10)+"</div>s<br>";
+            if(curAction.costgold) {
+                costsDiv += "Next Gold Cost <div class='bold'>"+curAction.costgold+"</div><br>";
+            }
+            if(curAction.costwood) {
+                costsDiv += "Next Wood Cost <div class='bold'>"+curAction.costwood+"</div><br>";
+            }
+            if(curAction.costmana) {
+                costsDiv += "Additional Mana Cost <div class='bold'>"+curAction.costmana+"</div><br>";
+            }
+            if(curAction.failed) {
+                costsDiv += "<br>Times Failed <div class='bold'>"+curAction.failed+"</div><br>" +
+                    "Failure Reasons "+curAction.failedReason;
+            }
+            document.getElementById("action"+i+name+"Costs").innerHTML = costsDiv;
         },
         updateCreated: function() {
             for (let property in created.castle) {
@@ -357,17 +381,7 @@ let view = {
                 totalDivText +=
                     "<div id='actionTooltip"+i+name+"' style='display:none;padding-left:10px;width:90%'>" +
                     "<div style='text-align:center;width:100%'>"+action.name+"</div><br><br>" +
-                    "<div class='bold'>Seconds Needed</div> <div id='action"+i+name+"TimeNeeded'></div><br>" +
-                    "<div class='bold'>Next Mana Cost</div> <div id='action"+i+name+"ManaCost'></div><br>" +
-                    // "<div class='bold'>Mana Remaining</div> <div id='action"+i+name+"ManaRemaining'></div><br>" +
-                    "<div class='bold'>Next Gold Cost</div> <div id='action"+i+name+"GoldCost'></div><br>" +
-                    // "<div class='bold'>Gold Remaining</div> <div id='action"+i+name+"GoldRemaining'></div><br>" +
-                    "<div class='bold'>Next Wood Cost</div> <div id='action"+i+name+"WoodCost'></div><br>" +
-                    // "<div class='bold'>Wood Remaining</div> <div id='action"+i+name+"WoodRemaining'></div><br><br>" +
-                    "<div id='action"+i+name+"HasFailed' style='display:none'>" +
-                    "<div class='bold'>Times Failed</div> <div id='action"+i+name+"Failed'>0</div><br>" +
-                    "<div class='bold'>Error</div> <div id='action"+i+name+"Error'></div>" +
-                    "</div>" +
+                    "<div id='action"+i+name+"Costs'></div>" +
                     "</div>";
             }
 
@@ -381,11 +395,7 @@ let view = {
                 div.style.opacity = isHover ? "1" : "0";
                 document.getElementById("actionTooltip"+i+name).style.display = isHover ? "inline-block" : "none";
                 if(isHover) {
-                    let curAction = actionsList.current[name][i];
-                    document.getElementById("action"+i+name+"GoldCost").innerHTML = curAction.costgold+"";
-                    document.getElementById("action"+i+name+"WoodCost").innerHTML = curAction.costwood+"";
-                    document.getElementById("action"+i+name+"ManaCost").innerHTML = curAction.costmana+"";
-                    document.getElementById("action"+i+name+"TimeNeeded").innerHTML = intToString((curAction.costseconds*10 - curAction.manaUsed)/10, 2);
+                    view.updating.updateInfoDiv(name, i);
                 }
             }
             view.actionInfoDiv[name].style.display = isHover ? "inline-block" : "none";
