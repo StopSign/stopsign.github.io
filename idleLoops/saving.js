@@ -362,3 +362,10 @@ function importCurrentList() {
 }
 
 // setInterval(tick, 20);
+
+function showSavingDiv() {
+    document.getElementById("savingDiv").style.display = "block";
+}
+function hideSavingDiv() {
+    document.getElementById("savingDiv").style.display = "none";
+}
