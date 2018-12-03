@@ -42,7 +42,7 @@ function createLevel(num) {
         levelData.hideouts[i].fightCounter = 20;
         let hideout = curLevelData.hideouts[i];
         if(hideout.creates) {
-            levelData.hideouts[i].createCounter = hideout.creates.initialTime;
+            levelData.hideouts[i].creates.counter = hideout.creates.initialTime;
         }
         for (let property in hideout.units) {
             if (hideout.units.hasOwnProperty(property)) {
@@ -92,7 +92,7 @@ levelInitials = [{
     hideouts:[
         {
             units: { thug:10 },
-            creates: { thug:1, initialTime: 5, period: 20 },
+            creates: { units: { thug:1 }, initialTime: 20, period: 200 },
             reward: [{
                 type:"gold",
                 amount:2000
@@ -101,7 +101,7 @@ levelInitials = [{
         },
         {
             units: { thug:30, brigand:5, bandit:2 },
-            creates: { brigand:2, initialTime: 90, period: 30 },
+            creates: { units: { brigand:2 }, initialTime: 800, period: 300 },
             reward: [{
                 type:"gold",
                 amount:5000

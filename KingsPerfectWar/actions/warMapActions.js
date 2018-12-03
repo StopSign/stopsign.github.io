@@ -6,6 +6,8 @@ let warMap = {
         warMap.bases.fight();
 
         warMap.units.travel();
+
+        warMap.bases.createAttackers();
     },
     actions: {
         createWarMapActions: function() {
@@ -122,10 +124,13 @@ let warMap = {
                 unit.exp = stats.exp;
             }
             unit.speed = 12; //DEBUG 2
-            let base = warMap.bases.baseNameToObj(startingLoc);
-            base.units.push(unit);
-            warMap.units.checkUnitsForCombineInBase(base);
-            warMap.units.sortHpLowestToHighest(base.units);
+            if(startingLoc) {
+                let base = warMap.bases.baseNameToObj(startingLoc);
+                base.units.push(unit);
+                warMap.units.checkUnitsForCombineInBase(base);
+                warMap.units.sortHpLowestToHighest(base.units);
+            }
+            return unit;
         },
         getAllUnits: function() {
             let allUnits = [];
@@ -156,7 +161,7 @@ let warMap = {
                 let travelObj = levelData.traveling[i];
                 for(let j = travelObj.units.length - 1; j >= 0; j--) {
                     let unit = travelObj.units[j];
-                    if(action.unitsToMove[unit.type]) {
+                    if(unit.isFriendly && action.unitsToMove[unit.type]) {
                         warMap.units.addTravelingObj(unit, target, travelObj.coords);
                         travelObj.units.splice(j, 1);
                     }
@@ -359,6 +364,25 @@ let warMap = {
                 maxMana += manaReward;
                 gold += reward.type === "gold" ? reward.amount : 0;
             });
+        },
+        createAttackers: function() {
+            for(let i = 0; i < levelData.hideouts.length; i++) {
+                let hideout = levelData.hideouts[i];
+                if(!hideout.creates) {
+                    return;
+                }
+                hideout.creates.counter--;
+                if(hideout.creates.counter === 0) {
+                    hideout.creates.counter = hideout.creates.period;
+                    for (let property in hideout.creates.units) {
+                        if (hideout.creates.units.hasOwnProperty(property)) {
+                            let unit = warMap.units.createUnit(property, false, null, hideout.creates.units[property]); //"hideout_"+i
+                            console.log("creating a " + unit.isFriendly + " " + unit.varName);
+                            warMap.units.addTravelingObj(unit, "home", warMap.bases.baseNameToObj("hideout_"+i).coords);
+                        }
+                    }
+                }
+            }
         }
     }
 };

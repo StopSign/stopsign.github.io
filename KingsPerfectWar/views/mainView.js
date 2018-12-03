@@ -496,6 +496,7 @@ let view = {
                 createLevel(curLevel);
                 warMap.actions.createWarMapActions(levelData);
                 let allDivs = "";
+
                 let homeCoords = view.helpers.translateToWarMapCoords(levelData.home.coords);
 
                 //create castle
@@ -528,6 +529,10 @@ let view = {
                 }
 
                 document.getElementById("warMapActions").innerHTML = allDivs;
+                //re-add divs created from traveling units
+                viewTravelObjs.forEach(function(viewTravelObj) {
+                    document.getElementById("warMapActions").appendChild(viewTravelObj.div);
+                });
             },
             createKingIcons: function() {
                 let container = document.getElementById("kingActions");
