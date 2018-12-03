@@ -299,7 +299,6 @@ function exportSave() {
     document.getElementById("exportImport").value = encode(window.localStorage[saveName]);
     document.getElementById("exportImport").select();
     document.execCommand('copy');
-    document.getElementById("exportImport").value = "";
 }
 
 function importSave() {
