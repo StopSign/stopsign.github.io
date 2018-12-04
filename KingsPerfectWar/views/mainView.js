@@ -315,13 +315,23 @@ let view = {
                 updateRapportGain = true;
             }
             if(updateRapportGain) {
+                let rapportBonus = king.helpers.calcRapportBonus();
+                let allDivs = "<div class='smallTitle'>Most People Met</div>";
+
+                let allZero = true;
                 for(let i = 0; i < levelSave[curLevel].highestPerson.length; i++) {
-                    let num = levelSave[curLevel].highestPerson[i];
-                    document.getElementById("personHighest"+i).innerHTML = num < 0 ? "NA" : num;
+                    let highestPerson = levelSave[curLevel].highestPerson[i];
+                    if(highestPerson.person === 0) {
+                        continue;
+                    }
+                    allDivs += "Met <b>" + highestPerson.person + "</b> people <b>" + highestPerson.amount + "</b> times<br>";
+                }
+                if(allZero) {
+                    allDivs += "Nobody met yet.<br>"
                 }
 
-                let rapportBonus = king.helpers.calcRapportBonus();
-                document.getElementById("rapportBonus").innerHTML = round((rapportBonus-1)*100);
+                allDivs += "Current Bonus: <b>" + round((rapportBonus-1)*100) + "</b>%";
+                document.getElementById("personHighest").innerHTML = allDivs;
                 document.getElementById("rapportAdded").innerHTML = intToString(king.savedData.cha * rapportBonus);
             }
 

@@ -201,6 +201,7 @@ let warMap = {
                     }
                     warMap.units.checkUnitsForCombineInBase(target);
                     warMap.bases.setInitialHP(target, isFriendly);
+                    warMap.units.sortHpLowestToHighest(target.units);
                 }
                 if(travelingObj.units.length === 0) {
                     levelData.traveling.splice(i, 1);
@@ -356,6 +357,9 @@ let warMap = {
                 extraUnit.amount = 1;
                 extraUnit.hp = remainingHp;
             });
+            if(extraUnit) {
+                warMap.units.sortHpLowestToHighest(unitList);
+            }
             return extraUnit;
         },
         getReward: function(base) {

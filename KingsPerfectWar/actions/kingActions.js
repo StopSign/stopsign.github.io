@@ -186,16 +186,40 @@ let king = {
         calcRapportBonus: function() {
             let bonus = 0;
             for(let i = 0; i < levelSave[curLevel].highestPerson.length; i++) {
-                if(levelData.data.person < levelSave[curLevel].highestPerson[i]) {
-                    bonus++;
+                if(levelData.data.person < levelSave[curLevel].highestPerson[i].person) {
+                    bonus += levelSave[curLevel].highestPerson[i].amount;
                 }
             }
             return 1 + (bonus / 4);
         },
         saveHighestPerson: function() {
-            levelSave[curLevel].highestPerson.push(levelData.data.person);
-            levelSave[curLevel].highestPerson.sort(function(a, b){ return b-a });
-            levelSave[curLevel].highestPerson.splice(levelSave[curLevel].highestPerson.length - 1, 1);
+            //{ person, amount }
+            let found = false;
+            for(let i = 0; i < levelSave[curLevel].highestPerson.length; i++) {
+                let highestPerson = levelSave[curLevel].highestPerson[i];
+                if(highestPerson.person === levelData.data.person) {
+                    highestPerson.amount++;
+                    found = true;
+                    break;
+                }
+            }
+            if(!found) {
+                levelSave[curLevel].highestPerson.push({person:levelData.data.person, amount:1});
+            }
+            levelSave[curLevel].highestPerson.sort(function(a, b){ return a.person-b.person });
+
+            let foundAmount = 0;
+            //keep only the top ${personListLength}
+            for(let i = levelSave[curLevel].highestPerson.length - 1; i >= 0; i--) {
+                let highestPerson = levelSave[curLevel].highestPerson[i];
+                if(foundAmount >= personListLength) {
+                    levelSave[curLevel].highestPerson.splice(i, 1);
+                }
+                foundAmount += highestPerson.amount;
+                if(foundAmount >= personListLength) {
+                    highestPerson.amount = personListLength - (foundAmount - highestPerson.amount);
+                }
+            }
         },
         getBonusByAura: function(auraName) {
             if(!king.helpers.kingIsHome() || king.curData.aura !== auraName) {

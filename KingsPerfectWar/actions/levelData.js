@@ -14,7 +14,7 @@ function createLevel(num) {
         levelSave[num].uniqueCleared = false;
         levelSave[num].knowledge = 0;
         levelSave[num].knowledgeCap = 0;
-        levelSave[num].highestPerson = [0, 0, 0, 0];
+        levelSave[num].highestPerson = [{person:0, amount:4}];
     }
 
     levelData.data = {

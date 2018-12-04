@@ -159,7 +159,7 @@ let castle = {
             castle.initial.addCastleAction({
                 varName:"barracks",
                 name:"Build Barracks",
-                desc:"Recruit some spearmen here to take the hits. Each barracks increases spearman equipped by 1.",
+                desc:"Recruit some spearmen here to take the hits. Each barracks increases spearman equipped by 1, and increases the cost accordingly.",
                 cost: [
                     {
                         resource:"gold",
@@ -194,7 +194,7 @@ let castle = {
             castle.initial.addCastleAction({
                 varName:"range",
                 name:"Build Archery Range",
-                desc:"Train archers here to take enemies down from behind the front line. Each archery range increases archers trained by 1.",
+                desc:"Train archers here to take enemies down from behind the front line. Each archery range increases archers trained by 1, and increases the cost accordingly..",
                 cost: [
                     {
                         resource:"gold",
@@ -228,7 +228,7 @@ let castle = {
             castle.initial.addCastleAction({
                 varName:"designer",
                 name:"Hire Designer",
-                desc:"Designers know the ins and outs of mass production. Each designer increases catapults built by 1.",
+                desc:"Designers know the ins and outs of mass production. Each designer increases catapults built by 1, and increases the cost accordingly..",
                 cost: [
                     {
                         resource:"gold",

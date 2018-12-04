@@ -44,6 +44,7 @@ let totalTime = 0;
 let gold = 0;
 let wood = 0;
 let buildAuraValue = 1.5;
+let personListLength = 4;
 
 let curList = 1; //castle
 let currentlyHovering = 0;

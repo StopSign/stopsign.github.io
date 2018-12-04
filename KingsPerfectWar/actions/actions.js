@@ -122,16 +122,23 @@ function adjustCosts(num) {
         if(actions.validActions[num] === i && action.loopsLeft > 0) {
             numPrior += action.loops - action.loopsLeft; //also count completed loops in current action
         }
-        setCosts(action, numPrior);
+        if(action.createdWith) {
+            setCosts(action, numPrior, numOnList[action.createdWith] ? numOnList[action.createdWith] : 0);
+        } else {
+            setCosts(action, numPrior);
+        }
         numOnList[action.varName] = numPrior + action.loops;
     }
 }
 
-function setCosts(action, numPrior) {
+function setCosts(action, numPrior, numCreatedWith) {
     action.costseconds = 0;
     action.costgold = 0;
     action.costwood = 0;
     action.costmana = 0;
+    if(numCreatedWith === undefined) {
+        numCreatedWith = 1;
+    }
     for(let i = 0; i < action.cost.length; i++) {
         let cost = action.cost[i];
         let amount = 0;
@@ -140,7 +147,7 @@ function setCosts(action, numPrior) {
         } else if (cost.type === "linear") {
             amount += cost.starting + cost.growth * numPrior;
         }
-        action["cost"+cost.resource] = amount;
+        action["cost"+cost.resource] = numCreatedWith * amount;
     }
 }
 
