@@ -129,6 +129,7 @@ let warMap = {
                 base.units.push(unit);
                 warMap.units.checkUnitsForCombineInBase(base);
                 warMap.units.sortHpLowestToHighest(base.units);
+                warMap.bases.setInitialHP(base, isFriendly);
             }
             return unit;
         },
@@ -190,14 +191,16 @@ let warMap = {
         checkUnitsToJoinBase: function() {
             for(let i = levelData.traveling.length - 1; i >= 0; i--) {
                 let travelingObj = levelData.traveling[i];
-                for(let j = travelingObj.units.length -1; j >= 0; j--) {
-                    let unit = travelingObj.units[j];
-                    let target = warMap.bases.baseNameToObj(travelingObj.target);
-                    if (withinDistance(target.coords.x, target.coords.y, travelingObj.coords.x, travelingObj.coords.y, 4)) {
+                let target = warMap.bases.baseNameToObj(travelingObj.target);
+                if (withinDistance(target.coords.x, target.coords.y, travelingObj.coords.x, travelingObj.coords.y, 4)) {
+                    let isFriendly = travelingObj.units[0].isFriendly;
+                    for(let j = travelingObj.units.length - 1; j >= 0; j--) {
+                        let unit = travelingObj.units[j];
                         travelingObj.units.splice(j, 1);
                         target.units.push(unit);
-                        warMap.units.checkUnitsForCombineInBase(target);
                     }
+                    warMap.units.checkUnitsForCombineInBase(target);
+                    warMap.bases.setInitialHP(target, isFriendly);
                 }
                 if(travelingObj.units.length === 0) {
                     levelData.traveling.splice(i, 1);
@@ -309,6 +312,7 @@ let warMap = {
                     }
                 }
 
+                //get reward if cleared
                 let remainingUnits = warMap.bases.getUnitsByAllegiance(base);
                 if(remainingUnits.friendly.length && remainingUnits.enemy.length === 0) {
                     warMap.bases.getReward(base);
@@ -364,6 +368,7 @@ let warMap = {
                 maxMana += manaReward;
                 gold += reward.type === "gold" ? reward.amount : 0;
             });
+            base.reward = [];
         },
         createAttackers: function() {
             for(let i = 0; i < levelData.hideouts.length; i++) {
@@ -376,13 +381,33 @@ let warMap = {
                     hideout.creates.counter = hideout.creates.period;
                     for (let property in hideout.creates.units) {
                         if (hideout.creates.units.hasOwnProperty(property)) {
-                            let unit = warMap.units.createUnit(property, false, null, hideout.creates.units[property]); //"hideout_"+i
-                            console.log("creating a " + unit.isFriendly + " " + unit.varName);
+                            let unit = warMap.units.createUnit(property, false, null, hideout.creates.units[property]);
                             warMap.units.addTravelingObj(unit, "home", warMap.bases.baseNameToObj("hideout_"+i).coords);
                         }
                     }
                 }
             }
+        },
+        setInitialHP: function(base, isFriendly) {
+            //run on initial load and join, this sets initialHP for the visuals
+            let totalHp = warMap.bases.getTotalHP(base);
+            if(isFriendly === undefined || isFriendly) {
+                base.initialFriendlyHP = totalHp.friendly;
+            }
+            if(!isFriendly) {
+                base.initialEnemyHP = totalHp.enemy;
+            }
+        },
+        getTotalHP: function(base) {
+            let totalHp = {friendly:0, enemy:0};
+            let unitsByAllegience = warMap.bases.getUnitsByAllegiance(base);
+            unitsByAllegience.friendly.forEach(function (unit) {
+                totalHp.friendly += unit.hp * unit.amount;
+            });
+            unitsByAllegience.enemy.forEach(function (unit) {
+                totalHp.enemy += unit.hp * unit.amount;
+            });
+            return totalHp;
         }
     }
 };

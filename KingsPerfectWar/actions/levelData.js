@@ -23,6 +23,7 @@ function createLevel(num) {
         difficulty:(num+1)
     };
     levelData.home.units = [];
+    levelData.home.varName = "home";
     levelData.home.fightCounter = 20;
     levelData.traveling = [];
     //turn unit mentions into actual units
@@ -30,23 +31,27 @@ function createLevel(num) {
     for(let i = 0; i < curLevelData.dungeons.length; i++) {
         levelData.dungeons[i].units = [];
         levelData.dungeons[i].fightCounter = 20;
+        let varName = "dungeon_"+i;
+        levelData.dungeons[i].varName = "dungeon_"+i;
         let dungeon = curLevelData.dungeons[i];
         for (let property in dungeon.units) {
             if (dungeon.units.hasOwnProperty(property)) {
-                warMap.units.createUnit(property, false, "dungeon_"+i, dungeon.units[property]);
+                warMap.units.createUnit(property, false, varName, dungeon.units[property]);
             }
         }
     }
     for(let i = 0; i < curLevelData.hideouts.length; i++) {
         levelData.hideouts[i].units = [];
         levelData.hideouts[i].fightCounter = 20;
+        let varName = "hideout_"+i;
+        levelData.hideouts[i].varName = "hideout_"+i;
         let hideout = curLevelData.hideouts[i];
         if(hideout.creates) {
             levelData.hideouts[i].creates.counter = hideout.creates.initialTime;
         }
         for (let property in hideout.units) {
             if (hideout.units.hasOwnProperty(property)) {
-                warMap.units.createUnit(property, false, "hideout_"+i, hideout.units[property]);
+                warMap.units.createUnit(property, false, varName, hideout.units[property]);
             }
         }
     }

@@ -1,7 +1,5 @@
 TODO
 
-better map graphics
-lose condition of empty castle / dead king
 make # of king people lists variable & compressed
 lab
     2 buildings in castle
@@ -39,6 +37,7 @@ Soul Crystals
             500k SC - archer x100
             1.5m SC - cata x100
             etc.
+lose condition of empty castle / dead king
 heroes
     purpose
         Make combat more interesting and less one-dimensional

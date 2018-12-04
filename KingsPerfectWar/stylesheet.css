@@ -348,3 +348,22 @@ input {
     cursor:pointer;
     background-color:#b3b3b3;
 }
+
+.mapFriendlyHPBar, .mapEnemyHPBar {
+    position:absolute;
+    left:0;
+    width:40px;
+    height:5px;
+    background-color:white;
+}
+.mapFriendlyHPBar div, .mapEnemyHPBar div {
+    position:absolute;
+    left:0;
+    height:100%;
+}
+.mapFriendlyHPBar div {
+    background-color: #0007d8;
+}
+.mapEnemyHPBar div {
+    background-color: #c10000;
+}
