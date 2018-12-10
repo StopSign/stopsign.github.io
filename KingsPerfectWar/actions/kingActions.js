@@ -209,15 +209,15 @@ let king = {
             levelSave[curLevel].highestPerson.sort(function(a, b){ return a.person-b.person });
 
             let foundAmount = 0;
-            //keep only the top ${personListLength}
+            //keep only the top ${highestListsLength}
             for(let i = levelSave[curLevel].highestPerson.length - 1; i >= 0; i--) {
                 let highestPerson = levelSave[curLevel].highestPerson[i];
-                if(foundAmount >= personListLength) {
+                if(foundAmount >= Math.floor(highestListsLength/2)) {
                     levelSave[curLevel].highestPerson.splice(i, 1);
                 }
                 foundAmount += highestPerson.amount;
-                if(foundAmount >= personListLength) {
-                    highestPerson.amount = personListLength - (foundAmount - highestPerson.amount);
+                if(foundAmount >= Math.floor(highestListsLength/2)) {
+                    highestPerson.amount = Math.floor(highestListsLength/2) - (foundAmount - highestPerson.amount);
                 }
             }
         },

@@ -62,7 +62,7 @@
             <div id="actionInfoDivKing" style="display:none;width:100%"></div>
             <div id="actionInfoDivCastle" style="display:none;width:100%"></div>
             <div id="actionInfoDivUnits" style="display:none;width:100%"></div>
-            <div id="actionInfoDivLab" style="display:none;width:100%"></div>
+            <div id="actionInfoDivShrine" style="display:none;width:100%"></div>
             <div id="optionsDiv" style="position:relative;height:100%;width:100%;">
                 <div style="width:100%;vertical-align:top">
                     <div onclick='restart()' class='button showthat' style='margin-left:5px'>Restart
@@ -113,7 +113,7 @@
         </div>
         
         <div style="margin-top:4px;width:100%">
-            <div style="width:290px">
+            <div style="width:270px">
                 <div class="showthat" style="width:100px">
                     <img src='img/gold.svg' class='largeIcon imageDragFix' style="vertical-align:bottom">
                     <div id="gold"></div>
@@ -122,8 +122,7 @@
                         Non-rounded Gold: <div id="actualGold" class="bold"></div><br>
                         Per second: <div id="goldPerSecond" class="bold"></div>
                     </div>
-                </div>
-                <div class="showthat" style="width:100px">
+                </div><div class="showthat" style="width:100px">
                     <img src='img/wood.svg' class='largeIcon imageDragFix' style="vertical-align:bottom">
                     <div id="wood"></div>
                     (+<div id="woodPerTick" class="bold"></div>)
@@ -131,8 +130,7 @@
                         Non-rounded Wood: <div id="actualWood" class="bold"></div><br>
                         Per second: <div id="woodPerSecond" class="bold"></div>
                     </div>
-                </div>
-                <div class="showthat" style="width:65px">
+                </div><div class="showthat" style="width:65px">
                     <img src='img/mana.svg' class='largeIcon imageDragFix' style="vertical-align:bottom">
                     <div id="mana"></div>
                     <div id='manaTooltip' class="showthis"></div>
@@ -147,10 +145,10 @@
                 <div id="kingSelector" class="tabSelector kingColor" onclick="switchActionsTab(0)">King</div>
                 <div id="castleSelector" class="tabSelector castleColor" onclick="switchActionsTab(1)">Castle</div>
                 <div id="unitsSelector" class="tabSelector unitsColor" onclick="switchActionsTab(2)">Units</div>
-                <div id="labSelector" class="tabSelector labColor" onclick="switchActionsTab(3)">Laboratory</div>
+                <div id="shrineSelector" class="tabSelector shrineColor" onclick="switchActionsTab(3)">Shrine</div>
                 <div id="heroSelector" class="tabSelector heroColor" onclick="switchActionsTab(4)">Heroes</div>
             </div><div style="width:694px;height:100%;vertical-align:top;">
-                <div id="kingContainer" class="tabContainer kingColorH" style="position:relative;">
+                <div id="kingContainer" class="tabContainer kingColorH">
                     <div id="kingActions" class="abs" style="left:0;top:0;"></div>
                     <div id="kingOtherInfo" class="abs" style="left:0;top:0">
                         <div id='kingStats' class="abs" style="left:18px;top:10px;width:200px">
@@ -208,14 +206,17 @@
                         </div>
                     </div>
                 </div>
-                <div id="castleContainer" class="tabContainer castleColorH" style="display:block;position:relative;">
+                <div id="castleContainer" class="tabContainer castleColorH" style="display:block;">
                     <div class="title abs" style="top:0;left:63px;">Income</div>
                     <div class="title abs" style="top:0;left:300px;">Army</div>
-                    <div class="title abs" style="top:0;left:580px;">Labs</div>
+                    <div class="title abs" style="top:0;left:580px;">Shrines</div>
                     <div id="castleActions" class="abs" style="left:0;top:0;"></div>
                 </div>
                 <div id="unitsContainer" class="tabContainer unitsColorH"></div>
-                <div id="labContainer" class="tabContainer labColorH"></div>
+                <div id="shrinesContainer" class="tabContainer shrineColorH">
+                    <div style="font-size:16px;margin:10px;position:absolute;">Favor <div id="favor" class="bold"></div></div>
+                    <div id="shrineActions" class="abs"></div>
+                </div>
                 <div id="heroContainer" class="tabContainer heroColorH"></div>
             </div>
         </div>
@@ -227,15 +228,16 @@
             <div id="kingListSelector" class="listSelector kingColor" onclick="switchListTab(0)">King <img id="kingTabSleep" src='img/sleep.svg' class='smallIcon imageDragFix tabSleep'></div>
             <div id="castleListSelector" class="listSelector castleColor" onclick="switchListTab(1)">Castle <img id="castleTabSleep" src='img/sleep.svg' class='smallIcon imageDragFix tabSleep'></div>
             <div id="unitsListSelector" class="listSelector unitsColor" onclick="switchListTab(2)">Units <img id="unitsTabSleep" src='img/sleep.svg' class='smallIcon imageDragFix tabSleep'></div>
-            <div id="labListSelector" class="listSelector labColor" onclick="switchListTab(3)">Lab <img id="labTabSleep" src='img/sleep.svg' class='smallIcon imageDragFix tabSleep'></div>
+            <div id="shrineListSelector" class="listSelector shrineColor" onclick="switchListTab(3)">Shrine <img id="shrineTabSleep" src='img/sleep.svg' class='smallIcon imageDragFix tabSleep'></div>
         </div>
         <div id="kingListContainer" class="listContainer"><div id="kingCurActions" class="actionListLeft kingColorD"></div><div id="kingNextActions" class="actionListRight kingColorH"></div></div>
         <div id="castleListContainer" class="listContainer" style="display:block;"><div id="castleCurActions" class="actionListLeft castleColorD"></div><div id="castleNextActions" class="actionListRight castleColorH"></div></div>
         <div id="unitsListContainer" class="listContainer"><div id="unitsCurActions" class="actionListLeft unitsColorD"></div><div id="unitsNextActions" class="actionListRight unitsColorH"></div></div>
-        <div id="labListContainer" class="listContainer"><div id="labCurActions" class="actionListLeft labColorD"></div><div id="labNextActions" class="actionListRight labColorH"></div></div>
+        <div id="shrineListContainer" class="listContainer"><div id="shrineCurActions" class="actionListLeft shrineColorD"></div><div id="shrineNextActions" class="actionListRight shrineColorH"></div></div>
     </div>
 
-
+    <!--<div>Icons made by <a href="https://www.flaticon.com/authors/smashicons" title="Smashicons">Smashicons</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a></div>-->
+    <!--<a href="http://www.onlinewebfonts.com">oNline Web Fonts</a>-->
 
     <script src="helpers.js?1"></script>
     <script src="interval.js?1"></script>
@@ -248,6 +250,7 @@
     <script src="actions/kingActions.js?1"></script>
     <script src="actions/castleActions.js?1"></script>
     <script src="actions/warMapActions.js?1"></script>
+    <script src="actions/shrineActions.js?1"></script>
     <script src="actions/otherActions.js?1"></script>
     <script>
         (function (i, s, o, g, r, a, m) {

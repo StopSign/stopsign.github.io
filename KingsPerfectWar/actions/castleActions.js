@@ -50,7 +50,7 @@ let castle = {
         createCastleActions() {
             castle.initial.createEconomyActions();
             castle.initial.createArmyActions();
-            castle.initial.createLabActions();
+            castle.initial.createShrineActions();
         },
         createEconomyActions() {
             castle.initial.addCastleAction({
@@ -259,8 +259,65 @@ let castle = {
                 yPos:110
             });
         },
-        createLabActions() {
+        createShrineActions() {
+            castle.initial.addCastleAction({
+                varName:"altar",
+                name:"Build Altar",
+                desc:"Gives +1 Favor",
+                cost: [
+                    {
+                        resource:"wood",
+                        type:"static",
+                        starting:2000
+                    },
+                    {
+                        resource:"gold",
+                        type:"static",
+                        starting:1000
+                    }
+                ],
+                seconds:10,
+                xPos:535,
+                yPos:25
+            });
 
+            castle.initial.addCastleAction({
+                varName:"shrine",
+                name:"Build Shrine",
+                desc:"Gives +5 Favor per second.",
+                cost: [
+                    {
+                        resource:"wood",
+                        type:"static",
+                        starting:20000
+                    },
+                    {
+                        resource:"gold",
+                        type:"static",
+                        starting:10000
+                    }
+                ],
+                seconds:20,
+                xPos:585,
+                yPos:25
+            });
+
+            castle.initial.addCastleAction({
+                varName:"ritual",
+                name:"Perform Ritual",
+                desc:"Give wood back to the forest in ever-larger effigies. Doubles favor.",
+                cost: [
+                    {
+                        resource:"wood",
+                        type:"linear",
+                        starting:10000,
+                        growth:10000
+                    }
+                ],
+                seconds:20,
+                xPos:635,
+                yPos:25
+            });
         }
     },
     helpers: {

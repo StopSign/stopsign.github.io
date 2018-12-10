@@ -3,10 +3,11 @@ let view = {
         view.clickable.initial.createCastleIcons();
         view.clickable.initial.createWarMap();
         view.clickable.initial.createKingIcons();
+        view.clickable.initial.createShrineIcons();
         this.actionInfoDiv = {"king":document.getElementById("actionInfoDivKing"),
             "castle":document.getElementById("actionInfoDivCastle"),
             "units":document.getElementById("actionInfoDivUnits"),
-            "lab":document.getElementById("actionInfoDivLab")};
+            "shrine":document.getElementById("actionInfoDivShrine")};
     },
     updating: {
         update: function () {
@@ -19,6 +20,7 @@ let view = {
             view.updating.updateUnits();
             view.updating.updateTraveling();
             view.updating.updateKingTab();
+            view.updating.updateShrineTab();
 
             view.updating.saveCurrentState();
         },
@@ -27,6 +29,7 @@ let view = {
             prevState.maxMana = maxMana;
             prevState.gold = gold;
             prevState.wood = wood;
+            prevState.favor = favor;
             prevState.next = copyArray(actionsList.next);
             prevState.current = copyArray(actionsList.current);
             prevState.created = copyArray(created);
@@ -56,6 +59,7 @@ let view = {
                 document.getElementById("actualWood").innerHTML = round5(wood);
                 document.getElementById("woodPerSecond").innerHTML = round5(woodToAdd/10);
             }
+
         },
         updateLists: function() {
             for (let i = 0; i < actionsList.nextNames.length; i++) {
@@ -138,6 +142,11 @@ let view = {
                     document.getElementById(property+"Num").innerHTML = created.castle[property];
                     document.getElementById(property+"Num").style.opacity = created.castle[property] === 0 ? "0" : "1";
                 }
+            }
+            if(!prevState.created || prevState.created.castle.shrine !== created.castle.shrine
+                ||  prevState.created.castle.altar !== created.castle.altar
+                || prevState.created.castle.ritual !== created.castle.ritual) {
+                document.getElementById("favor").innerHTML = shrine.helpers.calcFavor();
             }
         },
         updateUnits: function() {
@@ -324,10 +333,11 @@ let view = {
                     if(highestPerson.person === 0) {
                         continue;
                     }
+                    allZero = false;
                     allDivs += "Met <b>" + highestPerson.person + "</b> people <b>" + highestPerson.amount + "</b> times<br>";
                 }
                 if(allZero) {
-                    allDivs += "Nobody met yet.<br>"
+                    allDivs += "Nobody met before.<br>"
                 }
 
                 allDivs += "Current Bonus: <b>" + round((rapportBonus-1)*100) + "</b>%";
@@ -335,6 +345,38 @@ let view = {
                 document.getElementById("rapportAdded").innerHTML = intToString(king.savedData.cha * rapportBonus);
             }
 
+        },
+        updateShrineTab: function() {
+            let noPrevShrine = !prevState.levelData || !prevState.levelData.shrine;
+            let baseFavorChanged = !prevState.created || prevState.created.castle.shrine !== created.castle.shrine
+                ||  prevState.created.castle.altar !== created.castle.altar
+                || prevState.created.castle.ritual !== created.castle.ritual;
+            for(let i = 0; i < shrine.actions.length; i++) {
+                let varName = shrine.actions[i].varName;
+                if(noPrevShrine || baseFavorChanged || prevState.levelData.shrine[varName+"Tribute"] !== levelData.shrine[varName+"Tribute"]) {
+                    document.getElementById(varName + "TributeString").innerHTML = "<b>"+levelData.shrine[varName+"Tribute"]+"</b> / <b>" + levelData.shrine[varName+"TributeNeeded"] + "</b> tribute";
+                    document.getElementById(varName + "TributeBar").style.width = (100 * levelData.shrine[varName+"Tribute"] / levelData.shrine[varName+"TributeNeeded"])+"%";
+                    document.getElementById(varName + "TributeGain").innerHTML = round(shrine.helpers.calcFavor() * shrine.helpers.calcTributeBonus(varName));
+                    document.getElementById(varName + "Num").innerHTML = created.shrine[varName];
+                }
+                if(noPrevShrine || JSON.stringify(prevState.levelSave.shrine[varName]) !== JSON.stringify(levelSave[curLevel].shrine[varName])) {
+                    let allDivs = "<div class='smallTitle'>Most Blessings Received</div>";
+
+                    let allZero = true;
+                    for(let i = 0; i < levelSave[curLevel].shrine[varName].length; i++) {
+                        let highestNum = levelSave[curLevel].shrine[varName][i];
+                        if(highestNum.num === 0) {
+                            continue;
+                        }
+                        allZero = false;
+                        allDivs += "Received <b>" + highestNum.num + "</b> blessings <b>" + highestNum.amount + "</b> times<br>";
+                    }
+                    if(allZero) {
+                        allDivs += "Blessing not yet received.<br>"
+                    }
+                    document.getElementById(varName+"BonusTooltip").innerHTML = allDivs;
+                }
+            }
         }
     },
     actionList: {
@@ -555,6 +597,38 @@ let view = {
                         '</div>' +
                         '<div id="'+action.varName+'Num" class="createdNum abs" style="left:'+(action.xPos+10)+'px;top:'+(action.yPos+43)+'px;"></div>';
                 });
+                container.innerHTML = allDivs;
+            },
+            createShrineIcons: function() {
+                let container = document.getElementById("shrineActions");
+                let allDivs = "";
+
+                shrine.actions.forEach(function(action) {
+                    let costDesc = view.helpers.getCostsString(action.cost);
+
+                    let desc = action.desc + "<br>Adds to the Shrine queue.<br>" + costDesc + " Can receive up to " + action.max + " times.";
+
+                    allDivs +=
+                        '<div class="abs" style="left:'+action.xPos+'px;top:'+action.yPos+'px;">' +
+                            '<div id="'+action.varName+'Container" onclick="addActionToList(\''+action.varName+'\', 3, true)" class="clickable abs showthat" style="left:0;top:0">' +
+                                '<img src="img/' + action.varName + '.svg" class="superLargeIcon imageDragFix">' +
+                                '<div class="showthisUp" style="width:250px">' +
+                                    '<div class="smallTitle">'+action.name+'</div>' +
+                                    '<div class="small">'+desc+'</div>' +
+                                '</div>' +
+                            '</div>' +
+                            '<div id="'+action.varName+'Num" class="createdNum abs" style="left:10px;top:43px;"></div>' +
+                            '<div class="abs" style="left:50px;top:15px;width:140px;height:17px;background-color:rgb(243,229,255);">' +
+                                '<div id="'+action.varName+'TributeBar" class="abs" style="left:0;top:0;width:20%;height:100%;background-color:rgb(216,185,232);"></div>' +
+                                '<div id="'+action.varName+'TributeString" class="abs" style="left:5px"></div>' +
+                            '</div>' +
+                            '<div class="abs showthat" style="left:170px;top:15px;width:50px">' +
+                                '+<div class="bold" id="'+action.varName+'TributeGain">1.00</div>' +
+                                '<div class="showthisUp" id="'+action.varName+'BonusTooltip" style="width:150px"></div>' +
+                            '</div>' +
+                        '</div>';
+                });
+
                 container.innerHTML = allDivs;
             }
         }

@@ -11,7 +11,7 @@ function clearCurrentList() {
 }
 
 function switchActionsTab(num) {
-    let ids = ["kingContainer", "castleContainer", "unitsContainer", "labContainer", "heroContainer"];
+    let ids = ["kingContainer", "castleContainer", "unitsContainer", "shrinesContainer", "heroContainer"];
     for(let i = 0; i < ids.length; i++) {
         if(num === i) {
             document.getElementById(ids[i]).style.display = "block";
@@ -22,7 +22,7 @@ function switchActionsTab(num) {
 }
 
 function switchListTab(num) {
-    let ids = ["kingListContainer", "castleListContainer", "unitsListContainer", "labListContainer"];
+    let ids = ["kingListContainer", "castleListContainer", "unitsListContainer", "shrineListContainer"];
     curList = num;
     for(let i = 0; i < ids.length; i++) {
         if(num === i) {

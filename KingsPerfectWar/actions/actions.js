@@ -83,7 +83,7 @@ let actions = {
             king:[],
             castle:[],
             units:[],
-            lab:[]
+            shrine:[]
         };
         for(let i = 0; i < actionsList.nextNames.length; i++) {
             actions.refresh(i);
@@ -168,6 +168,9 @@ function translateNextToCurrent(action, name) {
     if(actionData.start) {
         action.start = actionData.start
     }
+    if(actionData.tribute) {
+        action.tribute = actionData.tribute;
+    }
     action.cost = actionData.cost;
     action.buy = actionData.buy;
     action.visible = actionData.visible;
@@ -191,6 +194,8 @@ function getActionByVarName(varName, list) {
         return warMap.actions.getWarMapActionByVarName(varName);
     } else if(list === "king") {
         return getKingActionByVarName(varName);
+    } else if(list === "shrine") {
+        return getShrineActionByVarName(varName);
     }
     return null;
 }

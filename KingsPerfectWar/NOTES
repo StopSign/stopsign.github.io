@@ -1,16 +1,27 @@
 TODO
 
-lab
+shrineActions
+    initial
+    extra values
+    use created as buffs in relevant places
+    images
+
+6 actions
+
+shrine
     2 buildings in castle
-        small shrine 1000 wood/gold, build 10 seconds, gives 1 spirit power
-        large shrine 10000 wood/gold, build 20 seconds, gives 5 spirit power
+        altar 2000 wood 1000 gold, build 10 seconds, gives 1 Favor
+        shrine 20000 wood 10000 gold, build 20 seconds, gives 5 Favor
+        ritual 10000 wood+, build 10 seconds, x2 Favor
     Blessings
         purpose
-            a feature that uses wood buildup of a run to give sort of temporary bonuses
+            a feature that uses wood to give temporary bonuses, wherein the bonuses get stronger on reset
         general info
             each action takes 1 second
-            each action has its own list, contains up to 12 "highest runs". For each, If current level < highest run, -6.25% spirit points needed, max 25%
-            costs 100 wood per spirit power
+            attempts to spend favor if you have it
+            Takes 10 wood per favor spent - doesn't fail if you don't have it
+            each action has its own list of highest runs, if current < highest, favor is 10% more effective. double highestListsLength max
+
         temporary - completions save per level
             Faerie Enchantments - +20% atk all units, 100 points + 100 each time, 5 max
             Blessed Feasts - +20% hp all units, 100 points + 100 each time, 5 max
@@ -66,7 +77,17 @@ image pooling for map
 browsers
 mobile
 tutorial
+    level 1 - send king to kill hideout
+    level 2 - send king to kill dungeon, get unique reward of exp, use train, kill hideout
+    level 3 - send king to kill 1st hideout for initial gold/wood, build economy, build barracks/spearman, kill 2nd hideout
+    level 4 - have initial gold/wood, defend against attackers (barely doesn't kill king), aura intro, dungeon is weak but far away w/ mana, build economy/units, kill 2nd hideout
+    level 5 - regular level, talk to people intro
+    level 6-10 - regular level
+    level 11 - regular level, shrine, total mana should be ~4-5k
 
+
+
+    regular level - have initial gold/wood, attackers come later, dungeons for mana and hideouts for gold
 
 additional ideas -
     rally peasants / send mercenaries / send assassins - auto-creates units and sends them at the nearest base w/o a unique reward

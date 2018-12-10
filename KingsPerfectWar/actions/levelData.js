@@ -14,7 +14,11 @@ function createLevel(num) {
         levelSave[num].uniqueCleared = false;
         levelSave[num].knowledge = 0;
         levelSave[num].knowledgeCap = 0;
-        levelSave[num].highestPerson = [{person:0, amount:4}];
+        levelSave[num].highestPerson = [];
+        levelSave[num].shrine = {};
+        shrine.actions.forEach(function(action) {
+            levelSave[num].shrine[action.varName] = [];
+        });
     }
 
     levelData.data = {
@@ -22,6 +26,13 @@ function createLevel(num) {
         rapport:0,
         difficulty:(num+1)
     };
+    levelData.shrine = {};
+    shrine.actions.forEach(function(action) {
+        levelData.shrine[action.varName+"Tribute"] = 0;
+        levelData.shrine[action.varName+"TributeNeeded"] = action.tribute;
+        created.shrine[action.varName] = 0;
+    });
+
     levelData.home.units = [];
     levelData.home.varName = "home";
     levelData.home.fightCounter = 20;
@@ -60,9 +71,9 @@ function createLevel(num) {
 levelInitials = [{
     initial: {
         people:30, //5270
-        gold: 1000,
-        wood: 1000,
-        mana: 1200
+        gold: 1000000,
+        wood: 1000000,
+        mana: 3000
     },
     home: {
         coords: {x: 0, y: 100},

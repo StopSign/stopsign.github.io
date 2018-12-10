@@ -19,18 +19,18 @@ let saveName = !isBeta ? "KPW1" :  "KPWBeta";
 let stop = false;
 let prevState = {};
 let actionsList = {
-    nextNames: ["king", "castle", "units", "lab"],
+    nextNames: ["king", "castle", "units", "shrine"],
     next: {
         king:[],
         castle:[],
         units:[],
-        lab:[]
+        shrine:[]
     },
     current: {
         king:[],
         castle:[],
         units:[],
-        lab:[]
+        shrine:[]
     }
 };
 let created = {};
@@ -44,7 +44,7 @@ let totalTime = 0;
 let gold = 0;
 let wood = 0;
 let buildAuraValue = 1.5;
-let personListLength = 4;
+let highestListsLength = 8;
 
 let curList = 1; //castle
 let currentlyHovering = 0;

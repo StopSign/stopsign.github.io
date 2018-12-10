@@ -220,13 +220,13 @@ input {
     background-color: rgba(191, 210, 220, 1);
 }
 
-.labColor, .labColorH, .labColorD:hover {
+.shrineColor, .shrineColorH, .shrineColorD:hover {
     background-color: rgba(237, 212, 245, 1);
 }
-.labColor:hover, .labColorH:hover {
+.shrineColor:hover, .shrineColorH:hover {
     background-color: rgba(247, 222, 255, 1);
 }
-.labColor:active, .labColorD {
+.shrineColor:active, .shrineColorD {
     background-color: rgba(227, 202, 235, 1);
 }
 
@@ -269,6 +269,7 @@ input {
     width:100%;
     height:100%;
     display:none;
+    position:relative;
 }
 
 .actionListLeft, .actionListRight {
