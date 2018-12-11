@@ -71,9 +71,9 @@ function createLevel(num) {
 levelInitials = [{
     initial: {
         people:30, //5270
-        gold: 1000000,
-        wood: 1000000,
-        mana: 3000
+        gold: 100,
+        wood: 0,
+        mana: 1200
     },
     home: {
         coords: {x: 0, y: 100},
