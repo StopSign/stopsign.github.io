@@ -51,6 +51,7 @@ let currentlyHovering = 0;
 let unitsSelectedForMove = { king:false, units:true, heroes:false };
 
 let levelSave = [];
+let curInfoBox = "extras";
 
 function clearSave() {
     window.localStorage[saveName] = "";

@@ -3,7 +3,6 @@ let view = {
         view.clickable.initial.createCastleIcons();
         view.clickable.initial.createWarMap();
         view.clickable.initial.createKingIcons();
-        view.clickable.initial.createShrineIcons();
         this.actionInfoDiv = {"king":document.getElementById("actionInfoDivKing"),
             "castle":document.getElementById("actionInfoDivCastle"),
             "units":document.getElementById("actionInfoDivUnits"),
@@ -279,6 +278,10 @@ let view = {
                 document.getElementById("rflxGain").innerHTML = intToString((king.savedData.rflxCap - king.curData.rflxCur)/100);
             }
             if(noPrevKing || prevState.king.curData.aura !== king.curData.aura) {
+                document.getElementById("directContainer").style.padding = "3px";
+                document.getElementById("communeContainer").style.padding = "3px";
+                document.getElementById("marketContainer").style.padding = "3px";
+
                 let color = king.helpers.kingIsHome() ? "rgba(255, 255, 0, 1)" : "rgba(255, 255, 0, .4)";
                 let hidden = "rgba(255, 255, 0, 0)";
                 document.getElementById("directContainer").style.border = "2px solid " + hidden;
@@ -531,23 +534,30 @@ let view = {
     },
     clickable: {
         initial: {
-            createCastleIcons: function () {
-                let container = document.getElementById("castleActions");
+            createCastleIcons: function() {
+                let container = document.getElementById("castleActionList");
                 let allDivs = "";
+                let curInfoBox = document.getElementById("infoBoxList");
+
                 castle.actions.forEach(function(action) {
                     let costDesc = view.helpers.getCostsString(action.cost);
 
                     let desc = action.desc + "<br>Adds to the Castle queue.<br>" + costDesc;
 
                     allDivs +=
-                        '<div id="'+action.varName+'Container" onclick="addActionToList(\''+action.varName+'\', 1, true)" class="clickable abs showthat" style="left:'+action.xPos+'px;top:'+action.yPos+'px;">' +
+                        '<div id="'+action.varName+'Container" onclick="selectAction(\''+action.varName+'\', 1)" class="clickable abs showthat" style="left:'+action.xPos+'px;top:'+action.yPos+'px;">' +
                         '<img src="img/' + action.varName + '.svg" class="superLargeIcon imageDragFix">' +
                         '<div class="showthisUp" style="width:250px">' +
-                        '<div class="smallTitle">'+action.name+'</div>' +
-                        '<div class="small">'+desc+'</div>' +
+                            '<div class="smallTitle">'+action.name+'</div>' +
+                            '<div class="small">'+desc+'</div>' +
                         '</div>' +
                         '</div>' +
                         '<div id="'+action.varName+'Num" class="createdNum abs" style="left:'+(action.xPos+10)+'px;top:'+(action.yPos+43)+'px;"></div>';
+
+                    curInfoBox.innerHTML += '<div id="'+action.varName+'InfoBox" class="infoBox">' +
+                        '<div class="smallTitle">'+action.name+'</div>' +
+                        '<div class="small">'+desc+'</div>' +
+                        '</div>';
                 });
                 container.innerHTML = allDivs;
             },
@@ -555,6 +565,7 @@ let view = {
                 createLevel(curLevel);
                 warMap.actions.createWarMapActions(levelData);
                 let allDivs = "";
+                let curInfoBox = document.getElementById("infoBoxList");
 
                 warMap.bases.getAllBases().forEach(function(base) {
                     let coords = view.helpers.translateToWarMapCoords(base.coords);
@@ -563,13 +574,16 @@ let view = {
                         '<div style="position:absolute;left:'+coords.x+'px;top:'+(coords.y)+'px;">' +
                             '<div class="mapFriendlyHPBar" id="'+base.varName+'FriendlyHPBar" style="position:absolute;top:-10px"><div id="'+base.varName+'FriendlyHP"></div></div>' +
                             '<div class="mapEnemyHPBar" id="'+base.varName+'EnemyHPBar" style="position:absolute;top:-4px"><div id="'+base.varName+'EnemyHP"></div></div>' +
-                            '<div class="clickable showthat" style="position:absolute;top:0;left:0" onclick="addActionToList(\''+base.varName+'\', 2, true)">' +
+                            '<div class="clickable showthat" style="position:absolute;top:0;left:0" onclick="selectAction(\''+base.varName+'\', 2)">' +
                                 '<img src="img/'+imageName+'.svg" class="superLargeIcon imageDragFix">' +
                                 '<div class="showthis" id="'+base.varName+'Tooltip"></div>' +
                             '</div>' +
                             (base.creates ? ('<div class="createCounter" style="position:absolute;left:-20px;top:43px;width:80px">' +
                                 '<img src="img/enemy.svg" class="smallIcon imageDragFix">: <div id="'+base.varName+'CreateCounter">'+base.creates.counter+'</div>'+
                             '</div>') : "") +
+                        '</div>';
+
+                    curInfoBox.innerHTML += '<div id="'+base.varName+'InfoBox" class="infoBox">' +
                         '</div>';
                 });
 
@@ -580,15 +594,17 @@ let view = {
                 });
             },
             createKingIcons: function() {
-                let container = document.getElementById("kingActions");
+                let container = document.getElementById("kingActionList");
                 let allDivs = "";
+                let curInfoBox = document.getElementById("infoBoxList");
+
                 king.actions.forEach(function(action) {
                     let costDesc = view.helpers.getCostsString(action.cost);
 
                     let desc = action.desc + "<br>Adds to the King queue.<br>" + costDesc;
 
                     allDivs +=
-                        '<div id="'+action.varName+'Container" onclick="addActionToList(\''+action.varName+'\', 0, true)" class="clickable abs showthat" style="left:'+action.xPos+'px;top:'+action.yPos+'px;">' +
+                        '<div id="'+action.varName+'Container" onclick="selectAction(\''+action.varName+'\', 0)" class="clickable abs showthat" style="left:'+action.xPos+'px;top:'+action.yPos+'px;">' +
                         '<img src="img/' + action.varName + '.svg" class="superLargeIcon imageDragFix">' +
                         '<div class="showthisUp" style="width:250px">' +
                         '<div class="smallTitle">'+action.name+'</div>' +
@@ -596,12 +612,12 @@ let view = {
                         '</div>' +
                         '</div>' +
                         '<div id="'+action.varName+'Num" class="createdNum abs" style="left:'+(action.xPos+10)+'px;top:'+(action.yPos+43)+'px;"></div>';
+
+                    curInfoBox.innerHTML += '<div id="'+action.varName+'InfoBox" class="infoBox">' +
+                        '<div class="smallTitle">'+action.name+'</div>' +
+                        '<div class="small">'+desc+'</div>' +
+                        '</div>';
                 });
-                container.innerHTML = allDivs;
-            },
-            createShrineIcons: function() {
-                let container = document.getElementById("shrineActions");
-                let allDivs = "";
 
                 shrine.actions.forEach(function(action) {
                     let costDesc = view.helpers.getCostsString(action.cost);
@@ -610,25 +626,29 @@ let view = {
 
                     allDivs +=
                         '<div class="abs" style="left:'+action.xPos+'px;top:'+action.yPos+'px;">' +
-                            '<div id="'+action.varName+'Container" onclick="addActionToList(\''+action.varName+'\', 3, true)" class="clickable abs showthat" style="left:0;top:0">' +
-                                '<img src="img/' + action.varName + '.svg" class="superLargeIcon imageDragFix">' +
-                                '<div class="showthisUp" style="width:250px">' +
-                                    '<div class="smallTitle">'+action.name+'</div>' +
-                                    '<div class="small">'+desc+'</div>' +
-                                '</div>' +
-                            '</div>' +
-                            '<div id="'+action.varName+'Num" class="createdNum abs" style="left:10px;top:43px;"></div>' +
-                            '<div class="abs" style="left:50px;top:15px;width:140px;height:17px;background-color:rgb(243,229,255);">' +
-                                '<div id="'+action.varName+'TributeBar" class="abs" style="left:0;top:0;width:20%;height:100%;background-color:rgb(216,185,232);"></div>' +
-                                '<div id="'+action.varName+'TributeString" class="abs" style="left:5px"></div>' +
-                            '</div>' +
-                            '<div class="abs showthat" style="left:170px;top:15px;width:50px">' +
-                                '+<div class="bold" id="'+action.varName+'TributeGain">1.00</div>' +
-                                '<div class="showthisUp" id="'+action.varName+'BonusTooltip" style="width:150px"></div>' +
-                            '</div>' +
+                        '<div id="'+action.varName+'Container" onclick="selectAction(\''+action.varName+'\', 3)" class="clickable abs showthat" style="left:0;top:0">' +
+                        '<img src="img/' + action.varName + '.svg" class="superLargeIcon imageDragFix">' +
+                        '<div class="showthisUp" style="width:250px">' +
+                        '<div class="smallTitle">'+action.name+'</div>' +
+                        '<div class="small">'+desc+'</div>' +
+                        '</div>' +
+                        '</div>' +
+                        '<div id="'+action.varName+'Num" class="createdNum abs" style="left:10px;top:43px;"></div>' +
+                        '<div class="abs" style="left:50px;top:15px;width:140px;height:17px;background-color:rgb(243,229,255);">' +
+                        '<div id="'+action.varName+'TributeBar" class="abs" style="left:0;top:0;width:20%;height:100%;background-color:rgb(216,185,232);"></div>' +
+                        '<div id="'+action.varName+'TributeString" class="abs" style="left:5px"></div>' +
+                        '</div>' +
+                        '<div class="abs showthat" style="left:170px;top:15px;width:50px">' +
+                        '+<div class="bold" id="'+action.varName+'TributeGain">1.00</div>' +
+                        '<div class="showthisUp" id="'+action.varName+'BonusTooltip" style="width:150px"></div>' +
+                        '</div>' +
+                        '</div>';
+
+                    curInfoBox.innerHTML += '<div id="'+action.varName+'InfoBox" class="infoBox">' +
+                        '<div class="smallTitle">'+action.name+'</div>' +
+                        '<div class="small">'+desc+'</div>' +
                         '</div>';
                 });
-
                 container.innerHTML = allDivs;
             }
         }
@@ -672,10 +692,10 @@ let view = {
                 document.getElementById(base.varName + "EnemyHPBar").style.display = "none";
             }
             tooltipDiv += "</div>"; //closing mapTooltipRow
-            document.getElementById(base.varName + "Tooltip").innerHTML = tooltipDiv;
+            document.getElementById(base.varName + "InfoBox").innerHTML = tooltipDiv;
         },
         translateToWarMapCoords: function(coords) { //x,y 0-190,0-100, translated to x:10-550 and y:15-300
-            return {x:10+(coords.x / 190 * 541), y:15+(coords.y / 100 * 285)};
+            return {x:10+(coords.x / 190 * 791), y:15+(coords.y / 100 * 435)};
         },
         getUnitString: function(unitList) {
             let total = { atk:0, hp:0, exp:0 };

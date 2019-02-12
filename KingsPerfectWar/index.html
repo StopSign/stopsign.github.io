@@ -21,8 +21,8 @@
 <body id="theBody" style="min-width:1210px">
 
     <div style="width:854px">
-        <div style="width:600px;vertical-align:top;">
-            <div id="warMap" style="width:100%;height:355px;position:relative;text-align:center;" class="unitsColorH">
+        <div style="width:850px;vertical-align:top;">
+            <div id="warMap" style="width:100%;height:505px;position:relative;text-align:center;" class="unitsColorH">
                 <div class="showthat">
                     <div class="title">War Map</div>
                     <div class="showthis">
@@ -57,63 +57,9 @@
 
         </div>
 
-        <div style="width:250px;height:355px;vertical-align:top;position:relative" class="extrasColor">
-            <div class="title">Extras</div>
-            <div id="actionInfoDivKing" style="display:none;width:100%"></div>
-            <div id="actionInfoDivCastle" style="display:none;width:100%"></div>
-            <div id="actionInfoDivUnits" style="display:none;width:100%"></div>
-            <div id="actionInfoDivShrine" style="display:none;width:100%"></div>
-            <div id="optionsDiv" style="position:relative;height:100%;width:100%;">
-                <div style="width:100%;vertical-align:top">
-                    <div onclick='restart()' class='button showthat' style='margin-left:5px'>Restart
-                        <div class='showthis' style='color:black;width:230px;'>Restarts the clock and your lists</div>
-                    </div>
-                    <div id='pausePlay' onclick='togglePause()' class='button'>Play</div><br>
-                    <div class='control'><input type='checkbox' id='pauseBeforeRestart'><label for='pauseBeforeRestart'> Pause before restart</label></div><br>
-                    <input type="checkbox" id="pauseListEmpty" checked>
-                    <label for="pauseListEmpty">Pause when next list is empty</label><br>
-                    <input type="checkbox" id="pausePlaceCleared" checked>
-                    <label for="pausePlaceCleared">Pause when a place is cleared</label><br>
-                    <div class="showthat">
-                        <input type="checkbox" id="keepBuild">
-                        <label for="keepBuild">Keep Direct Worker bonus at</label> <input id="buildValue" type="text" class="listTextInput" value="1.5" onchange="changeBuildValue()" onclick="this.select();">
-                        <div class="showthis">
-                            If you want to improve INT without messing up your action timing, use this option to keep things stable. The valid range is between 1.5 and your max. Uncheck to always use your max.
-                        </div>
-                    </div><br><br>
-                    <div onclick='clearCurrentList()' class='button showthat'>
-                        Clear Current List
-                        <div class="showthis" style="color:black;width:230px">
-                            Clears the currently showing list of all actions past the active one.
-                        </div>
-                    </div><br>
-                </div>
-                <div class="clickable showthat abs" style="bottom:26px;right:138px;" onclick="addRestartAction(curList)">
-                    <img src='img/restart.svg' class='superLargeIcon imageDragFix'>
-                    <div class="showthis" style="width:250px">
-                        <div class="smallTitle">Restart</div>
-                        <div class="small">Add an action that restarts the map when it's run. Takes 5 seconds to finish.</div>
-                    </div>
-                </div>
-                <div class="clickable showthat abs" style="bottom:26px;right:88px;" onclick="addPauseAction(curList)">
-                    <img src='img/pause.svg' class='superLargeIcon imageDragFix'>
-                    <div class="showthis" style="width:250px">
-                        <div class="smallTitle">Pause</div>
-                        <div class="small">Add an action to the current list that pauses when it's run. Does not interfere with the game otherwise</div>
-                    </div>
-                </div>
-                <div class="clickable showthat abs" style="bottom:26px;right:38px;" onclick="addSleepAction(curList)">
-                    <img src='img/sleep.svg' class='superLargeIcon imageDragFix'>
-                    <div class="showthis" style="width:250px">
-                        <div class="smallTitle">Sleep</div>
-                        <div class="small">Add an action to the current list that waits for one second. Auto-added if no other action is available.</div>
-                    </div>
-                </div>
-            </div>
-        </div>
         
         <div style="margin-top:4px;width:100%">
-            <div style="width:270px">
+            <div>
                 <div class="showthat" style="width:100px">
                     <img src='img/gold.svg' class='largeIcon imageDragFix' style="vertical-align:bottom">
                     <div id="gold"></div>
@@ -130,111 +76,184 @@
                         Non-rounded Wood: <div id="actualWood" class="bold"></div><br>
                         Per second: <div id="woodPerSecond" class="bold"></div>
                     </div>
+                </div><div class="showthat" style="width:100px">
+                    <img src='img/wood.svg' class='largeIcon imageDragFix' style="vertical-align:bottom">
+                    <div id="favor"></div>
+                    <div class="showthis">
+                        Non-rounded Favor: <div id="actualFavor" class="bold"></div><br>
+                        Per second: <div id="favorPerSecond" class="bold"></div>
+                    </div>
                 </div><div class="showthat" style="width:65px">
                     <img src='img/mana.svg' class='largeIcon imageDragFix' style="vertical-align:bottom">
                     <div id="mana"></div>
                     <div id='manaTooltip' class="showthis"></div>
                 </div>
-            </div><div style="width:555px;height:10px;background-color:#dbdff3;margin-top:6px;">
+            </div><div style="width:455px;height:10px;background-color:#dbdff3;margin-top:6px;">
                 <div id="manaBar" style="width:80%;height:100%;background-color:rgb(130, 147, 255);vertical-align:top;"></div>
             </div>
         </div>
 
-        <div style="width:100%;background-color:#c4c9e6;height:204px;margin-top:4px;">
-            <div style="width:160px;vertical-align:top;" class="large bold">
-                <div id="kingSelector" class="tabSelector kingColor" onclick="switchActionsTab(0)">King</div>
-                <div id="castleSelector" class="tabSelector castleColor" onclick="switchActionsTab(1)">Castle</div>
-                <div id="unitsSelector" class="tabSelector unitsColor" onclick="switchActionsTab(2)">Units</div>
-                <div id="shrineSelector" class="tabSelector shrineColor" onclick="switchActionsTab(3)">Shrine</div>
-                <div id="heroSelector" class="tabSelector heroColor" onclick="switchActionsTab(4)">Heroes</div>
-            </div><div style="width:694px;height:100%;vertical-align:top;">
-                <div id="kingContainer" class="tabContainer kingColorH">
-                    <div id="kingActions" class="abs" style="left:0;top:0;"></div>
-                    <div id="kingOtherInfo" class="abs" style="left:0;top:0">
-                        <div id='kingStats' class="abs" style="left:18px;top:10px;width:200px">
-                            <div style='font-size:20px'>Level <div id="kingLevel" class="bold"></div></div>
-                            <div style="position:relative;width:100%;height:17px;background-color:rgb(223,194,249);margin-bottom:3px;">
-                                <div class="abs" id="expProgress" style="left:0;top:0;height:100%;width:20%;background-color:rgba(179,92,249,0.8)"></div>
-                                <div class="abs" id="exp" style="left:0;top:0;"></div>
-                            </div>
-                            Current Reflex: <div id="rflxCur" class="bold"></div><br>
-                            Reflex Cap: <div id="rflxCap" class="bold"></div><br>
-                            Intelligence: <div id="int" class="bold"></div><br>
-                            Wisdom: <div id="wis" class="bold"></div><br>
-                            Charisma: <div id="cha" class="bold"></div>
+    </div>
+
+    <div style="width:378px;height:350px;vertical-align:top;">
+        <div style="height:150px;position:relative;width:100%;" class="kingColorH">
+            <div class="title">Stats</div>
+
+            <div id="kingOtherInfo" class="abs" style="left:0;top:0">
+                <div id='kingStats' class="abs" style="left:18px;top:10px;width:200px">
+                    <div style='font-size:20px'>Level <div id="kingLevel" class="bold"></div></div>
+                    <div style="position:relative;width:100%;height:17px;background-color:rgb(223,194,249);margin-bottom:3px;">
+                        <div class="abs" id="expProgress" style="left:0;top:0;height:100%;width:20%;background-color:rgba(179,92,249,0.8)"></div>
+                        <div class="abs" id="exp" style="left:0;top:0;"></div>
+                    </div>
+                    Current Reflex: <div id="rflxCur" class="bold"></div><br>
+                    Reflex Cap: <div id="rflxCap" class="bold"></div><br>
+                    Intelligence: <div id="int" class="bold"></div><br>
+                    Wisdom: <div id="wis" class="bold"></div><br>
+                    Charisma: <div id="cha" class="bold"></div>
+                </div>
+                <div id="peopleInfo" class="abs" style='left:300px;top:20px;width:250px;'>
+                    <div class="abs" style='left:0;top:0'>Person <div id="personNum" class="bold"></div>, Difficulty <div id="difficulty" class="bold"></div></div>
+                    <div class="abs" style="left:0;top:20px;height:17px;width:150px;background-color:rgb(255,247,181);">
+                        <div id="rapportProgress" class="abs" style="left:0;width:20%;height:100%;background-color:rgba(255, 184, 15, .8)"></div>
+                        <div id="rapport" class="abs" style="left:5px">50 / 250 rapport</div>
+                    </div>
+                    <div class="abs showthat" style='left:0;top:38px'>
+                        Secrets Learned: <div id="secrets" class="bold"></div>
+                        <div class="showthis" style='width:200px'>
+                            <div id="mapMaxPeople" class="bold"></div> people total on this map
                         </div>
-                        <div id="peopleInfo" class="abs" style='left:300px;top:20px;width:250px;'>
-                            <div class="abs" style='left:0;top:0'>Person <div id="personNum" class="bold"></div>, Difficulty <div id="difficulty" class="bold"></div></div>
-                            <div class="abs" style="left:0;top:20px;height:17px;width:150px;background-color:rgb(255,247,181);">
-                                <div id="rapportProgress" class="abs" style="left:0;width:20%;height:100%;background-color:rgba(255, 184, 15, .8)"></div>
-                                <div id="rapport" class="abs" style="left:5px">50 / 250 rapport</div>
-                            </div>
-                            <div class="abs showthat" style='left:0;top:38px'>
-                                Secrets Learned: <div id="secrets" class="bold"></div>
-                                <div class="showthis" style='width:200px'>
-                                    <div id="mapMaxPeople" class="bold"></div> people total on this map
-                                </div>
-                            </div>
-                            <div class="abs showthat" style='left:150px;top:20px'>
-                                +<div id="rapportAdded" class="bold"></div>
-                                <div class="showthis" style="width:150px">
-                                    <div id="personHighest"></div>
-                                </div>
-                            </div>
-                            <div class="abs showthat" style='left:-65px;top:0'>
-                                <i class="fa fa-question-circle" aria-hidden="true" style='font-size:16px'></i>
-                                <div class="showthisUp" style="width:720px">
-                                    Each map has a max number of people to talk to. You gain rapport equal to your CHA until a person has shared their secrets, which increases your knowledge cap. You can only get max knowledge from a person once.<br>
-                                    Each person has a difficulty, and the next person has +0.1 difficulty. You need (10 * difficulty) rapport per person. Additionally, if their difficulty is higher than your CHA, you need an additional ((difficulty - CHA)^2)*5 rapport.<br>
-                                    If the difficulty is higher than your CHA, upon completion you gain CHA equal to (difficulty - CHA)/10, rounded up to the nearest hundredth.<br>
-                                    You gain 200 max knowledge for the first secret, and -2 for each subsequent secret.<br>
-                                    Additionally, you get better at speaking to people you've already spoken to. Everyone with less difficulty than your highest reached difficulty is 25% easier to talk to. Your highest reached is saved 4 separate times per map.<br>
-                                </div>
-                            </div>
+                    </div>
+                    <div class="abs showthat" style='left:150px;top:20px'>
+                        +<div id="rapportAdded" class="bold"></div>
+                        <div class="showthis" style="width:150px">
+                            <div id="personHighest"></div>
                         </div>
-                        <div id="knowledgeInfo" class="abs showthat" style='left:300px;top:98px;width:200px;'>
-                            Knowledge: <div id="knowledge" class="bold"></div> / <div id="knowledgeCap" class="bold"></div> (+<div id="knowledgeRate" class="bold"></div>)<br>
-                            <div class="showthis">
-                                Every 1000 knowledge gained gives the king 1 INT
-                            </div>
-                        </div>
-                        <div id="trainInfo" class="abs showthat" style='left:300px;top:158px;width:250px;'>
-                            Reflex to Gain: <div id="rflxGain" class="bold"></div>
-                            <div class="showthisUp">
-                                The King's ATK is equal to the current reflex, and HP is equal to current reflex * 10
-                            </div>
+                    </div>
+                    <div class="abs showthat" style='left:-65px;top:0'>
+                        <i class="fa fa-question-circle" aria-hidden="true" style='font-size:16px'></i>
+                        <div class="showthisUp" style="width:720px">
+                            Each map has a max number of people to talk to. You gain rapport equal to your CHA until a person has shared their secrets, which increases your knowledge cap. You can only get max knowledge from a person once.<br>
+                            Each person has a difficulty, and the next person has +0.1 difficulty. You need (10 * difficulty) rapport per person. Additionally, if their difficulty is higher than your CHA, you need an additional ((difficulty - CHA)^2)*5 rapport.<br>
+                            If the difficulty is higher than your CHA, upon completion you gain CHA equal to (difficulty - CHA)/10, rounded up to the nearest hundredth.<br>
+                            You gain 200 max knowledge for the first secret, and -2 for each subsequent secret.<br>
+                            Additionally, you get better at speaking to people you've already spoken to. Everyone with less difficulty than your highest reached difficulty is 25% easier to talk to. Your highest reached is saved 4 separate times per map.<br>
                         </div>
                     </div>
                 </div>
-                <div id="castleContainer" class="tabContainer castleColorH" style="display:block;">
-                    <div class="title abs" style="top:0;left:63px;">Income</div>
-                    <div class="title abs" style="top:0;left:300px;">Army</div>
-                    <div class="title abs" style="top:0;left:580px;">Shrines</div>
-                    <div id="castleActions" class="abs" style="left:0;top:0;"></div>
+                <div id="knowledgeInfo" class="abs showthat" style='left:300px;top:98px;width:200px;'>
+                    Knowledge: <div id="knowledge" class="bold"></div> / <div id="knowledgeCap" class="bold"></div> (+<div id="knowledgeRate" class="bold"></div>)<br>
+                    <div class="showthis">
+                        Every 1000 knowledge gained gives the king 1 INT
+                    </div>
                 </div>
-                <div id="unitsContainer" class="tabContainer unitsColorH"></div>
-                <div id="shrinesContainer" class="tabContainer shrineColorH">
-                    <div style="font-size:16px;margin:10px;position:absolute;">Favor <div id="favor" class="bold"></div></div>
-                    <div id="shrineActions" class="abs"></div>
+                <div id="trainInfo" class="abs showthat" style='left:300px;top:158px;width:250px;'>
+                    Reflex to Gain: <div id="rflxGain" class="bold"></div>
+                    <div class="showthisUp">
+                        The King's ATK is equal to the current reflex, and HP is equal to current reflex * 10
+                    </div>
                 </div>
-                <div id="heroContainer" class="tabContainer heroColorH"></div>
             </div>
+        </div>
+        <div style="height:150px">
+            <div class="title">Action Lists</div>
+            <div style="width:100%;height:20px;" class="large bold">
+                <div id="kingListSelector" class="listSelector kingColor" onclick="switchListTab(0)">King <img id="kingTabSleep" src='img/sleep.svg' class='smallIcon imageDragFix tabSleep'></div>
+                <div id="castleListSelector" class="listSelector castleColor" onclick="switchListTab(1)">Castle <img id="castleTabSleep" src='img/sleep.svg' class='smallIcon imageDragFix tabSleep'></div>
+                <div id="unitsListSelector" class="listSelector unitsColor" onclick="switchListTab(2)">Units <img id="unitsTabSleep" src='img/sleep.svg' class='smallIcon imageDragFix tabSleep'></div>
+                <div id="shrineListSelector" class="listSelector shrineColor" onclick="switchListTab(3)">Shrine <img id="shrineTabSleep" src='img/sleep.svg' class='smallIcon imageDragFix tabSleep'></div>
+            </div>
+            <div id="kingListContainer" class="listContainer"><div id="kingCurActions" class="actionListLeft kingColorD"></div><div id="kingNextActions" class="actionListRight kingColorH"></div></div>
+            <div id="castleListContainer" class="listContainer" style="display:block;"><div id="castleCurActions" class="actionListLeft castleColorD"></div><div id="castleNextActions" class="actionListRight castleColorH"></div></div>
+            <div id="unitsListContainer" class="listContainer"><div id="unitsCurActions" class="actionListLeft unitsColorD"></div><div id="unitsNextActions" class="actionListRight unitsColorH"></div></div>
+            <div id="shrineListContainer" class="listContainer"><div id="shrineCurActions" class="actionListLeft shrineColorD"></div><div id="shrineNextActions" class="actionListRight shrineColorH"></div></div>
+
         </div>
     </div>
 
-    <div style="width:378px;height:550px;vertical-align:top;">
-        <div class="title">Action Lists</div>
-        <div style="width:100%;height:20px;" class="large bold">
-            <div id="kingListSelector" class="listSelector kingColor" onclick="switchListTab(0)">King <img id="kingTabSleep" src='img/sleep.svg' class='smallIcon imageDragFix tabSleep'></div>
-            <div id="castleListSelector" class="listSelector castleColor" onclick="switchListTab(1)">Castle <img id="castleTabSleep" src='img/sleep.svg' class='smallIcon imageDragFix tabSleep'></div>
-            <div id="unitsListSelector" class="listSelector unitsColor" onclick="switchListTab(2)">Units <img id="unitsTabSleep" src='img/sleep.svg' class='smallIcon imageDragFix tabSleep'></div>
-            <div id="shrineListSelector" class="listSelector shrineColor" onclick="switchListTab(3)">Shrine <img id="shrineTabSleep" src='img/sleep.svg' class='smallIcon imageDragFix tabSleep'></div>
+    <div style="width:1300px">
+        <div style="background-color:#c4c9e6;height:254px;margin-top:4px;">
+            <div id="castleActionContainer" class="mainActionList castleColorH" style="position:relative;width:332px;">
+                <div style="display:block;text-align:center;margin-top:5px;margin-bottom:5px;" class="large bold">Castle Actions</div>
+                <div style="width:125px;text-align:center;" class="bold">Income</div>
+                <div style="width:125px;text-align:center;" class="bold">Army</div>
+                <div style="width:70px;text-align:center;" class="bold">Shrine</div>
+                <div id="castleActionList" class="abs" style="left:0;top:50px;"></div>
+            </div><div id="kingActionContainer" class="mainActionList kingColorH" style="position:relative;width:270px;">
+            <div style="display:block;text-align:center;margin-top:5px;margin-bottom:5px;" class="large bold">King Actions</div>
+            <div style="width:76px;text-align:center;" class="bold">Auras</div>
+            <div style="width:50px;text-align:center;" class="bold">Growth</div>
+            <div style="width:135px;text-align:center;" class="bold">Blessings</div>
+            <div id="kingActionList" class="abs" style="left:0;top:50px;"></div>
+        </div><div id="optionsContainer" class="mainActionList extrasColor" style="position:relative;width:70px;vertical-align:top;">
+            <div style="display:block;text-align:center;margin-top:5px;margin-bottom:5px;" class="large bold">Options Actions</div>
+            <div id="optionsActionList" class="abs" style="left:0;top:50px;">
+                <div class="clickable showthat abs" style="left:15px;top:0;" onclick="addRestartAction(curList)">
+                    <img src='img/restart.svg' class='superLargeIcon imageDragFix'>
+                    <div class="showthis" style="width:250px">
+                        <div class="smallTitle">Restart</div>
+                        <div class="small">Add an action that restarts the map when it's run. Takes 5 seconds to finish.</div>
+                    </div>
+                </div>
+                <div class="clickable showthat abs" style="left:15px;top:50px;" onclick="addPauseAction(curList)">
+                    <img src='img/pause.svg' class='superLargeIcon imageDragFix'>
+                    <div class="showthis" style="width:250px">
+                        <div class="smallTitle">Pause</div>
+                        <div class="small">Add an action to the current list that pauses when it's run. Does not interfere with the game otherwise</div>
+                    </div>
+                </div>
+                <div class="clickable showthat abs" style="left:15px;top:100px;" onclick="addSleepAction(curList)">
+                    <img src='img/sleep.svg' class='superLargeIcon imageDragFix'>
+                    <div class="showthis" style="width:250px">
+                        <div class="smallTitle">Sleep</div>
+                        <div class="small">Add an action to the current list that waits for one second. Auto-added if no other action is available.</div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div id="kingListContainer" class="listContainer"><div id="kingCurActions" class="actionListLeft kingColorD"></div><div id="kingNextActions" class="actionListRight kingColorH"></div></div>
-        <div id="castleListContainer" class="listContainer" style="display:block;"><div id="castleCurActions" class="actionListLeft castleColorD"></div><div id="castleNextActions" class="actionListRight castleColorH"></div></div>
-        <div id="unitsListContainer" class="listContainer"><div id="unitsCurActions" class="actionListLeft unitsColorD"></div><div id="unitsNextActions" class="actionListRight unitsColorH"></div></div>
-        <div id="shrineListContainer" class="listContainer"><div id="shrineCurActions" class="actionListLeft shrineColorD"></div><div id="shrineNextActions" class="actionListRight shrineColorH"></div></div>
+
+            <div style="width:300px;height:254px;vertical-align:top">
+                <div class="title">Info Box</div>
+                <div id="infoBoxList"></div>
+                <div id="extrasInfoBox" style="width:250px;height:150px;vertical-align:top;position:relative" class="extrasColor">
+                    <div class="title">Extras</div>
+                    <div id="actionInfoDivKing" style="display:none;width:100%"></div>
+                    <div id="actionInfoDivCastle" style="display:none;width:100%"></div>
+                    <div id="actionInfoDivUnits" style="display:none;width:100%"></div>
+                    <div id="actionInfoDivShrine" style="display:none;width:100%"></div>
+                    <div id="optionsDiv" style="position:relative;height:100%;width:100%;">
+                        <div style="width:100%;vertical-align:top">
+                            <div onclick='restart()' class='button showthat' style='margin-left:5px'>Restart
+                                <div class='showthis' style='color:black;width:230px;'>Restarts the clock and your lists</div>
+                            </div>
+                            <div id='pausePlay' onclick='togglePause()' class='button'>Play</div><br>
+                            <div class='control'><input type='checkbox' id='pauseBeforeRestart'><label for='pauseBeforeRestart'> Pause before restart</label></div><br>
+                            <input type="checkbox" id="pauseListEmpty" checked>
+                            <label for="pauseListEmpty">Pause when next list is empty</label><br>
+                            <input type="checkbox" id="pausePlaceCleared" checked>
+                            <label for="pausePlaceCleared">Pause when a place is cleared</label><br>
+                            <div class="showthat">
+                                <input type="checkbox" id="keepBuild">
+                                <label for="keepBuild">Keep Direct Worker bonus at</label> <input id="buildValue" type="text" class="listTextInput" value="1.5" onchange="changeBuildValue()" onclick="this.select();">
+                                <div class="showthis">
+                                    If you want to improve INT without messing up your action timing, use this option to keep things stable. The valid range is between 1.5 and your max. Uncheck to always use your max.
+                                </div>
+                            </div><br><br>
+                            <div onclick='clearCurrentList()' class='button showthat'>
+                                Clear Current List
+                                <div class="showthis" style="color:black;width:230px">
+                                    Clears the currently showing list of all actions past the active one.
+                                </div>
+                            </div><br>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
     </div>
+
+
 
     <!--<div>Icons made by <a href="https://www.flaticon.com/authors/smashicons" title="Smashicons">Smashicons</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a></div>-->
     <!--<a href="http://www.onlinewebfonts.com">oNline Web Fonts</a>-->

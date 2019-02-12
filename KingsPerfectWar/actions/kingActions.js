@@ -64,8 +64,8 @@ let king = {
                 desc:"Go to the market and use your kingly charisma to get the gold flowing. Gold gain from income buildings is multiplied by (2 + CHA / 20). Lasts until the King starts another action or leaves the castle.",
                 cost: [],
                 seconds:1,
-                xPos:20,
-                yPos:150,
+                xPos:15,
+                yPos:0,
                 start: function() {
                     king.curData.aura = "gold";
                 }
@@ -77,8 +77,8 @@ let king = {
                 desc:"Speak with the spirits of your forest, convincing them to guide your wood gathering efforts. Wood gain from income buildings is multiplied by (2 + CHA / 20). Lasts until the King starts another action or leaves the castle.",
                 cost: [],
                 seconds:1,
-                xPos:70,
-                yPos:150,
+                xPos:15,
+                yPos:50,
                 start: function() {
                     king.curData.aura = "wood";
                 }
@@ -90,8 +90,8 @@ let king = {
                 desc:"Take a critical role in organizing your workers using your ever-increasing knowledge. Building speed of Castle multiplied by (1.5 + INT / 100). Lasts until the King starts another action or leaves the castle.",
                 cost: [],
                 seconds:1,
-                xPos:120,
-                yPos:150,
+                xPos:15,
+                yPos:100,
                 start: function() {
                     king.curData.aura = "build";
                 }
@@ -103,8 +103,8 @@ let king = {
                 desc:"Learn to talk to your citizens, and when you have enough rapport, learn about interesting family secrets and books to further study. Hover the (?) for info on numbers.",
                 cost: [],
                 seconds:5,
-                xPos:250,
-                yPos:25,
+                xPos:85,
+                yPos:0,
                 buy: function() {
                     //levelData.initial describes things initials of every level reset and the initial numbers of the permanent level data
                     //levelData.data describes things that are reset every level
@@ -148,8 +148,8 @@ let king = {
                 desc:"Learn how to internalize the knowledge that you've gained from others. Gain Knowledge equal to your WIS up to your Knowledge Cap. Get .001 permanent INT per Knowledge.",
                 cost: [],
                 seconds:5,
-                xPos:250,
-                yPos:85,
+                xPos:85,
+                yPos:50,
                 buy: function() {
                     let knowledgeGain = king.savedData.wis;
                     if((knowledgeGain + levelSave[curLevel].knowledge) > levelSave[curLevel].knowledgeCap) {
@@ -166,8 +166,8 @@ let king = {
                 desc:"Train to recover the reflexes you've had in past lives. Add (Reflex Cap - Current Reflex)/100 to your Current Reflex.",
                 cost: [],
                 seconds:5,
-                xPos:250,
-                yPos:145,
+                xPos:85,
+                yPos:100,
                 buy: function() {
                     king.curData.rflxCur += (king.savedData.rflxCap - king.curData.rflxCur)/100;
                 }

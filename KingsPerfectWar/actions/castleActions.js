@@ -66,8 +66,8 @@ let castle = {
                     }
                 ],
                 seconds:10,
-                xPos:20,
-                yPos:25
+                xPos:15,
+                yPos:0
             });
 
             castle.initial.addCastleAction({
@@ -83,8 +83,8 @@ let castle = {
                     }
                 ],
                 seconds:40,
-                xPos:70,
-                yPos:25
+                xPos:15,
+                yPos:50
             });
 
             castle.initial.addCastleAction({
@@ -100,8 +100,8 @@ let castle = {
                     }
                 ],
                 seconds:160,
-                xPos:120,
-                yPos:25
+                xPos:15,
+                yPos:100
             });
 
             castle.initial.addCastleAction({
@@ -117,8 +117,8 @@ let castle = {
                     }
                 ],
                 seconds:10,
-                xPos:20,
-                yPos:110
+                xPos:75,
+                yPos:0
             });
 
             castle.initial.addCastleAction({
@@ -134,8 +134,8 @@ let castle = {
                     }
                 ],
                 seconds:40,
-                xPos:70,
-                yPos:110
+                xPos:75,
+                yPos:50
             });
 
             castle.initial.addCastleAction({
@@ -151,8 +151,8 @@ let castle = {
                     }
                 ],
                 seconds:160,
-                xPos:120,
-                yPos:110
+                xPos:75,
+                yPos:100
             });
         },
         createArmyActions() {
@@ -170,8 +170,8 @@ let castle = {
                 ],
                 unit:true,
                 seconds:10,
-                xPos:250,
-                yPos:25
+                xPos:145,
+                yPos:0
             });
 
             castle.initial.addCastleAction({
@@ -187,8 +187,8 @@ let castle = {
                 ],
                 createdWith:"barracks",
                 seconds:5,
-                xPos:250,
-                yPos:110
+                xPos:205,
+                yPos:0
             });
 
             castle.initial.addCastleAction({
@@ -204,8 +204,8 @@ let castle = {
                     }
                 ],
                 seconds:10,
-                xPos:300,
-                yPos:25
+                xPos:145,
+                yPos:50
             });
 
             castle.initial.addCastleAction({
@@ -221,8 +221,8 @@ let castle = {
                 ],
                 createdWith:"range",
                 seconds:10,
-                xPos:300,
-                yPos:110
+                xPos:205,
+                yPos:50
             });
 
             castle.initial.addCastleAction({
@@ -238,8 +238,8 @@ let castle = {
                     }
                 ],
                 seconds:10,
-                xPos:350,
-                yPos:25
+                xPos:145,
+                yPos:100
             });
 
             castle.initial.addCastleAction({
@@ -255,15 +255,15 @@ let castle = {
                 ],
                 createdWith:"designer",
                 seconds:20,
-                xPos:350,
-                yPos:110
+                xPos:205,
+                yPos:100
             });
         },
         createShrineActions() {
             castle.initial.addCastleAction({
                 varName:"altar",
                 name:"Build Altar",
-                desc:"Gives +1 Favor",
+                desc:"Gives +1 Favor per second.",
                 cost: [
                     {
                         resource:"wood",
@@ -277,8 +277,8 @@ let castle = {
                     }
                 ],
                 seconds:10,
-                xPos:535,
-                yPos:25
+                xPos:275,
+                yPos:0
             });
 
             castle.initial.addCastleAction({
@@ -298,8 +298,8 @@ let castle = {
                     }
                 ],
                 seconds:20,
-                xPos:585,
-                yPos:25
+                xPos:275,
+                yPos:50
             });
 
             castle.initial.addCastleAction({
@@ -315,8 +315,8 @@ let castle = {
                     }
                 ],
                 seconds:20,
-                xPos:635,
-                yPos:25
+                xPos:275,
+                yPos:100
             });
         }
     },

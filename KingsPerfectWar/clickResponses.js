@@ -10,17 +10,6 @@ function clearCurrentList() {
     actions.refresh(curList);
 }
 
-function switchActionsTab(num) {
-    let ids = ["kingContainer", "castleContainer", "unitsContainer", "shrinesContainer", "heroContainer"];
-    for(let i = 0; i < ids.length; i++) {
-        if(num === i) {
-            document.getElementById(ids[i]).style.display = "block";
-        } else {
-            document.getElementById(ids[i]).style.display = "none";
-        }
-    }
-}
-
 function switchListTab(num) {
     let ids = ["kingListContainer", "castleListContainer", "unitsListContainer", "shrineListContainer"];
     curList = num;

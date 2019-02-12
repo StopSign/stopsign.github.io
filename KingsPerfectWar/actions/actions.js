@@ -200,6 +200,28 @@ function getActionByVarName(varName, list) {
     return null;
 }
 
+function selectAction(varName, num) {
+    //prev
+    let infoBoxDiv = document.getElementById(curInfoBox+"InfoBox");
+    infoBoxDiv.style.display = "none";
+    let container = document.getElementById(curInfoBox+"Container");
+    if(container) {
+        container.style.border = "2px solid rgba(255, 255, 0, 0)";
+    }
+
+    //next
+    infoBoxDiv = document.getElementById(varName+"InfoBox");
+    infoBoxDiv.style.display = "inline-block";
+    container = document.getElementById(varName+"Container");
+    if(container) {
+        container.style.border = "2px solid rgba(255, 255, 0, 1)";
+    }
+
+    curInfoBox = varName;
+
+    // addActionToList(varName, num, true);
+}
+
 function addActionToList(varName, num, switchLists) {
     if(switchLists && curList !== num) {
         switchListTab(num);

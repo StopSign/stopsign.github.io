@@ -64,8 +64,8 @@ let shrine = {
                 cost: [],
                 max: 5,
                 seconds:5,
-                xPos:25,
-                yPos:35
+                xPos:155,
+                yPos:0
             });
 
             shrine.initial.addShrineAction({
@@ -76,8 +76,8 @@ let shrine = {
                 tribute:100,
                 max: 5,
                 seconds:5,
-                xPos:25,
-                yPos:90
+                xPos:155,
+                yPos:50
             });
 
             shrine.initial.addShrineAction({
@@ -88,8 +88,8 @@ let shrine = {
                 tribute:300,
                 max: 15,
                 seconds:5,
-                xPos:25,
-                yPos:145
+                xPos:155,
+                yPos:100
             });
 
             shrine.initial.addShrineAction({
@@ -100,8 +100,8 @@ let shrine = {
                 tribute:50,
                 max: 15,
                 seconds:5,
-                xPos:240,
-                yPos:35
+                xPos:215,
+                yPos:0
             });
 
             shrine.initial.addShrineAction({
@@ -112,8 +112,8 @@ let shrine = {
                 tribute:50,
                 max: 15,
                 seconds:5,
-                xPos:240,
-                yPos:90
+                xPos:215,
+                yPos:50
             });
 
             shrine.initial.addShrineAction({
@@ -124,8 +124,8 @@ let shrine = {
                 tribute:100,
                 max: 3,
                 seconds:5,
-                xPos:455,
-                yPos:15
+                xPos:215,
+                yPos:100
             });
         }
     },
