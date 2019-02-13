@@ -203,8 +203,18 @@ function selectAction(varName, num) {
     let infoBoxDiv = document.getElementById(curInfoBox+"InfoBox");
     infoBoxDiv.style.display = "none";
     let container = document.getElementById(curInfoBox+"Container");
+
     if(container) {
-        container.style.border = "2px solid rgba(255, 255, 0, 0)";
+        let color = king.helpers.kingIsHome() ? "rgba(255, 255, 0, 1)" : "rgba(255, 255, 0, .4)";
+        if(curInfoBox === "market" && king.curData.aura === "gold") {
+            document.getElementById("marketContainer").style.border = "2px solid " + color;
+        } else if(curInfoBox === "commune" && king.curData.aura === "wood") {
+            document.getElementById("communeContainer").style.border = "2px solid " + color;
+        } else if(curInfoBox === "direct" && king.curData.aura === "build") {
+            document.getElementById("directContainer").style.border = "2px solid " + color;
+        } else {
+            container.style.border = "2px solid rgba(0, 0, 0, 0)";
+        }
     }
 
     if(varName === curInfoBox) {
@@ -219,7 +229,16 @@ function selectAction(varName, num) {
     infoBoxDiv.style.display = "block";
     container = document.getElementById(varName+"Container");
     if(container) {
-        container.style.border = "2px solid rgba(255, 255, 0, 1)";
+        let color = king.helpers.kingIsHome() ? "rgba(200, 200, 0, 1)" : "rgba(200, 200, 0, .4)";
+        if(varName === "market" && king.curData.aura === "gold") {
+            document.getElementById("marketContainer").style.border = "2px solid " + color;
+        } else if(varName === "commune" && king.curData.aura === "wood") {
+            document.getElementById("communeContainer").style.border = "2px solid " + color;
+        } else if(varName === "direct" && king.curData.aura === "build") {
+            document.getElementById("directContainer").style.border = "2px solid " + color;
+        } else {
+            container.style.border = "2px solid rgba(0, 0, 0, 1)";
+        }
     }
 
     curInfoBox = varName;

@@ -35,6 +35,7 @@ let view = {
             prevState.king = {};
             prevState.king.savedData = copyArray(king.savedData);
             prevState.king.curData = copyArray(king.curData);
+            prevState.king.isHome = king.helpers.kingIsHome();
             prevState.levelSave = copyArray(levelSave[curLevel]);
         },
         updateResources: function() {
@@ -276,22 +277,24 @@ let view = {
                 document.getElementById("rflxCap").innerHTML = king.savedData.rflxCap + "";
                 document.getElementById("rflxGain").innerHTML = intToString((king.savedData.rflxCap - king.curData.rflxCur)/100);
             }
-            if(noPrevKing || prevState.king.curData.aura !== king.curData.aura) {
+            let kingIsHome = king.helpers.kingIsHome();
+            if(noPrevKing || prevState.king.curData.aura !== king.curData.aura || prevState.king.isHome !== kingIsHome) {
                 document.getElementById("directContainer").style.padding = "3px";
                 document.getElementById("communeContainer").style.padding = "3px";
                 document.getElementById("marketContainer").style.padding = "3px";
 
-                let color = king.helpers.kingIsHome() ? "rgba(255, 255, 0, 1)" : "rgba(255, 255, 0, .4)";
+                let color = kingIsHome ? "rgba(255, 255, 0, 1)" : "rgba(255, 255, 0, .4)";
+                let mutedColor = kingIsHome ? "rgba(200, 200, 0, 1)" : "rgba(200, 200, 0, .4)";
                 let hidden = "rgba(255, 255, 0, 0)";
                 document.getElementById("directContainer").style.border = "2px solid " + hidden;
                 document.getElementById("communeContainer").style.border = "2px solid " + hidden;
                 document.getElementById("marketContainer").style.border = "2px solid " + hidden;
                 if(king.curData.aura === "gold") {
-                    document.getElementById("marketContainer").style.border = "2px solid " + color;
+                    document.getElementById("marketContainer").style.border = "2px solid " + (curInfoBox === "market" ? mutedColor : color);
                 } else if(king.curData.aura === "wood") {
-                    document.getElementById("communeContainer").style.border = "2px solid " + color;
+                    document.getElementById("communeContainer").style.border = "2px solid " + (curInfoBox === "commune" ? mutedColor : color);
                 } else if(king.curData.aura === "build") {
-                    document.getElementById("directContainer").style.border = "2px solid " + color;
+                    document.getElementById("directContainer").style.border = "2px solid " + (curInfoBox === "direct" ? mutedColor : color);
                 }
             }
 

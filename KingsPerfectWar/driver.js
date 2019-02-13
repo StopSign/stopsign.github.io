@@ -98,6 +98,7 @@ function restart() {
         }
     }
     actions.restart();
+    king.curData.aura = "";
     view.clickable.initial.createWarMap();
     mana = levelData.initial.mana;
     maxMana = mana;
