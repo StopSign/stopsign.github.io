@@ -1,35 +1,8 @@
 TODO
 
 shrineActions
-    initial
-    extra values
-    use created as buffs in relevant places
-    images
-
-6 actions
-
-shrine
-    2 buildings in castle
-        altar 2000 wood 1000 gold, build 10 seconds, gives 1 Favor
-        shrine 20000 wood 10000 gold, build 20 seconds, gives 5 Favor
-        ritual 10000 wood+, build 10 seconds, x2 Favor
-    Blessings
-        purpose
-            a feature that uses wood to give temporary bonuses, wherein the bonuses get stronger on reset
-        general info
-            each action takes 1 second
-            attempts to spend favor if you have it
-            Takes 10 wood per favor spent - doesn't fail if you don't have it
-            each action has its own list of highest runs, if current < highest, favor is 10% more effective. double highestListsLength max
-
-        temporary - completions save per level
-            Faerie Enchantments - +20% atk all units, 100 points + 100 each time, 5 max
-            Blessed Feasts - +20% hp all units, 100 points + 100 each time, 5 max
-            Faerie Guidance - +20% spd all units, 300 points + 300 each time, 5 max
-            Peaceful Aura - +10% gold all buildings, levels 5/10/15 unlock buildings. 50+ points, 15 max
-            Nature's Bounty - +10% wood all buildings, levels 5/10/15 unlock buildings. 50+ points, 15 max
-            Forest Champion - 100 * 10 each time, 3 max
-    saving # of completions per
+    use values in relevant places
+    stop creating more at max
 
 Soul Crystals
     purpose

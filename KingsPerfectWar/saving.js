@@ -19,21 +19,19 @@ let saveName = !isBeta ? "KPW1" :  "KPWBeta";
 let stop = false;
 let prevState = {};
 let actionsList = {
-    nextNames: ["king", "castle", "units", "shrine"],
+    nextNames: ["king", "castle", "units"],
     next: {
         king:[],
         castle:[],
-        units:[],
-        shrine:[]
+        units:[]
     },
     current: {
         king:[],
         castle:[],
-        units:[],
-        shrine:[]
+        units:[]
     }
 };
-let created = {};
+let created = {}; //keep track of the number of times an action has happened per restart
 window.language = "eng";
 window.addAmount = 1;
 

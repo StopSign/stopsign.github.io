@@ -1,8 +1,7 @@
 let view = {
     initialize: function() {
-        view.clickable.initial.createCastleIcons();
+        view.clickable.initial.createIcons();
         view.clickable.initial.createWarMap();
-        view.clickable.initial.createKingIcons();
         this.actionInfoDiv = {"king":document.getElementById("actionInfoDivKing"),
             "castle":document.getElementById("actionInfoDivCastle"),
             "units":document.getElementById("actionInfoDivUnits"),
@@ -135,16 +134,16 @@ let view = {
             document.getElementById("action"+i+name+"Costs").innerHTML = costsDiv;
         },
         updateCreated: function() {
-            for (let property in created.castle) {
-                if (!prevState.created || created.castle.hasOwnProperty(property) &&
-                    JSON.stringify(created.castle[property]) !== JSON.stringify(prevState.created.castle[property])) {
-                    document.getElementById(property+"Num").innerHTML = created.castle[property];
-                    document.getElementById(property+"Num").style.opacity = created.castle[property] === 0 ? "0" : "1";
+            for (let property in created) {
+                if (!prevState.created || created.hasOwnProperty(property) &&
+                    JSON.stringify(created[property]) !== JSON.stringify(prevState.created[property])) {
+                    document.getElementById(property+"Num").innerHTML = created[property];
+                    document.getElementById(property+"Num").style.opacity = created[property] === 0 ? "0" : "1";
                 }
             }
-            if(!prevState.created || prevState.created.castle.shrine !== created.castle.shrine
-                ||  prevState.created.castle.altar !== created.castle.altar
-                || prevState.created.castle.ritual !== created.castle.ritual) {
+            if(!prevState.created || prevState.created.shrine !== created.shrine
+                ||  prevState.created.altar !== created.altar
+                || prevState.created.ritual !== created.ritual) {
                 document.getElementById("favor").innerHTML = shrine.helpers.calcFavor();
             }
         },
@@ -351,16 +350,17 @@ let view = {
         },
         updateShrineTab: function() {
             let noPrevShrine = !prevState.levelData || !prevState.levelData.shrine;
-            let baseFavorChanged = !prevState.created || prevState.created.castle.shrine !== created.castle.shrine
-                ||  prevState.created.castle.altar !== created.castle.altar
-                || prevState.created.castle.ritual !== created.castle.ritual;
-            for(let i = 0; i < shrine.actions.length; i++) {
-                let varName = shrine.actions[i].varName;
+            let baseFavorChanged = !prevState.created || prevState.created.shrine !== created.shrine
+                ||  prevState.created.altar !== created.altar
+                || prevState.created.ritual !== created.ritual;
+
+            actionData.get.blessingActions().forEach(function (action) {
+                let varName = action.varName;
                 if(noPrevShrine || baseFavorChanged || prevState.levelData.shrine[varName+"Tribute"] !== levelData.shrine[varName+"Tribute"]) {
                     document.getElementById(varName + "TributeString").innerHTML = "<b>"+levelData.shrine[varName+"Tribute"]+"</b> / <b>" + levelData.shrine[varName+"TributeNeeded"] + "</b> tribute";
                     document.getElementById(varName + "TributeBar").style.width = (100 * levelData.shrine[varName+"Tribute"] / levelData.shrine[varName+"TributeNeeded"])+"%";
                     document.getElementById(varName + "TributeGain").innerHTML = round(shrine.helpers.calcFavor() * shrine.helpers.calcTributeBonus(varName));
-                    document.getElementById(varName + "Num").innerHTML = created.shrine[varName];
+                    document.getElementById(varName + "Num").innerHTML = created[varName];
                 }
                 if(noPrevShrine || JSON.stringify(prevState.levelSave.shrine[varName]) !== JSON.stringify(levelSave[curLevel].shrine[varName])) {
                     let allDivs = "<div class='smallTitle'>Most Blessings Received</div>";
@@ -379,7 +379,7 @@ let view = {
                     }
                     document.getElementById(varName+"BonusTooltip").innerHTML = allDivs;
                 }
-            }
+            });
         }
     },
     actionList: {
@@ -534,28 +534,59 @@ let view = {
     },
     clickable: {
         initial: {
-            createCastleIcons: function() {
-                let container = document.getElementById("castleActionList");
-                let allDivs = "";
+            createIcons: function() {
+                let divText = { king:"", castle:"", other:"" };
+                let infoText = "";
+
+                for (let property in actionData.list) {
+                    if (actionData.list.hasOwnProperty(property)) {
+                        let actionDatum = actionData.list[property];
+
+                        actionDatum.forEach(function(action) {
+                            let costDesc = view.helpers.getCostsString(action.cost);
+                            let desc = action.desc + "<br>" + costDesc;
+                            if(action.max) {
+                                desc += " Can receive up to " + action.max + " times.";
+                            }
+
+                            let tributeOuter = !action.tribute ? "" :  '<div class="abs showthat" style="left:35px;top:5px;width:50px">' +
+                                '+<div class="bold hyperVisible small" id="'+action.varName+'TributeGain">1.00</div>' +
+                                '<div class="showthisUp" id="'+action.varName+'BonusTooltip" style="width:150px"></div>' +
+                                '</div>';
+
+                            divText[property] +=
+                                '<div class="abs" style="left:'+action.xPos+'px;top:'+action.yPos+'px;">' +
+                                    '<div id="'+action.varName+'Container" onclick="selectAction(\''+action.varName+'\', '+action.listNum+')" class="clickable abs showthat" style="left:0;top:0">' +
+                                        '<img src="img/' + action.varName + '.svg" class="superLargeIcon imageDragFix">' +
+                                    '</div>' +
+                                    '<div id="'+action.varName+'Num" class="hyperVisible bold abs small" style="right:-43px;top:32px;"></div>' +
+                                    tributeOuter +
+                                '</div>';
+
+                            let tributeInfo = !action.tribute ? "" :
+                                '<div style="width:100%;height:17px;background-color:rgb(243,229,255);">' +
+                                    '<div id="'+action.varName+'TributeBar" class="abs" style="left:0;top:0;width:20%;height:100%;background-color:rgb(216,185,232);"></div>' +
+                                    '<div id="'+action.varName+'TributeString" class="abs" style="left:5px"></div>' +
+                                '</div>';
+
+                            infoText += '<div id="'+action.varName+'InfoBox" class="infoBox">' +
+                                '<div class="smallTitle">'+action.name+'</div>' +
+                                tributeInfo +
+                                '<div class="small">'+desc+'</div>' +
+                                '</div>';
+                        });
+                    }
+                }
+
+                for (let property in divText) {
+                    if (divText.hasOwnProperty(property)) {
+                        let container = document.getElementById(property + "ActionList");
+                        container.innerHTML = divText[property];
+                    }
+                }
+
                 let curInfoBox = document.getElementById("infoBoxList");
-
-                castle.actions.forEach(function(action) {
-                    let costDesc = view.helpers.getCostsString(action.cost);
-
-                    let desc = action.desc + "<br>" + costDesc;
-
-                    allDivs +=
-                        '<div id="'+action.varName+'Container" onclick="selectAction(\''+action.varName+'\', 1)" class="clickable abs showthat" style="left:'+action.xPos+'px;top:'+action.yPos+'px;">' +
-                        '<img src="img/' + action.varName + '.svg" class="superLargeIcon imageDragFix">' +
-                        '</div>' +
-                        '<div id="'+action.varName+'Num" class="hyperVisible abs" style="left:'+(action.xPos+10)+'px;top:'+(action.yPos+43)+'px;"></div>';
-
-                    curInfoBox.innerHTML += '<div id="'+action.varName+'InfoBox" class="infoBox">' +
-                        '<div class="smallTitle">'+action.name+'</div>' +
-                        '<div class="small">'+desc+'</div>' +
-                        '</div>';
-                });
-                container.innerHTML = allDivs;
+                curInfoBox.innerHTML = infoText;
             },
             createWarMap: function() {
                 createLevel(curLevel);
@@ -587,56 +618,6 @@ let view = {
                 viewTravelObjs.forEach(function(viewTravelObj) {
                     document.getElementById("warMapActions").appendChild(viewTravelObj.div);
                 });
-            },
-            createKingIcons: function() {
-                let container = document.getElementById("kingActionList");
-                let allDivs = "";
-                let curInfoBox = document.getElementById("infoBoxList");
-
-                king.actions.forEach(function(action) {
-                    let costDesc = view.helpers.getCostsString(action.cost);
-
-                    let desc = action.desc + "<br>" + costDesc;
-
-                    allDivs +=
-                        '<div id="'+action.varName+'Container" onclick="selectAction(\''+action.varName+'\', 0)" class="clickable abs showthat" style="left:'+action.xPos+'px;top:'+action.yPos+'px;">' +
-                        '<img src="img/' + action.varName + '.svg" class="superLargeIcon imageDragFix">' +
-                        '</div>' +
-                        '<div id="'+action.varName+'Num" class="createdNum abs" style="left:'+(action.xPos+10)+'px;top:'+(action.yPos+43)+'px;"></div>';
-
-                    curInfoBox.innerHTML += '<div id="'+action.varName+'InfoBox" class="infoBox">' +
-                        '<div class="smallTitle">'+action.name+'</div>' +
-                        '<div class="small">'+desc+'</div>' +
-                        '</div>';
-                });
-
-                shrine.actions.forEach(function(action) {
-                    let costDesc = view.helpers.getCostsString(action.cost);
-
-                    let desc = action.desc + "<br>" + costDesc + " Can receive up to " + action.max + " times.";
-
-                    allDivs +=
-                        '<div class="abs" style="left:'+action.xPos+'px;top:'+action.yPos+'px;">' +
-                        '<div id="'+action.varName+'Container" onclick="selectAction(\''+action.varName+'\', 3)" class="clickable abs showthat" style="left:0;top:0">' +
-                        '<img src="img/' + action.varName + '.svg" class="superLargeIcon imageDragFix">' +
-                        '</div>' +
-                        '<div id="'+action.varName+'Num" class="hyperVisible bold abs small" style="right:-43px;top:32px;"></div>' +
-                        '<div class="abs showthat" style="left:35px;top:5px;width:50px">' +
-                            '+<div class="bold hyperVisible small" id="'+action.varName+'TributeGain">1.00</div>' +
-                            '<div class="showthisUp" id="'+action.varName+'BonusTooltip" style="width:150px"></div>' +
-                        '</div>' +
-                        '</div>';
-
-                    curInfoBox.innerHTML += '<div id="'+action.varName+'InfoBox" class="infoBox">' +
-                        '<div class="smallTitle" style="margin-bottom:30px;">'+action.name+'</div>' +
-                        '<div class="small">'+desc+'</div>' +
-                        '<div class="abs" style="left:0;top:20px;width:100%;height:17px;background-color:rgb(243,229,255);">' +
-                            '<div id="'+action.varName+'TributeBar" class="abs" style="left:0;top:0;width:20%;height:100%;background-color:rgb(216,185,232);"></div>' +
-                            '<div id="'+action.varName+'TributeString" class="abs" style="left:5px"></div>' +
-                        '</div>' +
-                        '</div>';
-                });
-                container.innerHTML = allDivs;
             }
         }
     },
@@ -682,7 +663,7 @@ let view = {
             document.getElementById(base.varName + "InfoBox").innerHTML = tooltipDiv;
         },
         translateToWarMapCoords: function(coords) { //x,y 0-190,0-100, translated to x:10-550 and y:15-300
-            return {x:10+(coords.x / 190 * 641), y:15+(coords.y / 100 * 435)};
+            return {x:10+(coords.x / 190 * 641), y:15+(coords.y / 100 * 335)};
         },
         getUnitString: function(unitList) {
             let total = { atk:0, hp:0, exp:0 };

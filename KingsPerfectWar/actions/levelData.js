@@ -16,7 +16,7 @@ function createLevel(num) {
         levelSave[num].knowledgeCap = 0;
         levelSave[num].highestPerson = [];
         levelSave[num].shrine = {};
-        shrine.actions.forEach(function(action) {
+        actionData.get.blessingActions().forEach(function(action) {
             levelSave[num].shrine[action.varName] = [];
         });
     }
@@ -27,10 +27,11 @@ function createLevel(num) {
         difficulty:(num+1)
     };
     levelData.shrine = {};
-    shrine.actions.forEach(function(action) {
+
+    actionData.get.blessingActions().forEach(function(action) {
         levelData.shrine[action.varName+"Tribute"] = 0;
         levelData.shrine[action.varName+"TributeNeeded"] = action.tribute;
-        created.shrine[action.varName] = 0;
+        created[action.varName] = 0;
     });
 
     levelData.home.units = [];

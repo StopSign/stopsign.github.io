@@ -11,7 +11,7 @@ function clearCurrentList() {
 }
 
 function switchListTab(num) {
-    let ids = ["kingListContainer", "castleListContainer", "unitsListContainer", "shrineListContainer"];
+    let ids = ["kingListContainer", "castleListContainer", "unitsListContainer"];
     curList = num;
     for(let i = 0; i < ids.length; i++) {
         if(num === i) {

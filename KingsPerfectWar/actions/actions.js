@@ -157,25 +157,25 @@ function translateNextToCurrent(action, name) {
     action.failed = 0;
     action.failReason = "";
 
-    let actionData = getActionByVarName(action.varName, name);
-    action.name = actionData.name;
-    if(actionData.moveAction) {
+    let actionDatum = getActionByVarName(action.varName, name);
+    action.name = actionDatum.name;
+    if(actionDatum.moveAction) {
         action.name = warMap.actions.createNameString(action);
     }
-    if(actionData.createdWith) {
-        action.createdWith = actionData.createdWith;
+    if(actionDatum.createdWith) {
+        action.createdWith = actionDatum.createdWith;
     }
-    if(actionData.start) {
-        action.start = actionData.start
+    if(actionDatum.start) {
+        action.start = actionDatum.start
     }
-    if(actionData.tribute) {
-        action.tribute = actionData.tribute;
+    if(actionDatum.tribute) {
+        action.tribute = actionDatum.tribute;
     }
-    action.cost = actionData.cost;
-    action.buy = actionData.buy;
-    action.visible = actionData.visible;
-    action.unlocked = actionData.unlocked;
-    action.canBuy = actionData.canBuy;
+    action.cost = actionDatum.cost;
+    action.buy = actionDatum.buy;
+    action.visible = actionDatum.visible;
+    action.unlocked = actionDatum.unlocked;
+    action.canBuy = actionDatum.canBuy;
     action.spend = function () {
         gold -= action.costgold;
         wood -= action.costwood;
@@ -185,7 +185,7 @@ function translateNextToCurrent(action, name) {
 
 function getActionByVarName(varName, list) {
     if(["sleep", "pause", "restart"].indexOf(varName) !== -1) {
-        return getOtherAction(varName);
+        return getOtherActionByVarName(varName);
     }
 
     if(list === "castle") {
@@ -194,8 +194,6 @@ function getActionByVarName(varName, list) {
         return warMap.actions.getWarMapActionByVarName(varName);
     } else if(list === "king") {
         return getKingActionByVarName(varName);
-    } else if(list === "shrine") {
-        return getShrineActionByVarName(varName);
     }
     return null;
 }
@@ -226,11 +224,12 @@ function selectAction(varName, num) {
 
     curInfoBox = varName;
     curListNum = num;
-
-    // addActionToList(varName, num, true);
 }
 
 function addAction() {
+    if(["sleep", "pause", "restart"].indexOf(curInfoBox) !== -1) {
+        curListNum = curList;
+    }
     addActionToList(curInfoBox, curListNum, true);
 }
 

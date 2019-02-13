@@ -92,19 +92,9 @@ function unpauseGame() {
 function restart() {
     king.helpers.saveHighestPerson();
     shrine.helpers.saveHighestBlessings();
-    for (let property in created.castle) {
-        if (created.castle.hasOwnProperty(property)) {
-            created.castle[property] = 0;
-        }
-    }
-    for (let property in created.king) {
-        if (created.king.hasOwnProperty(property)) {
-            created.king[property] = 0;
-        }
-    }
-    for (let property in created.shrine) {
-        if (created.shrine.hasOwnProperty(property)) {
-            created.shrine[property] = 0;
+    for (let property in created) {
+        if (created.hasOwnProperty(property)) {
+            created[property] = 0;
         }
     }
     actions.restart();

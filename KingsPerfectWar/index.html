@@ -22,7 +22,7 @@
 
     <div style="width:704px">
         <div style="width:700px;vertical-align:top;">
-            <div id="warMap" style="width:100%;height:505px;position:relative;text-align:center;" class="unitsColorH">
+            <div id="warMap" style="width:100%;height:405px;position:relative;text-align:center;" class="unitsColorH">
                 <div class="showthat">
                     <div class="title">War Map</div>
                     <div class="showthis">
@@ -54,42 +54,45 @@
                 </div>
                 <div id="warMapActions"></div>
             </div>
+            <div style="width:100%;height:10px;background-color:#dbdff3;display:block;">
+                <div id="manaBar" style="width:80%;height:100%;background-color:rgb(130, 147, 255);vertical-align:top;"></div>
+            </div>
         </div>
 
         
         <div style="margin-top:4px;width:100%">
-            <div>
-                <div class="showthat" style="width:100px">
-                    <img src='img/gold.svg' class='largeIcon imageDragFix' style="vertical-align:bottom">
-                    <div id="gold"></div>
-                    (+<div id="goldPerTick" class="bold"></div>)
-                    <div class="showthis">
-                        Non-rounded Gold: <div id="actualGold" class="bold"></div><br>
-                        Per second: <div id="goldPerSecond" class="bold"></div>
-                    </div>
-                </div><div class="showthat" style="width:100px">
-                    <img src='img/wood.svg' class='largeIcon imageDragFix' style="vertical-align:bottom">
-                    <div id="wood"></div>
-                    (+<div id="woodPerTick" class="bold"></div>)
-                    <div class="showthis">
-                        Non-rounded Wood: <div id="actualWood" class="bold"></div><br>
-                        Per second: <div id="woodPerSecond" class="bold"></div>
-                    </div>
-                </div><div class="showthat" style="width:100px">
-                    <img src='img/wood.svg' class='largeIcon imageDragFix' style="vertical-align:bottom">
-                    <div id="favor"></div>
-                    <div class="showthis">
-                        Non-rounded Favor: <div id="actualFavor" class="bold"></div><br>
-                        Per second: <div id="favorPerSecond" class="bold"></div>
-                    </div>
-                </div><div class="showthat" style="width:65px">
-                    <img src='img/mana.svg' class='largeIcon imageDragFix' style="vertical-align:bottom">
-                    <div id="mana"></div>
-                    <div id='manaTooltip' class="showthis"></div>
+            <div class="showthat" style="width:100px">
+                <img src='img/gold.svg' class='largeIcon imageDragFix' style="vertical-align:bottom">
+                <div id="gold"></div>
+                (+<div id="goldPerTick" class="bold"></div>)
+                <div class="showthis">
+                    Non-rounded Gold: <div id="actualGold" class="bold"></div><br>
+                    Per second: <div id="goldPerSecond" class="bold"></div>
                 </div>
-            </div><div style="width:455px;height:10px;background-color:#dbdff3;margin-top:6px;">
-                <div id="manaBar" style="width:80%;height:100%;background-color:rgb(130, 147, 255);vertical-align:top;"></div>
+            </div><div class="showthat" style="width:100px">
+                <img src='img/wood.svg' class='largeIcon imageDragFix' style="vertical-align:bottom">
+                <div id="wood"></div>
+                (+<div id="woodPerTick" class="bold"></div>)
+                <div class="showthis">
+                    Non-rounded Wood: <div id="actualWood" class="bold"></div><br>
+                    Per second: <div id="woodPerSecond" class="bold"></div>
+                </div>
+            </div><div class="showthat" style="width:100px">
+                <img src='img/wood.svg' class='largeIcon imageDragFix' style="vertical-align:bottom">
+                <div id="favor"></div>
+                <div class="showthis">
+                    Non-rounded Favor: <div id="actualFavor" class="bold"></div><br>
+                    Per second: <div id="favorPerSecond" class="bold"></div>
+                </div>
+            </div><div class="showthat" style="width:65px">
+                <img src='img/mana.svg' class='largeIcon imageDragFix' style="vertical-align:bottom">
+                <div id="mana"></div>
+                <div id='manaTooltip' class="showthis"></div>
             </div>
+            <div onclick='restart()' class='button showthat' style='margin-left:5px'>Restart
+                <div class='showthis' style='color:black;width:230px;'>Restarts the clock and your lists</div>
+            </div>
+            <div id='pausePlay' onclick='togglePause()' class='button'>Play</div>
         </div>
 
     </div>
@@ -113,24 +116,20 @@
                 </div>
             </div>
         </div>
-        <div style="height:400px;margin-top:10px;">
-            <div class="title">Action Lists</div>
+        <div style="height:300px;margin-top:10px;width:350px">
             <div style="width:100%;height:20px;" class="large bold">
                 <div id="kingListSelector" class="listSelector kingColor" onclick="switchListTab(0)">King <img id="kingTabSleep" src='img/sleep.svg' class='smallIcon imageDragFix tabSleep'></div>
                 <div id="castleListSelector" class="listSelector castleColor" onclick="switchListTab(1)">Castle <img id="castleTabSleep" src='img/sleep.svg' class='smallIcon imageDragFix tabSleep'></div>
                 <div id="unitsListSelector" class="listSelector unitsColor" onclick="switchListTab(2)">Units <img id="unitsTabSleep" src='img/sleep.svg' class='smallIcon imageDragFix tabSleep'></div>
-                <div id="shrineListSelector" class="listSelector shrineColor" onclick="switchListTab(3)">Shrine <img id="shrineTabSleep" src='img/sleep.svg' class='smallIcon imageDragFix tabSleep'></div>
             </div>
             <div id="kingListContainer" class="listContainer"><div id="kingCurActions" class="actionListLeft kingColorD"></div><div id="kingNextActions" class="actionListRight kingColorH"></div></div>
             <div id="castleListContainer" class="listContainer" style="display:block;"><div id="castleCurActions" class="actionListLeft castleColorD"></div><div id="castleNextActions" class="actionListRight castleColorH"></div></div>
             <div id="unitsListContainer" class="listContainer"><div id="unitsCurActions" class="actionListLeft unitsColorD"></div><div id="unitsNextActions" class="actionListRight unitsColorH"></div></div>
-            <div id="shrineListContainer" class="listContainer"><div id="shrineCurActions" class="actionListLeft shrineColorD"></div><div id="shrineNextActions" class="actionListRight shrineColorH"></div></div>
-
         </div>
     </div>
 
     <div style="width:1300px">
-        <div style="background-color:#c4c9e6;height:254px;margin-top:4px;">
+        <div style="background-color:#c4c9e6;height:219px;">
             <div id="castleActionContainer" class="mainActionList castleColorH" style="position:relative;width:332px;">
                 <div style="display:block;text-align:center;margin-top:5px;margin-bottom:5px;" class="large bold">Castle Actions</div>
                 <div style="width:125px;text-align:center;" class="bold">Income</div>
@@ -145,31 +144,9 @@
             <div id="kingActionList" class="abs" style="left:0;top:50px;"></div>
         </div><div id="optionsContainer" class="mainActionList extrasColor" style="position:relative;width:70px;vertical-align:top;">
             <div style="display:block;text-align:center;margin-top:5px;margin-bottom:5px;" class="large bold">Options Actions</div>
-            <div id="optionsActionList" class="abs" style="left:0;top:50px;">
-                <div class="clickable showthat abs" style="left:15px;top:0;" onclick="addRestartAction(curList)">
-                    <img src='img/restart.svg' class='superLargeIcon imageDragFix'>
-                    <div class="showthis" style="width:250px">
-                        <div class="smallTitle">Restart</div>
-                        <div class="small">Add an action that restarts the map when it's run. Takes 5 seconds to finish.</div>
-                    </div>
-                </div>
-                <div class="clickable showthat abs" style="left:15px;top:50px;" onclick="addPauseAction(curList)">
-                    <img src='img/pause.svg' class='superLargeIcon imageDragFix'>
-                    <div class="showthis" style="width:250px">
-                        <div class="smallTitle">Pause</div>
-                        <div class="small">Add an action to the current list that pauses when it's run. Does not interfere with the game otherwise</div>
-                    </div>
-                </div>
-                <div class="clickable showthat abs" style="left:15px;top:100px;" onclick="addSleepAction(curList)">
-                    <img src='img/sleep.svg' class='superLargeIcon imageDragFix'>
-                    <div class="showthis" style="width:250px">
-                        <div class="smallTitle">Sleep</div>
-                        <div class="small">Add an action to the current list that waits for one second. Auto-added if no other action is available.</div>
-                    </div>
-                </div>
-            </div>
-        </div><div style="width:300px;height:254px;vertical-align:top">
-                <div class="title">Info Box</div>
+            <div id="otherActionList" class="abs" style="left:0;top:50px;"></div>
+        </div><div style="width:300px;height:100%;vertical-align:top">
+                <div style="display:block;text-align:center;margin-top:5px;margin-bottom:5px;" class="large bold">Info Box</div>
                 <div id="infoBoxList" style="width:100%"></div>
                 <div id="addButtons" style="text-align:center;display:none;margin-top:20px;">
                     <div class="button" onclick="addAction()">Add Action</div>
@@ -182,10 +159,6 @@
                     <div id="actionInfoDivShrine" style="display:none;width:100%"></div>
                     <div id="optionsDiv" style="position:relative;height:100%;width:100%;">
                         <div style="width:100%;vertical-align:top">
-                            <div onclick='restart()' class='button showthat' style='margin-left:5px'>Restart
-                                <div class='showthis' style='color:black;width:230px;'>Restarts the clock and your lists</div>
-                            </div>
-                            <div id='pausePlay' onclick='togglePause()' class='button'>Play</div><br>
                             <div class='control'><input type='checkbox' id='pauseBeforeRestart'><label for='pauseBeforeRestart'> Pause before restart</label></div><br>
                             <input type="checkbox" id="pauseListEmpty" checked>
                             <label for="pauseListEmpty">Pause when next list is empty</label><br>
@@ -226,6 +199,7 @@
     <script src="saving.js?1"></script>
     <script src="actions/levelData.js?1"></script>
     <script src="actions/actions.js?1"></script>
+    <script src="actions/actionData.js?1"></script>
     <script src="actions/kingActions.js?1"></script>
     <script src="actions/castleActions.js?1"></script>
     <script src="actions/warMapActions.js?1"></script>
