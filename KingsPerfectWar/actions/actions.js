@@ -209,17 +209,29 @@ function selectAction(varName, num) {
         container.style.border = "2px solid rgba(255, 255, 0, 0)";
     }
 
+    if(varName === curInfoBox) {
+        varName = "extras";
+        addButtons.style.display = "none";
+    } else {
+        addButtons.style.display = "block";
+    }
+
     //next
     infoBoxDiv = document.getElementById(varName+"InfoBox");
-    infoBoxDiv.style.display = "inline-block";
+    infoBoxDiv.style.display = "block";
     container = document.getElementById(varName+"Container");
     if(container) {
         container.style.border = "2px solid rgba(255, 255, 0, 1)";
     }
 
     curInfoBox = varName;
+    curListNum = num;
 
     // addActionToList(varName, num, true);
+}
+
+function addAction() {
+    addActionToList(curInfoBox, curListNum, true);
 }
 
 function addActionToList(varName, num, switchLists) {

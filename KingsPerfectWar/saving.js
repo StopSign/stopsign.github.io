@@ -52,6 +52,8 @@ let unitsSelectedForMove = { king:false, units:true, heroes:false };
 
 let levelSave = [];
 let curInfoBox = "extras";
+let addButtons = document.getElementById("addButtons");
+let curListNum = 1;
 
 function clearSave() {
     window.localStorage[saveName] = "";

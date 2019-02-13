@@ -20,8 +20,8 @@
 </head>
 <body id="theBody" style="min-width:1210px">
 
-    <div style="width:854px">
-        <div style="width:850px;vertical-align:top;">
+    <div style="width:704px">
+        <div style="width:700px;vertical-align:top;">
             <div id="warMap" style="width:100%;height:505px;position:relative;text-align:center;" class="unitsColorH">
                 <div class="showthat">
                     <div class="title">War Map</div>
@@ -54,7 +54,6 @@
                 </div>
                 <div id="warMapActions"></div>
             </div>
-
         </div>
 
         
@@ -96,66 +95,25 @@
     </div>
 
     <div style="width:378px;height:350px;vertical-align:top;">
-        <div style="height:150px;position:relative;width:100%;" class="kingColorH">
+        <div style="height:80px;position:relative;width:280px;" class="kingColorH">
             <div class="title">Stats</div>
-
             <div id="kingOtherInfo" class="abs" style="left:0;top:0">
-                <div id='kingStats' class="abs" style="left:18px;top:10px;width:200px">
+                <div id='kingStats' class="abs" style="left:10px;top:30px;width:250px">
                     <div style='font-size:20px'>Level <div id="kingLevel" class="bold"></div></div>
                     <div style="position:relative;width:100%;height:17px;background-color:rgb(223,194,249);margin-bottom:3px;">
                         <div class="abs" id="expProgress" style="left:0;top:0;height:100%;width:20%;background-color:rgba(179,92,249,0.8)"></div>
                         <div class="abs" id="exp" style="left:0;top:0;"></div>
                     </div>
-                    Current Reflex: <div id="rflxCur" class="bold"></div><br>
-                    Reflex Cap: <div id="rflxCap" class="bold"></div><br>
-                    Intelligence: <div id="int" class="bold"></div><br>
-                    Wisdom: <div id="wis" class="bold"></div><br>
-                    Charisma: <div id="cha" class="bold"></div>
-                </div>
-                <div id="peopleInfo" class="abs" style='left:300px;top:20px;width:250px;'>
-                    <div class="abs" style='left:0;top:0'>Person <div id="personNum" class="bold"></div>, Difficulty <div id="difficulty" class="bold"></div></div>
-                    <div class="abs" style="left:0;top:20px;height:17px;width:150px;background-color:rgb(255,247,181);">
-                        <div id="rapportProgress" class="abs" style="left:0;width:20%;height:100%;background-color:rgba(255, 184, 15, .8)"></div>
-                        <div id="rapport" class="abs" style="left:5px">50 / 250 rapport</div>
-                    </div>
-                    <div class="abs showthat" style='left:0;top:38px'>
-                        Secrets Learned: <div id="secrets" class="bold"></div>
-                        <div class="showthis" style='width:200px'>
-                            <div id="mapMaxPeople" class="bold"></div> people total on this map
-                        </div>
-                    </div>
-                    <div class="abs showthat" style='left:150px;top:20px'>
-                        +<div id="rapportAdded" class="bold"></div>
-                        <div class="showthis" style="width:150px">
-                            <div id="personHighest"></div>
-                        </div>
-                    </div>
-                    <div class="abs showthat" style='left:-65px;top:0'>
-                        <i class="fa fa-question-circle" aria-hidden="true" style='font-size:16px'></i>
-                        <div class="showthisUp" style="width:720px">
-                            Each map has a max number of people to talk to. You gain rapport equal to your CHA until a person has shared their secrets, which increases your knowledge cap. You can only get max knowledge from a person once.<br>
-                            Each person has a difficulty, and the next person has +0.1 difficulty. You need (10 * difficulty) rapport per person. Additionally, if their difficulty is higher than your CHA, you need an additional ((difficulty - CHA)^2)*5 rapport.<br>
-                            If the difficulty is higher than your CHA, upon completion you gain CHA equal to (difficulty - CHA)/10, rounded up to the nearest hundredth.<br>
-                            You gain 200 max knowledge for the first secret, and -2 for each subsequent secret.<br>
-                            Additionally, you get better at speaking to people you've already spoken to. Everyone with less difficulty than your highest reached difficulty is 25% easier to talk to. Your highest reached is saved 4 separate times per map.<br>
-                        </div>
-                    </div>
-                </div>
-                <div id="knowledgeInfo" class="abs showthat" style='left:300px;top:98px;width:200px;'>
-                    Knowledge: <div id="knowledge" class="bold"></div> / <div id="knowledgeCap" class="bold"></div> (+<div id="knowledgeRate" class="bold"></div>)<br>
-                    <div class="showthis">
-                        Every 1000 knowledge gained gives the king 1 INT
-                    </div>
-                </div>
-                <div id="trainInfo" class="abs showthat" style='left:300px;top:158px;width:250px;'>
-                    Reflex to Gain: <div id="rflxGain" class="bold"></div>
-                    <div class="showthisUp">
-                        The King's ATK is equal to the current reflex, and HP is equal to current reflex * 10
-                    </div>
+                    <div class="abs small" style="left:80px;top:9px;">GAIN: <div id="rflxGain" class="bold"></div></div>
+                    <div class="abs small" style="left:80px;top:-3px;">CAP: <div id="rflxCap" class="bold"></div></div>
+                    <div class="abs small" style="left:80px;top:-15px;">RFLX: <div id="rflxCur" class="bold"></div></div>
+                    <div class="abs small" style="left:170px;top:9px;">WIS: <div id="wis" class="bold"></div></div>
+                    <div class="abs small" style="left:170px;top:-3px;">CHA: <div id="cha" class="bold"></div></div>
+                    <div class="abs small" style="left:170px;top:-15px;">INT: <div id="int" class="bold"></div></div>
                 </div>
             </div>
         </div>
-        <div style="height:150px">
+        <div style="height:400px;margin-top:10px;">
             <div class="title">Action Lists</div>
             <div style="width:100%;height:20px;" class="large bold">
                 <div id="kingListSelector" class="listSelector kingColor" onclick="switchListTab(0)">King <img id="kingTabSleep" src='img/sleep.svg' class='smallIcon imageDragFix tabSleep'></div>
@@ -210,12 +168,13 @@
                     </div>
                 </div>
             </div>
-        </div>
-
-            <div style="width:300px;height:254px;vertical-align:top">
+        </div><div style="width:300px;height:254px;vertical-align:top">
                 <div class="title">Info Box</div>
-                <div id="infoBoxList"></div>
-                <div id="extrasInfoBox" style="width:250px;height:150px;vertical-align:top;position:relative" class="extrasColor">
+                <div id="infoBoxList" style="width:100%"></div>
+                <div id="addButtons" style="text-align:center;display:none;margin-top:20px;">
+                    <div class="button" onclick="addAction()">Add Action</div>
+                </div>
+                <div id="extrasInfoBox" style="width:100%;height:150px;vertical-align:top;position:relative" class="extrasColor">
                     <div class="title">Extras</div>
                     <div id="actionInfoDivKing" style="display:none;width:100%"></div>
                     <div id="actionInfoDivCastle" style="display:none;width:100%"></div>
@@ -248,6 +207,7 @@
                         </div>
                     </div>
                 </div>
+
             </div>
 
         </div>

@@ -305,7 +305,7 @@ let castle = {
             castle.initial.addCastleAction({
                 varName:"ritual",
                 name:"Perform Ritual",
-                desc:"Give wood back to the forest in ever-larger effigies. Doubles favor.",
+                desc:"Give wood back to the forest in ever-larger effigies. Doubles favor gain.",
                 cost: [
                     {
                         resource:"wood",

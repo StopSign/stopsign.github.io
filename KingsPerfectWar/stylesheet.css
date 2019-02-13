@@ -17,6 +17,15 @@ body {
     cursor:default;
 }
 
+.hyperVisible {
+    text-shadow:
+            -1px -1px 0 #000,
+            1px -1px 0 #000,
+            -1px 1px 0 #000,
+            1px 1px 0 #000;
+    color:white;
+}
+
 .showthatH:hover .showthisH {
     display:block;
 }
@@ -378,4 +387,5 @@ input {
     width:100%;
     height:100%;
     display:none;
+    position:relative;
 }

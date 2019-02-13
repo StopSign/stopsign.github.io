@@ -100,7 +100,36 @@ let king = {
             king.initial.addKingAction({
                 varName:"chat",
                 name:"Chat with Citizens",
-                desc:"Learn to talk to your citizens, and when you have enough rapport, learn about interesting family secrets and books to further study. Hover the (?) for info on numbers.",
+                desc:"Learn to talk to your citizens, and when you have enough rapport, learn about interesting family secrets and books to further study. Hover the (?) for the info on numbers.<br>" +
+                    "<div class=\"showthat\" style=''>" +
+                    "    <i class=\"fa fa-question-circle\" aria-hidden=\"true\" style='font-size:16px'></i>" +
+                    "    <div class=\"showthisUp\" style=\"width:520px\">" +
+                    "        Each map has a max number of people to talk to. You gain rapport equal to your CHA until you've filled the rapport bar and the person shares their secrets. Secrets increase increases your knowledge cap by 200 for the first, dropping -2 for each one from there. You can only get secrets from a person once, but you need to talk to people in the right order.<br>" +
+                    "        Each person has a difficulty, and the next person has +0.1 difficulty. You need (10 * difficulty) rapport per person. Additionally, if their difficulty is higher than your CHA, you need an additional ((difficulty - CHA)^2)*5 rapport.<br>" +
+                    "        If the difficulty is higher than your CHA, upon completion you gain CHA equal to (difficulty - CHA)/10, rounded up to the nearest hundredth.<br>" +
+                    "        You gain 200 max knowledge for the first secret, and -2 for each subsequent secret.<br>" +
+                    "        You remember the conversations, and you get better at speaking to people you've already spoken to. Everyone with less difficulty than your highest reached difficulty is 25% easier to talk to. Your highest reached is saved 4 separate times per map.<br>" +
+                    "    </div>" +
+                    "</div><br>" +
+                    "<div id=\"peopleInfo\" style='width:250px;position:relative;height:50px;'>" +
+                    "    <div class=\"abs\" style='left:0;top:0'>Person <div id=\"personNum\" class=\"bold\"></div>, Difficulty <div id=\"difficulty\" class=\"bold\"></div></div>" +
+                    "    <div class=\"abs\" style=\"left:0;top:20px;height:17px;width:150px;background-color:rgb(255,247,181);\">" +
+                    "        <div id=\"rapportProgress\" class=\"abs\" style=\"left:0;width:20%;height:100%;background-color:rgba(255, 184, 15, .8)\"></div>" +
+                    "        <div id=\"rapport\" class=\"abs\" style=\"left:5px\">50 / 250 rapport</div>" +
+                    "    </div>" +
+                    "    <div class=\"abs showthat\" style='left:0;top:38px'>" +
+                    "        Secrets Learned: <div id=\"secrets\" class=\"bold\"></div>" +
+                    "        <div class=\"showthis\" style='width:200px'>" +
+                    "            <div id=\"mapMaxPeople\" class=\"bold\"></div> people total on this map" +
+                    "        </div>" +
+                    "    </div>" +
+                    "    <div class=\"abs showthat\" style='left:150px;top:20px'>" +
+                    "        +<div id=\"rapportAdded\" class=\"bold\"></div>" +
+                    "        <div class=\"showthis\" style=\"width:150px\">" +
+                    "            <div id=\"personHighest\"></div>" +
+                    "        </div>" +
+                    "    </div>" +
+                    "</div>",
                 cost: [],
                 seconds:5,
                 xPos:85,
@@ -145,7 +174,13 @@ let king = {
             king.initial.addKingAction({
                 varName:"study",
                 name:"Study",
-                desc:"Learn how to internalize the knowledge that you've gained from others. Gain Knowledge equal to your WIS up to your Knowledge Cap. Get .001 permanent INT per Knowledge.",
+                desc:"Learn how to internalize the knowledge that you've gained from others. Gain Knowledge equal to your WIS up to your Knowledge Cap. Get .001 permanent INT per Knowledge." +
+                    "<div id=\"knowledgeInfo\" class=\"showthat\" style='width:100%'>" +
+                    "    Knowledge: <div id=\"knowledge\" class=\"bold\"></div> / <div id=\"knowledgeCap\" class=\"bold\"></div> (+<div id=\"knowledgeRate\" class=\"bold\"></div>)<br>" +
+                    "    <div class=\"showthis\">" +
+                    "        Every 1000 knowledge gained gives the king 1 INT" +
+                    "    </div>" +
+                    "</div>",
                 cost: [],
                 seconds:5,
                 xPos:85,
