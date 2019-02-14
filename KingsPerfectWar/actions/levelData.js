@@ -194,7 +194,7 @@ levelInitials = [
                     amount:400,
                     unique:true
                 }],
-                coords:{x:0, y:0}
+                coords:{x:130, y:10}
             }
         ]
     },

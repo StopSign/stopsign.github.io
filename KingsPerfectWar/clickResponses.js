@@ -49,8 +49,9 @@ function prevLevel() {
     if(curLevel < 1) {
         curLevel = 0;
         addClassToDiv(document.getElementById("prevLevel"), "hidden");
+    } else {
+        removeClassFromDiv(document.getElementById("prevLevel"), "hidden");
     }
-    removeClassFromDiv(document.getElementById("prevLevel"), "hidden");
     restart()
 }
 
@@ -59,9 +60,34 @@ function nextLevel() {
     if(curLevel > highestLevel || curLevel >= levelInitials.length) {
         curLevel--;
         addClassToDiv(document.getElementById("nextLevel"), "hidden");
+    } else {
+        removeClassFromDiv(document.getElementById("nextLevel"), "hidden");
     }
-    removeClassFromDiv(document.getElementById("nextLevel"), "hidden");
     restart()
+}
+
+let curTooltip = 0;
+let curTooltipStrings = [];
+function createTooltip(stringArray) {
+    curTooltip = 0;
+    curTooltipStrings = stringArray;
+    document.getElementById("popupBox").style.display = "block";
+    nextTooltip();
+}
+
+function nextTooltip() {
+    if(curTooltipStrings.length <= curTooltip) {
+        closePopupBox();
+        curTooltip = 0;
+        return;
+    }
+    document.getElementById("popupText").innerHTML = curTooltipStrings[curTooltip];
+    document.getElementById("popupButton").innerHTML = (curTooltipStrings.length === (curTooltip+1)) ? "Okay" : ("Next (" + (curTooltip+1) + "/" + curTooltipStrings.length + ")");
+    curTooltip++;
+}
+
+function closePopupBox() {
+    document.getElementById("popupBox").style.display = "none";
 }
 
 function setLoop(index, num) {

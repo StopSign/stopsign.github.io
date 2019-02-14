@@ -576,7 +576,7 @@ let view = {
 
                             divText[property] +=
                                 '<div class="abs" style="left:'+action.xPos+'px;top:'+action.yPos+'px;">' +
-                                    '<div id="'+action.varName+'Container" onclick="selectAction(\''+action.varName+'\', '+action.listNum+')" class="clickable abs showthat disabled hidden" style="left:0;top:0">' +
+                                    '<div id="'+action.varName+'Container" onclick="selectAction(\''+action.varName+'\', '+action.listNum+')" oncontextmenu="straightToAdd(\''+action.varName+'\', '+action.listNum+')" class="clickable abs showthat disabled hidden" style="left:0;top:0">' +
                                         '<img src="img/' + action.varName + '.svg" class="superLargeIcon imageDragFix">' +
                                         '<div id="'+action.varName+'Num" class="hyperVisible bold abs small" style="right:-3px;top:32px;"></div>' +
                                         tributeOuter +
@@ -588,8 +588,8 @@ let view = {
                                     '<div id="'+action.varName+'TributeBar" class="abs" style="left:0;top:0;width:20%;height:100%;background-color:rgb(216,185,232);"></div>' +
                                     '<div id="'+action.varName+'TributeString" class="abs" style="left:5px"></div>' +
                                 '</div>';
-
-                            infoText += '<div id="'+action.varName+'InfoBox" class="infoBox">' +
+                            let backgroundColor = action.listNum === 0 ? "kingColorH" : (action.listNum === 1 ? "castleColorH" : "extrasColor");
+                            infoText += '<div id="'+action.varName+'InfoBox" class="infoBox '+backgroundColor+'" style="padding:5px 0">' +
                                 '<div class="smallTitle">'+action.name+'</div>' +
                                 tributeInfo +
                                 '<div class="small">'+desc+'</div>' +
@@ -621,7 +621,7 @@ let view = {
                         '<div style="position:absolute;left:'+coords.x+'px;top:'+(coords.y)+'px;">' +
                             '<div class="mapFriendlyHPBar" id="'+base.varName+'FriendlyHPBar" style="position:absolute;top:-10px"><div id="'+base.varName+'FriendlyHP"></div></div>' +
                             '<div class="mapEnemyHPBar" id="'+base.varName+'EnemyHPBar" style="position:absolute;top:-4px"><div id="'+base.varName+'EnemyHP"></div></div>' +
-                            '<div class="clickable" style="position:absolute;top:0;left:0" onclick="selectAction(\''+base.varName+'\', 2)">' +
+                            '<div id="'+base.varName+'Container" class="clickable" style="position:absolute;top:0;left:0" onclick="selectAction(\''+base.varName+'\', 2)" oncontextmenu="straightToAdd(\''+base.varName+'\', 2)">' +
                                 '<img src="img/'+imageName+'.svg" class="superLargeIcon imageDragFix">' +
                             '</div>' +
                             (base.creates ? ('<div class="createCounter" style="position:absolute;left:-20px;top:43px;width:80px">' +
@@ -629,7 +629,7 @@ let view = {
                             '</div>') : "") +
                         '</div>';
 
-                    curInfoBox.innerHTML += '<div id="'+base.varName+'InfoBox" class="infoBox">' +
+                    curInfoBox.innerHTML += '<div id="'+base.varName+'InfoBox" class="infoBox unitsColorH" style="padding:5px 0">' +
                         '</div>';
                 });
 

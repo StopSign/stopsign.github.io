@@ -1,10 +1,12 @@
 TODO
 
+story hello world
 notify about unique reward got or not
 test unique
-select black border around war map actions
 actionLists saved to their level
 but you can copy/paste them
+offline / pause / bonus seconds
+level names / numbers
 
 
 
@@ -12,11 +14,30 @@ but you can copy/paste them
 
 
 
-
+lose condition of empty castle / dead king
 
 shrineActions
     use values in relevant places
     stop creating more at max
+restart reason/pop-up
+
+switching levels / level design
+    restart on level clear option, default off
+    levels scale in time from ~1 minute to ~15 minutes over ~20 levels
+    make a random level generator?
+    1 time prizes of WIS/INT on *very* difficult dungeons every few levels, starting at 5
+    increasing gold prizes and EXP for clearing each level to entice players to stay at peak
+
+saving
+    lists
+    levelData
+    king stats
+extras tab
+    export / import
+    discord link
+    polls
+
+
 
 Soul Crystals
     purpose
@@ -34,46 +55,19 @@ Soul Crystals
             500k SC - archer x100
             1.5m SC - cata x100
             etc.
-lose condition of empty castle / dead king
 heroes
     purpose
         Make combat more interesting and less one-dimensional
         build up over time
         can't be accessed immediately in the level - requires minimal propagation
-statistics
-    unit
-    restart reason/pop-up
-switching levels / level design
-    restart on level clear option, default off
-    levels scale in time from ~1 minute to ~15 minutes over ~20 levels
-    make a random level generator?
-    1 time prizes of WIS/INT on *very* difficult dungeons every few levels, starting at 5
-    increasing gold prizes and EXP for clearing each level to entice players to stay at peak
-offline / pause / bonus seconds
-saving
-    lists
-    levelData
-    king stats
-extras tab
-    export / import
-    discord link
-    polls
+unit statistics
+
+
 image pooling for lists
 image pooling for map
 browsers
 mobile
-tutorial
-    level 1 - send king to kill hideout
-    level 2 - send king to kill dungeon, get unique reward of exp, use train, kill hideout
-    level 3 - send king to kill 1st hideout for initial gold/wood, build economy, build barracks/spearman, kill 2nd hideout
-    level 4 - have initial gold/wood, defend against attackers (barely doesn't kill king), aura intro, dungeon is weak but far away w/ mana, build economy/units, kill 2nd hideout
-    level 5 - regular level, talk to people intro
-    level 6-10 - regular level
-    level 11 - regular level, shrine, total mana should be ~4-5k
 
-
-
-    regular level - have initial gold/wood, attackers come later, dungeons for mana and hideouts for gold
 
 additional ideas -
     rally peasants / send mercenaries / send assassins - auto-creates units and sends them at the nearest base w/o a unique reward

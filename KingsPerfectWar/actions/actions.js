@@ -263,6 +263,13 @@ function deselect() {
     document.getElementById("deselectButton").style.display = "none";
 }
 
+function straightToAdd(varName, num) {
+    if(varName !== curInfoBox) {
+        selectAction(varName, num);
+    }
+    addAction();
+}
+
 function addAction() {
     if(["sleep", "pause", "restart"].indexOf(curInfoBox) !== -1) {
         curListNum = curList;

@@ -109,5 +109,8 @@ function restart() {
     gold = levelData.initial.gold;
     wood = levelData.initial.wood;
 
+    unlockLists.checkUnlocks();
+
     prevState = {};
 }
+

@@ -156,8 +156,8 @@ actionData = {
                     seconds:10,
                     xPos:15,
                     yPos:0,
-                    unlocked: function() { return highestLevel >= 2; },
-                    visible: function() { return highestLevel >= 2; }
+                    unlocked: function() { return curLevel >= 2; },
+                    visible: function() { return curLevel >= 2; }
                 });
 
                 actionData.create.castleAction({
@@ -209,8 +209,8 @@ actionData = {
                     seconds:10,
                     xPos:75,
                     yPos:0,
-                    unlocked: function() { return highestLevel >= 2; },
-                    visible: function() { return highestLevel >= 2; }
+                    unlocked: function() { return curLevel >= 2; },
+                    visible: function() { return curLevel >= 2; }
                 });
 
                 actionData.create.castleAction({
@@ -428,8 +428,8 @@ actionData = {
                     start: function() {
                         king.curData.aura = "gold";
                     },
-                    unlocked: function() { return highestLevel >= 2; },
-                    visible: function() { return highestLevel >= 2; }
+                    unlocked: function() { return curLevel >= 2; },
+                    visible: function() { return curLevel >= 2; }
                 });
 
                 actionData.create.kingAction({
@@ -442,8 +442,8 @@ actionData = {
                     start: function() {
                         king.curData.aura = "wood";
                     },
-                    unlocked: function() { return highestLevel >= 3; },
-                    visible: function() { return highestLevel >= 3; }
+                    unlocked: function() { return curLevel >= 3; },
+                    visible: function() { return curLevel >= 3; }
                 });
 
                 actionData.create.kingAction({
@@ -456,8 +456,8 @@ actionData = {
                     start: function() {
                         king.curData.aura = "build";
                     },
-                    unlocked: function() { return highestLevel >= 4; },
-                    visible: function() { return highestLevel >= 4; }
+                    unlocked: function() { return curLevel >= 4; },
+                    visible: function() { return curLevel >= 4; }
                 });
             },
             growth: function() {
@@ -476,8 +476,8 @@ actionData = {
                             kingUnit.hp = king.curData.rflxCur*10;
                         }
                     },
-                    unlocked: function() { return highestLevel >= 1; },
-                    visible: function() { return highestLevel >= 1; }
+                    unlocked: function() { return curLevel >= 1; },
+                    visible: function() { return curLevel >= 1; }
                 });
 
                 actionData.create.kingAction({
@@ -551,7 +551,9 @@ actionData = {
                     },
                     canBuy: function() {
                         return levelData.data.people >= 0;
-                    }
+                    },
+                    unlocked: function() { return levelInitials[curLevel].initial.people > 0; },
+                    unlocked: function() { return levelInitials[curLevel].initial.people > 0; }
                 });
 
                 actionData.create.kingAction({

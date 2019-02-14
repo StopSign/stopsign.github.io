@@ -431,7 +431,7 @@ let warMap = {
         checkWinLevel: function() {
             let foundEnemy = false;
             foundEnemy = foundEnemy || levelData.hideouts.forEach(function(base) {
-                return warMap.bases.getUnitsByAllegiance(base).enemy.length === 0;
+                return warMap.bases.getUnitsByAllegiance(base).enemy.length !== 0;
             });
             if(foundEnemy) {
                 return;
