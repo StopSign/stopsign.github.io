@@ -1,5 +1,19 @@
 TODO
 
+notify about unique reward got or not
+test unique
+select black border around war map actions
+actionLists saved to their level
+but you can copy/paste them
+
+
+
+
+
+
+
+
+
 shrineActions
     use values in relevant places
     stop creating more at max
@@ -30,7 +44,6 @@ statistics
     unit
     restart reason/pop-up
 switching levels / level design
-    when all hideouts are cleared, level is complete and "next" arrow appears
     restart on level clear option, default off
     levels scale in time from ~1 minute to ~15 minutes over ~20 levels
     make a random level generator?

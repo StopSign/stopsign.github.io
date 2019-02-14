@@ -428,8 +428,8 @@ actionData = {
                     start: function() {
                         king.curData.aura = "gold";
                     },
-                    unlocked: function() { return highestLevel >= 3; },
-                    visible: function() { return highestLevel >= 3; }
+                    unlocked: function() { return highestLevel >= 2; },
+                    visible: function() { return highestLevel >= 2; }
                 });
 
                 actionData.create.kingAction({
@@ -442,8 +442,8 @@ actionData = {
                     start: function() {
                         king.curData.aura = "wood";
                     },
-                    unlocked: function() { return highestLevel >= 4; },
-                    visible: function() { return highestLevel >= 4; }
+                    unlocked: function() { return highestLevel >= 3; },
+                    visible: function() { return highestLevel >= 3; }
                 });
 
                 actionData.create.kingAction({
@@ -456,8 +456,8 @@ actionData = {
                     start: function() {
                         king.curData.aura = "build";
                     },
-                    unlocked: function() { return highestLevel >= 5; },
-                    visible: function() { return highestLevel >= 5; }
+                    unlocked: function() { return highestLevel >= 4; },
+                    visible: function() { return highestLevel >= 4; }
                 });
             },
             growth: function() {
