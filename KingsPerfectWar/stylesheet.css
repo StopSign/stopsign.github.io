@@ -26,6 +26,18 @@ body {
     color:white;
 }
 
+.disabled {
+    opacity:.5;
+    cursor:default;
+    pointer-events:none;
+}
+
+.hidden {
+    opacity:0;
+    cursor:default;
+    pointer-events:none;
+}
+
 .showthatH:hover .showthisH {
     display:block;
 }
@@ -83,7 +95,7 @@ body {
 }
 
 .mapTooltipRow {
-    width:280px;
+    width:320px;
     position:relative;
 }
 
@@ -133,11 +145,6 @@ input {
 
 .unused {
     background-color: #99c193;
-}
-
-
-.hidden {
-    display:none;
 }
 
 .locked {

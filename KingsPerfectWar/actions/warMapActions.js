@@ -89,18 +89,18 @@ let warMap = {
             catapult: { atk:25, hp: 180 },
 
             //enemy
-            thug: { atk:1, hp:15, exp:2 },
-            brigand: { atk: 3, hp: 40, exp:4 },
-            bandit: { atk: 6, hp: 100, exp:8 },
-            thief: { atk:10, hp: 120, exp:10 },
+            thug: { atk:1, hp:15, exp:1 },
+            brigand: { atk: 3, hp: 40, exp:2 },
+            bandit: { atk: 6, hp: 100, exp:5 },
+            thief: { atk:10, hp: 120, exp:7 },
 
             //monsters
-            goblin: { atk:1, hp:5, exp:1 },
-            hobgoblin: { atk:2, hp:30, exp:3 }
+            goblin: { atk:1, hp:5, exp:2 },
+            hobgoblin: { atk:2, hp:30, exp:4 }
         },
         getStatsOfUnit: function(varName) {
             if(varName === "king") {
-                return { atk: Math.floor(king.curData.rflxCur+.00000001), hp: Math.floor(king.curData.rflxCur*10+.0000001) };
+                return { atk: king.curData.rflxCur, hp: king.curData.rflxCur*10 };
             }
             return warMap.units.unitStats[varName]; //TODO buffs go here
         },
@@ -123,7 +123,7 @@ let warMap = {
             if(stats.exp) {
                 unit.exp = stats.exp;
             }
-            unit.speed = 12; //DEBUG 2
+            unit.speed = 2; //DEBUG 2
             if(startingLoc) {
                 let base = warMap.bases.baseNameToObj(startingLoc);
                 base.units.push(unit);
@@ -142,6 +142,15 @@ let warMap = {
                 allUnits = allUnits.concat(base.units);
             });
             return allUnits;
+        },
+        getKingUnit: function() {
+            let toReturn = null;
+            warMap.units.getAllUnits().forEach(function(unit) {
+                if(unit.varName === "king") {
+                    toReturn = unit;
+                }
+            });
+            return toReturn;
         },
         createTravelingUnits: function(action) {
             let target = action.varName;
@@ -338,7 +347,7 @@ let warMap = {
                 unit.amount -= amountKilled;
                 damage -= unit.hp * amountKilled;
                 if(unit.exp) {
-                    king.savedData.exp += unit.exp * amountKilled;
+                    king.gainExp(unit.exp * amountKilled);
                 }
                 // console.log("Killed " + amountKilled + " units to take away " + unit.hp * amountKilled + " damage. Remaining units: " + unit.amount + " and remaining damage: " + damage);
                 if(unit.amount === 0) {
@@ -367,12 +376,18 @@ let warMap = {
                 return;
             }
             base.reward.forEach(function(reward) {
+                if(reward.unique) {
+                    reward.unique = false;
+                }
                 let manaReward = reward.type === "mana" ? reward.amount : 0;
                 mana += manaReward;
                 maxMana += manaReward;
                 gold += reward.type === "gold" ? reward.amount : 0;
+                wood += reward.type === "wood" ? reward.amount : 0;
+                king.gainExp(reward.type === "exp" ? reward.amount : 0);
             });
             base.reward = [];
+            warMap.bases.checkWinLevel();
         },
         createAttackers: function() {
             for(let i = 0; i < levelData.hideouts.length; i++) {
@@ -412,6 +427,22 @@ let warMap = {
                 totalHp.enemy += unit.hp * unit.amount;
             });
             return totalHp;
+        },
+        checkWinLevel: function() {
+            let foundEnemy = false;
+            foundEnemy = foundEnemy || levelData.hideouts.forEach(function(base) {
+                return warMap.bases.getUnitsByAllegiance(base).enemy.length === 0;
+            });
+            if(foundEnemy) {
+                return;
+            }
+
+            //Level unlocked
+            if(highestLevel < curLevel + 1) {
+                highestLevel++;
+                removeClassFromDiv(document.getElementById("nextLevel"), "hidden");
+                console.log('level won');
+            }
         }
     }
 };

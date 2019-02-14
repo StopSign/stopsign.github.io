@@ -44,6 +44,26 @@ function changeBuildValue() {
     document.getElementById("buildValue").value = buildAuraValue;
 }
 
+function prevLevel() {
+    curLevel--;
+    if(curLevel < 1) {
+        curLevel = 0;
+        addClassToDiv(document.getElementById("prevLevel"), "hidden");
+    }
+    removeClassFromDiv(document.getElementById("prevLevel"), "hidden");
+    restart()
+}
+
+function nextLevel() {
+    curLevel++;
+    if(curLevel > highestLevel || curLevel >= levelInitials.length) {
+        curLevel--;
+        addClassToDiv(document.getElementById("nextLevel"), "hidden");
+    }
+    removeClassFromDiv(document.getElementById("nextLevel"), "hidden");
+    restart()
+}
+
 function setLoop(index, num) {
     let listName = actionsList.nextNames[num];
     let theList = actionsList.next[listName];

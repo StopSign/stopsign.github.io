@@ -1,6 +1,6 @@
 'use strict';
 
-let gameSpeed = 1;
+let gameSpeed = 8;
 let bonusSpeed = 1;
 
 let curTime = new Date();
@@ -39,6 +39,7 @@ function tick() {
         shrine.tick(); //progress on buffs
         actions.tick(); //actions
         warMap.tick(); //combat
+        unlockLists.tick();
 
         //TODO check if king is dead or only enemies at home, restart
         if(document.getElementById("pauseBeforeRestart").checked && mana === 0) {
@@ -90,8 +91,11 @@ function unpauseGame() {
 }
 
 function restart() {
-    king.helpers.saveHighestPerson();
-    shrine.helpers.saveHighestBlessings();
+    king.curData.rflxCur = king.savedData.rflxInitial;
+    if(levelSave[curLevel]) {
+        king.saveHighestPerson();
+        shrine.helpers.saveHighestBlessings();
+    }
     for (let property in created) {
         if (created.hasOwnProperty(property)) {
             created[property] = 0;
@@ -104,9 +108,6 @@ function restart() {
     maxMana = mana;
     gold = levelData.initial.gold;
     wood = levelData.initial.wood;
-
-    king.curData.rflxCur = king.savedData.rflxInitial;
-
 
     prevState = {};
 }

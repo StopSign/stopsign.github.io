@@ -23,6 +23,7 @@
     <div style="width:704px">
         <div style="width:700px;vertical-align:top;">
             <div id="warMap" style="width:100%;height:405px;position:relative;text-align:center;" class="unitsColorH">
+                <div id="prevLevel" class="fa fa-arrow-left clickable hidden" style="" onclick="prevLevel()"></div>
                 <div class="showthat">
                     <div class="title">War Map</div>
                     <div class="showthis">
@@ -31,20 +32,21 @@
                         Units move their speed in distance every second.
                     </div>
                 </div>
+                <div id="nextLevel" class="fa fa-arrow-right clickable hidden" style="" onclick="nextLevel()"></div>
                 <div style="position:absolute;border:1px solid;bottom:2px;right:2px">
-                    <div id="kingToMove" class="clickable showthat" style="border:2px solid rgba(255, 255, 0, 0)" onclick="switchMapMoveUnits('king')">
+                    <div id="kingToMove" class="clickable showthat" style="border:2px solid rgba(255, 255, 0, 1)" onclick="switchMapMoveUnits('king')">
                         <img src='img/king.svg' class='largeIcon imageDragFix'>
                         <div class="showthis" style="width:250px">
                             <div class="smallTitle">Select King</div>
                             <div class="small">Clicking a place with this highlighted queues an action to move the King to that place.</div>
                         </div>
-                    </div><div id="unitsToMove" class="clickable showthat" style="border:2px solid rgba(255, 255, 0, 1)" onclick="switchMapMoveUnits('units')">
+                    </div><div id="unitsToMove" class="clickable showthat hidden" style="border:2px solid rgba(255, 255, 0, 0)" onclick="switchMapMoveUnits('units')">
                         <img src='img/units.svg' class='largeIcon imageDragFix'>
                         <div class="showthis" style="width:250px">
                             <div class="smallTitle">Select Army</div>
                             <div class="small">Clicking a place with this highlighted queues an action to move all Army to that place.</div>
                         </div>
-                    </div><div id="heroesToMove" class="clickable showthat" style="border:2px solid rgba(255, 255, 0, 0)" onclick="switchMapMoveUnits('heroes')">
+                    </div><div id="heroesToMove" class="clickable showthat hidden" style="border:2px solid rgba(255, 255, 0, 0)" onclick="switchMapMoveUnits('heroes')">
                         <img src='img/heroes.svg' class='largeIcon imageDragFix'>
                         <div class="showthis" style="width:250px">
                             <div class="smallTitle">Select Heroes</div>
@@ -60,8 +62,8 @@
         </div>
 
         
-        <div style="margin-top:4px;width:100%">
-            <div class="showthat" style="width:100px">
+        <div style="margin-top:4px;width:110%">
+            <div id="goldContainer" class="showthat hidden" style="width:100px;">
                 <img src='img/gold.svg' class='largeIcon imageDragFix' style="vertical-align:bottom">
                 <div id="gold"></div>
                 (+<div id="goldPerTick" class="bold"></div>)
@@ -69,7 +71,7 @@
                     Non-rounded Gold: <div id="actualGold" class="bold"></div><br>
                     Per second: <div id="goldPerSecond" class="bold"></div>
                 </div>
-            </div><div class="showthat" style="width:100px">
+            </div><div id="woodContainer" class="showthat hidden" style="width:100px">
                 <img src='img/wood.svg' class='largeIcon imageDragFix' style="vertical-align:bottom">
                 <div id="wood"></div>
                 (+<div id="woodPerTick" class="bold"></div>)
@@ -77,29 +79,27 @@
                     Non-rounded Wood: <div id="actualWood" class="bold"></div><br>
                     Per second: <div id="woodPerSecond" class="bold"></div>
                 </div>
-            </div><div class="showthat" style="width:100px">
+            </div><div id="favorContainer" class="showthat hidden" style="width:100px">
                 <img src='img/favor.svg' class='largeIcon imageDragFix' style="vertical-align:bottom">
                 <div id="favor"></div>
                 <div class="showthis">
                     Non-rounded Favor: <div id="actualFavor" class="bold"></div><br>
                     Per second: <div id="favorPerSecond" class="bold"></div>
                 </div>
-            </div><div class="showthat" style="width:100px">
+            </div><div id="soulCContainer" class="showthat hidden" style="width:100px">
                 <img src='img/soulC.svg' class='largeIcon imageDragFix' style="vertical-align:bottom">
                 <div id="soulC">0</div>
                 <div class="showthis">
-                    Non-rounded Favor: <div id="actualSoulC" class="bold"></div><br>
-                    Per second: <div id="SoulCPerSecond" class="bold"></div>
+                    Non-rounded Soul Crystals: <div id="actualSoulC" class="bold"></div><br>
                 </div>
             </div><div class="showthat" style="width:65px">
                 <img src='img/mana.svg' class='largeIcon imageDragFix' style="vertical-align:bottom">
                 <div id="mana"></div>
                 <div id='manaTooltip' class="showthis"></div>
             </div>
-            <div onclick='restart()' class='button showthat' style='margin-left:5px'>Restart
-                <div class='showthis' style='color:black;width:230px;'>Restarts the clock and your lists</div>
-            </div>
-            <div id='pausePlay' onclick='togglePause()' class='button'>Play</div>
+            <div id='pausePlay' onclick='togglePause()' class='button' style="width:40px;">Play</div>
+            <div onclick='restart()' class='button'>Restart</div>
+            <div onclick='clearCurrentList()' class='button showthat'>Clear Current List</div>
         </div>
 
     </div>
@@ -129,8 +129,8 @@
                 <div id="castleListSelector" class="listSelector castleColor" onclick="switchListTab(1)">Castle <img id="castleTabSleep" src='img/sleep.svg' class='smallIcon imageDragFix tabSleep'></div>
                 <div id="unitsListSelector" class="listSelector unitsColor" onclick="switchListTab(2)">Units <img id="unitsTabSleep" src='img/sleep.svg' class='smallIcon imageDragFix tabSleep'></div>
             </div>
-            <div id="kingListContainer" class="listContainer"><div id="kingCurActions" class="actionListLeft kingColorD"></div><div id="kingNextActions" class="actionListRight kingColorH"></div></div>
-            <div id="castleListContainer" class="listContainer" style="display:block;"><div id="castleCurActions" class="actionListLeft castleColorD"></div><div id="castleNextActions" class="actionListRight castleColorH"></div></div>
+            <div id="kingListContainer" class="listContainer" style="display:block;"><div id="kingCurActions" class="actionListLeft kingColorD"></div><div id="kingNextActions" class="actionListRight kingColorH"></div></div>
+            <div id="castleListContainer" class="listContainer"><div id="castleCurActions" class="actionListLeft castleColorD"></div><div id="castleNextActions" class="actionListRight castleColorH"></div></div>
             <div id="unitsListContainer" class="listContainer"><div id="unitsCurActions" class="actionListLeft unitsColorD"></div><div id="unitsNextActions" class="actionListRight unitsColorH"></div></div>
         </div>
     </div>
@@ -138,27 +138,28 @@
     <div style="width:1300px">
         <div style="background-color:#c4c9e6;height:219px;">
             <div id="castleActionContainer" class="mainActionList castleColorH" style="position:relative;width:332px;">
-                <div style="display:block;text-align:center;margin-top:5px;margin-bottom:5px;" class="large bold">Castle Actions</div>
-                <div style="width:125px;text-align:center;" class="bold">Income</div>
-                <div style="width:125px;text-align:center;" class="bold">Army</div>
-                <div style="width:70px;text-align:center;" class="bold">Shrine</div>
+                <div id="castleLabel1" style="display:block;text-align:center;margin-top:5px;margin-bottom:5px;" class="large bold hidden">Castle Actions</div>
+                <div id="castleLabel2" style="width:125px;text-align:center;" class="bold hidden">Income</div>
+                <div id="castleLabel3" style="width:125px;text-align:center;" class="bold hidden">Army</div>
+                <div id="castleLabel4" style="width:70px;text-align:center;" class="bold hidden">Shrine</div>
                 <div id="castleActionList" class="abs" style="left:0;top:50px;"></div>
             </div><div id="kingActionContainer" class="mainActionList kingColorH" style="position:relative;width:270px;">
-            <div style="display:block;text-align:center;margin-top:5px;margin-bottom:5px;" class="large bold">King Actions</div>
-            <div style="width:76px;text-align:center;" class="bold">Auras</div>
-            <div style="width:50px;text-align:center;" class="bold">Growth</div>
-            <div style="width:135px;text-align:center;" class="bold">Blessings</div>
+            <div id="kingLabel1" style="display:block;text-align:center;margin-top:5px;margin-bottom:5px;" class="large bold hidden">King Actions</div>
+            <div id="kingLabel2" style="width:76px;text-align:center;" class="bold hidden">Auras</div>
+            <div id="kingLabel3" style="width:50px;text-align:center;" class="bold hidden">Growth</div>
+            <div id="kingLabel4" style="width:135px;text-align:center;" class="bold hidden">Blessings</div>
             <div id="kingActionList" class="abs" style="left:0;top:50px;"></div>
-        </div><div id="optionsContainer" class="mainActionList extrasColor" style="position:relative;width:70px;vertical-align:top;">
+        </div><div id="optionsContainer" class="mainActionList extrasColor hidden" style="position:relative;width:70px;vertical-align:top;">
             <div style="display:block;text-align:center;margin-top:5px;margin-bottom:5px;" class="large bold">Options Actions</div>
             <div id="otherActionList" class="abs" style="left:0;top:50px;"></div>
-        </div><div style="width:300px;height:100%;vertical-align:top">
+        </div><div style="width:320px;height:100%;vertical-align:top;position:relative;">
+                <div id="deselectButton" class="abs fa fa-ban" style="left:10px;top:5px;cursor:pointer;display:none;" onclick="deselect()"></div>
                 <div style="display:block;text-align:center;margin-top:5px;margin-bottom:5px;" class="large bold">Info Box</div>
                 <div id="infoBoxList" style="width:100%"></div>
                 <div id="addButtons" style="text-align:center;display:none;margin-top:10px;">
                     <div class="button" onclick="addAction()">Add Action</div>
                 </div>
-                <div id="extrasInfoBox" style="width:100%;height:150px;vertical-align:top;position:relative" class="extrasColor">
+                <div id="extrasInfoBox" style="width:100%;height:150px;vertical-align:top;position:relative" class="extrasColor hidden">
                     <div class="title">Extras</div>
                     <div id="actionInfoDivKing" style="display:none;width:100%"></div>
                     <div id="actionInfoDivCastle" style="display:none;width:100%"></div>
@@ -171,19 +172,13 @@
                             <label for="pauseListEmpty">Pause when next list is empty</label><br>
                             <input type="checkbox" id="pausePlaceCleared" checked>
                             <label for="pausePlaceCleared">Pause when a place is cleared</label><br>
-                            <div class="showthat">
+                            <div id="directWorkerBonus" class="showthat hidden">
                                 <input type="checkbox" id="keepBuild">
                                 <label for="keepBuild">Keep Direct Worker bonus at</label> <input id="buildValue" type="text" class="listTextInput" value="1.5" onchange="changeBuildValue()" onclick="this.select();">
                                 <div class="showthis">
                                     If you want to improve INT without messing up your action timing, use this option to keep things stable. The valid range is between 1.5 and your max. Uncheck to always use your max.
                                 </div>
-                            </div><br><br>
-                            <div onclick='clearCurrentList()' class='button showthat'>
-                                Clear Current List
-                                <div class="showthis" style="color:black;width:230px">
-                                    Clears the currently showing list of all actions past the active one.
-                                </div>
-                            </div><br>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -211,17 +206,17 @@
     <script src="actions/castleActions.js?1"></script>
     <script src="actions/warMapActions.js?1"></script>
     <script src="actions/shrineActions.js?1"></script>
-    <script src="actions/otherActions.js?1"></script>
+    <script src="actions/unlockLists.js?1"></script>
     <script>
-        (function (i, s, o, g, r, a, m) {
-            i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function () {
-                (i[r].q = i[r].q || []).push(arguments)
-            }, i[r].l = 1 * new Date(); a = s.createElement(o),
-                m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m)
-        })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
-
-        ga('create', 'UA-60978932-1', 'auto');
-        ga('send', 'pageview');
+        // (function (i, s, o, g, r, a, m) {
+        //     i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function () {
+        //         (i[r].q = i[r].q || []).push(arguments)
+        //     }, i[r].l = 1 * new Date(); a = s.createElement(o),
+        //         m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m)
+        // })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+        //
+        // ga('create', 'UA-60978932-1', 'auto');
+        // ga('send', 'pageview');
 
     </script>
     <script>

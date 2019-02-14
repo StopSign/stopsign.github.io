@@ -47,7 +47,7 @@ let actions = {
                 }
             }
             if(i === 1 && ["sleep", "restart"].indexOf(action.varName) === -1) {
-                action.manaUsed += king.helpers.getBonusByAura("build");
+                action.manaUsed += king.getBonusByAura("build");
             } else {
                 action.manaUsed++;
             }
@@ -82,9 +82,20 @@ let actions = {
         actionsList.current = {
             king:[],
             castle:[],
-            units:[],
-            shrine:[]
+            units:[]
         };
+        //clear all of the last action if it's sleep
+        for(let i = 0; i < actionsList.nextNames.length; i++) {
+            let name = actionsList.nextNames[i];
+            let nextList = actionsList.next[name];
+            if(nextList.length === 0) {
+                continue;
+            }
+            let lastAction = nextList[nextList.length-1];
+            if(lastAction.varName === "sleep") {
+                nextList.splice(nextList.length-1, 1);
+            }
+        }
         for(let i = 0; i < actionsList.nextNames.length; i++) {
             actions.refresh(i);
         }
@@ -205,7 +216,7 @@ function selectAction(varName, num) {
     let container = document.getElementById(curInfoBox+"Container");
 
     if(container) {
-        let color = king.helpers.kingIsHome() ? "rgba(255, 255, 0, 1)" : "rgba(255, 255, 0, .4)";
+        let color = king.kingIsHome() ? "rgba(255, 255, 0, 1)" : "rgba(255, 255, 0, .4)";
         if(curInfoBox === "market" && king.curData.aura === "gold") {
             document.getElementById("marketContainer").style.border = "2px solid " + color;
         } else if(curInfoBox === "commune" && king.curData.aura === "wood") {
@@ -220,8 +231,10 @@ function selectAction(varName, num) {
     if(varName === curInfoBox) {
         varName = "extras";
         addButtons.style.display = "none";
+        document.getElementById("deselectButton").style.display = "none";
     } else {
         addButtons.style.display = "block";
+        document.getElementById("deselectButton").style.display = "block";
     }
 
     //next
@@ -229,7 +242,7 @@ function selectAction(varName, num) {
     infoBoxDiv.style.display = "block";
     container = document.getElementById(varName+"Container");
     if(container) {
-        let color = king.helpers.kingIsHome() ? "rgba(200, 200, 0, 1)" : "rgba(200, 200, 0, .4)";
+        let color = king.kingIsHome() ? "rgba(200, 200, 0, 1)" : "rgba(200, 200, 0, .4)";
         if(varName === "market" && king.curData.aura === "gold") {
             document.getElementById("marketContainer").style.border = "2px solid " + color;
         } else if(varName === "commune" && king.curData.aura === "wood") {
@@ -243,6 +256,11 @@ function selectAction(varName, num) {
 
     curInfoBox = varName;
     curListNum = num;
+}
+
+function deselect() {
+    selectAction(curInfoBox, curListNum);
+    document.getElementById("deselectButton").style.display = "none";
 }
 
 function addAction() {

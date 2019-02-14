@@ -36,6 +36,7 @@ window.language = "eng";
 window.addAmount = 1;
 
 let curLevel = 0;
+let highestLevel = 0;
 let mana = 1200;
 let maxMana = 1200;
 let totalTime = 0;
@@ -44,14 +45,15 @@ let wood = 0;
 let buildAuraValue = 1.5;
 let highestListsLength = 8;
 
-let curList = 1; //castle
+let curList = 0; //king
 let currentlyHovering = 0;
-let unitsSelectedForMove = { king:false, units:true, heroes:false };
+let unitsSelectedForMove = { king:true, units:false, heroes:false };
 
 let levelSave = [];
 let curInfoBox = "extras";
 let addButtons = document.getElementById("addButtons");
 let curListNum = 1;
+let unlockList = [];
 
 function clearSave() {
     window.localStorage[saveName] = "";

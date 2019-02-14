@@ -1,7 +1,7 @@
 let view = {
     initialize: function() {
         view.clickable.initial.createIcons();
-        view.clickable.initial.createWarMap();
+        // view.clickable.initial.createWarMap();
         this.actionInfoDiv = {"king":document.getElementById("actionInfoDivKing"),
             "castle":document.getElementById("actionInfoDivCastle"),
             "units":document.getElementById("actionInfoDivUnits"),
@@ -19,6 +19,7 @@ let view = {
             view.updating.updateTraveling();
             view.updating.updateKingTab();
             view.updating.updateShrineTab();
+            view.updating.updateActionVisibility();
 
             view.updating.saveCurrentState();
         },
@@ -35,7 +36,7 @@ let view = {
             prevState.king = {};
             prevState.king.savedData = copyArray(king.savedData);
             prevState.king.curData = copyArray(king.curData);
-            prevState.king.isHome = king.helpers.kingIsHome();
+            prevState.king.isHome = king.kingIsHome();
             prevState.levelSave = copyArray(levelSave[curLevel]);
         },
         updateResources: function() {
@@ -185,7 +186,7 @@ let view = {
             //update hideouts
             for(let i = 0; i < levelData.hideouts.length; i++) {
                 let hideout = levelData.hideouts[i];
-                if(prevLevelDatum.hideouts[i].creates.counter !== hideout.creates.counter) {
+                if(hideout.creates && prevLevelDatum.hideouts[i].creates.counter !== hideout.creates.counter) {
                     document.getElementById(hideout.varName+"CreateCounter").innerHTML = hideout.creates.counter;
                 }
                 if(prevLevelDatum.hideouts[i].fightCounter !== hideout.fightCounter && document.getElementById(hideout.varName+"FightProgress")) {
@@ -265,19 +266,19 @@ let view = {
                 updateRapportGain = true;
             }
             if(noPrevKing || prevState.king.curData.rflxCur !== king.curData.rflxCur) {
-                document.getElementById("rflxCur").innerHTML = king.curData.rflxCur + "";
+                document.getElementById("rflxCur").innerHTML = intToString(king.curData.rflxCur,3);
             }
             if(noPrevKing || prevState.king.savedData.exp !== king.savedData.exp) {
-                document.getElementById("kingLevel").innerHTML = king.helpers.getLevel();
-                let expNeeded = king.helpers.getExpOfLevel(king.helpers.getLevel());
+                document.getElementById("kingLevel").innerHTML = king.getLevel();
+                let expNeeded = king.getExpOfLevel(king.getLevel());
                 document.getElementById("exp").innerHTML = "<b>"+king.savedData.exp+"</b> / <b>"+expNeeded+"</b> exp";
-                let expOfPrev = king.helpers.getExpOfLevel(king.helpers.getLevel()-1);
+                let expOfPrev = king.getExpOfLevel(king.getLevel()-1);
                 document.getElementById("expProgress").style.width = 100 * (king.savedData.exp - expOfPrev) / (expNeeded - expOfPrev) + "%";
 
                 document.getElementById("rflxCap").innerHTML = king.savedData.rflxCap + "";
-                document.getElementById("rflxGain").innerHTML = intToString((king.savedData.rflxCap - king.curData.rflxCur)/100);
+                document.getElementById("rflxGain").innerHTML = intToString((king.savedData.rflxCap - king.curData.rflxCur)/100, 3);
             }
-            let kingIsHome = king.helpers.kingIsHome();
+            let kingIsHome = king.kingIsHome();
             if(noPrevKing || prevState.king.curData.aura !== king.curData.aura || prevState.king.isHome !== kingIsHome) {
                 document.getElementById("directContainer").style.padding = "3px";
                 document.getElementById("communeContainer").style.padding = "3px";
@@ -329,7 +330,7 @@ let view = {
                 updateRapportGain = true;
             }
             if(updateRapportGain) {
-                let rapportBonus = king.helpers.calcRapportBonus();
+                let rapportBonus = king.calcRapportBonus();
                 let allDivs = "<div class='smallTitle'>Most People Met</div>";
 
                 let allZero = true;
@@ -383,6 +384,22 @@ let view = {
                     document.getElementById(varName+"BonusTooltip").innerHTML = allDivs;
                 }
             });
+        },
+        updateActionVisibility: function() {
+            for (let property in actionData.list) {
+                if (actionData.list.hasOwnProperty(property)) {
+                    let actionDatum = actionData.list[property];
+
+                    actionDatum.forEach(function(action) {
+                        if(action.unlocked && action.unlocked()) {
+                            removeClassFromDiv(document.getElementById(action.varName + "Container"), "disabled");
+                        }
+                        if(action.visible && action.visible()) {
+                            removeClassFromDiv(document.getElementById(action.varName + "Container"), "hidden");
+                        }
+                    })
+                }
+            }
         }
     },
     actionList: {
@@ -559,11 +576,11 @@ let view = {
 
                             divText[property] +=
                                 '<div class="abs" style="left:'+action.xPos+'px;top:'+action.yPos+'px;">' +
-                                    '<div id="'+action.varName+'Container" onclick="selectAction(\''+action.varName+'\', '+action.listNum+')" class="clickable abs showthat" style="left:0;top:0">' +
+                                    '<div id="'+action.varName+'Container" onclick="selectAction(\''+action.varName+'\', '+action.listNum+')" class="clickable abs showthat disabled hidden" style="left:0;top:0">' +
                                         '<img src="img/' + action.varName + '.svg" class="superLargeIcon imageDragFix">' +
+                                        '<div id="'+action.varName+'Num" class="hyperVisible bold abs small" style="right:-3px;top:32px;"></div>' +
+                                        tributeOuter +
                                     '</div>' +
-                                    '<div id="'+action.varName+'Num" class="hyperVisible bold abs small" style="right:-43px;top:32px;"></div>' +
-                                    tributeOuter +
                                 '</div>';
 
                             let tributeInfo = !action.tribute ? "" :
@@ -627,7 +644,7 @@ let view = {
     helpers: {
         createMapTooltipString: function(titleName, base) {
             let tooltipDiv = "<div class='mapTooltipRow'><div class='title'>"+titleName+"</div>"
-                + "<div style='opacity:.7;position:absolute;top:0;right:0'>(" + base.coords.x +", "+base.coords.y + ")</div>";
+                + "<div style='opacity:.7;position:absolute;top:0;right:2px'>(" + base.coords.x +", "+base.coords.y + ")</div>";
             let unitsByAllegience = warMap.bases.getUnitsByAllegiance(base);
             let totalHp = warMap.bases.getTotalHP(base);
             if(unitsByAllegience.friendly.length > 0) {
@@ -679,15 +696,15 @@ let view = {
                 total.exp += exp;
                 tooltipDiv += "<div style='width:20px'><div class='bold'>" + num + "</div></div>" +
                     "<div style='width:80px'>" + capitalizeFirst(unit.varName) + "</div>" +
-                    "<div style='width:60px'>Atk: <div class='bold'>"+ unit.atk + "</div></div>" +
-                    "<div style='width:60px'>HP: <div class='bold'>"+ unit.hp + "</div></div>" +
+                    "<div style='width:70px'>Atk: <div class='bold'>"+ intToString(unit.atk, 2) + "</div></div>" +
+                    "<div style='width:70px'>HP: <div class='bold'>"+ intToString(unit.hp, 2) + "</div></div>" +
                     (total.exp === 0 ? "" : "<div style='width:60px'>Exp: <div class='bold'>"+ exp + "</div></div>") +
                     "<br>";
             });
             tooltipDiv += "<div style='width:100px'>Total</div>" +
-                "<div style='width:60px'>Atk: <div class='bold'>"+ total.atk + "</div></div>" +
-                "<div style='width:60px'>HP: <div class='bold'>"+ total.hp + "</div></div>" +
-                (total.exp === 0 ? "" : "<div style='width:60px'>Exp: <div class='bold'>"+ total.exp + "</div></div>") +
+                "<div style='width:70px'>Atk: <div class='bold'>"+ intToString(total.atk, 2) + "</div></div>" +
+                "<div style='width:70px'>HP: <div class='bold'>"+ intToString(total.hp, 2) + "</div></div>" +
+                (total.exp === 0 ? "" : "<div style='width:70px'>Exp: <div class='bold'>"+ intToString(total.exp, 1) + "</div></div>") +
                 "<br>";
             return tooltipDiv;
         },
