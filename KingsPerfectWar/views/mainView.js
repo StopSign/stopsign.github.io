@@ -6,6 +6,7 @@ let view = {
             "castle":document.getElementById("actionInfoDivCastle"),
             "units":document.getElementById("actionInfoDivUnits"),
             "shrine":document.getElementById("actionInfoDivShrine")};
+        setMapArrowVisibility();
     },
     updating: {
         update: function () {

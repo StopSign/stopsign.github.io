@@ -60,14 +60,25 @@ function changeBuildValue() {
     document.getElementById("buildValue").value = buildAuraValue;
 }
 
-function prevLevel() {
-    curLevel--;
-    if(curLevel < 1) {
-        curLevel = 0;
+function setMapArrowVisibility() {
+    if(curLevel === 0) {
         addClassToDiv(document.getElementById("prevLevel"), "hidden");
     } else {
         removeClassFromDiv(document.getElementById("prevLevel"), "hidden");
     }
+    if(curLevel >= highestLevel || curLevel >= levelInitials.length) {
+        addClassToDiv(document.getElementById("nextLevel"), "hidden");
+    } else {
+        removeClassFromDiv(document.getElementById("nextLevel"), "hidden");
+    }
+}
+
+function prevLevel() {
+    curLevel--;
+    if(curLevel < 1) {
+        curLevel = 0;
+    }
+    setMapArrowVisibility();
     restart()
 }
 
@@ -75,10 +86,8 @@ function nextLevel() {
     curLevel++;
     if(curLevel > highestLevel || curLevel >= levelInitials.length) {
         curLevel--;
-        addClassToDiv(document.getElementById("nextLevel"), "hidden");
-    } else {
-        removeClassFromDiv(document.getElementById("nextLevel"), "hidden");
     }
+    setMapArrowVisibility();
     restart()
 }
 

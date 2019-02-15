@@ -105,21 +105,27 @@ let actions = {
         let name = actionsList.nextNames[num];
         let nextList = actionsList.next[name];
         let currentList = actionsList.current[name];
+        let modified = false;
         for(let j = 0; j < nextList.length; j++) {
             let curAction = actionsList.current[name][j];
             if(this.validActions[num] > j || //only modify untouched ones
                 (this.validActions[num] === j && curAction && (curAction.manaUsed !== 0 || curAction.loopsLeft !== curAction.loops))) { //and ones not currently updating
                 continue;
             }
+            modified = true;
             let action = copyArray(nextList[j]);
             translateNextToCurrent(action, name);
             actionsList.current[name][j] = action;
         }
         if(this.validActions[num] !== -1 && this.validActions[num] < nextList.length && currentList.length !== nextList.length) { //remove extra actions from current list
+            modified = true;
             currentList.splice(nextList.length, currentList.length - nextList.length);
         }
 
         adjustCosts(num);
+        if(modified) { //save the action order when it changes
+            levelSave[curLevel].nextLists = listsToSimplified();
+        }
     }
 };
 
@@ -277,7 +283,8 @@ function addAction() {
     addActionToList(curInfoBox, curListNum, true);
 }
 
-function addActionToList(varName, num, switchLists) {
+//loopCount and unitsToMove are for loading list from simple
+function addActionToList(varName, num, switchLists, loopCount, unitsToMove) {
     if(switchLists && curList !== num) {
         switchListTab(num);
     }
@@ -295,10 +302,10 @@ function addActionToList(varName, num, switchLists) {
     let listName = actionsList.nextNames[num];
     let action = getActionByVarName(varName, listName);
     if(action.moveAction) {
-        action.unitsToMove = copyArray(unitsSelectedForMove); //for icons
+        action.unitsToMove = unitsToMove ? unitsToMove : copyArray(unitsSelectedForMove); //for icons
     }
     if(action && action.visible() && action.unlocked() && (!action.allowed || getNumOnList(action.varName, listName) < action.allowed())) {
-        let addAmount = window.addAmount;
+        let addAmount = loopCount ? loopCount : window.addAmount;
         if(action.allowed) {
             let numLeft = action.allowed() - getNumOnList(action.varName, listName);
             if(numLeft < addAmount) {

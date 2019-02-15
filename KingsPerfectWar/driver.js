@@ -135,9 +135,9 @@ function restart() {
             created[property] = 0;
         }
     }
+    view.clickable.initial.createWarMap();
     actions.restart();
     king.curData.aura = "";
-    view.clickable.initial.createWarMap();
     mana = levelData.initial.mana;
     maxMana = mana;
     gold = levelData.initial.gold;

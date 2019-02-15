@@ -9,7 +9,7 @@ function createLevel(num) {
 
     if(!levelSave[num]) {
         levelSave[num] = {};
-        levelSave[num].nextLists = {}; //TODO whew boy
+        levelSave[num].nextLists = {king:[], castle:[], units:[]};
         levelSave[num].secrets = 0;
         levelSave[num].uniqueCleared = false;
         levelSave[num].knowledge = 0;
@@ -66,6 +66,10 @@ function createLevel(num) {
                 warMap.units.createUnit(property, false, varName, hideout.units[property]);
             }
         }
+    }
+
+    if(levelSave[num]) {
+        createActionListsFromSimplifiedList(levelSave[num].nextLists);
     }
 }
 

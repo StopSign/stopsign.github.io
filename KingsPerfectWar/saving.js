@@ -72,10 +72,8 @@ function load() {
         toLoad = JSON.parse(window.localStorage[saveName]);
     }
 
-
     totalOfflineMs = toLoad.totalOfflineMs !== undefined ? toLoad.totalOfflineMs : 0;
     addOffline(Math.floor((new Date() - new Date(toLoad.date)) * .8));
-
 
     recalcInterval(50);
     pauseGame();
@@ -127,3 +125,58 @@ function displayBetaSaveNote() {
 //     save();
 //     window.localStorage.idleLoops1 = window.localStorage[saveName];
 // }
+
+
+function createActionListsFromSimplifiedList(simplifiedList) {
+    for (let property in simplifiedList) {
+        if (simplifiedList.hasOwnProperty(property)) {
+            actionsList.next[property] = [];
+            let num = property === "castle" ? 0 : (property === "king" ? 1 : 2);
+            listToActions(simplifiedList[property], num);
+        }
+    }
+}
+
+function listToActions(arr, num) {
+    for(let i = 0; i < arr.length; i++) {
+        let split = arr[i].split("|");
+        let varName = split[0];
+        let loops = split[1];
+        let unitsToMove = {king:false, units:false, heroes:false};
+        if(split[2]) { //unitsToMove
+            let typeCount = split[2] - 0; //convert to int
+            if(typeCount >= 4) {
+                typeCount -= 4;
+                unitsToMove.heroes = true;
+            }
+            if(typeCount >= 2) {
+                typeCount -= 2;
+                unitsToMove.units = true;
+            }
+            if(typeCount >= 1) {
+                unitsToMove.king = true;
+            }
+        }
+        addActionToList(varName, num, false, loops, unitsToMove)
+    }
+}
+
+function listsToSimplified() {
+    let simplifiedList = {};
+    for (let property in actionsList.next) {
+        if (actionsList.next.hasOwnProperty(property)) {
+            simplifiedList[property] = nextListSimplified(actionsList.next[property]);
+        }
+    }
+    return simplifiedList;
+}
+
+function nextListSimplified(nextList) {
+    let str = [];
+    for(let i = 0; i < nextList.length; i++) {
+        let unit = nextList[i];
+        let unitsToMoveStr = !unit.unitsToMove ? "" : "|" + (unit.unitsToMove.king * 1 + unit.unitsToMove.units * 2 + unit.unitsToMove.heroes * 4);
+        str.push(unit.varName + "|" + unit.loops + unitsToMoveStr);
+    }
+    return str;
+}
