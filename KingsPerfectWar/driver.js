@@ -6,6 +6,7 @@ let bonusSpeed = 1;
 let curTime = new Date();
 let gameTicksLeft = 0;
 let sudoStop = false;
+let saveTimer = 0;
 
 function tick() {
     if(sudoStop) {
@@ -16,7 +17,7 @@ function tick() {
     gameTicksLeft += newTime - curTime;
     curTime = newTime;
     if(stop) {
-        // addOffline(gameTicksLeft * offlineRatio);
+        addOffline(gameTicksLeft * .8);
         gameTicksLeft = 0;
         view.updating.update();
         return;
@@ -49,6 +50,11 @@ function tick() {
             restart();
         }
     }
+    saveTimer++;
+    if(saveTimer > 500) {
+        saveTimer = 0;
+        save();
+    }
 
     view.updating.update();
 }
@@ -66,6 +72,32 @@ function recalcInterval(fps) {
     }
 }
 
+function addOffline(num) {
+    if(num) {
+        if(totalOfflineMs + num < 0 && bonusSpeed > 1) {
+            toggleOffline();
+        }
+        totalOfflineMs += num;
+        if(totalOfflineMs < 0) {
+            totalOfflineMs = 0;
+        }
+        document.getElementById("bonusSeconds").innerHTML = intToString(totalOfflineMs / 1000, 2);
+    }
+}
+
+function toggleOffline() {
+    let button = document.getElementById("bonusButton");
+    if(bonusSpeed === 1) { //go fast
+        bonusSpeed = 4;
+        addClassToDiv(button, "buttonPressed");
+        removeClassFromDiv(button, "button");
+    } else { //take it slow
+        bonusSpeed = 1;
+        removeClassFromDiv(button, "buttonPressed");
+        addClassToDiv(button, "button");
+    }
+}
+
 function togglePause() {
     if(stop) {
         unpauseGame();
@@ -73,7 +105,6 @@ function togglePause() {
         pauseGame();
     }
 }
-
 
 function pauseGame() {
     stop = true;
@@ -113,4 +144,3 @@ function restart() {
 
     prevState = {};
 }
-

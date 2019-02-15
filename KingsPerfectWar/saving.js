@@ -55,6 +55,8 @@ let addButtons = document.getElementById("addButtons");
 let curListNum = 1;
 let unlockList = [];
 
+let totalOfflineMs = 0;
+
 function clearSave() {
     window.localStorage[saveName] = "";
     load();
@@ -67,9 +69,13 @@ function load() {
     loadDefaults();
     let toLoad = {};
     if(window.localStorage[saveName]) { //has a save file
-        // closeTutorial();
-        // toLoad = JSON.parse(window.localStorage[saveName]);
+        toLoad = JSON.parse(window.localStorage[saveName]);
     }
+
+
+    totalOfflineMs = toLoad.totalOfflineMs !== undefined ? toLoad.totalOfflineMs : 0;
+    addOffline(Math.floor((new Date() - new Date(toLoad.date)) * .8));
+
 
     recalcInterval(50);
     pauseGame();
@@ -81,6 +87,10 @@ function load() {
 
 function save() {
     let toSave = {};
+
+
+    toSave.date = new Date();
+    toSave.totalOfflineMs = totalOfflineMs;
 
     window.localStorage[saveName] = JSON.stringify(toSave);
 }

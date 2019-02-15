@@ -134,6 +134,26 @@ input {
     transform: translateY(-2px);
     margin-bottom:2px;
 }
+.buttonPressed {
+    padding: 1px 5px;
+    text-align: center;
+    vertical-align:center;
+    min-width:9px;
+    cursor: pointer;
+    outline: none;
+    color: #e1e1e1;
+    border: none;
+    border-radius: 6px;
+    margin-bottom:2px;
+    background-color: #3e8e41;
+    box-shadow: 0 1px #666;
+    transform: translateY(0px);
+}
+.buttonPressed.active {
+    background-color: #357937;
+    box-shadow: 0 1px #666;
+    transform: translateY(-1px);
+}
 
 .button:hover {background-color: #3e8e41}
 

@@ -2,12 +2,28 @@ function clearCurrentList() {
     let curActionNum = actions.validActions[curList];
     let name = actionsList.nextNames[curList];
     let curAction = actionsList.current[name][curActionNum];
+    if(!curAction) { //start of game
+        return
+    }
     if(curAction.manaUsed !== 0 || curAction.loopsLeft !== curAction.loops) {
         curActionNum++; //don't delete current stuff
     }
     actionsList.next[name].splice(curActionNum);
     actionsList.current[name].splice(curActionNum);
     actions.refresh(curList);
+}
+
+let bonusPressed = false;
+function toggleUseBonusTicks() {
+    let button = document.getElementById("bonusButton");
+    bonusPressed = !bonusPressed;
+    if(bonusPressed) {
+        addClassToDiv(button, "buttonPressed");
+        removeClassFromDiv(button, "button");
+    } else {
+        removeClassFromDiv(button, "buttonPressed");
+        addClassToDiv(button, "button");
+    }
 }
 
 function switchListTab(num) {
