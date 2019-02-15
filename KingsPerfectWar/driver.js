@@ -46,6 +46,9 @@ function tick() {
         if(document.getElementById("pauseBeforeRestart").checked && mana === 0) {
             pauseGame();
         }
+        if(bonusSpeed > 1) {
+            addOffline(-1 * gameTicksLeft * ((bonusSpeed - 1)/bonusSpeed));
+        }
         if(!stop && mana === 0) {
             restart();
         }
