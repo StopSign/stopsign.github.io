@@ -162,6 +162,7 @@ let view = {
                 for(let i = 0; i < levelData.hideouts.length; i++) {
                     view.helpers.createMapTooltipString("Hideout "+(i+1), levelData.hideouts[i]);
                 }
+                document.getElementById("mapName").innerHTML = "<b>"+levelData.name + "</b> (" + curLevel + ")";
                 return;
             }
 
@@ -196,6 +197,11 @@ let view = {
                 if(JSON.stringify(prevLevelDatum.hideouts[i].units) !== JSON.stringify(hideout.units)) {
                     view.helpers.createMapTooltipString("Hideout "+(i+1), hideout);
                 }
+            }
+
+            //update map name
+            if(prevLevelDatum && prevLevelDatum.name !== levelData.name) {
+                document.getElementById("mapName").innerHTML = "<b>"+levelData.name + "</b> (" + curLevel + ")";
             }
         },
         updateTraveling: function() {
@@ -610,7 +616,6 @@ let view = {
                 curInfoBox.innerHTML = infoText;
             },
             createWarMap: function() {
-                createLevel(curLevel);
                 warMap.actions.createWarMapActions(levelData);
                 let allDivs = "";
                 let curInfoBox = document.getElementById("infoBoxList");
@@ -662,10 +667,54 @@ let view = {
                 tooltipDiv += "<div>Enemy Units</div><br>";
                 tooltipDiv += view.helpers.getUnitString(unitsByAllegience.enemy);
             }
-            if(base.reward) {
+            if(base.reward && base.reward.length > 0) {
+                let repeatableRewards = [];
+                let uniqueRewards = [];
                 for(let i = 0; i < base.reward.length; i++) {
                     let nextReward = base.reward[i];
-                    tooltipDiv += "Gain <b>" + nextReward.amount + "</b> " + nextReward.type + " when cleared. ";
+                    if(nextReward.unique !== undefined) {
+                        uniqueRewards.push(nextReward);
+                    } else {
+                        repeatableRewards.push(nextReward);
+                    }
+                }
+
+                let repeatableRewardsStr = "";
+                if(repeatableRewards.length > 0) {
+                    repeatableRewardsStr += "[";
+                    for (let i = 0; i < repeatableRewards.length; i++) {
+                        let nextReward = repeatableRewards[i];
+                        repeatableRewardsStr += "<b>" + nextReward.amount + "</b> " + nextReward.type + ", ";
+                    }
+                    repeatableRewardsStr = repeatableRewardsStr.substr(0, repeatableRewardsStr.length - 2);
+                }
+
+                let uniqueRewardsStr = "";
+                let uniqueCompleted = undefined;
+                if(uniqueRewards.length > 0) {
+                    uniqueCompleted = uniqueRewards[0].unique;
+                    uniqueRewardsStr += " a one-time reward of [";
+                    for (let i = 0; i < uniqueRewards.length; i++) {
+                        let nextReward = uniqueRewards[i];
+                        uniqueRewardsStr += "<b>" + nextReward.amount + "</b> " + nextReward.type + ", ";
+                    }
+                    uniqueRewardsStr = uniqueRewardsStr.substr(0, uniqueRewardsStr.length - 2);
+                }
+
+                tooltipDiv += "Gain ";
+                if(repeatableRewards.length > 0) {
+                    tooltipDiv += repeatableRewardsStr;
+                    tooltipDiv += "] when cleared. ";
+                }
+                if(repeatableRewards.length === 0 ) {
+                    tooltipDiv += uniqueRewardsStr;
+                    tooltipDiv += "] when cleared. " + (uniqueCompleted === false ? "<b>(Completed)</b>" : "");
+                }
+
+                if(repeatableRewards.length > 0 && uniqueRewards.length > 0) {
+                    tooltipDiv += "In addition, gain ";
+                    tooltipDiv += uniqueRewardsStr;
+                    tooltipDiv += "] when cleared. " + (uniqueCompleted === false ? "<b>(Completed)</b>" : "");
                 }
             }
             if(base.initialFriendlyHP && totalHp.friendly > 0) {

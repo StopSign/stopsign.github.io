@@ -68,9 +68,7 @@ function createLevel(num) {
         }
     }
 
-    if(levelSave[num]) {
-        createActionListsFromSimplifiedList(levelSave[num].nextLists);
-    }
+
 }
 
 let nameCounter = 0;

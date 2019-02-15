@@ -135,7 +135,13 @@ function restart() {
             created[property] = 0;
         }
     }
+
+    createLevel(curLevel);
     view.clickable.initial.createWarMap();
+    if(levelSave[curLevel]) {
+        createActionListsFromSimplifiedList(levelSave[curLevel].nextLists);
+    }
+
     actions.restart();
     king.curData.aura = "";
     mana = levelData.initial.mana;
