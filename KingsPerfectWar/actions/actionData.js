@@ -679,7 +679,7 @@ actionData = {
                 name:"Restart",
                 desc:"Add an action that restarts the map when it's run. Takes 5 seconds to finish.",
                 second:5,
-                buy: function() { mana = 0; },
+                buy: function() { restartReason = "Action"; mana = 0; },
                 xPos:15,
                 yPos:110
             });

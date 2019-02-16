@@ -8,6 +8,8 @@ let gameTicksLeft = 0;
 let sudoStop = false;
 let saveTimer = 0;
 
+let reachedOneMana = false;
+
 function tick() {
     if(sudoStop) {
         return;
@@ -42,6 +44,10 @@ function tick() {
         warMap.tick(); //combat
         unlockLists.tick();
 
+        if(mana === 1) {
+            reachedOneMana = true;
+        }
+
         //TODO check if king is dead or only enemies at home, restart
         if(document.getElementById("pauseBeforeRestart").checked && mana === 0) {
             pauseGame();
@@ -50,7 +56,11 @@ function tick() {
             addOffline(-1 * gameTicksLeft * ((bonusSpeed - 1)/bonusSpeed));
         }
         if(!stop && mana === 0) {
+            if(reachedOneMana) {
+                restartReason = "0 Mana";
+            }
             restart();
+            reachedOneMana = false;
         }
     }
     saveTimer++;

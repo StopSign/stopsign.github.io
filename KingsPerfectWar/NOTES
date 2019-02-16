@@ -1,32 +1,18 @@
 TODO
 
-story hello world
-notify about unique reward got or not
-test unique
-actionLists saved to their level
-but you can copy/paste them
-level names / numbers
-
-
-
-
-
-
-
 lose condition of empty castle / dead king
+restart reason/pop-up
 
+save per level
+    unique completions
+    growth
+    blessings
+test unique
+
+actionLists, you can copy/paste them
 shrineActions
     use values in relevant places
     stop creating more at max
-restart reason/pop-up
-
-switching levels / level design
-    restart on level clear option, default off
-    levels scale in time from ~1 minute to ~15 minutes over ~20 levels
-    make a random level generator?
-    1 time prizes of WIS/INT on *very* difficult dungeons every few levels, starting at 5
-    increasing gold prizes and EXP for clearing each level to entice players to stay at peak
-
 saving
     lists
     levelData
@@ -35,6 +21,14 @@ extras tab
     export / import
     discord link
     polls
+story hello world
+switching levels / level design
+    restart on level clear option, default off
+    levels scale in time from ~1 minute to ~15 minutes over ~20 levels
+    make a random level generator?
+    1 time prizes of WIS/INT on *very* difficult dungeons every few levels, starting at 5
+    increasing gold prizes and EXP for clearing each level to entice players to stay at peak
+
 
 
 

@@ -79,6 +79,7 @@ function prevLevel() {
         curLevel = 0;
     }
     setMapArrowVisibility();
+    restartReason = "New Level";
     restart()
 }
 
@@ -88,6 +89,7 @@ function nextLevel() {
         curLevel--;
     }
     setMapArrowVisibility();
+    restartReason = "New Level";
     restart()
 }
 
@@ -280,4 +282,9 @@ function draggedUndecorate(i, name) {
     if(document.getElementById("nextActionContainer" + i + name)) {
         document.getElementById("nextActionContainer" + i + name).classList.remove("draggedAction");
     }
+}
+
+function clickRestart() {
+    restartReason = "Manual";
+    restart();
 }

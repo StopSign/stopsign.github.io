@@ -39,6 +39,7 @@ let view = {
             prevState.king.curData = copyArray(king.curData);
             prevState.king.isHome = king.kingIsHome();
             prevState.levelSave = copyArray(levelSave[curLevel]);
+            prevState.restartReason = restartReason;
         },
         updateResources: function() {
             if(prevState.mana !== mana || prevState.maxMana !== maxMana) {
@@ -153,6 +154,7 @@ let view = {
         updateUnits: function() {
             let prevLevelDatum = prevState.levelData;
 
+
             //initial
             if(!prevLevelDatum) {
                 view.helpers.createMapTooltipString("Castle", levelData.home);
@@ -199,9 +201,12 @@ let view = {
                 }
             }
 
-            //update map name
+            //update map
             if(prevLevelDatum && prevLevelDatum.name !== levelData.name) {
                 document.getElementById("mapName").innerHTML = "<b>"+levelData.name + "</b> (" + curLevel + ")";
+            }
+            if(prevLevelDatum && prevLevelDatum.restartReason !== restartReason) {
+                document.getElementById("restartReason").innerHTML = restartReason;
             }
         },
         updateTraveling: function() {
@@ -759,7 +764,7 @@ let view = {
             return tooltipDiv;
         },
         getImage: function(action, num) {
-            if(num !== 2 || action.varName === "sleep") {
+            if(num !== 2 || ["sleep", "pause", "restart"].indexOf(curInfoBox) !== -1) {
                 return "<img src='img/" + action.varName + ".svg' class='smallIcon imageDragFix' style='margin-left:5px'>";
             } else {
                 if(action.unitsToMove) {

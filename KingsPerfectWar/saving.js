@@ -36,7 +36,7 @@ window.language = "eng";
 window.addAmount = 1;
 
 let curLevel = 0;
-let highestLevel = 0;
+let highestLevel = 2;
 let mana = 1200;
 let maxMana = 1200;
 let totalTime = 0;
@@ -54,6 +54,7 @@ let curInfoBox = "extras";
 let addButtons = document.getElementById("addButtons");
 let curListNum = 1;
 let unlockList = [];
+let restartReason = "";
 
 let totalOfflineMs = 0;
 
@@ -131,7 +132,7 @@ function createActionListsFromSimplifiedList(simplifiedList) {
     for (let property in simplifiedList) {
         if (simplifiedList.hasOwnProperty(property)) {
             actionsList.next[property] = [];
-            let num = property === "castle" ? 0 : (property === "king" ? 1 : 2);
+            let num = property === "king" ? 0 : (property === "castle" ? 1 : 2);
             listToActions(simplifiedList[property], num);
         }
     }

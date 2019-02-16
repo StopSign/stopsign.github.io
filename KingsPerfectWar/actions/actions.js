@@ -288,7 +288,7 @@ function addActionToList(varName, num, switchLists, loopCount, unitsToMove) {
     if(switchLists && curList !== num) {
         switchListTab(num);
     }
-    if(num === 2 && varName !== "sleep") {
+    if(num === 2 && ["sleep", "pause", "restart"].indexOf(curInfoBox) === -1) {
         let validAction = false;
         for (let property in unitsSelectedForMove) {
             if (unitsSelectedForMove.hasOwnProperty(property)) {

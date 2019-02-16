@@ -104,11 +104,12 @@
                 <div id='manaTooltip' class="showthis"></div>
             </div>
             <div id='pausePlay' onclick='togglePause()' class='button' style="width:40px;">Play</div>
-            <div onclick='restart()' class='button'>Restart</div>
+            <div onclick='clickRestart()' class='button'>Restart</div>
             <div onclick='clearCurrentList()' class='button'>Clear Current List</div>
+            <div style="margin-left:5px" class="small">Reason for restart: <div id="restartReason" class="bold" style="width:60px;"></div></div>
             <div style="margin-left:15px;" class="small">Bonus Ticks</div>
             <div id="bonusButton" onclick='toggleOffline()' class='button'>>>>></div>
-            <div class="bold small" id="bonusSeconds"></div>
+            <div class="bold small" id="bonusSeconds" style="width:40px"></div>
         </div>
 
     </div>
@@ -132,7 +133,7 @@
                 </div>
             </div>
         </div>
-        <div style="height:300px;margin-top:10px;width:348px">
+        <div style="height:300px;margin-top:10px;width:351px">
             <div style="width:100%;height:20px;" class="large bold">
                 <div id="kingListSelector" class="listSelector kingColor" onclick="switchListTab(0)">King <img id="kingTabSleep" src='img/sleep.svg' class='smallIcon imageDragFix tabSleep'></div>
                 <div id="castleListSelector" class="listSelector castleColor" onclick="switchListTab(1)">Castle <img id="castleTabSleep" src='img/sleep.svg' class='smallIcon imageDragFix tabSleep'></div>

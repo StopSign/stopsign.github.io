@@ -8,6 +8,11 @@ let warMap = {
         warMap.units.travel();
 
         warMap.bases.createAttackers();
+
+        if(warMap.units.getKingUnit() === null) {
+            restartReason = "Dead King";
+            mana = 0;
+        }
     },
     actions: {
         createWarMapActions: function() {
