@@ -1,7 +1,6 @@
 TODO
 
-lose condition of empty castle / dead king
-restart reason/pop-up
+actionLists, you can copy/paste them
 
 save per level
     unique completions
@@ -9,7 +8,6 @@ save per level
     blessings
 test unique
 
-actionLists, you can copy/paste them
 shrineActions
     use values in relevant places
     stop creating more at max
@@ -21,9 +19,8 @@ extras tab
     export / import
     discord link
     polls
-story hello world
+story hello world / diary
 switching levels / level design
-    restart on level clear option, default off
     levels scale in time from ~1 minute to ~15 minutes over ~20 levels
     make a random level generator?
     1 time prizes of WIS/INT on *very* difficult dungeons every few levels, starting at 5

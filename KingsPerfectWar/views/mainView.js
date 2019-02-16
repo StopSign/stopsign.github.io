@@ -764,7 +764,7 @@ let view = {
             return tooltipDiv;
         },
         getImage: function(action, num) {
-            if(num !== 2 || ["sleep", "pause", "restart"].indexOf(curInfoBox) !== -1) {
+            if(num !== 2 || ["sleep", "pause", "restart"].indexOf(action.varName) !== -1) {
                 return "<img src='img/" + action.varName + ".svg' class='smallIcon imageDragFix' style='margin-left:5px'>";
             } else {
                 if(action.unitsToMove) {

@@ -36,7 +36,7 @@ window.language = "eng";
 window.addAmount = 1;
 
 let curLevel = 0;
-let highestLevel = 2;
+let highestLevel = 0;
 let mana = 1200;
 let maxMana = 1200;
 let totalTime = 0;
