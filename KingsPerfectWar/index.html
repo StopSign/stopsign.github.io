@@ -164,19 +164,24 @@
             <div id="otherActionList" class="abs" style="left:0;top:50px;"></div>
         </div><div style="width:320px;height:100%;vertical-align:top;position:relative;">
                 <div id="deselectButton" class="abs fa fa-ban" style="left:10px;top:5px;cursor:pointer;display:none;" onclick="deselect()"></div>
+                <div id="optionsMenu" class="abs fa fa-cog" style="right:10px;top:5px;cursor:pointer;" onclick="openExtras()"></div>
                 <div style="display:block;text-align:center;margin-top:5px;margin-bottom:5px;" class="large bold">Info Box</div>
-                <div id="infoBoxList" style="width:100%"></div>
-                <div id="addButtons" style="text-align:center;display:none;margin-top:10px;">
-                    <div class="button" onclick="addAction()">Add Action</div>
-                </div>
-                <div id="extrasInfoBox" style="width:100%;height:150px;vertical-align:top;position:relative" class="extrasColor hidden">
-                    <div class="title">Extras</div>
+                <div id="defaultInfoBox" style="display:none;">
                     <div id="actionInfoDivKing" style="display:none;width:100%"></div>
                     <div id="actionInfoDivCastle" style="display:none;width:100%"></div>
                     <div id="actionInfoDivUnits" style="display:none;width:100%"></div>
-                    <div id="actionInfoDivShrine" style="display:none;width:100%"></div>
+                </div>
+                <div id="infoBoxList" style="width:100%;height:180px"></div>
+                <div id="addButtons" style="text-align:center;display:none;margin-top:-15px;">
+                    <div class="button" style="margin-top:-20px;" onclick="addAction()">Add Action</div>
+                </div>
+                <div id="extrasInfoBox" style="width:100%;height:189px;vertical-align:top;position:absolute;top:30px;display:none;" class="extrasColor">
+                    <div class="title">Extras</div>
                     <div id="optionsDiv" style="position:relative;height:100%;width:100%;">
                         <div style="width:100%;vertical-align:top">
+                            <div class="button" onclick="exportCurrentList()">Export Current List</div>
+                            <div class="button" onclick="exportMapList()">Export Map Lists</div><br>
+                            <div class="button" onclick="importList()">Import List(s)</div> <textarea id="exportImportList" class="listTextInput" style="width:80px;" onclick="this.select();"></textarea><br>
                             <div class='control'><input type='checkbox' id='pauseBeforeRestart'><label for='pauseBeforeRestart'> Pause before restart</label></div><br>
                             <input type="checkbox" id="pauseListEmpty" checked>
                             <label for="pauseListEmpty">Pause when next list is empty</label><br>
@@ -189,8 +194,11 @@
                                     If you want to improve INT without messing up your action timing, use this option to keep things stable. The valid range is between 1.5 and your max. Uncheck to always use your max.
                                 </div>
                             </div>
+                            <div class="button" onclick="exportSave()">Export Save</div><div class="button" onclick="save()">Save</div><div class="small">Auto Saving in <div id="saveTimer" class="bold"></div></div><br>
+                            <div class="button" onclick="importSave()">Import Save</div> <textarea id="exportImportSave" class="listTextInput" style="width:80px;" onclick="this.select();"></textarea><br>
                         </div>
                     </div>
+
                 </div>
 
             </div>

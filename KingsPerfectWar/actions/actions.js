@@ -1,5 +1,5 @@
 let actions = {
-    validActions: [0, 0, 0, 0],
+    validActions: [0, 0, 0],
     tick: function() {
         //get a list of valid actions, moving to next if cost fails
         for(let i = 0; i < actionsList.nextNames.length; i++) {
@@ -78,7 +78,7 @@ let actions = {
         }
     },
     restart: function() {
-        this.validActions = [0, 0, 0, 0];
+        this.validActions = [0, 0, 0];
         actionsList.current = {
             king:[],
             castle:[],
@@ -188,6 +188,7 @@ function translateNextToCurrent(action, name) {
     if(actionDatum.tribute) {
         action.tribute = actionDatum.tribute;
     }
+
     action.cost = actionDatum.cost;
     action.buy = actionDatum.buy;
     action.visible = actionDatum.visible;
@@ -235,7 +236,7 @@ function selectAction(varName, num) {
     }
 
     if(varName === curInfoBox) {
-        varName = "extras";
+        varName = "default";
         addButtons.style.display = "none";
         document.getElementById("deselectButton").style.display = "none";
     } else {
@@ -243,9 +244,8 @@ function selectAction(varName, num) {
         document.getElementById("deselectButton").style.display = "block";
     }
 
+    document.getElementById(varName+"InfoBox").style.display = "block";
     //next
-    infoBoxDiv = document.getElementById(varName+"InfoBox");
-    infoBoxDiv.style.display = "block";
     container = document.getElementById(varName+"Container");
     if(container) {
         let color = king.kingIsHome() ? "rgba(200, 200, 0, 1)" : "rgba(200, 200, 0, .4)";
@@ -267,6 +267,13 @@ function selectAction(varName, num) {
 function deselect() {
     selectAction(curInfoBox, curListNum);
     document.getElementById("deselectButton").style.display = "none";
+    document.getElementById("extrasInfoBox").style.display = "none";
+}
+
+function openExtras() {
+    selectAction(curInfoBox, curListNum);
+    document.getElementById("deselectButton").style.display = "block";
+    document.getElementById("extrasInfoBox").style.display = "block";
 }
 
 function straightToAdd(varName, num) {
@@ -304,6 +311,7 @@ function addActionToList(varName, num, switchLists, loopCount, unitsToMove) {
     if(action.moveAction) {
         action.unitsToMove = unitsToMove ? unitsToMove : copyArray(unitsSelectedForMove); //for icons
     }
+
     if(action && action.visible() && action.unlocked() && (!action.allowed || getNumOnList(action.varName, listName) < action.allowed())) {
         let addAmount = loopCount ? loopCount : window.addAmount;
         if(action.allowed) {

@@ -6,7 +6,7 @@ let bonusSpeed = 1;
 let curTime = new Date();
 let gameTicksLeft = 0;
 let sudoStop = false;
-let saveTimer = 0;
+let saveTimer = 2000;
 
 let reachedOneMana = false;
 
@@ -18,21 +18,34 @@ function tick() {
     totalTime += newTime - curTime;
     gameTicksLeft += newTime - curTime;
     curTime = newTime;
+
+    saveTimer--;
+    if(saveTimer < 0) {
+        save();
+    }
+    document.getElementById("saveTimer").innerHTML = round(saveTimer/10);
+
     if(stop) {
         addOffline(gameTicksLeft * .8);
         gameTicksLeft = 0;
-        view.updating.update();
+        if(saveTimer % 5 === 0) { //for performance
+            view.updating.update();
+        }
         return;
     }
+
+    let didSomething = false; //for performance
 
     while (gameTicksLeft > (1000 / 10)) {
         if(stop) {
             break;
         }
+        didSomething = true;
         if(gameTicksLeft > 2000) {
             window.fps /= 2;
             console.warn('too fast! (${gameTicksLeft})');
             gameTicksLeft = 0;
+            stop = true;
         }
         gameTicksLeft -= (1000 / 10) / gameSpeed / bonusSpeed;
 
@@ -48,7 +61,7 @@ function tick() {
             reachedOneMana = true;
         }
 
-        //TODO check if king is dead or only enemies at home, restart
+        //TODO check if only enemies at home, restart
         if(document.getElementById("pauseBeforeRestart").checked && mana === 0) {
             pauseGame();
         }
@@ -63,13 +76,9 @@ function tick() {
             reachedOneMana = false;
         }
     }
-    saveTimer++;
-    if(saveTimer > 500) {
-        saveTimer = 0;
-        save();
+    if(didSomething) {
+        view.updating.update();
     }
-
-    view.updating.update();
 }
 
 function recalcInterval(fps) {

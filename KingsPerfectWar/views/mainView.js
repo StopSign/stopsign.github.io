@@ -4,8 +4,7 @@ let view = {
         // view.clickable.initial.createWarMap();
         this.actionInfoDiv = {"king":document.getElementById("actionInfoDivKing"),
             "castle":document.getElementById("actionInfoDivCastle"),
-            "units":document.getElementById("actionInfoDivUnits"),
-            "shrine":document.getElementById("actionInfoDivShrine")};
+            "units":document.getElementById("actionInfoDivUnits")};
         setMapArrowVisibility();
     },
     updating: {
@@ -457,6 +456,7 @@ let view = {
                 let action = theList[i];
                 let width = 100 * action.manaUsed / (action.costseconds * 10) + "%";
                 let image = view.helpers.getImage(action, num);
+
                 totalDivText +=
                     "<div class='curActionContainer small' id='curAction"+i+name+"' onmouseover='view.actionList.showInfoDiv("+i+", \""+name+"\", true)' onmouseleave='view.actionList.showInfoDiv("+i+", \""+name+"\",false)'>" +
                     "<div class='curActionBar' style='width:"+width+"' id='action"+i+name+"Bar'></div>" +
@@ -472,8 +472,9 @@ let view = {
 
             for(let i = 0; i < theList.length; i++) {
                 let action = theList[i];
+                let backgroundColor = num === 0 ? "kingColorH" : (num === 1 ? "castleColorH" : "unitsColor");
                 totalDivText +=
-                    "<div id='actionTooltip"+i+name+"' style='display:none;padding-left:10px;width:90%'>" +
+                    "<div class=\""+backgroundColor+"\" id='actionTooltip"+i+name+"' style='display:none;padding-left:10px;width:90%'>" +
                     "<div style='text-align:center;width:100%'>"+action.name+"</div><br><br>" +
                     "<div id='action"+i+name+"Costs'></div>" +
                     "</div>";
@@ -493,9 +494,6 @@ let view = {
                 }
             }
             view.actionInfoDiv[name].style.display = isHover ? "inline-block" : "none";
-            if(actionsList.nextNames[curList] === name) {
-                document.getElementById("optionsDiv").style.display = isHover ? "none" : "inline-block";
-            }
         }
     },
     performance: {
@@ -601,7 +599,7 @@ let view = {
                                     '<div id="'+action.varName+'TributeString" class="abs" style="left:5px"></div>' +
                                 '</div>';
                             let backgroundColor = action.listNum === 0 ? "kingColorH" : (action.listNum === 1 ? "castleColorH" : "extrasColor");
-                            infoText += '<div id="'+action.varName+'InfoBox" class="infoBox '+backgroundColor+'" style="padding:5px 0">' +
+                            infoText += '<div id="'+action.varName+'InfoBox" class="infoBox '+backgroundColor+'">' +
                                 '<div class="smallTitle">'+action.name+'</div>' +
                                 tributeInfo +
                                 '<div class="small">'+desc+'</div>' +

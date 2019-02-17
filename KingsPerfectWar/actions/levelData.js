@@ -138,7 +138,7 @@ levelInitials = [
                             amount:400
                         }
                     ],
-                coords:{x:130, y:60}
+                coords:{x:140, y:50}
             },
             {
                 units: { thug:2 },

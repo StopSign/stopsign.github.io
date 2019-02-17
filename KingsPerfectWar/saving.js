@@ -86,6 +86,7 @@ function load() {
 
 function save() {
     let toSave = {};
+    saveTimer = 2000;
 
 
     toSave.date = new Date();
@@ -94,20 +95,77 @@ function save() {
     window.localStorage[saveName] = JSON.stringify(toSave);
 }
 
-// function exportSave() {
-//     save();
-//     document.getElementById("exportImport").value = encode(window.localStorage[saveName]);
-//     document.getElementById("exportImport").select();
-//     document.execCommand('copy');
-//     document.getElementById("exportImport").value = "";
-// }
+function exportMapList() {
+    let str = "";
+    for(let i = 0; i < actionsList.nextNames.length; i++) {
+        let name = actionsList.nextNames[i];
+        let arr = nextListSimplified(actionsList.next[name]);
+        str += capitalizeFirst(name) + "=\n";
+        if(arr.length > 0) {
+            for(let i = 0; i < arr.length; i++) {
+                str += '"'+arr[i]+'",\n';
+            }
+            str = str.substring(0, str.length - 2) + "\n";
+        }
+        str += "="
+    }
+    str = str.substring(0, str.length - 2);
 
-// function importSave() {
-//     window.localStorage[saveName] = decode(document.getElementById("exportImport").value);
-//
-//     load();
-//     pauseGame();
-// }
+    document.getElementById("exportImportList").value = str;
+    document.getElementById("exportImportList").select();
+    document.execCommand('copy');
+}
+
+function exportCurrentList() {
+    let name = actionsList.nextNames[curList];
+    let arr = nextListSimplified(actionsList.next[name]);
+    let str = capitalizeFirst(name) + "=\n";
+    if(arr.length > 0) {
+        for (let i = 0; i < arr.length; i++) {
+            str += '"' + arr[i] + '",\n';
+        }
+        str = str.substring(0, str.length - 2);
+    }
+
+    document.getElementById("exportImportList").value = str;
+    document.getElementById("exportImportList").select();
+    document.execCommand('copy');
+}
+
+function importList() {
+    let str = document.getElementById("exportImportList").value;
+    restartReason = "Imported";
+    restart();
+
+    let parts = str.split("=");
+    if(parts.length % 2 === 1) {
+        return; //invalid
+    }
+    let simplifiedList = {};
+    for(let i = 0; i < parts.length; i+=2) {
+        let name = parts[i];
+        let list = "["+parts[i+1]+"]";
+        simplifiedList[name.toLowerCase()] = JSON.parse(list);
+    }
+
+    createActionListsFromSimplifiedList(simplifiedList);
+}
+
+function exportSave() {
+    save();
+    document.getElementById("exportImportSave").value = encode(window.localStorage[saveName]);
+    document.getElementById("exportImportSave").select();
+    document.execCommand('copy');
+    document.getElementById("exportImportSave").value = "";
+}
+
+function importSave() {
+    window.localStorage[saveName] = decode(document.getElementById("exportImportSave").value);
+    restartReason = "Imported";
+
+    load();
+    pauseGame();
+}
 
 function displayBetaSaveNote() {
     // console.log(isBeta);
@@ -129,10 +187,12 @@ function displayBetaSaveNote() {
 
 
 function createActionListsFromSimplifiedList(simplifiedList) {
-    for (let property in simplifiedList) {
-        if (simplifiedList.hasOwnProperty(property)) {
+    for (let property in actionsList.next) {
+        if (actionsList.next.hasOwnProperty(property) && simplifiedList[property]) {
             actionsList.next[property] = [];
+            actionsList.current[property] = [];
             let num = property === "king" ? 0 : (property === "castle" ? 1 : 2);
+            actions.refresh(num);
             listToActions(simplifiedList[property], num);
         }
     }
@@ -173,11 +233,11 @@ function listsToSimplified() {
 }
 
 function nextListSimplified(nextList) {
-    let str = [];
+    let arr = [];
     for(let i = 0; i < nextList.length; i++) {
         let unit = nextList[i];
         let unitsToMoveStr = !unit.unitsToMove ? "" : "|" + (unit.unitsToMove.king * 1 + unit.unitsToMove.units * 2 + unit.unitsToMove.heroes * 4);
-        str.push(unit.varName + "|" + unit.loops + unitsToMoveStr);
+        arr.push(unit.varName + "|" + unit.loops + unitsToMoveStr);
     }
-    return str;
+    return arr;
 }

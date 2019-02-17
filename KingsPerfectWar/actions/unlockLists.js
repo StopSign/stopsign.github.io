@@ -8,7 +8,7 @@ let unlockLists = {
         unlockLists.check(0, true);
         unlockLists.check(1, levelData && levelData.home.units.length === 0);
         unlockLists.check(2, highestLevel >= 1);
-        unlockLists.check(3, curLevel >= 1, ["kingLabel1", "kingLabel3", "extrasInfoBox", "optionsContainer"]);
+        unlockLists.check(3, curLevel >= 1, ["kingLabel1", "kingLabel3", "optionsContainer"]);
         unlockLists.check(4, gold > 0, ["goldContainer", "castleLabel1", "woodContainer", "castleLabel3", "unitsToMove"]);
         unlockLists.check(5, highestLevel >= 2);
         unlockLists.check(6, curLevel >= 2, ["castleLabel2"]);

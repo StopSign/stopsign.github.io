@@ -1,7 +1,5 @@
 TODO
 
-actionLists, you can copy/paste them
-
 save per level
     unique completions
     growth
@@ -21,6 +19,10 @@ extras tab
     polls
 story hello world / diary
 switching levels / level design
+    tutorial improvements
+        unable to click except
+        highlight
+        option to skip
     levels scale in time from ~1 minute to ~15 minutes over ~20 levels
     make a random level generator?
     1 time prizes of WIS/INT on *very* difficult dungeons every few levels, starting at 5
@@ -61,3 +63,6 @@ mobile
 
 additional ideas -
     rally peasants / send mercenaries / send assassins - auto-creates units and sends them at the nearest base w/o a unique reward
+
+Questions -
+    Better way to re-arrange Stats? Or Extras?

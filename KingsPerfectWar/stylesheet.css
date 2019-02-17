@@ -338,6 +338,7 @@ input {
 .listTextInput {
     width:30px;
     height:9px;
+    font-size:10px;
 }
 
 .tabSleep {
@@ -415,4 +416,5 @@ input {
     height:100%;
     display:none;
     position:relative;
+    padding:5px 0;
 }
