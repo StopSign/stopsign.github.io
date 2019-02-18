@@ -242,6 +242,8 @@ function selectAction(varName, num) {
     } else {
         addButtons.style.display = "block";
         document.getElementById("deselectButton").style.display = "block";
+        document.getElementById("extrasInfoBox").style.display = "none";
+        document.getElementById("storyInfoBox").style.display = "none";
     }
 
     document.getElementById(varName+"InfoBox").style.display = "block";
@@ -268,12 +270,30 @@ function deselect() {
     selectAction(curInfoBox, curListNum);
     document.getElementById("deselectButton").style.display = "none";
     document.getElementById("extrasInfoBox").style.display = "none";
+    document.getElementById("storyInfoBox").style.display = "none";
 }
 
 function openExtras() {
+    if(document.getElementById("extrasInfoBox").style.display === "block") {
+        deselect();
+        return;
+    }
     selectAction(curInfoBox, curListNum);
+    document.getElementById("storyInfoBox").style.display = "none";
     document.getElementById("deselectButton").style.display = "block";
     document.getElementById("extrasInfoBox").style.display = "block";
+}
+
+function openStory() {
+    if(document.getElementById("storyInfoBox").style.display === "block") {
+        deselect();
+        return;
+    }
+    selectAction(curInfoBox, curListNum);
+    document.getElementById("deselectButton").style.display = "block";
+    document.getElementById("extrasInfoBox").style.display = "none";
+    document.getElementById("storyInfoBox").style.display = "block";
+    document.getElementById("pageNum"+storyPage).style.display = "block";
 }
 
 function straightToAdd(varName, num) {

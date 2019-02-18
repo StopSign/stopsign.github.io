@@ -162,9 +162,10 @@
         </div><div id="optionsContainer" class="mainActionList extrasColor hidden" style="position:relative;width:70px;vertical-align:top;">
             <div style="display:block;text-align:center;margin-top:5px;margin-bottom:5px;" class="large bold">Options Actions</div>
             <div id="otherActionList" class="abs" style="left:0;top:50px;"></div>
-        </div><div style="width:320px;height:100%;vertical-align:top;position:relative;">
+        </div><div style="width:380px;height:100%;vertical-align:top;position:relative;">
                 <div id="deselectButton" class="abs fa fa-ban" style="left:10px;top:5px;cursor:pointer;display:none;" onclick="deselect()"></div>
                 <div id="optionsMenu" class="abs fa fa-cog" style="right:10px;top:5px;cursor:pointer;" onclick="openExtras()"></div>
+                <div id="storyMenu" class="abs fa fa-book" style="right:40px;top:5px;cursor:pointer;color:red;" onclick="openStory()"></div>
                 <div style="display:block;text-align:center;margin-top:5px;margin-bottom:5px;" class="large bold">Info Box</div>
                 <div id="defaultInfoBox" style="display:none;">
                     <div id="actionInfoDivKing" style="display:none;width:100%"></div>
@@ -193,14 +194,19 @@
                                 <div class="showthis">
                                     If you want to improve INT without messing up your action timing, use this option to keep things stable. The valid range is between 1.5 and your max. Uncheck to always use your max.
                                 </div>
-                            </div>
+                            </div><br>
                             <div class="button" onclick="exportSave()">Export Save</div><div class="button" onclick="save()">Save</div><div class="small">Auto Saving in <div id="saveTimer" class="bold"></div></div><br>
                             <div class="button" onclick="importSave()">Import Save</div> <textarea id="exportImportSave" class="listTextInput" style="width:80px;" onclick="this.select();"></textarea><br>
                         </div>
                     </div>
 
                 </div>
-
+                <div id="storyInfoBox" style="width:100%;height:189px;vertical-align:top;position:absolute;top:30px;display:none;" class="extrasColor">
+                    <div class="title">Story</div>
+                    <div class="fa fa-arrow-left abs clickable" style="left:10px;top:3px;" onclick="prevStory()"></div>
+                    <div class="fa fa-arrow-right abs clickable" style="right:10px;top:3px;" onclick="nextStory()"></div>
+                    <div id="storyContainer" style="padding:5px;"></div>
+                </div>
             </div>
 
         </div>

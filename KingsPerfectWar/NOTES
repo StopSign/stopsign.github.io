@@ -1,24 +1,25 @@
 TODO
 
+story hello world / diary
+
 save per level
     unique completions
     growth
     blessings
-test unique
 
 shrineActions
     use values in relevant places
     stop creating more at max
+test unique & shrines
+
+
 saving
     lists
     levelData
     king stats
-extras tab
-    export / import
-    discord link
-    polls
-story hello world / diary
-switching levels / level design
+
+
+level design
     tutorial improvements
         unable to click except
         highlight
@@ -27,6 +28,9 @@ switching levels / level design
     make a random level generator?
     1 time prizes of WIS/INT on *very* difficult dungeons every few levels, starting at 5
     increasing gold prizes and EXP for clearing each level to entice players to stay at peak
+extras tab
+    discord link
+    polls
 
 
 

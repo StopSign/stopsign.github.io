@@ -37,6 +37,16 @@ let tutorial = [
 ];
 
 let story = [
-    "story1",
-    "story2"
+    [
+        "story1"
+    ],
+    [
+        "story2"
+    ]
 ];
+
+let divText = "";
+for(let i = 0; i < story.length; i++) {
+    divText += "<div id='pageNum"+i+"' style='display:none'>"+story[i]+"</div>"
+}
+document.getElementById("storyContainer").innerHTML = divText;

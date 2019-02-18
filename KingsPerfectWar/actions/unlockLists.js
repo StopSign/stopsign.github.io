@@ -19,6 +19,8 @@ let unlockLists = {
         unlockLists.check(15, levelInitials[curLevel].initial.people > 0,["statLabel1", "statLabel2", "statLabel3"]);
 
         unlockLists.check(20, highestLevel >= 20,["heroesToMove"])
+
+        unlockLists.checkStory(1, true)
     },
     check: function(num, shouldUnlock, isMadeVisibleList) {
         if(!unlockList[num] && shouldUnlock) {
@@ -31,6 +33,11 @@ let unlockLists = {
                 createTooltip(tutorial[num]);
             }
             unlockList[num] = true;
+        }
+    },
+    checkStory: function(num, shouldUnlock) {
+        if(!unlockStory[num] && shouldUnlock) {
+            unlockStory[num] = true;
         }
     }
 };

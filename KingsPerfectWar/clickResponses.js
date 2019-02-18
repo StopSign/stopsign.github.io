@@ -113,6 +113,14 @@ function nextTooltip() {
     curTooltip++;
 }
 
+function prevStory() {
+
+}
+
+function nextStory() {
+
+}
+
 function closePopupBox() {
     document.getElementById("popupBox").style.display = "none";
 }

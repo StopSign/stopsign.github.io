@@ -54,7 +54,9 @@ let curInfoBox = "extras";
 let addButtons = document.getElementById("addButtons");
 let curListNum = 1;
 let unlockList = [];
+let unlockStory = [];
 let restartReason = "";
+let storyPage = 0;
 
 let totalOfflineMs = 0;
 
