@@ -114,11 +114,29 @@ function nextTooltip() {
 }
 
 function prevStory() {
-
+    document.getElementById("pageNum"+storyPage).style.display = "none";
+    let tempStoryPage = storyPage-1;
+    while(unlockStory[tempStoryPage] === undefined && tempStoryPage >= 0) {
+        tempStoryPage--;
+    }
+    if(tempStoryPage < 0) { //didn't find prev unlock
+        tempStoryPage = storyPage;
+    }
+    storyPage = tempStoryPage;
+    document.getElementById("pageNum"+storyPage).style.display = "block";
 }
 
 function nextStory() {
-
+    document.getElementById("pageNum"+storyPage).style.display = "none";
+    let tempStoryPage = storyPage+1;
+    while(unlockStory[tempStoryPage] === undefined && tempStoryPage < unlockStory.length) {
+        tempStoryPage++;
+    }
+    if(tempStoryPage >= unlockStory.length) { //didn't find next unlock
+        tempStoryPage = storyPage;
+    }
+    storyPage = tempStoryPage;
+    document.getElementById("pageNum"+storyPage).style.display = "block";
 }
 
 function closePopupBox() {

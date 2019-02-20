@@ -54,7 +54,7 @@ let curInfoBox = "extras";
 let addButtons = document.getElementById("addButtons");
 let curListNum = 1;
 let unlockList = [];
-let unlockStory = [];
+let unlockStory = []; //undefined is locked, true is new, false is seen
 let restartReason = "";
 let storyPage = 0;
 

@@ -18,9 +18,15 @@ let unlockLists = {
         unlockLists.check(14, king > 0,["directWorkerBonus"]);
         unlockLists.check(15, levelInitials[curLevel].initial.people > 0,["statLabel1", "statLabel2", "statLabel3"]);
 
-        unlockLists.check(20, highestLevel >= 20,["heroesToMove"])
+        unlockLists.check(20, highestLevel >= 20,["heroesToMove"]);
 
-        unlockLists.checkStory(1, true)
+        unlockLists.checkStory(0, true);
+        unlockLists.checkStory(1, true);
+        unlockLists.checkStory(2, true);
+        unlockLists.checkStory(3, true);
+        unlockLists.checkStory(4, true);
+        unlockLists.checkStory(5, true);
+        unlockLists.checkStory(6, true);
     },
     check: function(num, shouldUnlock, isMadeVisibleList) {
         if(!unlockList[num] && shouldUnlock) {
@@ -36,7 +42,7 @@ let unlockLists = {
         }
     },
     checkStory: function(num, shouldUnlock) {
-        if(!unlockStory[num] && shouldUnlock) {
+        if(unlockStory[num] === undefined && shouldUnlock) {
             unlockStory[num] = true;
         }
     }
