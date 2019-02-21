@@ -1,6 +1,6 @@
 'use strict';
 
-let gameSpeed = 1;
+let gameSpeed = 8;
 let bonusSpeed = 1;
 
 let curTime = new Date();
@@ -17,29 +17,24 @@ function tick() {
     let newTime = new Date();
     totalTime += newTime - curTime;
     gameTicksLeft += newTime - curTime;
+    saveTimer -= newTime - curTime;
     curTime = newTime;
 
-    saveTimer--;
     if(saveTimer < 0) {
         save();
     }
-    document.getElementById("saveTimer").innerHTML = round(saveTimer/10);
-
-    if(stop) {
-        addOffline(gameTicksLeft * .8);
-        gameTicksLeft = 0;
-        if(saveTimer % 5 === 0) { //for performance
-            view.updating.update();
-        }
-        return;
-    }
+    document.getElementById("saveTimer").innerHTML = round(saveTimer/1000);
 
     let didSomething = false; //for performance
 
     while (gameTicksLeft > (1000 / 10)) {
         if(stop) {
+            addOffline(gameTicksLeft * .8);
+            gameTicksLeft = 0;
+            view.updating.update();
             break;
         }
+
         didSomething = true;
         if(gameTicksLeft > 2000) {
             window.fps /= 2;

@@ -1,22 +1,20 @@
 TODO
 
-story hello world / diary
+shrineActions
+    use values in relevant places
+    stop creating more at max
 
 save per level
     unique completions
     growth
     blessings
-
-shrineActions
-    use values in relevant places
-    stop creating more at max
 test unique & shrines
-
 
 saving
     lists
     levelData
     king stats
+
 
 
 level design

@@ -89,8 +89,7 @@
                 <img src='img/favor.svg' class='largeIcon imageDragFix' style="vertical-align:bottom">
                 <div id="favor"></div>
                 <div class="showthis">
-                    Non-rounded Favor: <div id="actualFavor" class="bold"></div><br>
-                    Per second: <div id="favorPerSecond" class="bold"></div>
+                    Favor
                 </div>
             </div><div id="soulCContainer" class="showthat hidden" style="width:100px">
                 <img src='img/soulC.svg' class='largeIcon imageDragFix' style="vertical-align:bottom">
@@ -172,7 +171,7 @@
                     <div id="actionInfoDivCastle" style="display:none;width:100%"></div>
                     <div id="actionInfoDivUnits" style="display:none;width:100%"></div>
                 </div>
-                <div id="infoBoxList" style="width:100%;height:180px"></div>
+                <div id="infoBoxList" style="width:100%;height:180px;display:none;"></div>
                 <div id="addButtons" style="text-align:center;display:none;margin-top:-15px;">
                     <div class="button" style="margin-top:-20px;" onclick="addAction()">Add Action</div>
                 </div>
@@ -201,11 +200,12 @@
                     </div>
 
                 </div>
-                <div id="storyInfoBox" style="width:100%;height:189px;vertical-align:top;position:absolute;top:30px;display:none;overflow:auto;" class="extrasColor small">
-                    <div class="title">Story</div>
-                    <div class="fa fa-arrow-left abs clickable" style="left:10px;top:3px;" onclick="prevStory()"></div>
-                    <div class="fa fa-arrow-right abs clickable" style="right:10px;top:3px;" onclick="nextStory()"></div>
-                    <div id="storyContainer" style="padding:5px;"></div>
+                <div id="storyInfoBox" style="width:100%;height:189px;vertical-align:top;position:absolute;top:30px;display:none;overflow:scroll;overflow-x: hidden;" class="extrasColor small">
+                    <div class="title">Story<div class="medium"> - Page <div id="storyPageNum">0</div></div></div>
+                    <div id="prevStoryArrow" class="fa fa-arrow-left abs clickable" style="left:10px;top:3px;" onclick="prevStory()"></div>
+                    <div id="nextStoryArrow" class="fa fa-arrow-right abs clickable" style="right:10px;top:3px;" onclick="nextStory()"></div>
+                    <div id="storyContainer" style="padding:5px;margin-top:5px;"></div><br>
+                    <textarea id="storyDiary" style="width:350px;height:17px;" placeholder="Add to your journal" onchange="diaryChanged()"></textarea>
                 </div>
             </div>
 

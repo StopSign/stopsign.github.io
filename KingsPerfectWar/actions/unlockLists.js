@@ -44,6 +44,7 @@ let unlockLists = {
     checkStory: function(num, shouldUnlock) {
         if(unlockStory[num] === undefined && shouldUnlock) {
             unlockStory[num] = true;
+            adjustStoryDivs();
         }
     }
 };

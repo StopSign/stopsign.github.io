@@ -113,6 +113,29 @@ function nextTooltip() {
     curTooltip++;
 }
 
+function openExtras() {
+    if(document.getElementById("extrasInfoBox").style.display === "block") {
+        deselect();
+        return;
+    }
+    selectAction(curInfoBox, curListNum);
+    document.getElementById("storyInfoBox").style.display = "none";
+    document.getElementById("deselectButton").style.display = "block";
+    document.getElementById("extrasInfoBox").style.display = "block";
+}
+
+function openStory() {
+    if(document.getElementById("storyInfoBox").style.display === "block") {
+        deselect();
+        return;
+    }
+    selectAction(curInfoBox, curListNum);
+    document.getElementById("deselectButton").style.display = "block";
+    document.getElementById("extrasInfoBox").style.display = "none";
+    document.getElementById("storyInfoBox").style.display = "block";
+    adjustStoryDivs();
+}
+
 function prevStory() {
     document.getElementById("pageNum"+storyPage).style.display = "none";
     let tempStoryPage = storyPage-1;
@@ -123,7 +146,7 @@ function prevStory() {
         tempStoryPage = storyPage;
     }
     storyPage = tempStoryPage;
-    document.getElementById("pageNum"+storyPage).style.display = "block";
+    adjustStoryDivs();
 }
 
 function nextStory() {
@@ -136,7 +159,40 @@ function nextStory() {
         tempStoryPage = storyPage;
     }
     storyPage = tempStoryPage;
+    adjustStoryDivs();
+}
+
+function adjustStoryDivs() {
     document.getElementById("pageNum"+storyPage).style.display = "block";
+    document.getElementById("storyPageNum").innerHTML = storyPage;
+    document.getElementById("storyDiary").value = storyDiary[storyPage] === undefined ? "" : storyDiary[storyPage];
+    unlockStory[storyPage] = false;
+    let newStoryFound = false;
+    for(let i = 0; i < unlockStory.length; i++) {
+        if(unlockStory[i]) {
+            newStoryFound = true;
+            break;
+        }
+    }
+    if(newStoryFound) {
+        document.getElementById("storyMenu").style.color = "red";
+    } else {
+        document.getElementById("storyMenu").style.color = "black";
+    }
+    if(storyPage === 0) {
+        addClassToDiv(document.getElementById("prevStoryArrow"), "hidden");
+    } else {
+        removeClassFromDiv(document.getElementById("prevStoryArrow"), "hidden");
+    }
+    if(storyPage >= unlockStory.length - 1) {
+        addClassToDiv(document.getElementById("nextStoryArrow"), "hidden");
+    } else {
+        removeClassFromDiv(document.getElementById("nextStoryArrow"), "hidden");
+    }
+}
+
+function diaryChanged() {
+    storyDiary[storyPage] = document.getElementById("storyDiary").value;
 }
 
 function closePopupBox() {

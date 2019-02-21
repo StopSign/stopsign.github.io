@@ -576,7 +576,7 @@ let view = {
                             let costDesc = view.helpers.getCostsString(action.cost);
                             let desc = action.desc + "<br>" + costDesc;
                             if(action.max) {
-                                desc += " Can receive up to " + action.max + " times.";
+                                desc += " Can receive bonus up to " + action.max + " times.";
                             }
 
                             let tributeOuter = !action.tribute ? "" :  '<div class="abs showthat" style="left:35px;top:5px;width:50px">' +
@@ -595,7 +595,7 @@ let view = {
 
                             let tributeInfo = !action.tribute ? "" :
                                 '<div style="width:100%;height:17px;background-color:rgb(243,229,255);">' +
-                                    '<div id="'+action.varName+'TributeBar" class="abs" style="left:0;top:0;width:20%;height:100%;background-color:rgb(216,185,232);"></div>' +
+                                    '<div id="'+action.varName+'TributeBar" style="position:relative;left:0;top:0;width:20%;height:100%;background-color:rgb(216,185,232);"></div>' +
                                     '<div id="'+action.varName+'TributeString" class="abs" style="left:5px"></div>' +
                                 '</div>';
                             let backgroundColor = action.listNum === 0 ? "kingColorH" : (action.listNum === 1 ? "castleColorH" : "extrasColor");

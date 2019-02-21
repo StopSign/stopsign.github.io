@@ -36,7 +36,7 @@ window.language = "eng";
 window.addAmount = 1;
 
 let curLevel = 0;
-let highestLevel = 0;
+let highestLevel = 4;
 let mana = 1200;
 let maxMana = 1200;
 let totalTime = 0;
@@ -55,6 +55,7 @@ let addButtons = document.getElementById("addButtons");
 let curListNum = 1;
 let unlockList = [];
 let unlockStory = []; //undefined is locked, true is new, false is seen
+let storyDiary = [];
 let restartReason = "";
 let storyPage = 0;
 
@@ -88,7 +89,7 @@ function load() {
 
 function save() {
     let toSave = {};
-    saveTimer = 2000;
+    saveTimer = 60000;
 
 
     toSave.date = new Date();
@@ -193,6 +194,7 @@ function createActionListsFromSimplifiedList(simplifiedList) {
         if (actionsList.next.hasOwnProperty(property) && simplifiedList[property]) {
             actionsList.next[property] = [];
             actionsList.current[property] = [];
+            actions.validActions = [0, 0, 0];
             let num = property === "king" ? 0 : (property === "castle" ? 1 : 2);
             actions.refresh(num);
             listToActions(simplifiedList[property], num);

@@ -73,7 +73,7 @@ function createLevel(num) {
 
 let nameCounter = 0;
 function chooseNextName() {
-    let list = ["Hellforth", "Barongar", "Umtriul", "Sepheern", "Yidden", "Ternum", "Sphelpheim"];
+    let list = ["Hrongar", "Hullfirth", "Barongar", "Umtriul", "Sepheern", "Yidden", "Ternum", "Sphelpheim", "Beckton", "Glanchester", "Dalry", "Newham", "Lingmell", "Greenflower", "Bullmar", "Accreton"];
     if(nameCounter >= list.length) {
         return "Ancient Ruins";
     }
@@ -81,8 +81,52 @@ function chooseNextName() {
 }
 
 levelInitials = [
-    { //1
-        name: "Hrongar",
+    { //debug
+        name: chooseNextName(),
+        initial: {
+            people:30,
+            gold: 50000,
+            wood: 50000,
+            mana: 5000
+        },
+        home: {
+            coords: { x: 90, y: 30},
+            units: { king: 1 }
+        },
+        dungeons:[
+        ],
+        hideouts:[
+            {
+                units: { thug:11 },
+                reward: [
+                    {
+                        type:"mana",
+                        amount:1200
+                    },
+                    {
+                        type:"gold",
+                        amount:500
+                    },
+                    {
+                        type:"wood",
+                        amount:400
+                    }
+                ],
+                coords:{x:140, y:50}
+            },
+            {
+                units: { thug:2 },
+                reward: [{
+                    type:"exp",
+                    amount:300,
+                    unique:true
+                }],
+                coords:{x:0, y:100}
+            }
+        ]
+    },
+    { //0
+        name: chooseNextName(),
         initial: {
             people:0,
             gold: 0,
@@ -107,7 +151,7 @@ levelInitials = [
             }
         ]
     },
-    { //2
+    { //1
         name: chooseNextName(),
         initial: {
             people:0,
@@ -151,7 +195,7 @@ levelInitials = [
             }
         ]
     },
-    { //3
+    { //2
         name: chooseNextName(),
         initial: {
             people:0,
@@ -200,7 +244,7 @@ levelInitials = [
             }
         ]
     },
-    { //4
+    { //3
         name: chooseNextName(),
         initial: {
             people:30, //5270

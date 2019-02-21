@@ -9,10 +9,10 @@ actionData = {
             }
 
             if(!action.unlocked) {
-                action.unlocked = function() { return highestLevel >= 99; }
+                action.unlocked = function() { return true; } //highestLevel >= 99; }
             }
             if(!action.visible) {
-                action.visible = function() { return highestLevel >= 99; }
+                action.visible = function() { return true; } //highestLevel >= 99; }
             }
 
             if(!action.seconds) {
@@ -359,7 +359,7 @@ actionData = {
                 actionData.create.castleAction({
                     varName:"altar",
                     name:"Build Altar",
-                    desc:"Gives +1 Favor per second.",
+                    desc:"Gives +1 Favor. The King gains Tribute equal to Favor when they complete a Blessing.",
                     cost: [
                         {
                             resource:"wood",
@@ -380,7 +380,7 @@ actionData = {
                 actionData.create.castleAction({
                     varName:"shrine",
                     name:"Build Shrine",
-                    desc:"Gives +5 Favor per second.",
+                    desc:"Gives +5 Favor. The King gains Tribute equal to Favor when they complete a Blessing.",
                     cost: [
                         {
                             resource:"wood",
@@ -401,7 +401,7 @@ actionData = {
                 actionData.create.castleAction({
                     varName:"ritual",
                     name:"Perform Ritual",
-                    desc:"Give wood back to the forest in ever-larger effigies. Doubles favor gain.",
+                    desc:"Give wood back to the forest in ever-larger effigies. Doubles favor.",
                     cost: [
                         {
                             resource:"wood",
@@ -553,7 +553,7 @@ actionData = {
                         return levelData.data.people >= 0;
                     },
                     unlocked: function() { return levelInitials[curLevel].initial.people > 0; },
-                    unlocked: function() { return levelInitials[curLevel].initial.people > 0; }
+                    visible: function() { return levelInitials[curLevel].initial.people > 0; }
                 });
 
                 actionData.create.kingAction({
@@ -585,8 +585,8 @@ actionData = {
                 actionData.create.blessingAction({
                     varName:"enchant",
                     name:"Faerie Enchantments",
-                    desc:"+20% atk all units, 100 points + 100 each time",
-                    tribute:100,
+                    desc:"+20% atk all units, 10 points + 10 each time",
+                    tribute:10,
                     cost: [],
                     max: 5,
                     seconds:5,
@@ -597,9 +597,9 @@ actionData = {
                 actionData.create.blessingAction({
                     varName:"feast",
                     name:"Blessed Feasts",
-                    desc:"+20% hp all units, 100 points + 100 each time",
+                    desc:"+20% hp all units, 10 points + 10 each time",
                     cost: [],
-                    tribute:100,
+                    tribute:10,
                     max: 5,
                     seconds:5,
                     xPos:155,

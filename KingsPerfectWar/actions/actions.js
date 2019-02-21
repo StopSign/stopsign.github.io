@@ -107,7 +107,7 @@ let actions = {
         let currentList = actionsList.current[name];
         let modified = false;
         for(let j = 0; j < nextList.length; j++) {
-            let curAction = actionsList.current[name][j];
+            let curAction = currentList[j];
             if(this.validActions[num] > j || //only modify untouched ones
                 (this.validActions[num] === j && curAction && (curAction.manaUsed !== 0 || curAction.loopsLeft !== curAction.loops))) { //and ones not currently updating
                 continue;
@@ -115,7 +115,7 @@ let actions = {
             modified = true;
             let action = copyArray(nextList[j]);
             translateNextToCurrent(action, name);
-            actionsList.current[name][j] = action;
+            currentList[j] = action;
         }
         if(this.validActions[num] !== -1 && this.validActions[num] < nextList.length && currentList.length !== nextList.length) { //remove extra actions from current list
             modified = true;
@@ -239,9 +239,11 @@ function selectAction(varName, num) {
         varName = "default";
         addButtons.style.display = "none";
         document.getElementById("deselectButton").style.display = "none";
+        document.getElementById("infoBoxList").style.display = "none";
     } else {
         addButtons.style.display = "block";
         document.getElementById("deselectButton").style.display = "block";
+        document.getElementById("infoBoxList").style.display = "block";
         document.getElementById("extrasInfoBox").style.display = "none";
         document.getElementById("storyInfoBox").style.display = "none";
     }
@@ -271,29 +273,6 @@ function deselect() {
     document.getElementById("deselectButton").style.display = "none";
     document.getElementById("extrasInfoBox").style.display = "none";
     document.getElementById("storyInfoBox").style.display = "none";
-}
-
-function openExtras() {
-    if(document.getElementById("extrasInfoBox").style.display === "block") {
-        deselect();
-        return;
-    }
-    selectAction(curInfoBox, curListNum);
-    document.getElementById("storyInfoBox").style.display = "none";
-    document.getElementById("deselectButton").style.display = "block";
-    document.getElementById("extrasInfoBox").style.display = "block";
-}
-
-function openStory() {
-    if(document.getElementById("storyInfoBox").style.display === "block") {
-        deselect();
-        return;
-    }
-    selectAction(curInfoBox, curListNum);
-    document.getElementById("deselectButton").style.display = "block";
-    document.getElementById("extrasInfoBox").style.display = "none";
-    document.getElementById("storyInfoBox").style.display = "block";
-    document.getElementById("pageNum"+storyPage).style.display = "block";
 }
 
 function straightToAdd(varName, num) {
