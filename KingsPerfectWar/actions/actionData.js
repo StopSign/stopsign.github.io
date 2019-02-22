@@ -125,6 +125,9 @@ actionData = {
                 return gold >= this.costgold && wood >= this.costwood && mana >= this.costmana && (!this.createdWith || created[this.createdWith] > 0);
             };
             action.listNum = 1;
+            if(action.createdWith) {
+                action.desc += "<br><div class='button hidden medium' id='"+action.varName+"EmpowerButton' style='margin-top:3px;' onclick='openEmpowerMenu()'>Empower Menu</div>"
+            }
 
             actionData.create.actionBase(action);
         },
@@ -289,25 +292,6 @@ actionData = {
                 });
 
                 actionData.create.castleAction({
-                    varName:"spearman",
-                    name:"Equip Spearman",
-                    desc:"The meat of your army, they'll take damage before your other units. Cost is multiplied by number of barracks.",
-                    cost: [
-                        {
-                            resource:"wood",
-                            type:"static",
-                            starting:200
-                        }
-                    ],
-                    createdWith:"barracks",
-                    seconds:5,
-                    xPos:205,
-                    yPos:0,
-                    unlocked: function() { return gold > 0; },
-                    visible: function() { return gold > 0; }
-                });
-
-                actionData.create.castleAction({
                     varName:"range",
                     name:"Build Archery Range",
                     desc:"Train archers here to take enemies down from behind the front line. Each archery range increases archers trained by 1, and increases the cost accordingly..",
@@ -321,23 +305,6 @@ actionData = {
                     ],
                     seconds:10,
                     xPos:145,
-                    yPos:55
-                });
-
-                actionData.create.castleAction({
-                    varName:"archer",
-                    name:"Train Archer",
-                    desc:"Elite archers capable of dealing death to your enemies. Requires archery range.",
-                    cost: [
-                        {
-                            resource:"wood",
-                            type:"static",
-                            starting:1000
-                        }
-                    ],
-                    createdWith:"range",
-                    seconds:10,
-                    xPos:205,
                     yPos:55
                 });
 
@@ -359,9 +326,45 @@ actionData = {
                 });
 
                 actionData.create.castleAction({
+                    varName:"spearman",
+                    name:"Equip Spearman",
+                    desc:"The meat of your army, they'll take damage before your other units. Cost is multiplied by number of barracks.",
+                    cost: [
+                        {
+                            resource:"wood",
+                            type:"static",
+                            starting:200
+                        }
+                    ],
+                    createdWith:"barracks",
+                    seconds:5,
+                    xPos:205,
+                    yPos:0,
+                    unlocked: function() { return gold > 0; },
+                    visible: function() { return gold > 0; }
+                });
+
+                actionData.create.castleAction({
+                    varName:"archer",
+                    name:"Train Archer",
+                    desc:"Elite archers capable of dealing death to your enemies. Cost is multiplied by number of archery ranges.",
+                    cost: [
+                        {
+                            resource:"wood",
+                            type:"static",
+                            starting:1000
+                        }
+                    ],
+                    createdWith:"range",
+                    seconds:10,
+                    xPos:205,
+                    yPos:55
+                });
+
+                actionData.create.castleAction({
                     varName:"catapult",
                     name:"Build Catapult",
-                    desc:"For when you have a lot of enemies to kill and a lot of resoures to throw at the problem. Requires designer.",
+                    desc:"For when you have a lot of enemies to kill and a lot of resoures to throw at the problem. Cost is multiplied by number of designers.",
                     cost: [
                         {
                             resource:"wood",
@@ -394,7 +397,9 @@ actionData = {
                     ],
                     seconds:10,
                     xPos:275,
-                    yPos:0
+                    yPos:0,
+                    unlocked: function() { return highestLevel >= 10; },
+                    visible: function() { return highestLevel >= 10; }
                 });
 
                 actionData.create.castleAction({
@@ -415,7 +420,9 @@ actionData = {
                     ],
                     seconds:20,
                     xPos:275,
-                    yPos:55
+                    yPos:55,
+                    unlocked: function() { return highestLevel >= 10; },
+                    visible: function() { return highestLevel >= 10; }
                 });
 
                 actionData.create.castleAction({
@@ -432,7 +439,9 @@ actionData = {
                     ],
                     seconds:20,
                     xPos:275,
-                    yPos:110
+                    yPos:110,
+                    unlocked: function() { return highestLevel >= 10; },
+                    visible: function() { return highestLevel >= 10; }
                 });
             }
         },

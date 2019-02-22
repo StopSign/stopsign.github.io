@@ -13,7 +13,7 @@ let unlockLists = {
         unlockLists.check(5, highestLevel >= 2);
         unlockLists.check(6, curLevel >= 2, ["castleLabel2"]);
         unlockLists.check(7, created.altar > 0, ["favorContainer"]);
-        unlockLists.check(8, soulC > 0, ["soulCContainer"]);
+        unlockLists.check(8, soulC > 0, ["soulCContainer", "spearmanEmpowerButton", "archerEmpowerButton", "catapultEmpowerButton"]);
 
         unlockLists.check(14, king > 0,["directWorkerBonus"]);
         unlockLists.check(15, levelInitials[curLevel].initial.people > 0,["statLabel1", "statLabel2", "statLabel3"]);

@@ -199,6 +199,13 @@ function closePopupBox() {
     document.getElementById("popupBox").style.display = "none";
 }
 
+function openEmpowerMenu() {
+    document.getElementById("empowerMenu").style.display = "block";
+}
+function closeEmpowerMenu() {
+    document.getElementById("empowerMenu").style.display = "none";
+}
+
 function setLoop(index, num) {
     let listName = actionsList.nextNames[num];
     let theList = actionsList.next[listName];

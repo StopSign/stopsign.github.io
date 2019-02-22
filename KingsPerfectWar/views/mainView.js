@@ -28,7 +28,7 @@ let view = {
             prevState.maxMana = maxMana;
             prevState.gold = gold;
             prevState.wood = wood;
-            prevState.favor = favor;
+            prevState.soulC = soulC;
             prevState.next = copyArray(actionsList.next);
             prevState.current = copyArray(actionsList.current);
             prevState.created = copyArray(created);
@@ -60,7 +60,10 @@ let view = {
                 document.getElementById("actualWood").innerHTML = round5(wood);
                 document.getElementById("woodPerSecond").innerHTML = round5(woodToAdd/10);
             }
-
+            if(prevState.soulC !== soulC) {
+                document.getElementById("soulC").innerHTML = intToString(soulC, 1);
+                document.getElementById("actualSoulC").innerHTML = round5(soulC);
+            }
         },
         updateLists: function() {
             for (let i = 0; i < actionsList.nextNames.length; i++) {

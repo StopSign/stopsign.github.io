@@ -1,14 +1,35 @@
 TODO
 
-shrineActions
-    use values in relevant places
-    stop creating more at max
+Empower Menu
+    icon | name | + level - | amount | cost | base attack, hp
+    attack, hp increases 10x per level
+    cost increaes 100x per level
+    When building a unit of that type, takes the highest empowered type first
+    resets available when reset
+
+Soul Crystals
+    purpose
+        a feature that uses gold buildup of a run
+        extra gold becomes soul crystals (prestige currency), use for super strong units
+    specifics
+        every 1k extra gold becoems 1 soul crystal
+        first units built become highest tier
+        units
+            1000 SC - spearman x10
+            5000 SC - archer x10
+            15k SC - catapult x10
+            100k SC - spearman x100
+            500k SC - archer x100
+            1.5m SC - cata x100
+            etc.
 
 save per level
     unique completions
     growth
     blessings
-test unique & shrines
+test unique & shrines per level
+
+bug - ensure all hideouts are dead before next level unlocks
 
 saving
     lists
@@ -34,23 +55,6 @@ extras tab
 
 
 
-
-Soul Crystals
-    purpose
-        a feature that uses gold buildup of a run
-        extra gold becomes soul crystals (prestige currency), use for super strong units
-    specifics
-        every 1k extra gold becoems 1 soul crystal
-        first units built become highest tier
-        these are king actions that take 20*(tier) seconds each
-        units
-            1000 SC - spearman x10
-            5000 SC - archer x10
-            15k SC - catapult x10
-            100k SC - spearman x100
-            500k SC - archer x100
-            1.5m SC - cata x100
-            etc.
 heroes
     purpose
         Make combat more interesting and less one-dimensional

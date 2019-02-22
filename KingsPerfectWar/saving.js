@@ -42,6 +42,7 @@ let maxMana = 1200;
 let totalTime = 0;
 let gold = 0;
 let wood = 0;
+let soulC = 0;
 let buildAuraValue = 1.5;
 let highestListsLength = 8;
 
