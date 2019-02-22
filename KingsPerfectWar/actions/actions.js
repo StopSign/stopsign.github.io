@@ -194,11 +194,7 @@ function translateNextToCurrent(action, name) {
     action.visible = actionDatum.visible;
     action.unlocked = actionDatum.unlocked;
     action.canBuy = actionDatum.canBuy;
-    action.spend = function () {
-        gold -= action.costgold;
-        wood -= action.costwood;
-        mana -= action.costmana;
-    };
+    action.spend = actionDatum.spend;
 }
 
 function getActionByVarName(varName, list) {

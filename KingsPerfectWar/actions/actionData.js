@@ -31,9 +31,18 @@ actionData = {
                 created[action.varName] = 0;
             }
 
-            action.canBuy = function() {
-                return gold >= this.costgold && wood >= this.costwood && mana >= this.costmana;
-            };
+            if(!action.canBuy) {
+                action.canBuy = function () {
+                    return gold >= this.costgold && wood >= this.costwood && mana >= this.costmana;
+                };
+            }
+            if(!action.spend) {
+                action.spend = function () {
+                    gold -= this.costgold;
+                    wood -= this.costwood;
+                    mana -= this.costmana;
+                };
+            }
 
             if(action.listNum === 0) {
                 actionData.list.king.push(action);
@@ -64,10 +73,6 @@ actionData = {
             if(!action.buy) {
                 action.buy = function () {
                     let favor = shrine.helpers.calcFavor();
-                    if (wood < favor * 10) {
-                        return;
-                    }
-                    wood -= favor * 10;
                     levelData.shrine[this.varName + "Tribute"] = round5(levelData.shrine[this.varName + "Tribute"] +
                         favor * shrine.helpers.calcTributeBonus(this.varName));
                     if (levelData.shrine[this.varName + "Tribute"] >= levelData.shrine[this.varName + "TributeNeeded"]) {
@@ -78,15 +83,30 @@ actionData = {
                         } else {
                             levelData.shrine[this.varName + "TributeNeeded"] += this.tribute;
                         }
+                        warMap.units.updateExistingUnitStats();
                     }
                 }
             }
+            if(!action.canBuy) {
+                action.canBuy = function() {
+                    return created[this.varName] < action.max && wood >= shrine.helpers.calcFavor() * 100;
+                }
+            }
+            action.spend = function() {
+                wood -= shrine.helpers.calcFavor() * 100;
+            };
+            if(!action.unlocked) {
+                action.unlocked = function() { return highestLevel >= 10; };
+                action.visible = function() { return highestLevel >= 10; };
+            }
+
             action.listNum = 0;
 
             actionData.create.actionBase(action);
         },
         warMapAction: function(action) {
             action.listNum = 0;
+            //UNUSED - placeholder in case I want to join Units list?
 
             actionData.create.actionBase(action);
         },
@@ -359,7 +379,7 @@ actionData = {
                 actionData.create.castleAction({
                     varName:"altar",
                     name:"Build Altar",
-                    desc:"Gives +1 Favor. The King gains Tribute equal to Favor when they complete a Blessing.",
+                    desc:"Gives +1 Favor. The Blessing gains Tribute equal to Favor, plus 10% more for each time you've completed that level's Blessing.",
                     cost: [
                         {
                             resource:"wood",
@@ -380,7 +400,7 @@ actionData = {
                 actionData.create.castleAction({
                     varName:"shrine",
                     name:"Build Shrine",
-                    desc:"Gives +5 Favor. The King gains Tribute equal to Favor when they complete a Blessing.",
+                    desc:"Gives +5 Favor. The Blessing gains Tribute equal to Favor, plus 10% more for each time you've completed that level's Blessing.",
                     cost: [
                         {
                             resource:"wood",
@@ -470,11 +490,7 @@ actionData = {
                     yPos:0,
                     buy: function() {
                         king.curData.rflxCur += (king.savedData.rflxCap - king.curData.rflxCur)/100;
-                        let kingUnit = warMap.units.getKingUnit();
-                        if(kingUnit) {
-                            kingUnit.atk = king.curData.rflxCur;
-                            kingUnit.hp = king.curData.rflxCur*10;
-                        }
+                        warMap.units.updateExistingUnitStats();
                     },
                     unlocked: function() { return curLevel >= 1; },
                     visible: function() { return curLevel >= 1; }
@@ -585,7 +601,7 @@ actionData = {
                 actionData.create.blessingAction({
                     varName:"enchant",
                     name:"Faerie Enchantments",
-                    desc:"+20% atk all units, 10 points + 10 each time",
+                    desc:"+20% atk all units, 10 points + 10 each time. Costs 100 wood per favor.",
                     tribute:10,
                     cost: [],
                     max: 5,
@@ -597,7 +613,7 @@ actionData = {
                 actionData.create.blessingAction({
                     varName:"feast",
                     name:"Blessed Feasts",
-                    desc:"+20% hp all units, 10 points + 10 each time",
+                    desc:"+20% hp all units, 10 points + 10 each time. Costs 100 wood per favor.",
                     cost: [],
                     tribute:10,
                     max: 5,
@@ -609,9 +625,9 @@ actionData = {
                 actionData.create.blessingAction({
                     varName:"guidance",
                     name:"Faerie Guidance",
-                    desc:"+20% spd all units, 300 points + 300 each time",
+                    desc:"+20% spd all units, 30 points + 30 each time. Costs 100 wood per favor.",
                     cost: [],
-                    tribute:300,
+                    tribute:30,
                     max: 15,
                     seconds:5,
                     xPos:155,
@@ -621,9 +637,9 @@ actionData = {
                 actionData.create.blessingAction({
                     varName:"peace",
                     name:"Peaceful Aura",
-                    desc:"+10% gold all buildings, levels 5/10/15 unlock buildings. 50+ points",
+                    desc:"+10% gold all buildings. 5 points + 5 each time. Costs 100 wood per favor.",
                     cost: [],
-                    tribute:50,
+                    tribute:5,
                     max: 15,
                     seconds:5,
                     xPos:215,
@@ -633,9 +649,9 @@ actionData = {
                 actionData.create.blessingAction({
                     varName:"bounty",
                     name:"Nature's Bounty",
-                    desc:"+10% wood all buildings, levels 5/10/15 unlock buildings. 50+ points",
+                    desc:"+10% wood all buildings. 5 points + 5 each time. Costs 100 wood per favor.",
                     cost: [],
-                    tribute:50,
+                    tribute:5,
                     max: 15,
                     seconds:5,
                     xPos:215,
@@ -645,13 +661,15 @@ actionData = {
                 actionData.create.blessingAction({
                     varName:"heroes",
                     name:"Empower Forest Champion",
-                    desc:"100 * 10 each time, 3 max",
+                    desc:"100 * 10 each time, 3 max. Costs 100 wood per favor.",
                     cost: [],
                     tribute:100,
                     max: 3,
                     seconds:5,
                     xPos:215,
-                    yPos:110
+                    yPos:110,
+                    unlocked: function() { return highestLevel >= 50; }, //TODO eventually
+                    visible: function() { return highestLevel >= 50; }
                 });
             }
         },

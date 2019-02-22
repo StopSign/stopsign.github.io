@@ -107,7 +107,7 @@ let warMap = {
             if(varName === "king") {
                 return { atk: king.curData.rflxCur, hp: king.curData.rflxCur*10 };
             }
-            return warMap.units.unitStats[varName]; //TODO buffs go here
+            return warMap.units.unitStats[varName];
         },
         createUnit: function(varName, isFriendly, startingLoc, amount) {
             let unit = {};
@@ -121,14 +121,9 @@ let warMap = {
             }
             unit.isFriendly = isFriendly;
             unit.amount = amount;
-            let stats = warMap.units.getStatsOfUnit(unit.varName);
-            unit.atk = stats.atk;
-            unit.hp = stats.hp;
-            unit.maxHp = stats.hp;
-            if(stats.exp) {
-                unit.exp = stats.exp;
-            }
-            unit.speed = 2; //DEBUG 2
+
+            warMap.units.applyUnitStats(unit);
+
             if(startingLoc) {
                 let base = warMap.bases.baseNameToObj(startingLoc);
                 base.units.push(unit);
@@ -253,6 +248,34 @@ let warMap = {
         },
         sortHpLowestToHighest: function(unitList) {
             unitList.sort((unit1,unit2) => unit1.maxHp !== unit2.maxHp ? unit1.maxHp - unit2.maxHp : unit1.hp - unit2.hp );
+        },
+        updateExistingUnitStats: function() {
+            warMap.units.getAllUnits().forEach(function(unit) {
+                if(!unit.isFriendly) {
+                    return;
+                }
+                warMap.units.applyUnitStats(unit);
+            });
+        },
+        applyUnitStats: function(unit) {
+            let attackBonus = 1 + (2 * created.enchant)/10;
+            let hpBonus = 1 + (2 * created.feast)/10;
+            let speedBonus = 1 + (2 * created.guidance)/10;
+            if(!unit.isFriendly) {
+                attackBonus = 1;
+                hpBonus = 1;
+                speedBonus = 1;
+            }
+
+            let unitStats = warMap.units.getStatsOfUnit(unit.varName);
+            unit.atk = unitStats.atk * attackBonus;
+            let damageTaken = unit.hp ? unit.maxHp - unit.hp : 0;
+            unit.maxHp = unitStats.hp * hpBonus;
+            unit.hp = unitStats.hp * hpBonus - damageTaken;
+            unit.speed = 2 * speedBonus;
+            if(unitStats.exp) {
+                unit.exp = unitStats.exp;
+            }
         }
     },
     bases: {

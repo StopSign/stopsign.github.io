@@ -372,9 +372,9 @@ let view = {
             actionData.get.blessingActions().forEach(function (action) {
                 let varName = action.varName;
                 if(noPrevShrine || baseFavorChanged || prevState.levelData.shrine[varName+"Tribute"] !== levelData.shrine[varName+"Tribute"]) {
-                    document.getElementById(varName + "TributeString").innerHTML = "<b>"+levelData.shrine[varName+"Tribute"]+"</b> / <b>" + levelData.shrine[varName+"TributeNeeded"] + "</b> tribute";
+                    document.getElementById(varName + "TributeString").innerHTML = "<b>"+round1(levelData.shrine[varName+"Tribute"])+"</b> / <b>" + levelData.shrine[varName+"TributeNeeded"] + "</b> tribute";
                     document.getElementById(varName + "TributeBar").style.width = (100 * levelData.shrine[varName+"Tribute"] / levelData.shrine[varName+"TributeNeeded"])+"%";
-                    document.getElementById(varName + "TributeGain").innerHTML = round(shrine.helpers.calcFavor() * shrine.helpers.calcTributeBonus(varName));
+                    document.getElementById(varName + "TributeGain").innerHTML = "+" + round1(shrine.helpers.calcFavor() * shrine.helpers.calcTributeBonus(varName));
                     document.getElementById(varName + "Num").innerHTML = created[varName];
                 }
                 if(noPrevShrine || JSON.stringify(prevState.levelSave.shrine[varName]) !== JSON.stringify(levelSave[curLevel].shrine[varName])) {
@@ -579,9 +579,9 @@ let view = {
                                 desc += " Can receive bonus up to " + action.max + " times.";
                             }
 
-                            let tributeOuter = !action.tribute ? "" :  '<div class="abs showthat" style="left:35px;top:5px;width:50px">' +
-                                '+<div class="bold hyperVisible small" id="'+action.varName+'TributeGain">1.00</div>' +
-                                '<div class="showthisUp" id="'+action.varName+'BonusTooltip" style="width:150px"></div>' +
+                            let tributeOuter = !action.tribute ? "" :  '<div class="abs showthat" style="right:-10px;top:5px">' +
+                                '<div class="bold hyperVisible small" id="'+action.varName+'TributeGain">1.00</div>' +
+                                '<div class="showthisUp small" id="'+action.varName+'BonusTooltip" style="width:200px"></div>' +
                                 '</div>';
 
                             divText[property] +=

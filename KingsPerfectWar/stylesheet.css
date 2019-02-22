@@ -339,6 +339,7 @@ input {
     width:30px;
     height:9px;
     font-size:10px;
+    vertical-align:top;
 }
 
 .tabSleep {
