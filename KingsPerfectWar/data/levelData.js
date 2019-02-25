@@ -68,8 +68,6 @@ function createLevel(num) {
             }
         }
     }
-
-
 }
 
 let nameCounter = 0;
@@ -82,50 +80,42 @@ function chooseNextName() {
 }
 
 levelInitials = [
-    { //debug
-        name: chooseNextName(),
-        initial: {
-            people:30,
-            gold: 50000,
-            wood: 50000,
-            mana: 5000
-        },
-        home: {
-            coords: { x: 90, y: 30},
-            units: { king: 1 }
-        },
-        dungeons:[
-        ],
-        hideouts:[
-            {
-                units: { thug:11 },
-                reward: [
-                    {
-                        type:"mana",
-                        amount:1200
-                    },
-                    {
-                        type:"gold",
-                        amount:500
-                    },
-                    {
-                        type:"wood",
-                        amount:400
-                    }
-                ],
-                coords:{x:140, y:50}
-            },
-            {
-                units: { thug:2 },
-                reward: [{
-                    type:"exp",
-                    amount:300,
-                    unique:true
-                }],
-                coords:{x:0, y:100}
-            }
-        ]
-    },
+    // { //debug
+    //     name: chooseNextName(),
+    //     initial: {
+    //         people:30,
+    //         gold: 50000,
+    //         wood: 50000,
+    //         mana: 5000
+    //     },
+    //     home: {
+    //         coords: { x: 90, y: 30},
+    //         units: { king: 1 }
+    //     },
+    //     dungeons:[
+    //     ],
+    //     hideouts:[
+    //         {
+    //             units: { thug:1 },
+    //             reward: [
+    //                 {
+    //                     type:"gold",
+    //                     amount:1e10,
+    //                     unique:true
+    //                 }
+    //             ],
+    //             coords:{x:140, y:50}
+    //         },
+    //         {
+    //             units: { thug:2 },
+    //             reward: [{
+    //                 type:"exp",
+    //                 amount:300
+    //             }],
+    //             coords:{x:140, y:20}
+    //         }
+    //     ]
+    // },
     { //0
         name: chooseNextName(),
         initial: {

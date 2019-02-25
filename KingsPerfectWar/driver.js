@@ -140,7 +140,7 @@ function unpauseGame() {
 
 function restart() {
     king.curData.rflxCur = king.savedData.rflxInitial;
-    if(levelSave[curLevel]) {
+    if(levelSave[curLevel] && levelData.data) {
         king.saveHighestPerson();
         shrine.helpers.saveHighestBlessings();
     }
@@ -166,4 +166,5 @@ function restart() {
     unlockLists.checkUnlocks();
 
     prevState = {};
+    save();
 }

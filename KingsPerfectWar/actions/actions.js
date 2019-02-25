@@ -40,7 +40,7 @@ let actions = {
                 console.log("????");
                 continue;
             }
-            if(action.manaUsed === 0 && action.buy) {
+            if(action.manaUsed === 0 && action.spend) {
                 action.spend(); //spend as soon as action starts
                 if(action.start) {
                     action.start();
@@ -105,27 +105,21 @@ let actions = {
         let name = actionsList.nextNames[num];
         let nextList = actionsList.next[name];
         let currentList = actionsList.current[name];
-        let modified = false;
         for(let j = 0; j < nextList.length; j++) {
             let curAction = currentList[j];
             if(this.validActions[num] > j || //only modify untouched ones
                 (this.validActions[num] === j && curAction && (curAction.manaUsed !== 0 || curAction.loopsLeft !== curAction.loops))) { //and ones not currently updating
                 continue;
             }
-            modified = true;
             let action = copyArray(nextList[j]);
             translateNextToCurrent(action, name);
             currentList[j] = action;
         }
         if(this.validActions[num] !== -1 && this.validActions[num] < nextList.length && currentList.length !== nextList.length) { //remove extra actions from current list
-            modified = true;
             currentList.splice(nextList.length, currentList.length - nextList.length);
         }
 
         adjustCosts(num);
-        if(modified) { //save the action order when it changes
-            levelSave[curLevel].nextLists = listsToSimplified();
-        }
     }
 };
 
@@ -172,7 +166,7 @@ function translateNextToCurrent(action, name) {
     action.loopsLeft = action.loops;
     action.manaUsed = 0;
     action.failed = 0;
-    action.failReason = "";
+    action.failedReason = "";
 
     let actionDatum = getActionByVarName(action.varName, name);
     action.name = actionDatum.name;
@@ -283,6 +277,7 @@ function addAction() {
         curListNum = curList;
     }
     addActionToList(curInfoBox, curListNum, true);
+    levelSave[curLevel].nextLists = listsToSimplified();
 }
 
 //loopCount and unitsToMove are for loading list from simple
@@ -303,10 +298,13 @@ function addActionToList(varName, num, switchLists, loopCount, unitsToMove) {
     }
     let listName = actionsList.nextNames[num];
     let action = getActionByVarName(varName, listName);
+    if(!action || JSON.stringify(action) === "{}") {
+        console.log("Couldn't find action " + varName); //importing wrong actions
+        return;
+    }
     if(action.moveAction) {
         action.unitsToMove = unitsToMove ? unitsToMove : copyArray(unitsSelectedForMove); //for icons
     }
-
     if(action && action.visible() && action.unlocked() && (!action.allowed || getNumOnList(action.varName, listName) < action.allowed())) {
         let addAmount = loopCount ? loopCount : window.addAmount;
         if(action.allowed) {

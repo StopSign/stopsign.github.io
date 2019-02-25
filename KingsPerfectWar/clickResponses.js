@@ -74,6 +74,7 @@ function setMapArrowVisibility() {
 }
 
 function prevLevel() {
+    restart(); //save level-specific values
     curLevel--;
     if(curLevel < 1) {
         curLevel = 0;
@@ -84,6 +85,7 @@ function prevLevel() {
 }
 
 function nextLevel() {
+    restart(); //save level-specific values
     curLevel++;
     if(curLevel > highestLevel || curLevel >= levelInitials.length) {
         curLevel--;
@@ -252,6 +254,7 @@ function setLoop(index, num) {
         }
     }
     theObj.loops = amount;
+    levelSave[curLevel].nextLists = listsToSimplified();
     actions.refresh(num);
 }
 
@@ -268,6 +271,7 @@ function addLoop(index, num) {
         }
     }
     theObj.loops += addAmount;
+    levelSave[curLevel].nextLists = listsToSimplified();
     actions.refresh(num);
 }
 
@@ -279,6 +283,7 @@ function removeLoop(index, num) {
     if(theObj.loops < 0) {
         theObj.loops = 0;
     }
+    levelSave[curLevel].nextLists = listsToSimplified();
     actions.refresh(num);
 }
 
@@ -288,6 +293,7 @@ function split(index, num) {
     let theObj = theList[index];
     addActionToNext(theObj, listName, Math.ceil(theObj.loops/2), index);
     theObj.loops = Math.floor(theObj.loops/2);
+    levelSave[curLevel].nextLists = listsToSimplified();
     actions.refresh(num);
 }
 
@@ -300,6 +306,7 @@ function moveUp(index, num) {
     const temp = theList[index-1];
     theList[index-1] = theList[index];
     theList[index] = temp;
+    levelSave[curLevel].nextLists = listsToSimplified();
     actions.refresh(num);
 }
 
@@ -312,6 +319,7 @@ function moveDown(index, num) {
     const temp = theList[index+1];
     theList[index+1] = theList[index];
     theList[index] = temp;
+    levelSave[curLevel].nextLists = listsToSimplified();
     actions.refresh(num);
 }
 
@@ -326,6 +334,7 @@ function removeAction(index, num) {
             addActionToNext({varName:"sleep"}, name, 1);
         }
     }
+    levelSave[curLevel].nextLists = listsToSimplified();
     actions.refresh(num);
 }
 
@@ -375,6 +384,7 @@ function moveQueuedAction(initialIndex, resultingIndex, name) {
             theList[initialIndex+i] = temp;
         }
     }
+    levelSave[curLevel].nextLists = listsToSimplified();
 }
 
 function dragOverDecorate(i, name) {

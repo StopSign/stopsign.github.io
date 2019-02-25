@@ -327,7 +327,7 @@ let view = {
 
             let noPrevLevelData = !(prevState.levelData && prevState.levelData.data);
             if(noPrevLevelData || prevState.levelData.data.person !== levelData.data.person) {
-                document.getElementById("personNum").innerHTML = levelData.data.person + "";
+                document.getElementById("personNum").innerHTML = "<b>" + levelData.data.person + "</b> / <b>"+levelData.initial.people+"</b>";
             }
             if(noPrevLevelData || prevState.levelData.data.difficulty !== levelData.data.difficulty) {
                 document.getElementById("difficulty").innerHTML = levelData.data.difficulty + "";
@@ -724,9 +724,7 @@ let view = {
                 }
 
                 let uniqueRewardsStr = "";
-                let uniqueCompleted = undefined;
                 if(uniqueRewards.length > 0) {
-                    uniqueCompleted = uniqueRewards[0].unique;
                     uniqueRewardsStr += " a one-time reward of [";
                     for (let i = 0; i < uniqueRewards.length; i++) {
                         let nextReward = uniqueRewards[i];
@@ -735,6 +733,7 @@ let view = {
                     uniqueRewardsStr = uniqueRewardsStr.substr(0, uniqueRewardsStr.length - 2);
                 }
 
+                let uniqueCompleted = levelSave[curLevel].uniqueCleared;
                 tooltipDiv += "Gain ";
                 if(repeatableRewards.length > 0) {
                     tooltipDiv += repeatableRewardsStr;
@@ -742,13 +741,13 @@ let view = {
                 }
                 if(repeatableRewards.length === 0 ) {
                     tooltipDiv += uniqueRewardsStr;
-                    tooltipDiv += "] when cleared. " + (uniqueCompleted === false ? "<b>(Completed)</b>" : "");
+                    tooltipDiv += "] when cleared. " + (uniqueCompleted ? "<b>(Completed)</b>" : "");
                 }
 
                 if(repeatableRewards.length > 0 && uniqueRewards.length > 0) {
                     tooltipDiv += "In addition, gain ";
                     tooltipDiv += uniqueRewardsStr;
-                    tooltipDiv += "] when cleared. " + (uniqueCompleted === false ? "<b>(Completed)</b>" : "");
+                    tooltipDiv += "] when cleared. " + (uniqueCompleted ? "<b>(Completed)</b>" : "");
                 }
             }
             if(base.initialFriendlyHP && totalHp.friendly > 0) {

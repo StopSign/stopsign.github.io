@@ -9,10 +9,10 @@ actionData = {
             }
 
             if(!action.unlocked) {
-                action.unlocked = function() { return true; } //highestLevel >= 99; }
+                action.unlocked = function() { return highestLevel >= 99; }
             }
             if(!action.visible) {
-                action.visible = function() { return true; } //highestLevel >= 99; }
+                action.visible = function() { return highestLevel >= 99; }
             }
 
             if(!action.seconds) {
@@ -520,7 +520,7 @@ actionData = {
                         "    </div>" +
                         "</div><br>" +
                         "<div id=\"peopleInfo\" style='width:250px;position:relative;height:50px;'>" +
-                        "    <div class=\"abs\" style='left:0;top:0'>Person <div id=\"personNum\" class=\"bold\"></div>, Difficulty <div id=\"difficulty\" class=\"bold\"></div></div>" +
+                        "    <div class=\"abs\" style='left:0;top:0'>Person <div id=\"personNum\"></div>, Difficulty <div id=\"difficulty\" class=\"bold\"></div></div>" +
                         "    <div class=\"abs\" style=\"left:0;top:20px;height:17px;width:150px;background-color:rgb(255,247,181);\">" +
                         "        <div id=\"rapportProgress\" class=\"abs\" style=\"left:0;width:20%;height:100%;background-color:rgba(255, 184, 15, .8)\"></div>" +
                         "        <div id=\"rapport\" class=\"abs\" style=\"left:5px\">50 / 250 rapport</div>" +
@@ -575,7 +575,7 @@ actionData = {
                         levelData.data.rapport = round5(levelData.data.rapport);
                     },
                     canBuy: function() {
-                        return levelData.data.people >= 0;
+                        return levelData.data.person < levelData.initial.people;
                     },
                     unlocked: function() { return levelInitials[curLevel].initial.people > 0; },
                     visible: function() { return levelInitials[curLevel].initial.people > 0; }
@@ -602,6 +602,7 @@ actionData = {
                         }
                         levelSave[curLevel].knowledge += knowledgeGain;
                         king.savedData.int += knowledgeGain / 1000;
+                        king.helpers.recalcListLength();
                     }
                 });
 

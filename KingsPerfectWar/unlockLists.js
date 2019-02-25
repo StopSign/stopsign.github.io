@@ -5,7 +5,6 @@ let unlockLists = {
         unlockLists.checkUnlocks();
     },
     checkUnlocks: function() {
-        unlockLists.check(0, true);
         unlockLists.check(1, levelData && levelData.home.units.length === 0);
         unlockLists.check(2, highestLevel >= 1);
         unlockLists.check(3, curLevel >= 1, ["kingLabel1", "kingLabel3", "optionsContainer"]);
@@ -27,15 +26,18 @@ let unlockLists = {
         unlockLists.checkStory(4, true);
         unlockLists.checkStory(5, true);
         unlockLists.checkStory(6, true);
+        initialUnlock = false;
+
+        unlockLists.check(0, !unlockList[0]);
     },
     check: function(num, shouldUnlock, isMadeVisibleList) {
-        if(!unlockList[num] && shouldUnlock) {
+        if(shouldUnlock && (!unlockList[num] || initialUnlock)) {
             if(isMadeVisibleList) {
                 for (let i = 0; i < isMadeVisibleList.length; i++) {
                     removeClassFromDiv(document.getElementById(isMadeVisibleList[i]), "hidden");
                 }
             }
-            if(tutorial[num]) {
+            if(!initialUnlock && tutorial[num]) {
                 createTooltip(tutorial[num]);
             }
             unlockList[num] = true;

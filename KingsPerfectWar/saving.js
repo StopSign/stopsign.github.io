@@ -36,7 +36,7 @@ window.language = "eng";
 window.addAmount = 1;
 
 let curLevel = 0;
-let highestLevel = 4;
+let highestLevel = 0;
 let mana = 1200;
 let maxMana = 1200;
 let totalTime = 0;
@@ -44,7 +44,7 @@ let gold = 0;
 let wood = 0;
 let soulC = 0;
 let buildAuraValue = 1.5;
-let highestListsLength = 8;
+let highestListsLength;
 
 let curList = 0; //king
 let currentlyHovering = 0;
@@ -60,6 +60,7 @@ let storyDiary = [];
 let restartReason = "";
 let storyPage = 0;
 let empowered = {};
+let initialUnlock = true;
 
 let totalOfflineMs = 0;
 
@@ -80,22 +81,51 @@ function load() {
 
     totalOfflineMs = toLoad.totalOfflineMs !== undefined ? toLoad.totalOfflineMs : 0;
     addOffline(Math.floor((new Date() - new Date(toLoad.date)) * .8));
+    empowered = toLoad.empowered !== undefined ? toLoad.empowered : {};
+
+    //defines defaults later
+    if(toLoad.levelSave) {levelSave = toLoad.levelSave;}
+    if(toLoad.king && toLoad.king.savedData) {king.savedData = toLoad.king.savedData;}
+    king.recalcListLength();
+
+    if(toLoad.unlockList) {unlockList = toLoad.unlockList; }
+    if(toLoad.unlockStory) {unlockStory = toLoad.unlockStory;}
+    if(toLoad.storyDiary) {storyDiary = toLoad.storyDiary;}
+    if(toLoad.storyPage) {storyPage = toLoad.storyPage;}
+    if(toLoad.buildAuraValue) {buildAuraValue = toLoad.buildAuraValue;}
+    if(toLoad.soulC) {soulC = toLoad.soulC;}
+    if(toLoad.totalTime) {totalTime = toLoad.totalTime;}
+    if(toLoad.curLevel) {curLevel = toLoad.curLevel;}
+    if(toLoad.highestLevel) {highestLevel = toLoad.highestLevel;}
 
     recalcInterval(50);
     pauseGame();
 
     view.initialize();
+    adjustStoryDivs();
     restart();
     save();
 }
 
 function save() {
+    console.log("saved");
     let toSave = {};
     saveTimer = 60000;
 
-
     toSave.date = new Date();
     toSave.totalOfflineMs = totalOfflineMs;
+    toSave.empowered = empowered;
+    toSave.levelSave = levelSave;
+    toSave.king = {savedData:king.savedData};
+    toSave.unlockList = unlockList;
+    toSave.unlockStory = unlockStory;
+    toSave.storyDiary = storyDiary;
+    toSave.storyPage = storyPage;
+    toSave.buildAuraValue = buildAuraValue;
+    toSave.soulC = soulC;
+    toSave.totalTime = totalTime;
+    toSave.curLevel = curLevel;
+    toSave.highestLevel = highestLevel;
 
     window.localStorage[saveName] = JSON.stringify(toSave);
 }
@@ -141,6 +171,10 @@ function importList() {
     let str = document.getElementById("exportImportList").value;
     restartReason = "Imported";
     restart();
+
+    if(!str) {
+        createActionListsFromSimplifiedList({king:[],castle:[],units:[]});
+    }
 
     let parts = str.split("=");
     if(parts.length % 2 === 1) {

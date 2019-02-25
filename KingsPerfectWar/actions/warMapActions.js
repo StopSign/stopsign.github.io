@@ -409,6 +409,10 @@ let warMap = {
             }
             base.reward.forEach(function(reward) {
                 if(reward.unique) {
+                    if(levelSave[curLevel].uniqueCleared) {
+                        return;
+                    }
+                    levelSave[curLevel].uniqueCleared = true;
                     reward.unique = false;
                 }
                 let manaReward = reward.type === "mana" ? reward.amount : 0;
@@ -462,8 +466,8 @@ let warMap = {
         },
         checkWinLevel: function() {
             let foundEnemy = false;
-            foundEnemy = foundEnemy || levelData.hideouts.forEach(function(base) {
-                return warMap.bases.getUnitsByAllegiance(base).enemy.length !== 0;
+            levelData.hideouts.forEach(function(base) {
+                foundEnemy = foundEnemy || warMap.bases.getUnitsByAllegiance(base).enemy.length !== 0;
             });
             if(foundEnemy) {
                 return;

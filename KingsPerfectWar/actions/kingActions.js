@@ -90,6 +90,8 @@ let king = {
             console.log('leveled up!');
             king.savedData.rflxCap += 2;
         }
-
+    },
+    recalcListLength: function() {
+        highestListsLength = Math.floor(king.savedData.int) + 4;
     }
 };
