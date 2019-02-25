@@ -508,7 +508,7 @@ actionData = {
                 actionData.create.kingAction({
                     varName:"chat",
                     name:"Chat with Citizens",
-                    desc:"Learn to talk to your citizens, and when you have enough rapport, learn about interesting family secrets and books to further study. Hover the (?) for the info on numbers.<br>" +
+                    desc:"Learn to talk to your citizens, and when you have enough rapport, learn about interesting family secrets to further study. Hover the (?) for the info on numbers.<br>" +
                         "<div class=\"showthat\" style=''>" +
                         "    <i class=\"fa fa-question-circle\" aria-hidden=\"true\" style='font-size:16px'></i>" +
                         "    <div class=\"showthisUp\" style=\"width:520px\">" +
