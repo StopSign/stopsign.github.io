@@ -205,6 +205,34 @@ function openEmpowerMenu() {
 function closeEmpowerMenu() {
     document.getElementById("empowerMenu").style.display = "none";
 }
+function buyEmpowerUnit(varName) {
+    let stageNum = Math.floor(document.getElementById(varName + "EmpowerStage").value);
+    let cost = castle.helpers.empowerCost(varName, stageNum);
+    if(soulC >= cost) {
+        soulC -= cost;
+        if(!empowered[varName]) {
+            empowered[varName] = [];
+            levelData.empowered[varName] = [];
+        }
+        if(!empowered[varName][stageNum]) {
+            empowered[varName][stageNum] = 0;
+            levelData.empowered[varName][stageNum] = 0;
+        }
+        empowered[varName][stageNum]++;
+        levelData.empowered[varName][stageNum]++;
+        document.getElementById(varName + "EmpowerBought").innerHTML = empowered[varName][stageNum];
+    }
+}
+function changeEmpowerStage(varName) {
+    let stageNum = Math.floor(document.getElementById(varName + "EmpowerStage").value);
+    let bought = empowered[varName] && empowered[varName][stageNum] ? empowered[varName][stageNum] : 0;
+    let cost = castle.helpers.empowerCost(varName, stageNum);
+    let unitStats = warMap.units.getStatsOfUnit(varName, stageNum);
+
+    document.getElementById(varName + "EmpowerBought").innerHTML = bought+"";
+    document.getElementById(varName + "EmpowerCost").innerHTML = intToString(cost, 1);
+    document.getElementById(varName + "EmpowerStats").innerHTML = "<b>"+intToString(unitStats.atk, 1)+"</b>|<b>"+intToString(unitStats.hp, 1)+"</b>";
+}
 
 function setLoop(index, num) {
     let listName = actionsList.nextNames[num];

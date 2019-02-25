@@ -1,6 +1,7 @@
 let view = {
     initialize: function() {
         view.clickable.initial.createIcons();
+        view.clickable.initial.createEmpower();
         // view.clickable.initial.createWarMap();
         this.actionInfoDiv = {"king":document.getElementById("actionInfoDivKing"),
             "castle":document.getElementById("actionInfoDivCastle"),
@@ -650,6 +651,33 @@ let view = {
                 viewTravelObjs.forEach(function(viewTravelObj) {
                     document.getElementById("warMapActions").appendChild(viewTravelObj.div);
                 });
+            },
+            createEmpower: function() {
+                let divText = "";
+
+                actionData.list.castle.forEach(function(action) {
+                    if(!action.createdWith) { //only unit actions
+                        return;
+                    }
+                    let cost = castle.helpers.empowerCost(action.varName, 1);
+                    let unitStats = warMap.units.getStatsOfUnit(action.varName, 1);
+
+                    divText += "<div class='empowerOption'>" +
+                            "<div class='clickable'>" +
+                                '<img src="img/' + action.varName + '.svg" class="superLargeIcon imageDragFix">' +
+                            "</div>" +
+                            "<div class='medium bold' style='width:70px;text-align:center;vertical-align:top;margin-top:13px'>"+capitalizeFirst(action.varName)+"</div>" +
+                            "<input id='"+action.varName+"EmpowerStage' onchange='changeEmpowerStage(\""+action.varName+"\")' type='number' min='1' value='1' class='small' step='1' style='margin-left:4px;text-align:center;vertical-align:top;margin-top:10px;width:30px;'>" +
+                            "<div id='"+action.varName+"EmpowerBought' class='medium bold' style='width:55px;text-align:center;vertical-align:top;margin-top:13px'>0</div>" +
+                            "<div id='"+action.varName+"EmpowerCost' class='medium bold' style='width:55px;text-align:center;vertical-align:top;margin-top:13px'>"+intToString(cost, 1)+"</div>" +
+                            "<div id='"+action.varName+"EmpowerStats' class='medium bold' style='width:105px;text-align:center;vertical-align:top;margin-top:13px'><b>"+intToString(unitStats.atk, 1)+"</b>|<b>"+intToString(unitStats.hp, 1)+"</b></div>" +
+                            "<div class='button' style='vertical-align:top;margin-top:13px;' onclick='buyEmpowerUnit(\""+action.varName+"\")'>Buy</div>" +
+                        "</div>";
+
+                });
+
+
+                document.getElementById("empowerContainer").innerHTML = divText;
             }
         }
     },

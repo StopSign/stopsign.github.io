@@ -27,6 +27,7 @@ function createLevel(num) {
         difficulty:(num+1)
     };
     levelData.shrine = {};
+    levelData.empowered = copyArray(empowered);
 
     actionData.get.blessingActions().forEach(function(action) {
         levelData.shrine[action.varName+"Tribute"] = 0;

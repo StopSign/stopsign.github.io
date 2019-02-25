@@ -26,9 +26,12 @@
         <div id="popupButton" class="button" style="display:block;margin-top:5px;" onclick="nextTooltip()"></div>
     </div>
 
-    <div id="empowerMenu" class="abs extrasColor" style="left:400px;top:100px;width:350px;z-index:2000;padding:5px;">
+    <div id="empowerMenu" class="abs extrasColor" style="left:400px;top:100px;width:450px;z-index:2000;padding:5px;">
         <div class="title" style="margin-top:5px;margin-bottom:5px;">Empower Menu</div>
         <div class="abs fa fa-times clickable large" style="top:0px;right:0px;" onclick="closeEmpowerMenu()"></div>
+        <div style='margin-left:58px'>Name</div><div style='margin-left:20px;'>Stage</div><div style='margin-left:7px'>Bought</div><div style='margin-left:9px'>SC Cost</div><div style='margin-left:9px'>Base ATK|HP</div>
+        <div id="empowerContainer" style='position:relative'></div>
+        <div>When you restart a map, you receive 1 Soul Crystal for every 1000 gold remaining. Empower units using Soul Crystals. Units (up to the amount of empowerments bought) will become fully empowered when you build them.</div>
     </div>
 
     <div style="width:704px">
@@ -228,9 +231,9 @@
     <script src="views/mainView.js?1"></script>
     <script src="clickResponses.js?1"></script>
     <script src="saving.js?1"></script>
-    <script src="actions/levelData.js?1"></script>
+    <script src="data/levelData.js?1"></script>
     <script src="actions/actions.js?1"></script>
-    <script src="actions/actionData.js?1"></script>
+    <script src="data/actionData.js?1"></script>
     <script src="actions/kingActions.js?1"></script>
     <script src="actions/castleActions.js?1"></script>
     <script src="actions/warMapActions.js?1"></script>

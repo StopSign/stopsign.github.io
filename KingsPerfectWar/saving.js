@@ -59,6 +59,7 @@ let unlockStory = []; //undefined is locked, true is new, false is seen
 let storyDiary = [];
 let restartReason = "";
 let storyPage = 0;
+let empowered = {};
 
 let totalOfflineMs = 0;
 

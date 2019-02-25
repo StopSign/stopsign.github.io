@@ -103,11 +103,14 @@ let warMap = {
             goblin: { atk:1, hp:5, exp:2 },
             hobgoblin: { atk:2, hp:30, exp:4 }
         },
-        getStatsOfUnit: function(varName) {
+        getStatsOfUnit: function(varName, empowered) {
             if(varName === "king") {
                 return { atk: king.curData.rflxCur, hp: king.curData.rflxCur*10 };
             }
-            return warMap.units.unitStats[varName];
+            let unitStats = copyArray(warMap.units.unitStats[varName]);
+            unitStats.atk *= Math.pow(10, empowered);
+            unitStats.hp *= Math.pow(10, empowered);
+            return unitStats;
         },
         createUnit: function(varName, isFriendly, startingLoc, amount) {
             let unit = {};
@@ -121,6 +124,7 @@ let warMap = {
             }
             unit.isFriendly = isFriendly;
             unit.amount = amount;
+            unit.empowered = castle.helpers.getNextHighestEmpower(varName);
 
             warMap.units.applyUnitStats(unit);
 
@@ -267,7 +271,7 @@ let warMap = {
                 speedBonus = 1;
             }
 
-            let unitStats = warMap.units.getStatsOfUnit(unit.varName);
+            let unitStats = warMap.units.getStatsOfUnit(unit.varName, unit.empowered);
             unit.atk = unitStats.atk * attackBonus;
             let damageTaken = unit.hp ? unit.maxHp - unit.hp : 0;
             unit.maxHp = unitStats.hp * hpBonus;

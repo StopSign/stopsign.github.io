@@ -419,3 +419,8 @@ input {
     position:relative;
     padding:5px 0;
 }
+
+.empowerOption {
+    display:block;
+    margin:5px;
+}
