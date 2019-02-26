@@ -50,7 +50,7 @@ function switchInfoBoxTab(num) {
 }
 
 function switchInfoTab(num) {
-    let ids = ["infoContainer", "storyInfoBox", "extrasContainer"];
+    let ids = ["infoContainer", "storyInfoBox", "changelogContainer", "extrasContainer"];
     for(let i = 0; i < ids.length; i++) {
         if(num === i) {
             document.getElementById(ids[i]).style.display = "block";
@@ -279,7 +279,7 @@ function nextStory() {
 function adjustStoryDivs() {
     document.getElementById("pageNum"+storyPage).style.display = "block";
     document.getElementById("storyPageNum").innerHTML = storyPage;
-    document.getElementById("storyDiary").value = storyDiary[storyPage] === undefined ? "" : storyDiary[storyPage];
+    document.getElementById("storyJournal").value = storyJournal[storyPage] === undefined ? "" : storyJournal[storyPage];
     unlockStory[storyPage] = false;
     let newStoryFound = false;
     for(let i = 0; i < unlockStory.length; i++) {
@@ -306,7 +306,7 @@ function adjustStoryDivs() {
 }
 
 function diaryChanged() {
-    storyDiary[storyPage] = document.getElementById("storyDiary").value;
+    storyJournal[storyPage] = document.getElementById("storyJournal").value;
 }
 
 function closePopupBox() {

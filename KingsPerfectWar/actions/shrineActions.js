@@ -18,8 +18,8 @@ let shrine = {
             //{ num, amount }
             let found = false;
             let createdAmount = created[varName];
-            for(let i = 0; i < levelSave[curLevel].shrine[varName].length; i++) {
-                let highestNum = levelSave[curLevel].shrine[varName][i];
+            for(let i = 0; i < levelSave[curLevel].blessings[varName].length; i++) {
+                let highestNum = levelSave[curLevel].blessings[varName][i];
                 if(highestNum.num === createdAmount) {
                     highestNum.amount++;
                     found = true;
@@ -27,16 +27,16 @@ let shrine = {
                 }
             }
             if(!found) {
-                levelSave[curLevel].shrine[varName].push({num:createdAmount, amount:1});
+                levelSave[curLevel].blessings[varName].push({num:createdAmount, amount:1});
             }
-            levelSave[curLevel].shrine[varName].sort(function(a, b){ return a.num-b.num });
+            levelSave[curLevel].blessings[varName].sort(function(a, b){ return a.num-b.num });
 
             let foundAmount = 0;
             //keep only the top ${highestListsLength}
-            for(let i = levelSave[curLevel].shrine[varName].length - 1; i >= 0; i--) {
-                let highestNum = levelSave[curLevel].shrine[varName][i];
+            for(let i = levelSave[curLevel].blessings[varName].length - 1; i >= 0; i--) {
+                let highestNum = levelSave[curLevel].blessings[varName][i];
                 if(foundAmount >= highestListsLength) {
-                    levelSave[curLevel].shrine[varName].splice(i, 1);
+                    levelSave[curLevel].blessings[varName].splice(i, 1);
                 }
                 foundAmount += highestNum.amount;
                 if(foundAmount >= highestListsLength) {
@@ -47,9 +47,9 @@ let shrine = {
         calcTributeBonus: function(varName) {
             let bonus = 0;
             let createdAmount = created[varName];
-            for(let i = 0; i < levelSave[curLevel].shrine[varName].length; i++) {
-                if(createdAmount < levelSave[curLevel].shrine[varName][i].num) {
-                    bonus += levelSave[curLevel].shrine[varName][i].amount;
+            for(let i = 0; i < levelSave[curLevel].blessings[varName].length; i++) {
+                if(createdAmount < levelSave[curLevel].blessings[varName][i].num) {
+                    bonus += levelSave[curLevel].blessings[varName][i].amount;
                 }
             }
             return 1 + (bonus / 10);

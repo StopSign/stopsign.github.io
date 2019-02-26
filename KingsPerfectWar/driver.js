@@ -127,6 +127,9 @@ function unpauseGame() {
 
 function restart() {
     king.curData.rflxCur = king.savedData.rflxInitial;
+    if(levelData.victory) {
+        soulC += gold / 10000;
+    }
     if(levelSave[curLevel] && levelData.data) {
         king.saveHighestPerson();
         shrine.helpers.saveHighestBlessings();

@@ -341,7 +341,7 @@ input {
 .listTextInput {
     width:30px;
     height:9px;
-    font-size:10px;
+    font-size:12px;
     vertical-align:top;
 }
 
@@ -373,6 +373,14 @@ input {
     background-color: #ff907d;
     position:absolute;
     opacity:.5;
+}
+.curActionErrorBar {
+    height:3px;
+    width:100%;
+    background-color: #ff907d;
+    position:absolute;
+    opacity:.5;
+    top:10px;
 }
 .actionSelectedIndicator {
     position:absolute;

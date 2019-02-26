@@ -32,11 +32,12 @@
         <div>Empower a base unit to the specified stage using Soul Crystals. The highest empowered units will train first. You can't empower more units than you have bought.</div>
     </div>
 
-    <div id="extraInfoBox" class="abs extrasColorH" style="left:200px;top:50px;width:700px;z-index:2000;">
+    <div id="extraInfoBox" class="abs extrasColorH" style="left:200px;top:50px;width:700px;z-index:2000;display:none;">
         <div style="width:100%;height:30px;" class="large bold">
             <div id="extraInfoSelector" class="infoSelector extrasColor" onclick="switchInfoTab(0)">Info</div>
             <div id="storySelector" class="infoSelector kingColor" onclick="switchInfoTab(1)">Story</div>
-            <div id="extrasSelector" class="infoSelector castleColor" onclick="switchInfoTab(2)">Extras</div>
+            <div id="changelogSelector" class="infoSelector extrasColor" onclick="switchInfoTab(2)">ChangeLog</div>
+            <div id="extrasSelector" class="infoSelector castleColor" onclick="switchInfoTab(3)">Extras</div>
             <div style="float:right" class="fa fa-times clickable" onclick="closeInfoBox()"></div>
         </div>
 
@@ -68,7 +69,7 @@
                         <li>Pause when next list is empty - When any of the 3 lists completes their non-sleep actions, the game will pause.</li>
                         <li>Pause when a place is cleared - The place types are your castle, dungeons, and hideouts. When your units finish killing any enemy units found there, the game pauses.</li>
                     </ul>
-                    Bonus Ticks are gathered either when the game is paused or the game is offline. Click the >>>> button to spend bonus ticks to speed up the game 4x faster until you run out. Bonus ticks are effectively 80% the speed of regular play - it's better to keep things running rather than paused!<br><br>
+                    Bonus Ticks are gathered either when the game is paused or the game is offline, getting .8 Bonus Ticks per second. Click the >>>> button to spend bonus ticks to speed up the game 4x faster until you run out. It's better to keep things running rather than paused!<br><br>
                     You can add actions to your list, but if the loop has already started you can't edit things that already happened. Similarly, clearing the current list only clears actions that haven't been run. You can restart and then Clear Current List to truly clear it.<br><br>
                     You can also right click an action to immediately add it to the list.
                 </div>
@@ -118,7 +119,8 @@
                 </div>
                 <div id="infoBox8" style="display:none;">
                     <div class="title">Blessings</div>
-                    TODO
+                    Give praise to the spirits and they'll reward you in turn. Build up faith with Shrines, Altars, and Tribute in the castle and then use 100 * Faith wood to give tribute for a specific blessing. Blessings apply immediately to your units, the King, and any future created units.<br><br>
+                    You gain tribute equal to your Faith (if you have enough wood), but with a bonus if you've finished communing with the spirits before. Because you remember the connection, you get 10% better at receiving blessings you've already had, up to (4 + INT)
                 </div>
             </div>
         </div>
@@ -128,7 +130,11 @@
             <div id="prevStoryArrow" class="fa fa-arrow-left abs clickable" style="left:10px;top:3px;" onclick="prevStory()"></div>
             <div id="nextStoryArrow" class="fa fa-arrow-right abs clickable" style="right:10px;top:3px;" onclick="nextStory()"></div>
             <div id="storyContainer" style="padding:5px;margin-top:5px;"></div><br>
-            <textarea id="storyDiary" style="width:350px;height:17px;" placeholder="Add to your journal" onchange="diaryChanged()"></textarea>
+            <textarea id="storyJournal" style="width:350px;height:17px;" placeholder="Add to your journal" onchange="diaryChanged()"></textarea>
+        </div>
+
+        <div id="changelogContainer" class="abs extrasColorH" style="top:30px;width:700px;padding-bottom:10px;display:none;padding-top:5px;">
+            Too much changing in beta. This is where they'll go, though.
         </div>
 
         <div id="extrasContainer" class="abs castleColorH" style="top:30px;width:700px;padding-bottom:10px;display:none;padding-top:5px;">
@@ -201,7 +207,7 @@
             <div id='pausePlay' onclick='togglePause()' class='button' style="width:40px;">Play</div>
             <div onclick='clickRestart()' class='button'>Restart</div>
             <div id="clearCurrentList" class='button'>Clear Current List</div>
-            <div style="margin-left:5px" class="small">Reason for restart: <div id="restartReason" class="bold" style="width:60px;"></div></div>
+            <div style="margin-left:5px" class="small">Reason for restart: <div id="restartReason" class="bold" style="width:65px;"></div></div>
             <div style="margin-left:15px;" class="small">Bonus Ticks</div>
             <div id="bonusButton" class='button'>>>>></div>
             <div class="bold small" id="bonusSeconds" style="width:40px"></div>

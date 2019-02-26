@@ -8,12 +8,15 @@ actionData = {
                 action.desc = action["desc"+window.language];
             }
 
-            if(!action.unlocked) {
-                action.unlocked = function() { return highestLevel >= 99; }
-            }
-            if(!action.visible) {
-                action.visible = function() { return highestLevel >= 99; }
-            }
+            action.unlocked = function() { return true; };
+            action.visible = function() { return true; };
+
+            // if(!action.unlocked) {
+            //     action.unlocked = function() { return highestLevel >= 99; }
+            // }
+            // if(!action.visible) {
+            //     action.visible = function() { return highestLevel >= 99; }
+            // }
 
             if(!action.seconds) {
                 action.seconds = 1;
@@ -73,15 +76,15 @@ actionData = {
             if(!action.buy) {
                 action.buy = function () {
                     let favor = shrine.helpers.calcFavor();
-                    levelData.shrine[this.varName + "Tribute"] = round5(levelData.shrine[this.varName + "Tribute"] +
+                    levelData.blessings[this.varName + "Tribute"] = round5(levelData.blessings[this.varName + "Tribute"] +
                         favor * shrine.helpers.calcTributeBonus(this.varName));
-                    if (levelData.shrine[this.varName + "Tribute"] >= levelData.shrine[this.varName + "TributeNeeded"]) {
-                        levelData.shrine[this.varName + "Tribute"] -= levelData.shrine[this.varName + "TributeNeeded"];
+                    if (levelData.blessings[this.varName + "Tribute"] >= levelData.blessings[this.varName + "TributeNeeded"]) {
+                        levelData.blessings[this.varName + "Tribute"] -= levelData.blessings[this.varName + "TributeNeeded"];
                         created[this.varName]++;
                         if (this.varName === "heroes") {
-                            levelData.shrine[this.varName + "TributeNeeded"] *= 10;
+                            levelData.blessings[this.varName + "TributeNeeded"] *= 10;
                         } else {
-                            levelData.shrine[this.varName + "TributeNeeded"] += this.tribute;
+                            levelData.blessings[this.varName + "TributeNeeded"] += this.tribute;
                         }
                         warMap.units.updateExistingUnitStats();
                     }
@@ -154,12 +157,12 @@ actionData = {
     },
     initial: {
         all: function() {
+            actionData.initial.castle.income();
+            actionData.initial.castle.army();
+            actionData.initial.castle.spirits();
             actionData.initial.king.auras();
             actionData.initial.king.growth();
             actionData.initial.king.blessings();
-            actionData.initial.castle.income();
-            actionData.initial.castle.army();
-            actionData.initial.castle.shrine();
             actionData.initial.other();
         },
         castle: {
@@ -378,7 +381,7 @@ actionData = {
                     yPos:110
                 });
             },
-            shrine: function() {
+            spirits: function() {
                 actionData.create.castleAction({
                     varName:"altar",
                     name:"Build Altar",

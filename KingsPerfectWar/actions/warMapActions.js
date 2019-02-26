@@ -13,6 +13,12 @@ let warMap = {
             restartReason = "Dead King";
             mana = 0;
         }
+
+        let unitsAtHome = warMap.bases.getUnitsByAllegiance(levelData.home);
+        if(unitsAtHome.friendly.length === 0 && unitsAtHome.enemy.length > 0) {
+            restartReason = "Castle Fell";
+            mana = 0;
+        }
     },
     actions: {
         createWarMapActions: function() {
@@ -428,7 +434,7 @@ let warMap = {
         createAttackers: function() {
             for(let i = 0; i < levelData.hideouts.length; i++) {
                 let hideout = levelData.hideouts[i];
-                if(!hideout.creates) {
+                if(!hideout.creates || warMap.bases.getUnitsByAllegiance(hideout).enemy.length === 0) {
                     return;
                 }
                 hideout.creates.counter--;
@@ -478,6 +484,7 @@ let warMap = {
                 highestLevel++;
                 removeClassFromDiv(document.getElementById("nextLevel"), "hidden");
                 console.log('level won');
+                levelData.victory = true;
             }
         }
     }

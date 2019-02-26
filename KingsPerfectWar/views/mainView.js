@@ -96,6 +96,7 @@ let view = {
                     let curAction = actionsList.current[name][j];
                     if(!prevAction ||
                         prevAction.varName !== curAction.varName ) {
+                        console.log(curAction);
                         view.actionList.createCurrentList(i);
                         break;
                     } else if(prevAction.manaUsed !== curAction.manaUsed
@@ -105,6 +106,10 @@ let view = {
                             document.getElementById("action"+j+name+"Bar").style.width = "100%";
                         } else {
                             document.getElementById("action" + j + name + "Bar").style.width = (100 * curAction.manaUsed / (curAction.costseconds * 10)) + "%";
+                        }
+                        if(curAction.failed) {
+                            document.getElementById("action" + j + name + "Bar").style.display = "none";
+                            document.getElementById("action" + j + name + "ErrorBar").style.display = "block";
                         }
                         document.getElementById("action"+j+name+"LoopsLeft").innerHTML = curAction.loopsLeft;
                         document.getElementById("action"+j+name+"Loops").innerHTML = curAction.loops;
@@ -241,7 +246,7 @@ let view = {
                     let image = view.helpers.getTravelingImage(travelObj);
                     let unitString = view.helpers.getUnitString(travelObj.units);
                     viewTravelObj.div.innerHTML = image +
-                        "<div class='showthis'><div class='mapTooltipRow'>"+unitString+"</div></div>";
+                        "<div class='showthis small'><div class='mapTooltipRow'>"+unitString+"</div></div>";
                 }
 
                 let coords = view.helpers.translateToWarMapCoords(travelObj.coords);
@@ -375,18 +380,18 @@ let view = {
 
             actionData.get.blessingActions().forEach(function (action) {
                 let varName = action.varName;
-                if(noPrevShrine || baseFavorChanged || prevState.levelData.shrine[varName+"Tribute"] !== levelData.shrine[varName+"Tribute"]) {
-                    document.getElementById(varName + "TributeString").innerHTML = "<b>"+round1(levelData.shrine[varName+"Tribute"])+"</b> / <b>" + levelData.shrine[varName+"TributeNeeded"] + "</b> tribute";
-                    document.getElementById(varName + "TributeBar").style.width = (100 * levelData.shrine[varName+"Tribute"] / levelData.shrine[varName+"TributeNeeded"])+"%";
+                if(noPrevShrine || baseFavorChanged || prevState.levelData.blessings[varName+"Tribute"] !== levelData.blessings[varName+"Tribute"]) {
+                    document.getElementById(varName + "TributeString").innerHTML = "<b>"+round1(levelData.blessings[varName+"Tribute"])+"</b> / <b>" + levelData.blessings[varName+"TributeNeeded"] + "</b> tribute";
+                    document.getElementById(varName + "TributeBar").style.width = (100 * levelData.blessings[varName+"Tribute"] / levelData.blessings[varName+"TributeNeeded"])+"%";
                     document.getElementById(varName + "TributeGain").innerHTML = "+" + round1(shrine.helpers.calcFavor() * shrine.helpers.calcTributeBonus(varName));
                     document.getElementById(varName + "Num").innerHTML = created[varName];
                 }
-                if(noPrevShrine || JSON.stringify(prevState.levelSave.shrine[varName]) !== JSON.stringify(levelSave[curLevel].shrine[varName])) {
+                if(noPrevShrine || JSON.stringify(prevState.levelSave.blessings[varName]) !== JSON.stringify(levelSave[curLevel].blessings[varName])) {
                     let allDivs = "<div class='smallTitle'>Most Blessings Received</div>";
 
                     let allZero = true;
-                    for(let i = 0; i < levelSave[curLevel].shrine[varName].length; i++) {
-                        let highestNum = levelSave[curLevel].shrine[varName][i];
+                    for(let i = 0; i < levelSave[curLevel].blessings[varName].length; i++) {
+                        let highestNum = levelSave[curLevel].blessings[varName][i];
                         if(highestNum.num === 0) {
                             continue;
                         }
@@ -460,10 +465,10 @@ let view = {
                 let action = theList[i];
                 let width = 100 * action.manaUsed / (action.costseconds * 10) + "%";
                 let image = view.helpers.getImage(action, num);
-
                 totalDivText +=
                     "<div class='curActionContainer small' id='curAction"+i+name+"' onmouseover='view.actionList.showInfoDiv("+i+", \""+name+"\", true)' onmouseleave='view.actionList.showInfoDiv("+i+", \""+name+"\",false)'>" +
                     "<div class='curActionBar' style='width:"+width+"' id='action"+i+name+"Bar'></div>" +
+                    "<div class='curActionErrorBar' style='display:"+(action.failed?"block":"none")+"' id='action"+i+name+"ErrorBar'></div>" +
                     "<div class='actionSelectedIndicator' id='action"+i+name+"Selected'></div>" +
                     image + " x " +
                     "<div id='action"+i+name+"LoopsLeft' style='margin-left:3px'>"+ action.loopsLeft+"</div>(" + "<div id='action"+i+name+"Loops'>" + action.loops + "</div>" + ")" +
@@ -644,7 +649,7 @@ let view = {
                             placeNum +
                         '</div>';
 
-                    curInfoBox.innerHTML += '<div id="'+base.varName+'InfoBox" class="infoBox unitsColorH" style="padding:5px 0">' +
+                    curInfoBox.innerHTML += '<div id="'+base.varName+'InfoBox" class="infoBox unitsColorH small" style="padding:5px 0">' +
                         '</div>';
                 });
 
@@ -779,16 +784,16 @@ let view = {
                 total.hp += unit.hp * num;
                 let exp = (unit.exp ? unit.exp * num : 0);
                 total.exp += exp;
-                tooltipDiv += "<div style='width:20px'><div class='bold'>" + num + "</div></div>" +
-                    "<div style='width:80px'>" + capitalizeFirst(unit.varName) + "</div>" +
-                    "<div style='width:70px'>Atk: <div class='bold'>"+ intToString(unit.atk, 2) + "</div></div>" +
-                    "<div style='width:70px'>HP: <div class='bold'>"+ intToString(unit.hp, 2) + "</div></div>" +
+                tooltipDiv += "<div style='width:30px'><div class='bold'>" + num + "</div></div>" +
+                    "<div style='width:70px'>" + capitalizeFirst(unit.varName) + "</div>" +
+                    "<div style='width:80px'>Atk: <div class='bold'>"+ intToString(unit.atk, 2) + "</div></div>" +
+                    "<div style='width:80px'>HP: <div class='bold'>"+ intToString(unit.hp, 2) + "</div></div>" +
                     (total.exp === 0 ? "" : "<div style='width:60px'>Exp: <div class='bold'>"+ exp + "</div></div>") +
                     "<br>";
             });
             tooltipDiv += "<div style='width:100px'>Total</div>" +
-                "<div style='width:70px'>Atk: <div class='bold'>"+ intToString(total.atk, 2) + "</div></div>" +
-                "<div style='width:70px'>HP: <div class='bold'>"+ intToString(total.hp, 2) + "</div></div>" +
+                "<div style='width:80px'>Atk: <div class='bold'>"+ intToString(total.atk, 2) + "</div></div>" +
+                "<div style='width:80px'>HP: <div class='bold'>"+ intToString(total.hp, 2) + "</div></div>" +
                 (total.exp === 0 ? "" : "<div style='width:70px'>Exp: <div class='bold'>"+ intToString(total.exp, 1) + "</div></div>") +
                 "<br>";
             return tooltipDiv;

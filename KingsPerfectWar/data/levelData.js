@@ -15,9 +15,9 @@ function createLevel(num) {
         levelSave[num].knowledge = 0;
         levelSave[num].knowledgeCap = 0;
         levelSave[num].highestPerson = [];
-        levelSave[num].shrine = {};
+        levelSave[num].blessings = {};
         actionData.get.blessingActions().forEach(function(action) {
-            levelSave[num].shrine[action.varName] = [];
+            levelSave[num].blessings[action.varName] = [];
         });
     }
 
@@ -26,12 +26,12 @@ function createLevel(num) {
         rapport:0,
         difficulty:(num+1)
     };
-    levelData.shrine = {};
+    levelData.blessings = {};
     levelData.empowered = copyArray(empowered);
 
     actionData.get.blessingActions().forEach(function(action) {
-        levelData.shrine[action.varName+"Tribute"] = 0;
-        levelData.shrine[action.varName+"TributeNeeded"] = action.tribute;
+        levelData.blessings[action.varName+"Tribute"] = 0;
+        levelData.blessings[action.varName+"TributeNeeded"] = action.tribute;
         created[action.varName] = 0;
     });
 
@@ -39,6 +39,7 @@ function createLevel(num) {
     levelData.home.varName = "home";
     levelData.home.fightCounter = 20;
     levelData.traveling = [];
+    levelData.victory = false;
     //turn unit mentions into actual units
     warMap.units.createUnit("king", true, "home", 1);
     for(let i = 0; i < curLevelData.dungeons.length; i++) {
@@ -80,42 +81,43 @@ function chooseNextName() {
 }
 
 levelInitials = [
-    // { //debug
-    //     name: chooseNextName(),
-    //     initial: {
-    //         people:30,
-    //         gold: 50000,
-    //         wood: 50000,
-    //         mana: 5000
-    //     },
-    //     home: {
-    //         coords: { x: 90, y: 30},
-    //         units: { king: 1 }
-    //     },
-    //     dungeons:[
-    //     ],
-    //     hideouts:[
-    //         {
-    //             units: { thug:1 },
-    //             reward: [
-    //                 {
-    //                     type:"gold",
-    //                     amount:1e10,
-    //                     unique:true
-    //                 }
-    //             ],
-    //             coords:{x:140, y:50}
-    //         },
-    //         {
-    //             units: { thug:2 },
-    //             reward: [{
-    //                 type:"exp",
-    //                 amount:300
-    //             }],
-    //             coords:{x:140, y:20}
-    //         }
-    //     ]
-    // },
+    { //debug
+        name: chooseNextName(),
+        initial: {
+            people:30,
+            gold: 5,
+            wood: 50000,
+            mana: 5000
+        },
+        home: {
+            coords: { x: 90, y: 30},
+            units: { king: 1 }
+        },
+        dungeons:[
+        ],
+        hideouts:[
+            {
+                units: { thug:1 },
+                creates: { units: { thug:2 }, initialTime: 350, period: 1000 },
+                reward: [
+                    {
+                        type:"gold",
+                        amount:6,
+                        unique:true
+                    }
+                ],
+                coords:{x:140, y:50}
+            },
+            {
+                units: { thug:2 },
+                reward: [{
+                    type:"exp",
+                    amount:300
+                }],
+                coords:{x:140, y:20}
+            }
+        ]
+    },
     { //0
         name: chooseNextName(),
         initial: {

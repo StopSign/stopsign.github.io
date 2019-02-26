@@ -56,7 +56,7 @@ let addButtons = document.getElementById("addButtons");
 let curListNum = 1;
 let unlockList = [];
 let unlockStory = []; //undefined is locked, true is new, false is seen
-let storyDiary = [];
+let storyJournal = [];
 let restartReason = "";
 let storyPage = 0;
 let empowered = {};
@@ -76,7 +76,7 @@ function load() {
     loadDefaults();
     let toLoad = {};
     if(window.localStorage[saveName]) { //has a save file
-        toLoad = JSON.parse(window.localStorage[saveName]);
+        // toLoad = JSON.parse(window.localStorage[saveName]);
     }
 
     totalOfflineMs = toLoad.totalOfflineMs !== undefined ? toLoad.totalOfflineMs : 0;
@@ -90,7 +90,7 @@ function load() {
 
     if(toLoad.unlockList) {unlockList = toLoad.unlockList; }
     if(toLoad.unlockStory) {unlockStory = toLoad.unlockStory;}
-    if(toLoad.storyDiary) {storyDiary = toLoad.storyDiary;}
+    if(toLoad.storyJournal) {storyJournal = toLoad.storyJournal;}
     if(toLoad.storyPage) {storyPage = toLoad.storyPage;}
     if(toLoad.buildAuraValue) {buildAuraValue = toLoad.buildAuraValue;}
     if(toLoad.soulC) {soulC = toLoad.soulC;}
@@ -119,7 +119,7 @@ function save() {
     toSave.king = {savedData:king.savedData};
     toSave.unlockList = unlockList;
     toSave.unlockStory = unlockStory;
-    toSave.storyDiary = storyDiary;
+    toSave.storyJournal = storyJournal;
     toSave.storyPage = storyPage;
     toSave.buildAuraValue = buildAuraValue;
     toSave.soulC = soulC;
