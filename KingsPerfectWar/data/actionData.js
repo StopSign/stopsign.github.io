@@ -450,7 +450,7 @@ actionData = {
                 actionData.create.kingAction({
                     varName:"market",
                     name:"Oversee Market",
-                    desc:"Go to the market and use your kingly charisma to get the gold flowing. Gold gain from income buildings is multiplied by (2 + CHA / 20). Lasts until the King starts another action or leaves the castle.",
+                    desc:"Go to the market and use your kingly charisma to get the gold flowing. Lasts until the King starts another action or leaves the castle.",
                     seconds:1,
                     xPos:15,
                     yPos:0,
@@ -464,7 +464,7 @@ actionData = {
                 actionData.create.kingAction({
                     varName:"commune",
                     name:"Commune with Forest",
-                    desc:"Speak with the spirits of your forest, convincing them to guide your wood gathering efforts. Wood gain from income buildings is multiplied by (2 + CHA / 20). Lasts until the King starts another action or leaves the castle.",
+                    desc:"Speak with the spirits of your forest, convincing them to guide your wood gathering efforts. Lasts until the King starts another action or leaves the castle.",
                     seconds:1,
                     xPos:15,
                     yPos:55,
@@ -478,7 +478,7 @@ actionData = {
                 actionData.create.kingAction({
                     varName:"direct",
                     name:"Direct Workers",
-                    desc:"Take a critical role in organizing your workers using your ever-increasing knowledge. Building speed of Castle multiplied by (1.5 + INT / 100). Lasts until the King starts another action or leaves the castle.",
+                    desc:"Take a critical role in organizing your workers using your ever-increasing knowledge. Lasts until the King starts another action or leaves the castle.",
                     seconds:1,
                     xPos:15,
                     yPos:110,
@@ -493,12 +493,12 @@ actionData = {
                 actionData.create.kingAction({
                     varName:"train",
                     name:"Train",
-                    desc:"Train to recover the reflexes you've had in past lives. Add (Reflex Cap - Current Reflex)/100 to your Current Reflex.",
+                    desc:"Train to recover the reflexes you've had in past lives. Add (Reflex Cap - Current Reflex)/50 to your Current Reflex.",
                     seconds:5,
                     xPos:85,
                     yPos:0,
                     buy: function() {
-                        king.curData.rflxCur += (king.savedData.rflxCap - king.curData.rflxCur)/100;
+                        king.curData.rflxCur += (king.savedData.rflxCap - king.curData.rflxCur)/50;
                         warMap.units.updateExistingUnitStats();
                     },
                     unlocked: function() { return curLevel >= 1; },

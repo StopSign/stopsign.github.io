@@ -1,14 +1,7 @@
 TODO
 
-
-saving
-    lists
-    levelData
-
-bug - ensure all hideouts are dead before next level unlocks
-
-handle units list targeting base that doesn't exist
-
+rename all shrine to blessing in code
+rename all diary to journal in code
 
 level design
     tutorial improvements
@@ -20,9 +13,13 @@ level design
     1 time prizes of WIS/INT on *very* difficult dungeons every few levels, starting at 5
     increasing gold prizes and EXP for clearing each level to entice players to stay at peak
 extras tab
-    discord link
     polls
 
+lose when enemy is in your castle
+stop spawning enemy units when place is cleared
+get SC
+    only get SC when level is cleared
+strikethrough on failed action
 
 
 heroes
@@ -40,6 +37,8 @@ mobile
 
 
 additional ideas -
+    bestiary to show unit types
+        simulate combat
     need more goals than "overcome next wall". Consider sprawling in a different direction?
         dungeons for king/heroes
         research technologies / magic

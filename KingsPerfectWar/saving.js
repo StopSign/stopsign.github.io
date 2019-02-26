@@ -1,7 +1,7 @@
 function startGame() {
     if (isFileSystem) {
     } else {
-        window.doWork = new Worker('interval.js');
+        window.doWork = new Worker('helpers/interval.js');
         window.doWork.onmessage = function (event) {
             if (event.data === 'interval.start') {
                 tick();
@@ -101,6 +101,7 @@ function load() {
     recalcInterval(50);
     pauseGame();
 
+    click.init(); //attach onclick listeners
     view.initialize();
     adjustStoryDivs();
     restart();
@@ -108,7 +109,6 @@ function load() {
 }
 
 function save() {
-    console.log("saved");
     let toSave = {};
     saveTimer = 60000;
 

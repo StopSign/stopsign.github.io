@@ -291,7 +291,7 @@ let view = {
                 document.getElementById("expProgress").style.width = 100 * (king.savedData.exp - expOfPrev) / (expNeeded - expOfPrev) + "%";
 
                 document.getElementById("rflxCap").innerHTML = king.savedData.rflxCap + "";
-                document.getElementById("rflxGain").innerHTML = intToString((king.savedData.rflxCap - king.curData.rflxCur)/100, 3);
+                document.getElementById("rflxGain").innerHTML = intToString((king.savedData.rflxCap - king.curData.rflxCur)/50, 3);
             }
             let kingIsHome = king.kingIsHome();
             if(noPrevKing || prevState.king.curData.aura !== king.curData.aura || prevState.king.isHome !== kingIsHome) {
@@ -602,7 +602,7 @@ let view = {
                                     '<div id="'+action.varName+'TributeBar" style="position:relative;left:0;top:0;width:20%;height:100%;background-color:rgb(216,185,232);"></div>' +
                                     '<div id="'+action.varName+'TributeString" class="abs" style="left:5px"></div>' +
                                 '</div>';
-                            let backgroundColor = action.listNum === 0 ? "kingColorH" : (action.listNum === 1 ? "castleColorH" : "extrasColor");
+                            let backgroundColor = action.listNum === 0 ? "kingColorH" : (action.listNum === 1 ? "castleColorH" : "extrasColorH");
                             infoText += '<div id="'+action.varName+'InfoBox" class="infoBox '+backgroundColor+'">' +
                                 '<div class="smallTitle">'+action.name+'</div>' +
                                 tributeInfo +
@@ -630,16 +630,18 @@ let view = {
                 warMap.bases.getAllBases().forEach(function(base) {
                     let coords = view.helpers.translateToWarMapCoords(base.coords);
                     let imageName = base.varName.split("_")[0];
+                    let placeNum = base.varName.split("_")[1] ? '<div class="hyperVisible bold abs" style="top:27px;left:31px">' + ((base.varName.split("_")[1]-0)+1) + '</div>' : "";
                     allDivs +=
                         '<div style="position:absolute;left:'+coords.x+'px;top:'+(coords.y)+'px;">' +
-                            '<div class="mapFriendlyHPBar" id="'+base.varName+'FriendlyHPBar" style="position:absolute;top:-10px"><div id="'+base.varName+'FriendlyHP"></div></div>' +
-                            '<div class="mapEnemyHPBar" id="'+base.varName+'EnemyHPBar" style="position:absolute;top:-4px"><div id="'+base.varName+'EnemyHP"></div></div>' +
+                            '<div class="mapFriendlyHPBar abs" id="'+base.varName+'FriendlyHPBar" style="top:-10px"><div id="'+base.varName+'FriendlyHP"></div></div>' +
+                            '<div class="mapEnemyHPBar abs" id="'+base.varName+'EnemyHPBar" style="top:-4px"><div id="'+base.varName+'EnemyHP"></div></div>' +
                             '<div id="'+base.varName+'Container" class="clickable" style="position:absolute;top:0;left:0" onclick="selectAction(\''+base.varName+'\', 2)" oncontextmenu="straightToAdd(\''+base.varName+'\', 2)">' +
                                 '<img src="img/'+imageName+'.svg" class="superLargeIcon imageDragFix">' +
                             '</div>' +
                             (base.creates ? ('<div class="createCounter" style="position:absolute;left:-20px;top:43px;width:80px">' +
                                 '<img src="img/enemy.svg" class="smallIcon imageDragFix">: <div id="'+base.varName+'CreateCounter">'+base.creates.counter+'</div>'+
                             '</div>') : "") +
+                            placeNum +
                         '</div>';
 
                     curInfoBox.innerHTML += '<div id="'+base.varName+'InfoBox" class="infoBox unitsColorH" style="padding:5px 0">' +

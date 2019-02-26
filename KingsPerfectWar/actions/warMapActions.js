@@ -320,7 +320,7 @@ let warMap = {
                 if(unitsByAllegience.friendly.length === 0 || unitsByAllegience.enemy.length === 0) {
                     return;
                 }
-                //fight once a second
+                //fight once every 2 seconds
                 if(base.fightCounter > 0) {
                     base.fightCounter--;
                     return;

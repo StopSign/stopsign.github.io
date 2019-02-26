@@ -24,7 +24,7 @@
         <div id="popupButton" class="button" style="display:block;margin-top:5px;" onclick="nextTooltip()"></div>
     </div>
 
-    <div id="empowerMenu" class="abs extrasColor" style="left:400px;top:100px;width:450px;z-index:2000;padding:5px;display:none;">
+    <div id="empowerMenu" class="abs extrasColorH" style="left:400px;top:100px;width:450px;z-index:2000;padding:5px;display:none;">
         <div class="title" style="margin-top:5px;margin-bottom:5px;">Empower Menu</div>
         <div class="abs fa fa-times clickable large" style="top:0px;right:0px;" onclick="closeEmpowerMenu()"></div>
         <div style='margin-left:58px'>Name</div><div style='margin-left:20px;'>Stage</div><div style='margin-left:7px'>Bought</div><div style='margin-left:9px'>SC Cost</div><div style='margin-left:9px'>Base ATK|HP</div>
@@ -32,38 +32,127 @@
         <div>Empower a base unit to the specified stage using Soul Crystals. The highest empowered units will train first. You can't empower more units than you have bought.</div>
     </div>
 
+    <div id="extraInfoBox" class="abs extrasColorH" style="left:200px;top:50px;width:700px;z-index:2000;">
+        <div style="width:100%;height:30px;" class="large bold">
+            <div id="extraInfoSelector" class="infoSelector extrasColor" onclick="switchInfoTab(0)">Info</div>
+            <div id="storySelector" class="infoSelector kingColor" onclick="switchInfoTab(1)">Story</div>
+            <div id="extrasSelector" class="infoSelector castleColor" onclick="switchInfoTab(2)">Extras</div>
+            <div style="float:right" class="fa fa-times clickable" onclick="closeInfoBox()"></div>
+        </div>
+
+        <div id="infoContainer" class="abs extrasColorH" style="top:30px;width:700px;padding-bottom:10px;padding-top:5px;">
+            <div style="width:150px;text-align:center;" class="large bold">
+                <div class="infoBoxSelector extrasColor" onclick="switchInfoBoxTab(0)">Overview</div>
+                <div class="infoBoxSelector extrasColor" onclick="switchInfoBoxTab(1)">Gameplay</div>
+                <div class="infoBoxSelector extrasColor" onclick="switchInfoBoxTab(2)">Economy</div>
+                <div class="infoBoxSelector extrasColor" onclick="switchInfoBoxTab(3)">War Map</div>
+                <div class="infoBoxSelector extrasColor" onclick="switchInfoBoxTab(4)">Units</div>
+                <div class="infoBoxSelector extrasColor" onclick="switchInfoBoxTab(5)">King's Stats</div>
+                <div class="infoBoxSelector extrasColor" onclick="switchInfoBoxTab(6)">Auras</div>
+                <div class="infoBoxSelector extrasColor" onclick="switchInfoBoxTab(7)">Growth</div>
+                <div class="infoBoxSelector extrasColor" onclick="switchInfoBoxTab(8)">Blessings</div>
+            </div><div class="small" style="width:550px;vertical-align:top;height:279px;overflow:auto;">
+                <div id="infoBox0">
+                    <div class="title">Overview</div>
+                    Welcome to King's Perfect War! The goal of this game is to clear each map to unlock the next one. Currently there are <div id="mapCount"></div> total maps to clear!<br><br>
+                    To clear a map, you must kill all enemies in hideouts. To kill enemies, you need units. To get units, you need an economy. So, roughly, in each map you will build an economy, build units, and send units to to clear out the hideouts.<br><br>
+                    However, you can't wait around for economy or units - you have to be exact, because you have a time limit in the form of Mana. You lose 10 mana per second, and you have until 0 mana to clear the map. Some hideouts and dungeons give mana as a reward, to keep the level going longer.<br><br>
+                    The map resets if you press the reset button, your mana runs out, your king dies, or an enemy unit is in your castle with no defenders. When the map resets, all lists will start over and your resources will be set to the level's default values.<br><br>
+
+                </div>
+                <div id="infoBox1" style="display:none;">
+                    <div class="title">Gameplay</div>
+                    Click the options wheel in the Info Box to see when the game pauses automatically. These options are:
+                    <ul>
+                        <li>Pause before restart - when you lose, no matter how, the game will pause just before it's about to restart. Look at the Reason for restart for why your loop ended.</li>
+                        <li>Pause when next list is empty - When any of the 3 lists completes their non-sleep actions, the game will pause.</li>
+                        <li>Pause when a place is cleared - The place types are your castle, dungeons, and hideouts. When your units finish killing any enemy units found there, the game pauses.</li>
+                    </ul>
+                    Bonus Ticks are gathered either when the game is paused or the game is offline. Click the >>>> button to spend bonus ticks to speed up the game 4x faster until you run out. Bonus ticks are effectively 80% the speed of regular play - it's better to keep things running rather than paused!<br><br>
+                    You can add actions to your list, but if the loop has already started you can't edit things that already happened. Similarly, clearing the current list only clears actions that haven't been run. You can restart and then Clear Current List to truly clear it.<br><br>
+                    You can also right click an action to immediately add it to the list.
+                </div>
+                <div id="infoBox2" style="display:none;">
+                    <div class="title">Economy</div>
+                    Hire Beggar is the cheapest way to get gold income. When the action completes, you'll start receiving gold per second. The cost increases linearly - the first requires 50 gold, the second 100, the third 150, etc.<br><br>
+                    Gold is used to get wood income. Wood income is treated the same as gold. Wood income is used to build unit buildings and units.<br><br>
+                    As long as you've won the map (cleared all hideouts), any additional gold you have when the game resets becomes Soul Crystals at a rate of 10k gold to 1 Soul Crystal. Use Soul Crystals to empower units in the empowerment menu.<br><br>
+                </div>
+                <div id="infoBox3" style="display:none;">
+                    <div class="title">War Map</div>
+                    Each place in the War Map can contain units and enemies. Dungeons and Hideouts have a reward as well, and sometimes have a unique reward. The unique reward can only be acquired once, ever, while the regular awards are given every time you clear the place.<br><br>
+                    The map is arranged on a 190 x 100 grid, and then translated to the UI. Each place shows its coordinates in the upper right. All units move a default speed of 2 distance towards their target per 1 mana.<br><br>
+                    In later levels, some places have a dark unit icon under them with a timer. When the timer runs down, they will send units to attack your castle. Defend against them or you'll lose!<br><br>
+                    The War Map is finished when all Hideouts have been destroyed. Dungeons are not necessary to clear in order to win.<br><br>
+                </div>
+                <div id="infoBox4" style="display:none;">
+                    <div class="title">Combat</div>
+                    When your units are in the same place as enemy units, they'll attack! Every two seconds, both armies will deal damage at the same time. Damage will be dealt to unit types with the lowest max HP first.<br><br>
+                    Every enemy unit has an amount of EXP associated with it. When the unit is killed, the King gains that EXP permanently.
+                </div>
+                <div id="infoBox5" style="display:none;">
+                    <div class="title">King's Stats</div>
+                    <ul>
+                        <li>CAP - Reflex Cap: The highest value you can Train towards. This permanently increases by 2 when the King gains a level.</li>
+                        <li>RFLX - Reflex: The king has atk equal to RFLX and hp equal to 10 * RFLX, before other bonuses. RFLX resets to its default value every loop.</li>
+                        <li>GAIN - Reflex Gain: The amount you will gain with the next Train action.</li>
+                        <li>INT - Intelligence: Improved by the growth action Study. Improves the Direct Workers Aura. Every 1 INT also increases the amount of bonuses you keep in Blessings (starting at 4). Every 2 INT also increaes the amount of bonuses you keep in Chat (starting at 2).</li>
+                        <li>WIS - Wisdom: Improves the rate of the growth action Study. Find unique rewards to increase it.</li>
+                        <li>CHA - Charisma: Improved by the growth action Chat. Improves the Oversee Market and Commune with Forest Auras. Improves Chat. See the Growth info for more details about Chat.</li>
+                    </ul>
+                </div>
+                <div id="infoBox6" style="display:none;">
+                    <div class="title">Auras</div>
+                    The King's presence inspires his workers to do great things. Unfortunately, the King has to be present, and there are many other places that demand his attention. The King can only have one Aura active at a time, but only needs the action once for the Aura to remain on (until Aura change or reset). The Aura is applied and starts working the same mana tick that the Aura action starts. If the King leaves his castle (to attack units), the Aura will stop working (shown by dimming) until the King comes back.<br><br>
+                    Oversee Market and Commune with Forest behave similarly - the first affects gold gain per second, and the second affects wood gain per second. The bonus applied is equal to (2 + CHA / 20).<br><br>
+                    When Direct Workers is on, the completion speed of every action in Castle is multiplied by (1.5 + INT / 100). However, INT can change slowly, shortening your castle completion actions - maybe even trying to build something before you have resources, which ruins your list. To prevent this from happening while you're away, there is an option to keep the build value the same until you modify it. You can set this value between 1.5 and (1.5 + INT / 100).
+                </div>
+                <div id="infoBox7" style="display:none;">
+                    <div class="title">Growth</div>
+                    Train: Your physical body resets every loop, but you get better and better at recovering muscle memory. When Train completes, your RFLX is increased by GAIN. GAIN is 2% of the difference between RFLX and CAP.<br><br>
+                    Chat: Each map has a max number of people to talk to. When you complete the action, you get rapport until the person has shared their secrets, and introduces you to the next person. In each loop, you must start with the easiest people to talk to.<br><br>
+                    Every person has a difficulty modifier. The first person's difficulty is decided by the level, and each person after has +0.1 difficulty. You need (10 * difficulty) rapport per person to get their secrets.<br><br>
+                    If the difficulty is higher than your CHA, you need an additional ((difficulty - CHA)^2)*5 rapport. However, upon completion you gain CHA equal to (difficulty - CHA)/10, rounded up to the nearest hundredth. For example, if you have 2 CHA and finish talking to someone with a difficulty of 3, your CHA will raise to 2.1. If you finish talking to them again, your CHA will raise to 2.19.<br><br>
+                    You gain rapport equal to your CHA, but with a bonus if you've finished talking to them before. Because you remember the conversations, you get better at speaking to people you've already spoken to. Everyone with less difficulty than your highest reached difficulty is 25% easier to talk to. Your highest reached is saved 2 separate times per map, and increases for every 2 INT you have.<br><br>
+                    Study: When you gain enough rapport for a person for the first time, you gain access to their knowledge, but you then need to study and think about what they've told you. You gain 200 max knowledge from the first person in a map, and -2 for each subsequent one, but you can only gain the knowledge once per person. Every 1000 knowledge that you study gives 1 permanent INT.
+                </div>
+                <div id="infoBox8" style="display:none;">
+                    <div class="title">Blessings</div>
+                    TODO
+                </div>
+            </div>
+        </div>
+
+        <div id="storyInfoBox" style="width:700px;height:320px;top:30px;display:none;overflow:auto;overflow-x: hidden;padding-top:5px;" class="kingColorH small abs">
+            <div class="title">Story<div class="medium"> - Page <div id="storyPageNum">0</div></div></div>
+            <div id="prevStoryArrow" class="fa fa-arrow-left abs clickable" style="left:10px;top:3px;" onclick="prevStory()"></div>
+            <div id="nextStoryArrow" class="fa fa-arrow-right abs clickable" style="right:10px;top:3px;" onclick="nextStory()"></div>
+            <div id="storyContainer" style="padding:5px;margin-top:5px;"></div><br>
+            <textarea id="storyDiary" style="width:350px;height:17px;" placeholder="Add to your journal" onchange="diaryChanged()"></textarea>
+        </div>
+
+        <div id="extrasContainer" class="abs castleColorH" style="top:30px;width:700px;padding-bottom:10px;display:none;padding-top:5px;">
+            <a href="https://discord.gg/EmRuWPp" target="_blank" >Link to Discord</a><br>
+            Thank you all for being such an amazing community! You're great :)
+        </div>
+
+    </div>
+
     <div style="width:704px">
         <div style="width:700px;vertical-align:top;">
             <div id="warMap" style="width:100%;height:405px;position:relative;text-align:center;" class="unitsColorH">
                 <div id="prevLevel" class="fa fa-arrow-left clickable hidden" style="" onclick="prevLevel()"></div>
-                <div class="showthat">
+                <div>
                     <div class="title" style="font-weight:normal">War Map - <div id="mapName"></div></div>
-                    <div class="showthis">
-                        Select unit types and click a place to queue an action to send those units to that place.<br>
-                        Map is 190 x 100. Coordinates of each place are in the top right of their tooltip.<br>
-                        Units move their speed in distance every second.
-                    </div>
                 </div>
                 <div id="nextLevel" class="fa fa-arrow-right clickable hidden" style="" onclick="nextLevel()"></div>
                 <div style="position:absolute;border:1px solid;bottom:2px;right:2px">
                     <div id="kingToMove" class="clickable showthat" style="border:2px solid rgba(255, 255, 0, 1)" onclick="switchMapMoveUnits('king')">
                         <img src='img/king.svg' class='largeIcon imageDragFix'>
-                        <div class="showthis" style="width:250px">
-                            <div class="smallTitle">Select King</div>
-                            <div class="small">Clicking a place with this highlighted queues an action to move the King to that place.</div>
-                        </div>
                     </div><div id="unitsToMove" class="clickable showthat hidden" style="border:2px solid rgba(255, 255, 0, 0)" onclick="switchMapMoveUnits('units')">
                         <img src='img/units.svg' class='largeIcon imageDragFix'>
-                        <div class="showthis" style="width:250px">
-                            <div class="smallTitle">Select Army</div>
-                            <div class="small">Clicking a place with this highlighted queues an action to move all Army to that place.</div>
-                        </div>
                     </div><div id="heroesToMove" class="clickable showthat hidden" style="border:2px solid rgba(255, 255, 0, 0)" onclick="switchMapMoveUnits('heroes')">
                         <img src='img/heroes.svg' class='largeIcon imageDragFix'>
-                        <div class="showthis" style="width:250px">
-                            <div class="smallTitle">Select Heroes</div>
-                            <div class="small">Clicking a place with this highlighted queues an action to move all Heroes to that place.</div>
-                        </div>
                     </div>
                 </div>
                 <div id="warMapActions"></div>
@@ -102,7 +191,7 @@
                 <div id="soulC">0</div>
                 <div class="showthis">
                     Non-rounded Soul Crystals: <div id="actualSoulC" class="bold"></div><br>
-                    When you restart a map, you receive 1 Soul Crystal for every 1000 gold remaining.
+                    When you restart a map, you receive 1 Soul Crystal for every 10000 gold remaining.
                 </div>
             </div><div class="showthat" style="width:65px">
                 <img src='img/mana.svg' class='largeIcon imageDragFix' style="vertical-align:bottom">
@@ -111,10 +200,10 @@
             </div>
             <div id='pausePlay' onclick='togglePause()' class='button' style="width:40px;">Play</div>
             <div onclick='clickRestart()' class='button'>Restart</div>
-            <div onclick='clearCurrentList()' class='button'>Clear Current List</div>
+            <div id="clearCurrentList" class='button'>Clear Current List</div>
             <div style="margin-left:5px" class="small">Reason for restart: <div id="restartReason" class="bold" style="width:60px;"></div></div>
             <div style="margin-left:15px;" class="small">Bonus Ticks</div>
-            <div id="bonusButton" onclick='toggleOffline()' class='button'>>>>></div>
+            <div id="bonusButton" class='button'>>>>></div>
             <div class="bold small" id="bonusSeconds" style="width:40px"></div>
         </div>
 
@@ -165,13 +254,14 @@
             <div id="kingLabel3" style="width:50px;text-align:center;" class="bold hidden">Growth</div>
             <div id="kingLabel4" style="width:135px;text-align:center;" class="bold hidden">Blessings</div>
             <div id="kingActionList" class="abs" style="left:0;top:50px;"></div>
-        </div><div id="optionsContainer" class="mainActionList extrasColor hidden" style="position:relative;width:70px;vertical-align:top;">
+        </div><div id="optionsContainer" class="mainActionList extrasColorH hidden" style="position:relative;width:70px;vertical-align:top;">
             <div style="display:block;text-align:center;margin-top:5px;margin-bottom:5px;" class="large bold">Options Actions</div>
             <div id="otherActionList" class="abs" style="left:0;top:50px;"></div>
         </div><div style="width:380px;height:100%;vertical-align:top;position:relative;">
-                <div id="deselectButton" class="abs fa fa-ban" style="left:10px;top:5px;cursor:pointer;display:none;" onclick="deselect()"></div>
-                <div id="optionsMenu" class="abs fa fa-cog" style="right:10px;top:5px;cursor:pointer;" onclick="openExtras()"></div>
-                <div id="storyMenu" class="abs fa fa-book" style="right:40px;top:5px;cursor:pointer;color:red;" onclick="openStory()"></div>
+                <div id="deselectButton" class="abs fa fa-ban clickable" style="left:10px;top:5px;cursor:pointer;display:none;" onclick="deselect()"></div>
+                <div id="optionsMenu" class="abs fa fa-cog clickable" style="right:10px;top:5px;cursor:pointer;" onclick="openExtras()"></div>
+                <div id="storyMenu" class="abs fa fa-book clickable" style="right:40px;top:5px;color:red;" onclick="openStory()"></div>
+                <div id="infoMenu" class="abs fa fa-question clickable" style="right:70px;top:5px;" onclick="openInfoBox()"></div>
                 <div style="display:block;text-align:center;margin-top:5px;margin-bottom:5px;" class="large bold">Info Box</div>
                 <div id="defaultInfoBox" style="display:none;">
                     <div id="actionInfoDivKing" style="display:none;width:100%"></div>
@@ -182,7 +272,7 @@
                 <div id="addButtons" style="text-align:center;display:none;margin-top:-15px;">
                     <div class="button" style="margin-top:-20px;" onclick="addAction()">Add Action</div>
                 </div>
-                <div id="extrasInfoBox" style="width:100%;height:189px;vertical-align:top;position:absolute;top:30px;display:none;" class="extrasColor">
+                <div id="extrasInfoBox" style="width:100%;height:189px;vertical-align:top;position:absolute;top:30px;display:none;" class="extrasColorH">
                     <div class="title">Extras</div>
                     <div id="optionsDiv" style="position:relative;height:170px;width:100%;">
                         <div style="width:100%;vertical-align:top">
@@ -206,13 +296,6 @@
                         </div>
                     </div>
 
-                </div>
-                <div id="storyInfoBox" style="width:100%;height:189px;vertical-align:top;position:absolute;top:30px;display:none;overflow:scroll;overflow-x: hidden;" class="extrasColor small">
-                    <div class="title">Story<div class="medium"> - Page <div id="storyPageNum">0</div></div></div>
-                    <div id="prevStoryArrow" class="fa fa-arrow-left abs clickable" style="left:10px;top:3px;" onclick="prevStory()"></div>
-                    <div id="nextStoryArrow" class="fa fa-arrow-right abs clickable" style="right:10px;top:3px;" onclick="nextStory()"></div>
-                    <div id="storyContainer" style="padding:5px;margin-top:5px;"></div><br>
-                    <textarea id="storyDiary" style="width:350px;height:17px;" placeholder="Add to your journal" onchange="diaryChanged()"></textarea>
                 </div>
             </div>
 

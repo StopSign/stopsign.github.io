@@ -92,26 +92,13 @@ function recalcInterval(fps) {
 function addOffline(num) {
     if(num) {
         if(totalOfflineMs + num < 0 && bonusSpeed > 1) {
-            toggleOffline();
+            click.event.toggleOffline();
         }
         totalOfflineMs += num;
         if(totalOfflineMs < 0) {
             totalOfflineMs = 0;
         }
         document.getElementById("bonusSeconds").innerHTML = intToString(totalOfflineMs / 1000, 2);
-    }
-}
-
-function toggleOffline() {
-    let button = document.getElementById("bonusButton");
-    if(bonusSpeed === 1) { //go fast
-        bonusSpeed = 4;
-        addClassToDiv(button, "buttonPressed");
-        removeClassFromDiv(button, "button");
-    } else { //take it slow
-        bonusSpeed = 1;
-        removeClassFromDiv(button, "buttonPressed");
-        addClassToDiv(button, "button");
     }
 }
 

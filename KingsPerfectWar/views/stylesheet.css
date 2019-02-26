@@ -95,7 +95,7 @@ body {
 }
 
 .mapTooltipRow {
-    width:320px;
+    width:380px;
     position:relative;
 }
 
@@ -287,11 +287,14 @@ input {
     background-color: rgba(184, 218, 184, 1);
 }
 
-.extrasColor {
+.extrasColor, .extrasColorH {
     background-color: rgba(212, 216, 235, 1);
 }
-.extrasColor:hover {
+.extrasColor:hover, .extraColorsH:hover {
     background-color: rgba(222, 226, 245, 1);
+}
+.extrasColor:active {
+    background-color: rgba(202, 206, 225, 1);
 }
 
 .tabSelector {
@@ -423,4 +426,19 @@ input {
 .empowerOption {
     display:block;
     margin:5px;
+}
+
+.infoSelector {
+    cursor:pointer;
+    text-align:center;
+    height:30px;
+    padding:4px 0;
+    width:114px;
+    position:relative;
+}
+.infoBoxSelector {
+    display:block;
+    cursor:pointer;
+    height:23px;
+    padding-top:8px;
 }

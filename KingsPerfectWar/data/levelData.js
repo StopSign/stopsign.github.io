@@ -295,3 +295,5 @@ levelInitials = [
         ]
     }
 ];
+
+document.getElementById("mapCount").innerHTML = levelInitials.length + "";

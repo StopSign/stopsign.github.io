@@ -1,29 +1,90 @@
-function clearCurrentList() {
-    let curActionNum = actions.validActions[curList];
-    let name = actionsList.nextNames[curList];
-    let curAction = actionsList.current[name][curActionNum];
-    if(!curAction) { //start of game
-        return
+let click = {
+    init: function() {
+        document.getElementById("clearCurrentList").onclick = function() { click.event.clearCurrentList(); };
+        document.getElementById("bonusButton").onclick = function() { click.event.toggleOffline() };
+    },
+    event: {
+        clearCurrentList: function() {
+            let curActionNum = actions.validActions[curList];
+            let name = actionsList.nextNames[curList];
+            let curAction = actionsList.current[name][curActionNum];
+            if(!curAction) { //start of game
+                return
+            }
+            if(curAction.manaUsed !== 0 || curAction.loopsLeft !== curAction.loops) {
+                curActionNum++; //don't delete current stuff
+            }
+            actionsList.next[name].splice(curActionNum);
+            actionsList.current[name].splice(curActionNum);
+            actions.refresh(curList);
+        },
+        toggleOffline: function() {
+            let button = document.getElementById("bonusButton");
+            if(bonusSpeed === 1) { //go fast
+                bonusSpeed = 4;
+                addClassToDiv(button, "buttonPressed");
+                removeClassFromDiv(button, "button");
+            } else { //take it slow
+                bonusSpeed = 1;
+                removeClassFromDiv(button, "buttonPressed");
+                addClassToDiv(button, "button");
+            }
+        }
+    },
+    menu: {
+
+    },
+    list: {
+
     }
-    if(curAction.manaUsed !== 0 || curAction.loopsLeft !== curAction.loops) {
-        curActionNum++; //don't delete current stuff
+};
+
+function switchInfoBoxTab(num) {
+    for(let i = 0; i < 9; i++) {
+        if(num === i) {
+            document.getElementById("infoBox" + i).style.display = "block";
+        } else {
+            document.getElementById("infoBox" + i).style.display = "none";
+        }
     }
-    actionsList.next[name].splice(curActionNum);
-    actionsList.current[name].splice(curActionNum);
-    actions.refresh(curList);
 }
 
-let bonusPressed = false;
-function toggleUseBonusTicks() {
-    let button = document.getElementById("bonusButton");
-    bonusPressed = !bonusPressed;
-    if(bonusPressed) {
-        addClassToDiv(button, "buttonPressed");
-        removeClassFromDiv(button, "button");
-    } else {
-        removeClassFromDiv(button, "buttonPressed");
-        addClassToDiv(button, "button");
+function switchInfoTab(num) {
+    let ids = ["infoContainer", "storyInfoBox", "extrasContainer"];
+    for(let i = 0; i < ids.length; i++) {
+        if(num === i) {
+            document.getElementById(ids[i]).style.display = "block";
+        } else {
+            document.getElementById(ids[i]).style.display = "none";
+        }
     }
+    if(num === 1) {
+        adjustStoryDivs();
+    }
+}
+function openInfoBox() {
+    if(document.getElementById("extraInfoBox").style.display === "block" && document.getElementById("extraInfoBox").style.display === "block") {
+        closeInfoBox();
+        return;
+    }
+    if(document.getElementById("extraInfoBox").style.display === "none") {
+        document.getElementById("extraInfoBox").style.display = "block";
+    }
+    switchInfoTab(0);
+}
+function closeInfoBox() {
+    document.getElementById("extraInfoBox").style.display = "none";
+}
+
+function openStory() {
+    if(document.getElementById("extraInfoBox").style.display === "block" && document.getElementById("storyInfoBox").style.display === "block") {
+        closeInfoBox();
+        return;
+    }
+    if(document.getElementById("extraInfoBox").style.display === "none") {
+        document.getElementById("extraInfoBox").style.display = "block";
+    }
+    switchInfoTab(1);
 }
 
 function switchListTab(num) {
@@ -67,7 +128,6 @@ function selectAction(varName, num) {
         document.getElementById("deselectButton").style.display = "block";
         document.getElementById("infoBoxList").style.display = "block";
         document.getElementById("extrasInfoBox").style.display = "none";
-        document.getElementById("storyInfoBox").style.display = "none";
     }
 
     document.getElementById(varName+"InfoBox").style.display = "block";
@@ -94,7 +154,6 @@ function deselect() {
     selectAction(curInfoBox, curListNum);
     document.getElementById("deselectButton").style.display = "none";
     document.getElementById("extrasInfoBox").style.display = "none";
-    document.getElementById("storyInfoBox").style.display = "none";
 }
 
 function straightToAdd(varName, num) {
@@ -187,21 +246,8 @@ function openExtras() {
         return;
     }
     selectAction(curInfoBox, curListNum);
-    document.getElementById("storyInfoBox").style.display = "none";
     document.getElementById("deselectButton").style.display = "block";
     document.getElementById("extrasInfoBox").style.display = "block";
-}
-
-function openStory() {
-    if(document.getElementById("storyInfoBox").style.display === "block") {
-        deselect();
-        return;
-    }
-    selectAction(curInfoBox, curListNum);
-    document.getElementById("deselectButton").style.display = "block";
-    document.getElementById("extrasInfoBox").style.display = "none";
-    document.getElementById("storyInfoBox").style.display = "block";
-    adjustStoryDivs();
 }
 
 function prevStory() {
