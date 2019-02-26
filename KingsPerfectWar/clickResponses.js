@@ -38,6 +38,72 @@ function switchListTab(num) {
     }
 }
 
+function selectAction(varName, num) {
+    //prev
+    let infoBoxDiv = document.getElementById(curInfoBox+"InfoBox");
+    infoBoxDiv.style.display = "none";
+    let container = document.getElementById(curInfoBox+"Container");
+
+    if(container) {
+        let color = king.kingIsHome() ? "rgba(255, 255, 0, 1)" : "rgba(255, 255, 0, .4)";
+        if(curInfoBox === "market" && king.curData.aura === "gold") {
+            document.getElementById("marketContainer").style.border = "2px solid " + color;
+        } else if(curInfoBox === "commune" && king.curData.aura === "wood") {
+            document.getElementById("communeContainer").style.border = "2px solid " + color;
+        } else if(curInfoBox === "direct" && king.curData.aura === "build") {
+            document.getElementById("directContainer").style.border = "2px solid " + color;
+        } else {
+            container.style.border = "2px solid rgba(0, 0, 0, 0)";
+        }
+    }
+
+    if(varName === curInfoBox) {
+        varName = "default";
+        addButtons.style.display = "none";
+        document.getElementById("deselectButton").style.display = "none";
+        document.getElementById("infoBoxList").style.display = "none";
+    } else {
+        addButtons.style.display = "block";
+        document.getElementById("deselectButton").style.display = "block";
+        document.getElementById("infoBoxList").style.display = "block";
+        document.getElementById("extrasInfoBox").style.display = "none";
+        document.getElementById("storyInfoBox").style.display = "none";
+    }
+
+    document.getElementById(varName+"InfoBox").style.display = "block";
+    //next
+    container = document.getElementById(varName+"Container");
+    if(container) {
+        let color = king.kingIsHome() ? "rgba(200, 200, 0, 1)" : "rgba(200, 200, 0, .4)";
+        if(varName === "market" && king.curData.aura === "gold") {
+            document.getElementById("marketContainer").style.border = "2px solid " + color;
+        } else if(varName === "commune" && king.curData.aura === "wood") {
+            document.getElementById("communeContainer").style.border = "2px solid " + color;
+        } else if(varName === "direct" && king.curData.aura === "build") {
+            document.getElementById("directContainer").style.border = "2px solid " + color;
+        } else {
+            container.style.border = "2px solid rgba(0, 0, 0, 1)";
+        }
+    }
+
+    curInfoBox = varName;
+    curListNum = num;
+}
+
+function deselect() {
+    selectAction(curInfoBox, curListNum);
+    document.getElementById("deselectButton").style.display = "none";
+    document.getElementById("extrasInfoBox").style.display = "none";
+    document.getElementById("storyInfoBox").style.display = "none";
+}
+
+function straightToAdd(varName, num) {
+    if(varName !== curInfoBox) {
+        selectAction(varName, num);
+    }
+    addAction();
+}
+
 function switchMapMoveUnits(name) {
     unitsSelectedForMove[name] = !unitsSelectedForMove[name];
     for (let property in unitsSelectedForMove) {

@@ -66,7 +66,7 @@ let actions = {
                 }
                 if(action.buy) {
                     action.buy();
-                    adjustCosts(i);
+                    actions.adjustCosts(i);
                 }
                 if(["sleep", "restart"].indexOf(action.varName) === -1 && action.loopsLeft === 0 && !actionsList.current[name][this.validActions[i]+1]) { //no next action after non-sleep
                     shouldPause = true;
@@ -112,84 +112,81 @@ let actions = {
                 continue;
             }
             let action = copyArray(nextList[j]);
-            translateNextToCurrent(action, name);
+            actions.translateNextToCurrent(action, name);
             currentList[j] = action;
         }
         if(this.validActions[num] !== -1 && this.validActions[num] < nextList.length && currentList.length !== nextList.length) { //remove extra actions from current list
             currentList.splice(nextList.length, currentList.length - nextList.length);
         }
 
-        adjustCosts(num);
+        actions.adjustCosts(num);
+    },
+    adjustCosts: function(num) {
+        let name = actionsList.nextNames[num];
+        let currentList = actionsList.current[name];
+        let numOnList = {};
+        for(let i = 0; i < currentList.length; i++) {
+            let action = currentList[i];
+            let numPrior = (numOnList[action.varName] ? numOnList[action.varName] : 0);
+            if(actions.validActions[num] === i && action.loopsLeft > 0) {
+                numPrior += action.loops - action.loopsLeft; //also count completed loops in current action
+            }
+            if(action.createdWith) {
+                actions.setCosts(action, numPrior, numOnList[action.createdWith] ? numOnList[action.createdWith] : 0);
+            } else {
+                actions.setCosts(action, numPrior);
+            }
+            numOnList[action.varName] = numPrior + action.loops;
+        }
+    },
+    setCosts: function(action, numPrior, numCreatedWith) {
+        action.costseconds = 0;
+        action.costgold = 0;
+        action.costwood = 0;
+        action.costmana = 0;
+        if(numCreatedWith === undefined) {
+            numCreatedWith = 1;
+        }
+        for(let i = 0; i < action.cost.length; i++) {
+            let cost = action.cost[i];
+            let amount = 0;
+            if (cost.type === "static") {
+                amount += cost.starting;
+            } else if (cost.type === "linear") {
+                amount += cost.starting + cost.growth * numPrior;
+            }
+            action["cost"+cost.resource] = numCreatedWith * amount;
+        }
+    },
+    translateNextToCurrent: function(action, name) {
+        action.loopsLeft = action.loops;
+        action.manaUsed = 0;
+        action.failed = 0;
+        action.failedReason = "";
+
+        let actionDatum = getActionByVarName(action.varName, name);
+        action.name = actionDatum.name;
+        if(actionDatum.moveAction) {
+            action.name = warMap.actions.createNameString(action);
+        }
+        if(actionDatum.createdWith) {
+            action.createdWith = actionDatum.createdWith;
+        }
+        if(actionDatum.start) {
+            action.start = actionDatum.start
+        }
+        if(actionDatum.tribute) {
+            action.tribute = actionDatum.tribute;
+        }
+
+        action.cost = actionDatum.cost;
+        action.buy = actionDatum.buy;
+        action.visible = actionDatum.visible;
+        action.unlocked = actionDatum.unlocked;
+        action.canBuy = actionDatum.canBuy;
+        action.spend = actionDatum.spend;
     }
 };
-
-function adjustCosts(num) {
-    let name = actionsList.nextNames[num];
-    let currentList = actionsList.current[name];
-    let numOnList = {};
-    for(let i = 0; i < currentList.length; i++) {
-        let action = currentList[i];
-        let numPrior = (numOnList[action.varName] ? numOnList[action.varName] : 0);
-        if(actions.validActions[num] === i && action.loopsLeft > 0) {
-            numPrior += action.loops - action.loopsLeft; //also count completed loops in current action
-        }
-        if(action.createdWith) {
-            setCosts(action, numPrior, numOnList[action.createdWith] ? numOnList[action.createdWith] : 0);
-        } else {
-            setCosts(action, numPrior);
-        }
-        numOnList[action.varName] = numPrior + action.loops;
-    }
-}
-
-function setCosts(action, numPrior, numCreatedWith) {
-    action.costseconds = 0;
-    action.costgold = 0;
-    action.costwood = 0;
-    action.costmana = 0;
-    if(numCreatedWith === undefined) {
-        numCreatedWith = 1;
-    }
-    for(let i = 0; i < action.cost.length; i++) {
-        let cost = action.cost[i];
-        let amount = 0;
-        if (cost.type === "static") {
-            amount += cost.starting;
-        } else if (cost.type === "linear") {
-            amount += cost.starting + cost.growth * numPrior;
-        }
-        action["cost"+cost.resource] = numCreatedWith * amount;
-    }
-}
-
-function translateNextToCurrent(action, name) {
-    action.loopsLeft = action.loops;
-    action.manaUsed = 0;
-    action.failed = 0;
-    action.failedReason = "";
-
-    let actionDatum = getActionByVarName(action.varName, name);
-    action.name = actionDatum.name;
-    if(actionDatum.moveAction) {
-        action.name = warMap.actions.createNameString(action);
-    }
-    if(actionDatum.createdWith) {
-        action.createdWith = actionDatum.createdWith;
-    }
-    if(actionDatum.start) {
-        action.start = actionDatum.start
-    }
-    if(actionDatum.tribute) {
-        action.tribute = actionDatum.tribute;
-    }
-
-    action.cost = actionDatum.cost;
-    action.buy = actionDatum.buy;
-    action.visible = actionDatum.visible;
-    action.unlocked = actionDatum.unlocked;
-    action.canBuy = actionDatum.canBuy;
-    action.spend = actionDatum.spend;
-}
 
 function getActionByVarName(varName, list) {
     if(["sleep", "pause", "restart"].indexOf(varName) !== -1) {
@@ -204,72 +201,6 @@ function getActionByVarName(varName, list) {
         return getKingActionByVarName(varName);
     }
     return null;
-}
-
-function selectAction(varName, num) {
-    //prev
-    let infoBoxDiv = document.getElementById(curInfoBox+"InfoBox");
-    infoBoxDiv.style.display = "none";
-    let container = document.getElementById(curInfoBox+"Container");
-
-    if(container) {
-        let color = king.kingIsHome() ? "rgba(255, 255, 0, 1)" : "rgba(255, 255, 0, .4)";
-        if(curInfoBox === "market" && king.curData.aura === "gold") {
-            document.getElementById("marketContainer").style.border = "2px solid " + color;
-        } else if(curInfoBox === "commune" && king.curData.aura === "wood") {
-            document.getElementById("communeContainer").style.border = "2px solid " + color;
-        } else if(curInfoBox === "direct" && king.curData.aura === "build") {
-            document.getElementById("directContainer").style.border = "2px solid " + color;
-        } else {
-            container.style.border = "2px solid rgba(0, 0, 0, 0)";
-        }
-    }
-
-    if(varName === curInfoBox) {
-        varName = "default";
-        addButtons.style.display = "none";
-        document.getElementById("deselectButton").style.display = "none";
-        document.getElementById("infoBoxList").style.display = "none";
-    } else {
-        addButtons.style.display = "block";
-        document.getElementById("deselectButton").style.display = "block";
-        document.getElementById("infoBoxList").style.display = "block";
-        document.getElementById("extrasInfoBox").style.display = "none";
-        document.getElementById("storyInfoBox").style.display = "none";
-    }
-
-    document.getElementById(varName+"InfoBox").style.display = "block";
-    //next
-    container = document.getElementById(varName+"Container");
-    if(container) {
-        let color = king.kingIsHome() ? "rgba(200, 200, 0, 1)" : "rgba(200, 200, 0, .4)";
-        if(varName === "market" && king.curData.aura === "gold") {
-            document.getElementById("marketContainer").style.border = "2px solid " + color;
-        } else if(varName === "commune" && king.curData.aura === "wood") {
-            document.getElementById("communeContainer").style.border = "2px solid " + color;
-        } else if(varName === "direct" && king.curData.aura === "build") {
-            document.getElementById("directContainer").style.border = "2px solid " + color;
-        } else {
-            container.style.border = "2px solid rgba(0, 0, 0, 1)";
-        }
-    }
-
-    curInfoBox = varName;
-    curListNum = num;
-}
-
-function deselect() {
-    selectAction(curInfoBox, curListNum);
-    document.getElementById("deselectButton").style.display = "none";
-    document.getElementById("extrasInfoBox").style.display = "none";
-    document.getElementById("storyInfoBox").style.display = "none";
-}
-
-function straightToAdd(varName, num) {
-    if(varName !== curInfoBox) {
-        selectAction(varName, num);
-    }
-    addAction();
 }
 
 function addAction() {
