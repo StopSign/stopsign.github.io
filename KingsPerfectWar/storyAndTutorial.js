@@ -1,38 +1,47 @@
 let tutorial = [
     [ //0
-        "Welcome to King's Perfect War! The first few levels are meant to familiarize you with the game.<br>" +
-        "Your goal is to beat all hideouts in the map (for this map there's only the 1), in order to unlock the next map.<br>",
-        "The map resets if you press the reset button, your mana runs out (for this map you have "+levelInitials[0].initial.mana+" mana), your king dies, or an enemy unit is in your castle with no defenders.<br>" +
+        "Welcome to King's Perfect War! Please follow the tutorial exactly to understand the base mechanics.<br>" +
+        "Your goal is to beat all hideouts in the map in order to unlock the next map.<br>" +
+        "The map resets if your king dies or you run out of mana.<br>" +
         "When the map resets, all lists will start over and your resources will be set to the level's default values.",
-        "Click on the enemy's hideout and press Add Action in the Info Box. An action to move your king to the first hideout is created and added to the Units list.<br>" +
+        "Click on the dungeon (closer to your castle) and press Add Action in the Info Box. An action to move your king to the first hideout is created and added to the Units list.<br>" +
         "You can also right click an action to select it AND add it to the list. Save a click!<br>" +
         "Press Play to start the timer running!"
     ],
     [ //1
-        "The game has paused automatically. With default settings, pausing will occur when:<br>" +
-        "<ul><li>A list has completed a non-sleep action and has no actions remaining.</li>" +
-        "<li>A place (hideout, dungeon, castle) is cleared of all enemies</li>" +
-        "<li>The map is about to restart</li></ul><br>" +
-        "Not to worry about all the wasted time - you will get bonus ticks at 80% efficiency when the game is paused (or offline).",
-        "Now that you've sent your king to the enemy hideout, go ahead and Play (until the game pauses automatically when you've cleared the hideout)<br>"
+        "The game has paused automatically because the Units list has finished, sending the King to the enemy dungeon.<br>" +
+        "Press Play again until the king has slain the troll, and the game will pause again."
     ],
     [ //2
-        "Each enemy killed gives you EXP, which helps you level up. In addition, the dungeon this time had a unique reward of 200 exp - enough to get a level! Unique rewards can only be received once, even after resetting the map.<br>" +
-        "Leveling up increases your Reflex Cap by 2. You'll use this in the next map. At the top of the War Map, an arrow has appeared to bring you to the next town. Click it now."
+        "The reward for clearing the dungeon is gold, wood, and mana, which has unlocked some buildings. Use your gold on Hire Beggar once and then Scavenger's Den once.<br>" +
+        "Then Play until they're built (and the game pauses because Castle list is complete)."
     ],
     [ //3
-        "This map's first hideout has one more Thug - you won't be able to kill it as you are now. Use the new Train action 11 times (enough to get >10.2 RFLX) and then take down the first hideout.<br>" +
-        "Remember, you can rely on pausing when actions are completed to plan your next step."
+        "Great! That's the basics of income. Now that you have some resources flowing, it's time to get units.",
+        "Each unit has a production facility, which is required to build the unit.<br>" +
+        "Having one barracks when you build a spearman means you build one spearman for 200 wood in one action.<br>" +
+        "Having two barracks when you build a spearman means you build two spearman for 400 wood in one action.",
+        "Add the sleep action 10 times to let resources build, then build one barracks and two spearman.<br>" +
+        "Be careful, as the the game won't pause if the last action on a list is sleeping.",
+        "In addition, you'll want your king to fight with your units, so send him back to your castle."
     ],
     [ //4
-        "You've gained some gold and wood from that battle, enough to build some units! Build a barracks and two spearmen to take out the last hideout. You can also order the King unit to come back home, so they can leave with the new spearmen.<br>" +
-        "Change which units get selected for a move order by ensuring they're highlighted when you add the action. All units of those types will immediately head toward the destination when the action finishes."
+        "Now that you have the units, it's time to send them off!<br>" +
+        "Change which units get selected for a move order by ensuring they're highlighted in the bottom right corner of War Map when you add the action. All units of those types will immediately head toward the destination when the action finishes.",
+        "Select both King and Units and send them all to the hideout, to clear out the thugs."
     ],
     [ //5
         "Great! You've cleared the map. Move on to the next one to continue."
     ],
     [ //6
-        "This map has a dungeon! Dungeons aren't required to beat the map, but often give important resources needed to win."
+        "As King, you can inspire workers to work harder... as long as you're there. Use the unlocked Auras to give the extra boost needed to win this level!",
+        "There are many ways to win the levels from here on out, but to start you should" +
+        "<ul><li>Enable the Oversee Market Aura</li>" +
+        "<li>Hire a first Beggar</li>" +
+        "<li>Sleep 5 seconds</li>" +
+        "<li>Hire a second Beggar</li>" +
+        "<li>Get two Scavengers</li>" +
+        "</ul>"
     ]
 ];
 

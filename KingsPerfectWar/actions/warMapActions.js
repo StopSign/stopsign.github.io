@@ -107,7 +107,8 @@ let warMap = {
 
             //monsters
             goblin: { atk:1, hp:5, exp:2 },
-            hobgoblin: { atk:2, hp:30, exp:4 }
+            hobgoblin: { atk:2, hp:30, exp:4 },
+            troll: { atk:15, hp:60, exp:6 }
         },
         getStatsOfUnit: function(varName, empowered) {
             if(varName === "king") {

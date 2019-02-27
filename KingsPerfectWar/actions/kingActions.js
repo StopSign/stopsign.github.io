@@ -64,7 +64,7 @@ let king = {
             return 1;
         }
         if(["gold", "wood"].indexOf(auraName) !== -1) {
-            return 2 + king.savedData.cha / 20;
+            return 2 + (king.savedData.cha-1) / 20;
         }
         if("build" === auraName) {
             return document.getElementById("keepBuild").checked ? buildAuraValue : 1.5 + king.savedData.int / 100;

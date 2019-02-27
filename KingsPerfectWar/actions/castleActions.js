@@ -5,23 +5,23 @@ let castle = {
         wood += castle.helpers.woodToAdd();
     },
     helpers: {
-        woodToAdd: function() {
-            let addedWood = 0;
-            addedWood += created.scavenger;
-            addedWood += created.logger * 5;
-            addedWood += created.forester * 25;
-            addedWood *= king.getBonusByAura("wood");
-            addedWood *= created.bounty;
-            return addedWood;
-        },
         goldToAdd: function() {
             let addedGold = 0;
             addedGold += created.beg;
             addedGold += created.merchant * 5;
             addedGold += created.tax * 25;
             addedGold *= king.getBonusByAura("gold");
-            addedGold *= created.peace;
-            return addedGold;
+            addedGold *= 1 + (created.peace / 10);
+            return round5(addedGold);
+        },
+        woodToAdd: function() {
+            let addedWood = 0;
+            addedWood += created.scavenger;
+            addedWood += created.logger * 5;
+            addedWood += created.forester * 25;
+            addedWood *= king.getBonusByAura("wood");
+            addedWood *= 1 + (created.bounty / 10);
+            return round5(addedWood);
         },
         empowerCost: function(varName, stageNum) {
             if(varName === "spearman") {

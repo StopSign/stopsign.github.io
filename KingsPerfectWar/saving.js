@@ -9,6 +9,10 @@ function startGame() {
         };
     }
     displayBetaSaveNote();
+
+    //debug
+    // window.localStorage[saveName] = decode("eyJkYXRlIjoiMjAxOS0wMi0yN1QxNzo0OMSWMy45OTJaIiwidG90YWxPZmZsaW5lTXPEhjkwMzI4LjDEuMS5xLoxxKFlbXBvd2VyZWTEhnt9xKFsZXZlbFNhxY3EhlvEgMSteHRMaXN0xLA6xIBrxKxnxZMic8WLZXB8MTMiXcShY2HFm8WLxaPFpWXFp3wyNMSgImJlZ8Wpxbpzxa/FjW5nxYPFv8ShxbTFtjEwxbpiYXJyYWNrc8aHxaRwZcaPbWFuxpZzxpjGmsacxb/FrSJ1bmnFnMWjZMamxoVvbl8wxanGnsWmxagyMsW6aG9tZcayMcaAxrR8xJfGuGlkZW91dMawxrLFq13FicWkZWPFhMapOjDEocamaXF1ZUPFi8aPxYXEhnRyx5rEoWtuxYHFi2TGhcSGx5Uix6XHp8WFxoVDYXDHq8ShaGlnaGXFm1DFg3PGrsWTxIDGmHLHv27HtSJhbceHbnTEhjJ9xqRixYtzc8WhxZ3EgGVuY2jGnMiNOsWUIm51bciHyInIi8ieyI/GpGbGmcWbyIHIocijyKXIisamyKjIkMShZ3XHhMacY8SFyJ/Flciwx5TEocimyLPIjsi1IsagyLvIrsiiyKTJgMiIyLLIjMmEyJHIp3nJici/x6zJgsmPOsipx7bFg2/Hu8mUyYvJlsmOyLTHjcWJxZVlxZfFmcWbyJfHrcWhxZPGpMWvxbHIvFvGpMeXx5PJs8eOc8eQx5LFncesx5fHmcebx53FhMWGOmbEpsm5x6THpnfHqMeqyYzHrsqKx7DHm8ezyIfHt8e5x7t0x73IhMiAyJ/IkciTyJXGhMmryJnIm8idya7EocirxbDInsmzyLbIuMSCyJrJssakyYfKrsShYsmSyqQix7pyyZ3Fncm3yYXFoMaExYfFpMWRxYVExINhyr/ErMiex6x3xZrEhsS8Isqiy4zEoXLEqnhJxqd0acSmy4zHrMuSbHjHsse0OjEyxL14y6DGtjB9x47GpmxvxpPJqcqox6HHo8uxZSzLs8u1x6LLtMu2y7rLuMm0bsusxpNTxKNyyZPIn8qFbMqHy7vLssu4y7fMisyNZcakxZtvzINEy5jMg8q1zJHMg1BhyozHrGLIuGxkQXXGkVbEpseay4wuNcaIx4dsQ8erxLc2MTbEocSjxKVsVGnGu8uMMzk3M8esY8yjTMWMxY7LkMq2x7jHusWbzYPFjWzLjH0=");
+
     load();
 }
 
@@ -76,7 +80,7 @@ function load() {
     loadDefaults();
     let toLoad = {};
     if(window.localStorage[saveName]) { //has a save file
-        // toLoad = JSON.parse(window.localStorage[saveName]);
+        toLoad = JSON.parse(window.localStorage[saveName]);
     }
 
     totalOfflineMs = toLoad.totalOfflineMs !== undefined ? toLoad.totalOfflineMs : 0;
@@ -119,7 +123,7 @@ function save() {
     toSave.king = {savedData:king.savedData};
     toSave.unlockList = unlockList;
     toSave.unlockStory = unlockStory;
-    toSave.storyJournal = storyJournal;
+    toSave.storyDiary = storyJournal;
     toSave.storyPage = storyPage;
     toSave.buildAuraValue = buildAuraValue;
     toSave.soulC = soulC;
@@ -242,7 +246,7 @@ function listToActions(arr, num) {
     for(let i = 0; i < arr.length; i++) {
         let split = arr[i].split("|");
         let varName = split[0];
-        let loops = split[1];
+        let loops = split[1] - 0;
         let unitsToMove = {king:false, units:false, heroes:false};
         if(split[2]) { //unitsToMove
             let typeCount = split[2] - 0; //convert to int

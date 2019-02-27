@@ -8,15 +8,16 @@ actionData = {
                 action.desc = action["desc"+window.language];
             }
 
-            action.unlocked = function() { return true; };
-            action.visible = function() { return true; };
+            //DEBUG
+            // action.unlocked = function() { return true; };
+            // action.visible = function() { return true; };
 
-            // if(!action.unlocked) {
-            //     action.unlocked = function() { return highestLevel >= 99; }
-            // }
-            // if(!action.visible) {
-            //     action.visible = function() { return highestLevel >= 99; }
-            // }
+            if(!action.unlocked) {
+                action.unlocked = function() { return highestLevel >= 99; }
+            }
+            if(!action.visible) {
+                action.visible = function() { return highestLevel >= 99; }
+            }
 
             if(!action.seconds) {
                 action.seconds = 1;
@@ -182,8 +183,8 @@ actionData = {
                     seconds:10,
                     xPos:15,
                     yPos:0,
-                    unlocked: function() { return curLevel >= 2; },
-                    visible: function() { return curLevel >= 2; }
+                    unlocked: function() { return unlockList[2]; },
+                    visible: function() { return unlockList[2]; }
                 });
 
                 actionData.create.castleAction({
@@ -235,8 +236,8 @@ actionData = {
                     seconds:10,
                     xPos:75,
                     yPos:0,
-                    unlocked: function() { return curLevel >= 2; },
-                    visible: function() { return curLevel >= 2; }
+                    unlocked: function() { return unlockList[2]; },
+                    visible: function() { return unlockList[2]; }
                 });
 
                 actionData.create.castleAction({
@@ -290,8 +291,8 @@ actionData = {
                     seconds:10,
                     xPos:145,
                     yPos:0,
-                    unlocked: function() { return gold > 0; },
-                    visible: function() { return gold > 0; }
+                    unlocked: function() { return unlockList[3]; },
+                    visible: function() { return unlockList[3]; }
                 });
 
                 actionData.create.castleAction({
@@ -343,8 +344,8 @@ actionData = {
                     seconds:5,
                     xPos:205,
                     yPos:0,
-                    unlocked: function() { return gold > 0; },
-                    visible: function() { return gold > 0; }
+                    unlocked: function() { return unlockList[3]; },
+                    visible: function() { return unlockList[3]; }
                 });
 
                 actionData.create.castleAction({
@@ -453,29 +454,29 @@ actionData = {
                 actionData.create.kingAction({
                     varName:"market",
                     name:"Oversee Market",
-                    desc:"Go to the market and use your kingly charisma to get the gold flowing. Lasts until the King starts another action or leaves the castle.",
+                    desc:"Go to the market and use your kingly charisma to get the gold flowing. Doubles gold gain. Lasts until the King starts another action or leaves the castle.",
                     seconds:1,
                     xPos:15,
                     yPos:0,
                     start: function() {
                         king.curData.aura = "gold";
                     },
-                    unlocked: function() { return curLevel >= 2; },
-                    visible: function() { return curLevel >= 2; }
+                    unlocked: function() { return unlockList[6]; },
+                    visible: function() { return unlockList[6]; }
                 });
 
                 actionData.create.kingAction({
                     varName:"commune",
                     name:"Commune with Forest",
-                    desc:"Speak with the spirits of your forest, convincing them to guide your wood gathering efforts. Lasts until the King starts another action or leaves the castle.",
+                    desc:"Speak with the spirits of your forest, convincing them to guide your wood gathering efforts. Doubles wood gain. Lasts until the King starts another action or leaves the castle.",
                     seconds:1,
                     xPos:15,
                     yPos:55,
                     start: function() {
                         king.curData.aura = "wood";
                     },
-                    unlocked: function() { return curLevel >= 3; },
-                    visible: function() { return curLevel >= 3; }
+                    unlocked: function() { return unlockList[6]; },
+                    visible: function() { return unlockList[6]; }
                 });
 
                 actionData.create.kingAction({
@@ -504,8 +505,8 @@ actionData = {
                         king.curData.rflxCur += (king.savedData.rflxCap - king.curData.rflxCur)/50;
                         warMap.units.updateExistingUnitStats();
                     },
-                    unlocked: function() { return curLevel >= 1; },
-                    visible: function() { return curLevel >= 1; }
+                    unlocked: function() { return unlockList[7]; },
+                    visible: function() { return unlockList[7]; }
                 });
 
                 actionData.create.kingAction({
