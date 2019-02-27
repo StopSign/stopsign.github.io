@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <!-- to force a reload -->
+    <meta http-equiv="cache-control" content="max-age=0" />
+    <meta http-equiv="cache-control" content="no-cache" />
+    <meta http-equiv="expires" content="0" />
+    <meta http-equiv="expires" content="Tue, 01 Jan 1980 1:00:00 GMT" />
+    <meta http-equiv="pragma" content="no-cache" />
+
+    <title>King's Perfect War</title>
+    <link rel="stylesheet" href="views/stylesheet.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="img/favicon-16x16.png">
+
+</head>
+<body id="theBody" style="min-width:1210px" oncontextmenu="return false;">
+    <div id="popupBox" class="abs" style="display:none;left:50px;top:200px;width:450px;background-color:rgba(160, 160, 160, 1);z-index:2000;padding:5px;">
+        <div class="title" style="margin-top:5px;margin-bottom:5px;">Tutorial</div>
+        <div class="abs fa fa-times clickable large" style="top:0px;right:0px;" onclick="nextTooltip()"></div>
+        <div id="popupText" class="medium"></div>
+        <div id="popupButton" class="button" style="display:block;margin-top:5px;" onclick="nextTooltip()"></div>
+    </div>
+
+    <div id="empowerMenu" class="abs extrasColorH" style="left:400px;top:100px;width:450px;z-index:2000;padding:5px;display:none;">
+        <div class="title" style="margin-top:5px;margin-bottom:5px;">Empower Menu</div>
+        <div class="abs fa fa-times clickable large" style="top:0px;right:0px;" onclick="closeEmpowerMenu()"></div>
+        <div style='margin-left:58px'>Name</div><div style='margin-left:20px;'>Stage</div><div style='margin-left:7px'>Bought</div><div style='margin-left:9px'>SC Cost</div><div style='margin-left:9px'>Base ATK|HP</div>
+        <div id="empowerContainer" style='position:relative'></div>
+        <div>Empower a base unit to the specified stage using Soul Crystals. The highest empowered units will train first. You can't empower more units than you have bought.</div>
+    </div>
+
+    <div id="extraInfoBox" class="abs extrasColorH" style="left:200px;top:50px;width:700px;z-index:2000;display:none;">
+        <div style="width:100%;height:30px;" class="large bold">
+            <div id="extraInfoSelector" class="infoSelector extrasColor" onclick="switchInfoTab(0)">Info</div>
+            <div id="storySelector" class="infoSelector kingColor" onclick="switchInfoTab(1)">Story</div>
+            <div id="changelogSelector" class="infoSelector extrasColor" onclick="switchInfoTab(2)">ChangeLog</div>
+            <div id="extrasSelector" class="infoSelector castleColor" onclick="switchInfoTab(3)">Extras</div>
+            <div style="float:right" class="fa fa-times clickable" onclick="closeInfoBox()"></div>
+        </div>
+
+        <div id="infoContainer" class="abs extrasColorH" style="top:30px;width:700px;padding-bottom:10px;padding-top:5px;">
+            <div style="width:150px;text-align:center;" class="large bold">
+                <div class="infoBoxSelector extrasColor" onclick="switchInfoBoxTab(0)">Overview</div>
+                <div class="infoBoxSelector extrasColor" onclick="switchInfoBoxTab(1)">Gameplay</div>
+                <div class="infoBoxSelector extrasColor" onclick="switchInfoBoxTab(2)">Economy</div>
+                <div class="infoBoxSelector extrasColor" onclick="switchInfoBoxTab(3)">War Map</div>
+                <div class="infoBoxSelector extrasColor" onclick="switchInfoBoxTab(4)">Units</div>
+                <div class="infoBoxSelector extrasColor" onclick="switchInfoBoxTab(5)">King's Stats</div>
+                <div class="infoBoxSelector extrasColor" onclick="switchInfoBoxTab(6)">Auras</div>
+                <div class="infoBoxSelector extrasColor" onclick="switchInfoBoxTab(7)">Growth</div>
+                <div class="infoBoxSelector extrasColor" onclick="switchInfoBoxTab(8)">Blessings</div>
+            </div><div class="small" style="width:550px;vertical-align:top;height:279px;overflow:auto;">
+                <div id="infoBox0">
+                    <div class="title">Overview</div>
+                    Welcome to King's Perfect War! The goal of this game is to clear each map to unlock the next one. Currently there are <div id="mapCount"></div> total maps to clear!<br><br>
+                    To clear a map, you must kill all enemies in hideouts. To kill enemies, you need units. To get units, you need an economy. So, roughly, in each map you will build an economy, build units, and send units to to clear out the hideouts.<br><br>
+                    However, you can't wait around for economy or units - you have to be exact, because you have a time limit in the form of Mana. You lose 10 mana per second, and you have until 0 mana to clear the map. Some hideouts and dungeons give mana as a reward, to keep the level going longer.<br><br>
+                    The map resets if you press the reset button, your mana runs out, your king dies, or an enemy unit is in your castle with no defenders. When the map resets, all lists will start over and your resources will be set to the level's default values.<br><br>
+
+                </div>
+                <div id="infoBox1" style="display:none;">
+                    <div class="title">Gameplay</div>
+                    Click the options wheel in the Info Box to see when the game pauses automatically. These options are:
+                    <ul>
+                        <li>Pause before restart - when you lose, no matter how, the game will pause just before it's about to restart. Look at the Reason for restart for why your loop ended.</li>
+                        <li>Pause when next list is empty - When any of the 3 lists completes their non-sleep actions, the game will pause.</li>
+                        <li>Pause when a place is cleared - The place types are your castle, dungeons, and hideouts. When your units finish killing any enemy units found there, the game pauses.</li>
+                    </ul>
+                    Bonus Ticks are gathered either when the game is paused or the game is offline, getting .8 Bonus Ticks per second. Click the >>>> button to spend bonus ticks to speed up the game 4x faster until you run out. It's better to keep things running rather than paused!<br><br>
+                    You can add actions to your list, but if the loop has already started you can't edit things that already happened. Similarly, clearing the current list only clears actions that haven't been run. You can restart and then Clear Current List to truly clear it.<br><br>
+                    You can also right click an action to immediately add it to the list.
+                </div>
+                <div id="infoBox2" style="display:none;">
+                    <div class="title">Economy</div>
+                    Hire Beggar is the cheapest way to get gold income. When the action completes, you'll start receiving gold per second. The cost increases linearly - the first requires 50 gold, the second 100, the third 150, etc.<br><br>
+                    Gold is used to get wood income. Wood income is treated the same as gold. Wood income is used to build unit buildings and units.<br><br>
+                    As long as you've won the map (cleared all hideouts), any additional gold you have when the game resets becomes Soul Crystals at a rate of 10k gold to 1 Soul Crystal. Use Soul Crystals to empower units in the empowerment menu.<br><br>
+                </div>
+                <div id="infoBox3" style="display:none;">
+                    <div class="title">War Map</div>
+                    Each place in the War Map can contain units and enemies. Dungeons and Hideouts have a reward as well, and sometimes have a unique reward. The unique reward can only be acquired once, ever, while the regular awards are given every time you clear the place.<br><br>
+                    The map is arranged on a 190 x 100 grid, and then translated to the UI. Each place shows its coordinates in the upper right. All units move a default speed of 2 distance towards their target per 1 mana.<br><br>
+                    In later levels, some places have a dark unit icon under them with a timer. When the timer runs down, they will send units to attack your castle. Defend against them or you'll lose!<br><br>
+                    The War Map is finished when all Hideouts have been destroyed. Dungeons are not necessary to clear in order to win.<br><br>
+                </div>
+                <div id="infoBox4" style="display:none;">
+                    <div class="title">Combat</div>
+                    When your units are in the same place as enemy units, they'll attack! Every two seconds, both armies will deal damage at the same time. Damage will be dealt to unit types with the lowest max HP first.<br><br>
+                    Every enemy unit has an amount of EXP associated with it. When the unit is killed, the King gains that EXP permanently.
+                </div>
+                <div id="infoBox5" style="display:none;">
+                    <div class="title">King's Stats</div>
+                    <ul>
+                        <li>CAP - Reflex Cap: The highest value you can Train towards. This permanently increases by 2 when the King gains a level.</li>
+                        <li>RFLX - Reflex: The king has atk equal to RFLX and hp equal to 10 * RFLX, before other bonuses. RFLX resets to its default value every loop.</li>
+                        <li>GAIN - Reflex Gain: The amount you will gain with the next Train action.</li>
+                        <li>INT - Intelligence: Improved by the growth action Study. Improves the Direct Workers Aura. Every 1 INT also increases the amount of bonuses you keep in Blessings (starting at 4). Every 2 INT also increaes the amount of bonuses you keep in Chat (starting at 2).</li>
+                        <li>WIS - Wisdom: Improves the rate of the growth action Study. Find unique rewards to increase it.</li>
+                        <li>CHA - Charisma: Improved by the growth action Chat. Improves the Oversee Market and Commune with Forest Auras. Improves Chat. See the Growth info for more details about Chat.</li>
+                    </ul>
+                </div>
+                <div id="infoBox6" style="display:none;">
+                    <div class="title">Auras</div>
+                    The King's presence inspires his workers to do great things. Unfortunately, the King has to be present, and there are many other places that demand his attention. The King can only have one Aura active at a time, but only needs the action once for the Aura to remain on (until Aura change or reset). The Aura is applied and starts working the same mana tick that the Aura action starts. If the King leaves his castle (to attack units), the Aura will stop working (shown by dimming) until the King comes back.<br><br>
+                    Oversee Market and Commune with Forest behave similarly - the first affects gold gain per second, and the second affects wood gain per second. The bonus applied is equal to (1.95 + CHA / 20).<br><br>
+                    When Direct Workers is on, the completion speed of every action in Castle is multiplied by (1.5 + INT / 100). However, INT can change slowly, shortening your castle completion actions - maybe even trying to build something before you have resources, which ruins your list. To prevent this from happening while you're away, there is an option to keep the build value the same until you modify it. You can set this value between 1.5 and (1.5 + INT / 100).
+                </div>
+                <div id="infoBox7" style="display:none;">
+                    <div class="title">Growth</div>
+                    Train: Your physical body resets every loop, but you get better and better at recovering muscle memory. When Train completes, your RFLX is increased by GAIN. GAIN is 2% of the difference between RFLX and CAP.<br><br>
+                    Chat: Each map has a max number of people to talk to. When you complete the action, you get rapport until the person has shared their secrets, and introduces you to the next person. In each loop, you must start with the easiest people to talk to.<br><br>
+                    Every person has a difficulty modifier. The first person's difficulty is decided by the level, and each person after has +0.1 difficulty. You need (10 * difficulty) rapport per person to get their secrets.<br><br>
+                    If the difficulty is higher than your CHA, you need an additional ((difficulty - CHA)^2)*5 rapport. However, upon completion you gain CHA equal to (difficulty - CHA)/10, rounded up to the nearest hundredth. For example, if you have 2 CHA and finish talking to someone with a difficulty of 3, your CHA will raise to 2.1. If you finish talking to them again, your CHA will raise to 2.19.<br><br>
+                    You gain rapport equal to your CHA, but with a bonus if you've finished talking to them before. Because you remember the conversations, you get better at speaking to people you've already spoken to. Everyone with less difficulty than your highest reached difficulty is 25% easier to talk to. Your highest reached is saved 2 separate times per map, and increases for every 2 INT you have.<br><br>
+                    Study: When you gain enough rapport for a person for the first time, you gain access to their knowledge, but you then need to study and think about what they've told you. You gain 200 max knowledge from the first person in a map, and -2 for each subsequent one, but you can only gain the knowledge once per person. Every 1000 knowledge that you study gives 1 permanent INT.
+                </div>
+                <div id="infoBox8" style="display:none;">
+                    <div class="title">Blessings</div>
+                    Give praise to the spirits and they'll reward you in turn. Build up faith with Shrines, Altars, and Tribute in the castle and then use 100 * Faith wood to give tribute for a specific blessing. Blessings apply immediately to your units, the King, and any future created units.<br><br>
+                    You gain tribute equal to your Faith (if you have enough wood), but with a bonus if you've finished communing with the spirits before. Because you remember the connection, you get 10% better at receiving blessings you've already had, up to (4 + INT)
+                </div>
+            </div>
+        </div>
+
+        <div id="storyInfoBox" style="width:700px;height:320px;top:30px;display:none;overflow:auto;overflow-x: hidden;padding-top:5px;" class="kingColorH small abs">
+            <div class="title">Story<div class="medium"> - Page <div id="storyPageNum">0</div></div></div>
+            <div id="prevStoryArrow" class="fa fa-arrow-left abs clickable" style="left:10px;top:3px;" onclick="prevStory()"></div>
+            <div id="nextStoryArrow" class="fa fa-arrow-right abs clickable" style="right:10px;top:3px;" onclick="nextStory()"></div>
+            <div id="storyContainer" style="padding:5px;margin-top:5px;"></div><br>
+            <textarea id="storyJournal" style="width:350px;height:17px;" placeholder="Add to your journal" onchange="diaryChanged()"></textarea>
+        </div>
+
+        <div id="changelogContainer" class="abs extrasColorH" style="top:30px;width:700px;padding-bottom:10px;display:none;padding-top:5px;">
+            Too much changing in beta. This is where they'll go, though.
+        </div>
+
+        <div id="extrasContainer" class="abs castleColorH" style="top:30px;width:700px;padding-bottom:10px;display:none;padding-top:5px;">
+            <a href="https://discord.gg/EmRuWPp" target="_blank" >Link to Discord</a><br>
+            Thank you all for being such an amazing community! You're great :)
+        </div>
+
+    </div>
+
+    <div style="width:704px">
+        <div style="width:700px;vertical-align:top;">
+            <div id="warMap" style="width:100%;height:405px;position:relative;text-align:center;" class="unitsColorH">
+                <div id="prevLevel" class="fa fa-arrow-left clickable hidden" style="" onclick="prevLevel()"></div>
+                <div>
+                    <div class="title" style="font-weight:normal">War Map - <div id="mapName"></div></div>
+                </div>
+                <div id="nextLevel" class="fa fa-arrow-right clickable hidden" style="" onclick="nextLevel()"></div>
+                <div style="position:absolute;border:1px solid;bottom:2px;right:2px">
+                    <div id="kingToMove" class="clickable showthat" style="border:2px solid rgba(255, 255, 0, 1)" onclick="switchMapMoveUnits('king')">
+                        <img src='img/king.svg' class='largeIcon imageDragFix'>
+                    </div><div id="unitsToMove" class="clickable showthat hidden" style="border:2px solid rgba(255, 255, 0, 0)" onclick="switchMapMoveUnits('units')">
+                        <img src='img/units.svg' class='largeIcon imageDragFix'>
+                    </div><div id="heroesToMove" class="clickable showthat hidden" style="border:2px solid rgba(255, 255, 0, 0)" onclick="switchMapMoveUnits('heroes')">
+                        <img src='img/heroes.svg' class='largeIcon imageDragFix'>
+                    </div>
+                </div>
+                <div id="warMapActions"></div>
+            </div>
+            <div style="width:100%;height:10px;background-color:#dbdff3;display:block;">
+                <div id="manaBar" style="width:80%;height:100%;background-color:rgb(130, 147, 255);vertical-align:top;"></div>
+            </div>
+        </div>
+
+        
+        <div style="margin-top:4px;width:150%">
+            <div id="goldContainer" class="showthat hidden" style="width:100px;">
+                <img src='img/gold.svg' class='largeIcon imageDragFix' style="vertical-align:bottom">
+                <div id="gold"></div>
+                (+<div id="goldPerTick" class="bold"></div>)
+                <div class="showthis">
+                    Non-rounded Gold: <div id="actualGold" class="bold"></div><br>
+                    Per second: <div id="goldPerSecond" class="bold"></div>
+                </div>
+            </div><div id="woodContainer" class="showthat hidden" style="width:100px">
+                <img src='img/wood.svg' class='largeIcon imageDragFix' style="vertical-align:bottom">
+                <div id="wood"></div>
+                (+<div id="woodPerTick" class="bold"></div>)
+                <div class="showthis">
+                    Non-rounded Wood: <div id="actualWood" class="bold"></div><br>
+                    Per second: <div id="woodPerSecond" class="bold"></div>
+                </div>
+            </div><div id="favorContainer" class="showthat hidden" style="width:100px">
+                <img src='img/favor.svg' class='largeIcon imageDragFix' style="vertical-align:bottom">
+                <div id="favor"></div>
+                <div class="showthis">
+                    Favor
+                </div>
+            </div><div id="soulCContainer" class="showthat hidden" style="width:100px">
+                <img src='img/soulC.svg' class='largeIcon imageDragFix' style="vertical-align:bottom">
+                <div id="soulC">0</div>
+                <div class="showthis">
+                    Non-rounded Soul Crystals: <div id="actualSoulC" class="bold"></div><br>
+                    When you restart a map, you receive 1 Soul Crystal for every 10000 gold remaining.
+                </div>
+            </div><div class="showthat" style="width:65px">
+                <img src='img/mana.svg' class='largeIcon imageDragFix' style="vertical-align:bottom">
+                <div id="mana"></div>
+                <div id='manaTooltip' class="showthis"></div>
+            </div>
+            <div id='pausePlay' onclick='togglePause()' class='button' style="width:40px;">Play</div>
+            <div onclick='clickRestart()' class='button'>Restart</div>
+            <div id="clearCurrentList" class='button'>Clear Current List</div>
+            <div style="margin-left:5px" class="small">Reason for restart: <div id="restartReason" class="bold" style="width:65px;"></div></div>
+            <div style="margin-left:15px;" class="small">Bonus Ticks</div>
+            <div id="bonusButton" class='button'>>>>></div>
+            <div class="bold small" id="bonusSeconds" style="width:40px"></div>
+        </div>
+
+    </div>
+
+    <div style="width:378px;height:350px;vertical-align:top;">
+        <div style="height:80px;position:relative;width:280px;" class="kingColorH">
+            <div class="title">Stats</div>
+            <div id="kingOtherInfo" class="abs" style="left:0;top:0">
+                <div id='kingStats' class="abs" style="left:10px;top:30px;width:250px">
+                    <div style='font-size:20px'>Level <div id="kingLevel" class="bold"></div></div>
+                    <div style="position:relative;width:100%;height:17px;background-color:rgb(223,194,249);margin-bottom:3px;">
+                        <div class="abs" id="expProgress" style="left:0;top:0;height:100%;width:20%;background-color:rgba(179,92,249,0.8)"></div>
+                        <div class="abs" id="exp" style="left:0;top:0;"></div>
+                    </div>
+                    <div class="abs small" style="left:80px;top:9px;">GAIN: <div id="rflxGain" class="bold"></div></div>
+                    <div class="abs small" style="left:80px;top:-3px;">RFLX: <div id="rflxCur" class="bold"></div></div>
+                    <div class="abs small" style="left:80px;top:-15px;">CAP: <div id="rflxCap" class="bold"></div></div>
+                    <div id="statLabel1" class="abs small hidden" style="left:170px;top:9px;">WIS: <div id="wis" class="bold"></div></div>
+                    <div id="statLabel2" class="abs small hidden" style="left:170px;top:-3px;">CHA: <div id="cha" class="bold"></div></div>
+                    <div id="statLabel3" class="abs small hidden" style="left:170px;top:-15px;">INT: <div id="int" class="bold"></div></div>
+                </div>
+            </div>
+        </div>
+        <div style="height:300px;margin-top:10px;width:351px">
+            <div style="width:100%;height:20px;" class="large bold">
+                <div id="kingListSelector" class="listSelector kingColor" onclick="switchListTab(0)">King <img id="kingTabSleep" src='img/sleep.svg' class='smallIcon imageDragFix tabSleep'></div>
+                <div id="castleListSelector" class="listSelector castleColor" onclick="switchListTab(1)">Castle <img id="castleTabSleep" src='img/sleep.svg' class='smallIcon imageDragFix tabSleep'></div>
+                <div id="unitsListSelector" class="listSelector unitsColor" onclick="switchListTab(2)">Units <img id="unitsTabSleep" src='img/sleep.svg' class='smallIcon imageDragFix tabSleep'></div>
+            </div>
+            <div id="kingListContainer" class="listContainer" style="display:block;"><div id="kingCurActions" class="actionListLeft kingColorD"></div><div id="kingNextActions" class="actionListRight kingColorH"></div></div>
+            <div id="castleListContainer" class="listContainer"><div id="castleCurActions" class="actionListLeft castleColorD"></div><div id="castleNextActions" class="actionListRight castleColorH"></div></div>
+            <div id="unitsListContainer" class="listContainer"><div id="unitsCurActions" class="actionListLeft unitsColorD"></div><div id="unitsNextActions" class="actionListRight unitsColorH"></div></div>
+        </div>
+    </div>
+
+    <div style="width:1300px">
+        <div style="background-color:#c4c9e6;height:219px;">
+            <div id="castleActionContainer" class="mainActionList castleColorH" style="position:relative;width:332px;">
+                <div id="castleLabel1" style="display:block;text-align:center;margin-top:5px;margin-bottom:5px;" class="large bold hidden">Castle Actions</div>
+                <div id="castleLabel2" style="width:125px;text-align:center;" class="bold hidden">Income</div>
+                <div id="castleLabel3" style="width:125px;text-align:center;" class="bold hidden">Army</div>
+                <div id="castleLabel4" style="width:70px;text-align:center;" class="bold hidden">Spirits</div>
+                <div id="castleActionList" class="abs" style="left:0;top:50px;"></div>
+            </div><div id="kingActionContainer" class="mainActionList kingColorH" style="position:relative;width:270px;">
+            <div id="kingLabel1" style="display:block;text-align:center;margin-top:5px;margin-bottom:5px;" class="large bold hidden">King Actions</div>
+            <div id="kingLabel2" style="width:76px;text-align:center;" class="bold hidden">Auras</div>
+            <div id="kingLabel3" style="width:50px;text-align:center;" class="bold hidden">Growth</div>
+            <div id="kingLabel4" style="width:135px;text-align:center;" class="bold hidden">Blessings</div>
+            <div id="kingActionList" class="abs" style="left:0;top:50px;"></div>
+        </div><div id="optionsContainer" class="mainActionList extrasColorH hidden" style="position:relative;width:70px;vertical-align:top;">
+            <div style="display:block;text-align:center;margin-top:5px;margin-bottom:5px;" class="large bold">Options Actions</div>
+            <div id="otherActionList" class="abs" style="left:0;top:50px;"></div>
+        </div><div style="width:380px;height:100%;vertical-align:top;position:relative;">
+                <div id="deselectButton" class="abs fa fa-ban clickable" style="left:10px;top:5px;cursor:pointer;display:none;" onclick="deselect()"></div>
+                <div id="optionsMenu" class="abs fa fa-cog clickable" style="right:10px;top:5px;cursor:pointer;" onclick="openExtras()"></div>
+                <div id="storyMenu" class="abs fa fa-book clickable" style="right:40px;top:5px;color:red;" onclick="openStory()"></div>
+                <div id="infoMenu" class="abs fa fa-question clickable" style="right:70px;top:5px;" onclick="openInfoBox()"></div>
+                <div style="display:block;text-align:center;margin-top:5px;margin-bottom:5px;" class="large bold">Info Box</div>
+                <div id="defaultInfoBox" style="display:none;">
+                    <div id="actionInfoDivKing" style="display:none;width:100%"></div>
+                    <div id="actionInfoDivCastle" style="display:none;width:100%"></div>
+                    <div id="actionInfoDivUnits" style="display:none;width:100%"></div>
+                </div>
+                <div id="infoBoxList" style="width:100%;height:180px;display:none;"></div>
+                <div id="addButtons" style="text-align:center;display:none;margin-top:-15px;">
+                    <div class="button" style="margin-top:-20px;" onclick="addAction()">Add Action</div>
+                </div>
+                <div id="extrasInfoBox" style="width:100%;height:189px;vertical-align:top;position:absolute;top:30px;display:none;" class="extrasColorH">
+                    <div class="title">Extras</div>
+                    <div id="optionsDiv" style="position:relative;height:170px;width:100%;">
+                        <div style="width:100%;vertical-align:top">
+                            <div class="button" onclick="exportCurrentList()">Export Current List</div>
+                            <div class="button" onclick="exportMapList()">Export Map Lists</div><br>
+                            <div class="button" onclick="importList()">Import List(s)</div> <textarea id="exportImportList" class="listTextInput" style="width:80px;" onclick="this.select();"></textarea><br>
+                            <div class='control'><input type='checkbox' id='pauseBeforeRestart'><label for='pauseBeforeRestart'> Pause before restart</label></div><br>
+                            <input type="checkbox" id="pauseListEmpty" checked>
+                            <label for="pauseListEmpty">Pause when next list is empty</label><br>
+                            <input type="checkbox" id="pausePlaceCleared" checked>
+                            <label for="pausePlaceCleared">Pause when a place is cleared</label><br>
+                            <div id="directWorkerBonus" class="showthat hidden">
+                                <input type="checkbox" id="keepBuild">
+                                <label for="keepBuild">Keep Direct Worker bonus at</label> <input id="buildValue" type="text" class="listTextInput" value="1.5" onchange="changeBuildValue()" onclick="this.select();">
+                                <div class="showthis">
+                                    If you want to improve INT without messing up your action timing, use this option to keep things stable. The valid range is between 1.5 and your max. Uncheck to always use your max.
+                                </div>
+                            </div><br>
+                            <div class="button" onclick="exportSave()">Export Save</div><div class="button" onclick="save()">Save</div><div class="small">Auto Saving in <div id="saveTimer" class="bold"></div></div><br>
+                            <div class="button" onclick="importSave()">Import Save</div> <textarea id="exportImportSave" class="listTextInput" style="width:80px;" onclick="this.select();"></textarea><br>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+
+    <!--<div>Icons made by <a href="https://www.flaticon.com/authors/smashicons" title="Smashicons">Smashicons</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a></div>-->
+    <!--<a href="http://www.onlinewebfonts.com">oNline Web Fonts</a>-->
+
+    <script src="helpers/helpers.js?1"></script>
+    <script src="helpers/interval.js?1"></script>
+    <script src="driver.js?1"></script>
+    <script src="views/mainView.js?1"></script>
+    <script src="clickResponses.js?1"></script>
+    <script src="saving.js?1"></script>
+    <script src="data/levelData.js?1"></script>
+    <script src="actions/actions.js?1"></script>
+    <script src="data/actionData.js?1"></script>
+    <script src="actions/kingActions.js?1"></script>
+    <script src="actions/castleActions.js?1"></script>
+    <script src="actions/warMapActions.js?1"></script>
+    <script src="actions/shrineActions.js?1"></script>
+    <script src="storyAndTutorial.js?1"></script>
+    <script src="unlockLists.js?1"></script>
+    <script>
+        // (function (i, s, o, g, r, a, m) {
+        //     i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function () {
+        //         (i[r].q = i[r].q || []).push(arguments)
+        //     }, i[r].l = 1 * new Date(); a = s.createElement(o),
+        //         m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m)
+        // })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+        //
+        // ga('create', 'UA-60978932-1', 'auto');
+        // ga('send', 'pageview');
+
+    </script>
+    <script>
+        startGame();
+    </script>
+</body>
+</html>

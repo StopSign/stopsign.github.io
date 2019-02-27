@@ -1,0 +1,452 @@
+div {
+    display:inline-block;
+}
+
+body {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    font-family:Arial, Helvetica, serif;
+    color:black;
+    font-size:14px;
+    height:100%;
+    margin:0;
+    background-color: #cfd3e6;
+    cursor:default;
+}
+
+.hyperVisible {
+    text-shadow:
+            -1px -1px 0 #000,
+            1px -1px 0 #000,
+            -1px 1px 0 #000,
+            1px 1px 0 #000;
+    color:white;
+}
+
+.disabled {
+    opacity:.5;
+    cursor:default;
+    pointer-events:none;
+}
+
+.hidden {
+    opacity:0;
+    cursor:default;
+    pointer-events:none;
+}
+
+.showthatH:hover .showthisH {
+    display:block;
+}
+.showthat:hover .showthis, .showthat:hover .showthisUp, .showthat2:hover .showthis2 {
+    display:block;
+}
+.showthis, .showthisUp, .showthis2, .showthisH {
+    display:none;
+    position:absolute;
+    background-color: #BBD6E6;
+    border:1px solid;
+    padding:3px 5px;
+    border-radius:4px;
+    margin-top:5px;
+    z-index:999;
+    text-align:left;
+}
+.showthisUp {
+    bottom:105%;
+}
+
+.showthis2 {
+    z-index:1000;
+    min-width:400px;
+}
+
+.title {
+    font-size:16px;
+    font-weight:bold;
+    display:block;
+    text-align:center;
+}
+.smallTitle {
+    font-size:14px;
+    font-weight:bold;
+    display:block;
+    text-align:center;
+}
+
+.large {
+    font-size:16px;
+}
+.medium {
+    font-size:14px;
+}
+.small {
+    font-size:12px;
+}
+.bold {
+    font-weight:bold;
+}
+
+.abs {
+    position:absolute;
+}
+
+.mapTooltipRow {
+    width:380px;
+    position:relative;
+}
+
+.superLargeIcon {
+    width:30px;
+    height:30px;
+}
+.largeIcon {
+    width:20px;
+    height:20px;
+}
+.smallIcon {
+    width:16px;
+    height:16px;
+}
+
+input, label {
+    cursor:pointer;
+}
+input {
+    margin-right:0;
+}
+
+.button {
+    padding: 1px 5px;
+    text-align: center;
+    vertical-align:center;
+    min-width:9px;
+    cursor: pointer;
+    outline: none;
+    color: #e1e1e1;
+    background-color: #4CAF50;
+    border: none;
+    border-radius: 6px;
+    box-shadow: 0 3px #999;
+    transform: translateY(-2px);
+    margin-bottom:2px;
+}
+.buttonPressed {
+    padding: 1px 5px;
+    text-align: center;
+    vertical-align:center;
+    min-width:9px;
+    cursor: pointer;
+    outline: none;
+    color: #e1e1e1;
+    border: none;
+    border-radius: 6px;
+    margin-bottom:2px;
+    background-color: #3e8e41;
+    box-shadow: 0 1px #666;
+    transform: translateY(0px);
+}
+.buttonPressed.active {
+    background-color: #357937;
+    box-shadow: 0 1px #666;
+    transform: translateY(-1px);
+}
+
+.button:hover {background-color: #3e8e41}
+
+.button:active {
+    background-color: #3e8e41;
+    box-shadow: 0 1px #666;
+    transform: translateY(0px);
+}
+
+.unused {
+    background-color: #99c193;
+}
+
+.locked {
+    background-color: #bfbfbf;
+    cursor:default;
+    border-radius:10px;
+}
+.locked:hover {
+    background-color: #a8a8a8;
+}
+
+.statTooltipPerc {
+    float:right;
+    margin-left:3px;
+}
+
+.ssContainer {
+    display:none;
+}
+
+#expandableList {
+    position:relative;
+    height:500px;
+    width:100%;
+    /*border-bottom:2px solid purple;*/
+}
+
+.resizable {
+    width: 10px;
+    height: 10px;
+    background: blue;
+    position:absolute;
+    right: 0;
+    bottom: 0;
+    cursor: se-resize;
+}
+
+.draggedOverAction {
+    background:lightblue;
+}
+
+.draggedAction{
+    opacity:0.4;
+}
+
+.imageDragFix {
+    pointer-events:none;
+    user-drag: none;
+    user-select: none;
+    -moz-user-select: none;
+    -webkit-user-drag: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+}
+
+#trackedResources .resource, #timeControls .control {
+  margin-right : 5px;
+}
+
+.clickable:hover {
+    background-color: rgba(200, 200, 200, 1);
+}
+.clickable:active {
+    background-color: rgba(180, 180, 180, 1);
+}
+.clickable {
+    background-color: rgba(190, 190, 190, .3);
+    cursor:pointer;
+    padding:3px;
+    border:2px solid rgba(190, 190, 190, 0);
+}
+
+.kingColor, .kingColorH, .kingColorD:hover {
+    background-color: rgba(234, 234, 202, 1);
+}
+.kingColor:hover, .kingColorH:hover {
+    background-color: rgba(244, 244, 212, 1);
+}
+.kingColor:active, .kingColorD {
+    background-color: rgba(224, 224, 192, 1);
+}
+
+.castleColor, .castleColorH, .castleColorD:hover {
+    background-color: rgba(201, 220, 230, 1);
+}
+.castleColor:hover, .castleColorH:hover {
+    background-color: rgba(211, 230, 240, 1);
+}
+.castleColor:active, .castleColorD {
+    background-color: rgba(191, 210, 220, 1);
+}
+
+.shrineColor, .shrineColorH, .shrineColorD:hover {
+    background-color: rgba(237, 212, 245, 1);
+}
+.shrineColor:hover, .shrineColorH:hover {
+    background-color: rgba(247, 222, 255, 1);
+}
+.shrineColor:active, .shrineColorD {
+    background-color: rgba(227, 202, 235, 1);
+}
+
+.unitsColor, .unitsColorH, .unitsColorD:hover {
+    background-color: rgba(230, 203, 201, 1);
+}
+.unitsColor:hover, .unitsColorH:hover {
+    background-color: rgba(240, 213, 211, 1);
+}
+.unitsColor:active, .unitsColorD {
+    background-color: rgba(220, 193, 191, 1);
+}
+
+.heroColor, .heroColorH, .heroColorD:hover {
+    background-color: rgba(194, 228, 194, 1);
+}
+.heroColor:hover, .heroColorH:hover {
+    background-color: rgba(204, 238, 204, 1);
+}
+.heroColor:active, .heroColorD {
+    background-color: rgba(184, 218, 184, 1);
+}
+
+.extrasColor, .extrasColorH {
+    background-color: rgba(212, 216, 235, 1);
+}
+.extrasColor:hover, .extraColorsH:hover {
+    background-color: rgba(222, 226, 245, 1);
+}
+.extrasColor:active {
+    background-color: rgba(202, 206, 225, 1);
+}
+
+.tabSelector {
+    width:100%;
+    display:block;
+    text-align:center;
+    cursor:pointer;
+    padding:10px 0;
+    margin-bottom:3px;
+}
+.tabContainer {
+    width:100%;
+    height:100%;
+    display:none;
+    position:relative;
+}
+
+.actionListLeft, .actionListRight {
+    height:100%;
+    text-align:center;
+    vertical-align:top;
+    position:relative;
+    overflow-y:auto;
+}
+.actionListLeft {
+    width:39%;
+}
+.actionListRight {
+    width:61%;
+}
+
+.listContainer {
+    display:none;
+    height:100%;
+}
+.listSelector {
+    cursor:pointer;
+    text-align:center;
+    margin-top:-2px;
+    padding:4px 0;
+    width:114px;
+    position:relative;
+}
+.listTextInput {
+    width:30px;
+    height:9px;
+    font-size:12px;
+    vertical-align:top;
+}
+
+.tabSleep {
+    position:absolute;
+    right:2px;
+    opacity:.5;
+}
+
+.nextActionContainer, .curActionContainer {
+    margin-left:3px;
+    display:block;
+    padding-top:1px;
+    padding-bottom:1px;
+    border-bottom:1px solid #b9b9b9;
+    position:relative;
+    text-align:left;
+}
+.nextActionContainer {
+    width:210px;
+}
+.curActionContainer {
+    width:123px;
+}
+
+.curActionBar {
+    height:100%;
+    width:0;
+    background-color: #ff907d;
+    position:absolute;
+    opacity:.5;
+}
+.curActionErrorBar {
+    height:3px;
+    width:100%;
+    background-color: #ff907d;
+    position:absolute;
+    opacity:.5;
+    top:10px;
+}
+.actionSelectedIndicator {
+    position:absolute;
+    opacity:0;
+    background-color: #0900e2;
+    width:3px;
+    height:100%;
+}
+
+.actionIcon {
+    text-align:center;
+    width:12px;
+}
+.actionIcon:hover {
+    color:red;
+    cursor:pointer;
+    background-color:#b3b3b3;
+}
+
+.mapFriendlyHPBar, .mapEnemyHPBar {
+    position:absolute;
+    left:0;
+    width:40px;
+    height:5px;
+    background-color:white;
+}
+.mapFriendlyHPBar div, .mapEnemyHPBar div {
+    position:absolute;
+    left:0;
+    height:100%;
+}
+.mapFriendlyHPBar div {
+    background-color: #0007d8;
+}
+.mapEnemyHPBar div {
+    background-color: #c10000;
+}
+
+.mainActionList {
+    height:100%;
+}
+
+.infoBox {
+    width:100%;
+    height:100%;
+    display:none;
+    position:relative;
+    padding:5px 0;
+}
+
+.empowerOption {
+    display:block;
+    margin:5px;
+}
+
+.infoSelector {
+    cursor:pointer;
+    text-align:center;
+    height:30px;
+    padding:4px 0;
+    width:114px;
+    position:relative;
+}
+.infoBoxSelector {
+    display:block;
+    cursor:pointer;
+    height:23px;
+    padding-top:8px;
+}
