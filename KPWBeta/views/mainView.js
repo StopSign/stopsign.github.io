@@ -3,9 +3,9 @@ let view = {
         view.clickable.initial.createIcons();
         view.clickable.initial.createEmpower();
         // view.clickable.initial.createWarMap();
-        this.actionInfoDiv = {"king":document.getElementById("actionInfoDivKing"),
-            "castle":document.getElementById("actionInfoDivCastle"),
-            "units":document.getElementById("actionInfoDivUnits")};
+        this.actionInfoDiv = {king:document.getElementById("actionInfoDivKing"),
+            castle:document.getElementById("actionInfoDivCastle"),
+            units:document.getElementById("actionInfoDivUnits")};
         setMapArrowVisibility();
     },
     updating: {
@@ -32,6 +32,7 @@ let view = {
             prevState.soulC = soulC;
             prevState.next = copyArray(actionsList.next);
             prevState.current = copyArray(actionsList.current);
+            prevState.validActions = copyArray(actions.validActions);
             prevState.created = copyArray(created);
             prevState.levelData = copyArray(levelData);
             prevState.king = {};
@@ -40,6 +41,7 @@ let view = {
             prevState.king.isHome = king.kingIsHome();
             prevState.levelSave = copyArray(levelSave[curLevel]);
             prevState.restartReason = restartReason;
+            prevState.consoleLog = copyArray(consoleLog);
         },
         updateResources: function() {
             if(prevState.mana !== mana || prevState.maxMana !== maxMana) {
@@ -87,6 +89,15 @@ let view = {
             }
             for (let i = 0; i < actionsList.nextNames.length; i++) {
                 let name = actionsList.nextNames[i];
+
+                let currentAction = actionsList.current[name][actions.validActions[i]];
+                let currentActionName = currentAction ? currentAction.varName.split("_")[0] : "sleep";
+                let prevCurrentAction = prevState.current ? prevState.current[name][prevState.validActions[i]] : null;
+                let prevActionName = prevCurrentAction ? prevCurrentAction.varName.split("_")[0] : "sleep";
+                if (currentActionName !== prevActionName) {
+                    document.getElementById(name + "TabAction").innerHTML = "<img src='img/" + currentActionName + ".svg' class='smallIcon imageDragFix'>";
+                }
+
                 if(!prevState.current || prevState.current[name].length !== actionsList.current[name].length) {
                     view.actionList.createCurrentList(i);
                     continue;
@@ -96,7 +107,6 @@ let view = {
                     let curAction = actionsList.current[name][j];
                     if(!prevAction ||
                         prevAction.varName !== curAction.varName ) {
-                        console.log(curAction);
                         view.actionList.createCurrentList(i);
                         break;
                     } else if(prevAction.manaUsed !== curAction.manaUsed
@@ -118,11 +128,13 @@ let view = {
                         }
                     }
                 }
-                let currentAction = actionsList.current[name][actions.validActions[i]];
-                let nextAction = actionsList.current[name][actions.validActions[i]+1];
-                document.getElementById(name+"TabSleep").style.opacity = (!currentAction || currentAction.varName === "sleep" ||
-                    (currentAction.loopsLeft === 0 && currentAction.manaUsed === currentAction.costseconds*10 && (!nextAction || nextAction.varName === "sleep"))) //pause when next list is empty condition
-                    ? ".5" : "0";
+            }
+            if(!prevState.consoleLog || prevState.consoleLog.length !== consoleLog.length || prevState.consoleLog[0] !== consoleLog[0]) {
+                let divText = "";
+                for (let i = 0; i < consoleLog.length; i++) {
+                    divText += consoleLog[i] + "<br>";
+                }
+                document.getElementById("consoleLog").innerHTML = divText;
             }
         },
         updateInfoDiv: function(name, i) {
@@ -162,6 +174,9 @@ let view = {
         updateUnits: function() {
             let prevLevelDatum = prevState.levelData;
 
+            if(!prevLevelDatum || prevLevelDatum.totalMana !== levelData.totalMana) {
+                document.getElementById("totalMana").innerHTML = "Total Mana: " + levelData.totalMana;
+            }
 
             //initial
             if(!prevLevelDatum) {
@@ -216,6 +231,7 @@ let view = {
             if(prevLevelDatum && prevLevelDatum.restartReason !== restartReason) {
                 document.getElementById("restartReason").innerHTML = restartReason;
             }
+
         },
         updateTraveling: function() {
             let prevLevelDatum = prevState.levelData;
@@ -287,17 +303,19 @@ let view = {
             }
             if(noPrevKing || prevState.king.curData.rflxCur !== king.curData.rflxCur) {
                 document.getElementById("rflxCur").innerHTML = intToString(king.curData.rflxCur,3);
+                document.getElementById("rflxGain").innerHTML = intToString((king.savedData.rflxCap - king.curData.rflxCur)/50, 4);
             }
             if(noPrevKing || prevState.king.savedData.exp !== king.savedData.exp) {
                 document.getElementById("kingLevel").innerHTML = king.getLevel();
                 let expNeeded = king.getExpOfLevel(king.getLevel());
-                document.getElementById("exp").innerHTML = "<b>"+king.savedData.exp+"</b> / <b>"+expNeeded+"</b> exp";
                 let expOfPrev = king.getExpOfLevel(king.getLevel()-1);
+
+                document.getElementById("exp").innerHTML = "<b>"+(king.savedData.exp - expOfPrev)+"</b> / <b>"+(expNeeded - expOfPrev)+"</b> exp";
                 document.getElementById("expProgress").style.width = 100 * (king.savedData.exp - expOfPrev) / (expNeeded - expOfPrev) + "%";
 
                 document.getElementById("rflxCap").innerHTML = king.savedData.rflxCap + "";
-                document.getElementById("rflxGain").innerHTML = intToString((king.savedData.rflxCap - king.curData.rflxCur)/50, 3);
             }
+
             let kingIsHome = king.kingIsHome();
             if(noPrevKing || prevState.king.curData.aura !== king.curData.aura || prevState.king.isHome !== kingIsHome) {
                 document.getElementById("directContainer").style.padding = "3px";
@@ -489,6 +507,11 @@ let view = {
                     "</div>";
             }
 
+            //update tab icon
+            let currentAction = actionsList.current[name][actions.validActions[num]];
+            let currentActionName = currentAction ? currentAction.varName.split("_")[0] : "sleep";
+            document.getElementById(name+"TabAction").innerHTML = "<img src='img/"+currentActionName+".svg' class='smallIcon imageDragFix'>";
+
             view.actionInfoDiv[name].innerHTML = totalDivText;
             view.actionList.showInfoDiv(0, name, false);
         },
@@ -503,6 +526,7 @@ let view = {
                 }
             }
             view.actionInfoDiv[name].style.display = isHover ? "inline-block" : "none";
+            document.getElementById(name+"NextActions").style.display = isHover ? "none" : "inline-block";
         }
     },
     performance: {

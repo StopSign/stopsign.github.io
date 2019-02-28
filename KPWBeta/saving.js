@@ -11,7 +11,13 @@ function startGame() {
     displayBetaSaveNote();
 
     //debug
-    // window.localStorage[saveName] = decode("eyJkYXRlIjoiMjAxOS0wMi0yN1QxNzo0OMSWMy45OTJaIiwidG90YWxPZmZsaW5lTXPEhjkwMzI4LjDEuMS5xLoxxKFlbXBvd2VyZWTEhnt9xKFsZXZlbFNhxY3EhlvEgMSteHRMaXN0xLA6xIBrxKxnxZMic8WLZXB8MTMiXcShY2HFm8WLxaPFpWXFp3wyNMSgImJlZ8Wpxbpzxa/FjW5nxYPFv8ShxbTFtjEwxbpiYXJyYWNrc8aHxaRwZcaPbWFuxpZzxpjGmsacxb/FrSJ1bmnFnMWjZMamxoVvbl8wxanGnsWmxagyMsW6aG9tZcayMcaAxrR8xJfGuGlkZW91dMawxrLFq13FicWkZWPFhMapOjDEocamaXF1ZUPFi8aPxYXEhnRyx5rEoWtuxYHFi2TGhcSGx5Uix6XHp8WFxoVDYXDHq8ShaGlnaGXFm1DFg3PGrsWTxIDGmHLHv27HtSJhbceHbnTEhjJ9xqRixYtzc8WhxZ3EgGVuY2jGnMiNOsWUIm51bciHyInIi8ieyI/GpGbGmcWbyIHIocijyKXIisamyKjIkMShZ3XHhMacY8SFyJ/Flciwx5TEocimyLPIjsi1IsagyLvIrsiiyKTJgMiIyLLIjMmEyJHIp3nJici/x6zJgsmPOsipx7bFg2/Hu8mUyYvJlsmOyLTHjcWJxZVlxZfFmcWbyJfHrcWhxZPGpMWvxbHIvFvGpMeXx5PJs8eOc8eQx5LFncesx5fHmcebx53FhMWGOmbEpsm5x6THpnfHqMeqyYzHrsqKx7DHm8ezyIfHt8e5x7t0x73IhMiAyJ/IkciTyJXGhMmryJnIm8idya7EocirxbDInsmzyLbIuMSCyJrJssakyYfKrsShYsmSyqQix7pyyZ3Fncm3yYXFoMaExYfFpMWRxYVExINhyr/ErMiex6x3xZrEhsS8Isqiy4zEoXLEqnhJxqd0acSmy4zHrMuSbHjHsse0OjEyxL14y6DGtjB9x47GpmxvxpPJqcqox6HHo8uxZSzLs8u1x6LLtMu2y7rLuMm0bsusxpNTxKNyyZPIn8qFbMqHy7vLssu4y7fMisyNZcakxZtvzINEy5jMg8q1zJHMg1BhyozHrGLIuGxkQXXGkVbEpseay4wuNcaIx4dsQ8erxLc2MTbEocSjxKVsVGnGu8uMMzk3M8esY8yjTMWMxY7LkMq2x7jHusWbzYPFjWzLjH0=");
+    // window.localStorage[saveName] = decode("eyJkYXRlIjoiMjAxOS0wMi0yOFQxNzo0NTo1NS7ElzFaIiwidG90YWxPZmZsaW5lTXPEhjIxxJQwOTQuMMS5xLrEijjEoWVtcG93ZXJlZMSGe33EoWxldmVsU2HFjsSGW8SAxK14dExpc3TEsDrEgGvErGfFlCJzxYxlcHw3MyJdxKFjYcWcxYzFpMWmZcWofDLFrMShYmVnfDHEoMWlxbDFjm5nxYTFv8aBxbXFtzEwxoFiYXJyYWNrc8aIxKFzcGXGkG1hbsaXxaXGmsacxp7GiMWuInVuacWdxaRkxqjGhm9uXzDFv8agxorFqcSyxoFob21lxrTGgMaYxafFqTQ4xrlpZGVvdXTGssa0xaxdxYrFpWVjxYXGqzowxKHGqGlxdWVDxYzGkMWGxIZ0csecxKFrbsWCxYxkxobEhseXIsenx6nFhsaGQ2Fwx63EoWhpZ2hlxZxQxYRzxrDFlMSAxppyyIFux7ciYW3HiW50xLF9xqZixYxzc8WixZ7EgGVuY2jGnsiPOsWVIm51bciJyIvIjcifMsiRxKFmxpvFnMiDyKLIpMimyIzGqMipyKsiZ3XHhsaeY8SFyKDFlsiyx5bEocinyLXIkMamxqLIvciwyKPIpcmCyIrItMiOyYbFu8ioecmKyYHHrsmEyZA6yKrGpse8cm/HvcmVyYzJl8mPyLbHj8WKxZZlxZjFmsWcyJjHr8WixaTGnXJrZXTGtceBxao5xoFjxrttxqjGvca/xaXJtzjGjcamxbDFssi+WyLFvMW+yoDGtnw1xo7Fvca1xoPImsaGcsqTxZLKlcaHyoDGj8aRxpPGlcagyp3GksaUxpbKjcaicsadxp/KpsabyqjGpMqNybfKkMaYyqfKqcm2xbbFqcqrxqPKqsaJybczxo3KssqsyrTKuMqtyrrKv8q5xqXHmMapx5XKicqOxozKgMe5x4fHiceLxrMxfMW6yoHKtsuVyrEiy4/HiMeKX8uUy5TLlsqOxrjHuMeGy53Hi8ugy5XFrceQc8eSx5TFnseux5nHm8edx5/FhcWHOsejx6XHr8eod8eqx6zJjcewy73Hssedx7XIice5x7vHvXTHv8iGyILIoMiSyJTIlsaFya3ImsicyJ7FlMamyK3FscifW8amyLnIu8ibyojJh8abyYnMjsmSyLXJlMyly5vFhMmfxZ7MnH3It8WhxoXFiMWlyplkRMSDYcyzxKzIn8eud8WbxIYxxa/Inc2AxKFyxKp4ScuJacSmzYDHrs2GbHjHtMe2OjE0xL54zZM1NDHMr8uIbG/GlMmrzJvLuWUszaTNpsekzaXNp82rzanNqMecxqbGqM2fxpRTxKNyzKhbZsSmy63Nrs2qza3NrMelzb9lxqbFnG/NtkTNi822zJfGmM21eVBhy7/HrmLIumxkQXXGklbEpseczYAuNcaYx4lsQ8etxLg2xLXEocSjxKVsVGnGvMSxNsS2xJHHrmPOl0zFjcWPzYTLm8e6x7zFnM61xY5syJA=");
+
+    let divText = "";
+    for(let i = 0; i < story.length; i++) {
+        divText += "<div id='pageNum"+i+"' style='display:none'>"+story[i]+"</div>"
+    }
+    document.getElementById("storyContainer").innerHTML = divText;
 
     load();
 }
@@ -39,34 +45,16 @@ let created = {}; //keep track of the number of times an action has happened per
 window.language = "eng";
 window.addAmount = 1;
 
-let curLevel = 0;
-let highestLevel = 0;
-let mana = 1200;
-let maxMana = 1200;
-let totalTime = 0;
-let gold = 0;
-let wood = 0;
-let soulC = 0;
-let buildAuraValue = 1.5;
-let highestListsLength;
+let curLevel, highestLevel, mana, maxMana, totalTime, gold, wood, soulC, buildAuraValue, highestListsLength;
 
 let curList = 0; //king
 let currentlyHovering = 0;
 let unitsSelectedForMove = { king:true, units:false, heroes:false };
-
-let levelSave = [];
-let curInfoBox = "extras";
+let curInfoBox = "default";
 let addButtons = document.getElementById("addButtons");
 let curListNum = 1;
-let unlockList = [];
-let unlockStory = []; //undefined is locked, true is new, false is seen
-let storyJournal = [];
-let restartReason = "";
-let storyPage = 0;
-let empowered = {};
-let initialUnlock = true;
 
-let totalOfflineMs = 0;
+let levelSave, unlockList, unlockStory, storyJournal, restartReason, storyPage, empowered, initialUnlock, consoleLog, totalOfflineMs;
 
 function clearSave() { //Doesn't work atm
     window.localStorage[saveName] = "";
@@ -74,6 +62,27 @@ function clearSave() { //Doesn't work atm
 }
 
 function loadDefaults() {
+    curLevel = 0;
+    highestLevel = 0;
+    mana = 1200;
+    maxMana = 1200;
+    totalTime = 0;
+    gold = 0;
+    wood = 0;
+    soulC = 0;
+    buildAuraValue = 1.5;
+
+    levelSave = [];
+    unlockList = [];
+    unlockStory = []; //undefined is locked, true is new, false is seen
+    storyJournal = [];
+    restartReason = "";
+    storyPage = 0;
+    empowered = {};
+    initialUnlock = true;
+    consoleLog = [];
+
+    totalOfflineMs = 0;
 }
 
 function load() {
@@ -90,7 +99,7 @@ function load() {
     //defines defaults later
     if(toLoad.levelSave) {levelSave = toLoad.levelSave;}
     if(toLoad.king && toLoad.king.savedData) {king.savedData = toLoad.king.savedData;}
-    king.recalcListLength();
+    king.recalcListLength(); //set highestListLength
 
     if(toLoad.unlockList) {unlockList = toLoad.unlockList; }
     if(toLoad.unlockStory) {unlockStory = toLoad.unlockStory;}
@@ -213,9 +222,9 @@ function importSave() {
 function displayBetaSaveNote() {
     // console.log(isBeta);
     if(!isBeta) return;
-    document.addEventListener("DOMContentLoaded", function() {
-        document.getElementById("betaSave").style.display = "block";
-    });
+    // document.addEventListener("DOMContentLoaded", function() {
+    //     document.getElementById("betaSave").style.display = "block";
+    // });
 }
 
 // function moveSaveToBeta() {

@@ -335,7 +335,7 @@ input {
     text-align:center;
     margin-top:-2px;
     padding:4px 0;
-    width:114px;
+    width:124px;
     position:relative;
 }
 .listTextInput {
@@ -345,7 +345,7 @@ input {
     vertical-align:top;
 }
 
-.tabSleep {
+.tabIcon {
     position:absolute;
     right:2px;
     opacity:.5;

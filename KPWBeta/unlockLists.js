@@ -7,7 +7,7 @@ let unlockLists = {
     checkUnlocks: function() {
         unlockLists.check(1, levelData && levelData.home.units.length === 0);
         unlockLists.check(2, gold > 0, ["goldContainer", "castleLabel1", "castleLabel2", "woodContainer"]);
-        unlockLists.check(3, created.scavenger > 0, ["unitsToMove", "castleLabel3", "optionsContainer"]);
+        unlockLists.check(3, created.scavenger > 0, ["unitsToMove", "castleLabel3", "optionsActionContainer"]);
         unlockLists.check(4, created.spearman > 0);
         unlockLists.check(5, highestLevel >= 1);
         unlockLists.check(6, curLevel >= 1, ["kingLabel1", "kingLabel2"]);

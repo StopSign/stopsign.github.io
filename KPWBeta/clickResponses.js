@@ -50,7 +50,7 @@ function switchInfoBoxTab(num) {
 }
 
 function switchInfoTab(num) {
-    let ids = ["infoContainer", "storyInfoBox", "changelogContainer", "extrasContainer"];
+    let ids = ["infoContainer", "storyInfoBox", "optionsContainer", "savingContainer", "changelogContainer"];
     for(let i = 0; i < ids.length; i++) {
         if(num === i) {
             document.getElementById(ids[i]).style.display = "block";
@@ -62,8 +62,9 @@ function switchInfoTab(num) {
         adjustStoryDivs();
     }
 }
+
 function openInfoBox() {
-    if(document.getElementById("extraInfoBox").style.display === "block" && document.getElementById("extraInfoBox").style.display === "block") {
+    if(document.getElementById("extraInfoBox").style.display === "block" && document.getElementById("infoContainer").style.display === "block") {
         closeInfoBox();
         return;
     }
@@ -85,6 +86,28 @@ function openStory() {
         document.getElementById("extraInfoBox").style.display = "block";
     }
     switchInfoTab(1);
+}
+
+function openOptions() {
+    if(document.getElementById("extraInfoBox").style.display === "block" && document.getElementById("optionsContainer").style.display === "block") {
+        closeInfoBox();
+        return;
+    }
+    if(document.getElementById("extraInfoBox").style.display === "none") {
+        document.getElementById("extraInfoBox").style.display = "block";
+    }
+    switchInfoTab(2);
+}
+
+function openSaving() {
+    if(document.getElementById("extraInfoBox").style.display === "block" && document.getElementById("savingContainer").style.display === "block") {
+        closeInfoBox();
+        return;
+    }
+    if(document.getElementById("extraInfoBox").style.display === "none") {
+        document.getElementById("extraInfoBox").style.display = "block";
+    }
+    switchInfoTab(3);
 }
 
 function switchListTab(num) {
@@ -127,7 +150,6 @@ function selectAction(varName, num) {
         addButtons.style.display = "block";
         document.getElementById("deselectButton").style.display = "block";
         document.getElementById("infoBoxList").style.display = "block";
-        document.getElementById("extrasInfoBox").style.display = "none";
     }
 
     document.getElementById(varName+"InfoBox").style.display = "block";
@@ -238,16 +260,6 @@ function nextTooltip() {
     document.getElementById("popupText").innerHTML = curTooltipStrings[curTooltip];
     document.getElementById("popupButton").innerHTML = (curTooltipStrings.length === (curTooltip+1)) ? "Okay" : ("Next (" + (curTooltip+1) + "/" + curTooltipStrings.length + ")");
     curTooltip++;
-}
-
-function openExtras() {
-    if(document.getElementById("extrasInfoBox").style.display === "block") {
-        deselect();
-        return;
-    }
-    selectAction(curInfoBox, curListNum);
-    document.getElementById("deselectButton").style.display = "block";
-    document.getElementById("extrasInfoBox").style.display = "block";
 }
 
 function prevStory() {

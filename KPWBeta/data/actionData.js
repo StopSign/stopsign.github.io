@@ -120,9 +120,11 @@ actionData = {
                     if(this.createdWith) { //is army unit
                         if(created[this.createdWith]) {
                             warMap.units.createUnit(this.varName, true, "home", created[this.createdWith]);
+                            created[this.varName] += created[this.createdWith];
                         }
+                    } else {
+                        created[this.varName]++;
                     }
-                    created[this.varName]++;
                 }
             }
             action.canBuy = function() {
@@ -332,7 +334,7 @@ actionData = {
                 actionData.create.castleAction({
                     varName:"spearman",
                     name:"Equip Spearman",
-                    desc:"The meat of your army, they'll take damage before your other units. Cost is multiplied by number of barracks.",
+                    desc:"The meat of your army, they'll take damage before your other units. Cost shown here is multiplied by number of barracks.",
                     cost: [
                         {
                             resource:"wood",
@@ -351,7 +353,7 @@ actionData = {
                 actionData.create.castleAction({
                     varName:"archer",
                     name:"Train Archer",
-                    desc:"Elite archers capable of dealing death to your enemies. Cost is multiplied by number of archery ranges.",
+                    desc:"Elite archers capable of dealing death to your enemies. Cost shown here is multiplied by number of archery ranges.",
                     cost: [
                         {
                             resource:"wood",
@@ -368,7 +370,7 @@ actionData = {
                 actionData.create.castleAction({
                     varName:"catapult",
                     name:"Build Catapult",
-                    desc:"For when you have a lot of enemies to kill and a lot of resoures to throw at the problem. Cost is multiplied by number of designers.",
+                    desc:"For when you have a lot of enemies to kill and a lot of resoures to throw at the problem. Cost shown here is multiplied by number of designers.",
                     cost: [
                         {
                             resource:"wood",

@@ -7,6 +7,8 @@ function createLevel(num) {
     let curLevelData = levelInitials[num];
     levelData = copyArray(curLevelData);
 
+    levelData.totalMana = 0;
+
     if(!levelSave[num]) {
         levelSave[num] = {};
         levelSave[num].nextLists = {king:[], castle:[], units:[]};
@@ -127,7 +129,7 @@ levelInitials = [
             mana: 250
         },
         home: {
-            coords: { x: 30, y: 30},
+            coords: { x: 70, y: 30},
             units: { king: 1 }
         },
         dungeons:[
@@ -146,7 +148,7 @@ levelInitials = [
                         type:"mana",
                         amount:1000
                     }],
-                coords:{x:50, y:40}
+                coords:{x:90, y:30}
             }
         ],
         hideouts:[
@@ -157,7 +159,7 @@ levelInitials = [
                     amount:200,
                     unique:true
                 }],
-                coords:{x:70, y:20}
+                coords:{x:110, y:30}
             }
         ]
     },
@@ -196,56 +198,51 @@ levelInitials = [
                 coords:{x:60, y:20}
             }
         ]
+    },
+    { //2
+        name: chooseNextName(),
+        initial: {
+            people:0,
+            gold: 0,
+            wood: 0,
+            mana: 700
+        },
+        home: {
+            coords: { x: 110, y: 100},
+            units: { king: 1 }
+        },
+        dungeons:[
+        ],
+        hideouts:[
+            {
+                units: { thug:11 },
+                reward: [
+                    {
+                        type:"mana",
+                        amount:600
+                    },
+                    {
+                        type:"gold",
+                        amount:500
+                    },
+                    {
+                        type:"wood",
+                        amount:200
+                    }
+                ],
+                coords:{x:125, y:85}
+            },
+            {
+                units: { thug:2 },
+                reward: [{
+                    type:"exp",
+                    amount:400,
+                    unique:true
+                }],
+                coords:{x:80, y:60}
+            }
+        ]
     }
-    // { //2
-    //     name: chooseNextName(),
-    //     initial: {
-    //         people:0,
-    //         gold: 50,
-    //         wood: 0,
-    //         mana: 5000
-    //     },
-    //     home: {
-    //         coords: { x: 0, y: 100},
-    //         units: { king: 1 }
-    //     },
-    //     dungeons:[
-    //         {
-    //             units: { goblin:15, hobgoblin:3 },
-    //             reward: [
-    //                 {
-    //                     type:"mana",
-    //                     amount:600
-    //                 },
-    //                 {
-    //                     type:"wood",
-    //                     amount:1000
-    //                 }
-    //                 ],
-    //             coords:{x:30, y:50},
-    //         }
-    //     ],
-    //     hideouts:[
-    //         {
-    //             units: { thug:7, brigand:2 },
-    //             reward: [{
-    //                 type:"mana",
-    //                 amount:600
-    //             }],
-    //             coords:{x:130, y:60}
-    //         },
-    //         {
-    //             units: { thug:2, brigand:7 },
-    //             creates: { units: { thug:2 }, initialTime: 1000, period: 1000 },
-    //             reward: [{
-    //                 type:"exp",
-    //                 amount:400,
-    //                 unique:true
-    //             }],
-    //             coords:{x:130, y:10}
-    //         }
-    //     ]
-    // },
     // { //3
     //     name: chooseNextName(),
     //     initial: {

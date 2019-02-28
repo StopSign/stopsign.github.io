@@ -34,14 +34,15 @@
 
     <div id="extraInfoBox" class="abs extrasColorH" style="left:200px;top:50px;width:700px;z-index:2000;display:none;">
         <div style="width:100%;height:30px;" class="large bold">
-            <div id="extraInfoSelector" class="infoSelector extrasColor" onclick="switchInfoTab(0)">Info</div>
+            <div id="extraInfoSelector" class="infoSelector castleColor" onclick="switchInfoTab(0)">Info</div>
             <div id="storySelector" class="infoSelector kingColor" onclick="switchInfoTab(1)">Story</div>
-            <div id="changelogSelector" class="infoSelector extrasColor" onclick="switchInfoTab(2)">ChangeLog</div>
-            <div id="extrasSelector" class="infoSelector castleColor" onclick="switchInfoTab(3)">Extras</div>
+            <div id="optionsSelector" class="infoSelector castleColor" onclick="switchInfoTab(2)">Options</div>
+            <div id="savingSelector" class="infoSelector kingColor" onclick="switchInfoTab(3)">Saving</div>
+            <div id="changelogSelector" class="infoSelector castleColor" onclick="switchInfoTab(4)">ChangeLog</div>
             <div style="float:right" class="fa fa-times clickable" onclick="closeInfoBox()"></div>
         </div>
 
-        <div id="infoContainer" class="abs extrasColorH" style="top:30px;width:700px;padding-bottom:10px;padding-top:5px;">
+        <div id="infoContainer" class="abs castleColorH" style="top:30px;width:700px;padding-bottom:10px;padding-top:5px;">
             <div style="width:150px;text-align:center;" class="large bold">
                 <div class="infoBoxSelector extrasColor" onclick="switchInfoBoxTab(0)">Overview</div>
                 <div class="infoBoxSelector extrasColor" onclick="switchInfoBoxTab(1)">Gameplay</div>
@@ -133,13 +134,43 @@
             <textarea id="storyJournal" style="width:350px;height:17px;" placeholder="Add to your journal" onchange="diaryChanged()"></textarea>
         </div>
 
-        <div id="changelogContainer" class="abs extrasColorH" style="top:30px;width:700px;padding-bottom:10px;display:none;padding-top:5px;">
-            Too much changing in beta. This is where they'll go, though.
+        <div id="optionsContainer" class="abs castleColorH" style="top:30px;width:700px;padding-bottom:10px;display:none;padding-top:5px;">
+            <div class="title">Options</div>
+            <div id="optionsDiv" style="position:relative;width:100%;">
+                <div style="width:100%;vertical-align:top">
+                    <div class='control'><input type='checkbox' id='pauseBeforeRestart' checked><label for='pauseBeforeRestart'> Pause before restart</label></div><br>
+                    <input type="checkbox" id="pauseListEmpty" checked>
+                    <label for="pauseListEmpty">Pause when next list is empty</label><br>
+                    <input type="checkbox" id="pausePlaceCleared" checked>
+                    <label for="pausePlaceCleared">Pause when a place is cleared</label><br>
+                    <div id="directWorkerBonus" class="showthat hidden">
+                        <input type="checkbox" id="keepBuild">
+                        <label for="keepBuild">Keep Direct Worker bonus at</label> <input id="buildValue" type="text" class="listTextInput" value="1.5" onchange="changeBuildValue()" onclick="this.select();">
+                        <div class="showthis">
+                            If you want to improve INT without messing up your action timing, use this option to keep things stable. The valid range is between 1.5 and your max. Uncheck to always use your max.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <br><br><a href="https://discord.gg/EmRuWPp" target="_blank" >Link to Discord</a><br>
+            Thank you all for being such an amazing community! You're great :)
         </div>
 
-        <div id="extrasContainer" class="abs castleColorH" style="top:30px;width:700px;padding-bottom:10px;display:none;padding-top:5px;">
-            <a href="https://discord.gg/EmRuWPp" target="_blank" >Link to Discord</a><br>
-            Thank you all for being such an amazing community! You're great :)
+        <div id="savingContainer" class="abs kingColorH" style="top:30px;width:700px;padding-bottom:10px;display:none;padding-top:5px;">
+            <div class="title">Saving</div>
+            <div class="button" onclick="exportCurrentList()">Export Current List</div>
+            <div class="button" onclick="exportMapList()">Export Map Lists</div><br>
+            <div class="button" onclick="importList()">Import List(s)</div> <textarea id="exportImportList" class="listTextInput" style="width:80px;" onclick="this.select();"></textarea><br>
+            Importing an empty list will reset and clear all lists.
+            <br><br><br>
+            <div class="button" onclick="save()">Save</div><div class="small">Auto Saving in <div id="saveTimer" class="bold"></div></div><br>
+            <div class="button" onclick="exportSave()">Export Save</div><br>
+            <div class="button" onclick="importSave()">Import Save</div> <textarea id="exportImportSave" class="listTextInput" style="width:80px;" onclick="this.select();"></textarea><br>
+        </div>
+
+        <div id="changelogContainer" class="abs castleColorH" style="top:30px;width:700px;padding-bottom:10px;display:none;padding-top:5px;">
+            <div class="title">Changelog</div>
+            Too much changing in beta. This is where they'll go, though.
         </div>
 
     </div>
@@ -147,6 +178,10 @@
     <div style="width:704px">
         <div style="width:700px;vertical-align:top;">
             <div id="warMap" style="width:100%;height:405px;position:relative;text-align:center;" class="unitsColorH">
+                <div id="infoMenu" class="abs fa fa-question clickable" style="right:100px;top:5px;width:12px;" onclick="openInfoBox()"></div>
+                <div id="storyMenu" class="abs fa fa-book clickable" style="right:70px;top:5px;color:red;width:12px;" onclick="openStory()"></div>
+                <div id="optionsMenu" class="abs fa fa-cog clickable" style="right:40px;top:5px;cursor:pointer;width:12px;" onclick="openOptions()"></div>
+                <div id="savingMenu" class="abs fa fa-floppy-o clickable" style="right:10px;top:5px;cursor:pointer;width:12px;" onclick="openSaving()"></div>
                 <div id="prevLevel" class="fa fa-arrow-left clickable hidden" style="" onclick="prevLevel()"></div>
                 <div>
                     <div class="title" style="font-weight:normal">War Map - <div id="mapName"></div></div>
@@ -169,7 +204,7 @@
         </div>
 
         
-        <div style="margin-top:4px;width:150%">
+        <div style="margin-top:4px;width:1065px">
             <div id="goldContainer" class="showthat hidden" style="width:100px;">
                 <img src='img/gold.svg' class='largeIcon imageDragFix' style="vertical-align:bottom">
                 <div id="gold"></div>
@@ -234,15 +269,15 @@
                 </div>
             </div>
         </div>
-        <div style="height:300px;margin-top:10px;width:351px">
+        <div style="height:300px;margin-top:10px;width:381px">
             <div style="width:100%;height:20px;" class="large bold">
-                <div id="kingListSelector" class="listSelector kingColor" onclick="switchListTab(0)">King <img id="kingTabSleep" src='img/sleep.svg' class='smallIcon imageDragFix tabSleep'></div>
-                <div id="castleListSelector" class="listSelector castleColor" onclick="switchListTab(1)">Castle <img id="castleTabSleep" src='img/sleep.svg' class='smallIcon imageDragFix tabSleep'></div>
-                <div id="unitsListSelector" class="listSelector unitsColor" onclick="switchListTab(2)">Units <img id="unitsTabSleep" src='img/sleep.svg' class='smallIcon imageDragFix tabSleep'></div>
+                <div id="kingListSelector" class="listSelector kingColor" onclick="switchListTab(0)">King <div id="kingTabAction" class="tabIcon"></div></div>
+                <div id="castleListSelector" class="listSelector castleColor" onclick="switchListTab(1)">Castle <div id="castleTabAction" class="tabIcon"></div></div>
+                <div id="unitsListSelector" class="listSelector unitsColor" onclick="switchListTab(2)">Units <div id="unitsTabAction" class="tabIcon"></div></div>
             </div>
-            <div id="kingListContainer" class="listContainer" style="display:block;"><div id="kingCurActions" class="actionListLeft kingColorD"></div><div id="kingNextActions" class="actionListRight kingColorH"></div></div>
-            <div id="castleListContainer" class="listContainer"><div id="castleCurActions" class="actionListLeft castleColorD"></div><div id="castleNextActions" class="actionListRight castleColorH"></div></div>
-            <div id="unitsListContainer" class="listContainer"><div id="unitsCurActions" class="actionListLeft unitsColorD"></div><div id="unitsNextActions" class="actionListRight unitsColorH"></div></div>
+            <div id="kingListContainer" class="listContainer" style="display:block;"><div id="kingCurActions" class="actionListLeft kingColorD"></div><div id="kingNextActions" class="actionListRight kingColorH"></div><div id="actionInfoDivKing" class="actionListRight kingColorH" style="display:none;"></div></div>
+            <div id="castleListContainer" class="listContainer"><div id="castleCurActions" class="actionListLeft castleColorD"></div><div id="castleNextActions" class="actionListRight castleColorH"></div><div id="actionInfoDivCastle" class="actionListRight castleColorH" style="display:none;"></div></div>
+            <div id="unitsListContainer" class="listContainer"><div id="unitsCurActions" class="actionListLeft unitsColorD"></div><div id="unitsNextActions" class="actionListRight unitsColorH"></div><div id="actionInfoDivUnits" class="actionListRight unitsColorH" style="display:none;"></div></div>
         </div>
     </div>
 
@@ -260,47 +295,19 @@
             <div id="kingLabel3" style="width:50px;text-align:center;" class="bold hidden">Growth</div>
             <div id="kingLabel4" style="width:135px;text-align:center;" class="bold hidden">Blessings</div>
             <div id="kingActionList" class="abs" style="left:0;top:50px;"></div>
-        </div><div id="optionsContainer" class="mainActionList extrasColorH hidden" style="position:relative;width:70px;vertical-align:top;">
+        </div><div id="optionsActionContainer" class="mainActionList extrasColorH hidden" style="position:relative;width:70px;vertical-align:top;">
             <div style="display:block;text-align:center;margin-top:5px;margin-bottom:5px;" class="large bold">Options Actions</div>
             <div id="otherActionList" class="abs" style="left:0;top:50px;"></div>
         </div><div style="width:380px;height:100%;vertical-align:top;position:relative;">
                 <div id="deselectButton" class="abs fa fa-ban clickable" style="left:10px;top:5px;cursor:pointer;display:none;" onclick="deselect()"></div>
-                <div id="optionsMenu" class="abs fa fa-cog clickable" style="right:10px;top:5px;cursor:pointer;" onclick="openExtras()"></div>
-                <div id="storyMenu" class="abs fa fa-book clickable" style="right:40px;top:5px;color:red;" onclick="openStory()"></div>
-                <div id="infoMenu" class="abs fa fa-question clickable" style="right:70px;top:5px;" onclick="openInfoBox()"></div>
-                <div style="display:block;text-align:center;margin-top:5px;margin-bottom:5px;" class="large bold">Info Box</div>
-                <div id="defaultInfoBox" style="display:none;">
-                    <div id="actionInfoDivKing" style="display:none;width:100%"></div>
-                    <div id="actionInfoDivCastle" style="display:none;width:100%"></div>
-                    <div id="actionInfoDivUnits" style="display:none;width:100%"></div>
-                </div>
+                <div class="abs small" style="right:10px;" id="totalMana"></div>
+                <div style="display:block;text-align:center;margin-top:5px;margin-bottom:5px;" class="large bold">Action Info Box</div>
+                <div id="defaultInfoBox"><div id="consoleLog" class="small" style="padding:5px;"></div></div>
                 <div id="infoBoxList" style="width:100%;height:180px;display:none;"></div>
                 <div id="addButtons" style="text-align:center;display:none;margin-top:-15px;">
                     <div class="button" style="margin-top:-20px;" onclick="addAction()">Add Action</div>
                 </div>
                 <div id="extrasInfoBox" style="width:100%;height:189px;vertical-align:top;position:absolute;top:30px;display:none;" class="extrasColorH">
-                    <div class="title">Extras</div>
-                    <div id="optionsDiv" style="position:relative;height:170px;width:100%;">
-                        <div style="width:100%;vertical-align:top">
-                            <div class="button" onclick="exportCurrentList()">Export Current List</div>
-                            <div class="button" onclick="exportMapList()">Export Map Lists</div><br>
-                            <div class="button" onclick="importList()">Import List(s)</div> <textarea id="exportImportList" class="listTextInput" style="width:80px;" onclick="this.select();"></textarea><br>
-                            <div class='control'><input type='checkbox' id='pauseBeforeRestart'><label for='pauseBeforeRestart'> Pause before restart</label></div><br>
-                            <input type="checkbox" id="pauseListEmpty" checked>
-                            <label for="pauseListEmpty">Pause when next list is empty</label><br>
-                            <input type="checkbox" id="pausePlaceCleared" checked>
-                            <label for="pausePlaceCleared">Pause when a place is cleared</label><br>
-                            <div id="directWorkerBonus" class="showthat hidden">
-                                <input type="checkbox" id="keepBuild">
-                                <label for="keepBuild">Keep Direct Worker bonus at</label> <input id="buildValue" type="text" class="listTextInput" value="1.5" onchange="changeBuildValue()" onclick="this.select();">
-                                <div class="showthis">
-                                    If you want to improve INT without messing up your action timing, use this option to keep things stable. The valid range is between 1.5 and your max. Uncheck to always use your max.
-                                </div>
-                            </div><br>
-                            <div class="button" onclick="exportSave()">Export Save</div><div class="button" onclick="save()">Save</div><div class="small">Auto Saving in <div id="saveTimer" class="bold"></div></div><br>
-                            <div class="button" onclick="importSave()">Import Save</div> <textarea id="exportImportSave" class="listTextInput" style="width:80px;" onclick="this.select();"></textarea><br>
-                        </div>
-                    </div>
 
                 </div>
             </div>
@@ -315,6 +322,7 @@
 
     <script src="helpers/helpers.js?1"></script>
     <script src="helpers/interval.js?1"></script>
+    <script src="helpers/hotkeys.js?1"></script>
     <script src="driver.js?1"></script>
     <script src="views/mainView.js?1"></script>
     <script src="clickResponses.js?1"></script>

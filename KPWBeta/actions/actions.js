@@ -42,6 +42,7 @@ let actions = {
             }
             if(action.manaUsed === 0 && action.spend) {
                 action.spend(); //spend as soon as action starts
+                actions.addToConsole(name, action);
                 if(action.start) {
                     action.start();
                 }
@@ -155,7 +156,7 @@ let actions = {
             } else if (cost.type === "linear") {
                 amount += cost.starting + cost.growth * numPrior;
             }
-            action["cost"+cost.resource] = numCreatedWith * amount;
+            action["cost"+cost.resource] = cost.type === "mana" ? amount : numCreatedWith * amount;
         }
     },
     translateNextToCurrent: function(action, name) {
@@ -185,6 +186,12 @@ let actions = {
         action.unlocked = actionDatum.unlocked;
         action.canBuy = actionDatum.canBuy;
         action.spend = actionDatum.spend;
+    },
+    addToConsole: function(name, action) {
+        if(consoleLog.length > 12) {
+            consoleLog.splice(0, 1);
+        }
+        consoleLog.push(levelData.totalMana + " mana: " + capitalizeFirst(name) + ": " + action.name);
     }
 };
 

@@ -13,6 +13,8 @@ extras tab
     polls
 
 make clearSave work (defaults in load());
+QoL auto-add sleep when you can't do a task
+reset and clear all lists button
 
 heroes
     purpose

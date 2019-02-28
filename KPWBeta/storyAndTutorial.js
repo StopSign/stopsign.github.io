@@ -1,7 +1,7 @@
 let tutorial = [
     [ //0
         "Welcome to King's Perfect War! Please follow the tutorial exactly to understand the base mechanics.<br>" +
-        "Your goal is to beat all hideouts in the map in order to unlock the next map.<br>" +
+        "Your goal is to beat all hideouts in the map in order to unlock the next map, by adding actions to your three lists.<br>" +
         "The map resets if your king dies or you run out of mana.<br>" +
         "When the map resets, all lists will start over and your resources will be set to the level's default values.",
         "Click on the dungeon (closer to your castle) and press Add Action in the Info Box. An action to move your king to the first hideout is created and added to the Units list.<br>" +
@@ -42,6 +42,11 @@ let tutorial = [
         "<li>Hire a second Beggar</li>" +
         "<li>Get two Scavengers</li>" +
         "</ul>"
+    ],
+    [//7
+        "You've unlocked the Train action, which lets you get closer to your Reflex Cap. Reflex affects the king's attack and health.<br>" +
+        "For the king to kill 11 Thugs on his own, he needs at least 10.2 RFLX. Use Train until you've passed that threshold, and then attack!<br>" +
+        "There's no time for economy - rush to getting a spearman and send it and the king together to take down the remaining hideout."
     ]
 ];
 
@@ -89,12 +94,6 @@ let story = [
     [ //9
         "Day 100<br><br>" +
         "Today is the day. I have scouted 10 thugs, and have learned their patrol routes. Today I will kill them all, and end this nightmare!"
-    ],
+    ]
 
 ];
-
-let divText = "";
-for(let i = 0; i < story.length; i++) {
-    divText += "<div id='pageNum"+i+"' style='display:none'>"+story[i]+"</div>"
-}
-document.getElementById("storyContainer").innerHTML = divText;

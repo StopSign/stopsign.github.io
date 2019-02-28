@@ -51,6 +51,7 @@ function tick() {
         actions.tick(); //actions
         warMap.tick(); //combat
         unlockLists.tick();
+        levelData.totalMana++;
 
         if(mana === 1) {
             reachedOneMana = true;
@@ -152,6 +153,7 @@ function restart() {
     maxMana = mana;
     gold = levelData.initial.gold;
     wood = levelData.initial.wood;
+    consoleLog = [];
 
     unlockLists.checkUnlocks();
 
