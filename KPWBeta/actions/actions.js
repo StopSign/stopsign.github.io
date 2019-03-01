@@ -54,10 +54,8 @@ let actions = {
             }
             if(action.manaUsed / 10 >= action.costseconds) {
                 action.loopsLeft--;
-                if(action.loopsLeft > 0) {
-                    action.manaUsed = 0;
-                } else { //action done
-                    action.manaUsed = action.costseconds * 10;
+                action.manaUsed = 0;
+                if(action.loopsLeft === 0) {
                     let nextAction = actionsList.current[name][this.validActions[i]+1];
                     if(nextAction && nextAction.varName === "pause" && nextAction.loopsLeft > 0) {
                         nextAction.loopsLeft = 0;
@@ -284,10 +282,16 @@ function addActionToNext(action, listName, addAmount, index) {
         toAdd.unitsToMove = action.unitsToMove;
     }
 
+    let listToAdd = actionsList.next[listName];
     if(index !== undefined) {
-        actionsList.next[listName].splice(index, 0, toAdd) //insert at index
+        listToAdd.splice(index, 0, toAdd) //insert at index
     } else {
-        actionsList.next[listName].push(toAdd);
+        let lastAction = listToAdd[listToAdd.length - 1];
+        if(lastAction && lastAction.varName === toAdd.varName) {
+            lastAction.loops += toAdd.loops;
+        } else {
+            listToAdd.push(toAdd);
+        }
     }
 }
 

@@ -19,7 +19,7 @@ actionData = {
                 action.visible = function() { return highestLevel >= 99; }
             }
 
-            if(!action.seconds) {
+            if(action.seconds === undefined) {
                 action.seconds = 1;
             }
             if(!action.cost) {
@@ -694,7 +694,7 @@ actionData = {
                 varName:"sleep",
                 name:"Sleep",
                 desc:"Add an action to the current list that waits for one second. Auto-added if no other action is available.",
-                second:1,
+                seconds:1,
                 xPos:15,
                 yPos:0
             });
@@ -703,7 +703,7 @@ actionData = {
                 varName:"pause",
                 name:"Pause",
                 desc:"Add an action to the current list that pauses when it's run. Does not interfere with the game otherwise.",
-                second:1,
+                seconds:0,
                 xPos:15,
                 yPos:55
             });
@@ -712,7 +712,7 @@ actionData = {
                 varName:"restart",
                 name:"Restart",
                 desc:"Add an action that restarts the map when it's run. Takes 5 seconds to finish.",
-                second:5,
+                seconds:5,
                 buy: function() { restartReason = "Action"; mana = 0; },
                 xPos:15,
                 yPos:110

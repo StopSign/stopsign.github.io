@@ -112,11 +112,8 @@ let view = {
                     } else if(prevAction.manaUsed !== curAction.manaUsed
                         || prevAction.loopsLeft !== curAction.loopsLeft
                         || prevAction.loops !== curAction.loops) {
-                        if(curAction.costseconds === 0 && curAction.loopsLeft === 0 && curAction.loops > 0) { //completed pause action
-                            document.getElementById("action"+j+name+"Bar").style.width = "100%";
-                        } else {
-                            document.getElementById("action" + j + name + "Bar").style.width = (100 * curAction.manaUsed / (curAction.costseconds * 10)) + "%";
-                        }
+                        let width = (curAction.loopsLeft === 0 && curAction.loops > 0) ? "100%" : (100 * curAction.manaUsed / (curAction.costseconds * 10) + "%");
+                        document.getElementById("action"+j+name+"Bar").style.width = width;
                         if(curAction.failed) {
                             document.getElementById("action" + j + name + "Bar").style.display = "none";
                             document.getElementById("action" + j + name + "ErrorBar").style.display = "block";
@@ -481,7 +478,7 @@ let view = {
             let theList = actionsList.current[name];
             for(let i = 0; i < theList.length; i++) {
                 let action = theList[i];
-                let width = 100 * action.manaUsed / (action.costseconds * 10) + "%";
+                let width = (action.loopsLeft === 0 && action.loops > 0) ? "100%" : (100 * action.manaUsed / (action.costseconds * 10) + "%");
                 let image = view.helpers.getImage(action, num);
                 totalDivText +=
                     "<div class='curActionContainer small' id='curAction"+i+name+"' onmouseover='view.actionList.showInfoDiv("+i+", \""+name+"\", true)' onmouseleave='view.actionList.showInfoDiv("+i+", \""+name+"\",false)'>" +
