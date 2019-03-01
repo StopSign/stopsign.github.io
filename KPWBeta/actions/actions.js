@@ -108,11 +108,30 @@ let actions = {
         let currentList = actionsList.current[name];
         for(let j = 0; j < nextList.length; j++) {
             let curAction = currentList[j];
-            if(this.validActions[num] > j || //only modify untouched ones
-                (this.validActions[num] === j && curAction && (curAction.manaUsed !== 0 || curAction.loopsLeft !== curAction.loops))) { //and ones not currently updating
+            let nextAction = nextList[j];
+            if(this.validActions[num] > j) { //only modify untouched ones
                 continue;
             }
-            let action = copyArray(nextList[j]);
+            if(curAction && nextAction && curAction.varName === nextAction.varName) {
+                let loopsDone = curAction.loops - curAction.loopsLeft + (curAction.manaUsed !== 0 ? 1 : 0);
+                let newLoops = nextAction.loops;
+                if(newLoops < loopsDone) {
+                    newLoops = loopsDone;
+                }
+                let difference = curAction.loops - newLoops;
+                curAction.loops = newLoops;
+                curAction.loopsLeft = curAction.loopsLeft - difference;
+                continue;
+            }
+
+            if(this.validActions[num] > j || //only modify untouched ones
+                (this.validActions[num] === j && curAction && (curAction.manaUsed !== 0 || curAction.loopsLeft !== curAction.loops))) { //and ones not currently updating
+                if(num === 0) {
+                    console.log(this.validActions[num]);
+                }
+                continue;
+            }
+            let action = copyArray(nextAction);
             actions.translateNextToCurrent(action, name);
             currentList[j] = action;
         }
