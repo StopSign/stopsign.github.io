@@ -15,13 +15,22 @@ let actions = {
                 }
             }
             while(action && (action.loopsLeft === 0 || (action.manaUsed === 0 && !action.canBuy()))) { //action exists but is invalid, slide
-                this.validActions[i]++;
-                if(!action.canBuy() && action.loopsLeft !== 0) { //failed to buy
+                if(!document.getElementById("waitForResources").checked && !action.canBuy() && action.loopsLeft !== 0) { //failed to buy
                     action.failed++;
                     action.failedReason = "Not enough resources.";
                     action.loops -= action.loopsLeft;
                     action.loopsLeft = 0;
-                    actions.refresh(i);
+                    this.validActions[i]++;
+                } else {
+                    if(document.getElementById("waitForResources").checked && !action.canBuy() && action.loopsLeft !== 0) {
+                        addSleepAction(i, this.validActions[i]);
+                        if(list[this.validActions[i]].varName !== "sleep") { //combined the sleep
+                            this.validActions[i]--;
+                        }
+                        actions.refresh(i);
+                    } else {
+                        this.validActions[i]++;
+                    }
                 }
                 action = list[this.validActions[i]];
             }
@@ -127,9 +136,6 @@ let actions = {
 
             if(this.validActions[num] > j || //only modify untouched ones
                 (this.validActions[num] === j && curAction && (curAction.manaUsed !== 0 || curAction.loopsLeft !== curAction.loops))) { //and ones not currently updating
-                if(num === 0) {
-                    console.log(this.validActions[num]);
-                }
                 continue;
             }
             let action = copyArray(nextAction);
@@ -277,7 +283,7 @@ function addActionToList(varName, num, switchLists, loopCount, unitsToMove, inde
     actions.refresh(num);
 }
 
-function addActionToNext(action, listName, addAmount, index) {
+function addActionToNext(action, listName, addAmount, index, isSplit) {
     let toAdd = {};
     toAdd.loops = addAmount;
     toAdd.varName = action.varName;
@@ -287,16 +293,27 @@ function addActionToNext(action, listName, addAmount, index) {
 
     let listToAdd = actionsList.next[listName];
     if(index !== undefined && index !== null) {
-        listToAdd.splice(index, 0, toAdd) //insert at index
+        if(!isSplit && isSameAction(listToAdd[index], toAdd)) {
+            listToAdd[index].loops += toAdd.loops;
+        } else if(!isSplit && isSameAction(listToAdd[index-1], toAdd)) {
+            listToAdd[index-1].loops += toAdd.loops;
+        } else {
+            listToAdd.splice(index, 0, toAdd) //insert at index
+        }
     } else {
-        let lastAction = listToAdd[listToAdd.length - 1];
-        if(lastAction && lastAction.varName === toAdd.varName &&
-            (!toAdd.unitsToMove || JSON.stringify(toAdd.unitsToMove) === JSON.stringify(lastAction.unitsToMove))) {
-            lastAction.loops += toAdd.loops;
+        let actionAtIndex = listToAdd[listToAdd.length - 1];
+        if(isSameAction(actionAtIndex, toAdd)) {
+            actionAtIndex.loops += toAdd.loops;
         } else {
             listToAdd.push(toAdd);
+            scrollToEnd = listName;
         }
     }
+}
+
+function isSameAction(action1, action2) {
+    return action1 && action2 && action1.varName === action2.varName &&
+        (!action2.unitsToMove || JSON.stringify(action2.unitsToMove) === JSON.stringify(action1.unitsToMove))
 }
 
 function getNumOnList(varName, listName) {

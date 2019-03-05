@@ -754,6 +754,6 @@ function getOtherActionByVarName(varName) {
 }
 
 //for auto adding
-function addSleepAction(num) {
-    addActionToList("sleep", num, false);
+function addSleepAction(num, index) {
+    addActionToList("sleep", num, false, false, false, index);
 }

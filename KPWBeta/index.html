@@ -70,6 +70,7 @@
                         <li>Pause when next list is empty - When any of the 3 lists completes their non-sleep actions, the game will pause.</li>
                         <li>Pause when all lists are empty - When the last of the 3 lists completes their non-sleep actions, the game will pause.</li>
                         <li>Pause when a place is cleared - The place types are your castle, dungeons, and hideouts. When your units finish killing any enemy units found there, the game pauses.</li>
+                        <li>Wait for resouces available - If you are unable to start an action due to insufficient resources, a sleep action will be added before the action starts</li>
                     </ul>
                     Bonus Ticks are gathered either when the game is paused or the game is offline, getting .8 Bonus Ticks per second. Click the >>>> button to spend bonus ticks to speed up the game 4x faster until you run out. It's better to keep things running rather than paused!<br><br>
                     You can add actions to your list, but if the loop has already started you can't edit things that already happened. Similarly, clearing the current list only clears actions that haven't been run. You can restart and then Clear Current List to truly clear it.<br><br>
@@ -146,6 +147,8 @@
                     <label for="pauseListsEmpty">Pause when all lists are empty</label><br>
                     <input type="checkbox" id="pausePlaceCleared" checked>
                     <label for="pausePlaceCleared">Pause when a place is cleared</label><br>
+                    <input type="checkbox" id="waitForResources" checked>
+                    <label for="waitForResources">Wait for resouces available</label><br>
                     <div id="directWorkerBonus" class="showthat hidden">
                         <input type="checkbox" id="keepBuild">
                         <label for="keepBuild">Keep Direct Worker bonus at</label> <input id="buildValue" type="text" class="listTextInput" value="1.5" onchange="changeBuildValue()" onclick="this.select();">

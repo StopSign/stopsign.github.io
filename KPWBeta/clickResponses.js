@@ -23,6 +23,7 @@ let click = {
             actionsList.next[name].splice(curActionNum);
             actionsList.current[name].splice(curActionNum);
             actions.refresh(curList);
+            levelSave[curLevel].nextLists = listsToSimplified();
         },
         toggleOffline: function() {
             let button = document.getElementById("bonusButton");
@@ -450,7 +451,7 @@ function split(index, num) {
     let listName = actionsList.nextNames[num];
     let theList = actionsList.next[listName];
     let theObj = theList[index];
-    addActionToNext(theObj, listName, Math.ceil(theObj.loops/2), index);
+    addActionToNext(theObj, listName, Math.ceil(theObj.loops/2), index, true);
     theObj.loops = Math.floor(theObj.loops/2);
     levelSave[curLevel].nextLists = listsToSimplified();
     actions.refresh(num);
@@ -521,10 +522,14 @@ function handleDragDrop(event, num) {
         let actionData = JSON.parse(event.dataTransfer.getData("actionData"));
         addActionToList(actionData.varName, actionData.listNum, true, false, false, indexOfDroppedOverElement);
     }
+    levelSave[curLevel].nextLists = listsToSimplified();
     actions.refresh(num);
 }
 
 function handleDirectActionDragStart(event, varName, listNum) {
+    if(["sleep", "pause", "restart"].indexOf(varName) !== -1) {
+        listNum = curList;
+    }
     switchListTab(listNum);
     let actionData = {varName: varName, listNum: listNum};
     event.dataTransfer.setData("actionData", JSON.stringify(actionData));

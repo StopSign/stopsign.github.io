@@ -133,6 +133,11 @@ let view = {
                 }
                 document.getElementById("consoleLog").innerHTML = divText;
             }
+            if(scrollToEnd) {
+                document.getElementById(scrollToEnd + "NextActions").scrollTo(0, 1e10);
+                document.getElementById(scrollToEnd + "CurActions").scrollTo(0, 1e10);
+                scrollToEnd = "";
+            }
         },
         updateInfoDiv: function(name, i) {
             let curAction = actionsList.current[name][i];
