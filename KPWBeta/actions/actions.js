@@ -20,11 +20,26 @@ let actions = {
                     action.failedReason = "Not enough resources.";
                     action.loops -= action.loopsLeft;
                     action.loopsLeft = 0;
+                    // actions.refresh(i);
                     this.validActions[i]++;
                 } else {
                     if(document.getElementById("waitForResources").checked && !action.canBuy() && action.loopsLeft !== 0) {
+                        // console.log("can't buy but not done");
+                        if(action.loops - action.loopsLeft > 0) { //some loops completed already
+                            action.loops -= action.loopsLeft;
+                            let loopsLeftToAdd = action.loopsLeft;
+                            action.loopsLeft = 0;
+                            actionsList.next[name][this.validActions[i]].loops = action.loops;
+                            addActionToNext(action, name, loopsLeftToAdd, this.validActions[i]+1, true);
+                            levelSave[curLevel].nextLists = listsToSimplified();
+                            actions.refresh(i);
+                            this.validActions[i]++;
+                            addSleepAction(i, this.validActions[i]);
+                            break;
+                        }
                         addSleepAction(i, this.validActions[i]);
-                        if(list[this.validActions[i]].varName !== "sleep") { //combined the sleep
+                        if(list[this.validActions[i]-1] && list[this.validActions[i]-1].varName === "sleep") { //combined the sleep
+                            // console.log('sleep already existed, go back');
                             this.validActions[i]--;
                         }
                         actions.refresh(i);

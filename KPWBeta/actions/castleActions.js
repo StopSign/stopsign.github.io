@@ -39,7 +39,6 @@ let castle = {
             }
             for(let i = list.length-1; i >= 0; i--) {
                 if(list[i] && list[i] > 0) {
-                    list[i]--;
                     return i;
                 }
             }

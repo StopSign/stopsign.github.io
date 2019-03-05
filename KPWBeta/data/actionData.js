@@ -119,8 +119,28 @@ actionData = {
                 action.buy = function() {
                     if(this.createdWith) { //is army unit
                         if(created[this.createdWith]) {
-                            warMap.units.createUnit(this.varName, true, "home", created[this.createdWith]);
-                            created[this.varName] += created[this.createdWith];
+                            let amountToMake = created[this.createdWith];
+                            created[this.varName] += amountToMake;
+                            while(amountToMake > 0) {
+                                let empowerIndex = castle.helpers.getNextHighestEmpower(this.varName);
+                                console.log(empowerIndex, amountToMake);
+
+                                if(empowerIndex === 0) {
+                                    warMap.units.createUnit(this.varName, true, "home", amountToMake, empowerIndex);
+                                    break;
+                                }
+
+                                let empowerAmount = levelData.empowered[this.varName] ? levelData.empowered[this.varName][empowerIndex] : 0;
+                                if(empowerAmount >= amountToMake) {
+                                    levelData.empowered[this.varName][empowerIndex] -= amountToMake;
+                                    warMap.units.createUnit(this.varName, true, "home", amountToMake, empowerIndex);
+                                    break;
+                                }
+
+                                warMap.units.createUnit(this.varName, true, "home", empowerAmount, empowerIndex);
+                                levelData.empowered[this.varName][empowerIndex] -= empowerAmount;
+                                amountToMake -= empowerAmount;
+                            }
                         }
                     } else {
                         created[this.varName]++;

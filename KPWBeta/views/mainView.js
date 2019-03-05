@@ -694,6 +694,7 @@ let view = {
                     }
                     let cost = castle.helpers.empowerCost(action.varName, 1);
                     let unitStats = warMap.units.getStatsOfUnit(action.varName, 1);
+                    let empowerCount = empowered[action.varName] ? empowered[action.varName][1] : 0;
 
                     divText += "<div class='empowerOption'>" +
                             "<div class='clickable'>" +
@@ -701,7 +702,7 @@ let view = {
                             "</div>" +
                             "<div class='medium bold' style='width:70px;text-align:center;vertical-align:top;margin-top:13px'>"+capitalizeFirst(action.varName)+"</div>" +
                             "<input id='"+action.varName+"EmpowerStage' onchange='changeEmpowerStage(\""+action.varName+"\")' type='number' min='1' value='1' class='small' step='1' style='margin-left:4px;text-align:center;vertical-align:top;margin-top:10px;width:30px;'>" +
-                            "<div id='"+action.varName+"EmpowerBought' class='medium bold' style='width:55px;text-align:center;vertical-align:top;margin-top:13px'>0</div>" +
+                            "<div id='"+action.varName+"EmpowerBought' class='medium bold' style='width:55px;text-align:center;vertical-align:top;margin-top:13px'>"+empowerCount+"</div>" +
                             "<div id='"+action.varName+"EmpowerCost' class='medium bold' style='width:55px;text-align:center;vertical-align:top;margin-top:13px'>"+intToString(cost, 1)+"</div>" +
                             "<div id='"+action.varName+"EmpowerStats' class='medium bold' style='width:105px;text-align:center;vertical-align:top;margin-top:13px'><b>"+intToString(unitStats.atk, 1)+"</b>|<b>"+intToString(unitStats.hp, 1)+"</b></div>" +
                             "<div class='button' style='vertical-align:top;margin-top:13px;' onclick='buyEmpowerUnit(\""+action.varName+"\")'>Buy</div>" +

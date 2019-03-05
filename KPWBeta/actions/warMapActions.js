@@ -119,7 +119,7 @@ let warMap = {
             unitStats.hp *= Math.pow(10, empowered);
             return unitStats;
         },
-        createUnit: function(varName, isFriendly, startingLoc, amount) {
+        createUnit: function(varName, isFriendly, startingLoc, amount, empowered) {
             let unit = {};
             unit.varName = varName;
             if(varName === "king") {
@@ -131,7 +131,7 @@ let warMap = {
             }
             unit.isFriendly = isFriendly;
             unit.amount = amount;
-            unit.empowered = castle.helpers.getNextHighestEmpower(varName);
+            unit.empowered = empowered ? empowered : 0;
 
             warMap.units.applyUnitStats(unit);
 
