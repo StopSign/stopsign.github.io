@@ -32,7 +32,7 @@ let actions = {
         }
 
         //add tick to each action. if it finishes, get the rewards
-        let shouldPause = false;
+        let listsEmpty = [false, false, false];
         for(let i = 0; i < actionsList.nextNames.length; i++) {
             let name = actionsList.nextNames[i];
             let action = actionsList.current[name][this.validActions[i]];
@@ -68,11 +68,14 @@ let actions = {
                     actions.adjustCosts(i);
                 }
                 if(["sleep", "restart"].indexOf(action.varName) === -1 && action.loopsLeft === 0 && !actionsList.current[name][this.validActions[i]+1]) { //no next action after non-sleep
-                    shouldPause = true;
+                    listsEmpty[i] = true;
                 }
             }
         }
-        if(shouldPause && document.getElementById("pauseListEmpty").checked) {
+        if(document.getElementById("pauseListEmpty").checked && (listsEmpty[0] || listsEmpty[1] || listsEmpty[2])) {
+            pauseGame();
+        }
+        if(document.getElementById("pauseListsEmpty").checked && listsEmpty[0] && listsEmpty[1] && listsEmpty[2]) {
             pauseGame();
         }
     },
@@ -236,7 +239,7 @@ function addAction() {
 }
 
 //loopCount and unitsToMove are for loading list from simple
-function addActionToList(varName, num, switchLists, loopCount, unitsToMove) {
+function addActionToList(varName, num, switchLists, loopCount, unitsToMove, index) {
     if(switchLists && curList !== num) {
         switchListTab(num);
     }
@@ -269,7 +272,7 @@ function addActionToList(varName, num, switchLists, loopCount, unitsToMove) {
             }
         }
 
-        addActionToNext(action, listName, addAmount);
+        addActionToNext(action, listName, addAmount, index);
     }
     actions.refresh(num);
 }
@@ -283,11 +286,12 @@ function addActionToNext(action, listName, addAmount, index) {
     }
 
     let listToAdd = actionsList.next[listName];
-    if(index !== undefined) {
+    if(index !== undefined && index !== null) {
         listToAdd.splice(index, 0, toAdd) //insert at index
     } else {
         let lastAction = listToAdd[listToAdd.length - 1];
-        if(lastAction && lastAction.varName === toAdd.varName) {
+        if(lastAction && lastAction.varName === toAdd.varName &&
+            (!toAdd.unitsToMove || JSON.stringify(toAdd.unitsToMove) === JSON.stringify(lastAction.unitsToMove))) {
             lastAction.loops += toAdd.loops;
         } else {
             listToAdd.push(toAdd);

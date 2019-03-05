@@ -451,7 +451,7 @@ let view = {
                 let capButton = "";
                 let image = view.helpers.getImage(action, num);
                 totalDivText +=
-                    "<div id='nextActionContainer" + i + name + "' class='nextActionContainer small' ondragover='handleDragOver(event)' ondrop='handleDragDrop(event, "+num+")' ondragstart='handleDragStart(event, \""+name+"\")' ondragend='draggedUndecorate(" + i + ", \""+name+"\")' ondragenter='dragOverDecorate(" + i +", \""+name+"\")' ondragleave='dragExitUndecorate("+i+", \""+name+"\")' draggable='true' data-index='"+i+"'>" +
+                    "<div id='nextActionContainer" + i + name + "' class='nextActionContainer small' ondragover='handleDragOver(event)' ondragstart='handleDragStart(event, \""+name+"\")' ondragend='draggedUndecorate(" + i + ", \""+name+"\")' ondragenter='dragOverDecorate(" + i +", \""+name+"\")' ondragleave='dragExitUndecorate("+i+", \""+name+"\")' draggable='true' data-index='"+i+"'>" +
                     image + " x " +
                     "<input id='loopInput" + i + name + "' type='text' class='listTextInput' value='"+action.loops+"' onchange='setLoop(" + i + ","+num+")' onclick='this.select();'>" +
                     "<div style='float:right;margin-top:4px;'>" +
@@ -615,7 +615,7 @@ let view = {
                                 '</div>';
 
                             divText[property] +=
-                                '<div class="abs" style="left:'+action.xPos+'px;top:'+action.yPos+'px;">' +
+                                '<div class="abs" style="left:'+action.xPos+'px;top:'+action.yPos+'px;" draggable="true" ondragstart="handleDirectActionDragStart(event, \''+action.varName+'\', '+action.listNum+')" ondragover="handleDragOver(event)" ondragend="handleDirectActionDragEnd(\''+action.varName+'\')">' +
                                     '<div id="'+action.varName+'Container" onclick="selectAction(\''+action.varName+'\', '+action.listNum+')" oncontextmenu="straightToAdd(\''+action.varName+'\', '+action.listNum+')" class="clickable abs showthat disabled hidden" style="left:0;top:0">' +
                                         '<img src="img/' + action.varName + '.svg" class="superLargeIcon imageDragFix">' +
                                         '<div id="'+action.varName+'Num" class="hyperVisible bold abs small" style="right:-3px;top:32px;"></div>' +
@@ -658,7 +658,7 @@ let view = {
                     let imageName = base.varName.split("_")[0];
                     let placeNum = base.varName.split("_")[1] ? '<div class="hyperVisible bold abs" style="top:27px;left:31px">' + ((base.varName.split("_")[1]-0)+1) + '</div>' : "";
                     allDivs +=
-                        '<div style="position:absolute;left:'+coords.x+'px;top:'+(coords.y)+'px;">' +
+                        '<div style="position:absolute;left:'+coords.x+'px;top:'+(coords.y)+'px;"  draggable="true" ondragstart="handleDirectActionDragStart(event, \''+base.varName+'\', 2)" ondragover="handleDragOver(event)" ondragend="handleDirectActionDragEnd(\''+base.varName+'\')">' +
                             '<div class="mapFriendlyHPBar abs" id="'+base.varName+'FriendlyHPBar" style="top:-10px"><div id="'+base.varName+'FriendlyHP"></div></div>' +
                             '<div class="mapEnemyHPBar abs" id="'+base.varName+'EnemyHPBar" style="top:-4px"><div id="'+base.varName+'EnemyHP"></div></div>' +
                             '<div id="'+base.varName+'Container" class="clickable" style="position:absolute;top:0;left:0" onclick="selectAction(\''+base.varName+'\', 2)" oncontextmenu="straightToAdd(\''+base.varName+'\', 2)">' +

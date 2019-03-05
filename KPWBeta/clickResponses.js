@@ -2,6 +2,12 @@ let click = {
     init: function() {
         document.getElementById("clearCurrentList").onclick = function() { click.event.clearCurrentList(); };
         document.getElementById("bonusButton").onclick = function() { click.event.toggleOffline() };
+        document.getElementById("loadoutButton1").onclick = function() { click.event.selectLoadout(1); };
+        document.getElementById("loadoutButton2").onclick = function() { click.event.selectLoadout(2); };
+        document.getElementById("loadoutButton3").onclick = function() { click.event.selectLoadout(3); };
+        document.getElementById("loadoutButton4").onclick = function() { click.event.selectLoadout(4); };
+        document.getElementById("saveLoadout").onclick = function() { click.event.saveLoadout(); };
+        document.getElementById("loadLoadout").onclick = function() { click.event.loadLoadout(); };
     },
     event: {
         clearCurrentList: function() {
@@ -29,6 +35,35 @@ let click = {
                 removeClassFromDiv(button, "buttonPressed");
                 addClassToDiv(button, "button");
             }
+        },
+        selectLoadout: function(num) {
+            let prevButton = document.getElementById("loadoutButton" + selectedLoadout);
+            let button = document.getElementById("loadoutButton" + num);
+
+            if(prevButton) {
+                removeClassFromDiv(prevButton, "buttonPressed");
+                addClassToDiv(prevButton, "button");
+            }
+
+            if(selectedLoadout === num) {
+                selectedLoadout = 0;
+            } else {
+                selectedLoadout = num;
+                addClassToDiv(button, "buttonPressed");
+                removeClassFromDiv(button, "button");
+            }
+        },
+        saveLoadout: function() {
+            if(!selectedLoadout) {
+                return;
+            }
+            loadouts[selectedLoadout] = curListsAsString();
+        },
+        loadLoadout: function() {
+            if(!selectedLoadout) {
+                return;
+            }
+            loadListFromString(loadouts[selectedLoadout]);
         }
     },
     menu: {
@@ -475,10 +510,29 @@ function handleDragOver(event) {
 function handleDragDrop(event, num) {
     let name = actionsList.nextNames[num];
     let indexOfDroppedOverElement = event.target.getAttribute("data-index");
-    dragExitUndecorate(indexOfDroppedOverElement, name);
+    if(indexOfDroppedOverElement !== null) { //dropped on list, not action
+        dragExitUndecorate(indexOfDroppedOverElement, name);
+    }
+
     let initialIndex = event.dataTransfer.getData("text/html");
-    moveQueuedAction(initialIndex, indexOfDroppedOverElement, name);
+    if(initialIndex !== "") {
+        moveQueuedAction(initialIndex, indexOfDroppedOverElement, name);
+    } else {
+        let actionData = JSON.parse(event.dataTransfer.getData("actionData"));
+        addActionToList(actionData.varName, actionData.listNum, true, false, false, indexOfDroppedOverElement);
+    }
     actions.refresh(num);
+}
+
+function handleDirectActionDragStart(event, varName, listNum) {
+    switchListTab(listNum);
+    let actionData = {varName: varName, listNum: listNum};
+    event.dataTransfer.setData("actionData", JSON.stringify(actionData));
+}
+
+function handleDirectActionDragEnd(actionVarName) {
+    // turn on hover-over
+    // document.getElementById("container"+actionVarName).children[2].style.display = ""
 }
 
 function moveQueuedAction(initialIndex, resultingIndex, name) {
@@ -538,4 +592,8 @@ function draggedUndecorate(i, name) {
 function clickRestart() {
     restartReason = "Manual";
     restart();
+}
+
+function pressLoadout() {
+
 }

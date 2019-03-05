@@ -68,6 +68,7 @@
                     <ul>
                         <li>Pause before restart - when you lose, no matter how, the game will pause just before it's about to restart. Look at the Reason for restart for why your loop ended.</li>
                         <li>Pause when next list is empty - When any of the 3 lists completes their non-sleep actions, the game will pause.</li>
+                        <li>Pause when all lists are empty - When the last of the 3 lists completes their non-sleep actions, the game will pause.</li>
                         <li>Pause when a place is cleared - The place types are your castle, dungeons, and hideouts. When your units finish killing any enemy units found there, the game pauses.</li>
                     </ul>
                     Bonus Ticks are gathered either when the game is paused or the game is offline, getting .8 Bonus Ticks per second. Click the >>>> button to spend bonus ticks to speed up the game 4x faster until you run out. It's better to keep things running rather than paused!<br><br>
@@ -141,6 +142,8 @@
                     <div class='control'><input type='checkbox' id='pauseBeforeRestart' checked><label for='pauseBeforeRestart'> Pause before restart</label></div><br>
                     <input type="checkbox" id="pauseListEmpty" checked>
                     <label for="pauseListEmpty">Pause when next list is empty</label><br>
+                    <input type="checkbox" id="pauseListsEmpty" checked>
+                    <label for="pauseListsEmpty">Pause when all lists are empty</label><br>
                     <input type="checkbox" id="pausePlaceCleared" checked>
                     <label for="pausePlaceCleared">Pause when a place is cleared</label><br>
                     <div id="directWorkerBonus" class="showthat hidden">
@@ -251,7 +254,7 @@
     </div>
 
     <div style="width:378px;height:350px;vertical-align:top;">
-        <div style="height:80px;position:relative;width:280px;" class="kingColorH">
+        <div style="height:80px;position:relative;width:280px;vertical-align:top;" class="kingColorH">
             <div class="title">Stats</div>
             <div id="kingOtherInfo" class="abs" style="left:0;top:0">
                 <div id='kingStats' class="abs" style="left:10px;top:30px;width:250px">
@@ -269,15 +272,21 @@
                 </div>
             </div>
         </div>
+        <div style="height:80px;position:relative;width:90px;vertical-align:top;text-align:center;" class="extrasColorH">
+            <div class="title">Loadouts</div>
+            <div id="loadoutButton1" class="button">1</div> <div id="loadoutButton2" class="button">2</div><br>
+            <div id="loadoutButton3" class="button">3</div> <div id="loadoutButton4" class="button">4</div><br>
+            <div id="saveLoadout" class="button">Save</div><div id="loadLoadout" class="button">Load</div>
+        </div>
         <div style="height:300px;margin-top:10px;width:381px">
             <div style="width:100%;height:20px;" class="large bold">
                 <div id="kingListSelector" class="listSelector kingColor" onclick="switchListTab(0)">King <div id="kingTabAction" class="tabIcon"></div></div>
                 <div id="castleListSelector" class="listSelector castleColor" onclick="switchListTab(1)">Castle <div id="castleTabAction" class="tabIcon"></div></div>
                 <div id="unitsListSelector" class="listSelector unitsColor" onclick="switchListTab(2)">Units <div id="unitsTabAction" class="tabIcon"></div></div>
             </div>
-            <div id="kingListContainer" class="listContainer" style="display:block;"><div id="kingCurActions" class="actionListLeft kingColorD"></div><div id="kingNextActions" class="actionListRight kingColorH"></div><div id="actionInfoDivKing" class="actionListRight kingColorH" style="display:none;"></div></div>
-            <div id="castleListContainer" class="listContainer"><div id="castleCurActions" class="actionListLeft castleColorD"></div><div id="castleNextActions" class="actionListRight castleColorH"></div><div id="actionInfoDivCastle" class="actionListRight castleColorH" style="display:none;"></div></div>
-            <div id="unitsListContainer" class="listContainer"><div id="unitsCurActions" class="actionListLeft unitsColorD"></div><div id="unitsNextActions" class="actionListRight unitsColorH"></div><div id="actionInfoDivUnits" class="actionListRight unitsColorH" style="display:none;"></div></div>
+            <div id="kingListContainer" class="listContainer" style="display:block;"><div id="kingCurActions" class="actionListLeft kingColorD"></div><div id="kingNextActions" class="actionListRight kingColorH" ondragover="handleDragOver(event)" ondrop="handleDragDrop(event, 0)"></div><div id="actionInfoDivKing" class="actionListRight kingColorH" style="display:none;"></div></div>
+            <div id="castleListContainer" class="listContainer"><div id="castleCurActions" class="actionListLeft castleColorD"></div><div id="castleNextActions" class="actionListRight castleColorH" ondragover="handleDragOver(event)" ondrop="handleDragDrop(event, 1)"></div><div id="actionInfoDivCastle" class="actionListRight castleColorH" style="display:none;"></div></div>
+            <div id="unitsListContainer" class="listContainer"><div id="unitsCurActions" class="actionListLeft unitsColorD"></div><div id="unitsNextActions" class="actionListRight unitsColorH" ondragover="handleDragOver(event)" ondrop="handleDragDrop(event, 2)"></div><div id="actionInfoDivUnits" class="actionListRight unitsColorH" style="display:none;"></div></div>
         </div>
     </div>
 

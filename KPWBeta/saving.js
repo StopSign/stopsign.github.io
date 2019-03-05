@@ -53,8 +53,9 @@ let unitsSelectedForMove = { king:true, units:false, heroes:false };
 let curInfoBox = "default";
 let addButtons = document.getElementById("addButtons");
 let curListNum = 1;
+let selectedLoadout = 0;
 
-let levelSave, unlockList, unlockStory, storyJournal, restartReason, storyPage, empowered, initialUnlock, consoleLog, totalOfflineMs;
+let levelSave, unlockList, unlockStory, storyJournal, restartReason, storyPage, empowered, initialUnlock, consoleLog, totalOfflineMs, loadouts;
 
 function clearSave() { //Doesn't work atm
     window.localStorage[saveName] = "";
@@ -81,6 +82,7 @@ function loadDefaults() {
     empowered = {};
     initialUnlock = true;
     consoleLog = [];
+    loadouts = [];
 
     totalOfflineMs = 0;
 }
@@ -144,6 +146,12 @@ function save() {
 }
 
 function exportMapList() {
+    document.getElementById("exportImportList").value = curListsAsString();
+    document.getElementById("exportImportList").select();
+    document.execCommand('copy');
+}
+
+function curListsAsString() {
     let str = "";
     for(let i = 0; i < actionsList.nextNames.length; i++) {
         let name = actionsList.nextNames[i];
@@ -158,10 +166,7 @@ function exportMapList() {
         str += "="
     }
     str = str.substring(0, str.length - 2);
-
-    document.getElementById("exportImportList").value = str;
-    document.getElementById("exportImportList").select();
-    document.execCommand('copy');
+    return str;
 }
 
 function exportCurrentList() {
@@ -182,11 +187,16 @@ function exportCurrentList() {
 
 function importList() {
     let str = document.getElementById("exportImportList").value;
+    loadListFromString(str);
+}
+
+function loadListFromString(str) {
     restartReason = "Imported";
     restart();
 
     if(!str) {
         createActionListsFromSimplifiedList({king:[],castle:[],units:[]});
+        return;
     }
 
     let parts = str.split("=");
