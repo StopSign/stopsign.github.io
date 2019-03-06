@@ -58,6 +58,7 @@ let selectedLoadout = 0;
 let scrollToEnd = "";
 
 let levelSave, unlockList, unlockStory, storyJournal, restartReason, storyPage, empowered, initialUnlock, consoleLog, totalOfflineMs, loadouts;
+let recentTutorial;
 
 function clearSave() { //Doesn't work atm
     window.localStorage[saveName] = "";
@@ -85,6 +86,8 @@ function loadDefaults() {
     initialUnlock = true;
     consoleLog = [];
     loadouts = [];
+
+    recentTutorial = 0;
 
     totalOfflineMs = 0;
 }

@@ -1,6 +1,7 @@
 let tutorial = [
     [ //0
         "Welcome to King's Perfect War! Please follow the tutorial exactly to understand the base mechanics.<br>" +
+        "Press the <b>T</b> in the upper right corner to re-open the current tutorial tip.<br>",
         "Your goal is to beat all hideouts in the map in order to unlock the next map, by adding actions to your three lists.<br>" +
         "The map resets if your king dies or you run out of mana.<br>" +
         "When the map resets, all lists will start over and your resources will be set to the level's default values.",

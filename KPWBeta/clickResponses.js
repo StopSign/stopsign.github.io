@@ -146,6 +146,8 @@ function openSaving() {
     switchInfoTab(3);
 }
 
+
+
 function switchListTab(num) {
     let ids = ["kingListContainer", "castleListContainer", "unitsListContainer"];
     curList = num;
@@ -296,6 +298,12 @@ function nextTooltip() {
     document.getElementById("popupText").innerHTML = curTooltipStrings[curTooltip];
     document.getElementById("popupButton").innerHTML = (curTooltipStrings.length === (curTooltip+1)) ? "Okay" : ("Next (" + (curTooltip+1) + "/" + curTooltipStrings.length + ")");
     curTooltip++;
+}
+
+function openTutorial() {
+    if(tutorial[recentTutorial]) {
+        createTooltip(tutorial[recentTutorial]);
+    }
 }
 
 function prevStory() {

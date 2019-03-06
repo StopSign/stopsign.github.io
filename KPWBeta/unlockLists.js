@@ -39,6 +39,7 @@ let unlockLists = {
                 }
             }
             if(!unlockList[num] && tutorial[num]) {
+                recentTutorial = num;
                 createTooltip(tutorial[num]);
             }
             unlockList[num] = true;
