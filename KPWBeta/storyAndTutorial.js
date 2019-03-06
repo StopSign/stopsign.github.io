@@ -22,14 +22,14 @@ let tutorial = [
         "Each unit has a production facility, which is required to build the unit.<br>" +
         "Having one barracks when you build a spearman means you build one spearman for 200 wood in one action.<br>" +
         "Having two barracks when you build a spearman means you build two spearman for 400 wood in one action.",
-        "Add the sleep action 10 times to let resources build, then build one barracks and two spearman.<br>" +
-        "Be careful, as the the game won't pause if the last action on a list is sleeping.",
+        "Automatically adding sleep when you don't have resources is an option that's on by default.<br>" +
+        "Add one barracks and two spearman actions to the list.",
         "In addition, you'll want your king to fight with your units, so send him back to your castle."
     ],
     [ //4
         "Now that you have the units, it's time to send them off!<br>" +
         "Change which units get selected for a move order by ensuring they're highlighted in the bottom right corner of War Map when you add the action. All units of those types will immediately head toward the destination when the action finishes.",
-        "Select both King and Units and send them all to the hideout, to clear out the thugs."
+        "Select both King and Units and send them together from the castle to the hideout, to clear out the thugs."
     ],
     [ //5
         "Great! You've cleared the map. Move on to the next one to continue."
@@ -38,16 +38,22 @@ let tutorial = [
         "As King, you can inspire workers to work harder... as long as you're there. Use the unlocked Auras to give the extra boost needed to win this level!",
         "There are many ways to win the levels from here on out, but to start you should" +
         "<ul><li>Enable the Oversee Market Aura</li>" +
-        "<li>Hire a first Beggar</li>" +
-        "<li>Sleep 5 seconds</li>" +
-        "<li>Hire a second Beggar</li>" +
-        "<li>Get two Scavengers</li>" +
+        "<li>Hire two Beggars</li>" +
+        "<li>Hire two Scavengers</li>" +
         "</ul>"
     ],
     [//7
+        "Congrats, you've cleared the map! Move on to the next one (I'll stop reminding you after this)."
+    ],
+    [//8
         "You've unlocked the Train action, which lets you get closer to your Reflex Cap. Reflex affects the king's attack and health.<br>" +
-        "For the king to kill 11 Thugs on his own, he needs at least 10.2 RFLX. Use Train until you've passed that threshold, and then attack!<br>" +
-        "There's no time for economy - rush to getting a spearman and send it and the king together to take down the remaining hideout."
+        "For the king to kill 11 Thugs on his own, he needs at least 10.2 RFLX. Use Train until you've passed that threshold, and then attack!<br>",
+        "After you win, there's no time for economy - get a single spearman as soon as you can and send it and the king together to kill the final hideout."
+    ],
+    [//9
+        "Units can spawn from enemy places too, and attack your castle. You'll lose if an enemy is in your castle with no allied units.<br>" +
+        "After you defeat the place, units will stop spawning",
+        "Use the newly unlocked Direct Workers aura to quickly build some spearman to help the King defend."
     ]
 ];
 

@@ -59,11 +59,6 @@ actionData = {
             }
         },
         kingAction: function(action) {
-            if(!action.start) {
-                action.start = function() {
-                    king.curData.aura = "";
-                }
-            }
             if(!action.buy) {
                 action.buy = function() {
                     created[this.varName]++;
@@ -123,7 +118,6 @@ actionData = {
                             created[this.varName] += amountToMake;
                             while(amountToMake > 0) {
                                 let empowerIndex = castle.helpers.getNextHighestEmpower(this.varName);
-                                console.log(empowerIndex, amountToMake);
 
                                 if(empowerIndex === 0) {
                                     warMap.units.createUnit(this.varName, true, "home", amountToMake, empowerIndex);
@@ -511,8 +505,8 @@ actionData = {
                     start: function() {
                         king.curData.aura = "build";
                     },
-                    unlocked: function() { return curLevel >= 4; },
-                    visible: function() { return curLevel >= 4; }
+                    unlocked: function() { return unlockList[9]; },
+                    visible: function() { return unlockList[9]; }
                 });
             },
             growth: function() {

@@ -167,7 +167,7 @@ levelInitials = [
         name: chooseNextName(),
         initial: {
             people:0,
-            gold: 500,
+            gold: 50,
             wood: 0,
             mana: 1500
         },
@@ -189,7 +189,7 @@ levelInitials = [
                 coords:{x:100, y:30}
             },
             {
-                units: { thug:11 },
+                units: { thug:13 },
                 reward: [{
                     type:"exp",
                     amount:300,
@@ -242,66 +242,119 @@ levelInitials = [
                 coords:{x:80, y:60}
             }
         ]
+    },
+    { //3
+        name: chooseNextName(),
+        initial: {
+            people:0, //5270
+            gold: 550,
+            wood: 600,
+            mana: 1200
+        },
+        home: {
+            coords: {x: 20, y: 90},
+            units: { king: 1 }
+        },
+        dungeons:[
+            {
+                units: { goblin:5, hobgoblin:2 },
+                reward: [{
+                    type:"mana",
+                    amount:1200
+                },
+                {
+                    type:"wood",
+                    amount:600
+                }],
+                coords:{x:30, y:50}
+            }
+        ],
+        hideouts:[
+            {
+                units: { thug:5, brigand:3 },
+                creates: { units: { brigand:1 }, initialTime: 1200, period: 600 },
+                reward: [{
+                    type:"mana",
+                    amount:600
+                },
+                {
+                    type:"wood",
+                    amount:600
+                }],
+                coords:{x:100, y:60}
+            },
+            {
+                units: { thug:8, brigand:4 },
+                creates: { units: { thug:11 }, initialTime: 20, period: 3000 },
+                reward: [{
+                    type:"exp",
+                    amount:400,
+                    unique:true
+                }],
+                coords:{x:40, y:70}
+            }
+        ]
     }
-    // { //3
-    //     name: chooseNextName(),
-    //     initial: {
-    //         people:30, //5270
-    //         gold: 100,
-    //         wood: 0,
-    //         mana: 1200
-    //     },
-    //     home: {
-    //         coords: {x: 0, y: 100},
-    //         units: { king: 1 }
-    //     },
-    //     dungeons:[
-    //         {
-    //             units: { goblin:10, hobgoblin:1 },
-    //             reward: [{
-    //                 type:"mana",
-    //                 amount:600
-    //             }],
-    //             coords:{x:30, y:50}
-    //         },
-    //         {
-    //             units: { goblin:20, hobgoblin:2 },
-    //             reward: [{
-    //                 type:"mana",
-    //                 amount:600
-    //             }],
-    //             coords:{x:110, y:90}
-    //         },
-    //         {
-    //             units: { goblin:10, hobgoblin:10 },
-    //             reward: [{
-    //                 type:"mana",
-    //                 amount:1200
-    //             }],
-    //             coords:{x:165, y:60}
-    //         }
-    //     ],
-    //     hideouts:[
-    //         {
-    //             units: { thug:10 },
-    //             creates: { units: { thug:1 }, initialTime: 20, period: 200 },
-    //             reward: [{
-    //                 type:"gold",
-    //                 amount:2000
-    //             }],
-    //             coords:{x:70, y:20}
-    //         },
-    //         {
-    //             units: { thug:30, brigand:5, bandit:2 },
-    //             creates: { units: { brigand:2 }, initialTime: 800, period: 300 },
-    //             reward: [{
-    //                 type:"gold",
-    //                 amount:5000
-    //             }],
-    //             coords:{x:190, y:0}
-    //         }
-    //     ]
-    // }
 ];
+
+// { //example
+//     name: chooseNextName(),
+//         initial: {
+//     people:30, //5270
+//         gold: 100,
+//         wood: 0,
+//         mana: 1200
+// },
+//     home: {
+//         coords: {x: 0, y: 100},
+//         units: { king: 1 }
+//     },
+//     dungeons:[
+//         {
+//             units: { goblin:10, hobgoblin:1 },
+//             reward: [{
+//                 type:"mana",
+//                 amount:600
+//             }],
+//             coords:{x:30, y:50}
+//         },
+//         {
+//             units: { goblin:20, hobgoblin:2 },
+//             reward: [{
+//                 type:"mana",
+//                 amount:600
+//             }],
+//             coords:{x:110, y:90}
+//         },
+//         {
+//             units: { goblin:10, hobgoblin:10 },
+//             reward: [{
+//                 type:"mana",
+//                 amount:1200
+//             }],
+//             coords:{x:165, y:60}
+//         }
+//     ],
+//         hideouts:[
+//     {
+//         units: { thug:10 },
+//         creates: { units: { thug:1 }, initialTime: 20, period: 200 },
+//         reward: [{
+//             type:"gold",
+//             amount:2000
+//         }],
+//         coords:{x:70, y:20}
+//     },
+//     {
+//         units: { thug:30, brigand:5, bandit:2 },
+//         creates: { units: { brigand:2 }, initialTime: 800, period: 300 },
+//         reward: [{
+//             type:"gold",
+//             amount:5000
+//         }],
+//         coords:{x:190, y:0}
+//     }
+// ]
+// }
 
 document.getElementById("mapCount").innerHTML = levelInitials.length + "";

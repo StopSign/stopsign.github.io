@@ -480,12 +480,13 @@ let warMap = {
                 return;
             }
 
+            console.log('level won');
+            levelData.victory = true;
+
             //Level unlocked
             if(highestLevel < curLevel + 1) {
                 highestLevel++;
                 removeClassFromDiv(document.getElementById("nextLevel"), "hidden");
-                console.log('level won');
-                levelData.victory = true;
             }
         }
     }
