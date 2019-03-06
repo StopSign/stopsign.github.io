@@ -118,6 +118,7 @@ function load() {
     if(toLoad.curLevel) {curLevel = toLoad.curLevel;}
     if(toLoad.highestLevel) {highestLevel = toLoad.highestLevel;}
     if(toLoad.loadouts) {loadouts = toLoad.loadouts;}
+    if(toLoad.recentTutorial) {recentTutorial = toLoad.recentTutorial;}
 
     recalcInterval(50);
     pauseGame();
@@ -140,7 +141,7 @@ function save() {
     toSave.king = {savedData:king.savedData};
     toSave.unlockList = unlockList;
     toSave.unlockStory = unlockStory;
-    toSave.storyDiary = storyJournal;
+    toSave.storyJournal = storyJournal;
     toSave.storyPage = storyPage;
     toSave.buildAuraValue = buildAuraValue;
     toSave.soulC = soulC;
@@ -148,6 +149,7 @@ function save() {
     toSave.curLevel = curLevel;
     toSave.highestLevel = highestLevel;
     toSave.loadouts = loadouts;
+    toSave.recentTutorial = recentTutorial;
 
     window.localStorage[saveName] = JSON.stringify(toSave);
 }
