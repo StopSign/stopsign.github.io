@@ -206,35 +206,39 @@ actionData = {
                 actionData.create.castleAction({
                     varName:"merchant",
                     name:"Hire Merchant",
-                    desc:"Invest in a Merchant. They'll make it back eventually. Gives 5 gold per tick.",
+                    desc:"Invest in a Merchant. They'll make it back eventually. Gives 10 gold per tick.",
                     cost: [
                         {
                             resource:"gold",
                             type:"linear",
-                            starting:500,
-                            growth:500
+                            starting:2000,
+                            growth:2000
                         }
                     ],
-                    seconds:40,
+                    seconds:15,
                     xPos:15,
-                    yPos:55
+                    yPos:55,
+                    unlocked: function() { return unlockList[8]; },
+                    visible: function() { return unlockList[8]; }
                 });
 
                 actionData.create.castleAction({
                     varName:"tax",
                     name:"Hire Tax Collector",
-                    desc:"The more you ask, the more they have! Isn't economics amazing? Gives 25 gold per tick.",
+                    desc:"The more you ask, the more they have! Isn't economics amazing? Gives 100 gold per tick.",
                     cost: [
                         {
                             resource:"gold",
                             type:"linear",
-                            starting:5000,
-                            growth:5000
+                            starting:80000,
+                            growth:80000
                         }
                     ],
-                    seconds:160,
+                    seconds:20,
                     xPos:15,
-                    yPos:110
+                    yPos:110,
+                    unlocked: function() { return unlockList[8]; },
+                    visible: function() { return unlockList[8]; }
                 });
 
                 actionData.create.castleAction({
@@ -259,35 +263,39 @@ actionData = {
                 actionData.create.castleAction({
                     varName:"logger",
                     name:"Logger's Hut",
-                    desc:"The forest is magical, and some of the trees are tougher than iron. Woodcutters can take all but the toughest trees. Gives 5 wood per tick.",
+                    desc:"The forest is magical, and some of the trees are tougher than iron. Woodcutters can take all but the toughest trees. Gives 10 wood per tick.",
                     cost: [
                         {
                             resource:"gold",
                             type:"linear",
-                            starting:500,
-                            growth:500
+                            starting:2000,
+                            growth:2000
                         }
                     ],
-                    seconds:40,
+                    seconds:15,
                     xPos:75,
-                    yPos:55
+                    yPos:55,
+                    unlocked: function() { return unlockList[8]; },
+                    visible: function() { return unlockList[8]; }
                 });
 
                 actionData.create.castleAction({
                     varName:"forester",
                     name:"Forester's Cabin",
-                    desc:"The forester knows the best trees to cut down without hurting the forest, and has the tools to take them down. Gives 25 wood per tick.",
+                    desc:"The forester knows the best trees to cut down without hurting the forest, and has the tools to take them down. Gives 100 wood per tick.",
                     cost: [
                         {
                             resource:"gold",
                             type:"linear",
-                            starting:5000,
-                            growth:5000
+                            starting:80000,
+                            growth:80000
                         }
                     ],
-                    seconds:160,
+                    seconds:20,
                     xPos:75,
-                    yPos:110
+                    yPos:110,
+                    unlocked: function() { return unlockList[8]; },
+                    visible: function() { return unlockList[8]; }
                 });
             },
             army: function() {
@@ -325,7 +333,9 @@ actionData = {
                     ],
                     seconds:10,
                     xPos:145,
-                    yPos:55
+                    yPos:55,
+                    unlocked: function() { return unlockList[9]; },
+                    visible: function() { return unlockList[9]; }
                 });
 
                 actionData.create.castleAction({
@@ -342,7 +352,9 @@ actionData = {
                     ],
                     seconds:10,
                     xPos:145,
-                    yPos:110
+                    yPos:110,
+                    unlocked: function() { return unlockList[10]; },
+                    visible: function() { return unlockList[10]; }
                 });
 
                 actionData.create.castleAction({
@@ -378,7 +390,9 @@ actionData = {
                     createdWith:"range",
                     seconds:10,
                     xPos:205,
-                    yPos:55
+                    yPos:55,
+                    unlocked: function() { return unlockList[9]; },
+                    visible: function() { return unlockList[9]; }
                 });
 
                 actionData.create.castleAction({
@@ -393,9 +407,11 @@ actionData = {
                         }
                     ],
                     createdWith:"designer",
-                    seconds:20,
+                    seconds:15,
                     xPos:205,
-                    yPos:110
+                    yPos:110,
+                    unlocked: function() { return unlockList[10]; },
+                    visible: function() { return unlockList[10]; }
                 });
             },
             spirits: function() {
@@ -418,8 +434,8 @@ actionData = {
                     seconds:10,
                     xPos:275,
                     yPos:0,
-                    unlocked: function() { return highestLevel >= 10; },
-                    visible: function() { return highestLevel >= 10; }
+                    unlocked: function() { return unlockList[10]; },
+                    visible: function() { return unlockList[10]; }
                 });
 
                 actionData.create.castleAction({
@@ -441,8 +457,8 @@ actionData = {
                     seconds:20,
                     xPos:275,
                     yPos:55,
-                    unlocked: function() { return highestLevel >= 10; },
-                    visible: function() { return highestLevel >= 10; }
+                    unlocked: function() { return unlockList[10]; },
+                    visible: function() { return unlockList[10]; }
                 });
 
                 actionData.create.castleAction({
@@ -460,8 +476,8 @@ actionData = {
                     seconds:20,
                     xPos:275,
                     yPos:110,
-                    unlocked: function() { return highestLevel >= 10; },
-                    visible: function() { return highestLevel >= 10; }
+                    unlocked: function() { return unlockList[10]; },
+                    visible: function() { return unlockList[10]; }
                 });
             }
         },
@@ -521,8 +537,8 @@ actionData = {
                         king.curData.rflxCur += (king.savedData.rflxCap - king.curData.rflxCur)/50;
                         warMap.units.updateExistingUnitStats();
                     },
-                    unlocked: function() { return unlockList[7]; },
-                    visible: function() { return unlockList[7]; }
+                    unlocked: function() { return unlockList[8]; },
+                    visible: function() { return unlockList[8]; }
                 });
 
                 actionData.create.kingAction({
@@ -597,8 +613,8 @@ actionData = {
                     canBuy: function() {
                         return levelData.data.person < levelData.initial.people;
                     },
-                    unlocked: function() { return levelInitials[curLevel].initial.people > 0; },
-                    visible: function() { return levelInitials[curLevel].initial.people > 0; }
+                    unlocked: function() { return unlockList[11]; },
+                    visible: function() { return unlockList[11]; }
                 });
 
                 actionData.create.kingAction({
@@ -623,7 +639,9 @@ actionData = {
                         levelSave[curLevel].knowledge += knowledgeGain;
                         king.savedData.int += knowledgeGain / 1000;
                         king.helpers.recalcListLength();
-                    }
+                    },
+                    unlocked: function() { return unlockList[11]; },
+                    visible: function() { return unlockList[11]; }
                 });
 
             },
@@ -637,7 +655,9 @@ actionData = {
                     max: 5,
                     seconds:5,
                     xPos:155,
-                    yPos:0
+                    yPos:0,
+                    unlocked: function() { return unlockList[10]; },
+                    visible: function() { return unlockList[10]; }
                 });
 
                 actionData.create.blessingAction({
@@ -649,7 +669,9 @@ actionData = {
                     max: 5,
                     seconds:5,
                     xPos:155,
-                    yPos:55
+                    yPos:55,
+                    unlocked: function() { return unlockList[10]; },
+                    visible: function() { return unlockList[10]; }
                 });
 
                 actionData.create.blessingAction({
@@ -661,7 +683,9 @@ actionData = {
                     max: 15,
                     seconds:5,
                     xPos:155,
-                    yPos:110
+                    yPos:110,
+                    unlocked: function() { return unlockList[11]; },
+                    visible: function() { return unlockList[11]; }
                 });
 
                 actionData.create.blessingAction({
@@ -673,7 +697,9 @@ actionData = {
                     max: 15,
                     seconds:5,
                     xPos:215,
-                    yPos:0
+                    yPos:0,
+                    unlocked: function() { return unlockList[11]; },
+                    visible: function() { return unlockList[11]; }
                 });
 
                 actionData.create.blessingAction({
@@ -685,7 +711,9 @@ actionData = {
                     max: 15,
                     seconds:5,
                     xPos:215,
-                    yPos:55
+                    yPos:55,
+                    unlocked: function() { return unlockList[11]; },
+                    visible: function() { return unlockList[11]; }
                 });
 
                 actionData.create.blessingAction({
@@ -698,8 +726,8 @@ actionData = {
                     seconds:5,
                     xPos:215,
                     yPos:110,
-                    unlocked: function() { return highestLevel >= 50; }, //TODO eventually
-                    visible: function() { return highestLevel >= 50; }
+                    unlocked: function() { return false; }, //TODO eventually
+                    visible: function() { return false; }
                 });
             }
         },

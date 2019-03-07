@@ -237,6 +237,12 @@ input {
     border:2px solid rgba(190, 190, 190, 0);
 }
 
+.lookClickable {
+    background-color: rgba(190, 190, 190, .3);
+    padding:3px;
+    border:2px solid rgba(190, 190, 190, 0);
+}
+
 .kingColor, .kingColorH, .kingColorD:hover {
     background-color: rgba(234, 234, 202, 1);
 }

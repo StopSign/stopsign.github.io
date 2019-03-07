@@ -8,6 +8,7 @@ let click = {
         document.getElementById("loadoutButton4").onclick = function() { click.event.selectLoadout(4); };
         document.getElementById("saveLoadout").onclick = function() { click.event.saveLoadout(); };
         document.getElementById("loadLoadout").onclick = function() { click.event.loadLoadout(); };
+        document.getElementById("soulCContainer").onclick = function() { openEmpowerMenu(); };
     },
     event: {
         clearCurrentList: function() {
@@ -266,7 +267,7 @@ function prevLevel() {
         curLevel = 0;
     }
     setMapArrowVisibility();
-    restartReason = "New Level";
+    restartReason = "New Map";
     restart()
 }
 
@@ -277,7 +278,7 @@ function nextLevel() {
         curLevel--;
     }
     setMapArrowVisibility();
-    restartReason = "New Level";
+    restartReason = "New Map";
     restart()
 }
 

@@ -103,12 +103,16 @@ let warMap = {
             thug: { atk:1, hp:15, exp:1 },
             brigand: { atk: 3, hp: 40, exp:2 },
             bandit: { atk: 6, hp: 100, exp:5 },
-            thief: { atk:10, hp: 120, exp:7 },
+            thief: { atk: 10, hp: 120, exp:7 },
+            rogue: { atk: 15, hp: 200, exp:10 },
+            assassin: {atk: 25, hp: 300, exp: 15 },
 
             //monsters
             goblin: { atk:1, hp:5, exp:2 },
             hobgoblin: { atk:2, hp:30, exp:4 },
-            troll: { atk:15, hp:60, exp:6 }
+            troll: { atk:15, hp:60, exp:6 },
+            drake: { atk: 20, hp: 250, exp: 12 },
+            dragon: { atk: 50, hp: 800, exp: 30 }
         },
         getStatsOfUnit: function(varName, empowered) {
             if(varName === "king") {
@@ -429,6 +433,7 @@ let warMap = {
                 gold += reward.type === "gold" ? reward.amount : 0;
                 wood += reward.type === "wood" ? reward.amount : 0;
                 king.gainExp(reward.type === "exp" ? reward.amount : 0);
+                king.savedData.wis += reward.type === "wisdom" ? reward.amount : 0;
             });
             base.reward = [];
             warMap.bases.checkWinLevel();

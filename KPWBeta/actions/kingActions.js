@@ -1,7 +1,7 @@
 let king = {
     savedData: {
         int:0,
-        wis:1,
+        wis:0,
         cha:1,
         rflxInitial:10,
         rflxCap:10,

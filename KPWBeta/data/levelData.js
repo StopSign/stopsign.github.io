@@ -172,7 +172,7 @@ levelInitials = [
             mana: 1500
         },
         home: {
-            coords: { x: 110, y: 10},
+            coords: { x: 110, y: 30},
             units: { king: 1 }
         },
         dungeons:[
@@ -186,7 +186,7 @@ levelInitials = [
                             amount:600
                         }
                     ],
-                coords:{x:100, y:30}
+                coords:{x:100, y:50}
             },
             {
                 units: { thug:13 },
@@ -195,7 +195,7 @@ levelInitials = [
                     amount:300,
                     unique:true
                 }],
-                coords:{x:60, y:20}
+                coords:{x:60, y:40}
             }
         ]
     },
@@ -208,7 +208,7 @@ levelInitials = [
             mana: 700
         },
         home: {
-            coords: { x: 110, y: 100},
+            coords: { x: 110, y: 60},
             units: { king: 1 }
         },
         dungeons:[
@@ -230,7 +230,7 @@ levelInitials = [
                         amount:200
                     }
                 ],
-                coords:{x:125, y:85}
+                coords:{x:125, y:45}
             },
             {
                 units: { thug:2 },
@@ -239,7 +239,7 @@ levelInitials = [
                     amount:400,
                     unique:true
                 }],
-                coords:{x:80, y:60}
+                coords:{x:80, y:20}
             }
         ]
     },
@@ -252,7 +252,7 @@ levelInitials = [
             mana: 1200
         },
         home: {
-            coords: {x: 20, y: 90},
+            coords: {x: 40, y: 60},
             units: { king: 1 }
         },
         dungeons:[
@@ -266,7 +266,7 @@ levelInitials = [
                     type:"wood",
                     amount:600
                 }],
-                coords:{x:30, y:50}
+                coords:{x:50, y:20}
             }
         ],
         hideouts:[
@@ -281,7 +281,7 @@ levelInitials = [
                     type:"wood",
                     amount:600
                 }],
-                coords:{x:100, y:60}
+                coords:{x:120, y:30}
             },
             {
                 units: { thug:8, brigand:4 },
@@ -291,7 +291,125 @@ levelInitials = [
                     amount:400,
                     unique:true
                 }],
-                coords:{x:40, y:70}
+                coords:{x:60, y:40}
+            }
+        ]
+    },
+    { //4
+        name: chooseNextName(),
+        initial: {
+            people: 0,
+            gold: 2000,
+            wood: 0,
+            mana: 1200
+        },
+        home: {
+            coords: { x: 50, y: 50},
+            units: { king: 1 }
+        },
+        dungeons:[
+            {
+                units: { hobgoblin: 5, troll:3 },
+                reward: [
+                    {
+                        type:"mana",
+                        amount:1200
+                    }],
+                coords:{x:70, y:30}
+            }
+        ],
+        hideouts:[
+            {
+                units: { thug:15, brigand:10 },
+                creates: { units: { brigand:2 }, initialTime: 1800, period: 600 },
+                reward: [{
+                    type:"exp",
+                    amount:600,
+                    unique:true
+                }],
+                coords:{x:80, y:80}
+            }
+        ]
+    },
+    { //5
+        name: chooseNextName(),
+        initial: {
+            people: 5,
+            gold: 2000,
+            wood: 0,
+            mana: 1200
+        },
+        home: {
+            coords: { x: 50, y: 50},
+            units: { king: 1 }
+        },
+        dungeons:[
+            {
+                units: { hobgoblin: 7, troll:5 },
+                reward: [
+                    {
+                        type:"mana",
+                        amount:1200
+                    }],
+                coords:{x:70, y:30}
+            },
+            {
+                units: { drake: 4, dragon: 1 },
+                reward: [
+                    {
+                        type:"wisdom",
+                        amount:1,
+                        unique:true
+                    }],
+                coords:{x:120, y:40}
+            }
+        ],
+        hideouts:[
+            {
+                units: { thug:20, brigand:15 },
+                creates: { units: { brigand:3 }, initialTime: 1800, period: 600 },
+                reward: [{
+                    type:"exp",
+                    amount:800,
+                    unique:true
+                }],
+                coords:{x:80, y:80}
+            }
+        ]
+    },
+    { //6
+        name: chooseNextName(),
+        initial: {
+            people: 7,
+            gold: 2000,
+            wood: 0,
+            mana: 1200
+        },
+        home: {
+            coords: { x: 50, y: 50},
+            units: { king: 1 }
+        },
+        dungeons:[
+            {
+                units: { hobgoblin: 10, troll:8 },
+                reward: [
+                    {
+                        type:"mana",
+                        amount:1200
+                    }],
+                coords:{x:70, y:30}
+            }
+        ],
+        hideouts:[
+            {
+                units: { brigand:15, bandit:10 },
+                creates: { units: { bandit:2 }, initialTime: 1800, period: 600 },
+                reward: [{
+                    type:"exp",
+                    amount:1000,
+                    unique:true
+                }],
+                coords:{x:80, y:80}
             }
         ]
     }

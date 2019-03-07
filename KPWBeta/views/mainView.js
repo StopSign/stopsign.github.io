@@ -704,7 +704,7 @@ let view = {
                     let empowerCount = empowered[action.varName] ? empowered[action.varName][1] : 0;
 
                     divText += "<div class='empowerOption'>" +
-                            "<div class='clickable'>" +
+                            "<div class='lookClickable'>" +
                                 '<img src="img/' + action.varName + '.svg" class="superLargeIcon imageDragFix">' +
                             "</div>" +
                             "<div class='medium bold' style='width:70px;text-align:center;vertical-align:top;margin-top:13px'>"+capitalizeFirst(action.varName)+"</div>" +

@@ -8,8 +8,8 @@ let castle = {
         goldToAdd: function() {
             let addedGold = 0;
             addedGold += created.beg;
-            addedGold += created.merchant * 5;
-            addedGold += created.tax * 25;
+            addedGold += created.merchant * 10;
+            addedGold += created.tax * 100;
             addedGold *= king.getBonusByAura("gold");
             addedGold *= 1 + (created.peace / 10);
             return round5(addedGold);
@@ -17,8 +17,8 @@ let castle = {
         woodToAdd: function() {
             let addedWood = 0;
             addedWood += created.scavenger;
-            addedWood += created.logger * 5;
-            addedWood += created.forester * 25;
+            addedWood += created.logger * 10;
+            addedWood += created.forester * 100;
             addedWood *= king.getBonusByAura("wood");
             addedWood *= 1 + (created.bounty / 10);
             return round5(addedWood);

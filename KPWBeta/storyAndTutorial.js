@@ -54,6 +54,19 @@ let tutorial = [
         "Units can spawn from enemy places too, and attack your castle. You'll lose if an enemy is in your castle with no allied units.<br>" +
         "After you defeat the place, units will stop spawning",
         "Use the newly unlocked Direct Workers aura to quickly build some spearman to help the King defend."
+    ],
+    [//10
+        "You've unlocked favor, and two blessings to use it with. Build favor with resources and then spend wood with favor on blessings.<br>" +
+        "Blessings get easier to receive every time you use them: the more you stay on a level the easier it gets."
+    ],
+    [//11
+        "You've unlocked Chat and Study. Chat permanently improves your CHA, which improves the resource auras. Chatting also gives you knowledge to Study.<br>" +
+        "Study permanently uses knowledge to give you INT, which improves Direct Workers as well as the amount of bonuses you remember for Blessings and Chat.",
+        "Chatting, like blessings, get easier to use every time you build rapport with a person. Look in Info -> Growth for more information.",
+        "Study requires WIS to use knowledge. Clear the dragon's dungeon to receive your first WIS!"
+    ],
+    [//12
+        "Unlocked Soul Crystals. Every time you clear all hideouts of a level, your final gold / 10,000 becomes Soul Crystals. Use them to permanently gain an empowered unit, which will be created first in each loop."
     ]
 ];
 

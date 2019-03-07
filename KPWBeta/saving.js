@@ -126,6 +126,8 @@ function load() {
     if(toLoad.waitForResources !== undefined) { document.getElementById("waitForResources").checked = toLoad.waitForResources }
     if(toLoad.keepBuild !== undefined) { document.getElementById("keepBuild").checked = toLoad.keepBuild }
 
+    versionFix();
+
     recalcInterval(50);
     pauseReason = "Load";
     pauseGame();
@@ -157,7 +159,7 @@ function save() {
     toSave.highestLevel = highestLevel;
     toSave.loadouts = loadouts;
     toSave.recentTutorial = recentTutorial;
-    //pauseBeforeRestart pauseListEmpty pauseListsEmpty pausePlaceCleared waitForResources keepBuild buildValue
+
     toSave.pauseBeforeRestart = document.getElementById("pauseBeforeRestart").checked;
     toSave.pauseListEmpty = document.getElementById("pauseListEmpty").checked;
     toSave.pauseListsEmpty = document.getElementById("pauseListsEmpty").checked;
@@ -167,6 +169,12 @@ function save() {
 
 
     window.localStorage[saveName] = JSON.stringify(toSave);
+}
+
+function versionFix() {
+    if(!unlockList[11] && king.savedData.wis > 0) { //originally started with 1 WIS, changed to 0 WIS initial (u dumb)
+        king.savedData.wis = 0;
+    }
 }
 
 function exportMapList() {
