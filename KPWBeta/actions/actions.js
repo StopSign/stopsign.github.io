@@ -55,8 +55,8 @@ let actions = {
             }
         }
 
+        let listEmpty = false;
         //add tick to each action. if it finishes, get the rewards
-        let listsEmpty = [false, false, false];
         for(let i = 0; i < actionsList.nextNames.length; i++) {
             let name = actionsList.nextNames[i];
             let action = actionsList.current[name][this.validActions[i]];
@@ -84,6 +84,7 @@ let actions = {
                     if(nextAction && nextAction.varName === "pause" && nextAction.loopsLeft > 0) {
                         nextAction.loopsLeft = 0;
                         this.validActions[i]++;
+                        pauseReason = "Action";
                         pauseGame();
                     }
                 }
@@ -91,16 +92,31 @@ let actions = {
                     action.buy();
                     actions.adjustCosts(i);
                 }
-                if(["sleep", "restart"].indexOf(action.varName) === -1 && action.loopsLeft === 0 && !actionsList.current[name][this.validActions[i]+1]) { //no next action after non-sleep
-                    listsEmpty[i] = true;
+                if(action.varName !== "sleep" && action.loopsLeft === 0 && !actionsList.current[name][this.validActions[i]+1]) { //no next action after non-sleep
+                    listEmpty = i;
                 }
             }
         }
-        if(document.getElementById("pauseListEmpty").checked && (listsEmpty[0] || listsEmpty[1] || listsEmpty[2])) {
+
+        if(document.getElementById("pauseListEmpty").checked && listEmpty !== false) {
+            pauseReason = capitalizeFirst(actionsList.nextNames[listEmpty]) + " List Done";
             pauseGame();
         }
-        if(document.getElementById("pauseListsEmpty").checked && listsEmpty[0] && listsEmpty[1] && listsEmpty[2]) {
-            pauseGame();
+        if(document.getElementById("pauseListsEmpty").checked) {
+            let listsEmpty = true;
+            let allSleep = true;
+            for(let i = 0; i < actionsList.nextNames.length; i++) {
+                let name = actionsList.nextNames[i];
+                let action = actionsList.current[name][this.validActions[i]];
+                let listIsDone = action.varName !== "sleep" && action.loopsLeft === 0 && !actionsList.current[name][this.validActions[i]+1];
+                let currentlySleeping = action.varName === "sleep" && !actionsList.current[name][this.validActions[i]+1];
+                listsEmpty = listsEmpty && (listIsDone || currentlySleeping);
+                allSleep = allSleep && currentlySleeping;
+            }
+            if(listsEmpty && !allSleep) {
+                pauseReason = "All Lists Done";
+                pauseGame();
+            }
         }
     },
     restart: function() {

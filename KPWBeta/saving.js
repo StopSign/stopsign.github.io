@@ -11,8 +11,7 @@ function startGame() {
     displayBetaSaveNote();
 
     //debug
-    // window.localStorage[saveName] = decode("eyJkYXRlIjoiMjAxOS0wM8SNNlQxNzozxJQwOC44NjJaIiwidG90YWxPZmZsaW5lTXPEhjY4MzM0Ny4wxLjEucS5NcSgZW1wb3dlcmVkxIZ7fcSgbGV2ZWxTYcWNxIZbxIDErHh0TGlzdMSvOsSAa8SrZ8WTInPFi2VwfDczIl3EoGNhxZvFi8WjxaVlxad8MsWrxKBiZWd8McSfxaTFr8WNbmfFg8W+xoDFtMW2MTDGgGJhcnJhY2tzxofEoHNwZcaPbWFuxbfFrMSgdW5pxZzFo2TGosaFb25fMMW+xpbFpMWmxag1xb/EoGhvbWXGrsa0xrDFtcWoMTjGgGhpZGVvdXTGrMauxatdxYnFpGVjxYTGpTowxqHGo3F1ZUPFi8aPxYXEhnRyx5jEoGtuxYHFi2TGhcSGx5Qix6PHpcWFxoVDYXDHqca1aWdoZcWbUMWDc8aqxZPEgMaZcse8bsezImFtx4ZudMSGMn3FrSJixYtzc8WhxZ3EgGVuY2jGnciKOsWUIm51bciEyIbIiMicyIzIjmbGmsWbx77In8ihyKPIh8aiyKbIjcSgZ3XHg8adY8SFyJ3Flciux5PEoMikyLHIi8izIsaZxpLIusieyKDIosi+yIXIsMiJyYLIjmLIpXnIrMmJyK/IpcmPxrXFg2/HuMmUyL3HqsmAyY46yKd9xYnFlWXFl8WZxZvIlcerxaHFo8accmtldMavxonFqDfGu2PGt23Gosa5xrvJtcWpNcagIsWvxbHJh8iPxbzJtMaxfMqBxbrKiMm+xoLIl8aFcsafxbrGj8aRxpPGlcm+yoo3xo3KlsaSxpTJtMmFcsacxp40xojKijbGiMqiyqTKica9xb7GjMaXyqvGncaHyI7GosakxZ1bxrzFtjkyx4HHg8eFx4fHiTF8xbnKusWoxLTKvseEx4bHiMaty4PLhcm/Mcq9x7TLisuBy4PLjsqnyq7KpsuTy4DHiMuWy4TFrMeNc8ePx5HFnceqyrbHl8eZx5vFhMWGOsefx6HHq8ekd8emx6jJi8esy7LHrseZx7HIhMeCx7bHuHTHusiBx73Iu8mEx7vMgsmfyY3InDHJg8iQx7jIk8aEyavIl8iZyJvJncmKzIfJlzrMisioyKrInMmIyZ7Iv8yIxIbMmci0yLbEgsiYyYfIvMyVzJ/Ml8yizITJhsyUyZbJgcyYzIvJksyvyYvJoMyJyYPHt3LJm8q4zKjMsMmhzJnJpCzJpsmoxZrHksWfya3IncShxpHEq8ufxpfKqMq9yI7KhHTFss2Kyb/EnMqdxpDKn8qZyqrGmsqjyrPFv8q1xqPHksq5y5DKjCLHgsuUy4zGusuYxbY0zafGtsa4zazNj8quMcuFzanLnF/LnseLy6HLo8myy6XHlWnLqMeazZ7Hncutx6Blx6LLscuzyLrHqsu2zozHsMeyyYvLvMe3x7nMhciDzIPIgMiCzL/MuMmQyJHMjmfMkMiYyJrJocydzKnJjMyryYPIqcWwzJzMvsy2zKDMssiOyLXIt8ymzLXMlsyxzKzJhci5zrbMqs64zLPIscmTzIPJlc6vzqnIjsy6zLzOvM6ozr7HjMmDxaDGhMWHxaTFkcWFRMSDYc+QxKvInMeqd8WazKHFrsiaz50icsSpeEnNo2nEpcyhx6rPomx4zpHMoTbEvXjOkjk2Ns2CIsaibG/Gk8mpzJzLrs6Jz78s0IHQg86I0ILQhdCEx6HPv82iz7rGk1PEonLPgVtmxKXLotCG0InQh9CY0JfQmmXIjsWbb9CQSseGcm7PqMid0J3Qj3lQYcu0x6piyLZsZEF1xpFWxKXHmMyhLsS8xaTHhmxDx6nEtzYwOcSgxKLEpGxUaca4xIY3ODk4xLLFrtCzTMWMxY7Ii8e0y73Fm9GTxY1sxIYzxYpvYWTLi8q4yI7FhMi5yIlUx4fQn8+n0Zw6OH0=");
-
+    // window.localStorage[saveName] = decode("eyJkYXRlIjoiMjAxOS0wM8SNN1QxNjoxMDo1OC40MzlaIiwidG90YWxPZmZsaW5lTXPEhjbEncSyMDc1Ljg0OTk0NDcxxKFlbXBvd2VyZWTEhnt9xKFsZXZlbFNhxZHEhlvEgMSteHRMaXN0xLA6xIBrxKxnxZcic8WPZXB8NzMiXcShY2HFn8WPxafFqWXFq3wyxa/EoWJlZ3wxxKDFqMWzxZFuZ8WHxoLGhMW4xbrElsaEYmFycmFja3PGi8Shc3BlxpJtYW7Fu8WwxKF1bmnFoMWnZMalxolvbl8wxoLGmcWoxarFrDXGg8ShaG9tZcaxxrfGs8W5xawxOMaEaGlkZW91dMavxrHFr13FjcWoZWPFiMaoOjDGpMamcXVlQ8WPxpLFicSGdHLHm8Sha27FhcWPZMaJxIbHlyLHpseoxYnGiUNhcMesxrhpZ2hlxZ9QxYdzxq3Fl8SAxpxyx79ux7YiYW3HiW50xIYyfcWxImLFj3NzxaXFocSAZW5jaMagyI06xZgibnVtyIfIiciLyJ/Ij8iRZsadxZ/IgciiyKTIpsiKxqXIqciQxKFndceGxqBjxIXIoMWZyLHHlsShyKfItMiOyLYixpzGlci9yKHIo8ilyYHIiMizyIzJhciRYsioecivyYzIssioyZLGuMWHb8e7yZfJgMetyYPJkTrIqn3FjcWZZcWbxZ3Fn8iYx67FpcWnxp9ya2V0xrLGjcWsxL/GhGPGum3Gpca8xr7JuMWtNcajIsWzxbXJisiSxoDJt8a0fMqExb7Ki8qBxobImsaJcsaixb7GksaUxpbGmMqByo03xpDKmcaVxpfJt8mIcsafxqE0xozKjTbGjMqlyqfKjMeAxoIwyq3GncqmxqDGi8iRxqXGp8WhW8a/xbo5MseEx4bHiMeKx4wxfMW9yr7FrDPKqce3x4fHiceLxrDLh8uJyoIxy4HLjsuEx4vLh8uTyqrKscuNIseFy4/Lhcuby4jFsMeQc8eSx5TFocetyrrHmsecx57FiMWKOseix6THrsend8epx6vJjsevy7jHscecx7TIh8eFx7nHu3THvciEyIDIvsmHx77MiMmiyZDInzHJhsiTx7vIlsaIya7ImsicyJ7JoMmNzI3JmsSVyYbIrMW0yJ/Ji8mhyYLMjsSGzJDIkci4yLrIm8mKyL/Mm8ylzJ3MqMShyYjIvMyayZnJhMyeyZPJlcy2yY7Jo8yPyYbHunLJnsq8zK7Mt8mkzKjJpyzJqcmrxZ7HlcWjybDIoMSixpTErMulxprKq8uByJHKh3TFts2RyoI2y5fIksqhypvKpMq1yq/Gg8q5xqbHlcq9y5XKj8ugy4PLkMuGyrDFujTNrca5xrvGvcudxo7Licuhy5lfy6THjsuny6nJtcurx5hpy67Hncq1x6DLs8ejZcely7fLuci9x63LvM6Qx7PHtcmOzILHuse8zIvIhsyJyIPIhc2GyLXJk8iUzJRnzJbIm8idyaTMo8yvyY/MnciqxKHMoMiuzInJmMy9zKbJpcmGzKrEgsyszLzMnMy4zq7MismJzrvMsM69zJHMu86yzKTOrM+DyJHNgc2Dz4HPiMmkyabJqMiiyarFnM2Nya7FpMaIxqlpxYhjybbGvseiYc2Uza3Jssm0z53GhM+fz6HJu8m9yb/Gss+nxqEyza3KgjXKqc2ZzKHNnMq9xpHGk8qiypzKtMaeyrfLicW/xoHKncqxyp/KkNCBxozKk8aIxorNoMuVz7zKtsahz7/Nosqj0ILFutCLyq7Kt9CTx4HKs8aa0JbGodCYxbvQmsWo0Jx8y5/KgtCk0KLKhM2oyrvFt8qezaDGqtCJxq3NscuUyo3LjMeExrrKgM2Vy4rKjjnLgsuiy5HHjc25xaw2xr7NvM2wzb/LpsaazoLHlcusx5nHm86Ix5/Lssu0zo3Ltsewx6rOkc6O0ZTHssyAzpfHuM6ZzIXOm8ivzp7MjM+Cz4/Mkc6jyJfFiyLMl86ozKLNhc60zJ00zJ/IrdGsyLDOq8y+xIbRsMypyLnOucy1z4bRtc610bjMs8ad0bzOqs6g0bfPhMi0yZbRvdKFOtKAy6DJncmf0orRrsy40bjJp8iRz5fFpsWixajFlcWJRMSDYdGoxKzIn8etd8WezKfFssid0qYicsSqeEnNqWnEpsynx63Sq2x4zpXMpzjFgXjOlseCOTjNiSLGpWxvxpbJrMyi0ZEs04jTis6M04nTjNOLx6TTj86N0ZHNqNODxpZTxKNy0olbZsSmy6jTjdOQ047TodOg06NlyJHFn2/TmUrHiXJu0rHIoNOm05h5UGHLusetYsi5bGRBdcaUVsSmx5vMpy41xprHiWxDyI4uMjY2xKHEo8SlbFRpxrvEsTM1NjjUitSDyobTvEzFkMWSxIYzx7fMg8Wf1J3FkWzRt8WOb2Fky5DKvMiRz5vImnRUx4rTqNKw1Kc6OcyzYXXLqEJlZtOoZVLMhMaSyJ/TiMmH1LvLqNOGRcWDdNKJ05xs057ViNS8ZdOGc9WMcNWOxIbVkNWScNWJZVBsyYnRjsux1ZvTndGSd8+gdEbTqNWDx7/TvMi8xaHVh8m0xatC07jLstWcZX0=");
 
     let divText = "";
     for(let i = 0; i < story.length; i++) {
@@ -57,8 +56,8 @@ let curListNum = 1;
 let selectedLoadout = 0;
 let scrollToEnd = "";
 
-let levelSave, unlockList, unlockStory, storyJournal, restartReason, storyPage, empowered, initialUnlock, consoleLog, totalOfflineMs, loadouts;
-let recentTutorial;
+let levelSave, unlockList, unlockStory, storyJournal, restartReason, pauseReason, storyPage, empowered, initialUnlock, consoleLog, totalOfflineMs;
+let loadouts, recentTutorial;
 
 function clearSave() { //Doesn't work atm
     window.localStorage[saveName] = "";
@@ -81,12 +80,12 @@ function loadDefaults() {
     unlockStory = []; //undefined is locked, true is new, false is seen
     storyJournal = [];
     restartReason = "";
+    pauseReason = "";
     storyPage = 0;
     empowered = {};
     initialUnlock = true;
     consoleLog = [];
     loadouts = [];
-
     recentTutorial = 0;
 
     totalOfflineMs = 0;
@@ -104,23 +103,31 @@ function load() {
     empowered = toLoad.empowered !== undefined ? toLoad.empowered : {};
 
     //defines defaults later
-    if(toLoad.levelSave) {levelSave = toLoad.levelSave;}
+    if(toLoad.levelSave !== undefined) {levelSave = toLoad.levelSave;}
     if(toLoad.king && toLoad.king.savedData) {king.savedData = toLoad.king.savedData;}
     king.recalcListLength(); //set highestListLength
 
-    if(toLoad.unlockList) {unlockList = toLoad.unlockList; }
-    if(toLoad.unlockStory) {unlockStory = toLoad.unlockStory;}
-    if(toLoad.storyJournal) {storyJournal = toLoad.storyJournal;}
-    if(toLoad.storyPage) {storyPage = toLoad.storyPage;}
-    if(toLoad.buildAuraValue) {buildAuraValue = toLoad.buildAuraValue;}
-    if(toLoad.soulC) {soulC = toLoad.soulC;}
-    if(toLoad.totalTime) {totalTime = toLoad.totalTime;}
-    if(toLoad.curLevel) {curLevel = toLoad.curLevel;}
-    if(toLoad.highestLevel) {highestLevel = toLoad.highestLevel;}
-    if(toLoad.loadouts) {loadouts = toLoad.loadouts;}
-    if(toLoad.recentTutorial) {recentTutorial = toLoad.recentTutorial;}
+    if(toLoad.unlockList !== undefined) {unlockList = toLoad.unlockList; }
+    if(toLoad.unlockStory !== undefined) {unlockStory = toLoad.unlockStory;}
+    if(toLoad.storyJournal !== undefined) {storyJournal = toLoad.storyJournal;}
+    if(toLoad.storyPage !== undefined) {storyPage = toLoad.storyPage;}
+    if(toLoad.buildAuraValue !== undefined) {buildAuraValue = toLoad.buildAuraValue;}
+    if(toLoad.soulC !== undefined) {soulC = toLoad.soulC;}
+    if(toLoad.totalTime !== undefined) {totalTime = toLoad.totalTime;}
+    if(toLoad.curLevel !== undefined) {curLevel = toLoad.curLevel;}
+    if(toLoad.highestLevel !== undefined) {highestLevel = toLoad.highestLevel;}
+    if(toLoad.loadouts !== undefined) {loadouts = toLoad.loadouts;}
+    if(toLoad.recentTutorial !== undefined) {recentTutorial = toLoad.recentTutorial;}
+
+    if(toLoad.pauseBeforeRestart !== undefined) { document.getElementById("pauseBeforeRestart").checked = toLoad.pauseBeforeRestart }
+    if(toLoad.pauseListEmpty !== undefined) { document.getElementById("pauseListEmpty").checked = toLoad.pauseListEmpty }
+    if(toLoad.pauseListsEmpty !== undefined) { document.getElementById("pauseListsEmpty").checked = toLoad.pauseListsEmpty }
+    if(toLoad.pausePlaceCleared !== undefined) { document.getElementById("pausePlaceCleared").checked = toLoad.pausePlaceCleared }
+    if(toLoad.waitForResources !== undefined) { document.getElementById("waitForResources").checked = toLoad.waitForResources }
+    if(toLoad.keepBuild !== undefined) { document.getElementById("keepBuild").checked = toLoad.keepBuild }
 
     recalcInterval(50);
+    pauseReason = "Load";
     pauseGame();
 
     click.init(); //attach onclick listeners
@@ -150,6 +157,14 @@ function save() {
     toSave.highestLevel = highestLevel;
     toSave.loadouts = loadouts;
     toSave.recentTutorial = recentTutorial;
+    //pauseBeforeRestart pauseListEmpty pauseListsEmpty pausePlaceCleared waitForResources keepBuild buildValue
+    toSave.pauseBeforeRestart = document.getElementById("pauseBeforeRestart").checked;
+    toSave.pauseListEmpty = document.getElementById("pauseListEmpty").checked;
+    toSave.pauseListsEmpty = document.getElementById("pauseListsEmpty").checked;
+    toSave.pausePlaceCleared = document.getElementById("pausePlaceCleared").checked;
+    toSave.waitForResources = document.getElementById("waitForResources").checked;
+    toSave.keepBuild = document.getElementById("keepBuild").checked;
+
 
     window.localStorage[saveName] = JSON.stringify(toSave);
 }
@@ -235,7 +250,7 @@ function importSave() {
     restartReason = "Imported";
 
     load();
-    pauseGame();
+    pauseReason = "Import";
 }
 
 function displayBetaSaveNote() {

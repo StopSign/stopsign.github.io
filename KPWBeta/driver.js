@@ -57,14 +57,15 @@ function tick() {
             reachedOneMana = true;
         }
 
-        //TODO check if only enemies at home, restart
         if(document.getElementById("pauseBeforeRestart").checked && mana === 0) {
+            pauseReason = "Restart Next";
             pauseGame();
         }
         if(bonusSpeed > 1) {
             addOffline(-1 * gameTicksLeft * ((bonusSpeed - 1)/bonusSpeed));
         }
         if(!stop && mana === 0) {
+            console.log(reachedOneMana);
             if(reachedOneMana) {
                 restartReason = "0 Mana";
             }
@@ -107,6 +108,7 @@ function togglePause() {
     if(stop) {
         unpauseGame();
     } else {
+        pauseReason = "Manual";
         pauseGame();
     }
 }
@@ -118,7 +120,9 @@ function pauseGame() {
 }
 
 function unpauseGame() {
+    pauseReason = "";
     if(mana === 0) {
+        restartReason = "0 mana";
         restart();
     }
     stop = false;

@@ -158,6 +158,7 @@ function switchListTab(num) {
             document.getElementById(ids[i]).style.display = "none";
         }
     }
+    document.getElementById("clearCurrentList").innerHTML = "Clear " + capitalizeFirst(actionsList.nextNames[num]);
 }
 
 function selectAction(varName, num) {
@@ -605,8 +606,4 @@ function draggedUndecorate(i, name) {
 function clickRestart() {
     restartReason = "Manual";
     restart();
-}
-
-function pressLoadout() {
-
 }

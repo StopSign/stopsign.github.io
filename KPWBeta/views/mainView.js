@@ -22,6 +22,7 @@ let view = {
             view.updating.updateShrineTab();
             view.updating.updateActionVisibility();
 
+
             view.updating.saveCurrentState();
         },
         saveCurrentState: function () {
@@ -41,6 +42,7 @@ let view = {
             prevState.king.isHome = king.kingIsHome();
             prevState.levelSave = copyArray(levelSave[curLevel]);
             prevState.restartReason = restartReason;
+            prevState.pauseReason = pauseReason;
             prevState.consoleLog = copyArray(consoleLog);
         },
         updateResources: function() {
@@ -67,6 +69,14 @@ let view = {
                 document.getElementById("soulC").innerHTML = intToString(soulC, 1);
                 document.getElementById("actualSoulC").innerHTML = round5(soulC);
             }
+
+            if(prevState.restartReason !== restartReason) {
+                document.getElementById("restartReason").innerHTML = restartReason;
+            }
+            if(prevState.pauseReason !== pauseReason) {
+                document.getElementById("pauseReason").innerHTML = pauseReason;
+            }
+
         },
         updateLists: function() {
             for (let i = 0; i < actionsList.nextNames.length; i++) {
@@ -229,9 +239,6 @@ let view = {
             //update map
             if(prevLevelDatum && prevLevelDatum.name !== levelData.name) {
                 document.getElementById("mapName").innerHTML = "<b>"+levelData.name + "</b> (" + curLevel + ")";
-            }
-            if(prevLevelDatum && prevLevelDatum.restartReason !== restartReason) {
-                document.getElementById("restartReason").innerHTML = restartReason;
             }
 
         },
@@ -784,6 +791,16 @@ let view = {
                     tooltipDiv += "] when cleared. " + (uniqueCompleted ? "<b>(Completed)</b>" : "");
                 }
             }
+            if(base.creates) {
+                tooltipDiv += "<br>Sends units to attack after " + base.creates.initialTime + " mana, and every " + base.creates.period + " mana afterwards. Sends:<br>";
+                let createdUnits = base.creates.units;
+                for (let property in createdUnits) {
+                    if (createdUnits.hasOwnProperty(property)) {
+                        tooltipDiv += "<div style='width:30px;'>" + createdUnits[property] + "</div><div style='width:70px;'>" + capitalizeFirst(property) + "</div><br>";
+                    }
+                }
+            }
+
             if(base.initialFriendlyHP && totalHp.friendly > 0) {
                 document.getElementById(base.varName + "FriendlyHPBar").style.display = "block";
                 document.getElementById(base.varName + "FriendlyHP").style.width = (100 * totalHp.friendly / base.initialFriendlyHP) + "%";

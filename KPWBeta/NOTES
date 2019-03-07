@@ -1,10 +1,5 @@
 TODO
 
-show pause reason
-show "creates" in description of place
-bug: pause when all lists empty
-save options state
-
 5th map - additional income
 6th map - shrines & 2 blessings
 7th map - chat/study
@@ -53,6 +48,8 @@ additional ideas -
         apprentice
 
     rally peasants / send mercenaries / send assassins - auto-creates units and sends them at the nearest base w/o a unique reward
+
+    complex movements
 
 Questions -
     Better way to re-arrange Stats? Or Extras?

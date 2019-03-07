@@ -366,6 +366,7 @@ let warMap = {
                 if(remainingUnits.friendly.length && remainingUnits.enemy.length === 0) {
                     warMap.bases.getReward(base);
                     if(document.getElementById("pausePlaceCleared").checked && !stop) {
+                        pauseReason = "Place Cleared";
                         pauseGame();
                     }
                 }
