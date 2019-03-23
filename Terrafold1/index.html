@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <!-- to force a reload -->
+    <meta http-equiv="cache-control" content="max-age=0" />
+    <meta http-equiv="cache-control" content="no-cache" />
+    <meta http-equiv="expires" content="0" />
+    <meta http-equiv="expires" content="Tue, 01 Jan 1980 1:00:00 GMT" />
+    <meta http-equiv="pragma" content="no-cache" />
+
+    <title>Terrafold</title>
+    <link rel="stylesheet" href="stylesheet.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+<body id="theBody">
+
+<div id="info" style="position:fixed;z-index:1001;" class="medium">
+    <div class="showthat infoText">S<div class="showthis">
+        Story<br>
+        <div class="small">
+            The Kutchian Horde had targeted your planet's rich resources. They were coming, and you didn't stop them. You knew you couldn't, but you had a different plan.
+            With the last of the planet's reserves, you had directed your people to build a planetship.
+            It is barely large enough to keep an atmosphere, but you know you can figure out how to make it grow.
+            You escaped with your people in crystorage, and it'll be hard work to get the resources to sustain them.
+            You consider yourself lucky your connection to the water market is working well enough.<br><br>
+            But your species live a long time, and you won't forget what the Kutchians did.<br>
+        </div>
+    </div></div>
+    <div class="showthat infoText">?<div class="showthis">
+        Help Menu<br><br>
+        <div class="small">
+            Get some more water and build some farms, <br>
+            then build a spaceship and explore the universe.<br>
+            There are 10 ticks per second.<br>
+            The game works at full speed while in a hidden tab.<br>
+            Saving happens every 50 ticks.<br>
+            Right click and drag to move the screen around.<br>
+            You can use scientific numbers like 1e12 in the inputs<br>
+        </div>
+    </div></div>
+    <div class="showthat infoText">O<div class="showthis">
+        Options Menu<br><br>
+        <div class="small">
+            <div class="button" onclick="clearSave()">Hard Reset</div><br>
+            <div class="button" onclick="pauseGame()">Toggle Pause</div><br>
+            <div class="button" onclick="game.cash+=.1">Beg for Money<br>(+$.1 for if you get stuck)</div><br>
+            <div class="button" onclick="save()">Save</div><br>
+        </div>
+    </div></div>
+    <div id="resources" class="infoText" style="padding:0 10px;">
+        <div class="showthat2 globalResourceInfo"> <img src='img/water.png' class='largeIcon'>: <div id="totalWater"></div><div class="showthis2">Total Water from anywhere</div></div>
+        <div class="showthat2 globalResourceInfo"> <img src='img/cash.png' class='largeIcon'>: <div id="cash"></div><div class="showthis2">Cash</div></div>
+        <div class="showthat2 globalResourceInfo"> <img src='img/oxygen.png' class='largeIcon'>: <div id="oxygen"></div>
+            <div class="showthis2 small">
+                Oxygen<br>
+                .0001% of Oxygen leaks into space<br>
+                <div>Oxygen Leaked: <div id="oxygenLeak"></div></div> per tick.<br>
+            </div>
+        </div>
+        <div class="showthat2 globalResourceInfo"> <img src='img/science.png' class='largeIcon'>: <div id="science"></div><div class="showthis2">Science</div></div>
+        <div class="showthat2 globalResourceInfo" id="woodContainer"> <img src='img/wood.png' class='largeIcon'>: <div id="wood"></div><div class="showthis2">Wood</div></div>
+        <div class="showthat2 globalResourceInfo" id="metalContainer"> <img src='img/metal.png' class='largeIcon'>: <div id="metal"></div><div class="showthis2">Metal</div></div>
+    </div>
+</div>
+
+
+<div id="mainContainer" style="position:absolute;width:2500px;height:900px;overflow:hidden;" class="small" oncontextmenu="return false;">
+
+    <div id="spaceTransition"></div>
+
+    <div id="spaceContainer">
+    </div>
+
+    <div id="cometsContainer" style="position:absolute;">
+    </div>
+
+    <canvas id="spaceCanvas" width="1000" height="900" style="position:absolute;left:1600px;"></canvas>
+
+    <div id="iceContainer" class="container showthat" style="left:0;top:35px;width:130px;">
+        <div class="title">Ice</div>
+        <div class="waterIcon showthat2"><img src='img/water.png' class='superLargeIcon'>
+            <div class="showthis2">
+                <div>Melting: <div id="iceTransferred"></div></div> <img src='img/water.png' class='smallIcon'><br>
+            </div>
+        </div>
+        <div>Ice: <div id="ice"></div></div><br>
+        <input id="buyIceAmount" type="number" value="1000"><br>
+        <div class="button" onclick="game.buyIce()">Buy Ice for $1</div><br>
+        <div>Buyable Ice: <div id="buyableIce"></div></div><br>
+        <div class="showthis">
+            Ice melts at a rate of .1% per tick and becomes <img src='img/water.png' class='smallIcon'>.<br>
+            <label for="buyIceAmount">Set how much you want to buy with the input.</label><br>
+            You can buy up to the max at a time, and it comes back at <div id="iceBuyerAmount"></div> per tick.
+        </div>
+    </div>
+
+    <div id="indoorWaterContainer" class="container showthat" style="left:0;top:210px;">
+        <div class="title">Storage</div>
+        <div class="waterIcon showthat2"><img src='img/water.png' class='superLargeIcon'>
+            <div class="showthis2">
+                <div>Receiving: <div id="indoorWaterReceived"></div> <img src='img/water.png' class='smallIcon'></div><br>
+                <div>Overflowing: <div id="excessWater"></div></div> <img src='img/water.png' class='smallIcon'><br>
+            </div>
+        </div>
+        <div><img src='img/water.png' class='smallIcon'>: <div id="indoorWater"></div></div><br>
+        <div> Selling: <div id="indoorWaterSelling"></div></div><br>
+        <div> Profits: <div id="indoorWaterProfits"></div></div><br>
+        <div> Max: <div id="indoorWaterMax"></div></div><br>
+        <div class="showthis">
+            When <img src='img/water.png' class='smallIcon'> is at max, extra water spills into the lake.<br>
+            Sells 1% of max per tick. Sells for $2 per 1.<br>
+        </div>
+    </div>
+
+    <div id="outdoorWaterContainer" class="container showthat" style="left:180px;top:265px;">
+        <div class="title">Lake</div>
+        <div class="waterIcon showthat2"><img src='img/water.png' class='superLargeIcon'>
+            <div class="showthis2">
+                <div>Receiving from Storage: <div id="lakeWaterFromStorage"></div> <img src='img/water.png' class='smallIcon'></div><br>
+                <div>Receiving from Forest: <div id="lakeWaterFromForest"></div> <img src='img/water.png' class='smallIcon'></div><br>
+                <div>Receiving from Farm: <div id="lakeWaterFromFarm"></div> <img src='img/water.png' class='smallIcon'></div><br>
+                <div>Evaporating: <div id="waterTransferred"></div></div> <img src='img/water.png' class='smallIcon'><br>
+            </div>
+        </div>
+        <div><img src='img/water.png' class='smallIcon'>: <div id="outdoorWater"></div></div><br>
+        <div class="showthis">
+            Lake <img src='img/water.png' class='smallIcon'> evaporates .1% per tick into cloud water.
+        </div>
+    </div>
+
+    <div id="cloudsContainer" class="container showthat" style="left:300px;top:20px;">
+        <div class="title">Clouds</div>
+        <div class="waterIcon showthat2"><img src='img/water.png' class='superLargeIcon'>
+            <div class="showthis2">
+                <div>Receiving: <div id="cloudsReceived"></div> <img src='img/water.png' class='smallIcon'></div><br>
+                <div>Raining: <div id="rain"></div></div> <img src='img/water.png' class='smallIcon'><br>
+            </div>
+        </div>
+        <div><img src='img/water.png' class='smallIcon'>: <div id="clouds"></div></div><br>
+        <div class='progress-bar'>
+            <div>Next Storm:<br><div id="stormTimer"></div></div><br>
+            <canvas id='nextStormProgress' class='progress-active' height='80px' width='80px'></canvas>
+        </div>
+        <div class='progress-bar'>
+            <div>Duration:<br><div id="stormDuration"></div></div><br>
+            <canvas id='stormDurationProgress' class='progress-active' height='80px' width='80px'></canvas>
+        </div><br>
+        <div>Intensity: <div id="stormRate"></div></div><br>
+        <div class="verticalProgress" style="left:94px;top:88px;">
+            <div class="verticalProgressInner" id="intensityPB"></div>
+        </div>
+        <div id="lightningContainer">
+            <div>Lightning Chance: <div id="lightningChance"></div></div>%<br>
+        </div>
+        <div class="showthis">
+            Rain falls on land, but only when storming.<br>
+            Rain falls at a rate of (water / 500) * intensity.<br>
+            <div id="lightningTooltip">
+                Chance for a lightning strike per tick.<br>
+                Only strikes with a full storm.<br>
+                Strength of strike is sqrt(Water).<br>
+                <div>Lightning Strength: <div id="lightningStrength"></div></div><br>
+            </div>
+        </div>
+    </div>
+
+    <div id="landContainer" class="container showthat" style="left:470px;top:245px;">
+        <div class="title">Land</div>
+        <div class="waterIcon showthat2"><img src='img/water.png' class='superLargeIcon'>
+            <div class="showthis2">
+                <div>Receiving: <div id="landReceived"></div> <img src='img/water.png' class='smallIcon'></div><br>
+                <div>Dry Land to Soil: <div id="landConverted"></div></div> <img src='img/water.png' class='smallIcon'><br>
+                <div>Flowing to Forest: <div id="landWaterToForest"></div> <img src='img/water.png' class='smallIcon'></div><br>
+                <div>Flowing to Farm: <div id="landWaterToFarm"></div> <img src='img/water.png' class='smallIcon'></div><br>
+            </div>
+        </div>
+        <div><img src='img/water.png' class='smallIcon'>: <div id="landWater"></div></div><br>
+        <div>Total Land: <div id="optimizedLand"></div></div><br>
+        <div>Soil: <div id="soil"></div></div><br>
+        <div class="showthis">
+            <div>Base Land: <div id="baseLand"></div></div><br>
+            <div>Dry Land: <div id="land"></div></div><br>
+            Dry land + water = soil, at a rate of (water / 1000)<br>
+            .1% <img src='img/water.png' class='smallIcon'> goes to forest, another .1% to farms.<br>
+        </div>
+    </div>
+
+    <div id="treesContainer" class="container showthat" style="left:760px;top:40px;">
+        <div class="title">Forest</div>
+        <div class="waterIcon showthat2"><img src='img/water.png' class='superLargeIcon'>
+            <div class="showthis2">
+                <div>Receiving: <div id="forestReceived"></div> <img src='img/water.png' class='smallIcon'></div><br>
+                <div><img src='img/water.png' class='smallIcon'> to grow Ferns: <div id="fernWater"></div> <img src='img/water.png' class='smallIcon'></div><br>
+                <div><img src='img/water.png' class='smallIcon'> to grow Small Trees: <div id="smallTreesWater"></div> <img src='img/water.png' class='smallIcon'></div><br>
+                <div><img src='img/water.png' class='smallIcon'> to grow Trees: <div id="treesWater"></div> <img src='img/water.png' class='smallIcon'></div><br>
+                <div>Flowing to Lake: <div id="forestWaterToLake"></div> <img src='img/water.png' class='smallIcon'></div><br>
+            </div>
+        </div>
+        <div><img src='img/water.png' class='smallIcon'>: <div id="forestWater"></div></div><br>
+
+        <div class="forestIcon showthat2">
+            <img src='img/fern.png' class='superLargeIcon'><br>
+            <div><div id="ferns"></div></div>
+            <div class="showthis2">
+                Ferns<br>
+                <div>Ferns Delta: <div id="fernsDelta"></div></div><br>
+                .1% of Ferns become Small Trees, using Water.<br>
+                One Fern makes .001 oxygen/tick<br>
+            </div>
+        </div>
+        <i class="fa fa-arrow-right"></i>
+        <div class="forestIcon showthat2">
+            <img src='img/smalltree.svg' class='superLargeIcon'><br>
+            <div><div id="smallTrees"></div></div>
+            <div class="showthis2">
+                Small Trees<br>
+                <div>Small Trees Delta: <div id="smallTreesDelta"></div></div><br>
+                .1% of Small Trees become Trees, using Water.<br>
+                One Small Tree makes .003 oxygen/tick<br>
+            </div>
+        </div>
+        <i class="fa fa-arrow-right"></i>
+        <div class="forestIcon showthat2">
+            <img src='img/tree.png' class='superLargeIcon'><br>
+            <div><div id="trees"></div></div>
+            <div class="showthis2">
+                Trees<br>
+                <div>Trees Delta: <div id="treesDelta"></div></div><br>
+                One Tree makes .01 oxygen/tick<br>
+            </div>
+        </div><br>
+        <div>Total Plants: <div id="totalPlants"></div></div><br>
+        <div>Oxygen Produced: <div id="oxygenGain"></div></div><br>
+
+        <div class="showthis" style="width:300px;">
+            Total Plants equilibrium is equal to Soil amount.<br>
+            Plants each take 1 water to grow.<br>
+            If you have less equilibrium, smaller plants die first.<br>
+            Ferns grow slower the closer the Total Plants are to equilibrium.<br>
+            .1% of Water per tick goes back to the Lake.<br>
+        </div>
+    </div>
+
+    <div id="foodContainer" class="container showthat" style="left:680px;top:210px;">
+        <div class="title">Farm</div>
+        <div class="waterIcon showthat2"><img src='img/water.png' class='superLargeIcon'>
+            <div class="showthis2">
+                <div>Food Eaten: <div id="farmFoodEaten"></div></div><br>
+                <div>Receiving: <div id="farmReceived"></div> <img src='img/water.png' class='smallIcon'></div><br>
+                <div>Water to Food: <div id="foodCreated"></div> <img src='img/water.png' class='smallIcon'></div><br>
+                <div>Flowing to Lake: <div id="farmWaterToLake"></div> <img src='img/water.png' class='smallIcon'></div><br>
+            </div>
+        </div>
+        <div><img src='img/water.png' class='smallIcon'>: <div id="farmsWater"></div></div><br>
+        <input id="buyFarmAmount" type="number" step="1" value="1"><br>
+        <div class="button" onclick="game.buyFarms()">Buy Farm for 50 soil</div><br>
+        <div>Farms: <div id="farms"></div></div><br>
+        <div>Food: <div id="food"></div></div><br>
+        <div class="showthis">
+            <label for="buyFarmAmount">Set how much you want to buy with the input.</label><br>
+            WARNING: using soil reduces trees.<br>
+            One farm makes .01 food/tick, using water.<br>
+            .1% of water per tick goes back to the lake.<br>
+            <div>Farm Efficiency: <div id="efficiency"></div>%</div><br>
+        </div>
+    </div>
+
+    <div id="populationContainer" class="container showthat" style="left:920px;top:370px;">
+        <div class="title">City</div>
+        <div class="waterIcon showthat2"><img src='img/happy.jpg' class='superLargeIcon'>
+            <div class="showthis2">
+                <div>Food Eaten: <div id="foodEaten"></div></div><br>
+                <div>Population Growth: <div id="populationGrowth"></div></div><br>
+                <div>Dying from Starvation: <div id="starving"></div></div><br>
+                <div>Base Happiness From House: <div id="happinessFromHouse"></div></div><br>
+                <div>Happiness From Trees: <div id="happinessFromTrees"></div></div><br>
+                <div>Happiness From Oxygen: <div id="happinessFromOxygen"></div></div><br>
+            </div>
+        </div>
+        <div>Population: <div id="population"></div></div><br>
+        <div>Happiness: <div id="happiness"></div></div><br>
+        <div id="sliderContainer" style="width:150px;">
+            <input type="range" min="0" max="100" value="0" class="slider" id="scienceSlider">
+        </div><br>
+        <div id="scienceRatio"></div><br>
+        <div>Science created: <div id="scienceDelta"></div></div><br>
+        <div>Cash created: <div id="cashDelta"></div></div><br>
+        <div class="showthis">
+            One person eats .01 food / tick.<br>
+            People die faster if there is 0 food.<br>
+            People work harder if they are happier.<br>
+            Choose whether people create science or cash.<br>
+        </div>
+    </div>
+
+    <div id="computerContainer" class="container" style="left:0;top:400px;">
+        <div class="title">Computer</div>
+        <div id="unlockComputer" class="button" onclick="game.computer.unlockComputer()">Build Computer (1000 science)</div>
+        <div id="unlockedComputer" style="display:none;">
+            <div>Threads: <div id="freeThreads"></div>/<div id="threads"></div></div> Speed: <div id="speed"></div><br>
+            <div id="buyThread" class="button" onclick="game.computer.buyThread()">Research New Thread (+1 thread) for <div id="threadCost"></div> science</div><br>
+            <div id="buySpeed" class="button" onclick="game.computer.buySpeed()">Buy Processor (+1 speed) for <div id="speedCost"></div> cash</div><br>
+            <div id="computerRows" style="text-align:left;">
+            </div>
+        </div>
+    </div>
+
+    <div id="robotsContainer" class="container" style="left:380px;top:515px;">
+        <div class="title">Robots</div>
+        <div id="unlockRobots" class="button" onclick="game.robots.unlockRobots()">Special deal! Buy first robot for $3000</div><br>
+        <div id="failRobots" class="button" onclick="game.robots.failedRobots()">Buy robot for $1m</div>
+        <div id="unlockedRobots">
+            <div>Free: <div id="robotsFree"></div>, Total: <div id="robots"></div>, Max: <div id="robotMax"></div></div><br>
+            <div>Ore: <div id="ore"></div></div><br>
+            <div id="robotRows" style="text-align:left;">
+            </div>
+        </div>
+    </div>
+
+    <div id="energyContainer" class="container showthat" style="left:380px;top:365px;">
+        <div class="title">Power Plant</div>
+        <div id="unlockEnergy" class="button" onclick="game.energy.unlockEnergy()">Build lightning rod for 500 metal</div>
+        <div id="unlockedEnergy">
+            <div>Energy: <div id="energy"></div></div><br>
+            <div>Battery: <div id="battery"></div></div><br>
+            <input id="buyBattery" type="number" value="1"><br>
+            <div class="button" onclick="game.buyBattery()">+1 battery for <br><div id="batteryCost">30k oxygen, 20k science</div></div><br>
+        </div><br>
+        <div class="showthis">
+            Loses 2% of energy past the battery per tick<br>
+            <div>Draining: <div id="drain"></div></div><br>
+        </div>
+    </div>
+
+    <div id="spaceStationContainer" class="container showthat" style="left:1100px;top:30px;">
+        <div class="title">Space Station</div>
+        <div id="unlockSpaceStation" class="button" onclick="game.spaceStation.unlockSpaceStation()">Build Space Station for 2000 metal, 20k wood</div>
+        <div id="unlockedSpaceStation">
+            <div>You have <div id="orbitingResources"></div></div> in orbit.<br>
+            <div>Sending <div id="orbitSending"></div></div> to the planet.<br>
+        </div>
+
+        <div class="showthis">
+            Sends .01% of orbiting resources to the planet.<br>
+            Dirt gets added to base land.<br>
+        </div>
+    </div>
+
+    <div id="tractorBeamContainer" class="container showthat" style="left:1100px;top:140px;">
+        <div class="title">Tractor Beam</div>
+        <div id="unlockTractorBeam" class="button" onclick="game.tractorBeam.unlockTractorBeam()">Build Tractor Beam for 5m oxygen, 500k science</div>
+        <div id="unlockedTractorBeam">
+            Energy: <div id="tractorBeamEnergy"></div> out of <div id="tractorBeamEnergyNeeded"></div><br><br>
+
+            <div id="allPassing"></div>
+        </div>
+
+        <div class="showthis">
+            Charges using 1% energy from Power Plant per tick.<br>
+            Pulls 1%+10 of passing debris into orbit when charged<br>
+            2/3rd chance to find new comet per tick.<br>
+            1/3rd chance to find new asteroid per tick.<br>
+            Brought <div id="takeAmount"></div> into orbit last charge
+        </div>
+    </div>
+
+    <div id="spaceDockContainer" class="container showthat" style="left:1420px;top:30px;">
+        <div class="title">Space Dock</div>
+        <input id="buyBattleshipAmount" type="number" value="1"><br>
+        <div class="button" onclick="game.buyBattleship()">Build Battleship for <br><div id="battleshipCost">30m oxygen, 15m science</div></div><br>
+        Battleships: <div id="battleships"></div><br>
+        Energy: <div id="spaceportEnergy"></div><br>
+        Battery: <div id="spaceBattery"></div>
+
+        <div class="showthis">
+            <label for="buyBattleshipAmount">Set how much you want to buy with the input.</label><br>
+        </div>
+    </div>
+
+    <div id="hangarContainer" class="container showthat" style="left:1460px;top:260px;">
+        <div class="title">Hangar 1</div>
+        Sending <div id="hangar0Sending"></div>
+        <div class="showthis">
+            Takes 5% of your current food. The more food a ship takes the longer it lasts<br>
+            When a ship is out of food it comes back to base.<br>
+            Adjust where ships spawn - they'll target the nearest planet.<br>
+            Ships destroy atmosphere, destroy health, and build buidings before moving on.<br>
+            The buildings add dirt directly to your space station.<br>
+            WARNING - there is no saving for battleships in flight or the state of planets. You can refresh for a new set of planets for now. Working on it ...
+        </div>
+    </div>
+
+    <div id="shipSpawnSlidersContainer" style="left:1685px;top:220px;position:absolute;">
+        <div class="sliderWrapper">
+            <input type="range" min="0" max="100" step="1" value="0" class="shipSpawnSlider" id="shipSpawnSlider1">
+        </div><br>
+    </div>
+
+
+</div>
+
+
+</body>
+<script src="helpers.js"></script>
+<script src="interval.js"></script>
+<script src="view.js"></script>
+<script src="driver.js"></script>
+<script src="game.js"></script>
+<script src="classes/Clouds.js"></script>
+<script src="classes/Computer.js"></script>
+<script src="classes/Energy.js"></script>
+<script src="classes/Farms.js"></script>
+<script src="classes/Hangar.js"></script>
+<script src="classes/Ice.js"></script>
+<script src="classes/Land.js"></script>
+<script src="classes/Planet.js"></script>
+<script src="classes/City.js"></script>
+<script src="classes/Robots.js"></script>
+<script src="classes/Ship.js"></script>
+<script src="classes/Space.js"></script>
+<script src="classes/SpaceDock.js"></script>
+<script src="classes/SpaceStation.js"></script>
+<script src="classes/TractorBeam.js"></script>
+<script src="classes/Trees.js"></script>
+<script src="classes/Water.js"></script>
+<script src="UIClasses/spaceView.js"></script>
+<script src="UIClasses/ProgressBar.js"></script>
+<script src="hotkeys.js"></script>
+<script src="saving.js"></script>
+</html>

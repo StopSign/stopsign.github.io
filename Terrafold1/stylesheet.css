@@ -1,0 +1,324 @@
+div {
+    display:inline-block;
+}
+
+body {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    font-family:Arial, Helvetica, serif;
+    color:black;
+    font-size:14px;
+    height:100%;
+    margin:0;
+    background-color: #ececec;
+    cursor:default;
+}
+
+.showthat:hover .showthis, .showthat2:hover .showthis2 {
+    display:block;
+}
+.showthis, .showthis2 {
+    display:none;
+    position:absolute;
+    background-color: #b4b3e4;
+    border:1px solid;
+    padding:3px 5px;
+    min-width:300px;
+    border-radius:4px;
+    margin-top:5px;
+    z-index:999;
+    text-align:left;
+}
+
+.showthis2 {
+    z-index:1000;
+    min-width:200px;
+}
+
+.waterIcon {
+    position:absolute;
+    top:0;
+    right:0;
+}
+
+
+input {
+    width:100px;
+}
+
+.title {
+    font-size:16px;
+    font-weight:bold;
+    display:block;
+    text-align:center;
+}
+
+
+.large {
+    font-size:16px;
+    font-weight:bold;
+}
+.medium {
+    font-size:14px;
+    font-weight:bold;
+}
+.small {
+    font-size:12px;
+    font-weight:bold;
+}
+
+.superLargeIcon {
+    width:30px;
+    height:30px;
+}
+.largeIcon {
+    width:20px;
+    height:20px;
+}
+.smallIcon {
+    width:16px;
+    height:16px;
+}
+
+input, label {
+    cursor:pointer;
+}
+
+.button {
+    border:2px white solid;
+    background-color: #bde0b7;
+    padding:3px 5px;
+    cursor:pointer;
+    border-radius:10px;
+    min-width:9px;
+    text-align:center;
+    vertical-align:center;
+}
+.button:hover {
+    border:2px blue solid;
+}
+
+.container {
+    border:1px solid black;
+    margin:10px;
+    padding:3px 8px;
+    position:absolute;
+    border-radius:5px;
+    text-align:center;
+    min-width:100px;
+    opacity:.7;
+    background-color: #c3d2ff;
+}
+.container:hover {
+    opacity:1;
+}
+
+.slider {
+    -webkit-appearance: none;  /* Override default CSS styles */
+    appearance: none;
+    width: 100%; /* Full-width */
+    height: 25px; /* Specified height */
+    background: #d3d3d3; /* Grey background */
+    outline: none; /* Remove outline */
+    opacity: 0.7; /* Set transparency (for mouse-over effects on hover) */
+    -webkit-transition: .2s; /* 0.2 seconds transition on hover */
+    transition: opacity .2s;
+}
+
+.slider:hover {
+    opacity: 1; /* Fully shown on mouse-over */
+}
+
+.slider::-webkit-slider-thumb {
+    -webkit-appearance: none; /* Override default look */
+    appearance: none;
+    width: 25px; /* Set a specific slider handle width */
+    height: 25px; /* Slider handle height */
+    background: #4CAF50; /* Green background */
+    cursor: pointer; /* Cursor on hover */
+}
+
+.slider::-moz-range-thumb {
+    width: 25px; /* Set a specific slider handle width */
+    height: 25px; /* Slider handle height */
+    background: #4CAF50; /* Green background */
+    cursor: pointer; /* Cursor on hover */
+}
+
+.computerRow, .robotRow {
+    margin-bottom:5px;
+    border-bottom:1px solid;
+    display:block;
+    position:relative;
+}
+
+.computerTooltipContainer {
+    display:none;
+    position:absolute;
+    left:100%;
+    border:2px solid;
+    border-radius:5px;
+    background-color:white;
+    top:0;
+    padding:2px;
+    z-index:998;
+}
+
+.rowTooltip {
+    display:block;
+    width:250px;
+}
+
+.rowProgressBarOuter {
+    width:100px;
+    height:20px;
+    background-color:black;
+    float:right;
+    margin-left:5px;
+    margin-top:3px;
+}
+
+.rowProgressBarInner {
+    width:0;
+    height:18px;
+    margin-top:1px;
+    background-color:red;
+}
+
+
+.progress-bar {
+    position:relative;
+    display: inline-block;
+    width: 80px;
+    height: 80px;
+    margin: 7px;
+    padding: 0;
+    text-align:center;
+}
+
+.progress-bar .progress-active {
+    position: absolute;
+    left:5px;
+}
+
+.verticalProgress {
+    width:20px;
+    height:45px;
+    background-color:grey;
+    position: absolute;
+}
+
+.verticalProgressInner {
+    width: 18px;
+    background-color: black;
+    position: absolute;
+    bottom: 0;
+    left: 1px;
+}
+
+.fa.fa-arrow-right {
+    vertical-align:top;
+    margin-top:14px;
+    font-size:16px;
+}
+
+.forestIcon {
+    border:1px solid;
+    border-radius:3px;
+    width:45px;
+}
+
+.disabled {
+    pointer-events:none;
+    opacity:.2;
+}
+
+.comet {
+    position:absolute;
+    width:20px;
+    height:20px;
+    background-color:blue;
+    opacity:.5;
+    border-radius:10px;
+}
+
+.asteroid {
+    position:absolute;
+    width:10px;
+    height:10px;
+    background-color:brown;
+    opacity:.5;
+    border-radius:5px;
+}
+
+.infoText {
+    background-color:white;
+    border:1px solid;
+    border-top:0;
+    padding:0 5px;
+    height:23px;
+    vertical-align:top;
+}
+
+.globalResourceInfo {
+    width:84px;
+    text-align:center;
+}
+
+#spaceTransition {
+    position:absolute;
+    left:1300px;
+    height:100%;
+    width:500px;
+    background: linear-gradient(to right, rgba(255,255,255,0), rgba(0,0,0,1));
+}
+
+#spaceContainer {
+    left:1800px;
+    width:700px;
+    position:absolute;
+    background-color:black;
+    height:100%;
+}
+
+.sliderWrapper {
+    display: inline-block;
+    width: 20px;
+    padding: 0;
+}
+.sliderWrapper input {
+    width: 360px;
+    height: 1px;
+    margin: 0;
+    transform-origin: 75px 75px;
+    transform: rotate(-90deg);
+}
+.shipSpawnSlider {
+    -webkit-appearance: none;  /* Override default CSS styles */
+    appearance: none;
+    width: 100%; /* Full-width */
+    height: 25px; /* Specified height */
+    /*background: transparent; !* Grey background *!*/
+    outline: none; /* Remove outline */
+    opacity: 0.7; /* Set transparency (for mouse-over effects on hover) */
+    -webkit-transition: .2s; /* 0.2 seconds transition on hover */
+    transition: opacity .2s;
+}
+
+.shipSpawnSlider:hover {
+    opacity: 1; /* Fully shown on mouse-over */
+}
+
+.shipSpawnSlider::-webkit-slider-thumb {
+    -webkit-appearance: none; /* Override default look */
+    appearance: none;
+    width: 12px; /* Set a specific slider handle width */
+    height: 25px; /* Slider handle height */
+    background: #ee8b44; /* Green background */
+    cursor: pointer; /* Cursor on hover */
+    border-bottom-left-radius:8px;
+    border-bottom-right-radius:8px;
+}
