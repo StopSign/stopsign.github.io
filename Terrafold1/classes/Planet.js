@@ -8,12 +8,12 @@ function Planet() {
     this.view.light = Math.floor(Math.random() * 15 + 40);
 
     this.findArea = function() {
-        for(var i = 0; i < game.space.planets.length; i++) {
-            var target = game.space.planets[i];
+        for(let i = 0; i < game.space.planets.length; i++) {
+            let target = game.space.planets[i];
             if(target === this) {
                 continue;
             }
-            var counter = 0;
+            let counter = 0;
             while(this.withinDistance(this.x, this.y, 75)) {
                 counter++;
                 if(counter > 40) {
@@ -32,8 +32,8 @@ function Planet() {
         return Math.random() * 330 + 5;
     };
     this.withinDistance = function(x1, y1, radius) {
-        for(var i = 0; i < game.space.planets.length; i++) {
-            var target = game.space.planets[i];
+        for(let i = 0; i < game.space.planets.length; i++) {
+            let target = game.space.planets[i];
             if(target === this) {
                 continue;
             }
@@ -74,9 +74,9 @@ function Planet() {
         return this.atmo / this.maxAtmo;
     };
     this.takeDamage = function(damage) {
-        var healthDamage = damage * (1 - this.getShieldReduction());
+        let healthDamage = damage * (1 - this.getShieldReduction());
         this.atmo -= damage * this.getShieldReduction();
-        var extraDamage = 0;
+        let extraDamage = 0;
         if(this.atmo < 0) {
             extraDamage = this.atmo * -1;
             this.atmo = 0;
@@ -144,7 +144,7 @@ function Planet() {
 
     this.bots = 0;
     this.tickBots = function() {
-        var botWork = precision2(this.bots/10);
+        let botWork = precision2(this.bots/10);
         this.ore -= botWork;
         this.workOnSolar(botWork);
     };
@@ -189,7 +189,7 @@ function Planet() {
     this.tickCoilgun = function() {
         if(this.coilgunCharge >= this.coilgunChargeMax) {
             this.coilgunCharge -= this.coilgunChargeMax;
-            var loadSize = 500;
+            let loadSize = 500;
             if(this.dirt <= loadSize) {
                 loadSize = this.dirt;
             }

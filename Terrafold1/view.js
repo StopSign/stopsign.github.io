@@ -163,9 +163,9 @@ function View() {
         if(!game.computer.unlocked) {
             return;
         }
-        for(var i = 0; i < game.computer.processes.length; i++) {
-            var row = game.computer.processes[i];
-            var baseId = "computerRow" + i;
+        for(let i = 0; i < game.computer.processes.length; i++) {
+            let row = game.computer.processes[i];
+            let baseId = "computerRow" + i;
             document.getElementById(baseId+"PB").style.width = (row.currentTicks / row.ticksNeeded)*100 + "%";
             document.getElementById(baseId+"PB").style.backgroundColor = row.isMoving ? "yellow" : "red";
             document.getElementById(baseId+"CurrentTicks").innerHTML = row.currentTicks+"";
@@ -186,29 +186,29 @@ function View() {
         document.getElementById('speed').innerHTML = game.computer.speed+"";
         document.getElementById('threadCost').innerHTML = intToString(game.computer.getThreadCost(), 1);
         document.getElementById('speedCost').innerHTML = intToString(game.computer.getSpeedCost(), 1);
-        for(var i = 0; i < game.computer.processes.length; i++) {
-            var row = game.computer.processes[i];
+        for(let i = 0; i < game.computer.processes.length; i++) {
+            let row = game.computer.processes[i];
             document.getElementById('computerRow'+i+'Threads').innerHTML = row.threads;
             document.getElementById('computerRow'+i+'Container').style.display = row.showing() ? "block" : "none";
         }
     };
 
     this.addComputerRow = function(dataPos) {
-        var containerDiv = document.getElementById('computerRows');
-        var rowContainer = document.createElement("div");
+        let containerDiv = document.getElementById('computerRows');
+        let rowContainer = document.createElement("div");
         rowContainer.className = "computerRow";
-        var baseId = "computerRow" + dataPos;
+        let baseId = "computerRow" + dataPos;
         rowContainer.id = baseId + 'Container';
-        var plusButton = "<div id='"+baseId+"Plus' class='button' onclick='game.computer.addThread("+dataPos+", 1)'>+</div>";
-        var minusButton = "<div id='"+baseId+"Minus' class='button' onclick='game.computer.removeThread("+dataPos+", 1)'>-</div>";
-        var threads = " <div id='"+baseId+"Threads' class='small' style='margin-right:4px'></div>" ;
-        var text = "<div>" + processesView[dataPos].text + "</div>";
-        var progressBar = "<div class='rowProgressBarOuter'><div class='rowProgressBarInner' id='"+baseId+"PB'></div></div>";
+        let plusButton = "<div id='"+baseId+"Plus' class='button' onclick='game.computer.addThread("+dataPos+", 1)'>+</div>";
+        let minusButton = "<div id='"+baseId+"Minus' class='button' onclick='game.computer.removeThread("+dataPos+", 1)'>-</div>";
+        let threads = " <div id='"+baseId+"Threads' class='small' style='margin-right:4px'></div>" ;
+        let text = "<div>" + processesView[dataPos].text + "</div>";
+        let progressBar = "<div class='rowProgressBarOuter'><div class='rowProgressBarInner' id='"+baseId+"PB'></div></div>";
 
-        var tooltip = "<div id='"+baseId+"CurrentTicks'></div> ticks<br>" +
+        let tooltip = "<div id='"+baseId+"CurrentTicks'></div> ticks<br>" +
             "<div id='"+baseId+"TicksNeeded'></div> ticks needed<br>" +
             "<div id='"+baseId+"Cost'></div><br>";
-        var tooltipContainer = "<div class='computerTooltipContainer' id='"+baseId+"Tooltip'><div class='rowTooltip'>" + tooltip +  processesView[dataPos].tooltip + "</div></div>";
+        let tooltipContainer = "<div class='computerTooltipContainer' id='"+baseId+"Tooltip'><div class='rowTooltip'>" + tooltip +  processesView[dataPos].tooltip + "</div></div>";
         rowContainer.onmouseover = function () {
             document.getElementById(baseId+"Tooltip").style.display = "block";
         };
@@ -224,8 +224,8 @@ function View() {
         document.getElementById('robots').innerHTML = game.robots.robots+"";
         document.getElementById('robotsFree').innerHTML = game.robots.robotsFree+"";
         document.getElementById('robotMax').innerHTML = game.robots.robotMax+"";
-        for(var i = 0; i < game.robots.jobs.length; i++) {
-            var row = game.robots.jobs[i];
+        for(let i = 0; i < game.robots.jobs.length; i++) {
+            let row = game.robots.jobs[i];
             document.getElementById('robotRow'+i+'Workers').innerHTML = row.workers;
             document.getElementById('robotRow'+i+'Container').style.display = row.showing() ? "block" : "none";
         }
@@ -233,9 +233,9 @@ function View() {
 
     this.updateRobotsRowProgress = function() {
         document.getElementById('ore').innerHTML = intToString(game.robots.ore);
-        for(var i = 0; i < game.robots.jobs.length; i++) {
-            var row = game.robots.jobs[i];
-            var baseId = "robotRow" + i;
+        for(let i = 0; i < game.robots.jobs.length; i++) {
+            let row = game.robots.jobs[i];
+            let baseId = "robotRow" + i;
             if(!row.ticksNeeded) { //Has a progress bar
                 continue;
             }
@@ -245,7 +245,7 @@ function View() {
             document.getElementById(baseId+"TicksNeeded").innerHTML = intToString(row.ticksNeeded,1);
             if(row.cost) {
                 document.getElementById(baseId+"Cost").style.display = "block";
-                var costString = "Each tick costs "+intToString(row.cost[0]) + " "+row.costType[0];
+                let costString = "Each tick costs "+intToString(row.cost[0]) + " "+row.costType[0];
                 costString += row.cost.length > 1 ? " and " + intToString(row.cost[1]) + " " + row.costType[1] : "";
                 document.getElementById(baseId+"Cost").innerHTML = costString;
             } else {
@@ -257,27 +257,27 @@ function View() {
     };
 
     this.addRobotRow = function(dataPos) {
-        var containerDiv = document.getElementById('robotRows');
-        var rowContainer = document.createElement("div");
+        let containerDiv = document.getElementById('robotRows');
+        let rowContainer = document.createElement("div");
         rowContainer.className = "robotRow";
-        var baseId = "robotRow" + dataPos;
+        let baseId = "robotRow" + dataPos;
         rowContainer.id = baseId + 'Container';
-        var plusButton = "<div id='"+baseId+"Plus' class='button' onclick='game.robots.addWorker("+dataPos+", 1)'>+</div>";
-        var minusButton = "<div id='"+baseId+"Minus' class='button' onclick='game.robots.removeWorker("+dataPos+", 1)'>-</div>";
-        var workers = " <div id='"+baseId+"Workers' class='small' style='margin-right:4px'></div>" ;
-        var text = "<div>" + jobsView[dataPos].text + "</div>";
+        let plusButton = "<div id='"+baseId+"Plus' class='button' onclick='game.robots.addWorker("+dataPos+", 1)'>+</div>";
+        let minusButton = "<div id='"+baseId+"Minus' class='button' onclick='game.robots.removeWorker("+dataPos+", 1)'>-</div>";
+        let workers = " <div id='"+baseId+"Workers' class='small' style='margin-right:4px'></div>" ;
+        let text = "<div>" + jobsView[dataPos].text + "</div>";
 
         if(game.robots.jobs[dataPos].ticksNeeded) {
-            var tooltip = "<div id='"+baseId+"CurrentTicks'></div> ticks<br>" +
+            let tooltip = "<div id='"+baseId+"CurrentTicks'></div> ticks<br>" +
                 "<div id='"+baseId+"TicksNeeded'></div> ticks needed<br>" +
                 "<div id='"+baseId+"Cost'></div><br>";
-            var progressBar = "<div class='rowProgressBarOuter'><div class='rowProgressBarInner' id='" + baseId + "PB'></div></div>";
+            let progressBar = "<div class='rowProgressBarOuter'><div class='rowProgressBarInner' id='" + baseId + "PB'></div></div>";
         } else {
             tooltip = "";
             progressBar = "";
         }
 
-        var tooltipContainer = "<div class='computerTooltipContainer' id='"+baseId+"Tooltip'><div class='rowTooltip'>" + tooltip + jobsView[dataPos].tooltip + "</div></div>";
+        let tooltipContainer = "<div class='computerTooltipContainer' id='"+baseId+"Tooltip'><div class='rowTooltip'>" + tooltip + jobsView[dataPos].tooltip + "</div></div>";
         rowContainer.onmouseover = function () {
             document.getElementById(baseId+"Tooltip").style.display = "block";
         };
@@ -330,9 +330,9 @@ function View() {
     };
 
     this.updateSpaceStation = function() {
-        var orbitString = "";
-        var orbitSendString = "";
-        for(var i = 0; i < game.spaceStation.orbiting.length; i++) {
+        let orbitString = "";
+        let orbitSendString = "";
+        for(let i = 0; i < game.spaceStation.orbiting.length; i++) {
             orbitString += intToString(game.spaceStation.orbiting[i].amount) + " " + game.spaceStation.orbiting[i].type;
             orbitSendString += intToString(game.spaceStation.orbiting[i].amount / 10000, 4) + " " + game.spaceStation.orbiting[i].type;
             if(i !== game.spaceStation.orbiting.length - 1) {
@@ -365,10 +365,10 @@ function View() {
         document.getElementById('tractorBeamEnergy').innerHTML = intToString(game.tractorBeam.energy, 2);
         document.getElementById('tractorBeamEnergyNeeded').innerHTML = intToString(game.tractorBeam.energyNeeded, 1);
 
-        var container = document.getElementById("allPassing");
-        var text = "";
-        var comets = game.tractorBeam.comets;
-        for(var i = 0; i < comets.length; i++) {
+        let container = document.getElementById("allPassing");
+        let text = "";
+        let comets = game.tractorBeam.comets;
+        for(let i = 0; i < comets.length; i++) {
             text += comets[i].name + " with " +
                 intToString(comets[i].amount, 1) +
                 " " + comets[i].amountType +
@@ -380,14 +380,14 @@ function View() {
     };
 
     this.drawComet = function(cometData) {
-        var cometDivName = 'comet'+cometData.id;
-        var cometDiv = document.getElementById(cometDivName);
+        let cometDivName = 'comet'+cometData.id;
+        let cometDiv = document.getElementById(cometDivName);
         if(!cometDiv) {
             cometDiv = document.createElement("div");
             cometDiv.className = cometData.name.toLowerCase();
             cometDiv.id = cometDivName;
 
-            var totalDistance = cometData.speed * cometData.duration;
+            let totalDistance = cometData.speed * cometData.duration;
             cometData.startingY = Math.random() * (totalDistance * .4) + totalDistance * .1;
 
             cometData.left = 0;
@@ -404,8 +404,8 @@ function View() {
     };
 
     this.removeComet = function(cometData) {
-        var cometDivName = 'comet'+cometData.id;
-        var cometDiv = document.getElementById(cometDivName);
+        let cometDivName = 'comet'+cometData.id;
+        let cometDiv = document.getElementById(cometDivName);
         if(cometDiv) {
             document.getElementById('cometsContainer').removeChild(cometDiv);
         } else {

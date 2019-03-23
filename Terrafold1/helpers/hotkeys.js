@@ -1,13 +1,13 @@
-var myKeyQueue = [];
+let myKeyQueue = [];
 document.addEventListener("keydown", function(e) {
-    var code = {key:(e.charCode !== 0 ? e.charCode : e.keyCode), shift:e.shiftKey};
+    let code = {key:(e.charCode !== 0 ? e.charCode : e.keyCode), shift:e.shiftKey};
     myKeyQueue.push(code);
     processKeyQueue();
 });
 
 function processKeyQueue() {
-    var key = myKeyQueue[0].key;
-    var shift = myKeyQueue[0].shift;
+    let key = myKeyQueue[0].key;
+    let shift = myKeyQueue[0].shift;
     myKeyQueue.splice(0, 1);
     if(key === 27) { //escape
     } else if(key === 13 || key === 32) { //enter / space
@@ -34,7 +34,7 @@ function processKeyQueue() {
     }
 }
 
-var keys = {32: 1, 37: 1, 38: 1, 39: 1, 40: 1};
+let keys = {32: 1, 37: 1, 38: 1, 39: 1, 40: 1};
 
 function preventDefault(e) {
     e = e || window.event;
@@ -57,8 +57,8 @@ disableScroll();
 
 
 
-var backgroundGrid = document.getElementById('mainContainer');
-var rclickStartingPoint;
+let backgroundGrid = document.getElementById('mainContainer');
+let rclickStartingPoint;
 
 backgroundGrid.onmousedown  = function(e) {
     if((e.which && e.which === 3) || (e.buttons && e.buttons === 2)) { //Right click
@@ -69,9 +69,9 @@ backgroundGrid.onmousedown  = function(e) {
 
 backgroundGrid.onmousemove = function(e) {
     if((e.which && e.which === 3) || (e.buttons && e.buttons === 2)) {
-        var dragToPoint = {x:e.pageX, y:e.pageY};
-        var offsetx = Math.ceil((dragToPoint.x - rclickStartingPoint.x)/1.5);
-        var offsety = Math.ceil((dragToPoint.y - rclickStartingPoint.y)/1.5);
+        let dragToPoint = {x:e.pageX, y:e.pageY};
+        let offsetx = Math.ceil((dragToPoint.x - rclickStartingPoint.x)/1.5);
+        let offsety = Math.ceil((dragToPoint.y - rclickStartingPoint.y)/1.5);
         console.log(offsetx);
         window.scrollBy(offsetx, offsety);
         rclickStartingPoint = dragToPoint;

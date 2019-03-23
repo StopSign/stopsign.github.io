@@ -1,8 +1,8 @@
-var canvas = document.getElementById("spaceCanvas");
-var ctx = canvas.getContext("2d");
+let canvas = document.getElementById("spaceCanvas");
+let ctx = canvas.getContext("2d");
 ctx.font = "11px Arial";
-var xOffset = 200;
-var mousePos = {};
+let xOffset = 200;
+let mousePos = {};
 
 canvas.addEventListener('mousemove', function(e) {
     mousePos = {x:e.offsetX - xOffset, y:e.offsetY};
@@ -17,20 +17,20 @@ function updateSpace() {
 }
 
 function drawTooltips() {
-    for(var i = 0; i < game.space.planets.length; i++) {
+    for(let i = 0; i < game.space.planets.length; i++) {
         drawPlanetTooltip(game.space.planets[i]);
     }
 }
 
 function drawBattleships() {
-    for(var i = 0; i < game.space.ships.length; i++) {
+    for(let i = 0; i < game.space.ships.length; i++) {
         drawShip(game.space.ships[i]);
     }
 }
 
 function drawTargets() {
-    for(var i = 0; i < game.space.planets.length; i++) {
-        var planet = game.space.planets[i];
+    for(let i = 0; i < game.space.planets.length; i++) {
+        let planet = game.space.planets[i];
         drawPlanet(planet, planet.isBoss ? "B" : i+1);
     }
 }
@@ -41,15 +41,15 @@ function drawBorders() {
 }
 
 function drawShip(ship) {
-    var offsetX = ship.x + 200;
+    let offsetX = ship.x + 200;
 
     ctx.translate(offsetX+25, ship.y+25);
     ctx.rotate(ship.direction);
 
-    var point1 = {x:-10, y:-10};
-    var point2 = {x:10, y:0};
-    var point3 = {x:-10, y:10};
-    var point4 = {x:-7, y:0};
+    let point1 = {x:-10, y:-10};
+    let point2 = {x:10, y:0};
+    let point3 = {x:-10, y:10};
+    let point4 = {x:-7, y:0};
 
     ctx.beginPath();
     ctx.fillStyle="#008080";
@@ -71,8 +71,8 @@ function drawShip(ship) {
 }
 
 function drawPlanet(planet, text) {
-    var size = getPlanetSize(planet.isBoss);
-    var offsetX = planet.x + xOffset;
+    let size = getPlanetSize(planet.isBoss);
+    let offsetX = planet.x + xOffset;
     ctx.translate(offsetX+size, planet.y+size);
 
     drawPlanetAtmo(planet, size);
@@ -87,8 +87,8 @@ function drawPlanet(planet, text) {
 }
 
 function drawPlanetTooltip(planet) {
-    var size = getPlanetSize(planet.isBoss);
-    var offsetX = planet.x + xOffset;
+    let size = getPlanetSize(planet.isBoss);
+    let offsetX = planet.x + xOffset;
 
     planet.showTooltip = withinDistance(mousePos.x, mousePos.y, planet.x+size, planet.y+size, 50);
     if(!planet.showTooltip) {
@@ -117,10 +117,10 @@ function drawPlanetTooltip(planet) {
 }
 
 function drawPlanetAtmo(planet, size) {
-    var atmoRatio = size * (planet.atmo / planet.maxAtmo / 2 + .5);
-    var atmosphere = ctx.createRadialGradient(0, 0, atmoRatio*1.1, 0, 0, atmoRatio/3.3);
+    let atmoRatio = size * (planet.atmo / planet.maxAtmo / 2 + .5);
+    let atmosphere = ctx.createRadialGradient(0, 0, atmoRatio*1.1, 0, 0, atmoRatio/3.3);
     atmosphere.addColorStop(0, 'black');
-    var color = "hsl("+ (planet.view.color+120) +",90%,60%)";
+    let color = "hsl("+ (planet.view.color+120) +",90%,60%)";
     atmosphere.addColorStop(1, color);
     ctx.fillStyle = atmosphere;
     ctx.fillRect(-size,-size,size*2,size*2);
@@ -134,7 +134,7 @@ function drawPlanetAtmo(planet, size) {
 
 function drawPlanetHealth(planet, size) {
     ctx.beginPath();
-    var saturation = Math.floor(planet.health / planet.maxHealth * 70 + 10); //10-80
+    let saturation = Math.floor(planet.health / planet.maxHealth * 70 + 10); //10-80
     ctx.fillStyle = "hsl("+ planet.view.color +","+saturation+"%,"+planet.view.light+"%)";
     ctx.arc(0,0,size/2,0,2*Math.PI);
     ctx.fill();

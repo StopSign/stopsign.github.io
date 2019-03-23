@@ -28,7 +28,7 @@ function Land(totalLand) {
     };
 
     this.improveLand = function() {
-        var amount = (10 * this.baseLand - this.optimizedLand) / 100;
+        let amount = (10 * this.baseLand - this.optimizedLand) / 100;
         this.optimizedLand += amount;
         this.land += amount;
     };

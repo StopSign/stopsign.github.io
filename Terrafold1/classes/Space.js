@@ -3,7 +3,7 @@ function Space() {
     this.ships = [];
     this.sector = 0;
     this.tick = function() {
-        for(var i = 0; i < this.planets.length; i++) {
+        for(let i = 0; i < this.planets.length; i++) {
             this.planets[i].tick();
         }
         for(i = 0; i < this.ships.length; i++) {
@@ -22,7 +22,7 @@ function Space() {
     };
 
     this.newLevel = function() {
-        for(var i = 0; i < 10; i++) {
+        for(let i = 0; i < 10; i++) {
             this.planets.push(new Planet());
         }
         sortArrayObjectsByValue(this.planets, "x");

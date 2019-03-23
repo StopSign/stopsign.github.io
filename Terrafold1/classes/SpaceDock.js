@@ -7,7 +7,7 @@ function SpaceDock() {
         if(!this.unlocked) {
             return;
         }
-        var excess = this.energy - this.battery;
+        let excess = this.energy - this.battery;
         this.drain = 0;
         if(excess > 0) {
             this.drain = excess/500;
