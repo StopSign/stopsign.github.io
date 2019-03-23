@@ -21,9 +21,9 @@ let view = {
             prevState.lakes = copyArray(lakes);
         },
         resources: function() {
-            if(prevState.totalWater !== totalWater) {
-                document.getElementById("totalWater").innerHTML = round5(totalWater);
-            }
+            // if(prevState.totalWater !== totalWater) {
+            //     document.getElementById("totalWater").innerHTML = round5(totalWater);
+            // }
             if(prevState.cash !== cash) {
                 document.getElementById("cash").innerHTML = cash;
             }

@@ -1,13 +1,13 @@
 function ProgressBar(id, color) {
 
     this.tick = function(ticks, ticksNeeded) {
-        let percentage = (ticks / ticksNeeded);
+        var percentage = (ticks / ticksNeeded);
         this.reset(this.aProgress);
         drawProgress(this.aProgress, percentage, this.color);
     };
 
     this.reset = function(bar) {
-        let barCTX = bar.getContext("2d");
+        var barCTX = bar.getContext("2d");
         barCTX.lineCap = 'square';
 
         barCTX.beginPath();
@@ -23,10 +23,10 @@ function ProgressBar(id, color) {
 
 
 function drawProgress(bar, percentage, color) {
-    let barCTX = bar.getContext("2d");
-    let quarterTurn = Math.PI / 2;
-    let endingAngle = ((2 * percentage * .95) * Math.PI) - quarterTurn * .9; //.985 because lineWidth
-    let startingAngle = 0 - quarterTurn * .9;
+    var barCTX = bar.getContext("2d");
+    var quarterTurn = Math.PI / 2;
+    var endingAngle = ((2 * percentage * .95) * Math.PI) - quarterTurn * .9; //.985 because lineWidth
+    var startingAngle = 0 - quarterTurn * .9;
 
     barCTX.lineCap = 'square';
 

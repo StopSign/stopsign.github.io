@@ -31,7 +31,7 @@ function Game() {
 
         this.oxygenLeak = this.oxygen / 100000;
         this.oxygen -= this.oxygenLeak;
-        for(let i = 0; i < this.hangars.length; i++) {
+        for(var i = 0; i < this.hangars.length; i++) {
             this.hangars[i].tick();
         }
     };
@@ -53,7 +53,7 @@ function Game() {
         this.spaceDock = new SpaceDock();
 
 
-        for(let i = 0; i < this.computer.processes.length; i++) {
+        for(var i = 0; i < this.computer.processes.length; i++) {
             view.addComputerRow(i);
             this.computer.processes[i].isMoving = 0;
             this.computer.processes[i].completions = 0;
@@ -74,7 +74,7 @@ function Game() {
     this.buyIce = function(toBuy) {
         if(toBuy === undefined) {
             toBuy = Number(document.getElementById('buyIceAmount').value);
-            let shouldUpdate = true;
+            var shouldUpdate = true;
         }
         if(toBuy > this.cash) {
             toBuy = this.cash;
@@ -89,7 +89,7 @@ function Game() {
     };
 
     this.buyFarms = function() {
-        let toBuy = Number(document.getElementById('buyFarmAmount').value);
+        var toBuy = Number(document.getElementById('buyFarmAmount').value);
         if(toBuy * 50 > this.land.soil) {
             toBuy = Math.floor(this.land.soil/50);
         }
@@ -102,7 +102,7 @@ function Game() {
     };
 
     this.buyBattery = function() {
-        let toBuy = Number(document.getElementById('buyBattery').value);
+        var toBuy = Number(document.getElementById('buyBattery').value);
         if(toBuy * 3e4 > this.oxygen) {
             toBuy = Math.floor(this.oxygen/3e4);
         }
@@ -119,7 +119,7 @@ function Game() {
     };
 
     this.buyBattleship = function() {
-        let toBuy = Number(document.getElementById('buyBattleshipAmount').value);
+        var toBuy = Number(document.getElementById('buyBattleshipAmount').value);
         if(toBuy * 3e7 > this.oxygen) {
             toBuy = Math.floor(this.oxygen / 3e7);
         }

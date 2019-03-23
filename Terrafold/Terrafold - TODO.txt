@@ -133,3 +133,11 @@ You're trimps! Very high reproduction rate. Ability to cobble together these spa
 
 ... I can't find it. For the ice, I was thinking that each ice upgrade would be +1 + 0.1%, or something like that -- a small constatn for the early game, and a percentage upgrade for late game
 
+To support 1,000 water on the farms, you need 1m ice, which needs 100m ice in the space station.
+That's what it takes with no ice market to even consider attacking planets
+So with a LOT of land (333k total land), which is 97% optimized with 10k dirt in orbit, 307k trees, 500 farms @ 23.5% efficiency, I am making  30.7k oxygen/sec, and 24.5k science/sec, or just over 1 battery per sec.
+The question is, how long before I can get 100m ice in the space station.
+And, how in the heck can the ice market supply such crazy levels of ice? Are they depositing comets on my doorstep? ... I'm currently at 1897 per tick, so that's a comet every 2 minutes.
+Yea, end-game requires way too much water.
+
+

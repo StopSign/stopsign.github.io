@@ -1,4 +1,4 @@
-let foodPerShip = 20;
+var foodPerShip = 20;
 function Ship(name, amount, foodAmount) {
     this.name = name;
     this.amount = amount;
@@ -24,8 +24,8 @@ function Ship(name, amount, foodAmount) {
         if(!this.engaged) {
             return;
         }
-        for(let i = game.space.ships.length-1; i >= 0; i--) {
-            let ship = game.space.ships[i];
+        for(var i = game.space.ships.length-1; i >= 0; i--) {
+            var ship = game.space.ships[i];
             if(ship === this || ship.name !== this.name || ship.isEmpty()) { //only join on same types
                 continue;
             }
@@ -37,10 +37,10 @@ function Ship(name, amount, foodAmount) {
     };
 
     this.findClosestTarget = function() {
-        let pos = 0;
-        let targetPlanet = null;
-        for(let i = 0; i < game.space.planets.length; i++) {
-            let planet = game.space.planets[i];
+        var pos = 0;
+        var targetPlanet = null;
+        for(var i = 0; i < game.space.planets.length; i++) {
+            var planet = game.space.planets[i];
             if(planet.doneBuilding()) {
                 continue;
             }
@@ -73,8 +73,8 @@ function Ship(name, amount, foodAmount) {
     this.returnHome = function() {
         game.spaceDock.battleships += this.amount;
         game.farms.food += this.foodAmount * foodPerShip;
-        for(let i = game.space.ships.length-1; i >= 0; i--) {
-            let ship = game.space.ships[i];
+        for(var i = game.space.ships.length-1; i >= 0; i--) {
+            var ship = game.space.ships[i];
             if(ship === this) {
                 game.space.ships.splice(i, 1);
                 break;
@@ -98,14 +98,14 @@ function Ship(name, amount, foodAmount) {
             }
             this.returnHome();
         }
-        let magnitude = this.speed;
-        let extraTurn = 0;
-        let firstVC = this.target.y - this.y;
-        let secondVC = this.target.x - this.x;
+        var magnitude = this.speed;
+        var extraTurn = 0;
+        var firstVC = this.target.y - this.y;
+        var secondVC = this.target.x - this.x;
         if((firstVC >= 0 && secondVC < 0) || (firstVC < 0 && secondVC < 0)) {
             extraTurn = Math.PI;
         }
-        let direction = Math.atan(firstVC/secondVC)+extraTurn; //(y2-y1)/(x2-x1)
+        var direction = Math.atan(firstVC/secondVC)+extraTurn; //(y2-y1)/(x2-x1)
         this.x = this.x + magnitude * Math.cos(direction); //||v||cos(theta)
         this.y = this.y + magnitude * Math.sin(direction);
         this.direction = direction;

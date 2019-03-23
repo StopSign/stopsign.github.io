@@ -33,7 +33,7 @@ function Trees() {
         this.treesWaterUse = this.smallTrees / 1000;
 
         if(this.fernsDelta < 0) {
-            let excessDying = 0;
+            var excessDying = 0;
             if (this.ferns + this.fernsDelta < 0) { //Not enough ferns to kill off
                 excessDying = this.fernsDelta + this.ferns;
                 this.fernsDelta = -1 * this.ferns;

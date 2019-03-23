@@ -26,10 +26,10 @@ function SpaceStation() {
         if(!this.unlocked) {
             return;
         }
-        for(let i = 0; i < this.orbiting.length; i++) {
-            let take = this.orbiting[i].amount / 100000;
+        for(var i = 0; i < this.orbiting.length; i++) {
+            var take = this.orbiting[i].amount / 100000;
             this.orbiting[i].amount -= take;
-            let type = this.orbiting[i].type;
+            var type = this.orbiting[i].type;
             if(type === "ice") {
                 game.ice.ice += take;
             } else if(type === "dirt") {

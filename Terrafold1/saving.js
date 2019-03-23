@@ -1,17 +1,17 @@
-let doWork = new Worker('helpers/interval.js');
+var doWork = new Worker('interval.js');
 doWork.onmessage = function (event) {
     if (event.data === 'interval.start') {
         tick();
     }
 };
 
-let view;
-let game;
-let timer = 0;
-let stop = 0;
-let cometId = 0;
+var view;
+var game;
+var timer = 0;
+var stop = 0;
+var cometId = 0;
 
-let timeList = [];
+var timeList = [];
 
 function clearSave() {
     window.localStorage.terrafold2 = "";
@@ -44,8 +44,8 @@ function load() {
         recalcInterval(10);
         return;
     }
-    let toLoad = JSON.parse(window.localStorage.terrafold2);
-    for(let property in toLoad.game) {
+    var toLoad = JSON.parse(window.localStorage.terrafold2);
+    for(var property in toLoad.game) {
         if (toLoad.game.hasOwnProperty(property) && typeof toLoad.game[property] !== 'object') {
             game[property] = toLoad.game[property];
         }
@@ -66,9 +66,9 @@ function load() {
     game.computer.threads = toLoad.game.computer.threads;
     game.computer.freeThreads = toLoad.game.computer.freeThreads;
     game.computer.speed = toLoad.game.computer.speed;
-    for(let i = 0; i < toLoad.game.computer.processes.length; i++) {
-        let rowData = toLoad.game.computer.processes[i];
-        let row = game.computer.processes[i];
+    for(var i = 0; i < toLoad.game.computer.processes.length; i++) {
+        var rowData = toLoad.game.computer.processes[i];
+        var row = game.computer.processes[i];
         row.currentTicks = rowData.currentTicks;
         row.ticksNeeded = rowData.ticksNeeded;
         row.threads = rowData.threads;
@@ -101,7 +101,7 @@ function load() {
 }
 
 function loadGameVar(toLoad, theVar) {
-    for(let property in toLoad.game[theVar]) {
+    for(var property in toLoad.game[theVar]) {
         if (toLoad.game[theVar].hasOwnProperty(property)) {
             game[theVar][property] = toLoad.game[theVar][property];
         }
@@ -109,7 +109,7 @@ function loadGameVar(toLoad, theVar) {
 }
 
 function save() {
-    let toSave = {};
+    var toSave = {};
     toSave.game = game;
     window.localStorage.terrafold2 = JSON.stringify(toSave);
 }

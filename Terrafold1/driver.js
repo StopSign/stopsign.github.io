@@ -24,7 +24,7 @@ function handleFPSDifference() {
     timeList.push(new Date().getTime());
     if(timeList.length > 10) {
         timeList.splice(0, 1);
-        //let fps = msWaitTime/((timeList[timeList.length-1] - timeList[0]) / (timeList.length-1))*100;
+        //var fps = msWaitTime/((timeList[timeList.length-1] - timeList[0]) / (timeList.length-1))*100;
         //multFromFps = 100/fps;
         //$scope.fps = round(fps)+"%";
     } else {

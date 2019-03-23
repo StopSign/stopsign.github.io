@@ -8,7 +8,7 @@ function Robots() {
     this.failed = 0;
 
     this.tick = function() {
-        for(let i = 0; i < this.jobs.length; i++) {
+        for(var i = 0; i < this.jobs.length; i++) {
             this.tickRow(this.jobs[i], this.jobs[i].workers);
         }
     };
@@ -27,8 +27,8 @@ function Robots() {
             return;
         }
         if(row.cost) {
-            for(let i = 0; i < row.cost.length; i++) {
-                let cost = ticksGained * row.cost[i];
+            for(var i = 0; i < row.cost.length; i++) {
+                var cost = ticksGained * row.cost[i];
                 if (row.costType[i]) {
                     if (game[row.costType[i]] < cost) {
                         row.isMoving = 0;
@@ -45,7 +45,7 @@ function Robots() {
         row.currentTicks += ticksGained;
         row.isMoving = 1;
         if (row.currentTicks >= row.ticksNeeded) {
-            let overflow = row.currentTicks - row.ticksNeeded;
+            var overflow = row.currentTicks - row.ticksNeeded;
             row.currentTicks = 0;
             row.completions++;
             row.finish();
@@ -173,7 +173,7 @@ function Robots() {
     ];
 }
 
-let jobsView = [
+var jobsView = [
     {
         text:"Cut Trees",
         tooltip:"Cut down 2 trees for 1 wood"

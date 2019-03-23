@@ -1,4 +1,4 @@
-let intervalId = null;
+var intervalId = null;
 onmessage = function(event) {
     if ( event.data.start ) {
         intervalId = setInterval(function(){

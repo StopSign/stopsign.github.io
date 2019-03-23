@@ -14,7 +14,7 @@ function TractorBeam() {
         this.removeAsteroidIfDone();
         this.checkForNewAsteroids();
 
-        let transferred = game.power / 1000;
+        var transferred = game.power / 1000;
         game.power -= transferred;
         this.energy += transferred;
         this.pullIntoOrbit();
@@ -36,13 +36,13 @@ function TractorBeam() {
         while(this.energy >= this.energyNeeded) {
             this.energy -= this.energyNeeded;
             this.takeAmount = "";
-            for(let j = 0; j < game.spaceStation.orbiting.length; j++) {
-                let orbiting = game.spaceStation.orbiting[j];
-                let totalAmount = 0;
-                for(let i = 0; i < this.comets.length; i++) {
-                    let comet = this.comets[i];
+            for(var j = 0; j < game.spaceStation.orbiting.length; j++) {
+                var orbiting = game.spaceStation.orbiting[j];
+                var totalAmount = 0;
+                for(var i = 0; i < this.comets.length; i++) {
+                    var comet = this.comets[i];
                     if(comet.amountType === orbiting.type) {
-                        let taken = comet.amount / 100 + 10;
+                        var taken = comet.amount / 100 + 10;
                         comet.amount -= taken;
                         totalAmount += taken;
                     }
@@ -57,16 +57,16 @@ function TractorBeam() {
     };
 
     this.checkForNewAsteroids = function() {
-        let discoverChance = Math.random();
+        var discoverChance = Math.random();
         if(discoverChance < this.cometSpotChance || this.comets.length === 0) {
             this.addComet();
         }
     };
 
     this.removeAsteroidIfDone = function() {
-        let length = this.comets.length - 1;
-        for(let i = length; i >= 0; i--) {
-            let comet = this.comets[i];
+        var length = this.comets.length - 1;
+        for(var i = length; i >= 0; i--) {
+            var comet = this.comets[i];
             comet.duration--;
             if(comet.duration < 0 || comet.amount < 1) {
                 view.removeComet(comet);
@@ -80,11 +80,11 @@ function TractorBeam() {
         if(this.comets.length > 20) {
             return;
         }
-        let typeRoll = Math.random();
-        let amountRoll = Math.random() * 400 + 200;
-        let durationRoll = Math.floor(Math.random() * 750 + 250);
-        let speedRoll = Math.random() * 2 + 1;
-        let comet = {};
+        var typeRoll = Math.random();
+        var amountRoll = Math.random() * 400 + 200;
+        var durationRoll = Math.floor(Math.random() * 750 + 250);
+        var speedRoll = Math.random() * 2 + 1;
+        var comet = {};
 
         if(typeRoll < .9) {
             comet = {

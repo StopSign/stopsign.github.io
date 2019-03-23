@@ -13,7 +13,7 @@ function Energy() {
     };
 
     this.tick = function() {
-        let excess = game.power - this.battery;
+        var excess = game.power - this.battery;
         this.drain = 0;
         if(excess > 0) {
             this.drain = excess/500;

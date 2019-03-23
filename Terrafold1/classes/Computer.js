@@ -5,7 +5,7 @@ function Computer() {
     this.speed = 1;
 
     this.tick = function() {
-        for(let i = 0; i < this.processes.length; i++) {
+        for(var i = 0; i < this.processes.length; i++) {
             this.tickRow(this.processes[i], this.speed * this.processes[i].threads);
         }
     };
@@ -15,7 +15,7 @@ function Computer() {
             row.isMoving = 0;
             return;
         }
-        let cost = ticksGained * row.cost;
+        var cost = ticksGained * row.cost;
         if(row.costType) {
             if(game[row.costType] < cost) {
                 row.isMoving = 0;
@@ -26,7 +26,7 @@ function Computer() {
         row.currentTicks += ticksGained;
         row.isMoving = 1;
         if(row.currentTicks >= row.ticksNeeded) {
-            let overflow = row.currentTicks - row.ticksNeeded;
+            var overflow = row.currentTicks - row.ticksNeeded;
             row.currentTicks = 0;
             row.completions++;
             row.finish();
@@ -44,7 +44,7 @@ function Computer() {
     };
 
     this.buyThread = function() {
-        let threadCost = this.getThreadCost();
+        var threadCost = this.getThreadCost();
         if(game.science >= threadCost) {
             game.science -= threadCost;
             this.threads++;
@@ -57,7 +57,7 @@ function Computer() {
     };
 
     this.buySpeed = function() {
-        let speedCost = this.getSpeedCost();
+        var speedCost = this.getSpeedCost();
         if(game.cash >= speedCost) {
             game.cash -= speedCost;
             this.speed++;
@@ -172,7 +172,7 @@ function Computer() {
 }
 
 //Not saved, keep parity with processes
-let processesView = [
+var processesView = [
     {
         text:"Optimize Land",
         tooltip:"Improve 1% of unimproved land.<br>Max to improve to is ( 10 x base land )<br>Percent Optimized: <div id='landOptimized'></div>"
