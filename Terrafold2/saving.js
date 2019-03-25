@@ -19,7 +19,7 @@ let stop = false;
 let totalTime;
 let cash, ice, totalWater;
 
-let rivers, lakes;
+let rivers, lakes, clouds;
 
 let prevState = {};
 
@@ -30,16 +30,15 @@ function clearSave() { //Doesn't work atm
 
 function loadDefaults() {
     totalTime = 0;
-    cash = 1000;
+    cash = 1000; //1000
     ice = 0;
     totalWater = 0;
 
     rivers = [];
     lakes = [];
+    clouds = [];
 
-
-    window.riverData.create(5, "lake_0");
-    window.lakeData.create(1000);
+    loadData();
 }
 
 function load() {

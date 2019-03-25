@@ -180,3 +180,7 @@ input {
     padding:3px;
     border:2px solid rgba(190, 190, 190, 0);
 }
+
+.preciseNum {
+    width:60px;
+}

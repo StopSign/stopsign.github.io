@@ -1,29 +1,20 @@
 Terrafold 2
 
-Evaporation
-    % of total water in lakes gets sent to atmosphere
-    Wind sweeps atmosphere every 5 minutes, collecting 90% moisture
-    clouds rain harder the larger they are, adding water to the feature they're hovering over
-
-
 Lakes
-    minimum - amount of water before generator intake starts
-    capacity - amount of water they can hold
-    generator intake - rate of water leaving the lake, up to capacity
-    power ratio - rate of electricity per intake
-    overflow - rate of water beyond capacity leaving the lake
-
     capacity, generator intake, overflow are upgradeable via iron
     power ratio upgradeable later
 
 Lake 0
     Purpose: get iron from electricity
-    minimum: 10
-    capacity: 1000
-    intake: .01/tick
-    power: 1 per 100 water through intake
-    overflow: 1%
 
+    Start with 1 c.bot
+    Mine ore | bot count | amount | progress (seconds) | auto
+        1 elec, 20 seconds
+    Process ore |
+        gives 1 iron, 1 dirt
+        2 elec, 5 seconds
+    Build c.bots |
+        3 elec, 5 seconds, 1 iron
     Build c.bots with iron
         Mine ore
             c.Bot intensive, low electricity
@@ -31,38 +22,43 @@ Lake 0
             Low c.bot, high electricity
         Build c.bots
             cost iron, click
-
-
-
+    Upgrade generator - 10 iron * 1.1^# - +1% efficiency
+    Upgrade intake - 100 iron * 1.1^# - 10%
 
 Lake 1
     Purpose: get atmosphere from electricity
-Minimum:200
-Capacity:10000
-Intake:  .01
-Power: 1 per 100
-Overflow:1%
-Use electricity for drills
-Induce volcanoes
-    Heat *slightly* lowers
-    Pressure builds based on heat
-    (eventually need to reheat)
-Use electricity for heat, make volcanoes
-Volcanoes release NH3, H20, CO2.
-NH3 slowly burns into N2, which stays
-H20 goes to clouds
-CO2 stays
-
-
+    Drill Hole |
+        1 elec, 10 second, 10m
+        Creates volcano, volcano lasts for 60 seconds (disables drill hole)
+        Pressure starts at 100%
+        Each hole multiplies pressure by .9
+        Pressure builds at .001% per tick - not when volcano is running though
+        volcano reqs 500m / pressure
+        spews .07 H2O, .03 CO2 per tick
+    Upgrade generator - 100 iron * 1.1^# - +1% efficiency
+    Upgrade intake - 1000 iron * 1.1^# - 10%
 
 
 Lake 2
     Purpose: get oxygen from electricity
-Irrigate to redirect water
-Plants take groundwater, carbon dioxide, and produce oxygen, putting water in atmosphere (transpiration)
+    Place dirt |
+    Spread dirt |
+    Irrigate soil |
+        Increases max groundwater soil can take
+        Groundwater slowly leaks into underground water, which feeds back into lake 2
+    Plant seeds |
+        Uses groundwater, CO2, produces O2, puts H2O back in atmosphere (transpiration)
+    O2 Unlocks livable water ?
+        oxygenated water -> algae farms -> Insect farms -> fisheries -> small $$ to start, tourism later
+    O2 for creating pneumatic tools
+        better drills
+    O2 for smelting
+        create steel
+
 
 
 Lake 3
-    Purpose: get science from electricity
+    Purpose: get money from electricity
+
 
 

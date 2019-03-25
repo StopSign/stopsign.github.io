@@ -15,11 +15,16 @@
 
 </head>
 <body id="theBody" oncontextmenu="return false;">
+    Total Water: <div id="totalWater" class="preciseNum"></div><br>
+    Cash: <div id="cash" class="preciseNum"></div><br>
+    Ice: <div id="ice" class="preciseNum"></div> <div class="button" onclick="clicked('iceData.buyIce')">Buy Ice</div> <input id="iceBuyAmount" value="1000"><br>
 
-    Cash: <div id="cash"></div><br>
-    Ice: <div id="ice"></div><div class="button" onclick="clicked('iceData.buyIce')">Buy Ice</div><input id="iceBuyAmount"><br>
     <div id="riverContainer0"></div><br>
     <div id="lakeContainer0"></div><br>
+    <div id="riverContainer1"></div><br>
+    <div id="lakeContainer1"></div><br>
+    <div id="riverContainer2"></div><br>
+    <div id="lakeContainer2"></div><br>
 
 
 
@@ -36,7 +41,9 @@
     <script src="classes/target.js?1"></script>
     <script src="classes/ice.js?1"></script>
     <script src="classes/lakes.js?1"></script>
+    <script src="classes/clouds.js?1"></script>
     <script src="clickResponses.js?1"></script>
+    <script src="data.js?1"></script>
     <script>
         // (function (i, s, o, g, r, a, m) {
         //     i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function () {

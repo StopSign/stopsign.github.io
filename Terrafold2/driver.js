@@ -1,6 +1,6 @@
 'use strict';
 
-let gameSpeed = 1;
+let gameSpeed = 10;
 let bonusSpeed = 1;
 
 let curTime = new Date();
@@ -44,6 +44,9 @@ function tick() {
 
         window.riverData.tick();
         window.iceData.tick();
+        window.lakeData.tick();
+        window.cloudData.tick();
+        totalWater = calcTotalWater();
     }
     if(didSomething) {
         view.updating.update();
