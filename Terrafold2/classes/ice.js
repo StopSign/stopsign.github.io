@@ -1,6 +1,6 @@
 window.iceData = {
     buyIce:function() {
-        let amount = document.getElementById("iceBuyAmount").value - 0;
+        let amount = Number(document.getElementById("iceBuyAmount").value);
         if(amount <= 0) {
             return;
         }

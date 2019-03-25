@@ -17,9 +17,9 @@ let saveName = "terrafold2";
 
 let stop = false;
 let totalTime;
-let cash, ice, totalWater;
+let cash, ice, totalWater, cbots, cbotsMax, ore, iron, dirt;
 
-let rivers, lakes, clouds;
+let rivers, lakes, clouds, cbotRows;
 
 let prevState = {};
 
@@ -33,10 +33,16 @@ function loadDefaults() {
     cash = 1000; //1000
     ice = 0;
     totalWater = 0;
+    cbots = 1;
+    cbotsMax = 1;
+    ore = 0;
+    iron = 0;
+    dirt = 0;
 
     rivers = [];
     lakes = [];
     clouds = [];
+    cbotRows = [];
 
     loadData();
 }

@@ -27,4 +27,43 @@ function loadData() {
         efficiency:.01,
         target: ""
     });
+
+    createCBotRow({
+        name:"Mine Ore",
+        pNeeded: 400,
+        electricity: 1,
+        finish: function() {
+            ore++;
+        },
+        lake: 0
+    });
+    createCBotRow({
+        name:"Process Ore",
+        pNeeded: 100,
+        electricity: 2,
+        finish: function() {
+            iron++;
+            dirt++;
+        },
+        lake: 0
+    });
+    createCBotRow({
+        name:"Build C.Bot",
+        pNeeded: 200,
+        electricity: 3,
+        finish: function() {
+            cbots++;
+        },
+        lake: 0
+    });
+}
+
+function createCBotRow(cbotRow) {
+    cbotRow.auto = false;
+    cbotRow.cbotCount = 0;
+    cbotRow.numLeft = 0;
+    cbotRow.pCurrent = 0;
+    cbotRow.id = cbotRows.length;
+
+    cbotRows.push(cbotRow);
 }

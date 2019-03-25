@@ -3,6 +3,7 @@ let view = {
         //auto generated elements
         this.create.rivers();
         this.create.lakes();
+        this.create.lakeUniques();
 
     },
     updating: {
@@ -18,6 +19,11 @@ let view = {
             prevState.cash = cash;
             prevState.ice = ice;
             prevState.totalWater = totalWater;
+            prevState.cbots = cbots;
+            prevState.cbotsMax = cbotsMax;
+            prevState.iron = iron;
+            prevState.dirt = dirt;
+            prevState.ore = ore;
             prevState.rivers = copyArray(rivers);
             prevState.lakes = copyArray(lakes);
             prevState.clouds = copyArray(clouds);
@@ -31,6 +37,21 @@ let view = {
             }
             if(prevState.ice !== ice) {
                 document.getElementById("ice").innerHTML = intToString(ice, 4);
+            }
+            if(prevState.cbots !== cbots) {
+                document.getElementById("cbots").innerHTML = cbots;
+            }
+            if(prevState.cbotsMax !== cbotsMax) {
+                document.getElementById("cbotsMax").innerHTML = cbotsMax;
+            }
+            if(prevState.ore !== ore) {
+                document.getElementById("ore").innerHTML = intToString(ore, 1);
+            }
+            if(prevState.iron !== iron) {
+                document.getElementById("iron").innerHTML = intToString(iron, 1);
+            }
+            if(prevState.dirt !== dirt) {
+                document.getElementById("dirt").innerHTML = intToString(dirt, 1);
             }
         },
         rivers: function() {
@@ -123,6 +144,24 @@ let view = {
 
                 document.getElementById("lakeContainer" + i).innerHTML = divText;
             }
+        },
+        lakeUniques: function() {
+            document.getElementById("lakeContainer0").innerHTML += "Ore: <div id='ore'></div><br>";
+
+            for(let i = 0; i < cbotRows.length; i++) {
+                document.getElementById("lakeContainer" + cbotRows[i].lake).innerHTML += view.helpers.cbotRow(cbotRows[i]);
+            }
+        },
+    },
+    helpers: {
+        cbotRow: function(cbotRow) {
+            //Mine ore | bot count | amount | progress (seconds) | auto
+            return "<div class='bold' style='width:90px'>" + cbotRow.name + "</div>" +
+                " <label for='cbotCount"+cbotRow.id+"'>C.Bots</label> <input id='cbotCount"+cbotRow.id+"' type='number' class='inputNum' value='0' onchange='changeCbotCount("+cbotRow.id+")'>" +
+                " <label for='numLeft"+cbotRow.id+"'>Num Left</label> <input id='numLeft"+cbotRow.id+"' type='number' class='inputNum' value='0' onchange='changeNumLeft("+cbotRow.id+")'>" +
+                " <div class='progressOuter'><div class='progressInner' id='progress"+cbotRow.id+"'></div></div>" +
+                " <label for='auto"+cbotRow.id+"'>Auto</label><input type='checkbox' id='auto"+cbotRow.id+"' onchange='changeAuto("+cbotRow.id+")'>" +
+                "<br>";
         }
     }
 };
