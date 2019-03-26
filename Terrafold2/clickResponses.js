@@ -6,3 +6,12 @@ function clicked(funcName) {
         window[parts[0]][parts[1]]();
     }
 }
+
+function changeBuyAmount() {
+    let value = Number(document.getElementById("buyAmount").value);
+    if(isNaN(value) || value < 0) {
+        value = 0;
+    }
+    buyAmount = value;
+    document.getElementById("buyAmount").value = value;
+}

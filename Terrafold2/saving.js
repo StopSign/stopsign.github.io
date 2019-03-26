@@ -17,8 +17,9 @@ let saveName = "terrafold2";
 
 let stop = false;
 let totalTime;
-let cash, ice, totalWater, cbots, cbotsMax, ore, iron, dirt;
+let totalWater, buyAmount;
 
+let res, unique;
 let rivers, lakes, clouds, cbotRows;
 
 let prevState = {};
@@ -30,14 +31,24 @@ function clearSave() { //Doesn't work atm
 
 function loadDefaults() {
     totalTime = 0;
-    cash = 1000; //1000
-    ice = 0;
+    res = {
+        cash:1000,
+        ice:0,
+        cbots:1,
+        cbotsMax:1,
+        ore:0,
+        iron:0,
+        dirt:0
+    };
+    unique = {
+        volcDur: 0,
+        volcMult: 1,
+        depth:0,
+        pressure:1,
+        depthNeeded:500
+    };
     totalWater = 0;
-    cbots = 1;
-    cbotsMax = 1;
-    ore = 0;
-    iron = 0;
-    dirt = 0;
+    buyAmount = 1;
 
     rivers = [];
     lakes = [];

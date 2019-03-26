@@ -12,46 +12,42 @@ let view = {
             view.updating.rivers();
             view.updating.lakes();
             view.updating.clouds();
+            view.updating.lakeUniques();
 
             view.updating.saveCurrentState();
         },
         saveCurrentState: function () {
-            prevState.cash = cash;
-            prevState.ice = ice;
             prevState.totalWater = totalWater;
-            prevState.cbots = cbots;
-            prevState.cbotsMax = cbotsMax;
-            prevState.iron = iron;
-            prevState.dirt = dirt;
-            prevState.ore = ore;
+            prevState.res = copyArray(res);
             prevState.rivers = copyArray(rivers);
             prevState.lakes = copyArray(lakes);
             prevState.clouds = copyArray(clouds);
+            prevState.cbotRows = copyArray(cbotRows);
         },
         resources: function() {
             if(prevState.totalWater !== totalWater) {
                 document.getElementById("totalWater").innerHTML = intToString(totalWater, 1);
             }
-            if(prevState.cash !== cash) {
-                document.getElementById("cash").innerHTML = cash;
+            if(!prevState.res || prevState.res.cash !== res.cash) {
+                document.getElementById("cash").innerHTML = res.cash;
             }
-            if(prevState.ice !== ice) {
-                document.getElementById("ice").innerHTML = intToString(ice, 4);
+            if(!prevState.res || prevState.res.ice !== res.ice) {
+                document.getElementById("ice").innerHTML = intToString(res.ice, 4);
             }
-            if(prevState.cbots !== cbots) {
-                document.getElementById("cbots").innerHTML = cbots;
+            if(!prevState.res || prevState.res.cbots !== res.cbots) {
+                document.getElementById("cbots").innerHTML = res.cbots;
             }
-            if(prevState.cbotsMax !== cbotsMax) {
-                document.getElementById("cbotsMax").innerHTML = cbotsMax;
+            if(!prevState.res || prevState.res.cbotsMax !== res.cbotsMax) {
+                document.getElementById("cbotsMax").innerHTML = res.cbotsMax;
             }
-            if(prevState.ore !== ore) {
-                document.getElementById("ore").innerHTML = intToString(ore, 1);
+            if(!prevState.res || prevState.res.ore !== res.ore) {
+                document.getElementById("ore").innerHTML = intToString(res.ore, 1);
             }
-            if(prevState.iron !== iron) {
-                document.getElementById("iron").innerHTML = intToString(iron, 1);
+            if(!prevState.res || prevState.res.iron !== res.iron) {
+                document.getElementById("iron").innerHTML = intToString(res.iron, 1);
             }
-            if(prevState.dirt !== dirt) {
-                document.getElementById("dirt").innerHTML = intToString(dirt, 1);
+            if(!prevState.res || prevState.res.dirt !== res.dirt) {
+                document.getElementById("dirt").innerHTML = intToString(res.dirt, 1);
             }
         },
         rivers: function() {
@@ -107,6 +103,20 @@ let view = {
                 }
 
             }
+        },
+        lakeUniques: function() {
+            for(let i = 0; i < cbotRows.length; i++) {
+                if(!prevState.cbotRows || prevState.cbotRows[i].pCurrent !== cbotRows[i].pCurrent) {
+                    document.getElementById("progress" + cbotRows[i].id).style.width = (cbotRows[i].pCurrent / cbotRows[i].pNeeded * 100) + "%";
+                    document.getElementById("pSecs"+cbotRows[i].id).innerHTML = (cbotRows[i].pNeeded - cbotRows[i].pCurrent)/20 + "s";
+                }
+                if(!prevState.cbotRows || prevState.cbotRows[i].numLeft !== cbotRows[i].numLeft) {
+                    document.getElementById("numLeft" + cbotRows[i].id).value = cbotRows[i].numLeft;
+                }
+                if(!prevState.cbotRows || prevState.cbotRows[i].cbotCount !== cbotRows[i].cbotCount) {
+                    document.getElementById("cbotCount"+cbotRows[i].id).innerHTML = cbotRows[i].cbotCount;
+                }
+            }
         }
     },
     create: {
@@ -157,9 +167,9 @@ let view = {
         cbotRow: function(cbotRow) {
             //Mine ore | bot count | amount | progress (seconds) | auto
             return "<div class='bold' style='width:90px'>" + cbotRow.name + "</div>" +
-                " <label for='cbotCount"+cbotRow.id+"'>C.Bots</label> <input id='cbotCount"+cbotRow.id+"' type='number' class='inputNum' value='0' onchange='changeCbotCount("+cbotRow.id+")'>" +
+                " C.Bots <div id='cbotCount"+cbotRow.id+"' class='bold'></div> <div class='fa fa-plus clickable' onclick='addCbots("+cbotRow.id+")'></div> <div class='fa fa-minus clickable' onclick='subtractCbots("+cbotRow.id+")'></div>" +
                 " <label for='numLeft"+cbotRow.id+"'>Num Left</label> <input id='numLeft"+cbotRow.id+"' type='number' class='inputNum' value='0' onchange='changeNumLeft("+cbotRow.id+")'>" +
-                " <div class='progressOuter'><div class='progressInner' id='progress"+cbotRow.id+"'></div></div>" +
+                " <div class='progressOuter'><div class='progressInner' id='progress"+cbotRow.id+"'></div><div id='pSecs"+cbotRow.id+"' style='color:white;' class='abs bold small'></div></div>" +
                 " <label for='auto"+cbotRow.id+"'>Auto</label><input type='checkbox' id='auto"+cbotRow.id+"' onchange='changeAuto("+cbotRow.id+")'>" +
                 "<br>";
         }

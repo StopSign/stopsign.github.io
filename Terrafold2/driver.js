@@ -46,6 +46,7 @@ function tick() {
         window.iceData.tick();
         window.lakeData.tick();
         window.cloudData.tick();
+        window.cbotData.tick();
         totalWater = calcTotalWater();
     }
     if(didSomething) {

@@ -4,15 +4,15 @@ window.iceData = {
         if(amount <= 0) {
             return;
         }
-        if(amount >= cash) {
-            amount = cash;
+        if(amount >= res.cash) {
+            amount = res.cash;
         }
-        ice += amount;
-        cash -= amount;
+        res.ice += amount;
+        res.cash -= amount;
     },
     tick: function() {
-        let transfer = ice / 10000;
-        ice -= transfer;
+        let transfer = res.ice / 10000;
+        res.ice -= transfer;
         addWaterTo("river_0", transfer);
     }
 };

@@ -17,7 +17,7 @@ function addWaterTo(target, water) {
 
 function calcTotalWater() {
     let totalWater = 0;
-    totalWater += ice;
+    totalWater += res.ice;
     for(let i = 0; i < rivers.length; i++) {
         for(let j = 0; j < rivers[i].chunks.length; j++) {
             totalWater += rivers[i].chunks[j].water;

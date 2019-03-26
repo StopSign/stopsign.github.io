@@ -28,42 +28,45 @@ function loadData() {
         target: ""
     });
 
-    createCBotRow({
+    window.cbotData.create({
         name:"Mine Ore",
         pNeeded: 400,
-        electricity: 1,
+        cost: { electricity: 1 },
         finish: function() {
-            ore++;
+            res.ore++;
         },
         lake: 0
     });
-    createCBotRow({
+    window.cbotData.create({
         name:"Process Ore",
         pNeeded: 100,
-        electricity: 2,
+        cost: { electricity: 2, ore: 1},
         finish: function() {
-            iron++;
-            dirt++;
+            res.iron++;
+            res.dirt++;
         },
         lake: 0
     });
-    createCBotRow({
+    window.cbotData.create({
         name:"Build C.Bot",
         pNeeded: 200,
-        electricity: 3,
+        cost: { electricity: 3, iron: 1 },
         finish: function() {
-            cbots++;
+            res.cbots++;
+            res.cbotsMax++;
         },
         lake: 0
     });
-}
-
-function createCBotRow(cbotRow) {
-    cbotRow.auto = false;
-    cbotRow.cbotCount = 0;
-    cbotRow.numLeft = 0;
-    cbotRow.pCurrent = 0;
-    cbotRow.id = cbotRows.length;
-
-    cbotRows.push(cbotRow);
+    window.cbotData.create({
+        name:"Drill Hole",
+        pNeeded: 200,
+        cost: { electricity: 1 },
+        enabled: function() {
+            return unique.volcDur === 0;
+        },
+        finish: function() {
+            res.dirt++;
+        },
+        lake: 1
+    });
 }

@@ -78,13 +78,13 @@ body {
 }
 
 .large {
-    font-size:16px;
-}
-.medium {
     font-size:14px;
 }
-.small {
+.medium {
     font-size:12px;
+}
+.small {
+    font-size:10px;
 }
 .bold {
     font-weight:bold;
@@ -188,4 +188,17 @@ input {
     width:50px;
     font-size:12px;
     margin-right:10px;
+    height:10px;
+}
+
+.progressOuter {
+    width:80px;
+    height:11px;
+    background-color:rgba(50, 50, 50, .8);
+    position:relative;
+}
+.progressInner {
+    height:100%;
+    position:absolute;
+    background-color: #a86fc4;
 }

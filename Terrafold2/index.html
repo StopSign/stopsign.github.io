@@ -14,21 +14,22 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
 </head>
-<body id="theBody" oncontextmenu="return false;" style="padding:5px">
+<body id="theBody" oncontextmenu="return false;" style="padding:5px" class="medium">
     Total Water: <div id="totalWater" class="preciseNum"></div>
     Cash: <div id="cash" class="preciseNum"></div>
     Construction Bots: <div style='width:60px'><div id="cbots"></div> / <div id="cbotsMax"></div></div>
     Iron: <div id="iron" class="preciseNum"></div>
     Dirt: <div id="dirt" class="preciseNum"></div>
     <br>
-    Ice: <div id="ice" class="preciseNum"></div> <div class="button" onclick="clicked('iceData.buyIce')">Buy Ice</div> <input id="iceBuyAmount" value="1000" class='inputNum' type='number'><br>
+    <label for="buyAmount">Add Amount: </label><input id="buyAmount" class="inputNum" type="number" value="1" onchange="changeBuyAmount()" onclick='this.select();'><br>
+    Ice: <div id="ice" class="preciseNum"></div> <div class="button" onclick="clicked('iceData.buyIce')">Buy Ice</div> <input id="iceBuyAmount" value="1000" class='inputNum' type='number' onclick='this.select();'><br><br>
 
-    <div id="riverContainer0"></div><br>
-    <div id="lakeContainer0"></div><br>
-    <div id="riverContainer1"></div><br>
-    <div id="lakeContainer1"></div><br>
-    <div id="riverContainer2"></div><br>
-    <div id="lakeContainer2"></div><br>
+    <div id="riverContainer0"></div><br><br>
+    <div id="lakeContainer0"></div><br><br>
+    <div id="riverContainer1"></div><br><br>
+    <div id="lakeContainer1"></div><br><br>
+    <div id="riverContainer2"></div><br><br>
+    <div id="lakeContainer2"></div><br><br>
 
 
 
@@ -46,6 +47,7 @@
     <script src="classes/ice.js?1"></script>
     <script src="classes/lakes.js?1"></script>
     <script src="classes/clouds.js?1"></script>
+    <script src="classes/cbotRows.js?1"></script>
     <script src="clickResponses.js?1"></script>
     <script src="data.js?1"></script>
     <script>
