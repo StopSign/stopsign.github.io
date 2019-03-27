@@ -183,6 +183,7 @@ input {
 
 .preciseNum {
     width:60px;
+    font-weight:bold;
 }
 .inputNum {
     width:50px;

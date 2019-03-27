@@ -1,37 +1,43 @@
 let view = {
     initialize: function() {
         //auto generated elements
+        this.create.atmo();
         this.create.rivers();
         this.create.lakes();
-        this.create.lakeUniques();
+        this.create.cbotRows();
 
     },
     updating: {
         update: function () {
+            view.updating.atmo();
             view.updating.resources();
             view.updating.rivers();
             view.updating.lakes();
             view.updating.clouds();
-            view.updating.lakeUniques();
+            view.updating.cbotRows();
+            view.updating.unique();
 
             view.updating.saveCurrentState();
         },
         saveCurrentState: function () {
             prevState.totalWater = totalWater;
             prevState.res = copyArray(res);
+            prevState.localAtmo = copyArray(localAtmo);
+            prevState.globalAtmo = copyArray(globalAtmo);
             prevState.rivers = copyArray(rivers);
             prevState.lakes = copyArray(lakes);
             prevState.clouds = copyArray(clouds);
             prevState.cbotRows = copyArray(cbotRows);
+            prevState.unique = copyArray(unique);
         },
         resources: function() {
-            if(prevState.totalWater !== totalWater) {
+            if(intToString(prevState.totalWater, 1) !== intToString(totalWater, 1)) {
                 document.getElementById("totalWater").innerHTML = intToString(totalWater, 1);
             }
             if(!prevState.res || prevState.res.cash !== res.cash) {
                 document.getElementById("cash").innerHTML = res.cash;
             }
-            if(!prevState.res || prevState.res.ice !== res.ice) {
+            if(!prevState.res || intToString(prevState.res.ice, 4) !== intToString(res.ice, 4)) {
                 document.getElementById("ice").innerHTML = intToString(res.ice, 4);
             }
             if(!prevState.res || prevState.res.cbots !== res.cbots) {
@@ -50,10 +56,22 @@ let view = {
                 document.getElementById("dirt").innerHTML = intToString(res.dirt, 1);
             }
         },
+        atmo: function() {
+            for(let property in localAtmo) {
+                if(localAtmo.hasOwnProperty(property)) {
+                    if(!prevState.localAtmo || intToString(prevState.localAtmo[property], 4) !== intToString(localAtmo[property], 4)) {
+                        document.getElementById("local"+property).innerHTML = intToString(localAtmo[property], 4);
+                    }
+                    if(!prevState.globalAtmo || intToString(prevState.globalAtmo[property], 4) !== intToString(globalAtmo[property], 4)) {
+                        document.getElementById("global"+property).innerHTML = intToString(globalAtmo[property], 4);
+                    }
+                }
+            }
+        },
         rivers: function() {
             for(let i = 0; i < rivers.length; i++) {
                 for(let j = 0; j < rivers[i].chunks.length; j++) {
-                    if(!prevState.rivers || prevState.rivers[i].chunks[j].water !== rivers[i].chunks[j].water) {
+                    if(!prevState.rivers || intToString(prevState.rivers[i].chunks[j].water, 4) !== intToString(rivers[i].chunks[j].water, 4)) {
                         document.getElementById(i + "_riverwater_" + j).innerHTML = intToString(rivers[i].chunks[j].water, 4);
                     }
                 }
@@ -61,10 +79,10 @@ let view = {
         },
         lakes: function() {
             for(let i = 0; i < lakes.length; i++) {
-                if(!prevState.lakes || prevState.lakes[i].water !== lakes[i].water) {
+                if(!prevState.lakes || intToString(prevState.lakes[i].water, 4) !== intToString(lakes[i].water, 4)) {
                     document.getElementById("lakewater_"+i).innerHTML = intToString(lakes[i].water, 4);
                 }
-                if(!prevState.lakes || prevState.lakes[i].water !== lakes[i].water) {
+                if(!prevState.lakes || intToString(prevState.lakes[i].water, 1) !== intToString(lakes[i].water, 1)) {
                     document.getElementById("lakeminimum_"+i).innerHTML = intToString(lakes[i].minimum, 1);
                 }
                 if(!prevState.lakes || prevState.lakes[i].capacity !== lakes[i].capacity) {
@@ -73,59 +91,88 @@ let view = {
                 if(!prevState.lakes || prevState.lakes[i].intake !== lakes[i].intake) {
                     document.getElementById("lakeintake_"+i).innerHTML = intToString(lakes[i].intake, 4);
                 }
-                if(!prevState.lakes || prevState.lakes[i].overflow !== lakes[i].overflow) {
+                if(!prevState.lakes || intToString(prevState.lakes[i].overflow, 4) !== intToString(lakes[i].overflow, 4)) {
                     document.getElementById("lakeoverflow_"+i).innerHTML = intToString(lakes[i].overflow, 4);
                 }
                 if(!prevState.lakes || prevState.lakes[i].electricity !== lakes[i].electricity) {
                     document.getElementById("lakeelectricity_"+i).innerHTML = intToString(lakes[i].electricity, 4);
                 }
-                if(!prevState.lakes || prevState.lakes[i].evaporated !== lakes[i].evaporated) {
+                if(!prevState.lakes || intToString(prevState.lakes[i].evaporated, 5) !== intToString(lakes[i].evaporated, 5)) {
                     document.getElementById("lakeevaporated_"+i).innerHTML = intToString(lakes[i].evaporated, 5);
                 }
             }
         },
         clouds: function() {
             for(let i = 0; i < clouds.length; i++) {
-                if(!prevState.clouds || prevState.clouds[i].water !== clouds[i].water) {
+                if(!prevState.clouds || intToString(prevState.clouds[i].water, 4) !== intToString(clouds[i].water, 4)) {
                     document.getElementById("cloudwater_"+i).innerHTML = intToString(clouds[i].water, 4);
                 }
-                if(i === 0 && (!prevState.clouds || prevState.clouds[i].rain !== clouds[i].rain)) {
+                if(i === 0 && (!prevState.clouds || intToString(prevState.clouds[i].rain, 4) !== intToString(clouds[i].rain, 4))) {
                     document.getElementById("cloudrain_"+i).innerHTML = intToString(clouds[i].rain, 4);
                 }
-                if(i === 0 && (!prevState.clouds || prevState.clouds[i].rainTimer !== clouds[i].rainTimer)) {
+                if(i === 0 && (!prevState.clouds || intToString(prevState.clouds[i].rainTimer/20, 1) !== intToString(clouds[i].rainTimer/20, 1))) {
                     document.getElementById("cloudrainTimer_"+i).innerHTML = intToString(clouds[i].rainTimer/20, 1)+"s";
                 }
-                if(i === 0 && (!prevState.clouds || prevState.clouds[i].rainDuration !== clouds[i].rainDuration)) {
+                if(i === 0 && (!prevState.clouds || intToString(prevState.clouds[i].rainDuration/20, 1) !== intToString(clouds[i].rainDuration/20, 1))) {
                     document.getElementById("cloudrainDuration_"+i).innerHTML = intToString(clouds[i].rainDuration/20, 1)+"s";
                 }
-                if(i !== 0 && (!prevState.clouds || prevState.clouds[i].windTimer !== clouds[i].windTimer)) {
+                if(i !== 0 && (!prevState.clouds || intToString(prevState.clouds[i].windTimer/20, 1) !== intToString(clouds[i].windTimer/20, 1))) {
                     document.getElementById("cloudwindTimer_"+i).innerHTML = intToString(clouds[i].windTimer/20, 1)+"s";
                 }
 
             }
         },
-        lakeUniques: function() {
+        cbotRows: function() {
             for(let i = 0; i < cbotRows.length; i++) {
                 if(!prevState.cbotRows || prevState.cbotRows[i].pCurrent !== cbotRows[i].pCurrent) {
                     document.getElementById("progress" + cbotRows[i].id).style.width = (cbotRows[i].pCurrent / cbotRows[i].pNeeded * 100) + "%";
-                    document.getElementById("pSecs"+cbotRows[i].id).innerHTML = (cbotRows[i].pNeeded - cbotRows[i].pCurrent)/20 + "s";
+                    document.getElementById("pSecs"+cbotRows[i].id).innerHTML = intToString((cbotRows[i].pNeeded - cbotRows[i].pCurrent)/20/cbotRows[i].cbotCount, 2) + "s";
                 }
                 if(!prevState.cbotRows || prevState.cbotRows[i].numLeft !== cbotRows[i].numLeft) {
-                    document.getElementById("numLeft" + cbotRows[i].id).value = cbotRows[i].numLeft;
+                    document.getElementById("numLeft" + cbotRows[i].id).innerHTML = cbotRows[i].numLeft;
                 }
                 if(!prevState.cbotRows || prevState.cbotRows[i].cbotCount !== cbotRows[i].cbotCount) {
                     document.getElementById("cbotCount"+cbotRows[i].id).innerHTML = cbotRows[i].cbotCount;
                 }
             }
+        },
+        unique: function() {
+            if(!prevState.unique || prevState.unique.depth !== unique.depth) {
+                document.getElementById("depth").innerHTML = unique.depth+"m";
+            }
+            if(!prevState.unique || prevState.unique.pressure !== unique.pressure) {
+                document.getElementById("pressure").innerHTML = intToString(unique.pressure*100, 3) + "%";
+                let actualDepth = unique.depthNeeded / unique.pressure;
+                document.getElementById("depthNeeded").innerHTML = intToString(actualDepth, 2)+"m";
+            }
+            if(!prevState.unique || intToString(prevState.unique.volcDur/20, 1) !== intToString(unique.volcDur/20, 1)) {
+                document.getElementById("volcDur").innerHTML = intToString(unique.volcDur/20, 1)+"s";
+            }
+            if(!prevState.unique || prevState.unique.volcMult !== unique.volcMult) {
+                let output = cbotData.helpers.getVolcanoOutput();
+                document.getElementById("volcOutput").innerHTML = "Spewing Water: <div class='preciseNum'>" + output.water + "</div> and CO2: <div class='preciseNum'>" + output.co2 + "</div>";
+            }
         }
     },
     create: {
+        atmo: function() {
+            let localDivText = "<div style='width:110px'>Local Atmosphere</div>";
+            let globalDivText = "<br><div style='width:110px'>Global Atmosphere</div>";
+            for(let property in localAtmo) {
+                if(localAtmo.hasOwnProperty(property)) {
+                    localDivText += property.toUpperCase() + ": <div id='local"+property+"' class='preciseNum'></div>";
+                    globalDivText += property.toUpperCase() + ": <div id='global"+property+"' class='preciseNum'></div>";
+                }
+            }
+
+            document.getElementById("atmoContainer").innerHTML = localDivText + globalDivText;
+        },
         rivers: function() {
             for(let i = 0; i < rivers.length; i++) {
                 let divText = "";
                 let river = rivers[i];
                 for(let j = 0; j < river.chunks.length; j++) {
-                    divText += "River "+i+" Chunk " + j + ": <div id='"+i+"_riverwater_"+j+"' class='preciseNum'></div> water<br>";
+                    divText += "River "+i+"_" + j + " water: <div id='"+i+"_riverwater_"+j+"' class='preciseNum'></div><br>";
                 }
 
                 document.getElementById("riverContainer" + i).innerHTML = divText;
@@ -155,9 +202,7 @@ let view = {
                 document.getElementById("lakeContainer" + i).innerHTML = divText;
             }
         },
-        lakeUniques: function() {
-            document.getElementById("lakeContainer0").innerHTML += "Ore: <div id='ore'></div><br>";
-
+        cbotRows: function() {
             for(let i = 0; i < cbotRows.length; i++) {
                 document.getElementById("lakeContainer" + cbotRows[i].lake).innerHTML += view.helpers.cbotRow(cbotRows[i]);
             }
@@ -165,12 +210,12 @@ let view = {
     },
     helpers: {
         cbotRow: function(cbotRow) {
-            //Mine ore | bot count | amount | progress (seconds) | auto
             return "<div class='bold' style='width:90px'>" + cbotRow.name + "</div>" +
                 " C.Bots <div id='cbotCount"+cbotRow.id+"' class='bold'></div> <div class='fa fa-plus clickable' onclick='addCbots("+cbotRow.id+")'></div> <div class='fa fa-minus clickable' onclick='subtractCbots("+cbotRow.id+")'></div>" +
-                " <label for='numLeft"+cbotRow.id+"'>Num Left</label> <input id='numLeft"+cbotRow.id+"' type='number' class='inputNum' value='0' onchange='changeNumLeft("+cbotRow.id+")'>" +
+                " Num Left <div id='numLeft"+cbotRow.id+"' class='bold'></div> <div class='fa fa-plus clickable' onclick='addNumLeft("+cbotRow.id+")'></div> <div class='fa fa-minus clickable' onclick='subtractNumLeft("+cbotRow.id+")'></div>" +
                 " <div class='progressOuter'><div class='progressInner' id='progress"+cbotRow.id+"'></div><div id='pSecs"+cbotRow.id+"' style='color:white;' class='abs bold small'></div></div>" +
                 " <label for='auto"+cbotRow.id+"'>Auto</label><input type='checkbox' id='auto"+cbotRow.id+"' onchange='changeAuto("+cbotRow.id+")'>" +
+                cbotRow.uniqueDiv +
                 "<br>";
         }
     }

@@ -19,7 +19,7 @@ let stop = false;
 let totalTime;
 let totalWater, buyAmount;
 
-let res, unique;
+let res, unique, localAtmo, globalAtmo;
 let rivers, lakes, clouds, cbotRows;
 
 let prevState = {};
@@ -41,12 +41,17 @@ function loadDefaults() {
         dirt:0
     };
     unique = {
-        volcDur: 0,
-        volcMult: 1,
         depth:0,
+        depthNeeded:500,
         pressure:1,
-        depthNeeded:500
+        volcDur: 0,
+        volcMult: 1
     };
+    localAtmo = {
+        co2:0,
+        o2:0
+    };
+    globalAtmo = copyArray(localAtmo);
     totalWater = 0;
     buyAmount = 1;
 

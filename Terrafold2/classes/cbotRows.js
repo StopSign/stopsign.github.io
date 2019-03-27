@@ -6,6 +6,9 @@ window.cbotData = {
         cbotRow.pCurrent = 0;
         cbotRow.id = cbotRows.length;
 
+        if(!cbotRow.uniqueDiv) {
+            cbotRow.uniqueDiv = "";
+        }
         if(!cbotRow.enabled) {
             cbotRow.enabled = function() { return true; }
         }
@@ -35,7 +38,6 @@ window.cbotData = {
             return true;
         };
 
-
         cbotRows.push(cbotRow);
     },
     tick: function() {
@@ -47,7 +49,7 @@ window.cbotData = {
             if(cbotRow.pCurrent > 0) { //already started
                 cbotRow.pCurrent += cbotRow.cbotCount;
             }
-            if(cbotRow.cbotCount > 0 && cbotRow.pCurrent === 0 && cbotRow.numLeft > 0) { //should start
+            if(cbotRow.cbotCount > 0 && cbotRow.pCurrent === 0 && (cbotRow.numLeft > 0 || cbotRow.auto)) { //should start
                 if(cbotRow.canBuy()) {
                     cbotRow.takeCost();
                     cbotRow.pCurrent += cbotRow.cbotCount;
@@ -59,9 +61,6 @@ window.cbotData = {
                 if(cbotRow.numLeft < 0) {
                     cbotRow.numLeft = 0;
                 }
-                if(cbotRow.auto && cbotRow.numLeft === 0) {
-                    cbotRow.numLeft = 1;
-                }
                 cbotRow.finish();
             }
         }
@@ -69,8 +68,26 @@ window.cbotData = {
     },
     tickUnique: function() {
         //volcano
-        if(unique.depth > unique.depthNeeded) {
-
+        unique.pressure += .000001;
+        if(unique.pressure > 1) {
+            unique.pressure = 1;
+        }
+        let actualDepth = unique.depthNeeded / unique.pressure;
+        if(unique.depth >= actualDepth) {
+            unique.volcDur += 60 * 20;
+            unique.pressure *= .9;
+            unique.depth = 0;
+        }
+        if(unique.volcDur > 0) {
+            let output = cbotData.helpers.getVolcanoOutput();
+            clouds[1].water += output.water;
+            localAtmo.co2 += output.co2;
+            unique.volcDur--;
+        }
+    },
+    helpers: {
+        getVolcanoOutput() {
+            return { water:.07 * unique.volcMult, co2:.03 * unique.volcMult}
         }
     }
 };
@@ -92,22 +109,16 @@ function subtractCbots(id) {
     cbotRows[id].cbotCount -= change;
 }
 
-
-function changeNumLeft(id) {
-    let div = document.getElementById("numLeft"+id);
-    let value = Math.floor(Number(div.value));
-    if(isNaN(value) || value < 0) {
-        value = 0;
+function addNumLeft(id) {
+    cbotRows[id].numLeft += buyAmount;
+}
+function subtractNumLeft(id) {
+    cbotRows[id].numLeft -= buyAmount;
+    if(cbotRows[id].numLeft < 0) {
+        cbotRows[id].numLeft = 0;
     }
-    cbotRows[id].numLeft = value;
-    document.getElementById("numLeft"+id).value = value;
 }
 
 function changeAuto(id) {
-    let div = document.getElementById("auto"+id);
-    if(Number(document.getElementById("numLeft"+id).value) === 0) {
-        document.getElementById("numLeft"+id).value = 1;
-        cbotRows[id].numLeft = 1;
-    }
-    cbotRows[id].auto = div.checked;
+    cbotRows[id].auto = document.getElementById("auto"+id).checked;
 }

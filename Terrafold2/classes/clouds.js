@@ -5,7 +5,7 @@ window.cloudData = {
             rain: 0,
             rainTimer: 2000 + (1200 * clouds.length),
             rainDuration: 400,
-            windTimer: 18000 - 3600 * clouds.length //3 minutes
+            windTimer: 9000 - 1200 * clouds.length
         };
         clouds.push(cloud);
     },
@@ -15,7 +15,7 @@ window.cloudData = {
             if(i !== 0) {  //no wind on cloud 0
                 cloud.windTimer--;
                 if(cloud.windTimer <= 0) {
-                    cloud.windTimer += 18000; //15 minutes
+                    cloud.windTimer += 5 * 60 * 20;
                     let transfer = cloud.water * .9;
                     cloud.water -= transfer;
                     clouds[i - 1].water += transfer;
@@ -39,6 +39,17 @@ window.cloudData = {
                         lakes[i].water += cloud.rain;
                     }
                 }
+            }
+        }
+        cloudData.tickAtmo()
+    },
+    tickAtmo: function() {
+        for(let property in localAtmo) {
+            if(localAtmo.hasOwnProperty(property)) {
+                let toGlobal = localAtmo[property] * .0001;
+                let toLocal = globalAtmo[property] * .000001;
+                localAtmo[property] = localAtmo[property] - toGlobal + toLocal;
+                globalAtmo[property] = globalAtmo[property] - toLocal + toGlobal;
             }
         }
     }

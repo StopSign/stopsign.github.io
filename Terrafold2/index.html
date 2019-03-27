@@ -17,10 +17,11 @@
 <body id="theBody" oncontextmenu="return false;" style="padding:5px" class="medium">
     Total Water: <div id="totalWater" class="preciseNum"></div>
     Cash: <div id="cash" class="preciseNum"></div>
-    Construction Bots: <div style='width:60px'><div id="cbots"></div> / <div id="cbotsMax"></div></div>
+    Construction Bots: <div class='preciseNum'><div id="cbots"></div> / <div id="cbotsMax"></div></div>
     Iron: <div id="iron" class="preciseNum"></div>
     Dirt: <div id="dirt" class="preciseNum"></div>
     <br>
+    <div id="atmoContainer"></div><br>
     <label for="buyAmount">Add Amount: </label><input id="buyAmount" class="inputNum" type="number" value="1" onchange="changeBuyAmount()" onclick='this.select();'><br>
     Ice: <div id="ice" class="preciseNum"></div> <div class="button" onclick="clicked('iceData.buyIce')">Buy Ice</div> <input id="iceBuyAmount" value="1000" class='inputNum' type='number' onclick='this.select();'><br><br>
 

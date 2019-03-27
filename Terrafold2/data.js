@@ -11,7 +11,7 @@ function loadData() {
     });
     window.riverData.create(6, "lake_1");
     window.lakeData.create({
-        minimum: 600,
+        minimum: 200,
         capacity: 10000,
         intakeRate:.05,
         overflowRate:.01,
@@ -30,16 +30,17 @@ function loadData() {
 
     window.cbotData.create({
         name:"Mine Ore",
-        pNeeded: 400,
+        pNeeded: 40 * 20,
         cost: { electricity: 1 },
         finish: function() {
             res.ore++;
         },
-        lake: 0
+        lake: 0,
+        uniqueDiv: " Ore: <div id='ore'></div>"
     });
     window.cbotData.create({
         name:"Process Ore",
-        pNeeded: 100,
+        pNeeded: 10 * 20,
         cost: { electricity: 2, ore: 1},
         finish: function() {
             res.iron++;
@@ -49,7 +50,7 @@ function loadData() {
     });
     window.cbotData.create({
         name:"Build C.Bot",
-        pNeeded: 200,
+        pNeeded: 40 * 20,
         cost: { electricity: 3, iron: 1 },
         finish: function() {
             res.cbots++;
@@ -59,14 +60,21 @@ function loadData() {
     });
     window.cbotData.create({
         name:"Drill Hole",
-        pNeeded: 200,
+        pNeeded: 20 * 60 * 20,
         cost: { electricity: 1 },
         enabled: function() {
             return unique.volcDur === 0;
         },
         finish: function() {
             res.dirt++;
+            unique.depth += 100;
         },
-        lake: 1
+        lake: 1,
+        uniqueDiv:"<br>" +
+        "Depth: <div id='depth' class='preciseNum'></div>" +
+        "Volcano at: <div id='depthNeeded' class='preciseNum'></div>" +
+        "Pressure: <div id='pressure' class='preciseNum'></div>" +
+        "Volcano Duration: <div id='volcDur' class='preciseNum'></div>" +
+        "<div id='volcOutput'></div>"
     });
 }
