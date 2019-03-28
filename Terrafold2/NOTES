@@ -7,23 +7,8 @@ Lakes
 Lake 0
     Purpose: get iron from electricity
 
-    Start with 1 c.bot
-    Mine ore | bot count | amount | progress (seconds) | auto
-        1 elec, 20 seconds
-    Process ore |
-        gives 1 iron, 1 dirt
-        2 elec, 5 seconds
-    Build c.bots |
-        3 elec, 5 seconds, 1 iron
-    Build c.bots with iron
-        Mine ore
-            c.Bot intensive, low electricity
-        Process ore
-            Low c.bot, high electricity
-        Build c.bots
-            cost iron, click
-    Upgrade generator - 10 iron * 1.1^# - +1% efficiency
-    Upgrade intake - 100 iron * 1.1^# - 10%
+    Upgrade generator - 10 iron * #^2 - +1% efficiency
+    Upgrade intake - 10 steel * 1.1^# - +100%
 
 
 Lake 1
@@ -41,25 +26,54 @@ Lake 1
 
 
 Lake 2
-    Purpose: get oxygen from electricity
-    Place dirt |
-    Spread dirt |
-    Irrigate soil |
-        Increases max groundwater soil can take
-        Groundwater slowly leaks into underground water, which feeds back into lake 2
-    Plant seeds |
-        Uses groundwater, CO2, produces O2, puts H2O back in atmosphere (transpiration)
-    O2 Unlocks livable water ?
-        oxygenated water -> algae farms -> Insect farms -> fisheries -> small $$ to start, tourism later
-    O2 for creating pneumatic tools
-        better drills
-    O2 for smelting
-        create steel
+    Purpose: get oxygen, steel from electricity
+    build dam - 50 iron, 2000 dirt
+    Farm
+    repair farm bot - 100 iron
+    Place dirt - cbots
+    Spread dirt -> land - fbots (optimize)
+    plant seeds (fbots)
+        puts seeds around land
+    water plants (fbots)
+        adds constant amount to groundwater
+        plants absorb at a linear rate
+        groundwater goes back into lake
+        plants have a lifespan and effectiveness
+        effectivness drops if no water
+        plants take CO2 from localAtmo, send O2 + H2O into atmo/clouds (transpiration)
 
-
+    Steel Plant
+    Smelt Steel
+        Uses O2 + iron, gives steel
+    Weld Farm Bot
+        Uses 10 cbots + steel + O2, gives f.bot
 
 Lake 3
     Purpose: get money from electricity
+    aerate water - uses co2, elec
 
+Lake 4
+    Purpose: get population, scrip from electricity
 
+Lake 5
+    Purpose: get happiness from electricity
 
+Lake 6
+    Purpose: science
+
+Lake 7
+    Purpose: industry
+
+Lake 8
+    Purpose: military
+
+FIN
+
+need:
+use endless c.bots w/o elec
+OR limit c.bots
+
+possible science upgrades:
+    volcano lasts longer
+    river transfers faster
+    stronger wind

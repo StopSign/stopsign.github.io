@@ -38,7 +38,8 @@ function loadDefaults() {
         cbotsMax:1,
         ore:0,
         iron:0,
-        dirt:0
+        dirt:0,
+        steel:0
     };
     unique = {
         depth:0,

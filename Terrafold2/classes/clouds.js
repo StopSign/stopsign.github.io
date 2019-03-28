@@ -16,7 +16,7 @@ window.cloudData = {
                 cloud.windTimer--;
                 if(cloud.windTimer <= 0) {
                     cloud.windTimer += 5 * 60 * 20;
-                    let transfer = cloud.water * .9;
+                    let transfer = cloud.water * .8;
                     cloud.water -= transfer;
                     clouds[i - 1].water += transfer;
                 }

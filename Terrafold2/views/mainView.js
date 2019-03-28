@@ -55,6 +55,9 @@ let view = {
             if(!prevState.res || prevState.res.dirt !== res.dirt) {
                 document.getElementById("dirt").innerHTML = intToString(res.dirt, 1);
             }
+            if(!prevState.res || prevState.res.steel !== res.steel) {
+                document.getElementById("steel").innerHTML = intToString(res.steel, 1);
+            }
         },
         atmo: function() {
             for(let property in localAtmo) {
@@ -100,6 +103,14 @@ let view = {
                 if(!prevState.lakes || intToString(prevState.lakes[i].evaporated, 5) !== intToString(lakes[i].evaporated, 5)) {
                     document.getElementById("lakeevaporated_"+i).innerHTML = intToString(lakes[i].evaporated, 5);
                 }
+                if(!prevState.lakes || prevState.lakes[i].upgrade.generator !== lakes[i].upgrade.generator) {
+                    document.getElementById("lakeefficiency_"+i).innerHTML = intToString(lakes[i].efficiency() * 100, 1) + "%";
+                    document.getElementById("lakeefficiencycost_"+i).innerHTML = intToString(lakes[i].upgrade.generatorCost(), 1);
+                }
+                if(!prevState.lakes || prevState.lakes[i].upgrade.intake !== lakes[i].upgrade.intake) {
+                    document.getElementById("lakeintakeRate_"+i).innerHTML = intToString(lakes[i].intakeRate(), 3);
+                    document.getElementById("lakeintakeRatecost_"+i).innerHTML = intToString(lakes[i].upgrade.intakeCost(), 1);
+                }
             }
         },
         clouds: function() {
@@ -126,7 +137,7 @@ let view = {
             for(let i = 0; i < cbotRows.length; i++) {
                 if(!prevState.cbotRows || prevState.cbotRows[i].pCurrent !== cbotRows[i].pCurrent) {
                     document.getElementById("progress" + cbotRows[i].id).style.width = (cbotRows[i].pCurrent / cbotRows[i].pNeeded * 100) + "%";
-                    document.getElementById("pSecs"+cbotRows[i].id).innerHTML = intToString((cbotRows[i].pNeeded - cbotRows[i].pCurrent)/20/cbotRows[i].cbotCount, 2) + "s";
+                    document.getElementById("pSecs"+cbotRows[i].id).innerHTML = intToString((cbotRows[i].pNeeded - cbotRows[i].pCurrent)/20/(cbotRows[i].cbotCount ? cbotRows[i].cbotCount : 1), 2) + "s";
                 }
                 if(!prevState.cbotRows || prevState.cbotRows[i].numLeft !== cbotRows[i].numLeft) {
                     document.getElementById("numLeft" + cbotRows[i].id).innerHTML = cbotRows[i].numLeft;
@@ -189,6 +200,11 @@ let view = {
                     " overflow: <div id='lakeoverflow_"+i+"' class='preciseNum'></div>" +
                     " electricity: <div id='lakeelectricity_"+i+"' class='preciseNum'></div>" +
                     " evaporated: <div id='lakeevaporated_"+i+"' class='preciseNum'></div>" +
+                    "<br>";
+
+                divText += "Upgrades " +
+                    "<div class='button' onclick='buyGenerator("+i+")'>Upgrade Generator (+1%)</div> Iron Cost: <div class='preciseNum' id='lakeefficiencycost_"+i+"'></div> Current: <div class='preciseNum' id='lakeefficiency_"+i+"'></div>" +
+                    "<div class='button' onclick='buyIntake("+i+")'>Upgrade Intake (+"+lakes[i].intakeRate()+")</div> Steel Cost: <div class='preciseNum' id='lakeintakeRatecost_"+i+"'></div> Current: <div class='preciseNum' id='lakeintakeRate_"+i+"'></div>" +
                     "<br>";
 
                 divText += "Cloud "+i+
