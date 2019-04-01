@@ -23,24 +23,44 @@ function removeDonation(i) {
 
 function clickBuildDam(i) {
     let lake = lakes[i];
-    let canBuy = true;
-
-    for(let property in lake.buildCost) {
-        if(lake.buildCost.hasOwnProperty(property)) {
-            if(res[property] < lake.buildCost[property]) {
-                canBuy = false;
-            }
-        }
-    }
-
-    console.log(lake.buildCost, canBuy);
-    if(canBuy) {
-        for(let property in lake.buildCost) {
-            if(lake.buildCost.hasOwnProperty(property)) {
-                res[property] -= lake.buildCost[property];
-            }
-        }
+    if(canBuy(lake.buildCost)) {
+        takeCost(lake.buildCost);
         lake.built = true;
     }
+}
 
+function clickRepairFarmBot(costObj) {
+    if(canBuy(costObj)) {
+        takeCost(costObj);
+        res.fbots = 1;
+        res.fbotsMax = 1;
+        cbotRows[4].unlocked = true;
+        //cbotRows[5].unlocked = true;
+    }
+}
+
+function canBuy(costObj, lakeId) { //lakeId is only for "electricity"
+    for(let property in costObj) {
+        if(costObj.hasOwnProperty(property)) {
+            if(property === "electricity" && lakes[lakeId].electricity < costObj.electricity) {
+                return false;
+            } else if(res[property] < costObj[property]) {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+function takeCost(costObj, lakeId) { //lakeId is only for "electricity"
+    for(let property in costObj) {
+        if(costObj.hasOwnProperty(property)) {
+            if(property === "electricity") {
+                lakes[lakeId].electricity -= costObj.electricity;
+            } else {
+                res[property] -= costObj[property];
+            }
+        }
+    }
+    return true;
 }

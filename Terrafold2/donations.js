@@ -11,7 +11,7 @@ window.donations = {
         window.donations.check(5, totalVolc > 0, 300, "First volcano", "EXPLOSIONSareLIFE", "E X P L O S I O N !!!", ["atmoContainer"]);
         window.donations.check(15, res.steel > 0, 100, "First Steel", getRandomUsername(), "We industrial age now boys.", ["steelContainer", "lakesteel_0", "lakesteel_1", "lakesteel_2", "lakesteel_3"]);
 
-        window.donations.check(14, lakes[2].built, 200, "Lake 2 Dam Built", getRandomUsername(), "look at it go", ["riverContainer3", "lakeContainer3"]);
+        window.donations.check(14, lakes[2].built, 200, "Lake 2 Dam Built", getRandomUsername(), "look at it go", ["riverContainer3", "lakeContainer3", "unlockButton4"]);
     },
     check: function(num, shouldUnlock, reward, reason, user, message, isMadeVisibleList) {
         if(shouldUnlock && !donationList[num]) {

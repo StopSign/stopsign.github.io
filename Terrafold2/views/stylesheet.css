@@ -39,7 +39,11 @@ body {
 }
 
 .gone {
-    display:none;
+    display:none !important;
+}
+
+.block {
+    display:block;
 }
 
 .showthatH:hover .showthisH {

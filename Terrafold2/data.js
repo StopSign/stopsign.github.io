@@ -87,4 +87,20 @@ function loadData() {
         "Volcano Duration: <div id='volcDur' class='preciseNum'></div>" +
         "<div id='volcOutput'></div>"
     });
+    window.cbotData.create({
+        name:"Place Dirt",
+        pNeeded: 5 * 60 * 20,
+        cost: { electricity: 1, dirt:10 },
+        enabled: function() {
+            return unique.volcDur === 0;
+        },
+        finish: function() {
+            res.baseLand++;
+            res.land++;
+        },
+        lake: 2,
+        unlocked:false,
+        unlockButton:"<div id='unlockButton4' class='button gone' onclick='clickRepairFarmBot({ iron: 50 })'>Repair Farm Bot for 50 iron</div>",
+        uniqueDiv:"asdf"
+    });
 }

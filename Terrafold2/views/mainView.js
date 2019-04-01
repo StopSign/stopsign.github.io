@@ -58,6 +58,9 @@ let view = {
             if(!prevState.res || prevState.res.steel !== res.steel) {
                 document.getElementById("steel").innerHTML = intToString(res.steel, 1);
             }
+            if(!prevState.res || prevState.res.land !== res.land) {
+                document.getElementById("land").innerHTML = intToString(res.land, 1);
+            }
         },
         atmo: function() {
             for(let property in localAtmo) {
@@ -154,6 +157,21 @@ let view = {
                 if(!prevState.cbotRows || prevState.cbotRows[i].cbotCount !== cbotRows[i].cbotCount) {
                     document.getElementById("cbotCount"+cbotRows[i].id).innerHTML = cbotRows[i].cbotCount;
                 }
+                if(!prevState.cbotRows || prevState.cbotRows[i].unlocked !== cbotRows[i].unlocked) {
+                    if(!lakes[cbotRows[i].lake].built) {
+                        addClassToDiv(document.getElementById("cbotContainer" + i), "gone");
+                    } else {
+                        if(cbotRows[i].unlocked === false) { //hidden
+                            removeClassFromDiv(document.getElementById("unlockButton" + i), "gone");
+                            addClassToDiv(document.getElementById("cbotContainer" + i), "gone");
+                        } else {
+                            if(document.getElementById("unlockButton" + i)) {
+                                addClassToDiv(document.getElementById("unlockButton" + i), "gone");
+                            }
+                            removeClassFromDiv(document.getElementById("cbotContainer" + i), "gone");
+                        }
+                    }
+                }
             }
         },
         unique: function() {
@@ -223,10 +241,10 @@ let view = {
                     "<div id='lakeToBuild_"+i+"' class='button "+(!lakes[i].built ? "" : "gone")+"' onclick='clickBuildDam("+i+")'>Build Dam for "+costString+"</div>" +
                     "<br>";
 
-                divText += "<div id='lakeiron_"+i+"' class='gone'>Upgrades " +
+                divText += "<div id='lakeiron_"+i+"' class='block gone'>Upgrades " +
                     "<div class='button' onclick='buyGenerator("+i+")'>Upgrade Generator (+1%)</div> Iron Cost: <div class='preciseNum' id='lakeefficiencycost_"+i+"'></div> Current: <div class='preciseNum' id='lakeefficiency_"+i+"'></div>" +
                     "<div id='lakesteel_"+i+"' class='hidden'><div class='button' onclick='buyIntake("+i+")'>Upgrade Intake (+"+lakes[i].intakeRate()+")</div> Steel Cost: <div class='preciseNum' id='lakeintakeRatecost_"+i+"'></div> Current: <div class='preciseNum' id='lakeintakeRate_"+i+"'></div></div>" +
-                    "</div><br>";
+                    "</div>";
 
                 divText += "Cloud "+i+
                     " water: <div id='cloudwater_"+i+"' class='preciseNum'></div>" +
@@ -259,13 +277,14 @@ let view = {
     },
     helpers: {
         cbotRow: function(cbotRow) {
-            return "<div class='bold' style='width:90px'>" + cbotRow.name + "</div>" +
+            return (cbotRow.unlockButton ? cbotRow.unlockButton : "") +
+                "<div id='cbotContainer"+cbotRow.id+"' style='display:block'><div class='bold' style='width:90px'>" + cbotRow.name + "</div>" +
                 " C.Bots <div id='cbotCount"+cbotRow.id+"' class='bold'></div> <div class='fa fa-plus clickable' onclick='addCbots("+cbotRow.id+")'></div> <div class='fa fa-minus clickable' onclick='subtractCbots("+cbotRow.id+")'></div>" +
                 " Num Left <div id='numLeft"+cbotRow.id+"' class='bold'></div> <div class='fa fa-plus clickable' onclick='addNumLeft("+cbotRow.id+")'></div> <div class='fa fa-minus clickable' onclick='subtractNumLeft("+cbotRow.id+")'></div>" +
                 " <div class='progressOuter'><div class='progressInner' id='progress"+cbotRow.id+"'></div><div id='pSecs"+cbotRow.id+"' style='color:white;' class='abs bold small'></div></div>" +
                 " <label for='auto"+cbotRow.id+"'>Auto</label><input type='checkbox' id='auto"+cbotRow.id+"' onchange='changeAuto("+cbotRow.id+")'>" +
                 cbotRow.uniqueDiv +
-                "<br>";
+                "</div>";
         }
     }
 };

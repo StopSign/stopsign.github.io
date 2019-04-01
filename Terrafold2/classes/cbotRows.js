@@ -13,31 +13,6 @@ window.cbotData = {
             cbotRow.enabled = function() { return true; }
         }
 
-        cbotRow.canBuy = function() {
-            for(let property in cbotRow.cost) {
-                if(cbotRow.cost.hasOwnProperty(property)) {
-                    if(property === "electricity" && lakes[cbotRow.lake].electricity < cbotRow.cost.electricity) {
-                        return false;
-                    } else if(res[property] < cbotRow.cost[property]) {
-                        return false;
-                    }
-                }
-            }
-            return true;
-        };
-        cbotRow.takeCost = function() {
-            for(let property in cbotRow.cost) {
-                if(cbotRow.cost.hasOwnProperty(property)) {
-                    if(property === "electricity") {
-                        lakes[cbotRow.lake].electricity -= cbotRow.cost.electricity;
-                    } else {
-                        res[property] -= cbotRow.cost[property];
-                    }
-                }
-            }
-            return true;
-        };
-
         cbotRows.push(cbotRow);
     },
     tick: function() {
@@ -50,8 +25,8 @@ window.cbotData = {
                 cbotRow.pCurrent += cbotRow.cbotCount;
             }
             if(cbotRow.cbotCount > 0 && cbotRow.pCurrent === 0 && (cbotRow.numLeft > 0 || cbotRow.auto)) { //should start
-                if(cbotRow.canBuy()) {
-                    cbotRow.takeCost();
+                if(canBuy(cbotRow.cost, cbotRow.lake)) {
+                    takeCost(cbotRow.cost, cbotRow.lake);
                     cbotRow.pCurrent += cbotRow.cbotCount;
                 }
             }

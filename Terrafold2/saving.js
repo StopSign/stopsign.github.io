@@ -36,10 +36,16 @@ function loadDefaults() {
         ice:0,
         cbots:1,
         cbotsMax:1,
+        fbots:0,
+        fbotsMax:0,
         ore:0,
         iron:0,
         dirt:0,
-        steel:0
+        steel:0,
+        land:0,
+        usedLand:0,
+        baseLand:0,
+        soil:0
     };
     unique = {
         depth:0,
