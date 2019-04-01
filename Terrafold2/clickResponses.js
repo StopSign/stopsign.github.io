@@ -15,3 +15,8 @@ function changeBuyAmount() {
     buyAmount = value;
     document.getElementById("buyAmount").value = value;
 }
+
+function removeDonation(i) {
+    donationsShowing.splice(i, 1);
+    view.create.donationMessage();
+}

@@ -20,7 +20,7 @@ let totalTime;
 let totalWater, buyAmount;
 
 let res, unique, localAtmo, globalAtmo;
-let rivers, lakes, clouds, cbotRows;
+let rivers, lakes, clouds, cbotRows, donationList, donationsShowing;
 
 let prevState = {};
 
@@ -60,6 +60,8 @@ function loadDefaults() {
     lakes = [];
     clouds = [];
     cbotRows = [];
+    donationList = []; //boolean vars for unlocking donations
+    donationsShowing = [];
 
     loadData();
 }

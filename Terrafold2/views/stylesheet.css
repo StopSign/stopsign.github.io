@@ -203,3 +203,30 @@ input {
     position:absolute;
     background-color: #a86fc4;
 }
+
+.donationContainer {
+    padding:5px;
+    background-color:white;
+    opacity:.8;
+    width:100%;
+    border-radius:15px;
+    cursor:pointer;
+    margin-bottom:10px;
+}
+
+.donationContainer:hover {
+    background-color:#ff8080;
+}
+
+.donationReward {
+    font-size:14px;
+}
+
+.donationMessage {
+    font-size:12px;
+}
+
+.donationReason {
+    font-size:10px;
+    opacity: .8;
+}

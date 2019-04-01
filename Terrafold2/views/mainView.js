@@ -108,7 +108,7 @@ let view = {
                     document.getElementById("lakeefficiencycost_"+i).innerHTML = intToString(lakes[i].upgrade.generatorCost(), 1);
                 }
                 if(!prevState.lakes || prevState.lakes[i].upgrade.intake !== lakes[i].upgrade.intake) {
-                    document.getElementById("lakeintakeRate_"+i).innerHTML = intToString(lakes[i].intakeRate(), 3);
+                    document.getElementById("lakeintakeRate_"+i).innerHTML = intToString(lakes[i].intakeRate(), 5);
                     document.getElementById("lakeintakeRatecost_"+i).innerHTML = intToString(lakes[i].upgrade.intakeCost(), 1);
                 }
             }
@@ -223,6 +223,17 @@ let view = {
                 document.getElementById("lakeContainer" + cbotRows[i].lake).innerHTML += view.helpers.cbotRow(cbotRows[i]);
             }
         },
+        donationMessage: function() {
+            let divText = "";
+            for(let i = 0; i < donationsShowing.length; i++) {
+                divText += "<div class='donationContainer' onclick='removeDonation("+i+")'>" +
+                    "<div class='donationReward'>Got <b>"+donationsShowing[i].reward+"</b> from " + donationsShowing[i].user + "</div><br>" +
+                    "<div class='donationMessage'>"+donationsShowing[i].message+"</div>" +
+                    "<div class='donationReason'>(Reason: "+donationsShowing[i].reason+")</div>" +
+                    "</div><br>";
+            }
+            document.getElementById("donationsContainer").innerHTML = divText;
+        }
     },
     helpers: {
         cbotRow: function(cbotRow) {

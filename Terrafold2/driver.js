@@ -47,6 +47,7 @@ function tick() {
         window.lakeData.tick();
         window.cloudData.tick();
         window.cbotData.tick();
+        window.donations.tick();
         totalWater = calcTotalWater();
     }
     if(didSomething) {
