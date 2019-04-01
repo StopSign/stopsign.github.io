@@ -38,6 +38,10 @@ body {
     pointer-events:none;
 }
 
+.gone {
+    display:none;
+}
+
 .showthatH:hover .showthisH {
     display:block;
 }

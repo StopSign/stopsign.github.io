@@ -12,6 +12,8 @@ window.lakeData = {
             intake: 0
         };
 
+        lakeData.built = !lakeData.buildCost;
+
         lakeData.efficiency = function() {
             return lakeData.efficiencyInitial * (1 + lakeData.upgrade.generator);
         };

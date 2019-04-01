@@ -1,33 +1,7 @@
 Terrafold 2
 
-Lakes
-    capacity, generator intake, overflow are upgradeable via iron
-    power ratio upgradeable later
-
-Lake 0
-    Purpose: get iron from electricity
-
-    Upgrade generator - 10 iron * #^2 - +1% efficiency
-    Upgrade intake - 10 steel * 1.1^# - +100%
-
-
-Lake 1
-    Purpose: get atmosphere from electricity
-    Drill Hole |
-        1 elec, 10 second, 10m
-        Creates volcano, volcano lasts for 60 seconds (disables drill hole)
-        Pressure starts at 100%
-        Each hole multiplies pressure by .9
-        Pressure builds at .001% per tick - not when volcano is running though
-        volcano reqs 500m / pressure
-        spews .07 H2O, .03 CO2 per tick
-    Upgrade generator - 100 iron * 1.1^# - +1% efficiency
-    Upgrade intake - 1000 iron * 1.1^# - 10%
-
-
 Lake 2
     Purpose: get oxygen, steel from electricity
-    build dam - 50 iron, 2000 dirt
     Farm
     repair farm bot - 100 iron
     Place dirt - cbots

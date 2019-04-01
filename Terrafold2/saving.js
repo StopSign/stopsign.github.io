@@ -17,7 +17,7 @@ let saveName = "terrafold2";
 
 let stop = false;
 let totalTime;
-let totalWater, buyAmount;
+let totalWater, buyAmount, totalVolc;
 
 let res, unique, localAtmo, globalAtmo;
 let rivers, lakes, clouds, cbotRows, donationList, donationsShowing;
@@ -32,7 +32,7 @@ function clearSave() { //Doesn't work atm
 function loadDefaults() {
     totalTime = 0;
     res = {
-        cash:1000,
+        cash:0,
         ice:0,
         cbots:1,
         cbotsMax:1,
@@ -54,6 +54,7 @@ function loadDefaults() {
     };
     globalAtmo = copyArray(localAtmo);
     totalWater = 0;
+    totalVolc = 0;
     buyAmount = 1;
 
     rivers = [];

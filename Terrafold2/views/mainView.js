@@ -111,6 +111,15 @@ let view = {
                     document.getElementById("lakeintakeRate_"+i).innerHTML = intToString(lakes[i].intakeRate(), 5);
                     document.getElementById("lakeintakeRatecost_"+i).innerHTML = intToString(lakes[i].upgrade.intakeCost(), 1);
                 }
+                if(!prevState.lakes || prevState.lakes[i].built !== lakes[i].built) {
+                    if(lakes[i].built) {
+                        addClassToDiv(document.getElementById("lakeToBuild_" + i), "gone");
+                        removeClassFromDiv(document.getElementById("lakebuilt_" + i), "gone");
+                    } else {
+                        removeClassFromDiv(document.getElementById("lakeToBuild_" + i), "gone");
+                        addClassToDiv(document.getElementById("lakebuilt_" + i), "gone");
+                    }
+                }
             }
         },
         clouds: function() {
@@ -192,20 +201,32 @@ let view = {
         lakes: function() {
             for(let i = 0; i < lakes.length; i++) {
                 let divText = "";
+
+                let costString = "";
+                if(lakes[i].buildCost) {
+                    for(let property in lakes[i].buildCost) {
+                        if(lakes[i].buildCost.hasOwnProperty(property)) {
+                            costString += lakes[i].buildCost[property] + " " + capitalizeFirst(property) + ", ";
+                        }
+                    }
+                    costString = costString.substring(0, costString.length - 2);
+                }
+
                 divText += "Lake "+i+
                     " water: <div id='lakewater_"+i+"' class='preciseNum'></div>" +
-                    " minimum: <div id='lakeminimum_"+i+"' class='preciseNum'></div>" +
+                    " evaporated: <div id='lakeevaporated_"+i+"' class='preciseNum'></div>" +
+                    "<div id='lakebuilt_"+i+"' class='"+(lakes[i].built ? "" : "gone")+"'> minimum: <div id='lakeminimum_"+i+"' class='preciseNum'></div>" +
                     " capacity: <div id='lakecapacity_"+i+"' class='preciseNum'></div>" +
                     " intake: <div id='lakeintake_"+i+"' class='preciseNum'></div>" +
                     " overflow: <div id='lakeoverflow_"+i+"' class='preciseNum'></div>" +
-                    " electricity: <div id='lakeelectricity_"+i+"' class='preciseNum'></div>" +
-                    " evaporated: <div id='lakeevaporated_"+i+"' class='preciseNum'></div>" +
+                    " electricity: <div id='lakeelectricity_"+i+"' class='preciseNum'></div></div>" +
+                    "<div id='lakeToBuild_"+i+"' class='button "+(!lakes[i].built ? "" : "gone")+"' onclick='clickBuildDam("+i+")'>Build Dam for "+costString+"</div>" +
                     "<br>";
 
-                divText += "Upgrades " +
+                divText += "<div id='lakeiron_"+i+"' class='gone'>Upgrades " +
                     "<div class='button' onclick='buyGenerator("+i+")'>Upgrade Generator (+1%)</div> Iron Cost: <div class='preciseNum' id='lakeefficiencycost_"+i+"'></div> Current: <div class='preciseNum' id='lakeefficiency_"+i+"'></div>" +
-                    "<div class='button' onclick='buyIntake("+i+")'>Upgrade Intake (+"+lakes[i].intakeRate()+")</div> Steel Cost: <div class='preciseNum' id='lakeintakeRatecost_"+i+"'></div> Current: <div class='preciseNum' id='lakeintakeRate_"+i+"'></div>" +
-                    "<br>";
+                    "<div id='lakesteel_"+i+"' class='hidden'><div class='button' onclick='buyIntake("+i+")'>Upgrade Intake (+"+lakes[i].intakeRate()+")</div> Steel Cost: <div class='preciseNum' id='lakeintakeRatecost_"+i+"'></div> Current: <div class='preciseNum' id='lakeintakeRate_"+i+"'></div></div>" +
+                    "</div><br>";
 
                 divText += "Cloud "+i+
                     " water: <div id='cloudwater_"+i+"' class='preciseNum'></div>" +
@@ -222,13 +243,14 @@ let view = {
             for(let i = 0; i < cbotRows.length; i++) {
                 document.getElementById("lakeContainer" + cbotRows[i].lake).innerHTML += view.helpers.cbotRow(cbotRows[i]);
             }
+
         },
         donationMessage: function() {
             let divText = "";
             for(let i = 0; i < donationsShowing.length; i++) {
                 divText += "<div class='donationContainer' onclick='removeDonation("+i+")'>" +
                     "<div class='donationReward'>Got <b>"+donationsShowing[i].reward+"</b> from " + donationsShowing[i].user + "</div><br>" +
-                    "<div class='donationMessage'>"+donationsShowing[i].message+"</div>" +
+                    "<div class='donationMessage'>"+donationsShowing[i].message+"</div><br>" +
                     "<div class='donationReason'>(Reason: "+donationsShowing[i].reason+")</div>" +
                     "</div><br>";
             }

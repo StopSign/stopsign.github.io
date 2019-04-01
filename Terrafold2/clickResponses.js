@@ -20,3 +20,27 @@ function removeDonation(i) {
     donationsShowing.splice(i, 1);
     view.create.donationMessage();
 }
+
+function clickBuildDam(i) {
+    let lake = lakes[i];
+    let canBuy = true;
+
+    for(let property in lake.buildCost) {
+        if(lake.buildCost.hasOwnProperty(property)) {
+            if(res[property] < lake.buildCost[property]) {
+                canBuy = false;
+            }
+        }
+    }
+
+    console.log(lake.buildCost, canBuy);
+    if(canBuy) {
+        for(let property in lake.buildCost) {
+            if(lake.buildCost.hasOwnProperty(property)) {
+                res[property] -= lake.buildCost[property];
+            }
+        }
+        lake.built = true;
+    }
+
+}

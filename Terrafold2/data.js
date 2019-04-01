@@ -1,28 +1,40 @@
 function loadData() {
 
-    window.riverData.create(5, "lake_0");
+    window.riverData.create(4, "lake_0");
     window.lakeData.create({
         minimum:10,
         capacity: 1000,
         intakeInitial:.1,
         efficiencyInitial:.01,
-        target: "river_1"
+        target: "river_1",
+        built: true
     });
-    window.riverData.create(6, "lake_1");
+    window.riverData.create(5, "lake_1");
     window.lakeData.create({
         minimum: 200,
         capacity: 10000,
         intakeInitial:.05,
         efficiencyInitial:.01,
-        target: "river_2"
+        target: "river_2",
+        built: true
     });
-    window.riverData.create(7, "lake_2");
+    window.riverData.create(6, "lake_2");
+    window.lakeData.create({
+        minimum: 2000,
+        capacity: 50000,
+        intakeInitial:.025,
+        efficiencyInitial:.01,
+        target: "river_3",
+        buildCost: { iron: 50, dirt: 1000 }
+    });
+    window.riverData.create(7, "lake_3");
     window.lakeData.create({
         minimum: 2e12,
         capacity: 3e12,
-        intakeInitial:.025,
+        intakeInitial:.02,
         efficiencyInitial:.01,
-        target: ""
+        target: "",
+        buildCost: { steel: 500, dirt: 50000 }
     });
 
     window.cbotData.create({
@@ -63,6 +75,7 @@ function loadData() {
             return unique.volcDur === 0;
         },
         finish: function() {
+            totalVolc++;
             res.dirt++;
             unique.depth += 100;
         },
