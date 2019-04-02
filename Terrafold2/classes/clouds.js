@@ -5,7 +5,7 @@ window.cloudData = {
             rain: 0,
             rainTimer: 2000 + (1200 * clouds.length),
             rainDuration: 400,
-            windTimer: 9000 - 1200 * clouds.length
+            windTimer: 9600 - 1200 * clouds.length
         };
         clouds.push(cloud);
     },
@@ -33,6 +33,7 @@ window.cloudData = {
                     cloud.rainDuration--;
                     if(cloud.rainDuration === 0) {
                         cloud.rainDuration = 400;
+                        cloud.rain = 0;
                     } else {
                         cloud.rain = cloud.water * .001;
                         cloud.water -= cloud.rain;

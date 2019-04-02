@@ -1,6 +1,6 @@
 function loadData() {
 
-    window.riverData.create(4, "lake_0");
+    window.riverData.create(3, "lake_0");
     window.lakeData.create({
         minimum:10,
         capacity: 1000,
@@ -84,7 +84,7 @@ function loadData() {
         "Depth: <div id='depth' class='preciseNum'></div>" +
         "Volcano at: <div id='depthNeeded' class='preciseNum'></div>" +
         "Pressure: <div id='pressure' class='preciseNum'></div>" +
-        "Volcano Duration: <div id='volcDur' class='preciseNum'></div>" +
+        "Volcano Left: <div id='volcDur' class='preciseNum'></div>" +
         "<div id='volcOutput'></div>"
     });
     window.cbotData.create({

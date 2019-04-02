@@ -43,7 +43,7 @@ window.cbotData = {
     },
     tickUnique: function() {
         //volcano
-        if(unique.volcDur > 0) {
+        if(unique.volcDur === 0) {
             unique.pressure += .000001;
         }
         if(unique.pressure > 1) {

@@ -1,10 +1,76 @@
 Terrafold 2
 
+Livestream
+    Achievement system for money
+    Allows me to slow down the game otherwise, since money comse in
+    Donations
+        1st Ore - 100
+        "Congratulations on your first step in the galaxy. You're gonna do great out there! :) XOXO -aunt carol" -carolS57
+        upgrade lake 0 gen - 200
+        "Stream is interesting, I'll be watching for a while. Here's a starting boost, more to come." -Yield_Sign
+        build c.bot - 200
+        "Name it after me, please" -your_name_here
+        build 5 c.bots - 300
+        "Cool bot design" -RainbowDigimon
+        build 42 c.bots - 420
+        "ayyyy" -xXx420_Sniper
+        lake 0,1 water 420 - 420
+        "ayy" -xXx420_Sniper
+        lake 2 water 420 - 420
+        "ayyy" -xXx420_Sniper
+        1st volcano - 500
+        "Magnificent" -explosionsAreLife
+        upgrade lake 1 gen - 300
+        "Doing good bro, here's an investment of my own." -
+
+
+        usernames:
+        mur_der
+        BelowNothing
+        Chickenlord81
+        WatchCasually
+        Blank___Space
+        herotocats5
+        miDDonx
+        Wh3ntr1
+        handpicked_sunshine
+
+
+
+
+    Subscribers
+
+
+
+Lakes
+    capacity, generator intake, overflow are upgradeable via iron
+    power ratio upgradeable later
+
+Lake 0
+    Purpose: get iron from electricity
+
+    Upgrade generator - 10 iron * #^2 - +1% efficiency
+    Upgrade intake - 10 steel * 1.1^# - +100%
+
+
+Lake 1
+    Purpose: get atmosphere from electricity
+    Drill Hole |
+        1 elec, 10 second, 10m
+        Creates volcano, volcano lasts for 60 seconds (disables drill hole)
+        Pressure starts at 100%
+        Each hole multiplies pressure by .9
+        Pressure builds at .001% per tick - not when volcano is running though
+        volcano reqs 500m / pressure
+        spews .07 H2O, .03 CO2 per tick
+    Upgrade generator - 100 iron * 1.1^# - +1% efficiency
+    Upgrade intake - 1000 iron * 1.1^# - 10%
+
+
 Lake 2
-    Purpose: get oxygen, steel from electricity
-
-
-
+    Purpose: get oxygen from electricity
+Irrigate to redirect water
+Plants take groundwater, carbon dioxide, and produce oxygen, putting water in atmosphere (transpiration)
 
     Farm
     repair farm bot - 100 iron
