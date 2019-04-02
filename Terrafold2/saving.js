@@ -9,6 +9,8 @@ function startGame() {
         };
     }
 
+    // window.localStorage[saveName] = decode("");
+
     load();
 }
 
@@ -77,8 +79,54 @@ function load() {
     loadDefaults();
     let toLoad = {};
     if(window.localStorage[saveName]) { //has a save file
-        // toLoad = JSON.parse(window.localStorage[saveName]);
+        toLoad = JSON.parse(window.localStorage[saveName]);
     }
+
+    if(toLoad.totalTime !== undefined) {totalTime = toLoad.totalTime; }
+    if(toLoad.totalVolc !== undefined) {totalVolc = toLoad.totalVolc; }
+
+    if(toLoad.res !== undefined) { res = toLoad.res; }
+    if(toLoad.localAtmo !== undefined) {localAtmo = toLoad.localAtmo; }
+    if(toLoad.globalAtmo !== undefined) {globalAtmo = toLoad.globalAtmo; }
+    if(toLoad.rivers !== undefined) {
+        for(let i = 0; i < toLoad.rivers.length; i++) {
+            for(let property in toLoad.rivers[i]) {
+                if(toLoad.rivers[i].hasOwnProperty(property)) {
+                    rivers[i][property] = toLoad.rivers[i][property];
+                }
+            }
+        }
+    }
+    if(toLoad.lakes !== undefined) {
+        for(let i = 0; i < toLoad.lakes.length; i++) {
+            for(let property in toLoad.lakes[i]) {
+                if(toLoad.lakes[i].hasOwnProperty(property)) {
+                    lakes[i][property] = toLoad.lakes[i][property];
+                }
+            }
+        }
+    }
+    if(toLoad.clouds !== undefined) {
+        for(let i = 0; i < toLoad.clouds.length; i++) {
+            for(let property in toLoad.clouds[i]) {
+                if(toLoad.clouds[i].hasOwnProperty(property)) {
+                    clouds[i][property] = toLoad.clouds[i][property];
+                }
+            }
+        }
+    }
+    if(toLoad.cbotRows !== undefined) {
+        for(let i = 0; i < toLoad.cbotRows.length; i++) {
+            for(let property in toLoad.cbotRows[i]) {
+                if(toLoad.cbotRows[i].hasOwnProperty(property)) {
+                    cbotRows[i][property] = toLoad.cbotRows[i][property];
+                }
+            }
+        }
+    }
+    if(toLoad.unique !== undefined) { unique = toLoad.unique; }
+    if(toLoad.donationList !== undefined) { donationList = toLoad.donationList; }
+    if(toLoad.donationsShowing !== undefined) { donationsShowing = toLoad.donationsShowing; }
 
     view.initialize();
     recalcInterval(50);
@@ -87,5 +135,35 @@ function load() {
 function save() {
     let toSave = {};
 
+    toSave.totalTime = totalTime;
+    toSave.totalVolc = totalVolc;
+
+    toSave.res = res;
+    toSave.localAtmo = localAtmo;
+    toSave.globalAtmo = globalAtmo;
+    toSave.rivers = rivers;
+    toSave.lakes = lakes;
+    toSave.clouds = clouds;
+    toSave.cbotRows = cbotRows;
+    toSave.unique = unique;
+    toSave.donationList = donationList;
+    toSave.donationsShowing = donationsShowing;
+
     window.localStorage[saveName] = JSON.stringify(toSave);
 }
+
+function exportSave() {
+    save();
+    let encoded = encode(window.localStorage[saveName]);
+    console.log(encoded);
+    // document.getElementById("exportImportSave").value = encoded;
+    // document.getElementById("exportImportSave").select();
+    // document.execCommand('copy');
+    // document.getElementById("exportImportSave").value = "";
+}
+
+// function importSave() {
+//     window.localStorage[saveName] = decode(document.getElementById("exportImportSave").value);
+//
+//     load();
+// }

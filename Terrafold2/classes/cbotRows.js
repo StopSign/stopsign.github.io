@@ -54,6 +54,7 @@ window.cbotData = {
             unique.volcDur += 60 * 20;
             unique.pressure *= .9;
             unique.depth = 0;
+            totalVolc++;
         }
         if(unique.volcDur > 0) {
             let output = cbotData.helpers.getVolcanoOutput();

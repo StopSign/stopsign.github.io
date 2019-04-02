@@ -9,7 +9,7 @@ function loadData() {
         target: "river_1",
         built: true
     });
-    window.riverData.create(5, "lake_1");
+    window.riverData.create(4, "lake_1");
     window.lakeData.create({
         minimum: 200,
         capacity: 10000,
@@ -18,7 +18,7 @@ function loadData() {
         target: "river_2",
         built: true
     });
-    window.riverData.create(6, "lake_2");
+    window.riverData.create(5, "lake_2");
     window.lakeData.create({
         minimum: 2000,
         capacity: 50000,
@@ -27,7 +27,7 @@ function loadData() {
         target: "river_3",
         buildCost: { iron: 50, dirt: 1000 }
     });
-    window.riverData.create(7, "lake_3");
+    window.riverData.create(6, "lake_3");
     window.lakeData.create({
         minimum: 2e12,
         capacity: 3e12,
@@ -75,7 +75,6 @@ function loadData() {
             return unique.volcDur === 0;
         },
         finish: function() {
-            totalVolc++;
             res.dirt++;
             unique.depth += 100;
         },

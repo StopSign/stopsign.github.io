@@ -17,15 +17,15 @@ window.lakeData = {
         lakeData.efficiency = function() {
             return lakeData.efficiencyInitial * (1 + lakeData.upgrade.generator);
         };
-        lakeData.upgrade.generatorCost = function() {
-            return 10 * (5 ** lakeData.id) * (2 ** lakeData.upgrade.generator);
+        lakeData.generatorCost = function() {
+            return 2 * (5 ** lakeData.id) * (2 ** lakeData.upgrade.generator);
         };
 
         lakeData.intakeRate = function() {
             return lakeData.intakeInitial * (1 + lakeData.upgrade.intake);
         };
-        lakeData.upgrade.intakeCost = function() {
-            return 10 * (5 ** lakeData.id) * (2 ** lakeData.upgrade.intake);
+        lakeData.intakeCost = function() {
+            return 2 * (5 ** lakeData.id) * (2 ** lakeData.upgrade.intake);
         };
 
         lakes.push(lakeData);
@@ -61,7 +61,7 @@ window.lakeData = {
 
 function buyGenerator(id) {
     let lake = lakes[id];
-    let cost = lake.upgrade.generatorCost();
+    let cost = lake.generatorCost();
     if(res.iron >= cost) {
         res.iron -= cost;
         lake.upgrade.generator++;
@@ -70,7 +70,7 @@ function buyGenerator(id) {
 
 function buyIntake(id) {
     let lake = lakes[id];
-    let cost = lake.upgrade.intakeCost();
+    let cost = lake.intakeCost();
     if(res.steel >= cost) {
         res.steel -= cost;
         lake.upgrade.intake++;

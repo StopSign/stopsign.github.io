@@ -108,11 +108,11 @@ let view = {
                 }
                 if(!prevState.lakes || prevState.lakes[i].upgrade.generator !== lakes[i].upgrade.generator) {
                     document.getElementById("lakeefficiency_"+i).innerHTML = intToString(lakes[i].efficiency() * 100, 1) + "%";
-                    document.getElementById("lakeefficiencycost_"+i).innerHTML = intToString(lakes[i].upgrade.generatorCost(), 1);
+                    document.getElementById("lakeefficiencycost_"+i).innerHTML = intToString(lakes[i].generatorCost(), 1);
                 }
                 if(!prevState.lakes || prevState.lakes[i].upgrade.intake !== lakes[i].upgrade.intake) {
                     document.getElementById("lakeintakeRate_"+i).innerHTML = intToString(lakes[i].intakeRate(), 5);
-                    document.getElementById("lakeintakeRatecost_"+i).innerHTML = intToString(lakes[i].upgrade.intakeCost(), 1);
+                    document.getElementById("lakeintakeRatecost_"+i).innerHTML = intToString(lakes[i].intakeCost(), 1);
                 }
                 if(!prevState.lakes || prevState.lakes[i].built !== lakes[i].built) {
                     if(lakes[i].built) {
