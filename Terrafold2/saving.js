@@ -17,9 +17,10 @@ let saveName = "terrafold2";
 
 let stop = false;
 let totalTime;
-let cash, ice, totalWater;
+let totalWater, buyAmount, totalVolc;
 
-let rivers, lakes;
+let res, unique, localAtmo, globalAtmo;
+let rivers, lakes, clouds, cbotRows, donationList, donationsShowing;
 
 let prevState = {};
 
@@ -30,16 +31,46 @@ function clearSave() { //Doesn't work atm
 
 function loadDefaults() {
     totalTime = 0;
-    cash = 1000;
-    ice = 0;
+    res = {
+        cash:0,
+        ice:0,
+        cbots:1,
+        cbotsMax:1,
+        fbots:0,
+        fbotsMax:0,
+        ore:0,
+        iron:0,
+        dirt:0,
+        steel:0,
+        land:0,
+        usedLand:0,
+        baseLand:0,
+        soil:0
+    };
+    unique = {
+        depth:0,
+        depthNeeded:500,
+        pressure:1,
+        volcDur: 0,
+        volcMult: 1
+    };
+    localAtmo = {
+        co2:0,
+        o2:0
+    };
+    globalAtmo = copyArray(localAtmo);
     totalWater = 0;
+    totalVolc = 0;
+    buyAmount = 1;
 
     rivers = [];
     lakes = [];
+    clouds = [];
+    cbotRows = [];
+    donationList = []; //boolean vars for unlocking donations
+    donationsShowing = [];
 
-
-    window.riverData.create(5, "lake_0");
-    window.lakeData.create(1000);
+    loadData();
 }
 
 function load() {

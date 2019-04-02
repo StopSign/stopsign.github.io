@@ -1,16 +1,18 @@
 window.iceData = {
     buyIce:function() {
-        let amount = document.getElementById("iceBuyAmount").value - 0;
-        if(amount >= 0 && cash >= amount) {
-            ice += amount;
-            console.log(ice);
-            cash -= amount;
-            totalWater += amount;
+        let amount = Number(document.getElementById("iceBuyAmount").value);
+        if(amount <= 0) {
+            return;
         }
+        if(amount >= res.cash) {
+            amount = res.cash;
+        }
+        res.ice += amount;
+        res.cash -= amount;
     },
     tick: function() {
-        let transfer = ice / 10000;
-        ice -= transfer;
-        getTarget("river_0").water += transfer;
+        let transfer = res.ice / 10000;
+        res.ice -= transfer;
+        addWaterTo("river_0", transfer);
     }
 };

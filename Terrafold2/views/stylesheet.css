@@ -38,6 +38,14 @@ body {
     pointer-events:none;
 }
 
+.gone {
+    display:none !important;
+}
+
+.block {
+    display:block;
+}
+
 .showthatH:hover .showthisH {
     display:block;
 }
@@ -78,13 +86,13 @@ body {
 }
 
 .large {
-    font-size:16px;
-}
-.medium {
     font-size:14px;
 }
-.small {
+.medium {
     font-size:12px;
+}
+.small {
+    font-size:10px;
 }
 .bold {
     font-weight:bold;
@@ -179,4 +187,54 @@ input {
     cursor:pointer;
     padding:3px;
     border:2px solid rgba(190, 190, 190, 0);
+}
+
+.preciseNum {
+    width:60px;
+    font-weight:bold;
+}
+.inputNum {
+    width:50px;
+    font-size:12px;
+    margin-right:10px;
+    height:10px;
+}
+
+.progressOuter {
+    width:80px;
+    height:11px;
+    background-color:rgba(50, 50, 50, .8);
+    position:relative;
+}
+.progressInner {
+    height:100%;
+    position:absolute;
+    background-color: #a86fc4;
+}
+
+.donationContainer {
+    padding:5px;
+    background-color:white;
+    opacity:.8;
+    width:100%;
+    border-radius:15px;
+    cursor:pointer;
+    margin-bottom:10px;
+}
+
+.donationContainer:hover {
+    background-color:#ff8080;
+}
+
+.donationReward {
+    font-size:14px;
+}
+
+.donationMessage {
+    font-size:12px;
+}
+
+.donationReason {
+    font-size:10px;
+    opacity: .8;
 }

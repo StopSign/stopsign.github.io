@@ -14,12 +14,31 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
 </head>
-<body id="theBody" oncontextmenu="return false;">
+<body id="theBody" oncontextmenu="return false;" style="padding:5px" class="medium">
+    <div style="position:fixed;top:0;left:0;background-color: #cfd3e6;height:20px;z-index:9999">
+        <label for="buyAmount">Add Amount: </label><input id="buyAmount" class="inputNum" type="number" value="1" onchange="changeBuyAmount()" onclick='this.select();'>
+        Total Water: <div id="totalWater" class="preciseNum"></div>
+        Cash: <div id="cash" class="preciseNum"></div>
+        Construction Bots: <div class='preciseNum'><div id="cbots"></div> / <div id="cbotsMax"></div></div>
+        <div id="ironContainer" class="hidden">Iron: <div id="iron" class="preciseNum"></div>
+        Dirt: <div id="dirt" class="preciseNum"></div></div>
+        <div id="steelContainer" class="hidden">Steel: <div id="steel" class="preciseNum"></div></div>
+        <div id="landContainer" class="hidden">Land: <div class='preciseNum' id="land"></div></div>
+    </div>
+    <br>
+    <div id="atmoContainer" class="gone"></div><br>
+    Ice: <div id="ice" class="preciseNum"></div> <div class="button" onclick="clicked('iceData.buyIce')">Buy Ice</div> <input id="iceBuyAmount" value="1000" class='inputNum' type='number' onclick='this.select();'><br><br>
 
-    Cash: <div id="cash"></div><br>
-    Ice: <div id="ice"></div><div class="button" onclick="clicked('iceData.buyIce')">Buy Ice</div><input id="iceBuyAmount"><br>
-    <div id="riverContainer0"></div><br>
-    <div id="lakeContainer0"></div><br>
+    <div id="riverContainer0"></div><br><br>
+    <div id="lakeContainer0"></div><br><br>
+    <div id="riverContainer1"></div><br><br>
+    <div id="lakeContainer1"></div><br><br>
+    <div id="riverContainer2"></div><br><br>
+    <div id="lakeContainer2"></div><br><br>
+    <div id="riverContainer3" class="gone"></div><br><br>
+    <div id="lakeContainer3" class="gone"></div><br><br>
+
+    <div style='position:fixed;right:20px;bottom:10px;width:300px;' id="donationsContainer"></div>
 
 
 
@@ -36,7 +55,11 @@
     <script src="classes/target.js?1"></script>
     <script src="classes/ice.js?1"></script>
     <script src="classes/lakes.js?1"></script>
+    <script src="classes/clouds.js?1"></script>
+    <script src="classes/cbotRows.js?1"></script>
     <script src="clickResponses.js?1"></script>
+    <script src="data.js?1"></script>
+    <script src="donations.js?1"></script>
     <script>
         // (function (i, s, o, g, r, a, m) {
         //     i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function () {

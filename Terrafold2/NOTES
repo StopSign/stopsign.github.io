@@ -1,68 +1,57 @@
 Terrafold 2
 
-Evaporation
-    % of total water in lakes gets sent to atmosphere
-    Wind sweeps atmosphere every 5 minutes, collecting 90% moisture
-    clouds rain harder the larger they are, adding water to the feature they're hovering over
-
-
-Lakes
-    minimum - amount of water before generator intake starts
-    capacity - amount of water they can hold
-    generator intake - rate of water leaving the lake, up to capacity
-    power ratio - rate of electricity per intake
-    overflow - rate of water beyond capacity leaving the lake
-
-    capacity, generator intake, overflow are upgradeable via iron
-    power ratio upgradeable later
-
-Lake 0
-    Purpose: get iron from electricity
-    minimum: 10
-    capacity: 1000
-    intake: .01/tick
-    power: 1 per 100 water through intake
-    overflow: 1%
-
-    Build c.bots with iron
-        Mine ore
-            c.Bot intensive, low electricity
-        Process ore
-            Low c.bot, high electricity
-        Build c.bots
-            cost iron, click
-
-
-
-
-Lake 1
-    Purpose: get atmosphere from electricity
-Minimum:200
-Capacity:10000
-Intake:  .01
-Power: 1 per 100
-Overflow:1%
-Use electricity for drills
-Induce volcanoes
-    Heat *slightly* lowers
-    Pressure builds based on heat
-    (eventually need to reheat)
-Use electricity for heat, make volcanoes
-Volcanoes release NH3, H20, CO2.
-NH3 slowly burns into N2, which stays
-H20 goes to clouds
-CO2 stays
-
-
-
-
 Lake 2
-    Purpose: get oxygen from electricity
-Irrigate to redirect water
-Plants take groundwater, carbon dioxide, and produce oxygen, putting water in atmosphere (transpiration)
+    Purpose: get oxygen, steel from electricity
 
+
+
+
+    Farm
+    repair farm bot - 100 iron
+    Place dirt - cbots
+    Spread dirt -> land - fbots (optimize)
+    plant seeds (fbots)
+        puts seeds around land
+    water plants (fbots)
+        adds constant amount to groundwater
+        plants absorb at a linear rate
+        groundwater goes back into lake
+        plants have a lifespan and effectiveness
+        effectivness drops if no water
+        plants take CO2 from localAtmo, send O2 + H2O into atmo/clouds (transpiration)
+
+    Steel Plant
+    Smelt Steel
+        Uses O2 + iron, gives steel
+    Weld Farm Bot
+        Uses 10 cbots + steel + O2, gives f.bot
 
 Lake 3
-    Purpose: get science from electricity
+    Purpose: get money from electricity
+    aerate water - uses co2, elec
 
+Lake 4
+    Purpose: get population, scrip from electricity
 
+Lake 5
+    Purpose: get happiness from electricity
+
+Lake 6
+    Purpose: science
+
+Lake 7
+    Purpose: industry
+
+Lake 8
+    Purpose: military
+
+FIN
+
+need:
+use endless c.bots w/o elec
+OR limit c.bots
+
+possible science upgrades:
+    volcano lasts longer
+    river transfers faster
+    stronger wind
