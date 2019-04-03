@@ -1,6 +1,8 @@
 window.cbotData = {
     create: function(cbotRow) {
-        cbotRow.auto = false;
+        if(!cbotRow.auto) {
+            cbotRow.auto = false;
+        }
         cbotRow.cbotCount = 0;
         cbotRow.numLeft = 0;
         cbotRow.pCurrent = 0;
@@ -65,7 +67,7 @@ window.cbotData = {
     },
     helpers: {
         getVolcanoOutput() {
-            return { water:.14 * unique.volcMult, co2:.06 * unique.volcMult}
+            return { water:.07 * unique.volcMult, co2:.03 * unique.volcMult}
         }
     }
 };

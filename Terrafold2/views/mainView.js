@@ -61,6 +61,9 @@ let view = {
             if(!prevState.res || prevState.res.land !== res.land) {
                 document.getElementById("land").innerHTML = intToString(res.land, 1);
             }
+            if(!prevState.res || prevState.res.stations !== res.stations) {
+                document.getElementById("stations").innerHTML = intToString(res.stations*50, 1);
+            }
         },
         atmo: function() {
             for(let property in localAtmo) {
@@ -127,8 +130,8 @@ let view = {
         },
         clouds: function() {
             for(let i = 0; i < clouds.length; i++) {
-                if(!prevState.clouds || intToString(prevState.clouds[i].water, 4) !== intToString(clouds[i].water, 4)) {
-                    document.getElementById("cloudwater_"+i).innerHTML = intToString(clouds[i].water, 4);
+                if(!prevState.clouds || intToString(prevState.clouds[i].water, 2) !== intToString(clouds[i].water, 2)) {
+                    document.getElementById("cloudwater_"+i).innerHTML = intToString(clouds[i].water, 2);
                 }
                 if(i === 0 && (!prevState.clouds || intToString(prevState.clouds[i].rain, 4) !== intToString(clouds[i].rain, 4))) {
                     document.getElementById("cloudrain_"+i).innerHTML = intToString(clouds[i].rain, 4);
@@ -142,7 +145,6 @@ let view = {
                 if(i !== 0 && (!prevState.clouds || intToString(prevState.clouds[i].windTimer/20, 1) !== intToString(clouds[i].windTimer/20, 1))) {
                     document.getElementById("cloudwindTimer_"+i).innerHTML = intToString(clouds[i].windTimer/20, 1)+"s";
                 }
-
             }
         },
         cbotRows: function() {
@@ -156,6 +158,9 @@ let view = {
                 }
                 if(!prevState.cbotRows || prevState.cbotRows[i].cbotCount !== cbotRows[i].cbotCount) {
                     document.getElementById("cbotCount"+cbotRows[i].id).innerHTML = cbotRows[i].cbotCount;
+                }
+                if(!prevState.cbotRows || prevState.cbotRows[i].auto !== cbotRows[i].auto) {
+                    document.getElementById("auto"+i).checked = cbotRows[i].auto;
                 }
                 if(!prevState.cbotRows || prevState.cbotRows[i].unlocked !== cbotRows[i].unlocked) {
                     if(!lakes[cbotRows[i].lake].built) {
@@ -171,6 +176,16 @@ let view = {
                             removeClassFromDiv(document.getElementById("cbotContainer" + i), "gone");
                         }
                     }
+                }
+                if(!prevState.cbotRows || JSON.stringify(prevState.cbotRows[i].cost) === JSON.stringify(cbotRows[i].cost)) {
+                    let costString = "Costs ";
+                    for(let property in cbotRows[i].cost) {
+                        if(cbotRows[i].cost.hasOwnProperty(property)) {
+                            costString += cbotRows[i].cost[property] + " " + capitalizeFirst(property) + ", ";
+                        }
+                    }
+                    costString = costString.substring(0, costString.length - 2) + ". ";
+                    document.getElementById("cbotCost"+i).innerHTML = costString;
                 }
             }
         },
@@ -259,7 +274,20 @@ let view = {
         },
         cbotRows: function() {
             for(let i = 0; i < cbotRows.length; i++) {
-                document.getElementById("lakeContainer" + cbotRows[i].lake).innerHTML += view.helpers.cbotRow(cbotRows[i]);
+                let divText = "";
+                let cbotRow = cbotRows[i];
+
+                divText += (cbotRow.unlockButton ? cbotRow.unlockButton : "") +
+                    "<div id='cbotContainer"+cbotRow.id+"' style='display:block'><div class='bold' style='width:90px'>" + cbotRow.name + "</div>" +
+                    " C.Bots <div id='cbotCount"+cbotRow.id+"' class='bold'></div> <div class='fa fa-plus clickable' onclick='addCbots("+cbotRow.id+")'></div> <div class='fa fa-minus clickable' onclick='subtractCbots("+cbotRow.id+")'></div>" +
+                    " Num Left <div id='numLeft"+cbotRow.id+"' class='bold'></div> <div class='fa fa-plus clickable' onclick='addNumLeft("+cbotRow.id+")'></div> <div class='fa fa-minus clickable' onclick='subtractNumLeft("+cbotRow.id+")'></div>" +
+                    " <div class='progressOuter'><div class='progressInner' id='progress"+cbotRow.id+"'></div><div id='pSecs"+cbotRow.id+"' style='color:white;' class='abs bold small'></div></div>" +
+                    " <label for='auto"+cbotRow.id+"'>Auto</label><input type='checkbox' id='auto"+cbotRow.id+"' onchange='changeAuto("+cbotRow.id+")'>" +
+                    "<div id='cbotCost"+cbotRow.id+"'></div>" +
+                    cbotRow.uniqueDiv +
+                    "</div>";
+
+                document.getElementById("lakeContainer" + cbotRows[i].lake).innerHTML += divText;
             }
 
         },
@@ -273,18 +301,6 @@ let view = {
                     "</div><br>";
             }
             document.getElementById("donationsContainer").innerHTML = divText;
-        }
-    },
-    helpers: {
-        cbotRow: function(cbotRow) {
-            return (cbotRow.unlockButton ? cbotRow.unlockButton : "") +
-                "<div id='cbotContainer"+cbotRow.id+"' style='display:block'><div class='bold' style='width:90px'>" + cbotRow.name + "</div>" +
-                " C.Bots <div id='cbotCount"+cbotRow.id+"' class='bold'></div> <div class='fa fa-plus clickable' onclick='addCbots("+cbotRow.id+")'></div> <div class='fa fa-minus clickable' onclick='subtractCbots("+cbotRow.id+")'></div>" +
-                " Num Left <div id='numLeft"+cbotRow.id+"' class='bold'></div> <div class='fa fa-plus clickable' onclick='addNumLeft("+cbotRow.id+")'></div> <div class='fa fa-minus clickable' onclick='subtractNumLeft("+cbotRow.id+")'></div>" +
-                " <div class='progressOuter'><div class='progressInner' id='progress"+cbotRow.id+"'></div><div id='pSecs"+cbotRow.id+"' style='color:white;' class='abs bold small'></div></div>" +
-                " <label for='auto"+cbotRow.id+"'>Auto</label><input type='checkbox' id='auto"+cbotRow.id+"' onchange='changeAuto("+cbotRow.id+")'>" +
-                cbotRow.uniqueDiv +
-                "</div>";
         }
     }
 };

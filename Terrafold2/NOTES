@@ -1,47 +1,10 @@
 Terrafold 2
 
-Cost in cbotRows visuals
 max, 0 button
 steel upgrades to make mine ore more elec > process ore > c.bot
 1 buttons for add amount
 max, half button for c.bots
 
-Livestream
-    Achievement system for money
-    Allows me to slow down the game otherwise, since money comse in
-    Donations
-
-
-
-
-
-    Subscribers
-
-
-
-Lakes
-    capacity, generator intake, overflow are upgradeable via iron
-    power ratio upgradeable later
-
-Lake 0
-    Purpose: get iron from electricity
-
-    Upgrade generator - 10 iron * #^2 - +1% efficiency
-    Upgrade intake - 10 steel * 1.1^# - +100%
-
-
-Lake 1
-    Purpose: get atmosphere from electricity
-    Drill Hole |
-        1 elec, 10 second, 10m
-        Creates volcano, volcano lasts for 60 seconds (disables drill hole)
-        Pressure starts at 100%
-        Each hole multiplies pressure by .9
-        Pressure builds at .001% per tick - not when volcano is running though
-        volcano reqs 500m / pressure
-        spews .07 H2O, .03 CO2 per tick
-    Upgrade generator - 100 iron * 1.1^# - +1% efficiency
-    Upgrade intake - 1000 iron * 1.1^# - 10%
 
 
 Lake 2
@@ -52,6 +15,9 @@ Plants take groundwater, carbon dioxide, and produce oxygen, putting water in at
     Farm
     repair farm bot - 100 iron
     Place dirt - cbots
+        Show baseLand, (max land),
+        land as resource above
+
     Spread dirt -> land - fbots (optimize)
     plant seeds (fbots)
         puts seeds around land

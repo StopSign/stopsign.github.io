@@ -18,14 +18,14 @@ window.lakeData = {
             return lakeData.efficiencyInitial * (1 + lakeData.upgrade.generator);
         };
         lakeData.generatorCost = function() {
-            return 2 * (5 ** lakeData.id) * (2 ** lakeData.upgrade.generator);
+            return 2 * (5 ** lakeData.id) * (3 ** lakeData.upgrade.generator);
         };
 
         lakeData.intakeRate = function() {
             return lakeData.intakeInitial * (1 + lakeData.upgrade.intake);
         };
         lakeData.intakeCost = function() {
-            return 2 * (5 ** lakeData.id) * (2 ** lakeData.upgrade.intake);
+            return 2 * (5 ** lakeData.id) * (3 ** lakeData.upgrade.intake);
         };
 
         lakes.push(lakeData);
@@ -34,7 +34,7 @@ window.lakeData = {
     tick: function() {
         for(let i = 0; i < lakes.length; i++) {
             let lake = lakes[i];
-            if(lake.water > (lake.minimum + lake.intakeRate())) {
+            if(lake.built && lake.water > (lake.minimum + lake.intakeRate())) {
                 lake.intake = lake.intakeRate(); //for graphics
                 if(addWaterTo(lake.target, lake.intakeRate())) {
                     lake.water -= lake.intakeRate();

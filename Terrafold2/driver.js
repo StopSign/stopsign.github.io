@@ -1,6 +1,6 @@
 'use strict';
 
-let gameSpeed = 4;
+let gameSpeed = 10;
 let bonusSpeed = 1;
 
 let curTime = new Date();

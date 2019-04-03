@@ -25,7 +25,7 @@ function loadData() {
         intakeInitial:.025,
         efficiencyInitial:.01,
         target: "river_3",
-        buildCost: { iron: 15, dirt: 100 }
+        buildCost: { iron: 50, dirt: 200 }
     });
     window.riverData.create(6, "lake_3");
     window.lakeData.create({
@@ -61,6 +61,9 @@ function loadData() {
         name:"Build C.Bot",
         pNeeded: 40 * 20,
         cost: { electricity: 3, iron: 1 },
+        enabled: function() {
+           return res.cbotsMax < res.stations * 50;
+        },
         finish: function() {
             res.cbots++;
             res.cbotsMax++;
@@ -68,9 +71,21 @@ function loadData() {
         lake: 0
     });
     window.cbotData.create({
+        name:"Build Charging Station",
+        pNeeded: 100 * 60 * 20,
+        cost: { electricity: 500, dirt: 100},
+        finish: function() {
+            res.stations++;
+        },
+        lake: 0,
+        uniqueDiv: "Current C.Bot max: <div id='stations'></div>"
+    });
+
+    window.cbotData.create({
         name:"Drill Hole",
         pNeeded: 20 * 60 * 20,
-        cost: { electricity: 1 },
+        auto:true,
+        cost: { electricity: 2 },
         enabled: function() {
             return unique.volcDur === 0;
         },

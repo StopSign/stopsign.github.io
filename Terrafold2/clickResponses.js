@@ -34,8 +34,7 @@ function clickRepairFarmBot(costObj) {
         takeCost(costObj);
         res.fbots = 1;
         res.fbotsMax = 1;
-        cbotRows[4].unlocked = true;
-        //cbotRows[5].unlocked = true;
+        cbotRows[5].unlocked = true;
     }
 }
 
