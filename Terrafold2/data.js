@@ -11,7 +11,7 @@ function loadData() {
     });
     window.riverData.create(4, "lake_1");
     window.lakeData.create({
-        minimum: 200,
+        minimum: 800,
         capacity: 10000,
         intakeInitial:.05,
         efficiencyInitial:.01,
@@ -25,7 +25,7 @@ function loadData() {
         intakeInitial:.025,
         efficiencyInitial:.01,
         target: "river_3",
-        buildCost: { iron: 50, dirt: 1000 }
+        buildCost: { iron: 15, dirt: 100 }
     });
     window.riverData.create(6, "lake_3");
     window.lakeData.create({
@@ -90,16 +90,13 @@ function loadData() {
         name:"Place Dirt",
         pNeeded: 5 * 60 * 20,
         cost: { electricity: 1, dirt:10 },
-        enabled: function() {
-            return unique.volcDur === 0;
-        },
         finish: function() {
             res.baseLand++;
             res.land++;
         },
         lake: 2,
         unlocked:false,
-        unlockButton:"<div id='unlockButton4' class='button gone' onclick='clickRepairFarmBot({ iron: 50 })'>Repair Farm Bot for 50 iron</div>",
+        unlockButton:"<div id='unlockButton4' class='button gone' onclick='clickRepairFarmBot({ iron: 5 })'>Repair Farm Bot for 5 iron</div>",
         uniqueDiv:"asdf"
     });
 }

@@ -65,7 +65,7 @@ window.cbotData = {
     },
     helpers: {
         getVolcanoOutput() {
-            return { water:.07 * unique.volcMult, co2:.03 * unique.volcMult}
+            return { water:.14 * unique.volcMult, co2:.06 * unique.volcMult}
         }
     }
 };

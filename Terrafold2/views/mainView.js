@@ -77,8 +77,8 @@ let view = {
         rivers: function() {
             for(let i = 0; i < rivers.length; i++) {
                 for(let j = 0; j < rivers[i].chunks.length; j++) {
-                    if(!prevState.rivers || intToString(prevState.rivers[i].chunks[j].water, 4) !== intToString(rivers[i].chunks[j].water, 4)) {
-                        document.getElementById(i + "_riverwater_" + j).innerHTML = intToString(rivers[i].chunks[j].water, 4);
+                    if(!prevState.rivers || intToString(prevState.rivers[i].chunks[j].water, 2) !== intToString(rivers[i].chunks[j].water, 2)) {
+                        document.getElementById(i + "_riverwater_" + j).innerHTML = intToString(rivers[i].chunks[j].water, 2);
                     }
                 }
             }
