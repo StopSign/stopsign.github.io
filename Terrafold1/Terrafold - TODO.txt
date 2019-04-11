@@ -3,6 +3,8 @@
 the space station gives me way less ice/dirt then it actually says it does
 
 1/10/100/custom options for threads and robots
+hover-over total water of different types
+
 
 
 Computer
@@ -139,5 +141,11 @@ So with a LOT of land (333k total land), which is 97% optimized with 10k dirt in
 The question is, how long before I can get 100m ice in the space station.
 And, how in the heck can the ice market supply such crazy levels of ice? Are they depositing comets on my doorstep? ... I'm currently at 1897 per tick, so that's a comet every 2 minutes.
 Yea, end-game requires way too much water.
+
+
+game.hangars[0] should give you a report on your ship hangars
+game.hangars[0].sendRate=0 should stop sending the ships and killing your food
+
+
 
 
