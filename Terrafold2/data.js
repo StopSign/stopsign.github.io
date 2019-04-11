@@ -13,7 +13,7 @@ function loadData() {
     window.lakeData.create({
         minimum: 800,
         capacity: 10000,
-        intakeInitial:.05,
+        intakeInitial:.2,
         efficiencyInitial:.01,
         target: "river_2",
         built: true
@@ -22,7 +22,7 @@ function loadData() {
     window.lakeData.create({
         minimum: 2000,
         capacity: 50000,
-        intakeInitial:.025,
+        intakeInitial:.4,
         efficiencyInitial:.01,
         target: "river_3",
         buildCost: { iron: 50, dirt: 200 }
@@ -31,7 +31,7 @@ function loadData() {
     window.lakeData.create({
         minimum: 2e12,
         capacity: 3e12,
-        intakeInitial:.02,
+        intakeInitial:.8,
         efficiencyInitial:.01,
         target: "",
         buildCost: { steel: 500, dirt: 50000 }
@@ -45,7 +45,7 @@ function loadData() {
             res.ore++;
         },
         lake: 0,
-        uniqueDiv: " Ore: <div id='ore'></div>"
+        uniqueDiv: " Ore: <div id='ore' class='bold'></div>"
     });
     window.cbotData.create({
         name:"Process Ore",
@@ -71,14 +71,15 @@ function loadData() {
         lake: 0
     });
     window.cbotData.create({
-        name:"Build Charging Station",
+        name:"Charging Station",
         pNeeded: 100 * 60 * 20,
         cost: { electricity: 500, dirt: 100},
         finish: function() {
             res.stations++;
         },
         lake: 0,
-        uniqueDiv: "Current C.Bot max: <div id='stations'></div>"
+        uniqueDiv: "Current C.Bot max: <div id='stations'></div>",
+        hidden:true
     });
 
     window.cbotData.create({
@@ -111,7 +112,72 @@ function loadData() {
         },
         lake: 2,
         unlocked:false,
-        unlockButton:"<div id='unlockButton4' class='button gone' onclick='clickRepairFarmBot({ iron: 5 })'>Repair Farm Bot for 5 iron</div>",
+        unlockButton:"<div id='unlockButton5' class='button gone' onclick='clickRepairFarmBot({ iron: 5 })'>Repair Farm Bot for 5 iron</div>",
+        uniqueDiv:"asdf"
+    });
+    window.cbotData.create({
+        name:"Spread dirt",
+        type:"f",
+        pNeeded: 5 * 60 * 20,
+        cost: { electricity: 1, dirt:10 },
+        finish: function() {
+            res.baseLand++;
+            res.land++;
+        },
+        lake: 2,
+        unlocked:false,
+        uniqueDiv:"asdf"
+    });
+    window.cbotData.create({
+        name:"Plant Seeds",
+        type:"f",
+        pNeeded: 5 * 60 * 20,
+        cost: { electricity: 1, dirt:10 },
+        finish: function() {
+            res.baseLand++;
+            res.land++;
+        },
+        lake: 2,
+        unlocked:false,
+        uniqueDiv:"asdf"
+    });
+    window.cbotData.create({
+        name:"Water Plants",
+        type:"f",
+        pNeeded: 5 * 60 * 20,
+        cost: { electricity: 1, dirt:10 },
+        finish: function() {
+            res.baseLand++;
+            res.land++;
+        },
+        lake: 2,
+        unlocked:false,
+        uniqueDiv:"asdf"
+    });
+    window.cbotData.create({
+        name:"Smelt Steel",
+        type:"c",
+        pNeeded: 5 * 60 * 20,
+        cost: { electricity: 1, dirt:10 },
+        finish: function() {
+            res.baseLand++;
+            res.land++;
+        },
+        lake: 2,
+        unlocked:false,
+        uniqueDiv:"asdf"
+    });
+    window.cbotData.create({
+        name:"Weld Farm Bot",
+        type:"c",
+        pNeeded: 5 * 60 * 20,
+        cost: { electricity: 1, dirt:10 },
+        finish: function() {
+            res.baseLand++;
+            res.land++;
+        },
+        lake: 2,
+        unlocked:false,
         uniqueDiv:"asdf"
     });
 }

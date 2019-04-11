@@ -3,6 +3,9 @@ window.cbotData = {
         if(!cbotRow.auto) {
             cbotRow.auto = false;
         }
+        if(!cbotRow.type) {
+            cbotRow.type = "c";
+        }
         cbotRow.cbotCount = 0;
         cbotRow.numLeft = 0;
         cbotRow.pCurrent = 0;
@@ -13,6 +16,9 @@ window.cbotData = {
         }
         if(!cbotRow.enabled) {
             cbotRow.enabled = function() { return true; }
+        }
+        if(!cbotRow.hidden) {
+            cbotRow.hidden = false;
         }
 
         cbotRows.push(cbotRow);

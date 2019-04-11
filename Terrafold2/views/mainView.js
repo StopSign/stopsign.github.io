@@ -46,6 +46,12 @@ let view = {
             if(!prevState.res || prevState.res.cbotsMax !== res.cbotsMax) {
                 document.getElementById("cbotsMax").innerHTML = res.cbotsMax;
             }
+            if(!prevState.res || prevState.res.fbots !== res.fbots) {
+                document.getElementById("fbots").innerHTML = res.fbots;
+            }
+            if(!prevState.res || prevState.res.fbotsMax !== res.fbotsMax) {
+                document.getElementById("fbotsMax").innerHTML = res.fbotsMax;
+            }
             if(!prevState.res || prevState.res.ore !== res.ore) {
                 document.getElementById("ore").innerHTML = intToString(res.ore, 1);
             }
@@ -163,7 +169,9 @@ let view = {
                     document.getElementById("auto"+i).checked = cbotRows[i].auto;
                 }
                 if(!prevState.cbotRows || prevState.cbotRows[i].unlocked !== cbotRows[i].unlocked) {
-                    if(!lakes[cbotRows[i].lake].built) {
+                    if(cbotRows[i].hidden) {
+                        addClassToDiv(document.getElementById("cbotContainer" + i), "gone");
+                    } else if(!lakes[cbotRows[i].lake].built) {
                         addClassToDiv(document.getElementById("cbotContainer" + i), "gone");
                     } else {
                         if(cbotRows[i].unlocked === false) { //hidden
@@ -178,10 +186,10 @@ let view = {
                     }
                 }
                 if(!prevState.cbotRows || JSON.stringify(prevState.cbotRows[i].cost) === JSON.stringify(cbotRows[i].cost)) {
-                    let costString = "Costs ";
+                    let costString = " Costs ";
                     for(let property in cbotRows[i].cost) {
                         if(cbotRows[i].cost.hasOwnProperty(property)) {
-                            costString += cbotRows[i].cost[property] + " " + capitalizeFirst(property) + ", ";
+                            costString += "<b>" + cbotRows[i].cost[property] + "</b> " + capitalizeFirst(property) + ", ";
                         }
                     }
                     costString = costString.substring(0, costString.length - 2) + ". ";
@@ -278,8 +286,8 @@ let view = {
                 let cbotRow = cbotRows[i];
 
                 divText += (cbotRow.unlockButton ? cbotRow.unlockButton : "") +
-                    "<div id='cbotContainer"+cbotRow.id+"' style='display:block'><div class='bold' style='width:90px'>" + cbotRow.name + "</div>" +
-                    " C.Bots <div id='cbotCount"+cbotRow.id+"' class='bold'></div> <div class='fa fa-plus clickable' onclick='addCbots("+cbotRow.id+")'></div> <div class='fa fa-minus clickable' onclick='subtractCbots("+cbotRow.id+")'></div>" +
+                    "<div id='cbotContainer"+cbotRow.id+"' style='display:block' class='"+(cbotRow.hidden ? "gone" : "")+"'><div class='bold' style='width:110px'>" + cbotRow.name + "</div>" +
+                    " "+cbotRow.type.toUpperCase()+".Bots <div id='cbotCount"+cbotRow.id+"' class='bold'></div> <div class='fa fa-plus clickable' onclick='addCbots("+cbotRow.id+")'></div> <div class='fa fa-minus clickable' onclick='subtractCbots("+cbotRow.id+")'></div>" +
                     " Num Left <div id='numLeft"+cbotRow.id+"' class='bold'></div> <div class='fa fa-plus clickable' onclick='addNumLeft("+cbotRow.id+")'></div> <div class='fa fa-minus clickable' onclick='subtractNumLeft("+cbotRow.id+")'></div>" +
                     " <div class='progressOuter'><div class='progressInner' id='progress"+cbotRow.id+"'></div><div id='pSecs"+cbotRow.id+"' style='color:white;' class='abs bold small'></div></div>" +
                     " <label for='auto"+cbotRow.id+"'>Auto</label><input type='checkbox' id='auto"+cbotRow.id+"' onchange='changeAuto("+cbotRow.id+")'>" +
