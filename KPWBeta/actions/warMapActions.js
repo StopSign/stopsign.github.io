@@ -111,8 +111,10 @@ let warMap = {
             goblin: { atk:1, hp:5, exp:2 },
             hobgoblin: { atk:2, hp:30, exp:4 },
             troll: { atk:15, hp:60, exp:6 },
-            drake: { atk: 20, hp: 250, exp: 12 },
-            dragon: { atk: 50, hp: 800, exp: 30 }
+            drakeling: { atk: 20, hp: 250, exp: 15 },
+            drake: { atk: 30, hp: 550, exp: 20 },
+            wyvern: { atk: 40, hp: 300, exp: 20 },
+            dragon: { atk: 50, hp: 800, exp: 40 }
         },
         getStatsOfUnit: function(varName, empowered) {
             if(varName === "king") {

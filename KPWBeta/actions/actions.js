@@ -10,7 +10,7 @@ let actions = {
                 action.loops++;
                 action.loopsLeft++;
                 action.manaUsed = 0;
-                if(actionsList.next[name][this.validActions[i]].varName === "sleep") {
+                if(actionsList.next[name][this.validActions[i]] && actionsList.next[name][this.validActions[i]].varName === "sleep") {
                     actionsList.next[name][this.validActions[i]].loops = action.loops;
                 }
             }
@@ -108,8 +108,8 @@ let actions = {
             for(let i = 0; i < actionsList.nextNames.length; i++) {
                 let name = actionsList.nextNames[i];
                 let action = actionsList.current[name][this.validActions[i]];
-                let listIsDone = action.varName !== "sleep" && action.loopsLeft === 0 && !actionsList.current[name][this.validActions[i]+1];
-                let currentlySleeping = action.varName === "sleep" && !actionsList.current[name][this.validActions[i]+1];
+                let listIsDone = !action || (action.varName !== "sleep" && action.loopsLeft === 0 && !actionsList.current[name][this.validActions[i]+1]);
+                let currentlySleeping = action && action.varName === "sleep" && !actionsList.current[name][this.validActions[i]+1];
                 listsEmpty = listsEmpty && (listIsDone || currentlySleeping);
                 allSleep = allSleep && currentlySleeping;
             }

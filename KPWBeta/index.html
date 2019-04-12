@@ -100,7 +100,7 @@
                         <li>CAP - Reflex Cap: The highest value you can Train towards. This permanently increases by 2 when the King gains a level.</li>
                         <li>RFLX - Reflex: The king has atk equal to RFLX and hp equal to 10 * RFLX, before other bonuses. RFLX resets to its default value every loop.</li>
                         <li>GAIN - Reflex Gain: The amount you will gain with the next Train action.</li>
-                        <li>INT - Intelligence: Improved by the growth action Study. Improves the Direct Workers Aura. Every 1 INT also increases the amount of bonuses you keep in Blessings (starting at 4). Every 2 INT also increaes the amount of bonuses you keep in Chat (starting at 2).</li>
+                        <li>INT - Intelligence: Improved by the growth action Study. Improves the Direct Workers Aura. Every 1 INT also increases the amount of bonuses you keep in Blessings (starting at 6). Every 2 INT also increaes the amount of bonuses you keep in Chat (starting at 3).</li>
                         <li>WIS - Wisdom: Improves the rate of the growth action Study. Find unique rewards to increase it.</li>
                         <li>CHA - Charisma: Improved by the growth action Chat. Improves the Oversee Market and Commune with Forest Auras. Improves Chat. See the Growth info for more details about Chat.</li>
                     </ul>
@@ -211,39 +211,39 @@
         </div>
 
         
-        <div style="margin-top:4px;width:1115px">
-            <div id="goldContainer" class="showthat hidden" style="width:100px;">
+        <div style="margin-top:4px;width:1300px">
+            <div id="goldContainer" class="showthat hidden" style="width:105px;">
                 <img src='img/gold.svg' class='largeIcon imageDragFix' style="vertical-align:bottom">
-                <div id="gold"></div>
-                (+<div id="goldPerTick" class="bold"></div>)
+                <div id="gold" class="bold small"></div>
+                (+<div id="goldPerTick" class="bold small"></div>)
                 <div class="showthis">
                     Non-rounded Gold: <div id="actualGold" class="bold"></div><br>
                     Per second: <div id="goldPerSecond" class="bold"></div>
                 </div>
-            </div><div id="woodContainer" class="showthat hidden" style="width:100px">
+            </div><div id="woodContainer" class="showthat hidden" style="width:105px">
                 <img src='img/wood.svg' class='largeIcon imageDragFix' style="vertical-align:bottom">
-                <div id="wood"></div>
-                (+<div id="woodPerTick" class="bold"></div>)
+                <div id="wood" class="bold small"></div>
+                (+<div id="woodPerTick" class="bold small"></div>)
                 <div class="showthis">
                     Non-rounded Wood: <div id="actualWood" class="bold"></div><br>
                     Per second: <div id="woodPerSecond" class="bold"></div>
                 </div>
             </div><div id="favorContainer" class="showthat hidden" style="width:100px">
                 <img src='img/favor.svg' class='largeIcon imageDragFix' style="vertical-align:bottom">
-                <div id="favor"></div>
+                <div id="favor" class="bold small"></div>
                 <div class="showthis">
                     Favor
                 </div>
             </div><div id="soulCContainer" class="showthat hidden" style="width:100px">
                 <img src='img/soulC.svg' class='largeIcon imageDragFix' style="vertical-align:bottom">
-                <div id="soulC">0</div>
+                <div id="soulC" class="bold small">0</div>
                 <div class="showthis">
                     Non-rounded Soul Crystals: <div id="actualSoulC" class="bold"></div><br>
                     When you restart a map, you receive 1 Soul Crystal for every 10000 gold remaining.
                 </div>
             </div><div class="showthat" style="width:65px">
                 <img src='img/mana.svg' class='largeIcon imageDragFix' style="vertical-align:bottom">
-                <div id="mana"></div>
+                <div id="mana" class="bold small"></div>
                 <div id='manaTooltip' class="showthis"></div>
             </div>
             <div id='pausePlay' onclick='togglePause()' class='button' style="width:40px;">Play</div>
@@ -293,7 +293,7 @@
             <div id="unitsListContainer" class="listContainer"><div id="unitsCurActions" class="actionListLeft unitsColorD"></div><div id="unitsNextActions" class="actionListRight unitsColorH" ondragover="handleDragOver(event)" ondrop="handleDragDrop(event, 2)"></div><div id="actionInfoDivUnits" class="actionListRight unitsColorH" style="display:none;"></div></div>
         </div>
     </div>
-
+    <br>
     <div style="width:1300px">
         <div style="background-color:#c4c9e6;height:219px;">
             <div id="castleActionContainer" class="mainActionList castleColorH" style="position:relative;width:332px;">

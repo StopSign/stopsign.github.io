@@ -126,7 +126,7 @@ function load() {
     if(toLoad.waitForResources !== undefined) { document.getElementById("waitForResources").checked = toLoad.waitForResources }
     if(toLoad.keepBuild !== undefined) { document.getElementById("keepBuild").checked = toLoad.keepBuild }
 
-    versionFix();
+    versionFix(toLoad);
 
     recalcInterval(50);
     pauseReason = "Load";
@@ -167,14 +167,17 @@ function save() {
     toSave.waitForResources = document.getElementById("waitForResources").checked;
     toSave.keepBuild = document.getElementById("keepBuild").checked;
 
+    toSave.version = "1";
+
 
     window.localStorage[saveName] = JSON.stringify(toSave);
 }
 
-function versionFix() {
-    if(!unlockList[11] && king.savedData.wis > 0) { //originally started with 1 WIS, changed to 0 WIS initial (u dumb)
-        king.savedData.wis = 0;
+function versionFix(toLoad) {
+    if(toLoad.version === undefined) {
+        levelSave[5].uniqueCleared = false;
     }
+
 }
 
 function exportMapList() {

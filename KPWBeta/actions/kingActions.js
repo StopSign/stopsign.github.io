@@ -92,6 +92,6 @@ let king = {
         }
     },
     recalcListLength: function() {
-        highestListsLength = Math.floor(king.savedData.int) + 4;
+        highestListsLength = Math.floor(king.savedData.int) + 6;
     }
 };

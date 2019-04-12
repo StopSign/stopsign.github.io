@@ -16,7 +16,7 @@ window.donations = {
         window.donations.check(8, res.cbotsMax > 1, 40, "First C.Bot Built", "your_name_here", "Name if after me, pease.");
         window.donations.check(9, res.cbotsMax > 2, 10, "Second C.Bot Built", "your_name_here", "Please*");
         window.donations.check(47, res.cbotsMax > 24, 100, "25 C.Bots", getRandomUsername(), "By the way streamer, if you have more than 50 bots without storage they'll all crash! Have fun :)", ["cbotContainer3"]);
-        window.donations.check(10, res.cbotsMax > 41, 420, "42 C.Bots", "xXx420_N0sc0p3", "ayy");
+        window.donations.check(10, res.cbotsMax > 41, 420, "42 C.Bots", "xXx420_N0sc0p3", "ayyy");
 
         window.donations.check(12, lakes[1].upgrade.generator > 0, 300, "First Upgrade Lake 1", "Yield_Sign", "I'm impressed by your progress, "+username+". You may be destined for greatness.");
         window.donations.check(13, clouds[0].water >= 100, 30, "Cloud 0 Water is 100", getRandomUsername(), "That cloud looks like a bunny.");
@@ -32,13 +32,13 @@ window.donations = {
         window.donations.check(45, clouds[0].water >= 9001, 130, "Cloud 0 Water is 9001", getRandomUsername(), getRandomComment());
         window.donations.check(46, clouds[0].water >= 10000, 140, "Cloud 0 Water is 10000", getRandomUsername(), getRandomComment());
 
-        window.donations.check(14, res.dirt >= 10, 200, "10 Dirt", dirtName, "What are you gonna do with all that dirt?");
-        window.donations.check(15, res.dirt >= 12, 50, "12 Dirt", dirtName, "Maybe build a mountain.");
-        window.donations.check(16, res.dirt >= 15, 50, "15 Dirt", dirtName, "Maybe build another mountain.");
+        window.donations.check(14, res.dirt >= 10, 100, "10 Dirt", dirtName, "What are you gonna do with all that dirt?");
+        window.donations.check(15, res.dirt >= 12, 30, "12 Dirt", dirtName, "Maybe build a mountain.");
+        window.donations.check(16, res.dirt >= 15, 40, "15 Dirt", dirtName, "Maybe build another mountain.");
         window.donations.check(17, res.dirt >= 20, 50, "20 Dirt", dirtName, "Is that what you're doing?");
         window.donations.check(18, res.dirt >= 21, 200, "21 Dirt", dirtName, "Hey, answer me!");
-        window.donations.check(19, res.dirt >= 30, 50, "30 Dirt", dirtName, "Guess this streamer doesn't read chat");
-        window.donations.check(20, res.dirt >= 42, 210, "42 Dirt", "xXx420_N0sc0p3", "ayy");
+        window.donations.check(19, res.dirt >= 30, 30, "30 Dirt", dirtName, "Guess this streamer doesn't read chat");
+        window.donations.check(20, res.dirt >= 42, 42, "42 Dirt", "xXx420_N0sc0p3", "ayy");
         window.donations.check(21, res.cbotsMax >= 10, 200, "9 C.Bots Built", getRandomUsername(), "So many bots, all at once! 150 IQ!");
 
         window.donations.check(22, lakes[2].built, 200, "Lake 2 Dam Built", "CreeperBehinBOOM", "Just like the simulations. LET IT FLOW", ["riverContainer3", "lakeContainer3", "unlockButton5", "fbotContainer"]);
@@ -59,7 +59,7 @@ window.donations = {
         window.donations.check(11, totalVolc >= 10, 300, "10 Volcanoes", "EXPLOSIONSareLIFE", "magnificent.", ["atmoContainer"]);
 
         window.donations.check(34, lakes[0].water > lakes[0].capacity, 50, "Lake 0 overflow", getRandomUsername(), "Sir we can't hold on to all this water! It's overflowing!");
-        window.donations.check(35, res.cash >= 1000, 100, "1000 Cash", getRandomUsername(), "Is "+username+" even using the money we give him?");
+        window.donations.check(35, res.cash >= 1500, 50, "1500 Cash", getRandomUsername(), "Is "+username+" even using the money we give him?");
 
         loadDonations = false;
     },

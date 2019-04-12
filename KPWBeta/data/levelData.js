@@ -299,9 +299,9 @@ levelInitials = [
         name: chooseNextName(),
         initial: {
             people: 0,
-            gold: 2000,
+            gold: 2100,
             wood: 0,
-            mana: 1200
+            mana: 1400
         },
         home: {
             coords: { x: 50, y: 50},
@@ -309,7 +309,7 @@ levelInitials = [
         },
         dungeons:[
             {
-                units: { hobgoblin: 5, troll:3 },
+                units: { hobgoblin: 4, troll:2 },
                 reward: [
                     {
                         type:"mana",
@@ -320,8 +320,8 @@ levelInitials = [
         ],
         hideouts:[
             {
-                units: { thug:15, brigand:10 },
-                creates: { units: { brigand:2 }, initialTime: 1800, period: 600 },
+                units: { thug:10, brigand:8 },
+                creates: { units: { brigand:2 }, initialTime: 1800, period: 800 },
                 reward: [{
                     type:"exp",
                     amount:600,
@@ -335,9 +335,9 @@ levelInitials = [
         name: chooseNextName(),
         initial: {
             people: 5,
-            gold: 2000,
+            gold: 2100,
             wood: 0,
-            mana: 1200
+            mana: 1400
         },
         home: {
             coords: { x: 50, y: 50},
@@ -345,7 +345,7 @@ levelInitials = [
         },
         dungeons:[
             {
-                units: { hobgoblin: 7, troll:5 },
+                units: { hobgoblin: 6, troll:4 },
                 reward: [
                     {
                         type:"mana",
@@ -354,7 +354,7 @@ levelInitials = [
                 coords:{x:70, y:30}
             },
             {
-                units: { drake: 4, dragon: 1 },
+                units: { drakeling:1, drake: 1, dragon: 1 },
                 reward: [
                     {
                         type:"wisdom",
@@ -366,8 +366,8 @@ levelInitials = [
         ],
         hideouts:[
             {
-                units: { thug:20, brigand:15 },
-                creates: { units: { brigand:3 }, initialTime: 1800, period: 600 },
+                units: { thug:15, brigand:16 },
+                creates: { units: { brigand:3 }, initialTime: 1800, period: 800 },
                 reward: [{
                     type:"exp",
                     amount:800,
@@ -381,9 +381,9 @@ levelInitials = [
         name: chooseNextName(),
         initial: {
             people: 7,
-            gold: 2000,
+            gold: 2100,
             wood: 0,
-            mana: 1200
+            mana: 1400
         },
         home: {
             coords: { x: 50, y: 50},
@@ -391,7 +391,7 @@ levelInitials = [
         },
         dungeons:[
             {
-                units: { hobgoblin: 10, troll:8 },
+                units: { hobgoblin: 8, troll:6 },
                 reward: [
                     {
                         type:"mana",
@@ -402,14 +402,189 @@ levelInitials = [
         ],
         hideouts:[
             {
-                units: { brigand:15, bandit:10 },
-                creates: { units: { bandit:2 }, initialTime: 1800, period: 600 },
+                units: { thug:25, brigand:20 },
+                creates: { units: { brigand:5 }, initialTime: 1800, period: 800 },
                 reward: [{
                     type:"exp",
                     amount:1000,
                     unique:true
                 }],
                 coords:{x:80, y:80}
+            }
+        ]
+    },
+    { //7
+        name: chooseNextName(),
+        initial: {
+            people: 8,
+            gold: 100,
+            wood: 2000,
+            mana: 2000
+        },
+        home: {
+            coords: { x: 80, y: 40},
+            units: { king: 1 }
+        },
+        dungeons:[
+            {
+                units: { drakeling:6, wyvern:2 },
+                creates: { units: { drakeling:1 }, initialTime: 1800, period:800 },
+                reward: [
+                    {
+                        type:"mana",
+                        amount:1500
+                    },
+                    {
+                        type:"gold",
+                        amount:6000
+                    },
+                    {
+                        type:"wisdom",
+                        amount:1,
+                        unique:true
+                    }],
+                coords:{x:70, y:80}
+            }
+        ],
+        hideouts:[
+            {
+                units: { brigand:20, bandit:15 },
+                reward: [
+                    {
+                        type:"mana",
+                        amount:2000
+                    },
+                    {
+                        type:"gold",
+                        amount:2000
+                    }
+                ],
+                coords:{x:50, y:20}
+            },
+            {
+                units: { thief:12, rogue:11, assassin:2 },
+                creates: { units: { assassin:1 }, initialTime: 1400, period: 1000 },
+                reward: [{
+                    type:"exp",
+                    amount:1200,
+                    unique:true
+                }],
+                coords:{x:20, y:30}
+            }
+        ]
+    },
+    { //8
+        name: chooseNextName(),
+        initial: {
+            people: 10,
+            gold: 100,
+            wood: 2000,
+            mana: 2000
+        },
+        home: {
+            coords: { x: 80, y: 40},
+            units: { king: 1 }
+        },
+        dungeons:[
+            {
+                units: { drakeling:8, wyvern:3 },
+                creates: { units: { drakeling:2 }, initialTime: 1800, period:800 },
+                reward: [
+                    {
+                        type:"mana",
+                        amount:1500
+                    },
+                    {
+                        type:"gold",
+                        amount:6000
+                    }],
+                coords:{x:70, y:80}
+            }
+        ],
+        hideouts:[
+            {
+                units: { brigand:25, bandit:20 },
+                reward: [
+                    {
+                        type:"mana",
+                        amount:2000
+                    },
+                    {
+                        type:"gold",
+                        amount:2000
+                    }
+                ],
+                coords:{x:50, y:20}
+            },
+            {
+                units: { thief:12, rogue:11, assassin:8 },
+                creates: { units: { assassin:1 }, initialTime: 1400, period: 1000 },
+                reward: [{
+                    type:"exp",
+                    amount:1400,
+                    unique:true
+                }],
+                coords:{x:20, y:30}
+            }
+        ]
+    },
+    { //9
+        name: chooseNextName(),
+        initial: {
+            people: 12,
+            gold: 100,
+            wood: 2000,
+            mana: 2000
+        },
+        home: {
+            coords: { x: 80, y: 40},
+            units: { king: 1 }
+        },
+        dungeons:[
+            {
+                units: { drakeling:12, wyvern:5, drake:3 },
+                creates: { units: { drakeling:2 }, initialTime: 1800, period:800 },
+                reward: [
+                    {
+                        type:"mana",
+                        amount:1500
+                    },
+                    {
+                        type:"gold",
+                        amount:6000
+                    },
+                    {
+                        type:"wisdom",
+                        amount:1,
+                        unique:true
+                    }],
+                coords:{x:70, y:80}
+            }
+        ],
+        hideouts:[
+            {
+                units: { brigand:30, bandit:25 },
+                reward: [
+                    {
+                        type:"mana",
+                        amount:2000
+                    },
+                    {
+                        type:"gold",
+                        amount:2000
+                    }
+                ],
+                coords:{x:50, y:20}
+            },
+            {
+                units: { thief:12, rogue:11, assassin:15 },
+                creates: { units: { assassin:2 }, initialTime: 1400, period: 1000 },
+                reward: [{
+                    type:"exp",
+                    amount:1600,
+                    unique:true
+                }],
+                coords:{x:20, y:30}
             }
         ]
     }
