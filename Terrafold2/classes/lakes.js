@@ -11,6 +11,7 @@ window.lakeData = {
             generator: 0,
             intake: 0
         };
+        lakeData.intakeList = [];
 
         lakeData.built = !lakeData.buildCost;
 
@@ -18,14 +19,14 @@ window.lakeData = {
             return lakeData.efficiencyInitial * (1 + lakeData.upgrade.generator);
         };
         lakeData.generatorCost = function() {
-            return 2 * (5 ** lakeData.id) * (3 ** lakeData.upgrade.generator);
+            return 2 * (10 ** lakeData.id) * (3 ** lakeData.upgrade.generator);
         };
 
         lakeData.intakeRate = function() {
             return lakeData.intakeInitial * (1 + lakeData.upgrade.intake);
         };
         lakeData.intakeCost = function() {
-            return 2 * (5 ** lakeData.id) * (3 ** lakeData.upgrade.intake);
+            return 2 * (10 ** lakeData.id) * (3 ** lakeData.upgrade.intake);
         };
 
         lakes.push(lakeData);

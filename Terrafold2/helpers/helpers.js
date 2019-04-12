@@ -192,6 +192,22 @@ function sortArrayObjectsByValue(arr, valueName) {
     }
 }
 
+function getAvgFromInts(listOfInts) {
+    let average = 0;
+    for(let intake of listOfInts) {
+        average += intake;
+    }
+    average /= listOfInts.length;
+    return average;
+}
+
+function addAndCapList(list, toAdd, maxAmount) {
+    list.push(toAdd);
+    if(list.length > maxAmount) {
+        list.splice(0, 1);
+    }
+}
+
 function addClassToDiv(div, className) {
     const arr = div.className.split(" ");
     if (arr.indexOf(className) === -1) {

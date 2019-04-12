@@ -180,7 +180,7 @@ input {
     background-color: rgba(200, 200, 200, 1);
 }
 .clickable:active {
-    background-color: rgba(180, 180, 180, 1);
+    background-color: rgba(160, 160, 160, 1);
 }
 .clickable {
     background-color: rgba(190, 190, 190, .3);

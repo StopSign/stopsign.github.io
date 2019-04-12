@@ -52,7 +52,7 @@ window.cbotData = {
     tickUnique: function() {
         //volcano
         if(unique.volcDur === 0) {
-            unique.pressure += .000001;
+            unique.pressure += .00000004;
         }
         if(unique.pressure > 1) {
             unique.pressure = 1;
@@ -60,7 +60,7 @@ window.cbotData = {
         let actualDepth = unique.depthNeeded / unique.pressure;
         if(unique.depth >= actualDepth) {
             unique.volcDur += 60 * 20;
-            unique.pressure *= .9;
+            unique.pressure *= .98;
             unique.depth = 0;
             totalVolc++;
         }

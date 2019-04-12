@@ -7,19 +7,30 @@ window.donations = {
         // window.donations.check(0, true, 0, "Loaded game", "Dev", "", ["lakebuilt_0", "lakebuilt_1"]);
         window.donations.check(0, true, 0, "Loaded game", "Dev", "Welcome to Terrafold, an Unfolding game about Terraforming. Click this message to make it disappear.", ["lakebuilt_0", "lakebuilt_1"]);
         window.donations.check(1, true, 1000, "Loaded game", "Dev", "To get started, spend all your cash on buying Ice, then work towards building a Construction Bot");
-        window.donations.check(2, res.ore > 0, 200, "Built 1st C.Bot", "carolS43", "Congratulations on your first step in the galaxy, sweetie!! You're gonna do great out there :) :) XOXO -aunt carol");
+        window.donations.check(2, res.ore > 0, 50, "Built 1st C.Bot", "carolS43", "Congratulations on your first step in the galaxy, sweetie!! You're gonna do great out there :) :) XOXO -aunt carol");
         window.donations.check(3, res.ore > 0, 0, "First Donation", "Dev", "You'll get donations from your viewers for reaching some milestones. Buy more ice, and make a volcano explode!", ["lakeiron_0"]);
-        window.donations.check(4, res.iron > 0, 300, "First Iron", getRandomUsername(), "We iron age now", ["ironContainer", "lakeiron_0", "lakeiron_1", "lakeiron_2", "lakeiron_3", "lakeiron_4"]);
-        window.donations.check(5, unique.depth > 0, 200, "First Dig", "BeardsMakesTheMan", "Dig, dig, dig, dig");
+        window.donations.check(4, res.iron > 0, 100, "First Iron", getRandomUsername(), "We iron age now", ["ironContainer", "lakeiron_0", "lakeiron_1", "lakeiron_2", "lakeiron_3", "lakeiron_4"]);
+        window.donations.check(5, unique.depth > 0, 100, "First Dig", "BeardsMakesTheMan", "Dig, dig, dig, dig");
 
-        window.donations.check(7, lakes[0].upgrade.generator > 0, 200, "First Upgrade Lake 0", "Yield_Sign", "Stream is interesting, I'll be watching for a while. Here's a starting boost, more to come.");
-        window.donations.check(8, res.cbotsMax > 1, 200, "First C.Bot Built", "your_name_here", "Name if after me, pease.");
-        window.donations.check(9, res.cbotsMax > 2, 50, "Second C.Bot Built", "your_name_here", "Please*");
-        window.donations.check(30, res.cbotsMax > 24, 100, "25 C.Bots", getRandomUsername(), "By the way streamer, if you have more than 50 bots without storage they'll all crash! Have fun :)", ["cbotContainer3"]);
+        window.donations.check(7, lakes[0].upgrade.generator > 0, 300, "First Upgrade Lake 0", "Yield_Sign", "Stream is interesting, I'll be watching for a while. Here's a starting boost, more to come.");
+        window.donations.check(8, res.cbotsMax > 1, 40, "First C.Bot Built", "your_name_here", "Name if after me, pease.");
+        window.donations.check(9, res.cbotsMax > 2, 10, "Second C.Bot Built", "your_name_here", "Please*");
+        window.donations.check(47, res.cbotsMax > 24, 100, "25 C.Bots", getRandomUsername(), "By the way streamer, if you have more than 50 bots without storage they'll all crash! Have fun :)", ["cbotContainer3"]);
         window.donations.check(10, res.cbotsMax > 41, 420, "42 C.Bots", "xXx420_N0sc0p3", "ayy");
 
-        window.donations.check(12, lakes[1].upgrade.generator > 0, 300, "First Upgrade Lake 1", "Yield_Sign", "I'm impressed by your progress. You may be destined for greatness.");
-        window.donations.check(13, clouds[0].water > 1000, 200, "Cloud 0 Water is 1000", getRandomUsername(), "That one looks like a bunny.");
+        window.donations.check(12, lakes[1].upgrade.generator > 0, 300, "First Upgrade Lake 1", "Yield_Sign", "I'm impressed by your progress, "+username+". You may be destined for greatness.");
+        window.donations.check(13, clouds[0].water >= 100, 30, "Cloud 0 Water is 100", getRandomUsername(), "That cloud looks like a bunny.");
+        window.donations.check(36, clouds[0].water >= 150, 40, "Cloud 0 Water is 150", getRandomUsername(), "That cloud that looks like somebody that I used to know (somebody).");
+        window.donations.check(37, clouds[0].water >= 200, 50, "Cloud 0 Water is 200", getRandomUsername(), "There's two clouds now. "+username+ " has a good strat here.");
+        window.donations.check(38, clouds[0].water >= 300, 60, "Cloud 0 Water is 300", getRandomUsername(), "Is that cloud formation... loss?");
+        window.donations.check(39, clouds[0].water >= 500, 70, "Cloud 0 Water is 500", getRandomUsername(), "The rain is a bit more than mist now, pretty cool.");
+        window.donations.check(40, clouds[0].water >= 1000, 80, "Cloud 0 Water is 1000", getRandomUsername(), "Lol these clouds are beefing up");
+        window.donations.check(41, clouds[0].water >= 1500, 90, "Cloud 0 Water is 1500", getRandomUsername(), getRandomComment());
+        window.donations.check(42, clouds[0].water >= 2000, 100, "Cloud 0 Water is 2000", getRandomUsername(), getRandomComment());
+        window.donations.check(43, clouds[0].water >= 3000, 110, "Cloud 0 Water is 3000", getRandomUsername(), getRandomComment());
+        window.donations.check(44, clouds[0].water >= 5000, 120, "Cloud 0 Water is 5000", getRandomUsername(), getRandomComment());
+        window.donations.check(45, clouds[0].water >= 9001, 130, "Cloud 0 Water is 9001", getRandomUsername(), getRandomComment());
+        window.donations.check(46, clouds[0].water >= 10000, 140, "Cloud 0 Water is 10000", getRandomUsername(), getRandomComment());
 
         window.donations.check(14, res.dirt >= 10, 200, "10 Dirt", dirtName, "What are you gonna do with all that dirt?");
         window.donations.check(15, res.dirt >= 12, 50, "12 Dirt", dirtName, "Maybe build a mountain.");
@@ -34,7 +45,7 @@ window.donations = {
         window.donations.check(23, res.steel > 0, 100, "First Steel", getRandomUsername(), "We industrial age now boys.", ["steelContainer", "lakesteel_0", "lakesteel_1", "lakesteel_2", "lakesteel_3"]);
         window.donations.check(29, lakes[0].upgrade.generator > 1, 250, "Second Upgrade Lake 0", "Yield_Sign", "Excellent electricity efficiency.");
 
-        window.donations.check(24, res.ore > 2, 300, "3 Ore at once", getRandomUsername(), "Hi, just joined the stream. Is this streamer really efficient?");
+        window.donations.check(24, res.ore > 2, 300, "3 Ore at once", getRandomUsername(), "Hi, just joined the stream. Is this streamer really not that great at being efficient or is that just me?");
 
         window.donations.check(6, totalVolc >= 1, 200, "First Volcano", "EXPLOSIONSareLIFE", "E X P L O S I O N !!!", ["atmoContainer"]);
         window.donations.check(25, totalVolc >= 2, 20, "Second Volcano", getRandomUsername(), getRandomComment());
@@ -48,6 +59,7 @@ window.donations = {
         window.donations.check(11, totalVolc >= 10, 300, "10 Volcanoes", "EXPLOSIONSareLIFE", "magnificent.", ["atmoContainer"]);
 
         window.donations.check(34, lakes[0].water > lakes[0].capacity, 50, "Lake 0 overflow", getRandomUsername(), "You cheated not only the game, but yourself. You didn't grow. You didn't improve. You took a shortcut and gained nothing. You experienced a hollow victory. Nothing was risked and nothing was gained. It's sad that you don't know the difference.");
+        window.donations.check(35, res.cash >= 1000, 100, "1000 Cash", getRandomUsername(), "Is "+username+" even using the money we give him?");
 
         loadDonations = false;
     },
@@ -95,8 +107,8 @@ function getRandomUsername() {
         "Zukatsu",
         "healthyn_t",
         "WinterIsLate",
-
     ];
+    // let listToSelect = ;
 
     return list[Math.floor(Math.random() * list.length)];
 }

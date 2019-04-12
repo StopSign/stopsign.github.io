@@ -20,7 +20,7 @@ function loadData() {
     });
     window.riverData.create(5, "lake_2");
     window.lakeData.create({
-        minimum: 2000,
+        minimum: 4000,
         capacity: 50000,
         intakeInitial:.4,
         efficiencyInitial:.01,
@@ -45,7 +45,7 @@ function loadData() {
             res.ore++;
         },
         lake: 0,
-        uniqueDiv: " Ore: <div id='ore' class='bold'></div>"
+        uniqueDiv: ", Total Ore: <div id='ore' class='bold'></div>"
     });
     window.cbotData.create({
         name:"Process Ore",
@@ -73,15 +73,16 @@ function loadData() {
     window.cbotData.create({
         name:"Charging Station",
         pNeeded: 100 * 60 * 20,
-        cost: { electricity: 500, dirt: 100},
+        cost: { electricity: 500, dirt: 500},
         finish: function() {
             res.stations++;
         },
         lake: 0,
-        uniqueDiv: "Current C.Bot max: <div id='stations'></div>",
+        uniqueDiv: ", Current C.Bot max: <b><div id='stations'></div></b>",
         hidden:true
     });
 
+    //1
     window.cbotData.create({
         name:"Drill Hole",
         pNeeded: 20 * 60 * 20,
@@ -102,6 +103,8 @@ function loadData() {
         "Volcano Left: <div id='volcDur' class='preciseNum'></div>" +
         "<div id='volcOutput'></div>"
     });
+
+    //2
     window.cbotData.create({
         name:"Place Dirt",
         pNeeded: 5 * 60 * 20,
@@ -116,13 +119,12 @@ function loadData() {
         uniqueDiv:"asdf"
     });
     window.cbotData.create({
-        name:"Spread dirt",
+        name:"Spread Dirt",
         type:"f",
         pNeeded: 5 * 60 * 20,
         cost: { electricity: 1, dirt:10 },
         finish: function() {
-            res.baseLand++;
-            res.land++;
+            res.land += (res.baseLand*100 - res.land) * .001
         },
         lake: 2,
         unlocked:false,

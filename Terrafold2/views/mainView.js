@@ -67,6 +67,9 @@ let view = {
             if(!prevState.res || prevState.res.land !== res.land) {
                 document.getElementById("land").innerHTML = intToString(res.land, 1);
             }
+            if(!prevState.res || prevState.res.baseLand !== res.baseLand) {
+                document.getElementById("baseLand").innerHTML = intToString(res.baseLand, 1);
+            }
             if(!prevState.res || prevState.res.stations !== res.stations) {
                 document.getElementById("stations").innerHTML = intToString(res.stations*50, 1);
             }
@@ -94,6 +97,12 @@ let view = {
         },
         lakes: function() {
             for(let i = 0; i < lakes.length; i++) {
+                //efficiency over 5s
+                addAndCapList(lakes[i].intakeList, lakes[i].intake, 100);
+
+                let average = getAvgFromInts(lakes[i].intakeList);
+                document.getElementById("lakeintakeavg_"+i).innerHTML = "<b>" + intToString(average, 4) + "</b> ("+intToString(average / lakes[i].intakeRate() * 100, 1) + ")%";
+
                 if(!prevState.lakes || intToString(prevState.lakes[i].water, 4) !== intToString(lakes[i].water, 4)) {
                     document.getElementById("lakewater_"+i).innerHTML = intToString(lakes[i].water, 4);
                 }
@@ -169,27 +178,28 @@ let view = {
                     document.getElementById("auto"+i).checked = cbotRows[i].auto;
                 }
                 if(!prevState.cbotRows || prevState.cbotRows[i].unlocked !== cbotRows[i].unlocked) {
-                    if(cbotRows[i].hidden) {
+                    if(i === 3 && donationList[47]) {
+                        removeClassFromDiv(document.getElementById("cbotContainer" + i), "gone"); //unlocked
+                    } else if(cbotRows[i].hidden) {
                         addClassToDiv(document.getElementById("cbotContainer" + i), "gone");
                     } else if(!lakes[cbotRows[i].lake].built) {
                         addClassToDiv(document.getElementById("cbotContainer" + i), "gone");
+                    } else if(cbotRows[i].unlocked === false) { //hidden
+                        removeClassFromDiv(document.getElementById("unlockButton" + i), "gone");
+                        addClassToDiv(document.getElementById("cbotContainer" + i), "gone");
                     } else {
-                        if(cbotRows[i].unlocked === false) { //hidden
-                            removeClassFromDiv(document.getElementById("unlockButton" + i), "gone");
-                            addClassToDiv(document.getElementById("cbotContainer" + i), "gone");
-                        } else {
-                            if(document.getElementById("unlockButton" + i)) {
-                                addClassToDiv(document.getElementById("unlockButton" + i), "gone");
-                            }
-                            removeClassFromDiv(document.getElementById("cbotContainer" + i), "gone");
+                        if(document.getElementById("unlockButton" + i)) {
+                            addClassToDiv(document.getElementById("unlockButton" + i), "gone");
                         }
+                        removeClassFromDiv(document.getElementById("cbotContainer" + i), "gone");
                     }
+
                 }
                 if(!prevState.cbotRows || JSON.stringify(prevState.cbotRows[i].cost) === JSON.stringify(cbotRows[i].cost)) {
                     let costString = " Costs ";
                     for(let property in cbotRows[i].cost) {
                         if(cbotRows[i].cost.hasOwnProperty(property)) {
-                            costString += "<b>" + cbotRows[i].cost[property] + "</b> " + capitalizeFirst(property) + ", ";
+                            costString +=  capitalizeFirst(property) + ": " + "<b>" + cbotRows[i].cost[property] + "</b> ";
                         }
                     }
                     costString = costString.substring(0, costString.length - 2) + ". ";
@@ -259,6 +269,7 @@ let view = {
                     "<div id='lakebuilt_"+i+"' class='"+(lakes[i].built ? "" : "gone")+"'> minimum: <div id='lakeminimum_"+i+"' class='preciseNum'></div>" +
                     " capacity: <div id='lakecapacity_"+i+"' class='preciseNum'></div>" +
                     " intake: <div id='lakeintake_"+i+"' class='preciseNum'></div>" +
+                    " intake average: <div id='lakeintakeavg_"+i+"' style='width:90px;'></div>" +
                     " overflow: <div id='lakeoverflow_"+i+"' class='preciseNum'></div>" +
                     " electricity: <div id='lakeelectricity_"+i+"' class='preciseNum'></div></div>" +
                     "<div id='lakeToBuild_"+i+"' class='button "+(!lakes[i].built ? "" : "gone")+"' onclick='clickBuildDam("+i+")'>Build Dam for "+costString+"</div>" +

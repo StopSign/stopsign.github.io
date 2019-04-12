@@ -5,6 +5,14 @@ steel upgrades to make mine ore more elec > process ore > c.bot
 1 buttons for add amount
 max, half button for c.bots
 
+add tooltips to c.bots
+show efficiency for intake
+random donation message types change based on how much sellout points you have in total
+
+info box
+    auto opens when you click the tooltip symbols
+    has "go to previous" list of previous 10 pages
+
 
 
 Lake 2
@@ -15,7 +23,7 @@ Plants take groundwater, carbon dioxide, and produce oxygen, putting water in at
     Farm
     repair farm bot - 100 iron
     Place dirt - cbots
-        Show baseLand, (max land),
+        Show baseLand, (max land), efficiency %
         land as resource above
 
     Spread dirt -> land - fbots (optimize)
@@ -36,10 +44,74 @@ Plants take groundwater, carbon dioxide, and produce oxygen, putting water in at
         Uses 10 cbots + steel + O2, gives f.bot
 
 Lake 3
-    Purpose: get money from electricity
+    Purpose: hold sponsorship (rebirth) features, sponsorship button, unique upgrades that unlock/get better through resetting
+
+
+
+    Sponsorship - new featuers, you get 5x the cash you've built up to now,
+        Milking it timer - You have up to 5 minutes to get more resources before you're forced to reset. You can reset early
+        Gives you sellout points, each to unlock the next sponsorship feature (or upgrade it)
+
+
+        sponsorship types, unlocked if you pass certain thresholds - using one makes it's efficiency % goes down by 75, with a very, very slow regen time, gives sellout points basd on sqrt of what you choose
+            water
+                using estimate of 100k water by then, log2 = 16, sqrt = 316, sqrt(200k) = 447
+            cash
+            ore
+            iron
+            steel
+            c.bots
+
+
+
+
+
+
+
+
+        requires from upgrades - water total goes up by at least 2x each reset. Costs 200 to start, 2x effect upgrades for 3x price each time, takes 2 hr, x4 hr each time, show how much % you get per second
+            upgrade generator efficiency - .01 base % per completion
+            upgrade intake -
+            ugprade donation amount -
+            ice buy ratio -
+            initial construction bot amount -
+            initial water -
+            dirt gather amount -
+            c.bot build efficiency -
+            f.bot build efficiency -
+            QOL - unlocks the next one in line, shows next 2 in line
+                Auto buy ice
+                auto buy lowest cost generator
+                Num Left
+                    previous to this, you could only set On or Off
+                set minimum electricity
+                auto-place new f bots
+                auto buy lowest cost generator
+
+
+                auto-place new c bots
+        for every sellout point, you also get BrandBucks, which can only be spent on improving your brand, so UI. Each one has individual upgrades too. GA on which ones people choose - or strawpoll? both?
+            starting - grid
+
+            document
+            satellite
+            orbital
+            work station - windows you can drag around
+
+
+
+
+
+
+
+
     aerate water - uses co2, elec
 
 Lake 4
+    way harder than lake 3 - let users sit on reincarnate cycle for a bit, let their %s build
+
+
+
     Purpose: get population, scrip from electricity
 
 Lake 5
@@ -62,5 +134,7 @@ OR limit c.bots
 
 possible science upgrades:
     volcano lasts longer
+    reduce how much pressure builds in volcano
+    more co2/water in volcano
     river transfers faster
     stronger wind
