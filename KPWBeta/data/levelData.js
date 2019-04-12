@@ -26,7 +26,7 @@ function createLevel(num) {
     levelData.data = {
         person:0,
         rapport:0,
-        difficulty:(num+1)
+        difficulty:(num-4) < 0 ? 0 : (num-4)
     };
     levelData.blessings = {};
     levelData.empowered = copyArray(empowered);
