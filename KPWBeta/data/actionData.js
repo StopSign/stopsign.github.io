@@ -638,7 +638,7 @@ actionData = {
                         }
                         levelSave[curLevel].knowledge += knowledgeGain;
                         king.savedData.int += knowledgeGain / 1000;
-                        king.helpers.recalcListLength();
+                        king.recalcListLength();
                     },
                     unlocked: function() { return unlockList[11]; },
                     visible: function() { return unlockList[11]; }
