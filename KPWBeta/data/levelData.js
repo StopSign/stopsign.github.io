@@ -134,7 +134,7 @@ levelInitials = [
         },
         dungeons:[
             {
-                units: { troll:1 },
+                units: { kobold:1 },
                 reward: [
                     {
                         type:"gold",
@@ -309,7 +309,7 @@ levelInitials = [
         },
         dungeons:[
             {
-                units: { hobgoblin: 4, troll:2 },
+                units: { hobgoblin: 4, kobold:2 },
                 reward: [
                     {
                         type:"mana",
@@ -345,7 +345,7 @@ levelInitials = [
         },
         dungeons:[
             {
-                units: { hobgoblin: 6, troll:4 },
+                units: { hobgoblin: 6, kobold:4 },
                 reward: [
                     {
                         type:"mana",
@@ -354,7 +354,7 @@ levelInitials = [
                 coords:{x:70, y:30}
             },
             {
-                units: { drakeling:1, drake: 1, dragon: 1 },
+                units: { drakeling:1 },
                 reward: [
                     {
                         type:"wisdom",
@@ -391,7 +391,7 @@ levelInitials = [
         },
         dungeons:[
             {
-                units: { hobgoblin: 8, troll:6 },
+                units: { hobgoblin: 8, kobold:6 },
                 reward: [
                     {
                         type:"mana",
@@ -422,13 +422,12 @@ levelInitials = [
             mana: 2000
         },
         home: {
-            coords: { x: 80, y: 40},
+            coords: { x: 120, y: 40},
             units: { king: 1 }
         },
         dungeons:[
             {
-                units: { drakeling:6, wyvern:2 },
-                creates: { units: { drakeling:1 }, initialTime: 1800, period:800 },
+                units: { slime: 20 },
                 reward: [
                     {
                         type:"mana",
@@ -443,12 +442,13 @@ levelInitials = [
                         amount:1,
                         unique:true
                     }],
-                coords:{x:70, y:80}
+                coords:{x:110, y:80}
             }
         ],
         hideouts:[
             {
-                units: { brigand:20, bandit:15 },
+                units: { brigand:10, bandit:8 },
+                creates: { units: { rogue:1 }, initialTime: 1800, period:800 },
                 reward: [
                     {
                         type:"mana",
@@ -459,7 +459,7 @@ levelInitials = [
                         amount:2000
                     }
                 ],
-                coords:{x:50, y:20}
+                coords:{x:90, y:20}
             },
             {
                 units: { thief:12, rogue:11, assassin:2 },
@@ -469,7 +469,7 @@ levelInitials = [
                     amount:1200,
                     unique:true
                 }],
-                coords:{x:20, y:30}
+                coords:{x:60, y:30}
             }
         ]
     },
@@ -482,13 +482,12 @@ levelInitials = [
             mana: 2000
         },
         home: {
-            coords: { x: 80, y: 40},
+            coords: { x: 120, y: 40},
             units: { king: 1 }
         },
         dungeons:[
             {
-                units: { drakeling:8, wyvern:3 },
-                creates: { units: { drakeling:2 }, initialTime: 1800, period:800 },
+                units: { kobold: 15, gnoll: 10 },
                 reward: [
                     {
                         type:"mana",
@@ -498,12 +497,13 @@ levelInitials = [
                         type:"gold",
                         amount:6000
                     }],
-                coords:{x:70, y:80}
+                coords:{x:110, y:80}
             }
         ],
         hideouts:[
             {
-                units: { brigand:25, bandit:20 },
+                units: { brigand:14, bandit:10 },
+                creates: { units: { rogue:2 }, initialTime: 1800, period:800 },
                 reward: [
                     {
                         type:"mana",
@@ -514,7 +514,7 @@ levelInitials = [
                         amount:2000
                     }
                 ],
-                coords:{x:50, y:20}
+                coords:{x:90, y:20}
             },
             {
                 units: { thief:12, rogue:11, assassin:8 },
@@ -524,7 +524,7 @@ levelInitials = [
                     amount:1400,
                     unique:true
                 }],
-                coords:{x:20, y:30}
+                coords:{x:60, y:30}
             }
         ]
     },
@@ -537,13 +537,12 @@ levelInitials = [
             mana: 2000
         },
         home: {
-            coords: { x: 80, y: 40},
+            coords: { x: 120, y: 40},
             units: { king: 1 }
         },
         dungeons:[
             {
-                units: { drakeling:12, wyvern:5, drake:3 },
-                creates: { units: { drakeling:2 }, initialTime: 1800, period:800 },
+                units: { slime: 60 },
                 reward: [
                     {
                         type:"mana",
@@ -558,12 +557,13 @@ levelInitials = [
                         amount:1,
                         unique:true
                     }],
-                coords:{x:70, y:80}
+                coords:{x:110, y:80}
             }
         ],
         hideouts:[
             {
-                units: { brigand:30, bandit:25 },
+                units: { brigand:16, bandit:12 },
+                creates: { units: { rogue:2 }, initialTime: 1800, period:800 },
                 reward: [
                     {
                         type:"mana",
@@ -574,7 +574,7 @@ levelInitials = [
                         amount:2000
                     }
                 ],
-                coords:{x:50, y:20}
+                coords:{x:90, y:20}
             },
             {
                 units: { thief:12, rogue:11, assassin:15 },
@@ -584,7 +584,7 @@ levelInitials = [
                     amount:1600,
                     unique:true
                 }],
-                coords:{x:20, y:30}
+                coords:{x:60, y:30}
             }
         ]
     }

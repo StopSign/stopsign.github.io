@@ -174,7 +174,7 @@ function save() {
 }
 
 function versionFix(toLoad) {
-    if(toLoad.version === undefined) {
+    if(toLoad.version === undefined && levelSave[5]) {
         levelSave[5].uniqueCleared = false;
     }
 
