@@ -188,9 +188,7 @@ let view = {
                         removeClassFromDiv(document.getElementById("unlockButton" + i), "gone");
                         addClassToDiv(document.getElementById("cbotContainer" + i), "gone");
                     } else {
-                        if(document.getElementById("unlockButton" + i)) {
-                            addClassToDiv(document.getElementById("unlockButton" + i), "gone");
-                        }
+                        addClassToDiv(document.getElementById("unlockButton" + i), "gone");
                         removeClassFromDiv(document.getElementById("cbotContainer" + i), "gone");
                     }
 

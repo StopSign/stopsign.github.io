@@ -209,14 +209,18 @@ function addAndCapList(list, toAdd, maxAmount) {
 }
 
 function addClassToDiv(div, className) {
-    const arr = div.className.split(" ");
-    if (arr.indexOf(className) === -1) {
-        div.className += " " + className;
+    if(div) {
+        const arr = div.className.split(" ");
+        if(arr.indexOf(className) === -1) {
+            div.className += " " + className;
+        }
     }
 }
 
 function removeClassFromDiv(div, className) {
-    div.classList.remove(className);
+    if(div) {
+        div.classList.remove(className);
+    }
 }
 
 let numbers = "zero one two three four five six seven eight nine ten eleven twelve thirteen fourteen fifteen sixteen seventeen eighteen nineteen".split(" ");

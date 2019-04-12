@@ -53,7 +53,8 @@ function loadDefaults() {
         usedLand:0,
         baseLand:0,
         soil:0,
-        stations:1
+        stations:1,
+        sp:0
     };
     unique = {
         depth:0,
@@ -86,7 +87,7 @@ function load() {
     loadDefaults();
     let toLoad = {};
     if(window.localStorage[saveName]) { //has a save file
-        toLoad = JSON.parse(window.localStorage[saveName]);
+        // toLoad = JSON.parse(window.localStorage[saveName]);
     }
 
     if(toLoad.totalTime !== undefined) {totalTime = toLoad.totalTime; }
