@@ -165,8 +165,17 @@ let view = {
             }
             if(curAction.failed) {
                 costsDiv += "<br>Times Failed <div class='bold'>"+curAction.failed+"</div><br>" +
-                    "Failure Reasons "+curAction.failedReason;
+                    "Failure Reasons:<br> "+curAction.failedReason + "<br>";
             }
+            if(curAction.snapshot) {
+                costsDiv += "When completed, you had:<br>";
+                for(let property in curAction.snapshot) {
+                    if(curAction.snapshot.hasOwnProperty(property)) {
+                        costsDiv += "<b>"+curAction.snapshot[property]+"</b> " + capitalizeFirst(property) + "<br>";
+                    }
+                }
+            }
+
             document.getElementById("action"+i+name+"Costs").innerHTML = costsDiv;
         },
         updateCreated: function() {

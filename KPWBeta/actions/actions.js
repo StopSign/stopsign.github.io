@@ -89,6 +89,7 @@ let actions = {
                     }
                 }
                 if(action.buy) {
+                    action.takeSnapshot();
                     action.buy();
                     actions.adjustCosts(i);
                 }
@@ -243,6 +244,10 @@ let actions = {
         action.unlocked = actionDatum.unlocked;
         action.canBuy = actionDatum.canBuy;
         action.spend = actionDatum.spend;
+
+        action.takeSnapshot = function() {
+            this.snapshot = { mana:mana, gold: gold, wood:wood};
+        };
     },
     addToConsole: function(name, action) {
         if(consoleLog.length > 12) {

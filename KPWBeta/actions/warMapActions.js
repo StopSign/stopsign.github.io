@@ -150,6 +150,7 @@ let warMap = {
             unit.amount = amount;
             unit.empowered = empowered ? empowered : 0;
 
+
             warMap.units.applyUnitStats(unit);
 
             if(startingLoc) {
