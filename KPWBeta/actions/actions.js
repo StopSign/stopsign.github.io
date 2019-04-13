@@ -214,7 +214,7 @@ let actions = {
             } else if (cost.type === "linear") {
                 amount += cost.starting + cost.growth * numPrior;
             }
-            action["cost"+cost.resource] = cost.type === "mana" ? amount : numCreatedWith * amount;
+            action["cost"+cost.resource] = cost.resource === "seconds" ? amount : numCreatedWith * amount;
         }
     },
     translateNextToCurrent: function(action, name) {
