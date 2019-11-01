@@ -1,0 +1,202 @@
+You are a colonization simulation
+Stabilize with more and more people
+When you stabilize, your next cap of people is doubled based on your population growth
+You have a number of cryogenic pods to unfreeze, and population growth from there
+
+It's as if you landed on a peaceful planet with alien flora and fauna
+Your ship has basic automata, you have cryogenic pods to unfreeze an adult
+
+You have a queue of actions. You perform the front of the queue.
+One second is 20 ticks
+
+Start with 0/1 people
+Start with 10/10 robots
+To stabilize:
+food, water, resources, shelter, software, max people
+New Simulation
+Requirements
+At least max people
+Shelter for #max people
+People have 100% purpose
+2x food req per person OR don't starve for 10 minutes
+2x water req per person OR don't thirst for 10 minutes
+Restart:
+Reset everything except software
+Double the # of frozen people
+
+ACTION universals
+[ ] Until Empty OR
+[ ] For X times
+[ ] Re-add to Queue when done
+
+People:
+Upkeep every minute
+-1 food per person
+-10 clean water per person
+req house
+Productivity
+0 food, x0.5
+0 clean water, x0.5
+
+
+Food
+Identify Fauna
+Progress bar gets added to the front depending on action
+Using robots:
+ACTION Send Robot to observe animals - 2s
+-1 Robot
++1 Fauna Info per second
+Computer:
+ACTION Process Fauna Info - 10s
+Fauna Info -100
+Useful Fauna Info +1
+Each simulation has 1+ animals in each size, more as the game progresses
+Each animal has 5-10 pieces of info
+Gives bonuses later (maybe)
+Need all pieces of info to hunt
+Always there info
+Meat
+Speed
+Difficulty
+Population (regenerates .01% of current +.0001 per second)
+It's significantly harder to identify the next one of the same size
+Choose which size to look for
+Sizes
+Small - difficulty 1
+Medium - difficulty 2
+Large - difficulty 4
+In general, large are reliable, small have crazier bonuses
+Hunt Fauna
+Only for fauna with all info found
+Using robots:
+ACTION Send Robot to hunt for <fauna type> (available per fauna) - 2s
+-1 Robot
+Kills 1 animal every <difficulty>*10s
+-1 <fauna type> population
++1 <fauna type> corpse
+ACTION Set Robot to Process Fauna - 2s
+-1 Robot
+Processes a fauna every <difficulty>*5s - starts at lowest difficulty
+Efficiency starts at 10%. Meat is decimals, others are whole numbers.
+Potential gains:
+Soft Materials (clothing)
+Dense Materials (building)
+Using people:
+ACTION Cook Meat
+1/X people
+-3 meat/10 sec
++1 food/10 sec
+
+Water
+Getting Water
+Using robots:
+ACTION Send Robot to get water with buckets - 2s
+-1 Robot
++1 water per second
+
+Purifying Water
+Using robots:
+ACTION Set Robot to put water through filters - 2s
+-1 Robot
+-2 water per second
++1 clean water per second
+
+Resources
+Mining
+Using Robots:
+ACTION Set Robot to Dig a Hole - 2s
+-1 Robot
++1 Dirt per second
++1 Depth per second
+
+Processing
+Using Robots:
+ACTION Set Robot to Compact Dirt into Concrete - 2s
+-1 Robot
+-10 Dirt per second
++1 Concrete per second
+
+Civil Planning
+Planning
+Using Computer:
+ACTION Plan for a new building - 10s + 1 per completion
++1 Building Plan
+Building Homes
+Using Robots:
+ACTION Set Robot to Build an Apartment - 2s
+-1 Robots
+-1 Concrete/s
++.01 Apartment/s
+-.01 Building plan/s
+
+
+People
+Growing Population
+INPUT & CLICK Release X people
+
+Software
+Using People:
+[ ] Rotate people's roles if no work found
+Research Improvement
+Upgrade list for options, add to queue
+Move to Integrate Queue
+Integrate Change
+Move to Testing Queue
+Debugging
+Move to Staged Queue
+
+Computer:
+ACTION Reboot - 60s
+All robots stop
+Upgrades in Staged queue activate
+
+
+Upgrades:
+
+
+
+
+Data:
+
+Fauna Names:
+    Small
+    Medium
+    Large
+    Pigzor
+    Cowfee
+    Longtail
+
+
+Fauna Modifiers:
+    Small
+    Body
+    Chitin
+    Feathered
+    Head
+    Limbs
+    Behavior
+    Other
+    Chunky
+    Medium
+    Body
+    Feathered
+    Head
+    Limbs
+    Behavior
+    Tree Swinging
+    Other
+    Chunky
+    Large
+    Body
+    Fur
+    Scales
+    Dense Bones
+    Head
+    No Eyes
+    Too Many Eyes
+    Horns
+    Limbs
+    Behavior
+    Cave Dwelling
+    Other
+    Chunky
