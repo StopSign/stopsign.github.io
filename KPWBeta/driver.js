@@ -65,7 +65,6 @@ function tick() {
             addOffline(-1 * gameTicksLeft * ((bonusSpeed - 1)/bonusSpeed));
         }
         if(!stop && mana === 0) {
-            console.log(reachedOneMana);
             if(reachedOneMana) {
                 restartReason = "0 Mana";
             }

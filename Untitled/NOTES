@@ -1,0 +1,214 @@
+PROCESSES:
+Adding a new Standard Buff
+
+1. New block in SpellData.js, fill in data
+2. Add to the relevant stat in Hero
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+THOUGHTS:
+
+4 Paths open (to start)
+Each path has the same base, but with a different twist
+Each path improves itself greatly, and other paths less so
+Player can choose to focus on one or get multiple at a time
+Focusing is more efficient to improving itself, but not to attacking
+
+
+
+
+
+Theme
+gamingmau: in a world where everyone has magic, you're the only person without it, yet you somehow manage to enter a mages tournament to determine the top mage. seeing as everyone there is a top mage in there field, you learn magic by either befriending or beating the other mages. hows that sound phurple?
+and your unique ability is to not actually lose magic power, and opponents aren't used to actually injuring someone - just taking their magic power - so they stop.
+you'd get 5 chances to leech for free and then the fights on, to test out a hard opponent or something
+obscurans: oooo magic combat is until someone forgets their spells and surrenders?
+
+
+
+Archangel100: you could link prestiging to dimensional magic, where you hopt to a parallel dimension where you died, but are weakened by the process
+
+
+
+You're a wizard, who's decided to practice a lot (for... reasons). You cast spells all the time, and you can set your playstyle.
+You have mana regen to spend
+You have exp and a level
+There's a terminal with flavor output
+Leveling up changes:
+	Exp per spell cast
+	Health
+	Attack
+	max charges
+
+
+
+difficulty modifier changes:
+	Dodge %
+	Attack
+	Health
+	-Armor
+	Hit %  / Accuracy
+	Block %
+
+
+Fight Easy (don't have to regen much, more items, $)
+	Random from the magic you have selected,
+Fight Hard (have to regen more, less items but better ones, less $)
+Talk Easy
+Craft - lategame stuff
+	Better Wood Type (increase base atk)
+	Better Enchant (increase base mana gain)
+
+	standard buff = X by 1 % level, lasts 5 seconds * level, stacks by adding the time
+	standard dmg = standard buff + builds to Y charges
+
+	each level increases time needed by 10
+	each spell unlocks after the previous one has level 100 * level
+	increasing boosts for overcharging it basically
+
+Cast Magic
+	1 Shadow
+		1 Adjust Shadow
+			Increases chance to dodge standard
+			exp:10
+			mana cost:1
+
+		2 Shadow Density
+			reduce mana cost by standard
+			exp:100
+			mana cost: 2
+
+		3 Shadow Absorb
+			standard dmg, level charges
+			dmg:1
+			perma:mana gain standard buff
+			mana cost: 3
+
+		4 Shadow Hold
+			standard dmg, level charges
+			dmg:3
+			perma enemy dodge % down
+			mana cost: 8
+
+		5 Shadow Steal
+
+		6 Shadow Choke
+
+		7 Darkness
+
+		8 Shadow Stitch
+
+		9
+
+	2 Light
+		1 Glinting Smile
+			Increase charisma by standard
+			exp: 1
+
+		2 Golden Aura
+			Increase charisma by standard
+			exp: 3
+
+		3 Debruise
+
+		4 Cure Wounds
+
+		5 Bless
+
+		6 Cure
+
+		7 Purify
+
+		8 Cleanse
+
+	3 Reality
+		1 Predict Movements
+			Increase accuracy by standard
+
+	4 Time
+		1 Learn the Time
+			increases Shadow, Space, Water leveling by standard / 10
+			*Grumbles about it*
+
+		2 Age a Plant
+			Increase Light, Earth, Wood leveling by standard / 10
+
+		3
+
+
+
+	Req level 100
+	Gravity
+		1 Count the Stars
+			Increase gravity leveling by standard/10
+
+		2 Change a Feather's Weight
+
+
+		3 Relieve the Pressure
+
+
+
+	Space
+		1 Reach
+			Increase Space leveling by standard/10
+
+		2 Bring Closer
+			increase accuracy by standard
+
+		3 Shift Forward
+			increases movement by standard
+
+		4 Get Some Space
+			Increases dodge by standard
+
+
+	Soul
+	Mind
+	Ash
+	Lightning
+	Poison
+	Sound
+	Dust
+	Ice
+	Lava
+	Wood
+	Steam
+	Fire
+	Water
+	Earth
+	Air
+	Dimension
+
+	i want your actions to be automated movements around a map/minimap. You choose (Fight [Easy, Hard], Craft [Wood, Metal, Art], Fight: [Cast Ash [x], Cast Gravity [x], Cast Dust [x]]), etc.
+
+	How about something like magic can only be wielded via artifcats or something, or ike, gems embedded in the boddy
+
