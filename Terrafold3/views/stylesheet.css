@@ -129,8 +129,8 @@ input {
     min-width:9px;
     cursor: pointer;
     outline: none;
-    color: #e1e1e1;
-    background-color: #6077af;
+    color: #000000;
+    background-color: #55d4de;
     border: none;
     border-radius: 6px;
     box-shadow: 0 3px #999;

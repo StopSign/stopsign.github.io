@@ -2,7 +2,7 @@ let view = {
     initialize: function() {
         //auto generated elements
         // this.create.atmo();
-
+        document.getElementById("modulesDiv").innerHTML = buttonHTML;
     },
     updating: {
         update: function () {

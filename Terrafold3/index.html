@@ -30,7 +30,7 @@
 <div style="position:absolute;right:10px;top:330px;width:300px;height:200px;background-color:white;padding:10px;">
     <div class="title">Stats</div>
     Population: <div id="popCur" class="bold">0</div> people / <div id="shelterCur" class="bold">1</div> shelters<br>
-    Robots: <div id="robotCur" class="bold">10</div> idle / <div id="robotMax" class="bold">10</div> max<br>
+    <img src="img/robot.svg" class="smallIcon"> (Robots): <div id="robotCur" class="bold">10</div> idle / <div id="robotMax" class="bold">10</div> max<br>
     Food: <div id="foodCur" class="bold">0</div><br>
     Water: <div id="waterCur" class="bold">0</div><br><br>
     <div class="smallTitle">New Sim Requirements</div>
@@ -41,11 +41,16 @@
     <div class="button disabled">New Simulation</div>
 </div>
 
-<div id="modules" style="width:1000px;border:1px solid;height:600px;">
+<div id="modules" style="width:1000px;border:1px solid;height:600px;position:relative">
     <div class="title">Modules</div>
-    <div style="width:25%">
 
+    <div style="position:absolute;width:100%" id="modulesDiv">
+        <!--<div class="button abs" style="left:20px;top:50px;"><img src="img/robot.svg" class="smallIcon"> to Dig</div>-->
+        <!--<div class="button abs" style="left:20px;top:50px;"><img src="img/robot.svg" class="smallIcon"> to Drill</div>-->
+        <!--<div class="button abs" style="left:20px;top:50px;"><img src="img/robot.svg" class="smallIcon"> to Build Iron Detector</div>-->
+        <!--<div class="button abs" style="left:20px;top:50px;"><img src="img/robot.svg" class="smallIcon"> to Build Iron Detector</div>-->
     </div>
+
 </div>
 
 
@@ -56,6 +61,7 @@
     <script src="helpers/helpers.js?1"></script>
     <script src="helpers/hotkeys.js?1"></script>
     <script src="helpers/interval.js?1"></script>
+    <script src="data/moduleData.js?1"></script>
     <script>
         // (function (i, s, o, g, r, a, m) {
         //     i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function () {
