@@ -2,7 +2,9 @@ let view = {
     initialize: function() {
         //auto generated elements
         // this.create.atmo();
-        document.getElementById("modulesDiv").innerHTML = buttonHTML;
+        for(let i = 0; i < moduleData.length; i++) {
+            // view.create.createButton(moduleData[i], i);
+        }
     },
     updating: {
         update: function () {
@@ -21,6 +23,16 @@ let view = {
         }
     },
     create: {
+        createButton(buttonDatum, pos) {
+            let buttonHTML = "<div class='button abs showthat' onclick='buttonData[" + pos + "].onclick()' " +
+                "style='top:" + buttonDatum.y + "px;left:" + buttonDatum.x + "px'>" +
+                buttonDatum.text +
+                "<div class='showthis'>" + buttonDatum.tooltip + "</div>" +
+                "</div>";
 
+            let elem = document.createElement("div");
+            elem.innerHTML = buttonHTML;
+            document.getElementById("modulesDiv").append(elem);
+        }
     }
 };

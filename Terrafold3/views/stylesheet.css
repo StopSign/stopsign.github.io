@@ -158,10 +158,11 @@ input {
     transform: translateY(-1px);
 }
 
-.button:hover {background-color: #3e8e41}
+.button:hover {background-color: #60eef9
+}
 
 .button:active {
-    background-color: #3e8e41;
+    background-color: #3e9aa2;
     box-shadow: 0 1px #666;
     transform: translateY(0px);
 }

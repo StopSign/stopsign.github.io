@@ -20,7 +20,7 @@ let saveName = "terrafold3";
 
 let stop = false;
 let totalTime;
-let res = {};
+let res;
 
 let prevState = {};
 
@@ -30,6 +30,26 @@ function clearSave() { //Doesn't work atm
 }
 
 function loadDefaults() {
+    res = {
+        robotCur:10,
+        robotMax:10,
+        popCur:0,
+        shelterCur:1,
+        foodCur:0,
+        waterCur:0,
+        popNeeded:1,
+        shelterNeeded:1,
+        foodNeeded:5,
+        foodTimer:600,
+        waterTimer:600,
+
+        depth:0,
+        dirt:0,
+        robotDig:0,
+        quarry:0,
+        robotQuarry:0
+
+    }
 
 }
 

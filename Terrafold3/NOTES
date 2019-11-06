@@ -39,6 +39,12 @@ Productivity
 0 clean water, x0.5
 
 
+# Robot / Dig + / Dig - / # Dirt
+# Robot / Quarry + / Quarry - / # Quarry / Progress
+
+
+
+
 Food
 Identify Fauna
 Progress bar gets added to the front depending on action
@@ -200,3 +206,6 @@ Fauna Modifiers:
     Cave Dwelling
     Other
     Chunky
+
+
+

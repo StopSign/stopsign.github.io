@@ -15,7 +15,26 @@
 
 </head>
 <body id="theBody" oncontextmenu="return false;" style="padding:5px" class="medium">
-<div style="position:absolute;right:335px;width:300px;height:600px;background-color:white;padding:10px;">
+
+<div style="width:322px;vertical-align:top">
+    <div style="height:300px;width:300px;background-color:white;padding:10px;">
+        <div class="title">Resources</div>
+    </div>
+    <div style="top:330px;width:300px;height:200px;background-color:white;padding:10px;margin-top:5px;">
+        <div class="title">Stats</div>
+        Population: <div id="popCur" class="bold">0</div> people / <div id="shelterCur" class="bold">1</div> shelters<br>
+        <img src="img/robot.svg" class="smallIcon"> (Robots): <div id="robotCur" class="bold">10</div> idle / <div id="robotMax" class="bold">10</div> max<br>
+        Food: <div id="foodCur" class="bold">0</div><br>
+        Water: <div id="waterCur" class="bold">0</div><br><br>
+        <div class="smallTitle">New Sim Requirements</div>
+        <div class="red">Population: <div id="popNeeded" class="bold">1</div></div><br>
+        <div class="red">Shelter: <div id="shelterNeeded" class="bold">1</div></div><br>
+        <div class="red">Food: <div id="foodNeeded" class="bold">5</div> OR have stable food for <div id="foodTimer" class="bold">10:00</div></div><br>
+        <div class="red">Water: <div id="waterNeeded" class="bold">5</div> OR have stable water for <div id="waterTimer" class="bold">10:00</div></div><br><br>
+        <div class="button disabled">New Simulation</div>
+    </div>
+</div>
+<div style="position:relative;width:300px;height:600px;background-color:white;padding:10px;;vertical-align:top">
     <div class="title">Actions</div>
     <div style="position:absolute;bottom:10px;width:100%">
         <div class="smallTitle">New Action Modifiers</div>
@@ -24,33 +43,15 @@
         <input id="checkboxReAdd" type="checkbox"><label for="checkboxReAdd"> Re-Add when complete</label><br>
     </div>
 </div>
-<div style="position:absolute;right:10px;height:300px;width:300px;background-color:white;padding:10px;">
-    <div class="title">Resources</div>
-</div>
-<div style="position:absolute;right:10px;top:330px;width:300px;height:200px;background-color:white;padding:10px;">
-    <div class="title">Stats</div>
-    Population: <div id="popCur" class="bold">0</div> people / <div id="shelterCur" class="bold">1</div> shelters<br>
-    <img src="img/robot.svg" class="smallIcon"> (Robots): <div id="robotCur" class="bold">10</div> idle / <div id="robotMax" class="bold">10</div> max<br>
-    Food: <div id="foodCur" class="bold">0</div><br>
-    Water: <div id="waterCur" class="bold">0</div><br><br>
-    <div class="smallTitle">New Sim Requirements</div>
-    <div class="red">Population: <div id="popNeeded" class="bold">1</div></div><br>
-    <div class="red">Shelter: <div id="shelterNeeded" class="bold">1</div></div><br>
-    <div class="red">Food: <div id="foodNeeded" class="bold">5</div> OR have stable food for <div id="foodTimer" class="bold">10:00</div></div><br>
-    <div class="red">Water: <div id="waterNeeded" class="bold">5</div> OR have stable water for <div id="waterTimer" class="bold">10:00</div></div><br><br>
-    <div class="button disabled">New Simulation</div>
-</div>
 
-<div id="modules" style="width:1000px;border:1px solid;height:600px;position:relative">
+<div id="modules" style="width:1000px;border:1px solid;height:600px;position:relative;vertical-align:top">
     <div class="title">Modules</div>
-
     <div style="position:absolute;width:100%" id="modulesDiv">
         <!--<div class="button abs" style="left:20px;top:50px;"><img src="img/robot.svg" class="smallIcon"> to Dig</div>-->
         <!--<div class="button abs" style="left:20px;top:50px;"><img src="img/robot.svg" class="smallIcon"> to Drill</div>-->
         <!--<div class="button abs" style="left:20px;top:50px;"><img src="img/robot.svg" class="smallIcon"> to Build Iron Detector</div>-->
         <!--<div class="button abs" style="left:20px;top:50px;"><img src="img/robot.svg" class="smallIcon"> to Build Iron Detector</div>-->
     </div>
-
 </div>
 
 
@@ -58,6 +59,7 @@
     <script src="driver.js?1"></script>
     <script src="views/mainView.js?1"></script>
     <script src="saving.js?1"></script>
+    <script src="actions.js?1"></script>
     <script src="helpers/helpers.js?1"></script>
     <script src="helpers/hotkeys.js?1"></script>
     <script src="helpers/interval.js?1"></script>
