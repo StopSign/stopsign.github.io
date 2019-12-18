@@ -1,0 +1,14 @@
+Buy advanced bots is half-done, would ruin the graphics so I think undo
+update helpers, replace distance
+create desert square, that you can't build on
+create bonus squares, that give double or more
+create level-builder?
+
+desire:
+squares that you can't build on
+more things you can build on squares - bonuses?
+special squares - additional resources, resource multipliers
+fix levels to be loopable more
+
+total cells filled
+trim level

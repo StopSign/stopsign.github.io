@@ -29,16 +29,16 @@ function View() {
     this.createGrid = function() {
         this.deleteGrid();
         this.grid = [];
-        for(var col = 0; col < theGrid.length; col++) {
+        for(let col = 0; col < theGrid.length; col++) {
             this.grid[col] = [];
-            for (var row = 0; row < theGrid[col].length; row++) {
+            for (let row = 0; row < theGrid[col].length; row++) {
                 if(!theGrid[col][row]) {
                     continue;
                 }
-                var elem = document.createElement("div");
-                var rowSize = 700 / 13;
-                var rectStartX = col*rowSize + 30;
-                var rectStartY = row*rowSize + 30;
+                let elem = document.createElement("div");
+                let rowSize = 700 / 13;
+                let rectStartX = col*rowSize + 30;
+                let rectStartY = row*rowSize + 30;
                 elem.innerHTML =
                     "<div class='naniteSquare' style='left:"+rectStartX+"px;top:"+rectStartY+"px;width:"+(rowSize-10)+"px;height:"+(rowSize-10)+"px;' onclick='clickedSquare("+col+","+row+")'>" +
                     "<div class='displayNum' id='displayNumcol"+col+"row"+row+"'></div>" +
@@ -60,10 +60,10 @@ function View() {
         if(!this.grid) {
             return;
         }
-        for(var col = 0; col < this.grid.length; col++) {
-            for(var row = 0; row < this.grid[col].length; row++) {
+        for(let col = 0; col < this.grid.length; col++) {
+            for(let row = 0; row < this.grid[col].length; row++) {
                 if(this.grid[col][row]) {
-                    var parent = this.grid[col][row].parentElement;
+                    let parent = this.grid[col][row].parentElement;
                     parent.parentElement.removeChild(parent);
                 }
             }
@@ -91,9 +91,9 @@ function View() {
             rclickStartingPoint = dragToPoint;
             return;
         }
-        var currentPos = {x:e.pageX - theView.offsetx, y:e.pageY - theView.offsety};
+        let currentPos = {x:e.pageX - theView.offsetx, y:e.pageY - theView.offsety};
         if(isDragging) {
-            var distance = Math.sqrt(Math.pow(startingDragPoint.x - currentPos.x, 2) + Math.pow(startingDragPoint.y - currentPos.y, 2));
+            let distance = Math.sqrt(Math.pow(startingDragPoint.x - currentPos.x, 2) + Math.pow(startingDragPoint.y - currentPos.y, 2));
             if(distance < 20) {
                 theView.dragSelectDiv.style.display = "none";
             } else {
@@ -102,16 +102,20 @@ function View() {
         } else {
             return;
         }
+        let leftX;
+        let rightX;
+        let topY;
+        let bottomY;
         if(startingDragPoint.x > currentPos.x) {
-            var leftX = currentPos.x;
-            var rightX = startingDragPoint.x + 4;
+            leftX = currentPos.x;
+            rightX = startingDragPoint.x + 4;
         } else {
             leftX = startingDragPoint.x + 8;
             rightX = currentPos.x - 4;
         }
         if(startingDragPoint.y > currentPos.y) {
-            var topY = currentPos.y;
-            var bottomY = startingDragPoint.y;
+            topY = currentPos.y;
+            bottomY = startingDragPoint.y;
         } else {
             topY = startingDragPoint.y;
             bottomY = currentPos.y;
@@ -131,20 +135,24 @@ function View() {
         document.getElementById('dragSelectDiv').style.display = 'none';
         isDragging = false;
         endingDragPoint = {x:(e.pageX - theView.offsetx), y:(e.pageY - theView.offsety)};
-        var distance = Math.sqrt(Math.pow(startingDragPoint.x - endingDragPoint.x, 2) + Math.pow(startingDragPoint.y - endingDragPoint.y, 2));
+        let distance = Math.sqrt(Math.pow(startingDragPoint.x - endingDragPoint.x, 2) + Math.pow(startingDragPoint.y - endingDragPoint.y, 2));
         if(distance < 20) {
             return;
         }
+        let leftX;
+        let rightX;
+        let topY;
+        let bottomY;
         if(startingDragPoint.x > endingDragPoint.x) {
-            var leftX = endingDragPoint.x;
-            var rightX = startingDragPoint.x;
+            leftX = endingDragPoint.x;
+            rightX = startingDragPoint.x;
         } else {
             leftX = startingDragPoint.x;
             rightX = endingDragPoint.x;
         }
         if(startingDragPoint.y > endingDragPoint.y) {
-            var topY = endingDragPoint.y;
-            var bottomY = startingDragPoint.y;
+            topY = endingDragPoint.y;
+            bottomY = startingDragPoint.y;
         } else {
             topY = startingDragPoint.y;
             bottomY = endingDragPoint.y;
@@ -158,7 +166,7 @@ function View() {
     };
 
     this.setSelectedFalse = function() {
-        for(var i = 0; i < selected.length; i++) {
+        for(let i = 0; i < selected.length; i++) {
             selected[i].isSelected = 0;
             this.changeBorderSelected(selected[i]);
             this.updateDirectionArrow(selected[i]);
@@ -166,14 +174,14 @@ function View() {
         selected = [];
     };
     this.changeBorderColors = function() {
-        for(var i = 0; i < selected.length; i++) {
+        for(let i = 0; i < selected.length; i++) {
             this.changeBorderSelected(selected[i]);
             this.updateDirectionArrow(selected[i]);
         }
         changeBordersOfLowest(this.grid);
     };
     this.changeBorderSelected = function(square) {
-        var gridSquare = this.grid[square.col][square.row];
+        let gridSquare = this.grid[square.col][square.row];
         if(square.isSelected) {
             gridSquare.style.border = "2px solid #ff9600";
         } else {
@@ -183,9 +191,9 @@ function View() {
     };
 
     this.update = function() {
-        for(var col = 0; col < theGrid.length; col++) {
-            for (var row = 0; row < theGrid[col].length; row++) {
-                var square = theGrid[col][row];
+        for(let col = 0; col < theGrid.length; col++) {
+            for (let row = 0; row < theGrid[col].length; row++) {
+                let square = theGrid[col][row];
                 if(!square) {
                     continue;
                 }
@@ -205,16 +213,16 @@ function View() {
     };
 
     this.updateDirectionArrow = function(square, borderColor) {
-        var directionArrowInner = document.getElementById('directionArrowInnercol'+square.col+'row'+square.row);
-        var directionArrowOuter = document.getElementById('directionArrowOutercol'+square.col+'row'+square.row);
+        let directionArrowInner = document.getElementById('directionArrowInnercol'+square.col+'row'+square.row);
+        let directionArrowOuter = document.getElementById('directionArrowOutercol'+square.col+'row'+square.row);
         if(!directionArrowInner) {
             return;
         }
         if(!borderColor) {
             borderColor = square.isSelected ? "#ff9600" : (square.isActive() ? "black" : "white");
         }
-        var dir = square.transferDirection;
-        var backgroundColor = getInactiveBackgroundColor(square.consumeCost);
+        let dir = square.transferDirection;
+        let backgroundColor = getInactiveBackgroundColor(square.consumeCost);
         if(square.isActive()) {
             backgroundColor = getActiveBackgroundColor(square.nanites);
         }
@@ -236,12 +244,12 @@ function View() {
     };
 
     this.updateDirectionDot = function(square) {
-        var directionDot = document.getElementById('directionDotcol'+square.col+'row'+square.row);
+        let directionDot = document.getElementById('directionDotcol'+square.col+'row'+square.row);
         if(!directionDot) {
             return;
         }
 
-        var dir = square.transferDirection;
+        let dir = square.transferDirection;
         if(dir === "East") {
             directionDot.style.top = '22px';
             directionDot.style.left = '39px';
@@ -259,8 +267,8 @@ function View() {
     };
 
     this.updateDisplayNum = function(square, resourceType) {
-        var displayNum = document.getElementById('displayNumcol'+square.col+'row'+square.row);
-        var secondDisplayNum = document.getElementById('displayNum2col'+square.col+'row'+square.row);
+        let displayNum = document.getElementById('displayNumcol'+square.col+'row'+square.row);
+        let secondDisplayNum = document.getElementById('displayNum2col'+square.col+'row'+square.row);
         if(!displayNum) {
             return;
         }
@@ -311,12 +319,12 @@ function View() {
     };
 
     this.changeBackground = function(square) {
-        var gridSquare = this.grid[square.col][square.row];
+        let gridSquare = this.grid[square.col][square.row];
         if(square.isActive()) {
             gridSquare.style.background = getActiveBackgroundColor(square.nanites);
             gridSquare.style.opacity = 1;
         } else {
-            var temp = Math.log10(square.consumeCost)/13+.15;
+            let temp = Math.log10(square.consumeCost)/13+.15;
             gridSquare.style.background = getInactiveBackgroundColor(square.consumeCost);
             gridSquare.style.opacity = temp > 1 ? 1 : temp;
         }
@@ -508,9 +516,9 @@ function View() {
 		document.getElementById('averageEPPerLevel').innerHTML = intToString(bonuses.points / stats.totalLevels);
     };
 	this.updateGrowth = function() {
-        for(var x = 0; x < bonuses.derivs.length; x++) {
-            var deriv = bonuses.derivs[x];
-            var derivGain = deriv.amount * Math.pow(2, deriv.upgradeAmount);
+        for(let x = 0; x < bonuses.derivs.length; x++) {
+            let deriv = bonuses.derivs[x];
+            let derivGain = deriv.amount * Math.pow(2, deriv.upgradeAmount);
             document.getElementById('deriv'+x+'Gain').innerHTML = intToString(x === 0 ? derivGain / 100 : derivGain);
             document.getElementById(x+'DerivInner').style.width = ((deriv.currentTicks+1) / deriv.ticksNeeded * 100) + '%';
         }
@@ -532,26 +540,26 @@ function View() {
 	this.recreateDerivs = function() {
 	    //Dynamically create all divs and their buy buttons
         document.getElementById('derivCost').innerHTML = intToString(calcCostForNextDeriv());
-        var parentElem = document.getElementById('autoGenDerivs');
+        let parentElem = document.getElementById('autoGenDerivs');
         while (parentElem.firstChild) {
             parentElem.removeChild(parentElem.firstChild);
         }
 
-        for(var x = 0; x < bonuses.derivs.length; x++) {
+        for(let x = 0; x < bonuses.derivs.length; x++) {
             if (x > this.derivNames.length) {
                 break;
             }
-            var prevName = "";
+            let prevName = "";
             if (x === 0) {
                 prevName = "% added growth bonus";
             } else {
                 prevName = " "+this.derivNames[x-1];
             }
 
-            var labelName = this.derivNames[x];
-            var ticksNeeded = bonuses.derivs[x].ticksNeeded;
+            let labelName = this.derivNames[x];
+            let ticksNeeded = bonuses.derivs[x].ticksNeeded;
 
-            var elem = document.createElement("div");
+            let elem = document.createElement("div");
             elem.innerHTML = '<div id="'+x+'Deriv" class="derivContainer">' +
                 '<div class="derivLabel medium">'+labelName+'</div>' +
                 '<div class="outerDerivBar"><div id="'+x+'DerivInner" class="innerDerivBar"></div></div>' +
@@ -575,18 +583,18 @@ function getInactiveBackgroundColor(consumeCost) {
     if(consumeCost < 1e11) {
         return "hsl(120, 88%, 17%)";
     } else {
-        var newColor = (Math.log10(consumeCost)-11)*10 + 120;
+        let newColor = (Math.log10(consumeCost)-11)*10 + 120;
         return "hsl("+newColor+", 88%, 17%)";
     }
 
 }
 
 function buttonSetup(type, typeUpper, label) { //lol javascript
-    var buyAvailableOr = selected[0]["canBuy"+typeUpper+"AfterMultiBuy"]() ? 1 : 0;
-    var buyAvailableAnd = selected[0]["canBuy"+typeUpper+"AfterMultiBuy"]();
-    var amount = selected[0][type+'Amount'];
-    var lastSelected = selected[0];
-    for(var i = 1; i < selected.length; i++) {
+    let buyAvailableOr = selected[0]["canBuy"+typeUpper+"AfterMultiBuy"]() ? 1 : 0;
+    let buyAvailableAnd = selected[0]["canBuy"+typeUpper+"AfterMultiBuy"]();
+    let amount = selected[0][type+'Amount'];
+    let lastSelected = selected[0];
+    for(let i = 1; i < selected.length; i++) {
         if(selected[i][type+'Amount'] !== amount) {
             amount = -1;
         }
@@ -594,8 +602,8 @@ function buttonSetup(type, typeUpper, label) { //lol javascript
         buyAvailableOr += selected[i]["canBuy"+typeUpper+"AfterMultiBuy"]() ? 1 : 0;
         buyAvailableAnd = buyAvailableAnd && selected[i]["canBuy"+typeUpper+"AfterMultiBuy"]();
     }
-    var lowestSelected = selected.length > 1 ? select.getLowestSquare(select.getSelectedActive(), type) : selected[0];
-    var displaySquare = settings.showLastOrLowest ? lowestSelected : lastSelected;
+    let lowestSelected = selected.length > 1 ? select.getLowestSquare(select.getSelectedActive(), type) : selected[0];
+    let displaySquare = settings.showLastOrLowest ? lowestSelected : lastSelected;
     if(!displaySquare) {
         return;
     }
@@ -609,16 +617,16 @@ function buttonSetup(type, typeUpper, label) { //lol javascript
 }
 
 function drawDirectionArrow() {
-    var arrows = [document.getElementById('leftArrow'), document.getElementById('rightArrow'), document.getElementById('upArrow'), document.getElementById('downArrow')];
+    let arrows = [document.getElementById('leftArrow'), document.getElementById('rightArrow'), document.getElementById('upArrow'), document.getElementById('downArrow')];
     clearArrows(arrows);
 
-    var dir = selected[0].transferDirection;
-    for(var i = 0; i < selected.length; i++) {
+    let dir = selected[0].transferDirection;
+    for(let i = 0; i < selected.length; i++) {
         if(selected[i].transferDirection !== dir) {
             return; //just clear arrows if they're not all the same
         }
     }
-    var arrowToChange = arrows[0];
+    let arrowToChange = arrows[0];
     if(dir === "East") {
         arrowToChange = arrows[1];
     } else if(dir === "North") {
@@ -630,17 +638,17 @@ function drawDirectionArrow() {
 }
 
 function clearArrows(arrows) {
-    for(var x = 0; x < arrows.length; x++) {
+    for(let x = 0; x < arrows.length; x++) {
         arrows[x].style.backgroundColor = "transparent";
     }
 }
 
 function colorShiftMath(initialColor, multi, leftOverMulti) {
     //Hue is 0-360, 0 is red, 120 is green, 240 is blue. Sat is 0-100, 0=greyscale. Light is 0-100, 25=half black
-    var hue = initialColor - (multi-1)*30; //- (leftOverMulti)*9;
-    var sat = 10+Math.pow(multi, .8) * 2; //+ (leftOverMulti)*3
+    let hue = initialColor - (multi-1)*30; //- (leftOverMulti)*9;
+    let sat = 10+Math.pow(multi, .8) * 2; //+ (leftOverMulti)*3
     sat = sat > 100 ? 100 : sat; //multi^.9 * 6 reaches at 23
-    var light = 50;
+    let light = 50;
     return "hsl("+hue+", "+sat+"%, "+light+"%)";
 }
 
@@ -648,14 +656,14 @@ function changeBordersOfLowest(viewGrid) {
     if(!settings.selectAllOrLowestBorderColor || selected.length <= 1) {
         return;
     }
-    var lowestSquares;
+    let lowestSquares;
     if(settings.selectedResourceNum === 0) {
         lowestSquares = select.getLowestSquares(select.getSelectedActive(), 'nanite');
     } else {
         lowestSquares = select.getLowestSquares(select.getSelectedActive(), 'advBot');
     }
-    for (var i = 0; i < lowestSquares.length; i++) {
-        var gridSquare = viewGrid[lowestSquares[i].col][lowestSquares[i].row];
+    for (let i = 0; i < lowestSquares.length; i++) {
+        let gridSquare = viewGrid[lowestSquares[i].col][lowestSquares[i].row];
         if(lowestSquares[i].isSelected) {
             gridSquare.style.border = "2px solid blue";
             theView.updateDirectionArrow(lowestSquares[i], "blue");
@@ -676,10 +684,10 @@ function selectedSingleOrMultiple() {
 }
 
 function selectedActiveOrNot() {
-    var selectedActiveAND = true;
-    var selectedActiveOR = false;
-    for(var i = 0; i < selected.length; i++) {
-        var isActive = selected[i].isActive();
+    let selectedActiveAND = true;
+    let selectedActiveOR = false;
+    for(let i = 0; i < selected.length; i++) {
+        let isActive = selected[i].isActive();
         selectedActiveAND = selectedActiveAND && isActive;
         selectedActiveOR = selectedActiveOR || isActive;
     }
@@ -736,16 +744,16 @@ function showNanites() {
 }
 
 function updateInfoGridExtras() {
-    var totalTransferRate = 0;
-    for(var i = 0; i < selected.length; i++) {
+    let totalTransferRate = 0;
+    for(let i = 0; i < selected.length; i++) {
         totalTransferRate += (selected[i].transferRate/100);
     }
-    var inactiveList = select.getSelectedInactive();
-    var totalConsumeCost = 0;
-    for(i = 0; i < inactiveList.length; i++) {
+    let inactiveList = select.getSelectedInactive();
+    let totalConsumeCost = 0;
+    for(let i = 0; i < inactiveList.length; i++) {
         totalConsumeCost += inactiveList[i].consumeCost;
     }
-    var lowestInactive = select.getLowestInactiveSquare(inactiveList);
+    let lowestInactive = select.getLowestInactiveSquare(inactiveList);
 
     document.getElementById('totalTransferRate').innerHTML = intToString(totalTransferRate);
     document.getElementById('averageTransferRate').innerHTML = intToString(totalTransferRate / selected.length);
@@ -758,13 +766,13 @@ function updateInfoGridExtras() {
 }
 
 function updateInfoGrid(label, varLabel) {
-    var totalNanites = 0;
-    var totalNaniteRate = 0;
-    var totalNaniteTransferAmount = 0;
-    var totalNaniteAmountReceived = 0;
-    var totalConsumeCost = 0;
-    var totalEquilibrium = 0;
-    for(var i = 0; i < selected.length; i++) {
+    let totalNanites = 0;
+    let totalNaniteRate = 0;
+    let totalNaniteTransferAmount = 0;
+    let totalNaniteAmountReceived = 0;
+    let totalConsumeCost = 0;
+    let totalEquilibrium = 0;
+    for(let i = 0; i < selected.length; i++) {
         totalNanites += selected[i][varLabel+'s'];
         totalNaniteRate += selected[i][varLabel+'Rate'];
         totalNaniteTransferAmount += selected[i][varLabel+'TransferAmount'];
@@ -787,7 +795,7 @@ function updateInfoGrid(label, varLabel) {
         document.getElementById('averageTTransferAmount').innerHTML = intToString(totalNaniteTransferAmount / selected.length);
         document.getElementById('averageTAmountReceived').innerHTML = intToString(totalNaniteAmountReceived / selected.length);
 
-        var lowestSquare = select.getLowestSquare(select.getSelectedActive(), varLabel);
+        let lowestSquare = select.getLowestSquare(select.getSelectedActive(), varLabel);
         if(lowestSquare) {
             document.getElementById('lowestTs').innerHTML = intToString(lowestSquare[varLabel + 's']);
             document.getElementById('lowestNetTs').innerHTML = intToStringNegative((lowestSquare[varLabel + 'Rate'] * getNaniteGainBonus()) + lowestSquare[varLabel + 'AmountReceived'] - lowestSquare[varLabel + 'TransferAmount']);
@@ -798,9 +806,9 @@ function updateInfoGrid(label, varLabel) {
             document.getElementById('lowestTEquilibrium').innerHTML = intToString((lowestSquare[varLabel + 'Rate'] * getNaniteGainBonus() + lowestSquare[varLabel + 'AmountReceived']) / lowestSquare.transferRate * 100);
             document.getElementById('lowestConsumeCost').innerHtml = intToString(lowestSquare.consumeCost);
         }
-        var selectedInactive = select.getSelectedInactive();
+        let selectedInactive = select.getSelectedInactive();
         if(selectedInactive.length === selected.length) { //only selecting inactive
-            var lowestInactive = select.getLowestInactiveSquare(selectedInactive);
+            let lowestInactive = select.getLowestInactiveSquare(selectedInactive);
             document.getElementById('lowestNetTs').innerHTML = intToStringNegative(lowestInactive[varLabel + 'Rate'] + lowestInactive[varLabel + 'AmountReceived'] - lowestInactive[varLabel + 'TransferAmount']);
             document.getElementById('lowestTAmountReceived').innerHTML = intToString(lowestInactive[varLabel + 'AmountReceived']);
             document.getElementById('lowestConsumeCost').innerHtml = intToString(lowestInactive.consumeCost);

@@ -1,0 +1,42 @@
+.gridRow {
+    height:20px;
+    margin-top:5px;
+}
+
+.gridCell {
+    height:100%;
+    margin-right:5px;
+    background-color:red;
+    display:inline-block;
+}
+
+input {
+    width:40px;
+}
+
+
+.button {
+    padding: 1px 5px;
+    text-align: center;
+    vertical-align:center;
+    min-width:9px;
+    cursor: pointer;
+    outline: none;
+    color: #000000;
+    background-color: #55d4de;
+    border: none;
+    border-radius: 6px;
+    box-shadow: 0 3px #999;
+    transform: translateY(-2px);
+    margin-bottom:2px;
+    display:inline-block;
+}
+
+.button:hover {background-color: #60eef9
+}
+
+.button:active {
+    background-color: #3e9aa2;
+    box-shadow: 0 1px #666;
+    transform: translateY(0px);
+}

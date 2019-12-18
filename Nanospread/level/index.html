@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Nanospread Level Builder</title>
+    <link rel="stylesheet" href="stylesheet.css">
+</head>
+<body>
+<label for="gridX">Grid Height: </label><input id="gridX" value="12">
+<label for="gridY">Grid Width: </label><input id="gridY" value="12">
+<div class="button" onclick="createGrid()">Create Grid</div>
+<div id="grid"></div>
+<div>Total Num: <div id="total" style="display:inline-block"></div></div>
+<div>Total Cells: <div id="totalCells" style="display:inline-block"></div></div>
+<div>
+    -1 is Start, 0 is a hole, >0 is logarithmic values
+</div>
+<div id="export" class="button" onclick="exportGrid()">Export</div>
+<div id="import" class="button" onclick="importGrid()">Import</div>
+<label for="exportString">Grid String: </label><textarea id="exportString"></textarea>
+
+</body>
+<script src="../helpers.js"></script>
+<script src="controller.js"></script>
+</html>

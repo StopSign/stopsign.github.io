@@ -3,14 +3,14 @@
 //Even if that means a level reset causes a different level to appear.
 function createGridFromSave(savedGrid) {
     theGrid = [];
-    for(var x = 0; x < 20; x++) {
+    for(let x = 0; x < 20; x++) {
         theGrid[x] = [];
     }
-    for (var column = 0; column < savedGrid.length; column++) {
-        for (var row = 0; row < savedGrid[column].length; row++) {
+    for (let column = 0; column < savedGrid.length; column++) {
+        for (let row = 0; row < savedGrid[column].length; row++) {
             if(savedGrid[column][row]) {
                 theGrid[column][row] = new Square(column, row, 5);
-                for(var property in savedGrid[column][row]) {
+                for(let property in savedGrid[column][row]) {
                     if (savedGrid[column][row].hasOwnProperty(property)) {
                         if(property === "specialLevels") {
                             continue;
@@ -29,20 +29,20 @@ function createGridFromSave(savedGrid) {
 
 
 function createGrid() {
-    var startingCoords = {x:0,y:0};
+    let startingCoords = {x:0,y:0};
 
     theGrid = [];
-    for(var x = 0; x < 20; x++) {
+    for(let x = 0; x < 20; x++) {
         theGrid[x] = [];
     }
-    var wrapAroundLevel = currentLevel;
+    let wrapAroundLevel = currentLevel;
     if(currentLevel >= levelData.length) {
         wrapAroundLevel = (currentLevel-4) % (levelData.length-4) + 4; //first 4 levels are 'tutorial', and don't repeat
     }
     console.log(wrapAroundLevel);
 
-    var currentLevelGrid = levelData[wrapAroundLevel].grid;
-    var goalCost = Math.pow(2, currentLevel-2) * 100000000;
+    let currentLevelGrid = levelData[wrapAroundLevel].grid;
+    let goalCost = Math.pow(2, currentLevel-2) * 100000000;
     if(currentLevel === 0) {
         goalCost /= 2000;
     }
@@ -57,10 +57,10 @@ function createGrid() {
     }
 
 
-    var totalFromLevelData = 0;
-    for(var column = 0; column < currentLevelGrid[0].length; column++) {
-        for (var row = 0; row < currentLevelGrid.length; row++) {
-            var levelDataNum = currentLevelGrid[row][column];
+    let totalFromLevelData = 0;
+    for(let column = 0; column < currentLevelGrid[0].length; column++) {
+        for (let row = 0; row < currentLevelGrid.length; row++) {
+            let levelDataNum = currentLevelGrid[row][column];
             if(levelDataNum === -1) {
                 startingCoords.x = column;
                 startingCoords.y = row;
@@ -71,23 +71,23 @@ function createGrid() {
         }
     }
 
-    var consumeCostModifier = goalCost / totalFromLevelData;
+    let consumeCostModifier = goalCost / totalFromLevelData;
 
-    var initialCostGrid = [];
-    for(x = 0; x < currentLevelGrid.length; x++) {
+    let initialCostGrid = [];
+    for(let x = 0; x < currentLevelGrid.length; x++) {
         initialCostGrid[x] = [];
-        for(var y = 0; y < currentLevelGrid[x].length; y++) {
+        for(let y = 0; y < currentLevelGrid[x].length; y++) {
             initialCostGrid[x][y] = (Math.pow(2, currentLevelGrid[x][y]) * consumeCostModifier) * 2;
         }
     }
 
 
-    for (column = 0; column < currentLevelGrid[0].length; column++) {
-        for (row = 0; row < currentLevelGrid.length; row++) {
+    for (let column = 0; column < currentLevelGrid[0].length; column++) {
+        for (let row = 0; row < currentLevelGrid.length; row++) {
             if(currentLevelGrid[row][column] === 0) {
                 continue; //this makes the empty spots undefined in theGrid. Change if you want other terrain there.
             }
-            var initialConsumeCost = initialCostGrid[row][column];
+            let initialConsumeCost = initialCostGrid[row][column];
             theGrid[column][row] =  new Square(column, row, initialConsumeCost);
         }
     }
@@ -96,7 +96,7 @@ function createGrid() {
         square.chooseStartingDirection(); //All of them have a transfer target
     }, false);
 
-    var startingSquare = theGrid[startingCoords.x][startingCoords.y];
+    let startingSquare = theGrid[startingCoords.x][startingCoords.y];
     startingSquare.gainNanites(startingSquare.consumeCost);
 }
 
@@ -130,7 +130,7 @@ function autobuyLevels() {
 
 function clearNanitesReceived() {
     doToAllSquares(function (square) {
-        var target = theGrid[square.targetCol][square.targetRow];
+        let target = theGrid[square.targetCol][square.targetRow];
         target.naniteAmountReceived = 0;
         target.advBotAmountReceived = 0;
     }, false);
@@ -138,11 +138,11 @@ function clearNanitesReceived() {
 
 function sendNanites() {
     doToAllSquares(function (square) {
-        var target = theGrid[square.targetCol][square.targetRow];
+        let target = theGrid[square.targetCol][square.targetRow];
         if(target.isActive()) {
             target.gainAdvBots(square.sendPieceOfAdvBots()); //transfer .1% advBots
         }
-        var amountTransferred = square.sendPieceOfNanites();
+        let amountTransferred = square.sendPieceOfNanites();
         target.gainNanites(amountTransferred); //transfer .1% nanites
         target.naniteAmountReceived += amountTransferred;
 		stats.transferredThisLevel += amountTransferred;
@@ -164,7 +164,7 @@ function getNaniteGainBonus() {
 }
 
 function clickedSquare(col, row) {
-    var square = theGrid[col][row];
+    let square = theGrid[col][row];
     //multiple are selected, selectOne setting is on, clicked a selected
     if(!settings.selectOneOrMultiple && selected.length > 1) {
         theView.setSelectedFalse();
@@ -177,7 +177,7 @@ function clickedSquare(col, row) {
     }
 
     square.isSelected = !square.isSelected;
-    var pos = selected.indexOf(square);
+    let pos = selected.indexOf(square);
     if(pos === -1) { //click new square
         menuOpen = "";
         if(!settings.selectOneOrMultiple && selected.length > 0) { //single
@@ -200,9 +200,9 @@ function singleSelect(xDelta, yDelta) {
     if(selected.length === 0) {
         return;
     }
-    var lastSelected = selected[selected.length - 1];
-    var targetX = lastSelected.col + xDelta;
-    var targetY = lastSelected.row + yDelta;
+    let lastSelected = selected[selected.length - 1];
+    let targetX = lastSelected.col + xDelta;
+    let targetY = lastSelected.row + yDelta;
     if(targetX < 0 || targetX > theGrid.length || targetY < 0 || !theGrid[targetX][targetY]) {
         return;
     }
@@ -213,21 +213,21 @@ function changeDirectionOfSelected(direction) {
     if(selected.length === 0) {
         return;
     }
-    for(var i = 0; i < selected.length; i++) {
-        var tempDirection = selected[i].transferDirection;
+    for(let i = 0; i < selected.length; i++) {
+        let tempDirection = selected[i].transferDirection;
         selected[i].changeTargetDirection(direction);
         if(!selected[i].getTarget()) {
             selected[i].changeTargetDirection(tempDirection);
         }
     }
     theView.updateInfoBox();
-    for(i = 0; i < selected.length; i++) {
+    for(let i = 0; i < selected.length; i++) {
         theView.updateDirectionDot(selected[i]);
     }
 }
 
 function buyAll() {
-    for(var i = 0; i < selected.length; i++) {
+    for(let i = 0; i < selected.length; i++) {
         if(selected[i].canBuyNanitesAfterMultiBuy()) {
             selected[i].buyMultipleNanites(settings.buyPerClick);
         }
@@ -246,25 +246,25 @@ function buyNanitesButtonPressed() {
         buyLowestEach();
     }
     theView.updateInfoBox();
-    for(var i = 0; i < selected.length; i++) {
+    for(let i = 0; i < selected.length; i++) {
         theView.updateDisplayNum(selected[i], settings.selectedResourceNum === 0 ? 'nanite' : 'advBot');
     }
 }
 function buyLowest() {
-    var lowestAmountSquares = select.getLowestSquares(select.getSelectedActive(), 'nanite');
-    var allBuyable = true;
-    for(var i = 0; i < lowestAmountSquares.length; i++) {
+    let lowestAmountSquares = select.getLowestSquares(select.getSelectedActive(), 'nanite');
+    let allBuyable = true;
+    for(let i = 0; i < lowestAmountSquares.length; i++) {
         allBuyable = allBuyable && lowestAmountSquares[i].canBuyNanitesAfterMultiBuy();
     }
     if(allBuyable) {
-        for(i = 0; i < lowestAmountSquares.length; i++) {
+        for(let i = 0; i < lowestAmountSquares.length; i++) {
             lowestAmountSquares[i].buyMultipleNanites(settings.buyPerClick);
         }
     }
 }
 function buyLowestEach() {
-    var lowestAmountSquares = select.getLowestSquares(select.getSelectedActive(), 'nanite');
-    for(var i = 0; i < lowestAmountSquares.length; i++) {
+    let lowestAmountSquares = select.getLowestSquares(select.getSelectedActive(), 'nanite');
+    for(let i = 0; i < lowestAmountSquares.length; i++) {
         if(lowestAmountSquares[i].isActive() && lowestAmountSquares[i].canBuyNanitesAfterMultiBuy()) {
             lowestAmountSquares[i].buyMultipleNanites(settings.buyPerClick);
         }
@@ -272,7 +272,7 @@ function buyLowestEach() {
 }
 
 function buyAdvBotsButtonPressed() {
-    for(var i = 0; i < selected.length; i++) {
+    for(let i = 0; i < selected.length; i++) {
         if(selected[i].canBuyAdvBots()) {
             selected[i].buyAdvBots();
         }
@@ -284,7 +284,7 @@ function handleFPSDifference() {
     timeList.push(new Date().getTime());
     if(timeList.length > 10) {
         timeList.splice(0, 1);
-        var fps = msWaitTime/((timeList[timeList.length-1] - timeList[0]) / (timeList.length-1))*100;
+        let fps = msWaitTime/((timeList[timeList.length-1] - timeList[0]) / (timeList.length-1))*100;
         multFromFps = 100/fps;
         //$scope.fps = round(fps)+"%";
     } else {
@@ -301,7 +301,7 @@ function changeLevel(newLevel) {
     resetDerivBonuses();
     document.getElementById('levelConfirm').checked = "";
     theView.setSelectedFalse();
-    var EPGain = calcEvolutionPointGain();
+    let EPGain = calcEvolutionPointGain();
     bonuses.points += EPGain;
     bonuses.availableEP += EPGain;
 	if(EPGain > 0) {
@@ -310,7 +310,7 @@ function changeLevel(newLevel) {
     if(document.getElementById('resetAvailableEP').checked) {
         resetBonusPoints();
     }
-    var keepDirections;
+    let keepDirections;
     if(newLevel === currentLevel) {
         keepDirections = theGrid;
     }
@@ -326,10 +326,10 @@ function changeLevel(newLevel) {
 }
 
 function applyDirectionsToGrid(tempGrid) {
-    for (var column = 0; column < theGrid.length; column++) {
-        for (var row = 0; row < theGrid[column].length; row++) {
-            var oldSquare = tempGrid[column][row];
-            var square = theGrid[column][row];
+    for (let column = 0; column < theGrid.length; column++) {
+        for (let row = 0; row < theGrid[column].length; row++) {
+            let oldSquare = tempGrid[column][row];
+            let square = theGrid[column][row];
             if(oldSquare && square) {
                 square.changeTargetDirection(oldSquare.transferDirection);
                 if(!square.getTarget()) {
@@ -341,10 +341,10 @@ function applyDirectionsToGrid(tempGrid) {
 }
 
 function calcEvolutionPointGain() {
-    var bonus = 9999999999;
-    for (var column = 0; column < theGrid.length; column++) {
-        for (var row = 0; row < theGrid[column].length; row++) {
-            var square = theGrid[column][row];
+    let bonus = 9999999999;
+    for (let column = 0; column < theGrid.length; column++) {
+        for (let row = 0; row < theGrid[column].length; row++) {
+            let square = theGrid[column][row];
             if (square && square.curSpecialPosNanites < bonus) { //gets lowest
                 bonus = square.curSpecialPosNanites;
             }
@@ -459,9 +459,9 @@ function resetBonusPoints() {
 }
 
 function doToAllSquares(functionToRun, onlyIsActive) {
-    for (var column = 0; column < theGrid.length; column++) {
-        for (var row = 0; row < theGrid[column].length; row++) {
-            var square = theGrid[column][row];
+    for (let column = 0; column < theGrid.length; column++) {
+        for (let row = 0; row < theGrid[column].length; row++) {
+            let square = theGrid[column][row];
             if(square && (!onlyIsActive || square.isActive())) {
                 functionToRun(square);
             }
@@ -537,7 +537,7 @@ function calcAchieveBonus(achievement) {
 }
 
 function calcTotalAchieveBonus() {
-	var totalAchieveBonus = 0;
+	let totalAchieveBonus = 0;
 	totalAchieveBonus += calcAchieveBonus(achieves.highestTicksAch);
 	totalAchieveBonus += calcAchieveBonus(achieves.totalTicksAch);
 	totalAchieveBonus += calcAchieveBonus(achieves.highestProducedAch);
@@ -550,8 +550,8 @@ function calcTotalAchieveBonus() {
 }
 
 function tickGrowth() {
-    for(var x = bonuses.derivs.length - 1; x >= 0; x--) {
-        var deriv = bonuses.derivs[x];
+    for(let x = bonuses.derivs.length - 1; x >= 0; x--) {
+        let deriv = bonuses.derivs[x];
         deriv.currentTicks++;
         if(deriv.currentTicks >= deriv.ticksNeeded) {
             deriv.currentTicks -= deriv.ticksNeeded;
@@ -560,7 +560,7 @@ function tickGrowth() {
                 bonuses.growthBonus += (deriv.amount * Math.pow(2, deriv.upgradeAmount)) / 10000;
                 continue;
             }
-            var prevDeriv = bonuses.derivs[x-1];
+            let prevDeriv = bonuses.derivs[x-1];
             prevDeriv.amount += deriv.amount * Math.pow(2, deriv.upgradeAmount);
         }
     }
@@ -568,7 +568,7 @@ function tickGrowth() {
 
 function resetDerivBonuses() {
     bonuses.growthBonus = 1;
-    for(var x = 0; x < bonuses.derivs.length; x++) {
+    for(let x = 0; x < bonuses.derivs.length; x++) {
         bonuses.derivs[x].ticksNeeded = x === 0 ? 4 : Math.pow(2, (x-1))*10;
         bonuses.derivs[x].currentTicks = 0;
         bonuses.derivs[x].upgradeAmount = 0;
@@ -581,7 +581,7 @@ function calcCostForNextDeriv() {
 }
 
 function buyNextDeriv() {
-    var cost = calcCostForNextDeriv();
+    let cost = calcCostForNextDeriv();
     if(bonuses.availableEP >= cost) {
         bonuses.availableEP -= cost;
         bonuses.points -= cost;
@@ -590,9 +590,9 @@ function buyNextDeriv() {
 }
 
 function addDeriv() {
-    var pos = bonuses.derivs.length;
+    let pos = bonuses.derivs.length;
     bonuses.derivs[pos] = {};
-    var newDeriv = bonuses.derivs[pos];
+    let newDeriv = bonuses.derivs[pos];
     newDeriv.ticksNeeded = pos === 0 ? 4 : Math.pow(2, (pos-1))*10;
     newDeriv.currentTicks = 0;
     newDeriv.upgradeAmount = 0;

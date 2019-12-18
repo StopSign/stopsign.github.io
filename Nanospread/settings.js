@@ -156,7 +156,7 @@ function selectGridFont(num) {
 
 
 function buyAmountOption(num) {
-    var highlighted = document.getElementById('buy'+settings.buyPerClick);
+    let highlighted = document.getElementById('buy'+settings.buyPerClick);
     if(highlighted) {
         highlighted.style.backgroundColor = "grey";
     }
@@ -180,7 +180,7 @@ function toggleAutobuy(setting) {
 }
 
 function autobuyAmountOption(num) {
-    var highlighted = document.getElementById('autobuy'+settings.autobuyPerTick);
+    let highlighted = document.getElementById('autobuy'+settings.autobuyPerTick);
     if(highlighted) {
         highlighted.style.backgroundColor = "grey";
     }
@@ -204,7 +204,7 @@ function openGrowthTab() {
 }
 
 function adjustUpgradeTabs() {
-    var selectedScreen = document.getElementById("selectedScreen");
+    let selectedScreen = document.getElementById("selectedScreen");
     closeUpgradeScreens();
     if (upgradeTab === "upgrade") {
         selectedScreen.style.backgroundColor = "#6d6dc5";

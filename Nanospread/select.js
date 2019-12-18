@@ -11,11 +11,11 @@ function Select() {
     };
     this.selectAllActive = function() {
         this.deselectAll();
-        var temp = settings.selectOneOrMultiple;
+        let temp = settings.selectOneOrMultiple;
         settings.selectOneOrMultiple = 1;
-        for (var column = 0; column < theGrid.length; column++) {
-            for (var row = 0; row < theGrid[column].length; row++) {
-                var square = theGrid[column][row];
+        for (let column = 0; column < theGrid.length; column++) {
+            for (let row = 0; row < theGrid[column].length; row++) {
+                let square = theGrid[column][row];
                 if (square && square.isActive()) {
                     clickedSquare(column, row);
                 }
@@ -25,8 +25,8 @@ function Select() {
     };
 
     this.getLowestSquares = function(list, resourceType) {  //gets all the Squares with the lowest upgrade amount
-        var lowestAmountSquares;
-        for(var i = 0; i < list.length; i++) {
+        let lowestAmountSquares;
+        for(let i = 0; i < list.length; i++) {
             if(!lowestAmountSquares) {
                 lowestAmountSquares = [list[i]];
                 continue;
@@ -42,8 +42,8 @@ function Select() {
     };
 
     this.getLowestSquare = function(list, resourceType) {
-        var lowestSquare;
-        for(var i = 0; i < list.length; i++) {
+        let lowestSquare;
+        for(let i = 0; i < list.length; i++) {
             if(!lowestSquare) {
                 lowestSquare = list[i];
                 continue;
@@ -57,8 +57,8 @@ function Select() {
     };
 
     this.getSelectedActive = function() {
-        var selectedActive = [];
-        for(var i = 0; i < selected.length; i++) {
+        let selectedActive = [];
+        for(let i = 0; i < selected.length; i++) {
             if(selected[i].isActive()) {
                 selectedActive.push(selected[i]);
             }
@@ -67,8 +67,8 @@ function Select() {
     };
 
     this.getSelectedInactive = function() {
-        var selectedInactive = [];
-        for(var i = 0; i < selected.length; i++) {
+        let selectedInactive = [];
+        for(let i = 0; i < selected.length; i++) {
             if(!selected[i].isActive()) {
                 selectedInactive.push(selected[i]);
             }
@@ -77,8 +77,8 @@ function Select() {
     };
 
     this.getLowestInactiveSquare = function(list) {
-        var lowestInactive;
-        for(var i = 0; i < list.length; i++) {
+        let lowestInactive;
+        for(let i = 0; i < list.length; i++) {
             if(!lowestInactive) {
                 lowestInactive = list[i];
                 continue;
@@ -92,17 +92,17 @@ function Select() {
 
     this.selectAllInCoordinates = function(startingDragPoint, endingDragPoint) {
         this.deselectAll();
-        var temp = settings.selectOneOrMultiple;
+        let temp = settings.selectOneOrMultiple;
         settings.selectOneOrMultiple = 1;
-        var containerOffset = document.getElementById('theBody').offsetWidth > 800 ? (document.getElementById('theBody').offsetWidth - 800)/2 : 0;
-        for (var column = 0; column < theGrid.length; column++) {
-            for (var row = 0; row < theGrid[column].length; row++) {
-                var square = theGrid[column][row];
-                var squareDiv = theView.grid[column][row];
+        let containerOffset = document.getElementById('theBody').offsetWidth > 800 ? (document.getElementById('theBody').offsetWidth - 800)/2 : 0;
+        for (let column = 0; column < theGrid.length; column++) {
+            for (let row = 0; row < theGrid[column].length; row++) {
+                let square = theGrid[column][row];
+                let squareDiv = theView.grid[column][row];
                 if (square && squareDiv) {
 
-                    var squareStartingPoint = {x:pxToInt(squareDiv.style.left)+containerOffset, y:pxToInt(squareDiv.style.top)};
-                    var squareEndingPoint = {x:(pxToInt(squareDiv.style.left)+pxToInt(squareDiv.style.width)+containerOffset), y:(pxToInt(squareDiv.style.top)+pxToInt(squareDiv.style.height))};
+                    let squareStartingPoint = {x:pxToInt(squareDiv.style.left)+containerOffset, y:pxToInt(squareDiv.style.top)};
+                    let squareEndingPoint = {x:(pxToInt(squareDiv.style.left)+pxToInt(squareDiv.style.width)+containerOffset), y:(pxToInt(squareDiv.style.top)+pxToInt(squareDiv.style.height))};
 
                     if(doOverlap(squareStartingPoint, squareEndingPoint, startingDragPoint, endingDragPoint) &&
                         !insideSquare(squareStartingPoint, squareEndingPoint, startingDragPoint, endingDragPoint)) {

@@ -44,28 +44,28 @@ function Square(col,row,initialConsumeCost) {
             curSpecialPosNanites = this.curSpecialPosNanites;
             naniteAmount = this.naniteAmount;
         }
-        var naniteCostExtra = Math.pow(5, (curSpecialPosNanites));
+        let naniteCostExtra = Math.pow(5, (curSpecialPosNanites));
         if(curSpecialPosNanites >= 10) {
             naniteCostExtra *= Math.pow(2, Math.floor(curSpecialPosNanites-10)); //growing costs every 10
         }
         //naniteCostExtra *= Math.pow(2, Math.floor(curSpecialPosNanites / 10)); //growing costs every 10
-        var amountShift = curSpecialPosNanites === 0 ? 0 : curSpecialPosNanites*3;
+        let amountShift = curSpecialPosNanites === 0 ? 0 : curSpecialPosNanites*3;
         return (naniteAmount - getSpecialLevels(curSpecialPosNanites) + amountShift) * 10 * naniteCostExtra / getCostReduction(bonuses.discountLevel);
     };
     this.buyMultipleNanites = function(buyPerClick) {
-        var toBuy;
+        let toBuy;
         if(buyPerClick === "Next") {
             toBuy = getSpecialLevels(this.curSpecialPosNanites+1) - this.naniteAmount;
         } else {
             toBuy = buyPerClick - this.naniteAmount % buyPerClick;
         }
-        for(var j = 0; j < toBuy; j++) {
+        for(let j = 0; j < toBuy; j++) {
             this.buyNanites();
         }
     };
 	this.autobuyMultipleNanites = function(autobuyPerTick) {
-        var num = settings.autobuyPerTick - this.naniteAmount % autobuyPerTick;
-        for(var j = 0; j < num; j++) {
+        let num = settings.autobuyPerTick - this.naniteAmount % autobuyPerTick;
+        for(let j = 0; j < num; j++) {
             this.buyNanites();
         }
     };
@@ -73,26 +73,26 @@ function Square(col,row,initialConsumeCost) {
         return this.isActive() && this.nanites >= this.naniteCostAfterMultiBuy(settings.buyPerClick);
     };
     this.naniteCostAfterMultiBuy = function(amount) {
-        var numToBuy;
+        let numToBuy;
         if(amount === "Next") {
             numToBuy = getSpecialLevels(this.curSpecialPosNanites+1) - this.naniteAmount;
         } else {
             numToBuy = amount - this.naniteAmount % amount;
         }
 
-        var totalNaniteCost = 0;
-        for(var i = 1; i < numToBuy+1; i++) {
+        let totalNaniteCost = 0;
+        for(let i = 1; i < numToBuy+1; i++) {
             totalNaniteCost += this.calcPrice(i);
         }
         return totalNaniteCost;
     };
     this.calcPrice = function(num) {
-        var nextNaniteCost = this.naniteCost;
-        var tempNanites = this.nanites;
-        var tempAmount = this.naniteAmount;
-        var tempSpecialPos = this.curSpecialPosNanites;
-        var tempNaniteAmountBonus = this.naniteAmountBonus;
-        for(var i = 0; i < num-1; i++) {
+        let nextNaniteCost = this.naniteCost;
+        let tempNanites = this.nanites;
+        let tempAmount = this.naniteAmount;
+        let tempSpecialPos = this.curSpecialPosNanites;
+        let tempNaniteAmountBonus = this.naniteAmountBonus;
+        for(let i = 0; i < num-1; i++) {
             tempNanites -= nextNaniteCost;
             tempAmount++;
             if (tempAmount >= getSpecialLevels(tempSpecialPos+1)) {
@@ -163,14 +163,14 @@ function Square(col,row,initialConsumeCost) {
         if(newDirection === this.transferDirection) {
             return;
         }
-        var target = theGrid[this.targetCol] ? theGrid[this.targetCol][this.targetRow] : false;
+        let target = theGrid[this.targetCol] ? theGrid[this.targetCol][this.targetRow] : false;
         if(target) {
             target.naniteAmountReceived = 0;
             target.advBotAmountReceived = 0;
         }
 
-        var tempCol = this.col;
-        var tempRow = this.row;
+        let tempCol = this.col;
+        let tempRow = this.row;
         if(newDirection === "South" ) {
             tempRow = this.row + 1;
         } else if(newDirection === "East") {

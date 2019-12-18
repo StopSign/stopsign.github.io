@@ -121,22 +121,6 @@ input, label {
 input {
     margin-right:0;
 }
-
-.button {
-    padding: 1px 5px;
-    text-align: center;
-    vertical-align:center;
-    min-width:9px;
-    cursor: pointer;
-    outline: none;
-    color: #000000;
-    background-color: #55d4de;
-    border: none;
-    border-radius: 6px;
-    box-shadow: 0 3px #999;
-    transform: translateY(-2px);
-    margin-bottom:2px;
-}
 .buttonPressed {
     padding: 1px 5px;
     text-align: center;
@@ -156,6 +140,22 @@ input {
     background-color: #357937;
     box-shadow: 0 1px #666;
     transform: translateY(-1px);
+}
+
+.button {
+    padding: 1px 5px;
+    text-align: center;
+    vertical-align:center;
+    min-width:9px;
+    cursor: pointer;
+    outline: none;
+    color: #000000;
+    background-color: #55d4de;
+    border: none;
+    border-radius: 6px;
+    box-shadow: 0 3px #999;
+    transform: translateY(-2px);
+    margin-bottom:2px;
 }
 
 .button:hover {background-color: #60eef9
