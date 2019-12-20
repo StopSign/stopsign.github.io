@@ -24,6 +24,7 @@ let rclickStartingPoint;
 let currentLevel, highestLevel;
 let bonuses, autobuy, stats, achieves;
 let specialLevels = [0, 10, 25, 50, 75, 100, 125, 150, 175, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 775, 850, 925, 1000, 1075, 1150, 1225, 1300, 1400, 1500, 1600, 1700, 1800, 1900, 2000, 2200, 2400, 2600, 2800, 3000, 3300, 3600, 3900, 4200, 4500, 4800, 5200, 5600, 6000, 6600, 7300, 7900, 8500, 9400, 10000];
+let numTutLevels = 4;
 
 function getSpecialLevels(pos) {
     if(specialLevels[pos] === undefined) {

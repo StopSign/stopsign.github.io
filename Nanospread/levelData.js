@@ -1,11 +1,11 @@
 //-1 = starting spot
 //0 = doesn't exist
 //>0 = logarithmic ratio of the amount per square
-let levelData2 = [
+let levelData = [
     {
         name:"Intro",
-        grid: [[-1, 2],
-            [5, 12]]
+        grid: [[-1, 5],
+            [2, 12]]
     },
     {
         name:"Gap",
@@ -95,7 +95,7 @@ let levelData2 = [
 ];
 
 
-let levelData = [
+let levelData2 = [
     {
         level:0,
         grid:[

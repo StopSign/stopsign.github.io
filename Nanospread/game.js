@@ -29,7 +29,6 @@ function createGridFromSave(savedGrid) {
 
 
 function createGrid() {
-    let startingCoords = {x:0,y:0};
 
     theGrid = [];
     for(let x = 0; x < 20; x++) {
@@ -37,34 +36,18 @@ function createGrid() {
     }
     let wrapAroundLevel = currentLevel;
     if(currentLevel >= levelData.length) {
-        wrapAroundLevel = (currentLevel-4) % (levelData.length-4) + 4; //first 4 levels are 'tutorial', and don't repeat
+        wrapAroundLevel = (currentLevel-numTutLevels) % (levelData.length-numTutLevels) + numTutLevels; //first 4 levels are 'tutorial', and don't repeat
     }
     console.log(wrapAroundLevel);
 
     let currentLevelGrid = levelData[wrapAroundLevel].grid;
     let goalCost = Math.pow(2, currentLevel-2) * 100000000;
-    if(currentLevel === 0) {
-        goalCost /= 2000;
-    }
-    if(currentLevel === 1) {
-        goalCost /= 300;
-    }
-    if(currentLevel === 2) {
-        goalCost /= 250;
-    }
-    if(currentLevel === 3) {
-        goalCost /= 50;
-    }
-
+    goalCost /= ((currentLevel+1) / 4000);
 
     let totalFromLevelData = 0;
     for(let column = 0; column < currentLevelGrid[0].length; column++) {
         for (let row = 0; row < currentLevelGrid.length; row++) {
             let levelDataNum = currentLevelGrid[row][column];
-            if(levelDataNum === -1) {
-                startingCoords.x = column;
-                startingCoords.y = row;
-            }
             if(levelDataNum > 0) {
                 totalFromLevelData += Math.pow(2, levelDataNum);
             }
@@ -96,8 +79,17 @@ function createGrid() {
         square.chooseStartingDirection(); //All of them have a transfer target
     }, false);
 
-    let startingSquare = theGrid[startingCoords.x][startingCoords.y];
-    startingSquare.gainNanites(startingSquare.consumeCost);
+    for(let column = 0; column < currentLevelGrid[0].length; column++) {
+        for (let row = 0; row < currentLevelGrid.length; row++) {
+            let levelDataNum = currentLevelGrid[row][column];
+            if(levelDataNum === -1) {
+                theGrid[column][row].gainNanites(theGrid[column][row].consumeCost);
+            } else if(levelDataNum === -2) {
+                theGrid[column][row].isPassive = true;
+                theGrid[column][row].consumeCost = 0;
+            }
+        }
+    }
 }
 
 function tick() {
@@ -138,8 +130,11 @@ function clearNanitesReceived() {
 
 function sendNanites() {
     doToAllSquares(function (square) {
+        if(!square.isActive() && !square.isPassive) { //allow passive square to send
+            return;
+        }
         let target = theGrid[square.targetCol][square.targetRow];
-        if(target.isActive()) {
+        if(target.isActive() || target.isPassive) {
             target.gainAdvBots(square.sendPieceOfAdvBots()); //transfer .1% advBots
         }
         let amountTransferred = square.sendPieceOfNanites();
@@ -156,7 +151,7 @@ function sendNanites() {
         square.gainAdvBots(square.advBotRate);
 		stats.producedThisLevel += (square.naniteRate * getNaniteGainBonus());
 		stats.totalProduced += (square.naniteRate * getNaniteGainBonus());
-    }, true);
+    }, false);
 }
 
 function getNaniteGainBonus() {
@@ -354,7 +349,7 @@ function calcEvolutionPointGain() {
         highestLevel++;
         console.log('level up!');
     }
-    return bonus === 0 ? 0 : ((currentLevel+1) * Math.pow(1.2, bonus) * (1 + (calcTotalAchieveBonus() / 100)));
+    return bonus === 0 ? 0 : (Math.pow((currentLevel+1), 2) * Math.pow(1.2, bonus) * (1 + (calcTotalAchieveBonus() / 100)));
 }
 
 function recalcInterval(newSpeed) {

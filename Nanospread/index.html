@@ -27,6 +27,7 @@
     <div id="scrollEast" class="scrollArrow" onclick="theView.shiftLeft()" style=""></div>
     <div id="scrollNorth" class="scrollArrow" onclick="theView.shiftDown()" style=""></div>
     <div id="scrollSouth" class="scrollArrow" onclick="theView.shiftUp()" style=""></div>
+    <div id="levelName" style="position:absolute;font-size:30px;color:black;left:20px;top:5px;"></div>
 </div>
 
 <div id="dragSelectDiv" style="display:none;border:2px solid yellow;border-radius:1px;position:absolute;"></div>
@@ -99,7 +100,7 @@
         </div>
 		<div style="padding:5px;">
             Switching levels or resetting will prestige you, removing most upgrades<br>
-            You will gain evolution points equal to ((Level # + 1) * 1.2^(Lowest Square's Bonus)) * (Achievement Bonus)<br>
+            You will gain evolution points equal to ((Level # + 1)^2 * 1.2^(Lowest Square's Bonus)) * (Achievement Bonus)<br>
             Each evolution point gives 5% more nanite production<br>
             Currently you have <div id="evolutionPoints">0</div> evolution points.<br>
             <input type="checkbox" id="levelConfirm" onclick="theView.updateLevel()">

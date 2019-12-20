@@ -27,6 +27,7 @@ function Square(col,row,initialConsumeCost) {
     this.advBotAmountReceived = 0;
     this.advBotNextSpecial = 10;
     this.consumeCost = initialConsumeCost;
+    this.isPassive = false;
 
     this.buyNanites = function() {
         this.nanites -= this.naniteCost;
@@ -132,7 +133,7 @@ function Square(col,row,initialConsumeCost) {
         }
     };
     this.gainNanites = function(amount) {
-        if(this.isActive()) {
+        if(this.isActive() || this.isPassive) {
             this.nanites+=amount;
             return this.nanites;
         } else {
@@ -143,12 +144,12 @@ function Square(col,row,initialConsumeCost) {
         }
     };
     this.gainAdvBots = function(amount) {
-        if(this.isActive()) {
+        if(this.isActive() || this.isPassive) {
             this.advBots+=amount;
             return this.advBots;
         }
     };
-    this.isActive = function() { return this.naniteAmount > 0; };
+    this.isActive = function() { return this.naniteAmount > 0 && !this.isPassive; };
     this.sendPieceOfNanites = function() {
         this.naniteTransferAmount = this.nanites * this.transferRate / 100;
         this.nanites -= this.naniteTransferAmount;

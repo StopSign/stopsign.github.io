@@ -52,6 +52,7 @@ function View() {
                 this.grid[col][row] = elem.firstChild;
             }
         }
+        document.getElementById("levelName").innerHTML = levelData[currentLevel].name;
         this.recreateDerivs();
         this.update();
     };
@@ -84,7 +85,7 @@ function View() {
     };
     this.backgroundGrid.onmousemove = function(e) {
         if((e.which && e.which === 3) || (e.buttons && e.buttons === 2)) {
-            var dragToPoint = {x:e.pageX, y:e.pageY};
+            let dragToPoint = {x:e.pageX, y:e.pageY};
             theView.offsetx += dragToPoint.x - rclickStartingPoint.x;
             theView.offsety += dragToPoint.y - rclickStartingPoint.y;
             theView.updateOffset();
@@ -93,7 +94,7 @@ function View() {
         }
         let currentPos = {x:e.pageX - theView.offsetx, y:e.pageY - theView.offsety};
         if(isDragging) {
-            let distance = Math.sqrt(Math.pow(startingDragPoint.x - currentPos.x, 2) + Math.pow(startingDragPoint.y - currentPos.y, 2));
+            let distance = getDistance(startingDragPoint.x, startingDragPoint.y, currentPos.x, currentPos.y);
             if(distance < 20) {
                 theView.dragSelectDiv.style.display = "none";
             } else {
@@ -135,7 +136,7 @@ function View() {
         document.getElementById('dragSelectDiv').style.display = 'none';
         isDragging = false;
         endingDragPoint = {x:(e.pageX - theView.offsetx), y:(e.pageY - theView.offsety)};
-        let distance = Math.sqrt(Math.pow(startingDragPoint.x - endingDragPoint.x, 2) + Math.pow(startingDragPoint.y - endingDragPoint.y, 2));
+        let distance = getDistance(startingDragPoint.x, startingDragPoint.y, endingDragPoint.x, endingDragPoint.y);
         if(distance < 20) {
             return;
         }
@@ -185,7 +186,7 @@ function View() {
         if(square.isSelected) {
             gridSquare.style.border = "2px solid #ff9600";
         } else {
-            gridSquare.style.border = square.isActive() ? "2px solid black" : "2px solid white";
+            gridSquare.style.border = square.isActive() ? "2px solid black" : (square.isPassive ? "2px solid grey" : "2px solid white");
         }
         this.updateDirectionArrow(square);
     };
@@ -219,11 +220,11 @@ function View() {
             return;
         }
         if(!borderColor) {
-            borderColor = square.isSelected ? "#ff9600" : (square.isActive() ? "black" : "white");
+            borderColor = square.isSelected ? "#ff9600" : (square.isActive() ? "black" : (square.isPassive ? "grey" : "white"));
         }
         let dir = square.transferDirection;
         let backgroundColor = getInactiveBackgroundColor(square.consumeCost);
-        if(square.isActive()) {
+        if(square.isActive() || square.isPassive) {
             backgroundColor = getActiveBackgroundColor(square.nanites);
         }
         directionArrowOuter.className = "directionArrowOuter"+dir;
@@ -277,7 +278,7 @@ function View() {
         if(settings.selectShowNoneOrNanitesOrAmount === 0) {
             displayNum.innerHTML = '';
         } else if(settings.selectShowNoneOrNanitesOrAmount === 1) {
-            if(square.isActive()) {
+            if(square.isActive() || square.isPassive) {
                 displayNum.innerHTML = intToStringRound(square[resourceType+'s']);
             } else {
                 displayNum.innerHTML = intToStringRound(square.consumeCost);
@@ -285,8 +286,10 @@ function View() {
         } else if(settings.selectShowNoneOrNanitesOrAmount === 2) {
             if(square.isActive()) {
                 displayNum.innerHTML = intToStringRound(square[resourceType+'Amount']);
-            } else {
+            } else if(!square.isPassive) {
                 displayNum.innerHTML = intToStringRound(square.consumeCost);
+            } else {
+                displayNum.innerHTML = '';
             }
         } else {
             secondDisplayNum.style.display = "block";
@@ -294,8 +297,10 @@ function View() {
                 displayNum.style.marginTop = "23%";
                 displayNum.innerHTML = intToStringRound(square[resourceType+'s']);
                 secondDisplayNum.innerHTML = "("+intToStringRound(square[resourceType+'Amount'])+")";
-            } else {
+            } else if(!square.isPassive) {
                 displayNum.innerHTML = intToStringRound(square.consumeCost);
+            } else {
+                displayNum.innerHTML = intToStringRound(square[resourceType+'s']);
             }
         }
 
@@ -304,7 +309,7 @@ function View() {
                 displayNum.classList.toggle('hyperVisible');
                 secondDisplayNum.classList.toggle('hyperVisible');
             }
-            if(!square.isActive()) {
+            if(!square.isActive() || square.isPassive) {
                 displayNum.style.color = "white";
             } else {
                 displayNum.style.color = "black";
@@ -320,7 +325,7 @@ function View() {
 
     this.changeBackground = function(square) {
         let gridSquare = this.grid[square.col][square.row];
-        if(square.isActive()) {
+        if(square.isActive() || square.isPassive) {
             gridSquare.style.background = getActiveBackgroundColor(square.nanites);
             gridSquare.style.opacity = 1;
         } else {
@@ -577,6 +582,9 @@ function View() {
 
 
 function getActiveBackgroundColor(nanites) {
+    if(nanites < 1) {
+        nanites = 1;
+    }
     return colorShiftMath(360, Math.log10(nanites));
 }
 function getInactiveBackgroundColor(consumeCost) {
@@ -686,22 +694,27 @@ function selectedSingleOrMultiple() {
 function selectedActiveOrNot() {
     let selectedActiveAND = true;
     let selectedActiveOR = false;
+    let selectedPassiveOR = false;
     for(let i = 0; i < selected.length; i++) {
         let isActive = selected[i].isActive();
         selectedActiveAND = selectedActiveAND && isActive;
         selectedActiveOR = selectedActiveOR || isActive;
+        selectedPassiveOR = selectedPassiveOR || selected[i].isPassive;
     }
-    if(selectedActiveAND) {
-        labelChange(true, false);
-    } else if(selectedActiveOR) {
-        labelChange(true, true);
-    } else {
-        labelChange(false, true);
-    }
+    labelChange((selectedActiveAND || selectedActiveOR || selectedPassiveOR), !selectedActiveAND, selectedActiveOR);
+    // if(selectedActiveAND) {
+    //     labelChange(true, false);
+    // } else if(selectedActiveOR) {
+    //     labelChange(true, true);
+    // } else {
+    //     labelChange(false, true);
+    // }
     selectedSingleOrMultiple()
 }
 
-function labelChange(isShowing, consumeShowing) {
+function labelChange(isShowing, consumeShowing, buttonsShowing) {
+    document.getElementById("buttonContainer").style.display = buttonsShowing ? "inline-block" : "none";
+
     document.getElementById('totalLabel').style.display = isShowing ? "block" : "none";
     document.getElementById('totalTs').style.display = isShowing ? "block" : "none";
     document.getElementById('averageTs').style.display = isShowing ? "block" : "none";
