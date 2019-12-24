@@ -88,17 +88,11 @@ function exportGrid() {
     let name = document.getElementById("name").value;
     let grid = JSON.stringify(theGrid).replace(/],/g, '],\n');
     let exportString = "{\n";
-    exportString += "name:'"+name+"',\n";
+    exportString += 'name:"'+name+'",\n';
     exportString += "grid:"+grid+"\n";
     exportString+="}";
     document.getElementById("exportString").value = exportString;
 }
-/*
-    {
-        name:"Intro",
-        grid: [[-1, 5],
-            [2, 10]]
-    },*/
 
 function readGrid() {
     for(let x = 0; x < gridX; x++) {
@@ -115,8 +109,8 @@ function importGrid() {
     if(!theString) {
         return;
     }
-    let grid = JSON.parse(theString);
-    createGrid(grid);
+    let levelObj = JSON.parse(theString);
+    createGrid(levelObj.grid);
 }
 
 function showNanites() {
@@ -126,6 +120,8 @@ function showNanites() {
 
     let goalCost = Math.pow(2, currentLevel-2) * 100000000;
     goalCost /= 4000 / Math.pow((currentLevel+1), 2);
+    document.getElementById("totalNanites").innerHTML = intToString(goalCost);
+
     let totalFromLevelData = 0;
     for(let column = 0; column < theGrid[0].length; column++) {
         for (let row = 0; row < theGrid.length; row++) {
