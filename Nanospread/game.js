@@ -61,7 +61,7 @@ function createGrid() {
     for(let x = 0; x < currentLevelGrid.length; x++) {
         initialCostGrid[x] = [];
         for(let y = 0; y < currentLevelGrid[x].length; y++) {
-            initialCostGrid[x][y] = (Math.pow(2, currentLevelGrid[x][y]) * consumeCostModifier) * 2;
+            initialCostGrid[x][y] = (Math.pow(2, currentLevelGrid[x][y]) * consumeCostModifier);
         }
     }
 

@@ -150,7 +150,7 @@ function showNanites() {
                 } else if(val === -2) {
                     newCell.innerHTML = "0";
                 } else {
-                    val = (Math.pow(2, val) * consumeCostModifier) * 2;
+                    val = (Math.pow(2, val) * consumeCostModifier);
                     newCell.innerHTML = intToString(val);
                 }
             }
