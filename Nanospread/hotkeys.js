@@ -39,6 +39,10 @@ function processKeyQueue() {
         } else {
             singleSelect(1, 0);
         }
+    } else if(key === 88 || key === 191) { //x or /
+        if(!shift) {
+            changeDirectionOfSelected('')
+        }
     } else if(key === 66) { //b
         // toggleBuild();
     } else if(key === 81) { //q

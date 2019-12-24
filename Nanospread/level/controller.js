@@ -85,8 +85,20 @@ function calcTotal() {
 
 function exportGrid() {
     readGrid();
-    document.getElementById("exportString").value = JSON.stringify(theGrid).replace(/],/g, '],\n');
+    let name = document.getElementById("name").value;
+    let grid = JSON.stringify(theGrid).replace(/],/g, '],\n');
+    let exportString = "{\n";
+    exportString += "name:'"+name+"',\n";
+    exportString += "grid:"+grid+"\n";
+    exportString+="}";
+    document.getElementById("exportString").value = exportString;
 }
+/*
+    {
+        name:"Intro",
+        grid: [[-1, 5],
+            [2, 10]]
+    },*/
 
 function readGrid() {
     for(let x = 0; x < gridX; x++) {
@@ -109,7 +121,7 @@ function importGrid() {
 
 function showNanites() {
     let gridElem = document.getElementById("naniteGrid");
-    let currentLevel = document.getElementById("levelSim").value;
+    let currentLevel = parseInt(document.getElementById("levelSim").value);
     gridElem.innerHTML = "";
 
     let goalCost = Math.pow(2, currentLevel-2) * 100000000;
@@ -166,8 +178,8 @@ function createExistingLevels() {
         "<div style='width:50px'># Cells</div>";
     existingLevelsDiv.appendChild(labels);
     existingLevelsDiv.appendChild(document.createElement("br"));
-    for(let i = 0; i < levelData.length; i++) {
-        let grid = levelData[i].grid;
+    for(let i = 0; i < levelData2.length; i++) {
+        let grid = levelData2[i].grid;
 
         let total = 0, totalCells = 0;
         for(let x = 0; x < grid.length; x++) {
@@ -183,13 +195,14 @@ function createExistingLevels() {
 
         let elem = document.createElement("div");
         elem.innerHTML = "<div style='width:50px;'>"+i+"</div>" +
-            "<div class='clickable' style='width:150px;'>"+levelData[i].name+"</div>" +
+            "<div class='clickable' style='width:150px;'>"+levelData2[i].name+"</div>" +
             "<div style='width:100px'>"+total+"</div>" +
             "<div style='width:50px'>"+totalCells+"</div>";
         elem.onclick = function() {
-            theGrid = levelData[i].grid;
+            theGrid = levelData2[i].grid;
             createGrid(theGrid);
             document.getElementById("levelSim").value = i;
+            document.getElementById("name").value = levelData2[i].name;
         };
         existingLevelsDiv.appendChild(elem);
         existingLevelsDiv.appendChild(document.createElement("br"));

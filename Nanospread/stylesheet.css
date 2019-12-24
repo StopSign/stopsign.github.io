@@ -92,24 +92,24 @@ body {
     background-color:#ff4400 !important;
 }
 #leftArrow {
-    right:63px;
+    right:66px;
     top:50px;
 }
 #rightArrow {
-    right:23px;
+    right:20px;
     top:50px;
 }
 #upArrow {
     right:43px;
-    top:30px;
+    top:27px;
 }
 #downArrow {
     right:43px;
-    top:70px;
+    top:73px;
 }
 #noArrow {
     right:43px;
-    top:30px;
+    top:50px;
 }
 
 .hidden {
