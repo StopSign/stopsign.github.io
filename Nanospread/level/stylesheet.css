@@ -27,6 +27,7 @@ div {
     width:40px;
     padding-top:10px;
     font-size:12px;
+    vertical-align: top;
 }
 
 .naniteCellEmpty {
