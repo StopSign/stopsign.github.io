@@ -107,6 +107,14 @@ body {
     right:43px;
     top:70px;
 }
+#noArrow {
+    right:43px;
+    top:30px;
+}
+
+.hidden {
+    display:none;
+}
 
 .buyButton {
     width:100%;
@@ -360,6 +368,7 @@ input, label {
 }
 
 .directionArrowOuterEast, .directionArrowInnerEast {
+    display:block;
     top:8px;
     position:absolute;
     border-top:15px solid transparent !important;
@@ -374,6 +383,7 @@ input, label {
 }
 
 .directionArrowOuterWest, .directionArrowInnerWest {
+    display:block;
     top:8px;
     position:absolute;
     border-top:15px solid transparent !important;
@@ -388,6 +398,7 @@ input, label {
 }
 
 .directionArrowOuterSouth, .directionArrowInnerSouth {
+    display:block;
     left:8px;
     position:absolute;
     border-left:15px solid transparent !important;
@@ -401,8 +412,8 @@ input, label {
     top:42px;
 }
 
-
 .directionArrowOuterNorth, .directionArrowInnerNorth {
+    display:block;
     left:8px;
     position:absolute;
     border-left:15px solid transparent !important;

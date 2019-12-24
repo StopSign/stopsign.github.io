@@ -38,11 +38,11 @@ function createGrid() {
     if(currentLevel >= levelData.length) {
         wrapAroundLevel = (currentLevel-numTutLevels) % (levelData.length-numTutLevels) + numTutLevels; //first 4 levels are 'tutorial', and don't repeat
     }
-    console.log(wrapAroundLevel);
+    document.getElementById("levelName").innerHTML = levelData[wrapAroundLevel].name;
 
     let currentLevelGrid = levelData[wrapAroundLevel].grid;
     let goalCost = Math.pow(2, currentLevel-2) * 100000000;
-    goalCost /= ((currentLevel+1) / 4000);
+    goalCost /= 4000 / Math.pow((currentLevel+1), 2);
 
     let totalFromLevelData = 0;
     for(let column = 0; column < currentLevelGrid[0].length; column++) {
@@ -68,7 +68,7 @@ function createGrid() {
     for (let column = 0; column < currentLevelGrid[0].length; column++) {
         for (let row = 0; row < currentLevelGrid.length; row++) {
             if(currentLevelGrid[row][column] === 0) {
-                continue; //this makes the empty spots undefined in theGrid. Change if you want other terrain there.
+                continue; //this makes the empty spots
             }
             let initialConsumeCost = initialCostGrid[row][column];
             theGrid[column][row] =  new Square(column, row, initialConsumeCost);
@@ -211,7 +211,7 @@ function changeDirectionOfSelected(direction) {
     for(let i = 0; i < selected.length; i++) {
         let tempDirection = selected[i].transferDirection;
         selected[i].changeTargetDirection(direction);
-        if(!selected[i].getTarget()) {
+        if(!selected[i].getTarget()) { //don't change if there's no good target
             selected[i].changeTargetDirection(tempDirection);
         }
     }
@@ -359,7 +359,7 @@ function recalcInterval(newSpeed) {
 }
 
 function buyTickSpeed() {
-    if(bonuses.availableEP >= getTickSpeedCost() && bonuses.tickSpeedLevel < 5) {
+    if(bonuses.availableEP >= getTickSpeedCost() && bonuses.tickSpeedLevel < 2) {
 		bonuses.availableEP -= getTickSpeedCost();
 		recalcInterval(bonuses.tickSpeedLevel + .2);
     }
@@ -370,7 +370,7 @@ function getTickSpeedCost(tickSpeedLevel) {
     if(tickSpeedLevel === undefined) {
         tickSpeedLevel = bonuses.tickSpeedLevel;
     }
-    return precision2(50 * Math.pow(2, (tickSpeedLevel - 1)*5));
+    return precision2(50 * Math.pow(5, (tickSpeedLevel - 1)*5));
 }
 
 function setTransferRate(newRate) {
@@ -381,9 +381,9 @@ function setTransferRate(newRate) {
 }
 
 function buyTransferRate() {
-    if(bonuses.availableEP >= getTransferRateCost() && bonuses.transferRateLevel < 10) {
+    if(bonuses.availableEP >= getTransferRateCost() && bonuses.transferRateLevel < 50) {
 		bonuses.availableEP -= getTransferRateCost();
-		setTransferRate(bonuses.transferRateLevel + 1);
+		setTransferRate(round5(bonuses.transferRateLevel + .1));
     }
     theView.update();
 }
@@ -392,7 +392,7 @@ function getTransferRateCost(transferRateLevel) {
     if(transferRateLevel === undefined) {
         transferRateLevel = bonuses.transferRateLevel;
     }
-    return precision2(15 * Math.pow(2, transferRateLevel - 1));
+    return precision2(15 * Math.pow(4, transferRateLevel - 1));
 }
 
 function buyDiscountLevel() {
@@ -414,11 +414,11 @@ function getDiscountCost(discountLevel) {
     if(discountLevel === undefined) {
         discountLevel = bonuses.discountLevel;
     }
-    return precision2(Math.pow(1.03, discountLevel) * Math.pow(discountLevel+1, 2)); // 1.01^n * (n+1)^2
+    return precision2(Math.pow(1.06, discountLevel) * Math.pow(discountLevel+1, 2)); // 1.06^n * (n+1)^2
 }
 
 function buyAbMaxLevel() {
-    if(autobuy.currentMax < highestLevel * 10 && bonuses.availableEP >= getAbMaxCost()) {
+    if(autobuy.currentMax < (highestLevel+1) * 10 && bonuses.availableEP >= getAbMaxCost()) {
 		bonuses.availableEP -= getAbMaxCost();
 		autobuy.currentMax++;
     }
@@ -429,7 +429,7 @@ function getAbMaxCost(currentMax) {
     if(currentMax === undefined) {
         currentMax = autobuy.currentMax;
     }
-    return precision2(10 / 4 * currentMax);
+    return round2(10 / 4 * Math.pow(currentMax, 2));
 }
 
 function buyAbAmtToSpendLevel() {
@@ -444,7 +444,7 @@ function getAbAmtToSpendCost(amtToSpend) {
     if(amtToSpend === undefined) {
         amtToSpend = autobuy.amtToSpend;
     }
-    return precision2(25 * amtToSpend);
+    return Math.pow(amtToSpend, 2) * 25;
 }
 
 function resetBonusPoints() {

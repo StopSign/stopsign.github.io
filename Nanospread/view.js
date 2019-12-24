@@ -52,7 +52,6 @@ function View() {
                 this.grid[col][row] = elem.firstChild;
             }
         }
-        document.getElementById("levelName").innerHTML = levelData[currentLevel].name;
         this.recreateDerivs();
         this.update();
     };
@@ -241,6 +240,9 @@ function View() {
         } else if(dir === "South") {
             directionArrowOuter.style.borderTop = '7px solid '+borderColor;
             directionArrowInner.style.borderTop = '7px solid '+backgroundColor;
+        } else {
+            directionArrowInner.className = "hidden";
+            directionArrowOuter.className = "hidden";
         }
     };
 
@@ -251,6 +253,7 @@ function View() {
         }
 
         let dir = square.transferDirection;
+        directionDot.style.display = 'block';
         if(dir === "East") {
             directionDot.style.top = '22px';
             directionDot.style.left = '39px';
@@ -263,6 +266,8 @@ function View() {
         } else if(dir === "South") {
             directionDot.style.top = '39px';
             directionDot.style.left = '22px';
+        } else {
+            directionDot.style.display = 'none';
         }
 
     };
@@ -434,7 +439,7 @@ function View() {
 			document.getElementById('buyDiscountButton').style.borderColor = 'red';
 		}
 
-		if(autobuy.currentMax >= highestLevel * 10) {
+		if(autobuy.currentMax >= (highestLevel+1) * 10) {
             document.getElementById('buyAbMaxButton').style.borderColor = 'grey';
         } else if(bonuses.availableEP >= getAbMaxCost()) {
             document.getElementById('buyAbMaxButton').style.borderColor = 'green';
@@ -468,7 +473,7 @@ function View() {
 		document.getElementById('buyDiscountCost').innerHTML = intToString(getDiscountCost());
         document.getElementById('buyDiscountCostN').innerHTML = intToString(getDiscountCost(bonuses.discountLevel+1));
 		document.getElementById('abCurrentMax').innerHTML = intToString(autobuy.currentMax);
-        document.getElementById('abMaxMax').innerHTML = intToString(highestLevel * 5);
+        document.getElementById('abMaxMax').innerHTML = intToString((highestLevel+1) * 10);
         document.getElementById('buyAbMaxCost').innerHTML = intToString(getAbMaxCost());
         document.getElementById('buyAbMaxCostN').innerHTML = intToString(getAbMaxCost(autobuy.currentMax+1));
         document.getElementById('abAmtToSpendLevel').innerHTML = intToString(autobuy.amtToSpend);
@@ -625,7 +630,7 @@ function buttonSetup(type, typeUpper, label) { //lol javascript
 }
 
 function drawDirectionArrow() {
-    let arrows = [document.getElementById('leftArrow'), document.getElementById('rightArrow'), document.getElementById('upArrow'), document.getElementById('downArrow')];
+    let arrows = [document.getElementById('leftArrow'), document.getElementById('rightArrow'), document.getElementById('upArrow'), document.getElementById('downArrow'), document.getElementById('noArrow')];
     clearArrows(arrows);
 
     let dir = selected[0].transferDirection;
@@ -641,6 +646,8 @@ function drawDirectionArrow() {
         arrowToChange = arrows[2];
     } else if(dir === "South") {
         arrowToChange = arrows[3];
+    } else {
+        arrowToChange = arrows[4];
     }
     arrowToChange.style.backgroundColor = "#ff9600";
 }

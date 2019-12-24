@@ -122,18 +122,18 @@
         <div class="selectedScreen" id="selectedScreen">
             <div id="upgradeScreen">
                 <div style="padding:5px;">
-                    <div id='buyTickSpeedButton' class="normalButton" onclick="buyTickSpeed()"> +20% Tick Speed </div><br>
+                    <div id='buyTickSpeedButton' class="normalButton" onclick="buyTickSpeed()"> +10% Tick Speed </div><br>
                     Current Tick Speed: <div id="currentTickSpeed">1</div>/sec<br>
                     Cost: <div id="buyTickSpeedCost">10</div> EP<br>
                     Next Cost: <div id="buyTickSpeedCostN">10</div> EP<br>
-                    Maximum of 5/sec
+                    Maximum of 2/sec
                 </div>
                 <div style="padding:5px;">
-                    <div id='buyTransferRateButton' class="normalButton" onclick="buyTransferRate()"> +0.01 Transfer Rate </div><br>
+                    <div id='buyTransferRateButton' class="normalButton" onclick="buyTransferRate()"> +0.001 Transfer Rate </div><br>
                     Current Transfer Rate: <div id="currentTransferRate">0.01</div><br>
                     Cost: <div id="buyTransferRateCost">100</div> EP<br>
                     Next Cost: <div id="buyTransferRateCostN">10</div> EP<br>
-                    Maximum of 0.1
+                    Maximum of 0.05
                 </div>
                 <div style="padding:5px;">
                     <div id='buyDiscountButton' class="normalButton" onclick="buyDiscountLevel()"> +<div id="nextDiscountBonus">0</div>% Cost Reduction </div><br>
@@ -147,14 +147,15 @@
                     Autobuy Max Level: <div id="abCurrentMax">1</div><br>
                     Cost: <div id="buyAbMaxCost">10</div> EP<br>
                     Next Cost: <div id="buyAbMaxCostN">10</div> EP<br>
-                    Maximum of <div id="abMaxMax">0</div>
+                    Maximum of <div id="abMaxMax">0</div><br>
+                    Max increase 10 per level
                 </div>
                 <div style="padding:5px;">
                     <div id='buyAbAmtToSpendButton' class="normalButton" onclick="buyAbAmtToSpendLevel()"> +1% Max Spent </div><br>
                     Autobuy Max Amt. To Spend: <div id="abAmtToSpendLevel">1</div>%<br>
                     Cost: <div id="buyAbAmtToSpendCost">100</div> EP<br>
                     Next Cost: <div id="buyAbAmtToSpendCostN">10</div> EP<br>
-                    Maximum of 50%
+                    Maximum of 20%
                 </div>
             </div>
             <div id="growthScreen">
@@ -183,7 +184,7 @@
             </div>
         </div>
     </div>
-    <div id="helpBox" style="display:none;">
+    <div id="helpBox" style="display:none;padding-left:5px;">
         Click on the starting Square and upgrade it.<br>
         Point it at the Square you want to activate next.<br>
         Cost goes up every bonus level, but nanite production doubles. The first bonus level is at 10, then every 25, increasing later.<br>
@@ -346,14 +347,13 @@
                 <div id="advBotSpecialNext"></div>
                 <div id="numSelectedAdvBotsButtonBuyable" style="position:absolute;right:5px;top:2px;"></div>
             </div>
-        </div>		
+        </div>
         <i id="closeButton" class="closeButton fa fa-close" onclick="select.deselectAll()"></i>
         <i id="leftArrow" class="fa fa-arrow-circle-left arrow" onclick="changeDirectionOfSelected('West')"></i>
         <i id="rightArrow" class="fa fa-arrow-circle-right arrow" onclick="changeDirectionOfSelected('East')"></i>
         <i id="upArrow" class="fa fa-arrow-circle-up arrow" onclick="changeDirectionOfSelected('North')"></i>
         <i id="downArrow" class="fa fa-arrow-circle-down arrow" onclick="changeDirectionOfSelected('South')"></i>
-
-        
+        <i id="noArrow" class="fa fa-stop-circle arrow" onclick="changeDirectionOfSelected('None')"></i>
 
     </div>
 

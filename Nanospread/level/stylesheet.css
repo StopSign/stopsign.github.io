@@ -1,3 +1,7 @@
+div {
+    display:inline-block;
+}
+
 .gridRow {
     height:20px;
     margin-top:5px;
@@ -6,7 +10,29 @@
 .gridCell {
     height:100%;
     margin-right:5px;
-    background-color:red;
+    display:inline-block;
+}
+
+.naniteRow {
+    height:40px;
+    margin-top:5px;
+}
+
+.naniteCell {
+    height:30px;
+    margin-right:3px;
+    display:inline-block;
+    text-align:center;
+    border:1px solid black;
+    width:40px;
+    padding-top:10px;
+    font-size:12px;
+}
+
+.naniteCellEmpty {
+    height:41px;
+    width:42px;
+    margin-right:3px;
     display:inline-block;
 }
 
@@ -39,4 +65,10 @@ input {
     background-color: #3e9aa2;
     box-shadow: 0 1px #666;
     transform: translateY(0px);
+}
+
+.clickable {
+    cursor:pointer;
+    color:blue;
+    text-decoration:underline;
 }

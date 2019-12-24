@@ -6,20 +6,49 @@
     <link rel="stylesheet" href="stylesheet.css">
 </head>
 <body>
-<label for="gridX">Grid Height: </label><input id="gridX" value="12">
-<label for="gridY">Grid Width: </label><input id="gridY" value="12">
-<div class="button" onclick="createGrid()">Create Grid</div>
-<div id="grid"></div>
-<div>Total Num: <div id="total" style="display:inline-block"></div></div>
-<div>Total Cells: <div id="totalCells" style="display:inline-block"></div></div>
-<div>
-    -1 is Start, 0 is a hole, >0 is logarithmic values
-</div>
-<div id="export" class="button" onclick="exportGrid()">Export</div>
-<div id="import" class="button" onclick="importGrid()">Import</div>
-<label for="exportString">Grid String: </label><textarea id="exportString"></textarea>
+<div id="createGridContainer">
+    <label for="gridX">Grid Height: </label><input id="gridX" value="8">
+    <label for="gridY">Grid Width: </label><input id="gridY" value="8">
+    <div class="button" onclick="newGrid()">New Grid</div><br>
 
+    <div id="gridContainer" style="text-align:center;position:relative;margin-left:40px;display:none;">
+        <div id="addTop" class="button" onclick="addTopRow()">+</div>
+        <div id="removeTop" class="button" onclick="removeTopRow()">-</div><br>
+
+        <div id="addLeft" class="button" style="position:absolute;top:50%;left:-40px;" onclick="addLeftRow()">+</div>
+        <div id="removeLeft" class="button" style="position:absolute;top:50%;left:-20px;" onclick="removeLeftRow()">-</div>
+
+        <div id="grid"></div>
+
+        <div id="addRight" class="button" style="position:absolute;top:50%;right:-20px;" onclick="addRightRow()">+</div>
+        <div id="removeRight" class="button" style="position:absolute;top:50%;right:-40px;" onclick="removeRightRow()">-</div><br><br>
+
+        <div id="addBottom" class="button" onclick="addBottomRow()">+</div>
+        <div id="removeBottom" class="button" onclick="removeBottomRow()">-</div>
+    </div><br>
+
+    <div>Total Num: <div id="total"></div></div><br>
+    <div>Total Cells: <div id="totalCells"></div></div><br>
+    <div>
+        -1 is Start<br>
+        0/empty is a hole<br>
+        >0 is logarithmic values, so 1 => 2, 2 => 4, 3 => 8, etc.<br>
+        X.1 is a x2 multiplier, X.2 is a x4 multiplier, etc. (so like 2.2)
+    </div><br>
+    <div id="export" class="button" onclick="exportGrid()">Export</div>
+    <div id="import" class="button" onclick="importGrid()">Import</div><br>
+    <label for="exportString">Grid String: </label><textarea id="exportString"></textarea>
+</div>
+<div style="vertical-align:top;margin-left:60px;">
+    <div class="button" onclick="showNanites()">Show Nanites for Level:</div> <input id="levelSim" value="0"><br>
+    <div id="naniteGrid"></div>
+</div>
+<div style="vertical-align:top;margin-left:50px;">
+    Existing levels:<br>
+    <div id="existingLevels"></div>
+</div>
 </body>
 <script src="../helpers.js"></script>
+<script src="../levelData.js"></script>
 <script src="controller.js"></script>
 </html>
