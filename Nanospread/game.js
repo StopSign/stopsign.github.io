@@ -38,7 +38,8 @@ function createGrid() {
     if(currentLevel >= levelData.length) {
         wrapAroundLevel = (currentLevel-numTutLevels) % (levelData.length-numTutLevels) + numTutLevels; //first 4 levels are 'tutorial', and don't repeat
     }
-    document.getElementById("levelName").innerHTML = levelData[wrapAroundLevel].name;
+    let name = levelData[wrapAroundLevel].name;
+    document.getElementById("levelName").innerHTML = name ? name : "";
 
     let currentLevelGrid = levelData[wrapAroundLevel].grid;
     let goalCost = Math.pow(2, currentLevel-2) * 100000000;
