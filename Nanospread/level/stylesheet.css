@@ -35,6 +35,7 @@ div {
     width:42px;
     margin-right:3px;
     display:inline-block;
+    vertical-align: top;
 }
 
 input {
