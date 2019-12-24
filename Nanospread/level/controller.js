@@ -88,8 +88,8 @@ function exportGrid() {
     let name = document.getElementById("name").value;
     let grid = JSON.stringify(theGrid).replace(/],/g, '],\n');
     let exportString = "{\n";
-    exportString += 'name:"'+name+'",\n';
-    exportString += "grid:"+grid+"\n";
+    exportString += '"name":"'+name+'",\n';
+    exportString += '"grid":'+grid+'\n';
     exportString+="}";
     document.getElementById("exportString").value = exportString;
 }
