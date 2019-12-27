@@ -414,6 +414,7 @@ function View() {
     this.updateEvolutionGain = function() {
         document.getElementById('evolutionGain').innerHTML = intToString(calcEvolutionPointGain());
         document.getElementById('evolutionPoints').innerHTML = intToString(bonuses.points);
+        document.getElementById('evolutionBonus').innerHTML = intToString(bonuses.points * 5);
     };
 
 	this.updateUpgrade = function() {
@@ -775,8 +776,8 @@ function updateInfoGridExtras() {
     }
     let lowestInactive = select.getLowestInactiveSquare(inactiveList);
 
-    document.getElementById('totalTransferRate').innerHTML = intToString(totalTransferRate);
-    document.getElementById('averageTransferRate').innerHTML = intToString(totalTransferRate / selected.length);
+    document.getElementById('totalTransferRate').innerHTML = intToString(totalTransferRate, 4);
+    document.getElementById('averageTransferRate').innerHTML = intToString(totalTransferRate / selected.length, 4);
 
     document.getElementById('totalConsumeCost').innerHTML = intToString(totalConsumeCost);
     document.getElementById('averageConsumeCost').innerHTML = intToString(totalConsumeCost / inactiveList.length);

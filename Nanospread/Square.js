@@ -186,16 +186,17 @@ function Square(col,row,initialConsumeCost) {
         this.transferDirection = newDirection;
     };
     this.chooseStartingDirection = function() {
-        this.changeTargetDirection("South");
-        if(!this.getTarget()) {
-            this.changeTargetDirection("East");
-        }
-        if(!this.getTarget()) {
-            this.changeTargetDirection("North");
-        }
-        if(!this.getTarget()) {
-            this.changeTargetDirection("West");
-        }
+        this.changeTargetDirection("");
+        // this.changeTargetDirection("South");
+        // if(!this.getTarget()) {
+        //     this.changeTargetDirection("East");
+        // }
+        // if(!this.getTarget()) {
+        //     this.changeTargetDirection("North");
+        // }
+        // if(!this.getTarget()) {
+        //     this.changeTargetDirection("West");
+        // }
 
     };
     this.getTarget = function() {

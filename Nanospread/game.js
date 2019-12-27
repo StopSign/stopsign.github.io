@@ -337,20 +337,27 @@ function applyDirectionsToGrid(tempGrid) {
 }
 
 function calcEvolutionPointGain() {
-    let bonus = 9999999999;
+    let bonus = 0;
+    let allActive = true;
+    let numActive = 0;
     for (let column = 0; column < theGrid.length; column++) {
         for (let row = 0; row < theGrid[column].length; row++) {
             let square = theGrid[column][row];
-            if (square && square.curSpecialPosNanites < bonus) { //gets lowest
-                bonus = square.curSpecialPosNanites;
+            if (square && !square.isPassive) {
+                numActive++;
+                bonus += square.curSpecialPosNanites;
+                if(!square.isActive()) {
+                    allActive = false;
+                }
             }
         }
     }
-    if(bonus > 0 && currentLevel === highestLevel) {
+    bonus = bonus / numActive;
+    if(allActive && currentLevel === highestLevel) {
         highestLevel++;
         console.log('level up!');
     }
-    return bonus === 0 ? 0 : (Math.pow((currentLevel+1), 2) * Math.pow(1.2, bonus) * (1 + (calcTotalAchieveBonus() / 100)));
+    return !allActive ? 0 : (Math.pow((currentLevel+1), 2) * Math.pow(1.2, bonus) * (1 + (calcTotalAchieveBonus() / 100)));
 }
 
 function recalcInterval(newSpeed) {
@@ -377,14 +384,14 @@ function getTickSpeedCost(tickSpeedLevel) {
 function setTransferRate(newRate) {
     bonuses.transferRateLevel = newRate;
     doToAllSquares(function (square) {
-        square.transferRate = newRate;
+        square.transferRate = 1 + (newRate-1)/10;
     }, false);
 }
 
 function buyTransferRate() {
     if(bonuses.availableEP >= getTransferRateCost() && bonuses.transferRateLevel < 50) {
 		bonuses.availableEP -= getTransferRateCost();
-		setTransferRate(round5(bonuses.transferRateLevel + .1));
+		setTransferRate(round5(bonuses.transferRateLevel + 1));
     }
     theView.update();
 }
@@ -393,7 +400,7 @@ function getTransferRateCost(transferRateLevel) {
     if(transferRateLevel === undefined) {
         transferRateLevel = bonuses.transferRateLevel;
     }
-    return precision2(15 * Math.pow(4, transferRateLevel - 1));
+    return precision2(15 * Math.pow(4, (transferRateLevel - 1)));
 }
 
 function buyDiscountLevel() {
@@ -430,7 +437,7 @@ function getAbMaxCost(currentMax) {
     if(currentMax === undefined) {
         currentMax = autobuy.currentMax;
     }
-    return round2(10 / 4 * Math.pow(currentMax, 2));
+    return round2(5 * currentMax + 50);
 }
 
 function buyAbAmtToSpendLevel() {

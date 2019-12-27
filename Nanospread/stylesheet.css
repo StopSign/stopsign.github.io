@@ -426,3 +426,10 @@ input, label {
 .directionArrowInnerNorth {
     top:-5px;
 }
+
+
+.clickable {
+    cursor:pointer;
+    color:blue;
+    text-decoration:underline;
+}

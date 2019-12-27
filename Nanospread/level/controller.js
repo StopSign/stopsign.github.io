@@ -111,6 +111,7 @@ function importGrid() {
     }
     let levelObj = JSON.parse(theString);
     createGrid(levelObj.grid);
+    document.getElementById("name").value = levelObj.name;
 }
 
 function showNanites() {
@@ -174,8 +175,8 @@ function createExistingLevels() {
         "<div style='width:50px'># Cells</div>";
     existingLevelsDiv.appendChild(labels);
     existingLevelsDiv.appendChild(document.createElement("br"));
-    for(let i = 0; i < levelData2.length; i++) {
-        let grid = levelData2[i].grid;
+    for(let i = 0; i < levelData.length; i++) {
+        let grid = levelData[i].grid;
 
         let total = 0, totalCells = 0;
         for(let x = 0; x < grid.length; x++) {
@@ -191,14 +192,14 @@ function createExistingLevels() {
 
         let elem = document.createElement("div");
         elem.innerHTML = "<div style='width:50px;'>"+i+"</div>" +
-            "<div class='clickable' style='width:150px;'>"+levelData2[i].name+"</div>" +
+            "<div class='clickable' style='width:150px;'>"+levelData[i].name+"</div>" +
             "<div style='width:100px'>"+total+"</div>" +
             "<div style='width:50px'>"+totalCells+"</div>";
         elem.onclick = function() {
-            theGrid = levelData2[i].grid;
+            theGrid = copyArray(levelData[i].grid);
             createGrid(theGrid);
             document.getElementById("levelSim").value = i;
-            document.getElementById("name").value = levelData2[i].name;
+            document.getElementById("name").value = levelData[i].name;
         };
         existingLevelsDiv.appendChild(elem);
         existingLevelsDiv.appendChild(document.createElement("br"));
