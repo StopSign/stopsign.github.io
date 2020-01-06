@@ -466,7 +466,7 @@ function View() {
         document.getElementById('currentTickSpeed').innerHTML = intToString(bonuses.tickSpeedLevel);
         document.getElementById('buyTickSpeedCost').innerHTML = intToString(getTickSpeedCost());
         document.getElementById('buyTickSpeedCostN').innerHTML = intToString(getTickSpeedCost(bonuses.tickSpeedLevel+.2));
-        document.getElementById('currentTransferRate').innerHTML = intToString(bonuses.transferRateLevel / 100);
+        document.getElementById('currentTransferRate').innerHTML = intToString((1 + bonuses.transferRateLevel/10) / 100);
         document.getElementById('buyTransferRateCost').innerHTML = intToString(getTransferRateCost());
         document.getElementById('buyTransferRateCostN').innerHTML = intToString(getTransferRateCost(bonuses.transferRateLevel+1));
 		document.getElementById('nextDiscountBonus').innerHTML = intToString((getCostReduction(bonuses.discountLevel + 1) - getCostReduction(bonuses.discountLevel)) * 100);

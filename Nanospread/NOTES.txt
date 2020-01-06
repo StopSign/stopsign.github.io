@@ -9,4 +9,30 @@ fix levels to be loopable more
 
 
 change to average bonus level for EP
-show individual bonuses in EP calc 
+show individual bonuses in EP calc
+
+chess board
+checkers board
+
+change consume cost graphics
+
+something to speed up neuron growth, but expensive
+something to reward early expansion
+
+upgrades for neurons
+
+change auto buy to rewards for challenges
+    challenge ideas
+        nanites decay
+        random squares lose all nanites
+        challenge unlocks when total nanites > cost of the next special level
+
+zooming in/out
+highlight buyable squares
+select active includes newly active
+remove autobuy max, lower the % of autobuy
+
+1 time level upgrades
+
+performance
+

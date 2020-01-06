@@ -119,8 +119,11 @@ function showNanites() {
     let currentLevel = parseInt(document.getElementById("levelSim").value);
     gridElem.innerHTML = "";
 
-    let goalCost = Math.pow(2, currentLevel-2) * 100000000;
+    let goalCost = Math.pow(4, currentLevel-2) * 1000000000;
     goalCost /= 4000 / Math.pow((currentLevel+1), 2);
+    if(currentLevel >= levelData.length) { //when you wrap around
+        goalCost *= 10;
+    }
     document.getElementById("totalNanites").innerHTML = intToString(goalCost);
 
     let totalFromLevelData = 0;
@@ -128,7 +131,7 @@ function showNanites() {
         for (let row = 0; row < theGrid.length; row++) {
             let levelDataNum = theGrid[row][column];
             if(levelDataNum > 0) {
-                totalFromLevelData += Math.pow(2, levelDataNum);
+                totalFromLevelData += Math.pow(3, levelDataNum);
             }
         }
     }
@@ -151,7 +154,7 @@ function showNanites() {
                 } else if(val === -2) {
                     newCell.innerHTML = "0";
                 } else {
-                    val = (Math.pow(2, val) * consumeCostModifier);
+                    val = (Math.pow(4, val) * consumeCostModifier);
                     newCell.innerHTML = intToString(val);
                 }
             }

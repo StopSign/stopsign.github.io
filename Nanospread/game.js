@@ -42,7 +42,7 @@ function createGrid() {
     document.getElementById("levelName").innerHTML = name ? name : "";
 
     let currentLevelGrid = levelData[wrapAroundLevel].grid;
-    let goalCost = Math.pow(2, currentLevel-2) * 100000000;
+    let goalCost = Math.pow(3, currentLevel-2) * 1000000000;
     goalCost /= 4000 / Math.pow((currentLevel+1), 2);
 
     let totalFromLevelData = 0;
@@ -50,7 +50,7 @@ function createGrid() {
         for (let row = 0; row < currentLevelGrid.length; row++) {
             let levelDataNum = currentLevelGrid[row][column];
             if(levelDataNum > 0) {
-                totalFromLevelData += Math.pow(2, levelDataNum);
+                totalFromLevelData += Math.pow(4, levelDataNum);
             }
         }
     }
@@ -61,7 +61,7 @@ function createGrid() {
     for(let x = 0; x < currentLevelGrid.length; x++) {
         initialCostGrid[x] = [];
         for(let y = 0; y < currentLevelGrid[x].length; y++) {
-            initialCostGrid[x][y] = (Math.pow(2, currentLevelGrid[x][y]) * consumeCostModifier);
+            initialCostGrid[x][y] = (Math.pow(4, currentLevelGrid[x][y]) * consumeCostModifier);
         }
     }
 
@@ -357,7 +357,7 @@ function calcEvolutionPointGain() {
         highestLevel++;
         console.log('level up!');
     }
-    return !allActive ? 0 : (Math.pow((currentLevel+1), 2) * Math.pow(1.2, bonus) * (1 + (calcTotalAchieveBonus() / 100)));
+    return !allActive ? 0 : (Math.pow((currentLevel+1), 2) * Math.pow(1.3, bonus) * (1 + (calcTotalAchieveBonus() / 100)));
 }
 
 function recalcInterval(newSpeed) {
@@ -572,7 +572,7 @@ function tickGrowth() {
 function resetDerivBonuses() {
     bonuses.growthBonus = 1;
     for(let x = 0; x < bonuses.derivs.length; x++) {
-        bonuses.derivs[x].ticksNeeded = x === 0 ? 4 : Math.pow(2, (x-1))*10;
+        bonuses.derivs[x].ticksNeeded = x === 0 ? 4 : Math.pow(3, (x-1))*10;
         bonuses.derivs[x].currentTicks = 0;
         bonuses.derivs[x].upgradeAmount = 0;
         bonuses.derivs[x].amount = 1;
@@ -596,7 +596,7 @@ function addDeriv() {
     let pos = bonuses.derivs.length;
     bonuses.derivs[pos] = {};
     let newDeriv = bonuses.derivs[pos];
-    newDeriv.ticksNeeded = pos === 0 ? 4 : Math.pow(2, (pos-1))*10;
+    newDeriv.ticksNeeded = pos === 0 ? 4 : Math.pow(3, (pos-1))*10;
     newDeriv.currentTicks = 0;
     newDeriv.upgradeAmount = 0;
     newDeriv.amount = 1;

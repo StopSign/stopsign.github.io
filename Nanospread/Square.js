@@ -47,7 +47,7 @@ function Square(col,row,initialConsumeCost) {
         }
         let naniteCostExtra = Math.pow(5, (curSpecialPosNanites));
         if(curSpecialPosNanites >= 10) {
-            naniteCostExtra *= Math.pow(2, Math.floor(curSpecialPosNanites-10)); //growing costs every 10
+            naniteCostExtra *= Math.pow(3, Math.floor(curSpecialPosNanites-10)); //growing costs every 10
         }
         //naniteCostExtra *= Math.pow(2, Math.floor(curSpecialPosNanites / 10)); //growing costs every 10
         let amountShift = curSpecialPosNanites === 0 ? 0 : curSpecialPosNanites*3;
@@ -97,7 +97,7 @@ function Square(col,row,initialConsumeCost) {
             tempNanites -= nextNaniteCost;
             tempAmount++;
             if (tempAmount >= getSpecialLevels(tempSpecialPos+1)) {
-                tempNaniteAmountBonus = Math.pow(2, (++tempSpecialPos));
+                tempNaniteAmountBonus = Math.pow(3, (++tempSpecialPos));
             }
             nextNaniteCost = this.calcNaniteCost(tempSpecialPos, tempAmount);
         }
