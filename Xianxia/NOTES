@@ -1,0 +1,175 @@
+Xianxia tropes:
+
+Son of the town leader bullying someone
+Carriage about to trample a kid
+Auction house plot
+larger sect bullying the smaller one
+forced marriage
+tournament for right to marry
+
+Levels
+Early stage, mid stage, late stage, peak
+
+Qi condensation
+Foundation Establishment
+Core Formation
+Nascent Soul
+Divine Soul
+False Immortal
+Earth Immortal
+Heaven Immortal
+Golden Immortal
+God
+God King
+God Emperor
+
+
+Cultivation Method types: Mortal, Profound, Spirit, Earth, Sky, Emperor, Tyrant, Sovereign, God
+
+Body types: Copper, Iron, Bronze, Silver, Gold, Jade, Mithril, Heavenly, Divine
+
+
+Elements
+Wood, Fire, Earth, Metal, Water
+
+Items
+Weapons - Sword, Spear, Staff
+Talismans - passive buffs, can have 1 of each element at a time
+
+Game:
+Goals:
+    1. Get more gold - can be used to buy items / pills (boosts) / plants (boosts) / cores / maps
+    2. Cultivate - Gain unrefined Qi and refine Qi (based on quality of cultivation), can use cores to add unrefined Qi, plants for elemental-specific unrefined Qi
+    3. Read scrolls - Improve Cultivation Method (limited by quality of the scroll)
+    4. Body Refinement - Improve max health/current health/boost efficiency, slowly removes impurities (based on cultivation)
+    5. Qi Circulation - Convert refined Qi into purified Qi, removes impurities
+    6. Train Arts - Improve arts (based on cultivation + body)
+    7. Fighting - Do better based on cultivate, body, arts, combat, and items
+        6a. Fight monsters - Repeat endlessly, gain beast cores, find plants, that can be sold or refined
+        6b. Quests - Random quests available that take 5-60 minutes and give a choice of rewards at the end
+        6c. Tournament - Much longer quest, potentially shitty rewards, potentially much better rewards
+        6d. Lost Tombs - Requires a map, gives scrolls and arts as rewards
+    8. Forge Items - Imbue items with cores
+    9. Build Sect - Improve and gain from followers
+
+General:
+
+Choose which Dao (cultivation method) to cultivate. Choices are based on element, unrefined gain rate, max unrefined rate, refine rate, max cultivation base, impurity rate
+Switching cultivation methods loses all unrefined
+Use refined Qi to either improve Cultivation Base as a lump cost, or recover purified Qi (of that element)
+If you have more unrefined than your base can handle, you can refine twice as fast for half the efficiency
+Improving cultivation base unlocks more features and powers you up, increases the amount of purified Qi you can store, increases the default rate of purified Qi gain
+Powerups are both element specific and total, with the first breakthrough giving a higher benefit to the totals
+Purified Qi (mana) is used to for Arts (spells)
+
+Combat:
+Combat is always 1 vs Many.
+Combat is idle, but you can add conditions to determine what to do in different situations (complicated)
+Each person (including you) has an Engaged meter. When an engaged meter is filled, continuous damage is applied to the next target
+Each additional enemy has a penalty to their engaged meter.
+Some arts can slow, freeze, quicken, or reset the engaged meter.
+Some arts are long range, and can start damaging at half the engaged meter.
+Some arts are multi-target, and can target everyone engaged with you
+Enemies typically have 1 art, which they start using when engaged
+Enemy groups typically have 1 element
+Dying/losing exits the activity and adds impurities
+Health is continuous and regens slowly, but arts can regen it much better
+Arts have a cast time, but most are near-instant. Casting arts doesn't interrupt the continuous damage
+
+
+Quests:
+    Will appear based on Cultivation Base
+    Quests expire after 10 minutes, new ones show up every 5 minutes / (1 + 1.05^informants)
+    3 random ones appear at a time to start, with a refresh timer of 10 minutes.
+    Some quests have a rare "Hire as informant" that increases number of quests visible, up to 20.
+    Quests have:
+        Title & Desc (hint at rewards)
+        # waves
+        Total # enemies
+        Approx Difficulty
+        Element (if applicable)
+    Quests should take 5-60 minutes
+    All quests have a choice of 2+ rewards at the end
+    Reputation is a quest-specific resource that reduces shop prices and enables features like tournament / certain rewards
+    Reputation can go negative, which would increase prices
+    Common reward choices: Gold, Pills, Cores, Reputation
+    Rare reward choices: Informant, Merchant (gold/s), Scrolls, Maps, Arts, Weapons, Plants
+    Quest Types:
+        Kidnapped Daughter - Bandits have taken her! Get her back
+            Rewards: Gold, Reputation (How can I ever repay you?)
+        Lost Son - Monsters are closing in! Please save him
+            Rewards: Cores, Rep-cost: Plants, Reputation (Thank you for saving me, you can have the cores)
+        Small Town Famous - Don't you know who I am? You'll regret this!
+            Rewards: Gold, Pills. Rare: rep-cost Informant
+        Son of a Lord - Don't you know who my father is? You'll regret this!
+            Rewards: Rep-cost: Informant, Gold, Pills. Rare: rep-cost merchant
+        Auction Time - The Auctioneer is being blackmailed to not sell to you. Fix that first
+            Rewards: Reputation, Buy cheap cores and pills. Chance to buy rare Items, Plants.
+        Forced Marriage - Using their strength, they want a peerless beauty to give up her lifestyle
+            Rewards: Merchant, Rep-cost: Informant, Reputation. Rare: rep-cost: arts
+        Greedy Fool - Merchant put economic pressure on someone he's weaker than. Protect him!
+            Rewards: Rep-cost: Merchant, Informant, Pills. Rare: rep-cost: plants
+        Greedy Bastard - A merchant is putting economic pressure on me because he's stronger! Stop him!
+            Rewards: Merchant, Informant, Reputation. Rare: rep-cost: Maps
+        Lost Apprentice - I sent him for herbs and he hasn't come back!
+            Rewards: Plants, Rep-cost: Cores, Gold. Rare: Rep-cost: Talisman
+        Merchant Escort - Only a small chance of bandits, I swear.
+            Rewards: Merchant, Informant, Pills, Gold. Rare: Weapons
+        Assassin in the Night - An enemy of yours sent assassins to kill you. Return the favor.
+            Rewards: Informant, Reputation. Rare: weapons, talisman
+        Rumors of a Flower - A villager saw a glowing flower. Hunt it down!
+            Rewards: Plant, Rare: talisman
+        Old Man's Last Wish - Kill the monsters he swore veangence on
+            Rewards: Gold, Pills. Rare: Plants, Scrolls, Maps, Arts, Weapons
+        I'm No Bystander - Get in the middle of a feud between villages
+            Rewards: Reputation, rep-cost: scrolls, rep-cost: arts
+        Cultists of the Deep - Sacrifices and tentacles. Not cool
+            Rewards: Talismans, Pills. Rare: Scrolls, Arts
+        Cultists of the Woods - Using monsters to attack, they must be stopped
+            Rewards: Talismans, Pills. Rare: Scrolls, Plants
+        Cultists of the Forge - Their 'art' causes insanity. Don't look too closely!
+            Rewards: Talismans, Pills. Rare: Scrolls, Weapons
+        Cultists of the Sun - Raving lunatics. Mostly just super annoying.
+            Rewards: Talisman, Pills. Rare: Scrolls, Reputation
+        Cultists of the Cliffs - Bandits in disguise.
+            Rewards: Talisman, Pills. Rare: Scrolls, Gold
+
+Elements
+    Wood - Bind & Protect
+    Fire - Single target & Multi-target
+    Earth - Bind & Multi-target
+    Metal - Protect & Enhance
+    Water - Single Target & Heal
+
+Wood Arts
+    (Bind) Roots
+    (Protect) Barkskin
+    (Bind) Poison Needles
+    (Multi-target) Thorns
+
+Fire Arts
+    (Single Target) Scorch
+    (Single Target) Incinerate
+    (Multi-target) Flame Wall
+    (Multi-target) Flame Breath
+
+Earth Arts
+    (Bind) Spike
+    (Multi-target bind) Quake
+    (Multi-target) Rift
+    (Multi-target) Shatter
+
+Metal Arts
+    (Protect) Jade Skin
+    (Protect) Shield Arm
+    (Enhance) Iron Lungs
+    (Enhance) Blade Connection
+
+Water Arts
+    (Single target) Icicle
+    (Multi-target Bind) Freeze
+    (HOT) Blood Flow
+    (Heal) Close wounds
+
+Start of game:
+You have a water scroll, and can cultivate it
