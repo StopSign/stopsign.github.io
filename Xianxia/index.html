@@ -18,121 +18,7 @@
 
 <div id="modalWarning" style="position:absolute;width:300px;height:200px;background-color:#c49396;top:200px;left:500px;display:none;"></div>
 
-<div id="cultivationDiv" style="border:1px solid;">
-    <div class="title">Cultivation</div>
-    You are at the <div id="qiStageName">Early Qi Condensation</div> stage<br>
-    <div class="showthat">Current Cultivate Method: Mortal Water Scroll
-        <div class="showthis">
-            The insights and laws that lead you towards enlightenment.<br>
-            Cultivate with the insights gained from the scroll to grow in power and soul.
-        </div>
-    </div><br>
-    <div class="showthat">Impurities: 0
-        <div class="showthis">
-            Cracks in your pillars or flaws in your soul.<br>
-            Reduces maximum unrefined Qi by 1% per impurity.<br>
-        </div>
-    </div><br>
-    <div style="vertical-align:top">
-        <div class="title">
-            <div class="showthat">The Dao
-                <div class="showthisD">
-                    Improve your cultivation to become closer to the heavens, on the ultimate journey to become an immortal.
-                </div>
-            </div>
-        </div>
-
-        <div id="daoDivs">
-            <div id="daoWater" style="background-color:#809bca;padding:10px;">
-                <div class="button showthat" style="display:block">
-                    Cultivate
-                    <div class="showthisD">
-                        Collect the raw Qi from the atmosphere around you in the manner your scroll leads you to do, and turn it into elemental unrefined Qi.
-                        Then, make that Qi yours by attuning it to the frequency of your soul.
-                    </div>
-                </div>
-                <div class="button showthat" style="display:block;margin-top:5px;">
-                    Cycle Qi
-                    <div class="showthisD">
-                        Cycle Qi through your meridians to purify it into a useable form for your arts. Turns Refined Qi into Purified Qi to be used by your Arts, at same rate as Refining.
-                    </div>
-                </div>
-                <div class="showthat">Unrefined Water Qi: 0/90
-                    <div class="showthisD">
-                        Take in the Qi that surrounds you, or that comes from spiritual objects.<br>
-                        Efficiency ( * 1/(1+impurities)): 90%<br>
-                        Every 90 Unrefined Qi, refinement rate doubles but efficiency halves.<br>
-                    </div>
-                </div><br>
-                <div class="showthat">Refined Water Qi: 0/1000 (+.8)
-                    <div class="showthisD">
-                        Processed Qi that's been attuned to your soul.<br>
-                        Unprocessed Qi becomes impurities.<br>
-                        Every 1000 Refined Qi, refinement is 25% slower<br>
-                        Qi Gain is reduced by purity, having too much Refined Qi, or having too much Unrefined Qi.<br>
-                    </div>
-                </div>
-                <div class="button showthat" style="display:block;margin-top:5px;">
-                    Breakthrough: 100 Refined Qi
-                    <div class="showthisD">
-                        Expend Unrefined Qi into breaking through to the next stage of cultivation! Each stage is significantly stronger than the previous. Reduces current impurities by 50%
-                    </div>
-                </div>
-                <div style="margin:5px;border:1px solid;">
-                    <div class="smallTitle">Mortal Water Dao</div>
-                    Unrefined Qi: 1/s (100)<br>
-                    Refined Qi: 5/s (1000)<br>
-                    Purity: 80%<br>
-                </div><br>
-                <div id='methodWater' class="button" onclick="openChangeScroll()">Change Scroll</div><br>
-            </div>
-            <div id="changeScrollModal" style="display:none;">
-                <!-- Has X, has list of 4 scrolls for each other element than selected, has warning that unrefined Qi will be lost -->
-            </div>
-        </div>
-    </div>
-
-    <div style="vertical-align:top">
-        <div class="title showthat">
-            <div class="showthat">Body Method
-                <div class="showthisD">
-                    Improve your body. Increasing in rank increases max health and how much unrefined Qi you can store at a time<br>
-                    Ranks: Copper, Iron, Bronze, Silver, Gold, Jade, Mithril, Heavenly, Divine
-                </div>
-            </div>
-        </div>
-        <div class="button showthat" style="display:block">
-            Breathing Exercises
-            <div class="showthisD">
-                Take in the natural Qi of the world and use it to expel impurities. Gain unrefined Qi at half the rate of your Dao, but reduce impurities with the other half.
-            </div>
-        </div>
-        <div class="button showthat" style="display:block">
-            Open Meridians
-            <div class="showthisD">
-                Using refined Qi from your Dao, use it in opening additional meridians, to better flow Qi through your body.
-            </div>
-        </div>
-        <div class="showthat">
-            Meridians: 0<br>
-            <div class="progressOuter">
-                Next Meridian <div style="float:right">0 / 50</div>
-                <div class="progressInner"></div>
-            </div>
-            <div class="showthisD">
-                The network of channels in the body through which Qi flows. Like blood vessels, but for Qi.
-            </div>
-        </div><br>
-        <div class="button showthat" style="display:block">
-            Open Meridian
-            <div class="showthisD">
-                Using refined Qi from your Dao, use it in opening additional meridians, to better flow Qi through your body.
-            </div>
-        </div>
-    </div>
-</div><br>
-
-<div id="artsDiv" style="border:1px solid;">
+<div id="artsDiv" class="infoDiv">
     <div class="title">
         <div class="showthat">The Arts
             <div class="showthisD">
@@ -140,6 +26,16 @@
             </div>
         </div>
     </div>
+    <div class="smallTitle">Health</div>
+    <div class="progressOuter">
+        Health <div style="float:right">0 / 100</div>
+        <div class="progressInner"></div>
+    </div><br>
+    <div class="progressOuter">
+        Stamina <div style="float:right">0 / 100</div>
+        <div class="progressInner"></div>
+    </div><br>
+    Attack <div style="float:right">1</div><br>
     <div class="smallTitle">Purified Qi</div>
     <div class="progressOuter">
         Water <div style="float:right">0 / 1000</div>
@@ -168,10 +64,255 @@
     Blood Flow <div style="float:right">200</div><br>
     <div class="smallTitle">Earth</div>
 
+    <div class="smallTitle">Physical Arts</div>
+    <div class="smallTitle">Sword</div>
+    Parry  <div style="float:right">1</div><br>
+
+</div>
+<div>
+    <div id="sectDiv" class="infoDiv">
+        <div class="title">
+            <div class="showthat">In the Sect
+                <div class="showthisD">Your safehaven, to cultivate at peace and manage your affairs</div>
+            </div>
+        </div>
+
+        <div id="cultivationDiv" class="infoDiv">
+            <div class="title">Cultivation</div>
+            You are at the <div id="qiStageName">Early Qi Condensation</div> stage<br>
+            <div class="showthat">Current Cultivate Method: Mortal Water Scroll
+                <div class="showthisD">
+                    The insights and laws that lead you towards enlightenment.<br>
+                    Cultivate with the insights gained from the scroll to grow in power and soul.
+                </div>
+            </div><br>
+            <div class="showthat">Impurities: 0 (+0.2)
+                <div class="showthisD">
+                    Cracks in your pillars or flaws in your soul.<br>
+                    Reduces maximum unrefined Qi by 1% per impurity.<br>
+                </div>
+            </div><br>
+            <div class="infoDiv">
+                <div class="title">
+                    <div class="showthat">The Dao
+                        <div class="showthisD">
+                            Improve your cultivation to become closer to the heavens, on the ultimate journey to become an immortal.
+                        </div>
+                    </div>
+                </div>
+
+                <div id="daoWater" style="background-color:#809bca;padding:10px;">
+                    <div class="button showthat">
+                        Cultivate
+                        <div class="showthisD">
+                            Collect the raw Qi from the atmosphere around you in the manner your scroll leads you to do, and turn it into elemental unrefined Qi.
+                            Then, make that Qi yours by attuning it to the frequency of your soul.
+                        </div>
+                    </div><br>
+                    <div class="button showthat" style="margin-top:5px;">
+                        Cycle Qi
+                        <div class="showthisD">
+                            Cycle Qi through your meridians to purify it into a useable form for your arts. Turns Refined Qi into Purified Qi to be used by your Arts, at same rate as Refining.
+                        </div>
+                    </div><br>
+                    <div class="showthat">Unrefined Water Qi: 0/90 (+.8)
+                        <div class="showthisD">
+                            Take in the Qi that surrounds you, or that comes from spiritual objects.<br>
+                            Efficiency ( * 1/(1+impurities)): 90%<br>
+                            Every 90 Unrefined Qi, refinement rate doubles but efficiency halves.<br>
+                        </div>
+                    </div><br>
+                    <div class="showthat">Refined Water Qi: 0/1000 (+5)
+                        <div class="showthisD">
+                            Processed Qi that's been attuned to your soul.<br>
+                            Unprocessed Qi becomes impurities.<br>
+                            Every 1000 Refined Qi, refinement is 25% slower<br>
+                            Qi Gain is reduced by purity, having too much Refined Qi, or having too much Unrefined Qi.<br>
+                        </div>
+                    </div>
+                    <div class="button showthat" style="display:block;margin-top:5px;">
+                        Breakthrough: 100 Refined Qi
+                        <div class="showthisD">
+                            Expend Unrefined Qi into breaking through to the next stage of cultivation! Each stage is significantly stronger than the previous. Reduces current impurities by 50%
+                        </div>
+                    </div>
+                    <div class="infoDiv" style="margin:5px;">
+                        <div class="smallTitle">Mortal Water Dao</div>
+                        Unrefined Qi: 1/s (100)<br>
+                        Refined Qi: 5/s (1000)<br>
+                        Purity: 80%<br>
+                    </div>
+                </div>
+            </div>
+
+            <div class="infoDiv">
+                <div class="title showthat">
+                    <div class="showthat">Body Method
+                        <div class="showthisD">
+                            Improve your body. Increasing in rank increases max health and how much unrefined Qi you can store at a time<br>
+                            Ranks: Copper, Iron, Bronze, Silver, Gold, Jade, Mithril, Heavenly, Divine
+                        </div>
+                    </div>
+                </div>
+                <div class="button showthat">
+                    Breathing Exercises
+                    <div class="showthisD">
+                        Take in the natural Qi of the world and use it to expel impurities. Gain unrefined Qi at half the rate of your Dao, but reduce impurities with the other half.
+                    </div>
+                </div><br>
+                <div class="button showthat">
+                    Open Meridians
+                    <div class="showthisD">
+                        Using refined Qi from your Dao, use it in opening additional meridians, to better flow Qi through your body.
+                    </div>
+                </div><br>
+                <div class="showthat">
+                    Meridians: 0<br>
+                    <div class="progressOuter">
+                        Next Meridian <div style="float:right">0 / 50</div>
+                        <div class="progressInner"></div>
+                    </div>
+                    <div class="showthisD">
+                        The network of channels in the body through which Qi flows. Like blood vessels, but for Qi.
+                    </div>
+                </div><br>
+                <div class="button showthat" style="margin-top:5px">
+                    Open Meridian
+                    <div class="showthisD">
+                        Using refined Qi from your Dao, use it in opening additional meridians at the same rate as refining, to better flow Qi through your body.
+                    </div>
+                </div><br>
+            </div>
+        </div>
+
+        <div id="itemsDiv" class="infoDiv" >
+            <div id="selectedItemsDiv">
+                <div style="vertical-align: top;border-right:1px solid;">
+                    <div class="title">Weapon</div>
+                    <div id="selectedWeaponDiv" class="Body infoDiv" style="margin:5px;cursor:pointer;">
+                        <div class="smallTitle">Copper Sword</div>
+                        Damage: 10<br>
+                        Arc: 0<br>
+                        Range: 5
+                    </div>
+                </div>
+                <div style="vertical-align: top;">
+                    <div class="title">Equipped Scrolls</div>
+                    <div id="selectedWaterScrollDiv" class="Water infoDiv" style="margin:5px;cursor:pointer;">
+                        <div class="smallTitle">Mortal Water Dao</div>
+                        Unrefined Qi: 1/s (100)<br>
+                        Refined Qi: 5/s (1000)<br>
+                        Purity: 80%<br>
+                    </div>
+                    <div id="selectedEarthScrollDiv" class="Earth infoDiv" style="margin:5px;cursor:pointer;">
+                        <div class="smallTitle">Mortal Earth Dao</div>
+                        Unrefined Qi: 1/s (100)<br>
+                        Refined Qi: 5/s (1000)<br>
+                        Purity: 80%<br>
+                    </div>
+                    <div id="selectedMetalScrollDiv" class="Metal infoDiv" style="margin:5px;cursor:pointer;">
+                        <div class="smallTitle">Mortal Metal Dao</div>
+                        Unrefined Qi: 1/s (100)<br>
+                        Refined Qi: 5/s (1000)<br>
+                        Purity: 80%<br>
+                    </div>
+                    <div id="selectedFireScrollDiv" class="Fire infoDiv" style="margin:5px;cursor:pointer;">
+                        <div class="smallTitle">Mortal Fire Dao</div>
+                        Unrefined Qi: 1/s (100)<br>
+                        Refined Qi: 5/s (1000)<br>
+                        Purity: 80%<br>
+                    </div>
+                    <div id="selectedWoodScrollDiv" class="Wood infoDiv" style="margin:5px;cursor:pointer;">
+                        <div class="smallTitle">Mortal Wood Dao</div>
+                        Unrefined Qi: 1/s (100)<br>
+                        Refined Qi: 5/s (1000)<br>
+                        Purity: 80%<br>
+                    </div>
+                    <br>Click to change current cultivation scroll. Warning: Changing elements will reset Unrefined Qi to 0
+                </div>
+            </div><br>
+            <div id="inventoryDiv" class="infoDiv" style="display:block;">
+                <div class="title">Inventory</div>
+
+                <div class="infoDiv">
+                    <div class="smallTitle">Selected Info</div>
+                    <div class="infoDiv">
+                        Item goes here<br>
+                        attack:1<br>
+                        Value:5<br>
+                        quantity:1<br>
+                    </div><br>
+                    <div class="button">Equip/Use</div><br>
+                    <div class="button">Sell</div>
+                </div>
+
+                <div id="inventoryContainers">
+                    <div class="inventoryBox"></div>
+                    <div class="inventoryBox"></div>
+                    <div class="inventoryBox"></div>
+                    <div class="inventoryBox"></div>
+                    <div class="inventoryBox"></div>
+                    <div class="inventoryBox"></div>
+                    <div class="inventoryBox"></div>
+                    <div class="inventoryBox"></div>
+                    <div class="inventoryBox"></div>
+                    <div class="inventoryBox"></div><br>
+                    <div class="inventoryBox"></div>
+                    <div class="inventoryBox"></div>
+                    <div class="inventoryBox"></div>
+                    <div class="inventoryBox"></div>
+                    <div class="inventoryBox"></div>
+                    <div class="inventoryBox"></div>
+                    <div class="inventoryBox"></div>
+                    <div class="inventoryBox"></div>
+                    <div class="inventoryBox"></div>
+                    <div class="inventoryBox"></div><br>
+                </div>
+            </div>
+        </div>
+
+        <div id="shopDiv" class="infoDiv">
+            <div class="title">Shops</div>
+        </div>
+    </div>
+
+    <br><div class="infoDiv" style="display:block;">
+        <div class="title">
+            Journey Out
+        </div>
+
+        <div id="questDiv" class="infoDiv">
+            <div class="title">Quests</div>
+            <div class="infoDiv">
+                <div class="smallTitle">Selected Quest</div>
+                <div class="infoDiv">
+                    Quest info goes here<br>
+                    Quest description<br>
+                    Level: 0<br>
+                    Waves: 5<br>
+                    Avg # per wave: 2<br>
+                    Elements: Water, Earth<br>
+                    Rewards: <br>
+                    Rare rewards: <br>
+                </div><br>
+                <div class="button">Start</div>
+            </div>
+            <div id="availableQuests">
+                <div class="title">Available Quests</div>
+                <div class="infoDiv">
+                    <div class="smallTitle">
+                        Fight Monsters
+                    </div>
+                </div>
+                <div class="inventoryBox"></div>
+                <div class="inventoryBox"></div>
+                <div class="inventoryBox"></div>
+            </div>
+        </div>
+    </div>
 </div>
 
-
-    <script src="driver.js?1"></script>
+<script src="driver.js?1"></script>
     <script src="views/mainView.js?1"></script>
     <script src="saving.js?1"></script>
     <script src="helpers/helpers.js?1"></script>

@@ -1,5 +1,6 @@
 div {
     display:inline-block;
+    font-size:12px;
 }
 
 body {
@@ -10,7 +11,7 @@ body {
     user-select: none;
     font-family:Arial, Helvetica, serif;
     color:black;
-    font-size:14px;
+    font-size:0;
     height:100%;
     margin:0;
     background-color: #cfd3e6;
@@ -75,6 +76,8 @@ body {
 .showthisD {
     left:105%;
     min-width:300px;
+    z-index:1000;
+    position:absolute;
 }
 
 .showthis2 {
@@ -87,6 +90,10 @@ body {
     font-weight:bold;
     display:block;
     text-align:center;
+}
+.title .showthat {
+    font-size:16px;
+    font-weight:bold;
 }
 .smallTitle {
     font-size:14px;
@@ -131,6 +138,13 @@ input, label {
 input {
     margin-right:0;
 }
+
+.infoDiv {
+    border:1px solid;
+    padding:2px;
+    vertical-align: top;
+}
+
 .buttonPressed {
     padding: 1px 5px;
     text-align: center;
@@ -144,12 +158,10 @@ input {
     margin-bottom:2px;
     background-color: #3e9aa2;
     box-shadow: 0 1px #666;
-    transform: translateY(0px);
 }
 .buttonPressed.active {
     background-color: #36868d;
     box-shadow: 0 1px #666;
-    transform: translateY(-1px);
 }
 
 .button {
@@ -164,7 +176,6 @@ input {
     border: none;
     border-radius: 6px;
     box-shadow: 0 3px #999;
-    transform: translateY(-2px);
     margin-bottom:2px;
 }
 
@@ -176,7 +187,6 @@ input {
     background-color: #3e9aa2;
     box-shadow: 0 1px #666;
     color: #e1e1e1;
-    transform: translateY(0px);
 }
 
 .imageDragFix {
@@ -226,3 +236,58 @@ input {
     background-color: #a86fc4;
 }
 
+.Water {
+    background-color:rgb(128, 155, 202);
+}
+.Water:hover {
+    background-color:rgb(138, 165, 212);
+}
+.Earth {
+    background-color: rgb(165, 126, 107);
+}
+.Earth:hover {
+    background-color: rgb(175, 136, 117);
+}
+.Metal {
+    background-color: rgb(170, 170, 167);
+}
+.Metal:hover {
+    background-color: rgb(180, 180, 177);
+}
+.Fire {
+    background-color: rgb(249, 143, 144);
+}
+.Fire:hover {
+    background-color: rgb(256, 153, 154);
+}
+.Wood {
+    background-color: rgb(142, 202, 143);
+}
+.Wood:hover {
+    background-color: rgb(152, 212, 153);
+}
+.Body {
+    background-color: rgb(233, 196, 214);
+}
+.Body:hover {
+    background-color: rgb(243, 206, 224);
+}
+
+.inventoryBox {
+    width:50px;
+    height:50px;
+    margin:2px;
+    cursor:pointer;
+    padding:2px;
+    border:1px solid;
+    vertical-align: top;
+}
+.inventoryBoxSelected {
+    width:50px;
+    height:50px;
+    margin:2px;
+    cursor:pointer;
+    padding:1px;
+    border:2px solid yellow;
+    vertical-align: top;
+}

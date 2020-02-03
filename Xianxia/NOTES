@@ -26,14 +26,14 @@ God Emperor
 
 Cultivation Method types: Mortal, Profound, Spirit, Earth, Sky, Emperor, Tyrant, Sovereign, God
 
-Body types: Copper, Iron, Bronze, Silver, Gold, Jade, Mithril, Heavenly, Divine
+Physical types: Copper, Iron, Bronze, Silver, Gold, Jade, Mithril, Heavenly, Divine
 
 
 Elements
 Wood, Fire, Earth, Metal, Water
 
 Items
-Weapons - Sword, Spear, Staff
+Weapons - Sword, Spear, BO Staff
 Talismans - passive buffs, can have 1 of each element at a time
 
 Game:
@@ -172,4 +172,13 @@ Water Arts
     (Heal) Close wounds
 
 Start of game:
-You have a water scroll, and can cultivate it
+You have a water scroll, and can cultivate it. You have 1 scroll art
+You have a copper sword in your inventory you need to equip
+You complete the first quest and get the Blood Flow Art
+
+
+Questions: training/improving arts?
+    NO to individual training
+    Power boosts related to element-specific stage
+    Qi cost reduced by # meridians
+    Art scrolls have higher costs / power
