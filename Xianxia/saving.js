@@ -21,8 +21,12 @@ let stop = false;
 let prevState = {};
 
 let culRes = {};
-let currCulMethod = "";
 let scrollMethods = {};
+let equippedScrolls = {}; //map of 5 scroll items, one per element
+let currDao = {}; //scroll currently cultivating
+let currWeapon = {}; //weapon equipped
+let inventory = [];
+
 
 function clearSave() { //Doesn't work atm
     window.localStorage[saveName] = "";
@@ -30,53 +34,31 @@ function clearSave() { //Doesn't work atm
 }
 
 function loadDefaults() {
-    scrollMethods = {
-        "Water":{
-            element:"Water",
-                level:0,
-            unrefinedGain: 1,
-            refineRate: 5,
-            maxUnrefined:100,
-            maxRefined:1000,
-            purity:.8
-        },
-        "Earth":{
-            element:"Earth",
-            level:0,
-            unrefinedGain: 1,
-            refineRate: 5,
-            maxUnrefined:100,
-            maxRefined:1000,
-            purity:.8
-        },
-        "Metal":{
-            element:"Metal",
-            level:0,
-            unrefinedGain: 1,
-            refineRate: 5,
-            maxUnrefined:100,
-            maxRefined:1000,
-            purity:.8
-        },
-        "Fire":{
-            element:"Fire",
-            level:0,
-            unrefinedGain: 1,
-            refineRate: 5,
-            maxUnrefined:100,
-            maxRefined:1000,
-            purity:.8
-        },
-        "Wood":{
-            element:"Wood",
-            level:0,
-            unrefinedGain: 1,
-            refineRate: 5,
-            maxUnrefined:100,
-            maxRefined:1000,
-            purity:.8
-        }
-    };
+    let newScroll = new Item("Water", 0);
+    newScroll.createAsScroll(1, 100, 5, 1000, 80);
+    equippedScrolls.put("Water", newScroll);
+
+    newScroll = new Item("Earth", 0);
+    newScroll.createAsScroll(1, 100, 5, 1000, 80);
+    equippedScrolls.put("Earth", newScroll);
+
+    newScroll = new Item("Metal", 0);
+    newScroll.createAsScroll(1, 100, 5, 1000, 80);
+    equippedScrolls.put("Metal", newScroll);
+
+    newScroll = new Item("Fire", 0);
+    newScroll.createAsScroll(1, 100, 5, 1000, 80);
+    equippedScrolls.put("Fire", newScroll);
+
+    newScroll = new Item("Wood", 0);
+    newScroll.createAsScroll(1, 100, 5, 1000, 80);
+    equippedScrolls.put("Wood", newScroll);
+
+    currDao = equippedScrolls.get("Water");
+
+    let newWeapon = new Item("Body", 0);
+    newWeapon.createAsWeapon("sword", 5, 90, 3);
+    inventory.push(newWeapon);
 
     culRes = {
         "Water": {
