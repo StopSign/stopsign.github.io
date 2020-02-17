@@ -214,10 +214,13 @@ input {
 }
 
 .progressOuter {
-    width:150px;
-    height:13px;
-    background-color:rgba(113, 113, 113, .8);
+    width:300px;
+    height:19px;
+    background-color:rgba(173, 173, 173, .8);
     position:relative;
+    color:white;
+    font-size:15px;
+    font-weight:bold;
 }
 
 .progressInner {
@@ -226,3 +229,12 @@ input {
     background-color: #a86fc4;
 }
 
+.log {
+    display:block;
+    height:100px;
+    background-color:#e0e0e0;
+    font-size:12px;
+    padding:5px;
+    overflow:auto;
+    margin-bottom:5px;
+}

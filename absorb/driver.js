@@ -1,6 +1,6 @@
 'use strict';
 
-let gameSpeed = 10;
+let gameSpeed = 1;
 let bonusSpeed = 1;
 
 let curTime = new Date();
@@ -10,12 +10,13 @@ let saveTimer = 2000;
 let ticksPerSecond = 20;
 let totalTime = 0;
 
+let prevTime = curTime;
+
 function tick() {
     if(sudoStop) {
         return;
     }
     let newTime = new Date();
-    totalTime += newTime - curTime;
     gameTicksLeft += newTime - curTime;
     saveTimer -= newTime - curTime;
     curTime = newTime;
@@ -26,7 +27,7 @@ function tick() {
     // document.getElementById("saveTimer").innerHTML = round(saveTimer/1000);
 
     let didSomething = false; //for performance
-
+    let secondTime = false;
     while (gameTicksLeft > (1000 / ticksPerSecond)) {
         if(stop) {
             gameTicksLeft = 0;
@@ -35,7 +36,7 @@ function tick() {
         }
 
         totalTime++;
-        if(totalTime % 20 === 0) {
+        if(totalTime % ticksPerSecond === 0) {
             secondPassed();
         }
         tickPassed();
@@ -50,18 +51,23 @@ function tick() {
         }
         gameTicksLeft -= (1000 / ticksPerSecond) / gameSpeed / bonusSpeed;
 
+        if(secondTime) {
+            console.log("lag");
+        }
+        secondTime = true;
     }
     if(didSomething) {
         view.updating.update();
     }
+    prevTime = curTime;
 }
 
 function tickPassed() {
-
+    dealDamage();
 }
 
 function secondPassed() {
-
+    recoverHealth();
 }
 
 function recalcInterval(fps) {

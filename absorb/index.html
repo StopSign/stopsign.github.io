@@ -16,6 +16,44 @@
 </head>
 <body id="theBody" oncontextmenu="return false;" style="padding:5px" class="medium">
 
+<div id="myDiv">
+    <div class="title">Creature</div>
+    <div id="charLog" class="log" style="height:138px;"></div>
+    <div class="smallTitle">Combat</div>
+    <div id="charHealth" class="progressOuter">
+        <div class="progressInner" id="charHealthBar"></div>
+        <div id="charHealthNum" style="position:absolute;"></div>
+    </div><br>
+    <div id="charAttack" class="progressOuter">
+        <div class="progressInner" id="charAttackSpeedBar"></div>
+        <div id="charAttackSpeedNum" style="position:absolute;"></div>
+    </div><br><br>
+    <div class="button" onclick="startFight()">FIGHT</div>
+</div>
+
+<div id="enemyDiv" style="margin-left:50px;vertical-align:top">
+    <div class="title">Enemy</div>
+    <div id="enemyLog" class="log"></div>
+    <div class="smallTitle">Hunt</div>
+    <div id="hunt" class="progressOuter">
+        <div class="progressInner" id="huntBar"></div>
+    </div>
+    <div class="smallTitle">Combat</div>
+    <div id="enemyHealth" class="progressOuter">
+        <div class="progressInner" id="enemyHealthBar"></div>
+        <div id="enemyHealthNum" style="position:absolute;"></div>
+    </div><br>
+    <div id="enemyAttack" class="progressOuter">
+        <div class="progressInner" id="enemyAttackSpeedBar"></div>
+        <div id="enemyAttackSpeedNum" style="position:absolute;"></div>
+    </div><br><br>
+    <div class="smallTitle">Consume</div>
+    <div id="consume" class="progressOuter">
+        <div class="progressInner" id="consumeBar"></div>
+    </div>
+</div>
+
+
 
     <script src="driver.js?1"></script>
     <script src="views/mainView.js?1"></script>
@@ -23,6 +61,8 @@
     <script src="helpers/helpers.js?1"></script>
     <script src="helpers/hotkeys.js?1"></script>
     <script src="helpers/interval.js?1"></script>
+    <script src="game.js?1"></script>
+    <script src="enemy.js?1"></script>
     <script>
         // (function (i, s, o, g, r, a, m) {
         //     i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function () {

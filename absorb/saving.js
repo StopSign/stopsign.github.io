@@ -18,7 +18,10 @@ let saveName = "absorb";
 
 let stop = false;
 
-let prevState = {};
+let prevState;
+
+let all = {char: {}, enemy:{}};
+let isCombat = false;
 
 
 function clearSave() { //Doesn't work atm
@@ -27,6 +30,24 @@ function clearSave() { //Doesn't work atm
 }
 
 function loadDefaults() {
+    all.char = {
+        healthMax: 10,
+        healthCur: 10,
+        healthRegen: 0.01,
+        attack: 1,
+        attackSpeedMax:3000,
+        attackSpeedCur:0
+    };
+    all.enemy = {
+        healthMax: 5,
+        healthCur: 5,
+        healthRegen: 0,
+        attack:1,
+        attackSpeedMax:2000,
+        attackSpeedCur:0
+    };
+    all.charLog = [];
+    all.enemyLog = [];
 
 }
 
@@ -38,7 +59,7 @@ function load() {
     }
 
     view.initialize();
-    recalcInterval(50);
+    recalcInterval(ticksPerSecond);
 }
 
 function save() {
