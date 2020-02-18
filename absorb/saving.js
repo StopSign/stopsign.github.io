@@ -22,6 +22,7 @@ let prevState;
 
 let all = {char: {}, enemy:{}};
 let isCombat = false;
+let combatTime;
 
 
 function clearSave() { //Doesn't work atm
@@ -46,8 +47,7 @@ function loadDefaults() {
         attackSpeedMax:2000,
         attackSpeedCur:0
     };
-    all.charLog = [];
-    all.enemyLog = [];
+    all.logs = [];
 
 }
 

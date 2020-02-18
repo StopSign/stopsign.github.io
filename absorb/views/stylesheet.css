@@ -230,11 +230,12 @@ input {
 }
 
 .log {
-    display:block;
-    height:100px;
+    height:200px;
     background-color:#e0e0e0;
     font-size:12px;
     padding:5px;
-    overflow:auto;
+    overflow-y:scroll;
     margin-bottom:5px;
+    width:400px;
+    vertical-align: top;
 }

@@ -6,8 +6,9 @@ let view = {
         update:function() {
             view.updating.updateCreature("char");
             view.updating.updateCreature("enemy");
-            view.updating.updateLog("charLog");
-            view.updating.updateLog("enemyLog");
+
+
+            view.updating.updateLog();
 
             prevState = copyArray(all);
         },
@@ -21,21 +22,26 @@ let view = {
                 document.getElementById(varName+"AttackSpeedBar").style.width = all[varName].attackSpeedCur / all[varName].attackSpeedMax * 100 + "%";
             }
             if(changeR(varName, "attackSpeedMax")) {
-                document.getElementById(varName+"Attack").style.width = all[varName].attackSpeedMax / 300 * 6 + "%"; //5000 ms = 300px;
+                if(all[varName].attackSpeedMax > 4000) {
+                    document.getElementById(varName+"Attack").style.width = "100%";
+                } else {
+                    document.getElementById(varName + "Attack").style.width = all[varName].attackSpeedMax / 300 * 7.5 + "%"; //4000 ms = 300px;
+                }
                 document.getElementById(varName+"AttackSpeedNum").innerHTML = intToStringRound(all[varName].attackSpeedMax);
             }
         },
-        updateLog:function(varName) {
+        updateLog:function() {
 
-            if(changeA(varName)) {
+            if(changeA(all.logs)) {
                 let theStr = "";
-                while(all[varName].length > 20) {
-                    all[varName].shift();
+                while(all.logs.length > 20) {
+                    all.logs.shift();
                 }
-                for(let i = 0; i < all[varName].length; i++) {
-                    theStr = all[varName][i]  + "<br>" + theStr; //backwards
+                for(let i = 0; i < all.logs.length; i++) {
+                    let time = all.logs[i].timer === undefined ? "" : ("<div style='float:right'>"+all.logs[i].timer/1000+"s</div>");
+                    theStr = all.logs[i].message + time  + "<br>" + theStr; //backwards
                 }
-                document.getElementById(varName).innerHTML = theStr;
+                document.getElementById("log").innerHTML = theStr;
             }
 
         }
@@ -43,7 +49,20 @@ let view = {
     create: {
         log: function(num, type, text) {
             let color = "black";
-            return "<div style='font-weight:bold;color:"+color+";'>" + num + "</div> " + text;
+            return {
+                message:"<div style='font-weight:bold;color:"+color+";'>" + num + "</div> " + text + "<div style='font-weight:bold;color:"+color+";'>"+type+"</div>",
+                creature:"char"
+            };
+        },
+        damageLog: function(num, healthCur, type, victimName) {
+            let color = "black";
+            let middleText = victimName === "char" ? " health lost from " : " damage dealt with ";
+            return {
+                message: "<div style='font-weight:bold;color:"+color+";'>" + num + "</div>"+middleText+"<div style='font-weight:bold;color:"+color+";'>"+type+"</div>! " +
+                    "<div style='font-weight:bold;color:darkred;'>"+intToString(healthCur)+"</div> remaining health!",
+                timer: combatTime,
+                creature:"char"
+            };
         }
     }
 };
