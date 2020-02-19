@@ -5,7 +5,7 @@ let view = {
     updating: {
         update:function() {
             view.updating.updateCreature("char");
-            view.updating.updateCreature("enemy");
+            view.updating.updateEnemy();
 
 
             view.updating.updateLog();
@@ -13,6 +13,7 @@ let view = {
             prevState = copyArray(all);
         },
         updateCreature:function(varName) {
+
             if(changeR(varName, "healthCur") || changeR(varName, "healthMax")) {
                 document.getElementById(varName+"HealthNum").innerHTML =  "Health: " + intToStringRound(all[varName].healthCur) + " / " + intToStringRound(all[varName].healthMax);
                 document.getElementById(varName+"HealthBar").style.width = all[varName].healthCur / all[varName].healthMax * 100 + "%";
@@ -29,6 +30,24 @@ let view = {
                 }
                 document.getElementById(varName+"AttackSpeedNum").innerHTML = intToStringRound(all[varName].attackSpeedMax);
             }
+        },
+        updateEnemy:function() {
+            view.updating.updateCreature("enemy");
+
+            if(changeR("enemy", "huntCur")) {
+                document.getElementById("huntBar").style.width = all.enemy.huntCur / all.enemy.huntMax * 100 + "%";
+            }
+            if(changeR("enemy", "huntMax")) {
+                document.getElementById("huntNum").innerHTML =  all.enemy.huntMax;
+            }
+
+            if(changeR("enemy", "consumeCur")) {
+                document.getElementById("consumeBar").style.width = all.enemy.consumeCur / all.enemy.consumeMax * 100 + "%";
+            }
+            if(changeR("enemy", "consumeMax")) {
+                document.getElementById("consumeNum").innerHTML =  all.enemy.consumeMax;
+            }
+
         },
         updateLog:function() {
 

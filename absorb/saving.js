@@ -21,7 +21,7 @@ let stop = false;
 let prevState;
 
 let all = {char: {}, enemy:{}};
-let isCombat = false;
+let isCombat = false, isHunt = false, isFight = false, isConsume = false;
 let combatTime;
 
 
@@ -39,14 +39,7 @@ function loadDefaults() {
         attackSpeedMax:3000,
         attackSpeedCur:0
     };
-    all.enemy = {
-        healthMax: 5,
-        healthCur: 5,
-        healthRegen: 0,
-        attack:1,
-        attackSpeedMax:2000,
-        attackSpeedCur:0
-    };
+    all.enemy = createEnemy();
     all.logs = [];
 
 }

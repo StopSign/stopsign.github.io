@@ -239,3 +239,10 @@ input {
     width:400px;
     vertical-align: top;
 }
+
+.huntC {
+    background-color:#7dad1f;
+}
+.healthC {
+    background-color:#ca2615;
+}

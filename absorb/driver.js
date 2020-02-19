@@ -63,7 +63,7 @@ function tick() {
 }
 
 function tickPassed() {
-    dealDamage();
+    engageMonster();
 }
 
 function secondPassed() {
