@@ -1,7 +1,32 @@
+function addToFightList() {
+    let selected = enemySelectionData[selectedFight.col][selectedFight.row];
+    let fightQueued = {
+        quantity: document.getElementById("fightNum").value,
+        name: selected.name,
+        col: selectedFight.col,
+        row: selectedFight.row,
+        fought: 0,
+        timer:0
+    };
+    fightList.push(fightQueued);
+    view.create.fightList();
+}
+
+function startFight() {
+    findMonster();
+}
+
+let fightListIndex = 0;
+
 function findMonster() {
     combatTime = 0;
     all.char.attackSpeedCur = 0;
-    all.enemy = createEnemy(0, 0);
+
+    let currentFight = fightList[fightListIndex];
+    if(currentFight === undefined) {
+        return;
+    }
+    all.enemy = createEnemy(currentFight.col, currentFight.row);
 
     document.getElementById("enemyDiv").style.opacity = "1";
     document.getElementById("hunt").style.display = "block";
@@ -12,6 +37,8 @@ function findMonster() {
     isHunt = true;
     isFight = false;
     isConsume = false;
+    view.updating.update();
+    view.create.fightList();
 }
 
 //Run every tick
@@ -29,6 +56,7 @@ function engageMonster() {
         all.logs.push({message:"Starting the fight!", timer:combatTime});
         document.getElementById("hunt").style.display = "none";
         document.getElementById("fight").style.display = "block";
+        console.log(all.enemy.healthCur);
         return;
     }
 
@@ -59,9 +87,48 @@ function engageMonster() {
     }
     if(all.enemy.consumeCur >= all.enemy.stats.consumeMax && isConsume) {
         isConsume = false;
-        isCombat = false;
         getReward(all.char, all.enemy);
+        if(fightList[fightListIndex] === undefined) { //deleted the fight we were on
+            outOfFights();
+            view.create.fightList();
+            return;
+        }
+        fightList[fightListIndex].fought++;
+        fightList[fightListIndex].timer += combatTime;
+        if(fightList[fightListIndex].fought >= fightList[fightListIndex].quantity) { //go to next fight?
+            fightListIndex++;
+            if(fightList[fightListIndex] === undefined) { //no more next fights
+                outOfFights();
+                view.create.fightList();
+                return;
+            }
+        }
+        findMonster();
+        view.create.fightList();
     }
+}
+
+function outOfFights() {
+    for(let i = 0; i < fightList.length; i++) { //clear out fought
+        fightList[i].fought = 0;
+    }
+    if(document.getElementById("loopCheck").checked && fightList.length > 0) { //loop if necessary
+        fightListIndex = 0;
+        findMonster();
+        for(let i = 0; i < fightList.length; i++) { //clear out fought
+            fightList[i].timer = 0;
+        }
+    } else { //otherwise stop combat
+        isCombat = false;
+    }
+}
+
+function removeFight(index) {
+    fightList.splice(index, 1);
+    if(fightListIndex > index) {
+        fightListIndex--;
+    }
+    view.create.fightList();
 }
 
 function exitCombat() {
@@ -70,12 +137,15 @@ function exitCombat() {
     document.getElementById("hunt").style.display = "none";
     document.getElementById("fight").style.display = "none";
     document.getElementById("consume").style.display = "none";
+
+    fightListIndex = 0;
+    view.create.fightList();
 }
 
 function getReward(char, enemy) {
     for (let property in enemy.reward) {
         if (enemy.reward.hasOwnProperty(property)) {
-            all.logs.push(view.create.log(enemy.reward[property], property, " gained for "));
+            all.logs.push(view.create.log(enemy.reward[property], camelToTitle(property), " gained for ", combatTime));
             if(property === "healthMax") {
                 char.healthCur += enemy.reward[property];
             }

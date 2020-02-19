@@ -1,6 +1,6 @@
-function createEnemy() {
-    let col = selectedFight.col >= 0 ? selectedFight.col : 0; //for initial load
-    let row = selectedFight.row >= 0 ? selectedFight.row : 0;
+function createEnemy(col, row) {
+    // let col = selectedFight.col >= 0 ? selectedFight.col : 0; //for initial load
+    // let row = selectedFight.row >= 0 ? selectedFight.row : 0;
     let data = copyArray(enemyData[col][row]);
     data.attackSpeedCur = 0;
     data.healthCur = data.stats.healthMax;
@@ -11,6 +11,10 @@ function createEnemy() {
     data.unlocked = false;
     data.col = col;
     data.row = row;
+
+    data.stats.strength = data.stats.strength === undefined ? 0 : data.stats.strength;
+    data.stats.healthRegen = data.stats.healthRegen === undefined ? 0 : data.stats.healthRegen;
+    data.stats.constitution = data.stats.constitution === undefined ? 0 : data.stats.constitution;
     return data;
 }
 
@@ -31,8 +35,6 @@ let enemyData = [
             name:"Flower",
             stats: {
                 healthMax: 60,
-                healthRegen: 0,
-                strength:0,
                 attackSpeedMax:60000,
                 huntMax: 2000,
                 consumeMax: 3000
@@ -52,8 +54,8 @@ let enemyData = [
                 consumeMax: 4000,
             },
             reward: {
-                healthRegen: .25,
                 healthMax: 3,
+                healthRegen: .25,
                 strength:.25
             }
         },

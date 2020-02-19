@@ -24,6 +24,7 @@ let all = {char: {}, enemy:{}};
 let isCombat = false, isHunt = false, isFight = false, isConsume = false;
 let combatTime;
 let enemySelectionData = [];
+let fightList = [];
 let selectedFight = {col:-1, row:-1};
 
 
@@ -60,8 +61,8 @@ function load() {
     view.initialize();
     selectFight(0, 0);
 
-    all.enemy = createEnemy();
-    recalcInterval(ticksPerSecond);
+    all.enemy = createEnemy(0, 0);
+    recalcInterval(60);
 }
 
 function save() {

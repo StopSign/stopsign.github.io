@@ -14,7 +14,7 @@ let view = {
             }
 
             view.updating.updateLog();
-
+            if(isChanged())
 
             prevState = copyArray(all);
         },
@@ -58,7 +58,7 @@ let view = {
         updateLog:function() {
             if(isChanged("logs")) {
                 let theStr = "";
-                while(all.logs.length > 20) {
+                while(all.logs.length > 50) {
                     all.logs.shift();
                 }
                 for(let i = 0; i < all.logs.length; i++) {
@@ -123,6 +123,17 @@ let view = {
                     view.updating.updateSelectionBox(i, j);
                 }
             }
+        },
+        fightList: function() {
+            let str = "";
+            for(let i = 0; i < fightList.length; i++) {
+                str += "<div style='width:20px'>"+(fightListIndex === i ? ">" : "")+"</div>";
+                str += fightList[i].quantity + " x " + fightList[i].name + " (" + fightList[i].fought + ")";
+                let timer = fightList[i].timer > 0 ? (fightList[i].timer/1000)+"s" : "";
+                str += "<div style='float:right'>"+timer+" <div style='cursor:pointer' onclick='removeFight("+i+")'>X</div></div><br>"
+            }
+
+            document.getElementById("fightList").innerHTML = str;
         }
     }
 };
@@ -134,7 +145,7 @@ function selectFight(col, row) {
     }
     selectedFight.col = col;
     selectedFight.row = row;
-    let enemyData = createEnemy();
+    let enemyData = createEnemy(col, row);
     document.getElementById("enemyStats").innerHTML = printStats(enemyData);
     document.getElementById("selection"+col+"_"+row).style.border = "1px solid yellow";
     document.getElementById("selection"+col+"_"+row).style.padding = "1px";
@@ -167,9 +178,26 @@ function printStats(creature) {
     let str = "<div style='padding:5px;width:100%;'>";
 
     str += "<div class='title'>"+creature.name+"</div>";
-    str += statStr(creature.stats.healthMax, "#ca2615", "Health", "Your max health.");
+    str += statStr(creature.stats.huntMax, "#7dad1f", "Hunt Time", "Time it takes to find an enemy of this type.");
+    str += statStr(creature.stats.consumeMax, "#a86fc4", "Consume Time", "Time it takes to consume an enemy for stats.");
+    str += "<br>";
+    str += statStr(creature.stats.healthMax, "#ca2615", "Health", "The maximum health. Dead at 0.");
     str += statStr(creature.stats.healthRegen, "#ca2615", "Health Regen", "Regen this amount every second.");
     str += statStr(creature.stats.strength, "black", "Strength", "One strength is one damage.");
+    str += statStr(creature.stats.attackSpeedMax, "#a86fc4", "Attack Speed Max", "Time it takes to deal damage. This is improved with Agility.");
+
+    // attackSpeedMax:3000,
+    //     huntMax: 3000,
+    //     consumeMax: 4000,
+
+    if(creature.reward) {
+        str += "<br><div class='smallTitle'>Rewards</div>";
+        for (let property in creature.reward) {
+            if (creature.reward.hasOwnProperty(property)) {
+                str += "<b>"+creature.reward[property]+"</b> " + camelToTitle(property) + "<br>";
+            }
+        }
+    }
 
     str += "</div>";
     return str;
@@ -180,5 +208,6 @@ function statStr(value, color, label, tooltip) {
         return "";
     }
     return "<div class='showthat'><div style='color:"+color+"'>"+label+"</div>: <b>" + value + "</b>" +
-    "<div class='showthis'>"+tooltip+"</div></div><br>";
+    "<div class='showthisD'>"+tooltip+"</div></div><br>";
 }
+

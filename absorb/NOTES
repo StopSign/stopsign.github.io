@@ -1,5 +1,12 @@
 Kill enemies for their stats!
 
+TO ADD A NEW STAT:
+    saving.js, loadDefaults, add the stat as 0 to the custom
+    enemyData.js, createEnemy, add the stat as 0
+    add it's effect in combat
+    in mainview.js, printStats, add stat description / color / tooltip
+
+
 Stats:
 
 HP

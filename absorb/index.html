@@ -20,7 +20,7 @@
 </div>
 <div id="combat" style="vertical-align: top;">
 
-    <div id="enemyDiv" style="display:block;height:300px;">
+    <div id="enemyDiv" style="display:block;height:300px;opacity:0">
         <div class="title">Enemy</div>
         <div id="hunt" style="display:none;">
             <div class="smallTitle">Hunt</div>
@@ -48,10 +48,11 @@
             </div>
         </div><br>
         <div id="enemyPic"></div>
+        <div class="button" onclick="exitCombat()">FLEE!</div><br>
     </div><br>
 
     <div id="myDiv">
-        <div class="title">Creature</div>
+        <div class="title">Voidling</div>
         <div class="smallTitle">Combat</div>
         <div id="charHealth" class="progressOuter">
             <div class="progressInner healthC" id="charHealthBar"></div>
@@ -68,16 +69,19 @@
     <div id="enemyStats" class="infoDiv" style="width:200px;height:300px;">
     </div>
     <div class="infoDiv">
-        <div>
-            <div class="button" onclick="findMonster()">FIGHT</div><br>
-            <div class="button" onclick="exitCombat()">FLEE!</div><br>
+        <div style="width:200px;">
+            <input id="fightNum" style="width:40px;margin-right:5px" value="1">
+            <div class="button" onclick="addToFightList()">ADD</div>
+            <div class="button" onclick="startFight()">FIGHT</div><br>
+            <input type="checkbox" id="loopCheck"><label for="loopCheck">Loop Fights</label><br>
+            <div id="fightList" style="border-top:1px solid;display:block;overflow-y:scroll;"></div>
         </div>
-        <div class="infoDiv" id="selectionBoxes">Enemy types</div>
+        <div class="infoDiv" id="selectionBoxes"></div>
     </div>
 </div><br>
-
-<div id="log" class="log">
-
+<div>
+    <div class="title">Log</div>
+    <div id="log" class="log"></div>
 </div>
 </div>
 
