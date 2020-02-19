@@ -16,41 +16,73 @@
 </head>
 <body id="theBody" oncontextmenu="return false;" style="padding:5px" class="medium">
 
-<div id="myDiv">
-    <div class="title">Creature</div>
-    <div id="charLog" class="log" style="height:138px;"></div>
-    <div class="smallTitle">Combat</div>
-    <div id="charHealth" class="progressOuter">
-        <div class="progressInner" id="charHealthBar"></div>
-        <div id="charHealthNum" style="position:absolute;"></div>
-    </div><br>
-    <div id="charAttack" class="progressOuter">
-        <div class="progressInner" id="charAttackSpeedBar"></div>
-        <div id="charAttackSpeedNum" style="position:absolute;"></div>
-    </div><br><br>
-    <div class="button" onclick="startFight()">FIGHT</div>
+<div id="charStats" class="infoDiv" style="width:200px;height:400px;vertical-align: top;font-size:14px;">
 </div>
+<div id="combat" style="vertical-align: top;">
 
-<div id="enemyDiv" style="margin-left:50px;vertical-align:top">
-    <div class="title">Enemy</div>
-    <div id="enemyLog" class="log"></div>
-    <div class="smallTitle">Hunt</div>
-    <div id="hunt" class="progressOuter">
-        <div class="progressInner" id="huntBar"></div>
-    </div>
-    <div class="smallTitle">Combat</div>
-    <div id="enemyHealth" class="progressOuter">
-        <div class="progressInner" id="enemyHealthBar"></div>
-        <div id="enemyHealthNum" style="position:absolute;"></div>
+    <div id="enemyDiv" style="display:block;height:300px;opacity:0">
+        <div class="title">Enemy</div>
+        <div id="hunt" style="display:none;">
+            <div class="smallTitle">Hunt</div>
+            <div class="progressOuter">
+                <div class="progressInner huntC" id="huntBar"></div>
+                <div id="huntNum" style="position:absolute;"></div>
+            </div>
+        </div>
+        <div id="fight" style="display:none;">
+            <div class="smallTitle">Fight</div>
+            <div id="enemyHealth" class="progressOuter">
+                <div class="progressInner healthC" id="enemyHealthBar"></div>
+                <div id="enemyHealthNum" style="position:absolute;"></div>
+            </div><br>
+            <div id="enemyAttack" class="progressOuter">
+                <div class="progressInner" id="enemyAttackSpeedBar"></div>
+                <div id="enemyAttackSpeedNum" style="position:absolute;"></div>
+            </div><br>
+        </div>
+        <div id="consume" style="display:none;">
+            <div class="smallTitle">Consume</div>
+            <div class="progressOuter">
+                <div class="progressInner" id="consumeBar"></div>
+                <div id="consumeNum" style="position:absolute;"></div>
+            </div>
+        </div><br>
+        <div id="enemyPic"></div>
+        <div class="button" onclick="exitCombat()">FLEE!</div><br>
     </div><br>
-    <div id="enemyAttack" class="progressOuter">
-        <div class="progressInner" id="enemyAttackSpeedBar"></div>
-        <div id="enemyAttackSpeedNum" style="position:absolute;"></div>
-    </div><br><br>
-    <div class="smallTitle">Consume</div>
-    <div id="consume" class="progressOuter">
-        <div class="progressInner" id="consumeBar"></div>
+
+    <div id="myDiv">
+        <div class="title">Voidling</div>
+        <div class="smallTitle">Combat</div>
+        <div id="charHealth" class="progressOuter">
+            <div class="progressInner healthC" id="charHealthBar"></div>
+            <div id="charHealthNum" style="position:absolute;"></div>
+        </div><br>
+        <div id="charAttack" class="progressOuter">
+            <div class="progressInner" id="charAttackSpeedBar"></div>
+            <div id="charAttackSpeedNum" style="position:absolute;"></div>
+        </div><br>
     </div>
+</div>
+<div>
+<div id="chooseFight" style="vertical-align: top;">
+    <div id="enemyStats" class="infoDiv" style="width:200px;height:300px;">
+    </div>
+    <div class="infoDiv">
+        <div style="width:200px;">
+            <input id="fightNum" style="width:40px;margin-right:5px" value="1">
+            <div class="button" onclick="addToFightList()">ADD</div>
+            <div class="button" onclick="startFight()">FIGHT</div><br>
+            <input type="checkbox" id="loopCheck"><label for="loopCheck">Loop Fights</label><br>
+            <div id="fightList" style="border-top:1px solid;display:block;overflow-y:scroll;"></div>
+        </div>
+        <div class="infoDiv" id="selectionBoxes"></div>
+    </div>
+</div><br>
+<div>
+    <div class="title">Log</div>
+    <div id="log" class="log"></div>
+</div>
 </div>
 
 
@@ -62,7 +94,7 @@
     <script src="helpers/hotkeys.js?1"></script>
     <script src="helpers/interval.js?1"></script>
     <script src="game.js?1"></script>
-    <script src="enemy.js?1"></script>
+    <script src="enemyData.js?1"></script>
     <script>
         // (function (i, s, o, g, r, a, m) {
         //     i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function () {

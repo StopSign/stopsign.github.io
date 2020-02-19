@@ -75,6 +75,8 @@ body {
 .showthisD {
     left:105%;
     min-width:300px;
+    z-index:1000;
+    position:absolute;
 }
 
 .showthis2 {
@@ -153,7 +155,7 @@ input {
 }
 
 .button {
-    padding: 1px 5px;
+    padding: 3px 8px;
     text-align: center;
     vertical-align:center;
     min-width:9px;
@@ -166,6 +168,8 @@ input {
     box-shadow: 0 3px #999;
     transform: translateY(-2px);
     margin-bottom:2px;
+    font-weight:bold;
+    font-size:14px;
 }
 
 .button:hover {
@@ -230,11 +234,36 @@ input {
 }
 
 .log {
-    display:block;
-    height:100px;
+    height:200px;
     background-color:#e0e0e0;
     font-size:12px;
     padding:5px;
-    overflow:auto;
+    overflow-y:scroll;
     margin-bottom:5px;
+    width:400px;
+    vertical-align: top;
+}
+
+.huntC {
+    background-color:#7dad1f;
+}
+.healthC {
+    background-color:#ca2615;
+}
+
+.infoDiv {
+    border:1px solid;
+    padding:2px;
+    vertical-align: top;
+}
+
+.selectionDiv {
+    width:100px;
+    height:70px;
+    cursor:pointer;
+    padding:2px;
+    vertical-align: top;
+}
+.selectionDiv:hover {
+    background-color:rgb(217, 221, 240);
 }

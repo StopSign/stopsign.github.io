@@ -4,6 +4,13 @@ Choose enemy, starting attack speed is 3 seconds
 lower than 200 ms instead double attacks
 
 
+TO ADD A NEW STAT:
+    saving.js, loadDefaults, add the stat as 0 to the custom
+    enemyData.js, createEnemy, add the stat as 0
+    add it's effect in combat
+    in mainview.js, printStats, add stat description / color / tooltip
+
+
 Stats:
 
 Stage 1:
@@ -56,6 +63,81 @@ Stage 6:
 Open Wound - 1x / 1.5x
 Combo attack - 1x / 2x / 3x dmg
 Power Attack - 1x / 1x / 1x / 4x
+
+
+
+Plants
+	Flower - no damage, gain health
+	Mushroom - low damage, gain health regen
+	thorny bush - low damage, gain damage
+	fern - gain
+	Tree - gain defense
+	cactus - gain thorns
+Critters
+	Toad - gain scavenge
+	Mouse - gain stamina
+	Spider - gain poison
+	Squirrel -
+	Snake - Hunt
+
+
+
+Small Monsters
+Beasts
+	Porcupine
+	Honeybadger
+	Deer
+	Boar
+	WOlf
+	Bear
+
+Humanoids 1 (civilians)
+	Goblin
+	Kobold
+	Villager
+	Orc
+	Minotaur
+Monsters
+Humanoids 2 (adventurers)
+Undead
+Elementals
+Large Monsters
+Aberrations
+Dragons
+Humanodis 3 (immortals)
+Spirits
+Gods
+
+
+When you kill the last God, you unlock the void run
+void run is "go as far as you can", if you are satisfied you prestige with currency based on distance
+spend currency on bonuses:
+Soul bond - gain 2x/3x/4x... of stats until you hit the max of all your runs
+Talent, one for each stat, gain 2x/3x/4x of it.
+Extra spells?
+Challenges - unbalanced stat gains, gain an extra stat after completion
+	Maple run - 4x defense gain, 2x poison/acid stat gain, 1/4 other stats
+	Sakura run - very low max MP, high spell efficiency
+	Sasuke - learn faster, less MP
+	Naruto - High phsyical + max + regen, low specialty stats
+	Luffy - high physical, high stamina, low magic
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

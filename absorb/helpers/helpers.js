@@ -149,6 +149,11 @@ function camelize(str) {
     });
 }
 
+function camelToTitle(str) {
+    let result = str.replace( /([A-Z])/g, " $1" );
+    return result.charAt(0).toUpperCase() + result.slice(1);
+}
+
 function isVisible(obj) {
     return obj.offsetWidth > 0 && obj.offsetHeight > 0;
 }
