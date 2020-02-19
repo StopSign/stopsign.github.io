@@ -23,6 +23,8 @@ let prevState;
 let all = {char: {}, enemy:{}};
 let isCombat = false, isHunt = false, isFight = false, isConsume = false;
 let combatTime;
+let enemySelectionData = [];
+let selectedFight = {col:-1, row:-1};
 
 
 function clearSave() { //Doesn't work atm
@@ -32,16 +34,20 @@ function clearSave() { //Doesn't work atm
 
 function loadDefaults() {
     all.char = {
-        healthMax: 10,
-        healthCur: 10,
-        healthRegen: 0.01,
-        attack: 1,
-        attackSpeedMax:3000,
+        name: "Voidling",
+        stats: {
+            healthMax: 5,
+            healthRegen: 0,
+            strength: 5,
+            attackSpeedMax:3000
+        },
+        healthCur: 5,
         attackSpeedCur:0
     };
-    all.enemy = createEnemy();
     all.logs = [];
-
+    createAllEnemySelection();
+    enemySelectionData[0][0].unlocked = true;
+    enemySelectionData[0][1].unlocked = true;
 }
 
 function load() {
@@ -52,6 +58,9 @@ function load() {
     }
 
     view.initialize();
+    selectFight(0, 0);
+
+    all.enemy = createEnemy();
     recalcInterval(ticksPerSecond);
 }
 

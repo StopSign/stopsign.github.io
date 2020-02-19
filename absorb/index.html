@@ -16,33 +16,38 @@
 </head>
 <body id="theBody" oncontextmenu="return false;" style="padding:5px" class="medium">
 
-<div id="stats">
-
+<div id="charStats" class="infoDiv" style="width:200px;height:400px;vertical-align: top;font-size:14px;">
 </div>
-<div id="combat">
+<div id="combat" style="vertical-align: top;">
 
-    <div id="enemyDiv">
+    <div id="enemyDiv" style="display:block;height:300px;">
         <div class="title">Enemy</div>
-        <div class="smallTitle">Hunt</div>
-        <div id="hunt" class="progressOuter">
-            <div class="progressInner huntC" id="huntBar"></div>
-            <div id="huntNum" style="position:absolute;"></div>
+        <div id="hunt" style="display:none;">
+            <div class="smallTitle">Hunt</div>
+            <div class="progressOuter">
+                <div class="progressInner huntC" id="huntBar"></div>
+                <div id="huntNum" style="position:absolute;"></div>
+            </div>
         </div>
-        <div class="smallTitle">Combat</div>
-        <div id="enemyHealth" class="progressOuter">
-            <div class="progressInner healthC" id="enemyHealthBar"></div>
-            <div id="enemyHealthNum" style="position:absolute;"></div>
+        <div id="fight" style="display:none;">
+            <div class="smallTitle">Fight</div>
+            <div id="enemyHealth" class="progressOuter">
+                <div class="progressInner healthC" id="enemyHealthBar"></div>
+                <div id="enemyHealthNum" style="position:absolute;"></div>
+            </div><br>
+            <div id="enemyAttack" class="progressOuter">
+                <div class="progressInner" id="enemyAttackSpeedBar"></div>
+                <div id="enemyAttackSpeedNum" style="position:absolute;"></div>
+            </div><br>
+        </div>
+        <div id="consume" style="display:none;">
+            <div class="smallTitle">Consume</div>
+            <div class="progressOuter">
+                <div class="progressInner" id="consumeBar"></div>
+                <div id="consumeNum" style="position:absolute;"></div>
+            </div>
         </div><br>
-        <div id="enemyAttack" class="progressOuter">
-            <div class="progressInner" id="enemyAttackSpeedBar"></div>
-            <div id="enemyAttackSpeedNum" style="position:absolute;"></div>
-        </div><br><br>
-        <div class="smallTitle">Consume</div>
-        <div id="consume" class="progressOuter">
-            <div class="progressInner" id="consumeBar"></div>
-            <div id="consumeNum" style="position:absolute;"></div>
-        </div><br>
-        <div id="enemyPic" style="margin-bottom:200px;"></div>
+        <div id="enemyPic"></div>
     </div><br>
 
     <div id="myDiv">
@@ -55,22 +60,25 @@
         <div id="charAttack" class="progressOuter">
             <div class="progressInner" id="charAttackSpeedBar"></div>
             <div id="charAttackSpeedNum" style="position:absolute;"></div>
-        </div><br><br>
-        <div class="button" onclick="findMonster()">FIGHT</div>
+        </div><br>
     </div>
 </div>
-
-<div id="chooseFight">
-
-</div>
-
-<div id="logDiv">
-
-
-</div>
+<div>
+<div id="chooseFight" style="vertical-align: top;">
+    <div id="enemyStats" class="infoDiv" style="width:200px;height:300px;">
+    </div>
+    <div class="infoDiv">
+        <div>
+            <div class="button" onclick="findMonster()">FIGHT</div><br>
+            <div class="button" onclick="exitCombat()">FLEE!</div><br>
+        </div>
+        <div class="infoDiv" id="selectionBoxes">Enemy types</div>
+    </div>
+</div><br>
 
 <div id="log" class="log">
 
+</div>
 </div>
 
 

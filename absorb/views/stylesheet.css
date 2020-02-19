@@ -246,3 +246,20 @@ input {
 .healthC {
     background-color:#ca2615;
 }
+
+.infoDiv {
+    border:1px solid;
+    padding:2px;
+    vertical-align: top;
+}
+
+.selectionDiv {
+    width:100px;
+    height:70px;
+    cursor:pointer;
+    padding:2px;
+    vertical-align: top;
+}
+.selectionDiv:hover {
+    background-color:rgb(217, 221, 240);
+}
