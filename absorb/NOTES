@@ -1,24 +1,86 @@
 Kill enemies for their stats!
 
+Choose enemy, starting attack speed is 3 seconds
+lower than 200 ms instead double attacks
+
+
 Stats:
 
+Stage 1:
 HP
-MP
 HP Regen
+STR - +1 Phys Damage
+CON - Defense - ((CON)*0.06)/(1+0.06*(CON))
+AGI - Attack speed increase - (AGI*0.007)/(1+0.001*AGI)
+Speed - find enemies faster
+
+
+Stage 2:
+stamina - used for physical actions
+DEX - +1 Starting dmg - when enemy health is <20%
+Harden - +1 Block, after CON
+Spines - Uses stamina, DEX for dmg, sta reduction (STA*0.06)/(1+0.06*STA)
+scavenge - speed of absorb
+recover - health gain from absorb
+
+
+Stage 3:
+PER - +1 defense when health is <50%
+Reflex - +1 defense when health is >=50%
+Luck - chance for double stats on absorb
+shield - reduce dmg by # for first # hits
+vampire - life steal
+reflect - thorns
+Sunder - reduce enemy block
+
+
+Stage 4:
+MP
 MP Regen
-STR - Damage
-CON - Defense
-DEX - Finishing dmg
-AGI - Starting dmg
-WIS - Spell Efficiency
-INT - Spell Damage
-Grace - Spell Defense
-Weapon Skill - damage
-Harden - Block
-Spines - Starting dmg
-PER - Finishing defense
-Reflex - Starting defense
-Speed - find encounters
-Luck - absorb %
+WIS - Spell Efficiency - ((WIS)*0.06)/(1+0.06*(WIS))
+INT - +1 Spell Damage
+Grace - Spell Defense - ((GRC)*0.06)/(1+0.06*(GRC))
+Locate - find encounters faster using mana
 
 
+Stage 5:
+elements - do more dmg to other elements, add elemental dmg to your attacks
+    dark <-> light
+    fire -> wind -> earth -> water -> fire
+Harmony - reduce element specific dmg
+rage - more damage as battle continues
+chill - reduce enemy attack speed as battle continues
+adrenaline - more attack speed as battle continues
+
+Stage 6:
+Open Wound - 1x / 1.5x
+Combo attack - 1x / 2x / 3x dmg
+Power Attack - 1x / 1x / 1x / 4x
+
+
+
+
+
+burn - deal damage over 3 turns
+acid - deal damage over 4 turns
+Poison - deal damage over 5 turns
+bleed - deal damage over 6 turns
+curse - deal damage over 10 turns
+
+
+
+
+%s - not til way later
+crit / crit dmg
+heavy attack
+dodge
+
+
+
+Enemy progression
+    Flower
+    Bush
+    Grasshopper
+    Mouse
+    Frog
+    Spider
