@@ -156,7 +156,7 @@ let enemyData = [
                 constitution: 5
             },
             reward: {
-                health:30,
+                healthMax:10,
                 healthRegen:1,
                 scavenge:2
             }
@@ -175,7 +175,7 @@ let enemyData = [
             },
             reward: {
                 strength:2,
-                harden:1
+                harden:.25
             }
         },
         {
@@ -200,12 +200,12 @@ let enemyData = [
             stats: {
                 huntMax: 11000,
                 consumeMax: 12000,
-                healthMax: 400,
+                healthMax: 300,
                 healthRegen: 2,
                 attackSpeedMax: 4000,
                 strength: 40,
                 dexterity: 300,
-                constitution: 30,
+                constitution: 100,
                 reflex: 100
             },
             reward: {
