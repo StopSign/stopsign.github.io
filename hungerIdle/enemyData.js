@@ -8,7 +8,7 @@ function createEnemy(col, row) {
     data.consumeCur = 0;
     data.isHunted = false;
     data.isConsumed = false;
-    data.unlocked = false;
+    data.unlocked = true; //false if we want locking
     data.col = col;
     data.row = row;
 

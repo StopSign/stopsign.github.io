@@ -19,12 +19,12 @@ HP Regen
 STR - +1 Phys Damage
 CON - Defense - ((CON)*0.06)/(1+0.06*(CON))
 AGI - Attack speed increase - (AGI*0.007)/(1+0.001*AGI)
-Speed - find enemies faster
+hunt - find enemies faster
 
 
 Stage 2:
 stamina - used for physical actions
-DEX - +1 Starting dmg - when enemy health is <20%
+DEX - +1 Starting dmg - when enemy health is >80%
 Harden - +1 Block, after CON
 Spines - Uses stamina, DEX for dmg, sta reduction (STA*0.06)/(1+0.06*STA)
 scavenge - speed of absorb

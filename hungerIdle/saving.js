@@ -14,7 +14,7 @@ function startGame() {
 
 
 let isFileSystem = !!location.href.match("file");
-let saveName = "absorb";
+let saveName = "hunger";
 
 let stop = false;
 
@@ -67,6 +67,7 @@ function load() {
 
 function save() {
     let toSave = {};
+    toSave.all = all;
 
     window.localStorage[saveName] = JSON.stringify(toSave);
 }
