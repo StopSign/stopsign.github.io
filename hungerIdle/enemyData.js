@@ -89,7 +89,7 @@ let enemyData = [
             name:"Fruit",
             stats: {
                 huntMax: 2000,
-                consumeMax: 4000,
+                consumeMax: 5000,
                 healthMax: 80,
                 healthRegen: .5,
                 attackSpeedMax: 60000,
@@ -150,23 +150,22 @@ let enemyData = [
         // },
     ],
     [ //Critters
-        // {
-        //     name:"Toad",
-        //     stats: {
-        //         huntMax: 12000,
-        //         consumeMax: 3000,
-        //         healthMax: 350,
-        //         healthRegen: 6,
-        //         attackSpeedMax: 2000,
-        //         strength: 15,
-        //         constitution: 5
-        //     },
-        //     reward: {
-        //         healthMax:10,
-        //         healthRegen:1,
-        //         scavenge:2
-        //     }
-        // },
+        {
+            name:"Toad",
+            stats: {
+                huntMax: 12000,
+                consumeMax: 3000,
+                healthMax: 10,
+                healthRegen: .5,
+                attackSpeedMax: 2000,
+                constitution:10,
+                strength: 4
+            },
+            reward: {
+                scavenge:1,
+                recover:1
+            }
+        },
         // {
         //     name:"Beetle",
         //     stats: {

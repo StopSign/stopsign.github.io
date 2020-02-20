@@ -85,6 +85,7 @@ function load() {
                 }
             }
         }
+        totalTime = toLoad.totalTime === undefined ? 0 : toLoad.totalTime;
     }
 
     view.initialize();
@@ -100,6 +101,7 @@ function save() {
     toSave.all = all;
     toSave.fightList = fightList;
     toSave.enemySelectionData = enemySelectionData;
+    toSave.totalTime = totalTime;
 
     window.localStorage[saveName] = JSON.stringify(toSave);
 }
