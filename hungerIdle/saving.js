@@ -49,8 +49,6 @@ function loadDefaults() {
 
     all.logs = [];
     createAllEnemySelection();
-    enemySelectionData[0][0].unlocked = true;
-    enemySelectionData[0][1].unlocked = true;
 }
 
 function load() {
@@ -75,6 +73,15 @@ function load() {
             fightList = toLoad.fightList;
             view.create.fightList();
         }
+        if(toLoad.enemySelectionData) {
+            for (let i = 0; i < enemySelectionData.length; i++) {
+                for (let j = 0; j < enemySelectionData[i].length; j++) {
+                    if (toLoad.enemySelectionData[i] && toLoad.enemySelectionData[i][j]) {
+                        enemySelectionData[i][j] = toLoad.enemySelectionData[i][j];
+                    }
+                }
+            }
+        }
     }
 
     view.initialize();
@@ -89,6 +96,7 @@ function save() {
     let toSave = {};
     toSave.all = all;
     toSave.fightList = fightList;
+    toSave.enemySelectionData = enemySelectionData;
 
     window.localStorage[saveName] = JSON.stringify(toSave);
 }
