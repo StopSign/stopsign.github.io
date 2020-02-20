@@ -155,11 +155,11 @@ let enemyData = [
             stats: {
                 huntMax: 12000,
                 consumeMax: 3000,
-                healthMax: 10,
+                healthMax: 100,
                 healthRegen: .5,
-                attackSpeedMax: 2000,
-                constitution:10,
-                strength: 4
+                attackSpeedMax: 4000,
+                constitution: 10,
+                strength: 8
             },
             reward: {
                 scavenge:1,
