@@ -6,7 +6,7 @@ let bonusSpeed = 1;
 let curTime = new Date();
 let gameTicksLeft = 0;
 let sudoStop = false;
-let saveTimer = 2000;
+let saveTimer = 10000;
 let ticksPerSecond = 20;
 let totalTime = 0;
 
@@ -22,6 +22,7 @@ function tick() {
     curTime = newTime;
 
     if(saveTimer < 0) {
+        saveTimer = 10000;
         save();
     }
     // document.getElementById("saveTimer").innerHTML = round(saveTimer/1000);

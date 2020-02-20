@@ -16,8 +16,12 @@
 </head>
 <body id="theBody" oncontextmenu="return false;" style="padding:5px" class="medium">
 
-<div id="charStats" class="infoDiv" style="width:200px;height:400px;vertical-align: top;font-size:14px;">
+<div id="leftCol" style="vertical-align: top;">
+    <div id="charStats" class="infoDiv" style="width:200px;height:400px;vertical-align: top;font-size:14px;">
+    </div><br>
+    Saving in ... <div id="saveTimer"></div>
 </div>
+
 <div id="combat" style="vertical-align: top;">
 
     <div id="enemyDiv" style="display:block;height:300px;opacity:0">
@@ -94,6 +98,8 @@
     <script src="helpers/hotkeys.js?1"></script>
     <script src="helpers/interval.js?1"></script>
     <script src="game.js?1"></script>
+    <script src="combat.js?1"></script>
+    <script src="statFormula.js?1"></script>
     <script src="enemyData.js?1"></script>
     <script>
         // (function (i, s, o, g, r, a, m) {

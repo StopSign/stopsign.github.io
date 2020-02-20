@@ -38,13 +38,12 @@ function loadDefaults() {
         name: "Voidling",
         stats: {
             healthMax: 5,
-            healthRegen: 0,
             strength: 5,
             attackSpeedMax:3000
-        },
-        healthCur: 5,
-        attackSpeedCur:0
+        }
     };
+    zeroStats(all.char);
+
     all.logs = [];
     createAllEnemySelection();
     enemySelectionData[0][0].unlocked = true;
@@ -55,7 +54,15 @@ function load() {
     loadDefaults();
     let toLoad = {};
     if(window.localStorage[saveName]) { //has a save file
-        // toLoad = JSON.parse(window.localStorage[saveName]);
+        toLoad = JSON.parse(window.localStorage[saveName]);
+
+        for (let property in toLoad.all.char.stats) {
+            if (toLoad.all.char.stats.hasOwnProperty(property)) {
+                all.char.stats[property] = toLoad.all.char.stats[property];
+            }
+        }
+        all.char.healthCur = toLoad.all.char.healthCur;
+        all.char.staminaCur = toLoad.all.char.staminaCur;
     }
 
     view.initialize();
@@ -63,6 +70,7 @@ function load() {
 
     all.enemy = createEnemy(0, 0);
     recalcInterval(60);
+    toLoad = {};
 }
 
 function save() {

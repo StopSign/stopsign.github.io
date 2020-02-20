@@ -5,9 +5,8 @@ lower than 200 ms instead double attacks
 
 
 TO ADD A NEW STAT:
-    saving.js, loadDefaults, add the stat as 0 to the custom
-    enemyData.js, createEnemy, add the stat as 0
-    add it's effect in combat
+    enemyData.js, zeroStats, add the stat as 0
+    add it's effect in combat.js or statFormula.js
     in mainview.js, printStats, add stat description / color / tooltip
 
 
@@ -27,8 +26,8 @@ stamina - used for physical actions
 DEX - +1 Starting dmg - when enemy health is >80%
 Harden - +1 Block, after CON
 Spines - Uses stamina, DEX for dmg, sta reduction (STA*0.06)/(1+0.06*STA)
-scavenge - speed of absorb
-recover - health gain from absorb
+scavenge - speed of consume
+recover - health gain from consume
 
 
 Stage 3:
@@ -37,7 +36,7 @@ Reflex - +1 defense when health is >=50%
 Luck - chance for double stats on absorb
 shield - reduce dmg by # for first # hits
 vampire - life steal
-reflect - thorns
+thorns - reflect
 Sunder - reduce enemy block
 
 
@@ -65,21 +64,25 @@ Combo attack - 1x / 2x / 3x dmg
 Power Attack - 1x / 1x / 1x / 4x
 
 
-
 Plants
-	Flower - no damage, gain health
+	Moss - no damage, gain health
 	Mushroom - low damage, gain health regen
-	thorny bush - low damage, gain damage
-	fern - gain
-	Tree - gain defense
+	Flower - reflect, gain attack
+	thorny bush - reflect, gain CON
+	Tree - gain harden, gain HP
 	cactus - gain thorns
+	Piranha Plant - gain attack
+	Lotus - gain mana
+	mandrake - gain ?
 Critters
-	Toad - gain scavenge
-	Mouse - gain stamina
-	Spider - gain poison
-	Squirrel -
-	Snake - Hunt
+	Toad - gain scavenge, gain health, regen
+	Beetle - gain harden, gain STR
+	Squirrel - gain AGI, gain hunt
+	Snake - gain DEX, gain CON
+	Rat - gain stamina, gain PER
+	Giant Spider - gain poison, gain recover
 
+next: spines, stamina, scavenge,
 
 
 Small Monsters
