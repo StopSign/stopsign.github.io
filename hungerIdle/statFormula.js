@@ -3,7 +3,7 @@ function getPhysDamage(attacker, victim) {
     let attackerHealthPerc = attacker.healthCur / attacker.stats.healthMax * 100;
 
     let incPhysDamage = attacker.stats.strength;
-    incPhysDamage += victimHealthPerc > 80 ? attacker.stats.dexterity : 0;
+    incPhysDamage += victimHealthPerc > 75 ? attacker.stats.dexterity : 0;
 
     incPhysDamage *= getPhysReduction(victim);
 

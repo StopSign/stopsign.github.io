@@ -8,6 +8,7 @@ function startGame() {
             }
         };
     }
+    // window.localStorage[saveName] = "";
 
     load();
 }

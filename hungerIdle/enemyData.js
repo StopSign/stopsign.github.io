@@ -51,8 +51,8 @@ let enemyData = [
         {
             name:"Moss",
             stats: {
-                huntMax: 1000,
-                consumeMax: 2000,
+                huntMax: 2000,
+                consumeMax: 3000,
                 healthMax: 25,
                 attackSpeedMax: 60000
             },
@@ -82,9 +82,9 @@ let enemyData = [
                 consumeMax: 10000,
                 healthMax: 150,
                 healthRegen: .5,
-                attackSpeedMax: 10000,
+                attackSpeedMax: 60000,
                 constitution: 10,
-                reflect: 6
+                reflect: 8
             },
             reward: {
                 healthMax: 5,
@@ -94,14 +94,13 @@ let enemyData = [
         {
             name:"Flower",
             stats: {
-                huntMax: 9000,
-                consumeMax: 2000,
-                healthMax: 500,
+                huntMax: 11000,
+                consumeMax: 4000,
+                healthMax: 300,
                 healthRegen: 3,
-                attackSpeedMax: 10000,
-                strength: 1,
+                attackSpeedMax: 60000,
                 constitution: 30,
-                reflect: 10
+                reflect: 20
             },
             reward: {
                 healthMax: 30,
@@ -111,18 +110,19 @@ let enemyData = [
         {
             name:"Shrub",
             stats: {
-                huntMax: 12000,
+                huntMax: 6000,
                 consumeMax: 20000,
-                healthMax: 800,
+                healthMax: 500,
                 healthRegen: 5,
                 attackSpeedMax: 10000,
-                strength: 3,
+                strength: 10,
                 constitution: 100,
-                reflect: 20
+                reflect: 40
             },
             reward: {
                 healthMax: 50,
-                constitution: 5
+                constitution: 5,
+                reflect:1
             }
         },
         {
@@ -130,15 +130,16 @@ let enemyData = [
             stats: {
                 huntMax: 6000,
                 consumeMax: 30000,
-                healthMax: 5000,
-                healthRegen: 10,
+                healthMax: 1500,
+                healthRegen: 5,
                 attackSpeedMax: 60000,
                 constitution: 200,
-                harden:20
+                harden:10
             },
             reward: {
-                healthMax: 400,
-                harden:5
+                healthMax: 300,
+                constitution:10,
+                harden:3
             }
         },
     ],
@@ -146,16 +147,70 @@ let enemyData = [
         {
             name:"Toad",
             stats: {
-                healthMax: 450,
-                healthRegen: 0,
-                strength: 3,
-                constitution: 5,
-                attackSpeedMax: 1000,
-                huntMax: 2000,
-                consumeMax: 1000,
+                huntMax: 12000,
+                consumeMax: 3000,
+                healthMax: 350,
+                healthRegen: 6,
+                attackSpeedMax: 2000,
+                strength: 15,
+                constitution: 5
             },
             reward: {
-                strength:1
+                health:30,
+                healthRegen:1,
+                scavenge:2
+            }
+        },
+        {
+            name:"Beetle",
+            stats: {
+                huntMax: 6000,
+                consumeMax: 14000,
+                healthMax: 150,
+                healthRegen: 1,
+                attackSpeedMax: 6000,
+                strength: 50,
+                constitution: 100,
+                harden:10
+            },
+            reward: {
+                strength:2,
+                harden:1
+            }
+        },
+        {
+            name:"Squirrel",
+            stats: {
+                huntMax: 18000,
+                consumeMax: 4000,
+                healthMax: 700,
+                healthRegen: 2,
+                attackSpeedMax: 1000,
+                strength: 10,
+                dexterity: 20,
+                perception: 40
+            },
+            reward: {
+                agility: 1,
+                hunt: 2
+            }
+        },
+        {
+            name:"Snake",
+            stats: {
+                huntMax: 11000,
+                consumeMax: 12000,
+                healthMax: 400,
+                healthRegen: 2,
+                attackSpeedMax: 4000,
+                strength: 40,
+                dexterity: 300,
+                constitution: 30,
+                reflex: 100
+            },
+            reward: {
+                dexterity:5,
+                constitution:4
             }
         },
     ]

@@ -30,7 +30,7 @@ let view = {
             if(isChanged(varName+".attackSpeedCur") || isChanged(varName+".stats.attackSpeedMax")) {
                 document.getElementById(varName+"AttackSpeedBar").style.width = all[varName].attackSpeedCur / realAttackSpeedMax * 100 + "%";
             }
-            if(isChanged(varName+".stats.attackSpeedMax")) {
+            if(isChanged(varName+".stats.attackSpeedMax") || isChanged(varName+".stats.agility")) {
                 if(realAttackSpeedMax > 4000) {
                     document.getElementById(varName+"Attack").style.width = "100%";
                 } else {
@@ -46,16 +46,16 @@ let view = {
             if(isChanged("enemy.huntCur")) {
                 document.getElementById("huntBar").style.width = all.enemy.huntCur / realHuntMax * 100 + "%";
             }
-            if(isChanged("enemy.stats.huntMax")) {
-                document.getElementById("huntNum").innerHTML =  realHuntMax;
+            if(isChanged("enemy.stats.huntMax") || isChanged("char.stats.hunt")) {
+                document.getElementById("huntNum").innerHTML =  intToStringRound(realHuntMax);
             }
 
             let realConsumeMax = all.enemy.stats.consumeMax * getScavengeMult();
             if(isChanged("enemy.consumeCur")) {
                 document.getElementById("consumeBar").style.width = all.enemy.consumeCur / realConsumeMax * 100 + "%";
             }
-            if(isChanged("enemy.stats.consumeMax")) {
-                document.getElementById("consumeNum").innerHTML =  realConsumeMax;
+            if(isChanged("enemy.stats.consumeMax") || isChanged("char.stats.scavenge")) {
+                document.getElementById("consumeNum").innerHTML =  intToStringRound(realConsumeMax);
             }
 
         },
@@ -99,7 +99,7 @@ let view = {
             let color = "black";
             let middleText = victimName === "char" ? " health lost from " : " damage dealt with ";
             return {
-                message: "<div style='font-weight:bold;color:"+color+";'>" + num + "</div>"+middleText+"<div style='font-weight:bold;color:"+color+";'>"+type+"</div>! " +
+                message: "<div style='font-weight:bold;color:"+color+";'>" + intToStringRound(num) + "</div>"+middleText+"<div style='font-weight:bold;color:"+color+";'>"+type+"</div>! " +
                     "<div style='font-weight:bold;color:#ca2615;'>"+intToStringRound(healthCur)+"</div> remaining health!",
                 timer: combatTime,
                 creature:"char"
@@ -192,7 +192,7 @@ function printStats(creature) {
     str += statStr(creature.stats.strength, "black", "Strength", "One strength is one damage.");
     str += statStr(creature.stats.constitution, "black", "Constitution", "Adds to defense, which reduces physical damage taken. Reduction from constitution: " + intToStringRound(getConMult(creature)*100) + "%");
     str += statStr(creature.stats.agility, "black", "Agility", "Reduces time to attack. Current reduction: " + intToStringRound(getAgiMult(creature)*100) + "%");
-    str += statStr(creature.stats.dexterity, "black", "Dexterity", "Deals extra damage when health is above 80%.");
+    str += statStr(creature.stats.dexterity, "black", "Dexterity", "Deals extra damage when health is above 75%.");
     str += statStr(creature.stats.perception, "black", "Perception", "Increases defense when health is below or equal to 50%. Additional reduction: " + intToStringRound(getPerceptionMult(creature)*100) + "%");
     str += statStr(creature.stats.reflex, "black", "Reflex", "Increases defense when health is above 50%. Additional Reduction: " + intToStringRound(getReflexMult(creature)*100) + "%");
     str += statStr(creature.stats.reflect, "black", "Reflect", "When an opponent attacks, deals damage. Ignores flat reduction from Harden.");
