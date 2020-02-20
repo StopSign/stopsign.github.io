@@ -71,6 +71,9 @@ function load() {
         all.char.staminaCur = toLoad.all.char.staminaCur;
         if(toLoad.fightList) {
             fightList = toLoad.fightList;
+            for(let i = 0; i < fightList.length; i++) { //clear out fought
+                fightList[i].fought = 0;
+            }
             view.create.fightList();
         }
         if(toLoad.enemySelectionData) {

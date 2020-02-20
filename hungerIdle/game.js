@@ -60,6 +60,9 @@ function processDying() {
     }
     fixStartingStats(all.char);
     if(document.getElementById("continueFightCheck").checked) {
+        for(let i = 0; i < fightList.length; i++) { //clear out fought
+            fightList[i].timer = 0;
+        }
         findMonster();
     }
     selectFight(selectedFight.col, selectedFight.row);

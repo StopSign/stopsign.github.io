@@ -52,7 +52,7 @@ function tick() {
         gameTicksLeft -= (1000 / ticksPerSecond) / gameSpeed / bonusSpeed;
 
         if(secondTime) {
-            console.log("lag");
+            // console.log("lag");
         }
         secondTime = true;
     }
