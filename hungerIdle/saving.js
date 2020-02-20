@@ -38,12 +38,14 @@ function loadDefaults() {
     all.char = {
         name: "Voidling",
         stats: {
+            attackSpeedMax:2000
+        },
+        base: {
             healthMax: 5,
-            strength: 5,
-            attackSpeedMax:3000
+            strength: 5
         }
     };
-    zeroStats(all.char);
+    fixStartingStats(all.char);
 
     all.logs = [];
     createAllEnemySelection();
@@ -62,8 +64,17 @@ function load() {
                 all.char.stats[property] = toLoad.all.char.stats[property];
             }
         }
+        for (let property in toLoad.all.char.base) {
+            if (toLoad.all.char.base.hasOwnProperty(property)) {
+                all.char.base[property] = toLoad.all.char.base[property];
+            }
+        }
         all.char.healthCur = toLoad.all.char.healthCur;
         all.char.staminaCur = toLoad.all.char.staminaCur;
+        if(toLoad.fightList) {
+            fightList = toLoad.fightList;
+            view.create.fightList();
+        }
     }
 
     view.initialize();
@@ -77,6 +88,7 @@ function load() {
 function save() {
     let toSave = {};
     toSave.all = all;
+    toSave.fightList = fightList;
 
     window.localStorage[saveName] = JSON.stringify(toSave);
 }

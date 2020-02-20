@@ -22,10 +22,7 @@ function engageMonster() {
         processAttack("enemy", "char");
     }
     if(isFight && all.char.healthCur <= 0) {//died :(
-        all.char.healthCur = all.char.healthCur < 0 ? 0 : all.char.healthCur;
-        all.logs.push({message: "You have died!", timer: combatTime});
-        isCombat = false;
-        isFight = false;
+        processDying();
         return;
     }
     if(isFight && all.enemy.healthCur <= 0) { //VICTORY
@@ -44,8 +41,8 @@ function engageMonster() {
     }
     if(all.enemy.consumeCur >= (all.enemy.stats.consumeMax * getScavengeMult()) && isConsume) {
         isConsume = false;
-        getReward(all.char, all.enemy);
-        changeHealth(all.char, all.char.stats.recover);
+
+        consumeEnemy();
 
         if(fightList[fightListIndex] === undefined) { //deleted the fight we were on
             outOfFights();
@@ -105,15 +102,36 @@ function changeHealth(creature, delta) {
 }
 
 function recoverHealth() {
+    if(all.char.healthCur <= 0) {
+        return;
+    }
     processRecovery(all.char);
     if(all.enemy.healthCur > 0) {
         processRecovery(all.enemy);
     }
+    if(all.char.healthCur <= 0) {
+        processDying();
+    }
 }
 
 function processRecovery(creature) {
-    creature.healthCur += creature.stats.healthRegen;
-    if(creature.healthCur > creature.stats.healthMax) { creature.healthCur = creature.stats.healthMax; }
+    let healthChange = creature.stats.healthRegen - creature.poison;
+    if(creature.poison) {
+        all.logs.push(view.create.damageLog(creature.poison, creature.healthCur, "poison", "char"));
+    }
+    changeHealth(creature, healthChange);
+}
+
+function consumeEnemy() {
+    getReward(all.char, all.enemy);
+    changeHealth(all.char, all.char.stats.recover);
+    enemySelectionData[all.enemy.col][all.enemy.row].consumed++;
+    if(enemySelectionData[all.enemy.col][all.enemy.row].consumed > 10) {
+        all.char.poison++;
+    }
+    if(all.enemy.col === selectedFight.col && all.enemy.row === selectedFight.row) {
+        selectFight(selectedFight.col, selectedFight.row);
+    }
 }
 
 function getReward(char, enemy) {
@@ -124,6 +142,10 @@ function getReward(char, enemy) {
                 char.healthCur += enemy.reward[property];
             }
             char.stats[property] += enemy.reward[property];
+            if(char.base[property] === undefined) {
+                char.base[property] = 0;
+            }
+            char.base[property] = round5(char.base[property] + (enemy.reward[property] / 100));
         }
     }
 }
