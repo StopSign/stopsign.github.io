@@ -9,7 +9,7 @@ function getPhysDamage(attacker, victim) {
 
     incPhysDamage -= victim.stats.harden;
     incPhysDamage = incPhysDamage < 0 ? 0 : incPhysDamage;
-    return incPhysDamage
+    return incPhysDamage;
 }
 
 function getPhysReduction(creature) {

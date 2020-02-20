@@ -77,7 +77,10 @@
             <input id="fightNum" style="width:40px;margin-right:5px" value="1">
             <div class="button" onclick="addToFightList()">ADD</div>
             <div class="button" onclick="startFight()">FIGHT</div><br>
+            <div class="button" onclick="clearLists()">CLEAR</div><br>
+            <input type="checkbox" id="continueFightCheck"><label for="continueFightCheck">Start Fighting after Death</label><br>
             <input type="checkbox" id="loopCheck"><label for="loopCheck">Loop Fights</label><br>
+
             <div id="fightList" style="border-top:1px solid;display:block;overflow-y:scroll;height:420px;"></div>
         </div>
         <div class="infoDiv" id="selectionBoxes"></div>

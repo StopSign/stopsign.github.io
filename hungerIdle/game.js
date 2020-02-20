@@ -12,6 +12,12 @@ function addToFightList() {
     view.create.fightList();
 }
 
+function clearLists() {
+    fightList = [];
+    fightListIndex = 0;
+    view.create.fightList();
+}
+
 function startFight() {
     findMonster();
 }
@@ -41,6 +47,23 @@ function findMonster() {
     view.create.fightList();
 }
 
+
+function processDying() {
+    outOfFights();
+    all.char.healthCur = all.char.healthCur < 0 ? 0 : all.char.healthCur;
+    all.logs.push({message: "You have died!", timer: combatTime});
+    exitCombat();
+    for(let i = 0; i < enemySelectionData.length; i++) {
+        for(let j = 0; j < enemySelectionData[i].length; j++) {
+            enemySelectionData[i][j].consumed = 0;
+        }
+    }
+    fixStartingStats(all.char);
+    if(document.getElementById("continueFightCheck").checked) {
+        findMonster();
+    }
+    selectFight(selectedFight.col, selectedFight.row);
+}
 
 function outOfFights() {
     fightListIndex = 0;

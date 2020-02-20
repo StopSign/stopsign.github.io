@@ -13,7 +13,7 @@ let view = {
             view.updating.updateEnemy();
 
             if(isChanged("char.stats")) {
-                document.getElementById("charStats").innerHTML = printStats(all.char);
+                document.getElementById("charStats").innerHTML = printStats(all.char, true);
             }
 
             view.updating.updateLog();
@@ -131,8 +131,8 @@ let view = {
         fightList: function() {
             let str = "";
             for(let i = 0; i < fightList.length; i++) {
-                str += "<div style='width:20px'>"+(fightListIndex === i ? ">" : "")+"</div>";
-                str += fightList[i].quantity + " x " + fightList[i].name + " (" + fightList[i].fought + ")";
+                str += "<div onclick='switchToFight("+i+")' style='cursor:pointer;'><div style='width:20px'>"+(fightListIndex === i ? ">" : "")+"</div>";
+                str += fightList[i].quantity + " x " + fightList[i].name + " (" + fightList[i].fought + ")</div>";
                 let timer = fightList[i].timer > 0 ? (fightList[i].timer/1000)+"s" : "";
                 str += "<div style='float:right'>"+timer+" <div style='cursor:pointer' onclick='removeFight("+i+")'>X</div></div><br>"
             }
@@ -142,6 +142,11 @@ let view = {
     }
 };
 
+function switchToFight(index) {
+    fightListIndex = index;
+    findMonster();
+}
+
 function selectFight(col, row) {
     if(selectedFight.col >= 0) {
         document.getElementById("selection" + selectedFight.col + "_" + selectedFight.row).style.border = "";
@@ -150,7 +155,7 @@ function selectFight(col, row) {
     selectedFight.col = col;
     selectedFight.row = row;
     let enemyData = createEnemy(col, row);
-    document.getElementById("enemyStats").innerHTML = printStats(enemyData);
+    document.getElementById("enemyStats").innerHTML = printStats(enemyData, false);
     document.getElementById("selection"+col+"_"+row).style.border = "1px solid yellow";
     document.getElementById("selection"+col+"_"+row).style.padding = "1px";
 }
@@ -178,29 +183,36 @@ function isChanged(varName) {
     return JSON.stringify(nextVarPrev) !== JSON.stringify(nextVarAll);
 }
 
-function printStats(creature) {
+function printStats(creature, isChar) {
+
     let str = "<div style='padding:5px;width:100%;'>";
 
-    str += "<div class='title'>"+creature.name+"</div>";
-    str += statStr(creature.stats.huntMax, "#7dad1f", "Hunt Time", "Time it takes to find an enemy of this type. Reduced by the Hunt stat. After reduction: " + intToStringRound(creature.stats.huntMax * getHuntMult()));
-    str += statStr(creature.stats.consumeMax, "#a86fc4", "Consume Time", "Time it takes to consume an enemy for stats. Reduced by the Scavenge stat. After reduction: " + intToStringRound(creature.stats.consumeMax * getScavengeMult()));
+
+    str += "<div class='title showthat'>"+creature.name+ (isChar ? "<div class='showthisD'>1% of stat gain goes to your base stats. When you die, you start with base stats.</div>" : "")+"</div>";
+    str += statStr(creature, "huntMax", "#7dad1f", "Hunt Time", "Time it takes to find an enemy of this type. Reduced by the Hunt stat. After reduction: " + intToStringRound(creature.stats.huntMax * getHuntMult()));
+    str += statStr(creature, "consumeMax", "#a86fc4", "Consume Time", "Time it takes to consume an enemy for stats. Reduced by the Scavenge stat. After reduction: " + intToStringRound(creature.stats.consumeMax * getScavengeMult()));
     str += "<br>";
-    str += statStr(creature.stats.healthMax, "#ca2615", "Health", "The maximum health. Dead at 0.");
-    str += statStr(creature.stats.healthRegen, "#ca2615", "Health Regen", "Regen this amount every second.");
-    str += statStr(creature.stats.staminaMax, "black", "Stamina", "Used for certain abilities.");
-    str += statStr(creature.stats.attackSpeedMax, "#a86fc4", "Attack Speed Max", "Time it takes to deal damage. Reduced by the Agility stat. After reduction: " + intToStringRound(creature.stats.attackSpeedMax * getAgiMult(creature)));
-    str += statStr(creature.stats.strength, "black", "Strength", "One strength is one damage.");
-    str += statStr(creature.stats.constitution, "black", "Constitution", "Adds to defense, which reduces physical damage taken. Reduction from constitution: " + intToStringRound(getConMult(creature)*100) + "%");
-    str += statStr(creature.stats.agility, "black", "Agility", "Reduces time to attack. Current reduction: " + intToStringRound(getAgiMult(creature)*100) + "%");
-    str += statStr(creature.stats.dexterity, "black", "Dexterity", "Deals extra damage when health is above 75%.");
-    str += statStr(creature.stats.perception, "black", "Perception", "Increases defense when health is below or equal to 50%. Additional reduction: " + intToStringRound(getPerceptionMult(creature)*100) + "%");
-    str += statStr(creature.stats.reflex, "black", "Reflex", "Increases defense when health is above 50%. Additional Reduction: " + intToStringRound(getReflexMult(creature)*100) + "%");
-    str += statStr(creature.stats.reflect, "black", "Reflect", "When an opponent attacks, deals damage. Ignores flat reduction from Harden.");
-    str += statStr(creature.stats.harden, "black", "Harden", "Reduces physical damage by a flat amount, after defense reduction.");
-    str += statStr(creature.stats.scavenge, "black", "Scavenge", "Reduces time to consume an enemy. Current reduction: " + intToStringRound(getScavengeMult()*100) + "%");
-    str += statStr(creature.stats.hunt, "black", "Hunt", "Reduces time to find a new enemy. Current reduction: " + intToStringRound(getHuntMult()*100) + "%");
-    str += statStr(creature.stats.poison, "black", "Poison", "Deals damage the next 5 times the opponent attacks. Stacks, so 1 poison does 1x first attack, 2x second attack, etc.");
-    str += statStr(creature.stats.recover, "black", "Recover", "Amount of health gained after a consume.");
+    str += statStr(creature, "healthMax", "#ca2615", "Health", "The maximum health. Dead at 0.");
+    str += statStr(creature, "healthRegen", "#ca2615", "Health Regen", "Regen this amount every second.");
+    str += statStr(creature, "staminaMax", "black", "Stamina", "Used for certain abilities.");
+    str += statStr(creature, "attackSpeedMax", "#a86fc4", "Attack Speed Max", "Time it takes to deal damage. Reduced by the Agility stat. After reduction: " + intToStringRound(creature.stats.attackSpeedMax * getAgiMult(creature)));
+    str += statStr(creature, "strength", "black", "Strength", "One strength is one damage.");
+    str += statStr(creature, "constitution", "black", "Constitution", "Adds to defense, which reduces physical damage taken. Reduction from constitution: " + intToStringRound(getConMult(creature)*100) + "%");
+    str += statStr(creature, "agility", "black", "Agility", "Reduces time to attack. Current reduction: " + intToStringRound(getAgiMult(creature)*100) + "%");
+    str += statStr(creature, "dexterity", "black", "Dexterity", "Deals extra damage when health is above 75%.");
+    str += statStr(creature, "perception", "black", "Perception", "Increases defense when health is below or equal to 50%. Additional reduction: " + intToStringRound(getPerceptionMult(creature)*100) + "%");
+    str += statStr(creature, "reflex", "black", "Reflex", "Increases defense when health is above 50%. Additional Reduction: " + intToStringRound(getReflexMult(creature)*100) + "%");
+    str += statStr(creature, "reflect", "black", "Reflect", "When an opponent attacks, deals damage. Ignores flat reduction from Harden.");
+    str += statStr(creature, "harden", "black", "Harden", "Reduces physical damage by a flat amount, after defense reduction.");
+    str += statStr(creature, "scavenge", "black", "Scavenge", "Reduces time to consume an enemy. Current reduction: " + intToStringRound(getScavengeMult()*100) + "%");
+    str += statStr(creature, "hunt", "black", "Hunt", "Reduces time to find a new enemy. Current reduction: " + intToStringRound(getHuntMult()*100) + "%");
+    str += statStr(creature, "poison", "black", "Poison", "Deals damage the next 5 times the opponent attacks. Stacks, so 1 poison does 1x first attack, 2x second attack, etc.");
+    str += statStr(creature, "recover", "black", "Recover", "Amount of health gained after a consume.");
+    if(creature.poison) {
+        str += "<br><div class='showthat'><div style='color:darkgreen'>Poison</div>: <b>" + creature.poison + "</b>" +
+            "<div class='showthisD'>Taking damage per second untl you die</div></div><br>";
+    }
+
 
 
 
@@ -208,24 +220,32 @@ function printStats(creature) {
     //     huntMax: 3000,
     //     consumeMax: 4000,
 
-    if(creature.reward) {
+    if(!isChar) {
         str += "<br><div class='smallTitle'>Rewards</div>";
         for (let property in creature.reward) {
             if (creature.reward.hasOwnProperty(property)) {
                 str += "<b>"+creature.reward[property]+"</b> " + camelToTitle(property) + "<br>";
             }
         }
+
+        str += "<br>You have consumed <b>" + enemySelectionData[selectedFight.col][selectedFight.row].consumed + " / 10</b><br>Each extra you consume causes you to take 1 poison dmg/s until you die.";
     }
+
 
     str += "</div>";
     return str;
 }
 
-function statStr(value, color, label, tooltip) {
+function statStr(creature, valueName, color, label, tooltip) {
+    let value = creature.stats[valueName];
     if(value === undefined || value === 0) {
         return "";
     }
+    let baseVal = "";
+    if(creature.base && creature.base[valueName]) {
+        baseVal = "<br>You have a base value of " + creature.base[valueName];
+    }
     return "<div class='showthat'><div style='color:"+color+"'>"+label+"</div>: <b>" + value + "</b>" +
-    "<div class='showthisD'>"+tooltip+"</div></div><br>";
+    "<div class='showthisD'>"+tooltip+baseVal+"</div></div><br>";
 }
 
