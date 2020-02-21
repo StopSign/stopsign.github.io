@@ -267,3 +267,23 @@ input {
 .selectionDiv:hover {
     background-color:rgb(217, 221, 240);
 }
+
+
+.draggedOverAction {
+    background:lightblue;
+}
+
+.draggedAction{
+    opacity:0.4;
+}
+
+.imageDragFix {
+    pointer-events:none;
+    user-drag: none;
+    user-select: none;
+    -moz-user-select: none;
+    -webkit-user-drag: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+}
+

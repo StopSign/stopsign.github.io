@@ -59,7 +59,7 @@ function processDying() {
         }
     }
     fixStartingStats(all.char);
-    let totalCombatTime = 0;
+    let totalCombatTime = combatTime; //unfinished timer
     for(let i = 0; i < fightList.length; i++) {
         totalCombatTime += fightList[i].timer;
         fightList[i].timer = 0;

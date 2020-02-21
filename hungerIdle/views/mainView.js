@@ -131,16 +131,87 @@ let view = {
         fightList: function() {
             let str = "";
             for(let i = 0; i < fightList.length; i++) {
-                str += "<div onclick='switchToFight("+i+")' style='cursor:pointer;'><div style='width:20px'>"+(fightListIndex === i ? ">" : "")+"</div>";
+                str += "<div style='display:block' id='fightContainer"+i+"'  ondragover='handleDragOver(event)' ondrop='handleDragDrop(event)' ondragstart='handleDragStart(event)' ondragend='draggedUndecorate(" + i + ")' ondragenter='dragOverDecorate(" + i +")' ondragleave='dragExitUndecorate("+i+")' draggable='true' data-index='"+i+"'>";
+                str += "<div onclick='switchToFight("+i+")' style='cursor:pointer;' data-index='"+i+"'><div style='width:20px'>"+(fightListIndex === i ? ">" : "")+"</div>";
                 str += fightList[i].quantity + " x " + fightList[i].name + " (" + fightList[i].fought + ")</div>";
                 let timer = fightList[i].timer > 0 ? (fightList[i].timer/1000)+"s" : "";
-                str += "<div style='float:right'>"+timer+" <div style='cursor:pointer' onclick='removeFight("+i+")'>X</div></div><br>"
+                str += "<div style='float:right'>"+timer+" <div style='cursor:pointer' onclick='removeFight("+i+")'>X</div></div></div>"
             }
 
             document.getElementById("fightList").innerHTML = str;
         }
     }
 };
+
+function handleDragStart(event) {
+    let index = event.target.getAttribute("data-index");
+    draggedDecorate(index);
+    event.dataTransfer.setData('text/html', index);
+}
+
+function handleDragOver(event) {
+    event.preventDefault();
+}
+
+function handleDragDrop(event) {
+    let indexOfDroppedOverElement = event.target.getAttribute("data-index");
+    console.log(event.target);
+    dragExitUndecorate(indexOfDroppedOverElement);
+    let initialIndex = event.dataTransfer.getData("text/html");
+    moveQueuedAction(initialIndex, indexOfDroppedOverElement);
+}
+
+function moveQueuedAction(initialIndex, resultingIndex) {
+    console.log(initialIndex, resultingIndex);
+    initialIndex = Number(initialIndex);
+    resultingIndex = Number(resultingIndex);
+    if (initialIndex < 0 || initialIndex > fightList.length || resultingIndex < 0 || resultingIndex > fightList.length - 1) {
+        return;
+    }
+    let difference = initialIndex - resultingIndex;
+    if (difference === 0) {
+        return;
+    }
+
+    let delta = Math.abs(difference);
+
+    if (difference > 0) {
+        for (let i = 0; i < delta; i++) {
+            const temp = fightList[initialIndex-i-1];
+            fightList[initialIndex-i-1] = fightList[initialIndex-i];
+            fightList[initialIndex-i] = temp;
+        }
+    } else {
+        for (let i = 0; i < delta; i++) {
+            const temp = fightList[initialIndex+i+1];
+            fightList[initialIndex+i+1] = fightList[initialIndex+i];
+            fightList[initialIndex+i] = temp;
+        }
+    }
+
+    view.create.fightList();
+}
+
+function dragOverDecorate(i) {
+    if(document.getElementById("fightContainer" + i))
+        document.getElementById("fightContainer" + i).classList.add("draggedOverAction");
+}
+
+function dragExitUndecorate(i) {
+    if(document.getElementById("fightContainer" + i))
+        document.getElementById("fightContainer" + i).classList.remove("draggedOverAction");
+}
+
+function draggedDecorate(i) {
+    if(document.getElementById("fightContainer" + i))
+        document.getElementById("fightContainer" + i).classList.add("draggedAction");
+}
+
+function draggedUndecorate(i) {
+    if(document.getElementById("fightContainer" + i))
+        document.getElementById("fightContainer" + i).classList.remove("draggedAction");
+}
+
 
 function switchToFight(index) {
     fightListIndex = index;
