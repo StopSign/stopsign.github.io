@@ -59,10 +59,15 @@ function processDying() {
         }
     }
     fixStartingStats(all.char);
+    let totalCombatTime = 0;
+    for(let i = 0; i < fightList.length; i++) {
+        totalCombatTime += fightList[i].timer;
+        fightList[i].timer = 0;
+    }
+    document.getElementById("totalFightTimer").innerHTML = "You died after " + totalCombatTime/1000+"s.";
+    view.create.fightList();
+
     if(document.getElementById("continueFightCheck").checked) {
-        for(let i = 0; i < fightList.length; i++) { //clear out fought
-            fightList[i].timer = 0;
-        }
         findMonster();
     }
     selectFight(selectedFight.col, selectedFight.row);

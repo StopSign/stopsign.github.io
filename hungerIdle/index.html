@@ -19,7 +19,10 @@
 <div id="leftCol" style="vertical-align: top;">
     <div id="charStats" class="infoDiv" style="width:200px;height:400px;vertical-align: top;font-size:14px;">
     </div><br>
-    Saving in ... <div id="saveTimer"></div>
+    Saving in ... <div id="saveTimer"></div><br>
+    <input id="exportImportSave"><label for="exportImportSave">Export/Import</label><br>
+    <div class="button" onclick="save()">Save</div><div class="button" onclick="exportSave()">Export</div><div class="button" onclick="importSave()">Import</div><br>
+    Import blank to hard reset.<br>Export puts the save in your Ctrl-V
 </div>
 
 <div id="combat" style="vertical-align: top;">
@@ -82,7 +85,8 @@
             <input type="checkbox" id="continueFightCheck"><label for="continueFightCheck">Start Fighting after Death</label><br>
             <input type="checkbox" id="loopCheck"><label for="loopCheck">Loop Fights</label><br>
 
-            <div id="fightList" style="border-top:1px solid;display:block;overflow-y:scroll;height:420px;"></div>
+            <div id="fightList" style="border-top:1px solid;display:block;overflow-y:scroll;height:400px;"></div>
+            <div id="totalFightTimer"></div>
         </div>
         <div class="infoDiv" id="selectionBoxes"></div>
     </div>

@@ -245,7 +245,7 @@ function statStr(creature, valueName, color, label, tooltip) {
     if(creature.base && creature.base[valueName]) {
         baseVal = "<br>You have a base value of " + creature.base[valueName];
     }
-    return "<div class='showthat'><div style='color:"+color+"'>"+label+"</div>: <b>" + value + "</b>" +
+    return "<div class='showthat'><div style='color:"+color+"'>"+label+"</div>: <b>" + intToStringRound(value) + "</b>" +
     "<div class='showthisD'>"+tooltip+baseVal+"</div></div><br>";
 }
 

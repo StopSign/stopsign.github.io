@@ -46,6 +46,7 @@ function fixStat(creature, stat) {
 }
 
 function createAllEnemySelection() {
+    enemySelectionData = [];
     for(let i = 0; i < enemyData.length; i++) {
         enemySelectionData.push([]);
         for(let j = 0; j < enemyData[i].length; j++) {
