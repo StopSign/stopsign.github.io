@@ -14,11 +14,12 @@ Stats:
 
 Stage 1:
 HP
-HP Regen
 STR - +1 Phys Damage
 CON - Defense - ((CON)*0.06)/(1+0.06*(CON))
 AGI - Attack speed increase - (AGI*0.007)/(1+0.001*AGI)
 hunt - find enemies faster
+recover - health gain from consume
+scavenge - speed of consume
 
 
 Stage 2:
@@ -26,8 +27,7 @@ stamina - used for physical actions
 DEX - +1 Starting dmg - when enemy health is >80%
 Harden - +1 Block, after CON
 Spines - Uses stamina, DEX for dmg, sta reduction (STA*0.06)/(1+0.06*STA)
-scavenge - speed of consume
-recover - health gain from consume
+thorns - reflect
 
 
 Stage 3:
@@ -35,8 +35,6 @@ PER - +1 defense when health is <50%
 Reflex - +1 defense when health is >=50%
 Luck - chance for double stats on absorb
 shield - reduce dmg by # for first # hits
-vampire - life steal
-thorns - reflect
 Sunder - reduce enemy block
 
 

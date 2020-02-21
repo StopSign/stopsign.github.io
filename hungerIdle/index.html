@@ -27,8 +27,9 @@
 
 <div id="combat" style="vertical-align: top;">
 
-    <div id="enemyDiv" style="display:block;height:300px;opacity:0">
+    <div id="enemyDiv" style="display:block;height:300px;opacity:0;position:relative;">
         <div class="title">Enemy</div>
+        <div class="button" onclick="exitCombat()" style="position:absolute;left:0;top:0">FLEE!</div><br>
         <div id="hunt" style="display:none;">
             <div class="smallTitle">Hunt</div>
             <div class="progressOuter">
@@ -55,7 +56,6 @@
             </div>
         </div><br>
         <div id="enemyPic"></div>
-        <div class="button" onclick="exitCombat()">FLEE!</div><br>
     </div><br>
 
     <div id="myDiv">
