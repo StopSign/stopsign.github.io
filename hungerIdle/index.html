@@ -83,7 +83,10 @@
             <div class="button" onclick="clearLists()">CLEAR</div>
             <div class="button" onclick="processDying()">DIE</div><br>
             <input type="checkbox" id="continueFightCheck"><label for="continueFightCheck">Start Fighting after Death</label><br>
-            <input type="checkbox" id="loopCheck"><label for="loopCheck">Loop Fights</label><br>
+            When the list runs out...<br>
+            <input type="radio" name="listEnd" id="pauseCheck" value="pauseCheck" checked="checked"><label for="pauseCheck">Pause</label><br>
+            <input type="radio" name="listEnd" id="loopCheck" value="loopCheck"><label for="loopCheck">Start the list over</label><br>
+            <input type="radio" name="listEnd" id="dieCheck" value="dieCheck"><label for="dieCheck">Die</label><br>
 
             <div id="fightList" style="border-top:1px solid;display:block;overflow-y:scroll;height:400px;"></div>
             <div id="totalFightTimer"></div>

@@ -20,6 +20,8 @@ function fixStartingStats(creature) {
 
     fixStat(creature, "healthMax");
     fixStat(creature, "healthRegen");
+    fixStat(creature, "manaMax");
+    fixStat(creature, "manaRegen");
     fixStat(creature, "strength");
     fixStat(creature, "constitution");
     fixStat(creature, "agility");
@@ -34,6 +36,8 @@ function fixStartingStats(creature) {
     fixStat(creature, "poison");
     fixStat(creature, "recover");
 
+    creature.max = creature.max === undefined ? 10 : creature.max;
+    creature.manaCur = creature.stats.manaMax;
     creature.healthCur = creature.stats.healthMax;
     creature.staminaCur = creature.stats.staminaMax;
 }
@@ -62,8 +66,8 @@ let enemyData = [
         {
             name:"Moss",
             stats: {
-                huntMax: 2000,
-                consumeMax: 2000,
+                huntMax: 1000,
+                consumeMax: 1000,
                 healthMax: 12,
                 attackSpeedMax: 60000
             },
@@ -72,26 +76,11 @@ let enemyData = [
             }
         },
         {
-            name:"Flower",
-            stats: {
-                huntMax: 2000,
-                consumeMax: 3000,
-                healthMax: 30,
-                healthRegen: .5,
-                attackSpeedMax: 60000,
-                constitution: 10,
-                reflect:.5
-            },
-            reward: {
-                constitution: 1
-            }
-        },
-        {
             name:"Fruit",
             stats: {
                 huntMax: 2000,
                 consumeMax: 5000,
-                healthMax: 80,
+                healthMax: 60,
                 healthRegen: .5,
                 attackSpeedMax: 60000,
                 reflect:2
@@ -100,18 +89,47 @@ let enemyData = [
                 strength: 1
             }
         },
+        {
+            name:"Mushroom",
+            stats: {
+                huntMax: 4000,
+                consumeMax: 2000,
+                healthMax: 20,
+                healthRegen: 3,
+                attackSpeedMax: 60000,
+                reflect:.5
+            },
+            reward: {
+                recover:1
+            }
+        },
+        {
+            name:"Mandrake",
+            max:0,
+            stats: {
+                huntMax: 15000,
+                consumeMax: 15000,
+                healthMax: 140,
+                attackSpeedMax: 20000,
+                strength: 70
+            },
+            reward: {
+                manaMax: 100
+            }
+        },
         // {
-        //     name:"Mushroom",
+        //     name:"Flower",
         //     stats: {
-        //         huntMax: 9000,
-        //         consumeMax: 4000,
-        //         healthMax: 80,
-        //         healthRegen: .5,
-        //         attackSpeedMax: 3000,
-        //         strength:2
+        //         huntMax: 1000,
+        //         consumeMax: 2000,
+        //         healthMax: 30,
+        //         healthRegen: 0.5,
+        //         attackSpeedMax: 60000,
+        //         constitution: 10,
+        //         reflect: .5
         //     },
         //     reward: {
-        //         strength:.25,
+        //         constitution: 1
         //     }
         // },
         // {

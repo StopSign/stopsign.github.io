@@ -101,7 +101,17 @@ function changeHealth(creature, delta) {
     }
 }
 
-function recoverHealth() {
+function changeMana(creature, delta) {
+    creature.manaCur += delta;
+    if(creature.manaCur > creature.stats.manaMax) {
+        creature.manaCur = creature.stats.manaMax;
+    }
+    if(creature.manaCur < 0) {
+        creature.manaCur = 0;
+    }
+}
+
+function applyRegen() {
     if(all.char.healthCur <= 0) {
         return;
     }
@@ -112,6 +122,8 @@ function recoverHealth() {
     if(all.char.healthCur <= 0) {
         processDying();
     }
+
+    changeMana(all.char, all.char.stats.manaRegen);
 }
 
 function processRecovery(creature) {
@@ -126,8 +138,8 @@ function consumeEnemy() {
     getReward(all.char, all.enemy);
     changeHealth(all.char, all.char.stats.recover);
     enemySelectionData[all.enemy.col][all.enemy.row].consumed++;
-    if(enemySelectionData[all.enemy.col][all.enemy.row].consumed > 10) {
-        all.char.poison++;
+    if(enemySelectionData[all.enemy.col][all.enemy.row].consumed > all.enemy.max) {
+        all.char.poison += enemySelectionData[all.enemy.col][all.enemy.row].consumed - all.enemy.max;
     }
     if(all.enemy.col === selectedFight.col && all.enemy.row === selectedFight.row) {
         selectFight(selectedFight.col, selectedFight.row);

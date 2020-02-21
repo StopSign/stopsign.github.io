@@ -25,7 +25,7 @@ let all = {char: {}, enemy:{}};
 let isCombat = false, isHunt = false, isFight = false, isConsume = false;
 let combatTime;
 let enemySelectionData = [];
-let fightList = [];
+let fightList;
 let selectedFight = {col:-1, row:-1};
 
 
@@ -45,6 +45,8 @@ function loadDefaults() {
             strength: 5
         }
     };
+    fightList = [];
+    enemySelectionData = [];
     fixStartingStats(all.char);
 
     all.logs = [];
@@ -74,7 +76,6 @@ function load() {
             for(let i = 0; i < fightList.length; i++) { //clear out fought
                 fightList[i].fought = 0;
             }
-            view.create.fightList();
         }
         if(toLoad.enemySelectionData) {
             for (let i = 0; i < enemySelectionData.length; i++) {
@@ -85,10 +86,11 @@ function load() {
                 }
             }
         }
-        totalTime = toLoad.totalTime === undefined ? 0 : toLoad.totalTime;
     }
+    totalTime = toLoad.totalTime === undefined ? 0 : toLoad.totalTime;
 
     view.initialize();
+    view.create.fightList();
     selectFight(0, 0);
 
     all.enemy = createEnemy(0, 0);

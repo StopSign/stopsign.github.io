@@ -66,7 +66,11 @@ function tickPassed() {
 }
 
 function secondPassed() {
-    recoverHealth();
+    applyRegen();
+}
+
+function getTotalTime() {
+    return round2(totalTime/ticksPerSecond/60) + " minutes have passed.";
 }
 
 function recalcInterval(fps) {

@@ -49,7 +49,7 @@ function findMonster() {
 
 
 function processDying() {
-    outOfFights();
+    fightListIndex = 0;
     all.char.healthCur = all.char.healthCur < 0 ? 0 : all.char.healthCur;
     all.logs.push({message: "You have died!", timer: combatTime});
     exitCombat();
@@ -62,6 +62,7 @@ function processDying() {
     let totalCombatTime = combatTime; //unfinished timer
     for(let i = 0; i < fightList.length; i++) {
         totalCombatTime += fightList[i].timer;
+        fightList[i].fought = 0;
         fightList[i].timer = 0;
     }
     document.getElementById("totalFightTimer").innerHTML = "You died after " + totalCombatTime/1000+"s.";
@@ -69,6 +70,8 @@ function processDying() {
 
     if(document.getElementById("continueFightCheck").checked) {
         findMonster();
+    } else {
+        isCombat = false;
     }
     selectFight(selectedFight.col, selectedFight.row);
 }
@@ -83,7 +86,9 @@ function outOfFights() {
         for(let i = 0; i < fightList.length; i++) { //clear out fought
             fightList[i].timer = 0;
         }
-    } else { //otherwise stop combat
+    } else if(document.getElementById("dieCheck").checked ) {
+        processDying()
+    } else { //otherwise pause
         isCombat = false;
     }
 }

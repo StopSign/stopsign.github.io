@@ -265,6 +265,8 @@ function printStats(creature, isChar) {
     str += "<br>";
     str += statStr(creature, "healthMax", "#ca2615", "Health", "The maximum health. Dead at 0.");
     str += statStr(creature, "healthRegen", "#ca2615", "Health Regen", "Regen this amount every second.");
+    str += statStr(creature, "manaMax", "#5c60ca", "Mana", "The maximum mana, used for spells");
+    str += statStr(creature, "manaRegen", "#5c60ca", "Mana Regen", "Regen this amount of mana every second.");
     str += statStr(creature, "staminaMax", "black", "Stamina", "Used for certain abilities.");
     str += statStr(creature, "attackSpeedMax", "#a86fc4", "Attack Speed Max", "Time it takes to deal damage. Reduced by the Agility stat. After reduction: " + intToStringRound(creature.stats.attackSpeedMax * getAgiMult(creature)));
     str += statStr(creature, "strength", "black", "Strength", "One strength is one damage.");
@@ -299,7 +301,7 @@ function printStats(creature, isChar) {
             }
         }
 
-        str += "<br>You have consumed <b>" + enemySelectionData[selectedFight.col][selectedFight.row].consumed + " / 10</b><br>Each extra you consume causes you to take 1 poison dmg/s until you die.";
+        str += "<br>You have consumed <b>" + enemySelectionData[selectedFight.col][selectedFight.row].consumed + " / "+creature.max+"</b><br>Each extra you consume causes you to take +1 poison dmg/s until you die.";
     }
 
 
