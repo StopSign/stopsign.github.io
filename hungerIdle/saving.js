@@ -70,6 +70,7 @@ function load() {
             }
         }
         all.char.healthCur = toLoad.all.char.healthCur;
+        all.char.manaCur = toLoad.all.char.manaCur;
         all.char.staminaCur = toLoad.all.char.staminaCur;
         if(toLoad.fightList) {
             fightList = toLoad.fightList;

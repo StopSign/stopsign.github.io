@@ -250,6 +250,9 @@ input {
 .healthC {
     background-color:#ca2615;
 }
+.manaC {
+    background-color:#5c60ca;
+}
 
 .infoDiv {
     border:1px solid;

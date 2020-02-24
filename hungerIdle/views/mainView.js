@@ -9,8 +9,8 @@ let view = {
             if(!prevState || Math.floor(prevState.saveTimer / 1000) !== Math.floor(saveTimer / 1000)) {
                 document.getElementById("saveTimer").innerHTML = Math.floor(saveTimer / 1000) + "s";
             }
-            view.updating.updateCreature("char");
             view.updating.updateEnemy();
+            view.updating.updateChar();
 
             if(isChanged("char.stats")) {
                 document.getElementById("charStats").innerHTML = printStats(all.char, true);
@@ -20,6 +20,20 @@ let view = {
 
             prevState = copyArray(all);
             prevState.saveTimer = saveTimer;
+        },
+        updateChar: function() {
+            view.updating.updateCreature("char");
+            if(isChanged("char.stats.manaMax")) {
+                if(all.char.stats.manaMax === 0) {
+                    document.getElementById("charMana").style.display = "none";
+                } else {
+                    document.getElementById("charMana").style.display = "block";
+                }
+            }
+            if(isChanged("char.stats.manaMax") || isChanged("char.manaCur")) {
+                document.getElementById("charManaNum").innerHTML =  "Mana: " + intToStringRound(all.char.manaCur) + " / " + intToStringRound(all.char.stats.manaMax);
+                document.getElementById("charManaBar").style.width = all.char.manaCur / all.char.stats.manaMax * 100 + "%";
+            }
         },
         updateCreature:function(varName) {
             if(isChanged(varName+".healthCur") || isChanged(varName+".stats.healthMax")) {
