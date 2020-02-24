@@ -27,7 +27,7 @@ let combatTime;
 let enemySelectionData = [];
 let fightList;
 let selectedFight = {col:-1, row:-1};
-
+let fightListIndex = 0;
 
 function clearSave() { //Doesn't work atm
     window.localStorage[saveName] = "";

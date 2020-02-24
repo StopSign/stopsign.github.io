@@ -49,6 +49,29 @@ function getDistance(x1, y1, x2, y2) {
     return Math.sqrt(Math.pow(Math.abs(x1-x2), 2) + Math.pow(Math.abs(y1-y2), 2));
 }
 
+function isChanged(varName, all, prevState) {
+    if(prevState === undefined) {
+        return true;
+    }
+    varName = "." + varName;
+    let nextVarPrev = prevState;
+    let nextVarAll = all;
+    while(varName.indexOf(".") >= 0) {
+        varName = varName.substring(1);
+        let nextVarName = varName;
+        if(varName.indexOf(".") > 0) {
+            nextVarName = varName.substring(0, varName.indexOf("."));
+        }
+        varName = varName.substring(varName.indexOf("."));
+        if(nextVarPrev[nextVarName] === undefined) {
+            return true;
+        }
+        nextVarPrev = nextVarPrev[nextVarName];
+        nextVarAll = nextVarAll[nextVarName];
+    }
+    return JSON.stringify(nextVarPrev) !== JSON.stringify(nextVarAll);
+}
+
 //x2, y2 is target
 function moveToTarget(x1, y1, x2, y2, magnitude) {
     let extraTurn = 0;

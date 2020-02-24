@@ -1,29 +1,3 @@
-function addToFightList() {
-    let selected = enemySelectionData[selectedFight.col][selectedFight.row];
-    let fightQueued = {
-        quantity: document.getElementById("fightNum").value,
-        name: selected.name,
-        col: selectedFight.col,
-        row: selectedFight.row,
-        fought: 0,
-        timer:0
-    };
-    fightList.push(fightQueued);
-    view.create.fightList();
-}
-
-function clearLists() {
-    fightList = [];
-    fightListIndex = 0;
-    view.create.fightList();
-}
-
-function startFight() {
-    findMonster();
-}
-
-let fightListIndex = 0;
-
 function findMonster() {
     combatTime = 0;
     all.char.attackSpeedCur = 0;
@@ -46,7 +20,6 @@ function findMonster() {
     view.updating.update();
     view.create.fightList();
 }
-
 
 function processDying() {
     fightListIndex = 0;
@@ -91,14 +64,6 @@ function outOfFights() {
     } else { //otherwise pause
         isCombat = false;
     }
-}
-
-function removeFight(index) {
-    fightList.splice(index, 1);
-    if(fightListIndex > index) {
-        fightListIndex--;
-    }
-    view.create.fightList();
 }
 
 function exitCombat() {
