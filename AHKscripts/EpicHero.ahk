@@ -10,7 +10,8 @@ SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
 ;If you want help setting up, ask
 
 
-
+originalOffsetX := 278 
+originalOffsetY := 296
 	
 
 !1::
@@ -66,8 +67,8 @@ if(!(blackX > 0)) {
 
 MouseMove, blackX, blackY, 0 
 
-FileDelete, test.txt
-FileAppend, %blackX%`n%blackY%, test.txt
+FileDelete, epicHeroCoords.txt
+FileAppend, %blackX%`n%blackY%, epicHeroCoords.txt
 
 return 
 
@@ -77,16 +78,19 @@ return
 readOffsetFile()
 
 t := 100 
-MCSO(331, 902) ;
+MCS(331, 902) ;
+z := colorIsVisibleQuick(66, 487, 0x2B2B2B)
 
 return 
 
 readOffsetFile() {
 	global xOffset
 	global yOffset
-	
+	if(!FileExist("epicHeroCoords.txt"))
+		MsgBox, Coords have not been set yet, use alt 1 first!
+
 	lineNum := 0
-	Loop, read, test.txt 
+	Loop, read, epicHeroCoords.txt 
 	{
 		if(lineNum == 0) 
 			xOffset := A_LoopReadLine
@@ -94,14 +98,36 @@ readOffsetFile() {
 			yOffset := A_LoopReadLine
 		lineNum++
 	}
+	
 }
 
 
 
+!3::
+readOffsetFile()
+t := 150 
+MouseGetPos, returnX, returnY
 
+MCS(415, 899) ;skill table 
+sleep, 100 
+MCS(387, 871) ;angel skills 
+if(colorIsVisibleQuick(317, 417, 0xE6DAEF)) { ;check for angel 
+	Send {1 down}
+	
+	MCS(493, 597) ;god bless
+	MCS(335, 648) ;muscle 
+	MCS(488, 645) ;magic 
+	MCS(339, 697) ;protect 
+	MCS(494, 691) ;haste 
+	MCS(341, 749) ;gold 
+	MCS(494, 742) ;wings 
+	Send {1 up}
+}
+	
 
+MouseMove, returnX, returnY, 0
 
-
+return 
 
 
 
@@ -261,20 +287,22 @@ WinGetTitle, Title, A
 StringGetPos, pos, Title, Notepad++
 if(pos < 0)
 	MCSH(422, 1059, 100) ;notepad++ icon
-Send {Enter}MCSO(%xpos%, %ypos%){Space}{;}
+Send {Enter}MCS(%xpos%, %ypos%){Space}{;}
 MouseMove, returnX, returnY, 0
 return
 
 !q::
-CoordMode, Mouse, Screen
-CoordMode, Pixel, Screen
+CoordMode, Mouse, Window
 MouseGetPos, xpos, ypos
+
+CoordMode, Mouse, Screen
+MouseGetPos, returnX, returnY
 WinGetTitle, Title, A
 StringGetPos, pos, Title, Notepad++
 if(pos < 0)
 	MCSH(422, 1059, 100) ;notepad++ icon
 Send %xpos%, %ypos%
-MouseMove, xpos, ypos, 0
+MouseMove, returnX, returnY, 0
 return
 
 !w::
@@ -291,48 +319,31 @@ MouseMove, xpos, ypos, 0
 return
 
 
-
-
-MS(x, y, t) {
-	if(GetKeyState("left"))
-	return
-	MouseMove, %x%, %y%, 0
-	Sleep, %t%
-}
-
-MCS(x, y, t) {
-	if(GetKeyState("left"))
-	return
-	MouseMove, %x%, %y%, 0
-	sleep, 10
-	Click
-	Sleep, %t%
-}
-
-MCSO(x, y) {
+MCS(x, y) {
 	global t
 	global xOffset 
 	global yOffset 
+	global originalOffsetX
+	global originalOffsetY
 	if(GetKeyState("left"))
 	return
-	newX := x + xOffset - 278
-	newY := y + yOffset - 296
+	newX := x + xOffset - originalOffsetX
+	newY := y + yOffset - originalOffsetY
 	MouseMove, %newX%, %newY%, 0
 	sleep, 10
 	Click
 	Sleep, %t%
 }
 
-MCSD(x, y, t) {
+MCSA(Px2, Py2) {
+	global t
 	if(GetKeyState("left"))
 	return
 	MouseMove, %x%, %y%, 0
-	Click
-	sleep, 5
-	Click
-	sleep, 5
-	Click
+	sleep, 10 
+	Click 
 	Sleep, %t%
+
 }
 
 MCSH(x, y, t) {
@@ -345,7 +356,25 @@ MCSH(x, y, t) {
 	Sleep, %t%
 }
 
-MCSHR(x, y, t) {
+MCSHR(x, y) {
+	global t
+	global xOffset 
+	global yOffset 
+	global originalOffsetX
+	global originalOffsetY
+	if(GetKeyState("left"))
+	return
+	newX := x + xOffset - originalOffsetX
+	newY := y + yOffset - originalOffsetY
+	MouseMove, %newX%, %newY%, 0
+	Send {RButton down}
+	sleep, 25
+	Send {RButton up}
+	Sleep, %t%
+}
+
+MCSHRA(x, y) {
+	global t
 	if(GetKeyState("left"))
 	return
 	MouseMove, %x%, %y%, 0
@@ -355,62 +384,6 @@ MCSHR(x, y, t) {
 	Sleep, %t%
 }
 
-MCSHH(x, y, t) {
-	if(GetKeyState("left"))
-	return
-	MouseMove, %x%, %y%, 0
-	heavyClick() 
-	Sleep, %t%
-}
-
-heavyClick() {
-	Send {Click down}
-  sleep, 25
-  Send {Click up}
-  sleep, 25
-}
-
-MCSHT(x, y, time) {
-	global t
-	if(GetKeyState("left"))
-	return
-	MouseMove, %x%, %y%, 0
-	Click
-	count = 1
-	loop, %time%
-	{
-		if(GetKeyState("left"))
-		return
-		if(GetKeyState("Home")) {
-			stableTooltip("continuing...", 0)
-			sleep, 1000
-			Tooltip
-			return
-		}
-		stableTooltip(%count% + "out of" + %time%, 0)
-		sleep, 1000
-		count++
-	}
-	Tooltip,
-}
-
-stableTooltip(theString, isSafeAfter) {
-	global tooltipX
-	global tooltipY
-	Tooltip, %theString%, %tooltipX%, %tooltipY%
-	if(isSafeAfter)
-		MCSH(348, 478, 50)
-}
-
-
-waitMultipleForColorNotVisibleQuick(x, y, color) {
-	while(!GetKeyState("left")) {
-		colorIsVisibleQuick(x, y, color)
-		waitForColorNotVisibleQuick(x, y, color)
-
-	}
-}
-
 
 waitForColorVisibleQuick(x, y, color) {
 	x2 := x+15
@@ -418,11 +391,19 @@ waitForColorVisibleQuick(x, y, color) {
 	waitForColorVisible(x, y, x2, y2, color)
 }
 
-waitForColorVisible(x, y, x2, y2, theColor) {
-	;safeSpot() ;If game tooltips interrupt you
+waitForColorVisible(x, y, x2, y2, color) {
+	safeSpot() ;If game tooltips interrupt you
+	global xOffset 
+	global yOffset 
+	global originalOffsetX
+	global originalOffsetY
+	newX := x + xOffset - originalOffsetX
+	newY := y + yOffset - originalOffsetY
+	newX2 := x2 + xOffset - originalOffsetX
+	newY2 := y2 + yOffset - originalOffsetY
 	z := 0
 	while (!GetKeyState("left")) {
-		PixelSearch, Px, Py, %x%, %y%, %x2%, %y2%, %theColor%, 3, Fast
+		PixelSearch, Px, Py, %newX%, %newY%, %newX2%, %newY2%, %color%, 3, Fast
 		if ErrorLevel {
 			sleep, 10
 			z++ ;How long you've waited
@@ -442,10 +423,18 @@ waitForColorNotVisibleQuick(x, y, color) {
 }
 
 waitForColorNotVisible(x, y, x2, y2, color) {
-	;safeSpot()
+	safeSpot()
 	z := 0
+	global xOffset 
+	global yOffset 
+	global originalOffsetX
+	global originalOffsetY
+	newX := x + xOffset - originalOffsetX
+	newY := y + yOffset - originalOffsetY
+	newX2 := x2 + xOffset - originalOffsetX
+	newY2 := y2 + yOffset - originalOffsetY
 	while(!GetKeyState("left")) {
-		PixelSearch, Px, Py, %x%, %y%, %x2%, %y2%, %color%, 3, Fast
+		PixelSearch, Px, Py, %newX%, %newY%, %newX2%, %newY2%, %color%, 3, Fast
 		if ErrorLevel {
 			return 1
 		}
@@ -463,9 +452,16 @@ colorIsVisibleQuick(x, y, color) {
 	return colorIsVisible(x, y, x2, y2, color)
 }
 
-; isColorVisible
 colorIsVisible(x, y, x2, y2, color) {
-	PixelSearch, Px, Py, %x%, %y%, %x2%, %y2%, %color%, 8, Fast
+	global xOffset 
+	global yOffset 
+	global originalOffsetX
+	global originalOffsetY
+	newX := x + xOffset - originalOffsetX
+	newY := y + yOffset - originalOffsetY
+	newX2 := x2 + xOffset - originalOffsetX
+	newY2 := y2 + yOffset - originalOffsetY
+	PixelSearch, Px, Py, %newX%, %newY%, %newX2%, %newY2%, %color%, 5, Fast
 	if ErrorLevel {
 		return 0
 	}
@@ -481,7 +477,15 @@ colorIsNotVisibleQuick(x, y, color) {
 }
 
 colorIsNotVisible(x, y, x2, y2, color) {
-	PixelSearch, Px, Py, %x%, %y%, %x2%, %y2%, %color%, 3, Fast
+	global xOffset 
+	global yOffset 
+	global originalOffsetX
+	global originalOffsetY
+	newX := x + xOffset - originalOffsetX
+	newY := y + yOffset - originalOffsetY
+	newX2 := x2 + xOffset - originalOffsetX
+	newY2 := y2 + yOffset - originalOffsetY
+	PixelSearch, Px, Py, %newX%, %newY%, %newX2%, %newY2%, %color%, 5, Fast
 	if ErrorLevel {
 		return 1
 	}
@@ -499,71 +503,59 @@ clickUntilColorVisible(x1, y1, x2, y2, color) {
 
 
 clickOn(x, y, x2, y2, theColor) {
-	global t
-	PixelSearch, Px, Py, %x%, %y%, %x2%, %y2%, %theColor%, 3, Fast
+	global xOffset 
+	global yOffset 
+	global originalOffsetX
+	global originalOffsetY
+	newX := x + xOffset - originalOffsetX
+	newY := y + yOffset - originalOffsetY
+	newX2 := x2 + xOffset - originalOffsetX
+	newY2 := y2 + yOffset - originalOffsetY
+	PixelSearch, Px, Py, %newX%, %newY%, %newX2%, %newY2%, %color%, 3, Fast
 	if ErrorLevel {
 		return false
 	} else {
 		Px2 := Px + 1
 		Py2 := Py + 1
 		;MouseGetPos, xpos, ypos 
-		MCS(Px2, Py2, t)
+		MCSA(Px2, Py2)
 		;MouseMove, xpos, ypos, 0
 		safeSpot()
 		return true
 	}
 }
 
-rClickOn(x, y, x2, y2, theColor) {
-	global t
-	PixelSearch, Px, Py, %x%, %y%, %x2%, %y2%, %theColor%, 3, Fast
+rClickOn(x, y, x2, y2, color) {
+	global xOffset 
+	global yOffset 
+	global originalOffsetX
+	global originalOffsetY
+	newX := x + xOffset - originalOffsetX
+	newY := y + yOffset - originalOffsetY
+	newX2 := x2 + xOffset - originalOffsetX
+	newY2 := y2 + yOffset - originalOffsetY
+	PixelSearch, Px, Py, %newX%, %newY%, %newX2%, %newY2%, %color%, 3, Fast
 	if ErrorLevel {
 		return false
 	} else {
 		Px2 := Px + 1
 		Py2 := Py + 1
 		;MouseGetPos, xpos, ypos 
-		MCSHR(Px2, Py2, t)
+		MCSHRA(Px2, Py2)
 		;MouseMove, xpos, ypos, 0
 		return true
 	}
 }
 
 safeSpot() {
+	global xOffset 
+	global yOffset 
+	global originalOffsetX
+	global originalOffsetY
 	if(GetKeyState("left"))
 	return 
-	MouseMove, 2455, 383, 0
+	newX := 509 + xOffset - originalOffsetX
+	newY := 365 + yOffset - originalOffsetY
+	MouseMove, %newX%, %newY%, 0
 	sleep, 100
-}
-
-clickScrollBar(x, y) {
-	if(GetKeyState("left"))
-	return
-	MouseMove, %x%, %y%, 0
-	loop, 4 {
-		Click
-		sleep, 50
-	}
-}
-
-down4() {
-if(GetKeyState("left"))
-return
-sleep, 50
-loop, 4 {
-Send {WheelDown}
-sleep, 50
-}
-sleep, 50
-}
-
-down3() {
-if(GetKeyState("left"))
-return
-sleep, 150
-loop, 3 {
-Send {WheelDown}
-sleep, 50
-}
-sleep, 150
 }
