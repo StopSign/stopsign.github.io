@@ -103,8 +103,8 @@ body {
 }
 
 .superLargeIcon {
-    width:35px;
-    height:35px;
+    width:40px;
+    height:40px;
 }
 .largeIcon {
     width:20px;
@@ -158,13 +158,43 @@ input {
     margin-bottom:2px;
 }
 
-.button:hover {background-color: #60eef9
+.button:hover {
+    background-color: #60eef9
 }
 
 .button:active {
     background-color: #3e9aa2;
     box-shadow: 0 1px #666;
     transform: translateY(0px);
+}
+.errorButton {
+    padding: 4px 10px;
+    text-align: center;
+    vertical-align:center;
+    min-width:9px;
+    cursor: pointer;
+    outline: none;
+    color: #000000;
+    background-color: #f90e0c;
+    border: none;
+    border-radius: 6px;
+    box-shadow: 0 3px #999;
+    transform: translateY(-2px);
+    margin-bottom:2px;
+    font-size:16px;
+    font-weight:bold;
+}
+.errorButton:hover {
+    background-color: #c51d20
+}
+
+.errorButton:active {
+    background-color: #870002;
+    box-shadow: 0 1px #666;
+    transform: translateY(0px);
+}
+.errorMessage {
+    display:block;
 }
 
 .imageDragFix {
@@ -239,4 +269,8 @@ input {
 }
 .resourceDiv {
     display:block;
+}
+.researchDiv {
+    border:1px solid;
+    width:100%;
 }

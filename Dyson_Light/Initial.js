@@ -8,8 +8,11 @@ function initialize() {
     data.systems[0].luminosity = 1;
     data.systems[0].distance = 0;
 
+
+    data.systems[0].planets[0].panels = 1;
+
     view.changePlanets(0, 0);
-    view.initializeResearch();
+    view.createResearch();
 }
 
 function addPlanet(solarSystemNum, gridWidth, gridHeight, solarEfficiency, oreNum, distance) {
@@ -22,7 +25,7 @@ function addPlanet(solarSystemNum, gridWidth, gridHeight, solarEfficiency, oreNu
     }
     let newPlanet = {
         pop:0,
-        virtualPop:0,
+        vPop:0,
         ore:0,
         electronics:0,
         panels:0,
@@ -37,7 +40,7 @@ function addPlanet(solarSystemNum, gridWidth, gridHeight, solarEfficiency, oreNu
         for(let height = 0; height < gridHeight; height++) {
             let cellContents = {
                 outline:"", //empty, off, error, warning
-                isOn:false,
+                isOn:true,
                 type:"",
                 text:""
             };
@@ -50,7 +53,6 @@ function addPlanet(solarSystemNum, gridWidth, gridHeight, solarEfficiency, oreNu
         let randY = (Math.random()*gridHeight)|0;
         if(newPlanet.grid[randX][randY].type !== "ore") {
             newPlanet.grid[randX][randY].type = "ore";
-            newPlanet.grid[randX][randY].text = "Ore";
             orePlaced++;
         }
     }

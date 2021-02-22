@@ -1,7 +1,18 @@
 
 let view = {
     update: function() {
+        view.updateResourcesDisplays();
+    },
+    updateResourcesDisplays: function() {
+        document.getElementById("science").innerHTML = data.science;
 
+        let thePlanet = data.systems[data.curSystem].planets[data.curPlanet];
+        document.getElementById("pop").innerHTML = thePlanet.pop;
+        document.getElementById("vPop").innerHTML = thePlanet.vPop;
+        document.getElementById("ore").innerHTML = thePlanet.ore;
+        document.getElementById("power").innerHTML = thePlanet.power;
+        document.getElementById("panels").innerHTML = thePlanet.panels;
+        document.getElementById("sails").innerHTML = thePlanet.sails;
     },
     changePlanets: function() { //initializes solar system, planet grid
         let planetGrid = data.systems[data.curSystem].planets[data.curPlanet].grid;
@@ -29,27 +40,42 @@ let view = {
     selectCell(col, row) { //displaying options
         if(col == null || row == null) {
             document.getElementById("selectionOptionsDiv").style.display = "none";
+            document.getElementById("buildingInfoDiv").style.display = "none";
             return;
         }
-        document.getElementById("selectionOptionsDiv").style.display = "inline-block";
 
         let theCell = data.systems[data.curSystem].planets[data.curPlanet].grid[col][row];
-        if(theCell.type === "ore") {
-            document.getElementById("buildMine").style.display = "inline-block";
+        if(theCell.type === "" || theCell.type === "ore") {
+            document.getElementById("selectionOptionsDiv").style.display = "inline-block";
+            document.getElementById("buildMine").style.display = theCell.type === "ore" ? "inline-block" : "none";
+            document.getElementById("buildHouse").style.display = data.research[0].unlocked ? "inline-block" : "none";
+            document.getElementById("buildServer").style.display = data.research[1].unlocked ? "inline-block" : "none";
+            document.getElementById("buildQuantumTransport").style.display = data.research[2].unlocked ? "inline-block" : "none";
+            document.getElementById("buildRadioTelescope").style.display = data.research[3].unlocked ? "inline-block" : "none";
+            document.getElementById("buildLaunchPad").style.display = data.research[4].unlocked ? "inline-block" : "none";
         } else {
-            document.getElementById("buildMine").style.display = "none";
+            document.getElementById("selectionOptionsDiv").style.display = "none";
+        }
+        if(theCell.type !== "" && theCell.type !== "ore") {
+            document.getElementById("buildingInfoDiv").style.display = "inline-block";
+            document.getElementById("buildingInfo").innerHTML = view.createBuildingInfo(theCell);
+        } else {
+            document.getElementById("buildingInfoDiv").style.display = "none";
         }
 
-        if(data.research[0])
-
         view.updatePlanetGridCell(col, row);
+    },
+    createBuildingInfo(theCell) {
+        if(theCell.type === "solarPanel") {
+            return "Harness the light of the sun! Gain 1 electricity. Buildings will not work without electricity."
+        }
     },
     updatePlanetGridCell: function(col, row) { //only for updating the num & border
         let theCell = data.systems[data.curSystem].planets[data.curPlanet].grid[col][row];
         if(data.selectedCol === col && data.selectedRow === row) {
             document.getElementById("cellcol" + col + "row" + row).style.border = 'solid 1px yellow';
         } else if(theCell.outline === "") {
-            document.getElementById("cellcol" + col + "row" + row).style.border = 'solid 1px #a2a2a2';
+            document.getElementById("cellcol" + col + "row" + row).style.border = 'solid 1px #adadad';
         } else if(theCell.outline === "error") {
             document.getElementById("cellcol" + col + "row" + row).style.border = 'solid 1px red';
         } else {
@@ -63,24 +89,34 @@ let view = {
         } else {
             document.getElementById("imgcol" + col + "row" + row).innerHTML = "";
         }
-        if(theCell.text) {
-            document.getElementById("textcol" + col + "row" + row).innerHTML = theCell.text;
-        } else {
-            document.getElementById("textcol" + col + "row" + row).innerHTML = "";
-        }
+
+        document.getElementById("textcol" + col + "row" + row).innerHTML = theCell.text;
     },
-    initializeResearch: function() {
+    createResearch: function() {
+        let researchDivs = "";
         for(let i = 0; i < data.research.length; i++) {
-
-            let elem = document.createElement("div");
-
-            elem.innerHTML =
-                "<div class='researchDiv'  id='researchDiv"+i+"'>" +
-                "<div class='smallTitle'>"+data.research[i].title+"</div>"+
-                "<div class='button' onclick='clickedResearch(" +i+ ")'>Buy for "+data.research[i].cost+" science</div>" +
-                "</div>";
-
-            document.getElementById("researchDivs").appendChild(elem);
+            if(!data.research[i].unlocked && (data.research[i].req == null || data.research[data.research[i].req].unlocked)) {
+                researchDivs +=
+                    "<div class='researchDiv'  id='researchDiv" + i + "'>" +
+                    "<div class='smallTitle'>" + data.research[i].title + "</div>" +
+                    "<div>" + data.research[i].desc + "</div><br>" +
+                    "<div class='button' onclick='clickedResearch(" + i + ")'>Buy for " + data.research[i].cost + " science</div>" +
+                    "</div>";
+            }
         }
-    }
+        document.getElementById("researchDivs").innerHTML = researchDivs;
+    },
+    createErrorMessages: function() {
+        let errorDivs = "";
+
+        for(let i = 0; i < errorMessages.length; i++) {
+            errorDivs +=
+                "<div class='errorMessage' id='error"+i+"'>" +
+                "<div class='errorButton' onclick='closeError("+i+")'>ERROR: "+errorMessages[i]+"</div>" +
+                "</div>";
+        }
+
+        document.getElementById("errorMessages").innerHTML = errorDivs;
+    },
+
 };
