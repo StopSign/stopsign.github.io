@@ -58,7 +58,8 @@ let view = {
         }
         if(theCell.type !== "" && theCell.type !== "ore") {
             document.getElementById("buildingInfoDiv").style.display = "inline-block";
-            document.getElementById("buildingInfo").innerHTML = view.createBuildingInfo(theCell);
+            view.createBuildingInfo(theCell);
+
         } else {
             document.getElementById("buildingInfoDiv").style.display = "none";
         }
@@ -66,9 +67,14 @@ let view = {
         view.updatePlanetGridCell(col, row);
     },
     createBuildingInfo(theCell) {
+        let infoDiv = "";
+        let title = "";
         if(theCell.type === "solarPanel") {
-            return "Harness the light of the sun! Gain 1 electricity. Buildings will not work without electricity."
+            infoDiv = "Harness the light of the sun! Gain 1 electricity. Buildings will not work without electricity.";
+            title = "Solar Panel";
         }
+        document.getElementById("buildingInfoTitle").innerHTML = title;
+        document.getElementById("buildingInfo").innerHTML = infoDiv;
     },
     updatePlanetGridCell: function(col, row) { //only for updating the num & border
         let theCell = data.systems[data.curSystem].planets[data.curPlanet].grid[col][row];
