@@ -46,3 +46,128 @@ let data = {
 };
 
 let errorMessages = [];
+
+let poweredCells = {
+    ore:[],
+    mine:[],
+    //solarPanel:[],
+    factory:[],
+    lab:[],
+    house:[],
+    server:[],
+    quantumTransport:[],
+    radioTelescope:[],
+    launchPad:[]
+};
+
+let info = {
+    mine: {
+        oreCost:[0, 0, 0, 0],
+        electronicCost:[0, 0, 0, 0],
+        panelCost:[0, 0, 0, 0],
+        power:[0, 0, 0, 0],
+        title:"Mine",
+        infoDiv:"Gain 1 ore per second.",
+        extra:"",
+        pausable:false,
+        buildTitle:"(M)ine",
+        buildDesc:"Free to build. Gain ore per second.<br>Can use up to 5 population."
+    },
+    solarPanel: {
+        oreCost:[0],
+        electronicCost:[0],
+        panelCost:[1],
+        power:[1],
+        title:"Solar Panel",
+        infoDiv:"Harness the light of the sun! Gain 1 electricity. Buildings will not work without electricity.",
+        extra:"",
+        pausable:false,
+        buildTitle:"Build Solar (P)anel",
+        buildDesc:"Costs 1 solar panel. Provides 1 electricity."
+    },
+    factory: {
+        oreCost:[10],
+        electronicCost:[0],
+        panelCost:[0],
+        power:[1],
+        title:"Factory",
+        infoDiv:"Choose between creating electronics from ore at 1 per second, or solar panels from ore at .5 per second",
+        extra:"",
+        pausable:true,
+        buildTitle:"Build (F)actory",
+        buildDesc:"Costs 10 ore. Creates electronics from ore, <br>or solar panels from electronics.<br>Uses 1 electricity."
+    },
+    lab: {
+        oreCost:[0],
+        electronicCost:[50],
+        panelCost:[0],
+        power:[3],
+        title:"Lab",
+        infoDiv:"Gain 1 research per second.",
+        extra:"",
+        pausable:true,
+        buildTitle:"Build (L)ab",
+        buildDesc:"Costs 50 electronics. Uses 3 electricity for research."
+    },
+    house: {
+        oreCost:[100],
+        electronicCost:[30],
+        panelCost:[0],
+        power:[5],
+        title:"House",
+        infoDiv:"",
+        extra:"",
+        pausable:true,
+        buildTitle:"Build (H)ouse",
+        buildDesc:"Increases pop by 10. Pop increases by .1% <br>of current population every second. <br>Minimum 2 population."
+    },
+    server: {
+        oreCost:[0],
+        electronicCost:[1000],
+        panelCost:[0],
+        power:[50],
+        title:"Server",
+        infoDiv:"",
+        extra:"",
+        pausable:true,
+        buildTitle:"Build (S)erver",
+        buildDesc:"Costs 1k electronics and uses 50 electricity. Creates virtual population with all excess population growth. Holds 1k virtual population."
+    },
+    quantumTransport: {
+        oreCost:[0],
+        electronicCost:[10000],
+        panelCost:[0],
+        power:[50],
+        title:"Quantum Transport",
+        infoDiv:"",
+        extra:"",
+        pausable:true,
+        buildTitle:"Build (Q)uantum Transport",
+        buildDesc:"Costs 10k electronics and 50 electricity. Can send resources to any planet in range using power."
+    },
+    radioTelescope: {
+        oreCost:[20000],
+        electronicCost:[20000],
+        panelCost:[0],
+        power:[],
+        title:"Radio Telescope",
+        infoDiv:"",
+        extra:"",
+        pausable:true,
+        buildTitle:"Build (R)adio Telescope",
+        buildDesc:"Costs 20k electronics, 20k ore. Can receive virtual population, or power from the Dyson Sphere."
+    },
+    launchPad: {
+        oreCost:[0],
+        electronicCost:[100000],
+        panelCost:[0],
+        power:[1000],
+        title:"Launch Pad",
+        infoDiv:"",
+        extra:"",
+        pausable:true,
+        buildTitle:"Build L(a)unch Pad",
+        buildDesc:"Costs 100k electronics. Creates and launches solar sails from solar panels & ore."
+    }
+
+};

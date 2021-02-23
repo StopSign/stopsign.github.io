@@ -13,6 +13,7 @@ function initialize() {
 
     view.changePlanets(0, 0);
     view.createResearch();
+    view.createBuildOptions();
 }
 
 function addPlanet(solarSystemNum, gridWidth, gridHeight, solarEfficiency, oreNum, distance) {
@@ -25,11 +26,17 @@ function addPlanet(solarSystemNum, gridWidth, gridHeight, solarEfficiency, oreNu
     }
     let newPlanet = {
         pop:0,
+        popD:0,
         vPop:0,
+        vPopD:0,
         ore:0,
+        oreD:0,
         electronics:0,
+        electronicsD:0,
         panels:0,
+        panelsD:0,
         sails:0,
+        sailsD:0,
         power:0,
         grid:[],
         distance:distance
@@ -42,7 +49,8 @@ function addPlanet(solarSystemNum, gridWidth, gridHeight, solarEfficiency, oreNu
                 outline:"", //empty, off, error, warning
                 isOn:true,
                 type:"",
-                text:""
+                text:"",
+                mark:0
             };
             newPlanet.grid[width][height] = cellContents;
         }

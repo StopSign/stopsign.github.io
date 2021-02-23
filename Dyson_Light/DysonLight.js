@@ -1,8 +1,110 @@
 
 
 function gameTick() {
+    tickPlanetResources()
+
+}
+
+function tickPlanetResources() {
+    let thePlanet = data.systems[data.curSystem].planets[data.curPlanet];
 
 
+    let poweredCells = handlePower(thePlanet);
+    if(poweredCells === undefined) { //error
+        return;
+    }
+
+
+    thePlanet.oreD = calcOreD(poweredCells);
+    thePlanet.ore = round5(thePlanet.ore + thePlanet.oreD / ticksPerSecond);
+    thePlanet.electronicsD = calcElectronicsD(poweredCells);
+    thePlanet.electronics = round5(thePlanet.electronics + thePlanet.electronicsD / ticksPerSecond);
+    thePlanet.popD = calcPopD(poweredCells);
+    thePlanet.pop = round5(thePlanet.pop + thePlanet.popD / ticksPerSecond);
+    thePlanet.vPopD = calcVPopD(poweredCells);
+    thePlanet.vPop = round5(thePlanet.vPop + thePlanet.vPopD / ticksPerSecond);
+    thePlanet.panelsD = calcPanelsD(poweredCells);
+    thePlanet.panels = round5(thePlanet.panels + thePlanet.panelsD / ticksPerSecond);
+    thePlanet.sailsD = calcSailsD(poweredCells);
+    thePlanet.sails = round5(thePlanet.sails + thePlanet.sailsD / ticksPerSecond);
+
+
+}
+
+function calcOreD(poweredCells) {
+    let oreD = 0;
+    for(let i = 0; i < poweredCells.mine.length; i++) {
+        oreD += 1;
+    }
+    return oreD;
+}
+
+function calcElectronicsD(poweredCells) {
+    return 0;
+}
+
+function calcVPopD(poweredCells) {
+    return 0;
+}
+
+function calcPanelsD(poweredCells) {
+    return 0;
+}
+
+function calcPopD(poweredCells) {
+    return 0;
+}
+
+function calcSailsD(poweredCells) {
+    return 0;
+}
+
+
+function handlePower(thePlanet) {
+    let poweredCells = {
+        ore:[],
+        mine:[],
+        //solarPanel:[],
+        factory:[],
+        lab:[],
+        house:[],
+        server:[],
+        quantumTransport:[],
+        radioTelescope:[],
+        launchPad:[]
+    };
+
+    let powerGain = 0;
+    let powerReq = 0;
+    for(let col = 0; col < thePlanet.grid.length; col++) {
+        for(let row = 0; row < thePlanet.grid[col].length; row++) {
+            let theCell = thePlanet.grid[col][row];
+            if(theCell.type === "solarPanel") {
+                powerGain += info[theCell.type].power[theCell.mark];
+            } else if(theCell.isOn && theCell.type && theCell.type !== "ore") {
+                powerReq += info[theCell.type].power[theCell.mark];
+                poweredCells[theCell.type].push(theCell);
+            }
+        }
+    }
+
+    if(powerReq > powerGain && powerReq > 0) {
+        errorMessages.push("Not enough power! Shutting things off.");
+
+        for(let col = 0; col < thePlanet.grid.length; col++) {
+            for (let row = 0; row < thePlanet.grid[col].length; row++) {
+                let theCell = thePlanet.grid[col][row];
+                if(theCell.type && theCell.type !== "solarPanel" && theCell.type !== "ore" && theCell.type !== "mine") {
+                    theCell.isOn = false;
+                }
+            }
+        }
+        return undefined;
+    }
+
+    thePlanet.powerReq = powerReq;
+    thePlanet.powerGain = powerGain;
+    return poweredCells;
 }
 
 function clickedCell(col, row) {
@@ -35,12 +137,18 @@ function clickedResearch(i) {
 function sellBuilding() {
     let thePlanet = data.systems[data.curSystem].planets[data.curPlanet];
     let theCell = thePlanet.grid[data.selectedCol][data.selectedRow];
-    if(theCell.type === "solarPanel") {
-        thePlanet.panels++;
-    }
 
-    theCell.type = "";
+    let oreCost = info[theCell.type].oreCost[theCell.mark];
+    let elecCost = info[theCell.type].electronicCost[theCell.mark];
+    let panelCost = info[theCell.type].panelCost[theCell.mark];
+
+    thePlanet.ore += oreCost;
+    thePlanet.elecCost += elecCost;
+    thePlanet.panels += panelCost;
+
+    theCell.type = theCell.type === "mine" ? "ore" : "";
     theCell.outline = "";
+    theCell.power = 0;
 
     view.selectCell(data.selectedCol, data.selectedRow);
     view.updatePlanetGridCell(data.selectedCol, data.selectedRow);
@@ -52,80 +160,63 @@ function buyBuilding(type) {
     let thePlanet = data.systems[data.curSystem].planets[data.curPlanet];
     let theCell = thePlanet.grid[data.selectedCol][data.selectedRow];
 
-    if(type === "solarPanel") {
-        if (thePlanet.panels < 1) {
-            addErrorMessage("Need at least 1 solar panel to build a Solar Panel.");
-            return;
-        } else {
-            thePlanet.panels--;
-        }
+    let oreCost = info[type].oreCost[theCell.mark];
+    let elecCost = info[type].electronicCost[theCell.mark];
+    let panelCost = info[type].panelCost[theCell.mark];
+    let powerCost = info[type].power[theCell.mark];
+
+
+
+    let errorMsg = info[type].title + " costs ";
+    if(oreCost > 0) {
+        errorMsg += oreCost + " ore";
     }
-    if(type === "factory") {
-        if (thePlanet.ore < 10) {
-            addErrorMessage("Factory costs 10 ore. You have " + thePlanet.ore + " ore.");
-            return;
-        } else {
-            thePlanet.ore -= 10;
-        }
+    if(elecCost > 0) {
+        errorMsg += (oreCost > 0 ? " and " : "") + elecCost + " electronics";
     }
-    if(type === "lab") {
-        if (thePlanet.electronics < 50) {
-            addErrorMessage("Lab costs 50 electronics. You have " + thePlanet.electronics + " electronics.");
-            return;
-        } else {
-            thePlanet.electronics -= 50;
-        }
+    if(panelCost > 0) {
+        errorMsg += panelCost + " panels";
     }
-    if(type === "house") {
-        if (thePlanet.ore < 100 || thePlanet.electronics < 30) {
-            addErrorMessage("House costs 100 ore and 30 electronics. You have " + thePlanet.ore + " ore and " + thePlanet.electronics + " electronics.");
-            return;
-        } else {
-            thePlanet.ore -= 100;
-            thePlanet.electronics -= 30;
-        }
+    errorMsg += ". You have ";
+    if(oreCost > 0) {
+        errorMsg += thePlanet.ore + " ore";
     }
-    if(type === "server") {
-        if (thePlanet.electronics < 1000) {
-            addErrorMessage("Server costs 1000 electronics. You have " + thePlanet.electronics + " electronics.");
-            return;
-        } else {
-            thePlanet.electronics -= 1000;
-        }
+    if(elecCost > 0) {
+        errorMsg += (oreCost > 0 ? " and " : "") + thePlanet.electronics + " electronics";
     }
-    if(type === "quantumTransport") {
-        if (thePlanet.electronics < 10000) {
-            addErrorMessage("Server costs 10k electronics. You have " + thePlanet.electronics + " electronics.");
-            return;
-        } else {
-            thePlanet.electronics -= 10000;
-        }
+    if(panelCost > 0) {
+        errorMsg += thePlanet.panels + " panels";
     }
-    if(type === "radioTelescope") {
-        if (thePlanet.ore < 20000 || thePlanet.electronics < 20000) {
-            addErrorMessage("Radio Telescope costs 20k ore and 20k electronics. You have " + thePlanet.ore + " ore and " + thePlanet.electronics + " electronics.");
-            return;
-        } else {
-            thePlanet.ore -= 20000;
-            thePlanet.electronics -= 20000;
-        }
+    errorMsg += ".";
+
+    if(thePlanet.panels < panelCost || thePlanet.ore < oreCost || thePlanet.electronics < elecCost) {
+        addErrorMessage(errorMsg);
+        return;
     }
-    if(type === "launchPad") {
-        if (thePlanet.electronics < 100000) {
-            addErrorMessage("Launch Pad costs 100k electronics. You have " + thePlanet.electronics + " electronics.");
-            return;
-        } else {
-            thePlanet.electronics -= 100000;
-        }
+
+    if(type !== "solarPanel" && thePlanet.powerGain - thePlanet.powerReq < powerCost) {
+        addErrorMessage("Adding a " + info[type].title + " right now would crash the power grid!");
+        return;
     }
+
+    thePlanet.panels -= panelCost;
+    thePlanet.ore -= oreCost;
+    thePlanet.electronics -= elecCost;
 
     theCell.type = type;
     theCell.outline = "off";
+    theCell.isOn = true;
 
     view.selectCell(data.selectedCol, data.selectedRow);
     view.updatePlanetGridCell(data.selectedCol, data.selectedRow);
     view.changePlanetGridCell(data.selectedCol, data.selectedRow);
     view.updateResourcesDisplays();
+}
+
+function pauseBuilding() {
+    let thePlanet = data.systems[data.curSystem].planets[data.curPlanet];
+    let theCell = thePlanet.grid[data.selectedCol][data.selectedRow];
+    theCell.isOn = !theCell.isOn;
 }
 
 function addErrorMessage(text) {

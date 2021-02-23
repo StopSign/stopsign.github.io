@@ -20,12 +20,13 @@
     <div id="leftSideDivs" style="width:300px;">
         <div id="resources" style="vertical-align: top;width:280px;height:160px;border:1px solid;padding:10px;font-size:14px;text-align:left;">
             <div class="title">Resources</div>
-            <div class="resourceDiv" id="popDiv">Population: <div id="pop" class="bold">5</div> (<div id="popDelta">+1</div>)</div>
-            <div class="resourceDiv" id="vPopDiv" style="display:none;">Virtual Pop: <div id="vPop" class="bold">5</div> (<div id="vPopDelta">+1</div>)</div>
-            <div class="resourceDiv" id="oreDiv">Ore: <div id="ore" class="bold">5</div> (<div id="oreDelta">+1</div>)</div>
-            <div class="resourceDiv" id="elecDiv" style="display:none;">Electronics: <div id="power" class="bold">5</div> (<div id="powerDelta">+1</div>)</div>
-            <div class="resourceDiv" id="solarPanelsDiv">Solar Panels: <div id="panels" class="bold">5</div> (<div id="panelsDelta">+1</div>)</div>
-            <div class="resourceDiv" id="sailsDiv" style="display:none;">Solar Sails: <div id="sails" class="bold">5</div> (<div id="sailsDelta">+1</div>)</div>
+            <div class="resourceDiv" id="electricityDiv">Electricity: <div id="electricityUsed" class="bold"></div> / <div id="electricityGain"></div></div>
+            <div class="resourceDiv" id="oreDiv">Ore: <div id="ore" class="bold">5</div> (<div id="oreDelta">+1</div>/s)</div>
+            <div class="resourceDiv" id="elecDiv" style="display:none;">Electronics: <div id="electronics" class="bold">5</div> (<div id="electronicsDelta">+1</div>/s)</div>
+            <div class="resourceDiv" id="solarPanelsDiv">Solar Panels: <div id="panels" class="bold">5</div> (<div id="panelsDelta">+1</div>/s)</div>
+            <div class="resourceDiv" id="sailsDiv" style="display:none;">Solar Sails: <div id="sails" class="bold">5</div> (<div id="sailsDelta">+1</div>/s)</div>
+            <div class="resourceDiv" id="popDiv" style="display:none;">Population: <div id="pop" class="bold">5</div> (<div id="popDelta">+1</div>/s)</div>
+            <div class="resourceDiv" id="vPopDiv" style="display:none;">Virtual Pop: <div id="vPop" class="bold">5</div> (<div id="vPopDelta">+1</div>/s)</div>
         </div>
         <div id="working" style="vertical-align: top;width:280px;height:160px;border:1px solid;padding:10px;font-size:14px;text-align:left;">
             <div class="title">Workers</div>
@@ -51,55 +52,13 @@
         <div id="buildingInfoDiv" style="border:1px solid;width:100%;display:none;">
             <div class="title" id="buildingInfoTitle">Building Info</div>
             <div id="buildingInfo"></div>
+            <div id="buildingExtra"></div>
             <div class="button" onclick="sellBuilding()">Sell</div>
+            <div class="button" id="buildingPause" onclick="pauseBuilding()">Pause</div>
         </div>
         <div id="selectionOptionsDiv" style="border:1px solid;width:100%;display:none;">
             <div class="title">Build Options</div>
-            <div class="buildOption" id="buildMine">
-                <div class="smallTitle">Build (M)ine</div>
-                <div id="mineDesc">Free to build. Gain ore per second.<br>Can use up to 5 population.</div><br>
-                <div class="button" onclick="buyBuilding('mine')">Build</div>
-            </div>
-            <div class="buildOption" id="buildSolarPanel">
-                <div class="smallTitle">Build Solar (P)anel</div>
-                <div id="solarDesc">Costs 1 solar panel. Provides 1 electricity.</div><br>
-                <div class="button" onclick="buyBuilding('solarPanel')">Build</div>
-            </div>
-            <div class="buildOption" id="buildFactory">
-                <div class="smallTitle">Build (F)actory</div>
-                <div id="factoryDesc">Costs 10 ore. Creates electronics from ore, <br>or solar panels from electronics.<br>Uses 1 electricity.</div><br>
-                <div class="button" onclick="buyBuilding('factory')">Build</div>
-            </div>
-            <div class="buildOption" id="buildLab">
-                <div class="smallTitle">Build (L)ab</div>
-                <div id="labDesc">Costs 50 electronics. Uses 3 electricity for research.</div><br>
-                <div class="button" onclick="buyBuilding('lab')">Build</div>
-            </div>
-            <div class="buildOption" id="buildHouse">
-                <div class="smallTitle">Build (H)ouse</div>
-                <div id="houseDesc">Costs 100 ore and 30 electronics. Increases pop by 10. Pop increases by .1% <br>of current population every second. <br>Minimum 2 population.</div><br>
-                <div class="button" onclick="buyBuilding('house')">Build</div>
-            </div>
-            <div class="buildOption" id="buildServer">
-                <div class="smallTitle">Build (S)erver</div>
-                <div id="serverDesc">Costs 1k electronics and uses 50 electricity. Creates virtual population with all excess population growth. Holds 1k virtual population.</div><br>
-                <div class="button" onclick="buyBuilding('server')">Build</div>
-            </div>
-            <div class="buildOption" id="buildQuantumTransport">
-                <div class="smallTitle">Build (Q)uantum Transport</div>
-                <div id="quantumTransportDesc">Costs 10k electronics. Can send resources to any planet in range using power.</div><br>
-                <div class="button" onclick="buyBuilding('quantumTransport')">Build</div>
-            </div>
-            <div class="buildOption" id="buildRadioTelescope">
-                <div class="smallTitle">Build (R)adio Telescope</div>
-                <div id="radioTelescopeDesc">Costs 20k electronics, 20k ore. Can receive virtual population, or power from the Dyson Sphere.</div><br>
-                <div class="button" onclick="buyBuilding('radioTelescope')">Build</div>
-            </div>
-            <div class="buildOption" id="buildLaunchPad">
-                <div class="smallTitle">Build L(a)unch Pad</div>
-                <div id="launchPadDesc">Costs 100k electronics. Creates and launches solar sails from solar panels & ore.</div><br>
-                <div class="button" onclick="buyBuilding('launchPad')">Build</div>
-            </div>
+            <div id="buildOptions"></div>
         </div>
     </div>
 
