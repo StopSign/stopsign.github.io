@@ -121,6 +121,7 @@ input, label {
 input {
     margin-right:0;
 }
+
 .buttonPressed {
     padding: 1px 5px;
     text-align: center;
@@ -273,4 +274,52 @@ input {
 .researchDiv {
     border:1px solid;
     width:100%;
+}
+
+
+.selectOption {
+    padding: 20px 5px;
+    min-width:100px;
+    text-align: center;
+    vertical-align:center;
+    cursor: pointer;
+    outline: none;
+    color: #000000;
+    background-color: #49a64c;
+    border: none;
+    border-radius: 6px;
+    box-shadow: 0 3px #999;
+    transform: translateY(-2px);
+    margin-bottom:2px;
+}
+
+.selectOption:hover {
+    background-color: #4fb350;
+}
+
+.selectOption:active {
+    background-color: #459945;
+    box-shadow: 0 1px #666;
+    transform: translateY(0px);
+}
+
+.pressedSelectOption {
+    padding: 20px 5px;
+    min-width:100px;
+    text-align: center;
+    vertical-align:center;
+    cursor: pointer;
+    outline: none;
+    color: #e1e1e1;
+    border: none;
+    border-radius: 6px;
+    margin-bottom:2px;
+    background-color: #3e8e41;
+    box-shadow: 0 1px #666;
+    transform: translateY(0px);
+}
+.pressedSelectOption.active {
+    background-color: #357937;
+    box-shadow: 0 1px #666;
+    transform: translateY(-1px);
 }

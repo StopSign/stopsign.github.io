@@ -8,6 +8,8 @@ let gameTicksLeft = 0;
 let sudoStop = false;
 let saveTimer = 2000;
 let ticksPerSecond = 20;
+let tickCounter = 0;
+
 
 function tick() {
     if(sudoStop) {
@@ -32,8 +34,11 @@ function tick() {
             //view.update();
             break;
         }
-
-        gameTick();
+        tickCounter++;
+        if(tickCounter > ticksPerSecond) {
+            tickCounter = 1;
+            secondTick();
+        }
 
         didSomething = true;
         if(gameTicksLeft > 2000) {

@@ -12,6 +12,9 @@ function startGame() {
     // window.localStorage[saveName] = decode("");
 
     load();
+
+    //data.systems[0].planets[0].ore = 100;
+    //data.systems[0].planets[0].panels = 100;
 }
 
 
@@ -19,7 +22,7 @@ let isFileSystem = !!location.href.match("file");
 let saveName = "DysonLight1";
 
 let stop = false;
-let totalTime;
+let totalTime = 0;
 
 let prevState = {};
 

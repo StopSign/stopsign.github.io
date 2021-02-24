@@ -1,7 +1,7 @@
 
 
-function gameTick() {
-    tickPlanetResources()
+function secondTick() {
+   tickPlanetResources()
 
 }
 
@@ -14,50 +14,57 @@ function tickPlanetResources() {
         return;
     }
 
+    let ore1 = thePlanet.ore;
+    let electronics1 = thePlanet.electronics;
+    let panels1 = thePlanet.panels;
+    let sails1 = thePlanet.sails;
+    let pop1 = thePlanet.pop;
+    let vPop1 = thePlanet.vPop;
+    let science1 = data.science;
 
-    thePlanet.oreD = calcOreD(poweredCells);
-    thePlanet.ore = round5(thePlanet.ore + thePlanet.oreD / ticksPerSecond);
-    thePlanet.electronicsD = calcElectronicsD(poweredCells);
-    thePlanet.electronics = round5(thePlanet.electronics + thePlanet.electronicsD / ticksPerSecond);
-    thePlanet.popD = calcPopD(poweredCells);
-    thePlanet.pop = round5(thePlanet.pop + thePlanet.popD / ticksPerSecond);
-    thePlanet.vPopD = calcVPopD(poweredCells);
-    thePlanet.vPop = round5(thePlanet.vPop + thePlanet.vPopD / ticksPerSecond);
-    thePlanet.panelsD = calcPanelsD(poweredCells);
-    thePlanet.panels = round5(thePlanet.panels + thePlanet.panelsD / ticksPerSecond);
-    thePlanet.sailsD = calcSailsD(poweredCells);
-    thePlanet.sails = round5(thePlanet.sails + thePlanet.sailsD / ticksPerSecond);
-
-
-}
-
-function calcOreD(poweredCells) {
-    let oreD = 0;
     for(let i = 0; i < poweredCells.mine.length; i++) {
-        oreD += 1;
+        thePlanet.ore += info.mine.gain[poweredCells.mine[i].mark];
     }
-    return oreD;
+
+    for(let i = 0; i < poweredCells.factory.length; i++) {
+        if(poweredCells.factory[i].option === 0) { //convert ore to elec
+            let oreUsed = info.factory.gain[poweredCells.factory[i].mark] * 10;
+            if(oreUsed > thePlanet.ore) {
+                oreUsed = thePlanet.ore;
+            }
+            thePlanet.ore -= oreUsed;
+            thePlanet.electronics += oreUsed / 10;
+        }
+    }
+
+    for(let i = 0; i < poweredCells.factory.length; i++) {
+        if(poweredCells.factory[i].option === 1) { //convert elec to panel
+            let elecUsed = info.factory.gain2[poweredCells.factory[i].mark] / 2;
+            if(elecUsed > thePlanet.electronics) {
+                elecUsed = thePlanet.electronics;
+            }
+            thePlanet.electronics -= elecUsed;
+            thePlanet.panels += elecUsed * 2;
+        }
+    }
+
+
+
+
+
+
+    thePlanet.oreD = round5(thePlanet.ore - ore1);
+    thePlanet.electronicsD = round5(thePlanet.electronics - electronics1);
+    thePlanet.panelsD = round5(thePlanet.panels - panels1);
+    thePlanet.sailsD = round5(thePlanet.sails - sails1);
+    thePlanet.popD = round5(thePlanet.pop - pop1);
+    thePlanet.vPopD = round5(thePlanet.vPop - vPop1);
+    data.scienceD = round5(data.science - science1);
+
+
+
 }
 
-function calcElectronicsD(poweredCells) {
-    return 0;
-}
-
-function calcVPopD(poweredCells) {
-    return 0;
-}
-
-function calcPanelsD(poweredCells) {
-    return 0;
-}
-
-function calcPopD(poweredCells) {
-    return 0;
-}
-
-function calcSailsD(poweredCells) {
-    return 0;
-}
 
 
 function handlePower(thePlanet) {
@@ -150,6 +157,7 @@ function sellBuilding() {
     theCell.outline = "";
     theCell.power = 0;
 
+    handlePower(thePlanet);
     view.selectCell(data.selectedCol, data.selectedRow);
     view.updatePlanetGridCell(data.selectedCol, data.selectedRow);
     view.changePlanetGridCell(data.selectedCol, data.selectedRow);
@@ -164,7 +172,6 @@ function buyBuilding(type) {
     let elecCost = info[type].electronicCost[theCell.mark];
     let panelCost = info[type].panelCost[theCell.mark];
     let powerCost = info[type].power[theCell.mark];
-
 
 
     let errorMsg = info[type].title + " costs ";
@@ -207,6 +214,7 @@ function buyBuilding(type) {
     theCell.outline = "off";
     theCell.isOn = true;
 
+    handlePower(thePlanet);
     view.selectCell(data.selectedCol, data.selectedRow);
     view.updatePlanetGridCell(data.selectedCol, data.selectedRow);
     view.changePlanetGridCell(data.selectedCol, data.selectedRow);
@@ -227,4 +235,24 @@ function addErrorMessage(text) {
 function closeError(i) {
     errorMessages.splice(i, 1);
     view.createErrorMessages();
+}
+
+function selectOption(num) {
+    let thePlanet = data.systems[data.curSystem].planets[data.curPlanet];
+    let theCell = thePlanet.grid[data.selectedCol][data.selectedRow];
+
+    theCell.option = num;
+
+    if(document.getElementById("option0").classList.contains("pressedSelectOption")) {
+        document.getElementById("option0").classList.add("selectOption");
+        document.getElementById("option0").classList.remove("pressedSelectOption");
+    }
+    if(document.getElementById("option1").classList.contains("pressedSelectOption")) {
+        document.getElementById("option1").classList.add("selectOption");
+        document.getElementById("option1").classList.remove("pressedSelectOption");
+    }
+
+    let selected = document.getElementById("option"+num);
+    selected.classList.add("pressedSelectOption");
+    selected.classList.remove("selectOption");
 }

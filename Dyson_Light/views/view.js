@@ -12,13 +12,15 @@ let view = {
         document.getElementById("vPop").innerHTML = thePlanet.vPop;
         document.getElementById("vPopDelta").innerHTML = intToStringNegative(thePlanet.vPopD);
         document.getElementById("ore").innerHTML = intToString(thePlanet.ore);
-        document.getElementById("oreDelta").innerHTML = intToStringNegative(thePlanet.oreD, 2);
+        document.getElementById("oreDelta").innerHTML = intToStringNegative(thePlanet.oreD);
         document.getElementById("electronics").innerHTML = intToString(thePlanet.electronics);
-        document.getElementById("electronicsDelta").innerHTML = intToStringNegative(thePlanet.electronicsD, 2);
+        document.getElementById("electronicsDelta").innerHTML = intToStringNegative(thePlanet.electronicsD);
         document.getElementById("panels").innerHTML = intToString(thePlanet.panels);
-        document.getElementById("panelsDelta").innerHTML = intToStringNegative(thePlanet.panelsD, 2);
+        document.getElementById("panelsDelta").innerHTML = intToStringNegative(thePlanet.panelsD);
         document.getElementById("sails").innerHTML = intToString(thePlanet.sails);
-        document.getElementById("sailsDelta").innerHTML = intToStringNegative(thePlanet.sailsD, 2);
+        document.getElementById("sailsDelta").innerHTML = intToStringNegative(thePlanet.sailsD);
+        document.getElementById("science").innerHTML = intToString(data.science);
+        document.getElementById("scienceDelta").innerHTML = intToStringNegative(data.scienceD);
         document.getElementById("electricityUsed").innerHTML = thePlanet.powerReq;
         document.getElementById("electricityGain").innerHTML = thePlanet.powerGain;
     },
@@ -85,6 +87,10 @@ let view = {
         document.getElementById("buildingInfo").innerHTML = infoDiv;
         document.getElementById("buildingExtra").innerHTML = extra;
         document.getElementById("buildingPause").style.display = pausable ? "inline-block" : "none";
+
+        if(document.getElementById("option0")) {
+            selectOption(theCell.option);
+        }
     },
     updatePlanetGridCell: function(col, row) { //only for updating the num & border
         let theCell = data.systems[data.curSystem].planets[data.curPlanet].grid[col][row];

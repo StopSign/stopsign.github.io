@@ -1,6 +1,6 @@
 function initialize() {
     //create planets
-    addPlanet(0, 8, 8, 100, 3, 1);
+    addPlanet(0, 7, 7, 100, 3, 1);
     addPlanet(0, 8, 6, 90, 4, 2);
     addPlanet(0, 10, 8, 70, 1, 4);
     addPlanet(0, 4, 4, 60, 5, 8);
@@ -14,6 +14,7 @@ function initialize() {
     view.changePlanets(0, 0);
     view.createResearch();
     view.createBuildOptions();
+    view.updateResourcesDisplays();
 }
 
 function addPlanet(solarSystemNum, gridWidth, gridHeight, solarEfficiency, oreNum, distance) {
@@ -37,7 +38,8 @@ function addPlanet(solarSystemNum, gridWidth, gridHeight, solarEfficiency, oreNu
         panelsD:0,
         sails:0,
         sailsD:0,
-        power:0,
+        powerReq:0,
+        powerGain:0,
         grid:[],
         distance:distance
     };
@@ -50,7 +52,8 @@ function addPlanet(solarSystemNum, gridWidth, gridHeight, solarEfficiency, oreNu
                 isOn:true,
                 type:"",
                 text:"",
-                mark:0
+                mark:0,
+                option:0
             };
             newPlanet.grid[width][height] = cellContents;
         }
