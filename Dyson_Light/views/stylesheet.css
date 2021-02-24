@@ -151,7 +151,7 @@ input {
     cursor: pointer;
     outline: none;
     color: #000000;
-    background-color: #55d4de;
+    background-color: #60eef9;
     border: none;
     border-radius: 6px;
     box-shadow: 0 3px #999;
@@ -160,7 +160,7 @@ input {
 }
 
 .button:hover {
-    background-color: #60eef9
+    background-color: #55d4de;
 }
 
 .button:active {
@@ -296,6 +296,7 @@ input {
 .selectOption:hover {
     background-color: #4fb350;
 }
+
 
 .selectOption:active {
     background-color: #459945;

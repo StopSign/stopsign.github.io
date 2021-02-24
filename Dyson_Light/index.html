@@ -25,18 +25,18 @@
             <div class="resourceDiv" id="elecDiv">Electronics: <div id="electronics" class="bold">5</div> (<div id="electronicsDelta">+1</div>/s)</div>
             <div class="resourceDiv" id="solarPanelsDiv">Solar Panels: <div id="panels" class="bold">5</div> (<div id="panelsDelta">+1</div>/s)</div>
             <div class="resourceDiv" id="sailsDiv" style="display:none;">Solar Sails: <div id="sails" class="bold">5</div> (<div id="sailsDelta">+1</div>/s)</div>
-            <div class="resourceDiv" id="popDiv" style="display:none;">Population: <div id="pop" class="bold">5</div> (<div id="popDelta">+1</div>/s)</div>
-            <div class="resourceDiv" id="vPopDiv" style="display:none;">Virtual Pop: <div id="vPop" class="bold">5</div> (<div id="vPopDelta">+1</div>/s)</div>
+            <div class="resourceDiv" id="popDiv" style="display:none;">Population: <div id="pop" class="bold">5</div> / <div id="popTotal" class="bold">5</div> (<div id="popDelta">+1</div>/s)</div>
+            <div class="resourceDiv" id="vPopDiv" style="display:none;">Virtual Population: <div id="vPop" class="bold">5</div> / <div id="vPopTotal" class="bold">5</div> (<div id="vPopDelta">+1</div>/s)</div>
         </div>
-        <div id="working" style="vertical-align: top;width:280px;height:160px;border:1px solid;padding:10px;font-size:14px;text-align:left;">
+        <div id="working" style="vertical-align: top;width:280px;height:160px;border:1px solid;padding:10px;font-size:14px;text-align:left;opacity:0">
             <div class="title">Workers</div>
             <div class="resourceDiv" id="workersDiv">Workers: <div id="workers" class="bold">5</div> / <div id="workersTotal">5</div></div>
             <input id="workerNum" style="width:50px;" value="1"><div class="button">50%</div><div class="button">100%</div><br>
-            <div class="button">+</div><div class="button">-</div> <div class="bold" id="mineWorkers">5</div> / <div class="bold" id="mineWorkersAllowed">5</div> Working at Mine<br>
-            <div class="button">+</div><div class="button">-</div> <div class="bold" id="factoryWorkers">5</div> / <div class="bold" id="factoryWorkersAllowed">5</div> Working at Factory<br>
-            <div class="button">+</div><div class="button">-</div> <div class="bold" id="labWorkers">5</div> / <div class="bold" id="labWorkersAllowed">5</div> Working at Lab<br>
-            <div class="button">+</div><div class="button">-</div> <div class="bold" id="qTransWorkers">5</div> / <div class="bold" id="qTransWorkersAllowed">5</div> Working at Quantum Transport<br>
-            <div class="button">+</div><div class="button">-</div> <div class="bold" id="launchPadWorkers">5</div> / <div class="bold" id="launchPadWorkersAllowed">5</div> Working at Launch Pad<br>
+            <div class="button" onclick="changeWorker('mineWorker', true)">+</div><div class="button" onclick="changeWorker('mineWorker', false)">-</div> <div class="bold" id="mineWorker">5</div> Working at Mine<br>
+            <div class="button" onclick="changeWorker('factoryWorker', true)">+</div><div class="button" onclick="changeWorker('factoryWorker', false)">-</div> <div class="bold" id="factoryWorker">5</div> Working at Factory<br>
+            <div class="button" onclick="changeWorker('labWorker', true)">+</div><div class="button" onclick="changeWorker('labWorker', false)">-</div> <div class="bold" id="labWorker">5</div> Working at Lab<br>
+            <div id="workingquantumTransport"><div class="button" onclick="changeWorker('quantumTransportWorker', true)">+</div><div class="button" onclick="changeWorker('quantumTransportWorker', false)">-</div> <div class="bold" id="quantumTransportWorker">5</div> Working at Quantum Transport</div><br>
+            <div id="workinglaunchPad"><div class="button" onclick="changeWorker('launchPadWorker', true)">+</div><div class="button" onclick="changeWorker('launchPadWorker', false)">-</div> <div class="bold" id="launchPadWorker">5</div> Working at Launch Pad</div><br>
         </div>
         <div id="research" style="vertical-align: top;width:280px;height:250px;border:1px solid;padding:10px;font-size:15px;text-align:left;overflow-y:auto;">
             <div class="title">Research</div>
@@ -53,8 +53,8 @@
             <div class="title" id="buildingInfoTitle">Building Info</div>
             <div id="buildingInfo"></div>
             <div id="buildingExtra"></div><br>
-            <div class="button" onclick="sellBuilding()">Sell</div>
-            <div class="button" id="buildingPause" onclick="pauseBuilding()">Pause</div>
+            <div class="button" onclick="sellBuilding()">(S)ell</div>
+            <div class="button" id="buildingPause" onclick="pauseBuilding()">Pause (Space)</div>
         </div>
         <div id="selectionOptionsDiv" style="border:1px solid;width:100%;display:none;">
             <div class="title">Build Options</div>

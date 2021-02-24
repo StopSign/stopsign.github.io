@@ -15,6 +15,7 @@ function initialize() {
     view.createResearch();
     view.createBuildOptions();
     view.updateResourcesDisplays();
+    view.changeWorkers();
 }
 
 function addPlanet(solarSystemNum, gridWidth, gridHeight, solarEfficiency, oreNum, distance) {
@@ -28,8 +29,11 @@ function addPlanet(solarSystemNum, gridWidth, gridHeight, solarEfficiency, oreNu
     let newPlanet = {
         pop:0,
         popD:0,
+        popTotal:0,
         vPop:0,
         vPopD:0,
+        vPopTotal:0,
+        workers:0,
         ore:0,
         oreD:0,
         electronics:0,
@@ -40,6 +44,11 @@ function addPlanet(solarSystemNum, gridWidth, gridHeight, solarEfficiency, oreNu
         sailsD:0,
         powerReq:0,
         powerGain:0,
+        mineWorker:0,
+        factoryWorker:0,
+        labWorker:0,
+        quantumTransportWorker:0,
+        launchPadWorker:0,
         grid:[],
         distance:distance
     };

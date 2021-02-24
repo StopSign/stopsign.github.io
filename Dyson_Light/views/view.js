@@ -7,10 +7,14 @@ let view = {
         document.getElementById("science").innerHTML = data.science;
 
         let thePlanet = data.systems[data.curSystem].planets[data.curPlanet];
-        document.getElementById("pop").innerHTML = thePlanet.pop;
-        document.getElementById("popDelta").innerHTML = intToStringNegative(thePlanet.popD);
-        document.getElementById("vPop").innerHTML = thePlanet.vPop;
-        document.getElementById("vPopDelta").innerHTML = intToStringNegative(thePlanet.vPopD);
+        document.getElementById("workers").innerHTML = thePlanet.workers;
+        document.getElementById("workersTotal").innerHTML = Math.floor(thePlanet.pop + thePlanet.vPop + .0000001);
+        document.getElementById("pop").innerHTML = intToString(thePlanet.pop);
+        document.getElementById("popDelta").innerHTML = intToStringNegative(thePlanet.popD, 5);
+        document.getElementById("popTotal").innerHTML = intToString(thePlanet.popTotal);
+        document.getElementById("vPop").innerHTML = intToString(thePlanet.vPop);
+        document.getElementById("vPopDelta").innerHTML = intToStringNegative(thePlanet.vPopD, 5);
+        document.getElementById("vPopTotal").innerHTML = intToString(thePlanet.vPopTotal);
         document.getElementById("ore").innerHTML = intToString(thePlanet.ore);
         document.getElementById("oreDelta").innerHTML = intToStringNegative(thePlanet.oreD);
         document.getElementById("electronics").innerHTML = intToString(thePlanet.electronics);
@@ -77,14 +81,20 @@ let view = {
         view.updatePlanetGridCell(col, row);
     },
     createBuildingInfo(theCell) {
-
         let infoDiv = info[theCell.type].infoDiv;
         let title = info[theCell.type].title;
         let extra = info[theCell.type].extra;
         let pausable = info[theCell.type].pausable;
 
+        let costString = "";
+
+        let powerCost = info[theCell.type].power[theCell.mark];
+        if(powerCost > 0 && theCell.type !== "solarPanel") {
+            costString += "Electricity use: " + powerCost;
+        }
+
         document.getElementById("buildingInfoTitle").innerHTML = title;
-        document.getElementById("buildingInfo").innerHTML = infoDiv;
+        document.getElementById("buildingInfo").innerHTML = costString + "<br>" + infoDiv;
         document.getElementById("buildingExtra").innerHTML = extra;
         document.getElementById("buildingPause").style.display = pausable ? "inline-block" : "none";
 
@@ -94,12 +104,16 @@ let view = {
     },
     updatePlanetGridCell: function(col, row) { //only for updating the num & border
         let theCell = data.systems[data.curSystem].planets[data.curPlanet].grid[col][row];
-        if(data.selectedCol === col && data.selectedRow === row) {
+        if(data.selectedCol === col && data.selectedRow === row && !theCell.isOn) {
+            document.getElementById("cellcol" + col + "row" + row).style.border = 'solid 1px #ffb12e';
+        } else if(data.selectedCol === col && data.selectedRow === row) {
             document.getElementById("cellcol" + col + "row" + row).style.border = 'solid 1px yellow';
-        } else if(theCell.outline === "") {
+        } else if(!theCell.type || theCell.type === "ore") {
             document.getElementById("cellcol" + col + "row" + row).style.border = 'solid 1px #adadad';
-        } else if(theCell.outline === "error" || !theCell.isOn) {
+        } else if(!theCell.isOn) {
             document.getElementById("cellcol" + col + "row" + row).style.border = 'solid 1px red';
+        } else if(info[theCell.type].pausable) {
+            document.getElementById("cellcol" + col + "row" + row).style.border = 'solid 1px green';
         } else {
             document.getElementById("cellcol" + col + "row" + row).style.border = 'solid 1px black';
         }
@@ -114,7 +128,23 @@ let view = {
 
         document.getElementById("textcol" + col + "row" + row).innerHTML = theCell.text;
     },
+    changeWorkers: function() {
+        let thePlanet = data.systems[data.curSystem].planets[data.curPlanet];
+
+        document.getElementById("workers").innerHTML = thePlanet.workers;
+        document.getElementById("mineWorker").innerHTML = thePlanet.mineWorker;
+        document.getElementById("factoryWorker").innerHTML = thePlanet.factoryWorker;
+        document.getElementById("labWorker").innerHTML = thePlanet.labWorker;
+        document.getElementById("quantumTransportWorker").innerHTML = thePlanet.quantumTransportWorker;
+        document.getElementById("launchPadWorker").innerHTML = thePlanet.launchPadWorker;
+
+    },
     createResearch: function() {
+        document.getElementById("working").style.opacity = (data.research[0].unlocked ? 1 : 0)+"";
+        document.getElementById("popDiv").style.display = data.research[0].unlocked ? "inline-block" : "none";
+        document.getElementById("workingquantumTransport").style.display = data.research[2].unlocked ? "inline-block" : "none";
+        document.getElementById("workinglaunchPad").style.display = data.research[4].unlocked ? "inline-block" : "none";
+
         let researchDivs = "";
         for(let i = 0; i < data.research.length; i++) {
             if(!data.research[i].unlocked && (data.research[i].req == null || data.research[data.research[i].req].unlocked)) {

@@ -13,8 +13,10 @@ function startGame() {
 
     load();
 
-    //data.systems[0].planets[0].ore = 100;
-    //data.systems[0].planets[0].panels = 100;
+    // data.systems[0].planets[0].ore = 100;
+    // data.systems[0].planets[0].electronics = 30;
+    // data.systems[0].planets[0].panels = 9;
+    // data.science = 100;
 }
 
 
