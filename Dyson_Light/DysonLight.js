@@ -1,16 +1,28 @@
 
 
 function secondTick() {
-   tickPlanetResources()
+    let science1 = data.science;
 
+    for(let i = 0; i < data.systems.length; i++) {
+        for(let j = 0; j < data.systems[i].planets.length; j++) {
+            let poweredCells = tickPlanetResources(i, j);
+            if(poweredCells === undefined) {
+                continue;
+            }
+            for(let k = 0; k < poweredCells.lab.length; k++) {
+                data.science = round5(data.science + info.lab.gain[poweredCells.lab[k].mark] * (1 + data.systems[i].planets[j].labWorker/20));
+            }
+        }
+    }
+
+    data.scienceD = round5(data.science - science1);
 }
 
-function tickPlanetResources() {
-    let thePlanet = data.systems[data.curSystem].planets[data.curPlanet];
-
+function tickPlanetResources(systemNum, planetNum) {
+    let thePlanet = data.systems[systemNum].planets[planetNum];
 
     let poweredCells = handlePower(thePlanet);
-    if(poweredCells === undefined) { //error
+    if(poweredCells === undefined) { //error message
         return;
     }
 
@@ -19,13 +31,8 @@ function tickPlanetResources() {
     let panels1 = thePlanet.panels;
     let sails1 = thePlanet.sails;
     let pop1 = thePlanet.pop;
-    let science1 = data.science;
 
     handleMaterials(poweredCells, thePlanet);
-
-    for(let i = 0; i < poweredCells.lab.length; i++) {
-        data.science = round5(data.science + info.lab.gain[poweredCells.lab[i].mark] * (1 + thePlanet.labWorker/20));
-    }
 
     setWorkers(poweredCells, thePlanet);
 
@@ -35,7 +42,8 @@ function tickPlanetResources() {
     thePlanet.panelsD = round5(thePlanet.panels - panels1);
     thePlanet.sailsD = round5(thePlanet.sails - sails1);
     thePlanet.popD = round5(thePlanet.pop - pop1);
-    data.scienceD = round5(data.science - science1);
+
+    return poweredCells;
 }
 
 function handleMaterials(poweredCells, thePlanet) {
@@ -79,9 +87,14 @@ function setWorkers(poweredCells, thePlanet) {
         houseGain = 2;
     }
     thePlanet.popD = houseGain;
-    thePlanet.pop = round5(thePlanet.pop + houseGain);
+    let vPopGain = thePlanet.pop / 1000 - houseGain;
+    thePlanet.pop = round7(thePlanet.pop + houseGain);
 
-    let vPopGain = thePlanet.popD - houseGain;
+    thePlanet.vPopTotal = 0;
+    for(let i = 0; i < poweredCells.server.length; i++) {
+        thePlanet.vPopTotal += info.server.gain[poweredCells.server[i].mark];
+    }
+
     if(vPopGain < 0) {
         vPopGain = 0;
     }
@@ -92,7 +105,16 @@ function setWorkers(poweredCells, thePlanet) {
     thePlanet.vPopD = vPopGain;
 
     let workersCurr = thePlanet.mineWorker + thePlanet.factoryWorker + thePlanet.labWorker + thePlanet.quantumTransportWorker + thePlanet.launchPadWorker;
+    let workers1 = thePlanet.workers;
     thePlanet.workers = Math.floor(thePlanet.pop + thePlanet.vPop - workersCurr + .0000001);
+    if(thePlanet.workers > workers1 && thePlanet.autoWorker) {
+        let workerDiff = thePlanet.workers - workers1;
+        thePlanet[thePlanet.autoWorker+"Worker"] += workerDiff;
+        thePlanet.workers -= workerDiff;
+        if(thePlanet === data.systems[data.curSystem].planets[data.curPlanet]) {
+            view.changeWorkers();
+        }
+    }
 }
 
 function handlePower(thePlanet) {
@@ -115,7 +137,7 @@ function handlePower(thePlanet) {
         for(let row = 0; row < thePlanet.grid[col].length; row++) {
             let theCell = thePlanet.grid[col][row];
             if(theCell.type === "solarPanel") {
-                powerGain += info[theCell.type].power[theCell.mark];
+                powerGain += info[theCell.type].gain[theCell.mark];
             } else if(theCell.isOn && theCell.type && theCell.type !== "ore") {
                 powerReq += info[theCell.type].power[theCell.mark];
                 poweredCells[theCell.type].push(theCell);
@@ -124,7 +146,7 @@ function handlePower(thePlanet) {
     }
 
     if(powerReq > powerGain && powerReq > 0) {
-        errorMessages.push("Not enough power! You need "+(powerGain - powerReq)+"more. Shutting things off.");
+        errorMessages.push("Not enough power! You need "+(powerReq - powerGain)+" more. Shutting things off.");
 
         for(let col = 0; col < thePlanet.grid.length; col++) {
             for (let row = 0; row < thePlanet.grid[col].length; row++) {
@@ -161,51 +183,43 @@ function clickedCell(col, row) {
 }
 
 function clickedResearch(i) {
-    let theResearch = data.research[i];
+    let theResearch = researchInfo[i];
     if(data.science < theResearch.cost) {
-        addErrorMessage(theResearch.title + " costs " + theResearch.cost + " research points. You have " + data.science);
+        addErrorMessage(theResearch.title + " costs " + theResearch.cost + " research points. You have " + round2(data.science));
     } else {
         data.science -= theResearch.cost;
-        theResearch.unlocked = true;
+        data.research[theResearch.unlocks.type][theResearch.unlocks.num] = true;
     }
     view.updateResourcesDisplays();
     view.createResearch();
+    view.selectCell(data.selectedCol, data.selectedRow); //refresh options
 }
 
-function sellBuilding() {
+function upgradeBuilding() {
     let thePlanet = data.systems[data.curSystem].planets[data.curPlanet];
     if(data.selectedRow == null || data.selectedCol == null) { //press hotkey when nothing selected
         return;
     }
     let theCell = thePlanet.grid[data.selectedCol][data.selectedRow];
-
-    if(theCell.type === "house") {
-        let reducedPopTotal = thePlanet.popTotal - info[theCell.type].gain[theCell.mark];
-        if(thePlanet.pop > reducedPopTotal) {
-            let reducedWorkers = thePlanet.pop - reducedPopTotal;
-            if(thePlanet.workers < reducedWorkers) {
-                addErrorMessage("You need " + (reducedWorkers - thePlanet.workers) + " more free workers to sell this house!");
-                return;
-            }
-        }
+    if(!data.research[theCell.type] || !data.research[theCell.type][theCell.mark]) { //not unlocked yet
+        return;
     }
 
-    let oreCost = info[theCell.type].oreCost[theCell.mark];
-    let elecCost = info[theCell.type].electronicCost[theCell.mark];
-    let panelCost = info[theCell.type].panelCost[theCell.mark];
+    let oreCostNext = info[theCell.type].oreCost[theCell.mark+1];
+    let elecCostNext = info[theCell.type].electronicCost[theCell.mark+1];
+    let panelCostNext = info[theCell.type].panelCost[theCell.mark+1];
+    let powerCostNext = info[theCell.type].power[theCell.mark+1] - info[theCell.type].power[theCell.mark];
 
-    thePlanet.ore += oreCost;
-    thePlanet.electronics += elecCost;
-    thePlanet.panels += panelCost;
+    if(!checkCostAllowed(thePlanet, theCell.type, oreCostNext, elecCostNext, panelCostNext, powerCostNext, true)) {
+        return;
+    }
 
-    theCell.type = theCell.type === "mine" ? "ore" : "";
-    theCell.outline = "";
-    theCell.power = 0;
+    theCell.mark++;
 
     handlePower(thePlanet);
-    view.selectCell(data.selectedCol, data.selectedRow);
+
     view.updatePlanetGridCell(data.selectedCol, data.selectedRow);
-    view.changePlanetGridCell(data.selectedCol, data.selectedRow);
+    view.createBuildingInfo(theCell);
     view.updateResourcesDisplays();
 }
 
@@ -223,11 +237,11 @@ function buyBuilding(type) {
     if(theCell.type && theCell.type !== "ore") {
         return;
     }
-    if(type === "house" && !data.research[0].unlocked
-    || type === "server" && !data.research[1].unlocked
-    || type === "quantumTransport" && !data.research[2].unlocked
-    || type === "radioTelescope" && !data.research[3].unlocked
-    || type === "launchPad" && !data.research[4].unlocked) {
+    if(type === "house" && !data.research.unlock[0]
+    || type === "server" && !data.research.unlock[1]
+    || type === "quantumTransport" && !data.research.unlock[2]
+    || type === "radioTelescope" && !data.research.unlock[3]
+    || type === "launchPad" && !data.research.unlock[4]) {
         return;
     }
 
@@ -235,8 +249,25 @@ function buyBuilding(type) {
     let elecCost = info[type].electronicCost[theCell.mark];
     let panelCost = info[type].panelCost[theCell.mark];
     let powerCost = info[type].power[theCell.mark];
+    if(!checkCostAllowed(thePlanet, type, oreCost, elecCost, panelCost, powerCost)) {
+        return;
+    }
 
+    theCell.type = type;
+    theCell.isOn = true;
+    if(info[theCell.type].optionText) {
+        theCell.option = 0;
+    }
 
+    handlePower(thePlanet);
+
+    view.selectCell(data.selectedCol, data.selectedRow);
+    view.updatePlanetGridCell(data.selectedCol, data.selectedRow);
+    view.changePlanetGridCell(data.selectedCol, data.selectedRow);
+    view.updateResourcesDisplays();
+}
+
+function checkCostAllowed(thePlanet, type, oreCost, elecCost, panelCost, powerCost, isUpgrade) {
     let errorMsg = info[type].title + " costs ";
     if(oreCost > 0) {
         errorMsg += oreCost + " ore";
@@ -249,37 +280,87 @@ function buyBuilding(type) {
     }
     errorMsg += ". You have ";
     if(oreCost > 0) {
-        errorMsg += thePlanet.ore + " ore";
+        errorMsg += round2(thePlanet.ore) + " ore";
     }
     if(elecCost > 0) {
-        errorMsg += (oreCost > 0 ? " and " : "") + thePlanet.electronics + " electronics";
+        errorMsg += (oreCost > 0 ? " and " : "") + round2(thePlanet.electronics) + " electronics";
     }
     if(panelCost > 0) {
-        errorMsg += (oreCost > 0 ? " and " : "") + thePlanet.panels + " panels";
+        errorMsg += (oreCost > 0 || elecCost > 0 ? " and " : "") + round2(thePlanet.panels) + " panels";
     }
     errorMsg += ".";
 
     if(thePlanet.panels < panelCost || thePlanet.ore < oreCost || thePlanet.electronics < elecCost) {
         addErrorMessage(errorMsg);
-        return;
+        return false;
     }
 
     if(type !== "solarPanel" && thePlanet.powerGain - thePlanet.powerReq < powerCost) {
-        addErrorMessage("Adding a " + info[type].title + " right now would crash the power grid!");
-        return;
+        if(isUpgrade) {
+            addErrorMessage("Upgrading this " + info[type].title + " right now would crash the power grid!");
+        } else {
+            addErrorMessage("Adding a " + info[type].title + " right now would crash the power grid!");
+        }
+        return false;
     }
 
     thePlanet.panels -= panelCost;
     thePlanet.ore -= oreCost;
     thePlanet.electronics -= elecCost;
 
-    theCell.type = type;
-    theCell.outline = "off";
+    return true;
+}
+
+function sellBuilding() {
+    let thePlanet = data.systems[data.curSystem].planets[data.curPlanet];
+    if(data.selectedRow == null || data.selectedCol == null) { //press hotkey when nothing selected
+        return;
+    }
+    let theCell = thePlanet.grid[data.selectedCol][data.selectedRow];
+
+    if(theCell.type === "house") {
+        let reducedPopTotal = thePlanet.popTotal - info[theCell.type].gain[theCell.mark];
+        if(thePlanet.pop > reducedPopTotal) {
+            let reducedWorkers = Math.floor(thePlanet.pop - reducedPopTotal+.000001);
+            if(thePlanet.workers < reducedWorkers) {
+                addErrorMessage("You need " + (reducedWorkers - thePlanet.workers) + " more free workers to sell this house!");
+                return;
+            }
+        }
+    }
+    if(theCell.type === "server") {
+        let reducedPopTotal = thePlanet.vPopTotal - info[theCell.type].gain[theCell.mark];
+        if(thePlanet.vPop > reducedPopTotal) {
+            let reducedWorkers = Math.floor(thePlanet.vPop - reducedPopTotal+.000001);
+            if(thePlanet.workers < reducedWorkers) {
+                addErrorMessage("You need " + (reducedWorkers - thePlanet.workers) + " more free workers to sell this server!");
+                return;
+            }
+        }
+    }
+    let oreCost = 0;
+    let elecCost = 0;
+    let panelCost = 0;
+
+    for(let i = 0; i < (theCell.mark+1); i++) {
+        if(!info[theCell.type]) {
+            break;
+        }
+        oreCost += info[theCell.type].oreCost[i];
+        elecCost += info[theCell.type].electronicCost[i];
+        panelCost += info[theCell.type].panelCost[i];
+    }
+
+    thePlanet.ore += oreCost;
+    thePlanet.electronics += elecCost;
+    thePlanet.panels += panelCost;
+
+    theCell.type = theCell.type === "mine" ? "ore" : "";
     theCell.isOn = true;
-    theCell.option = 0;
+    theCell.power = 0;
+    theCell.mark = 0;
 
     handlePower(thePlanet);
-
     view.selectCell(data.selectedCol, data.selectedRow);
     view.updatePlanetGridCell(data.selectedCol, data.selectedRow);
     view.changePlanetGridCell(data.selectedCol, data.selectedRow);
@@ -327,6 +408,18 @@ function selectOption(num) {
     let selected = document.getElementById("option"+num);
     selected.classList.add("pressedSelectOption");
     selected.classList.remove("selectOption");
+    view.updatePlanetGridCell(data.selectedCol, data.selectedRow);
+}
+
+function setAmount(num) {
+    let thePlanet = data.systems[data.curSystem].planets[data.curPlanet];
+    if(num === 0) {
+        document.getElementById("workerNum").value = 1;
+    } else if(num === 1) {
+        document.getElementById("workerNum").value = Math.floor((thePlanet.pop + thePlanet.vPop)/2 + .0000001);
+    } else if(num === 2) {
+        document.getElementById("workerNum").value = Math.floor((thePlanet.pop + thePlanet.vPop) + .0000001);
+    }
 }
 
 function changeWorker(name, isAdd) {
@@ -357,6 +450,16 @@ function changeWorker(name, isAdd) {
     view.changeWorkers();
 }
 
+function autoWorker(name) {
+    let thePlanet = data.systems[data.curSystem].planets[data.curPlanet];
+    if(thePlanet.autoWorker === name) {
+        thePlanet.autoWorker = "";
+    } else {
+        thePlanet.autoWorker = name;
+    }
+    view.changeWorkers();
+}
+
 function gridKeyPress(colD, rowD) {
     if(data.selectedRow == null || data.selectedCol == null) {
         clickedCell(0, 0);
@@ -379,4 +482,16 @@ function gridKeyPress(colD, rowD) {
     }
 
     clickedCell(goToCol, goToRow);
+}
+
+function changePlanet(num) {
+    data.curPlanet = num;
+    data.selectedRow = null;
+    data.selectedCol = null;
+
+    view.createPlanets();
+    view.changePlanets();
+    view.updateResourcesDisplays();
+    view.changeWorkers();
+    view.selectCell(null, null);
 }

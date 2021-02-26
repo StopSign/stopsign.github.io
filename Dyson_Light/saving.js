@@ -12,11 +12,6 @@ function startGame() {
     // window.localStorage[saveName] = decode("");
 
     load();
-
-    // data.systems[0].planets[0].ore = 100;
-    // data.systems[0].planets[0].electronics = 30;
-    // data.systems[0].planets[0].panels = 9;
-    // data.science = 100;
 }
 
 
@@ -34,32 +29,46 @@ function clearSave() { //Doesn't work atm
 }
 
 function loadDefaults() {
+    //create planets
+    addPlanet(0, 7, 7, 3, 1);
+    addPlanet(0, 8, 5, 5, 2);
+    addPlanet(0, 10, 6, 2, 4);
+    addPlanet(0, 6, 6, 6, 7);
+
+    data.systems[0].luminosity = 1;
+    data.systems[0].distance = 0;
+
+    data.systems[0].planets[0].panels = 1;
 }
 
 function load() {
-    initialize();
     loadDefaults();
     let toLoad = {};
     if(window.localStorage[saveName]) { //has a save file
-        // toLoad = JSON.parse(window.localStorage[saveName]);
+        toLoad = JSON.parse(decode(window.localStorage[saveName]));
+
+        if(toLoad.data !== undefined) {data = toLoad.data; }
     }
 
-    if(toLoad.totalTime !== undefined) {totalTime = toLoad.totalTime; }
 
+    data.selectedCol = null;
+    data.selectedRow = null;
 
-    // view.initialize();
+    view.initialize();
     recalcInterval(50);
 }
 
 function save() {
+    saveTimer = 2000;
     let toSave = {};
 
-    toSave.totalTime = totalTime;
+    toSave.data = data;
 
-    window.localStorage[saveName] = JSON.stringify(toSave);
+    window.localStorage[saveName] = encode(JSON.stringify(toSave));
 }
 
 function exportSave() {
+
     save();
     let encoded = encode(window.localStorage[saveName]);
     console.log(encoded);

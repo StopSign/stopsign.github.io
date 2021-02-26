@@ -26,17 +26,17 @@
             <div class="resourceDiv" id="solarPanelsDiv">Solar Panels: <div id="panels" class="bold">5</div> (<div id="panelsDelta">+1</div>/s)</div>
             <div class="resourceDiv" id="sailsDiv" style="display:none;">Solar Sails: <div id="sails" class="bold">5</div> (<div id="sailsDelta">+1</div>/s)</div>
             <div class="resourceDiv" id="popDiv" style="display:none;">Population: <div id="pop" class="bold">5</div> / <div id="popTotal" class="bold">5</div> (<div id="popDelta">+1</div>/s)</div>
-            <div class="resourceDiv" id="vPopDiv" style="display:none;">Virtual Population: <div id="vPop" class="bold">5</div> / <div id="vPopTotal" class="bold">5</div> (<div id="vPopDelta">+1</div>/s)</div>
+            <div class="resourceDiv" id="vPopDiv" style="display:none;">V. Pop.: <div id="vPop" class="bold">5</div> / <div id="vPopTotal" class="bold">5</div> (<div id="vPopDelta">+1</div>/s)</div>
         </div>
         <div id="working" style="vertical-align: top;width:280px;height:160px;border:1px solid;padding:10px;font-size:14px;text-align:left;opacity:0">
             <div class="title">Workers</div>
             <div class="resourceDiv" id="workersDiv">Workers: <div id="workers" class="bold">5</div> / <div id="workersTotal">5</div></div>
-            <input id="workerNum" style="width:50px;" value="1"><div class="button">50%</div><div class="button">100%</div><br>
-            <div class="button" onclick="changeWorker('mineWorker', true)">+</div><div class="button" onclick="changeWorker('mineWorker', false)">-</div> <div class="bold" id="mineWorker">5</div> Working at Mine<br>
-            <div class="button" onclick="changeWorker('factoryWorker', true)">+</div><div class="button" onclick="changeWorker('factoryWorker', false)">-</div> <div class="bold" id="factoryWorker">5</div> Working at Factory<br>
-            <div class="button" onclick="changeWorker('labWorker', true)">+</div><div class="button" onclick="changeWorker('labWorker', false)">-</div> <div class="bold" id="labWorker">5</div> Working at Lab<br>
-            <div id="workingquantumTransport"><div class="button" onclick="changeWorker('quantumTransportWorker', true)">+</div><div class="button" onclick="changeWorker('quantumTransportWorker', false)">-</div> <div class="bold" id="quantumTransportWorker">5</div> Working at Quantum Transport</div><br>
-            <div id="workinglaunchPad"><div class="button" onclick="changeWorker('launchPadWorker', true)">+</div><div class="button" onclick="changeWorker('launchPadWorker', false)">-</div> <div class="bold" id="launchPadWorker">5</div> Working at Launch Pad</div><br>
+            <input id="workerNum" style="width:50px;" value="1"><div class="button" onclick="setAmount(0)">1</div><div class="button" onclick="setAmount(1)">50%</div><div class="button" onclick="setAmount(2)">100%</div><br>
+            <div class="button" onclick="changeWorker('mineWorker', true)">+</div><div class="button" onclick="changeWorker('mineWorker', false)">-</div><div class="button" onclick="autoWorker('mine')" id="mineAuto">auto</div> <div class="bold" id="mineWorker">5</div> Working at Mine<br>
+            <div class="button" onclick="changeWorker('factoryWorker', true)">+</div><div class="button" onclick="changeWorker('factoryWorker', false)">-</div><div class="button" onclick="autoWorker('factory')" id="factoryAuto">auto</div> <div class="bold" id="factoryWorker">5</div> Working at Factory<br>
+            <div class="button" onclick="changeWorker('labWorker', true)">+</div><div class="button" onclick="changeWorker('labWorker', false)">-</div><div class="button" onclick="autoWorker('lab')" id="labAuto">auto</div> <div class="bold" id="labWorker">5</div> Working at Lab<br>
+            <div id="workingquantumTransport"><div class="button" onclick="changeWorker('quantumTransportWorker', true)">+</div><div class="button" onclick="changeWorker('quantumTransportWorker', false)">-</div><div class="button" onclick="autoWorker('quantumTransport')" id="quantumTransportAuto">auto</div> <div class="bold" id="quantumTransportWorker">5</div> Working at Q. Transport</div><br>
+            <div id="workinglaunchPad"><div class="button" onclick="changeWorker('launchPadWorker', true)">+</div><div class="button" onclick="changeWorker('launchPadWorker', false)">-</div><div class="button" onclick="autoWorker('launchPad')" id="launchPadAuto">auto</div> <div class="bold" id="launchPadWorker">5</div> Working at Launch Pad</div><br>
         </div>
         <div id="research" style="vertical-align: top;width:280px;height:250px;border:1px solid;padding:10px;font-size:15px;text-align:left;overflow-y:auto;">
             <div class="title">Research</div>
@@ -45,16 +45,24 @@
         </div>
     </div>
 
-    <div id="buildingZone" style="vertical-align: top;width:500px;position:relative"></div>
+    <div id="gridZone" style="width:500px;text-align:center;vertical-align:top;font-size:0">
+        <div id="buildingZone" style="vertical-align: top;position:relative;font-size:14px;font-weight:bold;"></div>
+        <div id="planetZone" style="margin-top:400px;height:120px;width:100%;background-color:black;"></div>
+        <div id="sunZone" style="margin-top:520px;height:119px;width:100%;background-color:black;"></div>
+    </div>
 
     <div id="selectionOptions" style="vertical-align: top;width:300px;">
 
-        <div id="buildingInfoDiv" style="border:1px solid;width:100%;display:none;">
+        <div id="buildingInfoDiv" style="border:1px solid;width:100%;display:none;padding:10px;text-align:left;">
             <div class="title" id="buildingInfoTitle">Building Info</div>
             <div id="buildingInfo"></div>
             <div id="buildingExtra"></div><br>
             <div class="button" onclick="sellBuilding()">(S)ell</div>
-            <div class="button" id="buildingPause" onclick="pauseBuilding()">Pause (Space)</div>
+            <div class="button" id="buildingPause" onclick="pauseBuilding()">Pause (Space)</div><br><br>
+            <div id="buildingUpgrade">
+                <div id="buildingUpgradeInfo"></div><br>
+                <div class="button" onclick="upgradeBuilding()">(U)pgrade</div>
+            </div>
         </div>
         <div id="selectionOptionsDiv" style="border:1px solid;width:100%;display:none;">
             <div class="title">Build Options</div>

@@ -40,6 +40,9 @@ function processKeyQueue() {
     if(key === 83) { //s
         sellBuilding();
     }
+    if(key === 85) { //u
+        upgradeBuilding();
+    }
     if(key === 49) { //1
         selectOption(0);
     }

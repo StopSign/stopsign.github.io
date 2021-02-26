@@ -1,8 +1,2 @@
-initial:
-1. choose a degree
-2. if there's a branch within 119 degrees (4 branches eventually), give mana to that branch
-
-per branch, when receiving mana:
-1. choose a degree among the 90 degrees in front of you
-2. if there's a branch within 44 degrees in front of you (3 branches eventually), give mana to that branch
-3. otherwise, create new branch with *.9 size
+set auto add workers to one
+1 button

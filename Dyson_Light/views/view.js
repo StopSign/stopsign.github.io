@@ -1,5 +1,13 @@
 
 let view = {
+    initialize: function() {
+        view.createPlanets();
+        view.changePlanets();
+        view.createResearch();
+        view.createBuildOptions();
+        view.updateResourcesDisplays();
+        view.changeWorkers();
+    },
     update: function() {
         view.updateResourcesDisplays();
     },
@@ -13,7 +21,7 @@ let view = {
         document.getElementById("popDelta").innerHTML = intToStringNegative(thePlanet.popD, 5);
         document.getElementById("popTotal").innerHTML = intToString(thePlanet.popTotal);
         document.getElementById("vPop").innerHTML = intToString(thePlanet.vPop);
-        document.getElementById("vPopDelta").innerHTML = intToStringNegative(thePlanet.vPopD, 5);
+        document.getElementById("vPopDelta").innerHTML = intToStringNegative(thePlanet.vPopD);
         document.getElementById("vPopTotal").innerHTML = intToString(thePlanet.vPopTotal);
         document.getElementById("ore").innerHTML = intToString(thePlanet.ore);
         document.getElementById("oreDelta").innerHTML = intToStringNegative(thePlanet.oreD);
@@ -30,25 +38,31 @@ let view = {
     },
     changePlanets: function() { //initializes solar system, planet grid
         let planetGrid = data.systems[data.curSystem].planets[data.curPlanet].grid;
+        let elems = "";
+        let rowSize = 50;
+        let totalWidth = rowSize * planetGrid.length;
         for(let col = 0 ; col < planetGrid.length; col++) {
             for (let row = 0; row < planetGrid[col].length; row++) {
 
-                let elem = document.createElement("div");
-                let rowSize = 50;
                 let rectStartX = col * rowSize;
                 let rectStartY = row * rowSize;
-                elem.innerHTML =
+                elems +=
                     "<div class='gridCell' style='left:" + rectStartX + "px;top:" + rectStartY + "px;width:" + (rowSize-2) + "px;height:" + (rowSize-2) + "px;' onclick='clickedCell(" + col + "," + row + ")' id='cellcol" + col + "row" + row + "'>" +
                     "<div class='cellImg' id='imgcol" + col + "row" + row + "'></div>" +
+                    "<div class='displayOption' id='optioncol" + col + "row" + row + "'></div>" +
                     "<div class='displayNum' id='textcol" + col + "row" + row + "'></div>" +
                     "</div>";
 
-                document.getElementById('buildingZone').appendChild(elem);
+            }
+        }
+        document.getElementById('buildingZone').innerHTML = elems;
+        document.getElementById('buildingZone').style.width = totalWidth + "px";
+
+        for(let col = 0 ; col < planetGrid.length; col++) {
+            for (let row = 0; row < planetGrid[col].length; row++) {
                 view.changePlanetGridCell(col, row);
                 view.updatePlanetGridCell(col, row);
             }
-            let elem = document.createElement("br");
-            document.getElementById('buildingZone').appendChild(elem);
         }
     },
     selectCell(col, row) { //displaying options
@@ -62,11 +76,11 @@ let view = {
         if(theCell.type === "" || theCell.type === "ore") {
             document.getElementById("selectionOptionsDiv").style.display = "inline-block";
             document.getElementById("buildmine").style.display = theCell.type === "ore" ? "inline-block" : "none";
-            document.getElementById("buildhouse").style.display = data.research[0].unlocked ? "inline-block" : "none";
-            document.getElementById("buildserver").style.display = data.research[1].unlocked ? "inline-block" : "none";
-            document.getElementById("buildquantumTransport").style.display = data.research[2].unlocked ? "inline-block" : "none";
-            document.getElementById("buildradioTelescope").style.display = data.research[3].unlocked ? "inline-block" : "none";
-            document.getElementById("buildlaunchPad").style.display = data.research[4].unlocked ? "inline-block" : "none";
+            document.getElementById("buildhouse").style.display = data.research.unlock[0] ? "inline-block" : "none";
+            document.getElementById("buildserver").style.display = data.research.unlock[1] ? "inline-block" : "none";
+            document.getElementById("buildquantumTransport").style.display = data.research.unlock[2] ? "inline-block" : "none";
+            document.getElementById("buildradioTelescope").style.display = data.research.unlock[3] ? "inline-block" : "none";
+            document.getElementById("buildlaunchPad").style.display = data.research.unlock[4] ? "inline-block" : "none";
         } else {
             document.getElementById("selectionOptionsDiv").style.display = "none";
         }
@@ -97,6 +111,32 @@ let view = {
         document.getElementById("buildingInfo").innerHTML = costString + "<br>" + infoDiv;
         document.getElementById("buildingExtra").innerHTML = extra;
         document.getElementById("buildingPause").style.display = pausable ? "inline-block" : "none";
+        if(document.getElementById("infoGain")) {
+            document.getElementById("infoGain").innerHTML = info[theCell.type].gain[theCell.mark];
+        }
+        if(document.getElementById("infoGain2")) {
+            document.getElementById("infoGain2").innerHTML = info[theCell.type].gain2[theCell.mark];
+        }
+
+        if(!data.research[theCell.type][theCell.mark]) {
+            document.getElementById("buildingUpgrade").style.display = "none";
+        } else {
+            document.getElementById("buildingUpgrade").style.display = "inline-block";
+
+            let oreCostNext = info[theCell.type].oreCost[theCell.mark+1];
+            let elecCostNext = info[theCell.type].electronicCost[theCell.mark+1];
+            let panelCostNext = info[theCell.type].panelCost[theCell.mark+1];
+            let powerCostNext = info[theCell.type].power[theCell.mark+1];
+            let markString = "Upgrade to Mk. " + (theCell.mark+2) + " for:" +
+                (oreCostNext ? "<br>Ore: <div class='bold'>" + oreCostNext + "</div>" : "") +
+                (elecCostNext ? "<br>Electronics: <div class='bold'>" + elecCostNext + "</div>" : "") +
+                (panelCostNext ? "<br>Solar Panels: <div class='bold'>" + panelCostNext + "</div>" : "") +
+                (powerCostNext ? "<br>Electricity: <div class='bold'>" + powerCostNext + "</div>" : "");
+
+            markString += "<br><br>Effect will increase from " + info[theCell.type].gain[theCell.mark] + " to " + info[theCell.type].gain[theCell.mark+1] + "<br>";
+
+            document.getElementById("buildingUpgradeInfo").innerHTML = markString;
+        }
 
         if(document.getElementById("option0")) {
             selectOption(theCell.option);
@@ -113,10 +153,13 @@ let view = {
         } else if(!theCell.isOn) {
             document.getElementById("cellcol" + col + "row" + row).style.border = 'solid 1px red';
         } else if(info[theCell.type].pausable) {
-            document.getElementById("cellcol" + col + "row" + row).style.border = 'solid 1px green';
+            document.getElementById("cellcol" + col + "row" + row).style.border = 'solid 1px #11d611';
         } else {
             document.getElementById("cellcol" + col + "row" + row).style.border = 'solid 1px black';
         }
+
+        document.getElementById("optioncol" + col + "row" + row).innerHTML = (theCell.type && info[theCell.type] && info[theCell.type].optionText) ? info[theCell.type].optionText[theCell.option] : "";
+        document.getElementById("textcol" + col + "row" + row).innerHTML = theCell.mark > 0 ? (theCell.mark+1) : "";
     },
     changePlanetGridCell: function(col, row) { //for changing the image
         let theCell = data.systems[data.curSystem].planets[data.curPlanet].grid[col][row];
@@ -125,8 +168,6 @@ let view = {
         } else {
             document.getElementById("imgcol" + col + "row" + row).innerHTML = "";
         }
-
-        document.getElementById("textcol" + col + "row" + row).innerHTML = theCell.text;
     },
     changeWorkers: function() {
         let thePlanet = data.systems[data.curSystem].planets[data.curPlanet];
@@ -138,21 +179,42 @@ let view = {
         document.getElementById("quantumTransportWorker").innerHTML = thePlanet.quantumTransportWorker;
         document.getElementById("launchPadWorker").innerHTML = thePlanet.launchPadWorker;
 
+        let theList = ["mine", "factory", "lab", "quantumTransport", "launchPad"];
+        for(let i = 0; i < theList.length; i++) {
+            let autoName = theList[i];
+            if (document.getElementById(autoName + "Auto").classList.contains("buttonPressed")) {
+                document.getElementById(autoName + "Auto").classList.remove("buttonPressed");
+                document.getElementById(autoName + "Auto").classList.add("button");
+            }
+        }
+        if (thePlanet.autoWorker && document.getElementById(thePlanet.autoWorker + "Auto").classList.contains("button")) {
+            document.getElementById(thePlanet.autoWorker + "Auto").classList.remove("button");
+            document.getElementById(thePlanet.autoWorker + "Auto").classList.add("buttonPressed");
+        }
     },
     createResearch: function() {
-        document.getElementById("working").style.opacity = (data.research[0].unlocked ? 1 : 0)+"";
-        document.getElementById("popDiv").style.display = data.research[0].unlocked ? "inline-block" : "none";
-        document.getElementById("workingquantumTransport").style.display = data.research[2].unlocked ? "inline-block" : "none";
-        document.getElementById("workinglaunchPad").style.display = data.research[4].unlocked ? "inline-block" : "none";
+        document.getElementById("working").style.opacity = (data.research.unlock[0] ? 1 : 0)+"";
+        document.getElementById("popDiv").style.display = data.research.unlock[0] ? "inline-block" : "none";
+        document.getElementById("vPopDiv").style.display = data.research.unlock[1] ? "inline-block" : "none";
+        document.getElementById("planetZone").style.display = data.research.unlock[2] ? "inline-block" : "none";
+        document.getElementById("workingquantumTransport").style.display = data.research.unlock[2] ? "inline-block" : "none";
+        document.getElementById("workinglaunchPad").style.display = data.research.unlock[4] ? "inline-block" : "none";
+        document.getElementById("sailsDiv").style.display = data.research.unlock[4] ? "inline-block" : "none";
+        document.getElementById("sunZone").style.display = data.research.unlock[4] ? "inline-block" : "none";
 
         let researchDivs = "";
-        for(let i = 0; i < data.research.length; i++) {
-            if(!data.research[i].unlocked && (data.research[i].req == null || data.research[data.research[i].req].unlocked)) {
+        for(let i = 0; i < researchInfo.length; i++) {
+            let theInfo = researchInfo[i];
+            //if requirements are true, but it's not bought yet, create
+            let isBought = data.research[theInfo.unlocks.type][theInfo.unlocks.num];
+            let reqsPass = !theInfo.req || data.research[theInfo.req.type][theInfo.req.num];
+
+            if(reqsPass && !isBought) {
                 researchDivs +=
                     "<div class='researchDiv'  id='researchDiv" + i + "'>" +
-                    "<div class='smallTitle'>" + data.research[i].title + "</div>" +
-                    "<div>" + data.research[i].desc + "</div><br>" +
-                    "<div class='button' onclick='clickedResearch(" + i + ")'>Buy for " + data.research[i].cost + " science</div>" +
+                    "<div class='smallTitle'>" + theInfo.title + "</div>" +
+                    "<div>" + theInfo.desc + "</div><br>" +
+                    "<div class='button' onclick='clickedResearch(" + i + ")'>Buy for " + theInfo.cost + " science</div>" +
                     "</div>";
             }
         }
@@ -186,5 +248,15 @@ let view = {
 
         document.getElementById("errorMessages").innerHTML = errorDivs;
     },
+    createPlanets: function() {
+        let system = data.systems[data.curSystem];
+        let elems = "";
+        for(let i = 0; i < system.planets.length; i++) {
+            elems += "<div class='planetDiv' onclick='changePlanet("+i+")'>" +
+                "<img src='img/"+(i===data.curPlanet?"greenPlanet":"planet")+".svg' class='planetIcon imageDragFix'>" +
+                "</div>";
+        }
+        document.getElementById("planetZone").innerHTML = elems;
+    }
 
 };

@@ -103,8 +103,8 @@ body {
 }
 
 .superLargeIcon {
-    width:40px;
-    height:40px;
+    width:35px;
+    height:35px;
 }
 .largeIcon {
     width:20px;
@@ -133,12 +133,12 @@ input {
     border: none;
     border-radius: 6px;
     margin-bottom:2px;
-    background-color: #3e8e41;
+    background-color: #46abb3;
     box-shadow: 0 1px #666;
     transform: translateY(0px);
 }
 .buttonPressed.active {
-    background-color: #357937;
+    background-color: #3d9399;
     box-shadow: 0 1px #666;
     transform: translateY(-1px);
 }
@@ -258,10 +258,14 @@ input {
     position:absolute;
 }
 .displayNum {
-    width:100%;
-    display:block;
     position:absolute;
-    top:35px;
+    bottom:-1px;
+    right:1px;
+}
+.displayOption {
+    position:absolute;
+    bottom:-1px;
+    left:1px;
 }
 .buildOption {
     padding:5px;
@@ -323,4 +327,15 @@ input {
     background-color: #357937;
     box-shadow: 0 1px #666;
     transform: translateY(-1px);
+}
+.planetIcon {
+    width: 80px;
+    height:80px;
+}
+.planetDiv {
+    border:1px white;
+    height:100px;
+    width:100px;
+    cursor:pointer;
+    margin: 20px 10px 0 10px;
 }

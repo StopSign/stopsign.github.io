@@ -1,24 +1,4 @@
-function initialize() {
-    //create planets
-    addPlanet(0, 7, 7, 100, 3, 1);
-    addPlanet(0, 8, 6, 90, 4, 2);
-    addPlanet(0, 10, 8, 70, 1, 4);
-    addPlanet(0, 4, 4, 60, 5, 8);
-
-    data.systems[0].luminosity = 1;
-    data.systems[0].distance = 0;
-
-
-    data.systems[0].planets[0].panels = 1;
-
-    view.changePlanets(0, 0);
-    view.createResearch();
-    view.createBuildOptions();
-    view.updateResourcesDisplays();
-    view.changeWorkers();
-}
-
-function addPlanet(solarSystemNum, gridWidth, gridHeight, solarEfficiency, oreNum, distance) {
+function addPlanet(solarSystemNum, gridWidth, gridHeight, oreNum, distance) {
     if(data.systems.length <= solarSystemNum) {
         let system = {
             planets:[],
@@ -49,6 +29,7 @@ function addPlanet(solarSystemNum, gridWidth, gridHeight, solarEfficiency, oreNu
         labWorker:0,
         quantumTransportWorker:0,
         launchPadWorker:0,
+        autoWorker:"",
         grid:[],
         distance:distance
     };
@@ -57,12 +38,11 @@ function addPlanet(solarSystemNum, gridWidth, gridHeight, solarEfficiency, oreNu
         newPlanet.grid.push([]);
         for(let height = 0; height < gridHeight; height++) {
             let cellContents = {
-                outline:"", //empty, off, error, warning
                 isOn:true,
                 type:"",
                 text:"",
                 mark:0,
-                option:0
+                option:null
             };
             newPlanet.grid[width][height] = cellContents;
         }

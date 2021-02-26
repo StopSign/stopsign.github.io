@@ -22,7 +22,7 @@ function tick() {
     curTime = newTime;
 
     if(saveTimer < 0) {
-        save();
+        //save();
     }
     // document.getElementById("saveTimer").innerHTML = round(saveTimer/1000);
 

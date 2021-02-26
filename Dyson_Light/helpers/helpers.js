@@ -13,6 +13,9 @@ function round2(num) {
 function round5(num) {
     return Math.floor(num*100000 + .00000001)/100000
 }
+function round7(num) {
+    return Math.floor(num*10000000 + .00000001)/10000000
+}
 
 function precision2(num) {
     return Number(num.toPrecision(2));
