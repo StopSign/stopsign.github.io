@@ -174,7 +174,8 @@ let info = {
         gain2:[.1, .2, .6],
         title:"Factory",
         infoDiv:"Create <div id='infoGain'></div> electronics using 10x the ore per second, or <div id='infoGain2'></div> solar panels using 2x the electronics per second",
-        extra:"<div class='pressedSelectOption' id='option0' onclick='selectOption(0)'>Create<br>Electronics (1)</div><div class='selectOption' id='option1' onclick='selectOption(1)'>Create<br>Solar Panels (2)</div>",
+        extra:"<div class='pressedSelectOption' id='option0' onclick='selectOption(0)'>Create<br>Electronics (1)</div>" +
+            "<div class='selectOption' id='option1' onclick='selectOption(1)'>Create<br>Solar Panels (2)</div>",
         optionText:["E", "SP"],
         pausable:true,
         buildTitle:"Build (F)actory",
@@ -226,9 +227,20 @@ let info = {
         power:[0],
         gain:[1],
         title:"Quantum Transport",
-        infoDiv:"Send resources to other planets. Base transfer rate is <div id='infoGain'></div>. Send 10 ore, 1 electronic, or .5 solar panels per transfer rate.",
-        extra:"<div class='pressedSelectOption' id='option0' onclick='selectOption(0)'>Create<br>Electronics (1)</div><div class='selectOption' id='option1' onclick='selectOption(1)'>Create<br>Solar Panels (2)</div>",
+        infoDiv:"Send resources to other planets. Base transfer rate is <div id='infoGain'></div>. Send 1 ore, .1 electronic, .05 solar panels, .005 solar sails, or .01 virtual population per transfer rate. Virtual population will only transfer if the target planet has a Radio Telescope. Improve the rate with workers!",
+        extra:"<div class='pressedSelectOption' id='option0' onclick='selectOption(0)'>Send<br>Ore (1)</div>" +
+            "<div class='selectOption' id='option1' onclick='selectOption(1)'>Send<br>Electronics (2)</div>"+
+            "<div class='selectOption' id='option2' onclick='selectOption(2)'>Send<br>Solar Panels (3)</div>"+
+            "<div class='selectOption' id='option3' onclick='selectOption(3)'>Send<br>V. Population (4)</div>"+
+            "<div class='selectOption' id='option4' onclick='selectOption(4)'>Send<br>Solar Sails (5)</div><br><br>" +
+            "<div>Send to planet:</div><br>" +
+            "<div class='pressedSelectOption' id='targetOption0' onclick='selectTargetOption(0)'>Planet 1</div>" +
+            "<div class='selectOption' id='targetOption1' onclick='selectTargetOption(1)'>Planet 2</div><br>"+
+            "<div class='selectOption' id='targetOption2' onclick='selectTargetOption(2)'>Planet 3</div>"+
+            "<div class='selectOption' id='targetOption3' onclick='selectTargetOption(3)'>Planet 4</div><br>"+
+            "<div>Costs <div id='qTransPower' class='bold'></div> power to send.<br>Turns off when you switch planets.</div>",
         optionText:["O", "E", "SP", "VP", "SS"],
+        optionText2:["P1","P2","P3","P4"],
         pausable:true,
         buildTitle:"Build (Q)uantum Transport",
         buildDesc:"Costs 10k electronics. Can send resources to any planet in range using power, but uses more power for more distance."

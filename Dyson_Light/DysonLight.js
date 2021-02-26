@@ -3,6 +3,20 @@
 function secondTick() {
     let science1 = data.science;
 
+    //save pre-resources
+    let resourceList = ["ore", "electronics", "panels", "sails", "pop", "vPop"];
+    let deltaArray = [];
+    for(let i = 0; i < data.systems.length; i++) {
+        deltaArray[i] = [];
+        for (let j = 0; j < data.systems[i].planets.length; j++) {
+            deltaArray[i][j] = [];
+            for(let k = 0; k < resourceList.length; k++) {
+                deltaArray[i][j][k] = data.systems[i].planets[j][resourceList[k]];
+            }
+        }
+    }
+
+    //change resources
     for(let i = 0; i < data.systems.length; i++) {
         for(let j = 0; j < data.systems[i].planets.length; j++) {
             let poweredCells = tickPlanetResources(i, j);
@@ -11,6 +25,15 @@ function secondTick() {
             }
             for(let k = 0; k < poweredCells.lab.length; k++) {
                 data.science = round5(data.science + info.lab.gain[poweredCells.lab[k].mark] * (1 + data.systems[i].planets[j].labWorker/20));
+            }
+        }
+    }
+
+    //apply differences to the delta variables
+    for(let i = 0; i < data.systems.length; i++) {
+        for (let j = 0; j < data.systems[i].planets.length; j++) {
+            for(let k = 0; k < resourceList.length; k++) {
+                data.systems[i].planets[j][resourceList[k]+"D"] = round5(data.systems[i].planets[j][resourceList[k]] - deltaArray[i][j][k]);
             }
         }
     }
@@ -26,24 +49,35 @@ function tickPlanetResources(systemNum, planetNum) {
         return;
     }
 
-    let ore1 = thePlanet.ore;
-    let electronics1 = thePlanet.electronics;
-    let panels1 = thePlanet.panels;
-    let sails1 = thePlanet.sails;
-    let pop1 = thePlanet.pop;
-
     handleMaterials(poweredCells, thePlanet);
 
     setWorkers(poweredCells, thePlanet);
 
-
-    thePlanet.oreD = round5(thePlanet.ore - ore1);
-    thePlanet.electronicsD = round5(thePlanet.electronics - electronics1);
-    thePlanet.panelsD = round5(thePlanet.panels - panels1);
-    thePlanet.sailsD = round5(thePlanet.sails - sails1);
-    thePlanet.popD = round5(thePlanet.pop - pop1);
+    giveForeignMaterial(poweredCells, thePlanet);
 
     return poweredCells;
+}
+
+function giveForeignMaterial(poweredCells, thePlanet) {
+    let theList = ["ore", "electronics", "panels", "vPop", "sails"];
+    let modifier = [1, .1, .05, .01, .005];
+    for(let i = 0; i < poweredCells.quantumTransport.length; i++) {
+        let theCell = poweredCells.quantumTransport[i];
+        let targetPlanet = data.systems[0].planets[theCell.option2];
+        let amountTransferred = info[theCell.type].gain[theCell.mark] * modifier[theCell.option] * (1 + thePlanet.quantumTransportWorker/20);
+        if(thePlanet[theList[theCell.option]] < amountTransferred) {
+            amountTransferred = thePlanet[theList[theCell.option]];
+        }
+        if(theList[theCell.option] === "vPop") {
+            if(!targetPlanet.hasRadio) {
+                amountTransferred = 0;
+            } else if(thePlanet.vPopD > amountTransferred) { //only transfer at most how much you're making
+                amountTransferred = thePlanet.vPopD;
+            }
+        }
+        thePlanet[theList[theCell.option]] = round5(thePlanet[theList[theCell.option]] - amountTransferred);
+        targetPlanet[theList[theCell.option]] = round5(targetPlanet[theList[theCell.option]] + amountTransferred);
+    }
 }
 
 function handleMaterials(poweredCells, thePlanet) {
@@ -86,7 +120,6 @@ function setWorkers(poweredCells, thePlanet) {
     if(thePlanet.pop < 2 && thePlanet.popTotal) { //initial
         houseGain = 2;
     }
-    thePlanet.popD = houseGain;
     let vPopGain = thePlanet.pop / 1000 - houseGain;
     thePlanet.pop = round7(thePlanet.pop + houseGain);
 
@@ -139,7 +172,11 @@ function handlePower(thePlanet) {
             if(theCell.type === "solarPanel") {
                 powerGain += info[theCell.type].gain[theCell.mark];
             } else if(theCell.isOn && theCell.type && theCell.type !== "ore") {
-                powerReq += info[theCell.type].power[theCell.mark];
+                if(theCell.type === "quantumTransport") {
+                    powerReq += getPowerForQTrans(thePlanet, 0, theCell.option2);
+                } else {
+                    powerReq += info[theCell.type].power[theCell.mark];
+                }
                 poweredCells[theCell.type].push(theCell);
             }
         }
@@ -254,9 +291,15 @@ function buyBuilding(type) {
     }
 
     theCell.type = type;
-    theCell.isOn = true;
+    theCell.isOn = theCell.type !== "quantumTransport"; //only qTrans starts off
     if(info[theCell.type].optionText) {
         theCell.option = 0;
+    }
+    if(info[theCell.type].optionText2) {
+        theCell.option2 = 0;
+    }
+    if(theCell.type === "radioTelescope") {
+        thePlanet.hasRadio = true;
     }
 
     handlePower(thePlanet);
@@ -338,6 +381,22 @@ function sellBuilding() {
             }
         }
     }
+    if(theCell.type === "radioTelescope") { //check if that's the last radio telescope
+        let foundAnotherRadio = false;
+        for(let col = 0; col < thePlanet.grid.length; col++) {
+            for (let row = 0; row < thePlanet.grid[col].length; row++) {
+                if(col === data.selectedCol && row === data.selectedRow) { //about to sell this one
+                    continue;
+                }
+                let theCell = thePlanet.grid[col][row];
+                if(theCell.type === "radioTelescope") {
+                    foundAnotherRadio = true;
+                }
+            }
+        }
+        thePlanet.hasRadio = foundAnotherRadio;
+    }
+
     let oreCost = 0;
     let elecCost = 0;
     let panelCost = 0;
@@ -359,6 +418,8 @@ function sellBuilding() {
     theCell.isOn = true;
     theCell.power = 0;
     theCell.mark = 0;
+    delete theCell.option; //smaller save file
+    delete theCell.option2;
 
     handlePower(thePlanet);
     view.selectCell(data.selectedCol, data.selectedRow);
@@ -367,9 +428,42 @@ function sellBuilding() {
     view.updateResourcesDisplays();
 }
 
+function getPowerForQTrans(thePlanet, targetSystem, targetPlanet) {
+    let distanceD = Math.abs(thePlanet.distance - data.systems[targetSystem].planets[targetPlanet].distance);
+    if(distanceD === 0) { //target same planet it's on
+        return 0;
+    }
+    return  distanceD * 50 + 100;
+}
+
 function pauseBuilding() {
     let thePlanet = data.systems[data.curSystem].planets[data.curPlanet];
+    if(data.selectedRow == null || data.selectedCol == null) { //press hotkey when nothing selected
+        return;
+    }
     let theCell = thePlanet.grid[data.selectedCol][data.selectedRow];
+    if(!theCell.type || theCell.type === "ore" || !info[theCell.type].pausable) { //press hotkey when nothing selected
+        return;
+    }
+
+    let powerToUnpause = 0;
+    if(theCell.type !== "quantumTransport") {
+        powerToUnpause = info[theCell.type].power[theCell.mark];
+    } else {
+        if(data.curPlanet === theCell.option2) {
+            addErrorMessage("The Quantum Transport is trying to transport to this planet! Change to a different one.");
+            view.createErrorMessages();
+            return;
+        }
+        powerToUnpause = getPowerForQTrans(thePlanet, 0, theCell.option2);
+    }
+
+    if(!theCell.isOn && powerToUnpause > (thePlanet.powerGain - thePlanet.powerReq)) {
+        addErrorMessage("Unpausing this " +info[theCell.type].title+ " will crash the power grid! Need " + (powerToUnpause - (thePlanet.powerGain - thePlanet.powerReq)) + " to unpause.");
+        view.createErrorMessages();
+        return;
+    }
+
     if( theCell.type !== "" || theCell.type !== "ore" && info[theCell.type].pausable) {
         theCell.isOn = !theCell.isOn;
     }
@@ -388,24 +482,47 @@ function closeError(i) {
 
 function selectOption(num) {
     let thePlanet = data.systems[data.curSystem].planets[data.curPlanet];
-    if(data.selectedRow == null || data.selectedCol == null || !document.getElementById("option0")) { //press hotkey when nothing selected
+    if(data.selectedRow == null || data.selectedCol == null || num === undefined || num === null || !document.getElementById("option" + num)) { //press hotkey when nothing selected
         return;
     }
     let theCell = thePlanet.grid[data.selectedCol][data.selectedRow];
 
-
     theCell.option = num;
 
-    if(document.getElementById("option0").classList.contains("pressedSelectOption")) {
-        document.getElementById("option0").classList.add("selectOption");
-        document.getElementById("option0").classList.remove("pressedSelectOption");
-    }
-    if(document.getElementById("option1").classList.contains("pressedSelectOption")) {
-        document.getElementById("option1").classList.add("selectOption");
-        document.getElementById("option1").classList.remove("pressedSelectOption");
+    for(let i = 0; i < 5; i++) {
+        if(document.getElementById("option"+i) && document.getElementById("option"+i).classList.contains("pressedSelectOption")) {
+            document.getElementById("option"+i).classList.add("selectOption");
+            document.getElementById("option"+i).classList.remove("pressedSelectOption");
+        }
     }
 
     let selected = document.getElementById("option"+num);
+    selected.classList.add("pressedSelectOption");
+    selected.classList.remove("selectOption");
+    view.updatePlanetGridCell(data.selectedCol, data.selectedRow);
+}
+
+function selectTargetOption(num) {
+    let thePlanet = data.systems[data.curSystem].planets[data.curPlanet];
+    if(data.selectedRow == null || data.selectedCol == null || num === undefined || num === null || !document.getElementById("targetOption" + num)) { //press hotkey when nothing selected
+        return;
+    }
+    let theCell = thePlanet.grid[data.selectedCol][data.selectedRow];
+
+    if(theCell.option2 !== num) { //don't disable if you clicked the same one
+        theCell.isOn = false;
+    }
+    theCell.option2 = num;
+    document.getElementById("qTransPower").innerHTML = getPowerForQTrans(thePlanet, 0, theCell.option2);
+
+    for(let i = 0; i < 4; i++) {
+        if(document.getElementById("targetOption"+i) && document.getElementById("targetOption"+i).classList.contains("pressedSelectOption")) {
+            document.getElementById("targetOption"+i).classList.add("selectOption");
+            document.getElementById("targetOption"+i).classList.remove("pressedSelectOption");
+        }
+    }
+
+    let selected = document.getElementById("targetOption"+num);
     selected.classList.add("pressedSelectOption");
     selected.classList.remove("selectOption");
     view.updatePlanetGridCell(data.selectedCol, data.selectedRow);
@@ -485,6 +602,9 @@ function gridKeyPress(colD, rowD) {
 }
 
 function changePlanet(num) {
+    if(!data.research.unlock[2] || !data.systems[data.curSystem].planets[num]) {
+        return;
+    }
     data.curPlanet = num;
     data.selectedRow = null;
     data.selectedCol = null;

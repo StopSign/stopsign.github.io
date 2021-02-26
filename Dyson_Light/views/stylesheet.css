@@ -259,7 +259,7 @@ input {
 }
 .displayNum {
     position:absolute;
-    bottom:-1px;
+    top:-1px;
     right:1px;
 }
 .displayOption {
@@ -282,8 +282,8 @@ input {
 
 
 .selectOption {
-    padding: 20px 5px;
-    min-width:100px;
+    padding: 15px 5px;
+    min-width:90px;
     text-align: center;
     vertical-align:center;
     cursor: pointer;
@@ -295,6 +295,7 @@ input {
     box-shadow: 0 3px #999;
     transform: translateY(-2px);
     margin-bottom:2px;
+    font-size:12px;
 }
 
 .selectOption:hover {
@@ -309,8 +310,8 @@ input {
 }
 
 .pressedSelectOption {
-    padding: 20px 5px;
-    min-width:100px;
+    padding: 15px 5px;
+    min-width:90px;
     text-align: center;
     vertical-align:center;
     cursor: pointer;
@@ -322,6 +323,7 @@ input {
     background-color: #3e8e41;
     box-shadow: 0 1px #666;
     transform: translateY(0px);
+    font-size:12px;
 }
 .pressedSelectOption.active {
     background-color: #357937;

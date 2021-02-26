@@ -7,9 +7,9 @@ document.addEventListener("keydown", function(e) {
 
 function processKeyQueue() {
     let key = myKeyQueue[0].key;
-    // var shift = myKeyQueue[0].shift;
+    let shift = myKeyQueue[0].shift;
     myKeyQueue.splice(0, 1);
-    //console.log(key);
+    //console.log(key, shift);
     if(key === 80) { //p
         buyBuilding('solarPanel');
     }
@@ -44,10 +44,39 @@ function processKeyQueue() {
         upgradeBuilding();
     }
     if(key === 49) { //1
-        selectOption(0);
+        if(shift) {
+            changePlanet(0);
+        } else {
+            selectOption(0);
+        }
     }
     if(key === 50) { //2
-        selectOption(1);
+        if(shift) {
+            changePlanet(1);
+        } else {
+            selectOption(1);
+        }
+    }
+    if(key === 51) { //3
+        if(shift) {
+            changePlanet(2);
+        } else {
+            selectOption(2);
+        }
+    }
+    if(key === 52) { //4
+        if(shift) {
+            changePlanet(3);
+        } else {
+            selectOption(3);
+        }
+    }
+    if(key === 53) { //5
+        if(shift) {
+            changePlanet(4);
+        } else {
+            selectOption(4);
+        }
     }
     if(key === 32) { //space
         pauseBuilding();

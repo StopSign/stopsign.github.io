@@ -141,6 +141,9 @@ let view = {
         if(document.getElementById("option0")) {
             selectOption(theCell.option);
         }
+        if(document.getElementById("targetOption0")) {
+            selectTargetOption(theCell.option2);
+        }
     },
     updatePlanetGridCell: function(col, row) { //only for updating the num & border
         let theCell = data.systems[data.curSystem].planets[data.curPlanet].grid[col][row];
@@ -158,7 +161,8 @@ let view = {
             document.getElementById("cellcol" + col + "row" + row).style.border = 'solid 1px black';
         }
 
-        document.getElementById("optioncol" + col + "row" + row).innerHTML = (theCell.type && info[theCell.type] && info[theCell.type].optionText) ? info[theCell.type].optionText[theCell.option] : "";
+        document.getElementById("optioncol" + col + "row" + row).innerHTML = ((theCell.type && info[theCell.type] && info[theCell.type].optionText) ? info[theCell.type].optionText[theCell.option] : "")
+            + ((theCell.type && info[theCell.type] && info[theCell.type].optionText2) ? ">"+info[theCell.type].optionText2[theCell.option2] : "");
         document.getElementById("textcol" + col + "row" + row).innerHTML = theCell.mark > 0 ? (theCell.mark+1) : "";
     },
     changePlanetGridCell: function(col, row) { //for changing the image

@@ -29,6 +29,7 @@ function addPlanet(solarSystemNum, gridWidth, gridHeight, oreNum, distance) {
         labWorker:0,
         quantumTransportWorker:0,
         launchPadWorker:0,
+        hasRadio:false,
         autoWorker:"",
         grid:[],
         distance:distance
@@ -41,8 +42,7 @@ function addPlanet(solarSystemNum, gridWidth, gridHeight, oreNum, distance) {
                 isOn:true,
                 type:"",
                 text:"",
-                mark:0,
-                option:null
+                mark:0
             };
             newPlanet.grid[width][height] = cellContents;
         }
