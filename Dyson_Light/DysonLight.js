@@ -281,6 +281,11 @@ function buyBuilding(type) {
     || type === "launchPad" && !data.research.unlock[4]) {
         return;
     }
+    if(theCell.type === "ore" && (thePlanet.ore === 0 && thePlanet.electronics === 0 && thePlanet.panels === 0 && thePlanet.sails === 0)) {
+        addErrorMessage("Can't start mining until the planet is connected to a Quantum Transport! Send any resource to this planet and you can start mining.");
+        view.createErrorMessages();
+        return;
+    }
 
     let oreCost = info[type].oreCost[theCell.mark];
     let elecCost = info[type].electronicCost[theCell.mark];
@@ -433,7 +438,7 @@ function getPowerForQTrans(thePlanet, targetSystem, targetPlanet) {
     if(distanceD === 0) { //target same planet it's on
         return 0;
     }
-    return  distanceD * 50 + 100;
+    return  distanceD * 100 + 50;
 }
 
 function pauseBuilding() {
@@ -514,6 +519,7 @@ function selectTargetOption(num) {
     }
     theCell.option2 = num;
     document.getElementById("qTransPower").innerHTML = getPowerForQTrans(thePlanet, 0, theCell.option2);
+    document.getElementById("qTransDistance").innerHTML = Math.abs(thePlanet.distance - data.systems[0].planets[theCell.option2].distance)+"";
 
     for(let i = 0; i < 4; i++) {
         if(document.getElementById("targetOption"+i) && document.getElementById("targetOption"+i).classList.contains("pressedSelectOption")) {

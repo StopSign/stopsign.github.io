@@ -238,7 +238,7 @@ let info = {
             "<div class='selectOption' id='targetOption1' onclick='selectTargetOption(1)'>Planet 2</div><br>"+
             "<div class='selectOption' id='targetOption2' onclick='selectTargetOption(2)'>Planet 3</div>"+
             "<div class='selectOption' id='targetOption3' onclick='selectTargetOption(3)'>Planet 4</div><br>"+
-            "<div>Costs <div id='qTransPower' class='bold'></div> power to send.<br>Turns off when you switch planets.</div>",
+            "<div>Costs <div id='qTransPower' class='bold'></div> power to send resources a distance of <div id='qTransDistance' class='bold'></div><br>Turns off when you switch planets.</div>",
         optionText:["O", "E", "SP", "VP", "SS"],
         optionText2:["P1","P2","P3","P4"],
         pausable:true,

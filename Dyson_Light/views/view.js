@@ -64,6 +64,8 @@ let view = {
                 view.updatePlanetGridCell(col, row);
             }
         }
+
+        document.getElementById("distance").innerHTML = data.systems[data.curSystem].planets[data.curPlanet].distance;
     },
     selectCell(col, row) { //displaying options
         if(col == null || row == null) {
@@ -202,6 +204,7 @@ let view = {
         document.getElementById("vPopDiv").style.display = data.research.unlock[1] ? "inline-block" : "none";
         document.getElementById("planetZone").style.display = data.research.unlock[2] ? "inline-block" : "none";
         document.getElementById("workingquantumTransport").style.display = data.research.unlock[2] ? "inline-block" : "none";
+        document.getElementById("distanceDiv").style.display = data.research.unlock[2] ? "inline-block" : "none";
         document.getElementById("workinglaunchPad").style.display = data.research.unlock[4] ? "inline-block" : "none";
         document.getElementById("sailsDiv").style.display = data.research.unlock[4] ? "inline-block" : "none";
         document.getElementById("sunZone").style.display = data.research.unlock[4] ? "inline-block" : "none";
