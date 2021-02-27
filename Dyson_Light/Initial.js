@@ -2,7 +2,13 @@ function addPlanet(solarSystemNum, gridWidth, gridHeight, oreNum, distance) {
     if(data.systems.length <= solarSystemNum) {
         let system = {
             planets:[],
-            dyson:[]
+            sailsFromPlanet:[],
+            sailsInOrbit:[],
+            sailsFromSun:[],
+            dyson:[],
+            powerReq:0,
+            powerGain:0,
+            progress:0
         };
         data.systems.push(system);
     }
@@ -22,6 +28,7 @@ function addPlanet(solarSystemNum, gridWidth, gridHeight, oreNum, distance) {
         panelsD:0,
         sails:0,
         sailsD:0,
+        launching:0,
         powerReq:0,
         powerGain:0,
         mineWorker:0,
@@ -42,7 +49,8 @@ function addPlanet(solarSystemNum, gridWidth, gridHeight, oreNum, distance) {
                 isOn:true,
                 type:"",
                 text:"",
-                mark:0
+                mark:0,
+                isOre:false
             };
             newPlanet.grid[width][height] = cellContents;
         }
@@ -53,6 +61,7 @@ function addPlanet(solarSystemNum, gridWidth, gridHeight, oreNum, distance) {
         let randY = (Math.random()*gridHeight)|0;
         if(newPlanet.grid[randX][randY].type !== "ore") {
             newPlanet.grid[randX][randY].type = "ore";
+            newPlanet.grid[randX][randY].isOre = true;
             orePlaced++;
         }
     }

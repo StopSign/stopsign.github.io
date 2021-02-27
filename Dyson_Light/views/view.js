@@ -1,4 +1,4 @@
-
+let sailIdPool = [];
 let view = {
     initialize: function() {
         view.createPlanets();
@@ -10,19 +10,21 @@ let view = {
     },
     update: function() {
         view.updateResourcesDisplays();
+        view.updateSailMovement();
     },
     updateResourcesDisplays: function() {
         document.getElementById("science").innerHTML = data.science;
 
-        let thePlanet = data.systems[data.curSystem].planets[data.curPlanet];
+        let theSystem = data.systems[data.curSystem];
+        let thePlanet = theSystem.planets[data.curPlanet];
         document.getElementById("workers").innerHTML = thePlanet.workers;
         document.getElementById("workersTotal").innerHTML = Math.floor(thePlanet.pop + thePlanet.vPop + .0000001);
         document.getElementById("pop").innerHTML = intToString(thePlanet.pop);
         document.getElementById("popDelta").innerHTML = intToStringNegative(thePlanet.popD, 5);
-        document.getElementById("popTotal").innerHTML = intToString(thePlanet.popTotal);
+        document.getElementById("popTotal").innerHTML = intToString(thePlanet.popTotal, 1);
         document.getElementById("vPop").innerHTML = intToString(thePlanet.vPop);
         document.getElementById("vPopDelta").innerHTML = intToStringNegative(thePlanet.vPopD);
-        document.getElementById("vPopTotal").innerHTML = intToString(thePlanet.vPopTotal);
+        document.getElementById("vPopTotal").innerHTML = intToString(thePlanet.vPopTotal, 1);
         document.getElementById("ore").innerHTML = intToString(thePlanet.ore);
         document.getElementById("oreDelta").innerHTML = intToStringNegative(thePlanet.oreD);
         document.getElementById("electronics").innerHTML = intToString(thePlanet.electronics);
@@ -30,11 +32,56 @@ let view = {
         document.getElementById("panels").innerHTML = intToString(thePlanet.panels);
         document.getElementById("panelsDelta").innerHTML = intToStringNegative(thePlanet.panelsD);
         document.getElementById("sails").innerHTML = intToString(thePlanet.sails);
-        document.getElementById("sailsDelta").innerHTML = intToStringNegative(thePlanet.sailsD);
+        document.getElementById("sailsDelta").innerHTML = intToStringNegative(thePlanet.sailsD, 4);
         document.getElementById("science").innerHTML = intToString(data.science);
         document.getElementById("scienceDelta").innerHTML = intToStringNegative(data.scienceD);
         document.getElementById("electricityUsed").innerHTML = thePlanet.powerReq;
         document.getElementById("electricityGain").innerHTML = thePlanet.powerGain;
+
+        //sun zone
+        document.getElementById("sunZonePercent").innerHTML = theSystem.progress;
+        document.getElementById("sunZonePowerReq").innerHTML = theSystem.powerReq;
+        document.getElementById("sunZonePowerGain").innerHTML = theSystem.powerGain;
+        view.updateSailMovement();
+    },
+    updateSailMovement: function() {
+        let theSystem = data.systems[data.curSystem];
+
+        for(let i = 0; i < sailIdPool.length; i++) {
+            let sailDiv = document.getElementById("sail"+sailIdPool[i]);
+            if(sailDiv && sailDiv.style.display === "") {
+                sailDiv.style.display = "none";
+            }
+        }
+
+
+        //loop through all sails that exist
+        //match their IDs to the data
+        //set their new left/top to data's x/y
+        for(let i = 0; i < theSystem.sailsFromPlanet.length; i++) {
+            let theSail = theSystem.sailsFromPlanet[i];
+            let sailDiv = document.getElementById("sail"+theSail.id);
+            if(!sailDiv) {
+                let elem = document.createElement("div");
+                elem.style.position = "absolute";
+                elem.style.left = theSail.curX+"px";
+                elem.style.top = theSail.curY+"px";
+                elem.classList.add("solarSail");
+                elem.id = "sail" + theSail.id;
+                document.getElementById("sailsFromPlanetDiv").appendChild(elem);
+            } else {
+                sailDiv.style.left = theSail.curX + "px";
+                sailDiv.style.top = theSail.curY + "px";
+                if(sailDiv && sailDiv.style.display === "none") { //reveal it if it came from the pool
+                    sailDiv.style.display = "";
+                }
+            }
+        }
+
+        // sailsFromCell:[],
+        //     sailsFromPlanet:[],
+        //     sailsInOrbit:[],
+        //     sailsFromSun:[],
     },
     changePlanets: function() { //initializes solar system, planet grid
         let planetGrid = data.systems[data.curSystem].planets[data.curPlanet].grid;

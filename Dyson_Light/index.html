@@ -39,17 +39,24 @@
             <div id="workingquantumTransport"><div class="button" onclick="changeWorker('quantumTransportWorker', true)">+</div><div class="button" onclick="changeWorker('quantumTransportWorker', false)">-</div><div class="button" onclick="autoWorker('quantumTransport')" id="quantumTransportAuto">auto</div> <div class="bold" id="quantumTransportWorker">5</div> Working at Q. Transport</div><br>
             <div id="workinglaunchPad"><div class="button" onclick="changeWorker('launchPadWorker', true)">+</div><div class="button" onclick="changeWorker('launchPadWorker', false)">-</div><div class="button" onclick="autoWorker('launchPad')" id="launchPadAuto">auto</div> <div class="bold" id="launchPadWorker">5</div> Working at Launch Pad</div><br>
         </div>
-        <div id="research" style="vertical-align: top;width:280px;height:250px;border:1px solid;padding:10px;font-size:15px;text-align:left;overflow-y:auto;">
+        <div id="research" style="vertical-align: top;width:280px;height:254px;border:1px solid;padding:10px;font-size:15px;text-align:left;overflow-y:auto;">
             <div class="title">Research</div>
             <div class="resourceDiv" id="scienceDiv">Science: <div id="science" class="bold">5</div> (<div id="scienceDelta">+1</div>)</div>
             <div id="researchDivs" style="width:100%;"></div>
         </div>
     </div>
 
-    <div id="gridZone" style="width:500px;text-align:center;vertical-align:top;font-size:0">
+    <div id="gridZone" style="width:500px;text-align:center;vertical-align:top;font-size:0;position:relative">
         <div id="buildingZone" style="vertical-align: top;position:relative;font-size:14px;font-weight:bold;"></div>
-        <div id="planetZone" style="margin-top:400px;height:120px;width:100%;background-color:black;"></div>
-        <div id="sunZone" style="margin-top:520px;height:119px;width:100%;background-color:black;"></div>
+        <div id="planetZone" style="position:relative;top:400px;height:120px;width:100%;background-color:black;"></div>
+        <div id="sunZone" style="position:absolute;top:520px;left:0;height:120px;width:100%;background-color:black;cursor:pointer;overflow:hidden;">
+            <div id="sunZoneDrawing" style="width:800px;height:800px;background-color:yellow;border-radius:50%;"></div>
+            <div id="sunZoneInfo" style="position:absolute;right:10px;bottom:5px;font-size:14px;text-align:right">
+                Dyson Sphere progress: <div id="sunZonePercent" class="bold">10</div>%<br>
+                Electricity: <div id="sunZonePowerReq" class="bold">50</div> / <div id="sunZonePowerGain">250</div>
+            </div>
+        </div>
+        <div id="sailsFromPlanetDiv" style="position:absolute;top:0;left:0"></div>
     </div>
 
     <div id="selectionOptions" style="vertical-align: top;width:300px;">

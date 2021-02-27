@@ -341,3 +341,8 @@ input {
     cursor:pointer;
     margin: 20px 10px 0 10px;
 }
+.solarSail {
+    width:3px;
+    height:3px;
+    background-color: yellow;
+}

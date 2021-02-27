@@ -41,6 +41,104 @@ function secondTick() {
     data.scienceD = round5(data.science - science1);
 }
 
+function quickTick() {
+    for(let i = 0; i < data.systems.length; i++) {
+        handleSailMovement(data.systems[i]);
+    }
+    // stop = 1;
+}
+
+function handleSailMovement(theSystem) {
+
+
+    //     sailsFromPlanet:[],
+    //     sailsInOrbit:[],
+    //     sailsFromSun:[],
+    //     dyson:[],
+    for(let i = 0; i < theSystem.planets.length; i++) {
+        moveSails(theSystem);
+        handleNewSails(theSystem, i);
+    }
+
+}
+
+function moveSails(theSystem) {
+    for(let i = theSystem.sailsFromPlanet.length - 1; i >= 0; i--) {
+        let sailObj = theSystem.sailsFromPlanet[i];
+
+        sailTravel(sailObj, .1);
+
+        if(withinDistance(sailObj.curX, sailObj.curY, sailObj.targetX, sailObj.targetY, 3)) {
+            sailIdPool.push(sailObj.id);
+            theSystem.sailsFromPlanet.splice(i, 1)
+        }
+    }
+}
+
+function sailTravel(sailObj, speed) {
+    let magnitude = speed;
+    let extraTurn = 0;
+    let firstVC = sailObj.targetY - sailObj.curY;
+    let secondVC = sailObj.targetX - sailObj.curX;
+    if((firstVC >= 0 && secondVC < 0) || (firstVC < 0 && secondVC < 0)) {
+        extraTurn = Math.PI;
+    }
+    let direction = Math.atan(firstVC/secondVC)+extraTurn; //(y2-y1)/(x2-x1)
+    sailObj.curX = sailObj.curX + magnitude * Math.cos(direction); //||v||cos(theta)
+    sailObj.curY = sailObj.curY + magnitude * Math.sin(direction);
+}
+
+function handleNewSails(theSystem, planetNum) {
+    let thePlanet = theSystem.planets[planetNum];
+
+    if (thePlanet.launching < 1) {
+        return;
+    }
+    thePlanet.launching--;
+
+    let newId = data.sailId;
+    if(sailIdPool.length) {
+        newId = sailIdPool[0];
+        sailIdPool.splice(0, 1);
+    } else {
+        data.sailId++;
+    }
+    let sailObj = {
+        id:newId,
+        targetX:0, //bottom left corner
+        targetY:640
+    };
+    let launchFromPlanet = planetNum !== data.curPlanet;
+    if(planetNum === data.curPlanet) {
+        let validLaunchPads = [];
+        let xMod = (500 - Number(document.getElementById("buildingZone").style.width.substring(0, 3))) / 2;
+        for(let col = 0; col < thePlanet.grid.length; col++) {
+            for (let row = 0; row < thePlanet.grid[col].length; row++) {
+                let theCell = thePlanet.grid[col][row];
+                if(theCell.type === "launchPad" && theCell.isOn && theCell.option === 1) {
+                    validLaunchPads.push({
+                        cell:theCell,
+                        x:col * 50 + xMod + 25,
+                        y:row * 50 + 25
+                    });
+                }
+            }
+        }
+        if(!validLaunchPads.length) { //launch pad deleted?
+            launchFromPlanet = true;
+        } else {
+            let chosenLaunchPad = validLaunchPads[(Math.random() * validLaunchPads.length) | 0];
+            sailObj.curX = chosenLaunchPad.x;
+            sailObj.curY = chosenLaunchPad.y;
+        }
+    }
+    if(launchFromPlanet) {
+        sailObj.curX = planetNum * 120 + 70;
+        sailObj.curY = 460;
+    }
+    theSystem.sailsFromPlanet.push(sailObj);
+}
+
 function tickPlanetResources(systemNum, planetNum) {
     let thePlanet = data.systems[systemNum].planets[planetNum];
 
@@ -104,6 +202,28 @@ function handleMaterials(poweredCells, thePlanet) {
             }
             thePlanet.electronics = round5(thePlanet.electronics - elecUsed);
             thePlanet.panels = round5(thePlanet.panels + elecUsed / 2);
+        }
+    }
+
+    for(let i = 0; i < poweredCells.launchPad.length; i++) {
+        if(poweredCells.launchPad[i].option === 0) { //convert panels to sails
+            let panelsUsed = info.launchPad.gain[poweredCells.launchPad[i].mark] * 100 * (1 + thePlanet.launchPadWorker/20);
+            if(panelsUsed > thePlanet.panels) {
+                panelsUsed = thePlanet.panels;
+            }
+            thePlanet.panels = round5(thePlanet.panels - panelsUsed);
+            thePlanet.sails = round5(thePlanet.sails + panelsUsed / 100);
+        }
+    }
+
+    for(let i = 0; i < poweredCells.launchPad.length; i++) {
+        if(poweredCells.launchPad[i].option === 1) { //launch sails
+            let sailsUsed = info.launchPad.gain2[poweredCells.launchPad[i].mark] * (1 + thePlanet.launchPadWorker/20);
+            if(sailsUsed > thePlanet.sails) {
+                sailsUsed = thePlanet.sails;
+            }
+            thePlanet.sails = round5(thePlanet.sails - sailsUsed);
+            thePlanet.launching = round5(thePlanet.launching + sailsUsed);
         }
     }
 }
@@ -286,6 +406,17 @@ function buyBuilding(type) {
         view.createErrorMessages();
         return;
     }
+    if(type === "server") {
+        for(let col = 0; col < thePlanet.grid.length; col++) {
+            for (let row = 0; row < thePlanet.grid[col].length; row++) {
+                let theCell2 = thePlanet.grid[col][row];
+                if(theCell2.type === "server") {
+                    addErrorMessage("Cannot build another server - only 1 server allowed per planet!");
+                    return;
+                }
+            }
+        }
+    }
 
     let oreCost = info[type].oreCost[theCell.mark];
     let elecCost = info[type].electronicCost[theCell.mark];
@@ -303,7 +434,7 @@ function buyBuilding(type) {
     if(info[theCell.type].optionText2) {
         theCell.option2 = 0;
     }
-    if(theCell.type === "radioTelescope") {
+    if(theCell.type === "radioTelescope" && theCell.option === 0) {
         thePlanet.hasRadio = true;
     }
 
@@ -393,8 +524,8 @@ function sellBuilding() {
                 if(col === data.selectedCol && row === data.selectedRow) { //about to sell this one
                     continue;
                 }
-                let theCell = thePlanet.grid[col][row];
-                if(theCell.type === "radioTelescope") {
+                let theCell2 = thePlanet.grid[col][row];
+                if(theCell2.type === "radioTelescope" && theCell2.option === 0) {
                     foundAnotherRadio = true;
                 }
             }
@@ -419,7 +550,7 @@ function sellBuilding() {
     thePlanet.electronics += elecCost;
     thePlanet.panels += panelCost;
 
-    theCell.type = theCell.type === "mine" ? "ore" : "";
+    theCell.type = theCell.isOre ? "ore" : "";
     theCell.isOn = true;
     theCell.power = 0;
     theCell.mark = 0;
@@ -499,6 +630,19 @@ function selectOption(num) {
             document.getElementById("option"+i).classList.add("selectOption");
             document.getElementById("option"+i).classList.remove("pressedSelectOption");
         }
+    }
+
+    if(theCell.type === "radioTelescope") { //check if there's a good radio telescope
+        let foundRadio = false;
+        for(let col = 0; col < thePlanet.grid.length; col++) {
+            for (let row = 0; row < thePlanet.grid[col].length; row++) {
+                let theCell = thePlanet.grid[col][row];
+                if(theCell.type === "radioTelescope" && theCell.option === 0) {
+                    foundRadio = true;
+                }
+            }
+        }
+        thePlanet.hasRadio = foundRadio;
     }
 
     let selected = document.getElementById("option"+num);

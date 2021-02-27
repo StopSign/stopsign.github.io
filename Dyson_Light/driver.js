@@ -39,6 +39,7 @@ function tick() {
             tickCounter = 1;
             secondTick();
         }
+        quickTick();
 
         didSomething = true;
         if(gameTicksLeft > 2000) {

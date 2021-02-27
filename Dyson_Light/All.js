@@ -6,6 +6,7 @@ let data = {
     selectedRow:null,
     science:0,
     scienceD:0,
+    sailId: 0,
     research:{
         unlock:[],
         mine:[],
@@ -17,7 +18,7 @@ let data = {
         quantumTransport:[],
         radioTelescope:[],
         launchPad:[]
-    }
+    },
 };
 
 
@@ -215,7 +216,7 @@ let info = {
         gain:[1000],
         title:"Server",
         infoDiv:"Server",
-        extra:"Holds <div id='infoGain'></div> virtual people in it. Extra population growth becomes virtual people. Virtual people can be workers, but they don't contribute to population growth.",
+        extra:"Holds <div id='infoGain'></div> virtual people in it. Extra population growth becomes virtual people. Virtual people can be workers, but they don't contribute to population growth. Can only hold 1 server per planet.",
         pausable:false,
         buildTitle:"Build S(e)rver",
         buildDesc:"Costs 1k electronics and uses 50 electricity. Creates virtual population with all excess population growth. Holds 1k virtual population."
@@ -248,23 +249,30 @@ let info = {
     radioTelescope: {
         oreCost:[20000],
         electronicCost:[20000],
-        panelCost:[0],
-        power:[],
+        panelCost:[5000],
+        power:[0],
+        gain:[100],
         title:"Radio Telescope",
-        infoDiv:"",
-        extra:"",
-        pausable:true,
+        infoDiv:"Allows for virtual population to be sent to this planet via Quantum Transporters. Alternatively, can receive up to <div id='infoGain'></div> electricity from the Dyson Sphere.",
+        extra:"<div class='pressedSelectOption' id='option0' onclick='selectOption(0)'>Receive<br>Population (1)</div>" +
+            "<div class='selectOption' id='option1' onclick='selectOption(1)'>Receive<br>Power (2)</div>",
+        optionText:["VP", "E"],
+        pausable:false,
         buildTitle:"Build (R)adio Telescope",
-        buildDesc:"Costs 20k electronics, 20k ore. Can receive virtual population, or power from the Dyson Sphere."
+        buildDesc:"Costs 20k electronics, 20k ore, 5k solar panels. Can receive virtual population, or up to 100 power from the Dyson Sphere."
     },
     launchPad: {
         oreCost:[0],
         electronicCost:[100000],
         panelCost:[0],
-        power:[1000],
+        power:[100],
+        gain:[.01],
+        gain2:[.02],
         title:"Launch Pad",
-        infoDiv:"",
-        extra:"",
+        infoDiv:"Create <div id='infoGain'></div> solar sails using 100x the solar panels per second, or launch <div id='infoGain2'></div> solar sails per second to join the Dyson Sphere. The solar sails launch once the launch pad has used 1 solar sail, and once in place, they give 1 electricity to whoever can receive them.",
+        extra:"<div class='pressedSelectOption' id='option0' onclick='selectOption(0)'>Create<br>Solar Sails (1)</div>" +
+            "<div class='selectOption' id='option1' onclick='selectOption(1)'>Launch<br>Solar Sails (2)</div>",
+        optionText:["SS", "L"],
         pausable:true,
         buildTitle:"Build L(a)unch Pad",
         buildDesc:"Costs 100k electronics. Creates and launches solar sails from solar panels & ore."
