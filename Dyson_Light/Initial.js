@@ -5,11 +5,11 @@ function addPlanet(solarSystemNum, gridWidth, gridHeight, oreNum, distance) {
             sailsFromPlanet:[],
             sailsInOrbit:[],
             sailsFromSun:[],
-            dyson:[],
             powerReq:0,
             powerGain:0,
             progress:0
         };
+        initializeValidDysonPoints(system);
         data.systems.push(system);
     }
     let newPlanet = {
@@ -29,6 +29,7 @@ function addPlanet(solarSystemNum, gridWidth, gridHeight, oreNum, distance) {
         sails:0,
         sailsD:0,
         launching:0,
+        launchingD:0,
         powerReq:0,
         powerGain:0,
         mineWorker:0,

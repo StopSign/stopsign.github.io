@@ -16,7 +16,7 @@
 </head>
 <body id="theBody" oncontextmenu="return false;" style="padding:5px;text-align:center;height:600px;width:1200px;margin:auto;position:relative" class="medium">
 
-<div id="planetView">
+<div id="planetView" style="display:block">
     <div id="leftSideDivs" style="width:300px;">
         <div id="resources" style="vertical-align: top;width:280px;height:160px;border:1px solid;padding:10px;font-size:14px;text-align:left;">
             <div class="title">Planet Info</div>
@@ -28,6 +28,7 @@
             <div class="resourceDiv" id="popDiv" style="display:none;">Population: <div id="pop" class="bold">5</div> / <div id="popTotal" class="bold">5</div> (<div id="popDelta">+1</div>/s)</div>
             <div class="resourceDiv" id="vPopDiv" style="display:none;">V. Pop.: <div id="vPop" class="bold">5</div> / <div id="vPopTotal" class="bold">5</div> (<div id="vPopDelta">+1</div>/s)</div>
             <div class="resourceDiv" id="distanceDiv" style="display:none;">Distance from sun: <div id="distance" class="bold">1</div> AU</div>
+            <div class="resourceDiv" id="launchingDiv" style="display:none;">Launching: <div id="launching" class="bold">1</div> (<div id="launchingDelta">+1</div>/s)</div>
         </div>
         <div id="working" style="vertical-align: top;width:280px;height:160px;border:1px solid;padding:10px;font-size:14px;text-align:left;opacity:0">
             <div class="title">Workers</div>
@@ -49,7 +50,7 @@
     <div id="gridZone" style="width:500px;text-align:center;vertical-align:top;font-size:0;position:relative">
         <div id="buildingZone" style="vertical-align: top;position:relative;font-size:14px;font-weight:bold;"></div>
         <div id="planetZone" style="position:relative;top:400px;height:120px;width:100%;background-color:black;"></div>
-        <div id="sunZone" style="position:absolute;top:520px;left:0;height:120px;width:100%;background-color:black;cursor:pointer;overflow:hidden;">
+        <div id="sunZone" onclick="changeZone('sunView')" style="position:absolute;top:520px;left:0;height:120px;width:100%;background-color:black;cursor:pointer;overflow:hidden;">
             <div id="sunZoneDrawing" style="width:800px;height:800px;background-color:yellow;border-radius:50%;"></div>
             <div id="sunZoneInfo" style="position:absolute;right:10px;bottom:5px;font-size:14px;text-align:right">
                 Dyson Sphere progress: <div id="sunZonePercent" class="bold">10</div>%<br>
@@ -82,6 +83,14 @@
 
 </div>
 
+<div id="sunView" style="height:640px;width:1100px;background-color:black;display:none;text-align:left;position:relative;">
+    <div id="goBack" onclick="changeZone('planetView')" class="button" style="font-size:14px;position:absolute;left:0;top:0;">Planet View</div>
+    <div id="sunDrawing" style="width:600px;height:600px;background-color:yellow;border-radius:50%;top:20px;left:251px;position:absolute;"></div>
+    <canvas id="dysonDraw" style="position:absolute;top:20px;left:251px;" width="600" height="600"></canvas>
+    <div id="sailsInOrbitDiv" style="position:absolute;top:0;left:0"></div>
+    <div id="sailsFromSunDiv" style="position:absolute;top:0;left:0"></div>
+</div>
+
 </body>
 </html>
 <!--<div>Icons made by <a href="https://www.flaticon.com/authors/smashicons" title="Smashicons">Smashicons</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a></div>-->
@@ -94,6 +103,7 @@
 <script src="helpers/interval.js?1"></script>
 <script src="views/view.js?1"></script>
 <script src="DysonLight.js?1"></script>
+<script src="SailMovement.js?1"></script>
 <script src="Initial.js?1"></script>
 <script src="All.js?1"></script>
 <script>

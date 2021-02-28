@@ -4,7 +4,7 @@ function secondTick() {
     let science1 = data.science;
 
     //save pre-resources
-    let resourceList = ["ore", "electronics", "panels", "sails", "pop", "vPop"];
+    let resourceList = ["ore", "electronics", "panels", "sails", "pop", "vPop", "launching"];
     let deltaArray = [];
     for(let i = 0; i < data.systems.length; i++) {
         deltaArray[i] = [];
@@ -15,6 +15,7 @@ function secondTick() {
             }
         }
     }
+
 
     //change resources
     for(let i = 0; i < data.systems.length; i++) {
@@ -41,108 +42,10 @@ function secondTick() {
     data.scienceD = round5(data.science - science1);
 }
 
-function quickTick() {
-    for(let i = 0; i < data.systems.length; i++) {
-        handleSailMovement(data.systems[i]);
-    }
-    // stop = 1;
-}
-
-function handleSailMovement(theSystem) {
-
-
-    //     sailsFromPlanet:[],
-    //     sailsInOrbit:[],
-    //     sailsFromSun:[],
-    //     dyson:[],
-    for(let i = 0; i < theSystem.planets.length; i++) {
-        moveSails(theSystem);
-        handleNewSails(theSystem, i);
-    }
-
-}
-
-function moveSails(theSystem) {
-    for(let i = theSystem.sailsFromPlanet.length - 1; i >= 0; i--) {
-        let sailObj = theSystem.sailsFromPlanet[i];
-
-        sailTravel(sailObj, .1);
-
-        if(withinDistance(sailObj.curX, sailObj.curY, sailObj.targetX, sailObj.targetY, 3)) {
-            sailIdPool.push(sailObj.id);
-            theSystem.sailsFromPlanet.splice(i, 1)
-        }
-    }
-}
-
-function sailTravel(sailObj, speed) {
-    let magnitude = speed;
-    let extraTurn = 0;
-    let firstVC = sailObj.targetY - sailObj.curY;
-    let secondVC = sailObj.targetX - sailObj.curX;
-    if((firstVC >= 0 && secondVC < 0) || (firstVC < 0 && secondVC < 0)) {
-        extraTurn = Math.PI;
-    }
-    let direction = Math.atan(firstVC/secondVC)+extraTurn; //(y2-y1)/(x2-x1)
-    sailObj.curX = sailObj.curX + magnitude * Math.cos(direction); //||v||cos(theta)
-    sailObj.curY = sailObj.curY + magnitude * Math.sin(direction);
-}
-
-function handleNewSails(theSystem, planetNum) {
-    let thePlanet = theSystem.planets[planetNum];
-
-    if (thePlanet.launching < 1) {
-        return;
-    }
-    thePlanet.launching--;
-
-    let newId = data.sailId;
-    if(sailIdPool.length) {
-        newId = sailIdPool[0];
-        sailIdPool.splice(0, 1);
-    } else {
-        data.sailId++;
-    }
-    let sailObj = {
-        id:newId,
-        targetX:0, //bottom left corner
-        targetY:640
-    };
-    let launchFromPlanet = planetNum !== data.curPlanet;
-    if(planetNum === data.curPlanet) {
-        let validLaunchPads = [];
-        let xMod = (500 - Number(document.getElementById("buildingZone").style.width.substring(0, 3))) / 2;
-        for(let col = 0; col < thePlanet.grid.length; col++) {
-            for (let row = 0; row < thePlanet.grid[col].length; row++) {
-                let theCell = thePlanet.grid[col][row];
-                if(theCell.type === "launchPad" && theCell.isOn && theCell.option === 1) {
-                    validLaunchPads.push({
-                        cell:theCell,
-                        x:col * 50 + xMod + 25,
-                        y:row * 50 + 25
-                    });
-                }
-            }
-        }
-        if(!validLaunchPads.length) { //launch pad deleted?
-            launchFromPlanet = true;
-        } else {
-            let chosenLaunchPad = validLaunchPads[(Math.random() * validLaunchPads.length) | 0];
-            sailObj.curX = chosenLaunchPad.x;
-            sailObj.curY = chosenLaunchPad.y;
-        }
-    }
-    if(launchFromPlanet) {
-        sailObj.curX = planetNum * 120 + 70;
-        sailObj.curY = 460;
-    }
-    theSystem.sailsFromPlanet.push(sailObj);
-}
-
 function tickPlanetResources(systemNum, planetNum) {
     let thePlanet = data.systems[systemNum].planets[planetNum];
 
-    let poweredCells = handlePower(thePlanet);
+    let poweredCells = handlePower(planetNum, systemNum);
     if(poweredCells === undefined) { //error message
         return;
     }
@@ -270,7 +173,8 @@ function setWorkers(poweredCells, thePlanet) {
     }
 }
 
-function handlePower(thePlanet) {
+function handlePower(planetNum, systemNum) {
+    let thePlanet = data.systems[systemNum].planets[planetNum];
     let poweredCells = {
         ore:[],
         mine:[],
@@ -289,6 +193,9 @@ function handlePower(thePlanet) {
     for(let col = 0; col < thePlanet.grid.length; col++) {
         for(let row = 0; row < thePlanet.grid[col].length; row++) {
             let theCell = thePlanet.grid[col][row];
+            if(theCell.type === "radioTelescope") {
+                continue;
+            }
             if(theCell.type === "solarPanel") {
                 powerGain += info[theCell.type].gain[theCell.mark];
             } else if(theCell.isOn && theCell.type && theCell.type !== "ore") {
@@ -301,6 +208,29 @@ function handlePower(thePlanet) {
             }
         }
     }
+
+    let theSystem = data.systems[systemNum];
+    theSystem.powerReq = 0;
+    for(let i = 0; i < theSystem.planets.length; i++) {
+        let radioPlanet = theSystem.planets[i];
+        for(let col = 0; col < radioPlanet.grid.length; col++) {
+            for (let row = 0; row < radioPlanet.grid[col].length; row++) {
+                let theCell = radioPlanet.grid[col][row];
+                if(theCell.type !== "radioTelescope" || theCell.option !== 1) {
+                    continue;
+                }
+                let availableDysonPower = theSystem.powerGain - theSystem.powerReq;
+                if(availableDysonPower > info[theCell.type].gain[theCell.mark]) {
+                    availableDysonPower = info[theCell.type].gain[theCell.mark];
+                }
+                theSystem.powerReq += availableDysonPower;
+                if(planetNum === i) {
+                    powerGain += availableDysonPower;
+                }
+            }
+        }
+    }
+
 
     if(powerReq > powerGain && powerReq > 0) {
         errorMessages.push("Not enough power! You need "+(powerReq - powerGain)+" more. Shutting things off.");
@@ -373,7 +303,7 @@ function upgradeBuilding() {
 
     theCell.mark++;
 
-    handlePower(thePlanet);
+    handlePower(data.curPlanet, data.curSystem);
 
     view.updatePlanetGridCell(data.selectedCol, data.selectedRow);
     view.createBuildingInfo(theCell);
@@ -401,7 +331,7 @@ function buyBuilding(type) {
     || type === "launchPad" && !data.research.unlock[4]) {
         return;
     }
-    if(theCell.type === "ore" && (thePlanet.ore === 0 && thePlanet.electronics === 0 && thePlanet.panels === 0 && thePlanet.sails === 0)) {
+    if((data.curSystem !== 0 && data.curPlanet !== 0) || theCell.type === "ore" && (thePlanet.ore === 0 && thePlanet.electronics === 0 && thePlanet.panels === 0 && thePlanet.sails === 0)) {
         addErrorMessage("Can't start mining until the planet is connected to a Quantum Transport! Send any resource to this planet and you can start mining.");
         view.createErrorMessages();
         return;
@@ -438,7 +368,7 @@ function buyBuilding(type) {
         thePlanet.hasRadio = true;
     }
 
-    handlePower(thePlanet);
+    handlePower(data.curPlanet, data.curSystem);
 
     view.selectCell(data.selectedCol, data.selectedRow);
     view.updatePlanetGridCell(data.selectedCol, data.selectedRow);
@@ -517,7 +447,8 @@ function sellBuilding() {
             }
         }
     }
-    if(theCell.type === "radioTelescope") { //check if that's the last radio telescope
+    if(theCell.type === "radioTelescope") {
+        //check if that's the last radio telescope
         let foundAnotherRadio = false;
         for(let col = 0; col < thePlanet.grid.length; col++) {
             for (let row = 0; row < thePlanet.grid[col].length; row++) {
@@ -531,6 +462,12 @@ function sellBuilding() {
             }
         }
         thePlanet.hasRadio = foundAnotherRadio;
+
+        //reset power across planets
+        // data.systems[data.curSystem].powerReq = 0;
+        // for(let i = 0; i < data.systems[data.curSystem].planets.length; i++) {
+        //     handlePower(data.systems[data.curSystem].planets[i], data.systems[i]);
+        // }
     }
 
     let oreCost = 0;
@@ -557,7 +494,7 @@ function sellBuilding() {
     delete theCell.option; //smaller save file
     delete theCell.option2;
 
-    handlePower(thePlanet);
+    handlePower(data.curPlanet, data.curSystem);
     view.selectCell(data.selectedCol, data.selectedRow);
     view.updatePlanetGridCell(data.selectedCol, data.selectedRow);
     view.changePlanetGridCell(data.selectedCol, data.selectedRow);
@@ -764,4 +701,13 @@ function changePlanet(num) {
     view.updateResourcesDisplays();
     view.changeWorkers();
     view.selectCell(null, null);
+}
+
+function changeZone(zoneType) {
+    document.getElementById(zoneType).style.display = "block";
+    if(zoneType === "sunView") {
+        document.getElementById("planetView").style.display = "none";
+    } else {
+        document.getElementById("sunView").style.display = "none";
+    }
 }

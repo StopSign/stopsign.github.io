@@ -1,4 +1,5 @@
-let sailIdPool = [];
+let planetSailIdPool = [];
+let sunSailIdPool = [];
 let view = {
     initialize: function() {
         view.createPlanets();
@@ -7,6 +8,7 @@ let view = {
         view.createBuildOptions();
         view.updateResourcesDisplays();
         view.changeWorkers();
+        view.updateDysonSphere();
     },
     update: function() {
         view.updateResourcesDisplays();
@@ -33,13 +35,15 @@ let view = {
         document.getElementById("panelsDelta").innerHTML = intToStringNegative(thePlanet.panelsD);
         document.getElementById("sails").innerHTML = intToString(thePlanet.sails);
         document.getElementById("sailsDelta").innerHTML = intToStringNegative(thePlanet.sailsD, 4);
+        document.getElementById("launching").innerHTML = intToString(thePlanet.launching);
+        document.getElementById("launchingDelta").innerHTML = intToStringNegative(thePlanet.launchingD, 4);
         document.getElementById("science").innerHTML = intToString(data.science);
         document.getElementById("scienceDelta").innerHTML = intToStringNegative(data.scienceD);
         document.getElementById("electricityUsed").innerHTML = thePlanet.powerReq;
         document.getElementById("electricityGain").innerHTML = thePlanet.powerGain;
 
         //sun zone
-        document.getElementById("sunZonePercent").innerHTML = theSystem.progress;
+        document.getElementById("sunZonePercent").innerHTML = intToString(theSystem.powerGain / theSystem.totalDyson * 10, 4);
         document.getElementById("sunZonePowerReq").innerHTML = theSystem.powerReq;
         document.getElementById("sunZonePowerGain").innerHTML = theSystem.powerGain;
         view.updateSailMovement();
@@ -47,41 +51,122 @@ let view = {
     updateSailMovement: function() {
         let theSystem = data.systems[data.curSystem];
 
-        for(let i = 0; i < sailIdPool.length; i++) {
-            let sailDiv = document.getElementById("sail"+sailIdPool[i]);
-            if(sailDiv && sailDiv.style.display === "") {
+        if(document.getElementById("planetView").style.display === "block") { //only update when in planetView
+            for(let i = 0; i < planetSailIdPool.length; i++) {
+                let sailDiv = document.getElementById("sail"+planetSailIdPool[i]);
+                if(sailDiv && sailDiv.style.display === "") {
+                    sailDiv.style.display = "none";
+                }
+            }
+
+            //loop through all sails that exist
+            //match their IDs to the data
+            //set their new left/top to data's x/y
+            for(let i = 0; i < theSystem.sailsFromPlanet.length; i++) {
+                let theSail = theSystem.sailsFromPlanet[i];
+                let sailDiv = document.getElementById("sail"+theSail.id);
+                if(!sailDiv) {
+                    let elem = document.createElement("div");
+                    elem.style.position = "absolute";
+                    elem.style.left = theSail.curX+"px";
+                    elem.style.top = theSail.curY+"px";
+                    elem.classList.add("solarSail");
+                    elem.id = "sail" + theSail.id;
+                    document.getElementById("sailsFromPlanetDiv").appendChild(elem);
+                } else {
+                    sailDiv.style.left = theSail.curX + "px";
+                    sailDiv.style.top = theSail.curY + "px";
+                    if(sailDiv && sailDiv.style.display === "none") { //reveal it if it came from the pool
+                        sailDiv.style.display = "";
+                    }
+                }
+            }
+            return;
+        }
+
+        for(let i = 0; i < sunSailIdPool.length; i++) {
+            let sailDiv = document.getElementById("Ssail" + sunSailIdPool[i]);
+            if (sailDiv && sailDiv.style.display === "") {
+                //console.log("deleting sail id: " + sunSailIdPool[i]);
                 sailDiv.style.display = "none";
             }
         }
 
-
-        //loop through all sails that exist
-        //match their IDs to the data
-        //set their new left/top to data's x/y
-        for(let i = 0; i < theSystem.sailsFromPlanet.length; i++) {
-            let theSail = theSystem.sailsFromPlanet[i];
-            let sailDiv = document.getElementById("sail"+theSail.id);
+        for(let i = 0; i < theSystem.sailsInOrbit.length; i++) {
+            let theSail = theSystem.sailsInOrbit[i];
+            let sailDiv = document.getElementById("Ssail"+theSail.id);
             if(!sailDiv) {
                 let elem = document.createElement("div");
                 elem.style.position = "absolute";
                 elem.style.left = theSail.curX+"px";
                 elem.style.top = theSail.curY+"px";
                 elem.classList.add("solarSail");
-                elem.id = "sail" + theSail.id;
-                document.getElementById("sailsFromPlanetDiv").appendChild(elem);
+                elem.id = "Ssail" + theSail.id;
+                document.getElementById("sailsInOrbitDiv").appendChild(elem);
+                //console.log("adding new orbit sail: " + theSail.id);
             } else {
                 sailDiv.style.left = theSail.curX + "px";
                 sailDiv.style.top = theSail.curY + "px";
+                if(theSail.curX > 250 && theSail.curX < 850 && sailDiv.style.backgroundColor !== "blue") {
+                    sailDiv.style.backgroundColor = "blue";
+                } else if((theSail.curX <= 250 || theSail.curX >= 850) && sailDiv.style.backgroundColor === "blue") {
+                    sailDiv.style.backgroundColor = "yellow";
+                }
                 if(sailDiv && sailDiv.style.display === "none") { //reveal it if it came from the pool
                     sailDiv.style.display = "";
                 }
             }
         }
 
-        // sailsFromCell:[],
-        //     sailsFromPlanet:[],
+        for(let i = 0; i < theSystem.sailsFromSun.length; i++) {
+            let theSail = theSystem.sailsFromSun[i];
+            let sailDiv = document.getElementById("Ssail"+theSail.id);
+            if(!sailDiv) {
+                //console.log("adding a new sun sail: " + theSail.id);
+                let elem = document.createElement("div");
+                elem.style.position = "absolute";
+                elem.style.left = theSail.curX+"px";
+                elem.style.top = theSail.curY+"px";
+                elem.classList.add("solarSail");
+                elem.id = "Ssail" + theSail.id;
+                document.getElementById("sailsFromSunDiv").appendChild(elem);
+            } else {
+                sailDiv.style.left = theSail.curX + "px";
+                sailDiv.style.top = theSail.curY + "px";
+                if(theSail.curX > 250 && theSail.curX < 850 && sailDiv.style.backgroundColor !== "blue") {
+                    sailDiv.style.backgroundColor = "blue";
+                } else if((theSail.curX <= 250 || theSail.curX >= 850) && sailDiv.style.backgroundColor === "blue") {
+                    sailDiv.style.backgroundColor = "yellow";
+                }
+                if(sailDiv && sailDiv.style.display === "none") { //reveal it if it came from the pool
+                    sailDiv.style.display = "";
+                }
+            }
+        }
+
+
         //     sailsInOrbit:[],
         //     sailsFromSun:[],
+        //dyson:[]
+    },
+    updateDysonSphere:function() { //for onload or switching systems
+        let c = document.getElementById("dysonDraw");
+        let ctx = c.getContext("2d");
+        ctx.fillStyle = "#8c8c84";
+        let dyson = data.systems[data.curSystem].dysonPoints;
+        for(let col = 0; col < dyson.length; col++) {
+            for(let row = 0; row < dyson[0].length; row++) {
+                if(dyson[col][row] === 2) {
+                    ctx.fillRect(col * 3, row * 3, 3, 3); //x, y, x2, y2
+                }
+            }
+        }
+    },
+    addDysonSpherePoint: function(col, row) {
+        let c = document.getElementById("dysonDraw");
+        let ctx = c.getContext("2d");
+        ctx.fillStyle = "#8c8c84";
+        ctx.fillRect(col * 3, row * 3, 3, 3); //x, y, x2, y2
     },
     changePlanets: function() { //initializes solar system, planet grid
         let planetGrid = data.systems[data.curSystem].planets[data.curPlanet].grid;
@@ -255,6 +340,7 @@ let view = {
         document.getElementById("workinglaunchPad").style.display = data.research.unlock[4] ? "inline-block" : "none";
         document.getElementById("sailsDiv").style.display = data.research.unlock[4] ? "inline-block" : "none";
         document.getElementById("sunZone").style.display = data.research.unlock[4] ? "inline-block" : "none";
+        document.getElementById("launchingDiv").style.display = data.research.unlock[4] ? "inline-block" : "none";
 
         let researchDivs = "";
         for(let i = 0; i < researchInfo.length; i++) {
