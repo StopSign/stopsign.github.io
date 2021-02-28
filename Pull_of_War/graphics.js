@@ -329,7 +329,7 @@ function handleLineAmounts(lineCount) {
 	if(lineCount == 6) offset = 0;
 	offset+=37;
 	document.getElementById("fightTime").style.marginTop = offset+"px";
-	for(m = 1; m < 6; m++)
+	for(m = 1; m < 7; m++)
 		document.getElementById("line"+m).style.display="none";
 	document.getElementById("line"+lineCount).style.display="inline-block";
 	if(lineCount == 1) {
