@@ -59,7 +59,7 @@ function load() {
 }
 
 function save() {
-    saveTimer = 2000;
+    saveTimer = 20000;
     let toSave = {};
 
     toSave.data = data;
