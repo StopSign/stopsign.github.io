@@ -18,7 +18,8 @@
 
 <div id="planetView" style="display:block">
     <div id="leftSideDivs" style="width:300px;">
-        <div id="resources" style="vertical-align: top;width:280px;height:160px;border:1px solid;padding:10px;font-size:14px;text-align:left;">
+        <div id="resources" style="vertical-align: top;width:280px;height:160px;border:1px solid;padding:10px;font-size:14px;text-align:left;position:relative">
+            <div class="button" onclick="showMore()" style="position:absolute;left:5px;top:7px">Help</div>
             <div class="title">Planet Info</div>
             <div class="resourceDiv" id="electricityDiv">Electricity: <div id="electricityUsed" class="bold"></div> / <div id="electricityGain"></div></div>
             <div class="resourceDiv" id="oreDiv">Ore: <div id="ore" class="bold">5</div> (<div id="oreDelta">+1</div>/s)</div>
@@ -53,6 +54,7 @@
         <div id="sunZone" onclick="changeZone('sunView')" style="position:absolute;top:520px;left:0;height:120px;width:100%;background-color:black;cursor:pointer;overflow:hidden;">
             <div id="sunZoneDrawing" style="width:800px;height:800px;background-color:yellow;border-radius:50%;"></div>
             <div id="sunZoneInfo" style="position:absolute;right:10px;bottom:5px;font-size:14px;text-align:right">
+                Click here for the sun view<br>
                 Dyson Sphere progress: <div id="sunZonePercent" class="bold">10</div>%<br>
                 Electricity: <div id="sunZonePowerReq" class="bold">50</div> / <div id="sunZonePowerGain">250</div>
             </div>
@@ -80,15 +82,37 @@
     </div>
 
     <div id="errorMessages" style="position:absolute;left:380px;"></div>
-
 </div>
 
 <div id="sunView" style="height:640px;width:1100px;background-color:black;display:none;text-align:left;position:relative;">
     <div id="goBack" onclick="changeZone('planetView')" class="button" style="font-size:14px;position:absolute;left:0;top:0;">Planet View</div>
-    <div id="sunDrawing" style="width:600px;height:600px;background-color:yellow;border-radius:50%;top:20px;left:251px;position:absolute;"></div>
-    <canvas id="dysonDraw" style="position:absolute;top:20px;left:251px;" width="600" height="600"></canvas>
+    <div id="sunDrawing" style="width:600px;height:600px;background-color:yellow;border-radius:50%;top:21px;left:251px;position:absolute;"></div>
+    <canvas id="dysonDraw" style="position:absolute;top:20px;left:250px;" width="600" height="600"></canvas>
     <div id="sailsInOrbitDiv" style="position:absolute;top:0;left:0"></div>
     <div id="sailsFromSunDiv" style="position:absolute;top:0;left:0"></div>
+</div>
+
+<div id="winScreen" onclick="closeWin()" style="position: absolute;width: 200px;padding: 20px;border-radius: 15px;cursor: pointer;top: 260px;left:440px;font-size: 20px;background-color: green;display:none;">
+    You win! Congratulations and thanks for playing!<br>That's all... for now
+</div>
+
+<div id="moreScreen" onclick="closeMore()" style="position: absolute;width:700px;padding: 20px;border-radius: 15px;cursor: pointer;top: 100px;left:100px;font-size: 14px;background-color: #bbc0d8;display:none;border:2px solid;text-align:left">
+    This game is made for the incremental jam by Stop_Sign!<br>
+    The goal is to build a Dyson Sphere around the sun, piece by piece. There's 31415 solar sails to place around the sun, good luck!<br><br>
+    To start, click on ore and build mines - they're free to build, so cover each of the mines right away!<br>
+    Then, build a solar panel - you start with 1 - and a factory with the ore from the mines, and use the factory to get another solar panel, for another factory, etc.<br>
+    Don't be afraid to sell, there's a 100% return policy always, but be careful of selling electricity buildings and crashing the power grid.<br>
+    Get some science with a lab, and keep unlocking new pieces until you can harness the power of the sun!<br>
+    Click this window to close it.<br><br>
+
+    Some hotkeys:<br>
+    Use the arrow keys to move around the grid<br>
+    Press the key surrounded by () to build that building or do that action<br>
+    Escape closes error messages<br>
+    Shift + [num] moves to other planets, when you unlock them<br><br>
+
+    The game saves every 20 seconds.<br>
+    Total seconds played: <div id="totalTime"></div>
 </div>
 
 </body>

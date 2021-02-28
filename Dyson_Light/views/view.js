@@ -16,6 +16,7 @@ let view = {
     },
     updateResourcesDisplays: function() {
         document.getElementById("science").innerHTML = data.science;
+        document.getElementById("totalTime").innerHTML = data.totalTime;
 
         let theSystem = data.systems[data.curSystem];
         let thePlanet = theSystem.planets[data.curPlanet];
@@ -43,7 +44,7 @@ let view = {
         document.getElementById("electricityGain").innerHTML = thePlanet.powerGain;
 
         //sun zone
-        document.getElementById("sunZonePercent").innerHTML = intToString(theSystem.powerGain / theSystem.totalDyson * 10, 4);
+        document.getElementById("sunZonePercent").innerHTML = intToString(theSystem.powerGain / theSystem.totalDyson * 100, 4);
         document.getElementById("sunZonePowerReq").innerHTML = theSystem.powerReq;
         document.getElementById("sunZonePowerGain").innerHTML = theSystem.powerGain;
         view.updateSailMovement();
@@ -262,9 +263,9 @@ let view = {
             let panelCostNext = info[theCell.type].panelCost[theCell.mark+1];
             let powerCostNext = info[theCell.type].power[theCell.mark+1];
             let markString = "Upgrade to Mk. " + (theCell.mark+2) + " for:" +
-                (oreCostNext ? "<br>Ore: <div class='bold'>" + oreCostNext + "</div>" : "") +
-                (elecCostNext ? "<br>Electronics: <div class='bold'>" + elecCostNext + "</div>" : "") +
-                (panelCostNext ? "<br>Solar Panels: <div class='bold'>" + panelCostNext + "</div>" : "") +
+                (oreCostNext ? "<br>Ore: <div class='bold'>" + intToString(oreCostNext, 1) + "</div>" : "") +
+                (elecCostNext ? "<br>Electronics: <div class='bold'>" + intToString(elecCostNext, 1) + "</div>" : "") +
+                (panelCostNext ? "<br>Solar Panels: <div class='bold'>" + intToString(panelCostNext, 1) + "</div>" : "") +
                 (powerCostNext ? "<br>Electricity: <div class='bold'>" + powerCostNext + "</div>" : "");
 
             markString += "<br><br>Effect will increase from " + info[theCell.type].gain[theCell.mark] + " to " + info[theCell.type].gain[theCell.mark+1] + "<br>";
@@ -351,10 +352,10 @@ let view = {
 
             if(reqsPass && !isBought) {
                 researchDivs +=
-                    "<div class='researchDiv'  id='researchDiv" + i + "'>" +
+                    "<div class='buttonDiv researchDiv'  id='researchDiv" + i + "' onclick='clickedResearch(" + i + ")'>" +
                     "<div class='smallTitle'>" + theInfo.title + "</div>" +
                     "<div>" + theInfo.desc + "</div><br>" +
-                    "<div class='button' onclick='clickedResearch(" + i + ")'>Buy for " + theInfo.cost + " science</div>" +
+                    "<div>Buy for " + intToString(theInfo.cost, 1) + " science</div>" +
                     "</div>";
             }
         }
@@ -366,10 +367,9 @@ let view = {
             if (info.hasOwnProperty(property)) {
                 let value = info[property];
 
-                buildOptionsDiv += "<div class='buildOption' id='build"+property+"'>" +
+                buildOptionsDiv += "<div class='buttonDiv buildOption' id='build"+property+"' onclick='buyBuilding(\""+property+"\")'>" +
                     "<div class='smallTitle'>"+value.buildTitle+"</div>" +
                     "<div id='"+property+"Desc'>"+value.buildDesc+"</div><br>" +
-                    "<div class='button' onclick='buyBuilding(\""+property+"\")'>Build</div>" +
                     "</div>";
             }
         }

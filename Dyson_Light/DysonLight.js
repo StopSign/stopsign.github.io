@@ -1,7 +1,7 @@
 
 
 function secondTick() {
-    let science1 = data.science;
+    data.totalTime++;
 
     //save pre-resources
     let resourceList = ["ore", "electronics", "panels", "sails", "pop", "vPop", "launching"];
@@ -17,6 +17,7 @@ function secondTick() {
     }
 
 
+    let science1 = data.science;
     //change resources
     for(let i = 0; i < data.systems.length; i++) {
         for(let j = 0; j < data.systems[i].planets.length; j++) {
@@ -29,6 +30,7 @@ function secondTick() {
             }
         }
     }
+    data.scienceD = round5(data.science - science1);
 
     //apply differences to the delta variables
     for(let i = 0; i < data.systems.length; i++) {
@@ -39,7 +41,6 @@ function secondTick() {
         }
     }
 
-    data.scienceD = round5(data.science - science1);
 }
 
 function tickPlanetResources(systemNum, planetNum) {
@@ -72,8 +73,13 @@ function giveForeignMaterial(poweredCells, thePlanet) {
         if(theList[theCell.option] === "vPop") {
             if(!targetPlanet.hasRadio) {
                 amountTransferred = 0;
-            } else if(thePlanet.vPopD > amountTransferred) { //only transfer at most how much you're making
-                amountTransferred = thePlanet.vPopD;
+            } else {
+                //only transfer if workers available
+                //let workersAvailable = thePlanet.workers;
+                if(amountTransferred > thePlanet.workers) {
+                    amountTransferred = thePlanet.workers;
+                }
+                //amountTransferred = thePlanet.vPopD;
             }
         }
         thePlanet[theList[theCell.option]] = round5(thePlanet[theList[theCell.option]] - amountTransferred);
@@ -385,7 +391,7 @@ function checkCostAllowed(thePlanet, type, oreCost, elecCost, panelCost, powerCo
         errorMsg += (oreCost > 0 ? " and " : "") + elecCost + " electronics";
     }
     if(panelCost > 0) {
-        errorMsg += (oreCost > 0 ? " and " : "") + panelCost + " panels";
+        errorMsg += (oreCost > 0 || elecCost > 0 ? " and " : "") + panelCost + " panels";
     }
     errorMsg += ". You have ";
     if(oreCost > 0) {
@@ -506,7 +512,7 @@ function getPowerForQTrans(thePlanet, targetSystem, targetPlanet) {
     if(distanceD === 0) { //target same planet it's on
         return 0;
     }
-    return  distanceD * 100 + 50;
+    return  distanceD * 75 + 75;
 }
 
 function pauseBuilding() {
@@ -710,4 +716,21 @@ function changeZone(zoneType) {
     } else {
         document.getElementById("sunView").style.display = "none";
     }
+}
+
+function winGame() {
+    document.getElementById("winScreen").style.display = "block";
+    canWin = false;
+}
+
+function closeWin() {
+    document.getElementById("winScreen").style.display = "none";
+}
+
+function showMore() {
+    document.getElementById("moreScreen").style.display = "block";
+}
+
+function closeMore() {
+    document.getElementById("moreScreen").style.display = "none";
 }

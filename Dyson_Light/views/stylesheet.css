@@ -155,7 +155,7 @@ input {
     border: none;
     border-radius: 6px;
     box-shadow: 0 3px #999;
-    transform: translateY(-2px);
+    //transform: translateY(-2px);
     margin-bottom:2px;
 }
 
@@ -272,12 +272,35 @@ input {
     width:95%;
     border:1px solid black;
 }
+.buttonDiv {
+    padding: 5px 5px;
+    text-align: center;
+    vertical-align:center;
+    cursor: pointer;
+    outline: none;
+    color: #000000;
+    background-color: #8dccc8;
+    border: none;
+    border-radius: 6px;
+    box-shadow: 0 3px #999;
+    margin-bottom:2px;
+    font-size:12px;
+}
+.buttonDiv:hover {
+    background-color: #7db3af;
+}
+
+.buttonDiv:active {
+    background-color: #6b9996;
+    box-shadow: 0 1px #666;
+    transform: translateY(0px);
+}
+
 .resourceDiv {
     display:block;
 }
 .researchDiv {
-    border:1px solid;
-    width:100%;
+    width:97%;
 }
 
 
@@ -293,7 +316,6 @@ input {
     border: none;
     border-radius: 6px;
     box-shadow: 0 3px #999;
-    transform: translateY(-2px);
     margin-bottom:2px;
     font-size:12px;
 }

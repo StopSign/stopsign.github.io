@@ -20,9 +20,11 @@ let data = {
         radioTelescope:[],
         launchPad:[]
     },
+    totalTime:0
 };
 
 
+let canWin = true;
 let errorMessages = [];
 
 let researchInfo = [
@@ -32,20 +34,6 @@ let researchInfo = [
         desc:"Get population and workers! Each worker assigned to an industry increases output by 5%!",
         cost:100,
         unlocks:{type:"unlock",num:0},
-    },
-    {
-        req:{type:"unlock", num:2},
-        title:"Unlock Radio Telescope",
-        desc:"Receive virtual population from other planets, and later power from your Dyson Sphere",
-        cost:100000,
-        unlocks:{type:"unlock",num:3},
-    },
-    { //4
-        req:{type:"unlock", num:3},
-        title:"Unlock Launch Pad",
-        desc:"Build and launch solar sails that orbit 3 times around the sun before becoming part of the dyson sphere!",
-        cost:1000000,
-        unlocks:{type:"unlock",num:4},
     },
     { //5
         req:{type:"unlock", num:0},
@@ -77,17 +65,17 @@ let researchInfo = [
     },
     {
         req:{type:"factory", num:0},
-        title:"Unlock Solar Panel Mk. 3",
-        desc:"Within you is the light of a thousand suns.",
-        cost:3000,
-        unlocks:{type:"solarPanel",num:1},
-    },
-    {
-        req:{type:"factory", num:0},
         title:"Unlock Lab Mk. 2",
         desc:"Upgrade the lab, triple the gain at only double the power! You get the idea.",
         cost:2000,
         unlocks:{type:"lab",num:0},
+    },
+    {
+        req:{type:"factory", num:0},
+        title:"Unlock Solar Panel Mk. 3",
+        desc:"Within you is the light of a thousand suns.",
+        cost:3000,
+        unlocks:{type:"solarPanel",num:1},
     },
     {
         req:{type:"lab", num:0},
@@ -107,46 +95,242 @@ let researchInfo = [
         req:{type:"unlock", num:1},
         title:"Unlock Factory Mk. 3",
         desc:"The next in the line.",
-        cost:15000,
+        cost:30000,
         unlocks:{type:"factory",num:1},
     },
-    {
+    { //solar 4
         req:{type:"unlock", num:1},
         title:"Unlock Solar Panel Mk. 4",
         desc:"It is during our darkest moments that we must focus to see the light.",
-        cost:20000,
+        cost:50000,
         unlocks:{type:"solarPanel",num:2},
     },
     {
         req:{type:"unlock", num:1},
         title:"Unlock House Mk. 2",
-        desc:"Finally, improvements to housing technology - 2 floors",
-        cost:30000,
+        desc:"Finally, improvements to housing technology: 2 floors",
+        cost:100000,
         unlocks:{type:"house",num:0},
+    },
+    {
+        req:{type:"solarPanel", num:2},
+        title:"Unlock Lab Mk. 3",
+        desc:"Significant improvement to efficiency!",
+        cost:150000,
+        unlocks:{type:"lab",num:1},
     },
     {
         req:{type:"unlock", num:1},
         title:"Unlock Quantum Transport",
         desc:"Send resources to other planets, kick-starting them into eventually sending resources back! Electricity cost is dependent on distance.",
-        cost:50000,
+        cost:250000,
         unlocks:{type:"unlock",num:2},
     },
     {
         req:{type:"unlock", num:2},
-        title:"Unlock Lab Mk. 3",
-        desc:"Significant improvement to efficiency!",
-        cost:80000,
-        unlocks:{type:"lab",num:1},
+        title:"Unlock Radio Telescope",
+        desc:"Receive virtual population from other planets, and later power from your Dyson Sphere",
+        cost:400000,
+        unlocks:{type:"unlock",num:3},
+    },
+    { //solar 5
+        req:{type:"unlock", num:2},
+        title:"Unlock Solar Panel Mk. 5",
+        desc:"Only when we are brave enough to explore the darkness will we discover the infinite power of our light.",
+        cost:2e6,
+        unlocks:{type:"solarPanel",num:3},
+    },
+    {
+        req:{type:"unlock", num:2},
+        title:"Unlock Factory Mk. 4",
+        desc:"Gain Factory Mk. 4, which is an improvement over Mk. 3!",
+        cost:4e6,
+        unlocks:{type:"factory",num:2},
+    },
+    {
+        req:{type:"solarPanel", num:3},
+        title:"Unlock Mine Mk. 5",
+        desc:"More ore for a higher premium.",
+        cost:6e6,
+        unlocks:{type:"mine",num:3},
+    },
+    {
+        req:{type:"factory",num:2},
+        title:"Unlock Server Mk. 2",
+        desc:"Holds 5000 virtual people",
+        cost:8e6,
+        unlocks:{type:"server",num:0},
+    },
+    {
+        req:{type:"mine",num:3},
+        title:"Unlock House Mk. 3",
+        desc:"Holds 50 people",
+        cost:10e6,
+        unlocks:{type:"house",num:1},
+    },
+    {
+        req:{type:"server", num:0},
+        title:"Unlock Quantum Transport Mk. 2",
+        desc:"Has a higher base transfer rate per second",
+        cost:15e6,
+        unlocks:{type:"quantumTransport",num:0},
+    },
+    {
+        req:{type:"house", num:1},
+        title:"Unlock Lab Mk. 4",
+        desc:"Science leads us to the light! We need more of it",
+        cost:20e6,
+        unlocks:{type:"lab",num:2},
+    },
+    {
+        req:{type:"quantumTransport", num:0},
+        title:"Unlock Solar Panel Mk. 6",
+        desc:"Travel light, live light, spread light, be the light.",
+        cost:30e6,
+        unlocks:{type:"solarPanel",num:4},
+    },
+    {
+        req:{type:"lab", num:2},
+        title:"Unlock Factory Mk. 5",
+        desc:"Gain Factory Mk. 5, which is an even biger improvement over Mk. 3!",
+        cost:40e6,
+        unlocks:{type:"factory",num:3},
+    },
+    {
+        req:{type:"solarPanel", num:4},
+        title:"Unlock Mine Mk. 6",
+        desc:"Drill baby drill",
+        cost:60e6,
+        unlocks:{type:"mine",num:4},
+    },
+    {
+        req:{type:"factory",num:3},
+        title:"Unlock Server Mk. 3",
+        desc:"A (virtual) paradise, these people are happy.",
+        cost:100e6,
+        unlocks:{type:"server",num:1},
+    },
+    {
+        req:{type:"factory",num:3},
+        title:"Unlock House Mk. 4",
+        desc:"These people raise children that might live in paradise.",
+        cost:100e6,
+        unlocks:{type:"house",num:2},
+    },
+    {
+        req:{type:"mine", num:4},
+        title:"Unlock Quantum Transport Mk. 3",
+        desc:"Surely it\'s safe to teleport a digital person?",
+        cost:150e6,
+        unlocks:{type:"quantumTransport",num:1},
+    },
+    {
+        req:{type:"server", num:1},
+        title:"Unlock Launch Pad",
+        desc:"Build and launch solar sails that orbit 3 times around the sun before becoming part of the dyson sphere!",
+        cost:200e6,
+        unlocks:{type:"unlock",num:4},
+    },
+    {
+        req:{type:"unlock", num:4},
+        title:"Unlock Lab Mk. 5",
+        desc:"The ultimate in research technology.",
+        cost:250e6,
+        unlocks:{type:"lab",num:3},
+    },
+    {
+        req:{type:"unlock", num:4},
+        title:"Unlock Factory Mk. 6",
+        desc:"Gain Factory Mk. 6, featuring bathroom breaks for productivity!",
+        cost:300e6,
+        unlocks:{type:"factory",num:4},
+    },
+    {
+        req:{type:"unlock", num:4},
+        title:"Unlock Mine Mk. 7",
+        desc:"Dig even deeper.",
+        cost:400e6,
+        unlocks:{type:"mine",num:5},
+    },
+    {
+        req:{type:"lab",num:3},
+        title:"Unlock Server Mk. 4",
+        desc:"A (virtual) utopia, these people are overjoyed.",
+        cost:500e6,
+        unlocks:{type:"server",num:2},
+    },
+    {
+        req:{type:"lab", num:3},
+        title:"Unlock Radio Telescope Mk. 2",
+        desc:"Get double the power from the growing Dyson Sphere!",
+        cost:500e6,
+        unlocks:{type:"radioTelescope",num:0},
+    },
+    {
+        req:{type:"radioTelescope",num:0},
+        title:"Unlock Launch Pad Mk. 2",
+        desc:"Build and launch even more satellites.",
+        cost:1e9,
+        unlocks:{type:"launchPad",num:0},
+    },
+    {
+        req:{type:"launchPad",num:0},
+        title:"Unlock Radio Telescope Mk. 3",
+        desc:"The ultimate in power receiving technology!",
+        cost:2e9,
+        unlocks:{type:"radioTelescope",num:1},
+    },
+    {
+        req:{type:"launchPad", num:0},
+        title:"Unlock Mine Mk. 8",
+        desc:"The ultimate in drilling technology",
+        cost:3e9,
+        unlocks:{type:"mine",num:6},
+    },
+    {
+        req:{type:"launchPad", num:0},
+        title:"Unlock Factory Mk. 7",
+        desc:"The ultimate in assembly line technology",
+        cost:4e9,
+        unlocks:{type:"factory",num:5},
+    },
+    {
+        req:{type:"mine", num:6},
+        title:"Unlock Quantum Transport Mk. 4",
+        desc:"The ultimate in teleporting technology",
+        cost:5e9,
+        unlocks:{type:"quantumTransport",num:2},
+    },
+    {
+        req:{type:"quantumTransport", num:2},
+        title:"Unlock Solar Panel Mk. 7",
+        desc:"To love beauty is to see light.",
+        cost:7.5e9,
+        unlocks:{type:"solarPanel",num:5},
+    },
+    {
+        req:{type:"quantumTransport",num:2},
+        title:"Unlock Radio Telescope Mk. 4",
+        desc:"The ultimate in light transferring technology",
+        cost:7.5e9,
+        unlocks:{type:"radioTelescope",num:2},
+    },
+    {
+        req:{type:"radioTelescope",num:2},
+        title:"Unlock Launch Pad Mk. 3",
+        desc:"The ultimate in Dyson Sphere technology",
+        cost:10e9,
+        unlocks:{type:"launchPad",num:1},
     },
 ];
 
 let info = {
     mine: {
-        oreCost:[0, 0, 0, 0],
-        electronicCost:[0, 10, 40, 300],
-        panelCost:[0, 5, 30, 100],
-        power:[0, 0, 0, 0],
-        gain:[1, 2, 4, 10],
+        oreCost:[0, 0, 0, 0, 0, 0, 0, 0],
+        electronicCost:[0, 10, 40, 300, 8000, 150e3, 2e6, 50e6],
+        panelCost:[0, 5, 30, 100, 4000, 100e3, 1.5e6, 40e6],
+        power:[0, 0, 0, 0, 0, 0, 0, 0],
+        gain:[1, 2, 4, 10, 25, 75, 200, 1000],
         title:"Mine",
         infoDiv:"Gain <div id='infoGain'></div> ore per second.",
         extra:"",
@@ -155,11 +339,11 @@ let info = {
         buildDesc:"Free to build. Gain ore per second.<br>Can use up to 5 population."
     },
     solarPanel: {
-        oreCost:[0, 0, 0, 0],
-        electronicCost:[0, 0, 0, 0],
-        panelCost:[1, 10, 200, 1000],
-        power:[0, 0, 0, 0],
-        gain:[1, 2, 5, 10],
+        oreCost:[0, 0, 0, 0, 0, 0, 0],
+        electronicCost:[0, 0, 0, 0, 0, 0, 0],
+        panelCost:[1, 10, 200, 1000, 20e3, 300e3, 200e6],
+        power:[0, 0, 0, 0, 0, 0, 0],
+        gain:[1, 2, 5, 10, 25, 75, 200],
         title:"Solar Panel",
         infoDiv:"Harness the light of the sun for electricity! Buildings will not work without electricity.<br>Gain <div id='infoGain'></div> electricity.",
         extra:"",
@@ -168,12 +352,12 @@ let info = {
         buildDesc:"Costs 1 solar panel. Provides 1 electricity."
     },
     factory: {
-        oreCost:[50, 300, 2000],
-        electronicCost:[0, 10, 300],
-        panelCost:[0, 0, 10],
-        power:[1, 2, 6],
-        gain:[.1, .2, .6],
-        gain2:[.1, .2, .6],
+        oreCost:[50, 300, 2000, 100e3, 2e6, 30e6, 200e6],
+        electronicCost:[0, 10, 500, 10e3, 200e3, 3e6, 80e6],
+        panelCost:[0, 0, 0, 0, 0, 0, 0],
+        power:[1, 2, 6, 20, 50, 150, 500],
+        gain:[.1, .2, .6, 2, 5, 15, 50],
+        gain2:[.1, .2, .6, 2, 5, 15, 50],
         title:"Factory",
         infoDiv:"Create <div id='infoGain'></div> electronics using 10x the ore per second, or <div id='infoGain2'></div> solar panels using 2x the electronics per second",
         extra:"<div class='pressedSelectOption' id='option0' onclick='selectOption(0)'>Create<br>Electronics (1)</div>" +
@@ -184,11 +368,11 @@ let info = {
         buildDesc:"Costs 50 ore. Creates electronics from ore, <br>or solar panels from electronics.<br>Uses 1 electricity."
     },
     lab: {
-        oreCost:[0, 0, 0],
-        electronicCost:[20, 150, 6000],
-        panelCost:[0, 0, 0],
-        power:[5, 10, 20],
-        gain:[1, 3, 10],
+        oreCost:[0, 0, 0, 0, 0],
+        electronicCost:[20, 150, 6000, 100e3, 250e6],
+        panelCost:[0, 0, 0, 0, 0],
+        power:[5, 10, 25, 75, 200],
+        gain:[1, 3, 10, 40, 150],
         title:"Lab",
         infoDiv:"Gain <div id='infoGain'></div> science per second.",
         extra:"",
@@ -197,11 +381,11 @@ let info = {
         buildDesc:"Costs 20 electronics and 5 electricity. Provides 1 science per second.."
     },
     house: {
-        oreCost:[100, 5000],
-        electronicCost:[0, 0],
-        panelCost:[5, 200],
-        power:[0, 0],
-        gain:[10, 20],
+        oreCost:[100, 5000, 300e3, 5e6],
+        electronicCost:[0, 0, 0, 0],
+        panelCost:[5, 200, 15e3, 250e3],
+        power:[0, 0, 0, 0],
+        gain:[10, 20, 50, 200],
         title:"House",
         infoDiv:"Holds <div id='infoGain'></div> people in it. Population increases by .1% per second. Assign workers to other buildings to improve their efficiency by 5% per worker.",
         extra:"",
@@ -210,26 +394,26 @@ let info = {
         buildDesc:"Costs 100 ore and 5 panels. Increases max pop by 10. Pop increases by .1% <br>of current population every second. <br>Minimum 2 population."
     },
     server: {
-        oreCost:[0],
-        electronicCost:[1000],
-        panelCost:[0],
-        power:[50],
-        gain:[1000],
+        oreCost:[0, 0, 0, 0],
+        electronicCost:[1000, 50e3, 1e6, 15e6],
+        panelCost:[0, 0, 0, 0],
+        power:[25, 50, 100, 200],
+        gain:[1000, 5000, 25e3, 100e3],
         title:"Server",
         infoDiv:"Server",
         extra:"Holds <div id='infoGain'></div> virtual people in it. Extra population growth becomes virtual people. Virtual people can be workers, but they don't contribute to population growth. Can only hold 1 server per planet.",
         pausable:false,
         buildTitle:"Build S(e)rver",
-        buildDesc:"Costs 1k electronics and uses 50 electricity. Creates virtual population with all excess population growth. Holds 1k virtual population."
+        buildDesc:"Costs 1k electronics and uses 25 electricity. Creates virtual population with all excess population growth. Holds 1k virtual population."
     },
     quantumTransport: {
-        oreCost:[0],
-        electronicCost:[10000],
-        panelCost:[0],
-        power:[0],
-        gain:[1],
+        oreCost:[0, 0, 0, 0],
+        electronicCost:[10000, 60e3, 1e6, 5e9],
+        panelCost:[0, 0, 0, 0],
+        power:[0, 0, 0, 0],
+        gain:[1, 3, 10, 50],
         title:"Quantum Transport",
-        infoDiv:"Send resources to other planets. Base transfer rate is <div id='infoGain'></div>. Send 1 ore, .1 electronic, .05 solar panels, .005 solar sails, or .01 virtual population per transfer rate. Virtual population will only transfer if the target planet has a Radio Telescope. Improve the rate with workers!",
+        infoDiv:"Send resources to other planets. Base transfer rate is <div id='infoGain'></div>. Send 1 ore, .1 electronic, .05 solar panels, .005 solar sails, or .01 virtual population per transfer rate. Virtual population will only transfer if the target planet has a Radio Telescope AND this planet has workers available. Improve the transfer rate with workers!",
         extra:"<div class='pressedSelectOption' id='option0' onclick='selectOption(0)'>Send<br>Ore (1)</div>" +
             "<div class='selectOption' id='option1' onclick='selectOption(1)'>Send<br>Electronics (2)</div>"+
             "<div class='selectOption' id='option2' onclick='selectOption(2)'>Send<br>Solar Panels (3)</div>"+
@@ -248,11 +432,11 @@ let info = {
         buildDesc:"Costs 10k electronics. Can send resources to any planet in range using power, but uses more power for more distance."
     },
     radioTelescope: {
-        oreCost:[20000],
-        electronicCost:[20000],
-        panelCost:[5000],
-        power:[0],
-        gain:[100],
+        oreCost:[20000, 50e6, 1e9, 10e9],
+        electronicCost:[0, 0, 0, 0],
+        panelCost:[1000, 10e6, 200e6, 1e9],
+        power:[0, 0, 0, 0],
+        gain:[50, 100, 200, 1000],
         title:"Radio Telescope",
         infoDiv:"Allows for virtual population to be sent to this planet via Quantum Transporters. Alternatively, can receive up to <div id='infoGain'></div> electricity from the Dyson Sphere.",
         extra:"<div class='pressedSelectOption' id='option0' onclick='selectOption(0)'>Receive<br>Population (1)</div>" +
@@ -260,15 +444,15 @@ let info = {
         optionText:["VP", "E"],
         pausable:false,
         buildTitle:"Build (R)adio Telescope",
-        buildDesc:"Costs 20k electronics, 20k ore, 5k solar panels. Can receive virtual population, or up to 100 power from the Dyson Sphere from the closest planet onwards."
+        buildDesc:"Costs 20k ore and 1000 solar panels. Can receive virtual population, or up to 50 power from the Dyson Sphere from the closest planet onwards."
     },
     launchPad: {
-        oreCost:[0],
-        electronicCost:[100000],
-        panelCost:[0],
-        power:[100],
-        gain:[.01],
-        gain2:[.02],
+        oreCost:[10e6, 150e6, 10e9],
+        electronicCost:[2e6, 30e6, 2e9],
+        panelCost:[0, 0, 0],
+        power:[200, 400, 600],
+        gain:[.001, .005, .02],
+        gain2:[.002, .01, .04],
         title:"Launch Pad",
         infoDiv:"Create <div id='infoGain'></div> solar sails using 100x the solar panels per second, or launch <div id='infoGain2'></div> solar sails per second to join the Dyson Sphere. The solar sails launch once the launch pad has used 1 solar sail, and once in place, they give 1 electricity to whoever can receive them. When they start orbiting the sun, it takes 2-3 minutes before finding their permanent resting spot on the Dyson Sphere.",
         extra:"<div class='pressedSelectOption' id='option0' onclick='selectOption(0)'>Create<br>Solar Sails (1)</div>" +
@@ -276,7 +460,7 @@ let info = {
         optionText:["SS", "L"],
         pausable:true,
         buildTitle:"Build L(a)unch Pad",
-        buildDesc:"Costs 100k electronics. Creates and launches solar sails from solar panels & ore."
+        buildDesc:"Costs 10m ore, 2m electronics, and 200 power. Creates and launches solar sails from solar panels & ore."
     }
 
 };

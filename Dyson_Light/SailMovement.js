@@ -15,10 +15,6 @@ function handleSailMovement(theSystem, systemNum) {
     let newDysonTargetSails = moveSails(theSystem.sailsInOrbit, sunSailIdPool);
     let newDysonSails = moveSails(theSystem.sailsFromSun, sunSailIdPool);
 
-    for(let i = 0; i < theSystem.planets.length; i++) {
-        handleNewSails(theSystem, i);
-    }
-
     for(let j = 0; j < newSunSails; j++) {
         addNewSunSails(theSystem);
     }
@@ -31,8 +27,28 @@ function handleSailMovement(theSystem, systemNum) {
         addNewDysonSail(theSystem, newDysonSails[j]);
         if(systemNum === data.curSystem ) {
             view.addDysonSpherePoint(newDysonSails[j].targetDysonX, newDysonSails[j].targetDysonY);
-            theSystem.powerGain++;
+            // theSystem.powerGain++;
+            // if(theSystem.powerGain === theSystem.totalDyson) {
+            //     winGame();
+            // }
         }
+    }
+
+    let totalE = 0;
+    for(let col = 0; col < theSystem.dysonPoints.length; col++) {
+        for(let row = 0; row < theSystem.dysonPoints[0].length; row++) {
+            if(theSystem.dysonPoints[col][row] === 2) {
+                totalE++;
+            }
+        }
+    }
+    theSystem.powerGain = totalE;
+    if(theSystem.powerGain === theSystem.totalDyson && canWin) {
+        winGame();
+    }
+
+    for(let i = 0; i < theSystem.planets.length; i++) {
+        handleNewSails(theSystem, i);
     }
 }
 
@@ -77,13 +93,12 @@ function sailTravel(sailObj, speed) {
 
 function handleNewSails(theSystem, planetNum) {
     let thePlanet = theSystem.planets[planetNum];
-
-
     if (thePlanet.launching < 1) {
         return;
     }
-    let totalDysonUsed = theSystem.sailsFromPlanet.length + theSystem.sailsInOrbit.length + theSystem.sailsFromSun + theSystem.powerGain;
+    let totalDysonUsed = theSystem.sailsFromPlanet.length + theSystem.sailsInOrbit.length + theSystem.sailsFromSun.length + theSystem.powerGain;
     let availableLaunch = theSystem.totalDyson - totalDysonUsed;
+    //console.log(totalDysonUsed, availableLaunch);
     if(availableLaunch < 1) {
         return; //no more launch
     }
@@ -240,6 +255,8 @@ let sunTop = 20;
 function initializeValidDysonPoints(theSystem) {
     theSystem.dysonPoints = [];
     theSystem.totalDyson = 0;
+    theSystem.powerGain = 0;
+    theSystem.powerReq = 0;
     for(let col = 0; col < sunWidth / sailWidth; col++) {
         theSystem.dysonPoints[col] = [];
         for(let row = 0; row < sunWidth / sailWidth; row++) {

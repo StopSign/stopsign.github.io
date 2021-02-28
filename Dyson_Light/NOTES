@@ -2,6 +2,27 @@ graphics of covering the sun
 options
     show total time
     import/export
-info
-    how to play
-    hotkeys
+
+
+let totalE = 0;
+for(let col = 0; col < data.systems[0].dysonPoints.length; col++) {
+	for(let row = 0; row < data.systems[0].dysonPoints[0].length; row++) {
+		if(data.systems[0].dysonPoints[col][row] === 2) {
+			totalE++;
+		}
+	}
+}
+console.log(totalE);
+
+ let totalLeft = 0;
+for(let col = 0; col < data.systems[0].dysonPoints.length; col++) {
+	for(let row = 0; row < data.systems[0].dysonPoints[0].length; row++) {
+		if(data.systems[0].dysonPoints[col][row] === 1) {
+			totalLeft++;
+		}
+	}
+}
+console.log(totalLeft);
+
+
+data.systems[0].sailsFromPlanet.length + data.systems[0].sailsInOrbit.length + data.systems[0].sailsFromSun.length + data.systems[0].powerGain;
