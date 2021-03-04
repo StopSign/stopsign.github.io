@@ -6,7 +6,7 @@
 		[12, 1700, 2500, 60000, 15, 0, 0, 60*38, 6, [0, 5, 4], [0, .2, .12], [0, .0005, .0004]],
 		[16, 2900, 3400, 90000, 10, 0, 0, 60*40, 4, [0, 8.5, 8], [0, .25, .25], [0, .0005, .0005]],
 		[13, 2900, 5000, 100000, 10, 0, 0, 60*40, 3, [0, 12, 11], [0, 2, 2], [0,  .001, .001]]]*/
-		
+
 var maps = [];
 var currentMapInfoNum = 0;
 
@@ -14,7 +14,7 @@ for(var level = 0; level < 50; level++) {
 	if(level % 17 === 0) createMap(maps, level, 2,'start');
 	if(level % 17 === 1) createMap(maps, level, 3, 'soldier');
 	if(level % 17 === 2) createMap(maps, level, 5, 'soldier');
-    if(level % 17 === 3) createMap(maps, level, 2, 'spear');
+	if(level % 17 === 3) createMap(maps, level, 2, 'spear');
 	if(level % 17 === 4) createMap(maps, level, 6, 'soldier');
 	if(level % 17 === 5) createMap(maps, level, 4, 'both');
 	if(level % 17 === 6) createMap(maps, level, 3, 'spear');
@@ -44,7 +44,7 @@ function createMap(maps, level, lanes, type) {
 	theMap[6] = 0;                              	  //Tower Damage TODO
 	theMap[7] =  60*(10+level*2);                              	  //Cooldown on Bonus
 	theMap[8] = lanes;                              	  //Lane Count
-	
+
 	if(type === 'start') {
 		theMap[9] = [0, 1, 0];
 		theMap[10] = [0, 0, 0];
@@ -95,9 +95,9 @@ function updateMapInfo(num) {
 	document.getElementById('mapInfo').style.display="inline-block"
 	document.getElementById('mapInfo').style.left=212+201*(num%5)+'px';
 	document.getElementById('mapInfo').style.top=20+130*(Math.floor(num/5))+'px';
-	
+
 	document.getElementById('territoryGainInfo').style.color=mapTimers[num]===0?'yellow':'black';
-	
+
 	document.getElementById('baseGoldInfo').innerHTML = intToStringRound(maps[num][0])
 	document.getElementById('territoryGainInfo').innerHTML = mapTimers[num]===0?intToStringRound(maps[num][1]):intToStringRound(maps[num][1]/5)
 	document.getElementById('fenceHealthInfo').innerHTML = intToStringRound(maps[num][2])
@@ -112,10 +112,10 @@ function updateMapTimers() {
 	if(currentMapInfoNum != -1) {
 		document.getElementById('territoryGainInfo').style.color=mapTimers[currentMapInfoNum]===0?'yellow':'black';
 		document.getElementById('territoryGainInfo').innerHTML = mapTimers[currentMapInfoNum]===0?intToStringRound(maps[currentMapInfoNum][1]):intToStringRound(maps[currentMapInfoNum][1]/5)
-		
+
 	}
 	document.getElementById("territoryGain").innerHTML = mapTimers[stage]>0?maps[stage][1]/5:maps[stage][1]
-	
+
 	for(m = 0; m < (higheststageUnlocked+1) && m < 50; m++) {
 		if(mapTimers[m]===0) {
 			document.getElementById("timer"+m).innerHTML = "<div class='timerReady'>Bonus Ready!</div>"

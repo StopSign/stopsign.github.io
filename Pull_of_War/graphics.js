@@ -4,7 +4,7 @@ function newUnitDiv(unit) {
 	src = "pics/"+(unit.direction!="right"?"enemy":"")+unit.type+".png"
 	different = "<img height='30' width='50' src='"+src+"'>"
 	/*if(unit.direction === "right") {
-		different = "<div id='body' class='"+unit.type+" unit' style=''> </div>" + 
+		different = "<div id='body' class='"+unit.type+" unit' style=''> </div>" +
 			"<div id='unitWeapon' class='weapon'><div class='weapon"+unit.type+"'></div> </div>";
 	}
 	else {
@@ -22,7 +22,7 @@ function updateUnitPos(y, x) {
 	console.log("updating null unit "+y+", "+x);
 	if(document.getElementById("unit"+units[y][x].id) == null)
 	console.log("sadf" +units[y][x].id);
-	document.getElementById("unit"+units[y][x].id).style.left = (units[y][x].pos +7)*11.9 + "px"; 
+	document.getElementById("unit"+units[y][x].id).style.left = (units[y][x].pos +7)*11.9 + "px";
 }
 
 function updateManaVisual() {
@@ -188,7 +188,7 @@ function changeUnitScreen(unit) {
 		"<div class='buyIncreaseAmount' id='"+type+"Increase0'>5% faster</div>"+
 		"<div class='buyVal' style='color:rgb(102, 102, 102);'>Spawn units of this type every <div id='buy02' style='color:black;'></div> seconds.</div>"+
 	"</div>"
-	
+
 	next6="<div style='width:40%;height:110px;vertical-align:top;'>"
 	button2 = addButton(type, "Attack Speed", 2)
 	button3 = addButton(type, "Move Speed", 3)
@@ -196,7 +196,7 @@ function changeUnitScreen(unit) {
 	button5 = addButton(type, "Armor", 5)
 	button6 = addButton(type, "Range", 6)
 	finish ="</div>"
-	
+
 	curUnitScreen = typeNum
 	document.getElementById("unitUpgradesBox").innerHTML = commonStart+next+next2+next25+next3+button1+next4+button4+next5+next6+button2+button3+next7+button5+button6+finish;
 	if(upgradePointsInitial[typeNum] > 0)
@@ -247,8 +247,8 @@ function updateConstructionWorkers() {
 function updateStatusUpgrades(unit, type) {
 	typeNum = convertTypeToNum(type, "right")
 	document.getElementById("buy").innerHTML=upgradePointsInitial[typeNum];
-	document.getElementById("cost").innerHTML=round(unitCosts[typeNum]);
-	document.getElementById("costSpawn").innerHTML=round(costSpawnRate[typeNum]);
+	document.getElementById("cost").innerHTML=ceil(unitCosts[typeNum]);
+	document.getElementById("costSpawn").innerHTML=ceil(costSpawnRate[typeNum]);
 	if(upgradePointsInitial[typeNum] && document.getElementById("slider").children.length == 0)
 		slider('slider');
 	if(upgradePointsInitial[typeNum])
@@ -280,7 +280,7 @@ function addButton(type, name, num) {
 function updateHover(id) {
 	unitToDisplay = getUnitById(id)
 	if(!unitToDisplay) return
-	
+
 	document.getElementById("curDamageDone").innerHTML = round2(unitToDisplay.totalDamageDone);
 	document.getElementById("curKills").innerHTML = unitToDisplay.kills;
 	document.getElementById("curHealth").innerHTML = round1(unitToDisplay.curHealth);
@@ -329,7 +329,7 @@ function handleLineAmounts(lineCount) {
 	if(lineCount == 6) offset = 0;
 	offset+=37;
 	document.getElementById("fightTime").style.marginTop = offset+"px";
-	for(m = 1; m < 6; m++)
+	for(m = 1; m < 7; m++)
 		document.getElementById("line"+m).style.display="none";
 	document.getElementById("line"+lineCount).style.display="inline-block";
 	if(lineCount == 1) {
@@ -378,7 +378,7 @@ function redrawStoredLines(onTick){
 		ctx.strokeStyle="#000000"
 		ctx.beginPath();
 		x3 = storedArrowVisuals[i].x1+((storedArrowVisuals[i].x2-storedArrowVisuals[i].x1)/storedArrowVisuals[i].count*(storedArrowVisuals[i].count - storedArrowVisuals[i].curCount)) - 4
-		y3 = storedArrowVisuals[i].y1+((storedArrowVisuals[i].y2-storedArrowVisuals[i].y1)/storedArrowVisuals[i].count*(storedArrowVisuals[i].count - storedArrowVisuals[i].curCount)) 
+		y3 = storedArrowVisuals[i].y1+((storedArrowVisuals[i].y2-storedArrowVisuals[i].y1)/storedArrowVisuals[i].count*(storedArrowVisuals[i].count - storedArrowVisuals[i].curCount))
 		//console.log(storedArrowVisuals[i].x1+", "+storedArrowVisuals[i].y1+", "+storedArrowVisuals[i].x2+", "+storedArrowVisuals[i].y2+", " + storedArrowVisuals[i].curCount+", "+x3+", "+y3)
 		ctx.moveTo(x3,y3);
 		ctx.lineTo(x3+8,y3);
@@ -449,7 +449,7 @@ function hideAllInfo() {
 	document.getElementById("buildingsSpace").style.display = "none";
 	document.getElementById("placesSpace").style.display = "none";
 	document.getElementById("optionsPage").style.display = "none";
-	
+
 	document.getElementById("warTab").style.backgroundColor="white";
 	document.getElementById("mapTab").style.backgroundColor="white";
 	document.getElementById("territoryTab").style.backgroundColor="white";

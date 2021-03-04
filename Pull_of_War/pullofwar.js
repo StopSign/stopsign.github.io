@@ -44,10 +44,10 @@ timer = 0;
 //startTutorial()
 function tick() {
 	timeList.push(new Date().getTime())
-	var fps = round(50/calcAverageTime()* 20) 
+	var fps = round(50/calcAverageTime()* 20)
 	document.getElementById("fps").innerHTML = (fps > 20 ? 20 : fps)+" fps";
 	if(timeList.length > 100) timeList.splice(0, 1)
-	
+
 	totalTicks++;
 	if(stop)
 		return
@@ -72,7 +72,7 @@ function tick() {
 		timer = 0;
 	}
 	updateHover(curClickedUnit)
-	
+
 	if(totalTicks < 3 && spawnList.length == 0) { //Pause at start
 		stop = 1
 	}
@@ -105,12 +105,12 @@ function pause() {
 rateReduction = .0999999;
 function handleSpawnRates() {
 	//rateReduction = 0;
-	
+
 	//TODO: put these variables into an array
-	
+
 	//TODO: change the random spawn algorithm. Currently it'll spawn X units in potentially
 	//the same spot, and then the trigger for merging to two units triggers (this causes slowdown on mass unit # spawn)
-	//Correct formula 
+	//Correct formula
 	if(spawnAmounts[0] > 0) soldierSpawnRate -= rateReduction;
 	if(soldierSpawnRate <= 0) {
 		for(j = 0; j < spawnAmounts[0]; j++) {
@@ -214,7 +214,7 @@ function handleDamageAtEnds() {
 							document.getElementById("fenceHealth").style.display = 'none';
 						}
 					}
-					
+
 				} else {
 					units[y][x].shouldAttack = 1
 				}
@@ -225,7 +225,7 @@ function handleDamageAtEnds() {
 			}
 		}
 	}
-	
+
 	checkDoneStage()
 	updateWallHealthVisuals()
 }
@@ -279,22 +279,22 @@ function checkForUnitCollisions() {
 							if(units[y][x].id > units[z][w].id) continue //if yx is the earlier one, take the merge
 							//NOTE: this means that your units don't get pushed back while merging, but their units do
 							//because of the order the unit id's get created
-							
+
 							//average the units together
 							units[y][x].damage = average(units[y][x].damage, units[z][w].damage, units[y][x].unitCount, units[z][w].unitCount)
 							units[y][x].maxHealth = average(units[y][x].maxHealth, units[z][w].maxHealth, units[y][x].unitCount, units[z][w].unitCount) //visual purposes only
-							
+
 							totalUnitCount = units[y][x].unitCount + units[z][w].unitCount
 							totalHealthA = (units[y][x].unitCount-1)*units[y][x].actualMaxHealth + units[y][x].curHealth //represents total health the unit stack
 							totalHealthB = (units[z][w].unitCount-1)*units[z][w].actualMaxHealth + units[z][w].curHealth
 							averageHealth = average(units[y][x].actualMaxHealth, units[z][w].actualMaxHealth, units[y][x].unitCount, units[z][w].unitCount)
-							
+
 							//Fix: (trunc(healthA*100) + trunc(healthB*100))/100
 							//Fix: alternate fix, subtract by -.000001
 							//console.log(totalHealthA +","+totalHealthB+","+addbyinteger(totalHealthA, totalHealthB, 3)+","+ Math.ceil(addbyinteger(totalHealthA, totalHealthB, 3)/averageHealth))
 							newUnitCount = Math.ceil(addbyinteger(totalHealthA, totalHealthB, 3)/averageHealth)
 							temp = (totalHealthA + totalHealthB)%averageHealth
-							
+
 							if(temp < 1) { //1 because javascript rounding
 								units[y][x].curHealth = units[y][x].actualMaxHealth;
 							} else {
@@ -310,19 +310,19 @@ function checkForUnitCollisions() {
 								console.log('units[y][x].unitCount:'+units[y][x].unitCount)
 								console.log('units[z][w].unitCount:'+units[z][w].unitCount)
 								console.log('temp:'+temp)
-								
+
 							}*/
-							
+
 							units[y][x].actualMaxHealth = averageHealth;
 							units[y][x].unitCount = newUnitCount;
-							
+
 							unitsDead = totalUnitCount - newUnitCount
 							if(unitsDead * units[y][x].goldWorth) { //prevent adding NaN
 								gold += unitsDead * units[y][x].goldWorth;
 							}
 							totalDead[units[y][x].typeNum] += unitsDead
 							updateGoldVisual()
-							
+
 							tempHealth = (units[y][x].curHealth / units[y][x].maxHealth * 100)
 							document.getElementById("healthBar"+units[y][x].id).style.width = tempHealth>100?100:tempHealth + "%";
 							document.getElementById("count"+units[y][x].id).innerHTML = units[y][x].unitCount
@@ -395,7 +395,7 @@ function handleBattles() {
 					drawSpearLine(units[y][x], engageTarget);
 				}
 				count = engageTarget.unitCount
-				
+
 				engageTarget.takeDamage(units[y][x].getDamageRoll(engageTarget.typeNum))
 				units[y][x].kills += count - engageTarget.unitCount;
 				//console.log(engageTarget.id)
@@ -444,7 +444,7 @@ function removeUnit(unit, shouldAdd) {
 	var elem = document.getElementById("unit"+unit.id);
 	theParent = elem.parentNode
 	theParent.parentNode.removeChild(theParent);
-	
+
 	for(g = 0; g < units.length; g++) {
 		for(h = units[g].length - 1; h >= 0; h--) {
 			if(unit.equals(units[g][h])) {
@@ -505,7 +505,7 @@ function updateDeadUnitBonus() {
 	document.getElementById("totalDead"+curUnitScreen).innerHTML = totalDead[curUnitScreen]
 	document.getElementById("buy1").innerHTML=round2(unitValues[curUnitScreen][0]*deadUnitBonus[curUnitScreen])
 	document.getElementById("buy4").innerHTML=round2(unitValues[curUnitScreen][3]*deadUnitBonus[curUnitScreen])
-	
+
 }
 
 function tickConstruction() {
@@ -633,7 +633,7 @@ function findNearestList(unit) {
 			}
 			theIndex = nearestList.length
 			for(e = 1; e < nearestList.length; e++) {
-				if(Math.abs(units[q][w].pos - nearestList[0].pos)+Math.abs(q-nearestList[0].line)*5 < 
+				if(Math.abs(units[q][w].pos - nearestList[0].pos)+Math.abs(q-nearestList[0].line)*5 <
 				Math.abs(nearestList[e].pos - nearestList[0].pos)+Math.abs(nearestList[e].line-nearestList[0].line)*6) {
 					theIndex = e
 					break
@@ -664,13 +664,17 @@ function round(num) {
     return Math.floor(num).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
 
+function ceil(num) {
+    return Math.ceil(num).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
 function roundtoFormat1(num) {
     return num.toFixed(1).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
 function roundtoFormat2(num) {
     return num.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
-	
+
 
 
 function convertSecToMin(sec) {
