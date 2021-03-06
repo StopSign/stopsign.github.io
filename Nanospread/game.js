@@ -367,7 +367,7 @@ function recalcInterval(newSpeed) {
 }
 
 function buyTickSpeed() {
-    if(bonuses.availableEP >= getTickSpeedCost() && bonuses.tickSpeedLevel < 2) {
+    if(bonuses.availableEP >= getTickSpeedCost() && bonuses.tickSpeedLevel < 5) {
 		bonuses.availableEP -= getTickSpeedCost();
 		recalcInterval(bonuses.tickSpeedLevel + .2);
     }
