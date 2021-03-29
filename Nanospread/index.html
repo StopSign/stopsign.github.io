@@ -56,6 +56,7 @@
     <div class="menuButton" onclick="toggleHelp()"><i class="fa fa-question-circle-o" style="font-size:20px;"></i> Help (H)</div>
     <div class="menuButton" onclick="toggleLevelMenu()"><i class="fa fa-line-chart" style="font-size:20px;"></i> Level (L)</div>
 	<div class="menuButton" onclick="toggleUpgradeMenu()"><i class="fa fa-gear" style="font-size:20px;"></i> Upgrades (U)</div>
+    <div class="menuButton" onclick="toggleChallengesMenu()"><i class="fa fa-bar-chart" style="font-size:20px;"></i> Challenges (I)</div>
 	<div class="menuButton" onclick="toggleStatsMenu()"><i class="fa fa-bar-chart" style="font-size:20px;"></i> Stats (I)</div>
     <div class="menuButton" style="float:right" onclick="select.selectAllActive()"><div style="margin-top:3px;">Select Active (E)</div></div>
 </div>
@@ -176,6 +177,12 @@
             </div>
         </div>
         <i id="backButton2" class="backButton fa fa-close" onclick="closeUpgradeBox()" style="font-size:24px"></i>
+    </div>
+    <div id="challengesBox" style="display:none;">
+		<div style="padding:5px;">
+
+		</div>
+		<i id="backButton4" class="backButton fa fa-close" onclick="closeHelpBox()" style="font-size:24px"></i>
     </div>
     <div id="buildBox" style="display:none;">
         <!--fa fa-truck, microchip, industry -->
