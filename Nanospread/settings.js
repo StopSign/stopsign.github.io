@@ -76,6 +76,22 @@ function closeUpgradeBox() {
     adjustMenus();
 }
 
+function toggleChallengesMenu() {
+    if(menuOpen === "challenges") {
+        closeChallengesBox()
+    } else  {
+        openChallengesBox()
+    }
+}
+function openChallengesBox() {
+    menuOpen = "challenges";
+    adjustMenus();
+}
+function closeChallengesBox() {
+    menuOpen = "";
+    adjustMenus();
+}
+
 function toggleStatsMenu() {
     if(menuOpen === "stats") {
         closeStatsBox()
@@ -108,6 +124,9 @@ function adjustMenus() {
         document.getElementById('infoPanel').style.display = "block";
     } else if(menuOpen === "upgrade") {
         document.getElementById('upgradeBox').style.display = "block";
+        document.getElementById('infoPanel').style.display = "block";
+    } else if(menuOpen === "challenges") {
+        document.getElementById('challengesBox').style.display = "block";
         document.getElementById('infoPanel').style.display = "block";
     } else if(menuOpen === "stats") {
         document.getElementById('statsBox').style.display = "block";
