@@ -1,0 +1,367 @@
+div {
+    display:inline-block;
+}
+
+body {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    font-family:Arial, Helvetica, serif;
+    color:black;
+    font-size:14px;
+    height:100%;
+    margin:0;
+    background-color: #e4ece5;
+    cursor:default;
+}
+.showthatH:hover .showthisH {
+    display:block;
+}
+.showthat:hover .showthis, .showthat2:hover .showthis2 {
+    display:block;
+}
+.showthis, .showthis2, .showthisH {
+    display:none;
+    position:absolute;
+    background-color: #c0e4c7;
+    border:1px solid;
+    padding:3px 5px;
+    border-radius:4px;
+    margin-top:5px;
+    z-index:999;
+    text-align:left;
+}
+
+.showthis2 {
+    z-index:1000;
+    min-width:400px;
+}
+
+.title {
+    font-size:16px;
+    font-weight:bold;
+    display:block;
+    text-align:center;
+}
+
+
+.large {
+    font-size:16px;
+}
+.medium {
+    font-size:14px;
+}
+.small {
+    font-size:12px;
+}
+.bold {
+    font-weight:bold;
+}
+
+.superLargeIcon {
+    width:30px;
+    height:30px;
+}
+.largeIcon {
+    width:20px;
+    height:20px;
+}
+.smallIcon {
+    width:16px;
+    height:16px;
+}
+
+input, label {
+    cursor:pointer;
+}
+input {
+    margin-right:0;
+}
+
+/*.button {*/
+    /*border:2px white solid;*/
+    /*background-color: #bde0b7;*/
+    /*padding:3px 5px;*/
+    /*cursor:pointer;*/
+    /*border-radius:10px;*/
+    /*min-width:9px;*/
+    /*text-align:center;*/
+    /*vertical-align:center;*/
+/*}*/
+/*.button:hover {*/
+    /*border:2px blue solid;*/
+/*}*/
+
+
+.button {
+    padding: 1px 5px;
+    text-align: center;
+    vertical-align:center;
+    min-width:9px;
+    cursor: pointer;
+    outline: none;
+    color: #e1e1e1;
+    background-color: #4CAF50;
+    border: none;
+    border-radius: 6px;
+    box-shadow: 0 3px #999;
+    transform: translateY(-2px);
+    margin-bottom:2px;
+}
+
+.button:hover {background-color: #3e8e41}
+
+.button:active {
+    background-color: #3e8e41;
+    box-shadow: 0 1px #666;
+    transform: translateY(0px);
+}
+
+.unused {
+    background-color: #99c193;
+}
+
+.container {
+    border:1px solid black;
+    margin:10px;
+    padding:3px 8px;
+    position:absolute;
+    border-radius:5px;
+    text-align:center;
+    min-width:100px;
+    opacity:.7;
+    background-color: #c3d2ff;
+}
+.container:hover {
+    opacity:1;
+}
+
+.skillContainer {
+    width:100%;
+    position:relative;
+    text-align:left;
+}
+
+.statRadarContainer {
+    width:40px;
+    padding-top:20px;
+    position:absolute;
+}
+.statRegularContainer {
+    width:100%;
+}
+.statRegularContainer:hover {
+    background-color: #ccded1;
+}
+.statLabelContainer {
+    width:100%;
+    position:relative;
+    text-align:left;
+}
+.statNum {
+    width:40px;
+    text-align:right;
+    margin:5px 10px 0;
+    float:right;
+}
+
+.skillLabel {
+    margin-left:18px;
+}
+
+.thinProgressBarUpper, .thinProgressBarLower {
+    width:90%;
+    background-color:white;
+    display:block;
+    margin:0 auto 2px auto;
+}
+.thinProgressBarUpper { height:4px; }
+.thinProgressBarLower { height:3px; }
+
+.thickProgressBar {
+    background-color:white;
+    display:inline-block;
+    margin:0 2px 2px 2px;
+    height:8px;
+}
+
+.statBar {
+    height:100%;
+    width:0;
+    display:block;
+}
+.statLevelBar, .townExpBar, .skillExpBar {
+    background-color: #9d67cd;
+}
+.statTalentBar {
+    background-color: #ffb45b;
+}
+.townBar {
+    background-color: #95afff;
+}
+.segmentBar {
+    height:100%;
+    display:block;
+    width:100%;
+    float:right;
+}
+
+.townStatContainer {
+    width:100%;
+    height:23px;
+    text-align:left;
+    padding:0 10px 0;
+    margin-bottom:5px;
+    margin-top:10px;
+}
+
+.townInfoContainer {
+    width:100%;
+    height:15px;
+    text-align:left;
+    padding:0 10px 0;
+}
+
+.townInfo {
+    display:block;
+    text-align:left;
+}
+
+.actionOptions {
+    text-align:center;
+    min-height:470px;
+}
+
+.actionContainer {
+    cursor:pointer;
+    width:102px;
+    height:50px;
+    vertical-align:top;
+    margin:0 2px;
+}
+.actionContainer:hover, .travelContainer:hover {
+    background-color: #bef8ff;
+}
+
+.travelContainer {
+    cursor:pointer;
+    display:block;
+    width:200px;
+    height:50px;
+    vertical-align:top;
+    margin:2px auto;
+}
+
+
+.nextActionContainer, .curActionContainer {
+    margin-left:3px;
+    display:block;
+    padding-top:1px;
+    padding-bottom:1px;
+    border-bottom:1px solid #b9b9b9;
+    position:relative;
+}
+.nextActionContainer {
+    width:188px;
+}
+.curActionContainer {
+    width:102px;
+}
+
+.actionIcon {
+    text-align:center;
+    width:12px;
+}
+.actionIcon:hover {
+    color:red;
+    cursor:pointer;
+    background-color:#b3b3b3;
+}
+
+.curActionBar {
+    height:100%;
+    width:0;
+    background-color: #ff907d;
+    position:absolute;
+    opacity:.5;
+}
+
+.actionSelectedIndicator {
+    position:absolute;
+    opacity:0;
+    background-color: #0900e2;
+    width:3px;
+    height:100%;
+}
+
+.townLabel {
+    margin-left:25px;
+}
+
+.completedInfo {
+    margin-right:25px;
+    float:right;
+}
+
+.hidden {
+    display:none;
+}
+
+.locked {
+    background-color: #bfbfbf;
+    cursor:default;
+    border-radius:10px;
+}
+.locked:hover {
+    background-color: #a8a8a8;
+}
+
+.statTooltipPerc {
+    float:right;
+    margin-left:3px;
+}
+
+.ssContainer {
+    display:none;
+}
+
+#expandableList {
+    position:relative;
+    height:500px;
+    width:100%;
+    /*border-bottom:2px solid purple;*/
+}
+
+.resizable {
+    width: 10px;
+    height: 10px;
+    background: blue;
+    position:absolute;
+    right: 0;
+    bottom: 0;
+    cursor: se-resize;
+}
+
+.draggedOverAction {
+    background:lightblue;
+}
+
+.draggedAction{
+    opacity:0.4;
+}
+
+.imageDragFix {
+    pointer-events:none;
+    user-drag: none;
+    user-select: none;
+    -moz-user-select: none;
+    -webkit-user-drag: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+}
+
+#trackedResources .resource, #timeControls .control {
+  margin-right : 5px;
+}

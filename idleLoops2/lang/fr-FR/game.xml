@@ -1,0 +1,768 @@
+<?xml version="1.0"?>
+<body>
+  <menu>
+    <changelog>
+      <meta>
+        <title>Mises à jour</title>
+        <version_prefix>Version</version_prefix>
+      </meta>
+      <version verNum=".73"><![CDATA[
+          * Changed formula for how Old Shortcut reduces Continue On<br>
+          * Repeat last action on list saves now<br>
+          * Lootable first checkboxes save now<br>
+          * Window title switches when paused correctly<br>
+          * Dragging an action image doesn't change the URL in firefox<br>
+          * 2 more story parts, unlocked at Small Dungeon completion<br>
+          * Re-arrange icon/loop count order on lists<br>
+          * Get Drunk removes 2 gold instead of adding it
+        ]]></version>
+        <version verNum=".72"><![CDATA[
+            * Sound on pause available in options<br>
+            * training limit set to 50 from 10 (for now)<br>
+            * Mana Original is multipled by # loops<br>
+            * Travel Action styling change<br>
+            * Saving in town 3<br>
+            * DRAG AND DROP (Thanks to Hunter)
+      ]]></version>
+        <version verNum=".71"><![CDATA[
+            * Tooltip on reset button<br>
+            * Glasses give x2 to forest<br>
+            * Mana cost reflects the tooltips now rather than an average of stat reduction<br>
+            * Trainings are capped at 10 per loop<br>
+            * New actions! Brew Potions, Continue On, Explore City, Gamble, Get Drunk, Purchase Mana, Sell Potions<br>
+            * Some new actions are usless at the moment.
+      ]]></version>
+        <version verNum=".70"><![CDATA[
+            * Reverted skill nerf (too harsh)<br>
+            * Actually capped glasses<br>
+            * Sell Gold -> Buy Mana<br>
+            * Double soulstone recovery<br>
+            * Nerfed practical magic (more uses for it later)
+      ]]></version>
+        <version verNum=".69"><![CDATA[
+            * Nerfed the soulstone nerf<br>
+            * Cleared additional purple bars on exp<br>
+            * Corrected glasses/throw party tooltips<br>
+            * Actually nerfed skill growth - it's cheaper than before for level 2 - 23, and about 4x harder at level 100<br>
+            * Add action to top of list option
+      ]]></version>
+        <version verNum=".68"><![CDATA[
+            * Added tab icon<br>
+            * Throw Party costs 2 reputation from 3<br>
+            * Removed Guided Tour<br>
+            * Added Buy Glasses<br>
+            * Fixed later segment names for Fight<br>
+            * Nerfed soulstones<br>
+            * Changed soulstone gathering, equalling about half previous rate but more initially<br>
+            * Nerfed skill growth<br>
+            * Added Options and Discord Link (to be expanded)<br>
+            * Start Journey cost 2k -> 1k
+      ]]></version>
+        <version verNum=".67"><![CDATA[
+            * Added FAQ<br>
+            * Doubled effectiveness of Guided Tour<br>
+            * Fixed majority of memory leaks (not all)<br>
+            * Made Heal/Fight requirements visible with training unlock<br>
+            * Lengthened action list div<br>
+            * Changed some wording of descriptions for clarity<br>
+            * Added "lootable first" option, credit to Hunter<br>
+            * Fixed a bug with extreme gain on Heal
+      ]]></version>
+        <version verNum=".66"><![CDATA[
+            * Mostly fixed import being all weird<br>
+            * Changed investigate to be visible earlier<br>
+            * Fixed Old Shortcut to be 100% from 110%<br>
+            * Fixed Investigate to be 100% from 90%<br>
+            * Rewording old shortcut and hermit<br>
+            * Game autopauses if current list is empty<br>
+            * Saves variables even if they're 0 (fixes some incorrect negative values)<br>
+            * Fixes your save if your variables were negative.
+      ]]></version>
+        <version verNum=".65"><![CDATA[
+            * Added Learn Alchemy action and Alchemy skill<br>
+            * Made a reddit post and discord<br>
+            * Hid Skills that are at 0 exp<br>
+            * Import/export
+      ]]></version>
+        <version verNum=".64"><![CDATA[
+            * Start Journey costs 2k mana from 1k<br>
+            * Added Old Shortcut, Talk to Hermit, and Practical Magic actions<br>
+            * Added Practical Magic skill<br>
+            * Widened version tooltips
+      ]]></version>
+        <version verNum=".63"><![CDATA[
+            * Made Heal the Sick, Fight Monster, and Clear Dungeon more difficult<br>
+            * Changing forEach to for loops, I forgot to change return to continue, causing multiple large issues<br>
+            * Made stat window a little larger<br>
+            * Changed town numbers to update on reload, instead of just on a new %
+      ]]></version>
+        <version verNum=".62"><![CDATA[
+            * Added Gather Wild Mana, Gather Herbs, Hunt, and Sit Under Waterfall<br>
+            * Hide supplies/herbs/hide if you have 0<br>
+            * You'll need to complete 1 more % on Forest Explored to update Mana Sources (NOTE: not anymore)<br>
+      ]]></version>
+        <version verNum=".61"><![CDATA[
+            * Removed beautiful forEach loops because IE can't handle them<br>
+            * Possibly fixes game not working on iPads too (tell me if so)<br>
+            * Fixed errors for players with no save file<br>
+            * Adjusted mana costs for new actions
+      ]]></version>
+        <version verNum=".6"><![CDATA[
+            * Added version info<br>
+            * Added Haggle, Buy Supplies, Start Journey, Explore Forest<br>
+            * Added switching towns and town names<br>
+            * Added error messages when an action fails (red bar)<br>
+            * Require reputation now requires, instead of costs<br>
+            * Fixed repeating a last action with a cost bug<br>
+            * Visually separated resources and main actions<br>
+            * Reduced requirements/difficulty for heal/fight/dungeon<br>
+            * WARNING: adblock caused game to freeze. This has no ads, disable if you also freeze<br>
+            * Improved performance (since I was looking anyway)
+      ]]></version>
+    </changelog>
+    <save>
+      <meta>
+        <title>Sauvegarde</title>
+      </meta>
+      <manual_save>Sauvegarde manuelle</manual_save>
+      <input_label>Importer/Exporter</input_label>
+      <export_button>Exporter</export_button>
+      <export_comment><![CDATA[Cliquez sur Exporter pour exporter votre sauvegarde dans le presse-papier (collez avec ctrl-v ailleurs).<br>
+              Collez une sauvegarde et cliquez sur Importer pour importer.]]></export_comment>
+              <import_button>Importer</import_button>
+              <import_comment><![CDATA[
+                ATTENTION : Importer cassera votre sauvegarde si cette sauvegarde est invalide.<br>
+                Un import vide permet de recommencer le jeu à 0, pour de vrai.<br>
+                Si vous voulez vraiiiiiiiment éditer votre sauvegarde, ]]></import_comment>
+              <import_hover_special>survolez-moi ;)</import_hover_special>
+              <import_hover_special_tooltip><![CDATA[In the console, use decode("pasted savefile"), edit, then encode('pasted savefile'), then import it<br>This is mainly for fixing broken savefiles - don't be a cheater.]]></import_hover_special_tooltip>
+    </save>
+    <faq>
+      <meta>
+        <title>FAQ</title>
+        <q_prefix>Q</q_prefix>
+        <a_prefix>R</a_prefix>
+      </meta>
+        <q_a>
+          <q>A quoi servent les statistiques ?</q>
+          <a>Survolez le titre "Statistiques" pour savoir comment elles fonctionnent. Les statistiques importantes dépendent des actions que vous souhaitez faire et qui les utilisent.</a>
+        </q_a>
+        <q_a>
+          <q>Les boucles courtes semblent meilleures.</q>
+          <a>Les boucles courtes sont meilleurs, au début de la partie, avec l'équilibrage actuel. Au fur et à mesure du jeu, en accumulant des points de talents et des pierres d'âme, les boucles plus longues deviennt plus utiles.</a>
+        </q_a>
+        <q_a>
+          <q>Quel devrait être mon premier objectif ?</q>
+          <a>Commencez par vagabonder jusqu'à trouver des façons de regagner du mana. Ensuite, essayez de trouver comment vous entraîner au combat, ce qui vous donne un bonus permanet, et frottez vous à quelques monstres !</a>
+        </q_a>
+      </faq>
+    <options>
+      <meta>
+        <title>Options</title>
+      </meta>
+      <localization_title>Langue</localization_title>
+      <discord>
+        <link>https://discord.gg/EmRuWPp</link>
+        <title>Lien Discord</title>
+      </discord>
+      <adblock_warning><![CDATA[ATTENTION : pour une raison inconnue, Adblock Plus peut créer des lags gênants.<br>Je n'ajouterai jamais de publicités, donc si votre jeu se fige régulièrement, essayez de le désactiver sur cette page.]]></adblock_warning>
+      <pause_audio_cue>Emmetre un son quand le jeu passe en pause</pause_audio_cue>
+    </options>
+  </menu>
+  <tutorial><![CDATA[
+    TUTORIAL<br>
+    Click the Wander action and click Play to start.<br>
+    Wander for a bit, then smash pots.<br>
+    Watch the numbers change, read all the tooltips.<br>
+    Complete the town, go to the next one.<br><br>
+    ]]></tutorial>
+  <tracked_resources>
+    <reset_on_restart_txt>Se réinitialise quand la boucle redémarre.</reset_on_restart_txt>
+    <resource no_reset_on_restart="true">
+      <title>Mana</title>
+      <id>timer</id>
+      <desc>Votre principale ressource. Plus vous avez de mana, plus vous pouvez faire de chose avant que la boucle redémarre.</desc>
+    </resource>
+    <resource>
+      <title>Pièces d'or</title>
+      <id>gold</id>
+      <desc>A vendre pour acheter du mana, ou d'autres actions.</desc>
+    </resource>
+    <resource>
+      <title>Réputation</title>
+      <id>reputation</id>
+      <desc>L'influence que vous avez sur les gens en ville.</desc>
+    </resource>
+    <resource initially_hidden="true">
+      <title>Vivres</title>
+      <id>supplies</id>
+      <desc>Nécessaire pour aller à la ville suivante.</desc>
+    </resource>
+    <resource initially_hidden="true">
+      <title>Herbes</title>
+      <id>herbs</id>
+      <desc>Les plantes bénéfiques que vous avez récolté.</desc>
+    </resource>
+    <resource initially_hidden="true">
+      <title>Peaux</title>
+      <id>hide</id>
+      <desc>Le résultat d'une chasse fructueuse.</desc>
+    </resource>
+    <resource initially_hidden="true">
+      <title>Potions</title>
+      <id>potions</id>
+      <desc>Rare, mais pas complexe. Vaux quelques pièces d'or.</desc>
+    </resource>
+    <resource initially_hidden="true" no_count="true">
+      <title>Lunettes</title>
+      <id>glasses</id>
+      <desc>Hooooooo, ces arbres ont tellement de feuilles !</desc>
+    </resource>
+  </tracked_resources>
+  <time_controls>
+    <play_button>Lecture</play_button>
+    <pause_button>Pause</pause_button>
+    <pause_before_restart>Pause avant que la boucle redémarre</pause_before_restart>
+    <restart_button>Redémarrer</restart_button>
+    <restart_text>Redémarre la boucle. N'efface pas la sauvegarde.</restart_text>
+    <story_title>Histoire</story_title>
+    <stories>
+      <story num="0">
+        Vous êtes un simple messager, en long voyage pour livre un colis prioritaire. A l'instant où vous arrivez en ville, vous trébuchez - cassant vos lunettes au passage - et le colis s'éventre, vous recouvrant d'un liquide étrange. Imméditament, votre maigre quantité de mana commence à s'évaporer à une vitesse folle. Alors que la dernière goute de mana disparait, vous vous retrouvez quelques instant plus tôt, alors que le liquide s'imprégnait dans votre peau, vos "réserves" remplies,... mais s'écoulant de nouveau rapidement. Ces quelques secondes se déroulent de nouveau, et de nouveau, et encore. Le monde autour redémarre avec vous, jusqu'à ce que vous décidiez de trouver une manière de prolonger ces "boucles". Des cristaux de mana sont souvent présent dans les poteries en ville, peut être que vous devriez commencer par là....
+      </story>
+      <story num="1">
+        Vous arrivez au bout du donjon. Flotant sur un piédestal, une orbe brille doucement. Vous avez trouvé le coeur du donjon, du premier niveau du donjon en tous cas. Alors que vous vous en emparez, son essense vous pénêtre, imprégnant votre être de son pouvoir. C'est une petite quantité d'énergie, mais c'est un petit donjon. Vous reviendrez prendre ce pouvoir encore et encore, sachant qu'il restera en vous au travers des redémarrages de la boucle.
+      </story>
+      <story num="2">
+        Vous arrivez de nouveau au fond du donjon, mais pour la première fois, le coeur ne brille plus. De tout temps, il s'est murmuré que les coeurs de donjons se régénérent en utilisant le mana qui les entoure, mais vous commencez à vous demander si l'essence de ses précédents incarantions ne le draine pas d'une manière ou d'une autre. Ce n'est pas systématique, mais vous devrez disséminer plus de mana dans le monde pour pouvoir bénéficier de la puissance du coeur. Vous levez les épaules, ne pouvant qu'accepter cette nouvelle originalité de la boucle.
+      </story>
+    </stories>
+    <bonus_seconds>
+        <title>Secondes bonus</title>
+        <main_text><![CDATA[
+          Quand le bonus est actif, vous avez 3 secondes bonus par seconde (4 fois plus rapide).<br>
+          Accumulez 0.8 secondes bonus par seconde quand vous activez la pause, ou que vous êtes hors ligne.<br>
+          Le bonus est
+        ]]></main_text>
+        <state>
+          <on>ACTIF</on>
+          <off>INACTIF</off>
+        </state>
+        <counter_text>Secondes bonus en stock</counter_text>
+    </bonus_seconds>
+  </time_controls>
+  <stats>
+    <title>Statistiques</title>
+    <dex>
+      <blurb>Maîtrise ton corps.</blurb>
+      <long_form>Dextérité</long_form>
+      <short_form>Dex</short_form>
+    </dex>
+    <str>
+      <blurb>Entraîne ton corps.</blurb>
+      <long_form>Force</long_form>
+      <short_form>For</short_form>
+    </str>
+    <con>
+      <blurb>Un peu plus longtemps, un peu plus...</blurb>
+      <long_form>Constitution</long_form>
+      <short_form>Cons</short_form>
+    </con>
+    <spd>
+      <blurb>If faut aller vite.</blurb>
+      <long_form>Vitesse</long_form>
+      <short_form>Vit</short_form>
+    </spd>
+    <per>
+      <blurb>Regardez de plus près ...</blurb>
+      <long_form>Perception</long_form>
+      <short_form>Per</short_form>
+    </per>
+    <cha>
+      <blurb>Le dialogue est une bataille.</blurb>
+      <long_form>Charisme</long_form>
+      <short_form>Char</short_form>
+    </cha>
+    <int>
+      <blurb>Apprendre à apprendre.</blurb>
+      <long_form>Intelligence</long_form>
+      <short_form>Int</short_form>
+    </int>
+    <luck>
+      <blurb>L'opportunité sourit aux chanceux.</blurb>
+      <long_form>Chance</long_form>
+      <short_form>Chan</short_form>
+    </luck>
+    <soul>
+      <blurb>Vous êtes le capitaine.</blurb>
+      <long_form>Âme</long_form>
+      <short_form>Âme</short_form>
+    </soul>
+    <tooltip>
+      <level>Niveau</level>
+      <level_exp>XP du niveau</level_exp>
+      <talent>Talent</talent>
+      <talent_exp>XP du Talent</talent_exp>
+      <soulstone>Pierre d'âme</soulstone>
+      <soulstone_multiplier>Mult. de pierre d'âme</soulstone_multiplier>
+      <bonus_xp>Bonus d'XP</bonus_xp>
+      <explanation><![CDATA[
+          Chaque niveau dans une statistique réduit pour une action la portion du coût correspondant à la statistique d'autant de % que le niveau.
+          Le talent reçoit 1% de l'expérience du niveau, et est conservé au travers des redémarrages.
+          Chaque point de talent augmente les gains d'XP de niveau de la statistique correspondante de 1%.
+          L'XP de niveau gagnée pour une statistique donnée pour une action est (coût réel de mana/coût initial de mana) * (talent %) par tick.
+          Le bonus d'XP est la combinaison du bonus des points de talents et des pierres d'âme.<br><br>
+          Par exemple, Rencontrer des gens coûte 800 mana, et est répartit sur les statistiques <div class="bold">Int</div> 10% <div class="bold">Char</div> 80% <div class="bold">Âme</div> 10%.<br>
+          Ce qui signifie que 80 points de mana sont attribués à <div class="bold">Int</div>, 80 à <div class="bold">Soul</div> et les 640 manas restant à <div class="bold">Char</div>.<br>
+          So vous être niveau 20 en <div class="bold">Char</div> quand l'action débute, le coût réel en mana pour le charise est de 640 / 1.2 = 533.333<br>
+          En ajoutant les 160 manas de <div class="bold">Âme</div> et <div class="bold">Int</div>, le coût réel totla de l'action est (arrondi au supérieur) de 694, soit environ 15% de moins que le coût de base.<br>
+          L'action donnerait (800/694)*(1+talent/100) XP de niveau par mana pour chaqu'un des 694 manas.]]></explanation>
+        <graph_legend><![CDATA[
+          Click the legend to show/hide each.<br>
+          Upon freshly starting, Levels and Talent won't change much.<br>
+          Hover Stats for more info.]]></graph_legend>
+    </tooltip>
+    <view>
+      <regular>Vue classique</regular>
+      <radar>Vue radar</radar>
+    </view>
+  </stats>
+  <skills>
+    <title>Compétences</title>
+    <combat>
+      <label>Combat</label>
+      <desc>Battez vous pour votre vie.</desc>
+    </combat>
+    <magic>
+      <label>Magie</label>
+      <desc>Le contrôle de l'aether pour lancer des sorts et des invocations.</desc>
+    </magic>
+    <practical_magic>
+      <label>Magie Utilitaire</label>
+      <desc>Main de mage, magie de rue, détection de la magie, et d'autre tours utiles.</desc>
+      <desc2><![CDATA[Briser des pots et récolter du mana sauvage ont un coût en mana réduit de 1% par niveau (arrondi au supérieur).<br>
+        Crocheter des serrures rapporte 1% d'or supplémentaire par niveau de 1 à 200 (arrondi à l'inférieur).<br>
+        Courte quête rapporte 1% d'or supplémentaire par niveau de 201 à 300 (arrondi à l'inférieur).<br>
+        Longue quête rapporte 1% d'or supplémentaire par niveau de 201 à 400 (arrondi à l'inférieur).]]></desc2>
+    </practical_magic>
+    <alchemy>
+      <label>Alchimie</label>
+      <desc>Fabriquer des potions est une tâche pas évidente ! C'est une bonne chose que vous ayez trouvé un professeur.</desc>
+      <desc2>L'enseignant en Magie de la Ville du débutant adore l'alchimie. +1% à Leçon de magie (arrondi à l'inférieur) par niveau.</desc2>
+    </alchemy>
+    <tooltip>
+      <level>Niveau</level>
+      <no_reset_on_restart>Conservé lors des redémarrages</no_reset_on_restart>
+    </tooltip>
+  </skills>
+  <towns>
+    <town0>
+      <name>Ville du débutant</name>
+      <desc>La ville où toute histoire a un commencement.</desc>
+    </town0>
+    <town1>
+      <name>La forêt parsemée</name>
+      <desc>Une forêt éternellement verte. Vous sentez le mana affluer autour de vous...</desc>
+    </town1>
+    <town2>
+      <name>Marchanville</name>
+      <desc>Une ville qui mériterait une meilleur description.</desc>
+    </town2>
+  </towns>
+  <actions>
+    <title>Actions possibles</title>
+    <title_list>Action List</title_list>
+    <title_loadout>Loadouts</title_loadout>
+    <tooltip>
+      <desc><![CDATA[
+        Le coût en mana est basé sur un ratio du % de stats.<br>
+        Le gain d'XP est proportionnel aussi.<br>
+        L'expérience est gagnée à chaque tick.<br>
+        Les actions utiliserons les objets non vérifiés avant les objets vérifiés.]]></desc>
+      <mana_cost>Coût en Mana</mana_cost>
+      <exp_multiplier>Multiplicateur d'XP</exp_multiplier>
+      <higher_done_percent_benefic>Vous pouvez trouver plus de choses avec un meilleur %.</higher_done_percent_benefic>
+      <progress_label>Progrès</progress_label>
+      <mana_used>Mana Used</mana_used>
+      <mana_used_explanation><![CDATA[
+          Shows stat gain affecting speed.<br>
+          Updates every completed action.<br>
+          Accurate at end of run.]]></mana_used_explanation>
+      <amount>Amount</amount>
+      <current_list_active>Keep current list active</current_list_active>
+      <repeat_last_action>Repeat last action on list</repeat_last_action>
+      <add_action_top>Add action to top of list</add_action_top>
+      <save_loadout>Save List</save_loadout>
+      <load_loadout>Load Selected List</load_loadout>
+      <total_found>Total Found</total_found>
+      <icons>
+        <circle_thin>Cap to current max</circle_thin>
+        <plus>Add one loop</plus>
+        <minus>Subtract one loop</minus>
+        <arrows_h>Split action</arrows_h>
+        <sort_up>Move action up</sort_up>
+        <sort_down>Move action down</sort_down>
+        <times>Remove action</times>
+      </icons>
+      <list_explanation><![CDATA[
+      Drag and drop the actions to re-arrange them.<br>
+      The next list becomes the current list every restart.<br>
+      One second = 50 mana.<br>
+      Minimum 1 tick per action.<br>
+      Restarts automatically upon no actions left.]]></list_explanation>
+    </tooltip>
+    <current_action>
+        <mana_original>Mana Original</mana_original>
+        <mana_used>Mana Used</mana_used>
+        <mana_remaining>Mana Remaining</mana_remaining>
+        <gold_remaining>Gold Remaining</gold_remaining>
+        <failed_attempts>Failed Attempts</failed_attempts>
+        <error>Error</error>
+    </current_action>
+    <wander>
+      <label>Vagabonder</label>
+      <label_done>Exploré</label_done>
+      <tooltip>Explorez la ville, à la recherche de secrets et trésors.</tooltip>
+    </wander>
+    <meet_people>
+      <label>Sociabiliser</label>
+      <label_done>Personnes rencontrées</label_done>
+      <tooltip><![CDATA[
+        Ils ne vous laisseront pas partir avec un simple bonjour.<br>Débloqué à 22% d'exploration.
+      ]]></tooltip>
+    </meet_people>
+    <investigate>
+      <label>Enquêter</label>
+      <label_done>Enquête menée</label_done>
+      <tooltip><![CDATA[
+        Vous avez entendu des rumeurs...<br>Débloqué à 22% de personnes rencontrées.
+      ]]></tooltip>
+    </investigate>
+    <explore_forest>
+      <label>Explorer le bois</label>
+      <label_done>Bois exploré</label_done>
+      <tooltip><![CDATA[
+        Quel endroit plaisant.<br>2x progrès avec des lunettes.
+      ]]></tooltip>
+    </explore_forest>
+    <old_shortcut>
+      <label>Vieux raccourci</label>
+      <label_done>Raccourci Exploré</label_done>
+      <tooltip><![CDATA[
+        Personne n'est passé par ici depuis longtemps.<br>Donne des herbes supplémentaires.<br>Donne des sujets de discussion pour l'hermite. Recevez 1% de récompense pour Parle à l'hermite pour chaque % de raccourci exploré.<br>Débloqué à 20% de bois exploré.
+      ]]></tooltip>
+    </old_shortcut>
+    <hermit>
+      <label>Parler Hermite</label>
+      <label_done>Savoir de l'hermite appris</label_done>
+      <tooltip><![CDATA[
+        This old man is happy to have a listening ear, surely he has some useful knowledge. You hope.<br>Speed is 1% faster for Gather Herbs, Practical Magic, and Learn Alchemy per 1% of Hermit Knowledge.<br>Unlocked with both 20% Shortcut Explored and 40 Magic.
+      ]]></tooltip>
+    </hermit>
+    <explore_city>
+      <label>Explorer la Ville</label>
+      <label_done>Ville explorée</label_done>
+      <tooltip><![CDATA[
+        Everyone is so busy, and there's so much to do.<br>2x progress with glasses.
+      ]]></tooltip>
+    </explore_city>
+    <get_drunk>
+      <label>Se Saouler</label>
+      <label_done>Rumeures entendues</label_done>
+      <tooltip><![CDATA[
+        Sometimes you just need a drink.<br>Costs 2 gold and requires reputation greater than -3.<br>Costs 1 reputation.<br>Unlocked at 20% City Explored.
+      ]]></tooltip>
+    </get_drunk>
+    <buy_glasses>
+      <label>Achat Lunettes</label>
+      <tooltip><![CDATA[
+        That's not fair. There was time now. There was all the time I needed.<br>Now you have to get new glasses again for 10 gold!<br>Causes Wander to be 4x as effective for the rest of the loop.<br>Affects any action with the glasses icon<br>Can only have 1 Buy Glasses action.<br>Unlocked at 20% explored.
+      ]]></tooltip>
+    </buy_glasses>
+    <buy_mana>
+      <label>Achat Mana</label>
+      <tooltip><![CDATA[
+        1 gold = 50 mana. Buys all the mana you can.<br>Unlocked at 20% Explored.
+      ]]></tooltip>
+    </buy_mana>
+    <train_str>
+      <label>Se Muscler</label>
+      <tooltip><![CDATA[
+        Build up those muscles. Again.<br>Has 4x exp/talent gain, and can only be done <div id='trainingLimitStr'></div> times per reset<br>Unlocked at 5% People Met.
+      ]]></tooltip>
+    </train_str>
+    <train_dex>
+      <label>S'exercer</label>
+      <tooltip><![CDATA[
+        The kids are a little mad you're taking their playground. They'll get over it.<br>Has 4x exp/talent gain, and can only be done <div id='trainingLimitDex'></div> times per reset<br>Unlocked at 15% People Met.
+      ]]></tooltip>
+    </train_dex>
+    <train_spd>
+      <label>Sprinter</label>
+      <tooltip><![CDATA[
+        A new friend has a magical treadmill. Gotta go fast.<br>Has 4x exp/talent gain, and can only be done <div id='trainingLimitSpd'></div> times per reset<br>Unlocked at 30% People Met.
+      ]]></tooltip>
+    </train_spd>
+    <throw_party>
+      <label>Faire la fête</label>
+      <tooltip><![CDATA[
+        Take a break and socialize.<br>8x people met % over Meet People for equivalent mana cost.<br>Costs 2 reputation.<br>Unlocked at 30% Investigated.
+      ]]></tooltip>
+    </throw_party>
+    <warrior_lesson>
+      <label>Appr. Combat</label>
+      <tooltip><![CDATA[
+        Learning to fight is probably important; you have a long journey ahead of you.<br>Requires 2 reputation.<br>Unlocked at 20% Investigated.
+      ]]></tooltip>
+    </warrior_lesson>
+    <mage_lesson>
+      <label>Appr. Magie</label>
+      <tooltip><![CDATA[
+        The mystic got you into this mess, maybe it can help you get out of it.<br>Requires 2 reputation.<br>Unlocked at 20% Investigated.
+      ]]></tooltip>
+    </mage_lesson>
+    <buy_supplies>
+      <label>Achat Vivres</label>
+      <tooltip><![CDATA[
+          Prepare to move on.<br>Costs <div id='suppliesCost'></div> gold.<br>You only need one set of supplies.<br>Unlocks at a combined skill of 35.
+      ]]></tooltip>
+    </buy_supplies>
+    <haggle>
+      <label>Négocier</label>
+      <tooltip><![CDATA[
+          They won't like you as much, but hey - you're leaving.<br>Costs 1 reputation to reduce the price of supplies by 20. <br>Unlocks at a combined skill of 35.
+      ]]></tooltip>
+    </haggle>
+    <start_journey>
+      <label>Débuter le voyage</label>
+      <tooltip><![CDATA[
+          Follow the trail to end up at the next town. You need to keep moving until you can learn how to shut these loops off.<br>Costs 1 supplies. Finish once to unlock Forest Path's actions, then finish this in order to use Forest Path's actions.<br>Unlocks at a combined skill of 35.
+      ]]></tooltip>
+    </start_journey>
+    <train_soul>
+      <label>Chutes d'eau</label>
+      <tooltip><![CDATA[
+        It's peaceful here. Loud, but peaceful.<br>Has 4x exp/talent gain, and can only be done <div id='trainingLimitSoul'></div> times per reset<br>Unlocked at 70% Forest Explored.
+      ]]></tooltip>
+    </train_soul>
+    <practical_magic>
+      <label>Magie Utilitaire</label>
+      <tooltip><![CDATA[
+        Such simple uses to help out with everyday tasks. Genius, really. It's like pulling teeth getting this knowledge from the Hermit though.<br>Unlocked with both 20% Hermit Knowledge and 50 Magic.
+      ]]></tooltip>
+    </practical_magic>
+    <learn_alchemy>
+      <label>Appr. Alchimie</label>
+      <tooltip><![CDATA[
+          You can listen to him yammer while making light healing and remedy potions.<br>You're starting to think the potion that caused you to loop time was a complex one.<br>You provide the ingredients; costs 10 herbs.<br>Gives alchemy and magic skill.<br>Unlocked with both 40% Hermit Knowledge and 60 Magic.
+      ]]></tooltip>
+    </learn_alchemy>
+    <brew_potions>
+      <label>Créer Potions</label>
+      <tooltip><![CDATA[
+          Bubbles and Flasks. Potions and Magic.<br>Requires 5 reputation or he won't let you near his stuff.<br>Creates a potion from 10 herbs to sell at the next town.<br>Gives alchemy and magic skill.<br>Unlocked with 10 Alchemy.
+      ]]></tooltip>
+    </brew_potions>
+    <continue_on>
+      <label>Continuer</label>
+      <tooltip><![CDATA[
+          Keep walking to the next town, Merchanton.<br>Mana cost reduced by 60 per Old Shortcut %.
+      ]]></tooltip>
+    </continue_on>
+    <purchase_mana>
+      <label>Achat Mana</label>
+      <tooltip><![CDATA[
+          1 gold = 50 mana. Buys all the mana you can.
+      ]]></tooltip>
+    </purchase_mana>
+    <sell_potions>
+      <label>Vendre Potions</label>
+      <tooltip><![CDATA[
+        Potions are worth 1 gold per alchemy skill, but it takes a bit to find a seller.
+    ]]></tooltip>
+    </sell_potions>
+    <read_books>
+      <label>Lire</label>
+      <tooltip><![CDATA[
+        There's a library! You always loved reading.<br>Discover new worlds and perspectives, get ideas from fiction characters, and empathize with the desire to be stronger.<br>Requires glasses.<br>Has 4x exp/talent gain, and can only be done <div id='trainingLimitInt'></div> times per reset<br>Unlocks at 50% city explored.
+      ]]></tooltip>
+    </read_books>
+    <smash_pots>
+      <label>Casser Pots</label>
+      <label_done>Pots Cassés</label_done>
+      <info_text1>Pots with loot left</info_text1>
+      <info_text2>Pots with loot total</info_text2>
+      <info_text3>Pots to check for loot</info_text3>
+      <tooltip><![CDATA[
+          They're just sitting there, unbroken, full of potential.<br>Pots with loot in them have 100 mana.<br>Every 10 pots have mana.
+      ]]></tooltip>
+    </smash_pots>
+    <locks>
+      <label>Crocheter</label>
+      <label_done>Serrures Crochetées</label_done>
+      <info_text1>Houses with loot left</info_text1>
+      <info_text2>Houses with loot total</info_text2>
+      <info_text3>Houses to check for loot</info_text3>
+      <tooltip><![CDATA[
+          Don't worry; they won't remember.<br>Houses with loot in them have 
+      ]]></tooltip>
+      <tooltip2><![CDATA[
+           gold.<br>Every 10 houses have gold.<br>Unlocked at 20% Explored.
+      ]]></tooltip2>
+    </locks>
+    <short_quest>
+      <label>Quête Courte</label>
+      <label_done>Quêtes Courtes Accomplies</label_done>
+      <info_text1>Quests with loot left</info_text1>
+      <info_text2>Quests with loot total</info_text2>
+      <info_text3>Quests to finish</info_text3>
+      <tooltip><![CDATA[
+          Be a hero! ...If the reward is good and it doesn't take too long.<br>Short Quests with loot give 
+      ]]></tooltip>
+      <tooltip2><![CDATA[
+           gold as a reward.<br>Every 5 Short Quests have loot.<br>Unlocked at 5% People Met.
+      ]]></tooltip2>
+    </short_quest>
+    <long_quest>
+      <label>Quête Longue</label>
+      <label_done>Quêtes Longues Accomplies</label_done>
+      <info_text1>Quests with loot left</info_text1>
+      <info_text2>Quests with loot total</info_text2>
+      <info_text3>Quests to finish</info_text3>
+      <tooltip><![CDATA[
+          Be a more impressive hero! ...As long as someone is watching.<br>Long Quests with loot give 
+      ]]></tooltip>
+      <tooltip2><![CDATA[
+           gold and 1 reputation as a reward.<br>Every 5 Long Quests have loot.<br>Unlocked at 10% Investigated.
+      ]]></tooltip2>
+    </long_quest>
+    <wild_mana>
+      <label>Mana Sauvage</label>
+      <label_done>Sources de Mana récoltées</label_done>
+      <info_text1>Sources with loot left</info_text1>
+      <info_text2>Sources with loot total</info_text2>
+      <info_text3>Sources to check for loot</info_text3>
+      <tooltip><![CDATA[
+          They're out of sight of most travellers, but you have time to find and harvest them.<br>Every good mana spot has 250 mana.<br>Every 10 mana spots have good mana.
+      ]]></tooltip>
+    </wild_mana>
+    <gather_herbs>
+      <label>Récolter Herbes</label>
+      <label_done>Drôles de plantes arrachées</label_done>
+      <info_text1>Plants with loot left</info_text1>
+      <info_text2>Plants with loot total</info_text2>
+      <info_text3>Plants to check for loot</info_text3>
+      <tooltip><![CDATA[
+          Might as well dig up anything useful you find.<br>Every 10 funny plants are herbs.<br>Unlocked at 10% Forest Explored.
+      ]]></tooltip>
+    </gather_herbs>
+    <hunt>
+      <label>Chasser</label>
+      <label_done>Animaux dépecés</label_done>
+      <info_text1>Animals with loot left</info_text1>
+      <info_text2>Animals with loot total</info_text2>
+      <info_text3>Animals to check for loot</info_text3>
+      <tooltip><![CDATA[
+          The forest provides.<br>Every 10 animals have good hides.<br>Unlocked at 40% Forest Explored.<br>NOTE: Using hide is not implemented yet. I'll remove this note when it is.
+      ]]></tooltip>
+    </hunt>
+    <gamble>
+      <label>Parier</label>
+      <label_done>Badauds arnaqués</label_done>
+      <info_text1>Suckers left</info_text1>
+      <info_text2>Suckers total</info_text2>
+      <info_text3>People to check if they're suckers</info_text3>
+      <tooltip><![CDATA[
+          The cards still somehow come out different every time.<br>Has 2x exp/talent gain<br>Costs 20 gold and 1 reputation.<br>Requires reputation greater than -5.<br>You win against every 10 suckers, and get 60 gold for winning.
+      ]]></tooltip>
+    </gamble>
+    <heal_sick>
+      <label>Soigner Gens</label>
+      <label_done>Healed</label_done>
+      <label_part>Patient</label_part>
+      <tooltip><![CDATA[
+          You won't be able to heal them all, but they'll be thankful for doing what you can.<br>Healing is always 3 parts, each with a main stat - Diagnose (Per), Treat (Int), Inform (Cha).<br>Gives (magic skill) * (1 + main stat / 100) * sqrt(1 + times completed / 100) * (original mana cost / actual mana cost) progress points per mana.<br>Requires 12 Magic skill.<br>Gives 3 reputation upon patient completion.
+      ]]></tooltip>
+      <segment_names>
+        <name>Diagnose</name>
+        <name>Treat</name>
+        <name>Inform</name>
+      </segment_names>
+    </heal_sick>
+    <fight_monsters>
+      <label>Tuer Monstres</label>
+      <label_done>Killed</label_done>
+      <tooltip><![CDATA[
+          Slowly, you're figuring out their patterns.<br>Fighting rotates between 3 types of battles, each with a main stat - Quick (Spd), Defensive (Str), Aggressive (Con).<br>Gives (combat skill) * (1 + main stat / 100) * sqrt(1 + times completed / 100) * (original mana cost / actual mana cost) progress points per mana.<br>Requires 10 Combat skill.<br>Gives 20 gold per fight segment completion.
+      ]]></tooltip>
+      <segment_names>
+        <name>Deer</name>
+        <name>Giant Turtles</name>
+        <name>Goblins</name>
+        <name>Demon Rabbits</name>
+        <name>Giant Honeybadgers</name>
+        <name>Venemous Snakes</name>
+        <name>Angry Monkeys</name>
+        <name>Trolls</name>
+        <name>Ogres</name>
+        <name>Pixies</name>
+        <name>Treants</name>
+        <name>Gelatanous Cubes</name>
+        <name>Fairies</name>
+        <name>Orcs</name>
+        <name>Beholders</name>
+        <name>Spectres</name>
+        <name>Shambling Mound</name>
+        <name>Corrupted Mushroomfolk</name>
+        <name>Giant Owls</name>
+        <name>Blood Trolls</name>
+        <name>Small Wyrms</name>
+        <name>Pikachus</name>
+        <name>Machokes</name>
+        <name>Alakazams</name>
+      </segment_names>
+      <segment_alt_names>
+        <name>Speedy Monsters</name>
+        <name>Tough Monsters</name>
+        <name>Scary Monsters</name>
+      </segment_alt_names>
+      <segment_modifier_1>A couple</segment_modifier_1>
+      <segment_modifier_2>A few</segment_modifier_2>
+      <segment_modifier_3>A bunch of</segment_modifier_3>
+    </fight_monsters>
+    <small_dungeon>
+      <label>Petit Donjon</label>
+      <label_done>Looted</label_done>
+      <label_part>Small Dungeon</label_part>
+      <tooltip><![CDATA[
+          There are small changes each time; it's harder to get used to. The soulstones at the end last through loops, but they're not always in the dungeon... Strange.<br>The dungeon requires different skills at different points.<br>One action can clear multiple dungeons if your stats are high enough.<br>Gives (magic + combat skill) * (1 + main stat / 100) * sqrt(1 + times completed / 200) * (original mana cost / actual mana cost) progress points per mana.<br>Requires a combined skill of 35.<br>Gives 1 soulstone per completion - hover over Completed for info.
+      ]]></tooltip>
+      <completed_tooltip><![CDATA[
+        Each soulstone improves a random stat's exp gain by (1+(soulstones)^.8/10). Each soulstone reduces the chance you'll get the next one by 2%.<br>Chance to receive a soulstone recovers at .00002% per mana.
+      ]]></completed_tooltip>
+      <chance_label>Chance</chance_label>
+      <last_stat_label>Last Stat</last_stat_label>
+      <segment_names>
+        <name>Spike Traps</name>
+        <name>Long Hallways</name>
+        <name>Arrow Traps</name>
+        <name>Riddle Guardian</name>
+        <name>Swinging Axes</name>
+        <name>Boss</name>
+        <name>Loot</name>
+      </segment_names>
+    </small_dungeon>
+    <adventure_guild>
+      <label>Guilde</label>
+      <tooltip><![CDATA[
+          The one stop shop for all your adventuring needs.<br>Take their tests and get a rank!<br>You can only join 1 guild at a time, and only try once.<br>Gives 200 mana per rank.<br>Gives ((magic skill)/2 + (combat skill)) * (1 + main stat / 100) * sqrt(1 + times completed / 400) * (original mana cost / actual mana cost) progress points per mana.<br>Unlocks at 20% rumors heard.
+      ]]></tooltip>
+    </adventure_guild>
+    <craft_guild>
+      <label>Crafting Guild</label>
+    </craft_guild>
+  </actions>
+  <spells>
+    <title>Spells</title>
+  </spells>
+</body>

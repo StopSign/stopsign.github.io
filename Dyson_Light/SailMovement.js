@@ -115,7 +115,7 @@ function handleNewSails(theSystem, planetNum) {
         id:newId,
         targetX:0, //bottom left corner
         targetY:640,
-        speed:2 //.5
+        speed:.5
     };
     let launchFromPlanet = planetNum !== data.curPlanet;
     if(planetNum === data.curPlanet) {
@@ -159,7 +159,7 @@ function addNewSunSails(theSystem) {
         data.SsailId++;
     }
     let rand = (Math.random() * 60)|0;
-    let seconds = 5; //((Math.random() * 30)|0) + 120;
+    let seconds = ((Math.random() * 30)|0) + 120;
     let speed = (Math.random()*.3)+.7;
     let sailObj = {
         id:newId,
@@ -195,7 +195,7 @@ function addNewDysonTargetSails(theSystem, prevSailObj) {
         targetY:point.y * sailWidth + sunTop,
         targetDysonX:point.x,
         targetDysonY:point.y,
-        speed:2 //.3
+        speed:.3
     };
 
     theSystem.sailsFromSun.push(sailObj);

@@ -337,7 +337,7 @@ function buyBuilding(type) {
     || type === "launchPad" && !data.research.unlock[4]) {
         return;
     }
-    if(data.curSystem !== 0 && data.curPlanet !== 0 && theCell.type === "ore" && (thePlanet.ore === 0 && thePlanet.electronics === 0 && thePlanet.panels === 0 && thePlanet.sails === 0)) {
+    if((data.curSystem !== 0 || data.curPlanet !== 0) && theCell.type === "ore" && (thePlanet.ore === 0 && thePlanet.electronics === 0 && thePlanet.panels === 0 && thePlanet.sails === 0)) {
         addErrorMessage("Can't start mining until the planet is connected to a Quantum Transport! Send any resource to this planet and you can start mining.");
         view.createErrorMessages();
         return;
