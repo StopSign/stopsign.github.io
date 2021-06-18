@@ -1,156 +1,197 @@
-'use strict';
-function translateClassNames(name) {
-    if(name === "Wander") {
-        return new Wander();
-    } else if(name === "Smash Pots") {
-        return new SmashPots();
-    } else if(name === "Pick Locks") {
-        return new PickLocks();
-    } else if(name === "Buy Glasses") {
-        return new BuyGlasses();
-    } else if(name === "Buy Mana") {
-        return new BuyMana();
-    } else if(name === "Meet People") {
-        return new MeetPeople();
-    } else if(name === "Train Strength") {
-        return new TrainStr();
-    } else if(name === "Short Quest") {
-        return new ShortQuest();
-    } else if(name === "Investigate") {
-        return new Investigate();
-    } else if(name === "Long Quest") {
-        return new LongQuest();
-    } else if(name === "Warrior Lessons") {
-        return new WarriorLessons();
-    } else if(name === "Mage Lessons") {
-        return new MageLessons();
-    } else if(name === "Throw Party") {
-        return new ThrowParty();
-    } else if(name === "Heal The Sick") {
-        return new HealTheSick();
-    } else if(name === "Fight Monsters") {
-        return new FightMonsters();
-    } else if(name === "Small Dungeon") {
-        return new SmallDungeon();
-    } else if(name === "Buy Supplies") {
-        return new BuySupplies();
-    } else if(name === "Haggle") {
-        return new Haggle();
-    } else if(name === "Start Journey") {
-        return new StartJourney();
-    }
-    //town 2
-    if(name === "Explore Forest") {
-        return new ExploreForest();
-    } else if(name === "Wild Mana") {
-        return new WildMana();
-    } else if(name === "Gather Herbs") {
-        return new GatherHerbs();
-    } else if(name === "Hunt") {
-        return new Hunt();
-    } else if(name === "Sit By Waterfall") {
-        return new SitByWaterfall();
-    } else if(name === "Old Shortcut") {
-        return new OldShortcut();
-    } else if(name === "Talk To Hermit") {
-        return new TalkToHermit();
-    } else if(name === "Practical Magic") {
-        return new PracticalMagic();
-    } else if(name === "Learn Alchemy") {
-        return new LearnAlchemy();
-    } else if(name === "Brew Potions") {
-        return new BrewPotions();
-    } else if(name === "Train Dex") {
-        return new TrainDex();
-    } else if(name === "Train Speed") {
-        return new TrainSpd();
-    } else if(name === "Continue On") {
-        return new ContinueOn();
-    }
-    //town 3
-    if(name === "Explore City") {
-        return new ExploreCity();
-    } else if(name === "Gamble") {
-        return new Gamble();
-    } else if(name === "Get Drunk") {
-        return new GetDrunk();
-    } else if(name === "Purchase Mana") {
-        return new PurchaseMana();
-    } else if(name === "Sell Potions") {
-        return new SellPotions();
-    } else if(name === "Read Books") {
-        return new ReadBooks();
-    } else if(name === "Adventure Guild") {
-        return new JoinAdvGuild();
-    } else if(name === "Gather Team") {
-        return new GatherTeam();
-    } else if(name === "Large Dungeon") {
-        return new LargeDungeon();
-    } else if(name === "Crafting Guild") {
-        return new CraftingGuild();
-    } else if(name === "Craft Armor") {
-        return new CraftArmor();
-    } else if(name === "Apprentice") {
-        return new Apprentice();
-    } else if(name === "Mason") {
-        return new Mason();
-    } else if(name === "Architect") {
-        return new Architect();
-    } else if(name === "Tournament") {
-        return new Tournament();
-    }
-    console.log('error trying to create ' + name);
+"use strict";
+
+function withoutSpaces(name) {
+    return name.replace(/ /gu, "");
 }
 
-function hasCap(name) {
-    return (name === "Smash Pots" || name === "Pick Locks" || name === "Short Quest" || name === "Long Quest" || name === "Gather Herbs" || name === "Wild Mana" || name === "Hunt" || name === "Gamble");
+function translateClassNames(name) {
+    // construct a new action object with appropriate prototype
+    const nameWithoutSpaces = withoutSpaces(name);
+    if (nameWithoutSpaces in Action) {
+        return Object.create(Action[nameWithoutSpaces]);
+    }
+    console.log(`error trying to create ${name}`);
+    return false;
+}
+
+const limitedActions = [
+    "Smash Pots",
+    "Pick Locks",
+    "Short Quest",
+    "Long Quest",
+    "Gather Herbs",
+    "Wild Mana",
+    "Hunt",
+    "Gamble",
+    "Mana Geyser",
+    "Mine Soulstones",
+    "Accept Donations"
+];
+const trainingActions = [
+    "Train Speed",
+    "Train Strength",
+    "Train Dexterity",
+    "Sit By Waterfall",
+    "Read Books",
+    "Bird Watching"
+];
+function hasLimit(name) {
+    return limitedActions.includes(name);
 }
 function getTravelNum(name) {
-    return (name === "Start Journey" || name === "Continue On") ? 1 : 0;
+    if (name === "Face Judgement" && resources.reputation <= 50) return 2;
+    if (name === "Face Judgement" && resources.reputation >= 50) return 1;
+    if (name === "Start Journey" || name === "Continue On" || name === "Start Trek" || name === "Fall From Grace") return 1;
+    return 0;
 }
 function isTraining(name) {
-    return name === "Train Speed" || name === "Train Strength" || name === "Train Dex" || name === "Sit By Waterfall" || name === "Read Books";
+    return trainingActions.includes(name);
 }
 
-let townNames = ["Beginnersville", "Forest Path", "Merchanton"];
+function getXMLName(name) {
+    return name.toLowerCase().replace(/ /gu, "_");
+}
+
+const townNames = ["Beginnersville", "Forest Path", "Merchanton", "Mt. Olympus", "Valhalla", "Adeptsville"];
 
 
-//Progress actions
-//Progress actions have a progress bar and use 100,200,300,etc. leveling system
+// there are 4 types of actions
+// 1: normal actions. normal actions have no additional UI (haggle, train strength)
+// 2: progress actions. progress actions have a progress bar and use 100, 200, 300, etc. leveling system (wander, meet people)
+// 3: limited actions. limited actions have town info for their limit, and a set of town vars for their "data"
+// 4: multipart actions. multipart actions have multiple distinct parts to get through before repeating. they also get a bonus depending on how often you complete them
 
-function Wander() {
-    this.name = "Wander";
-    this.expMult = 1;
-    this.townNum = 0;
-    this.tooltip = _txt("actions>wander>tooltip");
-    this.label = _txt("actions>wander>label");
-    this.labelDone = _txt("actions>wander>label_done");
-    
-    this.varName = "Wander";
-    this.stats = {
-        Per:.2,
-        Con:.2,
-        Cha:.2,
-        Spd:.3,
-        Luck:.1
-    };
-    this.affectedBy = ["Buy Glasses"];
-    this.manaCost = function() {
+// type names are "normal", "progress", "limited", and "multipart".
+// define one of these in the action, and they will create any additional UI elements that are needed
+
+// exp mults are default 100%, 150% for skill training actions, 200% for actions that cost a resource, 300% for actions that cost 2 resources, and 500% for actions that cost soulstones
+// todo: ^^ currently some actions are too high, but I am saving these balance changes for the z5/z6 update
+
+// actions are all sorted below by town in order
+
+function Action(name, extras) {
+    this.name = name;
+    // many actions have to override this (in extras) for save compatibility, because the
+    // varName is often used in parts of the game state
+    this.varName = withoutSpaces(name);
+    Object.assign(this, extras);
+}
+
+/* eslint-disable no-invalid-this */
+// not all actions have tooltip2 or labelDone, but among actions that do, the XML format is
+// always the same; these are loaded lazily once (and then they become own properties of the
+// specific Action object)
+defineLazyGetter(Action.prototype, "tooltip", function() {
+    return _txt(`actions>${getXMLName(this.name)}>tooltip`);
+});
+defineLazyGetter(Action.prototype, "tooltip2", function() {
+    return _txt(`actions>${getXMLName(this.name)}>tooltip2`);
+});
+defineLazyGetter(Action.prototype, "label", function() {
+    return _txt(`actions>${getXMLName(this.name)}>label`);
+});
+defineLazyGetter(Action.prototype, "labelDone", function() {
+    return _txt(`actions>${getXMLName(this.name)}>label_done`);
+});
+
+// all actions to date with info text have the same info text, so presently this is
+// centralized here (function will not be called by the game code if info text is not
+// applicable)
+Action.prototype.infoText = function() {
+    return `${_txt(`actions>${getXMLName(this.name)}>info_text1`)}
+            <i class='fa fa-arrow-left'></i>
+            ${_txt(`actions>${getXMLName(this.name)}>info_text2`)}
+            <i class='fa fa-arrow-left'></i>
+            ${_txt(`actions>${getXMLName(this.name)}>info_text3`)}
+            <br><span class='bold'>${`${_txt("actions>tooltip>total_found")}: `}</span><div id='total${this.varName}'></div>
+            <br><span class='bold'>${`${_txt("actions>tooltip>total_checked")}: `}</span><div id='checked${this.varName}'></div>`;
+};
+
+// same as Action, but contains shared code to load segment names for multipart actions.
+// (constructor takes number of segments as a second argument)
+function MultipartAction(name, extras) {
+    Action.call(this, name, extras);
+    this.segments = (extras.varName === "Fight") ? 3 : extras.loopStats.length;
+}
+MultipartAction.prototype = Object.create(Action.prototype);
+MultipartAction.prototype.constructor = MultipartAction;
+// lazily calculate segment names when explicitly requested (to give chance for localization
+// code to be loaded first)
+defineLazyGetter(MultipartAction.prototype, "segmentNames", function() {
+    return Array.from(
+        _txtsObj(`actions>${getXMLName(this.name)}>segment_names>name`)
+    ).map(elt => elt.textContent);
+});
+MultipartAction.prototype.getSegmentName = function(segment) {
+    return this.segmentNames[segment % this.segmentNames.length];
+};
+/* eslint-enable no-invalid-this */
+
+// same as MultipartAction, but includes shared code to generate dungeon completion tooltip
+// as well as specifying 7 segments (constructor takes dungeon ID number as a second
+// argument)
+function DungeonAction(name, dungeonNum, extras) {
+    MultipartAction.call(this, name, extras);
+    this.dungeonNum = dungeonNum;
+}
+DungeonAction.prototype = Object.create(MultipartAction.prototype);
+DungeonAction.prototype.constructor = DungeonAction;
+DungeonAction.prototype.completedTooltip = function() {
+    let ssDivContainer = "";
+    for (let i = 0; i < dungeons[this.dungeonNum].length; i++) {
+        ssDivContainer += `Floor ${i + 1} |
+                            <div class='bold'>${_txt(`actions>${getXMLName(this.name)}>chance_label`)} </div> <div id='soulstoneChance${this.dungeonNum}_${i}'></div>% - 
+                            <div class='bold'>${_txt(`actions>${getXMLName(this.name)}>last_stat_label`)} </div> <div id='soulstonePrevious${this.dungeonNum}_${i}'>NA</div> - 
+                            <div class='bold'>${_txt(`actions>${getXMLName(this.name)}>label_done`)}</div> <div id='soulstoneCompleted${this.dungeonNum}_${i}'></div><br>`;
+    }
+    return _txt(`actions>${getXMLName(this.name)}>completed_tooltip`) + ssDivContainer;
+};
+DungeonAction.prototype.getPartName = function() {
+    const floor = Math.floor((towns[this.townNum][`${this.varName}LoopCounter`] + 0.0001) / this.segments + 1);
+    return `${_txt(`actions>${getXMLName(this.name)}>label_part`)} ${floor <= dungeons[this.dungeonNum].length ? numberToWords(floor) : _txt(`actions>${getXMLName(this.name)}>label_complete`)}`;
+};
+
+// town 1
+Action.Wander = new Action("Wander", {
+    type: "progress",
+    expMult: 1,
+    townNum: 0,
+    storyReqs(storyNum) {
+        switch (storyNum) {
+            case 1:
+                return towns[0].getLevel(this.varName) >= 20;
+            case 2:
+                return towns[0].getLevel(this.varName) >= 40;
+            case 3:
+                return towns[0].getLevel(this.varName) >= 60;
+            case 4:
+                return towns[0].getLevel(this.varName) >= 80;
+            case 5:
+                return towns[0].getLevel(this.varName) >= 100;
+        }
+        return false;
+    },
+    stats: {
+        Per: 0.2,
+        Con: 0.2,
+        Cha: 0.2,
+        Spd: 0.3,
+        Luck: 0.1
+    },
+    affectedBy: ["Buy Glasses"],
+    manaCost() {
         return 250;
-    };
-    this.visible = function() {
+    },
+    visible() {
         return true;
-    };
-    this.unlocked = function() {
+    },
+    unlocked() {
         return true;
-    };
-    this.finish = function() {
-        towns[0].finishProgress(this.varName, 200 * (glasses ? 4 : 1), function() {
-            adjustPots();
-            adjustLocks();
-        });
-    };
-}
+    },
+    finish() {
+        towns[0].finishProgress(this.varName, 200 * (resources.glasses ? 4 : 1));
+    }
+});
 function adjustPots() {
     towns[0].totalPots = towns[0].getLevel("Wander") * 5;
 }
@@ -158,1919 +199,3431 @@ function adjustLocks() {
     towns[0].totalLocks = towns[0].getLevel("Wander");
 }
 
-function MeetPeople() {
-    this.name = "Meet People";
-    this.expMult = 1;
-    this.townNum = 0;
-    this.tooltip = _txt("actions>meet_people>tooltip");
-    this.label = _txt("actions>meet_people>label");
-    this.labelDone = _txt("actions>meet_people>label_done");
-
-    this.varName = "Met";
-    this.stats = {
-        Int:.1,
-        Cha:.8,
-        Soul:.1
-    };
-    this.manaCost = function() {
-        return 800;
-    };
-    this.visible = function() {
-        return towns[0].getLevel("Wander") >= 10;
-    };
-    this.unlocked = function() {
-        return towns[0].getLevel("Wander") >= 22;
-    };
-    this.finish = function() {
-        towns[0].finishProgress(this.varName, 200, function() {
-            adjustSQuests();
+Action.SmashPots = new Action("Smash Pots", {
+    type: "limited",
+    expMult: 1,
+    townNum: 0,
+    varName: "Pots",
+    storyReqs(storyNum) {
+        switch (storyNum) {
+            case 1:
+                return towns[0][`good${this.varName}`] >= 50;
+        }
+        return false;
+    },
+    stats: {
+        Str: 0.2,
+        Per: 0.2,
+        Spd: 0.6
+    },
+    manaCost() {
+        return Math.ceil(50 / (1 + getSkillLevel("Practical") / 100));
+    },
+    visible() {
+        return true;
+    },
+    unlocked() {
+        return true;
+    },
+    // note this name is misleading: it is used for mana and gold gain.
+    goldCost() {
+        return Math.floor(100 * Math.pow(1 + getSkillLevel("Dark") / 60, 0.25));
+    },
+    finish() {
+        towns[0].finishRegular(this.varName, 10, () => {
+            const manaGain = this.goldCost();
+            addMana(manaGain);
+            return manaGain;
         });
-    };
-}
+    }
+});
+
+Action.PickLocks = new Action("Pick Locks", {
+    type: "limited",
+    varName: "Locks",
+    expMult: 1,
+    townNum: 0,
+    storyReqs(storyNum) {
+        switch (storyNum) {
+            case 1:
+                return towns[0][`checked${this.varName}`] >= 1;
+            case 2:
+                return towns[0][`checked${this.varName}`] >= 50;
+            case 3:
+                return towns[0][`good${this.varName}`] >= 10;
+        }
+        return false;
+    },
+    stats: {
+        Dex: 0.5,
+        Per: 0.3,
+        Spd: 0.1,
+        Luck: 0.1
+    },
+    manaCost() {
+        return 400;
+    },
+    visible() {
+        return towns[0].getLevel("Wander") >= 3;
+    },
+    unlocked() {
+        return towns[0].getLevel("Wander") >= 20;
+    },
+    goldCost() {
+        let practical = getSkillLevel("Practical");
+        practical = practical <= 200 ? practical : 200;
+        return Math.floor(10 * (1 + practical / 100));
+    },
+    finish() {
+        towns[0].finishRegular(this.varName, 10, () => {
+            const goldGain = this.goldCost();
+            addResource("gold", goldGain);
+            return goldGain;
+        });
+    }
+});
+
+Action.BuyGlasses = new Action("Buy Glasses", {
+    type: "normal",
+    expMult: 1,
+    townNum: 0,
+    storyReqs(storyNum) {
+        switch (storyNum) {
+            case 1:
+                return storyReqs.glassesBought;
+        }
+        return false;
+    },
+    stats: {
+        Cha: 0.7,
+        Spd: 0.3
+    },
+    allowed() {
+        return 1;
+    },
+    canStart() {
+        return resources.gold >= 10;
+    },
+    cost() {
+        addResource("gold", -10);
+    },
+    manaCost() {
+        return 50;
+    },
+    visible() {
+        return towns[0].getLevel("Wander") >= 3;
+    },
+    unlocked() {
+        return towns[0].getLevel("Wander") >= 20;
+    },
+    finish() {
+        addResource("glasses", true);
+        unlockStory("glassesBought");
+    }
+});
+
+Action.BuyMana = new Action("Buy Mana", {
+    type: "normal",
+    expMult: 1,
+    townNum: 0,
+    stats: {
+        Cha: 0.7,
+        Int: 0.2,
+        Luck: 0.1
+    },
+    manaCost() {
+        return 100;
+    },
+    visible() {
+        return towns[0].getLevel("Wander") >= 3;
+    },
+    unlocked() {
+        return towns[0].getLevel("Wander") >= 20;
+    },
+    finish() {
+        addMana(resources.gold * 50);
+        resetResource("gold");
+    },
+});
+
+Action.MeetPeople = new Action("Meet People", {
+    type: "progress",
+    expMult: 1,
+    townNum: 0,
+    varName: "Met",
+    storyReqs(storyNum) {
+        switch (storyNum) {
+            case 1:
+                return towns[0].getLevel(this.varName) >= 1;
+            case 2:
+                return towns[0].getLevel(this.varName) >= 20;
+            case 3:
+                return towns[0].getLevel(this.varName) >= 40;
+            case 4:
+                return towns[0].getLevel(this.varName) >= 60;
+            case 5:
+                return towns[0].getLevel(this.varName) >= 80;
+            case 6:
+                return towns[0].getLevel(this.varName) >= 100;
+        }
+        return false;
+    },
+    stats: {
+        Int: 0.1,
+        Cha: 0.8,
+        Soul: 0.1
+    },
+    manaCost() {
+        return 800;
+    },
+    visible() {
+        return towns[0].getLevel("Wander") >= 10;
+    },
+    unlocked() {
+        return towns[0].getLevel("Wander") >= 22;
+    },
+    finish() {
+        towns[0].finishProgress(this.varName, 200);
+    },
+});
 function adjustSQuests() {
     towns[0].totalSQuests = towns[0].getLevel("Met");
 }
 
-function Investigate() {
-    this.name = "Investigate";
-    this.expMult = 1;
-    this.townNum = 0;
-    this.tooltip = _txt("actions>investigate>tooltip");
-    this.label = _txt("actions>investigate>label");
-    this.labelDone = _txt("actions>investigate>label_done");
-
-    this.varName = "Secrets";
-    this.stats = {
-        Per:.3,
-        Cha:.4,
-        Spd:.2,
-        Luck:.1
-    };
-    this.manaCost = function() {
-        return 1000;
-    };
-    this.visible = function() {
-        return towns[0].getLevel("Met") >= 5;
-    };
-    this.unlocked = function() {
-        return towns[0].getLevel("Met") >= 25;
-    };
-    this.finish = function() {
-        towns[0].finishProgress(this.varName, 500, function() {
-            adjustLQuests();
-        });
-    };
-}
-function adjustLQuests() {
-    towns[0].totalLQuests = Math.floor(towns[0].getLevel("Secrets")/2);
-}
-
-function ExploreForest() {
-    this.name = "Explore Forest";
-    this.expMult = 1;
-    this.townNum = 1;
-    this.tooltip = _txt("actions>explore_forest>tooltip");
-    this.label = _txt("actions>explore_forest>label");
-    this.labelDone = _txt("actions>explore_forest>label_done");
-
-    this.varName = "Forest";
-    this.stats = {
-        Per:.4,
-        Con:.2,
-        Spd:.2,
-        Luck:.2
-    };
-    this.affectedBy = ["Buy Glasses"];
-    this.manaCost = function() {
-        return 400;
-    };
-    this.visible = function() {
-        return true;
-    };
-    this.unlocked = function() {
-        return true;
-    };
-    this.finish = function() {
-        towns[1].finishProgress(this.varName, 100 * (glasses ? 2 : 1), function() {
-            adjustWildMana();
-            adjustHunt();
-            adjustHerbs();
-        });
-    };
-}
-function adjustWildMana() {
-    towns[1].totalWildMana = towns[1].getLevel("Forest") * 5;
-}
-function adjustHunt() {
-    towns[1].totalHunt = towns[1].getLevel("Forest") * 2;
-}
-function adjustHerbs() {
-    towns[1].totalHerbs = towns[1].getLevel("Forest") * 5 + towns[1].getLevel("Shortcut") * 2;
-}
-
-function OldShortcut() {
-    this.name = "Old Shortcut";
-    this.expMult = 1;
-    this.townNum = 1;
-    this.tooltip = _txt("actions>old_shortcut>tooltip");
-    this.label = _txt("actions>old_shortcut>label");
-    this.labelDone = _txt("actions>old_shortcut>label_done");
-
-    this.varName = "Shortcut";
-    this.stats = {
-        Per:.3,
-        Con:.4,
-        Spd:.2,
-        Luck:.1
-    };
-    this.manaCost = function() {
-        return 1200;
-    };
-    this.visible = function() {
-        return true;
-    };
-    this.unlocked = function() {
-        return towns[1].getLevel("Forest") >= 20;
-    };
-    this.finish = function() {
-        towns[1].finishProgress(this.varName, 100, function() {
-            adjustHerbs();
-            view.adjustManaCost("Continue On");
-        });
-    };
-}
-
-function TalkToHermit() {
-    this.name = "Talk To Hermit";
-    this.expMult = 1;
-    this.townNum = 1;
-    this.tooltip = _txt("actions>hermit>tooltip");
-    this.label = _txt("actions>hermit>label");
-    this.labelDone = _txt("actions>hermit>label_done");
-
-    this.varName = "Hermit";
-    this.stats = {
-        Con:.5,
-        Cha:.3,
-        Soul:.2
-    };
-    this.manaCost = function() {
-        return 2000;
-    };
-    this.visible = function() {
-        return true;
-    };
-    this.unlocked = function() {
-        return towns[1].getLevel("Shortcut") >= 20 && getSkillLevel("Magic") >= 40;
-    };
-    this.finish = function() {
-        towns[1].finishProgress(this.varName, 50 * (1 + towns[1].getLevel("Shortcut")/100), function() {
-            view.adjustManaCost("Learn Alchemy");
-            view.adjustManaCost("Gather Herbs");
-            view.adjustManaCost("Practical Magic");
-        });
-    };
-}
-
-function ExploreCity() {
-    this.name = "Explore City";
-    this.expMult = 1;
-    this.townNum = 2;
-    this.tooltip = _txt("actions>explore_city>tooltip");
-    this.label = _txt("actions>explore_city>label");
-    this.labelDone = _txt("actions>explore_city>label_done");
-
-    this.varName = "City";
-    this.stats = {
-        Con:.1,
-        Per:.3,
-        Cha:.2,
-        Spd:.3,
-        Luck:.1
-    };
-    this.affectedBy = ["Buy Glasses"];
-    this.manaCost = function() {
-        return 750;
-    };
-    this.visible = function() {
-        return true;
-    };
-    this.unlocked = function() {
-        return true;
-    };
-    this.finish = function() {
-        towns[2].finishProgress(this.varName, 100 * (glasses ? 2 : 1), function() {
-            adjustSuckers();
-        });
-    };
-}
-function adjustSuckers() {
-    towns[2].totalGamble = towns[2].getLevel("City") * 3;
-}
-
-function GetDrunk() {
-    this.name = "Get Drunk";
-    this.expMult = 3;
-    this.townNum = 2;
-    this.tooltip = _txt("actions>get_drunk>tooltip");
-    this.label = _txt("actions>get_drunk>label");
-    this.labelDone = _txt("actions>get_drunk>label_done");
-
-    this.varName = "Drunk";
-    this.stats = {
-        Str:.1,
-        Cha:.5,
-        Con:.2,
-        Soul:.2
-    };
-    this.canStart = function() {
-        return reputation >= -3
-    };
-    this.cost = function() {
-        addReputation(-1);
-    };
-    this.manaCost = function() {
-        return 1000;
-    };
-    this.visible = function() {
-        return true;
-    };
-    this.unlocked = function() {
-        return towns[2].getLevel("City") >= 20;
-    };
-    this.finish = function() {
-        towns[2].finishProgress(this.varName, 100, function() {
-        });
-    };
-}
-
-function Apprentice() {
-    this.varName = "Apprentice";
-    this.name = "Apprentice";
-    this.expMult = 1.5;
-    this.townNum = 2;
-    this.tooltip = _txt("actions>apprentice>tooltip");
-    this.label = _txt("actions>apprentice>label");
-    this.labelDone = _txt("actions>apprentice>label_done");
-
-    this.stats = {
-        Dex:.2,
-        Int:.4,
-        Cha:.4
-    };
-    this.affectedBy = ["Crafting Guild"];
-    this.canStart = function() {
-        return guild === "Crafting";
-    };
-    this.manaCost = function() {
-        return 2000;
-    };
-    this.visible = function() {
-        return towns[2].getLevel("Drunk") >= 20;
-    };
-    this.unlocked = function() {
-        return towns[2].getLevel("Drunk") >= 40;
-    };
-    this.finish = function() {
-        towns[2].finishProgress(this.varName, 30 * getCraftGuildRank().bonus, function() {
-        });
-        addSkillExp("Crafting", 10 * (1 + towns[2].getLevel(this.varName)/100));
-        view.updateSkill("Crafting");
-    };
-}
-
-function Mason() {
-    this.varName = "Mason";
-    this.name = "Mason";
-    this.expMult = 2;
-    this.townNum = 2;
-    this.tooltip = _txt("actions>mason>tooltip");
-    this.label = _txt("actions>mason>label");
-    this.labelDone = _txt("actions>mason>label_done");
-
-    this.stats = {
-        Dex:.2,
-        Int:.5,
-        Cha:.3
-    };
-    this.affectedBy = ["Crafting Guild"];
-    this.canStart = function() {
-        return guild === "Crafting";
-    };
-    this.manaCost = function() {
-        return 2000;
-    };
-    this.visible = function() {
-        return towns[2].getLevel("Drunk") >= 40;
-    };
-    this.unlocked = function() {
-        return towns[2].getLevel("Drunk") >= 60 && towns[2].getLevel("Apprentice") >= 100;
-    };
-    this.finish = function() {
-        towns[2].finishProgress(this.varName, 20 * getCraftGuildRank().bonus, function() {
-        });
-        addSkillExp("Crafting", 20 * (1 + towns[2].getLevel(this.varName)/100));
-        view.updateSkill("Crafting");
-    };
-}
-
-function Architect() {
-    this.varName = "Architect";
-    this.name = "Architect";
-    this.expMult = 2.5;
-    this.townNum = 2;
-    this.tooltip = _txt("actions>architect>tooltip");
-    this.label = _txt("actions>architect>label");
-    this.labelDone = _txt("actions>architect>label_done");
-
-    this.stats = {
-        Dex:.2,
-        Int:.6,
-        Cha:.2
-    };
-    this.affectedBy = ["Crafting Guild"];
-    this.canStart = function() {
-        return guild === "Crafting";
-    };
-    this.manaCost = function() {
-        return 2000;
-    };
-    this.visible = function() {
-        return towns[2].getLevel("Drunk") >= 60;
-    };
-    this.unlocked = function() {
-        return towns[2].getLevel("Drunk") >= 80 && towns[2].getLevel("Mason") >= 100;
-    };
-    this.finish = function() {
-        towns[2].finishProgress(this.varName, 10 * getCraftGuildRank().bonus, function() {
-        });
-        addSkillExp("Crafting", 40 * (1 + towns[2].getLevel(this.varName)/100));
-        view.updateSkill("Crafting");
-    };
-}
-
-//Basic actions
-//Basic actions have no additional UI
-
-function BuyGlasses() {
-    this.name = "Buy Glasses";
-    this.expMult = 1;
-    this.townNum = 0;
-    this.tooltip = _txt("actions>buy_glasses>tooltip");
-    this.label = _txt("actions>buy_glasses>label");
-
-    this.varName = "Glasses";
-    this.stats = {
-        Cha:.7,
-        Spd:.3
-    };
-    this.allowed = function() {
-        return 1;
-    };
-    this.canStart = function() {
-        return gold >= 10;
-    };
-    this.cost = function() {
-        addGold(-10);
-    };
-    this.manaCost = function() {
-        return 50;
-    };
-    this.visible = function() {
-        return towns[0].getLevel("Wander") >= 3;
-    };
-    this.unlocked = function() {
-        return towns[0].getLevel("Wander") >= 20;
-    };
-    this.finish = function() {
-        addGlasses(1);
-    };
-}
-
-function BuyMana() {
-    this.name = "Buy Mana";
-    this.expMult = 1;
-    this.townNum = 0;
-    this.tooltip = _txt("actions>buy_mana>tooltip");
-    this.label = _txt("actions>buy_mana>label");
-
-    this.varName = "Gold";
-    this.stats = {
-        Cha:.7,
-        Int:.2,
-        Luck:.1
-    };
-    this.manaCost = function() {
-        return 100;
-    };
-    this.visible = function() {
-        return towns[0].getLevel("Wander") >= 3;
-    };
-    this.unlocked = function() {
-        return towns[0].getLevel("Wander") >= 20;
-    };
-    this.finish = function() {
-        addMana(gold * 50);
-        addGold(-gold);
-    };
-}
-
-function TrainStr() {
-    this.name = "Train Strength";
-    this.expMult = 4;
-    this.townNum = 0;
-    this.tooltip = _txt("actions>train_str>tooltip");
-    this.label = _txt("actions>train_str>label");
-
-    this.varName = "trStr";
-    this.stats = {
-        Str:.8,
-        Con:.2
-    };
-    this.allowed = function() {
-        return trainingLimits;
-    };
-    this.manaCost = function() {
-        return 2000;
-    };
-    this.visible = function() {
-        return towns[0].getLevel("Met") >= 1;
-    };
-    this.unlocked = function() {
-        return towns[0].getLevel("Met") >= 5;
-    };
-    this.finish = function() {
-    };
-}
-
-function ThrowParty() {
-    this.name = "Throw Party";
-    this.expMult = 2;
-    this.townNum = 0;
-    this.tooltip = _txt("actions>throw_party>tooltip");
-    this.label = _txt("actions>throw_party>label");
-
-    this.varName = "Party";
-    this.stats = {
-        Cha:.8,
-        Soul:.2
-    };
-    this.manaCost = function() {
-        return 1600;
-    };
-    this.canStart = function() {
-        return reputation >= 2;
-    };
-    this.cost = function() {
-        addReputation(-2);
-    };
-    this.visible = function() {
-        return towns[0].getLevel("Secrets") >= 20;
-    };
-    this.unlocked = function() {
-        return towns[0].getLevel("Secrets") >= 30;
-    };
-    this.finish = function() {
-        towns[0].finishProgress("Met", 3200, function() {
-            towns[0].totalSQuests = towns[0].getLevel("Met");
-        });
-    };
-}
-
-function WarriorLessons() {
-    this.name = "Warrior Lessons";
-    this.expMult = 1.5;
-    this.tooltip = "Learning to fight is probably important; you have a long journey ahead of you.<br>Requires 2 reputation.<br>Unlocked at 20% Investigated.";
-    this.townNum = 0;
-    this.tooltip = _txt("actions>warrior_lesson>tooltip");
-    this.label = _txt("actions>warrior_lesson>label");
-
-    this.varName = "trCombat";
-    this.stats = {
-        Str:.5,
-        Dex:.3,
-        Con:.2
-    };
-    this.manaCost = function() {
-        return 1000;
-    };
-    this.canStart = function() {
-        return reputation >= 2;
-    };
-    this.cost = function() {
-    };
-    this.visible = function() {
-        return towns[0].getLevel("Secrets") >= 10;
-    };
-    this.unlocked = function() {
-        return towns[0].getLevel("Secrets") >= 20;
-    };
-    this.finish = function() {
-        addSkillExp("Combat", 100);
-        view.updateProgressActions();
-    };
-}
-
-function MageLessons() {
-    this.name = "Mage Lessons";
-    this.expMult = 1.5;
-    this.tooltip = "The mystic got you into this mess, maybe it can help you get out of it.<br>Requires 2 reputation.<br>Unlocked at 20% Investigated.";
-    this.townNum = 0;
-    this.tooltip = _txt("actions>mage_lesson>tooltip");
-    this.label = _txt("actions>mage_lesson>label");
-
-    this.varName = "trMagic";
-    this.stats = {
-        Per:.3,
-        Int:.5,
-        Con:.2
-    };
-    this.manaCost = function() {
-        return 1000;
-    };
-    this.canStart = function() {
-        return reputation >= 2;
-    };
-    this.cost = function() {
-    };
-    this.visible = function() {
-        return towns[0].getLevel("Secrets") >= 10;
-    };
-    this.unlocked = function() {
-        return towns[0].getLevel("Secrets") >= 20;
-    };
-    this.finish = function() {
-        addSkillExp("Magic", 100 * (1 + getSkillLevel("Alchemy")/100));
-        view.updateProgressActions();
-    };
-}
-
-function BuySupplies() {
-    this.name = "Buy Supplies";
-    this.expMult = 1;
-    this.townNum = 0;
-    this.tooltip = _txt("actions>buy_supplies>tooltip");
-    this.label = _txt("actions>buy_supplies>label");
-
-    this.varName = "Supplies";
-    this.stats = {
-        Cha:.8,
-        Luck:.1,
-        Soul:.1
-    };
-    this.allowed = function() {
-        return 1;
-    };
-    this.manaCost = function() {
-        return 200;
-    };
-    this.canStart = function() {
-        return gold >= towns[0].suppliesCost && supplies === 0;
-    };
-    this.cost = function() {
-        addGold(-towns[0].suppliesCost);
-    };
-    this.visible = function() {
-        return (getSkillLevel("Combat") + getSkillLevel("Magic")) >= 15;
-    };
-    this.unlocked = function() {
-        return (getSkillLevel("Combat") + getSkillLevel("Magic")) >= 35;
-    };
-    this.finish = function() {
-        addSupplies(1);
-    };
-}
-
-function Haggle() {
-    this.name = "Haggle";
-    this.expMult = 1;
-    this.townNum = 0;
-    this.tooltip = _txt("actions>haggle>tooltip");
-    this.label = _txt("actions>haggle>label");
-
-    this.varName = "Haggle";
-    this.stats = {
-        Cha:.8,
-        Luck:.1,
-        Soul:.1
-    };
-    this.manaCost = function() {
-        return 100;
-    };
-    this.canStart = function() {
-        return reputation >= 1;
-    };
-    this.cost = function() {
-        addReputation(-1);
-    };
-    this.visible = function() {
-        return (getSkillLevel("Combat") + getSkillLevel("Magic")) >= 15;
-    };
-    this.unlocked = function() {
-        return (getSkillLevel("Combat") + getSkillLevel("Magic")) >= 35;
-    };
-    this.finish = function() {
-        towns[0].suppliesCost -= 20;
-        if(towns[0].suppliesCost < 0 ) {
-            towns[0].suppliesCost = 0;
+Action.TrainStrength = new Action("Train Strength", {
+    type: "normal",
+    expMult: 4,
+    townNum: 0,
+    storyReqs(storyNum) {
+        switch (storyNum) {
+            case 1:
+                return storyReqs.strengthTrained;
+            case 2:
+                return getTalent("Str") >= 100;
+            case 3:
+                return getTalent("Str") >= 1000;
         }
-        view.updateSupplies();
-    };
-}
-
-function StartJourney() {
-    this.name = "Start Journey";
-    this.expMult = 2;
-    this.townNum = 0;
-    this.tooltip = _txt("actions>start_journey>tooltip");
-    this.label = _txt("actions>start_journey>label");
-
-    this.varName = "Journey";
-    this.stats = {
-        Con:.4,
-        Per:.3,
-        Spd:.3
-    };
-    this.allowed = function() {
-        return 1;
-    };
-    this.manaCost = function() {
-        return 1000;
-    };
-    this.canStart = function() {
-        return supplies === 1;
-    };
-    this.cost = function() {
-        addSupplies(-1);
-    };
-    this.visible = function() {
-        return (getSkillLevel("Combat") + getSkillLevel("Magic")) >= 15;
-    };
-    this.unlocked = function() {
-        return (getSkillLevel("Combat") + getSkillLevel("Magic")) >= 35;
-    };
-    this.finish = function() {
-        unlockTown(1);
-    };
-}
-
-function SitByWaterfall() {
-    this.name = "Sit By Waterfall";
-    this.expMult = 4;
-    this.townNum = 1;
-    this.tooltip = _txt("actions>train_soul>tooltip");
-    this.label = _txt("actions>train_soul>label");
-
-    this.varName = "Waterfall";
-    this.stats = {
-        Con:.2,
-        Soul:.8
-    };
-    this.allowed = function() {
+        return false;
+    },
+    stats: {
+        Str: 0.8,
+        Con: 0.2
+    },
+    allowed() {
         return trainingLimits;
-    };
-    this.manaCost = function() {
+    },
+    manaCost() {
         return 2000;
-    };
-    this.visible = function() {
-        return towns[1].getLevel("Forest") >= 10;
-    };
-    this.unlocked = function() {
-        return towns[1].getLevel("Forest") >= 70;
-    };
-    this.finish = function() {
-    };
-}
+    },
+    visible() {
+        return towns[0].getLevel("Met") >= 1;
+    },
+    unlocked() {
+        return towns[0].getLevel("Met") >= 5;
+    },
+    finish() {
+        unlockStory("strengthTrained");
+    },
+});
 
-function PracticalMagic() {
-    this.name = "Practical Magic";
-    this.expMult = 1.5;
-    this.tooltip = "Such simple uses to help out with everyday tasks. Genius, really. It's like pulling teeth getting this knowledge from the Hermit though.<br>Unlocked with both 20% Hermit Knowledge and 50 Magic.";
-    this.townNum = 1;
-    this.tooltip = _txt("actions>practical_magic>tooltip");
-    this.label = _txt("actions>practical_magic>label");
-
-    this.varName = "trPractical";
-    this.stats = {
-        Per:.3,
-        Con:.2,
-        Int:.5
-    };
-    this.manaCost = function() {
-        return Math.ceil(4000 * (1 - towns[1].getLevel("Hermit") * .005));
-    };
-    this.visible = function() {
-        return towns[1].getLevel("Hermit") >= 10;
-    };
-    this.unlocked = function() {
-        return towns[1].getLevel("Hermit") >= 20 && getSkillLevel("Magic") >= 50;
-    };
-    this.finish = function() {
-        addSkillExp("Practical", 100);
-        view.adjustManaCost("Wild Mana");
-        view.adjustManaCost("Smash Pots");
-        view.adjustGoldCosts();
-        view.updateProgressActions();
-    };
-}
-
-function LearnAlchemy() {
-    this.name = "Learn Alchemy";
-    this.expMult = 1.5;
-    this.tooltip = "You can listen to him yammer while making light healing and remedy potions.<br>You're starting to think the potion that caused you to loop time was a complex one.<br>You provide the ingredients; costs 10 herbs.<br>Gives alchemy and magic skill.<br>Unlocked with both 40% Hermit Knowledge and 60 Magic.";
-    this.townNum = 1;
-    this.tooltip = _txt("actions>learn_alchemy>tooltip");
-    this.label = _txt("actions>learn_alchemy>label");
-
-    this.varName = "trAlchemy";
-    this.stats = {
-        Con:.3,
-        Per:.1,
-        Int:.6
-    };
-    this.canStart = function() {
-        return herbs >= 10;
-    };
-    this.cost = function() {
-        addHerbs(-10);
-    };
-    this.manaCost = function() {
-        return Math.ceil(5000 * (1 - towns[1].getLevel("Hermit") * .005));
-    };
-    this.visible = function() {
-        return towns[1].getLevel("Hermit") >= 10;
-    };
-    this.unlocked = function() {
-        return towns[1].getLevel("Hermit") >= 40 && getSkillLevel("Magic") >= 60;
-    };
-    this.finish = function() {
-        addSkillExp("Alchemy", 50);
-        addSkillExp("Magic", 50);
-    };
-}
-
-function BrewPotions() {
-    this.varName = "Potions";
-    this.name = "Brew Potions";
-    this.expMult = 1.5;
-    this.townNum = 1;
-    this.tooltip = _txt("actions>brew_potions>tooltip");
-    this.label = _txt("actions>brew_potions>label");
-
-    this.stats = {
-        Dex:.3,
-        Int:.6,
-        Luck:.1,
-    };
-    this.canStart = function() {
-        return herbs >= 10 && reputation >= 5;
-    };
-    this.cost = function() {
-        addHerbs(-10);
-    };
-    this.manaCost = function() {
-        return Math.ceil(4000);
-    };
-    this.visible = function() {
-        return getSkillLevel("Alchemy") >= 1;
-    };
-    this.unlocked = function() {
-        return getSkillLevel("Alchemy") >= 10;
-    };
-    this.finish = function() {
-        addPotions(1);
-        addSkillExp("Alchemy", 25);
-        addSkillExp("Magic", 50);
-    };
-}
-
-function TrainDex() {
-    this.name = "Train Dex";
-    this.expMult = 4;
-    this.townNum = 1;
-    this.tooltip = _txt("actions>train_dex>tooltip");
-    this.label = _txt("actions>train_dex>label");
-
-    this.varName = "trDex";
-    this.stats = {
-        Dex:.8,
-        Con:.2
-    };
-    this.allowed = function() {
-        return trainingLimits;
-    };
-    this.manaCost = function() {
-        return 2000;
-    };
-    this.visible = function() {
-        return towns[1].getLevel("Forest") >= 20;
-    };
-    this.unlocked = function() {
-        return towns[1].getLevel("Forest") >= 60;
-    };
-    this.finish = function() {
-    };
-}
-
-function TrainSpd() {
-    this.name = "Train Speed";
-    this.expMult = 4;
-    this.townNum = 1;
-    this.tooltip = _txt("actions>train_spd>tooltip");
-    this.label = _txt("actions>train_spd>label");
-
-    this.varName = "trSpd";
-    this.stats = {
-        Spd:.8,
-        Con:.2
-    };
-    this.allowed = function() {
-        return trainingLimits;
-    };
-    this.manaCost = function() {
-        return 2000;
-    };
-    this.visible = function() {
-        return towns[1].getLevel("Forest") >= 20;
-    };
-    this.unlocked = function() {
-        return towns[1].getLevel("Forest") >= 80;
-    };
-    this.finish = function() {
-    };
-}
-
-function ContinueOn() {
-    this.varName = "Continue";
-    this.name = "Continue On";
-    this.expMult = 2;
-    this.townNum = 1;
-    this.tooltip = _txt("actions>continue_on>tooltip");
-    this.label = _txt("actions>continue_on>label");
-
-    this.stats = {
-        Con:.4,
-        Per:.2,
-        Spd:.4
-    };
-    this.allowed = function() {
-        return 1;
-    };
-    this.manaCost = function() {
-        return Math.ceil(8000 - (60 * towns[1].getLevel("Shortcut")));
-    };
-    this.visible = function() {
-        return true;
-    };
-    this.unlocked = function() {
-        return true;
-    };
-    this.finish = function() {
-        unlockTown(2);
-    };
-}
-
-function PurchaseMana() {
-    this.varName = "Gold2";
-    this.name = "Purchase Mana";
-    this.expMult = 1;
-    this.townNum = 2;
-    this.tooltip = _txt("actions>purchase_mana>tooltip");
-    this.label = _txt("actions>purchase_mana>label");
-
-    this.stats = {
-        Cha:.7,
-        Int:.2,
-        Luck:.1
-    };
-    this.manaCost = function() {
-        return 100;
-    };
-    this.visible = function() {
-        return true;
-    };
-    this.unlocked = function() {
-        return true;
-    };
-    this.finish = function() {
-        addMana(gold * 50);
-        addGold(-gold);
-    };
-}
-
-function SellPotions() {
-    this.varName = "SellPotions";
-    this.name = "Sell Potions";
-    this.expMult = 1;
-    this.townNum = 2;
-    this.tooltip = _txt("actions>sell_potions>tooltip");
-    this.label = _txt("actions>sell_potions>label");
-
-    this.stats = {
-        Cha:.7,
-        Int:.2,
-        Luck:.1
-    };
-    this.manaCost = function() {
-        return 1000;
-    };
-    this.visible = function() {
-        return true;
-    };
-    this.unlocked = function() {
-        return true;
-    };
-    this.finish = function() {
-        addGold(potions * getSkillLevel("Alchemy"));
-        addPotions(-potions);
-    };
-}
-
-function ReadBooks() {
-    this.varName = "ReadBooks";
-    this.name = "Read Books";
-    this.expMult = 4;
-    this.townNum = 2;
-    this.tooltip = _txt("actions>read_books>tooltip");
-    this.label = _txt("actions>read_books>label");
-
-    this.stats = {
-        Int:.8,
-        Soul:.2
-    };
-    this.affectedBy = ["Buy Glasses"];
-    this.allowed = function() {
-        return trainingLimits;
-    };
-    this.canStart = function() {
-        return glasses;
-    };
-    this.manaCost = function() {
-        return 2000;
-    };
-    this.visible = function() {
-        return towns[2].getLevel("City") >= 5;
-    };
-    this.unlocked = function() {
-        return towns[2].getLevel("City") >= 50;
-    };
-    this.finish = function() {
-    };
-}
-
-function GatherTeam() {
-    this.varName = "GatherTeam";
-    this.name = "Gather Team";
-    this.expMult = 3;
-    this.townNum = 2;
-    this.tooltip = _txt("actions>gather_team>tooltip");
-    this.label = _txt("actions>gather_team>label");
-
-    this.stats = {
-        Per:.2,
-        Cha:.5,
-        Int:.2,
-        Luck:.1
-    };
-    this.affectedBy = ["Adventure Guild"];
-    this.allowed = function() {
-        return 5;
-    };
-    this.canStart = function() {
-        return guild === "Adventure" && gold >= (teamNum+1)*200;
-    };
-    this.cost = function() {
-        addGold(-(teamNum)*200); //cost comes after finish
-    };
-    this.manaCost = function() {
-        return 2000;
-    };
-    this.visible = function() {
-        return towns[2].getLevel("Drunk") >= 10;
-    };
-    this.unlocked = function() {
-        return towns[2].getLevel("Drunk") >= 20;
-    };
-    this.finish = function() {
-        addTeamNum(1);
-    };
-}
-
-function CraftArmor() {
-    this.varName = "CraftArmor";
-    this.name = "Craft Armor";
-    this.expMult = 1;
-    this.townNum = 2;
-    this.tooltip = _txt("actions>craft_armor>tooltip");
-    this.label = _txt("actions>craft_armor>label");
-
-    this.stats = {
-        Str:.1,
-        Dex:.3,
-        Con:.3,
-        Int:.3
-    };
-    // this.affectedBy = ["Crafting Guild"];
-    this.canStart = function() {
-        return hide >= 2;
-    };
-    this.cost = function() {
-        addHide(-2);
-    };
-    this.manaCost = function() {
-        return 1000;
-    };
-    this.visible = function() {
-        return towns[2].getLevel("Drunk") >= 15;
-    };
-    this.unlocked = function() {
-        return towns[2].getLevel("Drunk") >= 30;
-    };
-    this.finish = function() {
-        addArmor(1);
-    };
-}
-
-//Regular Actions
-//Regular actions have varName, infoName, infoText
-
-function SmashPots() {
-    this.varName = "Pots";
-    this.name = "Smash Pots";
-    this.expMult = 1;
-    this.townNum = 0;
-    this.tooltip = _txt("actions>smash_pots>tooltip");
-    this.label = _txt("actions>smash_pots>label");
-    this.labelDone = _txt("actions>smash_pots>label_done");
-    this.infoText = _txt("actions>smash_pots>info_text1") +
-      " <i class='fa fa-arrow-left'></i> " +
-      _txt("actions>smash_pots>info_text2") +
-      " <i class='fa fa-arrow-left'></i> " +
-      _txt("actions>smash_pots>info_text3") +
-      "<br><div class='bold'>" +
-      _txt("actions>tooltip>total_found") +
-       "</div> <div id='total"+this.varName+"'></div>";
-
-    this.stats = {
-        Str:.2,
-        Per:.2,
-        Spd:.6
-    };
-    this.manaCost = function() {
-        return Math.ceil(50 / (1 + getSkillLevel("Practical")/100));
-    };
-    this.visible = function() {
-        return true;
-    };
-    this.unlocked = function() {
-        return true;
-    };
-    this.finish = function() {
-        towns[0].finishRegular(this.varName, 10, function() {
-            addMana(100);
-            return 100;
-        })
-    };
-}
-
-function PickLocks() {
-    this.varName = "Locks";
-    this.name = "Pick Locks";
-    this.expMult = 1;
-    this.townNum = 0;
-    this.tooltip = _txt("actions>locks>tooltip");
-    this.tooltip2 = _txt("actions>locks>tooltip2");
-    this.label = _txt("actions>locks>label");
-    this.labelDone = _txt("actions>locks>label_done");
-    this.infoText = _txt("actions>locks>info_text1") +
-      " <i class='fa fa-arrow-left'></i> " +
-      _txt("actions>locks>info_text2") +
-      " <i class='fa fa-arrow-left'></i> " +
-      _txt("actions>locks>info_text3") +
-      "<br><div class='bold'>" +
-      _txt("actions>tooltip>total_found") +
-       "</div> <div id='total"+this.varName+"'></div>";
-
-    this.stats = {
-        Dex:.5,
-        Per:.3,
-        Spd:.1,
-        Luck:.1
-    };
-    this.manaCost = function() {
-        return 400;
-    };
-    this.visible = function() {
-        return towns[0].getLevel("Wander") >= 3;
-    };
-    this.unlocked = function() {
-        return towns[0].getLevel("Wander") >= 20;
-    };
-    this.finish = function() {
-        towns[0].finishRegular(this.varName, 10, function() {
-            let goldGain = goldCostLocks();
-            addGold(goldGain);
-            return goldGain;
-        })
-    };
-}
-function goldCostLocks() {
-    let practical = getSkillLevel("Practical");
-    practical = practical <= 200 ? practical : 200;
-    return Math.floor(10 * (1 + practical/100));
-}
-
-function ShortQuest() {
-    this.varName = "SQuests";
-    this.name = "Short Quest";
-    this.expMult = 1;
-    this.townNum = 0;
-    this.tooltip = _txt("actions>short_quest>tooltip");
-    this.tooltip2 = _txt("actions>short_quest>tooltip2");
-    this.label = _txt("actions>short_quest>label");
-    this.labelDone = _txt("actions>short_quest>label_done");
-    this.infoText = _txt("actions>short_quest>info_text1") +
-      " <i class='fa fa-arrow-left'></i> " +
-      _txt("actions>short_quest>info_text2") +
-      " <i class='fa fa-arrow-left'></i> " +
-      _txt("actions>short_quest>info_text3") +
-      "<br><div class='bold'>" +
-      _txt("actions>tooltip>total_found") +
-       "</div> <div id='total"+this.varName+"'></div>";
-
-    this.stats = {
-        Str:.2,
-        Dex:.1,
-        Cha:.3,
-        Spd:.2,
-        Luck:.1,
-        Soul:.1
-    };
-    this.manaCost = function() {
+Action.ShortQuest = new Action("Short Quest", {
+    type: "limited",
+    expMult: 1,
+    townNum: 0,
+    varName: "SQuests",
+    storyReqs(storyNum) {
+        switch (storyNum) {
+            case 1:
+                return towns[0][`checked${this.varName}`] >= 1;
+            case 2:
+                // 20 small quests in a loop
+                return storyReqs.maxSQuestsInALoop;
+        }
+        return false;
+    },
+    stats: {
+        Str: 0.2,
+        Dex: 0.1,
+        Cha: 0.3,
+        Spd: 0.2,
+        Luck: 0.1,
+        Soul: 0.1
+    },
+    manaCost() {
         return 600;
-    };
-    this.visible = function() {
+    },
+    visible() {
         return towns[0].getLevel("Met") >= 1;
-    };
-    this.unlocked = function() {
+    },
+    unlocked() {
         return towns[0].getLevel("Met") >= 5;
-    };
-    this.finish = function() {
-        towns[0].finishRegular(this.varName, 5, function() {
-            let goldGain = goldCostSQuests();
-            addGold(goldGain);
+    },
+    goldCost() {
+        let practical = Math.max(getSkillLevel("Practical") - 100, 0);
+        practical = Math.min(practical, 200);
+        return Math.floor(20 * (1 + practical / 100));
+    },
+    finish() {
+        towns[0].finishRegular(this.varName, 5, () => {
+            const goldGain = this.goldCost();
+            addResource("gold", goldGain);
             return goldGain;
-        })
-    };
-}
-function goldCostSQuests() {
-    let practical = getSkillLevel("Practical") - 100;
-    practical = practical <= 200 ? (practical >= 0 ? practical : 0) : 200;
-    return Math.floor(20 * (1 + practical/100));
-}
-
-function LongQuest() {
-    this.varName = "LQuests";
-    this.name = "Long Quest";
-    this.expMult = 1;
-    this.townNum = 0;
-    this.tooltip = _txt("actions>long_quest>tooltip");
-    this.tooltip2 = _txt("actions>long_quest>tooltip2");
-    this.label = _txt("actions>long_quest>label");
-    this.labelDone = _txt("actions>long_quest>label_done");
-    this.infoText = _txt("actions>long_quest>info_text1") +
-      " <i class='fa fa-arrow-left'></i> " +
-      _txt("actions>long_quest>info_text2") +
-      " <i class='fa fa-arrow-left'></i> " +
-      _txt("actions>long_quest>info_text3") +
-      "<br><div class='bold'>" +
-      _txt("actions>tooltip>total_found") +
-       "</div> <div id='total"+this.varName+"'></div>";
-
-    this.stats = {
-        Str:.2,
-        Int:.2,
-        Con:.4,
-        Spd:.2
-    };
-    this.manaCost = function() {
-        return 1500;
-    };
-    this.visible = function() {
-        return towns[0].getLevel("Secrets") >= 1;
-    };
-    this.unlocked = function() {
-        let toUnlock = towns[0].getLevel("Secrets") >= 10;
-        if(toUnlock && !isVisible(document.getElementById("skillList"))) {
-            document.getElementById("skillList").style.display = "inline-block";
-        }
-        return toUnlock;
-    };
-    this.finish = function() {
-        towns[0].finishRegular(this.varName, 5, function() {
-            addReputation(1);
-            let goldGain = goldCostLQuests();
-            addGold(goldGain);
-            return goldGain;
-        })
-    };
-}
-function goldCostLQuests() {
-    let practical = getSkillLevel("Practical") - 200;
-    practical = practical <= 200 ? (practical >= 0 ? practical : 0) : 200;
-    return Math.floor(30 * (1 + practical/100));
-}
-
-function WildMana() {
-    this.varName = "WildMana";
-    this.name = "Wild Mana";
-    this.expMult = 1;
-    this.townNum = 1;
-    this.tooltip = _txt("actions>wild_mana>tooltip");
-    this.label = _txt("actions>wild_mana>label");
-    this.labelDone = _txt("actions>wild_mana>label_done");
-    this.infoText = _txt("actions>wild_mana>info_text1") +
-      " <i class='fa fa-arrow-left'></i> " +
-      _txt("actions>wild_mana>info_text2") +
-      " <i class='fa fa-arrow-left'></i> " +
-      _txt("actions>wild_mana>info_text3") +
-      "<br><div class='bold'>" +
-      _txt("actions>tooltip>total_found") +
-       "</div> <div id='total"+this.varName+"'></div>";
-
-    this.stats = {
-        Con:.2,
-        Int:.6,
-        Soul:.2
-    };
-    this.manaCost = function() {
-        return Math.ceil(150 / (1 + getSkillLevel("Practical")/100));
-    };
-    this.visible = function() {
-        return true;
-    };
-    this.unlocked = function() {
-        return towns[1].getLevel("Forest") >= 2;
-    };
-    this.finish = function() {
-        towns[1].finishRegular(this.varName, 10, function() {
-            addMana(250);
-            return 250;
-        })
-    };
-}
-
-function GatherHerbs() {
-    this.varName = "Herbs";
-    this.name = "Gather Herbs";
-    this.expMult = 1;
-    this.townNum = 1;
-    this.tooltip = _txt("actions>gather_herbs>tooltip");
-    this.label = _txt("actions>gather_herbs>label");
-    this.labelDone = _txt("actions>gather_herbs>label_done");
-    this.infoText = _txt("actions>gather_herbs>info_text1") +
-      " <i class='fa fa-arrow-left'></i> " +
-      _txt("actions>gather_herbs>info_text2") +
-      " <i class='fa fa-arrow-left'></i> " +
-      _txt("actions>gather_herbs>info_text3") +
-      "<br><div class='bold'>" +
-      _txt("actions>tooltip>total_found") +
-       "</div> <div id='total"+this.varName+"'></div>";
-
-    this.stats = {
-        Str:.4,
-        Dex:.3,
-        Int:.3
-    };
-    this.manaCost = function() {
-        return Math.ceil(200 * (1 - towns[1].getLevel("Hermit") * .005));
-    };
-    this.visible = function() {
-        return towns[1].getLevel("Forest") >= 2;
-    };
-    this.unlocked = function() {
-        return towns[1].getLevel("Forest") >= 10;
-    };
-    this.finish = function() {
-        towns[1].finishRegular(this.varName, 10, function() {
-            addHerbs(1);
-            return 1;
-        })
-    };
-}
-
-function Hunt() {
-    this.varName = "Hunt";
-    this.name = "Hunt";
-    this.expMult = 1;
-    this.townNum = 1;
-    this.tooltip = _txt("actions>hunt>tooltip");
-    this.label = _txt("actions>hunt>label");
-    this.labelDone = _txt("actions>hunt>label_done");
-    this.infoText = _txt("actions>hunt>info_text1") +
-      " <i class='fa fa-arrow-left'></i> " +
-      _txt("actions>hunt>info_text2") +
-      " <i class='fa fa-arrow-left'></i> " +
-      _txt("actions>hunt>info_text3") +
-      "<br><div class='bold'>" +
-      _txt("actions>tooltip>total_found") +
-       "</div> <div id='total"+this.varName+"'></div>";
-
-    this.stats = {
-        Dex:.2,
-        Con:.2,
-        Per:.2,
-        Spd:.4
-    };
-    this.manaCost = function() {
-        return 800;
-    };
-    this.visible = function() {
-        return towns[1].getLevel("Forest") >= 10;
-    };
-    this.unlocked = function() {
-        return towns[1].getLevel("Forest") >= 40;
-    };
-    this.finish = function() {
-        towns[1].finishRegular(this.varName, 10, function() {
-            addHide(1);
-            return 1;
-        })
-    };
-}
-
-function Gamble() {
-    this.varName = "Gamble";
-    this.name = "Gamble";
-    this.expMult = 2;
-    this.townNum = 2;
-    this.tooltip = _txt("actions>gamble>tooltip");
-    this.label = _txt("actions>gamble>label");
-    this.labelDone = _txt("actions>gamble>label_done");
-    this.infoText = _txt("actions>gamble>info_text1") +
-      " <i class='fa fa-arrow-left'></i> " +
-      _txt("actions>gamble>info_text2") +
-      " <i class='fa fa-arrow-left'></i> " +
-      _txt("actions>gamble>info_text3") +
-      "<br><div class='bold'>" +
-      _txt("actions>tooltip>total_found") +
-       "</div> <div id='total"+this.varName+"'></div>";
-
-    this.stats = {
-        Cha:.2,
-        Luck:.8
-    };
-    this.canStart = function() {
-        return gold >= 20 && reputation >= -5;
-    };
-    this.cost = function() {
-        addGold(-20);
-        addReputation(-1);
-    };
-    this.manaCost = function() {
-        return 1000;
-    };
-    this.visible = function() {
-        return true;
-    };
-    this.unlocked = function() {
-        return towns[2].getLevel("City") >= 10;
-    };
-    this.finish = function() {
-        towns[2].finishRegular(this.varName, 10, function() {
-            addGold(60);
-            return 60;
-        })
-    };
-}
-
-
-//Multipart actions
-//Multipart actions have multiple distinct parts to get through before repeating
-//They also get a bonus depending on how often you complete them
-
-function HealTheSick() {
-    this.varName = "Heal";
-    this.name = "Heal The Sick";
-    this.expMult = 1;
-    this.townNum = 0;
-    this.tooltip = _txt("actions>heal_sick>tooltip");
-    this.label = _txt("actions>heal_sick>label");
-    this.labelDone = _txt("actions>heal_sick>label_done");
-
-    this.stats = {
-        Per:.2,
-        Int:.2,
-        Cha:.2,
-        Soul:.4
-    };
-    this.loopStats = ["Per", "Int", "Cha"];
-    this.segments = 3;
-    this.manaCost = function() {
-        return 2500;
-    };
-    this.canStart = function() {
-        return reputation >= 1;
-    };
-    this.loopCost = function(segment) {
-        return fibonacci(2+Math.floor((towns[0].HealLoopCounter+segment)/this.segments+.0000001)) * 5000;
-    };
-    this.tickProgress = function(offset) {
-        return getSkillLevel("Magic") * (1 + getLevel(this.loopStats[(towns[0].HealLoopCounter+offset) % this.loopStats.length])/100) * Math.sqrt(1 + towns[0].totalHeal/100);
-    };
-    this.loopsFinished = function() {
-        addReputation(3);
-    };
-    this.getPartName = function() {
-        return _txt("actions>heal_sick>label_part") + " " + numberToWords(Math.floor((towns[0].HealLoopCounter+.0001)/this.segments+1));
-    };
-    this.getSegmentName = function(segment) {
-        let segments = [];
-        $(_txtsObj("actions>heal_sick>segment_names>name")).each(function(x,segmentName) {
-          segments.push($(segmentName).text());
-        })
-        return segments[segment % 3];
-    };
-    this.visible = function() {
-        return towns[0].getLevel("Secrets") >= 20;
-    };
-    this.unlocked = function() {
-        return getSkillLevel("Magic") >= 12;
-    };
-    this.finish = function() {
-        addSkillExp("Magic", 10);
-        view.updateProgressActions();
-    };
-}
-
-function FightMonsters() {
-    this.varName = "Fight";
-    this.name = "Fight Monsters";
-    this.expMult = 1;
-    this.townNum = 0;
-    this.tooltip = _txt("actions>fight_monsters>tooltip");
-    this.label = _txt("actions>fight_monsters>label");
-    this.labelDone = _txt("actions>fight_monsters>label_done");
-
-    this.stats = {
-        Str:.3,
-        Spd:.3,
-        Con:.3,
-        Luck:.1
-    };
-    this.loopStats = ["Spd", "Spd", "Spd", "Str", "Str", "Str", "Con", "Con", "Con"];
-    this.segments = 3;
-    this.manaCost = function() {
-        return 2000;
-    };
-    this.canStart = function() {
-        return reputation >= 2;
-    };
-    this.loopCost = function(segment) {
-        return fibonacci(Math.floor((towns[0].FightLoopCounter+segment) - towns[0].FightLoopCounter/3+.0000001)) * 10000;
-    };
-    this.tickProgress = function(offset) {
-        return getSkillLevel("Combat") * (1 + getLevel(this.loopStats[(towns[0].FightLoopCounter+offset) % this.loopStats.length])/100) * Math.sqrt(1 + towns[0].totalFight/100);
-    };
-    this.loopsFinished = function() {
-    };
-    this.segmentFinished = function() {
-        addGold(20);
-    };
-    this.getPartName = function() {
-        return monsterNames(towns[0].FightLoopCounter);
-    };
-    this.getSegmentName = function(segment) {
-        let name = monsterNames(towns[0].FightLoopCounter);
-        if(segment % 3 === 0) {
-            return _txt("actions>fight_monsters>segment_modifier_1")+" "+name;
-        } else if(segment % 3 === 1) {
-            return _txt("actions>fight_monsters>segment_modifier_2")+" "+name;
-        }
-        return _txt("actions>fight_monsters>segment_modifier_3")+" "+name;
-    };
-    this.visible = function() {
-        return towns[0].getLevel("Secrets") >= 20;
-    };
-    this.unlocked = function() {
-        return getSkillLevel("Combat") >= 10;
-    };
-    this.finish = function() {
-        addSkillExp("Combat", 10);
-        view.updateProgressActions();
-    };
-}
-function monsterNames(FightLoopCounter) { //spd, defensive, aggressive
-    let names = [];
-    $(_txtsObj("actions>fight_monsters>segment_names>name")).each(function(x,monsterName) {
-      names.push($(monsterName).text());
-    });
-    let altNames = [];
-    $(_txtsObj("actions>fight_monsters>segment_alt_names>name")).each(function(x,monsterName) {
-      altNames.push($(monsterName).text());
-    });
-    let name = names[Math.floor(FightLoopCounter/3+.0000001)];
-    if(!name) {
-        name = altNames[Math.floor(FightLoopCounter/3+.0000001) % 3]
-    }
-    return name;
-}
-
-function SmallDungeon() {
-    this.varName = "SDungeon";
-    this.name = "Small Dungeon";
-    this.expMult = 1;
-    this.townNum = 0;
-    this.dungeonNum = 0;
-    this.tooltip = _txt("actions>small_dungeon>tooltip");
-    this.label = _txt("actions>small_dungeon>label");
-    this.labelDone = _txt("actions>small_dungeon>label_done");
-
-    this.stats = {
-        Str:.1,
-        Dex:.4,
-        Con:.3,
-        Cha:.1,
-        Luck:.1
-    };
-    this.loopStats = ["Dex", "Con", "Dex", "Cha", "Dex", "Str", "Luck"];
-    this.segments = 7;
-    let ssDivContainer = "";
-    for(let i = 0; i < dungeons[this.dungeonNum].length; i++) {
-        ssDivContainer += "Floor " + (i+1) +
-            " | <div class='bold'>"+_txt("actions>small_dungeon>chance_label")+" </div> <div id='soulstoneChance"+this.dungeonNum+"_"+i+"'></div>% - " +
-            "<div class='bold'>"+_txt("actions>small_dungeon>last_stat_label")+" </div> <div id='soulstonePrevious"+this.dungeonNum+"_"+i+"'>NA</div> - " +
-            "<div class='bold'>"+_txt("actions>small_dungeon>label_done")+"</div> <div id='soulstoneCompleted"+this.dungeonNum+"_"+i+"'></div><br>";
-    }
-    this.completedTooltip = _txt("actions>small_dungeon>completed_tooltip") +
-        ssDivContainer;
-    this.manaCost = function() {
-        return 2000;
-    };
-    this.canStart = function() {
-        let curFloor = Math.floor((towns[this.townNum].SDungeonLoopCounter)/this.segments+.0000001);
-        return reputation >= 2 && curFloor < dungeons[this.dungeonNum].length;
-    };
-    this.loopCost = function(segment) {
-        return precision3(Math.pow(2, Math.floor((towns[this.townNum].SDungeonLoopCounter+segment)/this.segments+.0000001)) * 15000);
-    };
-    this.tickProgress = function(offset) {
-        let floor = Math.floor((towns[this.townNum].SDungeonLoopCounter)/this.segments+.0000001);
-        return (getSkillLevel("Combat")+getSkillLevel("Magic")) * (1 + getLevel(this.loopStats[(towns[this.townNum].SDungeonLoopCounter+offset) % this.loopStats.length])/100) * Math.sqrt(1 + dungeons[this.dungeonNum][floor].completed / 200);
-    };
-    this.loopsFinished = function() {
-        let curFloor = Math.floor((towns[this.townNum].SDungeonLoopCounter)/this.segments+.0000001-1);
-        let success = finishDungeon(this.dungeonNum, curFloor);
-        if(success === true && storyMax <= 1) {
-            unlockStory(1);
-        } else if(success === false && storyMax <= 2) {
-            unlockStory(2);
-        }
-    };
-    this.getPartName = function() {
-        let floor = Math.floor((towns[0].SDungeonLoopCounter+.0001)/this.segments+1);
-        return _txt("actions>small_dungeon>label_part") + " " + (floor <= dungeons[this.dungeonNum].length ? numberToWords(floor) : _txt("actions>small_dungeon>label_complete"));
-    };
-    this.getSegmentName = function(segment) {
-        let segments = [];
-        $(_txtsObj("actions>small_dungeon>segment_names>name")).each(function(x,segmentName) {
-          segments.push($(segmentName).text());
         });
-        return segments[segment % segments.length];
-    };
-    this.visible = function() {
-        return (getSkillLevel("Combat") + getSkillLevel("Magic")) >= 15;
-    };
-    this.unlocked = function() {
-        return (getSkillLevel("Combat") + getSkillLevel("Magic")) >= 35;
-    };
-    this.finish = function() {
-        addSkillExp("Magic", 5);
-        addSkillExp("Combat", 5);
-        view.updateProgressActions();
-    };
+        if (towns[0][`good${this.varName}`] >= 20 && towns[0][`goodTemp${this.varName}`] <= towns[0][`good${this.varName}`] - 20) unlockStory("maxSQuestsInALoop");
+    },
+});
+
+Action.Investigate = new Action("Investigate", {
+    type: "progress",
+    expMult: 1,
+    townNum: 0,
+    varName: "Secrets",
+    storyReqs(storyNum) {
+        switch (storyNum) {
+            case 1:
+                return towns[0].getLevel(this.varName) >= 20;
+            case 2:
+                return towns[0].getLevel(this.varName) >= 40;
+            case 3:
+                return towns[0].getLevel(this.varName) >= 60;
+            case 4:
+                return towns[0].getLevel(this.varName) >= 80;
+            case 5:
+                return towns[0].getLevel(this.varName) >= 100;
+        }
+        return false;
+    },
+    stats: {
+        Per: 0.3,
+        Cha: 0.4,
+        Spd: 0.2,
+        Luck: 0.1
+    },
+    manaCost() {
+        return 1000;
+    },
+    visible() {
+        return towns[0].getLevel("Met") >= 5;
+    },
+    unlocked() {
+        return towns[0].getLevel("Met") >= 25;
+    },
+    finish() {
+        towns[0].finishProgress(this.varName, 500);
+    },
+});
+function adjustLQuests() {
+    towns[0].totalLQuests = Math.floor(towns[0].getLevel("Secrets") / 2);
 }
+
+Action.LongQuest = new Action("Long Quest", {
+    type: "limited",
+    expMult: 1,
+    townNum: 0,
+    varName: "LQuests",
+    storyReqs(storyNum) {
+        switch (storyNum) {
+            case 1:
+                return towns[0][`checked${this.varName}`] >= 1;
+            case 2:
+                // 10 long quests in a loop
+                return storyReqs.maxLQuestsInALoop;
+        }
+        return false;
+    },
+    stats: {
+        Str: 0.2,
+        Int: 0.2,
+        Con: 0.4,
+        Spd: 0.2
+    },
+    manaCost() {
+        return 1500;
+    },
+    visible() {
+        return towns[0].getLevel("Secrets") >= 1;
+    },
+    unlocked() {
+        return towns[0].getLevel("Secrets") >= 10;
+    },
+    goldCost() {
+        let practical = Math.max(getSkillLevel("Practical") - 200, 0);
+        practical = Math.min(practical, 200);
+        return Math.floor(30 * (1 + practical / 100));
+    },
+    finish() {
+        towns[0].finishRegular(this.varName, 5, () => {
+            addResource("reputation", 1);
+            const goldGain = this.goldCost();
+            addResource("gold", goldGain);
+            return goldGain;
+        });
+        if (towns[0][`good${this.varName}`] >= 10 && towns[0][`goodTemp${this.varName}`] <= towns[0][`good${this.varName}`] - 10) unlockStory("maxLQuestsInALoop");
+    },
+});
+
+Action.ThrowParty = new Action("Throw Party", {
+    type: "normal",
+    expMult: 2,
+    townNum: 0,
+    storyReqs(storyNum) {
+        switch (storyNum) {
+            case 1:
+                return storyReqs.partyThrown;
+        }
+        return false;
+    },
+    stats: {
+        Cha: 0.8,
+        Soul: 0.2
+    },
+    manaCost() {
+        return 1600;
+    },
+    canStart() {
+        return resources.reputation >= 2;
+    },
+    cost() {
+        addResource("reputation", -2);
+    },
+    visible() {
+        return towns[0].getLevel("Secrets") >= 20;
+    },
+    unlocked() {
+        return towns[0].getLevel("Secrets") >= 30;
+    },
+    finish() {
+        towns[0].finishProgress("Met", 3200);
+        unlockStory("partyThrown");
+    },
+});
+
+Action.WarriorLessons = new Action("Warrior Lessons", {
+    type: "normal",
+    expMult: 1.5,
+    townNum: 0,
+    storyReqs(storyNum) {
+        switch (storyNum) {
+            case 1:
+                return getSkillLevel("Combat") >= 1;
+            case 2:
+                return getSkillLevel("Combat") >= 100;
+            case 3:
+                return getSkillLevel("Combat") >= 200;
+            case 4:
+                return getSkillLevel("Combat") >= 250;
+        }
+        return false;
+    },
+    stats: {
+        Str: 0.5,
+        Dex: 0.3,
+        Con: 0.2
+    },
+    skills: {
+        Combat: 100
+    },
+    manaCost() {
+        return 1000;
+    },
+    canStart() {
+        return resources.reputation >= 2;
+    },
+    visible() {
+        return towns[0].getLevel("Secrets") >= 10;
+    },
+    unlocked() {
+        return towns[0].getLevel("Secrets") >= 20;
+    },
+    finish() {
+        handleSkillExp(this.skills);
+    },
+});
+
+Action.MageLessons = new Action("Mage Lessons", {
+    type: "normal",
+    expMult: 1.5,
+    townNum: 0,
+    storyReqs(storyNum) {
+        switch (storyNum) {
+            case 1:
+                return getSkillLevel("Magic") >= 1;
+            case 2:
+                return getSkillLevel("Magic") >= 100;
+            case 3:
+                return getSkillLevel("Magic") >= 200;
+            case 4:
+                return getSkillLevel("Magic") >= 250;
+            case 5:
+                return getSkillLevel("Alchemy") >= 10;
+            case 6:
+                return getSkillLevel("Alchemy") >= 50;
+            case 7:
+                return getSkillLevel("Alchemy") >= 100;
+        }
+        return false;
+    },
+    stats: {
+        Per: 0.3,
+        Int: 0.5,
+        Con: 0.2
+    },
+    skills: {
+        Magic() {
+            return 100 * (1 + getSkillLevel("Alchemy") / 100);
+        }
+    },
+    manaCost() {
+        return 1000;
+    },
+    canStart() {
+        return resources.reputation >= 2;
+    },
+    visible() {
+        return towns[0].getLevel("Secrets") >= 10;
+    },
+    unlocked() {
+        return towns[0].getLevel("Secrets") >= 20;
+    },
+    finish() {
+        handleSkillExp(this.skills);
+    },
+});
+
+Action.HealTheSick = new MultipartAction("Heal The Sick", {
+    type: "multipart",
+    expMult: 1,
+    townNum: 0,
+    varName: "Heal",
+    storyReqs(storyNum) {
+        switch (storyNum) {
+            case 1:
+                return towns[0].totalHeal >= 1;
+            case 2:
+                // 10 patients healed in a loop
+                return storyReqs.heal10PatientsInALoop;
+            case 3:
+                // fail reputation req
+                return storyReqs.failedHeal;
+        }
+        return false;
+    },
+    stats: {
+        Per: 0.2,
+        Int: 0.2,
+        Cha: 0.2,
+        Soul: 0.4
+    },
+    skills: {
+        Magic: 10
+    },
+    loopStats: ["Per", "Int", "Cha"],
+    manaCost() {
+        return 2500;
+    },
+    canStart() {
+        return resources.reputation >= 1;
+    },
+    loopCost(segment) {
+        return fibonacci(2 + Math.floor((towns[0].HealLoopCounter + segment) / this.segments + 0.0000001)) * 5000;
+    },
+    tickProgress(offset) {
+        return getSkillLevel("Magic") * (1 + getLevel(this.loopStats[(towns[0].HealLoopCounter + offset) % this.loopStats.length]) / 100) * Math.sqrt(1 + towns[0].totalHeal / 100);
+    },
+    loopsFinished() {
+        addResource("reputation", 3);
+    },
+    getPartName() {
+        return `${_txt(`actions>${getXMLName(this.name)}>label_part`)} ${numberToWords(Math.floor((towns[0].HealLoopCounter + 0.0001) / this.segments + 1))}`;
+    },
+    visible() {
+        return towns[0].getLevel("Secrets") >= 20;
+    },
+    unlocked() {
+        return getSkillLevel("Magic") >= 12;
+    },
+    finish() {
+        handleSkillExp(this.skills);
+        if (towns[0].HealLoopCounter / 3 + 1 >= 10) unlockStory("heal10PatientsInALoop");
+    },
+});
+
+Action.FightMonsters = new MultipartAction("Fight Monsters", {
+    type: "multipart",
+    expMult: 1,
+    townNum: 0,
+    varName: "Fight",
+    storyReqs(storyNum) {
+        switch (storyNum) {
+            case 1:
+                return towns[0].totalFight >= 1;
+            case 2:
+                return towns[0].totalFight >= 100;
+            case 3:
+                return towns[0].totalFight >= 500;
+            case 4:
+                return towns[0].totalFight >= 1000;
+            case 5:
+                return towns[0].totalFight >= 5000;
+            case 6:
+                return towns[0].totalFight >= 10000;
+            case 7:
+                return towns[0].totalFight >= 20000;
+        }
+        return false;
+    },
+    stats: {
+        Str: 0.3,
+        Spd: 0.3,
+        Con: 0.3,
+        Luck: 0.1
+    },
+    skills: {
+        Combat: 10
+    },
+    loopStats: ["Spd", "Spd", "Spd", "Str", "Str", "Str", "Con", "Con", "Con"],
+    manaCost() {
+        return 2000;
+    },
+    canStart() {
+        return resources.reputation >= 2;
+    },
+    loopCost(segment) {
+        return fibonacci(Math.floor((towns[0].FightLoopCounter + segment) - towns[0].FightLoopCounter / 3 + 0.0000001)) * 10000;
+    },
+    tickProgress(offset) {
+        return getSelfCombat() * (1 + getLevel(this.loopStats[(towns[0].FightLoopCounter + offset) % this.loopStats.length]) / 100) * Math.sqrt(1 + towns[0].totalFight / 100);
+    },
+    loopsFinished() {
+        // empty
+    },
+    segmentFinished() {
+        addResource("gold", 20);
+    },
+    getPartName() {
+        const monster = Math.floor(towns[0].FightLoopCounter / 3 + 0.0000001);
+        if (monster >= this.segmentNames.length) return this.altSegmentNames[monster % 3];
+        return this.segmentNames[monster];
+    },
+    getSegmentName(segment) {
+        return `${this.segmentModifiers[segment % 3]} ${this.getPartName()}`;
+    },
+    visible() {
+        return towns[0].getLevel("Secrets") >= 20;
+    },
+    unlocked() {
+        return getSkillLevel("Combat") >= 10;
+    },
+    finish() {
+        handleSkillExp(this.skills);
+    },
+});
+// lazily loaded to allow localization code to load first
+defineLazyGetter(Action.FightMonsters, "altSegmentNames",
+    () => Array.from(_txtsObj("actions>fight_monsters>segment_alt_names>name")).map(elt => elt.textContent)
+);
+defineLazyGetter(Action.FightMonsters, "segmentModifiers",
+    () => Array.from(_txtsObj("actions>fight_monsters>segment_modifiers>segment_modifier")).map(elt => elt.textContent)
+);
+
+Action.SmallDungeon = new DungeonAction("Small Dungeon", 0, {
+    type: "multipart",
+    expMult: 1,
+    townNum: 0,
+    varName: "SDungeon",
+    storyReqs(storyNum) {
+        switch (storyNum) {
+            case 1:
+                return storyReqs.smallDungeonAttempted;
+            case 2:
+                return towns[0][`total${this.varName}`] >= 1000;
+            case 3:
+                return towns[0][`total${this.varName}`] >= 5000;
+            case 4:
+                return towns[0][`total${this.varName}`] >= 10000;
+            case 5:
+                return storyReqs.clearSDungeon;
+        }
+        return false;
+    },
+    stats: {
+        Str: 0.1,
+        Dex: 0.4,
+        Con: 0.3,
+        Cha: 0.1,
+        Luck: 0.1
+    },
+    skills: {
+        Combat: 5,
+        Magic: 5
+    },
+    loopStats: ["Dex", "Con", "Dex", "Cha", "Dex", "Str", "Luck"],
+    manaCost() {
+        return 2000;
+    },
+    canStart() {
+        const curFloor = Math.floor((towns[this.townNum].SDungeonLoopCounter) / this.segments + 0.0000001);
+        return resources.reputation >= 2 && curFloor < dungeons[this.dungeonNum].length;
+    },
+    loopCost(segment) {
+        return precision3(Math.pow(2, Math.floor((towns[this.townNum].SDungeonLoopCounter + segment) / this.segments + 0.0000001)) * 15000);
+    },
+    tickProgress(offset) {
+        const floor = Math.floor((towns[this.townNum].SDungeonLoopCounter) / this.segments + 0.0000001);
+        return (getSelfCombat() + getSkillLevel("Magic")) *
+            (1 + getLevel(this.loopStats[(towns[this.townNum].SDungeonLoopCounter + offset) % this.loopStats.length]) / 100) *
+            Math.sqrt(1 + dungeons[this.dungeonNum][floor].completed / 200);
+    },
+    loopsFinished() {
+        const curFloor = Math.floor((towns[this.townNum].SDungeonLoopCounter) / this.segments + 0.0000001 - 1);
+        const success = finishDungeon(this.dungeonNum, curFloor);
+        if (success === true && storyMax <= 1) {
+            unlockGlobalStory(1);
+        } else if (success === false && storyMax <= 2) {
+            unlockGlobalStory(2);
+        }
+    },
+    visible() {
+        return (getSkillLevel("Combat") + getSkillLevel("Magic")) >= 15;
+    },
+    unlocked() {
+        return (getSkillLevel("Combat") + getSkillLevel("Magic")) >= 35;
+    },
+    finish() {
+        handleSkillExp(this.skills);
+        unlockStory("smallDungeonAttempted");
+        if (towns[0].SDungeonLoopCounter >= 42) unlockStory("clearSDungeon");
+    },
+});
 function finishDungeon(dungeonNum, floorNum) {
-    let floor = dungeons[dungeonNum][floorNum];
-    if(!floor) {
-        return;
+    const floor = dungeons[dungeonNum][floorNum];
+    if (!floor) {
+        return false;
     }
     floor.completed++;
-    let rand = Math.random();
-    if(rand <= floor.ssChance) {
-        let statToAdd = statList[Math.floor(Math.random() * statList.length)];
+    const rand = Math.random();
+    if (rand <= floor.ssChance) {
+        const statToAdd = statList[Math.floor(Math.random() * statList.length)];
         floor.lastStat = statToAdd;
-        stats[statToAdd].soulstone = stats[statToAdd].soulstone ? (stats[statToAdd].soulstone+ Math.pow(10, dungeonNum)) : 1;
-        floor.ssChance *= .98;
+        stats[statToAdd].soulstone = stats[statToAdd].soulstone ? (stats[statToAdd].soulstone + Math.pow(10, dungeonNum)) : 1;
+        floor.ssChance *= 0.98;
         view.updateSoulstones();
         return true;
     }
     return false;
 }
 
-function JoinAdvGuild() {
-    this.varName = "AdvGuild";
-    this.name = "Adventure Guild";
-    this.expMult = 1;
-    this.townNum = 2;
-    this.tooltip = _txt("actions>adventure_guild>tooltip");
-    this.label = _txt("actions>adventure_guild>label");
-    this.labelDone = _txt("actions>adventure_guild>label_done");
-
-    this.stats = {
-        Str:.4,
-        Dex:.3,
-        Con:.3
-    };
-    this.loopStats = ["Str", "Dex", "Con"];
-    this.segments = 3;
-    this.manaCost = function() {
-        return 3000;
-    };
-    this.allowed = function() {
+Action.BuySupplies = new Action("Buy Supplies", {
+    type: "normal",
+    expMult: 1,
+    townNum: 0,
+    storyReqs(storyNum) {
+        switch (storyNum) {
+            case 1:
+                return storyReqs.suppliesBought;
+            case 2:
+                return storyReqs.suppliesBoughtWithoutHaggling;
+        }
+        return false;
+    },
+    stats: {
+        Cha: 0.8,
+        Luck: 0.1,
+        Soul: 0.1
+    },
+    allowed() {
         return 1;
-    };
-    this.canStart = function() {
-        return guild === "";
-    };
-    this.loopCost = function(segment) {
-        return precision3(Math.pow(1.2, towns[2].AdvGuildLoopCounter + segment)) * 5e6;
-    };
-    this.tickProgress = function(offset) {
-        return (getSkillLevel("Magic")/2 + getSelfCombat("Combat")) * (1 + getLevel(this.loopStats[(towns[2].AdvGuildLoopCounter+offset) % this.loopStats.length])/100) * Math.sqrt(1 + towns[2].totalAdvGuild/1000);
-    };
-    this.loopsFinished = function() {
-    };
-    this.segmentFinished = function() {
-        window.curAdvGuildSegment++;
-        addMana(200);
-    };
-    this.getPartName = function() {
-        return "Rank " + getAdvGuildRank().name;
-    };
-    this.getSegmentName = function(segment) {
-        return "Rank " + getAdvGuildRank(segment % 3).name;
-    };
-    this.visible = function() {
-        return towns[2].getLevel("Drunk") >= 5;
-    };
-    this.unlocked = function() {
-        return towns[2].getLevel("Drunk") >= 20;
-    };
-    this.finish = function() {
-        guild = "Adventure";
-    };
-}
-function getAdvGuildRank(offset) {
-    let name = ["F", "E", "D", "C", "B", "A", "S", "SS", "SSS", "SSSS", "U", "UU", "UUU", "UUUU"][Math.floor(window.curAdvGuildSegment/3+.00001)];
+    },
+    manaCost() {
+        return 200;
+    },
+    canStart() {
+        return resources.gold >= towns[0].suppliesCost && !resources.supplies;
+    },
+    cost() {
+        addResource("gold", -towns[0].suppliesCost);
+    },
+    visible() {
+        return (getSkillLevel("Combat") + getSkillLevel("Magic")) >= 15;
+    },
+    unlocked() {
+        return (getSkillLevel("Combat") + getSkillLevel("Magic")) >= 35;
+    },
+    finish() {
+        addResource("supplies", true);
+        if (towns[0].suppliesCost === 300) unlockStory("suppliesBoughtWithoutHaggling");
+        unlockStory("suppliesBought");
+    },
+});
 
-    let segment = (offset === undefined ? 0 : offset) + window.curAdvGuildSegment;
-    let bonus = precision3(1 + segment/20 + (segment ** 2)/300);
-    if(!name) {
-        name = "Godlike";
-        bonus = Math.floor(10 + (45 ** 2)/30);
-    } else {
-        if(offset !== undefined) {
-            name += ["-", "", "+"][offset % 3];
-        } else {
-            name += ["-", "", "+"][window.curAdvGuildSegment % 3];
+Action.Haggle = new Action("Haggle", {
+    type: "normal",
+    expMult: 1,
+    townNum: 0,
+    storyReqs(storyNum) {
+        switch (storyNum) {
+            case 1:
+                return storyReqs.haggle;
+            case 2:
+                return storyReqs.haggle15TimesInALoop;
+            case 3:
+                return storyReqs.haggle16TimesInALoop;
         }
-    }
-    name += ", Mult x" + bonus;
-    return {name:name,bonus:bonus};
+        return false;
+    },
+    stats: {
+        Cha: 0.8,
+        Luck: 0.1,
+        Soul: 0.1
+    },
+    manaCost() {
+        return 100;
+    },
+    canStart() {
+        return resources.reputation >= 1;
+    },
+    cost() {
+        addResource("reputation", -1);
+    },
+    visible() {
+        return (getSkillLevel("Combat") + getSkillLevel("Magic")) >= 15;
+    },
+    unlocked() {
+        return (getSkillLevel("Combat") + getSkillLevel("Magic")) >= 35;
+    },
+    finish() {
+        if (towns[0].suppliesCost === 20) unlockStory("haggle15TimesInALoop");
+        else if (towns[0].suppliesCost === 0) unlockStory("haggle16TimesInALoop");
+        towns[0].suppliesCost -= 20;
+        if (towns[0].suppliesCost < 0) {
+            towns[0].suppliesCost = 0;
+        }
+        view.updateResource("supplies");
+        unlockStory("haggle");
+    },
+});
+
+Action.StartJourney = new Action("Start Journey", {
+    type: "normal",
+    expMult: 2,
+    townNum: 0,
+    storyReqs(storyNum) {
+        switch (storyNum) {
+            case 1:
+                return townsUnlocked.includes(1);
+        }
+        return false;
+    },
+    stats: {
+        Con: 0.4,
+        Per: 0.3,
+        Spd: 0.3
+    },
+    allowed() {
+        return 1;
+    },
+    manaCost() {
+        return 1000;
+    },
+    canStart() {
+        return resources.supplies;
+    },
+    cost() {
+        addResource("supplies", false);
+    },
+    visible() {
+        return (getSkillLevel("Combat") + getSkillLevel("Magic")) >= 15;
+    },
+    unlocked() {
+        return (getSkillLevel("Combat") + getSkillLevel("Magic")) >= 35;
+    },
+    finish() {
+        unlockTown(1);
+    },
+});
+
+/* Action.OpenRift = new Action("Open Rift", {
+    type: "normal",
+    expMult: 1,
+    townNum: 0,
+    stats: {
+        Int: 0.2,
+        Luck: 0.1,
+        Soul: 0.7
+    },
+    allowed() {
+        return 1;
+    },
+    manaCost() {
+        return 100000;
+    },
+    visible() {
+        return (getSkillLevel("Dark") >= 100 && getSkillLevel("Magic")) >= 15;
+    },
+    unlocked() {
+        return (getSkillLevel("Combat") + getSkillLevel("Magic")) >= 35;
+    },
+    finish() {
+        unlockTown(1);
+    },
+}); */
+
+// town 2
+
+Action.ExploreForest = new Action("Explore Forest", {
+    type: "progress",
+    expMult: 1,
+    townNum: 1,
+    varName: "Forest",
+    storyReqs(storyNum) {
+        switch (storyNum) {
+            case 1:
+                return towns[1].getLevel(this.varName) >= 1;
+            case 2:
+                return towns[1].getLevel(this.varName) >= 10;
+            case 3:
+                return towns[1].getLevel(this.varName) >= 20;
+            case 4:
+                return towns[1].getLevel(this.varName) >= 40;
+            case 5:
+                return towns[1].getLevel(this.varName) >= 50;
+            case 6:
+                return towns[1].getLevel(this.varName) >= 60;
+            case 7:
+                return towns[1].getLevel(this.varName) >= 80;
+            case 8:
+                return towns[1].getLevel(this.varName) >= 100;
+        }
+        return false;
+    },
+    stats: {
+        Per: 0.4,
+        Con: 0.2,
+        Spd: 0.2,
+        Luck: 0.2
+    },
+    affectedBy: ["Buy Glasses"],
+    manaCost() {
+        return 400;
+    },
+    visible() {
+        return true;
+    },
+    unlocked() {
+        return true;
+    },
+    finish() {
+        towns[1].finishProgress(this.varName, 100 * (resources.glasses ? 2 : 1));
+    },
+});
+function adjustWildMana() {
+    towns[1].totalWildMana = towns[1].getLevel("Forest") * 5 + towns[1].getLevel("Thicket") * 5;
+}
+function adjustHunt() {
+    towns[1].totalHunt = towns[1].getLevel("Forest") * 2;
+}
+function adjustHerbs() {
+    towns[1].totalHerbs = towns[1].getLevel("Forest") * 5 + towns[1].getLevel("Shortcut") * 2 + towns[1].getLevel("Flowers") * 13;
 }
 
-function LargeDungeon() {
-    this.varName = "LDungeon";
-    this.name = "Large Dungeon";
-    this.expMult = 2;
-    this.townNum = 2;
-    this.dungeonNum = 1;
-    this.tooltip = _txt("actions>large_dungeon>tooltip");
-    this.label = _txt("actions>large_dungeon>label");
-    this.labelDone = _txt("actions>large_dungeon>label_done");
-
-    this.stats = {
-        Str:.2,
-        Dex:.2,
-        Con:.2,
-        Cha:.3,
-        Luck:.1
-    };
-    this.loopStats = ["Cha", "Spd", "Str", "Cha", "Dex", "Dex", "Str"];
-    this.segments = 7;
-    let ssDivContainer = "";
-    for(let i = 0; i < dungeons[this.dungeonNum].length; i++) {
-        ssDivContainer += "Floor " + (i+1) +
-            " | <div class='bold'>"+_txt("actions>large_dungeon>chance_label")+" </div> <div id='soulstoneChance"+this.dungeonNum+"_"+i+"'></div>% - " +
-        "<div class='bold'>"+_txt("actions>large_dungeon>last_stat_label")+" </div> <div id='soulstonePrevious"+this.dungeonNum+"_"+i+"'>NA</div> - " +
-            "<div class='bold'>"+_txt("actions>large_dungeon>label_done")+"</div> <div id='soulstoneCompleted"+this.dungeonNum+"_"+i+"'></div><br>";
-    }
-    this.completedTooltip = _txt("actions>large_dungeon>completed_tooltip") +
-        ssDivContainer;
-    this.affectedBy = ["Gather Team"];
-    this.manaCost = function() {
-        return 6000;
-    };
-    this.canStart = function() {
-        let curFloor = Math.floor((towns[this.townNum].LDungeonLoopCounter)/this.segments+.0000001);
-        return teamNum >= 1 && curFloor < dungeons[this.dungeonNum].length;
-    };
-    this.loopCost = function(segment) {
-        return precision3(Math.pow(3, Math.floor((towns[this.townNum].LDungeonLoopCounter+segment)/this.segments+.0000001)) * 5e5);
-    };
-    this.tickProgress = function(offset) {
-        let floor = Math.floor((towns[this.townNum].LDungeonLoopCounter)/this.segments+.0000001);
-        return (getTeamCombat()+getSkillLevel("Magic")) * (1 + getLevel(this.loopStats[(towns[this.townNum].LDungeonLoopCounter+offset) % this.loopStats.length])/100) * Math.sqrt(1 + dungeons[this.dungeonNum][floor].completed / 200);
-    };
-    this.loopsFinished = function() {
-        let curFloor = Math.floor((towns[this.townNum].LDungeonLoopCounter)/this.segments+.0000001-1);
-        let success = finishDungeon(this.dungeonNum, curFloor);
-        if(success && storyMax <= 1) {
-            // unlockStory(1);
-        } else if(storyMax <= 2) {
-            // unlockStory(2);
+Action.WildMana = new Action("Wild Mana", {
+    type: "limited",
+    expMult: 1,
+    townNum: 1,
+    storyReqs(storyNum) {
+        switch (storyNum) {
+            case 1:
+                return towns[1][`checked${this.varName}`] >= 1;
         }
-    };
-    this.getPartName = function() {
-        let floor = Math.floor((towns[2].LDungeonLoopCounter+.0001)/this.segments+1);
-        return _txt("actions>large_dungeon>label_part") + " " + (floor <= dungeons[this.dungeonNum].length ? numberToWords(floor) : _txt("actions>large_dungeon>label_complete"));
-    };
-    this.getSegmentName = function(segment) {
-        let segments = [];
-        $(_txtsObj("actions>large_dungeon>segment_names>name")).each(function(x,segmentName) {
-            segments.push($(segmentName).text());
+        return false;
+    },
+    stats: {
+        Con: 0.2,
+        Int: 0.6,
+        Soul: 0.2
+    },
+    manaCost() {
+        return Math.ceil(150 / (1 + getSkillLevel("Practical") / 100));
+    },
+    visible() {
+        return true;
+    },
+    unlocked() {
+        return towns[1].getLevel("Forest") >= 2;
+    },
+    goldCost() {
+        return Math.floor(250 * Math.pow(1 + getSkillLevel("Dark") / 60, 0.25));
+    },
+    finish() {
+        towns[1].finishRegular(this.varName, 10, () => {
+            const manaGain = this.goldCost();
+            addMana(manaGain);
+            return manaGain;
         });
-        return segments[segment % segments.length];
-    };
-    this.visible = function() {
-        return towns[2].getLevel("Drunk") >= 5;
-    };
-    this.unlocked = function() {
-        return towns[2].getLevel("Drunk") >= 20;
-    };
-    this.finish = function() {
-        addSkillExp("Magic", 15);
-        addSkillExp("Combat", 15);
-        view.updateProgressActions();
-    };
+    }
+});
+
+Action.GatherHerbs = new Action("Gather Herbs", {
+    type: "limited",
+    expMult: 1,
+    townNum: 1,
+    varName: "Herbs",
+    storyReqs(storyNum) {
+        switch (storyNum) {
+            case 1:
+                return towns[1][`checked${this.varName}`] >= 1;
+        }
+        return false;
+    },
+    stats: {
+        Str: 0.4,
+        Dex: 0.3,
+        Int: 0.3
+    },
+    manaCost() {
+        return Math.ceil(200 * (1 - towns[1].getLevel("Hermit") * 0.005));
+    },
+    visible() {
+        return towns[1].getLevel("Forest") >= 2;
+    },
+    unlocked() {
+        return towns[1].getLevel("Forest") >= 10;
+    },
+    finish() {
+        towns[1].finishRegular(this.varName, 10, () => {
+            addResource("herbs", 1);
+            return 1;
+        });
+    },
+});
+
+Action.Hunt = new Action("Hunt", {
+    type: "limited",
+    expMult: 1,
+    townNum: 1,
+    storyReqs(storyNum) {
+        switch (storyNum) {
+            case 1:
+                return towns[1][`checked${this.varName}`] >= 1;
+            case 2:
+                return towns[1][`good${this.varName}`] >= 10;
+            case 3:
+                return towns[1][`good${this.varName}`] >= 20;
+        }
+        return false;
+    },
+    stats: {
+        Dex: 0.2,
+        Con: 0.2,
+        Per: 0.2,
+        Spd: 0.4
+    },
+    manaCost() {
+        return 800;
+    },
+    visible() {
+        return towns[1].getLevel("Forest") >= 10;
+    },
+    unlocked() {
+        return towns[1].getLevel("Forest") >= 40;
+    },
+    finish() {
+        towns[1].finishRegular(this.varName, 10, () => {
+            addResource("hide", 1);
+            return 1;
+        });
+    },
+});
+
+Action.SitByWaterfall = new Action("Sit By Waterfall", {
+    type: "normal",
+    expMult: 4,
+    townNum: 1,
+    storyReqs(storyNum) {
+        switch (storyNum) {
+            case 1:
+                return storyReqs.satByWaterfall;
+        }
+        return false;
+    },
+    stats: {
+        Con: 0.2,
+        Soul: 0.8
+    },
+    allowed() {
+        return trainingLimits;
+    },
+    manaCost() {
+        return 2000;
+    },
+    visible() {
+        return towns[1].getLevel("Forest") >= 10;
+    },
+    unlocked() {
+        return towns[1].getLevel("Forest") >= 70;
+    },
+    finish() {
+        unlockStory("satByWaterfall");
+    },
+});
+
+Action.OldShortcut = new Action("Old Shortcut", {
+    type: "progress",
+    expMult: 1,
+    townNum: 1,
+    varName: "Shortcut",
+    storyReqs(storyNum) {
+        switch (storyNum) {
+            case 1:
+                return towns[1].getLevel(this.varName) >= 1;
+            case 2:
+                return towns[1].getLevel(this.varName) >= 10;
+            case 3:
+                return towns[1].getLevel(this.varName) >= 20;
+            case 4:
+                return towns[1].getLevel(this.varName) >= 40;
+            case 5:
+                return towns[1].getLevel(this.varName) >= 60;
+            case 6:
+                return towns[1].getLevel(this.varName) >= 80;
+            case 7:
+                return towns[1].getLevel(this.varName) >= 100;
+        }
+        return false;
+    },
+    stats: {
+        Per: 0.3,
+        Con: 0.4,
+        Spd: 0.2,
+        Luck: 0.1
+    },
+    manaCost() {
+        return 800;
+    },
+    visible() {
+        return true;
+    },
+    unlocked() {
+        return towns[1].getLevel("Forest") >= 20;
+    },
+    finish() {
+        towns[1].finishProgress(this.varName, 100);
+        view.adjustManaCost("Continue On");
+    },
+});
+
+Action.TalkToHermit = new Action("Talk To Hermit", {
+    type: "progress",
+    expMult: 1,
+    townNum: 1,
+    varName: "Hermit",
+    storyReqs(storyNum) {
+        switch (storyNum) {
+            case 1:
+                return towns[1].getLevel(this.varName) >= 1;
+            case 2:
+                return towns[1].getLevel(this.varName) >= 10;
+            case 3:
+                return towns[1].getLevel(this.varName) >= 20;
+            case 4:
+                return towns[1].getLevel(this.varName) >= 40;
+            case 5:
+                return towns[1].getLevel(this.varName) >= 60;
+            case 6:
+                return towns[1].getLevel(this.varName) >= 80;
+            case 7:
+                return towns[1].getLevel(this.varName) >= 100;
+        }
+        return false;
+    },
+    stats: {
+        Con: 0.5,
+        Cha: 0.3,
+        Soul: 0.2
+    },
+    manaCost() {
+        return 1200;
+    },
+    visible() {
+        return true;
+    },
+    unlocked() {
+        return towns[1].getLevel("Shortcut") >= 20 && getSkillLevel("Magic") >= 40;
+    },
+    finish() {
+        towns[1].finishProgress(this.varName, 50 * (1 + towns[1].getLevel("Shortcut") / 100));
+        view.adjustManaCost("Learn Alchemy");
+        view.adjustManaCost("Gather Herbs");
+        view.adjustManaCost("Practical Magic");
+    },
+});
+
+Action.PracticalMagic = new Action("Practical Magic", {
+    type: "normal",
+    expMult: 1.5,
+    townNum: 1,
+    storyReqs(storyNum) {
+        switch (storyNum) {
+            case 1:
+                return getSkillLevel("Practical") >= 1;
+        }
+        return false;
+    },
+    stats: {
+        Per: 0.3,
+        Con: 0.2,
+        Int: 0.5
+    },
+    skills: {
+        Practical: 100
+    },
+    manaCost() {
+        return Math.ceil(4000 * (1 - towns[1].getLevel("Hermit") * 0.005));
+    },
+    visible() {
+        return towns[1].getLevel("Hermit") >= 10;
+    },
+    unlocked() {
+        return towns[1].getLevel("Hermit") >= 20 && getSkillLevel("Magic") >= 50;
+    },
+    finish() {
+        handleSkillExp(this.skills);
+        view.adjustManaCost("Wild Mana");
+        view.adjustManaCost("Smash Pots");
+        view.adjustGoldCosts();
+    },
+});
+
+Action.LearnAlchemy = new Action("Learn Alchemy", {
+    type: "normal",
+    expMult: 1.5,
+    townNum: 1,
+    storyReqs(storyNum) {
+        switch (storyNum) {
+            case 1:
+                return skills.Alchemy.exp >= 50;
+            case 2:
+                return getSkillLevel("Alchemy") >= 25;
+            case 3:
+                return getSkillLevel("Alchemy") >= 50;
+        }
+        return false;
+    },
+    stats: {
+        Con: 0.3,
+        Per: 0.1,
+        Int: 0.6
+    },
+    skills: {
+        Magic: 50,
+        Alchemy: 50
+    },
+    canStart() {
+        return resources.herbs >= 10;
+    },
+    cost() {
+        addResource("herbs", -10);
+    },
+    manaCost() {
+        return Math.ceil(5000 * (1 - towns[1].getLevel("Hermit") * 0.005));
+    },
+    visible() {
+        return towns[1].getLevel("Hermit") >= 10;
+    },
+    unlocked() {
+        return towns[1].getLevel("Hermit") >= 40 && getSkillLevel("Magic") >= 60;
+    },
+    finish() {
+        handleSkillExp(this.skills);
+        view.adjustExpGain(Action.MageLessons);
+    },
+});
+
+Action.BrewPotions = new Action("Brew Potions", {
+    type: "normal",
+    expMult: 1.5,
+    townNum: 1,
+    storyReqs(storyNum) {
+        switch (storyNum) {
+            case 1:
+                return storyReqs.potionBrewed;
+            case 2:
+                return storyReqs.failedBrewPotions;
+            case 3:
+                return storyReqs.failedBrewPotionsNegativeRep;
+        }
+        return false;
+    },
+    stats: {
+        Dex: 0.3,
+        Int: 0.6,
+        Luck: 0.1,
+    },
+    skills: {
+        Magic: 50,
+        Alchemy: 25
+    },
+    canStart() {
+        return resources.herbs >= 10 && resources.reputation >= 5;
+    },
+    cost() {
+        addResource("herbs", -10);
+    },
+    manaCost() {
+        return Math.ceil(4000);
+    },
+    visible() {
+        return getSkillLevel("Alchemy") >= 1;
+    },
+    unlocked() {
+        return getSkillLevel("Alchemy") >= 10;
+    },
+    finish() {
+        addResource("potions", 1);
+        handleSkillExp(this.skills);
+        unlockStory("potionBrewed");
+    },
+});
+
+Action.TrainDexterity = new Action("Train Dexterity", {
+    type: "normal",
+    expMult: 4,
+    townNum: 1,
+    storyReqs(storyNum) {
+        switch (storyNum) {
+            case 1:
+                return storyReqs.dexterityTrained;
+        }
+        return false;
+    },
+    stats: {
+        Dex: 0.8,
+        Con: 0.2
+    },
+    allowed() {
+        return trainingLimits;
+    },
+    manaCost() {
+        return 2000;
+    },
+    visible() {
+        return towns[1].getLevel("Forest") >= 20;
+    },
+    unlocked() {
+        return towns[1].getLevel("Forest") >= 60;
+    },
+    finish() {
+        unlockStory("dexterityTrained");
+    },
+});
+
+Action.TrainSpeed = new Action("Train Speed", {
+    type: "normal",
+    expMult: 4,
+    townNum: 1,
+    storyReqs(storyNum) {
+        switch (storyNum) {
+            case 1:
+                return storyReqs.speedTrained;
+        }
+        return false;
+    },
+    stats: {
+        Spd: 0.8,
+        Con: 0.2
+    },
+    allowed() {
+        return trainingLimits;
+    },
+    manaCost() {
+        return 2000;
+    },
+    visible() {
+        return towns[1].getLevel("Forest") >= 20;
+    },
+    unlocked() {
+        return towns[1].getLevel("Forest") >= 80;
+    },
+    finish() {
+        unlockStory("speedTrained");
+    },
+});
+
+Action.FollowFlowers = new Action("Follow Flowers", {
+    type: "progress",
+    expMult: 1,
+    townNum: 1,
+    varName: "Flowers",
+    storyReqs(storyNum) {
+        switch (storyNum) {
+            case 1:
+                return towns[1].getLevel(this.varName) >= 1;
+            case 2:
+                return towns[1].getLevel(this.varName) >= 10;
+            case 3:
+                return towns[1].getLevel(this.varName) >= 20;
+            case 4:
+                return towns[1].getLevel(this.varName) >= 40;
+            case 5:
+                return towns[1].getLevel(this.varName) >= 60;
+            case 6:
+                return towns[1].getLevel(this.varName) >= 80;
+            case 7:
+                return towns[1].getLevel(this.varName) >= 100;
+        }
+        return false;
+    },
+    stats: {
+        Per: 0.7,
+        Con: 0.1,
+        Spd: 0.2
+    },
+    affectedBy: ["Buy Glasses"],
+    manaCost() {
+        return 300;
+    },
+    visible() {
+        return towns[1].getLevel("Forest") >= 30;
+    },
+    unlocked() {
+        return towns[1].getLevel("Forest") >= 50;
+    },
+    finish() {
+        towns[1].finishProgress(this.varName, 100 * (resources.glasses ? 2 : 1));
+    },
+});
+
+Action.BirdWatching = new Action("Bird Watching", {
+    type: "normal",
+    expMult: 4,
+    townNum: 1,
+    storyReqs(storyNum) {
+        switch (storyNum) {
+            case 1:
+                return storyReqs.birdsWatched;
+        }
+        return false;
+    },
+    stats: {
+        Per: 0.8,
+        Int: 0.2
+    },
+    affectedBy: ["Buy Glasses"],
+    allowed() {
+        return trainingLimits;
+    },
+    manaCost() {
+        return 2000;
+    },
+    canStart() {
+        return resources.glasses;
+    },
+    visible() {
+        return towns[1].getLevel("Flowers") >= 30;
+    },
+    unlocked() {
+        return towns[1].getLevel("Flowers") >= 80;
+    },
+    finish() {
+        unlockStory("birdsWatched");
+    },
+});
+
+Action.ClearThicket = new Action("Clear Thicket", {
+    type: "progress",
+    expMult: 1,
+    townNum: 1,
+    varName: "Thicket",
+    storyReqs(storyNum) {
+        switch (storyNum) {
+            case 1:
+                return towns[1].getLevel(this.varName) >= 1;
+            case 2:
+                return towns[1].getLevel(this.varName) >= 10;
+            case 3:
+                return towns[1].getLevel(this.varName) >= 20;
+            case 4:
+                return towns[1].getLevel(this.varName) >= 40;
+            case 5:
+                return towns[1].getLevel(this.varName) >= 60;
+            case 6:
+                return towns[1].getLevel(this.varName) >= 80;
+            case 7:
+                return towns[1].getLevel(this.varName) >= 100;
+        }
+        return false;
+    },
+    stats: {
+        Dex: 0.1,
+        Str: 0.2,
+        Per: 0.3,
+        Con: 0.2,
+        Spd: 0.2
+    },
+    manaCost() {
+        return 500;
+    },
+    visible() {
+        return towns[1].getLevel("Flowers") >= 10;
+    },
+    unlocked() {
+        return towns[1].getLevel("Flowers") >= 20;
+    },
+    finish() {
+        towns[1].finishProgress(this.varName, 100);
+    },
+});
+
+Action.TalkToWitch = new Action("Talk To Witch", {
+    type: "progress",
+    expMult: 1,
+    townNum: 1,
+    varName: "Witch",
+    storyReqs(storyNum) {
+        switch (storyNum) {
+            case 1:
+                return towns[1].getLevel(this.varName) >= 1;
+            case 2:
+                return towns[1].getLevel(this.varName) >= 10;
+            case 3:
+                return towns[1].getLevel(this.varName) >= 20;
+            case 4:
+                return towns[1].getLevel(this.varName) >= 40;
+            case 5:
+                return towns[1].getLevel(this.varName) >= 50;
+            case 6:
+                return towns[1].getLevel(this.varName) >= 60;
+            case 7:
+                return towns[1].getLevel(this.varName) >= 80;
+            case 8:
+                return towns[1].getLevel(this.varName) >= 100;
+        }
+        return false;
+    },
+    stats: {
+        Cha: 0.3,
+        Int: 0.2,
+        Soul: 0.5
+    },
+    manaCost() {
+        return 1500;
+    },
+    visible() {
+        return towns[1].getLevel("Thicket") >= 20;
+    },
+    unlocked() {
+        return towns[1].getLevel("Thicket") >= 60 && getSkillLevel("Magic") >= 80;
+    },
+    finish() {
+        towns[1].finishProgress(this.varName, 100);
+        view.adjustManaCost("Dark Magic");
+        view.adjustManaCost("Dark Ritual");
+    },
+});
+
+Action.DarkMagic = new Action("Dark Magic", {
+    type: "normal",
+    expMult: 1.5,
+    townNum: 1,
+    storyReqs(storyNum) {
+        switch (storyNum) {
+            case 1:
+                return getSkillLevel("Dark") >= 1;
+            case 2:
+                return getSkillLevel("Dark") >= 25;
+            case 3:
+                return getSkillLevel("Dark") >= 50;
+        }
+        return false;
+    },
+    stats: {
+        Con: 0.2,
+        Int: 0.5,
+        Soul: 0.3
+    },
+    skills: {
+        Dark() {
+            return Math.floor(100 * (1 + getBuffLevel("Ritual") / 100));
+        }
+    },
+    manaCost() {
+        return Math.ceil(6000 * (1 - towns[1].getLevel("Witch") * 0.005));
+    },
+    canStart() {
+        return resources.reputation <= 0;
+    },
+    cost() {
+        addResource("reputation", -1);
+    },
+    visible() {
+        return towns[1].getLevel("Witch") >= 10;
+    },
+    unlocked() {
+        return towns[1].getLevel("Witch") >= 20 && getSkillLevel("Magic") >= 100;
+    },
+    finish() {
+        handleSkillExp(this.skills);
+        view.adjustGoldCost("Pots", Action.SmashPots.goldCost());
+        view.adjustGoldCost("WildMana", Action.WildMana.goldCost());
+    },
+});
+
+Action.DarkRitual = new MultipartAction("Dark Ritual", {
+    type: "multipart",
+    expMult: 10,
+    townNum: 1,
+    storyReqs(storyNum) {
+        switch (storyNum) {
+            case 1:
+                return storyReqs.darkRitualThirdSegmentReached;
+            case 2:
+                return getBuffLevel("Ritual") >= 1;
+        }
+        return false;
+    },
+    stats: {
+        Spd: 0.1,
+        Int: 0.1,
+        Soul: 0.8
+    },
+    loopStats: ["Spd", "Int", "Soul"],
+    manaCost() {
+        return Math.ceil(50000 * (1 - towns[1].getLevel("Witch") * 0.005));
+    },
+    allowed() {
+        return 1;
+    },
+    canStart() {
+        let tempCanStart = true;
+        const tempSoulstonesToSacrifice = Math.floor((towns[this.townNum][`total${this.varName}`] + 1) * 50 / 9);
+        let name = "";
+        let soulstones = -1;
+        for (const stat in stats) {
+            if (stats[stat].soulstone > soulstones) {
+                name = stat;
+                soulstones = stats[stat].soulstone;
+            }
+        }
+        for (const stat in stats) {
+            if (stat !== name) {
+                if (stats[stat].soulstone < tempSoulstonesToSacrifice) tempCanStart = false;
+            }
+        }
+        if (stats[name].soulstone < (towns[this.townNum][`total${this.varName}`] + 1) * 50 - tempSoulstonesToSacrifice * 8) tempCanStart = false;
+        return resources.reputation <= -5 && towns[this.townNum].DarkRitualLoopCounter === 0 && tempCanStart && getBuffLevel("Ritual") < parseInt(document.getElementById("buffRitualCap").value);
+    },
+    loopCost(segment) {
+        return 1000000 * (segment * 2 + 1);
+    },
+    tickProgress(offset) {
+        return getSkillLevel("Dark") * (1 + getLevel(this.loopStats[(towns[1].DarkRitualLoopCounter + offset) % this.loopStats.length]) / 100) / (1 - towns[1].getLevel("Witch") * 0.005);
+    },
+    loopsFinished() {
+        addBuffAmt("Ritual", 1);
+        const tempSoulstonesToSacrifice = Math.floor(towns[this.townNum][`total${this.varName}`] * 50 / 9);
+        let name = "";
+        let soulstones = -1;
+        for (const stat in stats) {
+            if (stats[stat].soulstone > soulstones) {
+                name = stat;
+                soulstones = stats[stat].soulstone;
+            }
+        }
+        for (const stat in stats) {
+            if (stat !== name) {
+                stats[stat].soulstone -= tempSoulstonesToSacrifice;
+            }
+        }
+        stats[name].soulstone -= towns[this.townNum][`total${this.varName}`] * 50 - tempSoulstonesToSacrifice * 8;
+        view.updateSoulstones();
+        view.adjustGoldCost("DarkRitual", this.goldCost());
+    },
+    getPartName() {
+        return "Perform Dark Ritual";
+    },
+    visible() {
+        return towns[1].getLevel("Witch") >= 20;
+    },
+    unlocked() {
+        return towns[1].getLevel("Witch") >= 50 && getSkillLevel("Dark") >= 50;
+    },
+    goldCost() {
+        return 50 * (getBuffLevel("Ritual") + 1);
+    },
+    finish() {
+        view.updateBuff("Ritual");
+        view.adjustExpGain(Action.DarkMagic);
+        if (towns[1].DarkRitualLoopCounter >= 0) unlockStory("darkRitualThirdSegmentReached");
+    },
+});
+
+Action.ContinueOn = new Action("Continue On", {
+    type: "normal",
+    expMult: 2,
+    townNum: 1,
+    storyReqs(storyNum) {
+        switch (storyNum) {
+            case 1:
+                return townsUnlocked.includes(2);
+        }
+        return false;
+    },
+    stats: {
+        Con: 0.4,
+        Per: 0.2,
+        Spd: 0.4
+    },
+    allowed() {
+        return 1;
+    },
+    manaCost() {
+        return Math.ceil(8000 - (60 * towns[1].getLevel("Shortcut")));
+    },
+    visible() {
+        return true;
+    },
+    unlocked() {
+        return true;
+    },
+    finish() {
+        unlockTown(2);
+    },
+});
+
+// town 3
+
+Action.ExploreCity = new Action("Explore City", {
+    type: "progress",
+    expMult: 1,
+    townNum: 2,
+    varName: "City",
+    storyReqs(storyNum) {
+        switch (storyNum) {
+            case 1:
+                return towns[2].getLevel(this.varName) >= 1;
+            case 2:
+                return towns[2].getLevel(this.varName) >= 10;
+            case 3:
+                return towns[2].getLevel(this.varName) >= 20;
+            case 4:
+                return towns[2].getLevel(this.varName) >= 40;
+            case 5:
+                return towns[2].getLevel(this.varName) >= 50;
+            case 6:
+                return towns[2].getLevel(this.varName) >= 60;
+            case 7:
+                return towns[2].getLevel(this.varName) >= 80;
+            case 8:
+                return towns[2].getLevel(this.varName) >= 90;
+            case 9:
+                return towns[2].getLevel(this.varName) >= 100;
+        }
+        return false;
+    },
+    stats: {
+        Con: 0.1,
+        Per: 0.3,
+        Cha: 0.2,
+        Spd: 0.3,
+        Luck: 0.1
+    },
+    affectedBy: ["Buy Glasses"],
+    manaCost() {
+        return 750;
+    },
+    visible() {
+        return true;
+    },
+    unlocked() {
+        return true;
+    },
+    finish() {
+        towns[2].finishProgress(this.varName, 100 * (resources.glasses ? 2 : 1));
+    },
+});
+function adjustSuckers() {
+    towns[2].totalGamble = towns[2].getLevel("City") * 3;
 }
 
-function CraftingGuild() {
-    this.name = "Crafting Guild";
-    this.expMult = 1;
-    this.townNum = 2;
+Action.Gamble = new Action("Gamble", {
+    type: "limited",
+    expMult: 2,
+    townNum: 2,
+    storyReqs(storyNum) {
+        switch (storyNum) {
+            case 1:
+                return towns[2][`checked${this.varName}`] >= 1;
+            case 2:
+                return towns[2][`good${this.varName}`] >= 1;
+            case 3:
+                return towns[2][`good${this.varName}`] >= 30;
+            case 4:
+                return storyReqs.failedGamble;
+            case 5:
+                return storyReqs.failedGambleLowMoney;
+        }
+        return false;
+    },
+    stats: {
+        Cha: 0.2,
+        Luck: 0.8
+    },
+    canStart() {
+        return resources.gold >= 20 && resources.reputation >= -5;
+    },
+    cost() {
+        addResource("gold", -20);
+        addResource("reputation", -1);
+    },
+    manaCost() {
+        return 1000;
+    },
+    visible() {
+        return true;
+    },
+    unlocked() {
+        return towns[2].getLevel("City") >= 10;
+    },
+    finish() {
+        towns[2].finishRegular(this.varName, 10, () => {
+            addResource("gold", 60);
+            return 60;
+        });
+    },
+});
 
-    this.tooltip = _txt("actions>craft_guild>tooltip");
-    this.label = _txt("actions>craft_guild>label"); // this is the displayed name of the action. You use the english name in the code, so I was obligated to create a new var for the displayed name in order to localize
-    this.labelDone = _txt("actions>craft_guild>label_done");
-    // this.label = his.name // this is the easiest (instead of previous line) way to have a correct display if you prefer to not go into the XML while coding/
+Action.GetDrunk = new Action("Get Drunk", {
+    type: "progress",
+    expMult: 3,
+    townNum: 2,
+    varName: "Drunk",
+    storyReqs(storyNum) {
+        switch (storyNum) {
+            case 1:
+                return towns[2].getLevel(this.varName) >= 1;
+            case 2:
+                return towns[2].getLevel(this.varName) >= 10;
+            case 3:
+                return towns[2].getLevel(this.varName) >= 20;
+            case 4:
+                return towns[2].getLevel(this.varName) >= 30;
+            case 5:
+                return towns[2].getLevel(this.varName) >= 40;
+            case 6:
+                return towns[2].getLevel(this.varName) >= 60;
+            case 7:
+                return towns[2].getLevel(this.varName) >= 80;
+            case 8:
+                return towns[2].getLevel(this.varName) >= 100;
+        }
+        return false;
+    },
+    stats: {
+        Str: 0.1,
+        Cha: 0.5,
+        Con: 0.2,
+        Soul: 0.2
+    },
+    canStart() {
+        return resources.reputation >= -3;
+    },
+    cost() {
+        addResource("reputation", -1);
+    },
+    manaCost() {
+        return 1000;
+    },
+    visible() {
+        return true;
+    },
+    unlocked() {
+        return towns[2].getLevel("City") >= 20;
+    },
+    finish() {
+        towns[2].finishProgress(this.varName, 100);
+    },
+});
 
-    this.varName = "CraftGuild";
-    this.stats = {
-        Dex:.3,
-        Per:.3,
-        Int:.4
-    };
-    this.loopStats = ["Int", "Per", "Dex"];
-    this.segments = 3;
-    this.manaCost = function() {
+Action.PurchaseMana = new Action("Purchase Mana", {
+    type: "normal",
+    expMult: 1,
+    townNum: 2,
+    stats: {
+        Cha: 0.7,
+        Int: 0.2,
+        Luck: 0.1
+    },
+    manaCost() {
+        return 100;
+    },
+    visible() {
+        return true;
+    },
+    unlocked() {
+        return true;
+    },
+    finish() {
+        addMana(resources.gold * 50);
+        resetResource("gold");
+    },
+});
+
+Action.SellPotions = new Action("Sell Potions", {
+    type: "normal",
+    expMult: 1,
+    townNum: 2,
+    storyReqs(storyNum) {
+        switch (storyNum) {
+            case 1:
+                return storyReqs.potionSold;
+            case 2:
+                return storyReqs.sell20PotionsInALoop;
+            case 3:
+                return storyReqs.sellPotionFor100Gold;
+        }
+        return false;
+    },
+    stats: {
+        Cha: 0.7,
+        Int: 0.2,
+        Luck: 0.1
+    },
+    manaCost() {
+        return 1000;
+    },
+    visible() {
+        return true;
+    },
+    unlocked() {
+        return true;
+    },
+    finish() {
+        if (resources.potions >= 20) unlockStory("sell20PotionsInALoop");
+        addResource("gold", resources.potions * getSkillLevel("Alchemy"));
+        resetResource("potions");
+        unlockStory("potionSold");
+        if (getSkillLevel("Alchemy") >= 100) unlockStory("sellPotionFor100Gold");
+    },
+});
+
+// the guild actions are somewhat unique in that they override the default segment naming
+// with their own segment names, and so do not use the segmentNames inherited from
+// MultipartAction
+Action.AdventureGuild = new MultipartAction("Adventure Guild", {
+    type: "multipart",
+    expMult: 1,
+    townNum: 2,
+    varName: "AdvGuild",
+    storyReqs(storyNum) {
+        switch (storyNum) {
+            case 1:
+                return storyReqs.advGuildTestsTaken;
+            case 2:
+                return storyReqs.advGuildRankEReached;
+            case 3:
+                return storyReqs.advGuildRankDReached;
+            case 4:
+                return storyReqs.advGuildRankCReached;
+            case 5:
+                return storyReqs.advGuildRankBReached;
+            case 6:
+                return storyReqs.advGuildRankAReached;
+            case 7:
+                return storyReqs.advGuildRankSReached;
+            case 8:
+                return storyReqs.advGuildRankUReached;
+            case 9:
+                return storyReqs.advGuildRankGodlikeReached;
+        }
+        return false;
+    },
+    stats: {
+        Str: 0.4,
+        Dex: 0.3,
+        Con: 0.3
+    },
+    loopStats: ["Str", "Dex", "Con"],
+    manaCost() {
         return 3000;
-    };
-    this.allowed = function() {
+    },
+    allowed() {
         return 1;
-    };
-    this.canStart = function() {
+    },
+    canStart() {
         return guild === "";
-    };
-    this.loopCost = function(segment) {
-        return precision3(Math.pow(1.2, towns[2].CraftGuildLoopCounter + segment)) * 2e6;
-    };
-    this.tickProgress = function(offset) {
-        return (getSkillLevel("Magic")/2 + getSkillLevel("Crafting")) * (1 + getLevel(this.loopStats[(towns[2].CraftGuildLoopCounter+offset) % this.loopStats.length])/100) * Math.sqrt(1 + towns[2].totalCraftGuild/1000);
-    };
-    this.loopsFinished = function() {
-    };
-    this.segmentFinished = function() {
-        window.curCraftGuildSegment++;
-        addSkillExp("Crafting", 50);
-        addGold(10);
-    };
-    this.getPartName = function() {
-        return "Rank " + getCraftGuildRank().name;
-    };
-    this.getSegmentName = function(segment) {
-        return "Rank " + getCraftGuildRank(segment % 3).name;
-    };
-    this.visible = function() {
+    },
+    loopCost(segment) {
+        return precision3(Math.pow(1.2, towns[2][`${this.varName}LoopCounter`] + segment)) * 5e6;
+    },
+    tickProgress(offset) {
+        return (getSkillLevel("Magic") / 2 +
+                getSelfCombat("Combat")) *
+                (1 + getLevel(this.loopStats[(towns[2][`${this.varName}LoopCounter`] + offset) % this.loopStats.length]) / 100) *
+                Math.sqrt(1 + towns[2][`total${this.varName}`] / 1000);
+    },
+    loopsFinished() {
+        if (curAdvGuildSegment >= 0) unlockStory("advGuildRankEReached");
+        if (curAdvGuildSegment >= 3) unlockStory("advGuildRankDReached");
+        if (curAdvGuildSegment >= 6) unlockStory("advGuildRankCReached");
+        if (curAdvGuildSegment >= 9) unlockStory("advGuildRankBReached");
+        if (curAdvGuildSegment >= 12) unlockStory("advGuildRankAReached");
+        if (curAdvGuildSegment >= 15) unlockStory("advGuildRankSReached");
+        if (curAdvGuildSegment >= 27) unlockStory("advGuildRankUReached");
+        if (curAdvGuildSegment >= 39) unlockStory("advGuildRankGodlikeReached");
+    },
+    segmentFinished() {
+        curAdvGuildSegment++;
+        addMana(200);
+    },
+    getPartName() {
+        return `Rank ${getAdvGuildRank().name}`;
+    },
+    getSegmentName(segment) {
+        return `Rank ${getAdvGuildRank(segment % 3).name}`;
+    },
+    visible() {
         return towns[2].getLevel("Drunk") >= 5;
-    };
-    this.unlocked = function() {
-        return towns[2].getLevel("Drunk") >= 30;
-    };
-    this.finish = function() {
-        guild = "Crafting";
-    };
-}
-function getCraftGuildRank(offset) {
-    let name = ["F", "E", "D", "C", "B", "A", "S", "SS", "SSS", "SSSS", "U", "UU", "UUU", "UUUU"][Math.floor(window.curCraftGuildSegment/3+.00001)];
-
-    let segment = (offset === undefined ? 0 : offset) + window.curCraftGuildSegment;
-    let bonus = precision3(1 + segment/20 + (segment ** 2)/300);
-    if(!name) {
-        name = "Godlike";
-        bonus = Math.floor(10 + (45 ** 2)/30);
-    } else {
-        if(offset !== undefined) {
-            name += ["-", "", "+"][offset % 3];
-        } else {
-            name += ["-", "", "+"][window.curCraftGuildSegment % 3];
-        }
-    }
-    name += ", Mult x" + bonus;
-    return {name:name,bonus:bonus};
-}
-
-function Tournament() {
-    this.name = "Tournament";
-    this.expMult = 1;
-    this.townNum = 2;
-
-    this.tooltip = _txt("actions>tournament>tooltip");
-    this.label = _txt("actions>tournament>label");
-    this.labelDone = _txt("actions>tournament>label_done");
-
-    this.varName = "Tournament";
-    this.stats = {
-        Str:.2,
-        Dex:.1,
-        Con:.3,
-        Spd:.1,
-        Int:.2,
-        Luck:.1
-    };
-    this.loopStats = ["Str", "Con", "Int"];
-    this.segments = 3;
-    this.manaCost = function() {
-        return 5000;
-    };
-    this.allowed = function() {
-        return 1;
-    };
-    this.canStart = function() {
-        let curFloor = Math.floor(window.curTournamentSegment/3+.00001);
-        return !window.tournyComplete && curFloor <= 5;
-    };
-    this.loopCost = function(segment) {
-        return precision3(Math.pow(1.1, towns[2].TournamentLoopCounter + segment)) * 5e6;
-    };
-    this.tickProgress = function(offset) {
-        return (getSkillLevel("Magic") + getSelfCombat()) * (1 + getLevel(this.loopStats[(towns[2].TournamentLoopCounter+offset) % this.loopStats.length])/100) * Math.sqrt(1 + towns[2].totalTournament/1000);
-    };
-    this.loopsFinished = function() {
-    };
-    this.segmentFinished = function() {
-        getTourneyReward();
-        window.curTournamentSegment++;
-    };
-    this.getPartName = function() {
-        return "Division " + getTournamentRank();
-    };
-    this.getSegmentName = function(segment) {
-        return "Division " + getTournamentRank(segment);
-    };
-    this.visible = function() {
+    },
+    unlocked() {
         return towns[2].getLevel("Drunk") >= 20;
-    };
-    this.unlocked = function() {
-        return towns[2].getLevel("Drunk") >= 40;
-    };
-    this.finish = function() {
-        window.tournyComplete = true;
-        getTourneyReward();
-    };
-}
-function getTournamentRank(offset) {
-    let name = ["5", "4", "3", "2", "1", "Secret"][Math.floor(window.curTournamentSegment/3+.00001)];
+    },
+    finish() {
+        guild = "Adventure";
+        unlockStory("advGuildTestsTaken");
+    },
+});
+function getAdvGuildRank(offset) {
+    let name = ["F", "E", "D", "C", "B", "A", "S", "SS", "SSS", "SSSS", "U", "UU", "UUU", "UUUU"][Math.floor(curAdvGuildSegment / 3 + 0.00001)];
 
-    if(!name) {
-        name = "Complete";
-    } else {
-        if(offset !== undefined) {
-            name += [", 3rd", ", 2nd", ", 1st"][offset % 3];
+    const segment = (offset === undefined ? 0 : offset - (curAdvGuildSegment % 3)) + curAdvGuildSegment;
+    let bonus = precision3(1 + segment / 20 + Math.pow(segment, 2) / 300);
+    if (name) {
+        if (offset === undefined) {
+            name += ["-", "", "+"][curAdvGuildSegment % 3];
         } else {
-            name += [", 3rd", ", 2nd", ", 1st"][window.curCraftGuildSegment % 3];
+            name += ["-", "", "+"][offset % 3];
         }
+    } else {
+        name = "Godlike";
+        bonus = 10;
     }
-    return name;
+    name += `, Mult x${bonus}`;
+    return { name, bonus };
 }
-function getTourneyReward() {
-    console.log(window.curTournamentSegment);
-    let curFloor = Math.floor(window.curTournamentSegment/3+.00001);
 
-    addSkillExp("Combat", 100 + curFloor * 50 );
-    addGold(40 + curFloor * 20);
-    if(window.curTournamentSegment === 17) {
-        unlockStory(3);
+Action.GatherTeam = new Action("Gather Team", {
+    type: "normal",
+    expMult: 3,
+    townNum: 2,
+    storyReqs(storyNum) {
+        switch (storyNum) {
+            case 1:
+                return storyReqs.teammateGathered;
+            case 2:
+                return storyReqs.fullParty;
+            case 3:
+                return storyReqs.failedGatherTeam;
+        }
+        return false;
+    },
+    stats: {
+        Per: 0.2,
+        Cha: 0.5,
+        Int: 0.2,
+        Luck: 0.1
+    },
+    affectedBy: ["Adventure Guild"],
+    allowed() {
+        return 5;
+    },
+    canStart() {
+        return guild === "Adventure" && resources.gold >= (resources.teamMembers + 1) * 100;
+    },
+    cost() {
+        // cost comes after finish
+        addResource("gold", -(resources.teamMembers) * 100);
+    },
+    manaCost() {
+        return 2000;
+    },
+    visible() {
+        return towns[2].getLevel("Drunk") >= 10;
+    },
+    unlocked() {
+        return towns[2].getLevel("Drunk") >= 20;
+    },
+    finish() {
+        addResource("teamMembers", 1);
+        unlockStory("teammateGathered");
+        if (resources.teamMembers >= 5) unlockStory("fullParty");
+    },
+});
+
+Action.LargeDungeon = new DungeonAction("Large Dungeon", 1, {
+    type: "multipart",
+    expMult: 2,
+    townNum: 2,
+    varName: "LDungeon",
+    storyReqs(storyNum) {
+        switch (storyNum) {
+            case 1:
+                return storyReqs.largeDungeonAttempted;
+            case 2:
+                return towns[2][`total${this.varName}`] >= 2000;
+            case 3:
+                return towns[2][`total${this.varName}`] >= 10000;
+            case 4:
+                return towns[2][`total${this.varName}`] >= 20000;
+            case 5:
+                return storyReqs.clearLDungeon;
+        }
+        return false;
+    },
+    stats: {
+        Str: 0.2,
+        Dex: 0.2,
+        Con: 0.2,
+        Cha: 0.3,
+        Luck: 0.1
+    },
+    skills: {
+        Combat: 15,
+        Magic: 15
+    },
+    loopStats: ["Cha", "Spd", "Str", "Cha", "Dex", "Dex", "Str"],
+    affectedBy: ["Gather Team"],
+    manaCost() {
+        return 6000;
+    },
+    canStart() {
+        const curFloor = Math.floor((towns[this.townNum].LDungeonLoopCounter) / this.segments + 0.0000001);
+        return resources.teamMembers >= 1 && curFloor < dungeons[this.dungeonNum].length;
+    },
+    loopCost(segment) {
+        return precision3(Math.pow(3, Math.floor((towns[this.townNum].LDungeonLoopCounter + segment) / this.segments + 0.0000001)) * 5e5);
+    },
+    tickProgress(offset) {
+        const floor = Math.floor((towns[this.townNum].LDungeonLoopCounter) / this.segments + 0.0000001);
+        return (getTeamCombat() + getSkillLevel("Magic")) *
+            (1 + getLevel(this.loopStats[(towns[this.townNum].LDungeonLoopCounter + offset) % this.loopStats.length]) / 100) *
+            Math.sqrt(1 + dungeons[this.dungeonNum][floor].completed / 200);
+    },
+    loopsFinished() {
+        const curFloor = Math.floor((towns[this.townNum].LDungeonLoopCounter) / this.segments + 0.0000001 - 1);
+        finishDungeon(this.dungeonNum, curFloor);
+    },
+    visible() {
+        return towns[2].getLevel("Drunk") >= 5;
+    },
+    unlocked() {
+        return towns[2].getLevel("Drunk") >= 20;
+    },
+    finish() {
+        handleSkillExp(this.skills);
+        unlockStory("largeDungeonAttempted");
+        if (towns[2].LDungeonLoopCounter >= 63) unlockStory("clearLDungeon");
+    },
+});
+
+Action.CraftingGuild = new MultipartAction("Crafting Guild", {
+    type: "multipart",
+    expMult: 1,
+    townNum: 2,
+    varName: "CraftGuild",
+    storyReqs(storyNum) {
+        switch (storyNum) {
+            case 1:
+                return storyReqs.craftGuildTestsTaken;
+            case 2:
+                return storyReqs.craftGuildRankEReached;
+            case 3:
+                return storyReqs.craftGuildRankDReached;
+            case 4:
+                return storyReqs.craftGuildRankCReached;
+            case 5:
+                return storyReqs.craftGuildRankBReached;
+            case 6:
+                return storyReqs.craftGuildRankAReached;
+            case 7:
+                return storyReqs.craftGuildRankSReached;
+            case 8:
+                return storyReqs.craftGuildRankUReached;
+            case 9:
+                return storyReqs.craftGuildRankGodlikeReached;
+        }
+        return false;
+    },
+    stats: {
+        Dex: 0.3,
+        Per: 0.3,
+        Int: 0.4
+    },
+    skills: {
+        Crafting: 50
+    },
+    loopStats: ["Int", "Per", "Dex"],
+    manaCost() {
+        return 3000;
+    },
+    allowed() {
+        return 1;
+    },
+    canStart() {
+        return guild === "";
+    },
+    loopCost(segment) {
+        return precision3(Math.pow(1.2, towns[2][`${this.varName}LoopCounter`] + segment)) * 2e6;
+    },
+    tickProgress(offset) {
+        return (getSkillLevel("Magic") / 2 +
+                getSkillLevel("Crafting")) *
+                (1 + getLevel(this.loopStats[(towns[2][`${this.varName}LoopCounter`] + offset) % this.loopStats.length]) / 100) *
+                Math.sqrt(1 + towns[2][`total${this.varName}`] / 1000);
+    },
+    loopsFinished() {
+        if (curCraftGuildSegment >= 0) unlockStory("craftGuildRankEReached");
+        if (curCraftGuildSegment >= 3) unlockStory("craftGuildRankDReached");
+        if (curCraftGuildSegment >= 6) unlockStory("craftGuildRankCReached");
+        if (curCraftGuildSegment >= 9) unlockStory("craftGuildRankBReached");
+        if (curCraftGuildSegment >= 12) unlockStory("craftGuildRankAReached");
+        if (curCraftGuildSegment >= 15) unlockStory("craftGuildRankSReached");
+        if (curCraftGuildSegment >= 27) unlockStory("craftGuildRankUReached");
+        if (curCraftGuildSegment >= 39) unlockStory("craftGuildRankGodlikeReached");
+    },
+    segmentFinished() {
+        curCraftGuildSegment++;
+        handleSkillExp(this.skills);
+        addResource("gold", 10);
+    },
+    getPartName() {
+        return `Rank ${getCraftGuildRank().name}`;
+    },
+    getSegmentName(segment) {
+        return `Rank ${getCraftGuildRank(segment % 3).name}`;
+    },
+    visible() {
+        return towns[2].getLevel("Drunk") >= 5;
+    },
+    unlocked() {
+        return towns[2].getLevel("Drunk") >= 30;
+    },
+    finish() {
+        guild = "Crafting";
+        unlockStory("craftGuildTestsTaken");
+    },
+});
+function getCraftGuildRank(offset) {
+    let name = ["F", "E", "D", "C", "B", "A", "S", "SS", "SSS", "SSSS", "U", "UU", "UUU", "UUUU"][Math.floor(curCraftGuildSegment / 3 + 0.00001)];
+
+    const segment = (offset === undefined ? 0 : offset - (curCraftGuildSegment % 3)) + curCraftGuildSegment;
+    let bonus = precision3(1 + segment / 20 + Math.pow(segment, 2) / 300);
+    if (name) {
+        if (offset === undefined) {
+            name += ["-", "", "+"][curCraftGuildSegment % 3];
+        } else {
+            name += ["-", "", "+"][offset % 3];
+        }
+    } else {
+        name = "Godlike";
+        bonus = 10;
     }
+    name += `, Mult x${bonus}`;
+    return { name, bonus };
 }
+
+Action.CraftArmor = new Action("Craft Armor", {
+    type: "normal",
+    expMult: 1,
+    townNum: 2,
+    storyReqs(storyNum) {
+        switch (storyNum) {
+            case 1:
+                return storyReqs.armorCrafted;
+            case 2:
+                return storyReqs.craft10Armor;
+            case 3:
+                return storyReqs.failedCraftArmor;
+        }
+        return false;
+    },
+    stats: {
+        Str: 0.1,
+        Dex: 0.3,
+        Con: 0.3,
+        Int: 0.3
+    },
+    // this.affectedBy = ["Crafting Guild"];
+    canStart() {
+        return resources.hide >= 2;
+    },
+    cost() {
+        addResource("hide", -2);
+    },
+    manaCost() {
+        return 1000;
+    },
+    visible() {
+        return towns[2].getLevel("Drunk") >= 15;
+    },
+    unlocked() {
+        return towns[2].getLevel("Drunk") >= 30;
+    },
+    finish() {
+        addResource("armor", 1);
+        unlockStory("armorCrafted");
+        if (resources.armor >= 10) unlockStory("craft10Armor");
+    },
+});
+
+Action.Apprentice = new Action("Apprentice", {
+    type: "progress",
+    expMult: 1.5,
+    townNum: 2,
+    storyReqs(storyNum) {
+        switch (storyNum) {
+            case 1:
+                return towns[2].getLevel(this.varName) >= 1;
+            case 2:
+                return towns[2].getLevel(this.varName) >= 10;
+            case 3:
+                return towns[2].getLevel(this.varName) >= 20;
+            case 4:
+                return towns[2].getLevel(this.varName) >= 40;
+            case 5:
+                return towns[2].getLevel(this.varName) >= 60;
+            case 6:
+                return towns[2].getLevel(this.varName) >= 80;
+            case 7:
+                return towns[2].getLevel(this.varName) >= 100;
+        }
+        return false;
+    },
+    stats: {
+        Dex: 0.2,
+        Int: 0.4,
+        Cha: 0.4
+    },
+    skills: {
+        Crafting() {
+            return 10 * (1 + towns[2].getLevel("Apprentice") / 100);
+        }
+    },
+    affectedBy: ["Crafting Guild"],
+    canStart() {
+        return guild === "Crafting";
+    },
+    manaCost() {
+        return 2000;
+    },
+    visible() {
+        return towns[2].getLevel("Drunk") >= 20;
+    },
+    unlocked() {
+        return towns[2].getLevel("Drunk") >= 40;
+    },
+    finish() {
+        towns[2].finishProgress(this.varName, 30 * getCraftGuildRank().bonus);
+        handleSkillExp(this.skills);
+        view.adjustExpGain(Action.Apprentice);
+    },
+});
+
+Action.Mason = new Action("Mason", {
+    type: "progress",
+    expMult: 2,
+    townNum: 2,
+    storyReqs(storyNum) {
+        switch (storyNum) {
+            case 1:
+                return towns[2].getLevel(this.varName) >= 1;
+            case 2:
+                return towns[2].getLevel(this.varName) >= 10;
+            case 3:
+                return towns[2].getLevel(this.varName) >= 20;
+            case 4:
+                return towns[2].getLevel(this.varName) >= 40;
+            case 5:
+                return towns[2].getLevel(this.varName) >= 60;
+            case 6:
+                return towns[2].getLevel(this.varName) >= 80;
+            case 7:
+                return towns[2].getLevel(this.varName) >= 100;
+        }
+        return false;
+    },
+    stats: {
+        Dex: 0.2,
+        Int: 0.5,
+        Cha: 0.3
+    },
+    skills: {
+        Crafting() {
+            return 20 * (1 + towns[2].getLevel("Mason") / 100);
+        }
+    },
+    affectedBy: ["Crafting Guild"],
+    canStart() {
+        return guild === "Crafting";
+    },
+    manaCost() {
+        return 2000;
+    },
+    visible() {
+        return towns[2].getLevel("Drunk") >= 40;
+    },
+    unlocked() {
+        return towns[2].getLevel("Drunk") >= 60 && towns[2].getLevel("Apprentice") >= 100;
+    },
+    finish() {
+        towns[2].finishProgress(this.varName, 20 * getCraftGuildRank().bonus);
+        handleSkillExp(this.skills);
+    },
+});
+
+Action.Architect = new Action("Architect", {
+    type: "progress",
+    expMult: 2.5,
+    townNum: 2,
+    storyReqs(storyNum) {
+        switch (storyNum) {
+            case 1:
+                return towns[2].getLevel(this.varName) >= 1;
+            case 2:
+                return towns[2].getLevel(this.varName) >= 10;
+            case 3:
+                return towns[2].getLevel(this.varName) >= 20;
+            case 4:
+                return towns[2].getLevel(this.varName) >= 40;
+            case 5:
+                return towns[2].getLevel(this.varName) >= 60;
+            case 6:
+                return towns[2].getLevel(this.varName) >= 80;
+            case 7:
+                return towns[2].getLevel(this.varName) >= 100;
+        }
+        return false;
+    },
+    stats: {
+        Dex: 0.2,
+        Int: 0.6,
+        Cha: 0.2
+    },
+    skills: {
+        Crafting() {
+            return 40 * (1 + towns[2].getLevel("Architect") / 100);
+        }
+    },
+    affectedBy: ["Crafting Guild"],
+    canStart() {
+        return guild === "Crafting";
+    },
+    manaCost() {
+        return 2000;
+    },
+    visible() {
+        return towns[2].getLevel("Drunk") >= 60;
+    },
+    unlocked() {
+        return towns[2].getLevel("Drunk") >= 80 && towns[2].getLevel("Mason") >= 100;
+    },
+    finish() {
+        towns[2].finishProgress(this.varName, 10 * getCraftGuildRank().bonus);
+        handleSkillExp(this.skills);
+    },
+});
+
+Action.ReadBooks = new Action("Read Books", {
+    type: "normal",
+    expMult: 4,
+    townNum: 2,
+    storyReqs(storyNum) {
+        switch (storyNum) {
+            case 1:
+                return storyReqs.booksRead;
+        }
+        return false;
+    },
+    stats: {
+        Int: 0.8,
+        Soul: 0.2
+    },
+    affectedBy: ["Buy Glasses"],
+    allowed() {
+        return trainingLimits;
+    },
+    canStart() {
+        return resources.glasses;
+    },
+    manaCost() {
+        return 2000;
+    },
+    visible() {
+        return towns[2].getLevel("City") >= 5;
+    },
+    unlocked() {
+        return towns[2].getLevel("City") >= 50;
+    },
+    finish() {
+        unlockStory("booksRead");
+    },
+});
+
+Action.BuyPickaxe = new Action("Buy Pickaxe", {
+    type: "normal",
+    expMult: 1,
+    townNum: 2,
+    storyReqs(storyNum) {
+        switch (storyNum) {
+            case 1:
+                return storyReqs.pickaxeBought;
+        }
+        return false;
+    },
+    stats: {
+        Cha: 0.8,
+        Int: 0.1,
+        Spd: 0.1
+    },
+    allowed() {
+        return 1;
+    },
+    canStart() {
+        return resources.gold >= 200;
+    },
+    cost() {
+        addResource("gold", -200);
+    },
+    manaCost() {
+        return 3000;
+    },
+    visible() {
+        return towns[2].getLevel("City") >= 60;
+    },
+    unlocked() {
+        return towns[2].getLevel("City") >= 90;
+    },
+    finish() {
+        addResource("pickaxe", true);
+        unlockStory("pickaxeBought");
+    },
+});
+
+// town 4
+
+Action.StartTrek = new Action("Start Trek", {
+    type: "normal",
+    expMult: 2,
+    townNum: 2,
+    storyReqs(storyNum) {
+        switch (storyNum) {
+            case 1:
+                return townsUnlocked.includes(3);
+        }
+        return false;
+    },
+    stats: {
+        Con: 0.7,
+        Per: 0.2,
+        Spd: 0.1
+    },
+    allowed() {
+        return 1;
+    },
+    manaCost() {
+        return Math.ceil(12000);
+    },
+    visible() {
+        return towns[2].getLevel("City") >= 30;
+    },
+    unlocked() {
+        return towns[2].getLevel("City") >= 60;
+    },
+    finish() {
+        unlockTown(3);
+    },
+});
+
+Action.ClimbMountain = new Action("Climb Mountain", {
+    type: "progress",
+    expMult: 1,
+    townNum: 3,
+    varName: "Mountain",
+    storyReqs(storyNum) {
+        switch (storyNum) {
+            case 1:
+                return towns[3].getLevel(this.varName) >= 1;
+            case 2:
+                return towns[3].getLevel(this.varName) >= 10;
+            case 3:
+                return towns[3].getLevel(this.varName) >= 20;
+            case 4:
+                return towns[3].getLevel(this.varName) >= 40;
+            case 5:
+                return towns[3].getLevel(this.varName) >= 60;
+            case 6:
+                return towns[3].getLevel(this.varName) >= 80;
+            case 7:
+                return towns[3].getLevel(this.varName) >= 100;
+        }
+        return false;
+    },
+    stats: {
+        Dex: 0.1,
+        Str: 0.2,
+        Con: 0.4,
+        Per: 0.2,
+        Spd: 0.1
+    },
+    affectedBy: ["Buy Pickaxe"],
+    manaCost() {
+        return 800;
+    },
+    visible() {
+        return true;
+    },
+    unlocked() {
+        return true;
+    },
+    finish() {
+        towns[3].finishProgress(this.varName, 100 * (resources.pickaxe ? 2 : 1));
+    },
+});
+
+Action.ManaGeyser = new Action("Mana Geyser", {
+    type: "limited",
+    expMult: 1,
+    townNum: 3,
+    varName: "Geysers",
+    storyReqs(storyNum) {
+        switch (storyNum) {
+            case 1:
+                return towns[3][`good${this.varName}`] >= 1;
+            case 2:
+                return towns[3][`good${this.varName}`] >= 10;
+        }
+        return false;
+    },
+    stats: {
+        Str: 0.6,
+        Per: 0.3,
+        Int: 0.1,
+    },
+    affectedBy: ["Buy Pickaxe"],
+    manaCost() {
+        return 2000;
+    },
+    canStart() {
+        return resources.pickaxe;
+    },
+    visible() {
+        return true;
+    },
+    unlocked() {
+        return towns[3].getLevel("Mountain") >= 2;
+    },
+    finish() {
+        towns[3].finishRegular(this.varName, 100, () => {
+            addMana(5000);
+            return 5000;
+        });
+    },
+});
+function adjustGeysers() {
+    towns[3].totalGeysers = towns[3].getLevel("Mountain") * 10;
+}
+
+Action.DecipherRunes = new Action("Decipher Runes", {
+    type: "progress",
+    expMult: 1,
+    townNum: 3,
+    varName: "Runes",
+    storyReqs(storyNum) {
+        switch (storyNum) {
+            case 1:
+                return towns[3].getLevel(this.varName) >= 1;
+            case 2:
+                return towns[3].getLevel(this.varName) >= 10;
+            case 3:
+                return towns[3].getLevel(this.varName) >= 20;
+            case 4:
+                return towns[3].getLevel(this.varName) >= 30;
+            case 5:
+                return towns[3].getLevel(this.varName) >= 40;
+            case 6:
+                return towns[3].getLevel(this.varName) >= 60;
+            case 7:
+                return towns[3].getLevel(this.varName) >= 80;
+            case 8:
+                return towns[3].getLevel(this.varName) >= 100;
+        }
+        return false;
+    },
+    stats: {
+        Per: 0.3,
+        Int: 0.7
+    },
+    affectedBy: ["Buy Glasses"],
+    manaCost() {
+        return 1200;
+    },
+    visible() {
+        return towns[3].getLevel("Mountain") >= 2;
+    },
+    unlocked() {
+        return towns[3].getLevel("Mountain") >= 20;
+    },
+    finish() {
+        towns[3].finishProgress(this.varName, 100 * (resources.glasses ? 2 : 1));
+        view.adjustManaCost("Chronomancy");
+        view.adjustManaCost("Pyromancy");
+    },
+});
+
+Action.Chronomancy = new Action("Chronomancy", {
+    type: "normal",
+    expMult: 2,
+    townNum: 3,
+    storyReqs(storyNum) {
+        switch (storyNum) {
+            case 1:
+                return getSkillLevel("Chronomancy") >= 1;
+            case 2:
+                return getSkillLevel("Chronomancy") >= 50;
+            case 3:
+                return getSkillLevel("Chronomancy") >= 100;
+        }
+        return false;
+    },
+    stats: {
+        Soul: 0.1,
+        Spd: 0.3,
+        Int: 0.6
+    },
+    skills: {
+        Chronomancy: 100
+    },
+    manaCost() {
+        return Math.ceil(10000 * (1 - towns[3].getLevel("Runes") * 0.005));
+    },
+    visible() {
+        return towns[3].getLevel("Runes") >= 8;
+    },
+    unlocked() {
+        return towns[3].getLevel("Runes") >= 30 && getSkillLevel("Magic") >= 150;
+    },
+    finish() {
+        handleSkillExp(this.skills);
+    },
+});
+
+Action.LoopingPotion = new Action("Looping Potion", {
+    type: "normal",
+    expMult: 2,
+    townNum: 3,
+    storyReqs(storyNum) {
+        switch (storyNum) {
+            case 1:
+                return storyReqs.loopingPotionMade;
+        }
+        return false;
+    },
+    stats: {
+        Dex: 0.2,
+        Int: 0.7,
+        Soul: 0.1,
+    },
+    skills: {
+        Alchemy: 100
+    },
+    canStart() {
+        return resources.herbs >= 200;
+    },
+    cost() {
+        addResource("herbs", -200);
+    },
+    manaCost() {
+        return Math.ceil(30000);
+    },
+    visible() {
+        return getSkillLevel("Alchemy") >= 10 && getSkillLevel("Chronomancy") >= 20;
+    },
+    unlocked() {
+        return getSkillLevel("Alchemy") >= 60 && getSkillLevel("Chronomancy") >= 100;
+    },
+    finish() {
+        addResource("loopingPotion", true);
+        handleSkillExp(this.skills);
+        unlockStory("loopingPotionMade");
+    },
+});
+
+Action.Pyromancy = new Action("Pyromancy", {
+    type: "normal",
+    expMult: 2,
+    townNum: 3,
+    storyReqs(storyNum) {
+        switch (storyNum) {
+            case 1:
+                return getSkillLevel("Pyromancy") >= 1;
+            case 2:
+                return getSkillLevel("Pyromancy") >= 50;
+            case 3:
+                return getSkillLevel("Pyromancy") >= 100;
+        }
+        return false;
+    },
+    stats: {
+        Per: 0.2,
+        Int: 0.7,
+        Soul: 0.1
+    },
+    skills: {
+        Pyromancy: 100
+    },
+    manaCost() {
+        return Math.ceil(14000 * (1 - towns[3].getLevel("Runes") * 0.005));
+    },
+    visible() {
+        return towns[3].getLevel("Runes") >= 16;
+    },
+    unlocked() {
+        return towns[3].getLevel("Runes") >= 60 && getSkillLevel("Magic") >= 200;
+    },
+    finish() {
+        handleSkillExp(this.skills);
+    },
+});
+
+Action.ExploreCavern = new Action("Explore Cavern", {
+    type: "progress",
+    expMult: 1,
+    townNum: 3,
+    varName: "Cavern",
+    storyReqs(storyNum) {
+        switch (storyNum) {
+            case 1:
+                return towns[3].getLevel(this.varName) >= 1;
+            case 2:
+                return towns[3].getLevel(this.varName) >= 10;
+            case 3:
+                return towns[3].getLevel(this.varName) >= 20;
+            case 4:
+                return towns[3].getLevel(this.varName) >= 40;
+            case 5:
+                return towns[3].getLevel(this.varName) >= 50;
+            case 6:
+                return towns[3].getLevel(this.varName) >= 60;
+            case 7:
+                return towns[3].getLevel(this.varName) >= 80;
+            case 8:
+                return towns[3].getLevel(this.varName) >= 100;
+        }
+        return false;
+    },
+    stats: {
+        Dex: 0.1,
+        Str: 0.3,
+        Con: 0.2,
+        Per: 0.3,
+        Spd: 0.1
+    },
+    manaCost() {
+        return 1500;
+    },
+    visible() {
+        return towns[3].getLevel("Mountain") >= 10;
+    },
+    unlocked() {
+        return towns[3].getLevel("Mountain") >= 40;
+    },
+    finish() {
+        towns[3].finishProgress(this.varName, 100);
+    },
+});
+
+Action.MineSoulstones = new Action("Mine Soulstones", {
+    type: "limited",
+    expMult: 1,
+    townNum: 3,
+    storyReqs(storyNum) {
+        switch (storyNum) {
+            case 1:
+                return towns[3][`checked${this.varName}`] >= 1;
+            case 2:
+                return towns[3][`good${this.varName}`] >= 1;
+            case 3:
+                return towns[3][`good${this.varName}`] >= 30;
+        }
+        return false;
+    },
+    stats: {
+        Str: 0.6,
+        Dex: 0.1,
+        Con: 0.3,
+    },
+    affectedBy: ["Buy Pickaxe"],
+    manaCost() {
+        return 5000;
+    },
+    canStart() {
+        return resources.pickaxe;
+    },
+    visible() {
+        return towns[3].getLevel("Cavern") >= 2;
+    },
+    unlocked() {
+        return towns[3].getLevel("Cavern") >= 20;
+    },
+    finish() {
+        towns[3].finishRegular(this.varName, 10, () => {
+            const statToAdd = statList[Math.floor(Math.random() * statList.length)];
+            stats[statToAdd].soulstone += 1;
+            view.updateSoulstones();
+        });
+    },
+});
+
+function adjustMineSoulstones() {
+    towns[3].totalMineSoulstones = towns[3].getLevel("Cavern") * 3;
+}
+
+Action.HuntTrolls = new MultipartAction("Hunt Trolls", {
+    type: "multipart",
+    expMult: 1.5,
+    townNum: 3,
+    storyReqs(storyNum) {
+        switch (storyNum) {
+            case 1:
+                return towns[3].totalHuntTrolls >= 1;
+            case 2:
+                return storyReqs.slay10TrollsInALoop;
+        }
+        return false;
+    },
+    stats: {
+        Str: 0.3,
+        Dex: 0.3,
+        Con: 0.2,
+        Per: 0.1,
+        Int: 0.1
+    },
+    skills: {
+        Combat: 1000
+    },
+    loopStats: ["Per", "Con", "Dex", "Str", "Int"],
+    manaCost() {
+        return 8000;
+    },
+    loopCost(segment) {
+        return precision3(Math.pow(2, Math.floor((towns[this.townNum].HuntTrollsLoopCounter + segment) / this.segments + 0.0000001)) * 1e6);
+    },
+    tickProgress(offset) {
+        return (getSelfCombat() * (1 + getLevel(this.loopStats[(towns[3].HuntTrollsLoopCounter + offset) % this.loopStats.length]) / 100) * Math.sqrt(1 + towns[3].totalHuntTrolls / 100));
+    },
+    loopsFinished() {
+        handleSkillExp(this.skills);
+        addResource("blood", 1);
+        if (resources.blood >= 10) unlockStory("slay10TrollsInALoop");
+    },
+    getPartName() {
+        return "Hunt Troll";
+    },
+    visible() {
+        return towns[3].getLevel("Cavern") >= 5;
+    },
+    unlocked() {
+        return towns[3].getLevel("Cavern") >= 50;
+    },
+    finish() {
+        // nothing
+    },
+});
+
+Action.CheckWalls = new Action("Check Walls", {
+    type: "progress",
+    expMult: 1,
+    townNum: 3,
+    varName: "Illusions",
+    storyReqs(storyNum) {
+        switch (storyNum) {
+            case 1:
+                return towns[3].getLevel(this.varName) >= 1;
+            case 2:
+                return towns[3].getLevel(this.varName) >= 10;
+            case 3:
+                return towns[3].getLevel(this.varName) >= 20;
+            case 4:
+                return towns[3].getLevel(this.varName) >= 40;
+            case 5:
+                return towns[3].getLevel(this.varName) >= 60;
+            case 6:
+                return towns[3].getLevel(this.varName) >= 70;
+            case 7:
+                return towns[3].getLevel(this.varName) >= 80;
+            case 8:
+                return towns[3].getLevel(this.varName) >= 100;
+        }
+        return false;
+    },
+    stats: {
+        Spd: 0.1,
+        Dex: 0.1,
+        Per: 0.4,
+        Int: 0.4
+    },
+    manaCost() {
+        return 3000;
+    },
+    visible() {
+        return towns[3].getLevel("Cavern") >= 40;
+    },
+    unlocked() {
+        return towns[3].getLevel("Cavern") >= 80;
+    },
+    finish() {
+        towns[3].finishProgress(this.varName, 100);
+    },
+});
+
+Action.TakeArtifacts = new Action("Take Artifacts", {
+    type: "limited",
+    expMult: 1,
+    townNum: 3,
+    varName: "Artifacts",
+    storyReqs(storyNum) {
+        switch (storyNum) {
+            case 1:
+                return towns[3][`good${this.varName}`] >= 1;
+            case 2:
+                return towns[3][`good${this.varName}`] >= 20;
+        }
+        return false;
+    },
+    stats: {
+        Spd: 0.2,
+        Per: 0.6,
+        Int: 0.2,
+    },
+    manaCost() {
+        return 1500;
+    },
+    visible() {
+        return towns[3].getLevel("Illusions") >= 1;
+    },
+    unlocked() {
+        return towns[3].getLevel("Illusions") >= 5;
+    },
+    finish() {
+        towns[3].finishRegular(this.varName, 25, () => {
+            addResource("artifacts", 1);
+        });
+    },
+});
+function adjustArtifacts() {
+    towns[3].totalArtifacts = towns[3].getLevel("Illusions") * 5;
+}
+
+Action.ImbueMind = new MultipartAction("Imbue Mind", {
+    type: "multipart",
+    expMult: 5,
+    townNum: 3,
+    storyReqs(storyNum) {
+        switch (storyNum) {
+            case 1:
+                return storyReqs.imbueMindThirdSegmentReached || getBuffLevel("Imbuement") >= 1;
+            case 2:
+                return getBuffLevel("Imbuement") >= 1;
+        }
+        return false;
+    },
+    stats: {
+        Spd: 0.1,
+        Per: 0.1,
+        Int: 0.8
+    },
+    loopStats: ["Spd", "Per", "Int"],
+    manaCost() {
+        return 500000;
+    },
+    allowed() {
+        return 1;
+    },
+    canStart() {
+        let tempCanStart = true;
+        const tempSoulstonesToSacrifice = Math.floor((towns[this.townNum][`total${this.varName}`] + 1) * 20 / 9);
+        let name = "";
+        let soulstones = -1;
+        for (const stat in stats) {
+            if (stats[stat].soulstone > soulstones) {
+                name = stat;
+                soulstones = stats[stat].soulstone;
+            }
+        }
+        for (const stat in stats) {
+            if (stat !== name) {
+                if (stats[stat].soulstone < tempSoulstonesToSacrifice) tempCanStart = false;
+            }
+        }
+        if (stats[name].soulstone < (towns[this.townNum][`total${this.varName}`] + 1) * 20 - tempSoulstonesToSacrifice * 8) tempCanStart = false;
+        return towns[3].ImbueMindLoopCounter === 0 && tempCanStart && getBuffLevel("Imbuement") < parseInt(document.getElementById("buffImbuementCap").value);
+    },
+    loopCost(segment) {
+        return 100000000 * (segment * 5 + 1);
+    },
+    tickProgress(offset) {
+        return getSkillLevel("Magic") * (1 + getLevel(this.loopStats[(towns[3].ImbueMindLoopCounter + offset) % this.loopStats.length]) / 100);
+    },
+    loopsFinished() {
+        trainingLimits++;
+        addBuffAmt("Imbuement", 1);
+        const tempSoulstonesToSacrifice = Math.floor(towns[this.townNum][`total${this.varName}`] * 20 / 9);
+        let name = "";
+        let soulstones = -1;
+        for (const stat in stats) {
+            if (stats[stat].soulstone > soulstones) {
+                name = stat;
+                soulstones = stats[stat].soulstone;
+            }
+        }
+        for (const stat in stats) {
+            if (stat !== name) {
+                stats[stat].soulstone -= tempSoulstonesToSacrifice;
+            }
+        }
+        stats[name].soulstone -= towns[this.townNum][`total${this.varName}`] * 20 - tempSoulstonesToSacrifice * 8;
+        view.updateSoulstones();
+        view.adjustGoldCost("ImbueMind", this.goldCost());
+    },
+    getPartName() {
+        return "Imbue Mind";
+    },
+    visible() {
+        return towns[3].getLevel("Illusions") >= 50;
+    },
+    unlocked() {
+        return towns[3].getLevel("Illusions") >= 70 && getSkillLevel("Magic") >= 300;
+    },
+    goldCost() {
+        return 20 * (getBuffLevel("Imbuement") + 1);
+    },
+    finish() {
+        view.updateBuff("Imbuement");
+        if (towns[3].ImbueMindLoopCounter >= 0) unlockStory("imbueMindThirdSegmentReached");
+    },
+});
+
+Action.FaceJudgement = new Action("Face Judgement", {
+    type: "normal",
+    expMult: 2,
+    townNum: 3,
+    storyReqs(storyNum) {
+        switch (storyNum) {
+            case 1:
+                return storyReqs.judgementFaced;
+            case 2:
+                return storyReqs.acceptedIntoValhalla;
+            case 3:
+                return storyReqs.castIntoShadowRealm;
+        }
+        return false;
+    },
+    stats: {
+        Cha: 0.3,
+        Luck: 0.2,
+        Soul: 0.5,
+    },
+    allowed() {
+        return 1;
+    },
+    manaCost() {
+        return 30000;
+    },
+    visible() {
+        return towns[3].getLevel("Mountain") >= 40;
+    },
+    unlocked() {
+        return towns[3].getLevel("Mountain") >= 100;
+    },
+    finish() {
+        unlockStory("judgementFaced");
+        if (resources.reputation >= 50) unlockStory("acceptedIntoValhalla");
+        else if (resources.reputation <= -50) unlockStory("castIntoShadowRealm");
+        // if (resources.reputation >= 50) unlockTown(4);
+        // else if (resources.reputation <= 50) unlockTown(5);
+    },
+});
+
+// town 5
+
+Action.GuidedTour = new Action("Guided Tour", {
+    type: "progress",
+    expMult: 1,
+    townNum: 4,
+    stats: {
+        Per: 0.3,
+        Con: 0.2,
+        Cha: 0.3,
+        Int: 0.1,
+        Luck: 0.1
+    },
+    manaCost() {
+        return 2500;
+    },
+    visible() {
+        return true;
+    },
+    unlocked() {
+        return true;
+    },
+    finish() {
+        towns[4].finishProgress(this.varName, 100 * (resources.glasses ? 2 : 1));
+        addResource("gold", -10);
+    },
+});
+
+Action.Canvass = new Action("Canvass", {
+    type: "progress",
+    expMult: 1,
+    townNum: 4,
+    varName: "Canvassed",
+    stats: {
+        Con: 0.1,
+        Cha: 0.5,
+        Spd: 0.2,
+        Luck: 0.2
+    },
+    manaCost() {
+        return 4000;
+    },
+    visible() {
+        return true;
+    },
+    unlocked() {
+        return true;
+    },
+    finish() {
+        towns[4].finishProgress(this.varName, 50);
+    },
+});
+
+Action.Donate = new Action("Donate", {
+    type: "normal",
+    expMult: 1,
+    townNum: 4,
+    stats: {
+        Per: 0.2,
+        Cha: 0.2,
+        Spd: 0.2,
+        Int: 0.4,
+    },
+    manaCost() {
+        return 2000;
+    },
+    visible() {
+        return true;
+    },
+    unlocked() {
+        return towns[4].getLevel("Canvassed") >= 5;
+    },
+    finish() {
+        addResource("gold", -20);
+        addResource("reputation", 1);
+    },
+});
+
+Action.AcceptDonations = new Action("Accept Donations", {
+    type: "limited",
+    expMult: 1,
+    townNum: 4,
+    stats: {
+        Con: 0.1,
+        Cha: 0.2,
+        Spd: 0.3,
+        Luck: 0.4
+    },
+    manaCost() {
+        return 2000;
+    },
+    visible() {
+        return true;
+    },
+    unlocked() {
+        return towns[4].getLevel("Canvassed") >= 5;
+    },
+    finish() {
+        addResource("gold", 20);
+        addResource("reputation", -1);
+    },
+});
+
+function adjustDonations() {
+    towns[4].totalDonations = towns[4].getLevel("Canvassed") * 5;
+}
+
+// todo: make this correct
+Action.GreatFeast = new MultipartAction("Great Feast", {
+    type: "multipart",
+    expMult: 5,
+    townNum: 4,
+    stats: {
+        Spd: 0.1,
+        Int: 0.1,
+        Soul: 0.8
+    },
+    loopStats: ["Spd", "Int", "Soul"],
+    manaCost() {
+        return Math.ceil(50000 * (1 - towns[1].getLevel("Witch") * 0.005));
+    },
+    allowed() {
+        return 1;
+    },
+    canStart() {
+        let tempCanStart = true;
+        const tempSoulstonesToSacrifice = Math.floor((towns[1][`total${this.varName}`] + 1) * 50 / 9);
+        let name = "";
+        let soulstones = 0;
+        for (const stat in stats) {
+            if (stats[stat].soulstone > soulstones) {
+                name = stat;
+                soulstones = stats[stat].soulstone;
+            }
+        }
+        for (const stat in stats) {
+            if (stat !== name) {
+                if (stats[stat].soulstone < tempSoulstonesToSacrifice) tempCanStart = false;
+            }
+        }
+        if (stats[name].soulstone < (towns[1][`total${this.varName}`] + 1) * 50 - tempSoulstonesToSacrifice * 8) tempCanStart = false;
+        return resources.reputation <= -5 && towns[1].DarkRitualLoopCounter === 0 && tempCanStart && getBuffLevel("Feast") < parseInt(document.getElementById("buffFeastCap").value);
+    },
+    loopCost(segment) {
+        return 1000000 * (segment * 2 + 1);
+    },
+    tickProgress(offset) {
+        return getSkillLevel("Dark") * (1 + getLevel(this.loopStats[(towns[1].DarkRitualLoopCounter + offset) % this.loopStats.length]) / 100) / (1 - towns[1].getLevel("Witch") * 0.005);
+    },
+    loopsFinished() {
+        addBuffAmt("Feast", 1);
+        const tempSoulstonesToSacrifice = Math.floor(towns[this.townNum][`total${this.varName}`] * 5000 / 9);
+        let name = "";
+        let soulstones = -1;
+        for (const stat in stats) {
+            if (stats[stat].soulstone > soulstones) {
+                name = stat;
+                soulstones = stats[stat].soulstone;
+            }
+        }
+        for (const stat in stats) {
+            if (stat !== name) {
+                stats[stat].soulstone -= tempSoulstonesToSacrifice;
+            }
+        }
+        stats[name].soulstone -= towns[this.townNum][`total${this.varName}`] * 5000 - tempSoulstonesToSacrifice * 8;
+        view.updateSoulstones();
+        view.adjustGoldCost("GreatFeast", this.goldCost());
+    },
+    getPartName() {
+        return "Host Great Feast";
+    },
+    visible() {
+        return towns[1].getLevel("Thicket") >= 50;
+    },
+    unlocked() {
+        return false;
+    },
+    goldCost() {
+        return 5000 * (getBuffLevel("Feast") + 1);
+    },
+    finish() {
+        view.updateBuff("Feast");
+    },
+});
+
+Action.FallFromGrace = new Action("Fall From Grace", {
+    type: "normal",
+    expMult: 2,
+    townNum: 4,
+    stats: {
+        Dex: 0.4,
+        Luck: 0.3,
+        Spd: 0.2,
+        Int: 0.1,
+    },
+    allowed() {
+        return 1;
+    },
+    manaCost() {
+        return 30000;
+    },
+    visible() {
+        return true;
+    },
+    unlocked() {
+        return true;
+    },
+    finish() {
+        unlockTown(5);
+    },
+});
+
+// town 6
+
+Action.TheSpire = new DungeonAction("The Spire", 2, {
+    type: "multipart",
+    expMult: 1,
+    townNum: 5,
+    stats: {
+        Str: 0.1,
+        Dex: 0.1,
+        Spd: 0.1,
+        Con: 0.1,
+        Per: 0.2,
+        Int: 0.2,
+        Soul: 0.2
+    },
+    skills: {
+        Combat: 5,
+        Magic: 5
+    },
+    loopStats: ["Per", "Int", "Con", "Spd", "Dex", "Per", "Int", "Str", "Soul"],
+    manaCost() {
+        return 2000;
+    },
+    canStart() {
+        const curFloor = Math.floor((towns[this.townNum].SDungeonLoopCounter) / this.segments + 0.0000001);
+        return resources.reputation >= 2 && curFloor < dungeons[this.dungeonNum].length;
+    },
+    loopCost(segment) {
+        return precision3(Math.pow(2, Math.floor((towns[this.townNum].SDungeonLoopCounter + segment) / this.segments + 0.0000001)) * 15000);
+    },
+    tickProgress(offset) {
+        const floor = Math.floor((towns[this.townNum].SDungeonLoopCounter) / this.segments + 0.0000001);
+        return (getSelfCombat() + getSkillLevel("Magic")) *
+        (1 + getLevel(this.loopStats[(towns[this.townNum].SDungeonLoopCounter + offset) % this.loopStats.length]) / 100) *
+        Math.sqrt(1 + dungeons[this.dungeonNum][floor].completed / 200);
+    },
+    loopsFinished() {
+        const curFloor = Math.floor((towns[this.townNum].SDungeonLoopCounter) / this.segments + 0.0000001 - 1);
+        const success = finishDungeon(this.dungeonNum, curFloor);
+        if (success === true && storyMax <= 1) {
+            unlockGlobalStory(1);
+        } else if (success === false && storyMax <= 2) {
+            unlockGlobalStory(2);
+        }
+    },
+    visible() {
+        return (getSkillLevel("Combat") + getSkillLevel("Magic")) >= 15;
+    },
+    unlocked() {
+        return (getSkillLevel("Combat") + getSkillLevel("Magic")) >= 35;
+    },
+    finish() {
+        handleSkillExp(this.skills);
+        unlockStory("smallDungeonAttempted");
+        if (towns[0].SDungeonLoopCounter >= 42) unlockStory("clearSDungeon");
+    },
+});
+
+const actionsWithGoldCost = Object.values(Action).filter(
+    action => action.goldCost !== undefined
+);

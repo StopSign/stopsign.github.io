@@ -6,119 +6,6 @@
         <title>Mises à jour</title>
         <version_prefix>Version</version_prefix>
       </meta>
-      <version verNum=".73"><![CDATA[
-          * Changed formula for how Old Shortcut reduces Continue On<br>
-          * Repeat last action on list saves now<br>
-          * Lootable first checkboxes save now<br>
-          * Window title switches when paused correctly<br>
-          * Dragging an action image doesn't change the URL in firefox<br>
-          * 2 more story parts, unlocked at Small Dungeon completion<br>
-          * Re-arrange icon/loop count order on lists<br>
-          * Get Drunk removes 2 gold instead of adding it
-        ]]></version>
-        <version verNum=".72"><![CDATA[
-            * Sound on pause available in options<br>
-            * training limit set to 50 from 10 (for now)<br>
-            * Mana Original is multipled by # loops<br>
-            * Travel Action styling change<br>
-            * Saving in town 3<br>
-            * DRAG AND DROP (Thanks to Hunter)
-      ]]></version>
-        <version verNum=".71"><![CDATA[
-            * Tooltip on reset button<br>
-            * Glasses give x2 to forest<br>
-            * Mana cost reflects the tooltips now rather than an average of stat reduction<br>
-            * Trainings are capped at 10 per loop<br>
-            * New actions! Brew Potions, Continue On, Explore City, Gamble, Get Drunk, Purchase Mana, Sell Potions<br>
-            * Some new actions are usless at the moment.
-      ]]></version>
-        <version verNum=".70"><![CDATA[
-            * Reverted skill nerf (too harsh)<br>
-            * Actually capped glasses<br>
-            * Sell Gold -> Buy Mana<br>
-            * Double soulstone recovery<br>
-            * Nerfed practical magic (more uses for it later)
-      ]]></version>
-        <version verNum=".69"><![CDATA[
-            * Nerfed the soulstone nerf<br>
-            * Cleared additional purple bars on exp<br>
-            * Corrected glasses/throw party tooltips<br>
-            * Actually nerfed skill growth - it's cheaper than before for level 2 - 23, and about 4x harder at level 100<br>
-            * Add action to top of list option
-      ]]></version>
-        <version verNum=".68"><![CDATA[
-            * Added tab icon<br>
-            * Throw Party costs 2 reputation from 3<br>
-            * Removed Guided Tour<br>
-            * Added Buy Glasses<br>
-            * Fixed later segment names for Fight<br>
-            * Nerfed soulstones<br>
-            * Changed soulstone gathering, equalling about half previous rate but more initially<br>
-            * Nerfed skill growth<br>
-            * Added Options and Discord Link (to be expanded)<br>
-            * Start Journey cost 2k -> 1k
-      ]]></version>
-        <version verNum=".67"><![CDATA[
-            * Added FAQ<br>
-            * Doubled effectiveness of Guided Tour<br>
-            * Fixed majority of memory leaks (not all)<br>
-            * Made Heal/Fight requirements visible with training unlock<br>
-            * Lengthened action list div<br>
-            * Changed some wording of descriptions for clarity<br>
-            * Added "lootable first" option, credit to Hunter<br>
-            * Fixed a bug with extreme gain on Heal
-      ]]></version>
-        <version verNum=".66"><![CDATA[
-            * Mostly fixed import being all weird<br>
-            * Changed investigate to be visible earlier<br>
-            * Fixed Old Shortcut to be 100% from 110%<br>
-            * Fixed Investigate to be 100% from 90%<br>
-            * Rewording old shortcut and hermit<br>
-            * Game autopauses if current list is empty<br>
-            * Saves variables even if they're 0 (fixes some incorrect negative values)<br>
-            * Fixes your save if your variables were negative.
-      ]]></version>
-        <version verNum=".65"><![CDATA[
-            * Added Learn Alchemy action and Alchemy skill<br>
-            * Made a reddit post and discord<br>
-            * Hid Skills that are at 0 exp<br>
-            * Import/export
-      ]]></version>
-        <version verNum=".64"><![CDATA[
-            * Start Journey costs 2k mana from 1k<br>
-            * Added Old Shortcut, Talk to Hermit, and Practical Magic actions<br>
-            * Added Practical Magic skill<br>
-            * Widened version tooltips
-      ]]></version>
-        <version verNum=".63"><![CDATA[
-            * Made Heal the Sick, Fight Monster, and Clear Dungeon more difficult<br>
-            * Changing forEach to for loops, I forgot to change return to continue, causing multiple large issues<br>
-            * Made stat window a little larger<br>
-            * Changed town numbers to update on reload, instead of just on a new %
-      ]]></version>
-        <version verNum=".62"><![CDATA[
-            * Added Gather Wild Mana, Gather Herbs, Hunt, and Sit Under Waterfall<br>
-            * Hide supplies/herbs/hide if you have 0<br>
-            * You'll need to complete 1 more % on Forest Explored to update Mana Sources (NOTE: not anymore)<br>
-      ]]></version>
-        <version verNum=".61"><![CDATA[
-            * Removed beautiful forEach loops because IE can't handle them<br>
-            * Possibly fixes game not working on iPads too (tell me if so)<br>
-            * Fixed errors for players with no save file<br>
-            * Adjusted mana costs for new actions
-      ]]></version>
-        <version verNum=".6"><![CDATA[
-            * Added version info<br>
-            * Added Haggle, Buy Supplies, Start Journey, Explore Forest<br>
-            * Added switching towns and town names<br>
-            * Added error messages when an action fails (red bar)<br>
-            * Require reputation now requires, instead of costs<br>
-            * Fixed repeating a last action with a cost bug<br>
-            * Visually separated resources and main actions<br>
-            * Reduced requirements/difficulty for heal/fight/dungeon<br>
-            * WARNING: adblock caused game to freeze. This has no ads, disable if you also freeze<br>
-            * Improved performance (since I was looking anyway)
-      ]]></version>
     </changelog>
     <save>
       <meta>
@@ -534,7 +421,7 @@
       ]]></tooltip>
     </haggle>
     <start_journey>
-      <label>Débuter le voyage</label>
+      <label>Débuter voyage</label>
       <tooltip><![CDATA[
           Follow the trail to end up at the next town. You need to keep moving until you can learn how to shut these loops off.<br>Costs 1 supplies. Finish once to unlock Forest Path's actions, then finish this in order to use Forest Path's actions.<br>Unlocks at a combined skill of 35.
       ]]></tooltip>

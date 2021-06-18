@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 function Actions() {
     this.current = [];
@@ -8,77 +8,92 @@ function Actions() {
     this.totalNeeded = 0;
     this.completedTicks = 0;
     this.currentPos = 0;
+    this.timeSinceLastUpdate = 0;
 
     this.tick = function() {
-        let curAction = this.getNextValidAction();
-        if(!curAction) { //out of actions
+        const curAction = this.getNextValidAction();
+        // out of actions
+        if (!curAction) {
             shouldRestart = true;
             return;
         }
         addExpFromAction(curAction);
-
         curAction.ticks++;
         curAction.manaUsed++;
-        if(curAction.loopStats) { //only for multi-part progress bars
+        curAction.timeSpent += 1 / baseManaPerSecond / getActualGameSpeed();
+        // only for multi-part progress bars
+        if (curAction.loopStats) {
             let segment = 0;
             let curProgress = towns[curAction.townNum][curAction.varName];
-            while(curProgress >= curAction.loopCost(segment)) {
+            while (curProgress >= curAction.loopCost(segment)) {
                 curProgress -= curAction.loopCost(segment);
                 segment++;
             }
-            //segment is 0,1,2
-            let toAdd = curAction.tickProgress(segment) * (curAction.manaCost() / curAction.adjustedTicks);
+            // segment is 0,1,2
+            const toAdd = curAction.tickProgress(segment) * (curAction.manaCost() / curAction.adjustedTicks);
             // console.log("using: "+curAction.loopStats[(towns[curAction.townNum][curAction.varName + "LoopCounter"]+segment) % curAction.loopStats.length]+" to add: " + toAdd + " to segment: " + segment + " and part " +towns[curAction.townNum][curAction.varName + "LoopCounter"]+" of progress " + curProgress + " which costs: " + curAction.loopCost(segment));
             towns[curAction.townNum][curAction.varName] += toAdd;
             curProgress += toAdd;
-            while(curProgress >= curAction.loopCost(segment)) {
+            let partUpdateRequired = false;
+            while (curProgress >= curAction.loopCost(segment)) {
                 curProgress -= curAction.loopCost(segment);
-                //segment finished
+                // segment finished
                 if (segment === curAction.segments - 1) {
-                    //part finished
+                    // part finished
+                    if (curAction.name === "Dark Ritual" && towns[curAction.townNum][curAction.varName] >= 4000000) unlockStory("darkRitualThirdSegmentReached");
+                    if (curAction.name === "Imbue Mind" && towns[curAction.townNum][curAction.varName] >= 700000000) unlockStory("imbueMindThirdSegmentReached");
                     towns[curAction.townNum][curAction.varName] = 0;
-                    towns[curAction.townNum][curAction.varName + "LoopCounter"] += curAction.segments;
-                    towns[curAction.townNum]["total"+curAction.varName]++;
+                    towns[curAction.townNum][`${curAction.varName}LoopCounter`] += curAction.segments;
+                    towns[curAction.townNum][`total${curAction.varName}`]++;
                     segment -= curAction.segments;
                     curAction.loopsFinished();
-                    if(!curAction.segmentFinished) {
-                        view.updateMultiPart(curAction);
-                    }
-                    if(curAction.canStart && !curAction.canStart()) {
+                    partUpdateRequired = true;
+                    if (curAction.canStart && !curAction.canStart()) {
+                        this.completedTicks += curAction.ticks;
+                        view.updateTotalTicks();
                         curAction.loopsLeft = 0;
                         curAction.ticks = 0;
+                        curAction.manaRemaining = timeNeeded - timer;
+                        curAction.goldRemaining = resources.gold;
+                        curAction.finish();
                         break;
                     }
+                    towns[curAction.townNum][curAction.varName] = curProgress;
                 }
-                if(curAction.segmentFinished) {
+                if (curAction.segmentFinished) {
                     curAction.segmentFinished();
-                    view.updateMultiPart(curAction);
+                    partUpdateRequired = true;
                 }
                 segment++;
-
             }
-            view.updateMultiPartSegments(curAction);
+            view.requestUpdate("updateMultiPartSegments", curAction);
+            if (partUpdateRequired) {
+                view.requestUpdate("updateMultiPart", curAction);
+            }
         }
-        if(curAction.ticks >= curAction.adjustedTicks) {
+        if (curAction.ticks >= curAction.adjustedTicks) {
             curAction.ticks = 0;
             curAction.loopsLeft--;
 
             this.completedTicks += curAction.adjustedTicks;
             curAction.finish();
-
-            if(curAction.cost) {
+            curAction.manaRemaining = timeNeeded - timer;
+            
+            if (curAction.cost) {
                 curAction.cost();
             }
+            curAction.goldRemaining = resources.gold;
 
             this.adjustTicksNeeded();
             view.updateCurrentActionLoops(this.currentPos);
         }
-        view.updateCurrentActionBarRequest(this.currentPos);
-        if(curAction.loopsLeft === 0) {
-            if(!this.current[this.currentPos + 1] && document.getElementById("repeatLastAction").checked &&
+        view.requestUpdate("updateCurrentActionBar", this.currentPos);
+        if (curAction.loopsLeft === 0) {
+            if (!this.current[this.currentPos + 1] && options.repeatLastAction &&
                 (!curAction.canStart || curAction.canStart()) && curAction.townNum === curTown) {
                 curAction.loopsLeft++;
                 curAction.loops++;
+                curAction.extraLoops++;
             } else {
                 this.currentPos++;
             }
@@ -87,31 +102,34 @@ function Actions() {
 
     this.getNextValidAction = function() {
         let curAction = this.current[this.currentPos];
-        if(!curAction) {
+        if (!curAction) {
             return curAction;
         }
-        if(curAction.allowed && getNumOnCurList(curAction.name) > curAction.allowed()) {
+        if (curAction.allowed && getNumOnCurList(curAction.name) > curAction.allowed()) {
             curAction.ticks = 0;
+            curAction.timeSpent = 0;
             view.updateCurrentActionBar(this.currentPos);
             return undefined;
         }
-        if((curAction.canStart && !curAction.canStart() && curAction.townNum === curTown) || curAction.townNum !== curTown) {
+        while ((curAction.canStart && !curAction.canStart() && curAction.townNum === curTown) || curAction.townNum !== curTown) {
             curAction.errorMessage = this.getErrorMessage(curAction);
-            curAction.loopsFailed = curAction.loopsLeft;
-            curAction.loopsLeft = 0;
             view.updateCurrentActionBar(this.currentPos);
             this.currentPos++;
+            if (this.currentPos >= this.current.length) {
+                curAction = undefined;
+                break;
+            }
             curAction = this.current[this.currentPos];
         }
         return curAction;
     };
 
     this.getErrorMessage = function(action) {
-        if(action.townNum !== curTown) {
-            return "You were in area " + (curTown+1) + " when you tried this action, and needed to be in " + (action.townNum+1);
+        if (action.townNum !== curTown) {
+            return `You were in zone ${curTown + 1} when you tried this action, and needed to be in zone ${action.townNum + 1}`;
         }
-        if(action.canStart && !action.canStart()) {
-            return "You could not make the cost for the action."
+        if (action.canStart && !action.canStart()) {
+            return "You could not make the cost for this action.";
         }
         return "??";
     };
@@ -120,68 +138,69 @@ function Actions() {
         this.currentPos = 0;
         this.completedTicks = 0;
         curTown = 0;
-        towns[0].Heal = 0;
-        towns[0].HealLoopCounter = 0;
-        towns[0].Fight = 0;
-        towns[0].FightLoopCounter = 0;
-        towns[0].SDungeon = 0;
-        towns[0].SDungeonLoopCounter = 0;
         towns[0].suppliesCost = 300;
-        view.updateSupplies();
-        towns[2].AdvGuild = 0;
-        towns[2].AdvGuildLoopCounter = 0;
-        window.curAdvGuildSegment = 0;
-        towns[2].CraftGuild = 0;
-        towns[2].CraftGuildLoopCounter = 0;
-        window.curCraftGuildSegment = 0;
-        towns[2].LDungeon = 0;
-        towns[2].LDungeonLoopCounter = 0;
-        towns[2].Tournament = 0;
-        towns[2].TournamentLoopCounter = 0;
-        window.curTournamentSegment = 0;
+        view.updateResource("supplies");
+        curAdvGuildSegment = 0;
+        curCraftGuildSegment = 0;
+        for (const town of towns) {
+            for (const action of town.totalActionList) {
+                if (action.type === "multipart") {
+                    town[action.varName] = 0;
+                    town[`${action.varName}LoopCounter`] = 0;
+                }
+            }
+        }
         guild = "";
-        window.tournyComplete = false;
-        if(document.getElementById("currentListActive").checked) {
+        if (options.keepCurrentList) {
             this.currentPos = 0;
             this.completedTicks = 0;
 
-            for(let i = 0; i < this.current.length; i++) {
-                let action = this.current[i];
+            for (const action of this.current) {
+                action.loops -= action.extraLoops;
                 action.loopsLeft = action.loops;
+                action.extraLoops = 0;
                 action.ticks = 0;
                 action.manaUsed = 0;
+                action.manaRemaining = 0;
+                action.goldRemaining = 0;
+                action.timeSpent = 0;
             }
 
         } else {
             this.current = [];
-            for(let i = 0; i < this.next.length; i++) {
-                let action = this.next[i];
-                if (action.loops === 0) { //don't add blank ones
+            for (const action of this.next) {
+                // don't add empty/disabled ones
+                if (action.loops === 0 || action.disabled) {
                     continue;
                 }
-                let toAdd = translateClassNames(action.name);
+                const toAdd = translateClassNames(action.name);
 
                 toAdd.loops = action.loops;
                 toAdd.loopsLeft = action.loops;
+                toAdd.extraLoops = 0;
                 toAdd.ticks = 0;
                 toAdd.manaUsed = 0;
+                toAdd.manaRemaining = 0;
+                toAdd.goldRemaining = 0;
+                toAdd.timeSpent = 0;
 
                 this.current.push(toAdd);
             }
         }
-        if(this.current.length === 0) {
+        if (this.current.length === 0) {
             pauseGame();
         }
         this.adjustTicksNeeded();
-        view.updateMultiPartActions();
-        view.updateNextActions();
+        view.requestUpdate("updateMultiPartActions");
+        view.requestUpdate("updateNextActions");
+        view.requestUpdate("updateTime");
     };
 
     this.adjustTicksNeeded = function() {
         let remainingTicks = 0;
-        for(let i = 0; i < this.current.length; i++) {
-            let action = this.current[i];
-            if(i < this.currentPos) {
+        for (let i = 0; i < this.current.length; i++) {
+            const action = this.current[i];
+            if (i < this.currentPos) {
                 continue;
             }
             setAdjustedTicks(action);
@@ -192,62 +211,66 @@ function Actions() {
     };
 
 
-    this.addAction = function(action, loops, initialOrder) {
-        let toAdd = {};
+    this.addAction = function(action, loops, initialOrder, disabled) {
+        const toAdd = {};
         toAdd.name = action;
+        if (disabled) toAdd.disabled = true;
+        else toAdd.disabled = false;
 
-        toAdd.loops = loops !== undefined ? loops : this.addAmount;
+        toAdd.loops = loops === undefined ? this.addAmount : loops;
 
-        if(initialOrder !== undefined) {
-            this.next.splice(initialOrder, 0, toAdd) //insert at index
-        } else {
-            if(document.getElementById("addActionTop").checked) {
+        if (initialOrder === undefined) {
+            if (options.addActionsToTop) {
                 this.next.splice(0, 0, toAdd);
             } else {
                 this.next.push(toAdd);
             }
+        } else {
+            // insert at index
+            this.next.splice(initialOrder, 0, toAdd);
         }
     };
 }
 
 function setAdjustedTicks(action) {
     let newCost = 0;
-    for(let i = 0; i < statList.length; i++) {
-        let statName = statList[i];
-        if(action.stats[statName]) {
-            newCost += action.stats[statName] / (1 + getLevel(statName)/100);
+    for (let i = 0; i < statList.length; i++) {
+        const statName = statList[i];
+        if (action.stats[statName]) {
+            newCost += action.stats[statName] / (1 + getLevel(statName) / 100);
         }
     }
-    action.adjustedTicks = Math.ceil(action.manaCost() * newCost - .000001);
+    action.adjustedTicks = Math.ceil(action.manaCost() * newCost - 0.000001);
 }
 
 function calcSoulstoneMult(soulstones) {
-    return 1+Math.pow(soulstones, .8)/30;
+    return 1 + Math.pow(soulstones, 0.8) / 30;
 }
 
 function calcTalentMult(talent) {
-    return 1+Math.pow(talent, .5)/5;
+    return 1 + Math.pow(talent, 0.4) / 3;
 }
 
 function addExpFromAction(action) {
-    for(let i = 0; i < statList.length; i++) {
-        let statName = statList[i];
-        if(action.stats[statName]) {
-            let expToAdd = action.stats[statName] * action.expMult * (action.manaCost() / action.adjustedTicks) * getTotalBonusXP(statName);
-            if(!action["statExp"+statName]) {
-                action["statExp"+statName] = 0;
+    const adjustedExp = action.expMult * (action.manaCost() / action.adjustedTicks);
+    for (const stat of statList) {
+        if (action.stats[stat]) {
+            const expToAdd = action.stats[stat] * adjustedExp * getTotalBonusXP(stat);
+            const statExp = `statExp${stat}`;
+            if (!action[statExp]) {
+                action[statExp] = 0;
             }
-            action["statExp"+statName] += expToAdd;
-            addExp(statName, expToAdd);
+            action[statExp] += expToAdd;
+            addExp(stat, expToAdd);
         }
     }
 }
 
 function getNumOnList(actionName) {
     let count = 0;
-    for(let i = 0; i < actions.next.length; i++) {
-        if(actions.next[i].name === actionName) {
-            count += actions.next[i].loops;
+    for (const action of actions.next) {
+        if (!action.disabled && action.name === actionName) {
+            count += action.loops;
         }
     }
     return count;
@@ -255,9 +278,9 @@ function getNumOnList(actionName) {
 
 function getNumOnCurList(actionName) {
     let count = 0;
-    for(let i = 0; i < actions.current.length; i++) {
-        if(actions.current[i].name === actionName) {
-            count += actions.current[i].loops;
+    for (const action of actions.current) {
+        if (action.name === actionName) {
+            count += action.loops;
         }
     }
     return count;
