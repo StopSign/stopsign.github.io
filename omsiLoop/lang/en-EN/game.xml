@@ -1,0 +1,1797 @@
+<?xml version="1.0"?>
+<body>
+    <menu>
+        <changelog>
+            <meta>
+                <title>Changelog</title>
+                <version_prefix>Version</version_prefix>
+            </meta>
+            <version verNum=".94"><![CDATA[
+            <b> June 18th, 2020 - The current date</b>
+            <b> v0.94 - "One for the history books."</b><br>
+            • Added a new set of action stories for Merchanton and Mt. Olympus. These were written by InfernoVulpix from the Discord.<br>
+            • Improved centering and alignment of various visual elements.<br>
+            • Rounded the corners of the action list.<br>
+            • Improved the save exporting system, reducing savefile export character lengths by up to 35%.<br>
+            • The changelog notes are now fixed to the top of the tooltip no matter the position of the version, and the versions now a hover effect.<br>
+            • Fixed various issues relating to element visibility when hard resetting your savefile through import.<br>
+            <br><b> v0.94b - June 18th, 2020</b><br>
+            • Fixed a bug where the skill list and buff list visibility checks were mixed up.<br>
+            <br><b> v0.94c - June 20th, 2020</b><br>
+            • Added a button on travel actions to collapse their respective zone.<br>
+            • Improved grammar on the first Adventure Guild action story.<br>
+            • Fixed the first Imbue Mind action story being unobtainable if you had capped it before the update.<br>
+            <br><b> v0.94d - June 27th, 2020</b><br>
+            • Action stories are now colored differently when you have unlocked all the stories for an action versus when you haven't.<br>
+            • Collapsing travel actions now only hides actions in the same zone that are before the travel action in your list.<br>
+            • Editable buff caps are now explained in the "Buffs" section's hover text.<br>
+            • Fixed the horizontal spacing on buff caps.<br>
+            • Fixed the negative and low reputation failed action stories for Brew Potions being obtainable from failing the action by having less than 10 herbs.<br>
+            • Fixed improper hiding of action stories when importing a new save file.
+        ]]></version>
+            <version verNum=".93"><![CDATA[
+            <b> March 16th, 2020 - June 18th, 2020</b>
+            <b> v0.93 - "Diminishing returns."</b><br>
+            • Team member gold cost and cost increase from 200 > 100 per.<br>
+            • Travel actions in the next action list now have multicolored backgrounds where the top half is the zone they're in, and the bottom half is the zone they bring you to.<br>
+            • Options are now all saved.<br>
+            • Manually set buff caps are now saved.<br>
+            • Fixed Mason and Architect not updating their exp gains in their tooltips properly upon completion.<br>
+            • Fixed odd behavior on failed actions in edge cases.<br>
+            • Fixed buffs improperly visually appearing and disappearing.<br>
+            • Fixed buff hard caps not working.<br>
+            <br><b> v0.93b - June 17th, 2020</b><br>
+            • Fixed pause on failed loop acting the same as pause before restart.<br>
+            • Slightly improved the visuals and centering on the current and next action bars.<br>
+            • The current action list now displays action loops in the form of "done/total", instead of "total(remaining)".
+        ]]></version>
+            <version verNum=".92"><![CDATA[
+            <b> April 29th, 2019 - March 16th, 2020</b>
+            <b> v0.92 - "For your eyes."</b><br>
+            • Added Themes. You can find these under a dropdown in the options menu. Currently there are 3 themes: Normal, Dark, and Cubic.<br>
+            • Actions in the next action list now have backgrounds depending on the zone the action is from.<br>
+            • Added a disable action button next to the remove action button. (this ignores the action when creating your current action list on restart)<br>
+            • Added a visual indicator for actions with 0 loops, that indicates they will be ignored when creating your current action list on restart.<br>
+            • Increased the horizontal size of actions on the next action list.<br>
+            • Action list buttons now hide when you begin to drag an action, and reappear when you finish the drag.<br>
+            • Adjusted the next action list buttons for consistency.<br>
+            • Reduced the space between the "x" and the loop count for actions on the current action bar.<br>
+            • Made the loop count for actions on the current action bar apply the same number formatting as actions on the next action list.<br>
+            • When you have the max allowed amount of an action on your list, it will now show with a red tinted background, distinguishing it from locked actions.<br>
+            • Buffs now display under the buff section upon unlocking them, rather than obtaining them at least once.<br>
+            • Adjusted the buff displays, to be more consistent with stats and skills.<br>
+            • Notable performance improvements, especially in edge cases.<br>
+            • Added missing commas to the Small dungeon and Large Dungeon floor looted counts in their tooltips.<br>
+            • Abjusted the current actions mana used display to allow space for larger numbers, and improved formatting.<br>
+            • Changed the self combat and team combat tooltips to mention guild multiplier instead of guild rank, for clarity.<br>
+            • Replaced references to "combined skill" with "combined Combat and Magic skill", for clarity.<br>
+            • Replaced references to "rank bonus" with "guild multiplier", for clarity.<br>
+            • Added an additional decimal point of precision for time values of < 10 seconds.<br>
+            • Fixed action buttons not being properly vertically centered.<br>
+            • Fixed visual elements not correctly updating upon import.<br>
+            • Fixed various typos.<br>
+            • Fixed actions with gold costs not properly updating their gold remaining upon completion.<br>
+            • Fixed the seconds left in loop display not updating if you toggled bonus seconds on/off while paused.<br>
+            • Fixed missing spaces between the stat shortforms and the exp gains on the current action bar tooltips.<br>
+            • Fixed improper vertical spacing between buff/buff cap numbers.<br>
+            • Fixed export to Stopsign not correctly removing new actions from the current action list.<br>
+            • Fixed loadout names not correctly resetting when you wiped your save.
+        ]]></version>
+            <version verNum=".91"><![CDATA[
+            <b> April 2nd, 2019 - April 29th, 2019</b>
+            <b> v0.91 - "A storied future."</b><br>
+            • Added action stories. These are short stories for most actions. These were written by Jacmac from the Discord. As of now, there are 120 individual entries. These become visible when their corresponding action is unlocked, and readable when a certain listed requirement is fulfilled. (arrow to the right of "Action Options" to view them)<br>
+            • Changed bonus seconds gains from 80% > 100%, and drain from 3/s > 4/s. (this will result in a 5x speed multiplier, up from the previous 4x)<br>
+            • When the delta between the last update and the current time is too long, the game will now attempt to give you bonus seconds equal to it, rather than just skipping it.<br>
+            • Action tooltips now display skill exp gain (if applicable) above stat percentages.<br>
+            • Dark Ritual and Imbue Mind now take the remainder of soulstones after division from the stat with the most soulstones, rather than soul.<br>
+            • Changed Dark Ritual's unlock requirement from 90% Thicket Explored to 50% Witch Knowledge to prevent confusion.<br>
+            • Changed the icons for Small Dungeon, Wild Mana, Looping Potion, and Buy Supplies to be consistent with other icons.<br>
+            • Supplies now shows as an icon in the resource list, to be consistent with other resources that are limited to 1.<br>
+            • Renamed Train Dex to Train Dexterity.<br>
+            • Added colons in various different places they were missing.<br>
+            • Minor performance improvements. (higher for those not using the radar chart)<br>
+            • Changes on patch notes are now preceded by • instead of *.<br>
+            • Modified the Throw Party and Old Shortcut tooltips for clarity.<br>
+            • Face Judgement now requires 100% Mountain Explored.<br>
+            • Translations now fallback to english if there's no translated version of the text. This means that the French translation has been re-enabled, but do note that it's only a partial translation.<br>
+            • Slightly adjusted the spacing and location of buttons on the saving menu.<br>
+            • Added a button on the saving menu to export your save in a Stopsign compatible form.<br>
+            • Skill levels now have a comma after 999, and a suffix after 9999.<br>
+            • Scarce action tooltips now display their total checked below their total found, and have a semicolon preceding their found count.<br>
+            • Added a visual indicator for when you save a loadout.<br>
+            • Added hotkeys for changing the current zone, showing action options/stories, and undoing the most recent action list change.<br>
+            • Revamped the changelog tooltips to allow for a scrollbar.<br>
+            • Fixed various typos.<br>
+            • Fixed the spacing between the load and clear list buttons.<br>
+            • Fixed certain tooltips not closing if you moved your mouse downwards onto the tooltip too quickly.<br>
+            • Fixed tooltips on thick progress bars overlapping with the bars themselves.<br>
+            • Fixed commas not appearing on travel action mana costs.<br>
+            • Fixed level exp on skill tooltips being labeled as "Level".<br>
+            • Fixed certain tooltips not closing if you moved your mouse downwards onto the tooltip too quickly.<br>
+            • Fixed ping on pause not working properly with pause on failed loop.<br>
+            • Fixed mana/gold remaining displays on the action list sometimes being incorrect at high game speeds.<br>
+            • Fixed failed actions being able to spend mana for a single tick before failing.<br>
+            • Fixed soulstone count not updating if you sacrificed exactly the amount of soulstones you had in a specific stat.<br>
+            • Fixed improper margins between town info and action options/stories before everything in a town is unlocked.<br>
+            • Fixed improper progress gains on multi part actions in certain cases.<br>
+            • Fixed bonus seconds provding a speed boost for a tick after enabling them, even when you had none.<br>
+            • Fixed the radar chart breaking if you imported a save and then swapped to it.
+        ]]></version>
+            <version verNum=".90"><![CDATA[
+            <b> February 16th, 2019 - April 2nd, 2019</b>
+            <b> v0.90 - "Crumbs in the keyboard."</b><br>
+            • Added hotkeys. (found in the options menu, hover over the word "hotkeys" for a list)<br>
+            • The small bar that appears when you hover over an action on the current action list has been restyled to better fit the game.<br>
+            • Performance has been greatly to moderately increased depending on the situation.<br>
+            • You can now shift+click actions with caps to add them to your action list at their capped amount. (or hold shift and then drag them into the list)<br>
+            • Fixed mana remaining not visually updating upon reset.<br>
+            • Fixed loadout names sometimes not loading.<br>
+            • Fixed Gamble not showing its unlock requirement.
+        ]]></version>
+            <version verNum=".89"><![CDATA[
+            <b> February 7th, 2019 - February 16th, 2019</b>
+            <b> v0.89 - "Cobwebs in the corner."</b><br>
+            • Fixed the stat radar exp/talent bars all being stacked on top of one another<br>
+            • Added an input box in the options that allows you to adjust the update rate of the game. This shouldn't affect your rate of progress, but there's a chance it might have a very small effect. It will increase your performance when reduced below the default of 50.<br>
+            • Stat percentages on actions tooltips are now always listed in the same order as the stats on the left side of the screen.<br>
+            • Added a time spent display for actions in the current action list.<br>
+            • You can now drag actions directly from the action options into your loop.<br>
+            • Fixed ping on pause not working.<br>
+            • Fixed incorrect formulas on the Dark Magic/Chronomancy tooltips.<br>
+            • Fixed soulstone costing actions not updating their tooltip cost upon completion.<br>
+            • Fixed the progress bar on multi part actions being larger than other progress bars.<br>
+            • Added 30 humorous new monster names for Fight Monsters.
+        ]]></version>
+            <version verNum=".88"><![CDATA[
+            <b> January 29th, 2019 - February 7th, 2019</b>
+            <b> v0.88 - "Almost spring cleaning."</b><br>
+            • Dark Ritual and Imbue Mind now have hard caps on the amount buffs you can get from them.<br>
+            • Dark Ritual and Imbue Mind now display their current soulstone cost on their respective action tooltips.<br>
+            • Reworked the buff display to allow for user limiting of the number of action completions for buff actions. The left number is your current amount, the right number is the amount you will stop being able to start the action at. You can change the right number, but you can not increase it past the hard cap.<br>
+            • Fixed a horizontal scrollbar appearing on the action list in certain cases.<br>
+            • There is now a fancy themed vertical scrollbar on the action list for browsers that support it. (Chrome, Safari, Opera, and a slightly worse looking one in Firefox)<br>
+            • Reworded reputation requirements on certain actions to prevent confusion.
+        ]]></version>
+            <version verNum=".87"><![CDATA[
+            <b> January 16th, 2019 - January 29th</b>
+            <b> v0.87 - "How about you name this one."</b><br>
+            • Fixed resource icons pushing page elements downwards when visible.<br>
+            • You can now name your loadouts by typing a name in the custom add amount box and then saving them. There is a 30 character max, and they can't only consist of numbers.<br>
+            • Versions now have dates and names in the patchnotes. <br>
+            • Patchnotes from the original version have been removed.
+        ]]></version>
+            <version verNum=".86"><![CDATA[
+            <b> December 6th, 2018 - January 16th, 2019</b>
+            <b> v0.86 - "Customization, confirmation, checkboxes."</b><br>
+            • Added a custom number input for the amount selections on the actions list.<br>
+            • Amounts on the actions list are now formatted at values > 999,999.<br>
+            • Formatted values now always have at least 3 digits of precision.<br>
+            • Added a checkbox to pause when a loop fails. (this will trigger if your loop ends before you reach the last action)<br>
+            • Added a confirmation when importing nothing, that warns you it will delete your save.
+        ]]></version>
+            <version verNum=".85"><![CDATA[
+            <b class="versiontitle"> November 7th, 2018 - December 6th, 2018</b>
+            <b class="versiontitle"> v0.85 - "This one isn't illusory."</b><br>
+            • New actions - Check Walls, Take Artifacts, Imbue Mind<br>
+            • Pyromancy mana cost 12000 > 14000.<br>
+            • Pyromancy self combat per level 10 > 5.<br>
+            • Start Trek now requires 60% City Explored.<br>
+            • The Crafting Guild and Adventure Guild rank bonuses at Godlike have been decreased. (77x > 10x)<br>
+            • Chronomancy and Dark Magic now show their current bonus on their skill tooltips.<br>
+            • Added commas to certain numbers >= 1,000 but < 9,999.<br>
+            • Items that you can only get one of now display as icons always on the right side of your resources.<br>
+            • Fixed minor typos/grammatical errors.<br>
+            • Increased the icon size for actions by 4 pixels.<br>
+            • The French translation has been disabled as it is currently broken, and no longer supported.
+        ]]></version>
+            <version verNum=".84"><![CDATA[
+            <b> October 14th, 2018 - November 7th, 2018</b>
+            <b> v0.84 - "Stop going so fast."</b><br>
+            • Chronomancy speed bonus sqrt(1 + level / 200) > (1 + level / 60) ^ 0.25.<br>
+            • Dark Magic mana gain bonus (1 + level / 100) > (1 + level / 60) ^ 0.25.<br>
+            • The action list height now saves on reload.<br>
+        ]]></version>
+            <version verNum=".83"><![CDATA[
+            <b> October 9th, 2018 - October 14th, 2018</b>
+            <b> v0.83 - "Bonus buttons."</b><br>
+            • Added an additional loadout slot.<br>
+            • Added 100/50 buttons to the amount selections on the actions list.<br>
+            • Added buttons to the top right of the actions list that allow you to adjust its vertical length.<br>
+            • When your loop ends during an action, your mana used that loop will now update properly.<br>
+            • Fixed various tooltips not overlapping certain elements.
+        ]]></version>
+            <version verNum=".82"><![CDATA[
+            <b> October 6th, 2018 - October 9th, 2018</b>
+            <b> v0.82 - "Please help I don't understand math."</b><br>
+            • New action - Face Judgement.<br>
+            • The talent multiplier formula has been changed to be worse at higher levels. (talent ^ 0.5 / 5) > (talent ^ 0.4 / 3)<br>
+            • Mine Soulstones mana cost 2500 > 5000.<br>
+            • Adjusted the placement of Pyromancy.<br>
+            • The currently selected loadout stays highlighted on refresh.<br>
+            • Fixed the mana cost reductions from Witch Knowledge and Runes Deciphered being applied improperly.<br>
+            • Fixed the Witch Knowledge Dark Ritual mana cost reduction not increasing the speed of the ritual to account for the reduced cost.
+        ]]></version>
+            <version verNum=".81"><![CDATA[
+            <b> October 3rd, 2018 - October 6th, 2018</b>
+            <b> v0.81 - "A new hobby."</b><br>
+            • New action - Bird Watching.<br>
+            • Fixed the speed bonuses Dark Ritual and Chronomancy draining bonus seconds faster.
+        ]]></version>
+            <version verNum=".80"><![CDATA[
+            <b> September 27th, 2018 - October 3rd, 2018</b>
+            <b> v0.80 - "The fine print."</b><br>
+            • New action - Looping Potion.<br>
+            • Dark Ritual now has bonuses for rituals 21-60, and a new unlimited per ritual bonus.<br>
+            • Chronomancy speed bonus sqrt(1 + level / 100) > sqrt(1 + level / 200).<br>
+            • The short forms of stat names have been capitalized.<br>
+            • Checkboxes have been vertically aligned.<br>
+            • Colons have been added to the end of resources with counts.<br>
+            • Fixed various minor bugs.
+        ]]></version>
+            <version verNum=".79"><![CDATA[
+            <b> September 20th, 2018 - September 27th, 2018</b>
+            <b> v0.79 - "Flowers and fire and trolls, oh my!"</b><br>
+            • Descriptions, flavor text, and tooltips have been changed in various places.<br>
+            • New actions - Follow Flowers, Mine Soulstones, Pyromancy, Hunt Trolls<br>
+            • Dark Ritual exp bonus 2000% -> 1000%<br>
+            • Dark Magic now reduces your reputation by 1 per completion.<br>
+            • Dark Ritual reputation requirement 0 or less -> -5 or less<br>
+            • Clear Thicket unlock 60% Forest Explored -> 20% Flower Trail Followed<br>
+            • Clear Thicket mana cost 300 -> 500<br>
+            • Explore Cavern no longer requires the pickaxe.<br>
+            • The font size on actions has been reduced by 1 pixel.
+        ]]></version>
+            <version verNum=".78"><![CDATA[
+            <b> August 18th, 2018 - September 20th, 2018</b>
+            <b> v0.78 - "Is it just me or is it getting evil in here?"</b><br>
+            • New actions - Clear Thicket, Talk to Witch, Dark Magic, Dark Ritual, Buy Pickaxe<br>
+            • Removed actions - Tournament<br>
+            • New zone - Mt. Olympus<br>
+            • Changed the colors for soul and charisma<br>
+            • Old Shortcut mana cost 1200 -> 800<br>
+            • Talk to Hermit mana cost 2000 -> 1200
+        ]]></version>
+        </changelog>
+        <save>
+            <meta>
+                <title>Saving</title>
+            </meta>
+            <manual_save>Save Manually</manual_save>
+            <export_list>Export Current List</export_list>
+            <import_list>Import List to Current</import_list>
+            <list_label>Export/Import List</list_label>
+            <list_comment>Export's the current list in a plain-text format you can paste and share with others</list_comment>
+            <input_label>Export/Import Savefile</input_label>
+            <export_button>Export</export_button>
+            <export_button_old>Export To Stopsign</export_button_old>
+            <export_comment><![CDATA[Click Export to export to your clipboard (ctrl-v somewhere else).<br>
+              Paste a save and click Import to import.]]></export_comment>
+            <import_button>Import</import_button>
+            <import_comment><![CDATA[
+              WARNING: Import will break the game if invalid save. Empty import will hard clear the game<br>
+              If you reaaallly want to edit your save file, ]]></import_comment>
+            <import_hover_special>hover me</import_hover_special>
+            <import_hover_special_tooltip>
+                <![CDATA[In the console, use decode("pasted savefile"), edit, then encode('pasted savefile'), then import it<br>This is mainly for fixing broken savefiles - don't be a cheater.]]></import_hover_special_tooltip>
+        </save>
+        <faq>
+            <meta>
+                <title>FAQ</title>
+                <q_prefix><![CDATA[<b>Q:</b>]]></q_prefix>
+                <a_prefix><![CDATA[<b>A:</b>]]></a_prefix>
+            </meta>
+            <q_a>
+                <q>What do stats do?</q>
+                <a>Hover over "Stats" for how they work. What stats are important depend on what actions you need that
+                    uses them.
+                </a>
+            </q_a>
+            <q_a>
+                <q>Short runs seem better.</q>
+                <a>Short runs are better, for the early game and current balance. But as your runs get longer and you accrue
+                    talent and soulstones, longer runs become more useful.
+                </a>
+            </q_a>
+            <q_a>
+                <q>What should my first goal be?</q>
+                <a>Start with wandering until you have ways of getting mana back. Then try to find how to get some
+                    warrior lessions to give yourself a permanent boost, and then try fighting monsters!
+                </a>
+            </q_a>
+        </faq>
+        <options>
+            <meta>
+                <title>Options</title>
+            </meta>
+            <localization_title>Language</localization_title>
+            <theme_title>Theme</theme_title>
+            <theme>
+                <normal>Normal</normal>
+            </theme>
+            <theme>
+                <dark>Dark</dark>
+            </theme>
+            <theme>
+                <cubic>Cubic</cubic>
+            </theme>
+            <!--changed discord link for analytical reasons-->
+            <discord>
+                <link>https://discord.gg/dnKA6Xd</link>
+                <title>Discord Link</title>
+            </discord>
+            <adblock_warning>WARNING: For some reason, Adblock Plus can cause massive lag. This game won't ever have ads, so if your game is freezing frequently, please disable it on this page.
+            </adblock_warning>
+            <pause_audio_cue>Ping on pause</pause_audio_cue>
+            <hotkeys>Hotkeys</hotkeys>
+            <hotkeys_tooltip><![CDATA[
+                Spacebar: Pause/play<br>
+                R: Restart<br>
+                B: Toggle bonus seconds<br>
+                1-5: Select loadout 1-5<br>
+                Shift+1-5: Select and load loadout 1-5<br>
+                +/-: Increase/decrease action list size<br>
+                Shift+S: Save current list to selected loudout<br>
+                Shift+L: Load selected loudout<br>
+                Shift+C: Clear current list<br>
+                Right/D: Show next zone<br>
+                Left/A: Show previous zone<br>
+                Shift+Right/D: Show action stories<br>
+                Shift+Left/A: Show action options<br>
+                Shift+Z: Undo most recent change to action list
+        ]]></hotkeys_tooltip>
+            <update_rate>Updates per second:</update_rate>
+        </options>
+    </menu>
+    <tutorial><![CDATA[
+      TUTORIAL:<br>
+      Click the Wander action and click Play to start.<br>
+      Wander for a bit, then smash pots.<br>
+      Watch the numbers change, read all the tooltips.<br>
+      Complete the town, go to the next one.<br><br>
+      Hey there, it looks like you're starting the game on omsi6.github.io.<br>
+      Before you start, you should know that this is a fanmade modification<br>
+      for the original game, located <a href="http://stopsign.github.io/idleLoops/">here</a>. You can import your save from the<br>
+      original, but if you import it back to the original, you'll lose any progress in features specific to this version.<br><br>
+      Thanks for playing, and have fun!<br><br>
+      ]]></tutorial>
+    <tracked_resources>
+        <reset_on_restart_txt>Resets when the loop restarts.</reset_on_restart_txt>
+        <!--countable items with names and counts on the top bar-->
+        <resource no_reset_on_restart="true">
+            <title>Mana:</title>
+            <id>timer</id>
+            <desc>Your main resource. The higher your mana, the more you can do before reset.</desc>
+        </resource>
+        <resource>
+            <title>Gold:</title>
+            <id>gold</id>
+            <desc>Sell for mana, or use for actions.</desc>
+        </resource>
+        <resource initially_hidden="true">
+            <title>Reputation:</title>
+            <id>reputation</id>
+            <desc>The influence you have over the people in town.</desc>
+        </resource>
+        <resource initially_hidden="true">
+            <title>Herbs:</title>
+            <id>herbs</id>
+            <desc>The beneficial plants you've found.</desc>
+        </resource>
+        <resource initially_hidden="true">
+            <title>Hide:</title>
+            <id>hide</id>
+            <desc>Results of successful hunting.</desc>
+        </resource>
+        <resource initially_hidden="true">
+            <title>Potions:</title>
+            <id>potions</id>
+            <desc>Rare, but not complex. Worth some money.</desc>
+        </resource>
+        <resource initially_hidden="true">
+            <title>Team Members:</title>
+            <id>teamMembers</id>
+            <desc>You know their personalities and fighting style. They don't know your name.</desc>
+        </resource>
+        <resource initially_hidden="true">
+            <title>Armor:</title>
+            <id>armor</id>
+            <desc>Crafted by your own hand, it protects you from dangers.</desc>
+        </resource>
+        <resource initially_hidden="true">
+            <title>Blood:</title>
+            <id>blood</id>
+            <desc>Regailed for it's regenerative properties. (this does nothing currently)</desc>
+        </resource>
+        <resource initially_hidden="true">
+            <title>Artifacts:</title>
+            <id>artifacts</id>
+            <desc>Various old rings, bracelets, amulets, and pendants. You might be able to fetch a pretty penny for them.</desc>
+        </resource>
+        <!--singular items with img icons rather than counts-->
+        <resource initially_hidden="true" no_count="true">
+            <title><![CDATA[<img src="img/buyGlasses.svg" class="smallIcon">]]></title>
+            <id>glasses</id>
+            <desc>Woah, trees have so many leaves on them.</desc>
+        </resource>
+        <resource initially_hidden="true" no_count="true">
+            <title><![CDATA[<img src="img/buySupplies.svg" class="smallIcon">]]></title>
+            <id>supplies</id>
+            <desc>Needed to go to the next town.</desc>
+        </resource>
+        <resource initially_hidden="true" no_count="true">
+            <title><![CDATA[<img src="img/buyPickaxe.svg" class="smallIcon">]]></title>
+            <id>pickaxe</id>
+            <desc>It's heavy, but you can make use of it.</desc>
+        </resource>
+        <resource initially_hidden="true" no_count="true">
+            <title><![CDATA[<img src="img/loopingPotion.svg" class="smallIcon">]]></title>
+            <id>loopingPotion</id>
+            <desc>It's a potion made with the very same formula that got you into this mess. Why exactly did you make this?</desc>
+        </resource>
+    </tracked_resources>
+    <time_controls>
+        <play_button>Play</play_button>
+        <pause_button>Pause</pause_button>
+        <pause_before_restart>Pause before restart</pause_before_restart>
+        <pause_on_failed_loop>Pause on failed loop</pause_on_failed_loop>
+        <restart_button>Restart</restart_button>
+        <restart_text>Resets the loop. Not a hard reset.</restart_text>
+        <hours>h</hours>
+        <minutes>m</minutes>
+        <seconds>s</seconds>
+        <talents_button>Talents</talents_button>
+        <story_title>Story</story_title>
+        <stories>
+            <story num="0">
+                You're a simple courier, on a long trip to deliver a high priority package. Just as you entered town,
+                you tripped - breaking your glasses - and the package burst open, spilling a strange liquid on you.
+                Immediately, your meager amount of mana started draining rapidly. Right as your mana became empty, you
+                found yourself back in the moment the liquid was absorbed into your skin, with your tiny reserves
+                filled... yet draining just as before. This happened again and again, the world resetting with you,
+                until you decided you had to figure out a way to prolong how long these 'loops' were. Mana crystals are
+                often stored in pottery around town, perhaps you'll start there ...
+            </story>
+            <story num="1">
+                You reach the end of the dungeon, where a softly glowing orb floats on a pedastal. You've found the
+                dungeon core - for the first level of the dungeon, at least. As you grasp it, the essence dives into
+                you, infusing your very being with the power it holds. It is a small amount of power, but this is a
+                small dungeon. You'll be back to take this power again, knowing with the foreign knowledge implanted
+                that it will stay with you no matter when you are.
+            </story>
+            <story num="2">
+                You reach the end of the dungeon again, but for the first time the core isn't glowing. It's always been
+                thought that dungeon cores build based on the mana spent around them, but you're beginning to think the
+                essence of it's previous incarnations drains it somehow. It doesn't always happen, but you'll need to
+                put more mana into the world to take the core's benefits out of it. You shrug, accepting yet another
+                oddity of the loops.
+            </story>
+            <story num="3">
+                You've done it! You've won the tournament and obtained the cure. You can stop looping at any moment.
+                But, there's still a little more you want to do ... (GAME COMPLETE, keep playing if you want).
+            </story>
+        </stories>
+        <bonus_seconds>
+            <title>Bonus Seconds</title>
+            <main_text><![CDATA[
+          When bonus is on, you get 4 extra seconds per second (5x faster).<br>
+          Accrue 1 bonus second per second when paused or offline. (capped at 1 month per offline period)<br>
+          Bonus is
+        ]]></main_text>
+            <state>
+                <on>ON</on>
+                <off>OFF</off>
+            </state>
+            <counter_text>Total Bonus Seconds</counter_text>
+        </bonus_seconds>
+    </time_controls>
+    <stats>
+        <title>Stats</title>
+        <dex>
+            <blurb>Know your body.</blurb>
+            <long_form>Dexterity</long_form>
+            <short_form>Dex</short_form>
+        </dex>
+        <str>
+            <blurb>Train your body.</blurb>
+            <long_form>Strength</long_form>
+            <short_form>Str</short_form>
+        </str>
+        <con>
+            <blurb>Just a little longer. Just a little more.</blurb>
+            <long_form>Constitution</long_form>
+            <short_form>Con</short_form>
+        </con>
+        <spd>
+            <blurb>Gotta go fast.</blurb>
+            <long_form>Speed</long_form>
+            <short_form>Spd</short_form>
+        </spd>
+        <per>
+            <blurb>Look a little closer...</blurb>
+            <long_form>Perception</long_form>
+            <short_form>Per</short_form>
+        </per>
+        <cha>
+            <blurb>Conversation is a battle.</blurb>
+            <long_form>Charisma</long_form>
+            <short_form>Cha</short_form>
+        </cha>
+        <int>
+            <blurb>Learning to learn.</blurb>
+            <long_form>Intelligence</long_form>
+            <short_form>Int</short_form>
+        </int>
+        <luck>
+            <blurb>Opportunity favors the fortunate.</blurb>
+            <long_form>Luck</long_form>
+            <short_form>Luck</short_form>
+        </luck>
+        <soul>
+            <blurb>You are the captain.</blurb>
+            <long_form>Soul</long_form>
+            <short_form>Soul</short_form>
+        </soul>
+        <tooltip>
+            <level>Level</level>
+            <level_exp>Level Exp</level_exp>
+            <exp>Exp</exp>
+            <talent>Talent</talent>
+            <talent_exp>Talent Exp</talent_exp>
+            <talent_multiplier>Talent Mult</talent_multiplier>
+            <soulstone>Soulstones</soulstone>
+            <soulstone_multiplier>Soulstone Mult</soulstone_multiplier>
+            <total_multiplier>Total Mult</total_multiplier>
+            <bonus_xp>Bonus XP</bonus_xp>
+            <explanation><![CDATA[
+          Each stat level reduces the relevant part of an action's mana cost by 1%.<br>
+          Talent exp gain is equal to 1% of stat exp gain, and persists through loops.<br>
+          Talent multiplies xp gain by (1+(talentLevel)^0.4/3).<br>
+          XP gain towards a stat per action is (original mana / actual mana) * (talent bonus) per tick.<br>
+          Total Mult is a combination of your talent and soulstone bonuses.<br><br>
+          e.g. Meet People costs 800 mana and has a breakdown of <div class="bold">Int</div> 10% <div class="bold">Cha</div> 80% <div class="bold">Soul</div> 10%.<br>
+          This effectively means 80 of the mana is controlled by <div class="bold">Int</div>, another 80 by <div class="bold">Soul</div>, and the remaining 640 by <div class="bold">Cha</div>.<br>
+          If your <div class="bold">Cha</div> is level 20 when the action is started, the bonus would be x1.2 so it'd be 640 / 1.2 = 533.33<br>
+          Adding back the 160 from <div class="bold">Soul</div> and <div class="bold">Int</div>, the total mana the action takes (rounded up) is now 694, so ~87% of the original mana cost.<br>
+          The action would give (800/694)*(1+(talent)^0.4/3) level exp per mana for the 694 mana.]]></explanation>
+            <graph_legend><![CDATA[
+          Click the legend to show/hide each.<br>
+          Upon freshly starting, Levels and Talent won't change much.<br>
+          Hover Stats for more info.]]></graph_legend>
+        </tooltip>
+        <view>
+            <regular>Regular View</regular>
+            <radar>Radar Chart</radar>
+        </view>
+    </stats>
+    <skills>
+        <title>Skills</title>
+        <scombat>
+            <label>Self Combat</label>
+            <desc>Self Combat = (Combat skill + Pyromancy skill * 5) * (1 + armor * Crafting Guild Multiplier / 5)</desc>
+        </scombat>
+        <tcombat>
+            <label>Team Combat</label>
+            <desc>Team Combat = Self Combat + Combat Skill * Team Members * Adventure Guild Multiplier / 2</desc>
+        </tcombat>
+        <combat>
+            <label>Combat</label>
+            <desc>Fight for your lives.</desc>
+        </combat>
+        <magic>
+            <label>Magic</label>
+            <desc>Control the aether to cast and conjure.</desc>
+        </magic>
+        <practical>
+            <label>Practical Magic</label>
+            <desc>Mage Hand, Prestidigitation, Detect Magic, and other useful tricks to help out.</desc>
+            <desc2><![CDATA[Smash Pots and Wild Mana costs are reduced to the original / (1 + level / 100) (rounded up).<br>
+      Pick Locks get 1% more gold per level from 1-200 (rounded down).<br>
+      Short Quests get 1% more gold per level from 101-300 (rounded down).<br>
+      Long Quests get 1% more gold per level from 201-400 (rounded down).<br>
+      Currently multiplying costs by <div id='skillBonusPractical'></div>x.]]></desc2>
+        </practical>
+        <alchemy>
+            <label>Alchemy</label>
+            <desc>Brewing potions is hard work! It's a good thing you found a teacher.</desc>
+            <desc2>The Magic teacher in Beginnersville adores alchemists. +1% Magic exp gain from the Mage Lessons action (rounded down) per level.</desc2>
+        </alchemy>
+        <dark>
+            <label>Dark Magic</label>
+            <desc>Use various dark arts to help you harvest mana.</desc>
+            <desc2><![CDATA[Multiply the mana gain from Smash Pots and Wild Mana by (1 + level / 60) ^ 0.25 (rounded down).<br> Currently granting <div id='skillBonusDark'></div>x mana gains.]]></desc2>
+        </dark>
+        <crafting>
+            <label>Crafting</label>
+            <desc>The skill of using your hands and creativity when doing physical work.</desc>
+        </crafting>
+        <chronomancy>
+            <label>Chronomancy</label>
+            <desc>Harness the magic of time to, well, speed up time.</desc>
+            <desc2><![CDATA[Actions in all zones are (1 + level / 60) ^ 0.25 times faster.<br> Currently granting <div id='skillBonusChronomancy'></div>x speed.]]></desc2>
+        </chronomancy>
+        <pyromancy>
+            <label>Pyromancy</label>
+            <desc>Fireball, Firebolt, Fire Shield, Burning Rays, just a veritable assortment of flaming fun!</desc>
+            <desc2><![CDATA[Increases self combat with 5x the efficiency of the combat skill.]]></desc2>
+        </pyromancy>
+        <restoration>
+            <label>Restoration</label>
+            <desc>From healing cantrips to mass resurrection, you'll be sure to make good use of these spells.</desc>
+            <desc2><![CDATA[Increases team combat with 2x the efficiency of the combat skill.]]></desc2>
+        </restoration>
+        <spatiomancy>
+            <label>Spatiomancy</label>
+            <desc>Who knew bending reality to your will could be so useful!</desc>
+            <desc2><![CDATA[Mana Geyser and Mana Well are reduced to the original / (1 + level / 100) (rounded up).<br>
+            Houses to check for valuables is increased by 0.5% per level from 1-200 (rounded down).<br>
+            Short quests to finish is increased by 0.5% per level from 101-300 (rounded down).<br>
+            Long quests to finish is increased by 0.5% per level from 201-400 (rounded down).<br>
+            People to check if they're suckers is increased by 0.5% per level from 301-500 (rounded down).<br>
+            Currently multiplying costs by <div id='skillBonusSpatiomancy'></div>x.]]></desc2>
+        </spatiomancy>
+        <tooltip>
+            <level>Level:</level>
+            <level_exp>Level Exp:</level_exp>
+            <no_reset_on_restart>Skills last through resets.</no_reset_on_restart>
+        </tooltip>
+    </skills>
+    <buffs>
+        <title>Buffs</title>
+        <dark_ritual>
+            <label>Dark Ritual</label>
+            <desc>The witch appreciates your dedication to the dark arts. +1% to Dark Magic exp gain from the Dark Magic action (rounded down) per ritual.</desc>
+            <desc2><![CDATA[<br>Actions are 10% faster in Beginnersville per ritual from 1-20.<br>
+            Actions are 5% faster in the Forest Path per ritual from 21-40.<br>
+            Actions are 2.5% faster in Merchanton per ritual from 41-60.<br>]]>
+            </desc2>
+        </dark_ritual>
+        <imbue_mind>
+            <label>Imbue Mind</label>
+            <desc><![CDATA[Using power from soulstones, you can increase your training limits.<br>
+            Increases the max amount of times you can do each training action by 1 per level.]]>
+            </desc>
+        </imbue_mind>
+         <great_feast>
+            <label>Great Feast</label>
+            <desc><![CDATA[That feast was so filling that it manages to keep you well satiated through your loops! That's some impressive magic.<br>
+            Self combat is increased by 5% per level. (rounded down)]]>
+            </desc>
+        </great_feast>
+        <the_spire>
+            <label>The Spire</label>
+            <desc><![CDATA[Reaching new heights in the spire fills your mind and soul with vigor and clarity.<br>
+            Talent Exp gain is increased by 1% per level. (rounded down).]]>
+            </desc>
+        </the_spire>
+        <tooltip>
+            <level>Level</level>
+            <no_reset_on_restart><![CDATA[Buffs last through resets.<br>You can click on the right hand number to edit it and adjust the cap for that buff. (buff actions will automatically fail and not spend soulstones past your set cap)]]></no_reset_on_restart>
+        </tooltip>
+    </buffs>
+    <towns>
+        <town0>
+            <name>Beginnersville</name>
+            <desc>Rats in basements, aggressive solo boars, bouncing slimes, and strangers that love exposition are some
+                of the the common things you'll see around Beginnersville. Some people are missing helmets or shoes, and
+                the fanciest sword around is still made out of iron. You got lucky with decent towns to start looping at.
+                If only there weren't so many rules not letting you do dangerous things, it'd be perfect.
+            </desc>
+        </town0>
+        <town1>
+            <name>Forest Path</name>
+            <desc>A forever green forest. You feel mana flowing around, but hiding in the dark, you sense an evil presence...</desc>
+        </town1>
+        <town2>
+            <name>Merchanton</name>
+            <desc>Merchanton! A modest town bustling with activity. You can find many attractions here, such as the library, the adventuring guild, the crafting guild, and the bazaar. Oh, and did I mention there's loads of suckers to swindle?</desc>
+        </town2>
+        <town3>
+            <name>Mt. Olympus</name>
+            <desc>You could have taken that path to the other town, but no! You just <i>had</i> to go to Mt. Olympus, didn't you. But anyways, while you're here, thanks to being neither a canine nor old, you can learn a few new tricks. And kill some innocent trolls while you're at it.</desc>
+        </town3>
+        <town4>
+            <name>Valhalla</name>
+            <desc>A sprawling and jolly city filled with all manner of nice things. Vikings, beer, angels, beer, blah blah blah, and beer! You can spend your time in the great hall, or in the outskirts of the city. Either way, you'll surely have a great time.</desc>
+        </town4>
+        <town5>
+            <name>Adeptsville</name>
+            <desc>A once familiar place, now crawling with shadows and ominous feelings of wasted sick days. There stands a large pillar of gloomy purple light in the center of it all, eminating from a spire surrounded by black clouds. It's emitting 10 weak beams of purple light to various points around the town, and appears to be casting all the shadows. Maybe you should check those spots out.</desc>
+        </town5>
+    </towns>
+    <talents>
+        <calculated_shattering>
+            <name>Calculated Shattering</name>
+            <desc><![CDATA[
+            Practicing your shattering technique to get through all these pots as quickly as possible seems rather productive.<br>Reduces the mana cost of <span class="localized" data-lockey="actions>smash_pots>name"></span> by 1 per level.
+        ]]></desc>
+        </calculated_shattering>
+        <no_frill_frames>
+            <name>No-frill Frames</name>
+            <desc><![CDATA[
+            If you dedicate a bit of time to perusing for glasses, you can find some cheaper frames. And considering you won't be using them for too long until everything starts over again, you figure it's a good idea to skimp.<br>Reduces the gold cost of <span class="localized" data-lockey="actions>buy_glasses>name"></span> by 1 per level.
+        ]]></desc>
+        </no_frill_frames>
+    </talents>
+    <actions>
+        <title>Action Options</title>
+        <title_stories>Action Stories</title_stories>
+        <title_list>Action List</title_list>
+        <active_title>Active</active_title>
+        <next_title>Next</next_title>
+        <title_loadout>Loadouts</title_loadout>
+        <tooltip>
+            <desc><![CDATA[
+          Mana cost is based on ratio of stat %s.<br>
+          Gained exp is proportional too.<br>
+          Stat/Talent exp is gained every tick.<br>
+          Skill exp is gained upon action completion unless otherwise specified.<br>
+          Actions will target unchecked objects before known lootable objects.]]></desc>
+            <mana_cost>Mana Cost</mana_cost>
+            <exp_multiplier>Exp Multiplier</exp_multiplier>
+            <mana_used>Mana Used</mana_used>
+            <mana_used_explanation><![CDATA[
+          Shows stat gain affecting speed.<br>
+          Updates every completed action.<br>
+          Accurate at end of run.]]></mana_used_explanation>
+            <amount>Amount</amount>
+            <current_list_active>Keep current list active</current_list_active>
+            <repeat_last_action>Repeat last action on list</repeat_last_action>
+            <add_action_top>Add action to top of list</add_action_top>
+            <save_loadout>Save List</save_loadout>
+            <load_loadout>Load Selected List</load_loadout>
+            <clear_list>Clear List</clear_list>
+            <higher_done_percent_benefic>You can find more stuff with higher %.</higher_done_percent_benefic>
+            <progress_label>Progress</progress_label>
+            <total_found>Total Found</total_found>
+            <total_checked>Total Checked</total_checked>
+            <icons>
+                <circle>Cap to current max</circle>
+                <plus>Add one loop</plus>
+                <minus>Subtract one loop</minus>
+                <arrows_h>Split action</arrows_h>
+                <sort_up>Move action up</sort_up>
+                <sort_down>Move action down</sort_down>
+                <circles>Enable/disable action</circles>
+                <times>Remove action</times>
+            </icons>
+            <list_explanation><![CDATA[
+      Drag and drop the actions to re-arrange them.<br>
+      The next list becomes the current list every restart.<br>
+      One second = 50 mana.<br>
+      Minimum 1 tick per action.<br>
+      Restarts automatically upon no actions left.]]></list_explanation>
+        </tooltip>
+        <current_action>
+            <mana_original>Mana Original:</mana_original>
+            <mana_used>Mana Used:</mana_used>
+            <mana_remaining>Mana Remaining:</mana_remaining>
+            <gold_remaining>Gold Remaining:</gold_remaining>
+            <time_spent>Time Spent:</time_spent>
+            <failed_attempts>Failed Attempts:</failed_attempts>
+            <error>Error:</error>
+        </current_action>
+        <!--town 1-->
+        <wander>
+            <label>Wander</label>
+            <label_done>Explored</label_done>
+            <tooltip>Explore the town, look for hidden areas and treasures.</tooltip>
+            <story_1><![CDATA[<b>20% Explored:</b>⮀ You know the general layout of the small village now, you don't get lost walking from one side to another!]]></story_1>
+            <story_2><![CDATA[<b>40% Explored:</b>⮀ You're starting to really know your way around, you can almost figure your way around without following a set path!]]></story_2>
+            <story_3><![CDATA[<b>60% Explored:</b>⮀ You've tread all the main roads and you avail yourself to the unkempt side paths and well worn paths. If you let yourself into some houses, well, no one needs to know, do they?]]></story_3>
+            <story_4><![CDATA[<b>80% Explored:</b>⮀ You've decided to explore the houses now that you've trod every single feasible path in this small village. Man, the stuff people keep around.]]></story_4>
+            <story_5><![CDATA[<b>100% Explored:</b>⮀ You've been everywhere, there is absolutely nowhere in this town you haven't been. You've been in every cellar, under every bed, and in every closet. You've pried all the floorboards, and just in general, been into everything. Except the houses with locks, those dastardly locks.]]></story_5>
+        </wander>
+        <smash_pots>
+            <label>Smash Pots</label>
+            <label_done>Pots Smashed</label_done>
+            <info_text1>Pots with mana left</info_text1>
+            <info_text2>Pots with mana total</info_text2>
+            <info_text3>Pots to check for mana</info_text3>
+            <tooltip><![CDATA[
+            They're just sitting there, unbroken, full of potential.<br>Pots with mana in them have 
+        ]]></tooltip>
+            <tooltip2><![CDATA[
+            mana.<br>Every 10 pots have mana.
+        ]]></tooltip2>
+            <story_1><![CDATA[<b>50 Pots with mana:</b>⮀ You've smashed every single pot in this village, and have figured out all the pots that contain any trace of mana. Having to break them all physically was time consuming, and your skills at absorbing the mana weren't the best. There must be more efficient ways of doing it.]]></story_1>
+        </smash_pots>
+        <pick_locks>
+            <label>Pick Locks</label>
+            <label_done>Locks Picked</label_done>
+            <info_text1>Houses with valuables left</info_text1>
+            <info_text2>Houses with valuables total</info_text2>
+            <info_text3>Houses to check for valuables</info_text3>
+            <tooltip><![CDATA[
+            Don't worry; they won't remember.<br>Houses with valuables in them have 
+        ]]></tooltip>
+            <tooltip2><![CDATA[
+            gold.<br>Every 10 houses have gold.<br>Unlocked at 20% Explored.
+        ]]></tooltip2>
+            <story_1><![CDATA[<b>House checked:</b>⮀ You manage to pick a lock that was in disrepair and opened the door, only to walk into the home's inhabitant. Good thing the loop ended not soon after. You're gonna have to figure out which houses are worth hitting. Some money wouldn't go astray.]]></story_1>
+            <story_2><![CDATA[<b>50 Houses known:</b>⮀ You really should look at hitting those locked houses around, who knows what goodies you'll manage to scrounge up.]]></story_2>
+            <story_3><![CDATA[<b>10 Houses with loot:</b>⮀ You've figured out which houses are uninhabited and have enough gold for it to be worth your time. As they say, time is mana!]]></story_3>
+        </pick_locks>
+        <buy_glasses>
+            <label>Buy Glasses</label>
+            <tooltip><![CDATA[
+            That's not fair. There was time now. There was all the time I needed.<br>Now you have to get new glasses again for 10 gold!<br>Causes Wander to be 4x as effective for the rest of the loop.<br>Affects any action with the glasses icon<br>Can only have 1 Buy Glasses action.<br>Unlocked at 20% explored.
+        ]]></tooltip>
+            <story_1><![CDATA[<b>Glasses bought:</b>⮀ The world snaps into sharp focus as you put them on and you gawk a little as details that had slipped your eyes previously stood out in sharp contrast. You're a little gobsmacked at how much of a difference they make.]]></story_1>
+        </buy_glasses>
+        <buy_mana>
+            <label>Buy Mana</label>
+            <tooltip><![CDATA[
+            1 gold = 50 mana. Buys all the mana you can.<br>Unlocked at 20% Explored.
+        ]]></tooltip>
+            <!--TODO: give this action story-->
+        </buy_mana>
+        <meet_people>
+            <label>Meet People</label>
+            <label_done>People Met</label_done>
+            <tooltip><![CDATA[
+            They won't let you get away with a simple chat.<br>Unlocked at 22% Explored.
+        ]]></tooltip>
+            <story_1><![CDATA[<b>1% People Met:</b>⮀ You stand there, a little stumped at the situation you’ve gotten yourself into, when a young lass asks you about your day so far.]]></story_1>
+            <story_2><![CDATA[<b>20% People Met:</b>⮀ The people here are generally nice enough, if a bit brusque at times. Some people have small tasks that they're happy to pay for.]]></story_2>
+            <story_3><![CDATA[<b>40% People Met:</b>⮀ There are a surprising amount of people in the village. You didn’t catch that when you were looking around.]]></story_3>
+            <story_4><![CDATA[<b>60% People Met:</b>⮀ It almost seems that most people have something they want done, the real problem is figuring out whats worth your time.]]></story_4>
+            <story_5><![CDATA[<b>80% People Met:</b>⮀ Having met such a large portion of the people in this village, you almost feel guilty about stealing from them. Almost.]]></story_5>
+            <story_6><![CDATA[<b>100% People Met:</b>⮀ You've spoken to everyone. Every child, adult, teen, animal and plant in this village. Everyone, and everything.]]></story_6>
+        </meet_people>
+        <train_strength>
+            <label>Train Strength</label>
+            <tooltip><![CDATA[
+            Build up those muscles. Again.<br>Has 4x exp/talent gain, and can only be done <div id='trainingLimitStr'></div> times per reset.<br>Unlocked at 5% People Met.
+        ]]></tooltip>
+            <story_1><![CDATA[<b>Strength trained:</b>⮀ You lift the oak barrel filled with water, holding it while you squat again and again. The barrel rests upon your back as you do push up after push up. It's a trusty companion in your quest to regain your muscle.]]></story_1>
+            <story_2><![CDATA[<b>100 Strength talent:</b>⮀ Your body adapts faster and faster to the strains you put upon it. You know exactly how far to push it and can tell almost instinctively when to stop.]]></story_2>
+            <story_3><![CDATA[<b>1,000 Strength talent:</b>⮀ Your body seems to build itself up faster and faster each time you break it down. You can practically feel your mana purr in satisfaction as it rebuilds your body to be stronger and stronger.]]></story_3>
+        </train_strength>
+        <short_quest>
+            <label>Short Quest</label>
+            <label_done>Short Quests Accomplished</label_done>
+            <info_text1>Quests with loot left</info_text1>
+            <info_text2>Quests with loot total</info_text2>
+            <info_text3>Quests to finish</info_text3>
+            <tooltip><![CDATA[
+            Be a hero! ...If the reward is good and it doesn't take too long.<br>Short Quests with loot give 
+        ]]></tooltip>
+            <tooltip2><![CDATA[
+            gold as a reward.<br>Every 5 Short Quests have loot.<br>Unlocked at 5% People Met.
+        ]]></tooltip2>
+            <story_1><![CDATA[<b>Short Quest finished:</b>⮀ You help an elderly woman get her cat down from atop her house, she rewards you handsomely for your efforts.]]></story_1>
+            <story_2><![CDATA[<b>20 Short Quests with loot in a loop:</b>⮀ You’ve helped everyone who’s been willing to take you on, and the gold from your work jingles beautifully in your pockets. The satisfaction of a job well done fills you with pride.]]></story_2>
+        </short_quest>
+        <investigate>
+            <label>Investigate</label>
+            <label_done>Investigated</label_done>
+            <tooltip><![CDATA[
+            You've been hearing some rumors...<br>Unlocked at 25% People Met.
+        ]]></tooltip>
+            <story_1><![CDATA[<b>20% Investigated:</b>⮀ You catch some snippets of truly interesting gossip. Apparently a Mage and Warrior duo had stopped in and were sticking around for a little while.]]></story_1>
+            <story_2><![CDATA[<b>40% Investigated:</b>⮀ People are really helpful when you help them, you're almost starting to get a reputation as a busybody around here, but it's offset in that you actually do help people.]]></story_2>
+            <story_3><![CDATA[<b>60% Investigated:</b>⮀ People are generally more willing to open up if you seem like you know things, and you do know things, as you've been around here awhile now.]]></story_3>
+            <story_4><![CDATA[<b>80% Investigated:</b>⮀ The villagers are all to happy to share some stories with you at this point, it doesn't hurt that you know a little about most people now and are more than willing to strike up a conversation.]]></story_4>
+            <story_5><![CDATA[<b>100% Investigated:</b>⮀ You've done it, spoken to everyone in this village. Spent a loop or more on each of them, actually. You know what needs to be done, and at this point you can just go straight there. You can also engineer a situation in which the more stubborn ones will offer you a quest.]]></story_5>
+        </investigate>
+        <long_quest>
+            <label>Long Quest</label>
+            <label_done>Long Quests Accomplished</label_done>
+            <info_text1>Quests with loot left</info_text1>
+            <info_text2>Quests with loot total</info_text2>
+            <info_text3>Quests to finish</info_text3>
+            <tooltip><![CDATA[
+            Be a more impressive hero! ...As long as someone is watching.<br>Long Quests with loot give 
+        ]]></tooltip>
+            <tooltip2><![CDATA[
+            gold and 1 reputation as a reward.<br>Every 5 Long Quests have loot.<br>Unlocked at 10% Investigated.
+        ]]></tooltip2>
+            <story_1><![CDATA[<b>Long Quest finished:</b>⮀ You cleared out a cellar of rats; there were at least sixty of the blighters. You were rewarded handsomely, and you got a small reputation boost to boot.]]></story_1>
+            <story_2><![CDATA[<b>10 Long Quests with loot in a loop:</b>⮀ You’ve cleared out cellars, helped build a house, collected flowers for dyes, worked in the bakery, taken out trash, and helped a seamstress finish a gift for her husband. Your reputation is spreading as the helpful courier. Everyone is at the very least willing to listen to you.]]></story_2>
+        </long_quest>
+        <throw_party>
+            <label>Throw Party</label>
+            <tooltip><![CDATA[
+            Take a break and socialize.<br>Gives people met progress equivalent to 16 Meet People actions.<br>Costs 2 reputation.<br>Unlocked at 30% Investigated.
+        ]]></tooltip>
+            <story_1><![CDATA[<b>Party thrown:</b>⮀ You announce that its your birthday and you want to throw a party. You commandeer the village square and the people necessary to make it happen. You don't have the gold but people aren't quite able to say no. You promise you'll pay it off with the money from this current job.]]></story_1>
+        </throw_party>
+        <warrior_lessons>
+            <label>Warrior Lessons</label>
+            <tooltip><![CDATA[
+            Learning to fight is probably important; you have a long journey ahead of you.<br>Requires a reputation of 2 or above.<br>Unlocked at 20% Investigated.
+        ]]></tooltip>
+            <story_1><![CDATA[<b>1 Combat:</b>⮀ You manage to track down the warrior that was staying in town, and are greeted by a small woman holding a sword almost as tall as her. She introduces herself as "Iron" and smiles politely, doesn't stop her from thoroughly trouncing you.]]></story_1>
+            <story_2><![CDATA[<b>100 Combat:</b>⮀ You manage to give Iron a run for her money, but she still manages to eek out a victory, she's noticeably worn out afterwards.]]></story_2>
+            <story_3><![CDATA[<b>200 Combat:</b>⮀ You push Iron to the brink of defeat and then she starts fighting dirty.]]></story_3>
+            <story_4><![CDATA[<b>250 Combat:</b>⮀ You manage to finally defeat Iron, all your experience fighting her finally pays off. You feel really proud of yourself, right up until she smacks your head with her sword and demands a rematch.]]></story_4>
+        </warrior_lessons>
+        <mage_lessons>
+            <label>Mage Lessons</label>
+            <tooltip><![CDATA[
+            The mystic got you into this mess, maybe it can help you get out of it.<br>Requires a reputation of 2 or above.<br>Unlocked at 20% Investigated.
+        ]]></tooltip>
+            <story_1><![CDATA[<b>1 Magic:</b>⮀ You approach a burly man dressed in flowing robes, and ask if he would be willing to teach you some magic. The man agrees to teach you some basic cantrips if you help him out with menial tasks. He introduces himself as Warrick.]]></story_1>
+            <story_2><![CDATA[<b>100 Magic:</b>⮀ Warrick compliments you on your ability to wield mana, and is happy to share some more dangerous cantrips with your promise to not use it for ill. He refuses to teach you about alchemy.]]></story_2>
+            <story_3><![CDATA[<b>200 Magic:</b>⮀ Warrick is suspicious about your proficiency with mana for someone he's just run into in the wild, but is still more than willing to humor you. If he throws appraising glances at you every now and then, you pay them no mind.]]></story_3>
+            <story_4><![CDATA[<b>250 Magic:</b>⮀ You and Warrick duel, your lessons from that point on are finding an out of the way location and duking it out with magic. Warrick seems appreciative about the exertion.]]></story_4>
+            <story_5><![CDATA[<b>10 Alchemy:</b>⮀ You offer to help him with his alchemy work and he immdiately seems to develop a soft spot for you, talking about herbs and their effects when combined with eachother and how they build together to create mystical potions. The man's passionate, that's for sure.]]></story_5>
+            <story_6><![CDATA[<b>50 Alchemy:</b>⮀ You offer Warrick some alchemy techniques that he's never heard of in exchange for some more magic techniques and lessons. He agrees readily.]]></story_6>
+            <story_7><![CDATA[<b>100 Alchemy:</b>⮀ You offer to teach Warrick about alchemy if he teaches you about the branches of magic you have little grounding in. The man himself is a genius and has much to teach. He gives it his all, tempted by the secrets of Alchemy.]]></story_7>
+        </mage_lessons>
+        <heal_the_sick>
+            <label>Heal The Sick</label>
+            <label_done>Healed</label_done>
+            <label_part>Patient</label_part>
+            <tooltip><![CDATA[
+            You won't be able to heal them all, but they'll be thankful for doing what you can.<br>Healing is always 3 parts, each with a main stat - Diagnose (Per), Treat (Int), Inform (Cha).<br>Gives (magic skill) * (1 + main stat / 100) * sqrt(1 + times completed / 100) * (original mana cost / actual mana cost) progress points per mana.<br>Requires a reputation of 1 or above.<br>Unlocked at 12 Magic skill.<br>Gives 3 reputation upon patient completion.
+        ]]></tooltip>
+            <story_1><![CDATA[<b>Patient healed:</b>⮀ You're allowed in to see the patients and begin healing. It's excellent practice and everyone you heal, be it from broken bones to small scrapes is extraordinarily thankful for your help.]]></story_1>
+            <story_2><![CDATA[<b>10 Patients healed in a loop:</b>⮀ Your reputation is absolutely sterling, you've basically cleared out the entire healing home and the nurses and healers are more than thankful for your help.]]></story_2>
+            <story_3><![CDATA[<b>Failed Action:</b>⮀ You're turned away at the door, the small healers home stating that they can't trust you to not poison the people inside or make the situation worse.]]></story_3>
+            <segment_names>
+                <name>Diagnose</name>
+                <name>Treat</name>
+                <name>Inform</name>
+            </segment_names>
+            <!--TODO: give this action story-->
+        </heal_the_sick>
+        <fight_monsters>
+            <label>Fight Monsters</label>
+            <label_done>Killed</label_done>
+            <tooltip><![CDATA[
+            Slowly, you're figuring out their patterns.<br>Fighting rotates between 3 types of battles, each with a main stat - Quick (Spd), Defensive (Str), Aggressive (Con).<br>Gives (self combat) * (1 + main stat / 100) * sqrt(1 + times completed / 100) * (original mana cost / actual mana cost) progress points per mana.<br>Requires a reputation of 2 or above.<br>Unlocked at 10 Combat skill.<br>Gives 20 gold per fight segment completion.
+        ]]></tooltip>
+            <segment_names>
+                <name>Deer</name>
+                <name>Giant Turtles</name>
+                <name>Goblins</name>
+                <name>Demon Rabbits</name>
+                <name>Giant Honey badgers</name>
+                <name>Venomous Snakes</name>
+                <name>Angry Monkeys</name>
+                <name>Trolls</name>
+                <name>Ogres</name>
+                <name>Pixies</name>
+                <name>Treants</name>
+                <name>Gelatinous Cubes</name>
+                <name>Fairies</name>
+                <name>Orcs</name>
+                <name>Beholders</name>
+                <name>Spectres</name>
+                <name>Mimics</name>
+                <name>Shambling Mounds</name>
+                <name>Corrupted Mushroomfolk</name>
+                <name>Giant Owls</name>
+                <name>Blood Trolls</name>
+                <name>Small Wyrms</name>
+                <name>Displacer Beasts</name>
+                <name>Gibbering Mouthers</name>
+                <name>Mind Flayers</name>
+                <name>Aboleths</name>
+                <name>Ancient Dragons</name>
+                <name>Liches</name>
+                <name>Tarrasques</name>
+                <name>Demiliches</name>
+                <name>Demigods</name>
+                <name>Gods</name>
+                <name>Deer but they're jerks and slightly larger than before</name>
+                <name>Giant Turtles with spherical shells</name>
+                <name>Goblins but they're late on their rent</name>
+                <name>Demon rabbits but they have massive teeth</name>
+                <name>Giant Honey badgers but they can turn invisible</name>
+                <name>Venomous Snakes that are also poisonous</name>
+                <name>Angry Monkeys with twelve arms</name>
+                <name>Trolls that aren't weak against fire</name>
+                <name>Ogres but they're smarter</name>
+                <name>Pixies with sand instead of pixie dust</name>
+                <name>Treants but they're on fire</name>
+                <name>Gelatinous Cubes that are constantly growing in size</name>
+                <name>Fairies with blindingly bright dresses</name>
+                <name>Orcs with multiple weapons</name>
+                <name>Beholders with mouthes on every eye</name>
+                <name>Spectres that are actually scary</name>
+                <name>Mimics without an obvious tell</name>
+                <name>Shambling Mounds that can locomote quickly</name>
+                <name>Corrupted Mushroomfolk that taste bad</name>
+                <name>Giant Owls that can swim</name>
+                <name>Blood Trolls that don't like your hairstyle</name>
+                <name>Small Wyrms that aren't grounded</name>
+                <name>Displacer Beasts that can properly place themselves</name>
+                <name>Gibbering Mouthers with eyes on every mouth</name>
+                <name>Mind Flayers with pitchforks</name>
+                <name>Aboleths but harder, better, faster, and stronger</name>
+                <name>Ancient Dragons who've graduated from college</name>
+                <name>Liches with strong political opinions</name>
+                <name>Tarrasques that actually notice you</name>
+                <name>Demiliches happy about their condition</name>
+                <name>Demigods that are even more elitist than before</name>
+                <name>Gods but they had to come in on saturday</name>
+            </segment_names>
+            <segment_alt_names>
+                <name>Speedy Monsters</name>
+                <name>Tough Monsters</name>
+                <name>Scary Monsters</name>
+            </segment_alt_names>
+            <segment_modifiers>
+                <segment_modifier>A couple</segment_modifier>
+                <segment_modifier>A few</segment_modifier>
+                <segment_modifier>A bunch of</segment_modifier>
+            </segment_modifiers>
+            <story_1><![CDATA[<b>Monster killed:</b>⮀ It's all so new, the way they respond and attack, you're not ashamed to admit that you almost got brained by a deer. Either way, their hides and rendered components will sell well.]]></story_1>
+            <story_2><![CDATA[<b>100 Monsters killed:</b>⮀ You've fought enough that you're really starting to figure out how they'll respond to most things.]]></story_2>
+            <story_3><![CDATA[<b>500 Monsters killed:</b>⮀ You've pretty much figured out their patterns now, how they respond to what you do.]]></story_3>
+            <story_4><![CDATA[<b>1,000 Monsters killed:</b>⮀ You know exactly what they're going to do, pretty much nothing surprises you anymore.]]></story_4>
+            <story_5><![CDATA[<b>5,000 Monsters killed:</b>⮀ You're able to effectively plan ambushes and set traps to kill them without even being there anymore.]]></story_5>
+            <story_6><![CDATA[<b>10,000 Monsters killed:</b>⮀ You don't struggle or need to worry about anything they throw at you anymore, you know everything.]]></story_6>
+            <story_7><![CDATA[<b>20,000 Monsters killed:</b>⮀ This is a joke, the only reason you're still doing this is the gold it rakes in. You need it.]]></story_7>
+        </fight_monsters>
+        <small_dungeon>
+            <label>Small Dungeon</label>
+            <label_done>Looted</label_done>
+            <label_complete>Completed</label_complete>
+            <label_part>Small Dungeon</label_part>
+            <tooltip><![CDATA[
+            There are small changes each time; it's harder to get used to. The soulstones at the end last through loops, but they're not always in the dungeon... Strange.<br>The dungeon requires different skills at different points.<br>One action can clear multiple floors if your stats are high enough.<br>Gives (magic + self combat) * (1 + main stat / 100) * sqrt(1 + times floor completed / 200) * (original mana cost / actual mana cost) progress points per mana.<br>Unlocked at a combined Combat and Magic skill of 35.<br>Requires a reputation of 2 or above.<br>Gives 1 soulstone per completion - hover over Looted for info.
+        ]]></tooltip>
+            <completed_tooltip><![CDATA[
+            Each soulstone improves a random stat's exp gain by (1+(soulstones)^.8/30).<br>Each floor has a soulstone that, when received, reduces the chance you'll get the next one by 2%.<br>Chance to receive a soulstone recovers per floor at 0.00001% per mana.<br>
+        ]]></completed_tooltip>
+            <chance_label>Chance</chance_label>
+            <last_stat_label>Last Stat</last_stat_label>
+            <segment_names>
+                <name>Spike Traps</name>
+                <name>Long Hallways</name>
+                <name>Arrow Traps</name>
+                <name>Riddle Guardian</name>
+                <name>Swinging Axes</name>
+                <name>Boss</name>
+                <name>Loot</name>
+            </segment_names>
+            <story_1><![CDATA[<b>Small dungeon attempted:</b>⮀ The cavernous entrance to the villages dungeon greets you. It's dark and looming, with rocks forming jagged fangs. It's the most imposing thing you've found in this town so far.]]></story_1>
+            <story_2><![CDATA[<b>1,000 Dungeon floors looted:</b>⮀ You know your way around the dungeon like no one else, almost as if you've explored every nook and cranny. You have.]]></story_2>
+            <story_3><![CDATA[<b>5,000 Dungeon floors looted:</b>⮀ The dungeon poses less and less of a threat to you each time you conquer it, the soulstones growing your power by small amounts now that you've accumulated so many of them.]]></story_3>
+            <story_4><![CDATA[<b>10,000 Dungeon floors looted:</b>⮀ The dungeon is a joke to you, if you could teleport you'd simply jump straight to them, the dungeon in your mind has been reduced to how short it is to get from one soulstone to the next. If you have to destroy a couple walls, so be it.]]></story_4>
+            <story_5><![CDATA[<b>6 Floors cleared in a loop:</b>⮀ You reach the actual end of the dungeon, the dungeon core glows an angry red as if irritated that you're at this floor at all. Regardless, you take your soulstone and leave, the dungeon core's red glow following you the whole time.]]></story_5>
+        </small_dungeon>
+        <buy_supplies>
+            <label>Buy Supplies</label>
+            <tooltip><![CDATA[
+            Prepare to move on.<br>Costs <div id='suppliesCost'></div> gold.<br>You only need one set of supplies.<br>Unlocked at a combined Combat and Magic skill of 35.
+        ]]></tooltip>
+            <story_1><![CDATA[<b>Supplies bought:</b>⮀ A tent, enough rations to last for a month, portable cooking equipment and other assorted paraphernalia for your trip. The tent is durable and the rations don't taste bland and lifeless. It was probably worth the 300 gold asking price. Good thing you knew how to haggle.]]></story_1>
+            <story_2><![CDATA[<b>Supplies bought without haggling:</b>⮀ How luxurious! You had the gold to just throw it away now, even though the mana would've been more beneficial in the long run, not having to haggle once in awhile was surprisingly nice. Truly, you have grown luxuriant.]]></story_2>
+        </buy_supplies>
+        <haggle>
+            <label>Haggle</label>
+            <tooltip><![CDATA[
+            They won't like you as much, but hey - you're leaving.<br>Costs 1 reputation to reduce the price of supplies by 20. <br>Unlocked at a combined Combat and Magic skill of 35.
+        ]]></tooltip>
+            <story_1><![CDATA[<b>Haggle:</b>⮀ The shopkeep has some of the supplies you need, but they are of inferior quality and you're not paying his asking price for them, at least that's what you tell him. You argue, grumble, make sharp comments and are just in general unpleasant to one another.]]></story_1>
+            <story_2><![CDATA[<b>15 Haggles in a loop:</b>⮀ The shopkeep basically throws you out the store shouting and cursing vociferously at you. You ears ring slightly at the barrage.]]></story_2>
+            <story_3><![CDATA[<b>16 Haggles in a loop:</b>⮀ At this point, it served no purpose, you were doing this solely for the fun of it. No matter how much you haggled, the merchant wasn't going to pay you to take the supplies. That was just wishful thinking. Although, losing the reputation you had accrued could be useful in the long run...]]></story_3>
+        </haggle>
+        <start_journey>
+            <label>Start Journey</label>
+            <tooltip><![CDATA[
+            Follow the trail to end up at the next town. You need to keep moving until you can learn how to shut these loops off.<br>Costs 1 supplies. Finish once to unlock Forest Path's actions, then finish this in order to use Forest Path's actions.<br>Unlocked at a combined Combat and Magic skill of 35.
+        ]]></tooltip>
+            <story_1><![CDATA[<b>Traveled to the second zone:</b>⮀ You leave town, heading towards the forest that stood between the village and Merchanton. You had exhausted every option in Beginnersville and there was nothing here that would stop the loops, it was time to look for other areas and solutions.]]></story_1>
+        </start_journey>
+        <open_rift>
+            <label>Open Rift</label>
+            <tooltip><![CDATA[
+            Using your vast knowledge of the dark arts, you can open a rift into the shadow realm to send you straight to Adeptsville.<br>Unlocked at 500 Dark Magic.
+        ]]></tooltip>
+            <!--TODO: give this action story-->
+        </open_rift>
+        <!--town 2-->
+        <explore_forest>
+            <label>Explore Forest</label>
+            <label_done>Forest Explored</label_done>
+            <tooltip><![CDATA[
+            What a pleasant area.<br>2x progress with glasses.
+        ]]></tooltip>
+            <story_1><![CDATA[<b>1% Forest explored:</b>⮀ You look at the side of the path from your little campsite, and are struck with a sense of wanderlust. You leave your camp to explore. Not too far from your campsite you find a tiny glade practically overflowing with mana.]]></story_1>
+            <story_2><![CDATA[<b>10% Forest explored:</b>⮀ The sense of wanderlust hasn't faded but you've definitely discovered the darker side of this forest. You continue to find tiny glades filled with mana throughout the forest.]]></story_2>
+            <story_3><![CDATA[<b>20% Forest explored:</b>⮀ You were exploring the forest when you found what looked like game trails but was actually a footpath worn into the ground, you decided to follow it.]]></story_3>
+            <story_4><![CDATA[<b>40% Forest explored:</b>⮀ You continue exploring the forest, and you've discovered something odd about it. One side of the main path is... calm you suppose, peaceful even. Welcoming. The other makes you feel ill at ease, as if there are unseen eyes constantly on you. One side is light and airy, the other dark and gloomy.]]></story_4>
+            <story_5><![CDATA[<b>50% Forest explored:</b>⮀ You found flowers in the forest, growing in the almost pitch black beneath the thick canopy on the gloomy side of the forest. Yet the flowers grow. There's a desire to follow them, almost as if they're saying, "Follow Me!"]]></story_5>
+            <story_6><![CDATA[<b>60% Forest explored:</b>⮀ You continue searching around the forest, finding tracks and trails, boltholes and hollowed out tree trunks. Life is abundant in this forest, and you're seeing that. On both sides.]]></story_6>
+            <story_7><![CDATA[<b>80% Forest explored:</b>⮀ You've managed to figure out where most of the herds in this forest are during your trip through, you've also stumbled across a fair amount of plants that produce mana, you wonder if they have a use.]]></story_7>
+            <story_8><![CDATA[<b>100% Forest explored:</b>⮀ You've done it, you find it impossible to get lost in the forest now, and your sense of wanderlust has faded. You've seen practically all you can in this forest. There were areas barred to you, and you found no way to enter them with a cursory examination.]]></story_8>
+        </explore_forest>
+        <wild_mana>
+            <label>Wild Mana</label>
+            <label_done>Mana Sources Tapped</label_done>
+            <info_text1>Sources with mana left</info_text1>
+            <info_text2>Sources with mana total</info_text2>
+            <info_text3>Sources to check for mana</info_text3>
+            <tooltip><![CDATA[
+            They're out of sight of most travellers, but you have time to find and harvest them.<br>Every good mana spot has 
+        ]]></tooltip>
+            <tooltip2><![CDATA[
+            mana.<br>Every 10 mana spots have good mana.
+        ]]></tooltip2>
+            <story_1><![CDATA[<b>Source checked for mana:</b>⮀ It's just sitting there, stray slightly from the beaten path and you find an abundance of mana just waiting for someone to take it, the only catch being you need to extract it from the plants surrounding it and they've proven slightly unwilling to part with it.]]></story_1>
+        </wild_mana>
+        <gather_herbs>
+            <label>Gather Herbs</label>
+            <label_done>Funny Plants Uprooted</label_done>
+            <info_text1>Plants with use left</info_text1>
+            <info_text2>Plants with use total</info_text2>
+            <info_text3>Plants to check for use</info_text3>
+            <tooltip><![CDATA[
+            Might as well dig up anything useful you find.<br>Every 10 funny plants are herbs.<br>Unlocked at 10% Forest Explored.
+        ]]></tooltip>
+            <story_1><![CDATA[<b>Plant checked for use:</b>⮀ You pull up random plants across the forest that emanate mana only to find that in most cases, they're simply plants that have started gathering mana, but in some cases they're actually magical plants. Small distinction, but a significant one.]]></story_1>
+        </gather_herbs>
+        <hunt>
+            <label>Hunt</label>
+            <label_done>Animals Skinned</label_done>
+            <info_text1>Animals with hides left</info_text1>
+            <info_text2>Animals with hides total</info_text2>
+            <info_text3>Animals to check for hides</info_text3>
+            <tooltip><![CDATA[
+            The forest provides.<br>Every 10 animals have good hides.<br>Unlocked at 40% Forest Explored.
+        ]]></tooltip>
+            <story_1><![CDATA[<b>Animal checked for hide:</b>⮀ You manage to track down a relatively harmless animal, but in the time it took you to bring the critter down you had ruined its pelt beyond all use. You needed practice.]]></story_1>
+            <story_2><![CDATA[<b>10 Animals with hide:</b>⮀ You ghost through the forest, targeting packs that you know graze or are moving through locations easily reached and ambushed. You're starting to get good at this tracking thing, but you suppose you only really have to do it once.]]></story_2>
+            <story_3><![CDATA[<b>20 Animals with hide:</b>⮀ A deer languishes by the water, lapping gently at the water seemingly unaware of your presence. It remains unaware of your presence as you slowly edge closer, the deer remains unaware of your presence until it is unaware of everything forevermore. You ghost through the forest on silent feet, swift as the wind and as deadly as a viper, your body swaying as you slip between blind spots and perception to reach your targets. The animals feel nothing as they die, you've had much practice. You offer a silent thanks as their pelts will be of value to you.]]></story_3>
+        </hunt>
+        <sit_by_waterfall>
+            <label>Sit By Waterfall</label>
+            <tooltip><![CDATA[
+            It's peaceful here. Loud, but peaceful.<br>Has 4x exp/talent gain, and can only be done <div id='trainingLimitSoul'></div> times per reset.<br>Unlocked at 70% Forest Explored.
+        ]]></tooltip>
+            <story_1><![CDATA[<b>Sat by waterfall:</b>⮀ You find a waterfall flowing from a higher point in a mountain down the side oddly scenic and decide stop to stare for awhile, simply to observe the natural beauty of the sight. As you watched, the force of the water managed to dislodge a small pebble from the top of the waterfall and send it careening down. You watch oddly mesmerized at it bounces along the path, constantly being immersed and spat out by the water. You don't know when you sat down and began meditating, only that you woke from your deep realization hours later.]]></story_1>
+        </sit_by_waterfall>
+        <old_shortcut>
+            <label>Old Shortcut</label>
+            <label_done>Shortcut Explored</label_done>
+            <tooltip><![CDATA[
+            No one has come down this way in quite some time.<br>Gives some additional herbs.<br>Old men are a pain unless you know something they care about. Talk to Hermit gives 1% more Hermit Knowledge Learned per 1% Shortcut Explored.<br>Unlocked at 20% Forest Explored.
+        ]]></tooltip>
+            <story_1><![CDATA[<b>1% Shortcut explored:</b>⮀ You continued on with your trip and discovered a small and worn path leading off the main thoroughfare. You wondered what it was and decided to explore.]]></story_1>
+            <story_2><![CDATA[<b>10% Shortcut explored:</b>⮀ You're mildly surprised to discover a seemingly sprawling network of interconnected paths that seem to get almost everywhere within the forest.]]></story_2>
+            <story_3><![CDATA[<b>20% Shortcut explored:</b>⮀ You stumble across a small clearing in the forest, racks of drying herbs and bubbling cauldrons litter the clearing. As soon as you step in, a hermit leaps from his hut yelling at you.]]></story_3>
+            <story_4><![CDATA[<b>40% Shortcut explored:</b>⮀ You continue to explore the shortcuts, you're able to recognize where you are in the sprawling network with a glance. You're able to move freely around the forest.]]></story_4>
+            <story_5><![CDATA[<b>60% Shortcut explored:</b>⮀ You've discovered another set of hidden shortcuts on the gloomy side of the forest, and set about exploring them, they seem less looked after than those on the other side, but are still serviceable.]]></story_5>
+            <story_6><![CDATA[<b>80% Shortcut explored:</b>⮀ These old shortcuts are incredible, they almost seem to tell a story of when this forest was more habitable. You wonder why they were forgotten.]]></story_6>
+            <story_7><![CDATA[<b>100% Shortcut explored:</b>⮀ You dust your hands and smile contently, you've done it. You've traveled every single path to completion. You could start at a completely random point and find your way out. That old hermit seems to like these paths.]]></story_7>
+        </old_shortcut>
+        <talk_to_hermit>
+            <label>Talk To Hermit</label>
+            <label_done>Hermit Knowledge Learned</label_done>
+            <tooltip><![CDATA[
+            This old man is happy to have a listening ear, surely he has some useful knowledge. You hope. He's initially confrontational, but opens up once you start talking about the road.<br>Reduces mana cost of Gather Herbs, Practical Magic, and Learn Alchemy by 0.5% per 1% of Hermit Knowledge.<br>Unlocked with both 20% Shortcut Explored and 40 Magic.
+        ]]></tooltip>
+            <story_1><![CDATA[<b>1% Hermit knowledge learned:</b>⮀ The Hermit is old, scraggly and surprisingly, not bald. Looks old as dirt. He doesn't know the name of the surrounding provinces, but knows the names of the provinces before the current ones.]]></story_1>
+            <story_2><![CDATA[<b>10% Hermit knowledge learned:</b>⮀ The old hermit is an absolute genius at using magic to speed things up and just in general make things quicker and easier. You have much information to wring from him. He doesn't tell you his name and insists you call him 'Old man', or 'Hermit'.]]></story_2>
+            <story_3><![CDATA[<b>20% Hermit knowledge learned:</b>⮀ He still hasn't told you his name and you've tried to worm it out of him over multiple loops. He just seems amused at your attempts. Either way, you're steadily wringing out more information from him.]]></story_3>
+            <story_4><![CDATA[<b>40% Hermit knowledge learned:</b>⮀ Apparently, the old man was here before this forest was a forest. He remembers the first seeds being sown. Just, what? How old would that even make him?]]></story_4>
+            <story_5><![CDATA[<b>60% Hermit knowledge learned:</b>⮀ You learn more about his tells, when to push and when not to. You've angered him and seen him joyful, made him laugh and cry. Reminisce on old memories and curse bitterly. You've almost figured him out. You still don't know his name.]]></story_5>
+            <story_6><![CDATA[<b>80% Hermit knowledge learned:</b>⮀ You've spent more time learning about this one man than you have most other things, you've come to see him almost as a familiar figure. With how much time you've spent with him, it's hard not to. You still don't know his name. One thing you do know is that he's been around a long time and has forgotten more about magic than you've learned.]]></story_6>
+            <story_7><![CDATA[<b>100% Hermit knowledge learned:</b>⮀ He finally told you his name. Gelt. He seemed almost knowing as he told you.]]></story_7>
+        </talk_to_hermit>
+        <practical_magic>
+            <label>Practical Magic</label>
+            <tooltip><![CDATA[
+            Such simple uses to help out with everyday tasks. Genius, really. It's like pulling teeth getting this knowledge from the Hermit though.<br>Unlocked with both 20% Hermit Knowledge and 50 Magic.
+        ]]></tooltip>
+            <story_1><![CDATA[<b>1 Practical magic:</b>⮀ You pester the hermit about magic and how to use it to make things easier on yourself. It's surprisingly handy to be able to move things around without havin to be there, rather than smashing pots you can instead lift them or knock them off edges. Why open a lock when you can unlock a latch with Mage Hand, why walk over to the wardrobe if you can just fling it open and ransack it? Magic, but practical. You're a little astonished that not everyone does this.]]></story_1>
+        </practical_magic>
+        <learn_alchemy>
+            <label>Learn Alchemy</label>
+            <tooltip><![CDATA[
+            You can listen to him yammer while making light healing and remedy potions.<br>You're starting to think the potion that caused you to loop time was a complex one.<br>You provide the ingredients; costs 10 herbs.<br>Gives alchemy and magic skill.<br>Unlocked with both 40% Hermit Knowledge and 60 Magic.
+        ]]></tooltip>
+            <story_1><![CDATA[<b>Alchemy learned:</b>⮀ You ask the hermit about potion's and are regaled of tales from his time as an apprentice, the mistakes he made and how one time, he managed to douse his masters beard with potion that would wildly change the color of it every minute, for a full year his master had to deal with a beard that was either glowing white like pure fallen snow or was more fit to be in the sky after rain. You take notes as the hermit speaks.]]></story_1>
+            <story_2><![CDATA[<b>25 Alchemy:</b>⮀ You sit by the fire inside the hermits clearing, fire dancing merrily away as he feeds magical herbs to the fire while throwing precise amounts into the large pot boiling above it. The stories he tells of his youth and learning alchemy under his master make you howl with laughter and provoke deep thoughtful silences.]]></story_2>
+            <story_3><![CDATA[<b>50 Alchemy:</b>⮀ As you learn more and more about alchemy, the potion that caused you to start looping begins to seem more and more hideously complex. Something as simple as your reputation can effect the outcome of a potion. It's more of an art than a science, or anything even easily conveyed really.]]></story_3>
+        </learn_alchemy>
+        <brew_potions>
+            <label>Brew Potions</label>
+            <tooltip><![CDATA[
+            Bubbles and Flasks. Potions and Magic.<br>Requires a reputation of 5 or above, or he won't let you near his stuff.<br>Creates a potion from 10 herbs to sell at the next town.<br>Gives alchemy and magic skill.<br>Unlocked with 10 Alchemy.
+        ]]></tooltip>
+            <story_1><![CDATA[<b>Potion brewed:</b>⮀ The old man happily lets you use his apparatus to brew your own potions after much haranguing about your technique and the fact that you're not buying ingredients off him, he leaves you to it. His workstations are old, well used and obviously well looked after. The only fault you can lay at their feet is that the measuring system used is older than dirt. Fits you suppose.]]></story_1>
+            <story_2><![CDATA[<b>Action failed with low reputation:</b>⮀ The hermit refuses to allow you near his workstations and potion brewing equipment no matter how much you ask and offer to pay. He tells you that you don't have a good enough karma for him to even be willing to risk you using his workstations and potion benches.]]></story_2>
+            <story_3><![CDATA[<b>Action failed with negative reputation:</b>⮀ The hermit shoos you away from his clearing when you even make a mention of using his potion supplies, something about not wanting you to taint his equipment with your karma.]]></story_3>
+        </brew_potions>
+        <train_dexterity>
+            <label>Train Dexterity</label>
+            <tooltip><![CDATA[
+            There's a nice array of rocks to hop between. It's a lot of fun.<br>Has 4x exp/talent gain, and can only be done <div id='trainingLimitDex'></div> times per reset.<br>Unlocked at 60% Forest Explored.
+        ]]></tooltip>
+            <story_1><![CDATA[<b>Dexterity trained:</b>⮀ You find rocks spaced intermittently in an open clearing. Your best guess is that they were set up as a training field for some mercenary group that had passed by. Either way, it's fun to bounce from one rock to another parrying invisible enemies and fighting the air.]]></story_1>
+        </train_dexterity>
+        <train_speed>
+            <label>Train Speed</label>
+            <tooltip><![CDATA[
+            A forest run is fantastic. You feel like you're learning a lot as you push your limits.<br>Has 4x exp/talent gain, and can only be done <div id='trainingLimitSpd'></div> times per reset.<br>Unlocked at 80% Forest Explored.
+        ]]></tooltip>
+            <story_1><![CDATA[<b>Speed trained:</b>⮀ Sprinting through the forest is an exhilarating experience. The vines whip past your head, the roots beneath your feet. The leaves whip past your face and the breeze blows hard enough against your ears that you hear nothing but. You feel at one with the forest as you chase a finch around, up and down and even under trees at times. Through dilapidated trunks and wooden labyrinths.]]></story_1>
+        </train_speed>
+        <follow_flowers>
+            <label>Follow Flowers</label>
+            <label_done>Flower Trail Followed</label_done>
+            <tooltip><![CDATA[
+            You've located an oddly out of place trail of flowers, why not see where it leads. You can find more herbs along the path.<br>2x progress with glasses.<br>Unlocked at 50% Forest Explored.
+        ]]></tooltip>
+            <story_1><![CDATA[<b>1% Flower trail followed:</b>⮀ You stumble across a small lane of flowers that are obviously planted by hand. You decide to follow it.]]></story_1>
+            <story_2><![CDATA[<b>10% Flower trail followed:</b>⮀ The planted flowers seem almost sprawling, threading to and fro across the forest.]]></story_2>
+            <story_3><![CDATA[<b>20% Flower trail followed:</b>⮀ The flowers led you to places in the forest that you hadn't been, you discovered a thicket that was overflowing with mana, but you would need to experiment to figure out how to draw the mana out.]]></story_3>
+            <story_4><![CDATA[<b>40% Flower trail followed:</b>⮀ The flowers continued to follow their unseen path, but you were starting to notice a pattern.]]></story_4>
+            <story_5><![CDATA[<b>60% Flower trail followed:</b>⮀ There were strange plants aplenty to be found along the flower path, and you had noticed that some had medicinal properties, you remembered from when you were young, the smell unmistakable.]]></story_5>
+            <story_6><![CDATA[<b>80% Flower trail followed:</b>⮀ The flower path was circuitous, circling around the darker side of the forest in patterns that you were starting to map out mentally.]]></story_6>
+            <story_7><![CDATA[<b>100% Flower trail followed:</b>⮀ The patterns were strangely geometric, and you had an inkling that the flower path had some sinister beginnings. Regardless, you'd explored the entire path. You were right too, it never did stray from the darker side of the forest.]]></story_7>
+        </follow_flowers>
+        <bird_watching>
+            <label>Bird Watching</label>
+            <tooltip><![CDATA[
+            Far along the flower trail, there seems to be a large variety of birds flying about. Perhaps you could take up a new hobby.<br>Requires glasses.<br>Has 4x exp/talent gain, and can only be done <div id='trainingLimitPer'></div> times per reset.<br>Unlocked at 80% Flower Trail Followed.
+        ]]></tooltip>
+            <story_1><![CDATA[<b>Birds watched:</b>⮀ You spot a colorful bird and attempt to follow it with your eyes, you fail. You try again and again until you can reliable pick out fast moving birds and animals with pinpoint precision. It's also strangely relaxing to watch birds congregate together, listening to the bird-call and watching them interact. Its fast, frenetic and savage at times, but that's nature.]]></story_1>
+        </bird_watching>
+        <clear_thicket>
+            <label>Clear Thicket</label>
+            <label_done>Thicket Explored</label_done>
+            <tooltip><![CDATA[
+            The path of flowers has lead you to a thicket, seemingly in the middle of nowhere. Perhaps it's some strange magic. You can clear out the thicket to find some more wild mana.<br>Unlocked at 20% Flower Trail Followed.
+        ]]></tooltip>
+            <story_1><![CDATA[<b>1% Thicket explored:</b>⮀ You trek to a thicket you found while following the flower path and decide to explore it. Maybe you'll find some more mana. It's not like it belongs to anyone.]]></story_1>
+            <story_2><![CDATA[<b>10% Thicket explored:</b>⮀ You've found more of these secluded thickets off the flower path than you thought you would, and you have a sense that there are many more that you haven't found yet.]]></story_2>
+            <story_3><![CDATA[<b>20% Thicket explored:</b>⮀ The mana in these thickets is rich and helpful, extending your time in the loop to let you search for more and more. The break from people is a nice break from normal too.]]></story_3>
+            <story_4><![CDATA[<b>40% Thicket explored:</b>⮀ You've thoroughly explored the darker side of the forest, and while resting close to the path that cut the forest in half, you stumbled across another thicket in the lighter side of the forest.]]></story_4>
+            <story_5><![CDATA[<b>60% Thicket explored:</b>⮀ You continued to stroll around to all the thickets you had found. They were innumerable at this point, just endless tangled tiny clearings and glades.]]></story_5>
+            <story_6><![CDATA[<b>80% Thicket explored:</b>⮀ Surely by now you're getting close to finding them all? Every time you think you're getting close you find another section of the forest that had clearings. How did you not find these earlier?]]></story_6>
+            <story_7><![CDATA[<b>100% Thicket explored:</b>⮀ You stumbled across another thicket and throw your hands up. You would question how you missed all these extra thickets but you don't really care at this point. You've gotten disturbingly good at ripping nature to pieces in search of more mana.]]></story_7>
+        </clear_thicket>
+        <talk_to_witch>
+            <label>Talk To Witch</label>
+            <label_done>Witch Knowledge Learned</label_done>
+            <tooltip><![CDATA[
+            Talk to the witch to learn her secrets of the dark arts.<br>Unlocked with both 60% Thicket Explored and 80 Magic.<br>Reduces mana cost of Dark Magic and Dark Ritual by 0.5% per 1% of Witch Knowledge.
+        ]]></tooltip>
+            <story_1><![CDATA[<b>1% Witch knowledge learned:</b>⮀ You stumble across a small crooked hut and as you approach the boundary, a small slip of a woman step outs. She's stunning and you're immediately on guard. The area pulses with a heady hum of magic that sends shivers down your spine. She introduces herself as Evis.]]></story_1>
+            <story_2><![CDATA[<b>10% Witch knowledge learned:</b>⮀ The Witch as you taken to referring to her as, seeing as she changes her name every time she introduces herself to you, is a veritable font of magical knowledge, of how to dominate the mana itself and make more from less.]]></story_2>
+            <story_3><![CDATA[<b>20% Witch knowledge learned:</b>⮀ You continue to hunt down the Witch and drag more information out of her, the magic she teaches you is cruel, callous even. The witch is surprisingly personable for what you would consider a stereotypical 'Wicked Witch'.]]></story_3>
+            <story_4><![CDATA[<b>40% Witch knowledge learned:</b>⮀ You start to learn more about the witches daily routine as you spend more and more time around her, the relationship you manage to cultivate with her at the start of each loop grows more familiar with each repetition. She seems to be slightly more interested each time you reveal your knowledge of dark magic.]]></story_4>
+            <story_5><![CDATA[<b>50% Witch knowledge learned:</b>⮀ You had apparently impressed her enough this time that she took you to a clearing she had found, and explained to you a ritual that would give you a boost, permanently through any circumstances by calling upon the dark gods. The catch she explained, with ill concealed glee, was that you would need souls to sacrifice if you wanted to do this ritual.]]></story_5>
+            <story_6><![CDATA[<b>60% Witch knowledge learned:</b>⮀ As you learn more and more about the witch and her varied names, one thing starts to become glaringly obvious. The Witch and The Hermit know one another. If her irritable grumbling about the old fool and his idiotic desires were anything to go by. You get the feeling that their relationship is complex.]]></story_6>
+            <story_7><![CDATA[<b>80% Witch knowledge learned:</b>⮀ The witch is struck with a strange sense of melancholy one loop and you have no idea why, but the witch is strangely open with information and you manage to pry out more of the relationship between her and the Hermit. They were lovers once, and to your surprise, she used to be the one whom nature adores. She shuts up quickly after letting that slip. You're all the more determined to pry it out of her though.]]></story_7>
+            <story_8><![CDATA[<b>100% Witch knowledge learned:</b>⮀ Somehow she seems to sense something about you this loop, and she tells you her name, and its the name she gives for every loop after. Trisha. You manage to pry most of her relationship with the hermit from her. They were lovers once, this you knew, but what you didn't was that she was of nobility and he a common vagabond. She fell for him and him for her, it was a love for the ages she tells you while drunk from the wine you brought along with you. He wanted to run away with her and she agreed, too love struck to question why. He was running from deals he had made and bargains he had forsaken, his glib tounge landing him in trouble of the otherworldly nature. Trisha seems frustrated with her youth's naivety as she tells you how she was made a scapegoat for his failings and forfeits in his deals and bargains. How she was essentially sold to the dark gods as his forfeit. When you ask what she did in return, all Trisha does is smile with dark satisfaction, the fire flaring briefly.]]></story_8>
+        </talk_to_witch>
+        <dark_magic>
+            <label>Dark Magic</label>
+            <tooltip><![CDATA[
+            Embrace the dark arts to more efficiently harvest mana. But at what cost?<br>Adds 1 negative reputation.<br>Requires a reputation of 0 or below.<br>Unlocked with both 20% Witch Knowledge and 100 Magic.
+        ]]></tooltip>
+            <story_1><![CDATA[<b>1 Dark magic:</b>⮀ You ask the witch for more information on dark magic and then during the conversation slowly reveal your interest in the subject and float the offer that you would be willing to trade if she would teach you the beginning steps. She smirks deviously and agrees to the deal.]]></story_1>
+            <story_2><![CDATA[<b>25 Dark magic:</b>⮀ The witch demands more and more of you and you slowly figure out ways of broaching the subject with her that doesn't startle her enough that she stops talking to you or just flat out shuts you down. The magic she begins to teach is brutal, ominous and forceful. You do not work with or help, you take and dominate.]]></story_2>
+            <story_3><![CDATA[<b>50 Dark magic:</b>⮀ The dark magic she teaches seems to veer more to the side of ritualistic sacrifice and communion with the dark gods, she tells you when you ask that its because she can't really teach you too much more unless you have a darker being backing you as her mana isn't inherent but a gift from the darker divine powers. She teaches you of a ritual that you can use to summon the dark gods and strike a bargain. She warns that you'll need souls as payment.]]></story_3>
+        </dark_magic>
+        <dark_ritual>
+            <label>Dark Ritual</label>
+            <label_done>Completed</label_done>
+            <tooltip><![CDATA[
+            Sacrifice an increasing amount of soulstones to the dark gods, granting a permanent speed 10% boost to all actions in Beginnersville.<br>Gives (dark magic skill) * (1 + witch knowledge / 100) * (1 + main stat / 100) * (original mana cost / actual mana cost) progress points per mana.<br>Requires a reputation of -5 or below.<br>Can only have 1 Dark Ritual action.<br>Unlocked with both 50% Witch Knowledge and 50 Dark Magic.<br>Sacrifices (50 * (rituals completed+1)) soulstones. Currently sacrificing 
+        ]]></tooltip>
+            <tooltip2><![CDATA[
+             soulstones.
+        ]]></tooltip2>
+            <segment_names>
+                <name>Clear the Area</name>
+                <name>Prepare the Altar</name>
+                <name>Summon the Dark Gods</name>
+            </segment_names>
+            <story_1><![CDATA[<b>3rd ritual segment reached:</b>⮀ Knowing what the ritual was and how large a space you would need, you were mildly surprised to find a clearing large enough in the forest. Well, the clearing itself wasn't really large enough on its own. It was a dense cluster of clearings that you've taken mana from that you could easily clear out to make a ritual space. Preparing the altar is surprisingly tame, all said and done. Stone and wood comprise most of the altar and the rest you brought with you when you made this plan. In the end the altar you build is only small, a communion point instead of a summoning. Holding a heart from nearby deer, you pierce it and begin to chant ritualistic words of power. The clearing grows dark and the forest quietens, nary a sound is heard apart from the drip drip drip of the blood from the pierced heart in your hand. The blood you've spilled on the altar begins to blacken and swirl without outside force and eventually forms into a small face, disgusting to look at but enough to communicate through.]]></story_1>
+            <story_2><![CDATA[<b>Ritual completed:</b>⮀ You commune with the dark gods long past the point that the blood has faded. The deal is struck thusly: time itself will move faster for you only in select areas, and you will pay a cost in souls. The dark god you commune with seems almost surprised as you immediately offer up some of the soulstones that you have.]]></story_2>
+        </dark_ritual>
+        <continue_on>
+            <label>Continue On</label>
+            <tooltip><![CDATA[
+            Keep walking to the next town, Merchanton.<br>Mana cost reduced by 60 per Old Shortcut %.
+        ]]></tooltip>
+            <story_1><![CDATA[<b>Traveled to the third zone:</b>⮀ You sigh gustily to yourself, you've done all you cared to do here and there was nothing left to do really, time to move on and out of the boonies and into civilized territory. Laws, taxes and bribes. You were almost looking forward to it, given how long you had been out in the country for at this point.]]></story_1>
+        </continue_on>
+        <!--town 3-->
+        <explore_city>
+            <label>Explore City</label>
+            <label_done>City Explored</label_done>
+            <tooltip><![CDATA[
+            Everyone is so busy, and there's so much to do.<br>2x progress with glasses.
+        ]]></tooltip>
+			<story_1><![CDATA[<b>1% City Explored:</b>⮀ This is a relatively big city, and as busy as you've ever seen. You have no idea where anything is and nobody seems inclined to spare enough time to talk to you.]]></story_1>
+			<story_2><![CDATA[<b>10% City Explored:</b>⮀ You've found a jovial man willing to chat with you on his way to the casino, where he invited you in for a game of poker. You declined, but it might be a good idea to come here on your own sometime.]]></story_2>
+			<story_3><![CDATA[<b>20% City Explored:</b>⮀ You're wandering the main streets, committing everything to memory. You find a bar or two along the way, and wonder how long it's been since you last had a good beer.]]></story_3>
+			<story_4><![CDATA[<b>40% City Explored:</b>⮀ You're getting the hang of the layout of the city now, though you've stayed away from the wealthy districts and the slums. You feel underdressed in one, and like you'd get mugged in the other.]]></story_4>
+			<story_5><![CDATA[<b>50% City Explored:</b>⮀ As you wander through a residential cluster, you spot a humble and welcoming library out of the corner of your eye. You wonder if it has your favourite book available.]]></story_5>
+			<story_6><![CDATA[<b>60% City Explored:</b>⮀ You hear of Mt. Olympus. In the slums they speak fairy tales of gods and monsters, and in the richer areas you hear of strange magics and ancient history. The mountain is far away, but you're increasingly seeing it as the obvious next destination.]]></story_6>
+			<story_7><![CDATA[<b>80% City Explored:</b>⮀ The more you venture into the slums and wealthy districts the more interesting places you find. The slums play host to businesses on the darker side of the law, while the richer areas display a parade of niche eccentric items, priceless commodities, and what you're pretty sure is a slave auction under all the frills. Maybe the slums aren't the only place you should be careful around back alleys.]]></story_7>
+			<story_8><![CDATA[<b>90% City Explored:</b>⮀ In one of the snobbiest streets of the city, you find a man selling, of all things, mining supplies. He says that he's selling the absolute pinnacle of mining-related craftsmanship, and the second you appear less than enamored he scoffs and sends you away.]]></story_8>
+			<story_9><![CDATA[<b>100% City Explored:</b>⮀ You've seen all that Merchanton has to offer, from all levels of society. The one constant is that no matter where you go, people are busy. This city is a hub for rare items and clandestine deals, and fortunes are made and lost like water to the frantic beat of the city.]]></story_9>
+        </explore_city>
+        <gamble>
+            <label>Gamble</label>
+            <label_done>Suckers Swindled</label_done>
+            <info_text1>Suckers left</info_text1>
+            <info_text2>Suckers total</info_text2>
+            <info_text3>People to check if they're suckers</info_text3>
+            <tooltip><![CDATA[
+            The cards still somehow come out different every time.<br>Has 2x exp/talent gain<br>Costs 20 gold and 1 reputation.<br>Requires a reputation above -6.<br>You win against every 10 suckers, and get 60 gold for winning.<br>Unlocked at 10% City Explored.
+        ]]></tooltip>
+			<story_1><![CDATA[<b>Sucker checked:</b>⮀ You sit down at the poker table… and promptly lose everything you bet. It seems Merchanton has a very competitive gambling culture. Still, there must be some people you can win against.]]></story_1>
+			<story_2><![CDATA[<b>Sucker swindled:</b>⮀ You've found him, barely old enough to enter and clearly struggling to remember the rules of the game. It doesn't take long before all his money belongs to you, and you make a mental note to find him next time you come here.]]></story_2>
+			<story_3><![CDATA[<b>30 Suckers swindled:</b>⮀ A fool and his money are soon parted, and you've found every fool in Merchanton. The money you conned them out of will be worth quite a lot of mana, easily worth the time you spent on it.]]></story_3>
+			<story_4><![CDATA[<b>Action failed with low reputation:</b>⮀ You're not sure if it's the conspicuous winning streak or the smell of alcohol on your breath, but it seems casino security has decided to evict you. Big, intimidating thugs practically drag you out, and by the looks on their faces they don't want to see you again anytime soon.]]></story_4>
+			<story_5><![CDATA[<b>Action failed with low money:</b>⮀ As you sit down at the table and reach into your pockets, you realize that you don't have any money left! You hastily excuse yourself and leave the casino, and try to ignore the looks of pity you're given as you go.]]></story_5>
+        </gamble>
+        <get_drunk>
+            <label>Get Drunk</label>
+            <label_done>Rumors Heard</label_done>
+            <tooltip><![CDATA[
+            Sometimes you just need a drink.<br>Requires a reputation above -4.<br>Has 3x exp/talent gain.<br>Costs 1 reputation.<br>Unlocked at 20% City Explored.
+        ]]></tooltip>
+			<story_1><![CDATA[<b>1% Rumors Heard:</b>⮀ A mug of beer and a cheerful environment, it's equal parts relaxing and enjoyable. You leave without paying, but it's okay if you're not welcome there anymore, since they won't remember next loop.]]></story_1>
+			<story_2><![CDATA[<b>10% Rumors Heard:</b>⮀ Lots of people turn into rampant gossips after a few glasses. You're learning about all sorts of interesting places, as well as far too many cases of infidelity and other personal drama for your liking.]]></story_2>
+			<story_3><![CDATA[<b>20% Rumors Heard:</b>⮀ A dangerous-looking man shows up and orders the strongest drink they have, and as he drinks he loudly boasts about his adventures in the dungeon near town. With some prodding, he gives you directions instead to the Adventurer Guild, saying without a team you shouldn't even bother trying.]]></story_3>
+			<story_4><![CDATA[<b>30% Rumors Heard:</b>⮀ Today you sit next to a woodworker from the Crafting Guild. Apparently he spends his days building fine chairs and tables but his true passion is glasswork, which he sadly has no talent for. You commiserate, and get directions to the Crafting Guild before you leave.]]></story_4>
+			<story_5><![CDATA[<b>40% Rumors Heard:</b>⮀ As you watch a loud drunken argument unfold, you see that the man next to you is looking rather glum. You buy a drink for him and he opens up, telling you that he quit his apprenticeship because he couldn't stand his boss. Another drink and he gives you the name of the master who needs a new apprentice.]]></story_5>
+			<story_6><![CDATA[<b>60% Rumors Heard:</b>⮀ An infuriated man rants about the construction work near his house. Talking to him is difficult without provoking his anger, but after a while he tells you what street it's happening on.]]></story_6>
+			<story_7><![CDATA[<b>80% Rumors Heard:</b>⮀ In a more high-class bar, you catch wind of an architectural design competition, where various architects each design the same house and the one with the best design wins the contract to build it. A polite inquiry gets you the name of the person you need to know to enter the competition.]]></story_7>
+			<story_8><![CDATA[<b>100% Rumors Heard:</b>⮀ You've been to every bar and dinner party, and heard every bit of gossip there is to hear. While you've only met a tiny fraction of Merchanton's population you've had drinks with every rung of society, and you're starting to feel like the city's running out of secrets for you to uncover.]]></story_8>
+        </get_drunk>
+        <purchase_mana>
+            <label>Purchase Mana</label>
+            <tooltip><![CDATA[
+            1 gold = 50 mana. Buys all the mana you can.
+        ]]></tooltip>
+            <!--TODO: give this action story-->
+        </purchase_mana>
+        <sell_potions>
+            <label>Sell Potions</label>
+            <tooltip><![CDATA[
+            Potions are worth 1 gold per alchemy skill, but it takes a while to find a buyer.
+        ]]></tooltip>
+			<story_1><![CDATA[<b>Potion sold:</b>⮀ You're part of the attention-grabbing vista now, trying to get people to listen to you long enough to convince them your potions are worth the money. It's surprisingly hard work, but you got a man to give you a small sum of gold for one of your potions.]]></story_1>
+			<story_2><![CDATA[<b>20 Potions sold in a loop:</b>⮀ All the good herbs of the forest, brewed into potions and sold to the people of Merchanton. It took you a while, but the weight in your coin pouch tells you it was worth the effort.]]></story_2>
+			<story_3><![CDATA[<b>Potion sold for 100 gold:</b>⮀ As you hawk your wares, you catch the eye of a passing noblewoman. She's apparently dabbled in alchemy herself, and knows a quality potion when she sees one. After a couple rounds of negotiation she buys the potion for a tidy sum, and you realize your alchemical skills have gotten good enough for you to start marketing to richer clientele.]]></story_3>
+        </sell_potions>
+        <adventure_guild>
+            <label>Adventure Guild</label>
+            <label_done>Impressed</label_done>
+            <tooltip><![CDATA[
+            The one stop shop for all your adventuring needs.<br>Take their tests and get a rank!<br>You can only join 1 guild at a time, and only try once.<br>Gives 200 mana per rank.<br>Gives ((magic skill)/2 + (self combat)) * (1 + main stat / 100) * sqrt(1 + times completed / 1000) * (original mana cost / actual mana cost) progress points per mana.<br>Unlocked at 20% Rumors Heard.
+        ]]></tooltip>
+			<story_1><![CDATA[<b>Tests taken:</b>⮀ You've gone through the standardized tests of the guild, and you're a little surprised at how low you placed. It seems that what you've considered impressive up until now is just the bare minimum around here.]]></story_1>
+			<story_2><![CDATA[<b>E Rank achieved:</b>⮀ You've clawed your way out of the ranks of the common riffraff. You still don't stand out at all, but it feels good to not be on the bottom rung anymore.]]></story_2>
+			<story_3><![CDATA[<b>D Rank achieved:</b>⮀ They say you're good for a new recruit, but it's still with a bored tone and an apathetic face. It seems even though you're getting much better scores nobody actually cares yet. Well, at least you're better off than the people stuck in F-rank.]]></story_3>
+			<story_4><![CDATA[<b>C Rank achieved:</b>⮀ People seem to actually respect you now, all of a sudden. Apparently it's pretty common for people to fail to make it higher than E or D and quit, but those who make it to C-rank are in for the long haul. You're being treated like a comrade in arms now, and it feels good.]]></story_4>
+			<story_5><![CDATA[<b>B Rank achieved:</b>⮀ Now people are starting to take note. B-rank adventurers don't come around every day, and most of them started lower and climbed their way up. That you came out of nowhere and placed B-rank on arrival is stirring up quite a few rumours.]]></story_5>
+			<story_6><![CDATA[<b>A Rank achieved:</b>⮀ There are only about a dozen A-rank adventurers in Merchanton, and your arrival astonishes them all. Rumours fly, and some are even saying that you're an A-rank previously thought dead, disguised under a new identity. All the attention makes you uncomfortable, but at this point it's hard to avoid.]]></story_6>
+			<story_7><![CDATA[<b>S Rank achieved:</b>⮀ There's only one other S-rank adventurer around, Guildmaster Rannet himself. There aren't any rumours of you being a fake identity this time, because S-rank adventurers are so rare that Rannet personally knows all of them and he's convinced he's never seen you before. Instead, people whisper about everything from the legacy of heroes to divine blood and everything in-between. At this point the only things that could explain your existence are implausible, and you can't really disagree with that assessment.]]></story_7>
+			<story_8><![CDATA[<b>U Rank achieved:</b>⮀ You stand above even Rannet now, and you're told the only person who compares is the strongest Guildmaster, Diphon "Living Earthquake" Granwell. Word spreads like wildfire and you become an instant celebrity. Everyone seems to want you to go challenge Diphon to see who's the strongest, but you know that you'd run out of mana long before you even get close to his city.]]></story_8>
+			<story_9><![CDATA[<b>Godlike rank achieved:</b>⮀ This isn't really a formal rank, as much as it reflects how you're stronger than they have means to measure, stronger than they've thought possible. They tell you you're the strongest human alive, perhaps the strongest to ever live, and while you hesitate to embrace such a status you can see that they honestly believe it.]]></story_9>
+        </adventure_guild>
+        <gather_team>
+            <label>Gather Team</label>
+            <tooltip><![CDATA[
+            You don't have to take them on by yourself.<br>Max 5 other team members.<br>Costs <div id='teamCost'></div>
+            gold, and the cost goes up by 100 gold per member.<br>Each member adds (Adventure Guild Multiplier) * (Combat Skill / 2) to your Team Combat.<br>Requires Adventure Guild.<br>Has 3x exp/talent gain.<br>Unlocked at 20% Rumors Heard.
+        ]]></tooltip>
+			<story_1><![CDATA[<b>Teammate gathered:</b>⮀ Cassandra, self-professed expert spell-slinger, makes no attempt to hide her suspicion of the newcomer who's insisting on an expedition the same day they joined the guild. Still, you're paying the asking price, so she grudgingly accepts. You can tell that she won't be a pleasant companion, though.]]></story_1>
+			<story_2><![CDATA[<b>Full party:</b>⮀ Cassandra was a solo adventurer, but you've located a full party willing to join you in the dungeon. There's Marcus the swordsman, Raven the archer, Harvey the spell-slinger, Emily the healer, and Kyla, a rare specialist in magic-augmented dagger fighting. And you, now that you've paid them handsomely to join you.]]></story_2>
+			<story_3><![CDATA[<b>Failed Action:</b>⮀ When Cassandra names her price, you mentally count the gold you have remaining and make a counteroffer. Before you can say anything else, Cassandra walks out and tells you to go home and stop wasting people's time.]]></story_3>
+        </gather_team>
+        <large_dungeon>
+            <label>Large Dungeon</label>
+            <label_done>Looted</label_done>
+            <label_complete>Completed</label_complete>
+            <label_part>Large Dungeon</label_part>
+            <tooltip><![CDATA[
+            With your party, you set out to accomplish great feats of dungeoneering that you couldn't have done while alone.<br>Gives (magic + team combat) * (1 + main stat / 100) * sqrt(1 + times floor completed / 200) * (original mana cost / actual mana cost) progress points per mana.<br>Requires at least one other party member.<br>Unlocked at 20% Rumors Heard.<br>Gives 10 soulstones per completion - hover over Looted for info.
+        ]]></tooltip>
+            <completed_tooltip><![CDATA[
+            Each soulstone improves a random stat's exp gain by (1+(soulstones)^.8/30).<br>Each floor has 10 soulstones that, when received, reduces the chance you'll get the next one by 2%.<br>Chance to receive a soulstone recovers per floor at 0.00001% per mana.<br>
+        ]]></completed_tooltip>
+            <chance_label>Chance</chance_label>
+            <last_stat_label>Last Stat</last_stat_label>
+            <segment_names>
+                <name>Rally Party</name>
+                <name>Journey to the Entrance</name>
+                <name>Fight Door Guardians</name>
+                <name>Argue over Loot</name>
+                <name>Dodge Traps</name>
+                <name>Dodge Friendly Fire</name>
+                <name>Fight Boss</name>
+            </segment_names>
+			<story_1><![CDATA[<b>Large Dungeon Attempted:</b>⮀ You quickly understand why you couldn't do this alone. The strong guardians at the entrance aside, many of the traps can only be disarmed by multiple people working together. If you tried this on your own you would've been squashed like a bug.]]></story_1>
+			<story_2><![CDATA[<b>2,000 Dungeon Floors Looted:</b>⮀ Adventuring in a party is tricky. Everyone wants the kill, everyone wants the loot, and one wrong word from anyone can spell a cascade of arguments. It's frustrating how much time you need to spend defusing tensions and keeping the party focused.]]></story_2>
+			<story_3><![CDATA[<b>10,000 Dungeon Floors Looted:</b>⮀ While the dungeon is never quite the same, you have its measure, and that lets you persuade your party to go down the right corridors and avoid traps. You can tell they're suspicious, but you shrug it off as some kind of intuition and change the topic before an argument can start.]]></story_3>
+			<story_4><![CDATA[<b>20,000 Dungeon Floors Looted:</b>⮀ They probably don't realize how much you're pulling the strings. How many arguments you've stopped before they start, or why they've never once made a wrong turn. At this point you know them better than they know themselves, and adventuring has never been so peaceful.]]></story_4>
+			<story_5><![CDATA[<b>9 Floors cleared in a loop:</b>⮀ An ornate altar in a room full of carvings holds the final soulstones of the dungeon. It emanates a deep red tinted with gray and you feel slightly unsettled, but soulstones are soulstones. You pocket them and swiftly leave.]]></story_5>
+        </large_dungeon>
+        <crafting_guild>
+            <label>Crafting Guild</label>
+            <label_done>Cried From Beauty</label_done>
+            <tooltip><![CDATA[
+            Learn to use your hands to build big structures.<br>Take their tests and get a rank!<br>You can only join 1 guild at a time, and only try once.<br>Gives 10 gold per segment completed.<br>Gives ((magic skill)/2 + (crafting skill)) * (1 + main stat / 100) * sqrt(1 + times completed / 1000) * (original mana cost / actual mana cost) progress points per mana.<br>Unlocked at 30% Rumors Heard.<br>Gives Crafting exp upon segment completion, rather than upon action completion.
+        ]]></tooltip>
+			<story_1><![CDATA[<b>Tests taken:</b>⮀ You want to make a cool suit of armor, but you don't know the first thing about metalworking so you apply as a carpenter until you know more. Your results are… unimpressive, and the clerk confides that you're likely to spend a couple years running errands before they let you actually learn anything.]]></story_1>
+			<story_2><![CDATA[<b>E Rank achieved:</b>⮀ You've proven yourself handy with wood, and they grant you a higher rank. A particularly harsh examiner says your work is shoddy and crude, but you seem to be above the errand boys now.]]></story_2>
+			<story_3><![CDATA[<b>D Rank achieved:</b>⮀ You hone your skills at all parts of a construction job, and the breadth seems to count in your favour. This is about the level, you're told, where people often settle into modestly-paying stable careers.]]></story_3>
+			<story_4><![CDATA[<b>C Rank achieved:</b>⮀ B-rank craftswoman Wilfrey says a house you built wouldn't be out of place in most parts of town. She shares with you a tip: to make it into B-rank, you have to know more than construction. If building houses is all you can do, well, a C-rank income still isn't anything to scoff at.]]></story_4>
+			<story_5><![CDATA[<b>B Rank achieved:</b>⮀ Taking Wilfrey's advice you branch out into working with cloth, glass, and metal. The new skills are finnicky and exhausting to get right, but you eventually impress the examiners enough to claim B-rank. You also take a moment to appreciate the first sword you've forged yourself. Shame it'll vanish at the end of the loop.]]></story_5>
+			<story_6><![CDATA[<b>A Rank achieved:</b>⮀ You're finally forcing the old grandmasters to take notice of you, but you're not sure that's a good thing. They seem to be invested in tearing the talented upstart down, and even though your skills impress everyone else in the guild the grandmasters only scoff and point out every flaw they find.]]></story_6>
+			<story_7><![CDATA[<b>S Rank achieved:</b>⮀ Slowly, you remove mistakes from your work and learn to find even the most subtle of defects. When you and the old grandmasters butt heads they have less to throw at you and you fire back with flaws in their own work.]]></story_7>
+			<story_8><![CDATA[<b>U Rank achieved:</b>⮀ It's official: you're unmatched here in Merchanton. Try as they might, the grandmasters can't find any mistakes in the things you make, and as you begin an exhaustive list of their own imperfections they grudgingly agree that you are superior, though you don't miss the way they talk about you behind your back.]]></story_8>
+			<story_9><![CDATA[<b>Godlike Rank achieved:</b>⮀ At last, you've finally broken their pride. You've gone beyond perfection and into the realm of revolution. Your new methods, honed by countless hours of experimentation, are so superior that even the proud old grandmasters bow their heads and humbly ask you to teach them. Victory is sweet.]]></story_9>
+        </crafting_guild>
+        <craft_armor>
+            <label>Craft Armor</label>
+            <tooltip><![CDATA[
+            Turn hide into armor through hard work.<br>Gives (20% * Crafting Guild Multiplier) to Self Combat per armor.<br>Costs 2 hides.<br>Unlocked at 30% Rumors Heard.
+        ]]></tooltip>
+			<story_1><![CDATA[<b>Armor crafted:</b>⮀ It only covers your torso from the front, but it fits well and can take a blow. Getting stabbed in the chest sucks, so even if it doesn't cover everything you're glad you made it. Now, what about the rest of the set?]]></story_1>
+			<story_2><![CDATA[<b>10 Armor crafted:</b>⮀ You're covered head to toe in hand-crafted leather armor. You even have gloves and a helmet, and you've taken care that it's comfortable and flexible. You feel ready to take on any monster, knowing that there's sturdy armor between it and you.]]></story_2>
+			<story_3><![CDATA[<b>Failed Action:</b>⮀ No matter how you cut it, there isn't enough hide here to make anything useful. Grumbling in frustration, you throw your unfinished product in the trash and leave. What you have will have to be enough.]]></story_3>
+        </craft_armor>
+        <apprentice>
+            <label>Apprentice</label>
+            <label_done>Apprenticeship</label_done>
+            <tooltip><![CDATA[
+            You decided that knowing more about construction would help. You use your Crafting Guild license to hit the books.<br>Goes faster with a higher guild multiplier.<br>Gives 10-20 exp to Crafting for 0-100%<br>Requires Crafting Guild.<br>Unlocked at 40% Rumors heard.
+        ]]></tooltip>
+			<story_1><![CDATA[<b>1% Apprenticeship:</b>⮀ Meck seems determined to ignore you as he goes about his work, only remembering that you exist when he needs you to fetch something. It's not pleasant, but you're happy he accepted in the first place.]]></story_1>
+			<story_2><![CDATA[<b>10% Apprenticeship:</b>⮀ Despite Meck's best efforts, he can't stop you from watching him work. You have to admit, for all his sour attitude he's got a steady hand and a keen mind. You could learn a lot from him if he didn’t keep sending you away to fetch pointless things.]]></story_2>
+			<story_3><![CDATA[<b>20% Apprenticeship:</b>⮀ After repeated badgering, you got Meck to explain his methods a little. You only get one nugget of knowledge at a time, but sooner or later it'll start adding up.]]></story_3>
+			<story_4><![CDATA[<b>40% Apprenticeship:</b>⮀ Bit by bit you're gaining skills, and you're itching to try them out. Unfortunately, Meck forbids you touching his tools, and the last time you tried to use one he slapped it out of your hand and berated you for five minutes straight.]]></story_4>
+			<story_5><![CDATA[<b>60% Apprenticeship:</b>⮀ You can follow along with most of what Meck says and have learned how to string him along into a longer lecture where you can pry some more advanced ideas out of him. Even better, once you start showing that you know what he's doing he eases up on the more frivolous fetch requests.]]></story_5>
+			<story_6><![CDATA[<b>80% Apprenticeship:</b>⮀ You called Meck out on a mistake! You fight the smug grin off your face as he re-examines his work and curses. He has you fetching random things non-stop for an hour after that, but it was totally worth it.]]></story_6>
+			<story_7><![CDATA[<b>100% Apprenticeship:</b>⮀ Meck is still a better craftsman by far, but he still won't let you touch his tools and you've learned enough to get certified, so it's time to find houses under construction and get some hands-on experience.]]></story_7>
+        </apprentice>
+        <mason>
+            <label>Mason</label>
+            <label_done>Buildings Built</label_done>
+            <tooltip><![CDATA[
+            You've completed your apprenticeship and have the theoretical knowledge - now you need to get hands on.<br>Goes faster with a higher guild multiplier.<br>Requires Crafting Guild.<br>Gives 20-40 exp to Crafting for 0-100%<br>Unlocked at 60% Rumors heard and 100% Apprenticeship.
+        ]]></tooltip>
+			<story_1><![CDATA[<b>1% Buildings Built:</b>⮀ You walk onto the construction site and ask if they need a hand. After convincing them you're good for the job they seem willing enough to let you do some of the less important work.]]></story_1>
+			<story_2><![CDATA[<b>10% Buildings Built:</b>⮀ With a little more effort they'll let you help on other parts of the job, and soon enough you've helped out everywhere at some point. During a break you ask if they know about any other construction sites.]]></story_2>
+			<story_3><![CDATA[<b>20% Buildings Built:</b>⮀ The job at this site is nearly done, so there isn't much for you to do except clean-up, but the workers are exceptionally friendly and they tell you about a few other active sites and even an upcoming project that's right about to start.]]></story_3>
+			<story_4><![CDATA[<b>40% Buildings Built:</b>⮀ Different houses have different needs and are approached in completely different ways, you find. You've worked on a good few houses and each time you felt like you had to learn from scratch. It's enlightening.]]></story_4>
+			<story_5><![CDATA[<b>60% Buildings Built:</b>⮀ You've gotten better at tracking down sites, and have wandered into construction teams all over the city by now. You're learning the difference between how a crew in the slums does it and how an aristocrat's crew operates.]]></story_5>
+			<story_6><![CDATA[<b>80% Buildings Built:</b>⮀ You need to be more proactive to find new sites, now that you've built on all the active ones. With a little smooth talking you can often convince people to start work a week early, opening up new sites to build at.]]></story_6>
+			<story_7><![CDATA[<b>100% Buildings Built:</b>⮀ You don't feel like you fully understand the art of construction, but you've exhausted all the construction opportunities you could find. If you want to continue advancing, you'll need to shift focus to the design side of things.]]></story_7>
+        </mason>
+        <architect>
+            <label>Architect</label>
+            <label_done>Projects Planned</label_done>
+            <tooltip><![CDATA[
+            Now that you know how things work, it's better to learn how to design them.<br>Goes faster with a higher guild multiplier.<br>Requires Crafting Guild.<br>Gives 40-80 exp to Crafting for 0-100%<br>Unlocked at 80% Rumors heard and 100% Buildings Built.
+        ]]></tooltip>
+			<story_1><![CDATA[<b>1% Projects Planned:</b>⮀ You sign up for a house design bid, but the deadline comes and goes as you struggle to turn your design plans into actual schematics.]]></story_1>
+			<story_2><![CDATA[<b>10% Projects Planned:</b>⮀ With multiple tries to polish things, you finish before the deadline this time. You don't win, placing near the bottom of the ranking, but you're just glad to be on the charts.]]></story_2>
+			<story_3><![CDATA[<b>20% Projects Planned:</b>⮀ You try another couple of the active bids, and with some effort you make submissions for them too. You aren't winning any bids yet, but you like to think you're getting better.]]></story_3>
+			<story_4><![CDATA[<b>40% Projects Planned:</b>⮀ After many revisions and redesigns, you come in third place on the most recent competition, and your design is put up alongside the winner and second best for public display.]]></story_4>
+			<story_5><![CDATA[<b>60% Projects Planned:</b>⮀ For the very first time, you've won a competition! You don't have time to actually supervise construction, so you turn down the bid itself, but your design still takes the place of honor on the public display.]]></story_5>
+			<story_6><![CDATA[<b>80% Projects Planned:</b>⮀ These days you win as often as not, and you rarely place beneath top three. Part of it is that you're already familiar with all of the active competitions, but you wouldn't be winning if you weren't making good designs.]]></story_6>
+			<story_7><![CDATA[<b>100% Projects Planned:</b>⮀ With this victory, you've won every design competition in Merchanton at least once. However, there are countless ways to design a house, so you aren't done designing and maybe never will be.]]></story_7>
+        </architect>
+        <read_books>
+            <label>Read Books</label>
+            <tooltip><![CDATA[
+            There's a library! You always loved reading.<br>Discover new worlds and perspectives, get ideas from fiction characters, and empathize with the desire to be stronger.<br>Requires glasses.<br>Has 4x exp/talent gain, and can only be done <div id='trainingLimitInt'></div> times per reset.<br>Unlocked at 50% city explored.
+        ]]></tooltip>
+			<story_1><![CDATA[<b>Books read:</b>⮀ They do have it! You must have read this book a hundred times when you were a kid, and it's been a long time since you've found another copy. That's not all the library has to offer, far from it, but right now you're happy to settle down with your favourite book for an afternoon of reading.]]></story_1>
+        </read_books>
+        <buy_pickaxe>
+            <label>Buy Pickaxe</label>
+            <tooltip><![CDATA[
+            Getting the pickaxe vendor to talk to you is a tricky task, but at least he'll offer it to you for 200 gold after some convincing.<br>Affects any action with the pickaxe icon.<br>Can only have 1 Buy Pickaxe action.<br>Unlocked at 90% City Explored.
+        ]]></tooltip>
+			<story_1><![CDATA[<b>Pickaxe bought:</b>⮀ The shopowner assures you that the pickaxe is made out of only the most sturdy materials and will last a lifetime without needing repair. You're not entirely convinced, but you don't need it to last a lifetime anyways, and it does have a good heft to it.]]></story_1>
+        </buy_pickaxe>
+        <start_trek>
+            <label>Start Trek</label>
+            <tooltip><![CDATA[
+            Begin your trek to the top of Mt. Olympus.<br>Unlocked at 60% City Explored.
+        ]]></tooltip>
+			<story_1><![CDATA[<b>Traveled to the fourth zone:</b>⮀ Merchanton is an interesting place, but unfortunately it doesn't seem to have your cure. You've heard many wonderous things about Mt. Olympus though, and if the stories are real then maybe divine intervention or old magic could be the solution you're looking for. They also say the mountain is dangerous, but to be honest you've always wanted to go mountain climbing.]]></story_1>
+        </start_trek>
+        <!--town 4-->
+        <climb_mountain>
+            <label>Climb Mountain</label>
+            <label_done>Mountain Explored</label_done>
+            <tooltip><![CDATA[
+            Traversing the mountain will be difficult, but you can use your pickaxe as a makeshift climbing pick of sorts to help you get around.<br>2x progress with pickaxe.
+        ]]></tooltip>
+			<story_1><![CDATA[<b>1% Mountain Explored:</b>⮀ You stand at the foot of the mountain and look up at the peak. It's so far away, so high up. You take a minute to just stare in awe before looking for a good route up.]]></story_1>
+			<story_2><![CDATA[<b>10% Mountain Explored:</b>⮀ As you climb up the foothills you see old abandoned campsites and think of the rumours you've heard. You're obviously not the first person to try to scale the mountain, but you wonder how the other expeditions ended.]]></story_2>
+			<story_3><![CDATA[<b>20% Mountain Explored:</b>⮀ On the mountain proper, you start seeing odd symbols carved into stones here and there. It looks like the stories of an old civilization living here were true after all, not that it changes much.]]></story_3>
+			<story_4><![CDATA[<b>40% Mountain Explored:</b>⮀ Hidden away in the side of the mountain, you find a tunnel that seems to go deep under the mountain. There's more of those odd symbols near the entrance, perhaps a warning not to go in?]]></story_4>
+			<story_5><![CDATA[<b>60% Mountain Explored:</b>⮀ The higher you climb the more remains of the ancient civilization you see. Even here at the outskirts you're finding bits of worked stone half-buried in the rocks. Time, it seems, has not been kind to their city.]]></story_5>
+			<story_6><![CDATA[<b>80% Mountain Explored:</b>⮀ You're in the heart of the ruined city now, and there's no hiding what once was anymore. Houses, roads, a once-lovely fountain, it's all in ruins but you can picture what their city must have looked like in its prime.]]></story_6>
+			<story_7><![CDATA[<b>100% Mountain Explored:</b>⮀ You reach the summit, and in front of you is a huge, magnificent temple. It, too, is in ruins, and the statues of the gods are worn and broken. Amidst the bleak scene, your attention is drawn to an inexplicably pristine altar in a position of prominence, and you feel strangely like you're being watched.]]></story_7>
+        </climb_mountain>
+        <mana_geyser>
+            <label>Mana Geyser</label>
+            <label_done>Weak Spots Checked</label_done>
+            <info_text1>Spots with geysers left</info_text1>
+            <info_text2>Spots with geysers total</info_text2>
+            <info_text3>Spots to check for geysers</info_text3>
+            <tooltip><![CDATA[
+            Search the ground for weak points in the hopes of revealing massive mana geysers.<br>Spots with geysers have 5000 mana.<br>Every 100 weak points has a mana geyser.<br>Requires pickaxe.
+        ]]></tooltip>
+			<story_1><![CDATA[<b>Geyser revealed:</b>⮀ As your pickaxe digs into the ground, it suddenly shoots right out of your hands by an explosive pressure from beneath. You glance at where it fell and resolve to retrieve it later, and then turn your attention to the absolutely massive amount of mana bursting forth from the ground, doing your best to absorb as much as you can.]]></story_1>
+			<story_2><![CDATA[<b>10 Geysers revealed:</b>⮀ Having canvassed the entire mountain, you know where all the pent up mana is hiding, and where to strike to get access to it. You wonder what was causing so much mana to build up inside a mountain, but decide it doesn't really matter as long as you can get at it undisturbed.]]></story_2>
+        </mana_geyser>
+        <decipher_runes>
+            <label>Decipher Runes</label>
+            <label_done>Runic Symbols Deciphered</label_done>
+            <tooltip><![CDATA[
+            There are many different runic markings on weathered headstones around the mountain, perhaps you can glean some sort of knowledge from them.<br>Reduces mana cost of Chronomancy and Pyromancy by 0.5% per 1% of Glyphs Deciphered.<br>2x progress with glasses.<br>Unlocked at 20% Mountain Explored.
+        ]]></tooltip>
+			<story_1><![CDATA[<b>1% Runic Symbols Deciphered:</b>⮀ There are plenty of little ruins scattered around the mountain, with runic markings carved into various stone objects. You can't make heads or tails of them, unfortunately.]]></story_1>
+			<story_2><![CDATA[<b>10% Runic Symbols Deciphered:</b>⮀ You borrowed a reference book from Merchanton's library, and can slowly assemble sentences in the 'language of the ancients' as it seems to be called. That doesn't help you translate them, though, so you'll need more reference books.]]></story_2>
+			<story_3><![CDATA[<b>20% Runic Symbols Deciphered:</b>⮀ A whole stack of reference books on your back and now you can slowly translate the runes and understand them. This one appears to tell the story of how one of the gods fought a giant wolf with venomous claws and won by calling lightning down upon it. Interesting, but not very useful.]]></story_3>
+			<story_4><![CDATA[<b>30% Runic Symbols Deciphered:</b>⮀ There's a whole cluster of engravings chronicling the saga of Tachytus, a time mage who fought against man, beast, and gods in his quest to save his beloved. What interests you more is the helpful how-to guide to time magic that he left behind in the runes.]]></story_4>
+			<story_5><![CDATA[<b>40% Runic Symbols Deciphered:</b>⮀ The translation is moving more smoothly now, since you're getting used to the vocabulary and structure of the runic language. There are a lot of myths and legends recorded, many appearing to be older versions of fairy tales you heard as a kid.]]></story_5>
+			<story_6><![CDATA[<b>60% Runic Symbols Deciphered:</b>⮀ This batch of runes is in a very open space, and it seems that this place is a training area for the art of pyromancy, with runic instructions on the walls. You wonder why whoever made this place felt the need to carve all this into stone. Surely there were mentors around to teach it the normal way?]]></story_6>
+			<story_7><![CDATA[<b>80% Runic Symbols Deciphered:</b>⮀ Translation is quick and easy these days, and one by one you read stories of gods and heroes, man and monster, victory and tragedy. One thing gnaws at you, though: why? Why carve their stories into stones across the mountain? Why put to stone what people were around to share in voice and paper?]]></story_7>
+			<story_8><![CDATA[<b>100% Runic Symbols Deciphered:</b>⮀ It's the last engraving on the mountain, on an intricately detailed but heavily worn headstone, and it explains why all these engravings exist. Out of nowhere, the gods left and a great blight fell upon the mountain. The doomed civilization, unable or unwilling to flee, spent its last days making these carvings. There's a final plea: don't let us be forgotten. Remember our magic, our stories, our way of life, even if nothing else of us survives.]]></story_8>
+        </decipher_runes>
+        <chronomancy>
+            <label>Chronomancy</label>
+            <tooltip><![CDATA[
+            Controlling time seems like it would be a great idea, and thankfully for you, the runes around here contain lots of information on the art of Chronomancy.<br>Unlocked with both 30% Runic Symbols Deciphered and 150 Magic.
+        ]]></tooltip>
+			<story_1><![CDATA[<b>1 Chronomancy:</b>⮀ Chronomancy is unlike any other magic you've practiced, and unbelievably finnicky. The mana has to be held perfectly still, as if time is at a standstill, and the slightest mistake will cause the entire spell to destabilize. It's hard work, but you finally get the hang of it and you feel yourself speed up by the barest fraction.]]></story_1>
+			<story_2><![CDATA[<b>50 Chronomancy:</b>⮀ The effect is more pronounced now, and you find that your reflexes are keeping up with your increased speed. Unfortunately, though, the mana drain of the loops appears to have kept up as well, so even though you're getting the same amount of work done in less time you can't seem to get more work done in a loop.]]></story_2>
+			<story_3><![CDATA[<b>100 Chronomancy:</b>⮀ You know that speeding up time isn't the only thing time magic can do, but it seems that for a human like you anything fancier is impossible without additional assistance. The runes recommend a group ritual but you're the only chronomancer you know, so instead you start learning what Tachytus has to say about chronomantic potions.]]></story_3>
+        </chronomancy>
+        <looping_potion>
+            <label>Looping Potion</label>
+            <tooltip><![CDATA[
+            Using your aptness of alchemy and your talent for time, you've managed to recreate the very potion that got you into this whole mess! It can't cure you, but maybe you can find another use for it. (this does nothing right now)<br>Requires 200 herbs.<br>Unlocked with both 60 Alchemy and 100 Chronomancy.
+        ]]></tooltip>
+			<story_1><![CDATA[<b>Potion Made:</b>⮀ There's no mistake, it's the same potion that you were transporting what feels like an eternity ago. This is chronomancy you'd never have been able to do as a spell, and you take a moment to feel proud at how far you've come. And yet, you don't really know what to do with the thing. Maybe you'll figure something out later.]]></story_1>
+        </looping_potion>
+        <pyromancy>
+            <label>Pyromancy</label>
+            <tooltip><![CDATA[
+            Conjure the power of feverishly forceful and furiously firey flickering flames to aid you in combat. And yeah, the runes contain some stuff about this too. <br>Unlocked with both 60% Runic Symbols Deciphered and 200 Magic.
+        ]]></tooltip>
+			<story_1><![CDATA[<b>1 Pyromancy:</b>⮀ Pyromancy is more normal than chronomancy, but it makes up for it by being extra dangerous. Fire, you quickly learn, will consume you just as happily as your foes. Your control has to be ironclad at all times or you might lose a hand in the time it takes to draw a breath.]]></story_1>
+			<story_2><![CDATA[<b>50 Pyromancy:</b>⮀ Without the loops to restore you to normal you'd probably be dead five times over by now, but the rewards you've gained are impressive indeed. Turning that lethality on monsters is a sight to behold, and it's much more versatile than melee combat. Fights often end before they even have a chance to get close.]]></story_2>
+			<story_3><![CDATA[<b>100 Pyromancy:</b>⮀ You feel like an unstoppable wildfire, burning enemies to a crisp in an instant. You haven't had an… accident in a long time, and controlling the flames is becoming second-nature. Fire isn't the solution to every problem, but here and now you feel like it just might be.]]></story_3>
+        </pyromancy>
+        <explore_cavern>
+            <label>Explore Cavern</label>
+            <label_done>Cavern Explored</label_done>
+            <tooltip><![CDATA[
+            Explore the expansive and twisting cavern beneath the mountain, who knows what wonders (or terrors) you'll find down there.<br>Unlocked at 40% Mountain Explored.
+        ]]></tooltip>
+			<story_1><![CDATA[<b>1% Cavern Explored:</b>⮀ You carefully step inside the tunnel, the warning runes on your mind. When horrible things fail to happen, you go a little further. What awaits you in the depths of the mountain?]]></story_1>
+			<story_2><![CDATA[<b>10% Cavern Explored:</b>⮀ Only a few minutes in you find a branching path. You pick one at random and investigate, only to find more branches further along. Keeping track of all of this is going to be a challenge.]]></story_2>
+			<story_3><![CDATA[<b>20% Cavern Explored:</b>⮀ You step inside a side-tunnel and are awed by what you see. Embedded in the walls are gems of every colour you can imagine, and the light glimmering from them leaves you breathtaken. Even better, you think you sensed some mana coming from them. Is there perhaps a soulstone here?]]></story_3>
+			<story_4><![CDATA[<b>40% Cavern Explored:</b>⮀ Slowly but inevitably, the tunnels lean downwards. As you clear out dead ends and loops, you find that the paths forward tend to be the ones that go further down. Despite how far underground you are, it's strangely warm.]]></story_4>
+			<story_5><![CDATA[<b>50% Cavern Explored:</b>⮀ You turn a corner and find yourself face to face with a giant, monstrous troll. You leap back and prepare for battle, but the behemoth just gives you a curious look and waves some kind of greeting.]]></story_5>
+			<story_6><![CDATA[<b>60% Cavern Explored:</b>⮀ The trolls seem to like it this far down, and you're seeing them all over the place. Maybe they like the heat? It's getting pretty warm, so maybe they aren't fond of cold.]]></story_6>
+			<story_7><![CDATA[<b>80% Cavern Explored:</b>⮀ There are fewer branches to keep track of this far deep, which suggests you might be nearing the end. It's gotten really hot, though, so you're needing to take breaks to rehydrate.]]></story_7>
+			<story_8><![CDATA[<b>100% Cavern Explored:</b>⮀ As you go down the last tunnel, you wonder what's causing all this heat. Maybe there's a giant lava pool just beneath your feet, heating the entire mountain. You reach the final dead-end, and the only thing your heat-baked mind can think of is that it doesn't look like you'll be getting an answer.]]></story_8>
+        </explore_cavern>
+        <mine_soulstones>
+            <label>Mine Soulstones</label>
+            <label_done>Shiny Spots Checked</label_done>
+            <info_text1>Spots with soulstones left</info_text1>
+            <info_text2>Spots with soulstones total</info_text2>
+            <info_text3>Spots to check for soulstones</info_text3>
+            <tooltip><![CDATA[
+            Extract soulstones lodged in the walls of the tunnels in the massive underground cavern.<br>Every 10 shiny spots has a soulstone.<br>Requires pickaxe.<br>Unlocked with 20% Cavern Explored.
+        ]]></tooltip>
+			<story_1><![CDATA[<b>Shiny spot checked:</b>⮀ You chip away at the wall until the sparkling object that caught your eye falls free. To your disappointment, what comes out of the wall is just some shiny rock. You doubt it'd even be worth much at market.]]></story_1>
+			<story_2><![CDATA[<b>Soulstone mined:</b>⮀ This time you're sure it's a soulstone, and as you pry it out of the wall you feel a rush of vindication. It glows an earthy brown with a slight blue tint, in contrast to the colors you found in the dungeon.]]></story_2>
+			<story_3><![CDATA[<b>30 Soulstones mined:</b>⮀ As you found all the soulstones hiding in Mt. Olympus' cavern walls, you quickly realized that unlike the soulstones found in dungeons, these soulstones appear in every loop. You wonder what the cause of that might be, but whatever the reason it's pretty convenient.]]></story_3>
+        </mine_soulstones>
+        <hunt_trolls>
+            <label>Hunt Trolls</label>
+            <label_done>Slain</label_done>
+            <tooltip><![CDATA[
+            The cavern is teeming with trolls, but thankfully they appear to be friendly from the encounters you've had with them. However, you could do with some troll's blood.<br>Gives (self combat) * (1 + main stat / 100) * sqrt(1 + times completed / 100) * (original mana cost / actual mana cost) progress points per mana.<br>Unlocked with 50% Cavern Explored.<br>Gives Combat exp per troll kill, rather than upon action completion.
+        ]]></tooltip>
+            <chance_label>Chance</chance_label>
+            <last_stat_label>Last Stat</last_stat_label>
+            <segment_names>
+                <name>Find a Hiding Spot</name>
+                <name>Scream Very Loudly to Lure Out the Troll</name>
+                <name>Pounce on the Troll</name>
+                <name>Fight the Troll</name>
+                <name>Drain the Troll's Blood</name>
+            </segment_names>
+			<story_1><![CDATA[<b>Troll slain:</b>⮀ It was an exciting fight, the nimble human against the powerful troll. Its hide was magically tough and one solid hit could break you in half, but despite that you eventually prevailed. It groans an unintelligible question as it dies, perhaps asking why you wanted it dead, and you can't help but feel a little bad.]]></story_1>
+			<story_2><![CDATA[<b>10 Trolls slain in a loop:</b>⮀ You've stopped getting looks of confusion. They know that something out there is hunting them, and when you bring one down it knows what is happening. Now you're getting hateful glares instead, and they die calling you something in their language. You doubt it's flattering.]]></story_2>
+        </hunt_trolls>
+        <check_walls>
+            <label>Check Walls</label>
+            <label_done>Illusory Walls Discovered</label_done>
+            <tooltip><![CDATA[
+            Now that you know the ins and outs of the cavern, you start to notice certain spots of the walls that are illusory! There seems to be all manner of goodies hidden behind them.<br>Unlocked with 80% Cavern Explored.
+        ]]></tooltip>
+			<story_1><![CDATA[<b>1% Illusory Walls Discovered:</b>⮀ You lean back against the wall to drink some water, except the wall isn't there and you're flat on your back with your water splashed all over your face. Even though you're halfway through the wall, it still looks like it's perfectly solid. These alcoves could've been all over the caverns and you wouldn't have noticed a thing.]]></story_1>
+			<story_2><![CDATA[<b>10% Illusory Walls Discovered:</b>⮀ You begin retracing your paths through the caverns, dragging your hand along the walls so you can notice illusions. Every so often your hand slips through the wall and you find another secret alcove.]]></story_2>
+			<story_3><![CDATA[<b>20% Illusory Walls Discovered:</b>⮀ Most of the alcoves are empty, either emptied over the passage of time or never holding anything to begin with. A few of them seem to be untouched, even after all these years, and you're finding ancient artifacts in chests and on pedestals.]]></story_3>
+			<story_4><![CDATA[<b>40% Illusory Walls Discovered:</b>⮀ You wonder if the ancients somehow hadn't invented locks. You can't really understand why they would go to the trouble of illusory-wall security but not add basic physical precautions.]]></story_4>
+			<story_5><![CDATA[<b>60% Illusory Walls Discovered:</b>⮀ Maybe an alarm goes off in an empty room every time you cross a wall? Perhaps these walls used to be solid magical barriers but now all that remains is the illusion? You're not sure you'll ever know the answer.]]></story_5>
+			<story_6><![CDATA[<b>70% Illusory Walls Discovered:</b>⮀ Instead of a normal alcove, the invisible wall you slipped through contained a large cavern full of a strange glowing liquid. The glow briefly intensifies when you touch it, and you feel your awareness expand a little, as if your mind is responding to the liquid in some way.]]></story_6>
+			<story_7><![CDATA[<b>80% Illusory Walls Discovered:</b>⮀ No matter what you try, the only thing that shows an illusory wall as fake is to reach out and touch it. It would be great if you could just make a potion of see-through-fake-walls or something, but whoever made these walls covered all the bases.]]></story_7>
+			<story_8><![CDATA[<b>100% Illusory Walls Discovered:</b>⮀ Traversing the entire cavern system the first time was time-consuming but interesting. Traveling it a second time with your hand on the walls was just boring. You just wish you knew to do this the first time around.]]></story_8>
+        </check_walls>
+        <take_artifacts>
+            <label>Take Artifacts</label>
+            <label_done>Artifacts Taken</label_done>
+            <info_text1>Alcoves with artifacts left</info_text1>
+            <info_text2>Alcoves with artifacts total</info_text2>
+            <info_text3>Alcoves to check for artifacts</info_text3>
+            <tooltip><![CDATA[
+            Behind some of the illusory walls, there are various sorts of artifacts that seem to belong to some sort of ancient civilization. Or at least that's what you'll say if anybody comes looking for them. (these do nothing right now)<br>Every 25 alcoves has an artifact.<br>Unlocked with 5% Illusory Walls Discovered.
+        ]]></tooltip>
+			<story_1><![CDATA[<b>Artifact taken:</b>⮀ You pick up an ornate necklace from the stone statue it was displayed on. It's made out of precious materials with incredible craftsmanship. If there's anything magical about it you can't figure it out, but there's really no reason to not take a priceless historical artifact with you.]]></story_1>
+			<story_2><![CDATA[<b>20 Artifacts taken:</b>⮀ Your collection is an unfocused assortment of unrelated artifacts found from all over the mountain, the only quality they all share being impeccable detail and craftsmanship. It seems like you're only picking clean what hasn't been lost to other people over time, but what you found will fetch a pretty penny nonetheless.]]></story_2>
+        </take_artifacts>
+        <imbue_mind>
+            <label>Imbue Mind</label>
+            <label_done>Completed</label_done>
+            <tooltip><![CDATA[
+            Deep behind one of the many illusory walls, you've found a small glowing lake full of some sort of liquid. Your soulstones seem to glow when they get close to it. You appear to be able to use them as a link to your mind, but the process requires a very large amount of mana and will destroy them once it's complete. Each imbuement will increase the training limit by 1.<br>Gives (magic skill) * (1 + main stat / 100) * (original mana cost / actual mana cost) progress points per mana.<br>Can only have 1 Imbue Mind action.<br>Unlocked with both 70% Illusory Walls Discovered and 300 Magic.<br>Sacrifices (20 * (imbuements+1)) soulstones. Currently sacrificing 
+        ]]></tooltip>
+            <tooltip2><![CDATA[
+             soulstones.
+        ]]></tooltip2>
+            <segment_names>
+                <name>Submerge the Soulstones</name>
+                <name>Arrange the Soulstones</name>
+                <name>Absorb Knowledge</name>
+            </segment_names>
+			<story_1><![CDATA[<b>Third phase reached:</b>⮀ The soulstones are all arranged, glowing a bright uniform white. You sit in the center and close your eyes as the ritual begins. You can sense the soulstones all around you, bathed in light, and you mentally reach out and start pulling them closer.]]></story_1>
+			<story_2><![CDATA[<b>Imbuement complete:</b>⮀ It's overwhelming. You're thinking faster than you remember ever thinking before, your mind flashing from scene to scene as fragments of knowledge float by on the sidelines. Slowing down would be fatal, you have no choice but to trust the strength of your mind. Finally, it ends, and you open your eyes. The soulstones are nowhere to be found and the lake is just clear water now.]]></story_2>
+        </imbue_mind>
+        <face_judgement>
+            <label>Face Judgement</label>
+            <tooltip><![CDATA[
+            Face the judgement of the gods. If your reputation is 50 or above, you'll be accepted into their good graces and granted passage to Valhalla. If your reputation is -50 or below, you'll be cast into the shadow realm and thrown back to the beginning of your journey.<br>Unlocked at 100% Mountain Explored. (this action does nothing right now)
+        ]]></tooltip>
+			<story_1><![CDATA[<b>Judgement Faced:</b>⮀ Their civilization may have fallen, but their gods are still very real, and the weight of their attention nearly drives you to your knees. Seeking to justify your presence, you begin to speak. Of your life, of your goal, and of your moral fibre. They are not impressed, you can tell, but they seem willing to lend you a hand. Before your eyes the world shifts and warps, and when it snaps back into focus you appear to be somewhere else entirely.]]></story_1>
+			<story_2><![CDATA[<b>Accepted by the Gods:</b>⮀ At the end of your story, a crack of lightning strikes behind the altar and leaves behind a cheerful man. Between the perfect bodily form and the power radiating from him, there's no doubt you're meeting a god in the flesh. He extends his hand, an offer of invitation, and you happily reach out and take it.]]></story_2>
+			<story_3><![CDATA[<b>Cast into the Shadow Realm:</b>⮀ There is only one word for the act of facing the gods while the stench of their dark cousins emanates from you: defiance. They know you aren't here to win their favour, but to spit in their faces as an emissary of their hated nemeses. Enraged, the gods strike you down, and you sink into a world of roiling black turmoil. And yet, the dark gods you're aligned with act too, and you see in front of you a path leading out of the abyss.]]></story_3>
+        </face_judgement>
+        <!--town 5-->
+        <guided_tour>
+            <label>Guided Tour</label>
+            <label_done>Tour Routes Followed</label_done>
+            <tooltip><![CDATA[
+            The city doesn't take too kindly to visitors snooping around, so you'll have to take all their tours to scope it out instead.<br>Costs 10 gold.<br>2x progress with glasses.
+        ]]></tooltip>
+            <!--TODO: give this action story-->
+        </guided_tour>
+        <canvass>
+            <label>Canvass</label>
+            <label_done>Houses Canvassed</label_done>
+            <tooltip><![CDATA[
+            The city has a local charity that's looking for volunteers to canvass around for potential benefactors. Maybe if you know the information of some of said people, it could be helpful.
+        ]]></tooltip>
+            <!--TODO: give this action story-->
+        </canvass>
+        <donate>
+            <label>Donate</label>
+            <tooltip><![CDATA[
+            You can donate to the charity yourself if you'd like.<br>Costs 20 gold.<br>Gives 1 reputation.
+        ]]></tooltip>
+            <!--TODO: give this action story-->
+        </donate>
+        <accept_donations>
+            <label>Accept Donations</label>
+            <label_done>Donations Accepted</label_done>
+            <info_text1>Meaningful donations left</info_text1>
+            <info_text2>Meaningful donations total</info_text2>
+            <info_text3>Donations to check for value</info_text3>
+            <tooltip><![CDATA[
+            After doing some canvassing for the local charity, you're now able to accept some donations on their behalf, since you know the routine.<br>Costs 1 reputation.<br>Meaningful donations are worth 20 gold each.<br>Every 5 donations is worth a meaningful amount. 
+        ]]></tooltip>
+            <!--TODO: give this action story-->
+        </accept_donations>
+        <mercantilism>
+            <label>Mercantilism</label>
+            <tooltip><![CDATA[
+            Practice your merchandising skills, which are sorely lacking considering how poor of a deal you're getting from those mana merchants.
+        ]]></tooltip>
+            <!--TODO: give this action story-->
+        </mercantilism>
+        <wizard_college>
+            <label>Wizard College</label>
+            <label_done>Spontaneously Combusted From Wonder</label_done>
+            <tooltip><![CDATA[
+            The wizard college is the finest school in all of the realms, you're lucky to be afforded a chance to get in. Although, it will cost you a small fortune in tuition.<br>Take their tests and get a grade!<br>Can only have 1 Wizard College action.<br>Costs 500 gold.<br>Gives (all schools of magic skills) * (1 + main stat / 100) * sqrt(1 + times completed / 1000) * (original mana cost / actual mana cost) progress points per mana.<br>Unlocked at ???
+        ]]></tooltip>
+            <!--TODO: give this action story-->
+        </wizard_college>
+        <restoration>
+            <label>Restoration</label>
+            <tooltip><![CDATA[
+            You've gone all this way without learning how to heal people, or even yourself. You should probably get around to learning that. Mana cost is reduced by Wizard College Grade.
+        ]]></tooltip>
+            <!--TODO: give this action story-->
+        </restoration>
+        <spatiomancy>
+            <label>Spatiomancy</label>
+            <tooltip><![CDATA[
+            At a base level, this is the art of manipulating matter. At a high level, well, this is that but more powerful. Being able to manipulate space itself will allow you to create more items for certain limited actions. Mana cost is reduced by Wizard College Grade.
+        ]]></tooltip>
+            <!--TODO: give this action story-->
+        </spatiomancy>
+        <great_feast>
+            <label>Great Feast</label>
+            <label_done>Completed</label_done>
+            <tooltip><![CDATA[
+            You realize now that you've forgotten the joy of food, after having gone for so "long" without needing to eat anything. It's about time for a feast of grand proportions. Unfortunately, all the catering services here only accepts payments in soulstones.<br>Gives (practical magic skill) * (1 + main stat / 100) * (original mana cost / actual mana cost) progress points per mana.<br>Can only have 1 Great Feast action.<br>Unlocked with ???<br>Sacrifices (5,000 * (feasts+1)) soulstones. Currently sacrificing 
+        ]]></tooltip>
+            <tooltip2><![CDATA[
+             soulstones.
+        ]]></tooltip2>
+            <segment_names>
+                <name>Explain Your Order</name>
+                <name>Give Them Your Information</name>
+                <name>Verify Your Identity</name>
+                <name>Confirm Your Address</name>
+            </segment_names>
+            <!--TODO: give this action story-->
+        </great_feast>
+        <fall_from_grace>
+            <label>Fall From Grace</label>
+            <tooltip><![CDATA[
+            Looks like the only way out of this place is to make them dislike you enough to kick you out. Some moderate vandalism will probably do the job. You'll be cast into the shadow realm and thrown back to the beginning of your journey, but at least you'll go out with a bang!
+        ]]></tooltip>
+            <!--TODO: give this action story-->
+        </fall_from_grace>
+        <!--town 6-->
+        <raise_zombie>
+            <label>Raise Zombie</label>
+            <tooltip><![CDATA[
+            Upon stumbling by the local cemetery, you realize that those numerous tombstones could perhaps benefit you in a meaningful way. With your knowledge of dark magic, and a hint of troll's blood, you might just be able to raise a zombie of your very own!<br>Costs 1 blood.<br>Each zombie adds (dark magic / 2) to your team combat.<br>Unlocked at ???.
+        ]]></tooltip>
+            <!--TODO: give this action story-->
+        </raise_zombie>
+        <the_spire>
+            <label>The Spire</label>
+            <label_done>Looted</label_done>
+            <label_complete>Completed</label_complete>
+            <label_part>The Spire</label_part>
+            <tooltip><![CDATA[
+            Standing tall in the dead center of the town is the towering spire. Surrounded by a storm, and almost emanating gloom. This is surely your greatest task yet.<br>Gives (team combat) * (1 + main stat / 100) * sqrt(1 + times floor completed / 200) * (original mana cost / actual mana cost) progress points per mana.<br>Progress scaling per floor is reduced by 0.1x per pylon disabled.<br>Unlocked at 20% Rumors Heard.<br>Gives 50 soulstones per completion - hover over Looted for info.
+        ]]></tooltip>
+            <completed_tooltip><![CDATA[
+            Each soulstone improves a random stat's exp gain by (1+(soulstones)^.8/30).<br>Each floor has 10 soulstones that, when received, reduces the chance you'll get the next one by 2%.<br>Chance to receive a soulstone recovers per floor at 0.00001% per mana.<br>
+        ]]></completed_tooltip>
+            <chance_label>Chance</chance_label>
+            <last_stat_label>Last Stat</last_stat_label>
+            <segment_names>
+                <name>Locate Entrance</name>
+                <name>Navigate Door Maze</name>
+                <name>Slay Spectres</name>
+                <name>Escape Evaporating Tunnel</name>
+                <name>Fend Off Spider Ambush</name>
+                <name>Avoid Explosive Runes</name>
+                <name>Disable Miniature Pylons</name>
+                <name>Fight Dark Amalgamation</name>
+                <name>Cleanse Floor</name>
+            </segment_names>
+            <!--TODO: give this action story-->
+        </the_spire>
+    </actions>
+    <spells>
+        <title>Spells</title>
+    </spells>
+</body>

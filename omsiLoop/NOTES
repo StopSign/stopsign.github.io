@@ -1,0 +1,147 @@
+To add a new regular action:
+    New class in actionList.js
+    End of town.js, this.createVars("New");
+    in view.js, createTownActions()
+    in actionList.js, translateClassNames(), add the translation
+    in actionList.js, in the parent progress class, finish(), towns[X].total<var>
+    get an svg
+
+Add a new basic action:
+    New class in actionList.js
+    in view.js, createTownActions()
+    in actionList.js, translateClassNames(), add the translation
+    get an svg
+
+Add a new progress bar action:
+    New class in actionList.js
+    End of town.js, this.createProgressVars("New");
+    in view.js, this.createTownAction(tempObj); this.createActionProgress(tempObj);
+    in actionList.js, translateClassNames(), add the translation
+    get an svg
+    add to save() and load()
+
+Add a new multipart progress bar action:
+    New class in actionList.js
+    in actionList.js, translateClassNames(), add the translation
+    get an svg
+    add to save() and load()
+    in view.js, this.createTownAction(tempObj); this.createMultiPartPBar(tempObj); and updateMultiPartActions();
+    End of town.js, new vars
+    actions.js restart()
+
+New Skill
+    New divs in index.html
+    add to skill list in saving.js
+	
+	
+TODO:
+show mana in previous run
+show mana saved by skills
+Adding actions group if same type
+change isVisible for stats to use data instead
+drag/drop actions
+show mana/gold/resources gain per action in tooltip
+actions fail if they don't do anything useful
+import/export just action list
+draggable action list size
+change tab title when pause
+graphics to show when to-check decreases
+modifier for highest achieved
+hard numbers for wander progress
+custom input numbers for action list
+hover -> focus
+
+Tutoring - 50 combat, 50 magic, 100% city explored, str 20, dex 20, per 10, int 20, con 30, exp 150%
+
+training soft caps per action - 1000x initial mana cost before 60% exp, trainings 80%.
+
+
+Remove talent
+    everything has a 10 + (90 / (1 + completed/1000)) multiplier to initial mana cost
+    rebalance mana costs
+    rebalance soulstone effect (maybe)
+
+
+remove clear list, import/export list there
+
+
+
+
+breakpoint action
+folder action
+
+
+
+.75
+	
+    large dungeon - like small dungeon, but uses team combat and gives 10 soulstones and items
+	
+    craft armor - cost 2 hides, gives 20% self combat, faster w/ craftsmanship skill
+    apprentice - faster w/ rank, PBA
+        craftsmanship skill +
+    journeyman - faster w/ rank, PBA
+        craftsmanship skill ++
+    architect - faster w/ rank, PBA
+        craftsmanship skill +++
+
+.76
+    Follow Flowers - PBA, more herbs
+        Clear thicket - PBA, more wild mana
+        talk to witch - PBA, slightly improve mage lessons, improve gather wild mana
+        learn dark magic - improves dark magic skill, costs reputation, req rep < 3
+            Dark Magic Skill -
+                Smash pots and wild mana 1% more reward per level.
+
+.77
+   rework small/large dungeon
+   checkbox to short-circuit heal/fight/dungeon when complete with a part
+
+.78
+    Perform ritual - req rep < 0, MPBA, gives perm +initial mana
+    initial mana to 100
+    smash pots max to 25, but give double mana
+    pick locks cost 100 less
+    half short quests, cost 600
+    half long quests, cost 1500
+    investigate double price, triple reward
+    buy supplies to 300 gold
+    heal req 1 rep
+    fight req 2 rep
+    trainStr to zone 3
+    trainDex/Spd to zone 2
+    wild mana higher initial, worse ratio, 25
+    Read Manuals - very hard PBA, improves train combat/magic
+    <hidden until dark magic> - Sacrifice - Costs 50 more soulstones each time, gives permanent +10% time modifier in zone 1, max 200%
+
+.79
+    Performance & data management rework
+
+
+town 2 - forest road
+
+
+town 3 - guilds and stuff
+
+    adventurers guild
+        hire adventurer
+        large dungeon
+        identify items
+        join tournament
+    crafters guild
+        tan & cure - costs hide, gives leather
+        apprentice builder -
+        journeyman builder -
+        architect -
+    merchants guild
+        apprentice
+        start a business / hire employees
+        promote business
+        manage business
+
+
+    read books
+
+    Build Boat
+    Hire Crew
+    Inspire Crew
+    Set Sail
