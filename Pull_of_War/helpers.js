@@ -10,18 +10,19 @@ function intToString (value) {
   }
 }
 
-function intToStringRound(value) {
+function intToStringRound(value, type=0) {
   if (value>=10000)
   {
-    return toSuffix(value);
+    return toSuffix(value, type);
   }
   else {
-    return Math.floor(value);
+    if(type == 0) return Math.floor(value);
+    if(type == 1) return Math.ceil(value);
   }
 }
 
-function toSuffix(value) {
-    value=Math.round(value);
+function toSuffix(value, type) {
+    if(type == 0 ? value=Math.floor(value) : value=Math.ceil(value));
     var suffixes = ["", "K", "M", "B","T","C","Q","S"];
     var suffixNum = Math.floor(((""+value).length-1)/3);
     var shortValue = parseFloat((suffixNum != 0 ? (value / Math.pow(1000,suffixNum)) : value).toPrecision(3));
@@ -37,5 +38,5 @@ function addbyinteger(toAdd1, toAdd2, precision, isAdd) {
 	//make toAdd2 negative when isAdd is false.
 	toReturn = Math.floor(toAdd1 + toAdd2)
 	return toReturn / precisionMult
-	
+
 }

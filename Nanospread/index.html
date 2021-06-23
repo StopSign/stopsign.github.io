@@ -12,7 +12,7 @@
     <title>Nanospread</title>
     <link rel="stylesheet" href="stylesheet.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-	
+
 </head>
 <body id="theBody" style="font-family:Arial, Helvetica, serif;color:black;font-size:0px;background-color:black;height:100%;margin:0;" oncontextmenu="return false;">
 
@@ -56,6 +56,7 @@
     <div class="menuButton" onclick="toggleHelp()"><i class="fa fa-question-circle-o" style="font-size:20px;"></i> Help (H)</div>
     <div class="menuButton" onclick="toggleLevelMenu()"><i class="fa fa-line-chart" style="font-size:20px;"></i> Level (L)</div>
 	<div class="menuButton" onclick="toggleUpgradeMenu()"><i class="fa fa-gear" style="font-size:20px;"></i> Upgrades (U)</div>
+    <div class="menuButton" onclick="toggleChallengesMenu()"><i class="fa fa-bar-chart" style="font-size:20px;"></i> Challenges (I)</div>
 	<div class="menuButton" onclick="toggleStatsMenu()"><i class="fa fa-bar-chart" style="font-size:20px;"></i> Stats (I)</div>
     <div class="menuButton" style="float:right" onclick="select.selectAllActive()"><div style="margin-top:3px;">Select Active (E)</div></div>
 </div>
@@ -132,7 +133,7 @@
                     Current Tick Speed: <div id="currentTickSpeed">1</div>/sec<br>
                     Cost: <div id="buyTickSpeedCost">10</div> EP<br>
                     Next Cost: <div id="buyTickSpeedCostN">10</div> EP<br>
-                    Maximum of 2/sec
+                    Maximum of 5/sec
                 </div>
                 <div style="padding:5px;">
                     <div id='buyTransferRateButton' class="normalButton" onclick="buyTransferRate()"> +0.001 Transfer Rate </div><br>
@@ -176,6 +177,12 @@
             </div>
         </div>
         <i id="backButton2" class="backButton fa fa-close" onclick="closeUpgradeBox()" style="font-size:24px"></i>
+    </div>
+    <div id="challengesBox" style="display:none;">
+		<div style="padding:5px;">
+
+		</div>
+		<i id="backButton4" class="backButton fa fa-close" onclick="closeHelpBox()" style="font-size:24px"></i>
     </div>
     <div id="buildBox" style="display:none;">
         <!--fa fa-truck, microchip, industry -->
@@ -314,7 +321,7 @@
             <!--</div>-->
         </div>
 		<div id="autobuyContainer" style="padding:5px;position:absolute;">
-			Autobuy 
+			Autobuy
 			<div id="autobuyToggleContainer">
                 <div id="autobuyOff" class="autobuyToggle" onclick="toggleAutobuy(0)" style="background-color:#ff4400">Off</div>
                 <div id="autobuyOn" class="autobuyToggle" onclick="toggleAutobuy(1)">On</div>
