@@ -2,7 +2,7 @@
 
 // eslint-disable-next-line prefer-const
 let gameSpeed = 1;
-const baseManaPerSecond = 50;
+const baseManaPerSecond = 100;
 
 let curTime = new Date();
 let gameTicksLeft = 0;
@@ -14,12 +14,12 @@ function getSpeedMult(zone = curTown) {
     let speedMult = 1;
 
     // dark ritual
-    if (zone === 0 && getBuffLevel("Ritual") > 0) speedMult *= 1 + Math.min(getBuffLevel("Ritual"), 20) / 10;
-    else if (zone === 1 && getBuffLevel("Ritual") > 20) speedMult *= 1 + Math.min(getBuffLevel("Ritual") - 20, 20) / 20;
-    else if (zone === 2 && getBuffLevel("Ritual") > 40) speedMult *= 1 + Math.min(getBuffLevel("Ritual") - 40, 20) / 40;
+    //if (zone === 0 && getBuffLevel("Ritual") > 0) speedMult *= 1 + Math.min(getBuffLevel("Ritual"), 20) / 10;
+    //else if (zone === 1 && getBuffLevel("Ritual") > 20) speedMult *= 1 + Math.min(getBuffLevel("Ritual") - 20, 20) / 20;
+    //else if (zone === 2 && getBuffLevel("Ritual") > 40) speedMult *= 1 + Math.min(getBuffLevel("Ritual") - 40, 20) / 40;
 
     // chronomancy
-    speedMult *= Math.pow(1 + getSkillLevel("Chronomancy") / 60, 0.25);
+    //speedMult *= Math.pow(1 + getSkillLevel("Chronomancy") / 60, 0.25);
 
     return speedMult;
 }
@@ -66,7 +66,7 @@ function tick() {
         }
 
         if (timer % (300 * gameSpeed) === 0) {
-            save();
+            //save();
         }
         gameTicksLeft -= ((1000 / baseManaPerSecond) / getActualGameSpeed());
     }
@@ -172,8 +172,8 @@ function addActionToList(name, townNum, isTravelAction, insertAtIndex) {
                     }
                 }
                 if (isTravelAction) {
-                    actionTownNum = townNum + 1;
                     actions.addAction(name, 1, insertAtIndex);
+                    action.unlock();
                 } else {
                     actions.addAction(name, addAmount, insertAtIndex);
                     if (shiftDown && hasLimit(name)) {
@@ -199,8 +199,6 @@ function addResource(resource, amount) {
     if (Number.isFinite(amount)) resources[resource] += amount;
     else resources[resource] = amount;
     view.updateResource(resource);
-
-    if (resource === "teamMembers" || resource === "armor") view.updateTeamCombat();
 }
 
 function resetResource(resource) {
@@ -308,19 +306,8 @@ function unlockTown(townNum) {
 }
 
 function adjustAll() {
-    adjustPots();
-    adjustLocks();
-    adjustSQuests();
-    adjustLQuests();
-    adjustWildMana();
-    adjustHerbs();
-    adjustHunt();
-    adjustSuckers();
-    adjustGeysers();
-    adjustMineSoulstones();
-    adjustArtifacts();
-    adjustDonations();
-    view.adjustManaCost("Continue On");
+    adjustManaPots();
+    adjustManaCrystals();
 }
 
 function capAmount(index, townNum) {
@@ -500,10 +487,6 @@ function moveDown(index) {
 function disableAction(index) {
     actions.nextLast = copyObject(actions.next);
     const action = actions.next[index];
-    const travelNum = getTravelNum(action.name);
-    if (travelNum) {
-        actionTownNum = travelNum - 1;
-    }
     const translated = translateClassNames(action.name);
     if (action.disabled) {
         if (!translated.allowed || getNumOnList(action.name) + action.loops <= translated.allowed()) action.disabled = false;
@@ -515,10 +498,6 @@ function disableAction(index) {
 }
 function removeAction(index) {
     actions.nextLast = copyObject(actions.next);
-    const travelNum = getTravelNum(actions.next[index].name);
-    if (travelNum) {
-        actionTownNum = travelNum - 1;
-    }
     actions.next.splice(index, 1);
     view.updateNextActions();
     view.updateLockedHidden();
@@ -540,7 +519,7 @@ function addOffline(num) {
 function toggleOffline() {
     if (totalOfflineMs === 0) return;
     if (bonusSpeed === 1) {
-        bonusSpeed = 5;
+        bonusSpeed = 10;
         document.getElementById("isBonusOn").textContent = _txt("time_controls>bonus_seconds>state>on");
     } else {
         bonusSpeed = 1;

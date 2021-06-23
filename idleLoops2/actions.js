@@ -5,10 +5,8 @@ function Actions() {
     this.next = [];
     this.addAmount = 1;
 
-    this.totalNeeded = 0;
     this.completedTicks = 0;
     this.currentPos = 0;
-    this.timeSinceLastUpdate = 0;
 
     this.tick = function() {
         const curAction = this.getNextValidAction();
@@ -138,10 +136,7 @@ function Actions() {
         this.currentPos = 0;
         this.completedTicks = 0;
         curTown = 0;
-        towns[0].suppliesCost = 300;
-        view.updateResource("supplies");
-        curAdvGuildSegment = 0;
-        curCraftGuildSegment = 0;
+
         for (const town of towns) {
             for (const action of town.totalActionList) {
                 if (action.type === "multipart") {
@@ -150,7 +145,6 @@ function Actions() {
                 }
             }
         }
-        guild = "";
         if (options.keepCurrentList) {
             this.currentPos = 0;
             this.completedTicks = 0;
@@ -206,7 +200,6 @@ function Actions() {
             setAdjustedTicks(action);
             remainingTicks += action.loopsLeft * action.adjustedTicks;
         }
-        this.totalNeeded = this.completedTicks + remainingTicks;
         view.updateTotalTicks();
     };
 
@@ -214,8 +207,7 @@ function Actions() {
     this.addAction = function(action, loops, initialOrder, disabled) {
         const toAdd = {};
         toAdd.name = action;
-        if (disabled) toAdd.disabled = true;
-        else toAdd.disabled = false;
+        toAdd.disabled = disabled;
 
         toAdd.loops = loops === undefined ? this.addAmount : loops;
 

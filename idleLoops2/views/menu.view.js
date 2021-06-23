@@ -49,7 +49,6 @@ Views.registerView("menu", {
                 <input id='exportImport'><label for='exportImport'> ${_txt("menu>save>input_label")}</label><br>
                 <div class='button' style='margin-top: 5px; margin-right: 2px;' onclick='exportSave()'>${_txt("menu>save>export_button")}</div>
                 <div class='button' style='margin-top: 1px;' onclick='importSave()'>${_txt("menu>save>import_button")}</div><br>
-                <div class='button' style='margin-top: 3px;' onclick='exportOldSave()'>${_txt("menu>save>export_button_old")}</div><br>
                 ${_txt("menu>save>export_comment")}<br>
                 ${_txt("menu>save>import_comment")}
                 <div class='showthat2'>

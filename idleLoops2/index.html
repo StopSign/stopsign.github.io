@@ -9,7 +9,7 @@
     <meta http-equiv="expires" content="Tue, 01 Jan 1980 1:00:00 GMT" />
     <meta http-equiv="pragma" content="no-cache" />
 
-    <title>Idle Loops</title>
+    <title>Idle Loops 2</title>
     <link rel="stylesheet" href="stylesheet.css">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.13.1/css/all.css" crossorigin="anonymous">
     <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
@@ -19,7 +19,7 @@
     <script src='lib/lz-string.min.js'></script>
     <script src='lib/chart.min.js'></script>
     <script src='lib/mousetrap.min.js'></script>
-
+    <!--<div>Icons made by <a href="https://www.flaticon.com/authors/prettycons" title="prettycons">prettycons</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></div>-->
 </head>
 <body id="theBody" style="min-width:1210px">
     <canvas id="talentTreeCanvas" style="display: none;"></canvas>
@@ -55,7 +55,7 @@
                     <div class="large bold localized" data-lockey="skills>title"></div>
                     <div class="showthis localized" data-lockey="skills>tooltip>no_reset_on_restart"></div>
                 </div><br>
-                <div class="skillContainer showthat" id="skillSCombatContainer">
+                <div class="skillContainer showthat hidden" id="skillSCombatContainer">
                     <div class="skillLabel medium bold localized" data-lockey="skills>scombat>label"></div>
                     <div class="statNum medium"><div id="skillSCombatLevel">0</div></div>
                     <div style="margin-top:18px;"></div>
@@ -63,119 +63,24 @@
                         <span class="localized" data-lockey="skills>scombat>desc"></span><br>
                     </div>
                 </div>
-                <div class="skillContainer showthat" id="skillTCombatContainer">
-                    <div class="skillLabel medium bold localized" data-lockey="skills>tcombat>label"></div>
-                    <div class="statNum medium"><div id="skillTCombatLevel">0</div></div>
+                <div class="skillContainer showthat" id="skillManaSenseContainer" onmouseover="view.showSkill('ManaSense')" onmouseout="view.showSkill(undefined)">
+                    <div class="skillLabel medium bold localized" data-lockey="skills>manasense>label"></div>
+                    <div class="statNum medium"><div id="skillManaSenseLevel">0</div></div>
                     <div style="margin-top:18px;"></div>
+                    <div class="thinProgressBarUpper"><div class="statBar skillExpBar townExpBar" id="skillManaSenseLevelBar"></div></div>
                     <div class="showthis">
-                        <span class="localized" data-lockey="skills>tcombat>desc"></span><br>
+                        <span class="localized" data-lockey="skills>manasense>desc"></span><br>
+                        <div class="medium bold localized" data-lockey="skills>tooltip>level_exp"></div> <div id="skillManaSenseLevelExp"></div>/<div id="skillManaSenseLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="skillManaSenseLevelProgress"></div>%)</div><br>
                     </div>
                 </div>
-                <div class="skillContainer showthat" id="skillCombatContainer" onmouseover="view.showSkill('Combat')" onmouseout="view.showSkill(undefined)">
-                    <div class="skillLabel medium bold localized" data-lockey="skills>combat>label"></div>
-                    <div class="statNum medium"><div id="skillCombatLevel">0</div></div>
+                <div class="skillContainer showthat" id="skillManaControlContainer" onmouseover="view.showSkill('ManaControl')" onmouseout="view.showSkill(undefined)">
+                    <div class="skillLabel medium bold localized" data-lockey="skills>manacontrol>label"></div>
+                    <div class="statNum medium"><div id="skillManaControlLevel">0</div></div>
                     <div style="margin-top:18px;"></div>
-                    <div class="thinProgressBarUpper"><div class="statBar skillExpBar townExpBar" id="skillCombatLevelBar"></div></div>
+                    <div class="thinProgressBarUpper"><div class="statBar skillExpBar townExpBar" id="skillManaControlLevelBar"></div></div>
                     <div class="showthis">
-                        <span class="localized" data-lockey="skills>combat>desc"></span><br>
-                        <div class="medium bold localized" data-lockey="skills>tooltip>level_exp"></div> <div id="skillCombatLevelExp"></div>/<div id="skillCombatLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="skillCombatLevelProgress"></div>%)</div><br>
-                    </div>
-                </div>
-                <div class="skillContainer showthat" id="skillMagicContainer" onmouseover="view.showSkill('Magic')" onmouseout="view.showSkill(undefined)">
-                    <div class="skillLabel medium bold localized" data-lockey="skills>magic>label"></div>
-                    <div class="statNum medium"><div id="skillMagicLevel">0</div></div>
-                    <div style="margin-top:18px;"></div>
-                    <div class="thinProgressBarUpper"><div class="statBar skillExpBar townExpBar" id="skillMagicLevelBar"></div></div>
-                    <div class="showthis">
-                        <span class="localized" data-lockey="skills>magic>desc"></span><br>
-                        <div class="medium bold localized" data-lockey="skills>tooltip>level_exp"></div> <div id="skillMagicLevelExp"></div>/<div id="skillMagicLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="skillMagicLevelProgress"></div>%)</div><br>
-                    </div>
-                </div>
-                <div class="skillContainer showthat" id="skillPracticalContainer" onmouseover="view.showSkill('Practical')" onmouseout="view.showSkill(undefined)">
-                    <div class="skillLabel medium bold localized" data-lockey="skills>practical>label"></div>
-                    <div class="statNum medium"><div id="skillPracticalLevel">0</div></div>
-                    <div style="margin-top:18px;"></div>
-                    <div class="thinProgressBarUpper"><div class="statBar skillExpBar townExpBar" id="skillPracticalLevelBar"></div></div>
-                    <div class="showthis" style="width:490px">
-                        <span class="localized" data-lockey="skills>practical>desc"></span><br>
-                        <div class="medium bold localized" data-lockey="skills>tooltip>level_exp"></div> <div id="skillPracticalLevelExp"></div>/<div id="skillPracticalLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="skillPracticalLevelProgress"></div>%)</div><br>
-                        <span class="localized" data-lockey="skills>practical>desc2"></span>
-                    </div>
-                </div>
-                <div class="skillContainer showthat" id="skillAlchemyContainer" onmouseover="view.showSkill('Alchemy')" onmouseout="view.showSkill(undefined)">
-                    <div class="skillLabel medium bold localized" data-lockey="skills>alchemy>label">Alchemy</div>
-                    <div class="statNum medium"><div id="skillAlchemyLevel">0</div></div>
-                    <div style="margin-top:18px;"></div>
-                    <div class="thinProgressBarUpper"><div class="statBar skillExpBar townExpBar" id="skillAlchemyLevelBar"></div></div>
-                    <div class="showthis">
-                        <span class="localized" data-lockey="skills>alchemy>desc"></span><br>
-                        <div class="medium bold localized" data-lockey="skills>tooltip>level_exp"></div> <div id="skillAlchemyLevelExp"></div>/<div id="skillAlchemyLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="skillAlchemyLevelProgress"></div>%)</div><br>
-                        <span class="localized" data-lockey="skills>alchemy>desc2"></span><br>
-                    </div>
-                </div>
-                <div class="skillContainer showthat" id="skillDarkContainer" onmouseover="view.showSkill('Dark')" onmouseout="view.showSkill(undefined)">
-                    <div class="skillLabel medium bold localized" data-lockey="skills>dark>label"></div>
-                    <div class="statNum medium"><div id="skillDarkLevel">0</div></div>
-                    <div style="margin-top:18px;"></div>
-                    <div class="thinProgressBarUpper"><div class="statBar skillExpBar townExpBar" id="skillDarkLevelBar"></div></div>
-                    <div class="showthis" style="width:490px">
-                        <span class="localized" data-lockey="skills>dark>desc"></span><br>
-                        <div class="medium bold localized" data-lockey="skills>tooltip>level_exp"></div> <div id="skillDarkLevelExp"></div>/<div id="skillDarkLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="skillDarkLevelProgress"></div>%)</div><br>
-                        <span class="localized" data-lockey="skills>dark>desc2"></span>
-                    </div>
-                </div>
-                <div class="skillContainer showthat" id="skillCraftingContainer" onmouseover="view.showSkill('Crafting')" onmouseout="view.showSkill(undefined)">
-                    <div class="skillLabel medium bold localized" data-lockey="skills>crafting>label"></div>
-                    <div class="statNum medium"><div id="skillCraftingLevel">0</div></div>
-                    <div style="margin-top:18px;"></div>
-                    <div class="thinProgressBarUpper"><div class="statBar skillExpBar townExpBar" id="skillCraftingLevelBar"></div></div>
-                    <div class="showthis">
-                        <span class="localized" data-lockey="skills>crafting>desc"></span><br>
-                        <div class="medium bold localized" data-lockey="skills>tooltip>level_exp"></div> <div id="skillCraftingLevelExp"></div>/<div id="skillCraftingLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="skillCraftingLevelProgress"></div>%)</div><br>
-                    </div>
-                </div>
-                <div class="skillContainer showthat" id="skillChronomancyContainer" onmouseover="view.showSkill('Chronomancy')" onmouseout="view.showSkill(undefined)">
-                    <div class="skillLabel medium bold localized" data-lockey="skills>chronomancy>label"></div>
-                    <div class="statNum medium"><div id="skillChronomancyLevel">0</div></div>
-                    <div style="margin-top:18px;"></div>
-                    <div class="thinProgressBarUpper"><div class="statBar skillExpBar townExpBar" id="skillChronomancyLevelBar"></div></div>
-                    <div class="showthis" style="width:490px">
-                        <span class="localized" data-lockey="skills>chronomancy>desc"></span><br>
-                        <div class="medium bold localized" data-lockey="skills>tooltip>level_exp"></div> <div id="skillChronomancyLevelExp"></div>/<div id="skillChronomancyLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="skillChronomancyLevelProgress"></div>%)</div><br>
-                        <span class="localized" data-lockey="skills>chronomancy>desc2"></span>
-                    </div>
-                </div>
-                <div class="skillContainer showthat" id="skillPyromancyContainer" onmouseover="view.showSkill('Pyromancy')" onmouseout="view.showSkill(undefined)">
-                    <div class="skillLabel medium bold localized" data-lockey="skills>pyromancy>label"></div>
-                    <div class="statNum medium"><div id="skillPyromancyLevel">0</div></div>
-                    <div style="margin-top:18px;"></div>
-                    <div class="thinProgressBarUpper"><div class="statBar skillExpBar townExpBar" id="skillPyromancyLevelBar"></div></div>
-                    <div class="showthis" style="width:490px">
-                        <span class="localized" data-lockey="skills>pyromancy>desc"></span><br>
-                        <div class="medium bold localized" data-lockey="skills>tooltip>level_exp"></div> <div id="skillPyromancyLevelExp"></div>/<div id="skillPyromancyLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="skillPyromancyLevelProgress"></div>%)</div><br>
-                        <span class="localized" data-lockey="skills>pyromancy>desc2"></span>
-                    </div>
-                </div>
-                <div class="skillContainer showthat" id="skillRestorationContainer" onmouseover="view.showSkill('Restoration')" onmouseout="view.showSkill(undefined)">
-                    <div class="skillLabel medium bold localized" data-lockey="skills>restoration>label"></div>
-                    <div class="statNum medium"><div id="skillRestorationLevel">0</div></div>
-                    <div style="margin-top:18px;"></div>
-                    <div class="thinProgressBarUpper"><div class="statBar skillExpBar townExpBar" id="skillRestorationLevelBar"></div></div>
-                    <div class="showthis" style="width:490px">
-                        <span class="localized" data-lockey="skills>restoration>desc"></span><br>
-                        <div class="medium bold localized" data-lockey="skills>tooltip>level_exp"></div> <div id="skillRestorationLevelExp"></div>/<div id="skillRestorationLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="skillRestorationLevelProgress"></div>%)</div><br>
-                        <span class="localized" data-lockey="skills>restoration>desc2"></span>
-                    </div>
-                </div>
-                <div class="skillContainer showthat" id="skillSpatiomancyContainer" onmouseover="view.showSkill('Spatiomancy')" onmouseout="view.showSkill(undefined)">
-                    <div class="skillLabel medium bold localized" data-lockey="skills>spatiomancy>label"></div>
-                    <div class="statNum medium"><div id="skillSpatiomancyLevel">0</div></div>
-                    <div style="margin-top:18px;"></div>
-                    <div class="thinProgressBarUpper"><div class="statBar skillExpBar townExpBar" id="skillSpatiomancyLevelBar"></div></div>
-                    <div class="showthis" style="width:490px">
-                        <span class="localized" data-lockey="skills>spatiomancy>desc"></span><br>
-                        <div class="medium bold localized" data-lockey="skills>tooltip>level_exp"></div> <div id="skillSpatiomancyLevelExp"></div>/<div id="skillSpatiomancyLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="skillSpatiomancyLevelProgress"></div>%)</div><br>
-                        <span class="localized" data-lockey="skills>spatiomancy>desc2"></span>
+                        <span class="localized" data-lockey="skills>manacontrol>desc"></span><br>
+                        <div class="medium bold localized" data-lockey="skills>tooltip>level_exp"></div> <div id="skillManaControlLevelExp"></div>/<div id="skillManaControlLevelExpNeeded"></div> <div class="statTooltipPerc">(<div id="skillManaControlLevelProgress"></div>%)</div><br>
                     </div>
                 </div>
             </div>

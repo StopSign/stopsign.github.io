@@ -22,7 +22,6 @@ function View() {
         this.changeTheme(true);
         this.adjustGoldCosts();
         this.adjustExpGains();
-        this.updateTeamCombat();
         this.updateLoadoutNames();
         this.updateResources();
         setInterval(() => {
@@ -181,9 +180,6 @@ function View() {
             return;
         }
         document.getElementById(`skill${skill}Container`).style.display = "inline-block";
-        if (skill === "Combat" || skill === "Pyromancy") {
-            this.updateTeamCombat();
-        }
 
         const levelPrc = getPrcToNextSkillLevel(skill);
         document.getElementById(`skill${skill}Level`).textContent = (getSkillLevel(skill) > 9999) ? toSuffix(getSkillLevel(skill)) : formatNumber(getSkillLevel(skill));
@@ -195,13 +191,13 @@ function View() {
             document.getElementById(`skill${skill}LevelExpNeeded`).textContent = intToString(`${getExpOfSkillLevel(getSkillLevel(skill) + 1) - expOfLevel}`, 1);
             document.getElementById(`skill${skill}LevelProgress`).textContent = intToString(levelPrc, 2);
 
-            if (skill === "Dark") {
+            /*if (skill === "Dark") {
                 document.getElementById("skillBonusDark").textContent = intToString(Math.pow(1 + getSkillLevel("Dark") / 60, 0.25), 4);
             } else if (skill === "Chronomancy") {
                 document.getElementById("skillBonusChronomancy").textContent = intToString(Math.pow(1 + getSkillLevel("Chronomancy") / 60, 0.25), 4);
             } else if (skill === "Practical") {
                 document.getElementById("skillBonusPractical").textContent = (1 / (1 + getSkillLevel("Practical") / 100)).toFixed(3).replace(/(\.\d*?[1-9])0+$/gu, "$1");
-            }
+            }*/
         }
     };
 
@@ -231,7 +227,7 @@ function View() {
 
     this.updateTime = function() {
         document.getElementById("timeBar").style.width = `${100 - timer / timeNeeded * 100}%`;
-        document.getElementById("timer").textContent = `${intToString((timeNeeded - timer), 1)} | ${formatTime((timeNeeded - timer) / 50 / getActualGameSpeed())}`;
+        document.getElementById("timer").textContent = `${intToString((timeNeeded - timer), 1)} | ${formatTime((timeNeeded - timer) / baseManaPerSecond / getActualGameSpeed())}`;
     };
     this.updateTotalTicks = function() {
         document.getElementById("totalTicks").textContent = `${formatNumber(actions.completedTicks)} | ${formatTime(timeCounter)}`;
@@ -246,17 +242,6 @@ function View() {
     };
     this.updateResources = function() {
         for (const resource in resources) this.updateResource(resource);
-    };
-    this.updateTeamCombat = function() {
-        if (towns[2].unlocked) {
-            document.getElementById("skillSCombatContainer").style.display = "inline-block";
-            document.getElementById("skillTCombatContainer").style.display = "inline-block";
-            document.getElementById("skillSCombatLevel").textContent = intToString(getSelfCombat(), 1);
-            document.getElementById("skillTCombatLevel").textContent = intToString(getTeamCombat(), 1);
-        } else {
-            document.getElementById("skillSCombatContainer").style.display = "none";
-            document.getElementById("skillTCombatContainer").style.display = "none";
-        }
     };
     this.zoneTints = [
         "rgba(255, 152, 0, 0.2)",
@@ -335,12 +320,7 @@ function View() {
             for (const collapse of collapses) {
                 if (townNum === collapse.zone && i < collapse.index) display =  "display: none"
             }
-            let color;
-            if (action.name === "Face Judgement") {
-                color = "linear-gradient(to bottom, rgb(183, 203, 196) 49%, transparent 51%), linear-gradient(to right, rgba(255, 255, 255, 0.2) 50%, rgba(103, 58, 183, 0.2) 51%)";
-            } else {
-                color = travelNum > 0 ? `linear-gradient(${this.zoneTints[townNum]} 49%, ${this.zoneTints[townNum + travelNum]} 51%)` : this.zoneTints[townNum];
-            }
+            let color = travelNum > 0 ? `linear-gradient(${this.zoneTints[townNum]} 49%, ${this.zoneTints[townNum + travelNum]} 51%)` : this.zoneTints[townNum];
             totalDivText +=
                 `<div
                     id='nextActionContainer${i}'
@@ -754,7 +734,7 @@ function View() {
                 ondragover='handleDragOver(event)'
                 ondragstart='handleDirectActionDragStart(event, "${action.name}", ${action.townNum}, "${action.varName}", false)'
                 ondragend='handleDirectActionDragEnd("${action.varName}")'
-                onclick='addActionToList("${action.name}", ${action.townNum})'
+                onclick='addActionToList("${action.name}", ${action.townNum}, ${isTravel})'
             >
                 ${action.label}<br>
                 <div style='position:relative'>

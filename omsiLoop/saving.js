@@ -86,7 +86,6 @@ let statShowing;
 let skillShowing;
 let curActionShowing;
 let dungeonShowing;
-let actionTownNum;
 let trainingLimits;
 let storyShowing = 0;
 let storyMax = 0;
@@ -282,7 +281,7 @@ function load() {
     for (let i = 0; i < 6; i++) {
         towns[i] = new Town(i);
     }
-    actionTownNum = toLoad.actionTownNum === undefined ? 0 : toLoad.actionTownNum;
+    //actionTownNum = toLoad.actionTownNum === undefined ? 0 : toLoad.actionTownNum;
     trainingLimits = toLoad.trainingLimits === undefined ? 10 : toLoad.trainingLimits;
 
     actions.next = [];
@@ -446,7 +445,7 @@ function save() {
     toSave.curLoadout = curLoadout;
     toSave.dungeons = dungeons;
     toSave.townsUnlocked = townsUnlocked;
-    toSave.actionTownNum = actionTownNum;
+    //toSave.actionTownNum = actionTownNum;
     toSave.trainingLimits = trainingLimits;
 
     toSave.stats = stats;
@@ -644,7 +643,7 @@ function exportOldSave() {
     if (towns[2].unlocked()) toSave.maxTown = 2;
     else if (towns[1].unlocked()) toSave.maxTown = 1;
     else if (towns[0].unlocked()) toSave.maxTown = 0;
-    toSave.actionTownNum = 0;
+    //toSave.actionTownNum = 0;
     toSave.trainingLimits = 10;
 
     let currentTown = towns[0];

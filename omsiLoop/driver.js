@@ -172,7 +172,7 @@ function addActionToList(name, townNum, isTravelAction, insertAtIndex) {
                     }
                 }
                 if (isTravelAction) {
-                    actionTownNum = townNum + 1;
+                    //actionTownNum = townNum + 1;
                     actions.addAction(name, 1, insertAtIndex);
                 } else {
                     actions.addAction(name, addAmount, insertAtIndex);
@@ -502,7 +502,7 @@ function disableAction(index) {
     const action = actions.next[index];
     const travelNum = getTravelNum(action.name);
     if (travelNum) {
-        actionTownNum = travelNum - 1;
+        //actionTownNum = travelNum - 1;
     }
     const translated = translateClassNames(action.name);
     if (action.disabled) {
@@ -517,7 +517,7 @@ function removeAction(index) {
     actions.nextLast = copyObject(actions.next);
     const travelNum = getTravelNum(actions.next[index].name);
     if (travelNum) {
-        actionTownNum = travelNum - 1;
+        //actionTownNum = travelNum - 1;
     }
     actions.next.splice(index, 1);
     view.updateNextActions();

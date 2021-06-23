@@ -22,9 +22,11 @@
       <excludeFolder url="file://$MODULE_DIR$/angAndReSkinAndReOrg" />
       <excludeFolder url="file://$MODULE_DIR$/growGL" />
       <excludeFolder url="file://$MODULE_DIR$/hungerIdle" />
+      <excludeFolder url="file://$MODULE_DIR$/idleLoops" />
       <excludeFolder url="file://$MODULE_DIR$/miner" />
       <excludeFolder url="file://$MODULE_DIR$/old1" />
       <excludeFolder url="file://$MODULE_DIR$/old2" />
+      <excludeFolder url="file://$MODULE_DIR$/omsiLoop" />
       <excludeFolder url="file://$MODULE_DIR$/progressBarQuest" />
       <excludeFolder url="file://$MODULE_DIR$/progressBarQuest3" />
       <excludeFolder url="file://$MODULE_DIR$/speedTests" />
