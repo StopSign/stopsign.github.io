@@ -1,15 +1,15 @@
 "use strict";
 function initializeStats() {
     for (let i = 0; i < statList.length; i++) {
-        addNewStat(statList[i]);
+        addNewStat(stats, statList[i]);
     }
 }
 
-function addNewStat(name) {
-    stats[name] = {};
-    stats[name].exp = 0;
-    stats[name].talent = 0;
-    stats[name].soulstone = 0;
+function addNewStat(theStats, name) {
+    theStats[name] = {};
+    theStats[name].exp = 0;
+    theStats[name].talent = 0;
+    theStats[name].soulstone = 0;
 }
 
 function initializeSkills() {
@@ -114,6 +114,9 @@ function addSkillExp(name, amount) {
 }
 
 function handleSkillExp(list) {
+    if(!list) {
+        return;
+    }
     for (const skill in list) {
         if (Number.isInteger(list[skill])) addSkillExp(skill, list[skill]);
         else addSkillExp(skill, list[skill]());

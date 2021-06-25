@@ -6,10 +6,13 @@ Math.log2 = Math.log2 || function(x) { return Math.log(x) * Math.LOG2E; };
 Math.log10 = Math.log10 || function(x) { return Math.log(x) * Math.LOG10E; };
 
 function round1(num) {
-    return Math.floor(num * 10) / 10;
+    return Math.floor(num * 10 + .000000001) / 10;
 }
 function round2(num) {
-    return Math.floor(num * 100) / 100;
+    return Math.floor(num * 100 + .000000001) / 100;
+}
+function round5(num) {
+    return Math.floor(num * 100000 + .000000001) / 100000;
 }
 
 function precision2(num) {
@@ -77,6 +80,7 @@ function intToStringNegative(value, amount) {
 }
 
 function intToString(value, amount) {
+    value += .0000001;
     if (value >= 10000) {
         return nFormatter(value, 3);
     }

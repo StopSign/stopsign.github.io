@@ -22,7 +22,6 @@
     <!--<div>Icons made by <a href="https://www.flaticon.com/authors/prettycons" title="prettycons">prettycons</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></div>-->
 </head>
 <body id="theBody" style="min-width:1210px">
-    <canvas id="talentTreeCanvas" style="display: none;"></canvas>
     <div id="talentTree" style="display: none;"></div>
     <div id="timeInfo" style="width:100%;text-align:center;">
         <button id="cheat" class="button showthat control" style="display: none; margin-top: 5px;" onclick="cheat()">Cheat</button>
@@ -95,7 +94,7 @@
         </div>
     </div>
 
-    <div id="actionsColumn" style="width:350px;vertical-align:top;">
+    <div id="actionsColumn" style="width:400px;vertical-align:top;">
         <div id="actionList" style="width:100%;text-align:center;">
             <div class="showthat">
                 <div class="large bold localized" style="margin-right: -49px;" data-lockey="actions>title_list"></div>
@@ -111,7 +110,7 @@
                     <span class='localized' data-lockey="actions>tooltip>list_explanation"></span>
                 </div>
             </div>
-            <div style="position: relative; left: 135px;">
+            <div style="position: relative; left: 159px;">
                 <div class="button" style="z-index: 0;" onclick="adjustActionListSize(100)">+</div>
                 <div class="button" style="z-index: 0;" onclick="adjustActionListSize(-100)">-</div>
             </div>
@@ -239,9 +238,9 @@
     <script src="actions.js"></script>
     <script src="views/main.view.js"></script>
     <script src="town.js"></script>
-    <script src="talents.js"></script>
     <script src="saving.js"></script>
     <script src="hotkeys.js"></script>
+    <script src="predictor.js"></script>
     <script src="views/views.js"></script>
     <script src="views/menu.view.js"></script>
     <script src="views/trackedresources.view.js"></script>

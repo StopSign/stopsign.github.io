@@ -37,9 +37,16 @@ Statistics menu
     Total mana spent
     Total Actions
 Count/save individual action #
-Make actions take less time, based on log10(number/100)
+Make actions take less time, based on log10(number/100) ??
 Fix radar chart
 Integrate the predictor
 drop-down city selection
 fix drag and drop
 stats are less effective but gain more at certain zones
+change travel actiosn to be the same size, but have a goto button on them
+repeat previous action until X mana used
+repeat previous action until X mana left
+repeat until no more to check
+redesign saving loadout name
+mobile - double click
+sliding scale bonus use 5x - 25x, higher being lower efficiency

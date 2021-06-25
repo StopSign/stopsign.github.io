@@ -16,16 +16,14 @@ function translateClassNames(name) {
 
 const limitedActions = [
     "Drink Potion",
+    "Uncover Crystal",
+    "Absorb Vein"
 ];
 const trainingActions = [
     //"Train Speed",
 ];
 function hasLimit(name) {
     return limitedActions.includes(name);
-}
-function getTravelNum(name) {
-    if (name === "Dive Into Well") return 1;
-    return 0;
 }
 function isTraining(name) {
     return trainingActions.includes(name);
@@ -34,8 +32,6 @@ function isTraining(name) {
 function getXMLName(name) {
     return name.toLowerCase().replace(/ /gu, "_");
 }
-
-const townNames = ["Beginnersville", "Forest Path", "Merchanton", "Mt. Olympus", "Valhalla", "Adeptsville"];
 
 
 // there are 4 types of actions
@@ -130,9 +126,6 @@ DungeonAction.prototype.getPartName = function() {
     const floor = Math.floor((towns[this.townNum][`${this.varName}LoopCounter`] + 0.0001) / this.segments + 1);
     return `${_txt(`actions>${getXMLName(this.name)}>label_part`)} ${floor <= dungeons[this.dungeonNum].length ? numberToWords(floor) : _txt(`actions>${getXMLName(this.name)}>label_complete`)}`;
 };
-const actionsWithGoldCost = Object.values(Action).filter(
-    action => action.goldCost !== undefined
-);
 
 function finishDungeon(dungeonNum, floorNum) {
     const floor = dungeons[dungeonNum][floorNum];
@@ -185,12 +178,12 @@ Action.SensePotions = new Action("Sense Potions", {
         return true;
     },
     finish() {
-        towns[0].finishProgress(this.varName, 5000 * (1 + getSkillLevel("ManaSense")));
+        towns[0].finishProgress(this.varName, 10000 * (1 + getSkillLevel("ManaSense")));
         handleSkillExp(this.skills);
     }
 });
 function adjustManaPots() {
-    towns[0].totalDrinkPotion = towns[0].getLevel("SensePotions");
+    towns[0].totalDrinkPotion = Math.floor(towns[0].getLevel("SensePotions") / 10 + 0.0000001);
 }
 
 Action.DrinkPotion = new Action("Drink Potion", {
@@ -205,7 +198,8 @@ Action.DrinkPotion = new Action("Drink Potion", {
         return false;
     },
     stats: {
-        Will:1
+        Will:.9,
+        Ref:.1
     },
     manaCost() {
         return 100;
@@ -216,13 +210,12 @@ Action.DrinkPotion = new Action("Drink Potion", {
     unlocked() {
         return true;
     },
-    // note this name is misleading: it is used for mana and gold gain.
-    goldCost() {
-        return 150;
+    manaGain() {
+        return 200;
     },
     finish() {
-        towns[0].finishRegular(this.varName, 10, () => {
-            const manaGain = this.goldCost();
+        towns[0].finishRegular(this.varName, 2, () => {
+            const manaGain = this.manaGain();
             addMana(manaGain);
             return manaGain;
         });
@@ -233,6 +226,7 @@ Action.DiveIntoWell = new Action("Dive Into Well", {
     type: "normal",
     expMult: 1,
     townNum: 0,
+    travelTarget:1,
     storyReqs(storyNum) {
         switch (storyNum) {
             case 1:
@@ -241,8 +235,8 @@ Action.DiveIntoWell = new Action("Dive Into Well", {
         return false;
     },
     stats: {
-        Will:.9,
-        Ele:.1
+        Will:.8,
+        Ref:.2
     },
     allowed() {
         return 1;
@@ -254,20 +248,14 @@ Action.DiveIntoWell = new Action("Dive Into Well", {
         return true;
     },
     visible() {
-        return towns[0].getLevel("SensePotions") >= 100;
+        return towns[0].getLevel("SensePotions") >= 60;
     },
     unlocked() {
-        return getSkillLevel("ManaSense") >= 3;
+        return getSkillLevel("ManaSense") >= 2;
     },
     finish() {
-        unlockTown(1);
-        curTown = 1;
-    },
-    unlock() {
-        unlockTown(1);
     }
 });
-
 
 Action.SenseCrystals = new Action("Sense Crystals", {
     type: "progress",
@@ -283,7 +271,7 @@ Action.SenseCrystals = new Action("Sense Crystals", {
         return false;
     },
     skills: {
-        ManaSense: 30
+        ManaSense: 25
     },
     stats: {
         Con:.3,
@@ -291,7 +279,7 @@ Action.SenseCrystals = new Action("Sense Crystals", {
         Will:.1
     },
     manaCost() {
-        return 600;
+        return 500;
     },
     visible() {
         return true;
@@ -300,12 +288,12 @@ Action.SenseCrystals = new Action("Sense Crystals", {
         return true;
     },
     finish() {
-        towns[1].finishProgress(this.varName, 3000 * (1 + getSkillLevel("ManaSense")));
+        towns[1].finishProgress(this.varName, 7500 * (1 + getSkillLevel("ManaSense")));
         handleSkillExp(this.skills);
     }
 });
 function adjustManaCrystals() {
-    towns[1].totalUncoverCrystal = Math.floor(towns[1].getLevel("SenseCrystals") / 10);
+    towns[1].totalUncoverCrystal = Math.floor(towns[1].getLevel("SenseCrystals") / 10 + .000001) + Math.floor(towns[1].getLevel("ExploreTunnels") / 10 + .000001);
 }
 
 Action.UncoverCrystal = new Action("Uncover Crystal", {
@@ -337,15 +325,605 @@ Action.UncoverCrystal = new Action("Uncover Crystal", {
     unlocked() {
         return true;
     },
-    goldCost() {
+    manaGain() {
         return 600 + (getSkillLevel("ManaControl") > 20 ? 20 : getSkillLevel("ManaControl")) * 10;
     },
     finish() {
         towns[1].finishRegular(this.varName, 2, () => {
-            const manaGain = this.goldCost();
+            const manaGain = this.manaGain();
             addMana(manaGain);
             return manaGain;
         });
         handleSkillExp(this.skills);
+        view.adjustManaCost("Absorb Source");
+        view.adjustManaCost("Get Well Mana");
     }
 });
+
+Action.ExploreTunnels = new Action("Explore Tunnels", {
+    type: "progress",
+    expMult: 1,
+    townNum: 1,
+    storyReqs(storyNum) {
+        switch (storyNum) {
+            case 1:
+                return towns[this.townNum].getLevel(this.varName) >= 50;
+            case 2:
+                return towns[this.townNum].getLevel(this.varName) >= 80;
+            case 3:
+                return towns[this.townNum].getLevel(this.varName) >= 100;
+        }
+        return false;
+    },
+    stats: {
+        Per:.5,
+        Ref:.3,
+        Soul:.2
+    },
+    skills: {
+        ManaSense: 30
+    },
+    manaCost() {
+        return 600;
+    },
+    visible() {
+        return towns[1].getLevel("SenseCrystals") >= 80;
+    },
+    unlocked() {
+        return towns[1].getLevel("SenseCrystals") >= 100;
+    },
+    finish() {
+        addResource("exploreTunnels", true);
+        towns[this.townNum].finishProgress(this.varName, 5000 * (1 + getSkillLevel("ManaSense")));
+        handleSkillExp(this.skills);
+    }
+});
+
+Action.DiscoverTraps = new Action("Discover Traps", {
+    type: "progress",
+    expMult: 1,
+    townNum: 1,
+    storyReqs(storyNum) {
+        switch (storyNum) {
+            case 1:
+                return towns[1].getLevel(this.varName) >= 100;
+        }
+        return false;
+    },
+    stats: {
+        Per:.5,
+        Ref:.5
+    },
+    affectedBy: ["Explore Tunnels"],
+    manaCost() {
+        return 600;
+    },
+    canStart() {
+        return resources.exploreTunnels;
+    },
+    skills: {
+        ManaSense: 30
+    },
+    visible() {
+        return towns[1].getLevel("ExploreTunnels") >= 80;
+    },
+    unlocked() {
+        return towns[1].getLevel("ExploreTunnels") >= 100;
+    },
+    finish() {
+        towns[1].finishProgress(this.varName, 3000 * (1 + getSkillLevel("ManaSense")));
+        handleSkillExp(this.skills);
+    }
+});
+
+Action.Switch1 = new Action("Switch1", {
+    type: "normal",
+    expMult: 1,
+    townNum: 1,
+    storyReqs(storyNum) {
+        switch (storyNum) {
+            case 1:
+                return resources.switch1;
+        }
+        return false;
+    },
+    stats: {
+        Con:.5,
+        Ref:.5
+    },
+    affectedBy: ["Explore Tunnels"],
+    allowed() {
+        return 1;
+    },
+    manaCost() {
+        return 200;
+    },
+    canStart() {
+        return resources.exploreTunnels;
+    },
+    visible() {
+        return towns[1].getLevel("DiscoverTraps") >= 40;
+    },
+    unlocked() {
+        return towns[1].getLevel("DiscoverTraps") >= 100;
+    },
+    finish() {
+        addResource("switch1", true);
+    },
+});
+
+Action.Switch2 = new Action("Switch2", {
+    type: "normal",
+    expMult: 1,
+    townNum: 1,
+    storyReqs(storyNum) {
+        switch (storyNum) {
+            case 1:
+                return resources.switch2;
+        }
+        return false;
+    },
+    stats: {
+        Con:.5,
+        Ref:.5
+    },
+    affectedBy: ["Explore Tunnels"],
+    allowed() {
+        return 1;
+    },
+    manaCost() {
+        return 200;
+    },
+    canStart() {
+        return resources.exploreTunnels;
+    },
+    visible() {
+        return towns[1].getLevel("DiscoverTraps") >= 70;
+    },
+    unlocked() {
+        return towns[1].getLevel("DiscoverTraps") >= 100;
+    },
+    finish() {
+        addResource("switch2", true);
+    },
+});
+
+Action.Switch3 = new Action("Switch3", {
+    type: "normal",
+    expMult: 1,
+    townNum: 1,
+    storyReqs(storyNum) {
+        switch (storyNum) {
+            case 1:
+                return resources.switch3;
+        }
+        return false;
+    },
+    stats: {
+        Con:.5,
+        Ref:.5
+    },
+    affectedBy: ["Explore Tunnels"],
+    allowed() {
+        return 1;
+    },
+    manaCost() {
+        return 200;
+    },
+    canStart() {
+        return resources.exploreTunnels;
+    },
+    visible() {
+        return towns[1].getLevel("DiscoverTraps") >= 100;
+    },
+    unlocked() {
+        return towns[1].getLevel("DiscoverTraps") >= 100;
+    },
+    finish() {
+        addResource("switch3", true);
+    },
+});
+
+Action.DisarmTraps = new Action("Disarm Traps", {
+    type: "normal",
+    expMult: 1,
+    townNum: 1,
+    storyReqs(storyNum) {
+        switch (storyNum) {
+            case 1:
+                return resources.disarmTraps;
+        }
+        return false;
+    },
+    stats: {
+        Ele:1
+    },
+    affectedBy: ["Switch1", "Switch2", "Switch3"],
+    allowed() {
+        return 1;
+    },
+    manaCost() {
+        return 400;
+    },
+    canStart() {
+        return resources.switch1 && resources.switch2 && resources.switch3;
+    },
+    visible() {
+        return towns[1].getLevel("DiscoverTraps") >= 100;
+    },
+    unlocked() {
+        return towns[1].getLevel("DiscoverTraps") >= 100;
+    },
+    finish() {
+        addResource("disarmTraps", true);
+    },
+});
+
+Action.ExploreDeep = new Action("Explore Deep", {
+    type: "progress",
+    expMult: 1,
+    townNum: 1,
+    storyReqs(storyNum) {
+        switch (storyNum) {
+            case 1:
+                return towns[this.townNum].getLevel(this.varName) >= 50;
+            case 2:
+                return towns[this.townNum].getLevel(this.varName) >= 100;
+        }
+        return false;
+    },
+    stats: {
+        Per:.4,
+        Ref:.3,
+        Soul:.3
+    },
+    skills: {
+        ManaSense: 50
+    },
+    affectedBy: ["Disarm Traps"],
+    canStart() {
+        return resources.disarmTraps;
+    },
+    manaCost() {
+        return 1000;
+    },
+    visible() {
+        return towns[1].getLevel("DiscoverTraps") >= 100;
+    },
+    unlocked() {
+        return towns[1].getLevel("DiscoverTraps") >= 100;
+    },
+    finish() {
+        addResource("exploreTunnels", true);
+        towns[this.townNum].finishProgress(this.varName, 2000 * (1 + getSkillLevel("ManaSense")));
+        handleSkillExp(this.skills);
+    }
+});
+function adjustManaVein() {
+    towns[1].totalAbsorbVein = Math.floor(towns[1].getLevel("ExploreDeep") / 20 + .000001);
+}
+
+Action.AbsorbVein = new Action("Absorb Vein", {
+    type: "limited",
+    expMult: 1,
+    townNum: 1,
+    storyReqs(storyNum) {
+        switch (storyNum) {
+            case 1:
+                return towns[1][`good${this.varName}`] >= 5;
+        }
+        return false;
+    },
+    stats: {
+        Con:.6,
+        Will:.4
+    },
+    skills: {
+        ManaControl: 50
+    },
+    affectedBy: ["Disarm Traps"],
+    canStart() {
+        return resources.disarmTraps;
+    },
+    manaCost() {
+        return 1000;
+    },
+    visible() {
+        return towns[1].getLevel("ExploreDeep") >= 20;
+    },
+    unlocked() {
+        return towns[1].getLevel("ExploreDeep") >= 20;
+    },
+    manaGain() {
+        let controlSkill = getSkillLevel("ManaControl") - 10;
+        if(controlSkill < 0) {
+            controlSkill = 0;
+        }
+        return 1500 + (controlSkill > 20 ? 20 : controlSkill) * 25;
+    },
+    finish() {
+        towns[1].finishRegular(this.varName, 1, () => {
+            const manaGain = this.manaGain();
+            addMana(manaGain);
+            return manaGain;
+        });
+        handleSkillExp(this.skills);
+        view.adjustManaCost("Absorb Source");
+        view.adjustManaCost("Get Well Mana");
+    }
+});
+
+Action.GetToSource = new Action("Get To Source", {
+    type: "normal",
+    expMult: 1,
+    townNum: 1,
+    storyReqs(storyNum) {
+        switch (storyNum) {
+            case 1:
+                return resources.getToSource;
+        }
+        return false;
+    },
+    stats: {
+        Con:.4,
+        Ref:.4,
+        Will:.2
+    },
+    affectedBy: ["Disarm Traps"],
+    canStart() {
+        return resources.disarmTraps;
+    },
+    allowed() {
+        return 1;
+    },
+    manaCost() {
+        return 3000;
+    },
+    visible() {
+        return towns[1].getLevel("ExploreDeep") >= 100;
+    },
+    unlocked() {
+        return towns[1].getLevel("ExploreDeep") >= 100;
+    },
+    finish() {
+        addResource("getToSource", true);
+    }
+});
+
+Action.AbsorbSource = new Action("Absorb Source", {
+    type: "normal",
+    expMult: 1,
+    townNum: 1,
+    storyReqs(storyNum) {
+        switch (storyNum) {
+            case 1:
+                return resources.absorbSource;
+        }
+        return false;
+    },
+    stats: {
+        Con:.5,
+        Will:.5
+    },
+    skills: {
+        ManaControl: 300
+    },
+    affectedBy: ["Get To Source"],
+    canStart() {
+        return resources.getToSource;
+    },
+    allowed() {
+        return 1;
+    },
+    manaCost() {
+        let controlSkill = getSkillLevel("ManaControl") - 10;
+        if(controlSkill < 0) {
+            controlSkill = 0;
+        }
+        return 2000 - (controlSkill > 24 ? 24 : controlSkill) * 50;
+    },
+    visible() {
+        return towns[1].getLevel("ExploreDeep") >= 100;
+    },
+    unlocked() {
+        return towns[1].getLevel("ExploreDeep") >= 100;
+    },
+    finish() {
+        handleSkillExp(this.skills);
+        addResource("absorbSource", true);
+        addMana(4000);
+        view.adjustManaCost("Absorb Source");
+        view.adjustManaCost("Get Well Mana");
+    },
+});
+
+Action.EscapeRoutes = new Action("Escape Routes", {
+    type: "progress",
+    expMult: 1,
+    townNum: 1,
+    storyReqs(storyNum) {
+        switch (storyNum) {
+            case 1:
+                return towns[this.townNum].getLevel(this.varName) >= 100;
+        }
+        return false;
+    },
+    stats: {
+        Per:.6,
+        Ele:.4
+    },
+    affectedBy: ["Absorb Source"],
+    canStart() {
+        return resources.absorbSource;
+    },
+    manaCost() {
+        return 1000;
+    },
+    visible() {
+        return towns[1].getLevel("ExploreDeep") >= 100;
+    },
+    unlocked() {
+        return towns[1].getLevel("ExploreDeep") >= 100;
+    },
+    finish() {
+        addResource("exploreTunnels", true);
+        towns[this.townNum].finishProgress(this.varName, 20000);
+        handleSkillExp(this.skills);
+    }
+});
+
+Action.EscapeWell = new Action("Escape Well", {
+    type: "normal",
+    expMult: 1,
+    townNum: 1,
+    travelTarget: 0,
+    storyReqs(storyNum) {
+        switch (storyNum) {
+            case 1:
+                return storyReqs.wellEscaped;
+        }
+        return false;
+    },
+    stats: {
+        Con:.4,
+        Ref:.4,
+        Will:.2
+    },
+    allowed() {
+        return 1;
+    },
+    manaCost() {
+        return 2000;
+    },
+    visible() {
+        return towns[1].getLevel("EscapeRoutes") >= 80;
+    },
+    unlocked() {
+        return towns[1].getLevel("EscapeRoutes") >= 100;
+    },
+    finish() {
+        unlockStory("wellEscaped");
+    }
+});
+
+Action.GetWellMana = new Action("Get Well Mana", {
+    type: "normal",
+    expMult: 1,
+    townNum: 0,
+    storyReqs(storyNum) {
+        switch (storyNum) {
+            case 1:
+                return resources.getWellMana;
+        }
+        return false;
+    },
+    stats: {
+        Con:.5,
+        Will:.5
+    },
+    skills: {
+        ManaControl: 300
+    },
+    affectedBy: ["Buy Ladder"],
+    canStart() {
+        return !resources.absorbSource && resources.ladder;
+    },
+    allowed() {
+        return 1;
+    },
+    manaCost() {
+        let controlSkill = getSkillLevel("ManaControl") - 10;
+        if(controlSkill < 0) {
+            controlSkill = 0;
+        }
+        return 2200 - (controlSkill > 24 ? 24 : controlSkill) * 50;
+    },
+    visible() {
+        return storyReqs.wellEscaped;
+    },
+    unlocked() {
+        return storyReqs.wellEscaped;
+    },
+    finish() {
+        handleSkillExp(this.skills);
+        unlockStory("getWellMana");
+        addMana(4000);
+        view.adjustManaCost("Absorb Source");
+        view.adjustManaCost("Get Well Mana");
+    },
+});
+
+Action.BuyLadder = new Action("Buy Ladder", {
+    type: "normal",
+    expMult: 1,
+    townNum: 0,
+    storyReqs(storyNum) {
+        switch (storyNum) {
+            case 1:
+                return resources.ladder;
+        }
+        return false;
+    },
+    stats: {
+        Lead: 1
+    },
+    allowed() {
+        return 1;
+    },
+    canStart() {
+        return true; //resources.gold >= 10;
+    },
+    cost() {
+        //addResource("gold", -10);
+    },
+    manaCost() {
+        return 200;
+    },
+    visible() {
+        return storyReqs.wellEscaped;
+    },
+    unlocked() {
+        return storyReqs.wellEscaped;
+    },
+    finish() {
+        addResource("ladder", true);
+    }
+});
+
+Action.LearnHealing = new Action("Learn Healing", {
+    type: "progress",
+    expMult: 1,
+    townNum: 0,
+    storyReqs(storyNum) {
+        switch (storyNum) {
+            case 1:
+                return towns[this.townNum].getLevel(this.varName) >= 100;
+        }
+        return false;
+    },
+    stats: {
+        Will:1
+    },
+    manaCost() {
+        return 500;
+    },
+    visible() {
+        return storyReqs.wellEscaped;
+    },
+    unlocked() {
+        return storyReqs.wellEscaped;
+    },
+    finish() {
+        addResource("exploreTunnels", true);
+        towns[this.townNum].finishProgress(this.varName, 600 * (1 + getSkillLevel("ManaSense")));
+        handleSkillExp(this.skills);
+    }
+});
+
+
+
+
+//needs to be at the end
+const actionsWithManaGain = Object.values(Action).filter(
+    action => action.manaGain !== undefined
+);

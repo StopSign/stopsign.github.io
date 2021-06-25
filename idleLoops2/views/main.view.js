@@ -20,7 +20,7 @@ function View() {
         this.updateTrainingLimits();
         this.changeStatView();
         this.changeTheme(true);
-        this.adjustGoldCosts();
+        this.adjustManaGains();
         this.adjustExpGains();
         this.updateLoadoutNames();
         this.updateResources();
@@ -233,10 +233,12 @@ function View() {
         document.getElementById("totalTicks").textContent = `${formatNumber(actions.completedTicks)} | ${formatTime(timeCounter)}`;
     };
     this.updateResource = function(resource) {
-        if (resource !== "gold") document.getElementById(`${resource}Div`).style.display = resources[resource] ? "inline-block" : "none";
+        let resourceDiv = document.getElementById(`${resource}Div`);
+        if(!resourceDiv) {
+            return;
+        }
+        if (resource !== "gold") resourceDiv.style.display = resources[resource] ? "inline-block" : "none";
 
-        if (resource === "supplies") document.getElementById("suppliesCost").textContent = towns[0].suppliesCost;
-        if (resource === "teamMembers") document.getElementById("teamCost").textContent = (resources.teamMembers + 1) * 100;
 
         if (Number.isFinite(resources[resource])) document.getElementById(resource).textContent = resources[resource];
     };
@@ -253,6 +255,7 @@ function View() {
     ];
     this.updateNextActions = function() {
         let count = 0;
+        //Remove existing, and listeners, to avoid memory leak
         while (nextActionsDiv.firstChild) {
             if (document.getElementById(`capButton${count}`)) {
                 document.getElementById(`capButton${count}`).removeAttribute("onclick");
@@ -292,7 +295,7 @@ function View() {
             const translatedAction = translateClassNames(action.name);
             let capButton = "";
             const townNum = translatedAction.townNum;
-            const travelNum = getTravelNum(action.name);
+            const travelNum = translatedAction.travelTarget;
             const collapses = [];
             // eslint-disable-next-line no-loop-func
             actions.next.forEach((a, index) => {
@@ -320,7 +323,7 @@ function View() {
             for (const collapse of collapses) {
                 if (townNum === collapse.zone && i < collapse.index) display =  "display: none"
             }
-            let color = travelNum > 0 ? `linear-gradient(${this.zoneTints[townNum]} 49%, ${this.zoneTints[townNum + travelNum]} 51%)` : this.zoneTints[townNum];
+            let color = travelNum !== undefined ? `linear-gradient(${this.zoneTints[townNum]} 49%, ${this.zoneTints[travelNum]} 51%)` : this.zoneTints[townNum];
             totalDivText +=
                 `<div
                     id='nextActionContainer${i}'
@@ -334,8 +337,11 @@ function View() {
                     draggable='true' data-index='${i}'
                     style='background: ${color}; ${opacity}; ${display};'
                 >
-                    <div><img src='img/${camelize(action.name)}.svg' class='smallIcon imageDragFix'> x 
-                    <div class='bold'>${actionLoops}</div></div>
+                    <div>
+                        <img src='img/${camelize(action.name)}.svg' class='smallIcon imageDragFix'> x 
+                        <div class='bold'>${actionLoops}</div>
+                        <div class='predictorMana' id='predictorMana${i}'></div>
+                    </div>
                     <div style='float:right; margin-top: 1px; margin-right: 3px;'>
                         ${capButton}
                         ${isSingular ? "" : `<i id='plusButton${i}' onclick='addLoop(${i})' class='actionIcon fas fa-plus'></i>`}
@@ -724,7 +730,7 @@ function View() {
                 extraImage += `<img src='img/${camelize(action.affectedBy[i])}.svg' class='smallIcon' draggable='false' style='position:absolute;${extraImagePositions[i]}'>`;
             }
         }
-        const isTravel = getTravelNum(action.name) > 0;
+        const isTravel = action.travelTarget !== undefined;
         const divClass = isTravel ? "travelContainer showthat" : "actionContainer showthat";
         const totalDivText =
             `<div
@@ -734,15 +740,15 @@ function View() {
                 ondragover='handleDragOver(event)'
                 ondragstart='handleDirectActionDragStart(event, "${action.name}", ${action.townNum}, "${action.varName}", false)'
                 ondragend='handleDirectActionDragEnd("${action.varName}")'
-                onclick='addActionToList("${action.name}", ${action.townNum}, ${isTravel})'
+                onclick='addActionToList("${action.name}", ${action.townNum})'
             >
                 ${action.label}<br>
                 <div style='position:relative'>
                     <img src='img/${camelize(action.name)}.svg' class='superLargeIcon' draggable='false'>${extraImage}
                 </div>
                 <div class='showthis' draggable='false'>
-                    ${action.tooltip}<span id='goldCost${action.varName}'></span>
-                    ${(action.goldCost === undefined) ? "" : action.tooltip2}
+                    ${action.tooltip}<span id='manaGain${action.varName}'></span>
+                    ${(action.manaGain === undefined) ? "" : action.tooltip2}
                     <br>
                     ${actionSkills}
                     ${actionStats}
@@ -797,13 +803,12 @@ function View() {
         const action = translateClassNames(actionName);
         document.getElementById(`manaCost${action.varName}`).textContent = formatNumber(action.manaCost());
     };
-
-    this.adjustGoldCost = function(varName, amount) {
-        document.getElementById(`goldCost${varName}`).textContent = formatNumber(amount);
+    this.adjustManaGain = function(varName, amount) {
+        document.getElementById(`manaGain${varName}`).textContent = formatNumber(amount);
     };
-    this.adjustGoldCosts = function() {
-        for (const action of actionsWithGoldCost) {
-            this.adjustGoldCost(action.varName, action.goldCost());
+    this.adjustManaGains = function() {
+        for (const action of actionsWithManaGain) {
+            this.adjustManaGain(action.varName, action.manaGain());
         }
     };
     this.adjustExpGain = function(action) {

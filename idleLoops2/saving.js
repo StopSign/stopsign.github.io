@@ -32,7 +32,7 @@ const towns = [];
 // eslint-disable-next-line prefer-const
 let curTown = 0;
 
-const statList = ["Con", "Per", "Will", "Ele", "Lead", "Soul"];
+const statList = ["Con", "Per", "Ref", "Will", "Ele", "Lead", "Soul"];
 const stats = {};
 let totalTalent = 0;
 // eslint-disable-next-line prefer-const
@@ -300,6 +300,7 @@ function load() {
     totalOfflineMs = toLoad.totalOfflineMs === undefined ? 0 : toLoad.totalOfflineMs;
     // capped at 1 month of gain
     addOffline(Math.min(Math.floor((new Date() - new Date(toLoad.date)) * offlineRatio), 2678400000));
+
 
 
     adjustAll();

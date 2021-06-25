@@ -152,7 +152,7 @@
         <bonus_seconds>
             <title>Bonus Seconds</title>
             <main_text><![CDATA[
-          When bonus is on, you get 9 extra seconds per second (10x faster).<br>
+          When bonus is on, you get 4 extra seconds per second (5x faster).<br>
           Accrue 100% of paused or offline time as available bonus seconds. (capped at 1 month per offline period)<br>
           Bonus is
         ]]></main_text>
@@ -166,37 +166,37 @@
     <stats>
         <title>Stats</title>
         <con>
-            <blurb>How well you can tell your body to do things.</blurb>
+            <blurb>Turning thought into action. Your connection to your body.</blurb>
             <long_form>Control</long_form>
             <short_form>Con</short_form>
         </con>
         <per>
-            <blurb>Your ability to gather information from the world around you.</blurb>
+            <blurb>Your ability to gather information from the world around you. Your connection to your senses.</blurb>
             <long_form>Perception</long_form>
             <short_form>Per</short_form>
         </per>
         <ref>
-            <blurb>Reaction time and muscle memory.</blurb>
+            <blurb>Reaction time and muscle memory. Your connection to your instinct.</blurb>
             <long_form>Reflex</long_form>
             <short_form>Ref</short_form>
         </ref>
         <will>
-            <blurb>Holding fast in the storm; the magnitude of desire.</blurb>
+            <blurb>Holding fast in the storm. Setting pain and discomfort aside for the sake of your goals. Your connection to your desire.</blurb>
             <long_form>Willpower</long_form>
             <short_form>Will</short_form>
         </will>
         <ele>
-            <blurb>Holding yourself with dignity and grace: appearances matter.</blurb>
+            <blurb>Holding yourself with dignity and grace: appearances matter. Your connection to your presense.</blurb>
             <long_form>Elegance</long_form>
             <short_form>Ele</short_form>
         </ele>
         <lead>
-            <blurb>Understanding, directing, and inspiring.</blurb>
+            <blurb>Understanding, directing, and inspiring. Your connection to your language.</blurb>
             <long_form>Leadership</long_form>
             <short_form>Lead</short_form>
         </lead>
         <soul>
-            <blurb>You are the captain.</blurb>
+            <blurb>You are the captain. Your connection to yourself.</blurb>
             <long_form>Soul</long_form>
             <short_form>Soul</short_form>
         </soul>
@@ -218,16 +218,18 @@
             <total_multiplier>Total Mult</total_multiplier>
             <bonus_xp>Bonus XP</bonus_xp>
             <explanation><![CDATA[
-          Each stat level reduces the relevant part of an action's mana cost by 1%.<br>
-          Talent exp gain is equal to 1% of stat exp gain, and persists through loops.<br>
-          Talent multiplies xp gain by (1+(talentLevel)^0.4/3).<br>
-          XP gain towards a stat per action is (original mana / actual mana) * (talent bonus) per tick.<br>
+          Actions' mana costs are both how much mana they take, as well as time. Stats reduce the time/cost that each takes.
+          Actions' mana costs are reduced by (stat levels)^.8 %<br>
+          Every time you run the action, it gives stat exp equal its mana cost, spread across its given stat ratios.<br>
+          The mana cost reduction from stats does not affect the amount of stat exp the action gives - only talent and soulstones affect the total exp an action gives.<br>
+          1% of exp gained for the stat goes to talent. As talent levels up, it affects stat gain exp equal to Talent Mult.<br><br>
+          Talent multiplies xp gain by (talentLevel / 50 + 1) ^ 0.4<br>
+          Soulstones multiply xp gain by 1 + soulstones ^ .6 / 10<br>
           Total Mult is a combination of your talent and soulstone bonuses.<br><br>
-          e.g. Meet People costs 800 mana and has a breakdown of <div class="bold">Int</div> 10% <div class="bold">Cha</div> 80% <div class="bold">Soul</div> 10%.<br>
-          This effectively means 80 of the mana is controlled by <div class="bold">Int</div>, another 80 by <div class="bold">Soul</div>, and the remaining 640 by <div class="bold">Cha</div>.<br>
-          If your <div class="bold">Cha</div> is level 20 when the action is started, the bonus would be x1.2 so it'd be 640 / 1.2 = 533.33<br>
-          Adding back the 160 from <div class="bold">Soul</div> and <div class="bold">Int</div>, the total mana the action takes (rounded up) is now 694, so ~87% of the original mana cost.<br>
-          The action would give (800/694)*(1+(talent)^0.4/3) level exp per mana for the 694 mana.]]></explanation>
+          e.g. An action costs 800 mana and has a breakdown of <div class="bold">Con</div> 20% <div class="bold">Per</div> 80%.<br>
+          This effectively means 160 of the mana is controlled by <div class="bold">Con</div>, and the remaining 640 by <div class="bold">Per</div>.<br>
+          If your <div class="bold">Per</div> is level 20 when the action is started, the bonus would be (1.20)^.8=1.157 so it'd be 640 / 1.157 = 553.15<br>
+          Adding back the 160 from <div class="bold">Con</div>, the total mana the action takes (rounded up) is now 713, so ~89% of the original mana cost.]]></explanation>
             <graph_legend><![CDATA[
           Click the legend to show/hide each.<br>
           Upon freshly starting, Levels and Talent won't change much.<br>
@@ -246,7 +248,7 @@
         </scombat>
         <manasense>
             <label>Mana Sense</label>
-            <desc>To control mana, first you need to know how to feel it around you.</desc>
+            <desc>To control mana, first you need to know how to feel it around you. Useful for finding where things are.</desc>
         </manasense>
         <manacontrol>
             <label>Mana Control</label>
@@ -334,7 +336,7 @@
             <list_explanation><![CDATA[
       Drag and drop the actions to re-arrange them.<br>
       The next list becomes the current list every restart.<br>
-      One second = 50 mana.<br>
+      One second = 100 mana.<br>
       Minimum 1 tick per action.<br>
       Restarts automatically upon no actions left.]]></list_explanation>
         </tooltip>
@@ -363,10 +365,10 @@
             <info_text2>Pots with mana total</info_text2>
             <info_text3>Pots to check for mana</info_text3>
             <tooltip><![CDATA[
-            Some of them have mana left, sometimes the mana sense is pinging off of a different potion. No choice but to drink it to figure it out.
+            Some of them have mana left, sometimes the mana sense is pinging off of a different potion. No choice but to drink it to figure it out. Each good potion gives
         ]]></tooltip>
             <tooltip2><![CDATA[
-            Each good potion gives 150 mana. Every 10 potions are good. You can choose to drink the good ones first with "lootable first" checked.
+              mana. Every 2 potions are good. You can choose to drink the good ones first with "lootable first" checked.
         ]]></tooltip2>
             <story_1><![CDATA[<b>10 Pots with mana:</b>⮀ ]]></story_1>
         </drink_potion>
@@ -375,10 +377,29 @@
             <tooltip><![CDATA[
             While searching for mana potions, you felt something much bigger, although further away. After searching all around town, you've found the strongest source - down the well.
             You don't have much time, so you dive in to figure out what's down there.
-            <br>Unlocked when Mana Sense is at least 3.
+            <br>Unlocked when Mana Sense is at least 2.
         ]]></tooltip>
-            <story_1><![CDATA[<b>Dove in:</b>⮀ ]]></story_1>
+            <story_1><![CDATA[<b>Dove in:</b>⮀ The water is cold, and you have to find a way out. After swimming for a bit, you find an access point and start to swim up, reaching a cave dimly lit by glowing crystals. Crystals that have mana in them. You know what to do next.]]></story_1>
         </dive_into_well>
+        <get_well_mana>
+            <label>Get Well Mana</label>
+            <tooltip>Now you know where the mana source is, so you can go right to it and absorb it. There's a problem, however - you'll need a ladder to go back to the source from that direction.
+                Cost reduces by 50 for each Mana Control level past 10, down to a cost of 1000. Gives 4000 mana. You of course can't both do this and go into the well to get it again.</tooltip>
+            <story_1><![CDATA[<b>Source Absorbed:</b>⮀ Using the ladder, you easily go to the mana source in the well and absorb it.]]></story_1>
+        </get_well_mana>
+        <buy_ladder>
+            <label>Buy Ladder</label>
+            <tooltip>Ladder time</tooltip>
+            <story_1><![CDATA[<b>Ladder Purchased:</b>⮀ Climb]]></story_1>
+        </buy_ladder>
+        <learn_healing>
+            <label>Learn Healing</label>
+            <label_done>Learned from Healing Book</label_done>
+            <tooltip>HEAL</tooltip>
+            <story_1><![CDATA[<b>50% Checked:</b>⮀ ]]></story_1>
+            <story_2><![CDATA[<b>100% Checked:</b>⮀ ]]></story_2>
+        </learn_healing>
+
         <!-- well -->
         <sense_crystals>
             <label>Sense Crystals</label>
@@ -394,15 +415,95 @@
             <info_text2>Crystals with mana total</info_text2>
             <info_text3>Crystals to check for mana</info_text3>
             <tooltip><![CDATA[
-            Luckily, there is an shovel nearby. You work to remove the covering dirt, and reveal crystals with fresh mana in them.
+            Luckily, there is an shovel nearby. You work to remove the covering dirt, and reveal crystals with fresh mana in them. Each good crystal gives
         ]]></tooltip>
             <tooltip2><![CDATA[
-            Each good crystal gives 600-800 mana. Every 2 crystals are good. You can choose to drink the good ones first with "lootable first" checked. Every Mana Control level increases mana the crystal gives by 10, until they give 800.
+             mana. Every Mana Control level increases mana a crystal gives by 10, until it gives 800. Every 2 crystals are good. You can choose to drink the good ones first with "lootable first" checked.
         ]]></tooltip2>
             <story_1><![CDATA[<b>5 Crystals with mana:</b>⮀ You're steadily improving the mana you can get from these crystals, but you've taken from all that have mana.]]></story_1>
             <story_2><![CDATA[<b>Mana Control 20:</b>⮀ Every bit of mana from the crystals is pulled out when you try.]]></story_2>
-
         </uncover_crystal>
+        <explore_tunnels>
+            <label>Explore Tunnels</label>
+            <label_done>Tunnels Explored</label_done>
+            <tooltip>There's lots of branching paths. Time to look through all of them! You'll find more mana crystals on the way. This action is required to move on. Unlocks at 100% Mana Crystals Sensed. Becomes 100% more effective for each mana sense level.</tooltip>
+            <story_1><![CDATA[<b>50% Checked:</b>⮀ You've run into a lot of dead ends and collapsed tunnels. The further you get, the older this place seems - and the more dangerous.]]></story_1>
+            <story_2><![CDATA[<b>80% Checked:</b>⮀ There's been a few grooves in the walls or floors you've seen - traps are ahead. So far, all of them have been triggered already.]]></story_2>
+            <story_3><![CDATA[<b>100% Checked:</b>⮀ This is as far as you can go before you can see active traps in front of you. You've explored everywhere without them. From now on, you only need a short jaunt through the tunnels to collect the mana, and you'll reach these traps.]]></story_3>
+        </explore_tunnels>
+        <discover_traps>
+            <label>Discover Traps</label>
+            <label_done>Traps Found</label_done>
+            <tooltip>Look for traps in the tunnels before you move on. Figure out how to avoid them or disarm them. Requires Explore Tunnels before you can run this action. Unlocks at 100% Explore Tunnels. Becomes 100% more effective for each mana sense level.</tooltip>
+            <story_1><![CDATA[<b>100% Checked:</b>⮀ After nearly being killed many times, there's only one trap room that matters, and beyond it you can see more branching paths, as well as feel a stronger presence of mana. If you can just get rid of these traps... Maybe these switches will help?]]></story_1>
+        </discover_traps>
+        <switch1>
+            <label>Switch 1</label>
+            <tooltip>While searching around for traps, you find a switch in the wall. You flip it, but nothing seems to happen. Maybe there are other switches to find.</tooltip>
+            <story_1><![CDATA[<b>Switch flipped:</b>⮀ Nothing obvious happens - maybe you need more switches?]]></story_1>
+        </switch1>
+        <switch2>
+            <label>Switch 2</label>
+            <tooltip>Another switch, in the floor this time. Switching it, or both the first and this one, result in nothing happening. You keep searching</tooltip>
+            <story_1><![CDATA[<b>Switch flipped:</b>⮀ Nothing obvious happens - maybe you need more switches?]]></story_1>
+        </switch2>
+        <switch3>
+            <label>Switch 3</label>
+            <tooltip>A third switch, disguised as a candle holder! Flipping all 3 switches, you can hear a clink in the walls - Maybe you can get in and remove the trap mechanism now.</tooltip>
+            <story_1><![CDATA[<b>Switch flipped:</b>⮀ Nothing obvious happens - maybe you need more switches?]]></story_1>
+        </switch3>
+        <disarm_traps>
+            <label>Disarm Traps</label>
+            <tooltip>With all the switches flipped, you can disable the whole mechanism.</tooltip>
+            <story_1><![CDATA[<b>Traps Disarmed:</b>⮀ Pulling a final lever, you hear a clink, a shutter, and something grinds to a halt. You're reasonably certain it's finally safe to continue.]]></story_1>
+        </disarm_traps>
+        <explore_deep>
+            <label>Explore Deep</label>
+            <label_done>Deep Tunnels Explored</label_done>
+            <tooltip>Past the traps, you find an even older area, more cavelike than the construction of before. There are mana veins here, filled with uesful mana. Still, they don't feel like the last piece you've been sensing all along. Becomes 100% more effective for each mana sense level.</tooltip>
+            <story_1><![CDATA[<b>50% Checked:</b>⮀ ]]></story_1>
+            <story_2><![CDATA[<b>100% Checked:</b>⮀ ]]></story_2>
+        </explore_deep>
+        <absorb_vein>
+            <label>Absorb Vein</label>
+            <label_done>Veins Absorbed</label_done>
+            <info_text1>Veins with mana left</info_text1>
+            <info_text2>Veins with mana total</info_text2>
+            <info_text3>Veins to check for mana</info_text3>
+            <tooltip><![CDATA[
+            Requires you to disarm the traps to get to these veins. Each vein gives
+        ]]></tooltip>
+            <tooltip2><![CDATA[
+              mana. Every Mana Control level past 10 increases mana a vein gives by 25, until it gives 2000. Every vein is full of mana.
+        ]]></tooltip2>
+            <story_1><![CDATA[<b>5 veins with mana:</b>⮀ The veins thankfully keep you going, and give you the time needed for the trial ahead.]]></story_1>
+        </absorb_vein>
+        <get_to_source>
+            <label>Get To Source</label>
+            <tooltip>You've explored the area, and only one path remains - the one to the source. It's long, but the reward will be worth it.</tooltip>
+            <story_1><![CDATA[<b>Traveled to Source:</b>⮀ It's beautiful.]]></story_1>
+        </get_to_source>
+        <absorb_source>
+            <label>Absorb Source</label>
+            <tooltip>The motherlode. The mana is deep and still, yet blinding in its quantity. It will take a lot of control to get it out. Cost reduces by 50 for each Mana Control level past 10, down to a cost of 800. Gives 4000 mana.</tooltip>
+            <story_1><![CDATA[<b>Source Absorbed:</b>⮀ After a mighty struggle, the power fills you. Finally, you have time to do more now. First, however, is figuring out how to get out quickly.]]></story_1>
+        </absorb_source>
+        <escape_routes>
+            <label>Escape Routes</label>
+            <label_done>Escape Routes Checked</label_done>
+            <tooltip>With the light of the motherlode fading, you can see more tunnels ahead. Some are leading up - maybe you'll find a way out? Requires Absorb Source to be completed.</tooltip>
+            <story_1><![CDATA[<b>100% Checked:</b>⮀ You found it - a way out. You nearly cry in relief. Unfortunately, it's pretty high up.]]></story_1>
+        </escape_routes>
+        <escape_well>
+            <label>Escape Well</label>
+            <tooltip>It's finally time to leave this well. The way out was down a cliff before you finally saw a small light in the ceiling, and after piling up some rocks to get to handholds, you're out. Run this action once to unlock new ones.</tooltip>
+            <story_1><![CDATA[<b>Escaped:</b>⮀ You climb and shimmy out, and then there's a wood floor above you, partially cracked.
+            You open it a little more and find a house in ruins, but with the quantity of bottles around, you can see it as the alchemist's shop, or at least it was.
+            Now that you know where you are, you could get back down much easier. That is, if you had the time to both do that and absorb the motherlode.
+            You spot a bookshelf with most of the books destroyed, but an Introduction to Magical Healing book is intact.]]></story_1>
+        </escape_well>
+
+
 
     </actions>
     <spells>

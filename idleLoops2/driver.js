@@ -102,7 +102,7 @@ function stopGame() {
     stop = true;
     view.updateTime();
     view.updateCurrentActionBar(actions.currentPos);
-    document.title = "*PAUSED* Idle Loops";
+    document.title = "*PAUSED* Idle Loops 2";
     document.getElementById("pausePlay").textContent = _txt("time_controls>play_button");
 }
 
@@ -110,7 +110,7 @@ function pauseGame(ping) {
     stop = !stop;
     view.updateTime();
     view.updateCurrentActionBar(actions.currentPos);
-    document.title = stop ? "*PAUSED* Idle Loops" : "Idle Loops";
+    document.title = stop ? "*PAUSED* Idle Loops 2" : "Idle Loops 2";
     document.getElementById("pausePlay").textContent = _txt(`time_controls>${stop ? "play_button" : "pause_button"}`);
     if (!stop && (shouldRestart || timer >= timeNeeded)) {
         restart();
@@ -147,7 +147,7 @@ function restart() {
     timer = 0;
     timeCounter = 0;
     timeNeeded = timeNeededInitial;
-    document.title = "Idle Loops";
+    document.title = "Idle Loops 2";
     resetResources();
     restartStats();
     for (let i = 0; i < towns.length; i++) {
@@ -158,7 +158,7 @@ function restart() {
     view.updateCurrentActionsDivs();
 }
 
-function addActionToList(name, townNum, isTravelAction, insertAtIndex) {
+function addActionToList(name, townNum, insertAtIndex) {
     actions.nextLast = copyObject(actions.next);
     for (const action of towns[townNum].totalActionList) {
         if (action.name === name) {
@@ -171,9 +171,10 @@ function addActionToList(name, townNum, isTravelAction, insertAtIndex) {
                         addAmount = numMax - numHave;
                     }
                 }
-                if (isTravelAction) {
+                if (action.travelTarget !== undefined) {
                     actions.addAction(name, 1, insertAtIndex);
-                    action.unlock();
+                    unlockTown(action.travelTarget);
+                    view.showTown(action.travelTarget);
                 } else {
                     actions.addAction(name, addAmount, insertAtIndex);
                     if (shiftDown && hasLimit(name)) {
@@ -302,12 +303,12 @@ function unlockTown(townNum) {
         // refresh current
         view.showTown(townNum);
     }
-    curTown = townNum;
 }
 
 function adjustAll() {
     adjustManaPots();
     adjustManaCrystals();
+    adjustManaVein();
 }
 
 function capAmount(index, townNum) {
@@ -372,11 +373,7 @@ function split(index) {
 function collapse(index) {
     actions.nextLast = copyObject(actions.next);
     const action = actions.next[index];
-    if (action.collapsed) {
-        action.collapsed = false;
-    } else {
-        action.collapsed = true;
-    }
+    action.collapsed = !action.collapsed;
     view.updateNextActions();
 }
 
@@ -403,9 +400,9 @@ function handleDragStart(event) {
     hideActionIcons();
 }
 
-function handleDirectActionDragStart(event, actionName, townNum, actionVarName, isTravelAction) {
+function handleDirectActionDragStart(event, actionName, townNum, actionVarName) {
     document.getElementById(`container${actionVarName}`).children[2].style.display = "none";
-    const actionData = { _actionName: actionName, _townNum: townNum, _isTravelAction: isTravelAction };
+    const actionData = { _actionName: actionName, _townNum: townNum};
     const serialData = JSON.stringify(actionData);
     event.dataTransfer.setData("actionData", serialData);
     hideActionIcons();
@@ -428,7 +425,7 @@ function handleDragDrop(event) {
     const initialIndex = event.dataTransfer.getData("text/html");
     if (initialIndex === "") {
         const actionData = JSON.parse(event.dataTransfer.getData("actionData"));
-        addActionToList(actionData._actionName, actionData._townNum, actionData._isTravelAction, indexOfDroppedOverElement);
+        addActionToList(actionData._actionName, actionData._townNum, indexOfDroppedOverElement);
     } else {
         moveQueuedAction(Number(initialIndex), Number(indexOfDroppedOverElement));
     }
@@ -519,7 +516,7 @@ function addOffline(num) {
 function toggleOffline() {
     if (totalOfflineMs === 0) return;
     if (bonusSpeed === 1) {
-        bonusSpeed = 10;
+        bonusSpeed = 5;
         document.getElementById("isBonusOn").textContent = _txt("time_controls>bonus_seconds>state>on");
     } else {
         bonusSpeed = 1;

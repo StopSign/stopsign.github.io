@@ -74,6 +74,9 @@ function Actions() {
             curAction.loopsLeft--;
 
             this.completedTicks += curAction.adjustedTicks;
+            if(curAction.travelTarget !== undefined) {
+                curTown = curAction.travelTarget;
+            }
             curAction.finish();
             curAction.manaRemaining = timeNeeded - timer;
             
@@ -186,7 +189,7 @@ function Actions() {
         }
         this.adjustTicksNeeded();
         view.requestUpdate("updateMultiPartActions");
-        view.requestUpdate("updateNextActions");
+        //view.requestUpdate("updateNextActions");
         view.requestUpdate("updateTime");
     };
 
@@ -229,18 +232,18 @@ function setAdjustedTicks(action) {
     for (let i = 0; i < statList.length; i++) {
         const statName = statList[i];
         if (action.stats[statName]) {
-            newCost += action.stats[statName] / (1 + getLevel(statName) / 100);
+            newCost += action.stats[statName] / (1 + Math.pow(getLevel(statName), .8) / 100);
         }
     }
     action.adjustedTicks = Math.ceil(action.manaCost() * newCost - 0.000001);
 }
 
 function calcSoulstoneMult(soulstones) {
-    return 1 + Math.pow(soulstones, 0.8) / 30;
+    return 1 + Math.pow(soulstones, 0.6) / 10;
 }
 
 function calcTalentMult(talent) {
-    return 1 + Math.pow(talent, 0.4) / 3;
+    return Math.pow(talent/50+1, 0.5);
 }
 
 function addExpFromAction(action) {
