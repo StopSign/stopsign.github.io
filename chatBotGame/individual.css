@@ -1,0 +1,95 @@
+
+#riverColumns {
+    width:1240px;
+}
+
+#progressBarContainer {
+    width: 310px;
+    height: 20px;
+}
+
+#progressBar {
+    width: 0%;
+    height: 100%;
+    background-color: #6493d7;
+}
+
+#iceContainer {
+    position:absolute;
+    top:62px;
+    left:125px;
+}
+
+#moneyContainer {
+    position:absolute;
+    top:0px;
+    left:16px;
+}
+
+#buyIceContainer {
+    position:absolute;
+    top:15px;
+    left:197px;
+    text-align:right;
+}
+
+#iceValue {
+    width:70px;
+}
+
+#reserveContainer {
+    position:absolute;
+    top:425px;
+    left:115px;
+    color: #D3D3D3;
+}
+
+#pipeImg {
+    position:absolute;
+    top:620px;
+    width:310px;
+}
+
+#riverTopImg {
+    position:absolute;
+    top:899px;
+    width:1240px;
+}
+
+#riverBottomImg {
+    position:absolute;
+    top:1122px;
+    width:1240px;
+}
+
+#plateauImg {
+    width:310px;
+}
+
+#iceImg {
+    width:200px;
+    left:45px;
+    top:20px;
+}
+
+#reserveImg {
+    width:310px;
+    top:310px;
+}
+
+#pumpContainer {
+    position:absolute;
+    top:620px;
+    text-align:right;
+}
+
+#pumpText {
+    color: #a4e4f5;
+}
+
+#riverContainer {
+    position:absolute;
+    top:1121px;
+    z-index:5;
+    height:200px;
+}

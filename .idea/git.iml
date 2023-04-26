@@ -11,6 +11,7 @@
       <excludeFolder url="file://$MODULE_DIR$/ManaTap" />
       <excludeFolder url="file://$MODULE_DIR$/Nanospread" />
       <excludeFolder url="file://$MODULE_DIR$/Pull_of_War" />
+      <excludeFolder url="file://$MODULE_DIR$/ReapandSow" />
       <excludeFolder url="file://$MODULE_DIR$/Scheduling3" />
       <excludeFolder url="file://$MODULE_DIR$/Terrafold" />
       <excludeFolder url="file://$MODULE_DIR$/Terrafold1" />
@@ -20,9 +21,13 @@
       <excludeFolder url="file://$MODULE_DIR$/Untitled" />
       <excludeFolder url="file://$MODULE_DIR$/Xianxia" />
       <excludeFolder url="file://$MODULE_DIR$/angAndReSkinAndReOrg" />
+      <excludeFolder url="file://$MODULE_DIR$/chatBotGame" />
+      <excludeFolder url="file://$MODULE_DIR$/chatBotGame/test" />
       <excludeFolder url="file://$MODULE_DIR$/growGL" />
       <excludeFolder url="file://$MODULE_DIR$/hungerIdle" />
       <excludeFolder url="file://$MODULE_DIR$/idleLoops" />
+      <excludeFolder url="file://$MODULE_DIR$/idleLoops2" />
+      <excludeFolder url="file://$MODULE_DIR$/initial" />
       <excludeFolder url="file://$MODULE_DIR$/miner" />
       <excludeFolder url="file://$MODULE_DIR$/old1" />
       <excludeFolder url="file://$MODULE_DIR$/old2" />
@@ -36,5 +41,9 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="angular-DefinitelyTyped" level="application" />
+    <orderEntry type="library" name="jquery-DefinitelyTyped" level="application" />
+    <orderEntry type="library" name="d3.v6" level="application" />
+    <orderEntry type="library" name="three" level="application" />
   </component>
 </module>

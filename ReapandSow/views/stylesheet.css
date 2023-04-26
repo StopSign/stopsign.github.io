@@ -1,0 +1,248 @@
+div {
+    display:inline-block;
+}
+
+body {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    font-family:Arial, Helvetica, serif;
+    color:black;
+    font-size:14px;
+    height:100%;
+    margin:0;
+    background-color: #cfd3e6;
+    cursor:default;
+}
+
+.hyperVisible {
+    text-shadow:
+            -1px -1px 0 #000,
+            1px -1px 0 #000,
+            -1px 1px 0 #000,
+            1px 1px 0 #000;
+    color:white;
+}
+
+.disabled {
+    opacity:.5;
+    cursor:default;
+    pointer-events:none;
+}
+
+.hidden {
+    opacity:0;
+    cursor:default;
+    pointer-events:none;
+}
+
+.gone {
+    display:none !important;
+}
+
+.block {
+    display:block;
+}
+
+.showthatH:hover .showthisH {
+    display:block;
+}
+.showthat:hover .showthis, .showthat:hover .showthisUp, .showthat2:hover .showthis2 {
+    display:block;
+}
+.showthis, .showthisUp, .showthis2, .showthisH {
+    display:none;
+    position:absolute;
+    background-color: #BBD6E6;
+    border:1px solid;
+    padding:3px 5px;
+    border-radius:4px;
+    margin-top:5px;
+    z-index:999;
+    text-align:left;
+}
+.showthisUp {
+    bottom:105%;
+}
+
+.showthis2 {
+    z-index:1000;
+    min-width:400px;
+}
+
+.title {
+    font-size:16px;
+    font-weight:bold;
+    display:block;
+    text-align:center;
+}
+.smallTitle {
+    font-size:14px;
+    font-weight:bold;
+    display:block;
+    text-align:center;
+}
+
+.large {
+    font-size:14px;
+}
+.medium {
+    font-size:12px;
+}
+.small {
+    font-size:10px;
+}
+.bold {
+    font-weight:bold;
+}
+
+.abs {
+    position:absolute;
+}
+
+.superLargeIcon {
+    width:30px;
+    height:30px;
+}
+.largeIcon {
+    width:20px;
+    height:20px;
+}
+.smallIcon {
+    width:16px;
+    height:16px;
+}
+
+input, label {
+    cursor:pointer;
+}
+input {
+    margin-right:0;
+}
+.buttonPressed {
+    padding: 1px 5px;
+    text-align: center;
+    vertical-align:center;
+    min-width:9px;
+    cursor: pointer;
+    outline: none;
+    color: #e1e1e1;
+    border: none;
+    border-radius: 6px;
+    margin-bottom:2px;
+    background-color: #3e8e41;
+    box-shadow: 0 1px #666;
+    transform: translateY(0px);
+}
+.buttonPressed.active {
+    background-color: #357937;
+    box-shadow: 0 1px #666;
+    transform: translateY(-1px);
+}
+
+.button {
+    padding: 1px 5px;
+    text-align: center;
+    vertical-align:center;
+    min-width:9px;
+    cursor: pointer;
+    outline: none;
+    color: #000000;
+    background-color: #55d4de;
+    border: none;
+    border-radius: 6px;
+    box-shadow: 0 3px #999;
+    transform: translateY(-2px);
+    margin-bottom:2px;
+}
+
+.button:hover {background-color: #60eef9
+}
+
+.button:active {
+    background-color: #3e9aa2;
+    box-shadow: 0 1px #666;
+    transform: translateY(0px);
+}
+
+.imageDragFix {
+    pointer-events:none;
+    user-drag: none;
+    user-select: none;
+    -moz-user-select: none;
+    -webkit-user-drag: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+}
+
+.clickable:hover {
+    background-color: rgba(200, 200, 200, 1);
+}
+.clickable:active {
+    background-color: rgba(160, 160, 160, 1);
+}
+.clickable {
+    background-color: rgba(190, 190, 190, .3);
+    cursor:pointer;
+    padding:3px;
+    border:2px solid rgba(190, 190, 190, 0);
+}
+
+.preciseNum {
+    width:60px;
+    font-weight:bold;
+}
+.inputNum {
+    width:50px;
+    font-size:12px;
+    margin-right:10px;
+    height:10px;
+}
+
+.progressOuter {
+    width:80px;
+    height:11px;
+    background-color:rgba(50, 50, 50, .8);
+    position:relative;
+}
+.progressInner {
+    height:100%;
+    position:absolute;
+    background-color: #a86fc4;
+}
+
+.donationContainer {
+    padding:5px;
+    background-color:white;
+    opacity:.8;
+    width:100%;
+    border-radius:15px;
+    cursor:pointer;
+    margin-bottom:10px;
+}
+
+.donationContainer:hover {
+    background-color:#ff8080;
+}
+
+.donationReward {
+    font-size:14px;
+}
+
+.donationMessage {
+    font-size:12px;
+}
+
+.donationReason {
+    font-size:10px;
+    opacity: .8;
+}
+
+.red {
+    color:red;
+}
+.green {
+    color:green;
+}

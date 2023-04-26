@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <!-- to force a reload -->
+    <meta http-equiv="cache-control" content="max-age=0" />
+    <meta http-equiv="cache-control" content="no-cache" />
+    <meta http-equiv="expires" content="0" />
+    <meta http-equiv="expires" content="Tue, 01 Jan 1980 1:00:00 GMT" />
+    <meta http-equiv="pragma" content="no-cache" />
+    <title>Save the Species! Idle</title>
+    <link rel="stylesheet" href="../StSi/views/stylesheet.css">
+</head>
+
+<body>
+<div class="grid" id="grid"></div>
+<div class="info-panel">
+    <ul>
+        <li>Total Color: <span id="totalColor"></span>, Delta: <span id="deltaColor"></span>/s</li>
+        <li>Total Anti Color: <span id="totalAntiColor"></span>, Delta: <span id="deltaAntiColor"></span>/s</li>
+        <li>Total, Added: <span id="totalAdded"></span>, Delta: <span id="deltaAdded"></span>/s</li>
+        <li>Selected Cell Water: <span id="selectedCellWater"></span></li>
+        <li>Selected Cell Content: <span id="selectedCellContent"></span></li>
+    </ul>
+</div>
+
+<script src="driver.js?1"></script>
+<script src="saving.js?1"></script>
+<script src="helpers/helpers.js?1"></script>
+<script src="helpers/hotkeys.js?1"></script>
+<script src="helpers/interval.js?1"></script>
+<script src="views/mainView.js?1"></script>
+<script src="game.js?1"></script>
+<script src="gameHelpers.js?1"></script>
+<script src="data/speciesData.js?1"></script>
+<script src="data/upgradeData.js?1"></script>
+<script src="data/levelData.js?1"></script>
+<script>
+    startGame();
+
+    addSpawner(50, 50, 1000, 1000, 80);
+    addSpawner(60, 50, -10000, -200, 80);
+    addSpawner(65, 50, -10000, -200, 80);
+    addSpawner(70, 50, -10000, -200, 80);
+    addSpawner(75, 50, -10000, -200, 80);
+</script>
+</body>
+</html>

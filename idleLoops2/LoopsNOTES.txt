@@ -1,0 +1,381 @@
+Features:
+	Add actions to the currently playing list 
+	Quests UI organization 
+	Zone select dropdown 
+	
+
+Start at village, 5 quest lines (1 to do always, 4 to open new areas)
+	Crystal
+		Sense Mana - takes 1x time
+		Absorb Mana  - takes 1x time
+		Dive into Well  - takes 2x time
+		Sense Deep Mana  - takes 2x time
+		Cross Traps  - takes 1x time
+		Absorb Crystal - takes 1x time, gives 10x time 
+		Escape
+		Result: Retrieve Crystal 
+		Goal: Get healing and some money, to retrieve the crystal
+		Sell Healing to Adventurer's - gain a little money (to buy ladder), but limited
+	Heal Mayor's Son 
+		Heal Homeless - reputation+
+		Heal Orphans - money+
+		Heal Civilians - requires reputation, reputation+ money++
+		Buy Mana 
+		Heal Mayor's Son - requires reputation++, money+++, gem+
+		Go with Bandits 
+		Result: Heal Mayor's Son 
+		Result: Approach Bandits 
+	Kill Pests
+		Find Help Wanted 
+		Kill Rats 
+		Buy Rat Poison 
+		Kill Rat Nest 
+		Buy Salt 
+		Kill Slimes 
+		Kill Slime Pool 
+		Buy Dynamite 
+		Kill Goblins 
+		Kill Goblin King 
+		Result: Collapse Bell Tower 
+		Result: Get Goblin Crown
+	Apprenticeship
+		Stack Bricks 
+		Buy Mana 
+		Saw Logs 
+		Smelt Bars 
+		Weave Cloak 
+		Apprentice 
+		Competition -> letter to city 
+		Result: Sabotage 
+		Result: Competition -> Letter to city 
+	Find Scroll 
+		Get Admission 
+		Work for Merchant 
+		Organize Books 
+		Learn Beginner Magic 
+		Talk to Old Man 
+		Learn Basic Magic 
+		Learn from Old Man 
+		Admission Letter 
+		Result: Letter 
+		
+Story:
+	1. Well dive for Crystal, need ladder 
+	2. Learn healing & sell for ladder, start healing lowbies and work up
+	3. Heal mayors son, bandits attack, gain secret exit
+	4. Use secret exit to steal gem 
+	5. Use gem to approach and join bandits
+	6. Learn bandithood (w/ gem everytime), gain the secret password
+	7. Use secret password & no gem, attack mayor w/ bandits for clout
+	8. Use clout to go to bandit secret hideout
+
+
+In act 1, Meeting people -> 100%
+In act 3, read about werewolves
+Unlocks in Act 1, Discuss werewolves -> 100%
+
+
+Meeting people, gain 100 exp at a time
+Next unlock is at 10, you don't need more than that at this time
+In act 3, improve meeting people effectiveness by 10x
+Require meeting people to be 100 for next action 
+
+
+Meeting people, gain 100 exp at a time
+Finish Talking 101 class - Meeting people is x2
+Finish History 101 class - Meeting people is x2 
+etc.
+
+
+
+
+When finished with Starting zone:
+	
+
+
+Medium Zones - primarily for exploring & skill building 
+	Forest 
+	School
+	Hideout
+	City 
+	
+Hard Zones 
+	Tower 
+	Dungeon 
+	Court 
+	
+Harder
+	Tournament
+	Guild 
+	
+Final
+	King -> Vault 
+	
+	
+	3 Action types:
+	Normal
+		Does an action
+		(OPTIONAL) travels to a zone 
+		(OPTIONAL) loots a lootable
+	Progress - 
+		0->100%, 
+		requires linear extra (100, 200, 300) to level, 
+		(OPTIONAL) can also give lootable things
+	MultiProgress
+		Has segments and uses skill to progress
+		(OPTIONAL) can cap the level (AKA only 7 floors in a dungeon) or be endless (AKA heal the sick in loops 1)
+		(OPTIONAL) can change how the segments scale per completion
+		can be EITHER different skills per segment (Always Con, Will, Ref), OR sequentially different skills per completion (Con Con Con, Will Will Will, Ref Ref Ref, repeat)
+		(OPTIONAL) can gain resources/skills per segment OR per completion 
+		
+		
+Required for an action:
+ Exp multiplier (higher for training / limited things that cost resources)
+ Which zone it is in
+ Stats - fractions that add up to 1
+ Mana Cost to start the action
+ Visible - when the action shows up on the list 
+ Unlocked - when the action can be used 
+ Required - which actions need to be completed in the current run before this one works (AKA disarm traps requires flip switch)
+ Result - gains mana or gives skill or gives progress or uses lootable 
+ (OPTIONAL) story text / tooltip 
+ (OPTIONAL) conditional story text 
+ 
+Things people like:
+	Bonuses that loop in a chain 
+	Completion to unlock contents 
+	
+Cons:
+	Grinding trivializes, but overgrinding is still nice
+	
+Boss with multiple layers
+	1. Fight and Kill - see it, kill it
+	2. Weaken and Kill -  Exploit it, kill it
+	3. Instakill - Abuse room/explosions
+	4. Ignore - Alternate route 
+	5. Pacify - Is calm
+	6. Befriend
+	
+You grow food
+With a nascent village unused to having  free food, you expand
+cooks process the food 
+merchants sell it abroad
+guards protect the merchants 
+craftsmen make better carts
+builders make roads, houses, plumbing, defenses 
+artists make art 
+priests pray 
+teachers teach 
+farm animals for wool, clothes
+blacksmith for tools, cooking ware, iron 
+
+More folding instead of BS progress
+Maximize yak-shaving
+
+
+Story
+    Your very average trading trip was interrupted by a very not average demon attack. You don't know why they came in such force to the small town of Startington, nor did you have any idea that there were dozens of high tier defenders of the nation ready to intercept them. You found yourself too close to the battle, and had to keep moving around. Dodging fireballs, lightning bolts, and twisting shadows, you lept and crawled from one hiding spot to another. You saw buildings destroyed, you cried out when your cart full of mundane clothes and furniture went up in flames. You were pushed and pulled by the various elemental forces around you, not understanding anything that was happening. You were a merchant, not a fighter! You'd never held a sword in your life!
+    The fighting seemed to culminate. Defenders' injuries were stacking up and their mana was bottoming out. The demons with their too-many eyes and claws and expressions of hatred were slowly decreasing in number, but it wasn't enough. While hiding in an alley, you could see a group of mages casting at targets out of sight. One of the mages shouted out something you couldn't make out, and other mages put their hands on her shoulders. A massive pull built up - mana, you supposed - but before you got to see what it did, you heard a growl behind you to see a demon dog. Yelping, you ran out of they alley.
+    You didn't realize, but the mages had backed up, and you were now in front of them. Their spell finished, and a beam of bright blue <i>something</i> shot out and hit your clumsy self right in the chest. Your vision went white, then faded black.
+    You woke up with a start, not sure how long had passed. The demons were gone, but the mages were lying on the ground where they had cast from, not moving. You went and checked them, and they were unconscious. A guard who had been carrying someone else came up to you surprised. He said that anyone with magic had been rendered unconscious from the Emergent Magical Pull, or EMP. It apparently was an area-wide mana drain and dispel of great power. While it is a powerful demon banisher, everyone with mana is absolutely drained, enough to put them unconscious for a few days for the warriors and weeks for the mages. He then said he was surprised because you clearly had mana, which after some back and forth of you denying it, actually meant you were leaking mana. While continuing to deny it, the world suddenly blinked, and you was lying back down on the ground, where you had found yourself 20 minutes ago.
+    You got up again, wondering what happened. You saw the same guard, and had an extremely irate conversation where he denied having met you before, until he finally dismissed you to go get some rest. As he was walking away, the world blinked again.
+    Another conversation, another fight, another blink. Twice more. You had an idea of what could be happening, but it was impossible. Finally, you decided to leave before the guard showed up. The town was mostly rubble, and anyone worth talking to had passed out, but the bookstore might have more information on what's going on with you.
+
+Start with 2000 mana (20 seconds)
+Bookstore - In a small town like this, it only had a few books in the first place. After the damage from the attack, it has even less. Luckily, at least, no one is guarding it.
+    Research Looping, find nothing, but it mentions mana, +50 reading, +100% to denial.
+        20% - You've been here a few times. Nothing changes. Surely you can't have been the only one?
+        40% - While you're more confident that your loop is "stable", you can't find anything else referencing such a thing.
+        60% - You find a book that references the spell used, but nothing more than the name
+        80% - You've almost skimmed all available books, but still can't find what you're looking for
+        100% - Nothing. The bookstore isn't complete, and a good amount of the stock is gone, but the history section was relatively untouched and there's still nothing.
+    Pocket story books.
+    Loot magic books.
+    Take monster books.
+    Exit bookstore
+Townsfolk
+    Talk to drunks - requires stories 20
+    Sing songs -
+    Talk to guards - monster knowledge up to 10
+
+Explore
+On your own - Wherever you are, you can always turn aside and focus on yourself
+    Denial - This can't be happening. Time, resetting? Impossible. Surely it's something else. You need to check the library.
+    Anger - You can't take it! Cursing a storm and raging around, you yell at everyone and break everything you can. Stacks with itself.
+        100% - You just don't care any more. You want other people to hurt like you do. A guard, Frederick, pulls you aside with force you can't match. He has sympathy in his eyes, and a pain of his own. He holds you, letting you calm down. He says he may not understand exactly what you're going through, but he knows that look in your eyes. He tells you everyone is grieving in their own ways, but not to take it out on others. Thank you, Frederick. You decide to refocus.
+    Bargaining - There must be something you can do.
+        100% - You've tried so much. Not everything, but there would be time for that, too. Nothing but time, really. The world is so... fake. The despair, the triumph... it's just meaningless, isn't it? You could figure out how to make a beggar a king, or a king a beggar, but what would that give <i>you</i>? When it's all reset, when <i>everything</i> is a boulder rolling down a hill, coming to rest the exact same way, every time, unless you push it. You're an outsider in this world, in this life. How could you decide which boulders deserve nudging, and by how much? Maybe it's best to not do anything at all.
+    Depression - You don't belong here.
+        100% - You didn't expect it to, you didn't realize it could, but the fog over your mind and emotions has passed. This is your life, and you get to decide what's important. Saving people, or arranging things so they're happy... they're real emotions, ones that you empathize with and connect to. You feel happy to make people happy, regardless of the temporal briefness of their happiness. It feels good to help, good to get better at it. It makes you feel whole, and lets you take on this possibly-endless journey the same way you do anything else - by just living it.
+    Acceptance - Just a different definition of living, you suppose.
+
+    Read stories. A mix of history and fiction, it brings you awareness of the world and myths. +100 reading, +100 stories
+    Read about monsters. +10 monster knowledge.
+    Read about magic Lv1. Gives +100 spell knowledge, up to 10.
+
+    Cast Ball of Light. Costs 400. A ball of light. Light Magic +10
+        2 - It's bright enough to light up a room, showing progress
+        4 - There's something fascinating about how the mana comes from you, and is converted. It seems to be a shell of your mana, filled with... you can't tell.
+        6 - You can create the light up to a meter away from you, but it has to been in line of sight. Maybe with more practice ...
+        8 - Something is happening to the magic inside the shell. Something that changes it from <i>your</i> magic into... something else. You don't have the vocabulary yet to describe it, but you know that the something else is bright.
+        10 - You are using your leaking mana to cast, but you may not need to. You try casting without the shell. It's hard, but it seems to work. Cost/2
+
+Stages of actions available
+    Denial - shock and refusal because the world as you know it no longer exists
+        Read books about looping
+        Try to get as far as you can away
+        Try to get someone to remember who you are 
+		Loop a lot really quickly 
+    Anger - Shifting the blame to others, being upset at what they have that you don't
+		Fighting monsters 
+		Fight the smug asshole noble
+		Fight the townsfolk
+		Destroy the remaining buildings 
+		Fight the witch
+		Learn secrets to make people upset 
+	Bargaining - Negotiating with yourself, setting goals hoping that things can be put back to the way they were 
+		Use the secrets to help people 
+		Heal the wounded 
+		Repair the village 
+		Clear out the dungeon 
+		Help all at once 
+		Kill all people in town at once 
+		Learn dark magic from the witch 
+	Depression - Your attempts are futile. No one can understand what you're going through. You just want to go away
+		Explore the forest, sit by waterfall
+		Find a horse and learn to tame it
+		Explore other areas
+			Desert - hopeless exploration, ancient tomb
+			Deep forest - fairies, ogre tribe, ancient elf
+			Dragon den - get eaten a lot, then talk to the dragon
+			Mountains - meet dwarves, drink a *lot*
+		Hedonism 
+	Acceptance - Learning to live with this as reality. Readjust by taking on new roles or assigning them to others.  
+		Go to magic tower, learn a lot of magic 
+		Go to city, heal people 
+		Go to forest, join bandits 
+		Go to deep forest, join druids 
+		Go to ancient tomb, conquer ancient dungeon 
+		Go to city, be a merchant 
+		Go to mountains, be a dwarven smith 
+		Go to ocean, be a sailor
+		Go to frontier fort, join adventurer team (x3)
+	Finding Meaning - Learning to move forward
+		Get soulbound items 
+		Get soulbound companions 
+		Go to badlands, conquer demon fortress 
+		Finish the loop by doing many of the previous things at once 
+			(new game+?)
+			
+			
+Action types
+	Limited - Can only be run a few times each loop 
+	Travel - Brings you to a new zone 
+	Static - Has a total number of times to complete, over all loops 
+	Scaling - Goes to 100%, gets more difficult the higher you are
+	Healing - Keeping your target alive with magic
+	Combat - Defeating your opponent while keeping yourself alive
+	
+Actions reduce with familiarity. Familiarity is multiplied by the stat 
+
+Start with 10 
+4 potions available, spend 8 for 20
+30 max - 8 to get it, 6 to travel, 3x4 run = 3 for 30
+10 max - 6 to travel, 1x4 run = 1 for 10
+
+
+Stages of actions, detailed 
+    Denial - shock and refusal because the world as you know it no longer exists
+        Try to get as far as you can away
+			[Rubble] Loot mana potions - [Limited] Costs 2, gives 5, can be done twice.
+			[Rubble] Travel to pub - [Travel] Costs 10
+			[Rubble] Travel to relief tent - [Travel] Costs 15
+			[Rubble] Run to the forest - [Travel] Costs 20
+        Try to get someone to remember who you are 
+			[Rubble] Talk to guard - [Static] Costs 5, /20, gives 2 more lootable potions
+			[Tent] Talk to priest - [Static] Costs 
+			[Tent] Talk to mage 
+			[Forest] Play with horse 
+			[Forest] Talk to witch
+			[Pub] Talk to crazy drunk 
+        Search for info about looping 
+			[Rubble] Travel to bookstore 
+			[Bookstore] Search for info
+			[Bookstore] Intro to Magic
+			[Bookstore] Intro to Combat 
+		Loop a lot really quickly 
+			[Train Magic] Light Ball 
+			[Train Magic] 
+    Anger - Shifting the blame to others, being upset at what they have that you don't
+		Fighting monsters 
+		Fight the smug asshole noble
+		Fight the townsfolk
+		Destroy the remaining buildings 
+		Fight the witch
+		Learn secrets to make people upset 
+	Bargaining - Negotiating with yourself, setting goals hoping that things can be put back to the way they were 
+		Use the secrets to help people 
+		Heal the wounded 
+		Repair the village 
+		Clear out the dungeon 
+		Help all at once 
+		Kill all people in town at once 
+		Learn dark magic from the witch 
+	Depression - Your attempts are futile. No one can understand what you're going through. You just want to go away
+		Explore the forest, sit by waterfall
+		Find a horse and learn to tame it
+		Explore other areas
+			Desert - hopeless exploration, ancient tomb
+			Deep forest - fairies, ogre tribe, ancient elf
+			Dragon den - get eaten a lot, then talk to the dragon
+			Mountains - meet dwarves, drink a *lot*
+		Hedonism 
+	Acceptance - Learning to live with this as reality. Readjust by taking on new roles or assigning them to others.  
+		Go to magic tower, learn a lot of magic 
+		Go to city, heal people 
+		Go to forest, join bandits 
+		Go to deep forest, join druids 
+		Go to ancient tomb, conquer ancient dungeon 
+		Go to city, be a merchant 
+		Go to mountains, be a dwarven smith 
+		Go to ocean, be a sailor
+		Go to frontier fort, join adventurer team (x3)
+	Finding Meaning - Learning to move forward
+		Get soulbound items 
+		Get soulbound companions 
+		Go to badlands, conquer demon fortress 
+		Finish the loop by doing many of the previous things at once 
+			(new game+?)
+			
+		
+		
+		
+		
+
+Skills
+Reading - Makes reading skills faster by multiplying their cost by (100/(100 + Reading))
+Stories - History, legends, parables, myths, and jokes. Helps with conversation
+Monster Knowledge - gives insights into attack patterns and weaknesses of various monsters
+Spell Knowledge - Understanding how to weave your magic into spells.
+Light Magic - Level is capped by spell knowledge
+    0 - Ball of Light
+    10 - Ball of Light cost /2
+    15 - Unlock Blinding Flash
+    XX - Unlock light barrier
+    XX - Unlock fake barrier
+    XX - Unlock Illusion Magic
+Life Magic - Level capped by Spell Knowledge. Each level increases healing effectiveness
+    0 - Regeneration
+
+Other:
+Soul talent grows initial mana
+
+Control - Control your movements; control your magic. Acting with deliberation. Your connection to your body.
+
+
+
+Later zones:
+Forest - you wander off on your own. You won't find answers here, but there will be long moments of peace among the pressure of combat. The town, not recognizing you, won't let you back in afterwards.
+Academy - the center of knowledge. Stealing a beacon crystal from a mage, you teleport there and try to learn more about your situation, and magic. There isn't a way to teleport back
+City - After signing up as a healer, you're given a mana potion per patient you heal. Eventually, you're recognized for your help and offered a healing job at the city. You get a horse and rush it, using healing to go faster. You can eventually come back.
+

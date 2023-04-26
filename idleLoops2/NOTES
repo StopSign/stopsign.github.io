@@ -32,6 +32,9 @@ New Skill
 	
 TODO:
 
+handleSkillExp is unnecessary
+finish shouldn't be requried
+
 Statistics menu
     Total loop #
     Total mana spent

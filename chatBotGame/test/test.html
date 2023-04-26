@@ -1,0 +1,54 @@
+<html>
+<head>
+    <style>
+        .column {
+            display: inline-block;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+        .bar {
+            position: absolute;
+            top: 0;
+            width: 100%;
+            background-color: black;
+        }
+    </style>
+</head>
+<body>
+<div id="riverContainer">
+    <img id="riverBottomImg" src="./../img/riverBottom.png" style="z-index:-1;position:absolute;"/>
+    <div id="riverColumns" ></div>
+</div>
+
+<script>
+    const riverBottomImg = document.getElementById("riverBottomImg");
+    const riverColumnsContainer = document.getElementById("riverColumns");
+    const numColumns = 10;
+
+    // Calculate the width of each column
+    const riverColumnWidth = riverBottomImg.offsetWidth / numColumns;
+
+    // Create the columns
+    for (let i = 0; i < numColumns; i++) {
+        const column = document.createElement("div");
+        column.classList.add("column");
+        column.style.width = `${riverColumnWidth}px`;
+        riverColumnsContainer.appendChild(column);
+    }
+
+    // Set the values for each column
+    const values = [50, 60, 70, 80, 90, 100, 90, 80, 70, 60];
+
+    // Update the columns to show the correct percentage of the image
+    riverColumnsContainer.childNodes.forEach((column, index) => {
+        const value = values[index];
+        const barHeight = (value / 100) * image.offsetHeight;
+        const bar = document.createElement("div");
+        bar.classList.add("bar");
+        bar.style.height = `${barHeight}px`;
+        column.appendChild(bar);
+    });
+</script>
+</body>
+</html>

@@ -145,6 +145,34 @@ function finishDungeon(dungeonNum, floorNum) {
     return false;
 }
 
+Action.GainMana = new Action("Gain Mana", {
+    type: "normal",
+    expMult: 1,
+    townNum: 0,
+    storyReqs(storyNum) {
+        return false;
+    },
+    stats: {
+        Con:.5,
+        Will:.5
+    },
+    //affectedBy: ["Buy Glasses"],
+    manaCost() {
+        return 200;
+    },
+    visible() {
+        return true;
+    },
+    unlocked() {
+        return true;
+    },
+    manaGain() {
+        return 300;
+    },
+    finish() {
+    }
+});
+
 
 Action.SensePotions = new Action("Sense Potions", {
     type: "progress",

@@ -141,8 +141,8 @@
         <story_title>Story</story_title>
         <stories>
             <story num="0">
-                Wrong place and wrong time. You were visiting the village next to yours, looking for work, when monsters attacked! Wolves, trolls, ogres, even a chimera destroyed the town while you were hiding under cover.
-                When your cover was destroyed by a stray fireball from the defenders, you ran out in the open - just in time for a platinum adventurer to conjure an elemental, right underneath you.
+                Wrong place and wrong time. You were visiting the city next to yours, looking for work, when monsters attacked! Wolves, trolls, ogres, even a chimera destroyed the town while you were hiding under cover.
+                When your cover was destroyed by a stray fireball from the defenders, you ran out in the open - just in time for a platinum adventurer to conjure an elemental, accidentally right underneath you.
                 You blacked out, and when you came to, the monsters were all defeated, and cleanup was underway. You helped for a bit, but then you suddenly collapsed - painlessly, thankfully - and the world went dark.
                 You woke up, and you were back where you were, minutes ago! You were looping in time! Desperately, you tried to run, but in about the same time, it happened again.
                 A few more loops, and you accidentally ran into a vase with water in it - and then the loop lasted just a little longer. After some experimentation, it seems that your mana is your clock, and when it runs out - time resets.
@@ -392,6 +392,11 @@
             <tooltip>Ladder time</tooltip>
             <story_1><![CDATA[<b>Ladder Purchased:</b>⮀ Climb]]></story_1>
         </buy_ladder>
+        <gain_mana>
+            <label>Gain Mana</label>
+            <tooltip>TEST</tooltip>
+            <story_1><![CDATA[<b>TESTTT:</b>⮀ Climb]]></story_1>
+        </gain_mana>
         <learn_healing>
             <label>Learn Healing</label>
             <label_done>Learned from Healing Book</label_done>

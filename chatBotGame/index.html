@@ -1,0 +1,65 @@
+<html>
+<head>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="individual.css">
+    <title>Idle Game</title>
+</head>
+<body>
+<img class="backgroundImage" id="plateauImg" src="img/plateau.png">
+<img class="backgroundImage" id="iceImg" src="img/ice.png">
+<img class="backgroundImage" id="reserveImg" src="img/reserve.png">
+<img class="backgroundImage" id="pipeImg" src="img/pipe.png">
+<img class="backgroundImage" id="riverTopImg" src="img/riverTop.png">
+<img class="backgroundImage" id="riverBottomImg" src="img/riverBottom.png">
+<div style="height:1000px;"></div>
+<p id="iceContainer">Ice: <span id="ice">0</span></p>
+<p id="moneyContainer">Money: <span id="money">0</span></p>
+<div id="buyIceContainer">
+    <button id="buyIceButton">Buy Ice ($1/unit)</button><br>
+    Units: <input type="number" id="iceValue" value="10"><br>
+    <button id="buyMaxIceButton">Buy Max</button>
+</div>
+<div id="reserveContainer">Reserve: <span id="reserve">0</span></div>
+<span id="pumpContainer">
+    <div id="progressBarContainer">
+        <div id="progressBar"></div>
+    </div>
+    <div id="pumpText">
+        Pump: <span id="pump">1</span> water from reserve/s
+    </div>
+    <button id="upgradePumpButton">Upgrade Pump ($10/unit)</button>
+</span>
+<span id="mountainLakeContainer">
+    Mountain Lake: <span id="mountainLake">0</span>
+</span>
+<br />
+<span id="riverContainer">
+    <div style="position:absolute;">River:</div>
+    <div id="riverColumns"></div>
+</span>
+<br />
+<p>Great Lake: <span id="greatLake">0</span></p>
+<button id="sellWaterButton">Sell Water ($1.25/unit)</button>
+<script src="saving.js"></script>
+<script src="game.js"></script>
+<script src="view.js"></script>
+<script src="listeners.js"></script>
+<script src="interval.js"></script>
+<script src="loadAndStart.js"></script>
+<script>
+    function startGame () {
+        saving.load();
+        if (isFileSystem) {
+        } else {
+            window.doWork = new Worker('interval.js');
+            window.doWork.onmessage = function (event) {
+                if (event.data === 'interval.start') {
+                    tick();
+                }
+            };
+        }
+    }
+    startGame();
+</script>
+</body>
+</html>
