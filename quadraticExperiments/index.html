@@ -18,7 +18,8 @@
 Seconds passed: <span id="time"></span><br>
 <button onclick="addEquation()">Add Equation</button>
 <button onclick="addLayer()">Add Layer</button>
-<button onclick="reset()">Reset</button><br>
+<button onclick="reset()">Reset</button>
+<button onclick="setToOne()">Set all inputs to 1</button><br>
 <label for="timer">Ticks per second: </label><input type="number" class="input-box" oninput="changeTime()" id="timer" value="1">
 Total ticks:<span id="ticks"></span>
 <div id="equationArea">
@@ -32,6 +33,18 @@ Total ticks:<span id="ticks"></span>
   setInterval(countSeconds, 1000);
   let id = setInterval(tick, 1000);
 
+  function setToOne() {
+    for(let i = 0; i < data.length; i++) {
+      for(let j = 0; j < data[i].length; j++) {
+        if(j === 0) {
+          continue;
+        }
+        document.getElementById("input"+i+"_"+j).value = 1;
+        data[i][j].mult = 1;
+      }
+    }
+  }
+
   function changeTime(event) {
     let newTime = document.getElementById("timer").value;
     if(newTime < 0) {
@@ -43,7 +56,7 @@ Total ticks:<span id="ticks"></span>
       document.getElementById("timer").value = newTime;
     }
     clearInterval(id);
-    if(newTime != 0) {
+    if(newTime !== 0) {
       id = setInterval(tick, 1000 / newTime);
     }
   }
@@ -93,6 +106,7 @@ Total ticks:<span id="ticks"></span>
           input.type = "number";
           input.className = "input-box";
           input.value = data[i][j].mult;
+          input.id = "input"+i+"_"+j;
           input.oninput = function (event) {
             data[i][j].mult = parseFloat(event.target.value) || 0;
           }
