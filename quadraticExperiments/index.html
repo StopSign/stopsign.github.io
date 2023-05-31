@@ -29,8 +29,9 @@ Total ticks:<span id="ticks"></span>
 <script>
   let time = 0;
   let ticks = 0;
+  let stop = 0;
   let data = [];
-  setInterval(countSeconds, 1000);
+  let secondsId = setInterval(countSeconds, 1000);
   let id = setInterval(tick, 1000);
 
   function setToOne() {
@@ -45,27 +46,39 @@ Total ticks:<span id="ticks"></span>
     }
   }
 
-  function changeTime(event) {
+  function changeTime() {
     let newTime = document.getElementById("timer").value;
-    if(newTime < 0) {
+    if (newTime <= 0) {
       newTime = 0;
       document.getElementById("timer").value = newTime;
+      stop = 1;
+      return;
+    } else {
+      stop = 0;
     }
-    if(newTime > 50) {
+    if (newTime > 50) {
       newTime = 50;
       document.getElementById("timer").value = newTime;
     }
     clearInterval(id);
-    if(newTime !== 0) {
+    if (newTime !== 0) {
       id = setInterval(tick, 1000 / newTime);
     }
   }
+
+
   function countSeconds() {
+    if(stop === 1) {
+      return;
+    }
     time++;
     document.getElementById("time").innerHTML = time;
   }
 
   function tick() {
+    if(stop === 1) {
+      return;
+    }
     ticks++;
     document.getElementById("ticks").innerHTML = ticks;
     for(let i = 0; i < data.length; i++) {
@@ -137,11 +150,16 @@ Total ticks:<span id="ticks"></span>
     }
     time = 0;
     ticks = 0;
+    clearInterval(secondsId);
+    clearInterval(id);
+    secondsId = setInterval(countSeconds, 1000);
+    id = setInterval(tick, 1000 / document.getElementById("timer").value);
     createGrid(); // Update the grid after resetting
   }
 
-  // Initiate with a 1x1 grid
+  // Initiate with a 1x2 grid
   addEquation();
+  addLayer();
   addLayer();
 </script>
 </body>
