@@ -7,7 +7,7 @@
       width: 50px;
     }
     .col {
-      width: 130px;
+      width: 150px;
       border: 1px solid;
       display: inline-block;
       margin-right: 5px;
@@ -34,8 +34,8 @@ Total ticks:<span id="ticks"></span>
 
   function changeTime(event) {
     let newTime = document.getElementById("timer").value;
-    if(newTime <= 0) {
-      newTime = 1;
+    if(newTime < 0) {
+      newTime = 0;
       document.getElementById("timer").value = newTime;
     }
     if(newTime > 50) {
@@ -43,7 +43,9 @@ Total ticks:<span id="ticks"></span>
       document.getElementById("timer").value = newTime;
     }
     clearInterval(id);
-    id = setInterval(tick, 1000 / newTime);
+    if(newTime != 0) {
+      id = setInterval(tick, 1000 / newTime);
+    }
   }
   function countSeconds() {
     time++;
@@ -108,7 +110,7 @@ Total ticks:<span id="ticks"></span>
     // Loop through each cell in the grid and update its number
     for(let i = 0; i < data.length; i++) {
       for(let j = 0; j < data[i].length; j++) {
-        document.getElementById(`num-${i}-${j}`).innerHTML = (j===0?"$":"")+intToString(data[i][j].num);
+        document.getElementById(`num-${i}-${j}`).innerHTML = (j===0?"$":"")+intToStringRound(data[i][j].num, 6);
       }
     }
   }
