@@ -11,6 +11,9 @@ function round1(num) {
 function round2(num) {
     return Math.floor(num * 100 + .000000001) / 100;
 }
+function round3(num) {
+    return Math.floor(num * 1000 + .000000001) / 1000;
+}
 function round5(num) {
     return Math.floor(num * 100000 + .000000001) / 100000;
 }
@@ -69,6 +72,9 @@ function intToStringNegative(value, amount) {
         isPositive = -1;
         value *= -1;
     }
+    if(value < .009) { //avoid wiggling
+        return "+0.00";
+    }
     if (value >= 10000) {
         return (isPositive === 1 ? "+" : "-") + nFormatter(value, 3);
     }
@@ -98,6 +104,7 @@ function intToString(value, amount) {
     }
     return parseFloat(value).toFixed(baseValue - 1);
 }
+
 
 function intToStringRound(value) {
     if (value >= 10000) {

@@ -1,38 +1,14 @@
 let view = {
     initialize: function() {
         //auto generated elements
-
-        //initialize grid
-        const gridElem = document.getElementById("grid");
-        for (let i = 0; i < width; i++) {
-            for (let j = 0; j < height; j++) {
-                const cellElem = document.createElement("div");
-                cellElem.className = "cell";
-                cellElem.style.gridColumn = i + 1;
-                cellElem.style.gridRow = j + 1;
-
-                const highlightElem = document.createElement("div");
-                highlightElem.className = "highlight";
-                cellElem.appendChild(highlightElem);
-                gridElem.appendChild(cellElem);
-
-                cellElem.onclick = function() {
-                    onEachCell(function(cell) {
-                        if(cell.firstElementChild.style.display !== "none") {
-                            cell.firstElementChild.style.display = "none";
-                        }
-                    });
-                    highlightElem.style.display = "block";
-                    view.updating.selectedCell([i, j]);
-                }
-            }
-        }
+        view.create.createLevel();
     },
     updating: {
         update: function () {
 
             view.updating.changedCells();
             view.updating.infoPanel();
+
 
             view.updating.selectedCell();
             view.updating.saveCurrentState();
@@ -47,8 +23,8 @@ let view = {
             // if changedCells is null, render all cells
             if (changedCells === null) {
                 changedCells = new Set();
-                for (let i = 0; i < width; i++) {
-                    for (let j = 0; j < height; j++) {
+                for (let i = 0; i < getCurLevel().width; i++) {
+                    for (let j = 0; j < getCurLevel().height; j++) {
                         changedCells.add([i, j]);
                     }
                 }
@@ -58,7 +34,7 @@ let view = {
             changedCells.forEach(function(coords) {
                 let i = coords[0];
                 let j = coords[1];
-                const cellElem = gridElem.children[i * width + j];
+                const cellElem = gridElem.children[i * getCurLevel().width + j];
                 if (grid[i][j] === "wall") {
                     cellElem.style.backgroundColor = "rgb(150, 150, 150)";
                     cellElem.style.cursor = "default";
@@ -82,29 +58,27 @@ let view = {
         },
         infoPanel: function() {
             // update the total water count
-            document.getElementById("totalAdded").innerHTML = round(info.totalAdded);
-            document.getElementById("totalColor").innerHTML = round(info.totalColor);
-            document.getElementById("totalAntiColor").innerHTML = round(info.totalAntiColor);
-            document.getElementById("deltaAdded").innerHTML = round(info.deltaAdded * ticksPerSecond);
-            document.getElementById("deltaColor").innerHTML = round(info.deltaColor * ticksPerSecond);
-            document.getElementById("deltaAntiColor").innerHTML = round(info.deltaAntiColor * ticksPerSecond);
+            // document.getElementById("totalAdded").innerHTML = intToStringNegative(info.totalAdded, 4);
+            document.getElementById("infoSpeciesTotal").innerHTML = intToString(info.totalSpecies, 4);
+            document.getElementById("infoEnemeyTotal").innerHTML = intToString(Math.abs(info.totalEnemy), 4);
+            // document.getElementById("deltaAdded").innerHTML = intToStringNegative(info.deltaAdded * ticksPerSecond);
+            document.getElementById("infoSpeciesDelta").innerHTML = intToStringNegative(info.deltaSpecies * ticksPerSecond);
+            document.getElementById("infoEnemyDelta").innerHTML = intToStringNegative(info.deltaEnemy * ticksPerSecond);
         },
-        selectedCell: function(selectedCell) {
+        selectedCell: function() {
             if (selectedCell !== undefined && selectedCell !== null) {
                 let i = selectedCell[0];
                 let j = selectedCell[1];
-                let cellWater = grid[i][j];
-                let cellContent = getCurSpecies().enemy.name;
-                if (cellWater === "wall") {
-                    cellContent = "Wall";
-                } else if (cellWater > 0) {
-                    cellContent = getCurSpecies().name;
+                let cellSpeciesCount = grid[i][j];
+                let cellContentName = getCurSpecies().enemy.name;
+                if (cellSpeciesCount === "wall") {
+                    cellContentName = "Wall";
+                } else if (cellSpeciesCount > 0) {
+                    cellContentName = getCurSpecies().name;
                 }
-                document.getElementById("selectedCellWater").innerHTML = cellWater;
-                document.getElementById("selectedCellContent").innerHTML = cellContent;
+                document.getElementById("selectedCellInfo").innerHTML = cellContentName + (isNaN(cellSpeciesCount)?"":("<br>" + nFormatter(Math.abs(cellSpeciesCount), 4))) + "<br>Coords: (" + i + ", " + j + ")";
             } else {
-                document.getElementById("selectedCellWater").innerHTML = "";
-                document.getElementById("selectedCellContent").innerHTML = "";
+                document.getElementById("selectedCellInfo").innerHTML = "";
             }
         },
         resources: function() {
@@ -114,6 +88,45 @@ let view = {
         }
     },
     create: {
+        createLevel: function() {
+            view.create.initializeGrid();
+            document.getElementById("infoSpeciesName").innerHTML = getCurSpecies().name;
+            document.getElementById("infoEnemyName").innerHTML = getCurSpecies().enemy.name;
+        },
+        initializeGrid: function() {
+            //initialize grid
+            const gridElem = document.getElementById("grid");
+
+
+            gridElem.style.gridTemplateColumns = "repeat("+getCurLevel().width+", 1fr)";
+            gridElem.style.gridTemplateRows = "repeat("+getCurLevel().height+", 1fr)";
+
+            for (let i = 0; i < getCurLevel().width; i++) {
+                for (let j = 0; j < getCurLevel().height; j++) {
+                    const cellElem = document.createElement("div");
+                    cellElem.className = "cell";
+                    cellElem.style.gridColumn = i + 1;
+                    cellElem.style.gridRow = j + 1;
+
+                    const highlightElem = document.createElement("div");
+                    highlightElem.className = "highlight";
+                    cellElem.appendChild(highlightElem);
+                    gridElem.appendChild(cellElem);
+
+                    cellElem.onclick = function() {
+                        onEachCell(function(cell) {
+                            if(cell.firstElementChild.style.display !== "none") {
+                                cell.firstElementChild.style.display = "none";
+                            }
+                        });
+                        if(this)
+                            highlightElem.style.display = "block";
+                        selectedCell = [i, j];
+                        view.updating.selectedCell();
+                    }
+                }
+            }
+        },
         createButton: function(buttonDatum, pos) {
             let buttonHTML = "<div class='button abs showthat' onclick='buttonData[" + pos + "].onclick()' " +
                 "style='top:" + buttonDatum.y + "px;left:" + buttonDatum.x + "px'>" +

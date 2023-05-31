@@ -7,7 +7,7 @@ let curTime = new Date();
 let gameTicksLeft = 0;
 let sudoStop = false;
 let saveTimer = 2000;
-let ticksPerSecond = 50;
+let ticksPerSecond = 20;
 let totalTime = 0;
 let ticksForSeconds = 0;
 

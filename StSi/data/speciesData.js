@@ -8,7 +8,7 @@ data.species.beavers = {
         },
     spawnerName: "Floodplain",
     researchName: "Burrow",
-    mapType: "river",
+    levelType: "river",
     ability: {
         name: "Lodge Fortress",
         desc: "Place a building in a location with at least <span id='beaverAbilityRequirement'>100</span> Beavers in it. It spawns at a rate of 25% of the primary spawner per second, for <span id='beaverAbilityduration'>8</span> seconds. Additionally, units within a distance of <span id='beaverAbilityDistance'>3</span> have <span id='beaverAbilityDefense'>0.3</span> more defense." +

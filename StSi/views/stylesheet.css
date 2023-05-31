@@ -201,13 +201,13 @@ input {
 .progressOuter {
     width:80px;
     height:11px;
-    background-color:rgba(50, 50, 50, .8);
+    background-color:black;
     position:relative;
 }
 .progressInner {
     height:100%;
     position:absolute;
-    background-color: #a86fc4;
+    background-color: #37e8c5;
 }
 
 .donationContainer {
@@ -245,14 +245,10 @@ input {
 }
 .grid {
     display: grid;
-    grid-template-columns: repeat(100, 1fr);
-    grid-template-rows: repeat(100, 1fr);
     background-color: white;
     border: 1px solid black;
     width: 800px;
     height: 800px;
-    margin-left: auto;
-    margin-right: auto;
 }
 
 .cell {
@@ -267,10 +263,11 @@ input {
 }
 
 .info-panel {
-    margin-left: 20px;
+    padding:5px;
+    background-color: #a86fc4;
     display: inline-block;
     vertical-align: top;
-    width: 300px;
+    width: 792px;
 }
 
 .info-panel ul {
@@ -281,4 +278,10 @@ input {
 .info-panel li {
     list-style-type: none;
     margin-bottom: 5px;
+}
+
+.infoColumn {
+    display:inline-block;
+    float:left;
+    width:30%;
 }

@@ -26,22 +26,22 @@ let spawners = [];
 
 let prevState = {};
 
-const width = 100;
-const height = 100;
-
 let lastColorValue = [];
+let selectedCell = null;
 let minNegativeValue = -1;
 
 let info = {};
 info.totalAdded = 0;
 info.prevTotalAdded = 0;
 info.deltaAdded = 0;
-info.totalColor = 0;
+info.totalSpecies = 0;
 info.prevTotalColor = 0;
-info.deltaColor = 0;
-info.totalAntiColor = 0;
+info.deltaSpecies = 0;
+info.speciesSpawn = 0;
+info.enemySpawn = 0;
+info.totalEnemy = 0;
 info.prevTotalAntiColor = 0;
-info.deltaAntiColor = 0;
+info.deltaEnemy = 0;
 info.ticksPerSecond = 20;
 
 let curSpecies = "beavers";

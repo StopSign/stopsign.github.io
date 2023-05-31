@@ -13,16 +13,20 @@
 </head>
 
 <body>
-<div class="grid" id="grid"></div>
-<div class="info-panel">
-    <ul>
-        <li>Total Color: <span id="totalColor"></span>, Delta: <span id="deltaColor"></span>/s</li>
-        <li>Total Anti Color: <span id="totalAntiColor"></span>, Delta: <span id="deltaAntiColor"></span>/s</li>
-        <li>Total, Added: <span id="totalAdded"></span>, Delta: <span id="deltaAdded"></span>/s</li>
-        <li>Selected Cell Water: <span id="selectedCellWater"></span></li>
-        <li>Selected Cell Content: <span id="selectedCellContent"></span></li>
-    </ul>
+<div class="info-panel" style="height:100px;">
+    <div style="height:70%">
+        <span class="infoColumn">Total <b><span id="infoSpeciesName"></span></b>: <b><span id="infoSpeciesTotal"></span></b>
+            <br>From combat: <b><span id="infoSpeciesDelta"></span></b>/s
+            <br>Spawning <b><span id="infoSpeciesSpawning"></span></b>/s
+            <br>Total change: <b><span id="infoSpeciesTotalPS"></span></b>/s</span>
+        <span class="infoColumn">Total <b><span id="infoEnemyName"></span></b>: <b><span id="infoEnemeyTotal"></span></b><br>From combat: <b><span id="infoEnemyDelta"></span></b>/s<br>Spawning <b><span id="infoEnemySpawning"></span></b>/s<br>Total change: <b><span id="infoEnemyTotalPS"></span></b>/s</span>
+        <span id="selectedCellInfo"></span>
+    </div>
+    <div class="progressOuter" style="width:802px;margin-left:-5px;height:30%;margin-top:5px;">
+        <div class="progressInner" id="infoProgress" style="width:20%"></div>
+    </div>
 </div>
+<div class="grid" id="grid"></div>
 
 <script src="driver.js?1"></script>
 <script src="saving.js?1"></script>
@@ -38,11 +42,6 @@
 <script>
     startGame();
 
-    addSpawner(50, 50, 1000, 1000, 80);
-    addSpawner(60, 50, -10000, -200, 80);
-    addSpawner(65, 50, -10000, -200, 80);
-    addSpawner(70, 50, -10000, -200, 80);
-    addSpawner(75, 50, -10000, -200, 80);
 </script>
 </body>
 </html>

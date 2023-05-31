@@ -99,6 +99,7 @@ function intToString(value, amount) {
     return parseFloat(value).toFixed(baseValue - 1);
 }
 
+
 function intToStringRound(value) {
     if (value >= 10000) {
         return nFormatter(value, 3);

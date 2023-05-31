@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Quadratic Demo</title>
+  <style>
+    .input-box {
+      width: 50px;
+    }
+    .col {
+      width: 130px;
+      border: 1px solid;
+      display: inline-block;
+      margin-right: 5px;
+    }
+  </style>
+</head>
+<body>
+Seconds passed: <span id="time"></span><br>
+<button onclick="addEquation()">Add Equation</button>
+<button onclick="addLayer()">Add Layer</button>
+<button onclick="reset()">Reset</button>
+<div id="equationArea">
+</div>
+
+<script>
+  let time = 0;
+  let data = [];
+  setInterval(tick, 1000);
+
+  function tick() {
+    time++;
+    document.getElementById("time").innerHTML = time;
+    for(let i = 0; i < data.length; i++) {
+      for(let j = data[i].length-1; j > 0; j--) {
+        data[i][j-1].num += data[i][j].mult * data[i][j].num;
+      }
+    }
+    updateGrid(); // Only update numbers inside the grid
+  }
+
+  function addEquation() {
+    let newRow = [];
+    for(let i = 0; i < (data[0] ? data[0].length : 0); i++) {
+      newRow.push({num: 1, mult: 0});
+    }
+    data.push(newRow);
+    createGrid();
+  }
+
+  function addLayer() {
+    for(let i = 0; i < data.length; i++) {
+      data[i].push({num: 1, mult: 0});
+    }
+    createGrid();
+  }
+
+  function createGrid() {
+    let theGrid = document.getElementById("equationArea");
+    theGrid.innerHTML = ''; // Clear the existing grid
+    for(let i = 0; i < data.length; i++) {
+      let equationElem = document.createElement("div");
+      equationElem.className = "col";
+      for(let j = 0; j < data[i].length; j++) {
+        let cellNum = document.createElement("span");
+        cellNum.id = `num-${i}-${j}`; // Set an id to the div for future reference
+        if(j > 0) {
+          let input = document.createElement("input");
+          input.type = "number";
+          input.className = "input-box";
+          input.value = data[i][j].mult;
+          input.oninput = function (event) {
+            data[i][j].mult = parseFloat(event.target.value) || 0;
+          }
+          equationElem.appendChild(input);
+        }
+        equationElem.appendChild(cellNum);
+        equationElem.appendChild(document.createElement("br"));
+      }
+      theGrid.appendChild(equationElem);
+    }
+    updateGrid(); // Display initial numbers
+  }
+
+  function updateGrid() {
+    // Loop through each cell in the grid and update its number
+    for(let i = 0; i < data.length; i++) {
+      for(let j = 0; j < data[i].length; j++) {
+        document.getElementById(`num-${i}-${j}`).innerHTML = data[i][j].num.toFixed(2);
+      }
+    }
+  }
+
+  function reset() {
+    for(let i = 0; i < data.length; i++) {
+      for(let j = 0; j < data[i].length; j++) {
+        data[i][j].num = 1;
+      }
+    }
+    time = 0;
+    createGrid(); // Update the grid after resetting
+  }
+
+  // Initiate with a 1x1 grid
+  addEquation();
+  addLayer();
+</script>
+</body>
+</html>
