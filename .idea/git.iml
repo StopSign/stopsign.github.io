@@ -27,7 +27,6 @@
       <excludeFolder url="file://$MODULE_DIR$/hungerIdle" />
       <excludeFolder url="file://$MODULE_DIR$/idleLoops" />
       <excludeFolder url="file://$MODULE_DIR$/idleLoops2" />
-      <excludeFolder url="file://$MODULE_DIR$/initial" />
       <excludeFolder url="file://$MODULE_DIR$/miner" />
       <excludeFolder url="file://$MODULE_DIR$/old1" />
       <excludeFolder url="file://$MODULE_DIR$/old2" />
@@ -38,6 +37,8 @@
       <excludeFolder url="file://$MODULE_DIR$/square" />
       <excludeFolder url="file://$MODULE_DIR$/temp" />
       <excludeFolder url="file://$MODULE_DIR$/tmp" />
+      <excludeFolder url="file://$MODULE_DIR$/StSi" />
+      <excludeFolder url="file://$MODULE_DIR$/quadraticExperiments" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
