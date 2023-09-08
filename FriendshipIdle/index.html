@@ -15,21 +15,20 @@
 </head>
 <body id="theBody" oncontextmenu="return false;" style="padding:5px" class="medium">
 
-<div class="shopContainer" style="position:relative;display:inline-block">
-    <div class="roofTriangle"></div>
-    <div class="shopSquare" ></div>
-</div>
-<div class="shopContainer" style="position:relative;display:inline-block">
-    <div class="roofTriangle"></div>
-    <div class="shopSquare" ></div>
-</div>
-<div class="shopContainer" style="position:relative;display:inline-block">
-    <div class="roofTriangle"></div>
-    <div class="shopSquare" ></div>
-</div>
-<div class="shopContainer" style="position:relative;display:inline-block">
-    <div class="roofTriangle"></div>
-    <div class="shopSquare" ></div>
+<div id="scene">
+    <div id="shop">
+        <div class="wall front-wall window"></div>
+        <div class="wall left-wall window"></div>
+        <div class="wall right-wall"></div>
+        <div class="wall back-wall"></div>
+
+        <!--Shop 2-->
+        <div style="left:320px" class="wall front-wall window"></div>
+        <div style="left:120px" class="wall left-wall"></div>
+        <div style="left:420px" class="wall right-wall window"></div>
+        <div style="left:320px" class="floor"></div>
+        <div style="left:320px" class="wall back-wall"></div>
+    </div>
 </div>
 
 </body>
@@ -39,12 +38,14 @@
 <!-- Script outside of body to load and execute before page content is loaded -->
 <script src="data/globals.js?1"></script>
 <script src="driver.js?1"></script>
+<script src="events.js?1"></script>
 <script src="views/mainView.js?1"></script>
 <script src="saving.js?1"></script>
 <script src="helpers/helpers.js?1"></script>
 <script src="helpers/hotkeys.js?1"></script>
 <script src="helpers/interval.js?1"></script>
 <script src="data/moduleData.js?1"></script>
+<script src="views/panelCreation.js?1"></script>
 <script>
     // (function (i, s, o, g, r, a, m) {
     //     i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function () {

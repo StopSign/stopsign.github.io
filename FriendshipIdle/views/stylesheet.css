@@ -266,3 +266,86 @@ input {
     display:inline-block
 }
 
+
+
+
+
+
+
+
+
+
+
+#scene {
+    perspective: 700px;
+    perspective-origin:bottom;
+    font-size:0;
+    margin:auto;
+    top:500px;
+    position:relative;
+    transform:perspective(1000px) scale(3);
+}
+
+#shop {
+    transform-style: preserve-3d;
+    position: relative;
+    width: 300px;
+    height: 100px;
+    transform: rotateX(-27deg) translateX(775px);
+    display:inline-block;
+}
+
+.wall {
+    position: absolute;
+    height:100px;
+    background-color: rgba(211, 209, 209);
+}
+
+.shortwall {
+    position:absolute;
+    height:20px;
+    width:300px;
+    background-color: rgba(211, 209, 209, .8);
+    transform:translateY(80px);
+}
+
+.front-wall {
+    width: 300px;
+}
+.back-wall {
+    width:300px;
+    transform:translateZ(-400px);
+}
+
+.left-wall {
+    width: 400px;
+    transform: rotateY(90deg) translateX(200px);
+    left:-200px;
+}
+
+.window {
+    background-color: rgba(0, 128, 255, 0.05) !important;
+    pointer-events: none;
+}
+
+.right-wall {
+    width: 400px;
+    transform: rotateY(90deg) translateX(200px);
+    left:100px;
+}
+
+.floor {
+    position:absolute;
+    width:400px;
+    height:300px;
+    background-color: rgb(203, 144, 64);
+    transform: rotateY(90deg) rotateX(90deg) translateX(200px) translateY(-50px) translateZ(50px);
+}
+
+.panel {
+    position:absolute;
+}
+
+.metal {
+    background-color: rgb(127, 129, 133);
+}
