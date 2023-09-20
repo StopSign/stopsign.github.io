@@ -117,7 +117,7 @@ function Computer() {
             threads: 0,
             cost:0,
             costType:"",
-            finish:function() { game.farms.improve(); this.ticksNeeded = precision3(20*(this.completions+2 )+ Math.pow(this.completions, 2)/10); },
+            finish:function() { game.farms.improve(); this.ticksNeeded = precision3(5*(this.completions+2 )+ Math.pow(this.completions, 2)/10); },
             showing: function() { return true; }
         },
         { //Find more Ice Sellers
