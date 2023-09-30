@@ -283,7 +283,8 @@ input {
     margin:auto;
     top:500px;
     position:relative;
-    transform:perspective(1000px) scale(3);
+    transform:perspective(1000px) scale(1);
+    width:1850px;
 }
 
 #shop {
@@ -349,3 +350,57 @@ input {
 .metal {
     background-color: rgb(127, 129, 133);
 }
+
+.lawn {
+    width: 500px;
+    height: 500px;
+    background: repeating-linear-gradient(
+            75deg,
+            #228B22,
+            #228B22 15px,
+            #027502 15px,
+            #027502 30px
+    );
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

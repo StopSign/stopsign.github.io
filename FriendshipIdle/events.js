@@ -58,7 +58,7 @@ document.addEventListener("mouseup", () => {
 
 // Scroll to Zoom
 document.addEventListener("wheel", (e) => {
-    zoom += e.deltaY * -0.001;
-    zoom = Math.min(Math.max(0.125, zoom), 4);  // Constrain zoom
+    zoom += e.deltaY * -0.002;
+    zoom = Math.min(Math.max(0.70, zoom), 10);  // Constrain zoom
     scene.style.transform = `perspective(1000px) scale(${zoom})`;
 });
