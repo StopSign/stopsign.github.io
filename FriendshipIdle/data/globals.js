@@ -22,6 +22,17 @@ let prevState = {};
 //Game globals
 let data = {};
 
-function loadDefaults() {
+let labels = {};
+labels.numbers = [];
 
+let displayItemCount = 0;
+let prevDisplayItemCount = 0;
+
+let breadDivs = [];
+let visibleBreadDivs = [];
+let trayDivs = [];
+
+function loadDefaults() {
+    data.showGlass = true;
+    data.showDoors = true;
 }

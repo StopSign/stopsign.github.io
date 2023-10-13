@@ -1,4 +1,5 @@
-
+let glassIds = [];
+let doorIds = [];
 
 let FLOOR_COLOR = "rgb(203, 144, 64)";
 let OUTSIDE_WALL_COLOR = "rgba(211, 209, 209)";
@@ -27,7 +28,8 @@ let GLASS_DOOR_COLOR = "rgba(0, 128, 255, .12)";
 let SIDEWALK_COLOR = "rgb(255, 248, 220)";
 let ASPHALT_COLOR = "rgb(70, 70, 70)";
 let PARKING_LOT_LINE_COLOR = "white";
-let BLACKBOARD_BORDER_COLOR = "rgb(145, 90, 2)"
+let BLACKBOARD_BORDER_COLOR = "rgb(145, 90, 2)";
+let BREAD_COLOR = "rgb(139, 69, 19)";
 
 
 
@@ -48,12 +50,19 @@ function createFlatPanel(id, fromLeft, fromFront, fromBottom, width, depth, colo
     div.style.height = depth+"px";
     div.style.width = width+"px";
     div.style.backgroundColor = color;
+    div.style.backfaceVisibility = "hidden";
     div.id = id + "-flat";
     if(!isClickable) {
         div.style.pointerEvents = "none";
     }
 
     document.getElementById("shop").appendChild(div);
+}
+
+
+function createFlatCircle(id, fromLeft, fromFront, fromBottom, width, depth, color, isClickable=true) {
+    createFlatPanel(id, fromLeft, fromFront, fromBottom, width, depth, color, isClickable);
+    document.getElementById(id+"-flat").style.borderRadius = width/2+"px";
 }
 
 
@@ -81,10 +90,11 @@ function createFrontPanel(id, fromLeft, fromFront, fromBottom, width, height, co
 
     div.style.position = 'absolute';
     div.style.width = `${width}px`;
-    div.style.height = `${height+1}px`;
+    div.style.height = `${height}px`;
     div.style.left = `${fromLeft}px`;
     div.style.bottom = `${fromBottom-1}px`;
     div.style.backgroundColor = color;
+    div.style.backfaceVisibility = "hidden";
     div.style.border = border;
     div.style.transform = "translateZ("+(-1*fromFront)+"px)";
     if(!isClickable) {
@@ -94,6 +104,11 @@ function createFrontPanel(id, fromLeft, fromFront, fromBottom, width, height, co
     div.id = `${id}-wall`;
 
     document.getElementById('shop').appendChild(div);
+}
+
+function createFrontCircle(id, fromLeft, fromFront, fromBottom, width, height, color, isClickable=true) {
+    createFrontPanel(id, fromLeft, fromFront, fromBottom, width, height, color, isClickable);
+    document.getElementById(id+"-wall").style.borderRadius = width/2+"px";
 }
 
 function createCubeSides(id, fromLeft, fromFront, fromBottom, width, height, depth, colors, isClickable=true) {
@@ -127,8 +142,8 @@ function createSquareTable(id, fromLeft, fromFront, fromBottom, width, height, d
     createFlatPanel(id + '-top', fromLeft, fromFront, fromBottom+height, width, depth, topColor);
 
     // Create the four legs
-    createFrontPanel(id + '-leg1', fromLeft, fromFront, fromBottom, legWidth, height+1, legColor);
-    createFrontPanel(id + '-leg2', fromLeft + width - legWidth, fromFront, fromBottom, legWidth, height+1, legColor);
+    createFrontPanel(id + '-leg1', fromLeft, fromFront, fromBottom, legWidth, height, legColor);
+    createFrontPanel(id + '-leg2', fromLeft + width - legWidth, fromFront, fromBottom, legWidth, height, legColor);
     createFrontPanel(id + '-leg3', fromLeft, fromFront + depth, fromBottom, legWidth, height, legColor);
     createFrontPanel(id + '-leg4', fromLeft + width - legWidth, fromFront + depth - legWidth, fromBottom, legWidth, height, legColor);
 }
@@ -137,19 +152,7 @@ function createCircularTable(id, fromLeft, fromFront, fromBottom, width, height,
     const radius = width / 2;
     const legWidth = width / 10;
 
-    // Create the circular table top
-    let divTop = document.createElement('div');
-    divTop.style.position = "absolute";
-    divTop.style.bottom = -1 * (depth / 2) + fromBottom + "px";
-    divTop.style.left = fromLeft + "px";
-    divTop.style.transform = "rotateX(90deg) translateY(" + -1 * (depth / 2 + fromFront) + "px) translateZ("+(height)+"px)";
-    // divTop.style.transform = "rotateX(90deg) translateY(" + -1 * (depth / 2 + fromFront) + "px) translateZ(0px)";
-    divTop.style.height = depth + "px";
-    divTop.style.width = width + "px";
-    divTop.style.borderRadius = radius + "px";
-    divTop.style.backgroundColor = color;
-    divTop.id = id + "-top";
-    document.getElementById("shop").appendChild(divTop);
+    createFlatCircle(id, fromLeft, fromFront, fromBottom + height, width, depth, color);
 
     // Create the leg
     createFrontPanel(id + '-leg', fromLeft + radius - legWidth / 2, fromFront + depth/2, fromBottom+1, legWidth, height-1, color);
@@ -191,6 +194,8 @@ function createFrontDoor(id, fromLeft, fromFront, fromBottom) {
     attachPanel(id+"-wall", "handle", 33, 40, 4, 4, METAL_COLOR_1);
     door.style.pointerEvents = "none";
     door.style.opacity = ".5";
+
+    doorIds.push(id+"-wall");
 }
 
 function createSideDoor(id, fromLeft, fromFront, fromBottom) {
@@ -199,6 +204,7 @@ function createSideDoor(id, fromLeft, fromFront, fromBottom) {
     attachPanel(id+"-sideWall", "handle", 33, 40, 4, 4, METAL_COLOR_1);
     door.style.pointerEvents = "none";
     door.style.opacity = ".6";
+    doorIds.push(id+"-sideWall");
 }
 
 function attachGlassDoor(targetId, fromLeft) {
@@ -208,6 +214,7 @@ function attachGlassDoor(targetId, fromLeft) {
     attachPanel(targetId+"-wall", "handle", 4, 39, 2, 10, METAL_COLOR_1);
     door.style.pointerEvents = "none";
     door.style.opacity = "1";
+    doorIds.push(targetId+"-wall");
 }
 
 function createRegister(id, fromLeft, fromFront, fromBottom, width, height, depth) {
@@ -229,14 +236,14 @@ function createRegister(id, fromLeft, fromFront, fromBottom, width, height, dept
 
     attachPanel(id+"2-front-wall", "display", 1, 1, width-4, 5, "black");
     let display = document.getElementById(id+"2-front-wall-display");
-    display.innerHTML = "<div style='font-size:3px;display:inline'>Total:</div> $99.00";
+    display.innerHTML = "<div style='font-size:3px;display:inline'>Total:</div> <div style='display:inline' id='"+id+"Amount'>99.00</div>";
     display.style.fontSize = "4px";
     display.style.padding = "1px";
     display.style.color = "rgb(84, 231, 84)";
 }
 
 function createFrontImage(id, fromLeft, fromFront, fromBottom, width, height, fileName) {
-    createFrontPanel(id, fromLeft, fromFront, fromBottom, width, height, "white");
+    createFrontPanel(id, fromLeft, fromFront, fromBottom, width, height, "rgba(0, 0, 0, 0)");
     let backgroundDiv = document.getElementById(id + "-wall");
     backgroundDiv.style.pointerEvents = "none";
     const img = new Image();

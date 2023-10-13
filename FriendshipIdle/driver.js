@@ -34,7 +34,7 @@ function tick() {
     while (gameTicksLeft > (1000 / ticksPerSecond)) {
         if(stop) {
             gameTicksLeft = 0;
-            view.updating.update();
+            view.update.tick();
             break;
         }
 
@@ -56,7 +56,7 @@ function tick() {
 
     }
     if(didSomething) {
-        view.updating.update();
+        view.update.tick();
     }
 }
 

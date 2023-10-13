@@ -149,18 +149,19 @@ input {
     background-color: #55d4de;
     border: none;
     border-radius: 6px;
-    box-shadow: 0 3px #999;
-    transform: translateY(-2px);
+    box-shadow: 0 1px #999;
+    transform: translateZ(2px);
     margin-bottom:2px;
 }
 
-.button:hover {background-color: #60eef9
+.button:hover {
+    background-color: #60eef9
 }
 
 .button:active {
     background-color: #3e9aa2;
-    box-shadow: 0 1px #666;
-    transform: translateY(0px);
+    box-shadow: 0 0px #666;
+    transform: translateZ(0px);
 }
 
 .imageDragFix {
@@ -363,8 +364,22 @@ input {
     );
 }
 
+.bread {
+    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+    transform-style: preserve-3d;
+}
 
-
+.bread:after {
+    content: "";
+    position: absolute;
+    left: 2.5px;
+    top: 2px;
+    width: 5px;
+    height: 2px;
+    background-color: #D2691E;
+    clip-path: polygon(0% 0%, 100% 0, 80% 100%, 20% 100%);
+    transform-style: preserve-3d;
+}
 
 
 
