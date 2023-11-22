@@ -66,6 +66,7 @@ function tickPassed() {
 
 function secondPassed() {
     //secondTick();
+    updateEggTimer();
 }
 
 function recalcInterval(fps) {

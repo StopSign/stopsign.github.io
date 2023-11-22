@@ -381,9 +381,54 @@ input {
     transform-style: preserve-3d;
 }
 
+/*#bakeCookTimer-wall {*/
+/*    position: relative;*/
+/*    border-radius: 50%;*/
+/*    overflow: hidden;*/
+/*}*/
 
+.eggTimerNumbers {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 
+.eggTimerNumbers span {
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    font-weight: bold;
+    transform-origin: center;
+}
 
+.hand {
+    position: absolute;
+    bottom: 50%;
+    left: 50%;
+    width: 1px;
+    height: 50%;
+    background-color: red;
+    transform-origin: 50% 100%;
+    transform: rotate(0deg);
+}
+
+@keyframes vibrate {
+    0% { left:41px; }
+    25% { left:43px; }
+    50% { left:45px; }
+    75% { left:43px; }
+    100% { left:41px; }
+}
+
+.vibrating {
+    animation: vibrate 0.1s ease-in-out;
+    animation-iteration-count: 20; /* this will make it vibrate for 2 seconds */
+}
 
 
 

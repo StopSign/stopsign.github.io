@@ -13,6 +13,11 @@ function attachPanel(targetId, id, fromLeft, fromTop, width, height, color) {
     document.getElementById(targetId).appendChild(div);
 }
 
+function attachCirclePanel(targetId, id, fromLeft, fromTop, width, color) {
+    attachPanel(targetId, id, fromLeft, fromTop, width, width, color);
+    document.getElementById(targetId+"-"+id).style.borderRadius = width/2+"px";
+}
+
 
 function attachCheckbox(targetId, variableName, fromLeft, fromTop, text, fontSize, updateFunction, border="none") {
     const div = document.createElement('div');

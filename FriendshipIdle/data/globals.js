@@ -32,7 +32,19 @@ let breadDivs = [];
 let visibleBreadDivs = [];
 let trayDivs = [];
 
+let expertiseNames = ["Untrained", "Novice", "Beginner", "Apprentice", "Competent", "Proficient", "Trained", "Skilled", "Seasoned", "Adept", "Expert", "Senior Expert", "Master", "Grandmaster"];
+let familiartyNames = ["Stranger", "Contact", "Acquaintance", "New Customer", "Regular", "Returning Customer", "Regular", "Recognized Shopper", "Valued Customer", "Frequent Buyer", "Preferred Customer", "Trusted Client", "Consultant", "Advisor", "Business Ally", "Partner", "Collaborator", "Insider", "Business Family", "Confidant"];
+
+let language = "english";
+
 function loadDefaults() {
     data.showGlass = true;
     data.showDoors = true;
+    data.eggTimerSeconds = 0;
+    data.ingredients = {};
+    data.ingredientLength = 0;
+    data.recipes = {};
+    data.emily = {};
+    data.emily.money = 0;
+    data.emily.sellProfitRatio = 1.1;
 }

@@ -1,0 +1,121 @@
+I'm creating a game where you play as a Local Friendly Hero, a talkative girl Fern who loves to gossip and spread news. and you have "focus" that you spend between 5 different shops at a time. Story wise, you have a spell to cast a point of listening for 1 focus, that lets you hear all the secrets, mundane and big, that fuel all your gossip. Eventually in the game, you will hear everything and be able to maximally tie people together with friendship and magic (in a way that makes for good game upgrades as well).
+
+Besides listening, you can also spend focus on directly helping out one of the stores at a time. . The task is essentially dumping your remaining non-listening focus onto it. The more focus, the more it progresses, and the more that some extra features for the focus unlock.
+
+The 6 shops are Bakery, Comic Store, Dance Studio, Bookstore, Coffee Shop, and Pet Shop. They each have NPCs that help each other out via upgrades that happen over time - but aided along with your focus. They each have NPCs that help each other out via upgrades that happen over time - but aided along with your focus. These are their names and personalities:
+
+===
+
+Bakery
+Name: Emily
+Personality Traits: Warm-hearted, Industrious, Nostalgic, Perfectionist
+Hobbies: Baking, Gardening, Poetry Writing, Antique Collecting
+Physical Description: A wild soul in the shape of a baker, with flour-dusted hands and eyes dancing with the heat of the oven. A face chiseled by hard work and framed with hair the color of warm bread.
+Pet: Cat (Tiggy) - Helps with keeping pests away and provides comfort during long baking nights.
+Unfulfilled Dream/Failure/Redemption: Dreams of opening a chain of bakeries but failed in a previous business venture. Plans to perfect her recipes and build connections to achieve her dream.
+Conflict: Struggles between her love for traditional baking and the need to innovate to compete. She faces this choice when deciding her shop's menu, causing inner turmoil.
+Longing for Connection: Longs for a close friend; a rejection by a former business partner intensified this need. She struggles to trust others.
+Shared Interest Dialogue: "You love sourdough too? It's like weaving magic into bread!"
+Frustration Dialogue: "These broken ovens! All was planned, now all is lost."
+Greeting a Rival: "Ah, good to see you. May your bread rise as your company thrives."
+Advice Given: "Always measure twice, for in precision lies the art of baking."
+Advice Needed: "Trust in your talents and open your heart to others; success will follow."
+
+Comic Store
+Name: Lucas
+Personality Traits: Quirky, Passionate, Geeky, Competitive
+Hobbies: Comic Book Collecting, Tabletop Gaming, Cosplay, Programming
+Physical Description: A pop-culture canvas, adorned with graphic tees and limited-edition sneakers, hair an ever-changing palette of vivid colors, and glasses that always seem to catch the reflection of the latest issue on the shelves.
+Pet: Bearded Dragon (Pixel) - A stoic companion often found nestled among the comic book stacks, a silent sentinel amidst the stories.
+Unfulfilled Dream/Failure/Redemption: Dreams of creating his own comic book series but got his submissions repeatedly rejected. Plans to network at comic cons and refine his storytelling skills.
+Conflict: Balancing the allure of mainstream, high-selling comics versus promoting indie, niche stories. Faces this challenge when curating his store’s offerings, which can either attract a wider audience or provide a platform for lesser-known creators.
+Longing for Connection: Seeks a creative partner; a fallout with a former co-creator left a void. He wrestles with the fear of creative vulnerability.
+Shared Interest Dialogue: "You're a fan of The Galactical Guardians too? I can talk about them for hours!"
+Frustration Dialogue: "Another delay in the shipment of the limited edition? It's like waiting for a hero that never arrives."
+Greeting a Rival: "Well, if it isn't my favorite antagonist. May your story arcs be as complex as your strategies."
+Advice Given: "In the world of comics, each panel is a universe. Choose your adventures wisely."
+Advice Needed: "Trust in the unique voice of your own creations, and don't be overshadowed by the giants."
+
+Dance Studio
+Name: Isabella
+Personality Traits: Energetic, Graceful, Ambitious, Sensitive
+Hobbies: Dancing, Painting, Traveling, Yoga
+Physical Description: A living whirlwind of grace and fire, slender with the poised stance of a dancer, her eyes a blend of ambition and fragility.
+Pet: Parrot (Feather) - Encourages her during practice and assists in attracting students.
+Unfulfilled Dream/Failure/Redemption: Dreams of being a world-famous choreographer; haunted by a failed audition. Plans to work hard and create a groundbreaking dance show.
+Conflict: Her passion for traditional dance forms versus the need to adapt to modern styles. Struggles when offered a show forcing her to choose.
+Longing for Connection: Yearns for a dance partner; rejection from a past partner intensified this need. She faces both internal doubts and societal judgments.
+Shared Interest Dialogue: "You dance Salsa? Let's sweep the floor together sometime!"
+Frustration Dialogue: "Cancelled again? My plans, my dreams, all crumbling!"
+Greeting a Rival: "A pleasure to see you; may your steps be as measured as your words."
+Advice Given: "Dance with your heart, not just your feet."
+Advice Needed: "Believe in your unique style, and don't fear to step outside the traditional path."
+
+Bookstore
+Name: Oliver
+Personality Traits: Introverted, Intellectual, Curious, Sentimental
+Hobbies: Reading, Writing, Stargazing, Chess
+Physical Description: A living encyclopedia wrapped in human form, with glasses perched precariously and a perpetual expression of thoughtful wonder.
+Pet: Owl (Whisper) - Aids in organizing books and keeps Oliver company during late hours.
+Unfulfilled Dream/Failure/Redemption: Dreams of writing a novel but is haunted by writer's block. Plans to read more and find inspiration.
+Conflict: Desire to keep rare, precious books versus the need to sell them. Struggles when a valuable collector's piece is demanded.
+Longing for Connection: Desires intellectual companionship; a rejection from a literary club intensified this need. Battles loneliness and misunderstandings.
+Shared Interest Dialogue: "You enjoy Hemingway? His words are like a fine, aged wine."
+Frustration Dialogue: "Another delay from the publisher? My plans, dashed like brittle paper."
+Greeting a Rival: "Your presence enriches the event, much like a plot twist in a novel."
+Advice Given: "In books, as in life, patience unveils the true essence."
+Advice Needed: "Embrace your creativity, and let go of the fear of judgment."
+
+Coffee Shop
+Name: Adrian
+Personality Traits: Sociable, Observant, Creative, Anxious
+Hobbies: Coffee Art, Playing Guitar, Photography, Cycling
+Physical Description: A concoction of caffeinated energy and urban flair, wiry frame, inked arms, and eyes always in search of the next inspiring brew.
+Pet: Dog (Brewer) - Assists in greeting customers and creates a relaxing atmosphere.
+Unfulfilled Dream/Failure/Redemption: Wants to create a community hub, but failed in a past business collaboration. Plans to build connections and host community events.
+Conflict: Commitment to ethical sourcing versus the need for profit. Faces it when selecting suppliers, causing stress and doubts.
+Longing for Connection: Seeks a mentor; rejection by a former role model deepened this need. Fights with feelings of inadequacy.
+Shared Interest Dialogue: "You're into single-origin brews too? Let's explore some together!"
+Frustration Dialogue: "A shipment delay now? My plans are as cold as iced coffee."
+Greeting a Rival: "Nice to see you here; may your cup be as full as your ambitions."
+Advice Given: "Life's like coffee; it's all in how you make it."
+Advice Needed: "Trust your instincts and don't be afraid to take risks."
+
+Pet Shop
+Name: Fiona
+Personality Traits: Compassionate, Playful, Responsible, Wistful
+Hobbies: Animal Care, Bird Watching, Hiking, Painting
+Physical Description: A walking menagerie, bustling with life, eyes sparkled with childlike wonder, and a voice that sings the song of nature's chorus.
+Pet: Parakeet (Chirpy) - Helps in entertaining other pets and keeps Fiona's spirit uplifted.
+Unfulfilled Dream/Failure/Redemption: Aspires to open an animal sanctuary but faced a devastating failure in securing funds. Plans to build the business and create awareness.
+Conflict: Love for animals versus the commercial aspect of selling them. Confronted with it when choosing suppliers, leading to moral dilemmas.
+Longing for Connection: Craves acceptance from animal welfare groups; rejection by one group intensified this longing. Struggles with credibility and self-identity.
+Shared Interest Dialogue: "You rescue animals too? They need more hearts like yours!"
+Frustration Dialogue: "A denied permit? My dreams are trapped like caged birds!"
+Greeting a Rival: "Your company is as surprising as a new litter of kittens; how do you do?"
+Advice Given: "With animals, as with people, kindness is the universal language."
+Advice Needed: "Follow your heart, but don't lose sight of the practicalities."
+
+===
+
+You (the player) is the hero, Fern, an girl with the following personality traits: Excitable, empathetic, optimistic, chatterbox, resourceful. Fern's hobbies are gossiping, socializing, community organizing, crafting friendship bracelets, and magic tricks. Fern's description is "A bundle of energy with a constant twinkle in her eyes, which are as bright as her infectious smile. Her appearance is casual yet spirited, often seen in colorful attire that matches her bubbly personality." Fern previously failed to mediate a major community conflict. She yearns to be the "Friendship Guru", and for the day when everyone can look past their differences. Struggles with the concept of privacy. 
+
+Aspects of the game:
+* In the game, Fern is the connecting piece between the shops. 
+* The gameplay is entirely you deciding which shop Fern sits and gossips at - the shops themselves are automatically run by the NPCs behind them. So you have one button per shop, and that's to place Fern there. No other manual gameplay will be accepted at this stage of the game.
+* Each shop is a different complex mix of idle mechanics that steadily grow in alternating periods of rapid growth and slow growth.
+* Fern will provide three major functions while at a shop: 
+	1. have a bonus somehow to the shop for being there (like 10 more items per second sold, if it somehow scales and is balanced) 
+	2. Generate new "gossip" - AKA unlock an upgrade - based on milestones of the various shops, and the gossip is set up as being added to the queue of the OTHER shops - NOT the one Fern is currently at 
+	3. Run out the gossip (that was unlocked by being at other shops) on the current shop that Fern is at. The types of gossip/upgrades will alternate between things that take lots of time and things that take short amounts that go first
+
+===
+
+
+
+
+
+Everyone gets to town at the same time, and so are new and setting up their shops. Write out the first month of drama, explaining what happens week by week to each character as they go about their lives and interact with each other.
+
+
+

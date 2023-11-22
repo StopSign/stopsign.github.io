@@ -32,13 +32,6 @@ let BLACKBOARD_BORDER_COLOR = "rgb(145, 90, 2)";
 let BREAD_COLOR = "rgb(139, 69, 19)";
 
 
-
-// Flat table:
-//     bottom:-<half of height (+offset)>
-// left:50px = transform:translateX(50px)
-// transform:translateY(50px) = send back
-//
-
 //Creates a div of widthxheight at fromLeft, fromFront, fromBottom, counting from the bottom left ground corner of the shops
 function createFlatPanel(id, fromLeft, fromFront, fromBottom, width, depth, color, isClickable=true)
 {
@@ -58,7 +51,6 @@ function createFlatPanel(id, fromLeft, fromFront, fromBottom, width, depth, colo
 
     document.getElementById("shop").appendChild(div);
 }
-
 
 function createFlatCircle(id, fromLeft, fromFront, fromBottom, width, depth, color, isClickable=true) {
     createFlatPanel(id, fromLeft, fromFront, fromBottom, width, depth, color, isClickable);
@@ -92,7 +84,7 @@ function createFrontPanel(id, fromLeft, fromFront, fromBottom, width, height, co
     div.style.width = `${width}px`;
     div.style.height = `${height}px`;
     div.style.left = `${fromLeft}px`;
-    div.style.bottom = `${fromBottom-1}px`;
+    div.style.bottom = `${fromBottom}px`;
     div.style.backgroundColor = color;
     div.style.backfaceVisibility = "hidden";
     div.style.border = border;

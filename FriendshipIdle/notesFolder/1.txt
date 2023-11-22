@@ -1,0 +1,348 @@
+TODO Coding
+Draw rough shapes of the shops
+Create Focus All, FOcus Next button
+Be able to switch between shops
+Start the first two shops - baking and coffee
+
+Plan out the details of the bake shop:
+
+Bake shop cycle:
+	Prep work -> bake -> display -> sell
+	Weekly activities
+		Deep Cleaning
+		Inventory Ordering
+		Social Media Updates
+			Advertising
+			Responding to customer reviews
+		Self-care
+		
+		
+"Weeks" are like "stages", each one requiring various social and physical requirements to move on
+Bonuses build up during the week to happen in the next - mechanic to get bonuses w/o finishing week, if needed.
+Shops do things without respect to time
+Each shop has different tasks that have to be done every week
+
+
+Week 1 is 2 shops and basic interactions
+Week 2 is 3 shops and more interactions, etc.
+
+
+Goods produce per second
+Each good has a shelf life.
+Baker bakes new ones constantly, but if the goods expire without being sold, she instead focuses on social media engagement and customer engagement to make more customers.
+Sales = Regular Customers * 10 + Reknown
+
+
+Baker's cycle is essentially learn a new recipe/find suppliers for it/create it/generate clients for it
+Only creates her latest learned recipe at a time
+Only does advertising for her latest recipe
+Loses 75% of regular customers every time she switches recipes
+New recipe gives 1.2x the $, cost 1.15x more in ingredients
+Fern counts for 10 regular customers, so Fern helps out in a huge way every time there's a new recipe
+	While placed there, Fern increases regular customers to the bake shop, increasing the rate at which it grows
+REQ: Customer rate grows quadratically ish, not exponential
+
+1. Finding inspiration
+INFO Baker starts looking at new recipe when she has 20+5*N non-fern customers (she gets bored)
+PBAR, INFO Search for inspiration for next recipe, improves with Town Vibe (requires exponentially more time). Uses 50% of $. 50% of the money spent gets evenly split among other shops.
+
+2. Prep Work - Once a recipe is found, Baker has to learn it and organize suppliers for it.
+INFO Sqrt of remaining money gets added to ingredient quality, which sqrt of that improves good's value
+INFO Supplier Connections starts at 1, increases with various upgrades or things Fern does. Stays pretty static mostly, never growing with time, only upgrades.
+INFO Each recipe has an estimated supplier connection point, that increases by 1 per recipe. For each point you don't have, it's +3x longer to prepare the good. For each point you have above the recipe, it's +1 ethics for being able to avoid the worst supplier, and you get integrity/s based on ethics.
+		Target Connection for <recipe>: 
+		Penalty: Takes +3x longer per point difference
+		Benefit: +1 ethics for the duration of the recipe
+
+3. Producing and Selling - Baker creates her recipe
+PBAR Takes 10+5*N seconds to create the good
+Picture of each item on the shelves, pbar on each for expiration. Expires in 60+20*N seconds
+PBAR It takes 20+10*N seconds per customer to sell a good
+Info on # regular customers, and # random customers
+Info on the baking good, including value, make time
+
+4. Social Media
+INFO Customers steadily create positive and negative reviews online. 
+PBAR, INFO When no one buys the recipe, baker actively searches for customers, posting on social media:
+	1. Respond to negative reviews (takes time, big customer improvements)
+	2. Respond to positive reviews (takes time, medium customer improvements)
+	3. Blog (time sink, small customer improvements)
+
+
+
+Fern Actions
+Basic: Eat baked goods - Happily munch away at whatever latest creation Emily has come up with! Counts as 10 regular customers. Does not count towards Emily's boredom.
+N1 Focus: Fern chats with everyone who comes in, recommending the baked goods. +.01 regular customers/s
+N2 Focus: Fern is talking all the time about others, and sometimes those relationships are useful. Connections +1 while Fern is there.
+
+
+
+TODO:
+
+Divs:
+	Open/Closed sign
+	Egg timer 
+	Stove in cook
+	cabinets in cook 
+	Deep frier in cook
+	background images
+	
+Game:
+	Emily's setup
+		Setup stages of regular sales
+			baking (multiple stages)
+			selling (customers)
+		Setup stages of progress
+			inspiration
+			ordering recipes
+			social media
+			
+		
+
+
+
+Images needed for bakery:
+Emily:
+Facing away, at a computer, leaning to the right and hunched over(circus:0.1)
+facing, standing, at counter, smiling softly
+baking, smiling a lot
+facing away at stove, dancing
+facing away at oven, standing on tip toes and putting in oven
+facing away writing on the white board
+on phone call in freezer
+
+Fern:
+Facing away, ordering
+Sitting at the table, side profile, lounging
+
+
+
+
+TODO in initial:
+rename to view.update.tick
+
+
+missed connections - thresholds & timers or lockouts, that decide different runs
+
+
+
+simple increase mechanics
+minerals in zerg wars - increase per second, increase rate
+progress in progress knight quest - exponential upgrade that is the threshold for other upgrades
+Repeated upgrade increases gain by x1000, have repeated upgrades at x1, x2, x10, x50, x250 - Coming back you can insta-gain up to where you should be, but waiting is still beneficial every time
+exponential growth, but through lots of upgrades, so that you're constantly spending instead of letting it grow
+compounding bonus | small amounts in different areas | upgrades at the end of a resource to make it useful for a long time still
+progression of upgrades: manual, automatic, free
+one resource that climbs exponentially, one that climbs slowly, require both - have meta upgrades for the slow upgrade
+linear + log for resource/s and static cost upgrades
+staggered upgrades with static cost and 0/X available
+reset for a resource that grows/costs exponential, and after a bit, unlock another resource that does the same thing
+a tree of upgrades, with each finishing to create two more
+one resource pushes the maximum, another pushes the rate, both produce a third, which produces amount
+
+
+improvement mechanics
+Prestige starts a new currency which can buy upgrades, including automation of the previous sections
+Targets to hit among all currencies, so that if you get massive upgrades to one you reach a target sooner
+
+
+
+for buttons: 
+copy starcraft
+icon, hotkey - click, tooltip appears in info section.
+right click to activate autocast
+
+
+
+
+
+
+Emily's bakery:
+Preparing and baking happens when there's no customers
+In general, the path is 
+Cycle:
+	Baking:	
+		Preparing goods: 10s
+		
+Bakery:
+Cycle:
+	Ordering goods:
+		1. Use $$/money to get suppliers
+			a. $100 for new supplier, start with $140
+			b. $100 for each new supplier, for total of 10. Buy when money available
+			c. Each new supplier increases max # of ingredients available to buy
+		2. Use $$ to increase storage, in freezer, to hold more at a time
+		2. Suppliers bring ingredients - ~2-4 ingredients per baked good
+			a. Each ingredient has an order time, a refill time, and a price
+			b. Ingredients are:
+				1. Cornmeal
+				2. Flour
+				3. Eggs
+				4. Sugar
+				5. Baking powder
+				6. Chocolate
+				7. Butter
+				8. Bananas
+				9. Cinammon
+				10. Yeast
+				11. Cream Cheese
+		3. automatically spends $$ on ordering ingredients if there's no ingredients for the next item.
+		4. Ingredients deliver after a time
+		potential Fern upgrades:
+			improve supplier prices
+	Choosing a recipe/Baking:
+		1. Choose the next available recipe to make. mixing|cooking|finishing
+			* See excel sheet
+		2. Make a batch, using all the available ingredients 
+		
+		
+		Each Ingredient has:
+		| * price
+		| * Maximum - Can be increased 9 times at the ingredient price, up to 10
+		| * buy supplier up to max buySupplier
+		* Supplier Familiarity (Stranger|1, Contact|3, Acquaintance|10, New Customer|30, Regular|100, Returning Customer|300, Regular|1000, Recognized Shopper|3000, Valued Customer|10000, Frequent Buyer|30000, Preferred Customer|100000, Trusted Client|300000, Consultant, Advisor, Business Ally, Partner, Collaborator, Insider, Business Family, Confidant)
+			** Starts at 10, and is ~x3 from there
+			** Each level increases refill speed by 2x and maximum by 1.1x compounding
+			** Familiarity increases by 1 per purchase
+		* Difficulty - for unlocking groups at a time
+		
+		Each recipe has:
+		| * Name
+		* Difficulty
+		* List of ingredients - type and num
+		* Total price (ingredients added up)
+		* Expertise (Untrained||10, Trained|100, Expert|1000, Master|10000)
+			** Each increase increases the maximum batch size by 2
+			** Each increase increases mixing and finishing time by 5% compounding
+			** Each increase increases profit by 10% (x1.1 -> x1.14)
+		| * Mixing/Cooking/Finishing ratio
+		| * Name of cooking tool "oven"
+		| * Time to complete in seconds
+		
+		
+		
+		
+		
+		
+		
+		
+		you get $ with the recipes, 
+		and that scales up over time to switch to the next recipes, 
+		so it could be an initial of 1 item capacity, 
+		and $ based on the recipe cost for increasing the item capacity up to 10. 
+		Then, there's a reputation per upgrade, that will slowly increase its maximum. 1/10th of this is permanently saved upon Block Party
+		Reputation increases through various means and upgrades, and logarithmically increases the capacity of item capacity as well as the refill rate. 
+		
+		
+	Emily AI:
+		
+		Emily will attempt to make the latest learned recipe
+			If there are enough ingredients for it, she starts the cooking process
+				Each stage (mixing|cooking|finishing) takes a different amount of time, and the total time changes based on batch size, with more being more efficient in time needed:
+					per unit = (Base Effort - Base Effort/2) * Batch Size^-.1 + base effort/2
+			At each stage completion, check if there's a customer
+			If there are not enough ingredients for it, she will attempt to spend money increasing the suppliers maximum, then switch to the next lowest recipe and repeat
+		If there is a customer
+			Customers
+				Have an initial talking time, 0-10 seconds.
+				Have a time per item that they buy 1-4+
+				Have a set amount of items that they buy 1-6+
+				Have a set time that they start, and time that they repeat the purchases (no random)
+				Have favorite items that they buy 4x as much of if available
+				Have an initial reputation requirement
+				Otherwise buy the cheapest item available
+			Emily will spend 0-10 seconds per customer saying hello, then 1-4 seconds per item they want, then the same hello time +2 to pay and say goodbye
+		Over time, Emily's proficiency at creating the latest item will increase through both her familiarity and through bigger batches from the suppliers
+		Emily uses money on suppliers and on increasing display case size, but puts 10% of profit into her Inspiration fund
+		When the display case is full, Emily gets on social media
+			On social media, if there are reviews, Emily responds to them, which increases the reputation of the bakery
+			New customers come if the reputation exceeds a certain amount
+			If there are none, she browses the internet for a new recipe
+				She stops if there's a customer, or if the display case isn't full.
+				Boredom gets added a little every time the recipe is made, and a lot when browsing the internet
+			If browsing the internet and boredom is maxed, goes on break
+				Lose the inspiration fund. Each other shop gets 1/10th of the money
+				Takes time based on the new recipe
+				Customers still come and buy half as many items, "online orders only"
+			When Emily comes back, she wants to practice the new recipe, so gets the suppliers for it, and browses the internet slowly improving the recipe while waiting for the ingredients
+			Loops between making the new recipe and studying online while waiting for suppliers
+			If display case runs out, bakes one batch at a time, focusing on studying the new recipe until its finished, based on the recipe difficulty
+			After 10 practice batches made, start selling it. 
+	
+	Fern story options:
+		setup a taste-test
+		bread-making tutorial
+		charity drive 
+		reveal Fern's secrets
+		Ask too personal of questions
+		Ask deep questions
+
+TODO Emily:
+	Ingredient items and list
+	Recipe items and list 
+	Creating a recipe minimally, to use the ingredients and have them refill
+
+		
+Lucas Comic Store:
+
+
+Isabella's Dance Studio:
+
+
+
+
+
+
+Player experience:
+
+Game starts:
+"All I ask, is for you to *listen*" <pause>
+-Fern's mother
+
+Fade in, single shop, only the counter visible, the sky is gray, Fern walks in, hungover, coffee in hand
+
+Emily: "Good morning! What can I get my very first customer of the day?"
+
+Fern: "Ugh, decisions..."
+
+Emily: "Rough night?"
+
+Fern: "Yea, a fun one, I think... I have the coffee, I need something to lift me up."
+
+Emily: "You're in luck! What do you want?"
+
+Fern: "Just give me your cheapest item."
+
+Emily: "I get that a lot! Every time actually... Here you go!"
+
+Fern sits and has her default happy pose. "Delicious! How do you do it?"
+
+Emily: "Let me show you!"
+
+Emily takes Fern throughout the bakery, having things become visible as they appear.
+
+Emily: "This is the kitchen! For each recipe, we have to prepare, cook, and finish, and its all done here."
+
+Emily: "This is the freezer! I need to order the ingredients from my suppliers to make my recipes!"
+
+Emily: "This is my office! Social media presence is important as well! I also might start looking for new recipes online soon."
+
+Emily: "And of course my display! This is where I showcase my best."
+
+Confusion symbols appear above Fern's eyes and head, and all 4 appear right after each other.
+
+Emily: "Oh! Sorry, I just realized you probably meant for me to say something like 'lots of practice' instead of showing you around my shop. I get carried away sometimes!"
+
+Fern: "No problem, I know the feeling! Thanks for showing me around!"
+
+Emily: "It's nice to talk with someone while I work!"
+
+Fern: "... Half off items if I stay and chat?"
+
+Emily "... deal"
+
+
+
+
+====
+the challenges are the pre-stories of each character, that built up to the current moment
