@@ -1,70 +1,104 @@
+//Emily has: current task (what progress currently goes towards), next task (what will be the current task when the current task is done
+//Current task is used to "distract" emily from baking, and she
+//task options: "deciding", "ordering", "mixing", "cooking", "finishing", "customer", "office"
+//Deciding: Emily in the middle of bake shop, hand on chin, thinking. Lasts 2 seconds, then completes to the next task
+let currentTask = "deciding";
+let taskTimeReq = 2;
+let taskTime = 0;
+
+
+function tickEmily() {
+    taskTime += 1/ticksPerSecond;
+    if(taskTime < taskTimeReq) { //Animation goes here
+        return;
+    }
+    if(currentTask === "deciding") {
+
+    }
+
+}
 
 function createIngredient(ingredient) {
     ingredient.id = data.ingredientLength++;
-    ingredient.baseCap = 1;
-    ingredient.suppliersBought = 0;
+    ingredient.baseCap = 1; // Initial store supply
+    ingredient.maxBaseCap = 10; // Maximum store supply that can be bought
+    ingredient.suppliersBought = 0; // Additional supply bought
     ingredient.amount = 0;
-    ingredient.supply = 0;
+    ingredient.supply = ingredient.baseCap; // Setting initial supply to baseCap
+    ingredient.storeMarketResponse = 0; // Tracks market response
+    ingredient.storeMarketResponseLevel = 1;
+    ingredient.supplierFamiliarity = 0;
+
     ingredient.buySupplier = function() {
-        while(this.suppliersBought < 9 && data.emily.money >= this.price*10) {
-            data.emily.money -= this.price*10;
+        while ((this.baseCap + this.suppliersBought) < this.maxBaseCap && data.emily.money >= this.price * 10) {
+            data.emily.money -= this.price * 10;
             this.suppliersBought++;
+            this.baseCap++; // Increase the base supply capacity
         }
-    }
+    };
+
     ingredient.getSupplyCap = function() {
-        return (this.suppliersBought + ingredient.baseCap) * this.getFamiliarityMaxBonus();
+        // Update to account for market response induced increases
+        let marketResponseBonus = Math.min(Math.floor(this.storeMarketResponse / 10) * 0.1, 9);
+        return this.baseCap * (1 + marketResponseBonus) * this.getFamiliarityMaxBonus();
+    };
+
+    ingredient.getStoreMarketResponseBonus = function() {
+        return Math.floor((this.storeMarketResponse+.0000001) / 10) * 0.1;
     }
 
-    ingredient.supplierFamiliarity = 0;
     ingredient.getFamiliarityStage = function() {
-        if (this.supplierFamiliarity === 0) {
+        if (this.supplierFamiliarity <= 1) {
             return 0;
         }
         let base10Stage = Math.floor(Math.log10(this.supplierFamiliarity));
         let base30Stage = Math.floor(Math.log10(this.supplierFamiliarity / 3));
         let maxStage = Math.max(base10Stage, base30Stage);
         return Math.min(maxStage, expertiseNames.length - 1);
-    }
+    };
 
     ingredient.getFamiliarityName = function() {
-        return familiartyNames[this.getFamiliarityStage()];
-    }
+        return familiarityNames[this.getFamiliarityStage()];
+    };
 
     ingredient.getFamiliarityRefillBonus = function() {
         return Math.pow(2, this.getFamiliarityStage());
-    }
+    };
 
-    //at max familiarity of 20, it should be 1.2^20 = 38
     ingredient.getFamiliarityMaxBonus = function() {
         return Math.pow(1.3, this.getFamiliarityStage());
-    }
+    };
 
     ingredient.buy = function(amountToBuy) {
-        if(this.supply < amountToBuy) {
-            amountToBuy = Math.min(this.supply);
+        if (this.supply < amountToBuy) {
+            amountToBuy = Math.min(this.supply, amountToBuy);
         }
-        if(data.emily.money >= amountToBuy * this.price) {
+        if (data.emily.money >= amountToBuy * this.price) {
             data.emily.money -= amountToBuy * this.price;
             this.supply -= amountToBuy;
-            this.supplierFamiliarity += amountToBuy;
+            this.supplierFamiliarity++; // Increase familiarity for each item bought
+            this.storeMarketResponse += amountToBuy; // Market response increases based on the amount bought
+            if(this.storeMarketResponseLevel * 10 <= this.storeMarketResponse) {
+                this.storeMarketResponse -= this.storeMarketResponseLevel * 10;
+                this.storeMarketResponseLevel++;
+            }
             return 1;
         }
-    }
+        return 0; // In case the transaction is not successful
+    };
 
-    //regenerates base/100 * refill bonus, so excluding the familiarity bonus to max
+    // Regenerates base/100 * refill bonus, so excluding the familiarity bonus to max
     ingredient.regenerateSupply = function() {
         let cap = this.getSupplyCap();
-        this.supply += (this.suppliersBought + ingredient.baseCap)/100 * this.getFamiliarityRefillBonus();
-        if(this.supply > cap) {
+        this.supply += (this.suppliersBought + ingredient.baseCap) / 100 * this.getFamiliarityRefillBonus();
+        if (this.supply > cap) {
             this.supply = cap;
         }
-    }
-
-
-
+    };
 
     data.ingredients[ingredient.name] = ingredient;
 }
+
 
 
 
@@ -124,14 +158,30 @@ function createRecipe(recipe) {
     recipe.batchEfficiency = .95;
     recipe.timeNeededForStage = recipe.getTimes().mixingTime
     recipe.getTimeNeededForStage = function() {
-        if(this.stage === "mixing") {
-            return recipe.getTimes().mixingTime * this.batchSize * Math.pow(this.batchEfficiency, this.batchSize);
-        }
-        if(this.stage === "cooking") {
+        const baseMixingTime = this.difficulty * this.mixingTime;
+        const baseCookingTime = this.difficulty * this.cookingTime;
+        const baseFinishingTime = this.difficulty * this.finishingTime;
 
+        if (this.stage === "mixing") {
+            let totalTime = 0;
+            for (let i = 0; i < this.batchSize; i++) {
+                totalTime += 1 - (i * 0.1);
+            }
+            return baseMixingTime * totalTime;
         }
-        if(this.stage === )
-    }
+        if (this.stage === "cooking") {
+            return baseCookingTime * (1 + 0.2 * (this.batchSize - 1));
+        }
+        if (this.stage === "finishing") {
+            let multiplier = 1;
+            let totalTime = 0;
+            for (let i = 0; i < this.batchSize; i++) {
+                totalTime += multiplier;
+                multiplier *= 0.95;
+            }
+            return baseFinishingTime * totalTime;
+        }
+    };
 
 
     recipe.progress = function() {

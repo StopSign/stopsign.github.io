@@ -237,7 +237,7 @@ function createRegister(id, fromLeft, fromFront, fromBottom, width, height, dept
 function createFrontImage(id, fromLeft, fromFront, fromBottom, width, height, fileName) {
     createFrontPanel(id, fromLeft, fromFront, fromBottom, width, height, "rgba(0, 0, 0, 0)");
     let backgroundDiv = document.getElementById(id + "-wall");
-    backgroundDiv.style.pointerEvents = "none";
+    // backgroundDiv.style.pointerEvents = "none";
     const img = new Image();
     img.id = id + "-img";
     img.src = "img/"+fileName;

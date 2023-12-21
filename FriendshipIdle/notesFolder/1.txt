@@ -1,10 +1,3 @@
-TODO Coding
-Draw rough shapes of the shops
-Create Focus All, FOcus Next button
-Be able to switch between shops
-Start the first two shops - baking and coffee
-
-Plan out the details of the bake shop:
 
 Bake shop cycle:
 	Prep work -> bake -> display -> sell
@@ -17,8 +10,8 @@ Bake shop cycle:
 		Self-care
 		
 		
-"Weeks" are like "stages", each one requiring various social and physical requirements to move on
-Bonuses build up during the week to happen in the next - mechanic to get bonuses w/o finishing week, if needed.
+Game is divided into "Episodes"/stages, each one requiring various social and physical requirements to move on
+Bonuses build up during the episode to happen in the next - mechanic to get bonuses w/o finishing episode, if needed.
 Shops do things without respect to time
 Each shop has different tasks that have to be done every week
 
@@ -139,12 +132,20 @@ staggered upgrades with static cost and 0/X available
 reset for a resource that grows/costs exponential, and after a bit, unlock another resource that does the same thing
 a tree of upgrades, with each finishing to create two more
 one resource pushes the maximum, another pushes the rate, both produce a third, which produces amount
+20% gain, 25% cost, but 3 resources chained together in the pattern
+compression, so selling 1 per second (or linear increase) while making the reward increase
+lots of little upgrades, one that upgrades everything
+one upgrade that takes a minute to fully engage
+
 
 
 improvement mechanics
 Prestige starts a new currency which can buy upgrades, including automation of the previous sections
 Targets to hit among all currencies, so that if you get massive upgrades to one you reach a target sooner
-
+not exactly prestige, but reach a point, reset, and unlock new things
+	new things can reset previous prestiges
+	have a slow down, such that you need x100 to get further, and it takes a while to get there
+		makes it so with future upgrades, maybe the annoying ones can be skipped
 
 
 for buttons: 
@@ -289,60 +290,225 @@ Lucas Comic Store:
 Isabella's Dance Studio:
 
 
+====
 
+
+Episodic formula to connect everyone. Each Episode has various goals, and unlocks new things
 
 
 
 Player experience:
 
 Game starts:
-"All I ask, is for you to *listen*" <pause>
+
+Episode 1: "Connections and Confections"
+
+"All I ask, is for you to *listen* as much as you talk"
 -Fern's mother
+<pause>
 
-Fade in, single shop, only the counter visible, the sky is gray, Fern walks in, hungover, coffee in hand
+Messages last 10 seconds
+If Prereq is able to be worked on, next unlock becomes visible but locked
+Show locked upgrades at 1/100th the required idle chatter
 
-Emily: "Good morning! What can I get my very first customer of the day?"
+20 * 1 | Wander | Fern outside, coming in. Screen is black and getting visible over course of action
+3 * 7 | Introductions | REQ Wander | Fern & Emily at counter
+10 * 1 | Enjoy coffee | REQ Introductions | Fern sitting with food, Emily at counter
+2 * 4 | Whirlwind Tour | REQ Whirlwind Tour | Fern & Emily in kitchen, then freezer, then office, then back. Fern with confusion symbols over eyes and head
+10 * 2 | Recovery | REQ Whirlwind Tour | Fern sitting, Emily at counter, with confusion in 1st one
+5 * 6 | The Deal | REQ Recovery | Fern sitting, Emily at counter | REWARD: sit at bakery to get idle chatter +1
 
-Fern: "Ugh, decisions..."
+Fern meets Emily
+{
 
-Emily: "Rough night?"
 
-Fern: "Yea, a fun one, I think... I have the coffee, I need something to lift me up."
+Fade in, single shop, only the counter visible, the sky is gray, Fern walks in
 
-Emily: "You're in luck! What do you want?"
+1. Emily: "Good morning! What can I get my very first customer of the day?"
 
-Fern: "Just give me your cheapest item."
+2. Fern: "Ugh, decisions..."
 
-Emily: "I get that a lot! Every time actually... Here you go!"
+3. Emily: "Rough night?"
 
-Fern sits and has her default happy pose. "Delicious! How do you do it?"
+4. Fern: "Yea, a fun one, I think... Well. I need something to make me a person again."
 
-Emily: "Let me show you!"
+5. Emily: "You're in luck! Eat any of my treats, and I guarantee you'll be a person! What would you like?"
+
+6. Fern: "Just give me your cheapest item."
+
+7. Emily: "Hah! I get that a lot! Come to think of it, it's every time actually... Here you go!"
+
+Fern sits and has her default happy pose. 
+
+1. Fern: "Delicious! How do you do it?"
+
+2. Emily: "Let me show you!"
 
 Emily takes Fern throughout the bakery, having things become visible as they appear.
 
-Emily: "This is the kitchen! For each recipe, we have to prepare, cook, and finish, and its all done here."
+3. Emily: "This is the kitchen! For each recipe, we have to prepare, cook, and finish, and its all done here."
 
-Emily: "This is the freezer! I need to order the ingredients from my suppliers to make my recipes!"
+4. Emily: "This is the freezer! I need to order the ingredients from my suppliers to make my recipes!"
 
-Emily: "This is my office! Social media presence is important as well! I also might start looking for new recipes online soon."
+5. Emily: "This is my office! Social media presence is important as well! I also might start looking for new recipes online soon."
 
-Emily: "And of course my display! This is where I showcase my best."
+6. Emily: "And of course my display! This is where I showcase my best."
 
 Confusion symbols appear above Fern's eyes and head, and all 4 appear right after each other.
 
-Emily: "Oh! Sorry, I just realized you probably meant for me to say something like 'lots of practice' instead of showing you around my shop. I get carried away sometimes!"
+1. Emily: "Oh! Sorry, I just realized you probably meant for me to say something like 'lots of practice' instead of showing you around my shop. I get carried away sometimes!"
 
-Fern: "No problem, I know the feeling! Thanks for showing me around!"
+1. Fern: "No problem, I know the feeling! Thanks for showing me around!"
 
-Emily: "It's nice to talk with someone while I work!"
+2. Emily: "It's nice to talk with someone while I work!"
 
-Fern: "... Half off items if I stay and chat?"
+3. Fern: "... Half off items if I stay and chat?"
 
-Emily "... deal"
+4. Emily "... no discounts"
+
+5. Fern: "... Full price items while I stay and chat?"
+
+6. Emily: "That's better. Agreed!"
+
+}
+
+Learn how the shop works
+{
+	
+}
+
+Expanding options
+{
+	
+}
+
+Fern meets Adrian
+
 
 
 
 
 ====
 the challenges are the pre-stories of each character, that built up to the current moment
+
+treat each shop like the idle loops zone, at least approximately in complexity
+
+
+====
+
+start of game should be ~~idle loops :
++1 attention/s
+start focused on bakery
+"Wander" to get to the bakery | req 20 attention
+"meet Emily" to do the story above, results in sitting at Emily's buys 1 good per 10 seconds
+"listen to supplier deals" unlocks next
+"Expanding options" "you seem to like talking, you should visit the next store over, the coffee shop!"
+"Meet Adrian"
+
+====
+
+future upgrades
+Emily early riser, starts with X minutes of progress already done at the start of the day
+===
+
+when out of named upgrades, fern gets idle chatter +1/s on every shop but the one she's on.
+each shop has unlocks based on idle chatter # from there on out
+
+
+====
+
+
+sometimes, with some big upgrades, you pick 3 cards from your "deck", which contain various upgardes or QoL or shortcuts
+After you reset the day, when you go to the same spot, you have a 4th option - the card you used last time (if it's not in use already). You can get/use cards in your draw that are only found later in the run
+	Later, you can get an upgrade to "lock" in certain cards to their spots, letting you no longer get those in the draw
+This means that each reset, you'll be able to optimize (based on luck) your build a little more, pushing the higher power cards to the front of your run.
+
+
+====
+
+buy instantly
+each ingredient has a resupply rate
+
+==
+
+redo emily's AI
+
+-pyramid of unlocks, sometimes going backwards
+-supplies are bought from the grocery store instantly, and it stocks up slowly, increasing in response to you buying it up to 10x but no more. Profit 5-3% linear scaling.
+-After, emily starts making connections with suppliers. Profit 5-10%+ upgrade scaling
+
+
+Basic Ingredients (flour, eggs, sugar)
+	5 available
+	Respawn .1/s
+	Market response: Increase x1.01 respawn rate per item bought, up to a 10x total. Also +.1 storage up to 25
+	
+Simple Ingredients (butter, cornmeal, buttermilk, yeast, chocolate, bananas, cinnamon)
+	5 available
+	respawn .01/s
+	Market response:Increase x1.01 respawn rate per item bought, up to a 10x total. Also +.1 storage, up to 25
+
+	
+	
+First Recipe, Muffins: 1 Flour, 1 Eggs, 1 Sugar. Difficulty 2, 4 mixing/5 cooking/1 finishing
+	Fern buys as much as she can. The store has 10 of each, so she buys 10 to fill her storage with a maximum capacity of 10. She will make as many muffins as she can. The difference in formula between making more:
+	She makes 1 muffin
+		mixing will take 2 * 4 * 1 = 8 seconds (difficulty * ratio * multiplier based on amount)
+		cooking will take 2 * 5 * 1 = 10 seconds
+		finishing will take 2 * 1 * 1 = 2 seconds
+		total time: 20s/muffin
+	She makes 10 muffins in a batch
+		mixing will take 2 * 4 * (1 + .9 + .8 + .7 + ... (10 of them)) = 2 * 4 * 6.51 = 52.08
+		cooking will take 2 * 5 * (1 + (.2 * N-1)) = 2 * 5 * 4.8 = 48s
+		finishing will take 2 * 1 * (1 + .95 + .91 + ...) = 2 * 1 * 8.02 = 16s
+		total time: 116, or 11.6/muffin
+
+
+===
+
+each character is sort of an expression of who I am
+emily - perfectionist
+adrian - outgoing
+oliver - introspective
+isabella - memory 
+lucas - passionate
+
+
+===
+
+what am i trying to do:
+reformat emily's goals to be more reset/progress pyramid type:
+
+Each new recipe has a happiness requirement
+
+emily's progress should be slowly climbing up an "achievement" board of some kind, that unlocks new things and bonuses at each stage
+
+
+TODO next:
+choose pictures
+position them
+turn them on or off depending on position
+change position logic to work with multiple times 
+add a progress bar and show it depending on position
+start AI logic 
+	Connect ingredients
+	setup unlock systems
+	new resources, one for primary progress, one for global happiness
+	
+
+
+"i live here, this is my house too. You can't force me"
+	- "you can't make me" childish. An unacceptable response for literally anything. "Take out the trash. You can't make me." Unacceptable because it is childish, and because I deserve an adult answer.
+	- not the point. the point is for you to go to bed first.
+		1. you take a long time doing teeth and stuff. I don't want to sit there for that
+		2. I want to go upstairs and put my phone down and sleep. I cannot if I'm sitting there waiting for that.
+		3. I want time to decompress. This time must be alone. I need to turn off the part of me that is constantly thinking of others
+		4. I don't like long conversations that shift bed times. I need consistency
+		5. You have stated that you want to go to bed early. Me asking you should be in line with your stated goals, right?
+	- being loud = day time. night time is when quiet begins. No quiet/dark = no night time = stay up. I use social queues instead of physical ones because my physical ones lie to me.
+	
+	
+===
+
+for stories, get stories based on achievements like IEH
+8 possible achievements, takes the best top 3 (upgradeable)

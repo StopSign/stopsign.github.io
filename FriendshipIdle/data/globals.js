@@ -21,6 +21,9 @@ let prevState = {};
 
 //Game globals
 let data = {};
+//need to be instantiated before load
+data.ingredients = {};
+data.recipes = {};
 
 let labels = {};
 labels.numbers = [];
@@ -33,7 +36,7 @@ let visibleBreadDivs = [];
 let trayDivs = [];
 
 let expertiseNames = ["Untrained", "Novice", "Beginner", "Apprentice", "Competent", "Proficient", "Trained", "Skilled", "Seasoned", "Adept", "Expert", "Senior Expert", "Master", "Grandmaster"];
-let familiartyNames = ["Stranger", "Contact", "Acquaintance", "New Customer", "Regular", "Returning Customer", "Regular", "Recognized Shopper", "Valued Customer", "Frequent Buyer", "Preferred Customer", "Trusted Client", "Consultant", "Advisor", "Business Ally", "Partner", "Collaborator", "Insider", "Business Family", "Confidant"];
+let familiarityNames = ["Stranger", "Contact", "Acquaintance", "New Customer", "Regular", "Returning Customer", "Regular", "Recognized Shopper", "Valued Customer", "Frequent Buyer", "Preferred Customer", "Trusted Client", "Consultant", "Advisor", "Business Ally", "Partner", "Collaborator", "Insider", "Business Family", "Confidant"];
 
 let language = "english";
 

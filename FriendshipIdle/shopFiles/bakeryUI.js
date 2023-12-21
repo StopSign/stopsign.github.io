@@ -3,6 +3,7 @@ function initializeBakery() {
     initializeBakeShopCook()
     initializeBakeShopFreezer()
     initializeBakeShopOffice()
+    initializeEmilyPictures()
 }
 function initializeBakeShopDisplay() {
     createFlatPanel("bakeDisplayFloor", 0, 0, 0, 220, 150, FLOOR_COLOR);
@@ -117,6 +118,16 @@ function initializeBakeShopOffice() {
     attachPanel("bakeOfficeMonitor-wall", "bakeComputer", 2, 2, 46, 22, "white");
 }
 
+function initializeEmilyPictures() {
+    createFrontImage("emilyDeciding", 156, 210, 14, 45, 67, "emily/deciding.png");
+    createFrontImage("emilyCooking", 100, 200, 0, 45, 67, "emily/cooking.png");
+    createFrontImage("emilyDecorating", 100, 200, 0, 45, 67, "emily/decorating.png");
+    createFrontImage("emilyMixing", 100, 200, 0, 45, 67, "emily/mixing.png");
+    createFrontImage("emilyCustomer", 100, 200, 0, 45, 67, "emily/customer.png");
+    createFrontImage("emilyOrdering", 100, 200, 0, 45, 67, "emily/ordering.png");
+    createFrontImage("emilyOffice", 220, 112, 0, 27, 66, "emily/office.png");
+
+}
 
 //Puts the picture in the 2 counters, uses light->dark brown upright ovals in the display cases, in 3x2 per top tray, 3x3 per mid tray, 3x4 per bottom tray. 4 trays per row.
 //Can run whenever - doesn't update if no change
@@ -327,4 +338,13 @@ function updateEggTimer() {
 
 function setEggTimer(seconds) {
     data.eggTimerSeconds = seconds;
+}
+
+function placeEmilyImage(task) {
+    if(currentTask === "deciding") {
+        document.getElementById("emilyDeciding").style.display = "none";
+    }
+    if(task === "deciding") {
+        document.getElementById("emilyDeciding").style.display = "block";
+    }
 }
