@@ -34,7 +34,7 @@ function tick() {
     while (gameTicksLeft > (1000 / ticksPerSecond)) {
         if(stop) {
             gameTicksLeft = 0;
-            view.updating.update();
+            view.update.tick();
             break;
         }
 
@@ -47,8 +47,8 @@ function tick() {
 
         didSomething = true;
         if(gameTicksLeft > 2000) {
-            window.fps /= 2;
-            console.warn('too fast! (${gameTicksLeft})');
+            console.warn('Too fast! (${gameTicksLeft})ms behind. Adjusted ticksPerSecond to ${ticksPerSecond} to handle');
+            ticksPerSecond = Math.max(ticksPerSecond / 2, 1);
             gameTicksLeft = 0;
             stop = true;
         }
@@ -56,16 +56,17 @@ function tick() {
 
     }
     if(didSomething) {
-        view.updating.update();
+        view.update.tick();
     }
 }
 
 function tickPassed() {
-    //gameTick();
+    gameTick();
 }
 
 function secondPassed() {
     //secondTick();
+    updateEggTimer();
 }
 
 function recalcInterval(fps) {

@@ -1,0 +1,466 @@
+body {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    font-family:Arial, Helvetica, serif;
+    color:black;
+    font-size:14px;
+    height:100%;
+    margin:0;
+    background-color: #cfd3e6;
+    cursor:default;
+}
+
+.hyperVisible {
+    text-shadow:
+            -1px -1px 0 #000,
+            1px -1px 0 #000,
+            -1px 1px 0 #000,
+            1px 1px 0 #000;
+    color:white;
+}
+
+.disabled {
+    opacity:.5;
+    cursor:default;
+    pointer-events:none;
+}
+
+.hidden {
+    opacity:0;
+    cursor:default;
+    pointer-events:none;
+}
+
+.gone {
+    display:none !important;
+}
+
+.block {
+    display:block;
+}
+
+.showthatH:hover .showthisH {
+    display:block;
+}
+.showthat:hover .showthis, .showthat:hover .showthisUp, .showthat2:hover .showthis2 {
+    display:block;
+}
+.showthis, .showthisUp, .showthis2, .showthisH {
+    display:none;
+    position:absolute;
+    background-color: #BBD6E6;
+    border:1px solid;
+    padding:3px 5px;
+    border-radius:4px;
+    margin-top:5px;
+    z-index:999;
+    text-align:left;
+}
+.showthisUp {
+    bottom:105%;
+}
+
+.showthis2 {
+    z-index:1000;
+    min-width:400px;
+}
+
+.title {
+    font-size:16px;
+    font-weight:bold;
+    display:block;
+    text-align:center;
+}
+.smallTitle {
+    font-size:14px;
+    font-weight:bold;
+    display:block;
+    text-align:center;
+}
+
+.large {
+    font-size:14px;
+}
+.medium {
+    font-size:12px;
+}
+.small {
+    font-size:10px;
+}
+.bold {
+    font-weight:bold;
+}
+
+.abs {
+    position:absolute;
+}
+
+.superLargeIcon {
+    width:30px;
+    height:30px;
+}
+.largeIcon {
+    width:20px;
+    height:20px;
+}
+.smallIcon {
+    width:16px;
+    height:16px;
+}
+
+input, label {
+    cursor:pointer;
+}
+input {
+    margin-right:0;
+}
+.buttonPressed {
+    padding: 1px 5px;
+    text-align: center;
+    vertical-align:center;
+    min-width:9px;
+    cursor: pointer;
+    outline: none;
+    color: #e1e1e1;
+    border: none;
+    border-radius: 6px;
+    margin-bottom:2px;
+    background-color: #3e8e41;
+    box-shadow: 0 1px #666;
+    transform: translateY(0px);
+}
+.buttonPressed.active {
+    background-color: #357937;
+    box-shadow: 0 1px #666;
+    transform: translateY(-1px);
+}
+
+.button {
+    padding: 1px 5px;
+    text-align: center;
+    vertical-align:center;
+    min-width:9px;
+    cursor: pointer;
+    outline: none;
+    color: #000000;
+    background-color: #55d4de;
+    border: none;
+    border-radius: 6px;
+    box-shadow: 0 1px #999;
+    transform: translateZ(2px);
+    margin-bottom:2px;
+}
+
+.button:hover {
+    background-color: #60eef9
+}
+
+.button:active {
+    background-color: #3e9aa2;
+    box-shadow: 0 0px #666;
+    transform: translateZ(0px);
+}
+
+.imageDragFix {
+    pointer-events:none;
+    user-drag: none;
+    user-select: none;
+    -moz-user-select: none;
+    -webkit-user-drag: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+}
+
+.clickable:hover {
+    background-color: rgba(200, 200, 200, 1);
+}
+.clickable:active {
+    background-color: rgba(160, 160, 160, 1);
+}
+.clickable {
+    background-color: rgba(190, 190, 190, .3);
+    cursor:pointer;
+    padding:3px;
+    border:2px solid rgba(190, 190, 190, 0);
+}
+
+.preciseNum {
+    width:60px;
+    font-weight:bold;
+}
+.inputNum {
+    width:50px;
+    font-size:12px;
+    margin-right:10px;
+    height:10px;
+}
+
+.progressOuter {
+    width:80px;
+    height:11px;
+    background-color:rgba(50, 50, 50, .8);
+    position:relative;
+}
+.progressInner {
+    height:100%;
+    position:absolute;
+    background-color: #a86fc4;
+}
+
+.donationContainer {
+    padding:5px;
+    background-color:white;
+    opacity:.8;
+    width:100%;
+    border-radius:15px;
+    cursor:pointer;
+    margin-bottom:10px;
+}
+
+.donationContainer:hover {
+    background-color:#ff8080;
+}
+
+.donationReward {
+    font-size:14px;
+}
+
+.donationMessage {
+    font-size:12px;
+}
+
+.donationReason {
+    font-size:10px;
+    opacity: .8;
+}
+
+.red {
+    color:red;
+}
+.green {
+    color:green;
+}
+
+
+.roofTriangle {
+    width: 0;
+    height: 0;
+    border-left: 150px solid transparent;
+    border-right: 150px solid transparent;
+    border-bottom: 200px solid #734910;
+}
+
+.shopSquare {
+    background-color:#7878c2;
+    width:300px;
+    height:300px;
+    position:relative;
+    top:0;
+
+}
+
+.shopContainer {
+    position:relative;
+    display:inline-block
+}
+
+
+
+
+
+
+
+
+
+
+
+#scene {
+    perspective: 700px;
+    perspective-origin:bottom;
+    font-size:0;
+    margin:auto;
+    top:500px;
+    position:relative;
+    transform:perspective(1000px) scale(1);
+    width:1850px;
+}
+
+#shop {
+    transform-style: preserve-3d;
+    position: relative;
+    width: 300px;
+    height: 100px;
+    transform: rotateX(-27deg) translateX(775px);
+    display:inline-block;
+}
+
+.wall {
+    position: absolute;
+    height:100px;
+    background-color: rgba(211, 209, 209);
+}
+
+.shortwall {
+    position:absolute;
+    height:20px;
+    width:300px;
+    background-color: rgba(211, 209, 209, .8);
+    transform:translateY(80px);
+}
+
+.front-wall {
+    width: 300px;
+}
+.back-wall {
+    width:300px;
+    transform:translateZ(-400px);
+}
+
+.left-wall {
+    width: 400px;
+    transform: rotateY(90deg) translateX(200px);
+    left:-200px;
+}
+
+.window {
+    background-color: rgba(0, 128, 255, 0.05) !important;
+    pointer-events: none;
+}
+
+.right-wall {
+    width: 400px;
+    transform: rotateY(90deg) translateX(200px);
+    left:100px;
+}
+
+.floor {
+    position:absolute;
+    width:400px;
+    height:300px;
+    background-color: rgb(203, 144, 64);
+    transform: rotateY(90deg) rotateX(90deg) translateX(200px) translateY(-50px) translateZ(50px);
+}
+
+.panel {
+    position:absolute;
+}
+
+.metal {
+    background-color: rgb(127, 129, 133);
+}
+
+.lawn {
+    width: 500px;
+    height: 500px;
+    background: repeating-linear-gradient(
+            75deg,
+            #228B22,
+            #228B22 15px,
+            #027502 15px,
+            #027502 30px
+    );
+}
+
+.bread {
+    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+    transform-style: preserve-3d;
+}
+
+.bread:after {
+    content: "";
+    position: absolute;
+    left: 2.5px;
+    top: 2px;
+    width: 5px;
+    height: 2px;
+    background-color: #D2691E;
+    clip-path: polygon(0% 0%, 100% 0, 80% 100%, 20% 100%);
+    transform-style: preserve-3d;
+}
+
+/*#bakeCookTimer-wall {*/
+/*    position: relative;*/
+/*    border-radius: 50%;*/
+/*    overflow: hidden;*/
+/*}*/
+
+.eggTimerNumbers {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.eggTimerNumbers span {
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    font-weight: bold;
+    transform-origin: center;
+}
+
+.hand {
+    position: absolute;
+    bottom: 50%;
+    left: 50%;
+    width: 1px;
+    height: 50%;
+    background-color: red;
+    transform-origin: 50% 100%;
+    transform: rotate(0deg);
+}
+
+@keyframes vibrate {
+    0% { left:41px; }
+    25% { left:43px; }
+    50% { left:45px; }
+    75% { left:43px; }
+    100% { left:41px; }
+}
+
+.vibrating {
+    animation: vibrate 0.1s ease-in-out;
+    animation-iteration-count: 20; /* this will make it vibrate for 2 seconds */
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

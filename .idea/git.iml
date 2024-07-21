@@ -38,6 +38,8 @@
       <excludeFolder url="file://$MODULE_DIR$/square" />
       <excludeFolder url="file://$MODULE_DIR$/temp" />
       <excludeFolder url="file://$MODULE_DIR$/tmp" />
+      <excludeFolder url="file://$MODULE_DIR$/StSi" />
+      <excludeFolder url="file://$MODULE_DIR$/quadraticExperiments" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
