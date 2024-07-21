@@ -119,13 +119,13 @@ function initializeBakeShopOffice() {
 }
 
 function initializeEmilyPictures() {
-    createFrontImage("emilyDeciding", 156, 210, 14, 45, 67, "emily/deciding.png");
-    createFrontImage("emilyCooking", 100, 200, 0, 45, 67, "emily/cooking.png");
-    createFrontImage("emilyDecorating", 100, 200, 0, 45, 67, "emily/decorating.png");
-    createFrontImage("emilyMixing", 100, 200, 0, 45, 67, "emily/mixing.png");
-    createFrontImage("emilyCustomer", 100, 200, 0, 45, 67, "emily/customer.png");
-    createFrontImage("emilyOrdering", 100, 200, 0, 45, 67, "emily/ordering.png");
-    createFrontImage("emilyOffice", 220, 112, 0, 27, 66, "emily/office.png");
+    // createFrontImage("emilyDeciding", 156, 210, 14, 45, 67, "emily/deciding.png");
+    // createFrontImage("emilyCooking", 100, 200, 0, 45, 67, "emily/cooking.png");
+    // createFrontImage("emilyDecorating", 100, 200, 0, 45, 67, "emily/decorating.png");
+    // createFrontImage("emilyMixing", 100, 200, 0, 45, 67, "emily/mixing.png");
+    // createFrontImage("emilyCustomer", 100, 200, 0, 45, 67, "emily/customer.png");
+    // createFrontImage("emilyOrdering", 100, 200, 0, 45, 67, "emily/ordering.png");
+    // createFrontImage("emilyOffice", 220, 112, 0, 27, 66, "emily/office.png");
 
 }
 
