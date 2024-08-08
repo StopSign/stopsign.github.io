@@ -1,0 +1,81 @@
+TODO:
+
+bring action list to phone
+
+
+
+
+reshape the actions
+the unveling of the resources should be more *grand*
+first few actions have max level and give huge buffs
+overall, give stats at 50 and 100 at a time, aiming for thousands
+
+
+everyone gets a talent, and yours is "with sufficient resolve, there are no barriers" and eventually you realize you want more motivation
+
+
+you're prepared for a future that's not happening, because the world started ending - monsters are appearing in portals all over the country
+your parents died a couple of years ago and you've been in a funk since. You have money and education, but minimal connections.
+You've been desperate for purpose, and you've decided fighting monsters is your calling.
+You also just read a book where the character helped himself by helping others.
+The country is collapsing, but your lands are self-sufficient and unaffected... for now.
+
+--This is the spine of the story, but it means a lot can change.
+For example, the world can be medieval, steam punk, or modern. The monsters can be demons, an invasion, aliens, etc.
+
+later
+
+...
+
+It wasn't enough. You were missing something crucial: being wrong. Having counselors and professionals to tell you how to *think*, not just what they can offer.
+
+You have time now, though, thanks to your parent's artifact.
+
+======
+
+stop being mired to motivate / spend money / socialization / mana
+it can be a different starting point, or a different alternate
+
+1st attempt: on your own, with your own knowledge - money, self-improvement
+2nd attempt: gaining knowledge (+mana) to go on
+3rd attempt:
+
+
+experiment with design patterns
+anime|pixar etc.
+
+
+
+actions, radial:
+East - Advance in the story
+West - Enhance the ability to advance
+South - personal
+North - social
+
+
+
+
+actions need to be "carved" into memory, having a very very low rate of expertise to start, which affects their ability to use resolve
+actions have 0-100% expertise, and start at an amount related to how much the character would know about them. Raising expertise is *hard*.
+Expertise is efficiency - it will waste resolve and not consume it for progress or sending - only 100% expertise will be "no" waste
+
+expertise doesn't get better by default when you reset - many completions will help the efficiency.
+Personal will account for roughly ~30% of expertise gain (more in the beginning), and social 70% in the ideal (ramping up over time)
+Expertise works by adding to a new var Object.skill. Expertise changes the efficency to =
+
+
+Change to 1% motivate cimb, adding +.1 each reset up to 2%
+Chagne starting resolve gain to 1
+keep tier 0 for a bit, because efficiency is gonna be baad
+req: 1st action improves motivate, 2nd action improves 1st, 3rd unlocks 4th which improves 2nd, etc. - grow fast and hard at the start
+
+
+Visualize Victory
+Remember the fallen <- Honor Past Sacrifices / Pay Tribute to Heroes <- Commemorate Heroes <- Light a Beacon (req: masterwork art?)
+Reaffirm your vows <- Practice Devotion <- Worship <- Divine Communion
+
+
+vice, which increases its own stat and decreases the other's stats
+
+
+

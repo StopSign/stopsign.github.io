@@ -1,0 +1,226 @@
+let downStreamRatios = {};
+downStreamRatios.resolve = {};
+
+
+// let previousValue = document.getElementById('resolveDownstream1').value;
+function changeDownstream(inputField, varName, targetVar, index) {
+    let value = inputField.value;
+
+    let ratios = downStreamRatios[varName];
+    let targetRatio = 5;
+
+    if(!isNaN(value) && value >= 0 && value <= 100) {
+        previousValue = value;
+    } else {
+        inputField.value = previousValue;
+    }
+}
+
+function validateInput(fromAction, toAction) {
+    let numInput = document.getElementById(fromAction + "NumInput" + toAction);
+    let value = parseInt(numInput.value);
+
+    if (value < 0 || value > 100 || isNaN(value)) {
+        numInput.value = "0";
+        alert("Please enter a number between 0 and 100.");
+    }
+}
+
+function updateSlider(fromAction, toAction) {
+    let numValue = document.getElementById(fromAction + "NumInput" + toAction).value;
+    let rangeInput = document.getElementById(fromAction + "RangeInput" + toAction);
+    rangeInput.value = numValue;
+    document.getElementById(fromAction+"_"+toAction+"_Line").style.opacity = (numValue/100*.8)+"";
+    // document.getElementById(fromAction + "DownstreamSendRate" + toAction).textContent = numValue;
+}
+
+function updateNumber(fromAction, toAction) {
+    let rangeValue = document.getElementById(fromAction + "RangeInput" + toAction).value;
+    document.getElementById(fromAction + "NumInput" + toAction).value = rangeValue;
+    document.getElementById(fromAction+"_"+toAction+"_Line").style.opacity = (rangeValue/100*.8)+"";
+    document.getElementById(fromAction + "DownstreamSendRate" + toAction).textContent = intToString((rangeValue/100)*data.actions[fromAction].progressRateReal()*ticksPerSecond, 4);
+}
+function toggleAllZero(actionVar) {
+    let action = data.actions[actionVar];
+    action.downstreamVars.forEach(function (toAction) {
+        if(!data.actions[toAction] || data.actions[toAction].resolveName !== action.resolveName) {
+            return;
+        }
+        let fromAction = actionVar;
+        let numValue = 0;
+        document.getElementById(fromAction + "RangeInput" + toAction).value = numValue;
+        document.getElementById(fromAction+"_"+toAction+"_Line").style.opacity = numValue+"";
+        document.getElementById(fromAction + "DownstreamSendRate" + toAction).textContent = numValue;
+    });
+}
+
+function toggleAllHundred(actionVar) {
+    let action = data.actions[actionVar];
+    action.downstreamVars.forEach(function (toAction) {
+        if(!data.actions[toAction] || data.actions[toAction].resolveName !== action.resolveName) {
+            return;
+        }
+        let fromAction = actionVar;
+        let numValue = 100;
+        document.getElementById(fromAction + "RangeInput" + toAction).value = numValue;
+        document.getElementById(fromAction + "NumInput" + toAction).value = numValue;
+        document.getElementById(fromAction+"_"+toAction+"_Line").style.opacity = (numValue/100*.8)+"";
+        // document.getElementById(fromAction + "DownstreamSendRate" + toAction).textContent = numValue;
+    });
+}
+
+let isDragging = false;
+let originalX, originalY;
+let originalLeft, originalTop;
+
+const windowElement = document.getElementById('window');
+const actionContainer = document.getElementById('actionContainer');
+
+actionContainer.addEventListener('mousedown', function(e) {
+    if (e.target === actionContainer) {
+        isDragging = true;
+
+        // Capture the initial position of the mouse and the container
+        originalX = e.clientX;
+        originalY = e.clientY;
+
+        const style = window.getComputedStyle(actionContainer);
+        originalLeft = parseInt(style.left, 10);
+        originalTop = parseInt(style.top, 10);
+    }
+});
+
+let scale = 1; // Initial scale value
+const scaleStep = 0.1; // Value by which the scale changes per scroll
+const minScale = 0.1; // Minimum scale value to prevent the content from becoming too small
+const maxScale = 3; // Maximum scale value to prevent the content from becoming too large
+
+actionContainer.addEventListener('wheel', function(e) {
+    // Prevent the default scrolling behavior
+    e.preventDefault();
+
+    // Determine the direction of the scroll
+    const delta = Math.sign(e.deltaY);
+
+    // Update the scale based on the direction
+    if (delta < 0) {
+        // Scrolling up, zoom in
+        scale += scaleStep;
+    } else {
+        // Scrolling down, zoom out
+        scale -= scaleStep;
+    }
+
+    // Clamp the scale value to the min and max scale limits
+    scale = Math.min(Math.max(minScale, scale), maxScale);
+
+    // Apply the scale transformation to the container
+    actionContainer.style.transform = `scale(${scale})`;
+});
+
+document.addEventListener('mousemove', function(e) {
+    if (isDragging) {
+        // Calculate the new position
+        const deltaX = e.clientX - originalX;
+        const deltaY = e.clientY - originalY;
+
+        // Proposed new position
+        let newLeft = originalLeft + deltaX;
+        let newTop = originalTop + deltaY;
+
+        // Prevent the container from moving beyond the window's boundaries
+        // The container should not move in a way that its right or bottom edges go inside the window's area
+        newLeft = Math.min(newLeft, 0); // Prevent the left edge from going right
+        newLeft = Math.max(newLeft, windowElement.offsetWidth - actionContainer.offsetWidth); // Prevent the right edge from going left
+
+        newTop = Math.min(newTop, 0); // Prevent the top edge from going down
+        newTop = Math.max(newTop, windowElement.offsetHeight - actionContainer.offsetHeight); // Prevent the bottom edge from going up
+
+        // Update the position of the container
+        actionContainer.style.left = `${newLeft}px`;
+        actionContainer.style.top = `${newTop}px`;
+        forceRedraw(windowElement);
+    }
+});
+
+document.addEventListener('mouseup', function() {
+    isDragging = false;
+});
+function forceRedraw(element) {
+    return;
+    // Save the current display style
+    const display = element.style.display;
+
+    // Change the display property to 'none', then back to its original value
+    element.style.display = 'none';
+
+    // This empty access to offsetHeight forces the browser to do a repaint
+    element.offsetHeight;
+
+    // Restore the original display style
+    element.style.display = display;
+}
+
+function actionTitleClicked(actionVar) {
+    let actionObj = data.actions[actionVar];
+
+    let newLeft = -((actionObj.realX + 110) * scale) + windowElement.offsetWidth / 2 - 4000 ;
+    let newTop = -((actionObj.realY + 50) * scale) + windowElement.offsetHeight / 2 - 4000 - 50;
+
+    newLeft = Math.max(newLeft, windowElement.offsetWidth - actionContainer.offsetWidth);
+    newTop = Math.max(newTop, windowElement.offsetHeight - actionContainer.offsetHeight);
+
+    actionContainer.style.left = `${newLeft}px`;
+    actionContainer.style.top = `${newTop}px`;
+}
+
+function attemptUnlockAction(actionVar) {
+    let actionObj = data.actions[actionVar];
+    let parentObj = data.actions[actionObj.parent];
+    if(!parentObj) {
+        return;
+    }
+    if(parentObj.resolve >= actionObj.unlockCost) {
+        parentObj.resolve -= actionObj.unlockCost;
+        actionObj.unlocked = true;
+    }
+}
+
+function toggleLevelInfo(actionVar) {
+    clickActionMenu(actionVar, "LevelInfoContainer", "ToggleLevelInfoButton");
+}
+
+function toggleDownstream(actionVar) {
+    clickActionMenu(actionVar, "DownstreamContainer", "ToggleDownstreamButton");
+}
+
+function toggleStatsInfo(actionVar) {
+    clickActionMenu(actionVar, "StatsContainer", "ToggleStatsInfoButton");
+}
+
+function toggleStory(actionVar) {
+    clickActionMenu(actionVar, "StoryContainer", "ToggleStoryButton");
+}
+
+function clickActionMenu(actionVar, containerId, buttonId) {
+    let container = document.getElementById(actionVar+containerId);
+    let button = document.getElementById(actionVar+buttonId);
+
+    let toggleOn = container.style.display === "none";
+    deselectActionMenus(actionVar);
+    if (toggleOn) {
+        container.style.display = "block";
+        button.style.backgroundColor = "#7cdde5";
+    }
+}
+
+function deselectActionMenus(actionVar) {
+    document.getElementById(actionVar+"LevelInfoContainer").style.display = "none";
+    document.getElementById(actionVar+"ToggleLevelInfoButton").style.backgroundColor = "#f1f1f1";
+    document.getElementById(actionVar+"DownstreamContainer").style.display = "none";
+    document.getElementById(actionVar+"ToggleDownstreamButton").style.backgroundColor = "#f1f1f1";
+    document.getElementById(actionVar+"StatsContainer").style.display = "none";
+    document.getElementById(actionVar+"ToggleStatsInfoButton").style.backgroundColor = "#f1f1f1";
+    document.getElementById(actionVar+"StoryContainer").style.display = "none";
+    document.getElementById(actionVar+"ToggleStoryButton").style.backgroundColor = "#f1f1f1";
+}
