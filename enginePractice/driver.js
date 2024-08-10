@@ -122,41 +122,52 @@ function tickGameObject(actionVar) {
     let isFlat = actionVar === "motivate";
 
     let progressRate = actionObj.progressRate();
-    actionObj.progress += progressRate;
-    actionObj.progressGain = progressRate * ticksPerSecond; //display purposes
+    let atMaxLevel = actionObj.maxLevel >= 0 && actionObj.level >= actionObj.maxLevel;
+
+    actionObj.progress += atMaxLevel ? 0 : progressRate;
+    actionObj.progressGain = atMaxLevel ? 0 : progressRate * ticksPerSecond; //display purposes
     if(isFlat) {
         actionObj.resolveIncoming = progressRate * ticksPerSecond / actionObj.progressMax * actionObj.toAdd; //display purposes
     } else {
-        //how much it's sending. resolveIncoming is affected by upstream effects also
-        actionObj.resolveIncoming -= progressRate * ticksPerSecond;
-        actionObj.resolve -= progressRate;
+        actionObj.resolve -= atMaxLevel ? 0 : progressRate;
+        //how much it's sending. resolveIncoming is affected by upstream effects also. resolveIncoming also = resolveDelta
+        actionObj.resolveIncoming -= atMaxLevel ? 0 : progressRate * ticksPerSecond;
     }
     if(actionObj.progress >= actionObj.progressMax) {
         actionObj.progress -= actionObj.progressMax;
         actionObj.onCompleteCustom();
         actionObj.onCompleteBasic();
     }
+    //sending a % to the self, so increase used there
+    actionObj.totalSend = isFlat ? 0 : (progressRate * ticksPerSecond);
 
+    actionObj.downstreamVars.forEach(function (downstreamVar) {
+        let downstreamAction = data.actions[downstreamVar];
+        if(!downstreamAction) {
+            return;
+        }
+        if(downstreamAction.resolveName !== actionObj.resolveName) {
+            return;
+        }
+        //Send resolve to downstream, and also update downstream's taken
+        //TODO cache this access
+        let mult = (document.getElementById(actionObj.actionVar+"NumInput"+downstreamVar).value-0)/100;
+        let taken = actionObj.resolve * actionObj.tierMult() / actionObj.tierMult() / 100 / ticksPerSecond * mult; //equal to progressRate for non-motivate
+        actionObj.totalSend += taken * ticksPerSecond;
 
-    actionObj.totalSend = isFlat?0: (progressRate * ticksPerSecond);
-    if(actionObj.downstreamVars) {
-        actionObj.downstreamVars.forEach(function (downstreamVar) {
-            if(!data.actions[downstreamVar]) {
-                return;
+        if(downstreamAction.unlockCost > 0) { //send to lock if locked
+            downstreamAction.unlockCost -= taken;
+            if(downstreamAction.unlockCost <= 0) {
+                downstreamAction.unlocked = true;
+                downstreamAction.onUnlock();
             }
-            if(data.actions[downstreamVar].resolveName !== actionObj.resolveName) {
-                return;
-            }
-            //Send resolve to downstream, and also update downstream's taken
-            //TODO send resolve to lock if it's locked, not the action
-            let mult = (document.getElementById(actionObj.actionVar+"NumInput"+downstreamVar).value-0)/100;
-            let taken = actionObj.resolve * actionObj.tierMult() / actionObj.tierMult() / 100 / ticksPerSecond * mult; //equal to progressRate for non-flat
-            actionObj.totalSend += taken * ticksPerSecond
-            data.actions[downstreamVar].resolve += taken;
-            data.actions[downstreamVar].resolveIncoming += taken * ticksPerSecond; //visual var only
-            actionObj.resolve -= taken;
-        });
-    }
+        } else {
+            downstreamAction.resolve += taken;
+            downstreamAction.resolveIncoming += taken * ticksPerSecond; //visual var only
+        }
+        actionObj.resolve -= taken;
+        actionObj.resolveIncoming -= taken * ticksPerSecond;
+    });
 
     return actionObj;
 }

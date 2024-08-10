@@ -34,10 +34,12 @@ data.statNames = [];
 let statTitles = []; //[<title>, <stat name to be located above>]
 
 let language = "english";
+let globalVisible = false;
 
 function initializeData() {
 
-    statTitles.push(["Motivate Stats", "discipline"]);
+    statTitles.push(["Motivate Stats", "drive"]);
+    createAndLinkNewStat("drive"); //
     createAndLinkNewStat("discipline"); //
     createAndLinkNewStat("ambition");
     createAndLinkNewStat("resilience"); //
@@ -77,8 +79,41 @@ function initializeData() {
     createAndLinkNewStat("judgement");
     createAndLinkNewStat("leadership");
 
-    create("motivate", 0, 0, ["makeMoney", "socialize", "gatherMana"]);
-    create("gatherMana", 1.4, 0, ["expelMana", "research"]);
+    create("motivate", ["reflect", "establishRituals", "travelToOutpost", "spendMoney"], 0, 0);
+        create("reflect", ["rememberTheFallen", "peruseLibrary"], -1.2, -1);
+            create("peruseLibrary", ["researchHistory"], 0, -1.2); //research. Req other unlocks
+                create("researchHistory", null, 0, -1);
+            create("rememberTheFallen", ["honorPastSacrifices", "payTribute"], -1.2, -1);
+                create("honorPastSacrifices", ["findInnerPeace"], 0, -1.2);
+                create("payTribute", ["findInnerPeace"], -1.2, -1);
+                    create("findInnerPeace", null, 0, -1);
+        create("establishRituals", ["studyReligiousTexts", "visitSacredSites", "participateInCeremonies"], .5, -1.4)
+
+    create("travelToOutpost", ["reportForDuty", "clearTheTrail"], 1.3, 1.3);
+        create("clearTheTrail", ["paveTheTrail"], 0, 1); //increase travel expertise
+            create("paveTheTrail", null, 0, 1); //increase travel expertise to max. Req builder skills
+
+
+    //story goals: help around town more and more until you're noticed as someone with a worthwhile Talent, and sent to
+    create("reportForDuty", ["helpClaire", "reportForLabor", "reportForTraining"], 1.3, -1.3);
+    //helpClaire is to improve expertise of outpost actions, as well as move the story forward
+    //reportForLabor is the start of making money, and has a few ways to improve taht
+    //reportForTraining gives some stats, but is mostly story to say "you suck at that lol". Then it opens up
+    //reportForEducation
+
+    //TODO gold + resolve = fortune
+    //spendMoney takes BOTH any resolve on it (* expertise) AND any GOLD in the global before it increases progress
+    create("spendMoney", [], -1.2, 1);
+
+    // create("gatherMana", 1.4, 0, ["expelMana", "research"]);
+    //
+    // create("motivate", 0, 0, ["makeMoney", "socialize", "gatherMana"]);
+    // create("makeMoney", -1.2, -1, ["basicLabor", "browseMarket", "spendMoney"]);
+    // create("spendMoney", 1.1, -.5, ["eatBetterFood", "fillBasicNeeds", "buyTransportation", "buyUtilityItems", "buyInvestments"]);
+    // create("eatBetterFood", 0, -1.4, ["pickupStreetFood", "eatQualityFood", "enjoyUpscaleFood"]); //improved with magic and socialization
+    // create("fillBasicNeeds", 1.1, -1.3, ["pickupStreetFood", "eatQualityFood", "enjoyUpscaleFood"]); //improved with crafting and socialization
+
+
 
     // createMotivate(0, 0, ["makeMoney", "socialize", "gatherMana"]);
     // createGatherMana(420, 0, ["expelMana", "research"]) //convert resolve to mana, splits into improve gather & improve spell preparation
@@ -178,11 +213,6 @@ function initializeData() {
                 // good ones from this were local -> sense closer -> identify magic,
                 // or learn signatures->read aura -> read spells -> read spell history,
                 // or influence of nature/manadisturbances -> natural resonance -> resonance patterns -> magical reading of plants/animals/biome/disturbances
-
-    create("makeMoney", -1.2, -1, ["basicLabor", "browseMarket", "spendMoney"]);
-    create("spendMoney", 1.1, -.5, ["eatBetterFood", "fillBasicNeeds", "buyTransportation", "buyUtilityItems", "buyInvestments"]);
-    create("eatBetterFood", 0, -1.4, ["pickupStreetFood", "eatQualityFood", "enjoyUpscaleFood"]); //improved with magic and socialization
-    create("fillBasicNeeds", 1.1, -1.3, ["pickupStreetFood", "eatQualityFood", "enjoyUpscaleFood"]); //improved with crafting and socialization
 
 
     // createMakeMoney(-380, 350, ["basicLabor", "browseMarket", "spendMoney"])

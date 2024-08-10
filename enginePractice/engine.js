@@ -32,7 +32,7 @@ function createAndLinkNewAction(actionVar, dataObj, title, x, y, downstreamVars)
     }
 
     let actionObj = data.actions[actionVar];
-    actionObj.downstreamVars = downstreamVars;
+    actionObj.downstreamVars = downstreamVars ? downstreamVars : [];
     actionObj.actionVar = actionVar;
     actionObj.progress = 0;
     actionObj.progressGain = 0; //calculated based on resolve & tier
@@ -67,9 +67,10 @@ function createAndLinkNewAction(actionVar, dataObj, title, x, y, downstreamVars)
     actionObj.parent = null;
     actionObj.unlockCost = dataObj.unlockCost;
     actionObj.unlocked = dataObj.unlocked === null ? true : dataObj.unlocked;
-    actionObj.visible = false;
+    actionObj.visible = (globalVisible || dataObj.visible === null) ? true : dataObj.visible;
     actionObj.maxLevel = dataObj.maxLevel ? dataObj.maxLevel : -1;
     actionObj.tier = dataObj.tier;
+    actionObj.onUnlock = dataObj.onUnlock ? dataObj.onUnlock : function() {};
     actionObj.onCompleteCustom = dataObj.onComplete;
     actionObj.onCompleteText = (dataObj.onCompleteText && dataObj.onCompleteText[language]) ? dataObj.onCompleteText[language] : "";
     actionObj.storyText = (dataObj.storyText && dataObj.storyText[language]) ? dataObj.storyText[language] : "";

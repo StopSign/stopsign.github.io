@@ -38,7 +38,7 @@ function updateNumber(fromAction, toAction) {
     let rangeValue = document.getElementById(fromAction + "RangeInput" + toAction).value;
     document.getElementById(fromAction + "NumInput" + toAction).value = rangeValue;
     document.getElementById(fromAction+"_"+toAction+"_Line").style.opacity = (rangeValue/100*.8)+"";
-    document.getElementById(fromAction + "DownstreamSendRate" + toAction).textContent = intToString((rangeValue/100)*data.actions[fromAction].progressRateReal()*ticksPerSecond, 4);
+    //document.getElementById(fromAction + "DownstreamSendRate" + toAction).textContent = intToString((rangeValue/100)*data.actions[fromAction].progressRateReal()*ticksPerSecond, 4);
 }
 function toggleAllZero(actionVar) {
     let action = data.actions[actionVar];
@@ -172,18 +172,6 @@ function actionTitleClicked(actionVar) {
 
     actionContainer.style.left = `${newLeft}px`;
     actionContainer.style.top = `${newTop}px`;
-}
-
-function attemptUnlockAction(actionVar) {
-    let actionObj = data.actions[actionVar];
-    let parentObj = data.actions[actionObj.parent];
-    if(!parentObj) {
-        return;
-    }
-    if(parentObj.resolve >= actionObj.unlockCost) {
-        parentObj.resolve -= actionObj.unlockCost;
-        actionObj.unlocked = true;
-    }
 }
 
 function toggleLevelInfo(actionVar) {

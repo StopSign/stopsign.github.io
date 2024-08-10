@@ -41,28 +41,32 @@ let view = {
             let roundedNumbers = [["progress", 2], ["progressMax", 2], ["progressGain", 2],
                 // ["realX", 1], ["realY", 1],
                 ["toAdd", 3], ["resolve", 2], ["resolveDelta", 2],
-                ["level", 1], ["maxLevel", 1], ["exp", 2], ["expToLevel", 2], ["expToAdd", 2],
+                ["level", 1], ["maxLevel", 1], ["exp", 2], ["expToLevel", 2], ["expToAdd", 2], ["expToAdd2", 2],
                 ["totalSend", 3], ["expToLevelMult", 3],
-                ["unlockCost", 1]];
+                ["unlockCost", 2]];
             let roundWithoutSig = ["progressMaxIncrease", "expToLevelIncrease"];
 
             roundedNumbers.forEach(obj => {
                 let capName = capitalizeFirst(obj[0]);
-                if(!view.cached[`${actionName}${capName}`]) {
+                let elem = view.cached[`${actionName}${capName}`];
+                let nameNoNums = obj[0].replace(/\d+/g, '');
+                if(!elem) {
                     return;
                 }
-                if(forceUpdate || intToString(prevAction[obj[0]], obj[1]) !== intToString(action[obj[0]], obj[1])) {
-                    view.cached[`${actionName}${capName}`].innerHTML = intToString(action[obj[0]], obj[1]);
+                if(forceUpdate || intToString(prevAction[nameNoNums], obj[1]) !== intToString(action[nameNoNums], obj[1])) {
+                    elem.innerHTML = intToString(action[nameNoNums], obj[1]);
                 }
             })
 
             roundWithoutSig.forEach(obj => {
                 let capName = capitalizeFirst(obj);
-                if(!view.cached[`${actionName}${capName}`]) {
+                let elem = view.cached[`${actionName}${capName}`];
+                let nameNoNums = obj.replace(/\d+/g, '');
+                if(!elem) {
                     return;
                 }
-                if(forceUpdate || prevAction[obj] !== action[obj]) {
-                    view.cached[`${actionName}${capName}`].innerHTML = action[obj];
+                if(forceUpdate || prevAction[nameNoNums] !== action[nameNoNums]) {
+                    elem.innerHTML = action[nameNoNums];
                 }
             })
 
@@ -84,13 +88,38 @@ let view = {
             }
 
             if(action.downstreamVars) {
-                action.downstreamVars.forEach(function (toAction) { //also in function updateNumber in events.js
-                    if(!data.actions[toAction] || data.actions[toAction].resolveName !== action.resolveName) {
+                action.downstreamVars.forEach(function (downstreamVar) {
+                    let downstreamObj = data.actions[downstreamVar];
+                    if(!downstreamObj || downstreamObj.resolveName !== action.resolveName) {
                         return;
                     }
+
+                    //also in function updateNumber in events.js - updates the send rate per tick
                     if (forceUpdate || prevAction.resolve !== action.resolve) {
-                        let rangeValue = document.getElementById(actionName + "RangeInput" + toAction).value;
-                        document.getElementById(`${actionName}DownstreamSendRate${toAction}`).textContent = intToString((rangeValue / 100) * data.actions[actionName].progressRateReal() * ticksPerSecond, 4);
+                        let rangeValue = document.getElementById(actionName + "RangeInput" + downstreamVar).value;
+                        if(downstreamObj.unlocked) {
+                            document.getElementById(`${actionName}DownstreamSendRate${downstreamVar}`).textContent = intToString((rangeValue / 100) * downstreamObj.progressRateReal() * ticksPerSecond, 4);
+                        } else {
+                            document.getElementById(`${actionName}DownstreamSendRate${downstreamVar}`).textContent = intToString((rangeValue / 100) * downstreamObj.progressRateReal() * ticksPerSecond, 4);
+                        }
+                    }
+
+                    //if downstream is invisible, hide it and the connecting line border
+                    //if downstream is invisible, hide relevant action's slider area
+                    let prevDownstreamObj = prevState.actions[downstreamVar];
+                    if(forceUpdate || prevDownstreamObj.visible !== downstreamObj.visible) {
+                        if(downstreamObj.visible) {
+                            document.getElementById(downstreamVar + "Container").style.display = "block";
+                            document.getElementById(actionName + "_" + downstreamVar + "_Line_Border").style.display = "block";
+                            document.getElementById(actionName + "_" + downstreamVar + "_Line").style.display = "block";
+                            document.getElementById(actionName + "SliderContainer" + downstreamVar).style.display = "block";
+
+                        } else {
+                            document.getElementById(actionName + "Container").style.display = "none";
+                            document.getElementById(actionName + "_" + downstreamVar + "_Line_Border").style.display = "none";
+                            document.getElementById(actionName + "_" + downstreamVar + "_Line").style.display = "none";
+                            document.getElementById(actionName + "SliderContainer" + downstreamVar).style.display = "none";
+                        }
                     }
                 });
             }
@@ -101,6 +130,24 @@ let view = {
                 } else {
                     document.getElementById(actionName + "LockContainer").style.display = "block";
                 }
+            }
+
+            if(forceUpdate || prevAction.visible !== action.visible) {
+                if(action.visible) {
+                    document.getElementById(actionName + "Container").style.display = "block";
+                    if(action.parent) {
+                        document.getElementById(action.parent + "_" + actionName + "_Line_Border").style.display = "block";
+                        document.getElementById(action.parent + "_" + actionName + "_Line").style.display = "block";
+                    }
+                } else {
+                    document.getElementById(actionName + "Container").style.display = "none";
+                    if(action.parent) {
+                        document.getElementById(action.parent + "_" + actionName + "_Line_Border").style.display = "none";
+                        document.getElementById(action.parent + "_" + actionName + "_Line").style.display = "none";
+                    }
+                }
+                //the unlocked action's parent_action_Line needs to be made visible too
+                //the option in the send list needs to be made visible too
             }
 
 
@@ -194,13 +241,16 @@ let view = {
              */
             let statModsStr = "";
             if(actionObj.statMods) {
+                let totalAmount = 1;
                 actionObj.statMods.forEach(function (statObj) {
                     let name = statObj[0];
                     let ratio = statObj[1] * 100 + "%";
-                    let amount = ((data.stats[name].mult-1) * ratio) + 1;
+                    let amount = ((data.stats[name].mult-1) * statObj[1]) + 1;
+                    totalAmount *= amount;
                     statModsStr +=
                         "<b>" + ratio + "</b> of <b>" + capitalizeFirst(name) + "</b>'s bonus = x<b><span id='"+actionVar+"_"+name+"Bonus'>" + amount + "</span></b><br>"
                 });
+                statModsStr += "Total: x<b>" + intToString(totalAmount, 3) + "</b><br>";
             }
             let statsContainer =
                 "<div id='"+actionVar+"StatsContainer' style='display:none;padding:3px;'>" +
@@ -219,7 +269,11 @@ let view = {
             let resolveContainer =
                 "<div id='"+actionVar+"ResolveContainer' style='margin:3px;'>" +
                     capitalizeFirst(actionObj.resolveName)+": <b><span id='"+actionVar+"Resolve'>0</span></b> " +
-                    "("+(isFlat?"+":"Δ ")+"<b><span id='"+actionVar+"ResolveDelta'>1.00</span></b>/s)" +
+                "("+
+                // (isFlat?"+":"Δ ")+"<b><span id='"+actionVar+"ResolveDelta'>1.00</span></b>/complete, " +
+                    "Δ<b><span id='"+actionVar+"ResolveDelta'>1.00</span></b>/s" +
+                    (isFlat?"+<b><span id='"+actionVar+"ExpToAdd2'>1.00</span></b>/s":"") +
+                ")"
                     // ": <span id='"+actionVar+"RealX'></span>, <span id='"+actionVar+"RealY'></span>" + //TODO debug only
                 "</div>" +
                 (isFlat?"":("<div style='margin:3px;font-size:10px;'>Consuming "+actionObj.tierMult()+"% of "+actionObj.resolveName+"/s for progress:</div>"));
@@ -302,6 +356,7 @@ let view = {
             view.cached[actionVar + "OnCompleteContainer"] = document.getElementById(actionVar + "OnCompleteContainer");
             view.cached[actionVar + "ToAdd"] = document.getElementById(actionVar + "ToAdd");
             view.cached[actionVar + "ExpToAdd"] = document.getElementById(actionVar + "ExpToAdd");
+            view.cached[actionVar + "ExpToAdd2"] = document.getElementById(actionVar + "ExpToAdd2");
             view.cached[actionVar + "ExpToLevelIncrease"] = document.getElementById(actionVar + "ExpToLevelIncrease");
             view.cached[actionVar + "Level"] = document.getElementById(actionVar + "Level");
             view.cached[actionVar + "MaxLevel"] = document.getElementById(actionVar + "MaxLevel");
@@ -326,7 +381,7 @@ let view = {
                 }
                 let title = data.actions[actionVar] ? data.actions[actionVar].title : actionVar; //can be placeHolder if next action isn't created yet
                 theStr +=
-                    "<div style='margin-bottom: 5px;margin-top:5px;font-size:12px;'>" +
+                    "<div id='"+actionObj.actionVar+"SliderContainer"+actionVar+"' style='margin-bottom: 5px;margin-top:5px;font-size:12px;'>" +
                         "<b><span style='margin-bottom: 10px;cursor:pointer;' onclick='actionTitleClicked(`"+actionVar+"`)'>"+title+"</span></b>" +
                         " (+<b><span id='"+actionObj.actionVar+"DownstreamSendRate"+actionVar+"'>0</span></b>/s)<br>" +
                         "<input type='number' id='"+actionObj.actionVar+"NumInput"+actionVar+"' value='0' min='0' max='100' oninput='validateInput(\""+actionObj.actionVar+"\", \""+actionVar+"\")' onchange='updateSlider(\""+actionObj.actionVar+"\", \""+actionVar+"\")' style='margin-right: 3px;font-size:10px;width:32px;'>" +
@@ -361,7 +416,6 @@ let view = {
 
 
                     const svgBorderLine = `<svg id="${actionVar}_${targetObj.actionVar}_Line_Border" style="position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;opacity:.4;"><line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="lightgrey" stroke-width="32" /></svg>`;
-
 
                     // Create the SVG line as a string
                     const svgLine = `<svg id="`+actionVar+`_`+targetObj.actionVar+`_Line" style="position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;opacity:`+opacity+`;"><line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="`+backgroundColor+`" stroke-width="30" /></svg>`;

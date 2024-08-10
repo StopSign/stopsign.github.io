@@ -40,7 +40,7 @@
 
 //design philosophy requirement: toAddMultIncrease >= progressMaxIncrease, to prevent levels ever being a bad thing
 
-function create(actionVar, x, y, downstreamVars) {
+function create(actionVar, downstreamVars, x, y) {
     let actionDataObj = actionData[actionVar];
     if(!actionDataObj) {
         console.log("Could not find in actionData, " + actionVar);
@@ -72,10 +72,180 @@ let actionData = {
         onComplete:function() {
             data.actions.motivate.resolve += data.actions.motivate.toAdd;
         },
-        statMods:[["discipline", 1], ["ambition", 1]],
-        onLevelStats:[["resilience", .1], ["diligence", .1]]
+        statMods:[["drive", 1], ["discipline", 1], ["ambition", 1]],
+        onLevelStats:[["resilience", 1], ["diligence", 1]]
     },
-    gatherMana:{
+    reflect: {
+        tier:0,
+        expToLevelBase:20, expToLevelMult:1, expToLevelIncrease:1.1,
+        progressMaxBase:1, progressMaxMult:1, progressMaxIncrease:3,
+        toAddBase:1, toAddMult:1, toAddMultIncrease:3.1,
+        unlockCost:10, visible:true, unlocked:false,
+        onComplete:function() {
+        },
+        onUnlock: function() {
+            data.actions.establishRituals.visible = true;
+        },
+        statMods:[],
+        onLevelStats:[["drive", 20]]
+    },
+    spendMoney: {
+        tier:0,
+        expToLevelBase:20, expToLevelMult:1, expToLevelIncrease:1.1,
+        progressMaxBase:1, progressMaxMult:1, progressMaxIncrease:3,
+        toAddBase:1, toAddMult:1, toAddMultIncrease:3.1,
+        unlockCost:10, visible:false, unlocked:false,
+        onComplete:function() {
+        },
+        onUnlock: function() {
+        },
+        statMods:[],
+        onLevelStats:[]
+    },
+    rememberTheFallen: {
+        tier:0,
+        expToLevelBase:35, expToLevelMult:1, expToLevelIncrease:1.1,
+        progressMaxBase:1, progressMaxMult:1, progressMaxIncrease:3,
+        toAddBase:1, toAddMult:1, toAddMultIncrease:3.1,
+        unlockCost:50, visible:false, unlocked:false,
+        onComplete:function() {
+        },
+        statMods:[],
+        onLevelStats:[]
+    },
+    honorPastSacrifices: {
+        tier:0,
+        expToLevelBase:35, expToLevelMult:1, expToLevelIncrease:1.1,
+        progressMaxBase:1, progressMaxMult:1, progressMaxIncrease:3,
+        toAddBase:1, toAddMult:1, toAddMultIncrease:3.1,
+        unlockCost:50, visible:false, unlocked:false,
+        onComplete:function() {
+        },
+        statMods:[],
+        onLevelStats:[]
+    },
+    payTribute: {
+        tier:0,
+        expToLevelBase:35, expToLevelMult:1, expToLevelIncrease:1.1,
+        progressMaxBase:1, progressMaxMult:1, progressMaxIncrease:3,
+        toAddBase:1, toAddMult:1, toAddMultIncrease:3.1,
+        unlockCost:50, visible:false, unlocked:false,
+        onComplete:function() {
+        },
+        statMods:[],
+        onLevelStats:[]
+    },
+    findInnerPeace: {
+        tier:0,
+        expToLevelBase:35, expToLevelMult:1, expToLevelIncrease:1.1,
+        progressMaxBase:1, progressMaxMult:1, progressMaxIncrease:3,
+        toAddBase:1, toAddMult:1, toAddMultIncrease:3.1,
+        unlockCost:50, visible:false, unlocked:false,
+        onComplete:function() {
+        },
+        statMods:[],
+        onLevelStats:[]
+    },
+    establishRituals: {
+        tier:0,
+        expToLevelBase:10, expToLevelMult:1, expToLevelIncrease:2,
+        progressMaxBase:10, progressMaxMult:1, progressMaxIncrease:2,
+        toAddBase:1, toAddMult:1, toAddMultIncrease:3.1,
+        unlockCost:100, visible:false, unlocked:false,
+        onComplete:function() {
+        },
+        onUnlock: function() {
+            data.actions.travelToOutpost.visible = true;
+        },
+        statMods:[["discipline", 10]],
+        onLevelStats:[]
+    },
+    peruseLibrary: {
+        tier:0,
+        expToLevelBase:35, expToLevelMult:1, expToLevelIncrease:1.1,
+        progressMaxBase:1, progressMaxMult:1, progressMaxIncrease:3,
+        toAddBase:1, toAddMult:1, toAddMultIncrease:3.1,
+        unlockCost:50, visible:false, unlocked:false,
+        onComplete:function() {
+        },
+        statMods:[],
+        onLevelStats:[]
+    },
+    researchHistory: {
+        tier:0,
+        expToLevelBase:35, expToLevelMult:1, expToLevelIncrease:1.1,
+        progressMaxBase:1, progressMaxMult:1, progressMaxIncrease:3,
+        toAddBase:1, toAddMult:1, toAddMultIncrease:3.1,
+        unlockCost:50, visible:false, unlocked:false,
+        onComplete:function() {
+        },
+        statMods:[],
+        onLevelStats:[]
+    },
+    reaffirmYourVows: {
+        tier:0,
+        expToLevelBase:35, expToLevelMult:1, expToLevelIncrease:1.1,
+        progressMaxBase:1, progressMaxMult:1, progressMaxIncrease:3,
+        toAddBase:1, toAddMult:1, toAddMultIncrease:3.1,
+        unlockCost:50, visible:false, unlocked:false,
+        onComplete:function() {
+        },
+        statMods:[],
+        onLevelStats:[]
+    },
+    travelToOutpost: {
+        tier:0,
+        expToLevelBase:35, expToLevelMult:1, expToLevelIncrease:1.1,
+        progressMaxBase:1, progressMaxMult:1, progressMaxIncrease:3,
+        toAddBase:1, toAddMult:1, toAddMultIncrease:3.1,
+        unlockCost:50, visible:false, unlocked:false,
+        onComplete:function() {
+        },
+        onUnlock: function() {
+            data.actions.reportForDuty.visible = true;
+        },
+        statMods:[],
+        onLevelStats:[]
+    },
+    reportForDuty: {
+        tier:0,
+        expToLevelBase:35, expToLevelMult:1, expToLevelIncrease:1.1,
+        progressMaxBase:1, progressMaxMult:1, progressMaxIncrease:3,
+        toAddBase:1, toAddMult:1, toAddMultIncrease:3.1,
+        unlockCost:50, visible:false, unlocked:false,
+        onComplete:function() {
+        },
+        statMods:[],
+        onLevelStats:[]
+    },
+    clearTheTrail: {
+        tier:0,
+        expToLevelBase:20, expToLevelMult:1, expToLevelIncrease:1.1,
+        progressMaxBase:1, progressMaxMult:1, progressMaxIncrease:3,
+        toAddBase:1, toAddMult:1, toAddMultIncrease:3.1,
+        unlockCost:10, visible:false, unlocked:false,
+        onComplete:function() {
+        },
+        onUnlock: function() {
+        },
+        statMods:[],
+        onLevelStats:[]
+    },
+    paveTheTrail: {
+        tier:0,
+        expToLevelBase:20, expToLevelMult:1, expToLevelIncrease:1.1,
+        progressMaxBase:1, progressMaxMult:1, progressMaxIncrease:3,
+        toAddBase:1, toAddMult:1, toAddMultIncrease:3.1,
+        unlockCost:10, visible:false, unlocked:false,
+        onComplete:function() {
+        },
+        onUnlock: function() {
+        },
+        statMods:[],
+        onLevelStats:[]
+    },
+
+    /*gatherMana:{
         tier:1,
         expToLevelBase:100, expToLevelMult:1, expToLevelIncrease:1.01,
         progressMaxBase:1, progressMaxMult:1, progressMaxIncrease:5,
@@ -222,28 +392,8 @@ let actionData = {
         },
         statMods:[["resourcefulness", .5]],
         onLevelStats:[["ambition", 5]]
-    },
+    },*/
 };
-
-//Bulky text:
-actionData.motivate.onCompleteText = {english:"+<b><span id='motivateToAdd'>1</span></b> Resolve to this action<br>"};
-actionData.motivate.storyText = {english:"motivate info"};
-
-//Mana
-actionData.gatherMana.onCompleteText = {english:"+<b><span id=\"gatherManaToAdd\">1</span></b> Mana to Expel Mana<br>"};
-actionData.gatherMana.storyText = {english:"gather mana info"};
-
-//Socialize
-actionData.socialize.onCompleteText = {english:"+<b><span id=\"socializeToAdd\">1</span></b> Conversations<br>"};
-actionData.socialize.storyText = {english:"socialize info"};
-
-//Money
-actionData.makeMoney.onCompleteText = {english:"+<b><span id=\"makeMoneyToAdd\">1</span></b> Gold<br>"};
-actionData.makeMoney.storyText = {english:"mm info"};
-
-actionData.spendMoney.storyText = {english:"Simple and frivoloous things that make you happy, that you can't help spend on. " +
-        "A treat, a trinket, an upgrade, a waste - or is it? Well, there are better ways to spend gold."};
-
 function createBrowseMarket(x, y, downstreamVars) {
     let result = arguments.callee.name;
     let actionVar = result.charAt(6).toLowerCase() + result.slice(7);
