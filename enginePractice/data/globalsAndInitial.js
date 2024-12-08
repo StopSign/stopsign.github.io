@@ -39,11 +39,13 @@ let globalVisible = false;
 function initializeData() {
 
     statTitles.push(["Motivate Stats", "drive"]);
+    createAndLinkNewStat("energy"); //
     createAndLinkNewStat("drive"); //
     createAndLinkNewStat("discipline"); //
     createAndLinkNewStat("ambition");
-    createAndLinkNewStat("resilience"); //
+    createAndLinkNewStat("resilience"); //Energy
     createAndLinkNewStat("diligence"); //
+    createAndLinkNewStat("confidence");
 
     statTitles.push(["Social Stats", "charm"]);
     createAndLinkNewStat("charm"); //exuding warmth, connecting
@@ -72,128 +74,40 @@ function initializeData() {
     statTitles.push(["General Stats", "curiosity"]);
     createAndLinkNewStat("curiosity");
     createAndLinkNewStat("patience");
-    createAndLinkNewStat("confidence");
     createAndLinkNewStat("strategy");
     createAndLinkNewStat("innovation");
     createAndLinkNewStat("creativity");
     createAndLinkNewStat("judgement");
     createAndLinkNewStat("leadership");
 
-    create("motivate", ["reflect", "establishRituals", "travelToOutpost", "spendMoney"], 0, 0);
-        create("reflect", ["rememberTheFallen", "peruseLibrary"], -1.2, -1);
-            create("peruseLibrary", ["researchHistory"], 0, -1.2); //research. Req other unlocks
-                create("researchHistory", null, 0, -1);
-            create("rememberTheFallen", ["honorPastSacrifices", "payTribute"], -1.2, -1);
-                create("honorPastSacrifices", ["findInnerPeace"], 0, -1.2);
-                create("payTribute", ["findInnerPeace"], -1.2, -1);
-                    create("findInnerPeace", null, 0, -1);
-        create("establishRituals", ["studyReligiousTexts", "visitSacredSites", "participateInCeremonies"], .5, -1.4)
-
-    create("travelToOutpost", ["reportForDuty", "clearTheTrail"], 1.3, 1.3);
-        create("clearTheTrail", ["paveTheTrail"], 0, 1); //increase travel expertise
-            create("paveTheTrail", null, 0, 1); //increase travel expertise to max. Req builder skills
-
-
-    //story goals: help around town more and more until you're noticed as someone with a worthwhile Talent, and sent to
-    create("reportForDuty", ["helpClaire", "reportForLabor", "reportForTraining"], 1.3, -1.3);
-    //helpClaire is to improve expertise of outpost actions, as well as move the story forward
-    //reportForLabor is the start of making money, and has a few ways to improve taht
-    //reportForTraining gives some stats, but is mostly story to say "you suck at that lol". Then it opens up
-    //reportForEducation
+    create("motivate", ["makeMoney", "travelToOutpost", "reflect"], 0, 0);
 
     //TODO gold + resolve = fortune
-    //spendMoney takes BOTH any resolve on it (* expertise) AND any GOLD in the global before it increases progress
-    create("spendMoney", [], -1.2, 1);
-
-    // create("gatherMana", 1.4, 0, ["expelMana", "research"]);
-    //
-    // create("motivate", 0, 0, ["makeMoney", "socialize", "gatherMana"]);
-    // create("makeMoney", -1.2, -1, ["basicLabor", "browseMarket", "spendMoney"]);
-    // create("spendMoney", 1.1, -.5, ["eatBetterFood", "fillBasicNeeds", "buyTransportation", "buyUtilityItems", "buyInvestments"]);
-    // create("eatBetterFood", 0, -1.4, ["pickupStreetFood", "eatQualityFood", "enjoyUpscaleFood"]); //improved with magic and socialization
-    // create("fillBasicNeeds", 1.1, -1.3, ["pickupStreetFood", "eatQualityFood", "enjoyUpscaleFood"]); //improved with crafting and socialization
+    create("makeMoney", ["spendMoney"], 0, -2.5);
+    create("spendMoney", [], 0, -1.5);
 
 
 
-    // createMotivate(0, 0, ["makeMoney", "socialize", "gatherMana"]);
-    // createGatherMana(420, 0, ["expelMana", "research"]) //convert resolve to mana, splits into improve gather & improve spell preparation
-    //     createExpelMana(290, -130, ["controlMana", "senseMana", "collectMana"]) //splits into training and casting (through control)
-    //         createControlMana(-290, -150,["trainMana", "prepareToCastBasicSpell"])
-    //             createTrainMana(-270, -150);
-    //             createPrepareToCastBasicSpell(50, -200, ["castBasicSpell"]) //convert mana to arcana
-    //                 createCastBasicSpell(50, -190) //practice cast reliabilty, cast quickness, cast power, cast accuracy
-    //         createSenseMana(310, -170) //unlock more esoteric passive mana uses, and truth-telling which interferes heavily with the social tree
-    //         createCollectMana(270, -370)
-    //     createResearch(260, 200)
 
-    /*
+    create("reflect", ["rememberTheFallen", "peruseLibrary"], -1.5, -1.5);
+        //     create("peruseLibrary", ["researchHistory"], 0, -1.2); //research. Req other unlocks
+        //         create("researchHistory", null, 0, -1);
+        //     create("rememberTheFallen", ["honorPastSacrifices", "payTribute"], -1.2, -1);
+        //         create("honorPastSacrifices", ["findInnerPeace"], 0, -1.2);
+        //         create("payTribute", ["findInnerPeace"], -1.2, -1);
+        //             create("findInnerPeace", null, 0, -1);
+        // create("establishRituals", ["studyReligiousTexts", "visitSacredSites", "participateInCeremonies"], .5, -1.4)
 
-    Under Mana:
-        passive magic enhancement:
-        mana stabilization
-        spell formation
-        mana attunement
-        arcane synthesis
-        spell cohesion (spell distance)
-        spell emanation
-
-        advanced magic enhancement:
-        aura expansion / aura amplifaction -> emanance
-        rune drawing
-
-        soul:
-        etheric modulation
-
-        elemental/energetic:
-        energy resonance
-        energy filtering
-        essence merging
-        energetic pathway creation
-        energetic calibration
-        elemental infusion
-        elemental convergence (combining)
-        elemental emergence
-        elemental assimiliation
-        elemental manifestation
-
-        thinking:
-        cognitive alignment / focus sharpening / mental clarity
-        incantation crafting = chant optimization / lexical formulation / phonetic construction / syntactic formation
-        somatic channeling = verbal weaving / syllable composition  / tonal adjustment / linguistic structuring
-        gestural mapping / gesture sequencing / movement synchronization / postural alighment / kinetic sculpting
-        spatial awareness / schematic visualization / concept refining
+    create("travelToOutpost", ["reportForDuty", "clearTheTrail", "travelToCrossroads"], 3, 0);
+        create("clearTheTrail", ["paveTheTrail"], 0, 1); //increase travel expertise
+            create("paveTheTrail", [], -1, 0); //increase travel expertise to max. Req builder skills
+    create("reportForDuty", ["meetVillageLeaderScott", "reportForTraining", "reportForLabor"], 0, -1);
+        create("meetVillageLeaderScott", ["helpScottWithChores"], -1, -1);
+        create("reportForTraining", ["talkToInstructorJohn"], 0, -1)
+        create("reportForLabor", ["shepherd", "fisherman", "horseTamer", "dockWorker"], 2, -2);
 
 
 
-        music/timing based:
-        melodic binding -> diverts into bardic magic (vibrational synchronization, verbal weaving, gestural mapping)
-        rythmic coordination
-        acoustic harmonizing
-        etheric tuning
-        runic time syncing
-        vibrational synchronization
-
-
-        big words:
-        realization
-        emergence
-        manifestation
-        synthesis
-        cohesion
-        invocation
-        cast
-
-
-    Under Research:
-        Self-improvement
-            Pattern Recognition
-                Concept Grasping
-            Philosophy
-                Abstract Reasoning
-
-
-
-    */
 
 
     //casting spells at all requires catalyst, which comes from within the crafting/money sections. buy it in spend money, then improve it in crafting

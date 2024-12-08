@@ -119,27 +119,33 @@ function secondTick() {
 
 function tickGameObject(actionVar) {
     let actionObj = data.actions[actionVar];
-    let isFlat = actionVar === "motivate";
 
-    let progressRate = actionObj.progressRate();
+    let resolveMaxRate = actionObj.isGenerator ? 1/ticksPerSecond : actionObj.resolve * actionObj.tierMult() / 100 / ticksPerSecond;
+    let rateInefficient = resolveMaxRate * (actionObj.efficiency/100);
     let atMaxLevel = actionObj.maxLevel >= 0 && actionObj.level >= actionObj.maxLevel;
 
-    actionObj.progress += atMaxLevel ? 0 : progressRate;
-    actionObj.progressGain = atMaxLevel ? 0 : progressRate * ticksPerSecond; //display purposes
-    if(isFlat) {
-        actionObj.resolveIncoming = progressRate * ticksPerSecond / actionObj.progressMax * actionObj.toAdd; //display purposes
+    //if action is max level, don't convert to progress
+    let resolveToAdd = (atMaxLevel||!actionObj.unlocked) ? 0 : resolveMaxRate;
+
+
+    if(actionObj.isGenerator) {
+        actionObj.resolveIncoming = resolveMaxRate * ticksPerSecond / actionObj.progressMax * actionObj.actionPower; //display purposes for resolveDelta
     } else {
-        actionObj.resolve -= atMaxLevel ? 0 : progressRate;
-        //how much it's sending. resolveIncoming is affected by upstream effects also. resolveIncoming also = resolveDelta
-        actionObj.resolveIncoming -= atMaxLevel ? 0 : progressRate * ticksPerSecond;
+        //take resolve to use on self
+        actionObj.resolve -= resolveToAdd;
+        //how much it's sending. resolveIncoming is affected by upstream. also resolveIncoming = resolveDelta
+        actionObj.resolveIncoming -= resolveToAdd * ticksPerSecond;
     }
+    actionObj.progress += resolveToAdd;
+    actionObj.progressGain = resolveToAdd * ticksPerSecond; //display purposes for (+1.0/s) on green bar
+
     if(actionObj.progress >= actionObj.progressMax) {
         actionObj.progress -= actionObj.progressMax;
         actionObj.onCompleteCustom();
         actionObj.onCompleteBasic();
     }
     //sending a % to the self, so increase used there
-    actionObj.totalSend = isFlat ? 0 : (progressRate * ticksPerSecond);
+    actionObj.totalSend = actionObj.isGenerator ? 0 : (resolveMaxRate * ticksPerSecond);
 
     actionObj.downstreamVars.forEach(function (downstreamVar) {
         let downstreamAction = data.actions[downstreamVar];
@@ -155,19 +161,33 @@ function tickGameObject(actionVar) {
         let taken = actionObj.resolve * actionObj.tierMult() / actionObj.tierMult() / 100 / ticksPerSecond * mult; //equal to progressRate for non-motivate
         actionObj.totalSend += taken * ticksPerSecond;
 
-        if(downstreamAction.unlockCost > 0) { //send to lock if locked
-            downstreamAction.unlockCost -= taken;
-            if(downstreamAction.unlockCost <= 0) {
-                downstreamAction.unlocked = true;
-                downstreamAction.onUnlock();
-            }
-        } else {
-            downstreamAction.resolve += taken;
-            downstreamAction.resolveIncoming += taken * ticksPerSecond; //visual var only
-        }
-        actionObj.resolve -= taken;
-        actionObj.resolveIncoming -= taken * ticksPerSecond;
+        giveResolveTo(actionObj, downstreamAction, taken);
     });
 
     return actionObj;
+}
+
+//Take a fraction, multiply by expertise and send to progress or locks
+function processResolve(actionObj) {
+
+}
+
+
+function giveResolveTo(actionObj, downstreamAction, amount) {
+    addResolveTo(downstreamAction, amount);
+    actionObj.resolve -= amount;
+}
+function addResolveTo(downstreamAction, amount) {
+    //gives to unlockCost of downstream action, unlocking if possible, and gives leftover to resolve
+    if(downstreamAction.unlockCost > 0) {
+        downstreamAction.unlockCost -= amount;
+        amount = 0;
+        if(downstreamAction.unlockCost <= 0) {
+            amount = -1 * downstreamAction.unlockCost;
+            downstreamAction.unlocked = true;
+            downstreamAction.onUnlock();
+        }
+    }
+    downstreamAction.resolve += amount;
+    downstreamAction.resolveIncoming += amount * ticksPerSecond; //visual var only
 }

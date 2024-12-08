@@ -47,10 +47,9 @@ function toggleAllZero(actionVar) {
             return;
         }
         let fromAction = actionVar;
-        let numValue = 0;
-        document.getElementById(fromAction + "RangeInput" + toAction).value = numValue;
-        document.getElementById(fromAction+"_"+toAction+"_Line").style.opacity = numValue+"";
-        document.getElementById(fromAction + "DownstreamSendRate" + toAction).textContent = numValue;
+        document.getElementById(fromAction + "RangeInput" + toAction).value = 0;
+        document.getElementById(fromAction+"_"+toAction+"_Line").style.opacity = 0+"";
+        document.getElementById(fromAction + "DownstreamSendRate" + toAction).textContent = 0+"";
     });
 }
 

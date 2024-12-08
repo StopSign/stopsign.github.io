@@ -40,10 +40,10 @@ let view = {
 
             let roundedNumbers = [["progress", 2], ["progressMax", 2], ["progressGain", 2],
                 // ["realX", 1], ["realY", 1],
-                ["toAdd", 3], ["resolve", 2], ["resolveDelta", 2],
-                ["level", 1], ["maxLevel", 1], ["exp", 2], ["expToLevel", 2], ["expToAdd", 2], ["expToAdd2", 2],
-                ["totalSend", 3], ["expToLevelMult", 3],
-                ["unlockCost", 2]];
+                ["actionPower", 3], ["resolve", 2], ["resolveDelta", 2],
+                ["level", 1], ["maxLevel", 1], ["exp", 2], ["expToLevel", 2], ["expToAdd", 2], ["expToAdd2", 2], ["actionPowerMult", 3],
+                ["totalSend", 3], ["expToLevelMult", 5],
+                ["unlockCost", 2], ["expertise", 1], ["efficiency", 2], ["expertiseCalc", 2]];
             let roundWithoutSig = ["progressMaxIncrease", "expToLevelIncrease"];
 
             roundedNumbers.forEach(obj => {
@@ -69,6 +69,8 @@ let view = {
                     elem.innerHTML = action[nameNoNums];
                 }
             })
+
+
 
             //TODO refactor to be generic ? / not update constantly
             if(action.statMods) {
@@ -98,9 +100,12 @@ let view = {
                     if (forceUpdate || prevAction.resolve !== action.resolve) {
                         let rangeValue = document.getElementById(actionName + "RangeInput" + downstreamVar).value;
                         if(downstreamObj.unlocked) {
-                            document.getElementById(`${actionName}DownstreamSendRate${downstreamVar}`).textContent = intToString((rangeValue / 100) * downstreamObj.progressRateReal() * ticksPerSecond, 4);
+                            document.getElementById(`${actionName}DownstreamSendRate${downstreamVar}`).textContent = intToString((rangeValue / 100) * action.progressRateReal() * ticksPerSecond, 4);
+                            //downstream send rate = rangeValue / 100 * current resolve * tier
                         } else {
-                            document.getElementById(`${actionName}DownstreamSendRate${downstreamVar}`).textContent = intToString((rangeValue / 100) * downstreamObj.progressRateReal() * ticksPerSecond, 4);
+                            document.getElementById(`${actionName}DownstreamSendRate${downstreamVar}`).textContent = intToString((rangeValue / 100) * action.progressRateReal() * ticksPerSecond, 4);
+                            //it's not the downstreamObj's progressRateReal, it's the current object's send rate times the efficiency times the slider setting
+
                         }
                     }
 
@@ -182,7 +187,6 @@ let view = {
         },
         generateActionDisplay(actionVar) {
             let actionObj = data.actions[actionVar];
-            let isFlat = actionVar === "motivate";
             let theStr = "";
             let progressColor = view.helpers.getBackgroundColor(actionObj);
 
@@ -196,7 +200,7 @@ let view = {
                 "</span>";
             let menuContainer =
                 "<div id='' style='position:absolute;top:-18px;font-size:13px;left:-1px;'>" +
-                    (isFlat?"":"<span id='"+actionVar+"GoToParentButton' onclick='actionTitleClicked(\""+actionObj.parent+"\")' class='buttonSimple' style='margin-right:3px;width:30px;height:30px;text-align:center;cursor:pointer;padding:0 4px;'>^</span>") +
+                    (actionObj.isGenerator?"":"<span id='"+actionVar+"GoToParentButton' onclick='actionTitleClicked(\""+actionObj.parent+"\")' class='buttonSimple' style='margin-right:3px;width:30px;height:30px;text-align:center;cursor:pointer;padding:0 4px;'>^</span>") +
                     "<span id='"+actionVar+"ToggleDownstreamButton' onclick='toggleDownstream(\""+actionVar+"\")' class='buttonSimple' style='margin-right:3px;width:30px;height:30px;text-align:center;cursor:pointer;padding:0 4px;background-color:#7cdde5'>Downstream</span>" +
                     "<span id='"+actionVar+"ToggleLevelInfoButton' onclick='toggleLevelInfo(\""+actionVar+"\")' class='buttonSimple' style='margin-right:3px;width:30px;height:30px;text-align:center;cursor:pointer;padding:0 4px;'>Info</span>" +
                     "<span id='"+actionVar+"ToggleStatsInfoButton' onclick='toggleStatsInfo(\""+actionVar+"\")' class='buttonSimple' style='margin-right:3px;width:30px;height:30px;text-align:center;cursor:pointer;padding:0 4px;'>Stats</span>" +
@@ -206,26 +210,22 @@ let view = {
 
             let onComplete =
                 "<div id='"+actionVar+"OnCompleteContainer'>On Complete:<br>" +
-                    "+<b><span id='"+actionVar+"ExpToAdd'>1</span></b> Exp<br>" +
+                    "+<b><span id='"+actionVar+"expToAdd'>1</span></b> Exp<br>" +
                     actionObj.onCompleteText +
                 "</div><br>";
             let onLevelText =
                 "On Level up:<br>" +
-                (isFlat?"":"x<b>"+ actionObj.progressMaxIncrease + "</b> to progress required to complete<br>") +
+                (actionObj.isGenerator?"":"x<b>"+ actionObj.progressMaxIncrease + "</b> to progress required to complete<br>") +
                 "x<b>" + actionObj.expToLevelIncrease + "</b> to exp required to level<br>" +
-                (actionObj.toAddMultIncrease===1?"":("x<b>" + actionObj.toAddMultIncrease + "</b> to complete result per level <br>"));
-            let onLevelStatsText = "";
-            if(actionObj.onLevelStats) {
-                actionObj.onLevelStats.forEach(function(onLevelStat) {
-                    onLevelStatsText += "+<b>"+onLevelStat[1]+"</b> " + onLevelStat[0]+"<br>";
-                });
-            }
+                (actionObj.actionPowerMultIncrease===1?"":("x<b>" + actionObj.actionPowerMultIncrease + "</b> to complete result per level <br>")) +
+                "(x<b><span id='"+actionVar+"ActionPowerMult'></b> total mult from level)<br>";
+
             let levelInfoContainer =
                 "<div id='"+actionVar+"LevelInfoContainer' style='display:none;padding:3px;'>" +
                     onComplete +
                     onLevelText +
-                    onLevelStatsText +
-                    (isFlat?(""):"<br>Send up ["+actionObj.resolveName+" consumption rate] downstream to each of the actions that also use " + actionObj.resolveName) +
+                    (actionObj.isGenerator?(""):"<br>Send up ["+actionObj.resolveName+" consumption rate] downstream to each of the actions that also use " + actionObj.resolveName) +
+                    actionObj.extraInfo+""+
                 "</div>";
 
             let storyContainer =
@@ -239,7 +239,7 @@ let view = {
             total of x15, applied in:
               [exp needed to level] /= total
              */
-            let statModsStr = "";
+            let statModsStr = "Stat Modifiers to Exp Required:<br>";
             if(actionObj.statMods) {
                 let totalAmount = 1;
                 actionObj.statMods.forEach(function (statObj) {
@@ -250,14 +250,25 @@ let view = {
                     statModsStr +=
                         "<b>" + ratio + "</b> of <b>" + capitalizeFirst(name) + "</b>'s bonus = x<b><span id='"+actionVar+"_"+name+"Bonus'>" + amount + "</span></b><br>"
                 });
-                statModsStr += "Total: x<b>" + intToString(totalAmount, 3) + "</b><br>";
+                statModsStr += "Total Reduction: x<b>" + intToString(totalAmount, 3) + "</b><br>" +
+                "Total Effect to Exp Required = " +
+                "x<b><span id='"+actionVar+"ExpToLevelMult'></span></b><br>";
             }
+
+            let onLevelStatsText = "<br>On Level Up:<br>";
+            if(actionObj.onLevelStats) {
+                actionObj.onLevelStats.forEach(function(onLevelStat) {
+                    onLevelStatsText += "+<b>"+onLevelStat[1]+" " + capitalizeFirst(onLevelStat[0])+"</b><br>";
+                });
+            }
+
+            let expertiseModsStr = "";
+
             let statsContainer =
                 "<div id='"+actionVar+"StatsContainer' style='display:none;padding:3px;'>" +
-                    "Stat modifiers:<br>" +
                     statModsStr +
-                    "<br>Total effect to exp required = " +
-                    "x<b><span id='"+actionVar+"ExpToLevelMult'></span></b>" +
+                    expertiseModsStr +
+                    onLevelStatsText +
                 "</div>";
 
             let lockOverAll = "<div id='"+actionVar+"LockContainer' " +
@@ -272,11 +283,13 @@ let view = {
                 "("+
                 // (isFlat?"+":"Δ ")+"<b><span id='"+actionVar+"ResolveDelta'>1.00</span></b>/complete, " +
                     "Δ<b><span id='"+actionVar+"ResolveDelta'>1.00</span></b>/s" +
-                    (isFlat?"+<b><span id='"+actionVar+"ExpToAdd2'>1.00</span></b>/s":"") +
-                ")"
+                    (actionObj.isGenerator?", +<b><span id='"+actionVar+"ExpToAdd2'>1.00</span></b>/s":"") +
+                ")" +
                     // ": <span id='"+actionVar+"RealX'></span>, <span id='"+actionVar+"RealY'></span>" + //TODO debug only
+                "<br>Expertise: 1.001^<b><span id='"+actionVar+"Expertise'></span></b> => x<span id='"+actionVar+"ExpertiseCalc'></span>, until 100%" +
+                "<br>Efficiency: <b><span id='"+actionVar+"Efficiency'></span></b>%" +
                 "</div>" +
-                (isFlat?"":("<div style='margin:3px;font-size:10px;'>Consuming "+actionObj.tierMult()+"% of "+actionObj.resolveName+"/s for progress:</div>"));
+                (actionObj.isGenerator?"":("<div style='margin:3px;font-size:10px;'>Consuming "+actionObj.tierMult()+"% of "+actionObj.resolveName+"/s for progress:</div>"));
             let pbar =
                 "<div id='"+actionVar+"ProgressBarOuter' style='width:100%;height:16px;position:relative;text-align:left;border-top:1px solid;border-bottom:1px solid;'>" +
                     "<div id='"+actionVar+"ProgressBarInner' style='width:30%;background-color:"+progressColor+";height:100%;position:absolute;'></div>" +
@@ -300,7 +313,7 @@ let view = {
 
             let downstreamContainer =
                 "<div id='"+actionVar+"DownstreamContainer' style='padding:3px;'>" +
-                    (isFlat?("Send up to 1% resolve/s downstream: <br>"):"") +
+                    (actionObj.isGenerator?("Send up to 1% resolve/s downstream: <br>"):"") +
                     view.create.createDownStreamSliders(actionObj) +
                     "<span id='"+actionVar+"AllZeroButton' onclick='toggleAllZero(\""+actionVar+"\")' class='buttonSimple' style='margin-right:3px;width:30px;height:30px;text-align:center;cursor:pointer;padding:0 4px;'>All 0</span>" +
                     "<span id='"+actionVar+"AllEqualButton' onclick='toggleAllHundred(\""+actionVar+"\")' class='buttonSimple' style='margin-right:3px;width:30px;height:30px;text-align:center;cursor:pointer;padding:0 4px;'>All 100</span>" +
@@ -354,8 +367,9 @@ let view = {
             view.cached[actionVar + "ProgressGain"] = document.getElementById(actionVar + "ProgressGain");
             view.cached[actionVar + "ProgressMaxIncrease"] = document.getElementById(actionVar + "ProgressMaxIncrease");
             view.cached[actionVar + "OnCompleteContainer"] = document.getElementById(actionVar + "OnCompleteContainer");
-            view.cached[actionVar + "ToAdd"] = document.getElementById(actionVar + "ToAdd");
-            view.cached[actionVar + "ExpToAdd"] = document.getElementById(actionVar + "ExpToAdd");
+            view.cached[actionVar + "ActionPower"] = document.getElementById(actionVar + "ActionPower");
+            view.cached[actionVar + "ActionPowerMult"] = document.getElementById(actionVar + "ActionPowerMult");
+            view.cached[actionVar + "expToAdd"] = document.getElementById(actionVar + "expToAdd");
             view.cached[actionVar + "ExpToAdd2"] = document.getElementById(actionVar + "ExpToAdd2");
             view.cached[actionVar + "ExpToLevelIncrease"] = document.getElementById(actionVar + "ExpToLevelIncrease");
             view.cached[actionVar + "Level"] = document.getElementById(actionVar + "Level");
@@ -366,6 +380,9 @@ let view = {
             view.cached[actionVar + "ExpToLevelMult"] = document.getElementById(actionVar + "ExpToLevelMult");
             view.cached[actionVar + "TotalSend"] = document.getElementById(actionVar + "TotalSend");
             view.cached[actionVar + "UnlockCost"] = document.getElementById(actionVar + "UnlockCost");
+            view.cached[actionVar + "Expertise"] = document.getElementById(actionVar + "Expertise");
+            view.cached[actionVar + "ExpertiseCalc"] = document.getElementById(actionVar + "ExpertiseCalc");
+            view.cached[actionVar + "Efficiency"] = document.getElementById(actionVar + "Efficiency");
 
             view.cached[actionVar + "RealX"] = document.getElementById(actionVar + "RealX");
             view.cached[actionVar + "RealY"] = document.getElementById(actionVar + "RealY");
@@ -475,4 +492,3 @@ let view = {
     }
 };
 let views = [];
-

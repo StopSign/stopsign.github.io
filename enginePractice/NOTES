@@ -1,6 +1,126 @@
 TODO:
 
-bring action list to phone
+TODO rename actionPower to Action Power, make the display automatic
+
+let stats affect expertise
+fix distribution
+play the game and tweak it
+
+test max level
+test efficiency
+Change locations for expertise/efficiency and explain it a little better
+    -efficiency is a bold number to the right of Level
+    -Expertise is in stats
+    -stats on level is also in stats
+Motivate should have a "on complete"
+When the numbers are below a certain threshold, make them 0
+
+test the mana conversion - separate generator, mproved with stats 
+
+create a desync progress bar that completes based on time, and the motivation levels up the
+oncomplete but not the timer, and the timer continues
+    -for spending money
+    -for mana
+
+
+Make money will use the highest $/s job as its base output in a desynced progress bar
+-each Job action has a base $/s, and improves with the job levels
+
+Create and see tags, for use in gaining expertise
+
+Create the ability for an action to have charges, gained per exp spend
+
+
+Spells have an initial mana cost very high, and leveling them *reduces* the amount of exp needed to cast
+Casting them still gives exp that is multipled by stats as normal
+This lets mana increase linearly and still feel good over time
+
+test 2-1-2 patterns
+
+tag system: 1st pass to apply tags, 2nd pass to apply mults
+
+
+COMBAT NEEDS TO BE SIMPLER THAN THIS:
+Combat brainstorming:
+* Has to use magic for damage
+* Has to use health and defense - take hits
+* Combat is every 5 minutes
+* Only 1 combat can happen at a time
+* Combat takes ~30 seconds
+* Spells have a maximum charge
+* They still consume mana and gain exp after that maximum charge is reached
+* They can be set to "dump" for exp
+* Spell charges can be used for non-combat things like healing people or detecting traps/magic
+* It uses 1 spell per exp gain, or else the exp gain stops
+
+Combat info:
+* Enemies come at you in front
+* Magic is casted all the time, from your biggest spells down
+* Magic is used to buildup spells
+
+Tournament/dungeon/combat actions:
+* Resolve builds tokens (filling the resolve bar).
+* Each action has multiple layers of fights you can spend tokens on.
+* Tokens can be automatically spent, but have a cooldown (30 seconds)
+* Action can be set to try the highest ranked, until failure
+* When the fight begins, you use your spells in spell order
+* You have 1 spell cast per school of magic (abjuration, evocation, illusion, etc.) on separate timers
+(defense, damage, support)
+* Spell order can be set/customized in separate lists
+* In parallel, you use a ranged attack if no enemies in melee range
+* You use a melee attack if enemies are in range
+* Defensive spells are used as needed, optimally (shield, heal, cure)
+* Enemies all spawn at once and come at you
+* Kill them all without dying
+* Can set where allies/summons are located, for who gets hit first (1,2,3 pyramid)
+
+
+Requires:
+* Lots of coding/testing for this
+* Heal/Cure/Illusion spells
+-NOT found in academy, which only has dps and shields
+-Healers have healing, disease story gives you cure, thieves give you illusion
+
+
+
+In the story:
+Flesh out the adventures
+Flesh out some characters
+Write out what you have for brainstorming the ending
+
+
+On Magic:
+* All mana is Raw, Elemental, or Pure.
+* Elements
+** Fire - Damage spells
+** Earth - Protection spells
+** Water - Healing spells
+** Arcane - Illusion/movement spells
+* Pure is for divination/detection/story/rituals
+
+
+Combat:
+* With enough resolve in a combat action, it initiates the fight using your spell charges.
+* There will be a timer/progress bar that will use fire charges to attack
+* In parallel, there will be a timer/progress bar that will use Arcane charges to disable the enemy
+* In parallel, there will be a timer/progress bar that will use Earth charges to create shields
+* In parallel, there will be a timer/progress bar that will use weapons to attack
+
+
+
+
+story:
+A curse kept the level cap low
+Garret was a soldier, used his Motivate to be strong and wealthy,
+which led him to being a soldier
+But monsters invaded, and
+His city burned, and
+he used Motivate to Get Out, to somewhere peaceful.
+He joined one of the refugee caravans, and then kept going until his power said to stop
+He struggles at first with survival's guilt, but he bottles it up for survival
+He's joins a village
+The curse was just lifted
+
 
 
 
@@ -9,6 +129,15 @@ reshape the actions
 the unveling of the resources should be more *grand*
 first few actions have max level and give huge buffs
 overall, give stats at 50 and 100 at a time, aiming for thousands
+
+
+
+big resources later:
+Arcana
+Fortune
+Intrigue/Rumors
+
+
 
 
 everyone gets a talent, and yours is "with sufficient resolve, there are no barriers" and eventually you realize you want more motivation
@@ -59,6 +188,12 @@ actions need to be "carved" into memory, having a very very low rate of expertis
 actions have 0-100% expertise, and start at an amount related to how much the character would know about them. Raising expertise is *hard*.
 Expertise is efficiency - it will waste resolve and not consume it for progress or sending - only 100% expertise will be "no" waste
 
+Actions have tags, and some some rewards are to increase all actions of a certain tagged type
+
+
+
+
+
 expertise doesn't get better by default when you reset - many completions will help the efficiency.
 Personal will account for roughly ~30% of expertise gain (more in the beginning), and social 70% in the ideal (ramping up over time)
 Expertise works by adding to a new var Object.skill. Expertise changes the efficency to =
@@ -79,3 +214,22 @@ vice, which increases its own stat and decreases the other's stats
 
 
 
+
+
+The actions are things that could feasibly be done in parallel - AKA 1 "work" action
+- This could actually be an entire sub-menu w/ folders:
+Work:
+-low wage job
+-no wage job
+-mid wage job
+-high wage job
+Story (one time actions), unlocks more mental actions, simple progress bar that gets reduced based on stats:
+-training montage
+-traveling
+   -disables jobs and therefore socials
+
+^^^I can do all this in current system
+
+
+The actions improve the jobs, but only a little.
+Jobs change which people are available to talk to at one time
