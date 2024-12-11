@@ -38,7 +38,6 @@ function updateNumber(fromAction, toAction) {
     let rangeValue = document.getElementById(fromAction + "RangeInput" + toAction).value;
     document.getElementById(fromAction + "NumInput" + toAction).value = rangeValue;
     document.getElementById(fromAction+"_"+toAction+"_Line").style.opacity = (rangeValue/100*.8)+"";
-    //document.getElementById(fromAction + "DownstreamSendRate" + toAction).textContent = intToString((rangeValue/100)*data.actions[fromAction].progressRateReal()*ticksPerSecond, 4);
 }
 function toggleAllZero(actionVar) {
     let action = data.actions[actionVar];

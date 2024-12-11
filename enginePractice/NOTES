@@ -2,25 +2,20 @@ TODO:
 
 TODO rename actionPower to Action Power, make the display automatic
 
-let stats affect expertise
-fix distribution
 play the game and tweak it
+    -reflect should have 3 increases to motivate's expertise before capping out - "this is expertise"
+    -make money improves unrelated stats for now, but it starts spend money. Has low expertise also
+    -spend money improves motivate's stats - not expertise
+
+
+
+Tutorial toasts
 
 test max level
-test efficiency
-Change locations for expertise/efficiency and explain it a little better
-    -efficiency is a bold number to the right of Level
-    -Expertise is in stats
-    -stats on level is also in stats
-Motivate should have a "on complete"
+
 When the numbers are below a certain threshold, make them 0
 
-test the mana conversion - separate generator, mproved with stats 
-
-create a desync progress bar that completes based on time, and the motivation levels up the
-oncomplete but not the timer, and the timer continues
-    -for spending money
-    -for mana
+test the mana conversion - separate generator, mproved with stats
 
 
 Make money will use the highest $/s job as its base output in a desynced progress bar
@@ -36,6 +31,8 @@ Casting them still gives exp that is multipled by stats as normal
 This lets mana increase linearly and still feel good over time
 
 test 2-1-2 patterns
+
+stats should show how many actions they affect
 
 tag system: 1st pass to apply tags, 2nd pass to apply mults
 

@@ -50,11 +50,19 @@ function create(actionVar, downstreamVars, x, y) {
     y*= -350;
     let title = actionVar.replace(/([a-z])([A-Z])/g, '$1 $2').replace(/\b\w/g, char => char.toUpperCase()); //basicLabor -> Basic Labor
     let actionObj = createAndLinkNewAction(actionVar, actionDataObj, title, x, y, downstreamVars);
-    actionObj.statMods.forEach(function (statMod) { //add the action to the stat, to update exp reductions
+    actionObj.expStats.forEach(function (expStat) { //add the action to the stat, to update exp reductions
         data.statNames.forEach(function (statName) {
             let stat = data.stats[statName];
-            if(statMod[0] === stat.statVar) {
-                stat.linkedActionVars.push(actionVar);
+            if(expStat[0] === stat.statVar) {
+                stat.linkedActionExpStats.push(actionVar);
+            }
+        });
+    });
+    actionObj.expertiseStats.forEach(function (expertiseStat) { //add the action to the stat, to update exp reductions
+        data.statNames.forEach(function (statName) {
+            let stat = data.stats[statName];
+            if(expertiseStat[0] === stat.statVar) {
+                stat.linkedActionExpertiseStats.push(actionVar);
             }
         });
     });
@@ -67,14 +75,15 @@ let actionData = {
         tier:0,
         expToLevelBase:2, expToLevelMult:1, expToLevelIncrease:1.002,
         progressMaxBase:10, progressMaxMult:1, progressMaxIncrease:1,
-        actionPowerBase:10, actionPowerMult:1, actionPowerMultIncrease:1.02,
-        unlockCost:0, visible:true, unlocked:true, isGenerator:true,
-        onComplete:function() {
+        actionPowerBase:100, actionPowerMult:1, actionPowerMultIncrease:1.02,
+        expertiseBase:.1,
+        unlockCost:0, visible:true, unlocked:true, isGenerator:true, generatorSpeed:10,
+        onCompleteCustom:function() {
             data.actions.motivate.resolve += data.actions.motivate.actionPower;
         },
-        statMods:[["drive", 1], ["discipline", 1], ["ambition", 1], ["energy", 1]],
+        expStats:[["discipline", 1], ["ambition", 1], ["energy", 1]],
         onLevelStats:[["resilience", 1], ["diligence", 1]],
-        expertiseStats:[["drive", .1]]
+        expertiseStats:[["drive", 10]]
     },
     //money
     makeMoney: {
@@ -82,8 +91,8 @@ let actionData = {
         expToLevelBase:25, expToLevelMult:1, expToLevelIncrease:1.1,
         progressMaxBase:10, progressMaxMult:1, progressMaxIncrease:1,
         actionPowerBase:1, actionPowerMult:1, actionPowerMultIncrease:1.02,
-        unlockCost:10, visible:true, unlocked:false, isGenerator:true,
-        onComplete: function() {
+        unlockCost:10, visible:false, unlocked:false, isGenerator:true, generatorSpeed:10,
+        onCompleteCustom: function() {
             //Give
             data.actions.makeMoney.calcActionPower();
             let amount = data.actions.makeMoney.actionPower;
@@ -98,7 +107,7 @@ let actionData = {
         onUnlock: function() {
             unveilAction("spendMoney");
         },
-        statMods:[["diligence", 1]],
+        expStats:[["diligence", 1]],
         onLevelStats:[["ambition", 2]],
         onCompleteText: {
                 english:"+<b><span id=\"makeMoneyActionPower\">1</span></b> Gold<br>"
@@ -113,12 +122,12 @@ let actionData = {
         progressMaxBase:10, progressMaxMult:1, progressMaxIncrease:1.1,
         //actionPowerBase:1, actionPowerMult:1, actionPowerMultIncrease:3.1,
         unlockCost:20, visible:false, unlocked:false,
-        onComplete:function() {
+        onCompleteCustom:function() {
         },
         onUnlock: function() {
             unveilAction("travelToOutpost");
         },
-        statMods:[],
+        expStats:[],
         onLevelStats:[["energy", 5], ["confidence", 2]]
     },
     //Reflect Chain
@@ -127,27 +136,30 @@ let actionData = {
         expToLevelBase:2, expToLevelMult:1, expToLevelIncrease:1.1,
         progressMaxBase:1, progressMaxMult:1, progressMaxIncrease:3,
         //actionPowerBase:1, actionPowerMult:1, actionPowerMultIncrease:3.1,
-        efficiencyInitial:50,
-        unlockCost:100, visible:false, unlocked:false,
-        onComplete:function() {
+        expertiseBase:.5,
+        unlockCost:5, visible:true, unlocked:false, maxLevel:4,
+        onCompleteCustom:function() {
         },
-        onUnlock: function() {
-            if(data.actions.establishRituals) {
-                data.actions.establishRituals.visible = true;
+        onLevelCustom: function() {
+            if(data.actions.reflect.level >= 2) {
+                data.actions.makeMoney.visible = true;
             }
         },
-        statMods:[],
+        onUnlock: function() {
+            //data.actions.establishRituals.visible = true;
+        },
+        expStats:[],
         onLevelStats:[["drive", 5]]
-    },
+    },/*
     rememberTheFallen: {
         tier:0,
         expToLevelBase:35, expToLevelMult:1, expToLevelIncrease:1.1,
         progressMaxBase:1, progressMaxMult:1, progressMaxIncrease:3,
         actionPowerBase:1, actionPowerMult:1, actionPowerMultIncrease:3.1,
         unlockCost:50, visible:false, unlocked:false,
-        onComplete:function() {
+        onCompleteCustom:function() {
         },
-        statMods:[],
+        expStats:[],
         onLevelStats:[]
     },
     honorPastSacrifices: {
@@ -156,9 +168,9 @@ let actionData = {
         progressMaxBase:1, progressMaxMult:1, progressMaxIncrease:3,
         actionPowerBase:1, actionPowerMult:1, actionPowerMultIncrease:3.1,
         unlockCost:50, visible:false, unlocked:false,
-        onComplete:function() {
+        onCompleteCustom:function() {
         },
-        statMods:[],
+        expStats:[],
         onLevelStats:[]
     },
     payTribute: {
@@ -167,9 +179,9 @@ let actionData = {
         progressMaxBase:1, progressMaxMult:1, progressMaxIncrease:3,
         actionPowerBase:1, actionPowerMult:1, actionPowerMultIncrease:3.1,
         unlockCost:50, visible:false, unlocked:false,
-        onComplete:function() {
+        onCompleteCustom:function() {
         },
-        statMods:[],
+        expStats:[],
         onLevelStats:[]
     },
     findInnerPeace: {
@@ -178,9 +190,9 @@ let actionData = {
         progressMaxBase:1, progressMaxMult:1, progressMaxIncrease:3,
         actionPowerBase:1, actionPowerMult:1, actionPowerMultIncrease:3.1,
         unlockCost:50, visible:false, unlocked:false,
-        onComplete:function() {
+        onCompleteCustom:function() {
         },
-        statMods:[],
+        expStats:[],
         onLevelStats:[]
     },
     establishRituals: {
@@ -189,12 +201,12 @@ let actionData = {
         progressMaxBase:10, progressMaxMult:1, progressMaxIncrease:2,
         actionPowerBase:1, actionPowerMult:1, actionPowerMultIncrease:3.1,
         unlockCost:100, visible:false, unlocked:false,
-        onComplete:function() {
+        onCompleteCustom:function() {
         },
         onUnlock: function() {
             data.actions.travelToOutpost.visible = true;
         },
-        statMods:[["discipline", 10]],
+        expStats:[["discipline", 10]],
         onLevelStats:[]
     },
     peruseLibrary: {
@@ -203,9 +215,9 @@ let actionData = {
         progressMaxBase:1, progressMaxMult:1, progressMaxIncrease:3,
         actionPowerBase:1, actionPowerMult:1, actionPowerMultIncrease:3.1,
         unlockCost:50, visible:false, unlocked:false,
-        onComplete:function() {
+        onCompleteCustom:function() {
         },
-        statMods:[],
+        expStats:[],
         onLevelStats:[]
     },
     researchHistory: {
@@ -214,9 +226,9 @@ let actionData = {
         progressMaxBase:1, progressMaxMult:1, progressMaxIncrease:3,
         actionPowerBase:1, actionPowerMult:1, actionPowerMultIncrease:3.1,
         unlockCost:50, visible:false, unlocked:false,
-        onComplete:function() {
+        onCompleteCustom:function() {
         },
-        statMods:[],
+        expStats:[],
         onLevelStats:[]
     },
     reaffirmYourVows: {
@@ -225,12 +237,12 @@ let actionData = {
         progressMaxBase:1, progressMaxMult:1, progressMaxIncrease:3,
         actionPowerBase:1, actionPowerMult:1, actionPowerMultIncrease:3.1,
         unlockCost:50, visible:false, unlocked:false,
-        onComplete:function() {
+        onCompleteCustom:function() {
         },
-        statMods:[],
+        expStats:[],
         onLevelStats:[]
     },
-
+*/
 
     //Village
     travelToOutpost: {
@@ -239,12 +251,12 @@ let actionData = {
         progressMaxBase:1, progressMaxMult:1, progressMaxIncrease:3,
         actionPowerBase:1, actionPowerMult:1, actionPowerMultIncrease:3.1,
         unlockCost:50, visible:false, unlocked:false,
-        onComplete:function() {
+        onCompleteCustom:function() {
         },
         onUnlock: function() {
             data.actions.reportForDuty.visible = true;
         },
-        statMods:[],
+        expStats:[],
         onLevelStats:[]
     },
     clearTheTrail: {
@@ -253,11 +265,11 @@ let actionData = {
         progressMaxBase:1, progressMaxMult:1, progressMaxIncrease:3,
         actionPowerBase:1, actionPowerMult:1, actionPowerMultIncrease:3.1,
         unlockCost:10, visible:true, unlocked:true,
-        onComplete:function() {
+        onCompleteCustom:function() {
         },
         onUnlock: function() {
         },
-        statMods:[],
+        expStats:[],
         onLevelStats:[]
     },
     paveTheTrail: {
@@ -266,11 +278,11 @@ let actionData = {
         progressMaxBase:1, progressMaxMult:1, progressMaxIncrease:3,
         actionPowerBase:1, actionPowerMult:1, actionPowerMultIncrease:3.1,
         unlockCost:10, visible:true, unlocked:false,
-        onComplete:function() {
+        onCompleteCustom:function() {
         },
         onUnlock: function() {
         },
-        statMods:[],
+        expStats:[],
         onLevelStats:[]
     },
     reportForDuty: {
@@ -279,9 +291,9 @@ let actionData = {
         progressMaxBase:1, progressMaxMult:1, progressMaxIncrease:3,
         actionPowerBase:1, actionPowerMult:1, actionPowerMultIncrease:3.1,
         unlockCost:50, visible:true, unlocked:false,
-        onComplete:function() {
+        onCompleteCustom:function() {
         },
-        statMods:[],
+        expStats:[],
         onLevelStats:[]
     },
     reportForTraining: {
@@ -290,9 +302,9 @@ let actionData = {
         progressMaxBase:1, progressMaxMult:1, progressMaxIncrease:3,
         actionPowerBase:1, actionPowerMult:1, actionPowerMultIncrease:3.1,
         unlockCost:50, visible:true, unlocked:false,
-        onComplete:function() {
+        onCompleteCustom:function() {
         },
-        statMods:[],
+        expStats:[],
         onLevelStats:[]
     },
     reportForLabor: {
@@ -301,9 +313,9 @@ let actionData = {
         progressMaxBase:1, progressMaxMult:1, progressMaxIncrease:3,
         actionPowerBase:1, actionPowerMult:1, actionPowerMultIncrease:3.1,
         unlockCost:50, visible:true, unlocked:false,
-        onComplete:function() {
+        onCompleteCustom:function() {
         },
-        statMods:[],
+        expStats:[],
         onLevelStats:[]
     },
     meetVillageLeaderScott: {
@@ -312,510 +324,9 @@ let actionData = {
         progressMaxBase:1, progressMaxMult:1, progressMaxIncrease:3,
         actionPowerBase:1, actionPowerMult:1, actionPowerMultIncrease:3.1,
         unlockCost:50, visible:true, unlocked:false,
-        onComplete:function() {
+        onCompleteCustom:function() {
         },
-        statMods:[],
+        expStats:[],
         onLevelStats:[]
     },
 };
-function createBrowseMarket(x, y, downstreamVars) {
-    let result = arguments.callee.name;
-    let actionVar = result.charAt(6).toLowerCase() + result.slice(7);
-    let actionObj = createAction(result, 4, 0, 1, 35, 55, x, y,  downstreamVars);
-    actionObj.onCompleteCustom = function () {
-        data.actions.spendMoney.resolve += actionObj.actionPower;
-    }
-    actionObj.onCompleteText = "+<b><span id=\""+actionVar+"ActionPower\">1</span></b> Gold<br>";
-    actionObj.storyText = "mm info"
-}
-function createLearnMarket(x, y, downstreamVars) {
-    let result = arguments.callee.name;
-    let actionVar = result.charAt(6).toLowerCase() + result.slice(7);
-    let actionObj = createAction(result, 4, 0, 1, 35, 55, x, y,  downstreamVars);
-    actionObj.onCompleteCustom = function () {
-        data.actions.spendMoney.resolve += actionObj.actionPower;
-    }
-    actionObj.onCompleteText = "+<b><span id=\""+actionVar+"ActionPower\">1</span></b> Gold<br>";
-    actionObj.storyText = "mm info"
-}
-function createCraftForTheDemand(x, y, downstreamVars) {
-    let result = arguments.callee.name;
-    let actionVar = result.charAt(6).toLowerCase() + result.slice(7);
-    let actionObj = createAction(result, 4, 0, 1, 35, 55, x, y,  downstreamVars);
-    actionObj.onCompleteCustom = function () {
-        data.actions.spendMoney.resolve += actionObj.actionPower;
-    }
-    actionObj.onCompleteText = "+<b><span id=\""+actionVar+"ActionPower\">1</span></b> Gold<br>";
-    actionObj.storyText = "mm info"
-}
-function createCraftSimpleItems(x, y, downstreamVars) {
-    let result = arguments.callee.name;
-    let actionVar = result.charAt(6).toLowerCase() + result.slice(7);
-    let actionObj = createAction(result, 4, 0, 1, 35, 55, x, y,  downstreamVars);
-    actionObj.onCompleteCustom = function () {
-        data.actions.spendMoney.resolve += actionObj.actionPower;
-    }
-    actionObj.onCompleteText = "+<b><span id=\""+actionVar+"ActionPower\">1</span></b> Gold<br>";
-    actionObj.storyText = "mm info"
-}
-function createCompareMarket(x, y, downstreamVars) {
-    let result = arguments.callee.name;
-    let actionVar = result.charAt(6).toLowerCase() + result.slice(7);
-    let actionObj = createAction(result, 4, 0, 1, 35, 55, x, y,  downstreamVars);
-    actionObj.onCompleteCustom = function () {
-        data.actions.spendMoney.resolve += actionObj.actionPower;
-    }
-    actionObj.onCompleteText = "+<b><span id=\""+actionVar+"ActionPower\">1</span></b> Gold<br>";
-    actionObj.storyText = "mm info"
-}
-function createSellFoundItems(x, y, downstreamVars) {
-    let result = arguments.callee.name;
-    let actionVar = result.charAt(6).toLowerCase() + result.slice(7);
-    let actionObj = createAction(result, 4, 0, 1, 35, 55, x, y,  downstreamVars);
-    actionObj.onCompleteCustom = function () {
-        data.actions.spendMoney.resolve += actionObj.actionPower;
-    }
-    actionObj.onCompleteText = "+<b><span id=\""+actionVar+"ActionPower\">1</span></b> Gold<br>";
-    actionObj.storyText = "mm info"
-}
-function createExploitMarket(x, y, downstreamVars) {
-    let result = arguments.callee.name;
-    let actionVar = result.charAt(6).toLowerCase() + result.slice(7);
-    let actionObj = createAction(result, 4, 0, 1, 35, 55, x, y,  downstreamVars);
-    actionObj.onCompleteCustom = function () {
-        data.actions.spendMoney.resolve += actionObj.actionPower;
-    }
-    actionObj.onCompleteText = "+<b><span id=\""+actionVar+"ActionPower\">1</span></b> Gold<br>";
-    actionObj.storyText = "mm info"
-}
-
-function createPickUpStreetFood(x, y, downstreamVars) {
-    let result = arguments.callee.name;
-    let actionVar = result.charAt(6).toLowerCase() + result.slice(7);
-    let actionObj = createAction(result, 3, 1, 10, 100, 55, x, y,  downstreamVars);
-    actionObj.resolveName = "gold";
-    actionObj.onCompleteCustom = function () {
-    }
-    actionObj.storyText = "";
-}
-function createEatLocalSpecialties(x, y, downstreamVars) {
-    let result = arguments.callee.name;
-    let actionVar = result.charAt(6).toLowerCase() + result.slice(7);
-    let actionObj = createAction(result, 3, 1, 10, 100, 55, x, y,  downstreamVars);
-    actionObj.resolveName = "gold";
-    actionObj.onCompleteCustom = function () {
-    }
-    actionObj.storyText = "";
-}
-function createEatFastFood(x, y, downstreamVars) {
-    let result = arguments.callee.name;
-    let actionVar = result.charAt(6).toLowerCase() + result.slice(7);
-    let actionObj = createAction(result, 3, 1, 10, 100, 55, x, y,  downstreamVars);
-    actionObj.resolveName = "gold";
-    actionObj.onCompleteCustom = function () {
-    }
-    actionObj.storyText = "";
-}
-function createEatQualityFood(x, y, downstreamVars) {
-    let result = arguments.callee.name;
-    let actionVar = result.charAt(6).toLowerCase() + result.slice(7);
-    let actionObj = createAction(result, 3, 1, 10, 100, 55, x, y,  downstreamVars);
-    actionObj.resolveName = "gold";
-    actionObj.onCompleteCustom = function () {
-    }
-    actionObj.storyText = "";
-}
-function createEatNutritionalFood(x, y, downstreamVars) {
-    let result = arguments.callee.name;
-    let actionVar = result.charAt(6).toLowerCase() + result.slice(7);
-    let actionObj = createAction(result, 3, 1, 10, 100, 55, x, y, downstreamVars);
-    actionObj.resolveName = "gold";
-    actionObj.onCompleteCustom = function () {
-    }
-    actionObj.storyText = "";
-}
-
-    function createEnjoyUpscaleFood(x, y, downstreamVars) {
-    let result = arguments.callee.name;
-    let actionVar = result.charAt(6).toLowerCase() + result.slice(7);
-    let actionObj = createAction(result, 3, 1, 10, 100, 55, x, y,  downstreamVars);
-    actionObj.resolveName = "gold";
-    actionObj.onCompleteCustom = function () {
-    }
-    actionObj.storyText = "";
-}
-
-function createFillBasicNeeds(x, y, downstreamVars) {
-    let result = arguments.callee.name;
-    let actionVar = result.charAt(6).toLowerCase() + result.slice(7);
-    let actionObj = createAction(result, 2, 1, 1, 100, 55, x, y,  downstreamVars);
-    actionObj.resolveName = "gold";
-    actionObj.onCompleteCustom = function () {
-        // data.res.gold.num += actionObj.actionPower;
-    }
-    // actionObj.onCompleteText = "+<b><span id=\""+actionVar+"ActionPower\">1</span></b> Gold<br>";
-    actionObj.storyText = "mm info"
-}
-
-function createImprovePersonalSpace(x, y, downstreamVars) {
-    let result = arguments.callee.name;
-    let actionVar = result.charAt(6).toLowerCase() + result.slice(7);
-    let actionObj = createAction(result, 2, 1, 1, 100, 55, x, y,  downstreamVars);
-    actionObj.resolveName = "gold";
-    actionObj.onCompleteCustom = function () {
-        // data.res.gold.num += actionObj.actionPower;
-    }
-    // actionObj.onCompleteText = "+<b><span id=\""+actionVar+"ActionPower\">1</span></b> Gold<br>";
-    actionObj.storyText = "mm info"
-}
-
-function createImproveNeighborhood(x, y, downstreamVars) {
-    let result = arguments.callee.name;
-    let actionVar = result.charAt(6).toLowerCase() + result.slice(7);
-    let actionObj = createAction(result, 2, 1, 1, 100, 55, x, y,  downstreamVars);
-    actionObj.resolveName = "gold";
-    actionObj.onCompleteCustom = function () {
-        // data.res.gold.num += actionObj.actionPower;
-    }
-    // actionObj.onCompleteText = "+<b><span id=\""+actionVar+"ActionPower\">1</span></b> Gold<br>";
-    actionObj.storyText = "mm info"
-}
-
-function createImprovePond(x, y, downstreamVars) {
-    let result = arguments.callee.name;
-    let actionVar = result.charAt(6).toLowerCase() + result.slice(7);
-    let actionObj = createAction(result, 2, 1, 1, 100, 55, x, y,  downstreamVars);
-    actionObj.resolveName = "gold";
-    actionObj.onCompleteCustom = function () {
-        // data.res.gold.num += actionObj.actionPower;
-    }
-    // actionObj.onCompleteText = "+<b><span id=\""+actionVar+"ActionPower\">1</span></b> Gold<br>";
-    actionObj.storyText = "mm info"
-}
-
-function createBuyQualityClothing(x, y, downstreamVars) {
-    let result = arguments.callee.name;
-    let actionVar = result.charAt(6).toLowerCase() + result.slice(7);
-    let actionObj = createAction(result, 2, 1, 1, 100, 55, x, y,  downstreamVars);
-    actionObj.resolveName = "gold";
-    actionObj.onCompleteCustom = function () {
-        // data.res.gold.num += actionObj.actionPower;
-    }
-    // actionObj.onCompleteText = "+<b><span id=\""+actionVar+"ActionPower\">1</span></b> Gold<br>";
-    actionObj.storyText = "mm info"
-}
-
-function createBuyFashionableClothing(x, y, downstreamVars) {
-    let result = arguments.callee.name;
-    let actionVar = result.charAt(6).toLowerCase() + result.slice(7);
-    let actionObj = createAction(result, 2, 1, 1, 100, 55, x, y,  downstreamVars);
-    actionObj.resolveName = "gold";
-    actionObj.onCompleteCustom = function () {
-        // data.res.gold.num += actionObj.actionPower;
-    }
-    // actionObj.onCompleteText = "+<b><span id=\""+actionVar+"ActionPower\">1</span></b> Gold<br>";
-    actionObj.storyText = "mm info"
-}
-
-function createBuyTransportation(x, y, downstreamVars) {
-    let result = arguments.callee.name;
-    let actionVar = result.charAt(6).toLowerCase() + result.slice(7);
-    let actionObj = createAction(result, 2, 1, 1, 100, 55, x, y,  downstreamVars);
-    actionObj.resolveName = "gold";
-    actionObj.onCompleteCustom = function () {
-        // data.res.gold.num += actionObj.actionPower;
-    }
-    // actionObj.onCompleteText = "+<b><span id=\""+actionVar+"ActionPower\">1</span></b> Gold<br>";
-    actionObj.storyText = "mm info"
-}
-
-function createBuyPractical(x, y, downstreamVars) {
-    let result = arguments.callee.name;
-    let actionVar = result.charAt(6).toLowerCase() + result.slice(7);
-    let actionObj = createAction(result, 2, 1, 1, 100, 55, x, y,  downstreamVars);
-    actionObj.resolveName = "gold";
-    actionObj.onCompleteCustom = function () {
-        // data.res.gold.num += actionObj.actionPower;
-    }
-    // actionObj.onCompleteText = "+<b><span id=\""+actionVar+"ActionPower\">1</span></b> Gold<br>";
-    actionObj.storyText = "mm info"
-}
-
-function createBuyKnowledge(x, y, downstreamVars) {
-    let result = arguments.callee.name;
-    let actionVar = result.charAt(6).toLowerCase() + result.slice(7);
-    let actionObj = createAction(result, 2, 1, 1, 100, 55, x, y,  downstreamVars);
-    actionObj.resolveName = "gold";
-    actionObj.onCompleteCustom = function () {
-        // data.res.gold.num += actionObj.actionPower;
-    }
-    // actionObj.onCompleteText = "+<b><span id=\""+actionVar+"ActionPower\">1</span></b> Gold<br>";
-    actionObj.storyText = "mm info"
-}
-
-function createBuyBooks(x, y, downstreamVars) {
-    let result = arguments.callee.name;
-    let actionVar = result.charAt(6).toLowerCase() + result.slice(7);
-    let actionObj = createAction(result, 2, 1, 1, 100, 55, x, y,  downstreamVars);
-    actionObj.resolveName = "gold";
-    actionObj.onCompleteCustom = function () {
-        // data.res.gold.num += actionObj.actionPower;
-    }
-    // actionObj.onCompleteText = "+<b><span id=\""+actionVar+"ActionPower\">1</span></b> Gold<br>";
-    actionObj.storyText = "mm info"
-}
-
-function createBuyMaps(x, y, downstreamVars) {
-    let result = arguments.callee.name;
-    let actionVar = result.charAt(6).toLowerCase() + result.slice(7);
-    let actionObj = createAction(result, 2, 1, 1, 100, 55, x, y,  downstreamVars);
-    actionObj.resolveName = "gold";
-    actionObj.onCompleteCustom = function () {
-        // data.res.gold.num += actionObj.actionPower;
-    }
-    // actionObj.onCompleteText = "+<b><span id=\""+actionVar+"ActionPower\">1</span></b> Gold<br>";
-    actionObj.storyText = "mm info"
-}
-
-function createBuyMaterials(x, y, downstreamVars) {
-    let result = arguments.callee.name;
-    let actionVar = result.charAt(6).toLowerCase() + result.slice(7);
-    let actionObj = createAction(result, 2, 1, 1, 100, 55, x, y,  downstreamVars);
-    actionObj.resolveName = "gold";
-    actionObj.onCompleteCustom = function () {
-        // data.res.gold.num += actionObj.actionPower;
-    }
-    // actionObj.onCompleteText = "+<b><span id=\""+actionVar+"ActionPower\">1</span></b> Gold<br>";
-    actionObj.storyText = "mm info"
-}
-
-function createBuyItems(x, y, downstreamVars) {
-    let result = arguments.callee.name;
-    let actionVar = result.charAt(6).toLowerCase() + result.slice(7);
-    let actionObj = createAction(result, 2, 1, 1, 100, 55, x, y,  downstreamVars);
-    actionObj.resolveName = "gold";
-    actionObj.onCompleteCustom = function () {
-        // data.res.gold.num += actionObj.actionPower;
-    }
-    // actionObj.onCompleteText = "+<b><span id=\""+actionVar+"ActionPower\">1</span></b> Gold<br>";
-    actionObj.storyText = "mm info"
-}
-
-function createBuyGear(x, y, downstreamVars) {
-    let result = arguments.callee.name;
-    let actionVar = result.charAt(6).toLowerCase() + result.slice(7);
-    let actionObj = createAction(result, 2, 1, 1, 100, 55, x, y,  downstreamVars);
-    actionObj.resolveName = "gold";
-    actionObj.onCompleteCustom = function () {
-        // data.res.gold.num += actionObj.actionPower;
-    }
-    // actionObj.onCompleteText = "+<b><span id=\""+actionVar+"ActionPower\">1</span></b> Gold<br>";
-    actionObj.storyText = "mm info"
-}
-
-function createBuyUtilityMagicItems(x, y, downstreamVars) {
-    let result = arguments.callee.name;
-    let actionVar = result.charAt(6).toLowerCase() + result.slice(7);
-    let actionObj = createAction(result, 2, 1, 1, 100, 55, x, y,  downstreamVars);
-    actionObj.resolveName = "gold";
-    actionObj.onCompleteCustom = function () {
-        // data.res.gold.num += actionObj.actionPower;
-    }
-    // actionObj.onCompleteText = "+<b><span id=\""+actionVar+"ActionPower\">1</span></b> Gold<br>";
-    actionObj.storyText = "mm info"
-}
-
-function createBuyInvestments(x, y, downstreamVars) {
-    let result = arguments.callee.name;
-    let actionVar = result.charAt(6).toLowerCase() + result.slice(7);
-    let actionObj = createAction(result, 2, 1, 1, 100, 55, x, y,  downstreamVars);
-    actionObj.resolveName = "gold";
-    actionObj.onCompleteCustom = function () {
-        // data.res.gold.num += actionObj.actionPower;
-    }
-    // actionObj.onCompleteText = "+<b><span id=\""+actionVar+"ActionPower\">1</span></b> Gold<br>";
-    actionObj.storyText = "mm info"
-}
-
-function createBuyHousing(x, y, downstreamVars) {
-    let result = arguments.callee.name;
-    let actionVar = result.charAt(6).toLowerCase() + result.slice(7);
-    let actionObj = createAction(result, 2, 1, 1, 100, 55, x, y,  downstreamVars);
-    actionObj.resolveName = "gold";
-    actionObj.onCompleteCustom = function () {
-        // data.res.gold.num += actionObj.actionPower;
-    }
-    // actionObj.onCompleteText = "+<b><span id=\""+actionVar+"ActionPower\">1</span></b> Gold<br>";
-    actionObj.storyText = "mm info"
-}
-
-function createPutInSavings(x, y, downstreamVars) {
-    let result = arguments.callee.name;
-    let actionVar = result.charAt(6).toLowerCase() + result.slice(7);
-    let actionObj = createAction(result, 2, 1, 1, 100, 55, x, y,  downstreamVars);
-    actionObj.resolveName = "gold";
-    actionObj.onCompleteCustom = function () {
-        // data.res.gold.num += actionObj.actionPower;
-    }
-    // actionObj.onCompleteText = "+<b><span id=\""+actionVar+"ActionPower\">1</span></b> Gold<br>";
-    actionObj.storyText = "mm info"
-}
-
-function createGenerateInterest(x, y, downstreamVars) {
-    let result = arguments.callee.name;
-    let actionVar = result.charAt(6).toLowerCase() + result.slice(7);
-    let actionObj = createAction(result, 2, 1, 1, 100, 55, x, y,  downstreamVars);
-    actionObj.resolveName = "gold";
-    actionObj.onCompleteCustom = function () {
-        // data.res.gold.num += actionObj.actionPower;
-    }
-    // actionObj.onCompleteText = "+<b><span id=\""+actionVar+"ActionPower\">1</span></b> Gold<br>";
-    actionObj.storyText = "mm info"
-}
-
-function createPullInterest(x, y, downstreamVars) {
-    let result = arguments.callee.name;
-    let actionVar = result.charAt(6).toLowerCase() + result.slice(7);
-    let actionObj = createAction(result, 2, 1, 1, 100, 55, x, y,  downstreamVars);
-    actionObj.resolveName = "gold";
-    actionObj.onCompleteCustom = function () {
-        // data.res.gold.num += actionObj.actionPower;
-    }
-    // actionObj.onCompleteText = "+<b><span id=\""+actionVar+"ActionPower\">1</span></b> Gold<br>";
-    actionObj.storyText = "mm info"
-}
-
-function createBasicLabor(x, y, downstreamVars) {
-    let result = arguments.callee.name;
-    let actionVar = result.charAt(6).toLowerCase() + result.slice(7);
-    let actionObj = createAction(result, 3, 1, 10, 100, 55, x, y,  downstreamVars);
-    actionObj.onCompleteCustom = function () {
-    }
-    actionObj.storyText = "info"
-}
-
-function createMaid(x, y, downstreamVars) {
-    let result = arguments.callee.name;
-    let actionVar = result.charAt(6).toLowerCase() + result.slice(7);
-    let actionObj = createAction(result, 3, 1, 10, 100, 55, x, y,  downstreamVars);
-    actionObj.onCompleteCustom = function () {
-    }
-    actionObj.storyText = "info"
-}
-
-function createStableHand(x, y, downstreamVars) {
-    let result = arguments.callee.name;
-    let actionVar = result.charAt(6).toLowerCase() + result.slice(7);
-    let actionObj = createAction(result, 3, 1, 10, 100, 55, x, y,  downstreamVars);
-    actionObj.onCompleteCustom = function () {
-    }
-    actionObj.storyText = "info"
-}
-
-function createFieldWork(x, y, downstreamVars) {
-    let result = arguments.callee.name;
-    let actionVar = result.charAt(6).toLowerCase() + result.slice(7);
-    let actionObj = createAction(result, 3, 1, 10, 100, 55, x, y,  downstreamVars);
-    actionObj.onCompleteCustom = function () {
-    }
-    actionObj.storyText = "info"
-}
-
-function createMining(x, y, downstreamVars) {
-    let result = arguments.callee.name;
-    let actionVar = result.charAt(6).toLowerCase() + result.slice(7);
-    let actionObj = createAction(result, 3, 1, 10, 100, 55, x, y,  downstreamVars);
-    actionObj.onCompleteCustom = function () {
-    }
-    actionObj.storyText = "info"
-}
-
-function createFish(x, y, downstreamVars) {
-    let result = arguments.callee.name;
-    let actionVar = result.charAt(6).toLowerCase() + result.slice(7);
-    let actionObj = createAction(result, 3, 1, 10, 100, 55, x, y,  downstreamVars);
-    actionObj.onCompleteCustom = function () {
-    }
-    actionObj.storyText = "info"
-}
-
-function createSkilledLabor(x, y, downstreamVars) {
-    let result = arguments.callee.name;
-    let actionVar = result.charAt(6).toLowerCase() + result.slice(7);
-    let actionObj = createAction(result, 3, 1, 10, 100, 55, x, y,  downstreamVars);
-    actionObj.onCompleteCustom = function () {
-    }
-    actionObj.storyText = "info"
-}
-
-function createScribe(x, y, downstreamVars) {
-    let result = arguments.callee.name;
-    let actionVar = result.charAt(6).toLowerCase() + result.slice(7);
-    let actionObj = createAction(result, 3, 1, 10, 100, 55, x, y,  downstreamVars);
-    actionObj.onCompleteCustom = function () {
-    }
-    actionObj.storyText = "info"
-}
-
-function createBaker(x, y, downstreamVars) {
-    let result = arguments.callee.name;
-    let actionVar = result.charAt(6).toLowerCase() + result.slice(7);
-    let actionObj = createAction(result, 3, 1, 10, 100, 55, x, y,  downstreamVars);
-    actionObj.onCompleteCustom = function () {
-    }
-    actionObj.storyText = "info"
-}
-
-function createRunAStall(x, y, downstreamVars) {
-    let result = arguments.callee.name;
-    let actionVar = result.charAt(6).toLowerCase() + result.slice(7);
-    let actionObj = createAction(result, 3, 1, 10, 100, 55, x, y,  downstreamVars);
-    actionObj.onCompleteCustom = function () {
-    }
-    actionObj.storyText = "info"
-}
-
-function createTailor(x, y, downstreamVars) {
-    let result = arguments.callee.name;
-    let actionVar = result.charAt(6).toLowerCase() + result.slice(7);
-    let actionObj = createAction(result, 3, 1, 10, 100, 55, x, y,  downstreamVars);
-    actionObj.onCompleteCustom = function () {
-    }
-    actionObj.storyText = "info"
-}
-
-function createBlacksmith(x, y, downstreamVars) {
-    let result = arguments.callee.name;
-    let actionVar = result.charAt(6).toLowerCase() + result.slice(7);
-    let actionObj = createAction(result, 3, 1, 10, 100, 55, x, y,  downstreamVars);
-    actionObj.onCompleteCustom = function () {
-    }
-    actionObj.storyText = "info"
-}
-
-function createAdvancedLabor(x, y, downstreamVars) {
-    let result = arguments.callee.name;
-    let actionVar = result.charAt(6).toLowerCase() + result.slice(7);
-    let actionObj = createAction(result, 3, 1, 10, 100, 55, x, y,  downstreamVars);
-    actionObj.onCompleteCustom = function () {
-    }
-    actionObj.storyText = "info"
-}
-
-function createMusician(x, y, downstreamVars) {
-    let result = arguments.callee.name;
-    let actionVar = result.charAt(6).toLowerCase() + result.slice(7);
-    let actionObj = createAction(result, 3, 1, 10, 100, 55, x, y,  downstreamVars);
-    actionObj.onCompleteCustom = function () {
-    }
-    actionObj.storyText = "info"
-}
-
-function createGuard(x, y, downstreamVars) {
-    let result = arguments.callee.name;
-    let actionVar = result.charAt(6).toLowerCase() + result.slice(7);
-    let actionObj = createAction(result, 3, 1, 10, 100, 55, x, y,  downstreamVars);
-    actionObj.onCompleteCustom = function () {
-    }
-    actionObj.storyText = "info"
-}

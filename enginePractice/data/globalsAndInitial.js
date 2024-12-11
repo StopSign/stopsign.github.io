@@ -80,7 +80,7 @@ function initializeData() {
     createAndLinkNewStat("judgement");
     createAndLinkNewStat("leadership");
 
-    create("motivate", ["makeMoney", "travelToOutpost", "reflect"], 0, 0);
+    create("motivate", ["reflect", "makeMoney", "travelToOutpost"], 0, 0);
 
     //TODO gold + resolve = fortune
     create("makeMoney", ["spendMoney"], 0, -2.5);

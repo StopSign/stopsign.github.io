@@ -88,14 +88,10 @@ function recalcInterval(fps) {
 function gameTick() {
     data.actionNames.forEach(function(actionName) {
         let actionObj = data.actions[actionName];
-        actionObj.resolveIncoming = 0; //reset
+        actionObj.resolveDelta = 0; //reset
     });
     data.actionNames.forEach(function(actionName) {
         tickGameObject(actionName);
-    });
-    data.actionNames.forEach(function(actionName) {
-        let actionObj = data.actions[actionName];
-        actionObj.resolveDelta = actionObj.resolveIncoming;
     });
 
 
@@ -120,62 +116,63 @@ function secondTick() {
 function tickGameObject(actionVar) {
     let actionObj = data.actions[actionVar];
 
-    let resolveMaxRate = actionObj.isGenerator ? 1/ticksPerSecond : actionObj.resolve * actionObj.tierMult() / 100 / ticksPerSecond;
+    //if generator, add Time to exp
+    //if not generator, add current resolve/10^tier to exp
+    let resolveMaxRate = actionObj.isGenerator ? actionObj.generatorSpeed / ticksPerSecond : actionObj.resolve * actionObj.tierMult() / ticksPerSecond;
+    //actual resolve change will be based on efficiency - for both generator and not
     let rateInefficient = resolveMaxRate * (actionObj.efficiency/100);
+    //when max level, do not consume resolve - only let it pass
     let atMaxLevel = actionObj.maxLevel >= 0 && actionObj.level >= actionObj.maxLevel;
 
-    //if action is max level, don't convert to progress
+    //if action is max level or locked, resolve rate should be 0
     let resolveToAdd = (atMaxLevel||!actionObj.unlocked) ? 0 : resolveMaxRate;
+    let resolveToAddInefficient = (atMaxLevel||!actionObj.unlocked) ? 0 : rateInefficient;
 
-
+    //Calculate resolve delta: 1. determine how much is being consumed and subtract it
+    //2. later, if non-generator, an upstream action will add how much it is sending to this actions resolveDelta
     if(actionObj.isGenerator) {
-        actionObj.resolveIncoming = resolveMaxRate * ticksPerSecond / actionObj.progressMax * actionObj.actionPower; //display purposes for resolveDelta
+        actionObj.resolveDelta = actionObj.actionPower / actionObj.progressMax * rateInefficient * ticksPerSecond;
+        actionObj.actionPowerDelta = actionObj.resolveDelta;
     } else {
-        //take resolve to use on self
+        //how much it's consuming.
+        actionObj.resolveDelta -= resolveToAdd * ticksPerSecond;
+        //take full resolve for consuming
         actionObj.resolve -= resolveToAdd;
-        //how much it's sending. resolveIncoming is affected by upstream. also resolveIncoming = resolveDelta
-        actionObj.resolveIncoming -= resolveToAdd * ticksPerSecond;
     }
-    actionObj.progress += resolveToAdd;
-    actionObj.progressGain = resolveToAdd * ticksPerSecond; //display purposes for (+1.0/s) on green bar
 
-    if(actionObj.progress >= actionObj.progressMax) {
+
+    actionObj.progress += resolveToAddInefficient;
+    actionObj.progressGain = resolveToAddInefficient * ticksPerSecond; //display purposes for (+1.0/s) on green bar
+
+    while(actionObj.progress >= actionObj.progressMax) {
         actionObj.progress -= actionObj.progressMax;
         actionObj.onCompleteCustom();
         actionObj.onCompleteBasic();
     }
-    //sending a % to the self, so increase used there
-    actionObj.totalSend = actionObj.isGenerator ? 0 : (resolveMaxRate * ticksPerSecond);
+    //sending a % to the self, so increase used there if relevant
+    actionObj.totalSend = actionObj.isGenerator||atMaxLevel ? 0 : (rateInefficient * ticksPerSecond);
 
     actionObj.downstreamVars.forEach(function (downstreamVar) {
         let downstreamAction = data.actions[downstreamVar];
-        if(!downstreamAction) {
-            return;
-        }
-        if(downstreamAction.resolveName !== actionObj.resolveName) {
+        if(!downstreamAction || downstreamAction.resolveName !== actionObj.resolveName) {
             return;
         }
         //Send resolve to downstream, and also update downstream's taken
-        //TODO cache this access
-        let mult = (document.getElementById(actionObj.actionVar+"NumInput"+downstreamVar).value-0)/100;
-        let taken = actionObj.resolve * actionObj.tierMult() / actionObj.tierMult() / 100 / ticksPerSecond * mult; //equal to progressRate for non-motivate
+        let mult = (view.cached[actionVar+"NumInput"+downstreamVar].value-0)/100;
+        let taken = actionObj.progressRateReal() * mult;
         actionObj.totalSend += taken * ticksPerSecond;
 
+        //sends to unlock cost first if needed
         giveResolveTo(actionObj, downstreamAction, taken);
     });
 
     return actionObj;
 }
 
-//Take a fraction, multiply by expertise and send to progress or locks
-function processResolve(actionObj) {
-
-}
-
-
 function giveResolveTo(actionObj, downstreamAction, amount) {
     addResolveTo(downstreamAction, amount);
     actionObj.resolve -= amount;
+    actionObj.resolveDelta -= amount * ticksPerSecond;
 }
 function addResolveTo(downstreamAction, amount) {
     //gives to unlockCost of downstream action, unlocking if possible, and gives leftover to resolve
@@ -189,5 +186,5 @@ function addResolveTo(downstreamAction, amount) {
         }
     }
     downstreamAction.resolve += amount;
-    downstreamAction.resolveIncoming += amount * ticksPerSecond; //visual var only
+    downstreamAction.resolveDelta += amount * ticksPerSecond;
 }
