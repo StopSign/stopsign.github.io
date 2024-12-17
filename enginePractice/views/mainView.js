@@ -242,8 +242,8 @@ let view = {
             let onLevelText =
                 "On Level up:<br>" +
                 (actionObj.isGenerator?"":"x<b>"+ actionObj.progressMaxIncrease + "</b> to progress required to complete<br>") +
-                "x<b>" + actionObj.expToLevelIncrease + "</b> to exp required to level<br>" +
-                (actionObj.actionPowerMultIncrease===1?"":("x<b>" + actionObj.actionPowerMultIncrease + "</b> to complete result per level <br>")) +
+                "x<b>" + actionObj.expToLevelIncrease + "</b> to Exp required to level<br>" +
+                (actionObj.actionPowerMultIncrease===1?"":("x<b>" + actionObj.actionPowerMultIncrease + "</b> to Action Power per level <br>")) +
                 "(x<b><span id='"+actionVar+"ActionPowerMult'></b> total mult from level)<br>";
 
             let levelInfoContainer =

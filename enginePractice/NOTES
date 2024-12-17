@@ -31,6 +31,8 @@ Create and see tags, for use in gaining expertise
 
 Create the ability for an action to have charges, gained per exp spend
 
+color the stats based on blue for creating without using, red for using without sending - only reveal if colored.
+
 
 Spells have an initial mana cost very high, and leveling them *reduces* the amount of exp needed to cast
 Casting them still gives exp that is multipled by stats as normal

@@ -61,7 +61,6 @@ function createAndLinkNewAction(actionVar, dataObj, title, x, y, downstreamVars)
     actionObj.resolve = 0;
     actionObj.resolveDelta = 0;
     actionObj.resolveName = dataObj.resolveName ? dataObj.resolveName : "resolve";
-    actionObj.downstreamRate = 0;
     actionObj.expToLevelIncrease = dataObj.expToLevelIncrease; //Can be played with w/o issue at beginning of run
     actionObj.actionPowerMultIncrease = dataObj.actionPowerMultIncrease ? dataObj.actionPowerMultIncrease : 1; //actionPowerMultIncrease must always > progressMaxIncrease on non-flat
     actionObj.progressMaxIncrease = dataObj.progressMaxIncrease;

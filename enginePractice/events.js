@@ -31,13 +31,14 @@ function updateSlider(fromAction, toAction) {
     let rangeInput = document.getElementById(fromAction + "RangeInput" + toAction);
     rangeInput.value = numValue;
     document.getElementById(fromAction+"_"+toAction+"_Line").style.opacity = (numValue/100*.8)+"";
-    // document.getElementById(fromAction + "DownstreamSendRate" + toAction).textContent = numValue;
+    data.actions[fromAction]["downstreamRate"+toAction] = numValue;
 }
 
 function updateNumber(fromAction, toAction) {
     let rangeValue = document.getElementById(fromAction + "RangeInput" + toAction).value;
     document.getElementById(fromAction + "NumInput" + toAction).value = rangeValue;
     document.getElementById(fromAction+"_"+toAction+"_Line").style.opacity = (rangeValue/100*.8)+"";
+    data.actions[fromAction]["downstreamRate"+toAction] = rangeValue;
 }
 function toggleAllZero(actionVar) {
     let action = data.actions[actionVar];
@@ -210,3 +211,16 @@ function deselectActionMenus(actionVar) {
     document.getElementById(actionVar+"StoryContainer").style.display = "none";
     document.getElementById(actionVar+"ToggleStoryButton").style.removeProperty("background-color");
 }
+
+const zoomInButton = document.getElementById('zoomInButton');
+const zoomOutButton = document.getElementById('zoomOutButton');
+
+zoomInButton.addEventListener('click', function() {
+    scale = Math.min(scale + scaleStep, maxScale); // Zoom in
+    actionContainer.style.transform = `scale(${scale})`;
+});
+
+zoomOutButton.addEventListener('click', function() {
+    scale = Math.max(scale - scaleStep, minScale); // Zoom out
+    actionContainer.style.transform = `scale(${scale})`;
+});
