@@ -202,11 +202,11 @@ function clickActionMenu(actionVar, containerId, buttonId) {
 
 function deselectActionMenus(actionVar) {
     document.getElementById(actionVar+"LevelInfoContainer").style.display = "none";
-    document.getElementById(actionVar+"ToggleLevelInfoButton").style.backgroundColor = "#f1f1f1";
+    document.getElementById(actionVar+"ToggleLevelInfoButton").style.removeProperty("background-color");
     document.getElementById(actionVar+"DownstreamContainer").style.display = "none";
-    document.getElementById(actionVar+"ToggleDownstreamButton").style.backgroundColor = "#f1f1f1";
+    document.getElementById(actionVar+"ToggleDownstreamButton").style.removeProperty("background-color");
     document.getElementById(actionVar+"StatsContainer").style.display = "none";
-    document.getElementById(actionVar+"ToggleStatsInfoButton").style.backgroundColor = "#f1f1f1";
+    document.getElementById(actionVar+"ToggleStatsInfoButton").style.removeProperty("background-color");
     document.getElementById(actionVar+"StoryContainer").style.display = "none";
-    document.getElementById(actionVar+"ToggleStoryButton").style.backgroundColor = "#f1f1f1";
+    document.getElementById(actionVar+"ToggleStoryButton").style.removeProperty("background-color");
 }

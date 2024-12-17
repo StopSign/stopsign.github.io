@@ -1,6 +1,11 @@
 TODO:
 
-TODO rename actionPower to Action Power, make the display automatic
+TODO
+
+
+add toasts/tutorials
+add help menu that has the option to view tips
+
 
 play the game and tweak it
     -reflect should have 3 increases to motivate's expertise before capping out - "this is expertise"
@@ -11,13 +16,14 @@ play the game and tweak it
 
 Tutorial toasts
 
-test max level
+
+figure out "total expertise mult" x1.00
 
 When the numbers are below a certain threshold, make them 0
 
 test the mana conversion - separate generator, mproved with stats
 
-
+move ^ button to top right
 Make money will use the highest $/s job as its base output in a desynced progress bar
 -each Job action has a base $/s, and improves with the job levels
 

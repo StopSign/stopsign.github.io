@@ -15,6 +15,9 @@ let view = {
 
             view.updating.saveCurrentState();
         },
+        updateOnSecond: function() {
+            showAllValidToasts();
+        },
         saveCurrentState: function () {
             prevState.stats = copyArray(data.stats);
             prevState.actions = copyArray(data.actions);
@@ -41,7 +44,8 @@ let view = {
             let roundedNumbers = [["progress", 2], ["progressMax", 2], ["progressGain", 2],
                 // ["realX", 1], ["realY", 1],
                 ["actionPower", 3], ["resolve", 2], ["resolveDelta", 2],
-                ["level", 1], ["maxLevel", 1], ["exp", 2], ["expToLevel", 2], ["expToAdd", 2], ["actionPowerDelta", 3], ["actionPowerMult", 3],
+                ["level", 1], ["maxLevel", 1], ["tier", 1],
+                ["exp", 2], ["expToLevel", 2], ["expToAdd", 2], ["actionPowerDelta", 3], ["actionPowerMult", 3],
                 ["totalSend", 3], ["expToLevelMult", 5], ["expertiseMult", 3], ["expertiseBase", 2],
                 ["unlockCost", 2], ["expertise", 1]];
             let roundWithoutSig = ["progressMaxIncrease", "expToLevelIncrease"];
@@ -210,16 +214,19 @@ let view = {
 
             let title =
                 "<span id='"+actionVar+"Title' onclick='actionTitleClicked(`"+actionVar+"`)' style='font-size:16px;width:100%;cursor:pointer;position:absolute;top:-40px;left:-1px;border:1px solid;padding-left:2px;padding-right:2px;border-top:0;border-right:0;'>" +
-                    "<b>" + actionObj.title + "</b> | " +
-                    "<span id='"+actionVar+"LevelContainer' style='font-size:14px;position:relative;'>" +
+
+                    "<b>" + actionObj.title + "</b>" +
+                    " | <span style='font-size:14px;'>Tier <b><span id='"+actionVar+"Tier'></span></span></b>" +
+                    " | <span style='font-size:14px;position:relative;'>" +
                         "Level <b></v><span id='"+actionVar+"Level'>0</span></b>" +
-                        (actionObj.maxLevel >= 0 ? " / <b><span id='"+actionVar+"MaxLevel'>0</span></b>" : "") +
-                        " | <b><span id='"+actionVar+"Efficiency'></span></b>%" +
+                    (actionObj.maxLevel >= 0 ? " / <b><span id='"+actionVar+"MaxLevel'>0</span></b>" : "") +
                     "</span>" +
+                    " | <span style='font-size:14px;'><b><span id='"+actionVar+"Efficiency'></span></b>%</span>" +
+                "</span>" +(actionObj.isGenerator?"":"<span id='"+actionVar+"GoToParentButton' onclick='actionTitleClicked(\""+actionObj.parent+"\")' " +
+                    "class='buttonSimple' style='margin-right:3px;width:30px;height:30px;text-align:center;cursor:pointer;padding:0 4px;'>^</span>") +
                 "</span>";
             let menuContainer =
                 "<div id='' style='position:absolute;top:-18px;font-size:13px;left:-1px;'>" +
-                    (actionObj.isGenerator?"":"<span id='"+actionVar+"GoToParentButton' onclick='actionTitleClicked(\""+actionObj.parent+"\")' class='buttonSimple' style='margin-right:3px;width:30px;height:30px;text-align:center;cursor:pointer;padding:0 4px;'>^</span>") +
                     "<span id='"+actionVar+"ToggleDownstreamButton' onclick='toggleDownstream(\""+actionVar+"\")' class='buttonSimple' style='margin-right:3px;width:30px;height:30px;text-align:center;cursor:pointer;padding:0 4px;background-color:#7cdde5'>Downstream</span>" +
                     "<span id='"+actionVar+"ToggleLevelInfoButton' onclick='toggleLevelInfo(\""+actionVar+"\")' class='buttonSimple' style='margin-right:3px;width:30px;height:30px;text-align:center;cursor:pointer;padding:0 4px;'>Info</span>" +
                     "<span id='"+actionVar+"ToggleStatsInfoButton' onclick='toggleStatsInfo(\""+actionVar+"\")' class='buttonSimple' style='margin-right:3px;width:30px;height:30px;text-align:center;cursor:pointer;padding:0 4px;'>Stats</span>" +
@@ -411,6 +418,7 @@ let view = {
             view.cached[actionVar + "ExpertiseBase"] = document.getElementById(actionVar + "ExpertiseBase");
             view.cached[actionVar + "ExpertiseMult"] = document.getElementById(actionVar + "ExpertiseMult");
             view.cached[actionVar + "Efficiency"] = document.getElementById(actionVar + "Efficiency");
+            view.cached[actionVar + "Tier"] = document.getElementById(actionVar + "Tier");
 
             view.cached[actionVar + "RealX"] = document.getElementById(actionVar + "RealX");
             view.cached[actionVar + "RealY"] = document.getElementById(actionVar + "RealY");

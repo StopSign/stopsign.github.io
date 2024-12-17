@@ -29,7 +29,10 @@ data.actions = {};
 data.actionNames = [];
 data.stats = {};
 data.statNames = [];
+data.toastStates = []; // array of toast objects: {id, state, element}
 
+let viewData = {}; //contains only things that are generated / not saved
+viewData.toasts = [];
 
 let statTitles = []; //[<title>, <stat name to be located above>]
 
@@ -394,6 +397,8 @@ function initializeData() {
     //socialize, conversations -> credibility
 
     actionTitleClicked(`motivate`);
+
+    initializeToasts();
 }
 
 function setRealCoordinates(actionVar) {

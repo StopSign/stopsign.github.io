@@ -169,6 +169,28 @@ input {
     transform: translateY(0px);
 }
 
+.toast {
+    position:relative;
+    margin-top:10px;
+    padding: 10px 25px 10px 10px;
+    cursor:pointer;
+    border:2px solid black;
+    background-color: #ffff00;
+    font-size:16px;
+    display:none;
+}
+.toast:hover {
+    background-color: #c7c700;
+}
+
+.toastInactive {
+    background-color: #b7b7b7;
+}
+
+.toastInactive:hover {
+    background-color: #969696;
+}
+
 .imageDragFix {
     pointer-events:none;
     user-drag: none;

@@ -69,6 +69,8 @@ function framePassed() {
 
 function secondPassed() {
     secondTick();
+
+    view.updating.updateOnSecond();
     secondsPassed++;
 }
 
