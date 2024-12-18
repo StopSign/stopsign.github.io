@@ -43,7 +43,7 @@ let view = {
 
             let roundedNumbers = [["progress", 2], ["progressMax", 2], ["progressGain", 2],
                 // ["realX", 1], ["realY", 1],
-                ["actionPower", 3], ["resolve", 2], ["resolveDelta", 2],
+                ["actionPower", 3], ["momentum", 2], ["momentumDelta", 2],
                 ["level", 1], ["maxLevel", 1], ["tier", 1],
                 ["exp", 2], ["expToLevel", 2], ["expToAdd", 2], ["actionPowerDelta", 3], ["actionPowerMult", 3],
                 ["totalSend", 3], ["expToLevelMult", 5], ["expertiseMult", 3], ["expertiseBase", 2],
@@ -115,15 +115,15 @@ let view = {
             if(action.downstreamVars) {
                 action.downstreamVars.forEach(function (downstreamVar) {
                     let downstreamObj = data.actions[downstreamVar];
-                    if(!downstreamObj || downstreamObj.resolveName !== action.resolveName) {
+                    if(!downstreamObj || downstreamObj.momentumName !== action.momentumName) {
                         return;
                     }
 
-                    if (forceUpdate || prevAction.resolve !== action.resolve) {
+                    if (forceUpdate || prevAction.momentum !== action.momentum) {
                         let rangeValue = document.getElementById(actionName + "RangeInput" + downstreamVar).value;
                         if(downstreamObj.unlocked) {
                             view.cached[`${actionName}DownstreamSendRate${downstreamVar}`].textContent = intToString((rangeValue / 100) * action.progressRateReal() * ticksPerSecond, 4);
-                            //downstream send rate = rangeValue / 100 * current resolve * tier
+                            //downstream send rate = rangeValue / 100 * current momentum * tier
                         } else {
                             view.cached[`${actionName}DownstreamSendRate${downstreamVar}`].textContent = intToString((rangeValue / 100) * action.progressRateReal() * ticksPerSecond, 4);
                             //it's not the downstreamObj's progressRateReal, it's the current object's send rate times the efficiency times the slider setting
@@ -250,7 +250,7 @@ let view = {
                 "<div id='"+actionVar+"LevelInfoContainer' style='display:none;padding:3px;'>" +
                     onComplete +
                     onLevelText +
-                    (actionObj.isGenerator?(""):"<br>Send up ["+actionObj.resolveName+" consumption rate] downstream to each of the actions that also use " + actionObj.resolveName) +
+                    (actionObj.isGenerator?(""):"<br>Send up ["+actionObj.momentumName+" consumption rate] downstream to each of the actions that also use " + actionObj.momentumName) +
                     actionObj.extraInfo+""+
                 "</div>";
 
@@ -311,19 +311,19 @@ let view = {
             let lockOverAll = "<div id='"+actionVar+"LockContainer' " +
                 "style='position:absolute;background-color: grey;width:100%;height:100%;top:0;text-align:center;'>" +
                 "<span id='"+actionVar+"LockIcon'></span><br>" +
-                "<span>Needs <b><span id='"+actionVar+"UnlockCost'>0</span></b> "+(data.actions[actionObj.parent]?data.actions[actionObj.parent].resolveName:"ERROR") +
+                "<span>Needs <b><span id='"+actionVar+"UnlockCost'>0</span></b> "+(data.actions[actionObj.parent]?data.actions[actionObj.parent].momentumName:"ERROR") +
                 "<br>sent from <b>" + (data.actions[actionObj.parent]?data.actions[actionObj.parent].title:"ERROR") + "</b></span>" +
                 "</div>";
-            let resolveContainer =
-                "<div id='"+actionVar+"ResolveContainer' style='margin:3px;'>" +
-                    capitalizeFirst(actionObj.resolveName)+": <b><span id='"+actionVar+"Resolve'>0</span></b> " +
+            let momentumContainer =
+                "<div id='"+actionVar+"MomentumContainer' style='margin:3px;'>" +
+                    capitalizeFirst(actionObj.momentumName)+": <b><span id='"+actionVar+"Momentum'>0</span></b> " +
                 "("+
                     (actionObj.isGenerator?"+<b><span id='"+actionVar+"ActionPowerDelta'></span></b>/s, ":"") +
-                    "Δ<b><span id='"+actionVar+"ResolveDelta'>1.00</span></b>/s" +
+                    "Δ<b><span id='"+actionVar+"MomentumDelta'>1.00</span></b>/s" +
                 ")" +
                     // ": <span id='"+actionVar+"RealX'></span>, <span id='"+actionVar+"RealY'></span>" + //TODO debug only
                 "</div>" +
-                (actionObj.isGenerator?"":("<div style='margin:3px;font-size:10px;'>Progress/s = "+actionObj.tierMult()*100+"% of "+actionObj.resolveName+" * efficiency:</div>"));
+                (actionObj.isGenerator?"":("<div style='margin:3px;font-size:10px;'>Progress/s = "+actionObj.tierMult()*100+"% of "+actionObj.momentumName+" * efficiency:</div>"));
             let pbar =
                 "<div id='"+actionVar+"ProgressBarOuter' style='width:100%;height:16px;position:relative;text-align:left;border-top:1px solid;border-bottom:1px solid;'>" +
                     "<div id='"+actionVar+"ProgressBarInner' style='width:30%;background-color:"+progressColor+";height:100%;position:absolute;'></div>" +
@@ -347,11 +347,11 @@ let view = {
 
             let downstreamContainer =
                 "<div id='"+actionVar+"DownstreamContainer' style='padding:3px;'>" +
-                    (actionVar==="motivate"?("Send up to (10% * efficiency of resolve)/s downstream: <br>"):"") +
+                    (actionVar==="overclock"?("Send up to (10% * efficiency of momentum)/s downstream: <br>"):"") +
                     view.create.createDownStreamSliders(actionObj) +
                     "<span id='"+actionVar+"AllZeroButton' onclick='toggleAllZero(\""+actionVar+"\")' class='buttonSimple' style='margin-right:3px;width:30px;height:30px;text-align:center;cursor:pointer;padding:0 4px;'>All 0</span>" +
                     "<span id='"+actionVar+"AllEqualButton' onclick='toggleAllHundred(\""+actionVar+"\")' class='buttonSimple' style='margin-right:3px;width:30px;height:30px;text-align:center;cursor:pointer;padding:0 4px;'>All 100</span>" +
-                    "<div>Sending "+actionObj.resolveName+"/s downstream: <b><span id='"+actionVar+"TotalSend'>1</span></b>/s</div>" +
+                    "<div>Sending "+actionObj.momentumName+"/s downstream: <b><span id='"+actionVar+"TotalSend'>1</span></b>/s</div>" +
                 "</div>";
 
             let newX = actionObj.realX + 4000;
@@ -361,7 +361,7 @@ let view = {
                 "<div id='"+actionVar+"Container' style='border:1px solid;background-color:#cfd3e6;position:absolute;left:"+newX+"px;top:"+newY+"px;width:300px;min-height:50px;'>" +
                     title +
                     menuContainer +
-                    resolveContainer +
+                    momentumContainer +
                     pbar +
                     expBar +
                     storyContainer +
@@ -393,8 +393,8 @@ let view = {
             view.cached[actionVar + "ProgressMax"] = document.getElementById(actionVar + "ProgressMax");
             view.cached[actionVar + "Title"] = document.getElementById(actionVar + "Title");
             view.cached[actionVar + "Container"] = document.getElementById(actionVar + "Container");
-            view.cached[actionVar + "Resolve"] = document.getElementById(actionVar + "Resolve");
-            view.cached[actionVar + "ResolveDelta"] = document.getElementById(actionVar + "ResolveDelta");
+            view.cached[actionVar + "Momentum"] = document.getElementById(actionVar + "Momentum");
+            view.cached[actionVar + "MomentumDelta"] = document.getElementById(actionVar + "MomentumDelta");
             view.cached[actionVar + "ProgressBarInner"] = document.getElementById(actionVar + "ProgressBarInner");
             view.cached[actionVar + "Progress"] = document.getElementById(actionVar + "Progress");
             view.cached[actionVar + "ProgressMax"] = document.getElementById(actionVar + "ProgressMax");
@@ -435,7 +435,7 @@ let view = {
                 return "";
             }
             actionObj.downstreamVars.forEach(function(downstreamVar) {
-                if(!data.actions[downstreamVar] || data.actions[downstreamVar].resolveName !== actionObj.resolveName) {
+                if(!data.actions[downstreamVar] || data.actions[downstreamVar].momentumName !== actionObj.momentumName) {
                     return;
                 }
                 let title = data.actions[downstreamVar] ? data.actions[downstreamVar].title : downstreamVar;
@@ -470,7 +470,7 @@ let view = {
                     const y2 = targetObj.realY + 50 + 4000; // 200 / 2
 
                     let backgroundColor = view.helpers.getBackgroundColor(targetObj);
-                    let isDifferentResource = actionObj.resolveName !== targetObj.resolveName;
+                    let isDifferentResource = actionObj.momentumName !== targetObj.momentumName;
                     let opacity = isDifferentResource ? ".8" : "0";
 
 
@@ -495,7 +495,7 @@ let view = {
     },
     helpers: {
         getBackgroundColor(actionObj) {
-            switch (actionObj.resolveName) {
+            switch (actionObj.momentumName) {
                 case "mana":
                     return "#2da3ef";
                 case "gold":

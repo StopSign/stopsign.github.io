@@ -15,13 +15,13 @@
 </head>
 <body id="theBody" oncontextmenu="return false;" style="padding:5px" class="medium">
 <div id="helpMenu" style="display:none">
-    <div id="help1">Actions and Resolve:
-        Resolve is generated from the Motivate action, and "flows" downstream to the further actions.
-        The primary resource of the action (resolve, mana, gold, etc.) is consumed at a specified rate per second on every action except Motivate.
+    <div id="help1">Actions and Momentum:
+        Momentum is generated from the Overclock action, and "flows" downstream to the further actions.
+        The primary resource of the action (momentum, mana, gold, etc.) is consumed at a specified rate per second on every action except Overclock.
         This consumption rate for progress cannot be stopped.
         You can only additionally add transferring the primary resource to a downstream action at a rate equal to your consumption rate, per downstream action.
-        For example, if an action is consuming .1% resolve per second, it means that 50 times a second, it takes 1/50th of .1% of your resolve and adds the same amount to progress.
-        If you are sending 100% to 2 downstream effects, it will be taking .1% (consumption) + .1% (stream1) + .1% (stream2) = .3% of current resolve per second (split into 50 parts).
+        For example, if an action is consuming .1% momentum per second, it means that 50 times a second, it takes 1/50th of .1% of your momentum and adds the same amount to progress.
+        If you are sending 100% to 2 downstream effects, it will be taking .1% (consumption) + .1% (stream1) + .1% (stream2) = .3% of current momentum per second (split into 50 parts).
 
         When progress fills up to the progress max, you get the on complete effect, which includes exp. When exp fills up, you get a level, with the described effects.
     </div>
@@ -32,7 +32,7 @@
 
 
 <div id="window" style="position:relative; width:100%; height:98%; border:2px solid; overflow:hidden;">
-    <div id="actionContainer" style="position:absolute; width:8000px; height:8000px;"> <!-- initial left/top with actionTitleClicked(`motivate`) -->
+    <div id="actionContainer" style="position:absolute; width:8000px; height:8000px;"> <!-- initial left/top with actionTitleClicked(`overclock`) -->
         <div id="lineContainer"></div>
         <div id="dot" style="position:absolute;left:4000px;top:4000px;border:2px solid;width:1px;height:1px;"></div>
         <!-- Child divs go here -->

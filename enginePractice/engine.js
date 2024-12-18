@@ -39,9 +39,9 @@ function createAndLinkNewAction(actionVar, dataObj, title, x, y, downstreamVars)
     actionObj.downstreamVars = downstreamVars ? downstreamVars : [];
     actionObj.isGenerator = dataObj.isGenerator;
     actionObj.actionVar = actionVar;
-    actionObj.resolve = 0;
+    actionObj.momentum = 0;
     actionObj.progress = 0;
-    actionObj.progressGain = 0; //calculated based on resolve & tier
+    actionObj.progressGain = 0; //calculated based on momentum & tier
     actionObj.progressMaxBase = dataObj.progressMaxBase ? dataObj.progressMaxBase : 1;
     actionObj.progressMaxMult = dataObj.progressMaxMult ? dataObj.progressMaxMult : 1;
     actionObj.progressMax = actionObj.progressMaxBase * actionObj.progressMaxMult;
@@ -58,9 +58,9 @@ function createAndLinkNewAction(actionVar, dataObj, title, x, y, downstreamVars)
     actionObj.expToAddMult = 1;
     actionObj.expToAdd = actionObj.expToAddBase * actionObj.expToAddMult;
     actionObj.generatorSpeed = dataObj.generatorSpeed ? dataObj.generatorSpeed : 1;
-    actionObj.resolve = 0;
-    actionObj.resolveDelta = 0;
-    actionObj.resolveName = dataObj.resolveName ? dataObj.resolveName : "resolve";
+    actionObj.momentum = 0;
+    actionObj.momentumDelta = 0;
+    actionObj.momentumName = dataObj.momentumName ? dataObj.momentumName : "momentum";
     actionObj.expToLevelIncrease = dataObj.expToLevelIncrease; //Can be played with w/o issue at beginning of run
     actionObj.actionPowerMultIncrease = dataObj.actionPowerMultIncrease ? dataObj.actionPowerMultIncrease : 1; //actionPowerMultIncrease must always > progressMaxIncrease on non-flat
     actionObj.progressMaxIncrease = dataObj.progressMaxIncrease;
@@ -116,14 +116,14 @@ function createAndLinkNewAction(actionVar, dataObj, title, x, y, downstreamVars)
         actionObj.actionPower = actionObj.actionPowerFunction ? actionObj.actionPowerFunction(theMult) : theMult;
     }
 
-    actionObj.progressRate = function() { //Rate of drain for resolve
+    actionObj.progressRate = function() { //Rate of drain for momentum
         if(actionObj.isGenerator) {
             return 1 / ticksPerSecond;
         }
         return actionObj.progressRateReal();
     }
     actionObj.progressRateReal = function() { //For data around the flat action too
-        return actionObj.resolve * actionObj.tierMult() * (actionObj.efficiency/100) / ticksPerSecond;
+        return actionObj.momentum * actionObj.tierMult() * (actionObj.efficiency/100) / ticksPerSecond;
     }
     actionObj.calcStatMult = function() {
         actionObj.expToLevelMult = 1;

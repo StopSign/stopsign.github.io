@@ -1,8 +1,8 @@
 let downStreamRatios = {};
-downStreamRatios.resolve = {};
+downStreamRatios.momentum = {};
 
 
-// let previousValue = document.getElementById('resolveDownstream1').value;
+// let previousValue = document.getElementById('momentumDownstream1').value;
 function changeDownstream(inputField, varName, targetVar, index) {
     let value = inputField.value;
 
@@ -43,7 +43,7 @@ function updateNumber(fromAction, toAction) {
 function toggleAllZero(actionVar) {
     let action = data.actions[actionVar];
     action.downstreamVars.forEach(function (toAction) {
-        if(!data.actions[toAction] || data.actions[toAction].resolveName !== action.resolveName) {
+        if(!data.actions[toAction] || data.actions[toAction].momentumName !== action.momentumName) {
             return;
         }
         let fromAction = actionVar;
@@ -56,7 +56,7 @@ function toggleAllZero(actionVar) {
 function toggleAllHundred(actionVar) {
     let action = data.actions[actionVar];
     action.downstreamVars.forEach(function (toAction) {
-        if(!data.actions[toAction] || data.actions[toAction].resolveName !== action.resolveName) {
+        if(!data.actions[toAction] || data.actions[toAction].momentumName !== action.momentumName) {
             return;
         }
         let fromAction = actionVar;

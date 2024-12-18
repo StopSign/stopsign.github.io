@@ -41,7 +41,7 @@ let globalVisible = false;
 
 function initializeData() {
 
-    statTitles.push(["Motivate Stats", "drive"]);
+    statTitles.push(["Overclock Stats", "drive"]);
     createAndLinkNewStat("energy"); //
     createAndLinkNewStat("drive"); //
     createAndLinkNewStat("discipline"); //
@@ -86,7 +86,7 @@ function initializeData() {
     createAndLinkNewStat("judgement");
     createAndLinkNewStat("leadership");
 
-    create("motivate", ["reflect", "makeMoney", "travelToOutpost", socialize], 0, 0);
+    create("overclock", ["reflect", "makeMoney", "travelToOutpost", socialize], 0, 0);
     create("reflect", ["rememberTheFallen", "peruseLibrary"], -1.5, -1.5);
     create("makeMoney", ["spendMoney"], 0, -2.5);
     create("spendMoney", ["fillBasicNeeds"], 0, -1.5);
@@ -120,8 +120,8 @@ function initializeData() {
     /*
 
             story elements for magic
-             [resolve] identify mana chamber  /10
-             [resolve] breathing - measured and deliberate vs synchronized
+             [momentum] identify mana chamber  /10
+             [momentum] breathing - measured and deliberate vs synchronized
              [mana] visualization
              ... observe leylines / draw from leylines
 
@@ -236,7 +236,7 @@ function initializeData() {
         //notes: socialize has to have nobles somewhere, for basictutoring
     //sellingFoundItems combos with hunting results in a lot of ways
     /*
-        createStrategicFriendship(["establishDiplomaticTies", "createTradeAgreements"]); //resolve branch
+        createStrategicFriendship(["establishDiplomaticTies", "createTradeAgreements"]); //momentum branch
             createMakeFriendsWithGuilds(["collaboratingOnProjects", "accessingExclusiveResources"]);
                 createEstablishArtisanPartnerships(["collaborativeDesigns", "exclusiveCraftsmanship"])
                     createJoinGuilds()
@@ -284,26 +284,26 @@ function initializeData() {
                 //createSports, createSportsBetting
     //TODO GAMEPLAY
     /*
-    spend money should level faster, and start to help out motivate. The level requirements climb moderately.
+    spend money should level faster, and start to help out overclock. The level requirements climb moderately.
     spend money has options for where to send money, either to:
         - eat food (street food and up)
         - buy basic needs (hygiene, clothing)
     early game will be about focusing money and alternating between improving food or basic needs
-    eat food & buy basic needs actions will have same values, and both reduce exp needed to motivate by 5%. Both increase in level exp req by 10x, and are staggered with an initial x2. They also have level caps, and the sub nodes increase the level caps
+    eat food & buy basic needs actions will have same values, and both reduce exp needed to overclock by 5%. Both increase in level exp req by 10x, and are staggered with an initial x2. They also have level caps, and the sub nodes increase the level caps
     */
 
     //todo formula / gain
 
     //as a general goal, keep the base numbers of the actions similar. you want the player to be able to compare the effectiveness of upgrades
 
-    //on upgrade: x.99 Motivate level exp requirement
-    //on upgrade: -1 Motivate progress completion requirement
+    //on upgrade: x.99 Overclock level exp requirement
+    //on upgrade: -1 Overclock progress completion requirement
 
     //on level up:+.1 strength
     //+.2 control
 
     //Modified by:
-    //<action> | 15 motivate requirement
+    //<action> | 15 overclock requirement
     //*1.2 exp | wisdom bonus
 
     //tag system
@@ -312,7 +312,7 @@ function initializeData() {
 
     //TODO ENGINE STUFF
     //set max level of action, and it no longer gains progress after that level
-    //unlock requires [resolve] cost of the action above it, and also unlockStats
+    //unlock requires [momentum] cost of the action above it, and also unlockStats
     //show the stats it gets improved by/stats it improves as icons surrounding the action
     //unlock based on level requirement of previous action
     //each level has a different name / different effect. Requires "total effects" section
@@ -345,7 +345,7 @@ function initializeData() {
     });
 
 
-    setRealCoordinates('motivate');
+    setRealCoordinates('overclock');
 
     data.actionNames.forEach(function (actionVar) { //wait until they are all created to link downstreams
         view.create.generateActionDisplay(actionVar);
@@ -362,8 +362,8 @@ function initializeData() {
 
     the rate of progress is controllable by spending resources, so you don't want a situation where it's worthwhile to save and then spend
     if you change the amount of exp or reduce level reqs, then it would be worthwhile to save the resources until you've maximized exp - to be avoided
-    if you increase reduce progress amount requirements, it also is worthwhile to save resolve until you've reduced maximally - to be avoided
-    in order to keep resolve being spent everywhere equally, just the time it takes to get there (and the tax along the way), the other variables cannot be altered after the game has started
+    if you increase reduce progress amount requirements, it also is worthwhile to save momentum until you've reduced maximally - to be avoided
+    in order to keep momentum being spent everywhere equally, just the time it takes to get there (and the tax along the way), the other variables cannot be altered after the game has started
     only alter those after the game has finished
 
     can't avoid making saving resources be worth it, so make it worthwhile to keep spending resources
@@ -373,7 +373,7 @@ function initializeData() {
         -reducing progress req of a different action
         -3rd party resource
 
-    alternatively, let it be uncontrolled, and have resolve affect something besides progress gain ?
+    alternatively, let it be uncontrolled, and have momentum affect something besides progress gain ?
 
 
     have to flip it around from a negative to a positive w/o changing the equation
@@ -382,7 +382,7 @@ function initializeData() {
 
 
     how do i want it to be, thematically?
-    resolve gets the action up to speed and chugs it along every-increasingly, with the chug getting higher req over time to prevent instant gain
+    momentum gets the action up to speed and chugs it along every-increasingly, with the chug getting higher req over time to prevent instant gain
     the result is a slow but steady and powerful upgrade that increases over time
     bonuses come from levels
 
@@ -398,7 +398,7 @@ function initializeData() {
 
     //socialize, conversations -> credibility
 
-    actionTitleClicked(`motivate`);
+    actionTitleClicked(`overclock`);
 
     initializeToasts();
 }
@@ -418,7 +418,7 @@ function setRealCoordinates(actionVar) {
         action.realX = parentAction.realX + action.x;
         action.realY = parentAction.realY + action.y;
     } else {
-        // If there is no parent (i.e., this is the "motivate" action), set realX and realY to its own x and y
+        // If there is no parent (i.e., this is the "overclock" action), set realX and realY to its own x and y
         action.realX = action.x;
         action.realY = action.y;
     }

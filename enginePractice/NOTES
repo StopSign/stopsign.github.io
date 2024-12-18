@@ -10,9 +10,9 @@ add help menu that has the option to view tips
 
 
 play the game and tweak it
-    -reflect should have 3 increases to motivate's expertise before capping out - "this is expertise"
+    -reflect should have 3 increases to overclock's expertise before capping out - "this is expertise"
     -make money improves unrelated stats for now, but it starts spend money. Has low expertise also
-    -spend money improves motivate's stats - not expertise
+    -spend money improves overclock's stats - not expertise
 
 
 
@@ -71,7 +71,7 @@ Combat info:
 * Magic is used to buildup spells
 
 Tournament/dungeon/combat actions:
-* Resolve builds tokens (filling the resolve bar).
+* Momentum builds tokens (filling the momentum bar).
 * Each action has multiple layers of fights you can spend tokens on.
 * Tokens can be automatically spent, but have a cooldown (30 seconds)
 * Action can be set to try the highest ranked, until failure
@@ -112,7 +112,7 @@ On Magic:
 
 
 Combat:
-* With enough resolve in a combat action, it initiates the fight using your spell charges.
+* With enough momentum in a combat action, it initiates the fight using your spell charges.
 * There will be a timer/progress bar that will use fire charges to attack
 * In parallel, there will be a timer/progress bar that will use Arcane charges to disable the enemy
 * In parallel, there will be a timer/progress bar that will use Earth charges to create shields
@@ -123,11 +123,11 @@ Combat:
 
 story:
 A curse kept the level cap low
-Garret was a soldier, used his Motivate to be strong and wealthy,
+Garret was a soldier, used his Overclock to be strong and wealthy,
 which led him to being a soldier
 But monsters invaded, and
 His city burned, and
-he used Motivate to Get Out, to somewhere peaceful.
+he used Overclock to Get Out, to somewhere peaceful.
 He joined one of the refugee caravans, and then kept going until his power said to stop
 He struggles at first with survival's guilt, but he bottles it up for survival
 He's joins a village
@@ -152,7 +152,7 @@ Intrigue/Rumors
 
 
 
-everyone gets a talent, and yours is "with sufficient resolve, there are no barriers" and eventually you realize you want more motivation
+everyone gets a talent, and yours is "with sufficient momentum, there are no barriers" and eventually you realize you want more motivation
 
 
 you're prepared for a future that's not happening, because the world started ending - monsters are appearing in portals all over the country
@@ -174,7 +174,7 @@ You have time now, though, thanks to your parent's artifact.
 
 ======
 
-stop being mired to motivate / spend money / socialization / mana
+stop being mired to overclock / spend money / socialization / mana
 it can be a different starting point, or a different alternate
 
 1st attempt: on your own, with your own knowledge - money, self-improvement
@@ -196,9 +196,9 @@ North - social
 
 
 
-actions need to be "carved" into memory, having a very very low rate of expertise to start, which affects their ability to use resolve
+actions need to be "carved" into memory, having a very very low rate of expertise to start, which affects their ability to use momentum
 actions have 0-100% expertise, and start at an amount related to how much the character would know about them. Raising expertise is *hard*.
-Expertise is efficiency - it will waste resolve and not consume it for progress or sending - only 100% expertise will be "no" waste
+Expertise is efficiency - it will waste momentum and not consume it for progress or sending - only 100% expertise will be "no" waste
 
 Actions have tags, and some some rewards are to increase all actions of a certain tagged type
 
@@ -211,10 +211,10 @@ Personal will account for roughly ~30% of expertise gain (more in the beginning)
 Expertise works by adding to a new var Object.skill. Expertise changes the efficency to =
 
 
-Change to 1% motivate cimb, adding +.1 each reset up to 2%
-Chagne starting resolve gain to 1
+Change to 1% overclock cimb, adding +.1 each reset up to 2%
+Chagne starting momentum gain to 1
 keep tier 0 for a bit, because efficiency is gonna be baad
-req: 1st action improves motivate, 2nd action improves 1st, 3rd unlocks 4th which improves 2nd, etc. - grow fast and hard at the start
+req: 1st action improves overclock, 2nd action improves 1st, 3rd unlocks 4th which improves 2nd, etc. - grow fast and hard at the start
 
 
 Visualize Victory

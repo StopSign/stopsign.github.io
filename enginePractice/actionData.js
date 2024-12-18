@@ -71,7 +71,7 @@ function create(actionVar, downstreamVars, x, y) {
 //Has a custom onComplete if it has a actionPower
 //Requires that upstream actions are above downstream, so updating works consistently
 let actionData = {
-    motivate:{
+    overclock:{
         tier:0,
         progressMaxBase:10, progressMaxMult:1, progressMaxIncrease:1,
         expToLevelBase:2, expToLevelMult:1, expToLevelIncrease:1.002,
@@ -79,7 +79,7 @@ let actionData = {
         expertiseBase:.1,
         unlockCost:0, visible:true, unlocked:true, isGenerator:true, generatorSpeed:10,
         onCompleteCustom:function() {
-            data.actions.motivate.resolve += data.actions.motivate.actionPower;
+            data.actions.overclock.momentum += data.actions.overclock.actionPower;
         },
         expStats:[["discipline", 1], ["ambition", 1], ["energy", 1]],
         onLevelStats:[["resilience", 1], ["diligence", 1]],
@@ -117,10 +117,10 @@ let actionData = {
             //Give
             data.actions.makeMoney.calcActionPower();
             let amount = data.actions.makeMoney.actionPower;
-            let takenFromResolve = Math.min(data.actions.makeMoney.resolve, amount);
+            let takenFromMomentum = Math.min(data.actions.makeMoney.momentum, amount);
 
-            addResolveTo(data.actions.spendMoney, takenFromResolve);
-            data.actions.makeMoney.resolve -= takenFromResolve;
+            addMomentumTo(data.actions.spendMoney, takenFromMomentum);
+            data.actions.makeMoney.momentum -= takenFromMomentum;
 
             data.actions.makeMoney.expToAddBase = amount;
             data.actions.makeMoney.expToAdd = data.actions.makeMoney.expToAddBase * data.actions.makeMoney.expToAddMult;
@@ -135,11 +135,11 @@ let actionData = {
                 english:"+<b><span id=\"makeMoneyActionPower\">1</span></b> Gold<br>"
             },
         actionPowerFunction: function(origMult) {
-            return Math.sqrt(data.actions.makeMoney.resolve * origMult);
+            return Math.sqrt(data.actions.makeMoney.momentum * origMult);
         }
     },
     spendMoney: {
-        tier:0, resolveName:"gold",
+        tier:0, momentumName:"gold",
         progressMaxBase:10, progressMaxMult:1, progressMaxIncrease:1.1,
         expToLevelBase:10, expToLevelMult:1, expToLevelIncrease:2,
         unlockCost:100, visible:false, unlocked:false,
@@ -214,7 +214,7 @@ let actionData = {
         expertiseStats:["pathfinding", 2]
     },
     fillBasicNeeds: {
-        tier:1, resolveName: "gold",
+        tier:1, momentumName: "gold",
         progressMaxBase:100, progressMaxMult:1, progressMaxIncrease:3,
         expToLevelBase:35, expToLevelMult:1, expToLevelIncrease:1.1,
         actionPowerBase:1, actionPowerMult:1, actionPowerMultIncrease:3.1,
@@ -253,7 +253,7 @@ let actionData = {
         expertiseStats:[]
     },
     buyClothing: {
-        tier:1, resolveName: "gold",
+        tier:1, momentumName: "gold",
         progressMaxBase:100, progressMaxMult:1, progressMaxIncrease:3,
         expToLevelBase:35, expToLevelMult:1, expToLevelIncrease:1.1,
         actionPowerBase:1, actionPowerMult:1, actionPowerMultIncrease:3.1,
@@ -293,10 +293,10 @@ let actionData = {
             //Give
             data.actions.socialize.calcActionPower();
             let amount = data.actions.socialize.actionPower;
-            let takenFromResolve = Math.min(data.actions.socialize.resolve, amount);
+            let takenFromMomentum = Math.min(data.actions.socialize.momentum, amount);
 
-            addResolveTo(data.actions.localOutreach, takenFromResolve);
-            data.actions.socialize.resolve -= takenFromResolve;
+            addMomentumTo(data.actions.localOutreach, takenFromMomentum);
+            data.actions.socialize.momentum -= takenFromMomentum;
 
             data.actions.socialize.expToAddBase = amount;
             data.actions.socialize.expToAdd = data.actions.socialize.expToAddBase * data.actions.socialize.expToAddMult;
@@ -311,11 +311,11 @@ let actionData = {
             english:"+<b><span id=\"makeMoneyActionPower\">1</span></b> Gold<br>"
         },
         actionPowerFunction: function(origMult) {
-            return Math.sqrt(data.actions.makeMoney.resolve * origMult);
+            return Math.sqrt(data.actions.makeMoney.momentum * origMult);
         }
     },
     localOutreach: {
-        tier:0, resolveName:"gold",
+        tier:0, momentumName:"gold",
         progressMaxBase:10, progressMaxMult:1, progressMaxIncrease:1.1,
         expToLevelBase:10, expToLevelMult:1, expToLevelIncrease:2,
         unlockCost:100, visible:false, unlocked:false,
