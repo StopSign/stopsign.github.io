@@ -3,8 +3,10 @@ TODO:
 TODO
 
 
-add toasts/tutorials
 add help menu that has the option to view tips
+
+
+
 
 
 play the game and tweak it
@@ -39,10 +41,15 @@ Casting them still gives exp that is multipled by stats as normal
 This lets mana increase linearly and still feel good over time
 
 test 2-1-2 patterns
+test stat bonus rate/s
 
 stats should show how many actions they affect
 
 tag system: 1st pass to apply tags, 2nd pass to apply mults
+
+
+prestige idea: per action, it can be upgraded to reduece the tier all the way to 0, with each tier and upgrade taking more points.
+Can be used to drastically improve the generators output
 
 
 COMBAT NEEDS TO BE SIMPLER THAN THIS:

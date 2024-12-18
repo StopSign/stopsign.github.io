@@ -57,6 +57,9 @@ function initializeData() {
     createAndLinkNewStat("tact"); //smooth movement, smooth conversations
     createAndLinkNewStat("grace"); //smooth movement, smooth conversations
     createAndLinkNewStat("insight"); //dig deep
+    createAndLinkNewStat("trust");
+    createAndLinkNewStat("influence");
+    createAndLinkNewStat("recognition");
     createAndLinkNewStat("deception"); //hot chip & lie
     createAndLinkNewStat("negotiation"); //convincing/persuasion
 
@@ -83,33 +86,32 @@ function initializeData() {
     createAndLinkNewStat("judgement");
     createAndLinkNewStat("leadership");
 
-    create("motivate", ["reflect", "makeMoney", "travelToOutpost"], 0, 0);
-
-    //TODO gold + resolve = fortune
-    create("makeMoney", ["spendMoney"], 0, -2.5);
-    create("spendMoney", [], 0, -1.5);
-
-
-
-
+    create("motivate", ["reflect", "makeMoney", "travelToOutpost", socialize], 0, 0);
     create("reflect", ["rememberTheFallen", "peruseLibrary"], -1.5, -1.5);
-        //     create("peruseLibrary", ["researchHistory"], 0, -1.2); //research. Req other unlocks
-        //         create("researchHistory", null, 0, -1);
-        //     create("rememberTheFallen", ["honorPastSacrifices", "payTribute"], -1.2, -1);
-        //         create("honorPastSacrifices", ["findInnerPeace"], 0, -1.2);
-        //         create("payTribute", ["findInnerPeace"], -1.2, -1);
-        //             create("findInnerPeace", null, 0, -1);
-        // create("establishRituals", ["studyReligiousTexts", "visitSacredSites", "participateInCeremonies"], .5, -1.4)
-
-    create("travelToOutpost", ["reportForDuty", "clearTheTrail", "travelToCrossroads"], 3, 0);
-        create("clearTheTrail", ["paveTheTrail"], 0, 1); //increase travel expertise
-            create("paveTheTrail", [], -1, 0); //increase travel expertise to max. Req builder skills
+    create("makeMoney", ["spendMoney"], 0, -2.5);
+    create("spendMoney", ["fillBasicNeeds"], 0, -1.5);
+    create("travelOnRoad", ["travelToOutpost", "clearTheTrail"], 3, 0);
+    create("clearTheTrail", ["paveTheTrail"], 0, 1); //increase travel expertise
+        create("paveTheTrail", [], 0, 1); //increase travel expertise to max. Req builder skills
+    create("travelToOutpost", ["reportForDuty", "travelToCrossroads"], 3, 0);
+    create("fillBasicNeeds", ["buyClothing"], -.5, -1);
     create("reportForDuty", ["meetVillageLeaderScott", "reportForTraining", "reportForLabor"], 0, -1);
-        create("meetVillageLeaderScott", ["helpScottWithChores"], -1, -1);
-        create("reportForTraining", ["talkToInstructorJohn"], 0, -1)
-        create("reportForLabor", ["shepherd", "fisherman", "horseTamer", "dockWorker"], 2, -2);
+    create("meetVillageLeaderScott", ["helpScottWithChores"], -1, -1);
+    create("buyClothing", [], -1, -2);
+    create("helpScottWithChores", ["helpScottWithChores"], -1, -1);
+    create("socialize", ["localOutreach"], 0, -1);
+    create("localOutreach", ["neighborlyTies"], 0, -1);
+    create("reportForTraining", ["talkToInstructorJohn"], 0, -1)
+    create("reportForLabor", ["shepherd", "fisherman", "horseTamer", "dockWorker"], 2, -2);
 
 
+    //     create("peruseLibrary", ["researchHistory"], 0, -1.2); //research. Req other unlocks
+    //         create("researchHistory", null, 0, -1);
+    //     create("rememberTheFallen", ["honorPastSacrifices", "payTribute"], -1.2, -1);
+    //         create("honorPastSacrifices", ["findInnerPeace"], 0, -1.2);
+    //         create("payTribute", ["findInnerPeace"], -1.2, -1);
+    //             create("findInnerPeace", null, 0, -1);
+    // create("establishRituals", ["studyReligiousTexts", "visitSacredSites", "participateInCeremonies"], .5, -1.4)
 
 
 
