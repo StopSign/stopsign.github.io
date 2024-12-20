@@ -2,12 +2,24 @@ TODO:
 
 TODO
 
-
+create Menu with horizontal tabs
+-Help
+--tips
+--strategy
+-Options
+--adjust fps
+-Statistics
+--how long this life has lasted
 add help menu that has the option to view tips
 
 
+add onUnlock messages and custom divs, and show +1 to reflect level on unlock travel on road and travel to outpost
 
+add coloring when level is maxed
+add reveal graphic for new actions
 
+display momentum visually:
+underneath
 
 play the game and tweak it
     -reflect should have 3 increases to overclock's expertise before capping out - "this is expertise"

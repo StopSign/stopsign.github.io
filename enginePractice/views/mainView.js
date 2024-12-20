@@ -213,15 +213,15 @@ let view = {
             let progressColor = view.helpers.getBackgroundColor(actionObj);
 
             let title =
-                "<span id='"+actionVar+"Title' onclick='actionTitleClicked(`"+actionVar+"`)' style='font-size:16px;width:100%;cursor:pointer;position:absolute;top:-40px;left:-1px;border:1px solid;padding-left:2px;padding-right:2px;border-top:0;border-right:0;'>" +
+                "<span id='"+actionVar+"Title' onclick='actionTitleClicked(`"+actionVar+"`)' style='font-size:16px;width:100%;cursor:pointer;position:absolute;top:-40px;left:-1px;white-space: nowrap;border:1px solid;padding-left:2px;padding-right:2px;border-top:0;border-right:0;'>" +
 
                     "<b>" + actionObj.title + "</b>" +
-                    " | <span style='font-size:14px;'>Tier <b><span id='"+actionVar+"Tier'></span></span></b>" +
-                    " | <span style='font-size:14px;position:relative;'>" +
+                    " | <span style='font-size:12px;'>Tier <b><span id='"+actionVar+"Tier'></span></span></b>" +
+                    " | <span style='font-size:12px;position:relative;'>" +
                         "Level <b></v><span id='"+actionVar+"Level'>0</span></b>" +
                     (actionObj.maxLevel >= 0 ? " / <b><span id='"+actionVar+"MaxLevel'>0</span></b>" : "") +
                     "</span>" +
-                    " | <span style='font-size:14px;'><b><span id='"+actionVar+"Efficiency'></span></b>%</span>" +
+                    " | <span style='font-size:12px;'><b><span id='"+actionVar+"Efficiency'></span></b>%</span>" +
                 "</span>" +(actionObj.isGenerator?"":"<span id='"+actionVar+"GoToParentButton' onclick='actionTitleClicked(\""+actionObj.parent+"\")' " +
                     "class='buttonSimple' style='margin-right:3px;width:30px;height:30px;text-align:center;cursor:pointer;padding:0 4px;'>^</span>") +
                 "</span>";
@@ -285,6 +285,10 @@ let view = {
                 actionObj.expertiseStats.forEach(function (expertiseStat) {
                     let name = expertiseStat[0];
                     let ratio = expertiseStat[1] * 100 + "%";
+                    if(data.stats[name] === undefined) {
+                        console.log("ERROR: you need to instantiate the stat '"+name+"'")
+                        stop = 1;
+                    }
                     let amount = ((data.stats[name].mult-1) * expertiseStat[1]) + 1;
                     totalAmount *= amount;
                     expertiseModsStr +=
@@ -500,6 +504,8 @@ let view = {
                     return "#2da3ef";
                 case "gold":
                     return "#ffe52c";
+                case "conversations":
+                    return "#c4ffff";
                 case "arcana":
                     return "#ff1cf4";
                 default:

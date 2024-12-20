@@ -49,11 +49,10 @@ function tick() {
 
 
         didSomething = true;
-        if(gameTicksLeft > 2000) {
-            // ticksPerSecond /= 2;
-            console.warn('too fast! (${gameTicksLeft})');
+        if(gameTicksLeft > 1200) {
+            ticksPerSecond /= 2;
+            console.warn(`too fast! (${gameTicksLeft}). Shifting ticksPerSecond to ${ticksPerSecond}`);
             gameTicksLeft = 0;
-            stop = true;
         }
         gameTicksLeft -= (1000 / ticksPerSecond) / gameSpeed / bonusSpeed;
 

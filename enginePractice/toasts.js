@@ -24,8 +24,8 @@ function initializeToasts() {
     createToast(function() { return toastIsClicked(5) },
         "Exp and Leveling", "When the progress bar is full, it will gain 1 exp into the lower, purple bar, and when that is full you level up, gaining 1) stats 2) increased Action Power and 3) increased progress/exp requirements. The amount of exp gained will remain at 1 until much later in the game.");
     createToast(function() { return toastIsClicked(6) },
-        "Leveling Stats with Reflect", "The Stats tab contains 1) Which stats the action gains on level up 2) Which stats reduce the amount of exp to level, and by how much 3) Which stats increase expertise, and by how much. The stat bonus is 1.01^stat. For example, Reflect will gain +5 Drive when it levels up, which increases the stat bonus by 1.01^5 = x1.051. Overclock uses 1000% of this bonus, or 10 x .051 + 1 = x1.51, which is applied to Overclock's original 10% efficiency to become 15.1%. <b>Get Reflect to Level 4</b>");
-    createToast(function() { return data.actions.reflect.level >= 4 },
+        "Leveling Stats with Reflect", "The Stats tab contains 1) Which stats the action gains on level up 2) Which stats reduce the amount of exp to level, and by how much 3) Which stats increase expertise, and by how much. The stat bonus is 1.01^stat. For example, Reflect will gain +5 Drive when it levels up, which increases the stat bonus by 1.01^5 = x1.051. Overclock uses 1000% of this bonus, or 10 x .051 + 1 = x1.51, which is applied to Overclock's original 10% efficiency to become x1.051. <b>Get Reflect to Level 3</b>");
+    createToast(function() { return data.actions.reflect.level >= 3 },
         "Max Level", "When the level is maxed, momentum will not be Consumed, but it will still be sent (if possible). Reflect doesn't have any downstream actions, so until you raise its max level, you should <b>stop sending Momentum to Reflect</b>. Remember, letting Momentum build on Overclock is simply holding it momentarily, as Overclock does not Consume.");
     createToast(function() { return toastIsClicked(8) },
         "Next Steps", "Time for some decisions. Do you 1) Spend Money, to increase Overclock's level, and therefore On Complete reward, or 2) Travel to the Outpost, getting Reflect levels and improving Spend Money? Or both? It is up to you to continue discovering the future options!");
@@ -91,8 +91,7 @@ function updateToastUI(toastId) {
 
 function createToastModal() {
     let overlayWrapper = document.createElement('div');
-    overlayWrapper.innerHTML = "<div style='position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);" +
-        "display:none;align-items:center;justify-content:center;z-index:10000;' onclick='closeModal()'>" +
+    overlayWrapper.innerHTML = "<div class='fullScreenGrey' style='display:none' onclick='closeModal()'>" +
         "<div style='background:#fff;padding:20px;border-radius:6px;max-width:400px;width:90%;text-align:center;position:relative;'>" +
         "<div id='toastModalTitle'>Toast Title</div>" +
         "<p id='toastModalMessage'>Here is a message</p>" +

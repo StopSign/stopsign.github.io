@@ -224,3 +224,8 @@ zoomOutButton.addEventListener('click', function() {
     scale = Math.max(scale - scaleStep, minScale); // Zoom out
     actionContainer.style.transform = `scale(${scale})`;
 });
+
+function clickMenuButton() {
+    let isShowing = document.getElementById("helpMenu").style.display !== "none";
+    document.getElementById("helpMenu").style.display = isShowing ? "none" : "block";
+}

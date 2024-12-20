@@ -6,7 +6,7 @@ let curTime = new Date();
 let gameTicksLeft = 0;
 let sudoStop = false;
 let saveTimer = 2000;
-let ticksPerSecond = 50;
+let ticksPerSecond = 20;
 let totalTime = 0;
 let ticksForSeconds = 0;
 let secondsPassed = 0;
@@ -42,6 +42,9 @@ let globalVisible = false;
 function initializeData() {
 
     statTitles.push(["Overclock Stats", "drive"]);
+    createAndLinkNewStat("neuralAgility"); //
+    createAndLinkNewStat("processing"); //
+    createAndLinkNewStat("focus"); //
     createAndLinkNewStat("energy"); //
     createAndLinkNewStat("drive"); //
     createAndLinkNewStat("discipline"); //
@@ -59,7 +62,9 @@ function initializeData() {
     createAndLinkNewStat("insight"); //dig deep
     createAndLinkNewStat("trust");
     createAndLinkNewStat("influence");
+    createAndLinkNewStat("haggling");
     createAndLinkNewStat("recognition");
+    createAndLinkNewStat("credibility");
     createAndLinkNewStat("deception"); //hot chip & lie
     createAndLinkNewStat("negotiation"); //convincing/persuasion
 
@@ -67,6 +72,10 @@ function initializeData() {
     statTitles.push(["Magic Stats", "magicControl"]);
     createAndLinkNewStat("magicControl");
 
+    //Physical Stats
+    statTitles.push(["Physical Stats", "endurance"]);
+    createAndLinkNewStat("endurance");
+    createAndLinkNewStat("weaponsExpertise");
 
     //Resource Stats
     statTitles.push(["Resource Stats", "adaptability"]);
@@ -79,6 +88,7 @@ function initializeData() {
     //Combined Stats
     statTitles.push(["General Stats", "curiosity"]);
     createAndLinkNewStat("curiosity");
+    createAndLinkNewStat("pathfinding");
     createAndLinkNewStat("patience");
     createAndLinkNewStat("strategy");
     createAndLinkNewStat("innovation");
@@ -86,21 +96,25 @@ function initializeData() {
     createAndLinkNewStat("judgement");
     createAndLinkNewStat("leadership");
 
-    create("overclock", ["reflect", "makeMoney", "travelToOutpost", socialize], 0, 0);
-    create("reflect", ["rememberTheFallen", "peruseLibrary"], -1.5, -1.5);
-    create("makeMoney", ["spendMoney"], 0, -2.5);
-    create("spendMoney", ["fillBasicNeeds"], 0, -1.5);
-    create("travelOnRoad", ["travelToOutpost", "clearTheTrail"], 3, 0);
+
+    statTitles.push(["Village Stats", "villagersKnown"]);
+    createAndLinkNewStat("villagersKnown");
+
+    create("overclock", ["reflect", "makeMoney", "travelOnRoad", "socialize"], 0, 0);
+    create("reflect", ["rememberTheFallen", "peruseLibrary"], -1.1, -1.1);
+    create("makeMoney", ["spendMoney"], 0, -1.6);
+    create("spendMoney", ["fillBasicNeeds"], 0, -1);
+    create("travelOnRoad", ["travelToOutpost", "clearTheTrail"], 1.5, 0);
     create("clearTheTrail", ["paveTheTrail"], 0, 1); //increase travel expertise
         create("paveTheTrail", [], 0, 1); //increase travel expertise to max. Req builder skills
-    create("travelToOutpost", ["reportForDuty", "travelToCrossroads"], 3, 0);
+    create("travelToOutpost", ["reportForDuty", "travelToCrossroads"], 1.5, 0);
     create("fillBasicNeeds", ["buyClothing"], -.5, -1);
     create("reportForDuty", ["meetVillageLeaderScott", "reportForTraining", "reportForLabor"], 0, -1);
-    create("meetVillageLeaderScott", ["helpScottWithChores"], -1, -1);
+    create("meetVillageLeaderScott", ["helpScottWithChores"], -1.1, -1);
     create("buyClothing", [], -1, -2);
-    create("helpScottWithChores", ["helpScottWithChores"], -1, -1);
-    create("socialize", ["localOutreach"], 0, -1);
-    create("localOutreach", ["neighborlyTies"], 0, -1);
+    create("helpScottWithChores", [], 0, -1);
+    create("socialize", ["localOutreach"], -3, 0);
+    create("localOutreach", ["neighborlyTies"], 0, 1);
     create("reportForTraining", ["talkToInstructorJohn"], 0, -1)
     create("reportForLabor", ["shepherd", "fisherman", "horseTamer", "dockWorker"], 2, -2);
 
@@ -345,14 +359,6 @@ function initializeData() {
     });
 
 
-    setRealCoordinates('overclock');
-
-    data.actionNames.forEach(function (actionVar) { //wait until they are all created to link downstreams
-        view.create.generateActionDisplay(actionVar);
-    })
-
-    view.create.generateLines();
-    updateAllActionStatMults();
 
     //Formula brainstorming
     /*
@@ -396,23 +402,24 @@ function initializeData() {
 
     */
 
-    //socialize, conversations -> credibility
 
-    actionTitleClicked(`overclock`);
+    setRealCoordinates('overclock');
 
+    data.actionNames.forEach(function (actionVar) { //wait until they are all created to link downstreams
+        view.create.generateActionDisplay(actionVar);
+    })
     initializeToasts();
+    view.create.generateLines();
+    updateAllActionStatMults();
+    actionTitleClicked(`overclock`);
 }
 
-function setRealCoordinates(actionVar) {
+//will always be run once from the top action (TODO per page)
+function setRealCoordinates2(actionVar) {
     let action = data.actions[actionVar];
     if (action.parent && data.actions[action.parent]) {
         // Get parent action
         let parentAction = data.actions[action.parent];
-
-        // If the parent's realX and realY are not set, calculate them first
-        if (typeof parentAction.realX === 'undefined' || typeof parentAction.realY === 'undefined') {
-            setRealCoordinates(action.parent);
-        }
 
         // Set the action's realX and realY based on its parent's coordinates
         action.realX = parentAction.realX + action.x;
@@ -432,5 +439,43 @@ function setRealCoordinates(actionVar) {
         });
     }
 }
+let check = 0;
+//Add all action.downstreamVars.forEach(downstreamVar variables to a list
+//Repeat until the list is empty:
+//Get the next in the list, set its realX and realY based on the parents, and add its downstream vars to the list
+function setRealCoordinates(startActionVar) {
+    // Create a queue and start with the given action variable
+    let queue = [startActionVar];
 
+    while (queue.length > 0) {
+        let currentVar = queue.shift();
+        let action = data.actions[currentVar];
+        if(check++ > 2000) {
+            stop = 1;
+            console.log("You have an infinite loop on action creation with: " + currentVar);
+            return;
+        }
 
+        if (!action) continue; // If action doesn't exist, skip it
+
+        // Determine realX and realY
+        if (action.parent && data.actions[action.parent]) {
+            let parentAction = data.actions[action.parent];
+            action.realX = parentAction.realX + action.x;
+            action.realY = parentAction.realY + action.y;
+        } else {
+            // This might be the top-level action
+            action.realX = action.x;
+            action.realY = action.y;
+        }
+
+        // Add downstream actions to the queue
+        if (action.downstreamVars && action.downstreamVars.length > 0) {
+            action.downstreamVars.forEach(downstreamVar => {
+                if (data.actions[downstreamVar]) {
+                    queue.push(downstreamVar);
+                }
+            });
+        }
+    }
+}
