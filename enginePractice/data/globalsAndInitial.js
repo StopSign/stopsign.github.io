@@ -41,60 +41,60 @@ let globalVisible = true;
 
 function initializeData() {
 
-    statTitles.push(["Overclock Stats", "drive"]);
+    statTitles.push(["Overclock Stats", "processing"]);
     createAndLinkNewStat("processing"); //
     createAndLinkNewStat("focus"); //
     createAndLinkNewStat("energy"); //
     createAndLinkNewStat("drive"); //
-    createAndLinkNewStat("discipline"); //
+    // createAndLinkNewStat("discipline"); //
     createAndLinkNewStat("ambition");
-    createAndLinkNewStat("resilience"); //Energy
+    // createAndLinkNewStat("resilience"); //Energy
     createAndLinkNewStat("diligence"); //
-    createAndLinkNewStat("confidence");
+    // createAndLinkNewStat("confidence");
 
     statTitles.push(["Social Stats", "charm"]);
     createAndLinkNewStat("charm"); //exuding warmth, connecting
-    createAndLinkNewStat("humor");
-    createAndLinkNewStat("wit"); //quick minded
-    createAndLinkNewStat("tact"); //smooth movement, smooth conversations
-    createAndLinkNewStat("grace"); //smooth movement, smooth conversations
-    createAndLinkNewStat("insight"); //dig deep
-    createAndLinkNewStat("trust");
-    createAndLinkNewStat("influence");
+    // createAndLinkNewStat("humor");
+    // createAndLinkNewStat("wit"); //quick minded
+    // createAndLinkNewStat("tact"); //smooth movement, smooth conversations
+    // createAndLinkNewStat("grace"); //smooth movement, smooth conversations
+    // createAndLinkNewStat("insight"); //dig deep
+    // createAndLinkNewStat("trust");
+    // createAndLinkNewStat("influence");
     createAndLinkNewStat("haggling");
     createAndLinkNewStat("recognition");
-    createAndLinkNewStat("credibility");
-    createAndLinkNewStat("deception"); //hot chip & lie
-    createAndLinkNewStat("negotiation"); //convincing/persuasion
+    // createAndLinkNewStat("credibility");
+    // createAndLinkNewStat("deception"); //hot chip & lie
+    // createAndLinkNewStat("negotiation"); //convincing/persuasion
 
     //Magic Stats
-    statTitles.push(["Magic Stats", "magicControl"]);
-    createAndLinkNewStat("magicControl");
+    // statTitles.push(["Magic Stats", "magicControl"]);
+    // createAndLinkNewStat("magicControl");
 
     //Physical Stats
     statTitles.push(["Physical Stats", "endurance"]);
     createAndLinkNewStat("endurance");
-    createAndLinkNewStat("weaponsExpertise");
+    // createAndLinkNewStat("weaponsExpertise");
 
     //Resource Stats
     statTitles.push(["Resource Stats", "adaptability"]);
-    createAndLinkNewStat("adaptability");
+    // createAndLinkNewStat("adaptability");
     createAndLinkNewStat("workEthic");
-    createAndLinkNewStat("resourcefulness");
+    // createAndLinkNewStat("resourcefulness");
 
-    createAndLinkNewStat("salesmanship");
-    createAndLinkNewStat("networking");
+    // createAndLinkNewStat("salesmanship");
+    // createAndLinkNewStat("networking");
 
     //Combined Stats
-    statTitles.push(["General Stats", "curiosity"]);
-    createAndLinkNewStat("curiosity");
+    statTitles.push(["General Stats", "pathfinding"]);
     createAndLinkNewStat("pathfinding");
-    createAndLinkNewStat("patience");
-    createAndLinkNewStat("strategy");
-    createAndLinkNewStat("innovation");
-    createAndLinkNewStat("creativity");
-    createAndLinkNewStat("judgement");
-    createAndLinkNewStat("leadership");
+    // createAndLinkNewStat("curiosity");
+    // createAndLinkNewStat("patience");
+    // createAndLinkNewStat("strategy");
+    // createAndLinkNewStat("innovation");
+    // createAndLinkNewStat("creativity");
+    // createAndLinkNewStat("judgement");
+    // createAndLinkNewStat("leadership");
 
 
     statTitles.push(["Village Stats", "villagersKnown"]);

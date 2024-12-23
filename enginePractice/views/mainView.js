@@ -77,7 +77,7 @@ let view = {
                 }
                 if(forceUpdate || intToString(prevAction[nameNoNums], obj[1]) !== intToString(action[nameNoNums], obj[1])) {
                     elem.innerHTML = intToString(action[nameNoNums], obj[1]);
-                    elem.style.color = `rgb(${Math.round(50+189*(1-(action[nameNoNums]/100)))},${Math.round(50+189*(action[nameNoNums]/100))},100)`;
+                    elem.style.color = `rgb(${Math.round(20+189*(1-(action[nameNoNums]/100)))},${Math.round(20+189*(action[nameNoNums]/100))},100)`;
                 }
             })
 
@@ -218,7 +218,7 @@ let view = {
             let progressColor = view.helpers.getBackgroundColor(actionObj);
 
             let title =
-                "<span id='"+actionVar+"Title' onclick='actionTitleClicked(`"+actionVar+"`)' style='font-size:16px;color:white;width:100%;cursor:pointer;position:absolute;top:-40px;left:-1px;white-space: nowrap;border:2px solid white;padding-left:2px;padding-right:2px;border-top:0;border-right:0;background-color:rgba(105,117,161,0.5)'>" +
+                "<span id='"+actionVar+"Title' onclick='actionTitleClicked(`"+actionVar+"`)' style='font-size:16px;color:black;width:100%;cursor:pointer;position:absolute;top:-40px;left:-1px;white-space: nowrap;border:2px solid lightgray;padding-left:2px;padding-right:2px;border-top:0;border-right:0;background-color:rgba(135,152,211,0.5)'>" +
                     "<b>" + actionObj.title + "</b>" +
                     " | <span style='font-size:12px;position:relative;'>" +
                         "Level <b></v><span id='"+actionVar+"Level'>0</span></b>" +
@@ -473,9 +473,9 @@ let view = {
                         return;
                     }
                     // Calculate the centers of each object
-                    const x1 = actionObj.realX + 155 + 4000; // 220 / 2
+                    const x1 = actionObj.realX + 160 + 4000; // 220 / 2
                     const y1 = actionObj.realY + 80 + 4000; // 200 / 2
-                    const x2 = targetObj.realX + 155 + 4000; // 220 / 2
+                    const x2 = targetObj.realX + 160 + 4000; // 220 / 2
                     const y2 = targetObj.realY + 80 + 4000; // 200 / 2
 
                     let backgroundColor = view.helpers.getBackgroundColor(targetObj);
