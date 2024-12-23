@@ -75,6 +75,9 @@ function createAndLinkNewAction(actionVar, dataObj, title, x, y, downstreamVars)
     actionObj.visible = (globalVisible || dataObj.visible === null) ? true : dataObj.visible;
     actionObj.maxLevel = dataObj.maxLevel ? dataObj.maxLevel : -1;
     actionObj.tier = dataObj.tier;
+    actionObj.moneyMult = dataObj.moneyMult ? dataObj.moneyMult : 0;
+
+
     actionObj.onUnlock = dataObj.onUnlock ? dataObj.onUnlock : function() {};
     actionObj.onCompleteCustom = dataObj.onCompleteCustom ? dataObj.onCompleteCustom : function() {};
     actionObj.onLevelCustom = dataObj.onLevelCustom ? dataObj.onLevelCustom : function() {};

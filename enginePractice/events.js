@@ -72,11 +72,12 @@ let isDragging = false;
 let originalX, originalY;
 let originalLeft, originalTop;
 
-const windowElement = document.getElementById('window');
+const windowElement = document.getElementById('windowElement');
 const actionContainer = document.getElementById('actionContainer');
 
-actionContainer.addEventListener('mousedown', function(e) {
-    if (e.target === actionContainer) {
+document.addEventListener('mousedown', function(e) {
+    // console.log(e.clientX, e.target);
+    if (e.target === windowElement || e.target === actionContainer) {
         isDragging = true;
 
         // Capture the initial position of the mouse and the container
@@ -94,7 +95,7 @@ const scaleStep = 0.1; // Value by which the scale changes per scroll
 const minScale = 0.1; // Minimum scale value to prevent the content from becoming too small
 const maxScale = 3; // Maximum scale value to prevent the content from becoming too large
 
-actionContainer.addEventListener('wheel', function(e) {
+windowElement.addEventListener('wheel', function(e) {
     // Prevent the default scrolling behavior
     e.preventDefault();
 
@@ -126,6 +127,7 @@ document.addEventListener('mousemove', function(e) {
         // Proposed new position
         let newLeft = originalLeft + deltaX;
         let newTop = originalTop + deltaY;
+        // console.log(newLeft);
 
         // Prevent the container from moving beyond the window's boundaries
         // The container should not move in a way that its right or bottom edges go inside the window's area
@@ -227,5 +229,67 @@ zoomOutButton.addEventListener('click', function() {
 
 function clickMenuButton() {
     let isShowing = document.getElementById("helpMenu").style.display !== "none";
-    document.getElementById("helpMenu").style.display = isShowing ? "none" : "block";
+    document.getElementById("helpMenu").style.display = isShowing ? "none" : "flex";
+}
+
+let selectedStat = null;
+function clickedStatName(statName) {
+    let theDiv = view.cached[statName+"Name"];
+
+    //set all borders to black
+    data.actionNames.forEach(function(actionVar) {
+        if(view.cached[actionVar+"Container"].style.borderColor !== "black") {
+            view.cached[actionVar + "Container"].style.borderColor = "black";
+        }
+    })
+    //clear previous
+    if(selectedStat) {
+        view.cached[selectedStat + "Name"].style.border = "";
+    }
+    if(selectedStat === statName) {
+        //clicked the same, so clear and return
+        selectedStat = null;
+        return;
+    }
+
+    //set new
+    selectedStat = statName;
+    theDiv.style.border = "2px solid black";
+    //Change the border colors of all actions that are relevant
+    //for each action, for each statList, if this stat is found, set the boolean
+    //var + "Container" .style.borderColor = getStatColor(statName);
+
+    data.actionNames.forEach(function(actionVar) {
+        let actionObj = data.actions[actionVar];
+        let statFoundInGain = false;
+        actionObj.onLevelStats.forEach(function(statObj) {
+            if(statObj[0] === statName) {
+                statFoundInGain = true;
+            }
+        });
+        let statFoundInUse = false;
+        actionObj.expStats.forEach(function(statObj) {
+            if(statObj[0] === statName) {
+                statFoundInUse = true;
+            }
+        });
+        actionObj.expertiseStats.forEach(function(statObj) {
+            if(statObj[0] === statName) {
+                statFoundInUse = true;
+            }
+        });
+
+        let color = "black;"
+        if(statFoundInUse && statFoundInGain) {
+            color = "orange";
+        }
+        if(statFoundInUse && !statFoundInGain) {
+            color = "blue";
+        }
+        if(!statFoundInUse && statFoundInGain) {
+            color = "green";
+        }
+        view.cached[actionVar+"Container"].style.borderColor = color;
+    });
+
 }

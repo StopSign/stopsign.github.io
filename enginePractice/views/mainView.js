@@ -35,6 +35,11 @@ let view = {
                 }
             })
 
+            let color = view.helpers.getStatColor(statName);
+            if(forceUpdate || view.cached[`${statName}Name`].style.color !== color) {
+                view.cached[`${statName}Name`].style.color = color;
+            }
+
         },
         updateAction: function(actionName) {
             let action = data.actions[actionName];
@@ -72,7 +77,7 @@ let view = {
                 }
                 if(forceUpdate || intToString(prevAction[nameNoNums], obj[1]) !== intToString(action[nameNoNums], obj[1])) {
                     elem.innerHTML = intToString(action[nameNoNums], obj[1]);
-                    elem.style.color = `rgb(${Math.round(139*(1-(action[nameNoNums]/100)))},${Math.round(139*(action[nameNoNums]/100))},0)`;
+                    elem.style.color = `rgb(${Math.round(50+189*(1-(action[nameNoNums]/100)))},${Math.round(50+189*(action[nameNoNums]/100))},100)`;
                 }
             })
 
@@ -136,13 +141,12 @@ let view = {
                     let prevDownstreamObj = prevState.actions[downstreamVar];
                     if(forceUpdate || prevDownstreamObj.visible !== downstreamObj.visible) {
                         if(downstreamObj.visible) {
-                            document.getElementById(downstreamVar + "Container").style.display = "block";
+                            view.cached[downstreamVar+"Container"].style.display = "block";
                             document.getElementById(actionName + "_" + downstreamVar + "_Line_Border").style.display = "block";
                             document.getElementById(actionName + "_" + downstreamVar + "_Line").style.display = "block";
                             document.getElementById(actionName + "SliderContainer" + downstreamVar).style.display = "block";
-
                         } else {
-                            document.getElementById(actionName + "Container").style.display = "none";
+                            view.cached[actionName+"Container"].style.display = "none";
                             document.getElementById(actionName + "_" + downstreamVar + "_Line_Border").style.display = "none";
                             document.getElementById(actionName + "_" + downstreamVar + "_Line").style.display = "none";
                             document.getElementById(actionName + "SliderContainer" + downstreamVar).style.display = "none";
@@ -192,7 +196,7 @@ let view = {
             });
             theStr +=
                 "<div id='"+statVar+"NumContainer' style='position:relative;'>"+
-                    "<b><span style='width:110px;display:inline-block'>" + decamelize(statVar) + "</span></b>" +
+                    "<b><span id='"+statVar+"Name' style='width:110px;display:inline-block;cursor:pointer' onclick='clickedStatName(\""+statVar+"\")'>" + decamelize(statVar) + "</span></b>" +
                     "<b><span id='"+statVar+"Num' style='width:50px;display:inline-block'>"+statObj.num+"</span></b>" +
                     "<span style='width:50px;display:inline-block'>x<b><span id='"+statVar+"Mult'>"+statObj.mult+"</span></b></span>" +
                     "<span style='width:50px;display:inline-block'>+<b><span id='"+statVar+"PerSecond'>"+statObj.perSecond+"</span></b>/s</span>" +
@@ -206,6 +210,7 @@ let view = {
             view.cached[statVar+"Num"] = document.getElementById(statVar+"Num");
             view.cached[statVar+"PerSecond"] = document.getElementById(statVar+"PerSecond");
             view.cached[statVar+"Mult"] = document.getElementById(statVar+"Mult");
+            view.cached[statVar+"Name"] = document.getElementById(statVar+"Name");
         },
         generateActionDisplay(actionVar) {
             let actionObj = data.actions[actionVar];
@@ -213,10 +218,8 @@ let view = {
             let progressColor = view.helpers.getBackgroundColor(actionObj);
 
             let title =
-                "<span id='"+actionVar+"Title' onclick='actionTitleClicked(`"+actionVar+"`)' style='font-size:16px;width:100%;cursor:pointer;position:absolute;top:-40px;left:-1px;white-space: nowrap;border:1px solid;padding-left:2px;padding-right:2px;border-top:0;border-right:0;'>" +
-
+                "<span id='"+actionVar+"Title' onclick='actionTitleClicked(`"+actionVar+"`)' style='font-size:16px;color:white;width:100%;cursor:pointer;position:absolute;top:-40px;left:-1px;white-space: nowrap;border:2px solid white;padding-left:2px;padding-right:2px;border-top:0;border-right:0;background-color:rgba(105,117,161,0.5)'>" +
                     "<b>" + actionObj.title + "</b>" +
-                    " | <span style='font-size:12px;'>Tier <b><span id='"+actionVar+"Tier'></span></span></b>" +
                     " | <span style='font-size:12px;position:relative;'>" +
                         "Level <b></v><span id='"+actionVar+"Level'>0</span></b>" +
                     (actionObj.maxLevel >= 0 ? " / <b><span id='"+actionVar+"MaxLevel'>0</span></b>" : "") +
@@ -320,11 +323,12 @@ let view = {
                 "</div>";
             let momentumContainer =
                 "<div id='"+actionVar+"MomentumContainer' style='margin:3px;'>" +
+                    "<span style='font-size:12px;'>Tier <b><span id='"+actionVar+"Tier'></span></span></b> | " +
                     capitalizeFirst(actionObj.momentumName)+": <b><span id='"+actionVar+"Momentum'>0</span></b> " +
-                "("+
-                    (actionObj.isGenerator?"+<b><span id='"+actionVar+"ActionPowerDelta'></span></b>/s, ":"") +
-                    "Δ<b><span id='"+actionVar+"MomentumDelta'>1.00</span></b>/s" +
-                ")" +
+                    "("+
+                        (actionObj.isGenerator?"+<b><span id='"+actionVar+"ActionPowerDelta'></span></b>/s, ":"") +
+                        "Δ<b><span id='"+actionVar+"MomentumDelta'>1.00</span></b>/s" +
+                    ")" +
                     // ": <span id='"+actionVar+"RealX'></span>, <span id='"+actionVar+"RealY'></span>" + //TODO debug only
                 "</div>" +
                 (actionObj.isGenerator?"":("<div style='margin:3px;font-size:10px;'>Progress/s = "+actionObj.tierMult()*100+"% of "+actionObj.momentumName+" * efficiency:</div>"));
@@ -350,7 +354,7 @@ let view = {
 
 
             let downstreamContainer =
-                "<div id='"+actionVar+"DownstreamContainer' style='padding:3px;'>" +
+                "<div id='"+actionVar+"DownstreamContainer' style='padding:10px;'>" +
                     (actionVar==="overclock"?("Send up to (10% * efficiency of momentum)/s downstream: <br>"):"") +
                     view.create.createDownStreamSliders(actionObj) +
                     "<span id='"+actionVar+"AllZeroButton' onclick='toggleAllZero(\""+actionVar+"\")' class='buttonSimple' style='margin-right:3px;width:30px;height:30px;text-align:center;cursor:pointer;padding:0 4px;'>All 0</span>" +
@@ -362,7 +366,7 @@ let view = {
             let newY = actionObj.realY + 4000;
 
             theStr +=
-                "<div id='"+actionVar+"Container' style='border:1px solid;background-color:#cfd3e6;position:absolute;left:"+newX+"px;top:"+newY+"px;width:300px;min-height:50px;'>" +
+                "<div id='"+actionVar+"Container' style='border:2px solid black;background-color:#cfd3e6;position:absolute;left:"+newX+"px;top:"+newY+"px;width:300px;min-height:50px;'>" +
                     title +
                     menuContainer +
                     momentumContainer +
@@ -394,6 +398,7 @@ let view = {
             document.getElementById(actionVar+"LockIcon").appendChild(lockIcon);
 
             //cache the created objects
+            view.cached[actionVar + "Container"] = document.getElementById(actionVar + "Container");
             view.cached[actionVar + "ProgressMax"] = document.getElementById(actionVar + "ProgressMax");
             view.cached[actionVar + "Title"] = document.getElementById(actionVar + "Title");
             view.cached[actionVar + "Container"] = document.getElementById(actionVar + "Container");
@@ -468,10 +473,10 @@ let view = {
                         return;
                     }
                     // Calculate the centers of each object
-                    const x1 = actionObj.realX + 110 + 4000; // 220 / 2
-                    const y1 = actionObj.realY + 50 + 4000; // 200 / 2
-                    const x2 = targetObj.realX + 110 + 4000; // 220 / 2
-                    const y2 = targetObj.realY + 50 + 4000; // 200 / 2
+                    const x1 = actionObj.realX + 155 + 4000; // 220 / 2
+                    const y1 = actionObj.realY + 80 + 4000; // 200 / 2
+                    const x2 = targetObj.realX + 155 + 4000; // 220 / 2
+                    const y2 = targetObj.realY + 80 + 4000; // 200 / 2
 
                     let backgroundColor = view.helpers.getBackgroundColor(targetObj);
                     let isDifferentResource = actionObj.momentumName !== targetObj.momentumName;
@@ -498,6 +503,38 @@ let view = {
         }
     },
     helpers: {
+        getStatColor(statName) {
+            let stat = data.stats[statName];
+            // if(stat.linkedActionExpStats.length === 0 && stat.linkedActionExpertiseStats.length === 0) {
+            //     return "blue"
+            // }
+            //if the stat is gained with unlocked actions
+            let statAddedTo = stat.perSecond !== 0;
+            let statUsed = false;
+            stat.linkedActionExpertiseStats.forEach(function(actionVar) {
+                let actionObj = data.actions[actionVar];
+                if(actionObj.visible || globalVisible) {
+                    statUsed = true;
+                }
+            });
+            stat.linkedActionExpStats.forEach(function(actionVar) {
+                let actionObj = data.actions[actionVar];
+                if(actionObj.visible || globalVisible) {
+                    statUsed = true;
+                }
+            });
+
+            if(statAddedTo && statUsed) {
+                return "black";
+            }
+            if(statAddedTo && !statUsed) {
+                return "green";
+            }
+            if(!statAddedTo && statUsed) {
+                return "blue";
+            }
+            return "red";
+        },
         getBackgroundColor(actionObj) {
             switch (actionObj.momentumName) {
                 case "mana":

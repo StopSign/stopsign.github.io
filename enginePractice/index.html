@@ -16,7 +16,7 @@
 <body id="theBody" oncontextmenu="return false;" style="padding:5px" class="medium">
 
 
-<div id="window" style="position:relative; width:100%; height:98%; border:2px solid; overflow:hidden;">
+<div id="windowElement" style="position:relative; width:100%; height:98%; border:2px solid; overflow:hidden;">
     <div id="actionContainer" style="position:absolute; width:8000px; height:8000px;"> <!-- initial left/top with actionTitleClicked(`overclock`) -->
         <div id="lineContainer"></div>
         <div id="dot" style="position:absolute;left:4000px;top:4000px;border:2px solid;width:1px;height:1px;"></div>
@@ -26,26 +26,28 @@
 
 <div class="button" style="position:absolute;left:25px;top:25px;padding:10px;font-size:16px;" onclick="clickMenuButton()">Menu</div>
 
-<div id="helpMenu" class='fullScreenGrey' style='display:none;' onclick='clickMenuButton()'>
-    <div style='background:#fff;padding:20px;border-radius:6px;max-width:400px;width:90%;text-align:center;position:relative;'>
-        <div id="help1">Actions and Momentum:
-            Momentum is generated from the Overclock action, and "flows" downstream to the further actions.
-            The primary resource of the action (momentum, mana, gold, etc.) is consumed at a specified rate per second on every action except Overclock.
-            This consumption rate for progress cannot be stopped.
-            You can only additionally add transferring the primary resource to a downstream action at a rate equal to your consumption rate, per downstream action.
-            For example, if an action is consuming .1% momentum per second, it means that 50 times a second, it takes 1/50th of .1% of your momentum and adds the same amount to progress.
-            If you are sending 100% to 2 downstream effects, it will be taking .1% (consumption) + .1% (stream1) + .1% (stream2) = .3% of current momentum per second (split into 50 parts).
+<div id="helpMenuContainer"></div>
 
-            When progress fills up to the progress max, you get the on complete effect, which includes exp. When exp fills up, you get a level, with the described effects.
-        </div>
-        <div id="help2">Stats
-            Each stat increases its bonus by 1%
-        </div>
-    </div>
-</div>
+<!--<div id="helpMenu" class='fullScreenGrey' style='display:none;' onclick='clickMenuButton()'>-->
+<!--    <div style='background:#fff;padding:20px;border-radius:6px;max-width:400px;width:90%;text-align:center;position:relative;'>-->
+<!--        <div id="help1">Actions and Momentum:-->
+<!--            Momentum is generated from the Overclock action, and "flows" downstream to the further actions.-->
+<!--            The primary resource of the action (momentum, mana, gold, etc.) is consumed at a specified rate per second on every action except Overclock.-->
+<!--            This consumption rate for progress cannot be stopped.-->
+<!--            You can only additionally add transferring the primary resource to a downstream action at a rate equal to your consumption rate, per downstream action.-->
+<!--            For example, if an action is consuming .1% momentum per second, it means that 50 times a second, it takes 1/50th of .1% of your momentum and adds the same amount to progress.-->
+<!--            If you are sending 100% to 2 downstream effects, it will be taking .1% (consumption) + .1% (stream1) + .1% (stream2) = .3% of current momentum per second (split into 50 parts).-->
+
+<!--            When progress fills up to the progress max, you get the on complete effect, which includes exp. When exp fills up, you get a level, with the described effects.-->
+<!--        </div>-->
+<!--        <div id="help2">Stats-->
+<!--            Each stat increases its bonus by 1%-->
+<!--        </div>-->
+<!--    </div>-->
+<!--</div>-->
 
 
-<div id="statDisplay" style="position:absolute;margin:5px;top:65px;background-color:rgba(192,199,225,0.8)">
+<div id="statDisplay" style="position:absolute;margin:5px;top:65px;background-color:rgba(105,117,161,0.8)">
     <div style="width:106px;display:inline-block;font-style:italic">Stat</div>
     <div style="width:46px;display:inline-block;font-style:italic">Amount</div>
     <div style="width:48px;display:inline-block;font-style:italic">Bonus</div>
@@ -76,6 +78,7 @@
 <script src="data/moduleData.js?1"></script>
 <script src="data/textData.js?1"></script> <!-- must go after actionData-->
 <script src="toasts.js?1"></script>
+<script src="menu.js?1"></script>
 <script>
 
     // multiCreateButton({label:"Cash", resource:"cash", buyFromFar:"cash",

@@ -26,6 +26,11 @@ play the game and tweak it
     -make money improves unrelated stats for now, but it starts spend money. Has low expertise also
     -spend money improves overclock's stats - not expertise
 
+stats UI:
+-Red when stat is used but not gained
+-Green when stat is gained but not used
+-Black when used & gained
+-Select a stat to modify the borders of all actions that use it, colored how they use it
 
 
 Tutorial toasts

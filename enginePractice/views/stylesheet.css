@@ -9,7 +9,7 @@ body {
     font-size:14px;
     height:100%;
     margin:0;
-    background-color: #c0c7e1;
+    background-color: #6975a1;
     cursor:default;
 }
 
@@ -78,6 +78,17 @@ body {
     align-items:center;
     justify-content:center;
     z-index:10000;
+    display:flex;
+}
+
+.centerMenuBox {
+    background:#fff;
+    padding:20px;
+    border-radius:6px;
+    max-width:400px;
+    width:90%;
+    text-align:center;
+    position:relative;
 }
 
 .title {
@@ -87,11 +98,15 @@ body {
     text-align:center;
 }
 .smallTitle {
-    font-size:14px;
-    font-weight:bold;
-    display:block;
-    text-align:center;
+    font-size: 14px;
+    font-weight: bold;
+    display: block;
+    text-align: center;
 }
+.menuTitle {
+
+}
+
 
 .large {
     font-size:14px;

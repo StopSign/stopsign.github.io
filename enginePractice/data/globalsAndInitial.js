@@ -37,12 +37,11 @@ viewData.toasts = [];
 let statTitles = []; //[<title>, <stat name to be located above>]
 
 let language = "english";
-let globalVisible = false;
+let globalVisible = true;
 
 function initializeData() {
 
     statTitles.push(["Overclock Stats", "drive"]);
-    createAndLinkNewStat("neuralAgility"); //
     createAndLinkNewStat("processing"); //
     createAndLinkNewStat("focus"); //
     createAndLinkNewStat("energy"); //
@@ -80,6 +79,7 @@ function initializeData() {
     //Resource Stats
     statTitles.push(["Resource Stats", "adaptability"]);
     createAndLinkNewStat("adaptability");
+    createAndLinkNewStat("workEthic");
     createAndLinkNewStat("resourcefulness");
 
     createAndLinkNewStat("salesmanship");
@@ -100,6 +100,7 @@ function initializeData() {
     statTitles.push(["Village Stats", "villagersKnown"]);
     createAndLinkNewStat("villagersKnown");
 
+    //intro
     create("overclock", ["reflect", "makeMoney", "travelOnRoad", "socialize"], 0, 0);
     create("reflect", ["rememberTheFallen", "peruseLibrary"], -1.1, -1.1);
     create("makeMoney", ["spendMoney"], 0, -1.6);
@@ -108,15 +109,38 @@ function initializeData() {
     create("clearTheTrail", ["paveTheTrail"], 0, 1); //increase travel expertise
         create("paveTheTrail", [], 0, 1); //increase travel expertise to max. Req builder skills
     create("travelToOutpost", ["reportForDuty", "travelToCrossroads"], 1.5, 0);
-    create("fillBasicNeeds", ["buyClothing"], -.5, -1);
+
     create("reportForDuty", ["meetVillageLeaderScott", "reportForTraining", "reportForLabor"], 0, -1);
     create("meetVillageLeaderScott", ["helpScottWithChores"], -1.1, -1);
-    create("buyClothing", [], -1, -2);
     create("helpScottWithChores", [], 0, -1);
+    create("fillBasicNeeds", ["buyClothing", "eatBetterFood"], -.5, -1);
+
     create("socialize", ["localOutreach"], -3, 0);
-    create("localOutreach", ["neighborlyTies"], 0, 1);
-    create("reportForTraining", ["talkToInstructorJohn"], 0, -1)
-    create("reportForLabor", ["shepherd", "fisherman", "horseTamer", "dockWorker"], 2, -2);
+    create("localOutreach", ["chatWithTownsfolk", "neighborlyTies"], 0, 1);
+
+    //Village
+    create("reportForTraining", ["takeLessonsFromJohn"], 0, -1)
+    create("takeLessonsFromJohn", [], 0, -1)
+
+
+
+    //jobs
+    create("reportForLabor", ["oddJobsLaborer"], 2, -2);
+    create("oddJobsLaborer", ["chimneySweep"], 0, -1);
+    create("chimneySweep", ["handyman"], 0, -1);
+    create("handyman", ["tavernHelper"], 0, -1);
+    create("tavernHelper", ["guildReceptionist"], 0, -1);
+    create("guildReceptionist", ["messenger"], 0, -1);
+    create("messenger", ["townCrier"], 0, -1);
+    create("townCrier", ["storyTeller"], 0, -1);
+    create("storyTeller", [], 0, -1);
+
+    //spend money
+    create("buyClothing", [], -1, -1.5);
+    create("eatBetterFood", [], -1, -.5);
+
+    //village chat
+    create("chatWithTownsfolk", [], 1, 1);
 
 
     //     create("peruseLibrary", ["researchHistory"], 0, -1.2); //research. Req other unlocks
@@ -412,6 +436,7 @@ function initializeData() {
     view.create.generateLines();
     updateAllActionStatMults();
     actionTitleClicked(`overclock`);
+    initializeMenu();
 }
 
 //will always be run once from the top action (TODO per page)
