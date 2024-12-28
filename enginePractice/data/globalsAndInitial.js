@@ -37,7 +37,7 @@ viewData.toasts = [];
 let statTitles = []; //[<title>, <stat name to be located above>]
 
 let language = "english";
-let globalVisible = true;
+let globalVisible = false;
 
 function initializeData() {
 
