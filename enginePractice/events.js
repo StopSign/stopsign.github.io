@@ -199,7 +199,7 @@ function clickActionMenu(actionVar, containerId, buttonId) {
     deselectActionMenus(actionVar);
     if (toggleOn) {
         container.style.display = "block";
-        button.style.backgroundColor = "#7cdde5";
+        button.style.backgroundColor = "var(--warning-color)";
     }
 }
 

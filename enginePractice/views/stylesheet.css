@@ -10,6 +10,7 @@
     --warning-color: #ff0e39;
     --error-color: #f38ba8;
     --overlay-color: rgba(30, 30, 46, 0.8);
+    --selection-color:#9f0000;
     --exp-color:#7b5fc1;
     --momentum-color:#4e8d49;
     --mana-color:#74c7ec;
@@ -31,6 +32,7 @@ body.lightMode {
     --warning-color: #ffde24;
     --error-color: #ff9aa2;
     --overlay-color: rgba(135, 152, 211, 0.8);
+    --selection-color:#67ff5b;
     --exp-color:#b79df8;
     --momentum-color:#a6e3a1;
     --mana-color:#74c7ec;
