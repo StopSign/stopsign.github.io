@@ -34,10 +34,10 @@ function generateStatDisplay(statVar) {
 function generateActionDisplay(actionVar) {
     let actionObj = data.actions[actionVar];
     let theStr = "";
-    let progressColor = getBackgroundColor(actionObj);
+    let progressColor = getResourceColor(actionObj);
 
     let title =
-        "<span id='"+actionVar+"Title' onclick='actionTitleClicked(`"+actionVar+"`)' style='font-size:16px;color:black;width:100%;cursor:pointer;position:absolute;top:-40px;left:-1px;white-space: nowrap;border:2px solid lightgray;padding-left:2px;padding-right:2px;border-top:0;border-right:0;background-color:rgba(135,152,211,0.5)'>" +
+        "<span id='"+actionVar+"Title' onclick='actionTitleClicked(`"+actionVar+"`)' style='font-size:16px;color:var(--text-primary);width:100%;cursor:pointer;position:absolute;top:-40px;left:-1px;white-space: nowrap;border:2px solid var(--border-color);padding-left:2px;padding-right:2px;border-top:0;border-right:0;background-color:var(--overlay-color)'>" +
         "<b>" + actionObj.title + "</b>" +
         " | <span style='font-size:12px;position:relative;'>" +
         "Level <b></v><span id='"+actionVar+"Level'>0</span></b>" +
@@ -135,7 +135,7 @@ function generateActionDisplay(actionVar) {
         "</div>";
 
     let lockOverAll = "<div id='"+actionVar+"LockContainer' " +
-        "style='position:absolute;background-color: grey;width:100%;height:100%;top:0;text-align:center;'>" +
+        "style='position:absolute;background-color: var(--bg-secondary);width:100%;height:100%;top:0;text-align:center;'>" +
         "<span id='"+actionVar+"LockIcon'></span><br>" +
         "<span>Needs <b><span id='"+actionVar+"UnlockCost'>0</span></b> "+(data.actions[actionObj.parent]?data.actions[actionObj.parent].momentumName:"ERROR") +
         "<br>sent from <b>" + (data.actions[actionObj.parent]?data.actions[actionObj.parent].title:"ERROR") + "</b></span>" +
@@ -163,7 +163,7 @@ function generateActionDisplay(actionVar) {
         "</div>";
     let expBar =
         "<div id='"+actionVar+"ExpBarOuter' style='width:100%;height:16px;position:relative;text-align:left;border-bottom:1px solid;'>" +
-        "<div id='"+actionVar+"ExpBarInner' style='width:30%;background-color:#b79df8;height:100%;position:absolute'></div>" +
+        "<div id='"+actionVar+"ExpBarInner' style='width:30%;background-color:var(--exp-color);height:100%;position:absolute'></div>" +
         "<div id='"+actionVar+"ExpNumContainer' style='position:absolute;top:1px;left:4px;;width:97%'><b></v>" +
         "<span id='"+actionVar+"Exp'>0</span></b> / " +
         "<b><span id='"+actionVar+"ExpToLevel'>1</span></b>" +
@@ -185,7 +185,7 @@ function generateActionDisplay(actionVar) {
     let newY = actionObj.realY + 4000;
 
     theStr +=
-        "<div id='"+actionVar+"Container' style='border:2px solid black;background-color:#cfd3e6;position:absolute;left:"+newX+"px;top:"+newY+"px;width:300px;min-height:50px;'>" +
+        "<div id='"+actionVar+"Container' style='border:2px solid var(--border-color);background-color:var(--bg-secondary);position:absolute;left:"+newX+"px;top:"+newY+"px;width:300px;min-height:50px;'>" +
         title +
         menuContainer +
         momentumContainer +
@@ -208,7 +208,7 @@ function generateActionDisplay(actionVar) {
     let lockIcon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     lockIcon.setAttribute('class', 'lock-icon');
     lockIcon.setAttribute('viewBox', '0 0 24 24');
-    lockIcon.setAttribute('fill', 'black');
+    lockIcon.setAttribute('fill', 'var(--text-primary)');
 
     let lockPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
     lockPath.setAttribute('d', 'M12 2C9.24 2 7 4.24 7 7v5H6c-1.1 0-2 .9-2 2v7c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-7c0-1.1-.9-2-2-2h-1V7c0-2.76-2.24-5-5-5zm1 12.5c0 .83-.67 1.5-1.5 1.5S10 15.33 10 14.5V13h3v1.5zM12 4c1.66 0 3 1.34 3 3v5H9V7c0-1.66 1.34-3 3-3z');
@@ -301,7 +301,7 @@ function generateLinesBetweenActions() {
             const x2 = targetObj.realX + 160 + 4000; // 220 / 2
             const y2 = targetObj.realY + 80 + 4000; // 200 / 2
 
-            let backgroundColor = getBackgroundColor(targetObj);
+            let backgroundColor = getResourceColor(targetObj);
             let isDifferentResource = actionObj.momentumName !== targetObj.momentumName;
             let opacity = isDifferentResource ? ".8" : "0";
 

@@ -20,29 +20,29 @@ function getStatColor(statName) {
     });
 
     if(statAddedTo && statUsed) {
-        return "black";
+        return "var(--text-primary)";
     }
     if(statAddedTo && !statUsed) {
-        return "green";
+        return "var(--success-color)";
     }
     if(!statAddedTo && statUsed) {
-        return "blue";
+        return "var(--accent-primary)";
     }
-    return "red";
+    return "var(--error-color)";
 }
 
-function getBackgroundColor(actionObj) {
+function getResourceColor(actionObj) {
     switch (actionObj.momentumName) {
         case "mana":
-            return "#2da3ef";
+            return "var(--mana-color)";
         case "gold":
-            return "#ffe52c";
+            return "var(--gold-color)";
         case "conversations":
-            return "#c4ffff";
+            return "var(--conversations-color)";
         case "arcana":
-            return "#ff1cf4";
-        default:
-            return "#BDF89DFF";
+            return "var(--arcana-color)";
+        default: //momentum
+            return "var(--momentum-color)";
     }
 }
 

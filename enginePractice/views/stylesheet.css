@@ -1,25 +1,66 @@
+:root {
+    --bg-primary: #1e1e2e;
+    --bg-secondary: #313244;
+    --text-primary: #cdd6f4;
+    --text-muted: #a6adc8;
+    --accent-primary: #89b4fa;
+    --accent-secondary: #74c7ec;
+    --border-color: #45475a;
+    --success-color: #a6e3a1;
+    --warning-color: #ff0e39;
+    --error-color: #f38ba8;
+    --overlay-color: rgba(30, 30, 46, 0.8);
+    --exp-color:#7b5fc1;
+    --momentum-color:#4e8d49;
+    --mana-color:#74c7ec;
+    --gold-color:#ffde24;
+    --conversations-color:#ffde24;
+    --garcana-color:#ffde24;
+}
+
+body.lightMode {
+    /* Light theme (default) - Rich colors with blue base */
+    --bg-primary: #8798d3;
+    --bg-secondary: #bbd6e6;
+    --text-primary: #000000;
+    --text-muted: #4a4e69;
+    --accent-primary: #55d4de;
+    --accent-secondary: #60eef9;
+    --border-color: #c4d7f2;
+    --success-color: #a6e3a1;
+    --warning-color: #ffde24;
+    --error-color: #ff9aa2;
+    --overlay-color: rgba(135, 152, 211, 0.8);
+    --exp-color:#b79df8;
+    --momentum-color:#a6e3a1;
+    --mana-color:#74c7ec;
+    --gold-color:#ffde24;
+    --conversations-color:#ffde24;
+    --garcana-color:#ffde24;
+}
+
 body {
     -webkit-touch-callout: none;
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
-    font-family:Arial, Helvetica, serif;
-    color:black;
-    font-size:14px;
-    height:100%;
-    margin:0;
-    background-color: #8798d3;
-    cursor:default;
+    font-family: Arial, Helvetica, serif;
+    color: var(--text-primary);
+    font-size: 14px;
+    height: 100%;
+    margin: 0;
+    background-color: var(--bg-primary);
+    cursor: default;
 }
 
 .hyperVisible {
     text-shadow:
-            -1px -1px 0 #000,
-            1px -1px 0 #000,
-            -1px 1px 0 #000,
-            1px 1px 0 #000;
-    color:white;
+            -1px -1px 0 var(--border-color),
+            1px -1px 0 var(--border-color),
+            -1px 1px 0 var(--border-color),
+            1px 1px 0 var(--border-color);
+    color: var(--accent-primary);
 }
 
 .disabled {
@@ -51,13 +92,14 @@ body {
 .showthis, .showthisUp, .showthis2, .showthisH {
     display:none;
     position:absolute;
-    background-color: #BBD6E6;
-    border:1px solid;
+    background-color: var(--bg-secondary);
+    border:1px solid var(--border-color);
     padding:3px 5px;
     border-radius:4px;
     margin-top:5px;
     z-index:999;
     text-align:left;
+    color: var(--text-primary);
 }
 .showthisUp {
     bottom:105%;
@@ -74,7 +116,7 @@ body {
     left:0;
     right:0;
     bottom:0;
-    background:rgba(0,0,0,0.5);
+    background:rgba(0,0,0,0.7);
     align-items:center;
     justify-content:center;
     z-index:10000;
@@ -82,13 +124,15 @@ body {
 }
 
 .centerMenuBox {
-    background:#fff;
+    background:var(--bg-secondary);
     padding:20px;
     border-radius:6px;
     max-width:400px;
     width:90%;
     text-align:center;
     position:relative;
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
 }
 
 .title {
@@ -151,18 +195,17 @@ input {
     min-width:9px;
     cursor: pointer;
     outline: none;
-    color: #e1e1e1;
+    color: var(--bg-primary);
     border: none;
     border-radius: 6px;
     margin-bottom:2px;
-    background-color: #3e8e41;
-    box-shadow: 0 1px #666;
+    background-color: var(--success-color);
+    box-shadow: 0 1px var(--border-color);
     transform: translateY(0px);
 }
 .buttonPressed.active {
-    background-color: #357937;
-    box-shadow: 0 1px #666;
-    transform: translateY(-1px);
+    background-color: var(--success-color);
+    opacity: 0.9;
 }
 
 .button {
@@ -172,28 +215,30 @@ input {
     min-width:9px;
     cursor: pointer;
     outline: none;
-    color: #000000;
-    background-color: #55d4de;
+    color: var(--bg-primary);
+    background-color: var(--accent-primary);
     border: none;
     border-radius: 6px;
-    box-shadow: 0 3px #999;
+    box-shadow: 0 3px var(--border-color);
     transform: translateY(-2px);
     margin-bottom:2px;
 }
 
-.button:hover {background-color: #60eef9
+.button:hover {
+    background-color: var(--accent-secondary);
 }
 .buttonSimple {
-    background-color: #f1f1f1;
+    background-color: var(--bg-secondary);
     cursor:pointer;
+    color: var(--text-primary);
 }
-.buttonSimple:hover {background-color: #c5e8ec
+.buttonSimple:hover {
+    background-color: var(--border-color);
 }
 
 .button:active {
-    background-color: #3e9aa2;
-    box-shadow: 0 1px #666;
-    transform: translateY(0px);
+    background-color: var(--accent-secondary);
+    box-shadow: 0 1px var(--border-color);
 }
 
 .toast {
@@ -201,21 +246,24 @@ input {
     margin-top:10px;
     padding: 10px 25px 10px 10px;
     cursor:pointer;
-    border:2px solid black;
-    background-color: #ffff00;
+    border:2px solid var(--border-color);
+    background-color: var(--warning-color);
     font-size:16px;
     display:none;
+    color: var(--text-primary);
 }
 .toast:hover {
-    background-color: #c7c700;
+    background-color: var(--warning-color);
+    opacity: 0.9;
 }
 
 .toastInactive {
-    background-color: #b7b7b7;
+    background-color: var(--bg-secondary);
+    color: var(--text-muted);
 }
 
 .toastInactive:hover {
-    background-color: #969696;
+    background-color: var(--border-color);
 }
 
 .imageDragFix {
@@ -229,16 +277,16 @@ input {
 }
 
 .clickable:hover {
-    background-color: rgba(200, 200, 200, 1);
+    background-color: var(--border-color);
 }
 .clickable:active {
-    background-color: rgba(160, 160, 160, 1);
+    background-color: var(--accent-secondary);
 }
 .clickable {
-    background-color: rgba(190, 190, 190, .3);
+    background-color: var(--bg-secondary);
     cursor:pointer;
     padding:3px;
-    border:2px solid rgba(190, 190, 190, 0);
+    border:2px solid transparent;
 }
 
 .preciseNum {
@@ -255,13 +303,14 @@ input {
 .progressOuter {
     width:80px;
     height:11px;
-    background-color:rgba(50, 50, 50, .8);
+    background-color:var(--bg-secondary);
     position:relative;
+    border: 1px solid var(--border-color);
 }
 .progressInner {
     height:100%;
     position:absolute;
-    background-color: #a86fc4;
+    background-color: var(--accent-primary);
 }
 
 .donationContainer {
@@ -292,14 +341,24 @@ input {
 }
 
 .red {
-    color:red;
+    color:var(--error-color);
 }
 .green {
-    color:green;
+    color:var(--success-color);
 }
 
 
 .lock-icon {
     width: 50px;
     height: 50px;
+}
+
+#windowElement {
+    border-color: var(--border-color) !important;
+}
+
+#statDisplay {
+    background-color: var(--overlay-color) !important;
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
 }

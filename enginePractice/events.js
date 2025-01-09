@@ -232,6 +232,13 @@ function clickMenuButton() {
     document.getElementById("helpMenu").style.display = isShowing ? "none" : "flex";
 }
 
+function changeDarkMode() {
+    const body = document.body;
+
+    // Toggle the dark-mode class
+    body.classList.toggle('lightMode');
+}
+
 let selectedStat = null;
 function clickedStatName(statName) {
     let theDiv = view.cached[statName+"Name"];
