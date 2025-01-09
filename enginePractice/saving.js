@@ -34,7 +34,7 @@ function load() {
         })
     }
 
-    view.initializeDisplay();
+    initializeDisplay();
     recalcInterval(50);
 }
 

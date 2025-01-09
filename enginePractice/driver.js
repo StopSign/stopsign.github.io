@@ -36,7 +36,7 @@ function tick() {
         if(stop || forceStop) {
             gameTicksLeft = 0;
             if(!forceStop) {
-                view.updating.update();
+                updateView();
             }
             break;
         }
@@ -58,7 +58,7 @@ function tick() {
 
     }
     if(didSomething) {
-        view.updating.update();
+        updateView();
     }
 }
 
@@ -69,7 +69,7 @@ function framePassed() {
 function secondPassed() {
     secondTick();
 
-    view.updating.updateOnSecond();
+    updateViewOnSecond();
     secondsPassed++;
 }
 
@@ -102,7 +102,7 @@ function gameTick() {
     //for each, add their (actionObj.onLevelStats amount (e.g. [["charm", .1], ["curiosity", .1]]) multiplied by levels/s) to the relevant stat in statsPerSecond
     //to get levels/s, the action gets (actionObj.progressRate()/actionObj.progressMax) = completes/s, and then (complete/s * actionObj.expToAdd / actionObj.expToLevel) = level/s
 
-    let statsPerSecond = view.helpers.getStatChanges();
+    let statsPerSecond = getStatChanges();
     data.statNames.forEach(function(statName) {
         data.stats[statName].perSecond = statsPerSecond[statName] ? statsPerSecond[statName] : 0;
     });
