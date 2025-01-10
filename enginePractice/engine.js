@@ -22,7 +22,7 @@ function createAndLinkNewStat(statVar) {
         })
     }
 
-    view.create.generateStatDisplay(statVar);
+    generateStatDisplay(statVar);
 }
 
 

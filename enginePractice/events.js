@@ -199,7 +199,7 @@ function clickActionMenu(actionVar, containerId, buttonId) {
     deselectActionMenus(actionVar);
     if (toggleOn) {
         container.style.display = "block";
-        button.style.backgroundColor = "#7cdde5";
+        button.style.backgroundColor = "var(--warning-color)";
     }
 }
 
@@ -230,6 +230,13 @@ zoomOutButton.addEventListener('click', function() {
 function clickMenuButton() {
     let isShowing = document.getElementById("helpMenu").style.display !== "none";
     document.getElementById("helpMenu").style.display = isShowing ? "none" : "flex";
+}
+
+function changeDarkMode() {
+    const body = document.body;
+
+    // Toggle the dark-mode class
+    body.classList.toggle('lightMode');
 }
 
 let selectedStat = null;

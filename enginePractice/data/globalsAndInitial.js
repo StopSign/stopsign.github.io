@@ -430,10 +430,10 @@ function initializeData() {
     setRealCoordinates('overclock');
 
     data.actionNames.forEach(function (actionVar) { //wait until they are all created to link downstreams
-        view.create.generateActionDisplay(actionVar);
+        generateActionDisplay(actionVar);
     })
     initializeToasts();
-    view.create.generateLines();
+    generateLinesBetweenActions();
     updateAllActionStatMults();
     actionTitleClicked(`overclock`);
     initializeMenu();
