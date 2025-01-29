@@ -334,7 +334,7 @@ function View() {
         var orbitSendString = "";
         for(var i = 0; i < game.spaceStation.orbiting.length; i++) {
             orbitString += intToString(game.spaceStation.orbiting[i].amount) + " " + game.spaceStation.orbiting[i].type;
-            orbitSendString += intToString(game.spaceStation.orbiting[i].amount / 10000, 4) + " " + game.spaceStation.orbiting[i].type;
+            orbitSendString += intToString(game.spaceStation.orbiting[i].amount / 100000, 4) + " " + game.spaceStation.orbiting[i].type;
             if(i !== game.spaceStation.orbiting.length - 1) {
                 orbitString += ", ";
                 orbitSendString += ", ";
