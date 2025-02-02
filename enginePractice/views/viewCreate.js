@@ -44,12 +44,17 @@ function generateActionDisplay(actionVar) {
         (actionObj.maxLevel >= 0 ? " / <b><span id='"+actionVar+"MaxLevel'>0</span></b>" : "") +
         "</span>" +
         " | <span style='font-size:12px;'><b><span id='"+actionVar+"Efficiency'></span></b>%</span>" +
-        "</span>" +(actionObj.isGenerator?"":"<span id='"+actionVar+"GoToParentButton' onclick='actionTitleClicked(\""+actionObj.parent+"\")' " +
-            "class='buttonSimple' style='margin-right:3px;width:30px;height:30px;text-align:center;cursor:pointer;padding:0 4px;'>^</span>") +
+        "</span>" +
         "</span>";
+
+    let hideDownstreambutton = actionObj.isGenerator && actionVar !== "overclock";
+    let displayDownstreamButton = hideDownstreambutton?"none":"";
+
     let menuContainer =
         "<div id='' style='position:absolute;top:-18px;font-size:13px;left:-1px;'>" +
-        "<span id='"+actionVar+"ToggleDownstreamButton' onclick='toggleDownstream(\""+actionVar+"\")' class='buttonSimple' style='margin-right:3px;width:30px;height:30px;text-align:center;cursor:pointer;padding:0 4px;background-color:var(--selection-color)'>Downstream</span>" +
+        (actionVar==="overclock"?"":"<span id='"+actionVar+"GoToParentButton' onclick='actionTitleClicked(\""+actionObj.parent+"\")' " +
+            "class='buttonSimple' style='margin-right:3px;width:30px;height:30px;text-align:center;cursor:pointer;padding:0 4px;'>^</span>") +
+        "<span id='"+actionVar+"ToggleDownstreamButton' onclick='toggleDownstream(\""+actionVar+"\")' class='buttonSimple' style='display:"+displayDownstreamButton+";margin-right:3px;width:30px;height:30px;text-align:center;cursor:pointer;padding:0 4px;background-color:var(--selection-color)'>Downstream</span>" +
         "<span id='"+actionVar+"ToggleLevelInfoButton' onclick='toggleLevelInfo(\""+actionVar+"\")' class='buttonSimple' style='margin-right:3px;width:30px;height:30px;text-align:center;cursor:pointer;padding:0 4px;'>Info</span>" +
         "<span id='"+actionVar+"ToggleStatsInfoButton' onclick='toggleStatsInfo(\""+actionVar+"\")' class='buttonSimple' style='margin-right:3px;width:30px;height:30px;text-align:center;cursor:pointer;padding:0 4px;'>Stats</span>" +
         "<span id='"+actionVar+"ToggleStoryButton' onclick='toggleStory(\""+actionVar+"\")' class='buttonSimple' style='margin-right:3px;width:30px;height:30px;text-align:center;cursor:pointer;padding:0 4px;'>Story</span>" +
@@ -66,13 +71,14 @@ function generateActionDisplay(actionVar) {
         (actionObj.isGenerator?"":"x<b>"+ actionObj.progressMaxIncrease + "</b> to progress required to complete<br>") +
         "x<b>" + actionObj.expToLevelIncrease + "</b> to Exp required to level<br>" +
         (actionObj.actionPowerMultIncrease===1?"":("x<b>" + actionObj.actionPowerMultIncrease + "</b> to Action Power per level <br>")) +
-        "(x<b><span id='"+actionVar+"ActionPowerMult'></b> total mult from level)<br>";
+        "(x<b><span id='"+actionVar+"ActionPowerMult'></b> total Action Power from level)<br>" +
+        actionObj.onLevelText;
 
     let levelInfoContainer =
         "<div id='"+actionVar+"LevelInfoContainer' style='display:none;padding:3px;'>" +
         onComplete +
         onLevelText +
-        (actionObj.isGenerator?(""):"<br>Send up ["+actionObj.momentumName+" consumption rate] downstream to each of the actions that also use " + actionObj.momentumName) +
+        (actionObj.isGenerator?(""):"<br>Send up to ["+actionObj.momentumName+" consumption rate] downstream to each of the actions that also use " + actionObj.momentumName) +
         actionObj.extraInfo+""+
         "</div>";
 
@@ -102,9 +108,9 @@ function generateActionDisplay(actionVar) {
     }
 
     let expertiseModsStr = "<br>Stat Modifiers to Expertise:<br>";
-    if(actionObj.expertiseStats) {
+    if(actionObj.efficiencyStats) {
         let totalAmount = 1;
-        actionObj.expertiseStats.forEach(function (expertiseStat) {
+        actionObj.efficiencyStats.forEach(function (expertiseStat) {
             let name = expertiseStat[0];
             let ratio = expertiseStat[1] * 100 + "%";
             if(data.stats[name] === undefined) {
@@ -143,11 +149,10 @@ function generateActionDisplay(actionVar) {
     let momentumContainer =
         "<div id='"+actionVar+"MomentumContainer' style='margin:3px;'>" +
         "<span style='font-size:12px;'>Tier <b><span id='"+actionVar+"Tier'></span></span></b> | " +
-        capitalizeFirst(actionObj.momentumName)+": <b><span id='"+actionVar+"Momentum'>0</span></b> " +
-        "("+
-        (actionObj.isGenerator?"+<b><span id='"+actionVar+"ActionPowerDelta'></span></b>/s, ":"") +
-        "Δ<b><span id='"+actionVar+"MomentumDelta'>1.00</span></b>/s" +
-        ")" +
+        capitalizeFirst(actionObj.momentumName)+": <b><span id='"+actionVar+"Momentum'>0</span></b><br>" +
+        "+<b><span id='"+actionVar+"MomentumIncrease'></span></b>/s, " +
+        "-<b><span id='"+actionVar+"MomentumDecrease'></span></b>/s, "  +
+        "Δ<b><span id='"+actionVar+"MomentumDelta'>1.0</span></b>/s" +
         // ": <span id='"+actionVar+"RealX'></span>, <span id='"+actionVar+"RealY'></span>" + //TODO debug only
         "</div>" +
         (actionObj.isGenerator?"":("<div style='margin:3px;font-size:10px;'>Progress/s = "+actionObj.tierMult()*100+"% of "+actionObj.momentumName+" * efficiency:</div>"));
@@ -178,14 +183,14 @@ function generateActionDisplay(actionVar) {
         createDownStreamSliders(actionObj) +
         "<span id='"+actionVar+"AllZeroButton' onclick='toggleAllZero(\""+actionVar+"\")' class='buttonSimple' style='margin-right:3px;width:30px;height:30px;text-align:center;cursor:pointer;padding:0 4px;'>All 0</span>" +
         "<span id='"+actionVar+"AllEqualButton' onclick='toggleAllHundred(\""+actionVar+"\")' class='buttonSimple' style='margin-right:3px;width:30px;height:30px;text-align:center;cursor:pointer;padding:0 4px;'>All 100</span>" +
-        "<div>Sending "+actionObj.momentumName+"/s downstream: <b><span id='"+actionVar+"TotalSend'>1</span></b>/s</div>" +
-        "</div>";
+        "<div>Total "+actionObj.momentumName+" sending downstream: <b><span id='"+actionVar+"TotalSend'>1</span></b>/s</div>"
+        + "</div>";
 
     let newX = actionObj.realX + 4000;
     let newY = actionObj.realY + 4000;
 
     theStr +=
-        "<div id='"+actionVar+"Container' style='border:2px solid var(--border-color);background-color:var(--bg-secondary);position:absolute;left:"+newX+"px;top:"+newY+"px;width:300px;min-height:50px;'>" +
+        "<div id='"+actionVar+"Container' style='border:2px solid var(--border-color);background-color:var(--bg-secondary);position:absolute;left:"+newX+"px;top:"+newY+"px;width:300px;min-height:150px;'>" +
         title +
         menuContainer +
         momentumContainer +
@@ -232,7 +237,9 @@ function generateActionDisplay(actionVar) {
     view.cached[actionVar + "ActionPower"] = document.getElementById(actionVar + "ActionPower");
     view.cached[actionVar + "ActionPowerMult"] = document.getElementById(actionVar + "ActionPowerMult");
     view.cached[actionVar + "ExpToAdd"] = document.getElementById(actionVar + "ExpToAdd");
-    view.cached[actionVar + "ActionPowerDelta"] = document.getElementById(actionVar + "ActionPowerDelta");
+    view.cached[actionVar + "MomentumIncrease"] = document.getElementById(actionVar + "MomentumIncrease");
+    view.cached[actionVar + "MomentumDecrease"] = document.getElementById(actionVar + "MomentumDecrease");
+    view.cached[actionVar + "AmountToSend"] = document.getElementById(actionVar + "AmountToSend");
     view.cached[actionVar + "ExpToLevelIncrease"] = document.getElementById(actionVar + "ExpToLevelIncrease");
     view.cached[actionVar + "Level"] = document.getElementById(actionVar + "Level");
     view.cached[actionVar + "MaxLevel"] = document.getElementById(actionVar + "MaxLevel");
@@ -273,7 +280,7 @@ function createDownStreamSliders(actionObj) {
             "<div id='"+actionObj.actionVar+"SliderContainer"+downstreamVar+"' style='margin-bottom: 5px;margin-top:5px;font-size:12px;'>" +
             "<b><span style='margin-bottom: 10px;cursor:pointer;' onclick='actionTitleClicked(`"+downstreamVar+"`)'>"+title+"</span></b>" +
             " (+<b><span id='"+actionObj.actionVar+"DownstreamSendRate"+downstreamVar+"'>0</span></b>/s)<br>" +
-            "<input type='number' id='"+actionObj.actionVar+"NumInput"+downstreamVar+"' value='0' min='0' max='100' oninput='validateInput(\""+actionObj.actionVar+"\", \""+downstreamVar+"\")' onchange='updateSlider(\""+actionObj.actionVar+"\", \""+downstreamVar+"\")' style='margin-right: 3px;font-size:10px;width:32px;'>" +
+            "<input type='number' id='"+actionObj.actionVar+"NumInput"+downstreamVar+"' value='0' min='0' max='100' oninput='validateInput(\""+actionObj.actionVar+"\", \""+downstreamVar+"\")' onchange='updateSlider(\""+actionObj.actionVar+"\", \""+downstreamVar+"\")' style='margin-right: 3px;font-size:10px;width:37px;'>" +
             "<input type='range' id='"+actionObj.actionVar+"RangeInput"+downstreamVar+"' value='0' min='0' max='100' oninput='updateNumber(\""+actionObj.actionVar+"\", \""+downstreamVar+"\")' style='margin-left:5px;width:200px;font-size:10px;height:5px;margin-bottom:8px;'>" +
             "</div>"
 

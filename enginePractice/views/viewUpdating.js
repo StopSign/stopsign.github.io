@@ -27,7 +27,7 @@ function updateStatView(statName) {
     let stat = data.stats[statName];
     let prevStat = prevState.stats[statName];
     let forceUpdate = !prevStat;
-    let roundedNumbers = [["num", 1], ["perSecond", 2], ["mult", 3]];
+    let roundedNumbers = [["num", 2], ["perSecond", 2], ["mult", 3]];
 
     roundedNumbers.forEach(obj => {
         let capName = capitalizeFirst(obj[0]);
@@ -50,9 +50,9 @@ function updateActionView(actionName) {
 
     let roundedNumbers = [["progress", 2], ["progressMax", 2], ["progressGain", 2],
         // ["realX", 1], ["realY", 1],
-        ["actionPower", 3], ["momentum", 2], ["momentumDelta", 2],
+        ["actionPower", 3], ["momentum", 2], ["momentumDelta", 2], ["amountToSend", 3],
         ["level", 1], ["maxLevel", 1], ["tier", 1],
-        ["exp", 2], ["expToLevel", 2], ["expToAdd", 2], ["actionPowerDelta", 3], ["actionPowerMult", 3],
+        ["exp", 2], ["expToLevel", 2], ["expToAdd", 2], ["momentumIncrease", 2], ["momentumDecrease", 2], ["actionPowerMult", 3],
         ["totalSend", 3], ["expToLevelMult", 5], ["expertiseMult", 3], ["expertiseBase", 2],
         ["unlockCost", 2], ["expertise", 1]];
     let roundWithoutSig = ["progressMaxIncrease", "expToLevelIncrease"];
@@ -103,8 +103,8 @@ function updateActionView(actionName) {
             document.getElementById(`${actionName}_${expStat[0]}StatExpMult`).innerHTML = intToString(action[expStat[0]+"StatExpMult"], 3);
         });
     }
-    if(action.expertiseStats) {
-        action.expertiseStats.forEach(function(expertiseStat) {
+    if(action.efficiencyStats) {
+        action.efficiencyStats.forEach(function(expertiseStat) {
             document.getElementById(`${actionName}_${expertiseStat[0]}StatExpertiseMult`).innerHTML = intToString(action[expertiseStat[0]+"StatExpertiseMult"], 3);
         });
     }
@@ -142,6 +142,9 @@ function updateActionView(actionName) {
             //if downstream is invisible, hide relevant action's slider area
             let prevDownstreamObj = prevState.actions[downstreamVar];
             if(forceUpdate || prevDownstreamObj.visible !== downstreamObj.visible) {
+                if(!document.getElementById(actionName + "_" + downstreamVar + "_Line_Border")) {
+                    console.log('missing div for ' + actionName + ', downstream: ' + downstreamVar);
+                }
                 if(downstreamObj.visible) {
                     view.cached[downstreamVar+"Container"].style.display = "block";
                     document.getElementById(actionName + "_" + downstreamVar + "_Line_Border").style.display = "block";

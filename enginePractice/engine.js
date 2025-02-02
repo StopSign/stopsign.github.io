@@ -13,7 +13,7 @@ function createAndLinkNewStat(statVar) {
     statObj.linkedActionExpertiseStats = [];
     statObj.add = function (amount) {
         statObj.num += amount;
-        statObj.mult = Math.pow(1.01, statObj.num); //calc only when adding
+        statObj.mult = Math.pow(1.1, statObj.num); //calc only when adding
         statObj.linkedActionExpStats.forEach(function (actionVar) {
             data.actions[actionVar].calcStatMult();
         })
@@ -60,6 +60,7 @@ function createAndLinkNewAction(actionVar, dataObj, title, x, y, downstreamVars)
     actionObj.generatorSpeed = dataObj.generatorSpeed ? dataObj.generatorSpeed : 1;
     actionObj.momentum = 0;
     actionObj.momentumDelta = 0;
+    actionObj.momentumIncrease = 0;
     actionObj.momentumName = dataObj.momentumName ? dataObj.momentumName : "momentum";
     actionObj.expToLevelIncrease = dataObj.expToLevelIncrease; //Can be played with w/o issue at beginning of run
     actionObj.actionPowerMultIncrease = dataObj.actionPowerMultIncrease ? dataObj.actionPowerMultIncrease : 1; //actionPowerMultIncrease must always > progressMaxIncrease on non-flat
@@ -82,17 +83,19 @@ function createAndLinkNewAction(actionVar, dataObj, title, x, y, downstreamVars)
     actionObj.onCompleteCustom = dataObj.onCompleteCustom ? dataObj.onCompleteCustom : function() {};
     actionObj.onLevelCustom = dataObj.onLevelCustom ? dataObj.onLevelCustom : function() {};
     actionObj.onCompleteText = (dataObj.onCompleteText && dataObj.onCompleteText[language]) ? dataObj.onCompleteText[language] : "";
+    actionObj.onLevelText = (dataObj.onLevelText && dataObj.onLevelText[language]) ? dataObj.onLevelText[language] : "";
     actionObj.storyText = (dataObj.storyText && dataObj.storyText[language]) ? dataObj.storyText[language] : "";
     actionObj.extraInfo = (dataObj.extraInfo && dataObj.extraInfo[language]) ? dataObj.extraInfo[language] : "";
 
-    actionObj.expertiseStats = dataObj.expertiseStats ? dataObj.expertiseStats : [];
+    actionObj.efficiencyStats = dataObj.efficiencyStats ? dataObj.efficiencyStats : [];
     actionObj.expertiseBase = dataObj.expertiseBase ? dataObj.expertiseBase : 1; //1 = 100%
     actionObj.expertiseMult = dataObj.expertiseMult ? dataObj.expertiseMult : 1;
     actionObj.expertise = actionObj.expertiseBase * actionObj.expertiseMult; //the initial and the multiplier (increases on stat add)
-    actionObj.efficiency = actionObj.expertise > 1 ? 100 : actionObj.expertise * 100;
+    actionObj.efficiencyMax = dataObj.efficiencyMax ? dataObj.efficiencyMax : 200;
+    actionObj.efficiency = actionObj.expertise > dataObj.efficiencyMax  ? dataObj.efficiencyMax : actionObj.expertise * 100;
 
-    let theMult = actionObj.actionPowerBase * actionObj.actionPowerMult * (actionObj.efficiency/100);
-    actionObj.actionPower = actionObj.actionPowerFunction ? actionObj.actionPowerFunction(theMult) : theMult;
+    actionObj.actionPower = actionObj.actionPowerBase * actionObj.actionPowerMult * (actionObj.efficiency/100);
+
 
     actionObj.onCompleteBasic = function() {
         actionObj.completions += 1;
@@ -104,19 +107,23 @@ function createAndLinkNewAction(actionVar, dataObj, title, x, y, downstreamVars)
             actionObj.progressMax = actionObj.progressMaxBase * actionObj.progressMaxMult;
             actionObj.expToLevelBase *= actionObj.expToLevelIncrease;
             actionObj.expToLevel = actionObj.expToLevelBase * actionObj.expToLevelMult;
+            actionObj.actionPowerMult *= actionObj.actionPowerMultIncrease;
             actionObj.calcActionPower();
             actionObj.onLevelStats.forEach(function (statObj) {
                 let name = statObj[0];
                 let amount = statObj[1];
+                if(!data.stats[name]) {
+                    console.log('The stat ' + name + ' doesnt exist');
+                }
                 data.stats[name].add(amount);
             });
             actionObj.onLevelCustom();
         }
     }
+    //power = base * mult * efficiency
+    //power = powerFunction?(power)
     actionObj.calcActionPower = function() {
-        actionObj.actionPowerMult *= actionObj.actionPowerMultIncrease;
-        let theMult = actionObj.actionPowerBase * actionObj.actionPowerMult * (actionObj.efficiency/100);
-        actionObj.actionPower = actionObj.actionPowerFunction ? actionObj.actionPowerFunction(theMult) : theMult;
+        actionObj.actionPower = actionObj.actionPowerBase * actionObj.actionPowerMult * (actionObj.efficiency/100);
     }
 
     actionObj.progressRate = function() { //Rate of drain for momentum
@@ -145,7 +152,7 @@ function createAndLinkNewAction(actionVar, dataObj, title, x, y, downstreamVars)
     }
     actionObj.calcStatExpertise = function() {
         actionObj.expertiseMult = 1;
-        actionObj.expertiseStats.forEach(function(expertiseStat) {
+        actionObj.efficiencyStats.forEach(function(expertiseStat) {
             let name = expertiseStat[0];
             let ratio = expertiseStat[1];
             if(!data.stats[name]) {

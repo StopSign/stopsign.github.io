@@ -90,6 +90,7 @@ function gameTick() {
     data.actionNames.forEach(function(actionName) {
         let actionObj = data.actions[actionName];
         actionObj.momentumDelta = 0; //reset
+        actionObj.momentumIncrease = 0; //reset
     });
     data.actionNames.forEach(function(actionName) {
         tickGameObject(actionName);
@@ -133,7 +134,9 @@ function tickGameObject(actionVar) {
     //2. later, if non-generator, an upstream action will add how much it is sending to this actions momentumDelta
     if(actionObj.isGenerator) {
         actionObj.momentumDelta = actionObj.actionPower / actionObj.progressMax * rateInefficient * ticksPerSecond;
-        actionObj.actionPowerDelta = actionObj.momentumDelta;
+        if(actionVar === "overclock") {
+            actionObj.momentumIncrease = actionObj.momentumDelta;
+        }
     } else {
         //how much it's consuming.
         actionObj.momentumDelta -= momentumToAdd * ticksPerSecond;
@@ -151,7 +154,8 @@ function tickGameObject(actionVar) {
         actionObj.onCompleteBasic();
     }
     //sending a % to the self, so increase used there if relevant
-    actionObj.totalSend = actionObj.isGenerator||atMaxLevel ? 0 : (rateInefficient * ticksPerSecond);
+    actionObj.momentumDecrease = actionObj.isGenerator||atMaxLevel ? 0 : (rateInefficient * ticksPerSecond);
+    actionObj.totalSend = 0;
 
     actionObj.downstreamVars.forEach(function (downstreamVar) {
         let downstreamAction = data.actions[downstreamVar];
@@ -162,6 +166,7 @@ function tickGameObject(actionVar) {
         let mult = (view.cached[actionVar+"NumInput"+downstreamVar].value-0)/100;
         let taken = actionObj.progressRateReal() * mult;
         actionObj.totalSend += taken * ticksPerSecond;
+        actionObj.momentumDecrease += taken * ticksPerSecond;
 
         //sends to unlock cost first if needed
         giveMomentumTo(actionObj, downstreamAction, taken);
@@ -188,4 +193,5 @@ function addMomentumTo(downstreamAction, amount) {
     }
     downstreamAction.momentum += amount;
     downstreamAction.momentumDelta += amount * ticksPerSecond;
+    downstreamAction.momentumIncrease += amount * ticksPerSecond;
 }

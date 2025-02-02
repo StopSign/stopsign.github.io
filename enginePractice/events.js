@@ -199,7 +199,7 @@ function clickActionMenu(actionVar, containerId, buttonId) {
     deselectActionMenus(actionVar);
     if (toggleOn) {
         container.style.display = "block";
-        button.style.backgroundColor = "var(--warning-color)";
+        button.style.backgroundColor = "var(--selection-color)";
     }
 }
 
@@ -280,7 +280,7 @@ function clickedStatName(statName) {
                 statFoundInUse = true;
             }
         });
-        actionObj.expertiseStats.forEach(function(statObj) {
+        actionObj.efficiencyStats.forEach(function(statObj) {
             if(statObj[0] === statName) {
                 statFoundInUse = true;
             }
@@ -288,10 +288,10 @@ function clickedStatName(statName) {
 
         let color = "black;"
         if(statFoundInUse && statFoundInGain) {
-            color = "orange";
+            color = "blue";
         }
         if(statFoundInUse && !statFoundInGain) {
-            color = "blue";
+            color = "orange";
         }
         if(!statFoundInUse && statFoundInGain) {
             color = "green";

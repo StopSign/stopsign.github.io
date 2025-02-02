@@ -1,5 +1,5 @@
 //Driver globals
-let gameSpeed = 1;
+let gameSpeed = 10;
 let bonusSpeed = 1;
 
 let curTime = new Date();
@@ -41,7 +41,8 @@ let globalVisible = true;
 
 function initializeData() {
 
-    statTitles.push(["Overclock Stats", "processing"]);
+    statTitles.push(["Overclock Stats", "abilityPower"]);
+    createAndLinkNewStat("abilityPower"); //improves efficiency of overclock & others. Comes from Overwhelm
     createAndLinkNewStat("processing"); //
     createAndLinkNewStat("focus"); //
     createAndLinkNewStat("energy"); //
@@ -50,7 +51,6 @@ function initializeData() {
     createAndLinkNewStat("ambition");
     // createAndLinkNewStat("resilience"); //Energy
     createAndLinkNewStat("diligence"); //
-    // createAndLinkNewStat("confidence");
 
     statTitles.push(["Social Stats", "charm"]);
     createAndLinkNewStat("charm"); //exuding warmth, connecting
@@ -63,6 +63,9 @@ function initializeData() {
     // createAndLinkNewStat("influence");
     createAndLinkNewStat("haggling");
     createAndLinkNewStat("recognition");
+    createAndLinkNewStat("scottFamiliarity");
+    createAndLinkNewStat("confidence");
+    createAndLinkNewStat("presentation");
     // createAndLinkNewStat("credibility");
     // createAndLinkNewStat("deception"); //hot chip & lie
     // createAndLinkNewStat("negotiation"); //convincing/persuasion
@@ -88,6 +91,7 @@ function initializeData() {
     //Combined Stats
     statTitles.push(["General Stats", "pathfinding"]);
     createAndLinkNewStat("pathfinding");
+    createAndLinkNewStat("observation");
     // createAndLinkNewStat("curiosity");
     // createAndLinkNewStat("patience");
     // createAndLinkNewStat("strategy");
@@ -101,16 +105,20 @@ function initializeData() {
     createAndLinkNewStat("villagersKnown");
 
     //intro
-    create("overclock", ["reflect", "makeMoney", "travelOnRoad", "socialize"], 0, 0);
-    create("reflect", ["rememberTheFallen", "peruseLibrary"], -1.1, -1.1);
+    create("overclock", ["overwhelm", "makeMoney", "travelOnRoad", "socialize"], 0, 0);
+    create("overwhelm", ["processThoughts"], -1.1, -1.1);
+    create("processThoughts", ["reflect"], -1, -1);
+    create("reflect", ["journal", "remember", "introspect"], -1, -1);
+    create("journal", ["takeNotes"], 0, 1);
+    create("takeNotes", [], 0, 1);
     create("makeMoney", ["spendMoney"], 0, -1.6);
     create("spendMoney", ["fillBasicNeeds"], 0, -1);
     create("travelOnRoad", ["travelToOutpost", "clearTheTrail"], 1.5, 0);
     create("clearTheTrail", ["paveTheTrail"], 0, 1); //increase travel expertise
         create("paveTheTrail", [], 0, 1); //increase travel expertise to max. Req builder skills
-    create("travelToOutpost", ["reportForDuty", "travelToCrossroads"], 1.5, 0);
+    create("travelToOutpost", ["checkNoticeBoard", "travelToCrossroads"], 1.5, 0);
 
-    create("reportForDuty", ["meetVillageLeaderScott", "reportForTraining", "reportForLabor"], 0, -1);
+    create("checkNoticeBoard", ["meetVillageLeaderScott", "reportForTraining", "reportForLabor"], 0, -1);
     create("meetVillageLeaderScott", ["helpScottWithChores"], -1.1, -1);
     create("helpScottWithChores", [], 0, -1);
     create("fillBasicNeeds", ["buyClothing", "eatBetterFood"], -.5, -1);

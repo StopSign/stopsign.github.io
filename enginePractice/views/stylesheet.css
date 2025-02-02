@@ -14,9 +14,9 @@
     --exp-color:#7b5fc1;
     --momentum-color:#4e8d49;
     --mana-color:#74c7ec;
-    --gold-color:#ffde24;
-    --conversations-color:#ffde24;
-    --garcana-color:#ffde24;
+    --gold-color: #a28a00;
+    --conversations-color: #007c6b;
+    --arcana-color: #c620f5;
 }
 
 body.lightMode {
@@ -37,8 +37,8 @@ body.lightMode {
     --momentum-color:#a6e3a1;
     --mana-color:#74c7ec;
     --gold-color:#ffde24;
-    --conversations-color:#ffde24;
-    --garcana-color:#ffde24;
+    --conversations-color: #c8fff4;
+    --arcana-color:#c620f5;
 }
 
 body {
