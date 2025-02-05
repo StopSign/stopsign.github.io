@@ -360,7 +360,6 @@ input {
 }
 
 #statDisplay {
-    background-color: var(--overlay-color) !important;
     border: 1px solid var(--border-color);
     color: var(--text-primary);
 }

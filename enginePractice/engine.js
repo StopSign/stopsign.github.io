@@ -77,6 +77,7 @@ function createAndLinkNewAction(actionVar, dataObj, title, x, y, downstreamVars)
     actionObj.maxLevel = dataObj.maxLevel ? dataObj.maxLevel : -1;
     actionObj.tier = dataObj.tier;
     actionObj.moneyMult = dataObj.moneyMult ? dataObj.moneyMult : 0;
+    actionObj.wage = dataObj.wage ? dataObj.wage : null;
 
 
     actionObj.onUnlock = dataObj.onUnlock ? dataObj.onUnlock : function() {};
@@ -86,6 +87,7 @@ function createAndLinkNewAction(actionVar, dataObj, title, x, y, downstreamVars)
     actionObj.onLevelText = (dataObj.onLevelText && dataObj.onLevelText[language]) ? dataObj.onLevelText[language] : "";
     actionObj.storyText = (dataObj.storyText && dataObj.storyText[language]) ? dataObj.storyText[language] : "";
     actionObj.extraInfo = (dataObj.extraInfo && dataObj.extraInfo[language]) ? dataObj.extraInfo[language] : "";
+    actionObj.unlockMessage = (dataObj.unlockMessage && dataObj.unlockMessage[language]) ? dataObj.unlockMessage[language] : "";
 
     actionObj.efficiencyStats = dataObj.efficiencyStats ? dataObj.efficiencyStats : [];
     actionObj.expertiseBase = dataObj.expertiseBase ? dataObj.expertiseBase : 1; //1 = 100%

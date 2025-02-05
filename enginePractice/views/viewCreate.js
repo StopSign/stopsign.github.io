@@ -143,8 +143,10 @@ function generateActionDisplay(actionVar) {
     let lockOverAll = "<div id='"+actionVar+"LockContainer' " +
         "style='position:absolute;background-color: var(--bg-secondary);width:100%;height:100%;top:0;text-align:center;'>" +
         "<span id='"+actionVar+"LockIcon'></span><br>" +
-        "<span>Needs <b><span id='"+actionVar+"UnlockCost'>0</span></b> "+(data.actions[actionObj.parent]?data.actions[actionObj.parent].momentumName:"ERROR") +
-        "<br>sent from <b>" + (data.actions[actionObj.parent]?data.actions[actionObj.parent].title:"ERROR") + "</b></span>" +
+        "<span>Needs <b><span id='"+actionVar+"UnlockCost'>0</span></b> " + actionObj.momentumName +
+        "<br>sent from <b>" + (data.actions[actionObj.parent]?data.actions[actionObj.parent].title:"WAIT") + "</b>.<br>" + //generally just not loaded yet
+        actionObj.unlockMessage +
+        "</span>" +
         "</div>";
     let momentumContainer =
         "<div id='"+actionVar+"MomentumContainer' style='margin:3px;'>" +

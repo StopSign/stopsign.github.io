@@ -6,6 +6,7 @@ actionData.overclock.onCompleteText = {english:"+<b><span id='overclockActionPow
 actionData.makeMoney.onCompleteText = {english:"-<b><span id='makeMoneyActionPower'>1</span></b> Momentum taken from this action.<br>" +
         "+<b><span id='makeMoneyAmountToSend'>1</span></b> gold in Spend Money<br>"}
 // actionData.reflect.onLevelText = {english:"+2 to the max level of Overwhelm<br>+2 to the max level of Process Thoughts"}
+actionData.makeMoney.extraInfo = {english:"<br>Exp & Gold gain = log(Momentum/100 * Action Power)^2 * Efficiency * Wages."}
 
 //Story Text:
 actionData.reflect.storyText = {english:"Your world ended, and they only live on through you. Think about what they would have wanted for you, and on how much you miss them, and let it drive you forward. This is an internal story as much as it is an external one."}
@@ -32,7 +33,7 @@ actionData.spendMoney.storyText={english:"At this village there are not many thi
 // actionData.socialize.storyText = {english:"socialize info"};
 
 //Money
-actionData.makeMoney.extraInfo = {english:"<br>Exp & Gold gain = log(Momentum/100 * Action Power)^2 * Efficiency."}
+
 
 
 // actionData.makeMoney.onCompleteText = {english:"+<b><span id=\"makeMoneyActionPower\">1</span></b> Gold<br>"};

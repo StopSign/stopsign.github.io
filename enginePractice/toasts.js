@@ -10,30 +10,57 @@ let toastIdCounter = 0; // to give each toast a unique ID
 function initializeToasts() {
     createToastModal();
     createToast(function() { return true; },
-        "Welcome! Click Here for Info!", "Welcome to the game! These messages will serve as the tutorial, so make sure to click these popups and read them for information, and only delete them with X when you're ready. The game will be straightforward in the beginning, while introducing the concepts. Feel free to ignore the messages and learn by watching instead.<b>Open the next message.</b><br>TODO You can access them again in the Help -> Messages screen.");
+        "Welcome! Click Here for Info!",
+        "Welcome to the game! These messages will serve as the tutorial, so " +
+        "make sure to click these popups and read them for information, and only delete them with X when you're ready. Feel free to ignore the messages " +
+        "and learn by watching instead.<b>Open the next message.</b><br>TODO You can access them again in the Menu -> Messages screen.");
     createToast(function() { return toastIsClicked(0); },
-        "Controls to Move Around", "Click or right click and drag around to move the game window, or use WASD. Use the mouse scroll wheel or the [+] and [-] to zoom in and out. Click the names of Actions to center the screen on them. Click the ^ to center the screen around the parent, all the way to Overclock. <b>Open the next message.</b>");
+        "Controls to Move Around",
+        "Click/right click and drag to move the game window. WASD also. " +
+        "Use the mouse scroll wheel or the [+] and [-] to zoom in and out. Click the names of Actions to center the screen " +
+        "on them. Click the ^ to center the screen around the parent, all the way to Overclock. <b>Open the next message.</b>");
     createToast(function() { return toastIsClicked(1); },
-        "Overclock Info", "The game starts with the Overclock action. Your primary gameplay control is to change the setting to keep or send the game's primary resource - Momentum - onwards to the downstream Actions. <b>Send enough Momentum from Overclock to Overwhelm to unlock it (Set the slider to 100%).</b>");
+        "Overclock Info",
+        "The game starts with the Overclock action. Your primary gameplay control is to change " +
+        "the percentage to keep or send the Action's resource (Momentum) onwards to the downstream Actions. <b>Send enough " +
+        "Momentum from Overclock to Overwhelm to unlock it (Set the slider to 100%).</b>");
     createToast(function() { return toastIsClicked(2)  && (data.actions.overclock.downstreamRateoverwhelm-0) > 0; },
-        "Game Math on Sending with Tiers", "Overclock is a Tier 0 Action. Tier sets the base rate of sending, with each tier increase being a 10x lower (tier 0 is 10%/s, tier 1 is 1%/s, etc.). NOTE: higher tiers make momentum move slower, they do NOT waste momentum. If Overclock had 100% efficiency and 100% send rate set (the slider), it would be sending up to 10% of it's current Momentum to each of the downstream actions. However, Overclock is not at 100% efficiency, it is at 10% efficiency, so it sends 1% momentum/s for now.");
-    createToast(function() { return toastIsClicked(3); },
-        "Game Math on Sending with Efficiency", "Effiency makes sending slower - like Tier, this does not waste Momentum in Sending. Efficiency can be increased up to 100% via Stats, found in the Stats tab of each action. For Generator Actions like Overclock, efficiency also affects how fast they complete their progress. Eventually, at 100% efficiency, Overclock will be 1/s. <b>Unlock Overwhelm</b>");
+        "Game Math on Sending with Tiers",
+        "Rate of sending = Tier mult * efficiency. As Tier 0, Overclock gets 10% of current Momentum/s. Tier 1 is 1%, then .1%, etc.");
     createToast(function() { return data.actions.overwhelm.unlocked; },
-        "Consuming Progress on Overwhelm", "Overwhelm is the more common type of action - it can Receive, Consume, and Send. Currently, you have no more downstream actions for Overwhelm, so this Action will only use the Momentum it Receives to Consume. While the action is not at max level, Consume will be turned on, which means that Momentum is converted to Progress to fill the top, light green bar. The rate is efficiency * tier rate - the equivalent of a 100% send rate to a downstream action. However, consumption WILL waste the momentum in the conversion according to the efficiency, meaning it will take the 100% efficiency rate and gain progress to the lower rate.");
-    createToast(function() { return toastIsClicked(5); },
-        "Exp and Leveling", "When the progress bar is full, it will gain 1 exp into the lower, purple bar, and when that is full you level up, gaining 1) stats 2) increased Action Power and 3) increased progress/exp requirements. The amount of exp gained will remain at 1 until much later in the game.");
-    createToast(function() { return toastIsClicked(6); },
-        "Leveling Stats with Overwhelm", "The Stats tab contains 1) Which stats the action gains on level up 2) Which stats reduce the amount of exp to level, and by how much 3) Which stats increase expertise, and by how much. The stat bonus is 1.01^stat. For example, Overwhelm will gain +5 Drive when it levels up, which increases the stat bonus by 1.01^5 = x1.051. Overclock uses 1000% of this bonus, or 10 x .051 + 1 = x1.51, which is applied to Overclock's original 10% efficiency to become x1.051. <b>Get Overwhelm to Level 3</b>");
-    createToast(function() { return data.actions.overwhelm.level >= 2; },
-        "Max Level", "When the level is maxed, momentum will not be Consumed, but it will still be sent (if possible). Overwhelm doesn't have any downstream actions, so until you raise its max level, you should <b>stop sending Momentum to Overwhelm</b>. Remember, letting Momentum build on Overclock is simply holding it momentarily, as Overclock does not Consume.");
-    createToast(function() { return toastIsClicked(8); },
-        "Next Steps", "You always want to be working towards unlocking whatever actions are visible. Shift the Momentum around the Action web to do so!");
+        "Exp and Leveling",
+        "When the progress bar is full, an Action will gain 1 exp into the lower, purple bar, " +
+        "and when that is full you level up, gaining 1) stats 2) increased Action Power and 3) increased progress/exp " +
+        "requirements. The amount of exp gained will remain at 1 until much later in the game.");
+    createToast(function() { return toastIsClicked(4); },
+        "Consuming Progress on Overwhelm",
+        "Overwhelm is the a common type of action. It can Receive, " +
+        "Consume, and Send. It receives momentum from the upstream action. It will always be consuming, and you can optionally set the downstream sliders to send momentum onwards. " +
+        "The consumption rate is the same as a single 100% slider (that you can't turn off).<br><br>Unlock a few actions to explore the world.");
+    createToast(function() { return data.actions.overwhelm.unlocked; },
+        "Leveling Stats with Overwhelm",
+        "The Stats tab contains 1) Which stats the action gains on level up " +
+        "2) Which stats reduce the amount of exp to level, and by how much 3) Which stats increase expertise, and by how " +
+        "much. The stat bonus is 1.01^stat. For example, Overwhelm will gain +5 Drive when it levels up, which increases " +
+        "the stat bonus by 1.01^5 = x1.051. Overclock uses 1000% of this bonus, or 10 x .051 + 1 = x1.51, which is applied " +
+        "to Overclock's original 10% efficiency to become x1.051. <b>Get Overwhelm to Level 3</b>");
+    createToast(function() { return data.actions.processThoughts.unlocked; },
+        "Efficiency",
+        "Process Thoughts uses efficiency in two ways. 1) It slows down the rate at which the Action consumes and sends. " +
+        "2) It reduces the amount of successfully consumed Momentum - only this part \"wastes\" Momentum.");
+    createToast(function() { return data.actions.reflect.unlocked; },
+        "Max Level",
+        "When the level is maxed, momentum will not be Consumed. If the max level is raised, Consumption will " +
+        "begin again. This means a maxxed level action can let all of the Momentum it receives be sent.");
+    createToast(function() { return data.actions.reflect.level >= 1 },
+        "Next Steps",
+        "You always want to be working towards unlocking whatever actions are visible. Shift " +
+        "the Momentum around the Action web to do so!");
 
     createToast(function() { return data.actions.makeMoney.unlocked; },
-        "Making Money", "Momentum here will be converted to Gold every 10 seconds based on the Action Power, which is calculated as the square root of (current momentum * the mult gained from leveling). The Gold lands on the Spend Money action, which has it flowing downstream from there in the same way as Momentum. You're not very good at Making Money just yet - only 10% efficiency - but with some Work Ethic from jobs at the outpost, you'll get a lot better.");
-    createToast(function() { return data.actions.spendMoney.unlocked; },
-        "Spending Money", "You used to not have any money to spare, and now you do (Overwhelm + 1 max level).");
+        "Making Money",
+        "Momentum here will be converted to Gold on every completion. The formula is in Info, and it has a minimum " +
+        "of ~200 to start working. The generated value adds to both Exp on Make Money, as well as Gold on Spend Money.<br><br>To make a lot more money, get a better job at the outpost.");
     // createToast(function() {},
     //     "", "");
 

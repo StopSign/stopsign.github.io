@@ -300,3 +300,19 @@ function clickedStatName(statName) {
     });
 
 }
+
+
+//to be run when the jobs level up
+function changeJob(actionVar) {
+    //if the given job is better than the existing job, then switch
+    let contender = data.actions[actionVar];
+    let contenderWage = contender.wage;
+    if(contenderWage > data.currentWage) {
+        data.currentWage = contenderWage;
+        data.currentJob = actionVar;
+    }
+
+    //set displayed
+    document.getElementById("jobTitle").innerHTML = data.currentJob;
+    document.getElementById("jobWage").innerHTML = data.currentWage;
+}

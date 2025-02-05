@@ -1,5 +1,5 @@
 //Driver globals
-let gameSpeed = 10;
+let gameSpeed = 1;
 let bonusSpeed = 1;
 
 let curTime = new Date();
@@ -30,6 +30,8 @@ data.actionNames = [];
 data.stats = {};
 data.statNames = [];
 data.toastStates = []; // array of toast objects: {id, state, element}
+data.currentJob = "Beggar";
+data.currentWage = 1;
 
 let viewData = {}; //contains only things that are generated / not saved
 viewData.toasts = [];
@@ -40,6 +42,9 @@ let language = "english";
 let globalVisible = true;
 
 function initializeData() {
+    if(globalVisible) {
+        document.getElementById("jobDisplay").style.display = "";
+    }
 
     statTitles.push(["Overclock Stats", "abilityPower"]);
     createAndLinkNewStat("abilityPower"); //improves efficiency of overclock & others. Comes from Overwhelm
