@@ -149,6 +149,21 @@ function intToStringRound(value) {
     return Math.floor(value);
 }
 
+function secondsToTime(seconds) {
+    const hours = Math.floor(seconds / 3600);
+    const remainder = seconds % 3600;
+    const minutes = Math.floor(remainder / 60);
+    const secs = remainder % 60;
+
+    if (hours > 0) {
+        // If 60 minutes or more, use "hh:mm:ss"
+        return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+    } else {
+        // Otherwise, use "m:ss"
+        return `${minutes}:${String(secs).padStart(2, '0')}`;
+    }
+}
+
 function toSuffix(value) {
     value = Math.round(value);
     const suffixes = ["", "K", "M", "B", "T", "Qa", "Qi", "Sx", "Sp", "O", "N", "Dc", "Ud", "Dd", "Td", "qd", "Qd", "sd", "Sd", "Od", "Nd", "V"];

@@ -456,16 +456,7 @@ function initializeData() {
     */
 
 
-    setRealCoordinates('overclock');
-
-    data.actionNames.forEach(function (actionVar) { //wait until they are all created to link downstreams
-        generateActionDisplay(actionVar);
-    })
-    initializeToasts();
-    generateLinesBetweenActions();
-    updateAllActionStatMults();
-    actionTitleClicked(`overclock`);
-    initializeMenu();
+    initializeDisplay();
 }
 
 //will always be run once from the top action (TODO per page)

@@ -87,8 +87,8 @@ let actionData = {
     },
     overwhelm: {
         tier:1,
-        progressMaxBase:1, progressMaxMult:1, progressMaxIncrease:1.5,
-        expToLevelBase:2, expToLevelMult:1, expToLevelIncrease:1.5,
+        progressMaxBase:1, progressMaxMult:1, progressMaxIncrease:1.3,
+        expToLevelBase:2, expToLevelMult:1, expToLevelIncrease:1.3,
         expertiseBase:1,
         unlockCost:10, visible:true, unlocked:false,
         onCompleteCustom:function() {
@@ -105,8 +105,8 @@ let actionData = {
     },
     processThoughts: {
         tier:1,
-        progressMaxBase:1, progressMaxMult:1, progressMaxIncrease:1.5,
-        expToLevelBase:2, expToLevelMult:1, expToLevelIncrease:1.5,
+        progressMaxBase:1, progressMaxMult:1, progressMaxIncrease:1.3,
+        expToLevelBase:2, expToLevelMult:1, expToLevelIncrease:1.3,
         expertiseBase:.5,
         unlockCost:10, visible:false, unlocked:false,
         onCompleteCustom:function() {
@@ -130,9 +130,6 @@ let actionData = {
         onLevelCustom: function() {
             if(data.actions.reflect.level >= 1) {
                 unveilAction('travelOnRoad')
-            }
-            if(data.actions.reflect.level >= 3) {
-                unveilAction('makeMoney')
             }
         },
         onUnlock: function() {
@@ -265,8 +262,6 @@ let actionData = {
         onCompleteCustom:function() {
         },
         onUnlock: function() {
-            unveilAction('makeMoney')
-            unveilAction('spendMoney')
             data.actions.reflect.maxLevel++;
         },
         onLevelStats:[["focus", 1]],
@@ -335,17 +330,22 @@ let actionData = {
         },
         onLevelStats:[["diligence", 5]],
         expStats:[],
-        efficiencyStats:[["observation", .1]]
+        efficiencyStats:[["observation", .1]],
+        extraInfo:{english:"Unlocks new actions with each level."}
     },
     meetVillageLeaderScott: {
         tier:1,
-        progressMaxBase:5, progressMaxMult:1, progressMaxIncrease:3,
-        expToLevelBase:4, expToLevelMult:1, expToLevelIncrease:3,
+        progressMaxBase:50, progressMaxMult:1, progressMaxIncrease:5, //Greater than reflect
+        expToLevelBase:4, expToLevelMult:1, expToLevelIncrease:5,
         expertiseBase:.6, maxLevel:3,
         unlockCost:50, visible:false, unlocked:false, //visible:false
         onCompleteCustom:function() {
         },
         onLevelCustom: function() {
+            if(data.actions.meetVillageLeaderScott.level >= 1) {
+                unveilAction('makeMoney')
+                unveilAction('spendMoney')
+            }
             data.actions.helpScottWithChores.maxLevel++
         },
         onUnlock: function() {
@@ -354,34 +354,33 @@ let actionData = {
         expStats:[],
         onLevelStats:[["villagersKnown", 1]],
         efficiencyStats:[["scottFamiliarity", 1]],
-        unlockMessage:{english:"On unlock, +1 max level for Reflect."}
+        unlockMessage:{english:"On unlock, +1 max level for Reflect."},
+        extraInfo:{english:"On level up: Increases Help Scott With Chores max level by 1"}
     },
     helpScottWithChores: {
         tier:1,
-        progressMaxBase:5, progressMaxMult:1, progressMaxIncrease:3,
-        expToLevelBase:4, expToLevelMult:1, expToLevelIncrease:3,
+        progressMaxBase:5, progressMaxMult:1, progressMaxIncrease:4,
+        expToLevelBase:4, expToLevelMult:1, expToLevelIncrease:4,
         expertiseBase:.3, maxLevel:1,
         unlockCost:50, visible:false, unlocked:false, //visible:false
         onCompleteCustom:function() {
         },
         onLevelCustom: function() {
-            if(data.actions.helpScottWithChores.level >= 1) {
+            if(data.actions.helpScottWithChores.level >= 2) {
                 unveilAction('fillBasicNeeds')
             }
-            if(data.actions.helpScottWithChores.level >= 2) {
-                unveilAction('socialize')
-            }
-            if(data.actions.helpScottWithChores.level >= 3) {
+            if(data.actions.helpScottWithChores.level >= 4) {
                 unveilAction('buyClothing')
+            }
+            if(data.actions.helpScottWithChores.level >= 6) {
                 unveilAction('eatBetterFood')
             }
-            if(data.actions.helpScottWithChores.level >= 4) {
-                data.actions.reflect.maxLevel++;
-            }
+            data.actions.reflect.maxLevel++;
         },
         expStats:[],
         onLevelStats:[["villagersKnown", 1]],
-        efficiencyStats:[["scottFamiliarity", .5], ["villagersKnown", .5]]
+        efficiencyStats:[["scottFamiliarity", .5], ["villagersKnown", .5]],
+        extraInfo:{english:"Unlocks new actions every even level until 6. Increases reflect's max level by 1 per level."}
     },
 
     reportForLabor: {
@@ -444,13 +443,14 @@ let actionData = {
         },
         onLevelCustom: function() {
             data.actions.oddJobsLaborer.wage += actionData.oddJobsLaborer.wage;
-            changeJob("oddJobsLaborer");
+            changeJob('oddJobsLaborer');
             if(data.actions.oddJobsLaborer.level >= 15) {
-                unveilAction("chimneySweep");
+                unveilAction('chimneySweep');
             }
         },
         onUnlock:function() {
-            changeJob("oddJobsLaborer");
+            unveilAction('socialize');
+            changeJob('oddJobsLaborer');
         },
         expStats:[["workEthic", .5]],
         onLevelStats:[["streetKnowledge", 1], ["jobExperience", 1]],
@@ -467,13 +467,13 @@ let actionData = {
         },
         onLevelCustom: function() {
             data.actions.oddJobsLaborer.wage += actionData.oddJobsLaborer.wage;
-            changeJob("chimneySweep");
+            changeJob('chimneySweep');
             if(data.actions.oddJobsLaborer.level >= 15) {
-                unveilAction("handyman");
+                unveilAction('handyman');
             }
         },
         onUnlock:function() {
-            changeJob("chimneySweep");
+            changeJob('chimneySweep');
         },
         expStats:[["workEthic", .5]],
         onLevelStats:[["streetKnowledge", 1], ["jobExperience", 1]],
@@ -490,13 +490,13 @@ let actionData = {
         },
         onLevelCustom: function() {
             data.actions.oddJobsLaborer.wage += actionData.oddJobsLaborer.wage;
-            changeJob("handyman");
+            changeJob('handyman');
             if(data.actions.oddJobsLaborer.level >= 15) {
-                unveilAction("tavernHelper");
+                unveilAction('tavernHelper');
             }
         },
         onUnlock:function() {
-            changeJob("handyman");
+            changeJob('handyman');
         },
         expStats:[["workEthic", .5]],
         onLevelStats:[["streetKnowledge", 1], ["jobExperience", 1]],
@@ -513,13 +513,13 @@ let actionData = {
         },
         onLevelCustom: function() {
             data.actions.oddJobsLaborer.wage += actionData.oddJobsLaborer.wage;
-            changeJob("tavernHelper");
+            changeJob('tavernHelper');
             if(data.actions.oddJobsLaborer.level >= 15) {
-                unveilAction("guildReceptionist");
+                unveilAction('guildReceptionist');
             }
         },
         onUnlock:function() {
-            changeJob("tavernHelper");
+            changeJob('tavernHelper');
         },
         expStats:[["workEthic", .5]],
         onLevelStats:[["streetKnowledge", 1], ["jobExperience", 1]],
@@ -536,13 +536,13 @@ let actionData = {
         },
         onLevelCustom: function() {
             data.actions.oddJobsLaborer.wage += actionData.oddJobsLaborer.wage;
-            changeJob("guildReceptionist");
+            changeJob('guildReceptionist');
             if(data.actions.oddJobsLaborer.level >= 15) {
-                unveilAction("messenger");
+                unveilAction('messenger');
             }
         },
         onUnlock:function() {
-            changeJob("guildReceptionist");
+            changeJob('guildReceptionist');
         },
         expStats:[["workEthic", .5]],
         onLevelStats:[["streetKnowledge", 1], ["jobExperience", 1]],
@@ -559,13 +559,13 @@ let actionData = {
         },
         onLevelCustom: function() {
             data.actions.oddJobsLaborer.wage += actionData.oddJobsLaborer.wage;
-            changeJob("messenger");
+            changeJob('messenger');
             if(data.actions.oddJobsLaborer.level >= 15) {
-                unveilAction("townCrier");
+                unveilAction('townCrier');
             }
         },
         onUnlock:function() {
-            changeJob("messenger");
+            changeJob('messenger');
         },
         expStats:[["workEthic", .5]],
         onLevelStats:[["streetKnowledge", 1], ["jobExperience", 1]],
@@ -582,13 +582,13 @@ let actionData = {
         },
         onLevelCustom: function() {
             data.actions.oddJobsLaborer.wage += actionData.oddJobsLaborer.wage;
-            changeJob("townCrier");
+            changeJob('townCrier');
             if(data.actions.oddJobsLaborer.level >= 15) {
-                unveilAction("storyTeller");
+                unveilAction('storyTeller');
             }
         },
         onUnlock:function() {
-            changeJob("townCrier");
+            changeJob('townCrier');
         },
         expStats:[["workEthic", .5]],
         onLevelStats:[["streetKnowledge", 1], ["jobExperience", 1]],
@@ -605,13 +605,13 @@ let actionData = {
         },
         onLevelCustom: function() {
             data.actions.oddJobsLaborer.wage += actionData.oddJobsLaborer.wage;
-            changeJob("storyTeller");
+            changeJob('storyTeller');
             if(data.actions.oddJobsLaborer.level >= 15) {
-                unveilAction("handyman");
+                unveilAction('handyman');
             }
         },
         onUnlock:function() {
-            changeJob("storyTeller");
+            changeJob('storyTeller');
         },
         expStats:[["workEthic", .5]],
         onLevelStats:[["streetKnowledge", 1], ["jobExperience", 1]],

@@ -2,6 +2,17 @@
 
 function initializeDisplay() {
     //auto generated elements
+    setRealCoordinates('overclock');
+    data.actionNames.forEach(function (actionVar) { //wait until they are all created to link downstreams
+        generateActionDisplay(actionVar);
+    })
+    initializeToasts();
+    generateLinesBetweenActions();
+    cacheDownstreamViews();
+    updateAllActionStatMults();
+    actionTitleClicked(`overclock`);
+    initializeMenu();
+
 }
 
 function generateStatDisplay(statVar) {
@@ -29,6 +40,14 @@ function generateStatDisplay(statVar) {
     view.cached[statVar+"PerSecond"] = document.getElementById(statVar+"PerSecond");
     view.cached[statVar+"Mult"] = document.getElementById(statVar+"Mult");
     view.cached[statVar+"Name"] = document.getElementById(statVar+"Name");
+
+    //TODO foreach actionName, recurse through its stats and add the found divs to cache
+    //actionName + "_" + statVar + "StatExpMult"
+    //actionName + "_" + statVar + "StatExpertiseMult"
+
+    data.actionNames.forEach(function(actionName) {
+
+    });
 }
 
 function generateActionDisplay(actionVar) {
@@ -231,6 +250,7 @@ function generateActionDisplay(actionVar) {
     view.cached[actionVar + "ProgressMax"] = document.getElementById(actionVar + "ProgressMax");
     view.cached[actionVar + "Title"] = document.getElementById(actionVar + "Title");
     view.cached[actionVar + "Container"] = document.getElementById(actionVar + "Container");
+    view.cached[actionVar + "LockContainer"] = document.getElementById(actionVar + "LockContainer");
     view.cached[actionVar + "Momentum"] = document.getElementById(actionVar + "Momentum");
     view.cached[actionVar + "MomentumDelta"] = document.getElementById(actionVar + "MomentumDelta");
     view.cached[actionVar + "ProgressBarInner"] = document.getElementById(actionVar + "ProgressBarInner");
@@ -262,12 +282,22 @@ function generateActionDisplay(actionVar) {
 
     view.cached[actionVar + "RealX"] = document.getElementById(actionVar + "RealX");
     view.cached[actionVar + "RealY"] = document.getElementById(actionVar + "RealY");
+}
 
-    actionObj.downstreamVars.forEach(function(downstreamVar) {
-        view.cached[actionVar+"NumInput"+downstreamVar] = document.getElementById(actionVar+"NumInput"+downstreamVar);
+//Has to wait until the lines are initiated before it caches them.
+function cacheDownstreamViews() {
+    data.actionNames.forEach(function(actionVar) {
+        let actionObj = data.actions[actionVar];
+        actionObj.downstreamVars.forEach(function(downstreamVar) {
+            view.cached[actionVar+"NumInput"+downstreamVar] = document.getElementById(actionVar+"NumInput"+downstreamVar);
 
-        view.cached[`${actionVar}DownstreamSendRate${downstreamVar}`] = document.getElementById(`${actionVar}DownstreamSendRate${downstreamVar}`);
-    });
+            view.cached[`${actionVar}DownstreamSendRate${downstreamVar}`] = document.getElementById(`${actionVar}DownstreamSendRate${downstreamVar}`);
+
+            view.cached[actionVar + "_" + downstreamVar + "_Line_Border"] = document.getElementById(actionVar + "_" + downstreamVar + "_Line_Border");
+            view.cached[actionVar + "_" + downstreamVar + "_Line"] = document.getElementById(actionVar + "_" + downstreamVar + "_Line");
+            view.cached[actionVar + "SliderContainer" + downstreamVar] = document.getElementById(actionVar + "SliderContainer" + downstreamVar);
+        });
+    })
 }
 
 

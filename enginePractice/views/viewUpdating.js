@@ -1,6 +1,8 @@
 let view = {
     cached: {}, //contains the elements that are being iterated over and updated regularly,
 };
+view.cached.totalMomentum = document.getElementById("totalMomentum");
+view.cached.secondsPassed = document.getElementById("secondsPassed");
 
 //This is the main function that is run once per 50ms
 function updateView() {
@@ -10,9 +12,25 @@ function updateView() {
     data.actionNames.forEach(function(actionName) {
         updateActionView(actionName);
     });
+    calcAndSetTotalMomentum();
+    setTimerUI();
 
 
     saveCurrentViewState();
+}
+
+function calcAndSetTotalMomentum() {
+    let totalMometum = 0;
+    data.actionNames.forEach(function(actionName) {
+        let actionObj = data.actions[actionName];
+        if(actionObj.momentumName === "momentum") {
+            totalMometum += actionObj.momentum;
+        }
+    });
+    view.cached.totalMomentum.innerHTML = intToString(totalMometum, 1);
+}
+function setTimerUI() {
+    view.cached.secondsPassed.innerHTML = secondsToTime(secondsPassed);
 }
 
 //Save a second copy of all the data after a view update, so it can request updates only for the ones that are different
@@ -44,7 +62,9 @@ function updateStatView(statName) {
     }
 }
 
-
+//big performance improvements:
+//TODO set numbers into 2 categories: zoomed in or zoomed out. At a certain zoom scale, it should switch, and the other numbers should not be updated
+//TODO when zoomed in, only update the numbers within a certain x/y of current x/y. This means that the actions should be aware if they're visible or not
 function updateActionView(actionName) {
     let action = data.actions[actionName];
     let prevAction = prevState.actions[actionName];
@@ -98,8 +118,7 @@ function updateActionView(actionName) {
     })
 
 
-
-    //TODO refactor to be generic ? / not update constantly
+    //TODO only update if needed
     if(action.expStats) {
         action.expStats.forEach(function(expStat) {
             document.getElementById(`${actionName}_${expStat[0]}StatExpMult`).innerHTML = intToString(action[expStat[0]+"StatExpMult"], 3);
@@ -144,19 +163,19 @@ function updateActionView(actionName) {
             //if downstream is invisible, hide relevant action's slider area
             let prevDownstreamObj = prevState.actions[downstreamVar];
             if(forceUpdate || prevDownstreamObj.visible !== downstreamObj.visible) {
-                if(!document.getElementById(actionName + "_" + downstreamVar + "_Line_Border")) {
+                if(!view.cached[actionName + "_" + downstreamVar + "_Line_Border"]) {
                     console.log('missing div for ' + actionName + ', downstream: ' + downstreamVar);
                 }
                 if(downstreamObj.visible) {
                     view.cached[downstreamVar+"Container"].style.display = "block";
-                    document.getElementById(actionName + "_" + downstreamVar + "_Line_Border").style.display = "block";
-                    document.getElementById(actionName + "_" + downstreamVar + "_Line").style.display = "block";
-                    document.getElementById(actionName + "SliderContainer" + downstreamVar).style.display = "block";
+                    // view.cached[actionName + "_" + downstreamVar + "_Line_Border"].style.display = "block";
+                    // view.cached[actionName + "_" + downstreamVar + "_Line"].style.display = "block";
+                    view.cached[actionName + "SliderContainer" + downstreamVar].style.display = "block";
                 } else {
                     view.cached[actionName+"Container"].style.display = "none";
-                    document.getElementById(actionName + "_" + downstreamVar + "_Line_Border").style.display = "none";
-                    document.getElementById(actionName + "_" + downstreamVar + "_Line").style.display = "none";
-                    document.getElementById(actionName + "SliderContainer" + downstreamVar).style.display = "none";
+                    // view.cached[actionName + "_" + downstreamVar + "_Line_Border"].style.display = "none";
+                    // view.cached[actionName + "_" + downstreamVar + "_Line"].style.display = "none";
+                    view.cached[actionName + "SliderContainer" + downstreamVar].style.display = "none";
                 }
             }
         });
@@ -164,24 +183,24 @@ function updateActionView(actionName) {
 
     if(forceUpdate || prevAction.unlocked !== action.unlocked) {
         if(action.unlocked) {
-            document.getElementById(actionName + "LockContainer").style.display = "none";
+            view.cached[actionName + "LockContainer"].style.display = "none";
         } else {
-            document.getElementById(actionName + "LockContainer").style.display = "block";
+            view.cached[actionName + "LockContainer"].style.display = "";
         }
     }
 
     if(forceUpdate || prevAction.visible !== action.visible) {
         if(action.visible) {
-            document.getElementById(actionName + "Container").style.display = "block";
+            view.cached[actionName + "Container"].style.display = "";
             if(action.parent) {
-                document.getElementById(action.parent + "_" + actionName + "_Line_Border").style.display = "block";
-                document.getElementById(action.parent + "_" + actionName + "_Line").style.display = "block";
+                view.cached[action.parent + "_" + actionName + "_Line_Border"].style.display = "";
+                view.cached[action.parent + "_" + actionName + "_Line"].style.display = "";
             }
         } else {
-            document.getElementById(actionName + "Container").style.display = "none";
+            view.cached[actionName + "Container"].style.display = "none";
             if(action.parent) {
-                document.getElementById(action.parent + "_" + actionName + "_Line_Border").style.display = "none";
-                document.getElementById(action.parent + "_" + actionName + "_Line").style.display = "none";
+                view.cached[action.parent + "_" + actionName + "_Line_Border"].style.display = "none";
+                view.cached[action.parent + "_" + actionName + "_Line"].style.display = "none";
             }
         }
         //the unlocked action's parent_action_Line needs to be made visible too

@@ -34,7 +34,7 @@ function load() {
         })
     }
 
-    initializeDisplay();
+    // initializeDisplay();
     recalcInterval(50);
 }
 

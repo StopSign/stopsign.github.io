@@ -25,7 +25,8 @@
 </div>
 
 <div class="button" style="position:absolute;left:25px;top:25px;padding:10px;font-size:16px;" onclick="clickMenuButton()">Menu</div>
-<div class="button" style="position:absolute;left:92px;top:25px;padding:10px;font-size:16px;" onclick="changeDarkMode()">Light Mode</div>
+<div class="button" style="position:absolute;left:92px;top:25px;padding:10px;font-size:16px;" id='lightModeButton' onclick="changeDarkMode()">Light Mode</div>
+<div class="button" style="position:absolute;left:200px;top:25px;padding:10px;font-size:16px;" id='pauseButton' onclick="pauseGame()">Pause</div>
 
 <div id="helpMenuContainer"></div>
 
@@ -50,8 +51,11 @@
 <div id="jobDisplay" style="display:none;position:absolute;margin:5px;font-size:17px;top:65px;background-color:var(--overlay-color);color: var(--text-primary);">
     Current Job: <span id="jobTitle">Beggar</span>, Wage: $<span id="jobWage">1</span>
 </div>
+<div id="momentumDisplay" style="position:absolute;margin:5px;font-size:14px;top:85px;background-color:var(--overlay-color);color: var(--text-primary);">
+    Total Momentum: <b><span id="totalMomentum">1</span></b> Time: <span id="secondsPassed"></span>
+</div>
 
-<div id="statDisplay" style="position:absolute;margin:5px;top:95px;background-color:var(--overlay-color);color: var(--text-primary);">
+<div id="statDisplay" style="position:absolute;margin:5px;top:115px;background-color:var(--overlay-color);color: var(--text-primary);">
     <div style="width:106px;display:inline-block;font-style:italic">Stat</div>
     <div style="width:46px;display:inline-block;font-style:italic">Amount</div>
     <div style="width:48px;display:inline-block;font-style:italic">Bonus</div>

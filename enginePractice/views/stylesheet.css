@@ -3,6 +3,7 @@
     --bg-secondary: #313244;
     --text-primary: #cdd6f4;
     --text-muted: #a6adc8;
+    --button-text: #252836;
     --accent-primary: #89b4fa;
     --accent-secondary: #74c7ec;
     --border-color: #45475a;
@@ -25,7 +26,8 @@ body.lightMode {
     --bg-secondary: #bbd6e6;
     --text-primary: #000000;
     --text-muted: #4a4e69;
-    --accent-primary: #55d4de;
+    --button-text: #4a4e69;
+    --accent-primary: #39e2ef;
     --accent-secondary: #60eef9;
     --border-color: #c4d7f2;
     --success-color: #a6e3a1;
@@ -217,7 +219,7 @@ input {
     min-width:9px;
     cursor: pointer;
     outline: none;
-    color: var(--bg-primary);
+    color: var(--button-text);
     background-color: var(--accent-primary);
     border: none;
     border-radius: 6px;

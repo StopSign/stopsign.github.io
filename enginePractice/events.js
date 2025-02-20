@@ -236,6 +236,7 @@ function changeDarkMode() {
 
     // Toggle the dark-mode class
     body.classList.toggle('lightMode');
+    document.getElementById('lightModeButton').innerHTML = body.classList.contains('lightMode') ? "Dark Mode" : "Light Mode";
 }
 
 let selectedStat = null;
@@ -314,4 +315,9 @@ function changeJob(actionVar) {
     //set displayed
     document.getElementById("jobTitle").innerHTML = data.actions[data.currentJob].title;
     document.getElementById("jobWage").innerHTML = data.currentWage;
+}
+
+function pauseGame() {
+    stop = !stop;
+    document.getElementById('pauseButton').innerHTML = stop ? "Resume" : "Pause";
 }
