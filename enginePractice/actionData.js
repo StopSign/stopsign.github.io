@@ -87,8 +87,8 @@ let actionData = {
     },
     overwhelm: {
         tier:1,
-        progressMaxBase:1, progressMaxMult:1, progressMaxIncrease:2,
-        expToLevelBase:2, expToLevelMult:1, expToLevelIncrease:1.07,
+        progressMaxBase:1, progressMaxMult:1, progressMaxIncrease:1.5,
+        expToLevelBase:2, expToLevelMult:1, expToLevelIncrease:1.5,
         expertiseBase:1,
         unlockCost:10, visible:true, unlocked:false,
         onCompleteCustom:function() {
@@ -96,6 +96,8 @@ let actionData = {
         onLevelCustom: function() {
         },
         onUnlock: function() {
+            unveilAction('processThoughts')
+            unveilAction('reflect')
         },
         onLevelStats:[["abilityPower", 1]],
         expStats:[["diligence", 1]],
@@ -103,10 +105,10 @@ let actionData = {
     },
     processThoughts: {
         tier:1,
-        progressMaxBase:1, progressMaxMult:1, progressMaxIncrease:2,
-        expToLevelBase:2, expToLevelMult:1, expToLevelIncrease:1.07,
+        progressMaxBase:1, progressMaxMult:1, progressMaxIncrease:1.5,
+        expToLevelBase:2, expToLevelMult:1, expToLevelIncrease:1.5,
         expertiseBase:.5,
-        unlockCost:10, visible:true, unlocked:false,
+        unlockCost:10, visible:false, unlocked:false,
         onCompleteCustom:function() {
         },
         onLevelCustom: function() {
@@ -114,19 +116,19 @@ let actionData = {
         onUnlock: function() {
         },
         onLevelStats:[["focus", 1]],
-        expStats:[["processing", 1]],
-        efficiencyStats:[]
+        expStats:[["processing", 1], ["memory", 1]],
+        efficiencyStats:[["processing", 1]]
     },
     reflect: {
         tier:1,
-        progressMaxBase:5, progressMaxMult:1, progressMaxIncrease:5,
-        expToLevelBase:1.25, expToLevelMult:1, expToLevelIncrease:2,
+        progressMaxBase:1, progressMaxMult:1, progressMaxIncrease:4,
+        expToLevelBase:4, expToLevelMult:1, expToLevelIncrease:2,
         expertiseBase:1, maxLevel:2,
-        unlockCost:10, visible:true, unlocked:false,
+        unlockCost:10, visible:false, unlocked:false,
         onCompleteCustom:function() {
         },
         onLevelCustom: function() {
-            if(data.actions.reflect.level >= 2) {
+            if(data.actions.reflect.level >= 1) {
                 unveilAction('travelOnRoad')
             }
             if(data.actions.reflect.level >= 3) {
@@ -141,11 +143,12 @@ let actionData = {
     },
     journal: {
         tier:2,
-        progressMaxBase:1e4, progressMaxMult:1, progressMaxIncrease:5,
-        expToLevelBase:1.25, expToLevelMult:1, expToLevelIncrease:2,
-        expertiseBase:1, maxLevel:2,
-        unlockCost:1e4, visible:false, unlocked:false,
+        progressMaxBase:1e5, progressMaxMult:1, progressMaxIncrease:10,
+        expToLevelBase:300, expToLevelMult:1, expToLevelIncrease:3,
+        expertiseBase:1, maxLevel:4,
+        unlockCost:1e6, visible:false, unlocked:false,
         onCompleteCustom:function() {
+            data.actions.reflect.maxLevel+=2
         },
         onLevelCustom: function() {
         },
@@ -157,11 +160,12 @@ let actionData = {
     },
     takeNotes: {
         tier:2,
-        progressMaxBase:1e5, progressMaxMult:1, progressMaxIncrease:5,
-        expToLevelBase:1.25, expToLevelMult:1, expToLevelIncrease:2,
+        progressMaxBase:1e9, progressMaxMult:1, progressMaxIncrease:100,
+        expToLevelBase:3000, expToLevelMult:1, expToLevelIncrease:10,
         expertiseBase:1, maxLevel:2,
         unlockCost:1e5, visible:false, unlocked:false,
         onCompleteCustom:function() {
+            data.actions.journal.maxLevel+=2
         },
         onLevelCustom: function() {
         },
@@ -175,7 +179,7 @@ let actionData = {
     makeMoney: {
         tier:1,
         progressMaxBase:20, progressMaxMult:1, progressMaxIncrease:1,
-        expToLevelBase:10, expToLevelMult:1, expToLevelIncrease:3,
+        expToLevelBase:10, expToLevelMult:1, expToLevelIncrease:2,
         actionPowerBase:1, actionPowerMult:1, actionPowerMultIncrease:1.02,
         expertiseBase:.2,
         unlockCost:4000, visible:false, unlocked:false, isGenerator:true, generatorSpeed:10,
@@ -183,7 +187,6 @@ let actionData = {
             //Take 1% (tier) of current, consume all of it
             //give 1 part to equation, 1 part to consume for expertise
             //equation takes its part and log(part)^2, gives that to spendMoney
-
 
             let actionObj = data.actions.makeMoney;
             let actionTarget = data.actions.spendMoney;
@@ -193,20 +196,19 @@ let actionData = {
             let amountToSend = actionObj.actionPowerFunction(amount, actionObj.actionPower) * (actionObj.efficiency/100);
             //visual only
             actionObj.amountToSend = amountToSend;
-
-            let takenFromMomentum = amount>actionObj.momentum?amount:actionObj.momentum;
-            // actionObj.momentum -= takenFromMomentum;
+            actionObj.momentum -= amount;
 
             addMomentumTo(actionTarget, amountToSend);
 
             //add exp based on amount sent
             actionObj.expToAddBase = amountToSend;
             actionObj.expToAdd = actionObj.expToAddBase * actionObj.expToAddMult;
+            document.getElementById('makeMoneyMomentumTaken').innerHTML = intToString(amount, 2);
         },
         onUnlock: function() {
             document.getElementById("jobDisplay").style.display = "";
         },
-        onLevelStats:[["energy", 1]],
+        onLevelStats:[["negotiation", 1]],
         expStats:[["diligence", 1], ["ambition", 1]],
         efficiencyStats:[["workEthic", 1]],
         onCompleteText: {
@@ -221,9 +223,9 @@ let actionData = {
     },
     spendMoney: {
         tier:1, momentumName:"gold",
-        progressMaxBase:10, progressMaxMult:1, progressMaxIncrease:1.1,
-        expToLevelBase:2, expToLevelMult:1, expToLevelIncrease:1.05,
-        expertiseBase:1,
+        progressMaxBase:1, progressMaxMult:1, progressMaxIncrease:1.1,
+        expToLevelBase:2, expToLevelMult:1, expToLevelIncrease:1.1,
+        expertiseBase:.8,
         unlockCost:10, visible:false, unlocked:false, //visible:false
         onCompleteCustom:function() {
         },
@@ -232,35 +234,34 @@ let actionData = {
         },
         onLevelStats:[["energy", 1], ["confidence", 1], ["ambition", 2]],
         expStats:[["presentation", 1]],
-        efficiencyStats:[["haggling", 1]],
+        efficiencyStats:[["haggling", .1]],
         unlockMessage:{english:"On unlock, +1 max level for Reflect."}
     },
     travelOnRoad: {
         tier:1,
-        progressMaxBase:200, progressMaxMult:1, progressMaxIncrease:5,
-        expToLevelBase:1.25, expToLevelMult:1, expToLevelIncrease:2,
-        expertiseBase:1, maxLevel:5,
-        unlockCost:200, visible:false, unlocked:false, //visible:false
+        progressMaxBase:5, progressMaxMult:1, progressMaxIncrease:3,
+        expToLevelBase:4, expToLevelMult:1, expToLevelIncrease:3,
+        expertiseBase:.5, maxLevel:10,
+        unlockCost:50, visible:false, unlocked:false, //visible:false
         onCompleteCustom:function() {
         },
         onUnlock: function() {
             unveilAction('travelToOutpost')
             unveilAction('checkNoticeBoard')
             unveilAction('clearTheTrail')
-            unveilAction('paveTheTrail')
             data.actions.reflect.maxLevel++;
         },
-        onLevelStats:[["focus", .5]],
+        onLevelStats:[["focus", 2]],
         expStats:[["pathfinding", 1], ["endurance", 1]],
-        efficiencyStats:[["pathfinding", 4]],
+        efficiencyStats:[["pathfinding", .2]],
         unlockMessage:{english:"On unlock, +1 max level for Reflect."}
     },
     travelToOutpost: {
         tier:1,
-        progressMaxBase:600, progressMaxMult:1, progressMaxIncrease:2,
-        expToLevelBase:2, expToLevelMult:1, expToLevelIncrease:1.07,
-        expertiseBase:1, maxLevel:15,
-        unlockCost:600, visible:false, unlocked:false, //visible:false
+        progressMaxBase:5, progressMaxMult:1, progressMaxIncrease:1.5,
+        expToLevelBase:4, expToLevelMult:1, expToLevelIncrease:1.5,
+        expertiseBase:.5, maxLevel:15,
+        unlockCost:50, visible:false, unlocked:false, //visible:false
         onCompleteCustom:function() {
         },
         onUnlock: function() {
@@ -268,35 +269,36 @@ let actionData = {
             unveilAction('spendMoney')
             data.actions.reflect.maxLevel++;
         },
-        onLevelStats:[["focus", 3]],
+        onLevelStats:[["focus", 1]],
         expStats:[["pathfinding", 1], ["endurance", 1]],
-        efficiencyStats:[["pathfinding", 2]],
+        efficiencyStats:[["pathfinding", .1]],
         unlockMessage:{english:"On unlock, +1 max level for Reflect."}
     },
     clearTheTrail: {
-        tier:2,
-        progressMaxBase:200000, progressMaxMult:1, progressMaxIncrease:5,
-        expToLevelBase:1.25, expToLevelMult:1, expToLevelIncrease:2,
+        tier:1,
+        progressMaxBase:100, progressMaxMult:1, progressMaxIncrease:3,
+        expToLevelBase:500, expToLevelMult:1, expToLevelIncrease:3,
         expertiseBase:1, maxLevel:5,
-        unlockCost:200000, visible:false, unlocked:false, //visible:false
+        unlockCost:2000, visible:false, unlocked:false, //visible:false
         onCompleteCustom:function() {
         },
         onUnlock: function() {
+            unveilAction('paveTheTrail')
         },
         onLevelCustom: function() {
             data.actions.travelOnRoad.maxLevel += 1;
             data.actions.travelToOutpost.maxLevel += 6;
         },
-        onLevelStats:[["pathfinding", 2]],
+        onLevelStats:[["pathfinding", 4]],
         expStats:[["diligence", 1], ["observation", 1]],
         efficiencyStats:[]
     },
     paveTheTrail: {
         tier:2,
-        progressMaxBase:2000000000, progressMaxMult:1, progressMaxIncrease:5,
-        expToLevelBase:1.25, expToLevelMult:1, expToLevelIncrease:2,
+        progressMaxBase:500000000, progressMaxMult:1, progressMaxIncrease:3,
+        expToLevelBase:50, expToLevelMult:1, expToLevelIncrease:3,
         expertiseBase:1, maxLevel:5,
-        unlockCost:2000000000, visible:false, unlocked:false, //visible:false
+        unlockCost:500000000, visible:false, unlocked:false, //visible:false
         onCompleteCustom:function() {
         },
         onUnlock: function() {
@@ -310,51 +312,56 @@ let actionData = {
     },
     checkNoticeBoard: {
         tier:1,
-        progressMaxBase:1000, progressMaxMult:1, progressMaxIncrease:5,
-        expToLevelBase:1.25, expToLevelMult:1, expToLevelIncrease:2,
-        expertiseBase:1, maxLevel:3,
-        unlockCost:1000, visible:false, unlocked:false, //visible:false
+        progressMaxBase:10, progressMaxMult:1, progressMaxIncrease:10,
+        expToLevelBase:2, expToLevelMult:1, expToLevelIncrease:2,
+        expertiseBase:.8, maxLevel:3,
+        unlockCost:25, visible:false, unlocked:false, //visible:false
         onCompleteCustom:function() {
         },
         onUnlock: function() {
+        },
+        onLevelCustom: function() {
             if(data.actions.checkNoticeBoard.level >= 1) {
                 unveilAction('meetVillageLeaderScott')
                 unveilAction('helpScottWithChores')
             }
             if(data.actions.checkNoticeBoard.level >= 2) {
-                unveilAction('reportForLabor')
-                unveilAction('oddJobsLaborer')
+                unveilAction('reportForTraining')
             }
             if(data.actions.checkNoticeBoard.level >= 3) {
-                unveilAction('reportForTraining')
-                unveilAction('takeLessonsFromJohn')
+                unveilAction('reportForLabor')
+                unveilAction('oddJobsLaborer')
             }
         },
         onLevelStats:[["diligence", 5]],
         expStats:[],
-        efficiencyStats:[["observation", 1]]
+        efficiencyStats:[["observation", .1]]
     },
     meetVillageLeaderScott: {
-        tier:2,
-        progressMaxBase:2000, progressMaxMult:1, progressMaxIncrease:5,
-        expToLevelBase:1.25, expToLevelMult:1, expToLevelIncrease:2,
-        expertiseBase:.8, maxLevel:3,
-        unlockCost:2000, visible:false, unlocked:false, //visible:false
+        tier:1,
+        progressMaxBase:5, progressMaxMult:1, progressMaxIncrease:3,
+        expToLevelBase:4, expToLevelMult:1, expToLevelIncrease:3,
+        expertiseBase:.6, maxLevel:3,
+        unlockCost:50, visible:false, unlocked:false, //visible:false
         onCompleteCustom:function() {
         },
         onLevelCustom: function() {
             data.actions.helpScottWithChores.maxLevel++
         },
+        onUnlock: function() {
+            data.actions.reflect.maxLevel++;
+        },
         expStats:[],
         onLevelStats:[["villagersKnown", 1]],
-        efficiencyStats:[["scottFamiliarity", 1]]
+        efficiencyStats:[["scottFamiliarity", 1]],
+        unlockMessage:{english:"On unlock, +1 max level for Reflect."}
     },
     helpScottWithChores: {
-        tier:2,
-        progressMaxBase:2000, progressMaxMult:1, progressMaxIncrease:5,
-        expToLevelBase:1.25, expToLevelMult:1, expToLevelIncrease:2,
-        expertiseBase:.3, maxLevel:0,
-        unlockCost:2000, visible:false, unlocked:false, //visible:false
+        tier:1,
+        progressMaxBase:5, progressMaxMult:1, progressMaxIncrease:3,
+        expToLevelBase:4, expToLevelMult:1, expToLevelIncrease:3,
+        expertiseBase:.3, maxLevel:1,
+        unlockCost:50, visible:false, unlocked:false, //visible:false
         onCompleteCustom:function() {
         },
         onLevelCustom: function() {
@@ -374,263 +381,434 @@ let actionData = {
         },
         expStats:[],
         onLevelStats:[["villagersKnown", 1]],
-        efficiencyStats:[["scottFamiliarity", 1]]
+        efficiencyStats:[["scottFamiliarity", .5], ["villagersKnown", .5]]
     },
 
     reportForLabor: {
-        tier:2,
-        progressMaxBase:5000, progressMaxMult:1, progressMaxIncrease:3,
-        expToLevelBase:2, expToLevelMult:1, expToLevelIncrease:1.05,
-        actionPowerBase:1, actionPowerMult:1, actionPowerMultIncrease:3.1,
+        tier:1,
+        progressMaxBase:20, progressMaxMult:1, progressMaxIncrease:2,
+        expToLevelBase:4, expToLevelMult:1, expToLevelIncrease:2,
         expertiseBase:.1,
-        unlockCost:5000, visible:false, unlocked:false, //visible:false
+        unlockCost:200, visible:false, unlocked:false, //visible:false
         onCompleteCustom:function() {
         },
         onUnlock: function() {
-            unveilAction('OddJobsLaborer');
             data.actions.reflect.maxLevel++;
         },
-        onLevelStats:[["ambition", 2]],
-        expStats:[],
-        efficiencyStats:[],
+        onLevelStats:[["workEthic", 1], ["ambition", 1]],
+        expStats:[["jobExperience", 1]],
+        efficiencyStats:[["ambition", .01]],
         unlockMessage:{english:"On unlock, +1 max level for Reflect."}
     },
 
     reportForTraining: {
-        tier:3,
-        progressMaxBase:1e7, progressMaxMult:1, progressMaxIncrease:5,
-        expToLevelBase:1.25, expToLevelMult:1, expToLevelIncrease:2,
-        actionPowerBase:1, actionPowerMult:1, actionPowerMultIncrease:3.1,
-        expertiseBase:.1, maxLevel:6,
-        unlockCost:1e7, visible:false, unlocked:false, //visible:false
+        tier:1,
+        progressMaxBase:10, progressMaxMult:1, progressMaxIncrease:1.5,
+        expToLevelBase:4, expToLevelMult:1, expToLevelIncrease:1.5,
+        expertiseBase:.6, maxLevel:20,
+        unlockCost:100, visible:false, unlocked:false, //visible:false
         onCompleteCustom:function() {
         },
+        onLevelCustom:function() {
+            if(data.actions.reportForTraining.level >= 15) {
+                unveilAction('takeLessonsFromJohn');
+            }
+        },
         expStats:[],
-        onLevelStats:[["endurance", 10], ["weaponsExpertise", 10]],
-        efficiencyStats:[]
+        onLevelStats:[["endurance", 1], ["memory", 1]],
+        efficiencyStats:[["drive", 1]]
     },
     takeLessonsFromJohn: {
-        tier:3,
-        progressMaxBase:1e7, progressMaxMult:1, progressMaxIncrease:5,
-        expToLevelBase:1.25, expToLevelMult:1, expToLevelIncrease:2,
+        tier:1,
+        progressMaxBase:1e6, progressMaxMult:1, progressMaxIncrease:1.5,
+        expToLevelBase:4, expToLevelMult:1, expToLevelIncrease:1.5,
         actionPowerBase:1, actionPowerMult:1, actionPowerMultIncrease:3.1,
-        expertiseBase:.1, maxLevel:6,
+        expertiseBase:.2, maxLevel:6,
         unlockCost:1e7, visible:false, unlocked:false, //visible:false
         onCompleteCustom:function() {
         },
         expStats:[],
-        onLevelStats:[["endurance", 10], ["weaponsExpertise", 10]],
+        onLevelStats:[["endurance", 2], ["weaponsExpertise", 2], ["memory", 2]],
         efficiencyStats:[]
     },
 
     //jobs
     oddJobsLaborer: {
-        tier:2,
-        progressMaxBase:50000, progressMaxMult:1, progressMaxIncrease:3,
-        expToLevelBase:35, expToLevelMult:1, expToLevelIncrease:1.05,
-        actionPowerBase:1, actionPowerMult:1, actionPowerMultIncrease:3.1,
+        tier:1,
+        progressMaxBase:1000, progressMaxMult:1, progressMaxIncrease:1.2,
+        expToLevelBase:10, expToLevelMult:1, expToLevelIncrease:1.2,
         expertiseBase:.1, maxLevel:20,
-        wage: 5,
-        unlockCost:50000, visible:false, unlocked:false, //visible:false
+        wage: 10,
+        unlockCost:100, visible:false, unlocked:false, //visible:false
         onCompleteCustom:function() {
         },
         onLevelCustom: function() {
             data.actions.oddJobsLaborer.wage += actionData.oddJobsLaborer.wage;
             changeJob("oddJobsLaborer");
+            if(data.actions.oddJobsLaborer.level >= 15) {
+                unveilAction("chimneySweep");
+            }
         },
-        expStats:[],
-        onLevelStats:[],
-        efficiencyStats:[]
+        onUnlock:function() {
+            changeJob("oddJobsLaborer");
+        },
+        expStats:[["workEthic", .5]],
+        onLevelStats:[["streetKnowledge", 1], ["jobExperience", 1]],
+        efficiencyStats:[["streetKnowledge", 1]]
     },
     chimneySweep: {
-        tier:2,
-        progressMaxBase:1, progressMaxMult:1, progressMaxIncrease:3,
-        expToLevelBase:35, expToLevelMult:1, expToLevelIncrease:1.05,
-        actionPowerBase:1, actionPowerMult:1, actionPowerMultIncrease:3.1,
-        expertiseBase:.1, maxLevel:20,
-        unlockCost:50, visible:false, unlocked:false, //visible:false
+        tier:1,
+        progressMaxBase:500000, progressMaxMult:1, progressMaxIncrease:1.2,
+        expToLevelBase:10, expToLevelMult:1, expToLevelIncrease:1.2,
+        expertiseBase:.1, maxLevel:22,
+        wage: 100,
+        unlockCost:500000, visible:false, unlocked:false, //visible:false
         onCompleteCustom:function() {
         },
-        expStats:[],
-        onLevelStats:[],
-        efficiencyStats:[]
+        onLevelCustom: function() {
+            data.actions.oddJobsLaborer.wage += actionData.oddJobsLaborer.wage;
+            changeJob("chimneySweep");
+            if(data.actions.oddJobsLaborer.level >= 15) {
+                unveilAction("handyman");
+            }
+        },
+        onUnlock:function() {
+            changeJob("chimneySweep");
+        },
+        expStats:[["workEthic", .5]],
+        onLevelStats:[["streetKnowledge", 1], ["jobExperience", 1]],
+        efficiencyStats:[["streetKnowledge", .5]]
     },
     handyman: {
-        tier:2,
-        progressMaxBase:1, progressMaxMult:1, progressMaxIncrease:3,
-        expToLevelBase:35, expToLevelMult:1, expToLevelIncrease:1.05,
-        actionPowerBase:1, actionPowerMult:1, actionPowerMultIncrease:3.1,
-        expertiseBase:.1, maxLevel:20,
-        unlockCost:50, visible:false, unlocked:false, //visible:false
+        tier:1,
+        progressMaxBase:250e6, progressMaxMult:1, progressMaxIncrease:1.2,
+        expToLevelBase:10, expToLevelMult:1, expToLevelIncrease:1.2,
+        expertiseBase:.1, maxLevel:24,
+        wage: 1000,
+        unlockCost:250e6, visible:false, unlocked:false, //visible:false
         onCompleteCustom:function() {
         },
-        expStats:[],
-        onLevelStats:[],
-        efficiencyStats:[]
+        onLevelCustom: function() {
+            data.actions.oddJobsLaborer.wage += actionData.oddJobsLaborer.wage;
+            changeJob("handyman");
+            if(data.actions.oddJobsLaborer.level >= 15) {
+                unveilAction("tavernHelper");
+            }
+        },
+        onUnlock:function() {
+            changeJob("handyman");
+        },
+        expStats:[["workEthic", .5]],
+        onLevelStats:[["streetKnowledge", 1], ["jobExperience", 1]],
+        efficiencyStats:[["streetKnowledge", .2]]
     },
     tavernHelper: {
-        tier:2,
-        progressMaxBase:1, progressMaxMult:1, progressMaxIncrease:3,
-        expToLevelBase:35, expToLevelMult:1, expToLevelIncrease:1.05,
-        actionPowerBase:1, actionPowerMult:1, actionPowerMultIncrease:3.1,
-        expertiseBase:.1, maxLevel:20,
-        unlockCost:50, visible:false, unlocked:false, //visible:false
+        tier:1,
+        progressMaxBase:125e9, progressMaxMult:1, progressMaxIncrease:1.2,
+        expToLevelBase:10, expToLevelMult:1, expToLevelIncrease:1.2,
+        expertiseBase:.1, maxLevel:26,
+        wage: 10000,
+        unlockCost:125e9, visible:false, unlocked:false, //visible:false
         onCompleteCustom:function() {
         },
-        expStats:[],
-        onLevelStats:[],
-        efficiencyStats:[]
+        onLevelCustom: function() {
+            data.actions.oddJobsLaborer.wage += actionData.oddJobsLaborer.wage;
+            changeJob("tavernHelper");
+            if(data.actions.oddJobsLaborer.level >= 15) {
+                unveilAction("guildReceptionist");
+            }
+        },
+        onUnlock:function() {
+            changeJob("tavernHelper");
+        },
+        expStats:[["workEthic", .5]],
+        onLevelStats:[["streetKnowledge", 1], ["jobExperience", 1]],
+        efficiencyStats:[["streetKnowledge", .1]]
     },
     guildReceptionist: {
-        tier:2,
-        progressMaxBase:1, progressMaxMult:1, progressMaxIncrease:3,
-        expToLevelBase:35, expToLevelMult:1, expToLevelIncrease:1.05,
-        actionPowerBase:1, actionPowerMult:1, actionPowerMultIncrease:3.1,
-        expertiseBase:.1, maxLevel:20,
-        unlockCost:50, visible:false, unlocked:false, //visible:false
+        tier:1,
+        progressMaxBase:60e12, progressMaxMult:1, progressMaxIncrease:1.2,
+        expToLevelBase:10, expToLevelMult:1, expToLevelIncrease:1.2,
+        expertiseBase:.1, maxLevel:28,
+        wage: 100000,
+        unlockCost:60e12, visible:false, unlocked:false, //visible:false
         onCompleteCustom:function() {
         },
-        expStats:[],
-        onLevelStats:[],
-        efficiencyStats:[]
+        onLevelCustom: function() {
+            data.actions.oddJobsLaborer.wage += actionData.oddJobsLaborer.wage;
+            changeJob("guildReceptionist");
+            if(data.actions.oddJobsLaborer.level >= 15) {
+                unveilAction("messenger");
+            }
+        },
+        onUnlock:function() {
+            changeJob("guildReceptionist");
+        },
+        expStats:[["workEthic", .5]],
+        onLevelStats:[["streetKnowledge", 1], ["jobExperience", 1]],
+        efficiencyStats:[["streetKnowledge", .05]]
     },
     messenger: {
-        tier:2,
-        progressMaxBase:1, progressMaxMult:1, progressMaxIncrease:3,
-        expToLevelBase:35, expToLevelMult:1, expToLevelIncrease:1.05,
-        actionPowerBase:1, actionPowerMult:1, actionPowerMultIncrease:3.1,
-        expertiseBase:.1, maxLevel:20,
-        unlockCost:50, visible:false, unlocked:false, //visible:false
+        tier:1,
+        progressMaxBase:30e15, progressMaxMult:1, progressMaxIncrease:1.2,
+        expToLevelBase:10, expToLevelMult:1, expToLevelIncrease:1.2,
+        expertiseBase:.1, maxLevel:30,
+        wage: 1000000,
+        unlockCost:30e15, visible:false, unlocked:false, //visible:false
         onCompleteCustom:function() {
         },
-        expStats:[],
-        onLevelStats:[],
-        efficiencyStats:[]
+        onLevelCustom: function() {
+            data.actions.oddJobsLaborer.wage += actionData.oddJobsLaborer.wage;
+            changeJob("messenger");
+            if(data.actions.oddJobsLaborer.level >= 15) {
+                unveilAction("townCrier");
+            }
+        },
+        onUnlock:function() {
+            changeJob("messenger");
+        },
+        expStats:[["workEthic", .5]],
+        onLevelStats:[["streetKnowledge", 1], ["jobExperience", 1]],
+        efficiencyStats:[["streetKnowledge", .02]]
     },
     townCrier: {
-        tier:2,
-        progressMaxBase:1, progressMaxMult:1, progressMaxIncrease:3,
-        expToLevelBase:35, expToLevelMult:1, expToLevelIncrease:1.05,
-        expertiseBase:.1, maxLevel:20,
-        unlockCost:50, visible:false, unlocked:false, //visible:false
+        tier:1,
+        progressMaxBase:15e18, progressMaxMult:1, progressMaxIncrease:1.2,
+        expToLevelBase:10, expToLevelMult:1, expToLevelIncrease:1.2,
+        expertiseBase:.1, maxLevel:32,
+        wage: 10000000,
+        unlockCost:15e18, visible:false, unlocked:false, //visible:false
         onCompleteCustom:function() {
         },
-        expStats:[],
-        onLevelStats:[],
-        efficiencyStats:[]
+        onLevelCustom: function() {
+            data.actions.oddJobsLaborer.wage += actionData.oddJobsLaborer.wage;
+            changeJob("townCrier");
+            if(data.actions.oddJobsLaborer.level >= 15) {
+                unveilAction("storyTeller");
+            }
+        },
+        onUnlock:function() {
+            changeJob("townCrier");
+        },
+        expStats:[["workEthic", .5]],
+        onLevelStats:[["streetKnowledge", 1], ["jobExperience", 1]],
+        efficiencyStats:[["streetKnowledge", .01]]
     },
     storyTeller: {
-        tier:2,
-        progressMaxBase:1, progressMaxMult:1, progressMaxIncrease:3,
-        expToLevelBase:35, expToLevelMult:1, expToLevelIncrease:1.05,
-        expertiseBase:.1, maxLevel:20,
-        unlockCost:50, visible:false, unlocked:false, //visible:false
+        tier:1,
+        progressMaxBase:10e21, progressMaxMult:1, progressMaxIncrease:1.2,
+        expToLevelBase:10, expToLevelMult:1, expToLevelIncrease:1.2,
+        expertiseBase:.1, maxLevel:34,
+        wage: 100000000,
+        unlockCost:10e21, visible:false, unlocked:false, //visible:false
         onCompleteCustom:function() {
         },
-        expStats:[],
-        onLevelStats:[],
-        efficiencyStats:[]
+        onLevelCustom: function() {
+            data.actions.oddJobsLaborer.wage += actionData.oddJobsLaborer.wage;
+            changeJob("storyTeller");
+            if(data.actions.oddJobsLaborer.level >= 15) {
+                unveilAction("handyman");
+            }
+        },
+        onUnlock:function() {
+            changeJob("storyTeller");
+        },
+        expStats:[["workEthic", .5]],
+        onLevelStats:[["streetKnowledge", 1], ["jobExperience", 1]],
+        efficiencyStats:[["streetKnowledge", .001]]
     },
 
     //spend money
     fillBasicNeeds: {
         tier:1, momentumName: "gold",
-        progressMaxBase:100000, progressMaxMult:1, progressMaxIncrease:2,
-        expToLevelBase:5, expToLevelMult:1, expToLevelIncrease:1.07,
-        expertiseBase:.5,
-        unlockCost:100000, visible:false, unlocked:false, //visible:false
+        progressMaxBase:10, progressMaxMult:1, progressMaxIncrease:1.3,
+        expToLevelBase:10, expToLevelMult:1, expToLevelIncrease:1.3,
+        expertiseBase:.8,
+        unlockCost:100, visible:false, unlocked:false, //visible:false
         onCompleteCustom:function() {
         },
         onLevelCustom:function() {
             unveilAction('journal');
         },
-        onLevelStats:[["energy", 2]],
-        expStats:[["presentation", 5]],
-        efficiencyStats:[["haggling", 1]]
+        onLevelStats:[["energy", 1]],
+        expStats:[["villagersKnown", 1], ["negotiation", 1]],
+        efficiencyStats:[["haggling", .1]]
     },
     buyClothing: {
         tier:1, momentumName: "gold",
-        progressMaxBase:200000, progressMaxMult:1, progressMaxIncrease:2,
-        expToLevelBase:1.5, expToLevelMult:1, expToLevelIncrease:1.07,
-        expertiseBase:.4,
+        progressMaxBase:20000, progressMaxMult:1, progressMaxIncrease:1.5,
+        expToLevelBase:4, expToLevelMult:1, expToLevelIncrease:1.5,
+        expertiseBase:.6,
         unlockCost:200000, visible:false, unlocked:false, //visible:false
         onCompleteCustom:function() {
         },
         onLevelCustom:function() {
             data.actions.fillBasicNeeds.maxLevel++
         }, //observation
-        expStats:[],
-        onLevelStats:[["presentation", 2], ["haggling", 1]],
-        efficiencyStats:[["observation", 1]]
+        onLevelStats:[["presentation", 1]],
+        expStats:[["negotiation", .5], ["observation", 1]],
+        efficiencyStats:[["haggling", .1]]
     },
     eatBetterFood: {
         tier:1, momentumName: "gold",
-        progressMaxBase:200000, progressMaxMult:1, progressMaxIncrease:2,
-        expToLevelBase:1.5, expToLevelMult:1, expToLevelIncrease:1.07,
-        expertiseBase:.4,
+        progressMaxBase:20000, progressMaxMult:1, progressMaxIncrease:1.5,
+        expToLevelBase:4, expToLevelMult:1, expToLevelIncrease:1.5,
+        expertiseBase:.6,
         unlockCost:200000, visible:false, unlocked:false, //visible:false
         onCompleteCustom:function() {
         },
         onLevelCustom:function() {
             data.actions.fillBasicNeeds.maxLevel++
         },
-        expStats:[],
+        expStats:[["negotiation", .5]],
         onLevelStats:[["energy", 2]],
-        efficiencyStats:[["haggling", 1]]
+        efficiencyStats:[["haggling", .1]]
     },
 
     //socialize
     socialize: {
-        tier:2,
-        progressMaxBase:100000, progressMaxMult:1, progressMaxIncrease:3,
-        expToLevelBase:20, expToLevelMult:1, expToLevelIncrease:1.05,
-        actionPowerBase:1, actionPowerMult:1, actionPowerMultIncrease:1.02,
-        expertiseBase:.1,
+        tier:1,
+        progressMaxBase:100, progressMaxMult:1, progressMaxIncrease:1.3,
+        expToLevelBase:20, expToLevelMult:1, expToLevelIncrease:1.3,
+        actionPowerBase:1, actionPowerMult:1, actionPowerMultIncrease:1.02, generatorSpeed:100,
+        expertiseBase:.01,
         unlockCost:1e7, visible:false, unlocked:false, //visible:false isGenerator:true, generatorSpeed:10,
         onCompleteCustom: function() {
-            //TODO fix like makeMoney
-            data.actions.socialize.calcActionPower();
-            let amount = data.actions.socialize.actionPower;
-            let takenFromMomentum = Math.min(data.actions.socialize.momentum, amount);
+            let actionObj = data.actions.socialize;
+            let actionTarget = data.actions.makeRelationships;
+            //this is the amount to remove from actionObj (1%)
+            let amount = actionObj.momentum * actionObj.tierMult();
+            //this is log10(1% * actionPower)^2 * efficiency
+            let amountToSend = actionObj.actionPowerFunction(amount, actionObj.actionPower) * (actionObj.efficiency/100);
+            //visual only
+            actionObj.amountToSend = amountToSend;
+            actionObj.momentum -= amount;
 
-            addMomentumTo(data.actions.localOutreach, takenFromMomentum);
-            data.actions.socialize.momentum -= takenFromMomentum;
+            addMomentumTo(actionTarget, amountToSend);
 
-            data.actions.socialize.expToAddBase = amount;
-            data.actions.socialize.expToAdd = data.actions.socialize.expToAddBase * data.actions.socialize.expToAddMult;
+            //add exp based on amount sent
+            actionObj.expToAddBase = amountToSend;
+            actionObj.expToAdd = actionObj.expToAddBase * actionObj.expToAddMult;
+            document.getElementById('socializeMomentumTaken').innerHTML = intToString(amount, 2);
         },
         onUnlock: function() {
-            unveilAction('localOutreach');
+            unveilAction('makeRelationships');
+            unveilAction('chatWithTownsfolk');
         },
-        expStats:[["diligence", 1]],
-        onLevelStats:[["ambition", 2]],
-        efficiencyStats:[],
+        expStats:[["wit", 1], ["grace", 1], ["tact", 1], ["insight", 1], ["trust", 1], ["influence", 1]],
+        onLevelStats:[["charm", 1], ["recognition", 1]],
+        efficiencyStats:[["confidence", 1], ["presentation", 1]],
         onCompleteText: {
-            english:"+<b><span id=\"makeMoneyActionPower\">1</span></b> Gold<br>"
+            english:"+<b><span id=\"socializeActionPower\">1</span></b> Conversation<br>"
         },
-        actionPowerFunction: function(origMult) {
-            return Math.log2(data.actions.socialize.momentum) * origMult;
+        actionPowerFunction: function(momentum, origMult) {
+            if(momentum * origMult < 1) {
+                return 0;
+            }
+            return Math.pow(Math.log10(momentum * origMult), 3); //log10(num * mult)^3
         }
     },
-    localOutreach: {
+    chat: {
         tier:1, momentumName:"conversations",
-        progressMaxBase:100000, progressMaxMult:1, progressMaxIncrease:3,
-        expToLevelBase:20, expToLevelMult:1, expToLevelIncrease:1.05,
-        unlockCost:100, visible:false, unlocked:false, //visible:false
+        progressMaxBase:50000, progressMaxMult:1, progressMaxIncrease:1.1,
+        expToLevelBase:10, expToLevelMult:1, expToLevelIncrease:1.1,
+        unlockCost:50000, visible:false, unlocked:false, //visible:false
         onCompleteCustom:function() {
         },
         onUnlock: function() {
-            unveilAction('chatWithTownsfolk');
+            data.actions.reflect.maxLevel++;
+        },
+        expStats:[["charm", 1]],
+        onLevelStats:[["processing", 1]],
+        efficiencyStats:[],
+        unlockMessage:{english:"On unlock, +1 max level for Reflect."}
+    },
+    neighborlyTies: {
+        tier:1, momentumName:"conversations",
+        progressMaxBase:50000, progressMaxMult:1, progressMaxIncrease:1.5,
+        expToLevelBase:10, expToLevelMult:1, expToLevelIncrease:1.5,
+        unlockCost:50000, maxLevel:50,
+        visible:false, unlocked:false, //visible:false
+        onCompleteCustom:function() {
+        },
+        onUnlock: function() {
+        },
+        expStats:[],
+        onLevelStats:[["villagersKnown", 1]],
+        efficiencyStats:[],
+    },
+    gossipAboutPrices: {
+        tier:1, momentumName:"conversations",
+        progressMaxBase:50000, progressMaxMult:1, progressMaxIncrease:1.5,
+        expToLevelBase:10, expToLevelMult:1, expToLevelIncrease:1.5,
+        unlockCost:50000,  maxLevel:10,
+        visible:false, unlocked:false, //visible:false
+        onCompleteCustom:function() {
+        },
+        onUnlock: function() {
         },
         expStats:[],
         onLevelStats:[["haggling", 1]],
         efficiencyStats:[],
     },
-    chatWithTownsfolk: {
+    talkAboutMarkets: {
         tier:1, momentumName:"conversations",
-        progressMaxBase:100000, progressMaxMult:1, progressMaxIncrease:1.1,
-        expToLevelBase:20, expToLevelMult:1, expToLevelIncrease:1.05,
-        unlockCost:100, visible:false, unlocked:false, //visible:false
+        progressMaxBase:100e6, progressMaxMult:1, progressMaxIncrease:1.5,
+        expToLevelBase:10, expToLevelMult:1, expToLevelIncrease:1.5,
+        unlockCost:100e6, visible:false, unlocked:false, //visible:false
+        onCompleteCustom:function() {
+        },
+        onUnlock: function() {
+        },
+        expStats:[],
+        onLevelStats:[["haggling", 1]],
+        efficiencyStats:[],
+    },
+    talkToScott: {
+        tier:1, momentumName:"conversations",
+        progressMaxBase:50000, progressMaxMult:1, progressMaxIncrease:1.5,
+        expToLevelBase:10, expToLevelMult:1, expToLevelIncrease:1.5,
+        unlockCost:50000, maxLevel:10,
+        visible:false, unlocked:false, //visible:false
+        onCompleteCustom:function() {
+        },
+        onUnlock: function() {
+        },
+        expStats:[],
+        onLevelStats:[["scottFamiliarity", 1]],
+        efficiencyStats:[],
+    },
+    talkAboutVillageHistory: {
+        tier:1, momentumName:"conversations",
+        progressMaxBase:50000, progressMaxMult:1, progressMaxIncrease:3,
+        expToLevelBase:10, expToLevelMult:1, expToLevelIncrease:3,
+        unlockCost:50000, visible:false, unlocked:false, //visible:false
+        onCompleteCustom:function() {
+        },
+        onUnlock: function() {
+        },
+        expStats:[],
+        onLevelStats:[["villagersKnown", 1]],
+        efficiencyStats:[],
+    },
+    talkAboutCurrentIssues: {
+        tier:1, momentumName:"conversations",
+        progressMaxBase:50000, progressMaxMult:1, progressMaxIncrease:1.5,
+        expToLevelBase:10, expToLevelMult:1, expToLevelIncrease:1.5,
+        unlockCost:50000, visible:false, unlocked:false, //visible:false
+        onCompleteCustom:function() {
+        },
+        onUnlock: function() {
+        },
+        expStats:[],
+        onLevelStats:[["villagersKnown", 1]],
+        efficiencyStats:[],
+    },
+    talkToInstructorJohn: {
+        tier:1, momentumName:"conversations",
+        progressMaxBase:50000, progressMaxMult:1, progressMaxIncrease:1.5,
+        expToLevelBase:10, expToLevelMult:1, expToLevelIncrease:1.5,
+        unlockCost:50000, visible:false, unlocked:false, //visible:false
         onCompleteCustom:function() {
         },
         onUnlock: function() {

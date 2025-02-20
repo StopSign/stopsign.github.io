@@ -2,6 +2,7 @@ let view = {
     cached: {}, //contains the elements that are being iterated over and updated regularly,
 };
 
+//This is the main function that is run once per 50ms
 function updateView() {
     data.statNames.forEach(function(resName) {
         updateStatView(resName);
@@ -14,13 +15,14 @@ function updateView() {
     saveCurrentViewState();
 }
 
-function updateViewOnSecond() {
-    showAllValidToasts();
-}
-
+//Save a second copy of all the data after a view update, so it can request updates only for the ones that are different
 function saveCurrentViewState() {
     prevState.stats = copyArray(data.stats);
     prevState.actions = copyArray(data.actions);
+}
+
+function updateViewOnSecond() {
+    showAllValidToasts();
 }
 
 function updateStatView(statName) {

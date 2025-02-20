@@ -99,6 +99,9 @@ function generateActionDisplay(actionVar) {
         actionObj.expStats.forEach(function (statObj) {
             let name = statObj[0];
             let ratio = statObj[1] * 100 + "%";
+            if(!data.stats[name]) {
+                console.log("Error - missing stat in initialization: " + name);
+            }
             let amount = ((data.stats[name].mult-1) * statObj[1]) + 1;
             totalAmount *= amount;
             expStatsStr +=

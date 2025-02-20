@@ -148,7 +148,6 @@ document.addEventListener('mouseup', function() {
     isDragging = false;
 });
 function forceRedraw(element) {
-    return;
     // Save the current display style
     const display = element.style.display;
 
@@ -313,6 +312,6 @@ function changeJob(actionVar) {
     }
 
     //set displayed
-    document.getElementById("jobTitle").innerHTML = data.currentJob;
+    document.getElementById("jobTitle").innerHTML = data.actions[data.currentJob].title;
     document.getElementById("jobWage").innerHTML = data.currentWage;
 }

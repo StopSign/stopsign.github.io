@@ -3,8 +3,10 @@
 //Bulky text:
 actionData.overclock.onCompleteText = {english:"+<b><span id='overclockActionPower'>1</span></b> Momentum to this action<br>"};
 
-actionData.makeMoney.onCompleteText = {english:"-<b><span id='makeMoneyActionPower'>1</span></b> Momentum taken from this action.<br>" +
+actionData.makeMoney.onCompleteText = {english:"-<b><span id='makeMoneyMomentumTaken'>1</span></b> Momentum taken from this action.<br>" +
         "+<b><span id='makeMoneyAmountToSend'>1</span></b> gold in Spend Money<br>"}
+actionData.socialize.onCompleteText = {english:"-<b><span id='socializeMomentumTaken'>1</span></b> Momentum taken from this action.<br>" +
+        "+<b><span id='socializeAmountToSend'>1</span></b> conversations in Chat with Locals<br>"}
 // actionData.reflect.onLevelText = {english:"+2 to the max level of Overwhelm<br>+2 to the max level of Process Thoughts"}
 actionData.makeMoney.extraInfo = {english:"<br>Exp & Gold gain = log(Momentum/100 * Action Power)^2 * Efficiency * Wages."}
 

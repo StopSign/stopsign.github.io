@@ -51,7 +51,7 @@ function initializeToasts() {
     createToast(function() { return data.actions.reflect.unlocked; },
         "Max Level",
         "When the level is maxed, momentum will not be Consumed. If the max level is raised, Consumption will " +
-        "begin again. This means a maxxed level action can let all of the Momentum it receives be sent.");
+        "begin again. This means a maxed level action can let all of the Momentum it receives be sent.");
     createToast(function() { return data.actions.reflect.level >= 1 },
         "Next Steps",
         "You always want to be working towards unlocking whatever actions are visible. Shift " +
@@ -69,10 +69,10 @@ function initializeToasts() {
     "Help Scott with Chores 1", "Here's how to fill your basic needs. Go do that.");
 
     createToast(function() { return data.actions.helpScottWithChores.level >= 2},
-        "Help Scott with Chores 2", "Here's how to buy clothing. Go do that.");
+        "Help Scott with Chores 2", "Here's how to socialize. Go do that.");
 
-    createToast(function() { return data.actions.helpScottWithChores.level >= 2},
-        "Help Scott with Chores 2", "Here's how to buy clothing. Go do that.");
+    createToast(function() { return data.actions.helpScottWithChores.level >= 3},
+        "Help Scott with Chores 3", "Here's how to buy clothing and eat better food. Go do that. Future levels will increase reflect's max level.");
 
     showAllValidToasts(); //ran automatically every second. Have to manually add it when you want faster
 }

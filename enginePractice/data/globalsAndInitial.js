@@ -10,6 +10,8 @@ let ticksPerSecond = 20;
 let totalTime = 0;
 let ticksForSeconds = 0;
 let secondsPassed = 0;
+//Store offline time
+let bonusTime = 0;
 
 //Saving globals
 let isFileSystem = !!location.href.match("file");
@@ -39,7 +41,7 @@ viewData.toasts = [];
 let statTitles = []; //[<title>, <stat name to be located above>]
 
 let language = "english";
-let globalVisible = true;
+let globalVisible = false;
 
 function initializeData() {
     if(globalVisible) {
@@ -52,6 +54,7 @@ function initializeData() {
     createAndLinkNewStat("focus"); //
     createAndLinkNewStat("energy"); //
     createAndLinkNewStat("drive"); //
+    createAndLinkNewStat("memory"); //
     // createAndLinkNewStat("discipline"); //
     createAndLinkNewStat("ambition");
     // createAndLinkNewStat("resilience"); //Energy
@@ -60,15 +63,13 @@ function initializeData() {
     statTitles.push(["Social Stats", "charm"]);
     createAndLinkNewStat("charm"); //exuding warmth, connecting
     // createAndLinkNewStat("humor");
-    // createAndLinkNewStat("wit"); //quick minded
-    // createAndLinkNewStat("tact"); //smooth movement, smooth conversations
-    // createAndLinkNewStat("grace"); //smooth movement, smooth conversations
-    // createAndLinkNewStat("insight"); //dig deep
-    // createAndLinkNewStat("trust");
-    // createAndLinkNewStat("influence");
-    createAndLinkNewStat("haggling");
+    createAndLinkNewStat("wit"); //quick minded
+    createAndLinkNewStat("tact"); //smooth movement, smooth conversations
+    createAndLinkNewStat("grace"); //smooth movement, smooth conversations
+    createAndLinkNewStat("insight"); //dig deep
+    createAndLinkNewStat("trust");
+    createAndLinkNewStat("influence");
     createAndLinkNewStat("recognition");
-    createAndLinkNewStat("scottFamiliarity");
     createAndLinkNewStat("confidence");
     createAndLinkNewStat("presentation");
     // createAndLinkNewStat("credibility");
@@ -82,7 +83,7 @@ function initializeData() {
     //Physical Stats
     statTitles.push(["Physical Stats", "endurance"]);
     createAndLinkNewStat("endurance");
-    // createAndLinkNewStat("weaponsExpertise");
+    createAndLinkNewStat("weaponsExpertise");
 
     //Resource Stats
     statTitles.push(["Resource Stats", "adaptability"]);
@@ -97,6 +98,8 @@ function initializeData() {
     statTitles.push(["General Stats", "pathfinding"]);
     createAndLinkNewStat("pathfinding");
     createAndLinkNewStat("observation");
+    createAndLinkNewStat("haggling");
+    createAndLinkNewStat("negotiation");
     // createAndLinkNewStat("curiosity");
     // createAndLinkNewStat("patience");
     // createAndLinkNewStat("strategy");
@@ -108,6 +111,11 @@ function initializeData() {
 
     statTitles.push(["Village Stats", "villagersKnown"]);
     createAndLinkNewStat("villagersKnown");
+    createAndLinkNewStat("scottFamiliarity");
+
+    statTitles.push(["Job Stats", "streetKnowledge"]);
+    createAndLinkNewStat("streetKnowledge");
+    createAndLinkNewStat("jobExperience");
 
     //intro
     create("overclock", ["overwhelm", "makeMoney", "travelOnRoad", "socialize"], 0, 0);
@@ -127,9 +135,6 @@ function initializeData() {
     create("meetVillageLeaderScott", ["helpScottWithChores"], -1.1, -1);
     create("helpScottWithChores", [], 0, -1);
     create("fillBasicNeeds", ["buyClothing", "eatBetterFood"], -.5, -1);
-
-    create("socialize", ["localOutreach"], -3, 0);
-    create("localOutreach", ["chatWithTownsfolk", "neighborlyTies"], 0, 1);
 
     //Village
     create("reportForTraining", ["takeLessonsFromJohn"], 0, -1)
@@ -152,8 +157,19 @@ function initializeData() {
     create("buyClothing", [], -1, -1.5);
     create("eatBetterFood", [], -1, -.5);
 
-    //village chat
-    create("chatWithTownsfolk", [], 1, 1);
+    //socialize
+    create("socialize", ["chat"], -3, 0);
+    create("chat", ["neighborlyTies"], 0, 2);
+
+    create("neighborlyTies", ["gossipAboutPrices", "talkToScott", "talkToInstructorJohn"], 0, 2);
+    create("gossipAboutPrices", ["talkAboutMarkets"], -1, 1);
+    create("talkAboutMarkets", [], -1, 0);
+
+    create("talkToScott", ["talkAboutVillageHistory", "talkAboutCurrentIssues"], 0, 2); //Pragmatism, kindness, mystery
+    create("talkAboutVillageHistory", [], 0, 2);
+    create("talkAboutCurrentIssues", [], -1, 2);
+
+    create("talkToInstructorJohn", [], -1.5, -.5);
 
 
     //     create("peruseLibrary", ["researchHistory"], 0, -1.2); //research. Req other unlocks

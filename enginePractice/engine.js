@@ -102,7 +102,7 @@ function createAndLinkNewAction(actionVar, dataObj, title, x, y, downstreamVars)
     actionObj.onCompleteBasic = function() {
         actionObj.completions += 1;
         actionObj.exp += actionObj.expToAdd;
-        while(actionObj.exp >= actionObj.expToLevel) { //on level TODO handle more gracefully instead of a while
+        while(actionObj.exp >= actionObj.expToLevel && (actionObj.maxLevel < 0 || (actionObj.level < actionObj.maxLevel))) {
             actionObj.exp -= actionObj.expToLevel;
             actionObj.level++;
             actionObj.progressMaxBase *= actionObj.progressMaxIncrease;

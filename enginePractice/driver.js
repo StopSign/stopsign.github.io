@@ -19,18 +19,27 @@ function tick() {
         return;
     }
     let newTime = new Date();
-    totalTime += newTime - curTime;
-    gameTicksLeft += newTime - curTime;
-    saveTimer -= newTime - curTime;
+    let delta = newTime - curTime;
+    totalTime += delta;
+    gameTicksLeft += delta;
+    saveTimer -= delta;
     curTime = newTime;
 
     if(saveTimer < 0) {
         saveTimer += 2000;
         save();
     }
-    // document.getElementById("saveTimer").innerHTML = round(saveTimer/1000);
 
     let didSomething = false; //for performance
+
+    // Main loop: only process up to a certain threshold to avoid huge catch-up
+    if (gameTicksLeft > 2000) {
+        // Dump the overflow into bonusTime
+        let overflow = gameTicksLeft;
+        gameTicksLeft = 0;
+        bonusTime += overflow;
+        console.warn(`Too large backlog! Moved ${overflow} ms to bonusTime (now ${bonusTime} ms).`);
+    }
 
     while (gameTicksLeft > (1000 / ticksPerSecond)) {
         if(stop || forceStop) {
@@ -41,17 +50,21 @@ function tick() {
             break;
         }
 
+        //Game logic for each tick
         ticksForSeconds++;
         if(ticksForSeconds % ticksPerSecond === 0) {
             secondPassed();
         }
         framePassed();
-
-
         didSomething = true;
+
         if(gameTicksLeft > 1200) {
             ticksPerSecond /= 2;
-            console.warn(`too fast! (${gameTicksLeft}). Shifting ticksPerSecond to ${ticksPerSecond}`);
+            if (ticksPerSecond < 1) {
+                ticksPerSecond = 1;
+            }
+            console.warn(`Too fast! (${gameTicksLeft}). Shifting ticksPerSecond to ${ticksPerSecond}`);
+            bonusTime += gameTicksLeft;
             gameTicksLeft = 0;
         }
         gameTicksLeft -= (1000 / ticksPerSecond) / gameSpeed / bonusSpeed;
