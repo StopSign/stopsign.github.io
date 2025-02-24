@@ -43,6 +43,11 @@ let statTitles = []; //[<title>, <stat name to be located above>]
 let language = "english";
 let globalVisible = false;
 
+
+let upgradeLevel = 1;
+data.upgrades = {};
+data.upgrades.sliderAutoSet = { amount:100 };
+
 function initializeData() {
     if(globalVisible) {
         document.getElementById("jobDisplay").style.display = "";
@@ -84,6 +89,7 @@ function initializeData() {
     statTitles.push(["Physical Stats", "endurance"]);
     createAndLinkNewStat("endurance");
     createAndLinkNewStat("weaponsExpertise");
+    createAndLinkNewStat("vitality"); //
 
     //Resource Stats
     statTitles.push(["Resource Stats", "adaptability"]);

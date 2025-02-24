@@ -189,6 +189,9 @@ function tickGameObject(actionVar) {
 }
 
 function giveMomentumTo(actionObj, downstreamAction, amount) {
+    if(!downstreamAction) {
+        console.log(actionObj.title + " is failing to give to downstream.");
+    }
     addMomentumTo(downstreamAction, amount);
     actionObj.momentum -= amount;
     actionObj.momentumDelta -= amount * ticksPerSecond;
@@ -199,9 +202,8 @@ function addMomentumTo(downstreamAction, amount) {
         downstreamAction.unlockCost -= amount;
         amount = 0;
         if(downstreamAction.unlockCost <= 0) {
-            amount = -1 * downstreamAction.unlockCost;
-            downstreamAction.unlocked = true;
-            downstreamAction.onUnlock();
+            unlockAction(downstreamAction);
+            amount = -1 * downstreamAction.unlockCost; //get the leftovers back
         }
     }
     downstreamAction.momentum += amount;

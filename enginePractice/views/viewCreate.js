@@ -31,9 +31,9 @@ function generateStatDisplay(statVar) {
         "<span style='width:50px;display:inline-block'>+<b><span id='"+statVar+"PerSecond'>"+statObj.perSecond+"</span></b>/s</span>" +
         "</div>";
 
-    let child = document.createElement("div");
+    let child = document.createElement("template");
     child.innerHTML = theStr;
-    document.getElementById("statDisplay").appendChild(child);
+    document.getElementById("statDisplay").appendChild(child.content);
 
     view.cached[statVar+"NumContainer"] = document.getElementById(statVar+"NumContainer");
     view.cached[statVar+"Num"] = document.getElementById(statVar+"Num");
@@ -66,14 +66,11 @@ function generateActionDisplay(actionVar) {
         "</span>" +
         "</span>";
 
-    let hideDownstreambutton = actionObj.isGenerator && actionVar !== "overclock";
-    let displayDownstreamButton = hideDownstreambutton?"none":"";
-
     let menuContainer =
         "<div id='' style='position:absolute;top:-18px;font-size:13px;left:-1px;'>" +
         (actionVar==="overclock"?"":"<span id='"+actionVar+"GoToParentButton' onclick='actionTitleClicked(\""+actionObj.parent+"\")' " +
             "class='buttonSimple' style='margin-right:3px;width:30px;height:30px;text-align:center;cursor:pointer;padding:0 4px;'>^</span>") +
-        "<span id='"+actionVar+"ToggleDownstreamButton' onclick='toggleDownstream(\""+actionVar+"\")' class='buttonSimple' style='display:"+displayDownstreamButton+";margin-right:3px;width:30px;height:30px;text-align:center;cursor:pointer;padding:0 4px;background-color:var(--selection-color)'>Downstream</span>" +
+        "<span id='"+actionVar+"ToggleDownstreamButton' onclick='toggleDownstream(\""+actionVar+"\")' class='buttonSimple' style='margin-right:3px;width:30px;height:30px;text-align:center;cursor:pointer;padding:0 4px;background-color:var(--selection-color)'>Downstream</span>" +
         "<span id='"+actionVar+"ToggleLevelInfoButton' onclick='toggleLevelInfo(\""+actionVar+"\")' class='buttonSimple' style='margin-right:3px;width:30px;height:30px;text-align:center;cursor:pointer;padding:0 4px;'>Info</span>" +
         "<span id='"+actionVar+"ToggleStatsInfoButton' onclick='toggleStatsInfo(\""+actionVar+"\")' class='buttonSimple' style='margin-right:3px;width:30px;height:30px;text-align:center;cursor:pointer;padding:0 4px;'>Stats</span>" +
         "<span id='"+actionVar+"ToggleStoryButton' onclick='toggleStory(\""+actionVar+"\")' class='buttonSimple' style='margin-right:3px;width:30px;height:30px;text-align:center;cursor:pointer;padding:0 4px;'>Story</span>" +
@@ -229,9 +226,9 @@ function generateActionDisplay(actionVar) {
 
 
 
-    let child = document.createElement("div");
+    let child = document.createElement("template");
     child.innerHTML = theStr;
-    document.getElementById("actionContainer").appendChild(child);
+    document.getElementById("actionContainer").appendChild(child.content);
 
 
     let lockIcon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
@@ -315,8 +312,8 @@ function createDownStreamSliders(actionObj) {
             "<div id='"+actionObj.actionVar+"SliderContainer"+downstreamVar+"' style='margin-bottom: 5px;margin-top:5px;font-size:12px;'>" +
             "<b><span style='margin-bottom: 10px;cursor:pointer;' onclick='actionTitleClicked(`"+downstreamVar+"`)'>"+title+"</span></b>" +
             " (+<b><span id='"+actionObj.actionVar+"DownstreamSendRate"+downstreamVar+"'>0</span></b>/s)<br>" +
-            "<input type='number' id='"+actionObj.actionVar+"NumInput"+downstreamVar+"' value='0' min='0' max='100' oninput='validateInput(\""+actionObj.actionVar+"\", \""+downstreamVar+"\")' onchange='updateSlider(\""+actionObj.actionVar+"\", \""+downstreamVar+"\")' style='margin-right: 3px;font-size:10px;width:37px;'>" +
-            "<input type='range' id='"+actionObj.actionVar+"RangeInput"+downstreamVar+"' value='0' min='0' max='100' oninput='updateNumber(\""+actionObj.actionVar+"\", \""+downstreamVar+"\")' style='margin-left:5px;width:200px;font-size:10px;height:5px;margin-bottom:8px;'>" +
+            "<input type='number' id='"+actionObj.actionVar+"NumInput"+downstreamVar+"' value='0' min='0' max='100' oninput='validateInput(\""+actionObj.actionVar+"\", \""+downstreamVar+"\")' onchange='downstreamNumberChanged(\""+actionObj.actionVar+"\", \""+downstreamVar+"\")' style='margin-right: 3px;font-size:10px;width:37px;'>" +
+            "<input type='range' id='"+actionObj.actionVar+"RangeInput"+downstreamVar+"' value='0' min='0' max='100' oninput='downstreamSliderChanged(\""+actionObj.actionVar+"\", \""+downstreamVar+"\")' style='margin-left:5px;width:200px;font-size:10px;height:5px;margin-bottom:8px;'>" +
             "</div>"
 
     });

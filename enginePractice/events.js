@@ -26,19 +26,24 @@ function validateInput(fromAction, toAction) {
     }
 }
 
-function updateSlider(fromAction, toAction) {
-    let numValue = document.getElementById(fromAction + "NumInput" + toAction).value;
-    let rangeInput = document.getElementById(fromAction + "RangeInput" + toAction);
-    rangeInput.value = numValue;
-    document.getElementById(fromAction+"_"+toAction+"_Line").style.opacity = (numValue/100*.8)+"";
-    data.actions[fromAction]["downstreamRate"+toAction] = numValue;
+function setSliderUI(fromAction, toAction, newValue) {
+    if(!fromAction || !toAction || !document.getElementById(fromAction + "NumInput" + toAction)) {
+        console.log('trying to set it from: ' + fromAction + ', ' + toAction);
+        return;
+    }
+    document.getElementById(fromAction + "NumInput" + toAction).value = newValue;
+    document.getElementById(fromAction + "RangeInput" + toAction).value = newValue;
+    document.getElementById(fromAction+"_"+toAction+"_Line").style.opacity = (newValue/100*.8)+"";
+    data.actions[fromAction]["downstreamRate"+toAction] = newValue;
+}
+function downstreamNumberChanged(fromAction, toAction) {
+    let newValue = document.getElementById(fromAction + "NumInput" + toAction).value;
+    setSliderUI(fromAction, toAction, newValue)
 }
 
-function updateNumber(fromAction, toAction) {
-    let rangeValue = document.getElementById(fromAction + "RangeInput" + toAction).value;
-    document.getElementById(fromAction + "NumInput" + toAction).value = rangeValue;
-    document.getElementById(fromAction+"_"+toAction+"_Line").style.opacity = (rangeValue/100*.8)+"";
-    data.actions[fromAction]["downstreamRate"+toAction] = rangeValue;
+function downstreamSliderChanged(fromAction, toAction) {
+    let newValue = document.getElementById(fromAction + "RangeInput" + toAction).value;
+    setSliderUI(fromAction, toAction, newValue);
 }
 function toggleAllZero(actionVar) {
     let action = data.actions[actionVar];
@@ -46,25 +51,16 @@ function toggleAllZero(actionVar) {
         if(!data.actions[toAction] || data.actions[toAction].momentumName !== action.momentumName) {
             return;
         }
-        let fromAction = actionVar;
-        document.getElementById(fromAction + "RangeInput" + toAction).value = 0;
-        document.getElementById(fromAction+"_"+toAction+"_Line").style.opacity = 0+"";
-        document.getElementById(fromAction + "DownstreamSendRate" + toAction).textContent = 0+"";
+        setSliderUI(actionVar, toAction, 0);
     });
 }
-
 function toggleAllHundred(actionVar) {
     let action = data.actions[actionVar];
     action.downstreamVars.forEach(function (toAction) {
         if(!data.actions[toAction] || data.actions[toAction].momentumName !== action.momentumName) {
             return;
         }
-        let fromAction = actionVar;
-        let numValue = 100;
-        document.getElementById(fromAction + "RangeInput" + toAction).value = numValue;
-        document.getElementById(fromAction + "NumInput" + toAction).value = numValue;
-        document.getElementById(fromAction+"_"+toAction+"_Line").style.opacity = (numValue/100*.8)+"";
-        // document.getElementById(fromAction + "DownstreamSendRate" + toAction).textContent = numValue;
+        setSliderUI(actionVar, toAction, 100);
     });
 }
 
@@ -75,20 +71,6 @@ let originalLeft, originalTop;
 const windowElement = document.getElementById('windowElement');
 const actionContainer = document.getElementById('actionContainer');
 
-document.addEventListener('mousedown', function(e) {
-    // console.log(e.clientX, e.target);
-    if (e.target === windowElement || e.target === actionContainer) {
-        isDragging = true;
-
-        // Capture the initial position of the mouse and the container
-        originalX = e.clientX;
-        originalY = e.clientY;
-
-        const style = window.getComputedStyle(actionContainer);
-        originalLeft = parseInt(style.left, 10);
-        originalTop = parseInt(style.top, 10);
-    }
-});
 
 let scale = 1; // Initial scale value
 const scaleStep = 0.1; // Value by which the scale changes per scroll
@@ -118,6 +100,20 @@ windowElement.addEventListener('wheel', function(e) {
     actionContainer.style.transform = `scale(${scale})`;
 });
 
+document.addEventListener('mousedown', function(e) {
+    // console.log(e.clientX, e.target);
+    if (e.target === windowElement || e.target === actionContainer) {
+        isDragging = true;
+
+        // Capture the initial position of the mouse and the container
+        originalX = e.clientX;
+        originalY = e.clientY;
+
+        const style = window.getComputedStyle(actionContainer);
+        originalLeft = parseInt(style.left, 10);
+        originalTop = parseInt(style.top, 10);
+    }
+});
 document.addEventListener('mousemove', function(e) {
     if (isDragging) {
         // Calculate the new position

@@ -58,6 +58,7 @@ function createAndLinkNewAction(actionVar, dataObj, title, x, y, downstreamVars)
     actionObj.expToAddMult = 1;
     actionObj.expToAdd = actionObj.expToAddBase * actionObj.expToAddMult;
     actionObj.generatorSpeed = dataObj.generatorSpeed ? dataObj.generatorSpeed : 1;
+    actionObj.generatorTarget = dataObj.generatorTarget;
     actionObj.momentum = 0;
     actionObj.momentumDelta = 0;
     actionObj.momentumIncrease = 0;
@@ -183,8 +184,43 @@ function updateAllActionStatMults() {
     })
 }
 
+
+//situation 1: Overwhelm is just unlocked. It should be 1% sent to Process Thoughts. AKA On unlock, set all sliders to 1%
+//situation 2: Travel to Outpost just became visible. It's parent, Overclock, should set it's newly visible slider to 1%. AKA On unveil, set parent to 1%.
 function unveilAction(actionVar) {
-    if(data.actions[actionVar]) {
-        data.actions[actionVar].visible = true;
+    let actionObj = data.actions[actionVar];
+    if(!actionObj || actionObj.visible) { //only change things if
+        if(!actionObj) {
+            console.log('tried to unveil ' + actionVar + ' in error.');
+        }
+        return;
     }
+    actionObj.visible = true;
+
+    //set all downstream actions to 1% when you unlock
+    let parentVar = actionObj.parent;
+    let parent = data.actions[parentVar];
+    let amountToSet = data.upgrades.sliderAutoSet.amount;
+
+    if(parent.isGenerator && parent.generatorTarget === actionVar) {
+        //There won't be a downstream slider
+        return;
+    }
+    parent.downstreamVars.forEach(function (downstreamVar) {
+        if(downstreamVar === actionVar) { //set the parent's matching slider
+            setSliderUI(parentVar, downstreamVar, amountToSet);
+        }
+    });
+}
+
+function unlockAction(actionObj) {
+    actionObj.unlocked = true;
+    actionObj.onUnlock();
+
+    let amountToSet = data.upgrades.sliderAutoSet.amount;
+    actionObj.downstreamVars.forEach(function(downstreamVar) {
+        setSliderUI(actionObj.actionVar, downstreamVar, amountToSet);
+    });
+
+
 }
