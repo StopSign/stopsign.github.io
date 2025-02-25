@@ -23,7 +23,9 @@ QoL: clicking the other actions in stats brings you to them
 QoL: whenever your screen is jumped around, it saves the previous spot and you can go back to it with space/button "return"
 QoL: show stats on the side
 QoL: show momentum left to level
-
+QoL: if no downstream are visible, hide the all 0 / all 100 button
+QoL: if the exp bar gets too fast, convert it into a completions/s window instead
+QoL: under the momentum deltas, put "total momentum to level: XXXX, time: :30"
 
 Thoughts:
 The balance is shaping out to be good up to the first job, should I be trying to reset soon?
@@ -214,7 +216,6 @@ Fortune
 Intrigue/Rumors
 
 
-if no downstream are visible, hide the all 0 / all 100 button
 
 later: challenges are the lich sending enemy time travelers into your timeline to interfere, and it blocks off certain important paths in the challenge. Another way to do it is to start with heavy negative stats in certain areas, which effectively blocks them off.
 

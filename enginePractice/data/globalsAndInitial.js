@@ -165,17 +165,18 @@ function initializeData() {
 
     //socialize
     create("socialize", ["chat"], -3, 0);
-    create("chat", ["neighborlyTies"], 0, 2);
+    create("chat", ["gossipAboutPrices", "talkToScott", "talkToInstructorJohn", "localOutreach"], 0, 1);
 
-    create("neighborlyTies", ["gossipAboutPrices", "talkToScott", "talkToInstructorJohn"], 0, 2);
-    create("gossipAboutPrices", ["talkAboutMarkets"], -1, 1);
-    create("talkAboutMarkets", [], -1, 0);
+    create("gossipAboutPrices", ["talkAboutMarkets"], 1, -.5);
+    create("talkAboutMarkets", [], 0, 1);
 
     create("talkToScott", ["talkAboutVillageHistory", "talkAboutCurrentIssues"], 0, 2); //Pragmatism, kindness, mystery
-    create("talkAboutVillageHistory", [], 0, 2);
-    create("talkAboutCurrentIssues", [], -1, 2);
+    create("talkAboutCurrentIssues", ["hearAboutTheLich"], 1, 0);
+    create("hearAboutTheLich", [], 1, 0);
+    create("talkAboutVillageHistory", [], 0, 1.5);
 
-    create("talkToInstructorJohn", [], -1.5, -.5);
+    create("talkToInstructorJohn", [], -1, 0);
+    create("localOutreach", [], -1.5, -1.5);
 
 
     //     create("peruseLibrary", ["researchHistory"], 0, -1.2); //research. Req other unlocks

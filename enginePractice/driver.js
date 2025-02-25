@@ -14,6 +14,7 @@ function startGame() {
     load();
 }
 
+//time-delta-based approach
 function tick() {
     if(sudoStop) {
         return;

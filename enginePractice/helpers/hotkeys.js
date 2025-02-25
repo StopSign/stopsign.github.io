@@ -38,22 +38,29 @@ function moveActionContainer() {
     let currentTop = parseInt(actionContainer.style.top || 0);
     let currentLeft = parseInt(actionContainer.style.left || 0);
 
+    let keyPressed = false;
     if (keysPressed['w']) { // Move up
         currentTop = Math.min(currentTop + movementStep, 0);
+        keyPressed = true;
     }
     if (keysPressed['a']) { // Move left
         currentLeft = Math.min(currentLeft + movementStep, 0);
+        keyPressed = true;
     }
     if (keysPressed['s']) { // Move down
         currentTop = Math.max(currentTop - movementStep, windowElement.offsetHeight - actionContainer.offsetHeight);
+        keyPressed = true;
     }
     if (keysPressed['d']) { // Move right
         currentLeft = Math.max(currentLeft - movementStep, windowElement.offsetWidth - actionContainer.offsetWidth);
+        keyPressed = true;
+    }
+    if(!keyPressed) {
+        return;
     }
 
     // Apply the new position
-    actionContainer.style.top = `${currentTop}px`;
-    actionContainer.style.left = `${currentLeft}px`;
+    actionContainer.style.transform = `translate(${currentLeft}px, ${currentTop}px)`;
 
     forceRedraw(windowElement);
 

@@ -64,9 +64,6 @@ function toggleAllHundred(actionVar) {
     });
 }
 
-let isDragging = false;
-let originalX, originalY;
-let originalLeft, originalTop;
 
 const windowElement = document.getElementById('windowElement');
 const actionContainer = document.getElementById('actionContainer');
@@ -97,47 +94,56 @@ windowElement.addEventListener('wheel', function(e) {
     scale = Math.min(Math.max(minScale, scale), maxScale);
 
     // Apply the scale transformation to the container
-    actionContainer.style.transform = `scale(${scale})`;
+    actionContainer.style.transform = `translate(${transformX}px, ${transformY}px) scale(${scale})`;
 });
 
+let isDragging = false;
+let originalX, originalY;
+let originalLeft, originalTop;
+
+let originalMouseX, originalMouseY;
+let transformX=0, transformY=0;
+let originalTransformX, originalTransformY;
 document.addEventListener('mousedown', function(e) {
     // console.log(e.clientX, e.target);
     if (e.target === windowElement || e.target === actionContainer) {
         isDragging = true;
 
         // Capture the initial position of the mouse and the container
-        originalX = e.clientX;
-        originalY = e.clientY;
+        originalMouseX = e.clientX;
+        originalMouseY = e.clientY;
 
-        const style = window.getComputedStyle(actionContainer);
-        originalLeft = parseInt(style.left, 10);
-        originalTop = parseInt(style.top, 10);
+        originalTransformX = transformX;
+        originalTransformY = transformY;
+
+        // const style = window.getComputedStyle(actionContainer);
+        // originalLeft = parseInt(style.left, 10);
+        // originalTop = parseInt(style.top, 10);
     }
 });
 document.addEventListener('mousemove', function(e) {
-    if (isDragging) {
-        // Calculate the new position
-        const deltaX = e.clientX - originalX;
-        const deltaY = e.clientY - originalY;
-
-        // Proposed new position
-        let newLeft = originalLeft + deltaX;
-        let newTop = originalTop + deltaY;
-        // console.log(newLeft);
-
-        // Prevent the container from moving beyond the window's boundaries
-        // The container should not move in a way that its right or bottom edges go inside the window's area
-        newLeft = Math.min(newLeft, 0); // Prevent the left edge from going right
-        newLeft = Math.max(newLeft, windowElement.offsetWidth - actionContainer.offsetWidth); // Prevent the right edge from going left
-
-        newTop = Math.min(newTop, 0); // Prevent the top edge from going down
-        newTop = Math.max(newTop, windowElement.offsetHeight - actionContainer.offsetHeight); // Prevent the bottom edge from going up
-
-        // Update the position of the container
-        actionContainer.style.left = `${newLeft}px`;
-        actionContainer.style.top = `${newTop}px`;
-        forceRedraw(windowElement);
+    if(!isDragging) {
+        return;
     }
+    // Calculate the new position
+    const deltaX = e.clientX - originalMouseX;
+    const deltaY = e.clientY - originalMouseY;
+
+    // Proposed new position
+    let newTransformX = originalTransformX + deltaX;
+    let newTransformY = originalTransformY + deltaY;
+    // console.log(newLeft);
+
+    // Clamp range to [-4000, 4000]
+    newTransformX = Math.max(-4000, Math.min(newTransformX, 4000));
+    newTransformY = Math.max(-4000, Math.min(newTransformY, 4000));
+
+    // Update our state
+    transformX = newTransformX;
+    transformY = newTransformY;
+
+    // Update the position of the container
+    actionContainer.style.transform = `translate(${transformX}px, ${transformY}px) scale(${scale})`;
 });
 
 document.addEventListener('mouseup', function() {
@@ -232,7 +238,7 @@ function changeDarkMode() {
 
     // Toggle the dark-mode class
     body.classList.toggle('lightMode');
-    document.getElementById('lightModeButton').innerHTML = body.classList.contains('lightMode') ? "Dark Mode" : "Light Mode";
+    document.getElementById('lightModeButton').innerText = body.classList.contains('lightMode') ? "Dark Mode" : "Light Mode";
 }
 
 let selectedStat = null;
@@ -309,11 +315,11 @@ function changeJob(actionVar) {
     }
 
     //set displayed
-    document.getElementById("jobTitle").innerHTML = data.actions[data.currentJob].title;
-    document.getElementById("jobWage").innerHTML = data.currentWage;
+    document.getElementById("jobTitle").innerText = data.actions[data.currentJob].title;
+    document.getElementById("jobWage").innerText = data.currentWage;
 }
 
 function pauseGame() {
     stop = !stop;
-    document.getElementById('pauseButton').innerHTML = stop ? "Resume" : "Pause";
+    document.getElementById('pauseButton').innerText = stop ? "Resume" : "Pause";
 }

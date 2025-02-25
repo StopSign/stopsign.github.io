@@ -27,10 +27,10 @@ function calcAndSetTotalMomentum() {
             totalMometum += actionObj.momentum;
         }
     });
-    view.cached.totalMomentum.innerHTML = intToString(totalMometum, 1);
+    view.cached.totalMomentum.innerText = intToString(totalMometum, 1);
 }
 function setTimerUI() {
-    view.cached.secondsPassed.innerHTML = secondsToTime(secondsPassed);
+    view.cached.secondsPassed.innerText = secondsToTime(secondsPassed);
 }
 
 //Save a second copy of all the data after a view update, so it can request updates only for the ones that are different
@@ -52,7 +52,7 @@ function updateStatView(statName) {
     roundedNumbers.forEach(obj => {
         let capName = capitalizeFirst(obj[0]);
         if(forceUpdate || intToString(prevStat[obj[0]], obj[1]) !== intToString(stat[obj[0]], obj[1])) {
-            view.cached[`${statName}${capName}`].innerHTML = intToString(stat[obj[0]], obj[1]);
+            view.cached[`${statName}${capName}`].innerText = intToString(stat[obj[0]], obj[1]);
         }
     })
 
@@ -87,7 +87,7 @@ function updateActionView(actionName) {
             return;
         }
         if(forceUpdate || intToString(prevAction[nameNoNums], obj[1]) !== intToString(action[nameNoNums], obj[1])) {
-            elem.innerHTML = intToString(action[nameNoNums], obj[1]);
+            elem.innerText = intToString(action[nameNoNums], obj[1]);
         }
     })
 
@@ -100,7 +100,7 @@ function updateActionView(actionName) {
             return;
         }
         if(forceUpdate || intToString(prevAction[nameNoNums], obj[1]) !== intToString(action[nameNoNums], obj[1])) {
-            elem.innerHTML = intToString(action[nameNoNums], obj[1]);
+            elem.innerText = intToString(action[nameNoNums], obj[1]);
             elem.style.color = `rgb(${Math.round(20+189*(1-(action[nameNoNums]/100)))},${Math.round(20+189*(action[nameNoNums]/100))},100)`;
         }
     })
@@ -113,7 +113,7 @@ function updateActionView(actionName) {
             return;
         }
         if(forceUpdate || prevAction[nameNoNums] !== action[nameNoNums]) {
-            elem.innerHTML = action[nameNoNums];
+            elem.innerText = action[nameNoNums];
         }
     })
 
@@ -121,12 +121,12 @@ function updateActionView(actionName) {
     //TODO only update if needed
     if(action.expStats) {
         action.expStats.forEach(function(expStat) {
-            document.getElementById(`${actionName}_${expStat[0]}StatExpMult`).innerHTML = intToString(action[expStat[0]+"StatExpMult"], 3);
+            document.getElementById(`${actionName}_${expStat[0]}StatExpMult`).innerText = intToString(action[expStat[0]+"StatExpMult"], 3);
         });
     }
     if(action.efficiencyStats) {
         action.efficiencyStats.forEach(function(expertiseStat) {
-            document.getElementById(`${actionName}_${expertiseStat[0]}StatExpertiseMult`).innerHTML = intToString(action[expertiseStat[0]+"StatExpertiseMult"], 3);
+            document.getElementById(`${actionName}_${expertiseStat[0]}StatExpertiseMult`).innerText = intToString(action[expertiseStat[0]+"StatExpertiseMult"], 3);
         });
     }
 
