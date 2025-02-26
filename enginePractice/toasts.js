@@ -23,36 +23,36 @@ function initializeToasts() {
         "Overclock Info",
         "The game starts with the Overclock action. Your primary gameplay control is to change " +
         "the percentage to keep or send the Action's resource (Momentum) onwards to the downstream Actions. <b>Send enough " +
-        "Momentum from Overclock to Overwhelm to unlock it (Set the slider to 100%).</b>");
-    createToast(function() { return toastIsClicked(2)  && (data.actions.overclock.downstreamRateoverwhelm-0) > 0; },
+        "Momentum from Overclock to Harness Overflow to unlock it (Set the slider to 100%).</b>");
+    createToast(function() { return toastIsClicked(2)  && (data.actions.overclock.downstreamRateharnessOverflow-0) > 0; },
         "Game Math on Sending with Tiers",
         "Rate of sending = Tier mult * efficiency. As Tier 0, Overclock gets 10% of current Momentum/s. Tier 1 is 1%, then .1%, etc.");
-    createToast(function() { return data.actions.overwhelm.unlocked; },
+    createToast(function() { return data.actions.harnessOverflow.unlocked; },
         "Exp and Leveling",
         "When the progress bar is full, an Action will gain 1 exp into the lower, purple bar, " +
         "and when that is full you level up, gaining 1) stats 2) increased Action Power and 3) increased progress/exp " +
         "requirements. The amount of exp gained will remain at 1 until much later in the game.");
     createToast(function() { return toastIsClicked(4); },
-        "Consuming Progress on Overwhelm",
-        "Overwhelm is the a common type of action. It can Receive, " +
+        "Consuming Progress on Harness Overflow",
+        "Harness Overflow is the a common type of action. It can Receive, " +
         "Consume, and Send. It receives momentum from the upstream action. It will always be consuming, and you can optionally set the downstream sliders to send momentum onwards. " +
         "The consumption rate is the same as a single 100% slider (that you can't turn off).<br><br>Unlock a few actions to explore the world.");
-    createToast(function() { return data.actions.overwhelm.unlocked; },
-        "Leveling Stats with Overwhelm",
+    createToast(function() { return data.actions.harnessOverflow.unlocked; },
+        "Leveling Stats with Harness Overflow",
         "The Stats tab contains 1) Which stats the action gains on level up " +
         "2) Which stats reduce the amount of exp to level, and by how much 3) Which stats increase expertise, and by how " +
-        "much. The stat bonus is 1.01^stat. For example, Overwhelm will gain +5 Drive when it levels up, which increases " +
+        "much. The stat bonus is 1.01^stat. For example, Harness Overflow will gain +5 Drive when it levels up, which increases " +
         "the stat bonus by 1.01^5 = x1.051. Overclock uses 1000% of this bonus, or 10 x .051 + 1 = x1.51, which is applied " +
-        "to Overclock's original 10% efficiency to become x1.051. <b>Get Overwhelm to Level 3</b>");
-    createToast(function() { return data.actions.processThoughts.unlocked; },
+        "to Overclock's original 10% efficiency to become x1.051. <b>Get Harness Overflow to Level 3</b>");
+    createToast(function() { return data.actions.distillInsight.unlocked; },
         "Efficiency",
         "Process Thoughts uses efficiency in two ways. 1) It slows down the rate at which the Action consumes and sends. " +
         "2) It reduces the amount of successfully consumed Momentum - only this part \"wastes\" Momentum.");
-    createToast(function() { return data.actions.reflect.unlocked; },
+    createToast(function() { return data.actions.remember.unlocked; },
         "Max Level",
         "When the level is maxed, momentum will not be Consumed. If the max level is raised, Consumption will " +
         "begin again. This means a maxed level action can let all of the Momentum it receives be sent.");
-    createToast(function() { return data.actions.reflect.level >= 1 },
+    createToast(function() { return data.actions.remember.level >= 1 },
         "Next Steps",
         "You always want to be working towards unlocking whatever actions are visible. Shift " +
         "the Momentum around the Action web to do so!");
@@ -72,7 +72,7 @@ function initializeToasts() {
         "Help Scott with Chores 2", "Here's how to socialize. Go do that.");
 
     createToast(function() { return data.actions.helpScottWithChores.level >= 3},
-        "Help Scott with Chores 3", "Here's how to buy clothing and eat better food. Go do that. Future levels will increase reflect's max level.");
+        "Help Scott with Chores 3", "Here's how to buy clothing and eat better food. Go do that. Future levels will increase remember's max level.");
 
     showAllValidToasts(); //ran automatically every second. Have to manually add it when you want faster
 }

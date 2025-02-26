@@ -94,7 +94,7 @@ solution:
 	-game should largely rotate which section gets all the sweet bonuses
 		-with proper game balance, if you let one "branch" coming off of Overclock be dead at a time, then resources sent to it are rather wasted, and it makes switching in a focused manor more desirable - making movespeed better. Solve this with balance, but make sure to include this at all times - socialize
 			-socialize for a bit to learn someone deeply, and then stop. Can do this early. Actions have max levels.
-			-reflect is the more-or-less-constant, but it frequently is hanging while you unlock higher levels for it. Later it becomes a key to push hard as it greatly improves Overclock in a feedback loop. Has max levels on the early nodes, none on the later ones
+			-remember is the more-or-less-constant, but it frequently is hanging while you unlock higher levels for it. Later it becomes a key to push hard as it greatly improves Overclock in a feedback loop. Has max levels on the early nodes, none on the later ones
 			-makeMoney/spendmoney every now and then gets improved enough to be charged first as a big leap forward
 			-travelToOutpost is where action have max levels and quickly get to 100% efficiency, making them not spend any as they travel. This will split into multiple actions that do start not having max levels, but the "road" is clear (or can be upgraded to that point), so to speak
 			--jobs:  is a pretty steady yet needed big drain, with big jumps in money gaining per level. jobs can cover ranges where they're effective, which is essentially a rough estimate for when the stats are supposed to be the most effective for them.

@@ -35,7 +35,7 @@ function load() {
     }
 
     // initializeDisplay();
-    recalcInterval(50);
+    // recalcInterval(50);
 }
 
 function save() {

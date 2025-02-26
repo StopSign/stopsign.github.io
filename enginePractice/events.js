@@ -33,7 +33,7 @@ function setSliderUI(fromAction, toAction, newValue) {
     }
     document.getElementById(fromAction + "NumInput" + toAction).value = newValue;
     document.getElementById(fromAction + "RangeInput" + toAction).value = newValue;
-    document.getElementById(fromAction+"_"+toAction+"_Line").style.opacity = (newValue/100*.8)+"";
+    // document.getElementById(fromAction+"_"+toAction+"_Line").style.opacity = (newValue/100*.8)+"";
     data.actions[fromAction]["downstreamRate"+toAction] = newValue;
 }
 function downstreamNumberChanged(fromAction, toAction) {
@@ -322,4 +322,9 @@ function changeJob(actionVar) {
 function pauseGame() {
     stop = !stop;
     document.getElementById('pauseButton').innerText = stop ? "Resume" : "Pause";
+}
+
+function increaseGamespeed() {
+    gameSpeed *= 2;
+    console.log('gamespeed increased to ' + gameSpeed);
 }

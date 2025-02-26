@@ -290,8 +290,8 @@ function cacheDownstreamViews() {
 
             view.cached[`${actionVar}DownstreamSendRate${downstreamVar}`] = document.getElementById(`${actionVar}DownstreamSendRate${downstreamVar}`);
 
-            view.cached[actionVar + "_" + downstreamVar + "_Line_Border"] = document.getElementById(actionVar + "_" + downstreamVar + "_Line_Border");
-            view.cached[actionVar + "_" + downstreamVar + "_Line"] = document.getElementById(actionVar + "_" + downstreamVar + "_Line");
+            // view.cached[actionVar + "_" + downstreamVar + "_Line_Border"] = document.getElementById(actionVar + "_" + downstreamVar + "_Line_Border");
+            // view.cached[actionVar + "_" + downstreamVar + "_Line"] = document.getElementById(actionVar + "_" + downstreamVar + "_Line");
             view.cached[actionVar + "SliderContainer" + downstreamVar] = document.getElementById(actionVar + "SliderContainer" + downstreamVar);
         });
     })
@@ -345,21 +345,21 @@ function generateLinesBetweenActions() {
             let opacity = isDifferentResource ? ".8" : "0";
 
 
-            const svgBorderLine = `<svg id="${actionVar}_${targetObj.actionVar}_Line_Border" style="position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;opacity:.4;"><line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="lightgrey" stroke-width="32" /></svg>`;
-
-            // Create the SVG line as a string
-            const svgLine = `<svg id="`+actionVar+`_`+targetObj.actionVar+`_Line" style="position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;opacity:`+opacity+`;"><line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="`+backgroundColor+`" stroke-width="30" /></svg>`;
-
-            // Create a div and set its innerHTML to the SVG line
-            const lineBorderDiv = document.createElement('div');
-            lineBorderDiv.innerHTML = svgBorderLine;
-            const lineDiv = document.createElement('div');
-            lineDiv.innerHTML = svgLine;
-
-            // Append the lineDiv to the lineContainer
-            const lineContainer = document.getElementById('lineContainer');
-            lineContainer.appendChild(lineBorderDiv);
-            lineContainer.appendChild(lineDiv);
+            // const svgBorderLine = `<svg id="${actionVar}_${targetObj.actionVar}_Line_Border" style="position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;opacity:.4;"><line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="lightgrey" stroke-width="32" /></svg>`;
+            //
+            // // Create the SVG line as a string
+            // const svgLine = `<svg id="`+actionVar+`_`+targetObj.actionVar+`_Line" style="position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;opacity:`+opacity+`;"><line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="`+backgroundColor+`" stroke-width="30" /></svg>`;
+            //
+            // // Create a div and set its innerHTML to the SVG line
+            // const lineBorderDiv = document.createElement('div');
+            // lineBorderDiv.innerHTML = svgBorderLine;
+            // const lineDiv = document.createElement('div');
+            // lineDiv.innerHTML = svgLine;
+            //
+            // // Append the lineDiv to the lineContainer
+            // const lineContainer = document.getElementById('lineContainer');
+            // lineContainer.appendChild(lineBorderDiv);
+            // lineContainer.appendChild(lineDiv);
         });
     });
 }

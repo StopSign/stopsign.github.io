@@ -103,7 +103,12 @@ function createAndLinkNewAction(actionVar, dataObj, title, x, y, downstreamVars)
     actionObj.onCompleteBasic = function() {
         actionObj.completions += 1;
         actionObj.exp += actionObj.expToAdd;
+        //Could this be the reason there's a memory leak?
+        let timesRun = 0;
         while(actionObj.exp >= actionObj.expToLevel && (actionObj.maxLevel < 0 || (actionObj.level < actionObj.maxLevel))) {
+            if(timesRun++ > 10) {
+                console.log('way overdoing it on ' + actionObj.actionVar + ', ' + timesRun);
+            }
             actionObj.exp -= actionObj.expToLevel;
             actionObj.level++;
             actionObj.progressMaxBase *= actionObj.progressMaxIncrease;
@@ -185,7 +190,7 @@ function updateAllActionStatMults() {
 }
 
 
-//situation 1: Overwhelm is just unlocked. It should be 1% sent to Process Thoughts. AKA On unlock, set all sliders to 1%
+//situation 1: Harness Overflow is just unlocked. It should be 1% sent to Process Thoughts. AKA On unlock, set all sliders to 1%
 //situation 2: Travel to Outpost just became visible. It's parent, Overclock, should set it's newly visible slider to 1%. AKA On unveil, set parent to 1%.
 function unveilAction(actionVar) {
     let actionObj = data.actions[actionVar];
@@ -201,7 +206,9 @@ function unveilAction(actionVar) {
     let parentVar = actionObj.parent;
     let parent = data.actions[parentVar];
     let amountToSet = data.upgrades.sliderAutoSet.amount;
-
+    if(!parent) {
+        console.log('Failed to access parent var ' + parentVar + ' of action ' + actionVar + '.');
+    }
     if(parent.isGenerator && parent.generatorTarget === actionVar) {
         //There won't be a downstream slider
         return;

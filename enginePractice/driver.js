@@ -3,12 +3,13 @@
 function startGame() {
     if (isFileSystem) {
     } else {
-        window.doWork = new Worker('helpers/interval.js');
-        window.doWork.onmessage = function (event) {
-            if (event.data === 'interval.start') {
-                tick();
-            }
-        };
+        setInterval(tick, 1000/50);
+        // window.doWork = new Worker('helpers/interval.js');
+        // window.doWork.onmessage = function (event) {
+        //     if (event.data === 'interval.start') {
+        //         tick();
+        //     }
+        // };
     }
 
     load();
@@ -162,7 +163,11 @@ function tickGameObject(actionVar) {
     actionObj.progress += momentumToAddInefficient;
     actionObj.progressGain = momentumToAddInefficient * ticksPerSecond; //display purposes for (+1.0/s) on green bar
 
-    while(actionObj.progress >= actionObj.progressMax) {
+    let timesRun = 0;
+    while(actionObj.progress >= actionObj.progressMax) { //or max
+        if(timesRun++ > 10) {
+            console.log('progress too fast on ' + actionObj.actionVar);
+        }
         actionObj.progress -= actionObj.progressMax;
         actionObj.onCompleteCustom();
         actionObj.onCompleteBasic();

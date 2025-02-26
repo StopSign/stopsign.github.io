@@ -54,7 +54,7 @@ function initializeData() {
     }
 
     statTitles.push(["Overclock Stats", "abilityPower"]);
-    createAndLinkNewStat("abilityPower"); //improves efficiency of overclock & others. Comes from Overwhelm
+    createAndLinkNewStat("abilityPower"); //improves efficiency of overclock & others. Comes from Harness Overflow
     createAndLinkNewStat("processing"); //
     createAndLinkNewStat("focus"); //
     createAndLinkNewStat("energy"); //
@@ -124,21 +124,21 @@ function initializeData() {
     createAndLinkNewStat("jobExperience");
 
     //intro
-    create("overclock", ["overwhelm", "makeMoney", "travelOnRoad", "socialize"], 0, 0);
-    create("overwhelm", ["processThoughts"], -1.1, -1.1);
-    create("processThoughts", ["reflect"], -1, -1);
-    create("reflect", ["journal", "remember", "introspect"], -1, -1);
-    create("journal", ["takeNotes"], 0, 1);
-    create("takeNotes", [], 0, 1);
-    create("makeMoney", ["spendMoney"], 0, -1.6);
+    create("overclock", ["harnessOverflow", "travelOnRoad", "makeMoney", "socialize"], 0, 0);
+    create("harnessOverflow", ["distillInsight", "remember"], -1, -1);
+    create("distillInsight", ["journal"], -1, 0);
+    create("journal", ["takeNotes"], -1, 0);
+    create("takeNotes", [], 0, -1);
+    create("remember", [], -1, -1);
+    create("makeMoney", ["spendMoney"], 0, -1.5);
     create("spendMoney", ["fillBasicNeeds"], 0, -1);
-    create("travelOnRoad", ["travelToOutpost", "clearTheTrail"], 1.5, 0);
+    create("travelOnRoad", ["travelToOutpost", "clearTheTrail"], 1, 0);
     create("clearTheTrail", ["paveTheTrail"], 0, 1); //increase travel expertise
-        create("paveTheTrail", [], 0, 1); //increase travel expertise to max. Req builder skills
-    create("travelToOutpost", ["checkNoticeBoard", "travelToCrossroads"], 1.5, 0);
+    create("paveTheTrail", [], 0, 1); //increase travel expertise to max. Req builder skills
+    create("travelToOutpost", ["meetVillageLeaderScott", "checkNoticeBoard", "travelToCrossroads"], 1, 0);
+    create("meetVillageLeaderScott", ["helpScottWithChores"], 0, -1);
 
-    create("checkNoticeBoard", ["meetVillageLeaderScott", "reportForTraining", "reportForLabor"], 0, -1);
-    create("meetVillageLeaderScott", ["helpScottWithChores"], -1.1, -1);
+    create("checkNoticeBoard", ["reportForTraining", "reportForLabor"], 1, -1);
     create("helpScottWithChores", [], 0, -1);
     create("fillBasicNeeds", ["buyClothing", "eatBetterFood"], -.5, -1);
 
@@ -149,7 +149,7 @@ function initializeData() {
 
 
     //jobs
-    create("reportForLabor", ["oddJobsLaborer"], 2, -2);
+    create("reportForLabor", ["oddJobsLaborer"], 1, -1);
     create("oddJobsLaborer", ["chimneySweep"], 0, -1);
     create("chimneySweep", ["handyman"], 0, -1);
     create("handyman", ["tavernHelper"], 0, -1);
@@ -164,10 +164,10 @@ function initializeData() {
     create("eatBetterFood", [], -1, -.5);
 
     //socialize
-    create("socialize", ["chat"], -3, 0);
+    create("socialize", ["chat"], -1.5, 0);
     create("chat", ["gossipAboutPrices", "talkToScott", "talkToInstructorJohn", "localOutreach"], 0, 1);
 
-    create("gossipAboutPrices", ["talkAboutMarkets"], 1, -.5);
+    create("gossipAboutPrices", ["talkAboutMarkets"], 1, 0);
     create("talkAboutMarkets", [], 0, 1);
 
     create("talkToScott", ["talkAboutVillageHistory", "talkAboutCurrentIssues"], 0, 2); //Pragmatism, kindness, mystery

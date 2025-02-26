@@ -163,9 +163,9 @@ function updateActionView(actionName) {
             //if downstream is invisible, hide relevant action's slider area
             let prevDownstreamObj = prevState.actions[downstreamVar];
             if(forceUpdate || prevDownstreamObj.visible !== downstreamObj.visible) {
-                if(!view.cached[actionName + "_" + downstreamVar + "_Line_Border"]) {
-                    console.log('missing div for ' + actionName + ', downstream: ' + downstreamVar);
-                }
+                // if(!view.cached[actionName + "_" + downstreamVar + "_Line_Border"]) {
+                //     console.log('missing div for ' + actionName + ', downstream: ' + downstreamVar);
+                // }
                 if(downstreamObj.visible) {
                     view.cached[downstreamVar+"Container"].style.display = "block";
                     // view.cached[actionName + "_" + downstreamVar + "_Line_Border"].style.display = "block";
@@ -193,14 +193,14 @@ function updateActionView(actionName) {
         if(action.visible) {
             view.cached[actionName + "Container"].style.display = "";
             if(action.parent) {
-                view.cached[action.parent + "_" + actionName + "_Line_Border"].style.display = "";
-                view.cached[action.parent + "_" + actionName + "_Line"].style.display = "";
+                // view.cached[action.parent + "_" + actionName + "_Line_Border"].style.display = "";
+                // view.cached[action.parent + "_" + actionName + "_Line"].style.display = "";
             }
         } else {
             view.cached[actionName + "Container"].style.display = "none";
             if(action.parent) {
-                view.cached[action.parent + "_" + actionName + "_Line_Border"].style.display = "none";
-                view.cached[action.parent + "_" + actionName + "_Line"].style.display = "none";
+                // view.cached[action.parent + "_" + actionName + "_Line_Border"].style.display = "none";
+                // view.cached[action.parent + "_" + actionName + "_Line"].style.display = "none";
             }
         }
         //the unlocked action's parent_action_Line needs to be made visible too
