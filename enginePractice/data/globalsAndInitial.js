@@ -32,7 +32,7 @@ data.actionNames = [];
 data.stats = {};
 data.statNames = [];
 data.toastStates = []; // array of toast objects: {id, state, element}
-data.currentJob = "Beggar";
+data.currentJob = "Helping Scott";
 data.currentWage = 1;
 
 let viewData = {}; //contains only things that are generated / not saved
@@ -88,7 +88,7 @@ function initializeData() {
     //Physical Stats
     statTitles.push(["Physical Stats", "endurance"]);
     createAndLinkNewStat("endurance");
-    createAndLinkNewStat("weaponsExpertise");
+    // createAndLinkNewStat("weaponsExpertise");
     createAndLinkNewStat("vitality"); //
 
     //Resource Stats
@@ -106,6 +106,7 @@ function initializeData() {
     createAndLinkNewStat("observation");
     createAndLinkNewStat("haggling");
     createAndLinkNewStat("negotiation");
+    createAndLinkNewStat("perspective");
     // createAndLinkNewStat("curiosity");
     // createAndLinkNewStat("patience");
     // createAndLinkNewStat("strategy");
@@ -163,20 +164,24 @@ function initializeData() {
     create("buyClothing", [], -1, -1.5);
     create("eatBetterFood", [], -1, -.5);
 
-    //socialize
+    //Socialize
     create("socialize", ["chat"], -1.5, 0);
-    create("chat", ["gossipAboutPrices", "talkToScott", "talkToInstructorJohn", "localOutreach"], 0, 1);
+    create("chat", ["gossip", "talkToScott", "talkToInstructorJohn", "localOutreach"], -1, 1);
 
-    create("gossipAboutPrices", ["talkAboutMarkets"], 1, 0);
+    //Socialize - Gossip
+    create("gossip", ["gossipAboutPrices", "hearAboutTheLich"], 1, .5);
+    create("hearAboutTheLich", [], 1, -.5);
+    create("gossipAboutPrices", ["talkAboutMarkets"], 0, 1);
     create("talkAboutMarkets", [], 0, 1);
 
-    create("talkToScott", ["talkAboutVillageHistory", "talkAboutCurrentIssues"], 0, 2); //Pragmatism, kindness, mystery
-    create("talkAboutCurrentIssues", ["hearAboutTheLich"], 1, 0);
-    create("hearAboutTheLich", [], 1, 0);
-    create("talkAboutVillageHistory", [], 0, 1.5);
+    //Socialize - Scott
+    create("talkToScott", ["talkAboutVillageHistory", "talkAboutCurrentIssues"], 0, 1.5); //Pragmatism, kindness, mystery
+    create("talkAboutVillageHistory", [], -.5, 1.5);
+    create("talkAboutCurrentIssues", [], .5, 1.5);
 
-    create("talkToInstructorJohn", [], -1, 0);
-    create("localOutreach", [], -1.5, -1.5);
+    //Socialize - John
+    create("talkToInstructorJohn", [], -1.5, 0);
+    create("localOutreach", [], -2, -1.5);
 
 
     //     create("peruseLibrary", ["researchHistory"], 0, -1.2); //research. Req other unlocks

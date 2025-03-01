@@ -207,8 +207,8 @@ function generateActionDisplay(actionVar) {
         "<div>Total "+actionObj.momentumName+" sending downstream: <b><span id='"+actionVar+"TotalSend'>1</span></b>/s</div>"
         + "</div>";
 
-    let newX = actionObj.realX + 4000;
-    let newY = actionObj.realY + 4000;
+    let newX = actionObj.realX;
+    let newY = actionObj.realY;
 
     theStr +=
         "<div id='"+actionVar+"Container' style='border:2px solid var(--border-color);background-color:var(--bg-secondary);position:absolute;left:"+newX+"px;top:"+newY+"px;width:300px;min-height:150px;'>" +
@@ -290,8 +290,8 @@ function cacheDownstreamViews() {
 
             view.cached[`${actionVar}DownstreamSendRate${downstreamVar}`] = document.getElementById(`${actionVar}DownstreamSendRate${downstreamVar}`);
 
-            // view.cached[actionVar + "_" + downstreamVar + "_Line_Border"] = document.getElementById(actionVar + "_" + downstreamVar + "_Line_Border");
-            // view.cached[actionVar + "_" + downstreamVar + "_Line"] = document.getElementById(actionVar + "_" + downstreamVar + "_Line");
+            view.cached[actionVar + "_" + downstreamVar + "_Line_Outer"] = document.getElementById(actionVar + "_" + downstreamVar + "_Line_Outer");
+            view.cached[actionVar + "_" + downstreamVar + "_Line_Inner"] = document.getElementById(actionVar + "_" + downstreamVar + "_Line_Inner");
             view.cached[actionVar + "SliderContainer" + downstreamVar] = document.getElementById(actionVar + "SliderContainer" + downstreamVar);
         });
     })
@@ -335,31 +335,57 @@ function generateLinesBetweenActions() {
                 return;
             }
             // Calculate the centers of each object
-            const x1 = actionObj.realX + 160 + 4000; // 220 / 2
-            const y1 = actionObj.realY + 80 + 4000; // 200 / 2
-            const x2 = targetObj.realX + 160 + 4000; // 220 / 2
-            const y2 = targetObj.realY + 80 + 4000; // 200 / 2
+            const x1 = actionObj.realX + 160; // 220 / 2
+            const y1 = actionObj.realY + 80; // 200 / 2
+            const x2 = targetObj.realX + 160; // 220 / 2
+            const y2 = targetObj.realY + 80; // 200 / 2
 
-            let backgroundColor = getResourceColor(targetObj);
+            let sourceBackgroundColor = getResourceColor(actionObj);
+            let targetBackgroundColor = getResourceColor(targetObj);
             let isDifferentResource = actionObj.momentumName !== targetObj.momentumName;
-            let opacity = isDifferentResource ? ".8" : "0";
+            let backgroundColor = isDifferentResource ? `linear-gradient(to right, ${sourceBackgroundColor}, ${targetBackgroundColor})` : 'black';
 
+            let borderId = `${actionVar}_${targetObj.actionVar}_Line_Outer`;
+            let lineId = actionVar+`_`+targetObj.actionVar+`_Line_Inner`;
 
-            // const svgBorderLine = `<svg id="${actionVar}_${targetObj.actionVar}_Line_Border" style="position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;opacity:.4;"><line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="lightgrey" stroke-width="32" /></svg>`;
-            //
-            // // Create the SVG line as a string
-            // const svgLine = `<svg id="`+actionVar+`_`+targetObj.actionVar+`_Line" style="position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;opacity:`+opacity+`;"><line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="`+backgroundColor+`" stroke-width="30" /></svg>`;
-            //
+            //Rotated retangle with inner line ready to adjust width of.
+            let length = Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
+            let angle = Math.atan2(y2 - y1, x2 - x1) * (180 / Math.PI);
+
+            let line = `<div id="${borderId}" style="pointer-events:none;display:flex;align-items: center;position: absolute; width: ${length}px; height: 20px; background: ${backgroundColor}; opacity: 1; transform-origin: 0 50%;transform: rotate(${angle}deg);  left: ${x1}px; top: ${y1}px;">` +
+                `<div id="${lineId}" style="transform:translateY(-50%) translateY(10px); width: 100%; height: 0px; background-color: ${targetBackgroundColor};"></div>` +
+            `</div>`;
+
             // // Create a div and set its innerHTML to the SVG line
-            // const lineBorderDiv = document.createElement('div');
-            // lineBorderDiv.innerHTML = svgBorderLine;
-            // const lineDiv = document.createElement('div');
-            // lineDiv.innerHTML = svgLine;
+            const lineDiv = document.createElement('template');
+            lineDiv.innerHTML = line;
             //
             // // Append the lineDiv to the lineContainer
-            // const lineContainer = document.getElementById('lineContainer');
-            // lineContainer.appendChild(lineBorderDiv);
-            // lineContainer.appendChild(lineDiv);
+            const lineContainer = document.getElementById('lineContainer');
+            lineContainer.appendChild(lineDiv.content);
         });
     });
+}
+
+function initializeKTL() {
+    //clears all actions, opens a new minigame with 3 visible actions - Overclock Targeting The Lich (it's a generator that does NOT grow), Kill Elite, and far away is Kill the Lich.
+    //handle resetting of numbers on Use Amult
+
+    /*
+    1. hide all actions
+    2. Stop all generators
+    3.
+    2. Use totalMomentum
+     */
+
+}
+
+function useAmulet() {
+    /*
+    1. Process all actions
+    1a. Clear them back to what actionData says
+    1b. Set their highest levels
+    1c. Start up the generators again
+
+     */
 }

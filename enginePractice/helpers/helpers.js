@@ -166,7 +166,7 @@ function secondsToTime(seconds) {
 
 function toSuffix(value) {
     value = Math.round(value);
-    const suffixes = ["", "K", "M", "B", "T", "Qa", "Qi", "Sx", "Sp", "O", "N", "Dc", "Ud", "Dd", "Td", "qd", "Qd", "sd", "Sd", "Od", "Nd", "V"];
+    const suffixes = ["", "k", "m", "b", "t", "Qa", "Qi", "Sx", "Sp", "o", "n", "Dc", "Ud", "Dd", "Td", "Qid", "Qad", "sd", "Sd", "Od", "Nd", "V"];
     const suffixNum = Math.floor(((String(value)).length - 1) / 3);
     let shortValue = parseFloat((suffixNum === 0 ? value : (value / Math.pow(1000, suffixNum))).toPrecision(3));
     if (shortValue % 1 !== 0) shortValue = shortValue.toPrecision(3);

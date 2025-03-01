@@ -13,11 +13,12 @@
     --overlay-color: rgba(30, 30, 46, 0.8);
     --selection-color:#9f0000;
     --exp-color:#7b5fc1;
-    --momentum-color:#4e8d49;
-    --mana-color:#74c7ec;
+    --momentum-color:#007BFF;
+    --mana-color: #0c20d4;
     --gold-color: #a28a00;
-    --conversations-color: #007c6b;
+    --conversations-color: #429977;
     --arcana-color: #c620f5;
+    --fear-color: #D5171BFF;
 }
 
 body.lightMode {
@@ -36,11 +37,12 @@ body.lightMode {
     --overlay-color: rgba(135, 152, 211, 0.8);
     --selection-color:#67ff5b;
     --exp-color:#b79df8;
-    --momentum-color:#a6e3a1;
+    --momentum-color:#00E1FF;
     --mana-color:#74c7ec;
-    --gold-color:#ffde24;
+    --gold-color:#FFD700;
     --conversations-color: #c8fff4;
     --arcana-color:#c620f5;
+    --fear-color: #D5171BFF;
 }
 
 body {
@@ -152,7 +154,7 @@ body {
     text-align: center;
 }
 .menuTitle {
-
+    font-size:16px;
 }
 
 
@@ -364,4 +366,35 @@ input {
 #statDisplay {
     border: 1px solid var(--border-color);
     color: var(--text-primary);
+}
+
+.menuSeparator {
+    width: 100%;
+    height: 2px;
+    background-color: rgba(255, 255, 255, 0.2); /* Adjust color as needed */
+    margin: 10px 0;
+}
+
+.dynamicContent {
+    max-height: 300px; /* Adjust max height as needed */
+    overflow-y: auto;
+    width: 100%;
+    padding: 10px;
+}
+
+.continueButton {
+    display: block;
+    margin: 20px auto 0 auto;
+    padding: 10px 20px;
+    background-color: #4e9f48; /* Adjust color as needed */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.continueButton:hover {
+    background-color: #3e8a3a;
 }

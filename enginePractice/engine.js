@@ -100,14 +100,15 @@ function createAndLinkNewAction(actionVar, dataObj, title, x, y, downstreamVars)
     actionObj.actionPower = actionObj.actionPowerBase * actionObj.actionPowerMult * (actionObj.efficiency/100);
 
 
-    actionObj.onCompleteBasic = function() {
+    actionObj.onLevelUp = function() {
         actionObj.completions += 1;
         actionObj.exp += actionObj.expToAdd;
         //Could this be the reason there's a memory leak?
         let timesRun = 0;
         while(actionObj.exp >= actionObj.expToLevel && (actionObj.maxLevel < 0 || (actionObj.level < actionObj.maxLevel))) {
             if(timesRun++ > 10) {
-                console.log('way overdoing it on ' + actionObj.actionVar + ', ' + timesRun);
+                //console.log('too many levels at once ' + actionObj.actionVar + ', ' + timesRun);
+                break;
             }
             actionObj.exp -= actionObj.expToLevel;
             actionObj.level++;
@@ -226,7 +227,9 @@ function unlockAction(actionObj) {
 
     let amountToSet = data.upgrades.sliderAutoSet.amount;
     actionObj.downstreamVars.forEach(function(downstreamVar) {
-        setSliderUI(actionObj.actionVar, downstreamVar, amountToSet);
+        if(data.actions[downstreamVar] && data.actions[downstreamVar].unlocked) {
+            setSliderUI(actionObj.actionVar, downstreamVar, amountToSet);
+        }
     });
 
 

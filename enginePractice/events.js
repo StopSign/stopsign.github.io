@@ -33,7 +33,7 @@ function setSliderUI(fromAction, toAction, newValue) {
     }
     document.getElementById(fromAction + "NumInput" + toAction).value = newValue;
     document.getElementById(fromAction + "RangeInput" + toAction).value = newValue;
-    // document.getElementById(fromAction+"_"+toAction+"_Line").style.opacity = (newValue/100*.8)+"";
+    document.getElementById(fromAction+"_"+toAction+"_Line_Inner").style.height = (newValue/100*20)+"px";
     data.actions[fromAction]["downstreamRate"+toAction] = newValue;
 }
 function downstreamNumberChanged(fromAction, toAction) {
@@ -166,14 +166,18 @@ function forceRedraw(element) {
 function actionTitleClicked(actionVar) {
     let actionObj = data.actions[actionVar];
 
-    let newLeft = -((actionObj.realX + 110) * scale) + windowElement.offsetWidth / 2 - 4000 ;
-    let newTop = -((actionObj.realY + 50) * scale) + windowElement.offsetHeight / 2 - 4000 - 50;
+    let newTransformX = -((actionObj.realX + 150) * scale) + windowElement.offsetWidth / 2 ;
+    let newTransformY = -((actionObj.realY) * scale) + windowElement.offsetHeight / 2 - 50;
 
-    newLeft = Math.max(newLeft, windowElement.offsetWidth - actionContainer.offsetWidth);
-    newTop = Math.max(newTop, windowElement.offsetHeight - actionContainer.offsetHeight);
+    newTransformX = Math.max(-4000, Math.min(newTransformX, 4000));
+    newTransformY = Math.max(-4000, Math.min(newTransformY, 4000));
 
-    actionContainer.style.left = `${newLeft}px`;
-    actionContainer.style.top = `${newTop}px`;
+    // Update our state
+    transformX = newTransformX;
+    transformY = newTransformY;
+
+    // Update the position of the container
+    actionContainer.style.transform = `translate(${newTransformX}px, ${newTransformY}px) scale(${scale})`;
 }
 
 function toggleLevelInfo(actionVar) {
@@ -217,6 +221,7 @@ function deselectActionMenus(actionVar) {
 
 const zoomInButton = document.getElementById('zoomInButton');
 const zoomOutButton = document.getElementById('zoomOutButton');
+const centerScreenButton = document.getElementById('centerScreenButton');
 
 zoomInButton.addEventListener('click', function() {
     scale = Math.min(scale + scaleStep, maxScale); // Zoom in
@@ -227,6 +232,11 @@ zoomOutButton.addEventListener('click', function() {
     scale = Math.max(scale - scaleStep, minScale); // Zoom out
     actionContainer.style.transform = `scale(${scale})`;
 });
+
+centerScreenButton.addEventListener('click', function() {
+    actionTitleClicked('overclock');
+});
+
 
 function clickMenuButton() {
     let isShowing = document.getElementById("helpMenu").style.display !== "none";
@@ -315,8 +325,8 @@ function changeJob(actionVar) {
     }
 
     //set displayed
-    document.getElementById("jobTitle").innerText = data.actions[data.currentJob].title;
-    document.getElementById("jobWage").innerText = data.currentWage;
+    document.getElementById("jobTitle").innerText = data.actions[data.currentJob] ? data.actions[data.currentJob].title : data.currentJob;
+    document.getElementById("jobWage").innerText = intToString(data.currentWage, 2);
 }
 
 function pauseGame() {
@@ -327,4 +337,14 @@ function pauseGame() {
 function increaseGamespeed() {
     gameSpeed *= 2;
     console.log('gamespeed increased to ' + gameSpeed);
+}
+
+function resetGamespeed() {
+    gameSpeed = 1;
+    console.log('gamespeed set to ' + gameSpeed);
+}
+
+function openKTLMenu() {
+    let isShowing = document.getElementById("killTheLichMenu").style.display !== "none";
+    document.getElementById("killTheLichMenu").style.display = isShowing ? "none" : "flex";
 }

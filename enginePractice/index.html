@@ -17,9 +17,9 @@
 
 
 <div id="windowElement" style="position:relative; width:100%; height:98%; border:2px solid; overflow:hidden;">
-    <div id="actionContainer" style="will-change: transform;position:absolute; width:8000px; height:8000px;"> <!-- initial left/top with actionTitleClicked(`overclock`) -->
+    <div id="actionContainer" style="will-change: transform;position:absolute;"> <!-- initial left/top with actionTitleClicked(`overclock`) -->
         <div id="lineContainer"></div>
-        <div id="dot" style="position:absolute;left:4000px;top:4000px;border:2px solid;width:1px;height:1px;"></div>
+        <div id="dot" style="position:absolute;border:2px solid;width:1px;height:1px;"></div>
         <!-- Child divs go here -->
     </div>
 </div>
@@ -27,9 +27,43 @@
 <div class="button" style="position:absolute;left:25px;top:25px;padding:10px;font-size:16px;" onclick="clickMenuButton()">Menu</div>
 <div class="button" style="position:absolute;left:92px;top:25px;padding:10px;font-size:16px;" id='lightModeButton' onclick="changeDarkMode()">Light Mode</div>
 <div class="button" style="position:absolute;left:200px;top:25px;padding:10px;font-size:16px;" id='pauseButton' onclick="pauseGame()">Pause</div>
-<div class="button" style="position:absolute;left:270px;top:25px;padding:10px;font-size:16px;" id='cheatButton' onclick="increaseGamespeed()">x2</div>
-
+<div class="button" style="position:absolute;left:380px;top:25px;padding:10px;font-size:16px;" id='killTheLichMenuButton' onclick="openKTLMenu()">Kill the Lich! (Req 1B total momentum)</div>
+<div id="cheatButtons">
+    <div class="button" style="position:absolute;left:280px;top:25px;padding:10px;font-size:16px;" id='cheatButton' onclick="increaseGamespeed()">x2</div>
+    <div class="button" style="position:absolute;left:325px;top:25px;padding:10px;font-size:16px;" onclick="resetGamespeed()">=1</div>
+</div>
 <div id="helpMenuContainer"></div>
+
+
+
+
+<!--    contains a repeat of total momentum, and an estimate of how many souls you will get. Change Overclock Target (Prestige).
+When clicked, clears all actions, opens a new minigame with 3 visible actions - Overclock Targeting The Lich (it's a generator that does NOT grow), Kill Elite, and far away is Kill the Lich.
+Unlock of the elite costs 1b, and gives 10 souls. Overclock targeting is tier 0. first level of the elite is like 100b.
+After the unlock, a new button opens up - Use Amulet. This opens the reset menu with the reset button as well as all of the upgrades. Buy the upgrades, then "Use Amulet" which resets game back to start (but with upgrades!) -->
+
+<div id="killTheLichMenu" class='fullScreenGrey' style="display:none" onClick='openKTLMenu()'>
+    <div class='centerMenuBox'>
+        <div class='menuTitle'>Kill the Lich!</div>
+
+        <!-- Separator Line -->
+        <div class="menuSeparator"></div>
+
+        <!-- Dynamic Content Area -->
+        <div id="ktlDynamicContent" class="dynamicContent"></div>
+
+        <!-- Continue Button -->
+        <button class="continueButton" onclick="initializeKTL()">Continue</button>
+    </div>
+</div>
+
+
+
+
+
+
+
+
 
 <!--<div id="helpMenu" class='fullScreenGrey' style='display:none;' onclick='clickMenuButton()'>-->
 <!--    <div style='background:#fff;padding:20px;border-radius:6px;max-width:400px;width:90%;text-align:center;position:relative;'>-->
@@ -50,7 +84,7 @@
 <!--</div>-->
 
 <div id="jobDisplay" style="display:none;position:absolute;margin:5px;font-size:17px;top:65px;background-color:var(--overlay-color);color: var(--text-primary);">
-    Current Job: <span id="jobTitle">Beggar</span>, Wage: $<span id="jobWage">1</span>
+    Current Job: <span id="jobTitle">Help Scott With Chores</span>, Wage: $<span id="jobWage">1</span>
 </div>
 <div id="momentumDisplay" style="position:absolute;margin:5px;font-size:14px;top:85px;background-color:var(--overlay-color);color: var(--text-primary);">
     Total Momentum: <b><span id="totalMomentum">1</span></b> Time: <span id="secondsPassed"></span>
@@ -66,6 +100,7 @@
 
 <div class="button" style="position:absolute;left:5px;bottom:45px;padding:10px" id="zoomInButton">+</div>
 <div class="button" style="position:absolute;left:5px;bottom:5px;padding:10px" id="zoomOutButton">-</div>
+<div class="button" style="position:absolute;left:45px;bottom:5px;padding:10px" id="centerScreenButton">o</div>
 
 <div id="toastList" style="position:absolute;bottom:20px;right:20px;"></div>
 
@@ -74,22 +109,22 @@
 
 
 <!-- Script outside of body to load and execute before page content is loaded -->
-<script src="data/globalsAndInitial.js?1"></script>
-<script src="driver.js?1"></script>
-<script src="views/viewCreate.js?1"></script>
-<script src="views/viewHelpers.js?1"></script>
-<script src="views/viewUpdating.js?1"></script>
-<script src="saving.js?1"></script>
-<script src="actionData.js?1"></script>
-<script src="events.js?1"></script>
-<script src="engine.js?1"></script>
-<script src="helpers/helpers.js?1"></script>
-<script src="helpers/hotkeys.js?1"></script>
-<script src="helpers/interval.js?1"></script>
-<script src="data/moduleData.js?1"></script>
-<script src="data/textData.js?1"></script> <!-- must go after actionData-->
-<script src="toasts.js?1"></script>
-<script src="menu.js?1"></script>
+<script src="data/globalsAndInitial.js"></script>
+<script src="driver.js"></script>
+<script src="views/viewCreate.js"></script>
+<script src="views/viewHelpers.js"></script>
+<script src="views/viewUpdating.js"></script>
+<script src="saving.js"></script>
+<script src="actionData.js"></script>
+<script src="events.js"></script>
+<script src="engine.js"></script>
+<script src="helpers/helpers.js"></script>
+<script src="helpers/hotkeys.js"></script>
+<script src="helpers/interval.js"></script>
+<script src="data/moduleData.js"></script>
+<script src="data/textData.js"></script> <!-- must go after actionData-->
+<script src="toasts.js"></script>
+<script src="menu.js"></script>
 <script>
 
     // multiCreateButton({label:"Cash", resource:"cash", buyFromFar:"cash",
