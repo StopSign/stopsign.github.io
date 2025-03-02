@@ -133,7 +133,7 @@ body {
     background:var(--bg-secondary);
     padding:20px;
     border-radius:6px;
-    max-width:400px;
+    max-width:600px;
     width:90%;
     text-align:center;
     position:relative;
@@ -245,6 +245,23 @@ input {
 .button:active {
     background-color: var(--accent-secondary);
     box-shadow: 0 1px var(--border-color);
+}
+
+.continueButton {
+    display: block;
+    margin: 20px auto 0 auto;
+    padding: 10px 20px;
+    background-color: var(--warning-color); /* Adjust color as needed */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.continueButton:hover {
+    background-color: #3e8a3a;
 }
 
 .toast {
@@ -380,21 +397,5 @@ input {
     overflow-y: auto;
     width: 100%;
     padding: 10px;
-}
-
-.continueButton {
-    display: block;
-    margin: 20px auto 0 auto;
-    padding: 10px 20px;
-    background-color: #4e9f48; /* Adjust color as needed */
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
-    transition: background-color 0.2s ease-in-out;
-}
-
-.continueButton:hover {
-    background-color: #3e8a3a;
+    font-size:14px;
 }

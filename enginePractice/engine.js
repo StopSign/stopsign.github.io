@@ -107,7 +107,7 @@ function createAndLinkNewAction(actionVar, dataObj, title, x, y, downstreamVars)
         let timesRun = 0;
         while(actionObj.exp >= actionObj.expToLevel && (actionObj.maxLevel < 0 || (actionObj.level < actionObj.maxLevel))) {
             if(timesRun++ > 10) {
-                //console.log('too many levels at once ' + actionObj.actionVar + ', ' + timesRun);
+                console.log('too many levels at once ' + actionObj.actionVar + ', ' + timesRun);
                 break;
             }
             actionObj.exp -= actionObj.expToLevel;

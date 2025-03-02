@@ -27,7 +27,7 @@
 <div class="button" style="position:absolute;left:25px;top:25px;padding:10px;font-size:16px;" onclick="clickMenuButton()">Menu</div>
 <div class="button" style="position:absolute;left:92px;top:25px;padding:10px;font-size:16px;" id='lightModeButton' onclick="changeDarkMode()">Light Mode</div>
 <div class="button" style="position:absolute;left:200px;top:25px;padding:10px;font-size:16px;" id='pauseButton' onclick="pauseGame()">Pause</div>
-<div class="button" style="position:absolute;left:380px;top:25px;padding:10px;font-size:16px;" id='killTheLichMenuButton' onclick="openKTLMenu()">Kill the Lich! (Req 1B total momentum)</div>
+<div class="button" style="position:absolute;left:380px;top:25px;padding:10px;font-size:16px;" id='killTheLichMenuButton' onclick="openKTLMenu()">Kill the Lich! (Req 1M total momentum)</div>
 <div id="cheatButtons">
     <div class="button" style="position:absolute;left:280px;top:25px;padding:10px;font-size:16px;" id='cheatButton' onclick="increaseGamespeed()">x2</div>
     <div class="button" style="position:absolute;left:325px;top:25px;padding:10px;font-size:16px;" onclick="resetGamespeed()">=1</div>
@@ -45,17 +45,51 @@ After the unlock, a new button opens up - Use Amulet. This opens the reset menu 
 <div id="killTheLichMenu" class='fullScreenGrey' style="display:none" onClick='openKTLMenu()'>
     <div class='centerMenuBox'>
         <div class='menuTitle'>Kill the Lich!</div>
-
-        <!-- Separator Line -->
         <div class="menuSeparator"></div>
+        <div id="ktlDynamicContent" class="dynamicContent">
+            Info:<br>
+            A new quick game is started with your total momentum across all actions.
+            You will try to get as much essence as you can, which at first should be 10
+            (unless you fell asleep and have the 1T needed for the next (not recommended)).<br>
+            <div class="menuSeparator"></div>
+            Story:<br>
+            The lich is coming, and you know what you must do. As your Overclock ability grows in power,
+            so too does its ability to achieve its Target. So far, it has been set to target itself, but now you know
+            of a great evil on the horizon, and you can't sit still. With all the gathered momentum from your ability
+            churning within itself, you shift that towardsa a new target: Kill the Lich.<br><br>
+            At first, the loss of so much happening at once is overwhelming, and just as you did in the beginning: you allow
+            the ability to guide your steps and purpose while you take a back seat and observe. It moves you with purpose -
+            you travel to a hidden set of ancient ruins close by, and, after carefully disabling a number of deadly traps,
+            you gather an amulet hidden in a deep puddle, that you immediately put around your neck.<br><br>
 
-        <!-- Dynamic Content Area -->
-        <div id="ktlDynamicContent" class="dynamicContent"></div>
-
-        <!-- Continue Button -->
-        <button class="continueButton" onclick="initializeKTL()">Continue</button>
+            Then, you go join the resistance trying to hold off the lich's hordes as they steadily approach. Before you know it,
+            you're equipped with army-standard and facing an elite, who roars as he stomps toward you.
+        </div>
+        <button class="continueButton" onclick="initializeKTL()">Reset Now</button>
     </div>
 </div>
+
+<!--
+This wasn't right. Your ability was supposed to kill the lich, not die in the first fight! As you lay dying, the amulet
+you had forgotten about in the heat of battle starts heating up. You become paralyzed as it activates, and your vision
+dims as it thrums with stolen power.
+
+It seems to reach out, and offer a question. -- what would you say to yourself, had he a second chance?
+"He, not I?"
+Silence. Very well. With your last breath, you craft a message. The amulet gathers it and burns the last of your life.
+It continues, capturing fraction essence of your fleeting soul and sending it in a direction eyes could not follow.<br><br>
+
+... You set your ability's Target to itself, thinking yourself clever. Then, you pause, and frown - though the room is quiet,
+ an echo of an echo adds itself the things you know like a blanket, laying on top of your potential in all the little ways your future's past has discovered.
+ As you are coming to grips with thinking that the extra ability is not just a hallucination, you gain more evidence:
+ A voice of utmost weariness -
+ one that frightens you to hear, especially when you recognize the voice as your own, and again when you recognize the desperation -
+ whisper to you, "If I just ...".
+
+ And you think that you'll do just that. You'll be yourself, because who else could the advice be for? And all you need
+ to do is follow your own voice's advice and everything will work out, right?
+
+-->
 
 
 

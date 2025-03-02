@@ -166,7 +166,7 @@ function tickGameObject(actionVar) {
     let timesRun = 0;
     while(actionObj.progress >= actionObj.progressMax) { //or max
         if(timesRun++ > 10) {
-            //console.log('progress too fast on ' + actionObj.actionVar);
+            console.log('progress too fast on ' + actionObj.actionVar);
             break;
         }
         actionObj.progress -= actionObj.progressMax;

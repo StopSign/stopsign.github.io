@@ -190,7 +190,7 @@ function generateActionDisplay(actionVar) {
     let expBar =
         "<div id='"+actionVar+"ExpBarOuter' style='width:100%;height:16px;position:relative;text-align:left;border-bottom:1px solid;'>" +
         "<div id='"+actionVar+"ExpBarInner' style='width:30%;background-color:var(--exp-color);height:100%;position:absolute'></div>" +
-        "<div id='"+actionVar+"ExpNumContainer' style='position:absolute;top:1px;left:4px;;width:97%'><b></v>" +
+        "<div id='"+actionVar+"ExpNumContainer' style='position:absolute;top:1px;left:4px;width:97%'><b></v>" +
         "<span id='"+actionVar+"Exp'>0</span></b> / " +
         "<b><span id='"+actionVar+"ExpToLevel'>1</span></b>" +
         "<span style='color:grey;position:absolute;right:0'>x<b><span id='"+actionVar+"ExpToLevelIncrease'>1</span></b> / lvl</span>" +
