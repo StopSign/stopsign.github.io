@@ -127,11 +127,18 @@ function gameTick() {
 }
 
 function secondTick() {
-
+    if(data.gameState !== "KTL") {
+        data.secondsPerReset++;
+    }
 }
 
 function tickGameObject(actionVar) {
     let actionObj = data.actions[actionVar];
+
+    //Full pause on actions not in the correct game state
+    if(!actionObj.isRunning) {
+        return;
+    }
 
     //if generator, add Time to exp
     //if not generator, add current momentum/10^tier to exp
@@ -191,8 +198,6 @@ function tickGameObject(actionVar) {
         //sends to unlock cost first if needed
         giveMomentumTo(actionObj, downstreamAction, taken);
     });
-
-    return actionObj;
 }
 
 function giveMomentumTo(actionObj, downstreamAction, amount) {

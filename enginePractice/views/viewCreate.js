@@ -1,8 +1,9 @@
 
 
 function initializeDisplay() {
-    //auto generated elements
-    setRealCoordinates('overclock');
+    //auto generate elements
+    setRealCoordinates('overclock'); //associate all parent/children and give them an x/y
+    setRealCoordinates('overclockTargetingTheLich');
     data.actionNames.forEach(function (actionVar) { //wait until they are all created to link downstreams
         generateActionDisplay(actionVar);
     })
@@ -12,9 +13,14 @@ function initializeDisplay() {
     updateAllActionStatMults();
     actionTitleClicked(`overclock`);
     initializeMenu();
-
+    setSingleCaches();
 }
 
+function setSingleCaches() {
+    view.cached.totalMomentum = document.getElementById("totalMomentum");
+    view.cached.secondsPerReset = document.getElementById("secondsPerReset");
+    view.cached.openUseAmuletButton = document.getElementById("openUseAmuletButton");
+}
 function generateStatDisplay(statVar) {
     let statObj = data.stats[statVar];
     let theStr = "";
@@ -365,27 +371,4 @@ function generateLinesBetweenActions() {
             lineContainer.appendChild(lineDiv.content);
         });
     });
-}
-
-function initializeKTL() {
-    //clears all actions, opens a new minigame with 3 visible actions - Overclock Targeting The Lich (it's a generator that does NOT grow), Kill Elite, and far away is Kill the Lich.
-    //handle resetting of numbers on Use Amult
-
-    /*
-    1. hide all actions
-    2. Stop all generators
-    3.
-    2. Use totalMomentum
-     */
-
-}
-
-function useAmulet() {
-    /*
-    1. Process all actions
-    1a. Clear them back to what actionData says
-    1b. Set their highest levels
-    1c. Start up the generators again
-
-     */
 }

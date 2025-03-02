@@ -1,8 +1,6 @@
 let view = {
     cached: {}, //contains the elements that are being iterated over and updated regularly,
 };
-view.cached.totalMomentum = document.getElementById("totalMomentum");
-view.cached.secondsPassed = document.getElementById("secondsPassed");
 
 //This is the main function that is run once per 50ms
 function updateView() {
@@ -12,14 +10,13 @@ function updateView() {
     data.actionNames.forEach(function(actionName) {
         updateActionView(actionName);
     });
-    calcAndSetTotalMomentum();
-    setTimerUI();
+    updateGlobals();
 
 
     saveCurrentViewState();
 }
 
-function calcAndSetTotalMomentum() {
+function updateGlobals() {
     let totalMometum = 0;
     data.actionNames.forEach(function(actionName) {
         let actionObj = data.actions[actionName];
@@ -28,9 +25,15 @@ function calcAndSetTotalMomentum() {
         }
     });
     view.cached.totalMomentum.innerText = intToString(totalMometum, 1);
-}
-function setTimerUI() {
-    view.cached.secondsPassed.innerText = secondsToTime(secondsPassed);
+    data.totalMomentum = totalMometum;
+
+    let toShow = data.useAmuletButtonShowing ? "" : "none";
+    if(view.cached.openUseAmuletButton.style.display !== toShow) {
+        view.cached.openUseAmuletButton.style.display = toShow;
+    }
+    if(view.cached.secondsPerReset.innerText !== secondsToTime(data.secondsPerReset)) {
+        view.cached.secondsPerReset.innerText = secondsToTime(data.secondsPerReset);
+    }
 }
 
 //Save a second copy of all the data after a view update, so it can request updates only for the ones that are different
@@ -167,12 +170,10 @@ function updateActionView(actionName) {
                     console.log('missing div for ' + actionName + ', downstream: ' + downstreamVar);
                 }
                 if(downstreamObj.visible) {
-                    view.cached[downstreamVar+"Container"].style.display = "";
                     view.cached[actionName + "_" + downstreamVar + "_Line_Outer"].style.display = "";
                     view.cached[actionName + "_" + downstreamVar + "_Line_Inner"].style.display = "";
                     view.cached[actionName + "SliderContainer" + downstreamVar].style.display = "";
                 } else {
-                    view.cached[actionName+"Container"].style.display = "none";
                     view.cached[actionName + "_" + downstreamVar + "_Line_Outer"].style.display = "none";
                     view.cached[actionName + "_" + downstreamVar + "_Line_Inner"].style.display = "none";
                     view.cached[actionName + "SliderContainer" + downstreamVar].style.display = "none";
@@ -189,8 +190,8 @@ function updateActionView(actionName) {
         }
     }
 
-    if(forceUpdate || prevAction.visible !== action.visible) {
-        if(action.visible) {
+    if(forceUpdate || (prevAction.visible !== action.visible) || (prevAction.isRunning !== action.isRunning)) {
+        if(action.visible && action.isRunning) {
             view.cached[actionName + "Container"].style.display = "";
             if(action.parent) {
                 view.cached[action.parent + "_" + actionName + "_Line_Outer"].style.display = "";

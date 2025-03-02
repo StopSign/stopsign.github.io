@@ -343,8 +343,3 @@ function resetGamespeed() {
     gameSpeed = 1;
     console.log('gamespeed set to ' + gameSpeed);
 }
-
-function openKTLMenu() {
-    let isShowing = document.getElementById("killTheLichMenu").style.display !== "none";
-    document.getElementById("killTheLichMenu").style.display = isShowing ? "none" : "flex";
-}

@@ -27,7 +27,8 @@
 <div class="button" style="position:absolute;left:25px;top:25px;padding:10px;font-size:16px;" onclick="clickMenuButton()">Menu</div>
 <div class="button" style="position:absolute;left:92px;top:25px;padding:10px;font-size:16px;" id='lightModeButton' onclick="changeDarkMode()">Light Mode</div>
 <div class="button" style="position:absolute;left:200px;top:25px;padding:10px;font-size:16px;" id='pauseButton' onclick="pauseGame()">Pause</div>
-<div class="button" style="position:absolute;left:380px;top:25px;padding:10px;font-size:16px;" id='killTheLichMenuButton' onclick="openKTLMenu()">Kill the Lich! (Req 1M total momentum)</div>
+<div class="button" style="position:absolute;left:380px;top:25px;padding:10px;font-size:16px;" id='killTheLichMenuButton' onclick="openKTLMenu()">Kill the Lich!</div>
+<div class="button" style="position:absolute;left:380px;top:25px;padding:10px;font-size:16px;display:none;" id='openUseAmuletButton' onclick="openUseAmuletMenu()">Use the Amulet!</div>
 <div id="cheatButtons">
     <div class="button" style="position:absolute;left:280px;top:25px;padding:10px;font-size:16px;" id='cheatButton' onclick="increaseGamespeed()">x2</div>
     <div class="button" style="position:absolute;left:325px;top:25px;padding:10px;font-size:16px;" onclick="resetGamespeed()">=1</div>
@@ -48,9 +49,10 @@ After the unlock, a new button opens up - Use Amulet. This opens the reset menu 
         <div class="menuSeparator"></div>
         <div id="ktlDynamicContent" class="dynamicContent">
             Info:<br>
-            A new quick game is started with your total momentum across all actions.
+            A new quick game is started with your total momentum across all actions as your only, non-renewable resource.
             You will try to get as much essence as you can, which at first should be 10
-            (unless you fell asleep and have the 1T needed for the next (not recommended)).<br>
+            (unless you fell asleep and have the 1T needed for the next (not recommended)). You can reach 10 with 1 million,
+            but if you're exact it might take a while, so the minimum of a reset is 1.1 million.<br>
             <div class="menuSeparator"></div>
             Story:<br>
             The lich is coming, and you know what you must do. As your Overclock ability grows in power,
@@ -68,6 +70,20 @@ After the unlock, a new button opens up - Use Amulet. This opens the reset menu 
         <button class="continueButton" onclick="initializeKTL()">Reset Now</button>
     </div>
 </div>
+
+<div id="useAmuletMenu" class='fullScreenGrey' style="display:none" onClick='openUseAmuletMenu()'>
+    <div class='centerMenuBox'>
+        <div class='menuTitle'>Use the Amulet!</div>
+        <div class="menuSeparator"></div>
+        <div id="useAmuletContent" class="dynamicContent">
+            Essence Show:<br>
+            Spend all your essence here before you start a new life.
+            <div class="menuSeparator"></div>
+        </div>
+        <button class="continueButton" onclick="useAmulet()">Start Again</button>
+    </div>
+</div>
+
 
 <!--
 This wasn't right. Your ability was supposed to kill the lich, not die in the first fight! As you lay dying, the amulet
@@ -121,7 +137,9 @@ It continues, capturing fraction essence of your fleeting soul and sending it in
     Current Job: <span id="jobTitle">Help Scott With Chores</span>, Wage: $<span id="jobWage">1</span>
 </div>
 <div id="momentumDisplay" style="position:absolute;margin:5px;font-size:14px;top:85px;background-color:var(--overlay-color);color: var(--text-primary);">
-    Total Momentum: <b><span id="totalMomentum">1</span></b> Time: <span id="secondsPassed"></span>
+    Total Momentum: <b><span id="totalMomentum">1</span></b>
+    Time: <span id="secondsPerReset"></span>
+    <span id="essenceDisplay" style="display:none">Total Essence: <b><span id="essence"></span></b></span>
 </div>
 
 <div id="statDisplay" style="position:absolute;margin:5px;top:115px;background-color:var(--overlay-color);color: var(--text-primary);">
@@ -159,6 +177,7 @@ It continues, capturing fraction essence of your fleeting soul and sending it in
 <script src="data/textData.js"></script> <!-- must go after actionData-->
 <script src="toasts.js"></script>
 <script src="menu.js"></script>
+<script src="ktl.js"></script>
 <script>
 
     // multiCreateButton({label:"Cash", resource:"cash", buyFromFar:"cash",

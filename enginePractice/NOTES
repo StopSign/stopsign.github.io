@@ -25,12 +25,12 @@ saving: update engine to separate the things that can be applied manually / on l
 
 idea: numbers in the lines between that update based on the log of the resource being sent
 
-TODO: how much am I actually consuming on an action? - show + and - next to delta
-TODO: custom level up messages. On Level Up for TravelOnRoad should include remember max level +1
+
 
 QoL that I just need to do:
 QoL: if no downstream are visible, hide the all 0 / all 100 button
 QoL: if the exp bar gets too fast, convert it into a completions/s window instead
+Hide stats that aren't generated (stat window should be ??? until unlocked)
 
 QoL I could monetize?: (200 per day)
 QoL: 100 clicking the other actions in Downstream brings you to them, clicking ^ brings you to parent
@@ -45,6 +45,8 @@ QoL: [Req KTL] 1000 show how far you'll get in killing the lich's army
 QoL: [Req KTL] 500 adds up your total souls and divides by time to show souls/hr, souls/day.
 QoL: [Req KTL] 1000 on each action, at the end of Info, show Time to Unlock: XX (-5:30) with what's in the parenthesis being the difference in time to the previous reset
 QoL: 200 Show on level up the total effect so far of that action (aka +1 Memory, +7 total = x1.8 bonus
+QoL: 500 show minimap
+QoL: 1000 Run Info - get a graph of how all the levels increased over time per action
 
 //5800 so far. I'll give ~1000 up front, ~2000 more over the next few days, ~10000 more over the next few weeks.
 

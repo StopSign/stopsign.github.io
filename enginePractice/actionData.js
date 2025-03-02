@@ -71,11 +71,64 @@ function create(actionVar, downstreamVars, x, y) {
 //Has a custom onComplete if it has a actionPower
 //Requires that upstream actions are above downstream, so updating works consistently
 let actionData = {
+    //KTL
+    overclockTargetingTheLich: {
+        tier:1,
+        progressMaxBase:60, progressMaxMult:1, progressMaxIncrease:1,
+        expToLevelBase:60, expToLevelMult:1, expToLevelIncrease:1,
+        expertiseBase:1, isKTL:true,
+        unlockCost:0, visible:true, unlocked:true, isGenerator:true, generatorSpeed:1,
+        onLevelStats:[],
+        expStats:[],
+        efficiencyStats:[]
+    },
+    killHorde: {
+        tier:1,
+        progressMaxBase:1e12, progressMaxMult:1, progressMaxIncrease:1.2,
+        expToLevelBase:10, expToLevelMult:1, expToLevelIncrease:1,
+        expertiseBase:1, isKTL:true, maxLevel:100,
+        unlockCost:1e6, visible:true, unlocked:false,
+        onUnlock: function() {
+            data.essence += 10;
+            data.useAmuletButtonShowing = true;
+        },
+        onCompleteCustom:function() {
+            data.essence += data.actions.killHorde.level;
+        },
+        onLevelCustom: function() {
+        },
+        onLevelStats:[],
+        expStats:[],
+        efficiencyStats:[]
+    },
+    killElites: {
+        tier:1,
+        progressMaxBase:10, progressMaxMult:1, progressMaxIncrease:1.2,
+        expToLevelBase:1, expToLevelMult:1, expToLevelIncrease:1.2,
+        expertiseBase:1, isKTL:true, maxLevel:100,
+        unlockCost:10, visible:false, unlocked:false,
+        onLevelStats:[],
+        expStats:[],
+        efficiencyStats:[]
+    },
+    killTheLich: {
+        tier:1,
+        progressMaxBase:10, progressMaxMult:1, progressMaxIncrease:1.2,
+        expToLevelBase:1, expToLevelMult:1, expToLevelIncrease:1.2,
+        expertiseBase:1, isKTL:true,
+        unlockCost:10, visible:true, unlocked:false,
+        onLevelStats:[],
+        expStats:[],
+        efficiencyStats:[]
+    },
+
+
+    //Book 1 actions
     overclock:{
         tier:0,
         progressMaxBase:10, progressMaxMult:1, progressMaxIncrease:1,
         expToLevelBase:1, expToLevelMult:1, expToLevelIncrease:1.2,
-        actionPowerBase:100, actionPowerMult:2, actionPowerMultIncrease:1.05,
+        actionPowerBase:100, actionPowerMult:1, actionPowerMultIncrease:1.05,
         expertiseBase:.1,
         unlockCost:0, visible:true, unlocked:true, isGenerator:true, generatorSpeed:10,
         onUnlock: function() {
@@ -667,7 +720,10 @@ let actionData = {
         expToLevelBase:1, expToLevelMult:1, expToLevelIncrease:1,
         unlockCost:100, maxLevel:1, visible:false, unlocked:false,
         onLevelCustom: function() {
-            //enable the reset menu
+            //enable the reset menu on first level
+            if(document.getElementById("killTheLichMenuButton").style.display === "none") {
+                document.getElementById("killTheLichMenuButton").style.display = "";
+            }
         },
         expStats:[],
         onLevelStats:[["focus", 10]],

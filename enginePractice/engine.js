@@ -25,31 +25,19 @@ function createAndLinkNewStat(statVar) {
     generateStatDisplay(statVar);
 }
 
-
-
-
-//function createAndLinkNewAction(actionVar, expToLevelIncrease, actionPowerMultIncrease, progressMaxIncrease, progressMax, expToLevel, unlockCost, title, x, y, downstreamVars, tier, dataObj) {
-function createAndLinkNewAction(actionVar, dataObj, title, x, y, downstreamVars) {
-    data.actionNames.push(actionVar);
-    if(!data.actions[actionVar]) {
-        data.actions[actionVar] = {};
-    }
-
-    let actionObj = data.actions[actionVar];
-    actionObj.downstreamVars = downstreamVars ? downstreamVars : [];
-    actionObj.isGenerator = dataObj.isGenerator;
-    actionObj.actionVar = actionVar;
+//Vars that should be reset each KTL
+function setBaseVariables(actionObj, dataObj) {
     actionObj.momentum = 0;
+
     actionObj.progress = 0;
     actionObj.progressGain = 0; //calculated based on momentum & tier
     actionObj.progressMaxBase = dataObj.progressMaxBase ? dataObj.progressMaxBase : 1;
     actionObj.progressMaxMult = dataObj.progressMaxMult ? dataObj.progressMaxMult : 1;
     actionObj.progressMax = actionObj.progressMaxBase * actionObj.progressMaxMult;
-    actionObj.completions = 0;
     actionObj.actionPowerBase = dataObj.actionPowerBase ? dataObj.actionPowerBase : 1;
     actionObj.actionPowerMult = dataObj.actionPowerMult ? dataObj.actionPowerMult : 1;
-    actionObj.actionPowerFunction = dataObj.actionPowerFunction;
     actionObj.level = 0;
+    actionObj.maxLevel = dataObj.maxLevel ? dataObj.maxLevel : -1;
     actionObj.exp = 0;
     actionObj.expToLevelBase = dataObj.expToLevelBase ? dataObj.expToLevelBase : 1;
     actionObj.expToLevelMult = dataObj.expToLevelMult ? dataObj.expToLevelMult : 1;
@@ -62,34 +50,13 @@ function createAndLinkNewAction(actionVar, dataObj, title, x, y, downstreamVars)
     actionObj.momentum = 0;
     actionObj.momentumDelta = 0;
     actionObj.momentumIncrease = 0;
-    actionObj.momentumName = dataObj.momentumName ? dataObj.momentumName : "momentum";
-    actionObj.expToLevelIncrease = dataObj.expToLevelIncrease; //Can be played with w/o issue at beginning of run
-    actionObj.actionPowerMultIncrease = dataObj.actionPowerMultIncrease ? dataObj.actionPowerMultIncrease : 1; //actionPowerMultIncrease must always > progressMaxIncrease on non-flat
+    actionObj.expToLevelIncrease = dataObj.expToLevelIncrease;
+    actionObj.actionPowerMultIncrease = dataObj.actionPowerMultIncrease ? dataObj.actionPowerMultIncrease : 1;
     actionObj.progressMaxIncrease = dataObj.progressMaxIncrease;
-    actionObj.x = x;
-    actionObj.y = y;
-    actionObj.title = title;
-    actionObj.onLevelStats = dataObj.onLevelStats ? dataObj.onLevelStats : [];
-    actionObj.expStats = dataObj.expStats ? dataObj.expStats : [];
-    actionObj.parent = null;
     actionObj.unlockCost = dataObj.unlockCost;
     actionObj.unlocked = dataObj.unlocked === null ? true : dataObj.unlocked;
-    actionObj.visible = (globalVisible || dataObj.visible === null) ? true : dataObj.visible;
-    actionObj.maxLevel = dataObj.maxLevel ? dataObj.maxLevel : -1;
-    actionObj.tier = dataObj.tier;
-    actionObj.moneyMult = dataObj.moneyMult ? dataObj.moneyMult : 0;
-    actionObj.wage = dataObj.wage ? dataObj.wage : null;
 
-
-    actionObj.onUnlock = dataObj.onUnlock ? dataObj.onUnlock : function() {};
-    actionObj.onCompleteCustom = dataObj.onCompleteCustom ? dataObj.onCompleteCustom : function() {};
-    actionObj.onLevelCustom = dataObj.onLevelCustom ? dataObj.onLevelCustom : function() {};
-    actionObj.onCompleteText = (dataObj.onCompleteText && dataObj.onCompleteText[language]) ? dataObj.onCompleteText[language] : "";
-    actionObj.onLevelText = (dataObj.onLevelText && dataObj.onLevelText[language]) ? dataObj.onLevelText[language] : "";
-    actionObj.storyText = (dataObj.storyText && dataObj.storyText[language]) ? dataObj.storyText[language] : "";
-    actionObj.extraInfo = (dataObj.extraInfo && dataObj.extraInfo[language]) ? dataObj.extraInfo[language] : "";
-    actionObj.unlockMessage = (dataObj.unlockMessage && dataObj.unlockMessage[language]) ? dataObj.unlockMessage[language] : "";
-
+    actionObj.isRunning = !dataObj.isKTL; //for controlling whether time affects it
     actionObj.efficiencyStats = dataObj.efficiencyStats ? dataObj.efficiencyStats : [];
     actionObj.expertiseBase = dataObj.expertiseBase ? dataObj.expertiseBase : 1; //1 = 100%
     actionObj.expertiseMult = dataObj.expertiseMult ? dataObj.expertiseMult : 1;
@@ -98,10 +65,54 @@ function createAndLinkNewAction(actionVar, dataObj, title, x, y, downstreamVars)
     actionObj.efficiency = actionObj.expertise > dataObj.efficiencyMax  ? dataObj.efficiencyMax : actionObj.expertise * 100;
 
     actionObj.actionPower = actionObj.actionPowerBase * actionObj.actionPowerMult * (actionObj.efficiency/100);
+}
 
+//One and done
+function setInitialVariables(actionObj, dataObj) {
+    actionObj.isGenerator = dataObj.isGenerator;
+    actionObj.momentumName = dataObj.momentumName ? dataObj.momentumName : "momentum";
+    actionObj.onLevelStats = dataObj.onLevelStats ? dataObj.onLevelStats : [];
+    actionObj.expStats = dataObj.expStats ? dataObj.expStats : [];
+    actionObj.visible = (globalVisible || dataObj.visible === null) ? true : dataObj.visible;
+    actionObj.tier = dataObj.tier;
+    actionObj.wage = dataObj.wage ? dataObj.wage : null;
+    actionObj.isKTL = dataObj.isKTL;
+
+    actionObj.actionPowerFunction = dataObj.actionPowerFunction;
+    actionObj.onUnlock = dataObj.onUnlock ? dataObj.onUnlock : function() {};
+    actionObj.onCompleteCustom = dataObj.onCompleteCustom ? dataObj.onCompleteCustom : function() {};
+    actionObj.onLevelCustom = dataObj.onLevelCustom ? dataObj.onLevelCustom : function() {};
+
+    actionObj.onCompleteText = (dataObj.onCompleteText && dataObj.onCompleteText[language]) ? dataObj.onCompleteText[language] : "";
+    actionObj.onLevelText = (dataObj.onLevelText && dataObj.onLevelText[language]) ? dataObj.onLevelText[language] : "";
+    actionObj.storyText = (dataObj.storyText && dataObj.storyText[language]) ? dataObj.storyText[language] : "";
+    actionObj.extraInfo = (dataObj.extraInfo && dataObj.extraInfo[language]) ? dataObj.extraInfo[language] : "";
+    actionObj.unlockMessage = (dataObj.unlockMessage && dataObj.unlockMessage[language]) ? dataObj.unlockMessage[language] : "";
+
+
+    //Vars that don't really need to be initalized but I like to know they're there
+    actionObj.parent = null;
+    actionObj.highestLevel = null;
+}
+
+//function createAndLinkNewAction(actionVar, expToLevelIncrease, actionPowerMultIncrease, progressMaxIncrease, progressMax, expToLevel, unlockCost, title, x, y, downstreamVars, tier, dataObj) {
+function createAndLinkNewAction(actionVar, dataObj, title, x, y, downstreamVars) {
+    data.actionNames.push(actionVar);
+    if(!data.actions[actionVar]) {
+        data.actions[actionVar] = {};
+    }
+
+    let actionObj = data.actions[actionVar];
+    actionObj.actionVar = actionVar;
+    actionObj.title = title;
+    actionObj.x = x;
+    actionObj.y = y;
+    actionObj.downstreamVars = downstreamVars ? downstreamVars : [];
+
+    setBaseVariables(actionObj, dataObj);
+    setInitialVariables(actionObj, dataObj);
 
     actionObj.onLevelUp = function() {
-        actionObj.completions += 1;
         actionObj.exp += actionObj.expToAdd;
         //Could this be the reason there's a memory leak?
         let timesRun = 0;
@@ -182,6 +193,13 @@ function createAndLinkNewAction(actionVar, dataObj, title, x, y, downstreamVars)
     return actionObj;
 }
 
+//To be used after Amulet, NOT on initialization
+function resetActionToBase(actionVar) {
+    let actionObj = data.actions[actionVar];
+    let dataObj = actionData[actionVar];
+    setBaseVariables(actionObj, dataObj);
+}
+
 function updateAllActionStatMults() {
     data.actionNames.forEach(function (name) {
         let obj = data.actions[name];
@@ -222,7 +240,11 @@ function unveilAction(actionVar) {
 }
 
 function unlockAction(actionObj) {
+    if(actionObj.unlocked) {
+        return;
+    }
     actionObj.unlocked = true;
+    actionObj.unlockTime = data.secondsPerReset; //mark when it unlocked
     actionObj.onUnlock();
 
     let amountToSet = data.upgrades.sliderAutoSet.amount;
@@ -231,6 +253,4 @@ function unlockAction(actionObj) {
             setSliderUI(actionObj.actionVar, downstreamVar, amountToSet);
         }
     });
-
-
 }
