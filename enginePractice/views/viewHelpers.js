@@ -53,7 +53,7 @@ function getStatChanges() {
         let actionObj = data.actions[actionName];
 
         // Calculate levels per second
-        let completesPerSecond = actionObj.progressRate() * ticksPerSecond / actionObj.progressMax;
+        let completesPerSecond = actionProgressRate(actionObj) * ticksPerSecond / actionObj.progressMax;
         let levelsPerSecond = completesPerSecond * actionObj.expToAdd / actionObj.expToLevel;
 
         // Update statsPerSecond based on the action's onLevelStats

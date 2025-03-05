@@ -25,6 +25,10 @@ saving: update engine to separate the things that can be applied manually / on l
 
 idea: numbers in the lines between that update based on the log of the resource being sent
 
+-keep track of the total amount of stats gained, and the total amount of levels gained for actions too.
+potentially use those as modifiers later (added up give bonuses?), which would make every game *really* unique but also
+encourage resets so be careful when you do it. It could be as a conjoined gain play with unlocking a new cliff of souls
+
 
 
 QoL that I just need to do:
@@ -47,6 +51,8 @@ QoL: [Req KTL] 1000 on each action, at the end of Info, show Time to Unlock: XX 
 QoL: 200 Show on level up the total effect so far of that action (aka +1 Memory, +7 total = x1.8 bonus
 QoL: 500 show minimap
 QoL: 1000 Run Info - get a graph of how all the levels increased over time per action
+QoL: Pie chart / explanation for source of stats
+
 
 //5800 so far. I'll give ~1000 up front, ~2000 more over the next few days, ~10000 more over the next few weeks.
 

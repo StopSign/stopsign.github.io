@@ -10,16 +10,19 @@ function initializeDisplay() {
     initializeToasts();
     generateLinesBetweenActions();
     cacheDownstreamViews();
-    updateAllActionStatMults();
+    actionUpdateAllStatMults();
     actionTitleClicked(`overclock`);
-    initializeMenu();
+    initializeMenus();
     setSingleCaches();
+    debug();
 }
 
 function setSingleCaches() {
     view.cached.totalMomentum = document.getElementById("totalMomentum");
     view.cached.secondsPerReset = document.getElementById("secondsPerReset");
     view.cached.openUseAmuletButton = document.getElementById("openUseAmuletButton");
+    view.cached.essence = document.getElementById("essence");
+    view.cached.essence2 = document.getElementById("essence2");
 }
 function generateStatDisplay(statVar) {
     let statObj = data.stats[statVar];

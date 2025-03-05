@@ -32,14 +32,13 @@ data.actionNames = [];
 data.stats = {};
 data.statNames = [];
 data.toastStates = []; // array of toast objects: {id, state, element}
-data.currentJob = "Helping Scott";
-data.currentWage = 1;
 data.gameState = "default"; //KTL
 data.totalMomentum = 0;
 data.essence = 0;
 data.useAmuletButtonShowing = false;
-data.useAmuletButtonShowing = false;
 data.secondsPerReset = 0;
+data.currentJob = "Helping Scott";
+data.currentWage = 1;
 
 let viewData = {}; //contains only things that are generated / not saved
 viewData.toasts = [];
@@ -50,9 +49,17 @@ let language = "english";
 let globalVisible = false;
 
 
-let upgradeLevel = 1;
 data.upgrades = {};
-data.upgrades.sliderAutoSet = { amount:100 };
+
+let isDebug = true;
+function debug() {
+    if(!isDebug) {
+        return;
+    }
+    document.getElementById("killTheLichMenuButton").style.display = "";
+    data.useAmuletButtonShowing = true;
+    data.essence = 100;
+}
 
 function initializeData() {
     if(globalVisible) {

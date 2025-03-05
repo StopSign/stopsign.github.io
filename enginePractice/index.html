@@ -9,7 +9,7 @@
     <meta http-equiv="expires" content="Tue, 01 Jan 1980 1:00:00 GMT" />
     <meta http-equiv="pragma" content="no-cache" />
 
-    <title>Test</title>
+    <title>KTL</title>
     <link rel="stylesheet" href="views/stylesheet.css">
 <!--    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">-->
 </head>
@@ -27,7 +27,7 @@
 <div class="button" style="position:absolute;left:25px;top:25px;padding:10px;font-size:16px;" onclick="clickMenuButton()">Menu</div>
 <div class="button" style="position:absolute;left:92px;top:25px;padding:10px;font-size:16px;" id='lightModeButton' onclick="changeDarkMode()">Light Mode</div>
 <div class="button" style="position:absolute;left:200px;top:25px;padding:10px;font-size:16px;" id='pauseButton' onclick="pauseGame()">Pause</div>
-<div class="button" style="position:absolute;left:380px;top:25px;padding:10px;font-size:16px;" id='killTheLichMenuButton' onclick="openKTLMenu()">Kill the Lich!</div>
+<div class="button" style="position:absolute;left:380px;top:25px;padding:10px;font-size:16px;display:none;" id='killTheLichMenuButton' onclick="openKTLMenu()">Kill the Lich!</div>
 <div class="button" style="position:absolute;left:380px;top:25px;padding:10px;font-size:16px;display:none;" id='openUseAmuletButton' onclick="openUseAmuletMenu()">Use the Amulet!</div>
 <div id="cheatButtons">
     <div class="button" style="position:absolute;left:280px;top:25px;padding:10px;font-size:16px;" id='cheatButton' onclick="increaseGamespeed()">x2</div>
@@ -44,7 +44,7 @@ Unlock of the elite costs 1b, and gives 10 souls. Overclock targeting is tier 0.
 After the unlock, a new button opens up - Use Amulet. This opens the reset menu with the reset button as well as all of the upgrades. Buy the upgrades, then "Use Amulet" which resets game back to start (but with upgrades!) -->
 
 <div id="killTheLichMenu" class='fullScreenGrey' style="display:none" onClick='openKTLMenu()'>
-    <div class='centerMenuBox'>
+    <div class='centerMenuBox' onClick="stopClicks(event)">
         <div class='menuTitle'>Kill the Lich!</div>
         <div class="menuSeparator"></div>
         <div id="ktlDynamicContent" class="dynamicContent">
@@ -72,14 +72,19 @@ After the unlock, a new button opens up - Use Amulet. This opens the reset menu 
 </div>
 
 <div id="useAmuletMenu" class='fullScreenGrey' style="display:none" onClick='openUseAmuletMenu()'>
-    <div class='centerMenuBox'>
-        <div class='menuTitle'>Use the Amulet!</div>
+    <div class='centerMenuBox' onClick="stopClicks(event)">
+        <div class='menuTitle'>Use the Amulet!<br>Essence available: <b><span id="essence2"></span></b></div>
         <div class="menuSeparator"></div>
         <div id="useAmuletContent" class="dynamicContent">
-            Essence Show:<br>
-            Spend all your essence here before you start a new life.
-            <div class="menuSeparator"></div>
+            <div id="amuletUpgrades" style="width:50%;display:inline-block;">
+
+            </div><div id="infoMenu" style="width:50%;display:inline-block;">
+                <div class="menuTitle" style="margin:auto;display:block;">Info Box</div>
+                <div id="infoText">lorem ipsum or whatever</div>
+            </div>
         </div>
+        <div class="menuSeparator"></div>
+        Spend all your essence  before you start a new life.
         <button class="continueButton" onclick="useAmulet()">Start Again</button>
     </div>
 </div>
@@ -178,6 +183,7 @@ It continues, capturing fraction essence of your fleeting soul and sending it in
 <script src="toasts.js"></script>
 <script src="menu.js"></script>
 <script src="ktl.js"></script>
+<script src="upgradeData.js"></script>
 <script>
 
     // multiCreateButton({label:"Cash", resource:"cash", buyFromFar:"cash",

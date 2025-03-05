@@ -1,3 +1,8 @@
+function statsSetBaseVariables(statObj) {
+    statObj.num = 0;
+    statObj.perSecond = 0;
+    statObj.mult = 1;
+}
 
 function createAndLinkNewStat(statVar) {
     data.statNames.push(statVar);
@@ -6,27 +11,16 @@ function createAndLinkNewStat(statVar) {
     }
     let statObj = data.stats[statVar];
     statObj.statVar = statVar;
-    statObj.num = 0;
-    statObj.perSecond = 0;
-    statObj.mult = 1;
     statObj.linkedActionExpStats = [];
     statObj.linkedActionExpertiseStats = [];
-    statObj.add = function (amount) {
-        statObj.num += amount;
-        statObj.mult = Math.pow(1.1, statObj.num); //calc only when adding
-        statObj.linkedActionExpStats.forEach(function (actionVar) {
-            data.actions[actionVar].calcStatMult();
-        })
-        statObj.linkedActionExpertiseStats.forEach(function (actionVar) {
-            data.actions[actionVar].calcStatExpertise();
-        })
-    }
+
+    statsSetBaseVariables(statObj);
 
     generateStatDisplay(statVar);
 }
 
 //Vars that should be reset each KTL
-function setBaseVariables(actionObj, dataObj) {
+function actionSetBaseVariables(actionObj, dataObj) {
     actionObj.momentum = 0;
 
     actionObj.progress = 0;
@@ -53,6 +47,7 @@ function setBaseVariables(actionObj, dataObj) {
     actionObj.expToLevelIncrease = dataObj.expToLevelIncrease;
     actionObj.actionPowerMultIncrease = dataObj.actionPowerMultIncrease ? dataObj.actionPowerMultIncrease : 1;
     actionObj.progressMaxIncrease = dataObj.progressMaxIncrease;
+    actionObj.visible = (globalVisible || dataObj.visible === null) ? true : dataObj.visible;
     actionObj.unlockCost = dataObj.unlockCost;
     actionObj.unlocked = dataObj.unlocked === null ? true : dataObj.unlocked;
 
@@ -68,12 +63,11 @@ function setBaseVariables(actionObj, dataObj) {
 }
 
 //One and done
-function setInitialVariables(actionObj, dataObj) {
+function actionSetInitialVariables(actionObj, dataObj) {
     actionObj.isGenerator = dataObj.isGenerator;
     actionObj.momentumName = dataObj.momentumName ? dataObj.momentumName : "momentum";
     actionObj.onLevelStats = dataObj.onLevelStats ? dataObj.onLevelStats : [];
     actionObj.expStats = dataObj.expStats ? dataObj.expStats : [];
-    actionObj.visible = (globalVisible || dataObj.visible === null) ? true : dataObj.visible;
     actionObj.tier = dataObj.tier;
     actionObj.wage = dataObj.wage ? dataObj.wage : null;
     actionObj.isKTL = dataObj.isKTL;
@@ -109,49 +103,9 @@ function createAndLinkNewAction(actionVar, dataObj, title, x, y, downstreamVars)
     actionObj.y = y;
     actionObj.downstreamVars = downstreamVars ? downstreamVars : [];
 
-    setBaseVariables(actionObj, dataObj);
-    setInitialVariables(actionObj, dataObj);
+    actionSetBaseVariables(actionObj, dataObj);
+    actionSetInitialVariables(actionObj, dataObj);
 
-    actionObj.onLevelUp = function() {
-        actionObj.exp += actionObj.expToAdd;
-        //Could this be the reason there's a memory leak?
-        let timesRun = 0;
-        while(actionObj.exp >= actionObj.expToLevel && (actionObj.maxLevel < 0 || (actionObj.level < actionObj.maxLevel))) {
-            if(timesRun++ > 10) {
-                console.log('too many levels at once ' + actionObj.actionVar + ', ' + timesRun);
-                break;
-            }
-            actionObj.exp -= actionObj.expToLevel;
-            actionObj.level++;
-            actionObj.progressMaxBase *= actionObj.progressMaxIncrease;
-            actionObj.progressMax = actionObj.progressMaxBase * actionObj.progressMaxMult;
-            actionObj.expToLevelBase *= actionObj.expToLevelIncrease;
-            actionObj.expToLevel = actionObj.expToLevelBase * actionObj.expToLevelMult;
-            actionObj.actionPowerMult *= actionObj.actionPowerMultIncrease;
-            actionObj.calcActionPower();
-            actionObj.onLevelStats.forEach(function (statObj) {
-                let name = statObj[0];
-                let amount = statObj[1];
-                if(!data.stats[name]) {
-                    console.log('The stat ' + name + ' doesnt exist');
-                }
-                data.stats[name].add(amount);
-            });
-            actionObj.onLevelCustom();
-        }
-    }
-    //power = base * mult * efficiency
-    //power = powerFunction?(power)
-    actionObj.calcActionPower = function() {
-        actionObj.actionPower = actionObj.actionPowerBase * actionObj.actionPowerMult * (actionObj.efficiency/100);
-    }
-
-    actionObj.progressRate = function() { //Rate of drain for momentum
-        if(actionObj.isGenerator) {
-            return 1 / ticksPerSecond;
-        }
-        return actionObj.progressRateReal();
-    }
     actionObj.progressRateReal = function() { //For data around the flat action too
         return actionObj.momentum * actionObj.tierMult() * (actionObj.efficiency/100) / ticksPerSecond;
     }
@@ -193,14 +147,64 @@ function createAndLinkNewAction(actionVar, dataObj, title, x, y, downstreamVars)
     return actionObj;
 }
 
-//To be used after Amulet, NOT on initialization
-function resetActionToBase(actionVar) {
-    let actionObj = data.actions[actionVar];
-    let dataObj = actionData[actionVar];
-    setBaseVariables(actionObj, dataObj);
+function actionProgressRate(actionObj) {
+    if(actionObj.isGenerator) {
+        return 1 / ticksPerSecond;
+    }
+    return actionObj.progressRateReal();
 }
 
-function updateAllActionStatMults() {
+function actionAddExp(actionObj) {
+    actionObj.exp += actionObj.expToAdd;
+    let timesRun = 0;
+    while(actionObj.exp >= actionObj.expToLevel && (actionObj.maxLevel < 0 || (actionObj.level < actionObj.maxLevel))) {
+        if(timesRun++ > 10) {
+            console.log('too many levels at once ' + actionObj.actionVar + ', ' + timesRun);
+            break;
+        }
+        actionObj.exp -= actionObj.expToLevel;
+        actionObj.level++;
+        actionObj.progressMaxBase *= actionObj.progressMaxIncrease;
+        actionObj.progressMax = actionObj.progressMaxBase * actionObj.progressMaxMult;
+        actionObj.expToLevelBase *= actionObj.expToLevelIncrease;
+        actionObj.expToLevel = actionObj.expToLevelBase * actionObj.expToLevelMult;
+        actionObj.actionPowerMult *= actionObj.actionPowerMultIncrease;
+
+        //power = base * mult * efficiency
+        actionObj.actionPower = actionObj.actionPowerBase * actionObj.actionPowerMult * (actionObj.efficiency/100);
+
+        actionObj.onLevelStats.forEach(function (statObj) {
+            let name = statObj[0];
+            let amount = statObj[1];
+            if(!data.stats[name]) {
+                console.log('The stat ' + name + ' doesnt exist');
+            }
+            statAddAmount(name, amount);
+        });
+        actionObj.onLevelCustom();
+    }
+}
+
+function statAddAmount(statVar, amount) {
+    let statObj = data.stats[statVar];
+    statObj.num += amount;
+    statObj.mult = Math.pow(1.1, statObj.num); //calc only when adding
+    statObj.linkedActionExpStats.forEach(function (actionVar) {
+        data.actions[actionVar].calcStatMult();
+    })
+    statObj.linkedActionExpertiseStats.forEach(function (actionVar) {
+        data.actions[actionVar].calcStatExpertise();
+    })
+}
+
+//To be used after Amulet, NOT on initialization
+function actionResetToBase(actionVar) {
+    let actionObj = data.actions[actionVar];
+    let dataObj = actionData[actionVar];
+    actionSetBaseVariables(actionObj, dataObj);
+}
+
+function actionUpdateAllStatMults() {
     data.actionNames.forEach(function (name) {
         let obj = data.actions[name];
         obj.calcStatMult();
@@ -224,7 +228,7 @@ function unveilAction(actionVar) {
     //set all downstream actions to 1% when you unlock
     let parentVar = actionObj.parent;
     let parent = data.actions[parentVar];
-    let amountToSet = data.upgrades.sliderAutoSet.amount;
+    // let amountToSet = data.upgrades.sliderAutoSet.amount;
     if(!parent) {
         console.log('Failed to access parent var ' + parentVar + ' of action ' + actionVar + '.');
     }
@@ -234,7 +238,7 @@ function unveilAction(actionVar) {
     }
     parent.downstreamVars.forEach(function (downstreamVar) {
         if(downstreamVar === actionVar) { //set the parent's matching slider
-            setSliderUI(parentVar, downstreamVar, amountToSet);
+            setSliderUI(parentVar, downstreamVar, 100);
         }
     });
 }
@@ -247,10 +251,10 @@ function unlockAction(actionObj) {
     actionObj.unlockTime = data.secondsPerReset; //mark when it unlocked
     actionObj.onUnlock();
 
-    let amountToSet = data.upgrades.sliderAutoSet.amount;
+    // let amountToSet = data.upgrades.sliderAutoSet.amount;
     actionObj.downstreamVars.forEach(function(downstreamVar) {
         if(data.actions[downstreamVar] && data.actions[downstreamVar].unlocked) {
-            setSliderUI(actionObj.actionVar, downstreamVar, amountToSet);
+            setSliderUI(actionObj.actionVar, downstreamVar, 100);
         }
     });
 }

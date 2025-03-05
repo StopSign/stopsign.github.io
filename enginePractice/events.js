@@ -46,18 +46,20 @@ function downstreamSliderChanged(fromAction, toAction) {
     setSliderUI(fromAction, toAction, newValue);
 }
 function toggleAllZero(actionVar) {
-    let action = data.actions[actionVar];
-    action.downstreamVars.forEach(function (toAction) {
-        if(!data.actions[toAction] || data.actions[toAction].momentumName !== action.momentumName) {
+    let actionObj = data.actions[actionVar];
+    actionObj.downstreamVars.forEach(function (toAction) {
+        let downstreamAction = data.actions[toAction];
+        if(!downstreamAction || downstreamAction.momentumName !== actionObj.momentumName || !downstreamAction.visible) {
             return;
         }
         setSliderUI(actionVar, toAction, 0);
     });
 }
 function toggleAllHundred(actionVar) {
-    let action = data.actions[actionVar];
-    action.downstreamVars.forEach(function (toAction) {
-        if(!data.actions[toAction] || data.actions[toAction].momentumName !== action.momentumName) {
+    let actionObj = data.actions[actionVar];
+    actionObj.downstreamVars.forEach(function (toAction) {
+        let downstreamAction = data.actions[toAction];
+        if(!downstreamAction || downstreamAction.momentumName !== actionObj.momentumName || !downstreamAction.visible) {
             return;
         }
         setSliderUI(actionVar, toAction, 100);
@@ -332,6 +334,10 @@ function changeJob(actionVar) {
 function pauseGame() {
     stop = !stop;
     document.getElementById('pauseButton').innerText = stop ? "Resume" : "Pause";
+}
+
+function stopClicks(event) {
+    event.stopPropagation();
 }
 
 function increaseGamespeed() {

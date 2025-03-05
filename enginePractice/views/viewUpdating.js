@@ -12,7 +12,6 @@ function updateView() {
     });
     updateGlobals();
 
-
     saveCurrentViewState();
 }
 
@@ -20,19 +19,24 @@ function updateGlobals() {
     let totalMometum = 0;
     data.actionNames.forEach(function(actionName) {
         let actionObj = data.actions[actionName];
-        if(actionObj.momentumName === "momentum") {
+        if(actionObj.momentumName === "momentum" &&
+            ((data.gameState === "default" && !actionObj.isKTL) || (data.gameState==="KTL"&&actionObj.isKTL))) {
             totalMometum += actionObj.momentum;
         }
     });
-    view.cached.totalMomentum.innerText = intToString(totalMometum, 1);
     data.totalMomentum = totalMometum;
+    view.cached.totalMomentum.innerText = intToString(totalMometum, 1);
 
-    let toShow = data.useAmuletButtonShowing ? "" : "none";
-    if(view.cached.openUseAmuletButton.style.display !== toShow) {
-        view.cached.openUseAmuletButton.style.display = toShow;
+    let toShowAmulet = data.useAmuletButtonShowing && data.gameState === "KTL" ? "" : "none";
+    if(view.cached.openUseAmuletButton.style.display !== toShowAmulet) {
+        view.cached.openUseAmuletButton.style.display = toShowAmulet;
     }
     if(view.cached.secondsPerReset.innerText !== secondsToTime(data.secondsPerReset)) {
         view.cached.secondsPerReset.innerText = secondsToTime(data.secondsPerReset);
+    }
+    if(view.cached.essence.innerText !== intToString(data.essence, 1)) {
+        view.cached.essence.innerText = intToString(data.essence, 1);
+        view.cached.essence2.innerText = intToString(data.essence, 1);
     }
 }
 

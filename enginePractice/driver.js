@@ -116,7 +116,7 @@ function gameTick() {
     //loop through all actions (data.actionNames is an [] with names, data.actions has the objects. actionObj = data.actions[actionNames[0]] for example)
     //have statsPerSecond = {"charm":num, "curiosity":num, ...}
     //for each, add their (actionObj.onLevelStats amount (e.g. [["charm", .1], ["curiosity", .1]]) multiplied by levels/s) to the relevant stat in statsPerSecond
-    //to get levels/s, the action gets (actionObj.progressRate()/actionObj.progressMax) = completes/s, and then (complete/s * actionObj.expToAdd / actionObj.expToLevel) = level/s
+    //to get levels/s, the action gets (actionProgressRate(actionObj)/actionObj.progressMax) = completes/s, and then (complete/s * actionObj.expToAdd / actionObj.expToLevel) = level/s
 
     let statsPerSecond = getStatChanges();
     data.statNames.forEach(function(statName) {
@@ -178,7 +178,7 @@ function tickGameObject(actionVar) {
         }
         actionObj.progress -= actionObj.progressMax;
         actionObj.onCompleteCustom();
-        actionObj.onLevelUp();
+        actionAddExp(actionObj);
     }
     //sending a % to the self, so increase used there if relevant
     actionObj.momentumDecrease = actionObj.isGenerator||atMaxLevel ? 0 : (rateInefficient * ticksPerSecond);
@@ -186,7 +186,7 @@ function tickGameObject(actionVar) {
 
     actionObj.downstreamVars.forEach(function (downstreamVar) {
         let downstreamAction = data.actions[downstreamVar];
-        if(!downstreamAction || downstreamAction.momentumName !== actionObj.momentumName) {
+        if(!downstreamAction || downstreamAction.momentumName !== actionObj.momentumName || !downstreamAction.visible) {
             return;
         }
         //Send momentum to downstream, and also update downstream's taken

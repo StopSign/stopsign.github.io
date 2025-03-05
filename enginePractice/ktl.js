@@ -6,15 +6,14 @@ function openKTLMenu() {
 }
 
 function initializeKTL() {
+    document.getElementById("killTheLichMenu").style.display = "none";
+
     data.gameState = "KTL";
     data.actionNames.forEach(function(actionVar) {
         let actionObj = data.actions[actionVar];
 
-        actionObj.isRunning = (data.gameState === "default" && !actionObj.isKTL) ||
-            (data.gameState === "KTL" && actionObj.isKTL);
-        if(!actionObj.isRunning) {
-            actionObj.visible = false;
-        }
+        actionObj.isRunning = actionObj.isKTL;
+        actionObj.visible = actionObj.isKTL;
     });
 
     data.actions.overclockTargetingTheLich.momentum = data.totalMomentum;
@@ -29,25 +28,33 @@ function openUseAmuletMenu() {
 }
 
 function useAmulet() {
-    //For each action, reset the base stats and set max level
+    document.getElementById("useAmuletMenu").style.display = "none";
 
-    data.actionNames.forEach(function(actionVar) {
-        let actionObj = data.actions[actionVar];
-        actionObj.highestLevel = actionObj.maxLevel;
-        actionObj.prevUnlockTime = actionObj.unlockTime;
-
-
-        resetActionToBase(actionVar);
+    //Reset all stats and bonuses
+    data.statNames.forEach(function (statName) {
+        let statObj = data.stats[statName];
+        statsSetBaseVariables(statObj);
     });
 
+    //For each action, reset the base stats and set max level
+    data.actionNames.forEach(function(actionVar) {
+        let actionObj = data.actions[actionVar];
+        actionObj.highestLevel = actionObj.level;
+        actionObj.prevUnlockTime = actionObj.unlockTime;
+
+        actionResetToBase(actionVar);
+
+        actionObj.downstreamVars.forEach(function(downstreamVar) {
+            if(data.actions[downstreamVar] && data.actions[downstreamVar].unlocked) {
+                setSliderUI(actionObj.actionVar, downstreamVar, 0);
+            }
+        });
+    });
+
+    data.secondsPerReset = 0;
+    data.currentJob = "Helping Scott";
+    data.currentWage = 1;
     data.gameState = "default";
-
-    /*
-    1. Process all actions
-    1a. Clear them back to what actionData says
-    1b. Set their highest levels
-    1c. Start up the generators again
-
-     */
-    view.cached.openUseAmuletButton.style.display = "none";
+    data.useAmuletButtonShowing = false;
+    document.getElementById("killTheLichMenuButton").style.display = "";
 }

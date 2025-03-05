@@ -252,7 +252,7 @@ input {
     margin: 20px auto 0 auto;
     padding: 10px 20px;
     background-color: var(--warning-color); /* Adjust color as needed */
-    color: white;
+    color: var(--text-primary);
     border: none;
     border-radius: 5px;
     cursor: pointer;
@@ -399,4 +399,14 @@ input {
     padding: 10px;
     font-size:14px;
     text-align:left;
+}
+
+.upgradeButton {
+    width:35px;
+    height:35px;
+    margin-right:8px;
+    border:none;
+    border-radius:6px;
+    cursor:pointer;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
 }
