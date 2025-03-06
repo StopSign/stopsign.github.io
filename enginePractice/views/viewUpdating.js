@@ -13,14 +13,16 @@ function updateView() {
     updateGlobals();
 
     saveCurrentViewState();
+
+    //in case this was set
+    forceVisuals = false;
 }
 
 function updateGlobals() {
     let totalMometum = 0;
     data.actionNames.forEach(function(actionName) {
         let actionObj = data.actions[actionName];
-        if(actionObj.momentumName === "momentum" &&
-            ((data.gameState === "default" && !actionObj.isKTL) || (data.gameState==="KTL"&&actionObj.isKTL))) {
+        if(actionObj.momentumName === "momentum" && gameStateMatches(actionObj)) {
             totalMometum += actionObj.momentum;
         }
     });
@@ -47,6 +49,7 @@ function updateGlobals() {
 function saveCurrentViewState() {
     prevState.stats = copyArray(data.stats);
     prevState.actions = copyArray(data.actions);
+    prevState.scale = scale;
 }
 
 function updateViewOnSecond() {
@@ -72,16 +75,46 @@ function updateStatView(statName) {
     }
 }
 
-//big performance improvements:
-//TODO set numbers into 2 categories: zoomed in or zoomed out. At a certain zoom scale, it should switch, and the other numbers should not be updated
-//TODO when zoomed in, only update the numbers within a certain x/y of current x/y. This means that the actions should be aware if they're visible or not
+
 function updateActionView(actionName) {
     let action = data.actions[actionName];
+    //duplicate display locations
+    action.miniLevel = action.level;
+
     let prevAction = prevState.actions[actionName];
-    let forceUpdate = !prevAction;
+    let forceUpdate = !prevAction || forceVisuals;
+
+
+    if(!forceUpdate &&
+        (!gameStateMatches(action) ||
+         !isInScreenRange(action))) {
+        return;
+    }
+
+
+    let miniVersion = scale < .45;
+    if(prevState.scale !== scale && miniVersion && view.cached[`${actionName}LargeVersionContainer`].style.display !== "none") {
+        //switch to mini versions
+        view.cached[`${actionName}LargeVersionContainer`].style.display = "none"
+        view.cached[`${actionName}Container`].style.pointerEvents = "none";
+        view.cached[`${actionName}SmallVersionContainer`].style.display = "";
+        forceUpdate = true;
+    } else if(prevState.scale !== scale && !miniVersion && view.cached[`${actionName}LargeVersionContainer`].style.display === "none") {
+        //switch to large versions
+        view.cached[`${actionName}LargeVersionContainer`].style.display = ""
+        view.cached[`${actionName}Container`].style.pointerEvents = "";
+        view.cached[`${actionName}SmallVersionContainer`].style.display = "none";
+        forceUpdate = true;
+    }
+
+    if(prevState.scale !== scale) {
+        view.cached[`${actionName}SmallVersionContainer`].style.scale = (1 / scale)*.8+"";
+    }
+
 
     // let roundedNumbers = [];
-    // if(action.)
+    //Add variables that are displayed all the time
+    //Add only the variables relevant for the menu that's open currently
 
     let roundedNumbers = [["progress", 2], ["progressMax", 2], ["progressGain", 2],
         // ["realX", 1], ["realY", 1],
@@ -89,7 +122,7 @@ function updateActionView(actionName) {
         ["level", 1], ["maxLevel", 1], ["tier", 1],
         ["exp", 2], ["expToLevel", 2], ["expToAdd", 2], ["momentumIncrease", 2], ["momentumDecrease", 2], ["actionPowerMult", 3],
         ["totalSend", 3], ["expToLevelMult", 5], ["expertiseMult", 3], ["expertiseBase", 2],
-        ["unlockCost", 2], ["expertise", 1]];
+        ["unlockCost", 2], ["expertise", 1], ["miniLevel", 1]];
     let roundWithoutSig = ["progressMaxIncrease", "expToLevelIncrease"];
 
     roundedNumbers.forEach(obj => {
@@ -201,7 +234,7 @@ function updateActionView(actionName) {
     }
 
     if(forceUpdate || (prevAction.visible !== action.visible) || (prevAction.isRunning !== action.isRunning)) {
-        if(action.visible && action.isRunning) {
+        if(action.visible && action.isRunning && gameStateMatches(action)) {
             view.cached[actionName + "Container"].style.display = "";
             if(action.parent) {
                 view.cached[action.parent + "_" + actionName + "_Line_Outer"].style.display = "";
@@ -217,4 +250,6 @@ function updateActionView(actionName) {
         //the unlocked action's parent_action_Line needs to be made visible too
         //the option in the send list needs to be made visible too
     }
+    //Fixes a memory leak with prev action references hanging around due to having live references
+    prevAction = {};
 }

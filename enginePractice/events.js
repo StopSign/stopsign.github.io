@@ -76,7 +76,7 @@ const actionContainer = document.getElementById('actionContainer');
 
 let scale = 1; // Initial scale value
 const scaleStep = 0.1; // Value by which the scale changes per scroll
-const minScale = 0.1; // Minimum scale value to prevent the content from becoming too small
+const minScale = 0.2; // Minimum scale value to prevent the content from becoming too small
 const maxScale = 3; // Maximum scale value to prevent the content from becoming too large
 
 windowElement.addEventListener('wheel', function(e) {
@@ -154,6 +154,13 @@ document.addEventListener('mousemove', function(e) {
 document.addEventListener('mouseup', function() {
     isDragging = false;
 });
+function isInScreenRange(action) {
+    const distanceX = Math.abs((transformX * -1) - (action.realX + 150) * scale + windowElement.offsetWidth / 2);
+    const distanceY = Math.abs((transformY * -1) - (action.realY + 50) * scale + windowElement.offsetHeight / 2);
+    const thresholdX = windowElement.offsetWidth / scale / 2 + 300;
+    const thresholdY = windowElement.offsetHeight / scale / 2 + 300;
+    return distanceX < thresholdX && distanceY < thresholdY;
+}
 function forceRedraw(element) {
     // Save the current display style
     const display = element.style.display;

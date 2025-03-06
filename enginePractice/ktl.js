@@ -20,6 +20,7 @@ function initializeKTL() {
         actionObj.visible = actionObj.isKTL;
     });
 
+    forceVisuals = true;
     data.actions.overclockTargetingTheLich.momentum = data.totalMomentum;
     document.getElementById("killTheLichMenuButton").style.display = "none";
     view.cached.openUseAmuletButton.style.display = "";

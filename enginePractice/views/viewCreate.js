@@ -72,6 +72,7 @@ function generateActionDisplay(actionVar) {
         " | <span style='font-size:12px;position:relative;'>" +
         "Level <b></v><span id='"+actionVar+"Level'>0</span></b>" +
         (actionObj.maxLevel >= 0 ? " / <b><span id='"+actionVar+"MaxLevel'>0</span></b>" : "") +
+            "<span id='"+actionVar+"HighestLevelContainer'></span>" +
         "</span>" +
         " | <span style='font-size:12px;'><b><span id='"+actionVar+"Efficiency'></span></b>%</span>" +
         "</span>" +
@@ -221,18 +222,26 @@ function generateActionDisplay(actionVar) {
     let newX = actionObj.realX;
     let newY = actionObj.realY;
 
+    let shouldDisplay = gameStateMatches(actionObj) ? "" : "none";
+
     theStr +=
-        "<div id='"+actionVar+"Container' style='border:2px solid var(--border-color);background-color:var(--bg-secondary);position:absolute;left:"+newX+"px;top:"+newY+"px;width:300px;min-height:150px;'>" +
-        title +
-        menuContainer +
-        momentumContainer +
-        pbar +
-        expBar +
-        storyContainer +
-        statsContainer +
-        levelInfoContainer +
-        downstreamContainer +
-        lockOverAll +
+        "<div id='"+actionVar+"Container' style='display:"+shouldDisplay+";position:absolute;left:"+newX+"px;top:"+newY+"px;width:300px;min-height:150px;'>" +
+            "<div id='"+actionVar+"LargeVersionContainer' style='border:2px solid var(--border-color);background-color:var(--bg-secondary);'>" +
+                title +
+                menuContainer +
+                momentumContainer +
+                pbar +
+                expBar +
+                storyContainer +
+                statsContainer +
+                levelInfoContainer +
+                downstreamContainer +
+                lockOverAll +
+            "</div>" +
+            "<div id='"+actionVar+"SmallVersionContainer' style='display:none;text-align:center;margin:50px auto;font-size:12px;width:100px;'>" +
+                "<b><span style='font-size:16px'>" + actionObj.title + "</span></b><br>" +
+                "Level <b><span id='"+actionVar+"MiniLevel'></b>" +
+            "</div>" +
         "</div>";
 
 
@@ -253,8 +262,15 @@ function generateActionDisplay(actionVar) {
     lockIcon.appendChild(lockPath);
     document.getElementById(actionVar+"LockIcon").appendChild(lockIcon);
 
+    //create the mini-version
+    let miniVersion = "TEST";
+
+
+
     //cache the created objects
     view.cached[actionVar + "Container"] = document.getElementById(actionVar + "Container");
+    view.cached[actionVar + "LargeVersionContainer"] = document.getElementById(actionVar + "LargeVersionContainer");
+    view.cached[actionVar + "SmallVersionContainer"] = document.getElementById(actionVar + "SmallVersionContainer");
     view.cached[actionVar + "ProgressMax"] = document.getElementById(actionVar + "ProgressMax");
     view.cached[actionVar + "Title"] = document.getElementById(actionVar + "Title");
     view.cached[actionVar + "Container"] = document.getElementById(actionVar + "Container");
@@ -276,6 +292,8 @@ function generateActionDisplay(actionVar) {
     view.cached[actionVar + "ExpToLevelIncrease"] = document.getElementById(actionVar + "ExpToLevelIncrease");
     view.cached[actionVar + "Level"] = document.getElementById(actionVar + "Level");
     view.cached[actionVar + "MaxLevel"] = document.getElementById(actionVar + "MaxLevel");
+    view.cached[actionVar + "MiniLevel"] = document.getElementById(actionVar + "MiniLevel");
+    view.cached[actionVar + "HighestLevelContainer"] = document.getElementById(actionVar + "HighestLevelContainer");
     view.cached[actionVar + "ExpBarInner"] = document.getElementById(actionVar + "ExpBarInner");
     view.cached[actionVar + "Exp"] = document.getElementById(actionVar + "Exp");
     view.cached[actionVar + "ExpToLevel"] = document.getElementById(actionVar + "ExpToLevel");

@@ -31,6 +31,10 @@ function getStatColor(statName) {
     return "var(--error-color)";
 }
 
+function gameStateMatches(actionObj) {
+    return (data.gameState === "default" && !actionObj.isKTL) || (data.gameState==="KTL" && actionObj.isKTL);
+}
+
 function getResourceColor(actionObj) {
     switch (actionObj.momentumName) {
         case "mana":

@@ -70,7 +70,7 @@ function actionSetInitialVariables(actionObj, dataObj) {
     actionObj.expStats = dataObj.expStats ? dataObj.expStats : [];
     actionObj.tier = dataObj.tier;
     actionObj.wage = dataObj.wage ? dataObj.wage : null;
-    actionObj.isKTL = dataObj.isKTL;
+    actionObj.isKTL = !!dataObj.isKTL;
 
     actionObj.actionPowerFunction = dataObj.actionPowerFunction;
     actionObj.onUnlock = dataObj.onUnlock ? dataObj.onUnlock : function() {};

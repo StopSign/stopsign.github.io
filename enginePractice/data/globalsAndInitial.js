@@ -47,6 +47,7 @@ let statTitles = []; //[<title>, <stat name to be located above>]
 
 let language = "english";
 let globalVisible = false;
+let forceVisuals = false;
 
 
 data.upgrades = {};
