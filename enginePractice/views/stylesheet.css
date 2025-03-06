@@ -13,6 +13,7 @@
     --overlay-color: rgba(30, 30, 46, 0.8);
     --selection-color:#9f0000;
     --exp-color:#7b5fc1;
+    --line-color: #000000;
     --momentum-color:#007BFF;
     --mana-color: #0c20d4;
     --gold-color: #a28a00;
@@ -37,6 +38,7 @@ body.lightMode {
     --overlay-color: rgba(135, 152, 211, 0.8);
     --selection-color:#67ff5b;
     --exp-color:#b79df8;
+    --line-color: #ffffff;
     --momentum-color:#00E1FF;
     --mana-color:#74c7ec;
     --gold-color:#FFD700;

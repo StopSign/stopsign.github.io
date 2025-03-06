@@ -20,11 +20,11 @@ function initializeKTL() {
         actionObj.visible = actionObj.isKTL;
     });
 
-    forceVisuals = true;
     data.actions.overclockTargetingTheLich.momentum = data.totalMomentum;
     document.getElementById("killTheLichMenuButton").style.display = "none";
     view.cached.openUseAmuletButton.style.display = "";
     document.getElementById("essenceDisplay").style.display = "";
+    forceVisuals = true;
 }
 
 function openUseAmuletMenu() {
@@ -79,4 +79,5 @@ function useAmulet() {
     data.gameState = "default";
     data.useAmuletButtonShowing = false;
     document.getElementById("killTheLichMenuButton").style.display = "";
+    forceVisuals = true;
 }

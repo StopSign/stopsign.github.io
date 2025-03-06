@@ -85,12 +85,6 @@ function updateActionView(actionName) {
     let forceUpdate = !prevAction || forceVisuals;
 
 
-    if(!forceUpdate &&
-        (!gameStateMatches(action) ||
-         !isInScreenRange(action))) {
-        return;
-    }
-
 
     let miniVersion = scale < .45;
     if(prevState.scale !== scale && miniVersion && view.cached[`${actionName}LargeVersionContainer`].style.display !== "none") {
@@ -111,6 +105,28 @@ function updateActionView(actionName) {
         view.cached[`${actionName}SmallVersionContainer`].style.scale = (1 / scale)*.8+"";
     }
 
+
+    if(forceUpdate || (prevAction.visible !== action.visible) || (prevAction.isRunning !== action.isRunning)) {
+        if(action.visible && action.isRunning && gameStateMatches(action)) {
+            view.cached[actionName + "Container"].style.display = "";
+            if(action.parent) {
+                view.cached[action.parent + "_" + actionName + "_Line_Outer"].style.display = "";
+                view.cached[action.parent + "_" + actionName + "_Line_Inner"].style.display = "";
+            }
+        } else {
+            view.cached[actionName + "Container"].style.display = "none";
+            if(action.parent) {
+                view.cached[action.parent + "_" + actionName + "_Line_Outer"].style.display = "none";
+                view.cached[action.parent + "_" + actionName + "_Line_Inner"].style.display = "none";
+            }
+        }
+    }
+
+    if(!forceUpdate &&
+        (!gameStateMatches(action) ||
+            !isInScreenRange(action))) {
+        return;
+    }
 
     // let roundedNumbers = [];
     //Add variables that are displayed all the time
@@ -176,7 +192,15 @@ function updateActionView(actionName) {
         });
     }
 
-    if (forceUpdate || prevAction.progress !== action.progress) {
+    //If exp/s is 3x greater than exp required, set progress to 100 width
+    let isTooFast = action.progressGain / action.progressMax > 2;
+    let prevTooFast = prevAction && prevAction.progressGain / prevAction.progressMax > 2;
+    if(isTooFast && !prevTooFast) {
+        console.log('too fast');
+        view.cached[`${actionName}ProgressBarInner`].style.width = `100%`;
+    }
+
+    if (!isTooFast && (forceUpdate || prevAction.progress !== action.progress)) {
         let progress = (action.progress / action.progressMax * 100);
         view.cached[`${actionName}ProgressBarInner`].style.width = `${(progress > 100 ? 100 : progress)}%`;
     }
@@ -231,24 +255,6 @@ function updateActionView(actionName) {
         } else {
             view.cached[actionName + "LockContainer"].style.display = "";
         }
-    }
-
-    if(forceUpdate || (prevAction.visible !== action.visible) || (prevAction.isRunning !== action.isRunning)) {
-        if(action.visible && action.isRunning && gameStateMatches(action)) {
-            view.cached[actionName + "Container"].style.display = "";
-            if(action.parent) {
-                view.cached[action.parent + "_" + actionName + "_Line_Outer"].style.display = "";
-                view.cached[action.parent + "_" + actionName + "_Line_Inner"].style.display = "";
-            }
-        } else {
-            view.cached[actionName + "Container"].style.display = "none";
-            if(action.parent) {
-                view.cached[action.parent + "_" + actionName + "_Line_Outer"].style.display = "none";
-                view.cached[action.parent + "_" + actionName + "_Line_Inner"].style.display = "none";
-            }
-        }
-        //the unlocked action's parent_action_Line needs to be made visible too
-        //the option in the send list needs to be made visible too
     }
     //Fixes a memory leak with prev action references hanging around due to having live references
     prevAction = {};

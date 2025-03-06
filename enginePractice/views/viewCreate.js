@@ -172,7 +172,7 @@ function generateActionDisplay(actionVar) {
         "</div>";
 
     let lockOverAll = "<div id='"+actionVar+"LockContainer' " +
-        "style='position:absolute;background-color: var(--bg-secondary);width:100%;height:100%;top:0;text-align:center;'>" +
+        "style='position:absolute;background-color: var(--bg-secondary);width:100%;height:100%;top:0;left:0;text-align:center;'>" +
         "<span id='"+actionVar+"LockIcon'></span><br>" +
         "<span>Needs <b><span id='"+actionVar+"UnlockCost'>0</span></b> " + actionObj.momentumName +
         "<br>sent from <b>" + (data.actions[actionObj.parent]?data.actions[actionObj.parent].title:"WAIT") + "</b>.<br>" + //generally just not loaded yet
@@ -372,7 +372,7 @@ function generateLinesBetweenActions() {
             let sourceBackgroundColor = getResourceColor(actionObj);
             let targetBackgroundColor = getResourceColor(targetObj);
             let isDifferentResource = actionObj.momentumName !== targetObj.momentumName;
-            let backgroundColor = isDifferentResource ? `linear-gradient(to right, ${sourceBackgroundColor}, ${targetBackgroundColor})` : 'black';
+            let backgroundColor = isDifferentResource ? `linear-gradient(to right, ${sourceBackgroundColor}, ${targetBackgroundColor})` : 'var(--line-color)';
 
             let borderId = `${actionVar}_${targetObj.actionVar}_Line_Outer`;
             let lineId = actionVar+`_`+targetObj.actionVar+`_Line_Inner`;
