@@ -45,6 +45,10 @@ function buyUpgrade() {
     if (upgrade.upgradesBought.indexOf(num) === -1) {
         upgrade.upgradesBought.push(num);
     }
+    upgrade.upgradePower++; //num bought per row
+    if(upgrade.upgradesBought.length === upgrade.upgradesAvailable) {
+        upgrade.isBought = true; //cleared the row
+    }
     document.getElementById(upgradeVar+"Button"+num).style.background = "#00ff39";
 }
 
@@ -66,9 +70,13 @@ function createUpgrades() {
         upgradeObj.initialCost = dataObj.initialCost;
         upgradeObj.costIncrease = dataObj.costIncrease;
         upgradeObj.upgradesAvailable = dataObj.upgradesAvailable;
-        upgradeObj.upgradesBought = []; //e.g. bought first and fifth upgrade and it would be [0,4]
+        upgradeObj.upgradesBought = []; //e.g. bought first and fifth upgrade and it would be [0,4]. Not used atm.
         upgradeObj.requireInOrder = dataObj.requireInOrder !== undefined ? dataObj.requireInOrder : true;
         upgradeObj.customInfo = dataObj.customInfo;
+        upgradeObj.highestLevel = -1;
+        upgradeObj.secondHighestLevel = -1;
+        upgradeObj.thirdHighestLevel = -1;
+        upgradeObj.isBought = false;
     }
 
 }
@@ -78,7 +86,7 @@ actionData.upgrades = {
         initialCost:5, costIncrease:1,
         upgradesAvailable:1,
         customInfo: function(num) {
-            return "On each action, get 2x exp as long as the action's level is lower than the highest level ever reached. " +
+            return "On each action, get 2x exp as long as the action's level is lower than the highest level ever reached." +
                 "The highest level achieved will be displayed.";
         }
     },
@@ -98,13 +106,21 @@ actionData.upgrades = {
         }
     },
     createABetterFoundation: {
-        initialCost:10, costIncrease:3,
+        initialCost:10, costIncrease:2,
         upgradesAvailable:3,
         customInfo: function(num) {
-            return "Motivation generation increased by x"+(1+(num+1)*.5);
+            return "Motivation generation increased by x"+(1+(num+1));
         }
     },
-    buyNicerStuff: { //unlock jobs/market/equipment
+    buyNicerStuff: { //unlock market/equipment/houses
+        initialCost:11, costIncrease:1,
+        upgradesAvailable:1,
+        customInfo: function(num) {
+            return "Unlock new actions!<br>Story: My armor is broken, my sword shattered, my shield is in pieces. The army " +
+                "did not expect me to fight this long, and their preparation was lacking.<br><br>I must take this into my own hands.";
+        }
+    },
+    makeMoreMoney: { //unlock jobs/market/equipment
         initialCost:11, costIncrease:1,
         upgradesAvailable:1,
         customInfo: function(num) {
@@ -116,16 +132,16 @@ actionData.upgrades = {
         initialCost:100, costIncrease:1,
         upgradesAvailable:1,
         customInfo: function(num) {
-            return "On each action, get 4x exp as long as the action's level is lower than the highest level ever reached. " +
-                "The highest level achieved will be displayed.";
+            return "On each action, get 2x exp as long as the action's level is lower than the second highest level ever reached." +
+                "The second highest level achieved will be displayed.";
         }
     },
     rememberMyMastery: {
         initialCost:1000, costIncrease:1,
         upgradesAvailable:1,
         customInfo: function(num) {
-            return "On each action, get 6x exp as long as the action's level is lower than the highest level ever reached. " +
-                "The highest level achieved will be displayed.";
+            return "On each action, get 2x exp as long as the action's level is lower than the third highest level ever reached." +
+                "The third highest level achieved will be displayed.";
         }
     },
     //... finish up to here

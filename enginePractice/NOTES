@@ -35,6 +35,7 @@ QoL that I just need to do:
 QoL: if no downstream are visible, hide the all 0 / all 100 button
 QoL: if the exp bar gets too fast, convert it into a completions/s window instead
 Hide stats that aren't generated (stat window should be ??? until unlocked)
+QoL: bar that raises/lowers based on =incoming / spending, to show you if it has reached equilibrium visually better
 
 QoL I could monetize?: (200 per day)
 QoL: 100 clicking the other actions in Downstream brings you to them, clicking ^ brings you to parent

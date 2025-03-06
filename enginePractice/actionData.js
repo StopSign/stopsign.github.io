@@ -139,7 +139,10 @@ let actionData = {
         onUnlock: function() {
         },
         onCompleteCustom:function() {
-            data.actions.overclock.momentum += data.actions.overclock.actionPower;
+            let upgradeMult = 1;
+            upgradeMult *= Math.pow(2, data.upgrades.createABetterFoundation.upgradePower);
+
+            data.actions.overclock.momentum += data.actions.overclock.actionPower * upgradeMult;
         },
         onLevelCustom: function() {
         },
@@ -782,26 +785,18 @@ let actionData = {
         tier:1, momentumName:"conversations",
         progressMaxBase:50000, progressMaxMult:1, progressMaxIncrease:3,
         expToLevelBase:10, expToLevelMult:1, expToLevelIncrease:3,
-        unlockCost:50000, visible:false, unlocked:false, //visible:false
-        onCompleteCustom:function() {
-        },
-        onUnlock: function() {
-        },
-        expStats:[],
+        unlockCost:50000, visible:false, unlocked:false,
         onLevelStats:[["villagersKnown", 1]],
+        expStats:[],
         efficiencyStats:[],
     },
     talkAboutCurrentIssues: {
         tier:1, momentumName:"conversations",
         progressMaxBase:50000, progressMaxMult:1, progressMaxIncrease:1.5,
         expToLevelBase:10, expToLevelMult:1, expToLevelIncrease:1.5,
-        unlockCost:50000, visible:false, unlocked:false, //visible:false
-        onCompleteCustom:function() {
-        },
-        onUnlock: function() {
-        },
-        expStats:[],
+        unlockCost:50000, visible:false, unlocked:false,
         onLevelStats:[["villagersKnown", 1]],
+        expStats:[],
         efficiencyStats:[],
     },
     //Socialize - John
@@ -809,13 +804,9 @@ let actionData = {
         tier:1, momentumName:"conversations",
         progressMaxBase:50000, progressMaxMult:1, progressMaxIncrease:1.5,
         expToLevelBase:10, expToLevelMult:1, expToLevelIncrease:1.5,
-        unlockCost:50000, visible:false, unlocked:false, //visible:false
-        onCompleteCustom:function() {
-        },
-        onUnlock: function() {
-        },
-        expStats:[],
+        unlockCost:50000, visible:false, unlocked:false,
         onLevelStats:[["villagersKnown", 1]],
+        expStats:[],
         efficiencyStats:[],
     },
     //Socialize - Local Outreach
@@ -825,13 +816,81 @@ let actionData = {
         expToLevelBase:10, expToLevelMult:1, expToLevelIncrease:1.5,
         unlockCost:50000, maxLevel:50,
         visible:false, unlocked:false,
-        onCompleteCustom:function() {
-        },
-        onUnlock: function() {
-        },
-        expStats:[],
         onLevelStats:[["villagersKnown", 1]],
+        expStats:[],
         efficiencyStats:[],
     },
 
+    //Buy Nicer Stuff - gold
+    eatStreetFood: {
+        tier:1, momentumName:"gold",
+        progressMaxBase:500, progressMaxMult:1, progressMaxIncrease:1.5,
+        expToLevelBase:10, expToLevelMult:1, expToLevelIncrease:1.5,
+        unlockCost:500, maxLevel:50,
+        visible:false, unlocked:false,
+        onLevelStats:[["confidence", 1]],
+        expStats:[],
+        efficiencyStats:[],
+    },
+    eatTastyFood: {
+        tier:1, momentumName:"gold",
+        progressMaxBase:500, progressMaxMult:1, progressMaxIncrease:1.5,
+        expToLevelBase:10, expToLevelMult:1, expToLevelIncrease:1.5,
+        unlockCost:500, maxLevel:50,
+        visible:false, unlocked:false,
+        onLevelStats:[["confidence", 1]],
+        expStats:[],
+        efficiencyStats:[],
+    },
+    eatQualityFood: {
+        tier:1, momentumName:"gold",
+        progressMaxBase:500, progressMaxMult:1, progressMaxIncrease:1.5,
+        expToLevelBase:10, expToLevelMult:1, expToLevelIncrease:1.5,
+        unlockCost:500, maxLevel:50,
+        visible:false, unlocked:false,
+        onLevelStats:[["confidence", 1]],
+        expStats:[],
+        efficiencyStats:[],
+    },
+    buyQualityClothing: {
+        tier:1, momentumName:"gold",
+        progressMaxBase:500, progressMaxMult:1, progressMaxIncrease:1.5,
+        expToLevelBase:10, expToLevelMult:1, expToLevelIncrease:1.5,
+        unlockCost:500, maxLevel:50,
+        visible:false, unlocked:false,
+        onLevelStats:[["confidence", 1]],
+        expStats:[],
+        efficiencyStats:[],
+    },
+    buyFashionableClothing: {
+        tier:1, momentumName:"gold",
+        progressMaxBase:500, progressMaxMult:1, progressMaxIncrease:1.5,
+        expToLevelBase:10, expToLevelMult:1, expToLevelIncrease:1.5,
+        unlockCost:500, maxLevel:50,
+        visible:false, unlocked:false,
+        onLevelStats:[["confidence", 1]],
+        expStats:[],
+        efficiencyStats:[],
+    },
+    improveHome: {
+        tier:1, momentumName:"gold",
+        progressMaxBase:500, progressMaxMult:1, progressMaxIncrease:1.5,
+        expToLevelBase:10, expToLevelMult:1, expToLevelIncrease:1.5,
+        unlockCost:500, maxLevel:50,
+        visible:false, unlocked:false,
+        onLevelStats:[["confidence", 1]],
+        expStats:[],
+        efficiencyStats:[],
+    },
+    //10 actions from renting a room and buying a house, increasing in gold costs
+    //buy market items, buy shop items, buy tools, buy equipment, buy sturdy weapons/armor (results in 10-1000x bonus to killing lich somehow)
+    //2 more layers columns of jobs -
+
+    //investments - needs to level up to be worth anything. Consumes itself to grow itself, so a big spike before falling off due to exp reqs.
+    // Has a very low slowdown rate / lasts forever. Can be sent to other investments that increasingly have a slower starting time but a higher peak... eventually.
+    // Each investment essentially slowly triggers the next, and each has decent stats?
+    // TODO figure out what to do with investment actions / fortune currency
+
+
+    //travel through forest, travel to city
 };

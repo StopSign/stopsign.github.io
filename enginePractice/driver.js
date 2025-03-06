@@ -124,6 +124,7 @@ function gameTick() {
     });
 
 
+    upgradeUpdates()
 }
 
 function secondTick() {

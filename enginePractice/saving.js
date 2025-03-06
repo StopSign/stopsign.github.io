@@ -5,6 +5,17 @@ function clearSave() { //Doesn't work atm
 
 function load() {
     initializeData();
+
+    /* Loading:
+        * The round that the player is running should stay the same when the player loads, even if the underlying actionData has been updated
+        * This is not true for upgradeData - take fresh actionData.upgrade copies and add toLoad data on top
+        * For actions, before UI creation is load. Load actionData into data, then change all the numbers with toLoad (keep the update's other effects?)
+        * bring all of the other data variables in too
+        *
+     */
+
+
+
     let toLoad = {};
     let isLoadingEnabled = false; //TODO HERE FOR CLEARING SAVE
     if(isLoadingEnabled && window.localStorage[saveName] && JSON.parse(window.localStorage[saveName]).data) { //has a save file

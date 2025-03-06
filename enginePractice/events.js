@@ -31,6 +31,9 @@ function setSliderUI(fromAction, toAction, newValue) {
         console.log('trying to set it from: ' + fromAction + ', ' + toAction);
         return;
     }
+    if(newValue === -1) { //no automatic change
+        return;
+    }
     document.getElementById(fromAction + "NumInput" + toAction).value = newValue;
     document.getElementById(fromAction + "RangeInput" + toAction).value = newValue;
     document.getElementById(fromAction+"_"+toAction+"_Line_Inner").style.height = (newValue/100*20)+"px";
@@ -197,6 +200,8 @@ function toggleStatsInfo(actionVar) {
 function toggleStory(actionVar) {
     clickActionMenu(actionVar, "StoryContainer", "ToggleStoryButton");
 }
+
+//Each action needs which menu they've selected, to intelligently deselect colors, as well as to use in minimizing UI updates
 
 function clickActionMenu(actionVar, containerId, buttonId) {
     let container = document.getElementById(actionVar+containerId);

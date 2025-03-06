@@ -80,6 +80,9 @@ function updateActionView(actionName) {
     let prevAction = prevState.actions[actionName];
     let forceUpdate = !prevAction;
 
+    // let roundedNumbers = [];
+    // if(action.)
+
     let roundedNumbers = [["progress", 2], ["progressMax", 2], ["progressGain", 2],
         // ["realX", 1], ["realY", 1],
         ["actionPower", 3], ["momentum", 2], ["momentumDelta", 2], ["amountToSend", 3],

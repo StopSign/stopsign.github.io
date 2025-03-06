@@ -152,8 +152,22 @@ function actionProgressRate(actionObj) {
     return actionObj.progressRateReal();
 }
 
+function calcUpgradeMultToExp(actionObj) {
+    let upgradeMult = 1;
+    if(data.upgrades.rememberWhatIDid.isBought && actionObj.level < actionObj.highestLevel) {
+        upgradeMult *= 2;
+    }
+    if(data.upgrades.rememberHowIGrew.isBought && actionObj.level < actionObj.secondHighestLevel) {
+        upgradeMult *= 2;
+    }
+    if(data.upgrades.rememberMyMastery.isBought && actionObj.level < actionObj.thirdHighestLevel) {
+        upgradeMult *= 2;
+    }
+    return upgradeMult;
+}
+
 function actionAddExp(actionObj) {
-    actionObj.exp += actionObj.expToAdd;
+    actionObj.exp += actionObj.expToAdd * calcUpgradeMultToExp(actionObj);
     let timesRun = 0;
     while(actionObj.exp >= actionObj.expToLevel && (actionObj.maxLevel < 0 || (actionObj.level < actionObj.maxLevel))) {
         if(timesRun++ > 10) {
@@ -236,7 +250,7 @@ function unveilAction(actionVar) {
     }
     parent.downstreamVars.forEach(function (downstreamVar) {
         if(downstreamVar === actionVar) { //set the parent's matching slider
-            setSliderUI(parentVar, downstreamVar, 100);
+            setSliderUI(parentVar, downstreamVar, getUpgradeSliderAmount());
         }
     });
 }
@@ -252,7 +266,15 @@ function unlockAction(actionObj) {
     // let amountToSet = data.upgrades.sliderAutoSet.amount;
     actionObj.downstreamVars.forEach(function(downstreamVar) {
         if(data.actions[downstreamVar] && data.actions[downstreamVar].unlocked) {
-            setSliderUI(actionObj.actionVar, downstreamVar, 100);
+            setSliderUI(actionObj.actionVar, downstreamVar, getUpgradeSliderAmount());
         }
     });
+}
+
+function upgradeUpdates() {
+    data.actions.overclock.momentum += data.upgrades.tryALittleHarder.upgradePower * 20 / ticksPerSecond;
+}
+
+function getUpgradeSliderAmount() {
+    return [0, 5, 20, 100, -1][data.upgrades.stopLettingOpportunityWait.upgradePower];
 }

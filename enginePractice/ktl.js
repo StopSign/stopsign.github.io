@@ -1,6 +1,7 @@
 
 
 function openKTLMenu() {
+    document.getElementById('confirmKTL').checked = false;
     let isShowing = view.cached.killTheLichMenu.style.display !== "none";
     view.cached.killTheLichMenu.style.display = isShowing ? "none" : "flex";
 }
@@ -9,7 +10,6 @@ function initializeKTL() {
     if(!document.getElementById('confirmKTL').checked) {
         return;
     }
-    document.getElementById('confirmKTL').checked = false;
     view.cached.killTheLichMenu.style.display = "none";
 
     data.gameState = "KTL";
@@ -27,6 +27,7 @@ function initializeKTL() {
 }
 
 function openUseAmuletMenu() {
+    document.getElementById('amuletConfirm').checked = false;
     let isShowing = document.getElementById("useAmuletMenu").style.display !== "none";
     document.getElementById("useAmuletMenu").style.display = isShowing ? "none" : "flex";
 }
@@ -35,7 +36,6 @@ function useAmulet() {
     if(!document.getElementById('amuletConfirm').checked) {
         return;
     }
-    document.getElementById('amuletConfirm').checked = false;
     document.getElementById("useAmuletMenu").style.display = "none";
 
     //Reset all stats and bonuses
@@ -47,8 +47,21 @@ function useAmulet() {
     //For each action, reset the base stats and set max level
     data.actionNames.forEach(function(actionVar) {
         let actionObj = data.actions[actionVar];
-        actionObj.highestLevel = actionObj.level;
+        let newLevel = actionObj.level;
         actionObj.prevUnlockTime = actionObj.unlockTime;
+
+        // Sort and insert the new level into the top 3 if applicable;
+        if (newLevel > actionObj.highestLevel) {
+            actionObj.thirdHighestLevel = actionObj.secondHighestLevel;
+            actionObj.secondHighestLevel = actionObj.highestLevel;
+            actionObj.highestLevel = newLevel;
+        } else if (newLevel > actionObj.secondHighestLevel) {
+            actionObj.thirdHighestLevel = actionObj.secondHighestLevel;
+            actionObj.secondHighestLevel = newLevel;
+        } else if (newLevel > actionObj.thirdHighestLevel) {
+            actionObj.thirdHighestLevel = newLevel;
+        }
+
 
         actionResetToBase(actionVar);
 
