@@ -67,7 +67,8 @@ After the unlock, a new button opens up - Use Amulet. This opens the reset menu 
             Then, you go join the resistance trying to hold off the lich's hordes as they steadily approach. Before you know it,
             you're equipped with army-standard and facing an elite, who roars as he stomps toward you.
         </div>
-        <button class="continueButton" onclick="initializeKTL()">Reset Now</button>
+        <input type="checkbox" id="confirmKTL"><label for="confirmKTL">Confirm</label>
+        <button class="continueButton" onclick="initializeKTL()">Reset now with <span id="totalMomentum2"></span> total momentum!</button>
     </div>
 </div>
 
@@ -75,17 +76,18 @@ After the unlock, a new button opens up - Use Amulet. This opens the reset menu 
     <div class='centerMenuBox' onClick="stopClicks(event)">
         <div class='menuTitle'>Use the Amulet!<br>Essence available: <b><span id="essence2"></span></b></div>
         <div class="menuSeparator"></div>
-        <div id="useAmuletContent" class="dynamicContent">
-            <div id="amuletUpgrades" style="width:50%;display:inline-block;">
-
-            </div><div id="infoMenu" style="width:50%;display:inline-block;">
-                <div class="menuTitle" style="margin:auto;display:block;">Info Box</div>
-                <div id="infoText">lorem ipsum or whatever</div>
-            </div>
-        </div>
+        <div class="menuTitle" style="font-size:12px;text-align:center;">As you lay dying, your last thoughts are recorded by the amulet:<br><span style="font-size:16px;"><b>IF ONLY I COULD JUST...</b></span></div>
         <div class="menuSeparator"></div>
-        Spend all your essence  before you start a new life.
+        <div id="amuletUpgrades" class="dynamicContent"></div>
+        <div class="menuSeparator"></div>
+        It is recommended to spend your essence before you start a new life.<br>
+        <input type="checkbox" id="amuletConfirm"><label for="amuletConfirm">Confirm</label>
         <button class="continueButton" onclick="useAmulet()">Start Again</button>
+        <div id="infoMenu" style="position:absolute;width:300px;top:150px;right:100%;display:none;background:var(--bg-secondary);border-radius:20px;border:2px solid #00cd41;padding:10px 0;">
+            <div class="menuTitle" style="margin:auto;display:block;">Info Box</div>
+            <div id="infoText">lorem ipsum or whatever</div>
+            <div class='button' onclick='buyUpgrade()' style="width:40%;padding:5px;font-size:14px;margin: 5px auto auto;">Buy</div>
+        </div>
     </div>
 </div>
 

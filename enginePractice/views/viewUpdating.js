@@ -26,6 +26,9 @@ function updateGlobals() {
     });
     data.totalMomentum = totalMometum;
     view.cached.totalMomentum.innerText = intToString(totalMometum, 1);
+    if(view.cached.killTheLichMenu.style.display !== "none") { //only update if menu is open
+        view.cached.totalMomentum2.innerText = intToString(totalMometum, 1);
+    }
 
     let toShowAmulet = data.useAmuletButtonShowing && data.gameState === "KTL" ? "" : "none";
     if(view.cached.openUseAmuletButton.style.display !== toShowAmulet) {

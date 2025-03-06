@@ -1,12 +1,16 @@
 
 
 function openKTLMenu() {
-    let isShowing = document.getElementById("killTheLichMenu").style.display !== "none";
-    document.getElementById("killTheLichMenu").style.display = isShowing ? "none" : "flex";
+    let isShowing = view.cached.killTheLichMenu.style.display !== "none";
+    view.cached.killTheLichMenu.style.display = isShowing ? "none" : "flex";
 }
 
 function initializeKTL() {
-    document.getElementById("killTheLichMenu").style.display = "none";
+    if(!document.getElementById('confirmKTL').checked) {
+        return;
+    }
+    document.getElementById('confirmKTL').checked = false;
+    view.cached.killTheLichMenu.style.display = "none";
 
     data.gameState = "KTL";
     data.actionNames.forEach(function(actionVar) {
@@ -28,6 +32,10 @@ function openUseAmuletMenu() {
 }
 
 function useAmulet() {
+    if(!document.getElementById('amuletConfirm').checked) {
+        return;
+    }
+    document.getElementById('amuletConfirm').checked = false;
     document.getElementById("useAmuletMenu").style.display = "none";
 
     //Reset all stats and bonuses

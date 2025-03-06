@@ -2,7 +2,7 @@ function calcUpgradeCost(upgrade, num) {
     if(num === 0) {
         return upgrade.initialCost;
     }
-    return upgrade.initialCost * Math.pow(upgrade.costIncrease, num);
+    return Math.floor(upgrade.initialCost * Math.pow(upgrade.costIncrease, num));
 }
 
 let selectedUpgrade = {var:"",num:0};
@@ -13,20 +13,27 @@ function selectBuyUpgrade(upgradeVar, num) {
 
     if(selectedUpgrade.var) {
         document.getElementById(selectedUpgrade.var + "Button" + selectedUpgrade.num).style.border = "none";
-        if(selectedUpgrade.var === upgradeVar && selectedUpgrade.num === num) {
+        if(selectedUpgrade.var === upgradeVar && selectedUpgrade.num === num) { //deselect
             document.getElementById("infoText").innerHTML = "";
             selectedUpgrade = {var:"",num:0};
+            document.getElementById("infoMenu").style.display = "none";
             return;
         }
     }
     selectedUpgrade = {var:upgradeVar,num:num};
     document.getElementById(upgradeVar+"Button"+num).style.border = "4px solid #ffae00";
     document.getElementById("infoText").innerHTML = createInfoText(upgradeVar, num);
+    document.getElementById("infoMenu").style.display = "inline-block";
 }
 
-function buyUpgrade(upgradeVar, num) {
+function buyUpgrade() {
+    let upgradeVar = selectedUpgrade.var;
+    let num = selectedUpgrade.num;
     let upgrade = data.upgrades[upgradeVar];
 
+    if(upgrade.upgradesBought.indexOf(num) !== -1) { //already bought
+        return;
+    }
     //check cost
     let cost = calcUpgradeCost(upgrade, num);
     if (data.essence < cost) {
@@ -44,32 +51,177 @@ function buyUpgrade(upgradeVar, num) {
 function createInfoText(upgradeVar, num) {
     let upgrade = data.upgrades[upgradeVar];
     return upgrade.customInfo(num) +
-        "<br>Cost: " + calcUpgradeCost(upgrade, num) + "<br>" +
-        "<div class='continueButton' onclick='buyUpgrade(\""+upgradeVar+"\", "+num+")'>Buy</div>";
+        "<br><span style='font-size:14px'>Cost: <b>" + calcUpgradeCost(upgrade, num) + "</b></span>";
 }
 
-data.upgrades.automaticallySetDownstreamSliders = {
-    amount:0,
-    initialCost:10, costIncrease:2,
-    upgradesAvailable:4,
-    upgradesBought:[], //e.g. bought first and third upgrade and it would be [0,2]
-    reqInOrder:true,
-    customInfo: function(num) {
-        let infoText = "When unlocking a new action, auto sets the slider to ";
-        switch (num) {
-            case 0:
-                infoText += "1%."
-                break;
-            case 1:
-                infoText += "10%."
-                break;
-            case 2:
-                infoText += "100%."
-                break;
-            case 3:
-                infoText += "not reset with an amulet reset, and previously undiscovered to be set at 100%."
-                break;
-        }
-        return infoText
+function createUpgrades() {
+    //Loop through action.upgrades
+    //modify/add base variables as needed
+    //add it to data.upgrades
+    for(let upgradeVar in actionData.upgrades) {
+        let dataObj = actionData.upgrades[upgradeVar];
+        data.upgrades[upgradeVar] = {};
+        let upgradeObj = data.upgrades[upgradeVar];
+        upgradeObj.upgradePower = 0; //for controlling the effect of the upgrade
+        upgradeObj.initialCost = dataObj.initialCost;
+        upgradeObj.costIncrease = dataObj.costIncrease;
+        upgradeObj.upgradesAvailable = dataObj.upgradesAvailable;
+        upgradeObj.upgradesBought = []; //e.g. bought first and fifth upgrade and it would be [0,4]
+        upgradeObj.requireInOrder = dataObj.requireInOrder !== undefined ? dataObj.requireInOrder : true;
+        upgradeObj.customInfo = dataObj.customInfo;
     }
-};
+
+}
+
+actionData.upgrades = {
+    rememberWhatIDid: {
+        initialCost:5, costIncrease:1,
+        upgradesAvailable:1,
+        customInfo: function(num) {
+            return "On each action, get 2x exp as long as the action's level is lower than the highest level ever reached. " +
+                "The highest level achieved will be displayed.";
+        }
+    },
+    stopLettingOpportunityWait: {
+        initialCost:5, costIncrease:3,
+        upgradesAvailable:4,
+        customInfo: function(num) {
+            return `When unlocking a new action, auto sets the new downstream sliders to ` +
+            `${["1%.", "10%.", "100%.", "not reset with an amulet reset, and for previously undiscovered sliders to be set at 100%."][num]}`;
+        }
+    },
+    tryALittleHarder: {
+        initialCost:10, costIncrease:1.1,
+        upgradesAvailable:5,
+        customInfo: function(num) {
+            return "Motivation generation on Overclock raise to " +((num+1)*20)+ "/s.";
+        }
+    },
+    createABetterFoundation: {
+        initialCost:10, costIncrease:3,
+        upgradesAvailable:3,
+        customInfo: function(num) {
+            return "Motivation generation increased by x"+(1+(num+1)*.5);
+        }
+    },
+    buyNicerStuff: { //unlock jobs/market/equipment
+        initialCost:11, costIncrease:1,
+        upgradesAvailable:1,
+        customInfo: function(num) {
+            return "Unlock new actions!<br>Story: My armor is broken, my sword shattered, my shield is in pieces. The army " +
+                "did not expect me to fight this long, and their preparation was lacking.<br><br>I must take this into my own hands.";
+        }
+    },
+    rememberHowIGrew: {
+        initialCost:100, costIncrease:1,
+        upgradesAvailable:1,
+        customInfo: function(num) {
+            return "On each action, get 4x exp as long as the action's level is lower than the highest level ever reached. " +
+                "The highest level achieved will be displayed.";
+        }
+    },
+    rememberMyMastery: {
+        initialCost:1000, costIncrease:1,
+        upgradesAvailable:1,
+        customInfo: function(num) {
+            return "On each action, get 6x exp as long as the action's level is lower than the highest level ever reached. " +
+                "The highest level achieved will be displayed.";
+        }
+    },
+    //... finish up to here
+    learnHowToFight: { //unlock john socialize / instruction
+        initialCost:40, costIncrease:1,
+        upgradesAvailable:1,
+        customInfo: function(num) {
+            return "Unlock new actions!<br>Story: My armor barely saved me when I was out of position. My shield disappeared " +
+                "when I lost my footing. My sword frequently gets stuck and leaves my grip. The problem is not only my equipment, but how I use it.";
+        }
+    },
+    getCombatExperience: {
+        initialCost:110, costIncrease:1,
+        upgradesAvailable:1,
+        customInfo: function(num) {
+            return "";
+        }
+    },
+    thinkAboutWhatINeed: {
+        initialCost:110, costIncrease:1,
+        upgradesAvailable:1,
+        customInfo: function(num) {
+            return "";
+        }
+    },
+    gainAccessToTheAcademy: {
+        initialCost:110, costIncrease:1,
+        upgradesAvailable:1,
+        customInfo: function(num) {
+            return "";
+        }
+    },
+    learnMoreFromTheLibrary: {
+        initialCost:110, costIncrease:1,
+        upgradesAvailable:1,
+        customInfo: function(num) {
+            return "";
+        }
+    },
+    learnMagicFromTheTowerMages: {
+        initialCost:110, costIncrease:1,
+        upgradesAvailable:1,
+        customInfo: function(num) {
+            return "";
+        }
+    },
+    nurtureAGoodReputation: {
+        initialCost:110, costIncrease:1,
+        upgradesAvailable:1,
+        customInfo: function(num) {
+            return "";
+        }
+    },
+    gatherBlackmailMaterial: {
+        initialCost:110, costIncrease:1,
+        upgradesAvailable:1,
+        customInfo: function(num) {
+            return "";
+        }
+    },
+    stealMagicFromTheTowerMages: {
+        initialCost:110, costIncrease:1,
+        upgradesAvailable:1,
+        customInfo: function(num) {
+            return "";
+        }
+    },
+    wieldMyNaturalMagic: {
+        initialCost:110, costIncrease:1,
+        upgradesAvailable:1,
+        customInfo: function(num) {
+            return "";
+        }
+    },
+    wieldMyMagicNaturally: {
+        initialCost:110, costIncrease:1,
+        upgradesAvailable:1,
+        customInfo: function(num) {
+            return "";
+        }
+    },
+    gatherArtifcatsOfPower: {
+        initialCost:110, costIncrease:1,
+        upgradesAvailable:1,
+        customInfo: function(num) {
+            return "";
+        }
+    },
+    leadTheCharge: { //win
+        initialCost:110, costIncrease:1,
+        upgradesAvailable:1,
+        customInfo: function(num) {
+            return "";
+        }
+    },
+
+
+
+}

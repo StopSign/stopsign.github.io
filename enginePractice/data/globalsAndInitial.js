@@ -302,6 +302,8 @@ function initializeData() {
         })
     });
 
+
+    createUpgrades();
     initializeDisplay();
 }
 

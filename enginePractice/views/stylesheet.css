@@ -393,16 +393,16 @@ input {
 }
 
 .dynamicContent {
-    max-height: 300px; /* Adjust max height as needed */
-    overflow-y: auto;
+    max-height: 400px; /* Adjust max height as needed */
     width: 100%;
     padding: 10px;
     font-size:14px;
     text-align:left;
+    overflow-y:auto;
 }
 
 .upgradeButton {
-    width:35px;
+    width:45px;
     height:35px;
     margin-right:8px;
     border:none;

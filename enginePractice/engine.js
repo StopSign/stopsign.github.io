@@ -92,9 +92,7 @@ function actionSetInitialVariables(actionObj, dataObj) {
 //function createAndLinkNewAction(actionVar, expToLevelIncrease, actionPowerMultIncrease, progressMaxIncrease, progressMax, expToLevel, unlockCost, title, x, y, downstreamVars, tier, dataObj) {
 function createAndLinkNewAction(actionVar, dataObj, title, x, y, downstreamVars) {
     data.actionNames.push(actionVar);
-    if(!data.actions[actionVar]) {
-        data.actions[actionVar] = {};
-    }
+    data.actions[actionVar] = {};
 
     let actionObj = data.actions[actionVar];
     actionObj.actionVar = actionVar;
