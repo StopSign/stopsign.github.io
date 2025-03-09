@@ -53,8 +53,8 @@ function getResourceColor(actionObj) {
 function getStatChanges() {
     let statsPerSecond = {};
 
-    data.actionNames.forEach(actionName => {
-        let actionObj = data.actions[actionName];
+    data.actionNames.forEach(actionVar => {
+        let actionObj = data.actions[actionVar];
 
         // Calculate levels per second
         let completesPerSecond = actionProgressRate(actionObj) * ticksPerSecond / actionObj.progressMax;

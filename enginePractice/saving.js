@@ -6,6 +6,7 @@ function clearSave() { //Doesn't work atm
 function load() {
     initializeData();
 
+    let isLoadingEnabled = false; //TODO SET FALSE FOR CLEARING SAVE
     /* Loading:
         * The round that the player is running should stay the same when the player loads, even if the underlying actionData has been updated
         * This is not true for upgradeData - take fresh actionData.upgrade copies and add toLoad data on top
@@ -14,10 +15,8 @@ function load() {
         *
      */
 
-
-
     let toLoad = {};
-    let isLoadingEnabled = false; //TODO HERE FOR CLEARING SAVE
+
     if(isLoadingEnabled && window.localStorage[saveName] && JSON.parse(window.localStorage[saveName]).data) { //has a save file
         toLoad = JSON.parse(window.localStorage[saveName]).data;
         console.log(toLoad)

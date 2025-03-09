@@ -192,25 +192,25 @@ function actionTitleClicked(actionVar) {
     actionContainer.style.transform = `translate(${newTransformX}px, ${newTransformY}px) scale(${scale})`;
 }
 
-function toggleLevelInfo(actionVar) {
-    clickActionMenu(actionVar, "LevelInfoContainer", "ToggleLevelInfoButton");
+function toggleDownstream(actionVar) {
+    clickActionMenu(actionVar, "DownstreamContainer", "ToggleDownstreamButton", "downstream");
 }
 
-function toggleDownstream(actionVar) {
-    clickActionMenu(actionVar, "DownstreamContainer", "ToggleDownstreamButton");
+function toggleLevelInfo(actionVar) {
+    clickActionMenu(actionVar, "LevelInfoContainer", "ToggleLevelInfoButton", "info");
 }
 
 function toggleStatsInfo(actionVar) {
-    clickActionMenu(actionVar, "StatsContainer", "ToggleStatsInfoButton");
+    clickActionMenu(actionVar, "StatsContainer", "ToggleStatsInfoButton", "stat");
 }
 
 function toggleStory(actionVar) {
-    clickActionMenu(actionVar, "StoryContainer", "ToggleStoryButton");
+    clickActionMenu(actionVar, "StoryContainer", "ToggleStoryButton", "story");
 }
 
 //Each action needs which menu they've selected, to intelligently deselect colors, as well as to use in minimizing UI updates
 
-function clickActionMenu(actionVar, containerId, buttonId) {
+function clickActionMenu(actionVar, containerId, buttonId, menuVar) {
     let container = document.getElementById(actionVar+containerId);
     let button = document.getElementById(actionVar+buttonId);
 
@@ -220,6 +220,8 @@ function clickActionMenu(actionVar, containerId, buttonId) {
         container.style.display = "block";
         button.style.backgroundColor = "var(--selection-color)";
     }
+    //for setting which is updating
+    data.actions[actionVar].currentMenu = menuVar;
 }
 
 function deselectActionMenus(actionVar) {

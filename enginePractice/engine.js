@@ -50,6 +50,7 @@ function actionSetBaseVariables(actionObj, dataObj) {
     actionObj.visible = (globalVisible || dataObj.visible === null) ? true : dataObj.visible;
     actionObj.unlockCost = dataObj.unlockCost;
     actionObj.unlocked = dataObj.unlocked === null ? true : dataObj.unlocked;
+    actionObj.currentMenu = "downstream";
 
     actionObj.isRunning = !dataObj.isKTL; //for controlling whether time affects it
     actionObj.efficiencyStats = dataObj.efficiencyStats ? dataObj.efficiencyStats : [];
@@ -87,6 +88,7 @@ function actionSetInitialVariables(actionObj, dataObj) {
     //Vars that don't really need to be initalized but I like to know they're there
     actionObj.parent = null;
     actionObj.highestLevel = null;
+    actionObj.prevUnlockTime = null;
 }
 
 //function createAndLinkNewAction(actionVar, expToLevelIncrease, actionPowerMultIncrease, progressMaxIncrease, progressMax, expToLevel, unlockCost, title, x, y, downstreamVars, tier, dataObj) {
@@ -217,8 +219,8 @@ function actionResetToBase(actionVar) {
 }
 
 function actionUpdateAllStatMults() {
-    data.actionNames.forEach(function (name) {
-        let obj = data.actions[name];
+    data.actionNames.forEach(function (actionVar) {
+        let obj = data.actions[actionVar];
         obj.calcStatMult();
         obj.calcStatExpertise();
     })

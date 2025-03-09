@@ -38,13 +38,7 @@ function formatNumber(num) {
 }
 
 function formatTime(seconds) {
-    if (Number.isInteger(seconds)) {
-        return (formatNumber(seconds) + _txt("time_controls>seconds")).replace(/\B(?=(\d{3})+(?!\d))/gu, ",");
-    }
-    if (seconds < 10) {
-        return seconds.toFixed(2) + _txt("time_controls>seconds");
-    }
-    return (seconds.toFixed(1) + _txt("time_controls>seconds")).replace(/\B(?=(\d{3})+(?!\d))/gu, ",");
+    secondsToTime(seconds);
 }
 
 function copyArray(arr) {
@@ -150,6 +144,9 @@ function intToStringRound(value) {
 }
 
 function secondsToTime(seconds) {
+    if(!seconds) {
+        seconds = 0;
+    }
     const hours = Math.floor(seconds / 3600);
     const remainder = seconds % 3600;
     const minutes = Math.floor(remainder / 60);

@@ -102,13 +102,14 @@ function recalcInterval(fps) {
 }
 
 function gameTick() {
-    data.actionNames.forEach(function(actionName) {
-        let actionObj = data.actions[actionName];
+    data.actionNames.forEach(function(actionVar) {
+        let actionObj = data.actions[actionVar];
         actionObj.momentumDelta = 0; //reset
         actionObj.momentumIncrease = 0; //reset
     });
-    data.actionNames.forEach(function(actionName) {
-        tickGameObject(actionName);
+    //prev must conclude first
+    data.actionNames.forEach(function(actionVar) {
+        tickGameObject(actionVar);
     });
 
 

@@ -15,7 +15,7 @@ function initializeMenus() {
     addMenuTextTab("Previous Tips", '<desc>'); //Adds a new tab that duplicates the toasts but can't
 
     //Create amulet upgrades
-    addAmuletContent();
+    generateAmuletContent();
 }
 
 function createMenu() {

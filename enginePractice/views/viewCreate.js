@@ -9,23 +9,13 @@ function initializeDisplay() {
     })
     initializeToasts();
     generateLinesBetweenActions();
-    cacheDownstreamViews();
     actionUpdateAllStatMults();
     actionTitleClicked(`overclock`);
     initializeMenus();
-    setSingleCaches();
+    setAllCaches(); //happens after generation
     debug();
 }
 
-function setSingleCaches() {
-    view.cached.totalMomentum = document.getElementById("totalMomentum");
-    view.cached.totalMomentum2 = document.getElementById("totalMomentum2");
-    view.cached.secondsPerReset = document.getElementById("secondsPerReset");
-    view.cached.openUseAmuletButton = document.getElementById("openUseAmuletButton");
-    view.cached.essence = document.getElementById("essence");
-    view.cached.essence2 = document.getElementById("essence2");
-    view.cached.killTheLichMenu = document.getElementById("killTheLichMenu");
-}
 function generateStatDisplay(statVar) {
     let statObj = data.stats[statVar];
     let theStr = "";
@@ -46,19 +36,6 @@ function generateStatDisplay(statVar) {
     child.innerHTML = theStr;
     document.getElementById("statDisplay").appendChild(child.content);
 
-    view.cached[statVar+"NumContainer"] = document.getElementById(statVar+"NumContainer");
-    view.cached[statVar+"Num"] = document.getElementById(statVar+"Num");
-    view.cached[statVar+"PerSecond"] = document.getElementById(statVar+"PerSecond");
-    view.cached[statVar+"Mult"] = document.getElementById(statVar+"Mult");
-    view.cached[statVar+"Name"] = document.getElementById(statVar+"Name");
-
-    //TODO foreach actionName, recurse through its stats and add the found divs to cache
-    //actionName + "_" + statVar + "StatExpMult"
-    //actionName + "_" + statVar + "StatExpertiseMult"
-
-    data.actionNames.forEach(function(actionName) {
-
-    });
 }
 
 function generateActionDisplay(actionVar) {
@@ -72,7 +49,7 @@ function generateActionDisplay(actionVar) {
         " | <span style='font-size:12px;position:relative;'>" +
         "Level <b></v><span id='"+actionVar+"Level'>0</span></b>" +
         (actionObj.maxLevel >= 0 ? " / <b><span id='"+actionVar+"MaxLevel'>0</span></b>" : "") +
-            "<span id='"+actionVar+"HighestLevelContainer'></span>" +
+            "<span id='"+actionVar+"HighestLevelContainer2'>(<b><span id='"+actionVar+"HighestLevel2'></span></b>)" +
         "</span>" +
         " | <span style='font-size:12px;'><b><span id='"+actionVar+"Efficiency'></span></b>%</span>" +
         "</span>" +
@@ -102,10 +79,18 @@ function generateActionDisplay(actionVar) {
         "(x<b><span id='"+actionVar+"ActionPowerMult'></b> total Action Power from level)<br>" +
         actionObj.onLevelText;
 
+    let upgradeInfoText = "<span id='"+actionVar+"HighestLevelContainer' style='display:none'>Highest level (2x up to): <b><span id='"+actionVar+"HighestLevel'></span></b></span>" +
+        "<span id='"+actionVar+"SecondHighestLevelContainer' style='display:none'>Second Highest level (2x up to): <b><span id='"+actionVar+"SecondHighestLevel'></span></b></span>" +
+        "<span id='"+actionVar+"ThirdHighestLevelContainer' style='display:none'>Third Highest level (2x up to): <b><span id='"+actionVar+"ThirdHighestLevel'></span></b></span>" +
+        "<span id='"+actionVar+"PrevUnlockTimeContainer' style='display:none'>Previous Unlock Time: <b><span id='"+actionVar+"PrevUnlockTime'></span></span></b>";
+    //highest level and unlock timer
+    //actionObj.prevUnlockTime
+
     let levelInfoContainer =
         "<div id='"+actionVar+"LevelInfoContainer' style='display:none;padding:3px;'>" +
         onComplete +
         onLevelText +
+        upgradeInfoText +
         (actionObj.isGenerator?(""):"<br>Send up to ["+actionObj.momentumName+" consumption rate] downstream to each of the actions that also use " + actionObj.momentumName) +
         actionObj.extraInfo+""+
         "</div>";
@@ -114,48 +99,6 @@ function generateActionDisplay(actionVar) {
         "<div id='"+actionVar+"StoryContainer' style='display:none;padding:3px;'>" +
         actionObj.storyText +
         "</div>";
-    /*
-    Stat Modifiers:
-     -100% of grace bonus for x1.4
-     -10% of curiosity bonus for x1.1
-    total of x15, applied in:
-      [exp needed to level] /= total
-     */
-    let expStatsStr = "Stat Modifiers to Exp Required:<br>";
-    if(actionObj.expStats) {
-        let totalAmount = 1;
-        actionObj.expStats.forEach(function (statObj) {
-            let name = statObj[0];
-            let ratio = statObj[1] * 100 + "%";
-            if(!data.stats[name]) {
-                console.log("Error - missing stat in initialization: " + name);
-            }
-            let amount = ((data.stats[name].mult-1) * statObj[1]) + 1;
-            totalAmount *= amount;
-            expStatsStr +=
-                "<b>" + ratio + "</b> of <b>" + capitalizeFirst(name) + "</b>'s bonus = x<b><span id='"+actionVar+"_"+name+"StatExpMult'>" + amount + "</span></b><br>"
-        });
-        expStatsStr += "Total Reduction: /<b>" + intToString(totalAmount, 3) + "</b>, = x<b><span id='"+actionVar+"ExpToLevelMult'></span></b><br>";
-    }
-
-    let expertiseModsStr = "<br>Stat Modifiers to Expertise:<br>";
-    if(actionObj.efficiencyStats) {
-        let totalAmount = 1;
-        actionObj.efficiencyStats.forEach(function (expertiseStat) {
-            let name = expertiseStat[0];
-            let ratio = expertiseStat[1] * 100 + "%";
-            if(data.stats[name] === undefined) {
-                console.log("ERROR: you need to instantiate the stat '"+name+"'")
-                stop = 1;
-            }
-            let amount = ((data.stats[name].mult-1) * expertiseStat[1]) + 1;
-            totalAmount *= amount;
-            expertiseModsStr +=
-                "<b>" + ratio + "</b> of <b>" + capitalizeFirst(name) + "</b>'s bonus = x<b><span id='"+actionVar+"_"+name+"StatExpertiseMult'>" + amount + "</span></b><br>"
-        });
-        expertiseModsStr += "Total Expertise Mult: x<b>" + intToString(totalAmount, 3) + "</b>, = x<b><span id='"+actionVar+"ExpertiseMult'></span></b><br>" +
-            "Expertise * base efficiency (x<b><span id='"+actionVar+"ExpertiseBase'></span></b>) = efficiency, in the title, capping at <b>100</b>%.<br>";
-    }
 
     let onLevelStatsText = "<br>On Level Up:<br>";
     if(actionObj.onLevelStats) {
@@ -166,8 +109,8 @@ function generateActionDisplay(actionVar) {
 
     let statsContainer =
         "<div id='"+actionVar+"StatsContainer' style='display:none;padding:3px;'>" +
-        expStatsStr +
-        expertiseModsStr +
+        generateActionExpStats(actionObj) +
+        generateActionEfficiencyStats(actionObj) +
         onLevelStatsText +
         "</div>";
 
@@ -240,7 +183,7 @@ function generateActionDisplay(actionVar) {
             "</div>" +
             "<div id='"+actionVar+"SmallVersionContainer' style='display:none;text-align:center;margin:50px auto;font-size:12px;width:100px;'>" +
                 "<b><span style='font-size:16px'>" + actionObj.title + "</span></b><br>" +
-                "Level <b><span id='"+actionVar+"MiniLevel'></b>" +
+                "Level <b><span id='"+actionVar+"Level2'></b>" +
             "</div>" +
         "</div>";
 
@@ -261,71 +204,51 @@ function generateActionDisplay(actionVar) {
 
     lockIcon.appendChild(lockPath);
     document.getElementById(actionVar+"LockIcon").appendChild(lockIcon);
-
-    //create the mini-version
-    let miniVersion = "TEST";
-
-
-
-    //cache the created objects
-    view.cached[actionVar + "Container"] = document.getElementById(actionVar + "Container");
-    view.cached[actionVar + "LargeVersionContainer"] = document.getElementById(actionVar + "LargeVersionContainer");
-    view.cached[actionVar + "SmallVersionContainer"] = document.getElementById(actionVar + "SmallVersionContainer");
-    view.cached[actionVar + "ProgressMax"] = document.getElementById(actionVar + "ProgressMax");
-    view.cached[actionVar + "Title"] = document.getElementById(actionVar + "Title");
-    view.cached[actionVar + "Container"] = document.getElementById(actionVar + "Container");
-    view.cached[actionVar + "LockContainer"] = document.getElementById(actionVar + "LockContainer");
-    view.cached[actionVar + "Momentum"] = document.getElementById(actionVar + "Momentum");
-    view.cached[actionVar + "MomentumDelta"] = document.getElementById(actionVar + "MomentumDelta");
-    view.cached[actionVar + "ProgressBarInner"] = document.getElementById(actionVar + "ProgressBarInner");
-    view.cached[actionVar + "Progress"] = document.getElementById(actionVar + "Progress");
-    view.cached[actionVar + "ProgressMax"] = document.getElementById(actionVar + "ProgressMax");
-    view.cached[actionVar + "ProgressGain"] = document.getElementById(actionVar + "ProgressGain");
-    view.cached[actionVar + "ProgressMaxIncrease"] = document.getElementById(actionVar + "ProgressMaxIncrease");
-    view.cached[actionVar + "OnCompleteContainer"] = document.getElementById(actionVar + "OnCompleteContainer");
-    view.cached[actionVar + "ActionPower"] = document.getElementById(actionVar + "ActionPower");
-    view.cached[actionVar + "ActionPowerMult"] = document.getElementById(actionVar + "ActionPowerMult");
-    view.cached[actionVar + "ExpToAdd"] = document.getElementById(actionVar + "ExpToAdd");
-    view.cached[actionVar + "MomentumIncrease"] = document.getElementById(actionVar + "MomentumIncrease");
-    view.cached[actionVar + "MomentumDecrease"] = document.getElementById(actionVar + "MomentumDecrease");
-    view.cached[actionVar + "AmountToSend"] = document.getElementById(actionVar + "AmountToSend");
-    view.cached[actionVar + "ExpToLevelIncrease"] = document.getElementById(actionVar + "ExpToLevelIncrease");
-    view.cached[actionVar + "Level"] = document.getElementById(actionVar + "Level");
-    view.cached[actionVar + "MaxLevel"] = document.getElementById(actionVar + "MaxLevel");
-    view.cached[actionVar + "MiniLevel"] = document.getElementById(actionVar + "MiniLevel");
-    view.cached[actionVar + "HighestLevelContainer"] = document.getElementById(actionVar + "HighestLevelContainer");
-    view.cached[actionVar + "ExpBarInner"] = document.getElementById(actionVar + "ExpBarInner");
-    view.cached[actionVar + "Exp"] = document.getElementById(actionVar + "Exp");
-    view.cached[actionVar + "ExpToLevel"] = document.getElementById(actionVar + "ExpToLevel");
-    view.cached[actionVar + "ExpToLevelMult"] = document.getElementById(actionVar + "ExpToLevelMult");
-    view.cached[actionVar + "TotalSend"] = document.getElementById(actionVar + "TotalSend");
-    view.cached[actionVar + "UnlockCost"] = document.getElementById(actionVar + "UnlockCost");
-    view.cached[actionVar + "Expertise"] = document.getElementById(actionVar + "Expertise");
-    view.cached[actionVar + "ExpertiseBase"] = document.getElementById(actionVar + "ExpertiseBase");
-    view.cached[actionVar + "ExpertiseMult"] = document.getElementById(actionVar + "ExpertiseMult");
-    view.cached[actionVar + "Efficiency"] = document.getElementById(actionVar + "Efficiency");
-    view.cached[actionVar + "Tier"] = document.getElementById(actionVar + "Tier");
-
-    view.cached[actionVar + "RealX"] = document.getElementById(actionVar + "RealX");
-    view.cached[actionVar + "RealY"] = document.getElementById(actionVar + "RealY");
 }
 
-//Has to wait until the lines are initiated before it caches them.
-function cacheDownstreamViews() {
-    data.actionNames.forEach(function(actionVar) {
-        let actionObj = data.actions[actionVar];
-        actionObj.downstreamVars.forEach(function(downstreamVar) {
-            view.cached[actionVar+"NumInput"+downstreamVar] = document.getElementById(actionVar+"NumInput"+downstreamVar);
+function generateActionExpStats(actionObj) {
+    let actionVar = actionObj.actionVar;
+    let expStatsStr = "<span id='"+actionVar+"StatExpContainer'>Stat Modifiers to Exp Required:<br>";
 
-            view.cached[`${actionVar}DownstreamSendRate${downstreamVar}`] = document.getElementById(`${actionVar}DownstreamSendRate${downstreamVar}`);
-
-            view.cached[actionVar + "_" + downstreamVar + "_Line_Outer"] = document.getElementById(actionVar + "_" + downstreamVar + "_Line_Outer");
-            view.cached[actionVar + "_" + downstreamVar + "_Line_Inner"] = document.getElementById(actionVar + "_" + downstreamVar + "_Line_Inner");
-            view.cached[actionVar + "SliderContainer" + downstreamVar] = document.getElementById(actionVar + "SliderContainer" + downstreamVar);
-        });
-    })
+    let totalAmount = 1;
+    actionObj.expStats.forEach(function (statObj) {
+        let name = statObj[0];
+        let ratio = statObj[1] * 100 + "%";
+        if(!data.stats[name]) {
+            console.log("Error - missing stat in initialization: " + name);
+        }
+        let amount = ((data.stats[name].mult-1) * statObj[1]) + 1;
+        totalAmount *= amount;
+        expStatsStr +=
+            "<b>" + ratio + "</b> of <b>" + capitalizeFirst(name) + "</b>'s bonus = x<b><span id='"+actionVar+"_"+name+"StatExpMult'>" + amount + "</span></b><br>"
+    });
+    expStatsStr += "Total Reduction: /<b>" + intToString(totalAmount, 3) + "</b>, = x<b><span id='"+actionVar+"ExpToLevelMult'></span></b><br>";
+    return expStatsStr;
 }
 
+function generateActionEfficiencyStats(actionObj) {
+    let actionVar = actionObj.actionVar;
+
+    let expertiseModsStr = "<span id='"+actionVar+"StatExpertiseContainer'><br>Stat Modifiers to Efficiency:<br>";
+
+    let totalAmount = 1;
+    actionObj.efficiencyStats.forEach(function (expertiseStat) {
+        let name = expertiseStat[0];
+        let ratio = expertiseStat[1] * 100 + "%";
+        if(data.stats[name] === undefined) {
+            console.log("ERROR: you need to instantiate the stat '"+name+"'")
+            stop = 1;
+        }
+        let amount = ((data.stats[name].mult-1) * expertiseStat[1]) + 1;
+        totalAmount *= amount;
+        expertiseModsStr +=
+            "<b>" + ratio + "</b> of <b>" + capitalizeFirst(name) + "</b>'s bonus = x<b><span id='"+actionVar+"_"+name+"StatExpertiseMult'>" + amount + "</span></b><br>"
+    });
+    expertiseModsStr += "Total Expertise Mult: x<b>" + intToString(totalAmount, 3) + "</b>, = x<b><span id='"+actionVar+"ExpertiseMult'></span></b><br>" +
+        "Expertise * base efficiency (x<b><span id='"+actionVar+"ExpertiseBase'></span></b>) = efficiency, in the title, capping at <b>100</b>%.<br>";
+    expertiseModsStr += "</span>";
+    return expertiseModsStr;
+}
 
 function createDownStreamSliders(actionObj) {
     let theStr = "";
@@ -339,18 +262,16 @@ function createDownStreamSliders(actionObj) {
         let title = data.actions[downstreamVar] ? data.actions[downstreamVar].title : downstreamVar;
         theStr +=
             "<div id='"+actionObj.actionVar+"SliderContainer"+downstreamVar+"' style='margin-bottom: 5px;margin-top:5px;font-size:12px;'>" +
-            "<b><span style='margin-bottom: 10px;cursor:pointer;' onclick='actionTitleClicked(`"+downstreamVar+"`)'>"+title+"</span></b>" +
-            " (+<b><span id='"+actionObj.actionVar+"DownstreamSendRate"+downstreamVar+"'>0</span></b>/s)<br>" +
-            "<input type='number' id='"+actionObj.actionVar+"NumInput"+downstreamVar+"' value='0' min='0' max='100' oninput='validateInput(\""+actionObj.actionVar+"\", \""+downstreamVar+"\")' onchange='downstreamNumberChanged(\""+actionObj.actionVar+"\", \""+downstreamVar+"\")' style='margin-right: 3px;font-size:10px;width:37px;'>" +
-            "<input type='range' id='"+actionObj.actionVar+"RangeInput"+downstreamVar+"' value='0' min='0' max='100' oninput='downstreamSliderChanged(\""+actionObj.actionVar+"\", \""+downstreamVar+"\")' style='margin-left:5px;width:200px;font-size:10px;height:5px;margin-bottom:8px;'>" +
+                "<b><span style='margin-bottom: 10px;cursor:pointer;' onclick='actionTitleClicked(`"+downstreamVar+"`)'>"+title+"</span></b>" +
+                " (+<b><span id='"+actionObj.actionVar+"DownstreamSendRate"+downstreamVar+"'>0</span></b>/s)<br>" +
+                "<input type='number' id='"+actionObj.actionVar+"NumInput"+downstreamVar+"' value='0' min='0' max='100' oninput='validateInput(\""+actionObj.actionVar+"\", \""+downstreamVar+"\")' onchange='downstreamNumberChanged(\""+actionObj.actionVar+"\", \""+downstreamVar+"\")' style='margin-right: 3px;font-size:10px;width:37px;'>" +
+                "<input type='range' id='"+actionObj.actionVar+"RangeInput"+downstreamVar+"' value='0' min='0' max='100' oninput='downstreamSliderChanged(\""+actionObj.actionVar+"\", \""+downstreamVar+"\")' style='margin-left:5px;width:200px;font-size:10px;height:5px;margin-bottom:8px;'>" +
             "</div>"
 
     });
 
-
-    return theStr
+    return theStr;
 }
-
 
 function generateLinesBetweenActions() {
     data.actionNames.forEach(function (actionVar) {
@@ -358,8 +279,8 @@ function generateLinesBetweenActions() {
         if(!actionObj.downstreamVars) {
             return;
         }
-        actionObj.downstreamVars.forEach(function(actionName, index) {
-            let targetObj = data.actions[actionName];
+        actionObj.downstreamVars.forEach(function(downstreamVar, index) {
+            let targetObj = data.actions[downstreamVar];
             if(!targetObj || targetObj.realX === undefined || actionObj.realX === undefined) {
                 return;
             }
@@ -396,8 +317,7 @@ function generateLinesBetweenActions() {
     });
 }
 
-
-function addAmuletContent() {
+function generateAmuletContent() {
     let amuletContent = "";
 
     for (let upgradeVar in data.upgrades) {
@@ -426,3 +346,116 @@ function addAmuletContent() {
     document.getElementById("amuletUpgrades").innerHTML = amuletContent;
 }
 
+
+
+
+function setAllCaches() {
+    setSingleCaches();
+    data.statNames.forEach(function (statVar) {
+        cacheStatNames(statVar);
+    });
+    data.actionNames.forEach(function(actionVar) {
+       cacheActionViews(actionVar);
+       cacheDownstreamViews(actionVar);
+    });
+}
+
+function setSingleCaches() {
+    view.cached.totalMomentum = document.getElementById("totalMomentum");
+    view.cached.totalMomentum2 = document.getElementById("totalMomentum2");
+    view.cached.secondsPerReset = document.getElementById("secondsPerReset");
+    view.cached.openUseAmuletButton = document.getElementById("openUseAmuletButton");
+    view.cached.essence = document.getElementById("essence");
+    view.cached.essence2 = document.getElementById("essence2");
+    view.cached.killTheLichMenu = document.getElementById("killTheLichMenu");
+}
+
+function cacheStatNames(statVar) {
+    view.cached[statVar+"NumContainer"] = document.getElementById(statVar+"NumContainer");
+    view.cached[statVar+"Num"] = document.getElementById(statVar+"Num");
+    view.cached[statVar+"PerSecond"] = document.getElementById(statVar+"PerSecond");
+    view.cached[statVar+"Mult"] = document.getElementById(statVar+"Mult");
+    view.cached[statVar+"Name"] = document.getElementById(statVar+"Name");
+
+    data.actionNames.forEach(function(actionVar) {
+        let actionObj = data.actions[actionVar];
+        actionObj.efficiencyStats.forEach(function (expertiseStat) {
+            let newStatVar = expertiseStat[0];
+            view.cached[actionVar + "_" + newStatVar + "StatExpertiseMult"] = document.getElementById(actionVar + "_" + newStatVar + "StatExpertiseMult");
+        });
+        actionObj.expStats.forEach(function (expStat) {
+            let newStatVar = expStat[0];
+            view.cached[actionVar + "_" + newStatVar + "StatExpMult"] = document.getElementById(actionVar + "_" + newStatVar + "StatExpMult");
+        });
+    });
+}
+
+function cacheActionViews(actionVar) {
+    //cache the created objects
+    view.cached[actionVar + "Container"] = document.getElementById(actionVar + "Container");
+    view.cached[actionVar + "LargeVersionContainer"] = document.getElementById(actionVar + "LargeVersionContainer");
+    view.cached[actionVar + "SmallVersionContainer"] = document.getElementById(actionVar + "SmallVersionContainer");
+    view.cached[actionVar + "ProgressMax"] = document.getElementById(actionVar + "ProgressMax");
+    view.cached[actionVar + "Title"] = document.getElementById(actionVar + "Title");
+    view.cached[actionVar + "Container"] = document.getElementById(actionVar + "Container");
+    view.cached[actionVar + "LockContainer"] = document.getElementById(actionVar + "LockContainer");
+    view.cached[actionVar + "Momentum"] = document.getElementById(actionVar + "Momentum");
+    view.cached[actionVar + "MomentumDelta"] = document.getElementById(actionVar + "MomentumDelta");
+    view.cached[actionVar + "ProgressBarInner"] = document.getElementById(actionVar + "ProgressBarInner");
+    view.cached[actionVar + "Progress"] = document.getElementById(actionVar + "Progress");
+    view.cached[actionVar + "ProgressMax"] = document.getElementById(actionVar + "ProgressMax");
+    view.cached[actionVar + "ProgressGain"] = document.getElementById(actionVar + "ProgressGain");
+    view.cached[actionVar + "ProgressMaxIncrease"] = document.getElementById(actionVar + "ProgressMaxIncrease");
+    view.cached[actionVar + "OnCompleteContainer"] = document.getElementById(actionVar + "OnCompleteContainer");
+    view.cached[actionVar + "ActionPower"] = document.getElementById(actionVar + "ActionPower");
+    view.cached[actionVar + "ActionPowerMult"] = document.getElementById(actionVar + "ActionPowerMult");
+    view.cached[actionVar + "ExpToAdd"] = document.getElementById(actionVar + "ExpToAdd");
+    view.cached[actionVar + "MomentumIncrease"] = document.getElementById(actionVar + "MomentumIncrease");
+    view.cached[actionVar + "MomentumDecrease"] = document.getElementById(actionVar + "MomentumDecrease");
+    view.cached[actionVar + "AmountToSend"] = document.getElementById(actionVar + "AmountToSend");
+    view.cached[actionVar + "ExpToLevelIncrease"] = document.getElementById(actionVar + "ExpToLevelIncrease");
+    view.cached[actionVar + "Level"] = document.getElementById(actionVar + "Level");
+    view.cached[actionVar + "MaxLevel"] = document.getElementById(actionVar + "MaxLevel");
+    view.cached[actionVar + "Level2"] = document.getElementById(actionVar + "Level2");
+    view.cached[actionVar + "HighestLevelContainer"] = document.getElementById(actionVar + "HighestLevelContainer");
+    view.cached[actionVar + "HighestLevelContainer2"] = document.getElementById(actionVar + "HighestLevelContainer2");
+    view.cached[actionVar + "SecondHighestLevelContainer"] = document.getElementById(actionVar + "SecondHighestLevelContainer");
+    view.cached[actionVar + "ThirdHighestLevelContainer"] = document.getElementById(actionVar + "ThirdHighestLevelContainer");
+    view.cached[actionVar + "HighestLevel"] = document.getElementById(actionVar + "HighestLevel");
+    view.cached[actionVar + "SecondHighestLevel"] = document.getElementById(actionVar + "SecondHighestLevel");
+    view.cached[actionVar + "ThirdHighestLevel"] = document.getElementById(actionVar + "ThirdHighestLevel");
+    view.cached[actionVar + "HighestLevel2"] = document.getElementById(actionVar + "HighestLevel2");
+    view.cached[actionVar + "PrevUnlockTime"] = document.getElementById(actionVar + "PrevUnlockTime");
+    view.cached[actionVar + "PrevUnlockTimeContainer"] = document.getElementById(actionVar + "PrevUnlockTimeContainer");
+    view.cached[actionVar + "ExpBarInner"] = document.getElementById(actionVar + "ExpBarInner");
+    view.cached[actionVar + "Exp"] = document.getElementById(actionVar + "Exp");
+    view.cached[actionVar + "ExpToLevel"] = document.getElementById(actionVar + "ExpToLevel");
+    view.cached[actionVar + "ExpToLevelMult"] = document.getElementById(actionVar + "ExpToLevelMult");
+    view.cached[actionVar + "TotalSend"] = document.getElementById(actionVar + "TotalSend");
+    view.cached[actionVar + "UnlockCost"] = document.getElementById(actionVar + "UnlockCost");
+    view.cached[actionVar + "Expertise"] = document.getElementById(actionVar + "Expertise");
+    view.cached[actionVar + "ExpertiseBase"] = document.getElementById(actionVar + "ExpertiseBase");
+    view.cached[actionVar + "ExpertiseMult"] = document.getElementById(actionVar + "ExpertiseMult");
+    view.cached[actionVar + "Efficiency"] = document.getElementById(actionVar + "Efficiency");
+    view.cached[actionVar + "Tier"] = document.getElementById(actionVar + "Tier");
+
+
+    view.cached[actionVar + "RealX"] = document.getElementById(actionVar + "RealX");
+    view.cached[actionVar + "RealY"] = document.getElementById(actionVar + "RealY");
+
+    view.cached[actionVar+"StatExpertiseContainer"] = document.getElementById(actionVar+"StatExpertiseContainer");
+    view.cached[actionVar+"StatExpContainer"] = document.getElementById(actionVar+"StatExpContainer");
+}
+
+function cacheDownstreamViews(actionVar) {
+    let actionObj = data.actions[actionVar];
+    actionObj.downstreamVars.forEach(function(downstreamVar) {
+        view.cached[actionVar+"NumInput"+downstreamVar] = document.getElementById(actionVar+"NumInput"+downstreamVar);
+
+        view.cached[`${actionVar}DownstreamSendRate${downstreamVar}`] = document.getElementById(`${actionVar}DownstreamSendRate${downstreamVar}`);
+
+        view.cached[actionVar + "_" + downstreamVar + "_Line_Outer"] = document.getElementById(actionVar + "_" + downstreamVar + "_Line_Outer");
+        view.cached[actionVar + "_" + downstreamVar + "_Line_Inner"] = document.getElementById(actionVar + "_" + downstreamVar + "_Line_Inner");
+        view.cached[actionVar + "SliderContainer" + downstreamVar] = document.getElementById(actionVar + "SliderContainer" + downstreamVar);
+    });
+}
