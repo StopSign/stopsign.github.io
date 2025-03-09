@@ -170,7 +170,7 @@ function updateActionView(actionVar) {
             roundedNumbers.push(["expertiseBase", 2]);
         }
         if(forceUpdate || scale < .45) { //miniversion
-            roundedNumbers.push(["level2", 2]);
+            roundedNumbers.push(["level2", 1]);
         }
     }
 
@@ -291,19 +291,6 @@ function updateActionProgressBarViews(actionObj, prevAction, forceUpdate) {
     if (forceUpdate || prevAction.momentumIncrease / prevAction.momentumDecrease !== actionObj.momentumIncrease / actionObj.momentumDecrease) {
         let balance = actionObj.momentumIncrease / actionObj.momentumDecrease;
         let needlePosition = Math.max(0, Math.min(100, balance * 50));
-
-        view.cached[`${actionVar}BalanceNeedle`].style.left = `${needlePosition}%`;
-    }
-    if (forceUpdate || prevAction.momentumIncrease / prevAction.momentumDecrease !== actionObj.momentumIncrease / actionObj.momentumDecrease) {
-        let balance = actionObj.momentumIncrease / actionObj.momentumDecrease;
-        let needlePosition;
-
-        if (balance < 1) {
-            needlePosition = Math.max(0, balance * 50);
-        } else {
-            needlePosition = 50 + (Math.log2(balance) / Math.log2(10)) * 50;
-        }
-        needlePosition = Math.max(0, Math.min(100, needlePosition));
 
         view.cached[`${actionVar}BalanceNeedle`].style.left = `${needlePosition}%`;
     }
