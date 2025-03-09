@@ -136,6 +136,7 @@ function secondTick() {
 
 function tickGameObject(actionVar) {
     let actionObj = data.actions[actionVar];
+    let dataObj = actionData[actionVar];
 
     //Full pause on actions not in the correct game state
     if(!actionObj.isRunning) {
@@ -178,7 +179,9 @@ function tickGameObject(actionVar) {
             break;
         }
         actionObj.progress -= actionObj.progressMax;
-        actionObj.onCompleteCustom();
+        if(dataObj.onCompleteCustom) {
+            dataObj.onCompleteCustom();
+        }
         actionAddExp(actionObj);
     }
     //sending a % to the self, so increase used there if relevant

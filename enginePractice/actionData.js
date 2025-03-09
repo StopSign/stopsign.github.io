@@ -568,10 +568,12 @@ let actionData = {
 
             let actionObj = data.actions.makeMoney;
             let actionTarget = data.actions[actionObj.generatorTarget];
+            let dataObj = actionData.makeMoney;
+
             //this is the amount to remove from actionObj (1%)
             let amount = actionObj.momentum * actionObj.tierMult();
             //this is log10(1% * actionPower)^2 * efficiency
-            let amountToSend = actionObj.actionPowerFunction(amount, actionObj.actionPower * actionObj.upgradeMult) * (actionObj.efficiency/100);
+            let amountToSend = dataObj.actionPowerFunction(amount, actionObj.actionPower * actionObj.upgradeMult) * (actionObj.efficiency/100);
             //visual only
             actionObj.amountToSend = amountToSend;
             if(amountToSend > 0) { //only take if it gave
@@ -660,10 +662,12 @@ let actionData = {
         onCompleteCustom: function() {
             let actionObj = data.actions.socialize;
             let actionTarget = data.actions[actionObj.generatorTarget];
+            let dataObj = actionData.makeMoney;
+
             //this is the amount to remove from actionObj (1%)
             let amount = actionObj.momentum * actionObj.tierMult();
             //this is log10(1% * actionPower)^2 * efficiency
-            let amountToSend = actionObj.actionPowerFunction(amount, actionObj.actionPower * actionObj.upgradeMult) * (actionObj.efficiency/100);
+            let amountToSend = dataObj.actionPowerFunction(amount, actionObj.actionPower * actionObj.upgradeMult) * (actionObj.efficiency/100);
             //visual only
             actionObj.amountToSend = amountToSend;
             if(amountToSend > 0) { //only take if it gave

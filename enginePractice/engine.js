@@ -78,10 +78,9 @@ function actionSetInitialVariables(actionObj, dataObj) {
     actionObj.wage = dataObj.wage ? dataObj.wage : null;
     actionObj.isKTL = !!dataObj.isKTL;
 
-    actionObj.actionPowerFunction = dataObj.actionPowerFunction;
-    actionObj.onUnlock = dataObj.onUnlock ? dataObj.onUnlock : function() {};
-    actionObj.onCompleteCustom = dataObj.onCompleteCustom ? dataObj.onCompleteCustom : function() {};
-    actionObj.onLevelCustom = dataObj.onLevelCustom ? dataObj.onLevelCustom : function() {};
+    // actionObj.onUnlock = dataObj.onUnlock ? dataObj.onUnlock : function() {};
+    // actionObj.onCompleteCustom = dataObj.onCompleteCustom ? dataObj.onCompleteCustom : function() {};
+    // actionObj.onLevelCustom = dataObj.onLevelCustom ? dataObj.onLevelCustom : function() {};
 
     actionObj.onCompleteText = (dataObj.onCompleteText && dataObj.onCompleteText[language]) ? dataObj.onCompleteText[language] : "";
     actionObj.onLevelText = (dataObj.onLevelText && dataObj.onLevelText[language]) ? dataObj.onLevelText[language] : "";
@@ -174,6 +173,8 @@ function calcUpgradeMultToExp(actionObj) {
 
 function actionAddExp(actionObj) {
     actionObj.exp += actionObj.expToAdd * calcUpgradeMultToExp(actionObj);
+    let dataObj = actionData[actionObj.actionVar];
+
     let timesRun = 0;
     while(actionObj.exp >= actionObj.expToLevel && (actionObj.maxLevel < 0 || (actionObj.level < actionObj.maxLevel))) {
         if(timesRun++ > 10) {
@@ -199,7 +200,9 @@ function actionAddExp(actionObj) {
             }
             statAddAmount(name, amount);
         });
-        actionObj.onLevelCustom();
+        if(dataObj.onLevelCustom) {
+            dataObj.onLevelCustom();
+        }
     }
 }
 
@@ -267,9 +270,11 @@ function unlockAction(actionObj) {
     }
     actionObj.unlocked = true;
     actionObj.unlockTime = data.secondsPerReset; //mark when it unlocked
-    actionObj.onUnlock();
+    let dataObj = actionData[actionObj.actionVar];
+    if(dataObj.onUnlock) {
+        dataObj.onUnlock();
+    }
 
-    // let amountToSet = data.upgrades.sliderAutoSet.amount;
     actionObj.downstreamVars.forEach(function(downstreamVar) {
         if(data.actions[downstreamVar] && data.actions[downstreamVar].unlocked) {
             setSliderUI(actionObj.actionVar, downstreamVar, getUpgradeSliderAmount());
