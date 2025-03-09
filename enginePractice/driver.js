@@ -143,7 +143,7 @@ function tickGameObject(actionVar) {
     }
 
     //if generator, add Time to exp
-    //if not generator, add current momentum/10^tier to exp
+    //if not generator, becomes 1% of momentum/s / 20.
     let momentumMaxRate = actionObj.isGenerator ? actionObj.generatorSpeed / ticksPerSecond : actionObj.momentum * actionObj.tierMult() / ticksPerSecond;
     //actual momentum change will be based on efficiency - for both generator and not
     let rateInefficient = momentumMaxRate * (actionObj.efficiency/100);
@@ -157,15 +157,14 @@ function tickGameObject(actionVar) {
     //Calculate momentum delta: 1. determine how much is being consumed and subtract it
     //2. later, if non-generator, an upstream action will add how much it is sending to this actions momentumDelta
     if(actionObj.isGenerator) {
-        actionObj.momentumDelta = actionObj.actionPower / actionObj.progressMax * rateInefficient * ticksPerSecond;
-        if(actionVar === "overclock") {
+        actionObj.momentumDelta = actionObj.actionPower * actionObj.upgradeMult / actionObj.progressMax * rateInefficient * ticksPerSecond;
+        if(actionVar === "overclock") { //visual only
             actionObj.momentumIncrease = actionObj.momentumDelta;
         }
     } else {
         //how much it's consuming.
-        actionObj.momentumDelta -= momentumToAdd * ticksPerSecond;
-        //take full momentum for consuming
-        actionObj.momentum -= momentumToAdd;
+        actionObj.momentumDelta -= rateInefficient * ticksPerSecond;
+        actionObj.momentum -= rateInefficient;
     }
 
 

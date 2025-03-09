@@ -126,12 +126,20 @@ function generateActionDisplay(actionVar) {
         "<div id='"+actionVar+"MomentumContainer' style='margin:3px;'>" +
         "<span style='font-size:12px;'>Tier <b><span id='"+actionVar+"Tier'></span></span></b> | " +
         capitalizeFirst(actionObj.momentumName)+": <b><span id='"+actionVar+"Momentum'>0</span></b><br>" +
+        (actionObj.isGenerator?"":("<div style='margin:3px;font-size:10px;'>Progress/s = "+actionObj.tierMult()*100+"% of "+actionObj.momentumName+" * efficiency:</div>")) +
         "+<b><span id='"+actionVar+"MomentumIncrease'></span></b>/s, " +
         "-<b><span id='"+actionVar+"MomentumDecrease'></span></b>/s, "  +
-        "Δ<b><span id='"+actionVar+"MomentumDelta'>1.0</span></b>/s" +
-        // ": <span id='"+actionVar+"RealX'></span>, <span id='"+actionVar+"RealY'></span>" + //TODO debug only
-        "</div>" +
-        (actionObj.isGenerator?"":("<div style='margin:3px;font-size:10px;'>Progress/s = "+actionObj.tierMult()*100+"% of "+actionObj.momentumName+" * efficiency:</div>"));
+        "Δ<b><span id='"+actionVar+"MomentumDelta'>1.0</span></b>/s, Balance:" +
+        "</div>";
+
+    let balanceNeedle =
+        "<div style='position:relative;width:100%;height:10px;border-top:1px solid;'>" +
+            "<div style='position:absolute;top:0;left:50%;width:2px;height:100%;background-color:var(--text-primary);opacity:0.5;'></div>" +
+            "<div id='"+actionVar+"BalanceNeedle' style='position:absolute;top:-3px;width:2px;height:16px;background-color:red;left:50%;'></div>" +
+        "</div>";
+
+
+
     let pbar =
         "<div id='"+actionVar+"ProgressBarOuter' style='width:100%;height:16px;position:relative;text-align:left;border-top:1px solid;border-bottom:1px solid;'>" +
         "<div id='"+actionVar+"ProgressBarInner' style='width:30%;background-color:"+progressColor+";height:100%;position:absolute;'></div>" +
@@ -173,6 +181,7 @@ function generateActionDisplay(actionVar) {
                 title +
                 menuContainer +
                 momentumContainer +
+                balanceNeedle +
                 pbar +
                 expBar +
                 storyContainer +
@@ -406,6 +415,7 @@ function cacheActionViews(actionVar) {
     view.cached[actionVar + "ProgressMax"] = document.getElementById(actionVar + "ProgressMax");
     view.cached[actionVar + "ProgressGain"] = document.getElementById(actionVar + "ProgressGain");
     view.cached[actionVar + "ProgressMaxIncrease"] = document.getElementById(actionVar + "ProgressMaxIncrease");
+    view.cached[actionVar + "BalanceNeedle"] = document.getElementById(actionVar + "BalanceNeedle");
     view.cached[actionVar + "OnCompleteContainer"] = document.getElementById(actionVar + "OnCompleteContainer");
     view.cached[actionVar + "ActionPower"] = document.getElementById(actionVar + "ActionPower");
     view.cached[actionVar + "ActionPowerMult"] = document.getElementById(actionVar + "ActionPowerMult");

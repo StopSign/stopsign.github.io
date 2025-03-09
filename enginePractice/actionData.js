@@ -139,12 +139,14 @@ let actionData = {
         onUnlock: function() {
         },
         onCompleteCustom:function() {
-            let upgradeMult = 1;
-            upgradeMult *= Math.pow(2, data.upgrades.createABetterFoundation.upgradePower);
-
-            data.actions.overclock.momentum += data.actions.overclock.actionPower * upgradeMult;
+            data.actions.overclock.momentum += data.actions.overclock.actionPower * data.actions.overclock.upgradeMult;
         },
         onLevelCustom: function() {
+        },
+        updateUpgradeMult:function() {
+            let upgradeMult = 1;
+            upgradeMult *= Math.pow(2, data.upgrades.createABetterFoundation.upgradePower);
+            data.actions.overclock.upgradeMult = upgradeMult;
         },
         onLevelStats:[["processing", 1], ["diligence", .1]],
         expStats:[["abilityPower", 1], ["energy", 1], ["focus", 1]],
@@ -569,7 +571,7 @@ let actionData = {
             //this is the amount to remove from actionObj (1%)
             let amount = actionObj.momentum * actionObj.tierMult();
             //this is log10(1% * actionPower)^2 * efficiency
-            let amountToSend = actionObj.actionPowerFunction(amount, actionObj.actionPower) * (actionObj.efficiency/100);
+            let amountToSend = actionObj.actionPowerFunction(amount, actionObj.actionPower * actionObj.upgradeMult) * (actionObj.efficiency/100);
             //visual only
             actionObj.amountToSend = amountToSend;
             if(amountToSend > 0) { //only take if it gave
@@ -661,7 +663,7 @@ let actionData = {
             //this is the amount to remove from actionObj (1%)
             let amount = actionObj.momentum * actionObj.tierMult();
             //this is log10(1% * actionPower)^2 * efficiency
-            let amountToSend = actionObj.actionPowerFunction(amount, actionObj.actionPower) * (actionObj.efficiency/100);
+            let amountToSend = actionObj.actionPowerFunction(amount, actionObj.actionPower * actionObj.upgradeMult) * (actionObj.efficiency/100);
             //visual only
             actionObj.amountToSend = amountToSend;
             if(amountToSend > 0) { //only take if it gave

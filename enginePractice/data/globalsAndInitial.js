@@ -66,6 +66,7 @@ function initializeData() {
     if(globalVisible) {
         document.getElementById("jobDisplay").style.display = "";
     }
+    createUpgrades();
 
     statTitles.push(["Overclock Stats", "abilityPower"]);
     createAndLinkNewStat("abilityPower"); //improves efficiency of overclock & others. Comes from Harness Overflow
@@ -304,7 +305,6 @@ function initializeData() {
     });
 
 
-    createUpgrades();
     initializeDisplay();
 }
 

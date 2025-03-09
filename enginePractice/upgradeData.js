@@ -109,7 +109,7 @@ actionData.upgrades = {
         initialCost:10, costIncrease:2,
         upgradesAvailable:3,
         customInfo: function(num) {
-            return "Motivation generation increased by x"+(1+(num+1));
+            return "Motivation generation increased by "+(num >0?"another ":"")+"x2";
         }
     },
     buyNicerStuff: { //unlock market/equipment/houses

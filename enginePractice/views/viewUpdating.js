@@ -287,6 +287,27 @@ function updateActionProgressBarViews(actionObj, prevAction, forceUpdate) {
         let exp = (actionObj.exp / actionObj.expToLevel * 100);
         view.cached[`${actionVar}ExpBarInner`].style.width = `${(exp > 100 ? 100 : exp)}%`;
     }
+
+    if (forceUpdate || prevAction.momentumIncrease / prevAction.momentumDecrease !== actionObj.momentumIncrease / actionObj.momentumDecrease) {
+        let balance = actionObj.momentumIncrease / actionObj.momentumDecrease;
+        let needlePosition = Math.max(0, Math.min(100, balance * 50));
+
+        view.cached[`${actionVar}BalanceNeedle`].style.left = `${needlePosition}%`;
+    }
+    if (forceUpdate || prevAction.momentumIncrease / prevAction.momentumDecrease !== actionObj.momentumIncrease / actionObj.momentumDecrease) {
+        let balance = actionObj.momentumIncrease / actionObj.momentumDecrease;
+        let needlePosition;
+
+        if (balance < 1) {
+            needlePosition = Math.max(0, balance * 50);
+        } else {
+            needlePosition = 50 + (Math.log2(balance) / Math.log2(10)) * 50;
+        }
+        needlePosition = Math.max(0, Math.min(100, needlePosition));
+
+        view.cached[`${actionVar}BalanceNeedle`].style.left = `${needlePosition}%`;
+    }
+
 }
 
 function updateActionStatViews(actionObj, prevAction, forceUpdate) {

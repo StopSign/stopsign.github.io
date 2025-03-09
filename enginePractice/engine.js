@@ -61,6 +61,11 @@ function actionSetBaseVariables(actionObj, dataObj) {
     actionObj.efficiency = actionObj.expertise > dataObj.efficiencyMax  ? dataObj.efficiencyMax : actionObj.expertise * 100;
 
     actionObj.actionPower = actionObj.actionPowerBase * actionObj.actionPowerMult * (actionObj.efficiency/100);
+
+    actionObj.upgradeMult = 1;
+    if(dataObj.updateUpgradeMult) {
+        dataObj.updateUpgradeMult();
+    }
 }
 
 //One and done
@@ -83,7 +88,6 @@ function actionSetInitialVariables(actionObj, dataObj) {
     actionObj.storyText = (dataObj.storyText && dataObj.storyText[language]) ? dataObj.storyText[language] : "";
     actionObj.extraInfo = (dataObj.extraInfo && dataObj.extraInfo[language]) ? dataObj.extraInfo[language] : "";
     actionObj.unlockMessage = (dataObj.unlockMessage && dataObj.unlockMessage[language]) ? dataObj.unlockMessage[language] : "";
-
 
     //Vars that don't really need to be initalized but I like to know they're there
     actionObj.parent = null;
