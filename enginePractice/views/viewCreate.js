@@ -12,6 +12,7 @@ function initializeDisplay() {
     actionUpdateAllStatMults();
     actionTitleClicked(`overclock`);
     initializeMenus();
+    generateAmuletContent();
     setAllCaches(); //happens after generation
     debug();
 }
@@ -49,7 +50,7 @@ function generateActionDisplay(actionVar) {
         " | <span style='font-size:12px;position:relative;'>" +
         "Level <b></v><span id='"+actionVar+"Level'>0</span></b>" +
         (actionObj.maxLevel >= 0 ? " / <b><span id='"+actionVar+"MaxLevel'>0</span></b>" : "") +
-            "<span id='"+actionVar+"HighestLevelContainer2'>(<b><span id='"+actionVar+"HighestLevel2'></span></b>)" +
+            "<span id='"+actionVar+"HighestLevelContainer2'> (<b><span id='"+actionVar+"HighestLevel2'></span></b>)" +
         "</span>" +
         " | <span style='font-size:12px;'><b><span id='"+actionVar+"Efficiency'></span></b>%</span>" +
         "</span>" +
@@ -79,7 +80,7 @@ function generateActionDisplay(actionVar) {
         "(x<b><span id='"+actionVar+"ActionPowerMult'></b> total Action Power from level)<br>" +
         actionObj.onLevelText;
 
-    let upgradeInfoText = "<span id='"+actionVar+"HighestLevelContainer' style='display:none'>Highest level (2x up to): <b><span id='"+actionVar+"HighestLevel'></span></b></span>" +
+    let upgradeInfoText = "<br><span id='"+actionVar+"HighestLevelContainer' style='display:none'>Highest level (2x up to): <b><span id='"+actionVar+"HighestLevel'></span></b></span>" +
         "<span id='"+actionVar+"SecondHighestLevelContainer' style='display:none'>Second Highest level (2x up to): <b><span id='"+actionVar+"SecondHighestLevel'></span></b></span>" +
         "<span id='"+actionVar+"ThirdHighestLevelContainer' style='display:none'>Third Highest level (2x up to): <b><span id='"+actionVar+"ThirdHighestLevel'></span></b></span>" +
         "<span id='"+actionVar+"PrevUnlockTimeContainer' style='display:none'>Previous Unlock Time: <b><span id='"+actionVar+"PrevUnlockTime'></span></span></b>";

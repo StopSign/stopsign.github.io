@@ -259,13 +259,6 @@ function clickMenuButton() {
     document.getElementById("helpMenu").style.display = isShowing ? "none" : "flex";
 }
 
-function changeDarkMode() {
-    const body = document.body;
-
-    // Toggle the dark-mode class
-    body.classList.toggle('lightMode');
-    document.getElementById('lightModeButton').innerText = body.classList.contains('lightMode') ? "Dark Mode" : "Light Mode";
-}
 
 let selectedStat = null;
 function clickedStatName(statName) {

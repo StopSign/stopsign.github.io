@@ -39,6 +39,7 @@ data.useAmuletButtonShowing = false;
 data.secondsPerReset = 0;
 data.currentJob = "Helping Scott";
 data.currentWage = 1;
+data.numberType = "engineering"; //or scientific
 
 let viewData = {}; //contains only things that are generated / not saved
 viewData.toasts = [];

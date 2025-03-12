@@ -38,7 +38,7 @@ function actionSetBaseVariables(actionObj, dataObj) {
     actionObj.expToLevel = actionObj.expToLevelBase * actionObj.expToLevelMult; //can be divided
     actionObj.expToAddBase = 1;
     actionObj.expToAddMult = 1;
-    actionObj.expToAdd = actionObj.expToAddBase * actionObj.expToAddMult;
+    actionObj.expToAdd = actionObj.expToAddBase * actionObj.expToAddMult * calcUpgradeMultToExp(actionObj);
     actionObj.generatorSpeed = dataObj.generatorSpeed ? dataObj.generatorSpeed : 1;
     actionObj.generatorTarget = dataObj.generatorTarget;
     actionObj.momentum = 0;

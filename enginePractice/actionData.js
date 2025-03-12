@@ -48,7 +48,7 @@ function create(actionVar, downstreamVars, x, y) {
     }
     x*= 380;
     y*= -380;
-    let title = actionVar.replace(/([a-z])([A-Z])/g, '$1 $2').replace(/\b\w/g, char => char.toUpperCase()); //basicLabor -> Basic Labor
+    let title = decamelizeWithSpace(actionVar); //basicLabor -> Basic Labor
     let actionObj = createAndLinkNewAction(actionVar, actionDataObj, title, x, y, downstreamVars);
     actionObj.expStats.forEach(function (expStat) { //add the action to the stat, to update exp reductions
         data.statNames.forEach(function (statName) {
@@ -584,7 +584,7 @@ let actionData = {
 
             //add exp based on amount sent
             actionObj.expToAddBase = amountToSend;
-            actionObj.expToAdd = actionObj.expToAddBase * actionObj.expToAddMult;
+            actionObj.expToAdd = actionObj.expToAddBase * actionObj.expToAddMult * calcUpgradeMultToExp(actionObj);
             document.getElementById('makeMoneyMomentumTaken').innerText = intToString(amount, 2);
         },
         onUnlock: function() {
@@ -678,7 +678,7 @@ let actionData = {
 
             //add exp based on amount sent
             actionObj.expToAddBase = amountToSend;
-            actionObj.expToAdd = actionObj.expToAddBase * actionObj.expToAddMult;
+            actionObj.expToAdd = actionObj.expToAddBase * actionObj.expToAddMult * calcUpgradeMultToExp(actionObj);
             document.getElementById('socializeMomentumTaken').innerText = intToString(amount, 2);
         },
         onUnlock: function() {

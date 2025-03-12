@@ -28,7 +28,7 @@ function tick() {
     curTime = newTime;
 
     if(saveTimer < 0) {
-        saveTimer += 2000;
+        saveTimer += 5000;
         save();
     }
 
@@ -146,13 +146,12 @@ function tickGameObject(actionVar) {
     //if generator, add Time to exp
     //if not generator, becomes 1% of momentum/s / 20.
     let momentumMaxRate = actionObj.isGenerator ? actionObj.generatorSpeed / ticksPerSecond : actionObj.momentum * actionObj.tierMult() / ticksPerSecond;
-    //actual momentum change will be based on efficiency - for both generator and not
-    let rateInefficient = momentumMaxRate * (actionObj.efficiency/100);
-    //when max level, do not consume momentum - only let it pass
-    let atMaxLevel = actionObj.maxLevel >= 0 && actionObj.level >= actionObj.maxLevel;
-
     //if action is max level or locked, momentum rate should be 0
+    let atMaxLevel = actionObj.maxLevel >= 0 && actionObj.level >= actionObj.maxLevel;
     let momentumToAdd = (atMaxLevel||!actionObj.unlocked) ? 0 : momentumMaxRate;
+    //actual momentum change will be based on efficiency - for both generator and not
+    let rateInefficient = momentumToAdd * (actionObj.efficiency/100);
+
     let momentumToAddInefficient = (atMaxLevel||!actionObj.unlocked) ? 0 : rateInefficient;
 
     //Calculate momentum delta: 1. determine how much is being consumed and subtract it

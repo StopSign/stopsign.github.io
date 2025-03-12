@@ -117,7 +117,11 @@ function intToString(value, amount) {
     let isNeg = value < 0;
     value *= isNeg ? -1 : 1;
     if (value >= 10000) {
-        return (isNeg?"-":"")+nFormatter(value, 3);
+        if(data.numberType === "engineering") {
+            return (isNeg ? "-" : "") + nFormatter(value, 3);
+        } else if(data.numberType === "scientific") {
+            return (isNeg?"-":"") + value.toExponential(2);
+        }
     }
     if (value >= 1000) { //1000 - 10000, should be 6,512 (.1) - 1 if base is > 2
         if(amount >= 2) {
@@ -126,13 +130,16 @@ function intToString(value, amount) {
             baseValue = 0;
         }
         const returnVal = parseFloat(value).toFixed(baseValue);
-        return (isNeg?"-":"")+`${returnVal[0]},${returnVal.substring(1)}`;
+        return (isNeg?"-":"") + `${returnVal[0]},${returnVal.substring(1)}`;
     }
     if(value < 1) {
-        return (isNeg?"-":"")+parseFloat(value).toPrecision(baseValue);
+        if(value < .0001) {
+            return (isNeg?"-":"") + value.toExponential(3);
+        }
+        return (isNeg?"-":"") + parseFloat(value).toPrecision(baseValue);
     }
 
-    return (isNeg?"-":"")+parseFloat(value).toFixed(baseValue - 1);
+    return (isNeg?"-":"") + parseFloat(value).toFixed(baseValue - 1);
 }
 
 
@@ -212,6 +219,9 @@ function decamelize(str) {
         .replace(/^./, first => first.toUpperCase());
 }
 
+function decamelizeWithSpace(str) {
+    return str.replace(/([a-z])([A-Z])/g, '$1 $2').replace(/\b\w/g, char => char.toUpperCase());
+}
 
 function camelize(str) {
     return str.replace(/(?:^\w|[A-Z]|\b\w|\s+)/gu, (match, index) => {

@@ -4,16 +4,24 @@
     --text-primary: #cdd6f4;
     --text-muted: #a6adc8;
     --button-text: #252836;
-    --accent-primary: #89b4fa;
-    --accent-secondary: #74c7ec;
+    --accent-primary: #4a90e2;
+    --accent-secondary: #589ff2;
+    --accent-tertiary: #2d6cb7;
     --border-color: #45475a;
     --success-color: #a6e3a1;
     --warning-color: #ff0e39;
     --error-color: #f38ba8;
     --overlay-color: rgba(30, 30, 46, 0.8);
     --selection-color:#9f0000;
-    --exp-color:#7b5fc1;
     --line-color: #000000;
+
+    --menu-background-color: #1e1e2e;
+    --menu-tab-button-color: #23153c;
+    --menu-tab-background-color: #0f0f17;
+    --menu-text-background-color: #ffffff;
+    --text-color: #e0e0e0;
+
+    --exp-color:#7b5fc1;
     --momentum-color:#007BFF;
     --mana-color: #0c20d4;
     --gold-color: #a28a00;
@@ -29,16 +37,25 @@ body.lightMode {
     --text-primary: #000000;
     --text-muted: #4a4e69;
     --button-text: #4a4e69;
-    --accent-primary: #39e2ef;
-    --accent-secondary: #60eef9;
+    --accent-primary: #3acbf7;
+    --accent-secondary: #4bd5ff;
+    --accent-tertiary: #19a1ca;
     --border-color: #c4d7f2;
     --success-color: #a6e3a1;
     --warning-color: #ffde24;
     --error-color: #ff9aa2;
     --overlay-color: rgba(135, 152, 211, 0.8);
     --selection-color:#67ff5b;
-    --exp-color:#b79df8;
     --line-color: #ffffff;
+
+    --menu-background-color: #cbe3f7;
+    --menu-tab-button-color: #d7c3f8;
+    --menu-tab-background-color: #e0e0e0;
+    --menu-text-background-color: #ffffff;
+    --text-color: #222222;
+
+
+    --exp-color:#b79df8;
     --momentum-color:#00E1FF;
     --mana-color:#74c7ec;
     --gold-color:#FFD700;
@@ -141,6 +158,7 @@ body {
     position:relative;
     color: var(--text-primary);
     border: 1px solid var(--border-color);
+    min-height: 500px;
 }
 
 .title {
@@ -227,8 +245,6 @@ input {
     background-color: var(--accent-primary);
     border: none;
     border-radius: 6px;
-    box-shadow: 0 3px var(--border-color);
-    transform: translateY(-2px);
     margin-bottom:2px;
 }
 
@@ -245,8 +261,7 @@ input {
 }
 
 .button:active {
-    background-color: var(--accent-secondary);
-    box-shadow: 0 1px var(--border-color);
+    background-color: var(--accent-tertiary);
 }
 
 .continueButton {

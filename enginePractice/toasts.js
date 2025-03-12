@@ -107,7 +107,6 @@ function createToast(visibleFunc, title, message) {
 //appear and show it with the name and text of the appropriate modal click
 
 
-
 // Update the UI of a specific toast based on its state
 function updateToastUI(toastId) {
     let el = viewData.toasts[toastId].element;
@@ -127,6 +126,7 @@ function updateToastUI(toastId) {
         case 'closed':
             el.classList.remove('toastInactive')
             el.style.display = 'none';
+            updatePreviousTipsMenu();
             break;
     }
 }
@@ -144,7 +144,6 @@ function createToastModal() {
     document.body.appendChild(modalOverlayEl);
 }
 
-// 3) Function to open the modal (for a specific toast)
 function openModal(toastId) {
     modalOverlayEl.style.display = 'flex';
     document.getElementById('toastModalTitle').innerHTML = viewData.toasts[toastId].title;
@@ -155,12 +154,10 @@ function openModal(toastId) {
     showAllValidToasts();
 }
 
-// 4) Function to close the modal
 function closeModal() {
     modalOverlayEl.style.display = 'none';
 }
 
-// Helper: Close a specific toast
 function closeToast(event, toastId) {
     event.stopPropagation(); // Prevents the outer click event
     data.toastStates[toastId] = 'closed'

@@ -58,15 +58,18 @@ function save() {
 function exportSave() {
     save();
     let encoded = encode(window.localStorage[saveName]);
-    console.log(encoded);
-    // document.getElementById("exportImportSave").value = encoded;
-    // document.getElementById("exportImportSave").select();
-    // document.execCommand('copy');
-    // document.getElementById("exportImportSave").value = "";
+    // console.log(encoded);
+    document.getElementById("exportImportSave").value = encoded;
+    document.getElementById("exportImportSave").select();
+    document.execCommand('copy');
+    document.getElementById("exportImportSave").value = "";
 }
 
 function importSave() {
-//     window.localStorage[saveName] = decode(document.getElementById("exportImportSave").value);
-//
-//     load();
+    if(!document.getElementById('confirmImportCheckbox').checked) {
+        return;
+    }
+    window.localStorage[saveName] = decode(document.getElementById("exportImportSave").value);
+
+    load();
 }
