@@ -157,8 +157,8 @@ function tickGameObject(actionVar) {
     //Calculate momentum delta: 1. determine how much is being consumed and subtract it
     //2. later, if non-generator, an upstream action will add how much it is sending to this actions momentumDelta
     if(actionObj.isGenerator) {
-        actionObj.momentumDelta = actionObj.actionPower * actionObj.upgradeMult / actionObj.progressMax * rateInefficient * ticksPerSecond;
         if(actionVar === "overclock") { //visual only
+            actionObj.momentumDelta = actionObj.actionPower * actionObj.upgradeMult / actionObj.progressMax * rateInefficient * ticksPerSecond;
             actionObj.momentumIncrease = actionObj.momentumDelta;
         }
     } else {
@@ -201,6 +201,10 @@ function tickGameObject(actionVar) {
         //sends to unlock cost first if needed
         giveMomentumTo(actionObj, downstreamAction, taken);
     });
+    if(actionObj.generatorSpeed && actionVar !== "overclock") { //set decrease for other generators
+        actionObj.momentumDecrease = (actionObj.momentum * actionObj.tierMult()) * actionObj.progressGain / actionObj.progressMax;
+        actionObj.momentumDelta = actionObj.momentumIncrease - actionObj.momentumDecrease;
+    }
 }
 
 function giveMomentumTo(actionObj, downstreamAction, amount) {

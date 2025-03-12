@@ -375,7 +375,6 @@ let actionData = {
     //3 levels is *13.8, 4 levels is *33. At 4th unlock, wage is *2, so the next wage should be worse. If the next unlock is x1100, it will be already when 8/8.
     //Next unlock is [33-1100] higher initial progress exp req
     //
-    //8th level takes
     oddJobsLaborer: {
         tier:1,
         progressMaxBase:1e3, progressMaxMult:1, progressMaxIncrease:3,

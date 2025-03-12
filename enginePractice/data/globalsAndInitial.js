@@ -60,7 +60,12 @@ function debug() {
     }
     document.getElementById("killTheLichMenuButton").style.display = "";
     data.useAmuletButtonShowing = true;
-    data.essence = 100;
+    data.essence = 300;
+    buyUpgrade("stopLettingOpportunityWait", 0);
+    buyUpgrade("stopLettingOpportunityWait", 1);
+    buyUpgrade("stopLettingOpportunityWait", 2);
+    buyUpgrade("stopLettingOpportunityWait", 3);
+
 }
 
 function initializeData() {

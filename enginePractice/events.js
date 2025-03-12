@@ -227,7 +227,7 @@ function clickActionMenu(actionVar, containerId, buttonId, menuVar) {
 function deselectActionMenus(actionVar) {
     document.getElementById(actionVar+"LevelInfoContainer").style.display = "none";
     document.getElementById(actionVar+"ToggleLevelInfoButton").style.removeProperty("background-color");
-    document.getElementById(actionVar+"DownstreamContainer").style.display = "none";
+    view.cached[actionVar + "DownstreamContainer"].style.display = "none";
     document.getElementById(actionVar+"ToggleDownstreamButton").style.removeProperty("background-color");
     document.getElementById(actionVar+"StatsContainer").style.display = "none";
     document.getElementById(actionVar+"ToggleStatsInfoButton").style.removeProperty("background-color");

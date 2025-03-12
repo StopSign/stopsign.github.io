@@ -26,9 +26,7 @@ function selectBuyUpgrade(upgradeVar, num) {
     document.getElementById("infoMenu").style.display = "inline-block";
 }
 
-function buyUpgrade() {
-    let upgradeVar = selectedUpgrade.var;
-    let num = selectedUpgrade.num;
+function buyUpgrade(upgradeVar, num) {
     let upgrade = data.upgrades[upgradeVar];
 
     if(upgrade.upgradesBought.indexOf(num) !== -1) { //already bought
@@ -78,7 +76,6 @@ function createUpgrades() {
         upgradeObj.thirdHighestLevel = -1;
         upgradeObj.isBought = false;
     }
-
 }
 
 actionData.upgrades = {

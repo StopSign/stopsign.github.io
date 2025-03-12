@@ -53,6 +53,7 @@ function generateActionDisplay(actionVar) {
             "<span id='"+actionVar+"HighestLevelContainer2'> (<b><span id='"+actionVar+"HighestLevel2'></span></b>)" +
         "</span>" +
         " | <span style='font-size:12px;'><b><span id='"+actionVar+"Efficiency'></span></b>%</span>" +
+        (!actionObj.wage ? "" : " | <b>$<span id='"+actionVar+"Wage' style='color:var(--gold-color)'></span></b>") +
         "</span>" +
         "</span>";
 
@@ -405,6 +406,7 @@ function cacheActionViews(actionVar) {
     view.cached[actionVar + "Container"] = document.getElementById(actionVar + "Container");
     view.cached[actionVar + "LargeVersionContainer"] = document.getElementById(actionVar + "LargeVersionContainer");
     view.cached[actionVar + "SmallVersionContainer"] = document.getElementById(actionVar + "SmallVersionContainer");
+    view.cached[actionVar + "DownstreamContainer"] = document.getElementById(actionVar + "DownstreamContainer");
     view.cached[actionVar + "ProgressMax"] = document.getElementById(actionVar + "ProgressMax");
     view.cached[actionVar + "Title"] = document.getElementById(actionVar + "Title");
     view.cached[actionVar + "Container"] = document.getElementById(actionVar + "Container");
@@ -449,6 +451,7 @@ function cacheActionViews(actionVar) {
     view.cached[actionVar + "ExpertiseMult"] = document.getElementById(actionVar + "ExpertiseMult");
     view.cached[actionVar + "Efficiency"] = document.getElementById(actionVar + "Efficiency");
     view.cached[actionVar + "Tier"] = document.getElementById(actionVar + "Tier");
+    view.cached[actionVar + "Wage"] = document.getElementById(actionVar + "Wage");
 
 
     view.cached[actionVar + "RealX"] = document.getElementById(actionVar + "RealX");

@@ -120,7 +120,28 @@ function updateActionForVisibility(actionObj, prevAction, forceUpdate) {
             view.cached[actionVar + "LockContainer"].style.display = "";
         }
     }
+
+    if (forceUpdate || actionObj.currentMenu === "downstream") {
+        let display = view.cached[actionVar + "DownstreamContainer"].style.display;
+        let hasVisible = hasDownstreamVisible(actionObj);
+        if(!display && !hasVisible) {
+            view.cached[actionVar + "DownstreamContainer"].style.display = "none";
+        } else if(display === "none" && hasVisible) {
+            view.cached[actionVar + "DownstreamContainer"].style.display = "";
+        }
+    }
     return forceUpdate;
+}
+
+function hasDownstreamVisible(actionObj) {
+    let visibleFound = false;
+    actionObj.downstreamVars.forEach(function(downVar) {
+        if(!data.actions[downVar] || !data.actions[downVar].visible) {
+            return;
+        }
+        visibleFound = true;
+    });
+    return visibleFound;
 }
 
 function updateActionView(actionVar) {
@@ -139,12 +160,12 @@ function updateActionView(actionVar) {
 
     updateActionViewsForUpgrades(actionVar);
 
-    //split into different sections: update based on menu
+    //always-visible nums per action
     let roundedNumbers = [
         ["progress", 2], ["progressMax", 2], ["progressGain", 2],
         ["momentum", 2], ["momentumDelta", 2], ["level", 1], ["maxLevel", 1], ["tier", 1],
         ["exp", 2], ["expToLevel", 2], ["expToAdd", 2], ["momentumIncrease", 2], ["momentumDecrease", 2],
-        ["expertise", 1], ["highestLevel2", 1],
+        ["expertise", 1], ["highestLevel2", 1], ["wage", 2]
     ];
 
     if(forceUpdate || !actionObj.unlocked) {
@@ -249,8 +270,7 @@ function updateActionDownstreamViews(actionObj, prevAction, forceUpdate) {
 
             //if downstream is invisible, hide it and the connecting line border
             //if downstream is invisible, hide relevant actionObj's slider area
-            let prevDownstreamObj = prevState.actions[downstreamVar];
-            if(forceUpdate || prevDownstreamObj.visible !== downstreamObj.visible) {
+            if(forceUpdate || downstreamObj.visible && view.cached[actionVar + "SliderContainer" + downstreamVar].style.display === "none") {
                 if(!view.cached[actionVar + "_" + downstreamVar + "_Line_Outer"]) {
                     console.log('missing div for ' + actionVar + ', downstream: ' + downstreamVar);
                 }
