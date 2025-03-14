@@ -1,6 +1,6 @@
 function statsSetBaseVariables(statObj) {
     statObj.num = 0;
-    statObj.perSecond = 0;
+    statObj.perMinute = 0;
     statObj.mult = 1;
 }
 

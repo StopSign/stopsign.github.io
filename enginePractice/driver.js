@@ -121,7 +121,7 @@ function gameTick() {
 
     let statsPerSecond = getStatChanges();
     data.statNames.forEach(function(statName) {
-        data.stats[statName].perSecond = statsPerSecond[statName] ? statsPerSecond[statName] : 0;
+        data.stats[statName].perMinute = statsPerSecond[statName] ? statsPerSecond[statName]*60 : 0;
     });
 
 

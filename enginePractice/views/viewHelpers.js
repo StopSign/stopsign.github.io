@@ -4,7 +4,7 @@ function getStatColor(statName) {
     //     return "blue"
     // }
     //if the stat is gained with unlocked actions
-    let statAddedTo = stat.perSecond !== 0;
+    let statAddedTo = stat.perMinute !== 0;
     let statUsed = false;
     stat.linkedActionExpertiseStats.forEach(function(actionVar) {
         let actionObj = data.actions[actionVar];
@@ -57,7 +57,10 @@ function getStatChanges() {
         let actionObj = data.actions[actionVar];
 
         // Calculate levels per second
-        let completesPerSecond = actionProgressRate(actionObj) * ticksPerSecond / actionObj.progressMax;
+        let completesPerSecond = 0;
+        if(actionObj.unlocked) {
+            completesPerSecond = actionProgressRate(actionObj) * ticksPerSecond / actionObj.progressMax;
+        }
         let levelsPerSecond = completesPerSecond * actionObj.expToAdd / actionObj.expToLevel;
 
         // Update statsPerSecond based on the action's onLevelStats

@@ -26,11 +26,11 @@ function generateStatDisplay(statVar) {
         }
     });
     theStr +=
-        "<div id='"+statVar+"NumContainer' style='position:relative;'>"+
+        "<div id='"+statVar+"StatContainer' style='position:relative;'>"+
         "<b><span id='"+statVar+"Name' style='width:110px;display:inline-block;cursor:pointer' onclick='clickedStatName(\""+statVar+"\")'>" + decamelize(statVar) + "</span></b>" +
         "<b><span id='"+statVar+"Num' style='width:50px;display:inline-block'>"+statObj.num+"</span></b>" +
         "<span style='width:50px;display:inline-block'>x<b><span id='"+statVar+"Mult'>"+statObj.mult+"</span></b></span>" +
-        "<span style='width:50px;display:inline-block'>+<b><span id='"+statVar+"PerSecond'>"+statObj.perSecond+"</span></b>/s</span>" +
+        "<span style='width:50px;display:inline-block'>+<b><span id='"+statVar+"PerMinute'>"+statObj.perMinute+"</span></b>/m</span>" +
         "</div>";
 
     let child = document.createElement("template");
@@ -382,9 +382,9 @@ function setSingleCaches() {
 }
 
 function cacheStatNames(statVar) {
-    view.cached[statVar+"NumContainer"] = document.getElementById(statVar+"NumContainer");
+    view.cached[statVar+"StatContainer"] = document.getElementById(statVar+"StatContainer");
     view.cached[statVar+"Num"] = document.getElementById(statVar+"Num");
-    view.cached[statVar+"PerSecond"] = document.getElementById(statVar+"PerSecond");
+    view.cached[statVar+"PerMinute"] = document.getElementById(statVar+"PerMinute");
     view.cached[statVar+"Mult"] = document.getElementById(statVar+"Mult");
     view.cached[statVar+"Name"] = document.getElementById(statVar+"Name");
 

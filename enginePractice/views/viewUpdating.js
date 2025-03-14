@@ -57,21 +57,38 @@ function updateViewOnSecond() {
 }
 
 function updateStatView(statName) {
-    let stat = data.stats[statName];
+    let statObj = data.stats[statName];
     let prevStat = prevState.stats[statName];
     let forceUpdate = !prevStat;
-    let roundedNumbers = [["num", 2], ["perSecond", 2], ["mult", 3]];
+
+    updateStatForVisibility(statObj, prevStat, forceUpdate);
+
+    let roundedNumbers = [["num", 2], ["perMinute", 2], ["mult", 3]];
 
     roundedNumbers.forEach(obj => {
         let capName = capitalizeFirst(obj[0]);
-        if(forceUpdate || intToString(prevStat[obj[0]], obj[1]) !== intToString(stat[obj[0]], obj[1])) {
-            view.cached[`${statName}${capName}`].innerText = intToString(stat[obj[0]], obj[1]);
+        if(forceUpdate || intToString(prevStat[obj[0]], obj[1]) !== intToString(statObj[obj[0]], obj[1])) {
+            view.cached[`${statName}${capName}`].innerText = intToString(statObj[obj[0]], obj[1]);
         }
     })
 
     let color = getStatColor(statName);
     if(forceUpdate || view.cached[`${statName}Name`].style.color !== color) {
         view.cached[`${statName}Name`].style.color = color;
+    }
+}
+
+function updateStatForVisibility(statObj, prevStat, forceUpdate) {
+    let statVar = statObj.statVar;
+    //only show if being the stat's amount is > 0
+    if(forceUpdate ||
+        (view.cached[statVar+"StatContainer"].style.display === "none" && statObj.num > 0) ||
+        (view.cached[statVar+"StatContainer"].style.display !== "none" && statObj.num === 0)) {
+        if (statObj.num > 0) {
+            view.cached[statVar + "StatContainer"].style.display = "";
+        } else {
+            view.cached[statVar + "StatContainer"].style.display = "none";
+        }
     }
 }
 
