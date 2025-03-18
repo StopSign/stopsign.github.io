@@ -4,7 +4,7 @@ function getStatColor(statName) {
     //     return "blue"
     // }
     //if the stat is gained with unlocked actions
-    let statAddedTo = stat.perSecond !== 0;
+    let statAddedTo = stat.perMinute !== 0;
     let statUsed = false;
     stat.linkedActionExpertiseStats.forEach(function(actionVar) {
         let actionObj = data.actions[actionVar];
@@ -31,6 +31,10 @@ function getStatColor(statName) {
     return "var(--error-color)";
 }
 
+function gameStateMatches(actionObj) {
+    return (data.gameState === "default" && !actionObj.isKTL) || (data.gameState==="KTL" && actionObj.isKTL);
+}
+
 function getResourceColor(actionObj) {
     switch (actionObj.momentumName) {
         case "mana":
@@ -49,11 +53,14 @@ function getResourceColor(actionObj) {
 function getStatChanges() {
     let statsPerSecond = {};
 
-    data.actionNames.forEach(actionName => {
-        let actionObj = data.actions[actionName];
+    data.actionNames.forEach(actionVar => {
+        let actionObj = data.actions[actionVar];
 
         // Calculate levels per second
-        let completesPerSecond = actionObj.progressRate() * ticksPerSecond / actionObj.progressMax;
+        let completesPerSecond = 0;
+        if(actionObj.unlocked) {
+            completesPerSecond = actionProgressRate(actionObj) * ticksPerSecond / actionObj.progressMax;
+        }
         let levelsPerSecond = completesPerSecond * actionObj.expToAdd / actionObj.expToLevel;
 
         // Update statsPerSecond based on the action's onLevelStats

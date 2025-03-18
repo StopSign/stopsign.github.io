@@ -26,73 +26,57 @@ function validateInput(fromAction, toAction) {
     }
 }
 
-function updateSlider(fromAction, toAction) {
-    let numValue = document.getElementById(fromAction + "NumInput" + toAction).value;
-    let rangeInput = document.getElementById(fromAction + "RangeInput" + toAction);
-    rangeInput.value = numValue;
-    document.getElementById(fromAction+"_"+toAction+"_Line").style.opacity = (numValue/100*.8)+"";
-    data.actions[fromAction]["downstreamRate"+toAction] = numValue;
+function setSliderUI(fromAction, toAction, newValue) {
+    if(!fromAction || !toAction || !document.getElementById(fromAction + "NumInput" + toAction)) {
+        console.log('trying to set it from: ' + fromAction + ', ' + toAction);
+        return;
+    }
+    if(newValue === -1) { //no automatic change
+        return;
+    }
+    document.getElementById(fromAction + "NumInput" + toAction).value = newValue;
+    document.getElementById(fromAction + "RangeInput" + toAction).value = newValue;
+    document.getElementById(fromAction+"_"+toAction+"_Line_Inner").style.height = (newValue/100*20)+"px";
+    data.actions[fromAction]["downstreamRate"+toAction] = newValue;
+}
+function downstreamNumberChanged(fromAction, toAction) {
+    let newValue = document.getElementById(fromAction + "NumInput" + toAction).value;
+    setSliderUI(fromAction, toAction, newValue)
 }
 
-function updateNumber(fromAction, toAction) {
-    let rangeValue = document.getElementById(fromAction + "RangeInput" + toAction).value;
-    document.getElementById(fromAction + "NumInput" + toAction).value = rangeValue;
-    document.getElementById(fromAction+"_"+toAction+"_Line").style.opacity = (rangeValue/100*.8)+"";
-    data.actions[fromAction]["downstreamRate"+toAction] = rangeValue;
+function downstreamSliderChanged(fromAction, toAction) {
+    let newValue = document.getElementById(fromAction + "RangeInput" + toAction).value;
+    setSliderUI(fromAction, toAction, newValue);
 }
 function toggleAllZero(actionVar) {
-    let action = data.actions[actionVar];
-    action.downstreamVars.forEach(function (toAction) {
-        if(!data.actions[toAction] || data.actions[toAction].momentumName !== action.momentumName) {
+    let actionObj = data.actions[actionVar];
+    actionObj.downstreamVars.forEach(function (toAction) {
+        let downstreamAction = data.actions[toAction];
+        if(!downstreamAction || downstreamAction.momentumName !== actionObj.momentumName || !downstreamAction.visible) {
             return;
         }
-        let fromAction = actionVar;
-        document.getElementById(fromAction + "RangeInput" + toAction).value = 0;
-        document.getElementById(fromAction+"_"+toAction+"_Line").style.opacity = 0+"";
-        document.getElementById(fromAction + "DownstreamSendRate" + toAction).textContent = 0+"";
+        setSliderUI(actionVar, toAction, 0);
     });
 }
-
 function toggleAllHundred(actionVar) {
-    let action = data.actions[actionVar];
-    action.downstreamVars.forEach(function (toAction) {
-        if(!data.actions[toAction] || data.actions[toAction].momentumName !== action.momentumName) {
+    let actionObj = data.actions[actionVar];
+    actionObj.downstreamVars.forEach(function (toAction) {
+        let downstreamAction = data.actions[toAction];
+        if(!downstreamAction || downstreamAction.momentumName !== actionObj.momentumName || !downstreamAction.visible) {
             return;
         }
-        let fromAction = actionVar;
-        let numValue = 100;
-        document.getElementById(fromAction + "RangeInput" + toAction).value = numValue;
-        document.getElementById(fromAction + "NumInput" + toAction).value = numValue;
-        document.getElementById(fromAction+"_"+toAction+"_Line").style.opacity = (numValue/100*.8)+"";
-        // document.getElementById(fromAction + "DownstreamSendRate" + toAction).textContent = numValue;
+        setSliderUI(actionVar, toAction, 100);
     });
 }
 
-let isDragging = false;
-let originalX, originalY;
-let originalLeft, originalTop;
 
 const windowElement = document.getElementById('windowElement');
 const actionContainer = document.getElementById('actionContainer');
 
-document.addEventListener('mousedown', function(e) {
-    // console.log(e.clientX, e.target);
-    if (e.target === windowElement || e.target === actionContainer) {
-        isDragging = true;
-
-        // Capture the initial position of the mouse and the container
-        originalX = e.clientX;
-        originalY = e.clientY;
-
-        const style = window.getComputedStyle(actionContainer);
-        originalLeft = parseInt(style.left, 10);
-        originalTop = parseInt(style.top, 10);
-    }
-});
 
 let scale = 1; // Initial scale value
 const scaleStep = 0.1; // Value by which the scale changes per scroll
-const minScale = 0.1; // Minimum scale value to prevent the content from becoming too small
+const minScale = 0.2; // Minimum scale value to prevent the content from becoming too small
 const maxScale = 3; // Maximum scale value to prevent the content from becoming too large
 
 windowElement.addEventListener('wheel', function(e) {
@@ -115,40 +99,69 @@ windowElement.addEventListener('wheel', function(e) {
     scale = Math.min(Math.max(minScale, scale), maxScale);
 
     // Apply the scale transformation to the container
-    actionContainer.style.transform = `scale(${scale})`;
+    actionContainer.style.transform = `translate(${transformX}px, ${transformY}px) scale(${scale})`;
 });
 
-document.addEventListener('mousemove', function(e) {
-    if (isDragging) {
-        // Calculate the new position
-        const deltaX = e.clientX - originalX;
-        const deltaY = e.clientY - originalY;
+let isDragging = false;
+let originalX, originalY;
+let originalLeft, originalTop;
 
-        // Proposed new position
-        let newLeft = originalLeft + deltaX;
-        let newTop = originalTop + deltaY;
-        // console.log(newLeft);
+let originalMouseX, originalMouseY;
+let transformX=0, transformY=0;
+let originalTransformX, originalTransformY;
+document.addEventListener('mousedown', function(e) {
+    // console.log(e.clientX, e.target);
+    if (e.target === windowElement || e.target === actionContainer) {
+        isDragging = true;
 
-        // Prevent the container from moving beyond the window's boundaries
-        // The container should not move in a way that its right or bottom edges go inside the window's area
-        newLeft = Math.min(newLeft, 0); // Prevent the left edge from going right
-        newLeft = Math.max(newLeft, windowElement.offsetWidth - actionContainer.offsetWidth); // Prevent the right edge from going left
+        // Capture the initial position of the mouse and the container
+        originalMouseX = e.clientX;
+        originalMouseY = e.clientY;
 
-        newTop = Math.min(newTop, 0); // Prevent the top edge from going down
-        newTop = Math.max(newTop, windowElement.offsetHeight - actionContainer.offsetHeight); // Prevent the bottom edge from going up
+        originalTransformX = transformX;
+        originalTransformY = transformY;
 
-        // Update the position of the container
-        actionContainer.style.left = `${newLeft}px`;
-        actionContainer.style.top = `${newTop}px`;
-        forceRedraw(windowElement);
+        // const style = window.getComputedStyle(actionContainer);
+        // originalLeft = parseInt(style.left, 10);
+        // originalTop = parseInt(style.top, 10);
     }
+});
+document.addEventListener('mousemove', function(e) {
+    if(!isDragging) {
+        return;
+    }
+    // Calculate the new position
+    const deltaX = e.clientX - originalMouseX;
+    const deltaY = e.clientY - originalMouseY;
+
+    // Proposed new position
+    let newTransformX = originalTransformX + deltaX;
+    let newTransformY = originalTransformY + deltaY;
+    // console.log(newLeft);
+
+    // Clamp range to [-4000, 4000]
+    newTransformX = Math.max(-4000, Math.min(newTransformX, 4000));
+    newTransformY = Math.max(-4000, Math.min(newTransformY, 4000));
+
+    // Update our state
+    transformX = newTransformX;
+    transformY = newTransformY;
+
+    // Update the position of the container
+    actionContainer.style.transform = `translate(${transformX}px, ${transformY}px) scale(${scale})`;
 });
 
 document.addEventListener('mouseup', function() {
     isDragging = false;
 });
+function isInScreenRange(action) {
+    const distanceX = Math.abs((transformX * -1) - (action.realX + 150) * scale + windowElement.offsetWidth / 2);
+    const distanceY = Math.abs((transformY * -1) - (action.realY + 50) * scale + windowElement.offsetHeight / 2);
+    const thresholdX = windowElement.offsetWidth / scale / 2 + 300;
+    const thresholdY = windowElement.offsetHeight / scale / 2 + 300;
+    return distanceX < thresholdX && distanceY < thresholdY;
+}
 function forceRedraw(element) {
-    return;
     // Save the current display style
     const display = element.style.display;
 
@@ -165,33 +178,39 @@ function forceRedraw(element) {
 function actionTitleClicked(actionVar) {
     let actionObj = data.actions[actionVar];
 
-    let newLeft = -((actionObj.realX + 110) * scale) + windowElement.offsetWidth / 2 - 4000 ;
-    let newTop = -((actionObj.realY + 50) * scale) + windowElement.offsetHeight / 2 - 4000 - 50;
+    let newTransformX = -((actionObj.realX + 150) * scale) + windowElement.offsetWidth / 2 ;
+    let newTransformY = -((actionObj.realY) * scale) + windowElement.offsetHeight / 2 - 50;
 
-    newLeft = Math.max(newLeft, windowElement.offsetWidth - actionContainer.offsetWidth);
-    newTop = Math.max(newTop, windowElement.offsetHeight - actionContainer.offsetHeight);
+    newTransformX = Math.max(-4000, Math.min(newTransformX, 4000));
+    newTransformY = Math.max(-4000, Math.min(newTransformY, 4000));
 
-    actionContainer.style.left = `${newLeft}px`;
-    actionContainer.style.top = `${newTop}px`;
-}
+    // Update our state
+    transformX = newTransformX;
+    transformY = newTransformY;
 
-function toggleLevelInfo(actionVar) {
-    clickActionMenu(actionVar, "LevelInfoContainer", "ToggleLevelInfoButton");
+    // Update the position of the container
+    actionContainer.style.transform = `translate(${newTransformX}px, ${newTransformY}px) scale(${scale})`;
 }
 
 function toggleDownstream(actionVar) {
-    clickActionMenu(actionVar, "DownstreamContainer", "ToggleDownstreamButton");
+    clickActionMenu(actionVar, "DownstreamContainer", "ToggleDownstreamButton", "downstream");
+}
+
+function toggleLevelInfo(actionVar) {
+    clickActionMenu(actionVar, "LevelInfoContainer", "ToggleLevelInfoButton", "info");
 }
 
 function toggleStatsInfo(actionVar) {
-    clickActionMenu(actionVar, "StatsContainer", "ToggleStatsInfoButton");
+    clickActionMenu(actionVar, "StatsContainer", "ToggleStatsInfoButton", "stat");
 }
 
 function toggleStory(actionVar) {
-    clickActionMenu(actionVar, "StoryContainer", "ToggleStoryButton");
+    clickActionMenu(actionVar, "StoryContainer", "ToggleStoryButton", "story");
 }
 
-function clickActionMenu(actionVar, containerId, buttonId) {
+//Each action needs which menu they've selected, to intelligently deselect colors, as well as to use in minimizing UI updates
+
+function clickActionMenu(actionVar, containerId, buttonId, menuVar) {
     let container = document.getElementById(actionVar+containerId);
     let button = document.getElementById(actionVar+buttonId);
 
@@ -199,14 +218,16 @@ function clickActionMenu(actionVar, containerId, buttonId) {
     deselectActionMenus(actionVar);
     if (toggleOn) {
         container.style.display = "block";
-        button.style.backgroundColor = "var(--warning-color)";
+        button.style.backgroundColor = "var(--selection-color)";
     }
+    //for setting which is updating
+    data.actions[actionVar].currentMenu = menuVar;
 }
 
 function deselectActionMenus(actionVar) {
     document.getElementById(actionVar+"LevelInfoContainer").style.display = "none";
     document.getElementById(actionVar+"ToggleLevelInfoButton").style.removeProperty("background-color");
-    document.getElementById(actionVar+"DownstreamContainer").style.display = "none";
+    view.cached[actionVar + "DownstreamContainer"].style.display = "none";
     document.getElementById(actionVar+"ToggleDownstreamButton").style.removeProperty("background-color");
     document.getElementById(actionVar+"StatsContainer").style.display = "none";
     document.getElementById(actionVar+"ToggleStatsInfoButton").style.removeProperty("background-color");
@@ -216,6 +237,7 @@ function deselectActionMenus(actionVar) {
 
 const zoomInButton = document.getElementById('zoomInButton');
 const zoomOutButton = document.getElementById('zoomOutButton');
+const centerScreenButton = document.getElementById('centerScreenButton');
 
 zoomInButton.addEventListener('click', function() {
     scale = Math.min(scale + scaleStep, maxScale); // Zoom in
@@ -227,17 +249,16 @@ zoomOutButton.addEventListener('click', function() {
     actionContainer.style.transform = `scale(${scale})`;
 });
 
+centerScreenButton.addEventListener('click', function() {
+    actionTitleClicked('overclock');
+});
+
+
 function clickMenuButton() {
     let isShowing = document.getElementById("helpMenu").style.display !== "none";
     document.getElementById("helpMenu").style.display = isShowing ? "none" : "flex";
 }
 
-function changeDarkMode() {
-    const body = document.body;
-
-    // Toggle the dark-mode class
-    body.classList.toggle('lightMode');
-}
 
 let selectedStat = null;
 function clickedStatName(statName) {
@@ -280,7 +301,7 @@ function clickedStatName(statName) {
                 statFoundInUse = true;
             }
         });
-        actionObj.expertiseStats.forEach(function(statObj) {
+        actionObj.efficiencyStats.forEach(function(statObj) {
             if(statObj[0] === statName) {
                 statFoundInUse = true;
             }
@@ -288,10 +309,10 @@ function clickedStatName(statName) {
 
         let color = "black;"
         if(statFoundInUse && statFoundInGain) {
-            color = "orange";
+            color = "blue";
         }
         if(statFoundInUse && !statFoundInGain) {
-            color = "blue";
+            color = "orange";
         }
         if(!statFoundInUse && statFoundInGain) {
             color = "green";
@@ -299,4 +320,39 @@ function clickedStatName(statName) {
         view.cached[actionVar+"Container"].style.borderColor = color;
     });
 
+}
+
+
+//to be run when the jobs level up
+function changeJob(actionVar) {
+    //if the given job is better than the existing job, then switch
+    let contender = data.actions[actionVar];
+    let contenderWage = contender.wage;
+    if(contenderWage > data.currentWage) {
+        data.currentWage = contenderWage;
+        data.currentJob = actionVar;
+    }
+
+    //set displayed
+    document.getElementById("jobTitle").innerText = data.actions[data.currentJob] ? data.actions[data.currentJob].title : data.currentJob;
+    document.getElementById("jobWage").innerText = intToString(data.currentWage, 2);
+}
+
+function pauseGame() {
+    stop = !stop;
+    document.getElementById('pauseButton').innerText = stop ? "Resume" : "Pause";
+}
+
+function stopClicks(event) {
+    event.stopPropagation();
+}
+
+function increaseGamespeed() {
+    gameSpeed *= 2;
+    console.log('gamespeed increased to ' + gameSpeed);
+}
+
+function resetGamespeed() {
+    gameSpeed = 1;
+    console.log('gamespeed set to ' + gameSpeed);
 }

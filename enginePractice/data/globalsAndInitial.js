@@ -10,6 +10,8 @@ let ticksPerSecond = 20;
 let totalTime = 0;
 let ticksForSeconds = 0;
 let secondsPassed = 0;
+//Store offline time
+let bonusTime = 0;
 
 //Saving globals
 let isFileSystem = !!location.href.match("file");
@@ -23,13 +25,21 @@ prevState.res = {};
 prevState.actions = {};
 prevState.stats = {};
 
-//Game globals
+//Game globals - these initializations will be overriden in load
 let data = {};
 data.actions = {};
 data.actionNames = [];
 data.stats = {};
 data.statNames = [];
 data.toastStates = []; // array of toast objects: {id, state, element}
+data.gameState = "default"; //KTL
+data.totalMomentum = 0;
+data.essence = 0;
+data.useAmuletButtonShowing = false;
+data.secondsPerReset = 0;
+data.currentJob = "Helping Scott";
+data.currentWage = 1;
+data.numberType = "engineering"; //or scientific
 
 let viewData = {}; //contains only things that are generated / not saved
 viewData.toasts = [];
@@ -38,31 +48,56 @@ let statTitles = []; //[<title>, <stat name to be located above>]
 
 let language = "english";
 let globalVisible = false;
+let forceVisuals = false;
+
+
+data.upgrades = {};
+
+let isDebug = true;
+function debug() {
+    if(!isDebug) {
+        return;
+    }
+    document.getElementById("killTheLichMenuButton").style.display = "";
+    data.useAmuletButtonShowing = true;
+    data.essence = 300;
+    buyUpgrade("stopLettingOpportunityWait", 0);
+    buyUpgrade("stopLettingOpportunityWait", 1);
+    buyUpgrade("stopLettingOpportunityWait", 2);
+    buyUpgrade("stopLettingOpportunityWait", 3);
+
+}
 
 function initializeData() {
+    if(globalVisible) {
+        document.getElementById("jobDisplay").style.display = "";
+    }
+    createUpgrades();
 
-    statTitles.push(["Overclock Stats", "processing"]);
+    statTitles.push(["Overclock Stats", "abilityPower"]);
+    createAndLinkNewStat("abilityPower"); //improves efficiency of overclock & others. Comes from Harness Overflow
     createAndLinkNewStat("processing"); //
     createAndLinkNewStat("focus"); //
     createAndLinkNewStat("energy"); //
     createAndLinkNewStat("drive"); //
+    createAndLinkNewStat("memory"); //
     // createAndLinkNewStat("discipline"); //
     createAndLinkNewStat("ambition");
     // createAndLinkNewStat("resilience"); //Energy
     createAndLinkNewStat("diligence"); //
-    // createAndLinkNewStat("confidence");
 
     statTitles.push(["Social Stats", "charm"]);
     createAndLinkNewStat("charm"); //exuding warmth, connecting
     // createAndLinkNewStat("humor");
-    // createAndLinkNewStat("wit"); //quick minded
-    // createAndLinkNewStat("tact"); //smooth movement, smooth conversations
-    // createAndLinkNewStat("grace"); //smooth movement, smooth conversations
-    // createAndLinkNewStat("insight"); //dig deep
-    // createAndLinkNewStat("trust");
-    // createAndLinkNewStat("influence");
-    createAndLinkNewStat("haggling");
+    createAndLinkNewStat("wit"); //quick minded
+    createAndLinkNewStat("tact"); //smooth movement, smooth conversations
+    createAndLinkNewStat("grace"); //smooth movement, smooth conversations
+    createAndLinkNewStat("insight"); //dig deep
+    createAndLinkNewStat("trust");
+    createAndLinkNewStat("influence");
     createAndLinkNewStat("recognition");
+    createAndLinkNewStat("confidence");
+    createAndLinkNewStat("presentation");
     // createAndLinkNewStat("credibility");
     // createAndLinkNewStat("deception"); //hot chip & lie
     // createAndLinkNewStat("negotiation"); //convincing/persuasion
@@ -75,6 +110,7 @@ function initializeData() {
     statTitles.push(["Physical Stats", "endurance"]);
     createAndLinkNewStat("endurance");
     // createAndLinkNewStat("weaponsExpertise");
+    createAndLinkNewStat("vitality"); //
 
     //Resource Stats
     statTitles.push(["Resource Stats", "adaptability"]);
@@ -88,6 +124,10 @@ function initializeData() {
     //Combined Stats
     statTitles.push(["General Stats", "pathfinding"]);
     createAndLinkNewStat("pathfinding");
+    createAndLinkNewStat("observation");
+    createAndLinkNewStat("haggling");
+    createAndLinkNewStat("negotiation");
+    createAndLinkNewStat("perspective");
     // createAndLinkNewStat("curiosity");
     // createAndLinkNewStat("patience");
     // createAndLinkNewStat("strategy");
@@ -99,24 +139,37 @@ function initializeData() {
 
     statTitles.push(["Village Stats", "villagersKnown"]);
     createAndLinkNewStat("villagersKnown");
+    createAndLinkNewStat("scottFamiliarity");
+
+    statTitles.push(["Job Stats", "streetKnowledge"]);
+    createAndLinkNewStat("streetKnowledge");
+    createAndLinkNewStat("jobExperience");
+    
+    //KTL
+
+    create("overclockTargetingTheLich", ["killHorde"], 0, 0);
+    create("killHorde", ["killElites"], 1, 0);
+    create("killElites", ["killTheLich"], 1, 0);
+    create("killTheLich", [], 1, 0);
 
     //intro
-    create("overclock", ["reflect", "makeMoney", "travelOnRoad", "socialize"], 0, 0);
-    create("reflect", ["rememberTheFallen", "peruseLibrary"], -1.1, -1.1);
-    create("makeMoney", ["spendMoney"], 0, -1.6);
+    create("overclock", ["harnessOverflow", "travelOnRoad", "makeMoney", "socialize"], 0, 0);
+    create("harnessOverflow", ["distillInsight", "remember"], -1, -1);
+    create("distillInsight", ["journal"], -1, 0);
+    create("journal", ["takeNotes"], -1, 0);
+    create("takeNotes", [], 0, -1);
+    create("remember", [], -1, -1);
+    create("makeMoney", ["spendMoney"], 0, -1.5);
     create("spendMoney", ["fillBasicNeeds"], 0, -1);
-    create("travelOnRoad", ["travelToOutpost", "clearTheTrail"], 1.5, 0);
+    create("travelOnRoad", ["travelToOutpost", "clearTheTrail"], 1, 0);
     create("clearTheTrail", ["paveTheTrail"], 0, 1); //increase travel expertise
-        create("paveTheTrail", [], 0, 1); //increase travel expertise to max. Req builder skills
-    create("travelToOutpost", ["reportForDuty", "travelToCrossroads"], 1.5, 0);
+    create("paveTheTrail", [], 0, 1); //increase travel expertise to max. Req builder skills
+    create("travelToOutpost", ["meetVillageLeaderScott", "checkNoticeBoard", "travelToCrossroads"], 1, 0);
+    create("meetVillageLeaderScott", ["helpScottWithChores"], 0, -1);
 
-    create("reportForDuty", ["meetVillageLeaderScott", "reportForTraining", "reportForLabor"], 0, -1);
-    create("meetVillageLeaderScott", ["helpScottWithChores"], -1.1, -1);
+    create("checkNoticeBoard", ["reportForTraining", "reportForLabor"], 1, -1);
     create("helpScottWithChores", [], 0, -1);
     create("fillBasicNeeds", ["buyClothing", "eatBetterFood"], -.5, -1);
-
-    create("socialize", ["localOutreach"], -3, 0);
-    create("localOutreach", ["chatWithTownsfolk", "neighborlyTies"], 0, 1);
 
     //Village
     create("reportForTraining", ["takeLessonsFromJohn"], 0, -1)
@@ -125,7 +178,7 @@ function initializeData() {
 
 
     //jobs
-    create("reportForLabor", ["oddJobsLaborer"], 2, -2);
+    create("reportForLabor", ["oddJobsLaborer"], 1, -1);
     create("oddJobsLaborer", ["chimneySweep"], 0, -1);
     create("chimneySweep", ["handyman"], 0, -1);
     create("handyman", ["tavernHelper"], 0, -1);
@@ -139,8 +192,24 @@ function initializeData() {
     create("buyClothing", [], -1, -1.5);
     create("eatBetterFood", [], -1, -.5);
 
-    //village chat
-    create("chatWithTownsfolk", [], 1, 1);
+    //Socialize
+    create("socialize", ["chat"], -1.5, 0);
+    create("chat", ["gossip", "talkToScott", "talkToInstructorJohn", "localOutreach"], -1, 1);
+
+    //Socialize - Gossip
+    create("gossip", ["gossipAboutPrices", "hearAboutTheLich"], 1, .5);
+    create("hearAboutTheLich", [], 1, -.5);
+    create("gossipAboutPrices", ["talkAboutMarkets"], 0, 1);
+    create("talkAboutMarkets", [], 0, 1);
+
+    //Socialize - Scott
+    create("talkToScott", ["talkAboutVillageHistory", "talkAboutCurrentIssues"], 0, 1.5); //Pragmatism, kindness, mystery
+    create("talkAboutVillageHistory", [], -.5, 1.5);
+    create("talkAboutCurrentIssues", [], .5, 1.5);
+
+    //Socialize - John
+    create("talkToInstructorJohn", [], -1.5, 0);
+    create("localOutreach", [], -2, -1.5);
 
 
     //     create("peruseLibrary", ["researchHistory"], 0, -1.2); //research. Req other unlocks
@@ -152,98 +221,6 @@ function initializeData() {
     // create("establishRituals", ["studyReligiousTexts", "visitSacredSites", "participateInCeremonies"], .5, -1.4)
 
 
-
-    //casting spells at all requires catalyst, which comes from within the crafting/money sections. buy it in spend money, then improve it in crafting
-
-    /*
-
-            story elements for magic
-             [momentum] identify mana chamber  /10
-             [momentum] breathing - measured and deliberate vs synchronized
-             [mana] visualization
-             ... observe leylines / draw from leylines
-
-     */
-            //     createCastBasicSpells()
-            // createSenseMana(["castBasicSpells", "focusManaSenses", "expandManaSenses", "amplifyManaSenses"])
-                // createLocalizedManaDetection(["immediateAreaFocus", "detectManaClusters"])
-                // good ones from this were local -> sense closer -> identify magic,
-                // or learn signatures->read aura -> read spells -> read spell history,
-                // or influence of nature/manadisturbances -> natural resonance -> resonance patterns -> magical reading of plants/animals/biome/disturbances
-
-
-    // createMakeMoney(-380, 350, ["basicLabor", "browseMarket", "spendMoney"])
-    //     createBrowseMarket(-400, -200, ["learnMarket"])
-    //         createLearnMarket(-400, -200, ["craftForTheDemand", "compareMarket"])
-    //             createCraftForTheDemand(-400, -200, ["craftSimpleItems"])
-    //                 createCraftSimpleItems(-400, -200)
-    //             createCompareMarket(-400, 200, ["sellFoundItems", "exploitMarket"])
-    //                 createSellFoundItems(-400, -200)
-    //                 createExploitMarket(-400, 200)
-    //
-    //     createSpendMoney(480, 70, ["eatBetterFood", "fillBasicNeeds", "buyTransportation", "buyUtilityItems", "buyInvestments"]);
-    //         createFillBasicNeeds(-120, 360, ["improvePersonalSpace", "buyQualityClothing", "buySafety"]); //hygiene
-    //             createBuyQualityClothing(400, 400, ["buyFashionableClothing"]); //TODO poor clothing first
-    //                 createBuyFashionableClothing(400, 400)
-    //             createImprovePersonalSpace(-120, 320, ["improveHouse", "improveNeighborhood"]); //furniture, repairs, bug control, laundry
-    //             // createImproveHouse(-100, 320) //TODO different ways to improve the house
-    //                 createImproveNeighborhood(170, 320, ["improvePond"]); //street, holidays?
-    //                     createImprovePond(-100, 320); //fishing
-    //             // createHostCommunity
-    //             //     createHostCelebrations
-    //             //         createOrganizeHolidays
-    //             //createOrganize<Specific Holiday>
-    //         createEatFood(-120, 360, ["pickupStreetFood", "eatQualityFood", "enjoyUpscaleFood"])
-    //             createPickUpStreetFood(-120, 360, ["eatFastFood", "eatLocalSpecialties"])
-    //                 createEatFastFood(-120, 360) //very small little effect, but constant so the player is inclined to put just a tiny fraction here
-    //                 createEatLocalSpecialties(-120, 360) //req social unlock, but essentially improves eat street food hugely
-    //                 // createEatForeignSpecialties() //req social unlock, same as previous but much later in the game. Idea is it's harder to meet foreigners to know their secrets, and also they aren't here as often so the shops don't establish word of mouth much.
-    //
-    //             createEatQualityFood(-120, 360, ["eatNutritionalFood"])
-    //                 createEatNutritionalFood(-120, 360)
-    //                 // createEnjoyATreat()
-    //             createEnjoyUpscaleFood(-120, 360)
-    //                 //todo types of fancy food
-    //             // createBuyPersonalChef()
-    //         createBuyPractical(450, 190, ["buyTransportation", "buyKnowledge", "buyMaterials", "buyItems"]);
-    //             createBuyTransportation(400, 0); //carriage to help clearing the roads to building new ones
-    //             createBuyKnowledge(400, 400, ["buyBooks", "buyMaps"]);
-    //                 createBuyBooks(400, 400);
-    //                 createBuyMaps(400, 400);
-    //             createBuyMaterials(400, 400);
-    //             createBuyItems(400, 400, ["buyGear", "buyUtilityMagicItems"]);
-    //                 createBuyGear(400, 400);
-    //                 createBuyUtilityMagicItems(400, 400); //
-    //         createBuyInvestments(380, 510, ["buyHousing", "putInSavings"]);
-    //             createBuyHousing(400, 400);
-    //             createPutInSavings(400, 400, ["generateInterest"]); //creates a new resource 'savings', which creates 'interest'
-    //                 createGenerateInterest(400, 400,["pullInterest"]); //creates interest
-    //                     createPullInterest(400, 400); //converts interest to money
-    //
-    //
-    //
-    //     createBasicLabor(-450, 400, ["maid", "stableHand", "fieldWork", "fish", "mining", "skilledLabor"]);
-    //         createMaid(-50, -200);
-    //         createStableHand(-300, -40); //-> empathize <- ask about problems? talk with beggars?
-    //         createFieldWork(-370, 150);
-    //         createFish(300, 190);
-    //         createMining(-50, 420);
-    //         createSkilledLabor(-600, 600, ["scribe", "baker", "runAStall", "tailor", "blacksmith", "advancedLabor"]);
-    //             createScribe(-50, -200);
-    //             createBaker(-300, -40);
-    //             createRunAStall(-370, 150);
-    //             createTailor(-50, 420);
-    //             createBlacksmith(300, 190);
-    //             createAdvancedLabor(-600, 600, ["musician", "guard", "offerServices"]);
-    //                 createMusician(-50, -200);
-    //                 createGuard(-300, -40);
-    //                 // createOfferServices();
-    //                 //     createTutorNobles();
-    //
-    //
-    //
-    //
-    // createSocialize(-340, -270, ["strategicFriendship"], ["culturalImmersion"]);
 
     /*
     Section works through people
@@ -319,56 +296,7 @@ function initializeData() {
 */
 
 
-                //createSports, createSportsBetting
-    //TODO GAMEPLAY
-    /*
-    spend money should level faster, and start to help out overclock. The level requirements climb moderately.
-    spend money has options for where to send money, either to:
-        - eat food (street food and up)
-        - buy basic needs (hygiene, clothing)
-    early game will be about focusing money and alternating between improving food or basic needs
-    eat food & buy basic needs actions will have same values, and both reduce exp needed to overclock by 5%. Both increase in level exp req by 10x, and are staggered with an initial x2. They also have level caps, and the sub nodes increase the level caps
-    */
 
-    //todo formula / gain
-
-    //as a general goal, keep the base numbers of the actions similar. you want the player to be able to compare the effectiveness of upgrades
-
-    //on upgrade: x.99 Overclock level exp requirement
-    //on upgrade: -1 Overclock progress completion requirement
-
-    //on level up:+.1 strength
-    //+.2 control
-
-    //Modified by:
-    //<action> | 15 overclock requirement
-    //*1.2 exp | wisdom bonus
-
-    //tag system
-    //stats are attached to the tags
-    //tags are attached to the actions
-
-    //TODO ENGINE STUFF
-    //set max level of action, and it no longer gains progress after that level
-    //unlock requires [momentum] cost of the action above it, and also unlockStats
-    //show the stats it gets improved by/stats it improves as icons surrounding the action
-    //unlock based on level requirement of previous action
-    //each level has a different name / different effect. Requires "total effects" section
-
-
-    //TODO Add mana to gather mana
-    //TODO create the resources and have them start moving downstream
-
-    //TODO fill in the more methods
-    //method to draw lines
-    //TODO Minimap lol
-
-    //TODO create links that re-center the map on what you clicked, so you can go up and down the chain
-
-    //TODO clicking the title centers the x, y
-    //TODO button for parent
-
-    //TODO lategame idea: create a "view" with the stats and their graphs over the course of a run, to be able to more easily compare. Auto-run recent, and compare to loadouts also
 
     data.actionNames.forEach(function(actionVar) {
         if(!data.actions[actionVar].downstreamVars) {
@@ -383,87 +311,8 @@ function initializeData() {
     });
 
 
-
-    //Formula brainstorming
-    /*
-    progress -> completions
-    exp -> levels
-    levels increase progress req, but give X
-
-    the rate of progress is controllable by spending resources, so you don't want a situation where it's worthwhile to save and then spend
-    if you change the amount of exp or reduce level reqs, then it would be worthwhile to save the resources until you've maximized exp - to be avoided
-    if you increase reduce progress amount requirements, it also is worthwhile to save momentum until you've reduced maximally - to be avoided
-    in order to keep momentum being spent everywhere equally, just the time it takes to get there (and the tax along the way), the other variables cannot be altered after the game has started
-    only alter those after the game has finished
-
-    can't avoid making saving resources be worth it, so make it worthwhile to keep spending resources
-
-
-    X could be:
-        -reducing progress req of a different action
-        -3rd party resource
-
-    alternatively, let it be uncontrolled, and have momentum affect something besides progress gain ?
-
-
-    have to flip it around from a negative to a positive w/o changing the equation
-    so from reducing exp costs to multiplying gains
-
-
-
-    how do i want it to be, thematically?
-    momentum gets the action up to speed and chugs it along every-increasingly, with the chug getting higher req over time to prevent instant gain
-    the result is a slow but steady and powerful upgrade that increases over time
-    bonuses come from levels
-
-
-    FIXes:
-        feedback loop - each one will improve the other in some ways, or the downstream effects will, which means optimal strategy is to push both hard, not save
-        instead of improving each other, A and B both improve C
-        resource splitting
-        game reacts to splitting focus with arbitrary bonuses
-        desire to initiate a growth period in a resource before moving on
-
-    */
-
-
-    setRealCoordinates('overclock');
-
-    data.actionNames.forEach(function (actionVar) { //wait until they are all created to link downstreams
-        generateActionDisplay(actionVar);
-    })
-    initializeToasts();
-    generateLinesBetweenActions();
-    updateAllActionStatMults();
-    actionTitleClicked(`overclock`);
-    initializeMenu();
 }
 
-//will always be run once from the top action (TODO per page)
-function setRealCoordinates2(actionVar) {
-    let action = data.actions[actionVar];
-    if (action.parent && data.actions[action.parent]) {
-        // Get parent action
-        let parentAction = data.actions[action.parent];
-
-        // Set the action's realX and realY based on its parent's coordinates
-        action.realX = parentAction.realX + action.x;
-        action.realY = parentAction.realY + action.y;
-    } else {
-        // If there is no parent (i.e., this is the "overclock" action), set realX and realY to its own x and y
-        action.realX = action.x;
-        action.realY = action.y;
-    }
-
-    // Recursively set realX and realY for downstream actions
-    if (action.downstreamVars) {
-        action.downstreamVars.forEach(downstreamVar => {
-            if (data.actions[downstreamVar]) {
-                setRealCoordinates(downstreamVar);
-            }
-        });
-    }
-}
 let check = 0;
 //Add all action.downstreamVars.forEach(downstreamVar variables to a list
 //Repeat until the list is empty:

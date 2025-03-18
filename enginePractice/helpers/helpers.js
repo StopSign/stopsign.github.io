@@ -38,13 +38,7 @@ function formatNumber(num) {
 }
 
 function formatTime(seconds) {
-    if (Number.isInteger(seconds)) {
-        return (formatNumber(seconds) + _txt("time_controls>seconds")).replace(/\B(?=(\d{3})+(?!\d))/gu, ",");
-    }
-    if (seconds < 10) {
-        return seconds.toFixed(2) + _txt("time_controls>seconds");
-    }
-    return (seconds.toFixed(1) + _txt("time_controls>seconds")).replace(/\B(?=(\d{3})+(?!\d))/gu, ",");
+    secondsToTime(seconds);
 }
 
 function copyArray(arr) {
@@ -123,7 +117,11 @@ function intToString(value, amount) {
     let isNeg = value < 0;
     value *= isNeg ? -1 : 1;
     if (value >= 10000) {
-        return (isNeg?"-":"")+nFormatter(value, 3);
+        if(data.numberType === "engineering") {
+            return (isNeg ? "-" : "") + nFormatter(value, 3);
+        } else if(data.numberType === "scientific") {
+            return (isNeg?"-":"") + value.toExponential(2);
+        }
     }
     if (value >= 1000) { //1000 - 10000, should be 6,512 (.1) - 1 if base is > 2
         if(amount >= 2) {
@@ -132,13 +130,16 @@ function intToString(value, amount) {
             baseValue = 0;
         }
         const returnVal = parseFloat(value).toFixed(baseValue);
-        return (isNeg?"-":"")+`${returnVal[0]},${returnVal.substring(1)}`;
+        return (isNeg?"-":"") + `${returnVal[0]},${returnVal.substring(1)}`;
     }
     if(value < 1) {
-        return (isNeg?"-":"")+parseFloat(value).toPrecision(baseValue);
+        if(value < .0001) {
+            return (isNeg?"-":"") + value.toExponential(3);
+        }
+        return (isNeg?"-":"") + parseFloat(value).toPrecision(baseValue);
     }
 
-    return (isNeg?"-":"")+parseFloat(value).toFixed(baseValue - 1);
+    return (isNeg?"-":"") + parseFloat(value).toFixed(baseValue - 1);
 }
 
 
@@ -149,9 +150,27 @@ function intToStringRound(value) {
     return Math.floor(value);
 }
 
+function secondsToTime(seconds) {
+    if(!seconds) {
+        seconds = 0;
+    }
+    const hours = Math.floor(seconds / 3600);
+    const remainder = seconds % 3600;
+    const minutes = Math.floor(remainder / 60);
+    const secs = remainder % 60;
+
+    if (hours > 0) {
+        // If 60 minutes or more, use "hh:mm:ss"
+        return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+    } else {
+        // Otherwise, use "m:ss"
+        return `${minutes}:${String(secs).padStart(2, '0')}`;
+    }
+}
+
 function toSuffix(value) {
     value = Math.round(value);
-    const suffixes = ["", "K", "M", "B", "T", "Qa", "Qi", "Sx", "Sp", "O", "N", "Dc", "Ud", "Dd", "Td", "qd", "Qd", "sd", "Sd", "Od", "Nd", "V"];
+    const suffixes = ["", "k", "m", "b", "t", "Qa", "Qi", "Sx", "Sp", "o", "n", "Dc", "Ud", "Dd", "Td", "Qid", "Qad", "sd", "Sd", "Od", "Nd", "V"];
     const suffixNum = Math.floor(((String(value)).length - 1) / 3);
     let shortValue = parseFloat((suffixNum === 0 ? value : (value / Math.pow(1000, suffixNum))).toPrecision(3));
     if (shortValue % 1 !== 0) shortValue = shortValue.toPrecision(3);
@@ -200,6 +219,9 @@ function decamelize(str) {
         .replace(/^./, first => first.toUpperCase());
 }
 
+function decamelizeWithSpace(str) {
+    return str.replace(/([a-z])([A-Z])/g, '$1 $2').replace(/\b\w/g, char => char.toUpperCase());
+}
 
 function camelize(str) {
     return str.replace(/(?:^\w|[A-Z]|\b\w|\s+)/gu, (match, index) => {
