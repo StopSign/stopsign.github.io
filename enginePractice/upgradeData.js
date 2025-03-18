@@ -52,7 +52,7 @@ function buyUpgrade(upgradeVar, num) {
 
 function createInfoText(upgradeVar, num) {
     let upgrade = data.upgrades[upgradeVar];
-    return upgrade.customInfo(num) +
+    return actionData.upgrades[upgradeVar].customInfo(num) +
         "<br><span style='font-size:14px'>Cost: <b>" + calcUpgradeCost(upgrade, num) + "</b></span>";
 }
 

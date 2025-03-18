@@ -6,7 +6,7 @@ function clearSave() { //Doesn't work atm
 function load() {
     initializeData();
 
-    let isLoadingEnabled = false; //TODO SET FALSE FOR CLEARING SAVE
+    let isLoadingEnabled = true; //TODO SET FALSE FOR CLEARING SAVE
     /* Loading:
         * The round that the player is running should stay the same when the player loads, even if the underlying actionData has been updated
         * This is not true for upgradeData - take fresh actionData.upgrade copies and add toLoad data on top
@@ -19,33 +19,46 @@ function load() {
 
     if(isLoadingEnabled && window.localStorage[saveName] && JSON.parse(window.localStorage[saveName]).data) { //has a save file
         toLoad = JSON.parse(window.localStorage[saveName]).data;
-        console.log(toLoad)
-        //TODO apply toLoad.data.actions to data.actions selectively
         data.actionNames.forEach(function (actionVar) {
+            let actionObj = data.actions[actionVar];
             Object.keys(toLoad.actions[actionVar]).forEach(function (key) {
                 if(["x", "y"].indexOf(key) !== -1) {
                     return;
                 }
-                if (typeof toLoad.actions[actionVar][key] !== 'function' && typeof data.actions[actionVar][key] !== 'function') {
-                    data.actions[actionVar][key] = toLoad.actions[actionVar][key];
+                if (typeof toLoad.actions[actionVar][key] !== 'function' && typeof actionObj[key] !== 'function') {
+                    actionObj[key] = toLoad.actions[actionVar][key];
                 }
             });
-            // let curAction = data.actions[actionVar]; //only needed if for some reason i don't want to overload something
-            // let prevAction = toLoad.actions[actionVar];
-            // curAction.progress = prevAction.progress;
 
         })
         data.statNames.forEach(function (statVar) {
             data.stats[statVar] = toLoad.stats[statVar];
-            // let curStat = data.stats[statVar]; //only needed if for some reason i don't want to overload something
-            // let prevStat = toLoad.stats[statVar];
-            // curStat.num = prevStat.num;
-            // curStat.mult = prevStat.mult;
         })
+        data.toastStates = toLoad.toastStates ? toLoad.toastStates : [];
+        data.gameState = toLoad.gameState ? toLoad.gameState : "default";
+        data.totalMomentum = toLoad.totalMomentum ? toLoad.totalMomentum : 0;
+        data.essence = toLoad.essence ? toLoad.essence : 0;
+        data.useAmuletButtonShowing = !!toLoad.useAmuletButtonShowing;
+        data.secondsPerReset = toLoad.secondsPerReset ? toLoad.secondsPerReset : 0;
+        data.currentJob = toLoad.currentJob ? toLoad.currentJob : "Helping Scott";
+        data.currentWage = toLoad.currentWage ? toLoad.currentWage : 1;
+        data.numberType = toLoad.numberType ? toLoad.numberType : "engineering";
+        data.upgrades = toLoad.upgrades;
     }
 
-    // initializeDisplay();
-    // recalcInterval(50);
+    initializeDisplay();
+
+    //set UI elements after both data and UI have been loaded
+    //set sliders
+    data.actionNames.forEach(function (actionVar) {
+        let actionObj = data.actions[actionVar];
+        actionObj.downstreamVars.forEach(function (downVar) {
+            if (!document.getElementById(actionVar + "NumInput" + downVar) || toLoad.actions[actionVar]["downstreamRate" + downVar] === undefined) {
+                return;
+            }
+            setSliderUI(actionVar, downVar, toLoad.actions[actionVar]["downstreamRate" + downVar]);
+        });
+    });
 }
 
 function save() {

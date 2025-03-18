@@ -25,7 +25,7 @@ prevState.res = {};
 prevState.actions = {};
 prevState.stats = {};
 
-//Game globals
+//Game globals - these initializations will be overriden in load
 let data = {};
 data.actions = {};
 data.actionNames = [];
@@ -311,7 +311,6 @@ function initializeData() {
     });
 
 
-    initializeDisplay();
 }
 
 let check = 0;
