@@ -25,13 +25,10 @@
 </div>
 
 <div class="button" style="position:absolute;left:25px;top:25px;padding:10px;font-size:16px;" onclick="clickMenuButton()">Menu</div>
-<div class="button" style="position:absolute;left:200px;top:25px;padding:10px;font-size:16px;" id='pauseButton' onclick="pauseGame()">Pause</div>
-<div class="button" style="position:absolute;left:380px;top:25px;padding:10px;font-size:16px;display:none;" id='killTheLichMenuButton' onclick="openKTLMenu()">Kill the Lich!</div>
-<div class="button" style="position:absolute;left:380px;top:25px;padding:10px;font-size:16px;display:none;" id='openUseAmuletButton' onclick="openUseAmuletMenu()">Use the Amulet!</div>
-<div id="cheatButtons">
-    <div class="button" style="position:absolute;left:280px;top:25px;padding:10px;font-size:16px;" id='cheatButton' onclick="increaseGamespeed()">x2</div>
-    <div class="button" style="position:absolute;left:325px;top:25px;padding:10px;font-size:16px;" onclick="resetGamespeed()">=1</div>
-</div>
+<div class="button" style="position:absolute;left:100px;top:25px;padding:10px;font-size:16px;" id='pauseButton' onclick="pauseGame()">Pause</div>
+<div class="button" style="position:absolute;left:190px;top:25px;padding:10px;font-size:16px;display:none;" id='killTheLichMenuButton' onclick="openKTLMenu()">Kill the Lich!</div>
+<div class="button" style="position:absolute;left:190px;top:25px;padding:10px;font-size:16px;display:none;" id='openUseAmuletButton' onclick="openUseAmuletMenu(true)">Use the Amulet!</div>
+<div class="button" style="position:absolute;left:380px;top:25px;padding:10px;font-size:16px;display:none;" id='openViewAmuletButton' onclick="openUseAmuletMenu(false)">View Amulet Upgrades!</div>
 <div id="helpMenuContainer"></div>
 
 
@@ -78,14 +75,16 @@ After the unlock, a new button opens up - Use Amulet. This opens the reset menu 
         <div class="menuTitle" style="font-size:12px;text-align:center;">As you lay dying, your last thoughts are recorded by the amulet:<br><span style="font-size:16px;"><b>IF ONLY I COULD JUST...</b></span></div>
         <div class="menuSeparator"></div>
         <div id="amuletUpgrades" class="dynamicContent"></div>
-        <div class="menuSeparator"></div>
-        It is recommended to spend your essence before you start a new life.<br>
-        <input type="checkbox" id="amuletConfirm"><label for="amuletConfirm">Confirm</label>
-        <button class="continueButton" onclick="useAmulet()">Start Again</button>
-        <div id="infoMenu" style="position:absolute;width:300px;top:150px;right:100%;display:none;background:var(--bg-secondary);border-radius:20px;border:2px solid #00cd41;padding:10px 0;">
-            <div class="menuTitle" style="margin:auto;display:block;">Info Box</div>
-            <div id="infoText">lorem ipsum or whatever</div>
-            <div class='button' onclick='buyUpgrade(selectedUpgrade.var, selectedUpgrade.num)' style="width:40%;padding:5px;font-size:14px;margin: 5px auto auto;">Buy</div>
+        <div id="amuletEnabledContainer">
+            <div class="menuSeparator"></div>
+            It is recommended to spend your essence before you start a new life.<br>
+            <input type="checkbox" id="amuletConfirm"><label for="amuletConfirm">Confirm</label>
+            <button class="continueButton" onclick="useAmulet()">Start Again</button>
+            <div id="infoMenu" style="position:absolute;width:300px;top:150px;right:100%;display:none;background:var(--bg-secondary);border-radius:20px;border:2px solid #00cd41;padding:10px 0;">
+                <div class="menuTitle" style="margin:auto;display:block;">Info Box</div>
+                <div id="infoText">lorem ipsum or whatever</div>
+                <div class='button' id='infoTextButton' onclick='buyUpgrade(selectedUpgrade.var, selectedUpgrade.num)' style="width:40%;padding:5px;font-size:14px;margin: 5px auto auto;">Buy</div>
+            </div>
         </div>
     </div>
 </div>

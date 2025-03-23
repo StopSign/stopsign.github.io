@@ -15,7 +15,7 @@ function processKeyQueue() {
 }
 
 let keysPressed = {}; // Track multiple keys
-let movementStep = 10; // Movement speed
+let movementStep = 30; // Movement speed
 let animationFrameId;
 
 // Track keys being pressed
@@ -35,24 +35,22 @@ document.addEventListener("keyup", function(e) {
 
 // Movement function using requestAnimationFrame
 function moveActionContainer() {
-    let currentTop = parseInt(actionContainer.style.top || 0);
-    let currentLeft = parseInt(actionContainer.style.left || 0);
 
     let keyPressed = false;
     if (keysPressed['w']) { // Move up
-        currentTop = Math.min(currentTop + movementStep, 0);
+        transformY += movementStep
         keyPressed = true;
     }
     if (keysPressed['a']) { // Move left
-        currentLeft = Math.min(currentLeft + movementStep, 0);
+        transformX += movementStep
         keyPressed = true;
     }
     if (keysPressed['s']) { // Move down
-        currentTop = Math.max(currentTop - movementStep, windowElement.offsetHeight - actionContainer.offsetHeight);
+        transformY -= movementStep
         keyPressed = true;
     }
     if (keysPressed['d']) { // Move right
-        currentLeft = Math.max(currentLeft - movementStep, windowElement.offsetWidth - actionContainer.offsetWidth);
+        transformX -= movementStep
         keyPressed = true;
     }
     if(!keyPressed) {
@@ -60,7 +58,7 @@ function moveActionContainer() {
     }
 
     // Apply the new position
-    actionContainer.style.transform = `translate(${currentLeft}px, ${currentTop}px)`;
+    actionContainer.style.transform = `translate(${transformX}px, ${transformY}px) scale(${scale})`;
 
     forceRedraw(windowElement);
 

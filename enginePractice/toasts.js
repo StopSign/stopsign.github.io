@@ -13,7 +13,7 @@ function initializeToasts() {
         "Welcome! Click Here for Info!",
         "Welcome to the game! These messages will serve as the tutorial, so " +
         "make sure to click these popups and read them for information, and only delete them with X when you're ready. Feel free to ignore the messages " +
-        "and learn by watching instead.<b>Open the next message.</b><br>TODO You can access them again in the Menu -> Messages screen.");
+        "and learn by watching instead.<b>Open the next message.</b><br>When you close them, you can access them again in the Menu -> Previous Tips.");
     createToast(function() { return toastIsClicked(0); },
         "Controls to Move Around",
         "Click/right click and drag to move the game window. WASD also. " +

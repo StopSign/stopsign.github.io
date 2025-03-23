@@ -20,10 +20,10 @@ function getStatColor(statName) {
     });
 
     if(statAddedTo && statUsed) {
-        return "var(--text-primary)";
+        return "var(--success-color)";
     }
     if(statAddedTo && !statUsed) {
-        return "var(--success-color)";
+        return "var(--text-primary)";
     }
     if(!statAddedTo && statUsed) {
         return "var(--accent-primary)";

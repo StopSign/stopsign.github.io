@@ -335,18 +335,15 @@ function generateAmuletContent() {
         let upgrade = data.upgrades[upgradeVar];
 
         // Start a new row for each upgrade
-        amuletContent += "<div style='margin-bottom:10px;'>";
+        amuletContent += "<div id='"+upgradeVar+"Container' style='margin-bottom:10px;'>";
         amuletContent += "<div style='width:100%;font-size:16px;margin-bottom:5px;'>..." + decamelize(upgradeVar) + "</div>";
 
         // Generate buttons for available upgrades
         for (let i = 0; i < upgrade.upgradesAvailable; i++) {
-            let isBought = upgrade.upgradesBought.includes(i);
-            let backgroundColor = isBought ? "#808080" : "#d3d3d3"; // Darker grey if purchased
-            let textColor = isBought ? "#ffffff" : "#000000";
             let id = upgradeVar+"Button"+i;
             let cost = intToString(calcUpgradeCost(upgrade, i),1);
             amuletContent += "<button class='upgradeButton' id='"+id+"'" +
-                " style='background:" + backgroundColor + "; color:" + textColor + ";'" +
+                " style='background:var(--upgrade-color); color:black;'" +
                 " onClick='selectBuyUpgrade(\"" + upgradeVar + "\", " + i + ")'><b>" +
                 cost +
                 "</b></button>";
@@ -376,6 +373,7 @@ function setSingleCaches() {
     view.cached.totalMomentum2 = document.getElementById("totalMomentum2");
     view.cached.secondsPerReset = document.getElementById("secondsPerReset");
     view.cached.openUseAmuletButton = document.getElementById("openUseAmuletButton");
+    view.cached.openViewAmuletButton = document.getElementById("openViewAmuletButton");
     view.cached.essence = document.getElementById("essence");
     view.cached.essence2 = document.getElementById("essence2");
     view.cached.killTheLichMenu = document.getElementById("killTheLichMenu");

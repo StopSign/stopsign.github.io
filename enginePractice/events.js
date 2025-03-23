@@ -262,17 +262,17 @@ function clickMenuButton() {
 
 let selectedStat = null;
 function clickedStatName(statName) {
-    let theDiv = view.cached[statName+"Name"];
-
-    //set all borders to black
+    //clear all borders
     data.actionNames.forEach(function(actionVar) {
-        if(view.cached[actionVar+"Container"].style.borderColor !== "black") {
-            view.cached[actionVar + "Container"].style.borderColor = "black";
+        if(view.cached[actionVar+"LargeVersionContainer"].style.borderColor !== "black") {
+            view.cached[actionVar + "LargeVersionContainer"].style.borderColor = "black";
+            view.cached[actionVar + "SmallVersionContainer"].style.border = "";
         }
     })
+
     //clear previous
     if(selectedStat) {
-        view.cached[selectedStat + "Name"].style.border = "";
+        view.cached[selectedStat + "StatContainer"].style.border = "";
     }
     if(selectedStat === statName) {
         //clicked the same, so clear and return
@@ -280,9 +280,9 @@ function clickedStatName(statName) {
         return;
     }
 
-    //set new
+    let theDiv = view.cached[statName+"StatContainer"];
     selectedStat = statName;
-    theDiv.style.border = "2px solid black";
+    theDiv.style.border = "2px solid var(--text-primary)";
     //Change the border colors of all actions that are relevant
     //for each action, for each statList, if this stat is found, set the boolean
     //var + "Container" .style.borderColor = getStatColor(statName);
@@ -309,15 +309,16 @@ function clickedStatName(statName) {
 
         let color = "black;"
         if(statFoundInUse && statFoundInGain) {
-            color = "blue";
+            color = "yellow";
         }
         if(statFoundInUse && !statFoundInGain) {
-            color = "orange";
+            color = "blue";
         }
         if(!statFoundInUse && statFoundInGain) {
             color = "green";
         }
-        view.cached[actionVar+"Container"].style.borderColor = color;
+        view.cached[actionVar+"LargeVersionContainer"].style.borderColor = color;
+        view.cached[actionVar + "SmallVersionContainer"].style.border = "2px solid "+color;
     });
 
 }

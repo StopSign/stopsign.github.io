@@ -20,6 +20,19 @@ function initializeMenus() {
     addMenuTextContainer("statistics", createStatisticsMenu());
     addMenuTextContainer("previousTips", "Close tips to fill this screen!");
     updatePreviousTipsMenu();
+
+
+    addMenuTab("cheat");
+    addMenuTextContainer("cheat", createCheatMenu());
+}
+
+function createCheatMenu() {
+    return "<div class='menuTitle'><s>Cheating</s> Developer Mode</div>" +
+        "<div class='menuSeparator'></div><br>" +
+        "<div class='button' style='width:150px;padding:10px;font-size:16px;' " +
+            "id='cheatButton' onClick='increaseGamespeed()'>x2 Game Speed</div>" +
+        "<div class='button' style='width:150px;padding:10px;font-size:16px;' " +
+            "onClick='resetGamespeed()'>Game Speed = 1</div>"
 }
 
 function createHelpMenu() {
@@ -60,12 +73,13 @@ function createOptionsMenu() {
          "id='lightModeButton' onClick='changeDarkMode()'>Change to Light Mode</div>" +
         "<div class='button' style='padding:10px;font-size:14px;width:200px;' " +
         "id='numberTypeButton' onClick='changeNumberType()'>Change numbers to scientific</div>" +
+        "<br>TODO set FPS<br>" +
         "<br><br>Auto save every 5 seconds, but if you want a button to click:<br>" +
         "<div class='button' style='padding:10px;font-size:14px;width:200px;' " +
         "onClick='save()'>Save</div><br><br>" +
         "<div class='button' style='padding:10px;font-size:14px;width:200px;' " +
         "onClick='exportSave()'>Export to clipboard</div><br><br>" +
-        "<label for='exportImportSave'>Put your save here to import: </label><input type='text' id='exportImportSave'><br>" +
+        "<label for='exportImportSave'>Put your save here to import (import a clear save to hard reset):<br></label><input type='text' id='exportImportSave'><br>" +
         "<input type='checkbox' id='confirmImportCheckbox'><label for='confirmImportCheckbox'>Confirm</label>" +
         "<div class='button' style='padding:10px;font-size:14px;width:200px;' " +
         "onClick='importSave()'>Import</div><br><br>";

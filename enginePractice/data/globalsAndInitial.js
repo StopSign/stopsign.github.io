@@ -14,7 +14,7 @@ let secondsPassed = 0;
 let bonusTime = 0;
 
 //Saving globals
-let isFileSystem = !!location.href.match("file");
+let isFileSystem = !!location.href.match("file") || !!location.href.match("localhost");
 let saveName = "save"; //Blank if you don't want to save
 
 let stop = false;
@@ -49,11 +49,12 @@ let statTitles = []; //[<title>, <stat name to be located above>]
 let language = "english";
 let globalVisible = false;
 let forceVisuals = false;
+let isLoadingEnabled = false; //SET FALSE FOR CLEARING SAVE
 
 
 data.upgrades = {};
 
-let isDebug = true;
+let isDebug = false;
 function debug() {
     if(!isDebug) {
         return;
@@ -64,7 +65,6 @@ function debug() {
     buyUpgrade("stopLettingOpportunityWait", 0);
     buyUpgrade("stopLettingOpportunityWait", 1);
     buyUpgrade("stopLettingOpportunityWait", 2);
-    buyUpgrade("stopLettingOpportunityWait", 3);
 
 }
 

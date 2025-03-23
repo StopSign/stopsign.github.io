@@ -10,12 +10,38 @@ function updateView() {
     data.actionNames.forEach(function(actionVar) {
         updateActionView(actionVar);
     });
+    for(let upgradeVar in data.upgrades) {
+        updateUpgradeView(upgradeVar);
+    }
     updateGlobals();
 
     saveCurrentViewState();
 
     //in case this was set
     forceVisuals = false;
+}
+
+function updateUpgradeView(upgradeVar) {
+    let isShowing = document.getElementById("useAmuletMenu").style.display !== "none";
+    if(!isShowing) {
+        return;
+    }
+    let upgrade = data.upgrades[upgradeVar];
+    document.getElementById(upgradeVar+"Container").style.display = upgrade.visible ? "" : "none";
+
+    for(let i = 0; i < upgrade.upgradesAvailable; i++) {
+        if(upgrade.upgradesBought.indexOf(i) !== -1) {
+            document.getElementById(upgradeVar + "Button" + i).style.background = "var(--upgrade-bought-color)";
+            document.getElementById(upgradeVar + "Button" + i).style.color = "black";
+        } else if(i === 0 || upgrade.upgradesBought.indexOf(i-1) !== -1) { //ready to buy
+            document.getElementById(upgradeVar + "Button" + i).style.background = "var(--upgrade-color)";
+            document.getElementById(upgradeVar + "Button" + i).style.color = "black";
+        } else {
+            document.getElementById(upgradeVar + "Button" + i).style.background = "var(--upgrade-disabled-color)";
+            document.getElementById(upgradeVar + "Button" + i).style.color = "white";
+        }
+    }
+
 }
 
 function updateGlobals() {
@@ -33,8 +59,13 @@ function updateGlobals() {
     }
 
     let toShowAmulet = data.useAmuletButtonShowing && data.gameState === "KTL" ? "" : "none";
+
     if(view.cached.openUseAmuletButton.style.display !== toShowAmulet) {
         view.cached.openUseAmuletButton.style.display = toShowAmulet;
+    }
+    let toViewAmulet = data.actions.overclock.highestLevel >= 0 && data.gameState !== "KTL" ? "" : "none";
+    if(view.cached.openViewAmuletButton.style.display !== toViewAmulet) {
+        view.cached.openViewAmuletButton.style.display = toViewAmulet;
     }
     if(view.cached.secondsPerReset.innerText !== secondsToTime(data.secondsPerReset)) {
         view.cached.secondsPerReset.innerText = secondsToTime(data.secondsPerReset);
@@ -367,10 +398,10 @@ function updateActionViewsForUpgrades(actionVar) {
     let prevAction = prevState.actions[actionVar];
     let forceUpdate = !prevAction || forceVisuals;
 
-    view.cached[actionVar+"HighestLevelContainer"].style.display = data.upgrades.rememberWhatIDid.isBought ? "" : "none";
-    view.cached[actionVar+"HighestLevelContainer2"].style.display = data.upgrades.rememberWhatIDid.isBought ? "" : "none";
-    view.cached[actionVar+"SecondHighestLevelContainer"].style.display = data.upgrades.rememberHowIGrew.isBought ? "" : "none";
-    view.cached[actionVar+"ThirdHighestLevelContainer"].style.display = data.upgrades.rememberMyMastery.isBought ? "" : "none";
+    view.cached[actionVar+"HighestLevelContainer"].style.display = data.upgrades.rememberWhatIDid.isFullyBought ? "" : "none";
+    view.cached[actionVar+"HighestLevelContainer2"].style.display = data.upgrades.rememberWhatIDid.isFullyBought ? "" : "none";
+    view.cached[actionVar+"SecondHighestLevelContainer"].style.display = data.upgrades.rememberHowIGrew.isFullyBought ? "" : "none";
+    view.cached[actionVar+"ThirdHighestLevelContainer"].style.display = data.upgrades.rememberMyMastery.isFullyBought ? "" : "none";
     if(forceUpdate || prevAction.prevUnlockTime !== actionObj.prevUnlockTime) {
         view.cached[actionVar + "PrevUnlockTimeContainer"].style.display = actionObj.prevUnlockTime ? "" : "none";
         view.cached[actionVar + "PrevUnlockTime"].innerText = secondsToTime(actionObj.prevUnlockTime);

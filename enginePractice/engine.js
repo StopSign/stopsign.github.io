@@ -38,7 +38,7 @@ function actionSetBaseVariables(actionObj, dataObj) {
     actionObj.expToLevel = actionObj.expToLevelBase * actionObj.expToLevelMult; //can be divided
     actionObj.expToAddBase = 1;
     actionObj.expToAddMult = 1;
-    actionObj.expToAdd = actionObj.expToAddBase * actionObj.expToAddMult * calcUpgradeMultToExp(actionObj);
+    actionObj.expToAdd = actionObj.expToAddBase * actionObj.expToAddMult;
     actionObj.generatorSpeed = dataObj.generatorSpeed ? dataObj.generatorSpeed : 1;
     actionObj.generatorTarget = dataObj.generatorTarget;
     actionObj.momentum = 0;
@@ -90,7 +90,7 @@ function actionSetInitialVariables(actionObj, dataObj) {
 
     //Vars that don't really need to be initalized but I like to know they're there
     actionObj.parent = null;
-    actionObj.highestLevel = null;
+    actionObj.highestLevel = -1;
     actionObj.prevUnlockTime = null;
 }
 
@@ -159,13 +159,13 @@ function actionProgressRate(actionObj) {
 
 function calcUpgradeMultToExp(actionObj) {
     let upgradeMult = 1;
-    if(data.upgrades.rememberWhatIDid.isBought && actionObj.level < actionObj.highestLevel) {
+    if(data.upgrades.rememberWhatIDid.isFullyBought && actionObj.level < actionObj.highestLevel) {
         upgradeMult *= 2;
     }
-    if(data.upgrades.rememberHowIGrew.isBought && actionObj.level < actionObj.secondHighestLevel) {
+    if(data.upgrades.rememberHowIGrew.isFullyBought && actionObj.level < actionObj.secondHighestLevel) {
         upgradeMult *= 2;
     }
-    if(data.upgrades.rememberMyMastery.isBought && actionObj.level < actionObj.thirdHighestLevel) {
+    if(data.upgrades.rememberMyMastery.isFullyBought && actionObj.level < actionObj.thirdHighestLevel) {
         upgradeMult *= 2;
     }
     return upgradeMult;

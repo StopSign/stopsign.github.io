@@ -1,12 +1,11 @@
-function clearSave() { //Doesn't work atm
+function clearSave() {
     window.localStorage[saveName] = "";
-    load();
+    location.reload();
 }
 
 function load() {
     initializeData();
 
-    let isLoadingEnabled = true; //TODO SET FALSE FOR CLEARING SAVE
     /* Loading:
         * The round that the player is running should stay the same when the player loads, even if the underlying actionData has been updated
         * This is not true for upgradeData - take fresh actionData.upgrade copies and add toLoad data on top
@@ -53,7 +52,9 @@ function load() {
     data.actionNames.forEach(function (actionVar) {
         let actionObj = data.actions[actionVar];
         actionObj.downstreamVars.forEach(function (downVar) {
-            if (!document.getElementById(actionVar + "NumInput" + downVar) || toLoad.actions[actionVar]["downstreamRate" + downVar] === undefined) {
+            if (!document.getElementById(actionVar + "NumInput" + downVar)
+                || !toLoad.actions || !toLoad.actions[actionVar] ||
+                toLoad.actions[actionVar]["downstreamRate" + downVar] === undefined) {
                 return;
             }
             setSliderUI(actionVar, downVar, toLoad.actions[actionVar]["downstreamRate" + downVar]);
@@ -80,6 +81,10 @@ function exportSave() {
 
 function importSave() {
     if(!document.getElementById('confirmImportCheckbox').checked) {
+        return;
+    }
+    if(!document.getElementById("exportImportSave").value.trim()) {
+        clearSave();
         return;
     }
     window.localStorage[saveName] = decode(document.getElementById("exportImportSave").value);

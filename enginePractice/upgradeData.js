@@ -24,9 +24,21 @@ function selectBuyUpgrade(upgradeVar, num) {
     document.getElementById(upgradeVar+"Button"+num).style.border = "4px solid #ffae00";
     document.getElementById("infoText").innerHTML = createInfoText(upgradeVar, num);
     document.getElementById("infoMenu").style.display = "inline-block";
+
+    if(data.upgrades[upgradeVar].upgradesBought.indexOf(num) !== -1) { //bought
+        document.getElementById("infoMenu").style.borderColor = "#c3cd00";
+        document.getElementById("infoTextButton").style.display = "none";
+    } else if(num === 0 || data.upgrades[upgradeVar].upgradesBought.indexOf(num-1) !== -1) { //ready
+        document.getElementById("infoMenu").style.borderColor = "#00cd41";
+        document.getElementById("infoTextButton").style.display = "";
+    } else { //disabled
+        document.getElementById("infoMenu").style.borderColor = "#ff0000";
+        document.getElementById("infoTextButton").style.display = "none";
+    }
 }
 
 function buyUpgrade(upgradeVar, num) {
+    //also deselect the upgrade
     let upgrade = data.upgrades[upgradeVar];
 
     if(upgrade.upgradesBought.indexOf(num) !== -1) { //already bought
@@ -45,9 +57,11 @@ function buyUpgrade(upgradeVar, num) {
     }
     upgrade.upgradePower++; //num bought per row
     if(upgrade.upgradesBought.length === upgrade.upgradesAvailable) {
-        upgrade.isBought = true; //cleared the row
+        upgrade.isFullyBought = true; //cleared the row
     }
-    document.getElementById(upgradeVar+"Button"+num).style.background = "#00ff39";
+    if(selectedUpgrade.var) { // <- allow buy on load
+        selectBuyUpgrade(selectedUpgrade.var, selectedUpgrade.num); //deselect
+    }
 }
 
 function createInfoText(upgradeVar, num) {
@@ -71,10 +85,8 @@ function createUpgrades() {
         upgradeObj.upgradesBought = []; //e.g. bought first and fifth upgrade and it would be [0,4]. Not used atm.
         upgradeObj.requireInOrder = dataObj.requireInOrder !== undefined ? dataObj.requireInOrder : true;
         upgradeObj.customInfo = dataObj.customInfo;
-        upgradeObj.highestLevel = -1;
-        upgradeObj.secondHighestLevel = -1;
-        upgradeObj.thirdHighestLevel = -1;
-        upgradeObj.isBought = false;
+        upgradeObj.isFullyBought = false;
+        upgradeObj.visible = !!dataObj.visible;
     }
 }
 
@@ -82,6 +94,7 @@ actionData.upgrades = {
     rememberWhatIDid: {
         initialCost:5, costIncrease:1,
         upgradesAvailable:1,
+        visible:true,
         customInfo: function(num) {
             return "On each action, get 2x exp as long as the action's level is lower than the highest level ever reached." +
                 "The highest level achieved will be displayed.";
@@ -90,6 +103,7 @@ actionData.upgrades = {
     stopLettingOpportunityWait: {
         initialCost:5, costIncrease:3,
         upgradesAvailable:4,
+        visible:true,
         customInfo: function(num) {
             return `When unlocking a new action, auto sets the new downstream sliders to ` +
             `${["1%.", "10%.", "100%.", "not reset with an amulet reset, and for previously undiscovered sliders to be set at 100%."][num]}`;
@@ -98,6 +112,7 @@ actionData.upgrades = {
     tryALittleHarder: {
         initialCost:10, costIncrease:1.1,
         upgradesAvailable:5,
+        visible:true,
         customInfo: function(num) {
             return "Motivation generation on Overclock raise to " +((num+1)*20)+ "/s.";
         }
@@ -105,6 +120,7 @@ actionData.upgrades = {
     createABetterFoundation: {
         initialCost:10, costIncrease:2,
         upgradesAvailable:3,
+        visible:true,
         customInfo: function(num) {
             return "Motivation generation increased by "+(num >0?"another ":"")+"x2";
         }
@@ -112,30 +128,33 @@ actionData.upgrades = {
     buyNicerStuff: { //unlock market/equipment/houses
         initialCost:11, costIncrease:1,
         upgradesAvailable:1,
+        visible:true,
         customInfo: function(num) {
             return "Unlock new actions!<br>Story: My armor is broken, my sword shattered, my shield is in pieces. The army " +
                 "did not expect me to fight this long, and their preparation was lacking.<br><br>I must take this into my own hands.";
         }
     },
-    makeMoreMoney: { //unlock jobs/market/equipment
-        initialCost:11, costIncrease:1,
-        upgradesAvailable:1,
+    makeMoreMoney: {
+        initialCost:12, costIncrease:2,
+        upgradesAvailable:4,
+        visible:true,
         customInfo: function(num) {
-            return "Unlock new actions!<br>Story: My armor is broken, my sword shattered, my shield is in pieces. The army " +
-                "did not expect me to fight this long, and their preparation was lacking.<br><br>I must take this into my own hands.";
+            return "Gold generation increased by "+(num >0?"another ":"")+"x2";
         }
     },
     rememberHowIGrew: {
-        initialCost:100, costIncrease:1,
+        initialCost:50, costIncrease:1,
         upgradesAvailable:1,
+        visible:true,
         customInfo: function(num) {
             return "On each action, get 2x exp as long as the action's level is lower than the second highest level ever reached." +
                 "The second highest level achieved will be displayed.";
         }
     },
     rememberMyMastery: {
-        initialCost:1000, costIncrease:1,
+        initialCost:200, costIncrease:1,
         upgradesAvailable:1,
+        visible:true,
         customInfo: function(num) {
             return "On each action, get 2x exp as long as the action's level is lower than the third highest level ever reached." +
                 "The third highest level achieved will be displayed.";
@@ -146,7 +165,7 @@ actionData.upgrades = {
         initialCost:40, costIncrease:1,
         upgradesAvailable:1,
         customInfo: function(num) {
-            return "Unlock new actions!<br>Story: My armor barely saved me when I was out of position. My shield disappeared " +
+            return "TODO / doesn't work<br>Unlock new actions!<br>Story: My armor barely saved me when I was out of position. My shield disappeared " +
                 "when I lost my footing. My sword frequently gets stuck and leaves my grip. The problem is not only my equipment, but how I use it.";
         }
     },
