@@ -74,6 +74,9 @@ function initializeToasts() {
     createToast(function() { return data.actions.helpScottWithChores.level >= 3},
         "Help Scott with Chores 3", "Here's how to buy clothing and eat better food. Go do that. Future levels will increase remember's max level.");
 
+    createToast(function() { return true},
+        "CLOSED BETA", "This game is currently in a closed beta - this means please do not share the link with people, as I do not want the larger audience's first impression to be this version. This is for feedback purposes. Thank you.<br>-Stop_Sign");
+
     showAllValidToasts(); //ran automatically every second. Have to manually add it when you want faster
 }
 

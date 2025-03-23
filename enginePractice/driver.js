@@ -5,14 +5,14 @@ function startGame() {
         console.log('running locally');
         setInterval(tick, 1000/50);
     } else {
-        // setInterval(tick, 1000/50);
+        setInterval(tick, 1000/50);
 
-        window.doWork = new Worker('helpers/interval.js');
-        window.doWork.onmessage = function (event) {
-            if (event.data === 'interval.start') {
-                tick();
-            }
-        };
+        // window.doWork = new Worker('helpers/interval.js');
+        // window.doWork.onmessage = function (event) {
+        //     if (event.data === 'interval.start') {
+        //         tick();
+        //     }
+        // };
     }
 
     load();
@@ -20,7 +20,6 @@ function startGame() {
 
 //time-delta-based approach
 function tick() {
-    console.log('here');
     if(sudoStop) {
         return;
     }
