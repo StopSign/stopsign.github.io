@@ -24,11 +24,11 @@
     </div>
 </div>
 
-<div class="button" style="position:absolute;left:25px;top:25px;padding:10px;font-size:16px;" onclick="clickMenuButton()">Menu</div>
-<div class="button" style="position:absolute;left:100px;top:25px;padding:10px;font-size:16px;" id='pauseButton' onclick="pauseGame()">Pause</div>
-<div class="button" style="position:absolute;left:190px;top:25px;padding:10px;font-size:16px;display:none;" id='killTheLichMenuButton' onclick="openKTLMenu()">Kill the Lich!</div>
-<div class="button" style="position:absolute;left:190px;top:25px;padding:10px;font-size:16px;display:none;" id='openUseAmuletButton' onclick="openUseAmuletMenu(true)">Use the Amulet!</div>
-<div class="button" style="position:absolute;left:380px;top:25px;padding:10px;font-size:16px;display:none;" id='openViewAmuletButton' onclick="openUseAmuletMenu(false)">View Amulet Upgrades!</div>
+<div class="button" style="position:absolute;left:25px;top:25px;padding:10px;font-size:16px;color: var(--text-primary);" onclick="clickMenuButton()">Menu</div>
+<div class="button" style="position:absolute;left:100px;top:25px;padding:10px;font-size:16px;color: var(--text-primary);" id='pauseButton' onclick="pauseGame()">Pause</div>
+<div class="button" style="position:absolute;left:190px;top:25px;padding:10px;font-size:16px;display:none;color: var(--text-primary);" id='killTheLichMenuButton' onclick="openKTLMenu()">Kill the Lich!</div>
+<div class="button" style="position:absolute;left:190px;top:25px;padding:10px;font-size:16px;display:none;color: var(--text-primary);" id='openUseAmuletButton' onclick="openUseAmuletMenu(true)">Use the Amulet!</div>
+<div class="button" style="position:absolute;left:380px;top:25px;padding:10px;font-size:16px;display:none;color: var(--text-primary);" id='openViewAmuletButton' onclick="openUseAmuletMenu(false)">View Amulet Upgrades!</div>
 <div id="helpMenuContainer"></div>
 
 
@@ -147,12 +147,13 @@ It continues, capturing fraction essence of your fleeting soul and sending it in
     <span id="essenceDisplay" style="display:none">Total Essence: <b><span id="essence"></span></b></span>
 </div>
 
-<div id="statDisplay" style="position:absolute;margin:5px;top:115px;background-color:var(--overlay-color);color: var(--text-primary);">
-    <div style="width:106px;display:inline-block;font-style:italic">Stat</div>
-    <div style="width:46px;display:inline-block;font-style:italic">Amount</div>
-    <div style="width:48px;display:inline-block;font-style:italic">Bonus</div>
-    <div style="width:50px;display:inline-block;font-style:italic">Change/m</div>
+<div id="statDisplay" style="position:absolute;padding:10px;margin:5px;top:115px;background-color:var(--overlay-color);color: var(--text-primary);">
+    <div style="width:140px;display:inline-block;font-style:italic">Stat</div>
+    <div style="width:70px;display:inline-block;font-style:italic">Amount</div>
+    <div style="width:70px;display:inline-block;font-style:italic">Bonus</div>
+    <div style="width:70px;display:inline-block;font-style:italic">Change/min</div>
 </div>
+<div id="statDisplayHideButton" class="button" style="position:absolute;padding:5px;top:110px;left:388px;font-size:14px;color:var(--text-primary);" onclick="statMenuHideButton()"><<</div>
 
 
 <div class="button" style="position:absolute;left:5px;bottom:45px;padding:10px" id="zoomInButton">+</div>

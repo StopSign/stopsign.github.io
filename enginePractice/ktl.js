@@ -7,7 +7,7 @@ function openKTLMenu() {
 }
 
 function initializeKTL() {
-    if(!document.getElementById('confirmKTL').checked || data.totalMomentum < 1.1e6) {
+    if(!document.getElementById('confirmKTL').checked || (!isDebug && data.totalMomentum < 1.1e6)) {1
         return;
     }
     view.cached.killTheLichMenu.style.display = "none";
@@ -25,6 +25,9 @@ function initializeKTL() {
     view.cached.openUseAmuletButton.style.display = "";
     document.getElementById("essenceDisplay").style.display = "";
     forceVisuals = true;
+    if(data.doneKTL) {
+        data.useAmuletButtonShowing = true;
+    }
 }
 
 function openUseAmuletMenu(isUseable) {
@@ -39,6 +42,7 @@ function useAmulet() {
     if(!document.getElementById('amuletConfirm').checked) {
         return;
     }
+    data.doneKTL = true;
     document.getElementById("useAmuletMenu").style.display = "none";
     document.getElementById("openViewAmuletButton").style.display = "";
 
@@ -47,6 +51,8 @@ function useAmulet() {
         let statObj = data.stats[statName];
         statsSetBaseVariables(statObj);
     });
+
+    //set overclock to the upgrade-relevant %
 
     //For each action, reset the base stats and set max level
     data.actionNames.forEach(function(actionVar) {
@@ -73,11 +79,12 @@ function useAmulet() {
 
         actionObj.downstreamVars.forEach(function(downstreamVar) {
             if(data.actions[downstreamVar] && data.actions[downstreamVar].unlocked) {
-                setSliderUI(actionObj.actionVar, downstreamVar, 0);
+                setSliderUI(actionObj.actionVar, downstreamVar, getUpgradeSliderAmount());
             }
         });
     });
 
+    setSliderUI("overclock", "harnessOverflow", getUpgradeSliderAmount());
     data.secondsPerReset = 0;
     data.currentJob = "Helping Scott";
     data.currentWage = 1;

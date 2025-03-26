@@ -270,7 +270,6 @@ let actionData = {
         unlockCost:5, visible:false, unlocked:false,
         onUnlock:function() {
             unveilAction('makeMoney')
-            unveilAction('spendMoney')
             unveilAction('checkNoticeBoard')
         },
         onLevelCustom: function() {
@@ -316,7 +315,6 @@ let actionData = {
             }
             if(data.actions.checkNoticeBoard.level >= 2) {
                 unveilAction('socialize');
-                unveilAction('chat');
             }
             if(data.actions.checkNoticeBoard.level >= 3) {
                 unveilAction('reportForLabor')
@@ -587,6 +585,7 @@ let actionData = {
             document.getElementById('makeMoneyMomentumTaken').innerText = intToString(amount, 2);
         },
         onUnlock: function() {
+            unveilAction('spendMoney');
             document.getElementById("jobDisplay").style.display = "";
         },
         onLevelStats:[["negotiation", 1]],
@@ -682,6 +681,7 @@ let actionData = {
         },
         onUnlock: function() {
             // unveilAction('neighborlyTies');
+            unveilAction('chat');
             unveilAction('journal');
         },
         onLevelStats:[["charm", 1], ["recognition", 1]],

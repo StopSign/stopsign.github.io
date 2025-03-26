@@ -39,7 +39,7 @@ function actionSetBaseVariables(actionObj, dataObj) {
     actionObj.expToAddBase = 1;
     actionObj.expToAddMult = 1;
     actionObj.expToAdd = actionObj.expToAddBase * actionObj.expToAddMult;
-    actionObj.generatorSpeed = dataObj.generatorSpeed ? dataObj.generatorSpeed : 1;
+    actionObj.generatorSpeed = dataObj.generatorSpeed ? dataObj.generatorSpeed : 0;
     actionObj.generatorTarget = dataObj.generatorTarget;
     actionObj.momentum = 0;
     actionObj.momentumDelta = 0;
@@ -171,16 +171,8 @@ function calcUpgradeMultToExp(actionObj) {
     return upgradeMult;
 }
 
-function actionAddExp(actionObj) {
-    actionObj.exp += actionObj.expToAdd * calcUpgradeMultToExp(actionObj);
-    let dataObj = actionData[actionObj.actionVar];
-
-    let timesRun = 0;
-    while(actionObj.exp >= actionObj.expToLevel && (actionObj.maxLevel < 0 || (actionObj.level < actionObj.maxLevel))) {
-        if(timesRun++ > 10) {
-            console.log('too many levels at once ' + actionObj.actionVar + ', ' + timesRun);
-            break;
-        }
+function checkLevelUp(actionObj, dataObj) {
+    if(actionObj.exp >= actionObj.expToLevel && (actionObj.maxLevel < 0 || (actionObj.level < actionObj.maxLevel))) {
         actionObj.exp -= actionObj.expToLevel;
         actionObj.level++;
         actionObj.progressMaxBase *= actionObj.progressMaxIncrease;
@@ -202,6 +194,20 @@ function actionAddExp(actionObj) {
         });
         if(dataObj.onLevelCustom) {
             dataObj.onLevelCustom();
+        }
+        return true;
+    }
+    return false;
+}
+
+function actionAddExp(actionObj) {
+    actionObj.exp += actionObj.expToAdd * calcUpgradeMultToExp(actionObj);
+    let dataObj = actionData[actionObj.actionVar];
+
+    let timesRun = 0;
+    for(let i = 0; i < 10; i++) {
+        if(!checkLevelUp(actionObj, dataObj)) {
+            break;
         }
     }
 }

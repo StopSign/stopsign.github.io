@@ -103,7 +103,7 @@ function intToString2(value, sigFigs) {
     }
 }
 
-function intToString(value, amount) {
+function intToString(value, amount, hideSmall) {
     let baseValue = amount ? amount : 3;
     if(value === 0) {
         if(baseValue > 1) {
@@ -113,10 +113,10 @@ function intToString(value, amount) {
             return "0"
         }
     }
-    value += .0000001; //anti floating point rounding issues
     let isNeg = value < 0;
     value *= isNeg ? -1 : 1;
     if (value >= 10000) {
+        value += .0000001; //anti floating point rounding issues
         if(data.numberType === "engineering") {
             return (isNeg ? "-" : "") + nFormatter(value, 3);
         } else if(data.numberType === "scientific") {
@@ -124,6 +124,7 @@ function intToString(value, amount) {
         }
     }
     if (value >= 1000) { //1000 - 10000, should be 6,512 (.1) - 1 if base is > 2
+        value += .0000001; //anti floating point rounding issues
         if(amount >= 2) {
             baseValue = 1;
         } else {
@@ -134,6 +135,9 @@ function intToString(value, amount) {
     }
     if(value < 1) {
         if(value < .0001) {
+            if(hideSmall) {
+                return parseFloat("0").toFixed(baseValue);
+            }
             return (isNeg?"-":"") + value.toExponential(3);
         }
         return (isNeg?"-":"") + parseFloat(value).toPrecision(baseValue);

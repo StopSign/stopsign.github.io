@@ -26,11 +26,11 @@ function generateStatDisplay(statVar) {
         }
     });
     theStr +=
-        "<div id='"+statVar+"StatContainer' style='position:relative;'>"+
-        "<b><span id='"+statVar+"Name' style='width:110px;display:inline-block;cursor:pointer' onclick='clickedStatName(\""+statVar+"\")'>" + decamelize(statVar) + "</span></b>" +
-        "<b><span id='"+statVar+"Num' style='width:50px;display:inline-block'>"+statObj.num+"</span></b>" +
-        "<span style='width:50px;display:inline-block'>x<b><span id='"+statVar+"Mult'>"+statObj.mult+"</span></b></span>" +
-        "<span style='width:50px;display:inline-block'>+<b><span id='"+statVar+"PerMinute'>"+statObj.perMinute+"</span></b>/m</span>" +
+        "<div id='"+statVar+"StatContainer' style='position:relative;cursor:pointer' onclick='clickedStatName(\""+statVar+"\")'>"+
+        "<b><span id='"+statVar+"Name' style='width:140px;display:inline-block;'>" + decamelize(statVar) + "</span></b>" +
+        "<b><span id='"+statVar+"Num' style='width:70px;display:inline-block'>"+statObj.num+"</span></b>" +
+        "<span style='width:70px;display:inline-block'>x<b><span id='"+statVar+"Mult'>"+statObj.mult+"</span></b></span>" +
+        "<span style='width:70px;display:inline-block'>+<b><span id='"+statVar+"PerMinute'>"+statObj.perMinute+"</span></b>/m</span>" +
         "</div>";
 
     let child = document.createElement("template");
@@ -45,7 +45,8 @@ function generateActionDisplay(actionVar) {
     let progressColor = getResourceColor(actionObj);
 
     let title =
-        "<span id='"+actionVar+"Title' onclick='actionTitleClicked(`"+actionVar+"`)' style='font-size:16px;color:var(--text-primary);width:100%;cursor:pointer;position:absolute;top:-40px;left:-1px;white-space: nowrap;border:2px solid var(--border-color);padding-left:2px;padding-right:2px;border-top:0;border-right:0;background-color:var(--overlay-color)'>" +
+        "<span id='"+actionVar+"Title' onclick='actionTitleClicked(`"+actionVar+"`)' style='font-size:16px;color:var(--text-primary);width:100%;cursor:pointer;position:absolute;top:-40px;" +
+        "left:-1px;white-space: nowrap;border-width: 0 0 2px 2px;border-style: solid;border-color: var(--border-color);padding-left:2px;padding-right:2px;background-color:var(--overlay-color)'>" +
         "<b>" + actionObj.title + "</b>" +
         " | <span style='font-size:12px;position:relative;'>" +
         "Level <b></v><span id='"+actionVar+"Level'>0</span></b>" +
@@ -78,7 +79,7 @@ function generateActionDisplay(actionVar) {
         (actionObj.isGenerator?"":"x<b>"+ actionObj.progressMaxIncrease + "</b> to progress required to complete<br>") +
         "x<b>" + actionObj.expToLevelIncrease + "</b> to Exp required to level<br>" +
         (actionObj.actionPowerMultIncrease===1?"":("x<b>" + actionObj.actionPowerMultIncrease + "</b> to Action Power per level <br>")) +
-        "(x<b><span id='"+actionVar+"ActionPowerMult'></b> total Action Power from level)<br>" +
+        (actionObj.isGenerator?"(x<b><span id='"+actionVar+"ActionPowerMult'></b> total Action Power from level)<br>":"") +
         actionObj.onLevelText;
 
     let upgradeInfoText = "<br><span id='"+actionVar+"HighestLevelContainer' style='display:none'>Highest level (2x up to): <b><span id='"+actionVar+"HighestLevel'></span></b></span>" +
@@ -93,7 +94,6 @@ function generateActionDisplay(actionVar) {
         onComplete +
         onLevelText +
         upgradeInfoText +
-        (actionObj.isGenerator?(""):"<br>Send up to ["+actionObj.momentumName+" consumption rate] downstream to each of the actions that also use " + actionObj.momentumName) +
         actionObj.extraInfo+""+
         "</div>";
 
@@ -377,6 +377,7 @@ function setSingleCaches() {
     view.cached.essence = document.getElementById("essence");
     view.cached.essence2 = document.getElementById("essence2");
     view.cached.killTheLichMenu = document.getElementById("killTheLichMenu");
+    view.cached.statDisplay = document.getElementById("statDisplay");
 }
 
 function cacheStatNames(statVar) {

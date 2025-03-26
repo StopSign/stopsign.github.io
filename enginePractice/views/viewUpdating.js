@@ -4,7 +4,7 @@ let view = {
 
 //This is the main function that is run once per 50ms
 function updateView() {
-    data.statNames.forEach(function(resName) {
+    data.statNames.forEach(function (resName) {
         updateStatView(resName);
     });
     data.actionNames.forEach(function(actionVar) {
@@ -98,8 +98,8 @@ function updateStatView(statName) {
 
     roundedNumbers.forEach(obj => {
         let capName = capitalizeFirst(obj[0]);
-        if(forceUpdate || intToString(prevStat[obj[0]], obj[1]) !== intToString(statObj[obj[0]], obj[1])) {
-            view.cached[`${statName}${capName}`].innerText = intToString(statObj[obj[0]], obj[1]);
+        if(forceUpdate || intToString(prevStat[obj[0]], obj[1], true) !== intToString(statObj[obj[0]], obj[1], true)) {
+            view.cached[`${statName}${capName}`].innerText = intToString(statObj[obj[0]], obj[1], true);
         }
     })
 
@@ -169,7 +169,7 @@ function updateActionForVisibility(actionObj, prevAction, forceUpdate) {
         }
     }
 
-    if (forceUpdate || actionObj.currentMenu === "downstream") {
+    if (actionObj.currentMenu === "downstream") {
         let display = view.cached[actionVar + "DownstreamContainer"].style.display;
         let hasVisible = hasDownstreamVisible(actionObj);
         if(!display && !hasVisible) {
@@ -212,7 +212,7 @@ function updateActionView(actionVar) {
     let roundedNumbers = [
         ["progress", 2], ["progressMax", 2], ["progressGain", 2],
         ["momentum", 2], ["momentumDelta", 2], ["level", 1], ["maxLevel", 1], ["tier", 1],
-        ["exp", 2], ["expToLevel", 2], ["expToAdd", 2], ["momentumIncrease", 2], ["momentumDecrease", 2],
+        ["exp", 2], ["expToLevel", 2], ["expToAdd", 2], ["momentumIncrease", 3], ["momentumDecrease", 3],
         ["expertise", 1], ["highestLevel2", 1], ["wage", 2]
     ];
 
@@ -220,27 +220,18 @@ function updateActionView(actionVar) {
         roundedNumbers.push(["unlockCost", 2]);
     }
     if(forceUpdate || actionObj.unlocked) {
-        if (forceUpdate || actionObj.currentMenu === "downstream") {
-            roundedNumbers.push(["totalSend", 3]);
-        }
-        if (forceUpdate || actionObj.currentMenu === "info") {
-            roundedNumbers.push(["amountToSend", 3]);
-            roundedNumbers.push(["actionPower", 3]);
-            roundedNumbers.push(["actionPowerMult", 3]);
-            roundedNumbers.push(["highestLevel", 1]);
-            roundedNumbers.push(["secondHighestLevel", 1]);
-            roundedNumbers.push(["thirdHighestLevel", 1]);
-            roundedNumbers.push(["prevUnlockTime", 1]);
-
-        }
-        if (forceUpdate || actionObj.currentMenu === "stats") {
-            roundedNumbers.push(["expToLevelMult", 5]);
-            roundedNumbers.push(["expertiseMult", 3]);
-            roundedNumbers.push(["expertiseBase", 2]);
-        }
-        if(forceUpdate || scale < .45) { //miniversion
-            roundedNumbers.push(["level2", 1]);
-        }
+        roundedNumbers.push(["totalSend", 3]);
+        roundedNumbers.push(["amountToSend", 2]);
+        roundedNumbers.push(["actionPower", 3]);
+        roundedNumbers.push(["actionPowerMult", 3]);
+        roundedNumbers.push(["highestLevel", 1]);
+        roundedNumbers.push(["secondHighestLevel", 1]);
+        roundedNumbers.push(["thirdHighestLevel", 1]);
+        roundedNumbers.push(["prevUnlockTime", 1]);
+        roundedNumbers.push(["expToLevelMult", 5]);
+        roundedNumbers.push(["expertiseMult", 3]);
+        roundedNumbers.push(["expertiseBase", 2]);
+        roundedNumbers.push(["level2", 1]);
     }
 
     let roundWithoutSig = ["progressMaxIncrease", "expToLevelIncrease"];
@@ -283,13 +274,11 @@ function updateActionView(actionVar) {
         }
     })
 
-    if(forceUpdate || actionObj.currentMenu === "downstream") {
+    if(forceUpdate || actionObj.unlocked) {
         updateActionDownstreamViews(actionObj, prevAction, forceUpdate);
-    }
-    if(forceUpdate || actionObj.currentMenu === "info") {
         updateActionStatViews(actionObj, prevAction, forceUpdate);
+        updateActionProgressBarViews(actionObj, prevAction, forceUpdate);
     }
-    updateActionProgressBarViews(actionObj, prevAction, forceUpdate);
 
     //Fixes a memory leak with prev actionObj references hanging around due to having live references
     prevAction = {};
@@ -305,7 +294,9 @@ function updateActionDownstreamViews(actionObj, prevAction, forceUpdate) {
                 return;
             }
 
-            if (forceUpdate || prevAction.momentum !== actionObj.momentum) {
+            if (forceUpdate
+                || prevAction.momentum !== actionObj.momentum
+                || (actionObj["downstreamRate"+downstreamVar] !== prevAction["downstreamRate"+downstreamVar])) {
                 let rangeValue = document.getElementById(actionVar + "RangeInput" + downstreamVar).value;
                 if(downstreamObj.unlocked) {
                     view.cached[`${actionVar}DownstreamSendRate${downstreamVar}`].textContent = intToString((rangeValue / 100) * actionObj.progressRateReal() * ticksPerSecond, 4);

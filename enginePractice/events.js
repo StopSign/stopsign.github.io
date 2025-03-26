@@ -28,16 +28,20 @@ function validateInput(fromAction, toAction) {
 
 function setSliderUI(fromAction, toAction, newValue) {
     if(!fromAction || !toAction || !document.getElementById(fromAction + "NumInput" + toAction)) {
-        console.log('trying to set it from: ' + fromAction + ', ' + toAction);
+        console.log('trying to set it from: ' + fromAction + ', ' + toAction + ' with val ' + newValue);
         return;
     }
-    if(newValue === -1) { //no automatic change
-        return;
+    if(newValue === -1) {
+        if(data.actions[fromAction]["downstreamRate"+toAction]) { //no automatic change if already set
+            return;
+        }
+        newValue = 100;
     }
+
     document.getElementById(fromAction + "NumInput" + toAction).value = newValue;
     document.getElementById(fromAction + "RangeInput" + toAction).value = newValue;
     document.getElementById(fromAction+"_"+toAction+"_Line_Inner").style.height = (newValue/100*20)+"px";
-    data.actions[fromAction]["downstreamRate"+toAction] = newValue;
+    data.actions[fromAction]["downstreamRate"+toAction] = Math.max(0, newValue);
 }
 function downstreamNumberChanged(fromAction, toAction) {
     let newValue = document.getElementById(fromAction + "NumInput" + toAction).value;
@@ -80,27 +84,46 @@ const minScale = 0.2; // Minimum scale value to prevent the content from becomin
 const maxScale = 3; // Maximum scale value to prevent the content from becoming too large
 
 windowElement.addEventListener('wheel', function(e) {
-    // Prevent the default scrolling behavior
     e.preventDefault();
 
-    // Determine the direction of the scroll
+    const rect = windowElement.getBoundingClientRect();
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+
+    const prevScale = scale;
     const delta = Math.sign(e.deltaY);
 
-    // Update the scale based on the direction
+    // Zoom logic
     if (delta < 0) {
-        // Scrolling up, zoom in
         scale += scaleStep;
     } else {
-        // Scrolling down, zoom out
         scale -= scaleStep;
     }
-
-    // Clamp the scale value to the min and max scale limits
     scale = Math.min(Math.max(minScale, scale), maxScale);
 
-    // Apply the scale transformation to the container
+    // Adjust translation to zoom at mouse position
+    const scaleFactor = scale / prevScale;
+    const dx = (mouseX - transformX) * (1 - scaleFactor);
+    const dy = (mouseY - transformY) * (1 - scaleFactor);
+
+    transformX += dx;
+    transformY += dy;
+
     actionContainer.style.transform = `translate(${transformX}px, ${transformY}px) scale(${scale})`;
+
+    for (let actionVar in data.actions) {
+        clearFuzziness(view.cached[actionVar + "Container"]);
+    }
 });
+
+function clearFuzziness(elem) {
+    if(elem.style.display !== "none") {
+        elem.style.display = "none";
+        void elem.offsetWidth;
+        elem.style.display = "";
+    }
+}
+
 
 let isDragging = false;
 let originalX, originalY;
@@ -201,7 +224,7 @@ function toggleLevelInfo(actionVar) {
 }
 
 function toggleStatsInfo(actionVar) {
-    clickActionMenu(actionVar, "StatsContainer", "ToggleStatsInfoButton", "stat");
+    clickActionMenu(actionVar, "StatsContainer", "ToggleStatsInfoButton", "stats");
 }
 
 function toggleStory(actionVar) {
@@ -241,12 +264,20 @@ const centerScreenButton = document.getElementById('centerScreenButton');
 
 zoomInButton.addEventListener('click', function() {
     scale = Math.min(scale + scaleStep, maxScale); // Zoom in
-    actionContainer.style.transform = `scale(${scale})`;
+    actionContainer.style.transform = `translate(${transformX}px, ${transformY}px) scale(${scale})`;
+
+    for (let actionVar in data.actions) {
+        clearFuzziness(view.cached[actionVar + "Container"]);
+    }
 });
 
 zoomOutButton.addEventListener('click', function() {
     scale = Math.max(scale - scaleStep, minScale); // Zoom out
-    actionContainer.style.transform = `scale(${scale})`;
+    actionContainer.style.transform = `translate(${transformX}px, ${transformY}px) scale(${scale})`;
+
+    for (let actionVar in data.actions) {
+        clearFuzziness(view.cached[actionVar + "Container"]);
+    }
 });
 
 centerScreenButton.addEventListener('click', function() {
@@ -356,4 +387,20 @@ function increaseGamespeed() {
 function resetGamespeed() {
     gameSpeed = 1;
     console.log('gamespeed set to ' + gameSpeed);
+}
+
+function statMenuHideButton() {
+    let button = document.getElementById("statDisplayHideButton");
+    let statDisplay = view.cached.statDisplay;
+    if(statDisplay.style.display !== "none") {
+        statDisplay.style.display = "none";
+        button.style.left = "18px";
+        button.style.top = "120px";
+        button.innerText = "Stats >>";
+    } else {
+        statDisplay.style.display = "block";
+        button.style.left = "388px";
+        button.style.top = "110px";
+        button.innerText = "<<";
+    }
 }

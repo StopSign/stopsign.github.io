@@ -114,6 +114,12 @@ function gameTick() {
     data.actionNames.forEach(function(actionVar) {
         tickGameObject(actionVar);
     });
+    //check once more for any that need to be leveled from other's stat improvements
+    for(let actionVar in data.actions) {
+        let actionObj = data.actions[actionVar];
+        let dataObj = actionData[actionVar];
+        checkLevelUp(actionObj, dataObj);
+    }
 
 
     //To get change/s
@@ -161,53 +167,65 @@ function tickGameObject(actionVar) {
     //2. later, if non-generator, an upstream action will add how much it is sending to this actions momentumDelta
     if(actionObj.isGenerator) {
         if(actionVar === "overclock") { //visual only
-            actionObj.momentumDelta = actionObj.actionPower * actionObj.upgradeMult / actionObj.progressMax * rateInefficient * ticksPerSecond;
+            let flatFromUpgrade = data.upgrades.tryALittleHarder.upgradePower * 20;
+            actionObj.momentumDelta = actionObj.actionPower * actionObj.upgradeMult * rateInefficient / actionObj.progressMax * ticksPerSecond + flatFromUpgrade;
             actionObj.momentumIncrease = actionObj.momentumDelta;
         }
     } else {
         //how much it's consuming.
-        actionObj.momentumDelta -= rateInefficient * ticksPerSecond;
-        actionObj.momentum -= rateInefficient;
+        actionObj.momentumDelta -= momentumToAddInefficient * ticksPerSecond;
+        actionObj.momentum -= momentumToAddInefficient;
     }
-
 
     actionObj.progress += momentumToAddInefficient;
     actionObj.progressGain = momentumToAddInefficient * ticksPerSecond; //display purposes for (+1.0/s) on green bar
 
-    let timesRun = 0;
-    while(actionObj.progress >= actionObj.progressMax) { //or max
-        if(timesRun++ > 10) {
-            console.log('progress too fast on ' + actionObj.actionVar);
+    //level up to 10 times
+    for(let i = 0; i < 10; i++) {
+        if(!checkProgressCompletion(actionObj, dataObj)) {
             break;
         }
-        actionObj.progress -= actionObj.progressMax;
-        if(dataObj.onCompleteCustom) {
-            dataObj.onCompleteCustom();
-        }
-        actionAddExp(actionObj);
     }
+
     //sending a % to the self, so increase used there if relevant
-    actionObj.momentumDecrease = actionObj.isGenerator||atMaxLevel ? 0 : (rateInefficient * ticksPerSecond);
+    actionObj.momentumDecrease = (actionObj.isGenerator||atMaxLevel) ? 0 : (rateInefficient * ticksPerSecond);
     actionObj.totalSend = 0;
 
     actionObj.downstreamVars.forEach(function (downstreamVar) {
         let downstreamAction = data.actions[downstreamVar];
-        if(!downstreamAction || downstreamAction.momentumName !== actionObj.momentumName || !downstreamAction.visible) {
+
+        if(!downstreamAction || !downstreamAction.visible) {
+            return;
+        }
+        if(downstreamAction.momentumName !== actionObj.momentumName) {
+            downstreamAction.momentumIncrease = actionObj.amountToSend * actionObj.progressGain / actionObj.progressMax;
             return;
         }
         //Send momentum to downstream, and also update downstream's taken
         let mult = (view.cached[actionVar+"NumInput"+downstreamVar].value-0)/100;
-        let taken = actionObj.progressRateReal() * mult;
+        let taken = actionObj.progressRateReal() * mult; //warning: this is different than rateEfficient in generators
         actionObj.totalSend += taken * ticksPerSecond;
         actionObj.momentumDecrease += taken * ticksPerSecond;
 
         //sends to unlock cost first if needed
         giveMomentumTo(actionObj, downstreamAction, taken);
     });
-    if(actionObj.generatorSpeed && actionVar !== "overclock") { //set decrease for other generators
+    if(actionObj.isGenerator && actionVar !== "overclock") { //set decrease for other generators
         actionObj.momentumDecrease = (actionObj.momentum * actionObj.tierMult()) * actionObj.progressGain / actionObj.progressMax;
         actionObj.momentumDelta = actionObj.momentumIncrease - actionObj.momentumDecrease;
     }
+}
+
+function checkProgressCompletion(actionObj, dataObj) {
+    if(actionObj.progress >= actionObj.progressMax) { //or max
+        actionObj.progress -= actionObj.progressMax;
+        if(dataObj.onCompleteCustom) {
+            dataObj.onCompleteCustom();
+        }
+        actionAddExp(actionObj);
+        return true;
+    }
+    return false;
 }
 
 function giveMomentumTo(actionObj, downstreamAction, amount) {

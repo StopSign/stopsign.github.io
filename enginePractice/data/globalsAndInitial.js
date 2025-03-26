@@ -40,6 +40,7 @@ data.secondsPerReset = 0;
 data.currentJob = "Helping Scott";
 data.currentWage = 1;
 data.numberType = "engineering"; //or scientific
+data.doneKTL = false;
 
 let viewData = {}; //contains only things that are generated / not saved
 viewData.toasts = [];
@@ -65,7 +66,8 @@ function debug() {
     buyUpgrade("stopLettingOpportunityWait", 0);
     buyUpgrade("stopLettingOpportunityWait", 1);
     buyUpgrade("stopLettingOpportunityWait", 2);
-
+    setSliderUI("overclock", "harnessOverflow", 100);
+    gameSpeed = 100;
 }
 
 function initializeData() {

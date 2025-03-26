@@ -101,12 +101,12 @@ actionData.upgrades = {
         }
     },
     stopLettingOpportunityWait: {
-        initialCost:5, costIncrease:3,
+        initialCost:5, costIncrease:2,
         upgradesAvailable:4,
         visible:true,
         customInfo: function(num) {
             return `When unlocking a new action, auto sets the new downstream sliders to ` +
-            `${["1%.", "10%.", "100%.", "not reset with an amulet reset, and for previously undiscovered sliders to be set at 100%."][num]}`;
+            `${["5%.", "20%.", "100%.", "not reset with an amulet reset, and for previously undiscovered sliders to be set at 100%."][num]}`;
         }
     },
     tryALittleHarder: {

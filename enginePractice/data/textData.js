@@ -9,7 +9,7 @@ actionData.socialize.onCompleteText = {english:"-<b><span id='socializeMomentumT
         "+<b><span id='socializeAmountToSend'>1</span></b> conversations in Chat with Locals<br>"}
 // actionData.remember.onLevelText = {english:"+2 to the max level of Harness Overflow<br>+2 to the max level of Process Thoughts"}
 actionData.makeMoney.extraInfo = {english:"<br>Exp & Gold gain = log(Momentum/100 * Action Power)^2 * Efficiency * Wages."}
-actionData.spendMoney.extraInfo = {english:"<br>Exp & Gold gain = log(Momentum/100 * Action Power)^3 * Efficiency."}
+actionData.socialize.extraInfo = {english:"<br>Exp & Gold gain = log(Momentum/100 * Action Power)^3 * Efficiency."}
 
 //Story Text:
 actionData.remember.storyText = {english:"Your world ended, and they only live on through you. Think about what they would have wanted for you, and on how much you miss them, and let it drive you forward. This is an internal story as much as it is an external one."}

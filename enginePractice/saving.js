@@ -43,6 +43,7 @@ function load() {
         data.currentWage = toLoad.currentWage ? toLoad.currentWage : 1;
         data.numberType = toLoad.numberType ? toLoad.numberType : "engineering";
         data.upgrades = toLoad.upgrades;
+        data.doneKTL = !!toLoad.doneKTL;
     }
 
     initializeDisplay();
