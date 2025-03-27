@@ -1,6 +1,8 @@
 'use strict';
 
 function startGame() {
+    load();
+
     if (isFileSystem) {
         console.log('running locally');
         setInterval(tick, 1000/50);
@@ -14,8 +16,6 @@ function startGame() {
         //     }
         // };
     }
-
-    load();
 }
 
 //time-delta-based approach

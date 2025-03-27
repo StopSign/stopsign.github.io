@@ -14,6 +14,7 @@
     --overlay-color: rgba(30, 30, 46, 0.8);
     --selection-color:#9f0000;
     --line-color: #000000;
+    --max-level-color: #2be343;
 
     --menu-background-color: #1e1e2e;
     --menu-tab-button-color: #23153c;
@@ -51,6 +52,7 @@ body.lightMode {
     --overlay-color: rgba(135, 152, 211, 0.8);
     --selection-color:#67ff5b;
     --line-color: #ffffff;
+    --max-level-color: #2be343;
 
     --menu-background-color: #cbe3f7;
     --menu-tab-button-color: #d7c3f8;

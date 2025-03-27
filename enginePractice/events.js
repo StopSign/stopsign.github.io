@@ -237,6 +237,15 @@ function clickActionMenu(actionVar, containerId, buttonId, menuVar) {
     let container = document.getElementById(actionVar+containerId);
     let button = document.getElementById(actionVar+buttonId);
 
+    let actionObj = data.actions[actionVar];
+
+
+    if(actionObj.currentMenu === menuVar) {
+        deselectActionMenus(actionVar);
+        data.actions[actionVar].currentMenu = "";
+        return;
+    }
+
     let toggleOn = container.style.display === "none";
     deselectActionMenus(actionVar);
     if (toggleOn) {

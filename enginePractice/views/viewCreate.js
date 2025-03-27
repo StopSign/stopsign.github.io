@@ -161,6 +161,8 @@ function generateActionDisplay(actionVar) {
         "<span style='color:grey;position:absolute;right:0'>x<b><span id='"+actionVar+"ExpToLevelIncrease'>1</span></b> / lvl</span>" +
         "</div>" +
         "</div>";
+    let maxLevel =
+        "<div id='"+actionVar+"IsMaxLevel' style='position:absolute;display:none;left:104px;top:71px;color:var(--max-level-color);font-size:18px;'><b>MAX LEVEL</b></div>";
 
 
     let downstreamContainer =
@@ -175,10 +177,10 @@ function generateActionDisplay(actionVar) {
     let newX = actionObj.realX;
     let newY = actionObj.realY;
 
-    let shouldDisplay = gameStateMatches(actionObj) ? "" : "none";
+    let shouldDisplay = "none"; //gameStateMatches(actionObj) ? "" : "none";
 
     theStr +=
-        "<div id='"+actionVar+"Container' style='display:"+shouldDisplay+";position:absolute;left:"+newX+"px;top:"+newY+"px;width:300px;min-height:150px;'>" +
+        "<div id='"+actionVar+"Container' style='display:"+shouldDisplay+";position:absolute;left:"+newX+"px;top:"+newY+"px;width:300px;'>" +
             "<div id='"+actionVar+"LargeVersionContainer' style='border:2px solid var(--border-color);background-color:var(--bg-secondary);'>" +
                 title +
                 menuContainer +
@@ -186,6 +188,7 @@ function generateActionDisplay(actionVar) {
                 balanceNeedle +
                 pbar +
                 expBar +
+                maxLevel +
                 storyContainer +
                 statsContainer +
                 levelInfoContainer +
@@ -296,9 +299,9 @@ function generateLinesBetweenActions() {
                 return;
             }
             // Calculate the centers of each object
-            const x1 = actionObj.realX + 160; // 220 / 2
+            const x1 = actionObj.realX + 155; // 220 / 2
             const y1 = actionObj.realY + 80; // 200 / 2
-            const x2 = targetObj.realX + 160; // 220 / 2
+            const x2 = targetObj.realX + 155; // 220 / 2
             const y2 = targetObj.realY + 80; // 200 / 2
 
             let sourceBackgroundColor = getResourceColor(actionObj);
@@ -417,6 +420,7 @@ function cacheActionViews(actionVar) {
     view.cached[actionVar + "ProgressMax"] = document.getElementById(actionVar + "ProgressMax");
     view.cached[actionVar + "ProgressGain"] = document.getElementById(actionVar + "ProgressGain");
     view.cached[actionVar + "ProgressMaxIncrease"] = document.getElementById(actionVar + "ProgressMaxIncrease");
+    view.cached[actionVar + "IsMaxLevel"] = document.getElementById(actionVar + "IsMaxLevel");
     view.cached[actionVar + "BalanceNeedle"] = document.getElementById(actionVar + "BalanceNeedle");
     view.cached[actionVar + "OnCompleteContainer"] = document.getElementById(actionVar + "OnCompleteContainer");
     view.cached[actionVar + "ActionPower"] = document.getElementById(actionVar + "ActionPower");

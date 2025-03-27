@@ -58,7 +58,7 @@ function getStatChanges() {
 
         // Calculate levels per second
         let completesPerSecond = 0;
-        if(actionObj.unlocked) {
+        if(actionObj.unlocked && actionObj.level < actionObj.maxLevel) {
             completesPerSecond = actionProgressRate(actionObj) * ticksPerSecond / actionObj.progressMax;
         }
         let levelsPerSecond = completesPerSecond * actionObj.expToAdd / actionObj.expToLevel;
