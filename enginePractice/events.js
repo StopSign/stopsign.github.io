@@ -93,6 +93,7 @@ let originalTransformX, originalTransformY;
 
 let initialPinchDistance = null;
 let lastTouchScale = 1;
+let isTouchDragging = false;
 windowElement.addEventListener('wheel', function(e) {
     e.preventDefault();
 
@@ -160,15 +161,25 @@ document.addEventListener('mouseup', function() {
 });
 
 
-// Touch pinch-to-zoom
+// Touch start
 windowElement.addEventListener('touchstart', function(e) {
     if (e.touches.length === 2) {
         e.preventDefault();
         initialPinchDistance = getTouchDistance(e.touches[0], e.touches[1]);
         lastTouchScale = scale;
+        isTouchDragging = false;
+    } else if (e.touches.length === 1) {
+        // Single finger drag
+        const touch = e.touches[0];
+        originalMouseX = touch.clientX;
+        originalMouseY = touch.clientY;
+        originalTransformX = transformX;
+        originalTransformY = transformY;
+        isTouchDragging = true;
     }
 }, { passive: false });
 
+// Touch move
 windowElement.addEventListener('touchmove', function(e) {
     if (e.touches.length === 2 && initialPinchDistance) {
         e.preventDefault();
@@ -192,15 +203,47 @@ windowElement.addEventListener('touchmove', function(e) {
         transformX += dx;
         transformY += dy;
 
-        actionContainer.style.transform = `translate(${transformX}px, ${transformY}px) scale(${scale})`;
+        applyTransform();
+    } else if (e.touches.length === 1 && isTouchDragging) {
+        e.preventDefault();
+
+        const touch = e.touches[0];
+        const deltaX = touch.clientX - originalMouseX;
+        const deltaY = touch.clientY - originalMouseY;
+
+        applyPan(originalTransformX + deltaX, originalTransformY + deltaY);
     }
 }, { passive: false });
 
+// Touch end
 windowElement.addEventListener('touchend', function(e) {
     if (e.touches.length < 2) {
         initialPinchDistance = null;
     }
+    if (e.touches.length === 0) {
+        isTouchDragging = false;
+    }
 });
+
+// Reusable helpers
+function getDistance(t1, t2) {
+    const dx = t2.clientX - t1.clientX;
+    const dy = t2.clientY - t1.clientY;
+    return Math.sqrt(dx * dx + dy * dy);
+}
+
+function applyPan(x, y) {
+    transformX = Math.max(-4000, Math.min(x, 4000));
+    transformY = Math.max(-4000, Math.min(y, 4000));
+    applyTransform();
+}
+
+function applyTransform() {
+    actionContainer.style.transform = `translate(${transformX}px, ${transformY}px) scale(${scale})`;
+    for (let actionVar in data.actions) {
+        clearFuzziness(view.cached[actionVar + "Container"]);
+    }
+}
 
 function getTouchDistance(touch1, touch2) {
     const dx = touch2.clientX - touch1.clientX;
