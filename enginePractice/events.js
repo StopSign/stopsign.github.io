@@ -78,11 +78,21 @@ const windowElement = document.getElementById('windowElement');
 const actionContainer = document.getElementById('actionContainer');
 
 
-let scale = 1; // Initial scale value
-const scaleStep = 0.1; // Value by which the scale changes per scroll
-const minScale = 0.2; // Minimum scale value to prevent the content from becoming too small
-const maxScale = 3; // Maximum scale value to prevent the content from becoming too large
+let scale = 1;
+const scaleStep = 0.1;
+const minScale = 0.2;
+const maxScale = 3;
 
+let isDragging = false;
+let originalX, originalY;
+let originalLeft, originalTop;
+
+let originalMouseX, originalMouseY;
+let transformX=0, transformY=0;
+let originalTransformX, originalTransformY;
+
+let initialPinchDistance = null;
+let lastTouchScale = 1;
 windowElement.addEventListener('wheel', function(e) {
     e.preventDefault();
 
@@ -93,12 +103,7 @@ windowElement.addEventListener('wheel', function(e) {
     const prevScale = scale;
     const delta = Math.sign(e.deltaY);
 
-    // Zoom logic
-    if (delta < 0) {
-        scale += scaleStep;
-    } else {
-        scale -= scaleStep;
-    }
+    scale += delta < 0 ? scaleStep : -scaleStep;
     scale = Math.min(Math.max(minScale, scale), maxScale);
 
     // Adjust translation to zoom at mouse position
@@ -114,7 +119,7 @@ windowElement.addEventListener('wheel', function(e) {
     for (let actionVar in data.actions) {
         clearFuzziness(view.cached[actionVar + "Container"]);
     }
-});
+}, { passive: false });
 
 function clearFuzziness(elem) {
     if(elem.style.display !== "none") {
@@ -124,51 +129,27 @@ function clearFuzziness(elem) {
     }
 }
 
-
-let isDragging = false;
-let originalX, originalY;
-let originalLeft, originalTop;
-
-let originalMouseX, originalMouseY;
-let transformX=0, transformY=0;
-let originalTransformX, originalTransformY;
 document.addEventListener('mousedown', function(e) {
-    // console.log(e.clientX, e.target);
     if (e.target === windowElement || e.target === actionContainer) {
         isDragging = true;
 
-        // Capture the initial position of the mouse and the container
         originalMouseX = e.clientX;
         originalMouseY = e.clientY;
 
         originalTransformX = transformX;
         originalTransformY = transformY;
-
-        // const style = window.getComputedStyle(actionContainer);
-        // originalLeft = parseInt(style.left, 10);
-        // originalTop = parseInt(style.top, 10);
     }
 });
 document.addEventListener('mousemove', function(e) {
     if(!isDragging) {
         return;
     }
-    // Calculate the new position
     const deltaX = e.clientX - originalMouseX;
     const deltaY = e.clientY - originalMouseY;
 
-    // Proposed new position
-    let newTransformX = originalTransformX + deltaX;
-    let newTransformY = originalTransformY + deltaY;
-    // console.log(newLeft);
-
     // Clamp range to [-4000, 4000]
-    newTransformX = Math.max(-4000, Math.min(newTransformX, 4000));
-    newTransformY = Math.max(-4000, Math.min(newTransformY, 4000));
-
-    // Update our state
-    transformX = newTransformX;
-    transformY = newTransformY;
+    transformX = Math.max(-4000, Math.min(originalTransformX + deltaX, 4000));
+    transformY = Math.max(-4000, Math.min(originalTransformY + deltaY, 4000));
 
     // Update the position of the container
     actionContainer.style.transform = `translate(${transformX}px, ${transformY}px) scale(${scale})`;
@@ -177,6 +158,56 @@ document.addEventListener('mousemove', function(e) {
 document.addEventListener('mouseup', function() {
     isDragging = false;
 });
+
+
+// Touch pinch-to-zoom
+windowElement.addEventListener('touchstart', function(e) {
+    if (e.touches.length === 2) {
+        e.preventDefault();
+        initialPinchDistance = getTouchDistance(e.touches[0], e.touches[1]);
+        lastTouchScale = scale;
+    }
+}, { passive: false });
+
+windowElement.addEventListener('touchmove', function(e) {
+    if (e.touches.length === 2 && initialPinchDistance) {
+        e.preventDefault();
+
+        const currentDistance = getTouchDistance(e.touches[0], e.touches[1]);
+        const pinchScale = currentDistance / initialPinchDistance;
+        let newScale = lastTouchScale * pinchScale;
+
+        newScale = Math.min(Math.max(minScale, newScale), maxScale);
+        const prevScale = scale;
+        scale = newScale;
+
+        const rect = windowElement.getBoundingClientRect();
+        const midX = (e.touches[0].clientX + e.touches[1].clientX) / 2 - rect.left;
+        const midY = (e.touches[0].clientY + e.touches[1].clientY) / 2 - rect.top;
+
+        const scaleFactor = scale / prevScale;
+        const dx = (midX - transformX) * (1 - scaleFactor);
+        const dy = (midY - transformY) * (1 - scaleFactor);
+
+        transformX += dx;
+        transformY += dy;
+
+        actionContainer.style.transform = `translate(${transformX}px, ${transformY}px) scale(${scale})`;
+    }
+}, { passive: false });
+
+windowElement.addEventListener('touchend', function(e) {
+    if (e.touches.length < 2) {
+        initialPinchDistance = null;
+    }
+});
+
+function getTouchDistance(touch1, touch2) {
+    const dx = touch2.clientX - touch1.clientX;
+    const dy = touch2.clientY - touch1.clientY;
+    return Math.sqrt(dx * dx + dy * dy);
+}
+
 function isInScreenRange(action) {
     const distanceX = Math.abs((transformX * -1) - (action.realX + 150) * scale + windowElement.offsetWidth / 2);
     const distanceY = Math.abs((transformY * -1) - (action.realY + 50) * scale + windowElement.offsetHeight / 2);
