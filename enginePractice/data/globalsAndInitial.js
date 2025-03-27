@@ -15,7 +15,7 @@ let bonusTime = 0;
 
 //Saving globals
 let isFileSystem = !!location.href.match("file");
-let saveName = "save"; //Blank if you don't want to save
+let saveName = "save2"; //Blank if you don't want to save, change name to force user reset
 
 let stop = false;
 let forceStop = false;
