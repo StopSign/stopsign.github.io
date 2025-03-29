@@ -14,7 +14,10 @@ function initializeDisplay() {
     initializeMenus();
     generateAmuletContent();
     setAllCaches(); //happens after generation
-    debug();
+
+    updateUIFromLoad(); //update the elements after create
+
+    debug(); //change game for easier debugging
 }
 
 function generateStatDisplay(statVar) {
@@ -54,7 +57,7 @@ function generateActionDisplay(actionVar) {
             "<span id='"+actionVar+"HighestLevelContainer2'> (<b><span id='"+actionVar+"HighestLevel2'></span></b>)" +
         "</span>" +
         " | <span style='font-size:12px;'><b><span id='"+actionVar+"Efficiency'></span></b>%</span>" +
-        (!actionObj.wage ? "" : " | <b>$<span id='"+actionVar+"Wage' style='color:var(--gold-color)'></span></b>") +
+        (!actionObj.wage ? "" : " | <b>$<span id='"+actionVar+"Wage' style='color:var(--wage-color)'></span></b>") +
         "</span>" +
         "</span>";
 
@@ -62,10 +65,10 @@ function generateActionDisplay(actionVar) {
         "<div id='' style='position:absolute;top:-18px;font-size:13px;left:-1px;'>" +
         (actionVar==="overclock"?"":"<span id='"+actionVar+"GoToParentButton' onclick='actionTitleClicked(\""+actionObj.parent+"\")' " +
             "class='buttonSimple' style='margin-right:3px;width:30px;height:30px;text-align:center;cursor:pointer;padding:0 4px;'>^</span>") +
-        "<span id='"+actionVar+"ToggleDownstreamButton' onclick='toggleDownstream(\""+actionVar+"\")' class='buttonSimple' style='margin-right:3px;width:30px;height:30px;text-align:center;cursor:pointer;padding:0 4px;background-color:var(--selection-color)'>Downstream</span>" +
-        "<span id='"+actionVar+"ToggleLevelInfoButton' onclick='toggleLevelInfo(\""+actionVar+"\")' class='buttonSimple' style='margin-right:3px;width:30px;height:30px;text-align:center;cursor:pointer;padding:0 4px;'>Info</span>" +
-        "<span id='"+actionVar+"ToggleStatsInfoButton' onclick='toggleStatsInfo(\""+actionVar+"\")' class='buttonSimple' style='margin-right:3px;width:30px;height:30px;text-align:center;cursor:pointer;padding:0 4px;'>Stats</span>" +
-        "<span id='"+actionVar+"ToggleStoryButton' onclick='toggleStory(\""+actionVar+"\")' class='buttonSimple' style='margin-right:3px;width:30px;height:30px;text-align:center;cursor:pointer;padding:0 4px;'>Story</span>" +
+        "<span id='"+actionVar+"_downstreamMenuButton' onclick='clickActionMenu(\""+actionVar+"\", \"downstream\")' class='buttonSimple' style='margin-right:3px;width:30px;height:30px;text-align:center;cursor:pointer;padding:0 4px;'>Downstream</span>" +
+        "<span id='"+actionVar+"_infoMenuButton' onclick='clickActionMenu(\""+actionVar+"\", \"info\")' class='buttonSimple' style='margin-right:3px;width:30px;height:30px;text-align:center;cursor:pointer;padding:0 4px;'>Info</span>" +
+        "<span id='"+actionVar+"_statsMenuButton' onclick='clickActionMenu(\""+actionVar+"\", \"stats\")' class='buttonSimple' style='margin-right:3px;width:30px;height:30px;text-align:center;cursor:pointer;padding:0 4px;'>Stats</span>" +
+        "<span id='"+actionVar+"_storyMenuButton' onclick='clickActionMenu(\""+actionVar+"\", \"story\")' class='buttonSimple' style='margin-right:3px;width:30px;height:30px;text-align:center;cursor:pointer;padding:0 4px;'>Story</span>" +
         "</div>";
 
 
@@ -90,7 +93,7 @@ function generateActionDisplay(actionVar) {
     //actionObj.prevUnlockTime
 
     let levelInfoContainer =
-        "<div id='"+actionVar+"LevelInfoContainer' style='display:none;padding:3px;'>" +
+        "<div id='"+actionVar+"_infoContainer' style='display:none;padding:3px;'>" +
         onComplete +
         onLevelText +
         upgradeInfoText +
@@ -98,7 +101,7 @@ function generateActionDisplay(actionVar) {
         "</div>";
 
     let storyContainer =
-        "<div id='"+actionVar+"StoryContainer' style='display:none;padding:3px;'>" +
+        "<div id='"+actionVar+"_storyContainer' style='display:none;padding:3px;'>" +
         actionObj.storyText +
         "</div>";
 
@@ -110,7 +113,7 @@ function generateActionDisplay(actionVar) {
     }
 
     let statsContainer =
-        "<div id='"+actionVar+"StatsContainer' style='display:none;padding:3px;'>" +
+        "<div id='"+actionVar+"_statsContainer' style='display:none;padding:3px;'>" +
         generateActionExpStats(actionObj) +
         generateActionEfficiencyStats(actionObj) +
         onLevelStatsText +
@@ -166,13 +169,14 @@ function generateActionDisplay(actionVar) {
 
 
     let downstreamContainer =
-        "<div id='"+actionVar+"DownstreamContainer' style='padding:10px;'>" +
-        (actionVar==="overclock"?("Send up to (10% * efficiency of momentum)/s downstream: <br>"):"") +
-        createDownStreamSliders(actionObj) +
-        "<span id='"+actionVar+"AllZeroButton' onclick='toggleAllZero(\""+actionVar+"\")' class='buttonSimple' style='margin-right:3px;width:30px;height:30px;text-align:center;cursor:pointer;padding:0 4px;'>All 0</span>" +
-        "<span id='"+actionVar+"AllEqualButton' onclick='toggleAllHundred(\""+actionVar+"\")' class='buttonSimple' style='margin-right:3px;width:30px;height:30px;text-align:center;cursor:pointer;padding:0 4px;'>All 100</span>" +
-        "<div>Total "+actionObj.momentumName+" sending downstream: <b><span id='"+actionVar+"TotalSend'>1</span></b>/s</div>"
-        + "</div>";
+        "<div id='"+actionVar+"_downstreamContainer' style='padding:10px;display:none;'>" +
+        "<div id='"+actionVar+"_downstreamButtonContainer'>" +
+            (actionVar==="overclock"?("Send up to (10% * efficiency of momentum)/s downstream: <br>"):"") +
+            createDownStreamSliders(actionObj) +
+            "<span id='"+actionVar+"AllZeroButton' onclick='toggleAllZero(\""+actionVar+"\")' class='buttonSimple' style='margin-right:3px;width:30px;height:30px;text-align:center;cursor:pointer;padding:0 4px;'>All 0</span>" +
+            "<span id='"+actionVar+"AllEqualButton' onclick='toggleAllHundred(\""+actionVar+"\")' class='buttonSimple' style='margin-right:3px;width:30px;height:30px;text-align:center;cursor:pointer;padding:0 4px;'>All 100</span>" +
+            "<div>Total "+actionObj.momentumName+" sending downstream: <b><span id='"+actionVar+"TotalSend'>1</span></b>/s</div>"
+        + "</div></div>";
 
     let newX = actionObj.realX;
     let newY = actionObj.realY;
@@ -408,7 +412,15 @@ function cacheActionViews(actionVar) {
     view.cached[actionVar + "Container"] = document.getElementById(actionVar + "Container");
     view.cached[actionVar + "LargeVersionContainer"] = document.getElementById(actionVar + "LargeVersionContainer");
     view.cached[actionVar + "SmallVersionContainer"] = document.getElementById(actionVar + "SmallVersionContainer");
-    view.cached[actionVar + "DownstreamContainer"] = document.getElementById(actionVar + "DownstreamContainer");
+    view.cached[actionVar + "_downstreamButtonContainer"] = document.getElementById(actionVar + "_downstreamButtonContainer");
+    view.cached[actionVar + "_downstreamContainer"] = document.getElementById(actionVar + "_downstreamContainer");
+    view.cached[actionVar + "_downstreamMenuButton"] = document.getElementById(actionVar + "_downstreamMenuButton");
+    view.cached[actionVar + "_infoContainer"] = document.getElementById(actionVar + "_infoContainer");
+    view.cached[actionVar + "_infoMenuButton"] = document.getElementById(actionVar + "_infoMenuButton");
+    view.cached[actionVar + "_statsContainer"] = document.getElementById(actionVar + "_statsContainer");
+    view.cached[actionVar + "_statsMenuButton"] = document.getElementById(actionVar + "_statsMenuButton");
+    view.cached[actionVar + "_storyContainer"] = document.getElementById(actionVar + "_storyContainer");
+    view.cached[actionVar + "_storyMenuButton"] = document.getElementById(actionVar + "_storyMenuButton");
     view.cached[actionVar + "ProgressMax"] = document.getElementById(actionVar + "ProgressMax");
     view.cached[actionVar + "Title"] = document.getElementById(actionVar + "Title");
     view.cached[actionVar + "Container"] = document.getElementById(actionVar + "Container");

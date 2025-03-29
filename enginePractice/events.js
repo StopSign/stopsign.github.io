@@ -252,11 +252,13 @@ function getTouchDistance(touch1, touch2) {
 }
 
 function isInScreenRange(action) {
-    const distanceX = Math.abs((transformX * -1) - (action.realX + 150) * scale + windowElement.offsetWidth / 2);
-    const distanceY = Math.abs((transformY * -1) - (action.realY + 50) * scale + windowElement.offsetHeight / 2);
-    const thresholdX = windowElement.offsetWidth / scale / 2 + 300;
-    const thresholdY = windowElement.offsetHeight / scale / 2 + 300;
-    return distanceX < thresholdX && distanceY < thresholdY;
+    return true;
+    //Major performance issue with .offsetWidth - it invalidates the cache
+    // const distanceX = Math.abs((transformX * -1) - (action.realX + 150) * scale + windowElement.offsetWidth / 2);
+    // const distanceY = Math.abs((transformY * -1) - (action.realY + 50) * scale + windowElement.offsetHeight / 2);
+    // const thresholdX = windowElement.offsetWidth / scale / 2 + 300;
+    // const thresholdY = windowElement.offsetHeight / scale / 2 + 300;
+    // return distanceX < thresholdX && distanceY < thresholdY;
 }
 function forceRedraw(element) {
     // Save the current display style
@@ -289,56 +291,27 @@ function actionTitleClicked(actionVar) {
     actionContainer.style.transform = `translate(${newTransformX}px, ${newTransformY}px) scale(${scale})`;
 }
 
-function toggleDownstream(actionVar) {
-    clickActionMenu(actionVar, "DownstreamContainer", "ToggleDownstreamButton", "downstream");
-}
 
-function toggleLevelInfo(actionVar) {
-    clickActionMenu(actionVar, "LevelInfoContainer", "ToggleLevelInfoButton", "info");
-}
-
-function toggleStatsInfo(actionVar) {
-    clickActionMenu(actionVar, "StatsContainer", "ToggleStatsInfoButton", "stats");
-}
-
-function toggleStory(actionVar) {
-    clickActionMenu(actionVar, "StoryContainer", "ToggleStoryButton", "story");
-}
-
-//Each action needs which menu they've selected, to intelligently deselect colors, as well as to use in minimizing UI updates
-
-function clickActionMenu(actionVar, containerId, buttonId, menuVar) {
-    let container = document.getElementById(actionVar+containerId);
-    let button = document.getElementById(actionVar+buttonId);
-
+function clickActionMenu(actionVar, menuVar, isLoad) {
     let actionObj = data.actions[actionVar];
+    if(!menuVar) {
+        return;
+    }
 
+    if(actionObj.currentMenu && !isLoad) {
+        view.cached[actionVar + "_" + actionObj.currentMenu + "Container"].style.display = "none";
+        view.cached[actionVar + "_" + actionObj.currentMenu + "MenuButton"].style.removeProperty("background-color");
+    }
 
-    if(actionObj.currentMenu === menuVar) {
-        deselectActionMenus(actionVar);
+    if(actionObj.currentMenu === menuVar && !isLoad) {
         data.actions[actionVar].currentMenu = "";
         return;
     }
 
-    let toggleOn = container.style.display === "none";
-    deselectActionMenus(actionVar);
-    if (toggleOn) {
-        container.style.display = "block";
-        button.style.backgroundColor = "var(--selection-color)";
-    }
-    //for setting which is updating
-    data.actions[actionVar].currentMenu = menuVar;
-}
+    view.cached[actionVar + "_" + menuVar + "Container"].style.display = "";
+    view.cached[actionVar + "_" + menuVar + "MenuButton"].style.backgroundColor = "var(--selection-color)";
 
-function deselectActionMenus(actionVar) {
-    document.getElementById(actionVar+"LevelInfoContainer").style.display = "none";
-    document.getElementById(actionVar+"ToggleLevelInfoButton").style.removeProperty("background-color");
-    view.cached[actionVar + "DownstreamContainer"].style.display = "none";
-    document.getElementById(actionVar+"ToggleDownstreamButton").style.removeProperty("background-color");
-    document.getElementById(actionVar+"StatsContainer").style.display = "none";
-    document.getElementById(actionVar+"ToggleStatsInfoButton").style.removeProperty("background-color");
-    document.getElementById(actionVar+"StoryContainer").style.display = "none";
-    document.getElementById(actionVar+"ToggleStoryButton").style.removeProperty("background-color");
+    data.actions[actionVar].currentMenu = menuVar;
 }
 
 const zoomInButton = document.getElementById('zoomInButton');
@@ -442,6 +415,9 @@ function clickedStatName(statName) {
 function changeJob(actionVar) {
     //if the given job is better than the existing job, then switch
     let contender = data.actions[actionVar];
+    if(!contender) {
+        return;
+    }
     let contenderWage = contender.wage;
     if(contenderWage > data.currentWage) {
         data.currentWage = contenderWage;

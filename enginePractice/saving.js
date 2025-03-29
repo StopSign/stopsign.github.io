@@ -33,7 +33,10 @@ function load() {
         data.statNames.forEach(function (statVar) {
             data.stats[statVar] = toLoad.stats[statVar];
         })
+
+        //TODO apply only the existing ones to data AKA allow for future updates
         data.toastStates = toLoad.toastStates ? toLoad.toastStates : [];
+
         data.gameState = toLoad.gameState ? toLoad.gameState : "default";
         data.totalMomentum = toLoad.totalMomentum ? toLoad.totalMomentum : 0;
         data.essence = toLoad.essence ? toLoad.essence : 0;
@@ -44,6 +47,8 @@ function load() {
         data.numberType = toLoad.numberType ? toLoad.numberType : "engineering";
         data.upgrades = toLoad.upgrades;
         data.doneKTL = !!toLoad.doneKTL;
+        data.doneAmulet = !!toLoad.doneAmulet;
+        data.displayJob = !!toLoad.displayJob;
     }
 
     initializeDisplay();
@@ -61,6 +66,35 @@ function load() {
             setSliderUI(actionVar, downVar, toLoad.actions[actionVar]["downstreamRate" + downVar]);
         });
     });
+}
+
+function updateUIFromLoad() {
+    /*
+
+Things that are not reloading properly:
+* tips
+     */
+
+    for(let actionVar in data.actions) {
+        let actionObj = data.actions[actionVar];
+        clickActionMenu(actionVar, actionObj.currentMenu, true);
+    }
+
+    if(data.doneKTL || (data.gameState !== "KTL" && data.actions.hearAboutTheLich.level >= 1)) {
+        document.getElementById("killTheLichMenuButton").style.display = "";
+    }
+    if(data.doneAmulet) {
+        document.getElementById("openViewAmuletButton").style.display = "";
+        document.getElementById("essenceDisplay").style.display = "";
+    }
+    if(data.displayJob) {
+        document.getElementById("jobDisplay").style.display = "";
+    }
+    changeJob(data.currentJob);
+
+    for(let i = 0; i < data.toastStates.length; i++) {
+        updateToastUI(i);
+    }
 }
 
 function save() {

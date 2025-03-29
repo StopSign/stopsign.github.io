@@ -586,6 +586,7 @@ let actionData = {
         },
         onUnlock: function() {
             unveilAction('spendMoney');
+            data.displayJob = true;
             document.getElementById("jobDisplay").style.display = "";
         },
         onLevelStats:[["negotiation", 1]],

@@ -15,7 +15,7 @@ let bonusTime = 0;
 
 //Saving globals
 let isFileSystem = !!location.href.match("file");
-let saveName = "save2"; //Blank if you don't want to save, change name to force user reset
+let saveName = "save3"; //Blank if you don't want to save, change name to force user reset
 
 let stop = false;
 let forceStop = false;
@@ -41,6 +41,7 @@ data.currentJob = "Helping Scott";
 data.currentWage = 1;
 data.numberType = "engineering"; //or scientific
 data.doneKTL = false;
+data.doneAmulet = false;
 
 let viewData = {}; //contains only things that are generated / not saved
 viewData.toasts = [];

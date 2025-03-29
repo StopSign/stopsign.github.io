@@ -63,7 +63,7 @@ function updateGlobals() {
     if(view.cached.openUseAmuletButton.style.display !== toShowAmulet) {
         view.cached.openUseAmuletButton.style.display = toShowAmulet;
     }
-    let toViewAmulet = data.actions.overclock.highestLevel >= 0 && data.gameState !== "KTL" ? "" : "none";
+    let toViewAmulet = data.doneKTL && data.gameState !== "KTL" ? "" : "none";
     if(view.cached.openViewAmuletButton.style.display !== toViewAmulet) {
         view.cached.openViewAmuletButton.style.display = toViewAmulet;
     }
@@ -169,13 +169,13 @@ function updateActionForVisibility(actionObj, prevAction, forceUpdate) {
         }
     }
 
-    if (actionObj.currentMenu === "downstream") {
-        let display = view.cached[actionVar + "DownstreamContainer"].style.display;
+    if (actionObj.currentMenu === "downstream") { //if downstream menu is showing, hide all 0 / all 100 buttons if no downstream visible
+        let display = view.cached[actionVar + "_downstreamButtonContainer"].style.display;
         let hasVisible = hasDownstreamVisible(actionObj);
-        if(!display && !hasVisible) {
-            view.cached[actionVar + "DownstreamContainer"].style.display = "none";
+        if(display !== "none" && !hasVisible) {
+            view.cached[actionVar + "_downstreamButtonContainer"].style.display = "none";
         } else if(display === "none" && hasVisible) {
-            view.cached[actionVar + "DownstreamContainer"].style.display = "";
+            view.cached[actionVar + "_downstreamButtonContainer"].style.display = "";
         }
     }
     return forceUpdate;

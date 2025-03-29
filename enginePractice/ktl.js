@@ -25,7 +25,8 @@ function initializeKTL() {
     view.cached.openUseAmuletButton.style.display = "";
     document.getElementById("essenceDisplay").style.display = "";
     forceVisuals = true;
-    if(data.doneKTL) {
+    data.doneKTL = true;
+    if(data.doneAmulet) {
         data.useAmuletButtonShowing = true;
     }
 }
@@ -42,7 +43,7 @@ function useAmulet() {
     if(!document.getElementById('amuletConfirm').checked) {
         return;
     }
-    data.doneKTL = true;
+    data.doneAmulet = true;
     document.getElementById("useAmuletMenu").style.display = "none";
     document.getElementById("openViewAmuletButton").style.display = "";
 

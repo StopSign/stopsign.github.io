@@ -85,13 +85,14 @@ function toastIsClicked(toastId) {
 }
 
 function createToast(visibleFunc, title, message) {
-    let wrapper = document.createElement('div');
     let id = toastIdCounter++;
-    wrapper.innerHTML = "<div id='toast"+id+"' class='toast' onclick='openModal(\""+id+"\")'>" +
-        "<span'>"+title+"</span>" +
-        "<span id='closeToastButton"+id+"' class='button' style='display:none;position:absolute;right:0;top:0;' onclick='closeToast(event, \""+id+"\")'>X</span>" +
-        "</div>";
-    let toastEl = wrapper.firstElementChild;
+
+    document.getElementById("toastList").insertAdjacentHTML("beforeend",
+        Raw.html`<div id='toast${id}' class='toast' onclick='openModal("${id}")'>
+        <span>${title}</span>
+        <span id='closeToastButton${id}' class='button' style='display:none;position:absolute;right:0;top:0;' onclick='closeToast(event, "${id}")'>X</span>
+        </div>`);
+    let toastEl = document.getElementById(`toast${id}`);
 
     let toastObj = {
         id: id,
@@ -100,16 +101,17 @@ function createToast(visibleFunc, title, message) {
         title:title,
         message:message
     };
-    data.toastStates.push('hidden');
+    if(!data.toastStates[id]) {
+        data.toastStates[id] = 'hidden';
+    }
     viewData.toasts.push(toastObj);
 
-    document.getElementById('toastList').appendChild(toastEl);
+
+    updateToastUI(id);
 }
 
 //create the modal independently, always
 //appear and show it with the name and text of the appropriate modal click
-
-
 // Update the UI of a specific toast based on its state
 function updateToastUI(toastId) {
     let el = viewData.toasts[toastId].element;
