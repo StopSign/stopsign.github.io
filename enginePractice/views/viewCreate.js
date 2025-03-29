@@ -7,11 +7,11 @@ function initializeDisplay() {
     data.actionNames.forEach(function (actionVar) { //wait until they are all created to link downstreams
         generateActionDisplay(actionVar);
     })
-    initializeToasts();
     generateLinesBetweenActions();
     actionUpdateAllStatMults();
     actionTitleClicked(`overclock`);
     initializeMenus();
+    initializeToasts();
     generateAmuletContent();
     setAllCaches(); //happens after generation
 
