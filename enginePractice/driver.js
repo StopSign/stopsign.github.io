@@ -121,7 +121,24 @@ function gameTick() {
         checkLevelUp(actionObj, dataObj);
     }
 
+    for (let actionVar in data.actions) {
+        const actionObj = data.actions[actionVar];
 
+        if (!actionObj.downstreamVars) continue;
+
+        actionObj.downstreamVars.forEach(function (downstreamVar) {
+            if (isAttentionLine(actionVar, downstreamVar)) {
+                const key = downstreamVar + "AttentionMult";
+                if(data.upgrades.rememberWhatIFocusedOn.upgradePower === 0) {
+                    return;
+                }
+                actionObj[key] += 1 / ticksPerSecond / 3600;
+                if(actionObj[key] > data.attentionLoopMax) {
+                    actionObj[key] = data.attentionLoopMax;
+                }
+            }
+        });
+    }
     //To get change/s
     //loop through all actions (data.actionNames is an [] with names, data.actions has the objects. actionObj = data.actions[actionNames[0]] for example)
     //have statsPerSecond = {"charm":num, "curiosity":num, ...}
@@ -201,9 +218,9 @@ function tickGameObject(actionVar) {
             downstreamAction.momentumIncrease = actionObj.amountToSend * actionObj.progressGain / actionObj.progressMax;
             return;
         }
-        //Send momentum to downstream, and also update downstream's taken
-        let mult = (view.cached[actionVar+"NumInput"+downstreamVar].value-0)/100;
-        let taken = actionObj.progressRateReal() * mult; //warning: this is different than rateEfficient in generators
+        let mult = (view.cached[actionVar + "NumInput" + downstreamVar].value - 0) / 100;
+        let taken = calculateTaken(actionVar, downstreamVar, actionObj, mult);
+
         actionObj.totalSend += taken * ticksPerSecond;
         actionObj.momentumDecrease += taken * ticksPerSecond;
 
@@ -215,6 +232,19 @@ function tickGameObject(actionVar) {
         actionObj.momentumDelta = actionObj.momentumIncrease - actionObj.momentumDecrease;
     }
 }
+
+function calculateTaken(actionVar, downstreamVar, actionObj, mult) {
+    let permAttentionMult = actionObj[downstreamVar + "AttentionMult"] >= 1 ? actionObj[downstreamVar + "AttentionMult"] : 1;
+
+
+    let totalTakenMult = actionObj.tierMult() * (actionObj.efficiency / 100) * permAttentionMult * (isAttentionLine(actionVar, downstreamVar) ? data.attentionMult : 1);
+    if (totalTakenMult > 0.1) {
+        totalTakenMult = 0.1; // Cap at 10%/s
+    }
+    let toReturn = actionObj.momentum / ticksPerSecond * totalTakenMult * mult;
+    return toReturn < .00001 ? 0 : toReturn;
+}
+
 
 function checkProgressCompletion(actionObj, dataObj) {
     if(actionObj.progress >= actionObj.progressMax) { //or max

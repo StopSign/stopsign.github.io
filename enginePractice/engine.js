@@ -77,6 +77,7 @@ function actionSetInitialVariables(actionObj, dataObj) {
     actionObj.tier = dataObj.tier;
     actionObj.wage = dataObj.wage ? dataObj.wage : null;
     actionObj.isKTL = !!dataObj.isKTL;
+    actionObj.purchased = !!dataObj.purchased;
 
     // actionObj.onUnlock = dataObj.onUnlock ? dataObj.onUnlock : function() {};
     // actionObj.onCompleteCustom = dataObj.onCompleteCustom ? dataObj.onCompleteCustom : function() {};
@@ -108,6 +109,11 @@ function createAndLinkNewAction(actionVar, dataObj, title, x, y, downstreamVars)
 
     actionSetBaseVariables(actionObj, dataObj);
     actionSetInitialVariables(actionObj, dataObj);
+
+
+    for(let downstreamVar of actionObj.downstreamVars) {
+        actionObj[downstreamVar+"AttentionMult"] = 1;
+    }
 
     actionObj.progressRateReal = function() { //For data around the flat action too
         return actionObj.momentum * actionObj.tierMult() * (actionObj.efficiency/100) / ticksPerSecond;
@@ -155,6 +161,12 @@ function actionProgressRate(actionObj) {
         return 1 / ticksPerSecond;
     }
     return actionObj.progressRateReal();
+}
+
+function isAttentionLine(actionVar, downstreamVar) {
+    return data.attentionSelected.some(
+        sel => sel.lineData.from === actionVar && sel.lineData.to === downstreamVar
+    );
 }
 
 function calcUpgradeMultToExp(actionObj) {
@@ -239,12 +251,21 @@ function actionUpdateAllStatMults() {
     })
 }
 
+//prepares the action to be unlocked during hte loop next round
+function purchaseAction(actionVar) {
+    let actionObj = data.actions[actionVar];
+    if(!actionObj) {
+        console.log('tried to purchase ' + actionVar + ' in error.');
+        return;
+    }
+    actionObj.purchased = true;
+}
 
 //situation 1: Harness Overflow is just unlocked. It should be 1% sent to Process Thoughts. AKA On unlock, set all sliders to 1%
 //situation 2: Travel to Outpost just became visible. It's parent, Overclock, should set it's newly visible slider to 1%. AKA On unveil, set parent to 1%.
 function unveilAction(actionVar) {
     let actionObj = data.actions[actionVar];
-    if(!actionObj || actionObj.visible) { //only change things if
+    if(!actionObj || actionObj.visible || !actionObj.purchased) { //only change things if needed
         if(!actionObj) {
             console.log('tried to unveil ' + actionVar + ' in error.');
         }

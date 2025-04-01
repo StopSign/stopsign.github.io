@@ -20,10 +20,10 @@ function getStatColor(statName) {
     });
 
     if(statAddedTo && statUsed) {
-        return "var(--success-color)";
+        return "var(--text-primary)";
     }
     if(statAddedTo && !statUsed) {
-        return "var(--text-primary)";
+        return "var(--success-color)";
     }
     if(!statAddedTo && statUsed) {
         return "var(--accent-primary)";
@@ -58,7 +58,7 @@ function getStatChanges() {
 
         // Calculate levels per second
         let completesPerSecond = 0;
-        if(actionObj.unlocked && actionObj.level < actionObj.maxLevel) {
+        if(actionObj.unlocked && (actionObj.maxLevel < 0 || (actionObj.level < actionObj.maxLevel))) {
             completesPerSecond = actionProgressRate(actionObj) * ticksPerSecond / actionObj.progressMax;
         }
         let levelsPerSecond = completesPerSecond * actionObj.expToAdd / actionObj.expToLevel;

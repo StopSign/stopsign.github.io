@@ -281,15 +281,70 @@ function createDownStreamSliders(actionObj) {
         theStr +=
             "<div id='"+actionObj.actionVar+"SliderContainer"+downstreamVar+"' style='margin-bottom: 5px;margin-top:5px;font-size:12px;'>" +
                 "<b><span style='margin-bottom: 10px;cursor:pointer;' onclick='actionTitleClicked(`"+downstreamVar+"`)'>"+title+"</span></b>" +
-                " (+<b><span id='"+actionObj.actionVar+"DownstreamSendRate"+downstreamVar+"'>0</span></b>/s)<br>" +
-                "<input type='number' id='"+actionObj.actionVar+"NumInput"+downstreamVar+"' value='0' min='0' max='100' oninput='validateInput(\""+actionObj.actionVar+"\", \""+downstreamVar+"\")' onchange='downstreamNumberChanged(\""+actionObj.actionVar+"\", \""+downstreamVar+"\")' style='margin-right: 3px;font-size:10px;width:37px;'>" +
-                "<input type='range' id='"+actionObj.actionVar+"RangeInput"+downstreamVar+"' value='0' min='0' max='100' oninput='downstreamSliderChanged(\""+actionObj.actionVar+"\", \""+downstreamVar+"\")' style='margin-left:5px;width:200px;font-size:10px;height:5px;margin-bottom:8px;'>" +
+                " (+<b><span id='"+actionObj.actionVar+"DownstreamSendRate"+downstreamVar+"'>0</span></b>/s)" +
+                " <b><span id='"+actionObj.actionVar+"DownstreamAttentionBonusLoop"+downstreamVar+"' class='hyperVisible' style='color:mediumpurple;display:none;'>x1.00</span></b>" +
+                " <b><span id='"+actionObj.actionVar+"DownstreamAttentionBonus"+downstreamVar+"' class='hyperVisible' style='color:yellow;display:none;'>x2</span></b><br>" +
+                "<input type='number' id='"+actionObj.actionVar+"NumInput"+downstreamVar+"' value='0' min='0' max='100' " +
+                    "oninput='validateInput(\""+actionObj.actionVar+"\", \""+downstreamVar+"\")' onchange='downstreamNumberChanged(\""+actionObj.actionVar+"\", \""+downstreamVar+"\")' style='margin-right: 3px;font-size:10px;width:37px;'>" +
+                "<input type='range' id='"+actionObj.actionVar+"RangeInput"+downstreamVar+"' value='0' min='0' max='100' " +
+                    "oninput='downstreamSliderChanged(\""+actionObj.actionVar+"\", \""+downstreamVar+"\")' style='margin-left:5px;width:200px;font-size:10px;height:5px;margin-bottom:8px;'>" +
             "</div>"
 
     });
 
     return theStr;
 }
+
+
+function highlightLine(borderId) {
+    const line = document.getElementById(borderId);
+    let miniVersion = scale < .45;
+    if (line) {
+        if(miniVersion) {
+            line.style.boxShadow = '0 0 40px 11px yellow';
+        } else {
+            line.style.boxShadow = '0 0 18px 5px yellow';
+        }
+        line.querySelector(".line-label-top").style.opacity = "1";
+    }
+}
+function unhighlightLine(borderId) {
+    const line = document.getElementById(borderId);
+    if (line) {
+        line.style.boxShadow = '';
+        line.querySelector(".line-label-top").style.opacity = "0";
+    }
+}
+
+
+function handleLineClick(borderId, lineData) {
+    const existingIndex = data.attentionSelected.findIndex(entry => entry.borderId === borderId);
+
+    if (existingIndex !== -1) {
+        unhighlightLine(borderId);
+        data.attentionSelected.splice(existingIndex, 1);
+    } else {
+        if (data.attentionSelected.length >= data.maxAttentionAllowed) {
+            const removed = data.attentionSelected.shift();
+            unhighlightLine(removed.borderId);
+        }
+        data.attentionSelected.push({ borderId, lineData });
+        highlightLine(borderId);
+    }
+}
+
+function getLabelOrientation(angle) {
+    const norm = ((angle % 360) + 360) % 360;
+
+    if ((norm >= 60 && norm <= 120) || (norm >= 240 && norm <= 300)) {
+        return "vertical"; // counter-rotate
+    } else if (norm > 120 && norm < 240) {
+        return "flipped"; // upside-down, but visually consistent
+    } else {
+        return "horizontal";
+    }
+}
+
 
 function generateLinesBetweenActions() {
     data.actionNames.forEach(function (actionVar) {
@@ -298,39 +353,70 @@ function generateLinesBetweenActions() {
             return;
         }
         actionObj.downstreamVars.forEach(function(downstreamVar, index) {
-            let targetObj = data.actions[downstreamVar];
-            if(!targetObj || targetObj.realX === undefined || actionObj.realX === undefined) {
+            let downstreamObj = data.actions[downstreamVar];
+            if(!downstreamObj || downstreamObj.realX === undefined || actionObj.realX === undefined) {
                 return;
             }
             // Calculate the centers of each object
             const x1 = actionObj.realX + 155; // 220 / 2
             const y1 = actionObj.realY + 80; // 200 / 2
-            const x2 = targetObj.realX + 155; // 220 / 2
-            const y2 = targetObj.realY + 80; // 200 / 2
+            const x2 = downstreamObj.realX + 155; // 220 / 2
+            const y2 = downstreamObj.realY + 80; // 200 / 2
 
             let sourceBackgroundColor = getResourceColor(actionObj);
-            let targetBackgroundColor = getResourceColor(targetObj);
-            let isDifferentResource = actionObj.momentumName !== targetObj.momentumName;
+            let targetBackgroundColor = getResourceColor(downstreamObj);
+            let isDifferentResource = actionObj.momentumName !== downstreamObj.momentumName;
             let backgroundColor = isDifferentResource ? `linear-gradient(to right, ${sourceBackgroundColor}, ${targetBackgroundColor})` : 'var(--line-color)';
 
-            let borderId = `${actionVar}_${targetObj.actionVar}_Line_Outer`;
-            let lineId = actionVar+`_`+targetObj.actionVar+`_Line_Inner`;
+            let borderId = `${actionVar}_${downstreamObj.actionVar}_Line_Outer`;
+            let lineId = actionVar+`_`+downstreamObj.actionVar+`_Line_Inner`;
 
             //Rotated retangle with inner line ready to adjust width of.
             let length = Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
             let angle = Math.atan2(y2 - y1, x2 - x1) * (180 / Math.PI);
 
-            let line = `<div id="${borderId}" style="pointer-events:none;display:flex;align-items: center;position: absolute; width: ${length}px; height: 20px; background: ${backgroundColor}; opacity: 1; transform-origin: 0 50%;transform: rotate(${angle}deg);  left: ${x1}px; top: ${y1}px;">` +
-                `<div id="${lineId}" style="transform:translateY(-50%) translateY(10px); width: 100%; height: 0px; background-color: ${targetBackgroundColor};"></div>` +
-            `</div>`;
+            const labelMode = getLabelOrientation(angle);
 
-            // // Create a div and set its innerHTML to the SVG line
-            const lineDiv = document.createElement('template');
-            lineDiv.innerHTML = line;
-            //
-            // // Append the lineDiv to the lineContainer
-            const lineContainer = document.getElementById('lineContainer');
-            lineContainer.appendChild(lineDiv.content);
+            let topTransform = "translateX(-50%)";
+            let bottomTransform = "translateX(-50%)";
+            let topY = "-12px";
+            let bottomY = "12px";
+            let lineTransform = "translateY(-50%) translateY(10px)";
+            let labelWrapperTransform = "";
+
+            if (labelMode === "vertical") {
+                labelWrapperTransform = `rotate(${-angle}deg)`;
+                topY = "";
+                bottomY = "";
+            } else if (labelMode === "flipped") {
+                labelWrapperTransform = `rotate(180deg)`;
+            } else {
+                labelWrapperTransform = "";
+            }
+
+            let isDifferentMomentum = actionObj.momentumName !== downstreamObj.momentumName;
+            let onclickText = isDifferentMomentum?``:`handleLineClick('${borderId}', {from: '${actionVar}', to: '${downstreamObj.actionVar}'})`;
+            let cursorStyle = isDifferentMomentum?``:`cursor:pointer`;
+
+            let lineHTML = Raw.html`
+                <div id="${borderId}" class="line-connection" 
+                     style="${cursorStyle}; display:flex; align-items: center; position: absolute; width: ${length}px; height: 20px; background: ${backgroundColor}; opacity: 1; transform-origin: 0 50%; transform: rotate(${angle}deg); left: ${x1}px; top: ${y1}px;"
+                     onclick="${onclickText}">
+                     
+                    <div id="${lineId}" style="transform:${lineTransform}; width: 100%; height: 0px; background-color: ${targetBackgroundColor}; position: relative;text-align:center;">
+                        <div id="${lineId}_Container" style="display: flex;position: absolute;left: 50%;top: 50%;
+                            transform: translate(-50%, -50%) ${labelWrapperTransform};flex-direction: column;align-items: center;pointer-events: none;">
+                            <div id="${lineId}_Top" class="line-label-top hyperVisible" style="opacity:0;position:relative;color: yellow;font-size: 14px;font-weight: bold;line-height: 1;top:${topY}">
+                                x10
+                            </div>
+                            <div id="${lineId}_Bottom" class="line-label-bottom hyperVisible" style="position:relative;color:mediumpurple;font-size: 12px;font-weight: bold;line-height: 1;top:${bottomY}">
+                                x1.00
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+
+            document.getElementById("lineContainer").insertAdjacentHTML("beforeend", lineHTML);
         });
     });
 }
@@ -482,9 +568,14 @@ function cacheDownstreamViews(actionVar) {
         view.cached[actionVar+"NumInput"+downstreamVar] = document.getElementById(actionVar+"NumInput"+downstreamVar);
 
         view.cached[`${actionVar}DownstreamSendRate${downstreamVar}`] = document.getElementById(`${actionVar}DownstreamSendRate${downstreamVar}`);
+        view.cached[`${actionVar}DownstreamAttentionBonus${downstreamVar}`] = document.getElementById(`${actionVar}DownstreamAttentionBonus${downstreamVar}`);
+        view.cached[`${actionVar}DownstreamAttentionBonusLoop${downstreamVar}`] = document.getElementById(`${actionVar}DownstreamAttentionBonusLoop${downstreamVar}`);
 
         view.cached[actionVar + "_" + downstreamVar + "_Line_Outer"] = document.getElementById(actionVar + "_" + downstreamVar + "_Line_Outer");
+        view.cached[actionVar + "_" + downstreamVar + "_Line_Inner_Top"] = document.getElementById(actionVar + "_" + downstreamVar + "_Line_Inner_Top");
+        view.cached[actionVar + "_" + downstreamVar + "_Line_Inner_Bottom"] = document.getElementById(actionVar + "_" + downstreamVar + "_Line_Inner_Bottom");
         view.cached[actionVar + "_" + downstreamVar + "_Line_Inner"] = document.getElementById(actionVar + "_" + downstreamVar + "_Line_Inner");
+        view.cached[actionVar + "_" + downstreamVar + "_Line_Inner_Container"] = document.getElementById(actionVar + "_" + downstreamVar + "_Line_Inner_Container");
         view.cached[actionVar + "SliderContainer" + downstreamVar] = document.getElementById(actionVar + "SliderContainer" + downstreamVar);
     });
 }

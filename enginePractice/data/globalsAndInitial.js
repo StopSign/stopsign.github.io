@@ -15,7 +15,7 @@ let bonusTime = 0;
 
 //Saving globals
 let isFileSystem = !!location.href.match("file");
-let saveName = "save3"; //Blank if you don't want to save, change name to force user reset
+let saveName = "KTLsave"; //Blank if you don't want to save, change name to force user reset
 
 let stop = false;
 let forceStop = false;
@@ -42,6 +42,10 @@ data.currentWage = 1;
 data.numberType = "engineering"; //or scientific
 data.doneKTL = false;
 data.doneAmulet = false;
+data.attentionSelected = [];
+data.maxAttentionAllowed = 2;
+data.attentionMult = 2;
+data.attentionLoopMax = 2.5;
 
 let viewData = {}; //contains only things that are generated / not saved
 viewData.toasts = [];
@@ -64,11 +68,12 @@ function debug() {
     document.getElementById("killTheLichMenuButton").style.display = "";
     data.useAmuletButtonShowing = true;
     data.essence = 300;
+    buyUpgrade("buyNicerStuff", 0);
     buyUpgrade("stopLettingOpportunityWait", 0);
     buyUpgrade("stopLettingOpportunityWait", 1);
     buyUpgrade("stopLettingOpportunityWait", 2);
     setSliderUI("overclock", "harnessOverflow", 100);
-    gameSpeed = 100;
+    gameSpeed = 10;
 }
 
 function initializeData() {
@@ -172,7 +177,7 @@ function initializeData() {
 
     create("checkNoticeBoard", ["reportForTraining", "reportForLabor"], 1, -1);
     create("helpScottWithChores", [], 0, -1);
-    create("fillBasicNeeds", ["buyClothing", "eatBetterFood"], -.5, -1);
+    create("fillBasicNeeds", ["buyClothing", "eatBetterFood", "improveHome"], -.5, -1);
 
     //Village
     create("reportForTraining", ["takeLessonsFromJohn"], 0, -1)
@@ -192,8 +197,15 @@ function initializeData() {
     create("storyTeller", [], 0, -1);
 
     //spend money
-    create("buyClothing", [], -1, -1.5);
-    create("eatBetterFood", [], -1, -.5);
+    create("eatBetterFood", ["eatStreetFood", "eatTastyFood"], -1, -.5);
+    create("eatStreetFood", [], 0, 1);
+    create("eatTastyFood", ["eatQualityFood"], -1, 0);
+    create("eatQualityFood", [], -1, -.5);
+    create("buyClothing", ["buyQualityClothing"], -1, -1.5);
+    create("buyQualityClothing", ["buyFashionableClothing"], 0, -1);
+    create("buyFashionableClothing", [], -1, 0);
+
+    create("improveHome", [], 0, -3);
 
     //Socialize
     create("socialize", ["chat"], -1.5, 0);

@@ -10,6 +10,7 @@ function initializeKTL() {
     if(!document.getElementById('confirmKTL').checked || (!isDebug && data.totalMomentum < 1.1e6)) {1
         return;
     }
+    data.attentionSelected = [];
     view.cached.killTheLichMenu.style.display = "none";
 
     data.gameState = "KTL";
@@ -36,13 +37,14 @@ function openUseAmuletMenu(isUseable) {
     document.getElementById("useAmuletMenu").style.display = isShowing ? "none" : "flex";
     document.getElementById('amuletConfirm').checked = false;
 
-    document.getElementById("amuletEnabledContainer").style.display = isUseable ? "" : "none";
+    // document.getElementById("infoTextButton").style.display = isUseable ? "" : "none";
 }
 
 function useAmulet() {
     if(!document.getElementById('amuletConfirm').checked) {
         return;
     }
+    data.attentionSelected = [];
     data.doneAmulet = true;
     document.getElementById("useAmuletMenu").style.display = "none";
     document.getElementById("openViewAmuletButton").style.display = "";
@@ -82,6 +84,9 @@ function useAmulet() {
             if(data.actions[downstreamVar] && data.actions[downstreamVar].unlocked) {
                 setSliderUI(actionObj.actionVar, downstreamVar, getUpgradeSliderAmount());
             }
+            let currentMult = actionObj[downstreamVar + "AttentionMult"];
+
+            actionObj[downstreamVar + "AttentionMult"] = (currentMult - 1) * [0, .2, .5, .9, 1][data.actions.knowWhatIFocusedOn.upgradePower] + 1;
         });
     });
 

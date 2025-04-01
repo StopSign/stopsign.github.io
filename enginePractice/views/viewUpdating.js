@@ -133,6 +133,7 @@ function updateActionForVisibility(actionObj, prevAction, forceUpdate) {
         view.cached[`${actionVar}Container`].style.pointerEvents = "none";
         view.cached[`${actionVar}SmallVersionContainer`].style.display = "";
         forceUpdate = true;
+        //go through each downstream action, and each bar should have its text container hidden, and the selected border color widened
     } else if(prevState.scale !== scale && !miniVersion && view.cached[`${actionVar}LargeVersionContainer`].style.display === "none") {
         //switch to large versions
         view.cached[`${actionVar}LargeVersionContainer`].style.display = ""
@@ -142,19 +143,45 @@ function updateActionForVisibility(actionObj, prevAction, forceUpdate) {
     }
 
     if(prevState.scale !== scale) {
+        for (let downstreamVar of actionObj.downstreamVars) {
+            if (!view.cached[actionVar + "_" + downstreamVar + "_Line_Inner_Container"]) { //for when downstream are declared but not created
+                continue;
+            }
+            if (miniVersion) {
+                view.cached[actionVar + "_" + downstreamVar + "_Line_Inner_Container"].style.display = "none"
+                if(isAttentionLine(actionVar, downstreamVar)) {
+                    view.cached[actionVar + "_" + downstreamVar + "_Line_Outer"].style.boxShadow = '0 0 40px 11px yellow';
+                } else {
+                    view.cached[actionVar + "_" + downstreamVar + "_Line_Outer"].style.boxShadow = '';
+                }
+            } else {
+                view.cached[actionVar + "_" + downstreamVar + "_Line_Inner_Container"].style.display = ""
+                if(isAttentionLine(actionVar, downstreamVar)) {
+                    view.cached[actionVar + "_" + downstreamVar + "_Line_Outer"].style.boxShadow = '0 0 18px 5px yellow';
+                } else {
+                    view.cached[actionVar + "_" + downstreamVar + "_Line_Outer"].style.boxShadow = '';
+                }
+            }
+        }
+    }
+
+    if(prevState.scale !== scale) {
         view.cached[`${actionVar}SmallVersionContainer`].style.scale = (1 / scale)*.8+"";
     }
 
-    if(forceUpdate || (prevAction.visible !== actionObj.visible) || (prevAction.isRunning !== actionObj.isRunning)) {
-        if(actionObj.visible && actionObj.isRunning && gameStateMatches(actionObj)) {
+    // if(actionObj.parent && !view.cached[actionObj.parent + "_" + actionVar + "_Line_Outer"]) {
+    //     console.log("not found: " + actionObj.parent + "_" + actionVar + "_Line_Outer")
+    // }
+    if (forceUpdate || (prevAction.visible !== actionObj.visible) || (prevAction.isRunning !== actionObj.isRunning)) {
+        if (actionObj.visible && actionObj.isRunning && gameStateMatches(actionObj)) {
             view.cached[actionVar + "Container"].style.display = "";
-            if(actionObj.parent) {
+            if (actionObj.parent) {
                 view.cached[actionObj.parent + "_" + actionVar + "_Line_Outer"].style.display = "";
                 view.cached[actionObj.parent + "_" + actionVar + "_Line_Inner"].style.display = "";
             }
         } else {
             view.cached[actionVar + "Container"].style.display = "none";
-            if(actionObj.parent) {
+            if (actionObj.parent) {
                 view.cached[actionObj.parent + "_" + actionVar + "_Line_Outer"].style.display = "none";
                 view.cached[actionObj.parent + "_" + actionVar + "_Line_Inner"].style.display = "none";
             }
@@ -290,7 +317,11 @@ function updateActionDownstreamViews(actionObj, prevAction, forceUpdate) {
     if(actionObj.downstreamVars) {
         actionObj.downstreamVars.forEach(function (downstreamVar) {
             let downstreamObj = data.actions[downstreamVar];
+            if(!downstreamObj) {
+                return;
+            }
             if(!downstreamObj || downstreamObj.momentumName !== actionObj.momentumName) {
+                view.cached[`${actionVar}_${downstreamVar}_Line_Inner_Bottom`].style.display = "none"
                 return;
             }
 
@@ -298,14 +329,33 @@ function updateActionDownstreamViews(actionObj, prevAction, forceUpdate) {
                 || prevAction.momentum !== actionObj.momentum
                 || (actionObj["downstreamRate"+downstreamVar] !== prevAction["downstreamRate"+downstreamVar])) {
                 let rangeValue = document.getElementById(actionVar + "RangeInput" + downstreamVar).value;
-                if(downstreamObj.unlocked) {
-                    view.cached[`${actionVar}DownstreamSendRate${downstreamVar}`].textContent = intToString((rangeValue / 100) * actionObj.progressRateReal() * ticksPerSecond, 4);
-                    //downstream send rate = rangeValue / 100 * current momentum * tier
-                } else {
-                    view.cached[`${actionVar}DownstreamSendRate${downstreamVar}`].textContent = intToString((rangeValue / 100) * actionObj.progressRateReal() * ticksPerSecond, 4);
-                    //it's not the downstreamObj's progressRateReal, it's the current object's send rate times the efficiency times the slider setting
-                }
+                let mult = rangeValue/100;
+                let taken = calculateTaken(actionVar, downstreamVar, actionObj, mult);
+
+
+
+                view.cached[`${actionVar}DownstreamSendRate${downstreamVar}`].textContent = intToString(taken * ticksPerSecond, 4);
             }
+
+
+            if(isAttentionLine(actionVar, downstreamVar)) {
+                view.cached[`${actionVar}DownstreamAttentionBonus${downstreamVar}`].textContent = "x"+intToString(data.attentionMult, 1);
+                view.cached[`${actionVar}_${downstreamVar}_Line_Inner_Top`].textContent = "x"+intToString(data.attentionMult, 1);
+                view.cached[`${actionVar}DownstreamAttentionBonus${downstreamVar}`].style.display = ""
+            } else {
+                view.cached[`${actionVar}DownstreamAttentionBonus${downstreamVar}`].style.display = "none"
+            }
+            if(actionObj[downstreamVar + "AttentionMult"] > 1.005) {
+                view.cached[`${actionVar}DownstreamAttentionBonusLoop${downstreamVar}`].textContent = "x"+intToString(actionObj[downstreamVar + "AttentionMult"], 3);
+                view.cached[`${actionVar}_${downstreamVar}_Line_Inner_Bottom`].textContent = "x"+intToString(actionObj[downstreamVar + "AttentionMult"], 3);
+                view.cached[`${actionVar}DownstreamAttentionBonusLoop${downstreamVar}`].style.display = ""
+                view.cached[`${actionVar}_${downstreamVar}_Line_Inner_Bottom`].style.display = ""
+            } else {
+                view.cached[`${actionVar}DownstreamAttentionBonusLoop${downstreamVar}`].style.display = "none"
+                view.cached[`${actionVar}_${downstreamVar}_Line_Inner_Bottom`].style.display = "none"
+            }
+
+
 
             //if downstream is invisible, hide it and the connecting line border
             //if downstream is invisible, hide relevant actionObj's slider area

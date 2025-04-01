@@ -18,24 +18,31 @@ function load() {
 
     if(isLoadingEnabled && window.localStorage[saveName] && JSON.parse(window.localStorage[saveName]).data) { //has a save file
         toLoad = JSON.parse(window.localStorage[saveName]).data;
-        data.actionNames.forEach(function (actionVar) {
-            let actionObj = data.actions[actionVar];
-            Object.keys(toLoad.actions[actionVar]).forEach(function (key) {
-                if(["x", "y"].indexOf(key) !== -1) {
-                    return;
-                }
-                if (typeof toLoad.actions[actionVar][key] !== 'function' && typeof actionObj[key] !== 'function') {
-                    actionObj[key] = toLoad.actions[actionVar][key];
-                }
-            });
+        // data.actionNames.forEach(function (actionVar) {
+        //     let actionObj = data.actions[actionVar];
+        //     Object.keys(toLoad.actions[actionVar]).forEach(function (key) {
+        //         if(["x", "y"].indexOf(key) !== -1) {
+        //             return;
+        //         }
+        //         if (typeof toLoad.actions[actionVar][key] !== 'function' && typeof actionObj[key] !== 'function') {
+        //             actionObj[key] = toLoad.actions[actionVar][key];
+        //         }
+        //     });
+        //
+        // })
+        // data.statNames.forEach(function (statVar) {
+        //     data.stats[statVar] = toLoad.stats[statVar];
+        // })
 
-        })
-        data.statNames.forEach(function (statVar) {
-            data.stats[statVar] = toLoad.stats[statVar];
-        })
 
-        //TODO apply only the existing ones to data AKA allow for future updates
-        data.toastStates = toLoad.toastStates ? toLoad.toastStates : [];
+        mergeExistingOnly(data, toLoad, "actions", ["x", "y"]);
+        mergeExistingOnly(data, toLoad, "stats");
+        mergeExistingOnly(data, toLoad, "upgrades");
+        mergeExistingOnly(data, toLoad, "toastStates");
+
+
+
+
 
         data.gameState = toLoad.gameState ? toLoad.gameState : "default";
         data.totalMomentum = toLoad.totalMomentum ? toLoad.totalMomentum : 0;
@@ -45,10 +52,13 @@ function load() {
         data.currentJob = toLoad.currentJob ? toLoad.currentJob : "Helping Scott";
         data.currentWage = toLoad.currentWage ? toLoad.currentWage : 1;
         data.numberType = toLoad.numberType ? toLoad.numberType : "engineering";
-        data.upgrades = toLoad.upgrades;
         data.doneKTL = !!toLoad.doneKTL;
         data.doneAmulet = !!toLoad.doneAmulet;
         data.displayJob = !!toLoad.displayJob;
+        data.attentionSelected = toLoad.attentionSelected ? toLoad.attentionSelected : [];
+        data.maxAttentionAllowed = toLoad.maxAttentionAllowed ? toLoad.maxAttentionAllowed : 3;
+        data.attentionMult = toLoad.attentionMult ? toLoad.attentionMult : 2;
+        data.attentionLoopMax = toLoad.attentionLoopMax ? toLoad.attentionLoopMax : 2.5;
     }
 
     initializeDisplay();
@@ -66,6 +76,19 @@ function load() {
             setSliderUI(actionVar, downVar, toLoad.actions[actionVar]["downstreamRate" + downVar]);
         });
     });
+}
+
+function mergeExistingOnly(data, toLoad, varName, skipList = []) {
+    const dataObj = data[varName];
+    const toLoadObj = toLoad[varName];
+    if (typeof dataObj !== "object" || typeof toLoadObj !== "object") return;
+
+    for (let key in toLoadObj) {
+        if (!(key in dataObj)) continue;         // Skip if the key is not in data
+        if (skipList.includes(key)) continue;    // Skip if key is in skipList
+
+        Object.assign(dataObj[key], toLoadObj[key]);
+    }
 }
 
 function updateUIFromLoad() {
@@ -95,6 +118,17 @@ Things that are not reloading properly:
     for(let i = 0; i < data.toastStates.length; i++) {
         updateToastUI(i);
     }
+
+    reapplyAttentionSelected();
+}
+
+function reapplyAttentionSelected() {
+    if (!data.attentionSelected) return;
+
+    data.attentionSelected.forEach(entry => {
+        const { borderId } = entry;
+        highlightLine(borderId); // Reapply visual state
+    });
 }
 
 function save() {

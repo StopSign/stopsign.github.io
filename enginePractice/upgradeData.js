@@ -30,7 +30,7 @@ function selectBuyUpgrade(upgradeVar, num) {
         document.getElementById("infoTextButton").style.display = "none";
     } else if(num === 0 || data.upgrades[upgradeVar].upgradesBought.indexOf(num-1) !== -1) { //ready
         document.getElementById("infoMenu").style.borderColor = "#00cd41";
-        document.getElementById("infoTextButton").style.display = "";
+        document.getElementById("infoTextButton").style.display = data.gameState !== "KTL" ? "none" : "";
     } else { //disabled
         document.getElementById("infoMenu").style.borderColor = "#ff0000";
         document.getElementById("infoTextButton").style.display = "none";
@@ -40,6 +40,7 @@ function selectBuyUpgrade(upgradeVar, num) {
 function buyUpgrade(upgradeVar, num) {
     //also deselect the upgrade
     let upgrade = data.upgrades[upgradeVar];
+    let dataObj = actionData.upgrades[upgradeVar];
 
     if(upgrade.upgradesBought.indexOf(num) !== -1) { //already bought
         return;
@@ -49,6 +50,7 @@ function buyUpgrade(upgradeVar, num) {
     if (data.essence < cost) {
         return;
     }
+    //buy
     data.essence -= cost;
 
     //add to upgrades
@@ -62,8 +64,12 @@ function buyUpgrade(upgradeVar, num) {
     if(selectedUpgrade.var) { // <- allow buy on load
         selectBuyUpgrade(selectedUpgrade.var, selectedUpgrade.num); //deselect
     }
+    if(dataObj.onBuy) {
+        dataObj.onBuy(upgrade.upgradePower);
+    }
 }
 
+//no listeners allowed here
 function createInfoText(upgradeVar, num) {
     let upgrade = data.upgrades[upgradeVar];
     return actionData.upgrades[upgradeVar].customInfo(num) +
@@ -84,7 +90,6 @@ function createUpgrades() {
         upgradeObj.upgradesAvailable = dataObj.upgradesAvailable;
         upgradeObj.upgradesBought = []; //e.g. bought first and fifth upgrade and it would be [0,4]. Not used atm.
         upgradeObj.requireInOrder = dataObj.requireInOrder !== undefined ? dataObj.requireInOrder : true;
-        upgradeObj.customInfo = dataObj.customInfo;
         upgradeObj.isFullyBought = false;
         upgradeObj.visible = !!dataObj.visible;
     }
@@ -132,6 +137,41 @@ actionData.upgrades = {
         customInfo: function(num) {
             return "Unlock new actions!<br>Story: My armor is broken, my sword shattered, my shield is in pieces. The army " +
                 "did not expect me to fight this long, and their preparation was lacking.<br><br>I must take this into my own hands.";
+        },
+        onBuy: function(num) {
+            if(num===1) {
+                purchaseAction('eatStreetFood');
+                purchaseAction('eatTastyFood');
+                purchaseAction('eatQualityFood');
+                purchaseAction('buyQualityClothing');
+                purchaseAction('buyFashionableClothing');
+                purchaseAction('improveHome');
+            } else if(num === 2) {
+                purchaseAction('rentARoomAtInn');
+                purchaseAction('listenToInnGuests');
+                purchaseAction('chatWithInnGuests');
+                purchaseAction('bargainForABetterRoom');
+                purchaseAction('getBetterService');
+
+                purchaseAction('buyAHouse');
+                purchaseAction('buyFirewood');
+                purchaseAction('buyFurniture');
+                purchaseAction('buySomeBooks');
+                purchaseAction('readByTheFireplace');
+
+                purchaseAction('getComfy');
+                purchaseAction('moveToCity');
+            } else if(num === 3) {
+                purchaseAction('buyACityHouse');
+                purchaseAction('hireLabor');
+                purchaseAction('buyHouseholdSupplies');
+                purchaseAction('buyFurniture');
+                purchaseAction('buyGardeningSupplies');
+                purchaseAction('payHouseholdStaff');
+                purchaseAction('payGroundskeeper');
+
+                purchaseAction('payTaxes');
+            }
         }
     },
     makeMoreMoney: {
@@ -140,6 +180,64 @@ actionData.upgrades = {
         visible:true,
         customInfo: function(num) {
             return "Gold generation increased by "+(num >0?"another ":"")+"x2";
+        }
+    },
+    haveBetterConversations: {
+        initialCost:12, costIncrease:2,
+        upgradesAvailable:4,
+        visible:true,
+        customInfo: function(num) {
+            return "Conversation generation increased by "+(num >0?"another ":"")+"x2";
+        }
+    },
+    focusHarder: {
+        initialCost:25, costIncrease:4,
+        upgradesAvailable:8,
+        visible:true,
+        customInfo: function(num) {
+            return "Increases the Focus Mult by "+(num >0?"another ":"")+"+1 (for a total of " + (num+1+2) + ")";
+        },
+        onBuy: function(num) {
+            data.attentionMult = 2 + num;
+        }
+    },
+    rememberWhatIFocusedOn: {
+        initialCost:40, costIncrease:5,
+        upgradesAvailable:3,
+        visible:true,
+        customInfo: function(num) {
+            if(num === 0) {
+                return "Gain +1/hr to a new Loop Bonus on the flow you have Focused. Stays when Focus is removed, but resets when the Amulet is used. The Loop Bonus has a max of 2.5. Maximum flow is still 10%/s."
+            }
+            return "Increases the Loop Bonus' max by "+(num >0?"another ":"")+"x2 (for a total of " + (2.5*Math.pow(2, (num+1))) + ")";
+        },
+        onBuy: function(num) {
+            data.attentionLoopMax = 2.5 * Math.pow(2, data.upgrades.rememberWhatIFocusedOn) * Math.pow(2, data.upgrades.rememberWhatIFocusedOnMore);
+            if(num === data.rememberWhatIFocusedOn.upgradesAvailable) {
+                data.upgrades.rememberWhatIFocusedOnMore.visible = true;
+            }
+        }
+    },
+    knowWhatIFocusedOn: {
+        initialCost:50, costIncrease:10,
+        upgradesAvailable:4,
+        visible:true,
+        customInfo: function(num) { //[0, .2, .5, .9, 1][data.actions.knowWhatIFocusedOn.upgradePower]
+            return "Keep "+(["20", "50", "90", "100"][num])+"% of your Loop Bonus when you use the Amulet";
+        }
+    },
+    rememberWhatIFocusedOnMore: {
+        initialCost:10000, costIncrease:5,
+        upgradesAvailable:3,
+        visible:false,
+        customInfo: function(num) {
+            if(num === 0) {
+                return "Gain +1/hr to a new Loop Bonus on the flow you have Focused. Stays when Focus is removed, but resets when the Amulet is used. The Loop Bonus has a max of 2.5. Maximum flow is still 10%/s."
+            }
+            return "Increases the Loop Bonus' max by "+(num >0?"another ":"")+"x2 (for a total of " + (2.5 * Math.pow(2, data.upgrades.rememberWhatIFocusedOn) * Math.pow(2, (num+1))) + ")";
+        },
+        onBuy: function(num) {
+            data.attentionLoopMax = 2.5 * Math.pow(2, data.upgrades.rememberWhatIFocusedOn) * Math.pow(2, data.upgrades.rememberWhatIFocusedOnMore);
         }
     },
     rememberHowIGrew: {
