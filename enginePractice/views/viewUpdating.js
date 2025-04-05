@@ -74,6 +74,10 @@ function updateGlobals() {
         view.cached.essence.innerText = intToString(data.essence, 1);
         view.cached.essence2.innerText = intToString(data.essence, 1);
     }
+
+    if(view.cached.bonusTime.innerText !== secondsToTime(bonusTime/1000, 1)) {
+        view.cached.bonusTime.innerText = secondsToTime(bonusTime/1000, 1);
+    }
 }
 
 //Save a second copy of all the data after a view update, so it can request updates only for the ones that are different

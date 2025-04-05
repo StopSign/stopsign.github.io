@@ -1,20 +1,40 @@
 'use strict';
-
 function startGame() {
+    // load calls recalcInterval, which will start the callbacks
     load();
+    setScreenSize();
+}
 
-    if (isFileSystem) {
-        console.log('running locally');
-        setInterval(tick, 1000/50);
+let screenSize;
+function setScreenSize() {
+    screenSize = document.body.scrollHeight;
+}
+
+let lastAnimationTime = 0;
+let animationFrameRequest = 0;
+let animationTicksEnabled = true;
+
+function recalcInterval(fps) {
+    windowFps = fps;
+    if (mainTickLoop !== undefined) {
+        clearInterval(mainTickLoop);
+    }
+    if (window.requestAnimationFrame) {
+        animationFrameRequest = requestAnimationFrame(animationTick);
+        // mainTickLoop = setInterval(tick, 1000);
     } else {
-        setInterval(tick, 1000/50);
-
-        // window.doWork = new Worker('helpers/interval.js');
-        // window.doWork.onmessage = function (event) {
-        //     if (event.data === 'interval.start') {
-        //         tick();
-        //     }
-        // };
+        mainTickLoop = setInterval(tick, 1000 / fps);
+    }
+}
+function animationTick(animationTime) {
+    if (animationTime === lastAnimationTime || !animationTicksEnabled) {
+        // double tick in the same frame, drop this one
+        return;
+    }
+    try {
+        tick();
+    } finally {
+        animationFrameRequest = requestAnimationFrame(animationTick);
     }
 }
 
@@ -27,11 +47,10 @@ function tick() {
     let delta = newTime - curTime;
     totalTime += delta;
     gameTicksLeft += delta;
-    saveTimer -= delta;
     curTime = newTime;
 
-    if(saveTimer < 0) {
-        saveTimer += 5000;
+    if (curTime - lastSave > data.options.autosaveRate * 1000) {
+        lastSave = curTime;
         save();
     }
 
@@ -43,11 +62,12 @@ function tick() {
         let overflow = gameTicksLeft;
         gameTicksLeft = 0;
         bonusTime += overflow;
-        console.warn(`Too large backlog! Moved ${overflow} ms to bonusTime (now ${bonusTime} ms).`);
+        // console.warn(`Too large backlog! Moved ${overflow} ms to bonusTime (now ${bonusTime} ms).`);
     }
 
     while (gameTicksLeft > (1000 / ticksPerSecond)) {
         if(stop || forceStop) {
+            bonusTime += gameTicksLeft;
             gameTicksLeft = 0;
             if(!forceStop) {
                 updateView();
@@ -61,19 +81,17 @@ function tick() {
             secondPassed();
         }
         framePassed();
-        didSomething = true;
+        didSomething = gameTicksLeft <= 1200;
 
-        if(gameTicksLeft > 1200) {
-            ticksPerSecond /= 2;
-            if (ticksPerSecond < 1) {
-                ticksPerSecond = 1;
-            }
-            console.warn(`Too fast! (${gameTicksLeft}). Shifting ticksPerSecond to ${ticksPerSecond}`);
-            bonusTime += gameTicksLeft;
-            gameTicksLeft = 0;
-        }
+        let timeSpent = (1000 / ticksPerSecond) / gameSpeed / bonusSpeed
         gameTicksLeft -= (1000 / ticksPerSecond) / gameSpeed / bonusSpeed;
 
+        if(bonusSpeed !== 1) {
+            bonusTime += -timeSpent * (bonusSpeed - 1);
+            if(bonusTime <= 100) {
+                toggleBonusSpeed()
+            }
+        }
     }
     if(didSomething) {
         updateView();
@@ -91,18 +109,21 @@ function secondPassed() {
     secondsPassed++;
 }
 
-function recalcInterval(fps) {
-    window.fps = fps;
-    if(window.mainTickLoop !== undefined) {
-        clearInterval(window.mainTickLoop);
-    }
-    if(isFileSystem) {
-        window.mainTickLoop = setInterval(tick, 1000/fps);
-    } else {
-        doWork.postMessage({stop: true});
-        doWork.postMessage({start: true, ms: (1000 / fps)});
-    }
-}
+// function recalcInterval(fps) {
+//     window.fps = fps;
+//     if(window.mainTickLoop !== undefined) {
+//         clearInterval(window.mainTickLoop);
+//     }
+//     if(isFileSystem) {
+//         window.mainTickLoop = setInterval(tick, 1000/fps);
+//     } else {
+//         doWork.postMessage({stop: true});
+//         doWork.postMessage({start: true, ms: (1000 / fps)});
+//     }
+// }
+
+
+
 
 function gameTick() {
     data.actionNames.forEach(function(actionVar) {

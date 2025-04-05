@@ -431,7 +431,13 @@ function changeJob(actionVar) {
 
 function pauseGame() {
     stop = !stop;
+    if(stop) {
+        document.title = "*PAUSED* KTL";
+    } else {
+        document.title = "KTL";
+    }
     document.getElementById('pauseButton').innerText = stop ? "Resume" : "Pause";
+    save();
 }
 
 function stopClicks(event) {
@@ -449,17 +455,41 @@ function resetGamespeed() {
 }
 
 function statMenuHideButton() {
-    let button = document.getElementById("statDisplayHideButton");
+    let button = document.getElementById("statDisplayShowButton");
     let statDisplay = view.cached.statDisplay;
     if(statDisplay.style.display !== "none") {
         statDisplay.style.display = "none";
-        button.style.left = "18px";
-        button.style.top = "120px";
-        button.innerText = "Stats >>";
+        button.style.display = "";
     } else {
         statDisplay.style.display = "block";
-        button.style.left = "388px";
-        button.style.top = "110px";
-        button.innerText = "<<";
+        button.style.display = "none";
     }
+}
+
+function bonusMenuHideButton() {
+    let button = document.getElementById("bonusDisplayShowButton");
+    let bonusDisplay = view.cached.bonusDisplay;
+    if(bonusDisplay.style.display !== "none") {
+        bonusDisplay.style.display = "none";
+        button.style.display = "";
+    } else {
+        bonusDisplay.style.display = "block";
+        button.style.display = "none";
+    }
+}
+
+function toggleBonusSpeed() {
+    if(bonusSpeed > 1 || bonusTime <= 1000) {
+        bonusSpeed = 1;
+        document.getElementById("toggleBonusSpeedButton").style.backgroundColor = "red";
+        document.getElementById("toggleBonusSpeedButton").innerText = "Enable Bonus Speed";
+    } else {
+        bonusSpeed = data.options.bonusRate;
+        document.getElementById("toggleBonusSpeedButton").style.backgroundColor = "green";
+        document.getElementById("toggleBonusSpeedButton").innerText = "Disable Bonus Speed";
+    }
+}
+
+function changeBonusSpeed(num) {
+    data.options.bonusRate = num;
 }

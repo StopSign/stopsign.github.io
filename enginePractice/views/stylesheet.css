@@ -245,13 +245,13 @@ input {
 }
 
 .button {
-    padding: 1px 5px;
+    padding:5px 8px;
     text-align: center;
     vertical-align:center;
     min-width:9px;
     cursor: pointer;
     outline: none;
-    color: var(--button-text);
+    color:var(--text-primary);
     background-color: var(--accent-primary);
     border: none;
     border-radius: 6px;
@@ -405,11 +405,6 @@ input {
 
 #windowElement {
     border-color: var(--border-color) !important;
-}
-
-#statDisplay {
-    border: 1px solid var(--border-color);
-    color: var(--text-primary);
 }
 
 .menuSeparator {

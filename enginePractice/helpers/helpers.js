@@ -158,6 +158,7 @@ function secondsToTime(seconds) {
     if(!seconds) {
         seconds = 0;
     }
+    seconds = Math.floor(seconds);
     const hours = Math.floor(seconds / 3600);
     const remainder = seconds % 3600;
     const minutes = Math.floor(remainder / 60);

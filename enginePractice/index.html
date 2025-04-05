@@ -24,20 +24,96 @@
     </div>
 </div>
 
-<div class="button" style="position:absolute;left:25px;top:25px;padding:10px;font-size:16px;color: var(--text-primary);" onclick="clickMenuButton()">Menu</div>
-<div class="button" style="position:absolute;left:100px;top:25px;padding:10px;font-size:16px;color: var(--text-primary);" id='pauseButton' onclick="pauseGame()">Pause</div>
-<div class="button" style="position:absolute;left:190px;top:25px;padding:10px;font-size:16px;display:none;color: var(--text-primary);" id='killTheLichMenuButton' onclick="openKTLMenu()">Kill the Lich!</div>
-<div class="button" style="position:absolute;left:190px;top:25px;padding:10px;font-size:16px;display:none;color: var(--text-primary);" id='openUseAmuletButton' onclick="openUseAmuletMenu(true)">Use the Amulet!</div>
-<div class="button" style="position:absolute;left:380px;top:25px;padding:10px;font-size:16px;display:none;color: var(--text-primary);" id='openViewAmuletButton' onclick="openUseAmuletMenu(false)">View Amulet Upgrades!</div>
 <div id="helpMenuContainer"></div>
 
+<div style="position:absolute;left:15px;top:21px;padding:10px;font-size:14px;color:var(--text-primary);">
+    <span class="button" style="padding:5px 8px;" onclick="clickMenuButton()">Menu</span>
+    <span class="button" style="padding:5px 8px;" id='pauseButton' onclick="pauseGame()">Pause</span>
+    <span class="button" style="display:none;padding:5px 8px;" id='killTheLichMenuButton' onclick="openKTLMenu()">Kill the Lich!</span>
+    <span class="button" style="display:none;padding:5px 8px;" id='openUseAmuletButton' onclick="openUseAmuletMenu(true)">Use the Amulet!</span>
+    <span class="button" style="display:none;padding:5px 8px;" id='openViewAmuletButton' onclick="openUseAmuletMenu(false)">View Amulet Upgrades!</span><br><br>
 
+    <span id="bonusDisplayShowButton" class="button" style="padding:5px 8px;margin-top:10px;" onclick="bonusMenuHideButton()">Offline >></span>
+    <div id="bonusDisplay" style="border: 1px solid var(--border-color);position:relative;display:none;padding:10px;margin:5px;background-color:var(--overlay-color);color: var(--text-primary);width:360px">
+        <span id="bonusDisplayHideButton" class="button" style="position:absolute;left:364px;top:-13px;padding:5px 8px;" onclick="bonusMenuHideButton()"><<</span>
+        <span id="toggleBonusSpeedButton" class="button" onclick="toggleBonusSpeed()" style="background-color: red">Enable Bonus Speed</span><br><br>
+        Bonus Time: <b><span id="bonusTime"></span></b><br>
+        Bonus Speed:
+        <label><input type="radio" onchange="changeBonusSpeed(2)" name="bonusSpeed" value="2x" checked> 2x</label>
+        <label><input type="radio" onchange="changeBonusSpeed(5)" name="bonusSpeed" value="5x"> 5x</label>
+        <label><input type="radio" onchange="changeBonusSpeed(20)" name="bonusSpeed" value="20x"> 20x</label><br>
+    </div>
+
+    <div id="jobDisplay" style="display:none;font-size:14px;top:65px;margin-top:10px;background-color:var(--overlay-color);color: var(--text-primary);">
+        Current Job: <span id="jobTitle">Help Scott With Chores</span>, Wage: $<span id="jobWage">1</span>
+    </div>
+
+    <div id="momentumDisplay" style="font-size:14px;background-color:var(--overlay-color);color: var(--text-primary);margin-bottom:10px;">
+        Total Momentum: <b><span id="totalMomentum">1</span></b>
+        Time: <span id="secondsPerReset"></span>
+        <span id="essenceDisplay" style="display:none">Total Essence: <b><span id="essence"></span></b></span>
+    </div>
+
+    <span id="statDisplayShowButton" class="button" style="display:none;padding:5px;top:110px;left:388px;" onclick="statMenuHideButton()">Stats >></span>
+    <div id="statDisplay" style="border: 1px solid var(--border-color);padding:10px;font-size:12px;background-color:var(--overlay-color);position:relative;">
+        <span id="statDisplayHideButton" class="button" style="font-size:14px;position:absolute;padding:5px 8px;top:-13px;left:374px;" onclick="statMenuHideButton()"><<</span>
+        <div style="width:140px;display:inline-block;font-style:italic">Stat</div>
+        <div style="width:70px;display:inline-block;font-style:italic">Amount</div>
+        <div style="width:70px;display:inline-block;font-style:italic">Bonus</div>
+        <div style="width:70px;display:inline-block;font-style:italic">Change/min</div>
+    </div>
+</div>
+
+<div class="button" style="position:absolute;left:5px;bottom:45px;padding:10px" id="zoomInButton">+</div>
+<div class="button" style="position:absolute;left:5px;bottom:5px;padding:10px" id="zoomOutButton">-</div>
+<div class="button" style="position:absolute;left:45px;bottom:5px;padding:10px" id="centerScreenButton">o</div>
 
 
 <!--    contains a repeat of total momentum, and an estimate of how many souls you will get. Change Overclock Target (Prestige).
 When clicked, clears all actions, opens a new minigame with 3 visible actions - Overclock Targeting The Lich (it's a generator that does NOT grow), Kill Elite, and far away is Kill the Lich.
 Unlock of the elite costs 1b, and gives 10 souls. Overclock targeting is tier 0. first level of the elite is like 100b.
 After the unlock, a new button opens up - Use Amulet. This opens the reset menu with the reset button as well as all of the upgrades. Buy the upgrades, then "Use Amulet" which resets game back to start (but with upgrades!) -->
+
+
+<!--
+This wasn't right. Your ability was supposed to kill the lich, not die in the first fight! As you lay dying, the amulet
+you had forgotten about in the heat of battle starts heating up. You become paralyzed as it activates, and your vision
+dims as it thrums with stolen power.
+
+It seems to reach out, and offer a question. -- what would you say to yourself, had he a second chance?
+"He, not I?"
+Silence. Very well. With your last breath, you craft a message. The amulet gathers it and burns the last of your life.
+It continues, capturing fraction essence of your fleeting soul and sending it in a direction eyes could not follow.<br><br>
+
+... You set your ability's Target to itself, thinking yourself clever. Then, you pause, and frown - though the room is quiet,
+ an echo of an echo adds itself the things you know like a blanket, laying on top of your potential in all the little ways your future's past has discovered.
+ As you are coming to grips with thinking that the extra ability is not just a hallucination, you gain more evidence:
+ A voice of utmost weariness -
+ one that frightens you to hear, especially when you recognize the voice as your own, and again when you recognize the desperation -
+ whisper to you, "If I just ...".
+
+ And you think that you'll do just that. You'll be yourself, because who else could the advice be for? And all you need
+ to do is follow your own voice's advice and everything will work out, right?
+
+-->
+
+<!--<div id="helpMenu" class='fullScreenGrey' style='display:none;' onclick='clickMenuButton()'>-->
+<!--    <div style='background:#fff;padding:20px;border-radius:6px;max-width:400px;width:90%;text-align:center;position:relative;'>-->
+<!--        <div id="help1">Actions and Momentum:-->
+<!--            Momentum is generated from the Overclock action, and "flows" downstream to the further actions.-->
+<!--            The primary resource of the action (momentum, mana, gold, etc.) is consumed at a specified rate per second on every action except Overclock.-->
+<!--            This consumption rate for progress cannot be stopped.-->
+<!--            You can only additionally add transferring the primary resource to a downstream action at a rate equal to your consumption rate, per downstream action.-->
+<!--            For example, if an action is consuming .1% momentum per second, it means that 50 times a second, it takes 1/50th of .1% of your momentum and adds the same amount to progress.-->
+<!--            If you are sending 100% to 2 downstream effects, it will be taking .1% (consumption) + .1% (stream1) + .1% (stream2) = .3% of current momentum per second (split into 50 parts).-->
+
+<!--            When progress fills up to the progress max, you get the on complete effect, which includes exp. When exp fills up, you get a level, with the described effects.-->
+<!--        </div>-->
+<!--        <div id="help2">Stats-->
+<!--            Each stat increases its bonus by 1%-->
+<!--        </div>-->
+<!--    </div>-->
+<!--</div>-->
 
 <div id="killTheLichMenu" class='fullScreenGrey' style="display:none" onClick='openKTLMenu()'>
     <div class='centerMenuBox' onClick="stopClicks(event)">
@@ -88,77 +164,6 @@ After the unlock, a new button opens up - Use Amulet. This opens the reset menu 
         </div>
     </div>
 </div>
-
-
-<!--
-This wasn't right. Your ability was supposed to kill the lich, not die in the first fight! As you lay dying, the amulet
-you had forgotten about in the heat of battle starts heating up. You become paralyzed as it activates, and your vision
-dims as it thrums with stolen power.
-
-It seems to reach out, and offer a question. -- what would you say to yourself, had he a second chance?
-"He, not I?"
-Silence. Very well. With your last breath, you craft a message. The amulet gathers it and burns the last of your life.
-It continues, capturing fraction essence of your fleeting soul and sending it in a direction eyes could not follow.<br><br>
-
-... You set your ability's Target to itself, thinking yourself clever. Then, you pause, and frown - though the room is quiet,
- an echo of an echo adds itself the things you know like a blanket, laying on top of your potential in all the little ways your future's past has discovered.
- As you are coming to grips with thinking that the extra ability is not just a hallucination, you gain more evidence:
- A voice of utmost weariness -
- one that frightens you to hear, especially when you recognize the voice as your own, and again when you recognize the desperation -
- whisper to you, "If I just ...".
-
- And you think that you'll do just that. You'll be yourself, because who else could the advice be for? And all you need
- to do is follow your own voice's advice and everything will work out, right?
-
--->
-
-
-
-
-
-
-
-
-
-<!--<div id="helpMenu" class='fullScreenGrey' style='display:none;' onclick='clickMenuButton()'>-->
-<!--    <div style='background:#fff;padding:20px;border-radius:6px;max-width:400px;width:90%;text-align:center;position:relative;'>-->
-<!--        <div id="help1">Actions and Momentum:-->
-<!--            Momentum is generated from the Overclock action, and "flows" downstream to the further actions.-->
-<!--            The primary resource of the action (momentum, mana, gold, etc.) is consumed at a specified rate per second on every action except Overclock.-->
-<!--            This consumption rate for progress cannot be stopped.-->
-<!--            You can only additionally add transferring the primary resource to a downstream action at a rate equal to your consumption rate, per downstream action.-->
-<!--            For example, if an action is consuming .1% momentum per second, it means that 50 times a second, it takes 1/50th of .1% of your momentum and adds the same amount to progress.-->
-<!--            If you are sending 100% to 2 downstream effects, it will be taking .1% (consumption) + .1% (stream1) + .1% (stream2) = .3% of current momentum per second (split into 50 parts).-->
-
-<!--            When progress fills up to the progress max, you get the on complete effect, which includes exp. When exp fills up, you get a level, with the described effects.-->
-<!--        </div>-->
-<!--        <div id="help2">Stats-->
-<!--            Each stat increases its bonus by 1%-->
-<!--        </div>-->
-<!--    </div>-->
-<!--</div>-->
-
-<div id="jobDisplay" style="display:none;position:absolute;margin:5px;font-size:17px;top:65px;background-color:var(--overlay-color);color: var(--text-primary);">
-    Current Job: <span id="jobTitle">Help Scott With Chores</span>, Wage: $<span id="jobWage">1</span>
-</div>
-<div id="momentumDisplay" style="position:absolute;margin:5px;font-size:14px;top:85px;background-color:var(--overlay-color);color: var(--text-primary);">
-    Total Momentum: <b><span id="totalMomentum">1</span></b>
-    Time: <span id="secondsPerReset"></span>
-    <span id="essenceDisplay" style="display:none">Total Essence: <b><span id="essence"></span></b></span>
-</div>
-
-<div id="statDisplay" style="position:absolute;padding:10px;margin:5px;top:115px;background-color:var(--overlay-color);color: var(--text-primary);">
-    <div style="width:140px;display:inline-block;font-style:italic">Stat</div>
-    <div style="width:70px;display:inline-block;font-style:italic">Amount</div>
-    <div style="width:70px;display:inline-block;font-style:italic">Bonus</div>
-    <div style="width:70px;display:inline-block;font-style:italic">Change/min</div>
-</div>
-<div id="statDisplayHideButton" class="button" style="position:absolute;padding:5px;top:110px;left:388px;font-size:14px;color:var(--text-primary);" onclick="statMenuHideButton()"><<</div>
-
-
-<div class="button" style="position:absolute;left:5px;bottom:45px;padding:10px" id="zoomInButton">+</div>
-<div class="button" style="position:absolute;left:5px;bottom:5px;padding:10px" id="zoomOutButton">-</div>
-<div class="button" style="position:absolute;left:45px;bottom:5px;padding:10px" id="centerScreenButton">o</div>
 
 <div id="toastList" style="position:absolute;bottom:20px;right:20px;"></div>
 

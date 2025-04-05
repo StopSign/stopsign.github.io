@@ -147,30 +147,30 @@ actionData.upgrades = {
                 purchaseAction('buyFashionableClothing');
                 purchaseAction('improveHome');
             } else if(num === 2) {
-                purchaseAction('rentARoomAtInn');
-                purchaseAction('listenToInnGuests');
-                purchaseAction('chatWithInnGuests');
-                purchaseAction('bargainForABetterRoom');
-                purchaseAction('getBetterService');
-
-                purchaseAction('buyAHouse');
-                purchaseAction('buyFirewood');
-                purchaseAction('buyFurniture');
-                purchaseAction('buySomeBooks');
-                purchaseAction('readByTheFireplace');
-
-                purchaseAction('getComfy');
-                purchaseAction('moveToCity');
+                // purchaseAction('rentARoomAtInn');
+                // purchaseAction('listenToInnGuests');
+                // purchaseAction('chatWithInnGuests');
+                // purchaseAction('bargainForABetterRoom');
+                // purchaseAction('getBetterService');
+                //
+                // purchaseAction('buyAHouse');
+                // purchaseAction('buyFirewood');
+                // purchaseAction('buyFurniture');
+                // purchaseAction('buySomeBooks');
+                // purchaseAction('readByTheFireplace');
+                //
+                // purchaseAction('getComfy');
+                // purchaseAction('moveToCity');
             } else if(num === 3) {
-                purchaseAction('buyACityHouse');
-                purchaseAction('hireLabor');
-                purchaseAction('buyHouseholdSupplies');
-                purchaseAction('buyFurniture');
-                purchaseAction('buyGardeningSupplies');
-                purchaseAction('payHouseholdStaff');
-                purchaseAction('payGroundskeeper');
-
-                purchaseAction('payTaxes');
+                // purchaseAction('buyACityHouse');
+                // purchaseAction('hireLabor');
+                // purchaseAction('buyHouseholdSupplies');
+                // purchaseAction('buyFurniture');
+                // purchaseAction('buyGardeningSupplies');
+                // purchaseAction('payHouseholdStaff');
+                // purchaseAction('payGroundskeeper');
+                //
+                // purchaseAction('payTaxes');
             }
         }
     },

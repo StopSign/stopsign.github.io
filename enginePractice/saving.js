@@ -4,6 +4,8 @@ function clearSave() {
 }
 
 function load() {
+    // loadDefaults();
+    // loadUISettings();
     initializeData();
 
     /* Loading:
@@ -39,6 +41,7 @@ function load() {
         mergeExistingOnly(data, toLoad, "stats");
         mergeExistingOnly(data, toLoad, "upgrades");
         mergeExistingOnly(data, toLoad, "toastStates");
+        mergeExistingOnly(data, toLoad, "options");
 
 
 
@@ -63,6 +66,8 @@ function load() {
 
     initializeDisplay();
 
+    // view.initalize();
+
     //set UI elements after both data and UI have been loaded
     //set sliders
     data.actionNames.forEach(function (actionVar) {
@@ -76,6 +81,8 @@ function load() {
             setSliderUI(actionVar, downVar, toLoad.actions[actionVar]["downstreamRate" + downVar]);
         });
     });
+
+    recalcInterval(data.options.updateRate);
 }
 
 function mergeExistingOnly(data, toLoad, varName, skipList = []) {

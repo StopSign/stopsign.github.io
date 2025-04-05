@@ -5,13 +5,15 @@ let bonusSpeed = 1;
 let curTime = new Date();
 let gameTicksLeft = 0;
 let sudoStop = false;
-let saveTimer = 2000;
 let ticksPerSecond = 20;
 let totalTime = 0;
 let ticksForSeconds = 0;
 let secondsPassed = 0;
 //Store offline time
 let bonusTime = 0;
+let mainTickLoop;
+let windowFps = 50;
+let lastSave = Date.now();
 
 //Saving globals
 let isFileSystem = !!location.href.match("file");
@@ -46,6 +48,10 @@ data.attentionSelected = [];
 data.maxAttentionAllowed = 2;
 data.attentionMult = 2;
 data.attentionLoopMax = 2.5;
+data.options = {};
+data.options.updateRate = 50;
+data.options.autosaveRate = 10;
+data.options.bonusRate = 2;
 
 let viewData = {}; //contains only things that are generated / not saved
 viewData.toasts = [];
@@ -67,13 +73,17 @@ function debug() {
     }
     document.getElementById("killTheLichMenuButton").style.display = "";
     data.useAmuletButtonShowing = true;
+    data.doneKTL = true;
+    data.doneAmulet = true;
+    data.displayJob = true;
     data.essence = 300;
     buyUpgrade("buyNicerStuff", 0);
     buyUpgrade("stopLettingOpportunityWait", 0);
     buyUpgrade("stopLettingOpportunityWait", 1);
     buyUpgrade("stopLettingOpportunityWait", 2);
     setSliderUI("overclock", "harnessOverflow", 100);
-    gameSpeed = 10;
+    // gameSpeed = 10;
+    bonusTime = 5000;
 }
 
 function initializeData() {

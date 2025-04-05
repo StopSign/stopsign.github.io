@@ -15,9 +15,9 @@ function initializeDisplay() {
     generateAmuletContent();
     setAllCaches(); //happens after generation
 
-    updateUIFromLoad(); //update the elements after create
-
     debug(); //change game for easier debugging
+
+    updateUIFromLoad(); //update the elements after create
 }
 
 function generateStatDisplay(statVar) {
@@ -469,8 +469,10 @@ function setSingleCaches() {
     view.cached.openViewAmuletButton = document.getElementById("openViewAmuletButton");
     view.cached.essence = document.getElementById("essence");
     view.cached.essence2 = document.getElementById("essence2");
+    view.cached.bonusTime = document.getElementById("bonusTime");
     view.cached.killTheLichMenu = document.getElementById("killTheLichMenu");
     view.cached.statDisplay = document.getElementById("statDisplay");
+    view.cached.bonusDisplay = document.getElementById("bonusDisplay");
 }
 
 function cacheStatNames(statVar) {
