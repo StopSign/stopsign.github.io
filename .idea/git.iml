@@ -41,6 +41,7 @@
       <excludeFolder url="file://$MODULE_DIR$/StSi" />
       <excludeFolder url="file://$MODULE_DIR$/quadraticExperiments" />
       <excludeFolder url="file://$MODULE_DIR$/FriendshipIdle" />
+      <excludeFolder url="file://$MODULE_DIR$/enginePractice" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

@@ -1,3 +1,0 @@
-Grant was a soldier. He's been beaten down by circumstance and war. He never even saw the enemy - he lost most of his troop to the irradiated mana wastelands and beasts that came out of them. The Emperor, far away, could care less - keeping his "no leveling allowed" aura encompassing the entire Empire, and letting the low level people fight it out. The lands got bigger, the monsters got bigger, and people had no ability to fight back - they just moved.
-
-Now, the emperor has died, after 418 years of rule. Grant is able to use his ability - Motivate - on his ability, initaiting exponential growth. He wants to fight back against the monsters, but more than that - he wants to destroy 
