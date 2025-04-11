@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en" style="height:100%;overflow:hidden;padding:10px;">
+<head>
+    <meta charset="UTF-8">
+    <!-- to force a reload -->
+    <meta http-equiv="cache-control" content="max-age=0" />
+    <meta http-equiv="cache-control" content="no-cache" />
+    <meta http-equiv="expires" content="0" />
+    <meta http-equiv="expires" content="Tue, 01 Jan 1980 1:00:00 GMT" />
+    <meta http-equiv="pragma" content="no-cache" />
+
+    <title>KTL</title>
+    <link rel="stylesheet" href="views/stylesheet.css">
+<!--    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">-->
+</head>
+<body id="theBody" oncontextmenu="return false;" style="padding:5px" class="medium">
+
+
+<div id="windowElement" style="position:relative; width:100%; height:98%; border:2px solid; overflow:hidden;">
+    <div id="actionContainer" style="will-change: transform;position:absolute;"> <!-- initial left/top with actionTitleClicked(`overclock`) -->
+        <div id="lineContainer"></div>
+<!--        <div id="dot" style="position:absolute;border:2px solid;width:1px;height:1px;"></div>-->
+        <!-- Child divs go here -->
+    </div>
+</div>
+
+<div id="helpMenuContainer"></div>
+
+<div style="position:absolute;left:15px;top:21px;padding:10px;font-size:14px;color:var(--text-primary);">
+    <span class="button" style="padding:5px 8px;" onclick="clickMenuButton()">Menu</span>
+    <span class="button" style="padding:5px 8px;" id='pauseButton' onclick="pauseGame()">Pause</span>
+    <span class="button" style="display:none;padding:5px 8px;" id='killTheLichMenuButton' onclick="openKTLMenu()">Kill the Lich!</span>
+    <span class="button" style="display:none;padding:5px 8px;" id='openUseAmuletButton' onclick="openUseAmuletMenu(true)">Use the Amulet!</span>
+    <span class="button" style="display:none;padding:5px 8px;" id='openViewAmuletButton' onclick="openUseAmuletMenu(false)">View Amulet Upgrades!</span><br><br>
+
+    <span id="bonusDisplayShowButton" class="button" style="padding:5px 8px;margin-top:10px;" onclick="bonusMenuHideButton()">Offline >></span><br><br>
+    <div id="bonusDisplay" style="border: 1px solid var(--border-color);position:relative;display:none;padding:10px;margin:5px;background-color:var(--overlay-color);color: var(--text-primary);width:360px">
+        <span id="bonusDisplayHideButton" class="button" style="position:absolute;left:364px;top:-13px;padding:5px 8px;" onclick="bonusMenuHideButton()"><<</span>
+        <span id="toggleBonusSpeedButton" class="button" onclick="toggleBonusSpeed()" style="background-color: red">Enable Bonus Speed</span><br><br>
+        Bonus Time: <b><span id="bonusTime"></span></b><br>
+        Bonus Speed:
+        <label><input type="radio" onchange="changeBonusSpeed(2)" name="bonusSpeed" value="2x" checked> 2x</label>
+        <label><input type="radio" onchange="changeBonusSpeed(5)" name="bonusSpeed" value="5x"> 5x</label>
+        <label><input type="radio" onchange="changeBonusSpeed(20)" name="bonusSpeed" value="20x"> 20x</label><br>
+    </div>
+
+    <div id="jobDisplay" style="display:none;font-size:14px;top:65px;margin-top:10px;background-color:var(--overlay-color);color: var(--text-primary);">
+        Current Job: <span id="jobTitle">Help Scott With Chores</span>, Wage: $<b><span id="jobWage">1</span></b>
+    </div>
+
+    <div id="momentumDisplay" style="font-size:14px;background-color:var(--overlay-color);color: var(--text-primary);margin-bottom:12px;">
+        Clock: <b><span id="secondsPerReset"></span></b>,
+        Total Momentum: <b><span id="totalMomentum">1</span></b>
+        <span id="essenceDisplay" style="display:none">, Total Essence: <b><span id="essence"></span></b></span>
+    </div>
+
+    <span id="statDisplayShowButton" class="button" style="display:none;padding:5px;top:110px;left:388px;" onclick="statMenuHideButton()">Stats >></span>
+    <div id="statDisplay" style="border: 1px solid var(--border-color);padding:10px;font-size:12px;background-color:var(--overlay-color);position:relative;">
+        <span id="statDisplayHideButton" class="button" style="font-size:14px;position:absolute;padding:5px 8px;top:-13px;left:374px;" onclick="statMenuHideButton()"><<</span>
+        <span style="font-size:12px;position:absolute;top:5px;left:5px;">Bonus = 1.1^Stat. Click the Stats, blue = uses, green = adds.</span>
+        <br><div style="width:140px;display:inline-block;font-style:italic">Stat</div>
+        <div style="width:70px;display:inline-block;font-style:italic">Amount</div>
+        <div style="width:70px;display:inline-block;font-style:italic">Bonus</div>
+        <div style="width:70px;display:inline-block;font-style:italic">Change/min</div>
+    </div>
+</div>
+
+<div class="button" style="position:absolute;left:5px;bottom:45px;padding:10px" id="zoomInButton">+</div>
+<div class="button" style="position:absolute;left:5px;bottom:5px;padding:10px" id="zoomOutButton">-</div>
+<div class="button" style="position:absolute;left:45px;bottom:5px;padding:10px" id="centerScreenButton">o</div>
+
+
+<!--    contains a repeat of total momentum, and an estimate of how many souls you will get. Change Overclock Target (Prestige).
+When clicked, clears all actions, opens a new minigame with 3 visible actions - Overclock Targeting The Lich (it's a generator that does NOT grow), Kill Elite, and far away is Kill the Lich.
+Unlock of the elite costs 1b, and gives 10 souls. Overclock targeting is tier 0. first level of the elite is like 100b.
+After the unlock, a new button opens up - Use Amulet. This opens the reset menu with the reset button as well as all of the upgrades. Buy the upgrades, then "Use Amulet" which resets game back to start (but with upgrades!) -->
+
+
+<!--
+This wasn't right. Your ability was supposed to kill the lich, not die in the first fight! As you lay dying, the amulet
+you had forgotten about in the heat of battle starts heating up. You become paralyzed as it activates, and your vision
+dims as it thrums with stolen power.
+
+It seems to reach out, and offer a question. -- what would you say to yourself, had he a second chance?
+"He, not I?"
+Silence. Very well. With your last breath, you craft a message. The amulet gathers it and burns the last of your life.
+It continues, capturing fraction essence of your fleeting soul and sending it in a direction eyes could not follow.<br><br>
+
+... You set your ability's Target to itself, thinking yourself clever. Then, you pause, and frown - though the room is quiet,
+ an echo of an echo adds itself the things you know like a blanket, laying on top of your potential in all the little ways your future's past has discovered.
+ As you are coming to grips with thinking that the extra ability is not just a hallucination, you gain more evidence:
+ A voice of utmost weariness -
+ one that frightens you to hear, especially when you recognize the voice as your own, and again when you recognize the desperation -
+ whisper to you, "If I just ...".
+
+ And you think that you'll do just that. You'll be yourself, because who else could the advice be for? And all you need
+ to do is follow your own voice's advice and everything will work out, right?
+
+-->
+
+<!--<div id="helpMenu" class='fullScreenGrey' style='display:none;' onclick='clickMenuButton()'>-->
+<!--    <div style='background:#fff;padding:20px;border-radius:6px;max-width:400px;width:90%;text-align:center;position:relative;'>-->
+<!--        <div id="help1">Actions and Momentum:-->
+<!--            Momentum is generated from the Overclock action, and "flows" downstream to the further actions.-->
+<!--            The primary resource of the action (momentum, mana, gold, etc.) is consumed at a specified rate per second on every action except Overclock.-->
+<!--            This consumption rate for progress cannot be stopped.-->
+<!--            You can only additionally add transferring the primary resource to a downstream action at a rate equal to your consumption rate, per downstream action.-->
+<!--            For example, if an action is consuming .1% momentum per second, it means that 50 times a second, it takes 1/50th of .1% of your momentum and adds the same amount to progress.-->
+<!--            If you are sending 100% to 2 downstream effects, it will be taking .1% (consumption) + .1% (stream1) + .1% (stream2) = .3% of current momentum per second (split into 50 parts).-->
+
+<!--            When progress fills up to the progress max, you get the on complete effect, which includes exp. When exp fills up, you get a level, with the described effects.-->
+<!--        </div>-->
+<!--        <div id="help2">Stats-->
+<!--            Each stat increases its bonus by 1%-->
+<!--        </div>-->
+<!--    </div>-->
+<!--</div>-->
+
+<div id="killTheLichMenu" class='fullScreenGrey' style="display:none" onClick='openKTLMenu()'>
+    <div class='centerMenuBox' onClick="stopClicks(event)">
+        <div class='menuTitle'>Kill the Lich!</div>
+        <div class="menuSeparator"></div>
+        <div id="ktlDynamicContent" class="dynamicContent">
+            Info:<br>
+            A new quick game is started with your total momentum across all actions as your only, non-renewable resource.
+            You will try to get as much essence as you can, which at first should be 10
+            (unless you fell asleep and have the 1T needed for the next (not recommended)). You can reach 10 with 1 million,
+            but if you're exact it might take a while, so the minimum of a reset is 1.1 million.<br>
+            <div class="menuSeparator"></div>
+            Story:<br>
+            The lich is coming, and you know what you must do. As your Overclock ability grows in power,
+            so too does its ability to achieve its Target. So far, it has been set to target itself, but now you know
+            of a great evil on the horizon, and you can't sit still. With all the gathered momentum from your ability
+            churning within itself, you shift that towardsa a new target: Kill the Lich.<br><br>
+            At first, the loss of so much happening at once is overwhelming, and just as you did in the beginning: you allow
+            the ability to guide your steps and purpose while you take a back seat and observe. It moves you with purpose -
+            you travel to a hidden set of ancient ruins close by, and, after carefully disabling a number of deadly traps,
+            you gather an amulet hidden in a deep puddle, that you immediately put around your neck.<br><br>
+
+            Then, you go join the resistance trying to hold off the lich's hordes as they steadily approach. Before you know it,
+            you're equipped with army-standard and facing an elite, who roars as he stomps toward you.
+        </div>
+        <input type="checkbox" id="confirmKTL"><label for="confirmKTL">Confirm (Reset requires >1.1 million total momentum)</label>
+        <button class="continueButton" onclick="initializeKTL()">Reset now with <span id="totalMomentum2"></span> total momentum!</button>
+    </div>
+</div>
+
+<div id="useAmuletMenu" class='fullScreenGrey' style="display:none" onClick='openUseAmuletMenu()'>
+    <div class='centerMenuBox' onClick="stopClicks(event)">
+        <div class='menuTitle'>Use the Amulet!<br>Essence available: <b><span id="essence2"></span></b></div>
+        <div class="menuSeparator"></div>
+        <div class="menuTitle" style="font-size:12px;text-align:center;">As you lay dying, your last thoughts are recorded by the amulet:<br><span style="font-size:16px;"><b>IF ONLY I COULD JUST...</b></span></div>
+        <div class="menuSeparator"></div>
+        <div id="amuletUpgrades" class="dynamicContent"></div>
+        <div id="amuletEnabledContainer">
+            <div class="menuSeparator"></div>
+            It is recommended to spend your essence before you start a new life.<br>
+            <input type="checkbox" id="amuletConfirm"><label for="amuletConfirm">Confirm</label>
+            <button class="continueButton" onclick="useAmulet()">Start Again</button>
+            <div id="infoMenu" style="position:absolute;width:300px;top:150px;right:100%;display:none;background:var(--bg-secondary);border-radius:20px;border:2px solid #00cd41;padding:10px 0;">
+                <div class="menuTitle" style="margin:auto;display:block;">Info Box</div>
+                <div id="infoText">lorem ipsum or whatever</div>
+                <div class='button' id='infoTextButton' onclick='buyUpgrade(selectedUpgrade.var, selectedUpgrade.num)' style="width:40%;padding:5px;font-size:14px;margin: 5px auto auto;">Buy</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="toastList" style="position:absolute;bottom:20px;right:20px;"></div>
+
+</body>
+
+
+
+<!-- Script outside of body to load and execute before page content is loaded -->
+<script src="data/globalsAndInitial.js"></script>
+<script src="driver.js"></script>
+<script src="views/viewCreate.js"></script>
+<script src="views/viewHelpers.js"></script>
+<script src="views/viewUpdating.js"></script>
+<script src="saving.js"></script>
+<script src="actionData.js"></script>
+<script src="events.js"></script>
+<script src="engine.js"></script>
+<script src="helpers/helpers.js"></script>
+<script src="helpers/hotkeys.js"></script>
+<script src="helpers/interval.js"></script>
+<script src="data/moduleData.js"></script>
+<script src="data/textData.js"></script> <!-- must go after actionData-->
+<script src="toasts.js"></script>
+<script src="menu.js"></script>
+<script src="ktl.js"></script>
+<script src="upgradeData.js"></script>
+<script>
+
+    // multiCreateButton({label:"Cash", resource:"cash", buyFromFar:"cash",
+    // option:{
+    //     type:"exponential",
+    //     buyCostMulti:1.5,
+    //     gainMulti:1.1,
+    //     initialCost:10,
+    //     initialOutput:1
+    // }, x:50, y:50});
+    // (function (i, s, o, g, r, a, m) {
+    //     i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function () {
+    //         (i[r].q = i[r].q || []).push(arguments)
+    //     }, i[r].l = 1 * new Date(); a = s.createElement(o),
+    //         m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m)
+    // })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+    //
+    // ga('create', 'UA-60978932-1', 'auto');
+    // ga('send', 'pageview');
+
+</script>
+<script>
+    startGame();
+</script>
+<!--<div>Icons made by <a href="https://www.flaticon.com/authors/smashicons" title="Smashicons">Smashicons</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a></div>-->
+<!--<a href="http://www.onlinewebfonts.com">oNline Web Fonts</a>-->
+
+</html>
