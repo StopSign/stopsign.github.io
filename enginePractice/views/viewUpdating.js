@@ -130,7 +130,7 @@ function updateStatForVisibility(statObj, prevStat, forceUpdate) {
 function updateActionForVisibility(actionObj, prevAction, forceUpdate) {
     let actionVar = actionObj.actionVar;
 
-    let miniVersion = scale < .45;
+    let miniVersion = scale < .35;
     if(prevState.scale !== scale && miniVersion && view.cached[`${actionVar}LargeVersionContainer`].style.display !== "none") {
         //switch to mini versions
         view.cached[`${actionVar}LargeVersionContainer`].style.display = "none"

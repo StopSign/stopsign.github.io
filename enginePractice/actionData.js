@@ -278,7 +278,7 @@ let actionData = {
         expStats:[],
         onLevelStats:[["villagersKnown", 1]],
         efficiencyStats:[["scottFamiliarity", .5]],
-        extraInfo:{english:"Unlocks new actions every even level until 6. Increases remember's max level by 1 per level."}
+        extraInfo:{english:"Increases remember's max level by 1 per level."}
     },
     clearTheTrail: {
         tier:1,
@@ -612,7 +612,7 @@ let actionData = {
         progressMaxBase:2, progressMaxMult:1, progressMaxIncrease:1.2,
         expToLevelBase:1, expToLevelMult:1, expToLevelIncrease:1.1,
         expertiseBase:.8,
-        unlockCost:10, visible:false, unlocked:false, purchased: true,
+        unlockCost:1, visible:false, unlocked:false, purchased: true,
         onLevelStats:[["energy", 1], ["confidence", 1]],
         expStats:[["negotiation", 1]],
         efficiencyStats:[["haggling", .1]]

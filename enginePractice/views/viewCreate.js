@@ -44,6 +44,7 @@ function generateStatDisplay(statVar) {
 
 function generateActionDisplay(actionVar) {
     let actionObj = data.actions[actionVar];
+    let dataObj = actionData[actionVar];
     let theStr = "";
     let progressColor = getResourceColor(actionObj);
 
@@ -56,7 +57,7 @@ function generateActionDisplay(actionVar) {
         (actionObj.maxLevel >= 0 ? " / <b><span id='"+actionVar+"MaxLevel'>0</span></b>" : "") +
             "<span id='"+actionVar+"HighestLevelContainer2'> (<b><span id='"+actionVar+"HighestLevel2'></span></b>)" +
         "</span>" +
-        " | <span style='font-size:12px;'><b><span id='"+actionVar+"Efficiency'></span></b>%</span>" +
+        " | <span style='font-size:12px;'><b><span id='"+actionVar+"Efficiency'></span></b>% eff</span>" +
         (!actionObj.wage ? "" : " | <b>$<span id='"+actionVar+"Wage' style='color:var(--wage-color)'></span></b>") +
         "</span>" +
         "</span>";
@@ -101,8 +102,8 @@ function generateActionDisplay(actionVar) {
         "</div>";
 
     let storyContainer =
-        "<div id='"+actionVar+"_storyContainer' style='display:none;padding:3px;'>" +
-        actionObj.storyText +
+        "<div id='"+actionVar+"_storyContainer' style='display:none;padding:5px;height:220px;overflow-y:auto;'>" +
+        (dataObj.storyText ? dataObj.storyText[language]:"") +
         "</div>";
 
     let onLevelStatsText = "<br>On Level Up:<br>";
@@ -150,7 +151,7 @@ function generateActionDisplay(actionVar) {
         "<div id='"+actionVar+"ProgressBarInner' style='width:30%;background-color:"+progressColor+";height:100%;position:absolute;'></div>" +
         "<div id='"+actionVar+"ProgressNumContainer' style='position:absolute;top:1px;left:4px;width:97%'><b></v>" +
         "<span id='"+actionVar+"Progress'>0</span></b> / " +
-        "<b><span id='"+actionVar+"ProgressMax'>1</span></b> " +
+        "<b><span id='"+actionVar+"ProgressMax'>1</span></b> progress " +
         "(+<b><span id='"+actionVar+"ProgressGain'>1</span></b>/s)" +
         "<span style='color:grey;position:absolute;right:0'>x<b><span id='"+actionVar+"ProgressMaxIncrease'>1</span></b> / lvl</span>" +
         "</div>" +
@@ -160,7 +161,7 @@ function generateActionDisplay(actionVar) {
         "<div id='"+actionVar+"ExpBarInner' style='width:30%;background-color:var(--exp-color);height:100%;position:absolute'></div>" +
         "<div id='"+actionVar+"ExpNumContainer' style='position:absolute;top:1px;left:4px;width:97%'><b></v>" +
         "<span id='"+actionVar+"Exp'>0</span></b> / " +
-        "<b><span id='"+actionVar+"ExpToLevel'>1</span></b>" +
+        "<b><span id='"+actionVar+"ExpToLevel'>1</span></b> exp" +
         "<span style='color:grey;position:absolute;right:0'>x<b><span id='"+actionVar+"ExpToLevelIncrease'>1</span></b> / lvl</span>" +
         "</div>" +
         "</div>";
@@ -298,7 +299,7 @@ function createDownStreamSliders(actionObj) {
 
 function highlightLine(borderId) {
     const line = document.getElementById(borderId);
-    let miniVersion = scale < .45;
+    let miniVersion = scale < .35;
     if (line) {
         if(miniVersion) {
             line.style.boxShadow = '0 0 40px 11px yellow';

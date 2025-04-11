@@ -85,7 +85,6 @@ function actionSetInitialVariables(actionObj, dataObj) {
 
     actionObj.onCompleteText = (dataObj.onCompleteText && dataObj.onCompleteText[language]) ? dataObj.onCompleteText[language] : "";
     actionObj.onLevelText = (dataObj.onLevelText && dataObj.onLevelText[language]) ? dataObj.onLevelText[language] : "";
-    actionObj.storyText = (dataObj.storyText && dataObj.storyText[language]) ? dataObj.storyText[language] : "";
     actionObj.extraInfo = (dataObj.extraInfo && dataObj.extraInfo[language]) ? dataObj.extraInfo[language] : "";
     actionObj.unlockMessage = (dataObj.unlockMessage && dataObj.unlockMessage[language]) ? dataObj.unlockMessage[language] : "";
 

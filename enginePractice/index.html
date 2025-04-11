@@ -33,7 +33,7 @@
     <span class="button" style="display:none;padding:5px 8px;" id='openUseAmuletButton' onclick="openUseAmuletMenu(true)">Use the Amulet!</span>
     <span class="button" style="display:none;padding:5px 8px;" id='openViewAmuletButton' onclick="openUseAmuletMenu(false)">View Amulet Upgrades!</span><br><br>
 
-    <span id="bonusDisplayShowButton" class="button" style="padding:5px 8px;margin-top:10px;" onclick="bonusMenuHideButton()">Offline >></span>
+    <span id="bonusDisplayShowButton" class="button" style="padding:5px 8px;margin-top:10px;" onclick="bonusMenuHideButton()">Offline >></span><br><br>
     <div id="bonusDisplay" style="border: 1px solid var(--border-color);position:relative;display:none;padding:10px;margin:5px;background-color:var(--overlay-color);color: var(--text-primary);width:360px">
         <span id="bonusDisplayHideButton" class="button" style="position:absolute;left:364px;top:-13px;padding:5px 8px;" onclick="bonusMenuHideButton()"><<</span>
         <span id="toggleBonusSpeedButton" class="button" onclick="toggleBonusSpeed()" style="background-color: red">Enable Bonus Speed</span><br><br>
@@ -50,14 +50,15 @@
 
     <div id="momentumDisplay" style="font-size:14px;background-color:var(--overlay-color);color: var(--text-primary);margin-bottom:12px;">
         Clock: <b><span id="secondsPerReset"></span></b>,
-        Total Momentum: <b><span id="totalMomentum">1</span></b>,
-        <span id="essenceDisplay" style="display:none">Total Essence: <b><span id="essence"></span></b></span>
+        Total Momentum: <b><span id="totalMomentum">1</span></b>
+        <span id="essenceDisplay" style="display:none">, Total Essence: <b><span id="essence"></span></b></span>
     </div>
 
     <span id="statDisplayShowButton" class="button" style="display:none;padding:5px;top:110px;left:388px;" onclick="statMenuHideButton()">Stats >></span>
     <div id="statDisplay" style="border: 1px solid var(--border-color);padding:10px;font-size:12px;background-color:var(--overlay-color);position:relative;">
         <span id="statDisplayHideButton" class="button" style="font-size:14px;position:absolute;padding:5px 8px;top:-13px;left:374px;" onclick="statMenuHideButton()"><<</span>
-        <div style="width:140px;display:inline-block;font-style:italic">Stat</div>
+        <span style="font-size:12px;position:absolute;top:5px;left:5px;">Bonus = 1.1^Stat. Click the Stats, blue = uses, green = adds.</span>
+        <br><div style="width:140px;display:inline-block;font-style:italic">Stat</div>
         <div style="width:70px;display:inline-block;font-style:italic">Amount</div>
         <div style="width:70px;display:inline-block;font-style:italic">Bonus</div>
         <div style="width:70px;display:inline-block;font-style:italic">Change/min</div>
