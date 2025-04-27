@@ -9,8 +9,8 @@ let toastIdCounter = 0; // to give each toast a unique ID
 
 function initializeToasts() {
     createToastModal();
-
-    createToast(function() { return true},
+return;
+    createToast(function() { return true },
         "CLOSED BETA", Raw.html`This game is currently in a closed beta - this means please do not share the link with people
         as I do not want the larger audience's first impression to be this version. This is for feedback purposes, and the game may change and the saves wiped for now
         until I start caring about save integrity. Thank you.<br><br>-Stop_Sign`);

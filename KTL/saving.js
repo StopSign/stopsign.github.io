@@ -64,6 +64,8 @@ function load() {
         data.attentionLoopMax = toLoad.attentionLoopMax ? toLoad.attentionLoopMax : 2.5;
     }
 
+    data.actions.overclock.momentumAdded = data.actions.overclock.actionPower * data.actions.overclock.upgradeMult;
+
     initializeDisplay();
 
     // view.initalize();
@@ -110,7 +112,7 @@ Things that are not reloading properly:
         clickActionMenu(actionVar, actionObj.currentMenu, true);
     }
 
-    if(data.doneKTL || (data.gameState !== "KTL" && data.actions.hearAboutTheLich.level >= 1)) {
+    if(data.doneKTL || (data.gameState !== "KTL" && data.actions.hearAboutTheLich && data.actions.hearAboutTheLich.level >= 1)) {
         document.getElementById("killTheLichMenuButton").style.display = "";
     }
     if(data.doneAmulet) {
@@ -127,6 +129,7 @@ Things that are not reloading properly:
     }
 
     reapplyAttentionSelected();
+    resizeStatMenu();
 }
 
 function reapplyAttentionSelected() {

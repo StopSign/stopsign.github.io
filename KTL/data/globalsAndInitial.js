@@ -61,12 +61,12 @@ let statTitles = []; //[<title>, <stat name to be located above>]
 let language = "english";
 let globalVisible = false;
 let forceVisuals = false;
-let isLoadingEnabled = true; //SET FALSE FOR CLEARING SAVE
+let isLoadingEnabled = false; //SET FALSE FOR CLEARING SAVE
 
 
 data.upgrades = {};
 
-let isDebug = false;
+let isDebug = true;
 function debug() {
     if(!isDebug) {
         return;
@@ -77,13 +77,13 @@ function debug() {
     data.doneAmulet = true;
     data.displayJob = true;
     data.essence = 300;
-    buyUpgrade("buyNicerStuff", 0);
+    // buyUpgrade("buyNicerStuff", 0);
     buyUpgrade("stopLettingOpportunityWait", 0);
     buyUpgrade("stopLettingOpportunityWait", 1);
     buyUpgrade("stopLettingOpportunityWait", 2);
-    setSliderUI("overclock", "harnessOverflow", 100);
-    // gameSpeed = 10;
-    bonusTime = 5000;
+    setSliderUI("overclock", "reflect", 100);
+    gameSpeed = 1;
+    bonusTime = 1000 * 60 * 60 * 24;
 }
 
 function initializeData() {
@@ -92,112 +92,131 @@ function initializeData() {
     }
     createUpgrades();
 
-    statTitles.push(["Overclock Stats", "abilityPower"]);
-    createAndLinkNewStat("abilityPower"); //improves efficiency of overclock & others. Comes from Harness Overflow
-    createAndLinkNewStat("processing"); //
-    createAndLinkNewStat("focus"); //
-    createAndLinkNewStat("energy"); //
-    createAndLinkNewStat("drive"); //
-    createAndLinkNewStat("memory"); //
-    // createAndLinkNewStat("discipline"); //
-    createAndLinkNewStat("ambition");
-    // createAndLinkNewStat("resilience"); //Energy
-    createAndLinkNewStat("diligence"); //
 
-    statTitles.push(["Social Stats", "charm"]);
-    createAndLinkNewStat("charm"); //exuding warmth, connecting
-    // createAndLinkNewStat("humor");
-    createAndLinkNewStat("wit"); //quick minded
-    createAndLinkNewStat("tact"); //smooth movement, smooth conversations
-    createAndLinkNewStat("grace"); //smooth movement, smooth conversations
-    createAndLinkNewStat("insight"); //dig deep
-    createAndLinkNewStat("trust");
-    createAndLinkNewStat("influence");
-    createAndLinkNewStat("recognition");
-    createAndLinkNewStat("confidence");
-    createAndLinkNewStat("presentation");
-    // createAndLinkNewStat("credibility");
-    // createAndLinkNewStat("deception"); //hot chip & lie
-    // createAndLinkNewStat("negotiation"); //convincing/persuasion
-
-    //Magic Stats
-    // statTitles.push(["Magic Stats", "magicControl"]);
-    // createAndLinkNewStat("magicControl");
-
-    //Physical Stats
-    statTitles.push(["Physical Stats", "endurance"]);
-    createAndLinkNewStat("endurance");
-    // createAndLinkNewStat("weaponsExpertise");
-    createAndLinkNewStat("vitality"); //
-
-    //Resource Stats
-    statTitles.push(["Resource Stats", "adaptability"]);
-    // createAndLinkNewStat("adaptability");
-    createAndLinkNewStat("workEthic");
-    // createAndLinkNewStat("resourcefulness");
-
-    // createAndLinkNewStat("salesmanship");
-    // createAndLinkNewStat("networking");
-
-    //Combined Stats
-    statTitles.push(["General Stats", "pathfinding"]);
-    createAndLinkNewStat("pathfinding");
+    statTitles.push(["Introspection", "awareness"]);
+    createAndLinkNewStat("awareness");
+    createAndLinkNewStat("curiosity");
     createAndLinkNewStat("observation");
-    createAndLinkNewStat("haggling");
-    createAndLinkNewStat("negotiation");
-    createAndLinkNewStat("perspective");
-    // createAndLinkNewStat("curiosity");
-    // createAndLinkNewStat("patience");
-    // createAndLinkNewStat("strategy");
-    // createAndLinkNewStat("innovation");
-    // createAndLinkNewStat("creativity");
-    // createAndLinkNewStat("judgement");
-    // createAndLinkNewStat("leadership");
+    createAndLinkNewStat("mentalClarity");
+    createAndLinkNewStat("stillness");
+    createAndLinkNewStat("integration");
 
 
-    statTitles.push(["Village Stats", "villagersKnown"]);
-    createAndLinkNewStat("villagersKnown");
-    createAndLinkNewStat("scottFamiliarity");
+    statTitles.push(["Magic", "focus"]);
+    createAndLinkNewStat("focus");
+    createAndLinkNewStat("circulation");
+    createAndLinkNewStat("willpower");
+    createAndLinkNewStat("amplification");
+    createAndLinkNewStat("pulse");
+    createAndLinkNewStat("spark");
+    createAndLinkNewStat("vision");
 
-    statTitles.push(["Job Stats", "streetKnowledge"]);
-    createAndLinkNewStat("streetKnowledge");
-    createAndLinkNewStat("jobExperience");
+
+    statTitles.push(["Physique", "endurance"]);
+    createAndLinkNewStat("endurance");
+    createAndLinkNewStat("flow");
+    createAndLinkNewStat("control");
+    createAndLinkNewStat("might");
+    createAndLinkNewStat("coordination");
+    createAndLinkNewStat("reflex");
+    createAndLinkNewStat("rhythm");
+
+
+    statTitles.push(["Adventuring", "energy"]);
+    createAndLinkNewStat("energy");
+    createAndLinkNewStat("navigation");
+    createAndLinkNewStat("comfort");
+    createAndLinkNewStat("instinct");
+    createAndLinkNewStat("initiative");
+    createAndLinkNewStat("logistics");
+    createAndLinkNewStat("valor");
+
+
+    statTitles.push(["Money", "ambition"]);
+    createAndLinkNewStat("ambition");
+    createAndLinkNewStat("savvy");
+    createAndLinkNewStat("cunning");
+    createAndLinkNewStat("leverage");
+    createAndLinkNewStat("adaptability");
+
+
+    statTitles.push(["Socialization", "confidence"]);
+    createAndLinkNewStat("confidence");
+    createAndLinkNewStat("recognition");
+    createAndLinkNewStat("charm");
+    createAndLinkNewStat("influence");
+    createAndLinkNewStat("discernment");
+    createAndLinkNewStat("deception");
+    createAndLinkNewStat("command");
+    createAndLinkNewStat("diplomacy");
     
     //KTL
-
     create("overclockTargetingTheLich", ["killHorde"], 0, 0);
-    create("killHorde", ["killElites"], 1, 0);
-    create("killElites", ["killTheLich"], 1, 0);
-    create("killTheLich", [], 1, 0);
+    create("killHorde", ["killElites"], 1, .1);
+    create("killElites", ["killDevils"], 1, .2);
+    create("killDevils", ["killGenerals"], 1, .3);
+    create("killGenerals", [], 1, .5);
 
     //intro
-    create("overclock", ["harnessOverflow", "travelOnRoad", "makeMoney", "socialize"], 0, 0);
-    create("harnessOverflow", ["distillInsight", "remember"], -1, -1);
-    create("distillInsight", ["journal"], -1, 0);
-    create("journal", ["takeNotes"], -1, 0);
-    create("takeNotes", [], 0, -1);
-    create("remember", [], -1, -1);
-    create("makeMoney", ["spendMoney"], 0, -1.5);
-    create("spendMoney", ["fillBasicNeeds"], 0, -1);
-    create("travelOnRoad", ["travelToOutpost", "clearTheTrail"], 1, 0);
-    create("clearTheTrail", ["paveTheTrail"], 0, 1); //increase travel expertise
-    create("paveTheTrail", [], 0, 1); //increase travel expertise to max. Req builder skills
-    create("travelToOutpost", ["meetVillageLeaderScott", "checkNoticeBoard", "travelToCrossroads"], 1, 0);
+    create("overclock", ["reflect", "bodyAwareness", "travelOnRoad", "makeMoney", "socialize", "generateMana"], 0, 0);
+    create("reflect", ["harnessOverflow", "distillInsight", "takeNotes", "remember"], -1, -1);
+    create("harnessOverflow", ["siftExcess"], -1.1, .5);
+    create("distillInsight", [], -1.9, 0);
+    create("takeNotes", ["journal"], -1.1, -.5);
+    create("bodyAwareness", ["meditate", "walkAware", "standStraighter"],-1, 0);
+    create("remember", [], -.2, -1.2);
+    create("travelOnRoad", ["travelToOutpost", "watchBirds", "catchAScent"], 2, 0);
+    create("travelToOutpost", ["meetVillageLeaderScott", "checkNoticeBoard", "browseLocalMarket", "travelToCrossroads"], 2, 0);
     create("meetVillageLeaderScott", ["helpScottWithChores"], 0, -1);
-
-    create("checkNoticeBoard", ["reportForTraining", "reportForLabor"], 1, -1);
     create("helpScottWithChores", [], 0, -1);
-    create("fillBasicNeeds", ["buyClothing", "eatBetterFood", "improveHome"], -.5, -1);
+    create("browseLocalMarket", [], -1, -1);
+    create("checkNoticeBoard", ["reportForTraining", "reportForLabor"], 1.5, -1);
+    create("makeMoney", ["spendMoney"], 1, -1);
+    create("spendMoney", ["buySocialAccess"], 0, -1);
+    create("buySocialAccess", ["slideTheCoin"], 0, -1);
+    create("slideTheCoin", ["buyCoffee"], .5, -1);
+    create("buyCoffee", [], .5, -1);
+    create("reportForLabor", ["oddJobsLaborer"], 1, 0);
+    create("oddJobsLaborer", ["chimneySweep"], .5, -1);
+    create("socialize", ["meetPeople"], -1, 1);
+    create("meetPeople", ["joinCoffeeClub", "talkToScott", "casualConversations"], 0, 1);
+    create("joinCoffeeClub", ["gossip"], 0, 1);
+    create("gossip", ["hearAboutTheLich"], 1, 0);
+    create("hearAboutTheLich", [], 0, -1.5);
 
-    //Village
-    create("reportForTraining", ["takeLessonsFromJohn"], 0, -1)
-    create("takeLessonsFromJohn", [], 0, -1)
+//--From Upgrades:--
 
 
+//Shortcut pt 1
+    create("watchBirds", [], 1, .5)
+    create("catchAScent", ["stepOffToExplore"], 0, 1);
+    create("stepOffToExplore", ["eatGoldenFruit", "questionTheTrail"], 0, 1);
+    create("eatGoldenFruit", [], 1, -.5);
+    create("journal", ["readTheWritten"], -1.9, 0);
 
-    //jobs
-    create("reportForLabor", ["oddJobsLaborer"], 1, -1);
-    create("oddJobsLaborer", ["chimneySweep"], 0, -1);
+
+//Meditate
+    create("meditate", ["feelTheAche"],-2, 0);
+    create("feelTheAche", ["softenTension"], -1, .5);
+    create("softenTension", ["releaseExpectations"], -1, .5);
+    create("releaseExpectations", [], -1, .5);
+    create("walkAware", [], -1, .5);
+
+//Notice board level 2 / Training & Shortcut pt 2
+    create("reportForTraining", ["basicTrainingWithJohn"], -.5, -1);
+    create("basicTrainingWithJohn", ["noticeTheStrain", "clenchTheJaw", "breatheThroughIt", "ownTheWeight", "moveWithPurpose"], 0, -1.3);
+    create("noticeTheStrain", [], -1, .3);
+    create("clenchTheJaw", [], 1, .3);
+    create("breatheThroughIt", [], -1, -.7);
+    create("ownTheWeight", [], 1, -.7);
+    create("moveWithPurpose", [], 0, -1.3);
+    create("questionTheTrail", ["climbTheRocks"], 1, .5);
+    create("climbTheRocks", ["spotAShortcut"], 1, -.5);
+    create("spotAShortcut", [], 0, -1);
+    create("standStraighter", [], -1, 1.5);
+
+//Notice Board level 3 / Jobs 1
+//     create("fillBasicNeeds", [], -.5, -1);
     create("chimneySweep", ["handyman"], 0, -1);
     create("handyman", ["tavernHelper"], 0, -1);
     create("tavernHelper", ["guildReceptionist"], 0, -1);
@@ -206,123 +225,40 @@ function initializeData() {
     create("townCrier", ["storyTeller"], 0, -1);
     create("storyTeller", [], 0, -1);
 
-    //spend money
-    create("eatBetterFood", ["eatStreetFood", "eatTastyFood"], -1, -.5);
-    create("eatStreetFood", [], 0, 1);
-    create("eatTastyFood", ["eatQualityFood"], -1, 0);
-    create("eatQualityFood", [], -1, -.5);
-    create("buyClothing", ["buyQualityClothing"], -1, -1.5);
-    create("buyQualityClothing", ["buyFashionableClothing"], 0, -1);
-    create("buyFashionableClothing", [], -1, 0);
+/*
 
-    create("improveHome", [], 0, -3);
+Market:
+* Opens a bunch of energy gains from food
+* Lots of social improvements with clothes
+* random improvement with stall chats
 
-    //Socialize
-    create("socialize", ["chat"], -1.5, 0);
-    create("chat", ["gossip", "talkToScott", "talkToInstructorJohn", "localOutreach"], -1, 1);
+Socialization:
+* Talk to Scott
+* Big buffs to everything existing
 
-    //Socialize - Gossip
-    create("gossip", ["gossipAboutPrices", "hearAboutTheLich"], 1, .5);
-    create("hearAboutTheLich", [], 1, -.5);
-    create("gossipAboutPrices", ["talkAboutMarkets"], 0, 1);
-    create("talkAboutMarkets", [], 0, 1);
-
-    //Socialize - Scott
-    create("talkToScott", ["talkAboutVillageHistory", "talkAboutCurrentIssues"], 0, 1.5); //Pragmatism, kindness, mystery
-    create("talkAboutVillageHistory", [], -.5, 1.5);
-    create("talkAboutCurrentIssues", [], .5, 1.5);
-
-    //Socialize - John
-    create("talkToInstructorJohn", [], -1.5, 0);
-    create("localOutreach", [], -2, -1.5);
+Travel and Emotions:
+* Process emotions for the buffs
+* travel through hermit for the stuff
 
 
-    //     create("peruseLibrary", ["researchHistory"], 0, -1.2); //research. Req other unlocks
-    //         create("researchHistory", null, 0, -1);
-    //     create("rememberTheFallen", ["honorPastSacrifices", "payTribute"], -1.2, -1);
-    //         create("honorPastSacrifices", ["findInnerPeace"], 0, -1.2);
-    //         create("payTribute", ["findInnerPeace"], -1.2, -1);
-    //             create("findInnerPeace", null, 0, -1);
-    // create("establishRituals", ["studyReligiousTexts", "visitSacredSites", "participateInCeremonies"], .5, -1.4)
+ */
 
 
+//TODO...
 
-    /*
-    Section works through people
-
-    Start with Sandra the Guide, who has Introduce 0/20 and every level unlocks a new person somewhere
-        -Introduce can be for both places and people
-        -Sandra has other actions for getting to know her otherwise
-        -late game: Collect powerful items to "jog Sandra's memory" and raise the level cap of introduce, to unlock mid/later game places. Could unlock 4 levels at once with a "meet guilds/nobles/artisans etc." pack or something
-    Start goals: quickly access something that unlocks the eat street food
-
-    Introduce 0: Market
-    Introduce 1: Steve the Stall Owner
-    Introduce 2: Bar & Inn
-    Introduce 3: The Guilds
-    Introduce 4: Bank Teller
-    Introduce 5: Worker's District
-    ...
+    // create("readTheWritten", [], -1, 0);
+    // create("siftExcess", [], -1.9, 0);
 
 
 
 
-     */
 
 
 
-    // createMaid(["learnTraditionRecipes", "gossip", "learnFavorites"]);
-    // createGossip(["learnFavorites"]);
-        //notes: socialize has to have nobles somewhere, for basictutoring
-    //sellingFoundItems combos with hunting results in a lot of ways
-    /*
-        createStrategicFriendship(["establishDiplomaticTies", "createTradeAgreements"]); //momentum branch
-            createMakeFriendsWithGuilds(["collaboratingOnProjects", "accessingExclusiveResources"]);
-                createEstablishArtisanPartnerships(["collaborativeDesigns", "exclusiveCraftsmanship"])
-                    createJoinGuilds()
-                    createCulturalExchanges(["artisanFestivals", "craftsmanshipShowcases"])
+    setParents();
+}
 
-            createMakeFriendsWithMerchants(["tradeAgreements", "economicInsights"]);
-                createTradeAgreements(["preferentialPricing", "exclusiveDeals"]);
-                    createPreferentialPricing(["bulkPurchaseDiscounts", "loyaltyRewards"]);
-                        createBulkPurchaseDiscounts(["discountedResourceBundles", "specialOffersOnGoods"]);
-                        createLoyaltyRewards(["earlyAccessToNewProducts", "customOrderPriorities"]);
-                    createExclusiveDeals(["limitedEditionItems", "firstBuyerRights"]);
-                        createLimitedEditionItems(["collector'sArtifacts", "uniqueEquipables"]);
-                        createFirstBuyerRights(["advanceProductReleases", "exclusivePurchaseOptions"]);
-                createEconomicInsights(["marketTrends", "investmentOpportunities"]);
-                    createMarketTrends(["priceFluctuationAnalysis", "demandForecasting"]);
-                        createPriceFluctuationAnalysis(["commodityValueTracking", "economicCyclesUnderstanding"]);
-                        createDemandForecasting(["upcomingNeedsPrediction", "stockpilingStrategies"]);
-                    createInvestmentOpportunities(["ventureCapital", "strategicPartnerships"]);
-                        createVentureCapital(["startupInvestments", "innovationFunding"]);
-                        createStrategicPartnerships(["jointBusinessVentures", "crossPromotionalAgreements"]);
-                createFriendsWithNobles(["politicalInfluence", "socialGatherings"]);
-                    createPoliticalInfluence(["advocacyForCauses", "legislativeSupport"]);
-                        createAdvocacyForCauses(["championingReforms", "publicEndorsements"]);
-                            createChampioningReforms(["lawAmendments", "policyIntroductions"]);
-                            createPublicEndorsements(["supportingNobleAgendas", "gainingPublicFavor"]);
-                        createLegislativeSupport(["billsSponsorship", "politicalAlliances"]);
-                            createBillsSponsorship(["fundingCampaigns", "policyDrafting"]);
-                            createPoliticalAlliances(["coalitionFormations", "strategySessions"]);
-                    createSocialGatherings(["eliteEventsAttendance", "privateAudiences"]);
-                        createEliteEventsAttendance(["ballsAndGalas", "charityEvents"]);
-                            createBallsAndGalas(["networkingOpportunities", "reputationBuilding"]);
-                            createCharityEvents(["philanthropicContributions", "influentialAcquaintances"]);
-                        createPrivateAudiences(["oneOnOneMeetings", "personalFavors"]);
-                            createOneOnOneMeetings(["negotiationSkills", "confidentialDiscussions"]);
-                            createPersonalFavors(["specialRequests", "insiderInformation"]);
-        createCulturalImmersion(["learnLocalCustoms", "participateInCulturalEvents"]); //conversation branch
-            createLearnLocalCustoms(["studyLanguage", "respectTraditions"]);
-                createStudyLanguage(["improveCommunication", "accessLocalLiterature"]);
-                createRespectTraditions(["gainTrust", "deepenUnderstanding"]);
-
-        I like beast hunters (looting large wild monsters), dungeon explorers (delvers), wardens (overland defensive rangers, prioritizing travel and mass-damage), and ocean-based combat. Rewrite with 3 options with these guilds in mind
-*/
-
-
-
-
+function setParents() {
     data.actionNames.forEach(function(actionVar) {
         if(!data.actions[actionVar].downstreamVars) {
             return;
@@ -334,8 +270,6 @@ function initializeData() {
             data.actions[downVar].parent = actionVar;
         })
     });
-
-
 }
 
 let check = 0;

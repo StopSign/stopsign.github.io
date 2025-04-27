@@ -97,99 +97,89 @@ function createUpgrades() {
 
 actionData.upgrades = {
     rememberWhatIDid: {
-        initialCost:5, costIncrease:1,
+        initialCost:1, costIncrease:1,
         upgradesAvailable:1,
         visible:true,
         customInfo: function(num) {
             return "On each action, get 2x exp as long as the action's level is lower than the highest level ever reached." +
-                "The highest level achieved will be displayed.";
+                " The action's highest level will be recorded on amulet use, and it will be displayed.";
         }
-    },
+    }, //1|1, 2x exp to highest
+    checkWhatScottMentioned: {
+        initialCost:1, costIncrease:1,
+        upgradesAvailable:1,
+        visible:true,
+        customInfo: function(num) {
+            return Raw.html`He said something about seeing a spot of gold among the trees. 
+            The birds, maybe? It might have been worth checking out.<br><br>
+            Unlocks 5 new actions.<br>
+            Recommended to start. 
+            `
+        },
+        onBuy: function(num) {
+            purchaseAction('watchBirds');
+            purchaseAction('catchAScent');
+            purchaseAction('stepOffToExplore');
+            purchaseAction('eatGoldenFruit');
+            purchaseAction('journal');
+        }
+    }, //STORY|1 - shortcut path
     stopLettingOpportunityWait: {
-        initialCost:5, costIncrease:2,
+        initialCost:1, costIncrease:3,
         upgradesAvailable:4,
         visible:true,
         customInfo: function(num) {
             return `When unlocking a new action, auto sets the new downstream sliders to ` +
             `${["5%.", "20%.", "100%.", "not reset with an amulet reset, and for previously undiscovered sliders to be set at 100%."][num]}`;
         }
-    },
+    }, //1|4|x3,  set sliders on unlock
     tryALittleHarder: {
-        initialCost:10, costIncrease:1.1,
+        initialCost:5, costIncrease:2,
         upgradesAvailable:5,
         visible:true,
         customInfo: function(num) {
-            return "Motivation generation on Overclock raise to " +((num+1)*20)+ "/s.";
+            return "Flat motivation generation increase on Overclock of <b>" +((num+1)*20)+ "</b> momentum/s.";
         }
-    },
+    }, //5|5|x2, Flat momentum increase
     createABetterFoundation: {
-        initialCost:10, costIncrease:2,
+        initialCost:5, costIncrease:4,
         upgradesAvailable:3,
         visible:true,
         customInfo: function(num) {
-            return "Motivation generation increased by "+(num >0?"another ":"")+"x2";
+            return "Motivation generation is multipled by "+(num >0?"another ":"")+"x2";
         }
-    },
-    buyNicerStuff: { //unlock market/equipment/houses
-        initialCost:11, costIncrease:1,
-        upgradesAvailable:1,
-        visible:true,
-        customInfo: function(num) {
-            return "Unlock new actions!<br>Story: My armor is broken, my sword shattered, my shield is in pieces. The army " +
-                "did not expect me to fight this long, and their preparation was lacking.<br><br>I must take this into my own hands.";
-        },
-        onBuy: function(num) {
-            if(num===1) {
-                purchaseAction('eatStreetFood');
-                purchaseAction('eatTastyFood');
-                purchaseAction('eatQualityFood');
-                purchaseAction('buyQualityClothing');
-                purchaseAction('buyFashionableClothing');
-                purchaseAction('improveHome');
-            } else if(num === 2) {
-                // purchaseAction('rentARoomAtInn');
-                // purchaseAction('listenToInnGuests');
-                // purchaseAction('chatWithInnGuests');
-                // purchaseAction('bargainForABetterRoom');
-                // purchaseAction('getBetterService');
-                //
-                // purchaseAction('buyAHouse');
-                // purchaseAction('buyFirewood');
-                // purchaseAction('buyFurniture');
-                // purchaseAction('buySomeBooks');
-                // purchaseAction('readByTheFireplace');
-                //
-                // purchaseAction('getComfy');
-                // purchaseAction('moveToCity');
-            } else if(num === 3) {
-                // purchaseAction('buyACityHouse');
-                // purchaseAction('hireLabor');
-                // purchaseAction('buyHouseholdSupplies');
-                // purchaseAction('buyFurniture');
-                // purchaseAction('buyGardeningSupplies');
-                // purchaseAction('payHouseholdStaff');
-                // purchaseAction('payGroundskeeper');
-                //
-                // purchaseAction('payTaxes');
-            }
-        }
-    },
+    }, //5|3|x4, Momentum multiplier
     makeMoreMoney: {
-        initialCost:12, costIncrease:2,
+        initialCost:10, costIncrease:2,
         upgradesAvailable:4,
         visible:true,
         customInfo: function(num) {
             return "Gold generation increased by "+(num >0?"another ":"")+"x2";
         }
-    },
+    }, //10|4|x2, Money x2
+    stopBeingSoTense: {
+        initialCost:30, costIncrease:1,
+        upgradesAvailable:1,
+        visible:true,
+        customInfo: function(num) {
+            return "What was the point? I should have handled myself first."
+        },
+        onBuy: function(num) {
+            purchaseAction('meditate');
+            purchaseAction('feelTheAche');
+            purchaseAction('softenTension');
+            purchaseAction('releaseExpectations');
+            purchaseAction('walkAware');
+        }
+    }, //STORY|30 - meditate path
     haveBetterConversations: {
-        initialCost:12, costIncrease:2,
+        initialCost:10, costIncrease:2,
         upgradesAvailable:4,
         visible:true,
         customInfo: function(num) {
             return "Conversation generation increased by "+(num >0?"another ":"")+"x2";
         }
-    },
+    }, //10|4|x2, Conversations x2
     focusHarder: {
         initialCost:25, costIncrease:4,
         upgradesAvailable:8,
@@ -200,9 +190,9 @@ actionData.upgrades = {
         onBuy: function(num) {
             data.attentionMult = 2 + num;
         }
-    },
+    }, //25|8|x4, Focus mult +1
     rememberWhatIFocusedOn: {
-        initialCost:40, costIncrease:5,
+        initialCost:25, costIncrease:5,
         upgradesAvailable:3,
         visible:true,
         customInfo: function(num) {
@@ -217,15 +207,30 @@ actionData.upgrades = {
                 data.upgrades.rememberWhatIFocusedOnMore.visible = true;
             }
         }
-    },
+    }, //25|3|x5, Focus mult is sticky, but resets
     knowWhatIFocusedOn: {
         initialCost:50, costIncrease:10,
         upgradesAvailable:4,
         visible:true,
         customInfo: function(num) { //[0, .2, .5, .9, 1][data.actions.knowWhatIFocusedOn.upgradePower]
-            return "Keep "+(["20", "50", "90", "100"][num])+"% of your Loop Bonus when you use the Amulet";
+            return "Keep "+(["20", "50", "90", "100"][num])+"% of your Focus Loop Bonus when you use the Amulet";
         }
-    },
+    }, //50|4|x10, Keep Focus mult on amulet
+    rememberHowIGrew: {
+        initialCost:50, costIncrease:1,
+        upgradesAvailable:1,
+        visible:true,
+        customInfo: function(num) {
+            return "On each action, get 2x exp as long as the action's level is lower than the second highest level ever reached." +
+                " The action's second highest level will be recorded on amulet use, and it will be displayed.";
+        }
+    }, //50|1, 2x exp to second highest
+
+
+    // return "Unlock new actions!<br>Story: My armor is broken, my sword shattered, my shield is in pieces. The army " +
+    //                 "did not expect me to fight this long, and their preparation was lacking.<br><br>I must take this into my own hands.";
+
+
     rememberWhatIFocusedOnMore: {
         initialCost:10000, costIncrease:5,
         upgradesAvailable:3,
@@ -239,26 +244,83 @@ actionData.upgrades = {
         onBuy: function(num) {
             data.attentionLoopMax = 2.5 * Math.pow(2, data.upgrades.rememberWhatIFocusedOn) * Math.pow(2, data.upgrades.rememberWhatIFocusedOnMore);
         }
-    },
-    rememberHowIGrew: {
-        initialCost:50, costIncrease:1,
-        upgradesAvailable:1,
-        visible:true,
-        customInfo: function(num) {
-            return "On each action, get 2x exp as long as the action's level is lower than the second highest level ever reached." +
-                "The second highest level achieved will be displayed.";
-        }
-    },
+    }, //10000|5|x3, Focus Mult +1
     rememberMyMastery: {
         initialCost:200, costIncrease:1,
         upgradesAvailable:1,
         visible:true,
         customInfo: function(num) {
             return "On each action, get 2x exp as long as the action's level is lower than the third highest level ever reached." +
-                "The third highest level achieved will be displayed.";
+                " The action's third highest level will be recorded on amulet use, and it will be displayed.";
         }
-    },
+    }, //200|1, 2x exp to third highest
+
+    lookCloserAtTheBoard: {
+        initialCost:11, costIncrease:3,
+        upgradesAvailable:2,
+        visible:true,
+        customInfo: function(num) {
+            return "The board was stuffed with notices. Surely something else is relevant for you."
+        },
+        onBuy: function(num) {
+            actionData.checkNoticeBoard.maxLevel++;
+            if(num === 1) {
+                purchaseAction('reportForTraining');
+                purchaseAction('basicTrainingWithJohn');
+                purchaseAction('noticeTheStrain');
+                purchaseAction('clenchTheJaw');
+                purchaseAction('breatheThroughIt');
+                purchaseAction('ownTheWeight');
+                purchaseAction('moveWithPurpose');
+                purchaseAction('standStraighter');
+                purchaseAction('questionTheTrail');
+                purchaseAction('climbTheRocks');
+                purchaseAction('findAShortcut');
+            } else if(num === 2) {
+                purchaseAction('fillBasicNeeds');
+                purchaseAction('chimneySweep');
+                purchaseAction('handyman');
+                purchaseAction('tavernHelper');
+                purchaseAction('guildReceptionist');
+                purchaseAction('messenger');
+                purchaseAction('storyTeller');
+            }
+        }
+    }, //STORY notice board level 2 (training) and level 3 (jobs)
+    buyNicerStuff: {
+        initialCost:11, costIncrease:1,
+        upgradesAvailable:1,
+        visible:false,
+        customInfo: function(num) {
+            return ""
+        },
+        onBuy: function(num) {
+        }
+    }, //STORY market
+    askScottMoreQuestions: {
+        initialCost:11, costIncrease:1,
+        upgradesAvailable:1,
+        visible:false,
+        customInfo: function(num) {
+            return ""
+        },
+        onBuy: function(num) {
+        }
+    }, //STORY socialization
+    discoverMoreOfTheWorld: {
+        initialCost:11, costIncrease:1,
+        upgradesAvailable:1,
+        visible:false,
+        customInfo: function(num) {
+            return ""
+        },
+        onBuy: function(num) {
+        }
+    }, //STORY travel
+
+
     //... finish up to here
+    /*
     learnHowToFight: { //unlock john socialize / instruction
         initialCost:40, costIncrease:1,
         upgradesAvailable:1,
@@ -351,7 +413,7 @@ actionData.upgrades = {
             return "";
         }
     },
-
+*/
 
 
 }

@@ -57,6 +57,7 @@ function actionSetBaseVariables(actionObj, dataObj) {
     actionObj.expertiseBase = dataObj.expertiseBase ? dataObj.expertiseBase : 1; //1 = 100%
     actionObj.expertiseMult = dataObj.expertiseMult ? dataObj.expertiseMult : 1;
     actionObj.expertise = actionObj.expertiseBase * actionObj.expertiseMult; //the initial and the multiplier (increases on stat add)
+    actionObj.statReductionEffect = 1;
     actionObj.efficiencyMax = dataObj.efficiencyMax ? dataObj.efficiencyMax : 200;
     actionObj.efficiency = actionObj.expertise > dataObj.efficiencyMax  ? dataObj.efficiencyMax : actionObj.expertise * 100;
 
@@ -119,7 +120,9 @@ function createAndLinkNewAction(actionVar, dataObj, title, x, y, downstreamVars)
     }
     actionObj.calcStatMult = function() {
         actionObj.expToLevelMult = 1;
-        actionObj.expStats.forEach(function(expStat) {
+        actionObj.progressMaxMult = 1;
+        let totalEffect = 1;
+        dataObj.expStats.forEach(function(expStat) {
             let name = expStat[0];
             let ratio = expStat[1];
             if(!data.stats[name]) {
@@ -128,9 +131,16 @@ function createAndLinkNewAction(actionVar, dataObj, title, x, y, downstreamVars)
             }
             let effect = ((data.stats[name].mult-1) * ratio) + 1; //10% of x2.5 -> .15
             actionObj[name+"StatExpMult"] = effect; //
-            actionObj.expToLevelMult /= effect;
+            totalEffect *= effect;
         })
-        actionObj.expToLevel = actionObj.expToLevelBase * actionObj.expToLevelMult;
+        actionObj.statReductionEffect = totalEffect;
+        if(actionObj.isGenerator) {
+            actionObj.expToLevelMult = 1/totalEffect;
+            actionObj.expToLevel = actionObj.expToLevelBase * actionObj.expToLevelMult;
+        } else {
+            actionObj.progressMaxMult = 1/totalEffect;
+            actionObj.progressMax = actionObj.progressMaxBase * actionObj.progressMaxMult;
+        }
     }
     actionObj.calcStatExpertise = function() {
         actionObj.expertiseMult = 1;
@@ -225,8 +235,11 @@ function actionAddExp(actionObj) {
 
 function statAddAmount(statVar, amount) {
     let statObj = data.stats[statVar];
+    if(!statObj) {
+        console.log("Tried to add to a stat that doesn't exist: " + statVar);
+    }
     statObj.num += amount;
-    statObj.mult = Math.pow(1.1, statObj.num); //calc only when adding
+    statObj.mult = 1 + statObj.num * .1; //Math.pow(1.1, statObj.num); //calc only when adding
     statObj.linkedActionExpStats.forEach(function (actionVar) {
         data.actions[actionVar].calcStatMult();
     })
@@ -264,7 +277,7 @@ function purchaseAction(actionVar) {
 //situation 2: Travel to Outpost just became visible. It's parent, Overclock, should set it's newly visible slider to 1%. AKA On unveil, set parent to 1%.
 function unveilAction(actionVar) {
     let actionObj = data.actions[actionVar];
-    if(!actionObj || actionObj.visible || !actionObj.purchased) { //only change things if needed
+    if(!actionObj || actionObj.visible || !actionObj.purchased) { //only change things if appropriate
         if(!actionObj) {
             console.log('tried to unveil ' + actionVar + ' in error.');
         }

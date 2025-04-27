@@ -72,6 +72,25 @@ function toggleAllHundred(actionVar) {
         setSliderUI(actionVar, toAction, 100);
     });
 }
+window.addEventListener('resize', () => {
+    resizeStatMenu();
+});
+
+function resizeStatMenu() {
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+
+    let bonusDisplay = view.cached.bonusDisplay;
+    let reduction = 200;
+    if(bonusDisplay.style.display !== "none") {
+        reduction += 97;
+    }
+
+    if(view.cached.statDisplay) {
+        view.cached.statDisplay.style.maxHeight = window.innerHeight - reduction + "px";
+    }
+}
+
 
 
 const windowElement = document.getElementById('windowElement');
@@ -375,20 +394,21 @@ function clickedStatName(statName) {
     //var + "Container" .style.borderColor = getStatColor(statName);
 
     data.actionNames.forEach(function(actionVar) {
-        let actionObj = data.actions[actionVar];
+        // let actionObj = data.actions[actionVar];
+        let dataObj = actionData[actionVar];
         let statFoundInGain = false;
-        actionObj.onLevelStats.forEach(function(statObj) {
+        dataObj.onLevelStats.forEach(function(statObj) {
             if(statObj[0] === statName) {
                 statFoundInGain = true;
             }
         });
         let statFoundInUse = false;
-        actionObj.expStats.forEach(function(statObj) {
+        dataObj.expStats.forEach(function(statObj) {
             if(statObj[0] === statName) {
                 statFoundInUse = true;
             }
         });
-        actionObj.efficiencyStats.forEach(function(statObj) {
+        dataObj.efficiencyStats.forEach(function(statObj) {
             if(statObj[0] === statName) {
                 statFoundInUse = true;
             }
@@ -476,6 +496,7 @@ function bonusMenuHideButton() {
         bonusDisplay.style.display = "block";
         button.style.display = "none";
     }
+    resizeStatMenu();
 }
 
 function toggleBonusSpeed() {

@@ -86,7 +86,7 @@ function useAmulet() {
             }
             let currentMult = actionObj[downstreamVar + "AttentionMult"];
 
-            actionObj[downstreamVar + "AttentionMult"] = (currentMult - 1) * [0, .2, .5, .9, 1][data.actions.knowWhatIFocusedOn.upgradePower] + 1;
+            actionObj[downstreamVar + "AttentionMult"] = (currentMult - 1) * [0, .2, .5, .9, 1][data.upgrades.knowWhatIFocusedOn.upgradePower] + 1;
         });
     });
 

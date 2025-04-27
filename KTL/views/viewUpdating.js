@@ -116,10 +116,10 @@ function updateStatView(statName) {
 function updateStatForVisibility(statObj, prevStat, forceUpdate) {
     let statVar = statObj.statVar;
     //only show if being the stat's amount is > 0
-    if(forceUpdate ||
+    if(forceUpdate || globalVisible ||
         (view.cached[statVar+"StatContainer"].style.display === "none" && statObj.num > 0) ||
         (view.cached[statVar+"StatContainer"].style.display !== "none" && statObj.num === 0)) {
-        if (statObj.num > 0) {
+        if (globalVisible || statObj.num > 0) {
             view.cached[statVar + "StatContainer"].style.display = "";
         } else {
             view.cached[statVar + "StatContainer"].style.display = "none";
@@ -232,8 +232,7 @@ function updateActionView(actionVar) {
     forceUpdate = updateActionForVisibility(actionObj, prevAction, forceUpdate);
 
     if(!forceUpdate &&
-        (!gameStateMatches(actionObj) ||
-            !isInScreenRange(actionObj))) {
+        (!gameStateMatches(actionObj))) {
         return;
     }
 
@@ -247,23 +246,24 @@ function updateActionView(actionVar) {
         ["expertise", 1], ["highestLevel2", 1], ["wage", 2]
     ];
 
+    if(actionVar === "overclock") {
+        roundedNumbers.push(["momentumAdded", 2]);
+    }
     if(forceUpdate || !actionObj.unlocked) {
         roundedNumbers.push(["unlockCost", 2]);
     }
-    if(forceUpdate || actionObj.unlocked) {
-        roundedNumbers.push(["totalSend", 3]);
-        roundedNumbers.push(["amountToSend", 2]);
-        roundedNumbers.push(["actionPower", 3]);
-        roundedNumbers.push(["actionPowerMult", 3]);
-        roundedNumbers.push(["highestLevel", 1]);
-        roundedNumbers.push(["secondHighestLevel", 1]);
-        roundedNumbers.push(["thirdHighestLevel", 1]);
-        roundedNumbers.push(["prevUnlockTime", 1]);
-        roundedNumbers.push(["expToLevelMult", 5]);
-        roundedNumbers.push(["expertiseMult", 3]);
-        roundedNumbers.push(["expertiseBase", 2]);
-        roundedNumbers.push(["level2", 1]);
-    }
+    roundedNumbers.push(["totalSend", 3]);
+    roundedNumbers.push(["amountToSend", 2]);
+    roundedNumbers.push(["actionPower", 3]);
+    roundedNumbers.push(["actionPowerMult", 3]);
+    roundedNumbers.push(["highestLevel", 1]);
+    roundedNumbers.push(["secondHighestLevel", 1]);
+    roundedNumbers.push(["thirdHighestLevel", 1]);
+    roundedNumbers.push(["prevUnlockTime", 1]);
+    roundedNumbers.push(["statReductionEffect", 3]);
+    roundedNumbers.push(["expertiseMult", 3]);
+    roundedNumbers.push(["expertiseBase", 2]);
+    roundedNumbers.push(["level2", 1]);
 
     let roundWithoutSig = ["progressMaxIncrease", "expToLevelIncrease"];
 

@@ -78,6 +78,7 @@ function generateActionDisplay(actionVar) {
         "+<b><span id='"+actionVar+"ExpToAdd'>1</span></b> Exp<br>" +
         actionObj.onCompleteText +
         "</div><br>";
+
     let onLevelText =
         "On Level up:<br>" +
         (actionObj.isGenerator?"":"x<b>"+ actionObj.progressMaxIncrease + "</b> to progress required to complete<br>") +
@@ -109,7 +110,7 @@ function generateActionDisplay(actionVar) {
     let onLevelStatsText = "<br>On Level Up:<br>";
     if(actionObj.onLevelStats) {
         actionObj.onLevelStats.forEach(function(onLevelStat) {
-            onLevelStatsText += "+<b>"+onLevelStat[1]+" " + capitalizeFirst(onLevelStat[0])+"</b><br>";
+            onLevelStatsText += "+<b>"+onLevelStat[1]+" to " + capitalizeFirst(onLevelStat[0])+"</b><br>";
         });
     }
 
@@ -128,10 +129,15 @@ function generateActionDisplay(actionVar) {
         actionObj.unlockMessage +
         "</span>" +
         "</div>";
+    let momentumDescription = "";
+    if(actionVar === "overclock") {
+        momentumDescription = Raw.html` (+<b><span id="${actionVar}MomentumAdded">10</span></b>)`;
+    }
     let momentumContainer =
         "<div id='"+actionVar+"MomentumContainer' style='margin:3px;'>" +
-        "<span style='font-size:12px;'>Tier <b><span id='"+actionVar+"Tier'></span></span></b> | " +
-        capitalizeFirst(actionObj.momentumName)+": <b><span id='"+actionVar+"Momentum'>0</span></b><br>" +
+        "<span style='font-size:12px;'>Tier <b><span id='"+actionVar+"Tier'></span></span></b> " +
+        (actionObj.isGenerator ? " Generator" : " Action") + "<br>" +
+        capitalizeFirst(actionObj.momentumName)+": <b><span id='"+actionVar+"Momentum'>0</span></b>"+momentumDescription+"<br>" +
         (actionObj.isGenerator?"":("<div style='margin:3px;font-size:10px;'>Progress/s = "+actionObj.tierMult()*100+"% of "+actionObj.momentumName+" * efficiency:</div>")) +
         "+<b><span id='"+actionVar+"MomentumIncrease'></span></b>/s, " +
         "-<b><span id='"+actionVar+"MomentumDecrease'></span></b>/s, "  +
@@ -227,10 +233,11 @@ function generateActionDisplay(actionVar) {
 
 function generateActionExpStats(actionObj) {
     let actionVar = actionObj.actionVar;
-    let expStatsStr = "<span id='"+actionVar+"StatExpContainer'>Stat Modifiers to Exp Required:<br>";
+    let dataObj = actionData[actionVar];
+    let expStatsStr = "<span id='"+actionVar+"StatExpContainer'>Stat Modifiers to Progress and Exp Required:<br>";
 
     let totalAmount = 1;
-    actionObj.expStats.forEach(function (statObj) {
+    dataObj.expStats.forEach(function (statObj) {
         let name = statObj[0];
         let ratio = statObj[1] * 100 + "%";
         if(!data.stats[name]) {
@@ -241,7 +248,7 @@ function generateActionExpStats(actionObj) {
         expStatsStr +=
             "<b>" + ratio + "</b> of <b>" + capitalizeFirst(name) + "</b>'s bonus = x<b><span id='"+actionVar+"_"+name+"StatExpMult'>" + amount + "</span></b><br>"
     });
-    expStatsStr += "Total Reduction: /<b>" + intToString(totalAmount, 3) + "</b>, = x<b><span id='"+actionVar+"ExpToLevelMult'></span></b><br>";
+    expStatsStr += "Total Reduction =  1 / <b><span id='"+actionVar+"StatReductionEffect'>" + totalAmount + "</span></b><br>";
     return expStatsStr;
 }
 
@@ -264,7 +271,7 @@ function generateActionEfficiencyStats(actionObj) {
             "<b>" + ratio + "</b> of <b>" + capitalizeFirst(name) + "</b>'s bonus = x<b><span id='"+actionVar+"_"+name+"StatExpertiseMult'>" + amount + "</span></b><br>"
     });
     expertiseModsStr += "Total Expertise Mult: x<b>" + intToString(totalAmount, 3) + "</b>, = x<b><span id='"+actionVar+"ExpertiseMult'></span></b><br>" +
-        "Expertise * base efficiency (x<b><span id='"+actionVar+"ExpertiseBase'></span></b>) = efficiency, in the title, capping at <b>100</b>%.<br>";
+        "<br>Expertise * base efficiency (x<b><span id='"+actionVar+"ExpertiseBase'></span></b>) = efficiency, in the title, capping at <b>100</b>%.<br>";
     expertiseModsStr += "</span>";
     return expertiseModsStr;
 }
@@ -408,7 +415,7 @@ function generateLinesBetweenActions() {
                         <div id="${lineId}_Container" style="display: flex;position: absolute;left: 50%;top: 50%;
                             transform: translate(-50%, -50%) ${labelWrapperTransform};flex-direction: column;align-items: center;pointer-events: none;">
                             <div id="${lineId}_Top" class="line-label-top hyperVisible" style="opacity:0;position:relative;color: yellow;font-size: 14px;font-weight: bold;line-height: 1;top:${topY}">
-                                x10
+                                x2
                             </div>
                             <div id="${lineId}_Bottom" class="line-label-bottom hyperVisible" style="position:relative;color:mediumpurple;font-size: 12px;font-weight: bold;line-height: 1;top:${bottomY}">
                                 x1.00
@@ -484,12 +491,12 @@ function cacheStatNames(statVar) {
     view.cached[statVar+"Name"] = document.getElementById(statVar+"Name");
 
     data.actionNames.forEach(function(actionVar) {
-        let actionObj = data.actions[actionVar];
-        actionObj.efficiencyStats.forEach(function (expertiseStat) {
+        let dataObj = actionData[actionVar];
+        dataObj.efficiencyStats.forEach(function (expertiseStat) {
             let newStatVar = expertiseStat[0];
             view.cached[actionVar + "_" + newStatVar + "StatExpertiseMult"] = document.getElementById(actionVar + "_" + newStatVar + "StatExpertiseMult");
         });
-        actionObj.expStats.forEach(function (expStat) {
+        dataObj.expStats.forEach(function (expStat) {
             let newStatVar = expStat[0];
             view.cached[actionVar + "_" + newStatVar + "StatExpMult"] = document.getElementById(actionVar + "_" + newStatVar + "StatExpMult");
         });
@@ -556,6 +563,9 @@ function cacheActionViews(actionVar) {
     view.cached[actionVar + "Efficiency"] = document.getElementById(actionVar + "Efficiency");
     view.cached[actionVar + "Tier"] = document.getElementById(actionVar + "Tier");
     view.cached[actionVar + "Wage"] = document.getElementById(actionVar + "Wage");
+    view.cached[actionVar + "MomentumAdded"] = document.getElementById(actionVar + "MomentumAdded");
+    view.cached[actionVar + "StatReductionEffect"] = document.getElementById(actionVar + "StatReductionEffect");
+
 
 
     view.cached[actionVar + "RealX"] = document.getElementById(actionVar + "RealX");
