@@ -1,5 +1,6 @@
 let view = {
     cached: {}, //contains the elements that are being iterated over and updated regularly,
+    prevValues: {}
 };
 
 let views = {
@@ -119,7 +120,9 @@ let views = {
 
                 views.updateVal(`${actionVar}_${downstreamVar}_Line_Inner_Bottom`, downstreamObj.momentumName === actionObj.momentumName ? "" : "none", "style.display");
                 views.updateVal(`${actionVar}_${downstreamVar}_Line_Outer`, downstreamObj.visible ? "" : "none", "style.display");
-                views.updateVal(`${actionVar}SliderContainer${downstreamVar}`, downstreamObj.visible ? "" : "none", "style.display");
+                if(actionObj.momentumName === downstreamObj.momentumName) {
+                    views.updateVal(`${actionVar}SliderContainer${downstreamVar}`, downstreamObj.visible ? "" : "none", "style.display");
+                }
             }
         }
 
@@ -161,6 +164,22 @@ let views = {
             views.updateVal(`${actionVar}ThirdHighestLevelContainer`, data.upgrades.rememberMyMastery.isFullyBought ? "" : "none", "style.display");
             views.updateVal(`${actionVar}PrevUnlockTimeContainer`, actionObj.prevUnlockTime ? "" : "none", "style.display");
             views.updateVal(`${actionVar}PrevUnlockTime`, secondsToTime(actionObj.prevUnlockTime), "innerText", "time");
+
+
+            views.updateVal(`${actionVar}StatExpContainer`, actionObj.expStats.length > 0 ? "" : "none", "style.display");
+            views.updateVal(`${actionVar}StatExpertiseContainer`, actionObj.efficiencyStats.length > 0 ? "" : "none", "style.display");
+
+            actionObj.expStats.forEach(function(expStat) {
+                let statVar = expStat[0];
+                views.updateVal(actionVar + "_" + statVar + "StatExpMult", actionObj[statVar + "StatExpMult"], "innerText", 3);
+            });
+
+            actionObj.efficiencyStats.forEach(function(efficiencyStat) {
+                let statVar = efficiencyStat[0];
+                views.updateVal(actionVar + "_" + statVar + "StatExpertiseMult", actionObj[statVar + "StatExpertiseMult"], "innerText", 3);
+            });
+
+
         }
 
         if (actionObj.currentMenu === "downstream") {
@@ -186,11 +205,12 @@ let views = {
             roundedNumbers.push(["amountToSend", 2]);
         }
         if(actionObj.isGenerator) {
-            roundedNumbers.push(["actionPower", 3]);
             roundedNumbers.push(["actionPowerMult", 3]);
         }
 
         if(actionObj.currentMenu === "stats") {
+            roundedNumbers.push(["statReductionEffect", 3]);
+            roundedNumbers.push(["expertiseMult", 3]);
             roundedNumbers.push(["highestLevel", 1]);
             roundedNumbers.push(["secondHighestLevel", 1]);
             roundedNumbers.push(["thirdHighestLevel", 1]);
@@ -203,8 +223,6 @@ let views = {
         }
         roundedNumbers.push(["totalSend", 3]);
         roundedNumbers.push(["prevUnlockTime", 1]);
-        roundedNumbers.push(["statReductionEffect", 3]);
-        roundedNumbers.push(["expertiseMult", 3]);
         roundedNumbers.push(["expertiseBase", 2]);
         roundedNumbers.push(["level2", 1]);
         roundedNumbers.push(["progressMaxIncrease", "none"]);
@@ -226,7 +244,7 @@ let views = {
         }
         for(let downstreamVar of actionObj.downstreamVars) {
             let downstreamObj = data.actions[downstreamVar];
-            if(!downstreamObj) {
+            if(!downstreamObj || actionObj.momentumName !== downstreamObj.momentumName) {
                 return;
             }
 
@@ -285,13 +303,17 @@ let views = {
     },
     updateVal: function(id, newVal, type="innerText", sigFigs) {
         const el = view.cached[id];
+        if(!view.prevValues[id]) {
+            view.prevValues[id] = {};
+        }
+        let prevValue = view.prevValues[id];
         if (!el) {
             console.log("Element of id " + id + " does not exist.");
             return;
         }
 
         const typeKey = `lastValue_${type}`;
-        let lastVal = el.dataset[typeKey] ?? null;
+        let lastVal = prevValue[typeKey] ?? null;
 
         if (lastVal !== newVal) {
             if (type.includes(".")) {
@@ -311,7 +333,7 @@ let views = {
                 }
             }
 
-            el.dataset[typeKey] = newVal;
+            prevValue[typeKey] = newVal;
         }
     },
 }
@@ -397,30 +419,30 @@ function hasDownstreamVisible(actionObj) {
     return visibleFound;
 }
 
-function updateActionStatsViews(actionObj, prevAction, forceUpdate) {
-    let actionVar = actionObj.actionVar;
-
-    if(actionObj.expStats.length > 0) {
-        if(view.cached[actionVar+"StatExpContainer"].style.display === "none") {
-            view.cached[actionVar+"StatExpContainer"].style.display = "";
-        }
-        actionObj.expStats.forEach(function(expStat) {
-            let statVar = expStat[0];
-            if(forceUpdate || intToString(prevAction[statVar+"StatExpMult"], 3) !== intToString(actionObj[statVar+"StatExpMult"], 3)) {
-                view.cached[actionVar + "_" + statVar + "StatExpMult"].innerText = intToString(actionObj[statVar + "StatExpMult"], 3);
-            }
-        });
-    }
-
-    if(actionObj.efficiencyStats.length > 0) {
-        if(view.cached[actionVar+"StatExpertiseContainer"].style.display === "none") {
-            view.cached[actionVar+"StatExpertiseContainer"].style.display = "";
-        }
-        actionObj.efficiencyStats.forEach(function(efficiencyStat) {
-            let statVar = efficiencyStat[0];
-            if(forceUpdate || intToString(prevAction[statVar+"StatExpertiseMult"], 3) !== intToString(actionObj[statVar+"StatExpertiseMult"], 3)) {
-                view.cached[actionVar + "_" + statVar + "StatExpertiseMult"].innerText = intToString(actionObj[statVar + "StatExpertiseMult"], 3);
-            }
-        });
-    }
-}
+// function updateActionStatsViews(actionObj, prevAction, forceUpdate) {
+//     let actionVar = actionObj.actionVar;
+//
+//     if(actionObj.expStats.length > 0) {
+//         if(view.cached[actionVar+"StatExpContainer"].style.display === "none") {
+//             view.cached[actionVar+"StatExpContainer"].style.display = "";
+//         }
+//         actionObj.expStats.forEach(function(expStat) {
+//             let statVar = expStat[0];
+//             if(forceUpdate || intToString(prevAction[statVar+"StatExpMult"], 3) !== intToString(actionObj[statVar+"StatExpMult"], 3)) {
+//                 view.cached[actionVar + "_" + statVar + "StatExpMult"].innerText = intToString(actionObj[statVar + "StatExpMult"], 3);
+//             }
+//         });
+//     }
+//
+//     if(actionObj.efficiencyStats.length > 0) {
+//         if(view.cached[actionVar+"StatExpertiseContainer"].style.display === "none") {
+//             view.cached[actionVar+"StatExpertiseContainer"].style.display = "";
+//         }
+//         actionObj.efficiencyStats.forEach(function(efficiencyStat) {
+//             let statVar = efficiencyStat[0];
+//             if(forceUpdate || intToString(prevAction[statVar+"StatExpertiseMult"], 3) !== intToString(actionObj[statVar+"StatExpertiseMult"], 3)) {
+//                 view.cached[actionVar + "_" + statVar + "StatExpertiseMult"].innerText = intToString(actionObj[statVar + "StatExpertiseMult"], 3);
+//             }
+//         });
+//     }
+// }

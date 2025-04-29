@@ -46,7 +46,22 @@ function generateActionDisplay(actionVar) {
     let actionObj = data.actions[actionVar];
     let dataObj = actionData[actionVar];
     let theStr = "";
-    let progressColor = getResourceColor(actionObj);
+    let resourceColor = getResourceColor(actionObj);
+
+    // let theStr = `
+    //     <span id='"+actionVar+"Title' onclick='actionTitleClicked(\`"+actionVar+"\`)' style='font-size:16px;color:var(--text-primary);width:100%;cursor:pointer;position:absolute;top:-40px;
+    //     left:-1px;white-space: nowrap;border-width: 0 0 2px 2px;border-style: solid;border-color: var(--border-color);padding-left:2px;padding-right:2px;background-color:var(--overlay-color)'>
+    //         <b>${actionObj.title}</b> |
+    //         <span style='font-size:12px;position:relative;'>
+    //             Level <b></v><span id='${actionVar}Level'>0</span></b>
+    //             (actionObj.maxLevel >= 0 ? " / <b><span id='"+actionVar+"MaxLevel'>0</span></b>" : "") +
+    //             "<span id='"+actionVar+"HighestLevelContainer2'> (<b><span id='"+actionVar+"HighestLevel2'></span></b>)" +
+    //             </span>
+    //             " | <span style='font-size:12px;'><b><span id='"+actionVar+"Efficiency'></span></b>% eff</span>" +
+    //             (!actionObj.wage ? "" : " | <b>$<span id='"+actionVar+"Wage' style='color:var(--wage-color)'></span></b>") +
+    //         "</span>" +
+    //     "</span>"
+    // `
 
     let title =
         "<span id='"+actionVar+"Title' onclick='actionTitleClicked(`"+actionVar+"`)' style='font-size:16px;color:var(--text-primary);width:100%;cursor:pointer;position:absolute;top:-40px;" +
@@ -163,7 +178,7 @@ function generateActionDisplay(actionVar) {
 
     let pbar =
         "<div id='"+actionVar+"ProgressBarOuter' style='width:100%;height:16px;position:relative;text-align:left;border-top:1px solid;border-bottom:1px solid;'>" +
-        "<div id='"+actionVar+"ProgressBarInner' style='width:30%;background-color:"+progressColor+";height:100%;position:absolute;'></div>" +
+        "<div id='"+actionVar+"ProgressBarInner' style='width:30%;background-color:"+resourceColor+";height:100%;position:absolute;'></div>" +
         "<div id='"+actionVar+"ProgressNumContainer' style='position:absolute;top:1px;left:4px;width:97%'><b></v>" +
         "<span id='"+actionVar+"Progress'>0</span></b> / " +
         "<b><span id='"+actionVar+"ProgressMax'>1</span></b> progress " +
@@ -257,7 +272,7 @@ function generateActionExpStats(actionObj) {
         expStatsStr +=
             "<b>" + ratio + "</b> of <b>" + capitalizeFirst(name) + "</b>'s bonus = x<b><span id='"+actionVar+"_"+name+"StatExpMult'>" + amount + "</span></b><br>"
     });
-    expStatsStr += "Total Reduction =  1 / <b><span id='"+actionVar+"StatReductionEffect'>" + totalAmount + "</span></b><br>";
+    expStatsStr += "Total Reduction = 1 / <b><span id='"+actionVar+"StatReductionEffect'>" + totalAmount + "</span></b><br>";
     return expStatsStr;
 }
 
@@ -279,7 +294,7 @@ function generateActionEfficiencyStats(actionObj) {
         expertiseModsStr +=
             "<b>" + ratio + "</b> of <b>" + capitalizeFirst(name) + "</b>'s bonus = x<b><span id='"+actionVar+"_"+name+"StatExpertiseMult'>" + amount + "</span></b><br>"
     });
-    expertiseModsStr += "Total Expertise Mult: x<b>" + intToString(totalAmount, 3) + "</b>, = x<b><span id='"+actionVar+"ExpertiseMult'></span></b><br>" +
+    expertiseModsStr += "Total Expertise Mult = x<b><span id='"+actionVar+"ExpertiseMult'></span></b><br>" +
         "<br>Expertise * base efficiency (x<b><span id='"+actionVar+"ExpertiseBase'></span></b>) = efficiency, in the title, capping at <b>100</b>%.<br>";
     expertiseModsStr += "</span>";
     return expertiseModsStr;

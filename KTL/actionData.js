@@ -416,9 +416,6 @@ let actionData = {
         onLevelStats:[["ambition", 1]],
         expStats:[["cunning", 1]],
         efficiencyStats:[["ambition", 1]],
-        onCompleteText: {
-            english:"+<b><span id=\"makeMoneyActionPower\">1</span></b> Gold<br>"
-        },
         actionPowerFunction: function(momentum, origMult) {
             if(momentum * origMult < 1) {
                 return 0;
