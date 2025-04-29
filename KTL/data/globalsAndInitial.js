@@ -158,15 +158,15 @@ function initializeData() {
     create("killGenerals", [], 1, .5);
 
     //intro
-    create("overclock", ["reflect", "bodyAwareness", "travelOnRoad", "makeMoney", "socialize", "generateMana"], 0, 0);
+    create("overclock", ["reflect", "bodyAwareness", "travelOnRoad", "makeMoney", "socialize"], 0, 0); //generateMana
     create("reflect", ["harnessOverflow", "distillInsight", "takeNotes", "remember"], -1, -1);
-    create("harnessOverflow", ["siftExcess"], -1.1, .5);
+    create("harnessOverflow", [], -1.1, .5); //siftExcess
     create("distillInsight", [], -1.9, 0);
     create("takeNotes", ["journal"], -1.1, -.5);
     create("bodyAwareness", ["meditate", "walkAware", "standStraighter"],-1, 0);
     create("remember", [], -.2, -1.2);
     create("travelOnRoad", ["travelToOutpost", "watchBirds", "catchAScent"], 2, 0);
-    create("travelToOutpost", ["meetVillageLeaderScott", "checkNoticeBoard", "browseLocalMarket", "travelToCrossroads"], 2, 0);
+    create("travelToOutpost", ["meetVillageLeaderScott", "checkNoticeBoard", "browseLocalMarket"], 2, 0); //travelToCrossroads
     create("meetVillageLeaderScott", ["helpScottWithChores"], 0, -1);
     create("helpScottWithChores", [], 0, -1);
     create("browseLocalMarket", [], -1, -1);
@@ -179,7 +179,7 @@ function initializeData() {
     create("reportForLabor", ["oddJobsLaborer"], 1, 0);
     create("oddJobsLaborer", ["chimneySweep"], .5, -1);
     create("socialize", ["meetPeople"], -1, 1);
-    create("meetPeople", ["joinCoffeeClub", "talkToScott", "casualConversations"], 0, 1);
+    create("meetPeople", ["joinCoffeeClub"], 0, 1); //talkToScott, casualConversations
     create("joinCoffeeClub", ["gossip"], 0, 1);
     create("gossip", ["hearAboutTheLich"], 1, 0);
     create("hearAboutTheLich", [], 0, -1.5);
@@ -192,7 +192,7 @@ function initializeData() {
     create("catchAScent", ["stepOffToExplore"], 0, 1);
     create("stepOffToExplore", ["eatGoldenFruit", "questionTheTrail"], 0, 1);
     create("eatGoldenFruit", [], 1, -.5);
-    create("journal", ["readTheWritten"], -1.9, 0);
+    create("journal", [], -1.9, 0); //readTheWritten
 
 
 //Meditate

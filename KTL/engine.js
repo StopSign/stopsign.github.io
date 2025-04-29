@@ -2,6 +2,7 @@ function statsSetBaseVariables(statObj) {
     statObj.num = 0;
     statObj.perMinute = 0;
     statObj.mult = 1;
+    statObj.unlocked = false;
 }
 
 function createAndLinkNewStat(statVar) {
@@ -63,10 +64,12 @@ function actionSetBaseVariables(actionObj, dataObj) {
 
     actionObj.actionPower = actionObj.actionPowerBase * actionObj.actionPowerMult * (actionObj.efficiency/100);
 
+
     actionObj.upgradeMult = 1;
     if(dataObj.updateUpgradeMult) {
         dataObj.updateUpgradeMult();
     }
+    actionObj.amountToSend = 0; //for generators
 }
 
 //One and done

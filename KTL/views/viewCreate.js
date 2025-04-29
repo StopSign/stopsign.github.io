@@ -25,7 +25,7 @@ function generateStatDisplay(statVar) {
     let theStr = "";
     statTitles.forEach(function (statTitle) {
         if(statTitle[1] === statVar) {
-            theStr += ((statVar === "discipline") ? "" : "<br>") +"<div><u><b>"+statTitle[0]+"</b></u></div>";
+            theStr += ((statVar === "discipline") ? "" : "<br>") +"<div><u>"+statTitle[0]+"</u></div>";
         }
     });
     theStr +=
@@ -145,10 +145,19 @@ function generateActionDisplay(actionVar) {
         "</div>";
 
     let balanceNeedle =
-        "<div style='position:relative;width:100%;height:10px;border-top:1px solid;'>" +
-            "<div style='position:absolute;top:0;left:50%;width:2px;height:100%;background-color:var(--text-primary);opacity:0.5;'></div>" +
-            "<div id='"+actionVar+"BalanceNeedle' style='position:absolute;top:-3px;width:2px;height:16px;background-color:red;left:50%;'></div>" +
-        "</div>";
+        Raw.html`
+        <div style="position:relative;width:100%;height:10px;">
+            <div style='position:absolute;top:-2px;width:100%;height:10px;border-top:1px solid;'>
+                <div style='position:absolute;top:0;left:25%;width:2px;height:100%;background-color:var(--text-primary);opacity:0.6;'></div> 
+                <div style='position:absolute;top:0;left:50%;width:2px;height:100%;background-color:var(--text-primary);opacity:0.6;'></div> 
+                <div style='position:absolute;top:0;left:75%;width:2px;height:100%;background-color:var(--text-primary);opacity:0.6;'></div> 
+                <div id='${actionVar}BalanceNeedle' style='position:absolute;top:-3px;width:2px;height:16px;background-color:red;left:50%;'></div>
+                <span style="position:absolute;left:25%;top:0;font-size:10px;transform:translateX(-100%);opacity:0.3;">x1</span>
+                <span style="position:absolute;left:50%;top:0;font-size:10px;transform:translateX(-100%);opacity:0.3;">x2</span>
+                <span style="position:absolute;left:75%;top:0;font-size:10px;transform:translateX(-100%);opacity:0.3;">x10</span>
+                <span style="position:absolute;left:100%;top:0;font-size:10px;transform:translateX(-100%);opacity:0.3;">x100</span>
+            </div>
+        </div>`;
 
 
 
@@ -590,5 +599,6 @@ function cacheDownstreamViews(actionVar) {
         view.cached[actionVar + "_" + downstreamVar + "_Line_Inner"] = document.getElementById(actionVar + "_" + downstreamVar + "_Line_Inner");
         view.cached[actionVar + "_" + downstreamVar + "_Line_Inner_Container"] = document.getElementById(actionVar + "_" + downstreamVar + "_Line_Inner_Container");
         view.cached[actionVar + "SliderContainer" + downstreamVar] = document.getElementById(actionVar + "SliderContainer" + downstreamVar);
+        view.cached[actionVar + "RangeInput" + downstreamVar] = document.getElementById(actionVar + "RangeInput" + downstreamVar);
     });
 }

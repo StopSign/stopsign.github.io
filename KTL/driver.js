@@ -70,7 +70,7 @@ function tick() {
             bonusTime += gameTicksLeft;
             gameTicksLeft = 0;
             if(!forceStop) {
-                updateView();
+                views.updateView();
             }
             break;
         }
@@ -94,7 +94,7 @@ function tick() {
         }
     }
     if(didSomething) {
-        updateView();
+        views.updateView();
     }
 }
 
