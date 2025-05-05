@@ -50,19 +50,27 @@ function create(actionVar, downstreamVars, x, y) {
     y*= -420;
     let title = decamelizeWithSpace(actionVar); //basicLabor -> Basic Labor
     let actionObj = createAndLinkNewAction(actionVar, dataObj, title, x, y, downstreamVars);
-    dataObj.expStats.forEach(function (expStat) { //add the action to the stat, to update exp reductions
-        data.statNames.forEach(function (statName) {
-            let stat = data.stats[statName];
-            if(expStat[0] === stat.statVar) {
-                stat.linkedActionExpStats.push(actionVar);
+    dataObj.expAtts.forEach(function (expAtt) { //add the action to the stat, to update exp reductions
+        data.attNames.forEach(function (attName) {
+            let att = data.atts[attName];
+            if(expAtt[0] === att.attVar) {
+                att.linkedActionExpAtts.push(actionVar);
             }
         });
     });
-    dataObj.efficiencyStats.forEach(function (expertiseStat) { //add the action to the stat, to update exp reductions
-        data.statNames.forEach(function (statName) {
-            let stat = data.stats[statName];
-            if(expertiseStat[0] === stat.statVar) {
-                stat.linkedActionExpertiseStats.push(actionVar);
+    dataObj.efficiencyAtts.forEach(function (expertiseAtt) { //add the action to the stat, to update exp reductions
+        data.attNames.forEach(function (attName) {
+            let att = data.atts[attName];
+            if(expertiseAtt[0] === att.attVar) {
+                att.linkedActionEfficiencyAtts.push(actionVar);
+            }
+        });
+    });
+    dataObj.onLevelAtts.forEach(function (onLevelAtt) { //add the action to the stat, to update exp reductions
+        data.attNames.forEach(function (attName) {
+            let att = data.atts[attName];
+            if(onLevelAtt[0] === att.attVar) {
+                att.linkedActionOnLevelAtts.push(actionVar);
             }
         });
     });
@@ -78,9 +86,9 @@ let actionData = {
         expToLevelBase:60, expToLevelIncrease:1,
         expertiseBase:1, isKTL:true, purchased: false,
         unlockCost:0, visible:true, unlocked:true, isGenerator:true, generatorSpeed:1,
-        onLevelStats:[],
-        expStats:[],
-        efficiencyStats:[]
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[]
     },
     killHorde: {
         tier:1,
@@ -98,9 +106,9 @@ let actionData = {
         onLevelCustom: function() {
             unveilAction('killElites');
         },
-        onLevelStats:[],
-        expStats:[],
-        efficiencyStats:[],
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[],
         extraInfo:{english:"Gives 2 * (1 + level) essence per complete."},
         unlockMessage:{english:"On unlock, +10 essence."}
     },
@@ -118,9 +126,9 @@ let actionData = {
         },
         onLevelCustom: function() {
         },
-        onLevelStats:[],
-        expStats:[],
-        efficiencyStats:[],
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[],
         extraInfo:{english:"Gives 6 * (1 + level) essence per complete."},
         unlockMessage:{english:"On unlock, +30 essence."}
     },
@@ -136,9 +144,9 @@ let actionData = {
         onCompleteCustom:function() {
             data.essence += 20 * (1 +  data.actions.killHorde.level);
         },
-        onLevelStats:[],
-        expStats:[],
-        efficiencyStats:[],
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[],
         extraInfo:{english:"Gives 20 * (1 + level) essence per complete."},
         unlockMessage:{english:"On unlock, +100 essence."}
     },
@@ -148,9 +156,9 @@ let actionData = {
         expToLevelBase:1, expToLevelIncrease:1.2,
         expertiseBase:1, isKTL:true, purchased: false,
         unlockCost:10, visible:true, unlocked:false,
-        onLevelStats:[],
-        expStats:[],
-        efficiencyStats:[]
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[]
     },
 
 
@@ -176,11 +184,11 @@ let actionData = {
             upgradeMult *= Math.pow(2, data.upgrades.createABetterFoundation.upgradePower);
             data.actions.overclock.upgradeMult = upgradeMult;
         },
-        onLevelStats:[],
-        expStats:[["awareness", 1], ["focus", 1], ["energy", 1], ["ambition", 1], ["control", 1],
+        onLevelAtts:[],
+        expAtts:[["awareness", 1], ["focus", 1], ["energy", 1], ["ambition", 1], ["control", 1],
             ["flow", 1], ["willpower", 1], ["coordination", 1], ["integration", 1], ["rhythm", 1],
             ["pulse", 1]],
-        efficiencyStats:[["circulation", 1]]
+        efficiencyAtts:[["circulation", 1]]
     },
     reflect: {
         tier:1,
@@ -191,9 +199,9 @@ let actionData = {
         onUnlock: function() {
             unveilAction('harnessOverflow')
         },
-        onLevelStats:[["awareness", 5]],
-        expStats:[["focus", 5], ["circulation", 5], ["observation", 5], ["energy", 5]],
-        efficiencyStats:[["circulation", 1]]
+        onLevelAtts:[["awareness", 5]],
+        expAtts:[["focus", 5], ["circulation", 5], ["observation", 5], ["energy", 5]],
+        efficiencyAtts:[["circulation", 1]]
     },
     harnessOverflow: {
         tier:1,
@@ -204,9 +212,9 @@ let actionData = {
         onLevelCustom: function() {
             unveilAction('distillInsight')
         },
-        onLevelStats:[["circulation", 1]],
-        expStats:[["awareness", 1], ["energy", 1]],
-        efficiencyStats:[]
+        onLevelAtts:[["circulation", 1]],
+        expAtts:[["awareness", 1], ["energy", 1]],
+        efficiencyAtts:[]
     },
     distillInsight: {
         tier:1,
@@ -217,9 +225,9 @@ let actionData = {
         onLevelCustom: function() {
             unveilAction('takeNotes')
         },
-        onLevelStats:[["focus", 1]],
-        expStats:[],
-        efficiencyStats:[["circulation", 1]]
+        onLevelAtts:[["focus", 1]],
+        expAtts:[],
+        efficiencyAtts:[["circulation", 1]]
     },
     takeNotes: {
         tier:1,
@@ -230,9 +238,9 @@ let actionData = {
         onLevelCustom:function() {
             unveilAction('bodyAwareness')
         },
-        onLevelStats:[["awareness", 10], ["curiosity", 3]],
-        expStats:[["observation", 1]],
-        efficiencyStats:[["circulation", 1]]
+        onLevelAtts:[["awareness", 10], ["curiosity", 3]],
+        expAtts:[["observation", 1]],
+        efficiencyAtts:[["circulation", 1]]
     },
     bodyAwareness: {
         tier:1,
@@ -245,9 +253,9 @@ let actionData = {
         onLevelCustom: function() {
             unveilAction('travelOnRoad')
         },
-        onLevelStats:[["awareness", 100]],
-        expStats:[["curiosity", 1], ["focus", 1], ["energy", 1], ["endurance", 1]],
-        efficiencyStats:[["flow", .1]]
+        onLevelAtts:[["awareness", 100]],
+        expAtts:[["curiosity", 1], ["focus", 1], ["energy", 1], ["endurance", 1]],
+        efficiencyAtts:[["flow", .1]]
     },
     remember: {
         tier:1,
@@ -261,9 +269,9 @@ let actionData = {
         onLevelCustom: function() {
             data.actions.harnessOverflow.maxLevel+=3;
         },
-        onLevelStats:[["focus", 5]],
-        expStats:[["awareness", 1], ["observation", 1]], //~x30 awareness when unlocked
-        efficiencyStats:[["circulation", 1]],
+        onLevelAtts:[["focus", 5]],
+        expAtts:[["awareness", 1], ["observation", 1]], //~x30 awareness when unlocked
+        efficiencyAtts:[["circulation", 1]],
         unlockMessage:{english:"On unlock, +1 max level for Body Awareness."},
         extraInfo:{english:"On Level up: +3 max levels for Harness Overflow."}
     },
@@ -280,9 +288,9 @@ let actionData = {
         onLevelCustom: function() {
             unveilAction('remember');
         },
-        onLevelStats:[["energy", 1], ["curiosity", 2]],
-        expStats:[["focus", 1], ["endurance", 1]],
-        efficiencyStats:[["navigation", 1]]
+        onLevelAtts:[["energy", 1], ["curiosity", 2]],
+        expAtts:[["focus", 1], ["endurance", 1]],
+        efficiencyAtts:[["navigation", 1]]
     },
     travelToOutpost: {
         tier:1,
@@ -293,9 +301,9 @@ let actionData = {
         onUnlock: function() {
             data.actions.bodyAwareness.maxLevel+=1;
         },
-        onLevelStats:[["energy", 2], ["curiosity", 5]],
-        expStats:[["endurance", 1]],
-        efficiencyStats:[["navigation", 1]],
+        onLevelAtts:[["energy", 2], ["curiosity", 5]],
+        expAtts:[["endurance", 1]],
+        efficiencyAtts:[["navigation", 1]],
         unlockMessage:{english:"On unlock, +1 max level for Body Awareness."}
     },
     meetVillageLeaderScott: {
@@ -311,9 +319,9 @@ let actionData = {
         },
         onUnlock: function() {
         },
-        onLevelStats:[],
-        expStats:[["curiosity", 1], ["observation", 1]],
-        efficiencyStats:[["observation", 10]],
+        onLevelAtts:[],
+        expAtts:[["curiosity", 1], ["observation", 1]],
+        efficiencyAtts:[["observation", 10]],
         extraInfo:{english:"On Level up: +2 max levels for Remember."}
     },
     helpScottWithChores: {
@@ -329,9 +337,9 @@ let actionData = {
         onLevelCustom: function() {
             data.actions.helpScottWithChores.wage += actionData.helpScottWithChores.wage/4;
         },
-        onLevelStats:[["recognition", 1]],
-        expStats:[["ambition", 1]],
-        efficiencyStats:[["energy", 1]],
+        onLevelAtts:[["recognition", 1]],
+        expAtts:[["ambition", 1]],
+        efficiencyAtts:[["energy", 1]],
         extraInfo:{english:"On Level up: Increase wage +25%"}
     },
     browseLocalMarket: {
@@ -342,9 +350,9 @@ let actionData = {
         unlockCost:100000, visible:false, unlocked:false, purchased: true,
         onLevelCustom: function() {
         },
-        onLevelStats:[["savvy", 3], ["recognition", 1]],
-        expStats:[["observation", 1], ["recognition", 1], ["confidence", 1], ["discernment", 1]],
-        efficiencyStats:[["ambition", 10]]
+        onLevelAtts:[["savvy", 3], ["recognition", 1]],
+        expAtts:[["observation", 1], ["recognition", 1], ["confidence", 1], ["discernment", 1]],
+        efficiencyAtts:[["ambition", 10]]
     },
     checkNoticeBoard: {
         tier:1,
@@ -364,9 +372,9 @@ let actionData = {
                 unveilAction('oddJobsLaborer')
             }
         },
-        onLevelStats:[],
-        expStats:[["observation", 1]],
-        efficiencyStats:[["observation", 1], ["savvy", 1]],
+        onLevelAtts:[],
+        expAtts:[["observation", 1]],
+        efficiencyAtts:[["observation", 1], ["savvy", 1]],
         extraInfo:{english:"Unlocks new actions with each level."}
     },
     makeMoney: {
@@ -413,9 +421,9 @@ let actionData = {
             upgradeMult *= Math.pow(2, data.upgrades.makeMoreMoney.upgradePower);
             data.actions.makeMoney.upgradeMult = upgradeMult;
         },
-        onLevelStats:[["ambition", 1]],
-        expStats:[["cunning", 1]],
-        efficiencyStats:[["ambition", 1]],
+        onLevelAtts:[["ambition", 1]],
+        expAtts:[["cunning", 1]],
+        efficiencyAtts:[["ambition", 1]],
         actionPowerFunction: function(momentum, origMult) {
             if(momentum * origMult < 1) {
                 return 0;
@@ -433,9 +441,9 @@ let actionData = {
             unveilAction('browseLocalMarket');
             unveilAction('checkNoticeBoard');
         },
-        onLevelStats:[["energy", 10]],
-        expStats:[["savvy", 1]],
-        efficiencyStats:[]
+        onLevelAtts:[["energy", 10]],
+        expAtts:[["savvy", 1]],
+        efficiencyAtts:[]
     },
     buySocialAccess: {
         tier:1, momentumName:"gold",
@@ -445,9 +453,9 @@ let actionData = {
         unlockCost:1, visible:false, unlocked:false, purchased: true,
         onUnlock:function() {
         },
-        onLevelStats:[["recognition", 1], ["charm", 1]],
-        expStats:[["savvy", 1]],
-        efficiencyStats:[]
+        onLevelAtts:[["recognition", 1], ["charm", 1]],
+        expAtts:[["savvy", 1]],
+        efficiencyAtts:[]
     },
     slideTheCoin: {
         tier:1, momentumName:"gold",
@@ -459,9 +467,9 @@ let actionData = {
         },
         onLevelCustom: function() {
         },
-        onLevelStats:[["influence", 10]],
-        expStats:[["recognition", 1]],
-        efficiencyStats:[["recognition", 1]]
+        onLevelAtts:[["influence", 10]],
+        expAtts:[["recognition", 1]],
+        efficiencyAtts:[["recognition", 1]]
     },
     buyCoffee: {
         tier:1, momentumName:"gold",
@@ -473,9 +481,9 @@ let actionData = {
         },
         onLevelCustom: function() {
         },
-        onLevelStats:[["cunning", 1]],
-        expStats:[["savvy", 1]],
-        efficiencyStats:[["discernment", 1]]
+        onLevelAtts:[["cunning", 1]],
+        expAtts:[["savvy", 1]],
+        efficiencyAtts:[["discernment", 1]]
     },
     reportForLabor: {
         tier:1,
@@ -486,9 +494,9 @@ let actionData = {
         onUnlock: function() {
             unveilAction('fillBasicNeeds');
         },
-        onLevelStats:[],
-        expStats:[],
-        efficiencyStats:[]
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[]
     },
     oddJobsLaborer: {
         tier:1,
@@ -507,9 +515,9 @@ let actionData = {
         onUnlock:function() {
             changeJob('oddJobsLaborer');
         },
-        onLevelStats:[],
-        expStats:[],
-        efficiencyStats:[],
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[],
         unlockMessage:{english:"On unlock, set job to Odd Jobs Laborer for a base wage of $10."}
     },
     socialize: {
@@ -551,9 +559,9 @@ let actionData = {
             upgradeMult *= Math.pow(2, data.upgrades.haveBetterConversations.upgradePower);
             data.actions.socialize.upgradeMult = upgradeMult;
         },
-        onLevelStats:[["confidence", 1]],
-        expStats:[["confidence", 1], ["curiosity", 1], ["observation", 1], ["recognition", 1], ["charm", 1], ["influence", 1]],
-        efficiencyStats:[["confidence", .1]],
+        onLevelAtts:[["confidence", 1]],
+        expAtts:[["confidence", 1], ["curiosity", 1], ["observation", 1], ["recognition", 1], ["charm", 1], ["influence", 1]],
+        efficiencyAtts:[["confidence", .1]],
         onCompleteText: {
             english:"+<b><span id=\"socializeActionPower\">1</span></b> Conversation<br>"
         },
@@ -575,9 +583,9 @@ let actionData = {
             unveilAction('buySocialAccess');
             unveilAction('slideTheCoin');
         },
-        onLevelStats:[["recognition", 1], ["confidence", 1], ["discernment", 1]],
-        expStats:[],
-        efficiencyStats:[]
+        onLevelAtts:[["recognition", 1], ["confidence", 1], ["discernment", 1]],
+        expAtts:[],
+        efficiencyAtts:[]
     },
     joinCoffeeClub: {
         tier:1, momentumName:"conversations",
@@ -592,9 +600,9 @@ let actionData = {
             unveilAction('gossip');
             unveilAction('hearAboutTheLich');
         },
-        onLevelStats:[],
-        expStats:[["influence", 100], ["recognition", 1]],
-        efficiencyStats:[["influence", 100], ["recognition", 1]],
+        onLevelAtts:[],
+        expAtts:[["influence", 100], ["recognition", 1]],
+        efficiencyAtts:[["influence", 100], ["recognition", 1]],
     },
     gossip: {
         tier:1, momentumName:"conversations",
@@ -608,9 +616,9 @@ let actionData = {
         onLevelCustom: function () {
             unveilAction('eatGoldenFruit');
         },
-        onLevelStats:[],
-        expStats:[["cunning", 10]],
-        efficiencyStats:[["discernment", 1], ["recognition", 1]],
+        onLevelAtts:[],
+        expAtts:[["cunning", 10]],
+        efficiencyAtts:[["discernment", 1], ["recognition", 1]],
     },
     hearAboutTheLich: {
         tier:1, momentumName:"conversations",
@@ -625,9 +633,9 @@ let actionData = {
                 document.getElementById("killTheLichMenuButton").style.display = "";
             }
         },
-        onLevelStats:[["integration", 20]],
-        expStats:[],
-        efficiencyStats:[],
+        onLevelAtts:[["integration", 20]],
+        expAtts:[],
+        efficiencyAtts:[],
     },
 
 //--- From upgrades ---
@@ -645,9 +653,9 @@ let actionData = {
             unveilAction('journal')
             unveilAction('catchAScent')
         },
-        onLevelStats:[["observation", 30]],
-        expStats:[["focus", 1], ["curiosity", 1], ["awareness", 1]],
-        efficiencyStats:[]
+        onLevelAtts:[["observation", 30]],
+        expAtts:[["focus", 1], ["curiosity", 1], ["awareness", 1]],
+        efficiencyAtts:[]
     },
     catchAScent: {
         tier:1,
@@ -658,9 +666,9 @@ let actionData = {
         onLevelCustom: function() {
             unveilAction('stepOffToExplore')
         },
-        onLevelStats:[["observation", 120]],
-        expStats:[["curiosity", 1]],
-        efficiencyStats:[["navigation", 1]]
+        onLevelAtts:[["observation", 120]],
+        expAtts:[["curiosity", 1]],
+        efficiencyAtts:[["navigation", 1]]
     },
     stepOffToExplore: {
         tier:1,
@@ -674,9 +682,9 @@ let actionData = {
         },
         onUnlock: function() {
         },
-        onLevelStats:[["endurance", 90], ["navigation", 2.5]],
-        expStats:[["curiosity", 1]],
-        efficiencyStats:[["curiosity", 1]],
+        onLevelAtts:[["endurance", 90], ["navigation", 2.5]],
+        expAtts:[["curiosity", 1]],
+        efficiencyAtts:[["curiosity", 1]],
         extraInfo:{english:"On Level up: +2 max levels for Body Awareness."}
     },
     eatGoldenFruit: {
@@ -689,9 +697,9 @@ let actionData = {
         },
         onUnlock: function () {
         },
-        onLevelStats:[["energy", 150], ["integration", 40]],
-        expStats:[["curiosity", 1], ["discernment", 1]],
-        efficiencyStats:[]
+        onLevelAtts:[["energy", 150], ["integration", 40]],
+        expAtts:[["curiosity", 1], ["discernment", 1]],
+        efficiencyAtts:[]
     },
     questionTheTrail: {
         tier:1,
@@ -703,9 +711,9 @@ let actionData = {
             unveilAction('climbTheRocks')
             unveilAction('spotAShortcut')
         },
-        onLevelStats:[["navigation", 2.5]],
-        expStats:[["curiosity", 1]],
-        efficiencyStats:[["navigation", 1]]
+        onLevelAtts:[["navigation", 2.5]],
+        expAtts:[["curiosity", 1]],
+        efficiencyAtts:[["navigation", 1]]
     },
     journal: {
         tier:1,
@@ -719,9 +727,9 @@ let actionData = {
         onUnlock: function() {
             data.actions.bodyAwareness.maxLevel++;
         },
-        onLevelStats:[["awareness", 50], ["curiosity", 25]],
-        expStats:[["observation", 1], ["energy", 1]],
-        efficiencyStats:[["circulation", 1]],
+        onLevelAtts:[["awareness", 50], ["curiosity", 25]],
+        expAtts:[["observation", 1], ["energy", 1]],
+        efficiencyAtts:[["circulation", 1]],
         unlockMessage:{english:"On unlock, +1 max level for Body Awareness."}
     },
 
@@ -738,9 +746,9 @@ let actionData = {
         },
         onLevelCustom: function() {
         },
-        onLevelStats:[["awareness", 500], ["circulation", 1]],
-        expStats:[["awareness", 1], ["curiosity", 1], ["focus", 1], ["flow", 1]],
-        efficiencyStats:[["flow", .1]]
+        onLevelAtts:[["awareness", 500], ["circulation", 1]],
+        expAtts:[["awareness", 1], ["curiosity", 1], ["focus", 1], ["flow", 1]],
+        efficiencyAtts:[["flow", .1]]
     },
     feelTheAche: {
         tier:1,
@@ -754,9 +762,9 @@ let actionData = {
         onLevelCustom: function() {
             data.actions.meditate.maxLevel+=1
         },
-        onLevelStats:[["flow", 1]],
-        expStats:[],
-        efficiencyStats:[["flow", .1]],
+        onLevelAtts:[["flow", 1]],
+        expAtts:[],
+        efficiencyAtts:[["flow", .1]],
         extraInfo:{english:"On Level up: +1 max level for Meditate."}
     },
     softenTension: {
@@ -771,9 +779,9 @@ let actionData = {
         onLevelCustom: function() {
             data.actions.feelTheAche.maxLevel+=1
         },
-        onLevelStats:[["flow", 2]],
-        expStats:[],
-        efficiencyStats:[["flow", .1]],
+        onLevelAtts:[["flow", 2]],
+        expAtts:[],
+        efficiencyAtts:[["flow", .1]],
         extraInfo:{english:"On Level up: +1 max level for Feel The Ache."}
     },
     releaseExpectations: {
@@ -790,9 +798,9 @@ let actionData = {
             // unveilAction('readTheWritten')
             // unveilAction('standStraighter')
         },
-        onLevelStats:[["flow", 3]],
-        expStats:[],
-        efficiencyStats:[["flow", .1]],
+        onLevelAtts:[["flow", 3]],
+        expAtts:[],
+        efficiencyAtts:[["flow", .1]],
         extraInfo:{english:"On Level up: +1 max level for Soften Tension."}
     },
     walkAware: {
@@ -805,9 +813,9 @@ let actionData = {
         },
         onLevelCustom: function() {
         },
-        onLevelStats:[],
-        expStats:[],
-        efficiencyStats:[]
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[]
     },
 
 
@@ -823,9 +831,9 @@ let actionData = {
                 unveilAction('basicTrainingWithJohn');
             }
         },
-        onLevelStats:[["endurance", 1], ["energy", 1]],
-        expStats:[],
-        efficiencyStats:[]
+        onLevelAtts:[["endurance", 1], ["energy", 1]],
+        expAtts:[],
+        efficiencyAtts:[]
     },
     basicTrainingWithJohn: {
         tier:1,
@@ -834,9 +842,9 @@ let actionData = {
         actionPowerBase:1, actionPowerMult:1, actionPowerMultIncrease:3.1,
         expertiseBase:.2, maxLevel:40,
         unlockCost:1e7, visible:false, unlocked:false, purchased: false,
-        onLevelStats:[],
-        expStats:[],
-        efficiencyStats:[]
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[]
     },
     noticeTheStrain: {
         tier:1,
@@ -845,9 +853,9 @@ let actionData = {
         actionPowerBase:1, actionPowerMult:1, actionPowerMultIncrease:3.1,
         expertiseBase:.2, maxLevel:40,
         unlockCost:1e7, visible:false, unlocked:false, purchased: false,
-        onLevelStats:[],
-        expStats:[],
-        efficiencyStats:[]
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[]
     },
     clenchTheJaw: {
         tier:1,
@@ -856,9 +864,9 @@ let actionData = {
         actionPowerBase:1, actionPowerMult:1, actionPowerMultIncrease:3.1,
         expertiseBase:.2, maxLevel:40,
         unlockCost:1e7, visible:false, unlocked:false, purchased: false,
-        onLevelStats:[],
-        expStats:[],
-        efficiencyStats:[]
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[]
     },
     breatheThroughIt: {
         tier:1,
@@ -867,9 +875,9 @@ let actionData = {
         actionPowerBase:1, actionPowerMult:1, actionPowerMultIncrease:3.1,
         expertiseBase:.2, maxLevel:40,
         unlockCost:1e7, visible:false, unlocked:false, purchased: false,
-        onLevelStats:[],
-        expStats:[],
-        efficiencyStats:[]
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[]
     },
     ownTheWeight: {
         tier:1,
@@ -878,9 +886,9 @@ let actionData = {
         actionPowerBase:1, actionPowerMult:1, actionPowerMultIncrease:3.1,
         expertiseBase:.2, maxLevel:40,
         unlockCost:1e7, visible:false, unlocked:false, purchased: false,
-        onLevelStats:[],
-        expStats:[],
-        efficiencyStats:[]
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[]
     },
     moveWithPurpose: {
         tier:1,
@@ -889,9 +897,9 @@ let actionData = {
         actionPowerBase:1, actionPowerMult:1, actionPowerMultIncrease:3.1,
         expertiseBase:.2, maxLevel:40,
         unlockCost:1e7, visible:false, unlocked:false, purchased: false,
-        onLevelStats:[],
-        expStats:[],
-        efficiencyStats:[]
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[]
     },
     climbTheRocks: {
         tier:1,
@@ -901,9 +909,9 @@ let actionData = {
         unlockCost:4000000, visible:false, unlocked:false, purchased: false,
         onUnlock: function() {
         },
-        onLevelStats:[["focus", 50]],
-        expStats:[["curiosity", 1], ["endurance", 10]],
-        efficiencyStats:[["endurance", 1]]
+        onLevelAtts:[["focus", 50]],
+        expAtts:[["curiosity", 1], ["endurance", 10]],
+        efficiencyAtts:[["endurance", 1]]
     },
     spotAShortcut: {
         tier:1,
@@ -913,9 +921,9 @@ let actionData = {
         unlockCost:4000000, visible:false, unlocked:false, purchased: false,
         onUnlock: function() {
         },
-        onLevelStats:[["navigation", 5]],
-        expStats:[["curiosity", 1], ["endurance", 1]],
-        efficiencyStats:[["endurance", 1]]
+        onLevelAtts:[["navigation", 5]],
+        expAtts:[["curiosity", 1], ["endurance", 1]],
+        efficiencyAtts:[["endurance", 1]]
     },
     standStraighter: {
         tier:1,
@@ -927,9 +935,9 @@ let actionData = {
         },
         onLevelCustom: function() {
         },
-        onLevelStats:[],
-        expStats:[],
-        efficiencyStats:[]
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[]
     },
 
 //Jobs 1
@@ -939,9 +947,9 @@ let actionData = {
         expToLevelBase:50, expToLevelIncrease:1.2,
         expertiseBase:.6,
         unlockCost:50, visible:false, unlocked:false, purchased: false,
-        onLevelStats:[],
-        expStats:[],
-        efficiencyStats:[]
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[]
     },
     chimneySweep: {
         tier:1,
@@ -960,9 +968,9 @@ let actionData = {
         onUnlock:function() {
             changeJob('chimneySweep');
         },
-        onLevelStats:[],
-        expStats:[],
-        efficiencyStats:[],
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[],
         unlockMessage:{english:"On unlock, set job to Chimney Sweep for a base wage of $500."}
     },
     handyman: {
@@ -982,9 +990,9 @@ let actionData = {
         onUnlock:function() {
             changeJob('handyman');
         },
-        onLevelStats:[],
-        expStats:[],
-        efficiencyStats:[],
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[],
         unlockMessage:{english:"On unlock, set job to Handyman for a base wage of $25k."}
     },
     tavernHelper: {
@@ -1004,9 +1012,9 @@ let actionData = {
         onUnlock:function() {
             changeJob('tavernHelper');
         },
-        onLevelStats:[],
-        expStats:[],
-        efficiencyStats:[],
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[],
         unlockMessage:{english:"On unlock, set job to tavernHelper for a base wage of $1.25m."}
     },
     guildReceptionist: {
@@ -1026,9 +1034,9 @@ let actionData = {
         onUnlock:function() {
             changeJob('guildReceptionist');
         },
-        onLevelStats:[],
-        expStats:[],
-        efficiencyStats:[],
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[],
         unlockMessage:{english:"On unlock, set job to guildReceptionist for a base wage of $100m."}
     },
     messenger: {
@@ -1048,9 +1056,9 @@ let actionData = {
         onUnlock:function() {
             changeJob('messenger');
         },
-        onLevelStats:[],
-        expStats:[],
-        efficiencyStats:[],
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[],
         unlockMessage:{english:"On unlock, set job to messenger for a base wage of $5b."}
     },
     townCrier: {
@@ -1070,9 +1078,9 @@ let actionData = {
         onUnlock:function() {
             changeJob('townCrier');
         },
-        onLevelStats:[],
-        expStats:[],
-        efficiencyStats:[],
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[],
         unlockMessage:{english:"On unlock, set job to townCrier for a base wage of $250b."}
     },
     storyTeller: {
@@ -1089,9 +1097,9 @@ let actionData = {
         onUnlock:function() {
             changeJob('storyTeller');
         },
-        onLevelStats:[],
-        expStats:[],
-        efficiencyStats:[],
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[],
         unlockMessage:{english:"On unlock, set job to storyTeller for a base wage of $20t."}
     },
 
@@ -1107,9 +1115,9 @@ let actionData = {
         },
         onUnlock: function() {
         },
-        onLevelStats:[["awareness", 1000], ["curiosity", 500]],
-        expStats:[["observation", 1], ["energy", 1]],
-        efficiencyStats:[["circulation", 1]]
+        onLevelAtts:[["awareness", 1000], ["curiosity", 500]],
+        expAtts:[["observation", 1], ["energy", 1]],
+        efficiencyAtts:[["circulation", 1]]
     },
     siftExcess: { //? dunno the purpose yet
         tier:1,
@@ -1119,9 +1127,9 @@ let actionData = {
         unlockCost:500000, visible:false, unlocked:false, purchased: false,
         onLevelCustom: function() {
         },
-        onLevelStats:[["circulation", 100]],
-        expStats:[["observation", 1]],
-        efficiencyStats:[]
+        onLevelAtts:[["circulation", 100]],
+        expAtts:[["observation", 1]],
+        efficiencyAtts:[]
     },
 
     gossipAboutPrices: {
@@ -1135,9 +1143,9 @@ let actionData = {
         onUnlock: function() {
             unveilAction('talkAboutMarkets');
         },
-        expStats:[],
-        onLevelStats:[["haggling", 1]],
-        efficiencyStats:[],
+        expAtts:[],
+        onLevelAtts:[["haggling", 1]],
+        efficiencyAtts:[],
     },
     talkAboutMarkets: {
         tier:1, momentumName:"conversations",
@@ -1149,9 +1157,9 @@ let actionData = {
         },
         onUnlock: function() {
         },
-        expStats:[],
-        onLevelStats:[["haggling", 1]],
-        efficiencyStats:[],
+        expAtts:[],
+        onLevelAtts:[["haggling", 1]],
+        efficiencyAtts:[],
     },
     //Socialize - Scott
     talkToScott: {
@@ -1164,27 +1172,27 @@ let actionData = {
             unveilAction('talkAboutVillageHistory');
             unveilAction('talkAboutCurrentIssues');
         },
-        expStats:[["scottFamiliarity", 1]],
-        onLevelStats:[["trust", 1]],
-        efficiencyStats:[],
+        expAtts:[["scottFamiliarity", 1]],
+        onLevelAtts:[["trust", 1]],
+        efficiencyAtts:[],
     },
     talkAboutVillageHistory: {
         tier:1, momentumName:"conversations",
         progressMaxBase:50000, progressMaxIncrease:3,
         expToLevelBase:10, expToLevelIncrease:3,
         unlockCost:50000, visible:false, unlocked:false, purchased: false,
-        onLevelStats:[["villagersKnown", 1]],
-        expStats:[],
-        efficiencyStats:[],
+        onLevelAtts:[["villagersKnown", 1]],
+        expAtts:[],
+        efficiencyAtts:[],
     },
     talkAboutCurrentIssues: {
         tier:1, momentumName:"conversations",
         progressMaxBase:50000, progressMaxIncrease:1.5,
         expToLevelBase:10, expToLevelIncrease:1.5,
         unlockCost:50000, visible:false, unlocked:false, purchased: false,
-        onLevelStats:[["villagersKnown", 1]],
-        expStats:[],
-        efficiencyStats:[],
+        onLevelAtts:[["villagersKnown", 1]],
+        expAtts:[],
+        efficiencyAtts:[],
     },
     //Socialize - John
     talkToInstructorJohn: {
@@ -1192,9 +1200,9 @@ let actionData = {
         progressMaxBase:50000, progressMaxIncrease:1.5,
         expToLevelBase:10, expToLevelIncrease:1.5,
         unlockCost:50000, visible:false, unlocked:false, purchased: false,
-        onLevelStats:[["villagersKnown", 1]],
-        expStats:[],
-        efficiencyStats:[],
+        onLevelAtts:[["villagersKnown", 1]],
+        expAtts:[],
+        efficiencyAtts:[],
     },
     //Socialize - Local Outreach
     localOutreach: {
@@ -1203,9 +1211,9 @@ let actionData = {
         expToLevelBase:10, expToLevelIncrease:1.5,
         unlockCost:50000, maxLevel:50,
         visible:false, unlocked:false, purchased: false,
-        onLevelStats:[["villagersKnown", 1]],
-        expStats:[],
-        efficiencyStats:[],
+        onLevelAtts:[["villagersKnown", 1]],
+        expAtts:[],
+        efficiencyAtts:[],
     },
 
 };

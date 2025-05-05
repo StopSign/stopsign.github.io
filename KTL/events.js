@@ -137,7 +137,9 @@ windowElement.addEventListener('wheel', function(e) {
     actionContainer.style.transform = `translate(${transformX}px, ${transformY}px) scale(${scale})`;
 
     for (let actionVar in data.actions) {
-        clearFuzziness(view.cached[actionVar + "Container"]);
+        if(data.actions[actionVar].visible || globalVisible) {
+            clearFuzziness(view.cached[actionVar + "Container"]);
+        }
     }
 }, { passive: false });
 
@@ -367,66 +369,67 @@ function clickMenuButton() {
 
 
 let selectedStat = null;
-function clickedStatName(statName) {
+function clickedStatName(attName) {
     //clear all borders
-    data.actionNames.forEach(function(actionVar) {
-        if(view.cached[actionVar+"LargeVersionContainer"].style.borderColor !== "black") {
+    data.actionNames.forEach(function (actionVar) {
+        if (view.cached[actionVar + "LargeVersionContainer"].style.borderColor !== "black") {
             view.cached[actionVar + "LargeVersionContainer"].style.borderColor = "black";
+            view.cached[actionVar + "LockContainer"].style.borderColor = "black";
             view.cached[actionVar + "SmallVersionContainer"].style.border = "";
         }
     })
 
     //clear previous
-    if(selectedStat) {
+    if (selectedStat) {
         view.cached[selectedStat + "StatContainer"].style.border = "";
     }
-    if(selectedStat === statName) {
+    if (selectedStat === attName) {
         //clicked the same, so clear and return
         selectedStat = null;
         return;
     }
 
-    let theDiv = view.cached[statName+"StatContainer"];
-    selectedStat = statName;
+    let theDiv = view.cached[attName + "StatContainer"];
+    selectedStat = attName;
     theDiv.style.border = "2px solid var(--text-primary)";
     //Change the border colors of all actions that are relevant
     //for each action, for each statList, if this stat is found, set the boolean
-    //var + "Container" .style.borderColor = getStatColor(statName);
+    //var + "Container" .style.borderColor = getAttColor(attName);
 
-    data.actionNames.forEach(function(actionVar) {
+    for (let actionVar in data.actions) {
         // let actionObj = data.actions[actionVar];
         let dataObj = actionData[actionVar];
-        let statFoundInGain = false;
-        dataObj.onLevelStats.forEach(function(statObj) {
-            if(statObj[0] === statName) {
-                statFoundInGain = true;
+        let attAddedTo = false;
+        dataObj.onLevelAtts.forEach(function (attObj) {
+            if (attObj[0] === attName) {
+                attAddedTo = true;
             }
         });
-        let statFoundInUse = false;
-        dataObj.expStats.forEach(function(statObj) {
-            if(statObj[0] === statName) {
-                statFoundInUse = true;
+        let expAttUsed = false;
+        dataObj.expAtts.forEach(function (attObj) {
+            if (attObj[0] === attName) {
+                expAttUsed = true;
             }
         });
-        dataObj.efficiencyStats.forEach(function(statObj) {
-            if(statObj[0] === statName) {
-                statFoundInUse = true;
+        let effAttUsed = false;
+        dataObj.efficiencyAtts.forEach(function (attObj) {
+            if (attObj[0] === attName) {
+                effAttUsed = true;
             }
         });
 
-        let color = "black;"
-        if(statFoundInUse && statFoundInGain) {
-            color = "yellow";
-        }
-        if(statFoundInUse && !statFoundInGain) {
-            color = "blue";
-        }
-        if(!statFoundInUse && statFoundInGain) {
-            color = "green";
-        }
-        view.cached[actionVar+"LargeVersionContainer"].style.borderColor = color;
-        view.cached[actionVar + "SmallVersionContainer"].style.border = "2px solid "+color;
-    });
+        let color = "black"
+        if (attAddedTo && !(expAttUsed || effAttUsed)) color = "var(--attribute-add-color)";
+        else if (attAddedTo && (expAttUsed || effAttUsed)) color = "white";
+        else if (expAttUsed) color = "var(--attribute-use-exp-color)";
+        else if (effAttUsed) color = "var(--attribute-use-eff-color)";
+
+        view.cached[actionVar + "LargeVersionContainer"].style.borderColor = color;
+        view.cached[actionVar + "LockContainer"].style.borderColor = color;
+        view.cached[actionVar + "SmallVersionContainer"].style.border = "2px solid " + color;
+    }
+
+    //Change all relevant OutsideContainers to change background color to fill in, if selected
 
 }
 

@@ -26,16 +26,16 @@ let views = {
         forceVisuals = false;
     },
     updateStats:function() {
-        for(let statVar in data.stats) {
-            views.updateStat(statVar);
+        for(let attVar in data.atts) {
+            views.updateStat(attVar);
         }
     },
-    updateStat:function(statVar) {
-        let statObj = data.stats[statVar];
+    updateStat:function(attVar) {
+        let attObj = data.atts[attVar];
 
         //Handle visibility
-        let isVisible = (statObj.unlocked || globalVisible);
-        views.updateVal(`${statVar}StatContainer`, isVisible?"":"none", "style.display");
+        let isVisible = (attObj.unlocked || globalVisible);
+        views.updateVal(`${attVar}StatContainer`, isVisible?"":"none", "style.display");
         if(!isVisible) {
             return;
         }
@@ -43,13 +43,14 @@ let views = {
         //Update the numbers
         let roundedNumbers = [["num", 2], ["perMinute", 2], ["mult", 3]];
 
-        for(let numberObj in roundedNumbers) {
+        for(let numberObj of roundedNumbers) {
             let capName = capitalizeFirst(numberObj[0]);
-            views.updateVal(`${statVar}${capName}`, data.stats[statVar][`${numberObj[0]}`], "innerText", numberObj[1]);
+            views.updateVal(`${attVar}${capName}`, data.atts[attVar][`${numberObj[0]}`], "innerText", numberObj[1]);
         }
 
-        let color = getStatColor(statVar);
-        views.updateVal(`{statVar}Name`, color, "style.color")
+        //TODO remove from constantly updating and into only the unlock/unveil
+        let color = getAttColor(attVar);
+        views.updateVal(`${attVar}Name`, color, "style.color")
     },
     updateActions:function() {
         for(let actionVar in data.actions) {
@@ -156,7 +157,7 @@ let views = {
 
 
         //Menu-specific updates
-        if(actionObj.currentMenu === "stats") {
+        if(actionObj.currentMenu === "atts") {
             views.updateActionStatsViews(actionObj);
 
             views.updateVal(`${actionVar}HighestLevelContainer`, data.upgrades.rememberWhatIDid.isFullyBought ? "" : "none", "style.display");
@@ -166,17 +167,17 @@ let views = {
             views.updateVal(`${actionVar}PrevUnlockTime`, secondsToTime(actionObj.prevUnlockTime), "innerText", "time");
 
 
-            views.updateVal(`${actionVar}StatExpContainer`, actionObj.expStats.length > 0 ? "" : "none", "style.display");
-            views.updateVal(`${actionVar}StatExpertiseContainer`, actionObj.efficiencyStats.length > 0 ? "" : "none", "style.display");
+            views.updateVal(`${actionVar}StatExpContainer`, actionObj.expAtts.length > 0 ? "" : "none", "style.display");
+            views.updateVal(`${actionVar}StatExpertiseContainer`, actionObj.efficiencyAtts.length > 0 ? "" : "none", "style.display");
 
-            actionObj.expStats.forEach(function(expStat) {
-                let statVar = expStat[0];
-                views.updateVal(actionVar + "_" + statVar + "StatExpMult", actionObj[statVar + "StatExpMult"], "innerText", 3);
+            actionObj.expAtts.forEach(function(expStat) {
+                let attVar = expStat[0];
+                views.updateVal(actionVar + "_" + attVar + "StatExpMult", actionObj[attVar + "StatExpMult"], "innerText", 3);
             });
 
-            actionObj.efficiencyStats.forEach(function(efficiencyStat) {
-                let statVar = efficiencyStat[0];
-                views.updateVal(actionVar + "_" + statVar + "StatExpertiseMult", actionObj[statVar + "StatExpertiseMult"], "innerText", 3);
+            actionObj.efficiencyAtts.forEach(function(efficiencyStat) {
+                let attVar = efficiencyStat[0];
+                views.updateVal(actionVar + "_" + attVar + "StatExpertiseMult", actionObj[attVar + "StatExpertiseMult"], "innerText", 3);
             });
 
 
@@ -208,7 +209,7 @@ let views = {
             roundedNumbers.push(["actionPowerMult", 3]);
         }
 
-        if(actionObj.currentMenu === "stats") {
+        if(actionObj.currentMenu === "atts") {
             roundedNumbers.push(["statReductionEffect", 3]);
             roundedNumbers.push(["expertiseMult", 3]);
             roundedNumbers.push(["highestLevel", 1]);
@@ -399,7 +400,7 @@ function updateGlobals() {
 
 //Save a second copy of all the data after a view update, so it can request updates only for the ones that are different
 function saveCurrentViewState() {
-    prevState.stats = copyArray(data.stats);
+    prevState.atts = copyArray(data.atts);
     prevState.actions = copyArray(data.actions);
     prevState.scale = scale;
 }
@@ -422,26 +423,26 @@ function hasDownstreamVisible(actionObj) {
 // function updateActionStatsViews(actionObj, prevAction, forceUpdate) {
 //     let actionVar = actionObj.actionVar;
 //
-//     if(actionObj.expStats.length > 0) {
+//     if(actionObj.expAtts.length > 0) {
 //         if(view.cached[actionVar+"StatExpContainer"].style.display === "none") {
 //             view.cached[actionVar+"StatExpContainer"].style.display = "";
 //         }
-//         actionObj.expStats.forEach(function(expStat) {
-//             let statVar = expStat[0];
-//             if(forceUpdate || intToString(prevAction[statVar+"StatExpMult"], 3) !== intToString(actionObj[statVar+"StatExpMult"], 3)) {
-//                 view.cached[actionVar + "_" + statVar + "StatExpMult"].innerText = intToString(actionObj[statVar + "StatExpMult"], 3);
+//         actionObj.expAtts.forEach(function(expStat) {
+//             let attVar = expStat[0];
+//             if(forceUpdate || intToString(prevAction[attVar+"StatExpMult"], 3) !== intToString(actionObj[attVar+"StatExpMult"], 3)) {
+//                 view.cached[actionVar + "_" + attVar + "StatExpMult"].innerText = intToString(actionObj[attVar + "StatExpMult"], 3);
 //             }
 //         });
 //     }
 //
-//     if(actionObj.efficiencyStats.length > 0) {
+//     if(actionObj.efficiencyAtts.length > 0) {
 //         if(view.cached[actionVar+"StatExpertiseContainer"].style.display === "none") {
 //             view.cached[actionVar+"StatExpertiseContainer"].style.display = "";
 //         }
-//         actionObj.efficiencyStats.forEach(function(efficiencyStat) {
-//             let statVar = efficiencyStat[0];
-//             if(forceUpdate || intToString(prevAction[statVar+"StatExpertiseMult"], 3) !== intToString(actionObj[statVar+"StatExpertiseMult"], 3)) {
-//                 view.cached[actionVar + "_" + statVar + "StatExpertiseMult"].innerText = intToString(actionObj[statVar + "StatExpertiseMult"], 3);
+//         actionObj.efficiencyAtts.forEach(function(efficiencyStat) {
+//             let attVar = efficiencyStat[0];
+//             if(forceUpdate || intToString(prevAction[attVar+"StatExpertiseMult"], 3) !== intToString(actionObj[attVar+"StatExpertiseMult"], 3)) {
+//                 view.cached[actionVar + "_" + attVar + "StatExpertiseMult"].innerText = intToString(actionObj[attVar + "StatExpertiseMult"], 3);
 //             }
 //         });
 //     }

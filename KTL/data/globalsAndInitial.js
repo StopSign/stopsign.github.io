@@ -25,14 +25,14 @@ let forceStop = false;
 let prevState = {};
 prevState.res = {};
 prevState.actions = {};
-prevState.stats = {};
+prevState.atts = {};
 
 //Game globals - these initializations will be overriden in load
 let data = {};
 data.actions = {};
 data.actionNames = [];
-data.stats = {};
-data.statNames = [];
+data.atts = {};
+data.attNames = [];
 data.toastStates = []; // array of toast objects: {id, state, element}
 data.gameState = "default"; //KTL
 data.totalMomentum = 0;
@@ -94,61 +94,61 @@ function initializeData() {
 
 
     statTitles.push(["Introspection", "awareness"]);
-    createAndLinkNewStat("awareness");
-    createAndLinkNewStat("curiosity");
-    createAndLinkNewStat("observation");
-    createAndLinkNewStat("mentalClarity");
-    createAndLinkNewStat("stillness");
-    createAndLinkNewStat("integration");
+    createAndLinkNewAttribute("awareness");
+    createAndLinkNewAttribute("curiosity");
+    createAndLinkNewAttribute("observation");
+    createAndLinkNewAttribute("processing");
+    createAndLinkNewAttribute("stillness");
+    createAndLinkNewAttribute("integration");
 
 
     statTitles.push(["Magic", "focus"]);
-    createAndLinkNewStat("focus");
-    createAndLinkNewStat("circulation");
-    createAndLinkNewStat("willpower");
-    createAndLinkNewStat("amplification");
-    createAndLinkNewStat("pulse");
-    createAndLinkNewStat("spark");
-    createAndLinkNewStat("vision");
+    createAndLinkNewAttribute("focus");
+    createAndLinkNewAttribute("circulation");
+    createAndLinkNewAttribute("willpower");
+    createAndLinkNewAttribute("amplification");
+    createAndLinkNewAttribute("pulse");
+    createAndLinkNewAttribute("spark");
+    createAndLinkNewAttribute("vision");
 
 
     statTitles.push(["Physique", "endurance"]);
-    createAndLinkNewStat("endurance");
-    createAndLinkNewStat("flow");
-    createAndLinkNewStat("control");
-    createAndLinkNewStat("might");
-    createAndLinkNewStat("coordination");
-    createAndLinkNewStat("reflex");
-    createAndLinkNewStat("rhythm");
+    createAndLinkNewAttribute("endurance");
+    createAndLinkNewAttribute("flow");
+    createAndLinkNewAttribute("control");
+    createAndLinkNewAttribute("might");
+    createAndLinkNewAttribute("coordination");
+    createAndLinkNewAttribute("reflex");
+    createAndLinkNewAttribute("rhythm");
 
 
     statTitles.push(["Adventuring", "energy"]);
-    createAndLinkNewStat("energy");
-    createAndLinkNewStat("navigation");
-    createAndLinkNewStat("comfort");
-    createAndLinkNewStat("instinct");
-    createAndLinkNewStat("initiative");
-    createAndLinkNewStat("logistics");
-    createAndLinkNewStat("valor");
+    createAndLinkNewAttribute("energy");
+    createAndLinkNewAttribute("navigation");
+    createAndLinkNewAttribute("comfort");
+    createAndLinkNewAttribute("instinct");
+    createAndLinkNewAttribute("initiative");
+    createAndLinkNewAttribute("logistics");
+    createAndLinkNewAttribute("valor");
 
 
     statTitles.push(["Money", "ambition"]);
-    createAndLinkNewStat("ambition");
-    createAndLinkNewStat("savvy");
-    createAndLinkNewStat("cunning");
-    createAndLinkNewStat("leverage");
-    createAndLinkNewStat("adaptability");
+    createAndLinkNewAttribute("ambition");
+    createAndLinkNewAttribute("savvy");
+    createAndLinkNewAttribute("cunning");
+    createAndLinkNewAttribute("leverage");
+    createAndLinkNewAttribute("adaptability");
 
 
     statTitles.push(["Socialization", "confidence"]);
-    createAndLinkNewStat("confidence");
-    createAndLinkNewStat("recognition");
-    createAndLinkNewStat("charm");
-    createAndLinkNewStat("influence");
-    createAndLinkNewStat("discernment");
-    createAndLinkNewStat("deception");
-    createAndLinkNewStat("command");
-    createAndLinkNewStat("diplomacy");
+    createAndLinkNewAttribute("confidence");
+    createAndLinkNewAttribute("recognition");
+    createAndLinkNewAttribute("charm");
+    createAndLinkNewAttribute("influence");
+    createAndLinkNewAttribute("discernment");
+    createAndLinkNewAttribute("deception");
+    createAndLinkNewAttribute("command");
+    createAndLinkNewAttribute("diplomacy");
     
     //KTL
     create("overclockTargetingTheLich", ["killHorde"], 0, 0);

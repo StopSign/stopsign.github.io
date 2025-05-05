@@ -3,7 +3,7 @@
 //addMenuTab("Help", <desc>) Adds a menu tab with the following text
 //addMenuTab("Strategy", <desc>) Adds a menu tab with the following text
 //addMenuOptionsTab() adjust fps, saving
-//addStatisticsTab()
+//addDataTab()
 //addMenuTab("Previous Tips", <desc>) Adds a new tab that duplicates the toasts but can't
 
 
@@ -12,12 +12,12 @@ function initializeMenus() {
     addMenuTab("help");
     addMenuTab("story");
     addMenuOptionsTab(); //adjust fps, saving
-    addStatisticsTab();
+    addDataTab();
     addMenuTab("previousTips");
     addMenuTextContainer("help", createHelpMenu());
     addMenuTextContainer("story", createStoryMenu());
     addMenuTextContainer("options", createOptionsMenu());
-    addMenuTextContainer("statistics", createStatisticsMenu());
+    addMenuTextContainer("statistics", createDataMenu());
     addMenuTextContainer("previousTips", "Close tips to fill this screen!");
     updatePreviousTipsMenu();
 
@@ -70,8 +70,8 @@ function createStoryMenu() {
 }
 
 
-function createStatisticsMenu() {
-    return "<div class='menuTitle'>Statistics</div>" +
+function createDataMenu() {
+    return "<div class='menuTitle'>Data</div>" +
         "<div class='menuSeparator'></div><br>" +
         "What do you want to know?"
 }
@@ -179,6 +179,6 @@ function addMenuOptionsTab() {
     addMenuTab("options");
 }
 
-function addStatisticsTab() {
+function addDataTab() {
     addMenuTab("statistics");
 }

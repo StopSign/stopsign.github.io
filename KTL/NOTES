@@ -25,7 +25,7 @@ saving: update engine to separate the things that can be applied manually / on l
 
 idea: numbers in the lines between that update based on the log of the resource being sent
 
--keep track of the total amount of stats gained, and the total amount of levels gained for actions too.
+-keep track of the total amount of atts gained, and the total amount of levels gained for actions too.
 potentially use those as modifiers later (added up give bonuses?), which would make every game *really* unique but also
 encourage resets so be careful when you do it. It could be as a conjoined gain play with unlocking a new cliff of souls
 
@@ -34,16 +34,16 @@ encourage resets so be careful when you do it. It could be as a conjoined gain p
 QoL that I just need to do:
 QoL: if no downstream are visible, hide the all 0 / all 100 button
 QoL: if the exp bar gets too fast, convert it into a completions/s window instead
-Hide stats that aren't generated (stat window should be ??? until unlocked)
+Hide atts that aren't generated (stat window should be ??? until unlocked)
 QoL: bar that raises/lowers based on =incoming / spending, to show you if it has reached equilibrium visually better
 
 QoL I could monetize?: (200 per day)
 QoL: 100 clicking the other actions in Downstream brings you to them, clicking ^ brings you to parent
 QoL: 200 whenever your screen is jumped around, it saves the previous spot and you can go back to it with space/button "return"
 QoL: 500 saves up to 10 in the queue to go back. Can custom set it
-QoL: 500 Clicking the stats in the menu to highlight which actions
-QoL: 500 Clicking the stats in the Stats menu to highlight them
-QoL: 500 show stats on the side of actions (+, -, = but in graphic form)
+QoL: 500 Clicking the atts in the menu to highlight which actions
+QoL: 500 Clicking the atts in the Stats menu to highlight them
+QoL: 500 show atts on the side of actions (+, -, = but in graphic form)
 QoL: 500 show momentum left to level under delta momentum
 QoL: 500 show how much time that is also
 QoL: [Req KTL] 1000 show how far you'll get in killing the lich's army
@@ -52,7 +52,7 @@ QoL: [Req KTL] 1000 on each action, at the end of Info, show Time to Unlock: XX 
 QoL: 200 Show on level up the total effect so far of that action (aka +1 Memory, +7 total = x1.8 bonus
 QoL: 500 show minimap
 QoL: 1000 Run Info - get a graph of how all the levels increased over time per action
-QoL: Pie chart / explanation for source of stats
+QoL: Pie chart / explanation for source of atts
 
 
 //5800 so far. I'll give ~1000 up front, ~2000 more over the next few days, ~10000 more over the next few weeks.
@@ -104,10 +104,10 @@ underneath
 
 play the game and tweak it
     -remember should have 3 increases to overclock's expertise before capping out - "this is expertise"
-    -make money improves unrelated stats for now, but it starts spend money. Has low expertise also
-    -spend money improves overclock's stats - not expertise
+    -make money improves unrelated atts for now, but it starts spend money. Has low expertise also
+    -spend money improves overclock's atts - not expertise
 
-stats UI:
+atts UI:
 -Red when stat is used but not gained
 -Green when stat is gained but not used
 -Black when used & gained
@@ -121,7 +121,7 @@ figure out "total expertise mult" x1.00
 
 When the numbers are below a certain threshold, make them 0
 
-test the mana conversion - separate generator, mproved with stats
+test the mana conversion - separate generator, mproved with atts
 
 move ^ button to top right
 Make money will use the highest $/s job as its base output in a desynced progress bar
@@ -131,17 +131,17 @@ Create and see tags, for use in gaining expertise
 
 Create the ability for an action to have charges, gained per exp spend
 
-color the stats based on blue for creating without using, red for using without sending - only reveal if colored.
+color the atts based on blue for creating without using, red for using without sending - only reveal if colored.
 
 
 Spells have an initial mana cost very high, and leveling them *reduces* the amount of exp needed to cast
-Casting them still gives exp that is multipled by stats as normal
+Casting them still gives exp that is multipled by atts as normal
 This lets mana increase linearly and still feel good over time
 
 test 2-1-2 patterns
 test stat bonus rate/s
 
-stats should show how many actions they affect
+atts should show how many actions they affect
 
 tag system: 1st pass to apply tags, 2nd pass to apply mults
 
@@ -238,7 +238,7 @@ The curse was just lifted
 reshape the actions
 the unveling of the resources should be more *grand*
 first few actions have max level and give huge buffs
-overall, give stats at 50 and 100 at a time, aiming for thousands
+overall, give atts at 50 and 100 at a time, aiming for thousands
 
 
 
@@ -249,7 +249,7 @@ Intrigue/Rumors
 
 
 
-later: challenges are the lich sending enemy time travelers into your timeline to interfere, and it blocks off certain important paths in the challenge. Another way to do it is to start with heavy negative stats in certain areas, which effectively blocks them off.
+later: challenges are the lich sending enemy time travelers into your timeline to interfere, and it blocks off certain important paths in the challenge. Another way to do it is to start with heavy negative atts in certain areas, which effectively blocks them off.
 
 
 
@@ -324,7 +324,7 @@ Remember the fallen <- Honor Past Sacrifices / Pay Tribute to Heroes <- Commemor
 Reaffirm your vows <- Practice Devotion <- Worship <- Divine Communion
 
 
-vice, which increases its own stat and decreases the other's stats
+vice, which increases its own stat and decreases the other's atts
 
 
 
@@ -337,7 +337,7 @@ Work:
 -no wage job
 -mid wage job
 -high wage job
-Story (one time actions), unlocks more mental actions, simple progress bar that gets reduced based on stats:
+Story (one time actions), unlocks more mental actions, simple progress bar that gets reduced based on atts:
 -training montage
 -traveling
    -disables jobs and therefore socials

@@ -1,8 +1,10 @@
 :root {
     --bg-primary: #1e1e2e;
     --bg-secondary: #313244;
+    --text-bright: #f4f5f9;
     --text-primary: #cdd6f4;
     --text-muted: #a6adc8;
+    --text-dark: #020931;
     --button-text: #252836;
     --accent-primary: #4a90e2;
     --accent-secondary: #589ff2;
@@ -22,6 +24,13 @@
     --menu-text-background-color: #ffffff;
     --text-color: #e0e0e0;
 
+
+    --attribute-add-color:#27d318;
+    --attribute-add-bg-color: #85d17e;
+    --attribute-use-exp-color:#7a4fe7;
+    --attribute-use-exp-bg-color: #937ec9;
+    --attribute-use-eff-color: #5199ff;
+    --attribute-use-eff-bg-color: #97c1ff;
     --upgrade-color:#d3d3d3;
     --upgrade-bought-color:#00ff39;
     --upgrade-disabled-color:#808080;
@@ -37,11 +46,12 @@
 }
 
 body.lightMode {
-    /* Light theme (default) - Rich colors with blue base */
     --bg-primary: #8798d3;
     --bg-secondary: #bbd6e6;
+    --text-bright: #020931;
     --text-primary: #000000;
     --text-muted: #4a4e69;
+    --text-dark: #f4f5f9;
     --button-text: #4a4e69;
     --accent-primary: #3acbf7;
     --accent-secondary: #4bd5ff;
@@ -61,6 +71,12 @@ body.lightMode {
     --menu-text-background-color: #ffffff;
     --text-color: #222222;
 
+    --attribute-add-color:#27d318;
+    --attribute-add-bg-color: #85d17e;
+    --attribute-use-exp-color:#7a4fe7;
+    --attribute-use-exp-bg-color: #937ec9;
+    --attribute-use-eff-color: #5199ff;
+    --attribute-use-eff-bg-color: #97c1ff;
     --upgrade-color:#d3d3d3;
     --upgrade-bought-color:#00ff39;
     --upgrade-disabled-color:#808080;
@@ -91,12 +107,8 @@ body {
 }
 
 .hyperVisible {
-    text-shadow:
-            -1px -1px 0 var(--border-color),
-            1px -1px 0 var(--border-color),
-            -1px 1px 0 var(--border-color),
-            1px 1px 0 var(--border-color);
-    color: var(--accent-primary);
+    text-shadow:1px 1px 2px black;
+    color: var(--text-bright);
 }
 
 .disabled {

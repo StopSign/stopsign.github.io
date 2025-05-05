@@ -162,13 +162,13 @@ function gameTick() {
     }
     //To get change/s
     //loop through all actions (data.actionNames is an [] with names, data.actions has the objects. actionObj = data.actions[actionNames[0]] for example)
-    //have statsPerSecond = {"charm":num, "curiosity":num, ...}
-    //for each, add their (actionObj.onLevelStats amount (e.g. [["charm", .1], ["curiosity", .1]]) multiplied by levels/s) to the relevant stat in statsPerSecond
+    //have attsPerSecond = {"charm":num, "curiosity":num, ...}
+    //for each, add their (actionObj.efficiencyAtts amount (e.g. [["charm", .1], ["curiosity", .1]]) multiplied by levels/s) to the relevant stat in attsPerSecond
     //to get levels/s, the action gets (actionProgressRate(actionObj)/actionObj.progressMax) = completes/s, and then (complete/s * actionObj.expToAdd / actionObj.expToLevel) = level/s
 
-    let statsPerSecond = getStatChanges();
-    data.statNames.forEach(function(statName) {
-        data.stats[statName].perMinute = statsPerSecond[statName] ? statsPerSecond[statName]*60 : 0;
+    let attsPerSecond = getStatChanges();
+    data.attNames.forEach(function(attName) {
+        data.atts[attName].perMinute = attsPerSecond[attName] ? attsPerSecond[attName]*60 : 0;
     });
 
 

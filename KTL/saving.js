@@ -32,13 +32,13 @@ function load() {
         //     });
         //
         // })
-        // data.statNames.forEach(function (statVar) {
-        //     data.stats[statVar] = toLoad.stats[statVar];
+        // data.attNames.forEach(function (attVar) {
+        //     data.atts[attVar] = toLoad.atts[attVar];
         // })
 
 
         mergeExistingOnly(data, toLoad, "actions", ["x", "y"]);
-        mergeExistingOnly(data, toLoad, "stats");
+        mergeExistingOnly(data, toLoad, "atts");
         mergeExistingOnly(data, toLoad, "upgrades");
         mergeExistingOnly(data, toLoad, "toastStates");
         mergeExistingOnly(data, toLoad, "options");

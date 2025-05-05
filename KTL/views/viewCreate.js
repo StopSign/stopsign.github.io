@@ -14,27 +14,34 @@ function initializeDisplay() {
     initializeToasts();
     generateAmuletContent();
     setAllCaches(); //happens after generation
+    revealActionAtts(data.actions.reflect);
 
     debug(); //change game for easier debugging
 
     updateUIFromLoad(); //update the elements after create
 }
 
-function generateStatDisplay(statVar) {
-    let statObj = data.stats[statVar];
+function generateAttDisplay(attVar) {
+    let attObj = data.atts[attVar];
     let theStr = "";
     statTitles.forEach(function (statTitle) {
-        if(statTitle[1] === statVar) {
-            theStr += ((statVar === "discipline") ? "" : "<br>") +"<div><u>"+statTitle[0]+"</u></div>";
+        if(statTitle[1] === attVar) {
+            theStr += ((attVar === "discipline") ? "" : "<br>") +"<div style='font-style: italic;'><u>"+statTitle[0]+"</u></div>";
         }
     });
+    queueCache(`${attVar}StatContainer`);
+    queueCache(`${attVar}Name`);
+    queueCache(`${attVar}Num`);
+    queueCache(`${attVar}Mult`);
+    queueCache(`${attVar}PerMinute`);
+
     theStr +=
-        "<div id='"+statVar+"StatContainer' style='position:relative;cursor:pointer' onclick='clickedStatName(\""+statVar+"\")'>"+
-        "<b><span id='"+statVar+"Name' style='width:140px;display:inline-block;'>" + decamelize(statVar) + "</span></b>" +
-        "<b><span id='"+statVar+"Num' style='width:70px;display:inline-block'>"+statObj.num+"</span></b>" +
-        "<span style='width:70px;display:inline-block'>x<b><span id='"+statVar+"Mult'>"+statObj.mult+"</span></b></span>" +
-        "<span style='width:70px;display:inline-block'>+<b><span id='"+statVar+"PerMinute'>"+statObj.perMinute+"</span></b>/m</span>" +
-        "</div>";
+        `<div id="${attVar}StatContainer" style="position:relative;cursor:pointer" onclick="clickedStatName('${attVar}')">
+            <b><span id="${attVar}Name" style="width:140px;display:inline-block;">${decamelize(attVar)}</span></b>
+            <b><span id="${attVar}Num" style='width:70px;display:inline-block'>${attObj.num}</span></b>
+            <span style="width:70px;display:inline-block">x<b><span id="${attVar}Mult">${attObj.mult}</span></b></span>
+            <span style="width:70px;display:inline-block">+<b><span id="${attVar}PerMinute">${attObj.perMinute}</span></b>/m</span>
+        </div>`;
 
     let child = document.createElement("template");
     child.innerHTML = theStr;
@@ -48,34 +55,25 @@ function generateActionDisplay(actionVar) {
     let theStr = "";
     let resourceColor = getResourceColor(actionObj);
 
-    // let theStr = `
-    //     <span id='"+actionVar+"Title' onclick='actionTitleClicked(\`"+actionVar+"\`)' style='font-size:16px;color:var(--text-primary);width:100%;cursor:pointer;position:absolute;top:-40px;
-    //     left:-1px;white-space: nowrap;border-width: 0 0 2px 2px;border-style: solid;border-color: var(--border-color);padding-left:2px;padding-right:2px;background-color:var(--overlay-color)'>
-    //         <b>${actionObj.title}</b> |
-    //         <span style='font-size:12px;position:relative;'>
-    //             Level <b></v><span id='${actionVar}Level'>0</span></b>
-    //             (actionObj.maxLevel >= 0 ? " / <b><span id='"+actionVar+"MaxLevel'>0</span></b>" : "") +
-    //             "<span id='"+actionVar+"HighestLevelContainer2'> (<b><span id='"+actionVar+"HighestLevel2'></span></b>)" +
-    //             </span>
-    //             " | <span style='font-size:12px;'><b><span id='"+actionVar+"Efficiency'></span></b>% eff</span>" +
-    //             (!actionObj.wage ? "" : " | <b>$<span id='"+actionVar+"Wage' style='color:var(--wage-color)'></span></b>") +
-    //         "</span>" +
-    //     "</span>"
-    // `
+    let title = Raw.html`
+        <span id='${actionVar}Title' onclick='actionTitleClicked("${actionVar}")' style='font-size:16px;color:var(--text-primary);width:100%;cursor:pointer;position:absolute;top:-40px;
+            left:-1px;white-space: nowrap;border-width: 0 0 2px 2px;border-style: solid;border-color: var(--border-color);padding-left:2px;padding-right:2px;background-color:var(--overlay-color)'>
+            <b>${actionObj.title}</b> |
+            <span style='font-size:12px;position:relative;'>
+                Level <b></v><span id='${actionVar}Level'>0</span></b>
+                ${actionObj.maxLevel >= 0 ? ` / <b><span id='${actionVar}MaxLevel'>0</span></b>` : ""}
+                <span id='${actionVar}HighestLevelContainer2'> 
+                    (<b><span id='${actionVar}HighestLevel2'></span></b>)
+                </span> | 
+                <span style='font-size:12px;'><b>
+                    <span id='${actionVar}Efficiency'></span></b>% eff
+                </span>
+                ${!actionObj.wage ? "" : ` | <b>$<span id='${actionVar}Wage' style='color:var(--wage-color)'></span></b>`}
+            </span>
+        </span>
+    `
 
-    let title =
-        "<span id='"+actionVar+"Title' onclick='actionTitleClicked(`"+actionVar+"`)' style='font-size:16px;color:var(--text-primary);width:100%;cursor:pointer;position:absolute;top:-40px;" +
-        "left:-1px;white-space: nowrap;border-width: 0 0 2px 2px;border-style: solid;border-color: var(--border-color);padding-left:2px;padding-right:2px;background-color:var(--overlay-color)'>" +
-        "<b>" + actionObj.title + "</b>" +
-        " | <span style='font-size:12px;position:relative;'>" +
-        "Level <b></v><span id='"+actionVar+"Level'>0</span></b>" +
-        (actionObj.maxLevel >= 0 ? " / <b><span id='"+actionVar+"MaxLevel'>0</span></b>" : "") +
-            "<span id='"+actionVar+"HighestLevelContainer2'> (<b><span id='"+actionVar+"HighestLevel2'></span></b>)" +
-        "</span>" +
-        " | <span style='font-size:12px;'><b><span id='"+actionVar+"Efficiency'></span></b>% eff</span>" +
-        (!actionObj.wage ? "" : " | <b>$<span id='"+actionVar+"Wage' style='color:var(--wage-color)'></span></b>") +
-        "</span>" +
-        "</span>";
+    title = title + generateOnLevelContainers(actionObj);
 
     let menuContainer =
         "<div id='' style='position:absolute;top:-18px;font-size:13px;left:-1px;'>" +
@@ -83,7 +81,7 @@ function generateActionDisplay(actionVar) {
             "class='buttonSimple' style='margin-right:3px;width:30px;height:30px;text-align:center;cursor:pointer;padding:0 4px;'>^</span>") +
         "<span id='"+actionVar+"_downstreamMenuButton' onclick='clickActionMenu(\""+actionVar+"\", \"downstream\")' class='buttonSimple' style='margin-right:3px;width:30px;height:30px;text-align:center;cursor:pointer;padding:0 4px;'>Downstream</span>" +
         "<span id='"+actionVar+"_infoMenuButton' onclick='clickActionMenu(\""+actionVar+"\", \"info\")' class='buttonSimple' style='margin-right:3px;width:30px;height:30px;text-align:center;cursor:pointer;padding:0 4px;'>Info</span>" +
-        "<span id='"+actionVar+"_statsMenuButton' onclick='clickActionMenu(\""+actionVar+"\", \"stats\")' class='buttonSimple' style='margin-right:3px;width:30px;height:30px;text-align:center;cursor:pointer;padding:0 4px;'>Stats</span>" +
+        "<span id='"+actionVar+"_attsMenuButton' onclick='clickActionMenu(\""+actionVar+"\", \"atts\")' class='buttonSimple' style='margin-right:3px;width:30px;height:30px;text-align:center;cursor:pointer;padding:0 4px;'>Stats</span>" +
         "<span id='"+actionVar+"_storyMenuButton' onclick='clickActionMenu(\""+actionVar+"\", \"story\")' class='buttonSimple' style='margin-right:3px;width:30px;height:30px;text-align:center;cursor:pointer;padding:0 4px;'>Story</span>" +
         "</div>";
 
@@ -122,22 +120,22 @@ function generateActionDisplay(actionVar) {
         (dataObj.storyText ? dataObj.storyText[language]:"") +
         "</div>";
 
-    let onLevelStatsText = "<br>On Level Up:<br>";
-    if(actionObj.onLevelStats) {
-        actionObj.onLevelStats.forEach(function(onLevelStat) {
-            onLevelStatsText += "+<b>"+onLevelStat[1]+" to " + capitalizeFirst(onLevelStat[0])+"</b><br>";
+    let onLevelAttsText = "<br>On Level Up:<br>";
+    if(actionObj.onLevelAtts) {
+        actionObj.onLevelAtts.forEach(function(onLevelStat) {
+            onLevelAttsText += "+<b>"+onLevelStat[1]+" to " + capitalizeFirst(onLevelStat[0])+"</b><br>";
         });
     }
 
-    let statsContainer =
-        "<div id='"+actionVar+"_statsContainer' style='display:none;padding:3px;'>" +
+    let attsContainer =
+        "<div id='"+actionVar+"_attsContainer' style='display:none;padding:3px;'>" +
         generateActionExpStats(actionObj) +
         generateActionEfficiencyStats(actionObj) +
-        onLevelStatsText +
+        onLevelAttsText +
         "</div>";
 
     let lockOverAll = "<div id='"+actionVar+"LockContainer' " +
-        "style='position:absolute;background-color: var(--bg-secondary);width:100%;height:100%;top:0;left:0;text-align:center;'>" +
+        "style='position:absolute;background-color: var(--bg-secondary);width:100%;height:100%;top:0;left:0;text-align:center;border:2px solid black;'>" +
         "<span id='"+actionVar+"LockIcon'></span><br>" +
         "<span>Needs <b><span id='"+actionVar+"UnlockCost'>0</span></b> " + actionObj.momentumName +
         "<br>sent from <b>" + (data.actions[actionObj.parent]?data.actions[actionObj.parent].title:"WAIT") + "</b>.<br>" + //generally just not loaded yet
@@ -225,7 +223,7 @@ function generateActionDisplay(actionVar) {
                 expBar +
                 maxLevel +
                 storyContainer +
-                statsContainer +
+                attsContainer +
                 levelInfoContainer +
                 downstreamContainer +
                 lockOverAll +
@@ -255,25 +253,94 @@ function generateActionDisplay(actionVar) {
     document.getElementById(actionVar+"LockIcon").appendChild(lockIcon);
 }
 
+function generateOnLevelContainers(actionObj) {
+    let actionVar = actionObj.actionVar;
+    let dataObj = actionData[actionVar];
+    let theStr = "";
+
+    if(dataObj.onLevelAtts.length > 0) {
+        theStr += Raw.html`
+            <span id="${actionVar}OnLevelAttributeContainer" style="font-size:10px;color:var(--text-primary);position:absolute;
+                top:0;left:299px;white-space: nowrap;padding-left:8px;">` //padding-left to make it overlap by 1 pix on the main container, so it redraws on zoom correctly.
+
+        for(let onLevelAtt of dataObj.onLevelAtts) {
+            theStr += generateOutsideAttDisplay(actionObj, onLevelAtt, "add");
+        }
+
+
+        theStr += `</span>`
+    }
+    if(dataObj.expAtts.length > 0 || dataObj.efficiencyAtts.length > 0) {
+        theStr += Raw.html`
+            <span id='${actionVar}UseAttributeContainer' style="font-size:10px;color:var(--text-primary);position:absolute;
+                top:0;right:299px;white-space: nowrap;padding-right:8px;">`
+
+        for(let onLevelAtt of dataObj.expAtts) {
+            theStr += generateOutsideAttDisplay(actionObj, onLevelAtt, "exp");
+        }
+        for(let onLevelAtt of dataObj.efficiencyAtts) {
+            theStr += generateOutsideAttDisplay(actionObj, onLevelAtt, "eff");
+        }
+        theStr += `</span>`;
+    }
+
+    return theStr;
+}
+
+function generateOutsideAttDisplay(actionObj, attObj, type) {
+    let actionVar = actionObj.actionVar;
+    let statName = attObj[0];
+    let statValue = attObj[1];
+
+    let color = type === "add"
+        ? "--attribute-add-color"
+        : (type === "exp"
+            ? "--attribute-use-exp-color"
+            : "--attribute-use-eff-color");
+
+    let backgroundColor = type === "add"
+        ? "--attribute-add-bg-color"
+        : (type === "exp"
+            ? "--attribute-use-exp-bg-color"
+            : "--attribute-use-eff-bg-color");
+
+    let text = type === "add"
+        ? "+" + intToString(statValue, 1)
+        : (statValue * 100) + "%";
+
+    queueCache(`${actionVar}${statName}OutsideContainer${type}`);
+
+    return Raw.html`
+        <div id="${actionVar}${statName}OutsideContainer${type}" onclick="clickedStatName('${statName}')" 
+             style="border:1px solid var(${color});margin-bottom:2px;cursor:pointer;background-color:var(--overlay-color);padding:1px;">
+            <div class="showthat" style="position:relative;width:30px;height:30px;background-color:var(${backgroundColor});">
+                <div class="showthisUp" style="font-size:18px;">${text + (type==="add"?" to ":" of ")+ capitalizeFirst(statName)}</div>
+                <img src="img/${statName}.svg" alt="${statName}" style="width:100%;height:100%;" />
+                <div class="hyperVisible" style="position:absolute;bottom:0;left:0;width:100%;height:50%;display:flex;align-items:flex-end;
+                justify-content:center;font-weight:bold;font-size:10px;">${text}</div>
+            </div>
+        </div>`;
+}
+
 function generateActionExpStats(actionObj) {
     let actionVar = actionObj.actionVar;
     let dataObj = actionData[actionVar];
-    let expStatsStr = "<span id='"+actionVar+"StatExpContainer'>Stat Modifiers to Progress and Exp Required:<br>";
+    let expAttsStr = "<span id='"+actionVar+"StatExpContainer'>Stat Modifiers to Progress and Exp Required:<br>";
 
     let totalAmount = 1;
-    dataObj.expStats.forEach(function (statObj) {
-        let name = statObj[0];
-        let ratio = statObj[1] * 100 + "%";
-        if(!data.stats[name]) {
+    dataObj.expAtts.forEach(function (attObj) {
+        let name = attObj[0];
+        let ratio = attObj[1] * 100 + "%";
+        if(!data.atts[name]) {
             console.log("Error - missing stat in initialization: " + name);
         }
-        let amount = ((data.stats[name].mult-1) * statObj[1]) + 1;
+        let amount = ((data.atts[name].mult-1) * attObj[1]) + 1;
         totalAmount *= amount;
-        expStatsStr +=
+        expAttsStr +=
             "<b>" + ratio + "</b> of <b>" + capitalizeFirst(name) + "</b>'s bonus = x<b><span id='"+actionVar+"_"+name+"StatExpMult'>" + amount + "</span></b><br>"
     });
-    expStatsStr += "Total Reduction = 1 / <b><span id='"+actionVar+"StatReductionEffect'>" + totalAmount + "</span></b><br>";
-    return expStatsStr;
+    expAttsStr += "Total Reduction = 1 / <b><span id='"+actionVar+"StatReductionEffect'>" + totalAmount + "</span></b><br>";
+    return expAttsStr;
 }
 
 function generateActionEfficiencyStats(actionObj) {
@@ -282,14 +349,14 @@ function generateActionEfficiencyStats(actionObj) {
     let expertiseModsStr = "<span id='"+actionVar+"StatExpertiseContainer'><br>Stat Modifiers to Efficiency:<br>";
 
     let totalAmount = 1;
-    actionObj.efficiencyStats.forEach(function (expertiseStat) {
+    actionObj.efficiencyAtts.forEach(function (expertiseStat) {
         let name = expertiseStat[0];
         let ratio = expertiseStat[1] * 100 + "%";
-        if(data.stats[name] === undefined) {
+        if(data.atts[name] === undefined) {
             console.log("ERROR: you need to instantiate the stat '"+name+"'")
             stop = 1;
         }
-        let amount = ((data.stats[name].mult-1) * expertiseStat[1]) + 1;
+        let amount = ((data.atts[name].mult-1) * expertiseStat[1]) + 1;
         totalAmount *= amount;
         expertiseModsStr +=
             "<b>" + ratio + "</b> of <b>" + capitalizeFirst(name) + "</b>'s bonus = x<b><span id='"+actionVar+"_"+name+"StatExpertiseMult'>" + amount + "</span></b><br>"
@@ -484,45 +551,41 @@ function generateAmuletContent() {
 
 function setAllCaches() {
     setSingleCaches();
-    data.statNames.forEach(function (statVar) {
-        cacheStatNames(statVar);
+    data.attNames.forEach(function (attVar) {
+        cacheStatNames();
     });
     data.actionNames.forEach(function(actionVar) {
        cacheActionViews(actionVar);
        cacheDownstreamViews(actionVar);
     });
+    clearCacheQueue();
 }
 
 function setSingleCaches() {
-    view.cached.totalMomentum = document.getElementById("totalMomentum");
-    view.cached.totalMomentum2 = document.getElementById("totalMomentum2");
-    view.cached.secondsPerReset = document.getElementById("secondsPerReset");
-    view.cached.openUseAmuletButton = document.getElementById("openUseAmuletButton");
-    view.cached.openViewAmuletButton = document.getElementById("openViewAmuletButton");
-    view.cached.essence = document.getElementById("essence");
-    view.cached.essence2 = document.getElementById("essence2");
-    view.cached.bonusTime = document.getElementById("bonusTime");
-    view.cached.killTheLichMenu = document.getElementById("killTheLichMenu");
-    view.cached.statDisplay = document.getElementById("statDisplay");
-    view.cached.bonusDisplay = document.getElementById("bonusDisplay");
+    queueCache("totalMomentum");
+    queueCache("totalMomentum2");
+    queueCache("secondsPerReset");
+    queueCache("openUseAmuletButton");
+    queueCache("openViewAmuletButton");
+    queueCache("essence");
+    queueCache("essence2");
+    queueCache("bonusTime");
+    queueCache("killTheLichMenu");
+    queueCache("statDisplay");
+    queueCache("bonusDisplay");
 }
 
-function cacheStatNames(statVar) {
-    view.cached[statVar+"StatContainer"] = document.getElementById(statVar+"StatContainer");
-    view.cached[statVar+"Num"] = document.getElementById(statVar+"Num");
-    view.cached[statVar+"PerMinute"] = document.getElementById(statVar+"PerMinute");
-    view.cached[statVar+"Mult"] = document.getElementById(statVar+"Mult");
-    view.cached[statVar+"Name"] = document.getElementById(statVar+"Name");
+function cacheStatNames() {
 
     data.actionNames.forEach(function(actionVar) {
         let dataObj = actionData[actionVar];
-        dataObj.efficiencyStats.forEach(function (expertiseStat) {
-            let newStatVar = expertiseStat[0];
-            view.cached[actionVar + "_" + newStatVar + "StatExpertiseMult"] = document.getElementById(actionVar + "_" + newStatVar + "StatExpertiseMult");
+        dataObj.efficiencyAtts.forEach(function (expertiseStat) {
+            let newAttVar = expertiseStat[0];
+            view.cached[actionVar + "_" + newAttVar + "StatExpertiseMult"] = document.getElementById(actionVar + "_" + newAttVar + "StatExpertiseMult");
         });
-        dataObj.expStats.forEach(function (expStat) {
-            let newStatVar = expStat[0];
-            view.cached[actionVar + "_" + newStatVar + "StatExpMult"] = document.getElementById(actionVar + "_" + newStatVar + "StatExpMult");
+        dataObj.expAtts.forEach(function (expStat) {
+            let newAttVar = expStat[0];
+            view.cached[actionVar + "_" + newAttVar + "StatExpMult"] = document.getElementById(actionVar + "_" + newAttVar + "StatExpMult");
         });
     });
 }
@@ -537,8 +600,8 @@ function cacheActionViews(actionVar) {
     view.cached[actionVar + "_downstreamMenuButton"] = document.getElementById(actionVar + "_downstreamMenuButton");
     view.cached[actionVar + "_infoContainer"] = document.getElementById(actionVar + "_infoContainer");
     view.cached[actionVar + "_infoMenuButton"] = document.getElementById(actionVar + "_infoMenuButton");
-    view.cached[actionVar + "_statsContainer"] = document.getElementById(actionVar + "_statsContainer");
-    view.cached[actionVar + "_statsMenuButton"] = document.getElementById(actionVar + "_statsMenuButton");
+    view.cached[actionVar + "_attsContainer"] = document.getElementById(actionVar + "_attsContainer");
+    view.cached[actionVar + "_attsMenuButton"] = document.getElementById(actionVar + "_attsMenuButton");
     view.cached[actionVar + "_storyContainer"] = document.getElementById(actionVar + "_storyContainer");
     view.cached[actionVar + "_storyMenuButton"] = document.getElementById(actionVar + "_storyMenuButton");
     view.cached[actionVar + "ProgressMax"] = document.getElementById(actionVar + "ProgressMax");
@@ -616,4 +679,16 @@ function cacheDownstreamViews(actionVar) {
         view.cached[actionVar + "SliderContainer" + downstreamVar] = document.getElementById(actionVar + "SliderContainer" + downstreamVar);
         view.cached[actionVar + "RangeInput" + downstreamVar] = document.getElementById(actionVar + "RangeInput" + downstreamVar);
     });
+}
+
+let idsToCache = [];
+function queueCache(id) {
+    idsToCache.push(id);
+}
+
+function clearCacheQueue() {
+    for(let id of idsToCache) {
+        view.cached[id] = document.getElementById(id);
+    }
+    idsToCache = {};
 }

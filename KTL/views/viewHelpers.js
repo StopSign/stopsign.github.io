@@ -1,35 +1,25 @@
-function getStatColor(statName) {
-    let stat = data.stats[statName];
-    // if(stat.linkedActionExpStats.length === 0 && stat.linkedActionExpertiseStats.length === 0) {
-    //     return "blue"
-    // }
-    //if the stat is gained with unlocked actions
-    let statAddedTo = stat.perMinute !== 0;
-    let statUsed = false;
-    stat.linkedActionExpertiseStats.forEach(function(actionVar) {
-        let actionObj = data.actions[actionVar];
-        if(actionObj.visible || globalVisible) {
-            statUsed = true;
-        }
-    });
-    stat.linkedActionExpStats.forEach(function(actionVar) {
-        let actionObj = data.actions[actionVar];
-        if(actionObj.visible || globalVisible) {
-            statUsed = true;
-        }
-    });
+function getAttColor(attName) {
+    const stat = data.atts[attName];
 
-    if(statAddedTo && statUsed) {
-        return "var(--text-primary)";
-    }
-    if(statAddedTo && !statUsed) {
-        return "var(--success-color)";
-    }
-    if(!statAddedTo && statUsed) {
-        return "var(--accent-primary)";
-    }
+    const attAddedTo = stat.linkedActionOnLevelAtts.some(actionVar =>
+        data.actions[actionVar].unlocked || globalVisible
+    );
+
+    const effAttUsed = stat.linkedActionEfficiencyAtts.some(actionVar =>
+        data.actions[actionVar].unlocked || globalVisible
+    );
+
+    const expAttUsed = stat.linkedActionExpAtts.some(actionVar =>
+        data.actions[actionVar].unlocked || globalVisible
+    );
+
+    if (attAddedTo && !(expAttUsed || effAttUsed)) return "var(--attribute-add-color)";
+    if (attAddedTo && (expAttUsed || effAttUsed)) return "var(--text-primary)";
+    if (expAttUsed) return "var(--attribute-use-exp-color)";
+    if (effAttUsed) return "var(--attribute-use-eff-color)";
     return "var(--error-color)";
 }
+
 
 function gameStateMatches(actionObj) {
     return (data.gameState === "default" && !actionObj.isKTL) || (data.gameState==="KTL" && actionObj.isKTL);
@@ -51,7 +41,7 @@ function getResourceColor(actionObj) {
 }
 
 function getStatChanges() {
-    let statsPerSecond = {};
+    let attsPerSecond = {};
 
     data.actionNames.forEach(actionVar => {
         let actionObj = data.actions[actionVar];
@@ -63,13 +53,13 @@ function getStatChanges() {
         }
         let levelsPerSecond = completesPerSecond * actionObj.expToAdd / actionObj.expToLevel;
 
-        // Update statsPerSecond based on the action's onLevelStats
-        actionObj.onLevelStats.forEach(([stat, amount]) => {
-            if (!statsPerSecond.hasOwnProperty(stat)) { // Auto-initialize
-                statsPerSecond[stat] = 0;
+        // Update attsPerSecond based on the action's efficiencyAtts
+        actionObj.efficiencyAtts.forEach(([stat, amount]) => {
+            if (!attsPerSecond.hasOwnProperty(stat)) { // Auto-initialize
+                attsPerSecond[stat] = 0;
             }
-            statsPerSecond[stat] += amount * levelsPerSecond;
+            attsPerSecond[stat] += amount * levelsPerSecond;
         });
     });
-    return statsPerSecond;
+    return attsPerSecond;
 }

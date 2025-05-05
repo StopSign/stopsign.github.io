@@ -49,15 +49,15 @@ function useAmulet() {
     document.getElementById("useAmuletMenu").style.display = "none";
     document.getElementById("openViewAmuletButton").style.display = "";
 
-    //Reset all stats and bonuses
-    data.statNames.forEach(function (statName) {
-        let statObj = data.stats[statName];
-        statsSetBaseVariables(statObj);
+    //Reset all atts and bonuses
+    data.attNames.forEach(function (attName) {
+        let attObj = data.atts[attName];
+        attsSetBaseVariables(attObj);
     });
 
     //set overclock to the upgrade-relevant %
 
-    //For each action, reset the base stats and set max level
+    //For each action, reset the base atts and set max level
     data.actionNames.forEach(function(actionVar) {
         let actionObj = data.actions[actionVar];
         let newLevel = actionObj.level;

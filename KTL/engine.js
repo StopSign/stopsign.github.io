@@ -1,23 +1,24 @@
-function statsSetBaseVariables(statObj) {
-    statObj.num = 0;
-    statObj.perMinute = 0;
-    statObj.mult = 1;
-    statObj.unlocked = false;
+function attsSetBaseVariables(attObj) {
+    attObj.num = 0;
+    attObj.perMinute = 0;
+    attObj.mult = 1;
+    attObj.unlocked = false;
 }
 
-function createAndLinkNewStat(statVar) {
-    data.statNames.push(statVar);
-    if(!data.stats[statVar]) {
-        data.stats[statVar] = {};
+function createAndLinkNewAttribute(attVar) {
+    data.attNames.push(attVar);
+    if(!data.atts[attVar]) {
+        data.atts[attVar] = {};
     }
-    let statObj = data.stats[statVar];
-    statObj.statVar = statVar;
-    statObj.linkedActionExpStats = [];
-    statObj.linkedActionExpertiseStats = [];
+    let attObj = data.atts[attVar];
+    attObj.attVar = attVar;
+    attObj.linkedActionExpAtts = [];
+    attObj.linkedActionEfficiencyAtts = [];
+    attObj.linkedActionOnLevelAtts = [];
 
-    statsSetBaseVariables(statObj);
+    attsSetBaseVariables(attObj);
 
-    generateStatDisplay(statVar);
+    generateAttDisplay(attVar);
 }
 
 //Vars that should be reset each KTL
@@ -54,7 +55,7 @@ function actionSetBaseVariables(actionObj, dataObj) {
     actionObj.currentMenu = "downstream";
 
     actionObj.isRunning = !dataObj.isKTL; //for controlling whether time affects it
-    actionObj.efficiencyStats = dataObj.efficiencyStats ? dataObj.efficiencyStats : [];
+    actionObj.onLevelAtts = dataObj.onLevelAtts ? dataObj.onLevelAtts : [];
     actionObj.expertiseBase = dataObj.expertiseBase ? dataObj.expertiseBase : 1; //1 = 100%
     actionObj.expertiseMult = dataObj.expertiseMult ? dataObj.expertiseMult : 1;
     actionObj.expertise = actionObj.expertiseBase * actionObj.expertiseMult; //the initial and the multiplier (increases on stat add)
@@ -76,8 +77,8 @@ function actionSetBaseVariables(actionObj, dataObj) {
 function actionSetInitialVariables(actionObj, dataObj) {
     actionObj.isGenerator = dataObj.isGenerator;
     actionObj.momentumName = dataObj.momentumName ? dataObj.momentumName : "momentum";
-    actionObj.onLevelStats = dataObj.onLevelStats ? dataObj.onLevelStats : [];
-    actionObj.expStats = dataObj.expStats ? dataObj.expStats : [];
+    actionObj.efficiencyAtts = dataObj.efficiencyAtts ? dataObj.efficiencyAtts : [];
+    actionObj.expAtts = dataObj.expAtts ? dataObj.expAtts : [];
     actionObj.tier = dataObj.tier;
     actionObj.wage = dataObj.wage ? dataObj.wage : null;
     actionObj.isKTL = !!dataObj.isKTL;
@@ -125,14 +126,14 @@ function createAndLinkNewAction(actionVar, dataObj, title, x, y, downstreamVars)
         actionObj.expToLevelMult = 1;
         actionObj.progressMaxMult = 1;
         let totalEffect = 1;
-        dataObj.expStats.forEach(function(expStat) {
+        dataObj.expAtts.forEach(function(expStat) {
             let name = expStat[0];
             let ratio = expStat[1];
-            if(!data.stats[name]) {
+            if(!data.atts[name]) {
                 console.log("need to instantiate " + name);
                 return;
             }
-            let effect = ((data.stats[name].mult-1) * ratio) + 1; //10% of x2.5 -> .15
+            let effect = ((data.atts[name].mult-1) * ratio) + 1; //10% of x2.5 -> .15
             actionObj[name+"StatExpMult"] = effect; //
             totalEffect *= effect;
         })
@@ -147,14 +148,14 @@ function createAndLinkNewAction(actionVar, dataObj, title, x, y, downstreamVars)
     }
     actionObj.calcStatExpertise = function() {
         actionObj.expertiseMult = 1;
-        actionObj.efficiencyStats.forEach(function(expertiseStat) {
+        actionObj.efficiencyAtts.forEach(function(expertiseStat) {
             let name = expertiseStat[0];
             let ratio = expertiseStat[1];
-            if(!data.stats[name]) {
+            if(!data.atts[name]) {
                 console.log("need to instantiate " + name);
                 return;
             }
-            let effect = ((data.stats[name].mult-1) * ratio) + 1;
+            let effect = ((data.atts[name].mult-1) * ratio) + 1;
             actionObj[name+"StatExpertiseMult"] = effect;
             actionObj.expertiseMult *= effect;
         })
@@ -208,10 +209,10 @@ function checkLevelUp(actionObj, dataObj) {
         //power = base * mult * efficiency
         actionObj.actionPower = actionObj.actionPowerBase * actionObj.actionPowerMult * (actionObj.efficiency/100);
 
-        actionObj.onLevelStats.forEach(function (statObj) {
-            let name = statObj[0];
-            let amount = statObj[1];
-            if(!data.stats[name]) {
+        actionObj.onLevelAtts.forEach(function (attObj) {
+            let name = attObj[0];
+            let amount = attObj[1];
+            if(!data.atts[name]) {
                 console.log('The stat ' + name + ' doesnt exist');
             }
             statAddAmount(name, amount);
@@ -236,17 +237,17 @@ function actionAddExp(actionObj) {
     }
 }
 
-function statAddAmount(statVar, amount) {
-    let statObj = data.stats[statVar];
-    if(!statObj) {
-        console.log("Tried to add to a stat that doesn't exist: " + statVar);
+function statAddAmount(attVar, amount) {
+    let attObj = data.atts[attVar];
+    if(!attObj) {
+        console.log("Tried to add to a stat that doesn't exist: " + attVar);
     }
-    statObj.num += amount;
-    statObj.mult = 1 + statObj.num * .1; //Math.pow(1.1, statObj.num); //calc only when adding
-    statObj.linkedActionExpStats.forEach(function (actionVar) {
+    attObj.num += amount;
+    attObj.mult = 1 + attObj.num * .1; //Math.pow(1.1, attObj.num); //calc only when adding
+    attObj.linkedActionExpAtts.forEach(function (actionVar) {
         data.actions[actionVar].calcStatMult();
     })
-    statObj.linkedActionExpertiseStats.forEach(function (actionVar) {
+    attObj.linkedActionEfficiencyAtts.forEach(function (actionVar) {
         data.actions[actionVar].calcStatExpertise();
     })
 }
@@ -288,6 +289,8 @@ function unveilAction(actionVar) {
     }
     actionObj.visible = true;
 
+    revealActionAtts(actionObj);
+
     //set all downstream actions to 1% when you unlock
     let parentVar = actionObj.parent;
     let parent = data.actions[parentVar];
@@ -304,6 +307,37 @@ function unveilAction(actionVar) {
             setSliderUI(parentVar, downstreamVar, getUpgradeSliderAmount());
         }
     });
+}
+
+function revealActionAtts(actionObj) {
+    actionObj.onLevelAtts.forEach(onLevelAtt => {
+        revealAtt(onLevelAtt);
+    });
+}
+
+function revealAtt(useAttObj) {
+    let attVar = useAttObj[0];
+    let attObj = data.atts[attVar];
+    attObj.unlocked = true; //sets the side menu
+
+
+    for(let actionVar in data.actions) {
+        let actionObj = data.actions[actionVar];
+
+        for (let actionVar of attObj.linkedActionExpAtts) {
+            // document.getElementById(`${actionVar}${attVar}OutsideContainerexp`)
+            views.updateVal(`${actionVar}${attVar}OutsideContainerexp`, "", "style.display");
+        }
+        for (let actionVar of attObj.linkedActionEfficiencyAtts) {
+            // document.getElementById(`${actionVar}${attVar}OutsideContainereff`)
+            views.updateVal(`${actionVar}${attVar}OutsideContainereff`, "", "style.display");
+        }
+    }
+//overclockawarenessOutsideContainer
+
+    //For each action, for each non-add linked stat
+    //Reveal the box (hide the ???? one)
+    //Reveal the OutsideContainer
 }
 
 function unlockAction(actionObj) {

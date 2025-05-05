@@ -47,7 +47,7 @@ return;
         "Exp and Leveling",
         Raw.html`When the progress bar is full, an action will gain 1 exp until it levels up. On level up, the stat will give:
         <ol>
-            <li>On-level stats, with details found in the Stats menu of each action</li>
+            <li>On-level atts, with details found in the Stats menu of each action</li>
             <li>Increased progress/exp requirements described by the greyed-out text in their bars</li>
             <li>If the Action is a generator (like overclock), increases the action power, with details found in the Info menu of each action</li>
         </ol>`);
