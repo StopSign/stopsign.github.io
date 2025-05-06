@@ -188,7 +188,7 @@ let actionData = {
         expAtts:[["awareness", 1], ["focus", 1], ["energy", 1], ["ambition", 1], ["control", 1],
             ["flow", 1], ["willpower", 1], ["coordination", 1], ["integration", 1], ["rhythm", 1],
             ["pulse", 1]],
-        efficiencyAtts:[["circulation", 1]]
+        efficiencyAtts:[["cycle", 1]]
     },
     reflect: {
         tier:1,
@@ -200,8 +200,8 @@ let actionData = {
             unveilAction('harnessOverflow')
         },
         onLevelAtts:[["awareness", 5]],
-        expAtts:[["focus", 5], ["circulation", 5], ["observation", 5], ["energy", 5]],
-        efficiencyAtts:[["circulation", 1]]
+        expAtts:[["focus", 5], ["cycle", 5], ["observation", 5], ["energy", 5]],
+        efficiencyAtts:[["cycle", 1]]
     },
     harnessOverflow: {
         tier:1,
@@ -212,7 +212,7 @@ let actionData = {
         onLevelCustom: function() {
             unveilAction('distillInsight')
         },
-        onLevelAtts:[["circulation", 1]],
+        onLevelAtts:[["cycle", 1]],
         expAtts:[["awareness", 1], ["energy", 1]],
         efficiencyAtts:[]
     },
@@ -227,7 +227,7 @@ let actionData = {
         },
         onLevelAtts:[["focus", 1]],
         expAtts:[],
-        efficiencyAtts:[["circulation", 1]]
+        efficiencyAtts:[["cycle", 1]]
     },
     takeNotes: {
         tier:1,
@@ -240,7 +240,7 @@ let actionData = {
         },
         onLevelAtts:[["awareness", 10], ["curiosity", 3]],
         expAtts:[["observation", 1]],
-        efficiencyAtts:[["circulation", 1]]
+        efficiencyAtts:[["cycle", 1]]
     },
     bodyAwareness: {
         tier:1,
@@ -271,7 +271,7 @@ let actionData = {
         },
         onLevelAtts:[["focus", 5]],
         expAtts:[["awareness", 1], ["observation", 1]], //~x30 awareness when unlocked
-        efficiencyAtts:[["circulation", 1]],
+        efficiencyAtts:[["cycle", 1]],
         unlockMessage:{english:"On unlock, +1 max level for Body Awareness."},
         extraInfo:{english:"On Level up: +3 max levels for Harness Overflow."}
     },
@@ -729,7 +729,7 @@ let actionData = {
         },
         onLevelAtts:[["awareness", 50], ["curiosity", 25]],
         expAtts:[["observation", 1], ["energy", 1]],
-        efficiencyAtts:[["circulation", 1]],
+        efficiencyAtts:[["cycle", 1]],
         unlockMessage:{english:"On unlock, +1 max level for Body Awareness."}
     },
 
@@ -746,7 +746,7 @@ let actionData = {
         },
         onLevelCustom: function() {
         },
-        onLevelAtts:[["awareness", 500], ["circulation", 1]],
+        onLevelAtts:[["awareness", 500], ["cycle", 1]],
         expAtts:[["awareness", 1], ["curiosity", 1], ["focus", 1], ["flow", 1]],
         efficiencyAtts:[["flow", .1]]
     },
@@ -1117,7 +1117,7 @@ let actionData = {
         },
         onLevelAtts:[["awareness", 1000], ["curiosity", 500]],
         expAtts:[["observation", 1], ["energy", 1]],
-        efficiencyAtts:[["circulation", 1]]
+        efficiencyAtts:[["cycle", 1]]
     },
     siftExcess: { //? dunno the purpose yet
         tier:1,
@@ -1127,7 +1127,7 @@ let actionData = {
         unlockCost:500000, visible:false, unlocked:false, purchased: false,
         onLevelCustom: function() {
         },
-        onLevelAtts:[["circulation", 100]],
+        onLevelAtts:[["cycle", 100]],
         expAtts:[["observation", 1]],
         efficiencyAtts:[]
     },

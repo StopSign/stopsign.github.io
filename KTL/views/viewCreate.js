@@ -24,19 +24,19 @@ function initializeDisplay() {
 function generateAttDisplay(attVar) {
     let attObj = data.atts[attVar];
     let theStr = "";
-    statTitles.forEach(function (statTitle) {
-        if(statTitle[1] === attVar) {
-            theStr += ((attVar === "discipline") ? "" : "<br>") +"<div style='font-style: italic;'><u>"+statTitle[0]+"</u></div>";
+    attTitles.forEach(function (attTitle) {
+        if(attTitle[1] === attVar) {
+            theStr += ((attVar === "discipline") ? "" : "<br>") +"<div style='font-style: italic;'><u>"+attTitle[0]+"</u></div>";
         }
     });
-    queueCache(`${attVar}StatContainer`);
+    queueCache(`${attVar}AttContainer`);
     queueCache(`${attVar}Name`);
     queueCache(`${attVar}Num`);
     queueCache(`${attVar}Mult`);
     queueCache(`${attVar}PerMinute`);
 
     theStr +=
-        `<div id="${attVar}StatContainer" style="position:relative;cursor:pointer" onclick="clickedStatName('${attVar}')">
+        `<div id="${attVar}AttContainer" style="position:relative;cursor:pointer" onclick="clickedAttName('${attVar}')">
             <b><span id="${attVar}Name" style="width:140px;display:inline-block;">${decamelize(attVar)}</span></b>
             <b><span id="${attVar}Num" style='width:70px;display:inline-block'>${attObj.num}</span></b>
             <span style="width:70px;display:inline-block">x<b><span id="${attVar}Mult">${attObj.mult}</span></b></span>
@@ -45,7 +45,7 @@ function generateAttDisplay(attVar) {
 
     let child = document.createElement("template");
     child.innerHTML = theStr;
-    document.getElementById("statDisplay").appendChild(child.content);
+    document.getElementById("attDisplay").appendChild(child.content);
 
 }
 
@@ -292,6 +292,7 @@ function generateOutsideAttDisplay(actionObj, attObj, type) {
     let statName = attObj[0];
     let statValue = attObj[1];
 
+    let startDisplayed = type === "add"?"":"none";
     let color = type === "add"
         ? "--attribute-add-color"
         : (type === "exp"
@@ -308,13 +309,24 @@ function generateOutsideAttDisplay(actionObj, attObj, type) {
         ? "+" + intToString(statValue, 1)
         : (statValue * 100) + "%";
 
+    let tooltipText;
+
+    if (type === "add") {
+        tooltipText = `${text} to ${capitalizeFirst(statName)}`;
+    } else if (type === "eff") {
+        tooltipText = `${text} of ${capitalizeFirst(statName)}'s bonus is multiplied to base efficiency`;
+    } else if (type === "exp") {
+        let target = actionObj.isGenerator ? "exp to level" : "progress to complete";
+        tooltipText = `${text} of ${capitalizeFirst(statName)} bonus reduces ${target}`;
+    }
     queueCache(`${actionVar}${statName}OutsideContainer${type}`);
 
+
     return Raw.html`
-        <div id="${actionVar}${statName}OutsideContainer${type}" onclick="clickedStatName('${statName}')" 
-             style="border:1px solid var(${color});margin-bottom:2px;cursor:pointer;background-color:var(--overlay-color);padding:1px;">
+        <div id="${actionVar}${statName}OutsideContainer${type}" onclick="clickedAttName('${statName}')" 
+             style="display:${startDisplayed};border:1px solid var(${color});margin-bottom:2px;cursor:pointer;background-color:var(--overlay-color);padding:1px;">
             <div class="showthat" style="position:relative;width:30px;height:30px;background-color:var(${backgroundColor});">
-                <div class="showthisUp" style="font-size:18px;">${text + (type==="add"?" to ":" of ")+ capitalizeFirst(statName)}</div>
+                <div class="showthisUp" style="font-size:18px;">${tooltipText}</div>
                 <img src="img/${statName}.svg" alt="${statName}" style="width:100%;height:100%;" />
                 <div class="hyperVisible" style="position:absolute;bottom:0;left:0;width:100%;height:50%;display:flex;align-items:flex-end;
                 justify-content:center;font-weight:bold;font-size:10px;">${text}</div>
@@ -571,7 +583,7 @@ function setSingleCaches() {
     queueCache("essence2");
     queueCache("bonusTime");
     queueCache("killTheLichMenu");
-    queueCache("statDisplay");
+    queueCache("attDisplay");
     queueCache("bonusDisplay");
 }
 

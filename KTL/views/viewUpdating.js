@@ -35,7 +35,7 @@ let views = {
 
         //Handle visibility
         let isVisible = (attObj.unlocked || globalVisible);
-        views.updateVal(`${attVar}StatContainer`, isVisible?"":"none", "style.display");
+        views.updateVal(`${attVar}AttContainer`, isVisible?"":"none", "style.display");
         if(!isVisible) {
             return;
         }

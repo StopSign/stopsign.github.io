@@ -86,8 +86,8 @@ function resizeStatMenu() {
         reduction += 97;
     }
 
-    if(view.cached.statDisplay) {
-        view.cached.statDisplay.style.maxHeight = window.innerHeight - reduction + "px";
+    if(view.cached.attDisplay) {
+        view.cached.attDisplay.style.maxHeight = window.innerHeight - reduction + "px";
     }
 }
 
@@ -99,7 +99,7 @@ const actionContainer = document.getElementById('actionContainer');
 
 let scale = 1;
 const scaleStep = 0.1;
-const minScale = 0.2;
+const minScale = 0.1;
 const maxScale = 3;
 
 let isDragging = false;
@@ -369,7 +369,7 @@ function clickMenuButton() {
 
 
 let selectedStat = null;
-function clickedStatName(attName) {
+function clickedAttName(attName) {
     //clear all borders
     data.actionNames.forEach(function (actionVar) {
         if (view.cached[actionVar + "LargeVersionContainer"].style.borderColor !== "black") {
@@ -381,7 +381,7 @@ function clickedStatName(attName) {
 
     //clear previous
     if (selectedStat) {
-        view.cached[selectedStat + "StatContainer"].style.border = "";
+        view.cached[selectedStat + "AttContainer"].style.border = "";
     }
     if (selectedStat === attName) {
         //clicked the same, so clear and return
@@ -389,7 +389,7 @@ function clickedStatName(attName) {
         return;
     }
 
-    let theDiv = view.cached[attName + "StatContainer"];
+    let theDiv = view.cached[attName + "AttContainer"];
     selectedStat = attName;
     theDiv.style.border = "2px solid var(--text-primary)";
     //Change the border colors of all actions that are relevant
@@ -478,13 +478,13 @@ function resetGamespeed() {
 }
 
 function statMenuHideButton() {
-    let button = document.getElementById("statDisplayShowButton");
-    let statDisplay = view.cached.statDisplay;
-    if(statDisplay.style.display !== "none") {
-        statDisplay.style.display = "none";
+    let button = document.getElementById("attDisplayShowButton");
+    let attDisplay = view.cached.attDisplay;
+    if(attDisplay.style.display !== "none") {
+        attDisplay.style.display = "none";
         button.style.display = "";
     } else {
-        statDisplay.style.display = "block";
+        attDisplay.style.display = "block";
         button.style.display = "none";
     }
 }

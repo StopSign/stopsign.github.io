@@ -48,10 +48,10 @@
 body.lightMode {
     --bg-primary: #8798d3;
     --bg-secondary: #bbd6e6;
-    --text-bright: #020931;
+    --text-bright: #f4f5f9;
     --text-primary: #000000;
     --text-muted: #4a4e69;
-    --text-dark: #f4f5f9;
+    --text-dark: #020931;
     --button-text: #4a4e69;
     --accent-primary: #3acbf7;
     --accent-secondary: #4bd5ff;
@@ -107,7 +107,7 @@ body {
 }
 
 .hyperVisible {
-    text-shadow:1px 1px 2px black;
+    text-shadow:1px 1px 2px var(--text-dark);
     color: var(--text-bright);
 }
 

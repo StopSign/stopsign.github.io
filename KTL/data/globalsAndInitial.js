@@ -56,7 +56,7 @@ data.options.bonusRate = 2;
 let viewData = {}; //contains only things that are generated / not saved
 viewData.toasts = [];
 
-let statTitles = []; //[<title>, <stat name to be located above>]
+let attTitles = []; //[<title>, <stat name to be located above>]
 
 let language = "english";
 let globalVisible = false;
@@ -93,7 +93,7 @@ function initializeData() {
     createUpgrades();
 
 
-    statTitles.push(["Introspection", "awareness"]);
+    attTitles.push(["Introspection", "awareness"]);
     createAndLinkNewAttribute("awareness");
     createAndLinkNewAttribute("curiosity");
     createAndLinkNewAttribute("observation");
@@ -102,9 +102,9 @@ function initializeData() {
     createAndLinkNewAttribute("integration");
 
 
-    statTitles.push(["Magic", "focus"]);
+    attTitles.push(["Magic", "focus"]);
     createAndLinkNewAttribute("focus");
-    createAndLinkNewAttribute("circulation");
+    createAndLinkNewAttribute("cycle");
     createAndLinkNewAttribute("willpower");
     createAndLinkNewAttribute("amplification");
     createAndLinkNewAttribute("pulse");
@@ -112,7 +112,7 @@ function initializeData() {
     createAndLinkNewAttribute("vision");
 
 
-    statTitles.push(["Physique", "endurance"]);
+    attTitles.push(["Physique", "endurance"]);
     createAndLinkNewAttribute("endurance");
     createAndLinkNewAttribute("flow");
     createAndLinkNewAttribute("control");
@@ -122,7 +122,7 @@ function initializeData() {
     createAndLinkNewAttribute("rhythm");
 
 
-    statTitles.push(["Adventuring", "energy"]);
+    attTitles.push(["Adventuring", "energy"]);
     createAndLinkNewAttribute("energy");
     createAndLinkNewAttribute("navigation");
     createAndLinkNewAttribute("comfort");
@@ -132,7 +132,7 @@ function initializeData() {
     createAndLinkNewAttribute("valor");
 
 
-    statTitles.push(["Money", "ambition"]);
+    attTitles.push(["Money", "ambition"]);
     createAndLinkNewAttribute("ambition");
     createAndLinkNewAttribute("savvy");
     createAndLinkNewAttribute("cunning");
@@ -140,7 +140,7 @@ function initializeData() {
     createAndLinkNewAttribute("adaptability");
 
 
-    statTitles.push(["Socialization", "confidence"]);
+    attTitles.push(["Socialization", "confidence"]);
     createAndLinkNewAttribute("confidence");
     createAndLinkNewAttribute("recognition");
     createAndLinkNewAttribute("charm");
