@@ -55,28 +55,33 @@ function generateActionDisplay(actionVar) {
     let theStr = "";
     let resourceColor = getResourceColor(actionObj);
 
+    queueCache(`${actionVar}Tier`);
+
     let title = Raw.html`
-        <span id='${actionVar}Title' onclick='actionTitleClicked("${actionVar}")' style='font-size:16px;color:var(--text-primary);width:100%;cursor:pointer;position:absolute;top:-40px;
-            left:-1px;white-space: nowrap;border-width: 0 0 2px 2px;border-style: solid;border-color: var(--border-color);padding-left:2px;padding-right:2px;background-color:var(--overlay-color)'>
-            <b>${actionObj.title}</b> |
-            <span style='font-size:12px;position:relative;'>
-                Level <b></v><span id='${actionVar}Level'>0</span></b>
+        <span onclick="actionTitleClicked('${actionVar}')" style="color:var(--text-primary);cursor:pointer;position:absolute;top:-77px;height:77px;left:0;
+            white-space: nowrap;border-width: 0 0 0 6px;border-style: solid;border-color: var(--text-muted);padding-left:4px;background-color:var(--overlay-color)">
+            
+            <span style="font-size:18px;"><b>${actionObj.title}</b><br></span>
+            <b><span style="font-size:16px;" id='${actionVar}Momentum'>0</span> 
+            <span style="color:${resourceColor};font-size:14px;">${capitalizeFirst(actionObj.momentumName)}</span></b>
+            <span style="font-size:14px;color:var(--text-muted)">${actionObj.isGenerator?`(+<b><span id="${actionVar}MomentumAdded">10</span></b>)`:""}</span><br>
+            
+<!--            <div class='menuSeparator' style="margin:0;background-color: var(&#45;&#45;border-color)"></div>-->
+            
+            <span style="font-size:12px;position:relative;">
+                Level <b><span id="${actionVar}Level">0</span></b>
                 ${actionObj.maxLevel >= 0 ? ` / <b><span id='${actionVar}MaxLevel'>0</span></b>` : ""}
                 <span id='${actionVar}HighestLevelContainer2'> 
                     (<b><span id='${actionVar}HighestLevel2'></span></b>)
                 </span> | 
-                <span style='font-size:12px;'><b>
-                    <span id='${actionVar}Efficiency'></span></b>% eff
-                </span>
+                <b><span id='${actionVar}Efficiency'></span></b>% efficiency
                 ${!actionObj.wage ? "" : ` | <b>$<span id='${actionVar}Wage' style='color:var(--wage-color)'></span></b>`}
             </span>
         </span>
     `
 
-    title = title + generateOnLevelContainers(actionObj);
-
     let menuContainer =
-        "<div id='' style='position:absolute;top:-18px;font-size:13px;left:-1px;'>" +
+        "<div id='' style='position:absolute;top:-18px;font-size:13px;left:3px;'>" +
         (actionVar==="overclock"?"":"<span id='"+actionVar+"GoToParentButton' onclick='actionTitleClicked(\""+actionObj.parent+"\")' " +
             "class='buttonSimple' style='margin-right:3px;width:30px;height:30px;text-align:center;cursor:pointer;padding:0 4px;'>^</span>") +
         "<span id='"+actionVar+"_downstreamMenuButton' onclick='clickActionMenu(\""+actionVar+"\", \"downstream\")' class='buttonSimple' style='margin-right:3px;width:30px;height:30px;text-align:center;cursor:pointer;padding:0 4px;'>Downstream</span>" +
@@ -84,6 +89,67 @@ function generateActionDisplay(actionVar) {
         "<span id='"+actionVar+"_attsMenuButton' onclick='clickActionMenu(\""+actionVar+"\", \"atts\")' class='buttonSimple' style='margin-right:3px;width:30px;height:30px;text-align:center;cursor:pointer;padding:0 4px;'>Stats</span>" +
         "<span id='"+actionVar+"_storyMenuButton' onclick='clickActionMenu(\""+actionVar+"\", \"story\")' class='buttonSimple' style='margin-right:3px;width:30px;height:30px;text-align:center;cursor:pointer;padding:0 4px;'>Story</span>" +
         "</div>";
+
+    let momentumDescription = "";
+    if(actionVar === "overclock") {
+        momentumDescription = Raw.html` (+<b><span id="${actionVar}MomentumAdded">10</span></b>)`;
+    }
+    let momentumContainer = Raw.html`
+    <div id="${actionVar}MomentumContainer" style='padding:3px 3px 0;'>
+        <div style="font-style: italic; color: var(--text-muted);">
+            <span style="display:inline-block;width:60px;"><u>Increase</u></span>
+            <span style="display:inline-block;width:60px;"><u>Decrease</u></span>
+            <span style="display:inline-block;width:60px;"><u>Change</u></span>
+        </div>
+        <div>
+            <span style="display:inline-block;width:60px;white-space: nowrap;">+<b><span id="${actionVar}MomentumIncrease"></span></b>/s</span>
+            <span style="display:inline-block;width:60px;white-space: nowrap;">-<b><span id="${actionVar}MomentumDecrease"></span></b>/s</span>
+            <span style="display:inline-block;width:60px;white-space: nowrap;">Δ<b><span id="${actionVar}MomentumDelta"></span></b>/s</span>
+        </div>
+    </div>`;
+
+    let balanceNeedle =
+        Raw.html`
+        <div style="color:var(--text-muted)">Change Ratio:</div>
+        <div style="position:relative;width:100%;height:10px;">
+            <div style="position:absolute;top:-2px;width:100%;height:10px;border-top:1px solid;">
+                <div style="position:absolute;top:0;left:25%;width:2px;height:100%;background-color:var(--text-primary);opacity:0.6;"></div> 
+                <div style="position:absolute;top:0;left:50%;width:2px;height:100%;background-color:var(--text-primary);opacity:0.6;"></div> 
+                <div style="position:absolute;top:0;left:75%;width:2px;height:100%;background-color:var(--text-primary);opacity:0.6;"></div> 
+                <div id="${actionVar}BalanceNeedle" style="position:absolute;top:-3px;width:2px;height:16px;background-color:red;left:50%;"></div>
+                <span style="color:var(--text-muted);position:absolute;left:25%;top:0;font-size:10px;transform:translateX(-100%);">x1</span>
+                <span style="color:var(--text-muted);position:absolute;left:50%;top:0;font-size:10px;transform:translateX(-100%);">x2</span>
+                <span style="color:var(--text-muted);position:absolute;left:75%;top:0;font-size:10px;transform:translateX(-100%);">x10</span>
+                <span style="color:var(--text-muted);position:absolute;left:100%;top:0;font-size:10px;transform:translateX(-100%);">x100</span>
+            </div>
+        </div>`;
+
+
+
+    let pbar =
+        "<div id='"+actionVar+"ProgressBarOuter' style='width:100%;height:16px;position:relative;text-align:left;border-top:1px solid;border-bottom:1px solid;'>" +
+        "<div id='"+actionVar+"ProgressBarInner' style='width:30%;background-color:"+resourceColor+";height:100%;position:absolute;'></div>" +
+        "<div id='"+actionVar+"ProgressNumContainer' style='position:absolute;top:1px;left:4px;width:97%'><b></v>" +
+        "<span id='"+actionVar+"Progress'>0</span></b> / " +
+        "<b><span id='"+actionVar+"ProgressMax'>1</span></b> progress " +
+        "(+<b><span id='"+actionVar+"ProgressGain'>1</span></b>/s)" +
+        "<span style='color:grey;position:absolute;right:0'>x<b><span id='"+actionVar+"ProgressMaxIncrease'>1</span></b> / lvl</span>" +
+        "</div>" +
+        "</div>";
+    let expBar =
+        "<div id='"+actionVar+"ExpBarOuter' style='width:100%;height:16px;position:relative;text-align:left;border-bottom:1px solid;'>" +
+        "<div id='"+actionVar+"ExpBarInner' style='width:30%;background-color:var(--exp-color);height:100%;position:absolute'></div>" +
+        "<div id='"+actionVar+"ExpNumContainer' style='position:absolute;top:1px;left:4px;width:97%'><b></v>" +
+        "<span id='"+actionVar+"Exp'>0</span></b> / " +
+        "<b><span id='"+actionVar+"ExpToLevel'>1</span></b> exp" +
+        "<span style='color:grey;position:absolute;right:0'>x<b><span id='"+actionVar+"ExpToLevelIncrease'>1</span></b> / lvl</span>" +
+        "</div>" +
+        "</div>";
+    let maxLevel =
+        "<div id='"+actionVar+"IsMaxLevel' class='hyperVisible' style='position:absolute;display:none;left:104px;top:66px;color:var(--max-level-color);font-size:18px;'><b>MAX LEVEL</b></div>";
+
+    title = title + generateOnLevelContainers(actionObj);
+
 
 
     let onComplete =
@@ -107,8 +173,10 @@ function generateActionDisplay(actionVar) {
     //highest level and unlock timer
     //actionObj.prevUnlockTime
 
-    let levelInfoContainer =
-        "<div id='"+actionVar+"_infoContainer' style='display:none;padding:3px;'>" +
+    let levelInfoContainer = Raw.html`
+            <div id="${actionVar}_infoContainer" style="display:none;padding:3px;">
+        Tier <b><span id="${actionVar}Tier"></span></b>${actionObj.isGenerator ? " Generator" : " Action"}<br>
+        ${actionObj.isGenerator?"":(`Consume and send rate is ${actionObj.tierMult()*100}% of ${actionObj.momentumName} * efficiency.<br>`)}<br>` +
         onComplete +
         onLevelText +
         upgradeInfoText +
@@ -142,97 +210,48 @@ function generateActionDisplay(actionVar) {
         actionObj.unlockMessage +
         "</span>" +
         "</div>";
-    let momentumDescription = "";
-    if(actionVar === "overclock") {
-        momentumDescription = Raw.html` (+<b><span id="${actionVar}MomentumAdded">10</span></b>)`;
-    }
-    let momentumContainer =
-        "<div id='"+actionVar+"MomentumContainer' style='margin:3px;'>" +
-        "<span style='font-size:12px;'>Tier <b><span id='"+actionVar+"Tier'></span></span></b> " +
-        (actionObj.isGenerator ? " Generator" : " Action") + "<br>" +
-        capitalizeFirst(actionObj.momentumName)+": <b><span id='"+actionVar+"Momentum'>0</span></b>"+momentumDescription+"<br>" +
-        (actionObj.isGenerator?"":("<div style='margin:3px;font-size:10px;'>Progress/s = "+actionObj.tierMult()*100+"% of "+actionObj.momentumName+" * efficiency:</div>")) +
-        "+<b><span id='"+actionVar+"MomentumIncrease'></span></b>/s, " +
-        "-<b><span id='"+actionVar+"MomentumDecrease'></span></b>/s, "  +
-        "Δ<b><span id='"+actionVar+"MomentumDelta'>1.0</span></b>/s, Balance:" +
-        "</div>";
-
-    let balanceNeedle =
-        Raw.html`
-        <div style="position:relative;width:100%;height:10px;">
-            <div style='position:absolute;top:-2px;width:100%;height:10px;border-top:1px solid;'>
-                <div style='position:absolute;top:0;left:25%;width:2px;height:100%;background-color:var(--text-primary);opacity:0.6;'></div> 
-                <div style='position:absolute;top:0;left:50%;width:2px;height:100%;background-color:var(--text-primary);opacity:0.6;'></div> 
-                <div style='position:absolute;top:0;left:75%;width:2px;height:100%;background-color:var(--text-primary);opacity:0.6;'></div> 
-                <div id='${actionVar}BalanceNeedle' style='position:absolute;top:-3px;width:2px;height:16px;background-color:red;left:50%;'></div>
-                <span style="position:absolute;left:25%;top:0;font-size:10px;transform:translateX(-100%);opacity:0.3;">x1</span>
-                <span style="position:absolute;left:50%;top:0;font-size:10px;transform:translateX(-100%);opacity:0.3;">x2</span>
-                <span style="position:absolute;left:75%;top:0;font-size:10px;transform:translateX(-100%);opacity:0.3;">x10</span>
-                <span style="position:absolute;left:100%;top:0;font-size:10px;transform:translateX(-100%);opacity:0.3;">x100</span>
-            </div>
-        </div>`;
-
-
-
-    let pbar =
-        "<div id='"+actionVar+"ProgressBarOuter' style='width:100%;height:16px;position:relative;text-align:left;border-top:1px solid;border-bottom:1px solid;'>" +
-        "<div id='"+actionVar+"ProgressBarInner' style='width:30%;background-color:"+resourceColor+";height:100%;position:absolute;'></div>" +
-        "<div id='"+actionVar+"ProgressNumContainer' style='position:absolute;top:1px;left:4px;width:97%'><b></v>" +
-        "<span id='"+actionVar+"Progress'>0</span></b> / " +
-        "<b><span id='"+actionVar+"ProgressMax'>1</span></b> progress " +
-        "(+<b><span id='"+actionVar+"ProgressGain'>1</span></b>/s)" +
-        "<span style='color:grey;position:absolute;right:0'>x<b><span id='"+actionVar+"ProgressMaxIncrease'>1</span></b> / lvl</span>" +
-        "</div>" +
-        "</div>";
-    let expBar =
-        "<div id='"+actionVar+"ExpBarOuter' style='width:100%;height:16px;position:relative;text-align:left;border-bottom:1px solid;'>" +
-        "<div id='"+actionVar+"ExpBarInner' style='width:30%;background-color:var(--exp-color);height:100%;position:absolute'></div>" +
-        "<div id='"+actionVar+"ExpNumContainer' style='position:absolute;top:1px;left:4px;width:97%'><b></v>" +
-        "<span id='"+actionVar+"Exp'>0</span></b> / " +
-        "<b><span id='"+actionVar+"ExpToLevel'>1</span></b> exp" +
-        "<span style='color:grey;position:absolute;right:0'>x<b><span id='"+actionVar+"ExpToLevelIncrease'>1</span></b> / lvl</span>" +
-        "</div>" +
-        "</div>";
-    let maxLevel =
-        "<div id='"+actionVar+"IsMaxLevel' style='position:absolute;display:none;left:104px;top:71px;color:var(--max-level-color);font-size:18px;'><b>MAX LEVEL</b></div>";
 
 
     let downstreamContainer =
         "<div id='"+actionVar+"_downstreamContainer' style='padding:10px;display:none;'>" +
         "<div id='"+actionVar+"_downstreamButtonContainer'>" +
-            (actionVar==="overclock"?("Send up to (10% * efficiency of momentum)/s downstream: <br>"):"") +
             createDownStreamSliders(actionObj) +
             "<span id='"+actionVar+"AllZeroButton' onclick='toggleAllZero(\""+actionVar+"\")' class='buttonSimple' style='margin-right:3px;width:30px;height:30px;text-align:center;cursor:pointer;padding:0 4px;'>All 0</span>" +
             "<span id='"+actionVar+"AllEqualButton' onclick='toggleAllHundred(\""+actionVar+"\")' class='buttonSimple' style='margin-right:3px;width:30px;height:30px;text-align:center;cursor:pointer;padding:0 4px;'>All 100</span>" +
             "<div>Total "+actionObj.momentumName+" sending downstream: <b><span id='"+actionVar+"TotalSend'>1</span></b>/s</div>"
         + "</div></div>";
 
-    let newX = actionObj.realX;
-    let newY = actionObj.realY;
+    let newX = actionObj.realX +"px";
+    let newY = actionObj.realY +"px";
 
     let shouldDisplay = "none"; //gameStateMatches(actionObj) ? "" : "none";
 
-    theStr +=
-        "<div id='"+actionVar+"Container' style='display:"+shouldDisplay+";position:absolute;left:"+newX+"px;top:"+newY+"px;width:300px;'>" +
-            "<div id='"+actionVar+"LargeVersionContainer' style='border:2px solid var(--border-color);background-color:var(--bg-secondary);'>" +
-                title +
-                menuContainer +
-                momentumContainer +
-                balanceNeedle +
-                pbar +
-                expBar +
-                maxLevel +
-                storyContainer +
-                attsContainer +
-                levelInfoContainer +
-                downstreamContainer +
-                lockOverAll +
-            "</div>" +
-            "<div id='"+actionVar+"SmallVersionContainer' style='display:none;text-align:center;margin:50px auto;font-size:12px;width:100px;'>" +
-                "<b><span style='font-size:16px'>" + actionObj.title + "</span></b><br>" +
-                "Level <b><span id='"+actionVar+"Level2'></b>" +
-            "</div>" +
-        "</div>";
+    queueCache(`${actionVar}Container`)
+    queueCache(`${actionVar}LargeVersionContainer`)
+    queueCache(`${actionVar}SmallVersionContainer`)
+    queueCache(`${actionVar}Level2`)
+
+    theStr += Raw.html`
+        <div id="${actionVar}Container" style="display:${shouldDisplay};position:absolute;left:${newX};top:${newY};width:300px;">
+            <div id="${actionVar}LargeVersionContainer" style="border:2px solid var(--border-color);background-color:var(--bg-secondary);">
+                ${title}
+                ${menuContainer}
+                ${momentumContainer}
+                ${balanceNeedle}
+                ${pbar}
+                ${expBar}
+                ${maxLevel}
+                ${storyContainer}
+                ${attsContainer}
+                ${levelInfoContainer}
+                ${downstreamContainer}
+                ${lockOverAll}
+            </div>
+            <div id="${actionVar}SmallVersionContainer" style="display:none;text-align:center;margin:50px auto;font-size:12px;width:100px;">
+                <b><span style="font-size:16px">${actionObj.title}</span></b><br>
+                Level <b><span id="${actionVar}Level2"></b>
+            </div>
+        </div>`;
 
 
 
@@ -337,21 +356,24 @@ function generateOutsideAttDisplay(actionObj, attObj, type) {
 function generateActionExpStats(actionObj) {
     let actionVar = actionObj.actionVar;
     let dataObj = actionData[actionVar];
-    let expAttsStr = "<span id='"+actionVar+"StatExpContainer'>Stat Modifiers to Progress and Exp Required:<br>";
+    queueCache(`${actionVar}StatExpContainer`);
+    let expAttsStr =
+        `<span id="${actionVar}StatExpContainer">Stat Modifiers to ${actionObj.isGenerator?"Exp":"Progress"}:<br>`;
 
-    let totalAmount = 1;
-    dataObj.expAtts.forEach(function (attObj) {
+    for(let attObj of dataObj.expAtts) {
         let name = attObj[0];
-        let ratio = attObj[1] * 100 + "%";
         if(!data.atts[name]) {
             console.log("Error - missing stat in initialization: " + name);
         }
-        let amount = ((data.atts[name].mult-1) * attObj[1]) + 1;
-        totalAmount *= amount;
+        queueCache(`${actionVar}StatExpContainer`);
         expAttsStr +=
-            "<b>" + ratio + "</b> of <b>" + capitalizeFirst(name) + "</b>'s bonus = x<b><span id='"+actionVar+"_"+name+"StatExpMult'>" + amount + "</span></b><br>"
-    });
-    expAttsStr += "Total Reduction = 1 / <b><span id='"+actionVar+"StatReductionEffect'>" + totalAmount + "</span></b><br>";
+            `<b>100%</b> of <b>${capitalizeFirst(name)}</b>'s bonus = x<b><span id="${actionVar}_${name}StatExpMult">1</span></b><br>`
+    }
+
+    queueCache(`${actionVar}StatReductionEffect`);
+    expAttsStr +=
+            `Total Reduction = 1 / <b><span id="${actionVar}StatReductionEffect">1</span></b><br>
+        </span>`;
     return expAttsStr;
 }
 
@@ -405,7 +427,6 @@ function createDownStreamSliders(actionObj) {
 
     return theStr;
 }
-
 
 function highlightLine(borderId) {
     const line = document.getElementById(borderId);
@@ -585,6 +606,9 @@ function setSingleCaches() {
     queueCache("killTheLichMenu");
     queueCache("attDisplay");
     queueCache("bonusDisplay");
+    queueCache("killTheLichMenuButton");
+    queueCache("essenceDisplay");
+    queueCache("jobDisplay");
 }
 
 function cacheStatNames() {
@@ -604,9 +628,6 @@ function cacheStatNames() {
 
 function cacheActionViews(actionVar) {
     //cache the created objects
-    view.cached[actionVar + "Container"] = document.getElementById(actionVar + "Container");
-    view.cached[actionVar + "LargeVersionContainer"] = document.getElementById(actionVar + "LargeVersionContainer");
-    view.cached[actionVar + "SmallVersionContainer"] = document.getElementById(actionVar + "SmallVersionContainer");
     view.cached[actionVar + "_downstreamButtonContainer"] = document.getElementById(actionVar + "_downstreamButtonContainer");
     view.cached[actionVar + "_downstreamContainer"] = document.getElementById(actionVar + "_downstreamContainer");
     view.cached[actionVar + "_downstreamMenuButton"] = document.getElementById(actionVar + "_downstreamMenuButton");
@@ -617,7 +638,6 @@ function cacheActionViews(actionVar) {
     view.cached[actionVar + "_storyContainer"] = document.getElementById(actionVar + "_storyContainer");
     view.cached[actionVar + "_storyMenuButton"] = document.getElementById(actionVar + "_storyMenuButton");
     view.cached[actionVar + "ProgressMax"] = document.getElementById(actionVar + "ProgressMax");
-    view.cached[actionVar + "Title"] = document.getElementById(actionVar + "Title");
     view.cached[actionVar + "Container"] = document.getElementById(actionVar + "Container");
     view.cached[actionVar + "LockContainer"] = document.getElementById(actionVar + "LockContainer");
     view.cached[actionVar + "Momentum"] = document.getElementById(actionVar + "Momentum");
@@ -639,7 +659,6 @@ function cacheActionViews(actionVar) {
     view.cached[actionVar + "ExpToLevelIncrease"] = document.getElementById(actionVar + "ExpToLevelIncrease");
     view.cached[actionVar + "Level"] = document.getElementById(actionVar + "Level");
     view.cached[actionVar + "MaxLevel"] = document.getElementById(actionVar + "MaxLevel");
-    view.cached[actionVar + "Level2"] = document.getElementById(actionVar + "Level2");
     view.cached[actionVar + "HighestLevelContainer"] = document.getElementById(actionVar + "HighestLevelContainer");
     view.cached[actionVar + "HighestLevelContainer2"] = document.getElementById(actionVar + "HighestLevelContainer2");
     view.cached[actionVar + "SecondHighestLevelContainer"] = document.getElementById(actionVar + "SecondHighestLevelContainer");
@@ -663,7 +682,6 @@ function cacheActionViews(actionVar) {
     view.cached[actionVar + "Tier"] = document.getElementById(actionVar + "Tier");
     view.cached[actionVar + "Wage"] = document.getElementById(actionVar + "Wage");
     view.cached[actionVar + "MomentumAdded"] = document.getElementById(actionVar + "MomentumAdded");
-    view.cached[actionVar + "StatReductionEffect"] = document.getElementById(actionVar + "StatReductionEffect");
 
 
 
@@ -671,7 +689,6 @@ function cacheActionViews(actionVar) {
     view.cached[actionVar + "RealY"] = document.getElementById(actionVar + "RealY");
 
     view.cached[actionVar+"StatExpertiseContainer"] = document.getElementById(actionVar+"StatExpertiseContainer");
-    view.cached[actionVar+"StatExpContainer"] = document.getElementById(actionVar+"StatExpContainer");
 }
 
 function cacheDownstreamViews(actionVar) {

@@ -40,6 +40,21 @@ function getResourceColor(actionObj) {
     }
 }
 
+function getDimResourceColor(actionObj) {
+    switch (actionObj.momentumName) {
+        case "mana":
+            return "var(--mana-color-dim)";
+        case "gold":
+            return "var(--gold-color-dim)";
+        case "conversations":
+            return "var(--conversations-color-dim)";
+        case "arcana":
+            return "var(--arcana-color-dim)";
+        default: //momentum
+            return "var(--momentum-color-dim)";
+    }
+}
+
 function getStatChanges() {
     let attsPerSecond = {};
 

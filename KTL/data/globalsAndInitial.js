@@ -71,7 +71,6 @@ function debug() {
     if(!isDebug) {
         return;
     }
-    document.getElementById("killTheLichMenuButton").style.display = "";
     data.useAmuletButtonShowing = true;
     data.doneKTL = true;
     data.doneAmulet = true;

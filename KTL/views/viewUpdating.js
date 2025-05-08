@@ -53,12 +53,54 @@ let views = {
         views.updateVal(`${attVar}Name`, color, "style.color")
     },
     updateActions:function() {
+        let resourceAmounts = {};
+
+        for (let actionVar in data.actions) {
+            let actionObj = data.actions[actionVar];
+            let resourceName = actionObj.momentumName;
+            let resourceAmount = actionObj.momentum;
+
+            if (!resourceAmounts[resourceName]) {
+                resourceAmounts[resourceName] = [];
+            }
+
+            resourceAmounts[resourceName].push({
+                id: actionVar,
+                amount: resourceAmount
+            });
+        }
+
+        for (let resourceName in resourceAmounts) {
+            let list = resourceAmounts[resourceName];
+            let maxAmount = Math.max(...list.map(entry => entry.amount));
+
+            for (let entry of list) {
+                let ratio = maxAmount > 0 ? entry.amount / maxAmount : 0;
+                let actionObj = data.actions[entry.id];
+
+                let color = getDimResourceColor(actionObj);
+                views.updateVal(`${entry.id}Container`,`${color} 0px 0px ${Math.floor(ratio * 75)}px ${Math.floor(ratio * 25)}px`,"style.boxShadow");
+                views.updateVal(`${entry.id}LargeVersionContainer`,`inset ${color} 0px 0px ${Math.floor(ratio * 15)}px ${Math.floor(ratio * 5)}px`,"style.boxShadow");
+                // views.updateVal(`${entry.id}SmallVersionContainer`,`inset ${getResourceColor(actionObj)} 0px 0px ${Math.min(ratio * 15)}px ${Math.min(ratio * 5)}px`,"style.boxShadow");
+            }
+        }
+
         for(let actionVar in data.actions) {
-            views.updateAction(actionVar);
+            let actionObj = data.actions[actionVar];
+            views.updateAction(actionObj);
+
+            //An action has actionObj.momentumName, which is the name of the resource.
+            //An action has actionObj.momentum, which is the amount of the resource (regardless of name)
+            //for each action, add the resource to an object of lists called resourceAmounts, aka resourceAmounts.momentum = [], resourceAmounts.gold = [] (instantiate based on momentumName if not found)
+            //for each list
+            //figure out the ratio of the max that each action is to its resource (i.e. if it has 50% of all gold, it should be .5)
+            //use this update method to change the box-shadow
+
+            // views.updateVal(`${actionVar}Container`, `${getResourceColor(actionObj)} 0px 0px 100px ${ratio*100}px`, "style.boxShadow");
         }
     },
-    updateAction:function(actionVar) {
-        let actionObj = data.actions[actionVar];
+    updateAction:function(actionObj) {
+        let actionVar = actionObj.actionVar;
 
         //Handle visibility
         if(!views.updateActionVisibility(actionObj)) {
@@ -90,7 +132,7 @@ let views = {
 
         let miniVersion = scale < .35;
         views.updateVal(`${actionVar}LargeVersionContainer`, !miniVersion?"":"none", "style.display");
-        views.updateVal(`${actionVar}Container`, !miniVersion?"":"none", "style.display");
+        // views.updateVal(`${actionVar}Container`, !miniVersion?"":"none", "style.display");
         views.updateVal(`${actionVar}SmallVersionContainer`, miniVersion?"":"none", "style.display");
         views.updateVal(`${actionVar}SmallVersionContainer`, (1 / scale)*.8+"", "style.scale");
 
@@ -364,38 +406,37 @@ function updateUpgradeView(upgradeVar) {
 
 function updateGlobals() {
     let totalMometum = 0;
-    data.actionNames.forEach(function(actionVar) {
+    for(let actionVar in data.actions) {
         let actionObj = data.actions[actionVar];
         if(actionObj.momentumName === "momentum" && gameStateMatches(actionObj)) {
             totalMometum += actionObj.momentum;
         }
-    });
+    }
     data.totalMomentum = totalMometum;
-    view.cached.totalMomentum.innerText = intToString(totalMometum, 1);
-    if(view.cached.killTheLichMenu.style.display !== "none") { //only update if menu is open
-        view.cached.totalMomentum2.innerText = intToString(totalMometum, 1);
+
+    views.updateVal(`totalMomentum`, totalMometum, "innerText", 1);
+
+    if(KTLMenuOpen) { //only update if menu is open
+        views.updateVal(`totalMomentum2`, totalMometum, "innerText", 1);
     }
 
-    let toShowAmulet = data.useAmuletButtonShowing && data.gameState === "KTL" ? "" : "none";
+    let toShowKTLButton = data.gameState !== "KTL" && (data.doneKTL || data.actions.hearAboutTheLich.level >= 1);
+    views.updateVal(`killTheLichMenuButton`, toShowKTLButton ? "" : "none", "style.display");
 
-    if(view.cached.openUseAmuletButton.style.display !== toShowAmulet) {
-        view.cached.openUseAmuletButton.style.display = toShowAmulet;
-    }
-    let toViewAmulet = data.doneKTL && data.gameState !== "KTL" ? "" : "none";
-    if(view.cached.openViewAmuletButton.style.display !== toViewAmulet) {
-        view.cached.openViewAmuletButton.style.display = toViewAmulet;
-    }
-    if(view.cached.secondsPerReset.innerText !== secondsToTime(data.secondsPerReset)) {
-        view.cached.secondsPerReset.innerText = secondsToTime(data.secondsPerReset);
-    }
-    if(view.cached.essence.innerText !== intToString(data.essence, 1)) {
-        view.cached.essence.innerText = intToString(data.essence, 1);
-        view.cached.essence2.innerText = intToString(data.essence, 1);
-    }
+    let toShowUseAmulet = data.useAmuletButtonShowing && data.gameState === "KTL" ? "" : "none";
+    views.updateVal(`openUseAmuletButton`, toShowUseAmulet ? "" : "none", "style.display");
 
-    if(view.cached.bonusTime.innerText !== secondsToTime(bonusTime/1000, 1)) {
-        view.cached.bonusTime.innerText = secondsToTime(bonusTime/1000, 1);
-    }
+    let toViewAmulet = data.doneAmulet && data.gameState !== "KTL" ? "" : "none";
+    views.updateVal(`openViewAmuletButton`, toViewAmulet ? "" : "none", "style.display");
+    views.updateVal(`essenceDisplay`, toViewAmulet ? "" : "none", "style.display");
+
+    views.updateVal(`jobDisplay`, data.displayJob ? "" : "none", "style.display");
+
+    views.updateVal(`secondsPerReset`, data.secondsPerReset, "innerText","time");
+    views.updateVal(`bonusTime`, bonusTime/1000, "innerText", "time");
+
+    views.updateVal(`essence`, data.essence, "innerText", 1);
+    views.updateVal(`essence2`, data.essence, "innerText", 1);
 }
 
 //Save a second copy of all the data after a view update, so it can request updates only for the ones that are different

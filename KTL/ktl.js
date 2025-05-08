@@ -1,9 +1,9 @@
 
-
+let KTLMenuOpen = false;
 function openKTLMenu() {
     document.getElementById('confirmKTL').checked = false;
-    let isShowing = view.cached.killTheLichMenu.style.display !== "none";
-    view.cached.killTheLichMenu.style.display = isShowing ? "none" : "flex";
+    KTLMenuOpen = !KTLMenuOpen;
+    view.cached.killTheLichMenu.style.display = KTLMenuOpen ? "flex" : "none";
 }
 
 function initializeKTL() {
@@ -22,7 +22,6 @@ function initializeKTL() {
     });
 
     data.actions.overclockTargetingTheLich.momentum = data.totalMomentum;
-    document.getElementById("killTheLichMenuButton").style.display = "none";
     view.cached.openUseAmuletButton.style.display = "";
     document.getElementById("essenceDisplay").style.display = "";
     forceVisuals = true;
@@ -96,6 +95,5 @@ function useAmulet() {
     data.currentWage = 1;
     data.gameState = "default";
     data.useAmuletButtonShowing = false;
-    document.getElementById("killTheLichMenuButton").style.display = "";
     forceVisuals = true;
 }

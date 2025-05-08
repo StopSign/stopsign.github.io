@@ -372,16 +372,14 @@ let selectedStat = null;
 function clickedAttName(attName) {
     //clear all borders
     data.actionNames.forEach(function (actionVar) {
-        if (view.cached[actionVar + "LargeVersionContainer"].style.borderColor !== "black") {
-            view.cached[actionVar + "LargeVersionContainer"].style.borderColor = "black";
-            view.cached[actionVar + "LockContainer"].style.borderColor = "black";
-            view.cached[actionVar + "SmallVersionContainer"].style.border = "";
-        }
+        views.updateVal(`${actionVar}LargeVersionContainer`, "black", "style.borderColor");
+        views.updateVal(`${actionVar}LockContainer`, "black", "style.borderColor");
+        views.updateVal(`${actionVar}SmallVersionContainer`, "", "style.border");
     })
 
     //clear previous
     if (selectedStat) {
-        view.cached[selectedStat + "AttContainer"].style.border = "";
+        views.updateVal(`${selectedStat}AttContainer`, "", "style.border");
     }
     if (selectedStat === attName) {
         //clicked the same, so clear and return
@@ -424,9 +422,9 @@ function clickedAttName(attName) {
         else if (expAttUsed) color = "var(--attribute-use-exp-color)";
         else if (effAttUsed) color = "var(--attribute-use-eff-color)";
 
-        view.cached[actionVar + "LargeVersionContainer"].style.borderColor = color;
-        view.cached[actionVar + "LockContainer"].style.borderColor = color;
-        view.cached[actionVar + "SmallVersionContainer"].style.border = "2px solid " + color;
+        views.updateVal(`${actionVar}LargeVersionContainer`, color, "style.borderColor");
+        views.updateVal(`${actionVar}LockContainer`, color, "style.borderColor");
+        views.updateVal(`${actionVar}SmallVersionContainer`, "2px solid " + color, "style.border");
     }
 
     //Change all relevant OutsideContainers to change background color to fill in, if selected

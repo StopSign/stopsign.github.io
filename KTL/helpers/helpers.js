@@ -239,6 +239,19 @@ function isVisible(obj) {
     return obj.offsetWidth > 0 && obj.offsetHeight > 0;
 }
 
+//#ffdd00 -> [r, g, b]
+function hexToRgb(hex) {
+    hex = hex.replace("#", "");
+    if (hex.length === 3) {
+        hex = hex.split("").map(c => c + c).join("");
+    }
+    let bigint = parseInt(hex, 16);
+    let r = (bigint >> 16) & 255;
+    let g = (bigint >> 8) & 255;
+    let b = bigint & 255;
+    return [r, g, b];
+}
+
 const factorials = [];
 function factorial(n) {
     if (n === 0 || n === 1)

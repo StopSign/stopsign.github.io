@@ -4,6 +4,7 @@
     --text-bright: #f4f5f9;
     --text-primary: #cdd6f4;
     --text-muted: #a6adc8;
+    --text-extra-muted: #9397b5;
     --text-dark: #020931;
     --button-text: #252836;
     --accent-primary: #4a90e2;
@@ -35,14 +36,20 @@
     --upgrade-bought-color:#00ff39;
     --upgrade-disabled-color:#808080;
 
-    --exp-color:#7b5fc1;
     --momentum-color:#007BFF;
+    --momentum-color-dim: rgba(0, 123, 255, 0.5);
+    --exp-color:#7b5fc1;
+    --exp-color-dim: rgba(123, 95, 193, 0.5);
     --mana-color: #0c20d4;
+    --mana-color-dim: rgba(12, 32, 212, 0.5);
     --gold-color: #a99102;
-    --wage-color: #ffdd00;
+    --gold-color-dim: rgba(169, 145, 2, 0.5);
     --conversations-color: #429977;
+    --conversations-color-dim: rgba(66, 153, 119, 0.5);
     --arcana-color: #c620f5;
-    --fear-color: #D5171BFF;
+    --arcana-color-dim: rgba(198, 32, 245, 0.5);
+
+    --wage-color: #ffdd00;
 }
 
 body.lightMode {
@@ -50,7 +57,8 @@ body.lightMode {
     --bg-secondary: #bbd6e6;
     --text-bright: #f4f5f9;
     --text-primary: #000000;
-    --text-muted: #4a4e69;
+    --text-muted: #3a3c56;
+    --text-extra-muted: #50546b;
     --text-dark: #020931;
     --button-text: #4a4e69;
     --accent-primary: #3acbf7;
@@ -81,14 +89,20 @@ body.lightMode {
     --upgrade-bought-color:#00ff39;
     --upgrade-disabled-color:#808080;
 
-    --exp-color:#b79df8;
     --momentum-color:#00E1FF;
+    --momentum-color-dim: rgba(0, 225, 255, 0.5);
+    --exp-color:#b79df8;
+    --exp-color-dim: rgba(183, 157, 248, 0.5);
     --mana-color:#74c7ec;
+    --mana-color-dim: rgba(116, 199, 236, 0.5);
     --gold-color:#FFD700;
-    --wage-color: #ffdd00;
+    --gold-color-dim: rgba(255, 215, 0, 0.5);
     --conversations-color: #c8fff4;
+    --conversations-color-dim: rgba(200, 255, 244, 0.5);
     --arcana-color:#c620f5;
-    --fear-color: #D5171BFF;
+    --arcana-color-dim: rgba(198, 32, 245, 0.5);
+
+    --wage-color: #ffdd00;
 }
 
 body {
@@ -277,6 +291,8 @@ input {
     background-color: var(--bg-secondary);
     cursor:pointer;
     color: var(--text-primary);
+    border-radius:2px;
+    padding:2px;
 }
 .buttonSimple:hover {
     background-color: var(--border-color);

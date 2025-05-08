@@ -628,10 +628,7 @@ let actionData = {
         unlockCost:100, maxLevel:1,
         visible:false, unlocked:false, purchased: true,
         onLevelCustom: function() {
-            //enable the reset menu on first level
-            if(document.getElementById("killTheLichMenuButton").style.display === "none") {
-                document.getElementById("killTheLichMenuButton").style.display = "";
-            }
+            //Auto-shows KTL button on level via view updates
         },
         onLevelAtts:[["integration", 20]],
         expAtts:[],

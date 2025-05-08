@@ -113,7 +113,7 @@ Things that are not reloading properly:
     }
 
     if(data.doneKTL || (data.gameState !== "KTL" && data.actions.hearAboutTheLich && data.actions.hearAboutTheLich.level >= 1)) {
-        document.getElementById("killTheLichMenuButton").style.display = "";
+        views.updateVal(`killTheLichMenuButton`, "", "style.display");
     }
     if(data.doneAmulet) {
         document.getElementById("openViewAmuletButton").style.display = "";
