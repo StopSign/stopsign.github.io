@@ -1,3 +1,24 @@
+Developer Guide:
+
+To create a new div element:
+1. Create it in viewCreate
+2. Where you create it, use queueCache(id)
+3. In the relevant update method, use:
+- views.updateVal(id, newVal, "style.color")
+- views.updateVal(id, newVal, "style.display")
+- views.updateVal(id, newVal, "innerText", 1)
+- views.updateVal(id, newVal, "innerText", "time")
+
+
+
+
+
+
+
+
+
+
+
 TODO:
 
 1.2^10 = 6.2

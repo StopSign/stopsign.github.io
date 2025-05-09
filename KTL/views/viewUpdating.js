@@ -209,17 +209,17 @@ let views = {
             views.updateVal(`${actionVar}PrevUnlockTime`, secondsToTime(actionObj.prevUnlockTime), "innerText", "time");
 
 
-            views.updateVal(`${actionVar}StatExpContainer`, actionObj.expAtts.length > 0 ? "" : "none", "style.display");
-            views.updateVal(`${actionVar}StatExpertiseContainer`, actionObj.efficiencyAtts.length > 0 ? "" : "none", "style.display");
+            views.updateVal(`${actionVar}AttExpContainer`, actionObj.expAtts.length > 0 ? "" : "none", "style.display");
+            views.updateVal(`${actionVar}AttEfficiencyContainer`, actionObj.efficiencyAtts.length > 0 ? "" : "none", "style.display");
 
             actionObj.expAtts.forEach(function(expStat) {
                 let attVar = expStat[0];
-                views.updateVal(actionVar + "_" + attVar + "StatExpMult", actionObj[attVar + "StatExpMult"], "innerText", 3);
+                views.updateVal(actionVar + "_" + attVar + "AttExpMult", actionObj[attVar + "AttExpMult"], "innerText", 3);
             });
 
             actionObj.efficiencyAtts.forEach(function(efficiencyStat) {
                 let attVar = efficiencyStat[0];
-                views.updateVal(actionVar + "_" + attVar + "StatExpertiseMult", actionObj[attVar + "StatExpertiseMult"], "innerText", 3);
+                views.updateVal(actionVar + "_" + attVar + "AttEfficiencyMult", actionObj[attVar + "AttEfficiencyMult"], "innerText", 3);
             });
 
 
@@ -252,8 +252,8 @@ let views = {
         }
 
         if(actionObj.currentMenu === "atts") {
-            roundedNumbers.push(["statReductionEffect", 3]);
-            roundedNumbers.push(["expertiseMult", 3]);
+            roundedNumbers.push(["attReductionEffect", 3]);
+            roundedNumbers.push(["efficiencyMult", 3]);
             roundedNumbers.push(["highestLevel", 1]);
             roundedNumbers.push(["secondHighestLevel", 1]);
             roundedNumbers.push(["thirdHighestLevel", 1]);
@@ -266,7 +266,7 @@ let views = {
         }
         roundedNumbers.push(["totalSend", 3]);
         roundedNumbers.push(["prevUnlockTime", 1]);
-        roundedNumbers.push(["expertiseBase", 2]);
+        roundedNumbers.push(["efficiencyBase", 2]);
         roundedNumbers.push(["level2", 1]);
         roundedNumbers.push(["progressMaxIncrease", "none"]);
         roundedNumbers.push(["expToLevelIncrease", "none"]);
@@ -465,25 +465,25 @@ function hasDownstreamVisible(actionObj) {
 //     let actionVar = actionObj.actionVar;
 //
 //     if(actionObj.expAtts.length > 0) {
-//         if(view.cached[actionVar+"StatExpContainer"].style.display === "none") {
-//             view.cached[actionVar+"StatExpContainer"].style.display = "";
+//         if(view.cached[actionVar+"AttExpContainer"].style.display === "none") {
+//             view.cached[actionVar+"AttExpContainer"].style.display = "";
 //         }
 //         actionObj.expAtts.forEach(function(expStat) {
 //             let attVar = expStat[0];
-//             if(forceUpdate || intToString(prevAction[attVar+"StatExpMult"], 3) !== intToString(actionObj[attVar+"StatExpMult"], 3)) {
-//                 view.cached[actionVar + "_" + attVar + "StatExpMult"].innerText = intToString(actionObj[attVar + "StatExpMult"], 3);
+//             if(forceUpdate || intToString(prevAction[attVar+"AttExpMult"], 3) !== intToString(actionObj[attVar+"AttExpMult"], 3)) {
+//                 view.cached[actionVar + "_" + attVar + "AttExpMult"].innerText = intToString(actionObj[attVar + "AttExpMult"], 3);
 //             }
 //         });
 //     }
 //
 //     if(actionObj.efficiencyAtts.length > 0) {
-//         if(view.cached[actionVar+"StatExpertiseContainer"].style.display === "none") {
-//             view.cached[actionVar+"StatExpertiseContainer"].style.display = "";
+//         if(view.cached[actionVar+"AttEfficiencyContainer"].style.display === "none") {
+//             view.cached[actionVar+"AttEfficiencyContainer"].style.display = "";
 //         }
 //         actionObj.efficiencyAtts.forEach(function(efficiencyStat) {
 //             let attVar = efficiencyStat[0];
-//             if(forceUpdate || intToString(prevAction[attVar+"StatExpertiseMult"], 3) !== intToString(actionObj[attVar+"StatExpertiseMult"], 3)) {
-//                 view.cached[actionVar + "_" + attVar + "StatExpertiseMult"].innerText = intToString(actionObj[attVar + "StatExpertiseMult"], 3);
+//             if(forceUpdate || intToString(prevAction[attVar+"AttEfficiencyMult"], 3) !== intToString(actionObj[attVar+"AttEfficiencyMult"], 3)) {
+//                 view.cached[actionVar + "_" + attVar + "AttEfficiencyMult"].innerText = intToString(actionObj[attVar + "AttEfficiencyMult"], 3);
 //             }
 //         });
 //     }

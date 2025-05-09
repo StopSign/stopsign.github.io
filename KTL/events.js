@@ -514,4 +514,5 @@ function toggleBonusSpeed() {
 
 function changeBonusSpeed(num) {
     data.options.bonusRate = num;
+    bonusSpeed = data.options.bonusRate;
 }

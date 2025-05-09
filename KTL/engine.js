@@ -56,10 +56,10 @@ function actionSetBaseVariables(actionObj, dataObj) {
 
     actionObj.isRunning = !dataObj.isKTL; //for controlling whether time affects it
     actionObj.onLevelAtts = dataObj.onLevelAtts ? dataObj.onLevelAtts : [];
-    actionObj.expertiseBase = dataObj.expertiseBase ? dataObj.expertiseBase : 1; //1 = 100%
-    actionObj.expertiseMult = dataObj.expertiseMult ? dataObj.expertiseMult : 1;
-    actionObj.expertise = actionObj.expertiseBase * actionObj.expertiseMult; //the initial and the multiplier (increases on stat add)
-    actionObj.statReductionEffect = 1;
+    actionObj.efficiencyBase = dataObj.efficiencyBase ? dataObj.efficiencyBase : 1; //1 = 100%
+    actionObj.efficiencyMult = dataObj.efficiencyMult ? dataObj.efficiencyMult : 1;
+    actionObj.expertise = actionObj.efficiencyBase * actionObj.efficiencyMult; //the initial and the multiplier (increases on stat add)
+    actionObj.attReductionEffect = 1;
     actionObj.efficiencyMax = dataObj.efficiencyMax ? dataObj.efficiencyMax : 200;
     actionObj.efficiency = actionObj.expertise > dataObj.efficiencyMax  ? dataObj.efficiencyMax : actionObj.expertise * 100;
 
@@ -134,10 +134,10 @@ function createAndLinkNewAction(actionVar, dataObj, title, x, y, downstreamVars)
                 return;
             }
             let effect = ((data.atts[name].mult-1) * ratio) + 1; //10% of x2.5 -> .15
-            actionObj[name+"StatExpMult"] = effect; //
+            actionObj[name+"AttExpMult"] = effect; //
             totalEffect *= effect;
         })
-        actionObj.statReductionEffect = totalEffect;
+        actionObj.attReductionEffect = totalEffect;
         if(actionObj.isGenerator) {
             actionObj.expToLevelMult = 1/totalEffect;
             actionObj.expToLevel = actionObj.expToLevelBase * actionObj.expToLevelMult;
@@ -147,7 +147,7 @@ function createAndLinkNewAction(actionVar, dataObj, title, x, y, downstreamVars)
         }
     }
     actionObj.calcStatExpertise = function() {
-        actionObj.expertiseMult = 1;
+        actionObj.efficiencyMult = 1;
         actionObj.efficiencyAtts.forEach(function(expertiseStat) {
             let name = expertiseStat[0];
             let ratio = expertiseStat[1];
@@ -156,10 +156,10 @@ function createAndLinkNewAction(actionVar, dataObj, title, x, y, downstreamVars)
                 return;
             }
             let effect = ((data.atts[name].mult-1) * ratio) + 1;
-            actionObj[name+"StatExpertiseMult"] = effect;
-            actionObj.expertiseMult *= effect;
+            actionObj[name+"AttEfficiencyMult"] = effect;
+            actionObj.efficiencyMult *= effect;
         })
-        actionObj.expertise = actionObj.expertiseBase * actionObj.expertiseMult;
+        actionObj.expertise = actionObj.efficiencyBase * actionObj.efficiencyMult;
         actionObj.efficiency = actionObj.expertise > 1 ? 100 : actionObj.expertise * 100;
     }
     actionObj.tierMult = function() {
