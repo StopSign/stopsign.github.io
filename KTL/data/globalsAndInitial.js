@@ -30,7 +30,6 @@ prevState.atts = {};
 //Game globals - these initializations will be overriden in load
 let data = {};
 data.actions = {};
-data.actionNames = [];
 data.atts = {};
 data.attNames = [];
 data.toastStates = []; // array of toast objects: {id, state, element}
@@ -258,17 +257,14 @@ Travel and Emotions:
 }
 
 function setParents() {
-    data.actionNames.forEach(function(actionVar) {
-        if(!data.actions[actionVar].downstreamVars) {
-            return;
-        }
-        data.actions[actionVar].downstreamVars.forEach(function(downVar) {
-            if(!data.actions[downVar]) {
-                return;
+    for(let actionVar in data.actions) {
+        let actionObj = data.actions[actionVar];
+        for(let downstreamVar of actionObj.downstreamVars) {
+            if(data.actions[downstreamVar]) {
+                data.actions[downstreamVar].parent = actionVar;
             }
-            data.actions[downVar].parent = actionVar;
-        })
-    });
+        }
+    }
 }
 
 let check = 0;

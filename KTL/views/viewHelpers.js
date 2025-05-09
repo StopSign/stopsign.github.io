@@ -58,7 +58,7 @@ function getDimResourceColor(actionObj) {
 function getStatChanges() {
     let attsPerSecond = {};
 
-    data.actionNames.forEach(actionVar => {
+    for(let actionVar in data.actions) {
         let actionObj = data.actions[actionVar];
 
         // Calculate levels per second
@@ -75,6 +75,6 @@ function getStatChanges() {
             }
             attsPerSecond[stat] += amount * levelsPerSecond;
         });
-    });
+    }
     return attsPerSecond;
 }

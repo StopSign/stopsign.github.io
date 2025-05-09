@@ -126,15 +126,15 @@ function secondPassed() {
 
 
 function gameTick() {
-    data.actionNames.forEach(function(actionVar) {
+    for(let actionVar in data.actions) {
         let actionObj = data.actions[actionVar];
         actionObj.momentumDelta = 0; //reset
         actionObj.momentumIncrease = 0; //reset
-    });
+    }
     //prev must conclude first
-    data.actionNames.forEach(function(actionVar) {
+    for(let actionVar in data.actions) {
         tickGameObject(actionVar);
-    });
+    }
     //check once more for any that need to be leveled from other's stat improvements
     for(let actionVar in data.actions) {
         let actionObj = data.actions[actionVar];
@@ -145,26 +145,19 @@ function gameTick() {
     for (let actionVar in data.actions) {
         const actionObj = data.actions[actionVar];
 
-        if (!actionObj.downstreamVars) continue;
-
-        actionObj.downstreamVars.forEach(function (downstreamVar) {
+        for(let downstreamVar of actionObj.downstreamVars) {
             if (isAttentionLine(actionVar, downstreamVar)) {
                 const key = downstreamVar + "AttentionMult";
                 if(data.upgrades.rememberWhatIFocusedOn.upgradePower === 0) {
-                    return;
+                    continue;
                 }
                 actionObj[key] += 1 / ticksPerSecond / 3600;
                 if(actionObj[key] > data.attentionLoopMax) {
                     actionObj[key] = data.attentionLoopMax;
                 }
             }
-        });
+        }
     }
-    //To get change/s
-    //loop through all actions (data.actionNames is an [] with names, data.actions has the objects. actionObj = data.actions[actionNames[0]] for example)
-    //have attsPerSecond = {"charm":num, "curiosity":num, ...}
-    //for each, add their (actionObj.efficiencyAtts amount (e.g. [["charm", .1], ["curiosity", .1]]) multiplied by levels/s) to the relevant stat in attsPerSecond
-    //to get levels/s, the action gets (actionProgressRate(actionObj)/actionObj.progressMax) = completes/s, and then (complete/s * actionObj.expToAdd / actionObj.expToLevel) = level/s
 
     let attsPerSecond = getStatChanges();
     data.attNames.forEach(function(attName) {

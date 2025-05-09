@@ -35,6 +35,7 @@ function actionSetBaseVariables(actionObj, dataObj) {
     actionObj.level = 0;
     actionObj.maxLevel = dataObj.maxLevel ? dataObj.maxLevel : -1;
     actionObj.exp = 0;
+    actionObj.expGain = 0;
     actionObj.expToLevelBase = dataObj.expToLevelBase ? dataObj.expToLevelBase : 1;
     actionObj.expToLevelMult = dataObj.expToLevelMult ? dataObj.expToLevelMult : 1;
     actionObj.expToLevel = actionObj.expToLevelBase * actionObj.expToLevelMult; //can be divided
@@ -101,7 +102,6 @@ function actionSetInitialVariables(actionObj, dataObj) {
 
 //function createAndLinkNewAction(actionVar, expToLevelIncrease, actionPowerMultIncrease, progressMaxIncrease, progressMax, expToLevel, unlockCost, title, x, y, downstreamVars, tier, dataObj) {
 function createAndLinkNewAction(actionVar, dataObj, title, x, y, downstreamVars) {
-    data.actionNames.push(actionVar);
     data.actions[actionVar] = {};
 
     let actionObj = data.actions[actionVar];
@@ -260,11 +260,11 @@ function actionResetToBase(actionVar) {
 }
 
 function actionUpdateAllStatMults() {
-    data.actionNames.forEach(function (actionVar) {
-        let obj = data.actions[actionVar];
-        obj.calcStatMult();
-        obj.calcStatExpertise();
-    })
+    for(let actionVar in data.actions) {
+        let actionObj = data.actions[actionVar];
+        actionObj.calcStatMult();
+        actionObj.calcStatExpertise();
+    }
 }
 
 //prepares the action to be unlocked during hte loop next round

@@ -320,8 +320,10 @@ function clickActionMenu(actionVar, menuVar, isLoad) {
     }
 
     if(actionObj.currentMenu && !isLoad) {
-        view.cached[actionVar + "_" + actionObj.currentMenu + "Container"].style.display = "none";
-        view.cached[actionVar + "_" + actionObj.currentMenu + "MenuButton"].style.removeProperty("background-color");
+        // view.cached[actionVar + "_" + actionObj.currentMenu + "MenuButton"].style.removeProperty("background-color");
+
+        views.updateVal(`${actionVar}_${actionObj.currentMenu}Container`, "none", "style.display");
+        views.updateVal(`${actionVar}_${actionObj.currentMenu}MenuButton`, "", "style.backgroundColor");
     }
 
     if(actionObj.currentMenu === menuVar && !isLoad) {
@@ -329,8 +331,8 @@ function clickActionMenu(actionVar, menuVar, isLoad) {
         return;
     }
 
-    view.cached[actionVar + "_" + menuVar + "Container"].style.display = "";
-    view.cached[actionVar + "_" + menuVar + "MenuButton"].style.backgroundColor = "var(--selection-color)";
+    views.updateVal(`${actionVar}_${menuVar}Container`, "", "style.display");
+    views.updateVal(`${actionVar}_${menuVar}MenuButton`, "var(--selection-color)", "style.backgroundColor");
 
     data.actions[actionVar].currentMenu = menuVar;
 }
@@ -371,11 +373,11 @@ function clickMenuButton() {
 let selectedStat = null;
 function clickedAttName(attName) {
     //clear all borders
-    data.actionNames.forEach(function (actionVar) {
+    for(let actionVar in data.actions) {
         views.updateVal(`${actionVar}LargeVersionContainer`, "black", "style.borderColor");
         views.updateVal(`${actionVar}LockContainer`, "black", "style.borderColor");
         views.updateVal(`${actionVar}SmallVersionContainer`, "", "style.border");
-    })
+    }
 
     //clear previous
     if (selectedStat) {

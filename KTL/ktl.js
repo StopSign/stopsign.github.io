@@ -14,12 +14,12 @@ function initializeKTL() {
     view.cached.killTheLichMenu.style.display = "none";
 
     data.gameState = "KTL";
-    data.actionNames.forEach(function(actionVar) {
+    for(let actionVar in data.actions) {
         let actionObj = data.actions[actionVar];
 
         actionObj.isRunning = actionObj.isKTL;
         actionObj.visible = actionObj.isKTL;
-    });
+    }
 
     data.actions.overclockTargetingTheLich.momentum = data.totalMomentum;
     view.cached.openUseAmuletButton.style.display = "";
@@ -57,7 +57,7 @@ function useAmulet() {
     //set overclock to the upgrade-relevant %
 
     //For each action, reset the base atts and set max level
-    data.actionNames.forEach(function(actionVar) {
+    for(let actionVar in data.actions) {
         let actionObj = data.actions[actionVar];
         let newLevel = actionObj.level;
         actionObj.prevUnlockTime = actionObj.unlockTime;
@@ -87,7 +87,7 @@ function useAmulet() {
 
             actionObj[downstreamVar + "AttentionMult"] = (currentMult - 1) * [0, .2, .5, .9, 1][data.upgrades.knowWhatIFocusedOn.upgradePower] + 1;
         });
-    });
+    }
 
     setSliderUI("overclock", "harnessOverflow", getUpgradeSliderAmount());
     data.secondsPerReset = 0;

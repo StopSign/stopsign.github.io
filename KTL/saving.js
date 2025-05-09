@@ -20,8 +20,8 @@ function load() {
 
     if(isLoadingEnabled && window.localStorage[saveName] && JSON.parse(window.localStorage[saveName]).data) { //has a save file
         toLoad = JSON.parse(window.localStorage[saveName]).data;
-        // data.actionNames.forEach(function (actionVar) {
-        //     let actionObj = data.actions[actionVar];
+        // for(let actionVar in data.actions) {
+            //     let actionObj = data.actions[actionVar];
         //     Object.keys(toLoad.actions[actionVar]).forEach(function (key) {
         //         if(["x", "y"].indexOf(key) !== -1) {
         //             return;
@@ -72,17 +72,17 @@ function load() {
 
     //set UI elements after both data and UI have been loaded
     //set sliders
-    data.actionNames.forEach(function (actionVar) {
+    for(let actionVar in data.actions) {
         let actionObj = data.actions[actionVar];
-        actionObj.downstreamVars.forEach(function (downVar) {
-            if (!document.getElementById(actionVar + "NumInput" + downVar)
+        for(let downstreamVar of actionObj.downstreamVars) {
+            if (!document.getElementById(actionVar + "NumInput" + downstreamVar)
                 || !toLoad.actions || !toLoad.actions[actionVar] ||
-                toLoad.actions[actionVar]["downstreamRate" + downVar] === undefined) {
-                return;
+                toLoad.actions[actionVar]["downstreamRate" + downstreamVar] === undefined) {
+                continue;
             }
-            setSliderUI(actionVar, downVar, toLoad.actions[actionVar]["downstreamRate" + downVar]);
-        });
-    });
+            setSliderUI(actionVar, downstreamVar, toLoad.actions[actionVar]["downstreamRate" + downstreamVar]);
+        }
+    }
 
     recalcInterval(data.options.updateRate);
 }

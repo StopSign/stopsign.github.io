@@ -76,6 +76,9 @@ let views = {
 
             for (let entry of list) {
                 let ratio = maxAmount > 0 ? entry.amount / maxAmount : 0;
+                if(maxAmount < 100) {
+                    ratio *= maxAmount/100; //scale first 100 smoother.
+                }
                 let actionObj = data.actions[entry.id];
 
                 let color = getDimResourceColor(actionObj);
@@ -132,7 +135,6 @@ let views = {
 
         let miniVersion = scale < .35;
         views.updateVal(`${actionVar}LargeVersionContainer`, !miniVersion?"":"none", "style.display");
-        // views.updateVal(`${actionVar}Container`, !miniVersion?"":"none", "style.display");
         views.updateVal(`${actionVar}SmallVersionContainer`, miniVersion?"":"none", "style.display");
         views.updateVal(`${actionVar}SmallVersionContainer`, (1 / scale)*.8+"", "style.scale");
 
@@ -212,16 +214,15 @@ let views = {
             views.updateVal(`${actionVar}AttExpContainer`, actionObj.expAtts.length > 0 ? "" : "none", "style.display");
             views.updateVal(`${actionVar}AttEfficiencyContainer`, actionObj.efficiencyAtts.length > 0 ? "" : "none", "style.display");
 
-            actionObj.expAtts.forEach(function(expStat) {
-                let attVar = expStat[0];
-                views.updateVal(actionVar + "_" + attVar + "AttExpMult", actionObj[attVar + "AttExpMult"], "innerText", 3);
-            });
+            for(let expAtt of actionObj.expAtts) {
+                let attVar = expAtt[0];
+                views.updateVal(`${actionVar}_${attVar}AttExpMult`, actionObj[`${attVar}AttExpMult`], "innerText", 3);
+            }
 
-            actionObj.efficiencyAtts.forEach(function(efficiencyStat) {
+            for(let efficiencyStat of actionObj.efficiencyAtts) {
                 let attVar = efficiencyStat[0];
-                views.updateVal(actionVar + "_" + attVar + "AttEfficiencyMult", actionObj[attVar + "AttEfficiencyMult"], "innerText", 3);
-            });
-
+                views.updateVal(`${actionVar}_${attVar}AttEfficiencyMult`, actionObj[`${attVar}AttEfficiencyMult`], "innerText", 3);
+            }
 
         }
 
@@ -236,8 +237,9 @@ let views = {
 
         let roundedNumbers = [
             ["progress", 2], ["progressMax", 2], ["progressGain", 2],
-            ["momentum", 2], ["momentumDelta", 2], ["level", 1], ["tier", 1],
-            ["exp", 2], ["expToLevel", 2], ["expToAdd", 2], ["momentumIncrease", 3], ["momentumDecrease", 3],
+            ["momentum", 2], ["momentumDelta", 2], ["level", 1],
+            ["exp", 2], ["expToLevel", 2], ["expToAdd", 2], ["expToAdd2", 2],
+            ["momentumIncrease", 3], ["momentumDecrease", 3],
             ["highestLevel2", 1]
         ];
         // if(actionObj.isGenerator) { //TODO
@@ -451,40 +453,10 @@ function updateViewOnSecond() {
 }
 
 function hasDownstreamVisible(actionObj) {
-    let visibleFound = false;
-    actionObj.downstreamVars.forEach(function(downVar) {
-        if(!data.actions[downVar] || !data.actions[downVar].visible) {
-            return;
+    for(let downstreamVar of actionObj.downstreamVars) {
+        if(data.actions[downstreamVar] && data.actions[downstreamVar].visible) {
+            return true;
         }
-        visibleFound = true;
-    });
-    return visibleFound;
+    }
+    return false;
 }
-
-// function updateActionStatsViews(actionObj, prevAction, forceUpdate) {
-//     let actionVar = actionObj.actionVar;
-//
-//     if(actionObj.expAtts.length > 0) {
-//         if(view.cached[actionVar+"AttExpContainer"].style.display === "none") {
-//             view.cached[actionVar+"AttExpContainer"].style.display = "";
-//         }
-//         actionObj.expAtts.forEach(function(expStat) {
-//             let attVar = expStat[0];
-//             if(forceUpdate || intToString(prevAction[attVar+"AttExpMult"], 3) !== intToString(actionObj[attVar+"AttExpMult"], 3)) {
-//                 view.cached[actionVar + "_" + attVar + "AttExpMult"].innerText = intToString(actionObj[attVar + "AttExpMult"], 3);
-//             }
-//         });
-//     }
-//
-//     if(actionObj.efficiencyAtts.length > 0) {
-//         if(view.cached[actionVar+"AttEfficiencyContainer"].style.display === "none") {
-//             view.cached[actionVar+"AttEfficiencyContainer"].style.display = "";
-//         }
-//         actionObj.efficiencyAtts.forEach(function(efficiencyStat) {
-//             let attVar = efficiencyStat[0];
-//             if(forceUpdate || intToString(prevAction[attVar+"AttEfficiencyMult"], 3) !== intToString(actionObj[attVar+"AttEfficiencyMult"], 3)) {
-//                 view.cached[actionVar + "_" + attVar + "AttEfficiencyMult"].innerText = intToString(actionObj[attVar + "AttEfficiencyMult"], 3);
-//             }
-//         });
-//     }
-// }
