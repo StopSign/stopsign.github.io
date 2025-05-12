@@ -409,7 +409,8 @@ let actionData = {
             //add exp based on amount sent
             actionObj.expToAddBase = amountToSend;
             actionObj.expToAdd = actionObj.expToAddBase * actionObj.expToAddMult * calcUpgradeMultToExp(actionObj);
-            document.getElementById('makeMoneyMomentumTaken').innerText = intToString(amount, 2);
+            data.actions.makeMoney.momentumAdded = amountToSend;
+            view.cached['makeMoneyMomentumTaken'].innerText = intToString(amount, 2);
         },
         onUnlock: function() {
             unveilAction('spendMoney');
@@ -548,7 +549,8 @@ let actionData = {
             //add exp based on amount sent
             actionObj.expToAddBase = amountToSend;
             actionObj.expToAdd = actionObj.expToAddBase * actionObj.expToAddMult * calcUpgradeMultToExp(actionObj);
-            document.getElementById('socializeMomentumTaken').innerText = intToString(amount, 2);
+            data.actions.socialize.momentumAdded = amountToSend;
+            view.cached['socializeMomentumTaken'].innerText = intToString(amount, 2);
         },
         onUnlock: function() {
             // unveilAction('neighborlyTies');

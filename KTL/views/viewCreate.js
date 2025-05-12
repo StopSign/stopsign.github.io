@@ -21,7 +21,7 @@ function initializeDisplay() {
     updateUIFromLoad(); //update the elements after create
 }
 
-function generateAttDisplay(attVar) {
+function createAttDisplay(attVar) {
     let attObj = data.atts[attVar];
     let theStr = "";
     attTitles.forEach(function (attTitle) {
@@ -237,6 +237,7 @@ function generateActionDisplay(actionVar) {
     let levelInfoContainer = Raw.html`
             <div id="${actionVar}_infoContainer" style="display:none;padding:3px;">
         Tier <b>${actionObj.tier}</b>${actionObj.isGenerator ? " Generator" : " Action"}<br>
+        Efficiency, found in the title, is Expertise Mult * Base Efficiency (x<b><span id="${actionVar}EfficiencyBase"></span></b>), capping at <b>100</b>%.<br>
         ${actionObj.isGenerator?"":(`Consume and send rate is ${actionObj.tierMult()*100}% of ${actionObj.momentumName} * efficiency.<br>`)}<br>
         ${onComplete}
         ${onLevelText}
@@ -247,24 +248,17 @@ function generateActionDisplay(actionVar) {
     queueCache(`${actionVar}_storyContainer`);
 
     let storyContainer = Raw.html`
-        <div id="${actionVar}_storyContainer" style="display:none;padding:5px;height:220px;overflow-y:auto;">
+        <div id="${actionVar}_storyContainer" style="display:none;padding:5px;max-height:220px;overflow-y:auto;">
             ${dataObj.storyText ? dataObj.storyText[language]:""}
         </div>`;
-
-    let onLevelAttsText = `<br>On Level Up:<br>`;
-    if(actionObj.onLevelAtts) {
-        actionObj.onLevelAtts.forEach(function(onLevelStat) {
-            onLevelAttsText += `+<b>${onLevelStat[1]} to ${capitalizeFirst(onLevelStat[0])}</b><br>`;
-        });
-    }
 
     queueCache(`${actionVar}_attsContainer`);
 
     let attsContainer = Raw.html`
-        <div id="${actionVar}_attsContainer" style="display:none;padding:3px;">
+        <div id="${actionVar}_attsContainer" style="display:none;padding:3px;max-height:220px;overflow-y:auto;">
+            ${generateActionOnLevelAtts(actionObj)}
             ${generateActionExpAtts(actionObj)}
             ${generateActionEfficiencyAtts(actionObj)}
-            ${onLevelAttsText}
         </div>`;
 
     queueCache(`${actionVar}LockContainer`);
@@ -292,7 +286,7 @@ function generateActionDisplay(actionVar) {
                     class="buttonSimple" style="margin-right:3px;width:30px;height:30px;text-align:center;cursor:pointer;padding:0 4px;">All 0</span>
                 <span onclick="toggleAllHundred('${actionVar}')" 
                     class="buttonSimple" style="margin-right:3px;width:30px;height:30px;text-align:center;cursor:pointer;padding:0 4px;">All 100</span>
-                <div>Total ${actionObj.momentumName} sending downstream: <b><span id='${actionVar}TotalSend'>1</span></b>/s</div>
+                <div style="color:var(--text-muted)">Total ${actionObj.momentumName} sending downstream: <b><span style="color:var(--text-primary)" id='${actionVar}TotalSend'>1</span></b>/s</div>
             </div>
         </div>`;
 
@@ -429,28 +423,60 @@ function generateOutsideAttDisplay(actionObj, attObj, type) {
         </div>`;
 }
 
+function generateActionOnLevelAtts(actionObj) {
+    let actionVar = actionObj.actionVar;
+    let dataObj = actionData[actionVar];
+    queueCache(`${actionVar}AttOnLevelContainer`);
+
+    let onLevelAttsText = `<div id="${actionVar}AttOnLevelContainer" style="display:none"><u>Stats gained each level:</u><br>`;
+    for(let attObj of dataObj.onLevelAtts) {
+        let attVar = attObj[0];
+
+        onLevelAttsText += `
+        <div style="color:var(--text-muted);cursor:pointer;" class="backgroundWhenHover" onclick="clickedAttName('${attVar}')">
+            +<span style="color:var(--text-primary)"><b>${attObj[1]}</b></span> to 
+            <img src="img/${attVar}.svg" alt="${attVar}" 
+            style="margin:1px;width:20px;height:20px;vertical-align:top;background:var(--attribute-add-bg-color)" />
+            <span style="color:var(--text-primary)"><b>${capitalizeFirst(attObj[0])}</b></span>
+        </div>`;
+    }
+    onLevelAttsText += `</div>`
+
+    return onLevelAttsText;
+}
+
 function generateActionExpAtts(actionObj) {
     let actionVar = actionObj.actionVar;
     let dataObj = actionData[actionVar];
 
+    let isFirst = dataObj.onLevelAtts.length === 0;
+
     queueCache(`${actionVar}AttExpContainer`);
     let expAttsStr =
-        `<span id="${actionVar}AttExpContainer">Stat Modifiers to ${actionObj.isGenerator?"Exp":"Progress"}:<br>`;
+        `<div id="${actionVar}AttExpContainer" style="display:none;">${isFirst?"":"<br>"}<u>Stat Modifiers to ${actionObj.isGenerator?"Exp":"Progress"}:</u><br>`;
 
     for(let attObj of dataObj.expAtts) {
-        let name = attObj[0];
-        if(!data.atts[name]) {
-            console.log(`ERROR: you need to instantiate the stat: '${name}'`);
+        let attVar = attObj[0];
+        let ratio = attObj[1] * 100;
+        if(!data.atts[attVar]) {
+            console.log(`ERROR: you need to instantiate the stat: '${attVar}'`);
         }
-        queueCache(`${actionVar}_${name}AttExpMult`);
-        expAttsStr +=
-            `<b>100%</b> of <b>${capitalizeFirst(name)}</b>'s bonus = x<b><span id="${actionVar}_${name}AttExpMult">1</span></b><br>`
+        queueCache(`${actionVar}_${attVar}AttExpMult`);
+        queueCache(`${actionVar}_${attVar}AttExpContainer`);
+
+        expAttsStr += Raw.html`
+        <div id="${actionVar}_${attVar}AttExpContainer" style="color:var(--text-muted);cursor:pointer;display:none;" class="backgroundWhenHover" onclick="clickedAttName('${attVar}')">
+            <span style="color:var(--text-primary)"><b>${ratio}</b></span>% of <img src="img/${attVar}.svg" alt="${attVar}" 
+            style="margin:1px;width:20px;height:20px;vertical-align:top;background:var(--attribute-use-exp-bg-color)" />
+            <span style="color:var(--text-primary)"><b>${capitalizeFirst(attVar)}</b></span>'s bonus 
+            = x<b><span style="color:var(--text-primary)" id="${actionVar}_${attVar}AttExpMult">1</span></b>
+        </div>`
     }
 
     queueCache(`${actionVar}AttReductionEffect`);
     expAttsStr +=
-            `Total Reduction = 1 / <b><span id="${actionVar}AttReductionEffect">1</span></b><br>
-        </span>`;
+            `<span style="color:var(--text-muted);">Total Reduction = 1 / </span><b><span id="${actionVar}AttReductionEffect">1</span></b>
+        </div>`;
     return expAttsStr;
 }
 
@@ -458,25 +484,34 @@ function generateActionEfficiencyAtts(actionObj) {
     let actionVar = actionObj.actionVar;
     let dataObj = actionData[actionVar];
 
+    let isFirst = dataObj.onLevelAtts.length === 0 && dataObj.expAtts.length === 0;
+
     queueCache(`${actionVar}AttEfficiencyContainer`);
     let expertiseModsStr =
-        `<span id='${actionVar}AttEfficiencyContainer'><br>Stat Modifiers to Efficiency:<br>`;
+        `<div id="${actionVar}AttEfficiencyContainer" style="display:none;">${isFirst?"":"<br>"}<u>Stat Modifiers to Efficiency:</u><br>`;
 
     for(let attObj of dataObj.efficiencyAtts) {
-        let name = attObj[0];
-        if(!data.atts[name]) {
-            console.log(`ERROR: you need to instantiate the stat: '${name}'`);
+        let attVar = attObj[0];
+        let ratio = attObj[1] * 100;
+        if(!data.atts[attVar]) {
+            console.log(`ERROR: you need to instantiate the stat: '${attVar}'`);
         }
-        queueCache(`${actionVar}_${name}AttEfficiencyMult`);
+        queueCache(`${actionVar}_${attVar}AttEfficiencyMult`);
+        queueCache(`${actionVar}_${attVar}AttEfficiencyContainer`);
+
         expertiseModsStr += Raw.html`
-            <b>100%</b> of <b>${capitalizeFirst(name)}</b>'s bonus = x<b><span id="${actionVar}_${name}AttEfficiencyMult">1</span></b><br>`
+        <div id="${actionVar}_${attVar}AttEfficiencyContainer" style="color:var(--text-muted);cursor:pointer;display:none;" class="backgroundWhenHover" onclick="clickedAttName('${attVar}')">
+            <span style="color:var(--text-primary)"><b>${ratio}</b></span>% of <img src="img/${attVar}.svg" alt="${attVar}" 
+            style="margin:1px;width:20px;height:20px;vertical-align:top;background:var(--attribute-use-eff-bg-color)" />
+            <span style="color:var(--text-primary)"><b>${capitalizeFirst(attVar)}</b></span>'s bonus 
+            = x<b><span style="color:var(--text-primary)" id="${actionVar}_${attVar}AttEfficiencyMult">1</span></b><br>
+        </div>`
     }
     queueCache(`${actionVar}EfficiencyMult`);
     queueCache(`${actionVar}EfficiencyBase`);
     expertiseModsStr += Raw.html`
-        Total Expertise Mult = x<b><span id="${actionVar}EfficiencyMult"></span></b><br>
-        <br>Efficiency is the Expertise Mult * Base EFficiency (x<b><span id="${actionVar}EfficiencyBase"></span></b>) in the title, capping at <b>100</b>%.<br>
-    </span>`;
+        <span style="color:var(--text-muted);">Total Expertise Mult = x</span><b><span id="${actionVar}EfficiencyMult"></span></b>
+    </div>`;
     
     return expertiseModsStr;
 }
@@ -692,6 +727,8 @@ function setAllCaches() {
 
     for(let actionVar in data.actions) {
         view.cached[actionVar + "ActionPower"] = document.getElementById(actionVar + "ActionPower");
+        view.cached[actionVar + "AmountToSend"] = document.getElementById(actionVar + "AmountToSend");
+        view.cached[actionVar + "MomentumTaken"] = document.getElementById(actionVar + "MomentumTaken");
     }
 
     clearCacheQueue();

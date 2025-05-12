@@ -172,6 +172,10 @@ body {
     min-width:400px;
 }
 
+.backgroundWhenHover:hover {
+    background:var(--bg-primary);
+}
+
 .fullScreenGrey {
     position:fixed;
     top:0;

@@ -389,9 +389,8 @@ function clickedAttName(attName) {
         return;
     }
 
-    let theDiv = view.cached[attName + "AttContainer"];
+    views.updateVal(`${attName}AttContainer`, "2px solid var(--text-primary)", "style.border");
     selectedStat = attName;
-    theDiv.style.border = "2px solid var(--text-primary)";
     //Change the border colors of all actions that are relevant
     //for each action, for each statList, if this stat is found, set the boolean
     //var + "Container" .style.borderColor = getAttColor(attName);
@@ -515,6 +514,8 @@ function toggleBonusSpeed() {
 }
 
 function changeBonusSpeed(num) {
+    if(bonusSpeed > 1) { //already running
+        bonusSpeed = num;
+    }
     data.options.bonusRate = num;
-    bonusSpeed = data.options.bonusRate;
 }

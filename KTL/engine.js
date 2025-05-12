@@ -1,9 +1,4 @@
-function attsSetBaseVariables(attObj) {
-    attObj.num = 0;
-    attObj.perMinute = 0;
-    attObj.mult = 1;
-    attObj.unlocked = false;
-}
+
 
 function createAndLinkNewAttribute(attVar) {
     data.attNames.push(attVar);
@@ -18,7 +13,14 @@ function createAndLinkNewAttribute(attVar) {
 
     attsSetBaseVariables(attObj);
 
-    generateAttDisplay(attVar);
+    createAttDisplay(attVar);
+}
+
+function attsSetBaseVariables(attObj) {
+    attObj.num = 0;
+    attObj.perMinute = 0;
+    attObj.mult = 1;
+    attObj.unlocked = false;
 }
 
 //Vars that should be reset each KTL
@@ -320,24 +322,19 @@ function revealAtt(useAttObj) {
     let attObj = data.atts[attVar];
     attObj.unlocked = true; //sets the side menu
 
-
-    for(let actionVar in data.actions) {
-        let actionObj = data.actions[actionVar];
-
-        for (let actionVar of attObj.linkedActionExpAtts) {
-            // document.getElementById(`${actionVar}${attVar}OutsideContainerexp`)
-            views.updateVal(`${actionVar}${attVar}OutsideContainerexp`, "", "style.display");
-        }
-        for (let actionVar of attObj.linkedActionEfficiencyAtts) {
-            // document.getElementById(`${actionVar}${attVar}OutsideContainereff`)
-            views.updateVal(`${actionVar}${attVar}OutsideContainereff`, "", "style.display");
-        }
+    for (let actionVar of attObj.linkedActionExpAtts) {
+        views.updateVal(`${actionVar}${attVar}OutsideContainerexp`, "", "style.display");
+        views.updateVal(`${actionVar}_${attVar}AttExpContainer`, "", "style.display");
+        views.updateVal(`${actionVar}AttExpContainer`, "", "style.display");
     }
-//overclockawarenessOutsideContainer
-
-    //For each action, for each non-add linked stat
-    //Reveal the box (hide the ???? one)
-    //Reveal the OutsideContainer
+    for (let actionVar of attObj.linkedActionEfficiencyAtts) {
+        views.updateVal(`${actionVar}${attVar}OutsideContainereff`, "", "style.display");
+        views.updateVal(`${actionVar}_${attVar}AttEfficiencyContainer`, "", "style.display");
+        views.updateVal(`${actionVar}AttEfficiencyContainer`, "", "style.display");
+    }
+    for(let actionVar of attObj.linkedActionOnLevelAtts) {
+        views.updateVal(`${actionVar}AttOnLevelContainer`, "", "style.display");
+    }
 }
 
 function unlockAction(actionObj) {

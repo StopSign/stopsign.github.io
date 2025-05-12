@@ -3,6 +3,14 @@ let view = {
     prevValues: {}
 };
 
+/*
+Types of views:
+update: run once a frame
+generate: functions to return an html that's made in a loop
+create: functions to put the pieces on the page. Uses generate methods.
+
+ */
+
 let views = {
     updateView: function() {
         //This is the main function that is run once per frame
@@ -53,6 +61,14 @@ let views = {
         views.updateVal(`${attVar}Name`, color, "style.color")
     },
     updateActions:function() {
+        views.updateAura();
+
+        for(let actionVar in data.actions) {
+            let actionObj = data.actions[actionVar];
+            views.updateAction(actionObj);
+        }
+    },
+    updateAura:function() {
         let resourceAmounts = {};
 
         for (let actionVar in data.actions) {
@@ -86,20 +102,6 @@ let views = {
                 views.updateVal(`${entry.id}LargeVersionContainer`,`inset ${color} 0px 0px ${Math.floor(ratio * 15)}px ${Math.floor(ratio * 5)}px`,"style.boxShadow");
                 // views.updateVal(`${entry.id}SmallVersionContainer`,`inset ${getResourceColor(actionObj)} 0px 0px ${Math.min(ratio * 15)}px ${Math.min(ratio * 5)}px`,"style.boxShadow");
             }
-        }
-
-        for(let actionVar in data.actions) {
-            let actionObj = data.actions[actionVar];
-            views.updateAction(actionObj);
-
-            //An action has actionObj.momentumName, which is the name of the resource.
-            //An action has actionObj.momentum, which is the amount of the resource (regardless of name)
-            //for each action, add the resource to an object of lists called resourceAmounts, aka resourceAmounts.momentum = [], resourceAmounts.gold = [] (instantiate based on momentumName if not found)
-            //for each list
-            //figure out the ratio of the max that each action is to its resource (i.e. if it has 50% of all gold, it should be .5)
-            //use this update method to change the box-shadow
-
-            // views.updateVal(`${actionVar}Container`, `${getResourceColor(actionObj)} 0px 0px 100px ${ratio*100}px`, "style.boxShadow");
         }
     },
     updateAction:function(actionObj) {
@@ -202,7 +204,6 @@ let views = {
 
         //Menu-specific updates
         if(actionObj.currentMenu === "atts") {
-            views.updateActionStatsViews(actionObj);
 
             views.updateVal(`${actionVar}HighestLevelContainer`, data.upgrades.rememberWhatIDid.isFullyBought ? "" : "none", "style.display");
             views.updateVal(`${actionVar}SecondHighestLevelContainer`, data.upgrades.rememberHowIGrew.isFullyBought ? "" : "none", "style.display");
@@ -210,9 +211,6 @@ let views = {
             views.updateVal(`${actionVar}PrevUnlockTimeContainer`, actionObj.prevUnlockTime ? "" : "none", "style.display");
             views.updateVal(`${actionVar}PrevUnlockTime`, secondsToTime(actionObj.prevUnlockTime), "innerText", "time");
 
-
-            views.updateVal(`${actionVar}AttExpContainer`, actionObj.expAtts.length > 0 ? "" : "none", "style.display");
-            views.updateVal(`${actionVar}AttEfficiencyContainer`, actionObj.efficiencyAtts.length > 0 ? "" : "none", "style.display");
 
             for(let expAtt of actionObj.expAtts) {
                 let attVar = expAtt[0];
@@ -318,11 +316,6 @@ let views = {
 
 
         }
-    },
-    updateActionStatsViews: function(actionObj) {
-        let actionVar = actionObj.actionVar;
-        //TODO update statistics 
-
     },
 
 
