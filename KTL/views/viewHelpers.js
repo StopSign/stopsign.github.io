@@ -1,5 +1,13 @@
-function getAttColor(attName) {
-    const stat = data.atts[attName];
+//Through unlock/unveil/click
+function showAttColors(attVar) {
+    let color = getAttColor(attVar);
+    views.updateVal(`${attVar}AttContainer`, "2px solid transparent", "style.border");
+    views.updateVal(`${attVar}Name`, color, "style.color");
+    views.updateVal(`${attVar}DisplayContainer`, color, "style.backgroundColor");
+}
+
+function getAttColor(attVar) {
+    const stat = data.atts[attVar];
 
     const attAddedTo = stat.linkedActionOnLevelAtts.some(actionVar =>
         data.actions[actionVar].unlocked || globalVisible
@@ -33,6 +41,8 @@ function getResourceColor(actionObj) {
             return "var(--gold-color)";
         case "conversations":
             return "var(--conversations-color)";
+        case "fear":
+            return "var(--fear-color)";
         case "arcana":
             return "var(--arcana-color)";
         default: //momentum
@@ -48,6 +58,8 @@ function getDimResourceColor(actionObj) {
             return "var(--gold-color-dim)";
         case "conversations":
             return "var(--conversations-color-dim)";
+        case "fear":
+            return "var(--fear-color-dim)";
         case "arcana":
             return "var(--arcana-color-dim)";
         default: //momentum

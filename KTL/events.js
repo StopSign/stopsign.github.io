@@ -113,6 +113,54 @@ let originalTransformX, originalTransformY;
 let initialPinchDistance = null;
 let lastTouchScale = 1;
 let isTouchDragging = false;
+
+function clickZoomIn() {
+    const rect = windowElement.getBoundingClientRect();
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+
+    const prevScale = scale;
+    scale = Math.max(minScale, scale + scaleStep*3);
+    const scaleFactor = scale / prevScale;
+
+    const dx = (centerX - transformX) * (1 - scaleFactor);
+    const dy = (centerY - transformY) * (1 - scaleFactor);
+
+    transformX += dx;
+    transformY += dy;
+
+    actionContainer.style.transform = `translate(${transformX}px, ${transformY}px) scale(${scale})`;
+
+    for (let actionVar in data.actions) {
+        if (data.actions[actionVar].visible || globalVisible) {
+            forceRedraw(view.cached[actionVar + "Container"]);
+        }
+    }
+}
+
+function clickZoomOut() {
+    const rect = windowElement.getBoundingClientRect();
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+
+    const prevScale = scale;
+    scale = Math.max(minScale, scale - scaleStep*3);
+    const scaleFactor = scale / prevScale;
+
+    const dx = (centerX - transformX) * (1 - scaleFactor);
+    const dy = (centerY - transformY) * (1 - scaleFactor);
+
+    transformX += dx;
+    transformY += dy;
+
+    actionContainer.style.transform = `translate(${transformX}px, ${transformY}px) scale(${scale})`;
+
+    for (let actionVar in data.actions) {
+        if (data.actions[actionVar].visible || globalVisible) {
+            forceRedraw(view.cached[actionVar + "Container"]);
+        }
+    }
+}
 windowElement.addEventListener('wheel', function(e) {
     e.preventDefault();
 
@@ -138,18 +186,10 @@ windowElement.addEventListener('wheel', function(e) {
 
     for (let actionVar in data.actions) {
         if(data.actions[actionVar].visible || globalVisible) {
-            clearFuzziness(view.cached[actionVar + "Container"]);
+            forceRedraw(view.cached[actionVar + "Container"]);
         }
     }
 }, { passive: false });
-
-function clearFuzziness(elem) {
-    if(elem.style.display !== "none") {
-        elem.style.display = "none";
-        void elem.offsetWidth;
-        elem.style.display = "";
-    }
-}
 
 document.addEventListener('mousedown', function(e) {
     if (e.target === windowElement || e.target === actionContainer) {
@@ -262,7 +302,7 @@ function applyPan(x, y) {
 function applyTransform() {
     actionContainer.style.transform = `translate(${transformX}px, ${transformY}px) scale(${scale})`;
     for (let actionVar in data.actions) {
-        clearFuzziness(view.cached[actionVar + "Container"]);
+        forceRedraw(view.cached[actionVar + "Container"]);
     }
 }
 
@@ -280,19 +320,16 @@ function isInScreenRange(action) {
     // const thresholdX = windowElement.offsetWidth / scale / 2 + 300;
     // const thresholdY = windowElement.offsetHeight / scale / 2 + 300;
     // return distanceX < thresholdX && distanceY < thresholdY;
+
+    //TODO get the screen once and on change, otherwise don't pull it every frame.
 }
-function forceRedraw(element) {
-    // Save the current display style
-    const display = element.style.display;
-
-    // Change the display property to 'none', then back to its original value
-    element.style.display = 'none';
-
-    // This empty access to offsetHeight forces the browser to do a repaint
-    element.offsetHeight;
-
-    // Restore the original display style
-    element.style.display = display;
+function forceRedraw(elem) {
+    if(elem.style.display !== "none") {
+        const display = elem.style.display;
+        elem.style.display = 'none';
+        elem.offsetHeight; // This empty access to offsetHeight forces the browser to do a repaint
+        elem.style.display = display;
+    }
 }
 
 function actionTitleClicked(actionVar) {
@@ -337,32 +374,6 @@ function clickActionMenu(actionVar, menuVar, isLoad) {
     data.actions[actionVar].currentMenu = menuVar;
 }
 
-const zoomInButton = document.getElementById('zoomInButton');
-const zoomOutButton = document.getElementById('zoomOutButton');
-const centerScreenButton = document.getElementById('centerScreenButton');
-
-zoomInButton.addEventListener('click', function() {
-    scale = Math.min(scale + scaleStep, maxScale); // Zoom in
-    actionContainer.style.transform = `translate(${transformX}px, ${transformY}px) scale(${scale})`;
-
-    for (let actionVar in data.actions) {
-        clearFuzziness(view.cached[actionVar + "Container"]);
-    }
-});
-
-zoomOutButton.addEventListener('click', function() {
-    scale = Math.max(scale - scaleStep, minScale); // Zoom out
-    actionContainer.style.transform = `translate(${transformX}px, ${transformY}px) scale(${scale})`;
-
-    for (let actionVar in data.actions) {
-        clearFuzziness(view.cached[actionVar + "Container"]);
-    }
-});
-
-centerScreenButton.addEventListener('click', function() {
-    actionTitleClicked('overclock');
-});
-
 
 function clickMenuButton() {
     let isShowing = document.getElementById("helpMenu").style.display !== "none";
@@ -371,7 +382,7 @@ function clickMenuButton() {
 
 
 let selectedStat = null;
-function clickedAttName(attName) {
+function clickedAttName(attVar) {
     //clear all borders
     for(let actionVar in data.actions) {
         views.updateVal(`${actionVar}LargeVersionContainer`, "black", "style.borderColor");
@@ -381,41 +392,41 @@ function clickedAttName(attName) {
 
     //clear previous
     if (selectedStat) {
-        views.updateVal(`${selectedStat}AttContainer`, "", "style.border");
+        showAttColors(selectedStat);
     }
-    if (selectedStat === attName) {
+    if (selectedStat === attVar) {
         //clicked the same, so clear and return
         selectedStat = null;
+        updateAttActionContainers();
         return;
     }
+    selectedStat = attVar;
 
-    views.updateVal(`${attName}AttContainer`, "2px solid var(--text-primary)", "style.border");
-    selectedStat = attName;
-    //Change the border colors of all actions that are relevant
-    //for each action, for each statList, if this stat is found, set the boolean
-    //var + "Container" .style.borderColor = getAttColor(attName);
+    views.updateVal(`${attVar}AttContainer`, "2px solid var(--text-selected-color)", "style.border");
+    views.updateVal(`${attVar}Name`, "var(--text-selected-color)", "style.color");
+    views.updateVal(`${attVar}DisplayContainer`, "var(--text-selected-color)", "style.backgroundColor");
+
 
     for (let actionVar in data.actions) {
-        // let actionObj = data.actions[actionVar];
         let dataObj = actionData[actionVar];
         let attAddedTo = false;
-        dataObj.onLevelAtts.forEach(function (attObj) {
-            if (attObj[0] === attName) {
+        for(let attObj of dataObj.onLevelAtts) {
+            if (attObj[0] === attVar) {
                 attAddedTo = true;
             }
-        });
+        }
         let expAttUsed = false;
-        dataObj.expAtts.forEach(function (attObj) {
-            if (attObj[0] === attName) {
+        for(let attObj of dataObj.expAtts) {
+            if (attObj[0] === attVar) {
                 expAttUsed = true;
             }
-        });
+        }
         let effAttUsed = false;
-        dataObj.efficiencyAtts.forEach(function (attObj) {
-            if (attObj[0] === attName) {
+        for(let attObj of dataObj.efficiencyAtts) {
+            if (attObj[0] === attVar) {
                 effAttUsed = true;
             }
-        });
+        }
 
         let color = "black"
         if (attAddedTo && !(expAttUsed || effAttUsed)) color = "var(--attribute-add-color)";
@@ -428,8 +439,48 @@ function clickedAttName(attName) {
         views.updateVal(`${actionVar}SmallVersionContainer`, "2px solid " + color, "style.border");
     }
 
-    //Change all relevant OutsideContainers to change background color to fill in, if selected
+    updateAttActionContainers();
 
+    // view.cached[`${attVar}AttContainer`].scrollIntoView({
+    //     behavior: "smooth",
+    //     block: "start",    // or "center" / "nearest" depending on your preference
+    //     inline: "nearest"
+    // });
+
+    const container = view.cached[`attDisplay`];
+    const target = view.cached[`${attVar}AttContainer`];
+
+    const containerRect = container.getBoundingClientRect();
+    const targetRect = target.getBoundingClientRect();
+
+    const offset = targetRect.top - containerRect.top + container.scrollTop;
+
+    container.scrollTo({
+        top: offset - 10,  // small margin
+        behavior: "smooth"
+    });
+}
+
+//Inside and Outside
+function updateAttActionContainers() {
+    for (let actionVar in data.actions) {
+        let dataObj = actionData[actionVar];
+        for (let attObj of dataObj.onLevelAtts) {
+            let attVar = attObj[0];
+            views.updateVal(`${actionVar}${attVar}OutsideContaineradd`, selectedStat && selectedStat === attVar ? "var(--text-selected-color)" : "var(--attribute-add-color)", "style.borderColor");
+            views.updateVal(`${actionVar}${attVar}InsideContaineradd`, selectedStat && selectedStat === attVar ? "var(--text-selected-color)" : "transparent", "style.borderColor");
+        }
+        for (let attObj of dataObj.expAtts) {
+            let attVar = attObj[0];
+            views.updateVal(`${actionVar}${attVar}OutsideContainerexp`, selectedStat && selectedStat === attVar ? "var(--text-selected-color)" : "var(--attribute-use-exp-color)", "style.borderColor");
+            views.updateVal(`${actionVar}${attVar}InsideContainerexp`, selectedStat && selectedStat === attVar ? "var(--text-selected-color)" : "transparent", "style.borderColor");
+        }
+        for (let attObj of dataObj.efficiencyAtts) {
+            let attVar = attObj[0];
+            views.updateVal(`${actionVar}${attVar}OutsideContainereff`, selectedStat && selectedStat === attVar ? "var(--text-selected-color)" : "var(--attribute-use-eff-color)", "style.borderColor");
+            views.updateVal(`${actionVar}${attVar}InsideContainereff`, selectedStat && selectedStat === attVar ? "var(--text-selected-color)" : "transparent", "style.borderColor");
+        }
+    }
 }
 
 
@@ -458,7 +509,7 @@ function pauseGame() {
     } else {
         document.title = "KTL";
     }
-    document.getElementById('pauseButton').innerText = stop ? "Resume" : "Pause";
+    document.getElementById('pauseButton').innerText = stop ? "> Resume" : "|| Pause";
     save();
 }
 

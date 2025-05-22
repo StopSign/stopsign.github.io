@@ -1,10 +1,15 @@
+let attTree = {};
 
+function createAndLinkNewAttribute(attCategory, attVar) {
+    if(!attTree[attCategory]) {
+        attTree[attCategory] = [];
+    }
+    attTree[attCategory].push(attVar);
 
-function createAndLinkNewAttribute(attVar) {
-    data.attNames.push(attVar);
     if(!data.atts[attVar]) {
         data.atts[attVar] = {};
     }
+
     let attObj = data.atts[attVar];
     attObj.attVar = attVar;
     attObj.linkedActionExpAtts = [];
@@ -12,8 +17,6 @@ function createAndLinkNewAttribute(attVar) {
     attObj.linkedActionOnLevelAtts = [];
 
     attsSetBaseVariables(attObj);
-
-    createAttDisplay(attVar);
 }
 
 function attsSetBaseVariables(attObj) {
@@ -118,7 +121,7 @@ function createAndLinkNewAction(actionVar, dataObj, title, x, y, downstreamVars)
 
 
     for(let downstreamVar of actionObj.downstreamVars) {
-        actionObj[downstreamVar+"AttentionMult"] = 1;
+        actionObj[downstreamVar+"FocusMult"] = 1;
     }
 
     actionObj.progressRateReal = function() { //For data around the flat action too
@@ -179,7 +182,7 @@ function actionProgressRate(actionObj) {
 }
 
 function isAttentionLine(actionVar, downstreamVar) {
-    return data.attentionSelected.some(
+    return data.focusSelected.some(
         sel => sel.lineData.from === actionVar && sel.lineData.to === downstreamVar
     );
 }
@@ -289,6 +292,12 @@ function unveilAction(actionVar) {
         }
         return;
     }
+
+    //If parent is not visible, add actionVar to a list instead
+    //Every time an action is unlocked, look through the downstream of the unlocked - does it match any in the list
+    //if so, unveil that one next
+
+
     actionObj.visible = true;
 
     revealActionAtts(actionObj);
@@ -312,9 +321,9 @@ function unveilAction(actionVar) {
 }
 
 function revealActionAtts(actionObj) {
-    actionObj.onLevelAtts.forEach(onLevelAtt => {
+    for(let onLevelAtt of actionObj.onLevelAtts) {
         revealAtt(onLevelAtt);
-    });
+    }
 }
 
 function revealAtt(useAttObj) {
@@ -324,16 +333,24 @@ function revealAtt(useAttObj) {
 
     for (let actionVar of attObj.linkedActionExpAtts) {
         views.updateVal(`${actionVar}${attVar}OutsideContainerexp`, "", "style.display");
-        views.updateVal(`${actionVar}_${attVar}AttExpContainer`, "", "style.display");
+        views.updateVal(`${actionVar}${attVar}InsideContainerexp`, "", "style.display");
         views.updateVal(`${actionVar}AttExpContainer`, "", "style.display");
     }
     for (let actionVar of attObj.linkedActionEfficiencyAtts) {
         views.updateVal(`${actionVar}${attVar}OutsideContainereff`, "", "style.display");
-        views.updateVal(`${actionVar}_${attVar}AttEfficiencyContainer`, "", "style.display");
+        views.updateVal(`${actionVar}${attVar}InsideContainereff`, "", "style.display");
         views.updateVal(`${actionVar}AttEfficiencyContainer`, "", "style.display");
     }
     for(let actionVar of attObj.linkedActionOnLevelAtts) {
         views.updateVal(`${actionVar}AttOnLevelContainer`, "", "style.display");
+    }
+
+    showAttColors(attVar);
+
+    for (let attCategory in attTree) {
+        if (attTree[attCategory].includes(attVar)) {
+            views.updateVal(`${attCategory}CategoryContainer`, "", "style.display");
+        }
     }
 }
 
@@ -353,6 +370,16 @@ function unlockAction(actionObj) {
             setSliderUI(actionObj.actionVar, downstreamVar, getUpgradeSliderAmount());
         }
     });
+
+    for(let onLevelObj of dataObj.onLevelAtts) {
+        showAttColors(onLevelObj[0]);
+    }
+    for(let onLevelObj of dataObj.expAtts) {
+        showAttColors(onLevelObj[0]);
+    }
+    for(let onLevelObj of dataObj.efficiencyAtts) {
+        showAttColors(onLevelObj[0]);
+    }
 }
 
 function upgradeUpdates() {

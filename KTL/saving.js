@@ -32,9 +32,9 @@ function load() {
         //     });
         //
         // })
-        // data.attNames.forEach(function (attVar) {
+        // for(let attVar in data.atts) {
         //     data.atts[attVar] = toLoad.atts[attVar];
-        // })
+        // }
 
 
         mergeExistingOnly(data, toLoad, "actions", ["x", "y"]);
@@ -58,10 +58,10 @@ function load() {
         data.doneKTL = !!toLoad.doneKTL;
         data.doneAmulet = !!toLoad.doneAmulet;
         data.displayJob = !!toLoad.displayJob;
-        data.attentionSelected = toLoad.attentionSelected ? toLoad.attentionSelected : [];
-        data.maxAttentionAllowed = toLoad.maxAttentionAllowed ? toLoad.maxAttentionAllowed : 3;
-        data.attentionMult = toLoad.attentionMult ? toLoad.attentionMult : 2;
-        data.attentionLoopMax = toLoad.attentionLoopMax ? toLoad.attentionLoopMax : 2.5;
+        data.focusSelected = toLoad.focusSelected ? toLoad.focusSelected : [];
+        data.maxFocusAllowed = toLoad.maxFocusAllowed ? toLoad.maxFocusAllowed : 3;
+        data.focusMult = toLoad.focusMult ? toLoad.focusMult : 2;
+        data.focusLoopMax = toLoad.focusLoopMax ? toLoad.focusLoopMax : 2.5;
     }
 
     data.actions.overclock.momentumAdded = data.actions.overclock.actionPower * data.actions.overclock.upgradeMult;
@@ -112,9 +112,6 @@ Things that are not reloading properly:
         clickActionMenu(actionVar, actionObj.currentMenu, true);
     }
 
-    if(data.doneKTL || (data.gameState !== "KTL" && data.actions.hearAboutTheLich && data.actions.hearAboutTheLich.level >= 1)) {
-        views.updateVal(`killTheLichMenuButton`, "", "style.display");
-    }
     if(data.doneAmulet) {
         document.getElementById("openViewAmuletButton").style.display = "";
         document.getElementById("essenceDisplay").style.display = "";
@@ -133,9 +130,9 @@ Things that are not reloading properly:
 }
 
 function reapplyAttentionSelected() {
-    if (!data.attentionSelected) return;
+    if (!data.focusSelected) return;
 
-    data.attentionSelected.forEach(entry => {
+    data.focusSelected.forEach(entry => {
         const { borderId } = entry;
         highlightLine(borderId); // Reapply visual state
     });

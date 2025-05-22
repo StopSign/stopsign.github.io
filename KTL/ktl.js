@@ -3,15 +3,16 @@ let KTLMenuOpen = false;
 function openKTLMenu() {
     document.getElementById('confirmKTL').checked = false;
     KTLMenuOpen = !KTLMenuOpen;
-    view.cached.killTheLichMenu.style.display = KTLMenuOpen ? "flex" : "none";
+    views.updateVal("killTheLichMenu", KTLMenuOpen ? "flex" : "none", "style.display");
 }
 
 function initializeKTL() {
-    if(!document.getElementById('confirmKTL').checked || (!isDebug && data.totalMomentum < 1.1e6)) {1
+    if(!document.getElementById('confirmKTL').checked || (!isDebug && data.totalMomentum < 1.1e6)) {
         return;
     }
-    data.attentionSelected = [];
-    view.cached.killTheLichMenu.style.display = "none";
+    data.focusSelected = [];
+
+    views.updateVal("killTheLichMenu", "none", "style.display")
 
     data.gameState = "KTL";
     for(let actionVar in data.actions) {
@@ -22,7 +23,9 @@ function initializeKTL() {
     }
 
     data.actions.overclockTargetingTheLich.momentum = data.totalMomentum;
-    view.cached.openUseAmuletButton.style.display = "";
+
+    views.updateVal("openUseAmuletButton", "", "style.display")
+
     document.getElementById("essenceDisplay").style.display = "";
     forceVisuals = true;
     data.doneKTL = true;
@@ -43,16 +46,16 @@ function useAmulet() {
     if(!document.getElementById('amuletConfirm').checked) {
         return;
     }
-    data.attentionSelected = [];
+    data.focusSelected = [];
     data.doneAmulet = true;
     document.getElementById("useAmuletMenu").style.display = "none";
     document.getElementById("openViewAmuletButton").style.display = "";
 
     //Reset all atts and bonuses
-    data.attNames.forEach(function (attName) {
-        let attObj = data.atts[attName];
+    for(let attVar in data.atts) {
+        let attObj = data.atts[attVar];
         attsSetBaseVariables(attObj);
-    });
+    }
 
     //set overclock to the upgrade-relevant %
 
@@ -83,9 +86,9 @@ function useAmulet() {
             if(data.actions[downstreamVar] && data.actions[downstreamVar].unlocked) {
                 setSliderUI(actionObj.actionVar, downstreamVar, getUpgradeSliderAmount());
             }
-            let currentMult = actionObj[downstreamVar + "AttentionMult"];
+            let currentMult = actionObj[downstreamVar + "FocusMult"];
 
-            actionObj[downstreamVar + "AttentionMult"] = (currentMult - 1) * [0, .2, .5, .9, 1][data.upgrades.knowWhatIFocusedOn.upgradePower] + 1;
+            actionObj[downstreamVar + "FocusMult"] = (currentMult - 1) * [0, .2, .5, .9, 1][data.upgrades.knowWhatIFocusedOn.upgradePower] + 1;
         });
     }
 

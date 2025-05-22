@@ -188,7 +188,7 @@ actionData.upgrades = {
             return "Increases the Focus Mult by "+(num >0?"another ":"")+"+1 (for a total of " + (num+1+2) + ")";
         },
         onBuy: function(num) {
-            data.attentionMult = 2 + num;
+            data.focusMult = 2 + num;
         }
     }, //25|8|x4, Focus mult +1
     rememberWhatIFocusedOn: {
@@ -202,7 +202,7 @@ actionData.upgrades = {
             return "Increases the Loop Bonus' max by "+(num >0?"another ":"")+"x2 (for a total of " + (2.5*Math.pow(2, (num+1))) + ")";
         },
         onBuy: function(num) {
-            data.attentionLoopMax = 2.5 * Math.pow(2, data.upgrades.rememberWhatIFocusedOn) * Math.pow(2, data.upgrades.rememberWhatIFocusedOnMore);
+            data.focusLoopMax = 2.5 * Math.pow(2, data.upgrades.rememberWhatIFocusedOn) * Math.pow(2, data.upgrades.rememberWhatIFocusedOnMore);
             if(num === data.rememberWhatIFocusedOn.upgradesAvailable) {
                 data.upgrades.rememberWhatIFocusedOnMore.visible = true;
             }
@@ -242,7 +242,7 @@ actionData.upgrades = {
             return "Increases the Loop Bonus' max by "+(num >0?"another ":"")+"x2 (for a total of " + (2.5 * Math.pow(2, data.upgrades.rememberWhatIFocusedOn) * Math.pow(2, (num+1))) + ")";
         },
         onBuy: function(num) {
-            data.attentionLoopMax = 2.5 * Math.pow(2, data.upgrades.rememberWhatIFocusedOn) * Math.pow(2, data.upgrades.rememberWhatIFocusedOnMore);
+            data.focusLoopMax = 2.5 * Math.pow(2, data.upgrades.rememberWhatIFocusedOn) * Math.pow(2, data.upgrades.rememberWhatIFocusedOnMore);
         }
     }, //10000|5|x3, Focus Mult +1
     rememberMyMastery: {

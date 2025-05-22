@@ -1,45 +1,3 @@
-
-
-
-// function createAction(methodName, type, tier, progressMax, expToLevel, unlockCost, x, y, downstreamVars) {
-//     let actionVar = methodName.charAt(6).toLowerCase() + methodName.slice(7); //createBasicLabor -> basicLabor
-//     let title = methodName.replace(/^create/, '').replace(/([A-Z])/g, ' $1').trim(); //createBasicLabor -> Basic Labor
-//
-//     //design philosophy requirement: actionPowerMultIncrease >= progressMaxIncrease, to prevent levels ever being a bad thing
-//     //Exception: spend money lol
-//     let progressMaxIncrease = 3.163; //sqrt(10)
-//     let expToLevelIncrease = 1.1;
-//     let actionPowerMultIncrease = 1;
-//     if(type === 1) {
-//         progressMaxIncrease = 1.02;
-//         expToLevelIncrease = 1.01;
-//         actionPowerMultIncrease = 1.04;
-//     }
-//     if(type === 2) {
-//         progressMaxIncrease = 1.25;
-//         actionPowerMultIncrease = 1.5;
-//     }
-//     if(type === 3) {
-//         progressMaxIncrease = 5;
-//         expToLevelIncrease = 1.01;
-//     }
-//     if(type === 4) {
-//         progressMaxIncrease = 3;
-//         actionPowerMultIncrease = 3.1;
-//     }
-//     if(type === 5) {
-//         progressMaxIncrease = 3;
-//         actionPowerMultIncrease = 3.1;
-//     }
-//
-//     let actionObj = createAndLinkNewAction(actionVar, expToLevelIncrease, actionPowerMultIncrease, progressMaxIncrease, progressMax, expToLevel, unlockCost, title, x, y, downstreamVars, tier);
-//     actionObj.tier = tier;
-//
-//     return actionObj;
-// }
-
-//design philosophy requirement: actionPowerMultIncrease >= progressMaxIncrease, to prevent levels ever being a bad thing
-
 function create(actionVar, downstreamVars, x, y) {
     let dataObj = actionData[actionVar];
     if(!dataObj) {
@@ -51,28 +9,28 @@ function create(actionVar, downstreamVars, x, y) {
     let title = decamelizeWithSpace(actionVar); //basicLabor -> Basic Labor
     let actionObj = createAndLinkNewAction(actionVar, dataObj, title, x, y, downstreamVars);
     dataObj.expAtts.forEach(function (expAtt) { //add the action to the stat, to update exp reductions
-        data.attNames.forEach(function (attName) {
-            let att = data.atts[attName];
+        for(let attVar in data.atts) {
+            let att = data.atts[attVar];
             if(expAtt[0] === att.attVar) {
                 att.linkedActionExpAtts.push(actionVar);
             }
-        });
+        }
     });
     dataObj.efficiencyAtts.forEach(function (expertiseAtt) { //add the action to the stat, to update exp reductions
-        data.attNames.forEach(function (attName) {
-            let att = data.atts[attName];
+        for(let attVar in data.atts) {
+            let att = data.atts[attVar];
             if(expertiseAtt[0] === att.attVar) {
                 att.linkedActionEfficiencyAtts.push(actionVar);
             }
-        });
+        }
     });
     dataObj.onLevelAtts.forEach(function (onLevelAtt) { //add the action to the stat, to update exp reductions
-        data.attNames.forEach(function (attName) {
-            let att = data.atts[attName];
+        for(let attVar in data.atts) {
+            let att = data.atts[attVar];
             if(onLevelAtt[0] === att.attVar) {
                 att.linkedActionOnLevelAtts.push(actionVar);
             }
-        });
+        }
     });
 }
 
@@ -185,7 +143,7 @@ let actionData = {
             data.actions.overclock.upgradeMult = upgradeMult;
         },
         onLevelAtts:[],
-        expAtts:[["awareness", 1], ["focus", 1], ["energy", 1], ["ambition", 1], ["control", 1],
+        expAtts:[["awareness", 1], ["concentration", 1], ["energy", 1], ["ambition", 1], ["control", 1],
             ["flow", 1], ["willpower", 1], ["coordination", 1], ["integration", 1], ["rhythm", 1],
             ["pulse", 1]],
         efficiencyAtts:[["cycle", 1]]
@@ -200,7 +158,7 @@ let actionData = {
             unveilAction('harnessOverflow')
         },
         onLevelAtts:[["awareness", 5]],
-        expAtts:[["focus", 5], ["cycle", 5], ["observation", 5], ["energy", 5]],
+        expAtts:[["concentration", 5], ["cycle", 5], ["observation", 5], ["energy", 5]],
         efficiencyAtts:[["cycle", 1]]
     },
     harnessOverflow: {
@@ -225,7 +183,7 @@ let actionData = {
         onLevelCustom: function() {
             unveilAction('takeNotes')
         },
-        onLevelAtts:[["focus", 1]],
+        onLevelAtts:[["concentration", 1]],
         expAtts:[],
         efficiencyAtts:[["cycle", 1]]
     },
@@ -254,7 +212,7 @@ let actionData = {
             unveilAction('travelOnRoad')
         },
         onLevelAtts:[["awareness", 100]],
-        expAtts:[["curiosity", 1], ["focus", 1], ["energy", 1], ["endurance", 1]],
+        expAtts:[["curiosity", 1], ["concentration", 1], ["energy", 1], ["endurance", 1]],
         efficiencyAtts:[["flow", .1]]
     },
     remember: {
@@ -269,7 +227,7 @@ let actionData = {
         onLevelCustom: function() {
             data.actions.harnessOverflow.maxLevel+=3;
         },
-        onLevelAtts:[["focus", 5]],
+        onLevelAtts:[["concentration", 5]],
         expAtts:[["awareness", 1], ["observation", 1]], //~x30 awareness when unlocked
         efficiencyAtts:[["cycle", 1]],
         unlockMessage:{english:"On unlock, +1 max level for Body Awareness."},
@@ -289,7 +247,7 @@ let actionData = {
             unveilAction('remember');
         },
         onLevelAtts:[["energy", 1], ["curiosity", 2]],
-        expAtts:[["focus", 1], ["endurance", 1]],
+        expAtts:[["concentration", 1], ["endurance", 1]],
         efficiencyAtts:[["navigation", 1]]
     },
     travelToOutpost: {
@@ -624,6 +582,18 @@ let actionData = {
     },
     hearAboutTheLich: {
         tier:1, momentumName:"conversations",
+
+        // progressMaxBase:10, progressMaxIncrease:1,
+        // expToLevelBase:100, expToLevelIncrease:1.4,
+        // actionPowerBase:1, actionPowerMult:1, actionPowerMultIncrease:1.1,
+        // efficiencyBase:.1,
+        // unlockCost:0, visible:false, unlocked:false, purchased: true,
+        // isGenerator:true, generatorTarget:"spendMoney", generatorSpeed:5,
+
+
+
+
+
         progressMaxBase:200, progressMaxIncrease:1,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:1,
@@ -635,6 +605,12 @@ let actionData = {
         onLevelAtts:[["integration", 20]],
         expAtts:[],
         efficiencyAtts:[],
+        extraButton: Raw.html`
+            <span class="button" id='killTheLichMenuButton2' onclick="openKTLMenu()" 
+                style="display:none;padding:8px 13px;position:absolute;top:330px;left:100px;border-color:black;
+                background-color:#880000;text-shadow:0 0 3px #ff0000;box-shadow:0 0 15px 4px rgba(255, 0, 0, 0.5);" >
+            Kill the Lich!</span>
+        `,
     },
 
 //--- From upgrades ---
@@ -653,7 +629,7 @@ let actionData = {
             unveilAction('catchAScent')
         },
         onLevelAtts:[["observation", 30]],
-        expAtts:[["focus", 1], ["curiosity", 1], ["awareness", 1]],
+        expAtts:[["concentration", 1], ["curiosity", 1], ["awareness", 1]],
         efficiencyAtts:[]
     },
     catchAScent: {
@@ -746,7 +722,7 @@ let actionData = {
         onLevelCustom: function() {
         },
         onLevelAtts:[["awareness", 500], ["cycle", 1]],
-        expAtts:[["awareness", 1], ["curiosity", 1], ["focus", 1], ["flow", 1]],
+        expAtts:[["awareness", 1], ["curiosity", 1], ["concentration", 1], ["flow", 1]],
         efficiencyAtts:[["flow", .1]]
     },
     feelTheAche: {
@@ -908,7 +884,7 @@ let actionData = {
         unlockCost:4000000, visible:false, unlocked:false, purchased: false,
         onUnlock: function() {
         },
-        onLevelAtts:[["focus", 50]],
+        onLevelAtts:[["concentration", 50]],
         expAtts:[["curiosity", 1], ["endurance", 10]],
         efficiencyAtts:[["endurance", 1]]
     },

@@ -225,8 +225,12 @@ function decamelize(str) {
 }
 
 function decamelizeWithSpace(str) {
-    return str.replace(/([a-z])([A-Z])/g, '$1 $2').replace(/\b\w/g, char => char.toUpperCase());
+    return str
+        .replace(/([a-z])([A-Z])/g, '$1 $2')
+        .replace(/([A-Z])([A-Z][a-z])/g, '$1 $2')
+        .replace(/\b\w/g, char => char.toUpperCase());
 }
+
 
 function camelize(str) {
     return str.replace(/(?:^\w|[A-Z]|\b\w|\s+)/gu, (match, index) => {

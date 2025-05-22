@@ -6,6 +6,7 @@
     --text-muted: #a6adc6;
     --text-extra-muted: #7d8397;
     --text-dark: #020931;
+    --text-selected-color: #f7ff1f;
     --button-text: #252836;
     --accent-primary: #4a90e2;
     --accent-secondary: #589ff2;
@@ -25,10 +26,16 @@
     --menu-text-background-color: #ffffff;
     --text-color: #e0e0e0;
 
+    --world-1-bg-primary: #1e1e2e;
+    --world-1-bg-secondary: #313244;
+    --world-1-bg-tertiary: #45465f;
+    --world-2-bg-primary: #372339;
+    --world-2-bg-secondary: #58375b;
+    --world-2-bg-tertiary: #754979;
 
     --attribute-add-color:#27d318;
     --attribute-add-bg-color: #85d17e;
-    --attribute-use-exp-color:#7a4fe7;
+    --attribute-use-exp-color: #7e55e7;
     --attribute-use-exp-bg-color: #937ec9;
     --attribute-use-eff-color: #5199ff;
     --attribute-use-eff-bg-color: #97c1ff;
@@ -46,6 +53,8 @@
     --gold-color-dim: rgba(169, 145, 2, 0.5);
     --conversations-color: #429977;
     --conversations-color-dim: rgba(66, 153, 119, 0.5);
+    --fear-color: #d2062a;
+    --fear-color-dim: #a30924;
     --arcana-color: #c620f5;
     --arcana-color-dim: rgba(198, 32, 245, 0.5);
 
@@ -60,6 +69,7 @@ body.lightMode {
     --text-muted: #3a3c56;
     --text-extra-muted: #50546b;
     --text-dark: #020931;
+    --text-selected-color: #d0d800;
     --button-text: #4a4e69;
     --accent-primary: #3acbf7;
     --accent-secondary: #4bd5ff;
@@ -99,6 +109,8 @@ body.lightMode {
     --gold-color-dim: rgba(255, 215, 0, 0.5);
     --conversations-color: #c8fff4;
     --conversations-color-dim: rgba(200, 255, 244, 0.5);
+    --fear-color: #d2062a;
+    --fear-color-dim: #a30924;
     --arcana-color:#c620f5;
     --arcana-color-dim: rgba(198, 32, 245, 0.5);
 
@@ -275,7 +287,7 @@ input {
 }
 
 .button {
-    padding:5px 8px;
+    padding:3px 6px;
     text-align: center;
     vertical-align:center;
     min-width:9px;
@@ -283,9 +295,10 @@ input {
     outline: none;
     color:var(--text-primary);
     background-color: var(--accent-primary);
-    border: none;
+    border: 2px solid var(--accent-secondary);
     border-radius: 6px;
     margin-bottom:2px;
+    font-weight:bold;
 }
 
 .button:hover {
@@ -463,4 +476,25 @@ input {
     border-radius:6px;
     cursor:pointer;
     box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.physicalPlaneButton {
+    background-color:var(--world-1-bg-primary);
+    border:2px solid var(--world-1-bg-secondary);
+}
+.physicalPlaneButton:hover {
+    background-color:var(--world-1-bg-secondary);
+}
+.physicalPlaneButton:active {
+    background-color:var(--world-1-bg-tertiary);
+}
+.astralPlaneButton {
+    background-color:var(--world-2-bg-primary);
+    border:2px solid var(--world-2-bg-secondary);
+}
+.astralPlaneButton:hover {
+    background-color:var(--world-2-bg-secondary);
+}
+.astralPlaneButton:active {
+    background-color:var(--world-2-bg-tertiary);
 }

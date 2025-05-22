@@ -8,12 +8,14 @@ function initializeDisplay() {
         generateActionDisplay(actionVar);
     }
     generateLinesBetweenActions();
+    createAttDisplay();
     actionUpdateAllStatMults();
     actionTitleClicked(`overclock`);
     initializeMenus();
     initializeToasts();
     generateAmuletContent();
     setAllCaches(); //happens after generation
+    showAttColors("awareness");
     revealActionAtts(data.actions.reflect);
 
     debug(); //change game for easier debugging
@@ -22,26 +24,39 @@ function initializeDisplay() {
 }
 
 function createAttDisplay(attVar) {
-    let attObj = data.atts[attVar];
     let theStr = "";
-    attTitles.forEach(function (attTitle) {
-        if(attTitle[1] === attVar) {
-            theStr += ((attVar === "discipline") ? "" : "<br>") +"<div style='font-style: italic;'><u>"+attTitle[0]+"</u></div>";
-        }
-    });
-    queueCache(`${attVar}AttContainer`);
-    queueCache(`${attVar}Name`);
-    queueCache(`${attVar}Num`);
-    queueCache(`${attVar}Mult`);
-    queueCache(`${attVar}PerMinute`);
+    for(let attCategory in attTree) {
+        queueCache(`${attCategory}CategoryContainer`);
 
-    theStr +=
-        `<div id="${attVar}AttContainer" style="position:relative;cursor:pointer" onclick="clickedAttName('${attVar}')">
-            <b><span id="${attVar}Name" style="width:140px;display:inline-block;">${decamelize(attVar)}</span></b>
-            <b><span id="${attVar}Num" style='width:70px;display:inline-block'>${attObj.num}</span></b>
-            <span style="width:70px;display:inline-block">x<b><span id="${attVar}Mult">${attObj.mult}</span></b></span>
-            <span style="width:70px;display:inline-block">+<b><span id="${attVar}PerMinute">${attObj.perMinute}</span></b>/m</span>
-        </div>`;
+        theStr += Raw.html`
+            <div id="${attCategory}CategoryContainer" style="display:none;margin-bottom:10px;">
+                <span style="font-style:italic;font-size:14px;font-weight:bold;"><u>${capitalizeFirst(attCategory)}</u></span>
+            `;
+
+        for(let attVar of attTree[attCategory]) {
+            let attObj = data.atts[attVar];
+
+            queueCache(`${attVar}AttContainer`);
+            queueCache(`${attVar}Name`);
+            queueCache(`${attVar}Num`);
+            queueCache(`${attVar}Mult`);
+            queueCache(`${attVar}PerMinute`);
+            queueCache(`${attVar}DisplayContainer`);
+
+            theStr += Raw.html`
+                <div id="${attVar}AttContainer" style="position:relative;cursor:pointer;white-space:nowrap;border:2px solid transparent" onclick="clickedAttName('${attVar}')">
+                    <img id="${attVar}DisplayContainer" src="img/${attVar}.svg" alt="${attVar}" 
+                        style="margin:1px;width:30px;height:30px;vertical-align:top;background:var(--text-bright);border:1px solid black;" />
+                    <span style="display:inline-block">
+                        <div id="${attVar}Name" style="font-weight:bold;color:var(--text-primary)">${decamelize(attVar)}</div>
+                        <span id="${attVar}Num" style="display:inline-block;font-weight:bold;color:var(--text-primary)">${attObj.num}</span>
+                        <span style="display:inline-block">(+<span id="${attVar}PerMinute" style="font-weight:bold;color:var(--text-primary)">${attObj.perMinute}</span>/m)</span>
+                        <span style="display:inline-block"> = x<span id="${attVar}Mult" style="font-weight:bold;color:var(--text-primary)">${attObj.mult}</span> bonus</span>
+                    </span>
+                </div>`;
+        }
+        theStr += `</div>`;
+    }
 
     let child = document.createElement("template");
     child.innerHTML = theStr;
@@ -69,18 +84,18 @@ function generateActionDisplay(actionVar) {
         <span onclick="actionTitleClicked('${actionVar}')" style="color:var(--text-primary);cursor:pointer;position:absolute;top:-77px;height:77px;left:0;
             white-space: nowrap;border-width: 0 0 0 6px;border-style: solid;border-color: var(--text-muted);padding-left:4px;background-color:var(--overlay-color)">
           
-            <span style="font-size:18px;"><b>${actionObj.title}</b><br></span>
-            <b><span style="font-size:16px;" id='${actionVar}Momentum'>0</span> 
-            <span style="color:${resourceColor};font-size:14px;">${capitalizeFirst(actionObj.momentumName)}</span></b>
-            <span style="font-size:14px;color:var(--text-muted)">${actionObj.isGenerator?`(+<b><span id="${actionVar}MomentumAdded">10</span></b>)`:""}</span><br>
-            <span style="font-size:12px;position:relative;">
-                Level <b><span id="${actionVar}Level">0</span></b>
-                ${actionObj.maxLevel >= 0 ? ` / <b><span id='${actionVar}MaxLevel'>0</span></b>` : ""}
-                <span id='${actionVar}HighestLevelContainer2'> 
-                    (<b><span id='${actionVar}HighestLevel2'></span></b>)
+            <span style="font-size:18px;font-weight:bold;">${actionObj.title}<br></span>
+            <span style="font-size:16px;font-weight:bold;" id='${actionVar}Momentum'>0</span> 
+            <span style="color:${resourceColor};font-size:14px;font-weight:bold;">${capitalizeFirst(actionObj.momentumName)}</span>
+            <span style="font-size:14px;color:var(--text-muted)">${actionObj.isGenerator?`(+<span id="${actionVar}MomentumAdded" style="color:var(--text-primary);font-weight:bold;">10</span>)`:""}</span><br>
+            <span style="font-size:12px;position:relative;color:var(--text-muted)">
+                Level <span id="${actionVar}Level" style="color:var(--text-primary);font-weight:bold;">0</span>
+                ${actionObj.maxLevel >= 0 ? ` / <span id="${actionVar}MaxLevel" style="color:var(--text-primary);font-weight:bold;">0</span>` : ""}
+                <span id="${actionVar}HighestLevelContainer2"> 
+                    (<b><span id='${actionVar}HighestLevel2' style="color:var(--text-primary);font-weight:bold;"></span></b>)
                 </span> | 
-                <b><span id='${actionVar}Efficiency'></span></b>% efficiency
-                ${!actionObj.wage ? "" : ` | <b>$<span id='${actionVar}Wage' style='color:var(--wage-color)'></span></b>`}
+                <span id="${actionVar}Efficiency" style="color:var(--text-primary);font-weight:bold;"></span>% efficiency
+                ${!actionObj.wage ? "" : ` | $<span id="${actionVar}Wage" style="color:var(--wage-color);font-weight:bold;"></span>`}
             </span>
         </span>
     `
@@ -192,11 +207,10 @@ function generateActionDisplay(actionVar) {
 
     queueCache(`${actionVar}ExpToAdd`);
 
-    let onComplete = Raw.html`
+    let onComplete = actionObj.onCompleteText ? Raw.html`
         <div>On Complete:<br>
-            +<b><span id="${actionVar}ExpToAdd">1</span></b> Exp<br>
             ${actionObj.onCompleteText}
-        </div><br>`;
+        </div><br>` : "";
 
     queueCache(`${actionVar}ActionPowerMult`);
 
@@ -235,7 +249,7 @@ function generateActionDisplay(actionVar) {
     queueCache(`${actionVar}_infoContainer`);
 
     let levelInfoContainer = Raw.html`
-            <div id="${actionVar}_infoContainer" style="display:none;padding:3px;">
+            <div id="${actionVar}_infoContainer" style="display:none;padding:5px;">
         Tier <b>${actionObj.tier}</b>${actionObj.isGenerator ? " Generator" : " Action"}<br>
         Efficiency, found in the title, is Expertise Mult * Base Efficiency (x<b><span id="${actionVar}EfficiencyBase"></span></b>), capping at <b>100</b>%.<br>
         ${actionObj.isGenerator?"":(`Consume and send rate is ${actionObj.tierMult()*100}% of ${actionObj.momentumName} * efficiency.<br>`)}<br>
@@ -255,7 +269,7 @@ function generateActionDisplay(actionVar) {
     queueCache(`${actionVar}_attsContainer`);
 
     let attsContainer = Raw.html`
-        <div id="${actionVar}_attsContainer" style="display:none;padding:3px;max-height:220px;overflow-y:auto;">
+        <div id="${actionVar}_attsContainer" style="display:none;padding:5px;max-height:220px;overflow-y:auto;">
             ${generateActionOnLevelAtts(actionObj)}
             ${generateActionExpAtts(actionObj)}
             ${generateActionEfficiencyAtts(actionObj)}
@@ -279,7 +293,7 @@ function generateActionDisplay(actionVar) {
     queueCache(`${actionVar}TotalSend`);
 
     let downstreamContainer = Raw.html`
-        <div id="${actionVar}_downstreamContainer" style="padding:10px;display:none;">
+        <div id="${actionVar}_downstreamContainer" style="padding:5px;display:none;">
             <div id="${actionVar}_downstreamButtonContainer">
                 ${createDownStreamSliders(actionObj)}
                 <span onclick="toggleAllZero('${actionVar}')" 
@@ -315,6 +329,7 @@ function generateActionDisplay(actionVar) {
                 ${levelInfoContainer}
                 ${downstreamContainer}
                 ${lockOverAll}
+                ${dataObj.extraButton ?? ""}
             </div>
             <div id="${actionVar}SmallVersionContainer" style="display:none;text-align:center;margin:50px auto;font-size:12px;width:100px;">
                 <b><span style="font-size:16px">${actionObj.title}</span></b><br>
@@ -382,7 +397,7 @@ function generateOutsideAttDisplay(actionObj, attObj, type) {
     let statValue = attObj[1];
 
     let startDisplayed = type === "add"?"":"none";
-    let color = type === "add"
+    let borderColor = type === "add"
         ? "--attribute-add-color"
         : (type === "exp"
             ? "--attribute-use-exp-color"
@@ -413,7 +428,7 @@ function generateOutsideAttDisplay(actionObj, attObj, type) {
 
     return Raw.html`
         <div id="${actionVar}${statName}OutsideContainer${type}" onclick="clickedAttName('${statName}')" 
-             style="display:${startDisplayed};border:1px solid var(${color});margin-bottom:2px;cursor:pointer;background-color:var(--overlay-color);padding:1px;">
+             style="display:${startDisplayed};border:2px solid var(${borderColor});margin-bottom:2px;cursor:pointer;background-color:var(--overlay-color);padding:1px;">
             <div class="showthat" style="position:relative;width:30px;height:30px;background-color:var(${backgroundColor});">
                 <div class="showthisUp" style="font-size:18px;">${tooltipText}</div>
                 <img src="img/${statName}.svg" alt="${statName}" style="width:100%;height:100%;" />
@@ -432,8 +447,10 @@ function generateActionOnLevelAtts(actionObj) {
     for(let attObj of dataObj.onLevelAtts) {
         let attVar = attObj[0];
 
+        queueCache(`${actionVar}${attVar}InsideContaineradd`);
+
         onLevelAttsText += `
-        <div style="color:var(--text-muted);cursor:pointer;" class="backgroundWhenHover" onclick="clickedAttName('${attVar}')">
+        <div id="${actionVar}${attVar}InsideContaineradd" style="color:var(--text-muted);cursor:pointer;border:2px solid transparent;" class="backgroundWhenHover" onclick="clickedAttName('${attVar}')">
             +<span style="color:var(--text-primary)"><b>${attObj[1]}</b></span> to 
             <img src="img/${attVar}.svg" alt="${attVar}" 
             style="margin:1px;width:20px;height:20px;vertical-align:top;background:var(--attribute-add-bg-color)" />
@@ -462,10 +479,11 @@ function generateActionExpAtts(actionObj) {
             console.log(`ERROR: you need to instantiate the stat: '${attVar}'`);
         }
         queueCache(`${actionVar}_${attVar}AttExpMult`);
-        queueCache(`${actionVar}_${attVar}AttExpContainer`);
+        queueCache(`${actionVar}${attVar}InsideContainerexp`);
 
         expAttsStr += Raw.html`
-        <div id="${actionVar}_${attVar}AttExpContainer" style="color:var(--text-muted);cursor:pointer;display:none;" class="backgroundWhenHover" onclick="clickedAttName('${attVar}')">
+        <div id="${actionVar}${attVar}InsideContainerexp" style="color:var(--text-muted);cursor:pointer;display:none;border:2px solid transparent;" 
+            class="backgroundWhenHover" onclick="clickedAttName('${attVar}')">
             <span style="color:var(--text-primary)"><b>${ratio}</b></span>% of <img src="img/${attVar}.svg" alt="${attVar}" 
             style="margin:1px;width:20px;height:20px;vertical-align:top;background:var(--attribute-use-exp-bg-color)" />
             <span style="color:var(--text-primary)"><b>${capitalizeFirst(attVar)}</b></span>'s bonus 
@@ -497,10 +515,11 @@ function generateActionEfficiencyAtts(actionObj) {
             console.log(`ERROR: you need to instantiate the stat: '${attVar}'`);
         }
         queueCache(`${actionVar}_${attVar}AttEfficiencyMult`);
-        queueCache(`${actionVar}_${attVar}AttEfficiencyContainer`);
+        queueCache(`${actionVar}${attVar}InsideContainereff`);
 
         expertiseModsStr += Raw.html`
-        <div id="${actionVar}_${attVar}AttEfficiencyContainer" style="color:var(--text-muted);cursor:pointer;display:none;" class="backgroundWhenHover" onclick="clickedAttName('${attVar}')">
+        <div id="${actionVar}${attVar}InsideContainereff" style="color:var(--text-muted);cursor:pointer;display:none;border:2px solid transparent;" 
+            class="backgroundWhenHover" onclick="clickedAttName('${attVar}')">
             <span style="color:var(--text-primary)"><b>${ratio}</b></span>% of <img src="img/${attVar}.svg" alt="${attVar}" 
             style="margin:1px;width:20px;height:20px;vertical-align:top;background:var(--attribute-use-eff-bg-color)" />
             <span style="color:var(--text-primary)"><b>${capitalizeFirst(attVar)}</b></span>'s bonus 
@@ -544,9 +563,9 @@ function createDownStreamSliders(actionObj) {
                 <b><span id="${actionVar}DownstreamAttentionBonus${downstreamVar}" 
                     class="hyperVisible" style="color:yellow;display:none;">x2</span></b><br>
                 <input type="number" id="${actionVar}NumInput${downstreamVar}" value="0" min="0" max="100" style="margin-right:3px;font-size:10px;width:37px;"
-                    oninput="validateInput('${actionVar}', 'downstreamVar')" onchange="downstreamNumberChanged('${actionVar}', 'downstreamVar')" >
+                    oninput="validateInput('${actionVar}', '${downstreamVar}')" onchange="downstreamNumberChanged('${actionVar}', '${downstreamVar}')" >
                 <input type="range" id="${actionVar}RangeInput${downstreamVar}" value="0" min="0" max="100" 
-                    oninput="downstreamSliderChanged('${actionVar}', 'downstreamVar')" style="margin-left:5px;width:200px;font-size:10px;height:5px;margin-bottom:8px;">
+                    oninput="downstreamSliderChanged('${actionVar}', '${downstreamVar}')" style="margin-left:5px;width:200px;font-size:10px;height:5px;margin-bottom:8px;">
             </div>`;
     }
 
@@ -575,17 +594,17 @@ function unhighlightLine(borderId) {
 
 
 function handleLineClick(borderId, lineData) {
-    const existingIndex = data.attentionSelected.findIndex(entry => entry.borderId === borderId);
+    const existingIndex = data.focusSelected.findIndex(entry => entry.borderId === borderId);
 
     if (existingIndex !== -1) {
         unhighlightLine(borderId);
-        data.attentionSelected.splice(existingIndex, 1);
+        data.focusSelected.splice(existingIndex, 1);
     } else {
-        if (data.attentionSelected.length >= data.maxAttentionAllowed) {
-            const removed = data.attentionSelected.shift();
+        if (data.focusSelected.length >= data.maxFocusAllowed) {
+            const removed = data.focusSelected.shift();
             unhighlightLine(removed.borderId);
         }
-        data.attentionSelected.push({ borderId, lineData });
+        data.focusSelected.push({ borderId, lineData });
         highlightLine(borderId);
     }
 }
@@ -721,7 +740,7 @@ function setAllCaches() {
     queueCache("killTheLichMenu");
     queueCache("attDisplay");
     queueCache("bonusDisplay");
-    queueCache("killTheLichMenuButton");
+    queueCache("killTheLichMenuButton2");
     queueCache("essenceDisplay");
     queueCache("jobDisplay");
 

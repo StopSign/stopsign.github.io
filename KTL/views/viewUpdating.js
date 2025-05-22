@@ -55,10 +55,6 @@ let views = {
             let capName = capitalizeFirst(numberObj[0]);
             views.updateVal(`${attVar}${capName}`, data.atts[attVar][`${numberObj[0]}`], "innerText", numberObj[1]);
         }
-
-        //TODO remove from constantly updating and into only the unlock/unveil
-        let color = getAttColor(attVar);
-        views.updateVal(`${attVar}Name`, color, "style.color")
     },
     updateActions:function() {
         views.updateAura();
@@ -236,7 +232,7 @@ let views = {
         let roundedNumbers = [
             ["progress", 2], ["progressMax", 2], ["progressGain", 2],
             ["momentum", 2], ["momentumDelta", 2], ["level", 1],
-            ["exp", 2], ["expToLevel", 2], ["expToAdd", 2], ["expToAdd2", 2],
+            ["exp", 2], ["expToLevel", 2], ["expToAdd2", 2],
             ["momentumIncrease", 3], ["momentumDecrease", 3],
             ["highestLevel2", 1]
         ];
@@ -249,6 +245,7 @@ let views = {
         }
         if(actionObj.isGenerator) {
             roundedNumbers.push(["actionPowerMult", 3]);
+            roundedNumbers.push(["actionPower", 2]);
         }
 
         if(actionObj.currentMenu === "atts") {
@@ -301,16 +298,16 @@ let views = {
             let isAttention = isAttentionLine(actionVar, downstreamVar);
             views.updateVal(`${actionVar}DownstreamAttentionBonus${downstreamVar}`, isAttention ? "" : "none", "style.display");
             if(isAttention) {
-                views.updateVal(`${actionVar}DownstreamAttentionBonus${downstreamVar}`, "x" + intToString(data.attentionMult, 1));
-                views.updateVal(`${actionVar}_${downstreamVar}_Line_Inner_Top`, "x"+intToString(data.attentionMult, 1));
+                views.updateVal(`${actionVar}DownstreamAttentionBonus${downstreamVar}`, "x" + intToString(data.focusMult, 1));
+                views.updateVal(`${actionVar}_${downstreamVar}_Line_Inner_Top`, "x"+intToString(data.focusMult, 1));
             }
 
-            let attentionShowing = actionObj[`${downstreamVar}AttentionMult`] > 1.005;
-            views.updateVal(`${actionVar}DownstreamAttentionBonusLoop${downstreamVar}`, attentionShowing ? "" : "none", "style.display");
-            views.updateVal(`${actionVar}_${downstreamVar}_Line_Inner_Bottom`, attentionShowing ? "" : "none", "style.display");
-            if(attentionShowing) {
-                views.updateVal(`${actionVar}DownstreamAttentionBonusLoop${downstreamVar}`, "x" + intToString(actionObj[downstreamVar + "AttentionMult"], 3));
-                views.updateVal(`${actionVar}_${downstreamVar}_Line_Inner_Bottom`, "x" + intToString(actionObj[downstreamVar + "AttentionMult"], 3));
+            let focusShowing = actionObj[`${downstreamVar}FocusMult`] > 1.005;
+            views.updateVal(`${actionVar}DownstreamAttentionBonusLoop${downstreamVar}`, focusShowing ? "" : "none", "style.display");
+            views.updateVal(`${actionVar}_${downstreamVar}_Line_Inner_Bottom`, focusShowing ? "" : "none", "style.display");
+            if(focusShowing) {
+                views.updateVal(`${actionVar}DownstreamAttentionBonusLoop${downstreamVar}`, "x" + intToString(actionObj[downstreamVar + "FocusMult"], 3));
+                views.updateVal(`${actionVar}_${downstreamVar}_Line_Inner_Bottom`, "x" + intToString(actionObj[downstreamVar + "FocusMult"], 3));
             }
 
 
@@ -416,7 +413,7 @@ function updateGlobals() {
     }
 
     let toShowKTLButton = data.gameState !== "KTL" && (data.doneKTL || data.actions.hearAboutTheLich.level >= 1);
-    views.updateVal(`killTheLichMenuButton`, toShowKTLButton ? "" : "none", "style.display");
+    views.updateVal(`killTheLichMenuButton2`, toShowKTLButton ? "" : "none", "style.display");
 
     let toShowUseAmulet = data.useAmuletButtonShowing && data.gameState === "KTL" ? "" : "none";
     views.updateVal(`openUseAmuletButton`, toShowUseAmulet ? "" : "none", "style.display");

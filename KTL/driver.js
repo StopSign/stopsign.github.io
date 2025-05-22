@@ -147,22 +147,22 @@ function gameTick() {
 
         for(let downstreamVar of actionObj.downstreamVars) {
             if (isAttentionLine(actionVar, downstreamVar)) {
-                const key = downstreamVar + "AttentionMult";
+                const key = downstreamVar + "FocusMult";
                 if(data.upgrades.rememberWhatIFocusedOn.upgradePower === 0) {
                     continue;
                 }
                 actionObj[key] += 1 / ticksPerSecond / 3600;
-                if(actionObj[key] > data.attentionLoopMax) {
-                    actionObj[key] = data.attentionLoopMax;
+                if(actionObj[key] > data.focusLoopMax) {
+                    actionObj[key] = data.focusLoopMax;
                 }
             }
         }
     }
 
     let attsPerSecond = getStatChanges();
-    data.attNames.forEach(function(attName) {
-        data.atts[attName].perMinute = attsPerSecond[attName] ? attsPerSecond[attName]*60 : 0;
-    });
+    for(let attVar in data.atts) {
+        data.atts[attVar].perMinute = attsPerSecond[attVar] ? attsPerSecond[attVar]*60 : 0;
+    }
 
 
     upgradeUpdates()
@@ -248,10 +248,10 @@ function tickGameObject(actionVar) {
 }
 
 function calculateTaken(actionVar, downstreamVar, actionObj, mult) {
-    let permAttentionMult = actionObj[downstreamVar + "AttentionMult"] >= 1 ? actionObj[downstreamVar + "AttentionMult"] : 1;
+    let permFocusMult = actionObj[downstreamVar + "FocusMult"] >= 1 ? actionObj[downstreamVar + "FocusMult"] : 1;
 
 
-    let totalTakenMult = actionObj.tierMult() * (actionObj.efficiency / 100) * permAttentionMult * (isAttentionLine(actionVar, downstreamVar) ? data.attentionMult : 1);
+    let totalTakenMult = actionObj.tierMult() * (actionObj.efficiency / 100) * permFocusMult * (isAttentionLine(actionVar, downstreamVar) ? data.focusMult : 1);
     if (totalTakenMult > 0.1) {
         totalTakenMult = 0.1; // Cap at 10%/s
     }

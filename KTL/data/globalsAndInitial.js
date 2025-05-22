@@ -31,7 +31,6 @@ prevState.atts = {};
 let data = {};
 data.actions = {};
 data.atts = {};
-data.attNames = [];
 data.toastStates = []; // array of toast objects: {id, state, element}
 data.gameState = "default"; //KTL
 data.totalMomentum = 0;
@@ -43,10 +42,10 @@ data.currentWage = 1;
 data.numberType = "engineering"; //or scientific
 data.doneKTL = false;
 data.doneAmulet = false;
-data.attentionSelected = [];
-data.maxAttentionAllowed = 2;
-data.attentionMult = 2;
-data.attentionLoopMax = 2.5;
+data.focusSelected = [];
+data.maxFocusAllowed = 2;
+data.focusMult = 2;
+data.focusLoopMax = 2.5;
 data.options = {};
 data.options.updateRate = 50;
 data.options.autosaveRate = 10;
@@ -54,8 +53,6 @@ data.options.bonusRate = 2;
 
 let viewData = {}; //contains only things that are generated / not saved
 viewData.toasts = [];
-
-let attTitles = []; //[<title>, <stat name to be located above>]
 
 let language = "english";
 let globalVisible = false;
@@ -90,63 +87,51 @@ function initializeData() {
     }
     createUpgrades();
 
+    createAndLinkNewAttribute("introspection", "awareness");
+    createAndLinkNewAttribute("introspection", "curiosity");
+    createAndLinkNewAttribute("introspection", "observation");
+    createAndLinkNewAttribute("introspection", "processing");
+    createAndLinkNewAttribute("introspection", "stillness");
+    createAndLinkNewAttribute("introspection", "integration");
 
-    attTitles.push(["Introspection", "awareness"]);
-    createAndLinkNewAttribute("awareness");
-    createAndLinkNewAttribute("curiosity");
-    createAndLinkNewAttribute("observation");
-    createAndLinkNewAttribute("processing");
-    createAndLinkNewAttribute("stillness");
-    createAndLinkNewAttribute("integration");
+    createAndLinkNewAttribute("magic", "concentration");
+    createAndLinkNewAttribute("magic", "cycle");
+    createAndLinkNewAttribute("magic", "willpower");
+    createAndLinkNewAttribute("magic", "amplification");
+    createAndLinkNewAttribute("magic", "pulse");
+    createAndLinkNewAttribute("magic", "spark");
+    createAndLinkNewAttribute("magic", "vision");
 
+    createAndLinkNewAttribute("physique", "endurance");
+    createAndLinkNewAttribute("physique", "flow");
+    createAndLinkNewAttribute("physique", "control");
+    createAndLinkNewAttribute("physique", "might");
+    createAndLinkNewAttribute("physique", "coordination");
+    createAndLinkNewAttribute("physique", "reflex");
+    createAndLinkNewAttribute("physique", "rhythm");
 
-    attTitles.push(["Magic", "focus"]);
-    createAndLinkNewAttribute("focus");
-    createAndLinkNewAttribute("cycle");
-    createAndLinkNewAttribute("willpower");
-    createAndLinkNewAttribute("amplification");
-    createAndLinkNewAttribute("pulse");
-    createAndLinkNewAttribute("spark");
-    createAndLinkNewAttribute("vision");
+    createAndLinkNewAttribute("adventuring", "energy");
+    createAndLinkNewAttribute("adventuring", "navigation");
+    createAndLinkNewAttribute("adventuring", "comfort");
+    createAndLinkNewAttribute("adventuring", "instinct");
+    createAndLinkNewAttribute("adventuring", "initiative");
+    createAndLinkNewAttribute("adventuring", "logistics");
+    createAndLinkNewAttribute("adventuring", "valor");
 
+    createAndLinkNewAttribute("money", "ambition");
+    createAndLinkNewAttribute("money", "savvy");
+    createAndLinkNewAttribute("money", "cunning");
+    createAndLinkNewAttribute("money", "leverage");
+    createAndLinkNewAttribute("money", "adaptability");
 
-    attTitles.push(["Physique", "endurance"]);
-    createAndLinkNewAttribute("endurance");
-    createAndLinkNewAttribute("flow");
-    createAndLinkNewAttribute("control");
-    createAndLinkNewAttribute("might");
-    createAndLinkNewAttribute("coordination");
-    createAndLinkNewAttribute("reflex");
-    createAndLinkNewAttribute("rhythm");
-
-
-    attTitles.push(["Adventuring", "energy"]);
-    createAndLinkNewAttribute("energy");
-    createAndLinkNewAttribute("navigation");
-    createAndLinkNewAttribute("comfort");
-    createAndLinkNewAttribute("instinct");
-    createAndLinkNewAttribute("initiative");
-    createAndLinkNewAttribute("logistics");
-    createAndLinkNewAttribute("valor");
-
-
-    attTitles.push(["Money", "ambition"]);
-    createAndLinkNewAttribute("ambition");
-    createAndLinkNewAttribute("savvy");
-    createAndLinkNewAttribute("cunning");
-    createAndLinkNewAttribute("leverage");
-    createAndLinkNewAttribute("adaptability");
-
-
-    attTitles.push(["Socialization", "confidence"]);
-    createAndLinkNewAttribute("confidence");
-    createAndLinkNewAttribute("recognition");
-    createAndLinkNewAttribute("charm");
-    createAndLinkNewAttribute("influence");
-    createAndLinkNewAttribute("discernment");
-    createAndLinkNewAttribute("deception");
-    createAndLinkNewAttribute("command");
-    createAndLinkNewAttribute("diplomacy");
+    createAndLinkNewAttribute("socialization", "confidence");
+    createAndLinkNewAttribute("socialization", "recognition");
+    createAndLinkNewAttribute("socialization", "charm");
+    createAndLinkNewAttribute("socialization", "influence");
+    createAndLinkNewAttribute("socialization", "discernment");
+    createAndLinkNewAttribute("socialization", "deception");
+    createAndLinkNewAttribute("socialization", "command");
+    createAndLinkNewAttribute("socialization", "diplomacy");
     
     //KTL
     create("overclockTargetingTheLich", ["killHorde"], 0, 0);

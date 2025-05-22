@@ -1,68 +1,53 @@
-let myKeyQueue = [];
-document.addEventListener("keydown", function(e) {
-    let code = {key:(e.charCode !== 0 ? e.charCode : e.keyCode), shift:e.shiftKey};
-    myKeyQueue.push(code);
-    processKeyQueue();
-});
-
-function processKeyQueue() {
-    let key = myKeyQueue[0].key;
-    // var shift = myKeyQueue[0].shift;
-    myKeyQueue.splice(0, 1);
-    if(key === 27) { //escape
-        // deselect();
-    }
-}
-
-let keysPressed = {}; // Track multiple keys
-let movementStep = 30; // Movement speed
+let keysPressed = {};
+let movementStep = 10;
 let animationFrameId;
 
-// Track keys being pressed
 document.addEventListener("keydown", function(e) {
-    keysPressed[e.key.toLowerCase()] = true; // Register the key
-    if (!animationFrameId) moveActionContainer(); // Start movement loop
+    let key = e.key.toLowerCase();
+    keysPressed[key] = {
+        code: e.keyCode || e.charCode,
+        shift: e.shiftKey
+    };
+
+    if (keysPressed['escape']) {
+        // deselect();
+    }
+    if(keysPressed[' ']) {
+        pauseGame();
+    }
+
+    if (!animationFrameId && ['w', 'a', 's', 'd'].includes(key)) {
+        moveActionContainer();
+    }
 });
 
-// Stop tracking keys when released
 document.addEventListener("keyup", function(e) {
     delete keysPressed[e.key.toLowerCase()];
+
     if (Object.keys(keysPressed).length === 0) {
         cancelAnimationFrame(animationFrameId);
         animationFrameId = null;
     }
 });
 
-// Movement function using requestAnimationFrame
 function moveActionContainer() {
-
-    let keyPressed = false;
-    if (keysPressed['w']) { // Move up
-        transformY += movementStep
-        keyPressed = true;
+    if (keysPressed['w']) {
+        transformY += movementStep;
     }
-    if (keysPressed['a']) { // Move left
-        transformX += movementStep
-        keyPressed = true;
+    if (keysPressed['a']) {
+        transformX += movementStep;
     }
-    if (keysPressed['s']) { // Move down
-        transformY -= movementStep
-        keyPressed = true;
+    if (keysPressed['s']) {
+        transformY -= movementStep;
     }
-    if (keysPressed['d']) { // Move right
-        transformX -= movementStep
-        keyPressed = true;
-    }
-    if(!keyPressed) {
-        return;
+    if (keysPressed['d']) {
+        transformX -= movementStep;
     }
 
-    // Apply the new position
     actionContainer.style.transform = `translate(${transformX}px, ${transformY}px) scale(${scale})`;
 
     forceRedraw(windowElement);
 
-    // Continue the animation loop if keys are still pressed
     animationFrameId = requestAnimationFrame(moveActionContainer);
 }
 

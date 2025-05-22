@@ -53,7 +53,7 @@ return;
         </ol>`);
     createToast(function() { return data.actions.harnessOverflow.level >= 4; },
         "Attention Bonus",
-        Raw.html`You can click the solid blue lines between the actions to set the attention bonus! For now, you can set 
+        Raw.html`You can click the solid blue lines between the actions to set the focus bonus! For now, you can set 
         up to 2, and they give a x2 to the slider they represent, moving the resources around faster!`);
     createToast(function() { return data.actions.remember.unlocked; },
         "Max Level",
