@@ -28,7 +28,7 @@ function validateInput(fromAction, toAction) {
 
 function setSliderUI(fromAction, toAction, newValue) {
     if(!fromAction || !toAction || !document.getElementById(fromAction + "NumInput" + toAction)) {
-        console.log('trying to set it from: ' + fromAction + ', ' + toAction + ' with val ' + newValue);
+        console.log('trying to set slider from: ' + fromAction + ', ' + toAction + ' with val ' + newValue);
         return;
     }
     if(newValue === -1) {
@@ -55,8 +55,8 @@ function downstreamSliderChanged(fromAction, toAction) {
 function toggleAllZero(actionVar) {
     let actionObj = data.actions[actionVar];
     actionObj.downstreamVars.forEach(function (toAction) {
-        let downstreamAction = data.actions[toAction];
-        if(!downstreamAction || downstreamAction.momentumName !== actionObj.momentumName || !downstreamAction.visible) {
+        let downstreamObj = data.actions[toAction];
+        if(!downstreamObj || !downstreamObj.hasUpstream || !downstreamObj.visible) {
             return;
         }
         setSliderUI(actionVar, toAction, 0);
@@ -65,8 +65,8 @@ function toggleAllZero(actionVar) {
 function toggleAllHundred(actionVar) {
     let actionObj = data.actions[actionVar];
     actionObj.downstreamVars.forEach(function (toAction) {
-        let downstreamAction = data.actions[toAction];
-        if(!downstreamAction || downstreamAction.momentumName !== actionObj.momentumName || !downstreamAction.visible) {
+        let downstreamObj = data.actions[toAction];
+        if(!downstreamObj || !downstreamObj.hasUpstream || !downstreamObj.visible) {
             return;
         }
         setSliderUI(actionVar, toAction, 100);

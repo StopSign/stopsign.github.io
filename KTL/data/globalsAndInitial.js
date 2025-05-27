@@ -2,6 +2,8 @@
 let gameSpeed = 1;
 let bonusSpeed = 1;
 
+let View = {};
+
 let curTime = new Date();
 let gameTicksLeft = 0;
 let sudoStop = false;
@@ -22,16 +24,13 @@ let saveName = "KTLsave"; //Blank if you don't want to save, change name to forc
 let stop = false;
 let forceStop = false;
 
-let prevState = {};
-prevState.res = {};
-prevState.actions = {};
-prevState.atts = {};
 
-//Game globals - these initializations will be overriden in load
+//Game globals - these initializations will be overriden in load TODO do i need these
 let data = {};
 data.actions = {};
 data.atts = {};
 data.toastStates = []; // array of toast objects: {id, state, element}
+data.planeTabSelected = 0;
 data.gameState = "default"; //KTL
 data.totalMomentum = 0;
 data.essence = 0;
@@ -77,6 +76,7 @@ function debug() {
     buyUpgrade("stopLettingOpportunityWait", 1);
     buyUpgrade("stopLettingOpportunityWait", 2);
     setSliderUI("overclock", "reflect", 100);
+    unveilAction('hearAboutTheLich');
     gameSpeed = 1;
     bonusTime = 1000 * 60 * 60 * 24;
 }
@@ -141,7 +141,7 @@ function initializeData() {
     create("killGenerals", [], 1, .5);
 
     //intro
-    create("overclock", ["reflect", "bodyAwareness", "travelOnRoad", "makeMoney", "socialize"], 0, 0); //generateMana
+    create("overclock", ["reflect", "bodyAwareness", "travelOnRoad", "makeMoney", "socialize", "hearAboutTheLich"], 0, 0); //generateMana
     create("reflect", ["harnessOverflow", "distillInsight", "takeNotes", "remember"], -1, -1);
     create("harnessOverflow", [], -1.1, .5); //siftExcess
     create("distillInsight", [], -1.9, 0);
@@ -164,8 +164,10 @@ function initializeData() {
     create("socialize", ["meetPeople"], -1, 1);
     create("meetPeople", ["joinCoffeeClub"], 0, 1); //talkToScott, casualConversations
     create("joinCoffeeClub", ["gossip"], 0, 1);
-    create("gossip", ["hearAboutTheLich"], 1, 0);
-    create("hearAboutTheLich", [], 0, -1.5);
+    // create("gossip", ["hearAboutTheLich"], 1, 0);
+    // create("hearAboutTheLich", [], 0, -1.5);
+    create("gossip", [], 1, 0);
+    create("hearAboutTheLich", [], 0, 1);
 
 //--From Upgrades:--
 

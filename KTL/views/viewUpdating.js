@@ -28,8 +28,6 @@ let views = {
         }
         updateGlobals();
 
-        saveCurrentViewState();
-
         //in case this was set
         forceVisuals = false;
     },
@@ -163,13 +161,11 @@ let views = {
 
                 views.updateVal(`${actionVar}_${downstreamVar}_Line_Inner_Bottom`, downstreamObj.momentumName === actionObj.momentumName ? "" : "none", "style.display");
                 views.updateVal(`${actionVar}_${downstreamVar}_Line_Outer`, downstreamObj.visible ? "" : "none", "style.display");
-                if(actionObj.momentumName === downstreamObj.momentumName) {
+                if(downstreamObj.hasUpstream) {
                     views.updateVal(`${actionVar}SliderContainer${downstreamVar}`, downstreamObj.visible ? "" : "none", "style.display");
                 }
             }
         }
-
-        //TODO update attributes here
     },
     updateActionLockedViews: function(actionObj) {
         let actionVar = actionObj.actionVar;
@@ -200,7 +196,6 @@ let views = {
 
         //Menu-specific updates
         if(actionObj.currentMenu === "atts") {
-
             views.updateVal(`${actionVar}HighestLevelContainer`, data.upgrades.rememberWhatIDid.isFullyBought ? "" : "none", "style.display");
             views.updateVal(`${actionVar}SecondHighestLevelContainer`, data.upgrades.rememberHowIGrew.isFullyBought ? "" : "none", "style.display");
             views.updateVal(`${actionVar}ThirdHighestLevelContainer`, data.upgrades.rememberMyMastery.isFullyBought ? "" : "none", "style.display");
@@ -227,8 +222,6 @@ let views = {
         }
 
         //Update the numbers
-
-
         let roundedNumbers = [
             ["progress", 2], ["progressMax", 2], ["progressGain", 2],
             ["momentum", 2], ["momentumDelta", 2], ["level", 1],
@@ -245,7 +238,7 @@ let views = {
         }
         if(actionObj.isGenerator) {
             roundedNumbers.push(["actionPowerMult", 3]);
-            roundedNumbers.push(["actionPower", 2]);
+            // roundedNumbers.push(["actionPower", 2]);
         }
 
         if(actionObj.currentMenu === "atts") {
@@ -284,10 +277,9 @@ let views = {
         }
         for(let downstreamVar of actionObj.downstreamVars) {
             let downstreamObj = data.actions[downstreamVar];
-            if(!downstreamObj || actionObj.momentumName !== downstreamObj.momentumName) {
+            if(!downstreamObj || !downstreamObj.hasUpstream) {
                 return;
             }
-
 
             let rangeValue = data.actions[actionVar][`downstreamRate${downstreamVar}`];
 
@@ -309,8 +301,6 @@ let views = {
                 views.updateVal(`${actionVar}DownstreamAttentionBonusLoop${downstreamVar}`, "x" + intToString(actionObj[downstreamVar + "FocusMult"], 3));
                 views.updateVal(`${actionVar}_${downstreamVar}_Line_Inner_Bottom`, "x" + intToString(actionObj[downstreamVar + "FocusMult"], 3));
             }
-
-
 
         }
     },
@@ -429,13 +419,6 @@ function updateGlobals() {
 
     views.updateVal(`essence`, data.essence, "innerText", 1);
     views.updateVal(`essence2`, data.essence, "innerText", 1);
-}
-
-//Save a second copy of all the data after a view update, so it can request updates only for the ones that are different
-function saveCurrentViewState() {
-    prevState.atts = copyArray(data.atts);
-    prevState.actions = copyArray(data.actions);
-    prevState.scale = scale;
 }
 
 function updateViewOnSecond() {

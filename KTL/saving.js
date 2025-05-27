@@ -3,39 +3,31 @@ function clearSave() {
     location.reload();
 }
 
-function load() {
-    // loadDefaults();
-    // loadUISettings();
-    initializeData();
+data.saveVersion = 0;
 
-    /* Loading:
-        * The round that the player is running should stay the same when the player loads, even if the underlying actionData has been updated
-        * This is not true for upgradeData - take fresh actionData.upgrade copies and add toLoad data on top
-        * For actions, before UI creation is load. Load actionData into data, then change all the numbers with toLoad (keep the update's other effects?)
-        * bring all of the other data variables in too
-        *
-     */
+const actionPatches = {
+    overclock: {
+        needsReset: true, // indicates structure has changed since last version
+        addedInVersion: 2,
+    },
+    meditate: {
+        needsReset: false,
+        addedInVersion: 1,
+    }
+};
+
+function load() {
+    initializeData();
 
     let toLoad = {};
 
-    if(isLoadingEnabled && window.localStorage[saveName] && JSON.parse(window.localStorage[saveName]).data) { //has a save file
-        toLoad = JSON.parse(window.localStorage[saveName]).data;
-        // for(let actionVar in data.actions) {
-            //     let actionObj = data.actions[actionVar];
-        //     Object.keys(toLoad.actions[actionVar]).forEach(function (key) {
-        //         if(["x", "y"].indexOf(key) !== -1) {
-        //             return;
-        //         }
-        //         if (typeof toLoad.actions[actionVar][key] !== 'function' && typeof actionObj[key] !== 'function') {
-        //             actionObj[key] = toLoad.actions[actionVar][key];
-        //         }
-        //     });
-        //
-        // })
-        // for(let attVar in data.atts) {
-        //     data.atts[attVar] = toLoad.atts[attVar];
-        // }
+    if(localStorage[saveName]) {
+        toLoad = JSON.parse(localStorage[saveName]);
+    }
+    if(isLoadingEnabled && localStorage[saveName] && toLoad.data) { //has a save file
+        const saveVersion = toLoad.saveVersion || 0;
 
+        patchActions(data.actions, toLoad.actions, actionData, actionPatches);
 
         mergeExistingOnly(data, toLoad, "actions", ["x", "y"]);
         mergeExistingOnly(data, toLoad, "atts");
@@ -43,35 +35,67 @@ function load() {
         mergeExistingOnly(data, toLoad, "toastStates");
         mergeExistingOnly(data, toLoad, "options");
 
-
-
-
-
-        data.gameState = toLoad.gameState ? toLoad.gameState : "default";
-        data.totalMomentum = toLoad.totalMomentum ? toLoad.totalMomentum : 0;
-        data.essence = toLoad.essence ? toLoad.essence : 0;
+        //load global items that aren't lists or objects
+        data.gameState = toLoad.gameState ?? "default";
+        data.planeTabSelected = toLoad.planeTabSelected ?? 0;
+        data.totalMomentum = toLoad.totalMomentum ?? 0;
+        data.essence = toLoad.essence ?? 0;
         data.useAmuletButtonShowing = !!toLoad.useAmuletButtonShowing;
-        data.secondsPerReset = toLoad.secondsPerReset ? toLoad.secondsPerReset : 0;
-        data.currentJob = toLoad.currentJob ? toLoad.currentJob : "Helping Scott";
-        data.currentWage = toLoad.currentWage ? toLoad.currentWage : 1;
-        data.numberType = toLoad.numberType ? toLoad.numberType : "engineering";
+        data.secondsPerReset = toLoad.secondsPerReset ?? 0;
+        data.currentJob = toLoad.currentJob ?? "Helping Scott";
+        data.currentWage = toLoad.currentWage ?? 1;
+        data.numberType = toLoad.numberType ?? "engineering";
         data.doneKTL = !!toLoad.doneKTL;
         data.doneAmulet = !!toLoad.doneAmulet;
         data.displayJob = !!toLoad.displayJob;
-        data.focusSelected = toLoad.focusSelected ? toLoad.focusSelected : [];
-        data.maxFocusAllowed = toLoad.maxFocusAllowed ? toLoad.maxFocusAllowed : 3;
-        data.focusMult = toLoad.focusMult ? toLoad.focusMult : 2;
-        data.focusLoopMax = toLoad.focusLoopMax ? toLoad.focusLoopMax : 2.5;
+        data.focusSelected = toLoad.focusSelected ?? [];
+        data.maxFocusAllowed = toLoad.maxFocusAllowed ?? 3;
+        data.focusMult = toLoad.focusMult ?? 2;
+        data.focusLoopMax = toLoad.focusLoopMax ?? 2.5;
     }
 
-    data.actions.overclock.momentumAdded = data.actions.overclock.actionPower * data.actions.overclock.upgradeMult;
+    //update all action data based on upgrades bought
+    Object.values(actionData).forEach(action => {
+        if (action.updateMults) action.updateMults();
+    });
 
     initializeDisplay();
+    setSlidersOnLoad(toLoad);
+    recalcInterval(data.options.updateRate);
+}
 
-    // view.initalize();
+function patchActions(currentData, loadedData, baseData, patchMap) {
+    const currentKeys = Object.keys(currentData);
+    const loadedKeys = loadedData ? Object.keys(loadedData) : [];
 
-    //set UI elements after both data and UI have been loaded
-    //set sliders
+    for (let key of currentKeys) {
+        if (!(key in loadedData)) {
+            //new action, load it
+            actionSetBaseVariables(currentData[key], baseData[key]);
+            continue;
+        }
+
+        // patch says reset, reset it
+        const needsReset = patchMap[key]?.needsReset;
+        if (needsReset) {
+            actionSetBaseVariables(currentData[key], baseData[key]);
+            continue;
+        }
+
+        //apply loaded data on top of current actionData
+        Object.assign(currentData[key], loadedData[key]);
+    }
+
+    // Remove deleted actions
+    for (let key of loadedKeys) {
+        if (!(key in currentData)) {
+            delete loadedData[key];
+        }
+    }
+}
+
+
+function setSlidersOnLoad(toLoad) {
     for(let actionVar in data.actions) {
         let actionObj = data.actions[actionVar];
         for(let downstreamVar of actionObj.downstreamVars) {
@@ -83,8 +107,6 @@ function load() {
             setSliderUI(actionVar, downstreamVar, toLoad.actions[actionVar]["downstreamRate" + downstreamVar]);
         }
     }
-
-    recalcInterval(data.options.updateRate);
 }
 
 function mergeExistingOnly(data, toLoad, varName, skipList = []) {
@@ -93,8 +115,8 @@ function mergeExistingOnly(data, toLoad, varName, skipList = []) {
     if (typeof dataObj !== "object" || typeof toLoadObj !== "object") return;
 
     for (let key in toLoadObj) {
-        if (!(key in dataObj)) continue;         // Skip if the key is not in data
-        if (skipList.includes(key)) continue;    // Skip if key is in skipList
+        if (!(key in dataObj)) continue;
+        if (skipList.includes(key)) continue;
 
         Object.assign(dataObj[key], toLoadObj[key]);
     }

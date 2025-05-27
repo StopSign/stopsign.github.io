@@ -147,7 +147,7 @@ function gameTick() {
 
         for(let downstreamVar of actionObj.downstreamVars) {
             if (isAttentionLine(actionVar, downstreamVar)) {
-                const key = downstreamVar + "FocusMult";
+                const key = `${downstreamVar}FocusMult`;
                 if(data.upgrades.rememberWhatIFocusedOn.upgradePower === 0) {
                     continue;
                 }
@@ -222,25 +222,31 @@ function tickGameObject(actionVar) {
     actionObj.momentumDecrease = (actionObj.isGenerator||atMaxLevel) ? 0 : (rateInefficient * ticksPerSecond);
     actionObj.totalSend = 0;
 
-    actionObj.downstreamVars.forEach(function (downstreamVar) {
-        let downstreamAction = data.actions[downstreamVar];
+    for(let downstreamVar of actionObj.downstreamVars) {
+        let downstreamObj = data.actions[downstreamVar];
+        let downstreamDataObj = actionData[downstreamVar];
 
-        if(!downstreamAction || !downstreamAction.visible) {
-            return;
+        if(!downstreamObj || !downstreamObj.visible) {
+            continue;
         }
-        if(downstreamAction.momentumName !== actionObj.momentumName) {
-            downstreamAction.momentumIncrease = actionObj.amountToSend * actionObj.progressGain / actionObj.progressMax;
-            return;
+        if(!downstreamObj.hasUpstream) {
+            if(!downstreamObj.unlocked && downstreamObj.unlockCost <= 0 && (!downstreamDataObj.isUnlockCustom || downstreamDataObj.isUnlockCustom())) {
+                unlockAction(downstreamObj);
+            }
+            downstreamObj.momentumIncrease = actionObj.amountToSend * actionObj.progressGain / actionObj.progressMax; //visual only
+            continue;
         }
-        let mult = (view.cached[actionVar + "NumInput" + downstreamVar].value - 0) / 100;
+        let mult = data.actions[actionVar][`downstreamRate${downstreamVar}`] / 100;
         let taken = calculateTaken(actionVar, downstreamVar, actionObj, mult);
 
         actionObj.totalSend += taken * ticksPerSecond;
         actionObj.momentumDecrease += taken * ticksPerSecond;
 
         //sends to unlock cost first if needed
-        giveMomentumTo(actionObj, downstreamAction, taken);
-    });
+        giveMomentumTo(actionObj, downstreamObj, taken);
+
+
+    }
     if(actionObj.isGenerator && actionVar !== "overclock") { //set decrease for other generators
         actionObj.momentumDecrease = (actionObj.momentum * actionObj.tierMult()) * actionObj.progressGain / actionObj.progressMax;
         actionObj.momentumDelta = actionObj.momentumIncrease - actionObj.momentumDecrease;
@@ -272,25 +278,27 @@ function checkProgressCompletion(actionObj, dataObj) {
     return false;
 }
 
-function giveMomentumTo(actionObj, downstreamAction, amount) {
-    if(!downstreamAction) {
+function giveMomentumTo(actionObj, downstreamObj, amount) {
+    if(!downstreamObj) {
         console.log(actionObj.title + " is failing to give to downstream.");
     }
-    addMomentumTo(downstreamAction, amount);
+    addMomentumTo(downstreamObj, amount);
     actionObj.momentum -= amount;
     actionObj.momentumDelta -= amount * ticksPerSecond;
 }
-function addMomentumTo(downstreamAction, amount) {
+function addMomentumTo(downstreamObj, amount) {
     //gives to unlockCost of downstream action, unlocking if possible, and gives leftover to momentum
-    if(downstreamAction.unlockCost > 0) {
-        downstreamAction.unlockCost -= amount;
+    let downstreamDataObj = actionData[downstreamObj.actionVar];
+    if(downstreamObj.unlockCost > 0) {
+        downstreamObj.unlockCost -= amount;
         amount = 0;
-        if(downstreamAction.unlockCost <= 0) {
-            unlockAction(downstreamAction);
-            amount = -1 * downstreamAction.unlockCost; //get the leftovers back
-        }
     }
-    downstreamAction.momentum += amount;
-    downstreamAction.momentumDelta += amount * ticksPerSecond;
-    downstreamAction.momentumIncrease += amount * ticksPerSecond;
+    if(!downstreamObj.unlocked && downstreamObj.unlockCost <= 0 && (!downstreamDataObj.isUnlockCustom || downstreamDataObj.isUnlockCustom())) {
+        unlockAction(downstreamObj);
+        amount = -1 * downstreamObj.unlockCost; //get the leftovers back
+        downstreamObj.unlockCost = 0;
+    }
+    downstreamObj.momentum += amount;
+    downstreamObj.momentumDelta += amount * ticksPerSecond;
+    downstreamObj.momentumIncrease += amount * ticksPerSecond;
 }

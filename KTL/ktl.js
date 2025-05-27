@@ -92,7 +92,7 @@ function useAmulet() {
         });
     }
 
-    setSliderUI("overclock", "harnessOverflow", getUpgradeSliderAmount());
+    setSliderUI("overclock", "reflect", getUpgradeSliderAmount());
     data.secondsPerReset = 0;
     data.currentJob = "Helping Scott";
     data.currentWage = 1;

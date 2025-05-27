@@ -17,6 +17,7 @@ function initializeDisplay() {
     setAllCaches(); //happens after generation
     showAttColors("awareness");
     revealActionAtts(data.actions.reflect);
+    data.actions.overclock.downstreamRatereflect = 0;
 
     debug(); //change game for easier debugging
 
@@ -207,9 +208,9 @@ function generateActionDisplay(actionVar) {
 
     queueCache(`${actionVar}ExpToAdd`);
 
-    let onComplete = actionObj.onCompleteText ? Raw.html`
+    let onComplete = dataObj.onCompleteText ? Raw.html`
         <div>On Complete:<br>
-            ${actionObj.onCompleteText}
+            ${dataObj.onCompleteText[language]}
         </div><br>` : "";
 
     queueCache(`${actionVar}ActionPowerMult`);
@@ -220,7 +221,7 @@ function generateActionDisplay(actionVar) {
         x<b>${actionObj.expToLevelIncrease}</b> to Exp required to level<br>
         ${actionObj.actionPowerMultIncrease===1?"":(`x<b>${actionObj.actionPowerMultIncrease}</b> to Action Power per level <br>`)}
         ${!actionObj.isGenerator?"":`(x<b><span id="${actionVar}ActionPowerMult"></b> total Action Power from level)<br>`}
-        ${actionObj.onLevelText}`;
+        ${dataObj.onLevelText ? dataObj.onLevelText[language]:""}`;
 
     queueCache(`${actionVar}HighestLevelContainer`);
     queueCache(`${actionVar}HighestLevel`);
@@ -256,7 +257,7 @@ function generateActionDisplay(actionVar) {
         ${onComplete}
         ${onLevelText}
         ${upgradeInfoText}
-        ${actionObj.extraInfo}
+        ${dataObj.extraInfo ? dataObj.extraInfo[language]:""}
         </div>`;
 
     queueCache(`${actionVar}_storyContainer`);
@@ -278,13 +279,16 @@ function generateActionDisplay(actionVar) {
     queueCache(`${actionVar}LockContainer`);
     queueCache(`${actionVar}UnlockCost`);
 
+    let message = Raw.html`Needs <b><span id="${actionVar}UnlockCost">0</span></b> ${actionObj.momentumName}<br>
+                sent from <b>${data.actions[actionObj.parent]?data.actions[actionObj.parent].title:"WAIT"}</b>.`
+
     let lockOverAll = Raw.html`
         <div id="${actionVar}LockContainer" 
             style="position:absolute;background-color: var(--bg-secondary);width:100%;height:100%;top:0;left:0;text-align:center;border:2px solid black;">
             <span id="${actionVar}LockIcon"></span><br>
-            <span>Needs <b><span id="${actionVar}UnlockCost">0</span></b> ${actionObj.momentumName}<br>
-                sent from <b>${data.actions[actionObj.parent]?data.actions[actionObj.parent].title:"WAIT"}</b>.<br>
-                ${actionObj.unlockMessage}
+            <span>
+                ${message}<br>
+                ${dataObj.unlockMessage ? dataObj.unlockMessage[language]:""}
             </span>
         </div>`;
 
@@ -315,7 +319,7 @@ function generateActionDisplay(actionVar) {
     queueCache(`${actionVar}Level2`)
 
     theStr += Raw.html`
-        <div id="${actionVar}Container" style="display:${shouldDisplay};position:absolute;left:${newX};top:${newY};width:300px;">
+        <div id="${actionVar}Container" style="display:${shouldDisplay};position:absolute;left:${newX};top:${newY};width:300px;transform-style: preserve-3d;">
             <div id="${actionVar}LargeVersionContainer" style="border:2px solid var(--border-color);background-color:var(--bg-secondary);">
                 ${title}
                 ${menuContainer}
@@ -541,8 +545,8 @@ function createDownStreamSliders(actionObj) {
         return "";
     }
     for(let downstreamVar of actionObj.downstreamVars) {
-        if(!data.actions[downstreamVar] || data.actions[downstreamVar].momentumName !== actionObj.momentumName) {
-            return;
+        if(!data.actions[downstreamVar] || !data.actions[downstreamVar].hasUpstream) {
+            continue;
         }
         let title = data.actions[downstreamVar] ? data.actions[downstreamVar].title : downstreamVar;
         let actionVar = actionObj.actionVar;

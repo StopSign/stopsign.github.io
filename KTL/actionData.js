@@ -6,6 +6,9 @@ function create(actionVar, downstreamVars, x, y) {
     }
     x*= 420;
     y*= -420;
+    if(!dataObj.addedInVersion) {
+        dataObj.addedInVersion = 0;
+    }
     let title = decamelizeWithSpace(actionVar); //basicLabor -> Basic Labor
     let actionObj = createAndLinkNewAction(actionVar, dataObj, title, x, y, downstreamVars);
     dataObj.expAtts.forEach(function (expAtt) { //add the action to the stat, to update exp reductions
@@ -127,15 +130,18 @@ let actionData = {
         expToLevelBase:10, expToLevelIncrease:1.1,
         actionPowerBase:100, actionPowerMult:1, actionPowerMultIncrease:1.1,
         efficiencyBase:.1,
-        unlockCost:0, visible:true, unlocked:true, purchased: true, isGenerator:true, generatorSpeed:10,
+        unlockCost:0, visible:true, unlocked:true, purchased: true, isGenerator:true, generatorSpeed:10, hasUpstream:false,
         onUnlock: function() {
         },
         onCompleteCustom:function() {
-            data.actions.overclock.momentumAdded = data.actions.overclock.actionPower * data.actions.overclock.upgradeMult;
+            actionData.overclock.updateMults();
             data.actions.overclock.momentum += data.actions.overclock.momentumAdded;
         },
-        onLevelCustom: function() {
+        updateMults: function() {
             data.actions.overclock.momentumAdded = data.actions.overclock.actionPower * data.actions.overclock.upgradeMult;
+        },
+        onLevelCustom: function() {
+            actionData.overclock.updateMults();
         },
         updateUpgradeMult:function() {
             let upgradeMult = 1;
@@ -395,7 +401,7 @@ let actionData = {
         progressMaxBase:1, progressMaxIncrease:1.5,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1,
-        unlockCost:1, visible:false, unlocked:false, purchased: true,
+        unlockCost:1, visible:false, unlocked:false, purchased: true, hasUpstream:false,
         onUnlock:function() {
             unveilAction('browseLocalMarket');
             unveilAction('checkNoticeBoard');
@@ -537,7 +543,7 @@ let actionData = {
         progressMaxBase:10, progressMaxIncrease:1.2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1,
-        unlockCost:5, visible:false, unlocked:false, purchased: true,
+        unlockCost:5, visible:false, unlocked:false, purchased: true, hasUpstream:false,
         onUnlock: function() {
             unveilAction('joinCoffeeClub');
             unveilAction('buySocialAccess');
@@ -581,14 +587,14 @@ let actionData = {
         efficiencyAtts:[["discernment", 1], ["recognition", 1]],
     },
     hearAboutTheLich: {
-        tier:1, momentumName:"conversations",
+        tier:1, momentumName:"fear",
 
         // progressMaxBase:10, progressMaxIncrease:1,
         // expToLevelBase:100, expToLevelIncrease:1.4,
         // actionPowerBase:1, actionPowerMult:1, actionPowerMultIncrease:1.1,
         // efficiencyBase:.1,
         // unlockCost:0, visible:false, unlocked:false, purchased: true,
-        // isGenerator:true, generatorTarget:"spendMoney", generatorSpeed:5,
+        // isGenerator:true, generatorTarget:"hearAboutTheLich", generatorSpeed:5,
 
 
 
@@ -597,10 +603,13 @@ let actionData = {
         progressMaxBase:200, progressMaxIncrease:1,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:1,
-        unlockCost:100, maxLevel:1,
-        visible:false, unlocked:false, purchased: true,
+        unlockCost:0, maxLevel:1,
+        visible:false, unlocked:false, purchased: true, hasUpstream:false,
         onLevelCustom: function() {
             //Auto-shows KTL button on level via view updates
+        },
+        isUnlockCustom: function() {
+            return data.actions.overclock.level >= 1;
         },
         onLevelAtts:[["integration", 20]],
         expAtts:[],
@@ -611,6 +620,7 @@ let actionData = {
                 background-color:#880000;text-shadow:0 0 3px #ff0000;box-shadow:0 0 15px 4px rgba(255, 0, 0, 0.5);" >
             Kill the Lich!</span>
         `,
+        unlockRequirementsMessage:{english:"Unlocks when Overclock is level 1."}
     },
 
 //--- From upgrades ---

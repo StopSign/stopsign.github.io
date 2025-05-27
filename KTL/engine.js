@@ -87,6 +87,7 @@ function actionSetInitialVariables(actionObj, dataObj) {
     actionObj.expAtts = dataObj.expAtts ? dataObj.expAtts : [];
     actionObj.tier = dataObj.tier;
     actionObj.wage = dataObj.wage ? dataObj.wage : null;
+    actionObj.hasUpstream = dataObj.hasUpstream ?? true;
     actionObj.isKTL = !!dataObj.isKTL;
     actionObj.purchased = !!dataObj.purchased;
 
@@ -94,10 +95,6 @@ function actionSetInitialVariables(actionObj, dataObj) {
     // actionObj.onCompleteCustom = dataObj.onCompleteCustom ? dataObj.onCompleteCustom : function() {};
     // actionObj.onLevelCustom = dataObj.onLevelCustom ? dataObj.onLevelCustom : function() {};
 
-    actionObj.onCompleteText = (dataObj.onCompleteText && dataObj.onCompleteText[language]) ? dataObj.onCompleteText[language] : "";
-    actionObj.onLevelText = (dataObj.onLevelText && dataObj.onLevelText[language]) ? dataObj.onLevelText[language] : "";
-    actionObj.extraInfo = (dataObj.extraInfo && dataObj.extraInfo[language]) ? dataObj.extraInfo[language] : "";
-    actionObj.unlockMessage = (dataObj.unlockMessage && dataObj.unlockMessage[language]) ? dataObj.unlockMessage[language] : "";
 
     //Vars that don't really need to be initalized but I like to know they're there
     actionObj.parent = null;
@@ -185,20 +182,6 @@ function isAttentionLine(actionVar, downstreamVar) {
     return data.focusSelected.some(
         sel => sel.lineData.from === actionVar && sel.lineData.to === downstreamVar
     );
-}
-
-function calcUpgradeMultToExp(actionObj) {
-    let upgradeMult = 1;
-    if(data.upgrades.rememberWhatIDid.isFullyBought && actionObj.level < actionObj.highestLevel) {
-        upgradeMult *= 2;
-    }
-    if(data.upgrades.rememberHowIGrew.isFullyBought && actionObj.level < actionObj.secondHighestLevel) {
-        upgradeMult *= 2;
-    }
-    if(data.upgrades.rememberMyMastery.isFullyBought && actionObj.level < actionObj.thirdHighestLevel) {
-        upgradeMult *= 2;
-    }
-    return upgradeMult;
 }
 
 function checkLevelUp(actionObj, dataObj) {
@@ -355,19 +338,20 @@ function revealAtt(useAttObj) {
 }
 
 function unlockAction(actionObj) {
+    let actionVar = actionObj.actionVar;
     if(actionObj.unlocked) {
         return;
     }
     actionObj.unlocked = true;
     actionObj.unlockTime = data.secondsPerReset; //mark when it unlocked
-    let dataObj = actionData[actionObj.actionVar];
+    let dataObj = actionData[actionVar];
     if(dataObj.onUnlock) {
         dataObj.onUnlock();
     }
 
     actionObj.downstreamVars.forEach(function(downstreamVar) {
-        if(data.actions[downstreamVar] && data.actions[downstreamVar].unlocked) {
-            setSliderUI(actionObj.actionVar, downstreamVar, getUpgradeSliderAmount());
+        if(data.actions[downstreamVar] && data.actions[downstreamVar].unlocked && document.getElementById(actionVar + "NumInput" + downstreamVar)) {
+            setSliderUI(actionVar, downstreamVar, getUpgradeSliderAmount());
         }
     });
 
@@ -388,4 +372,19 @@ function upgradeUpdates() {
 
 function getUpgradeSliderAmount() {
     return [0, 5, 20, 100, -1][data.upgrades.stopLettingOpportunityWait.upgradePower];
+}
+
+//get current info based on upgrade information, generally global or universal stuff. Individual action stuff upgrades get put on the action.
+function calcUpgradeMultToExp(actionObj) {
+    let upgradeMult = 1;
+    if(data.upgrades.rememberWhatIDid.isFullyBought && actionObj.level < actionObj.highestLevel) {
+        upgradeMult *= 2;
+    }
+    if(data.upgrades.rememberHowIGrew.isFullyBought && actionObj.level < actionObj.secondHighestLevel) {
+        upgradeMult *= 2;
+    }
+    if(data.upgrades.rememberMyMastery.isFullyBought && actionObj.level < actionObj.thirdHighestLevel) {
+        upgradeMult *= 2;
+    }
+    return upgradeMult;
 }
