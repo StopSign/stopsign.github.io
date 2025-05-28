@@ -171,16 +171,16 @@ function tickGameObject(actionVar) {
 
     //if generator, add Time to exp
     //if not generator, becomes 1% of momentum/s / 20.
-    let momentumMaxRate = actionObj.isGenerator ? actionObj.generatorSpeed / ticksPerSecond : actionObj.momentum * actionObj.tierMult() / ticksPerSecond;
+    let momentumMaxRate = actionObj.isGenerator ? actionObj.generatorSpeed / ticksPerSecond : actionObj.resource * actionObj.tierMult() / ticksPerSecond;
     //if action is max level or locked, momentum rate should be 0
     let atMaxLevel = actionObj.maxLevel >= 0 && actionObj.level >= actionObj.maxLevel;
     let momentumToAdd = (atMaxLevel||!actionObj.unlocked) ? 0 : momentumMaxRate;
-    //actual momentum change will be based on efficiency - for both generator and not
+    //actual resource change will be based on efficiency - for both generator and not
     let rateInefficient = momentumToAdd * (actionObj.efficiency/100);
 
     let momentumToAddInefficient = (atMaxLevel||!actionObj.unlocked) ? 0 : rateInefficient;
 
-    //Calculate momentum delta: 1. determine how much is being consumed and subtract it
+    //Calculate resource delta: 1. determine how much is being consumed and subtract it
     //2. later, if non-generator, an upstream action will add how much it is sending to this actions momentumDelta
     if(actionObj.isGenerator) {
         if(actionVar === "overclock") { //visual only
@@ -191,7 +191,7 @@ function tickGameObject(actionVar) {
     } else {
         //how much it's consuming.
         actionObj.momentumDelta -= momentumToAddInefficient * ticksPerSecond;
-        actionObj.momentum -= momentumToAddInefficient;
+        actionObj.resource -= momentumToAddInefficient;
     }
 
     actionObj.progress += momentumToAddInefficient;
@@ -234,7 +234,7 @@ function tickGameObject(actionVar) {
 
     }
     if(actionObj.isGenerator && actionVar !== "overclock") { //set decrease for other generators
-        actionObj.momentumDecrease = (actionObj.momentum * actionObj.tierMult()) * actionObj.progressGain / actionObj.progressMax;
+        actionObj.momentumDecrease = (actionObj.resource * actionObj.tierMult()) * actionObj.progressGain / actionObj.progressMax;
         actionObj.momentumDelta = actionObj.momentumIncrease - actionObj.momentumDecrease;
     }
 }
@@ -247,7 +247,7 @@ function calculateTaken(actionVar, downstreamVar, actionObj, mult) {
     if (totalTakenMult > 0.1) {
         totalTakenMult = 0.1; // Cap at 10%/s
     }
-    let toReturn = actionObj.momentum / ticksPerSecond * totalTakenMult * mult;
+    let toReturn = actionObj.resource / ticksPerSecond * totalTakenMult * mult;
     return toReturn < .00001 ? 0 : toReturn;
 }
 
@@ -269,11 +269,11 @@ function giveMomentumTo(actionObj, downstreamObj, amount) {
         console.log(actionObj.title + " is failing to give to downstream.");
     }
     addMomentumTo(downstreamObj, amount);
-    actionObj.momentum -= amount;
+    actionObj.resource -= amount;
     actionObj.momentumDelta -= amount * ticksPerSecond;
 }
 function addMomentumTo(downstreamObj, amount) {
-    //gives to unlockCost of downstream action, unlocking if possible, and gives leftover to momentum
+    //gives to unlockCost of downstream action, unlocking if possible, and gives leftover to resource
     let downstreamDataObj = actionData[downstreamObj.actionVar];
     if(downstreamObj.unlockCost > 0) {
         downstreamObj.unlockCost -= amount;
@@ -284,7 +284,7 @@ function addMomentumTo(downstreamObj, amount) {
         amount = -1 * downstreamObj.unlockCost; //get the leftovers back
         downstreamObj.unlockCost = 0;
     }
-    downstreamObj.momentum += amount;
+    downstreamObj.resource += amount;
     downstreamObj.momentumDelta += amount * ticksPerSecond;
     downstreamObj.momentumIncrease += amount * ticksPerSecond;
 }

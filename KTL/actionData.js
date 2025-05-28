@@ -135,9 +135,9 @@ let actionData = {
         },
         onCompleteCustom:function() {
             actionData.overclock.updateMults();
-            data.actions.overclock.momentum += data.actions.overclock.momentumAdded;
+            data.actions.overclock.resource += data.actions.overclock.momentumAdded;
 
-            data.actions.hearAboutTheLich.momentum += (data.totalMomentum+data.actions.overclock.momentumAdded) / 1000;
+            data.actions.hearAboutTheLich.resource += (data.totalMomentum+data.actions.overclock.momentumAdded) / 1000;
         },
         updateMults: function() {
             data.actions.overclock.momentumAdded = data.actions.overclock.actionPower * data.actions.overclock.upgradeMult;
@@ -361,13 +361,13 @@ let actionData = {
             let dataObj = actionData.makeMoney;
 
             //this is the amount to remove from actionObj (1%)
-            let amount = actionObj.momentum * actionObj.tierMult();
+            let amount = actionObj.resource * actionObj.tierMult();
             //this is log10(1% * actionPower)^2 * efficiency
             let amountToSend = dataObj.actionPowerFunction(amount, actionObj.actionPower * actionObj.upgradeMult) * (actionObj.efficiency/100);
             //visual only
             actionObj.amountToSend = amountToSend;
             if(amountToSend > 0) { //only take if it gave
-                actionObj.momentum -= amount;
+                actionObj.resource -= amount;
             }
 
             addMomentumTo(actionTarget, amountToSend);
@@ -391,11 +391,11 @@ let actionData = {
         onLevelAtts:[["ambition", 1]],
         expAtts:[["cunning", 1]],
         efficiencyAtts:[["ambition", 1]],
-        actionPowerFunction: function(momentum, origMult) {
-            if(momentum * origMult < 1) {
+        actionPowerFunction: function(resource, origMult) {
+            if(resource * origMult < 1) {
                 return 0;
             }
-            return Math.pow(Math.log10(momentum * origMult), 3) * data.currentWage; //log10(num * mult)^2 * wage
+            return Math.pow(Math.log10(resource * origMult), 3) * data.currentWage; //log10(num * mult)^2 * wage
         },
         onCompleteText: {english:Raw.html`
                 +<span style="font-weight:bold;" id='makeMoneyAmountToSend'>1</span> gold in Spend Money.<br>
@@ -505,13 +505,13 @@ let actionData = {
             let dataObj = actionData.makeMoney;
 
             //this is the amount to remove from actionObj (1%)
-            let amount = actionObj.momentum * actionObj.tierMult();
+            let amount = actionObj.resource * actionObj.tierMult();
             //this is log10(1% * actionPower)^2 * efficiency
             let amountToSend = dataObj.actionPowerFunction(amount, actionObj.actionPower * actionObj.upgradeMult) * (actionObj.efficiency/100);
             //visual only
             actionObj.amountToSend = amountToSend;
             if(amountToSend > 0) { //only take if it gave
-                actionObj.momentum -= amount;
+                actionObj.resource -= amount;
             }
 
             addMomentumTo(actionTarget, amountToSend);
@@ -537,11 +537,11 @@ let actionData = {
         // onCompleteText: {
         //     english:"+<b><span id=\"socializeActionPower\">1</span></b> Conversation<br>"
         // },
-        actionPowerFunction: function(momentum, origMult) {
-            if(momentum * origMult < 1) {
+        actionPowerFunction: function(resource, origMult) {
+            if(resource * origMult < 1) {
                 return 0;
             }
-            return Math.pow(Math.log10(momentum * origMult), 3); //log10(num * mult)^3
+            return Math.pow(Math.log10(resource * origMult), 3); //log10(num * mult)^3
         },
         onCompleteText: {english:Raw.html`
                 +<span style="font-weight:bold;" id='socializeAmountToSend'>1</span> conversations in Meet People.<br>

@@ -72,7 +72,7 @@ function generateActionDisplay(actionVar) {
     let resourceColor = getResourceColor(actionObj);
 
     queueCache(`${actionVar}Tier`);
-    queueCache(`${actionVar}Momentum`);
+    queueCache(`${actionVar}Resource`);
     queueCache(`${actionVar}MomentumAdded`);
     queueCache(`${actionVar}Level`);
     queueCache(`${actionVar}MaxLevel`);
@@ -86,7 +86,7 @@ function generateActionDisplay(actionVar) {
             white-space: nowrap;border-width: 0 0 0 6px;border-style: solid;border-color: var(--text-muted);padding-left:4px;background-color:var(--overlay-color)">
           
             <span style="font-size:18px;font-weight:bold;">${actionObj.title}<br></span>
-            <span style="font-size:16px;font-weight:bold;" id='${actionVar}Momentum'>0</span> 
+            <span style="font-size:16px;font-weight:bold;" id='${actionVar}Resource'>0</span> 
             <span style="color:${resourceColor};font-size:14px;font-weight:bold;">${capitalizeFirst(actionObj.momentumName)}</span>
             <span style="font-size:14px;color:var(--text-muted)">${actionObj.isGenerator?`(+<span id="${actionVar}MomentumAdded" style="color:var(--text-primary);font-weight:bold;">10</span>)`:""}</span><br>
             <span style="font-size:12px;position:relative;color:var(--text-muted)">

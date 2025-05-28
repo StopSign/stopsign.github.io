@@ -58,7 +58,7 @@ let views = {
         for (let actionVar in data.actions) {
             let actionObj = data.actions[actionVar];
             let resourceName = actionObj.momentumName;
-            let resourceAmount = actionObj.momentum;
+            let resourceAmount = actionObj.resource;
 
             if (!resourceAmounts[resourceName]) {
                 resourceAmounts[resourceName] = [];
@@ -214,7 +214,7 @@ let views = {
         //Update the numbers
         let roundedNumbers = [
             ["progress", 2], ["progressMax", 2], ["progressGain", 2],
-            ["momentum", 2], ["momentumDelta", 2], ["level", 1],
+            ["resource", 2], ["momentumDelta", 2], ["level", 1],
             ["exp", 2], ["expToLevel", 2], ["expToAdd2", 2],
             ["momentumIncrease", 3], ["momentumDecrease", 3],
             ["highestLevel2", 1]
@@ -382,7 +382,7 @@ function updateGlobals() {
     for(let actionVar in data.actions) {
         let actionObj = data.actions[actionVar];
         if(actionObj.momentumName === "momentum" && gameStateMatches(actionObj)) {
-            totalMometum += actionObj.momentum;
+            totalMometum += actionObj.resource;
         }
     }
     data.totalMomentum = totalMometum;

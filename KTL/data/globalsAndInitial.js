@@ -78,7 +78,7 @@ function debug() {
     unveilAction('hearAboutTheLich');
     gameSpeed = 1;
     bonusTime = 1000 * 60 * 60 * 24;
-    data.actions.overclock.momentum += 10;
+    data.actions.overclock.resource += 10;
 
 
     views.updateStats();

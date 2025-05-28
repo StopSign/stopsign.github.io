@@ -1,5 +1,5 @@
 let downStreamRatios = {};
-downStreamRatios.momentum = {};
+downStreamRatios.resource = {};
 
 
 // let previousValue = document.getElementById('momentumDownstream1').value;

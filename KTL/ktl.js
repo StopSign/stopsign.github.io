@@ -22,7 +22,7 @@ function initializeKTL() {
         actionObj.visible = actionObj.isKTL;
     }
 
-    data.actions.overclockTargetingTheLich.momentum = data.totalMomentum;
+    data.actions.overclockTargetingTheLich.resource = data.totalMomentum;
 
     views.updateVal("openUseAmuletButton", "", "style.display")
 

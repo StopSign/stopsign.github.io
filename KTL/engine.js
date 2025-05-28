@@ -28,10 +28,10 @@ function attsSetBaseVariables(attObj) {
 
 //Vars that should be reset each KTL
 function actionSetBaseVariables(actionObj, dataObj) {
-    actionObj.momentum = 0;
+    actionObj.resource = 0;
 
     actionObj.progress = 0;
-    actionObj.progressGain = 0; //calculated based on momentum & tier
+    actionObj.progressGain = 0; //calculated based on resource & tier
     actionObj.progressMaxBase = dataObj.progressMaxBase ? dataObj.progressMaxBase : 1;
     actionObj.progressMaxMult = dataObj.progressMaxMult ? dataObj.progressMaxMult : 1;
     actionObj.progressMax = actionObj.progressMaxBase * actionObj.progressMaxMult;
@@ -49,7 +49,7 @@ function actionSetBaseVariables(actionObj, dataObj) {
     actionObj.expToAdd = actionObj.expToAddBase * actionObj.expToAddMult;
     actionObj.generatorSpeed = dataObj.generatorSpeed ? dataObj.generatorSpeed : 0;
     actionObj.generatorTarget = dataObj.generatorTarget;
-    actionObj.momentum = 0;
+    actionObj.resource = 0;
     actionObj.momentumDelta = 0;
     actionObj.momentumIncrease = 0;
     actionObj.expToLevelIncrease = dataObj.expToLevelIncrease;
@@ -122,7 +122,7 @@ function createAndLinkNewAction(actionVar, dataObj, title, x, y, downstreamVars)
     }
 
     actionObj.progressRateReal = function() { //For data around the flat action too
-        return actionObj.momentum * actionObj.tierMult() * (actionObj.efficiency/100) / ticksPerSecond;
+        return actionObj.resource * actionObj.tierMult() * (actionObj.efficiency/100) / ticksPerSecond;
     }
     actionObj.calcStatMult = function() {
         actionObj.expToLevelMult = 1;
@@ -367,7 +367,7 @@ function unlockAction(actionObj) {
 }
 
 function upgradeUpdates() {
-    data.actions.overclock.momentum += data.upgrades.tryALittleHarder.upgradePower * 20 / ticksPerSecond;
+    data.actions.overclock.resource += data.upgrades.tryALittleHarder.upgradePower * 20 / ticksPerSecond;
 }
 
 function getUpgradeSliderAmount() {
