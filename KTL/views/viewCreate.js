@@ -278,16 +278,17 @@ function generateActionDisplay(actionVar) {
 
     queueCache(`${actionVar}LockContainer`);
     queueCache(`${actionVar}UnlockCost`);
-
-    let message = Raw.html`Needs <b><span id="${actionVar}UnlockCost">0</span></b> ${actionObj.momentumName}<br>
-                sent from <b>${data.actions[actionObj.parent]?data.actions[actionObj.parent].title:"WAIT"}</b>.`
+    queueCache(`${actionVar}UnlockCostContainer`);
 
     let lockOverAll = Raw.html`
         <div id="${actionVar}LockContainer" 
             style="position:absolute;background-color: var(--bg-secondary);width:100%;height:100%;top:0;left:0;text-align:center;border:2px solid black;">
             <span id="${actionVar}LockIcon"></span><br>
             <span>
-                ${message}<br>
+                <div id="${actionVar}UnlockCostContainer">
+                    Needs <span style="font-weight:bold;" id="${actionVar}UnlockCost">0</span> ${actionObj.momentumName}<br>
+                    sent from <b>${data.actions[actionObj.parent]?data.actions[actionObj.parent].title:"WAIT"}</b>.
+                </div>
                 ${dataObj.unlockMessage ? dataObj.unlockMessage[language]:""}
             </span>
         </div>`;

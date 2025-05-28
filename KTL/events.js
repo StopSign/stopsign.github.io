@@ -498,8 +498,8 @@ function changeJob(actionVar) {
     }
 
     //set displayed
-    document.getElementById("jobTitle").innerText = data.actions[data.currentJob] ? data.actions[data.currentJob].title : data.currentJob;
-    document.getElementById("jobWage").innerText = intToString(data.currentWage, 2);
+    document.getElementById("jobTitle").textContent = data.actions[data.currentJob] ? data.actions[data.currentJob].title : data.currentJob;
+    document.getElementById("jobWage").textContent = intToString(data.currentWage, 2);
 }
 
 function pauseGame() {
@@ -509,7 +509,7 @@ function pauseGame() {
     } else {
         document.title = "KTL";
     }
-    document.getElementById('pauseButton').innerText = stop ? "> Resume" : "|| Pause";
+    document.getElementById('pauseButton').textContent = stop ? "> Resume" : "|| Pause";
     save();
 }
 
@@ -556,11 +556,11 @@ function toggleBonusSpeed() {
     if(bonusSpeed > 1 || bonusTime <= 1000) {
         bonusSpeed = 1;
         document.getElementById("toggleBonusSpeedButton").style.backgroundColor = "red";
-        document.getElementById("toggleBonusSpeedButton").innerText = "Enable Bonus Speed";
+        document.getElementById("toggleBonusSpeedButton").textContent = "Enable Bonus Speed";
     } else {
         bonusSpeed = data.options.bonusRate;
         document.getElementById("toggleBonusSpeedButton").style.backgroundColor = "green";
-        document.getElementById("toggleBonusSpeedButton").innerText = "Disable Bonus Speed";
+        document.getElementById("toggleBonusSpeedButton").textContent = "Disable Bonus Speed";
     }
 }
 

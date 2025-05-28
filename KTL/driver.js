@@ -109,20 +109,6 @@ function secondPassed() {
     secondsPassed++;
 }
 
-// function recalcInterval(fps) {
-//     window.fps = fps;
-//     if(window.mainTickLoop !== undefined) {
-//         clearInterval(window.mainTickLoop);
-//     }
-//     if(isFileSystem) {
-//         window.mainTickLoop = setInterval(tick, 1000/fps);
-//     } else {
-//         doWork.postMessage({stop: true});
-//         doWork.postMessage({start: true, ms: (1000 / fps)});
-//     }
-// }
-
-
 
 
 function gameTick() {

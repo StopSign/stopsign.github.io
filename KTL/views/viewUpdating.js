@@ -12,14 +12,7 @@ create: functions to put the pieces on the page. Uses generate methods.
  */
 
 let views = {
-    updateView: function() {
-        //This is the main function that is run once per frame
-
-        //go through all possible numbers
-        //if the data has that the element should be visible
-        //run updateVal, which accesses the cache, only if the prevVal is different
-        //Which updates the element optimally
-
+    updateView: function() { //This is the main view update function that is run once per frame
         views.updateStats();
         views.updateActions();
 
@@ -27,9 +20,6 @@ let views = {
             updateUpgradeView(upgradeVar);
         }
         updateGlobals();
-
-        //in case this was set
-        forceVisuals = false;
     },
     updateStats:function() {
         for(let attVar in data.atts) {
@@ -51,7 +41,7 @@ let views = {
 
         for(let numberObj of roundedNumbers) {
             let capName = capitalizeFirst(numberObj[0]);
-            views.updateVal(`${attVar}${capName}`, data.atts[attVar][`${numberObj[0]}`], "innerText", numberObj[1]);
+            views.updateVal(`${attVar}${capName}`, data.atts[attVar][`${numberObj[0]}`], "textContent", numberObj[1]);
         }
     },
     updateActions:function() {
@@ -99,8 +89,6 @@ let views = {
         }
     },
     updateAction:function(actionObj) {
-        let actionVar = actionObj.actionVar;
-
         //Handle visibility
         if(!views.updateActionVisibility(actionObj)) {
             return; //If not visible or in small mode, don't update
@@ -152,7 +140,7 @@ let views = {
 
         let color = `rgb(${Math.round(20+189*(1-(actionObj.efficiency/100)))},${Math.round(20+189*(actionObj.efficiency/100))},100)`
         views.updateVal(`${actionVar}Efficiency`, color, "style.color");
-        views.updateVal(`${actionVar}Efficiency`, data.actions[actionVar].efficiency, "innerText", 2);
+        views.updateVal(`${actionVar}Efficiency`, data.actions[actionVar].efficiency, "textContent", 2);
 
         //Update visibility even before unlock, because it affecst the shape of it
         if (actionObj.currentMenu === "downstream") {
@@ -169,8 +157,10 @@ let views = {
     },
     updateActionLockedViews: function(actionObj) {
         let actionVar = actionObj.actionVar;
+        let dataObj = actionData[actionVar];
 
-        views.updateVal(`${actionVar}UnlockCost`, actionObj.unlockCost, "innerText", 2);
+        views.updateVal(`${actionVar}UnlockCost`, actionObj.unlockCost, "textContent", 2);
+        views.updateVal(`${actionVar}UnlockCostContainer`, dataObj.unlockCost <= 0 ? "none" : "", "style.display");
 
     },
     updateActionUnlockedViews: function(actionObj) {
@@ -200,17 +190,17 @@ let views = {
             views.updateVal(`${actionVar}SecondHighestLevelContainer`, data.upgrades.rememberHowIGrew.isFullyBought ? "" : "none", "style.display");
             views.updateVal(`${actionVar}ThirdHighestLevelContainer`, data.upgrades.rememberMyMastery.isFullyBought ? "" : "none", "style.display");
             views.updateVal(`${actionVar}PrevUnlockTimeContainer`, actionObj.prevUnlockTime ? "" : "none", "style.display");
-            views.updateVal(`${actionVar}PrevUnlockTime`, secondsToTime(actionObj.prevUnlockTime), "innerText", "time");
+            views.updateVal(`${actionVar}PrevUnlockTime`, secondsToTime(actionObj.prevUnlockTime), "textContent", "time");
 
 
             for(let expAtt of actionObj.expAtts) {
                 let attVar = expAtt[0];
-                views.updateVal(`${actionVar}_${attVar}AttExpMult`, actionObj[`${attVar}AttExpMult`], "innerText", 3);
+                views.updateVal(`${actionVar}_${attVar}AttExpMult`, actionObj[`${attVar}AttExpMult`], "textContent", 3);
             }
 
             for(let efficiencyStat of actionObj.efficiencyAtts) {
                 let attVar = efficiencyStat[0];
-                views.updateVal(`${actionVar}_${attVar}AttEfficiencyMult`, actionObj[`${attVar}AttEfficiencyMult`], "innerText", 3);
+                views.updateVal(`${actionVar}_${attVar}AttEfficiencyMult`, actionObj[`${attVar}AttEfficiencyMult`], "textContent", 3);
             }
 
         }
@@ -266,7 +256,7 @@ let views = {
         for(let numberObj of roundedNumbers) {
             let capName = capitalizeFirst(numberObj[0]);
             let nameNoNums = numberObj[0].replace(/\d+/g, '');
-            views.updateVal(`${actionVar}${capName}`, data.actions[actionVar][`${nameNoNums}`], "innerText", numberObj[1]);
+            views.updateVal(`${actionVar}${capName}`, data.actions[actionVar][`${nameNoNums}`], "textContent", numberObj[1]);
         }
 
     },
@@ -285,21 +275,21 @@ let views = {
 
             let mult = rangeValue/100;
             let taken = calculateTaken(actionVar, downstreamVar, actionObj, mult);
-            views.updateVal(`${actionVar}DownstreamSendRate${downstreamVar}`, taken * ticksPerSecond, "innerText", 4);
+            views.updateVal(`${actionVar}DownstreamSendRate${downstreamVar}`, taken * ticksPerSecond, "textContent", 4);
 
             let isAttention = isAttentionLine(actionVar, downstreamVar);
             views.updateVal(`${actionVar}DownstreamAttentionBonus${downstreamVar}`, isAttention ? "" : "none", "style.display");
             if(isAttention) {
-                views.updateVal(`${actionVar}DownstreamAttentionBonus${downstreamVar}`, "x" + intToString(data.focusMult, 1));
-                views.updateVal(`${actionVar}_${downstreamVar}_Line_Inner_Top`, "x"+intToString(data.focusMult, 1));
+                views.updateVal(`${actionVar}DownstreamAttentionBonus${downstreamVar}`, `x${intToString(data.focusMult, 1)}`, "textContent");
+                views.updateVal(`${actionVar}_${downstreamVar}_Line_Inner_Top`, `x${intToString(data.focusMult, 1)}`, "textContent");
             }
 
             let focusShowing = actionObj[`${downstreamVar}FocusMult`] > 1.005;
             views.updateVal(`${actionVar}DownstreamAttentionBonusLoop${downstreamVar}`, focusShowing ? "" : "none", "style.display");
             views.updateVal(`${actionVar}_${downstreamVar}_Line_Inner_Bottom`, focusShowing ? "" : "none", "style.display");
             if(focusShowing) {
-                views.updateVal(`${actionVar}DownstreamAttentionBonusLoop${downstreamVar}`, "x" + intToString(actionObj[downstreamVar + "FocusMult"], 3));
-                views.updateVal(`${actionVar}_${downstreamVar}_Line_Inner_Bottom`, "x" + intToString(actionObj[downstreamVar + "FocusMult"], 3));
+                views.updateVal(`${actionVar}DownstreamAttentionBonusLoop${downstreamVar}`, `x${intToString(actionObj[downstreamVar + "FocusMult"], 3)}`);
+                views.updateVal(`${actionVar}_${downstreamVar}_Line_Inner_Bottom`, `x${intToString(actionObj[downstreamVar + "FocusMult"], 3)}`);
             }
 
         }
@@ -326,7 +316,7 @@ let views = {
             }
         }
     },
-    updateVal: function(id, newVal, type="innerText", sigFigs) {
+    updateVal: function(id, newVal, type="textContent", sigFigs) {
         const el = view.cached[id];
         if(!view.prevValues[id]) {
             view.prevValues[id] = {};
@@ -338,7 +328,8 @@ let views = {
         }
 
         const typeKey = `lastValue_${type}`;
-        let lastVal = prevValue[typeKey] ?? null;
+        // let lastVal = prevValue[typeKey] ?? null;
+        let lastVal = null;
 
         if (lastVal !== newVal) {
             if (type.includes(".")) {
@@ -396,10 +387,10 @@ function updateGlobals() {
     }
     data.totalMomentum = totalMometum;
 
-    views.updateVal(`totalMomentum`, totalMometum, "innerText", 1);
+    views.updateVal(`totalMomentum`, totalMometum, "textContent", 1);
 
     if(KTLMenuOpen) { //only update if menu is open
-        views.updateVal(`totalMomentum2`, totalMometum, "innerText", 1);
+        views.updateVal(`totalMomentum2`, totalMometum, "textContent", 1);
     }
 
     let toShowKTLButton = data.gameState !== "KTL" && (data.doneKTL || data.actions.hearAboutTheLich.level >= 1);
@@ -414,11 +405,11 @@ function updateGlobals() {
 
     views.updateVal(`jobDisplay`, data.displayJob ? "" : "none", "style.display");
 
-    views.updateVal(`secondsPerReset`, data.secondsPerReset, "innerText","time");
-    views.updateVal(`bonusTime`, bonusTime/1000, "innerText", "time");
+    views.updateVal(`secondsPerReset`, data.secondsPerReset, "textContent","time");
+    views.updateVal(`bonusTime`, bonusTime/1000, "textContent", "time");
 
-    views.updateVal(`essence`, data.essence, "innerText", 1);
-    views.updateVal(`essence2`, data.essence, "innerText", 1);
+    views.updateVal(`essence`, data.essence, "textContent", 1);
+    views.updateVal(`essence2`, data.essence, "textContent", 1);
 }
 
 function updateViewOnSecond() {

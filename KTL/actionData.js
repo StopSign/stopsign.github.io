@@ -136,6 +136,8 @@ let actionData = {
         onCompleteCustom:function() {
             actionData.overclock.updateMults();
             data.actions.overclock.momentum += data.actions.overclock.momentumAdded;
+
+            data.actions.hearAboutTheLich.momentum += (data.totalMomentum+data.actions.overclock.momentumAdded) / 1000;
         },
         updateMults: function() {
             data.actions.overclock.momentumAdded = data.actions.overclock.actionPower * data.actions.overclock.upgradeMult;
@@ -374,7 +376,7 @@ let actionData = {
             actionObj.expToAddBase = amountToSend;
             actionObj.expToAdd = actionObj.expToAddBase * actionObj.expToAddMult * calcUpgradeMultToExp(actionObj);
             data.actions.makeMoney.momentumAdded = amountToSend;
-            view.cached['makeMoneyMomentumTaken'].innerText = intToString(amount, 2);
+            view.cached['makeMoneyMomentumTaken'].textContent = intToString(amount, 2);
         },
         onUnlock: function() {
             unveilAction('spendMoney');
@@ -394,7 +396,11 @@ let actionData = {
                 return 0;
             }
             return Math.pow(Math.log10(momentum * origMult), 3) * data.currentWage; //log10(num * mult)^2 * wage
-        }
+        },
+        onCompleteText: {english:Raw.html`
+                +<span style="font-weight:bold;" id='makeMoneyAmountToSend'>1</span> gold in Spend Money.<br>
+                -<span style="font-weight:bold;" id='makeMoneyMomentumTaken'>1</span> Momentum taken from this action.<br>`},
+        extraInfo: {english:Raw.html`<br>Exp & Gold gain = log10(Momentum/100 * Action Power)^3 * Efficiency * Wages.`}
     },
     spendMoney: {
         tier:1, momentumName:"gold",
@@ -514,7 +520,7 @@ let actionData = {
             actionObj.expToAddBase = amountToSend;
             actionObj.expToAdd = actionObj.expToAddBase * actionObj.expToAddMult * calcUpgradeMultToExp(actionObj);
             data.actions.socialize.momentumAdded = amountToSend;
-            view.cached['socializeMomentumTaken'].innerText = intToString(amount, 2);
+            view.cached['socializeMomentumTaken'].textContent = intToString(amount, 2);
         },
         onUnlock: function() {
             // unveilAction('neighborlyTies');
@@ -528,15 +534,19 @@ let actionData = {
         onLevelAtts:[["confidence", 1]],
         expAtts:[["confidence", 1], ["curiosity", 1], ["observation", 1], ["recognition", 1], ["charm", 1], ["influence", 1]],
         efficiencyAtts:[["confidence", .1]],
-        onCompleteText: {
-            english:"+<b><span id=\"socializeActionPower\">1</span></b> Conversation<br>"
-        },
+        // onCompleteText: {
+        //     english:"+<b><span id=\"socializeActionPower\">1</span></b> Conversation<br>"
+        // },
         actionPowerFunction: function(momentum, origMult) {
             if(momentum * origMult < 1) {
                 return 0;
             }
             return Math.pow(Math.log10(momentum * origMult), 3); //log10(num * mult)^3
-        }
+        },
+        onCompleteText: {english:Raw.html`
+                +<span style="font-weight:bold;" id='socializeAmountToSend'>1</span> conversations in Meet People.<br>
+                -<span style="font-weight:bold;" id='socializeMomentumTaken'>1</span> Momentum taken from this action.<br>`},
+        extraInfo: {english:`<br>Exp & Conversations gain = log10(Momentum/100 * Action Power)^3 * Efficiency.`}
     },
     meetPeople: {
         tier:1, momentumName:"conversations",
@@ -588,18 +598,6 @@ let actionData = {
     },
     hearAboutTheLich: {
         tier:1, momentumName:"fear",
-
-        // progressMaxBase:10, progressMaxIncrease:1,
-        // expToLevelBase:100, expToLevelIncrease:1.4,
-        // actionPowerBase:1, actionPowerMult:1, actionPowerMultIncrease:1.1,
-        // efficiencyBase:.1,
-        // unlockCost:0, visible:false, unlocked:false, purchased: true,
-        // isGenerator:true, generatorTarget:"hearAboutTheLich", generatorSpeed:5,
-
-
-
-
-
         progressMaxBase:200, progressMaxIncrease:1,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:1,
@@ -620,7 +618,9 @@ let actionData = {
                 background-color:#880000;text-shadow:0 0 3px #ff0000;box-shadow:0 0 15px 4px rgba(255, 0, 0, 0.5);" >
             Kill the Lich!</span>
         `,
-        unlockRequirementsMessage:{english:"Unlocks when Overclock is level 1."}
+        unlockMessage:{english:"Unlocks when Overclock is level 1."},
+        extraInfo: {english:Raw.html`This action gains (.1% of Total Momentum * 1% of conversations on Gossip) Fear each Overclock complete, which is a gain of  
+        <span style="font-weight:bold;" id="hearAboutTheLichActionPower">6</span>`}
     },
 
 //--- From upgrades ---

@@ -6,8 +6,8 @@ To create a new div element:
 3. In the relevant update method, use:
 - views.updateVal(id, newVal, "style.color")
 - views.updateVal(id, newVal?"":"none", "style.display")
-- views.updateVal(id, newVal, "innerText", 1)
-- views.updateVal(id, newVal, "innerText", "time")
+- views.updateVal(id, newVal, "textContent", 1)
+- views.updateVal(id, newVal, "textContent", "time")
 
 
 

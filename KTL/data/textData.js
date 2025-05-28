@@ -1,19 +1,4 @@
 
-
-//Bulky text:
-// actionData.overclock.onCompleteText = {english:"+<b><span id='overclockActionPower'>1</span></b> Momentum to this action.<br>"};
-
-actionData.makeMoney.onCompleteText = {english:"-<b><span id='makeMoneyMomentumTaken'>1</span></b> Momentum taken from this action.<br>" +
-        "+<b><span id='makeMoneyAmountToSend'>1</span></b> gold in Spend Money.<br>"}
-actionData.socialize.onCompleteText = {english:"-<b><span id='socializeMomentumTaken'>1</span></b> Momentum taken from this action.<br>" +
-        "+<b><span id='socializeAmountToSend'>1</span></b> conversations in Chat with Locals.<br>"}
-actionData.hearAboutTheLich.onCompleteText = {english:"-<b><span id='hearAboutTheLichMomentumTaken'>1</span></b> Momentum taken from parent.<br>" +
-        "+<b><span id='hearAboutTheLichAmountToSend'>1</span></b> Fear in this action.<br>"}
-// actionData.hearAboutTheLich.onCompleteText = {english:"+<b><span id='hearAboutTheLichActionPower'>1</span></b> Fear to this action.<br>"};
-// actionData.remember.onLevelText = {english:"+2 to the max level of Harness Overflow<br>+2 to the max level of Process Thoughts"}
-actionData.makeMoney.extraInfo = {english:"<br>Exp & Gold gain = log10(Momentum/100 * Action Power)^3 * Efficiency * Wages."}
-actionData.socialize.extraInfo = {english:"<br>Exp & Conversations gain = log10(Momentum/100 * Action Power)^3 * Efficiency."}
-
 //Story Text:
 actionData.remember.storyText = {english:"Your world ended, and they only live on through you. Think about what they would have wanted for you, and on how much you miss them, and let it drive you forward. This is an internal story as much as it is an external one."}
 actionData.overclock.storyText = {english:Raw.html`

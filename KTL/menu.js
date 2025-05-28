@@ -114,7 +114,7 @@ function changeNumberType() {
         data.numberType = "engineering";
     }
 
-    document.getElementById("numberTypeButton").innerText = "Change numbers to " + (data.numberType === "engineering"?"scientific":"engineering");
+    document.getElementById("numberTypeButton").textContent = "Change numbers to " + (data.numberType === "engineering"?"scientific":"engineering");
 }
 
 function changeDarkMode() {
@@ -122,7 +122,7 @@ function changeDarkMode() {
 
     // Toggle the dark-mode class
     body.classList.toggle('lightMode');
-    document.getElementById('lightModeButton').innerText = "Change to " + (body.classList.contains('lightMode') ? "Dark" : "Light") + " Mode";
+    document.getElementById('lightModeButton').textContent = "Change to " + (body.classList.contains('lightMode') ? "Dark" : "Light") + " Mode";
 }
 
 function addMenuTextContainer(menuVar, menuText) {

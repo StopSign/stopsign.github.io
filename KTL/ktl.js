@@ -27,7 +27,6 @@ function initializeKTL() {
     views.updateVal("openUseAmuletButton", "", "style.display")
 
     document.getElementById("essenceDisplay").style.display = "";
-    forceVisuals = true;
     data.doneKTL = true;
     if(data.doneAmulet) {
         data.useAmuletButtonShowing = true;
@@ -98,5 +97,4 @@ function useAmulet() {
     data.currentWage = 1;
     data.gameState = "default";
     data.useAmuletButtonShowing = false;
-    forceVisuals = true;
 }

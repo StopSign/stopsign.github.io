@@ -55,7 +55,6 @@ viewData.toasts = [];
 
 let language = "english";
 let globalVisible = false;
-let forceVisuals = false;
 let isLoadingEnabled = false; //SET FALSE FOR CLEARING SAVE
 
 
@@ -79,6 +78,16 @@ function debug() {
     unveilAction('hearAboutTheLich');
     gameSpeed = 1;
     bonusTime = 1000 * 60 * 60 * 24;
+    data.actions.overclock.momentum += 10;
+
+
+    views.updateStats();
+    views.updateActions();
+
+    for(let upgradeVar in data.upgrades) {
+        updateUpgradeView(upgradeVar);
+    }
+    updateGlobals();
 }
 
 function initializeData() {
