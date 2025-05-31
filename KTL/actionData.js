@@ -37,95 +37,12 @@ function create(actionVar, downstreamVars, x, y) {
     });
 }
 
-//Has a custom onComplete if it has a actionPower
-//Requires that upstream actions are above downstream, so updating works consistently
+//==== plane0 ====
+
+//Book 1 actions
 let actionData = {
-    //KTL
-    overclockTargetingTheLich: {
-        tier:1,
-        progressMaxBase:60, progressMaxIncrease:1,
-        expToLevelBase:60, expToLevelIncrease:1,
-        efficiencyBase:1, isKTL:true, purchased: false,
-        unlockCost:0, visible:true, unlocked:true, isGenerator:true, generatorSpeed:1,
-        onLevelAtts:[],
-        expAtts:[],
-        efficiencyAtts:[]
-    },
-    killHorde: {
-        tier:1,
-        progressMaxBase:1e10, progressMaxIncrease:10,
-        expToLevelBase:5, expToLevelIncrease:1,
-        efficiencyBase:1, isKTL:true, purchased: false, maxLevel:2,
-        unlockCost:1e9, visible:true, unlocked:false,
-        onUnlock: function() {
-            data.essence += 10;
-            data.useAmuletButtonShowing = true;
-        },
-        onCompleteCustom:function() {
-            data.essence += 2 * (1 +  data.actions.killHorde.level);
-        },
-        onLevelCustom: function() {
-            unveilAction('killElites');
-        },
-        onLevelAtts:[],
-        expAtts:[],
-        efficiencyAtts:[],
-        extraInfo:{english:"Gives 2 * (1 + level) essence per complete."},
-        unlockMessage:{english:"On unlock, +10 essence."}
-    },
-    killElites: {
-        tier:1,
-        progressMaxBase:1e13, progressMaxIncrease:10,
-        expToLevelBase:5, expToLevelIncrease:1,
-        efficiencyBase:1, isKTL:true, purchased: false, maxLevel:2,
-        unlockCost:1e12, visible:false, unlocked:false,
-        onUnlock: function() {
-            data.essence += 30;
-        },
-        onCompleteCustom:function() {
-            data.essence += 6 * (1 +  data.actions.killHorde.level);
-        },
-        onLevelCustom: function() {
-        },
-        onLevelAtts:[],
-        expAtts:[],
-        efficiencyAtts:[],
-        extraInfo:{english:"Gives 6 * (1 + level) essence per complete."},
-        unlockMessage:{english:"On unlock, +30 essence."}
-    },
-    killDevils: {
-        tier:1,
-        progressMaxBase:1e16, progressMaxIncrease:10,
-        expToLevelBase:5, expToLevelIncrease:1,
-        efficiencyBase:1, isKTL:true, purchased: false, maxLevel:2,
-        unlockCost:1e12, visible:true, unlocked:false,
-        onUnlock: function() {
-            data.essence += 100;
-        },
-        onCompleteCustom:function() {
-            data.essence += 20 * (1 +  data.actions.killHorde.level);
-        },
-        onLevelAtts:[],
-        expAtts:[],
-        efficiencyAtts:[],
-        extraInfo:{english:"Gives 20 * (1 + level) essence per complete."},
-        unlockMessage:{english:"On unlock, +100 essence."}
-    },
-    killGenerals: {
-        tier:1,
-        progressMaxBase:10, progressMaxIncrease:1.2,
-        expToLevelBase:1, expToLevelIncrease:1.2,
-        efficiencyBase:1, isKTL:true, purchased: false,
-        unlockCost:10, visible:true, unlocked:false,
-        onLevelAtts:[],
-        expAtts:[],
-        efficiencyAtts:[]
-    },
-
-
-    //Book 1 actions
     overclock:{
-        tier:0,
+        tier:0, plane:0,
         progressMaxBase:10, progressMaxIncrease:1,
         expToLevelBase:10, expToLevelIncrease:1.1,
         actionPowerBase:100, actionPowerMult:1, actionPowerMultIncrease:1.1,
@@ -135,12 +52,15 @@ let actionData = {
         },
         onCompleteCustom:function() {
             actionData.overclock.updateMults();
-            data.actions.overclock.resource += data.actions.overclock.momentumAdded;
+            data.actions.overclock.resource += data.actions.overclock.resourceAdded;
 
-            data.actions.hearAboutTheLich.resource += (data.totalMomentum+data.actions.overclock.momentumAdded) / 1000;
+            if(data.actions.hearAboutTheLich.unlocked) {
+                data.actions.hearAboutTheLich.actionPower = calcFearGain();
+                data.actions.hearAboutTheLich.resource += data.actions.hearAboutTheLich.actionPower;
+            }
         },
         updateMults: function() {
-            data.actions.overclock.momentumAdded = data.actions.overclock.actionPower * data.actions.overclock.upgradeMult;
+            data.actions.overclock.resourceAdded = data.actions.overclock.actionPower * data.actions.overclock.upgradeMult;
         },
         onLevelCustom: function() {
             actionData.overclock.updateMults();
@@ -157,7 +77,7 @@ let actionData = {
         efficiencyAtts:[["cycle", 1]]
     },
     reflect: {
-        tier:1,
+        tier:1, plane:0,
         progressMaxBase:.25, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.5,
@@ -170,7 +90,7 @@ let actionData = {
         efficiencyAtts:[["cycle", 1]]
     },
     harnessOverflow: {
-        tier:1,
+        tier:1, plane:0,
         progressMaxBase:.25, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1, maxLevel:10,
@@ -183,7 +103,7 @@ let actionData = {
         efficiencyAtts:[]
     },
     distillInsight: {
-        tier:1,
+        tier:1, plane:0,
         progressMaxBase:1, progressMaxIncrease:1.5,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.4,
@@ -196,7 +116,7 @@ let actionData = {
         efficiencyAtts:[["cycle", 1]]
     },
     takeNotes: {
-        tier:1,
+        tier:1, plane:0,
         progressMaxBase:1, progressMaxIncrease:1.5,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.3,
@@ -209,7 +129,7 @@ let actionData = {
         efficiencyAtts:[["cycle", 1]]
     },
     bodyAwareness: {
-        tier:1,
+        tier:1, plane:0,
         progressMaxBase:750, progressMaxIncrease:20,
         expToLevelBase:2, expToLevelIncrease:1,
         efficiencyBase:.6, maxLevel:1,
@@ -224,7 +144,7 @@ let actionData = {
         efficiencyAtts:[["flow", .1]]
     },
     remember: {
-        tier:1,
+        tier:1, plane:0,
         progressMaxBase:2000, progressMaxIncrease:5,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.2, maxLevel:3,
@@ -242,7 +162,7 @@ let actionData = {
         extraInfo:{english:"On Level up: +3 max levels for Harness Overflow."}
     },
     travelOnRoad: {
-        tier:1,
+        tier:1, plane:0,
         progressMaxBase:50, progressMaxIncrease:3,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.5, maxLevel:15,
@@ -259,7 +179,7 @@ let actionData = {
         efficiencyAtts:[["navigation", 1]]
     },
     travelToOutpost: {
-        tier:1,
+        tier:1, plane:0,
         progressMaxBase:1000, progressMaxIncrease:3,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.25, maxLevel:45,
@@ -273,7 +193,7 @@ let actionData = {
         unlockMessage:{english:"On unlock, +1 max level for Body Awareness."}
     },
     meetVillageLeaderScott: {
-        tier:1,
+        tier:1, plane:0,
         progressMaxBase:5000, progressMaxIncrease:40,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.5, maxLevel:3,
@@ -291,7 +211,7 @@ let actionData = {
         extraInfo:{english:"On Level up: +2 max levels for Remember."}
     },
     helpScottWithChores: {
-        tier:1,
+        tier:1, plane:0,
         progressMaxBase:25000, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.2,
@@ -302,6 +222,7 @@ let actionData = {
         },
         onLevelCustom: function() {
             data.actions.helpScottWithChores.wage += actionData.helpScottWithChores.wage/4;
+            unveilAction('hearAboutTheLich');
         },
         onLevelAtts:[["recognition", 1]],
         expAtts:[["ambition", 1]],
@@ -309,7 +230,7 @@ let actionData = {
         extraInfo:{english:"On Level up: Increase wage +25%"}
     },
     browseLocalMarket: {
-        tier:1,
+        tier:1, plane:0,
         progressMaxBase:10000, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.1,
@@ -321,7 +242,7 @@ let actionData = {
         efficiencyAtts:[["ambition", 10]]
     },
     checkNoticeBoard: {
-        tier:1,
+        tier:1, plane:0,
         progressMaxBase:5e6, progressMaxIncrease:20,
         expToLevelBase:2, expToLevelIncrease:2,
         efficiencyBase:.03125, maxLevel:1, //1/32
@@ -344,7 +265,7 @@ let actionData = {
         extraInfo:{english:"Unlocks new actions with each level."}
     },
     makeMoney: {
-        tier:1,
+        tier:1, plane:0,
         progressMaxBase:10, progressMaxIncrease:1,
         expToLevelBase:100, expToLevelIncrease:1.4,
         actionPowerBase:1, actionPowerMult:1, actionPowerMultIncrease:1.1,
@@ -375,7 +296,7 @@ let actionData = {
             //add exp based on amount sent
             actionObj.expToAddBase = amountToSend;
             actionObj.expToAdd = actionObj.expToAddBase * actionObj.expToAddMult * calcUpgradeMultToExp(actionObj);
-            data.actions.makeMoney.momentumAdded = amountToSend;
+            data.actions.makeMoney.resourceAdded = amountToSend;
             view.cached['makeMoneyMomentumTaken'].textContent = intToString(amount, 2);
         },
         onUnlock: function() {
@@ -403,7 +324,7 @@ let actionData = {
         extraInfo: {english:Raw.html`<br>Exp & Gold gain = log10(Momentum/100 * Action Power)^3 * Efficiency * Wages.`}
     },
     spendMoney: {
-        tier:1, momentumName:"gold",
+        tier:1, plane:0, resourceName:"gold",
         progressMaxBase:1, progressMaxIncrease:1.5,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1,
@@ -417,7 +338,7 @@ let actionData = {
         efficiencyAtts:[]
     },
     buySocialAccess: {
-        tier:1, momentumName:"gold",
+        tier:1, plane:0, resourceName:"gold",
         progressMaxBase:1, progressMaxIncrease:1.5,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.8,
@@ -429,7 +350,7 @@ let actionData = {
         efficiencyAtts:[]
     },
     slideTheCoin: {
-        tier:1, momentumName:"gold",
+        tier:1, plane:0, resourceName:"gold",
         progressMaxBase:50, progressMaxIncrease:1,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:.1, maxLevel:1,
@@ -443,7 +364,7 @@ let actionData = {
         efficiencyAtts:[["recognition", 1]]
     },
     buyCoffee: {
-        tier:1, momentumName:"gold",
+        tier:1, plane:0, resourceName:"gold",
         progressMaxBase:10, progressMaxIncrease:1.2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.8,
@@ -457,7 +378,7 @@ let actionData = {
         efficiencyAtts:[["discernment", 1]]
     },
     reportForLabor: {
-        tier:1,
+        tier:1, plane:0,
         progressMaxBase:20, progressMaxIncrease:4,
         expToLevelBase:4, expToLevelIncrease:1.1,
         efficiencyBase:.5,
@@ -470,7 +391,7 @@ let actionData = {
         efficiencyAtts:[]
     },
     oddJobsLaborer: {
-        tier:1,
+        tier:1, plane:0,
         progressMaxBase:1e3, progressMaxIncrease:3,
         expToLevelBase:10, expToLevelIncrease:1.2,
         efficiencyBase:.2, maxLevel:8,
@@ -492,7 +413,7 @@ let actionData = {
         unlockMessage:{english:"On unlock, set job to Odd Jobs Laborer for a base wage of $10."}
     },
     socialize: {
-        tier:1,
+        tier:1, plane:0,
         progressMaxBase:10, progressMaxIncrease:1,
         expToLevelBase:3000, expToLevelIncrease:1.2,
         actionPowerBase:1, actionPowerMult:1, actionPowerMultIncrease:1.2,
@@ -519,7 +440,7 @@ let actionData = {
             //add exp based on amount sent
             actionObj.expToAddBase = amountToSend;
             actionObj.expToAdd = actionObj.expToAddBase * actionObj.expToAddMult * calcUpgradeMultToExp(actionObj);
-            data.actions.socialize.momentumAdded = amountToSend;
+            data.actions.socialize.resourceAdded = amountToSend;
             view.cached['socializeMomentumTaken'].textContent = intToString(amount, 2);
         },
         onUnlock: function() {
@@ -549,7 +470,7 @@ let actionData = {
         extraInfo: {english:`<br>Exp & Conversations gain = log10(Momentum/100 * Action Power)^3 * Efficiency.`}
     },
     meetPeople: {
-        tier:1, momentumName:"conversations",
+        tier:1, plane:0, resourceName:"conversations",
         progressMaxBase:10, progressMaxIncrease:1.2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1,
@@ -564,7 +485,7 @@ let actionData = {
         efficiencyAtts:[]
     },
     joinCoffeeClub: {
-        tier:1, momentumName:"conversations",
+        tier:1, plane:0, resourceName:"conversations",
         progressMaxBase:30000, progressMaxIncrease:1,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:.001,
@@ -581,7 +502,7 @@ let actionData = {
         efficiencyAtts:[["influence", 100], ["recognition", 1]],
     },
     gossip: {
-        tier:1, momentumName:"conversations",
+        tier:1, plane:0, resourceName:"conversations",
         progressMaxBase:50, progressMaxIncrease:1.5,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.1,
@@ -597,7 +518,7 @@ let actionData = {
         efficiencyAtts:[["discernment", 1], ["recognition", 1]],
     },
     hearAboutTheLich: {
-        tier:1, momentumName:"fear",
+        tier:2, plane:0, resourceName:"fear",
         progressMaxBase:200, progressMaxIncrease:1,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:1,
@@ -619,15 +540,25 @@ let actionData = {
             Kill the Lich!</span>
         `,
         unlockMessage:{english:"Unlocks when Overclock is level 1."},
-        extraInfo: {english:Raw.html`This action gains (.1% of Total Momentum * 1% of conversations on Gossip) Fear each Overclock complete, which is a gain of  
-        <span style="font-weight:bold;" id="hearAboutTheLichActionPower">6</span>`}
+        extraInfo: {english:Raw.html`This action gains (Total Momentum / 1 billion * .1% of Conversations on Gossip) Fear each Overclock complete, which is a gain of  
+        <span style="font-weight:bold;" id="hearAboutTheLichActionPower">0</span>`}
     },
 
 //--- From upgrades ---
 
+
+
+
+
+
+};
+
 //Shortcut pt 1
+actionData = {
+    ...actionData,
+
     watchBirds: {
-        tier:1,
+        tier:1, plane:0,
         progressMaxBase:100000000, progressMaxIncrease:40,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:1, maxLevel:1,
@@ -643,7 +574,7 @@ let actionData = {
         efficiencyAtts:[]
     },
     catchAScent: {
-        tier:1,
+        tier:1, plane:0,
         progressMaxBase:200000, progressMaxIncrease:5,
         expToLevelBase:5, expToLevelIncrease:1,
         efficiencyBase:.8, maxLevel:1,
@@ -656,7 +587,7 @@ let actionData = {
         efficiencyAtts:[["navigation", 1]]
     },
     stepOffToExplore: {
-        tier:1,
+        tier:1, plane:0,
         progressMaxBase:5000000, progressMaxIncrease:4,
         expToLevelBase:2, expToLevelIncrease:1,
         efficiencyBase:.01, maxLevel:2,
@@ -673,7 +604,7 @@ let actionData = {
         extraInfo:{english:"On Level up: +2 max levels for Body Awareness."}
     },
     eatGoldenFruit: {
-        tier:1,
+        tier:1, plane:0,
         progressMaxBase:2000000000, progressMaxIncrease:10,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:1, maxLevel:5,
@@ -687,7 +618,7 @@ let actionData = {
         efficiencyAtts:[]
     },
     questionTheTrail: {
-        tier:1,
+        tier:1, plane:0,
         progressMaxBase:2000000, progressMaxIncrease:5,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:.5, maxLevel:2,
@@ -701,7 +632,7 @@ let actionData = {
         efficiencyAtts:[["navigation", 1]]
     },
     journal: {
-        tier:1,
+        tier:1, plane:0,
         progressMaxBase:4000, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.1,
@@ -717,11 +648,14 @@ let actionData = {
         efficiencyAtts:[["cycle", 1]],
         unlockMessage:{english:"On unlock, +1 max level for Body Awareness."}
     },
-
+}
 
 //Meditate
+actionData = {
+    ...actionData,
+
     meditate: { //purpose: take a while to ramp up, but slowly become the primary overclock increase for a while
-        tier:1,
+        tier:1, plane:0,
         progressMaxBase:1e6, progressMaxIncrease:1.05, //req high initial, reduces with flow
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.1, maxLevel:4,
@@ -736,7 +670,7 @@ let actionData = {
         efficiencyAtts:[["flow", .1]]
     },
     feelTheAche: {
-        tier:1,
+        tier:1, plane:0,
         progressMaxBase:5e5, progressMaxIncrease:1.05,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.2, maxLevel:1,
@@ -753,7 +687,7 @@ let actionData = {
         extraInfo:{english:"On Level up: +1 max level for Meditate."}
     },
     softenTension: {
-        tier:1,
+        tier:1, plane:0,
         progressMaxBase:2e5, progressMaxIncrease:1.1,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.3, maxLevel:1,
@@ -770,7 +704,7 @@ let actionData = {
         extraInfo:{english:"On Level up: +1 max level for Feel The Ache."}
     },
     releaseExpectations: {
-        tier:1,
+        tier:1, plane:0,
         progressMaxBase:2e5, progressMaxIncrease:1.1,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.4, maxLevel:20,
@@ -789,7 +723,7 @@ let actionData = {
         extraInfo:{english:"On Level up: +1 max level for Soften Tension."}
     },
     walkAware: {
-        tier:1,
+        tier:1, plane:0,
         progressMaxBase:250, progressMaxIncrease:1.1,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.2, maxLevel:100,
@@ -802,11 +736,15 @@ let actionData = {
         expAtts:[],
         efficiencyAtts:[]
     },
+}
 
 
 //Training / Notice board level 2 / shortcut pt2
+actionData = {
+    ...actionData,
+
     reportForTraining: {
-        tier:1,
+        tier:1, plane:0,
         progressMaxBase:1e6, progressMaxIncrease:1.4,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.3, maxLevel:40,
@@ -821,7 +759,7 @@ let actionData = {
         efficiencyAtts:[]
     },
     basicTrainingWithJohn: {
-        tier:1,
+        tier:1, plane:0,
         progressMaxBase:1e6, progressMaxIncrease:1.5,
         expToLevelBase:10, expToLevelIncrease:1,
         actionPowerBase:1, actionPowerMult:1, actionPowerMultIncrease:3.1,
@@ -832,7 +770,7 @@ let actionData = {
         efficiencyAtts:[]
     },
     noticeTheStrain: {
-        tier:1,
+        tier:1, plane:0,
         progressMaxBase:1e6, progressMaxIncrease:1.5,
         expToLevelBase:10, expToLevelIncrease:1,
         actionPowerBase:1, actionPowerMult:1, actionPowerMultIncrease:3.1,
@@ -843,7 +781,7 @@ let actionData = {
         efficiencyAtts:[]
     },
     clenchTheJaw: {
-        tier:1,
+        tier:1, plane:0,
         progressMaxBase:1e6, progressMaxIncrease:1.5,
         expToLevelBase:10, expToLevelIncrease:1,
         actionPowerBase:1, actionPowerMult:1, actionPowerMultIncrease:3.1,
@@ -854,7 +792,7 @@ let actionData = {
         efficiencyAtts:[]
     },
     breatheThroughIt: {
-        tier:1,
+        tier:1, plane:0,
         progressMaxBase:1e6, progressMaxIncrease:1.5,
         expToLevelBase:10, expToLevelIncrease:1,
         actionPowerBase:1, actionPowerMult:1, actionPowerMultIncrease:3.1,
@@ -865,7 +803,7 @@ let actionData = {
         efficiencyAtts:[]
     },
     ownTheWeight: {
-        tier:1,
+        tier:1, plane:0,
         progressMaxBase:1e6, progressMaxIncrease:1.5,
         expToLevelBase:10, expToLevelIncrease:1,
         actionPowerBase:1, actionPowerMult:1, actionPowerMultIncrease:3.1,
@@ -876,7 +814,7 @@ let actionData = {
         efficiencyAtts:[]
     },
     moveWithPurpose: {
-        tier:1,
+        tier:1, plane:0,
         progressMaxBase:1e6, progressMaxIncrease:1.5,
         expToLevelBase:10, expToLevelIncrease:1,
         actionPowerBase:1, actionPowerMult:1, actionPowerMultIncrease:3.1,
@@ -887,7 +825,7 @@ let actionData = {
         efficiencyAtts:[]
     },
     climbTheRocks: {
-        tier:1,
+        tier:1, plane:0,
         progressMaxBase:2000000000, progressMaxIncrease:2,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:.01, maxLevel:5,
@@ -899,7 +837,7 @@ let actionData = {
         efficiencyAtts:[["endurance", 1]]
     },
     spotAShortcut: {
-        tier:1,
+        tier:1, plane:0,
         progressMaxBase:200000000, progressMaxIncrease:3,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:.01, maxLevel:3,
@@ -911,7 +849,7 @@ let actionData = {
         efficiencyAtts:[["endurance", 1]]
     },
     standStraighter: {
-        tier:1,
+        tier:1, plane:0,
         progressMaxBase:250, progressMaxIncrease:1.1,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.2, maxLevel:100,
@@ -924,10 +862,15 @@ let actionData = {
         expAtts:[],
         efficiencyAtts:[]
     },
+}
+
 
 //Jobs 1
+actionData = {
+    ...actionData,
+
     fillBasicNeeds: {
-        tier:1, momentumName: "gold",
+        tier:1, plane:0, resourceName: "gold",
         progressMaxBase:20, progressMaxIncrease:1.2,
         expToLevelBase:50, expToLevelIncrease:1.2,
         efficiencyBase:.6,
@@ -937,7 +880,7 @@ let actionData = {
         efficiencyAtts:[]
     },
     chimneySweep: {
-        tier:1,
+        tier:1, plane:0,
         progressMaxBase:1e6, progressMaxIncrease:3,
         expToLevelBase:10, expToLevelIncrease:1.2,
         efficiencyBase:.1, maxLevel:8,
@@ -959,7 +902,7 @@ let actionData = {
         unlockMessage:{english:"On unlock, set job to Chimney Sweep for a base wage of $500."}
     },
     handyman: {
-        tier:1,
+        tier:1, plane:0,
         progressMaxBase:1e9, progressMaxIncrease:3,
         expToLevelBase:10, expToLevelIncrease:1.2,
         efficiencyBase:.05, maxLevel:8,
@@ -981,7 +924,7 @@ let actionData = {
         unlockMessage:{english:"On unlock, set job to Handyman for a base wage of $25k."}
     },
     tavernHelper: {
-        tier:1,
+        tier:1, plane:0,
         progressMaxBase:1e12, progressMaxIncrease:3,
         expToLevelBase:10, expToLevelIncrease:1.2,
         efficiencyBase:.025, maxLevel:8,
@@ -1003,7 +946,7 @@ let actionData = {
         unlockMessage:{english:"On unlock, set job to tavernHelper for a base wage of $1.25m."}
     },
     guildReceptionist: {
-        tier:1,
+        tier:1, plane:0,
         progressMaxBase:1e15, progressMaxIncrease:3,
         expToLevelBase:10, expToLevelIncrease:1.2,
         efficiencyBase:.0125, maxLevel:8,
@@ -1025,7 +968,7 @@ let actionData = {
         unlockMessage:{english:"On unlock, set job to guildReceptionist for a base wage of $100m."}
     },
     messenger: {
-        tier:1,
+        tier:1, plane:0,
         progressMaxBase:1e18, progressMaxIncrease:3,
         expToLevelBase:10, expToLevelIncrease:1.2,
         efficiencyBase:.00625, maxLevel:8,
@@ -1047,7 +990,7 @@ let actionData = {
         unlockMessage:{english:"On unlock, set job to messenger for a base wage of $5b."}
     },
     townCrier: {
-        tier:1,
+        tier:1, plane:0,
         progressMaxBase:1e21, progressMaxIncrease:3,
         expToLevelBase:10, expToLevelIncrease:1.2,
         efficiencyBase:.003, maxLevel:8,
@@ -1069,7 +1012,7 @@ let actionData = {
         unlockMessage:{english:"On unlock, set job to townCrier for a base wage of $250b."}
     },
     storyTeller: {
-        tier:1,
+        tier:1, plane:0,
         progressMaxBase:5e23, progressMaxIncrease:3,
         expToLevelBase:10, expToLevelIncrease:1.2,
         efficiencyBase:.0015, maxLevel:8,
@@ -1087,11 +1030,15 @@ let actionData = {
         efficiencyAtts:[],
         unlockMessage:{english:"On unlock, set job to storyTeller for a base wage of $20t."}
     },
+}
 
 
-    //TODO..
+//TODO..
+actionData = {
+    ...actionData,
+
     readTheWritten: {
-        tier:1,
+        tier:1, plane:0,
         progressMaxBase:10000000, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.05,
@@ -1105,7 +1052,7 @@ let actionData = {
         efficiencyAtts:[["cycle", 1]]
     },
     siftExcess: { //? dunno the purpose yet
-        tier:1,
+        tier:1, plane:0,
         progressMaxBase:100000, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.01,
@@ -1118,7 +1065,7 @@ let actionData = {
     },
 
     gossipAboutPrices: {
-        tier:1, momentumName:"conversations",
+        tier:1, plane:0, resourceName:"conversations",
         progressMaxBase:50, progressMaxIncrease:1.5,
         expToLevelBase:2, expToLevelIncrease:1.5,
         unlockCost:50, maxLevel:10,
@@ -1133,7 +1080,7 @@ let actionData = {
         efficiencyAtts:[],
     },
     talkAboutMarkets: {
-        tier:1, momentumName:"conversations",
+        tier:1, plane:0, resourceName:"conversations",
         progressMaxBase:1e6, progressMaxIncrease:1.5,
         expToLevelBase:10, expToLevelIncrease:1.5,
         unlockCost:1e6, visible:false, unlocked:false, purchased: false,
@@ -1148,7 +1095,7 @@ let actionData = {
     },
     //Socialize - Scott
     talkToScott: {
-        tier:1, momentumName:"conversations",
+        tier:1, plane:0, resourceName:"conversations",
         progressMaxBase:50000, progressMaxIncrease:1.5,
         expToLevelBase:10, expToLevelIncrease:1.5,
         unlockCost:50000, maxLevel:10,
@@ -1162,7 +1109,7 @@ let actionData = {
         efficiencyAtts:[],
     },
     talkAboutVillageHistory: {
-        tier:1, momentumName:"conversations",
+        tier:1, plane:0, resourceName:"conversations",
         progressMaxBase:50000, progressMaxIncrease:3,
         expToLevelBase:10, expToLevelIncrease:3,
         unlockCost:50000, visible:false, unlocked:false, purchased: false,
@@ -1171,7 +1118,7 @@ let actionData = {
         efficiencyAtts:[],
     },
     talkAboutCurrentIssues: {
-        tier:1, momentumName:"conversations",
+        tier:1, plane:0, resourceName:"conversations",
         progressMaxBase:50000, progressMaxIncrease:1.5,
         expToLevelBase:10, expToLevelIncrease:1.5,
         unlockCost:50000, visible:false, unlocked:false, purchased: false,
@@ -1181,7 +1128,7 @@ let actionData = {
     },
     //Socialize - John
     talkToInstructorJohn: {
-        tier:1, momentumName:"conversations",
+        tier:1, plane:0, resourceName:"conversations",
         progressMaxBase:50000, progressMaxIncrease:1.5,
         expToLevelBase:10, expToLevelIncrease:1.5,
         unlockCost:50000, visible:false, unlocked:false, purchased: false,
@@ -1191,7 +1138,7 @@ let actionData = {
     },
     //Socialize - Local Outreach
     localOutreach: {
-        tier:1, momentumName:"conversations",
+        tier:1, plane:0, resourceName:"conversations",
         progressMaxBase:50000, progressMaxIncrease:1.5,
         expToLevelBase:10, expToLevelIncrease:1.5,
         unlockCost:50000, maxLevel:50,
@@ -1200,5 +1147,125 @@ let actionData = {
         expAtts:[],
         efficiencyAtts:[],
     },
+}
 
-};
+
+//==== plane1 ====
+actionData = {
+    ...actionData,
+
+    overclockTargetingTheLich: {
+        tier:1, plane:1,
+        progressMaxBase:60, progressMaxIncrease:1,
+        expToLevelBase:60, expToLevelIncrease:1,
+        efficiencyBase:1, isKTL:true, purchased: false,
+        unlockCost:0, visible:true, unlocked:true, isGenerator:true, generatorSpeed:1,
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[]
+    },
+    killHorde: {
+        tier:1, plane:1,
+        progressMaxBase:1e10, progressMaxIncrease:10,
+        expToLevelBase:5, expToLevelIncrease:1,
+        efficiencyBase:1, isKTL:true, purchased: false, maxLevel:2,
+        unlockCost:1e9, visible:true, unlocked:false,
+        onUnlock: function() {
+            data.legacy += 10;
+            data.useAmuletButtonShowing = true;
+        },
+        onCompleteCustom:function() {
+            data.legacy += 2 * (1 +  data.actions.killHorde.level);
+        },
+        onLevelCustom: function() {
+            unveilAction('killElites');
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[],
+        extraInfo:{english:"Gives 2 * (1 + level) legacy per complete."},
+        unlockMessage:{english:"On unlock, +10 legacy."}
+    },
+    killElites: {
+        tier:1, plane:1,
+        progressMaxBase:1e13, progressMaxIncrease:10,
+        expToLevelBase:5, expToLevelIncrease:1,
+        efficiencyBase:1, isKTL:true, purchased: false, maxLevel:2,
+        unlockCost:1e12, visible:true, unlocked:false,
+        onUnlock: function() {
+            data.legacy += 30;
+        },
+        onCompleteCustom:function() {
+            data.legacy += 6 * (1 +  data.actions.killHorde.level);
+        },
+        onLevelCustom: function() {
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[],
+        extraInfo:{english:"Gives 6 * (1 + level) legacy per complete."},
+        unlockMessage:{english:"On unlock, +30 legacy."}
+    },
+    killDevils: {
+        tier:1, plane:1,
+        progressMaxBase:1e16, progressMaxIncrease:10,
+        expToLevelBase:5, expToLevelIncrease:1,
+        efficiencyBase:1, isKTL:true, purchased: false, maxLevel:2,
+        unlockCost:1e12, visible:true, unlocked:false,
+        onUnlock: function() {
+            data.legacy += 100;
+        },
+        onCompleteCustom:function() {
+            data.legacy += 20 * (1 +  data.actions.killHorde.level);
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[],
+        extraInfo:{english:"Gives 20 * (1 + level) legacy per complete."},
+        unlockMessage:{english:"On unlock, +100 legacy."}
+    },
+    killGenerals: {
+        tier:1, plane:1,
+        progressMaxBase:10, progressMaxIncrease:1.2,
+        expToLevelBase:1, expToLevelIncrease:1.2,
+        efficiencyBase:1, isKTL:true, purchased: false,
+        unlockCost:10, visible:true, unlocked:false,
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[]
+    },
+}
+
+//==== plane2 ====
+actionData = {
+    ...actionData,
+
+
+    echoKindle: {
+        tier:1, plane:2,
+        progressMaxBase:60, progressMaxIncrease:1,
+        expToLevelBase:60, expToLevelIncrease:1,
+        efficiencyBase:1, isKTL:true, purchased: false,
+        unlockCost:0, visible:true, unlocked:true, isGenerator:true, generatorSpeed:1,
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[]
+    },
+
+}
+
+//==== plane3 ====
+actionData = {
+    ...actionData,
+
+    absorbStarseed: {
+        tier:1, plane:3,
+        progressMaxBase:60, progressMaxIncrease:1,
+        expToLevelBase:60, expToLevelIncrease:1,
+        efficiencyBase:1, isKTL:true, purchased: false,
+        unlockCost:0, visible:true, unlocked:true, isGenerator:true, generatorSpeed:1,
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[]
+    },
+}

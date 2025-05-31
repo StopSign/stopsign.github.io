@@ -73,7 +73,7 @@ function generateActionDisplay(actionVar) {
 
     queueCache(`${actionVar}Tier`);
     queueCache(`${actionVar}Resource`);
-    queueCache(`${actionVar}MomentumAdded`);
+    queueCache(`${actionVar}ResourceAdded`);
     queueCache(`${actionVar}Level`);
     queueCache(`${actionVar}MaxLevel`);
     queueCache(`${actionVar}HighestLevelContainer2`);
@@ -87,8 +87,8 @@ function generateActionDisplay(actionVar) {
           
             <span style="font-size:18px;font-weight:bold;">${actionObj.title}<br></span>
             <span style="font-size:16px;font-weight:bold;" id='${actionVar}Resource'>0</span> 
-            <span style="color:${resourceColor};font-size:14px;font-weight:bold;">${capitalizeFirst(actionObj.momentumName)}</span>
-            <span style="font-size:14px;color:var(--text-muted)">${actionObj.isGenerator?`(+<span id="${actionVar}MomentumAdded" style="color:var(--text-primary);font-weight:bold;">10</span>)`:""}</span><br>
+            <span style="color:${resourceColor};font-size:14px;font-weight:bold;">${capitalizeFirst(actionObj.resourceName)}</span>
+            <span style="font-size:14px;color:var(--text-muted)">${actionObj.isGenerator?`(+<span id="${actionVar}ResourceAdded" style="color:var(--text-primary);font-weight:bold;">10</span>)`:""}</span><br>
             <span style="font-size:12px;position:relative;color:var(--text-muted)">
                 Level <span id="${actionVar}Level" style="color:var(--text-primary);font-weight:bold;">0</span>
                 ${actionObj.maxLevel >= 0 ? ` / <span id="${actionVar}MaxLevel" style="color:var(--text-primary);font-weight:bold;">0</span>` : ""}
@@ -108,7 +108,7 @@ function generateActionDisplay(actionVar) {
 
     let menuContainer = Raw.html`
         <div style="position:absolute;top:-18px;font-size:13px;left:3px;">
-        ${actionVar==="overclock"?"":`<span onclick="actionTitleClicked('${actionObj.parent}')" 
+        ${actionVar==="overclock"?"":`<span onclick="actionTitleClicked('${actionObj.parentVar}')" 
             class="buttonSimple" style="margin-right:3px;width:30px;height:30px;text-align:center;cursor:pointer;padding:0 4px;">^</span>`}
         <span id="${actionVar}_downstreamMenuButton" onclick="clickActionMenu('${actionVar}', 'downstream')" class="buttonSimple" 
             style="margin-right:3px;width:30px;height:30px;text-align:center;cursor:pointer;padding:0 4px;">Downstream</span>
@@ -253,7 +253,7 @@ function generateActionDisplay(actionVar) {
             <div id="${actionVar}_infoContainer" style="display:none;padding:5px;">
         Tier <b>${actionObj.tier}</b>${actionObj.isGenerator ? " Generator" : " Action"}<br>
         Efficiency, found in the title, is Expertise Mult * Base Efficiency (x<b><span id="${actionVar}EfficiencyBase"></span></b>), capping at <b>100</b>%.<br>
-        ${actionObj.isGenerator?"":(`Consume and send rate is ${actionObj.tierMult()*100}% of ${actionObj.momentumName} * efficiency.<br>`)}<br>
+        ${actionObj.isGenerator?"":(`Consume and send rate is ${actionObj.tierMult()*100}% of ${actionObj.resourceName} * efficiency.<br>`)}<br>
         ${onComplete}
         ${onLevelText}
         ${upgradeInfoText}
@@ -286,8 +286,8 @@ function generateActionDisplay(actionVar) {
             <span id="${actionVar}LockIcon"></span><br>
             <span>
                 <div id="${actionVar}UnlockCostContainer">
-                    Needs <span style="font-weight:bold;" id="${actionVar}UnlockCost">0</span> ${actionObj.momentumName}<br>
-                    sent from <b>${data.actions[actionObj.parent]?data.actions[actionObj.parent].title:"WAIT"}</b>.
+                    Needs <span style="font-weight:bold;" id="${actionVar}UnlockCost">0</span> ${actionObj.resourceName}<br>
+                    sent from <b>${data.actions[actionObj.parentVar]?data.actions[actionObj.parentVar].title:"WAIT"}</b>.
                 </div>
                 ${dataObj.unlockMessage ? dataObj.unlockMessage[language]:""}
             </span>
@@ -305,7 +305,7 @@ function generateActionDisplay(actionVar) {
                     class="buttonSimple" style="margin-right:3px;width:30px;height:30px;text-align:center;cursor:pointer;padding:0 4px;">All 0</span>
                 <span onclick="toggleAllHundred('${actionVar}')" 
                     class="buttonSimple" style="margin-right:3px;width:30px;height:30px;text-align:center;cursor:pointer;padding:0 4px;">All 100</span>
-                <div style="color:var(--text-muted)">Total ${actionObj.momentumName} sending downstream: <b><span style="color:var(--text-primary)" id='${actionVar}TotalSend'>1</span></b>/s</div>
+                <div style="color:var(--text-muted)">Total ${actionObj.resourceName} sending downstream: <b><span style="color:var(--text-primary)" id='${actionVar}TotalSend'>1</span></b>/s</div>
             </div>
         </div>`;
 
@@ -346,7 +346,7 @@ function generateActionDisplay(actionVar) {
 
     let child = document.createElement("template");
     child.innerHTML = theStr;
-    document.getElementById("actionContainer").appendChild(child.content);
+    document.getElementById(`planeContainer${actionObj.plane}`).appendChild(child.content);
 
 
     let lockIcon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
@@ -643,7 +643,7 @@ function generateLinesBetweenActions() {
 
             let sourceBackgroundColor = getResourceColor(actionObj);
             let targetBackgroundColor = getResourceColor(downstreamObj);
-            let isDifferentResource = actionObj.momentumName !== downstreamObj.momentumName;
+            let isDifferentResource = actionObj.resourceName !== downstreamObj.resourceName;
             let backgroundColor = isDifferentResource ? `linear-gradient(to right, ${sourceBackgroundColor}, ${targetBackgroundColor})` : 'var(--line-color)';
 
             let borderId = `${actionVar}_${downstreamObj.actionVar}_Line_Outer`;
@@ -671,7 +671,7 @@ function generateLinesBetweenActions() {
                 labelWrapperTransform += `rotate(180deg)`;
             }
 
-            let isDifferentMomentum = actionObj.momentumName !== downstreamObj.momentumName;
+            let isDifferentMomentum = actionObj.resourceName !== downstreamObj.resourceName;
             let onclickText = isDifferentMomentum?``:`handleLineClick('${borderId}', {from: '${actionVar}', to: '${downstreamObj.actionVar}'})`;
             let cursorStyle = isDifferentMomentum?``:`cursor:pointer`;
 
@@ -682,8 +682,8 @@ function generateLinesBetweenActions() {
             queueCache(`${lineId}_Bottom`);
             let lineHTML = Raw.html`
                 <div id="${borderId}" class="line-connection" 
-                     style="${cursorStyle}; display:flex; align-items: center; position: absolute; width: ${length}px; height: 20px; 
-                        background: ${backgroundColor}; opacity: 1; transform-origin: 0 50%; transform: rotate(${angle}deg); left: ${x1}px; top: ${y1}px;"
+                     style="${cursorStyle}; display:none; align-items: center; position: absolute; width: ${length}px; height: 20px; 
+                        background: ${backgroundColor}; opacity: 1; transform-origin: 0 50%; transform: rotate(${angle}deg); left:${x1}px; top:${y1}px;"
                      onclick="${onclickText}">
                      
                     <div id="${lineId}" style="transform:${lineTransform}; width: 100%; height: 0; background-color: ${targetBackgroundColor}; position: relative;text-align:center;">
@@ -692,14 +692,14 @@ function generateLinesBetweenActions() {
                             <div id="${lineId}_Top" class="line-label-top hyperVisible" style="opacity:0;position:relative;color: yellow;font-size: 14px;font-weight: bold;line-height: 1;top:${topY}">
                                 x2
                             </div>
-                            <div id="${lineId}_Bottom" class="line-label-bottom hyperVisible" style="position:relative;color:mediumpurple;font-size: 12px;font-weight: bold;line-height: 1;top:${bottomY}">
+                            <div id="${lineId}_Bottom" class="line-label-bottom hyperVisible" style="position:relative;color:mediumpurple;font-size: 12px;font-weight: bold;line-height: 1;top:${bottomY};display:none;">
                                 x1.00
                             </div>
                         </div>
                     </div>
                 </div>`;
 
-            document.getElementById("lineContainer").insertAdjacentHTML("beforeend", lineHTML);
+            document.getElementById(`lineContainer${actionObj.plane}`).insertAdjacentHTML("beforeend", lineHTML);
         }
     }
 }
@@ -711,18 +711,19 @@ function generateAmuletContent() {
         let upgrade = data.upgrades[upgradeVar];
 
         // Start a new row for each upgrade
-        amuletContent += "<div id='"+upgradeVar+"Container' style='margin-bottom:10px;'>";
-        amuletContent += "<div style='width:100%;font-size:16px;margin-bottom:5px;'>..." + decamelize(upgradeVar) + "</div>";
+        amuletContent += `<div id="${upgradeVar}Container" style="margin-bottom:10px;">`;
+        amuletContent += `<div style="width:100%;font-size:16px;margin-bottom:5px;">...${decamelize(upgradeVar)}</div>`;
 
         // Generate buttons for available upgrades
         for (let i = 0; i < upgrade.upgradesAvailable; i++) {
             let id = upgradeVar+"Button"+i;
             let cost = intToString(calcUpgradeCost(upgrade, i),1);
-            amuletContent += "<button class='upgradeButton' id='"+id+"'" +
-                " style='background:var(--upgrade-color); color:black;'" +
-                " onClick='selectBuyUpgrade(\"" + upgradeVar + "\", " + i + ")'><b>" +
-                cost +
-                "</b></button>";
+            amuletContent += Raw.html`
+                <button class="upgradeButton" id="${id}" 
+                    style="background:var(--upgrade-color); color:black;font-weight:bold;" 
+                    onClick="selectBuyUpgrade('${upgradeVar}', ${i})">
+                    ${cost}
+                </button>`;
         }
         amuletContent += "</div>";
     }
@@ -739,14 +740,14 @@ function setAllCaches() {
     queueCache("secondsPerReset");
     queueCache("openUseAmuletButton");
     queueCache("openViewAmuletButton");
-    queueCache("essence");
-    queueCache("essence2");
+    queueCache("legacy");
+    queueCache("legacy2");
     queueCache("bonusTime");
     queueCache("killTheLichMenu");
     queueCache("attDisplay");
     queueCache("bonusDisplay");
     queueCache("killTheLichMenuButton2");
-    queueCache("essenceDisplay");
+    queueCache("legacyDisplay");
     queueCache("jobDisplay");
 
     for(let actionVar in data.actions) {

@@ -15,6 +15,15 @@ document.addEventListener("keydown", function(e) {
     if(keysPressed[' ']) {
         pauseGame();
     }
+    if(keysPressed['1']) {
+        switchToPlane(0)
+    } else if(keysPressed['2']) {
+        switchToPlane(1)
+    } else if(keysPressed['3']) {
+        switchToPlane(2)
+    } else if(keysPressed['4']) {
+        switchToPlane(3)
+    }
 
     if (!animationFrameId && ['w', 'a', 's', 'd'].includes(key)) {
         moveActionContainer();

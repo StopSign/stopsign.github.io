@@ -47,11 +47,11 @@ function buyUpgrade(upgradeVar, num) {
     }
     //check cost
     let cost = calcUpgradeCost(upgrade, num);
-    if (data.essence < cost) {
+    if (data.legacy < cost) {
         return;
     }
     //buy
-    data.essence -= cost;
+    data.legacy -= cost;
 
     //add to upgrades
     if (upgrade.upgradesBought.indexOf(num) === -1) {

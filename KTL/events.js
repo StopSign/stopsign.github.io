@@ -133,7 +133,7 @@ function clickZoomIn() {
 
     for (let actionVar in data.actions) {
         if (data.actions[actionVar].visible || globalVisible) {
-            forceRedraw(view.cached[actionVar + "Container"]);
+            forceRedraw(view.cached[`${actionVar}Container`]);
         }
     }
 }
@@ -157,7 +157,7 @@ function clickZoomOut() {
 
     for (let actionVar in data.actions) {
         if (data.actions[actionVar].visible || globalVisible) {
-            forceRedraw(view.cached[actionVar + "Container"]);
+            forceRedraw(view.cached[`${actionVar}Container`]);
         }
     }
 }
@@ -186,7 +186,7 @@ windowElement.addEventListener('wheel', function(e) {
 
     for (let actionVar in data.actions) {
         if(data.actions[actionVar].visible || globalVisible) {
-            forceRedraw(view.cached[actionVar + "Container"]);
+            forceRedraw(view.cached[`${actionVar}Container`]);
         }
     }
 }, { passive: false });
@@ -302,7 +302,7 @@ function applyPan(x, y) {
 function applyTransform() {
     actionContainer.style.transform = `translate(${transformX}px, ${transformY}px) scale(${scale})`;
     for (let actionVar in data.actions) {
-        forceRedraw(view.cached[actionVar + "Container"]);
+        forceRedraw(view.cached[`${actionVar}Container`]);
     }
 }
 
@@ -569,4 +569,12 @@ function changeBonusSpeed(num) {
         bonusSpeed = num;
     }
     data.options.bonusRate = num;
+}
+
+
+function switchToPlane(num) {
+    document.getElementById(`planeContainer${data.planeTabSelected}`).style.display = 'none';
+    data.planeTabSelected = num;
+    document.getElementById(`planeContainer${data.planeTabSelected}`).style.display = '';
+    document.getElementById("windowElement").style.backgroundColor = `var(--world-${data.planeTabSelected}-bg-primary)`;
 }

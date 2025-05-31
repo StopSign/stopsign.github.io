@@ -242,7 +242,6 @@ function tickGameObject(actionVar) {
 function calculateTaken(actionVar, downstreamVar, actionObj, mult) {
     let permFocusMult = actionObj[downstreamVar + "FocusMult"] >= 1 ? actionObj[downstreamVar + "FocusMult"] : 1;
 
-
     let totalTakenMult = actionObj.tierMult() * (actionObj.efficiency / 100) * permFocusMult * (isAttentionLine(actionVar, downstreamVar) ? data.focusMult : 1);
     if (totalTakenMult > 0.1) {
         totalTakenMult = 0.1; // Cap at 10%/s

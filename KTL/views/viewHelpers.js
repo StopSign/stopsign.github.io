@@ -34,7 +34,7 @@ function gameStateMatches(actionObj) {
 }
 
 function getResourceColor(actionObj) {
-    switch (actionObj.momentumName) {
+    switch (actionObj.resourceName) {
         case "mana":
             return "var(--mana-color)";
         case "gold":
@@ -51,7 +51,7 @@ function getResourceColor(actionObj) {
 }
 
 function getDimResourceColor(actionObj) {
-    switch (actionObj.momentumName) {
+    switch (actionObj.resourceName) {
         case "mana":
             return "var(--mana-color-dim)";
         case "gold":

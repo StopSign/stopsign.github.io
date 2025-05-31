@@ -57,7 +57,7 @@ let views = {
 
         for (let actionVar in data.actions) {
             let actionObj = data.actions[actionVar];
-            let resourceName = actionObj.momentumName;
+            let resourceName = actionObj.resourceName;
             let resourceAmount = actionObj.resource;
 
             if (!resourceAmounts[resourceName]) {
@@ -104,12 +104,16 @@ let views = {
     updateActionVisibility: function(actionObj) {
         let actionVar = actionObj.actionVar;
 
-        //if game state doesn't match, return after updating it
-        let toDisplay = gameStateMatches(actionObj) && (globalVisible || actionObj.visible);
+        //if game state doesn't match, return
+        if(actionObj.plane !== data.planeTabSelected) {
+            return;
+        }
+        let toDisplay = actionObj.visible || globalVisible;
         views.updateVal(`${actionVar}Container`, toDisplay?"":"none", "style.display");
-        if(actionObj.parent) {
-            views.updateVal(`${actionObj.parent}_${actionVar}_Line_Outer`, toDisplay?"":"none", "style.display");
-            views.updateVal(`${actionObj.parent}_${actionVar}_Line_Inner`, toDisplay?"":"none", "style.display");
+        if(actionObj.parentVar) {
+            let parentObj = data.actions[actionObj.parentVar];
+            views.updateVal(`${actionObj.parentVar}_${actionVar}_Line_Outer`, toDisplay && parentObj.visible ?"flex":"none", "style.display");
+            views.updateVal(`${actionObj.parentVar}_${actionVar}_Line_Inner`, toDisplay && parentObj.visible ?"":"none", "style.display");
         }
 
         if(!toDisplay) { // || not in screen range
@@ -125,7 +129,7 @@ let views = {
 
         //go through each downstream
         for (let downstreamVar of actionObj.downstreamVars) {
-            views.updateVal(`${actionVar}_${downstreamVar}_Line_Inner_Container`, !miniVersion ? "" : "none", "style.display");
+            views.updateVal(`${actionVar}_${downstreamVar}_Line_Inner_Container`, !miniVersion ? "flex" : "none", "style.display");
             let boxShadow = !isAttentionLine(actionVar, downstreamVar)?"":(miniVersion?"0 0 40px 11px yellow":"0 0 18px 5px yellow");
             views.updateVal(`${actionVar}_${downstreamVar}_Line_Outer`, boxShadow, "style.boxShadow");
         }
@@ -147,8 +151,6 @@ let views = {
             for (let downstreamVar of actionObj.downstreamVars) {
                 let downstreamObj = data.actions[downstreamVar];
 
-                views.updateVal(`${actionVar}_${downstreamVar}_Line_Inner_Bottom`, downstreamObj.momentumName === actionObj.momentumName ? "" : "none", "style.display");
-                views.updateVal(`${actionVar}_${downstreamVar}_Line_Outer`, downstreamObj.visible ? "" : "none", "style.display");
                 if(downstreamObj.hasUpstream) {
                     views.updateVal(`${actionVar}SliderContainer${downstreamVar}`, downstreamObj.visible ? "" : "none", "style.display");
                 }
@@ -221,9 +223,9 @@ let views = {
         ];
         // if(actionObj.isGenerator) { //TODO
         if(actionVar === "overclock") {
-            roundedNumbers.push(["momentumAdded", 2]);
+            roundedNumbers.push(["resourceAdded", 2]);
         }
-        if(actionObj.isGenerator && actionVar !== "overclock") {
+        if(actionObj.isGenerator && actionObj.parent) {
             roundedNumbers.push(["amountToSend", 2]);
         }
         if(actionObj.isGenerator) {
@@ -271,7 +273,7 @@ let views = {
                 return;
             }
 
-            let rangeValue = data.actions[actionVar][`downstreamRate${downstreamVar}`];
+            let rangeValue = data.actions[actionVar][`downstreamRate${downstreamVar}`] || 0;
 
             let mult = rangeValue/100;
             let taken = calculateTaken(actionVar, downstreamVar, actionObj, mult);
@@ -284,7 +286,7 @@ let views = {
                 views.updateVal(`${actionVar}_${downstreamVar}_Line_Inner_Top`, `x${intToString(data.focusMult, 1)}`, "textContent");
             }
 
-            let focusShowing = actionObj[`${downstreamVar}FocusMult`] > 1.005;
+            let focusShowing = actionObj[`${downstreamVar}FocusMult`] > 1.005 && downstreamObj.resourceName === actionObj.resourceName;
             views.updateVal(`${actionVar}DownstreamAttentionBonusLoop${downstreamVar}`, focusShowing ? "" : "none", "style.display");
             views.updateVal(`${actionVar}_${downstreamVar}_Line_Inner_Bottom`, focusShowing ? "" : "none", "style.display");
             if(focusShowing) {
@@ -381,7 +383,7 @@ function updateGlobals() {
     let totalMometum = 0;
     for(let actionVar in data.actions) {
         let actionObj = data.actions[actionVar];
-        if(actionObj.momentumName === "momentum" && gameStateMatches(actionObj)) {
+        if(actionObj.resourceName === "momentum" && gameStateMatches(actionObj)) {
             totalMometum += actionObj.resource;
         }
     }
@@ -401,15 +403,15 @@ function updateGlobals() {
 
     let toViewAmulet = data.doneAmulet && data.gameState !== "KTL" ? "" : "none";
     views.updateVal(`openViewAmuletButton`, toViewAmulet ? "" : "none", "style.display");
-    views.updateVal(`essenceDisplay`, toViewAmulet ? "" : "none", "style.display");
+    views.updateVal(`legacyDisplay`, toViewAmulet ? "" : "none", "style.display");
 
     views.updateVal(`jobDisplay`, data.displayJob ? "" : "none", "style.display");
 
     views.updateVal(`secondsPerReset`, data.secondsPerReset, "textContent","time");
     views.updateVal(`bonusTime`, bonusTime/1000, "textContent", "time");
 
-    views.updateVal(`essence`, data.essence, "textContent", 1);
-    views.updateVal(`essence2`, data.essence, "textContent", 1);
+    views.updateVal(`legacy`, data.legacy, "textContent", 1);
+    views.updateVal(`legacy2`, data.legacy, "textContent", 1);
 }
 
 function updateViewOnSecond() {

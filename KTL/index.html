@@ -11,16 +11,25 @@
 
     <title>KTL</title>
     <link rel="stylesheet" href="views/stylesheet.css">
-<!--    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">-->
 </head>
 <body id="theBody" oncontextmenu="return false;" style="padding:5px" class="medium">
 
 
 <div id="windowElement" style="position:relative; width:100%; height:98%; border:2px solid; overflow:hidden;background-color:var(--world-1-bg-primary)">
-    <div id="actionContainer" style="will-change: transform;position:absolute;"> <!-- initial left/top with actionTitleClicked(`overclock`) -->
-        <div id="lineContainer"></div>
-<!--        <div id="dot" style="position:absolute;border:2px solid;width:1px;height:1px;"></div>-->
-        <!-- Child divs go here -->
+    <div id="actionContainer" style="will-change: transform;position:absolute;">
+        <span id="planeContainer0">
+            <span id="lineContainer0"></span>
+            <!-- Generated Actions go here -->
+        </span>
+        <span id="planeContainer1" style="display:none;">
+            <span id="lineContainer1"></span>
+        </span>
+        <span id="planeContainer2" style="display:none;">
+            <span id="lineContainer2"></span>
+        </span>
+        <span id="planeContainer3" style="display:none;">
+            <span id="lineContainer3"></span>
+        </span>
     </div>
 </div>
 
@@ -28,9 +37,9 @@
 
 <div style="position:absolute;left:15px;top:21px;padding:0 10px;font-size:14px;color: var(--text-muted);">
     <div id="momentumDisplay" style="font-size:14px;background-color:var(--overlay-color);">
-        Clock: <span id="secondsPerReset" style="display:inline-block;width:50px;color: var(--text-primary);font-weight:bold;"></span>
+        Clock: <span id="secondsPerReset" style="display:inline-block;margin-right:10px;color: var(--text-primary);font-weight:bold;"></span>
         Total Momentum: <span id="totalMomentum" style="display:inline-block;color: var(--text-primary);width:50px;font-weight:bold;">1</span>
-        <span id="essenceDisplay" style="display:none"> Total Essence: <span id="essence" style="color: var(--text-primary);font-weight:bold;"></span></span>
+        <span id="legacyDisplay" style="display:none"> Total Legacy: <span id="legacy" style="color: var(--text-primary);font-weight:bold;"></span></span>
     </div>
     <div id="jobDisplay" style="display:none;font-size:14px;top:65px;background-color:var(--overlay-color);">
         Current Job: <span id="jobTitle" style="color: var(--text-primary);font-weight:bold;">Help Scott With Chores</span>. Wage: $<b><span id="jobWage" style="color: var(--text-primary);">1</span></b>
@@ -83,15 +92,25 @@
         <span class="button" style="padding:6px 20px;position: absolute;top:-35px;font-weight:bold;pointer-events:auto;" id='pauseButton' onclick="pauseGame()">|| Pause</span>
 
         <div style="display:flex;justify-content:center;gap:5px;font-size:18px;width:100%;">
-            <div class="hyperVisible physicalPlaneButton" style="max-width:200px;height:60px;pointer-events:auto;
+            <div id="planeButton0" class="hyperVisible planeButton0" onclick="switchToPlane(0)" style="max-width:200px;height:60px;pointer-events:auto;
                 border-bottom:none;border-top-left-radius:10px;border-top-right-radius:10px;
                 display:flex;align-items:center;justify-content:center;font-weight:bold;cursor:pointer;width:50%;">
-                Physical Plane
+                Brythal [1]
             </div>
-            <div class="hyperVisible astralPlaneButton" style="max-width:200px;height:60px;pointer-events:auto;
+            <div id="planeButton1" class="hyperVisible planeButton1" onclick="switchToPlane(1)" style="max-width:200px;height:60px;pointer-events:auto;
                 border-bottom:none;border-top-left-radius:10px;border-top-right-radius:10px;
                 display:flex;align-items:center;justify-content:center;font-weight:bold;cursor:pointer;width:50%;">
-                Astral Plane
+                Kill the Lich [2]
+            </div>
+            <div id="planeButton2" class="hyperVisible planeButton2" onclick="switchToPlane(2)" style="max-width:200px;height:60px;pointer-events:auto;
+                border-bottom:none;border-top-left-radius:10px;border-top-right-radius:10px;
+                display:flex;align-items:center;justify-content:center;font-weight:bold;cursor:pointer;width:50%;">
+                Magic [3]
+            </div>
+            <div id="planeButton3" class="hyperVisible planeButton3" onclick="switchToPlane(3)" style="max-width:200px;height:60px;pointer-events:auto;
+                border-bottom:none;border-top-left-radius:10px;border-top-right-radius:10px;
+                display:flex;align-items:center;justify-content:center;font-weight:bold;cursor:pointer;width:50%;">
+                Astral Plane [4]
             </div>
         </div>
     </div>
@@ -119,7 +138,7 @@ dims as it thrums with stolen power.
 It seems to reach out, and offer a question. -- what would you say to yourself, had he a second chance?
 "He, not I?"
 Silence. Very well. With your last breath, you craft a message. The amulet gathers it and burns the last of your life.
-It continues, capturing fraction essence of your fleeting soul and sending it in a direction eyes could not follow.<br><br>
+It continues, capturing fraction legacy of your fleeting soul and sending it in a direction eyes could not follow.<br><br>
 
 ... You set your ability's Target to itself, thinking yourself clever. Then, you pause, and frown - though the room is quiet,
  an echo of an echo adds itself the things you know like a blanket, laying on top of your potential in all the little ways your future's past has discovered.
@@ -158,7 +177,7 @@ It continues, capturing fraction essence of your fleeting soul and sending it in
         <div id="ktlDynamicContent" class="dynamicContent">
             Info:<br>
             A new quick game is started with your total momentum across all actions as your only, non-renewable resource.
-            You will try to get as much essence as you can, which at first should be 10
+            You will try to get as much legacy as you can, which at first should be 10
             (unless you fell asleep and have the 1T needed for the next (not recommended)). You can reach 10 with 1 million,
             but if you're exact it might take a while, so the minimum of a reset is 1.1 million.<br>
             <div class="menuSeparator"></div>
@@ -182,14 +201,14 @@ It continues, capturing fraction essence of your fleeting soul and sending it in
 
 <div id="useAmuletMenu" class='fullScreenGrey' style="display:none" onClick='openUseAmuletMenu()'>
     <div class='centerMenuBox' onClick="stopClicks(event)">
-        <div class='menuTitle'>Use the Amulet!<br>Essence available: <b><span id="essence2"></span></b></div>
+        <div class='menuTitle'>Use the Amulet!<br>Legacy available: <b><span id="legacy2"></span></b></div>
         <div class="menuSeparator"></div>
         <div class="menuTitle" style="font-size:12px;text-align:center;">As you lay dying, your last thoughts are recorded by the amulet:<br><span style="font-size:16px;"><b>IF ONLY I COULD JUST...</b></span></div>
         <div class="menuSeparator"></div>
         <div id="amuletUpgrades" class="dynamicContent"></div>
         <div id="amuletEnabledContainer">
             <div class="menuSeparator"></div>
-            It is recommended to spend your essence before you start a new life.<br>
+            It is recommended to spend your legacy before you start a new life.<br>
             <input type="checkbox" id="amuletConfirm"><label for="amuletConfirm">Confirm</label>
             <button class="continueButton" onclick="useAmulet()">Start Again</button>
             <div id="infoMenu" style="position:absolute;width:300px;top:150px;right:100%;display:none;background:var(--bg-secondary);border-radius:20px;border:2px solid #00cd41;padding:10px 0;">
@@ -239,7 +258,7 @@ It continues, capturing fraction essence of your fleeting soul and sending it in
     //     i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function () {
     //         (i[r].q = i[r].q || []).push(arguments)
     //     }, i[r].l = 1 * new Date(); a = s.createElement(o),
-    //         m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m)
+    //         m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentVarNode.insertBefore(a, m)
     // })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
     //
     // ga('create', 'UA-60978932-1', 'auto');

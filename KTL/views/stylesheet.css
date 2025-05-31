@@ -26,12 +26,18 @@
     --menu-text-background-color: #ffffff;
     --text-color: #e0e0e0;
 
+    --world-0-bg-primary: #1e1e2e;
+    --world-0-bg-secondary: #313244;
+    --world-0-bg-tertiary: #45465f;
     --world-1-bg-primary: #1e1e2e;
     --world-1-bg-secondary: #313244;
     --world-1-bg-tertiary: #45465f;
     --world-2-bg-primary: #372339;
     --world-2-bg-secondary: #58375b;
     --world-2-bg-tertiary: #754979;
+    --world-3-bg-primary: #372339;
+    --world-3-bg-secondary: #58375b;
+    --world-3-bg-tertiary: #754979;
 
     --attribute-add-color:#27d318;
     --attribute-add-bg-color: #85d17e;
@@ -88,6 +94,19 @@ body.lightMode {
     --menu-tab-background-color: #e0e0e0;
     --menu-text-background-color: #ffffff;
     --text-color: #222222;
+
+    --world-0-bg-primary: #1e1e2e;
+    --world-0-bg-secondary: #313244;
+    --world-0-bg-tertiary: #45465f;
+    --world-1-bg-primary: #1e1e2e;
+    --world-1-bg-secondary: #313244;
+    --world-1-bg-tertiary: #45465f;
+    --world-2-bg-primary: #372339;
+    --world-2-bg-secondary: #58375b;
+    --world-2-bg-tertiary: #754979;
+    --world-3-bg-primary: #372339;
+    --world-3-bg-secondary: #58375b;
+    --world-3-bg-tertiary: #754979;
 
     --attribute-add-color:#27d318;
     --attribute-add-bg-color: #85d17e;
@@ -478,23 +497,43 @@ input {
     box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
 }
 
-.physicalPlaneButton {
-    background-color:var(--world-1-bg-primary);
-    border:2px solid var(--world-1-bg-secondary);
+.planeButton0 {
+    background-color:var(--world-0-bg-primary);
+    border:2px solid var(--world-0-bg-secondary);
 }
-.physicalPlaneButton:hover {
-    background-color:var(--world-1-bg-secondary);
+.planeButton0:hover {
+    background-color:var(--world-0-bg-secondary);
 }
-.physicalPlaneButton:active {
-    background-color:var(--world-1-bg-tertiary);
+.planeButton0:active {
+    background-color:var(--world-0-bg-tertiary);
 }
-.astralPlaneButton {
-    background-color:var(--world-2-bg-primary);
-    border:2px solid var(--world-2-bg-secondary);
+.planeButton1 {
+    background-color:var(--world-0-bg-primary);
+    border:2px solid var(--world-0-bg-secondary);
 }
-.astralPlaneButton:hover {
-    background-color:var(--world-2-bg-secondary);
+.planeButton1:hover {
+    background-color:var(--world-0-bg-secondary);
 }
-.astralPlaneButton:active {
-    background-color:var(--world-2-bg-tertiary);
+.planeButton1:active {
+    background-color:var(--world-0-bg-tertiary);
+}
+.planeButton2 {
+    background-color:var(--world-3-bg-primary);
+    border:2px solid var(--world-3-bg-secondary);
+}
+.planeButton2:hover {
+    background-color:var(--world-3-bg-secondary);
+}
+.planeButton2:active {
+    background-color:var(--world-3-bg-tertiary);
+}
+.planeButton3 {
+    background-color:var(--world-3-bg-primary);
+    border:2px solid var(--world-3-bg-secondary);
+}
+.planeButton3:hover {
+    background-color:var(--world-3-bg-secondary);
+}
+.planeButton3:active {
+    background-color:var(--world-3-bg-tertiary);
 }

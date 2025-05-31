@@ -18,15 +18,16 @@ function initializeKTL() {
     for(let actionVar in data.actions) {
         let actionObj = data.actions[actionVar];
 
-        actionObj.isRunning = actionObj.isKTL;
-        actionObj.visible = actionObj.isKTL;
+        actionObj.isRunning = actionObj.plane !== 0;
     }
 
     data.actions.overclockTargetingTheLich.resource = data.totalMomentum;
 
     views.updateVal("openUseAmuletButton", "", "style.display")
 
-    document.getElementById("essenceDisplay").style.display = "";
+    //first time stuff
+    document.getElementById("planeButton0").style.display = "";
+    document.getElementById("legacyDisplay").style.display = "";
     data.doneKTL = true;
     if(data.doneAmulet) {
         data.useAmuletButtonShowing = true;

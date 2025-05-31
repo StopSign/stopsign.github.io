@@ -39,7 +39,7 @@ function load() {
         data.gameState = toLoad.gameState ?? "default";
         data.planeTabSelected = toLoad.planeTabSelected ?? 0;
         data.totalMomentum = toLoad.totalMomentum ?? 0;
-        data.essence = toLoad.essence ?? 0;
+        data.legacy = toLoad.legacy ?? 0;
         data.useAmuletButtonShowing = !!toLoad.useAmuletButtonShowing;
         data.secondsPerReset = toLoad.secondsPerReset ?? 0;
         data.currentJob = toLoad.currentJob ?? "Helping Scott";
@@ -62,6 +62,7 @@ function load() {
     initializeDisplay();
     setSlidersOnLoad(toLoad);
     recalcInterval(data.options.updateRate);
+    views.updateView();
 }
 
 function patchActions(currentData, loadedData, baseData, patchMap) {
@@ -136,7 +137,7 @@ Things that are not reloading properly:
 
     if(data.doneAmulet) {
         document.getElementById("openViewAmuletButton").style.display = "";
-        document.getElementById("essenceDisplay").style.display = "";
+        document.getElementById("legacyDisplay").style.display = "";
     }
     if(data.displayJob) {
         document.getElementById("jobDisplay").style.display = "";

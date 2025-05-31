@@ -33,7 +33,7 @@ data.toastStates = []; // array of toast objects: {id, state, element}
 data.planeTabSelected = 0;
 data.gameState = "default"; //KTL
 data.totalMomentum = 0;
-data.essence = 0;
+data.legacy = 0;
 data.useAmuletButtonShowing = false;
 data.secondsPerReset = 0;
 data.currentJob = "Helping Scott";
@@ -65,29 +65,19 @@ function debug() {
     if(!isDebug) {
         return;
     }
-    data.useAmuletButtonShowing = true;
-    data.doneKTL = true;
-    data.doneAmulet = true;
-    data.displayJob = true;
-    data.essence = 300;
+    // data.useAmuletButtonShowing = true;
+    // data.doneKTL = true;
+    // data.doneAmulet = true;
+    // data.displayJob = true;
+    data.legacy = 300;
     // buyUpgrade("buyNicerStuff", 0);
     buyUpgrade("stopLettingOpportunityWait", 0);
     buyUpgrade("stopLettingOpportunityWait", 1);
     buyUpgrade("stopLettingOpportunityWait", 2);
     setSliderUI("overclock", "reflect", 100);
-    unveilAction('hearAboutTheLich');
+    // unveilAction('hearAboutTheLich');
     gameSpeed = 1;
     bonusTime = 1000 * 60 * 60 * 24;
-    data.actions.overclock.resource += 10;
-
-
-    views.updateStats();
-    views.updateActions();
-
-    for(let upgradeVar in data.upgrades) {
-        updateUpgradeView(upgradeVar);
-    }
-    updateGlobals();
 }
 
 function initializeData() {
@@ -150,7 +140,7 @@ function initializeData() {
     create("killGenerals", [], 1, .5);
 
     //intro
-    create("overclock", ["reflect", "bodyAwareness", "travelOnRoad", "makeMoney", "socialize", "hearAboutTheLich"], 0, 0); //generateMana
+    create("overclock", ["reflect", "bodyAwareness", "travelOnRoad", "makeMoney", "socialize"], 0, 0); //generateMana
     create("reflect", ["harnessOverflow", "distillInsight", "takeNotes", "remember"], -1, -1);
     create("harnessOverflow", [], -1.1, .5); //siftExcess
     create("distillInsight", [], -1.9, 0);
@@ -173,10 +163,10 @@ function initializeData() {
     create("socialize", ["meetPeople"], -1, 1);
     create("meetPeople", ["joinCoffeeClub"], 0, 1); //talkToScott, casualConversations
     create("joinCoffeeClub", ["gossip"], 0, 1);
-    // create("gossip", ["hearAboutTheLich"], 1, 0);
-    // create("hearAboutTheLich", [], 0, -1.5);
-    create("gossip", [], 1, 0);
-    create("hearAboutTheLich", [], 0, 1);
+    create("gossip", ["hearAboutTheLich"], 1, 0);
+    create("hearAboutTheLich", [], 0, -1.5);
+    // create("gossip", [], 1, 0);
+    // create("hearAboutTheLich", [], 0, 1);
 
 //--From Upgrades:--
 
@@ -187,7 +177,6 @@ function initializeData() {
     create("stepOffToExplore", ["eatGoldenFruit", "questionTheTrail"], 0, 1);
     create("eatGoldenFruit", [], 1, -.5);
     create("journal", [], -1.9, 0); //readTheWritten
-
 
 //Meditate
     create("meditate", ["feelTheAche"],-2, 0);
@@ -218,6 +207,16 @@ function initializeData() {
     create("messenger", ["townCrier"], 0, -1);
     create("townCrier", ["storyTeller"], 0, -1);
     create("storyTeller", [], 0, -1);
+
+
+    //Plane 2
+    create("echoKindle", [], 0, 0)
+    // create("manaPool", ["manipulateMana"], 0, 1);
+    // create("manipulateMana", [], 0, 1);
+
+
+    //Plane 3
+    create("absorbStarseed", [], 0, 0)
 
 /*
 
@@ -257,7 +256,7 @@ function setParents() {
         let actionObj = data.actions[actionVar];
         for(let downstreamVar of actionObj.downstreamVars) {
             if(data.actions[downstreamVar]) {
-                data.actions[downstreamVar].parent = actionVar;
+                data.actions[downstreamVar].parentVar = actionVar;
             }
         }
     }
@@ -283,8 +282,8 @@ function setRealCoordinates(startActionVar) {
         if (!action) continue; // If action doesn't exist, skip it
 
         // Determine realX and realY
-        if (action.parent && data.actions[action.parent]) {
-            let parentAction = data.actions[action.parent];
+        if (action.parentVar && data.actions[action.parentVar]) {
+            let parentAction = data.actions[action.parentVar];
             action.realX = parentAction.realX + action.x;
             action.realY = parentAction.realY + action.y;
         } else {

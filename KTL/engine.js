@@ -52,6 +52,8 @@ function actionSetBaseVariables(actionObj, dataObj) {
     actionObj.resource = 0;
     actionObj.momentumDelta = 0;
     actionObj.momentumIncrease = 0;
+    actionObj.momentumDecrease = 0;
+    actionObj.totalSend = 0;
     actionObj.expToLevelIncrease = dataObj.expToLevelIncrease;
     actionObj.actionPowerMultIncrease = dataObj.actionPowerMultIncrease ? dataObj.actionPowerMultIncrease : 1;
     actionObj.progressMaxIncrease = dataObj.progressMaxIncrease;
@@ -60,7 +62,7 @@ function actionSetBaseVariables(actionObj, dataObj) {
     actionObj.unlocked = dataObj.unlocked === null ? true : dataObj.unlocked;
     actionObj.currentMenu = "downstream";
 
-    actionObj.isRunning = !dataObj.isKTL; //for controlling whether time affects it
+    actionObj.isRunning = dataObj.plane === 0; //for controlling whether time affects it
     actionObj.onLevelAtts = dataObj.onLevelAtts ? dataObj.onLevelAtts : [];
     actionObj.efficiencyBase = dataObj.efficiencyBase ? dataObj.efficiencyBase : 1; //1 = 100%
     actionObj.efficiencyMult = dataObj.efficiencyMult ? dataObj.efficiencyMult : 1;
@@ -82,7 +84,7 @@ function actionSetBaseVariables(actionObj, dataObj) {
 //One and done
 function actionSetInitialVariables(actionObj, dataObj) {
     actionObj.isGenerator = dataObj.isGenerator;
-    actionObj.momentumName = dataObj.momentumName ? dataObj.momentumName : "momentum";
+    actionObj.resourceName = dataObj.resourceName ? dataObj.resourceName : "momentum";
     actionObj.efficiencyAtts = dataObj.efficiencyAtts ? dataObj.efficiencyAtts : [];
     actionObj.expAtts = dataObj.expAtts ? dataObj.expAtts : [];
     actionObj.tier = dataObj.tier;
@@ -90,6 +92,7 @@ function actionSetInitialVariables(actionObj, dataObj) {
     actionObj.hasUpstream = dataObj.hasUpstream ?? true;
     actionObj.isKTL = !!dataObj.isKTL;
     actionObj.purchased = !!dataObj.purchased;
+    actionObj.plane = dataObj.plane;
 
     // actionObj.onUnlock = dataObj.onUnlock ? dataObj.onUnlock : function() {};
     // actionObj.onCompleteCustom = dataObj.onCompleteCustom ? dataObj.onCompleteCustom : function() {};
@@ -97,7 +100,7 @@ function actionSetInitialVariables(actionObj, dataObj) {
 
 
     //Vars that don't really need to be initalized but I like to know they're there
-    actionObj.parent = null;
+    actionObj.parentVar = null;
     actionObj.highestLevel = -1;
     actionObj.prevUnlockTime = null;
 }
@@ -119,6 +122,7 @@ function createAndLinkNewAction(actionVar, dataObj, title, x, y, downstreamVars)
 
     for(let downstreamVar of actionObj.downstreamVars) {
         actionObj[downstreamVar+"FocusMult"] = 1;
+        actionObj[downstreamVar+"downstreamSendRate"] = 0;
     }
 
     actionObj.progressRateReal = function() { //For data around the flat action too
@@ -286,7 +290,7 @@ function unveilAction(actionVar) {
     revealActionAtts(actionObj);
 
     //set all downstream actions to 1% when you unlock
-    let parentVar = actionObj.parent;
+    let parentVar = actionObj.parentVar;
     let parent = data.actions[parentVar];
     // let amountToSet = data.upgrades.sliderAutoSet.amount;
     if(!parent) {
@@ -297,7 +301,7 @@ function unveilAction(actionVar) {
         return;
     }
     parent.downstreamVars.forEach(function (downstreamVar) {
-        if(downstreamVar === actionVar) { //set the parent's matching slider
+        if(downstreamVar === actionVar && data.actions[downstreamVar].hasUpstream) { //set the parent's matching slider
             setSliderUI(parentVar, downstreamVar, getUpgradeSliderAmount());
         }
     });
@@ -387,4 +391,8 @@ function calcUpgradeMultToExp(actionObj) {
         upgradeMult *= 2;
     }
     return upgradeMult;
+}
+
+function calcFearGain() {
+    return (data.totalMomentum + data.actions.overclock.resourceAdded) / 1e9 * (data.actions.gossip.resource / 1000);
 }
