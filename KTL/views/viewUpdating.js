@@ -81,7 +81,7 @@ let views = {
                 }
                 let actionObj = data.actions[entry.id];
 
-                let color = getDimResourceColor(actionObj);
+                let color = getResourceColorDim(actionObj);
                 views.updateVal(`${entry.id}Container`,`${color} 0px 0px ${Math.floor(ratio * 75)}px ${Math.floor(ratio * 25)}px`,"style.boxShadow");
                 views.updateVal(`${entry.id}LargeVersionContainer`,`inset ${color} 0px 0px ${Math.floor(ratio * 15)}px ${Math.floor(ratio * 5)}px`,"style.boxShadow");
                 // views.updateVal(`${entry.id}SmallVersionContainer`,`inset ${getResourceColor(actionObj)} 0px 0px ${Math.min(ratio * 15)}px ${Math.min(ratio * 5)}px`,"style.boxShadow");
@@ -129,6 +129,9 @@ let views = {
 
         //go through each downstream
         for (let downstreamVar of actionObj.downstreamVars) {
+            if(!actionData[downstreamVar]) {
+                continue;
+            }
             views.updateVal(`${actionVar}_${downstreamVar}_Line_Inner_Container`, !miniVersion ? "flex" : "none", "style.display");
             let boxShadow = !isAttentionLine(actionVar, downstreamVar)?"":(miniVersion?"0 0 40px 11px yellow":"0 0 18px 5px yellow");
             views.updateVal(`${actionVar}_${downstreamVar}_Line_Outer`, boxShadow, "style.boxShadow");
@@ -151,7 +154,7 @@ let views = {
             for (let downstreamVar of actionObj.downstreamVars) {
                 let downstreamObj = data.actions[downstreamVar];
 
-                if(downstreamObj.hasUpstream) {
+                if(downstreamObj && downstreamObj.hasUpstream) {
                     views.updateVal(`${actionVar}SliderContainer${downstreamVar}`, downstreamObj.visible ? "" : "none", "style.display");
                 }
             }

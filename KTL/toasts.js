@@ -9,8 +9,8 @@ let toastIdCounter = 0; // to give each toast a unique ID
 
 function initializeToasts() {
     createToastModal();
-return;
-    createToast(function() { return true },
+
+    createToast(function() { return false },
         "CLOSED BETA", Raw.html`This game is currently in a closed beta - this means please do not share the link with people
         as I do not want the larger audience's first impression to be this version. This is for feedback purposes, and the game may change and the saves wiped for now
         until I start caring about save integrity. Thank you.<br><br>-Stop_Sign`);
@@ -18,32 +18,32 @@ return;
     createToast(function() { return true; },
         "Welcome to Kill the Lich! Click Here for Info!",
         Raw.html`This is Kill the Lich, an idle/waiting optimization game! These messages will serve as the tutorial, so
-        make sure to click these popups and read them for information, but you can play a bit and discover things first as well!<br><br>
+        make sure to click these popups and read them for important information when you can!<br><br>
         
-        When you close a message, you can access it again in the Menu -> Previous Tips.`);
-    createToast(function() { return toastIsClicked(1); },
-        "Controls to Move Around",
-        Raw.html`Click/right click and drag to move the game window. WASD also. Use the mouse scroll wheel or the [+] 
-        and [-] to zoom in and out.`);
+        Removed messages are still accessible at Menu -> Previous Tips.`);
     createToast(function() { return toastIsClicked(1); },
         "Starting the Game",
         Raw.html`You've already started!<br><br>
 
-        The Overclock action gets progress automatically, and when it completes it generates the game's primary resource: momentum. 
-        The way you play is by changing the percentage (using the sliders) of send rate of momentum to downstream actions.<br><br>
+        The Overclock action gets progress automatically, and when it completes it generates your first resource: Momentum. 
+        The gameplay is to change the percentage (using the sliders) of send rate of each action's resource to their downstream actions.<br><br>
         
         To continue, increase the slider of overclock to 100%.`);
-    createToast(function() { return toastIsClicked(3)  && (data.actions.overclock.downstreamRateharnessOverflow-0) > 95; },
-        "Game Math on Sending",
-        Raw.html`Rate of sending = tier mult * efficiency * slider bar %.<br>
-        <ul>
-            <li>Each action has a tier, and as a tier 0, Overclock gets 10% of current Momentum/s</li>
-            <li>However, Overclock also starts at 10% efficiency (the number at the top next to level), so it is further 
-            reduced from 10% to 1% momentum/s, for now. The send rate effects the rate that resources flow, but it doesn't change the total momentum.</li>
-            <li>Each action has a tier, and all other actions to start are Tier 1, which is default 1% rate (at 100% eff)</li>
-            <li>Overclock does not consume momentum automatically, but most actions will automatically convert their sending rate to exp, essentially a 100% slider bar you can't turn off.</li>
-        </ul>`);
-    createToast(function() { return data.actions.harnessOverflow.level >= 2; },
+    // createToast(function() { return toastIsClicked(1); },
+    //     "Controls to Move Around",
+    //     Raw.html`Click/right click and drag to move the game window. WASD works also. Use the mouse scroll wheel or the [+]
+    //     and [-] to zoom in and out.`);
+    // createToast(function() { return toastIsClicked(2)  && (data.actions.overclock.downstreamRatereflect) > 95; },
+    //     "Game Math on Sending",
+    //     Raw.html`Rate of sending = tier mult * efficiency * slider bar %.<br>
+    //     <ul>
+    //         <li>Each action has a tier, and as a tier 0, Overclock gets 10% of current Momentum/s</li>
+    //         <li>However, Overclock also starts at 10% efficiency (the number at the top next to level), so it is further
+    //         reduced from 10% to 1% momentum/s, for now. The send rate effects the rate that resources flow, but it doesn't change the total momentum.</li>
+    //         <li>Each action has a tier, and all other actions to start are Tier 1, which is default 1% rate (at 100% eff)</li>
+    //         <li>Overclock does not consume momentum automatically, but most actions will automatically convert their sending rate to exp, essentially a 100% slider bar you can't turn off.</li>
+    //     </ul>`);
+    createToast(function() { return data.actions.overclock.level >= 1; },
         "Exp and Leveling",
         Raw.html`When the progress bar is full, an action will gain 1 exp until it levels up. On level up, the stat will give:
         <ol>
@@ -53,13 +53,12 @@ return;
         </ol>`);
     createToast(function() { return data.actions.harnessOverflow.level >= 4; },
         "Attention Bonus",
-        Raw.html`You can click the solid blue lines between the actions to set the focus bonus! For now, you can set 
+        Raw.html`You can click the solid blue lines between the actions to set the attention bonus! For now, you can set 
         up to 2, and they give a x2 to the slider they represent, moving the resources around faster!`);
-    createToast(function() { return data.actions.remember.unlocked; },
+    createToast(function() { return data.actions.reflect.level >= 8 },
         "Max Level",
-        Raw.html`The action "Remember" has a max level, first shown with "Level 0 / 4". When the level reaches the max (in this case 4), momentum will no longer be consumed.<br><br>
-
-        If the max level is raised, Consumption will begin again. `);
+        Raw.html`Reflect has a max level, first shown with "Level 0 / 10". When the level is at the max (in this case 10), 
+        momentum will no longer be consumed - this means it will send 100% of the resource onwards without taking any.`);
     createToast(function() { return data.actions.remember.level >= 1 },
         "Next Steps - Traveling!",
         Raw.html`You generally want to be working towards unlocking whatever actions are visible. Shift 

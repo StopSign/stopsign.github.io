@@ -63,6 +63,8 @@ function load() {
     setSlidersOnLoad(toLoad);
     recalcInterval(data.options.updateRate);
     views.updateView();
+
+    debug(); //change game after all else, for easier debugging
 }
 
 function patchActions(currentData, loadedData, baseData, patchMap) {
@@ -105,9 +107,10 @@ function setSlidersOnLoad(toLoad) {
                 toLoad.actions[actionVar]["downstreamRate" + downstreamVar] === undefined) {
                 continue;
             }
-            setSliderUI(actionVar, downstreamVar, toLoad.actions[actionVar]["downstreamRate" + downstreamVar]);
+            setSliderUI(actionVar, downstreamVar, toLoad.actions[actionVar]["downstreamRate" + downstreamVar]); //from save file
         }
     }
+    attachCustomSliderListeners();
 }
 
 function mergeExistingOnly(data, toLoad, varName, skipList = []) {

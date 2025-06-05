@@ -19,8 +19,6 @@ function initializeDisplay() {
     revealActionAtts(data.actions.reflect);
     data.actions.overclock.downstreamRatereflect = 0;
 
-    debug(); //change game for easier debugging
-
     updateUIFromLoad(); //update the elements after create
 }
 
@@ -263,7 +261,7 @@ function generateActionDisplay(actionVar) {
     queueCache(`${actionVar}_storyContainer`);
 
     let storyContainer = Raw.html`
-        <div id="${actionVar}_storyContainer" style="display:none;padding:5px;max-height:220px;overflow-y:auto;">
+        <div id="${actionVar}_storyContainer" style="display:none;padding:10px;max-height:220px;overflow-y:auto;">
             ${dataObj.storyText ? dataObj.storyText[language]:""}
         </div>`;
 
@@ -559,6 +557,9 @@ function createDownStreamSliders(actionObj) {
         queueCache(`${actionVar}NumInput${downstreamVar}`)
         queueCache(`${actionVar}RangeInput${downstreamVar}`)
 
+        let resourceColor = getResourceColor(actionObj);
+        // let dimColor = getResourceColorDim(actionObj);
+
         theStr += Raw.html`
             <div id="${actionVar}SliderContainer${downstreamVar}" style="margin-bottom:5px;margin-top:5px;font-size:12px;">
                 <b><span style="margin-bottom:10px;cursor:pointer;" onclick="actionTitleClicked('${downstreamVar}')">${title}</span></b>
@@ -567,15 +568,86 @@ function createDownStreamSliders(actionObj) {
                     class="hyperVisible" style="color:mediumpurple;display:none;">x1.00</span></b>
                 <b><span id="${actionVar}DownstreamAttentionBonus${downstreamVar}" 
                     class="hyperVisible" style="color:yellow;display:none;">x2</span></b><br>
-                <input type="number" id="${actionVar}NumInput${downstreamVar}" value="0" min="0" max="100" style="margin-right:3px;font-size:10px;width:37px;"
+                <input type="number" id="${actionVar}NumInput${downstreamVar}" value="0" min="0" max="100" style="margin-right:3px;font-size:10px;width:37px;vertical-align: top;"
                     oninput="validateInput('${actionVar}', '${downstreamVar}')" onchange="downstreamNumberChanged('${actionVar}', '${downstreamVar}')" >
-                <input type="range" id="${actionVar}RangeInput${downstreamVar}" value="0" min="0" max="100" 
-                    oninput="downstreamSliderChanged('${actionVar}', '${downstreamVar}')" style="margin-left:5px;width:200px;font-size:10px;height:5px;margin-bottom:8px;">
+                    
+
+                <div id="${actionVar}Container${downstreamVar}" style="display:inline-block;width: 220px; height: 20px; user-select: none; padding: 0 10px; box-sizing: border-box; cursor: pointer;">
+                    <div id="${actionVar}Track${downstreamVar}" style="margin-top:5px;width: 100%; height: 7px; background: linear-gradient(to right, red 10%, #ddd 10%, #ddd 90%, green 90%); position: relative;">
+                        <div id="${actionVar}Thumb${downstreamVar}" style="width: 10px; height: 20px; background-color: ${resourceColor}; position: absolute; top: 50%; transform: translate(-50%, -50%); pointer-events: none;"></div>
+                    </div>
+                </div>
+                
+                
             </div>`;
     }
 
     return theStr;
 }
+
+function attachCustomSliderListeners() {
+    for (let actionVar in data.actions) {
+        let actionObj = data.actions[actionVar]; // This is the actionObj for the current slider
+        if (!actionObj.downstreamVars) continue;
+
+        for (let downstreamVar of actionObj.downstreamVars) {
+            // Use an IIFE to correctly scope variables for each iteration's event listeners,
+            (function(actVar, downVar) {
+                const container = document.getElementById(actVar + "Container" + downVar);
+                const thumb = document.getElementById(actVar + "Thumb" + downVar);
+
+                let downstreamObj = data.actions[downVar];
+                if(!downstreamObj.hasUpstream) {
+                    return;
+                }
+
+                container.addEventListener('mouseenter', () => {
+                    thumb.style.border = "2px solid yellow";
+                });
+
+                container.addEventListener('mouseleave', () => {
+                    thumb.style.border = "";
+                });
+
+                const handleDrag = (event) => {
+                    event.preventDefault();
+                    const track = document.getElementById(actVar + "Track" + downVar);
+                    if (!track) return;
+
+                    const trackRect = track.getBoundingClientRect();
+                    let newLeft = event.clientX - trackRect.left;
+
+                    if (newLeft < 0) newLeft = 0;
+                    if (newLeft > trackRect.width) newLeft = trackRect.width;
+
+                    const newValue = Math.round((newLeft / trackRect.width) * 100);
+
+                    if (data.actions[actVar]["downstreamRate" + downVar] === newValue) {
+                        return;
+                    }
+
+                    data.actions[actVar]["downstreamRate" + downVar] = newValue;
+                    setSliderUI(actVar, downVar, newValue);
+                };
+
+                const stopDrag = () => {
+                    document.removeEventListener('mousemove', handleDrag);
+                    document.removeEventListener('mouseup', stopDrag);
+                };
+
+                container.addEventListener('mousedown', (event) => {
+                    handleDrag(event);
+                    document.addEventListener('mousemove', handleDrag);
+                    document.addEventListener('mouseup', stopDrag);
+                });
+
+            })(actionVar, downstreamVar, actionObj); // Pass the current actionObj to the IIFE
+        }
+    }
+}
+
+
+
 
 function highlightLine(borderId) {
     const line = document.getElementById(borderId);
@@ -660,7 +732,7 @@ function generateLinesBetweenActions() {
             let bottomTransform = "translateX(-50%)";
             let topY = "-12px";
             let bottomY = "12px";
-            let lineTransform = "translateY(-50%) translateY(10px)";
+            let lineTransform = "";
             let labelWrapperTransform = "translate(-50%, -50%) ";
 
             if (labelMode === "vertical") {
@@ -686,7 +758,7 @@ function generateLinesBetweenActions() {
                         background: ${backgroundColor}; opacity: 1; transform-origin: 0 50%; transform: rotate(${angle}deg); left:${x1}px; top:${y1}px;"
                      onclick="${onclickText}">
                      
-                    <div id="${lineId}" style="transform:${lineTransform}; width: 100%; height: 0; background-color: ${targetBackgroundColor}; position: relative;text-align:center;">
+                    <div id="${lineId}" style="width: 100%; height: 0; background-color: ${targetBackgroundColor}; position: relative;text-align:center;">
                         <div id="${lineId}_Container" style="display: flex;position: absolute;left: 50%;top: 50%;
                             transform:${labelWrapperTransform};flex-direction: column;align-items: center;pointer-events: none;">
                             <div id="${lineId}_Top" class="line-label-top hyperVisible" style="opacity:0;position:relative;color: yellow;font-size: 14px;font-weight: bold;line-height: 1;top:${topY}">

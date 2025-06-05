@@ -41,88 +41,107 @@ function create(actionVar, downstreamVars, x, y) {
 
 //Book 1 actions
 let actionData = {
-    overclock:{
-        tier:0, plane:0,
-        progressMaxBase:10, progressMaxIncrease:1,
-        expToLevelBase:10, expToLevelIncrease:1.1,
-        actionPowerBase:100, actionPowerMult:1, actionPowerMultIncrease:1.1,
-        efficiencyBase:.1,
-        unlockCost:0, visible:true, unlocked:true, purchased: true, isGenerator:true, generatorSpeed:10, hasUpstream:false,
-        onUnlock: function() {
+    overclock: {
+        tier: 0,
+        plane: 0,
+        progressMaxBase: 10,
+        progressMaxIncrease: 1,
+        expToLevelBase: 10,
+        expToLevelIncrease: 1.1,
+        actionPowerBase: 100,
+        actionPowerMult: 1,
+        actionPowerMultIncrease: 1.1,
+        efficiencyBase: .1,
+        unlockCost: 0,
+        visible: true,
+        unlocked: true,
+        purchased: true,
+        isGenerator: true,
+        generatorSpeed: 10,
+        hasUpstream: false,
+        onUnlock: function () {
         },
-        onCompleteCustom:function() {
+        onCompleteCustom: function () {
             actionData.overclock.updateMults();
             data.actions.overclock.resource += data.actions.overclock.resourceAdded;
 
-            if(data.actions.hearAboutTheLich.unlocked) {
+            if (data.actions.hearAboutTheLich.unlocked) {
                 data.actions.hearAboutTheLich.actionPower = calcFearGain();
                 data.actions.hearAboutTheLich.resource += data.actions.hearAboutTheLich.actionPower;
             }
         },
-        updateMults: function() {
+        updateMults: function () {
             data.actions.overclock.resourceAdded = data.actions.overclock.actionPower * data.actions.overclock.upgradeMult;
         },
-        onLevelCustom: function() {
+        onLevelCustom: function () {
             actionData.overclock.updateMults();
         },
-        updateUpgradeMult:function() {
+        updateUpgradeMult: function () {
             let upgradeMult = 1;
             upgradeMult *= Math.pow(2, data.upgrades.createABetterFoundation.upgradePower);
             data.actions.overclock.upgradeMult = upgradeMult;
         },
-        onLevelAtts:[],
-        expAtts:[["awareness", 1], ["concentration", 1], ["energy", 1], ["ambition", 1], ["control", 1],
+        onLevelAtts: [],
+        expAtts: [["awareness", 1], ["concentration", 1], ["energy", 1], ["ambition", 1], ["control", 1],
             ["flow", 1], ["willpower", 1], ["coordination", 1], ["integration", 1], ["rhythm", 1],
             ["pulse", 1]],
+        efficiencyAtts: [["cycle", 1]]
+    },
+    distillInsight: {
+        tier:1, plane:0,
+        progressMaxBase:1, progressMaxIncrease:3,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:.4, maxLevel:10,
+        unlockCost:10, visible:false, unlocked:false, purchased: true,
+        onLevelCustom: function() {
+        },
+        onLevelAtts:[["concentration", 2]],
+        expAtts:[],
         efficiencyAtts:[["cycle", 1]]
     },
     reflect: {
-        tier:1, plane:0,
-        progressMaxBase:.25, progressMaxIncrease:2,
-        expToLevelBase:10, expToLevelIncrease:1,
-        efficiencyBase:.5,
-        unlockCost:1, visible:true, unlocked:false, purchased: true,
-        onUnlock: function() {
-            unveilAction('harnessOverflow')
+        tier: 1, plane: 0,
+        progressMaxBase: 1, progressMaxIncrease: 4,
+        expToLevelBase: 10, expToLevelIncrease: 1,
+        efficiencyBase: .5, maxLevel:10,
+        unlockCost:2, visible: true, unlocked: false, purchased: true,
+        onUnlock: function () {
+            unveilAction('distillInsight')
         },
-        onLevelAtts:[["awareness", 5]],
-        expAtts:[["concentration", 5], ["cycle", 5], ["observation", 5], ["energy", 5]],
-        efficiencyAtts:[["cycle", 1]]
+        onLevelCustom: function() {
+            if(data.actions.reflect.level >= 1) {
+                unveilAction('harnessOverflow')
+            }
+            if(data.actions.reflect.level >= 2) {
+                unveilAction('takeNotes')
+            }
+            if(data.actions.reflect.level >= 3) {
+                unveilAction('bodyAwareness')
+            }
+        },
+        onLevelAtts: [["awareness", 10]],
+        expAtts: [["concentration", 1]],
+        efficiencyAtts: [["cycle", 1]]
     },
     harnessOverflow: {
         tier:1, plane:0,
         progressMaxBase:.25, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1, maxLevel:10,
-        unlockCost:2, visible:false, unlocked:false, purchased: true,
+        unlockCost:40, visible:false, unlocked:false, purchased: true,
         onLevelCustom: function() {
-            unveilAction('distillInsight')
         },
         onLevelAtts:[["cycle", 1]],
         expAtts:[["awareness", 1], ["energy", 1]],
         efficiencyAtts:[]
     },
-    distillInsight: {
-        tier:1, plane:0,
-        progressMaxBase:1, progressMaxIncrease:1.5,
-        expToLevelBase:10, expToLevelIncrease:1,
-        efficiencyBase:.4,
-        unlockCost:30, visible:false, unlocked:false, purchased: true,
-        onLevelCustom: function() {
-            unveilAction('takeNotes')
-        },
-        onLevelAtts:[["concentration", 1]],
-        expAtts:[],
-        efficiencyAtts:[["cycle", 1]]
-    },
     takeNotes: {
         tier:1, plane:0,
         progressMaxBase:1, progressMaxIncrease:1.5,
         expToLevelBase:10, expToLevelIncrease:1,
-        efficiencyBase:.3,
-        unlockCost:100, visible:false, unlocked:false, purchased: true,
+        efficiencyBase:.3, maxLevel:10,
+        unlockCost:200, visible:false, unlocked:false, purchased: true,
         onLevelCustom:function() {
-            unveilAction('bodyAwareness')
         },
         onLevelAtts:[["awareness", 10], ["curiosity", 3]],
         expAtts:[["observation", 1]],
@@ -133,7 +152,7 @@ let actionData = {
         progressMaxBase:750, progressMaxIncrease:20,
         expToLevelBase:2, expToLevelIncrease:1,
         efficiencyBase:.6, maxLevel:1,
-        unlockCost:50, visible:false, unlocked:false, purchased: true,
+        unlockCost:500, visible:false, unlocked:false, purchased: true,
         onUnlock: function() {
         },
         onLevelCustom: function() {
@@ -534,13 +553,13 @@ let actionData = {
         expAtts:[],
         efficiencyAtts:[],
         extraButton: Raw.html`
-            <span class="button" id='killTheLichMenuButton2' onclick="openKTLMenu()" 
+            <span class="button" id='killTheLichMenuButton2' onclick="openKTLMenu()"
                 style="display:none;padding:8px 13px;position:absolute;top:330px;left:100px;border-color:black;
                 background-color:#880000;text-shadow:0 0 3px #ff0000;box-shadow:0 0 15px 4px rgba(255, 0, 0, 0.5);" >
             Kill the Lich!</span>
         `,
         unlockMessage:{english:"Unlocks when Overclock is level 1."},
-        extraInfo: {english:Raw.html`This action gains (Total Momentum / 1 billion * .1% of Conversations on Gossip) Fear each Overclock complete, which is a gain of  
+        extraInfo: {english:Raw.html`This action gains (Total Momentum / 1 billion * .1% of Conversations on Gossip) Fear each Overclock complete, which is a gain of
         <span style="font-weight:bold;" id="hearAboutTheLichActionPower">0</span>`}
     },
 

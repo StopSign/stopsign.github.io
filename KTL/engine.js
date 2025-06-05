@@ -301,8 +301,8 @@ function unveilAction(actionVar) {
         return;
     }
     parent.downstreamVars.forEach(function (downstreamVar) {
-        if(downstreamVar === actionVar && data.actions[downstreamVar].hasUpstream) { //set the parent's matching slider
-            setSliderUI(parentVar, downstreamVar, getUpgradeSliderAmount());
+        if(downstreamVar === actionVar && data.actions[downstreamVar].hasUpstream) {
+            setSliderUI(parentVar, downstreamVar, getUpgradeSliderAmount()); //set parent on unveil
         }
     });
 }
@@ -355,7 +355,8 @@ function unlockAction(actionObj) {
 
     actionObj.downstreamVars.forEach(function(downstreamVar) {
         if(data.actions[downstreamVar] && data.actions[downstreamVar].unlocked && document.getElementById(actionVar + "NumInput" + downstreamVar)) {
-            setSliderUI(actionVar, downstreamVar, getUpgradeSliderAmount());
+            console.log("here");
+            setSliderUI(actionVar, downstreamVar, getUpgradeSliderAmount()); //set when unlock
         }
     });
 

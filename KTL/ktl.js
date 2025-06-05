@@ -84,7 +84,7 @@ function useAmulet() {
 
         actionObj.downstreamVars.forEach(function(downstreamVar) {
             if(data.actions[downstreamVar] && data.actions[downstreamVar].unlocked) {
-                setSliderUI(actionObj.actionVar, downstreamVar, getUpgradeSliderAmount());
+                setSliderUI(actionObj.actionVar, downstreamVar, getUpgradeSliderAmount()); //reset with amulet
             }
             let currentMult = actionObj[downstreamVar + "FocusMult"];
 
@@ -92,7 +92,7 @@ function useAmulet() {
         });
     }
 
-    setSliderUI("overclock", "reflect", getUpgradeSliderAmount());
+    setSliderUI("overclock", "reflect", getUpgradeSliderAmount()); //manual reset for actions with no parents
     data.secondsPerReset = 0;
     data.currentJob = "Helping Scott";
     data.currentWage = 1;

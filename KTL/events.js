@@ -1,20 +1,30 @@
-let downStreamRatios = {};
-downStreamRatios.resource = {};
-
-
-// let previousValue = document.getElementById('momentumDownstream1').value;
-function changeDownstream(inputField, varName, targetVar, index) {
-    let value = inputField.value;
-
-    let ratios = downStreamRatios[varName];
-    let targetRatio = 5;
-
-    if(!isNaN(value) && value >= 0 && value <= 100) {
-        previousValue = value;
-    } else {
-        inputField.value = previousValue;
-    }
+function updateCustomThumbPosition(actionVar, downstreamVar, newValue) {
+    const track = document.getElementById(actionVar + "Track" + downstreamVar);
+    const thumb = document.getElementById(actionVar + "Thumb" + downstreamVar);
+    const trackWidth = track.offsetWidth;
+    const thumbPosition = (newValue / 100) * trackWidth;
+    thumb.style.left = thumbPosition + 'px';
 }
+
+function setSliderUI(fromAction, toAction, newValue) {
+    if (!fromAction || !toAction || !document.getElementById(fromAction + "NumInput" + toAction)) {
+        console.log('trying to set slider from: ' + fromAction + ', ' + toAction + ' with val ' + newValue);
+        return;
+    }
+
+    if (newValue === -1) {
+        if (data.actions[fromAction]["downstreamRate" + toAction]) {
+            return;
+        }
+        newValue = 100;
+    }
+
+    document.getElementById(fromAction + "NumInput" + toAction).value = newValue;
+    document.getElementById(fromAction + "_" + toAction + "_Line_Inner").style.height = (newValue / 100 * 20) + "px";
+    updateCustomThumbPosition(fromAction, toAction, newValue);
+    data.actions[fromAction]["downstreamRate" + toAction] = Math.max(0, newValue);
+}
+
 
 function validateInput(fromAction, toAction) {
     let numInput = document.getElementById(fromAction + "NumInput" + toAction);
@@ -25,33 +35,11 @@ function validateInput(fromAction, toAction) {
         alert("Please enter a number between 0 and 100.");
     }
 }
-
-function setSliderUI(fromAction, toAction, newValue) {
-    if(!fromAction || !toAction || !document.getElementById(fromAction + "NumInput" + toAction)) {
-        console.log('trying to set slider from: ' + fromAction + ', ' + toAction + ' with val ' + newValue);
-        return;
-    }
-    if(newValue === -1) {
-        if(data.actions[fromAction]["downstreamRate"+toAction]) { //no automatic change if already set
-            return;
-        }
-        newValue = 100;
-    }
-
-    document.getElementById(fromAction + "NumInput" + toAction).value = newValue;
-    document.getElementById(fromAction + "RangeInput" + toAction).value = newValue;
-    document.getElementById(fromAction+"_"+toAction+"_Line_Inner").style.height = (newValue/100*20)+"px";
-    data.actions[fromAction]["downstreamRate"+toAction] = Math.max(0, newValue);
-}
 function downstreamNumberChanged(fromAction, toAction) {
     let newValue = document.getElementById(fromAction + "NumInput" + toAction).value;
-    setSliderUI(fromAction, toAction, newValue)
+    setSliderUI(fromAction, toAction, newValue); //number input changed
 }
 
-function downstreamSliderChanged(fromAction, toAction) {
-    let newValue = document.getElementById(fromAction + "RangeInput" + toAction).value;
-    setSliderUI(fromAction, toAction, newValue);
-}
 function toggleAllZero(actionVar) {
     let actionObj = data.actions[actionVar];
     actionObj.downstreamVars.forEach(function (toAction) {
@@ -59,7 +47,7 @@ function toggleAllZero(actionVar) {
         if(!downstreamObj || !downstreamObj.hasUpstream || !downstreamObj.visible) {
             return;
         }
-        setSliderUI(actionVar, toAction, 0);
+        setSliderUI(actionVar, toAction, 0); //0 button
     });
 }
 function toggleAllHundred(actionVar) {
@@ -69,7 +57,7 @@ function toggleAllHundred(actionVar) {
         if(!downstreamObj || !downstreamObj.hasUpstream || !downstreamObj.visible) {
             return;
         }
-        setSliderUI(actionVar, toAction, 100);
+        setSliderUI(actionVar, toAction, 100); //100 button
     });
 }
 window.addEventListener('resize', () => {

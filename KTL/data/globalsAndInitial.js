@@ -141,9 +141,9 @@ function initializeData() {
 
     //intro
     create("overclock", ["reflect", "bodyAwareness", "travelOnRoad", "makeMoney", "socialize"], 0, 0); //generateMana
-    create("reflect", ["harnessOverflow", "distillInsight", "takeNotes", "remember"], -1, -1);
-    create("harnessOverflow", [], -1.1, .5); //siftExcess
-    create("distillInsight", [], -1.9, 0);
+    create("reflect", ["distillInsight", "harnessOverflow", "takeNotes", "remember"], -1, -1);
+    create("distillInsight", [], -1.1, .5);
+    create("harnessOverflow", [], -1.9, 0); //siftExcess
     create("takeNotes", ["journal"], -1.1, -.5);
     create("bodyAwareness", ["meditate", "walkAware", "standStraighter"],-1, 0);
     create("remember", [], -.2, -1.2);
@@ -165,8 +165,6 @@ function initializeData() {
     create("joinCoffeeClub", ["gossip"], 0, 1);
     create("gossip", ["hearAboutTheLich"], 1, 0);
     create("hearAboutTheLich", [], 0, -1.5);
-    // create("gossip", [], 1, 0);
-    // create("hearAboutTheLich", [], 0, 1);
 
 //--From Upgrades:--
 
@@ -199,7 +197,7 @@ function initializeData() {
     create("standStraighter", [], -1, 1.5);
 
 //Notice Board level 3 / Jobs 1
-//     create("fillBasicNeeds", [], -.5, -1);
+    create("fillBasicNeeds", [], -.5, -1);
     create("chimneySweep", ["handyman"], 0, -1);
     create("handyman", ["tavernHelper"], 0, -1);
     create("tavernHelper", ["guildReceptionist"], 0, -1);

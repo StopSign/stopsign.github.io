@@ -1,5 +1,7 @@
 
 //Story Text:
+
+
 actionData.remember.storyText = {english:"Your world ended, and they only live on through you. Think about what they would have wanted for you, and on how much you miss them, and let it drive you forward. This is an internal story as much as it is an external one."}
 actionData.overclock.storyText = {english:Raw.html`
 "Overclock: Choose a target; get a little more out of it". Abilities are given intuitively, and the Description was part of that intuitive understanding, given as soon as one has understood all of the words within the description. Overclock works by using the concept of momentum to improve the target over time. The target will be denied unless it meets the criteria, which is any type of action you can do over and over until you get better at it.<br><br>
@@ -13,6 +15,12 @@ I would be prepared so that the next time a threat came along, I would be strong
 actionData.makeMoney.storyText = {english:"Your motivation to overclock spills over throughout your mind. Your general drive expands, and you put this to use in making money. At first it's whatever odd jobs you can find, with later getting employed, Making Money is the gateway to improving your situation."}
 actionData.spendMoney.storyText={english:"At this village there are not many things to buy, but there are still the essentials you need. Buying things with the money you've earned gets you confidence, and the things improve your life to gain more energy."}
 
+
+
+
+
+
+
 actionData.meetVillageLeaderScott.storyText = {english:Raw.html`
 Introductions with Scott as a village leader are nothing to note - he tells me not to make trouble and that he's open to chatting about any problems. He wants to help make the community work well. He seems like a good man. Past the introductions, when I really strike up a conversation with him, he opens up. 
 
@@ -24,7 +32,6 @@ Scott is really nice. I wish more people like him existed - my life would have g
 
 It also reminds me of how those men died, which starts to be more than I can handle for the moment. I have to start reminding myself that this is Someowhere Safe, but ultimately I am not quite up to do the task of socialization. I'm glad I ended up here though, and for the peace it has offered me.
 `};
-
 //Mana
 // actionData.gatherMana.onCompleteText = {english:"+<b><span id=\"gatherManaActionPower\">1</span></b> Mana to Expel Mana<br>"};
 // actionData.gatherMana.storyText = {english:"gather mana info"};

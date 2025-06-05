@@ -50,7 +50,7 @@ function getResourceColor(actionObj) {
     }
 }
 
-function getDimResourceColor(actionObj) {
+function getResourceColorDim(actionObj) {
     switch (actionObj.resourceName) {
         case "mana":
             return "var(--mana-color-dim)";
