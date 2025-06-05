@@ -1,8 +1,6 @@
 function updateCustomThumbPosition(actionVar, downstreamVar, newValue) {
-    const track = document.getElementById(actionVar + "Track" + downstreamVar);
     const thumb = document.getElementById(actionVar + "Thumb" + downstreamVar);
-    const trackWidth = track.offsetWidth;
-    const thumbPosition = (newValue / 100) * trackWidth;
+    const thumbPosition = (newValue / 100) * 200;
     thumb.style.left = thumbPosition + 'px';
 }
 
@@ -300,17 +298,6 @@ function getTouchDistance(touch1, touch2) {
     return Math.sqrt(dx * dx + dy * dy);
 }
 
-function isInScreenRange(action) {
-    return true;
-    //Major performance issue with .offsetWidth - it invalidates the cache
-    // const distanceX = Math.abs((transformX * -1) - (action.realX + 150) * scale + windowElement.offsetWidth / 2);
-    // const distanceY = Math.abs((transformY * -1) - (action.realY + 50) * scale + windowElement.offsetHeight / 2);
-    // const thresholdX = windowElement.offsetWidth / scale / 2 + 300;
-    // const thresholdY = windowElement.offsetHeight / scale / 2 + 300;
-    // return distanceX < thresholdX && distanceY < thresholdY;
-
-    //TODO get the screen once and on change, otherwise don't pull it every frame.
-}
 function forceRedraw(elem) {
     if(elem.style.display !== "none") {
         const display = elem.style.display;

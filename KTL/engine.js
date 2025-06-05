@@ -355,7 +355,6 @@ function unlockAction(actionObj) {
 
     actionObj.downstreamVars.forEach(function(downstreamVar) {
         if(data.actions[downstreamVar] && data.actions[downstreamVar].unlocked && document.getElementById(actionVar + "NumInput" + downstreamVar)) {
-            console.log("here");
             setSliderUI(actionVar, downstreamVar, getUpgradeSliderAmount()); //set when unlock
         }
     });

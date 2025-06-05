@@ -558,7 +558,6 @@ function createDownStreamSliders(actionObj) {
         queueCache(`${actionVar}RangeInput${downstreamVar}`)
 
         let resourceColor = getResourceColor(actionObj);
-        // let dimColor = getResourceColorDim(actionObj);
 
         theStr += Raw.html`
             <div id="${actionVar}SliderContainer${downstreamVar}" style="margin-bottom:5px;margin-top:5px;font-size:12px;">
@@ -573,7 +572,7 @@ function createDownStreamSliders(actionObj) {
                     
 
                 <div id="${actionVar}Container${downstreamVar}" style="display:inline-block;width: 220px; height: 20px; user-select: none; padding: 0 10px; box-sizing: border-box; cursor: pointer;">
-                    <div id="${actionVar}Track${downstreamVar}" style="margin-top:5px;width: 100%; height: 7px; background: linear-gradient(to right, red 10%, #ddd 10%, #ddd 90%, green 90%); position: relative;">
+                    <div id="${actionVar}Track${downstreamVar}" style="margin-top:6px;width: 100%; height: 5px; background: linear-gradient(to right, red 10%, #ddd 10%, #ddd 90%, green 90%); position: relative;">
                         <div id="${actionVar}Thumb${downstreamVar}" style="width: 10px; height: 20px; background-color: ${resourceColor}; position: absolute; top: 50%; transform: translate(-50%, -50%); pointer-events: none;"></div>
                     </div>
                 </div>

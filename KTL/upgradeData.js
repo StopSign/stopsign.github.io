@@ -77,7 +77,7 @@ function createInfoText(upgradeVar, num) {
 }
 
 function createUpgrades() {
-    //Loop through action.upgrades
+    //Loop through actionData.upgrades
     //modify/add base variables as needed
     //add it to data.upgrades
     for(let upgradeVar in actionData.upgrades) {

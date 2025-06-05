@@ -46,7 +46,7 @@ data.maxFocusAllowed = 2;
 data.focusMult = 2;
 data.focusLoopMax = 2.5;
 data.options = {};
-data.options.updateRate = 50;
+data.options.updateRate = 20;
 data.options.autosaveRate = 10;
 data.options.bonusRate = 2;
 

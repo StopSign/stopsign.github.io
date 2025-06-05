@@ -21,29 +21,40 @@ function initializeMenus() {
     addMenuTextContainer("previousTips", "Close tips to fill this screen!");
     updatePreviousTipsMenu();
 
+    addMenuTab("shop");
+    addMenuTextContainer("shop", createShopMenu());
 
     addMenuTab("cheat");
     addMenuTextContainer("cheat", createCheatMenu());
 }
 
 function createCheatMenu() {
-    return "<div class='menuTitle'><s>Cheating</s> Developer Mode</div>" +
-        "<div class='menuSeparator'></div><br>" +
-        "<div class='button' style='width:150px;padding:10px;font-size:16px;' " +
-            "id='cheatButton' onClick='increaseGamespeed()'>x2 Game Speed</div>" +
-        "<div class='button' style='width:150px;padding:10px;font-size:16px;' " +
-            "onClick='resetGamespeed()'>Game Speed = 1</div>"
+    return Raw.html`
+        <div class="menuTitle"><s>Cheating</s> Developer Mode</div>
+        <div class="menuSeparator"></div><br>
+        <div class="button" style="width:150px;padding:10px;font-size:16px;" 
+            id="cheatButton" onClick="increaseGamespeed()">x2 Game Speed</div>
+        <div class="button" style="width:150px;padding:10px;font-size:16px;" 
+            onClick="resetGamespeed()">Game Speed = 1</div>`
+}
+
+function createShopMenu() {
+    return Raw.html`
+        <div class="menuTitle">Shop</div>
+        <div class="menuSeparator"></div><br>
+        Money plz. (TODO)`;
 }
 
 function createHelpMenu() {
-    return "<div class='menuTitle'>Help</div>" +
-        "<div class='menuSeparator'></div><br>" +
-        "Skill issue. (TODO)"
+    return Raw.html`
+        <div class="menuTitle">Help</div>
+        <div class="menuSeparator"></div><br>
+        Skill issue. (TODO)`;
 }
 
 function createStoryMenu() {
-    return Raw.html`<div class='menuTitle'>Background</div>
-        <div class='menuSeparator'></div><br>
+    return Raw.html`<div class="menuTitle">Background</div>
+        <div class="menuSeparator"></div><br>
         Backstory:<br><br>
 &nbsp;&nbsp;&nbsp;&nbsp;13 years ago, the Emperor Brithan of Sovvgor had used one of his Talents to kill a lich far to the north. A lich is a creature of bones, dark magic, and myth, occuring rarely in history and causing catastrophes each time, and though this lich had been vanquished before his armies had spurng forth, a cost had incurred: There was a curse on the land. For hundreds of miles - which mostly included wasteland and the majority of the Empire of Sovvgor - those who had Talents could not use them. Though they told us the cause, it was a bitter pill to swallow for all of the country's citizens. Talents were our magic, our connection to the idea that though the world is big, we have our place in it.
 
@@ -77,40 +88,51 @@ function createStoryMenu() {
 
 
 function createDataMenu() {
-    return "<div class='menuTitle'>Data</div>" +
-        "<div class='menuSeparator'></div><br>" +
-        "What do you want to know?"
+    return Raw.html`
+        <div class="menuTitle">Data</div>
+        <div class="menuSeparator"></div><br>
+        What do you want to know?`
 }
 
 function updatePreviousTipsMenu() {
-    let tipStr = "<div class='menuTitle'>Previously Closed Tips</div>" +
-        "<div class='menuSeparator'></div>";
-    viewData.toasts.forEach(function(toastObj) {
+    let tipStr = Raw.html`
+        <div class="menuTitle">Previously Closed Tips</div>
+        <div class="menuSeparator"></div>`;
+
+    for(let toastObj in viewData.toasts) {
         if(data.toastStates[toastObj.id] !== 'closed') {
-            return;
+            continue;
         }
-        tipStr += "<span style='font-size:14px;'>Tip #"+toastObj.id+":</span><br>"+toastObj.message+"<br><br>";
-    })
+        tipStr += `<span style="font-size:14px;">Tip #${toastObj.id}:</span><br>${toastObj.message}<br><br>`;
+    }
 
     document.getElementById("previousTipsTextContainer").innerHTML = tipStr;
 }
 function createOptionsMenu() {
-    return "<div class='menuTitle'>Options</div>" +
-        "<div class='menuSeparator'></div>" +
-        "<div class='button' style='padding:10px;font-size:14px;width:200px;' " +
-         "id='lightModeButton' onClick='changeDarkMode()'>Change to Light Mode</div>" +
-        "<div class='button' style='padding:10px;font-size:14px;width:200px;' " +
-        "id='numberTypeButton' onClick='changeNumberType()'>Change numbers to scientific</div>" +
-        "<br>TODO set FPS<br>" +
-        "<br><br>Auto save every 5 seconds, but if you want a button to click:<br>" +
-        "<div class='button' style='padding:10px;font-size:14px;width:200px;' " +
-        "onClick='save()'>Save</div><br><br>" +
-        "<div class='button' style='padding:10px;font-size:14px;width:200px;' " +
-        "onClick='exportSave()'>Export to clipboard</div><br><br>" +
-        "<label for='exportImportSave'>Put your save here to import (import a clear save to hard reset):<br></label><input type='text' id='exportImportSave'><br>" +
-        "<input type='checkbox' id='confirmImportCheckbox'><label for='confirmImportCheckbox'>Confirm</label>" +
-        "<div class='button' style='padding:10px;font-size:14px;width:200px;' " +
-        "onClick='importSave()'>Import</div><br><br>";
+    return Raw.html`<div class='menuTitle'>Options</div>
+        <div class='menuSeparator'></div>
+        <div id='lightModeButton' onClick='changeDarkMode()' class='button' style='padding:10px;font-size:14px;width:200px;' >
+            Change to Light Mode</div>
+        <div id='numberTypeButton' onClick='changeNumberType()' class='button' style='padding:10px;font-size:14px;width:200px;' >
+            Change numbers to scientific</div><br>
+        <div style="display: flex; align-items: center; gap: 10px;">
+          FPS: <span id="sliderValue" style="font-weight: bold; min-width: 20px; text-align: left;">20</span>
+          <input type="range" id="mySlider" min="1" max="60" value="20" style="width: 200px;" oninput="updateSliderDisplay(this.value)">
+        </div>
+        <br><br>Auto save every 5 seconds, but if you want a button to click:<br>
+        <div class='button' style='padding:10px;font-size:14px;width:200px;' 
+        onClick='save()'>Save</div><br><br>
+        <div class='button' style='padding:10px;font-size:14px;width:200px;' 
+        onClick='exportSave()'>Export to clipboard</div><br><br>
+        <label for='exportImportSave'>Put your save here to import (import a clear save to hard reset):<br></label><input type='text' id='exportImportSave'><br>
+        <input type='checkbox' id='confirmImportCheckbox'><label for='confirmImportCheckbox'>Confirm</label>
+        <div class='button' style='padding:10px;font-size:14px;width:200px;' onClick='importSave()'>Import</div><br><br>`
+}
+
+function updateSliderDisplay(currentValue) {
+    recalcInterval(currentValue);
+    ticksPerSecond = currentValue;
+    document.getElementById('sliderValue').textContent = currentValue;
 }
 
 function changeNumberType() {
