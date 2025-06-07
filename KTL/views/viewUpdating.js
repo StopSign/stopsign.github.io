@@ -280,7 +280,7 @@ let views = {
 
             let mult = rangeValue/100;
             let taken = calculateTaken(actionVar, downstreamVar, actionObj, mult);
-            views.updateVal(`${actionVar}DownstreamSendRate${downstreamVar}`, taken * ticksPerSecond, "textContent", 4);
+            views.updateVal(`${actionVar}DownstreamSendRate${downstreamVar}`, taken * data.ticksPerSecond, "textContent", 4);
 
             let isAttention = isAttentionLine(actionVar, downstreamVar);
             views.updateVal(`${actionVar}DownstreamAttentionBonus${downstreamVar}`, isAttention ? "" : "none", "style.display");

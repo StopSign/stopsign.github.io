@@ -20,41 +20,47 @@ function initializeToasts() {
         Raw.html`This is Kill the Lich, an idle/waiting optimization game! These messages will serve as the tutorial, so
         make sure to click these popups and read them for important information when you can!<br><br>
         
-        Removed messages are still accessible at Menu -> Previous Tips.`);
+        Closed messages are still accessible at Menu -> Previous Tips.`);
     createToast(function() { return toastIsClicked(1); },
         "Starting the Game",
         Raw.html`You've already started!<br><br>
 
         The Overclock action gets progress automatically, and when it completes it generates your first resource: Momentum. 
-        The gameplay is to change the percentage (using the sliders) of send rate of each action's resource to their downstream actions.<br><br>
-        
-        To continue, increase the slider of overclock to 100%.`);
-    // createToast(function() { return toastIsClicked(1); },
-    //     "Controls to Move Around",
-    //     Raw.html`Click/right click and drag to move the game window. WASD works also. Use the mouse scroll wheel or the [+]
-    //     and [-] to zoom in and out.`);
-    // createToast(function() { return toastIsClicked(2)  && (data.actions.overclock.downstreamRatereflect) > 95; },
-    //     "Game Math on Sending",
-    //     Raw.html`Rate of sending = tier mult * efficiency * slider bar %.<br>
-    //     <ul>
-    //         <li>Each action has a tier, and as a tier 0, Overclock gets 10% of current Momentum/s</li>
-    //         <li>However, Overclock also starts at 10% efficiency (the number at the top next to level), so it is further
-    //         reduced from 10% to 1% momentum/s, for now. The send rate effects the rate that resources flow, but it doesn't change the total momentum.</li>
-    //         <li>Each action has a tier, and all other actions to start are Tier 1, which is default 1% rate (at 100% eff)</li>
-    //         <li>Overclock does not consume momentum automatically, but most actions will automatically convert their sending rate to exp, essentially a 100% slider bar you can't turn off.</li>
-    //     </ul>`);
+        The gameplay is to change (using the sliders) the percentage of send rate of each action's resource to their downstream actions.`);
+    createToast(function() { return data.actions.reflect.unlocked; },
+        "Controls to Move Around",
+        Raw.html`Click/right click and drag to move the game window. WASD works also. Use the mouse scroll wheel or the [+]
+        and [-] to zoom in and out.`);
+    createToast(function() { return data.actions.distillInsight.visible; },
+        "Attention Bonus",
+        Raw.html`To send resources between actions faster, you can click the solid blue lines between the actions, which sets the attention bonus. For now, you can set 
+        up to 2 at a time, and they give a x2 to the send rate!`);
     createToast(function() { return data.actions.overclock.level >= 1; },
         "Exp and Leveling",
-        Raw.html`When the progress bar is full, an action will gain 1 exp until it levels up. On level up, the stat will give:
+        Raw.html`When the progress bar is full, an action will gain 1 exp (for now) until it levels up. On level up, the stat will give:
         <ol>
-            <li>On-level atts, with details found in the Stats menu of each action</li>
-            <li>Increased progress/exp requirements described by the greyed-out text in their bars</li>
-            <li>If the Action is a generator (like overclock), increases the action power, with details found in the Info menu of each action</li>
+            <li>Attributes, which are the way actions affect each other - details are in Info menu.</li>
+            <li>Increased progress/exp requirements, described by the greyed-out text in their bars.</li>
+            <li>If the Action is a generator (like Overclock), increases the action power, which is how much it generates e.g. Overclock gets x1.1 multiplicative to action power per level. Details are in Info menu.</li>
         </ol>`);
-    createToast(function() { return data.actions.harnessOverflow.level >= 4; },
-        "Attention Bonus",
-        Raw.html`You can click the solid blue lines between the actions to set the attention bonus! For now, you can set 
-        up to 2, and they give a x2 to the slider they represent, moving the resources around faster!`);
+    createToast(function() { return toastIsClicked(5); },
+        "Attributes",
+        Raw.html`Each attribute is a 10% increase to bonus, shown in the Attributes window. You can click an attribute to see which actions use it. There are 3 colors:
+        <ol>
+            <li>Green: Adds the attribute on level</li>
+            <li>Purple: Reduces the progress required to complete if it is an action, reduces exp required to level if it is a generator</li>
+            <li>Blue: Increases efficiency. For actions, efficiency is the send and consume rate. For generators, it is the generator speed, generator amount, and send rate.</li>
+        </ol>`);
+    createToast(function() { return data.actions.harnessOverflow.visible; },
+        "Game Math on Sending",
+        Raw.html`Rate of sending = tier mult * efficiency * slider bar %.<br>
+        <ol>
+            <li>Each action has a tier. Tier 0 is a default send rate of 10%, Tier 1 is 1%, Tier 2 is .1%, etc.</li>
+            <li>Actions also have an efficiency, which is improved by the blue Attributes for that action.</li>
+            <li>Most actions will automatically convert their sending rate to exp, essentially a 100% slider bar you can't turn off.</li> 
+            <li>The send rate affects how resources are moved around as well as the consumption rate (if it is not a generator).</li>
+            <li>Generators do not consume resources automatically. Read their info for more.</li>
+        </ol>`);
     createToast(function() { return data.actions.reflect.level >= 8 },
         "Max Level",
         Raw.html`Reflect has a max level, first shown with "Level 0 / 10". When the level is at the max (in this case 10), 
@@ -168,7 +174,6 @@ function updateToastUI(toastId) {
         case 'closed':
             el.classList.remove('toastInactive')
             el.style.display = 'none';
-            updatePreviousTipsMenu();
             break;
     }
 }
@@ -204,6 +209,7 @@ function closeToast(event, toastId) {
     event.stopPropagation(); // Prevents the outer click event
     data.toastStates[toastId] = 'closed'
     updateToastUI(toastId);
+    updatePreviousTipsMenu();
 }
 
 function showAllValidToasts() {

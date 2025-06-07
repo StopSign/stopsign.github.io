@@ -12,6 +12,7 @@ function initializeDisplay() {
     actionUpdateAllStatMults();
     actionTitleClicked(`overclock`);
     initializeMenus();
+
     initializeToasts();
     generateAmuletContent();
     setAllCaches(); //happens after generation
@@ -307,8 +308,8 @@ function generateActionDisplay(actionVar) {
             </div>
         </div>`;
 
-    let newX = actionObj.realX +"px";
-    let newY = actionObj.realY +"px";
+    let newX = dataObj.realX +"px";
+    let newY = dataObj.realY +"px";
 
     let shouldDisplay = "none"; //gameStateMatches(actionObj) ? "" : "none";
 
@@ -701,24 +702,25 @@ function getLabelOrientation(angle) {
 function generateLinesBetweenActions() {
     for(let actionVar in data.actions) {
         let actionObj = data.actions[actionVar];
+        let dataObj = actionData[actionVar];
         for(let downstreamVar of actionObj.downstreamVars) {
-            let downstreamObj = data.actions[downstreamVar];
-            if(!downstreamObj || downstreamObj.realX === undefined || actionObj.realX === undefined) {
+            let downstreamDataObj = actionData[downstreamVar];
+            if(!downstreamDataObj || downstreamDataObj.realX === undefined || dataObj.realX === undefined) {
                 continue;
             }
             // Calculate the centers of each object
-            const x1 = actionObj.realX + 155; // 220 / 2
-            const y1 = actionObj.realY + 80; // 200 / 2
-            const x2 = downstreamObj.realX + 155; // 220 / 2
-            const y2 = downstreamObj.realY + 80; // 200 / 2
+            const x1 = dataObj.realX + 155; // 220 / 2
+            const y1 = dataObj.realY + 80; // 200 / 2
+            const x2 = downstreamDataObj.realX + 155; // 220 / 2
+            const y2 = downstreamDataObj.realY + 80; // 200 / 2
 
-            let sourceBackgroundColor = getResourceColor(actionObj);
-            let targetBackgroundColor = getResourceColor(downstreamObj);
-            let isDifferentResource = actionObj.resourceName !== downstreamObj.resourceName;
+            let sourceBackgroundColor = getResourceColor(dataObj);
+            let targetBackgroundColor = getResourceColor(downstreamDataObj);
+            let isDifferentResource = actionObj.resourceName !== downstreamDataObj.resourceName;
             let backgroundColor = isDifferentResource ? `linear-gradient(to right, ${sourceBackgroundColor}, ${targetBackgroundColor})` : 'var(--line-color)';
 
-            let borderId = `${actionVar}_${downstreamObj.actionVar}_Line_Outer`;
-            let lineId = `${actionVar}_${downstreamObj.actionVar}_Line_Inner`;
+            let borderId = `${actionVar}_${downstreamVar}_Line_Outer`;
+            let lineId = `${actionVar}_${downstreamVar}_Line_Inner`;
 
 
             //Rotated retangle with inner line ready to adjust width of.
@@ -742,8 +744,8 @@ function generateLinesBetweenActions() {
                 labelWrapperTransform += `rotate(180deg)`;
             }
 
-            let isDifferentMomentum = actionObj.resourceName !== downstreamObj.resourceName;
-            let onclickText = isDifferentMomentum?``:`handleLineClick('${borderId}', {from: '${actionVar}', to: '${downstreamObj.actionVar}'})`;
+            let isDifferentMomentum = actionObj.resourceName !== downstreamDataObj.resourceName;
+            let onclickText = isDifferentMomentum?``:`handleLineClick('${borderId}', {from: '${actionVar}', to: '${downstreamVar}'})`;
             let cursorStyle = isDifferentMomentum?``:`cursor:pointer`;
 
             queueCache(borderId);

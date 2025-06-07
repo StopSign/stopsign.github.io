@@ -19,7 +19,6 @@ function initializeMenus() {
     addMenuTextContainer("options", createOptionsMenu());
     addMenuTextContainer("statistics", createDataMenu());
     addMenuTextContainer("previousTips", "Close tips to fill this screen!");
-    updatePreviousTipsMenu();
 
     addMenuTab("shop");
     addMenuTextContainer("shop", createShopMenu());
@@ -99,7 +98,7 @@ function updatePreviousTipsMenu() {
         <div class="menuTitle">Previously Closed Tips</div>
         <div class="menuSeparator"></div>`;
 
-    for(let toastObj in viewData.toasts) {
+    for(let toastObj of viewData.toasts) {
         if(data.toastStates[toastObj.id] !== 'closed') {
             continue;
         }
@@ -117,7 +116,7 @@ function createOptionsMenu() {
             Change numbers to scientific</div><br>
         <div style="display: flex; align-items: center; gap: 10px;">
           FPS: <span id="sliderValue" style="font-weight: bold; min-width: 20px; text-align: left;">20</span>
-          <input type="range" id="mySlider" min="1" max="60" value="20" style="width: 200px;" oninput="updateSliderDisplay(this.value)">
+          <input type="range" id="FPSSlider" min="1" max="60" value="20" style="width: 200px;" oninput="updateSliderDisplay(this.value)">
         </div>
         <br><br>Auto save every 5 seconds, but if you want a button to click:<br>
         <div class='button' style='padding:10px;font-size:14px;width:200px;' 
@@ -131,7 +130,7 @@ function createOptionsMenu() {
 
 function updateSliderDisplay(currentValue) {
     recalcInterval(currentValue);
-    ticksPerSecond = currentValue;
+    data.ticksPerSecond = currentValue;
     document.getElementById('sliderValue').textContent = currentValue;
 }
 

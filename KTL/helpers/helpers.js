@@ -329,7 +329,11 @@ function encode(theSave) {
 }
 
 function decode(encodedSave) {
-    return LZWDecode(Base64.decode(encodedSave))
+    try {
+        return LZWDecode(Base64.decode(encodedSave))
+    } catch(e) {
+        return {};
+    }
 }
 
 // lzw-compress a string

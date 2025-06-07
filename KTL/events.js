@@ -308,10 +308,10 @@ function forceRedraw(elem) {
 }
 
 function actionTitleClicked(actionVar) {
-    let actionObj = data.actions[actionVar];
+    let dataObj = actionData[actionVar];
 
-    let newTransformX = -((actionObj.realX + 150) * scale) + windowElement.offsetWidth / 2 ;
-    let newTransformY = -((actionObj.realY) * scale) + windowElement.offsetHeight / 2 - 50;
+    let newTransformX = -((dataObj.realX + 150) * scale) + windowElement.offsetWidth / 2 ;
+    let newTransformY = -((dataObj.realY) * scale) + windowElement.offsetHeight / 2 - 50;
 
     newTransformX = Math.max(-4000, Math.min(newTransformX, 4000));
     newTransformY = Math.max(-4000, Math.min(newTransformY, 4000));

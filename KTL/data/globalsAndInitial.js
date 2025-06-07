@@ -7,7 +7,6 @@ let View = {};
 let curTime = new Date();
 let gameTicksLeft = 0;
 let sudoStop = false;
-let ticksPerSecond = 20;
 let totalTime = 0;
 let ticksForSeconds = 0;
 let secondsPassed = 0;
@@ -33,6 +32,7 @@ data.toastStates = []; // array of toast objects: {id, state, element}
 data.planeTabSelected = 0;
 data.gameState = "default"; //KTL
 data.totalMomentum = 0;
+data.ticksPerSecond = 20;
 data.legacy = 0;
 data.useAmuletButtonShowing = false;
 data.secondsPerReset = 0;
@@ -55,7 +55,7 @@ viewData.toasts = [];
 
 let language = "english";
 let globalVisible = false;
-let isLoadingEnabled = false; //SET FALSE FOR CLEARING SAVE
+let isLoadingEnabled = true; //SET FALSE FOR CLEARING SAVE
 
 
 data.upgrades = {};
@@ -143,7 +143,7 @@ function initializeData() {
     create("overclock", ["reflect", "bodyAwareness", "travelOnRoad", "makeMoney", "socialize"], 0, 0); //generateMana
     create("reflect", ["distillInsight", "harnessOverflow", "takeNotes", "remember"], -1, -1);
     create("distillInsight", [], -1.1, .5);
-    create("harnessOverflow", [], -1.9, 0); //siftExcess
+    create("harnessOverflow", [], -2, 0); //siftExcess
     create("takeNotes", ["journal"], -1.1, -.5);
     create("bodyAwareness", ["meditate", "walkAware", "standStraighter"],-1, 0);
     create("remember", [], -.2, -1.2);
@@ -270,30 +270,31 @@ function setRealCoordinates(startActionVar) {
 
     while (queue.length > 0) {
         let currentVar = queue.shift();
-        let action = data.actions[currentVar];
+        let dataObj = actionData[currentVar];
+        let actionObj = data.actions[currentVar];
         if(check++ > 2000) {
             stop = 1;
             console.log("You have an infinite loop on action creation with: " + currentVar);
             return;
         }
 
-        if (!action) continue; // If action doesn't exist, skip it
+        if (!dataObj) continue; // If action doesn't exist, skip it
 
         // Determine realX and realY
-        if (action.parentVar && data.actions[action.parentVar]) {
-            let parentAction = data.actions[action.parentVar];
-            action.realX = parentAction.realX + action.x;
-            action.realY = parentAction.realY + action.y;
+        if (actionObj.parentVar && actionData[actionObj.parentVar]) {
+            let parentAction = actionData[actionObj.parentVar];
+            dataObj.realX = parentAction.realX + dataObj.x;
+            dataObj.realY = parentAction.realY + dataObj.y;
         } else {
-            // This might be the top-level action
-            action.realX = action.x;
-            action.realY = action.y;
+            // This is the top-level action
+            dataObj.realX = dataObj.x;
+            dataObj.realY = dataObj.y;
         }
 
         // Add downstream actions to the queue
-        if (action.downstreamVars && action.downstreamVars.length > 0) {
-            action.downstreamVars.forEach(downstreamVar => {
-                if (data.actions[downstreamVar]) {
+        if (actionObj.downstreamVars && actionObj.downstreamVars.length > 0) {
+            actionObj.downstreamVars.forEach(downstreamVar => {
+                if (actionData[downstreamVar]) {
                     queue.push(downstreamVar);
                 }
             });

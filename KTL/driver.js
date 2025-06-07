@@ -65,7 +65,7 @@ function tick() {
         // console.warn(`Too large backlog! Moved ${overflow} ms to bonusTime (now ${bonusTime} ms).`);
     }
 
-    while (gameTicksLeft > (1000 / ticksPerSecond)) {
+    while (gameTicksLeft > (1000 / data.ticksPerSecond)) {
         if(stop || forceStop) {
             bonusTime += gameTicksLeft;
             gameTicksLeft = 0;
@@ -77,14 +77,14 @@ function tick() {
 
         //Game logic for each tick
         ticksForSeconds++;
-        if(ticksForSeconds % ticksPerSecond === 0) {
+        if(ticksForSeconds % data.ticksPerSecond === 0) {
             secondPassed();
         }
         framePassed();
         didSomething = gameTicksLeft <= 1200;
 
-        let timeSpent = (1000 / ticksPerSecond) / gameSpeed / bonusSpeed
-        gameTicksLeft -= (1000 / ticksPerSecond) / gameSpeed / bonusSpeed;
+        let timeSpent = (1000 / data.ticksPerSecond) / gameSpeed / bonusSpeed
+        gameTicksLeft -= (1000 / data.ticksPerSecond) / gameSpeed / bonusSpeed;
 
         if(bonusSpeed !== 1) {
             bonusTime += -timeSpent * (bonusSpeed - 1);
@@ -137,7 +137,7 @@ function gameTick() {
                 if(data.upgrades.rememberWhatIFocusedOn.upgradePower === 0) {
                     continue;
                 }
-                actionObj[key] += 1 / ticksPerSecond / 3600;
+                actionObj[key] += 1 / data.ticksPerSecond / 3600;
                 if(actionObj[key] > data.focusLoopMax) {
                     actionObj[key] = data.focusLoopMax;
                 }
@@ -171,7 +171,7 @@ function tickGameObject(actionVar) {
 
     //if generator, add Time to exp
     //if not generator, becomes 1% of momentum/s / 20.
-    let momentumMaxRate = actionObj.isGenerator ? actionObj.generatorSpeed / ticksPerSecond : actionObj.resource * actionObj.tierMult() / ticksPerSecond;
+    let momentumMaxRate = actionObj.isGenerator ? actionObj.generatorSpeed / data.ticksPerSecond : actionObj.resource * actionObj.tierMult() / data.ticksPerSecond;
     //if action is max level or locked, momentum rate should be 0
     let atMaxLevel = actionObj.maxLevel >= 0 && actionObj.level >= actionObj.maxLevel;
     let momentumToAdd = (atMaxLevel||!actionObj.unlocked) ? 0 : momentumMaxRate;
@@ -185,17 +185,17 @@ function tickGameObject(actionVar) {
     if(actionObj.isGenerator) {
         if(actionVar === "overclock") { //visual only
             let flatFromUpgrade = data.upgrades.tryALittleHarder.upgradePower * 20;
-            actionObj.momentumDelta = actionObj.actionPower * actionObj.upgradeMult * rateInefficient / actionObj.progressMax * ticksPerSecond + flatFromUpgrade;
+            actionObj.momentumDelta = actionObj.actionPower * actionObj.upgradeMult * rateInefficient / actionObj.progressMax * data.ticksPerSecond + flatFromUpgrade;
             actionObj.momentumIncrease = actionObj.momentumDelta;
         }
     } else {
         //how much it's consuming.
-        actionObj.momentumDelta -= momentumToAddInefficient * ticksPerSecond;
+        actionObj.momentumDelta -= momentumToAddInefficient * data.ticksPerSecond;
         actionObj.resource -= momentumToAddInefficient;
     }
 
     actionObj.progress += momentumToAddInefficient;
-    actionObj.progressGain = momentumToAddInefficient * ticksPerSecond; //display purposes for (+1.0/s) on green bar
+    actionObj.progressGain = momentumToAddInefficient * data.ticksPerSecond; //display purposes for (+1.0/s) on green bar
 
     //level up to 10 times
     for(let i = 0; i < 10; i++) {
@@ -205,7 +205,7 @@ function tickGameObject(actionVar) {
     }
 
     //sending a % to the self, so increase used there if relevant
-    actionObj.momentumDecrease = (actionObj.isGenerator||atMaxLevel) ? 0 : (rateInefficient * ticksPerSecond);
+    actionObj.momentumDecrease = (actionObj.isGenerator||atMaxLevel) ? 0 : (rateInefficient * data.ticksPerSecond);
     actionObj.totalSend = 0;
 
     for(let downstreamVar of actionObj.downstreamVars) {
@@ -225,8 +225,8 @@ function tickGameObject(actionVar) {
         let mult = data.actions[actionVar][`downstreamRate${downstreamVar}`] / 100;
         let taken = calculateTaken(actionVar, downstreamVar, actionObj, mult);
 
-        actionObj.totalSend += taken * ticksPerSecond;
-        actionObj.momentumDecrease += taken * ticksPerSecond;
+        actionObj.totalSend += taken * data.ticksPerSecond;
+        actionObj.momentumDecrease += taken * data.ticksPerSecond;
 
         //sends to unlock cost first if needed
         giveMomentumTo(actionObj, downstreamObj, taken);
@@ -246,7 +246,7 @@ function calculateTaken(actionVar, downstreamVar, actionObj, mult) {
     if (totalTakenMult > 0.1) {
         totalTakenMult = 0.1; // Cap at 10%/s
     }
-    let toReturn = actionObj.resource / ticksPerSecond * totalTakenMult * mult;
+    let toReturn = actionObj.resource / data.ticksPerSecond * totalTakenMult * mult;
     return toReturn < .00001 ? 0 : toReturn;
 }
 
@@ -269,7 +269,7 @@ function giveMomentumTo(actionObj, downstreamObj, amount) {
     }
     addMomentumTo(downstreamObj, amount);
     actionObj.resource -= amount;
-    actionObj.momentumDelta -= amount * ticksPerSecond;
+    actionObj.momentumDelta -= amount * data.ticksPerSecond;
 }
 function addMomentumTo(downstreamObj, amount) {
     //gives to unlockCost of downstream action, unlocking if possible, and gives leftover to resource
@@ -284,6 +284,6 @@ function addMomentumTo(downstreamObj, amount) {
         downstreamObj.unlockCost = 0;
     }
     downstreamObj.resource += amount;
-    downstreamObj.momentumDelta += amount * ticksPerSecond;
-    downstreamObj.momentumIncrease += amount * ticksPerSecond;
+    downstreamObj.momentumDelta += amount * data.ticksPerSecond;
+    downstreamObj.momentumIncrease += amount * data.ticksPerSecond;
 }

@@ -106,14 +106,12 @@ function actionSetInitialVariables(actionObj, dataObj) {
 }
 
 //function createAndLinkNewAction(actionVar, expToLevelIncrease, actionPowerMultIncrease, progressMaxIncrease, progressMax, expToLevel, unlockCost, title, x, y, downstreamVars, tier, dataObj) {
-function createAndLinkNewAction(actionVar, dataObj, title, x, y, downstreamVars) {
+function createAndLinkNewAction(actionVar, dataObj, title, downstreamVars) {
     data.actions[actionVar] = {};
 
     let actionObj = data.actions[actionVar];
     actionObj.actionVar = actionVar;
     actionObj.title = title;
-    actionObj.x = x;
-    actionObj.y = y;
     actionObj.downstreamVars = downstreamVars ? downstreamVars : [];
 
     actionSetBaseVariables(actionObj, dataObj);
@@ -126,7 +124,7 @@ function createAndLinkNewAction(actionVar, dataObj, title, x, y, downstreamVars)
     }
 
     actionObj.progressRateReal = function() { //For data around the flat action too
-        return actionObj.resource * actionObj.tierMult() * (actionObj.efficiency/100) / ticksPerSecond;
+        return actionObj.resource * actionObj.tierMult() * (actionObj.efficiency/100) / data.ticksPerSecond;
     }
     actionObj.calcStatMult = function() {
         actionObj.expToLevelMult = 1;
@@ -177,7 +175,7 @@ function createAndLinkNewAction(actionVar, dataObj, title, x, y, downstreamVars)
 
 function actionProgressRate(actionObj) {
     if(actionObj.isGenerator) {
-        return 1 / ticksPerSecond;
+        return 1 / data.ticksPerSecond;
     }
     return actionObj.progressRateReal();
 }
@@ -371,7 +369,7 @@ function unlockAction(actionObj) {
 }
 
 function upgradeUpdates() {
-    data.actions.overclock.resource += data.upgrades.tryALittleHarder.upgradePower * 20 / ticksPerSecond;
+    data.actions.overclock.resource += data.upgrades.tryALittleHarder.upgradePower * 20 / data.ticksPerSecond;
 }
 
 function getUpgradeSliderAmount() {

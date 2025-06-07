@@ -4,13 +4,15 @@ function create(actionVar, downstreamVars, x, y) {
         console.log("Could not find in actionData, " + actionVar);
         return;
     }
-    x*= 420;
-    y*= -420;
+    // x *= 420;
+    // y *= -420;
+    dataObj.x = x * 420;
+    dataObj.y = y * -420;
     if(!dataObj.addedInVersion) {
         dataObj.addedInVersion = 0;
     }
     let title = decamelizeWithSpace(actionVar); //basicLabor -> Basic Labor
-    let actionObj = createAndLinkNewAction(actionVar, dataObj, title, x, y, downstreamVars);
+    let actionObj = createAndLinkNewAction(actionVar, dataObj, title, downstreamVars);
     dataObj.expAtts.forEach(function (expAtt) { //add the action to the stat, to update exp reductions
         for(let attVar in data.atts) {
             let att = data.atts[attVar];
@@ -87,35 +89,25 @@ let actionData = {
             ["pulse", 1]],
         efficiencyAtts: [["cycle", 1]]
     },
-    distillInsight: {
-        tier:1, plane:0,
-        progressMaxBase:1, progressMaxIncrease:3,
-        expToLevelBase:10, expToLevelIncrease:1,
-        efficiencyBase:.4, maxLevel:10,
-        unlockCost:10, visible:false, unlocked:false, purchased: true,
-        onLevelCustom: function() {
-        },
-        onLevelAtts:[["concentration", 2]],
-        expAtts:[],
-        efficiencyAtts:[["cycle", 1]]
-    },
     reflect: {
         tier: 1, plane: 0,
-        progressMaxBase: 1, progressMaxIncrease: 4,
+        progressMaxBase: .25, progressMaxIncrease: 4,
         expToLevelBase: 10, expToLevelIncrease: 1,
         efficiencyBase: .5, maxLevel:10,
         unlockCost:2, visible: true, unlocked: false, purchased: true,
         onUnlock: function () {
-            unveilAction('distillInsight')
         },
         onLevelCustom: function() {
             if(data.actions.reflect.level >= 1) {
-                unveilAction('harnessOverflow')
+                unveilAction('distillInsight')
             }
             if(data.actions.reflect.level >= 2) {
+                unveilAction('harnessOverflow')
+            }
+            if(data.actions.reflect.level >= 4) {
                 unveilAction('takeNotes')
             }
-            if(data.actions.reflect.level >= 3) {
+            if(data.actions.reflect.level >= 6) {
                 unveilAction('bodyAwareness')
             }
         },
@@ -123,12 +115,24 @@ let actionData = {
         expAtts: [["concentration", 1]],
         efficiencyAtts: [["cycle", 1]]
     },
+    distillInsight: {
+        tier:1, plane:0,
+        progressMaxBase:1, progressMaxIncrease:3,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:.4, maxLevel:10,
+        unlockCost:20, visible:false, unlocked:false, purchased: true,
+        onLevelCustom: function() {
+        },
+        onLevelAtts:[["concentration", 2]],
+        expAtts:[],
+        efficiencyAtts:[["cycle", 1]]
+    },
     harnessOverflow: {
         tier:1, plane:0,
         progressMaxBase:.25, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1, maxLevel:10,
-        unlockCost:40, visible:false, unlocked:false, purchased: true,
+        unlockCost:80, visible:false, unlocked:false, purchased: true,
         onLevelCustom: function() {
         },
         onLevelAtts:[["cycle", 1]],
@@ -140,10 +144,10 @@ let actionData = {
         progressMaxBase:1, progressMaxIncrease:1.5,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.3, maxLevel:10,
-        unlockCost:200, visible:false, unlocked:false, purchased: true,
+        unlockCost:400, visible:false, unlocked:false, purchased: true,
         onLevelCustom:function() {
         },
-        onLevelAtts:[["awareness", 10], ["curiosity", 3]],
+        onLevelAtts:[["awareness", 20], ["curiosity", 3]],
         expAtts:[["observation", 1]],
         efficiencyAtts:[["cycle", 1]]
     },
@@ -152,7 +156,7 @@ let actionData = {
         progressMaxBase:750, progressMaxIncrease:20,
         expToLevelBase:2, expToLevelIncrease:1,
         efficiencyBase:.6, maxLevel:1,
-        unlockCost:500, visible:false, unlocked:false, purchased: true,
+        unlockCost:1000, visible:false, unlocked:false, purchased: true,
         onUnlock: function() {
         },
         onLevelCustom: function() {
