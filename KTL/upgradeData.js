@@ -277,7 +277,7 @@ actionData.upgrades = {
                 purchaseAction('climbTheRocks');
                 purchaseAction('findAShortcut');
             } else if(num === 2) {
-                purchaseAction('fillBasicNeeds');
+                purchaseAction('buyBasicSupplies');
                 purchaseAction('chimneySweep');
                 purchaseAction('handyman');
                 purchaseAction('tavernHelper');

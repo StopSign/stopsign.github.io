@@ -82,8 +82,8 @@ let views = {
                 let actionObj = data.actions[entry.id];
 
                 let color = getResourceColorDim(actionObj);
-                views.updateVal(`${entry.id}Container`,`${color} 0px 0px ${Math.floor(ratio * 75)}px ${Math.floor(ratio * 25)}px`,"style.boxShadow");
-                views.updateVal(`${entry.id}LargeVersionContainer`,`inset ${color} 0px 0px ${Math.floor(ratio * 15)}px ${Math.floor(ratio * 5)}px`,"style.boxShadow");
+                views.updateVal(`${entry.id}Container`,`${color} 0px 0px ${Math.floor(ratio * 50)}px ${Math.floor(ratio * 25)}px`,"style.boxShadow");
+                views.updateVal(`${entry.id}LargeVersionContainer`,`inset ${color} 0px 0px ${Math.floor(ratio * 10)}px ${Math.floor(ratio * 5)}px`,"style.boxShadow");
                 // views.updateVal(`${entry.id}SmallVersionContainer`,`inset ${getResourceColor(actionObj)} 0px 0px ${Math.min(ratio * 15)}px ${Math.min(ratio * 5)}px`,"style.boxShadow");
             }
         }
@@ -126,6 +126,8 @@ let views = {
         views.updateVal(`${actionVar}SmallVersionContainer`, miniVersion?"":"none", "style.display");
         views.updateVal(`${actionVar}SmallVersionContainer`, (1 / scale)*.8+"", "style.scale");
 
+        let isMaxLevel = (actionObj.maxLevel !== -1 && actionObj.level >= actionObj.maxLevel);
+        views.updateVal(`${actionVar}IsMaxLevel`, isMaxLevel && !miniVersion ? "":"none", "style.display");
 
         //go through each downstream
         for (let downstreamVar of actionObj.downstreamVars) {
@@ -185,9 +187,14 @@ let views = {
 
         //When Action is max level
         let isMaxLevel = (actionObj.maxLevel !== -1 && actionObj.level >= actionObj.maxLevel);
-        views.updateVal(`${actionVar}IsMaxLevel`, isMaxLevel?"":"none", "style.display");
         views.updateVal(`${actionVar}Level2`, isMaxLevel?"var(--max-level-color)":"var(--text-primary)", "style.color");
 
+        //When action should be dim
+        let isQuiet = isMaxLevel && actionObj.momentumIncrease === 0 && actionObj.momentumDecrease === 0 && !actionObj.mouseOnThis;
+        views.updateVal(`${actionVar}LargeVersionContainer`, isQuiet?".6":"1", "style.opacity");
+
+        views.updateVal(`${actionVar}LargeVersionContainer`, isMaxLevel?"var(--momentum-color-bg)":"var(--bg-secondary)", "style.backgroundColor");
+        //--bg-secondary-max
 
         //Menu-specific updates
         if(actionObj.currentMenu === "atts") {
@@ -224,16 +231,13 @@ let views = {
             ["momentumIncrease", 3], ["momentumDecrease", 3],
             ["highestLevel2", 1]
         ];
-        // if(actionObj.isGenerator) { //TODO
-        if(actionVar === "overclock") {
-            roundedNumbers.push(["resourceAdded", 2]);
-        }
-        if(actionObj.isGenerator && actionObj.parent) {
-            roundedNumbers.push(["amountToSend", 2]);
-        }
         if(actionObj.isGenerator) {
+            roundedNumbers.push(["resourceAdded", 2]);
             roundedNumbers.push(["actionPowerMult", 3]);
             // roundedNumbers.push(["actionPower", 2]);
+        }
+        if(actionObj.isGenerator && actionObj.parentVar) {
+            roundedNumbers.push(["amountToSend", 2]);
         }
 
         if(actionObj.currentMenu === "atts") {

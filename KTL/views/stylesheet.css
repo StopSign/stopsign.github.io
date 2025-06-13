@@ -1,6 +1,7 @@
 :root {
     --bg-primary: #1e1e2e;
     --bg-secondary: #313244;
+    --bg-secondary-max: #463d2a;
     --text-bright: #f4f5f9;
     --text-primary: #cdd6f4;
     --text-muted: #a6adc6;
@@ -18,7 +19,7 @@
     --overlay-color: rgba(30, 30, 46, 0.8);
     --selection-color:#9f0000;
     --line-color: #000000;
-    --max-level-color: #2be343;
+    --max-level-color: #e5e819;
 
     --menu-background-color: #1e1e2e;
     --menu-tab-button-color: #23153c;
@@ -51,18 +52,25 @@
 
     --momentum-color:#007BFF;
     --momentum-color-dim: rgba(0, 123, 255, 0.5);
+    --momentum-color-bg: #0b263f;
     --exp-color:#7b5fc1;
     --exp-color-dim: rgba(123, 95, 193, 0.5);
+    --exp-color-bg: #231c36;
     --mana-color: #0c20d4;
     --mana-color-dim: rgba(12, 32, 212, 0.5);
+    --mana-color-bg: #070b39;
     --gold-color: #a99102;
     --gold-color-dim: rgba(169, 145, 2, 0.5);
+    --gold-color-bg: #363107;
     --conversations-color: #429977;
     --conversations-color-dim: rgba(66, 153, 119, 0.5);
+    --conversations-color-bg: #162d23;
     --fear-color: #d2062a;
     --fear-color-dim: #a30924;
+    --fear-color-bg: #40090f;
     --arcana-color: #c620f5;
     --arcana-color-dim: rgba(198, 32, 245, 0.5);
+    --arcana-color-bg: #2a0932;
 
     --wage-color: #ffdd00;
 }
@@ -70,6 +78,7 @@
 body.lightMode {
     --bg-primary: #8798d3;
     --bg-secondary: #bbd6e6;
+    --bg-secondary-max: #bbd6e6;
     --text-bright: #f4f5f9;
     --text-primary: #000000;
     --text-muted: #3a3c56;

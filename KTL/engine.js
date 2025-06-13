@@ -64,6 +64,8 @@ function actionSetBaseVariables(actionObj, dataObj) {
 
     actionObj.isRunning = dataObj.plane === 0; //for controlling whether time affects it
     actionObj.onLevelAtts = dataObj.onLevelAtts ? dataObj.onLevelAtts : [];
+    actionObj.efficiencyAtts = dataObj.efficiencyAtts ? dataObj.efficiencyAtts : [];
+    actionObj.expAtts = dataObj.expAtts ? dataObj.expAtts : [];
     actionObj.efficiencyBase = dataObj.efficiencyBase ? dataObj.efficiencyBase : 1; //1 = 100%
     actionObj.efficiencyMult = dataObj.efficiencyMult ? dataObj.efficiencyMult : 1;
     actionObj.expertise = actionObj.efficiencyBase * actionObj.efficiencyMult; //the initial and the multiplier (increases on stat add)
@@ -85,8 +87,6 @@ function actionSetBaseVariables(actionObj, dataObj) {
 function actionSetInitialVariables(actionObj, dataObj) {
     actionObj.isGenerator = dataObj.isGenerator;
     actionObj.resourceName = dataObj.resourceName ? dataObj.resourceName : "momentum";
-    actionObj.efficiencyAtts = dataObj.efficiencyAtts ? dataObj.efficiencyAtts : [];
-    actionObj.expAtts = dataObj.expAtts ? dataObj.expAtts : [];
     actionObj.tier = dataObj.tier;
     actionObj.wage = dataObj.wage ? dataObj.wage : null;
     actionObj.hasUpstream = dataObj.hasUpstream ?? true;
@@ -307,12 +307,11 @@ function unveilAction(actionVar) {
 
 function revealActionAtts(actionObj) {
     for(let onLevelAtt of actionObj.onLevelAtts) {
-        revealAtt(onLevelAtt);
+        revealAtt(onLevelAtt[0]);
     }
 }
 
-function revealAtt(useAttObj) {
-    let attVar = useAttObj[0];
+function revealAtt(attVar) {
     let attObj = data.atts[attVar];
     attObj.unlocked = true; //sets the side menu
 

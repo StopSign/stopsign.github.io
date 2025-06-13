@@ -61,16 +61,31 @@ function initializeToasts() {
             <li>The send rate affects how resources are moved around as well as the consumption rate (if it is not a generator).</li>
             <li>Generators do not consume resources automatically. Read their info for more.</li>
         </ol>`);
-    createToast(function() { return data.actions.reflect.level >= 8 },
-        "Max Level",
-        Raw.html`Reflect has a max level, first shown with "Level 0 / 10". When the level is at the max (in this case 10), 
-        momentum will no longer be consumed - this means it will send 100% of the resource onwards without taking any.`);
-    createToast(function() { return data.actions.remember.level >= 1 },
-        "Next Steps - Traveling!",
-        Raw.html`You generally want to be working towards unlocking whatever actions are visible. Shift 
-        the Momentum around the Action web to do so! Choose the ratio of momentum to send between the internal southwest actions, or the external eastern actions.`);
+    createToast(function() { return data.actions.reflect.level >= 3 },
+        "Finding New Actions",
+        Raw.html`New will become visible when you reach various hidden milestones, but more will be visible at once later. For now, 
+        get reflect to levels 4 and 6 to unlock two new actions!<br>
 
-    createToast(function() { return data.actions.makeMoney.unlocked; },
+        There will generally be an obvious goal to work towards for more unlocks.`);
+    createToast(function() { return data.actions.harnessOverflow.level >= 8 },
+        "Max Level",
+        Raw.html`Some actions have max levels, first shown with "Level 0 / 10". When the level is at the max (in this case 10), 
+        momentum will no longer be consumed - this means it will send 100% of the resource onwards without taking any.`);
+    createToast(function() { return toastIsClicked(9); },
+        "Changing Colors",
+        Raw.html`When an action is max level, it will get a MAX LEVEL stamp and the background color of the action will change based on its resource.<br><br>
+
+        When an action is max level and there is no incoming or outgoing of its resource, it will dim.`);
+    createToast(function() { return data.actions.travelToOutpost.unlocked },
+        "Hesitation",
+        Raw.html`As you come to terms with what momentum can be for, you know that you need to do what you've 
+        been dreading: making connections in the local community. The closer you get, though, the more it reminds you of things you had put aside.<br><br>
+
+        Maybe it would better to process some memories first.`);
+    createToast(function() { return data.actions.remember.unlocked },
+        "Raising Max Levels",
+        Raw.html`Remember has an additional on-level effect, check its Info.`);
+    createToast(function() { return data.actions.helpScottWithChores.unlocked; },
         "Making Money",
         Raw.html`Scott showed you how to make money, and so the Current Job is set to Helping Scott with Chores, with a wage of $1.<br><br>
 

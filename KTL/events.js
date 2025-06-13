@@ -411,7 +411,7 @@ function clickedAttName(attVar) {
 
         views.updateVal(`${actionVar}LargeVersionContainer`, color, "style.borderColor");
         views.updateVal(`${actionVar}LockContainer`, color, "style.borderColor");
-        views.updateVal(`${actionVar}SmallVersionContainer`, "2px solid " + color, "style.border");
+        views.updateVal(`${actionVar}SmallVersionContainer`, color==="black"?"":("2px solid " + color), "style.border");
     }
 
     updateAttActionContainers();
@@ -552,4 +552,13 @@ function switchToPlane(num) {
     data.planeTabSelected = num;
     document.getElementById(`planeContainer${data.planeTabSelected}`).style.display = '';
     document.getElementById("windowElement").style.backgroundColor = `var(--world-${data.planeTabSelected}-bg-primary)`;
+}
+
+function mouseOnAction(actionVar) {
+    let actionObj = data.actions[actionVar];
+    actionObj.mouseOnThis = true;
+}
+function mouseOffAction(actionVar) {
+    let actionObj = data.actions[actionVar];
+    actionObj.mouseOnThis = false;
 }

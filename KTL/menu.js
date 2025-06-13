@@ -48,13 +48,12 @@ function createHelpMenu() {
     return Raw.html`
         <div class="menuTitle">Help</div>
         <div class="menuSeparator"></div><br>
-        Skill issue. (TODO)`;
+        <span style="font-weight: bold;font-size:20px;">#Skill issue</span>`;
 }
 
 function createStoryMenu() {
     return Raw.html`<div class="menuTitle">Background</div>
         <div class="menuSeparator"></div><br>
-        Backstory:<br><br>
 &nbsp;&nbsp;&nbsp;&nbsp;13 years ago, the Emperor Brithan of Sovvgor had used one of his Talents to kill a lich far to the north. A lich is a creature of bones, dark magic, and myth, occuring rarely in history and causing catastrophes each time, and though this lich had been vanquished before his armies had spurng forth, a cost had incurred: There was a curse on the land. For hundreds of miles - which mostly included wasteland and the majority of the Empire of Sovvgor - those who had Talents could not use them. Though they told us the cause, it was a bitter pill to swallow for all of the country's citizens. Talents were our magic, our connection to the idea that though the world is big, we have our place in it.
 
 &nbsp;&nbsp;&nbsp;&nbsp;My ability was Overclock, and the simple description of it was "choose a valid target; get a little more out of it". I used to change Overclock's target a dozen times a day, enjoying the extra "skips" in my "steps" as it hurried me along, so-to-speak. When, without warning, the curse made all abilities in the country inert and useless, my ability was locked with [Target:Get Somewhere Safe]. For a few peaceful years it was just something to grieve and adjust to. However, as Sovvgor was betrayed by our greedy neighbors, and as I was being conscripted and armed and trained as a soldier, the locked target of my Description instead became my mantra and my burden. It was forever locked on the one thing I desired, and this was a rather painful irony I had to overcome on my march towards certain death.<br><br>
@@ -102,7 +101,8 @@ function updatePreviousTipsMenu() {
         if(data.toastStates[toastObj.id] !== 'closed') {
             continue;
         }
-        tipStr += `<span style="font-size:14px;">Tip #${toastObj.id}:</span><br>${toastObj.message}<br><br>`;
+        tipStr += `<span style="font-size:14px;">Tip #${toastObj.id}: ${toastObj.title}</span><br>
+            ${toastObj.message}<br><br>`;
     }
 
     document.getElementById("previousTipsTextContainer").innerHTML = tipStr;
@@ -153,7 +153,7 @@ function changeDarkMode() {
 }
 
 function addMenuTextContainer(menuVar, menuText) {
-    let menuContainer = "<div id='"+menuVar+"TextContainer' style='display:none;padding:5px;text-align:left;'>" +
+    let menuContainer = "<div id='"+menuVar+"TextContainer' style='display:none;padding:10px;text-align:left;'>" +
         menuText +
         "</div>";
 

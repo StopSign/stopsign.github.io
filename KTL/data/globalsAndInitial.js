@@ -71,11 +71,13 @@ function debug() {
     // data.displayJob = true;
     data.legacy = 300;
     // buyUpgrade("buyNicerStuff", 0);
-    buyUpgrade("stopLettingOpportunityWait", 0);
-    buyUpgrade("stopLettingOpportunityWait", 1);
-    buyUpgrade("stopLettingOpportunityWait", 2);
+    // buyUpgrade("stopLettingOpportunityWait", 0);
+    // buyUpgrade("stopLettingOpportunityWait", 1);
+    // buyUpgrade("stopLettingOpportunityWait", 2);
     setSliderUI("overclock", "reflect", 100);
-    // unveilAction('hearAboutTheLich');
+    // unveilAction('makeMoney');
+    unveilAction('spendMoney');
+    // unveilAction('checkNoticeBoard');
     gameSpeed = 1;
     bonusTime = 1000 * 60 * 60 * 24;
 }
@@ -197,7 +199,7 @@ function initializeData() {
     create("standStraighter", [], -1, 1.5);
 
 //Notice Board level 3 / Jobs 1
-    create("fillBasicNeeds", [], -.5, -1);
+    create("buyBasicSupplies", [], -.5, -1);
     create("chimneySweep", ["handyman"], 0, -1);
     create("handyman", ["tavernHelper"], 0, -1);
     create("tavernHelper", ["guildReceptionist"], 0, -1);

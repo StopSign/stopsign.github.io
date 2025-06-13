@@ -2,6 +2,9 @@
 
 function initializeDisplay() {
     //auto generate elements
+    for(let actionVar in data.actions) {
+        attachAttLinks(actionVar);
+    }
     setRealCoordinates('overclock'); //associate all parent/children and give them an x/y
     setRealCoordinates('overclockTargetingTheLich');
     for(let actionVar in data.actions) {
@@ -86,8 +89,8 @@ function generateActionDisplay(actionVar) {
           
             <span style="font-size:18px;font-weight:bold;">${actionObj.title}<br></span>
             <span style="font-size:16px;font-weight:bold;" id='${actionVar}Resource'>0</span> 
-            <span style="color:${resourceColor};font-size:14px;font-weight:bold;">${capitalizeFirst(actionObj.resourceName)}</span>
-            <span style="font-size:14px;color:var(--text-muted)">${actionObj.isGenerator?`(+<span id="${actionVar}ResourceAdded" style="color:var(--text-primary);font-weight:bold;">10</span>)`:""}</span><br>
+            <span style="color:${resourceColor};font-size:14px;font-weight:bold;">${capitalizeFirst(dataObj.resourceName)}</span>
+            <span style="font-size:14px;color:var(--text-muted)">${actionObj.isGenerator?`(+<span id="${actionVar}ResourceAdded" style="color:var(--text-primary);font-weight:bold;">???</span>)`:""}</span><br>
             <span style="font-size:12px;position:relative;color:var(--text-muted)">
                 Level <span id="${actionVar}Level" style="color:var(--text-primary);font-weight:bold;">0</span>
                 ${actionObj.maxLevel >= 0 ? ` / <span id="${actionVar}MaxLevel" style="color:var(--text-primary);font-weight:bold;">0</span>` : ""}
@@ -95,7 +98,7 @@ function generateActionDisplay(actionVar) {
                     (<b><span id='${actionVar}HighestLevel2' style="color:var(--text-primary);font-weight:bold;"></span></b>)
                 </span> | 
                 <span id="${actionVar}Efficiency" style="color:var(--text-primary);font-weight:bold;"></span>% efficiency
-                ${!actionObj.wage ? "" : ` | $<span id="${actionVar}Wage" style="color:var(--wage-color);font-weight:bold;"></span>`}
+                ${!actionObj.wage ? "" : ` | Wage: $<span id="${actionVar}Wage" style="color:var(--wage-color);font-weight:bold;"></span>`}
             </span>
         </span>
     `
@@ -198,7 +201,7 @@ function generateActionDisplay(actionVar) {
 
     let maxLevel = Raw.html`
         <div id="${actionVar}IsMaxLevel" class="hyperVisible" 
-            style="position:absolute; display:none;left:104px;top:66px;color:var(--max-level-color);font-size:18px;">
+            style="position:absolute; display:none;left:88px;top:63px;color:var(--max-level-color);font-size:22px;">
             <b>MAX LEVEL</b>
         </div>`
 
@@ -216,10 +219,10 @@ function generateActionDisplay(actionVar) {
 
     let onLevelText = Raw.html`
         On Level up:<br>
-        ${actionObj.isGenerator?"":`x<b>${actionObj.progressMaxIncrease}</b> to progress required to complete<br>`}
-        x<b>${actionObj.expToLevelIncrease}</b> to Exp required to level<br>
-        ${actionObj.actionPowerMultIncrease===1?"":(`x<b>${actionObj.actionPowerMultIncrease}</b> to Action Power per level <br>`)}
-        ${!actionObj.isGenerator?"":`(x<b><span id="${actionVar}ActionPowerMult"></b> total Action Power from level)<br>`}
+        ${actionObj.isGenerator || actionObj.progressMaxIncrease === 1 ? "" : `x<b>${actionObj.progressMaxIncrease}</b> progress required to complete<br>`}
+        ${actionObj.expToLevelIncrease === 1 ? "" : `x<b>${actionObj.expToLevelIncrease}</b> exp required to level<br>`}
+        ${actionObj.actionPowerMultIncrease === 1 ?"" : `x<b>${actionObj.actionPowerMultIncrease}</b> to Action Power per level <br>`}
+        ${!actionObj.isGenerator ? "" : `(x<b><span id="${actionVar}ActionPowerMult"></b> total Action Power from level)<br>`}
         ${dataObj.onLevelText ? dataObj.onLevelText[language]:""}`;
 
     queueCache(`${actionVar}HighestLevelContainer`);
@@ -249,10 +252,10 @@ function generateActionDisplay(actionVar) {
     queueCache(`${actionVar}_infoContainer`);
 
     let levelInfoContainer = Raw.html`
-            <div id="${actionVar}_infoContainer" style="display:none;padding:5px;">
+            <div id="${actionVar}_infoContainer" style="display:none;padding:5px;max-height:220px;overflow-y:auto;">
         Tier <b>${actionObj.tier}</b>${actionObj.isGenerator ? " Generator" : " Action"}<br>
         Efficiency, found in the title, is Expertise Mult * Base Efficiency (x<b><span id="${actionVar}EfficiencyBase"></span></b>), capping at <b>100</b>%.<br>
-        ${actionObj.isGenerator?"":(`Consume and send rate is ${actionObj.tierMult()*100}% of ${actionObj.resourceName} * efficiency.<br>`)}<br>
+        ${actionObj.isGenerator?"":(`Consume and send rate is ${actionObj.tierMult()*100}% of ${dataObj.resourceName} * efficiency.<br>`)}<br>
         ${onComplete}
         ${onLevelText}
         ${upgradeInfoText}
@@ -285,7 +288,7 @@ function generateActionDisplay(actionVar) {
             <span id="${actionVar}LockIcon"></span><br>
             <span>
                 <div id="${actionVar}UnlockCostContainer">
-                    Needs <span style="font-weight:bold;" id="${actionVar}UnlockCost">0</span> ${actionObj.resourceName}<br>
+                    Needs <span style="font-weight:bold;" id="${actionVar}UnlockCost">0</span> ${dataObj.resourceName}<br>
                     sent from <b>${data.actions[actionObj.parentVar]?data.actions[actionObj.parentVar].title:"WAIT"}</b>.
                 </div>
                 ${dataObj.unlockMessage ? dataObj.unlockMessage[language]:""}
@@ -304,7 +307,7 @@ function generateActionDisplay(actionVar) {
                     class="buttonSimple" style="margin-right:3px;width:30px;height:30px;text-align:center;cursor:pointer;padding:0 4px;">All 0</span>
                 <span onclick="toggleAllHundred('${actionVar}')" 
                     class="buttonSimple" style="margin-right:3px;width:30px;height:30px;text-align:center;cursor:pointer;padding:0 4px;">All 100</span>
-                <div style="color:var(--text-muted)">Total ${actionObj.resourceName} sending downstream: <b><span style="color:var(--text-primary)" id='${actionVar}TotalSend'>1</span></b>/s</div>
+                <div style="color:var(--text-muted)">Total ${dataObj.resourceName} sending downstream: <b><span style="color:var(--text-primary)" id='${actionVar}TotalSend'>1</span></b>/s</div>
             </div>
         </div>`;
 
@@ -319,7 +322,7 @@ function generateActionDisplay(actionVar) {
     queueCache(`${actionVar}Level2`)
 
     theStr += Raw.html`
-        <div id="${actionVar}Container" style="display:${shouldDisplay};position:absolute;left:${newX};top:${newY};width:300px;transform-style: preserve-3d;">
+        <div id="${actionVar}Container" style="display:${shouldDisplay};position:absolute;left:${newX};top:${newY};width:300px;transform-style: preserve-3d;" onmouseenter="mouseOnAction('${actionVar}')" onmouseleave="mouseOffAction('${actionVar}')">
             <div id="${actionVar}LargeVersionContainer" style="border:2px solid var(--border-color);background-color:var(--bg-secondary);">
                 ${title}
                 ${menuContainer}
@@ -327,7 +330,6 @@ function generateActionDisplay(actionVar) {
                 ${balanceNeedle}
                 ${pbar}
                 ${expBar}
-                ${maxLevel}
                 ${storyContainer}
                 ${attsContainer}
                 ${levelInfoContainer}
@@ -339,6 +341,7 @@ function generateActionDisplay(actionVar) {
                 <b><span style="font-size:16px">${actionObj.title}</span></b><br>
                 Level <b><span id="${actionVar}Level2"></b>
             </div>
+            ${maxLevel}
         </div>`;
 
 
@@ -427,6 +430,9 @@ function generateOutsideAttDisplay(actionObj, attObj, type) {
         let target = actionObj.isGenerator ? "exp to level" : "progress to complete";
         tooltipText = `${text} of ${capitalizeFirst(statName)} bonus reduces ${target}`;
     }
+    if(actionVar === 'meditate') {
+        console.log(statName, type)
+    }
     queueCache(`${actionVar}${statName}OutsideContainer${type}`);
 
 
@@ -437,7 +443,7 @@ function generateOutsideAttDisplay(actionObj, attObj, type) {
                 <div class="showthisUp" style="font-size:18px;">${tooltipText}</div>
                 <img src="img/${statName}.svg" alt="${statName}" style="width:100%;height:100%;" />
                 <div class="hyperVisible" style="position:absolute;bottom:0;left:0;width:100%;height:50%;display:flex;align-items:flex-end;
-                justify-content:center;font-weight:bold;font-size:10px;">${text}</div>
+                justify-content:center;font-weight:bold;font-size:12px;">${text}</div>
             </div>
         </div>`;
 }
@@ -710,9 +716,9 @@ function generateLinesBetweenActions() {
             }
             // Calculate the centers of each object
             const x1 = dataObj.realX + 155; // 220 / 2
-            const y1 = dataObj.realY + 80; // 200 / 2
+            const y1 = dataObj.realY + 60; // 200 / 2
             const x2 = downstreamDataObj.realX + 155; // 220 / 2
-            const y2 = downstreamDataObj.realY + 80; // 200 / 2
+            const y2 = downstreamDataObj.realY + 60; // 200 / 2
 
             let sourceBackgroundColor = getResourceColor(dataObj);
             let targetBackgroundColor = getResourceColor(downstreamDataObj);
