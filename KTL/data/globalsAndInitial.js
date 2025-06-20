@@ -74,10 +74,14 @@ function debug() {
     // buyUpgrade("stopLettingOpportunityWait", 0);
     // buyUpgrade("stopLettingOpportunityWait", 1);
     // buyUpgrade("stopLettingOpportunityWait", 2);
-    setSliderUI("overclock", "reflect", 100);
+    // setSliderUI("overclock", "reflect", 100);
     // unveilAction('makeMoney');
-    unveilAction('spendMoney');
+    // unveilAction('spendMoney');
     // unveilAction('checkNoticeBoard');
+
+    // globalVisible = true;
+    // stop = 1;
+
     gameSpeed = 1;
     bonusTime = 1000 * 60 * 60 * 24;
 }
@@ -98,15 +102,15 @@ function initializeData() {
     createAndLinkNewAttribute("magic", "concentration");
     createAndLinkNewAttribute("magic", "cycle");
     createAndLinkNewAttribute("magic", "willpower");
+    createAndLinkNewAttribute("magic", "control");
     createAndLinkNewAttribute("magic", "amplification");
     createAndLinkNewAttribute("magic", "pulse");
     createAndLinkNewAttribute("magic", "spark");
     createAndLinkNewAttribute("magic", "vision");
-
+//mettle = fight, grit, resolve, spirit
     createAndLinkNewAttribute("physique", "endurance");
-    createAndLinkNewAttribute("physique", "flow");
-    createAndLinkNewAttribute("physique", "control");
     createAndLinkNewAttribute("physique", "might");
+    createAndLinkNewAttribute("physique", "flow");
     createAndLinkNewAttribute("physique", "coordination");
     createAndLinkNewAttribute("physique", "reflex");
     createAndLinkNewAttribute("physique", "rhythm");
@@ -121,6 +125,7 @@ function initializeData() {
 
     createAndLinkNewAttribute("money", "ambition");
     createAndLinkNewAttribute("money", "savvy");
+    createAndLinkNewAttribute("money", "geared");
     createAndLinkNewAttribute("money", "cunning");
     createAndLinkNewAttribute("money", "leverage");
     createAndLinkNewAttribute("money", "adaptability");
@@ -149,16 +154,20 @@ function initializeData() {
     create("takeNotes", ["journal"], -1.1, -.5);
     create("bodyAwareness", ["meditate", "walkAware", "standStraighter"],-1, 0);
     create("remember", [], -.2, -1.2);
-    create("travelOnRoad", ["travelToOutpost", "watchBirds", "catchAScent"], 2, 0);
+    create("travelOnRoad", ["travelToOutpost", "watchBirds"], 2, 0);
     create("travelToOutpost", ["meetVillageLeaderScott", "checkNoticeBoard", "browseLocalMarket"], 2, 0); //travelToCrossroads
     create("meetVillageLeaderScott", ["helpScottWithChores"], 0, -1);
     create("helpScottWithChores", [], 0, -1);
     create("browseLocalMarket", [], -1, -1);
     create("checkNoticeBoard", ["reportForTraining", "reportForLabor"], 1.5, -1);
     create("makeMoney", ["spendMoney"], 1, -1);
-    create("spendMoney", ["buySocialAccess"], 0, -1);
+    create("spendMoney", ["buyBasicSupplies", "buySocialAccess", "buyMarketItems"], 0, -1);
+    create("buyBasicSupplies", ["buyBasicClothes"], -1, -1);
+    create("buyBasicClothes", [], -1, -1);
+    create("buyMarketItems", ["buyShopItems"], 1, -1);
+    create("buyShopItems", [], 0, -1);
     create("buySocialAccess", ["slideTheCoin"], 0, -1);
-    create("slideTheCoin", ["buyCoffee"], .5, -1);
+    create("slideTheCoin", ["buyCoffee"], -1, -1);
     create("buyCoffee", [], .5, -1);
     create("reportForLabor", ["oddJobsLaborer"], 1, 0);
     create("oddJobsLaborer", ["chimneySweep"], .5, -1);
@@ -172,8 +181,8 @@ function initializeData() {
 
 
 //Shortcut pt 1
-    create("watchBirds", [], 1, .5)
-    create("catchAScent", ["stepOffToExplore"], 0, 1);
+    create("watchBirds", ["catchAScent"], 1, .5)
+    create("catchAScent", ["stepOffToExplore"], -1, .5);
     create("stepOffToExplore", ["eatGoldenFruit", "questionTheTrail"], 0, 1);
     create("eatGoldenFruit", [], 1, -.5);
     create("journal", [], -1.9, 0); //readTheWritten
@@ -194,12 +203,12 @@ function initializeData() {
     create("ownTheWeight", [], 1, -.7);
     create("moveWithPurpose", [], 0, -1.3);
     create("questionTheTrail", ["climbTheRocks"], 1, .5);
-    create("climbTheRocks", ["spotAShortcut"], 1, -.5);
-    create("spotAShortcut", [], 0, -1);
+    create("climbTheRocks", ["spotAPath"], 1, -.5);
+    create("spotAPath", [], 0, -1);
     create("standStraighter", [], -1, 1.5);
 
+
 //Notice Board level 3 / Jobs 1
-    create("buyBasicSupplies", [], -.5, -1);
     create("chimneySweep", ["handyman"], 0, -1);
     create("handyman", ["tavernHelper"], 0, -1);
     create("tavernHelper", ["guildReceptionist"], 0, -1);
@@ -207,6 +216,8 @@ function initializeData() {
     create("messenger", ["townCrier"], 0, -1);
     create("townCrier", ["storyTeller"], 0, -1);
     create("storyTeller", [], 0, -1);
+
+//Travelling onwards / hermit / dungeon
 
 
     //Plane 2

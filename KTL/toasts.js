@@ -95,7 +95,11 @@ function initializeToasts() {
         
         To make a lot more money, get a better job at the outpost (check notice board level 3).`);
 
+
     createToast(function() { return data.actions.checkNoticeBoard.level >= 1},
+        "NOTICE - Market Ads",
+        Raw.html`Many posters are advertising a market. Maybe you should check that out.`);
+    createToast(function() { return data.actions.checkNoticeBoard.level >= 2},
         "NOTICE - Report for Training",
             Raw.html`ATTENTION:
             <ul>
@@ -106,26 +110,16 @@ function initializeToasts() {
             
             <br<br>Come down to JOHN'S TRAINING CENTER and I will make you STRONG.`);
 
-    createToast(function() { return data.actions.checkNoticeBoard.level >= 2},
-        "Notice! Open for all! ",
-        Raw.html`It reads "Notice:<br>
-        Steam & Stormy - Community Coffeehouse now open<br>A new space for peaceful gathering and conversation. Steam & Story offers fresh-brewed drinks from across the 
-        realms and a welcoming place to meet others, share stories, or simply rest.<br><br>
-
-        Open to all, no guild or title required."<br><br>
-
-        You can start to talk to people through the Socialize action that opened up next to Overclock.`);
-
     createToast(function() { return data.actions.checkNoticeBoard.level >= 3 },
-        "A hidden notice",
+        "NOTICE - A hidden notice",
         Raw.html`It is tucked behind the others, so you did not spot it at first. It is short, and untitled:<br><br>
 
         "Laborer required for odd jobs. Starting wage $10. Ask Grelt."`)
-    // createToast(function() { return data.actions.oddJobsLaborer.level >= 3 },
-    //     "",
-    //     Raw.html``);
 
-    // createToast(function() {},
+    createToast(function() { return data.actions.basicTrainingWithJohn.unlocked },
+        "Training Options Hint",
+        Raw.html`Confused with too many options of John's training? Go from top to bottom!`);
+    // createToast(function() { return },
     //     "",
     //     Raw.html``);
 

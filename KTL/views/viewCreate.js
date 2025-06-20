@@ -430,9 +430,6 @@ function generateOutsideAttDisplay(actionObj, attObj, type) {
         let target = actionObj.isGenerator ? "exp to level" : "progress to complete";
         tooltipText = `${text} of ${capitalizeFirst(statName)} bonus reduces ${target}`;
     }
-    if(actionVar === 'meditate') {
-        console.log(statName, type)
-    }
     queueCache(`${actionVar}${statName}OutsideContainer${type}`);
 
 
@@ -762,7 +759,7 @@ function generateLinesBetweenActions() {
             let lineHTML = Raw.html`
                 <div id="${borderId}" class="line-connection" 
                      style="${cursorStyle}; display:none; align-items: center; position: absolute; width: ${length}px; height: 20px; 
-                        background: ${backgroundColor}; opacity: 1; transform-origin: 0 50%; transform: rotate(${angle}deg); left:${x1}px; top:${y1}px;"
+                        background: ${backgroundColor}; opacity: 1; transform-origin: 0 50%; transform: rotate(${angle}deg); left:${x1}px; top:${y1}px;border-radius:20px;"
                      onclick="${onclickText}">
                      
                     <div id="${lineId}" style="width: 100%; height: 0; background-color: ${targetBackgroundColor}; position: relative;text-align:center;">

@@ -192,6 +192,7 @@ let views = {
         //When action should be dim
         let isQuiet = isMaxLevel && actionObj.momentumIncrease === 0 && actionObj.momentumDecrease === 0 && !actionObj.mouseOnThis;
         views.updateVal(`${actionVar}LargeVersionContainer`, isQuiet?".6":"1", "style.opacity");
+        views.updateVal(`${actionVar}Container`, actionObj.mouseOnThis?"100":"0", "style.zIndex");
 
         views.updateVal(`${actionVar}LargeVersionContainer`, isMaxLevel?"var(--momentum-color-bg)":"var(--bg-secondary)", "style.backgroundColor");
         //--bg-secondary-max
