@@ -174,7 +174,7 @@ let views = {
         let actionVar = actionObj.actionVar;
 
         //Needle
-        let needlePosition = views.helpers.calcBalanceNeedle(actionObj.momentumIncrease, actionObj.momentumDecrease);
+        let needlePosition = views.helpers.calcBalanceNeedle(actionObj.resourceIncrease, actionObj.resourceDecrease);
         views.updateVal(`${actionVar}BalanceNeedle`, `${needlePosition}%`, "style.left");
 
         //PBar.
@@ -190,11 +190,12 @@ let views = {
         views.updateVal(`${actionVar}Level2`, isMaxLevel?"var(--max-level-color)":"var(--text-primary)", "style.color");
 
         //When action should be dim
-        let isQuiet = isMaxLevel && actionObj.momentumIncrease === 0 && actionObj.momentumDecrease === 0 && !actionObj.mouseOnThis;
+        let isQuiet = isMaxLevel && actionObj.resourceIncrease === 0 && actionObj.resourceDecrease === 0 && !actionObj.mouseOnThis;
         views.updateVal(`${actionVar}LargeVersionContainer`, isQuiet?".6":"1", "style.opacity");
         views.updateVal(`${actionVar}Container`, actionObj.mouseOnThis?"100":"0", "style.zIndex");
 
-        views.updateVal(`${actionVar}LargeVersionContainer`, isMaxLevel?"var(--momentum-color-bg)":"var(--bg-secondary)", "style.backgroundColor");
+
+        views.updateVal(`${actionVar}LargeVersionContainer`, isMaxLevel?`var(--${actionObj.resourceName}-color-bg)`:"var(--bg-secondary)", "style.backgroundColor");
         //--bg-secondary-max
 
         //Menu-specific updates
@@ -227,9 +228,9 @@ let views = {
         //Update the numbers
         let roundedNumbers = [
             ["progress", 2], ["progressMax", 2], ["progressGain", 2],
-            ["resource", 2], ["momentumDelta", 2], ["level", 1],
+            ["resource", 2], ["resourceDelta", 2], ["level", 1],
             ["exp", 2], ["expToLevel", 2], ["expToAdd2", 2],
-            ["momentumIncrease", 3], ["momentumDecrease", 3],
+            ["resourceIncrease", 3], ["resourceDecrease", 3],
             ["highestLevel2", 1]
         ];
         if(actionObj.isGenerator) {
@@ -411,15 +412,15 @@ function updateGlobals() {
 
     let toViewAmulet = data.doneAmulet && data.gameState !== "KTL" ? "" : "none";
     views.updateVal(`openViewAmuletButton`, toViewAmulet ? "" : "none", "style.display");
-    views.updateVal(`legacyDisplay`, toViewAmulet ? "" : "none", "style.display");
+    views.updateVal(`ancientCoinDisplay`, toViewAmulet ? "" : "none", "style.display");
 
     views.updateVal(`jobDisplay`, data.displayJob ? "" : "none", "style.display");
 
     views.updateVal(`secondsPerReset`, data.secondsPerReset, "textContent","time");
     views.updateVal(`bonusTime`, bonusTime/1000, "textContent", "time");
 
-    views.updateVal(`legacy`, data.legacy, "textContent", 1);
-    views.updateVal(`legacy2`, data.legacy, "textContent", 1);
+    views.updateVal(`ancientCoin`, data.ancientCoin, "textContent", 1);
+    views.updateVal(`ancientCoin2`, data.ancientCoin, "textContent", 1);
 }
 
 function updateViewOnSecond() {

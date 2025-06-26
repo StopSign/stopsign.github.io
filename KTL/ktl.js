@@ -27,7 +27,7 @@ function initializeKTL() {
 
     //first time stuff
     document.getElementById("planeButton0").style.display = "";
-    document.getElementById("legacyDisplay").style.display = "";
+    document.getElementById("ancientCoinDisplay").style.display = "";
     data.doneKTL = true;
     if(data.doneAmulet) {
         data.useAmuletButtonShowing = true;

@@ -7,6 +7,8 @@ function initializeDisplay() {
     }
     setRealCoordinates('overclock'); //associate all parent/children and give them an x/y
     setRealCoordinates('overclockTargetingTheLich');
+    setRealCoordinates('echoKindle');
+    setRealCoordinates('absorbStarseed');
     for(let actionVar in data.actions) {
         generateActionDisplay(actionVar);
     }
@@ -122,9 +124,9 @@ function generateActionDisplay(actionVar) {
             style="margin-right:3px;width:30px;height:30px;text-align:center;cursor:pointer;padding:0 4px;">Story</span>
         </div>`;
 
-    queueCache(`${actionVar}MomentumIncrease`);
-    queueCache(`${actionVar}MomentumDecrease`);
-    queueCache(`${actionVar}MomentumDelta`);
+    queueCache(`${actionVar}ResourceIncrease`);
+    queueCache(`${actionVar}ResourceDecrease`);
+    queueCache(`${actionVar}ResourceDelta`);
 
     let momentumContainer = Raw.html`
     <div style='padding:3px 3px 0;'>
@@ -134,9 +136,9 @@ function generateActionDisplay(actionVar) {
             <span style="display:inline-block;width:60px;"><u>Change</u></span>
         </div>
         <div>
-            <span style="display:inline-block;width:60px;white-space: nowrap;">+<b><span id="${actionVar}MomentumIncrease"></span></b>/s</span>
-            <span style="display:inline-block;width:60px;white-space: nowrap;">-<b><span id="${actionVar}MomentumDecrease"></span></b>/s</span>
-            <span style="display:inline-block;width:60px;white-space: nowrap;">Δ<b><span id="${actionVar}MomentumDelta"></span></b>/s</span>
+            <span style="display:inline-block;width:60px;white-space: nowrap;">+<b><span id="${actionVar}ResourceIncrease"></span></b>/s</span>
+            <span style="display:inline-block;width:60px;white-space: nowrap;">-<b><span id="${actionVar}ResourceDecrease"></span></b>/s</span>
+            <span style="display:inline-block;width:60px;white-space: nowrap;">Δ<b><span id="${actionVar}ResourceDelta"></span></b>/s</span>
         </div>
     </div>`;
 
@@ -709,6 +711,7 @@ function generateLinesBetweenActions() {
         for(let downstreamVar of actionObj.downstreamVars) {
             let downstreamDataObj = actionData[downstreamVar];
             if(!downstreamDataObj || downstreamDataObj.realX === undefined || dataObj.realX === undefined) {
+                console.log(downstreamVar);
                 continue;
             }
             // Calculate the centers of each object
@@ -816,14 +819,14 @@ function setAllCaches() {
     queueCache("secondsPerReset");
     queueCache("openUseAmuletButton");
     queueCache("openViewAmuletButton");
-    queueCache("legacy");
-    queueCache("legacy2");
+    queueCache("ancientCoin");
+    queueCache("ancientCoin2");
     queueCache("bonusTime");
     queueCache("killTheLichMenu");
     queueCache("attDisplay");
     queueCache("bonusDisplay");
     queueCache("killTheLichMenuButton2");
-    queueCache("legacyDisplay");
+    queueCache("ancientCoinDisplay");
     queueCache("jobDisplay");
 
     for(let actionVar in data.actions) {

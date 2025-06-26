@@ -33,7 +33,7 @@ data.planeTabSelected = 0;
 data.gameState = "default"; //KTL
 data.totalMomentum = 0;
 data.ticksPerSecond = 20;
-data.legacy = 0;
+data.ancientCoin = 0;
 data.useAmuletButtonShowing = false;
 data.secondsPerReset = 0;
 data.currentJob = "Helping Scott";
@@ -69,7 +69,7 @@ function debug() {
     // data.doneKTL = true;
     // data.doneAmulet = true;
     // data.displayJob = true;
-    data.legacy = 300;
+    // data.ancientCoin = 300;
     // buyUpgrade("buyNicerStuff", 0);
     // buyUpgrade("stopLettingOpportunityWait", 0);
     // buyUpgrade("stopLettingOpportunityWait", 1);
@@ -78,8 +78,9 @@ function debug() {
     // unveilAction('makeMoney');
     // unveilAction('spendMoney');
     // unveilAction('checkNoticeBoard');
+    data.actions.echoKindle.resource += 1;
 
-    // globalVisible = true;
+    globalVisible = true;
     // stop = 1;
 
     gameSpeed = 1;
@@ -164,8 +165,13 @@ function initializeData() {
     create("spendMoney", ["buyBasicSupplies", "buySocialAccess", "buyMarketItems"], 0, -1);
     create("buyBasicSupplies", ["buyBasicClothes"], -1, -1);
     create("buyBasicClothes", [], -1, -1);
-    create("buyMarketItems", ["buyShopItems"], 1, -1);
+    create("buyMarketItems", ["buyShopItems", "invest"], 1, -1);
     create("buyShopItems", [], 0, -1);
+    create("invest", ["buildFortune"], 1, -1);
+    create("buildFortune", ["deepInvestments", "investInLocals"], 0, -1);
+    create("deepInvestments", [], 1, -.5);
+    create("investInLocals", ["investInRoads"], 0, -1);
+    create("investInRoads", [], 0, -1);
     create("buySocialAccess", ["slideTheCoin"], 0, -1);
     create("slideTheCoin", ["buyCoffee"], -1, -1);
     create("buyCoffee", [], .5, -1);
@@ -182,17 +188,21 @@ function initializeData() {
 
 //Shortcut pt 1
     create("watchBirds", ["catchAScent"], 1, .5)
-    create("catchAScent", ["stepOffToExplore"], -1, .5);
-    create("stepOffToExplore", ["eatGoldenFruit", "questionTheTrail"], 0, 1);
+    create("catchAScent", ["questionTheTrail"], -1, .5);
+    create("questionTheTrail", ["stepOffToExplore", "eatGoldenFruit"], 0, 1);
+    create("stepOffToExplore", ["climbTheRocks"], 1, .5);
     create("eatGoldenFruit", [], 1, -.5);
-    create("journal", [], -1.9, 0); //readTheWritten
+    create("climbTheRocks", ["spotAPath"], 1, -.5);
+    create("spotAPath", [], 0, -1);
 
 //Meditate
+    create("journal", [], -1.9, 0); //readTheWritten
     create("meditate", ["feelTheAche"],-2, 0);
     create("feelTheAche", ["softenTension"], -1, .5);
     create("softenTension", ["releaseExpectations"], -1, .5);
     create("releaseExpectations", [], -1, .5);
     create("walkAware", [], -1, .5);
+    create("standStraighter", [], -1, 1.5);
 
 //Notice board level 2 / Training & Shortcut pt 2
     create("reportForTraining", ["basicTrainingWithJohn"], -.5, -1);
@@ -202,10 +212,6 @@ function initializeData() {
     create("breatheThroughIt", [], -1, -.7);
     create("ownTheWeight", [], 1, -.7);
     create("moveWithPurpose", [], 0, -1.3);
-    create("questionTheTrail", ["climbTheRocks"], 1, .5);
-    create("climbTheRocks", ["spotAPath"], 1, -.5);
-    create("spotAPath", [], 0, -1);
-    create("standStraighter", [], -1, 1.5);
 
 
 //Notice Board level 3 / Jobs 1
@@ -221,9 +227,70 @@ function initializeData() {
 
 
     //Plane 2
-    create("echoKindle", [], 0, 0)
-    // create("manaPool", ["manipulateMana"], 0, 1);
-    // create("manipulateMana", [], 0, 1);
+    create("echoKindle", ["poolMana"], 0, 0)
+    create("poolMana", ["manipulateMana"], 0, 1);
+    create("manipulateMana", ["auraControl"], 0, 1);
+    // create("manipulateMana", ["auraControl", "manaImprovement", "prepareSpells"], 0, 1);
+
+    create("auraControl", [], 0, 1);
+
+    // create("manaImprovement", ["manaExperiments", "magicResearch"], -1, 0);
+    // create("manaExperiments", ["manaObservations", "feelYourMana"], -1, 1);
+    // create("manaObservations", ["manaVisualizations"], 0, 1);
+    // create("manaVisualizations", ["manaShaping"], -1, 0);
+    // create("manaShaping", [], -1, 0);
+    // create("feelYourMana", ["growMagicSenses"], -1, 0);
+    // create("growMagicSenses", ["listenToTheMana"], -1, 0);
+    // create("listenToTheMana", ["manaInstinct"], -1, 0);
+    // create("manaInstinct", [], -1, 0);
+    // create("magicResearch", ["infuseTheHide"], -1, -1);
+    // create("infuseTheHide", ["etchTheCircle"], -1, 0);
+    // create("etchTheCircle", ["bindThePages"], 0, 1);
+    // create("bindThePages", ["awakenYourGrimoire"], -1, 0);
+    // create("awakenYourGrimoire", [], 0, -1);
+
+    // create("prepareSpells", ["prepareDungeonSpells"], 1, 0);
+    // create("prepareDungeonSpells", ["supportSpells", "recoverSpells", "combatSpells"], 0, -1);
+    // create("supportSpells", ["divination", "practicalMagic"], 0, -1);
+
+    // create("divination", ["identifyItem"], -1, -1);
+    // create("identifyItem", ["detectMagic"], 0, -1);
+    // create("detectMagic", [], 0, 1);
+    // create("practicalMagic", ["manaTransfer"], 0, 1);
+    // create("manaTransfer", ["illuminate"], 0, 1);
+    // create("illuminate", ["unblemish"], 0, 1);
+    // create("unblemish", [], 0, 1);
+    //
+    // create("recoverSpells", ["earthMagic"], 1, -1);
+    // create("earthMagic", ["moveEarth"], 0, -1);
+    // create("moveEarth", ["shelter"], 0, -1);
+    // create("shelter", ["reinforceArmor"], 0, -1);
+    // create("reinforceArmor", ["sharpenWeapons"], 0, -1);
+    // create("sharpenWeapons", ["repairEquipment"], 0, -1);
+    // create("repairEquipment", ["restoreEquipment"], 0, -1);
+    // create("restoreEquipment", [], 0, -1);
+    //
+    // create("healingMagic", ["singleTargetHealing", "massHeal"], 1, -1);
+    // create("singleTargetHealing", ["purifyPoison"], 0, -1);
+    // create("purifyPoison", [], 0, -1);
+    // create("massHeal", ["auraHealing", "healBurst"], 1, -1);
+    // create("auraHealing", [], 0, -1);
+    // create("healBurst", [], 1, -1);
+    //
+    // create("combatSpells", ["swarmSpells", "wardMagic", "duellingSpells"], 1, 0);
+    // create("swarmSpells", ["fireball"], 1, 1);
+    // create("fireball", [], 1, 0);
+    // create("wardMagic", ["ward"], 1, 0);
+    // create("ward", [], 1, 0);
+    // create("duellingSpells", ["firebolt"], 1, -1);
+    // create("firebolt", [], 1, 0);
+    //
+    //
+    // create("preparePhysicalSpells", ["overcharge"], 0, -1);
+    // create("overcharge", ["overboost"], 1, 0);
+    // create("overboost", ["overdrive"], 1, 0);
+    // create("overdrive", [], 1, 0);
+    // create("", [], 0, 0);
 
 
     //Plane 3

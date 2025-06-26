@@ -41,6 +41,8 @@ function getResourceColor(actionObj) {
             return "var(--gold-color)";
         case "conversations":
             return "var(--conversations-color)";
+        case "legacy":
+            return "var(--legacy-color)";
         case "fear":
             return "var(--fear-color)";
         case "arcana":
@@ -58,6 +60,8 @@ function getResourceColorDim(actionObj) {
             return "var(--gold-color-dim)";
         case "conversations":
             return "var(--conversations-color-dim)";
+        case "legacy":
+            return "var(--legacy-color-dim)";
         case "fear":
             return "var(--fear-color-dim)";
         case "arcana":

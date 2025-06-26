@@ -50,9 +50,10 @@ function actionSetBaseVariables(actionObj, dataObj) {
     actionObj.generatorSpeed = dataObj.generatorSpeed ? dataObj.generatorSpeed : 0;
     actionObj.generatorTarget = dataObj.generatorTarget;
     actionObj.resource = 0;
-    actionObj.momentumDelta = 0;
-    actionObj.momentumIncrease = 0;
-    actionObj.momentumDecrease = 0;
+    actionObj.resourceDelta = 0;
+    actionObj.resourceIncrease = 0;
+    actionObj.resourceDecrease = 0;
+    actionObj.resourceIncreaseFromGens = 0;
     actionObj.totalSend = 0;
     actionObj.expToLevelIncrease = dataObj.expToLevelIncrease;
     actionObj.actionPowerMultIncrease = dataObj.actionPowerMultIncrease ? dataObj.actionPowerMultIncrease : 1;
@@ -62,7 +63,7 @@ function actionSetBaseVariables(actionObj, dataObj) {
     actionObj.unlocked = dataObj.unlocked === null ? true : dataObj.unlocked;
     actionObj.currentMenu = "downstream";
 
-    actionObj.isRunning = dataObj.plane === 0; //for controlling whether time affects it
+    actionObj.isRunning = dataObj.plane !== 1; //for controlling whether time affects it
     actionObj.onLevelAtts = dataObj.onLevelAtts ? dataObj.onLevelAtts : [];
     actionObj.efficiencyAtts = dataObj.efficiencyAtts ? dataObj.efficiencyAtts : [];
     actionObj.expAtts = dataObj.expAtts ? dataObj.expAtts : [];

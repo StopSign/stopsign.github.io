@@ -62,8 +62,11 @@ let actionData = {
         onUnlock: function () {
         },
         onCompleteCustom: function () {
+            let actionObj = data.actions.overclock;
             actionData.overclock.updateMults();
-            data.actions.overclock.resource += data.actions.overclock.resourceAdded;
+            actionObj.resource += actionObj.resourceAdded;
+            // actionObj.amountToSend = actionObj.resourceAdded;
+            actionObj.currentRate = (actionObj.resourceAdded * actionObj.progressGain) / actionObj.progressMax;
 
             if (data.actions.hearAboutTheLich.unlocked) {
                 data.actions.hearAboutTheLich.actionPower = calcFearGain();
@@ -161,9 +164,6 @@ let actionData = {
             unveilAction('travelOnRoad')
             unveilAction('travelToOutpost')
             unveilAction('meetVillageLeaderScott')
-            if(data.actions.bodyAwareness.level >= 10) {
-                unveilAction('meditate')
-            }
         },
         onLevelAtts:[["awareness", 400]],
         expAtts:[["curiosity", 1], ["concentration", 1], ["energy", 1], ["endurance", 1]],
@@ -245,7 +245,7 @@ let actionData = {
     },
     helpScottWithChores: {
         tier:1, plane:0,
-        progressMaxBase:300000, progressMaxIncrease:2,
+        progressMaxBase:600000, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.2, maxLevel:4,
         wage: 1,
@@ -311,30 +311,30 @@ let actionData = {
         unlockCost:2e7, visible:false, unlocked:false, purchased: true,
         isGenerator:true, generatorTarget:"spendMoney", generatorSpeed:5,
         onCompleteCustom: function() {
-            //Take 1% (tier) of current, consume all of it
-            //give 1 part to equation, 1 part to consume for expertise
-            //equation takes its part and sqrt(part), gives that to spendMoney
-
             let actionObj = data.actions.makeMoney;
             let actionTarget = data.actions[actionObj.generatorTarget];
             let dataObj = actionData.makeMoney;
 
-            //this is the amount to remove from actionObj (1%)
+            // Determine the amount to consume and the amount to send.
             let amount = actionObj.resource * actionObj.tierMult();
-            //this is sqrt(1% * actionPower) * efficiency
-            let amountToSend = dataObj.actionPowerFunction(amount, actionObj.actionPower * actionObj.upgradeMult) * (actionObj.efficiency/100);
-            //visual only
+            let amountToSend = dataObj.actionPowerFunction(amount) * actionObj.actionPower * actionObj.upgradeMult * (actionObj.efficiency / 100);
+
+            // Store the amount sent for this cycle. The gameTick loop will use this to calculate the average /s.
             actionObj.amountToSend = amountToSend;
-            if(amountToSend > 0) { //only take if it gave
-                actionObj.resource -= amount;
+
+            // Perform the actual resource transfer.
+            if (amountToSend > 0) {
+                actionObj.resource -= amount; // Consume resource from self.
+                addResourceTo(actionTarget, amountToSend); // Give generated resource to target.
             }
 
-            addMomentumTo(actionTarget, amountToSend);
-
-            //add exp based on amount sent
+            // Handle EXP gain logic.
             actionObj.expToAddBase = amountToSend;
             actionObj.expToAdd = actionObj.expToAddBase * actionObj.expToAddMult * calcUpgradeMultToExp(actionObj);
-            data.actions.makeMoney.resourceAdded = amountToSend;
+            actionObj.resourceAdded = amountToSend;
+            actionObj.currentRate = (actionObj.resourceAdded * actionObj.progressGain) / actionObj.progressMax;
+
+            // Update any specific UI elements if needed.
             view.cached['makeMoneyMomentumTaken'].textContent = intToString(amount, 2);
         },
         onUnlock: function() {
@@ -346,20 +346,20 @@ let actionData = {
             data.actions.makeMoney.upgradeMult = upgradeMult;
         },
         onLevelAtts:[["ambition", 1]],
-        expAtts:[["cunning", 1]],
+        expAtts:[["adaptability", 1], ["cunning", 1]],
         efficiencyAtts:[["ambition", 1]],
-        actionPowerFunction: function(resource, origMult) {
-            if(resource * origMult < 1) {
+        actionPowerFunction: function(resource) {
+            if(resource < 1) {
                 return 0;
             }
-            return Math.pow(resource * origMult, .5) * data.currentWage; //sqrt(num * mult) * wage
+            return Math.pow(resource, .5) * data.currentWage; //sqrt(num * mult) * wage
         },
         onCompleteText: {english:Raw.html`
                 -<span style="font-weight:bold;" id='makeMoneyMomentumTaken'>???</span> Momentum taken from this action, converted to<br>
                 +<span style="font-weight:bold;" id='makeMoneyAmountToSend'>???</span> gold added to Spend Money.<br>
                 `},
         extraInfo: {english:Raw.html`<br>Momentum Taken = Current Momentum * Tier Mult.<br>
-                        Exp & Gold gain = sqrt(Momentum Taken * Action Power) * Efficiency * Wages.`}
+                        Exp & Gold gain = sqrt(Momentum Taken) * Action Power * Efficiency * Wages.`}
     },
     spendMoney: {
         tier:2, plane:0, resourceName:"gold",
@@ -415,6 +415,59 @@ let actionData = {
         expAtts:[["savvy", 1]],
         efficiencyAtts:[["ambition", 1]]
     },
+    invest: {
+        tier:2, plane:0, resourceName: "gold",
+        progressMaxBase:5e8, progressMaxIncrease:10,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:.1, maxLevel:10,
+        unlockCost:5e8, visible:false, unlocked:false, purchased: true,
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[]
+    },
+    buildFortune: {
+        tier:2, plane:0, resourceName: "fortune",
+        progressMaxBase:5e8, progressMaxIncrease:10,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:.1, maxLevel:10,
+        unlockCost:5e8, visible:false, unlocked:false, purchased: true,
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[]
+    },
+    deepInvestments: {
+        tier:2, plane:0, resourceName: "fortune",
+        progressMaxBase:5e8, progressMaxIncrease:10,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:.1, maxLevel:10,
+        unlockCost:5e8, visible:false, unlocked:false, purchased: true,
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[]
+    },
+    investInLocals: {
+        tier:2, plane:0, resourceName: "fortune",
+        progressMaxBase:5e8, progressMaxIncrease:10,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:.1, maxLevel:10,
+        unlockCost:5e8, visible:false, unlocked:false, purchased: true,
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[]
+    },
+    investInRoads: {
+        tier:2, plane:0, resourceName: "fortune",
+        progressMaxBase:5e8, progressMaxIncrease:10,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:.1, maxLevel:10,
+        unlockCost:5e8, visible:false, unlocked:false, purchased: true,
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[]
+    },
+
+
+
     buySocialAccess: {
         tier:2, plane:0, resourceName:"gold",
         progressMaxBase:1e5, progressMaxIncrease:5,
@@ -457,25 +510,25 @@ let actionData = {
     },
     reportForLabor: {
         tier:1, plane:0,
-        progressMaxBase:1e9, progressMaxIncrease:4,
-        expToLevelBase:4, expToLevelIncrease:1.1,
-        efficiencyBase:.5, maxLevel:10,
+        progressMaxBase:1e9, progressMaxIncrease:10,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:.05, maxLevel:10,
         unlockCost:1e11, visible:false, unlocked:false, purchased: true,
         onUnlock: function() {
         },
-        onLevelAtts:[],
-        expAtts:[],
-        efficiencyAtts:[]
+        onLevelAtts:[["coordination", 200], ["leverage", 10]],
+        expAtts:[["adaptability", 1]],
+        efficiencyAtts:[["adaptability", 1]]
     },
     oddJobsLaborer: {
         tier:1, plane:0,
-        progressMaxBase:1e10, progressMaxIncrease:3,
-        expToLevelBase:10, expToLevelIncrease:1.2,
+        progressMaxBase:1e10, progressMaxIncrease:2,
+        expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.2, maxLevel:8,
-        wage: 10,
+        wage: 20,
         unlockCost:1e11, visible:false, unlocked:false, purchased: true,
         onLevelCustom: function() {
-            data.actions.oddJobsLaborer.wage += actionData.oddJobsLaborer.wage/4;
+            data.actions.oddJobsLaborer.wage += actionData.oddJobsLaborer.wage/2;
             changeJob('oddJobsLaborer');
             if(data.actions.oddJobsLaborer.level >= 2) {
                 unveilAction('chimneySweep');
@@ -484,10 +537,57 @@ let actionData = {
         onUnlock:function() {
             changeJob('oddJobsLaborer');
         },
-        onLevelAtts:[],
+        onLevelAtts:[["adaptability", 1]],
         expAtts:[],
-        efficiencyAtts:[],
-        unlockMessage:{english:"On unlock, set job to Odd Jobs Laborer for a base wage of $10."}
+        efficiencyAtts:[["adaptability", 1]],
+        unlockMessage:{english:"On unlock, set job to Odd Jobs Laborer for a base wage of $20."},
+        onLevelText:{english:"Increase wage +50%"}
+    },
+    chimneySweep: {
+        tier:1, plane:0,
+        progressMaxBase:1e12, progressMaxIncrease:2,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:.2, maxLevel:8,
+        wage: 100,
+        unlockCost:1e13, visible:false, unlocked:false, purchased: true,
+        onLevelCustom: function() {
+            data.actions.chimneySweep.wage += actionData.chimneySweep.wage/2;
+            changeJob('chimneySweep');
+            if(data.actions.chimneySweep.level >= 2) {
+                unveilAction('handyman');
+            }
+        },
+        onUnlock:function() {
+            changeJob('chimneySweep');
+        },
+        onLevelAtts:[["adaptability", 2]],
+        expAtts:[],
+        efficiencyAtts:[["adaptability", .5]],
+        unlockMessage:{english:"On unlock, set job to Chimney Sweep for a base wage of $100."},
+        onLevelText:{english:"Increase wage +50%"}
+    },
+    handyman: {
+        tier:1, plane:0,
+        progressMaxBase:1e14, progressMaxIncrease:2,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:.2, maxLevel:8,
+        wage: 500,
+        unlockCost:1e15, visible:false, unlocked:false, purchased: true,
+        onLevelCustom: function() {
+            data.actions.handyman.wage += actionData.handyman.wage/2;
+            changeJob('handyman');
+            if(data.actions.handyman.level >= 2) {
+                unveilAction('tavernHelper');
+            }
+        },
+        onUnlock:function() {
+            changeJob('handyman');
+        },
+        onLevelAtts:[["adaptability", 4]],
+        expAtts:[],
+        efficiencyAtts:[["adaptability", .3]],
+        unlockMessage:{english:"On unlock, set job to Handyman for a base wage of $500."},
+        onLevelText:{english:"Increase wage +50%"}
     },
     socialize: {
         tier:1, plane:0,
@@ -500,19 +600,19 @@ let actionData = {
         onCompleteCustom: function() {
             let actionObj = data.actions.socialize;
             let actionTarget = data.actions[actionObj.generatorTarget];
-            let dataObj = actionData.makeMoney;
+            let dataObj = actionData.socialize;
 
             //this is the amount to remove from actionObj (1%)
             let amount = actionObj.resource * actionObj.tierMult();
             //this is log10(1% * actionPower)^2 * efficiency
-            let amountToSend = dataObj.actionPowerFunction(amount, actionObj.actionPower * actionObj.upgradeMult) * (actionObj.efficiency/100);
+            let amountToSend = dataObj.actionPowerFunction(amount) * actionObj.actionPower * actionObj.upgradeMult * (actionObj.efficiency/100);
             //visual only
             actionObj.amountToSend = amountToSend;
             if(amountToSend > 0) { //only take if it gave
                 actionObj.resource -= amount;
             }
 
-            addMomentumTo(actionTarget, amountToSend);
+            addResourceTo(actionTarget, amountToSend);
 
             //add exp based on amount sent
             actionObj.expToAddBase = amountToSend;
@@ -535,16 +635,16 @@ let actionData = {
         // onCompleteText: {
         //     english:"+<b><span id=\"socializeActionPower\">1</span></b> Conversation<br>"
         // },
-        actionPowerFunction: function(resource, origMult) {
-            if(resource * origMult < 1) {
+        actionPowerFunction: function(resource) {
+            if(resource < 1) {
                 return 0;
             }
-            return Math.pow(Math.log10(resource * origMult), 3); //log10(num * mult)^3
+            return Math.pow(Math.log10(resource), 3); //log10(num * mult)^3
         },
         onCompleteText: {english:Raw.html`
                 +<span style="font-weight:bold;" id='socializeAmountToSend'>1</span> conversations in Meet People.<br>
                 -<span style="font-weight:bold;" id='socializeMomentumTaken'>1</span> Momentum taken from this action.<br>`},
-        extraInfo: {english:`<br>Exp & Conversations gain = log10(Momentum/100 * Action Power)^3 * Efficiency.`}
+        extraInfo: {english:`<br>Exp & Conversations gain = log10(Momentum/100)^3 * Action Power * Efficiency.`}
     },
     meetPeople: {
         tier:1, plane:0, resourceName:"conversations",
@@ -637,7 +737,7 @@ actionData = {
         tier:1, plane:0,
         progressMaxBase:800000000, progressMaxIncrease:40,
         expToLevelBase:1, expToLevelIncrease:1,
-        efficiencyBase:1, maxLevel:1,
+        efficiencyBase:.6, maxLevel:1,
         unlockCost:400000, visible:false, unlocked:false, purchased: true,
         onUnlock: function() {
         },
@@ -646,13 +746,13 @@ actionData = {
         },
         onLevelAtts:[["observation", 30]],
         expAtts:[["concentration", 1], ["curiosity", 1], ["awareness", 1]],
-        efficiencyAtts:[]
+        efficiencyAtts:[["navigation", 1]]
     },
     catchAScent: {
         tier:1, plane:0,
         progressMaxBase:1e8, progressMaxIncrease:5,
         expToLevelBase:1, expToLevelIncrease:1,
-        efficiencyBase:.8, maxLevel:1,
+        efficiencyBase:.4, maxLevel:1,
         unlockCost:5e6, visible:false, unlocked:false, purchased: true,
         onLevelCustom: function() {
         },
@@ -664,41 +764,27 @@ actionData = {
         efficiencyAtts:[["navigation", 1]],
         unlockMessage:{english:"On unlock, +1 max level for Body Awareness."}
     },
-    stepOffToExplore: {
+    questionTheTrail: {
         tier:1, plane:0,
         progressMaxBase:1e9, progressMaxIncrease:4,
         expToLevelBase:2, expToLevelIncrease:1,
-        efficiencyBase:.1, maxLevel:2,
+        efficiencyBase:.2, maxLevel:2,
         unlockCost:4e8, visible:false, unlocked:false, purchased: true,
         onLevelCustom: function() {
-            unveilAction('questionTheTrail')
+            unveilAction('stepOffToExplore')
             unveilAction('eatGoldenFruit');
         },
         onUnlock: function() {
         },
-        onLevelAtts:[["endurance", 100], ["navigation", 2.5]],
+        onLevelAtts:[["navigation", 2.5]],
         expAtts:[["curiosity", 1]],
-        efficiencyAtts:[["geared", 1]]
+        efficiencyAtts:[["navigation", 1]]
     },
-    eatGoldenFruit: {
-        tier:1, plane:0,
-        progressMaxBase:1e11, progressMaxIncrease:10,
-        expToLevelBase:1, expToLevelIncrease:1,
-        efficiencyBase:1, maxLevel:5,
-        unlockCost:1e8, visible:false, unlocked:false, purchased: true,
-        onLevelCustom: function() {
-        },
-        onUnlock: function () {
-        },
-        onLevelAtts:[["awareness", 2000], ["integration", 40]],
-        expAtts:[["observation", 1], ["geared", 1], ["coordination", 1]],
-        efficiencyAtts:[]
-    },
-    questionTheTrail: {
+    stepOffToExplore: {
         tier:1, plane:0,
         progressMaxBase:1e9, progressMaxIncrease:5,
         expToLevelBase:1, expToLevelIncrease:1,
-        efficiencyBase:.5, maxLevel:2,
+        efficiencyBase:.1, maxLevel:3,
         unlockCost:1e9, visible:false, unlocked:false, purchased: true,
         onUnlock: function() {
             unveilAction('climbTheRocks')
@@ -706,36 +792,49 @@ actionData = {
         },
         onLevelCustom: function() {
         },
-        onLevelAtts:[["navigation", 2.5]],
-        expAtts:[["endurance", 1]],
+        onLevelAtts:[["navigation", 2.5], ["flow", 5]],
+        expAtts:[["endurance", 1], ["geared", 1]],
         efficiencyAtts:[["navigation", 1]]
+    },
+    eatGoldenFruit: {
+        tier:1, plane:0,
+        progressMaxBase:1e11, progressMaxIncrease:10,
+        expToLevelBase:1, expToLevelIncrease:1,
+        efficiencyBase:.03, maxLevel:1,
+        unlockCost:1e8, visible:false, unlocked:false, purchased: true,
+        onLevelCustom: function() {
+        },
+        onUnlock: function () {
+        },
+        onLevelAtts:[["awareness", 2000], ["integration", 40]],
+        expAtts:[["observation", 1], ["geared", 1], ["coordination", 1]],
+        efficiencyAtts:[["curiosity", 1]]
     },
     climbTheRocks: {
         tier:1, plane:0,
         progressMaxBase:1e11, progressMaxIncrease:1,
         expToLevelBase:1, expToLevelIncrease:1,
-        efficiencyBase:.01, maxLevel:5,
+        efficiencyBase:.05, maxLevel:5,
         unlockCost:1e9, visible:false, unlocked:false, purchased: true,
         onUnlock: function() {
         },
         onLevelAtts:[["concentration", 300]],
-        expAtts:[["might", 1], ["endurance", 1]],
-        efficiencyAtts:[["endurance", 1]]
+        expAtts:[["might", 1], ["geared", 1]],
+        efficiencyAtts:[["navigation", 1]]
     },
     spotAPath: {
         tier:1, plane:0,
         progressMaxBase:1e12, progressMaxIncrease:3,
         expToLevelBase:1, expToLevelIncrease:1,
-        efficiencyBase:.01, maxLevel:1,
+        efficiencyBase:.1, maxLevel:1,
         unlockCost:1e9, visible:false, unlocked:false, purchased: true,
         onUnlock: function() {
         },
         onLevelCustom: function() {
-
         },
-        onLevelAtts:[["navigation", 5]],
-        expAtts:[["might", 1], ["endurance", 1]],
-        efficiencyAtts:[["endurance", 1]]
+        onLevelAtts:[["navigation", 5], ["flow", 20]],
+        expAtts:[["might", 1], ["geared", 1]],
+        efficiencyAtts:[["integration", 1]]
     },
     standStraighter: {
         tier:1, plane:0,
@@ -890,7 +989,6 @@ actionData = {
             unveilAction('ownTheWeight');
             unveilAction('moveWithPurpose');
             data.actions.bodyAwareness.maxLevel += 6;
-            unveilAction('meditate');
         },
         onLevelAtts:[["coordination", 30]],
         expAtts:[["endurance", 1], ["might", 1], ["geared", 1]],
@@ -954,50 +1052,6 @@ actionData = {
 actionData = {
     ...actionData,
 
-    chimneySweep: {
-        tier:1, plane:0,
-        progressMaxBase:1e6, progressMaxIncrease:3,
-        expToLevelBase:10, expToLevelIncrease:1.2,
-        efficiencyBase:.1, maxLevel:8,
-        wage: 20,
-        unlockCost:1e6, visible:false, unlocked:false, purchased: true,
-        onLevelCustom: function() {
-            data.actions.chimneySweep.wage += actionData.chimneySweep.wage/4;
-            changeJob('chimneySweep');
-            if(data.actions.chimneySweep.level >= 2) {
-                unveilAction('handyman');
-            }
-        },
-        onUnlock:function() {
-            changeJob('chimneySweep');
-        },
-        onLevelAtts:[],
-        expAtts:[],
-        efficiencyAtts:[],
-        unlockMessage:{english:"On unlock, set job to Chimney Sweep for a base wage of $500."}
-    },
-    handyman: {
-        tier:1, plane:0,
-        progressMaxBase:1e9, progressMaxIncrease:3,
-        expToLevelBase:10, expToLevelIncrease:1.2,
-        efficiencyBase:.05, maxLevel:8,
-        wage: 40,
-        unlockCost:1e9, visible:false, unlocked:false, purchased: true,
-        onLevelCustom: function() {
-            data.actions.handyman.wage += actionData.handyman.wage/4;
-            changeJob('handyman');
-            if(data.actions.handyman.level >= 2) {
-                unveilAction('tavernHelper');
-            }
-        },
-        onUnlock:function() {
-            changeJob('handyman');
-        },
-        onLevelAtts:[],
-        expAtts:[],
-        efficiencyAtts:[],
-        unlockMessage:{english:"On unlock, set job to Handyman for a base wage of $25k."}
-    },
     tavernHelper: {
         tier:1, plane:0,
         progressMaxBase:1e12, progressMaxIncrease:3,
@@ -1246,11 +1300,11 @@ actionData = {
         efficiencyBase:1, isKTL:true, purchased: true, maxLevel:2,
         unlockCost:1e9, visible:true, unlocked:false,
         onUnlock: function() {
-            data.legacy += 10;
+            data.ancientCoin += 10;
             data.useAmuletButtonShowing = true;
         },
         onCompleteCustom:function() {
-            data.legacy += 2 * (1 +  data.actions.killHorde.level);
+            data.ancientCoin += 2 * (1 +  data.actions.killHorde.level);
         },
         onLevelCustom: function() {
             unveilAction('killElites');
@@ -1258,8 +1312,8 @@ actionData = {
         onLevelAtts:[],
         expAtts:[],
         efficiencyAtts:[],
-        extraInfo:{english:"Gives 2 * (1 + level) legacy per complete."},
-        unlockMessage:{english:"On unlock, +10 legacy."}
+        extraInfo:{english:"Gives 2 * (1 + level) Ancient Coin per complete."},
+        unlockMessage:{english:"On unlock, +10 Ancient Coin."}
     },
     killElites: {
         tier:1, plane:1,
@@ -1268,18 +1322,18 @@ actionData = {
         efficiencyBase:1, isKTL:true, purchased: true, maxLevel:2,
         unlockCost:1e12, visible:true, unlocked:false,
         onUnlock: function() {
-            data.legacy += 30;
+            data.ancientCoin += 30;
         },
         onCompleteCustom:function() {
-            data.legacy += 6 * (1 +  data.actions.killHorde.level);
+            data.ancientCoin += 6 * (1 +  data.actions.killHorde.level);
         },
         onLevelCustom: function() {
         },
         onLevelAtts:[],
         expAtts:[],
         efficiencyAtts:[],
-        extraInfo:{english:"Gives 6 * (1 + level) legacy per complete."},
-        unlockMessage:{english:"On unlock, +30 legacy."}
+        extraInfo:{english:"Gives 6 * (1 + level) Ancient Coin per complete."},
+        unlockMessage:{english:"On unlock, +30 Ancient Coin."}
     },
     killDevils: {
         tier:1, plane:1,
@@ -1288,16 +1342,16 @@ actionData = {
         efficiencyBase:1, isKTL:true, purchased: true, maxLevel:2,
         unlockCost:1e12, visible:true, unlocked:false,
         onUnlock: function() {
-            data.legacy += 100;
+            data.ancientCoin += 100;
         },
         onCompleteCustom:function() {
-            data.legacy += 20 * (1 +  data.actions.killHorde.level);
+            data.ancientCoin += 20 * (1 +  data.actions.killHorde.level);
         },
         onLevelAtts:[],
         expAtts:[],
         efficiencyAtts:[],
-        extraInfo:{english:"Gives 20 * (1 + level) legacy per complete."},
-        unlockMessage:{english:"On unlock, +100 legacy."}
+        extraInfo:{english:"Gives 20 * (1 + level) Ancient Coin per complete."},
+        unlockMessage:{english:"On unlock, +100 Ancient Coin."}
     },
     killGenerals: {
         tier:1, plane:1,
@@ -1315,17 +1369,94 @@ actionData = {
 actionData = {
     ...actionData,
 
-
     echoKindle: {
-        tier:1, plane:2,
-        progressMaxBase:60, progressMaxIncrease:1,
-        expToLevelBase:60, expToLevelIncrease:1,
-        efficiencyBase:1, isKTL:true, purchased: true,
-        unlockCost:0, visible:true, unlocked:true, isGenerator:true, generatorSpeed:1,
+        tier:0, plane:2, resourceName:"legacy",
+        progressMaxBase:2, progressMaxIncrease:1,
+        expToLevelBase:2, expToLevelIncrease:2,
+        actionPowerBase:1, actionPowerMult:1, actionPowerMultIncrease:1.1,
+        efficiencyBase:1,
+        unlockCost:0, visible:true, unlocked:true, purchased: true, hasDeltas: false,
+        isGenerator:true, generatorTarget:"poolMana", generatorSpeed:1,
+        onCompleteCustom: function() {
+            let actionObj = data.actions.echoKindle;
+            let actionTarget = data.actions[actionObj.generatorTarget];
+            let dataObj = actionData.echoKindle;
+
+            let amountToSend = dataObj.actionPowerFunction(actionObj.resource) * actionObj.actionPower * actionObj.upgradeMult * (actionObj.efficiency/100);
+
+            // Set amountToSend so gameTick knows how much was generated this cycle
+            actionObj.amountToSend = amountToSend;
+            actionObj.currentRate = (amountToSend * actionObj.progressGain) / actionObj.progressMax;
+
+
+            // Give the resource to the target action
+            addResourceTo(actionTarget, amountToSend);
+
+            // Update EXP and other UI elements
+            actionObj.expToAddBase = amountToSend;
+            actionObj.expToAdd = actionObj.expToAddBase * actionObj.expToAddMult * calcUpgradeMultToExp(actionObj);
+            actionObj.resourceAdded = amountToSend;
+            view.cached['echoKindleMomentumTaken'].textContent = intToString(amountToSend, 2);
+        },
+        onUnlock: function() {
+        },
+        // updateUpgradeMult:function() {
+        //     let upgradeMult = 1;
+        //     upgradeMult *= Math.pow(2, data.upgrades.makeMoreMoney.upgradePower);
+        //     data.actions.makeMoney.upgradeMult = upgradeMult;
+        // },
+        actionPowerFunction: function(resource) {
+            if(resource < 1) {
+                return 0;
+            }
+            return Math.pow(resource, .5);
+        },
+        onLevelAtts:[],
+        expAtts:[["spark", 1]],
+        efficiencyAtts:[["pulse", 1]],
+        onCompleteText: {english:Raw.html`
+                +<span style="font-weight:bold;" id='echoKindleMomentumTaken'>???</span> Mana added to Pool Mana.<br>
+                `},
+        extraInfo: {english:Raw.html`Exp & Mana gain = sqrt(Legacy) * Action Power * Efficiency.`}
+    },
+
+    poolMana: {
+        tier:1, plane:2, resourceName:"mana",
+        progressMaxBase:10000, progressMaxIncrease:15,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:.25, maxLevel:10,
+        unlockCost:1, visible:false, unlocked:false, purchased: true, hasUpstream:false,
+        onUnlock: function() {
+        },
         onLevelAtts:[],
         expAtts:[],
         efficiencyAtts:[]
     },
+    manipulateMana: {
+        tier:1, plane:2, resourceName:"mana",
+        progressMaxBase:10000, progressMaxIncrease:15,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:.25, maxLevel:10,
+        unlockCost:3000, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[]
+    },
+    auraControl: {
+        tier:1, plane:2, resourceName:"mana",
+        progressMaxBase:10000, progressMaxIncrease:15,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:.25, maxLevel:10,
+        unlockCost:3000, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[]
+    },
+
 
 }
 

@@ -85,6 +85,23 @@ const actionPatches = {
         preventReset: true
     },
 
+    questionTheTrail: {
+        preventReset: false
+    },
+    stepOffToExplore: {
+        preventReset: false
+    },
+    eatGoldenFruit: {
+        preventReset: false
+    },
+    climbTheRocks: {
+        preventReset: false
+    },
+    spotAPath: {
+        preventReset: false
+    },
+
+
 
     reportForLabor: {
         preventReset: false
@@ -92,7 +109,7 @@ const actionPatches = {
     oddJobsLaborer: {
         preventReset: false
     },
-    meditate: {
+    chimneySweep: {
         preventReset: false
     },
     buyMarketItems: {
@@ -101,7 +118,26 @@ const actionPatches = {
     buyShopItems: {
         preventReset: false
     },
+    invest: {
+        preventReset: false
+    },
+    buildFortune: {
+        preventReset: false
+    },
+    deepInvestments: {
+        preventReset: false
+    },
+    investInLocals: {
+        preventReset: false
+    },
+    investInRoads: {
+        preventReset: false
+    },
 
+
+    meditate: {
+        preventReset: false
+    },
 };
 
 function load() {
@@ -137,7 +173,7 @@ function load() {
         data.gameState = toLoad.gameState ?? "default";
         data.planeTabSelected = toLoad.planeTabSelected ?? 0;
         data.totalMomentum = toLoad.totalMomentum ?? 0;
-        data.legacy = toLoad.legacy ?? 0;
+        data.ancientCoin = toLoad.ancientCoin ?? 0;
         data.useAmuletButtonShowing = !!toLoad.useAmuletButtonShowing;
         data.secondsPerReset = toLoad.secondsPerReset ?? 0;
         data.currentJob = toLoad.currentJob ?? "Helping Scott";
@@ -271,7 +307,7 @@ function updateUIFromLoad() {
 
     if(data.doneAmulet) {
         document.getElementById("openViewAmuletButton").style.display = "";
-        document.getElementById("legacyDisplay").style.display = "";
+        document.getElementById("ancientCoinDisplay").style.display = "";
     }
     if(data.displayJob) {
         document.getElementById("jobDisplay").style.display = "";

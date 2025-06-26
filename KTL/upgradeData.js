@@ -47,11 +47,11 @@ function buyUpgrade(upgradeVar, num) {
     }
     //check cost
     let cost = calcUpgradeCost(upgrade, num);
-    if (data.legacy < cost) {
+    if (data.ancientCoin < cost) {
         return;
     }
     //buy
-    data.legacy -= cost;
+    data.ancientCoin -= cost;
 
     //add to upgrades
     if (upgrade.upgradesBought.indexOf(num) === -1) {
@@ -119,7 +119,7 @@ actionData.upgrades = {
         onBuy: function(num) {
             purchaseAction('watchBirds');
             purchaseAction('catchAScent');
-            purchaseAction('stepOffToExplore');
+            purchaseAction('questionTheTrail');
             purchaseAction('eatGoldenFruit');
             purchaseAction('journal');
         }
@@ -273,7 +273,7 @@ actionData.upgrades = {
                 purchaseAction('ownTheWeight');
                 purchaseAction('moveWithPurpose');
                 purchaseAction('standStraighter');
-                purchaseAction('questionTheTrail');
+                purchaseAction('stepOffToExplore');
                 purchaseAction('climbTheRocks');
                 purchaseAction('findAShortcut');
             } else if(num === 2) {

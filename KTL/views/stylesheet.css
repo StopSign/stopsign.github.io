@@ -33,9 +33,9 @@
     --world-1-bg-primary: #1e1e2e;
     --world-1-bg-secondary: #313244;
     --world-1-bg-tertiary: #45465f;
-    --world-2-bg-primary: #372339;
-    --world-2-bg-secondary: #58375b;
-    --world-2-bg-tertiary: #754979;
+    --world-2-bg-primary: #08344d;
+    --world-2-bg-secondary: #0c4667;
+    --world-2-bg-tertiary: #11608b;
     --world-3-bg-primary: #372339;
     --world-3-bg-secondary: #58375b;
     --world-3-bg-tertiary: #754979;
@@ -59,6 +59,9 @@
     --mana-color: #0c20d4;
     --mana-color-dim: rgba(12, 32, 212, 0.5);
     --mana-color-bg: #070b39;
+    --legacy-color: #db9812;
+    --legacy-color-dim: rgba(219, 152, 18, 0.5);
+    --legacy-color-bg: #5c4003;
     --gold-color: #a99102;
     --gold-color-dim: rgba(169, 145, 2, 0.5);
     --gold-color-bg: #363107;
@@ -131,6 +134,8 @@ body.lightMode {
     --momentum-color-dim: rgba(0, 225, 255, 0.5);
     --exp-color:#b79df8;
     --exp-color-dim: rgba(183, 157, 248, 0.5);
+    --legacy-color: #db9812;
+    --legacy-color-dim: rgba(219, 152, 18, 0.5);
     --mana-color:#74c7ec;
     --mana-color-dim: rgba(116, 199, 236, 0.5);
     --gold-color:#FFD700;
@@ -517,24 +522,24 @@ input {
     background-color:var(--world-0-bg-tertiary);
 }
 .planeButton1 {
-    background-color:var(--world-0-bg-primary);
-    border:2px solid var(--world-0-bg-secondary);
+    background-color:var(--world-1-bg-primary);
+    border:2px solid var(--world-1-bg-secondary);
 }
 .planeButton1:hover {
-    background-color:var(--world-0-bg-secondary);
+    background-color:var(--world-1-bg-secondary);
 }
 .planeButton1:active {
-    background-color:var(--world-0-bg-tertiary);
+    background-color:var(--world-1-bg-tertiary);
 }
 .planeButton2 {
-    background-color:var(--world-3-bg-primary);
-    border:2px solid var(--world-3-bg-secondary);
+    background-color:var(--world-2-bg-primary);
+    border:2px solid var(--world-2-bg-secondary);
 }
 .planeButton2:hover {
-    background-color:var(--world-3-bg-secondary);
+    background-color:var(--world-2-bg-secondary);
 }
 .planeButton2:active {
-    background-color:var(--world-3-bg-tertiary);
+    background-color:var(--world-2-bg-tertiary);
 }
 .planeButton3 {
     background-color:var(--world-3-bg-primary);
