@@ -1425,19 +1425,19 @@ actionData = {
         progressMaxBase:10000, progressMaxIncrease:15,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.25, maxLevel:10,
-        unlockCost:1, visible:false, unlocked:false, purchased: true, hasUpstream:false,
+        unlockCost:1, visible:true, unlocked:false, purchased: true, hasUpstream:false,
         onUnlock: function() {
         },
         onLevelAtts:[],
         expAtts:[],
         efficiencyAtts:[]
     },
-    manipulateMana: {
+    expelMana: {
         tier:1, plane:2, resourceName:"mana",
         progressMaxBase:10000, progressMaxIncrease:15,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.25, maxLevel:10,
-        unlockCost:3000, visible:false, unlocked:false, purchased: true,
+        unlockCost:3000, visible:true, unlocked:false, purchased: true,
         onUnlock: function() {
         },
         onLevelAtts:[],
@@ -1449,7 +1449,7 @@ actionData = {
         progressMaxBase:10000, progressMaxIncrease:15,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.25, maxLevel:10,
-        unlockCost:3000, visible:false, unlocked:false, purchased: true,
+        unlockCost:3000, visible:true, unlocked:false, purchased: true,
         onUnlock: function() {
         },
         onLevelAtts:[],

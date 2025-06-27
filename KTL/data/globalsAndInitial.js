@@ -80,7 +80,7 @@ function debug() {
     // unveilAction('checkNoticeBoard');
     data.actions.echoKindle.resource += 1;
 
-    globalVisible = true;
+    // globalVisible = true;
     // stop = 1;
 
     gameSpeed = 1;
@@ -228,9 +228,9 @@ function initializeData() {
 
     //Plane 2
     create("echoKindle", ["poolMana"], 0, 0)
-    create("poolMana", ["manipulateMana"], 0, 1);
-    create("manipulateMana", ["auraControl"], 0, 1);
-    // create("manipulateMana", ["auraControl", "manaImprovement", "prepareSpells"], 0, 1);
+    create("poolMana", ["expelMana"], 0, 1);
+    create("expelMana", ["auraControl"], 0, 1);
+    // create("expelMana", ["auraControl", "manaImprovement", "prepareSpells"], 0, 1);
 
     create("auraControl", [], 0, 1);
 

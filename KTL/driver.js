@@ -127,7 +127,6 @@ function gameTick() {
     for (let actionVar in data.actions) {
         tickGameObject(actionVar);
     }
-
     calcDeltas();
 
     //check once more for any that need to be leveled from other's stat improvements

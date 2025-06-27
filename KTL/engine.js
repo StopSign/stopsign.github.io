@@ -119,9 +119,11 @@ function createAndLinkNewAction(actionVar, dataObj, title, downstreamVars) {
     actionSetInitialVariables(actionObj, dataObj);
 
 
+
     for(let downstreamVar of actionObj.downstreamVars) {
         actionObj[downstreamVar+"FocusMult"] = 1;
         actionObj[downstreamVar+"downstreamSendRate"] = 0;
+        actionObj[`downstreamRate${downstreamVar}`] = 0;
     }
 
     actionObj.progressRateReal = function() { //For data around the flat action too
