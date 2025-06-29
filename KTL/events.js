@@ -377,41 +377,13 @@ function clickedAttName(attVar) {
     }
     selectedStat = attVar;
 
-    views.updateVal(`${attVar}AttContainer`, "2px solid var(--text-selected-color)", "style.border");
-    views.updateVal(`${attVar}Name`, "var(--text-selected-color)", "style.color");
-    views.updateVal(`${attVar}DisplayContainer`, "var(--text-selected-color)", "style.backgroundColor");
+    views.updateVal(`${selectedStat}AttContainer`, "2px solid var(--text-selected-color)", "style.border");
+    views.updateVal(`${selectedStat}Name`, "var(--text-selected-color)", "style.color");
+    views.updateVal(`${selectedStat}DisplayContainer`, "var(--text-selected-color)", "style.backgroundColor");
 
 
     for (let actionVar in data.actions) {
-        let dataObj = actionData[actionVar];
-        let attAddedTo = false;
-        for(let attObj of dataObj.onLevelAtts) {
-            if (attObj[0] === attVar) {
-                attAddedTo = true;
-            }
-        }
-        let expAttUsed = false;
-        for(let attObj of dataObj.expAtts) {
-            if (attObj[0] === attVar) {
-                expAttUsed = true;
-            }
-        }
-        let effAttUsed = false;
-        for(let attObj of dataObj.efficiencyAtts) {
-            if (attObj[0] === attVar) {
-                effAttUsed = true;
-            }
-        }
-
-        let color = "black"
-        if (attAddedTo && !(expAttUsed || effAttUsed)) color = "var(--attribute-add-color)";
-        else if (attAddedTo && (expAttUsed || effAttUsed)) color = "white";
-        else if (expAttUsed) color = "var(--attribute-use-exp-color)";
-        else if (effAttUsed) color = "var(--attribute-use-eff-color)";
-
-        views.updateVal(`${actionVar}LargeVersionContainer`, color, "style.borderColor");
-        views.updateVal(`${actionVar}LockContainer`, color, "style.borderColor");
-        views.updateVal(`${actionVar}SmallVersionContainer`, color==="black"?"":("2px solid " + color), "style.border");
+        setBorderColor(actionVar, selectedStat);
     }
 
     updateAttActionContainers();
@@ -434,6 +406,38 @@ function clickedAttName(attVar) {
         top: offset - 10,  // small margin
         behavior: "smooth"
     });
+}
+
+function setBorderColor(actionVar, attVar) {
+    let dataObj = actionData[actionVar];
+    let attAddedTo = false;
+    for(let attObj of dataObj.onLevelAtts) {
+        if (attObj[0] === attVar) {
+            attAddedTo = true;
+        }
+    }
+    let expAttUsed = false;
+    for(let attObj of dataObj.expAtts) {
+        if (attObj[0] === attVar) {
+            expAttUsed = true;
+        }
+    }
+    let effAttUsed = false;
+    for(let attObj of dataObj.efficiencyAtts) {
+        if (attObj[0] === attVar) {
+            effAttUsed = true;
+        }
+    }
+
+    let color = "black"
+    if (attAddedTo && !(expAttUsed || effAttUsed)) color = "var(--attribute-add-color)";
+    else if (attAddedTo && (expAttUsed || effAttUsed)) color = "white";
+    else if (expAttUsed) color = "var(--attribute-use-exp-color)";
+    else if (effAttUsed) color = "var(--attribute-use-eff-color)";
+
+    views.updateVal(`${actionVar}LargeVersionContainer`, color, "style.borderColor");
+    views.updateVal(`${actionVar}LockContainer`, color, "style.borderColor");
+    views.updateVal(`${actionVar}SmallVersionContainer`, color==="black"?"":("2px solid " + color), "style.border");
 }
 
 //Inside and Outside

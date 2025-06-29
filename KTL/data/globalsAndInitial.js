@@ -78,7 +78,7 @@ function debug() {
     // unveilAction('makeMoney');
     // unveilAction('spendMoney');
     // unveilAction('checkNoticeBoard');
-    data.actions.echoKindle.resource += 1;
+    data.actions.echoKindle.resource += 10;
 
     // globalVisible = true;
     // stop = 1;
@@ -102,12 +102,15 @@ function initializeData() {
 
     createAndLinkNewAttribute("magic", "concentration");
     createAndLinkNewAttribute("magic", "cycle");
-    createAndLinkNewAttribute("magic", "willpower");
     createAndLinkNewAttribute("magic", "control");
     createAndLinkNewAttribute("magic", "amplification");
     createAndLinkNewAttribute("magic", "pulse");
     createAndLinkNewAttribute("magic", "spark");
     createAndLinkNewAttribute("magic", "vision");
+    createAndLinkNewAttribute("magic", "spellcraft");
+    createAndLinkNewAttribute("magic", "wizardry");
+    createAndLinkNewAttribute("magic", "archmagery");
+
 //mettle = fight, grit, resolve, spirit
     createAndLinkNewAttribute("physique", "endurance");
     createAndLinkNewAttribute("physique", "might");
@@ -227,69 +230,69 @@ function initializeData() {
 
 
     //Plane 2
-    create("echoKindle", ["poolMana"], 0, 0)
+    create("echoKindle", ["sparkMana"], 0, 0)
+    create("sparkMana", ["poolMana"], 0, 1);
     create("poolMana", ["expelMana"], 0, 1);
-    create("expelMana", ["auraControl"], 0, 1);
-    // create("expelMana", ["auraControl", "manaImprovement", "prepareSpells"], 0, 1);
+    create("expelMana", ["auraControl", "manaImprovement", "prepareSpells"], 0, 1);
 
     create("auraControl", [], 0, 1);
 
-    // create("manaImprovement", ["manaExperiments", "magicResearch"], -1, 0);
-    // create("manaExperiments", ["manaObservations", "feelYourMana"], -1, 1);
-    // create("manaObservations", ["manaVisualizations"], 0, 1);
-    // create("manaVisualizations", ["manaShaping"], -1, 0);
-    // create("manaShaping", [], -1, 0);
-    // create("feelYourMana", ["growMagicSenses"], -1, 0);
-    // create("growMagicSenses", ["listenToTheMana"], -1, 0);
-    // create("listenToTheMana", ["manaInstinct"], -1, 0);
-    // create("manaInstinct", [], -1, 0);
-    // create("magicResearch", ["infuseTheHide"], -1, -1);
-    // create("infuseTheHide", ["etchTheCircle"], -1, 0);
-    // create("etchTheCircle", ["bindThePages"], 0, 1);
-    // create("bindThePages", ["awakenYourGrimoire"], -1, 0);
-    // create("awakenYourGrimoire", [], 0, -1);
+    create("manaImprovement", ["manaExperiments", "magicResearch"], -1, 0);
+    create("manaExperiments", ["manaObservations", "feelYourMana"], -.5, 1);
+    create("manaObservations", ["manaVisualizations"], 0, 1);
+    create("manaVisualizations", ["manaShaping"], -1, 0);
+    create("manaShaping", [], -1, 0);
+    create("feelYourMana", ["growMagicSenses"], -1, 0);
+    create("growMagicSenses", ["listenToTheMana"], -1, 0);
+    create("listenToTheMana", ["manaInstinct"], -1, 0);
+    create("manaInstinct", [], -1, 0);
+    create("magicResearch", ["infuseTheHide"], -.5, -1);
+    create("infuseTheHide", ["etchTheCircle"], -1, 0);
+    create("etchTheCircle", ["bindThePages"], -.5, 1);
+    create("bindThePages", ["awakenYourGrimoire"], -1, 0);
+    create("awakenYourGrimoire", [], .5, -1);
 
-    // create("prepareSpells", ["prepareDungeonSpells"], 1, 0);
-    // create("prepareDungeonSpells", ["supportSpells", "recoverSpells", "combatSpells"], 0, -1);
-    // create("supportSpells", ["divination", "practicalMagic"], 0, -1);
+    create("prepareSpells", ["prepareDungeonSpells", "preparePhysicalSpells"], 1, 0);
+    create("prepareDungeonSpells", ["supportSpells", "recoverSpells", "combatSpells"], .5, -1);
+    create("supportSpells", ["divination", "practicalMagic"], 0, -1);
 
-    // create("divination", ["identifyItem"], -1, -1);
-    // create("identifyItem", ["detectMagic"], 0, -1);
-    // create("detectMagic", [], 0, 1);
-    // create("practicalMagic", ["manaTransfer"], 0, 1);
-    // create("manaTransfer", ["illuminate"], 0, 1);
-    // create("illuminate", ["unblemish"], 0, 1);
-    // create("unblemish", [], 0, 1);
-    //
-    // create("recoverSpells", ["earthMagic"], 1, -1);
-    // create("earthMagic", ["moveEarth"], 0, -1);
-    // create("moveEarth", ["shelter"], 0, -1);
-    // create("shelter", ["reinforceArmor"], 0, -1);
-    // create("reinforceArmor", ["sharpenWeapons"], 0, -1);
-    // create("sharpenWeapons", ["repairEquipment"], 0, -1);
-    // create("repairEquipment", ["restoreEquipment"], 0, -1);
-    // create("restoreEquipment", [], 0, -1);
-    //
-    // create("healingMagic", ["singleTargetHealing", "massHeal"], 1, -1);
-    // create("singleTargetHealing", ["purifyPoison"], 0, -1);
-    // create("purifyPoison", [], 0, -1);
-    // create("massHeal", ["auraHealing", "healBurst"], 1, -1);
-    // create("auraHealing", [], 0, -1);
-    // create("healBurst", [], 1, -1);
-    //
-    // create("combatSpells", ["swarmSpells", "wardMagic", "duellingSpells"], 1, 0);
-    // create("swarmSpells", ["fireball"], 1, 1);
-    // create("fireball", [], 1, 0);
-    // create("wardMagic", ["ward"], 1, 0);
-    // create("ward", [], 1, 0);
-    // create("duellingSpells", ["firebolt"], 1, -1);
-    // create("firebolt", [], 1, 0);
-    //
-    //
-    // create("preparePhysicalSpells", ["overcharge"], 0, -1);
-    // create("overcharge", ["overboost"], 1, 0);
-    // create("overboost", ["overdrive"], 1, 0);
-    // create("overdrive", [], 1, 0);
+    create("divination", ["identifyItem"], -.5, -1);
+    create("identifyItem", ["detectMagic"], 0, -1);
+    create("detectMagic", [], 0, -1);
+    create("practicalMagic", ["manaTransfer"], .5, -1);
+    create("manaTransfer", ["illuminate"], 0, -1);
+    create("illuminate", ["unblemish"], 0, -1);
+    create("unblemish", [], 0, -1);
+
+    create("recoverSpells", ["earthMagic", "healingMagic"], 1, -.5);
+    create("earthMagic", ["moveEarth"], .5, -1);
+    create("moveEarth", ["shelter"], 0, -1);
+    create("shelter", ["reinforceArmor"], 0, -1);
+    create("reinforceArmor", ["sharpenWeapons"], 0, -1);
+    create("sharpenWeapons", ["repairEquipment"], 0, -1);
+    create("repairEquipment", ["restoreEquipment"], 0, -1);
+    create("restoreEquipment", [], 0, -1);
+
+    create("healingMagic", ["singleTargetHealing", "massHeal"], 1.5, -.5);
+    create("singleTargetHealing", ["purifyPoison"], 0, -1);
+    create("purifyPoison", [], 0, -1);
+    create("massHeal", ["auraHealing", "healBurst"], 1, -1);
+    create("auraHealing", [], 0, -1);
+    create("healBurst", [], 1, -1);
+
+    create("combatSpells", ["swarmSpells", "wardMagic", "duellingSpells"], 1, .5);
+    create("swarmSpells", ["fireball"], 1, 1.5);
+    create("fireball", [], 1, 0);
+    create("wardMagic", ["ward"], 1, .5);
+    create("ward", [], 1, 0);
+    create("duellingSpells", ["firebolt"], 1, -.5);
+    create("firebolt", [], 1, 0);
+
+
+    create("preparePhysicalSpells", ["overcharge"], 0, 1);
+    create("overcharge", ["overboost"], 1, 0);
+    create("overboost", ["overdrive"], 0, 1);
+    create("overdrive", [], 0, 1);
     // create("", [], 0, 0);
 
 

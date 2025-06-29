@@ -64,17 +64,32 @@ let actionData = {
         onCompleteCustom: function () {
             let actionObj = data.actions.overclock;
             actionData.overclock.updateMults();
-            actionObj.resource += actionObj.resourceAdded;
-            // actionObj.amountToSend = actionObj.resourceAdded;
-            actionObj.currentRate = (actionObj.resourceAdded * actionObj.progressGain) / actionObj.progressMax;
+
+            actionObj.resource += actionObj.resourceToAdd;
 
             if (data.actions.hearAboutTheLich.unlocked) {
                 data.actions.hearAboutTheLich.actionPower = calcFearGain();
                 data.actions.hearAboutTheLich.resource += data.actions.hearAboutTheLich.actionPower;
             }
+
+            views.scheduleUpdate('overclockResourceSent', intToString(actionObj.resourceToAdd, 2), "textContent")
         },
         updateMults: function () {
-            data.actions.overclock.resourceAdded = data.actions.overclock.actionPower * data.actions.overclock.upgradeMult;
+            let spellMult = 1;
+            if(isSpellReady('overcharge')) {
+                spellMult *= actionData.overcharge.spellpower();
+                useCharge('overcharge');
+                if(isSpellReady('overboost')) {
+                    spellMult *= actionData.overboost.spellpower();
+                    useCharge('overboost');
+                    if(isSpellReady('overdrive')) {
+                        spellMult *= actionData.overdrive.spellpower();
+                        useCharge('overdrive');
+                    }
+                }
+            }
+
+            data.actions.overclock.resourceToAdd = data.actions.overclock.actionPower * data.actions.overclock.upgradeMult * spellMult;
         },
         onLevelCustom: function () {
             actionData.overclock.updateMults();
@@ -86,9 +101,12 @@ let actionData = {
         },
         onLevelAtts: [],
         expAtts: [["awareness", 1], ["concentration", 1], ["energy", 1], ["control", 1],
-            ["flow", 1], ["willpower", 1], ["coordination", 1], ["integration", 1], ["rhythm", 1],
+            ["flow", 1], ["coordination", 1], ["integration", 1], ["rhythm", 1],
             ["pulse", 1]],
-        efficiencyAtts: [["cycle", 1]]
+        efficiencyAtts: [["cycle", 1]],
+        onCompleteText: {english:Raw.html`
+                +<span style="font-weight:bold;" id="overclockResourceSent">???</span> Mana was added.<br>
+                `},
     },
     reflect: {
         tier: 1, plane: 0,
@@ -312,33 +330,31 @@ let actionData = {
         isGenerator:true, generatorTarget:"spendMoney", generatorSpeed:5,
         onCompleteCustom: function() {
             let actionObj = data.actions.makeMoney;
-            let actionTarget = data.actions[actionObj.generatorTarget];
-            let dataObj = actionData.makeMoney;
+            actionData.makeMoney.updateMults();
+            let resourceTaken = actionObj.resource * actionObj.tierMult();
 
-            // Determine the amount to consume and the amount to send.
-            let amount = actionObj.resource * actionObj.tierMult();
-            let amountToSend = dataObj.actionPowerFunction(amount) * actionObj.actionPower * actionObj.upgradeMult * (actionObj.efficiency / 100);
 
-            // Store the amount sent for this cycle. The gameTick loop will use this to calculate the average /s.
-            actionObj.amountToSend = amountToSend;
-
-            // Perform the actual resource transfer.
-            if (amountToSend > 0) {
-                actionObj.resource -= amount; // Consume resource from self.
-                addResourceTo(actionTarget, amountToSend); // Give generated resource to target.
+            if (actionObj.resourceToAdd > 0) {
+                actionObj.resource -= resourceTaken;
+                addResourceTo(data.actions[actionObj.generatorTarget], actionObj.resourceToAdd);
             }
 
-            // Handle EXP gain logic.
-            actionObj.expToAddBase = amountToSend;
+            //Adds exp right after this function
+            actionObj.expToAddBase = actionObj.resourceToAdd;
             actionObj.expToAdd = actionObj.expToAddBase * actionObj.expToAddMult * calcUpgradeMultToExp(actionObj);
-            actionObj.resourceAdded = amountToSend;
-            actionObj.currentRate = (actionObj.resourceAdded * actionObj.progressGain) / actionObj.progressMax;
 
-            // Update any specific UI elements if needed.
-            view.cached['makeMoneyMomentumTaken'].textContent = intToString(amount, 2);
+            views.scheduleUpdate('makeMoneyResourceSent', intToString(actionObj.resourceToAdd, 2), "textContent")
+            views.scheduleUpdate('makeMoneyResourceTaken', intToString(resourceTaken, 2), "textContent")
         },
         onUnlock: function() {
             unveilAction('spendMoney');
+        },
+        updateMults: function () {
+            let actionObj = data.actions.makeMoney;
+            let dataObj = actionData.makeMoney;
+
+            let resourceTaken = actionObj.resource * actionObj.tierMult();
+            actionObj.resourceToAdd = dataObj.actionPowerFunction(resourceTaken) * actionObj.actionPower * actionObj.upgradeMult;
         },
         updateUpgradeMult:function() {
             let upgradeMult = 1;
@@ -355,8 +371,8 @@ let actionData = {
             return Math.pow(resource, .5) * data.currentWage; //sqrt(num * mult) * wage
         },
         onCompleteText: {english:Raw.html`
-                -<span style="font-weight:bold;" id='makeMoneyMomentumTaken'>???</span> Momentum taken from this action, converted to<br>
-                +<span style="font-weight:bold;" id='makeMoneyAmountToSend'>???</span> gold added to Spend Money.<br>
+                -<span style="font-weight:bold;" id="makeMoneyResourceTaken">???</span> Momentum was taken from this action, converted to<br>
+                +<span style="font-weight:bold;" id="makeMoneyResourceSent">???</span> gold, added to Spend Money.<br>
                 `},
         extraInfo: {english:Raw.html`<br>Momentum Taken = Current Momentum * Tier Mult.<br>
                         Exp & Gold gain = sqrt(Momentum Taken) * Action Power * Efficiency * Wages.`}
@@ -599,26 +615,27 @@ let actionData = {
         isGenerator:true, generatorTarget:"meetPeople", generatorSpeed:20,
         onCompleteCustom: function() {
             let actionObj = data.actions.socialize;
-            let actionTarget = data.actions[actionObj.generatorTarget];
-            let dataObj = actionData.socialize;
+            actionData.socialize.updateMults();
+            let resourceTaken = actionObj.resource * actionObj.tierMult();
 
-            //this is the amount to remove from actionObj (1%)
-            let amount = actionObj.resource * actionObj.tierMult();
-            //this is log10(1% * actionPower)^2 * efficiency
-            let amountToSend = dataObj.actionPowerFunction(amount) * actionObj.actionPower * actionObj.upgradeMult * (actionObj.efficiency/100);
-            //visual only
-            actionObj.amountToSend = amountToSend;
-            if(amountToSend > 0) { //only take if it gave
-                actionObj.resource -= amount;
+            if (actionObj.resourceToAdd > 0) {
+                actionObj.resource -= resourceTaken;
+                addResourceTo(data.actions[actionObj.generatorTarget], actionObj.resourceToAdd);
             }
 
-            addResourceTo(actionTarget, amountToSend);
-
-            //add exp based on amount sent
-            actionObj.expToAddBase = amountToSend;
+            //Adds exp right after this function
+            actionObj.expToAddBase = actionObj.resourceToAdd;
             actionObj.expToAdd = actionObj.expToAddBase * actionObj.expToAddMult * calcUpgradeMultToExp(actionObj);
-            data.actions.socialize.resourceAdded = amountToSend;
-            view.cached['socializeMomentumTaken'].textContent = intToString(amount, 2);
+
+            views.scheduleUpdate('socializeResourceSent', intToString(actionObj.resourceToAdd, 2), "textContent")
+            views.scheduleUpdate('socializeResourceTaken', intToString(resourceTaken, 2), "textContent")
+        },
+        updateMults: function () {
+            let actionObj = data.actions.socialize;
+            let dataObj = actionData.socialize;
+
+            let resourceTaken = actionObj.resource * actionObj.tierMult();
+            actionObj.resourceToAdd = dataObj.actionPowerFunction(resourceTaken) * actionObj.actionPower * actionObj.upgradeMult;
         },
         onUnlock: function() {
             // unveilAction('neighborlyTies');
@@ -632,9 +649,6 @@ let actionData = {
         onLevelAtts:[["confidence", 1]],
         expAtts:[["confidence", 1], ["curiosity", 1], ["observation", 1], ["recognition", 1], ["charm", 1], ["influence", 1]],
         efficiencyAtts:[["confidence", .1]],
-        // onCompleteText: {
-        //     english:"+<b><span id=\"socializeActionPower\">1</span></b> Conversation<br>"
-        // },
         actionPowerFunction: function(resource) {
             if(resource < 1) {
                 return 0;
@@ -642,8 +656,8 @@ let actionData = {
             return Math.pow(Math.log10(resource), 3); //log10(num * mult)^3
         },
         onCompleteText: {english:Raw.html`
-                +<span style="font-weight:bold;" id='socializeAmountToSend'>1</span> conversations in Meet People.<br>
-                -<span style="font-weight:bold;" id='socializeMomentumTaken'>1</span> Momentum taken from this action.<br>`},
+                -<span style="font-weight:bold;" id="socializeResourceTaken">???</span> Momentum was taken from this action, converted to <br>
+                +<span style="font-weight:bold;" id="socializeResourceSent">???</span> conversations, added to Meet People.<br>`},
         extraInfo: {english:`<br>Exp & Conversations gain = log10(Momentum/100)^3 * Action Power * Efficiency.`}
     },
     meetPeople: {
@@ -1372,84 +1386,763 @@ actionData = {
     echoKindle: {
         tier:0, plane:2, resourceName:"legacy",
         progressMaxBase:2, progressMaxIncrease:1,
-        expToLevelBase:2, expToLevelIncrease:2,
+        expToLevelBase:2, expToLevelIncrease:1.5,
         actionPowerBase:1, actionPowerMult:1, actionPowerMultIncrease:1.1,
-        efficiencyBase:1,
+        efficiencyBase:.25,
         unlockCost:0, visible:true, unlocked:true, purchased: true, hasDeltas: false,
-        isGenerator:true, generatorTarget:"poolMana", generatorSpeed:1,
+        isGenerator:true, generatorTarget:"sparkMana", generatorSpeed:1,
         onCompleteCustom: function() {
             let actionObj = data.actions.echoKindle;
-            let actionTarget = data.actions[actionObj.generatorTarget];
+            actionData.echoKindle.updateMults();
+
+            addResourceTo(data.actions[actionObj.generatorTarget], actionObj.resourceToAdd);
+
+            //Adds exp right after this function
+            actionObj.expToAddBase = actionObj.resourceToAdd;
+            actionObj.expToAdd = actionObj.expToAddBase * actionObj.expToAddMult * calcUpgradeMultToExp(actionObj);
+
+
+            views.scheduleUpdate('echoKindleResourceSent', intToString(actionObj.resourceToAdd, 2), "textContent")
+        },
+        updateMults: function () {
+            let actionObj = data.actions.echoKindle;
             let dataObj = actionData.echoKindle;
 
-            let amountToSend = dataObj.actionPowerFunction(actionObj.resource) * actionObj.actionPower * actionObj.upgradeMult * (actionObj.efficiency/100);
-
-            // Set amountToSend so gameTick knows how much was generated this cycle
-            actionObj.amountToSend = amountToSend;
-            actionObj.currentRate = (amountToSend * actionObj.progressGain) / actionObj.progressMax;
-
-
-            // Give the resource to the target action
-            addResourceTo(actionTarget, amountToSend);
-
-            // Update EXP and other UI elements
-            actionObj.expToAddBase = amountToSend;
-            actionObj.expToAdd = actionObj.expToAddBase * actionObj.expToAddMult * calcUpgradeMultToExp(actionObj);
-            actionObj.resourceAdded = amountToSend;
-            view.cached['echoKindleMomentumTaken'].textContent = intToString(amountToSend, 2);
+            let resourceTaken = actionObj.resource * actionObj.tierMult();
+            actionObj.resourceToAdd = dataObj.actionPowerFunction(resourceTaken) * actionObj.actionPower * actionObj.upgradeMult;
         },
-        onUnlock: function() {
-        },
-        // updateUpgradeMult:function() {
-        //     let upgradeMult = 1;
-        //     upgradeMult *= Math.pow(2, data.upgrades.makeMoreMoney.upgradePower);
-        //     data.actions.makeMoney.upgradeMult = upgradeMult;
-        // },
         actionPowerFunction: function(resource) {
             if(resource < 1) {
                 return 0;
             }
             return Math.pow(resource, .5);
         },
-        onLevelAtts:[],
-        expAtts:[["spark", 1]],
+        onLevelAtts:[["spark", 5]],
+        expAtts:[["vision", 1]],
         efficiencyAtts:[["pulse", 1]],
         onCompleteText: {english:Raw.html`
-                +<span style="font-weight:bold;" id='echoKindleMomentumTaken'>???</span> Mana added to Pool Mana.<br>
+                +<span style="font-weight:bold;" id="echoKindleResourceSent">???</span> Mana was added to Spark Mana.<br>
                 `},
         extraInfo: {english:Raw.html`Exp & Mana gain = sqrt(Legacy) * Action Power * Efficiency.`}
     },
-
-    poolMana: {
-        tier:1, plane:2, resourceName:"mana",
-        progressMaxBase:10000, progressMaxIncrease:15,
-        expToLevelBase:10, expToLevelIncrease:1,
-        efficiencyBase:.25, maxLevel:10,
+    sparkMana: {
+        tier:0, plane:2, resourceName:"mana",
+        progressMaxBase:10, progressMaxIncrease:10,
+        expToLevelBase:1, expToLevelIncrease:1,
+        efficiencyBase:1,
         unlockCost:1, visible:true, unlocked:false, purchased: true, hasUpstream:false,
         onUnlock: function() {
+            unveilAction('poolMana');
+            data.actions.poolMana.generatorSpeed = 2;
         },
-        onLevelAtts:[],
+        onLevelAtts:[["spark", 10]],
+        expAtts:[["amplification", 1]],
+        efficiencyAtts:[["spark", -1]]
+    },
+    poolMana: {
+        tier:0, plane:2, resourceName:"mana",
+        progressMaxBase:120, progressMaxIncrease:1,
+        expToLevelBase:1000, expToLevelIncrease:1.3,
+        actionPowerBase:1, actionPowerMult:1, actionPowerMultIncrease:1.03,
+        efficiencyBase:.5,
+        unlockCost:0, visible:true, unlocked:true, purchased: true, hasDeltas: false, hasUpstream:false,
+        isGenerator:true, generatorTarget:"poolMana", generatorSpeed:0,
+        onCompleteCustom: function() {
+            let sparkManaObj = data.actions.sparkMana;
+            let actionObj = data.actions.poolMana;
+            let dataObj = actionData.poolMana;
+            dataObj.updateMults();
+
+            addResourceTo(data.actions[dataObj.generatorTarget], actionObj.resourceToAdd);
+
+            actionObj.expToAddBase = actionObj.resourceToAdd;
+            actionObj.expToAdd = actionObj.expToAddBase * actionObj.expToAddMult * calcUpgradeMultToExp(actionObj);
+
+            views.scheduleUpdate('poolManaResourceTaken', intToString(sparkManaObj.resource, 2), "textContent")
+            views.scheduleUpdate('poolManaResourceSent', intToString(actionObj.resourceToAdd, 2), "textContent")
+
+            sparkManaObj.resource = 0;
+        },
+        updateMults: function () {
+            let actionObj = data.actions.poolMana;
+
+            actionObj.resourceToAdd = data.actions.sparkMana.resource * actionObj.actionPower * actionObj.upgradeMult;
+        },
+        onUnlock: function() {
+        },
+        onLevelAtts:[["pulse", 1]],
         expAtts:[],
-        efficiencyAtts:[]
+        efficiencyAtts:[["amplification", .1]],
+        onCompleteText: {english:Raw.html`
+                -<span style="font-weight:bold;" id="poolManaResourceTaken">???</span> Mana was taken from Spark Mana, converted to<br>
+                +<span style="font-weight:bold;" id="poolManaResourceSent">???</span> Mana, added to this action.<br>
+                `},
+        extraInfo: {english:Raw.html`Exp & Mana gain = sqrt(Legacy) * Action Power * Efficiency.`}
     },
     expelMana: {
         tier:1, plane:2, resourceName:"mana",
-        progressMaxBase:10000, progressMaxIncrease:15,
-        expToLevelBase:10, expToLevelIncrease:1,
-        efficiencyBase:.25, maxLevel:10,
-        unlockCost:3000, visible:true, unlocked:false, purchased: true,
+        progressMaxBase:3, progressMaxIncrease:9,
+        expToLevelBase:3, expToLevelIncrease:1,
+        efficiencyBase:.25,
+        unlockCost:5, visible:true, unlocked:false, purchased: true,
+        onUnlock: function() {
+            unveilAction("manaImprovement")
+            unveilAction("magicResearch")
+            unveilAction("manaExperiments")
+            unveilAction("prepareSpells")
+            unveilAction("preparePhysicalSpells")
+        },
+        onLevelAtts:[["amplification", 5]],
+        expAtts:[],
+        efficiencyAtts:[["integration", .5]]
+    },
+    prepareSpells: {
+        tier:1, plane:2, resourceName:"mana",
+        progressMaxBase:6, progressMaxIncrease:9,
+        expToLevelBase:3, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:9,
+        unlockCost:10, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+            unveilAction("overcharge")
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[]
+    },
+    preparePhysicalSpells: {
+        tier:1, plane:2, resourceName:"mana",
+        progressMaxBase:12, progressMaxIncrease:3,
+        expToLevelBase:3, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:9,
+        unlockCost:20, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+            unveilAction("overboost")
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[]
+    },
+    overcharge: {
+        tier:1, plane:2, resourceName:"mana",
+        progressMaxBase:100, progressMaxIncrease:1,
+        expToLevelBase:3, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:1, isSpell:true, cooldown:60,
+        unlockCost:20, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+            unveilAction("overdrive")
+        },
+        spellpower: function() {
+            return 10 * data.actions.overcharge.efficiency / 100;
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[],
+        extraInfo: {english:Raw.html`If a charge is available, the next Overclock will give (x10 * efficiency) momentum.`}
+    },
+    overboost: {
+        tier:1, plane:2, resourceName:"mana",
+        progressMaxBase:1000, progressMaxIncrease:3,
+        expToLevelBase:3, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:1, isSpell:true,
+        unlockCost:1000, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+        },
+        spellpower: function() {
+            return 10 * data.actions.overboost.efficiency / 100;
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[]
+    },
+    overdrive: {
+        tier:1, plane:2, resourceName:"mana",
+        progressMaxBase:1000, progressMaxIncrease:3,
+        expToLevelBase:3, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:1, isSpell:true,
+        unlockCost:1000, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+        },
+        spellpower: function() {
+            return 10 * data.actions.overdrive.efficiency / 100;
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[]
+    },
+    manaImprovement: {
+        tier:1, plane:2, resourceName:"mana",
+        progressMaxBase:20, progressMaxIncrease:3,
+        expToLevelBase:3, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:3,
+        unlockCost:50, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+            unveilAction("feelYourMana")
+            unveilAction("manaObservations")
+            unveilAction("infuseTheHide")
+        },
+        onLevelAtts:[["spark", 10], ["amplification", 5]],
+        expAtts:[],
+        efficiencyAtts:[]
+    },
+    manaExperiments: {
+        tier:1, plane:2, resourceName:"mana",
+        progressMaxBase:100, progressMaxIncrease:3,
+        expToLevelBase:3, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:9,
+        unlockCost:200, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+            unveilAction("manaVisualizations")
+            unveilAction("growMagicSenses")
+        },
+        onLevelAtts:[["amplification", 25], ["vision", 1]],
+        expAtts:[],
+        efficiencyAtts:[]
+    },
+    magicResearch: {
+        tier:1, plane:2, resourceName:"mana",
+        progressMaxBase:400, progressMaxIncrease:3,
+        expToLevelBase:3, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:9,
+        unlockCost:200, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+            unveilAction("etchTheCircle")
+        },
+        onLevelAtts:[["vision", 2], ["spark", 10], ["integration", 5]],
+        expAtts:[],
+        efficiencyAtts:[]
+    },
+    manaObservations: {
+        tier:1, plane:2, resourceName:"mana",
+        progressMaxBase:400, progressMaxIncrease:3,
+        expToLevelBase:3, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:9,
+        unlockCost:1000, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+            unveilAction("manaShaping")
+        },
+        onLevelAtts:[["vision", 5]],
+        expAtts:[],
+        efficiencyAtts:[]
+    },
+    feelYourMana: {
+        tier:1, plane:2, resourceName:"mana",
+        progressMaxBase:400, progressMaxIncrease:3,
+        expToLevelBase:3, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:9,
+        unlockCost:1000, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+            unveilAction("listenToTheMana");
+        },
+        onLevelAtts:[["amplification", 60]],
+        expAtts:[],
+        efficiencyAtts:[]
+    },
+    infuseTheHide: {
+        tier:1, plane:2, resourceName:"mana",
+        progressMaxBase:200, progressMaxIncrease:1,
+        expToLevelBase:3, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:2,
+        unlockCost:1000, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+            unveilAction("bindThePages")
+        },
+        onLevelAtts:[["vision", 10]],
+        expAtts:[["amplification", 1]],
+        efficiencyAtts:[]
+    },
+    etchTheCircle: {
+        tier:1, plane:2, resourceName:"mana",
+        progressMaxBase:150, progressMaxIncrease:1,
+        expToLevelBase:9, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:1,
+        unlockCost:2000, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+            unveilAction("awakenYourGrimoire")
+        },
+        onLevelAtts:[["vision", 60]],
+        expAtts:[["amplification", 1]],
+        efficiencyAtts:[]
+    },
+    bindThePages: {
+        tier:1, plane:2, resourceName:"mana",
+        progressMaxBase:100, progressMaxIncrease:1.01,
+        expToLevelBase:1, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:100,
+        unlockCost:3000, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+        },
+        onLevelAtts:[["vision", 1]],
+        expAtts:[["amplification", 1]],
+        efficiencyAtts:[]
+    },
+    awakenYourGrimoire: {
+        tier:1, plane:2, resourceName:"mana",
+        progressMaxBase:1000, progressMaxIncrease:1,
+        expToLevelBase:1, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:1,
+        unlockCost:8000, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+        },
+        onLevelAtts:[],
+        expAtts:[["amplification", 1]],
+        efficiencyAtts:[]
+    },
+
+    manaVisualizations: {
+        tier:1, plane:2, resourceName:"mana",
+        progressMaxBase:1000, progressMaxIncrease:3,
+        expToLevelBase:3, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:10,
+        unlockCost:1000, visible:false, unlocked:false, purchased: true,
         onUnlock: function() {
         },
         onLevelAtts:[],
         expAtts:[],
         efficiencyAtts:[]
     },
+
+    manaShaping: {
+        tier:1, plane:2, resourceName:"mana",
+        progressMaxBase:1000, progressMaxIncrease:3,
+        expToLevelBase:3, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:10,
+        unlockCost:1000, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[]
+    },
+
+
+    growMagicSenses: {
+        tier:1, plane:2, resourceName:"mana",
+        progressMaxBase:1000, progressMaxIncrease:3,
+        expToLevelBase:3, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:10,
+        unlockCost:1000, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+        },
+        onLevelAtts:[["amplification", 20]],
+        expAtts:[],
+        efficiencyAtts:[]
+    },
+
+    listenToTheMana: {
+        tier:1, plane:2, resourceName:"mana",
+        progressMaxBase:1000, progressMaxIncrease:3,
+        expToLevelBase:3, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:10,
+        unlockCost:1000, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[]
+    },
+
+    manaInstinct: {
+        tier:1, plane:2, resourceName:"mana",
+        progressMaxBase:1000, progressMaxIncrease:3,
+        expToLevelBase:3, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:10,
+        unlockCost:1000, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[]
+    },
+
     auraControl: {
         tier:1, plane:2, resourceName:"mana",
-        progressMaxBase:10000, progressMaxIncrease:15,
-        expToLevelBase:10, expToLevelIncrease:1,
-        efficiencyBase:.25, maxLevel:10,
-        unlockCost:3000, visible:true, unlocked:false, purchased: true,
+        progressMaxBase:1000, progressMaxIncrease:3,
+        expToLevelBase:3, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:10,
+        unlockCost:10000, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+        },
+        onLevelAtts:[["control", 10]],
+        expAtts:[],
+        efficiencyAtts:[]
+    },
+
+    prepareDungeonSpells: {
+        tier:1, plane:2, resourceName:"mana",
+        progressMaxBase:1000, progressMaxIncrease:3,
+        expToLevelBase:3, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:10,
+        unlockCost:1000, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[]
+    },
+
+    supportSpells: {
+        tier:1, plane:2, resourceName:"mana",
+        progressMaxBase:1000, progressMaxIncrease:3,
+        expToLevelBase:3, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:10,
+        unlockCost:1000, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[]
+    },
+
+    divination: {
+        tier:1, plane:2, resourceName:"mana",
+        progressMaxBase:1000, progressMaxIncrease:3,
+        expToLevelBase:3, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:10,
+        unlockCost:1000, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[]
+    },
+
+    identifyItem: {
+        tier:1, plane:2, resourceName:"mana",
+        progressMaxBase:1000, progressMaxIncrease:3,
+        expToLevelBase:3, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:10,
+        unlockCost:1000, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[]
+    },
+
+    detectMagic: {
+        tier:1, plane:2, resourceName:"mana",
+        progressMaxBase:1000, progressMaxIncrease:3,
+        expToLevelBase:3, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:10,
+        unlockCost:1000, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[]
+    },
+
+    practicalMagic: {
+        tier:1, plane:2, resourceName:"mana",
+        progressMaxBase:1000, progressMaxIncrease:3,
+        expToLevelBase:3, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:10,
+        unlockCost:1000, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[]
+    },
+
+    manaTransfer: {
+        tier:1, plane:2, resourceName:"mana",
+        progressMaxBase:1000, progressMaxIncrease:3,
+        expToLevelBase:3, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:10,
+        unlockCost:1000, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[]
+    },
+
+    illuminate: {
+        tier:1, plane:2, resourceName:"mana",
+        progressMaxBase:1000, progressMaxIncrease:3,
+        expToLevelBase:3, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:10,
+        unlockCost:1000, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[]
+    },
+
+    unblemish: {
+        tier:1, plane:2, resourceName:"mana",
+        progressMaxBase:1000, progressMaxIncrease:3,
+        expToLevelBase:3, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:10,
+        unlockCost:1000, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[]
+    },
+
+    recoverSpells: {
+        tier:1, plane:2, resourceName:"mana",
+        progressMaxBase:1000, progressMaxIncrease:3,
+        expToLevelBase:3, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:10,
+        unlockCost:1000, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[]
+    },
+
+    earthMagic: {
+        tier:1, plane:2, resourceName:"mana",
+        progressMaxBase:1000, progressMaxIncrease:3,
+        expToLevelBase:3, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:10,
+        unlockCost:1000, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[]
+    },
+
+    moveEarth: {
+        tier:1, plane:2, resourceName:"mana",
+        progressMaxBase:1000, progressMaxIncrease:3,
+        expToLevelBase:3, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:10,
+        unlockCost:1000, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[]
+    },
+
+    shelter: {
+        tier:1, plane:2, resourceName:"mana",
+        progressMaxBase:1000, progressMaxIncrease:3,
+        expToLevelBase:3, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:10,
+        unlockCost:1000, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[]
+    },
+
+    reinforceArmor: {
+        tier:1, plane:2, resourceName:"mana",
+        progressMaxBase:1000, progressMaxIncrease:3,
+        expToLevelBase:3, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:10,
+        unlockCost:1000, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[]
+    },
+
+    sharpenWeapons: {
+        tier:1, plane:2, resourceName:"mana",
+        progressMaxBase:1000, progressMaxIncrease:3,
+        expToLevelBase:3, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:10,
+        unlockCost:1000, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[]
+    },
+
+    repairEquipment: {
+        tier:1, plane:2, resourceName:"mana",
+        progressMaxBase:1000, progressMaxIncrease:3,
+        expToLevelBase:3, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:10,
+        unlockCost:1000, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[]
+    },
+
+    restoreEquipment: {
+        tier:1, plane:2, resourceName:"mana",
+        progressMaxBase:1000, progressMaxIncrease:3,
+        expToLevelBase:3, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:10,
+        unlockCost:1000, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[]
+    },
+
+    healingMagic: {
+        tier:1, plane:2, resourceName:"mana",
+        progressMaxBase:1000, progressMaxIncrease:3,
+        expToLevelBase:3, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:10,
+        unlockCost:1000, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[]
+    },
+
+    singleTargetHealing: {
+        tier:1, plane:2, resourceName:"mana",
+        progressMaxBase:1000, progressMaxIncrease:3,
+        expToLevelBase:3, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:10,
+        unlockCost:1000, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[]
+    },
+
+    purifyPoison: {
+        tier:1, plane:2, resourceName:"mana",
+        progressMaxBase:1000, progressMaxIncrease:3,
+        expToLevelBase:3, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:10,
+        unlockCost:1000, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[]
+    },
+
+    massHeal: {
+        tier:1, plane:2, resourceName:"mana",
+        progressMaxBase:1000, progressMaxIncrease:3,
+        expToLevelBase:3, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:10,
+        unlockCost:1000, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[]
+    },
+
+    auraHealing: {
+        tier:1, plane:2, resourceName:"mana",
+        progressMaxBase:1000, progressMaxIncrease:3,
+        expToLevelBase:3, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:10,
+        unlockCost:1000, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[]
+    },
+
+    healBurst: {
+        tier:1, plane:2, resourceName:"mana",
+        progressMaxBase:1000, progressMaxIncrease:3,
+        expToLevelBase:3, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:10,
+        unlockCost:1000, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[]
+    },
+    combatSpells: {
+        tier:1, plane:2, resourceName:"mana",
+        progressMaxBase:1000, progressMaxIncrease:3,
+        expToLevelBase:3, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:10,
+        unlockCost:1000, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[]
+    },
+    swarmSpells: {
+        tier:1, plane:2, resourceName:"mana",
+        progressMaxBase:1000, progressMaxIncrease:3,
+        expToLevelBase:3, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:10,
+        unlockCost:1000, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[]
+    },
+    fireball: {
+        tier:1, plane:2, resourceName:"mana",
+        progressMaxBase:1000, progressMaxIncrease:3,
+        expToLevelBase:3, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:10,
+        unlockCost:1000, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[]
+    },
+    wardMagic: {
+        tier:1, plane:2, resourceName:"mana",
+        progressMaxBase:1000, progressMaxIncrease:3,
+        expToLevelBase:3, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:10,
+        unlockCost:1000, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[]
+    },
+    ward: {
+        tier:1, plane:2, resourceName:"mana",
+        progressMaxBase:1000, progressMaxIncrease:3,
+        expToLevelBase:3, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:10,
+        unlockCost:1000, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[]
+    },
+    duellingSpells: {
+        tier:1, plane:2, resourceName:"mana",
+        progressMaxBase:1000, progressMaxIncrease:3,
+        expToLevelBase:3, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:10,
+        unlockCost:1000, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[]
+    },
+    firebolt: {
+        tier:1, plane:2, resourceName:"mana",
+        progressMaxBase:1000, progressMaxIncrease:3,
+        expToLevelBase:3, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:10,
+        unlockCost:1000, visible:false, unlocked:false, purchased: true,
         onUnlock: function() {
         },
         onLevelAtts:[],

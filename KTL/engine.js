@@ -81,12 +81,14 @@ function actionSetBaseVariables(actionObj, dataObj) {
     if(dataObj.updateUpgradeMult) {
         dataObj.updateUpgradeMult();
     }
-    actionObj.amountToSend = 0; //for generators
 }
 
 //One and done
 function actionSetInitialVariables(actionObj, dataObj) {
     actionObj.isGenerator = dataObj.isGenerator;
+    actionObj.isSpell = dataObj.isSpell;
+    actionObj.cooldown = dataObj.cooldown;
+    actionObj.cooldownTimer = 0; //when this is higher than cooldown it is ready
     actionObj.resourceName = dataObj.resourceName ? dataObj.resourceName : "momentum";
     actionObj.tier = dataObj.tier;
     actionObj.wage = dataObj.wage ? dataObj.wage : null;
@@ -153,19 +155,25 @@ function createAndLinkNewAction(actionVar, dataObj, title, downstreamVars) {
             actionObj.progressMax = actionObj.progressMaxBase * actionObj.progressMaxMult;
         }
     }
-    actionObj.calcStatExpertise = function() {
+    actionObj.calcAttExpertise = function() {
         actionObj.efficiencyMult = 1;
-        actionObj.efficiencyAtts.forEach(function(expertiseStat) {
-            let name = expertiseStat[0];
-            let ratio = expertiseStat[1];
+        for(let expertiseAtt of actionObj.efficiencyAtts) {
+            let name = expertiseAtt[0];
+            let ratio = expertiseAtt[1];
             if(!data.atts[name]) {
-                console.log("need to instantiate " + name);
-                return;
+                console.log(`You need to instantiate the attribute ${name}`);
+                continue;
             }
-            let effect = ((data.atts[name].mult-1) * ratio) + 1;
-            actionObj[name+"AttEfficiencyMult"] = effect;
+            let attPoints = data.atts[name].mult - 1;
+            let effect;
+            if (ratio >= 0) {
+                effect = (attPoints * ratio) + 1;
+            } else {
+                effect = Math.pow((1 - (ratio * -.1)), data.atts[name].mult-1);
+            }
+            actionObj[`${name}AttEfficiencyMult`] = effect;
             actionObj.efficiencyMult *= effect;
-        })
+        }
         actionObj.expertise = actionObj.efficiencyBase * actionObj.efficiencyMult;
         actionObj.efficiency = actionObj.expertise > 1 ? 100 : actionObj.expertise * 100;
     }
@@ -241,7 +249,7 @@ function statAddAmount(attVar, amount) {
         data.actions[actionVar].calcStatMult();
     })
     attObj.linkedActionEfficiencyAtts.forEach(function (actionVar) {
-        data.actions[actionVar].calcStatExpertise();
+        data.actions[actionVar].calcAttExpertise();
     })
 }
 
@@ -256,7 +264,7 @@ function actionUpdateAllStatMults() {
     for(let actionVar in data.actions) {
         let actionObj = data.actions[actionVar];
         actionObj.calcStatMult();
-        actionObj.calcStatExpertise();
+        actionObj.calcAttExpertise();
     }
 }
 
@@ -371,6 +379,10 @@ function unlockAction(actionObj) {
 }
 
 function upgradeUpdates() {
+    //update all generator's multiplier data
+    Object.values(actionData).forEach(action => {
+        if (action.updateMults) action.updateMults();
+    });
     data.actions.overclock.resource += data.upgrades.tryALittleHarder.upgradePower * 20 / data.ticksPerSecond;
 }
 
@@ -394,5 +406,28 @@ function calcUpgradeMultToExp(actionObj) {
 }
 
 function calcFearGain() {
-    return (data.totalMomentum + data.actions.overclock.resourceAdded) / 1e9 * (data.actions.gossip.resource / 1000);
+    return (data.totalMomentum + data.actions.overclock.resourceToAdd) / 1e9 * (data.actions.gossip.resource / 1000);
+}
+
+function isSpellReady(actionVar) {
+    let actionObj = data.actions[actionVar];
+    return actionObj.level > 0 && actionObj.cooldownTimer >= actionObj.cooldown;
+}
+
+function useCharge(actionVar) {
+    let actionObj = data.actions[actionVar];
+
+    actionObj.level--;
+    actionObj.cooldownTimer = 0;
+}
+
+//adjustActionData('', 'progressMaxBase', 1e6
+//function to be used as a debug helper, running in console
+function adjustActionData(actionVar, key, value) {
+    let actionObj = data.actions[actionVar];
+    actionObj.key = value;
+    if(['progressMaxBase', 'progressMaxMult'].includes(key)) {
+        actionObj.progressMax = actionObj.progressMaxBase * actionObj.progressMaxMult;
+    }
+
 }

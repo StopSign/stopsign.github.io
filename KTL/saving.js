@@ -189,7 +189,7 @@ function load() {
         data.ticksPerSecond = toLoad.ticksPerSecond ?? 20;
     }
 
-    //update all action data based on upgrades bought
+    //update all generator's multiplier data
     Object.values(actionData).forEach(action => {
         if (action.updateMults) action.updateMults();
     });

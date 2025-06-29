@@ -77,7 +77,7 @@ function generateActionDisplay(actionVar) {
 
     queueCache(`${actionVar}Tier`);
     queueCache(`${actionVar}Resource`);
-    queueCache(`${actionVar}ResourceAdded`);
+    queueCache(`${actionVar}ResourceToAdd`);
     queueCache(`${actionVar}Level`);
     queueCache(`${actionVar}MaxLevel`);
     queueCache(`${actionVar}HighestLevelContainer2`);
@@ -92,9 +92,9 @@ function generateActionDisplay(actionVar) {
             <span style="font-size:18px;font-weight:bold;">${actionObj.title}<br></span>
             <span style="font-size:16px;font-weight:bold;" id='${actionVar}Resource'>0</span> 
             <span style="color:${resourceColor};font-size:14px;font-weight:bold;">${capitalizeFirst(dataObj.resourceName)}</span>
-            <span style="font-size:14px;color:var(--text-muted)">${actionObj.isGenerator?`(+<span id="${actionVar}ResourceAdded" style="color:var(--text-primary);font-weight:bold;">???</span>)`:""}</span><br>
+            <span style="font-size:14px;color:var(--text-muted)">${actionObj.isGenerator?`(+<span id="${actionVar}ResourceToAdd" style="color:var(--text-primary);font-weight:bold;">???</span>)`:""}</span><br>
             <span style="font-size:12px;position:relative;color:var(--text-muted)">
-                Level <span id="${actionVar}Level" style="color:var(--text-primary);font-weight:bold;">0</span>
+                ${!actionObj.isSpell?"Level ":"Charges "}<span id="${actionVar}Level" style="color:var(--text-primary);font-weight:bold;">0</span>
                 ${actionObj.maxLevel >= 0 ? ` / <span id="${actionVar}MaxLevel" style="color:var(--text-primary);font-weight:bold;">0</span>` : ""}
                 <span id="${actionVar}HighestLevelContainer2"> 
                     (<b><span id='${actionVar}HighestLevel2' style="color:var(--text-primary);font-weight:bold;"></span></b>)
@@ -255,7 +255,7 @@ function generateActionDisplay(actionVar) {
 
     let levelInfoContainer = Raw.html`
             <div id="${actionVar}_infoContainer" style="display:none;padding:5px;max-height:220px;overflow-y:auto;">
-        Tier <b>${actionObj.tier}</b>${actionObj.isGenerator ? " Generator" : " Action"}<br>
+        Tier <b>${actionObj.tier}</b>${actionObj.isSpell ? " Spell" : actionObj.isGenerator ? " Generator" : " Action"}<br>
         Efficiency, found in the title, is Expertise Mult * Base Efficiency (x<b><span id="${actionVar}EfficiencyBase"></span></b>), capping at <b>100</b>%.<br>
         ${actionObj.isGenerator?"":(`Consume and send rate is ${actionObj.tierMult()*100}% of ${dataObj.resourceName} * efficiency.<br>`)}<br>
         ${onComplete}
@@ -577,7 +577,7 @@ function createDownStreamSliders(actionObj) {
                     oninput="validateInput('${actionVar}', '${downstreamVar}')" onchange="downstreamNumberChanged('${actionVar}', '${downstreamVar}')" >
                     
 
-                <div id="${actionVar}Container${downstreamVar}" style="display:inline-block;width: 220px; height: 20px; user-select: none; padding: 0 10px; box-sizing: border-box; cursor: pointer;">
+                <div id="${actionVar}Slider_Container${downstreamVar}" style="display:inline-block;width: 220px; height: 20px; user-select: none; padding: 0 10px; box-sizing: border-box; cursor: pointer;">
                     <div id="${actionVar}Track${downstreamVar}" style="margin-top:6px;width: 100%; height: 5px; background: linear-gradient(to right, red 10%, #ddd 10%, #ddd 90%, green 90%); position: relative;">
                         <div id="${actionVar}Thumb${downstreamVar}" style="width: 10px; height: 20px; background-color: ${resourceColor}; position: absolute; top: 50%; transform: translate(-50%, -50%); pointer-events: none;"></div>
                     </div>
@@ -598,8 +598,8 @@ function attachCustomSliderListeners() {
         for (let downstreamVar of actionObj.downstreamVars) {
             // Use an IIFE to correctly scope variables for each iteration's event listeners,
             (function(actVar, downVar) {
-                const container = document.getElementById(actVar + "Container" + downVar);
-                const thumb = document.getElementById(actVar + "Thumb" + downVar);
+                const container = document.getElementById(`${actVar}Slider_Container${downVar}`);
+                const thumb = document.getElementById(`${actVar}Thumb${downVar}`);
 
                 let downstreamObj = data.actions[downVar];
                 if(!downstreamObj.hasUpstream) {
@@ -616,7 +616,7 @@ function attachCustomSliderListeners() {
 
                 const handleDrag = (event) => {
                     event.preventDefault();
-                    const track = document.getElementById(actVar + "Track" + downVar);
+                    const track = document.getElementById(`${actVar}Track${downVar}`);
                     if (!track) return;
 
                     const trackRect = track.getBoundingClientRect();
@@ -627,11 +627,11 @@ function attachCustomSliderListeners() {
 
                     const newValue = Math.round((newLeft / trackRect.width) * 100);
 
-                    if (data.actions[actVar]["downstreamRate" + downVar] === newValue) {
+                    if (data.actions[actVar][`downstreamRate${downVar}`] === newValue) {
                         return;
                     }
 
-                    data.actions[actVar]["downstreamRate" + downVar] = newValue;
+                    data.actions[actVar][`downstreamRate${downVar}`] = newValue;
                     setSliderUI(actVar, downVar, newValue);
                 };
 
@@ -645,6 +645,25 @@ function attachCustomSliderListeners() {
                     document.addEventListener('mousemove', handleDrag);
                     document.addEventListener('mouseup', stopDrag);
                 });
+
+
+                const hoverTargetContainer = document.getElementById(`${actVar}SliderContainer${downVar}`);
+                const line = document.getElementById(`${actVar}_${downVar}_Line_Outer`);
+                const largeVersionContainer = document.getElementById(`${downVar}LargeVersionContainer`);
+                const lockContainer = document.getElementById(`${downVar}LockContainer`);
+
+                hoverTargetContainer.addEventListener('mouseenter', () => {
+                    line.style.borderColor = "yellow";
+                    largeVersionContainer.style.borderColor = "yellow";
+                    lockContainer.style.borderColor = "yellow";
+                });
+
+                hoverTargetContainer.addEventListener('mouseleave', () => {
+                    line.style.borderColor = "transparent";
+                    setBorderColor(downVar, selectedStat);
+                    lockContainer.style.borderColor = "black";
+                });
+
 
             })(actionVar, downstreamVar, actionObj); // Pass the current actionObj to the IIFE
         }
@@ -711,7 +730,7 @@ function generateLinesBetweenActions() {
         for(let downstreamVar of actionObj.downstreamVars) {
             let downstreamDataObj = actionData[downstreamVar];
             if(!downstreamDataObj || downstreamDataObj.realX === undefined || dataObj.realX === undefined) {
-                console.log(downstreamVar);
+                console.log(`Failed to create line from ${actionVar} to ${downstreamVar}`);
                 continue;
             }
             // Calculate the centers of each object
@@ -722,8 +741,8 @@ function generateLinesBetweenActions() {
 
             let sourceBackgroundColor = getResourceColor(dataObj);
             let targetBackgroundColor = getResourceColor(downstreamDataObj);
-            let isDifferentResource = actionObj.resourceName !== downstreamDataObj.resourceName;
-            let backgroundColor = isDifferentResource ? `linear-gradient(to right, ${sourceBackgroundColor}, ${targetBackgroundColor})` : 'var(--line-color)';
+            let isDifferentMomentum = downstreamDataObj.hasUpstream === false;
+            let backgroundColor = isDifferentMomentum ? `linear-gradient(to right, ${sourceBackgroundColor}, ${targetBackgroundColor})` : 'var(--line-color)';
 
             let borderId = `${actionVar}_${downstreamVar}_Line_Outer`;
             let lineId = `${actionVar}_${downstreamVar}_Line_Inner`;
@@ -735,11 +754,8 @@ function generateLinesBetweenActions() {
 
             const labelMode = getLabelOrientation(angle);
 
-            let topTransform = "translateX(-50%)";
-            let bottomTransform = "translateX(-50%)";
             let topY = "-12px";
             let bottomY = "12px";
-            let lineTransform = "";
             let labelWrapperTransform = "translate(-50%, -50%) ";
 
             if (labelMode === "vertical") {
@@ -750,7 +766,6 @@ function generateLinesBetweenActions() {
                 labelWrapperTransform += `rotate(180deg)`;
             }
 
-            let isDifferentMomentum = actionObj.resourceName !== downstreamDataObj.resourceName;
             let onclickText = isDifferentMomentum?``:`handleLineClick('${borderId}', {from: '${actionVar}', to: '${downstreamVar}'})`;
             let cursorStyle = isDifferentMomentum?``:`cursor:pointer`;
 
@@ -762,7 +777,7 @@ function generateLinesBetweenActions() {
             let lineHTML = Raw.html`
                 <div id="${borderId}" class="line-connection" 
                      style="${cursorStyle}; display:none; align-items: center; position: absolute; width: ${length}px; height: 20px; 
-                        background: ${backgroundColor}; opacity: 1; transform-origin: 0 50%; transform: rotate(${angle}deg); left:${x1}px; top:${y1}px;border-radius:20px;"
+                        background: ${backgroundColor}; opacity: 1; transform-origin: 0 50%; transform: rotate(${angle}deg); left:${x1}px; top:${y1}px;border-radius:20px;border:2px solid transparent"
                      onclick="${onclickText}">
                      
                     <div id="${lineId}" style="width: 100%; height: 0; background-color: ${targetBackgroundColor}; position: relative;text-align:center;">
@@ -831,8 +846,8 @@ function setAllCaches() {
 
     for(let actionVar in data.actions) {
         view.cached[actionVar + "ActionPower"] = document.getElementById(actionVar + "ActionPower");
-        view.cached[actionVar + "AmountToSend"] = document.getElementById(actionVar + "AmountToSend");
-        view.cached[actionVar + "MomentumTaken"] = document.getElementById(actionVar + "MomentumTaken");
+        view.cached[actionVar + "ResourceSent"] = document.getElementById(actionVar + "ResourceSent");
+        view.cached[actionVar + "ResourceTaken"] = document.getElementById(actionVar + "ResourceTaken");
     }
 
     clearCacheQueue();

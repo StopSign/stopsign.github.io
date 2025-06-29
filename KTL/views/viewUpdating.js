@@ -1,6 +1,7 @@
 let view = {
     cached: {}, //contains the elements that are being iterated over and updated regularly,
-    prevValues: {}
+    prevValues: {},
+    scheduled: [],
 };
 
 /*
@@ -20,6 +21,21 @@ let views = {
             updateUpgradeView(upgradeVar);
         }
         updateGlobals();
+
+        views.updateScheduled();
+    },
+    scheduleUpdate: function(elementId, value, type) {
+        view.scheduled.push({
+            id:elementId,
+            value:value,
+            type:type
+        })
+    },
+    updateScheduled: function() { //Comes from async processes in data, like onComplete
+        for(let scheduled of view.scheduled) {
+            views.updateVal(scheduled.id, scheduled.value, scheduled.type);
+        }
+        view.scheduled = [];
     },
     updateStats:function() {
         for(let attVar in data.atts) {
@@ -212,8 +228,8 @@ let views = {
                 views.updateVal(`${actionVar}_${attVar}AttExpMult`, actionObj[`${attVar}AttExpMult`], "textContent", 3);
             }
 
-            for(let efficiencyStat of actionObj.efficiencyAtts) {
-                let attVar = efficiencyStat[0];
+            for(let efficiencyAtt of actionObj.efficiencyAtts) {
+                let attVar = efficiencyAtt[0];
                 views.updateVal(`${actionVar}_${attVar}AttEfficiencyMult`, actionObj[`${attVar}AttEfficiencyMult`], "textContent", 3);
             }
 
@@ -234,12 +250,9 @@ let views = {
             ["highestLevel2", 1]
         ];
         if(actionObj.isGenerator) {
-            roundedNumbers.push(["resourceAdded", 2]);
+            roundedNumbers.push(["resourceToAdd", 2]);
             roundedNumbers.push(["actionPowerMult", 3]);
             // roundedNumbers.push(["actionPower", 2]);
-        }
-        if(actionObj.isGenerator && actionObj.parentVar) {
-            roundedNumbers.push(["amountToSend", 2]);
         }
 
         if(actionObj.currentMenu === "atts") {

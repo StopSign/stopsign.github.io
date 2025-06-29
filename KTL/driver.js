@@ -110,7 +110,6 @@ function secondPassed() {
 }
 
 
-
 function gameTick() {
     for (let actionVar in data.actions) {
         let actionObj = data.actions[actionVar];
@@ -118,10 +117,10 @@ function gameTick() {
         actionObj.resourceIncrease = 0;
         actionObj.resourceDecrease = 0;
         actionObj.progressGain = 0;
-        // This is reset after being used to prevent it from persisting across ticks
-        if(actionObj.isGenerator) {
-            actionObj.amountToSend = 0;
-        }
+    }
+
+    for(let actionVar in data.actions) {
+        tickActionTimer(actionVar);
     }
 
     for (let actionVar in data.actions) {
@@ -158,7 +157,6 @@ function gameTick() {
         data.atts[attVar].perMinute = attsPerSecond[attVar] ? attsPerSecond[attVar]*60 : 0;
     }
 
-
     upgradeUpdates()
 }
 
@@ -166,11 +164,11 @@ function calcDeltas() {
     // Aggregate all visual increases from persistent generator rates.
     for (let actionVar in data.actions) {
         let generatorObj = data.actions[actionVar];
-        if (generatorObj.isGenerator && generatorObj.currentRate > 0) {
+        if (generatorObj.isGenerator && generatorObj.resourceToAdd > 0) {
             let targetVar = generatorObj.generatorTarget || actionVar;
             let targetObj = data.actions[targetVar];
             if (targetObj) {
-                targetObj.resourceIncrease += generatorObj.currentRate;
+                targetObj.resourceIncrease += generatorObj.resourceToAdd * generatorObj.progressGain / generatorObj.progressMax;
             }
         }
     }
@@ -205,6 +203,16 @@ function calcDeltas() {
 function secondTick() {
     if(data.gameState !== "KTL") {
         data.secondsPerReset++;
+    }
+}
+
+//spells get to reset before actions are ready to use them
+function tickActionTimer(actionVar) {
+    let actionObj = data.actions[actionVar];
+
+    actionObj.cooldownTimer += 1 / data.ticksPerSecond;
+    if(actionObj.cooldownTimer > actionObj.cooldown) {
+        actionObj.cooldownTimer = actionObj.cooldown;
     }
 }
 
@@ -281,7 +289,6 @@ function checkProgressCompletion(actionObj, dataObj) {
         actionObj.progress -= actionObj.progressMax;
         if(dataObj.onCompleteCustom) {
             dataObj.onCompleteCustom();
-            actionObj.currentRate = (actionObj.resourceAdded * actionObj.progressGain) / actionObj.progressMax;
         }
         actionAddExp(actionObj);
         return true;
