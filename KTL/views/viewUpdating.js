@@ -136,10 +136,15 @@ let views = {
             return false;
         }
 
-
         let miniVersion = scale < .35;
         views.updateVal(`${actionVar}LargeVersionContainer`, !miniVersion?"":"none", "style.display");
         views.updateVal(`${actionVar}SmallVersionContainer`, miniVersion?"":"none", "style.display");
+
+        // let miniVersion = scale < .35;
+        // let mediumVersion = scale < .55 && scale >= .35;
+        // views.updateVal(`${actionVar}LargeVersionContainer`, !miniVersion&&!mediumVersion?"":"none", "style.display");
+        // views.updateVal(`${actionVar}MediumVersionContainer`, mediumVersion&&!miniVersion?"":"none", "style.display");
+        // views.updateVal(`${actionVar}SmallVersionContainer`, miniVersion&&!mediumVersion?"":"none", "style.display");
         views.updateVal(`${actionVar}SmallVersionContainer`, (1 / scale)*.8+"", "style.scale");
 
         let isMaxLevel = (actionObj.maxLevel !== -1 && actionObj.level >= actionObj.maxLevel);

@@ -210,7 +210,7 @@ function secondTick() {
 function tickActionTimer(actionVar) {
     let actionObj = data.actions[actionVar];
 
-    actionObj.cooldownTimer += 1 / data.ticksPerSecond;
+    actionObj.cooldownTimer += 1 / data.ticksPerSecond * (actionObj.efficiency/100);
     if(actionObj.cooldownTimer > actionObj.cooldown) {
         actionObj.cooldownTimer = actionObj.cooldown;
     }

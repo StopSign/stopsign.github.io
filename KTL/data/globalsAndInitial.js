@@ -233,7 +233,7 @@ function initializeData() {
     create("echoKindle", ["sparkMana"], 0, 0)
     create("sparkMana", ["poolMana"], 0, 1);
     create("poolMana", ["expelMana"], 0, 1);
-    create("expelMana", ["auraControl", "manaImprovement", "prepareSpells"], 0, 1);
+    create("expelMana", ["prepareSpells", "manaImprovement", "auraControl",], 0, 1);
 
     create("auraControl", [], 0, 1);
 

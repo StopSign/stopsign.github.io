@@ -64,6 +64,15 @@ let actionData = {
         onCompleteCustom: function () {
             let actionObj = data.actions.overclock;
             actionData.overclock.updateMults();
+            if(isSpellReady('overcharge')) {
+                useCharge('overcharge');
+                if(isSpellReady('overboost')) {
+                    useCharge('overboost');
+                    if(isSpellReady('overdrive')) {
+                        useCharge('overdrive');
+                    }
+                }
+            }
 
             actionObj.resource += actionObj.resourceToAdd;
 
@@ -78,13 +87,10 @@ let actionData = {
             let spellMult = 1;
             if(isSpellReady('overcharge')) {
                 spellMult *= actionData.overcharge.spellpower();
-                useCharge('overcharge');
                 if(isSpellReady('overboost')) {
                     spellMult *= actionData.overboost.spellpower();
-                    useCharge('overboost');
                     if(isSpellReady('overdrive')) {
                         spellMult *= actionData.overdrive.spellpower();
-                        useCharge('overdrive');
                     }
                 }
             }
@@ -1386,7 +1392,7 @@ actionData = {
     echoKindle: {
         tier:0, plane:2, resourceName:"legacy",
         progressMaxBase:2, progressMaxIncrease:1,
-        expToLevelBase:2, expToLevelIncrease:1.5,
+        expToLevelBase:.5, expToLevelIncrease:1.3,
         actionPowerBase:1, actionPowerMult:1, actionPowerMultIncrease:1.1,
         efficiencyBase:.25,
         unlockCost:0, visible:true, unlocked:true, purchased: true, hasDeltas: false,
@@ -1417,7 +1423,7 @@ actionData = {
             }
             return Math.pow(resource, .5);
         },
-        onLevelAtts:[["spark", 5]],
+        onLevelAtts:[["spark", 2]],
         expAtts:[["vision", 1]],
         efficiencyAtts:[["pulse", 1]],
         onCompleteText: {english:Raw.html`
@@ -1427,13 +1433,14 @@ actionData = {
     },
     sparkMana: {
         tier:0, plane:2, resourceName:"mana",
-        progressMaxBase:10, progressMaxIncrease:10,
+        progressMaxBase:10, progressMaxIncrease:4,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:1,
-        unlockCost:1, visible:true, unlocked:false, purchased: true, hasUpstream:false,
+        unlockCost:5, visible:true, unlocked:false, purchased: true, hasUpstream:false,
         onUnlock: function() {
             unveilAction('poolMana');
             data.actions.poolMana.generatorSpeed = 2;
+            unveilAction('expelMana')
         },
         onLevelAtts:[["spark", 10]],
         expAtts:[["amplification", 1]],
@@ -1442,10 +1449,10 @@ actionData = {
     poolMana: {
         tier:0, plane:2, resourceName:"mana",
         progressMaxBase:120, progressMaxIncrease:1,
-        expToLevelBase:1000, expToLevelIncrease:1.3,
+        expToLevelBase:10, expToLevelIncrease:3,
         actionPowerBase:1, actionPowerMult:1, actionPowerMultIncrease:1.03,
         efficiencyBase:.5,
-        unlockCost:0, visible:true, unlocked:true, purchased: true, hasDeltas: false, hasUpstream:false,
+        unlockCost:0, visible:false, unlocked:true, purchased: true, hasDeltas: false, hasUpstream:false,
         isGenerator:true, generatorTarget:"poolMana", generatorSpeed:0,
         onCompleteCustom: function() {
             let sparkManaObj = data.actions.sparkMana;
@@ -1471,7 +1478,7 @@ actionData = {
         onUnlock: function() {
         },
         onLevelAtts:[["pulse", 1]],
-        expAtts:[],
+        expAtts:[["amplification", 1]],
         efficiencyAtts:[["amplification", .1]],
         onCompleteText: {english:Raw.html`
                 -<span style="font-weight:bold;" id="poolManaResourceTaken">???</span> Mana was taken from Spark Mana, converted to<br>
@@ -1481,10 +1488,10 @@ actionData = {
     },
     expelMana: {
         tier:1, plane:2, resourceName:"mana",
-        progressMaxBase:3, progressMaxIncrease:9,
+        progressMaxBase:1, progressMaxIncrease:3,
         expToLevelBase:3, expToLevelIncrease:1,
-        efficiencyBase:.25,
-        unlockCost:5, visible:true, unlocked:false, purchased: true,
+        efficiencyBase:.8,
+        unlockCost:3, visible:false, unlocked:false, purchased: true,
         onUnlock: function() {
             unveilAction("manaImprovement")
             unveilAction("magicResearch")
@@ -1492,82 +1499,82 @@ actionData = {
             unveilAction("prepareSpells")
             unveilAction("preparePhysicalSpells")
         },
-        onLevelAtts:[["amplification", 5]],
+        onLevelAtts:[["amplification", 3]],
         expAtts:[],
         efficiencyAtts:[["integration", .5]]
     },
     prepareSpells: {
         tier:1, plane:2, resourceName:"mana",
-        progressMaxBase:6, progressMaxIncrease:9,
+        progressMaxBase:2, progressMaxIncrease:9,
         expToLevelBase:3, expToLevelIncrease:1,
-        efficiencyBase:1, maxLevel:9,
-        unlockCost:10, visible:false, unlocked:false, purchased: true,
+        efficiencyBase:.7, maxLevel:9,
+        unlockCost:6, visible:false, unlocked:false, purchased: true,
         onUnlock: function() {
             unveilAction("overcharge")
         },
-        onLevelAtts:[],
+        onLevelAtts:[["amplification", 6]],
         expAtts:[],
-        efficiencyAtts:[]
+        efficiencyAtts:[["integration", .5]]
     },
     preparePhysicalSpells: {
         tier:1, plane:2, resourceName:"mana",
-        progressMaxBase:12, progressMaxIncrease:3,
+        progressMaxBase:6, progressMaxIncrease:9,
         expToLevelBase:3, expToLevelIncrease:1,
-        efficiencyBase:1, maxLevel:9,
-        unlockCost:20, visible:false, unlocked:false, purchased: true,
+        efficiencyBase:.6, maxLevel:9,
+        unlockCost:15, visible:false, unlocked:false, purchased: true,
         onUnlock: function() {
             unveilAction("overboost")
         },
-        onLevelAtts:[],
+        onLevelAtts:[["amplification", 9]],
         expAtts:[],
-        efficiencyAtts:[]
+        efficiencyAtts:[["integration", .5]]
     },
     overcharge: {
         tier:1, plane:2, resourceName:"mana",
-        progressMaxBase:100, progressMaxIncrease:1,
+        progressMaxBase:10, progressMaxIncrease:1,
         expToLevelBase:3, expToLevelIncrease:1,
-        efficiencyBase:1, maxLevel:1, isSpell:true, cooldown:60,
+        efficiencyBase:.4, maxLevel:1, isSpell:true, cooldown:60,
         unlockCost:20, visible:false, unlocked:false, purchased: true,
         onUnlock: function() {
-            unveilAction("overdrive")
+            unveilAction("overdrive");
         },
         spellpower: function() {
-            return 10 * data.actions.overcharge.efficiency / 100;
+            return 10;
         },
         onLevelAtts:[],
         expAtts:[],
-        efficiencyAtts:[],
-        extraInfo: {english:Raw.html`If a charge is available, the next Overclock will give (x10 * efficiency) momentum.`}
+        efficiencyAtts:[["spellcraft", .1], ["wizardry", .1], ["archmagery", .1]],
+        extraInfo: {english:Raw.html`If a charge is available, the next Overclock will give x10 momentum (this does not affect exp).<br>Cooldown is slowed by efficiency.`}
     },
     overboost: {
         tier:1, plane:2, resourceName:"mana",
         progressMaxBase:1000, progressMaxIncrease:3,
         expToLevelBase:3, expToLevelIncrease:1,
-        efficiencyBase:1, maxLevel:1, isSpell:true,
+        efficiencyBase:.2, maxLevel:1, isSpell:true,
         unlockCost:1000, visible:false, unlocked:false, purchased: true,
         onUnlock: function() {
         },
         spellpower: function() {
-            return 10 * data.actions.overboost.efficiency / 100;
+            return 10;
         },
         onLevelAtts:[],
         expAtts:[],
-        efficiencyAtts:[]
+        efficiencyAtts:[["spellcraft", .1], ["wizardry", .1], ["archmagery", .1]]
     },
     overdrive: {
         tier:1, plane:2, resourceName:"mana",
         progressMaxBase:1000, progressMaxIncrease:3,
         expToLevelBase:3, expToLevelIncrease:1,
-        efficiencyBase:1, maxLevel:1, isSpell:true,
+        efficiencyBase:.1, maxLevel:1, isSpell:true,
         unlockCost:1000, visible:false, unlocked:false, purchased: true,
         onUnlock: function() {
         },
         spellpower: function() {
-            return 10 * data.actions.overdrive.efficiency / 100;
+            return 10;
         },
         onLevelAtts:[],
         expAtts:[],
-        efficiencyAtts:[]
+        efficiencyAtts:[["spellcraft", .1], ["wizardry", .1], ["archmagery", .1]]
     },
     manaImprovement: {
         tier:1, plane:2, resourceName:"mana",

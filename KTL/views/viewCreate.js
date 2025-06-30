@@ -203,8 +203,8 @@ function generateActionDisplay(actionVar) {
 
     let maxLevel = Raw.html`
         <div id="${actionVar}IsMaxLevel" class="hyperVisible" 
-            style="position:absolute; display:none;left:88px;top:63px;color:var(--max-level-color);font-size:22px;">
-            <b>MAX LEVEL</b>
+            style="position:absolute; display:none;left:88px;top:63px;color:${!actionObj.isSpell?"var(--max-level-color)":"var(--text-bright)"};font-size:22px;">
+            <b>${!actionObj.isSpell?"MAX LEVEL":"MAX CHARGES"}</b>
         </div>`
 
     title = title + generateOnLevelContainers(actionObj);
@@ -659,9 +659,8 @@ function attachCustomSliderListeners() {
                 });
 
                 hoverTargetContainer.addEventListener('mouseleave', () => {
-                    line.style.borderColor = "transparent";
+                    line.style.borderColor = "black";
                     setBorderColor(downVar, selectedStat);
-                    lockContainer.style.borderColor = "black";
                 });
 
 
@@ -777,7 +776,7 @@ function generateLinesBetweenActions() {
             let lineHTML = Raw.html`
                 <div id="${borderId}" class="line-connection" 
                      style="${cursorStyle}; display:none; align-items: center; position: absolute; width: ${length}px; height: 20px; 
-                        background: ${backgroundColor}; opacity: 1; transform-origin: 0 50%; transform: rotate(${angle}deg); left:${x1}px; top:${y1}px;border-radius:20px;border:2px solid transparent"
+                        background: ${backgroundColor}; opacity: 1; transform-origin: 0 50%; transform: rotate(${angle}deg); left:${x1}px; top:${y1}px;border-radius:20px;border:2px solid black"
                      onclick="${onclickText}">
                      
                     <div id="${lineId}" style="width: 100%; height: 0; background-color: ${targetBackgroundColor}; position: relative;text-align:center;">

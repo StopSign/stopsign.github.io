@@ -363,6 +363,7 @@ function clickedAttName(attVar) {
         views.updateVal(`${actionVar}LargeVersionContainer`, "black", "style.borderColor");
         views.updateVal(`${actionVar}LockContainer`, "black", "style.borderColor");
         views.updateVal(`${actionVar}SmallVersionContainer`, "", "style.border");
+        // views.updateVal(`${actionVar}MediumVersionContainer`, "", "style.border");
     }
 
     //clear previous
@@ -436,6 +437,7 @@ function setBorderColor(actionVar, attVar) {
     else if (effAttUsed) color = "var(--attribute-use-eff-color)";
 
     views.updateVal(`${actionVar}LargeVersionContainer`, color, "style.borderColor");
+    // views.updateVal(`${actionVar}MediumVersionContainer`, color, "style.borderColor");
     views.updateVal(`${actionVar}LockContainer`, color, "style.borderColor");
     views.updateVal(`${actionVar}SmallVersionContainer`, color==="black"?"":("2px solid " + color), "style.border");
 }
