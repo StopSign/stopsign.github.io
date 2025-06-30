@@ -55,7 +55,7 @@ function moveActionContainer() {
 
     actionContainer.style.transform = `translate(${transformX[data.planeTabSelected]}px, ${transformY[data.planeTabSelected]}px) scale(${scale})`;
 
-    forceRedraw(windowElement);
+    // forceRedraw(windowElement);
 
     animationFrameId = requestAnimationFrame(moveActionContainer);
 }

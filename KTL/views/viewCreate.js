@@ -105,14 +105,22 @@ function generateActionDisplay(actionVar) {
         </span>
     `
 
+    let mediumTitle = Raw.html`
+        <span onclick="actionTitleClicked('${actionVar}')" style="color:var(--text-primary);cursor:pointer;position:absolute;top:-77px;height:77px;left:0;
+            white-space: nowrap;border-width: 0 0 0 3px;border-style: solid;border-color: var(--text-muted);padding-left:4px;background-color:var(--overlay-color)">
+            
+        </span>
+    `
+
     queueCache(`${actionVar}_downstreamMenuButton`);
     queueCache(`${actionVar}_infoMenuButton`);
     queueCache(`${actionVar}_attsMenuButton`);
     queueCache(`${actionVar}_storyMenuButton`);
+    queueCache(`${actionVar}MenuButtons`);
 
     let menuContainer = Raw.html`
-        <div style="position:absolute;top:-18px;font-size:13px;left:3px;">
-        ${actionVar==="overclock"?"":`<span onclick="actionTitleClicked('${actionObj.parentVar}')" 
+        <div id="${actionVar}MenuButtons" style="position:absolute;top:-18px;font-size:13px;left:3px;">
+            ${actionVar==="overclock"?"":`<span onclick="actionTitleClicked('${actionObj.parentVar}')" 
             class="buttonSimple" style="margin-right:3px;width:30px;height:30px;text-align:center;cursor:pointer;padding:0 4px;">^</span>`}
         <span id="${actionVar}_downstreamMenuButton" onclick="clickActionMenu('${actionVar}', 'downstream')" class="buttonSimple" 
             style="margin-right:3px;width:30px;height:30px;text-align:center;cursor:pointer;padding:0 4px;">Downstream</span>
@@ -127,32 +135,34 @@ function generateActionDisplay(actionVar) {
     queueCache(`${actionVar}ResourceIncrease`);
     queueCache(`${actionVar}ResourceDecrease`);
     queueCache(`${actionVar}ResourceDelta`);
+    queueCache(`${actionVar}DeltasDisplayContainer`);
 
     let momentumContainer = Raw.html`
-    <div style='padding:3px 3px 0;'>
+    <div id="${actionVar}DeltasDisplayContainer" style="padding:3px 3px 0;">
         <div style="font-style: italic; color: var(--text-muted);">
-            <span style="display:inline-block;width:60px;"><u>Increase</u></span>
-            <span style="display:inline-block;width:60px;"><u>Decrease</u></span>
-            <span style="display:inline-block;width:60px;"><u>Change</u></span>
+            <span style="display:inline-block;width:60px;;text-decoration:underline">Increase</span>
+            <span style="display:inline-block;width:60px;;text-decoration:underline">Decrease</span>
+            <span style="display:inline-block;width:60px;text-decoration:underline">Change</span>
         </div>
         <div>
-            <span style="display:inline-block;width:60px;white-space: nowrap;">+<b><span id="${actionVar}ResourceIncrease"></span></b>/s</span>
-            <span style="display:inline-block;width:60px;white-space: nowrap;">-<b><span id="${actionVar}ResourceDecrease"></span></b>/s</span>
-            <span style="display:inline-block;width:60px;white-space: nowrap;">Δ<b><span id="${actionVar}ResourceDelta"></span></b>/s</span>
+            <span style="display:inline-block;width:60px;white-space: nowrap;">+<span id="${actionVar}ResourceIncrease" style="font-weight:bold"></span>/s</span>
+            <span style="display:inline-block;width:60px;white-space: nowrap;">-<span id="${actionVar}ResourceDecrease" style="font-weight:bold"></span>/s</span>
+            <span style="display:inline-block;width:60px;white-space: nowrap;">Δ<span id="${actionVar}ResourceDelta" style="font-weight:bold"></span>/s</span>
         </div>
     </div>`;
 
     queueCache(`${actionVar}BalanceNeedle`);
+    queueCache(`${actionVar}BalanceNeedleLabel`);
 
     let balanceNeedle =
         Raw.html`
-        <div style="color:var(--text-muted)">Change Ratio:</div>
-        <div style="position:relative;width:100%;height:10px;">
-            <div style="position:absolute;top:-2px;width:100%;height:10px;border-top:1px solid;">
+        <div id="${actionVar}BalanceNeedleLabel" style="color:var(--text-muted)">Change Ratio:</div>
+        <div style="position:relative;width:100%;height:12px;">
+            <div style="position:absolute;top:-2px;width:100%;height:11px;border-top:1px solid;">
                 <div style="position:absolute;top:0;left:25%;width:2px;height:100%;background-color:var(--text-primary);opacity:0.6;"></div> 
                 <div style="position:absolute;top:0;left:50%;width:2px;height:100%;background-color:var(--text-primary);opacity:0.6;"></div> 
                 <div style="position:absolute;top:0;left:75%;width:2px;height:100%;background-color:var(--text-primary);opacity:0.6;"></div> 
-                <div id="${actionVar}BalanceNeedle" style="position:absolute;top:-3px;width:2px;height:16px;background-color:red;left:50%;"></div>
+                <div id="${actionVar}BalanceNeedle" style="position:absolute;top:-3px;width:4px;height:16px;background-color:red;left:50%;"></div>
                 <span style="color:var(--text-extra-muted);position:absolute;left:25%;top:0;font-size:10px;transform:translateX(-100%);">x1</span>
                 <span style="color:var(--text-extra-muted);position:absolute;left:50%;top:0;font-size:10px;transform:translateX(-100%);">x2</span>
                 <span style="color:var(--text-extra-muted);position:absolute;left:75%;top:0;font-size:10px;transform:translateX(-100%);">x10</span>
@@ -166,17 +176,19 @@ function generateActionDisplay(actionVar) {
     queueCache(`${actionVar}ProgressMax`);
     queueCache(`${actionVar}ProgressGain`);
     queueCache(`${actionVar}ProgressMaxIncrease`);
+    queueCache(`${actionVar}ProgressBarLabels`);
 
     let pbar = Raw.html`
         <div style="width:100%;height:16px;position:relative;text-align:left;border-top:1px solid;border-bottom:1px solid;">
             <div id="${actionVar}ProgressBarInner" style="width:30%;background-color:${resourceColor};height:100%;position:absolute;"></div>
-            <div style="position:absolute;top:1px;left:4px;width:97%;color:var(--text-muted)">
+            <div id="${actionVar}ProgressBarLabels" style="position:absolute;top:1px;left:4px;width:97%;color:var(--text-muted)">
                 <span style="color:var(--text-primary)">
-                    <b><span id="${actionVar}Progress">0</span></b> / 
-                    <b><span id="${actionVar}ProgressMax">1</span></b>
+                    <span id="${actionVar}Progress" style="font-weight:bold;">0</span> / 
+                    <span id="${actionVar}ProgressMax" style="font-weight:bold;">1</span>
                 </span> progress
-                (+<b><span id="${actionVar}ProgressGain" style="color:var(--text-primary)">1</span></b>/s)
-                <span style="position:absolute;right:0">x<b><span id="${actionVar}ProgressMaxIncrease" style="color:var(--text-primary)">1</span></b>/lvl</span>
+                (+<span id="${actionVar}ProgressGain" style="color:var(--text-primary);font-weight:bold;">1</span>/s)
+                <span style="position:absolute;right:0;">x<span id="${actionVar}ProgressMaxIncrease" 
+                    style="color:var(--text-primary);font-weight:bold;">1</span>/lvl</span>
             </div>
         </div>`;
 
@@ -185,11 +197,12 @@ function generateActionDisplay(actionVar) {
     queueCache(`${actionVar}ExpToLevel`);
     queueCache(`${actionVar}ExpToAdd2`);
     queueCache(`${actionVar}ExpToLevelIncrease`);
+    queueCache(`${actionVar}ExpBarLabels`);
 
     let expBar = Raw.html`
-        <div style="width:100%;height:16px;position:relative;text-align:left;border-bottom:1px solid;">
+        <div style="width:100%;height:16px;position:relative;text-align:left;border-bottom:1px solid;margin-top:1px;">
             <div id="${actionVar}ExpBarInner" style="width:30%;background-color:var(--exp-color);height:100%;position:absolute"></div>
-            <div style="position:absolute;top:1px;left:4px;width:97%;color:var(--text-muted)">
+            <div id="${actionVar}ExpBarLabels" style="position:absolute;top:1px;left:4px;width:97%;color:var(--text-muted)">
                 <span style="color:var(--text-primary)">
                     <b><span id="${actionVar}Exp">0</span></b> / 
                     <b><span id="${actionVar}ExpToLevel">1</span></b>
@@ -286,7 +299,8 @@ function generateActionDisplay(actionVar) {
 
     let lockOverAll = Raw.html`
         <div id="${actionVar}LockContainer" 
-            style="position:absolute;background-color: var(--bg-secondary);width:100%;height:100%;top:0;left:0;text-align:center;border:2px solid black;">
+            style="position:absolute;background-color: var(--bg-secondary);width:100%;height:100%;top:0;left:0;
+            text-align:center;border:2px solid black;min-height:150px;">
             <span id="${actionVar}LockIcon"></span><br>
             <span>
                 <div id="${actionVar}UnlockCostContainer">
@@ -300,16 +314,19 @@ function generateActionDisplay(actionVar) {
     queueCache(`${actionVar}_downstreamContainer`);
     queueCache(`${actionVar}_downstreamButtonContainer`);
     queueCache(`${actionVar}TotalSend`);
+    queueCache(`${actionVar}ToggleDownstreamButtons`);
 
     let downstreamContainer = Raw.html`
         <div id="${actionVar}_downstreamContainer" style="padding:5px;display:none;">
             <div id="${actionVar}_downstreamButtonContainer">
                 ${createDownStreamSliders(actionObj)}
-                <span onclick="toggleAllZero('${actionVar}')" 
-                    class="buttonSimple" style="margin-right:3px;width:30px;height:30px;text-align:center;cursor:pointer;padding:0 4px;">All 0</span>
-                <span onclick="toggleAllHundred('${actionVar}')" 
-                    class="buttonSimple" style="margin-right:3px;width:30px;height:30px;text-align:center;cursor:pointer;padding:0 4px;">All 100</span>
-                <div style="color:var(--text-muted)">Total ${dataObj.resourceName} sending downstream: <b><span style="color:var(--text-primary)" id='${actionVar}TotalSend'>1</span></b>/s</div>
+                <div id="${actionVar}ToggleDownstreamButtons">
+                    <span onclick="toggleAllZero('${actionVar}')" 
+                        class="buttonSimple" style="margin-right:3px;width:30px;height:30px;text-align:center;cursor:pointer;padding:0 4px;">All 0</span>
+                    <span onclick="toggleAllHundred('${actionVar}')" 
+                        class="buttonSimple" style="margin-right:3px;width:30px;height:30px;text-align:center;cursor:pointer;padding:0 4px;">All 100</span>
+                    <div style="color:var(--text-muted)">Total ${dataObj.resourceName} sending downstream: <b><span style="color:var(--text-primary)" id='${actionVar}TotalSend'>1</span></b>/s</div>
+                </div>
             </div>
         </div>`;
 
@@ -324,7 +341,8 @@ function generateActionDisplay(actionVar) {
     queueCache(`${actionVar}Level2`)
 
     theStr += Raw.html`
-        <div id="${actionVar}Container" style="display:${shouldDisplay};position:absolute;left:${newX};top:${newY};width:300px;transform-style: preserve-3d;" onmouseenter="mouseOnAction('${actionVar}')" onmouseleave="mouseOffAction('${actionVar}')">
+        <div id="${actionVar}Container" style="display:${shouldDisplay};position:absolute;left:${newX};top:${newY};width:300px;transform-style: preserve-3d;" 
+            onmouseenter="mouseOnAction('${actionVar}')" onmouseleave="mouseOffAction('${actionVar}')">
             <div id="${actionVar}LargeVersionContainer" style="border:2px solid var(--border-color);background-color:var(--bg-secondary);">
                 ${title}
                 ${menuContainer}
@@ -557,29 +575,37 @@ function createDownStreamSliders(actionObj) {
         let actionVar = actionObj.actionVar;
 
         queueCache(`${actionVar}SliderContainer${downstreamVar}`)
+        queueCache(`${actionVar}SliderDownstreamTitle${downstreamVar}`)
         queueCache(`${actionVar}DownstreamSendRate${downstreamVar}`)
         queueCache(`${actionVar}DownstreamAttentionBonusLoop${downstreamVar}`)
         queueCache(`${actionVar}DownstreamAttentionBonus${downstreamVar}`)
         queueCache(`${actionVar}NumInput${downstreamVar}`)
         queueCache(`${actionVar}RangeInput${downstreamVar}`)
+        queueCache(`${actionVar}SliderLabels${downstreamVar}`)
 
         let resourceColor = getResourceColor(actionObj);
 
         theStr += Raw.html`
             <div id="${actionVar}SliderContainer${downstreamVar}" style="margin-bottom:5px;margin-top:5px;font-size:12px;">
-                <b><span style="margin-bottom:10px;cursor:pointer;" onclick="actionTitleClicked('${downstreamVar}')">${title}</span></b>
-                    (+<b><span id="${actionVar}DownstreamSendRate${downstreamVar}">0</span></b>/s)
-                <b><span id="${actionVar}DownstreamAttentionBonusLoop${downstreamVar}" 
-                    class="hyperVisible" style="color:mediumpurple;display:none;">x1.00</span></b>
-                <b><span id="${actionVar}DownstreamAttentionBonus${downstreamVar}" 
-                    class="hyperVisible" style="color:yellow;display:none;">x2</span></b><br>
-                <input type="number" id="${actionVar}NumInput${downstreamVar}" value="0" min="0" max="100" style="margin-right:3px;font-size:10px;width:37px;vertical-align: top;"
-                    oninput="validateInput('${actionVar}', '${downstreamVar}')" onchange="downstreamNumberChanged('${actionVar}', '${downstreamVar}')" >
-                    
+                <span id="${actionVar}SliderDownstreamTitle${downstreamVar}" style="margin-bottom:10px;cursor:pointer;font-weight:bold;" 
+                    onclick="actionTitleClicked('${downstreamVar}')">${title}</span>
+                <span id="${actionVar}SliderLabels${downstreamVar}">
+                    (+<span id="${actionVar}DownstreamSendRate${downstreamVar}" style="font-weight:bold;">0</span>/s)
+                    <span id="${actionVar}DownstreamAttentionBonusLoop${downstreamVar}"
+                        class="hyperVisible" style="color:mediumpurple;display:none;font-weight:bold;">x1.00</span>
+                    <span id="${actionVar}DownstreamAttentionBonus${downstreamVar}" 
+                        class="hyperVisible" style="color:yellow;display:none;font-weight:bold;">x2</span><br>
+                    <input type="number" id="${actionVar}NumInput${downstreamVar}" value="0" min="0" max="100" 
+                        style="margin-right:3px;font-size:10px;width:37px;vertical-align: top;"
+                        oninput="validateInput('${actionVar}', '${downstreamVar}')" onchange="downstreamNumberChanged('${actionVar}', '${downstreamVar}')" >
+                </span>
 
-                <div id="${actionVar}Slider_Container${downstreamVar}" style="display:inline-block;width: 220px; height: 20px; user-select: none; padding: 0 10px; box-sizing: border-box; cursor: pointer;">
-                    <div id="${actionVar}Track${downstreamVar}" style="margin-top:6px;width: 100%; height: 5px; background: linear-gradient(to right, red 10%, #ddd 10%, #ddd 90%, green 90%); position: relative;">
-                        <div id="${actionVar}Thumb${downstreamVar}" style="width: 10px; height: 20px; background-color: ${resourceColor}; position: absolute; top: 50%; transform: translate(-50%, -50%); pointer-events: none;"></div>
+                <div id="${actionVar}Slider_Container${downstreamVar}" style="display:inline-block;width:220px;height:20px; 
+                    user-select:none;padding: 0 10px;box-sizing:border-box;cursor:pointer;">
+                    <div id="${actionVar}Track${downstreamVar}" style="margin-top:6px;width:100%;height:5px; 
+                        background:linear-gradient(to right, red 10%, #ddd 10%, #ddd 90%, green 90%);position:relative;">
+                        <div id="${actionVar}Thumb${downstreamVar}" style="width:10px;height:20px;background-color: 
+                            ${resourceColor};position:absolute;top:50%;transform:translate(-50%, -50%);pointer-events:none;"></div>
                     </div>
                 </div>
                 

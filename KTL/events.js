@@ -117,11 +117,7 @@ function clickZoomIn() {
 
     actionContainer.style.transform = `translate(${transformX[data.planeTabSelected]}px, ${transformY[data.planeTabSelected]}px) scale(${scale})`;
 
-    for (let actionVar in data.actions) {
-        if (data.actions[actionVar].visible || globalVisible) {
-            forceRedraw(view.cached[`${actionVar}Container`]);
-        }
-    }
+    globalRedraw();
 }
 
 function clickZoomOut() {
@@ -141,11 +137,7 @@ function clickZoomOut() {
 
     actionContainer.style.transform = `translate(${transformX[data.planeTabSelected]}px, ${transformY[data.planeTabSelected]}px) scale(${scale})`;
 
-    for (let actionVar in data.actions) {
-        if (data.actions[actionVar].visible || globalVisible) {
-            forceRedraw(view.cached[`${actionVar}Container`]);
-        }
-    }
+    globalRedraw();
 }
 windowElement.addEventListener('wheel', function(e) {
     e.preventDefault();
@@ -170,11 +162,7 @@ windowElement.addEventListener('wheel', function(e) {
 
     actionContainer.style.transform = `translate(${transformX[data.planeTabSelected]}px, ${transformY[data.planeTabSelected]}px) scale(${scale})`;
 
-    for (let actionVar in data.actions) {
-        if(data.actions[actionVar].visible || globalVisible) {
-            forceRedraw(view.cached[`${actionVar}Container`]);
-        }
-    }
+    globalRedraw();
 }, { passive: false });
 
 document.addEventListener('mousedown', function(e) {
@@ -287,15 +275,18 @@ function applyPan(x, y) {
 
 function applyTransform() {
     actionContainer.style.transform = `translate(${transformX[data.planeTabSelected]}px, ${transformY[data.planeTabSelected]}px) scale(${scale})`;
-    for (let actionVar in data.actions) {
-        forceRedraw(view.cached[`${actionVar}Container`]);
-    }
+
+    globalRedraw();
 }
 
 function getTouchDistance(touch1, touch2) {
     const dx = touch2.clientX - touch1.clientX;
     const dy = touch2.clientY - touch1.clientY;
     return Math.sqrt(dx * dx + dy * dy);
+}
+
+function globalRedraw() {
+    forceRedraw(document.getElementById("actionContainer"));
 }
 
 function forceRedraw(elem) {
@@ -369,7 +360,6 @@ function clickedAttName(attVar) {
         views.updateVal(`${actionVar}LargeVersionContainer`, "black", "style.borderColor");
         views.updateVal(`${actionVar}LockContainer`, "black", "style.borderColor");
         views.updateVal(`${actionVar}SmallVersionContainer`, "", "style.border");
-        // views.updateVal(`${actionVar}MediumVersionContainer`, "", "style.border");
     }
 
     //clear previous
@@ -443,7 +433,6 @@ function setBorderColor(actionVar, attVar) {
     else if (effAttUsed) color = "var(--attribute-use-eff-color)";
 
     views.updateVal(`${actionVar}LargeVersionContainer`, color, "style.borderColor");
-    // views.updateVal(`${actionVar}MediumVersionContainer`, color, "style.borderColor");
     views.updateVal(`${actionVar}LockContainer`, color, "style.borderColor");
     views.updateVal(`${actionVar}SmallVersionContainer`, color==="black"?"":("2px solid " + color), "style.border");
 }

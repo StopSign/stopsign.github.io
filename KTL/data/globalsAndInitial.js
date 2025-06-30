@@ -1,6 +1,8 @@
 //Driver globals
 let gameSpeed = 1;
 let bonusSpeed = 1;
+let stop = false;
+let bonusTime = 0;
 
 let View = {};
 
@@ -11,7 +13,6 @@ let totalTime = 0;
 let ticksForSeconds = 0;
 let secondsPassed = 0;
 //Store offline time
-let bonusTime = 0;
 let mainTickLoop;
 let windowFps = 50;
 let lastSave = Date.now();
@@ -20,7 +21,6 @@ let lastSave = Date.now();
 let isFileSystem = !!location.href.match("file");
 let saveName = "KTLsave"; //Blank if you don't want to save, change name to force user reset
 
-let stop = false;
 let forceStop = false;
 
 

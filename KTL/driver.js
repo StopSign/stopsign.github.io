@@ -38,6 +38,8 @@ function animationTick(animationTime) {
     }
 }
 
+
+
 //time-delta-based approach
 function tick() {
     if(sudoStop) {

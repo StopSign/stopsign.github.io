@@ -137,15 +137,20 @@ let views = {
         }
 
         let miniVersion = scale < .35;
+        let mediumVersion = scale < .65 && !miniVersion;
         views.updateVal(`${actionVar}LargeVersionContainer`, !miniVersion?"":"none", "style.display");
         views.updateVal(`${actionVar}SmallVersionContainer`, miniVersion?"":"none", "style.display");
-
-        // let miniVersion = scale < .35;
-        // let mediumVersion = scale < .55 && scale >= .35;
-        // views.updateVal(`${actionVar}LargeVersionContainer`, !miniVersion&&!mediumVersion?"":"none", "style.display");
-        // views.updateVal(`${actionVar}MediumVersionContainer`, mediumVersion&&!miniVersion?"":"none", "style.display");
-        // views.updateVal(`${actionVar}SmallVersionContainer`, miniVersion&&!mediumVersion?"":"none", "style.display");
+        // views.updateVal(`${actionVar}LargeVersionContainer`, !mediumVersion?"":(1 / (scale) / 2 + .5)*.8+"", "style.scale");
         views.updateVal(`${actionVar}SmallVersionContainer`, (1 / scale)*.8+"", "style.scale");
+
+        // if(!miniVersion) { //don't check in small
+        //     views.updateVal(`${actionVar}DeltasDisplayContainer`, mediumVersion?"none":"", "style.display");
+        //     views.updateVal(`${actionVar}BalanceNeedleLabel`, mediumVersion?"none":"", "style.display");
+        //     views.updateVal(`${actionVar}ProgressBarLabels`, mediumVersion?"none":"", "style.display");
+        //     views.updateVal(`${actionVar}ExpBarLabels`, mediumVersion?"none":"", "style.display");
+        //     views.updateVal(`${actionVar}ToggleDownstreamButtons`, mediumVersion?"none":"", "style.display");
+        //     views.updateVal(`${actionVar}MenuButtons`, mediumVersion?"none":"", "style.display");
+        // }
 
         let isMaxLevel = (actionObj.maxLevel !== -1 && actionObj.level >= actionObj.maxLevel);
         views.updateVal(`${actionVar}IsMaxLevel`, isMaxLevel && !miniVersion ? "":"none", "style.display");
@@ -158,6 +163,11 @@ let views = {
             views.updateVal(`${actionVar}_${downstreamVar}_Line_Inner_Container`, !miniVersion ? "flex" : "none", "style.display");
             let boxShadow = !isAttentionLine(actionVar, downstreamVar)?"":(miniVersion?"0 0 40px 11px yellow":"0 0 18px 5px yellow");
             views.updateVal(`${actionVar}_${downstreamVar}_Line_Outer`, boxShadow, "style.boxShadow");
+
+            // if(!miniVersion) { //don't check in small
+            //     views.updateVal(`${actionVar}SliderLabels${downstreamVar}`, mediumVersion?"none":"", "style.display");
+            //     views.updateVal(`${actionVar}SliderDownstreamTitle${downstreamVar}`, mediumVersion?"16px":"12px", "style.fontSize");
+            // }
         }
 
         return !miniVersion;
