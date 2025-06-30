@@ -41,19 +41,19 @@ document.addEventListener("keyup", function(e) {
 
 function moveActionContainer() {
     if (keysPressed['w']) {
-        transformY += movementStep;
+        transformY[data.planeTabSelected] += movementStep;
     }
     if (keysPressed['a']) {
-        transformX += movementStep;
+        transformX[data.planeTabSelected] += movementStep;
     }
     if (keysPressed['s']) {
-        transformY -= movementStep;
+        transformY[data.planeTabSelected] -= movementStep;
     }
     if (keysPressed['d']) {
-        transformX -= movementStep;
+        transformX[data.planeTabSelected] -= movementStep;
     }
 
-    actionContainer.style.transform = `translate(${transformX}px, ${transformY}px) scale(${scale})`;
+    actionContainer.style.transform = `translate(${transformX[data.planeTabSelected]}px, ${transformY[data.planeTabSelected]}px) scale(${scale})`;
 
     forceRedraw(windowElement);
 

@@ -93,7 +93,7 @@ let originalX, originalY;
 let originalLeft, originalTop;
 
 let originalMouseX, originalMouseY;
-let transformX=0, transformY=0;
+let transformX = [0,0,0,0], transformY = [0,0,0,0];
 let originalTransformX, originalTransformY;
 
 let initialPinchDistance = null;
@@ -109,13 +109,13 @@ function clickZoomIn() {
     scale = Math.max(minScale, scale + scaleStep*3);
     const scaleFactor = scale / prevScale;
 
-    const dx = (centerX - transformX) * (1 - scaleFactor);
-    const dy = (centerY - transformY) * (1 - scaleFactor);
+    const dx = (centerX - transformX[data.planeTabSelected]) * (1 - scaleFactor);
+    const dy = (centerY - transformY[data.planeTabSelected]) * (1 - scaleFactor);
 
-    transformX += dx;
-    transformY += dy;
+    transformX[data.planeTabSelected] += dx;
+    transformY[data.planeTabSelected] += dy;
 
-    actionContainer.style.transform = `translate(${transformX}px, ${transformY}px) scale(${scale})`;
+    actionContainer.style.transform = `translate(${transformX[data.planeTabSelected]}px, ${transformY[data.planeTabSelected]}px) scale(${scale})`;
 
     for (let actionVar in data.actions) {
         if (data.actions[actionVar].visible || globalVisible) {
@@ -133,13 +133,13 @@ function clickZoomOut() {
     scale = Math.max(minScale, scale - scaleStep*3);
     const scaleFactor = scale / prevScale;
 
-    const dx = (centerX - transformX) * (1 - scaleFactor);
-    const dy = (centerY - transformY) * (1 - scaleFactor);
+    const dx = (centerX - transformX[data.planeTabSelected]) * (1 - scaleFactor);
+    const dy = (centerY - transformY[data.planeTabSelected]) * (1 - scaleFactor);
 
-    transformX += dx;
-    transformY += dy;
+    transformX[data.planeTabSelected] += dx;
+    transformY[data.planeTabSelected] += dy;
 
-    actionContainer.style.transform = `translate(${transformX}px, ${transformY}px) scale(${scale})`;
+    actionContainer.style.transform = `translate(${transformX[data.planeTabSelected]}px, ${transformY[data.planeTabSelected]}px) scale(${scale})`;
 
     for (let actionVar in data.actions) {
         if (data.actions[actionVar].visible || globalVisible) {
@@ -162,13 +162,13 @@ windowElement.addEventListener('wheel', function(e) {
 
     // Adjust translation to zoom at mouse position
     const scaleFactor = scale / prevScale;
-    const dx = (mouseX - transformX) * (1 - scaleFactor);
-    const dy = (mouseY - transformY) * (1 - scaleFactor);
+    const dx = (mouseX - transformX[data.planeTabSelected]) * (1 - scaleFactor);
+    const dy = (mouseY - transformY[data.planeTabSelected]) * (1 - scaleFactor);
 
-    transformX += dx;
-    transformY += dy;
+    transformX[data.planeTabSelected] += dx;
+    transformY[data.planeTabSelected] += dy;
 
-    actionContainer.style.transform = `translate(${transformX}px, ${transformY}px) scale(${scale})`;
+    actionContainer.style.transform = `translate(${transformX[data.planeTabSelected]}px, ${transformY[data.planeTabSelected]}px) scale(${scale})`;
 
     for (let actionVar in data.actions) {
         if(data.actions[actionVar].visible || globalVisible) {
@@ -184,8 +184,8 @@ document.addEventListener('mousedown', function(e) {
         originalMouseX = e.clientX;
         originalMouseY = e.clientY;
 
-        originalTransformX = transformX;
-        originalTransformY = transformY;
+        originalTransformX = transformX[data.planeTabSelected];
+        originalTransformY = transformY[data.planeTabSelected];
     }
 });
 document.addEventListener('mousemove', function(e) {
@@ -196,11 +196,11 @@ document.addEventListener('mousemove', function(e) {
     const deltaY = e.clientY - originalMouseY;
 
     // Clamp range to [-4000, 4000]
-    transformX = Math.max(-4000, Math.min(originalTransformX + deltaX, 4000));
-    transformY = Math.max(-4000, Math.min(originalTransformY + deltaY, 4000));
+    transformX[data.planeTabSelected] = Math.max(-4000, Math.min(originalTransformX + deltaX, 4000));
+    transformY[data.planeTabSelected] = Math.max(-4000, Math.min(originalTransformY + deltaY, 4000));
 
     // Update the position of the container
-    actionContainer.style.transform = `translate(${transformX}px, ${transformY}px) scale(${scale})`;
+    actionContainer.style.transform = `translate(${transformX[data.planeTabSelected]}px, ${transformY[data.planeTabSelected]}px) scale(${scale})`;
 });
 
 document.addEventListener('mouseup', function() {
@@ -220,8 +220,8 @@ windowElement.addEventListener('touchstart', function(e) {
         const touch = e.touches[0];
         originalMouseX = touch.clientX;
         originalMouseY = touch.clientY;
-        originalTransformX = transformX;
-        originalTransformY = transformY;
+        originalTransformX = transformX[data.planeTabSelected];
+        originalTransformY = transformY[data.planeTabSelected];
         isTouchDragging = true;
     }
 }, { passive: false });
@@ -244,11 +244,11 @@ windowElement.addEventListener('touchmove', function(e) {
         const midY = (e.touches[0].clientY + e.touches[1].clientY) / 2 - rect.top;
 
         const scaleFactor = scale / prevScale;
-        const dx = (midX - transformX) * (1 - scaleFactor);
-        const dy = (midY - transformY) * (1 - scaleFactor);
+        const dx = (midX - transformX[data.planeTabSelected]) * (1 - scaleFactor);
+        const dy = (midY - transformY[data.planeTabSelected]) * (1 - scaleFactor);
 
-        transformX += dx;
-        transformY += dy;
+        transformX[data.planeTabSelected] += dx;
+        transformY[data.planeTabSelected] += dy;
 
         applyTransform();
     } else if (e.touches.length === 1 && isTouchDragging) {
@@ -280,13 +280,13 @@ function getDistance(t1, t2) {
 }
 
 function applyPan(x, y) {
-    transformX = Math.max(-4000, Math.min(x, 4000));
-    transformY = Math.max(-4000, Math.min(y, 4000));
+    transformX[data.planeTabSelected] = Math.max(-4000, Math.min(x, 4000));
+    transformY[data.planeTabSelected] = Math.max(-4000, Math.min(y, 4000));
     applyTransform();
 }
 
 function applyTransform() {
-    actionContainer.style.transform = `translate(${transformX}px, ${transformY}px) scale(${scale})`;
+    actionContainer.style.transform = `translate(${transformX[data.planeTabSelected]}px, ${transformY[data.planeTabSelected]}px) scale(${scale})`;
     for (let actionVar in data.actions) {
         forceRedraw(view.cached[`${actionVar}Container`]);
     }
@@ -307,21 +307,27 @@ function forceRedraw(elem) {
     }
 }
 
-function actionTitleClicked(actionVar) {
+function actionTitleClicked(actionVar, setAll) {
     let dataObj = actionData[actionVar];
 
-    let newTransformX = -((dataObj.realX + 150) * scale) + windowElement.offsetWidth / 2 ;
-    let newTransformY = -((dataObj.realY) * scale) + windowElement.offsetHeight / 2 - 50;
+    let newtransformX = -((dataObj.realX + 150) * scale) + windowElement.offsetWidth / 2 ;
+    let newtransformY = -((dataObj.realY) * scale) + windowElement.offsetHeight / 2 - 50;
 
-    newTransformX = Math.max(-4000, Math.min(newTransformX, 4000));
-    newTransformY = Math.max(-4000, Math.min(newTransformY, 4000));
+    newtransformX = Math.max(-4000, Math.min(newtransformX, 4000));
+    newtransformY = Math.max(-4000, Math.min(newtransformY, 4000));
 
-    // Update our state
-    transformX = newTransformX;
-    transformY = newTransformY;
+    if(setAll) {
+        for(let plane in transformX) {
+            transformX[plane] = newtransformX;
+            transformY[plane] = newtransformY;
+        }
+    } else {
+        transformX[data.planeTabSelected] = newtransformX;
+        transformY[data.planeTabSelected] = newtransformY;
+    }
 
     // Update the position of the container
-    actionContainer.style.transform = `translate(${newTransformX}px, ${newTransformY}px) scale(${scale})`;
+    actionContainer.style.transform = `translate(${newtransformX}px, ${newtransformY}px) scale(${scale})`;
 }
 
 
@@ -558,6 +564,7 @@ function switchToPlane(num) {
     data.planeTabSelected = num;
     document.getElementById(`planeContainer${data.planeTabSelected}`).style.display = '';
     document.getElementById("windowElement").style.backgroundColor = `var(--world-${data.planeTabSelected}-bg-primary)`;
+    actionContainer.style.transform = `translate(${transformX[data.planeTabSelected]}px, ${transformY[data.planeTabSelected]}px) scale(${scale})`;
 }
 
 function mouseOnAction(actionVar) {

@@ -5,17 +5,17 @@ function initializeDisplay() {
     for(let actionVar in data.actions) {
         attachAttLinks(actionVar);
     }
-    setRealCoordinates('overclock'); //associate all parent/children and give them an x/y
-    setRealCoordinates('overclockTargetingTheLich');
-    setRealCoordinates('echoKindle');
-    setRealCoordinates('absorbStarseed');
+    setRealCoordinates("overclock"); //associate all parent/children and give them an x/y
+    setRealCoordinates("overclockTargetingTheLich");
+    setRealCoordinates("echoKindle");
+    setRealCoordinates("absorbStarseed");
     for(let actionVar in data.actions) {
         generateActionDisplay(actionVar);
     }
     generateLinesBetweenActions();
     createAttDisplay();
     actionUpdateAllStatMults();
-    actionTitleClicked(`overclock`);
+    actionTitleClicked("overclock", true);
     initializeMenus();
 
     initializeToasts();
