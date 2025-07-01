@@ -1508,7 +1508,7 @@ actionData = {
         progressMaxBase:2, progressMaxIncrease:9,
         expToLevelBase:3, expToLevelIncrease:1,
         efficiencyBase:.7, maxLevel:9,
-        unlockCost:6, visible:false, unlocked:false, purchased: true,
+        unlockCost:5, visible:false, unlocked:false, purchased: true,
         onUnlock: function() {
             unveilAction("overcharge")
         },
@@ -1521,7 +1521,7 @@ actionData = {
         progressMaxBase:6, progressMaxIncrease:9,
         expToLevelBase:3, expToLevelIncrease:1,
         efficiencyBase:.6, maxLevel:9,
-        unlockCost:15, visible:false, unlocked:false, purchased: true,
+        unlockCost:5, visible:false, unlocked:false, purchased: true,
         onUnlock: function() {
             unveilAction("overboost")
         },
@@ -1531,50 +1531,50 @@ actionData = {
     },
     overcharge: {
         tier:1, plane:2, resourceName:"mana",
-        progressMaxBase:10, progressMaxIncrease:1,
+        progressMaxBase:5, progressMaxIncrease:1,
         expToLevelBase:3, expToLevelIncrease:1,
-        efficiencyBase:.4, maxLevel:1, isSpell:true, cooldown:60,
-        unlockCost:20, visible:false, unlocked:false, purchased: true,
+        efficiencyBase:.4, maxLevel:1, isSpell:true, cooldown:5,
+        unlockCost:5, visible:false, unlocked:false, purchased: true,
         onUnlock: function() {
             unveilAction("overdrive");
         },
         spellpower: function() {
-            return 10;
+            return 25 * (data.actions.overcharge.efficiency/100);
         },
         onLevelAtts:[],
-        expAtts:[],
-        efficiencyAtts:[["spellcraft", .1], ["wizardry", .1], ["archmagery", .1]],
-        extraInfo: {english:Raw.html`If a charge is available, the next Overclock will give x10 momentum (this does not affect exp).<br>Cooldown is slowed by efficiency.`}
+        expAtts:[["spellcraft", .1]],
+        efficiencyAtts:[["vision", .1]],
+        extraInfo: {english:Raw.html`If a charge is available, the next Overclock will give x25 * efficiency momentum (this does not affect exp).`}
     },
     overboost: {
         tier:1, plane:2, resourceName:"mana",
         progressMaxBase:1000, progressMaxIncrease:3,
         expToLevelBase:3, expToLevelIncrease:1,
-        efficiencyBase:.2, maxLevel:1, isSpell:true,
+        efficiencyBase:.2, maxLevel:1, isSpell:true, cooldown:20,
         unlockCost:1000, visible:false, unlocked:false, purchased: true,
         onUnlock: function() {
         },
         spellpower: function() {
-            return 10;
+            return 25 * (data.actions.overboost.efficiency/100);
         },
         onLevelAtts:[],
-        expAtts:[],
-        efficiencyAtts:[["spellcraft", .1], ["wizardry", .1], ["archmagery", .1]]
+        expAtts:[["wizardry", .1]],
+        efficiencyAtts:[["vision", .1]]
     },
     overdrive: {
         tier:1, plane:2, resourceName:"mana",
         progressMaxBase:1000, progressMaxIncrease:3,
         expToLevelBase:3, expToLevelIncrease:1,
-        efficiencyBase:.1, maxLevel:1, isSpell:true,
+        efficiencyBase:.1, maxLevel:1, isSpell:true, cooldown:100,
         unlockCost:1000, visible:false, unlocked:false, purchased: true,
         onUnlock: function() {
         },
         spellpower: function() {
-            return 10;
+            return 25 * (data.actions.overdrive.efficiency/100);
         },
         onLevelAtts:[],
-        expAtts:[],
-        efficiencyAtts:[["spellcraft", .1], ["wizardry", .1], ["archmagery", .1]]
+        expAtts:[["archmagery", .1]],
+        efficiencyAtts:[["vision", .1]]
     },
     manaImprovement: {
         tier:1, plane:2, resourceName:"mana",

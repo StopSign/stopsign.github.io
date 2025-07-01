@@ -3,6 +3,7 @@ function startGame() {
     // load calls recalcInterval, which will start the callbacks
     load();
     setScreenSize();
+    initTimingSystem();
 }
 
 let screenSize;
@@ -10,6 +11,92 @@ function setScreenSize() {
     screenSize = document.body.scrollHeight;
 }
 
+// Listen for updates from the worker
+onmessage = function(e) {
+    const { type, totalTicks, secondsPassed, bonusTimeConsumed } = e.data;
+
+    if (type === 'update') {
+        // Update the global state with data from the worker
+        data.currentGameState.totalTicks = totalTicks;
+        data.currentGameState.secondsPassed = secondsPassed;
+
+        if (bonusTimeConsumed > 0) {
+            data.currentGameState.bonusTime = Math.max(0, data.currentGameState.bonusTime - bonusTimeConsumed);
+        }
+
+        // If bonus time runs out, automatically revert to 1x speed.
+        if (data.currentGameState.bonusTime <= 0 && data.gameSettings.bonusSpeed > 1) {
+            console.log("Bonus time exhausted. Reverting to 1x speed.");
+            data.gameSettings.bonusSpeed = 1;
+        }
+    }
+};
+
+// --- Offline Time Calculation ---
+function checkOfflineProgress() {
+    const lastVisit = localStorage.getItem('lastVisitTimestamp');
+    if (lastVisit) {
+        const offlineMilliseconds = Date.now() - parseInt(lastVisit, 10);
+        if (offlineMilliseconds > 10000) { // 10-second threshold
+            data.currentGameState.bonusTime += offlineMilliseconds;
+            console.log(`Welcome back! Gained ${(offlineMilliseconds / 1000).toFixed(1)}s of bonus time.`);
+        }
+    }
+    window.addEventListener('beforeunload', () => {
+        localStorage.setItem('lastVisitTimestamp', Date.now());
+    });
+}
+
+// --- Visual Rendering Loop ---
+let lastAnimationTime = 0;
+let timeAccumulators = { view30: 0, view10: 0, view1: 0 };
+
+function animationTick(currentTime) {
+    requestAnimationFrame(animationTick);
+
+    if (data.gameSettings.stopAll) return;
+
+    if (lastAnimationTime === 0) lastAnimationTime = currentTime;
+    const delta = currentTime - lastAnimationTime;
+
+    timeAccumulators.view30 += delta;
+    timeAccumulators.view10 += delta;
+    timeAccumulators.view1 += delta;
+
+    const interval30 = 1000 / data.gameSettings.fps;
+    if (timeAccumulators.view30 >= interval30) {
+        timeAccumulators.view30 %= interval30;
+        views.updateView();
+        lastAnimationTime = currentTime;
+    }
+
+    const interval10 = data.gameSettings.fps < 10 ? interval30 : 100;
+    if (timeAccumulators.view10 >= interval10) {
+        timeAccumulators.view10 %= interval10;
+        // View.update10();
+        lastAnimationTime = currentTime;
+    }
+
+    if (timeAccumulators.view1 >= 1000) {
+        timeAccumulators.view1 %= 1000;
+        updateViewOnSecond();
+        lastAnimationTime = currentTime;
+    }
+}
+
+// --- System Initialization ---
+function initTimingSystem() {
+    checkOfflineProgress();
+
+    // Start the worker and pass the initial configuration.
+    postMessage({
+        command: 'start'
+    });
+
+    // Start the main thread's rendering loop.
+    requestAnimationFrame(animationTick);
+}
+/*
 let lastAnimationTime = 0;
 let animationFrameRequest = 0;
 let animationTicksEnabled = true;
@@ -40,6 +127,8 @@ function animationTick(animationTime) {
 
 
 
+
+
 //time-delta-based approach
 function tick() {
     if(sudoStop) {
@@ -67,7 +156,7 @@ function tick() {
         // console.warn(`Too large backlog! Moved ${overflow} ms to bonusTime (now ${bonusTime} ms).`);
     }
 
-    while (gameTicksLeft > (1000 / data.ticksPerSecond)) {
+    while (gameTicksLeft > (1000 / data.gameSettings.ticksPerSecond)) {
         if(stop || forceStop) {
             bonusTime += gameTicksLeft;
             gameTicksLeft = 0;
@@ -79,14 +168,14 @@ function tick() {
 
         //Game logic for each tick
         ticksForSeconds++;
-        if(ticksForSeconds % data.ticksPerSecond === 0) {
+        if(ticksForSeconds % data.gameSettings.ticksPerSecond === 0) {
             secondPassed();
         }
         framePassed();
         didSomething = gameTicksLeft <= 1200;
 
-        let timeSpent = (1000 / data.ticksPerSecond) / gameSpeed / bonusSpeed
-        gameTicksLeft -= (1000 / data.ticksPerSecond) / gameSpeed / bonusSpeed;
+        let timeSpent = (1000 / data.gameSettings.ticksPerSecond) / gameSpeed / bonusSpeed
+        gameTicksLeft -= (1000 / data.gameSettings.ticksPerSecond) / gameSpeed / bonusSpeed;
 
         if(bonusSpeed !== 1) {
             bonusTime += -timeSpent * (bonusSpeed - 1);
@@ -102,17 +191,19 @@ function tick() {
 
 function framePassed() {
     gameTick();
-}
+}*/
 
 function secondPassed() {
     secondTick();
 
-    updateViewOnSecond();
     secondsPassed++;
 }
 
 
 function gameTick() {
+    totalTicks++;
+    ticksForSeconds++;
+
     for (let actionVar in data.actions) {
         let actionObj = data.actions[actionVar];
         actionObj.resourceDelta = 0;
@@ -146,7 +237,7 @@ function gameTick() {
                 if(data.upgrades.rememberWhatIFocusedOn.upgradePower === 0) {
                     continue;
                 }
-                actionObj[key] += 1 / data.ticksPerSecond / 3600;
+                actionObj[key] += 1 / data.gameSettings.ticksPerSecond / 3600;
                 if(actionObj[key] > data.focusLoopMax) {
                     actionObj[key] = data.focusLoopMax;
                 }
@@ -212,7 +303,7 @@ function secondTick() {
 function tickActionTimer(actionVar) {
     let actionObj = data.actions[actionVar];
 
-    actionObj.cooldownTimer += 1 / data.ticksPerSecond * (actionObj.efficiency/100);
+    actionObj.cooldownTimer += 1 / data.gameSettings.ticksPerSecond;
     if(actionObj.cooldownTimer > actionObj.cooldown) {
         actionObj.cooldownTimer = actionObj.cooldown;
     }
@@ -227,14 +318,14 @@ function tickGameObject(actionVar) {
         return;
     }
 
-    let momentumMaxRate = actionObj.isGenerator ? actionObj.generatorSpeed / data.ticksPerSecond : actionObj.resource * actionObj.tierMult() / data.ticksPerSecond;
+    let momentumMaxRate = actionObj.isGenerator ? actionObj.generatorSpeed / data.gameSettings.ticksPerSecond : actionObj.resource * actionObj.tierMult() / data.gameSettings.ticksPerSecond;
     let atMaxLevel = actionObj.maxLevel >= 0 && actionObj.level >= actionObj.maxLevel;
     let momentumToAdd = (atMaxLevel || !actionObj.unlocked) ? 0 : momentumMaxRate;
     let resourceToAddInefficient = momentumToAdd * (actionObj.efficiency / 100);
 
     // Update progress and set the progressGain rate for this tick.
     actionObj.progress += resourceToAddInefficient;
-    actionObj.progressGain = resourceToAddInefficient * data.ticksPerSecond;
+    actionObj.progressGain = resourceToAddInefficient * data.gameSettings.ticksPerSecond;
 
     // For non-generators, consume the resource used to generate progress.
     if (!actionObj.isGenerator) {
@@ -267,7 +358,7 @@ function tickGameObject(actionVar) {
         let taken = calculateTaken(actionVar, downstreamVar, actionObj, mult);
 
         // Keep track of the total sent out per second for the final calculation.
-        actionObj.totalSend += taken * data.ticksPerSecond;
+        actionObj.totalSend += taken * data.gameSettings.ticksPerSecond;
 
         // Give the resource to the downstream action.
         giveResourceTo(actionObj, downstreamObj, taken);
@@ -281,7 +372,7 @@ function calculateTaken(actionVar, downstreamVar, actionObj, mult) {
     if (totalTakenMult > 0.1) {
         totalTakenMult = 0.1; // Cap at 10%/s
     }
-    let toReturn = actionObj.resource / data.ticksPerSecond * totalTakenMult * mult;
+    let toReturn = actionObj.resource / data.gameSettings.ticksPerSecond * totalTakenMult * mult;
     return toReturn < .00001 ? 0 : toReturn;
 }
 
@@ -326,7 +417,7 @@ function addResourceTo(downstreamObj, amount) {
 
     // The visual increase rate is calculated here for actions with smooth upstream flow.
     if (downstreamObj.hasUpstream) {
-        downstreamObj.resourceIncrease += amount * data.ticksPerSecond;
+        downstreamObj.resourceIncrease += amount * data.gameSettings.ticksPerSecond;
     }
 }
 
@@ -336,7 +427,7 @@ function giveResourceTo2(actionObj, downstreamObj, amount) {
     }
     addResourceTo(downstreamObj, amount);
     actionObj.resource -= amount;
-    actionObj.resourceDelta -= amount * data.ticksPerSecond;
+    actionObj.resourceDelta -= amount * data.gameSettings.ticksPerSecond;
 }
 function addResourceTo2(downstreamObj, amount) {
     //gives to unlockCost of downstream action, unlocking if possible, and gives leftover to resource
@@ -351,6 +442,6 @@ function addResourceTo2(downstreamObj, amount) {
         downstreamObj.unlockCost = 0;
     }
     downstreamObj.resource += amount;
-    downstreamObj.resourceDelta += amount * data.ticksPerSecond;
-    downstreamObj.resourceIncrease += amount * data.ticksPerSecond;
+    downstreamObj.resourceDelta += amount * data.gameSettings.ticksPerSecond;
+    downstreamObj.resourceIncrease += amount * data.gameSettings.ticksPerSecond;
 }

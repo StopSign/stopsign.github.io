@@ -314,7 +314,7 @@ let views = {
 
             let mult = rangeValue/100;
             let taken = calculateTaken(actionVar, downstreamVar, actionObj, mult);
-            views.updateVal(`${actionVar}DownstreamSendRate${downstreamVar}`, taken * data.ticksPerSecond, "textContent", 4);
+            views.updateVal(`${actionVar}DownstreamSendRate${downstreamVar}`, taken * data.gameSettings.ticksPerSecond, "textContent", 4);
 
             let isAttention = isAttentionLine(actionVar, downstreamVar);
             views.updateVal(`${actionVar}DownstreamAttentionBonus${downstreamVar}`, isAttention ? "" : "none", "style.display");
@@ -445,7 +445,7 @@ function updateGlobals() {
     views.updateVal(`jobDisplay`, data.displayJob ? "" : "none", "style.display");
 
     views.updateVal(`secondsPerReset`, data.secondsPerReset, "textContent","time");
-    views.updateVal(`bonusTime`, bonusTime/1000, "textContent", "time");
+    views.updateVal(`bonusTime`, data.currentGameState.bonusTime/1000, "textContent", "time");
 
     views.updateVal(`ancientCoin`, data.ancientCoin, "textContent", 1);
     views.updateVal(`ancientCoin2`, data.ancientCoin, "textContent", 1);

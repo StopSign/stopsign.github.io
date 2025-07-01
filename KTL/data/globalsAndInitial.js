@@ -1,8 +1,14 @@
 //Driver globals
 let gameSpeed = 1;
-let bonusSpeed = 1;
 let stop = false;
-let bonusTime = 0;
+// let bonusTime = 0;
+
+let settings = {}; // Will be populated by the 'start' command.
+let timerId = null;
+let lastTickTime = 0;
+let ticksForSeconds = 0;
+let secondsPassed = 0;
+let totalTicks = 0;
 
 let View = {};
 
@@ -10,11 +16,8 @@ let curTime = new Date();
 let gameTicksLeft = 0;
 let sudoStop = false;
 let totalTime = 0;
-let ticksForSeconds = 0;
-let secondsPassed = 0;
 //Store offline time
 let mainTickLoop;
-let windowFps = 50;
 let lastSave = Date.now();
 
 //Saving globals
@@ -22,6 +25,7 @@ let isFileSystem = !!location.href.match("file");
 let saveName = "KTLsave"; //Blank if you don't want to save, change name to force user reset
 
 let forceStop = false;
+
 
 
 //Game globals - these initializations will be overriden in load TODO do i need these
@@ -32,7 +36,6 @@ data.toastStates = []; // array of toast objects: {id, state, element}
 data.planeTabSelected = 0;
 data.gameState = "default"; //KTL
 data.totalMomentum = 0;
-data.ticksPerSecond = 20;
 data.ancientCoin = 0;
 data.useAmuletButtonShowing = false;
 data.secondsPerReset = 0;
@@ -49,6 +52,24 @@ data.options = {};
 data.options.updateRate = 20;
 data.options.autosaveRate = 10;
 data.options.bonusRate = 2;
+
+// --- Core Settings ---
+data.gameSettings = {
+    gameSpeed: 1,
+    bonusSpeed: 1,
+    stop: false,
+    stopAll: false,
+    fps: 20,
+    ticksPerSecond: 20
+};
+
+// --- Dynamic Game State ---
+data.currentGameState = {
+    bonusTime: 0,
+    totalTicks: 0,
+    secondsPassed: 0,
+};
+
 
 let viewData = {}; //contains only things that are generated / not saved
 viewData.toasts = [];
@@ -84,7 +105,7 @@ function debug() {
     // stop = 1;
 
     gameSpeed = 1;
-    bonusTime = 1000 * 60 * 60 * 24;
+    data.currentGameState.bonusTime = 1000 * 60 * 60 * 24;
 }
 
 function initializeData() {
@@ -356,7 +377,7 @@ function setRealCoordinates(startActionVar) {
         let dataObj = actionData[currentVar];
         let actionObj = data.actions[currentVar];
         if(check++ > 2000) {
-            stop = 1;
+            data.gameSettings.stop = 1;
             console.log("You have an infinite loop on action creation with: " + currentVar);
             return;
         }

@@ -169,6 +169,8 @@ function load() {
 
         data.toastStates = toLoad.toastStates;
 
+        data.gameState = toLoad.gameState ?? "default";
+
         //load global items that aren't lists or objects
         data.gameState = toLoad.gameState ?? "default";
         data.planeTabSelected = toLoad.planeTabSelected ?? 0;
@@ -186,7 +188,7 @@ function load() {
         data.maxFocusAllowed = toLoad.maxFocusAllowed ?? 3;
         data.focusMult = toLoad.focusMult ?? 2;
         data.focusLoopMax = toLoad.focusLoopMax ?? 2.5;
-        data.ticksPerSecond = toLoad.ticksPerSecond ?? 20;
+        data.gameSettings.ticksPerSecond = toLoad.ticksPerSecond ?? 20;
     }
 
     //update all generator's multiplier data
@@ -196,7 +198,7 @@ function load() {
 
     initializeDisplay();
     setSlidersOnLoad(toLoad);
-    recalcInterval(data.options.updateRate);
+    // recalcInterval(data.options.updateRate);
     views.updateView();
 
     for(let actionVar in data.actions) {
@@ -318,8 +320,8 @@ function updateUIFromLoad() {
         updateToastUI(i);
     }
 
-    updateSliderDisplay(data.ticksPerSecond);
-    document.getElementById("FPSSlider").value = data.ticksPerSecond;
+    updateSliderDisplay(data.gameSettings.ticksPerSecond);
+    document.getElementById("FPSSlider").value = data.gameSettings.ticksPerSecond;
 
     updatePreviousTipsMenu();
     reapplyAttentionSelected();

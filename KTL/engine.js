@@ -129,7 +129,7 @@ function createAndLinkNewAction(actionVar, dataObj, title, downstreamVars) {
     }
 
     actionObj.progressRateReal = function() { //For data around the flat action too
-        return actionObj.resource * actionObj.tierMult() * (actionObj.efficiency/100) / data.ticksPerSecond;
+        return actionObj.resource * actionObj.tierMult() * (actionObj.efficiency/100) / data.gameSettings.ticksPerSecond;
     }
     actionObj.calcStatMult = function() {
         actionObj.expToLevelMult = 1;
@@ -186,7 +186,7 @@ function createAndLinkNewAction(actionVar, dataObj, title, downstreamVars) {
 
 function actionProgressRate(actionObj) {
     if(actionObj.isGenerator) {
-        return 1 / data.ticksPerSecond;
+        return 1 / data.gameSettings.ticksPerSecond;
     }
     return actionObj.progressRateReal();
 }
@@ -383,7 +383,7 @@ function upgradeUpdates() {
     Object.values(actionData).forEach(action => {
         if (action.updateMults) action.updateMults();
     });
-    data.actions.overclock.resource += data.upgrades.tryALittleHarder.upgradePower * 20 / data.ticksPerSecond;
+    data.actions.overclock.resource += data.upgrades.tryALittleHarder.upgradePower * 20 / data.gameSettings.ticksPerSecond;
 }
 
 function getUpgradeSliderAmount() {

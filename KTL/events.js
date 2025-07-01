@@ -479,13 +479,13 @@ function changeJob(actionVar) {
 }
 
 function pauseGame() {
-    stop = !stop;
-    if(stop) {
+    data.gameSettings.stop = !data.gameSettings.stop;
+    if(data.gameSettings.stop) {
         document.title = "*PAUSED* KTL";
     } else {
         document.title = "KTL";
     }
-    document.getElementById('pauseButton').textContent = stop ? "> Resume" : "|| Pause";
+    document.getElementById('pauseButton').textContent = data.gameSettings.stop ? "> Resume" : "|| Pause";
     save();
 }
 
@@ -529,20 +529,20 @@ function bonusMenuHideButton() {
 }
 
 function toggleBonusSpeed() {
-    if(bonusSpeed > 1 || bonusTime <= 1000) {
-        bonusSpeed = 1;
+    if(data.gameSettings.bonusSpeed > 1 || data.currentGameState.bonusTime <= 1000) {
+        data.gameSettings.bonusSpeed = 1;
         document.getElementById("toggleBonusSpeedButton").style.backgroundColor = "red";
         document.getElementById("toggleBonusSpeedButton").textContent = "Enable Bonus Speed";
     } else {
-        bonusSpeed = data.options.bonusRate;
+        data.gameSettings.bonusSpeed = data.options.bonusRate;
         document.getElementById("toggleBonusSpeedButton").style.backgroundColor = "green";
         document.getElementById("toggleBonusSpeedButton").textContent = "Disable Bonus Speed";
     }
 }
 
 function changeBonusSpeed(num) {
-    if(bonusSpeed > 1) { //already running
-        bonusSpeed = num;
+    if(data.gameSettings.bonusSpeed > 1) { //already running
+        data.gameSettings.bonusSpeed = num;
     }
     data.options.bonusRate = num;
 }

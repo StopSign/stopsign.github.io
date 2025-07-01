@@ -129,8 +129,8 @@ function createOptionsMenu() {
 }
 
 function updateSliderDisplay(currentValue) {
-    recalcInterval(currentValue);
-    data.ticksPerSecond = currentValue;
+    // recalcInterval(currentValue);
+    data.gameSettings.ticksPerSecond = currentValue;
     document.getElementById('sliderValue').textContent = currentValue;
 }
 
