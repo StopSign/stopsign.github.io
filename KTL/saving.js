@@ -85,10 +85,10 @@ const actionPatches = {
         preventReset: true
     },
 
-    questionTheTrail: {
+    exploreDifficultPath: {
         preventReset: false
     },
-    stepOffToExplore: {
+    keepGoing: {
         preventReset: false
     },
     eatGoldenFruit: {
@@ -189,6 +189,9 @@ function load() {
         data.focusMult = toLoad.focusMult ?? 2;
         data.focusLoopMax = toLoad.focusLoopMax ?? 2.5;
         data.gameSettings.ticksPerSecond = toLoad.ticksPerSecond ?? 20;
+
+        data.currentGameState = toLoad.currentGameState;
+        data.gameSettings = toLoad.gameSettings;
     }
 
     //update all generator's multiplier data

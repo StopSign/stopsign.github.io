@@ -189,7 +189,7 @@ let actionData = {
             unveilAction('travelToOutpost')
             unveilAction('meetVillageLeaderScott')
         },
-        onLevelAtts:[["awareness", 400]],
+        onLevelAtts:[["awareness", 100]],
         expAtts:[["curiosity", 1], ["concentration", 1], ["energy", 1], ["endurance", 1]],
         efficiencyAtts:[["coordination", .5]]
     },
@@ -223,13 +223,13 @@ let actionData = {
         onLevelCustom: function() {
         },
         onLevelAtts:[["energy", 5]],
-        expAtts:[["concentration", 1], ["endurance", 1]],
+        expAtts:[["concentration", 1], ["endurance", 1], ["geared", 1]],
         efficiencyAtts:[["navigation", 1]],
         unlockMessage:{english:"On unlock, +1 max level for Body Awareness."}
     },
     travelToOutpost: {
         tier:1, plane:0,
-        progressMaxBase:10000, progressMaxIncrease:15,
+        progressMaxBase:10000, progressMaxIncrease:10,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.25, maxLevel:10,
         unlockCost:3000, visible:false, unlocked:false, purchased: true,
@@ -237,7 +237,7 @@ let actionData = {
             unveilAction('remember');
         },
         onLevelAtts:[["energy", 30]],
-        expAtts:[["endurance", 1]],
+        expAtts:[["endurance", 1], ["geared", 1]],
         efficiencyAtts:[["navigation", 1]],
         unlockMessage:{english:"On unlock, reveal a new action."}
     },
@@ -260,12 +260,13 @@ let actionData = {
             }
         },
         onUnlock: function() {
+            data.actions.remember.maxLevel++
         },
         onLevelAtts:[],
         expAtts:[["curiosity", 1], ["observation", 1]],
         efficiencyAtts:[["observation", 1]],
         onLevelText:{english:"Unlocks new actions with each level.<br>+2 max levels for Remember."},
-        unlockMessage:{english:"This action gives +2 max levels per Remember."}
+        unlockMessage:{english:"On unlock, +1 max level for Remember.<b> In addition, +2 max levels for Remember when this action levels."}
     },
     helpScottWithChores: {
         tier:1, plane:0,
@@ -280,12 +281,12 @@ let actionData = {
             document.getElementById("jobDisplay").style.display = "";
         },
         onLevelCustom: function() {
-            data.actions.helpScottWithChores.wage += actionData.helpScottWithChores.wage/4;
+            data.actions.helpScottWithChores.wage += actionData.helpScottWithChores.wage/2;
         },
         onLevelAtts:[["recognition", 10]],
         expAtts:[["ambition", 1]],
         efficiencyAtts:[["energy", 1]],
-        onLevelText:{english:"Increase wage +25%"}
+        onLevelText:{english:"Increase wage +50%"}
     },
     browseLocalMarket: {
         tier:1, plane:0,
@@ -305,10 +306,10 @@ let actionData = {
     },
     checkNoticeBoard: {
         tier:1, plane:0,
-        progressMaxBase:20e6, progressMaxIncrease:40,
+        progressMaxBase:60e6, progressMaxIncrease:40,
         expToLevelBase:2, expToLevelIncrease:3,
         efficiencyBase:.003125, maxLevel:3, //1/320
-        unlockCost:5e6, visible:false, unlocked:false, purchased: true,
+        unlockCost:10e6, visible:false, unlocked:false, purchased: true,
         onLevelCustom: function() {
             if(data.actions.checkNoticeBoard.level >= 1) {
                 unveilAction('browseLocalMarket');
@@ -319,6 +320,7 @@ let actionData = {
             if(data.actions.checkNoticeBoard.level >= 3) {
                 unveilAction('reportForLabor')
                 unveilAction('oddJobsLaborer')
+                unveilAction('chimneySweep');
             }
         },
         onLevelAtts:[],
@@ -422,7 +424,7 @@ let actionData = {
         progressMaxBase:5e7, progressMaxIncrease:10,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.2, maxLevel:10,
-        unlockCost:1e8, visible:false, unlocked:false, purchased: true,
+        unlockCost:2e8, visible:false, unlocked:false, purchased: true,
         onLevelAtts:[["energy", 4000]],
         expAtts:[["savvy", 1]],
         efficiencyAtts:[["ambition", 1]]
@@ -432,7 +434,7 @@ let actionData = {
         progressMaxBase:5e8, progressMaxIncrease:10,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.1, maxLevel:10,
-        unlockCost:5e8, visible:false, unlocked:false, purchased: true,
+        unlockCost:2e9, visible:false, unlocked:false, purchased: true,
         onLevelAtts:[["energy", 10000], ["geared", 400]],
         expAtts:[["savvy", 1]],
         efficiencyAtts:[["ambition", 1]]
@@ -538,7 +540,7 @@ let actionData = {
         unlockCost:1e11, visible:false, unlocked:false, purchased: true,
         onUnlock: function() {
         },
-        onLevelAtts:[["coordination", 200], ["leverage", 10]],
+        onLevelAtts:[["coordination", 200]],
         expAtts:[["adaptability", 1]],
         efficiencyAtts:[["adaptability", 1]]
     },
@@ -552,9 +554,6 @@ let actionData = {
         onLevelCustom: function() {
             data.actions.oddJobsLaborer.wage += actionData.oddJobsLaborer.wage/2;
             changeJob('oddJobsLaborer');
-            if(data.actions.oddJobsLaborer.level >= 2) {
-                unveilAction('chimneySweep');
-            }
         },
         onUnlock:function() {
             changeJob('oddJobsLaborer');
@@ -563,7 +562,7 @@ let actionData = {
         expAtts:[],
         efficiencyAtts:[["adaptability", 1]],
         unlockMessage:{english:"On unlock, set job to Odd Jobs Laborer for a base wage of $20."},
-        onLevelText:{english:"Increase wage +50%"}
+        onLevelText:{english:"Increase wage +50%."}
     },
     chimneySweep: {
         tier:1, plane:0,
@@ -575,9 +574,6 @@ let actionData = {
         onLevelCustom: function() {
             data.actions.chimneySweep.wage += actionData.chimneySweep.wage/2;
             changeJob('chimneySweep');
-            if(data.actions.chimneySweep.level >= 2) {
-                unveilAction('handyman');
-            }
         },
         onUnlock:function() {
             changeJob('chimneySweep');
@@ -586,21 +582,18 @@ let actionData = {
         expAtts:[],
         efficiencyAtts:[["adaptability", .5]],
         unlockMessage:{english:"On unlock, set job to Chimney Sweep for a base wage of $100."},
-        onLevelText:{english:"Increase wage +50%"}
+        onLevelText:{english:"Increase wage +50%."}
     },
     handyman: {
         tier:1, plane:0,
-        progressMaxBase:1e14, progressMaxIncrease:2,
+        progressMaxBase:1e16, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.2, maxLevel:8,
         wage: 500,
-        unlockCost:1e15, visible:false, unlocked:false, purchased: true,
+        unlockCost:1e17, visible:false, unlocked:false, purchased: true,
         onLevelCustom: function() {
             data.actions.handyman.wage += actionData.handyman.wage/2;
             changeJob('handyman');
-            if(data.actions.handyman.level >= 2) {
-                unveilAction('tavernHelper');
-            }
         },
         onUnlock:function() {
             changeJob('handyman');
@@ -609,6 +602,26 @@ let actionData = {
         expAtts:[],
         efficiencyAtts:[["adaptability", .3]],
         unlockMessage:{english:"On unlock, set job to Handyman for a base wage of $500."},
+        onLevelText:{english:"Increase wage +50%"}
+    },
+    tavernHelper: {
+        tier:1, plane:0,
+        progressMaxBase:1e18, progressMaxIncrease:3,
+        expToLevelBase:10, expToLevelIncrease:1.2,
+        efficiencyBase:.2, maxLevel:8,
+        wage: 2000,
+        unlockCost:1e19, visible:false, unlocked:false, purchased: true,
+        onLevelCustom: function() {
+            data.actions.tavernHelper.wage += actionData.tavernHelper.wage/2;
+            changeJob('tavernHelper');
+        },
+        onUnlock:function() {
+            changeJob('tavernHelper');
+        },
+        onLevelAtts:[["adaptability", 8]],
+        expAtts:[],
+        efficiencyAtts:[["adaptability", .1]],
+        unlockMessage:{english:"On unlock, set job to Tavern Helper for a base wage of $2000."},
         onLevelText:{english:"Increase wage +50%"}
     },
     socialize: {
@@ -653,7 +666,7 @@ let actionData = {
             data.actions.socialize.upgradeMult = upgradeMult;
         },
         onLevelAtts:[["confidence", 1]],
-        expAtts:[["confidence", 1], ["curiosity", 1], ["observation", 1], ["recognition", 1], ["charm", 1], ["influence", 1]],
+        expAtts:[["confidence", 1], ["recognition", 1], ["charm", 1], ["influence", 1]],
         efficiencyAtts:[["confidence", .1]],
         actionPowerFunction: function(resource) {
             if(resource < 1) {
@@ -677,7 +690,7 @@ let actionData = {
             unveilAction('buySocialAccess');
             unveilAction('slideTheCoin');
         },
-        onLevelAtts:[["recognition", 1], ["confidence", 1], ["discernment", 1]],
+        onLevelAtts:[["confidence", 1]],
         expAtts:[],
         efficiencyAtts:[]
     },
@@ -777,91 +790,495 @@ actionData = {
         onLevelCustom: function() {
         },
         onUnlock: function() {
-            data.actions.bodyAwareness.maxLevel++;
+            data.actions.bodyAwareness.maxLevel+=3;
         },
         onLevelAtts:[["observation", 120]],
         expAtts:[["curiosity", 1], ["concentration", 1]],
         efficiencyAtts:[["navigation", 1]],
-        unlockMessage:{english:"On unlock, +1 max level for Body Awareness."}
+        unlockMessage:{english:"On unlock, +3 max level for Body Awareness."}
     },
-    questionTheTrail: {
+    exploreDifficultPath: {
         tier:1, plane:0,
-        progressMaxBase:1e9, progressMaxIncrease:4,
+        progressMaxBase:5e12, progressMaxIncrease:20,
         expToLevelBase:2, expToLevelIncrease:1,
         efficiencyBase:.2, maxLevel:2,
-        unlockCost:4e8, visible:false, unlocked:false, purchased: true,
+        unlockCost:1e11, visible:false, unlocked:false, purchased: true,
         onLevelCustom: function() {
-            unveilAction('stepOffToExplore')
+            unveilAction('keepGoing')
             unveilAction('eatGoldenFruit');
         },
         onUnlock: function() {
         },
-        onLevelAtts:[["navigation", 2.5]],
-        expAtts:[["curiosity", 1]],
-        efficiencyAtts:[["navigation", 1]]
-    },
-    stepOffToExplore: {
-        tier:1, plane:0,
-        progressMaxBase:1e9, progressMaxIncrease:5,
-        expToLevelBase:1, expToLevelIncrease:1,
-        efficiencyBase:.1, maxLevel:3,
-        unlockCost:1e9, visible:false, unlocked:false, purchased: true,
-        onUnlock: function() {
-            unveilAction('climbTheRocks')
-            unveilAction('spotAPath')
-        },
-        onLevelCustom: function() {
-        },
-        onLevelAtts:[["navigation", 2.5], ["flow", 5]],
-        expAtts:[["endurance", 1], ["geared", 1]],
+        onLevelAtts:[["navigation", 2]],
+        expAtts:[["geared", 1]],
         efficiencyAtts:[["navigation", 1]]
     },
     eatGoldenFruit: {
-        tier:1, plane:0,
+        tier:2, plane:0,
         progressMaxBase:1e11, progressMaxIncrease:10,
         expToLevelBase:1, expToLevelIncrease:1,
-        efficiencyBase:.03, maxLevel:1,
-        unlockCost:1e8, visible:false, unlocked:false, purchased: true,
+        efficiencyBase:1, maxLevel:1,
+        unlockCost:1e11, visible:false, unlocked:false, purchased: true,
         onLevelCustom: function() {
         },
         onUnlock: function () {
         },
-        onLevelAtts:[["awareness", 2000], ["integration", 40]],
-        expAtts:[["observation", 1], ["geared", 1], ["coordination", 1]],
-        efficiencyAtts:[["curiosity", 1]]
+        onLevelAtts:[["awareness", 1000], ["integration", 40]],
+        expAtts:[],
+        efficiencyAtts:[]
+    },
+    keepGoing: {
+        tier:1, plane:0,
+        progressMaxBase:2e13, progressMaxIncrease:20,
+        expToLevelBase:2, expToLevelIncrease:1,
+        efficiencyBase:.1, maxLevel:2,
+        unlockCost:5e12, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+            unveilAction('climbTheRocks')
+        },
+        onLevelCustom: function() {
+        },
+        onLevelAtts:[["navigation", 3], ["flow", 5]],
+        expAtts:[["geared", 1]],
+        efficiencyAtts:[["navigation", 1]]
     },
     climbTheRocks: {
         tier:1, plane:0,
-        progressMaxBase:1e11, progressMaxIncrease:1,
-        expToLevelBase:1, expToLevelIncrease:1,
+        progressMaxBase:4e13, progressMaxIncrease:1,
+        expToLevelBase:2, expToLevelIncrease:1,
         efficiencyBase:.05, maxLevel:5,
-        unlockCost:1e9, visible:false, unlocked:false, purchased: true,
+        unlockCost:1e13, visible:false, unlocked:false, purchased: true,
         onUnlock: function() {
         },
-        onLevelAtts:[["concentration", 300]],
-        expAtts:[["might", 1], ["geared", 1]],
+        onLevelCustom: function() {
+            if(data.actions.climbTheRocks.level >= 5) {
+                unveilAction('spotAPath')
+            }
+        },
+        onLevelAtts:[["concentration", 100]],
+        expAtts:[["geared", 1]],
         efficiencyAtts:[["navigation", 1]]
     },
     spotAPath: {
         tier:1, plane:0,
-        progressMaxBase:1e12, progressMaxIncrease:3,
+        progressMaxBase:1e15, progressMaxIncrease:3,
         expToLevelBase:1, expToLevelIncrease:1,
-        efficiencyBase:.1, maxLevel:1,
-        unlockCost:1e9, visible:false, unlocked:false, purchased: true,
+        efficiencyBase:.01, maxLevel:1,
+        unlockCost:3e13, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+        },
+        onLevelCustom: function() {
+            unveilAction('pleasantForest')
+        },
+        onLevelAtts:[["navigation", 5], ["flow", 20]],
+        expAtts:[["geared", 1], ["vision", 1]],
+        efficiencyAtts:[["integration", 1], ["vision", 1]]
+    },
+    pleasantForest: {
+        tier:1, plane:0,
+        progressMaxBase:1e16, progressMaxIncrease:10,
+        expToLevelBase:7, expToLevelIncrease:1,
+        efficiencyBase:.2, maxLevel:10,
+        unlockCost:1e13, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+            unveilAction('hiddenPath')
+        },
+        onLevelCustom: function() {
+        },
+        onLevelAtts:[["observation", 2000]],
+        expAtts:[["endurance", 1]],
+        efficiencyAtts:[["curiosity", .01]]
+    },
+    hiddenPath: {
+        tier:1, plane:0,
+        progressMaxBase:2e15, progressMaxIncrease:3,
+        expToLevelBase:7, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:5,
+        unlockCost:2e13, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+            unveilAction('exploreTheForest')
+            unveilAction('meetGrumpyHermit')
+        },
+        onLevelCustom: function() {
+        },
+        onLevelAtts:[],
+        expAtts:[["observation", 1]],
+        efficiencyAtts:[]
+    },
+    exploreTheForest: {
+        tier:1, plane:0,
+        progressMaxBase:1e15, progressMaxIncrease:3,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:10,
+        unlockCost:2e14, visible:false, unlocked:false, purchased: true,
         onUnlock: function() {
         },
         onLevelCustom: function() {
         },
-        onLevelAtts:[["navigation", 5], ["flow", 20]],
-        expAtts:[["might", 1], ["geared", 1]],
-        efficiencyAtts:[["integration", 1]]
+        onLevelAtts:[["curiosity", 1]],
+        expAtts:[],
+        efficiencyAtts:[]
     },
+    meetGrumpyHermit: {
+        tier:1, plane:0,
+        progressMaxBase:5e17, progressMaxIncrease:40,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:1,
+        unlockCost:5e13, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+        },
+        onLevelCustom: function() {
+            unveilAction('annoyHermitIntoAQuest')
+            if(data.actions.guildReceptionist.level >= 2) {
+                unveilAction('talkToHermit');
+            }
+            if(data.actions.guildReceptionist.level >= 3) {
+                unveilAction('learnToStayStill');
+            }
+        },
+        onLevelAtts:[],
+        expAtts:[["curiosity", 1], ["observation", 1]],
+        efficiencyAtts:[]
+    },
+    annoyHermitIntoAQuest: {
+        tier:1, plane:0,
+        progressMaxBase:1e15, progressMaxIncrease:3,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:10,
+        unlockCost:3e13, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+        },
+        onLevelCustom: function() {
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[]
+    },
+    presentTheOffering: {
+        tier:1, plane:0,
+        progressMaxBase:1e15, progressMaxIncrease:3,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:10,
+        unlockCost:3e13, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+        },
+        onLevelCustom: function() {
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[]
+    },
+    talkToHermit: {
+        tier:1, plane:0,
+        progressMaxBase:1e15, progressMaxIncrease:3,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:10,
+        unlockCost:3e13, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+        },
+        onLevelCustom: function() {
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[]
+    },
+    inquireAboutMagic: {
+        tier:1, plane:0,
+        progressMaxBase:1e15, progressMaxIncrease:3,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:10,
+        unlockCost:3e13, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+        },
+        onLevelCustom: function() {
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[]
+    },
+    talkWithScott: {
+        tier:1, plane:0,
+        progressMaxBase:1e15, progressMaxIncrease:3,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:2,
+        unlockCost:3e13, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+        },
+        onLevelCustom: function() {
+            unveilAction('handyman');
+            if(data.actions.talkWithScott.level >= 2) {
+                unveilAction('tavernHelper');
+            }
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[]
+    },
+    talkWithJohn: {
+        tier:1, plane:0,
+        progressMaxBase:1e15, progressMaxIncrease:3,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:2,
+        unlockCost:3e13, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+        },
+        onLevelCustom: function() {
+            unveilAction('guildReceptionist');
+            if(data.actions.talkWithJohn.level >= 2) {
+                unveilAction('messenger');
+            }
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[]
+    },
+    learnToListen: {
+        tier:1, plane:0,
+        progressMaxBase:1e15, progressMaxIncrease:3,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:10,
+        unlockCost:3e13, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+        },
+        onLevelCustom: function() {
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[]
+    },
+    chatWithMerchants: {
+        tier:1, plane:0,
+        progressMaxBase:1e15, progressMaxIncrease:3,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:10,
+        unlockCost:3e13, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+        },
+        onLevelCustom: function() {
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[]
+    },
+    chatWithHermit: {
+        tier:1, plane:0,
+        progressMaxBase:1e15, progressMaxIncrease:3,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:10,
+        unlockCost:3e13, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+        },
+        onLevelCustom: function() {
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[]
+    },
+    tellAJoke: {
+        tier:1, plane:0,
+        progressMaxBase:1e15, progressMaxIncrease:3,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:10,
+        unlockCost:3e13, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+        },
+        onLevelCustom: function() {
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[]
+    },
+    hearOfSecretShrine: {
+        tier:1, plane:0,
+        progressMaxBase:1e15, progressMaxIncrease:3,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:10,
+        unlockCost:3e13, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+        },
+        onLevelCustom: function() {
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[]
+    },
+    learnToStayStill: {
+        tier:1, plane:0,
+        progressMaxBase:1e15, progressMaxIncrease:3,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:10,
+        unlockCost:3e13, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+        },
+        onLevelCustom: function() {
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[]
+    },
+    feelTheResonance: {
+        tier:1, plane:0,
+        progressMaxBase:1e15, progressMaxIncrease:3,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:10,
+        unlockCost:3e13, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+        },
+        onLevelCustom: function() {
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[]
+    },
+    layerTheEchoes: {
+        tier:1, plane:0,
+        progressMaxBase:1e15, progressMaxIncrease:3,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:10,
+        unlockCost:3e13, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+        },
+        onLevelCustom: function() {
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[]
+    },
+    igniteTheSpark: {
+        tier:1, plane:0,
+        progressMaxBase:1e15, progressMaxIncrease:3,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:10,
+        unlockCost:3e13, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+        },
+        onLevelCustom: function() {
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[]
+    },
+    travelAlongTheRiver: {
+        tier:1, plane:0,
+        progressMaxBase:1e15, progressMaxIncrease:3,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:10,
+        unlockCost:3e13, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+        },
+        onLevelCustom: function() {
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[]
+    },
+    gatherRiverWeeds: {
+        tier:1, plane:0,
+        progressMaxBase:1e15, progressMaxIncrease:3,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:10,
+        unlockCost:3e13, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+        },
+        onLevelCustom: function() {
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[]
+    },
+    gatherRarePlants: {
+        tier:1, plane:0,
+        progressMaxBase:1e15, progressMaxIncrease:3,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:10,
+        unlockCost:3e13, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+        },
+        onLevelCustom: function() {
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[]
+    },
+    restAtWaterfall: {
+        tier:1, plane:0,
+        progressMaxBase:1e15, progressMaxIncrease:3,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:10,
+        unlockCost:3e13, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+        },
+        onLevelCustom: function() {
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[]
+    },
+    visitShrineBehindWaterfall: {
+        tier:1, plane:0,
+        progressMaxBase:1e15, progressMaxIncrease:3,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:10,
+        unlockCost:3e13, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+        },
+        onLevelCustom: function() {
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[]
+    },
+    travelToCrossroads: {
+        tier:1, plane:0,
+        progressMaxBase:1e15, progressMaxIncrease:3,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:10,
+        unlockCost:3e13, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+        },
+        onLevelCustom: function() {
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[]
+    },
+    forgottenShrine: {
+        tier:1, plane:0,
+        progressMaxBase:1e15, progressMaxIncrease:3,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:10,
+        unlockCost:3e13, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+        },
+        onLevelCustom: function() {
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[]
+    },
+    resonatingAmulet: {
+        tier:1, plane:0,
+        progressMaxBase:1e15, progressMaxIncrease:3,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:10,
+        unlockCost:3e13, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+        },
+        onLevelCustom: function() {
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[]
+    },
+
+
+
     standStraighter: {
         tier:1, plane:0,
-        progressMaxBase:250, progressMaxIncrease:1.1,
+        progressMaxBase:1e15, progressMaxIncrease:3,
         expToLevelBase:10, expToLevelIncrease:1,
-        efficiencyBase:.2, maxLevel:100,
-        unlockCost:2e6, visible:false, unlocked:false, purchased: true,
+        efficiencyBase:1, maxLevel:10,
+        unlockCost:3e13, visible:false, unlocked:false, purchased: true,
         onUnlock: function() {
         },
         onLevelCustom: function() {
@@ -885,7 +1302,6 @@ actionData = {
         onLevelCustom: function() {
         },
         onUnlock: function() {
-            data.actions.bodyAwareness.maxLevel++;
         },
         onLevelAtts:[["awareness", 200], ["curiosity", 50]],
         expAtts:[["observation", 1], ["energy", 1]],
@@ -983,7 +1399,7 @@ actionData = {
 
     reportForTraining: {
         tier:1, plane:0,
-        progressMaxBase:1e6, progressMaxIncrease:1.5,
+        progressMaxBase:3e6, progressMaxIncrease:1.5,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.05, maxLevel:5,
         unlockCost:1e8, visible:false, unlocked:false, purchased: true,
@@ -998,29 +1414,29 @@ actionData = {
     },
     basicTrainingWithJohn: {
         tier:1, plane:0,
-        progressMaxBase:1e8, progressMaxIncrease:8,
+        progressMaxBase:1e10, progressMaxIncrease:8,
         expToLevelBase:3, expToLevelIncrease:1,
         efficiencyBase:.5, maxLevel:5,
-        unlockCost:1e8, visible:false, unlocked:false, purchased: true,
+        unlockCost:3e8, visible:false, unlocked:false, purchased: true,
         onUnlock:function() {
             unveilAction('noticeTheStrain');
             unveilAction('clenchTheJaw');
             unveilAction('breatheThroughIt');
             unveilAction('ownTheWeight');
             unveilAction('moveWithPurpose');
-            data.actions.bodyAwareness.maxLevel += 6;
+            data.actions.bodyAwareness.maxLevel += 4;
         },
         onLevelAtts:[["coordination", 30]],
         expAtts:[["endurance", 1], ["might", 1], ["geared", 1]],
         efficiencyAtts:[["flow", 1]],
-        unlockMessage:{english:"On unlock, +6 max levels for Body Awareness."}
+        unlockMessage:{english:"On unlock, +4 max levels for Body Awareness."}
     },
     noticeTheStrain: {
         tier:1, plane:0,
         progressMaxBase:5e8, progressMaxIncrease:40,
         expToLevelBase:3, expToLevelIncrease:1,
         efficiencyBase:.05, maxLevel:3,
-        unlockCost:5e7, visible:false, unlocked:false, purchased: true,
+        unlockCost:10e7, visible:false, unlocked:false, purchased: true,
         onLevelAtts:[["observation", 500]],
         expAtts:[["endurance", 1], ["might", 10], ["geared", 1]],
         efficiencyAtts:[["coordination", 1]]
@@ -1030,17 +1446,17 @@ actionData = {
         progressMaxBase:2e11, progressMaxIncrease:3,
         expToLevelBase:3, expToLevelIncrease:1,
         efficiencyBase:.04, maxLevel:2,
-        unlockCost:5e7, visible:false, unlocked:false, purchased: true,
+        unlockCost:11e7, visible:false, unlocked:false, purchased: true,
         onLevelAtts:[["endurance", 100]],
         expAtts:[["endurance", 1], ["observation", 1], ["geared", 1]],
         efficiencyAtts:[["coordination", 1]]
     },
     breatheThroughIt: {
         tier:1, plane:0,
-        progressMaxBase:1e13, progressMaxIncrease:3,
+        progressMaxBase:5e12, progressMaxIncrease:2,
         expToLevelBase:3, expToLevelIncrease:1,
         efficiencyBase:.03, maxLevel:2,
-        unlockCost:5e7, visible:false, unlocked:false, purchased: true,
+        unlockCost:12e7, visible:false, unlocked:false, purchased: true,
         onLevelAtts:[["flow", 5]],
         expAtts:[["observation", 1], ["endurance", 1], ["geared", 1]],
         efficiencyAtts:[["coordination", 1]]
@@ -1050,17 +1466,20 @@ actionData = {
         progressMaxBase:2e9, progressMaxIncrease:3,
         expToLevelBase:3, expToLevelIncrease:1,
         efficiencyBase:.0005, maxLevel:2,
-        unlockCost:5e7, visible:false, unlocked:false, purchased: true,
+        unlockCost:13e7, visible:false, unlocked:false, purchased: true,
         onLevelAtts:[["might", 50]],
         expAtts:[["geared", 1]],
         efficiencyAtts:[["flow", 1000]]
     },
     moveWithPurpose: {
         tier:1, plane:0,
-        progressMaxBase:2e14, progressMaxIncrease:200,
+        progressMaxBase:2e14, progressMaxIncrease:600,
         expToLevelBase:3, expToLevelIncrease:1,
         efficiencyBase:.0005, maxLevel:2,
-        unlockCost:5e7, visible:false, unlocked:false, purchased: true,
+        unlockCost:14e7, visible:false, unlocked:false, purchased: true,
+        onLevelCustom: function() {
+
+        },
         onLevelAtts:[["endurance", 1000], ["might", 200], ["coordination", 100]],
         expAtts:[["observation", 1], ["might", 1], ["endurance", 1], ["geared", 1]],
         efficiencyAtts:[["flow", 1000]]
@@ -1072,28 +1491,6 @@ actionData = {
 actionData = {
     ...actionData,
 
-    tavernHelper: {
-        tier:1, plane:0,
-        progressMaxBase:1e12, progressMaxIncrease:3,
-        expToLevelBase:10, expToLevelIncrease:1.2,
-        efficiencyBase:.025, maxLevel:8,
-        wage: 80,
-        unlockCost:1e12, visible:false, unlocked:false, purchased: true,
-        onLevelCustom: function() {
-            data.actions.tavernHelper.wage += actionData.tavernHelper.wage/4;
-            changeJob('tavernHelper');
-            if(data.actions.tavernHelper.level >= 2) {
-                unveilAction('guildReceptionist');
-            }
-        },
-        onUnlock:function() {
-            changeJob('tavernHelper');
-        },
-        onLevelAtts:[],
-        expAtts:[],
-        efficiencyAtts:[],
-        unlockMessage:{english:"On unlock, set job to tavernHelper for a base wage of $1.25m."}
-    },
     guildReceptionist: {
         tier:1, plane:0,
         progressMaxBase:1e15, progressMaxIncrease:3,
@@ -1313,75 +1710,719 @@ actionData = {
         expAtts:[],
         efficiencyAtts:[]
     },
-    killHorde: {
+    fightTheEvilForces: {
         tier:1, plane:1,
-        progressMaxBase:1e10, progressMaxIncrease:10,
-        expToLevelBase:5, expToLevelIncrease:1,
-        efficiencyBase:1, isKTL:true, purchased: true, maxLevel:2,
-        unlockCost:1e9, visible:true, unlocked:false,
-        onUnlock: function() {
-            data.ancientCoin += 10;
-            data.useAmuletButtonShowing = true;
-        },
-        onCompleteCustom:function() {
-            data.ancientCoin += 2 * (1 +  data.actions.killHorde.level);
-        },
-        onLevelCustom: function() {
-            unveilAction('killElites');
-        },
-        onLevelAtts:[],
-        expAtts:[],
-        efficiencyAtts:[],
-        extraInfo:{english:"Gives 2 * (1 + level) Ancient Coin per complete."},
-        unlockMessage:{english:"On unlock, +10 Ancient Coin."}
-    },
-    killElites: {
-        tier:1, plane:1,
-        progressMaxBase:1e13, progressMaxIncrease:10,
-        expToLevelBase:5, expToLevelIncrease:1,
-        efficiencyBase:1, isKTL:true, purchased: true, maxLevel:2,
-        unlockCost:1e12, visible:true, unlocked:false,
-        onUnlock: function() {
-            data.ancientCoin += 30;
-        },
-        onCompleteCustom:function() {
-            data.ancientCoin += 6 * (1 +  data.actions.killHorde.level);
-        },
-        onLevelCustom: function() {
-        },
-        onLevelAtts:[],
-        expAtts:[],
-        efficiencyAtts:[],
-        extraInfo:{english:"Gives 6 * (1 + level) Ancient Coin per complete."},
-        unlockMessage:{english:"On unlock, +30 Ancient Coin."}
-    },
-    killDevils: {
-        tier:1, plane:1,
-        progressMaxBase:1e16, progressMaxIncrease:10,
-        expToLevelBase:5, expToLevelIncrease:1,
-        efficiencyBase:1, isKTL:true, purchased: true, maxLevel:2,
-        unlockCost:1e12, visible:true, unlocked:false,
-        onUnlock: function() {
-            data.ancientCoin += 100;
-        },
-        onCompleteCustom:function() {
-            data.ancientCoin += 20 * (1 +  data.actions.killHorde.level);
-        },
-        onLevelAtts:[],
-        expAtts:[],
-        efficiencyAtts:[],
-        extraInfo:{english:"Gives 20 * (1 + level) Ancient Coin per complete."},
-        unlockMessage:{english:"On unlock, +100 Ancient Coin."}
-    },
-    killGenerals: {
-        tier:1, plane:1,
-        progressMaxBase:10, progressMaxIncrease:1.2,
-        expToLevelBase:1, expToLevelIncrease:1.2,
+        progressMaxBase:60, progressMaxIncrease:1,
+        expToLevelBase:60, expToLevelIncrease:1,
         efficiencyBase:1, isKTL:true, purchased: true,
-        unlockCost:10, visible:true, unlocked:false,
+        unlockCost:0, visible:true, unlocked:true, isGenerator:true, generatorSpeed:1,
         onLevelAtts:[],
         expAtts:[],
         efficiencyAtts:[]
+    },
+    bridgeOfBone: {
+        tier:1, plane:1,
+        progressMaxBase:1e10, progressMaxIncrease:2,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
+        unlockCost:1e9, visible:true, unlocked:false,
+        onUnlock: function() {
+            data.ancientCoin += 1;
+            data.useAmuletButtonShowing = true;
+        },
+        onCompleteCustom:function() {
+            data.legacy += 1;
+        },
+        onLevelCustom: function() {
+            unveilAction('');
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[],
+        extraInfo:{english:"1 Legacy per complete."},
+        unlockMessage:{english:"On unlock, +1 Ancient Coin."}
+    },
+    harvestGhostlyField: {
+        tier:1, plane:1,
+        progressMaxBase:1e10, progressMaxIncrease:2,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
+        unlockCost:1e9, visible:true, unlocked:false,
+        onUnlock: function() {
+            data.ancientCoin += 1;
+            data.useAmuletButtonShowing = true;
+        },
+        onCompleteCustom:function() {
+            data.legacy += 1;
+        },
+        onLevelCustom: function() {
+            unveilAction('');
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[],
+        extraInfo:{english:"1 Legacy per complete."},
+        unlockMessage:{english:"On unlock, +1 Ancient Coin."}
+    },
+    geyserFields: {
+        tier:1, plane:1,
+        progressMaxBase:1e10, progressMaxIncrease:2,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
+        unlockCost:1e9, visible:true, unlocked:false,
+        onUnlock: function() {
+            data.ancientCoin += 1;
+            data.useAmuletButtonShowing = true;
+        },
+        onCompleteCustom:function() {
+            data.legacy += 1;
+        },
+        onLevelCustom: function() {
+            unveilAction('');
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[],
+        extraInfo:{english:"1 Legacy per complete."},
+        unlockMessage:{english:"On unlock, +1 Ancient Coin."}
+    },
+    destroySiegeEngine: {
+        tier:1, plane:1,
+        progressMaxBase:1e10, progressMaxIncrease:2,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
+        unlockCost:1e9, visible:true, unlocked:false,
+        onUnlock: function() {
+            data.ancientCoin += 1;
+            data.useAmuletButtonShowing = true;
+        },
+        onCompleteCustom:function() {
+            data.legacy += 1;
+        },
+        onLevelCustom: function() {
+            unveilAction('');
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[],
+        extraInfo:{english:"1 Legacy per complete."},
+        unlockMessage:{english:"On unlock, +1 Ancient Coin."}
+    },
+    destroyEasternMonolith: {
+        tier:1, plane:1,
+        progressMaxBase:1e10, progressMaxIncrease:2,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
+        unlockCost:1e9, visible:true, unlocked:false,
+        onUnlock: function() {
+            data.ancientCoin += 1;
+            data.useAmuletButtonShowing = true;
+        },
+        onCompleteCustom:function() {
+            data.legacy += 1;
+        },
+        onLevelCustom: function() {
+            unveilAction('');
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[],
+        extraInfo:{english:"1 Legacy per complete."},
+        unlockMessage:{english:"On unlock, +1 Ancient Coin."}
+    },
+    stopDarknessRitual: {
+        tier:1, plane:1,
+        progressMaxBase:1e10, progressMaxIncrease:2,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
+        unlockCost:1e9, visible:true, unlocked:false,
+        onUnlock: function() {
+            data.ancientCoin += 1;
+            data.useAmuletButtonShowing = true;
+        },
+        onCompleteCustom:function() {
+            data.legacy += 1;
+        },
+        onLevelCustom: function() {
+            unveilAction('');
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[],
+        extraInfo:{english:"1 Legacy per complete."},
+        unlockMessage:{english:"On unlock, +1 Ancient Coin."}
+    },
+    protectTheSunstone: {
+        tier:1, plane:1,
+        progressMaxBase:1e10, progressMaxIncrease:2,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
+        unlockCost:1e9, visible:true, unlocked:false,
+        onUnlock: function() {
+            data.ancientCoin += 1;
+            data.useAmuletButtonShowing = true;
+        },
+        onCompleteCustom:function() {
+            data.legacy += 1;
+        },
+        onLevelCustom: function() {
+            unveilAction('');
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[],
+        extraInfo:{english:"1 Legacy per complete."},
+        unlockMessage:{english:"On unlock, +1 Ancient Coin."}
+    },
+    silenceDeathChanters: {
+        tier:1, plane:1,
+        progressMaxBase:1e10, progressMaxIncrease:2,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
+        unlockCost:1e9, visible:true, unlocked:false,
+        onUnlock: function() {
+            data.ancientCoin += 1;
+            data.useAmuletButtonShowing = true;
+        },
+        onCompleteCustom:function() {
+            data.legacy += 1;
+        },
+        onLevelCustom: function() {
+            unveilAction('');
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[],
+        extraInfo:{english:"1 Legacy per complete."},
+        unlockMessage:{english:"On unlock, +1 Ancient Coin."}
+    },
+    breakFleshBarricade: {
+        tier:1, plane:1,
+        progressMaxBase:1e10, progressMaxIncrease:2,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
+        unlockCost:1e9, visible:true, unlocked:false,
+        onUnlock: function() {
+            data.ancientCoin += 1;
+            data.useAmuletButtonShowing = true;
+        },
+        onCompleteCustom:function() {
+            data.legacy += 1;
+        },
+        onLevelCustom: function() {
+            unveilAction('');
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[],
+        extraInfo:{english:"1 Legacy per complete."},
+        unlockMessage:{english:"On unlock, +1 Ancient Coin."}
+    },
+    conquerTheGatekeepers: {
+        tier:1, plane:1,
+        progressMaxBase:1e10, progressMaxIncrease:2,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
+        unlockCost:1e9, visible:true, unlocked:false,
+        onUnlock: function() {
+            data.ancientCoin += 1;
+            data.useAmuletButtonShowing = true;
+        },
+        onCompleteCustom:function() {
+            data.legacy += 1;
+        },
+        onLevelCustom: function() {
+            unveilAction('');
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[],
+        extraInfo:{english:"1 Legacy per complete."},
+        unlockMessage:{english:"On unlock, +1 Ancient Coin."}
+    },
+    unhookSacrificialCages: {
+        tier:1, plane:1,
+        progressMaxBase:1e10, progressMaxIncrease:2,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
+        unlockCost:1e9, visible:true, unlocked:false,
+        onUnlock: function() {
+            data.ancientCoin += 1;
+            data.useAmuletButtonShowing = true;
+        },
+        onCompleteCustom:function() {
+            data.legacy += 1;
+        },
+        onLevelCustom: function() {
+            unveilAction('');
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[],
+        extraInfo:{english:"1 Legacy per complete."},
+        unlockMessage:{english:"On unlock, +1 Ancient Coin."}
+    },
+    purgeUnholyRelics: {
+        tier:1, plane:1,
+        progressMaxBase:1e10, progressMaxIncrease:2,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
+        unlockCost:1e9, visible:true, unlocked:false,
+        onUnlock: function() {
+            data.ancientCoin += 1;
+            data.useAmuletButtonShowing = true;
+        },
+        onCompleteCustom:function() {
+            data.legacy += 1;
+        },
+        onLevelCustom: function() {
+            unveilAction('');
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[],
+        extraInfo:{english:"1 Legacy per complete."},
+        unlockMessage:{english:"On unlock, +1 Ancient Coin."}
+    },
+    destroyWesternMonolith: {
+        tier:1, plane:1,
+        progressMaxBase:1e10, progressMaxIncrease:2,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
+        unlockCost:1e9, visible:true, unlocked:false,
+        onUnlock: function() {
+            data.ancientCoin += 1;
+            data.useAmuletButtonShowing = true;
+        },
+        onCompleteCustom:function() {
+            data.legacy += 1;
+        },
+        onLevelCustom: function() {
+            unveilAction('');
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[],
+        extraInfo:{english:"1 Legacy per complete."},
+        unlockMessage:{english:"On unlock, +1 Ancient Coin."}
+    },
+    destroyFleshGrowths: {
+        tier:1, plane:1,
+        progressMaxBase:1e10, progressMaxIncrease:2,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
+        unlockCost:1e9, visible:true, unlocked:false,
+        onUnlock: function() {
+            data.ancientCoin += 1;
+            data.useAmuletButtonShowing = true;
+        },
+        onCompleteCustom:function() {
+            data.legacy += 1;
+        },
+        onLevelCustom: function() {
+            unveilAction('');
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[],
+        extraInfo:{english:"1 Legacy per complete."},
+        unlockMessage:{english:"On unlock, +1 Ancient Coin."}
+    },
+    crackCorruptedEggs: {
+        tier:1, plane:1,
+        progressMaxBase:1e10, progressMaxIncrease:2,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
+        unlockCost:1e9, visible:true, unlocked:false,
+        onUnlock: function() {
+            data.ancientCoin += 1;
+            data.useAmuletButtonShowing = true;
+        },
+        onCompleteCustom:function() {
+            data.legacy += 1;
+        },
+        onLevelCustom: function() {
+            unveilAction('');
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[],
+        extraInfo:{english:"1 Legacy per complete."},
+        unlockMessage:{english:"On unlock, +1 Ancient Coin."}
+    },
+    kiteTheAbomination: {
+        tier:1, plane:1,
+        progressMaxBase:1e10, progressMaxIncrease:2,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
+        unlockCost:1e9, visible:true, unlocked:false,
+        onUnlock: function() {
+            data.ancientCoin += 1;
+            data.useAmuletButtonShowing = true;
+        },
+        onCompleteCustom:function() {
+            data.legacy += 1;
+        },
+        onLevelCustom: function() {
+            unveilAction('');
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[],
+        extraInfo:{english:"1 Legacy per complete."},
+        unlockMessage:{english:"On unlock, +1 Ancient Coin."}
+    },
+    collapseCorpseTower: {
+        tier:1, plane:1,
+        progressMaxBase:1e10, progressMaxIncrease:2,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
+        unlockCost:1e9, visible:true, unlocked:false,
+        onUnlock: function() {
+            data.ancientCoin += 1;
+            data.useAmuletButtonShowing = true;
+        },
+        onCompleteCustom:function() {
+            data.legacy += 1;
+        },
+        onLevelCustom: function() {
+            unveilAction('');
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[],
+        extraInfo:{english:"1 Legacy per complete."},
+        unlockMessage:{english:"On unlock, +1 Ancient Coin."}
+    },
+    surviveLivingSiegeEngine: {
+        tier:1, plane:1,
+        progressMaxBase:1e10, progressMaxIncrease:2,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
+        unlockCost:1e9, visible:true, unlocked:false,
+        onUnlock: function() {
+            data.ancientCoin += 1;
+            data.useAmuletButtonShowing = true;
+        },
+        onCompleteCustom:function() {
+            data.legacy += 1;
+        },
+        onLevelCustom: function() {
+            unveilAction('');
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[],
+        extraInfo:{english:"1 Legacy per complete."},
+        unlockMessage:{english:"On unlock, +1 Ancient Coin."}
+    },
+    destroySouthernMonolith: {
+        tier:1, plane:1,
+        progressMaxBase:1e10, progressMaxIncrease:2,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
+        unlockCost:1e9, visible:true, unlocked:false,
+        onUnlock: function() {
+            data.ancientCoin += 1;
+            data.useAmuletButtonShowing = true;
+        },
+        onCompleteCustom:function() {
+            data.legacy += 1;
+        },
+        onLevelCustom: function() {
+            unveilAction('');
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[],
+        extraInfo:{english:"1 Legacy per complete."},
+        unlockMessage:{english:"On unlock, +1 Ancient Coin."}
+    },
+    burnFleshPits: {
+        tier:1, plane:1,
+        progressMaxBase:1e10, progressMaxIncrease:2,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
+        unlockCost:1e9, visible:true, unlocked:false,
+        onUnlock: function() {
+            data.ancientCoin += 1;
+            data.useAmuletButtonShowing = true;
+        },
+        onCompleteCustom:function() {
+            data.legacy += 1;
+        },
+        onLevelCustom: function() {
+            unveilAction('');
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[],
+        extraInfo:{english:"1 Legacy per complete."},
+        unlockMessage:{english:"On unlock, +1 Ancient Coin."}
+    },
+    openSoulGate: {
+        tier:1, plane:1,
+        progressMaxBase:1e10, progressMaxIncrease:2,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
+        unlockCost:1e9, visible:true, unlocked:false,
+        onUnlock: function() {
+            data.ancientCoin += 1;
+            data.useAmuletButtonShowing = true;
+        },
+        onCompleteCustom:function() {
+            data.legacy += 1;
+        },
+        onLevelCustom: function() {
+            unveilAction('');
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[],
+        extraInfo:{english:"1 Legacy per complete."},
+        unlockMessage:{english:"On unlock, +1 Ancient Coin."}
+    },
+    shatterTraps: {
+        tier:1, plane:1,
+        progressMaxBase:1e10, progressMaxIncrease:2,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
+        unlockCost:1e9, visible:true, unlocked:false,
+        onUnlock: function() {
+            data.ancientCoin += 1;
+            data.useAmuletButtonShowing = true;
+        },
+        onCompleteCustom:function() {
+            data.legacy += 1;
+        },
+        onLevelCustom: function() {
+            unveilAction('');
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[],
+        extraInfo:{english:"1 Legacy per complete."},
+        unlockMessage:{english:"On unlock, +1 Ancient Coin."}
+    },
+    killTheArchitect: {
+        tier:1, plane:1,
+        progressMaxBase:1e10, progressMaxIncrease:2,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
+        unlockCost:1e9, visible:true, unlocked:false,
+        onUnlock: function() {
+            data.ancientCoin += 1;
+            data.useAmuletButtonShowing = true;
+        },
+        onCompleteCustom:function() {
+            data.legacy += 1;
+        },
+        onLevelCustom: function() {
+            unveilAction('');
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[],
+        extraInfo:{english:"1 Legacy per complete."},
+        unlockMessage:{english:"On unlock, +1 Ancient Coin."}
+    },
+    destroyNorthernMonolith: {
+        tier:1, plane:1,
+        progressMaxBase:1e10, progressMaxIncrease:2,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
+        unlockCost:1e9, visible:true, unlocked:false,
+        onUnlock: function() {
+            data.ancientCoin += 1;
+            data.useAmuletButtonShowing = true;
+        },
+        onCompleteCustom:function() {
+            data.legacy += 1;
+        },
+        onLevelCustom: function() {
+            unveilAction('');
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[],
+        extraInfo:{english:"1 Legacy per complete."},
+        unlockMessage:{english:"On unlock, +1 Ancient Coin."}
+    },
+    breakOutOfEndlessMaze: {
+        tier:1, plane:1,
+        progressMaxBase:1e10, progressMaxIncrease:2,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
+        unlockCost:1e9, visible:true, unlocked:false,
+        onUnlock: function() {
+            data.ancientCoin += 1;
+            data.useAmuletButtonShowing = true;
+        },
+        onCompleteCustom:function() {
+            data.legacy += 1;
+        },
+        onLevelCustom: function() {
+            unveilAction('');
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[],
+        extraInfo:{english:"1 Legacy per complete."},
+        unlockMessage:{english:"On unlock, +1 Ancient Coin."}
+    },
+    killDopplegangers: {
+        tier:1, plane:1,
+        progressMaxBase:1e10, progressMaxIncrease:2,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
+        unlockCost:1e9, visible:true, unlocked:false,
+        onUnlock: function() {
+            data.ancientCoin += 1;
+            data.useAmuletButtonShowing = true;
+        },
+        onCompleteCustom:function() {
+            data.legacy += 1;
+        },
+        onLevelCustom: function() {
+            unveilAction('');
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[],
+        extraInfo:{english:"1 Legacy per complete."},
+        unlockMessage:{english:"On unlock, +1 Ancient Coin."}
+    },
+    killDeathKnights: {
+        tier:1, plane:1,
+        progressMaxBase:1e10, progressMaxIncrease:2,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
+        unlockCost:1e9, visible:true, unlocked:false,
+        onUnlock: function() {
+            data.ancientCoin += 1;
+            data.useAmuletButtonShowing = true;
+        },
+        onCompleteCustom:function() {
+            data.legacy += 1;
+        },
+        onLevelCustom: function() {
+            unveilAction('');
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[],
+        extraInfo:{english:"1 Legacy per complete."},
+        unlockMessage:{english:"On unlock, +1 Ancient Coin."}
+    },
+    silenceDoomScribe: {
+        tier:1, plane:1,
+        progressMaxBase:1e10, progressMaxIncrease:2,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
+        unlockCost:1e9, visible:true, unlocked:false,
+        onUnlock: function() {
+            data.ancientCoin += 1;
+            data.useAmuletButtonShowing = true;
+        },
+        onCompleteCustom:function() {
+            data.legacy += 1;
+        },
+        onLevelCustom: function() {
+            unveilAction('');
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[],
+        extraInfo:{english:"1 Legacy per complete."},
+        unlockMessage:{english:"On unlock, +1 Ancient Coin."}
+    },
+    removeWards: {
+        tier:1, plane:1,
+        progressMaxBase:1e10, progressMaxIncrease:2,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
+        unlockCost:1e9, visible:true, unlocked:false,
+        onUnlock: function() {
+            data.ancientCoin += 1;
+            data.useAmuletButtonShowing = true;
+        },
+        onCompleteCustom:function() {
+            data.legacy += 1;
+        },
+        onLevelCustom: function() {
+            unveilAction('');
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[],
+        extraInfo:{english:"1 Legacy per complete."},
+        unlockMessage:{english:"On unlock, +1 Ancient Coin."}
+    },
+    fightTheLich: {
+        tier:1, plane:1,
+        progressMaxBase:1e10, progressMaxIncrease:2,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
+        unlockCost:1e9, visible:true, unlocked:false,
+        onUnlock: function() {
+            data.ancientCoin += 1;
+            data.useAmuletButtonShowing = true;
+        },
+        onCompleteCustom:function() {
+            data.legacy += 1;
+        },
+        onLevelCustom: function() {
+            unveilAction('');
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[],
+        extraInfo:{english:"1 Legacy per complete."},
+        unlockMessage:{english:"On unlock, +1 Ancient Coin."}
+    },
+    killTheLich: {
+        tier:1, plane:1,
+        progressMaxBase:1e10, progressMaxIncrease:2,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
+        unlockCost:1e9, visible:true, unlocked:false,
+        onUnlock: function() {
+            data.ancientCoin += 1;
+            data.useAmuletButtonShowing = true;
+        },
+        onCompleteCustom:function() {
+            data.legacy += 1;
+        },
+        onLevelCustom: function() {
+            unveilAction('');
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[],
+        extraInfo:{english:"1 Legacy per complete."},
+        unlockMessage:{english:"On unlock, +1 Ancient Coin."}
+    },
+    shatterPhylactery: {
+        tier:1, plane:1,
+        progressMaxBase:1e10, progressMaxIncrease:2,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
+        unlockCost:1e9, visible:true, unlocked:false,
+        onUnlock: function() {
+            data.ancientCoin += 1;
+            data.useAmuletButtonShowing = true;
+        },
+        onCompleteCustom:function() {
+            data.legacy += 1;
+        },
+        onLevelCustom: function() {
+            unveilAction('');
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[],
+        extraInfo:{english:"1 Legacy per complete."},
+        unlockMessage:{english:"On unlock, +1 Ancient Coin."}
     },
 }
 
@@ -1392,7 +2433,7 @@ actionData = {
     echoKindle: {
         tier:0, plane:2, resourceName:"legacy",
         progressMaxBase:2, progressMaxIncrease:1,
-        expToLevelBase:.5, expToLevelIncrease:1.3,
+        expToLevelBase:2, expToLevelIncrease:1.3,
         actionPowerBase:1, actionPowerMult:1, actionPowerMultIncrease:1.1,
         efficiencyBase:.25,
         unlockCost:0, visible:true, unlocked:true, purchased: true, hasDeltas: false,
@@ -1424,7 +2465,7 @@ actionData = {
             return Math.pow(resource, .5);
         },
         onLevelAtts:[["spark", 2]],
-        expAtts:[["vision", 1]],
+        expAtts:[["vision", 1], ["integration", 1]],
         efficiencyAtts:[["pulse", 1]],
         onCompleteText: {english:Raw.html`
                 +<span style="font-weight:bold;" id="echoKindleResourceSent">???</span> Mana was added to Spark Mana.<br>

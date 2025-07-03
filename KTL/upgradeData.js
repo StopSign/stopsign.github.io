@@ -119,7 +119,7 @@ actionData.upgrades = {
         onBuy: function(num) {
             purchaseAction('watchBirds');
             purchaseAction('catchAScent');
-            purchaseAction('questionTheTrail');
+            purchaseAction('exploreDifficultPath');
             purchaseAction('eatGoldenFruit');
             purchaseAction('journal');
         }
@@ -273,7 +273,7 @@ actionData.upgrades = {
                 purchaseAction('ownTheWeight');
                 purchaseAction('moveWithPurpose');
                 purchaseAction('standStraighter');
-                purchaseAction('stepOffToExplore');
+                purchaseAction('keepGoing');
                 purchaseAction('climbTheRocks');
                 purchaseAction('findAShortcut');
             } else if(num === 2) {

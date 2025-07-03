@@ -3,34 +3,13 @@ function startGame() {
     // load calls recalcInterval, which will start the callbacks
     load();
     setScreenSize();
-    initTimingSystem();
+    setTimeout(initTimingSystem, 200);
 }
 
 let screenSize;
 function setScreenSize() {
     screenSize = document.body.scrollHeight;
 }
-
-// Listen for updates from the worker
-onmessage = function(e) {
-    const { type, totalTicks, secondsPassed, bonusTimeConsumed } = e.data;
-
-    if (type === 'update') {
-        // Update the global state with data from the worker
-        data.currentGameState.totalTicks = totalTicks;
-        data.currentGameState.secondsPassed = secondsPassed;
-
-        if (bonusTimeConsumed > 0) {
-            data.currentGameState.bonusTime = Math.max(0, data.currentGameState.bonusTime - bonusTimeConsumed);
-        }
-
-        // If bonus time runs out, automatically revert to 1x speed.
-        if (data.currentGameState.bonusTime <= 0 && data.gameSettings.bonusSpeed > 1) {
-            console.log("Bonus time exhausted. Reverting to 1x speed.");
-            data.gameSettings.bonusSpeed = 1;
-        }
-    }
-};
 
 // --- Offline Time Calculation ---
 function checkOfflineProgress() {
@@ -201,8 +180,8 @@ function secondPassed() {
 
 
 function gameTick() {
-    totalTicks++;
-    ticksForSeconds++;
+    data.currentGameState.totalTicks++;
+    data.gameSettings.ticksForSeconds++;
 
     for (let actionVar in data.actions) {
         let actionObj = data.actions[actionVar];
@@ -378,7 +357,8 @@ function calculateTaken(actionVar, downstreamVar, actionObj, mult) {
 
 
 function checkProgressCompletion(actionObj, dataObj) {
-    if(actionObj.progress >= actionObj.progressMax) { //or max
+    if(actionObj.progress >= actionObj.progressMax
+        && (actionObj.maxLevel < 0 || (actionObj.level < actionObj.maxLevel))) { //or max
         actionObj.progress -= actionObj.progressMax;
         if(dataObj.onCompleteCustom) {
             dataObj.onCompleteCustom();

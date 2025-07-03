@@ -51,12 +51,12 @@ function loop() {
 }
 
 
+// Listen for updates from the worker
 onmessage = function(e) {
-    const { command } = e.data;
+    const { type } = e.data;
 
-    switch (command) {
-        case 'start':
-            loop();
-            break;
+    if (data.currentGameState.bonusTime <= 0 && data.gameSettings.bonusSpeed > 1) {
+        data.gameSettings.bonusSpeed = 1;
     }
+    loop();
 };

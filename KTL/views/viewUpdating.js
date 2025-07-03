@@ -128,7 +128,7 @@ let views = {
         views.updateVal(`${actionVar}Container`, toDisplay?"":"none", "style.display");
         if(actionObj.parentVar) {
             let parentObj = data.actions[actionObj.parentVar];
-            views.updateVal(`${actionObj.parentVar}_${actionVar}_Line_Outer`, toDisplay && parentObj.visible ?"flex":"none", "style.display");
+            views.updateVal(`${actionObj.parentVar}_${actionVar}_Line_Outer`, globalVisible||(toDisplay && parentObj.visible) ?"flex":"none", "style.display");
             views.updateVal(`${actionObj.parentVar}_${actionVar}_Line_Inner`, toDisplay && parentObj.visible ?"":"none", "style.display");
         }
 

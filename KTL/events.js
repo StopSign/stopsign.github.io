@@ -117,7 +117,8 @@ function clickZoomIn() {
 
     actionContainer.style.transform = `translate(${transformX[data.planeTabSelected]}px, ${transformY[data.planeTabSelected]}px) scale(${scale})`;
 
-    globalRedraw();
+    clearTimeout(redrawTimeout);
+    redrawTimeout = setTimeout(globalRedraw, 500);
 }
 
 function clickZoomOut() {
@@ -137,7 +138,8 @@ function clickZoomOut() {
 
     actionContainer.style.transform = `translate(${transformX[data.planeTabSelected]}px, ${transformY[data.planeTabSelected]}px) scale(${scale})`;
 
-    globalRedraw();
+    clearTimeout(redrawTimeout);
+    redrawTimeout = setTimeout(globalRedraw, 500);
 }
 windowElement.addEventListener('wheel', function(e) {
     e.preventDefault();
@@ -162,8 +164,13 @@ windowElement.addEventListener('wheel', function(e) {
 
     actionContainer.style.transform = `translate(${transformX[data.planeTabSelected]}px, ${transformY[data.planeTabSelected]}px) scale(${scale})`;
 
-    globalRedraw();
+    clearTimeout(redrawTimeout);
+    redrawTimeout = setTimeout(globalRedraw, 500);
+
+    // globalRedraw();
 }, { passive: false });
+
+let redrawTimeout;
 
 document.addEventListener('mousedown', function(e) {
     if (e.target === windowElement || e.target === actionContainer) {
@@ -276,7 +283,8 @@ function applyPan(x, y) {
 function applyTransform() {
     actionContainer.style.transform = `translate(${transformX[data.planeTabSelected]}px, ${transformY[data.planeTabSelected]}px) scale(${scale})`;
 
-    globalRedraw();
+    clearTimeout(redrawTimeout);
+    redrawTimeout = setTimeout(globalRedraw, 500);
 }
 
 function getTouchDistance(touch1, touch2) {
