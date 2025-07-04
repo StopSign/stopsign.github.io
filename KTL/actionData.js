@@ -270,7 +270,7 @@ let actionData = {
     },
     helpScottWithChores: {
         tier:1, plane:0,
-        progressMaxBase:600000, progressMaxIncrease:2,
+        progressMaxBase:6000000, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.2, maxLevel:4,
         wage: 1,
@@ -331,10 +331,10 @@ let actionData = {
     makeMoney: {
         tier:1, plane:0,
         progressMaxBase:10, progressMaxIncrease:1,
-        expToLevelBase:100, expToLevelIncrease:1.4,
+        expToLevelBase:100, expToLevelIncrease:2,
         actionPowerBase:1, actionPowerMult:1, actionPowerMultIncrease:1.1,
         efficiencyBase:.1,
-        unlockCost:2e7, visible:false, unlocked:false, purchased: true,
+        unlockCost:1e7, visible:false, unlocked:false, purchased: true,
         isGenerator:true, generatorTarget:"spendMoney", generatorSpeed:5,
         onCompleteCustom: function() {
             let actionObj = data.actions.makeMoney;
@@ -390,7 +390,7 @@ let actionData = {
         progressMaxBase:.5, progressMaxIncrease:10,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.5, maxLevel:10,
-        unlockCost:10, visible:false, unlocked:false, purchased: true, hasUpstream:false,
+        unlockCost:50, visible:false, unlocked:false, purchased: true, hasUpstream:false,
         onUnlock:function() {
         },
         onLevelCustom:function() {
@@ -419,23 +419,33 @@ let actionData = {
         expAtts:[["savvy", 1]],
         efficiencyAtts:[["ambition", 1]]
     },
+    buyTravelersClothes: {
+        tier:2, plane:0, resourceName: "gold",
+        progressMaxBase:5e6, progressMaxIncrease:10,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:.1, maxLevel:3,
+        unlockCost:2e7, visible:false, unlocked:false, purchased: true,
+        onLevelAtts:[["geared", 400]],
+        expAtts:[["savvy", 1]],
+        efficiencyAtts:[["ambition", 1]]
+    },
     buyMarketItems: {
         tier:2, plane:0, resourceName: "gold",
-        progressMaxBase:5e7, progressMaxIncrease:10,
+        progressMaxBase:5e6, progressMaxIncrease:10,
         expToLevelBase:10, expToLevelIncrease:1,
-        efficiencyBase:.2, maxLevel:10,
-        unlockCost:2e8, visible:false, unlocked:false, purchased: true,
+        efficiencyBase:.1, maxLevel:10,
+        unlockCost:5e7, visible:false, unlocked:false, purchased: true,
         onLevelAtts:[["energy", 4000]],
         expAtts:[["savvy", 1]],
         efficiencyAtts:[["ambition", 1]]
     },
     buyShopItems: {
         tier:2, plane:0, resourceName: "gold",
-        progressMaxBase:5e8, progressMaxIncrease:10,
+        progressMaxBase:5e10, progressMaxIncrease:10,
         expToLevelBase:10, expToLevelIncrease:1,
-        efficiencyBase:.1, maxLevel:10,
-        unlockCost:2e9, visible:false, unlocked:false, purchased: true,
-        onLevelAtts:[["energy", 10000], ["geared", 400]],
+        efficiencyBase:.05, maxLevel:10,
+        unlockCost:2e11, visible:false, unlocked:false, purchased: true,
+        onLevelAtts:[["energy", 10000], ["geared", 1000]],
         expAtts:[["savvy", 1]],
         efficiencyAtts:[["ambition", 1]]
     },
@@ -539,6 +549,8 @@ let actionData = {
         efficiencyBase:.05, maxLevel:10,
         unlockCost:1e11, visible:false, unlocked:false, purchased: true,
         onUnlock: function() {
+            unveilAction('exploreDifficultPath')
+            unveilAction('buyTravelersClothes')
         },
         onLevelAtts:[["coordination", 200]],
         expAtts:[["adaptability", 1]],
@@ -566,7 +578,7 @@ let actionData = {
     },
     chimneySweep: {
         tier:1, plane:0,
-        progressMaxBase:1e12, progressMaxIncrease:2,
+        progressMaxBase:1e13, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.2, maxLevel:8,
         wage: 100,
@@ -586,7 +598,7 @@ let actionData = {
     },
     handyman: {
         tier:1, plane:0,
-        progressMaxBase:1e16, progressMaxIncrease:2,
+        progressMaxBase:1e17, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.2, maxLevel:8,
         wage: 500,
@@ -606,7 +618,7 @@ let actionData = {
     },
     tavernHelper: {
         tier:1, plane:0,
-        progressMaxBase:1e18, progressMaxIncrease:3,
+        progressMaxBase:1e19, progressMaxIncrease:3,
         expToLevelBase:10, expToLevelIncrease:1.2,
         efficiencyBase:.2, maxLevel:8,
         wage: 2000,
@@ -785,7 +797,7 @@ actionData = {
         tier:1, plane:0,
         progressMaxBase:1e8, progressMaxIncrease:5,
         expToLevelBase:1, expToLevelIncrease:1,
-        efficiencyBase:.4, maxLevel:1,
+        efficiencyBase:.5, maxLevel:1,
         unlockCost:5e6, visible:false, unlocked:false, purchased: true,
         onLevelCustom: function() {
         },
@@ -799,7 +811,7 @@ actionData = {
     },
     exploreDifficultPath: {
         tier:1, plane:0,
-        progressMaxBase:5e12, progressMaxIncrease:20,
+        progressMaxBase:2e12, progressMaxIncrease:20,
         expToLevelBase:2, expToLevelIncrease:1,
         efficiencyBase:.2, maxLevel:2,
         unlockCost:1e11, visible:false, unlocked:false, purchased: true,
@@ -811,14 +823,14 @@ actionData = {
         },
         onLevelAtts:[["navigation", 2]],
         expAtts:[["geared", 1]],
-        efficiencyAtts:[["navigation", 1]]
+        efficiencyAtts:[["navigation", 1], ["geared", .01]]
     },
     eatGoldenFruit: {
         tier:2, plane:0,
         progressMaxBase:1e11, progressMaxIncrease:10,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:1, maxLevel:1,
-        unlockCost:1e11, visible:false, unlocked:false, purchased: true,
+        unlockCost:5e11, visible:false, unlocked:false, purchased: true,
         onLevelCustom: function() {
         },
         onUnlock: function () {
@@ -829,9 +841,9 @@ actionData = {
     },
     keepGoing: {
         tier:1, plane:0,
-        progressMaxBase:2e13, progressMaxIncrease:20,
+        progressMaxBase:2e14, progressMaxIncrease:5,
         expToLevelBase:2, expToLevelIncrease:1,
-        efficiencyBase:.1, maxLevel:2,
+        efficiencyBase:.2, maxLevel:2,
         unlockCost:5e12, visible:false, unlocked:false, purchased: true,
         onUnlock: function() {
             unveilAction('climbTheRocks')
@@ -840,13 +852,13 @@ actionData = {
         },
         onLevelAtts:[["navigation", 3], ["flow", 5]],
         expAtts:[["geared", 1]],
-        efficiencyAtts:[["navigation", 1]]
+        efficiencyAtts:[["geared", .01]]
     },
     climbTheRocks: {
         tier:1, plane:0,
-        progressMaxBase:4e13, progressMaxIncrease:1,
+        progressMaxBase:4e14, progressMaxIncrease:1,
         expToLevelBase:2, expToLevelIncrease:1,
-        efficiencyBase:.05, maxLevel:5,
+        efficiencyBase:.1, maxLevel:5,
         unlockCost:1e13, visible:false, unlocked:false, purchased: true,
         onUnlock: function() {
         },
@@ -857,11 +869,11 @@ actionData = {
         },
         onLevelAtts:[["concentration", 100]],
         expAtts:[["geared", 1]],
-        efficiencyAtts:[["navigation", 1]]
+        efficiencyAtts:[["geared", .01]]
     },
     spotAPath: {
         tier:1, plane:0,
-        progressMaxBase:1e15, progressMaxIncrease:3,
+        progressMaxBase:1e16, progressMaxIncrease:3,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:.01, maxLevel:1,
         unlockCost:3e13, visible:false, unlocked:false, purchased: true,
@@ -870,16 +882,16 @@ actionData = {
         onLevelCustom: function() {
             unveilAction('pleasantForest')
         },
-        onLevelAtts:[["navigation", 5], ["flow", 20]],
+        onLevelAtts:[["navigation", 20], ["flow", 20]],
         expAtts:[["geared", 1], ["vision", 1]],
-        efficiencyAtts:[["integration", 1], ["vision", 1]]
+        efficiencyAtts:[["integration", 1], ["vision", 1], ["geared", .01]]
     },
     pleasantForest: {
         tier:1, plane:0,
-        progressMaxBase:1e16, progressMaxIncrease:10,
-        expToLevelBase:7, expToLevelIncrease:1,
+        progressMaxBase:2e16, progressMaxIncrease:10,
+        expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.2, maxLevel:10,
-        unlockCost:1e13, visible:false, unlocked:false, purchased: true,
+        unlockCost:1e15, visible:false, unlocked:false, purchased: true,
         onUnlock: function() {
             unveilAction('hiddenPath')
         },
@@ -894,7 +906,7 @@ actionData = {
         progressMaxBase:2e15, progressMaxIncrease:3,
         expToLevelBase:7, expToLevelIncrease:1,
         efficiencyBase:1, maxLevel:5,
-        unlockCost:2e13, visible:false, unlocked:false, purchased: true,
+        unlockCost:1e14, visible:false, unlocked:false, purchased: true,
         onUnlock: function() {
             unveilAction('exploreTheForest')
             unveilAction('meetGrumpyHermit')
@@ -910,12 +922,12 @@ actionData = {
         progressMaxBase:1e15, progressMaxIncrease:3,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1, maxLevel:10,
-        unlockCost:2e14, visible:false, unlocked:false, purchased: true,
+        unlockCost:2e16, visible:false, unlocked:false, purchased: true,
         onUnlock: function() {
         },
         onLevelCustom: function() {
         },
-        onLevelAtts:[["curiosity", 1]],
+        onLevelAtts:[["curiosity", 100]],
         expAtts:[],
         efficiencyAtts:[]
     },
@@ -924,7 +936,7 @@ actionData = {
         progressMaxBase:5e17, progressMaxIncrease:40,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1, maxLevel:1,
-        unlockCost:5e13, visible:false, unlocked:false, purchased: true,
+        unlockCost:5e15, visible:false, unlocked:false, purchased: true,
         onUnlock: function() {
         },
         onLevelCustom: function() {
@@ -945,7 +957,7 @@ actionData = {
         progressMaxBase:1e15, progressMaxIncrease:3,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1, maxLevel:10,
-        unlockCost:3e13, visible:false, unlocked:false, purchased: true,
+        unlockCost:3e15, visible:false, unlocked:false, purchased: true,
         onUnlock: function() {
         },
         onLevelCustom: function() {
@@ -959,7 +971,7 @@ actionData = {
         progressMaxBase:1e15, progressMaxIncrease:3,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1, maxLevel:10,
-        unlockCost:3e13, visible:false, unlocked:false, purchased: true,
+        unlockCost:3e15, visible:false, unlocked:false, purchased: true,
         onUnlock: function() {
         },
         onLevelCustom: function() {
@@ -1433,9 +1445,9 @@ actionData = {
     },
     noticeTheStrain: {
         tier:1, plane:0,
-        progressMaxBase:5e8, progressMaxIncrease:40,
+        progressMaxBase:5e8, progressMaxIncrease:60,
         expToLevelBase:3, expToLevelIncrease:1,
-        efficiencyBase:.05, maxLevel:3,
+        efficiencyBase:.08, maxLevel:3,
         unlockCost:10e7, visible:false, unlocked:false, purchased: true,
         onLevelAtts:[["observation", 500]],
         expAtts:[["endurance", 1], ["might", 10], ["geared", 1]],
@@ -1455,7 +1467,7 @@ actionData = {
         tier:1, plane:0,
         progressMaxBase:5e12, progressMaxIncrease:2,
         expToLevelBase:3, expToLevelIncrease:1,
-        efficiencyBase:.03, maxLevel:2,
+        efficiencyBase:.1, maxLevel:2,
         unlockCost:12e7, visible:false, unlocked:false, purchased: true,
         onLevelAtts:[["flow", 5]],
         expAtts:[["observation", 1], ["endurance", 1], ["geared", 1]],
@@ -1465,7 +1477,7 @@ actionData = {
         tier:1, plane:0,
         progressMaxBase:2e9, progressMaxIncrease:3,
         expToLevelBase:3, expToLevelIncrease:1,
-        efficiencyBase:.0005, maxLevel:2,
+        efficiencyBase:.001, maxLevel:2,
         unlockCost:13e7, visible:false, unlocked:false, purchased: true,
         onLevelAtts:[["might", 50]],
         expAtts:[["geared", 1]],
@@ -1475,7 +1487,7 @@ actionData = {
         tier:1, plane:0,
         progressMaxBase:2e14, progressMaxIncrease:600,
         expToLevelBase:3, expToLevelIncrease:1,
-        efficiencyBase:.0005, maxLevel:2,
+        efficiencyBase:.001, maxLevel:2,
         unlockCost:14e7, visible:false, unlocked:false, purchased: true,
         onLevelCustom: function() {
 

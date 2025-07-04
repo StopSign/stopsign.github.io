@@ -185,7 +185,8 @@ function initializeData() {
     create("makeMoney", ["spendMoney"], 1, -1);
     create("spendMoney", ["buyBasicSupplies", "buySocialAccess", "buyMarketItems"], 0, -1);
     create("buyBasicSupplies", ["buyBasicClothes"], -1, -1);
-    create("buyBasicClothes", [], -1, -1);
+    create("buyBasicClothes", ["buyTravelersClothes"], -1, -1);
+    create("buyTravelersClothes", [], -1, 0);
     create("buyMarketItems", ["buyShopItems", "invest"], 1, -1);
     create("buyShopItems", [], 0, -1);
 
