@@ -71,6 +71,7 @@ function getResourceColorDim(actionObj) {
     }
 }
 
+//Broken, and not very useful in the first place.
 function getStatChanges() {
     let attsPerSecond = {};
 

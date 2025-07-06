@@ -45,17 +45,18 @@ function createAttDisplay(attVar) {
             queueCache(`${attVar}Name`);
             queueCache(`${attVar}Num`);
             queueCache(`${attVar}Mult`);
-            queueCache(`${attVar}PerMinute`);
+            // queueCache(`${attVar}PerMinute`);
             queueCache(`${attVar}DisplayContainer`);
 
             theStr += Raw.html`
-                <div id="${attVar}AttContainer" style="position:relative;cursor:pointer;white-space:nowrap;border:2px solid transparent" onclick="clickedAttName('${attVar}')">
+                <div id="${attVar}AttContainer" style="position:relative;cursor:pointer;white-space:nowrap;border:2px solid transparent" 
+                    onclick="clickedAttName('${attVar}', false)">
                     <img id="${attVar}DisplayContainer" src="img/${attVar}.svg" alt="${attVar}" 
                         style="margin:1px;width:30px;height:30px;vertical-align:top;background:var(--text-bright);border:1px solid black;" />
                     <span style="display:inline-block">
                         <div id="${attVar}Name" style="font-weight:bold;color:var(--text-primary)">${decamelize(attVar)}</div>
                         <span id="${attVar}Num" style="display:inline-block;font-weight:bold;color:var(--text-primary)">${attObj.num}</span>
-                        <span style="display:inline-block">(+<span id="${attVar}PerMinute" style="font-weight:bold;color:var(--text-primary)">${attObj.perMinute}</span>/m)</span>
+<!--                        <span style="display:inline-block">(+<span id="${attVar}PerMinute" style="font-weight:bold;color:var(&#45;&#45;text-primary)">${attObj.perMinute}</span>/m)</span>-->
                         <span style="display:inline-block"> = x<span id="${attVar}Mult" style="font-weight:bold;color:var(--text-primary)">${attObj.mult}</span> bonus</span>
                     </span>
                 </div>`;
@@ -97,7 +98,7 @@ function generateActionDisplay(actionVar) {
                 ${!actionObj.isSpell?"Level ":"Charges "}<span id="${actionVar}Level" style="color:var(--text-primary);font-weight:bold;">0</span>
                 ${actionObj.maxLevel >= 0 ? ` / <span id="${actionVar}MaxLevel" style="color:var(--text-primary);font-weight:bold;">0</span>` : ""}
                 <span id="${actionVar}HighestLevelContainer2"> 
-                    (<b><span id='${actionVar}HighestLevel2' style="color:var(--text-primary);font-weight:bold;"></span></b>)
+                    (<span id='${actionVar}HighestLevel2' style="color:var(--text-primary);font-weight:bold;"></span>)
                 </span> | 
                 <span id="${actionVar}Efficiency" style="color:var(--text-primary);font-weight:bold;"></span>% efficiency
                 ${!actionObj.wage ? "" : ` | Wage: $<span id="${actionVar}Wage" style="color:var(--wage-color);font-weight:bold;"></span>`}
@@ -358,8 +359,8 @@ function generateActionDisplay(actionVar) {
                 ${dataObj.extraButton ?? ""}
             </div>
             <div id="${actionVar}SmallVersionContainer" style="display:none;text-align:center;margin:50px auto;font-size:12px;width:100px;">
-                <b><span style="font-size:16px">${actionObj.title}</span></b><br>
-                Level <b><span id="${actionVar}Level2"></b>
+                <span style="font-size:16px;font-weight:bold;">${actionObj.title}</span><br>
+                Level <span id="${actionVar}Level2" style="font-weight:bold;"></span>
             </div>
             ${maxLevel}
         </div>`;
@@ -423,7 +424,7 @@ function generateOutsideAttDisplay(actionObj, attObj, type) {
     let statName = attObj[0];
     let statValue = attObj[1];
 
-    let startDisplayed = type === "add"?"":"none";
+    let startDisplayed = (globalVisible || type === "add") ? "" : "none";
     let borderColor = type === "add"
         ? "--attribute-add-color"
         : (type === "exp"
@@ -454,7 +455,7 @@ function generateOutsideAttDisplay(actionObj, attObj, type) {
 
 
     return Raw.html`
-        <div id="${actionVar}${statName}OutsideContainer${type}" onclick="clickedAttName('${statName}')" 
+        <div id="${actionVar}${statName}OutsideContainer${type}" onclick="clickedAttName('${statName}', true)" 
              style="display:${startDisplayed};border:2px solid var(${borderColor});margin-bottom:2px;cursor:pointer;background-color:var(--overlay-color);padding:1px;">
             <div class="showthat" style="position:relative;width:30px;height:30px;background-color:var(${backgroundColor});">
                 <div class="showthisUp" style="font-size:18px;">${tooltipText}</div>
@@ -477,7 +478,8 @@ function generateActionOnLevelAtts(actionObj) {
         queueCache(`${actionVar}${attVar}InsideContaineradd`);
 
         onLevelAttsText += `
-        <div id="${actionVar}${attVar}InsideContaineradd" style="color:var(--text-muted);cursor:pointer;border:2px solid transparent;" class="backgroundWhenHover" onclick="clickedAttName('${attVar}')">
+        <div id="${actionVar}${attVar}InsideContaineradd" style="color:var(--text-muted);cursor:pointer;border:2px solid transparent;" class="backgroundWhenHover" 
+            onclick="clickedAttName('${attVar}', true)">
             +<span style="color:var(--text-primary)"><b>${attObj[1]}</b></span> to 
             <img src="img/${attVar}.svg" alt="${attVar}" 
             style="margin:1px;width:20px;height:20px;vertical-align:top;background:var(--attribute-add-bg-color)" />
@@ -510,7 +512,7 @@ function generateActionExpAtts(actionObj) {
 
         expAttsStr += Raw.html`
         <div id="${actionVar}${attVar}InsideContainerexp" style="color:var(--text-muted);cursor:pointer;display:none;border:2px solid transparent;" 
-            class="backgroundWhenHover" onclick="clickedAttName('${attVar}')">
+            class="backgroundWhenHover" onclick="clickedAttName('${attVar}', true)">
             <span style="color:var(--text-primary)"><b>${ratio}</b></span>% of <img src="img/${attVar}.svg" alt="${attVar}" 
             style="margin:1px;width:20px;height:20px;vertical-align:top;background:var(--attribute-use-exp-bg-color)" />
             <span style="color:var(--text-primary)"><b>${capitalizeFirst(attVar)}</b></span>'s bonus 
@@ -546,7 +548,7 @@ function generateActionEfficiencyAtts(actionObj) {
 
         expertiseModsStr += Raw.html`
         <div id="${actionVar}${attVar}InsideContainereff" style="color:var(--text-muted);cursor:pointer;display:none;border:2px solid transparent;" 
-            class="backgroundWhenHover" onclick="clickedAttName('${attVar}')">
+            class="backgroundWhenHover" onclick="clickedAttName('${attVar}', true)">
             <span style="color:var(--text-primary)"><b>${ratio}</b></span>% of <img src="img/${attVar}.svg" alt="${attVar}" 
             style="margin:1px;width:20px;height:20px;vertical-align:top;background:var(--attribute-use-eff-bg-color)" />
             <span style="color:var(--text-primary)"><b>${capitalizeFirst(attVar)}</b></span>'s bonus 
@@ -868,6 +870,7 @@ function setAllCaches() {
     queueCache("killTheLichMenuButton2");
     queueCache("ancientCoinDisplay");
     queueCache("jobDisplay");
+    queueCache("useAmuletMenu");
 
     for(let actionVar in data.actions) {
         view.cached[actionVar + "ActionPower"] = document.getElementById(actionVar + "ActionPower");

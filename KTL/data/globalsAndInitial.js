@@ -76,7 +76,8 @@ let viewData = {}; //contains only things that are generated / not saved
 viewData.toasts = [];
 
 let language = "english";
-let globalVisible = false;
+// let globalVisible = false;
+let globalVisible = true;
 let isLoadingEnabled = true; //SET FALSE FOR CLEARING SAVE
 
 
@@ -102,7 +103,6 @@ function debug() {
     // unveilAction('checkNoticeBoard');
     // data.actions.echoKindle.resource += 10;
 
-    // globalVisible = true;
     // stop = 1;
 
     gameSpeed = 1;
@@ -180,15 +180,25 @@ function initializeData() {
     create("travelToOutpost", ["meetVillageLeaderScott", "checkNoticeBoard", "browseLocalMarket", "pleasantForest"], 2, 0); //travelToCrossroads
     create("meetVillageLeaderScott", ["helpScottWithChores"], 0, -1);
     create("helpScottWithChores", [], 0, -1);
-    create("browseLocalMarket", [], -1, -1);
+    create("browseLocalMarket", ["browseStores"], -1, -1);
+    create("browseStores", ["browseBackRooms"], 0, -1);
+    create("browseBackRooms", ["browsePersonalCollection"], 0, -1);
+    create("browsePersonalCollection", [], 0, -1);
+
+
     create("checkNoticeBoard", ["reportForTraining", "reportForLabor"], 1.5, -1);
     create("makeMoney", ["spendMoney"], 1, -1);
     create("spendMoney", ["buyBasicSupplies", "buySocialAccess", "buyMarketItems"], 0, -1);
-    create("buyBasicSupplies", ["buyBasicClothes"], -1, -1);
-    create("buyBasicClothes", ["buyTravelersClothes"], -1, -1);
+    create("buyBasicSupplies", ["buyBasicClothes", "buyStreetFood"], -1, -1);
+    create("buyBasicClothes", ["buyTravelersClothes", "buyMatchingClothes"], -1, -1);
     create("buyTravelersClothes", [], -1, 0);
-    create("buyMarketItems", ["buyShopItems", "invest"], 1, -1);
-    create("buyShopItems", [], 0, -1);
+    create("buyMarketItems", ["buyShopItems"], 1, -1);
+    create("buyShopItems", ["invest"], 0, -1);
+    create("buyStreetFood", ["buyGoodFood"], -1, 0);
+    create("buyGoodFood", [], -1, 0);
+    create("buyMatchingClothes", ["buyStylishClothes"], -1, -1);
+    create("buyStylishClothes", [], -1, 0);
+
 
     create("reportForLabor", ["oddJobsLaborer"], 1, 0);
     create("oddJobsLaborer", ["chimneySweep"], .5, -1);
@@ -200,7 +210,7 @@ function initializeData() {
     create("investInRoads", [], 0, -1);
     create("buySocialAccess", ["slideTheCoin"], 0, -1);
     create("slideTheCoin", ["buyCoffee"], -1, -1);
-    create("buyCoffee", [], .5, -1)
+    create("buyCoffee", [], -1, -1)
 
 
 
@@ -231,7 +241,12 @@ function initializeData() {
     create("talkWithJohn", [], -1, 0);
 
     create("learnToListen", ["chatWithMerchants", "chatWithHermit"], -1, 1);
-    create("chatWithMerchants", [], -1, -.5);
+    create("chatWithMerchants", ["listenToWoes", "askAboutStitching", "complimentTheChef"], -1.5, 0);
+    create("askAboutStitching", [], -1, 0);
+    create("complimentTheChef", [], -1, -1);
+    create("listenToWoes", ["keyToTheBackroom"], -1, 1);
+    create("keyToTheBackroom", [], -1, 0);
+
     create("chatWithHermit", ["tellAJoke"], 0, 1);
     create("tellAJoke", ["hearOfSecretShrine"], 0, 1);
     create("hearOfSecretShrine", [], 0, 1);

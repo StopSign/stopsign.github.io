@@ -304,6 +304,50 @@ let actionData = {
         expAtts:[["observation", 1], ["recognition", 1], ["confidence", 1]],
         efficiencyAtts:[["ambition", 10]]
     },
+    browseStores: {
+        tier:1, plane:0,
+        progressMaxBase:7e7, progressMaxIncrease:2,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:.1, maxLevel:10,
+        unlockCost:1e8, visible:false, unlocked:false, purchased: true,
+        onLevelCustom: function() {
+            unveilAction('buyBasicSupplies')
+            unveilAction('buyBasicClothes')
+            unveilAction('buyMarketItems')
+            unveilAction('buyShopItems')
+        },
+        onLevelAtts:[["savvy", 5], ["observation", 50]],
+        expAtts:[["observation", 1], ["recognition", 1], ["confidence", 1]],
+        efficiencyAtts:[["ambition", 10]]
+    },
+    browseBackRooms: {
+        tier:1, plane:0,
+        progressMaxBase:7e7, progressMaxIncrease:2,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:.1, maxLevel:10,
+        unlockCost:1e8, visible:false, unlocked:false, purchased: true,
+        onLevelCustom: function() {
+            unveilAction('buyBasicSupplies')
+            unveilAction('buyBasicClothes')
+            unveilAction('buyMarketItems')
+            unveilAction('buyShopItems')
+        },
+        onLevelAtts:[["savvy", 5], ["observation", 50]],
+        expAtts:[["observation", 1], ["recognition", 1], ["confidence", 1]],
+        efficiencyAtts:[["ambition", 10]]
+    },
+    browsePersonalCollection: {
+        tier:1, plane:0,
+        progressMaxBase:7e7, progressMaxIncrease:2,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:.1, maxLevel:10,
+        unlockCost:1e8, visible:false, unlocked:false, purchased: true,
+        onLevelCustom: function() {
+        },
+        onLevelAtts:[["savvy", 5], ["observation", 50]],
+        expAtts:[["observation", 1], ["recognition", 1], ["confidence", 1]],
+        efficiencyAtts:[["ambition", 10]]
+    },
     checkNoticeBoard: {
         tier:1, plane:0,
         progressMaxBase:60e6, progressMaxIncrease:40,
@@ -435,17 +479,57 @@ let actionData = {
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.1, maxLevel:10,
         unlockCost:5e7, visible:false, unlocked:false, purchased: true,
-        onLevelAtts:[["energy", 4000]],
+        onLevelAtts:[["energy", 4000], ["recognition", 60]],
         expAtts:[["savvy", 1]],
         efficiencyAtts:[["ambition", 1]]
     },
     buyShopItems: {
         tier:2, plane:0, resourceName: "gold",
-        progressMaxBase:5e10, progressMaxIncrease:10,
+        progressMaxBase:5e9, progressMaxIncrease:10,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.05, maxLevel:10,
-        unlockCost:2e11, visible:false, unlocked:false, purchased: true,
-        onLevelAtts:[["energy", 10000], ["geared", 1000]],
+        unlockCost:5e10, visible:false, unlocked:false, purchased: true,
+        onLevelAtts:[["energy", 10000], ["geared", 1000], ["recognition", 80]],
+        expAtts:[["savvy", 1]],
+        efficiencyAtts:[["ambition", 1]]
+    },
+    buyStreetFood: {
+        tier:2, plane:0, resourceName: "gold",
+        progressMaxBase:5e9, progressMaxIncrease:10,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:.05, maxLevel:10,
+        unlockCost:5e10, visible:false, unlocked:false, purchased: true,
+        onLevelAtts:[["energy", 10000], ["geared", 1000], ["recognition", 80]],
+        expAtts:[["savvy", 1]],
+        efficiencyAtts:[["ambition", 1]]
+    },
+    buyGoodFood: {
+        tier:2, plane:0, resourceName: "gold",
+        progressMaxBase:5e9, progressMaxIncrease:10,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:.05, maxLevel:10,
+        unlockCost:5e10, visible:false, unlocked:false, purchased: true,
+        onLevelAtts:[["energy", 10000], ["geared", 1000], ["recognition", 80]],
+        expAtts:[["savvy", 1]],
+        efficiencyAtts:[["ambition", 1]]
+    },
+    buyMatchingClothes: {
+        tier:2, plane:0, resourceName: "gold",
+        progressMaxBase:5e9, progressMaxIncrease:10,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:.05, maxLevel:10,
+        unlockCost:5e10, visible:false, unlocked:false, purchased: true,
+        onLevelAtts:[["energy", 10000], ["geared", 1000], ["recognition", 80]],
+        expAtts:[["savvy", 1]],
+        efficiencyAtts:[["ambition", 1]]
+    },
+    buyStylishClothes: {
+        tier:2, plane:0, resourceName: "gold",
+        progressMaxBase:5e9, progressMaxIncrease:10,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:.05, maxLevel:10,
+        unlockCost:5e10, visible:false, unlocked:false, purchased: true,
+        onLevelAtts:[["energy", 10000], ["geared", 1000], ["recognition", 80]],
         expAtts:[["savvy", 1]],
         efficiencyAtts:[["ambition", 1]]
     },
@@ -504,29 +588,29 @@ let actionData = {
 
     buySocialAccess: {
         tier:2, plane:0, resourceName:"gold",
-        progressMaxBase:1e5, progressMaxIncrease:5,
+        progressMaxBase:5e11, progressMaxIncrease:10,
         expToLevelBase:10, expToLevelIncrease:1,
-        efficiencyBase:.8, maxLevel:5,
-        unlockCost:1e6, visible:false, unlocked:false, purchased: true,
+        efficiencyBase:.1, maxLevel:10,
+        unlockCost:2e12, visible:false, unlocked:false, purchased: true,
         onUnlock:function() {
         },
-        onLevelAtts:[["recognition", 1], ["charm", 1]],
+        onLevelAtts:[["recognition", 100], ["charm", 5]],
         expAtts:[["savvy", 1]],
-        efficiencyAtts:[]
+        efficiencyAtts:[["confidence", 1]]
     },
     slideTheCoin: {
         tier:2, plane:0, resourceName:"gold",
-        progressMaxBase:1e4, progressMaxIncrease:1,
+        progressMaxBase:5e15, progressMaxIncrease:1,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:.1, maxLevel:1,
-        unlockCost:1e7, visible:false, unlocked:false, purchased: true,
+        unlockCost:2e13, visible:false, unlocked:false, purchased: true,
         onUnlock:function() {
         },
         onLevelCustom: function() {
         },
-        onLevelAtts:[["influence", 10]],
+        onLevelAtts:[["influence", 40]],
         expAtts:[["recognition", 1]],
-        efficiencyAtts:[["recognition", 1]]
+        efficiencyAtts:[["recognition", .001]]
     },
     buyCoffee: {
         tier:2, plane:0, resourceName:"gold",
@@ -601,7 +685,7 @@ let actionData = {
         progressMaxBase:1e17, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.2, maxLevel:8,
-        wage: 500,
+        wage: 2000,
         unlockCost:1e17, visible:false, unlocked:false, purchased: true,
         onLevelCustom: function() {
             data.actions.handyman.wage += actionData.handyman.wage/2;
@@ -613,7 +697,7 @@ let actionData = {
         onLevelAtts:[["adaptability", 4]],
         expAtts:[],
         efficiencyAtts:[["adaptability", .3]],
-        unlockMessage:{english:"On unlock, set job to Handyman for a base wage of $500."},
+        unlockMessage:{english:"On unlock, set job to Handyman for a base wage of $2000."},
         onLevelText:{english:"Increase wage +50%"}
     },
     tavernHelper: {
@@ -621,7 +705,7 @@ let actionData = {
         progressMaxBase:1e19, progressMaxIncrease:3,
         expToLevelBase:10, expToLevelIncrease:1.2,
         efficiencyBase:.2, maxLevel:8,
-        wage: 2000,
+        wage: 10000,
         unlockCost:1e19, visible:false, unlocked:false, purchased: true,
         onLevelCustom: function() {
             data.actions.tavernHelper.wage += actionData.tavernHelper.wage/2;
@@ -633,17 +717,17 @@ let actionData = {
         onLevelAtts:[["adaptability", 8]],
         expAtts:[],
         efficiencyAtts:[["adaptability", .1]],
-        unlockMessage:{english:"On unlock, set job to Tavern Helper for a base wage of $2000."},
+        unlockMessage:{english:"On unlock, set job to Tavern Helper for a base wage of $10000."},
         onLevelText:{english:"Increase wage +50%"}
     },
     socialize: {
         tier:1, plane:0,
-        progressMaxBase:10, progressMaxIncrease:1,
-        expToLevelBase:3000, expToLevelIncrease:1.2,
+        progressMaxBase:15, progressMaxIncrease:1,
+        expToLevelBase:1000, expToLevelIncrease:1.2,
         actionPowerBase:1, actionPowerMult:1, actionPowerMultIncrease:1.2,
         efficiencyBase:.05,
-        unlockCost:20e6, visible:false, unlocked:false, purchased: true,
-        isGenerator:true, generatorTarget:"meetPeople", generatorSpeed:20,
+        unlockCost:4e14, visible:false, unlocked:false, purchased: true,
+        isGenerator:true, generatorTarget:"meetPeople", generatorSpeed:5,
         onCompleteCustom: function() {
             let actionObj = data.actions.socialize;
             actionData.socialize.updateMults();
@@ -681,28 +765,31 @@ let actionData = {
         expAtts:[["confidence", 1], ["recognition", 1], ["charm", 1], ["influence", 1]],
         efficiencyAtts:[["confidence", .1]],
         actionPowerFunction: function(resource) {
-            if(resource < 1) {
+            if(resource < 1e12) {
                 return 0;
             }
-            return Math.pow(Math.log10(resource), 3); //log10(num * mult)^3
+            return Math.pow(resource/1e12, .5); //sqrt(num * mult) * wage
         },
         onCompleteText: {english:Raw.html`
                 -<span style="font-weight:bold;" id="socializeResourceTaken">???</span> Momentum was taken from this action, converted to <br>
                 +<span style="font-weight:bold;" id="socializeResourceSent">???</span> conversations, added to Meet People.<br>`},
-        extraInfo: {english:`<br>Exp & Conversations gain = log10(Momentum/100)^3 * Action Power * Efficiency.`}
+        extraInfo: {english:`<br>Momentum Taken = Current Momentum * Tier Mult.<br>
+                        Exp & Conversations gain = sqrt(Momentum Taken/1e12) * Action Power * Efficiency.<br>
+                        Requires 1e12 Momentum Taken to function.`}
     },
     meetPeople: {
         tier:1, plane:0, resourceName:"conversations",
-        progressMaxBase:10, progressMaxIncrease:1.2,
-        expToLevelBase:10, expToLevelIncrease:1,
-        efficiencyBase:1,
+        progressMaxBase:1, progressMaxIncrease:1.5,
+        expToLevelBase:50, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:50,
         unlockCost:5, visible:false, unlocked:false, purchased: true, hasUpstream:false,
         onUnlock: function() {
             unveilAction('joinCoffeeClub');
             unveilAction('buySocialAccess');
             unveilAction('slideTheCoin');
+            unveilAction('talkWithScott');
         },
-        onLevelAtts:[["confidence", 1]],
+        onLevelAtts:[["recognition", 30]],
         expAtts:[],
         efficiencyAtts:[]
     },
@@ -710,18 +797,17 @@ let actionData = {
         tier:1, plane:0, resourceName:"conversations",
         progressMaxBase:30000, progressMaxIncrease:1,
         expToLevelBase:1, expToLevelIncrease:1,
-        efficiencyBase:.001,
+        efficiencyBase:.00001,
         unlockCost:50, maxLevel:1,
         visible:false, unlocked:false, purchased: true,
         onUnlock: function() {
         },
         onLevelCustom: function() {
             unveilAction('gossip');
-            unveilAction('hearAboutTheLich');
         },
         onLevelAtts:[],
         expAtts:[["influence", 100], ["recognition", 1]],
-        efficiencyAtts:[["influence", 100], ["recognition", 1]],
+        efficiencyAtts:[["influence", 100], ["recognition", .01]],
     },
     gossip: {
         tier:1, plane:0, resourceName:"conversations",
@@ -731,8 +817,10 @@ let actionData = {
         unlockCost:5, maxLevel:10,
         visible:false, unlocked:false, purchased: true,
         onUnlock: function() {
+            unveilAction('hearAboutTheLich');
         },
         onLevelCustom: function () {
+            unveilAction('hearAboutTheLich');
         },
         onLevelAtts:[],
         expAtts:[["cunning", 10]],
@@ -760,7 +848,7 @@ let actionData = {
                 background-color:#880000;text-shadow:0 0 3px #ff0000;box-shadow:0 0 15px 4px rgba(255, 0, 0, 0.5);" >
             Kill the Lich!</span>
         `,
-        unlockMessage:{english:"Unlocks when Overclock is level 1."},
+        unlockMessage:{english:"Unlocks when Gossip is level 1."},
         extraInfo: {english:Raw.html`This action gains (Total Momentum / 1 billion * .1% of Conversations on Gossip) Fear each Overclock complete, which is a gain of
         <span style="font-weight:bold;" id="hearAboutTheLichActionPower">0</span>`}
     },
@@ -917,27 +1005,14 @@ actionData = {
         expAtts:[["observation", 1]],
         efficiencyAtts:[]
     },
-    exploreTheForest: {
-        tier:1, plane:0,
-        progressMaxBase:1e15, progressMaxIncrease:3,
-        expToLevelBase:10, expToLevelIncrease:1,
-        efficiencyBase:1, maxLevel:10,
-        unlockCost:2e16, visible:false, unlocked:false, purchased: true,
-        onUnlock: function() {
-        },
-        onLevelCustom: function() {
-        },
-        onLevelAtts:[["curiosity", 100]],
-        expAtts:[],
-        efficiencyAtts:[]
-    },
     meetGrumpyHermit: {
         tier:1, plane:0,
-        progressMaxBase:5e17, progressMaxIncrease:40,
-        expToLevelBase:10, expToLevelIncrease:1,
-        efficiencyBase:1, maxLevel:1,
-        unlockCost:5e15, visible:false, unlocked:false, purchased: true,
+        progressMaxBase:4e18, progressMaxIncrease:40,
+        expToLevelBase:4, expToLevelIncrease:1,
+        efficiencyBase:.0001, maxLevel:1,
+        unlockCost:2e14, visible:false, unlocked:false, purchased: true,
         onUnlock: function() {
+            unveilAction('socialize');
         },
         onLevelCustom: function() {
             unveilAction('annoyHermitIntoAQuest')
@@ -950,6 +1025,20 @@ actionData = {
         },
         onLevelAtts:[],
         expAtts:[["curiosity", 1], ["observation", 1]],
+        efficiencyAtts:[["confidence", 1000]]
+    },
+    exploreTheForest: {
+        tier:1, plane:0,
+        progressMaxBase:1e15, progressMaxIncrease:3,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:10,
+        unlockCost:2e16, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+        },
+        onLevelCustom: function() {
+        },
+        onLevelAtts:[["curiosity", 200]],
+        expAtts:[],
         efficiencyAtts:[]
     },
     annoyHermitIntoAQuest: {
@@ -1010,10 +1099,10 @@ actionData = {
     },
     talkWithScott: {
         tier:1, plane:0,
-        progressMaxBase:1e15, progressMaxIncrease:3,
-        expToLevelBase:10, expToLevelIncrease:1,
+        progressMaxBase:2, progressMaxIncrease:100,
+        expToLevelBase:50, expToLevelIncrease:1,
         efficiencyBase:1, maxLevel:2,
-        unlockCost:3e13, visible:false, unlocked:false, purchased: true,
+        unlockCost:40, visible:false, unlocked:false, purchased: true,
         onUnlock: function() {
         },
         onLevelCustom: function() {
@@ -1022,16 +1111,16 @@ actionData = {
                 unveilAction('tavernHelper');
             }
         },
-        onLevelAtts:[],
-        expAtts:[],
+        onLevelAtts:[["savvy", 100]],
+        expAtts:[["confidence", 1]],
         efficiencyAtts:[]
     },
     talkWithJohn: {
         tier:1, plane:0,
-        progressMaxBase:1e15, progressMaxIncrease:3,
-        expToLevelBase:10, expToLevelIncrease:1,
+        progressMaxBase:2e5, progressMaxIncrease:100,
+        expToLevelBase:50, expToLevelIncrease:1,
         efficiencyBase:1, maxLevel:2,
-        unlockCost:3e13, visible:false, unlocked:false, purchased: true,
+        unlockCost:4e6, visible:false, unlocked:false, purchased: true,
         onUnlock: function() {
         },
         onLevelCustom: function() {
@@ -1040,11 +1129,25 @@ actionData = {
                 unveilAction('messenger');
             }
         },
+        onLevelAtts:[["savvy", 250]],
+        expAtts:[["confidence", 1]],
+        efficiencyAtts:[]
+    },
+    learnToListen: {
+        tier:1, plane:0,
+        progressMaxBase:1000, progressMaxIncrease:100,
+        expToLevelBase:1, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:10,
+        unlockCost:100, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+        },
+        onLevelCustom: function() {
+        },
         onLevelAtts:[],
         expAtts:[],
         efficiencyAtts:[]
     },
-    learnToListen: {
+    chatWithMerchants: {
         tier:1, plane:0,
         progressMaxBase:1e15, progressMaxIncrease:3,
         expToLevelBase:10, expToLevelIncrease:1,
@@ -1058,7 +1161,49 @@ actionData = {
         expAtts:[],
         efficiencyAtts:[]
     },
-    chatWithMerchants: {
+    askAboutStitching: {
+        tier:1, plane:0,
+        progressMaxBase:1e15, progressMaxIncrease:3,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:10,
+        unlockCost:3e13, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+        },
+        onLevelCustom: function() {
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[]
+    },
+    complimentTheChef: {
+        tier:1, plane:0,
+        progressMaxBase:1e15, progressMaxIncrease:3,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:10,
+        unlockCost:3e13, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+        },
+        onLevelCustom: function() {
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[]
+    },
+    listenToWoes: {
+        tier:1, plane:0,
+        progressMaxBase:1e15, progressMaxIncrease:3,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:10,
+        unlockCost:3e13, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+        },
+        onLevelCustom: function() {
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[]
+    },
+    keyToTheBackroom: {
         tier:1, plane:0,
         progressMaxBase:1e15, progressMaxIncrease:3,
         expToLevelBase:10, expToLevelIncrease:1,

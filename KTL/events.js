@@ -63,17 +63,14 @@ window.addEventListener('resize', () => {
 });
 
 function resizeStatMenu() {
-    const width = window.innerWidth;
-    const height = window.innerHeight;
-
-    let bonusDisplay = view.cached.bonusDisplay;
+    let bonusDisplay = view.cached[`bonusDisplay`];
     let reduction = 200;
     if(bonusDisplay.style.display !== "none") {
         reduction += 97;
     }
 
-    if(view.cached.attDisplay) {
-        view.cached.attDisplay.style.maxHeight = window.innerHeight - reduction + "px";
+    if(view.cached[`attDisplay`]) {
+        view.cached[`attDisplay`].style.maxHeight = window.innerHeight - reduction + "px";
     }
 }
 
@@ -117,8 +114,8 @@ function clickZoomIn() {
 
     actionContainer.style.transform = `translate(${transformX[data.planeTabSelected]}px, ${transformY[data.planeTabSelected]}px) scale(${scale})`;
 
-    clearTimeout(redrawTimeout);
-    redrawTimeout = setTimeout(globalRedraw, 200);
+    // clearTimeout(redrawTimeout);
+    // redrawTimeout = setTimeout(globalRedraw, 200);
 }
 
 function clickZoomOut() {
@@ -138,8 +135,8 @@ function clickZoomOut() {
 
     actionContainer.style.transform = `translate(${transformX[data.planeTabSelected]}px, ${transformY[data.planeTabSelected]}px) scale(${scale})`;
 
-    clearTimeout(redrawTimeout);
-    redrawTimeout = setTimeout(globalRedraw, 200);
+    // clearTimeout(redrawTimeout);
+    // redrawTimeout = setTimeout(globalRedraw, 200);
 }
 windowElement.addEventListener('wheel', function(e) {
     e.preventDefault();
@@ -164,10 +161,9 @@ windowElement.addEventListener('wheel', function(e) {
 
     actionContainer.style.transform = `translate(${transformX[data.planeTabSelected]}px, ${transformY[data.planeTabSelected]}px) scale(${scale})`;
 
-    clearTimeout(redrawTimeout);
-    redrawTimeout = setTimeout(globalRedraw, 200);
+    // clearTimeout(redrawTimeout);
+    // redrawTimeout = setTimeout(globalRedraw, 200);
 
-    // globalRedraw();
 }, { passive: false });
 
 let redrawTimeout;
@@ -284,7 +280,7 @@ function applyTransform() {
     actionContainer.style.transform = `translate(${transformX[data.planeTabSelected]}px, ${transformY[data.planeTabSelected]}px) scale(${scale})`;
 
     clearTimeout(redrawTimeout);
-    redrawTimeout = setTimeout(globalRedraw, 200);
+    // redrawTimeout = setTimeout(globalRedraw, 200);
 }
 
 function getTouchDistance(touch1, touch2) {
@@ -293,6 +289,8 @@ function getTouchDistance(touch1, touch2) {
     return Math.sqrt(dx * dx + dy * dy);
 }
 
+
+//clears fuzziness but causes global lag - to be avoided if there are lot of elements. Use transform:preserve-3d
 function globalRedraw() {
     forceRedraw(document.getElementById("actionContainer"));
 }
@@ -362,7 +360,7 @@ function clickMenuButton() {
 
 
 let selectedStat = null;
-function clickedAttName(attVar) {
+function clickedAttName(attVar, scrollToIt) {
     //clear all borders
     for(let actionVar in data.actions) {
         views.updateVal(`${actionVar}LargeVersionContainer`, "black", "style.borderColor");
@@ -393,12 +391,9 @@ function clickedAttName(attVar) {
 
     updateAttActionContainers();
 
-    // view.cached[`${attVar}AttContainer`].scrollIntoView({
-    //     behavior: "smooth",
-    //     block: "start",    // or "center" / "nearest" depending on your preference
-    //     inline: "nearest"
-    // });
-
+    if(!scrollToIt) {
+        return;
+    }
     const container = view.cached[`attDisplay`];
     const target = view.cached[`${attVar}AttContainer`];
 

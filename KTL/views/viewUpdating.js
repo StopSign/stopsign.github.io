@@ -12,17 +12,23 @@ create: functions to put the pieces on the page. Uses generate methods.
 
  */
 
+let totalVisible = [];
+
 let views = {
-    updateView: function() { //This is the main view update function that is run once per frame
-        views.updateStats();
+    updateViewAtFrame: function() { //This is the main view update function that is run once per frame
+        views.updateActionsAtFrame();
+
+
+        views.updateScheduled();
+    },
+    updateView: function() {
         views.updateActions();
+        views.updateStats();
 
         for(let upgradeVar in data.upgrades) {
             updateUpgradeView(upgradeVar);
         }
         updateGlobals();
-
-        views.updateScheduled();
     },
     scheduleUpdate: function(elementId, value, type) {
         view.scheduled.push({
@@ -53,20 +59,21 @@ let views = {
         }
 
         //Update the numbers
-        let roundedNumbers = [["num", 2], ["perMinute", 2], ["mult", 3]];
+        let roundedNumbers = [["num", 2], ["mult", 3]]; //["perMinute", 2],
 
         for(let numberObj of roundedNumbers) {
             let capName = capitalizeFirst(numberObj[0]);
             views.updateVal(`${attVar}${capName}`, data.atts[attVar][`${numberObj[0]}`], "textContent", numberObj[1]);
         }
     },
-    updateActions:function() {
-        views.updateAura();
-
+    updateActionsAtFrame:function() {
         for(let actionVar in data.actions) {
             let actionObj = data.actions[actionVar];
             views.updateAction(actionObj);
         }
+    },
+    updateActions:function() {
+        views.updateAura();
     },
     updateAura:function() {
         let resourceAmounts = {};
@@ -98,8 +105,8 @@ let views = {
                 let actionObj = data.actions[entry.id];
 
                 let color = getResourceColorDim(actionObj);
-                views.updateVal(`${entry.id}Container`,`${color} 0px 0px ${Math.floor(ratio * 50)}px ${Math.floor(ratio * 25)}px`,"style.boxShadow");
-                views.updateVal(`${entry.id}LargeVersionContainer`,`inset ${color} 0px 0px ${Math.floor(ratio * 10)}px ${Math.floor(ratio * 5)}px`,"style.boxShadow");
+                views.updateVal(`${entry.id}Container`,`${color} 0px 0px ${Math.floor(ratio * 100)/2}px ${Math.floor(ratio * 50)/2}px`,"style.boxShadow");
+                views.updateVal(`${entry.id}LargeVersionContainer`,`inset ${color} 0px 0px ${Math.floor(ratio * 20)/2}px ${Math.floor(ratio * 10)/2}px`,"style.boxShadow");
                 // views.updateVal(`${entry.id}SmallVersionContainer`,`inset ${getResourceColor(actionObj)} 0px 0px ${Math.min(ratio * 15)}px ${Math.min(ratio * 5)}px`,"style.boxShadow");
             }
         }
@@ -122,7 +129,7 @@ let views = {
 
         //if game state doesn't match, return
         if(actionObj.plane !== data.planeTabSelected) {
-            return;
+            return false;
         }
         let toDisplay = actionObj.visible || globalVisible;
         views.updateVal(`${actionVar}Container`, toDisplay?"":"none", "style.display");
@@ -132,7 +139,8 @@ let views = {
             views.updateVal(`${actionObj.parentVar}_${actionVar}_Line_Inner`, toDisplay && parentObj.visible ?"":"none", "style.display");
         }
 
-        if(!toDisplay) { // || not in screen range
+        // if(!toDisplay) { // || not in screen range
+        if(!toDisplay || !isActionVisible(actionVar)) { // || not in screen range
             return false;
         }
 
@@ -394,7 +402,7 @@ let views = {
 }
 
 function updateUpgradeView(upgradeVar) {
-    let isShowing = document.getElementById("useAmuletMenu").style.display !== "none";
+    let isShowing = view.cached[`useAmuletMenu`].style.display !== "none";
     if(!isShowing) {
         return;
     }
@@ -462,4 +470,21 @@ function hasDownstreamVisible(actionObj) {
         }
     }
     return false;
+}
+
+function isActionVisible(actionVar) {
+    const element = actionData[actionVar];
+    const currentTransformX = transformX[data.planeTabSelected];
+    const currentTransformY = transformY[data.planeTabSelected];
+
+    const elementScreenX = currentTransformX + (element.realX * scale);
+    const elementScreenY = currentTransformY + (element.realY * scale);
+
+    const elementScreenWidth = 350 * scale;
+    const elementScreenHeight = 400 * scale;
+
+    return elementScreenX < window.innerWidth &&
+        elementScreenX + elementScreenWidth > 0 &&
+        elementScreenY < window.innerHeight &&
+        elementScreenY + elementScreenHeight > 0;
 }

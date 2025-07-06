@@ -131,11 +131,11 @@ function load() {
 
     let toLoad = {};
 
-    if(onLoadData) {
-        toLoad = onLoadData;
-    } else if(localStorage[saveName]) {
-        toLoad = JSON.parse(decode(localStorage[saveName]));
-    }
+    // if(onLoadData) {
+    //     toLoad = onLoadData;
+    // } else if(localStorage[saveName]) {
+    //     toLoad = JSON.parse(decode(localStorage[saveName]));
+    // }
 
     // just before exploreDifficultPath
 
@@ -226,6 +226,12 @@ function patchActions(dataActions, toLoadActions, patchMap) {
     for (const key of loadedKeys) {
         if (!(key in dataActions)) {
             delete toLoadActions[key];
+        }
+    }
+
+    if(globalVisible) {
+        for(let attVar in data.atts) {
+            revealAtt(attVar);
         }
     }
 }

@@ -21,7 +21,7 @@ function createAndLinkNewAttribute(attCategory, attVar) {
 
 function attsSetBaseVariables(attObj) {
     attObj.num = 0;
-    attObj.perMinute = 0;
+    // attObj.perMinute = 0;
     attObj.mult = 1;
     attObj.unlocked = false;
 }

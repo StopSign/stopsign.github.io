@@ -45,14 +45,14 @@ function animationTick(currentTime) {
     const interval30 = 1000 / data.gameSettings.fps;
     if (timeAccumulators.view30 >= interval30) {
         timeAccumulators.view30 %= interval30;
-        views.updateView();
+        views.updateViewAtFrame();
         lastAnimationTime = currentTime;
     }
 
     const interval10 = data.gameSettings.fps < 10 ? interval30 : 100;
     if (timeAccumulators.view10 >= interval10) {
         timeAccumulators.view10 %= interval10;
-        // View.update10();
+        views.updateView();
         lastAnimationTime = currentTime;
     }
 
@@ -224,10 +224,10 @@ function gameTick() {
         }
     }
 
-    let attsPerSecond = getStatChanges();
-    for(let attVar in data.atts) {
-        data.atts[attVar].perMinute = attsPerSecond[attVar] ? attsPerSecond[attVar]*60 : 0;
-    }
+    // let attsPerSecond = getStatChanges();
+    // for(let attVar in data.atts) {
+    //     data.atts[attVar].perMinute = attsPerSecond[attVar] ? attsPerSecond[attVar]*60 : 0;
+    // }
 
     upgradeUpdates()
 }
