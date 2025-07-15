@@ -32,15 +32,17 @@ function actionSetBaseVariables(actionObj, dataObj) {
 
     actionObj.progress = 0;
     actionObj.progressGain = 0; //calculated based on resource & tier
+    actionObj.instability = 0;
     actionObj.progressMaxBase = dataObj.progressMaxBase ? dataObj.progressMaxBase : 1;
     actionObj.progressMaxMult = dataObj.progressMaxMult ? dataObj.progressMaxMult : 1;
-    actionObj.progressMax = actionObj.progressMaxBase * actionObj.progressMaxMult;
+    actionObj.progressMax = actionObj.progressMaxBase * actionObj.progressMaxMult * (1+actionObj.instability/100);
     actionObj.actionPowerBase = dataObj.actionPowerBase ? dataObj.actionPowerBase : 1;
     actionObj.actionPowerMult = dataObj.actionPowerMult ? dataObj.actionPowerMult : 1;
     actionObj.level = 0;
-    actionObj.maxLevel = dataObj.maxLevel ? dataObj.maxLevel : -1;
+    actionObj.maxLevel = dataObj.maxLevel;
     actionObj.exp = 0;
     actionObj.expGain = 0;
+    actionObj.power = dataObj.power ?? undefined;
     actionObj.expToLevelBase = dataObj.expToLevelBase ? dataObj.expToLevelBase : 1;
     actionObj.expToLevelMult = dataObj.expToLevelMult ? dataObj.expToLevelMult : 1;
     actionObj.expToLevel = actionObj.expToLevelBase * actionObj.expToLevelMult; //can be divided
@@ -91,7 +93,8 @@ function actionSetInitialVariables(actionObj, dataObj) {
     actionObj.cooldownTimer = 0; //when this is higher than cooldown it is ready
     actionObj.resourceName = dataObj.resourceName ? dataObj.resourceName : "momentum";
     actionObj.tier = dataObj.tier;
-    actionObj.wage = dataObj.wage ? dataObj.wage : null;
+    actionObj.wage = dataObj.wage ? dataObj.wage : undefined;
+    actionObj.instabilityToAdd = dataObj.instabilityToAdd ? dataObj.instabilityToAdd : undefined;
     actionObj.hasUpstream = dataObj.hasUpstream ?? true;
     actionObj.isKTL = !!dataObj.isKTL;
     actionObj.purchased = !!dataObj.purchased;
@@ -115,14 +118,14 @@ function createAndLinkNewAction(actionVar, dataObj, title, downstreamVars) {
     let actionObj = data.actions[actionVar];
     actionObj.actionVar = actionVar;
     actionObj.title = title;
-    actionObj.downstreamVars = downstreamVars ? downstreamVars : [];
+    dataObj.downstreamVars = downstreamVars ? downstreamVars : [];
 
     actionSetBaseVariables(actionObj, dataObj);
     actionSetInitialVariables(actionObj, dataObj);
 
 
 
-    for(let downstreamVar of actionObj.downstreamVars) {
+    for(let downstreamVar of dataObj.downstreamVars) {
         actionObj[downstreamVar+"FocusMult"] = 1;
         actionObj[downstreamVar+"downstreamSendRate"] = 0;
         actionObj[`downstreamRate${downstreamVar}`] = 0;
@@ -152,8 +155,9 @@ function createAndLinkNewAction(actionVar, dataObj, title, downstreamVars) {
             actionObj.expToLevel = actionObj.expToLevelBase * actionObj.expToLevelMult;
         } else {
             actionObj.progressMaxMult = 1/totalEffect;
-            actionObj.progressMax = actionObj.progressMaxBase * actionObj.progressMaxMult;
+            actionObj.progressMax = actionObj.progressMaxBase * actionObj.progressMaxMult * (1+actionObj.instability/100);
         }
+        actionObj.actionPower = actionObj.actionPowerBase * actionObj.actionPowerMult * (actionObj.efficiency/100);
     }
     actionObj.calcAttExpertise = function() {
         actionObj.efficiencyMult = 1;
@@ -198,11 +202,12 @@ function isAttentionLine(actionVar, downstreamVar) {
 }
 
 function checkLevelUp(actionObj, dataObj) {
-    if(actionObj.exp >= actionObj.expToLevel && (actionObj.maxLevel < 0 || (actionObj.level < actionObj.maxLevel))) {
+    let isMaxLevel = actionObj.maxLevel !== undefined && actionObj.level >= actionObj.maxLevel;
+    if(actionObj.exp >= actionObj.expToLevel && !isMaxLevel) {
         actionObj.exp -= actionObj.expToLevel;
         actionObj.level++;
         actionObj.progressMaxBase *= actionObj.progressMaxIncrease;
-        actionObj.progressMax = actionObj.progressMaxBase * actionObj.progressMaxMult;
+        actionObj.progressMax = actionObj.progressMaxBase * actionObj.progressMaxMult * (1+actionObj.instability/100);
         actionObj.expToLevelBase *= actionObj.expToLevelIncrease;
         actionObj.expToLevel = actionObj.expToLevelBase * actionObj.expToLevelMult;
         actionObj.actionPowerMult *= actionObj.actionPowerMultIncrease;
@@ -309,7 +314,7 @@ function unveilAction(actionVar) {
         //There won't be a downstream slider
         return;
     }
-    parent.downstreamVars.forEach(function (downstreamVar) {
+    actionData[parentVar].downstreamVars.forEach(function (downstreamVar) {
         if(downstreamVar === actionVar && data.actions[downstreamVar].hasUpstream) {
             setSliderUI(parentVar, downstreamVar, getUpgradeSliderAmount()); //set parent on unveil
         }
@@ -361,7 +366,7 @@ function unlockAction(actionObj) {
         dataObj.onUnlock();
     }
 
-    actionObj.downstreamVars.forEach(function(downstreamVar) {
+    dataObj.downstreamVars.forEach(function(downstreamVar) {
         if(data.actions[downstreamVar] && data.actions[downstreamVar].unlocked && document.getElementById(actionVar + "NumInput" + downstreamVar)) {
             setSliderUI(actionVar, downstreamVar, getUpgradeSliderAmount()); //set when unlock
         }
@@ -406,28 +411,32 @@ function calcUpgradeMultToExp(actionObj) {
 }
 
 function calcFearGain() {
-    return (data.totalMomentum + data.actions.overclock.resourceToAdd) / 1e9 * (data.actions.gossip.resource / 1000);
+    return (data.totalMomentum + data.actions.overclock.resourceToAdd) / 1e20 * (data.actions.gossipAroundCoffee.resource / 1000);
 }
 
 function isSpellReady(actionVar) {
     let actionObj = data.actions[actionVar];
-    return actionObj.level > 0 && actionObj.cooldownTimer >= actionObj.cooldown;
+    return actionObj.level > 0 && (!actionObj.cooldown || actionObj.cooldownTimer >= actionObj.cooldown);
 }
 
 function useCharge(actionVar) {
     let actionObj = data.actions[actionVar];
 
     actionObj.level--;
-    actionObj.cooldownTimer = 0;
+    actionObj.instability += actionObj.instabilityToAdd / (actionObj.efficiency/100);
+
+    if(actionObj.cooldown) {
+        actionObj.cooldownTimer = 0;
+    }
 }
 
-//adjustActionData('', 'progressMaxBase', 1e6
+//adjustActionData('', 'progressMaxBase', 1e6)
 //function to be used as a debug helper, running in console
 function adjustActionData(actionVar, key, value) {
     let actionObj = data.actions[actionVar];
-    actionObj.key = value;
+    actionObj[key] = value;
     if(['progressMaxBase', 'progressMaxMult'].includes(key)) {
-        actionObj.progressMax = actionObj.progressMaxBase * actionObj.progressMaxMult;
+        actionObj.progressMax = actionObj.progressMaxBase * actionObj.progressMaxMult * (1+actionObj.instability/100);
     }
 
 }

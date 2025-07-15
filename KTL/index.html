@@ -17,7 +17,7 @@
 
 <div id="windowElement" style="position:relative; width:100%; height:98%; border:2px solid; overflow:hidden;background-color:var(--world-1-bg-primary)">
     <div id="actionContainer" style="position:absolute;transform-style:preserve-3d">
-<!--    <div id="actionContainer" style="position:absolute;will-change:transform;">-->
+<!--    <div id="actionContainer" style="position:absolute;will-change:transform;transform-style:preserve-3d">-->
         <span id="planeContainer0">
             <span id="lineContainer0"></span>
             <!-- Generated Actions go here -->
@@ -38,9 +38,11 @@
 
 <div style="position:absolute;left:15px;top:21px;padding:0 10px;font-size:14px;color: var(--text-muted);pointer-events: none;">
     <div id="momentumDisplay" style="font-size:14px;background-color:var(--overlay-color);">
-        Clock: <span id="secondsPerReset" style="display:inline-block;margin-right:10px;color: var(--text-primary);font-weight:bold;"></span>
-        Total Momentum: <span id="totalMomentum" style="display:inline-block;color: var(--text-primary);width:50px;font-weight:bold;">1</span>
-        <span id="ancientCoinDisplay" style="display:none"> Ancient Coins: <span id="ancientCoin" style="color: var(--text-primary);font-weight:bold;"></span></span>
+        Clock: <span id="secondsPerReset" style="display:inline-block;width:50px;margin-right:5px;color: var(--text-primary);font-weight:bold;"></span>
+        Total Momentum: <span id="totalMomentum" style="display:inline-block;color: var(--text-primary);width:50px;margin-right:5px;font-weight:bold;">1</span>
+        <span id="spellPowerDisplay" style="display:none"> Spell Power: <span id="totalSpellPower" style="display:inline-block;color:var(--text-primary);font-weight:bold;width:50px;margin-right:5px;"></span></span>
+        <span id="ancientCoinDisplay" style="display:none"> Ancient Coins: <span id="ancientCoin" style="display:inline-block;color:var(--text-primary);font-weight:bold;width:50px;margin-right:5px;"></span></span>
+
     </div>
     <div id="jobDisplay" style="display:none;font-size:14px;top:65px;background-color:var(--overlay-color);">
         Current Job: <span id="jobTitle" style="color: var(--text-primary);font-weight:bold;">Help Scott With Chores</span>. Wage: $<b><span id="jobWage" style="color: var(--text-primary);">1</span></b>
@@ -50,7 +52,7 @@
     <span id="attDisplayShowButton" class="button" style="display:none;padding:5px;top:110px;left:388px;" onclick="statMenuHideButton()">Stats >></span>
     <div id="attDisplay" style="border: 1px solid var(--border-color);padding:10px;font-size:12px;background-color:var(--overlay-color);
         direction: rtl;position:relative;min-height:200px;overflow-y:auto;overflow-x:hidden;display: inline-block;scrollbar-gutter:stable;pointer-events: auto;">
-        <span style="direction:ltr;">
+        <span id="attDisplayUnder" style="direction:ltr;">
             <span id="attDisplayHideButton" class="button" style="font-size:14px;position:absolute;padding:5px 8px;top:-3px;left:350px;" onclick="statMenuHideButton()"><<</span>
             <div style="font-size:12px;position:absolute;top:5px;left:5px;">Bonus = 10% per Stat.</div><br>
             <div class="title">Attributes</div>
@@ -97,17 +99,17 @@
         <div style="display:flex;justify-content:center;gap:5px;font-size:18px;width:100%;">
             <div id="planeButton0" class="hyperVisible planeButton0" onclick="switchToPlane(0)" style="max-width:200px;height:60px;pointer-events:auto;
                 border-bottom:none;border-top-left-radius:10px;border-top-right-radius:10px;
-                display:flex;align-items:center;justify-content:center;font-weight:bold;cursor:pointer;width:50%;">
+                display:none;align-items:center;justify-content:center;font-weight:bold;cursor:pointer;width:50%;">
                 Brythal [1]
             </div>
             <div id="planeButton1" class="hyperVisible planeButton1" onclick="switchToPlane(1)" style="max-width:200px;height:60px;pointer-events:auto;
                 border-bottom:none;border-top-left-radius:10px;border-top-right-radius:10px;
-                display:flex;align-items:center;justify-content:center;font-weight:bold;cursor:pointer;width:50%;">
+                display:none;align-items:center;justify-content:center;font-weight:bold;cursor:pointer;width:50%;">
                 Kill the Lich [2]
             </div>
             <div id="planeButton2" class="hyperVisible planeButton2" onclick="switchToPlane(2)" style="max-width:200px;height:60px;pointer-events:auto;
                 border-bottom:none;border-top-left-radius:10px;border-top-right-radius:10px;
-                display:flex;align-items:center;justify-content:center;font-weight:bold;cursor:pointer;width:50%;">
+                display:none;align-items:center;justify-content:center;font-weight:bold;cursor:pointer;width:50%;">
                 Magic [3]
             </div>
 <!--            <div id="planeButton3" class="hyperVisible planeButton3" onclick="switchToPlane(3)" style="max-width:200px;height:60px;pointer-events:auto;-->
@@ -195,7 +197,8 @@ It continues, capturing fraction ancientCoin of your fleeting soul and sending i
             you're equipped with army-standard and facing an elite, who roars as he stomps toward you.
         </div>
         <input type="checkbox" id="confirmKTL"><label for="confirmKTL">Confirm (Reset requires >1.1 million total momentum)</label>
-        <button class="continueButton" onclick="initializeKTL()">Reset now with <span id="totalMomentum2"></span> total momentum!</button>
+        <button class="continueButton" onclick="initializeKTL()">Reset now with <span id="totalMomentum2"></span> total momentum
+            and <span id="totalSpellPower2"></span> spell power!</button>
     </div>
 </div>
 

@@ -58,10 +58,16 @@ function animationTick(currentTime) {
 
     if (timeAccumulators.view1 >= 1000) {
         timeAccumulators.view1 %= 1000;
+        timeSinceLastSave++
+        if(timeSinceLastSave >= 20) {
+            timeSinceLastSave = 0;
+            save();
+        }
         updateViewOnSecond();
         lastAnimationTime = currentTime;
     }
 }
+let timeSinceLastSave = 0;
 
 // --- System Initialization ---
 function initTimingSystem() {
@@ -209,8 +215,9 @@ function gameTick() {
 
     for (let actionVar in data.actions) {
         const actionObj = data.actions[actionVar];
+        const dataObj = actionData[actionVar];
 
-        for(let downstreamVar of actionObj.downstreamVars) {
+        for(let downstreamVar of dataObj.downstreamVars) {
             if (isAttentionLine(actionVar, downstreamVar)) {
                 const key = `${downstreamVar}FocusMult`;
                 if(data.upgrades.rememberWhatIFocusedOn.upgradePower === 0) {
@@ -249,20 +256,14 @@ function calcDeltas() {
     for (let actionVar in data.actions) {
         let actionObj = data.actions[actionVar];
 
-        // Start with the decrease from sending resources downstream.
-        // This applies to ANY action that sends resources, including 'overclock'.
         let totalDecrease = actionObj.totalSend || 0;
 
-        // Then, add the decrease from self-consumption.
         if (!actionObj.isGenerator) {
-            // Non-generators consume resources to gain progress.
             totalDecrease += actionObj.progressGain;
         } else {
-            // Specific generators might also consume their own resource.
-            if (actionVar === "makeMoney") {
+            if (["makeMoney", "socialize"].includes(actionVar)) {
                 totalDecrease += (actionObj.resource * actionObj.tierMult()) * actionObj.progressGain / actionObj.progressMax;
             }
-            // Generators like 'overclock' have no self-consumption, so nothing more is added.
         }
 
         actionObj.resourceDecrease = totalDecrease;
@@ -281,11 +282,18 @@ function secondTick() {
 //spells get to reset before actions are ready to use them
 function tickActionTimer(actionVar) {
     let actionObj = data.actions[actionVar];
+    if(!actionObj.cooldown) {
+        return;
+    }
 
     actionObj.cooldownTimer += 1 / data.gameSettings.ticksPerSecond;
     if(actionObj.cooldownTimer > actionObj.cooldown) {
         actionObj.cooldownTimer = actionObj.cooldown;
     }
+}
+
+function getInstabilityReduction() {
+    return data.atts.control.mult / 10;
 }
 
 
@@ -298,9 +306,13 @@ function tickGameObject(actionVar) {
     }
 
     let momentumMaxRate = actionObj.isGenerator ? actionObj.generatorSpeed / data.gameSettings.ticksPerSecond : actionObj.resource * actionObj.tierMult() / data.gameSettings.ticksPerSecond;
-    let atMaxLevel = actionObj.maxLevel >= 0 && actionObj.level >= actionObj.maxLevel;
-    let momentumToAdd = (atMaxLevel || !actionObj.unlocked) ? 0 : momentumMaxRate;
+    let isMaxLevel = actionObj.maxLevel !== undefined && actionObj.level >= actionObj.maxLevel;
+    let momentumToAdd = (isMaxLevel || !actionObj.unlocked) ? 0 : momentumMaxRate;
     let resourceToAddInefficient = momentumToAdd * (actionObj.efficiency / 100);
+
+    resourceToAddInefficient = resourceToAddInefficient < .0000001 ? 0 : resourceToAddInefficient;
+
+
 
     // Update progress and set the progressGain rate for this tick.
     actionObj.progress += resourceToAddInefficient;
@@ -309,6 +321,14 @@ function tickGameObject(actionVar) {
     // For non-generators, consume the resource used to generate progress.
     if (!actionObj.isGenerator) {
         actionObj.resource -= resourceToAddInefficient;
+    }
+
+    if(actionObj.instability > 0) {
+        actionObj.instability -= getInstabilityReduction() / data.gameSettings.ticksPerSecond;
+        actionObj.progressMax = actionObj.progressMaxBase * actionObj.progressMaxMult * (1+actionObj.instability/100);
+        if(actionObj.instability < 0) {
+            actionObj.instability = 0;
+        }
     }
 
     // Level up to 10 times per tick if progress is sufficient.
@@ -320,7 +340,7 @@ function tickGameObject(actionVar) {
 
     // Reset and calculate total resources sent to all downstream actions this tick.
     actionObj.totalSend = 0;
-    for (let downstreamVar of actionObj.downstreamVars) {
+    for (let downstreamVar of dataObj.downstreamVars) {
         let downstreamObj = data.actions[downstreamVar];
         let downstreamDataObj = actionData[downstreamVar];
 
@@ -347,18 +367,19 @@ function tickGameObject(actionVar) {
 function calculateTaken(actionVar, downstreamVar, actionObj, mult) {
     let permFocusMult = actionObj[downstreamVar + "FocusMult"] >= 1 ? actionObj[downstreamVar + "FocusMult"] : 1;
 
-    let totalTakenMult = actionObj.tierMult() * (actionObj.efficiency / 100) * permFocusMult * (isAttentionLine(actionVar, downstreamVar) ? data.focusMult : 1);
+    let totalTakenMult = actionObj.tierMult() * (actionObj.efficiency / 100) * permFocusMult *
+        (isAttentionLine(actionVar, downstreamVar) ? data.focusMult : 1);
     if (totalTakenMult > 0.1) {
         totalTakenMult = 0.1; // Cap at 10%/s
     }
     let toReturn = actionObj.resource / data.gameSettings.ticksPerSecond * totalTakenMult * mult;
-    return toReturn < .00001 ? 0 : toReturn;
+    return toReturn < .0000001 ? 0 : toReturn;
 }
 
 
 function checkProgressCompletion(actionObj, dataObj) {
-    if(actionObj.progress >= actionObj.progressMax
-        && (actionObj.maxLevel < 0 || (actionObj.level < actionObj.maxLevel))) { //or max
+    let isMaxLevel = actionObj.maxLevel !== undefined && actionObj.level >= actionObj.maxLevel;
+    if(actionObj.progress >= actionObj.progressMax && !isMaxLevel) {
         actionObj.progress -= actionObj.progressMax;
         if(dataObj.onCompleteCustom) {
             dataObj.onCompleteCustom();

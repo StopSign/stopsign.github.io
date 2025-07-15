@@ -18,7 +18,6 @@ let views = {
     updateViewAtFrame: function() { //This is the main view update function that is run once per frame
         views.updateActionsAtFrame();
 
-
         views.updateScheduled();
     },
     updateView: function() {
@@ -126,25 +125,28 @@ let views = {
     },
     updateActionVisibility: function(actionObj) {
         let actionVar = actionObj.actionVar;
+        let dataObj = actionData[actionVar];
 
         //if game state doesn't match, return
         if(actionObj.plane !== data.planeTabSelected) {
             return false;
         }
         let toDisplay = actionObj.visible || globalVisible;
-        views.updateVal(`${actionVar}Container`, toDisplay?"":"none", "style.display");
+        let isInRange = isActionVisible(actionVar);
+        views.updateVal(`${actionVar}Container`, toDisplay&&isInRange?"":"none", "style.display");
         if(actionObj.parentVar) {
             let parentObj = data.actions[actionObj.parentVar];
+            // views.updateVal(`${actionObj.parentVar}_${actionVar}_Line_Outer`, "none", "style.display");
             views.updateVal(`${actionObj.parentVar}_${actionVar}_Line_Outer`, globalVisible||(toDisplay && parentObj.visible) ?"flex":"none", "style.display");
             views.updateVal(`${actionObj.parentVar}_${actionVar}_Line_Inner`, toDisplay && parentObj.visible ?"":"none", "style.display");
         }
 
         // if(!toDisplay) { // || not in screen range
-        if(!toDisplay || !isActionVisible(actionVar)) { // || not in screen range
+        if(!toDisplay || !isInRange) { // || not in screen range
             return false;
         }
 
-        let miniVersion = scale < .35;
+        let miniVersion = scale < .45;
         let mediumVersion = scale < .65 && !miniVersion;
         views.updateVal(`${actionVar}LargeVersionContainer`, !miniVersion?"":"none", "style.display");
         views.updateVal(`${actionVar}SmallVersionContainer`, miniVersion?"":"none", "style.display");
@@ -160,11 +162,11 @@ let views = {
         //     views.updateVal(`${actionVar}MenuButtons`, mediumVersion?"none":"", "style.display");
         // }
 
-        let isMaxLevel = (actionObj.maxLevel !== -1 && actionObj.level >= actionObj.maxLevel);
+        let isMaxLevel = actionObj.maxLevel !== undefined && actionObj.level >= actionObj.maxLevel;
         views.updateVal(`${actionVar}IsMaxLevel`, isMaxLevel && !miniVersion ? "":"none", "style.display");
 
         //go through each downstream
-        for (let downstreamVar of actionObj.downstreamVars) {
+        for (let downstreamVar of dataObj.downstreamVars) {
             if(!actionData[downstreamVar]) {
                 continue;
             }
@@ -182,17 +184,38 @@ let views = {
     },
     updateActionSharedViews: function(actionObj) {
         let actionVar = actionObj.actionVar;
+        let dataObj = actionData[actionVar];
 
         views.updateVal(`${actionVar}HighestLevelContainer2`, data.upgrades.rememberWhatIDid.isFullyBought ? "" : "none", "style.display");
         views.updateVal(`${actionVar}LockContainer`, !actionObj.unlocked?"":"none", "style.display");
 
-        let color = `rgb(${Math.round(20+189*(1-(actionObj.efficiency/100)))},${Math.round(20+189*(actionObj.efficiency/100))},100)`
-        views.updateVal(`${actionVar}Efficiency`, color, "style.color");
-        views.updateVal(`${actionVar}Efficiency`, data.actions[actionVar].efficiency, "textContent", 2);
+        let effColor = `rgb(${Math.round(20+189*(1-(actionObj.efficiency/100)))},${Math.round(20+189*(actionObj.efficiency/100))}, 100)`
+        views.updateVal(`${actionVar}Efficiency`, effColor, "style.color");
+
+        //Update the numbers
+        let roundedNumbers = [["efficiency", 2]];
+        if(actionObj.maxLevel !== undefined) {
+            roundedNumbers.push(["maxLevel", 1]);
+        }
+        if(actionObj.wage) {
+            roundedNumbers.push(["wage", 2]);
+        }
+        if(actionObj.isSpell) {
+            let instaColor = `rgb(${Math.round(20+189*(actionObj.instability/100/data.atts.control.mult))}, ${Math.round(20+189*(1-(actionObj.instability/100/data.atts.control.mult)))}, 100)`;
+            views.updateVal(`${actionVar}Instability`, instaColor, "style.color");
+            roundedNumbers.push(["instability", 2]);
+            views.updateVal(`${actionVar}InstabilityToAdd`, actionObj.instabilityToAdd/(actionObj.efficiency/100), "textContent", 2);
+        }
+
+        for(let numberObj of roundedNumbers) {
+            let capName = capitalizeFirst(numberObj[0]);
+            let nameNoNums = numberObj[0].replace(/\d+/g, '');
+            views.updateVal(`${actionVar}${capName}`, data.actions[actionVar][`${nameNoNums}`], "textContent", numberObj[1]);
+        }
 
         //Update visibility even before unlock, because it affecst the shape of it
         if (actionObj.currentMenu === "downstream") {
-            for (let downstreamVar of actionObj.downstreamVars) {
+            for (let downstreamVar of dataObj.downstreamVars) {
                 let downstreamObj = data.actions[downstreamVar];
 
                 if(downstreamObj && downstreamObj.hasUpstream) {
@@ -225,7 +248,7 @@ let views = {
         views.updateVal(`${actionVar}ExpBarInner`, `${(exp > 100 ? 100 : exp)}%`, "style.width");
 
         //When Action is max level
-        let isMaxLevel = (actionObj.maxLevel !== -1 && actionObj.level >= actionObj.maxLevel);
+        let isMaxLevel = actionObj.maxLevel !== undefined && actionObj.level >= actionObj.maxLevel;
         views.updateVal(`${actionVar}Level2`, isMaxLevel?"var(--max-level-color)":"var(--text-primary)", "style.color");
 
         //When action should be dim
@@ -285,12 +308,6 @@ let views = {
             roundedNumbers.push(["secondHighestLevel", 1]);
             roundedNumbers.push(["thirdHighestLevel", 1]);
         }
-        if(actionObj.wage) {
-            roundedNumbers.push(["wage", 2]);
-        }
-        if(actionObj.maxLevel >= 0) {
-            roundedNumbers.push(["maxLevel", 1]);
-        }
         roundedNumbers.push(["totalSend", 3]);
         roundedNumbers.push(["prevUnlockTime", 1]);
         roundedNumbers.push(["efficiencyBase", 2]);
@@ -309,10 +326,11 @@ let views = {
     },
     updateActionDownstreamViews: function(actionObj) {
         let actionVar = actionObj.actionVar;
-        if(!actionObj.downstreamVars) {
+        let dataObj = actionData[actionVar];
+        if(!dataObj.downstreamVars) {
             return;
         }
-        for(let downstreamVar of actionObj.downstreamVars) {
+        for(let downstreamVar of dataObj.downstreamVars) {
             let downstreamObj = data.actions[downstreamVar];
             if(!downstreamObj || !downstreamObj.hasUpstream) {
                 return;
@@ -426,19 +444,35 @@ function updateUpgradeView(upgradeVar) {
 
 function updateGlobals() {
     let totalMometum = 0;
+    let totalSpellPower = 0;
     for(let actionVar in data.actions) {
         let actionObj = data.actions[actionVar];
         if(actionObj.resourceName === "momentum" && gameStateMatches(actionObj)) {
             totalMometum += actionObj.resource;
         }
+        if(actionObj.power) {
+            totalSpellPower += actionObj.power * actionObj.level;
+        }
     }
     data.totalMomentum = totalMometum;
+    data.totalSpellPower = totalSpellPower;
 
+    views.updateVal(`totalSpellPower`, totalSpellPower, "textContent", 1);
     views.updateVal(`totalMomentum`, totalMometum, "textContent", 1);
 
     if(KTLMenuOpen) { //only update if menu is open
         views.updateVal(`totalMomentum2`, totalMometum, "textContent", 1);
     }
+
+    views.updateVal(`secondsPerReset`, data.secondsPerReset, "textContent","time");
+    views.updateVal(`bonusTime`, data.currentGameState.bonusTime/1000, "textContent", "time");
+
+    views.updateVal(`ancientCoin`, data.ancientCoin, "textContent", 1);
+    views.updateVal(`ancientCoin2`, data.ancientCoin, "textContent", 1);
+}
+
+function updateViewOnSecond() {
+    showAllValidToasts();
 
     let toShowKTLButton = data.gameState !== "KTL" && (data.doneKTL || data.actions.hearAboutTheLich.level >= 1);
     views.updateVal(`killTheLichMenuButton2`, toShowKTLButton ? "" : "none", "style.display");
@@ -450,21 +484,14 @@ function updateGlobals() {
     views.updateVal(`openViewAmuletButton`, toViewAmulet ? "" : "none", "style.display");
     views.updateVal(`ancientCoinDisplay`, toViewAmulet ? "" : "none", "style.display");
 
+    views.updateVal(`spellPowerDisplay`, data.totalSpellPower > 0 ? "" : "none", "style.display");
+
     views.updateVal(`jobDisplay`, data.displayJob ? "" : "none", "style.display");
-
-    views.updateVal(`secondsPerReset`, data.secondsPerReset, "textContent","time");
-    views.updateVal(`bonusTime`, data.currentGameState.bonusTime/1000, "textContent", "time");
-
-    views.updateVal(`ancientCoin`, data.ancientCoin, "textContent", 1);
-    views.updateVal(`ancientCoin2`, data.ancientCoin, "textContent", 1);
-}
-
-function updateViewOnSecond() {
-    showAllValidToasts();
 }
 
 function hasDownstreamVisible(actionObj) {
-    for(let downstreamVar of actionObj.downstreamVars) {
+    let dataObj = actionData[actionObj.actionVar];
+    for(let downstreamVar of dataObj.downstreamVars) {
         if(data.actions[downstreamVar] && data.actions[downstreamVar].visible) {
             return true;
         }

@@ -66,7 +66,7 @@ function createAttDisplay(attVar) {
 
     let child = document.createElement("template");
     child.innerHTML = theStr;
-    document.getElementById("attDisplay").appendChild(child.content);
+    document.getElementById("attDisplayUnder").appendChild(child.content);
 
 }
 
@@ -85,6 +85,8 @@ function generateActionDisplay(actionVar) {
     queueCache(`${actionVar}HighestLevel2`);
     queueCache(`${actionVar}Efficiency`);
     queueCache(`${actionVar}Wage`);
+    queueCache(`${actionVar}Instability`);
+    queueCache(`${actionVar}InstabilityToAdd`);
 
     let title = Raw.html`
         <span onclick="actionTitleClicked('${actionVar}')" style="color:var(--text-primary);cursor:pointer;position:absolute;top:-77px;height:77px;left:0;
@@ -96,12 +98,14 @@ function generateActionDisplay(actionVar) {
             <span style="font-size:14px;color:var(--text-muted)">${actionObj.isGenerator?`(+<span id="${actionVar}ResourceToAdd" style="color:var(--text-primary);font-weight:bold;">???</span>)`:""}</span><br>
             <span style="font-size:12px;position:relative;color:var(--text-muted)">
                 ${!actionObj.isSpell?"Level ":"Charges "}<span id="${actionVar}Level" style="color:var(--text-primary);font-weight:bold;">0</span>
-                ${actionObj.maxLevel >= 0 ? ` / <span id="${actionVar}MaxLevel" style="color:var(--text-primary);font-weight:bold;">0</span>` : ""}
+                ${actionObj.maxLevel !== undefined ? ` / <span id="${actionVar}MaxLevel" style="color:var(--text-primary);font-weight:bold;">0</span>` : ""}
                 <span id="${actionVar}HighestLevelContainer2"> 
                     (<span id='${actionVar}HighestLevel2' style="color:var(--text-primary);font-weight:bold;"></span>)
                 </span> | 
                 <span id="${actionVar}Efficiency" style="color:var(--text-primary);font-weight:bold;"></span>% efficiency
                 ${!actionObj.wage ? "" : ` | Wage: $<span id="${actionVar}Wage" style="color:var(--wage-color);font-weight:bold;"></span>`}
+                ${!actionObj.isSpell ? "" : ` | <span id="${actionVar}Instability" style="color:var(--text-primary);font-weight:bold;">0</span>% instability
+                (+<span id="${actionVar}InstabilityToAdd" style="color:var(--text-primary);font-weight:bold;"></span>)` }
             </span>
         </span>
     `
@@ -217,7 +221,7 @@ function generateActionDisplay(actionVar) {
 
     let maxLevel = Raw.html`
         <div id="${actionVar}IsMaxLevel" class="hyperVisible" 
-            style="position:absolute; display:none;left:88px;top:63px;color:${!actionObj.isSpell?"var(--max-level-color)":"var(--text-bright)"};font-size:22px;">
+            style="position:absolute;display:none;top:63px;width:300px;text-align:center;color:${!actionObj.isSpell?"var(--max-level-color)":"var(--text-bright)"};font-size:22px;">
             <b>${!actionObj.isSpell?"MAX LEVEL":"MAX CHARGES"}</b>
         </div>`
 
@@ -320,7 +324,7 @@ function generateActionDisplay(actionVar) {
     let downstreamContainer = Raw.html`
         <div id="${actionVar}_downstreamContainer" style="padding:5px;display:none;">
             <div id="${actionVar}_downstreamButtonContainer">
-                ${createDownStreamSliders(actionObj)}
+                ${createDownStreamSliders(actionObj, dataObj)}
                 <div id="${actionVar}ToggleDownstreamButtons">
                     <span onclick="toggleAllZero('${actionVar}')" 
                         class="buttonSimple" style="margin-right:3px;width:30px;height:30px;text-align:center;cursor:pointer;padding:0 4px;">All 0</span>
@@ -340,9 +344,9 @@ function generateActionDisplay(actionVar) {
     queueCache(`${actionVar}LargeVersionContainer`)
     queueCache(`${actionVar}SmallVersionContainer`)
     queueCache(`${actionVar}Level2`)
-
+//transform-style: preserve-3d;
     theStr += Raw.html`
-        <div id="${actionVar}Container" style="display:${shouldDisplay};position:absolute;left:${newX};top:${newY};width:300px;transform-style: preserve-3d;" 
+        <div id="${actionVar}Container" style="display:${shouldDisplay};position:absolute;left:${newX};top:${newY};width:300px;" 
             onmouseenter="mouseOnAction('${actionVar}')" onmouseleave="mouseOffAction('${actionVar}')">
             <div id="${actionVar}LargeVersionContainer" style="border:2px solid var(--border-color);background-color:var(--bg-secondary);">
                 ${title}
@@ -430,12 +434,14 @@ function generateOutsideAttDisplay(actionObj, attObj, type) {
         : (type === "exp"
             ? "--attribute-use-exp-color"
             : "--attribute-use-eff-color");
+    borderColor = statName === "legacy" ? "--legacy-color-bg" : borderColor;
 
     let backgroundColor = type === "add"
         ? "--attribute-add-bg-color"
         : (type === "exp"
             ? "--attribute-use-exp-bg-color"
             : "--attribute-use-eff-bg-color");
+    backgroundColor = statName === "legacy" ? "--legacy-color" : backgroundColor;
 
     let text = type === "add"
         ? "+" + intToString(statValue, 1)
@@ -457,11 +463,11 @@ function generateOutsideAttDisplay(actionObj, attObj, type) {
     return Raw.html`
         <div id="${actionVar}${statName}OutsideContainer${type}" onclick="clickedAttName('${statName}', true)" 
              style="display:${startDisplayed};border:2px solid var(${borderColor});margin-bottom:2px;cursor:pointer;background-color:var(--overlay-color);padding:1px;">
-            <div class="showthat" style="position:relative;width:30px;height:30px;background-color:var(${backgroundColor});">
+            <div class="showthat" style="position:relative;width:35px;height:35px;background-color:var(${backgroundColor});">
                 <div class="showthisUp" style="font-size:18px;">${tooltipText}</div>
                 <img src="img/${statName}.svg" alt="${statName}" style="width:100%;height:100%;" />
                 <div class="hyperVisible" style="position:absolute;bottom:0;left:0;width:100%;height:50%;display:flex;align-items:flex-end;
-                justify-content:center;font-weight:bold;font-size:12px;">${text}</div>
+                justify-content:center;font-weight:bold;font-size:16px;">${text}</div>
             </div>
         </div>`;
 }
@@ -564,12 +570,12 @@ function generateActionEfficiencyAtts(actionObj) {
     return expertiseModsStr;
 }
 
-function createDownStreamSliders(actionObj) {
+function createDownStreamSliders(actionObj, dataObj) {
     let theStr = "";
-    if(!actionObj.downstreamVars) {
+    if(!dataObj.downstreamVars) {
         return "";
     }
-    for(let downstreamVar of actionObj.downstreamVars) {
+    for(let downstreamVar of dataObj.downstreamVars) {
         if(!data.actions[downstreamVar] || !data.actions[downstreamVar].hasUpstream) {
             continue;
         }
@@ -620,10 +626,11 @@ function createDownStreamSliders(actionObj) {
 
 function attachCustomSliderListeners() {
     for (let actionVar in data.actions) {
+        let dataObj = actionData[actionVar];
         let actionObj = data.actions[actionVar]; // This is the actionObj for the current slider
-        if (!actionObj.downstreamVars) continue;
+        if (!dataObj.downstreamVars) continue;
 
-        for (let downstreamVar of actionObj.downstreamVars) {
+        for (let downstreamVar of dataObj.downstreamVars) {
             // Use an IIFE to correctly scope variables for each iteration's event listeners,
             (function(actVar, downVar) {
                 const container = document.getElementById(`${actVar}Slider_Container${downVar}`);
@@ -702,7 +709,7 @@ function attachCustomSliderListeners() {
 
 function highlightLine(borderId) {
     const line = document.getElementById(borderId);
-    let miniVersion = scale < .35;
+    let miniVersion = scale < .45;
     if (line) {
         if(miniVersion) {
             line.style.boxShadow = '0 0 40px 11px yellow';
@@ -754,7 +761,7 @@ function generateLinesBetweenActions() {
     for(let actionVar in data.actions) {
         let actionObj = data.actions[actionVar];
         let dataObj = actionData[actionVar];
-        for(let downstreamVar of actionObj.downstreamVars) {
+        for(let downstreamVar of dataObj.downstreamVars) {
             let downstreamDataObj = actionData[downstreamVar];
             if(!downstreamDataObj || downstreamDataObj.realX === undefined || dataObj.realX === undefined) {
                 console.log(`Failed to create line from ${actionVar} to ${downstreamVar}`);
@@ -863,12 +870,15 @@ function setAllCaches() {
     queueCache("openViewAmuletButton");
     queueCache("ancientCoin");
     queueCache("ancientCoin2");
+    queueCache("totalSpellPower");
+    queueCache("totalSpellPower2");
     queueCache("bonusTime");
     queueCache("killTheLichMenu");
     queueCache("attDisplay");
     queueCache("bonusDisplay");
     queueCache("killTheLichMenuButton2");
     queueCache("ancientCoinDisplay");
+    queueCache("spellPowerDisplay");
     queueCache("jobDisplay");
     queueCache("useAmuletMenu");
 
@@ -876,6 +886,10 @@ function setAllCaches() {
         view.cached[actionVar + "ActionPower"] = document.getElementById(actionVar + "ActionPower");
         view.cached[actionVar + "ResourceSent"] = document.getElementById(actionVar + "ResourceSent");
         view.cached[actionVar + "ResourceTaken"] = document.getElementById(actionVar + "ResourceTaken");
+    }
+
+    for(let i = 0; i < data.planeUnlocked.length; i++) {
+        queueCache(`planeButton${i}`);
     }
 
     clearCacheQueue();

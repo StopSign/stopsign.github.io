@@ -13,9 +13,10 @@
 // actionData..storyText = { english:Raw.html`
 // &nbsp;&nbsp;&nbsp;&nbsp;
 // `}
-// actionData..storyText = { english:Raw.html`
-// &nbsp;&nbsp;&nbsp;&nbsp;
-// `}
+actionData.talkWithScott.storyText = { english:Raw.html`
+&nbsp;&nbsp;&nbsp;&nbsp;"Oh wow, you actually want to know about me? Well, I've been here a long time."<br>
+Scott and you keep talking for a while, and then he mentions that he overheard you've been doing good work, and has more people to recommend you to.
+`}
 actionData.bodyAwareness.storyText = { english:Raw.html`
 &nbsp;&nbsp;&nbsp;&nbsp;I was tapping my pen on my chin when I suddenly focused on the sensation - was there a way to use 
 my momentum on my own proprioception? To mindfully move each of my muscles at all times would be incredible! I could craft such fine tools!<br><br>

@@ -62,6 +62,7 @@ function useAmulet() {
     //For each action, reset the base atts and set max level
     for(let actionVar in data.actions) {
         let actionObj = data.actions[actionVar];
+        let dataObj = actionData[actionVar];
         let newLevel = actionObj.level;
         actionObj.prevUnlockTime = actionObj.unlockTime;
 
@@ -82,7 +83,7 @@ function useAmulet() {
 
         actionResetToBase(actionVar);
 
-        actionObj.downstreamVars.forEach(function(downstreamVar) {
+        dataObj.downstreamVars.forEach(function(downstreamVar) {
             if(data.actions[downstreamVar] && data.actions[downstreamVar].unlocked) {
                 setSliderUI(actionObj.actionVar, downstreamVar, getUpgradeSliderAmount()); //reset with amulet
             }

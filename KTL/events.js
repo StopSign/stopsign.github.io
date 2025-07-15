@@ -39,8 +39,8 @@ function downstreamNumberChanged(fromAction, toAction) {
 }
 
 function toggleAllZero(actionVar) {
-    let actionObj = data.actions[actionVar];
-    actionObj.downstreamVars.forEach(function (toAction) {
+    let dataObj = actionData[actionVar];
+    dataObj.downstreamVars.forEach(function (toAction) {
         let downstreamObj = data.actions[toAction];
         if(!downstreamObj || !downstreamObj.hasUpstream || !downstreamObj.visible) {
             return;
@@ -49,8 +49,8 @@ function toggleAllZero(actionVar) {
     });
 }
 function toggleAllHundred(actionVar) {
-    let actionObj = data.actions[actionVar];
-    actionObj.downstreamVars.forEach(function (toAction) {
+    let dataObj = actionData[actionVar];
+    dataObj.downstreamVars.forEach(function (toAction) {
         let downstreamObj = data.actions[toAction];
         if(!downstreamObj || !downstreamObj.hasUpstream || !downstreamObj.visible) {
             return;
@@ -446,7 +446,7 @@ function updateAttActionContainers() {
         let dataObj = actionData[actionVar];
         for (let attObj of dataObj.onLevelAtts) {
             let attVar = attObj[0];
-            views.updateVal(`${actionVar}${attVar}OutsideContaineradd`, selectedStat && selectedStat === attVar ? "var(--text-selected-color)" : "var(--attribute-add-color)", "style.borderColor");
+            views.updateVal(`${actionVar}${attVar}OutsideContaineradd`, selectedStat && selectedStat === attVar ? "var(--text-selected-color)" : (attVar !== "legacy" ? "var(--attribute-add-color)" : "var(--legacy-color-bg)"), "style.borderColor");
             views.updateVal(`${actionVar}${attVar}InsideContaineradd`, selectedStat && selectedStat === attVar ? "var(--text-selected-color)" : "transparent", "style.borderColor");
         }
         for (let attObj of dataObj.expAtts) {
@@ -552,11 +552,19 @@ function changeBonusSpeed(num) {
 
 
 function switchToPlane(num) {
+    if(!data.planeUnlocked[num]) {
+        return;
+    }
     document.getElementById(`planeContainer${data.planeTabSelected}`).style.display = 'none';
     data.planeTabSelected = num;
     document.getElementById(`planeContainer${data.planeTabSelected}`).style.display = '';
     document.getElementById("windowElement").style.backgroundColor = `var(--world-${data.planeTabSelected}-bg-primary)`;
     actionContainer.style.transform = `translate(${transformX[data.planeTabSelected]}px, ${transformY[data.planeTabSelected]}px) scale(${scale})`;
+}
+
+function unveilPlane(num) {
+    data.planeUnlocked[num] = true;
+    views.updateVal(`planeButton${num}`, "flex", "style.display");
 }
 
 function mouseOnAction(actionVar) {
@@ -566,4 +574,13 @@ function mouseOnAction(actionVar) {
 function mouseOffAction(actionVar) {
     let actionObj = data.actions[actionVar];
     actionObj.mouseOnThis = false;
+}
+
+function levelAllCharges() {
+    for(let actionVar in data.actions) {
+        let actionObj = data.actions[actionVar];
+        if(actionObj.instabilityToAdd) {
+            actionObj.maxLevel++;
+        }
+    }
 }

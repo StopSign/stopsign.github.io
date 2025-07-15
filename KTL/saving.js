@@ -117,9 +117,79 @@ const actionPatches = {
     spotAPath: {
         preventReset: true
     },
-
-
     pleasantForest: {
+        preventReset: true
+    },
+    exploreTheForest: {
+        preventReset: true
+    },
+    travelAlongTheRiver: {
+        preventReset: true
+    },
+    gatherRiverWeeds: {
+        preventReset: true
+    },
+    hiddenPath: {
+        preventReset: true
+    },
+    meetGrumpyHermit: {
+        preventReset: true
+    },
+    annoyHermitIntoAQuest: {
+        preventReset: true
+    },
+    presentTheOffering: {
+        preventReset: true
+    },
+    handyman: {
+        preventReset: true
+    },
+    tavernHelper: {
+        preventReset: true
+    },
+    buyStreetFood: {
+        preventReset: true
+    },
+    buyMatchingClothes: {
+        preventReset: true
+    },
+    buySocialAccess: {
+        preventReset: true
+    },
+    browseStores: {
+        preventReset: true
+    },
+    socialize: {
+        preventReset: true
+    },
+    meetPeople: {
+        preventReset: true
+    },
+    talkWithScott: {
+        preventReset: true
+    },
+    talkWithJohn: {
+        preventReset: true
+    },
+    learnToListen: {
+        preventReset: true
+    },
+    chatWithHermit: {
+        preventReset: true
+    },
+    chatWithMerchants: {
+        preventReset: true
+    },
+    askAboutStitching: {
+        preventReset: true
+    },
+    complimentTheChef: {
+        preventReset: true
+    },
+    listenToWoes: {
+        preventReset: true
+    },
+    keyToTheBackroom: {
         preventReset: true
     },
 
@@ -137,7 +207,7 @@ function load() {
     //     toLoad = JSON.parse(decode(localStorage[saveName]));
     // }
 
-    // just before exploreDifficultPath
+    // just after pleasant forest
 
 
     if(isLoadingEnabled && localStorage[saveName] && toLoad.actions) { //has a save file
@@ -169,6 +239,7 @@ function load() {
         data.doneAmulet = !!toLoad.doneAmulet;
         data.displayJob = !!toLoad.displayJob;
         data.focusSelected = toLoad.focusSelected ?? [];
+        data.planeUnlocked = toLoad.planeUnlocked ?? [true, false, false, false];
         data.maxFocusAllowed = toLoad.maxFocusAllowed ?? 3;
         data.focusMult = toLoad.focusMult ?? 2;
         data.focusLoopMax = toLoad.focusLoopMax ?? 2.5;
@@ -176,6 +247,12 @@ function load() {
 
         data.currentGameState = toLoad.currentGameState;
         data.gameSettings = toLoad.gameSettings;
+
+
+        //data correction
+
+        //new spells need to be leveled to current grimoire's level
+
     }
 
     //update all generator's multiplier data
@@ -238,8 +315,8 @@ function patchActions(dataActions, toLoadActions, patchMap) {
 
 function setSlidersOnLoad(toLoad) {
     for(let actionVar in data.actions) {
-        let actionObj = data.actions[actionVar];
-        for(let downstreamVar of actionObj.downstreamVars) {
+        let dataObj = actionData[actionVar];
+        for(let downstreamVar of dataObj.downstreamVars) {
             if (!document.getElementById(actionVar + "NumInput" + downstreamVar)
                 || !toLoad.actions || !toLoad.actions[actionVar] ||
                 toLoad.actions[actionVar]["downstreamRate" + downstreamVar] === undefined) {
@@ -292,11 +369,19 @@ function mergeExistingOnly(data, toLoad, varName, skipList = []) {
 }
 
 function updateUIFromLoad() {
-    for(let actionVar in data.actions) {
+    for (let actionVar in data.actions) {
         let actionObj = data.actions[actionVar];
         clickActionMenu(actionVar, actionObj.currentMenu, true);
-        if(actionObj.unlocked) {
+        if (actionObj.unlocked) {
             revealActionAtts(actionObj);
+        }
+    }
+
+    if (data.planeUnlocked[1] || data.planeUnlocked[2]) {
+        for (let i = 0; i < data.planeUnlocked.length; i++) {
+            if (data.planeUnlocked[i]) {
+                unveilPlane(i);
+            }
         }
     }
 

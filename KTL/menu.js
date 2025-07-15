@@ -160,7 +160,7 @@ function createOptionsMenu() {
           FPS: <span id="sliderValue" style="font-weight: bold; min-width: 20px; text-align: left;">20</span>
           <input type="range" id="FPSSlider" min="1" max="60" value="20" style="width: 200px;" oninput="updateSliderDisplay(this.value)">
         </div>
-        <br><br>Auto save every 5 seconds, but if you want a button to click:<br>
+        <br><br>Auto save every 20 seconds and on pause, but if you want a button to click:<br>
         <div class='button' style='padding:10px;font-size:14px;width:200px;' 
         onClick='save()'>Save</div><br><br>
         <div class='button' style='padding:10px;font-size:14px;width:200px;' 

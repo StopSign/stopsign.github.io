@@ -16,7 +16,7 @@
     --success-color: #a6e3a1;
     --warning-color: #ff0e39;
     --error-color: #f38ba8;
-    --overlay-color: rgba(30, 30, 46, 0.8);
+    --overlay-color: #0f0f17;
     --selection-color:#9f0000;
     --line-color: #000000;
     --max-level-color: #e5e819;
@@ -71,6 +71,9 @@
     --fear-color: #d2062a;
     --fear-color-dim: #a30924;
     --fear-color-bg: #40090f;
+    --spark-color: #1a9480;
+    --spark-color-dim: #15675a;
+    --spark-color-bg: #0b2e29;
     --arcana-color: #c620f5;
     --arcana-color-dim: rgba(198, 32, 245, 0.5);
     --arcana-color-bg: #2a0932;

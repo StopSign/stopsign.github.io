@@ -33,6 +33,7 @@ let data = {};
 data.actions = {};
 data.atts = {};
 data.toastStates = []; // array of toast objects: {id, state, element}
+data.planeUnlocked = [true, false, false, false];
 data.planeTabSelected = 0;
 data.gameState = "default"; //KTL
 data.totalMomentum = 0;
@@ -76,8 +77,8 @@ let viewData = {}; //contains only things that are generated / not saved
 viewData.toasts = [];
 
 let language = "english";
-// let globalVisible = false;
-let globalVisible = true;
+let globalVisible = false;
+// let globalVisible = true;
 let isLoadingEnabled = true; //SET FALSE FOR CLEARING SAVE
 
 
@@ -101,9 +102,17 @@ function debug() {
     // unveilAction('makeMoney');
     // unveilAction('spendMoney');
     // unveilAction('checkNoticeBoard');
-    // data.actions.echoKindle.resource += 10;
 
     // stop = 1;
+
+    revealAtt("integration")
+    revealAtt("legacy")
+    unveilPlane(0);
+    unveilPlane(2);
+    data.actions.echoKindle.resource += 10;
+    statAddAmount("pulse", 10)
+    statAddAmount("integration", 200)
+    statAddAmount("legacy", 10)
 
     gameSpeed = 1;
     data.currentGameState.bonusTime = 1000 * 60 * 60 * 24;
@@ -114,6 +123,7 @@ function initializeData() {
         document.getElementById("jobDisplay").style.display = "";
     }
     createUpgrades();
+    createAndLinkNewAttribute("legends", "legacy");
 
     createAndLinkNewAttribute("introspection", "awareness");
     createAndLinkNewAttribute("introspection", "curiosity");
@@ -138,8 +148,8 @@ function initializeData() {
     createAndLinkNewAttribute("physique", "might");
     createAndLinkNewAttribute("physique", "flow");
     createAndLinkNewAttribute("physique", "coordination");
-    createAndLinkNewAttribute("physique", "reflex");
     createAndLinkNewAttribute("physique", "rhythm");
+    createAndLinkNewAttribute("physique", "reflex");
 
     createAndLinkNewAttribute("adventuring", "energy");
     createAndLinkNewAttribute("adventuring", "navigation");
@@ -181,36 +191,37 @@ function initializeData() {
     create("meetVillageLeaderScott", ["helpScottWithChores"], 0, -1);
     create("helpScottWithChores", [], 0, -1);
     create("browseLocalMarket", ["browseStores"], -1, -1);
-    create("browseStores", ["browseBackRooms"], 0, -1);
-    create("browseBackRooms", ["browsePersonalCollection"], 0, -1);
+    create("browseStores", ["browseBackrooms"], 0, -1);
+    create("browseBackrooms", ["browsePersonalCollection"], 0, -1);
     create("browsePersonalCollection", [], 0, -1);
 
 
     create("checkNoticeBoard", ["reportForTraining", "reportForLabor"], 1.5, -1);
     create("makeMoney", ["spendMoney"], 1, -1);
-    create("spendMoney", ["buyBasicSupplies", "buySocialAccess", "buyMarketItems"], 0, -1);
-    create("buyBasicSupplies", ["buyBasicClothes", "buyStreetFood"], -1, -1);
-    create("buyBasicClothes", ["buyTravelersClothes", "buyMatchingClothes"], -1, -1);
-    create("buyTravelersClothes", [], -1, 0);
+    create("spendMoney", ["buyBasicSupplies", "buySocialAccess", "buyMarketItems"], 0, -.8);
+    create("buyBasicSupplies", ["buyBasicClothes", "buyStreetFood"], -1, -1.1);
+    create("buyBasicClothes", ["buyTravelersClothes", "buyMatchingClothes"], -1, -1.3);
+    create("buyTravelersClothes", [], -1.2, -.2);
     create("buyMarketItems", ["buyShopItems"], 1, -1);
     create("buyShopItems", ["invest"], 0, -1);
-    create("buyStreetFood", ["buyGoodFood"], -1, 0);
-    create("buyGoodFood", [], -1, 0);
-    create("buyMatchingClothes", ["buyStylishClothes"], -1, -1);
-    create("buyStylishClothes", [], -1, 0);
+    create("buyStreetFood", ["buyGoodFood"], -1, -.3);
+    create("buyGoodFood", [], -1.2, -.2);
+    create("buyMatchingClothes", ["buyStylishClothes"], -1, -1.2);
+    create("buyStylishClothes", [], -1.2, -.2);
 
 
     create("reportForLabor", ["oddJobsLaborer"], 1, 0);
     create("oddJobsLaborer", ["chimneySweep"], .5, -1);
+
 
     create("invest", ["buildFortune"], 1, -1);
     create("buildFortune", ["deepInvestments", "investInLocals"], 0, -1);
     create("deepInvestments", [], 1, -.5);
     create("investInLocals", ["investInRoads"], 0, -1);
     create("investInRoads", [], 0, -1);
-    create("buySocialAccess", ["slideTheCoin"], 0, -1);
-    create("slideTheCoin", ["buyCoffee"], -1, -1);
-    create("buyCoffee", [], -1, -1)
+    create("buySocialAccess", ["slideTheCoin"], 0, -1.3);
+    create("slideTheCoin", ["buyCoffee"], -1, -1.2);
+    create("buyCoffee", [], -.6, -1)
 
 
 
@@ -228,9 +239,9 @@ function initializeData() {
     create("pleasantForest", ["hiddenPath", "exploreTheForest", "travelToCrossroads"], 2, 0);
     create("hiddenPath", ["meetGrumpyHermit"], 0, 1);
     create("meetGrumpyHermit", ["annoyHermitIntoAQuest", "talkToHermit", "learnToStayStill"], 0, 1);
-    create("annoyHermitIntoAQuest", ["presentTheOffering"], -1, 0);
+    create("annoyHermitIntoAQuest", ["presentTheOffering"], -1, -.2);
     create("presentTheOffering", [], 0, -1);
-    create("talkToHermit", ["inquireAboutMagic"], 1, 0);
+    create("talkToHermit", ["inquireAboutMagic"], 1, -.5);
     create("inquireAboutMagic", [], 0, 1);
 
     //socialize start
@@ -251,8 +262,8 @@ function initializeData() {
     create("tellAJoke", ["hearOfSecretShrine"], 0, 1);
     create("hearOfSecretShrine", [], 0, 1);
 
-    create("joinCoffeeClub", ["gossip"], 0, 1);
-    create("gossip", ["hearAboutTheLich"], 1, 0);
+    create("joinCoffeeClub", ["gossipAroundCoffee"], 0, 1);
+    create("gossipAroundCoffee", ["hearAboutTheLich"], 1, 0);
     create("hearAboutTheLich", [], 0, -1.5);
 
     create("learnToStayStill", ["feelTheResonance"], 0, 1);
@@ -261,12 +272,12 @@ function initializeData() {
     create("igniteTheSpark", [], 0, -1);
     // create("", [], 0, -1);
 
-    create("exploreTheForest", ["travelAlongTheRiver"], 2, 1);
-    create("travelAlongTheRiver", ["gatherRiverWeeds", "restAtWaterfall"], 0, 1);
+    create("exploreTheForest", ["travelAlongTheRiver"], 1, .5);
+    create("travelAlongTheRiver", ["gatherRiverWeeds", "restAtWaterfall"], 1, .8);
     create("gatherRiverWeeds", ["gatherRarePlants"], 0, 1);
-    create("gatherRarePlants", [], 1, 0);
-    create("restAtWaterfall", ["visitShrineBehindWaterfall"], 1, 0);
-    create("visitShrineBehindWaterfall", [], 0, -1);
+    create("gatherRarePlants", [], 1, .5);
+    create("restAtWaterfall", ["visitShrineBehindWaterfall"], 1.3, .5);
+    create("visitShrineBehindWaterfall", [], -.3, -1);
 
     create("travelToCrossroads", ["forgottenShrine"], 2, 0);
     create("forgottenShrine", ["resonatingAmulet"], 0, -1);
@@ -305,12 +316,12 @@ function initializeData() {
     create("echoKindle", ["sparkMana"], 0, 0)
     create("sparkMana", ["poolMana"], 0, 1);
     create("poolMana", ["expelMana"], 0, 1);
-    create("expelMana", ["prepareSpells", "manaImprovement", "auraControl",], 0, 1);
+    create("expelMana", ["manaBasics", "prepareSpells", "auraControl",], 0, 1);
 
     create("auraControl", [], 0, 1);
 
-    create("manaImprovement", ["manaExperiments", "magicResearch"], -1, 0);
-    create("manaExperiments", ["manaObservations", "feelYourMana"], -.5, 1);
+    create("manaBasics", ["manaExperiments", "magicResearch"], -1, 0);
+    create("manaExperiments", ["feelYourMana", "manaObservations"], -.5, 1);
     create("manaObservations", ["manaVisualizations"], 0, 1);
     create("manaVisualizations", ["manaShaping"], -1, 0);
     create("manaShaping", [], -1, 0);
@@ -324,11 +335,11 @@ function initializeData() {
     create("bindThePages", ["awakenYourGrimoire"], -1, 0);
     create("awakenYourGrimoire", [], .5, -1);
 
-    create("prepareSpells", ["prepareDungeonSpells", "preparePhysicalSpells"], 1, 0);
-    create("prepareDungeonSpells", ["supportSpells", "recoverSpells", "combatSpells"], .5, -1);
-    create("supportSpells", ["divination", "practicalMagic"], 0, -1);
+    create("prepareSpells", ["prepareInternalSpells", "prepareExternalSpells"], 1, 0);
+    create("prepareExternalSpells", ["supportSpells", "recoverSpells", "combatSpells"], .5, -1);
+    create("supportSpells", ["earthMagic", "divination", "practicalMagic"], 0, -1);
 
-    create("divination", ["identifyItem"], -.5, -1);
+    create("divination", ["identifyItem"], 1.5, -.5);
     create("identifyItem", ["detectMagic"], 0, -1);
     create("detectMagic", [], 0, -1);
     create("practicalMagic", ["manaTransfer"], .5, -1);
@@ -336,8 +347,8 @@ function initializeData() {
     create("illuminate", ["unblemish"], 0, -1);
     create("unblemish", [], 0, -1);
 
-    create("recoverSpells", ["earthMagic", "healingMagic"], 1, -.5);
-    create("earthMagic", ["moveEarth"], .5, -1);
+    create("recoverSpells", ["healingMagic"], 1, -.5);
+    create("earthMagic", ["moveEarth"], -.5, -1);
     create("moveEarth", ["shelter"], 0, -1);
     create("shelter", ["reinforceArmor"], 0, -1);
     create("reinforceArmor", ["sharpenWeapons"], 0, -1);
@@ -361,7 +372,7 @@ function initializeData() {
     create("firebolt", [], 1, 0);
 
 
-    create("preparePhysicalSpells", ["overcharge"], 0, 1);
+    create("prepareInternalSpells", ["overcharge"], 0, 1);
     create("overcharge", ["overboost"], 1, 0);
     create("overboost", ["overdrive"], 0, 1);
     create("overdrive", [], 0, 1);
@@ -442,8 +453,8 @@ Travel and Emotions:
 
 function setParents() {
     for(let actionVar in data.actions) {
-        let actionObj = data.actions[actionVar];
-        for(let downstreamVar of actionObj.downstreamVars) {
+        let dataObj = actionData[actionVar];
+        for(let downstreamVar of dataObj.downstreamVars) {
             if(data.actions[downstreamVar]) {
                 data.actions[downstreamVar].parentVar = actionVar;
             }
@@ -483,8 +494,8 @@ function setRealCoordinates(startActionVar) {
         }
 
         // Add downstream actions to the queue
-        if (actionObj.downstreamVars && actionObj.downstreamVars.length > 0) {
-            actionObj.downstreamVars.forEach(downstreamVar => {
+        if (dataObj.downstreamVars && dataObj.downstreamVars.length > 0) {
+            dataObj.downstreamVars.forEach(downstreamVar => {
                 if (actionData[downstreamVar]) {
                     queue.push(downstreamVar);
                 }
