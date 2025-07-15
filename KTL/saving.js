@@ -223,7 +223,6 @@ function load() {
 
         data.toastStates = toLoad.toastStates;
 
-        data.gameState = toLoad.gameState ?? "default";
 
         //load global items that aren't lists or objects
         data.gameState = toLoad.gameState ?? "default";
@@ -385,9 +384,14 @@ function updateUIFromLoad() {
         }
     }
 
-    if(data.doneAmulet) {
-        document.getElementById("openViewAmuletButton").style.display = "";
-        document.getElementById("ancientCoinDisplay").style.display = "";
+    if(data.doneAmulet && data.gameState !== "KTL") {
+        views.updateVal(`openViewAmuletButton`, "", "style.display");
+    }
+    if(data.useAmuletButtonShowing && data.gameState === "KTL") {
+        views.updateVal(`openUseAmuletButton`, "", "style.display");
+    }
+    if(data.doneKTL) {
+        views.updateVal(`ancientCoinDisplay`, "", "style.display");
     }
     if(data.displayJob) {
         document.getElementById("jobDisplay").style.display = "";

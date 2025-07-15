@@ -6,7 +6,7 @@ function initializeDisplay() {
         attachAttLinks(actionVar);
     }
     setRealCoordinates("overclock"); //associate all parent/children and give them an x/y
-    setRealCoordinates("overclockTargetingTheLich");
+    setRealCoordinates("worry");
     setRealCoordinates("echoKindle");
     setRealCoordinates("absorbStarseed");
     for(let actionVar in data.actions) {
@@ -125,7 +125,7 @@ function generateActionDisplay(actionVar) {
 
     let menuContainer = Raw.html`
         <div id="${actionVar}MenuButtons" style="position:absolute;top:-18px;font-size:13px;left:3px;">
-            ${actionVar==="overclock"?"":`<span onclick="actionTitleClicked('${actionObj.parentVar}')" 
+            ${!actionObj.parentVar?"":`<span onclick="actionTitleClicked('${actionObj.parentVar}')" 
             class="buttonSimple" style="margin-right:3px;width:30px;height:30px;text-align:center;cursor:pointer;padding:0 4px;">^</span>`}
         <span id="${actionVar}_downstreamMenuButton" onclick="clickActionMenu('${actionVar}', 'downstream')" class="buttonSimple" 
             style="margin-right:3px;width:30px;height:30px;text-align:center;cursor:pointer;padding:0 4px;">Downstream</span>
@@ -338,15 +338,13 @@ function generateActionDisplay(actionVar) {
     let newX = dataObj.realX +"px";
     let newY = dataObj.realY +"px";
 
-    let shouldDisplay = "none"; //gameStateMatches(actionObj) ? "" : "none";
-
     queueCache(`${actionVar}Container`)
     queueCache(`${actionVar}LargeVersionContainer`)
     queueCache(`${actionVar}SmallVersionContainer`)
     queueCache(`${actionVar}Level2`)
 //transform-style: preserve-3d;
     theStr += Raw.html`
-        <div id="${actionVar}Container" style="display:${shouldDisplay};position:absolute;left:${newX};top:${newY};width:300px;" 
+        <div id="${actionVar}Container" style="display:none;position:absolute;left:${newX};top:${newY};width:300px;" 
             onmouseenter="mouseOnAction('${actionVar}')" onmouseleave="mouseOffAction('${actionVar}')">
             <div id="${actionVar}LargeVersionContainer" style="border:2px solid var(--border-color);background-color:var(--bg-secondary);">
                 ${title}

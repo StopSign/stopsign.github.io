@@ -77,8 +77,8 @@ let viewData = {}; //contains only things that are generated / not saved
 viewData.toasts = [];
 
 let language = "english";
-let globalVisible = false;
-// let globalVisible = true;
+// let globalVisible = false;
+let globalVisible = true;
 let isLoadingEnabled = true; //SET FALSE FOR CLEARING SAVE
 
 
@@ -108,11 +108,26 @@ function debug() {
     revealAtt("integration")
     revealAtt("legacy")
     unveilPlane(0);
+    unveilPlane(1);
     unveilPlane(2);
-    data.actions.echoKindle.resource += 10;
     statAddAmount("pulse", 10)
     statAddAmount("integration", 200)
     statAddAmount("legacy", 10)
+
+    //setup system to right before HATL:
+    unveilAction('earthMagic');
+    unveilAction('gossipAroundCoffee');
+    unveilAction('hearAboutTheLich');
+
+    data.actions.earthMagic.unlockCost = 0;
+    levelAllCharges();
+    data.actions.earthMagic.resource = 1e10;
+    data.actions.gossipAroundCoffee.unlockCost = 0;
+    data.actions.gossipAroundCoffee.resource += 1e8
+    data.actions.overclock.resource = 1e20;
+    statAddAmount("cycle", 40)
+    statAddAmount("discernment", 200)
+
 
     gameSpeed = 1;
     data.currentGameState.bonusTime = 1000 * 60 * 60 * 24;
@@ -379,7 +394,8 @@ function initializeData() {
     // create("", [], 0, 0);
 
     //KTL
-    create("overclockTargetingTheLich", ["fightTheEvilForces"], 0, 0);
+    create("worry", ["overclockTargetingTheLich"], 0, 0);
+    create("overclockTargetingTheLich", ["fightTheEvilForces"], .5, -1);
     create("fightTheEvilForces", ["bridgeOfBone"], 1.5, 0);
     create("bridgeOfBone", ["harvestGhostlyField"], 1, 0.2);
     create("harvestGhostlyField", ["geyserFields"], 1, 0.4);

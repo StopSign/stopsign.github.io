@@ -25,7 +25,12 @@ document.addEventListener("keydown", function(e) {
         switchToPlane(3)
     }
 
-    if (!animationFrameId && ['w', 'a', 's', 'd'].includes(key)) {
+
+    if(keysPressed['r']) {
+        actionTitleClicked('overclock');
+    }
+
+    if (!animationFrameId && ['w', 'a', 's', 'd', 'q', 'r', 'arrowleft', 'arrowup', 'arrowdown', 'arrowright'].includes(key)) {
         moveActionContainer();
     }
 });
@@ -40,20 +45,30 @@ document.addEventListener("keyup", function(e) {
 });
 
 function moveActionContainer() {
-    if (keysPressed['w']) {
-        transformY[data.planeTabSelected] += movementStep;
+    let shiftMod = keysPressed['shift'] ? 3 : 1;
+    if (keysPressed['w'] || keysPressed['arrowup']) {
+        transformY[data.planeTabSelected] += movementStep * shiftMod;
     }
-    if (keysPressed['a']) {
-        transformX[data.planeTabSelected] += movementStep;
+    if (keysPressed['a'] || keysPressed['arrowleft']) {
+        transformX[data.planeTabSelected] += movementStep * shiftMod;
     }
-    if (keysPressed['s']) {
-        transformY[data.planeTabSelected] -= movementStep;
+    if (keysPressed['s'] || keysPressed['arrowdown']) {
+        transformY[data.planeTabSelected] -= movementStep * shiftMod;
     }
-    if (keysPressed['d']) {
-        transformX[data.planeTabSelected] -= movementStep;
+    if (keysPressed['d'] || keysPressed['arrowright']) {
+        transformX[data.planeTabSelected] -= movementStep * shiftMod;
+    }
+    if(['w', 'a', 's', 'd', 'arrowleft', 'arrowup', 'arrowdown', 'arrowright'].some(key => keysPressed[key])) { //isMoving
+        actionContainer.style.transform = `translate(${transformX[data.planeTabSelected]}px, ${transformY[data.planeTabSelected]}px) scale(${scale})`;
     }
 
-    actionContainer.style.transform = `translate(${transformX[data.planeTabSelected]}px, ${transformY[data.planeTabSelected]}px) scale(${scale})`;
+
+    if (keysPressed['q']) {
+        setZoomNoMouse(scale - scaleStep/10)
+    }
+    if (keysPressed['e']) {
+        setZoomNoMouse(scale + scaleStep/10)
+    }
 
     // forceRedraw(windowElement);
 

@@ -55,6 +55,7 @@ function actionSetBaseVariables(actionObj, dataObj) {
     actionObj.resourceDelta = 0;
     actionObj.resourceIncrease = 0;
     actionObj.resourceDecrease = 0;
+    actionObj.resourceToAdd = dataObj.generatorSpeed ? 0 : undefined;
     actionObj.resourceIncreaseFromGens = 0;
     actionObj.totalSend = 0;
     actionObj.expToLevelIncrease = dataObj.expToLevelIncrease;
@@ -65,7 +66,7 @@ function actionSetBaseVariables(actionObj, dataObj) {
     actionObj.unlocked = dataObj.unlocked === null ? true : dataObj.unlocked;
     actionObj.currentMenu = "downstream";
 
-    actionObj.isRunning = dataObj.plane !== 1; //for controlling whether time affects it
+    actionObj.isRunning = dataObj.plane !== 2; //for controlling whether time affects it
     actionObj.onLevelAtts = dataObj.onLevelAtts ? dataObj.onLevelAtts : [];
     actionObj.efficiencyAtts = dataObj.efficiencyAtts ? dataObj.efficiencyAtts : [];
     actionObj.expAtts = dataObj.expAtts ? dataObj.expAtts : [];
@@ -248,6 +249,9 @@ function statAddAmount(attVar, amount) {
     if(!attObj) {
         console.log("Tried to add to a stat that doesn't exist: " + attVar);
     }
+    if(attVar === "legacy") {
+        data.actions.echoKindle.resource += amount;
+    }
     attObj.num += amount;
     attObj.mult = 1 + attObj.num * .1; //Math.pow(1.1, attObj.num); //calc only when adding
     attObj.linkedActionExpAtts.forEach(function (actionVar) {
@@ -408,10 +412,6 @@ function calcUpgradeMultToExp(actionObj) {
         upgradeMult *= 2;
     }
     return upgradeMult;
-}
-
-function calcFearGain() {
-    return (data.totalMomentum + data.actions.overclock.resourceToAdd) / 1e20 * (data.actions.gossipAroundCoffee.resource / 1000);
 }
 
 function isSpellReady(actionVar) {

@@ -18,7 +18,7 @@ function initializeKTL() {
     for(let actionVar in data.actions) {
         let actionObj = data.actions[actionVar];
 
-        actionObj.isRunning = actionObj.plane !== 0;
+        actionObj.isRunning = actionObj.plane === 2;
     }
 
     data.actions.overclockTargetingTheLich.resource = data.totalMomentum;
@@ -48,8 +48,8 @@ function useAmulet() {
     }
     data.focusSelected = [];
     data.doneAmulet = true;
-    document.getElementById("useAmuletMenu").style.display = "none";
-    document.getElementById("openViewAmuletButton").style.display = "";
+    views.updateVal(`useAmuletMenu`, "none", "style.display");
+    views.updateVal(`openViewAmuletButton`, "", "style.display");
 
     //Reset all atts and bonuses
     for(let attVar in data.atts) {

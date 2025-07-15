@@ -83,7 +83,7 @@ const actionContainer = document.getElementById('actionContainer');
 let scale = 1;
 const scaleStep = 0.1;
 const minScale = 0.1;
-const maxScale = 3;
+const maxScale = 2.5;
 
 let isDragging = false;
 let originalX, originalY;
@@ -97,13 +97,13 @@ let initialPinchDistance = null;
 let lastTouchScale = 1;
 let isTouchDragging = false;
 
-function clickZoomIn() {
+function setZoomNoMouse(newScale) {
     const rect = windowElement.getBoundingClientRect();
     const centerX = rect.width / 2;
     const centerY = rect.height / 2;
 
     const prevScale = scale;
-    scale = Math.max(minScale, scale + scaleStep*3);
+    scale = Math.min(maxScale, newScale);
     const scaleFactor = scale / prevScale;
 
     const dx = (centerX - transformX[data.planeTabSelected]) * (1 - scaleFactor);
@@ -113,30 +113,14 @@ function clickZoomIn() {
     transformY[data.planeTabSelected] += dy;
 
     actionContainer.style.transform = `translate(${transformX[data.planeTabSelected]}px, ${transformY[data.planeTabSelected]}px) scale(${scale})`;
+}
 
-    // clearTimeout(redrawTimeout);
-    // redrawTimeout = setTimeout(globalRedraw, 200);
+function clickZoomIn() {
+    setZoomNoMouse(scale + scaleStep*3)
 }
 
 function clickZoomOut() {
-    const rect = windowElement.getBoundingClientRect();
-    const centerX = rect.width / 2;
-    const centerY = rect.height / 2;
-
-    const prevScale = scale;
-    scale = Math.max(minScale, scale - scaleStep*3);
-    const scaleFactor = scale / prevScale;
-
-    const dx = (centerX - transformX[data.planeTabSelected]) * (1 - scaleFactor);
-    const dy = (centerY - transformY[data.planeTabSelected]) * (1 - scaleFactor);
-
-    transformX[data.planeTabSelected] += dx;
-    transformY[data.planeTabSelected] += dy;
-
-    actionContainer.style.transform = `translate(${transformX[data.planeTabSelected]}px, ${transformY[data.planeTabSelected]}px) scale(${scale})`;
-
-    // clearTimeout(redrawTimeout);
-    // redrawTimeout = setTimeout(globalRedraw, 200);
+    setZoomNoMouse(scale - scaleStep*3)
 }
 windowElement.addEventListener('wheel', function(e) {
     e.preventDefault();
@@ -307,8 +291,8 @@ function forceRedraw(elem) {
 function actionTitleClicked(actionVar, setAll) {
     let dataObj = actionData[actionVar];
 
-    let newtransformX = -((dataObj.realX + 150) * scale) + windowElement.offsetWidth / 2 ;
-    let newtransformY = -((dataObj.realY) * scale) + windowElement.offsetHeight / 2 - 50;
+    let newtransformX = -((dataObj.realX + 100) * scale) + windowElement.offsetWidth / 2 ;
+    let newtransformY = -((dataObj.realY + 100) * scale) + windowElement.offsetHeight / 2 - 50;
 
     newtransformX = Math.max(-4000, Math.min(newtransformX, 4000));
     newtransformY = Math.max(-4000, Math.min(newtransformY, 4000));

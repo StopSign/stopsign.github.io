@@ -474,15 +474,12 @@ function updateGlobals() {
 function updateViewOnSecond() {
     showAllValidToasts();
 
-    let toShowKTLButton = data.gameState !== "KTL" && (data.doneKTL || data.actions.hearAboutTheLich.level >= 1);
-    views.updateVal(`killTheLichMenuButton2`, toShowKTLButton ? "" : "none", "style.display");
-
-    let toShowUseAmulet = data.useAmuletButtonShowing && data.gameState === "KTL" ? "" : "none";
+    let toShowUseAmulet = data.useAmuletButtonShowing && data.gameState === "KTL";
     views.updateVal(`openUseAmuletButton`, toShowUseAmulet ? "" : "none", "style.display");
 
-    let toViewAmulet = data.doneAmulet && data.gameState !== "KTL" ? "" : "none";
+    let toViewAmulet = data.doneAmulet && data.gameState !== "KTL";
     views.updateVal(`openViewAmuletButton`, toViewAmulet ? "" : "none", "style.display");
-    views.updateVal(`ancientCoinDisplay`, toViewAmulet ? "" : "none", "style.display");
+    views.updateVal(`ancientCoinDisplay`, data.doneKTL ? "" : "none", "style.display");
 
     views.updateVal(`spellPowerDisplay`, data.totalSpellPower > 0 ? "" : "none", "style.display");
 

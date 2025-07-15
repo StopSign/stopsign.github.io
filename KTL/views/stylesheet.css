@@ -27,18 +27,40 @@
     --menu-text-background-color: #ffffff;
     --text-color: #e0e0e0;
 
+
+    /* World 0: Physical (Deeper, more subtle slate) */
     --world-0-bg-primary: #1e1e2e;
-    --world-0-bg-secondary: #313244;
-    --world-0-bg-tertiary: #45465f;
-    --world-1-bg-primary: #1e1e2e;
-    --world-1-bg-secondary: #313244;
-    --world-1-bg-tertiary: #45465f;
-    --world-2-bg-primary: #082535;
-    --world-2-bg-secondary: #0c4667;
-    --world-2-bg-tertiary: #11608b;
-    --world-3-bg-primary: #372339;
-    --world-3-bg-secondary: #58375b;
-    --world-3-bg-tertiary: #754979;
+    --world-0-bg-secondary: #262639;
+    --world-0-bg-tertiary: #33334d;
+
+    /* World 1: Mana (Deeper, glowing ocean abyss) */
+    --world-1-bg-primary: #0c2b40;
+    --world-1-bg-secondary: #0f3b59;
+    --world-1-bg-tertiary: #15517a;
+
+    /* World 2: Combat (Smoldering embers, dried blood) */
+    --world-2-bg-primary: #3a1919;
+    --world-2-bg-secondary: #512323;
+    --world-2-bg-tertiary: #6d3030;
+
+    /* World 3: Essence (Faint, mystical shadow) */
+    --world-3-bg-primary: #2a1e2e;
+    --world-3-bg-secondary: #3d2b42;
+    --world-3-bg-tertiary: #533b58;
+
+
+    /*--world-0-bg-primary: #1e1e2e;*/
+    /*--world-0-bg-secondary: #313244;*/
+    /*--world-0-bg-tertiary: #45465f;*/
+    /*--world-1-bg-primary: #082535;*/
+    /*--world-1-bg-secondary: #0c4667;*/
+    /*--world-1-bg-tertiary: #11608b;*/
+    /*--world-2-bg-primary: #3c1e1e;*/
+    /*--world-2-bg-secondary: #5a2b2b;*/
+    /*--world-2-bg-tertiary: #7e3c3c;*/
+    /*--world-3-bg-primary: #372339;*/
+    /*--world-3-bg-secondary: #58375b;*/
+    /*--world-3-bg-tertiary: #754979;*/
 
     --attribute-add-color:#27d318;
     --attribute-add-bg-color: #85d17e;
@@ -71,6 +93,9 @@
     --fear-color: #d2062a;
     --fear-color-dim: #a30924;
     --fear-color-bg: #40090f;
+    --fight-color: #FF6600;
+    --fight-color-dim: #b34700;
+    --fight-color-bg: #4d1a00;
     --spark-color: #1a9480;
     --spark-color-dim: #15675a;
     --spark-color-bg: #0b2e29;

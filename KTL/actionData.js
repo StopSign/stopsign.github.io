@@ -76,11 +76,7 @@ let actionData = {
 
             actionObj.resource += actionObj.resourceToAdd;
 
-            if (data.actions.hearAboutTheLich.unlocked) {
-                data.actions.hearAboutTheLich.actionPower = calcFearGain();
-                data.actions.hearAboutTheLich.resourceToAdd = data.actions.hearAboutTheLich.actionPower
-                data.actions.hearAboutTheLich.resource += data.actions.hearAboutTheLich.resourceToAdd;
-            }
+            actionData.hearAboutTheLich.completeFromOverclock();
 
             views.scheduleUpdate('overclockResourceSent', intToString(actionObj.resourceToAdd, 2), "textContent")
         },
@@ -422,7 +418,7 @@ let actionData = {
                 +<span style="font-weight:bold;" id="makeMoneyResourceSent">???</span> gold, added to Spend Money.<br>
                 `},
         extraInfo: {english:Raw.html`<br>Momentum Taken = Current Momentum * Tier Mult.<br>
-                        Exp & Gold gain = sqrt(Momentum Taken) * Action Power * Efficiency * Wages.`}
+                        Exp & Gold gain = (Momentum Taken)^.5 * Action Power * Efficiency * Wages.`}
     },
     spendMoney: {
         tier:2, plane:0, resourceName:"gold",
@@ -769,7 +765,7 @@ let actionData = {
                 -<span style="font-weight:bold;" id="socializeResourceTaken">???</span> Momentum was taken from this action, converted to <br>
                 +<span style="font-weight:bold;" id="socializeResourceSent">???</span> conversations, added to Meet People.<br>`},
         extraInfo: {english:`<br>Momentum Taken = Current Momentum * Tier Mult.<br>
-                        Exp & Conversations gain = sqrt(Momentum Taken/1e12) * Action Power * Efficiency.<br>
+                        Exp & Conversations gain = (Momentum Taken/1e12)^.5 * Action Power * Efficiency.<br>
                         Requires 1e12 Momentum Taken to function.`}
     },
     meetPeople: {
@@ -815,7 +811,6 @@ let actionData = {
             unveilAction('hearAboutTheLich');
         },
         onLevelCustom: function () {
-            unveilAction('hearAboutTheLich');
         },
         onLevelAtts:[["discernment", 10]],
         expAtts:[["cunning", 10]],
@@ -831,25 +826,40 @@ let actionData = {
         onLevelCustom: function() {
             //Auto-shows KTL button on level via view updates
             unveilPlane(0);
-            unveilPlane(1);
+            unveilPlane(2);
         },
         isUnlockCustom: function() {
             return data.actions.gossipAroundCoffee.level >= 1;
         },
         updateMults: function() {
-            data.actions.hearAboutTheLich.resourceToAdd = calcFearGain();
+            data.actions.hearAboutTheLich.resourceToAdd = actionData.hearAboutTheLich.calcFearGain();
+        },
+        completeFromOverclock: function() {
+            if (data.actions.hearAboutTheLich.unlocked) {
+                data.actions.hearAboutTheLich.actionPower = actionData.hearAboutTheLich.calcFearGain();
+                data.actions.hearAboutTheLich.resourceToAdd = data.actions.hearAboutTheLich.actionPower
+                data.actions.hearAboutTheLich.resource += data.actions.hearAboutTheLich.resourceToAdd;
+            }
+        },
+        calcFearGain: function() {
+            return Math.pow((data.totalMomentum + data.actions.overclock.resourceToAdd)/1e20, .25) *
+                Math.sqrt(data.actions.gossipAroundCoffee.resource / 1000);
         },
         onLevelAtts:[["integration", 200]],
         expAtts:[],
         efficiencyAtts:[],
         extraButton: Raw.html`
+<!--<div style="position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); padding: 20px 40px; -->
+<!--background-color:#550000; border: 2px solid #aa0000; border-radius: 5px; color: #ffdddd; font-size: 24px; -->
+<!--font-weight: bold; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8); box-shadow: 0 0 15px rgba(255, 0, 0, 0.7); cursor: pointer;">Kill the Lich!</div>-->
+
             <span class="button" id='killTheLichMenuButton2' onclick="openKTLMenu()"
-                style="display:none;padding:8px 13px;position:absolute;top:330px;left:100px;border-color:black;
-                background-color:#880000;text-shadow:0 0 3px #ff0000;box-shadow:0 0 15px 4px rgba(255, 0, 0, 0.5);" >
+                style="display:none;padding:8px 13px;position:absolute;top:330px;left:60px;border: 2px solid #aa0000;border-radius: 5px;
+                background-color:#550000;text-shadow: 3px 3px 2px rgba(0, 0, 0, 0.8);color: #ffdddd;box-shadow:0 0 10px 6px rgba(255, 0, 0, 0.7);font-size:26px;" >
             Kill the Lich!</span>
         `,
-        unlockMessage:{english:"Unlocks when Gossip is level 1."},
-        extraInfo: {english:Raw.html`This action gains (Total Momentum / 1e20 * .1% of Conversations on Gossip) Fear for each Overclock complete, which is a gain of
+        unlockMessage:{english:"Unlocks when Gossip Around Coffee is level 1."},
+        extraInfo: {english:Raw.html`This action gains (Total Momentum / 1e20)^.25 * (.1% of Conversations on Gossip)^.5 Fear for each Overclock complete, which is a gain of
         <span style="font-weight:bold;" id="hearAboutTheLichActionPower">0</span>`}
     },
 
@@ -1353,8 +1363,7 @@ actionData = {
         },
         onLevelCustom: function() {
             unveilPlane(0);
-            unveilPlane(2);
-            data.actions.echoKindle.resource += 10;
+            unveilPlane(1);
         },
         onLevelAtts:[["legacy", 10], ["pulse", 10]],
         expAtts:[],
@@ -1428,7 +1437,6 @@ actionData = {
         onUnlock: function() {
         },
         onLevelCustom: function() {
-            data.actions.echoKindle.resource += 20;
         },
         onLevelAtts:[["legacy", 20]],
         expAtts:[],
@@ -1457,7 +1465,6 @@ actionData = {
         onUnlock: function() {
         },
         onLevelCustom: function() {
-            data.actions.echoKindle.resource += 20;
         },
         onLevelAtts:[["legacy", 20]],
         expAtts:[],
@@ -1472,7 +1479,6 @@ actionData = {
         onUnlock: function() {
         },
         onLevelCustom: function() {
-            data.actions.echoKindle.resource += 30;
         },
         onLevelAtts:[["legacy", 30]],
         expAtts:[],
@@ -1908,167 +1914,183 @@ actionData = {
 actionData = {
     ...actionData,
 
-    overclockTargetingTheLich: {
-        tier:1, plane:1,
+    worry: {
+        tier:1, plane:2, resourceName: "fear",
         progressMaxBase:60, progressMaxIncrease:1,
         expToLevelBase:60, expToLevelIncrease:1,
         efficiencyBase:1, isKTL:true, purchased: true,
-        unlockCost:0, visible:true, unlocked:true, isGenerator:true, generatorSpeed:1,
+        unlockCost:0, visible:true, unlocked:true, isGenerator:true, generatorSpeed:1, hasUpstream: false,
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[]
+    },
+    overclockTargetingTheLich: {
+        tier:1, plane:2, resourceName:"momentum",
+        progressMaxBase:60, progressMaxIncrease:1,
+        expToLevelBase:60, expToLevelIncrease:1,
+        efficiencyBase:1, isKTL:true, purchased: true,
+        unlockCost:0, visible:true, unlocked:true, isGenerator:true, generatorSpeed:1, hasUpstream: false,
+        updateMults: function () {
+            data.actions.overclockTargetingTheLich.resourceToAdd = 0;
+        },
         onLevelAtts:[],
         expAtts:[],
         efficiencyAtts:[]
     },
     fightTheEvilForces: {
-        tier:1, plane:1,
+        tier:1, plane:2, resourceName:"fight",
         progressMaxBase:60, progressMaxIncrease:1,
         expToLevelBase:60, expToLevelIncrease:1,
         efficiencyBase:1, isKTL:true, purchased: true,
-        unlockCost:0, visible:true, unlocked:true, isGenerator:true, generatorSpeed:1,
+        unlockCost:0, visible:true, unlocked:true, isGenerator:true, generatorSpeed:1, hasUpstream: false,
         onLevelAtts:[],
         expAtts:[],
         efficiencyAtts:[]
     },
     bridgeOfBone: {
-        tier:1, plane:1,
+        tier:1, plane:2,
         progressMaxBase:1e10, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
         unlockCost:1e9, visible:true, unlocked:false,
         onUnlock: function() {
-            data.ancientCoin += 1;
+            data.ancientCoin += 3;
             data.useAmuletButtonShowing = true;
         },
         onCompleteCustom:function() {
-            data.legacy += 1;
+            data.legacy += 3;
         },
         onLevelCustom: function() {
-            unveilAction('');
+            if(data.actions.bridgeOfBone.level >= 3) {
+                unveilAction('harvestGhostlyField');
+            }
         },
         onLevelAtts:[],
-        expAtts:[],
+        expAtts:[["legacy", .1], ["legacy", .1]],
         efficiencyAtts:[],
         extraInfo:{english:"1 Legacy per complete."},
-        unlockMessage:{english:"On unlock, +1 Ancient Coin."}
+        unlockMessage:{english:"On unlock, +3 Ancient Coins."}
     },
     harvestGhostlyField: {
-        tier:1, plane:1,
+        tier:1, plane:2,
         progressMaxBase:1e10, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
-        efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
-        unlockCost:1e9, visible:true, unlocked:false,
+        efficiencyBase:1, isKTL:true, purchased: true, maxLevel:30,
+        unlockCost:1e15, visible:true, unlocked:false,
         onUnlock: function() {
-            data.ancientCoin += 1;
-            data.useAmuletButtonShowing = true;
+            data.ancientCoin += 4;
         },
         onCompleteCustom:function() {
-            data.legacy += 1;
+            statAddAmount("legacy", 1)
         },
         onLevelCustom: function() {
-            unveilAction('');
+            if(data.actions.harvestGhostlyField.level >= 3) {
+                unveilAction('geyserFields');
+            }
         },
         onLevelAtts:[],
-        expAtts:[],
+        expAtts:[["legacy", .1], ["legacy", .1]],
         efficiencyAtts:[],
-        extraInfo:{english:"1 Legacy per complete."},
-        unlockMessage:{english:"On unlock, +1 Ancient Coin."}
+        extraInfo:{english:"+1 Legacy per complete."},
+        unlockMessage:{english:"On unlock, +4 Ancient Coins."}
     },
     geyserFields: {
-        tier:1, plane:1,
+        tier:1, plane:2,
         progressMaxBase:1e10, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
-        efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
-        unlockCost:1e9, visible:true, unlocked:false,
+        efficiencyBase:1, isKTL:true, purchased: true, maxLevel:35,
+        unlockCost:1e21, visible:true, unlocked:false,
         onUnlock: function() {
-            data.ancientCoin += 1;
-            data.useAmuletButtonShowing = true;
+            data.ancientCoin += 5;
         },
         onCompleteCustom:function() {
             data.legacy += 1;
         },
         onLevelCustom: function() {
-            unveilAction('');
+            if(data.actions.geyserFields.level >= 3) {
+                unveilAction('destroySiegeEngine');
+            }
         },
         onLevelAtts:[],
-        expAtts:[],
+        expAtts:[["legacy", .1], ["legacy", .1]],
         efficiencyAtts:[],
         extraInfo:{english:"1 Legacy per complete."},
-        unlockMessage:{english:"On unlock, +1 Ancient Coin."}
+        unlockMessage:{english:"On unlock, +5 Ancient Coins."}
     },
     destroySiegeEngine: {
-        tier:1, plane:1,
+        tier:1, plane:2,
         progressMaxBase:1e10, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
-        efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
-        unlockCost:1e9, visible:true, unlocked:false,
+        efficiencyBase:1, isKTL:true, purchased: true, maxLevel:40,
+        unlockCost:1e27, visible:true, unlocked:false,
         onUnlock: function() {
-            data.ancientCoin += 1;
-            data.useAmuletButtonShowing = true;
+            data.ancientCoin += 6;
         },
         onCompleteCustom:function() {
             data.legacy += 1;
         },
         onLevelCustom: function() {
-            unveilAction('');
+            if(data.actions.destroySiegeEngine.level >= 3) {
+                unveilAction('destroyEasternMonolith');
+            }
         },
         onLevelAtts:[],
-        expAtts:[],
+        expAtts:[["legacy", .1], ["legacy", .1]],
         efficiencyAtts:[],
         extraInfo:{english:"1 Legacy per complete."},
-        unlockMessage:{english:"On unlock, +1 Ancient Coin."}
+        unlockMessage:{english:"On unlock, +6 Ancient Coins."}
     },
     destroyEasternMonolith: {
-        tier:1, plane:1,
+        tier:1, plane:2,
         progressMaxBase:1e10, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
-        efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
-        unlockCost:1e9, visible:true, unlocked:false,
+        efficiencyBase:1, isKTL:true, purchased: true, maxLevel:1,
+        unlockCost:1e33, visible:true, unlocked:false,
         onUnlock: function() {
-            data.ancientCoin += 1;
-            data.useAmuletButtonShowing = true;
+            data.ancientCoin += 7;
         },
         onCompleteCustom:function() {
             data.legacy += 1;
         },
         onLevelCustom: function() {
-            unveilAction('');
+            if(data.actions.destroyEasternMonolith.level >= 3) {
+                unveilAction('stopDarknessRitual');
+            }
         },
         onLevelAtts:[],
-        expAtts:[],
+        expAtts:[["legacy", .1], ["legacy", .1]],
         efficiencyAtts:[],
         extraInfo:{english:"1 Legacy per complete."},
-        unlockMessage:{english:"On unlock, +1 Ancient Coin."}
+        unlockMessage:{english:"On unlock, +7 Ancient Coins."}
     },
     stopDarknessRitual: {
-        tier:1, plane:1,
+        tier:1, plane:2,
         progressMaxBase:1e10, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
-        efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
+        efficiencyBase:1, isKTL:true, purchased: false, maxLevel:10,
         unlockCost:1e9, visible:true, unlocked:false,
         onUnlock: function() {
             data.ancientCoin += 1;
-            data.useAmuletButtonShowing = true;
         },
         onCompleteCustom:function() {
             data.legacy += 1;
         },
         onLevelCustom: function() {
-            unveilAction('');
         },
         onLevelAtts:[],
         expAtts:[],
         efficiencyAtts:[],
         extraInfo:{english:"1 Legacy per complete."},
-        unlockMessage:{english:"On unlock, +1 Ancient Coin."}
+        unlockMessage:{english:"On unlock, +1 Ancient Coins."}
     },
     protectTheSunstone: {
-        tier:1, plane:1,
+        tier:1, plane:2,
         progressMaxBase:1e10, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
         unlockCost:1e9, visible:true, unlocked:false,
         onUnlock: function() {
             data.ancientCoin += 1;
-            data.useAmuletButtonShowing = true;
         },
         onCompleteCustom:function() {
             data.legacy += 1;
@@ -2080,17 +2102,17 @@ actionData = {
         expAtts:[],
         efficiencyAtts:[],
         extraInfo:{english:"1 Legacy per complete."},
-        unlockMessage:{english:"On unlock, +1 Ancient Coin."}
+        unlockMessage:{english:"On unlock, +1 Ancient Coins."}
     },
     silenceDeathChanters: {
-        tier:1, plane:1,
+        tier:1, plane:2,
         progressMaxBase:1e10, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
         unlockCost:1e9, visible:true, unlocked:false,
         onUnlock: function() {
             data.ancientCoin += 1;
-            data.useAmuletButtonShowing = true;
+
         },
         onCompleteCustom:function() {
             data.legacy += 1;
@@ -2102,17 +2124,17 @@ actionData = {
         expAtts:[],
         efficiencyAtts:[],
         extraInfo:{english:"1 Legacy per complete."},
-        unlockMessage:{english:"On unlock, +1 Ancient Coin."}
+        unlockMessage:{english:"On unlock, +1 Ancient Coins."}
     },
     breakFleshBarricade: {
-        tier:1, plane:1,
+        tier:1, plane:2,
         progressMaxBase:1e10, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
         unlockCost:1e9, visible:true, unlocked:false,
         onUnlock: function() {
             data.ancientCoin += 1;
-            data.useAmuletButtonShowing = true;
+
         },
         onCompleteCustom:function() {
             data.legacy += 1;
@@ -2124,17 +2146,17 @@ actionData = {
         expAtts:[],
         efficiencyAtts:[],
         extraInfo:{english:"1 Legacy per complete."},
-        unlockMessage:{english:"On unlock, +1 Ancient Coin."}
+        unlockMessage:{english:"On unlock, +1 Ancient Coins."}
     },
     conquerTheGatekeepers: {
-        tier:1, plane:1,
+        tier:1, plane:2,
         progressMaxBase:1e10, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
         unlockCost:1e9, visible:true, unlocked:false,
         onUnlock: function() {
             data.ancientCoin += 1;
-            data.useAmuletButtonShowing = true;
+
         },
         onCompleteCustom:function() {
             data.legacy += 1;
@@ -2146,17 +2168,17 @@ actionData = {
         expAtts:[],
         efficiencyAtts:[],
         extraInfo:{english:"1 Legacy per complete."},
-        unlockMessage:{english:"On unlock, +1 Ancient Coin."}
+        unlockMessage:{english:"On unlock, +1 Ancient Coins."}
     },
     unhookSacrificialCages: {
-        tier:1, plane:1,
+        tier:1, plane:2,
         progressMaxBase:1e10, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
         unlockCost:1e9, visible:true, unlocked:false,
         onUnlock: function() {
             data.ancientCoin += 1;
-            data.useAmuletButtonShowing = true;
+
         },
         onCompleteCustom:function() {
             data.legacy += 1;
@@ -2168,17 +2190,17 @@ actionData = {
         expAtts:[],
         efficiencyAtts:[],
         extraInfo:{english:"1 Legacy per complete."},
-        unlockMessage:{english:"On unlock, +1 Ancient Coin."}
+        unlockMessage:{english:"On unlock, +1 Ancient Coins."}
     },
     purgeUnholyRelics: {
-        tier:1, plane:1,
+        tier:1, plane:2,
         progressMaxBase:1e10, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
         unlockCost:1e9, visible:true, unlocked:false,
         onUnlock: function() {
             data.ancientCoin += 1;
-            data.useAmuletButtonShowing = true;
+
         },
         onCompleteCustom:function() {
             data.legacy += 1;
@@ -2190,17 +2212,17 @@ actionData = {
         expAtts:[],
         efficiencyAtts:[],
         extraInfo:{english:"1 Legacy per complete."},
-        unlockMessage:{english:"On unlock, +1 Ancient Coin."}
+        unlockMessage:{english:"On unlock, +1 Ancient Coins."}
     },
     destroyWesternMonolith: {
-        tier:1, plane:1,
+        tier:1, plane:2,
         progressMaxBase:1e10, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
         unlockCost:1e9, visible:true, unlocked:false,
         onUnlock: function() {
             data.ancientCoin += 1;
-            data.useAmuletButtonShowing = true;
+
         },
         onCompleteCustom:function() {
             data.legacy += 1;
@@ -2212,17 +2234,17 @@ actionData = {
         expAtts:[],
         efficiencyAtts:[],
         extraInfo:{english:"1 Legacy per complete."},
-        unlockMessage:{english:"On unlock, +1 Ancient Coin."}
+        unlockMessage:{english:"On unlock, +1 Ancient Coins."}
     },
     destroyFleshGrowths: {
-        tier:1, plane:1,
+        tier:1, plane:2,
         progressMaxBase:1e10, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
         unlockCost:1e9, visible:true, unlocked:false,
         onUnlock: function() {
             data.ancientCoin += 1;
-            data.useAmuletButtonShowing = true;
+
         },
         onCompleteCustom:function() {
             data.legacy += 1;
@@ -2234,17 +2256,17 @@ actionData = {
         expAtts:[],
         efficiencyAtts:[],
         extraInfo:{english:"1 Legacy per complete."},
-        unlockMessage:{english:"On unlock, +1 Ancient Coin."}
+        unlockMessage:{english:"On unlock, +1 Ancient Coins."}
     },
     crackCorruptedEggs: {
-        tier:1, plane:1,
+        tier:1, plane:2,
         progressMaxBase:1e10, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
         unlockCost:1e9, visible:true, unlocked:false,
         onUnlock: function() {
             data.ancientCoin += 1;
-            data.useAmuletButtonShowing = true;
+
         },
         onCompleteCustom:function() {
             data.legacy += 1;
@@ -2256,17 +2278,17 @@ actionData = {
         expAtts:[],
         efficiencyAtts:[],
         extraInfo:{english:"1 Legacy per complete."},
-        unlockMessage:{english:"On unlock, +1 Ancient Coin."}
+        unlockMessage:{english:"On unlock, +1 Ancient Coins."}
     },
     kiteTheAbomination: {
-        tier:1, plane:1,
+        tier:1, plane:2,
         progressMaxBase:1e10, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
         unlockCost:1e9, visible:true, unlocked:false,
         onUnlock: function() {
             data.ancientCoin += 1;
-            data.useAmuletButtonShowing = true;
+
         },
         onCompleteCustom:function() {
             data.legacy += 1;
@@ -2278,17 +2300,17 @@ actionData = {
         expAtts:[],
         efficiencyAtts:[],
         extraInfo:{english:"1 Legacy per complete."},
-        unlockMessage:{english:"On unlock, +1 Ancient Coin."}
+        unlockMessage:{english:"On unlock, +1 Ancient Coins."}
     },
     collapseCorpseTower: {
-        tier:1, plane:1,
+        tier:1, plane:2,
         progressMaxBase:1e10, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
         unlockCost:1e9, visible:true, unlocked:false,
         onUnlock: function() {
             data.ancientCoin += 1;
-            data.useAmuletButtonShowing = true;
+
         },
         onCompleteCustom:function() {
             data.legacy += 1;
@@ -2300,17 +2322,17 @@ actionData = {
         expAtts:[],
         efficiencyAtts:[],
         extraInfo:{english:"1 Legacy per complete."},
-        unlockMessage:{english:"On unlock, +1 Ancient Coin."}
+        unlockMessage:{english:"On unlock, +1 Ancient Coins."}
     },
     surviveLivingSiegeEngine: {
-        tier:1, plane:1,
+        tier:1, plane:2,
         progressMaxBase:1e10, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
         unlockCost:1e9, visible:true, unlocked:false,
         onUnlock: function() {
             data.ancientCoin += 1;
-            data.useAmuletButtonShowing = true;
+
         },
         onCompleteCustom:function() {
             data.legacy += 1;
@@ -2322,17 +2344,17 @@ actionData = {
         expAtts:[],
         efficiencyAtts:[],
         extraInfo:{english:"1 Legacy per complete."},
-        unlockMessage:{english:"On unlock, +1 Ancient Coin."}
+        unlockMessage:{english:"On unlock, +1 Ancient Coins."}
     },
     destroySouthernMonolith: {
-        tier:1, plane:1,
+        tier:1, plane:2,
         progressMaxBase:1e10, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
         unlockCost:1e9, visible:true, unlocked:false,
         onUnlock: function() {
             data.ancientCoin += 1;
-            data.useAmuletButtonShowing = true;
+
         },
         onCompleteCustom:function() {
             data.legacy += 1;
@@ -2344,17 +2366,17 @@ actionData = {
         expAtts:[],
         efficiencyAtts:[],
         extraInfo:{english:"1 Legacy per complete."},
-        unlockMessage:{english:"On unlock, +1 Ancient Coin."}
+        unlockMessage:{english:"On unlock, +1 Ancient Coins."}
     },
     burnFleshPits: {
-        tier:1, plane:1,
+        tier:1, plane:2,
         progressMaxBase:1e10, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
         unlockCost:1e9, visible:true, unlocked:false,
         onUnlock: function() {
             data.ancientCoin += 1;
-            data.useAmuletButtonShowing = true;
+
         },
         onCompleteCustom:function() {
             data.legacy += 1;
@@ -2366,17 +2388,17 @@ actionData = {
         expAtts:[],
         efficiencyAtts:[],
         extraInfo:{english:"1 Legacy per complete."},
-        unlockMessage:{english:"On unlock, +1 Ancient Coin."}
+        unlockMessage:{english:"On unlock, +1 Ancient Coins."}
     },
     openSoulGate: {
-        tier:1, plane:1,
+        tier:1, plane:2,
         progressMaxBase:1e10, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
         unlockCost:1e9, visible:true, unlocked:false,
         onUnlock: function() {
             data.ancientCoin += 1;
-            data.useAmuletButtonShowing = true;
+
         },
         onCompleteCustom:function() {
             data.legacy += 1;
@@ -2388,17 +2410,17 @@ actionData = {
         expAtts:[],
         efficiencyAtts:[],
         extraInfo:{english:"1 Legacy per complete."},
-        unlockMessage:{english:"On unlock, +1 Ancient Coin."}
+        unlockMessage:{english:"On unlock, +1 Ancient Coins."}
     },
     shatterTraps: {
-        tier:1, plane:1,
+        tier:1, plane:2,
         progressMaxBase:1e10, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
         unlockCost:1e9, visible:true, unlocked:false,
         onUnlock: function() {
             data.ancientCoin += 1;
-            data.useAmuletButtonShowing = true;
+
         },
         onCompleteCustom:function() {
             data.legacy += 1;
@@ -2410,17 +2432,17 @@ actionData = {
         expAtts:[],
         efficiencyAtts:[],
         extraInfo:{english:"1 Legacy per complete."},
-        unlockMessage:{english:"On unlock, +1 Ancient Coin."}
+        unlockMessage:{english:"On unlock, +1 Ancient Coins."}
     },
     killTheArchitect: {
-        tier:1, plane:1,
+        tier:1, plane:2,
         progressMaxBase:1e10, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
         unlockCost:1e9, visible:true, unlocked:false,
         onUnlock: function() {
             data.ancientCoin += 1;
-            data.useAmuletButtonShowing = true;
+
         },
         onCompleteCustom:function() {
             data.legacy += 1;
@@ -2432,17 +2454,17 @@ actionData = {
         expAtts:[],
         efficiencyAtts:[],
         extraInfo:{english:"1 Legacy per complete."},
-        unlockMessage:{english:"On unlock, +1 Ancient Coin."}
+        unlockMessage:{english:"On unlock, +1 Ancient Coins."}
     },
     destroyNorthernMonolith: {
-        tier:1, plane:1,
+        tier:1, plane:2,
         progressMaxBase:1e10, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
         unlockCost:1e9, visible:true, unlocked:false,
         onUnlock: function() {
             data.ancientCoin += 1;
-            data.useAmuletButtonShowing = true;
+
         },
         onCompleteCustom:function() {
             data.legacy += 1;
@@ -2454,17 +2476,17 @@ actionData = {
         expAtts:[],
         efficiencyAtts:[],
         extraInfo:{english:"1 Legacy per complete."},
-        unlockMessage:{english:"On unlock, +1 Ancient Coin."}
+        unlockMessage:{english:"On unlock, +1 Ancient Coins."}
     },
     breakOutOfEndlessMaze: {
-        tier:1, plane:1,
+        tier:1, plane:2,
         progressMaxBase:1e10, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
         unlockCost:1e9, visible:true, unlocked:false,
         onUnlock: function() {
             data.ancientCoin += 1;
-            data.useAmuletButtonShowing = true;
+
         },
         onCompleteCustom:function() {
             data.legacy += 1;
@@ -2476,17 +2498,17 @@ actionData = {
         expAtts:[],
         efficiencyAtts:[],
         extraInfo:{english:"1 Legacy per complete."},
-        unlockMessage:{english:"On unlock, +1 Ancient Coin."}
+        unlockMessage:{english:"On unlock, +1 Ancient Coins."}
     },
     killDopplegangers: {
-        tier:1, plane:1,
+        tier:1, plane:2,
         progressMaxBase:1e10, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
         unlockCost:1e9, visible:true, unlocked:false,
         onUnlock: function() {
             data.ancientCoin += 1;
-            data.useAmuletButtonShowing = true;
+
         },
         onCompleteCustom:function() {
             data.legacy += 1;
@@ -2498,17 +2520,17 @@ actionData = {
         expAtts:[],
         efficiencyAtts:[],
         extraInfo:{english:"1 Legacy per complete."},
-        unlockMessage:{english:"On unlock, +1 Ancient Coin."}
+        unlockMessage:{english:"On unlock, +1 Ancient Coins."}
     },
     killDeathKnights: {
-        tier:1, plane:1,
+        tier:1, plane:2,
         progressMaxBase:1e10, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
         unlockCost:1e9, visible:true, unlocked:false,
         onUnlock: function() {
             data.ancientCoin += 1;
-            data.useAmuletButtonShowing = true;
+
         },
         onCompleteCustom:function() {
             data.legacy += 1;
@@ -2520,17 +2542,17 @@ actionData = {
         expAtts:[],
         efficiencyAtts:[],
         extraInfo:{english:"1 Legacy per complete."},
-        unlockMessage:{english:"On unlock, +1 Ancient Coin."}
+        unlockMessage:{english:"On unlock, +1 Ancient Coins."}
     },
     silenceDoomScribe: {
-        tier:1, plane:1,
+        tier:1, plane:2,
         progressMaxBase:1e10, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
         unlockCost:1e9, visible:true, unlocked:false,
         onUnlock: function() {
             data.ancientCoin += 1;
-            data.useAmuletButtonShowing = true;
+
         },
         onCompleteCustom:function() {
             data.legacy += 1;
@@ -2542,17 +2564,17 @@ actionData = {
         expAtts:[],
         efficiencyAtts:[],
         extraInfo:{english:"1 Legacy per complete."},
-        unlockMessage:{english:"On unlock, +1 Ancient Coin."}
+        unlockMessage:{english:"On unlock, +1 Ancient Coins."}
     },
     removeWards: {
-        tier:1, plane:1,
+        tier:1, plane:2,
         progressMaxBase:1e10, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
         unlockCost:1e9, visible:true, unlocked:false,
         onUnlock: function() {
             data.ancientCoin += 1;
-            data.useAmuletButtonShowing = true;
+
         },
         onCompleteCustom:function() {
             data.legacy += 1;
@@ -2564,17 +2586,17 @@ actionData = {
         expAtts:[],
         efficiencyAtts:[],
         extraInfo:{english:"1 Legacy per complete."},
-        unlockMessage:{english:"On unlock, +1 Ancient Coin."}
+        unlockMessage:{english:"On unlock, +1 Ancient Coins."}
     },
     fightTheLich: {
-        tier:1, plane:1,
+        tier:1, plane:2,
         progressMaxBase:1e10, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
         unlockCost:1e9, visible:true, unlocked:false,
         onUnlock: function() {
             data.ancientCoin += 1;
-            data.useAmuletButtonShowing = true;
+
         },
         onCompleteCustom:function() {
             data.legacy += 1;
@@ -2586,17 +2608,17 @@ actionData = {
         expAtts:[],
         efficiencyAtts:[],
         extraInfo:{english:"1 Legacy per complete."},
-        unlockMessage:{english:"On unlock, +1 Ancient Coin."}
+        unlockMessage:{english:"On unlock, +1 Ancient Coins."}
     },
     killTheLich: {
-        tier:1, plane:1,
+        tier:1, plane:2,
         progressMaxBase:1e10, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
         unlockCost:1e9, visible:true, unlocked:false,
         onUnlock: function() {
             data.ancientCoin += 1;
-            data.useAmuletButtonShowing = true;
+
         },
         onCompleteCustom:function() {
             data.legacy += 1;
@@ -2608,17 +2630,17 @@ actionData = {
         expAtts:[],
         efficiencyAtts:[],
         extraInfo:{english:"1 Legacy per complete."},
-        unlockMessage:{english:"On unlock, +1 Ancient Coin."}
+        unlockMessage:{english:"On unlock, +1 Ancient Coins."}
     },
     shatterPhylactery: {
-        tier:1, plane:1,
+        tier:1, plane:2,
         progressMaxBase:1e10, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
         unlockCost:1e9, visible:true, unlocked:false,
         onUnlock: function() {
             data.ancientCoin += 1;
-            data.useAmuletButtonShowing = true;
+
         },
         onCompleteCustom:function() {
             data.legacy += 1;
@@ -2630,7 +2652,7 @@ actionData = {
         expAtts:[],
         efficiencyAtts:[],
         extraInfo:{english:"1 Legacy per complete."},
-        unlockMessage:{english:"On unlock, +1 Ancient Coin."}
+        unlockMessage:{english:"On unlock, +1 Ancient Coins."}
     },
 }
 
@@ -2639,7 +2661,7 @@ actionData = {
     ...actionData,
 
     echoKindle: {
-        tier:0, plane:2, resourceName:"legacy",
+        tier:0, plane:1, resourceName:"legacy",
         progressMaxBase:10, progressMaxIncrease:1,
         expToLevelBase:10000000, expToLevelIncrease:1.2,
         actionPowerBase:1, actionPowerMult:1, actionPowerMultIncrease:1.05,
@@ -2678,10 +2700,10 @@ actionData = {
         onCompleteText: {english:Raw.html`
                 +<span style="font-weight:bold;" id="echoKindleResourceSent">???</span> Spark was added to Spark Mana.<br>
                 `},
-        extraInfo: {english:Raw.html`Exp & Mana gain = sqrt(Legacy) * Action Power * Efficiency * 1000.`}
+        extraInfo: {english:Raw.html`Exp & Mana gain = (Legacy)^.5 * Action Power * Efficiency * 1000.`}
     },
     sparkMana: {
-        tier:0, plane:2, resourceName:"spark",
+        tier:0, plane:1, resourceName:"spark",
         progressMaxBase:1000, progressMaxIncrease:4,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:1,
@@ -2698,7 +2720,7 @@ actionData = {
         efficiencyAtts:[["spark", -1]]
     },
     poolMana: {
-        tier:0, plane:2, resourceName:"mana",
+        tier:0, plane:1, resourceName:"mana",
         progressMaxBase:60, progressMaxIncrease:1,
         expToLevelBase:2, expToLevelIncrease:3,
         actionPowerBase:1, actionPowerMult:1, actionPowerMultIncrease:1.03,
@@ -2738,7 +2760,7 @@ actionData = {
         extraInfo: {english:Raw.html`Exp & Mana gain = Action Power * Efficiency.`}
     },
     expelMana: {
-        tier:0, plane:2, resourceName:"mana",
+        tier:0, plane:1, resourceName:"mana",
         progressMaxBase:.3, progressMaxIncrease:3,
         expToLevelBase:3, expToLevelIncrease:1,
         efficiencyBase:.5, maxLevel:6,
@@ -2753,7 +2775,7 @@ actionData = {
         efficiencyAtts:[["integration", .05]]
     },
     manaBasics: {
-        tier:0, plane:2, resourceName:"mana",
+        tier:0, plane:1, resourceName:"mana",
         progressMaxBase:1, progressMaxIncrease:3,
         expToLevelBase:3, expToLevelIncrease:1,
         efficiencyBase:.03, maxLevel:3,
@@ -2768,7 +2790,7 @@ actionData = {
         efficiencyAtts:[["integration", 2]]
     },
     manaExperiments: {
-        tier:0, plane:2, resourceName:"mana",
+        tier:0, plane:1, resourceName:"mana",
         progressMaxBase:10, progressMaxIncrease:3,
         expToLevelBase:3, expToLevelIncrease:1,
         efficiencyBase:.03, maxLevel:9,
@@ -2782,7 +2804,7 @@ actionData = {
         efficiencyAtts:[["integration", 2]]
     },
     magicResearch: {
-        tier:0, plane:2, resourceName:"mana",
+        tier:0, plane:1, resourceName:"mana",
         progressMaxBase:100, progressMaxIncrease:9,
         expToLevelBase:3, expToLevelIncrease:1,
         efficiencyBase:1, maxLevel:9,
@@ -2795,7 +2817,7 @@ actionData = {
         efficiencyAtts:[]
     },
     prepareSpells: {
-        tier:0, plane:2, resourceName:"mana",
+        tier:0, plane:1, resourceName:"mana",
         progressMaxBase:100, progressMaxIncrease:9,
         expToLevelBase:3, expToLevelIncrease:1,
         efficiencyBase:.35, maxLevel:9,
@@ -2811,7 +2833,7 @@ actionData = {
         efficiencyAtts:[["integration", .05]]
     },
     prepareInternalSpells: {
-        tier:0, plane:2, resourceName:"mana",
+        tier:0, plane:1, resourceName:"mana",
         progressMaxBase:300, progressMaxIncrease:9,
         expToLevelBase:3, expToLevelIncrease:1,
         efficiencyBase:.3, maxLevel:9,
@@ -2824,7 +2846,7 @@ actionData = {
         efficiencyAtts:[["integration", .05]]
     },
     overcharge: {
-        tier:0, plane:2, resourceName:"mana",
+        tier:0, plane:1, resourceName:"mana",
         progressMaxBase:100, progressMaxIncrease:1,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:.4, maxLevel:1, isSpell:true, instabilityToAdd:10,
@@ -2841,7 +2863,7 @@ actionData = {
         extraInfo: {english:Raw.html`If a charge is available, the next Overclock will give x10 momentum.`}
     },
     overboost: {
-        tier:0, plane:2, resourceName:"mana",
+        tier:0, plane:1, resourceName:"mana",
         progressMaxBase:100000, progressMaxIncrease:1,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:.2, maxLevel:1, isSpell:true, instabilityToAdd:100,
@@ -2856,7 +2878,7 @@ actionData = {
         efficiencyAtts:[["wizardry", .001]]
     },
     overdrive: {
-        tier:0, plane:2, resourceName:"mana",
+        tier:0, plane:1, resourceName:"mana",
         progressMaxBase:1000, progressMaxIncrease:1,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:.1, maxLevel:1, isSpell:true, instabilityToAdd:100,
@@ -2871,7 +2893,7 @@ actionData = {
         efficiencyAtts:[["wizardry", .0001]]
     },
     manaObservations: {
-        tier:0, plane:2, resourceName:"mana",
+        tier:0, plane:1, resourceName:"mana",
         progressMaxBase:30000, progressMaxIncrease:9,
         expToLevelBase:3, expToLevelIncrease:1,
         efficiencyBase:.01, maxLevel:3,
@@ -2884,7 +2906,7 @@ actionData = {
         efficiencyAtts:[["integration", 2]]
     },
     feelYourMana: {
-        tier:0, plane:2, resourceName:"mana",
+        tier:0, plane:1, resourceName:"mana",
         progressMaxBase:100, progressMaxIncrease:3,
         expToLevelBase:3, expToLevelIncrease:1,
         efficiencyBase:.02, maxLevel:9,
@@ -2897,7 +2919,7 @@ actionData = {
         efficiencyAtts:[["integration", 2]]
     },
     growMagicSenses: {
-        tier:0, plane:2, resourceName:"mana",
+        tier:0, plane:1, resourceName:"mana",
         progressMaxBase:1000, progressMaxIncrease:3,
         expToLevelBase:3, expToLevelIncrease:1,
         efficiencyBase:.015, maxLevel:9,
@@ -2909,7 +2931,7 @@ actionData = {
         efficiencyAtts:[["integration", 2]]
     },
     infuseTheHide: {
-        tier:0, plane:2, resourceName:"mana",
+        tier:0, plane:1, resourceName:"mana",
         progressMaxBase:2000, progressMaxIncrease:1,
         expToLevelBase:3, expToLevelIncrease:1,
         efficiencyBase:1, maxLevel:2,
@@ -2922,7 +2944,7 @@ actionData = {
         efficiencyAtts:[]
     },
     etchTheCircle: {
-        tier:0, plane:2, resourceName:"mana",
+        tier:0, plane:1, resourceName:"mana",
         progressMaxBase:2000, progressMaxIncrease:1,
         expToLevelBase:9, expToLevelIncrease:1,
         efficiencyBase:1, maxLevel:1,
@@ -2935,7 +2957,7 @@ actionData = {
         efficiencyAtts:[]
     },
     bindThePages: {
-        tier:0, plane:2, resourceName:"mana",
+        tier:0, plane:1, resourceName:"mana",
         progressMaxBase:300, progressMaxIncrease:1.01,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:1, maxLevel:100,
@@ -2947,7 +2969,7 @@ actionData = {
         efficiencyAtts:[]
     },
     awakenYourGrimoire: {
-        tier:0, plane:2, resourceName:"mana",
+        tier:0, plane:1, resourceName:"mana",
         progressMaxBase:30000, progressMaxIncrease:1,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:1, maxLevel:1,
@@ -2963,7 +2985,7 @@ actionData = {
         efficiencyAtts:[]
     },
     prepareExternalSpells: {
-        tier:0, plane:2, resourceName:"mana",
+        tier:0, plane:1, resourceName:"mana",
         progressMaxBase:100000, progressMaxIncrease:33,
         expToLevelBase:3, expToLevelIncrease:1,
         efficiencyBase:.2, maxLevel:9,
@@ -2976,7 +2998,7 @@ actionData = {
         efficiencyAtts:[["integration", .05]]
     },
     supportSpells: {
-        tier:0, plane:2, resourceName:"mana",
+        tier:0, plane:1, resourceName:"mana",
         progressMaxBase:300000, progressMaxIncrease:33,
         expToLevelBase:3, expToLevelIncrease:1,
         efficiencyBase:.15, maxLevel:9,
@@ -2989,7 +3011,7 @@ actionData = {
         efficiencyAtts:[["integration", .05]]
     },
     earthMagic: {
-        tier:0, plane:2, resourceName:"mana",
+        tier:0, plane:1, resourceName:"mana",
         progressMaxBase:10000, progressMaxIncrease:1,
         expToLevelBase:1, expToLevelIncrease:1, power:1,
         efficiencyBase:.2, maxLevel:0, isSpell:true, instabilityToAdd:5,
@@ -3002,7 +3024,7 @@ actionData = {
         efficiencyAtts:[["wizardry", .001]]
     },
     moveEarth: {
-        tier:0, plane:2, resourceName:"mana",
+        tier:0, plane:1, resourceName:"mana",
         progressMaxBase:1000, progressMaxIncrease:3,
         expToLevelBase:3, expToLevelIncrease:1,
         efficiencyBase:1, maxLevel:10,
@@ -3014,7 +3036,7 @@ actionData = {
         efficiencyAtts:[]
     },
     shelter: {
-        tier:0, plane:2, resourceName:"mana",
+        tier:0, plane:1, resourceName:"mana",
         progressMaxBase:1000, progressMaxIncrease:3,
         expToLevelBase:3, expToLevelIncrease:1,
         efficiencyBase:1, maxLevel:10,
@@ -3026,7 +3048,7 @@ actionData = {
         efficiencyAtts:[]
     },
     reinforceArmor: {
-        tier:0, plane:2, resourceName:"mana",
+        tier:0, plane:1, resourceName:"mana",
         progressMaxBase:1000, progressMaxIncrease:3,
         expToLevelBase:3, expToLevelIncrease:1,
         efficiencyBase:1, maxLevel:10,
@@ -3038,7 +3060,7 @@ actionData = {
         efficiencyAtts:[]
     },
     sharpenWeapons: {
-        tier:0, plane:2, resourceName:"mana",
+        tier:0, plane:1, resourceName:"mana",
         progressMaxBase:1000, progressMaxIncrease:3,
         expToLevelBase:3, expToLevelIncrease:1,
         efficiencyBase:1, maxLevel:10,
@@ -3050,7 +3072,7 @@ actionData = {
         efficiencyAtts:[]
     },
     repairEquipment: {
-        tier:0, plane:2, resourceName:"mana",
+        tier:0, plane:1, resourceName:"mana",
         progressMaxBase:1000, progressMaxIncrease:3,
         expToLevelBase:3, expToLevelIncrease:1,
         efficiencyBase:1, maxLevel:10,
@@ -3062,7 +3084,7 @@ actionData = {
         efficiencyAtts:[]
     },
     restoreEquipment: {
-        tier:0, plane:2, resourceName:"mana",
+        tier:0, plane:1, resourceName:"mana",
         progressMaxBase:1000, progressMaxIncrease:3,
         expToLevelBase:3, expToLevelIncrease:1,
         efficiencyBase:1, maxLevel:10,
@@ -3074,7 +3096,7 @@ actionData = {
         efficiencyAtts:[]
     },
     manaVisualizations: {
-        tier:0, plane:2, resourceName:"mana",
+        tier:0, plane:1, resourceName:"mana",
         progressMaxBase:1000, progressMaxIncrease:3,
         expToLevelBase:3, expToLevelIncrease:1,
         efficiencyBase:1, maxLevel:10,
@@ -3086,7 +3108,7 @@ actionData = {
         efficiencyAtts:[]
     },
     manaShaping: {
-        tier:0, plane:2, resourceName:"mana",
+        tier:0, plane:1, resourceName:"mana",
         progressMaxBase:1000, progressMaxIncrease:3,
         expToLevelBase:3, expToLevelIncrease:1,
         efficiencyBase:1, maxLevel:10,
@@ -3098,7 +3120,7 @@ actionData = {
         efficiencyAtts:[]
     },
     listenToTheMana: {
-        tier:0, plane:2, resourceName:"mana",
+        tier:0, plane:1, resourceName:"mana",
         progressMaxBase:1000, progressMaxIncrease:3,
         expToLevelBase:3, expToLevelIncrease:1,
         efficiencyBase:1, maxLevel:10,
@@ -3110,7 +3132,7 @@ actionData = {
         efficiencyAtts:[]
     },
     manaInstinct: {
-        tier:0, plane:2, resourceName:"mana",
+        tier:0, plane:1, resourceName:"mana",
         progressMaxBase:1000, progressMaxIncrease:3,
         expToLevelBase:3, expToLevelIncrease:1,
         efficiencyBase:1, maxLevel:10,
@@ -3122,7 +3144,7 @@ actionData = {
         efficiencyAtts:[]
     },
     auraControl: {
-        tier:0, plane:2, resourceName:"mana",
+        tier:0, plane:1, resourceName:"mana",
         progressMaxBase:10000, progressMaxIncrease:9,
         expToLevelBase:3, expToLevelIncrease:1,
         efficiencyBase:1, maxLevel:10,
@@ -3134,7 +3156,7 @@ actionData = {
         efficiencyAtts:[]
     },
     divination: {
-        tier:0, plane:2, resourceName:"mana",
+        tier:0, plane:1, resourceName:"mana",
         progressMaxBase:1000, progressMaxIncrease:3,
         expToLevelBase:3, expToLevelIncrease:1,
         efficiencyBase:1, maxLevel:10,
@@ -3146,7 +3168,7 @@ actionData = {
         efficiencyAtts:[]
     },
     identifyItem: {
-        tier:0, plane:2, resourceName:"mana",
+        tier:0, plane:1, resourceName:"mana",
         progressMaxBase:1000, progressMaxIncrease:3,
         expToLevelBase:3, expToLevelIncrease:1,
         efficiencyBase:1, maxLevel:10,
@@ -3158,7 +3180,7 @@ actionData = {
         efficiencyAtts:[]
     },
     detectMagic: {
-        tier:0, plane:2, resourceName:"mana",
+        tier:0, plane:1, resourceName:"mana",
         progressMaxBase:1000, progressMaxIncrease:3,
         expToLevelBase:3, expToLevelIncrease:1,
         efficiencyBase:1, maxLevel:10,
@@ -3170,7 +3192,7 @@ actionData = {
         efficiencyAtts:[]
     },
     practicalMagic: {
-        tier:0, plane:2, resourceName:"mana",
+        tier:0, plane:1, resourceName:"mana",
         progressMaxBase:1000, progressMaxIncrease:3,
         expToLevelBase:3, expToLevelIncrease:1,
         efficiencyBase:1, maxLevel:10,
@@ -3182,7 +3204,7 @@ actionData = {
         efficiencyAtts:[]
     },
     manaTransfer: {
-        tier:0, plane:2, resourceName:"mana",
+        tier:0, plane:1, resourceName:"mana",
         progressMaxBase:1000, progressMaxIncrease:3,
         expToLevelBase:3, expToLevelIncrease:1,
         efficiencyBase:1, maxLevel:10,
@@ -3194,7 +3216,7 @@ actionData = {
         efficiencyAtts:[]
     },
     illuminate: {
-        tier:0, plane:2, resourceName:"mana",
+        tier:0, plane:1, resourceName:"mana",
         progressMaxBase:1000, progressMaxIncrease:3,
         expToLevelBase:3, expToLevelIncrease:1,
         efficiencyBase:1, maxLevel:10,
@@ -3206,7 +3228,7 @@ actionData = {
         efficiencyAtts:[]
     },
     unblemish: {
-        tier:0, plane:2, resourceName:"mana",
+        tier:0, plane:1, resourceName:"mana",
         progressMaxBase:1000, progressMaxIncrease:3,
         expToLevelBase:3, expToLevelIncrease:1,
         efficiencyBase:1, maxLevel:10,
@@ -3218,7 +3240,7 @@ actionData = {
         efficiencyAtts:[]
     },
     recoverSpells: {
-        tier:0, plane:2, resourceName:"mana",
+        tier:0, plane:1, resourceName:"mana",
         progressMaxBase:20e7, progressMaxIncrease:9,
         expToLevelBase:3, expToLevelIncrease:1,
         efficiencyBase:.1, maxLevel:9,
@@ -3230,7 +3252,7 @@ actionData = {
         efficiencyAtts:[["integration", .05]]
     },
     healingMagic: {
-        tier:0, plane:2, resourceName:"mana",
+        tier:0, plane:1, resourceName:"mana",
         progressMaxBase:1000, progressMaxIncrease:3,
         expToLevelBase:3, expToLevelIncrease:1,
         efficiencyBase:1, maxLevel:10,
@@ -3243,7 +3265,7 @@ actionData = {
     },
 
     singleTargetHealing: {
-        tier:0, plane:2, resourceName:"mana",
+        tier:0, plane:1, resourceName:"mana",
         progressMaxBase:1000, progressMaxIncrease:3,
         expToLevelBase:3, expToLevelIncrease:1,
         efficiencyBase:1, maxLevel:10,
@@ -3255,7 +3277,7 @@ actionData = {
         efficiencyAtts:[]
     },
     purifyPoison: {
-        tier:0, plane:2, resourceName:"mana",
+        tier:0, plane:1, resourceName:"mana",
         progressMaxBase:1000, progressMaxIncrease:3,
         expToLevelBase:3, expToLevelIncrease:1,
         efficiencyBase:1, maxLevel:10,
@@ -3267,7 +3289,7 @@ actionData = {
         efficiencyAtts:[]
     },
     massHeal: {
-        tier:0, plane:2, resourceName:"mana",
+        tier:0, plane:1, resourceName:"mana",
         progressMaxBase:1000, progressMaxIncrease:3,
         expToLevelBase:3, expToLevelIncrease:1,
         efficiencyBase:1, maxLevel:10,
@@ -3279,7 +3301,7 @@ actionData = {
         efficiencyAtts:[]
     },
     auraHealing: {
-        tier:0, plane:2, resourceName:"mana",
+        tier:0, plane:1, resourceName:"mana",
         progressMaxBase:1000, progressMaxIncrease:3,
         expToLevelBase:3, expToLevelIncrease:1,
         efficiencyBase:1, maxLevel:10,
@@ -3291,7 +3313,7 @@ actionData = {
         efficiencyAtts:[]
     },
     healBurst: {
-        tier:0, plane:2, resourceName:"mana",
+        tier:0, plane:1, resourceName:"mana",
         progressMaxBase:1000, progressMaxIncrease:3,
         expToLevelBase:3, expToLevelIncrease:1,
         efficiencyBase:1, maxLevel:10,
@@ -3303,7 +3325,7 @@ actionData = {
         efficiencyAtts:[]
     },
     combatSpells: {
-        tier:0, plane:2, resourceName:"mana",
+        tier:0, plane:1, resourceName:"mana",
         progressMaxBase:20e10, progressMaxIncrease:9,
         expToLevelBase:3, expToLevelIncrease:1,
         efficiencyBase:.05, maxLevel:9,
@@ -3315,7 +3337,7 @@ actionData = {
         efficiencyAtts:[["integration", .05]]
     },
     swarmSpells: {
-        tier:0, plane:2, resourceName:"mana",
+        tier:0, plane:1, resourceName:"mana",
         progressMaxBase:1000, progressMaxIncrease:3,
         expToLevelBase:3, expToLevelIncrease:1,
         efficiencyBase:1, maxLevel:10,
@@ -3327,7 +3349,7 @@ actionData = {
         efficiencyAtts:[]
     },
     fireball: {
-        tier:0, plane:2, resourceName:"mana",
+        tier:0, plane:1, resourceName:"mana",
         progressMaxBase:1000, progressMaxIncrease:3,
         expToLevelBase:3, expToLevelIncrease:1,
         efficiencyBase:1, maxLevel:10,
@@ -3339,7 +3361,7 @@ actionData = {
         efficiencyAtts:[]
     },
     wardMagic: {
-        tier:0, plane:2, resourceName:"mana",
+        tier:0, plane:1, resourceName:"mana",
         progressMaxBase:1000, progressMaxIncrease:3,
         expToLevelBase:3, expToLevelIncrease:1,
         efficiencyBase:1, maxLevel:10,
@@ -3351,7 +3373,7 @@ actionData = {
         efficiencyAtts:[]
     },
     ward: {
-        tier:0, plane:2, resourceName:"mana",
+        tier:0, plane:1, resourceName:"mana",
         progressMaxBase:1000, progressMaxIncrease:3,
         expToLevelBase:3, expToLevelIncrease:1,
         efficiencyBase:1, maxLevel:10,
@@ -3363,7 +3385,7 @@ actionData = {
         efficiencyAtts:[]
     },
     duellingSpells: {
-        tier:0, plane:2, resourceName:"mana",
+        tier:0, plane:1, resourceName:"mana",
         progressMaxBase:1000, progressMaxIncrease:3,
         expToLevelBase:3, expToLevelIncrease:1,
         efficiencyBase:1, maxLevel:10,
@@ -3375,7 +3397,7 @@ actionData = {
         efficiencyAtts:[]
     },
     firebolt: {
-        tier:0, plane:2, resourceName:"mana",
+        tier:0, plane:1, resourceName:"mana",
         progressMaxBase:1000, progressMaxIncrease:3,
         expToLevelBase:3, expToLevelIncrease:1,
         efficiencyBase:1, maxLevel:10,
