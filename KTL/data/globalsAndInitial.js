@@ -77,8 +77,8 @@ let viewData = {}; //contains only things that are generated / not saved
 viewData.toasts = [];
 
 let language = "english";
-// let globalVisible = false;
-let globalVisible = true;
+let globalVisible = false;
+// let globalVisible = true;
 let isLoadingEnabled = true; //SET FALSE FOR CLEARING SAVE
 
 
@@ -105,28 +105,28 @@ function debug() {
 
     // stop = 1;
 
-    revealAtt("integration")
-    revealAtt("legacy")
-    unveilPlane(0);
-    unveilPlane(1);
-    unveilPlane(2);
-    statAddAmount("pulse", 10)
-    statAddAmount("integration", 200)
-    statAddAmount("legacy", 10)
-
     //setup system to right before HATL:
-    unveilAction('earthMagic');
-    unveilAction('gossipAroundCoffee');
-    unveilAction('hearAboutTheLich');
+    // revealAtt("integration")
+    // revealAtt("legacy")
+    // unveilPlane(0);
+    // unveilPlane(1);
+    // unveilPlane(2);
+    // statAddAmount("pulse", 10)
+    // statAddAmount("integration", 200)
+    // statAddAmount("legacy", 10)
 
-    data.actions.earthMagic.unlockCost = 0;
-    levelAllCharges();
-    data.actions.earthMagic.resource = 1e10;
-    data.actions.gossipAroundCoffee.unlockCost = 0;
-    data.actions.gossipAroundCoffee.resource += 1e8
-    data.actions.overclock.resource = 1e20;
-    statAddAmount("cycle", 40)
-    statAddAmount("discernment", 200)
+    // unveilAction('earthMagic');
+    // unveilAction('gossipAroundCoffee');
+    // unveilAction('hearAboutTheLich');
+
+    // data.actions.earthMagic.unlockCost = 0;
+    // levelAllCharges();
+    // data.actions.earthMagic.resource = 1e10;
+    // data.actions.gossipAroundCoffee.unlockCost = 0;
+    // data.actions.gossipAroundCoffee.resource += 1e8
+    // data.actions.overclock.resource = 1e20;
+    // statAddAmount("cycle", 40)
+    // statAddAmount("discernment", 200)
 
 
     gameSpeed = 1;
@@ -138,7 +138,7 @@ function initializeData() {
         document.getElementById("jobDisplay").style.display = "";
     }
     createUpgrades();
-    createAndLinkNewAttribute("legends", "legacy");
+    createAndLinkNewAttribute("echoes", "legacy");
 
     createAndLinkNewAttribute("introspection", "awareness");
     createAndLinkNewAttribute("introspection", "curiosity");
@@ -196,13 +196,13 @@ function initializeData() {
     create("reflect", ["distillInsight", "harnessOverflow", "takeNotes", "remember"], -1, -1);
     create("distillInsight", [], -1.1, .5);
     create("harnessOverflow", [], -2, 0); //siftExcess
-    create("takeNotes", ["journal"], -1.1, -.5);
+    create("takeNotes", ["journal", "readBooks"], -1.1, -.5);
     create("bodyAwareness", ["meditate", "standStraighter"],-1, 0);
     create("standStraighter", ["walkAware"], -1, .5);
     create("walkAware", [], -1, .5);
-    create("remember", [], -.2, -1.2);
+    create("remember", ["processEmotions"], -.2, -1.2);
     create("travelOnRoad", ["travelToOutpost", "watchBirds"], 2, 0);
-    create("travelToOutpost", ["meetVillageLeaderScott", "checkNoticeBoard", "browseLocalMarket", "pleasantForest"], 2, 0); //travelToCrossroads
+    create("travelToOutpost", ["meetVillageLeaderScott", "checkNoticeBoard", "browseLocalMarket", "pleasantForest"], 2, 0);
     create("meetVillageLeaderScott", ["helpScottWithChores"], 0, -1);
     create("helpScottWithChores", [], 0, -1);
     create("browseLocalMarket", ["browseStores"], -1, -1);
@@ -213,7 +213,7 @@ function initializeData() {
 
     create("checkNoticeBoard", ["reportForTraining", "reportForLabor"], 1.5, -1);
     create("makeMoney", ["spendMoney"], 1, -1);
-    create("spendMoney", ["buyBasicSupplies", "buySocialAccess", "buyMarketItems"], 0, -.8);
+    create("spendMoney", ["buyBasicSupplies", "buySocialAccess", "buyMarketItems"], 0, -1);
     create("buyBasicSupplies", ["buyBasicClothes", "buyStreetFood"], -1, -1.1);
     create("buyBasicClothes", ["buyTravelersClothes", "buyMatchingClothes"], -1, -1.3);
     create("buyTravelersClothes", [], -1.2, -.2);
@@ -222,7 +222,7 @@ function initializeData() {
     create("buyStreetFood", ["buyGoodFood"], -1, -.3);
     create("buyGoodFood", [], -1.2, -.2);
     create("buyMatchingClothes", ["buyStylishClothes"], -1, -1.2);
-    create("buyStylishClothes", [], -1.2, -.2);
+    create("buyStylishClothes", [], -.5, -1);
 
 
     create("reportForLabor", ["oddJobsLaborer"], 1, 0);
@@ -292,18 +292,10 @@ function initializeData() {
     create("gatherRiverWeeds", ["gatherRarePlants"], 0, 1);
     create("gatherRarePlants", [], 1, .5);
     create("restAtWaterfall", ["visitShrineBehindWaterfall"], 1.3, .5);
-    create("visitShrineBehindWaterfall", [], -.3, -1);
+    create("visitShrineBehindWaterfall", [], .3, 1);
 
-    create("travelToCrossroads", ["forgottenShrine"], 2, 0);
-    create("forgottenShrine", ["resonatingAmulet"], 0, -1);
-    create("resonatingAmulet", [], 0, -1);
+    create("travelToCrossroads", ["feelAGentleTug"], 2, 0);
 
-//Meditate
-    create("journal", [], -1.9, 0); //readTheWritten
-    create("meditate", ["feelTheAche"],-2, 0);
-    create("feelTheAche", ["softenTension"], -1, .5);
-    create("softenTension", ["releaseExpectations"], -1, .5);
-    create("releaseExpectations", [], -1, .5);
 
 //Notice board level 2 / Training & Shortcut pt 2
     create("reportForTraining", ["basicTrainingWithJohn"], -.5, -1);
@@ -325,6 +317,37 @@ function initializeData() {
     create("storyTeller", [], 0, -1);
 
 //Travelling onwards / hermit / dungeon
+    create("meditate", [],-2, 0);
+    create("journal", ["readTheWritten"], -1, -.5);
+    create("readTheWritten", [], -1, -.5);
+
+    create("feelAGentleTug", ["leaveTheOpenRoad"], 1.5, 1);
+    create("leaveTheOpenRoad", ["discoverBurntTown"], 1, 1);
+    create("discoverBurntTown", ["resonanceCompass"], 1, 1);
+    create("resonanceCompass", ["clearIvyWall"], 1, .5);
+    create("clearIvyWall", ["gatherOldBooks"], 1, -.1);
+    create("gatherOldBooks", [], .3, -1);
+
+    create("readBooks", ["catalogNewBooks", "sortBySubject"], -2, 0);
+    create("catalogNewBooks", ["buildPersonalLibrary"], -1, 0);
+    create("buildPersonalLibrary", [], 0, 1);
+    create("sortBySubject", ["readOldStories"], -1, -1);
+    create("readOldStories", ["readOldReligiousTexts", "readWarJournals"], 0, -1);
+    create("readOldReligiousTexts", ["readOldProphecies", "readOldPoetry"], -1, 0);
+    create("readOldProphecies", [], -1, -1);
+    create("readOldPoetry", ["readOldPhilosophy"], 0, -1);
+    create("readOldPhilosophy", [], -.5, -1);
+    create("readWarJournals", [], 0, -1);
+
+    create("processEmotions", ["reviewOldMemories"], -1, -.5);
+    create("reviewOldMemories", ["rememberTheWar", "rememberFriends"], -1, -.5);
+    create("rememberTheWar", ["honorTheLost"], -1, -.5);
+    create("honorTheLost", ["letGoOfGuilt"], 0, -1);
+    create("letGoOfGuilt", [], 0, -1);
+    create("rememberFriends", [], 0, -1.5);
+
+
+
 
 
     //Plane 2

@@ -289,7 +289,7 @@ let actionData = {
         tier:1, plane:0,
         progressMaxBase:7e7, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
-        efficiencyBase:.1, maxLevel:10,
+        efficiencyBase:.3, maxLevel:10,
         unlockCost:1e8, visible:false, unlocked:false, purchased: true,
         onLevelCustom: function() {
             unveilAction('buyBasicSupplies')
@@ -299,7 +299,7 @@ let actionData = {
         },
         onLevelAtts:[["savvy", 5], ["observation", 50]],
         expAtts:[["observation", 1], ["recognition", 1]],
-        efficiencyAtts:[["ambition", 10]]
+        efficiencyAtts:[["ambition", 1]]
     },
     browseStores: {
         tier:1, plane:0,
@@ -405,7 +405,7 @@ let actionData = {
             data.actions.makeMoney.upgradeMult = upgradeMult;
         },
         onLevelAtts:[["ambition", 1]],
-        expAtts:[["adaptability", 1], ["cunning", 1]],
+        expAtts:[["adaptability", 1], ["cunning", 1], ["leverage", 1]],
         efficiencyAtts:[["ambition", 1]],
         actionPowerFunction: function(resource) {
             if(resource < 1) {
@@ -417,7 +417,7 @@ let actionData = {
                 -<span style="font-weight:bold;" id="makeMoneyResourceTaken">???</span> Momentum was taken from this action, converted to<br>
                 +<span style="font-weight:bold;" id="makeMoneyResourceSent">???</span> gold, added to Spend Money.<br>
                 `},
-        extraInfo: {english:Raw.html`<br>Momentum Taken = Current Momentum * Tier Mult.<br>
+        extraInfo: {english:Raw.html`<br>Momentum Taken = !% of Current Momentum.<br>
                         Exp & Gold gain = (Momentum Taken)^.5 * Action Power * Efficiency * Wages.`}
     },
     spendMoney: {
@@ -878,7 +878,7 @@ actionData = {
 
     watchBirds: {
         tier:1, plane:0,
-        progressMaxBase:800000000, progressMaxIncrease:40,
+        progressMaxBase:800000000, progressMaxIncrease:1,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:.6, maxLevel:1,
         unlockCost:400000, visible:false, unlocked:false, purchased: true,
@@ -893,7 +893,7 @@ actionData = {
     },
     catchAScent: {
         tier:1, plane:0,
-        progressMaxBase:1e8, progressMaxIncrease:5,
+        progressMaxBase:1e8, progressMaxIncrease:1,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:.5, maxLevel:1,
         unlockCost:5e6, visible:false, unlocked:false, purchased: true,
@@ -1105,6 +1105,11 @@ actionData = {
         efficiencyBase:1, maxLevel:4,
         unlockCost:1e18, visible:false, unlocked:false, purchased: true,
         onUnlock: function() {
+            statAddAmount("legacy", 1);
+            unveilPlane(0);
+            unveilPlane(1);
+            unveilAction('echoKindle');
+            unveilAction('sparkMana');
         },
         onLevelCustom: function() {
             unveilAction('learnToStayStill')
@@ -1120,7 +1125,8 @@ actionData = {
         },
         onLevelAtts:[["integration", 40]],
         expAtts:[],
-        efficiencyAtts:[]
+        efficiencyAtts:[],
+        unlockMessage:{english:"On unlock, open Magic and +1 Legacy."}
     },
     talkWithScott: {
         tier:1, plane:0, resourceName:"conversations",
@@ -1318,12 +1324,18 @@ actionData = {
         efficiencyBase:1, maxLevel:1,
         unlockCost:1e18, visible:false, unlocked:false, purchased: true,
         onUnlock: function() {
+            unveilAction('meditate');
+            unveilAction('journal');
         },
         onLevelCustom: function() {
         },
         onLevelAtts:[],
         expAtts:[],
-        efficiencyAtts:[]
+        efficiencyAtts:[],
+        storyText: { english: Raw.html`
+        The first step in how to create your own magic: stay still. You've been trying not to do this, but with the instructions of the hermit 
+        it starts to become possible. The hermit notices your difficulty, and mentions that, later, it would help you to find time to meditate, and that 
+        with people that can't still like me it can help to also journal my experiences.` }
     },
     feelTheResonance: {
         tier:1, plane:0,
@@ -1362,10 +1374,8 @@ actionData = {
         onUnlock: function() {
         },
         onLevelCustom: function() {
-            unveilPlane(0);
-            unveilPlane(1);
         },
-        onLevelAtts:[["legacy", 10], ["pulse", 10]],
+        onLevelAtts:[["legacy", 9], ["pulse", 10]],
         expAtts:[],
         efficiencyAtts:[]
     },
@@ -1456,37 +1466,6 @@ actionData = {
         expAtts:[["endurance", 1]],
         efficiencyAtts:[["curiosity", .1]]
     },
-    forgottenShrine: {
-        tier:1, plane:0,
-        progressMaxBase:1e15, progressMaxIncrease:3,
-        expToLevelBase:10, expToLevelIncrease:1,
-        efficiencyBase:1, maxLevel:10,
-        unlockCost:3e13, visible:false, unlocked:false, purchased: true,
-        onUnlock: function() {
-        },
-        onLevelCustom: function() {
-        },
-        onLevelAtts:[["legacy", 20]],
-        expAtts:[],
-        efficiencyAtts:[]
-    },
-    resonatingAmulet: {
-        tier:1, plane:0,
-        progressMaxBase:1e15, progressMaxIncrease:3,
-        expToLevelBase:10, expToLevelIncrease:1,
-        efficiencyBase:1, maxLevel:10,
-        unlockCost:3e13, visible:false, unlocked:false, purchased: true,
-        onUnlock: function() {
-        },
-        onLevelCustom: function() {
-        },
-        onLevelAtts:[["legacy", 30]],
-        expAtts:[],
-        efficiencyAtts:[]
-    },
-
-
-
     standStraighter: {
         tier:1, plane:0,
         progressMaxBase:1e15, progressMaxIncrease:3,
@@ -1507,89 +1486,6 @@ actionData = {
 actionData = {
     ...actionData,
 
-    journal: {
-        tier:1, plane:0,
-        progressMaxBase:2e6, progressMaxIncrease:3,
-        expToLevelBase:10, expToLevelIncrease:1,
-        efficiencyBase:.1, maxLevel:10,
-        unlockCost:1e6, visible:false, unlocked:false, purchased: true,
-        onLevelCustom: function() {
-        },
-        onUnlock: function() {
-        },
-        onLevelAtts:[["awareness", 200], ["curiosity", 50]],
-        expAtts:[["observation", 1], ["energy", 1]],
-        efficiencyAtts:[["cycle", 1]],
-        unlockMessage:{english:"On unlock, +1 max level for Body Awareness."}
-    },
-    meditate: { //purpose: take a while to ramp up, but slowly become the primary overclock increase for a while
-        tier:1, plane:0,
-        progressMaxBase:5e12, progressMaxIncrease:20, //req high initial, reduces with flow
-        expToLevelBase:2, expToLevelIncrease:1,
-        efficiencyBase:.004, maxLevel:1,
-        unlockCost:2e10, visible:false, unlocked:false, purchased: true,
-        onUnlock: function() {
-            // unveilAction('feelTheAche')
-        },
-        onLevelCustom: function() {
-        },
-        onLevelAtts:[["awareness", 6000], ["flow", 5]],
-        expAtts:[["curiosity", 1], ["concentration", 1], ["flow", 1]],
-        efficiencyAtts:[["endurance", 1]]
-    },
-    feelTheAche: {
-        tier:1, plane:0,
-        progressMaxBase:5e5, progressMaxIncrease:1.05,
-        expToLevelBase:10, expToLevelIncrease:1,
-        efficiencyBase:.2, maxLevel:1,
-        unlockCost:2e6, visible:false, unlocked:false, purchased: true,
-        onUnlock: function() {
-            unveilAction('softenTension')
-        },
-        onLevelCustom: function() {
-            data.actions.meditate.maxLevel+=1
-        },
-        onLevelAtts:[["flow", 1]],
-        expAtts:[],
-        efficiencyAtts:[["flow", .1]],
-        onLevelText:{english:"+1 max level for Meditate."}
-    },
-    softenTension: {
-        tier:1, plane:0,
-        progressMaxBase:2e5, progressMaxIncrease:1.1,
-        expToLevelBase:10, expToLevelIncrease:1,
-        efficiencyBase:.3, maxLevel:1,
-        unlockCost:2e6, visible:false, unlocked:false, purchased: true,
-        onUnlock: function() {
-            unveilAction('releaseExpectations')
-        },
-        onLevelCustom: function() {
-            data.actions.feelTheAche.maxLevel+=1
-        },
-        onLevelAtts:[["flow", 2]],
-        expAtts:[],
-        efficiencyAtts:[["flow", .1]],
-        onLevelText:{english:"+1 max level for Feel The Ache."}
-    },
-    releaseExpectations: {
-        tier:1, plane:0,
-        progressMaxBase:2e5, progressMaxIncrease:1.1,
-        expToLevelBase:10, expToLevelIncrease:1,
-        efficiencyBase:.4, maxLevel:20,
-        unlockCost:2e6, visible:false, unlocked:false, purchased: true,
-        onUnlock: function() {
-        },
-        onLevelCustom: function() {
-            data.actions.softenTension.maxLevel+=1
-            // unveilAction('walkAware')
-            // unveilAction('readTheWritten')
-            // unveilAction('standStraighter')
-        },
-        onLevelAtts:[["flow", 3]],
-        expAtts:[],
-        efficiencyAtts:[["flow", .1]],
-        onLevelText:{english:"+1 max level for Soften Tension."}
-    },
     walkAware: {
         tier:1, plane:0,
         progressMaxBase:250, progressMaxIncrease:1.1,
@@ -1793,10 +1689,39 @@ actionData = {
 }
 
 
-//TODO..
+//After Hermit
 actionData = {
     ...actionData,
 
+    meditate: {
+        tier:1, plane:0,
+        progressMaxBase:5e12, progressMaxIncrease:20,
+        expToLevelBase:2, expToLevelIncrease:1,
+        efficiencyBase:.004, maxLevel:1,
+        unlockCost:2e10, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+        },
+        onLevelCustom: function() {
+        },
+        onLevelAtts:[["awareness", 6000], ["flow", 5]],
+        expAtts:[["curiosity", 1], ["concentration", 1], ["flow", 1]],
+        efficiencyAtts:[["endurance", 1]]
+    },
+    journal: {
+        tier:1, plane:0,
+        progressMaxBase:2e6, progressMaxIncrease:3,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:.1, maxLevel:10,
+        unlockCost:1e6, visible:false, unlocked:false, purchased: true,
+        onLevelCustom: function() {
+        },
+        onUnlock: function() {
+        },
+        onLevelAtts:[["awareness", 200], ["curiosity", 50]],
+        expAtts:[["observation", 1], ["energy", 1]],
+        efficiencyAtts:[["cycle", 1]],
+        unlockMessage:{english:"On unlock, +1 max level for Body Awareness."}
+    },
     readTheWritten: {
         tier:1, plane:0,
         progressMaxBase:10000000, progressMaxIncrease:2,
@@ -1811,6 +1736,315 @@ actionData = {
         expAtts:[["observation", 1], ["energy", 1]],
         efficiencyAtts:[["cycle", 1]]
     },
+    feelAGentleTug: {
+        tier:1, plane:0,
+        progressMaxBase:1e15, progressMaxIncrease:10,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:.1, maxLevel:10,
+        unlockCost:3e13, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+        },
+        onLevelCustom: function() {
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[["curiosity", .1]]
+    },
+    leaveTheOpenRoad: {
+        tier:1, plane:0,
+        progressMaxBase:1e15, progressMaxIncrease:10,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:.1, maxLevel:10,
+        unlockCost:3e13, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+        },
+        onLevelCustom: function() {
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[["curiosity", .1]]
+    },
+    discoverBurntTown: {
+        tier:1, plane:0,
+        progressMaxBase:1e15, progressMaxIncrease:10,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:.1, maxLevel:10,
+        unlockCost:3e13, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+        },
+        onLevelCustom: function() {
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[["curiosity", .1]]
+    },
+    resonanceCompass: {
+        tier:1, plane:0,
+        progressMaxBase:1e15, progressMaxIncrease:10,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:.1, maxLevel:10,
+        unlockCost:3e13, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+        },
+        onLevelCustom: function() {
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[["curiosity", .1]]
+    },
+    clearIvyWall: {
+        tier:1, plane:0,
+        progressMaxBase:1e15, progressMaxIncrease:10,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:.1, maxLevel:10,
+        unlockCost:3e13, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+        },
+        onLevelCustom: function() {
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[["curiosity", .1]]
+    },
+    gatherOldBooks: {
+        tier:1, plane:0,
+        progressMaxBase:1e15, progressMaxIncrease:10,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:.1, maxLevel:10,
+        unlockCost:3e13, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+        },
+        onLevelCustom: function() {
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[["curiosity", .1]]
+    },
+    readBooks: {
+        tier:1, plane:0,
+        progressMaxBase:1e15, progressMaxIncrease:10,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:.1, maxLevel:10,
+        unlockCost:3e13, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+        },
+        onLevelCustom: function() {
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[["curiosity", .1]]
+    },
+    catalogNewBooks: {
+        tier:1, plane:0,
+        progressMaxBase:1e15, progressMaxIncrease:10,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:.1, maxLevel:10,
+        unlockCost:3e13, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+        },
+        onLevelCustom: function() {
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[["curiosity", .1]]
+    },
+    buildPersonalLibrary: {
+        tier:1, plane:0,
+        progressMaxBase:1e15, progressMaxIncrease:10,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:.1, maxLevel:10,
+        unlockCost:3e13, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+        },
+        onLevelCustom: function() {
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[["curiosity", .1]]
+    },
+    sortBySubject: {
+        tier:1, plane:0,
+        progressMaxBase:1e15, progressMaxIncrease:10,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:.1, maxLevel:10,
+        unlockCost:3e13, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+        },
+        onLevelCustom: function() {
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[["curiosity", .1]]
+    },
+    readOldStories: {
+        tier:1, plane:0,
+        progressMaxBase:1e15, progressMaxIncrease:10,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:.1, maxLevel:10,
+        unlockCost:3e13, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+        },
+        onLevelCustom: function() {
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[["curiosity", .1]]
+    },
+    readOldReligiousTexts: {
+        tier:1, plane:0,
+        progressMaxBase:1e15, progressMaxIncrease:10,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:.1, maxLevel:10,
+        unlockCost:3e13, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+        },
+        onLevelCustom: function() {
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[["curiosity", .1]]
+    },
+    readOldProphecies: {
+        tier:1, plane:0,
+        progressMaxBase:1e15, progressMaxIncrease:10,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:.1, maxLevel:10,
+        unlockCost:3e13, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+        },
+        onLevelCustom: function() {
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[["curiosity", .1]]
+    },
+    readOldPoetry: {
+        tier:1, plane:0,
+        progressMaxBase:1e15, progressMaxIncrease:10,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:.1, maxLevel:10,
+        unlockCost:3e13, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+        },
+        onLevelCustom: function() {
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[["curiosity", .1]]
+    },
+    readOldPhilosophy: {
+        tier:1, plane:0,
+        progressMaxBase:1e15, progressMaxIncrease:10,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:.1, maxLevel:10,
+        unlockCost:3e13, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+        },
+        onLevelCustom: function() {
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[["curiosity", .1]]
+    },
+    readWarJournals: {
+        tier:1, plane:0,
+        progressMaxBase:1e15, progressMaxIncrease:10,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:.1, maxLevel:10,
+        unlockCost:3e13, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+        },
+        onLevelCustom: function() {
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[["curiosity", .1]]
+    },
+    processEmotions: {
+        tier:1, plane:0,
+        progressMaxBase:1e15, progressMaxIncrease:10,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:.1, maxLevel:10,
+        unlockCost:3e13, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+        },
+        onLevelCustom: function() {
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[["curiosity", .1]]
+    },
+    reviewOldMemories: {
+        tier:1, plane:0,
+        progressMaxBase:1e15, progressMaxIncrease:10,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:.1, maxLevel:10,
+        unlockCost:3e13, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+        },
+        onLevelCustom: function() {
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[["curiosity", .1]]
+    },
+    rememberTheWar: {
+        tier:1, plane:0,
+        progressMaxBase:1e15, progressMaxIncrease:10,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:.1, maxLevel:10,
+        unlockCost:3e13, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+        },
+        onLevelCustom: function() {
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[["curiosity", .1]]
+    },
+    honorTheLost: {
+        tier:1, plane:0,
+        progressMaxBase:1e15, progressMaxIncrease:10,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:.1, maxLevel:10,
+        unlockCost:3e13, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+        },
+        onLevelCustom: function() {
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[["curiosity", .1]]
+    },
+    letGoOfGuilt: {
+        tier:1, plane:0,
+        progressMaxBase:1e15, progressMaxIncrease:10,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:.1, maxLevel:10,
+        unlockCost:3e13, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+        },
+        onLevelCustom: function() {
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[["curiosity", .1]]
+    },
+    rememberFriends: {
+        tier:1, plane:0,
+        progressMaxBase:1e15, progressMaxIncrease:10,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:.1, maxLevel:10,
+        unlockCost:3e13, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+        },
+        onLevelCustom: function() {
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[["curiosity", .1]]
+    },
+
     siftExcess: { //? dunno the purpose yet
         tier:1, plane:0,
         progressMaxBase:100000, progressMaxIncrease:2,
@@ -1915,7 +2149,7 @@ actionData = {
     ...actionData,
 
     worry: {
-        tier:1, plane:2, resourceName: "fear",
+        tier:0, plane:2, resourceName: "fear",
         progressMaxBase:60, progressMaxIncrease:1,
         expToLevelBase:60, expToLevelIncrease:1,
         efficiencyBase:1, isKTL:true, purchased: true,
@@ -1925,7 +2159,7 @@ actionData = {
         efficiencyAtts:[]
     },
     overclockTargetingTheLich: {
-        tier:1, plane:2, resourceName:"momentum",
+        tier:0, plane:2, resourceName:"momentum",
         progressMaxBase:60, progressMaxIncrease:1,
         expToLevelBase:60, expToLevelIncrease:1,
         efficiencyBase:1, isKTL:true, purchased: true,
@@ -1938,7 +2172,7 @@ actionData = {
         efficiencyAtts:[]
     },
     fightTheEvilForces: {
-        tier:1, plane:2, resourceName:"fight",
+        tier:0, plane:2, resourceName:"fight",
         progressMaxBase:60, progressMaxIncrease:1,
         expToLevelBase:60, expToLevelIncrease:1,
         efficiencyBase:1, isKTL:true, purchased: true,
@@ -1948,7 +2182,7 @@ actionData = {
         efficiencyAtts:[]
     },
     bridgeOfBone: {
-        tier:1, plane:2,
+        tier:0, plane:2, resourceName:"fight",
         progressMaxBase:1e10, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
@@ -1958,7 +2192,7 @@ actionData = {
             data.useAmuletButtonShowing = true;
         },
         onCompleteCustom:function() {
-            data.legacy += 3;
+            statAddAmount("legacy", 2);
         },
         onLevelCustom: function() {
             if(data.actions.bridgeOfBone.level >= 3) {
@@ -1968,11 +2202,11 @@ actionData = {
         onLevelAtts:[],
         expAtts:[["legacy", .1], ["legacy", .1]],
         efficiencyAtts:[],
-        extraInfo:{english:"1 Legacy per complete."},
+        extraInfo:{english:"+2 Legacy per complete."},
         unlockMessage:{english:"On unlock, +3 Ancient Coins."}
     },
     harvestGhostlyField: {
-        tier:1, plane:2,
+        tier:0, plane:2, resourceName:"fight",
         progressMaxBase:1e10, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1, isKTL:true, purchased: true, maxLevel:30,
@@ -1995,7 +2229,7 @@ actionData = {
         unlockMessage:{english:"On unlock, +4 Ancient Coins."}
     },
     geyserFields: {
-        tier:1, plane:2,
+        tier:0, plane:2, resourceName:"fight",
         progressMaxBase:1e10, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1, isKTL:true, purchased: true, maxLevel:35,
@@ -2018,7 +2252,7 @@ actionData = {
         unlockMessage:{english:"On unlock, +5 Ancient Coins."}
     },
     destroySiegeEngine: {
-        tier:1, plane:2,
+        tier:0, plane:2, resourceName:"fight",
         progressMaxBase:1e10, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1, isKTL:true, purchased: true, maxLevel:40,
@@ -2041,7 +2275,7 @@ actionData = {
         unlockMessage:{english:"On unlock, +6 Ancient Coins."}
     },
     destroyEasternMonolith: {
-        tier:1, plane:2,
+        tier:0, plane:2, resourceName:"fight",
         progressMaxBase:1e10, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1, isKTL:true, purchased: true, maxLevel:1,
@@ -2064,7 +2298,7 @@ actionData = {
         unlockMessage:{english:"On unlock, +7 Ancient Coins."}
     },
     stopDarknessRitual: {
-        tier:1, plane:2,
+        tier:0, plane:2, resourceName:"fight",
         progressMaxBase:1e10, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1, isKTL:true, purchased: false, maxLevel:10,
@@ -2084,7 +2318,7 @@ actionData = {
         unlockMessage:{english:"On unlock, +1 Ancient Coins."}
     },
     protectTheSunstone: {
-        tier:1, plane:2,
+        tier:0, plane:2, resourceName:"fight",
         progressMaxBase:1e10, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
@@ -2105,7 +2339,7 @@ actionData = {
         unlockMessage:{english:"On unlock, +1 Ancient Coins."}
     },
     silenceDeathChanters: {
-        tier:1, plane:2,
+        tier:0, plane:2, resourceName:"fight",
         progressMaxBase:1e10, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
@@ -2127,7 +2361,7 @@ actionData = {
         unlockMessage:{english:"On unlock, +1 Ancient Coins."}
     },
     breakFleshBarricade: {
-        tier:1, plane:2,
+        tier:0, plane:2, resourceName:"fight",
         progressMaxBase:1e10, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
@@ -2149,7 +2383,7 @@ actionData = {
         unlockMessage:{english:"On unlock, +1 Ancient Coins."}
     },
     conquerTheGatekeepers: {
-        tier:1, plane:2,
+        tier:0, plane:2, resourceName:"fight",
         progressMaxBase:1e10, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
@@ -2171,7 +2405,7 @@ actionData = {
         unlockMessage:{english:"On unlock, +1 Ancient Coins."}
     },
     unhookSacrificialCages: {
-        tier:1, plane:2,
+        tier:0, plane:2, resourceName:"fight",
         progressMaxBase:1e10, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
@@ -2193,7 +2427,7 @@ actionData = {
         unlockMessage:{english:"On unlock, +1 Ancient Coins."}
     },
     purgeUnholyRelics: {
-        tier:1, plane:2,
+        tier:0, plane:2, resourceName:"fight",
         progressMaxBase:1e10, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
@@ -2215,7 +2449,7 @@ actionData = {
         unlockMessage:{english:"On unlock, +1 Ancient Coins."}
     },
     destroyWesternMonolith: {
-        tier:1, plane:2,
+        tier:0, plane:2, resourceName:"fight",
         progressMaxBase:1e10, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
@@ -2237,7 +2471,7 @@ actionData = {
         unlockMessage:{english:"On unlock, +1 Ancient Coins."}
     },
     destroyFleshGrowths: {
-        tier:1, plane:2,
+        tier:0, plane:2, resourceName:"fight",
         progressMaxBase:1e10, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
@@ -2259,7 +2493,7 @@ actionData = {
         unlockMessage:{english:"On unlock, +1 Ancient Coins."}
     },
     crackCorruptedEggs: {
-        tier:1, plane:2,
+        tier:0, plane:2, resourceName:"fight",
         progressMaxBase:1e10, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
@@ -2281,7 +2515,7 @@ actionData = {
         unlockMessage:{english:"On unlock, +1 Ancient Coins."}
     },
     kiteTheAbomination: {
-        tier:1, plane:2,
+        tier:0, plane:2, resourceName:"fight",
         progressMaxBase:1e10, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
@@ -2303,7 +2537,7 @@ actionData = {
         unlockMessage:{english:"On unlock, +1 Ancient Coins."}
     },
     collapseCorpseTower: {
-        tier:1, plane:2,
+        tier:0, plane:2, resourceName:"fight",
         progressMaxBase:1e10, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
@@ -2325,7 +2559,7 @@ actionData = {
         unlockMessage:{english:"On unlock, +1 Ancient Coins."}
     },
     surviveLivingSiegeEngine: {
-        tier:1, plane:2,
+        tier:0, plane:2, resourceName:"fight",
         progressMaxBase:1e10, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
@@ -2347,7 +2581,7 @@ actionData = {
         unlockMessage:{english:"On unlock, +1 Ancient Coins."}
     },
     destroySouthernMonolith: {
-        tier:1, plane:2,
+        tier:0, plane:2, resourceName:"fight",
         progressMaxBase:1e10, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
@@ -2369,7 +2603,7 @@ actionData = {
         unlockMessage:{english:"On unlock, +1 Ancient Coins."}
     },
     burnFleshPits: {
-        tier:1, plane:2,
+        tier:0, plane:2, resourceName:"fight",
         progressMaxBase:1e10, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
@@ -2391,7 +2625,7 @@ actionData = {
         unlockMessage:{english:"On unlock, +1 Ancient Coins."}
     },
     openSoulGate: {
-        tier:1, plane:2,
+        tier:0, plane:2, resourceName:"fight",
         progressMaxBase:1e10, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
@@ -2413,7 +2647,7 @@ actionData = {
         unlockMessage:{english:"On unlock, +1 Ancient Coins."}
     },
     shatterTraps: {
-        tier:1, plane:2,
+        tier:0, plane:2, resourceName:"fight",
         progressMaxBase:1e10, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
@@ -2435,7 +2669,7 @@ actionData = {
         unlockMessage:{english:"On unlock, +1 Ancient Coins."}
     },
     killTheArchitect: {
-        tier:1, plane:2,
+        tier:0, plane:2, resourceName:"fight",
         progressMaxBase:1e10, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
@@ -2457,7 +2691,7 @@ actionData = {
         unlockMessage:{english:"On unlock, +1 Ancient Coins."}
     },
     destroyNorthernMonolith: {
-        tier:1, plane:2,
+        tier:0, plane:2, resourceName:"fight",
         progressMaxBase:1e10, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
@@ -2479,7 +2713,7 @@ actionData = {
         unlockMessage:{english:"On unlock, +1 Ancient Coins."}
     },
     breakOutOfEndlessMaze: {
-        tier:1, plane:2,
+        tier:0, plane:2, resourceName:"fight",
         progressMaxBase:1e10, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
@@ -2501,7 +2735,7 @@ actionData = {
         unlockMessage:{english:"On unlock, +1 Ancient Coins."}
     },
     killDopplegangers: {
-        tier:1, plane:2,
+        tier:0, plane:2, resourceName:"fight",
         progressMaxBase:1e10, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
@@ -2523,7 +2757,7 @@ actionData = {
         unlockMessage:{english:"On unlock, +1 Ancient Coins."}
     },
     killDeathKnights: {
-        tier:1, plane:2,
+        tier:0, plane:2, resourceName:"fight",
         progressMaxBase:1e10, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
@@ -2545,7 +2779,7 @@ actionData = {
         unlockMessage:{english:"On unlock, +1 Ancient Coins."}
     },
     silenceDoomScribe: {
-        tier:1, plane:2,
+        tier:0, plane:2, resourceName:"fight",
         progressMaxBase:1e10, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
@@ -2567,7 +2801,7 @@ actionData = {
         unlockMessage:{english:"On unlock, +1 Ancient Coins."}
     },
     removeWards: {
-        tier:1, plane:2,
+        tier:0, plane:2, resourceName:"fight",
         progressMaxBase:1e10, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
@@ -2589,7 +2823,7 @@ actionData = {
         unlockMessage:{english:"On unlock, +1 Ancient Coins."}
     },
     fightTheLich: {
-        tier:1, plane:2,
+        tier:0, plane:2, resourceName:"fight",
         progressMaxBase:1e10, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
@@ -2611,7 +2845,7 @@ actionData = {
         unlockMessage:{english:"On unlock, +1 Ancient Coins."}
     },
     killTheLich: {
-        tier:1, plane:2,
+        tier:0, plane:2, resourceName:"fight",
         progressMaxBase:1e10, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
@@ -2633,14 +2867,13 @@ actionData = {
         unlockMessage:{english:"On unlock, +1 Ancient Coins."}
     },
     shatterPhylactery: {
-        tier:1, plane:2,
+        tier:0, plane:2, resourceName:"fight",
         progressMaxBase:1e10, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
         unlockCost:1e9, visible:true, unlocked:false,
         onUnlock: function() {
             data.ancientCoin += 1;
-
         },
         onCompleteCustom:function() {
             data.legacy += 1;
@@ -2666,7 +2899,7 @@ actionData = {
         expToLevelBase:10000000, expToLevelIncrease:1.2,
         actionPowerBase:1, actionPowerMult:1, actionPowerMultIncrease:1.05,
         efficiencyBase:.005,
-        unlockCost:0, visible:true, unlocked:true, purchased: true, hasDeltas: false,
+        unlockCost:0, visible:false, unlocked:false, purchased: true, hasDeltas: false,
         isGenerator:true, generatorTarget:"sparkMana", generatorSpeed:100,
         onCompleteCustom: function() {
             let actionObj = data.actions.echoKindle;
@@ -2707,8 +2940,9 @@ actionData = {
         progressMaxBase:1000, progressMaxIncrease:4,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:1,
-        unlockCost:25, visible:true, unlocked:false, purchased: true, hasUpstream:false,
+        unlockCost:25, visible:false, unlocked:false, purchased: true, hasUpstream:false,
         onUnlock: function() {
+            data.actions.poolMana.unlocked = true;
             unveilAction('poolMana');
             data.actions.poolMana.generatorSpeed = 6;
             unveilAction('expelMana')
@@ -2725,7 +2959,7 @@ actionData = {
         expToLevelBase:2, expToLevelIncrease:3,
         actionPowerBase:1, actionPowerMult:1, actionPowerMultIncrease:1.03,
         efficiencyBase:.08,
-        unlockCost:0, visible:false, unlocked:true, purchased: true, hasDeltas: false, hasUpstream:false,
+        unlockCost:0, visible:false, unlocked:false, purchased: true, hasDeltas: false, hasUpstream:false,
         isGenerator:true, generatorTarget:"poolMana", generatorSpeed:0,
         onCompleteCustom: function() {
             let sparkManaObj = data.actions.sparkMana;

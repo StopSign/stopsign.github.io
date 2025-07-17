@@ -304,7 +304,6 @@ function unveilAction(actionVar) {
 
 
     actionObj.visible = true;
-
     revealActionAtts(actionObj);
 
     //set all downstream actions to 1% when you unlock
@@ -327,11 +326,15 @@ function unveilAction(actionVar) {
 
 function revealActionAtts(actionObj) {
     for(let onLevelAtt of actionObj.onLevelAtts) {
+        if(actionObj.actionVar === "echoKindle") {
+            console.log('here1');
+        }
         revealAtt(onLevelAtt[0]);
     }
 }
 
 function revealAtt(attVar) {
+    // console.log(attVar);
     let attObj = data.atts[attVar];
     attObj.unlocked = true; //sets the side menu
 

@@ -341,6 +341,7 @@ function generateActionDisplay(actionVar) {
     queueCache(`${actionVar}Container`)
     queueCache(`${actionVar}LargeVersionContainer`)
     queueCache(`${actionVar}SmallVersionContainer`)
+    queueCache(`${actionVar}SmallVersionTitle`)
     queueCache(`${actionVar}Level2`)
 //transform-style: preserve-3d;
     theStr += Raw.html`
@@ -361,8 +362,10 @@ function generateActionDisplay(actionVar) {
                 ${dataObj.extraButton ?? ""}
             </div>
             <div id="${actionVar}SmallVersionContainer" style="display:none;text-align:center;margin:50px auto;font-size:12px;width:100px;">
-                <span style="font-size:16px;font-weight:bold;">${actionObj.title}</span><br>
-                Level <span id="${actionVar}Level2" style="font-weight:bold;"></span>
+                <span id="${actionVar}SmallVersionTitle">
+                    <span style="font-size:16px;font-weight:bold;">${actionObj.title}</span><br>
+                    Level <span id="${actionVar}Level2" style="font-weight:bold;"></span>
+                </span>
             </div>
             ${maxLevel}
         </div>`;
@@ -432,7 +435,7 @@ function generateOutsideAttDisplay(actionObj, attObj, type) {
         : (type === "exp"
             ? "--attribute-use-exp-color"
             : "--attribute-use-eff-color");
-    borderColor = statName === "legacy" ? "--legacy-color-bg" : borderColor;
+    // borderColor = statName === "legacy" ? "--legacy-color-bg" : borderColor;
 
     let backgroundColor = type === "add"
         ? "--attribute-add-bg-color"

@@ -264,12 +264,6 @@ function load() {
     // recalcInterval(data.options.updateRate);
     views.updateView();
 
-    for(let actionVar in data.actions) {
-        let actionObj = data.actions[actionVar];
-        if (actionObj.visible) {
-            revealActionAtts(actionObj); //reveals the patch map reset actions
-        }
-    }
 
     debug(); //change game after all else, for easier debugging
 }
@@ -371,7 +365,7 @@ function updateUIFromLoad() {
     for (let actionVar in data.actions) {
         let actionObj = data.actions[actionVar];
         clickActionMenu(actionVar, actionObj.currentMenu, true);
-        if (actionObj.unlocked) {
+        if (actionObj.unlocked || actionObj.visible) {
             revealActionAtts(actionObj);
         }
     }

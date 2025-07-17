@@ -103,7 +103,7 @@ function setZoomNoMouse(newScale) {
     const centerY = rect.height / 2;
 
     const prevScale = scale;
-    scale = Math.min(maxScale, newScale);
+    scale = Math.max(minScale, Math.min(maxScale, newScale));
     const scaleFactor = scale / prevScale;
 
     const dx = (centerX - transformX[data.planeTabSelected]) * (1 - scaleFactor);
@@ -430,7 +430,7 @@ function updateAttActionContainers() {
         let dataObj = actionData[actionVar];
         for (let attObj of dataObj.onLevelAtts) {
             let attVar = attObj[0];
-            views.updateVal(`${actionVar}${attVar}OutsideContaineradd`, selectedStat && selectedStat === attVar ? "var(--text-selected-color)" : (attVar !== "legacy" ? "var(--attribute-add-color)" : "var(--legacy-color-bg)"), "style.borderColor");
+            views.updateVal(`${actionVar}${attVar}OutsideContaineradd`, selectedStat && selectedStat === attVar ? "var(--text-selected-color)" : "var(--attribute-add-color)", "style.borderColor");
             views.updateVal(`${actionVar}${attVar}InsideContaineradd`, selectedStat && selectedStat === attVar ? "var(--text-selected-color)" : "transparent", "style.borderColor");
         }
         for (let attObj of dataObj.expAtts) {

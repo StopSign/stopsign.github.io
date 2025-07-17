@@ -166,9 +166,6 @@ actionData.upgrades = {
         },
         onBuy: function(num) {
             purchaseAction('meditate');
-            purchaseAction('feelTheAche');
-            purchaseAction('softenTension');
-            purchaseAction('releaseExpectations');
             purchaseAction('walkAware');
         }
     }, //STORY|30 - meditate path

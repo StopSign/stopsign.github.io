@@ -25,12 +25,19 @@ document.addEventListener("keydown", function(e) {
         switchToPlane(3)
     }
 
+    if (keysPressed['q']) {
+        setZoomNoMouse(scale - scaleStep*2)
+    }
+    if (keysPressed['e']) {
+        setZoomNoMouse(scale + scaleStep*2)
+    }
+
 
     if(keysPressed['r']) {
         actionTitleClicked('overclock');
     }
 
-    if (!animationFrameId && ['w', 'a', 's', 'd', 'q', 'r', 'arrowleft', 'arrowup', 'arrowdown', 'arrowright'].includes(key)) {
+    if (!animationFrameId && ['w', 'a', 's', 'd', 'r', 'arrowleft', 'arrowup', 'arrowdown', 'arrowright'].includes(key)) {
         moveActionContainer();
     }
 });
@@ -63,12 +70,6 @@ function moveActionContainer() {
     }
 
 
-    if (keysPressed['q']) {
-        setZoomNoMouse(scale - scaleStep/10)
-    }
-    if (keysPressed['e']) {
-        setZoomNoMouse(scale + scaleStep/10)
-    }
 
     // forceRedraw(windowElement);
 

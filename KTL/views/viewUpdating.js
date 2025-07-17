@@ -153,6 +153,9 @@ let views = {
         // views.updateVal(`${actionVar}LargeVersionContainer`, !mediumVersion?"":(1 / (scale) / 2 + .5)*.8+"", "style.scale");
         views.updateVal(`${actionVar}SmallVersionContainer`, (1 / scale)*.8+"", "style.scale");
 
+        views.updateVal(`${actionVar}SmallVersionTitle`, scale < .11 ? "0" : "1" , "style.opacity");
+        // views.updateVal(`${actionVar}SmallVersionTitle`, scale < .11 ? "none" : "" , "style.display");
+
         // if(!miniVersion) { //don't check in small
         //     views.updateVal(`${actionVar}DeltasDisplayContainer`, mediumVersion?"none":"", "style.display");
         //     views.updateVal(`${actionVar}BalanceNeedleLabel`, mediumVersion?"none":"", "style.display");
