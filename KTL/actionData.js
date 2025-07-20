@@ -540,7 +540,7 @@ let actionData = {
         tier:2, plane:0, resourceName:"gold",
         progressMaxBase:5e16, progressMaxIncrease:1,
         expToLevelBase:1, expToLevelIncrease:1,
-        efficiencyBase:.1, maxLevel:1,
+        efficiencyBase:.2, maxLevel:1,
         unlockCost:4e15, visible:false, unlocked:false, purchased: true,
         onUnlock:function() {
         },
@@ -552,10 +552,10 @@ let actionData = {
     },
     buyCoffee: {
         tier:2, plane:0, resourceName:"gold",
-        progressMaxBase:5e17, progressMaxIncrease:10,
+        progressMaxBase:5e19, progressMaxIncrease:10,
         expToLevelBase:10, expToLevelIncrease:1,
-        efficiencyBase:.1, maxLevel:10,
-        unlockCost:2e16, visible:false, unlocked:false, purchased: true,
+        efficiencyBase:.05, maxLevel:10,
+        unlockCost:2e17, visible:false, unlocked:false, purchased: true,
         onUnlock:function() {
         },
         onLevelCustom: function() {
@@ -786,12 +786,13 @@ let actionData = {
     },
     joinCoffeeClub: {
         tier:1, plane:0, resourceName:"conversations",
-        progressMaxBase:3000000000, progressMaxIncrease:1,
+        progressMaxBase:600000000000, progressMaxIncrease:1,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:.00001,
         unlockCost:20000, maxLevel:1,
         visible:false, unlocked:false, purchased: true,
         onUnlock: function() {
+            unveilAction('buyCoffee');
         },
         onLevelCustom: function() {
             unveilAction('gossipAroundCoffee');
@@ -813,12 +814,12 @@ let actionData = {
         onLevelCustom: function () {
         },
         onLevelAtts:[["discernment", 10]],
-        expAtts:[["cunning", 10]],
+        expAtts:[["cunning", 1]],
         efficiencyAtts:[["discernment", .5]],
     },
     hearAboutTheLich: {
         tier:2, plane:0, resourceName:"fear",
-        progressMaxBase:200, progressMaxIncrease:1,
+        progressMaxBase:200000, progressMaxIncrease:1e6,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:1,
         unlockCost:0, maxLevel:1,
@@ -843,10 +844,10 @@ let actionData = {
         },
         calcFearGain: function() {
             return Math.pow((data.totalMomentum + data.actions.overclock.resourceToAdd)/1e20, .25) *
-                Math.sqrt(data.actions.gossipAroundCoffee.resource / 1000);
+                Math.sqrt(data.actions.gossipAroundCoffee.resource / 100000);
         },
         onLevelAtts:[["integration", 200]],
-        expAtts:[],
+        expAtts:[["legacy", 1]],
         efficiencyAtts:[],
         extraButton: Raw.html`
 <!--<div style="position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); padding: 20px 40px; -->
@@ -859,8 +860,25 @@ let actionData = {
             Kill the Lich!</span>
         `,
         unlockMessage:{english:"Unlocks when Gossip Around Coffee is level 1."},
-        extraInfo: {english:Raw.html`This action gains (Total Momentum / 1e20)^.25 * (.1% of Conversations on Gossip)^.5 Fear for each Overclock complete, which is a gain of
-        <span style="font-weight:bold;" id="hearAboutTheLichActionPower">0</span>`}
+        extraInfo: {english:Raw.html`This action gains (Total Momentum / 1e20)^.25 * (Conversations on Gossip / 100k)^.5 Fear 
+        for each Overclock complete, which is a gain of
+        <span style="font-weight:bold;" id="hearAboutTheLichActionPower">0</span>`},
+        storyText: {english:Raw.html`
+        It is my worst nightmare become reality; the lich has returned. My lost home country, Sovvgor, had only ever delayed the 
+        lich with the Emperor's Curse. All I had known, all the horror I had witnessed... was only a delay. Perhaps that situation
+        was engineered by the lich in the background, in order to get around the blockade of the Curse.<br><br>
+        
+        It mattered little. There was a lich, it was coming for all humanity, and I was prepared.<br><br>
+        
+        I was terrified at the idea of trying to go against the lich, but I thought of how many lives had been sacrificed 
+        and ruined at the altar of this monstrosity's rampage. In what felt like such a short time, Overclock had grown far 
+        beyond what I had achieved to Get Safe, and I was ready I could bend fate in my favor to kill the lich.<br><br>
+        
+        This time, however, I was going to go prepared; I knew Fate could only bend so far at a time. I had just received magic,
+        and knew that all I needed was to show I had power in my spells, and they would let me join them.<br><br>
+        
+        I was sure that Overclock could handle the rest.`},
+        onLevelText:{english:"Increases Anxiety gained when Overclock's Target is switched."}
     },
 
 //--- From upgrades ---
@@ -971,7 +989,7 @@ actionData = {
     },
     spotAPath: {
         tier:1, plane:0,
-        progressMaxBase:1e16, progressMaxIncrease:3,
+        progressMaxBase:3e16, progressMaxIncrease:3,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:.01, maxLevel:1,
         unlockCost:3e13, visible:false, unlocked:false, purchased: true,
@@ -986,7 +1004,7 @@ actionData = {
     },
     pleasantForest: {
         tier:1, plane:0,
-        progressMaxBase:2e16, progressMaxIncrease:10,
+        progressMaxBase:2e16, progressMaxIncrease:9,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.2, maxLevel:10,
         unlockCost:1e15, visible:false, unlocked:false, purchased: true,
@@ -996,7 +1014,7 @@ actionData = {
         onLevelCustom: function() {
         },
         onLevelAtts:[["observation", 2000]],
-        expAtts:[["endurance", 1]],
+        expAtts:[["endurance", 1], ["flow", 1]],
         efficiencyAtts:[["curiosity", .01]]
     },
     hiddenPath: {
@@ -1025,7 +1043,7 @@ actionData = {
             unveilAction('socialize');
         },
         onLevelCustom: function() {
-            unveilAction('annoyHermitIntoAQuest')
+            unveilAction('pesterHermitForSecrets')
             if(data.actions.meetGrumpyHermit.level >= 2) {
                 unveilAction('talkToHermit');
             }
@@ -1050,7 +1068,7 @@ actionData = {
         expAtts:[["endurance", 1]],
         efficiencyAtts:[]
     },
-    annoyHermitIntoAQuest: {
+    pesterHermitForSecrets: {
         tier:1, plane:0,
         progressMaxBase:3e15, progressMaxIncrease:1,
         expToLevelBase:100, expToLevelIncrease:1,
@@ -1084,11 +1102,11 @@ actionData = {
     },
     talkToHermit: {
         tier:1, plane:0,
-        progressMaxBase:100e17, progressMaxIncrease:1,
+        progressMaxBase:100e18, progressMaxIncrease:1,
         expToLevelBase:10, expToLevelIncrease:1,
-        efficiencyBase:.00001, maxLevel:1,
+        efficiencyBase:.00003, maxLevel:1,
         unlockCost:100e15, visible:false, unlocked:false, purchased: true,
-        onUnlock: function() {
+        onUnlock: function() {f
             unveilAction('chatWithHermit')
             unveilAction('tellAJoke')
         },
@@ -1100,14 +1118,16 @@ actionData = {
     },
     inquireAboutMagic: {
         tier:1, plane:0,
-        progressMaxBase:1e17, progressMaxIncrease:3,
+        progressMaxBase:1e18, progressMaxIncrease:3,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1, maxLevel:4,
-        unlockCost:1e18, visible:false, unlocked:false, purchased: true,
+        unlockCost:5e18, visible:false, unlocked:false, purchased: true,
         onUnlock: function() {
             statAddAmount("legacy", 1);
             unveilPlane(0);
             unveilPlane(1);
+            data.actions.echoKindle.unlocked = true;
+            revealAtt("legacy");
             unveilAction('echoKindle');
             unveilAction('sparkMana');
         },
@@ -1123,10 +1143,11 @@ actionData = {
                 unveilAction('igniteTheSpark')
             }
         },
-        onLevelAtts:[["integration", 40]],
+        onLevelAtts:[["integration", 40], ["curiosity", 500]],
         expAtts:[],
         efficiencyAtts:[],
-        unlockMessage:{english:"On unlock, open Magic and +1 Legacy."}
+        unlockMessage:{english:"On unlock, open Magic and +1 Legacy."},
+        onLevelText:{english:"Unlocks new actions with each level."}
     },
     talkWithScott: {
         tier:1, plane:0, resourceName:"conversations",
@@ -1268,7 +1289,6 @@ actionData = {
             unveilAction('browseBackrooms')
             unveilAction('joinCoffeeClub');
             unveilAction('slideTheCoin');
-            unveilAction('buyCoffee');
         },
         onLevelAtts:[],
         expAtts:[],
@@ -1276,7 +1296,7 @@ actionData = {
     },
     chatWithHermit: {
         tier:1, plane:0, resourceName:"conversations",
-        progressMaxBase:10000, progressMaxIncrease:5,
+        progressMaxBase:1000000, progressMaxIncrease:5,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.1, maxLevel:10,
         unlockCost:10000, visible:false, unlocked:false, purchased: true,
@@ -1285,7 +1305,7 @@ actionData = {
         onLevelCustom: function() {
         },
         onLevelAtts:[["confidence", 5]],
-        expAtts:[],
+        expAtts:[["charm", 1]],
         efficiencyAtts:[["discernment", 1]]
     },
     tellAJoke: {
@@ -1319,10 +1339,10 @@ actionData = {
     },
     learnToStayStill: {
         tier:1, plane:0,
-        progressMaxBase:3e18, progressMaxIncrease:1,
+        progressMaxBase:1e19, progressMaxIncrease:1,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:1, maxLevel:1,
-        unlockCost:1e18, visible:false, unlocked:false, purchased: true,
+        unlockCost:1e19, visible:false, unlocked:false, purchased: true,
         onUnlock: function() {
             unveilAction('meditate');
             unveilAction('journal');
@@ -1333,16 +1353,20 @@ actionData = {
         expAtts:[],
         efficiencyAtts:[],
         storyText: { english: Raw.html`
-        The first step in how to create your own magic: stay still. You've been trying not to do this, but with the instructions of the hermit 
-        it starts to become possible. The hermit notices your difficulty, and mentions that, later, it would help you to find time to meditate, and that 
-        with people that can't still like me it can help to also journal my experiences.` }
+        &nbsp;&nbsp;&nbsp;&nbsp;The first step in how to create your own magic: Stay Still. I had been trying not to do this, but with the 
+        instructions of the hermit, I found new cause to try again. I don't hide my struggle with the task, and the old man scoffs.<br><br>
+        
+        &nbsp;&nbsp;&nbsp;&nbsp;"Do this on your own time, but later you should try meditation. Write things down if you have trouble with it."<br><br>
+        
+        &nbsp;&nbsp;&nbsp;&nbsp;He was surprisingly less grumpy as he said it, and with a look at my face his scowl returned.<br><br>
+        ` }
     },
     feelTheResonance: {
         tier:1, plane:0,
         progressMaxBase:1e17, progressMaxIncrease:1,
         expToLevelBase:100, expToLevelIncrease:1,
         efficiencyBase:1, maxLevel:1,
-        unlockCost:3e18, visible:false, unlocked:false, purchased: true,
+        unlockCost:3e19, visible:false, unlocked:false, purchased: true,
         onUnlock: function() {
         },
         onLevelCustom: function() {
@@ -1356,7 +1380,7 @@ actionData = {
         progressMaxBase:5e18, progressMaxIncrease:1,
         expToLevelBase:9, expToLevelIncrease:1,
         efficiencyBase:1, maxLevel:1,
-        unlockCost:1e19, visible:false, unlocked:false, purchased: true,
+        unlockCost:1e20, visible:false, unlocked:false, purchased: true,
         onUnlock: function() {
         },
         onLevelCustom: function() {
@@ -1370,7 +1394,7 @@ actionData = {
         progressMaxBase:1e20, progressMaxIncrease:1,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:1, maxLevel:1,
-        unlockCost:3e19, visible:false, unlocked:false, purchased: true,
+        unlockCost:3e20, visible:false, unlocked:false, purchased: true,
         onUnlock: function() {
         },
         onLevelCustom: function() {
@@ -1555,7 +1579,7 @@ actionData = {
         tier:1, plane:0,
         progressMaxBase:2e11, progressMaxIncrease:3,
         expToLevelBase:3, expToLevelIncrease:1,
-        efficiencyBase:.04, maxLevel:2,
+        efficiencyBase:.15, maxLevel:2,
         unlockCost:11e7, visible:false, unlocked:false, purchased: true,
         onLevelAtts:[["endurance", 100]],
         expAtts:[["endurance", 1], ["observation", 1], ["geared", 1]],
@@ -1603,39 +1627,33 @@ actionData = {
 
     guildReceptionist: {
         tier:1, plane:0,
-        progressMaxBase:1e15, progressMaxIncrease:3,
+        progressMaxBase:1e20, progressMaxIncrease:3,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.2, maxLevel:8,
-        wage: 100000,
-        unlockCost:1e15, visible:false, unlocked:false, purchased: true,
+        wage: 200000,
+        unlockCost:1e19, visible:false, unlocked:false, purchased: true,
         onLevelCustom: function() {
             data.actions.guildReceptionist.wage += actionData.guildReceptionist.wage/4;
             changeJob('guildReceptionist');
-            if(data.actions.guildReceptionist.level >= 2) {
-                unveilAction('messenger');
-            }
         },
         onUnlock:function() {
             changeJob('guildReceptionist');
         },
         onLevelAtts:[["adaptability", 16]],
         expAtts:[],
-        efficiencyAtts:[["adaptability", .08]],
-        unlockMessage:{english:"On unlock, set job to guildReceptionist for a base wage of $100k."}
+        efficiencyAtts:[["adaptability", .05]],
+        unlockMessage:{english:"On unlock, set job to guildReceptionist for a base wage of $200k."}
     },
     messenger: {
         tier:1, plane:0,
-        progressMaxBase:1e18, progressMaxIncrease:3,
+        progressMaxBase:1e23, progressMaxIncrease:3,
         expToLevelBase:10, expToLevelIncrease:1,
-        efficiencyBase:.2, maxLevel:8,
-        wage: 1e6,
-        unlockCost:1e18, visible:false, unlocked:false, purchased: true,
+        efficiencyBase:.1, maxLevel:8,
+        wage: 2e6,
+        unlockCost:1e22, visible:false, unlocked:false, purchased: true,
         onLevelCustom: function() {
             data.actions.messenger.wage += actionData.messenger.wage/4;
             changeJob('messenger');
-            if(data.actions.messenger.level >= 2) {
-                unveilAction('townCrier');
-            }
         },
         onUnlock:function() {
             changeJob('messenger');
@@ -1643,7 +1661,7 @@ actionData = {
         onLevelAtts:[["adaptability", 32]],
         expAtts:[],
         efficiencyAtts:[["adaptability", .05]],
-        unlockMessage:{english:"On unlock, set job to messenger for a base wage of $1m."}
+        unlockMessage:{english:"On unlock, set job to messenger for a base wage of $2m."}
     },
     townCrier: {
         tier:1, plane:0,
@@ -1695,32 +1713,34 @@ actionData = {
 
     meditate: {
         tier:1, plane:0,
-        progressMaxBase:5e12, progressMaxIncrease:20,
-        expToLevelBase:2, expToLevelIncrease:1,
-        efficiencyBase:.004, maxLevel:1,
-        unlockCost:2e10, visible:false, unlocked:false, purchased: true,
+        progressMaxBase:1e27, progressMaxIncrease:10,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:.001, maxLevel:1,
+        unlockCost:9e20, visible:false, unlocked:false, purchased: true,
         onUnlock: function() {
         },
         onLevelCustom: function() {
         },
-        onLevelAtts:[["awareness", 6000], ["flow", 5]],
-        expAtts:[["curiosity", 1], ["concentration", 1], ["flow", 1]],
-        efficiencyAtts:[["endurance", 1]]
+        onLevelAtts:[["awareness", 1000], ["cycle", 10]],
+        expAtts:[["curiosity", 1], ["flow", 1], ["concentration", 1], ["discernment", 1]],
+        efficiencyAtts:[["integration", 10]]
     },
     journal: {
         tier:1, plane:0,
-        progressMaxBase:2e6, progressMaxIncrease:3,
+        progressMaxBase:1e27, progressMaxIncrease:10,
         expToLevelBase:10, expToLevelIncrease:1,
-        efficiencyBase:.1, maxLevel:10,
-        unlockCost:1e6, visible:false, unlocked:false, purchased: true,
+        efficiencyBase:.05, maxLevel:4,
+        unlockCost:9e20, visible:false, unlocked:false, purchased: true,
         onLevelCustom: function() {
+            data.actions.meditate.maxLevel++;
         },
         onUnlock: function() {
         },
-        onLevelAtts:[["awareness", 200], ["curiosity", 50]],
-        expAtts:[["observation", 1], ["energy", 1]],
-        efficiencyAtts:[["cycle", 1]],
-        unlockMessage:{english:"On unlock, +1 max level for Body Awareness."}
+        onLevelAtts:[["curiosity", 5000], ["awareness", 1000]],
+        expAtts:[["energy", 1], ["observation", 1]],
+        efficiencyAtts:[["cycle", 2]],
+        unlockMessage:{english:"On level, +1 max level for Meditate."},
+        onLevelText:{english:"+1 max level for Meditate."}
     },
     readTheWritten: {
         tier:1, plane:0,
@@ -2918,8 +2938,7 @@ actionData = {
             let actionObj = data.actions.echoKindle;
             let dataObj = actionData.echoKindle;
 
-            let resourceTaken = actionObj.resource * actionObj.tierMult();
-            actionObj.resourceToAdd = dataObj.actionPowerFunction(resourceTaken) * actionObj.actionPower * actionObj.upgradeMult;
+            actionObj.resourceToAdd = dataObj.actionPowerFunction(actionObj.resource) * actionObj.tierMult() * actionObj.actionPower * actionObj.upgradeMult;
         },
         actionPowerFunction: function(resource) {
             if(resource < 1) {
@@ -3012,7 +3031,7 @@ actionData = {
         tier:0, plane:1, resourceName:"mana",
         progressMaxBase:1, progressMaxIncrease:3,
         expToLevelBase:3, expToLevelIncrease:1,
-        efficiencyBase:.03, maxLevel:3,
+        efficiencyBase:.015, maxLevel:3,
         unlockCost:1, visible:false, unlocked:false, purchased: true,
         onUnlock: function() {
             unveilAction("feelYourMana")
@@ -3021,13 +3040,13 @@ actionData = {
         },
         onLevelAtts:[["amplification", 60], ["pulse", 2]],
         expAtts:[],
-        efficiencyAtts:[["integration", 2]]
+        efficiencyAtts:[["integration", 3]]
     },
     manaExperiments: {
         tier:0, plane:1, resourceName:"mana",
         progressMaxBase:10, progressMaxIncrease:3,
         expToLevelBase:3, expToLevelIncrease:1,
-        efficiencyBase:.03, maxLevel:9,
+        efficiencyBase:.01, maxLevel:9,
         unlockCost:30, visible:false, unlocked:false, purchased: true,
         onUnlock: function() {
             unveilAction("manaVisualizations")
@@ -3137,13 +3156,13 @@ actionData = {
         },
         onLevelAtts:[["vision", 150]],
         expAtts:[],
-        efficiencyAtts:[["integration", 2]]
+        efficiencyAtts:[["integration", 1]]
     },
     feelYourMana: {
         tier:0, plane:1, resourceName:"mana",
         progressMaxBase:100, progressMaxIncrease:3,
         expToLevelBase:3, expToLevelIncrease:1,
-        efficiencyBase:.02, maxLevel:9,
+        efficiencyBase:.01, maxLevel:9,
         unlockCost:300, visible:false, unlocked:false, purchased: true,
         onUnlock: function() {
             unveilAction("listenToTheMana");
@@ -3162,7 +3181,7 @@ actionData = {
         },
         onLevelAtts:[["amplification", 2000]],
         expAtts:[],
-        efficiencyAtts:[["integration", 2]]
+        efficiencyAtts:[["integration", 1]]
     },
     infuseTheHide: {
         tier:0, plane:1, resourceName:"mana",
@@ -3222,7 +3241,7 @@ actionData = {
         tier:0, plane:1, resourceName:"mana",
         progressMaxBase:100000, progressMaxIncrease:33,
         expToLevelBase:3, expToLevelIncrease:1,
-        efficiencyBase:.2, maxLevel:9,
+        efficiencyBase:.15, maxLevel:9,
         unlockCost:20000, visible:false, unlocked:false, purchased: true,
         onUnlock: function() {
             unveilAction('earthMagic')
@@ -3235,7 +3254,7 @@ actionData = {
         tier:0, plane:1, resourceName:"mana",
         progressMaxBase:300000, progressMaxIncrease:33,
         expToLevelBase:3, expToLevelIncrease:1,
-        efficiencyBase:.15, maxLevel:9,
+        efficiencyBase:.1, maxLevel:9,
         unlockCost:30000, visible:false, unlocked:false, purchased: true,
         onUnlock: function() {
             unveilAction('moveEarth')

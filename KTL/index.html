@@ -15,7 +15,7 @@
 <body id="theBody" oncontextmenu="return false;" style="padding:5px" class="medium">
 
 
-<div id="windowElement" style="position:relative; width:100%; height:98%; border:2px solid; overflow:hidden;background-color:var(--world-1-bg-primary)">
+<div id="windowElement" style="position:relative; width:100%; height:98%; border:2px solid; overflow:hidden;background-color:var(--world-0-bg-primary)">
     <div id="actionContainer" style="position:absolute;transform-style:preserve-3d">
 <!--    <div id="actionContainer" style="position:absolute;will-change:transform;transform-style:preserve-3d">-->
         <span id="planeContainer0">
@@ -51,11 +51,13 @@
 
     <span id="attDisplayShowButton" class="button" style="display:none;padding:5px;top:110px;left:388px;" onclick="statMenuHideButton()">Stats >></span>
     <div id="attDisplay" style="border: 1px solid var(--border-color);padding:10px;font-size:12px;background-color:var(--overlay-color);
-        direction: rtl;position:relative;min-height:200px;overflow-y:auto;overflow-x:hidden;display: inline-block;scrollbar-gutter:stable;pointer-events: auto;">
+        direction:rtl;position:relative;min-height:200px;overflow-y:auto;overflow-x:hidden;display:inline-block;
+        scrollbar-gutter:stable;pointer-events:auto;">
         <span id="attDisplayUnder" style="direction:ltr;">
-            <span id="attDisplayHideButton" class="button" style="font-size:14px;position:absolute;padding:5px 8px;top:-3px;left:350px;" onclick="statMenuHideButton()"><<</span>
-            <div style="font-size:12px;position:absolute;top:5px;left:5px;">Bonus = 10% per Stat.</div><br>
-            <div class="title">Attributes</div>
+            <span id="attDisplayHideButton" class="button" style="font-size:14px;position:absolute;padding:5px 8px;top:-3px;left:350px;"
+                  onclick="statMenuHideButton()"><<</span>
+            <span style="font-size:14px;position:absolute;top:5px;left:5px;">Bonus = 10% per Stat.</span><br>
+            <span class="title">Attributes</span>
         </span>
     </div>
 </div>
@@ -76,14 +78,14 @@
 </div>
 
 <div id="bonusDisplay" style="border: 1px solid var(--border-color);position:absolute;display:none;left:20px;bottom:55px;
-    padding:10px;margin:5px;background-color:var(--overlay-color);color: var(--text-primary);width:200px">
-    <span id="bonusDisplayHideButton" class="button" style="position:absolute;left:204px;top:-13px;padding:5px 8px;" onclick="bonusMenuHideButton()"><<</span>
+    padding:10px;margin:5px;background-color:var(--overlay-color);color: var(--text-primary);width:230px">
+    <span id="bonusDisplayHideButton" class="button" style="position:absolute;left:230px;top:-13px;padding:5px 8px;" onclick="bonusMenuHideButton()"><<</span>
     <span id="toggleBonusSpeedButton" class="button" onclick="toggleBonusSpeed()" style="background-color: red">Enable Bonus Speed</span><br><br>
     Bonus Time: <b><span id="bonusTime"></span></b><br>
     Bonus Speed:
     <label><input type="radio" onchange="changeBonusSpeed(3)" name="bonusSpeed" value="3x" checked> 3x</label>
-    <label><input type="radio" onchange="changeBonusSpeed(5)" name="bonusSpeed" value="5x"> 5x</label>
-    <label><input type="radio" onchange="changeBonusSpeed(20)" name="bonusSpeed" value="20x"> 20x</label><br>
+    <label><input type="radio" onchange="changeBonusSpeed(10)" name="bonusSpeed" value="10x"> 10x</label>
+    <label><input type="radio" onchange="changeBonusSpeed(50)" name="bonusSpeed" value="50x"> 50x</label><br>
 </div>
 
 <div id="footerContainer" style="position:fixed;bottom:0;left:0;right:0;display:flex;justify-content:space-between;
@@ -96,7 +98,7 @@
     <div style="position:relative;display:flex;flex-direction:column;align-items:center;flex-grow:1;justify-content:flex-end;">
         <span class="button" style="padding:6px 20px;position: absolute;top:-35px;font-weight:bold;pointer-events:auto;" id='pauseButton' onclick="pauseGame()">|| Pause</span>
 
-        <div style="display:flex;justify-content:center;gap:5px;font-size:18px;width:100%;">
+        <div style="display:flex;justify-content:center;gap:5px;font-size:20px;width:100%;">
             <div id="planeButton0" class="hyperVisible planeButton0" onclick="switchToPlane(0)" style="max-width:200px;height:60px;pointer-events:auto;
                 border-bottom:none;border-top-left-radius:10px;border-top-right-radius:10px;
                 display:none;align-items:center;justify-content:center;font-weight:bold;cursor:pointer;width:50%;">

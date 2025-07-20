@@ -75,6 +75,7 @@ function generateActionDisplay(actionVar) {
     let dataObj = actionData[actionVar];
     let theStr = "";
     let resourceColor = getResourceColor(actionObj);
+    let resourceColorDim = getResourceColorDim(actionObj);
 
     queueCache(`${actionVar}Tier`);
     queueCache(`${actionVar}Resource`);
@@ -87,16 +88,17 @@ function generateActionDisplay(actionVar) {
     queueCache(`${actionVar}Wage`);
     queueCache(`${actionVar}Instability`);
     queueCache(`${actionVar}InstabilityToAdd`);
-
+//background-color:var(--overlay-color);
     let title = Raw.html`
-        <span onclick="actionTitleClicked('${actionVar}')" style="color:var(--text-primary);cursor:pointer;position:absolute;top:-77px;height:77px;left:0;
-            white-space: nowrap;border-width: 0 0 0 6px;border-style: solid;border-color: var(--text-muted);padding-left:4px;background-color:var(--overlay-color)">
-          
-            <span style="font-size:18px;font-weight:bold;">${actionObj.title}<br></span>
-            <span style="font-size:16px;font-weight:bold;" id='${actionVar}Resource'>0</span> 
-            <span style="color:${resourceColor};font-size:14px;font-weight:bold;">${capitalizeFirst(dataObj.resourceName)}</span>
-            <span style="font-size:14px;color:var(--text-muted)">${actionObj.isGenerator?`(+<span id="${actionVar}ResourceToAdd" style="color:var(--text-primary);font-weight:bold;">???</span>)`:""}</span><br>
-            <span style="font-size:12px;position:relative;color:var(--text-muted)">
+        <span onclick="actionTitleClicked('${actionVar}')" style="color:var(--text-primary);cursor:pointer;position:absolute;
+            top:-82px;height:82px;left:0;white-space: nowrap;border-width: 0 0 0 6px;border-style:solid;
+            border-color:${resourceColorDim};padding-left:4px;text-shadow:1px 1px 2px var(--text-dark);">
+            <span style="font-size:20px;font-weight:bold;">${actionObj.title}<br></span>
+            <span style="font-size:18px;font-weight:bold;" id='${actionVar}Resource'>0</span> 
+            <span style="color:${resourceColor};font-size:16px;font-weight:bold;">${capitalizeFirst(dataObj.resourceName)}</span>
+            <span style="font-size:14px;color:var(--text-muted)">${actionObj.isGenerator?`(+<span id="${actionVar}ResourceToAdd" 
+                style="color:var(--text-primary);font-weight:bold;">???</span>)`:""}</span><br>
+            <span style="font-size:14px;position:relative;color:var(--text-muted)">
                 ${!actionObj.isSpell?"Level ":"Charges "}<span id="${actionVar}Level" style="color:var(--text-primary);font-weight:bold;">0</span>
                 ${actionObj.maxLevel !== undefined ? ` / <span id="${actionVar}MaxLevel" style="color:var(--text-primary);font-weight:bold;">0</span>` : ""}
                 <span id="${actionVar}HighestLevelContainer2"> 
@@ -124,7 +126,7 @@ function generateActionDisplay(actionVar) {
     queueCache(`${actionVar}MenuButtons`);
 
     let menuContainer = Raw.html`
-        <div id="${actionVar}MenuButtons" style="position:absolute;top:-18px;font-size:13px;left:3px;">
+        <div id="${actionVar}MenuButtons" style="position:absolute;top:-20px;font-size:13px;left:3px;">
             ${!actionObj.parentVar?"":`<span onclick="actionTitleClicked('${actionObj.parentVar}')" 
             class="buttonSimple" style="margin-right:3px;width:30px;height:30px;text-align:center;cursor:pointer;padding:0 4px;">^</span>`}
         <span id="${actionVar}_downstreamMenuButton" onclick="clickActionMenu('${actionVar}', 'downstream')" class="buttonSimple" 
@@ -145,14 +147,14 @@ function generateActionDisplay(actionVar) {
     let momentumContainer = Raw.html`
     <div id="${actionVar}DeltasDisplayContainer" style="padding:3px 3px 0;">
         <div style="font-style: italic; color: var(--text-muted);">
-            <span style="display:inline-block;width:60px;;text-decoration:underline">Increase</span>
-            <span style="display:inline-block;width:60px;;text-decoration:underline">Decrease</span>
-            <span style="display:inline-block;width:60px;text-decoration:underline">Change</span>
+            <span style="display:inline-block;width:90px;text-decoration:underline">Increase</span>
+            <span style="display:inline-block;width:90px;text-decoration:underline">Decrease</span>
+            <span style="display:inline-block;width:90px;text-decoration:underline">Change</span>
         </div>
         <div>
-            <span style="display:inline-block;width:60px;white-space: nowrap;">+<span id="${actionVar}ResourceIncrease" style="font-weight:bold"></span>/s</span>
-            <span style="display:inline-block;width:60px;white-space: nowrap;">-<span id="${actionVar}ResourceDecrease" style="font-weight:bold"></span>/s</span>
-            <span style="display:inline-block;width:60px;white-space: nowrap;">Δ<span id="${actionVar}ResourceDelta" style="font-weight:bold"></span>/s</span>
+            <span style="display:inline-block;width:90px;white-space: nowrap;">+<span id="${actionVar}ResourceIncrease" style="font-weight:bold"></span>/s</span>
+            <span style="display:inline-block;width:90px;white-space: nowrap;">-<span id="${actionVar}ResourceDecrease" style="font-weight:bold"></span>/s</span>
+            <span style="display:inline-block;width:90px;white-space: nowrap;">Δ<span id="${actionVar}ResourceDelta" style="font-weight:bold"></span>/s</span>
         </div>
     </div>`;
 
@@ -161,9 +163,9 @@ function generateActionDisplay(actionVar) {
 
     let balanceNeedle =
         Raw.html`
-        <div id="${actionVar}BalanceNeedleLabel" style="color:var(--text-muted)">Change Ratio:</div>
+        <div id="${actionVar}BalanceNeedleLabel" style="color:var(--text-muted)">(Increase / Decrease) Ratio:</div>
         <div style="position:relative;width:100%;height:12px;">
-            <div style="position:absolute;top:-2px;width:100%;height:11px;border-top:1px solid;">
+            <div style="position:absolute;top:-1px;width:100%;height:11px;border-top:1px solid;">
                 <div style="position:absolute;top:0;left:25%;width:2px;height:100%;background-color:var(--text-primary);opacity:0.6;"></div> 
                 <div style="position:absolute;top:0;left:50%;width:2px;height:100%;background-color:var(--text-primary);opacity:0.6;"></div> 
                 <div style="position:absolute;top:0;left:75%;width:2px;height:100%;background-color:var(--text-primary);opacity:0.6;"></div> 
@@ -184,7 +186,7 @@ function generateActionDisplay(actionVar) {
     queueCache(`${actionVar}ProgressBarLabels`);
 
     let pbar = Raw.html`
-        <div style="width:100%;height:16px;position:relative;text-align:left;border-top:1px solid;border-bottom:1px solid;">
+        <div style="width:100%;height:18px;position:relative;text-align:left;border-top:2px solid;">
             <div id="${actionVar}ProgressBarInner" style="width:30%;background-color:${resourceColor};height:100%;position:absolute;"></div>
             <div id="${actionVar}ProgressBarLabels" style="position:absolute;top:1px;left:4px;width:97%;color:var(--text-muted)">
                 <span style="color:var(--text-primary)">
@@ -205,7 +207,7 @@ function generateActionDisplay(actionVar) {
     queueCache(`${actionVar}ExpBarLabels`);
 
     let expBar = Raw.html`
-        <div style="width:100%;height:16px;position:relative;text-align:left;border-bottom:1px solid;margin-top:1px;">
+        <div style="width:100%;height:18px;position:relative;text-align:left;border-bottom:2px solid;">
             <div id="${actionVar}ExpBarInner" style="width:30%;background-color:var(--exp-color);height:100%;position:absolute"></div>
             <div id="${actionVar}ExpBarLabels" style="position:absolute;top:1px;left:4px;width:97%;color:var(--text-muted)">
                 <span style="color:var(--text-primary)">
@@ -292,7 +294,7 @@ function generateActionDisplay(actionVar) {
     queueCache(`${actionVar}_attsContainer`);
 
     let attsContainer = Raw.html`
-        <div id="${actionVar}_attsContainer" style="display:none;padding:5px;max-height:220px;overflow-y:auto;">
+        <div id="${actionVar}_attsContainer" style="display:none;padding:5px;max-height:220px;overflow-y:auto;font-size;12px;">
             ${generateActionOnLevelAtts(actionObj)}
             ${generateActionExpAtts(actionObj)}
             ${generateActionEfficiencyAtts(actionObj)}
@@ -325,12 +327,12 @@ function generateActionDisplay(actionVar) {
         <div id="${actionVar}_downstreamContainer" style="padding:5px;display:none;">
             <div id="${actionVar}_downstreamButtonContainer">
                 ${createDownStreamSliders(actionObj, dataObj)}
-                <div id="${actionVar}ToggleDownstreamButtons">
+                <div id="${actionVar}ToggleDownstreamButtons" style="font-size:12px;">
                     <span onclick="toggleAllZero('${actionVar}')" 
                         class="buttonSimple" style="margin-right:3px;width:30px;height:30px;text-align:center;cursor:pointer;padding:0 4px;">All 0</span>
                     <span onclick="toggleAllHundred('${actionVar}')" 
                         class="buttonSimple" style="margin-right:3px;width:30px;height:30px;text-align:center;cursor:pointer;padding:0 4px;">All 100</span>
-                    <div style="color:var(--text-muted)">Total ${dataObj.resourceName} sending downstream: <b><span style="color:var(--text-primary)" id='${actionVar}TotalSend'>1</span></b>/s</div>
+                    <div style="color:var(--text-muted);">Total ${dataObj.resourceName} sending downstream: <b><span style="color:var(--text-primary)" id='${actionVar}TotalSend'>1</span></b>/s</div>
                 </div>
             </div>
         </div>`;
@@ -347,7 +349,8 @@ function generateActionDisplay(actionVar) {
     theStr += Raw.html`
         <div id="${actionVar}Container" style="display:none;position:absolute;left:${newX};top:${newY};width:300px;" 
             onmouseenter="mouseOnAction('${actionVar}')" onmouseleave="mouseOffAction('${actionVar}')">
-            <div id="${actionVar}LargeVersionContainer" style="border:2px solid var(--border-color);background-color:var(--bg-secondary);">
+            <div id="${actionVar}LargeVersionContainer" style="border:2px solid var(--border-color);
+                background-color:var(--bg-secondary);">
                 ${title}
                 ${menuContainer}
                 ${momentumContainer}
@@ -361,7 +364,8 @@ function generateActionDisplay(actionVar) {
                 ${lockOverAll}
                 ${dataObj.extraButton ?? ""}
             </div>
-            <div id="${actionVar}SmallVersionContainer" style="display:none;text-align:center;margin:50px auto;font-size:12px;width:100px;">
+            <div id="${actionVar}SmallVersionContainer" 
+                style="display:none;text-align:center;margin:50px auto;font-size:12px;width:100px;">
                 <span id="${actionVar}SmallVersionTitle">
                     <span style="font-size:16px;font-weight:bold;">${actionObj.title}</span><br>
                     Level <span id="${actionVar}Level2" style="font-weight:bold;"></span>
@@ -465,7 +469,7 @@ function generateOutsideAttDisplay(actionObj, attObj, type) {
         <div id="${actionVar}${statName}OutsideContainer${type}" onclick="clickedAttName('${statName}', true)" 
              style="display:${startDisplayed};border:2px solid var(${borderColor});margin-bottom:2px;cursor:pointer;background-color:var(--overlay-color);padding:1px;">
             <div class="showthat" style="position:relative;width:35px;height:35px;background-color:var(${backgroundColor});">
-                <div class="showthisUp" style="font-size:18px;">${tooltipText}</div>
+                <div class="showthisUp" style="font-size:20px;">${tooltipText}</div>
                 <img src="img/${statName}.svg" alt="${statName}" style="width:100%;height:100%;" />
                 <div class="hyperVisible" style="position:absolute;bottom:0;left:0;width:100%;height:50%;display:flex;align-items:flex-end;
                 justify-content:center;font-weight:bold;font-size:16px;">${text}</div>
@@ -522,7 +526,7 @@ function generateActionExpAtts(actionObj) {
             class="backgroundWhenHover" onclick="clickedAttName('${attVar}', true)">
             <span style="color:var(--text-primary)"><b>${ratio}</b></span>% of <img src="img/${attVar}.svg" alt="${attVar}" 
             style="margin:1px;width:20px;height:20px;vertical-align:top;background:var(--attribute-use-exp-bg-color)" />
-            <span style="color:var(--text-primary)"><b>${capitalizeFirst(attVar)}</b></span>'s bonus 
+            's bonus 
             = x<b><span style="color:var(--text-primary)" id="${actionVar}_${attVar}AttExpMult">1</span></b>
         </div>`
     }
@@ -595,8 +599,8 @@ function createDownStreamSliders(actionObj, dataObj) {
         let resourceColor = getResourceColor(actionObj);
 
         theStr += Raw.html`
-            <div id="${actionVar}SliderContainer${downstreamVar}" style="margin-bottom:5px;margin-top:5px;font-size:12px;">
-                <span id="${actionVar}SliderDownstreamTitle${downstreamVar}" style="margin-bottom:10px;cursor:pointer;font-weight:bold;" 
+            <div id="${actionVar}SliderContainer${downstreamVar}" style="margin-bottom:5px;margin-top:5px;font-size:14px;">
+                <span id="${actionVar}SliderDownstreamTitle${downstreamVar}" style="margin-bottom:10px;cursor:pointer;" 
                     onclick="actionTitleClicked('${downstreamVar}')">${title}</span>
                 <span id="${actionVar}SliderLabels${downstreamVar}">
                     (+<span id="${actionVar}DownstreamSendRate${downstreamVar}" style="font-weight:bold;">0</span>/s)

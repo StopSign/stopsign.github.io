@@ -266,7 +266,8 @@ body {
     background:var(--bg-secondary);
     padding:20px;
     border-radius:6px;
-    max-width:600px;
+    max-width:1200px;
+    min-width:600px;
     width:90%;
     text-align:center;
     position:relative;
@@ -275,7 +276,7 @@ body {
 }
 
 .title {
-    font-size:16px;
+    font-size:20px;
     font-weight:bold;
     display:block;
     text-align:center;
@@ -287,18 +288,18 @@ body {
     text-align: center;
 }
 .menuTitle {
-    font-size:16px;
+    font-size:20px;
 }
 
 
 .large {
-    font-size:14px;
+    font-size:20px;
 }
 .medium {
-    font-size:12px;
+    font-size:14px;
 }
 .small {
-    font-size:10px;
+    font-size:12px;
 }
 .bold {
     font-weight:bold;

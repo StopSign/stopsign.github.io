@@ -46,6 +46,7 @@ function useAmulet() {
     if(!document.getElementById('amuletConfirm').checked) {
         return;
     }
+    chartData = [];
     data.focusSelected = [];
     data.doneAmulet = true;
     views.updateVal(`useAmuletMenu`, "none", "style.display");

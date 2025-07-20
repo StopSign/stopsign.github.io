@@ -277,6 +277,8 @@ function secondTick() {
     if(data.gameState !== "KTL") {
         data.secondsPerReset++;
     }
+    takeDataSnapshot(data.actions.overclock.resourceToAdd, data.secondsPerReset);
+    // takeDataSnapshot(data.totalMomentum, data.secondsPerReset);
 }
 
 //spells get to reset before actions are ready to use them

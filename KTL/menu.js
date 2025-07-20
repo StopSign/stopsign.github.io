@@ -5,7 +5,7 @@
 //addMenuOptionsTab() adjust fps, saving
 //addDataTab()
 //addMenuTab("Previous Tips", <desc>) Adds a new tab that duplicates the toasts but can't
-
+let canvas, ctx, linearBtn, logBtn;
 
 function initializeMenus() {
     createMenu(); // makes the button | menu | title
@@ -17,14 +17,42 @@ function initializeMenus() {
     addMenuTextContainer("help", createHelpMenu());
     addMenuTextContainer("story", createStoryMenu());
     addMenuTextContainer("options", createOptionsMenu());
+
     addMenuTextContainer("statistics", createDataMenu());
+    statChartInitial();
+
     addMenuTextContainer("previousTips", "Close tips to fill this screen!");
 
     addMenuTab("shop");
     addMenuTextContainer("shop", createShopMenu());
 
-    addMenuTab("cheat");
-    addMenuTextContainer("cheat", createCheatMenu());
+    // addMenuTab("cheat");
+    // addMenuTextContainer("cheat", createCheatMenu());
+}
+
+function statChartInitial() {
+    canvas = document.getElementById('resourceChart');
+    ctx = canvas.getContext('2d');
+    linearBtn = document.getElementById('linearBtn');
+    logBtn = document.getElementById('logBtn');
+
+    linearBtn.addEventListener('click', () => {
+        chartScale = 'linear';
+        linearBtn.style.backgroundColor = '#4a5568';
+        linearBtn.style.color = 'white';
+        logBtn.style.backgroundColor = '#f7fafc';
+        logBtn.style.color = '#4a5568';
+        drawChart();
+    });
+
+    logBtn.addEventListener('click', () => {
+        chartScale = 'logarithmic';
+        logBtn.style.backgroundColor = '#4a5568';
+        logBtn.style.color = 'white';
+        linearBtn.style.backgroundColor = '#f7fafc';
+        linearBtn.style.color = '#4a5568';
+        drawChart();
+    });
 }
 
 function createCheatMenu() {
@@ -40,20 +68,51 @@ function createCheatMenu() {
 function createShopMenu() {
     return Raw.html`
         <div class="menuTitle">Shop</div>
-        <div class="menuSeparator"></div><br>
-        Money plz. (TODO)`;
+        <div class="menuSeparator"></div><br>TODO - Shop will be completed for full release with the following plans:<br>
+        Disclaimer: Game will be balanced without these upgrades.<br><br>
+        <ul>
+            <li>$5 for 1k Soul Coins</li>
+            <li>$20 for 5k</li>
+        </ul>
+        
+        <br>Unique Upgrades:<br>
+        <ul>
+            <li>+100 soul coins every 23hr, upgrade to +200 every 23hr in ~30 days.</li>
+            <li>Maximum Focus bars +1 (up to 4): 1k SC each</li>
+            <li>Focus Bars mult (up to x4): 1k SC each</li>
+            <li>Learn exact legacy/AC gained in KTL before switching Overclock targets: 500 SC</li>
+        </ul>
+        
+        <br>Special Resource Bonuses:<br>
+        <ul>
+            <li>+50% permanent momentum (up to 2): 500 SC, 1k SC</li>
+            <li>+50% permanent gold (up to 2): 500 SC, 1k SC</li>
+            <li>+50% permanent conversations (up to 2): 500 SC, 1k SC</li>
+            <li>+50% permanent mana (up to 2): 500 SC, 1k SC</li>
+        </ul>
+        
+        <br>Timed Resource Bonuses (repeated use adds to timer):<br>
+        <ul>
+            <li>x2 momentum for 24hr: 100 SC</li>
+            <li>x2 gold for 24hr: 100 SC</li>
+            <li>x2 conversations for 24hr: 100 SC</li>
+            <li>x2 mana for 24hr: 100 SC</li>
+        </ul>`;
 }
 
 function createHelpMenu() {
     return Raw.html`
         <div class="menuTitle">Help</div>
         <div class="menuSeparator"></div><br>
-        <span style="font-weight: bold;font-size:20px;">#Skill issue</span>`;
+        <span style="font-weight: bold;font-size:26px;">#Skill issue</span><br><br>
+        Move the colors to where they haven't been yet. Repeat.
+`;
 }
 
 function createStoryMenu() {
     return Raw.html`<div class="menuTitle">Background</div>
         <div class="menuSeparator"></div><br>
+        (No AI was used in the writing of the story)<br><br>
 &nbsp;&nbsp;&nbsp;&nbsp;A lich is a creature of bones, dark magic, and myth, occuring rarely in history and causing catastrophes each time. 13 years ago, the Emperor Brithan of Sovvgor had used one of his Talents to kill a lich far to the north, but not without great cost.
  Though this lich and his evil forces had been vanquished, there was a curse on the land. For hundreds of miles - which mostly included wasteland and the majority of the Empire of Sovvgor - those who had Talents could not use them. 
  Though they told us the cause, it was a bitter pill to swallow for all of the country's citizens. Talents were our magic, our connection to the idea that though the world is big, we have our place in it.<br><br>
@@ -131,7 +190,23 @@ function createDataMenu() {
     return Raw.html`
         <div class="menuTitle">Data</div>
         <div class="menuSeparator"></div><br>
-        What do you want to know?`
+        What do you want to know?
+    <div id="chartContainer" style="width: 80%; max-width: 800px; background-color: #2d3748; border-radius: 8px; 
+        box-shadow: 0 4px 12px rgba(0,0,0,0.4); padding: 20px;">
+        <h2 style="text-align: center; margin-top: 0; color: #e2e8f0;">Recent 100 Overclock Generations</h2>
+        <canvas id="resourceChart" style="width: 100%; height: 400px; border-radius: 4px;"></canvas>
+        <div style="text-align: center; margin-top: 15px;">
+            <button id="linearBtn" style="padding: 10px 20px; border: 1px solid #63b3ed; background-color: #63b3ed; 
+                color: #1a202c; border-radius: 5px; cursor: pointer; font-weight: bold; transition: background-color 0.2s;">
+                Linear
+            </button>
+            <button id="logBtn" style="padding: 10px 20px; border: 1px solid #4a5568; background-color: #4a5568; 
+                color: #e2e8f0; border-radius: 5px; cursor: pointer; font-weight: bold; transition: background-color 0.2s;">
+                Logarithmic
+            </button>
+        </div>
+    </div>
+`
 }
 
 function updatePreviousTipsMenu() {
@@ -152,8 +227,8 @@ function updatePreviousTipsMenu() {
 function createOptionsMenu() {
     return Raw.html`<div class='menuTitle'>Options</div>
         <div class='menuSeparator'></div>
-        <div id='lightModeButton' onClick='changeDarkMode()' class='button' style='padding:10px;font-size:14px;width:200px;' >
-            Change to Light Mode</div>
+<!--        <div id='lightModeButton' onClick='changeDarkMode()' class='button' style='padding:10px;font-size:14px;width:200px;' >-->
+<!--            Change to Light Mode</div>-->
         <div id='numberTypeButton' onClick='changeNumberType()' class='button' style='padding:10px;font-size:14px;width:200px;' >
             Change numbers to scientific</div><br>
         <div style="display: flex; align-items: center; gap: 10px;">
@@ -195,7 +270,7 @@ function changeDarkMode() {
 }
 
 function addMenuTextContainer(menuVar, menuText) {
-    let menuContainer = "<div id='"+menuVar+"TextContainer' style='display:none;padding:10px;text-align:left;'>" +
+    let menuContainer = "<div id='"+menuVar+"TextContainer' style='display:none;padding:10px;text-align:left;font-size:16px;'>" +
         menuText +
         "</div>";
 
@@ -205,15 +280,17 @@ function addMenuTextContainer(menuVar, menuText) {
 }
 
 function createMenu() {
-let helpMenu =
-    "<div id='helpMenu' class='fullScreenGrey' style='display:none;' onClick='clickMenuButton()'>" +
-        "<div class='centerMenuBox' onclick='stopClicks(event)''>" +
-            "<div class='menuTitle'>Options and Info Menu</div>" +
-            "<div class='menuSeparator'></div>" +
-            "<div id='menuIndexContainer' style='height:460px;width:30%;background-color:var(--menu-tab-background-color);display:inline-block;vertical-align: top;'></div>" +
-            "<div id='menuTextDisplayContainer' style='height:460px;width:70%;background-color:var(--menu-background-color);display:inline-block;vertical-align: top;overflow-y:auto'></div>" +
-        "</div>" +
-    "</div>";
+let helpMenu = Raw.html`
+    <div id="helpMenu" class="fullScreenGrey" style="display:none;" onClick="clickMenuButton()">
+        <div class="centerMenuBox" onclick="stopClicks(event)">
+            <div class="menuTitle">Options and Info Menu</div>
+            <div class="menuSeparator"></div>
+            <div id="menuIndexContainer" style="height:750px;width:30%;background-color:var(--menu-tab-background-color);
+                display:inline-block;vertical-align:top;"></div><div id="menuTextDisplayContainer" style="height:750px;
+                width:70%;background-color:var(--menu-background-color);display:inline-block;vertical-align:top;overflow-y:auto"></div>
+        </div>
+    </div>
+    `;
     document.getElementById("helpMenuContainer").innerHTML = helpMenu;
 }
 
@@ -221,9 +298,12 @@ let menuInfo = [];
 let selectedMenu = null;
 function addMenuTab(menuVar) {
     menuInfo.push(menuVar);
-    let newMenu = "<div id='"+menuVar+"MenuTab' onclick='clickMenuTab(\""+menuVar+"\")' style='border:1px solid; padding:5px 0;width:99%;height:20px;border-radius:3px;background-color:var(--menu-tab-button-color);cursor:pointer;font-size:16px;'>" +
-        decamelizeWithSpace(menuVar) +
-        "</div>";
+    let newMenu = Raw.html`
+        <div id="${menuVar}MenuTab" onclick="clickMenuTab('${menuVar}')" 
+            style="border:1px solid;width:99%;height:60px;border-radius:3px;background-color:var(--menu-tab-button-color);
+            cursor:pointer;font-size:20px;display:flex;align-items:center;justify-content:center;">
+            ${decamelizeWithSpace(menuVar)}
+        </div>`;
 
     let child = document.createElement("template");
     child.innerHTML = newMenu;
@@ -242,6 +322,9 @@ function clickMenuTab(menuVar) {
     selectedMenu = menuVar;
     document.getElementById(menuVar+"TextContainer").style.display = "";
     document.getElementById(selectedMenu+"MenuTab").style.background = "#8b5cf6";
+    if(selectedMenu === "statistics") {
+        resizeCanvas();
+    }
 }
 
 function addMenuOptionsTab() {

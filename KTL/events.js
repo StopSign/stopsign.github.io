@@ -60,6 +60,8 @@ function toggleAllHundred(actionVar) {
 }
 window.addEventListener('resize', () => {
     resizeStatMenu();
+    resizeCanvas();
+    drawChart();
 });
 
 function resizeStatMenu() {
@@ -123,6 +125,12 @@ function clickZoomOut() {
     setZoomNoMouse(scale - scaleStep*3)
 }
 windowElement.addEventListener('wheel', function(e) {
+    if(mouseIsOnAction) {
+        let elem = document.getElementById(`${mouseIsOnAction}_${data.actions[mouseIsOnAction].currentMenu}Container`);
+        if(elem.scrollHeight > elem.clientHeight) { //only stop wheel if there's a reason to
+            return;
+        }
+    }
     e.preventDefault();
 
     const rect = windowElement.getBoundingClientRect();
@@ -551,13 +559,16 @@ function unveilPlane(num) {
     views.updateVal(`planeButton${num}`, "flex", "style.display");
 }
 
+let mouseIsOnAction = null;
 function mouseOnAction(actionVar) {
     let actionObj = data.actions[actionVar];
     actionObj.mouseOnThis = true;
+    mouseIsOnAction = actionVar;
 }
 function mouseOffAction(actionVar) {
     let actionObj = data.actions[actionVar];
     actionObj.mouseOnThis = false;
+    mouseIsOnAction = null;
 }
 
 function levelAllCharges() {
@@ -567,4 +578,142 @@ function levelAllCharges() {
             actionObj.maxLevel++;
         }
     }
+}
+
+
+// function takeDataSnapshot(resourceValue) {
+//     const currentTime = chartData.length > 0 ? chartData[chartData.length - 1].time + 1 : 0;
+//
+//     chartData.push({
+//         time: currentTime,
+//         value: resourceValue
+//     });
+//
+//     if (chartData.length > 500) {
+//         chartData.shift(); // Removes the oldest data point
+//     }
+// }
+
+function takeDataSnapshot(resourceValue, currentTime) {
+    if (chartData.length === 0) {
+        chartData.push({
+            time: currentTime,
+            value: resourceValue
+        });
+        return;
+    }
+
+    const lastStoredPoint = chartData[chartData.length - 1];
+    if (resourceValue === lastStoredPoint.value) {
+        return;
+    }
+
+    const lastValue = lastStoredPoint.value;
+    const timeBeforeChange = currentTime - 1;
+
+    if (timeBeforeChange > lastStoredPoint.time) {
+        chartData.push({ time: timeBeforeChange, value: lastValue });
+    }
+
+    chartData.push({ time: currentTime, value: resourceValue });
+
+    if (chartData.length > 200) {
+        chartData.splice(0, 2);
+    }
+}
+
+function resizeCanvas() {
+    const dpr = window.devicePixelRatio || 1;
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+    ctx.scale(dpr, dpr);
+}
+
+function drawChart() {
+    if(selectedMenu !== "statistics") {
+        return;
+    }
+
+    const canvasWidth = canvas.clientWidth;
+    const canvasHeight = canvas.clientHeight;
+    const padding = 40;
+
+    // Clear the canvas and fill with dark background
+    ctx.fillStyle = '#2d3748';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    if (chartData.length < 2) {
+        ctx.fillStyle = '#a0aec0'; // Light gray text for placeholder
+        ctx.font = '16px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('Waiting for more data...', canvasWidth / 2, canvasHeight / 2);
+        return;
+    }
+
+    // --- Determine Data Range ---
+    const minTime = chartData[0].time;
+    const maxTime = chartData[chartData.length - 1].time;
+    const values = chartData.map(d => d.value);
+    const maxValue = Math.max(...values);
+
+    // --- Draw Axes ---
+    ctx.strokeStyle = '#4a5568'; // Subtle gray for axes
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(padding, padding);
+    ctx.lineTo(padding, canvasHeight - padding);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(padding, canvasHeight - padding);
+    ctx.lineTo(canvasWidth - padding, canvasHeight - padding);
+    ctx.stroke();
+
+    // --- Draw Data Line ---
+    ctx.strokeStyle = '#63b3ed'; // Vibrant, contrasting blue for the line
+    ctx.lineWidth = 3; // Thicker line
+    ctx.lineJoin = 'round'; // Smoother corners
+    ctx.beginPath();
+
+    for (let i = 0; i < chartData.length; i++) {
+        const dataPoint = chartData[i];
+        const x = padding + ((dataPoint.time - minTime) / (maxTime - minTime)) * (canvasWidth - 2 * padding);
+        let y;
+        if (chartScale === 'logarithmic') {
+            const logMaxValue = Math.log1p(maxValue);
+            const logValue = Math.log1p(dataPoint.value);
+            y = (canvasHeight - padding) - ((logValue / logMaxValue) * (canvasHeight - 2 * padding));
+        } else {
+            y = (canvasHeight - padding) - ((dataPoint.value / maxValue) * (canvasHeight - 2 * padding));
+        }
+        if (isNaN(y)) y = canvasHeight - padding;
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+
+    // --- Draw Labels and Grid ---
+    ctx.fillStyle = '#a0aec0'; // Light gray for labels
+    ctx.font = '12px sans-serif';
+    ctx.textAlign = 'center';
+    const numYLabels = 5;
+    for (let i = 0; i <= numYLabels; i++) {
+        const yPos = padding + (i / numYLabels) * (canvasHeight - 2 * padding);
+        let labelValue;
+        if (chartScale === 'logarithmic') {
+            labelValue = Math.expm1(Math.log1p(maxValue) * (1 - (i / numYLabels)));
+        } else {
+            labelValue = maxValue * (1 - (i / numYLabels));
+        }
+        ctx.fillText(intToString(labelValue, 1), padding - 20, yPos + 4);
+
+        // Horizontal grid line
+        ctx.strokeStyle = '#4a5568'; // Subtle gray for grid
+        ctx.beginPath();
+        ctx.moveTo(padding - 5, yPos);
+        ctx.lineTo(canvasWidth - padding, yPos);
+        ctx.stroke();
+    }
+    ctx.fillText(secondsToTime(minTime), padding, canvasHeight - padding + 20);
+    ctx.fillText(secondsToTime(maxTime), canvasWidth - padding, canvasHeight - padding + 20);
 }

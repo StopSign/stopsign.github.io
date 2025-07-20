@@ -117,21 +117,42 @@ function initializeToasts() {
 
         "Laborer required for odd jobs. Starting wage $10. Ask Grelt."`)
 
-    createToast(function() { return data.actions.basicTrainingWithJohn.unlocked },
-        "Training Options Hint", 0,
-        Raw.html`Confused with too many options of John's training? Go from top to bottom!`);
+    // createToast(function() { return data.actions.basicTrainingWithJohn.unlocked },
+    //     "Training Options Hint", 0,
+    //     Raw.html`Confused with too many options of John's training? Go from top to bottom!`);
 
     createToast(function() { return data.actions.reportForLabor.unlocked },
         "You Need A Break", 0,
         Raw.html`As soon as you step in sight of your new boss, you immediately decide that this can't be all there is. 
         You decide to get some clothes for the occasion, and go find where that scent came from. A higher wage will let you get those things easier.<br><br>2 new Actions unlocked!`);
 
-
-
     createToast(function() { return data.actions.meetGrumpyHermit.unlocked },
         "Rebuked by the Hermit", 0,
         Raw.html`You were told you were hard to talk to - by a hermit! He said to gain more of a spine before he'll 
         entertain you.<br><br>You've been putting it off, but it is time to do what you've been dreading - talk to people.<br><br>New action unlocked.`);
+
+    createToast(function() { return data.actions.inquireAboutMagic.unlocked },
+        "Magic", 0,
+        Raw.html`You have gained some Legacy from the amulet, and therefore unlocked Magic! Click the tab or press the hotkey [2] to switch to it.<br><br>
+        There will be many secrets to uncover in the realm of magic, but with only 1 legacy it is difficult to unlock any of them.<br>
+        You should keep asking the Hermit about magic - he knows how to really get you started.`);
+
+    createToast(function() { return data.actions.gossipAroundCoffee.unlocked },
+        "What did you just say?", 0,
+        Raw.html`You whirl around, fear clawing down your spine, hoping that you did not just hear the word 
+        "lich" on someone's tongue. You need to know more about this.`);
+
+    createToast(function() { return data.actions.hearAboutTheLich.level >= 1 },
+        "Something Must Be Done", 0,
+        Raw.html`The lich has returned, but this is what you were preparing for by targeting Overclock to itself.<br>
+            Check Info under Hear About The Lich for how it increases!<br><br>
+            Get at least 1 Spell Power from External Spells to be able to sign up and join humanity's last stand!`);
+
+
+    // createToast(function() { return },
+    //     "", 0,
+    //     Raw.html``);
+
     // createToast(function() { return },
     //     "", 0,
     //     Raw.html``);
@@ -197,14 +218,16 @@ function updateToastUI(toastId) {
 }
 
 function createToastModal() {
-    let overlayWrapper = document.createElement('div');
-    overlayWrapper.innerHTML = "<div class='fullScreenGrey' style='display:none' onclick='closeModal()'>" +
-        "<div class='centerMenuBox'>" +
-        "<b><div id='toastModalTitle' style='font-size:16px;'>Toast Title</div></b>" +
-        "<p id='toastModalMessage' style='text-align:left;font-size:14px;'>Here is a message</p>" +
-        "<div class='button' id=\"modal-ok\" style='margin-top:20px;padding:5px 10px;' onclick='closeModal()'>Close</div>" +
-        "</div>" +
-        "</div>";
+    let overlayWrapper = document.createElement("div");
+    overlayWrapper.innerHTML = Raw.html`
+        <div class="fullScreenGrey" style="display:none" onclick="closeModal()">
+            <div class="centerMenuBox">
+                <div id="toastModalTitle" style="font-size:20px;font-weight:bold;text-decoration:underline">Toast Title</div>
+                <p id="toastModalMessage" style='text-align:left;font-size:16px;'>Here is a message</p>
+                <span class="button" style="display:flex;position:absolute;right:0;top:0;" onclick="closeModal()">X</span>
+            </div>
+        </div>
+        `;
     modalOverlayEl = overlayWrapper.firstElementChild;
     document.body.appendChild(modalOverlayEl);
 }

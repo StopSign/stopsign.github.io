@@ -53,6 +53,8 @@ data.options = {};
 data.options.updateRate = 20;
 data.options.autosaveRate = 10;
 data.options.bonusRate = 2;
+let chartData = []; // Stores { time: number, value: number }
+let chartScale = 'linear'; // 'linear' or 'logarithmic'
 
 // --- Core Settings ---
 data.gameSettings = {
@@ -77,8 +79,8 @@ let viewData = {}; //contains only things that are generated / not saved
 viewData.toasts = [];
 
 let language = "english";
-let globalVisible = false;
-// let globalVisible = true;
+// let globalVisible = false;
+let globalVisible = true;
 let isLoadingEnabled = true; //SET FALSE FOR CLEARING SAVE
 
 
@@ -112,7 +114,7 @@ function debug() {
     // unveilPlane(1);
     // unveilPlane(2);
     // statAddAmount("pulse", 10)
-    // statAddAmount("integration", 200)
+    statAddAmount("integration", 120)
     // statAddAmount("legacy", 10)
 
     // unveilAction('earthMagic');
@@ -253,8 +255,8 @@ function initializeData() {
     create("spotAPath", [], 0, -1);
     create("pleasantForest", ["hiddenPath", "exploreTheForest", "travelToCrossroads"], 2, 0);
     create("hiddenPath", ["meetGrumpyHermit"], 0, 1);
-    create("meetGrumpyHermit", ["annoyHermitIntoAQuest", "talkToHermit", "learnToStayStill"], 0, 1);
-    create("annoyHermitIntoAQuest", ["presentTheOffering"], -1, -.2);
+    create("meetGrumpyHermit", ["pesterHermitForSecrets", "talkToHermit", "learnToStayStill"], 0, 1);
+    create("pesterHermitForSecrets", ["presentTheOffering"], -1, -.2);
     create("presentTheOffering", [], 0, -1);
     create("talkToHermit", ["inquireAboutMagic"], 1, -.5);
     create("inquireAboutMagic", [], 0, 1);

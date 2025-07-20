@@ -150,10 +150,11 @@ let views = {
         let mediumVersion = scale < .65 && !miniVersion;
         views.updateVal(`${actionVar}LargeVersionContainer`, !miniVersion?"":"none", "style.display");
         views.updateVal(`${actionVar}SmallVersionContainer`, miniVersion?"":"none", "style.display");
-        // views.updateVal(`${actionVar}LargeVersionContainer`, !mediumVersion?"":(1 / (scale) / 2 + .5)*.8+"", "style.scale");
+        views.updateVal(`${actionVar}Container`, miniVersion ? "100px" : "" , "style.borderRadius");
         views.updateVal(`${actionVar}SmallVersionContainer`, (1 / scale)*.8+"", "style.scale");
 
         views.updateVal(`${actionVar}SmallVersionTitle`, scale < .11 ? "0" : "1" , "style.opacity");
+        views.updateVal(`${actionVar}Container`, miniVersion ? "100px" : "" , "style.borderRadius");
         // views.updateVal(`${actionVar}SmallVersionTitle`, scale < .11 ? "none" : "" , "style.display");
 
         // if(!miniVersion) { //don't check in small
@@ -298,10 +299,12 @@ let views = {
             ["resourceIncrease", 3], ["resourceDecrease", 3],
             ["highestLevel2", 1]
         ];
-        if(actionObj.isGenerator) {
+        if(actionObj.isGenerator || actionVar === "hearAboutTheLich") {
             roundedNumbers.push(["resourceToAdd", 2]);
             roundedNumbers.push(["actionPowerMult", 3]);
-            // roundedNumbers.push(["actionPower", 2]);
+        }
+        if(actionVar === "hearAboutTheLich") {
+            roundedNumbers.push(["actionPower", 2]);
         }
 
         if(actionObj.currentMenu === "atts") {
@@ -476,6 +479,7 @@ function updateGlobals() {
 
 function updateViewOnSecond() {
     showAllValidToasts();
+    drawChart();
 
     let toShowUseAmulet = data.useAmuletButtonShowing && data.gameState === "KTL";
     views.updateVal(`openUseAmuletButton`, toShowUseAmulet ? "" : "none", "style.display");

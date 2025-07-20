@@ -135,7 +135,7 @@ const actionPatches = {
     meetGrumpyHermit: {
         preventReset: true
     },
-    annoyHermitIntoAQuest: {
+    pesterHermitForSecrets: {
         preventReset: true
     },
     presentTheOffering: {
@@ -177,6 +177,9 @@ const actionPatches = {
     chatWithHermit: {
         preventReset: true
     },
+    tellAJoke: {
+        preventReset: true
+    },
     chatWithMerchants: {
         preventReset: true
     },
@@ -192,7 +195,52 @@ const actionPatches = {
     keyToTheBackroom: {
         preventReset: true
     },
+    joinCoffeeClub: {
+        preventReset: true
+    },
+    buyGoodFood: {
+        preventReset: true
+    },
+    buyStylishClothes: {
+        preventReset: true
+    },
+    slideTheCoin: {
+        preventReset: true
+    },
+    browseBackrooms: {
+        preventReset: true
+    },
+    talkToHermit: {
+        preventReset: true
+    },
+    gossipAroundCoffee: {
+        preventReset: true
+    },
+    buyCoffee: {
+        preventReset: true
+    },
+    learnToStayStill: {
+        preventReset: true
+    },
+    inquireAboutMagic: {
+        preventReset: true
+    },
+    // feelTheResonance: {
+    //     preventReset: true
+    // },
+    // layerTheEchoes: {
+    //     preventReset: true
+    // },
+    // igniteTheSpark: {
+    //     preventReset: true
+    // },
 
+    echoKindle: {
+        preventReset: true
+    },
+    sparkMana: {
+        preventReset: true
+    },
 
 };
 
@@ -201,13 +249,13 @@ function load() {
 
     let toLoad = {};
 
-    // if(onLoadData) {
-    //     toLoad = onLoadData;
-    // } else if(localStorage[saveName]) {
-    //     toLoad = JSON.parse(decode(localStorage[saveName]));
-    // }
+    if(onLoadData) {
+        toLoad = onLoadData;
+    } else if(localStorage[saveName]) {
+        toLoad = JSON.parse(decode(localStorage[saveName]));
+    }
 
-    // just after pleasant forest
+    // just before inquire
 
 
     if(isLoadingEnabled && localStorage[saveName] && toLoad.actions) { //has a save file
@@ -369,6 +417,9 @@ function updateUIFromLoad() {
             revealActionAtts(actionObj);
         }
     }
+    if(data.actions.inquireAboutMagic.unlocked) { //inbetween inquire and seeing ignite the spark
+        revealAtt("legacy");
+    }
 
     if (data.planeUnlocked[1] || data.planeUnlocked[2]) {
         for (let i = 0; i < data.planeUnlocked.length; i++) {
@@ -377,6 +428,7 @@ function updateUIFromLoad() {
             }
         }
     }
+    // switchToPlane(0);
 
     if(data.doneAmulet && data.gameState !== "KTL") {
         views.updateVal(`openViewAmuletButton`, "", "style.display");

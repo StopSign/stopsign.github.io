@@ -311,7 +311,10 @@ function unveilAction(actionVar) {
     let parent = data.actions[parentVar];
     // let amountToSet = data.upgrades.sliderAutoSet.amount;
     if(!parent) {
-        console.log('Failed to access parent var ' + parentVar + ' of action ' + actionVar + '.');
+        if(!["echoKindle"].includes(actionVar)) {
+            console.log('Failed to access parent var ' + parentVar + ' of action ' + actionVar + '.');
+        }
+        return;
     }
     if(parent.isGenerator && parent.generatorTarget === actionVar) {
         //There won't be a downstream slider
@@ -326,9 +329,6 @@ function unveilAction(actionVar) {
 
 function revealActionAtts(actionObj) {
     for(let onLevelAtt of actionObj.onLevelAtts) {
-        if(actionObj.actionVar === "echoKindle") {
-            console.log('here1');
-        }
         revealAtt(onLevelAtt[0]);
     }
 }
