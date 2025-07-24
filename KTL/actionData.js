@@ -532,7 +532,7 @@ let actionData = {
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.1, maxLevel:10,
         unlockCost:2e18, visible:false, unlocked:false, purchased: true,
-        onLevelAtts:[["recognition", 2000], ["confidence", 5], ["discernment", 10]],
+        onLevelAtts:[["recognition", 2000], ["confidence", 10], ["discernment", 10]],
         expAtts:[["savvy", 1]],
         efficiencyAtts:[["confidence", .5]]
     },
@@ -803,10 +803,10 @@ let actionData = {
     },
     gossipAroundCoffee: {
         tier:1, plane:0, resourceName:"conversations",
-        progressMaxBase:1e6, progressMaxIncrease:20,
+        progressMaxBase:1e7, progressMaxIncrease:20,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.1,
-        unlockCost:400000, maxLevel:10,
+        unlockCost:1000000, maxLevel:10,
         visible:false, unlocked:false, purchased: true,
         onUnlock: function() {
             unveilAction('hearAboutTheLich');
@@ -819,18 +819,15 @@ let actionData = {
     },
     hearAboutTheLich: {
         tier:2, plane:0, resourceName:"fear",
-        progressMaxBase:200000, progressMaxIncrease:1e6,
+        progressMaxBase:200000, progressMaxIncrease:1e3,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:1,
-        unlockCost:0, maxLevel:1,
+        unlockCost:0,
         visible:false, unlocked:false, purchased: true, hasUpstream:false,
         onLevelCustom: function() {
-            //Auto-shows KTL button on level via view updates
-            unveilPlane(0);
-            unveilPlane(2);
         },
         isUnlockCustom: function() {
-            return data.actions.gossipAroundCoffee.level >= 1;
+            return data.actions.gossipAroundCoffee.level >= 5;
         },
         updateMults: function() {
             data.actions.hearAboutTheLich.resourceToAdd = actionData.hearAboutTheLich.calcFearGain();
@@ -838,13 +835,15 @@ let actionData = {
         completeFromOverclock: function() {
             if (data.actions.hearAboutTheLich.unlocked) {
                 data.actions.hearAboutTheLich.actionPower = actionData.hearAboutTheLich.calcFearGain();
-                data.actions.hearAboutTheLich.resourceToAdd = data.actions.hearAboutTheLich.actionPower
+                data.actions.hearAboutTheLich.resourceToAdd = data.actions.hearAboutTheLich.actionPower;
                 data.actions.hearAboutTheLich.resource += data.actions.hearAboutTheLich.resourceToAdd;
+                data.actions.hearAboutTheLich.resourceIncrease += data.actions.hearAboutTheLich.actionPower *
+                    data.gameSettings.ticksPerSecond;
             }
         },
         calcFearGain: function() {
-            return Math.pow((data.totalMomentum + data.actions.overclock.resourceToAdd)/1e20, .25) *
-                Math.sqrt(data.actions.gossipAroundCoffee.resource / 100000);
+            return Math.pow((data.totalMomentum + data.actions.overclock.resourceToAdd)/1e24, .25) *
+                Math.sqrt(data.actions.gossipAroundCoffee.resource / 1e12);
         },
         onLevelAtts:[["integration", 200]],
         expAtts:[["legacy", 1]],
@@ -859,8 +858,8 @@ let actionData = {
                 background-color:#550000;text-shadow: 3px 3px 2px rgba(0, 0, 0, 0.8);color: #ffdddd;box-shadow:0 0 10px 6px rgba(255, 0, 0, 0.7);font-size:26px;" >
             Kill the Lich!</span>
         `,
-        unlockMessage:{english:"Unlocks when Gossip Around Coffee is level 1."},
-        extraInfo: {english:Raw.html`This action gains (Total Momentum / 1e20)^.25 * (Conversations on Gossip / 100k)^.5 Fear 
+        unlockMessage:{english:"Unlocks when Gossip Around Coffee is level 5."},
+        extraInfo: {english:Raw.html`This action gains (Total Momentum / 1e24)^.25 * (Conversations on Gossip / 1e12)^.5 Fear 
         for each Overclock complete, which is a gain of
         <span style="font-weight:bold;" id="hearAboutTheLichActionPower">0</span>`},
         storyText: {english:Raw.html`
@@ -923,7 +922,11 @@ actionData = {
         onLevelAtts:[["observation", 120]],
         expAtts:[["curiosity", 1], ["concentration", 1]],
         efficiencyAtts:[["navigation", 1]],
-        unlockMessage:{english:"On unlock, +3 max level for Body Awareness."}
+        unlockMessage:{english:"On unlock, +3 max level for Body Awareness."},
+        storyText:{english:Raw.html`While off to the side of the path, you, at Scott's suggestion, focus on what you can 
+        smell as well. Sometimes there's a certain scent on the breeze, like something sweet, hiding on the mountain.<br><br>
+        The foliage on the mountain becomes too thick to move in and find the source of the scent, 
+        but you can at least tell Scott that you shared his experience.`}
     },
     exploreDifficultPath: {
         tier:1, plane:0,
@@ -1004,7 +1007,7 @@ actionData = {
     },
     pleasantForest: {
         tier:1, plane:0,
-        progressMaxBase:2e16, progressMaxIncrease:9,
+        progressMaxBase:1e16, progressMaxIncrease:10,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.2, maxLevel:10,
         unlockCost:1e15, visible:false, unlocked:false, purchased: true,
@@ -1043,7 +1046,7 @@ actionData = {
             unveilAction('socialize');
         },
         onLevelCustom: function() {
-            unveilAction('pesterHermitForSecrets')
+            unveilAction('annoyHermitIntoAQuest')
             if(data.actions.meetGrumpyHermit.level >= 2) {
                 unveilAction('talkToHermit');
             }
@@ -1068,7 +1071,7 @@ actionData = {
         expAtts:[["endurance", 1]],
         efficiencyAtts:[]
     },
-    pesterHermitForSecrets: {
+    annoyHermitIntoAQuest: {
         tier:1, plane:0,
         progressMaxBase:3e15, progressMaxIncrease:1,
         expToLevelBase:100, expToLevelIncrease:1,
@@ -1323,20 +1326,6 @@ actionData = {
         expAtts:[],
         efficiencyAtts:[["discernment", .5]]
     },
-    hearOfSecretShrine: {
-        tier:1, plane:0, resourceName:"conversations",
-        progressMaxBase:1e15, progressMaxIncrease:3,
-        expToLevelBase:10, expToLevelIncrease:1,
-        efficiencyBase:1, maxLevel:10,
-        unlockCost:3e13, visible:false, unlocked:false, purchased: true,
-        onUnlock: function() {
-        },
-        onLevelCustom: function() {
-        },
-        onLevelAtts:[],
-        expAtts:[],
-        efficiencyAtts:[]
-    },
     learnToStayStill: {
         tier:1, plane:0,
         progressMaxBase:1e19, progressMaxIncrease:1,
@@ -1398,6 +1387,7 @@ actionData = {
         onUnlock: function() {
         },
         onLevelCustom: function() {
+            unveilAction('pesterHermitForSecrets')
         },
         onLevelAtts:[["legacy", 9], ["pulse", 10]],
         expAtts:[],
@@ -1434,6 +1424,29 @@ actionData = {
         expAtts:[["coordination", 1], ["observation", 1], ["endurance", 1]],
         efficiencyAtts:[]
     },
+    pesterHermitForSecrets: {
+        tier:1, plane:0,
+        progressMaxBase:3e20, progressMaxIncrease:1000,
+        expToLevelBase:1, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:3,
+        unlockCost:1e21, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+            unveilAction('travelToCrossroads')
+        },
+        onLevelCustom: function() {
+            unveilAction('restAtWaterfall')
+            if(data.actions.pesterHermitForSecrets.level >= 2) {
+                unveilAction('visitShrineBehindWaterfall')
+            }
+            if(data.actions.pesterHermitForSecrets.level >= 3) {
+                unveilAction('forgottenShrine')
+            }
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[],
+        unlockMessage:{english:"On unlock and level, reveal a new action."}
+    },
     gatherRarePlants: {
         tier:1, plane:0,
         progressMaxBase:1e15, progressMaxIncrease:3,
@@ -1450,24 +1463,38 @@ actionData = {
     },
     restAtWaterfall: {
         tier:1, plane:0,
-        progressMaxBase:1e15, progressMaxIncrease:3,
+        progressMaxBase:6e20, progressMaxIncrease:3,
         expToLevelBase:10, expToLevelIncrease:1,
-        efficiencyBase:1, maxLevel:10,
-        unlockCost:3e13, visible:false, unlocked:false, purchased: true,
+        efficiencyBase:1, maxLevel:2,
+        unlockCost:2e21, visible:false, unlocked:false, purchased: true,
         onUnlock: function() {
         },
         onLevelCustom: function() {
         },
-        onLevelAtts:[],
+        onLevelAtts:[["flow", 110], ["concentration", 3000]],
+        expAtts:[],
+        efficiencyAtts:[]
+    },
+    forgottenShrine: {
+        tier:1, plane:0,
+        progressMaxBase:6e26, progressMaxIncrease:1,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:1,
+        unlockCost:2e27, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+        },
+        onLevelCustom: function() {
+        },
+        onLevelAtts:[["legacy", 30]],
         expAtts:[],
         efficiencyAtts:[]
     },
     visitShrineBehindWaterfall: {
         tier:1, plane:0,
-        progressMaxBase:1e15, progressMaxIncrease:3,
+        progressMaxBase:6e23, progressMaxIncrease:1,
         expToLevelBase:10, expToLevelIncrease:1,
-        efficiencyBase:1, maxLevel:10,
-        unlockCost:3e13, visible:false, unlocked:false, purchased: true,
+        efficiencyBase:1, maxLevel:1,
+        unlockCost:2e24, visible:false, unlocked:false, purchased: true,
         onUnlock: function() {
         },
         onLevelCustom: function() {
@@ -1478,17 +1505,17 @@ actionData = {
     },
     travelToCrossroads: {
         tier:1, plane:0,
-        progressMaxBase:1e15, progressMaxIncrease:10,
+        progressMaxBase:1e25, progressMaxIncrease:10,
         expToLevelBase:10, expToLevelIncrease:1,
-        efficiencyBase:.1, maxLevel:10,
-        unlockCost:3e13, visible:false, unlocked:false, purchased: true,
+        efficiencyBase:.05, maxLevel:10,
+        unlockCost:1e22, visible:false, unlocked:false, purchased: true,
         onUnlock: function() {
         },
         onLevelCustom: function() {
         },
-        onLevelAtts:[],
+        onLevelAtts:[["observation", 30000]],
         expAtts:[["endurance", 1]],
-        efficiencyAtts:[["curiosity", .1]]
+        efficiencyAtts:[["curiosity", .01]]
     },
     standStraighter: {
         tier:1, plane:0,
@@ -1627,11 +1654,11 @@ actionData = {
 
     guildReceptionist: {
         tier:1, plane:0,
-        progressMaxBase:1e20, progressMaxIncrease:3,
+        progressMaxBase:1e21, progressMaxIncrease:3,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.2, maxLevel:8,
-        wage: 200000,
-        unlockCost:1e19, visible:false, unlocked:false, purchased: true,
+        wage: 500000,
+        unlockCost:1e20, visible:false, unlocked:false, purchased: true,
         onLevelCustom: function() {
             data.actions.guildReceptionist.wage += actionData.guildReceptionist.wage/4;
             changeJob('guildReceptionist');
@@ -1642,7 +1669,7 @@ actionData = {
         onLevelAtts:[["adaptability", 16]],
         expAtts:[],
         efficiencyAtts:[["adaptability", .05]],
-        unlockMessage:{english:"On unlock, set job to guildReceptionist for a base wage of $200k."}
+        unlockMessage:{english:"On unlock, set job to Guild Receptionist for a base wage of $500k."}
     },
     messenger: {
         tier:1, plane:0,
@@ -1713,30 +1740,30 @@ actionData = {
 
     meditate: {
         tier:1, plane:0,
-        progressMaxBase:1e27, progressMaxIncrease:10,
+        progressMaxBase:1e29, progressMaxIncrease:40,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.001, maxLevel:1,
-        unlockCost:9e20, visible:false, unlocked:false, purchased: true,
+        unlockCost:1e22, visible:false, unlocked:false, purchased: true,
         onUnlock: function() {
         },
         onLevelCustom: function() {
         },
-        onLevelAtts:[["awareness", 1000], ["cycle", 10]],
+        onLevelAtts:[["awareness", 3000], ["cycle", 10]],
         expAtts:[["curiosity", 1], ["flow", 1], ["concentration", 1], ["discernment", 1]],
         efficiencyAtts:[["integration", 10]]
     },
     journal: {
         tier:1, plane:0,
-        progressMaxBase:1e27, progressMaxIncrease:10,
+        progressMaxBase:1e29, progressMaxIncrease:40,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.05, maxLevel:4,
-        unlockCost:9e20, visible:false, unlocked:false, purchased: true,
+        unlockCost:1e22, visible:false, unlocked:false, purchased: true,
         onLevelCustom: function() {
             data.actions.meditate.maxLevel++;
         },
         onUnlock: function() {
         },
-        onLevelAtts:[["curiosity", 5000], ["awareness", 1000]],
+        onLevelAtts:[["curiosity", 5000], ["awareness", 3000]],
         expAtts:[["energy", 1], ["observation", 1]],
         efficiencyAtts:[["cycle", 2]],
         unlockMessage:{english:"On level, +1 max level for Meditate."},
@@ -1744,45 +1771,59 @@ actionData = {
     },
     readTheWritten: {
         tier:1, plane:0,
-        progressMaxBase:10000000, progressMaxIncrease:2,
+        progressMaxBase:1e30, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.05,
-        unlockCost:50000000, visible:false, unlocked:false, purchased: true,
+        unlockCost:1e25, visible:false, unlocked:false, purchased: true,
         onLevelCustom: function() {
         },
         onUnlock: function() {
         },
-        onLevelAtts:[["awareness", 1000], ["curiosity", 500]],
-        expAtts:[["observation", 1], ["energy", 1]],
+        onLevelAtts:[["awareness", 20000], ["curiosity", 30000]],
+        expAtts:[["energy", 1], ["observation", 1]],
         efficiencyAtts:[["cycle", 1]]
     },
     feelAGentleTug: {
         tier:1, plane:0,
-        progressMaxBase:1e15, progressMaxIncrease:10,
+        progressMaxBase:1e21, progressMaxIncrease:6,
         expToLevelBase:10, expToLevelIncrease:1,
-        efficiencyBase:.1, maxLevel:10,
-        unlockCost:3e13, visible:false, unlocked:false, purchased: true,
+        efficiencyBase:.05, maxLevel:3,
+        unlockCost:1e22, visible:false, unlocked:false, purchased: true,
         onUnlock: function() {
         },
         onLevelCustom: function() {
         },
-        onLevelAtts:[],
+        onLevelAtts:[["observation", 30000]],
         expAtts:[],
-        efficiencyAtts:[["curiosity", .1]]
+        efficiencyAtts:[["curiosity", .01]]
     },
     leaveTheOpenRoad: {
         tier:1, plane:0,
-        progressMaxBase:1e15, progressMaxIncrease:10,
+        progressMaxBase:2e21, progressMaxIncrease:6,
         expToLevelBase:10, expToLevelIncrease:1,
-        efficiencyBase:.1, maxLevel:10,
-        unlockCost:3e13, visible:false, unlocked:false, purchased: true,
+        efficiencyBase:.04, maxLevel:3,
+        unlockCost:2e22, visible:false, unlocked:false, purchased: true,
         onUnlock: function() {
         },
         onLevelCustom: function() {
         },
         onLevelAtts:[],
         expAtts:[],
-        efficiencyAtts:[["curiosity", .1]]
+        efficiencyAtts:[["curiosity", .01]]
+    },
+    findOverlook: {
+        tier:1, plane:0,
+        progressMaxBase:4e21, progressMaxIncrease:6,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:.03, maxLevel:1,
+        unlockCost:4e22, visible:false, unlocked:false, purchased: true,
+        onUnlock: function() {
+        },
+        onLevelCustom: function() {
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[["curiosity", .01]]
     },
     discoverBurntTown: {
         tier:1, plane:0,

@@ -134,11 +134,14 @@ let views = {
         let toDisplay = actionObj.visible || globalVisible;
         let isInRange = isActionVisible(actionVar);
         views.updateVal(`${actionVar}Container`, toDisplay&&isInRange?"":"none", "style.display");
-        if(actionObj.parentVar) {
-            let parentObj = data.actions[actionObj.parentVar];
+        if(dataObj.parentVar) {
+            let parentObj = data.actions[dataObj.parentVar];
+            if(!parentObj) {
+                console.log(actionVar, dataObj.parentVar);
+            }
             // views.updateVal(`${actionObj.parentVar}_${actionVar}_Line_Outer`, "none", "style.display");
-            views.updateVal(`${actionObj.parentVar}_${actionVar}_Line_Outer`, globalVisible||(toDisplay && parentObj.visible) ?"flex":"none", "style.display");
-            views.updateVal(`${actionObj.parentVar}_${actionVar}_Line_Inner`, toDisplay && parentObj.visible ?"":"none", "style.display");
+            views.updateVal(`${dataObj.parentVar}_${actionVar}_Line_Outer`, globalVisible||(toDisplay && parentObj.visible) ?"flex":"none", "style.display");
+            views.updateVal(`${dataObj.parentVar}_${actionVar}_Line_Inner`, toDisplay && parentObj.visible ?"":"none", "style.display");
         }
 
         // if(!toDisplay) { // || not in screen range
@@ -299,7 +302,7 @@ let views = {
             ["resourceIncrease", 3], ["resourceDecrease", 3],
             ["highestLevel2", 1]
         ];
-        if(actionObj.isGenerator || actionVar === "hearAboutTheLich") {
+        if(actionObj.isGenerator && actionVar !== "hearAboutTheLich") {
             roundedNumbers.push(["resourceToAdd", 2]);
             roundedNumbers.push(["actionPowerMult", 3]);
         }
@@ -318,8 +321,8 @@ let views = {
         roundedNumbers.push(["prevUnlockTime", 1]);
         roundedNumbers.push(["efficiencyBase", 2]);
         roundedNumbers.push(["level2", 1]);
-        roundedNumbers.push(["progressMaxIncrease", "none"]);
-        roundedNumbers.push(["expToLevelIncrease", "none"]);
+        roundedNumbers.push(["progressMaxIncrease", 0]);
+        roundedNumbers.push(["expToLevelIncrease", 0]);
 
 
 

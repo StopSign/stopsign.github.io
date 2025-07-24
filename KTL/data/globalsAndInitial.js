@@ -79,8 +79,8 @@ let viewData = {}; //contains only things that are generated / not saved
 viewData.toasts = [];
 
 let language = "english";
-// let globalVisible = false;
-let globalVisible = true;
+let globalVisible = false;
+// let globalVisible = true;
 let isLoadingEnabled = true; //SET FALSE FOR CLEARING SAVE
 
 
@@ -91,6 +91,12 @@ function debug() {
     if(!isDebug) {
         return;
     }
+    //temp data corrections:
+
+
+    unveilAction('pesterHermitForSecrets')
+    adjustActionData('hearAboutTheLich', 'progressMaxIncrease', 1e3)
+
     // data.useAmuletButtonShowing = true;
     // data.doneKTL = true;
     // data.doneAmulet = true;
@@ -102,10 +108,6 @@ function debug() {
     // buyUpgrade("stopLettingOpportunityWait", 2);
     // setSliderUI("overclock", "reflect", 100);
     // unveilAction('makeMoney');
-    // unveilAction('spendMoney');
-    // unveilAction('checkNoticeBoard');
-
-    // stop = 1;
 
     //setup system to right before HATL:
     // revealAtt("integration")
@@ -114,7 +116,7 @@ function debug() {
     // unveilPlane(1);
     // unveilPlane(2);
     // statAddAmount("pulse", 10)
-    statAddAmount("integration", 120)
+    // statAddAmount("integration", 120)
     // statAddAmount("legacy", 10)
 
     // unveilAction('earthMagic');
@@ -129,6 +131,11 @@ function debug() {
     // data.actions.overclock.resource = 1e20;
     // statAddAmount("cycle", 40)
     // statAddAmount("discernment", 200)
+
+
+
+
+
 
 
     gameSpeed = 1;
@@ -255,11 +262,12 @@ function initializeData() {
     create("spotAPath", [], 0, -1);
     create("pleasantForest", ["hiddenPath", "exploreTheForest", "travelToCrossroads"], 2, 0);
     create("hiddenPath", ["meetGrumpyHermit"], 0, 1);
-    create("meetGrumpyHermit", ["pesterHermitForSecrets", "talkToHermit", "learnToStayStill"], 0, 1);
-    create("pesterHermitForSecrets", ["presentTheOffering"], -1, -.2);
+    create("meetGrumpyHermit", ["annoyHermitIntoAQuest", "talkToHermit", "learnToStayStill"], 0, 1);
+    create("annoyHermitIntoAQuest", ["presentTheOffering"], -1, -.2);
     create("presentTheOffering", [], 0, -1);
     create("talkToHermit", ["inquireAboutMagic"], 1, -.5);
-    create("inquireAboutMagic", [], 0, 1);
+    create("inquireAboutMagic", ["pesterHermitForSecrets"], 0, 1);
+    create("pesterHermitForSecrets", [], 0, 1);
 
     //socialize start
     create("socialize", ["meetPeople"], -1, 1);
@@ -276,8 +284,7 @@ function initializeData() {
     create("keyToTheBackroom", [], -1, 0);
 
     create("chatWithHermit", ["tellAJoke"], 0, 1);
-    create("tellAJoke", ["hearOfSecretShrine"], 0, 1);
-    create("hearOfSecretShrine", [], 0, 1);
+    create("tellAJoke", [], 0, 1);
 
     create("joinCoffeeClub", ["gossipAroundCoffee"], 0, 1);
     create("gossipAroundCoffee", ["hearAboutTheLich"], 1, 0);
@@ -292,11 +299,12 @@ function initializeData() {
     create("exploreTheForest", ["travelAlongTheRiver"], 1, .5);
     create("travelAlongTheRiver", ["gatherRiverWeeds", "restAtWaterfall"], 1, .8);
     create("gatherRiverWeeds", ["gatherRarePlants"], 0, 1);
-    create("gatherRarePlants", [], 1, .5);
+    create("gatherRarePlants", [], .5, 1);
     create("restAtWaterfall", ["visitShrineBehindWaterfall"], 1.3, .5);
     create("visitShrineBehindWaterfall", [], .3, 1);
 
-    create("travelToCrossroads", ["feelAGentleTug"], 2, 0);
+    create("travelToCrossroads", ["feelAGentleTug", "forgottenShrine"], 2, 0);
+    create("forgottenShrine", [], 2, -1);
 
 
 //Notice board level 2 / Training & Shortcut pt 2
@@ -324,7 +332,8 @@ function initializeData() {
     create("readTheWritten", [], -1, -.5);
 
     create("feelAGentleTug", ["leaveTheOpenRoad"], 1.5, 1);
-    create("leaveTheOpenRoad", ["discoverBurntTown"], 1, 1);
+    create("leaveTheOpenRoad", ["discoverBurntTown", "findOverlook"], 1, 1);
+    create("findOverlook", [], 1, 0);
     create("discoverBurntTown", ["resonanceCompass"], 1, 1);
     create("resonanceCompass", ["clearIvyWall"], 1, .5);
     create("clearIvyWall", ["gatherOldBooks"], 1, -.1);
@@ -496,8 +505,9 @@ function setParents() {
     for(let actionVar in data.actions) {
         let dataObj = actionData[actionVar];
         for(let downstreamVar of dataObj.downstreamVars) {
-            if(data.actions[downstreamVar]) {
-                data.actions[downstreamVar].parentVar = actionVar;
+            let downstreamDataObj = actionData[downstreamVar];
+            if(downstreamDataObj) {
+                downstreamDataObj.parentVar = actionVar;
             }
         }
     }
@@ -524,8 +534,8 @@ function setRealCoordinates(startActionVar) {
         if (!dataObj) continue; // If action doesn't exist, skip it
 
         // Determine realX and realY
-        if (actionObj.parentVar && actionData[actionObj.parentVar]) {
-            let parentAction = actionData[actionObj.parentVar];
+        let parentAction = actionData[dataObj.parentVar];
+        if (dataObj.parentVar && parentAction) {
             dataObj.realX = parentAction.realX + dataObj.x;
             dataObj.realY = parentAction.realY + dataObj.y;
         } else {

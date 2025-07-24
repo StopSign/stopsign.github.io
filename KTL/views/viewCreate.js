@@ -127,7 +127,7 @@ function generateActionDisplay(actionVar) {
 
     let menuContainer = Raw.html`
         <div id="${actionVar}MenuButtons" style="position:absolute;top:-20px;font-size:13px;left:3px;">
-            ${!actionObj.parentVar?"":`<span onclick="actionTitleClicked('${actionObj.parentVar}')" 
+            ${!dataObj.parentVar?"":`<span onclick="actionTitleClicked('${dataObj.parentVar}')" 
             class="buttonSimple" style="margin-right:3px;width:30px;height:30px;text-align:center;cursor:pointer;padding:0 4px;">^</span>`}
         <span id="${actionVar}_downstreamMenuButton" onclick="clickActionMenu('${actionVar}', 'downstream')" class="buttonSimple" 
             style="margin-right:3px;width:30px;height:30px;text-align:center;cursor:pointer;padding:0 4px;">Downstream</span>
@@ -136,7 +136,7 @@ function generateActionDisplay(actionVar) {
         <span id="${actionVar}_attsMenuButton" onclick="clickActionMenu('${actionVar}', 'atts')" class="buttonSimple" 
             style="margin-right:3px;width:30px;height:30px;text-align:center;cursor:pointer;padding:0 4px;">Stats</span>
         <span id="${actionVar}_storyMenuButton" onclick="clickActionMenu('${actionVar}', 'story')" class="buttonSimple" 
-            style="margin-right:3px;width:30px;height:30px;text-align:center;cursor:pointer;padding:0 4px;">Story</span>
+            style="display:${dataObj.storyText?"":"none"}margin-right:3px;width:30px;height:30px;text-align:center;cursor:pointer;padding:0 4px;">Story</span>
         </div>`;
 
     queueCache(`${actionVar}ResourceIncrease`);
@@ -312,7 +312,7 @@ function generateActionDisplay(actionVar) {
             <span>
                 <div id="${actionVar}UnlockCostContainer">
                     Needs <span style="font-weight:bold;" id="${actionVar}UnlockCost">0</span> ${dataObj.resourceName}<br>
-                    sent from <b>${data.actions[actionObj.parentVar]?data.actions[actionObj.parentVar].title:"WAIT"}</b>.
+                    sent from <b>${data.actions[dataObj.parentVar]?data.actions[dataObj.parentVar].title:"WAIT"}</b>.
                 </div>
                 ${dataObj.unlockMessage ? dataObj.unlockMessage[language]:""}
             </span>

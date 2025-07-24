@@ -135,7 +135,7 @@ const actionPatches = {
     meetGrumpyHermit: {
         preventReset: true
     },
-    pesterHermitForSecrets: {
+    annoyHermitIntoAQuest: {
         preventReset: true
     },
     presentTheOffering: {
@@ -213,9 +213,6 @@ const actionPatches = {
     talkToHermit: {
         preventReset: true
     },
-    gossipAroundCoffee: {
-        preventReset: true
-    },
     buyCoffee: {
         preventReset: true
     },
@@ -225,20 +222,57 @@ const actionPatches = {
     inquireAboutMagic: {
         preventReset: true
     },
-    // feelTheResonance: {
-    //     preventReset: true
-    // },
-    // layerTheEchoes: {
-    //     preventReset: true
-    // },
-    // igniteTheSpark: {
-    //     preventReset: true
-    // },
+    feelTheResonance: {
+        preventReset: true
+    },
+    layerTheEchoes: {
+        preventReset: true
+    },
+    igniteTheSpark: {
+        preventReset: true
+    },
+    gossipAroundCoffee: {
+        preventReset: true
+    },
+    hearAboutTheLich: {
+        preventReset: false
+    },
+    pesterHermitForSecrets: {
+        preventReset: true
+    },
+    guildReceptionist: {
+        preventReset: true
+    },
+    meditate: {
+        preventReset: true
+    },
+    journal: {
+        preventReset: true
+    },
+    travelToCrossroads: {
+        preventReset: false
+    },
+    restAtWaterfall: {
+        preventReset: true
+    },
+
 
     echoKindle: {
         preventReset: true
     },
     sparkMana: {
+        preventReset: true
+    },
+    poolMana: {
+        preventReset: true
+    },
+    expelMana: {
+        preventReset: true
+    },
+    prepareSpells: {
+        preventReset: true
+    },
+    manaBasics: {
         preventReset: true
     },
 

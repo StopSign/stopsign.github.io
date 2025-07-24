@@ -138,9 +138,10 @@ function initializeToasts() {
         You should keep asking the Hermit about magic - he knows how to really get you started.`);
 
     createToast(function() { return data.actions.gossipAroundCoffee.unlocked },
-        "What did you just say?", 0,
+        "What did they just say?", 0,
         Raw.html`You whirl around, fear clawing down your spine, hoping that you did not just hear the word 
-        "lich" on someone's tongue. You need to know more about this.`);
+        "lich" on someone's tongue. You need to know more about this.<br><br>
+        Get Gossip Around Coffee to level 1.`);
 
     createToast(function() { return data.actions.hearAboutTheLich.level >= 1 },
         "Something Must Be Done", 0,

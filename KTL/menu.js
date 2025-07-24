@@ -10,6 +10,7 @@ let canvas, ctx, linearBtn, logBtn;
 function initializeMenus() {
     createMenu(); // makes the button | menu | title
     addMenuTab("help");
+    addMenuTab("helpForReal");
     addMenuTab("story");
     addMenuOptionsTab(); //adjust fps, saving
     addDataTab();
@@ -26,7 +27,14 @@ function initializeMenus() {
     addMenuTab("shop");
     addMenuTextContainer("shop", createShopMenu());
 
-    // addMenuTab("cheat");
+    addMenuTextContainer("helpForReal", createHelpForRealMenu());
+
+    document.getElementById("helpForRealMenuTab").style.display = "none";
+    document.getElementById("helpMenuTab").addEventListener('click', () => {
+        document.getElementById("helpForRealMenuTab").style.display = "flex";
+    });
+
+        // addMenuTab("cheat");
     // addMenuTextContainer("cheat", createCheatMenu());
 }
 
@@ -68,19 +76,23 @@ function createCheatMenu() {
 function createShopMenu() {
     return Raw.html`
         <div class="menuTitle">Shop</div>
-        <div class="menuSeparator"></div><br>TODO - Shop will be completed for full release with the following plans:<br>
+        <div class="menuSeparator"></div><br>TODO - Shop will be completed for full release with the following plans. 
+        I will keep the game ad-free and AI-art free, and the demo will be open-source on my github.<br> 
+        I'm looking for feedback on the pricing for when the game lives on steam, outlined below.<br>
         Disclaimer: Game will be balanced without these upgrades.<br><br>
         <ul>
-            <li>$5 for 1k Soul Coins</li>
-            <li>$20 for 5k</li>
+            <li>$5 for 1k Soul Coins (SC)</li>
+            <li>$20 for 5k Soul Coins</li>
         </ul>
+        There will be a "daily bonus" button for +100 soul coins (and 30m of bonus speed) every 23hr, 
+        and it upgrades to +200 in ~30 days.<br>
         
         <br>Unique Upgrades:<br>
         <ul>
-            <li>+100 soul coins every 23hr, upgrade to +200 every 23hr in ~30 days.</li>
             <li>Maximum Focus bars +1 (up to 4): 1k SC each</li>
             <li>Focus Bars mult (up to x4): 1k SC each</li>
             <li>Learn exact legacy/AC gained in KTL before switching Overclock targets: 500 SC</li>
+            <li>Unlock option for Bonus Speed to go x10: 100 SC</li>
         </ul>
         
         <br>Special Resource Bonuses:<br>
@@ -93,18 +105,40 @@ function createShopMenu() {
         
         <br>Timed Resource Bonuses (repeated use adds to timer):<br>
         <ul>
-            <li>x2 momentum for 24hr: 100 SC</li>
-            <li>x2 gold for 24hr: 100 SC</li>
-            <li>x2 conversations for 24hr: 100 SC</li>
-            <li>x2 mana for 24hr: 100 SC</li>
-        </ul>`;
+            <li>x2 momentum for 24hr: 200 SC</li>
+            <li>x2 gold for 24hr: 200 SC</li>
+            <li>x2 conversations for 24hr: 200 SC</li>
+            <li>x2 mana for 24hr: 200 SC</li>
+            <li>x2 legacy for 24hr: 600 SC</li>
+            <li>x2 game speed for 24hr: 2000 SC</li>
+        </ul>
+
+        <br>Buy Bonus Time:<br>
+        <ul>
+            <li>1 hr for 200 SC</li>
+            <li>24hr for 2000 SC</li>
+        </ul>
+`;
+}
+
+function createHelpForRealMenu() {
+    return Raw.html`
+        <div class="menuTitle">How to Provide Feedback</div>
+        <div class="menuSeparator"></div><br>
+        You'll help, for real? Wow, I didn't know you were cool like that.<br>
+        My discord to discuss everything is here: <a href="https://discord.gg/dnKA6Xd">Stop_Sign Gaming</a>. I would really appreciate hearing about your experience, 
+        and how you felt while playing! 
+        You can also talk about the game in the discord with others, and share strategies.<br><br>
+        No AI was used in the writing of the story, and no AI-art will be added to the game.<br><br>
+        Thanks for playing! -Stop_Sign
+`;
 }
 
 function createHelpMenu() {
     return Raw.html`
         <div class="menuTitle">Help</div>
         <div class="menuSeparator"></div><br>
-        <span style="font-weight: bold;font-size:26px;">#Skill issue</span><br><br>
+        <span style="font-weight: bold;font-size:34px;">#Skill issue</span><br><br>
         Move the colors to where they haven't been yet. Repeat.
 `;
 }
@@ -112,7 +146,6 @@ function createHelpMenu() {
 function createStoryMenu() {
     return Raw.html`<div class="menuTitle">Background</div>
         <div class="menuSeparator"></div><br>
-        (No AI was used in the writing of the story)<br><br>
 &nbsp;&nbsp;&nbsp;&nbsp;A lich is a creature of bones, dark magic, and myth, occuring rarely in history and causing catastrophes each time. 13 years ago, the Emperor Brithan of Sovvgor had used one of his Talents to kill a lich far to the north, but not without great cost.
  Though this lich and his evil forces had been vanquished, there was a curse on the land. For hundreds of miles - which mostly included wasteland and the majority of the Empire of Sovvgor - those who had Talents could not use them. 
  Though they told us the cause, it was a bitter pill to swallow for all of the country's citizens. Talents were our magic, our connection to the idea that though the world is big, we have our place in it.<br><br>

@@ -107,7 +107,6 @@ function actionSetInitialVariables(actionObj, dataObj) {
 
 
     //Vars that don't really need to be initalized but I like to know they're there
-    actionObj.parentVar = null;
     actionObj.highestLevel = -1;
     actionObj.prevUnlockTime = null;
 }
@@ -291,6 +290,7 @@ function purchaseAction(actionVar) {
 //situation 2: Travel to Outpost just became visible. It's parent, Overclock, should set it's newly visible slider to 1%. AKA On unveil, set parent to 1%.
 function unveilAction(actionVar) {
     let actionObj = data.actions[actionVar];
+    let dataObj = actionData[actionVar];
     if(!actionObj || actionObj.visible || !actionObj.purchased) { //only change things if appropriate
         if(!actionObj) {
             console.log('tried to unveil ' + actionVar + ' in error.');
@@ -307,12 +307,11 @@ function unveilAction(actionVar) {
     revealActionAtts(actionObj);
 
     //set all downstream actions to 1% when you unlock
-    let parentVar = actionObj.parentVar;
-    let parent = data.actions[parentVar];
+    let parent = data.actions[dataObj.parentVar];
     // let amountToSet = data.upgrades.sliderAutoSet.amount;
     if(!parent) {
         if(!["echoKindle"].includes(actionVar)) {
-            console.log('Failed to access parent var ' + parentVar + ' of action ' + actionVar + '.');
+            console.log('Failed to access parent var ' + dataObj.parentVar + ' of action ' + actionVar + '.');
         }
         return;
     }
@@ -320,9 +319,9 @@ function unveilAction(actionVar) {
         //There won't be a downstream slider
         return;
     }
-    actionData[parentVar].downstreamVars.forEach(function (downstreamVar) {
+    actionData[dataObj.parentVar].downstreamVars.forEach(function (downstreamVar) {
         if(downstreamVar === actionVar && data.actions[downstreamVar].hasUpstream) {
-            setSliderUI(parentVar, downstreamVar, getUpgradeSliderAmount()); //set parent on unveil
+            setSliderUI(dataObj.parentVar, downstreamVar, getUpgradeSliderAmount()); //set parent on unveil
         }
     });
 }
@@ -433,13 +432,17 @@ function useCharge(actionVar) {
     }
 }
 
-//adjustActionData('', 'progressMaxBase', 1e6)
 //function to be used as a debug helper, running in console
+//adjustActionData('', 'progressMaxBase', 1e6)
+//adjustActionData('', 'efficiencyBase', .1)
 function adjustActionData(actionVar, key, value) {
     let actionObj = data.actions[actionVar];
     actionObj[key] = value;
     if(['progressMaxBase', 'progressMaxMult'].includes(key)) {
         actionObj.progressMax = actionObj.progressMaxBase * actionObj.progressMaxMult * (1+actionObj.instability/100);
     }
-
+    if(['efficiencyBase', 'efficiencyMult'].includes(key)) {
+        actionObj.expertise = actionObj.efficiencyBase * actionObj.efficiencyMult;
+        actionObj.efficiency = actionObj.expertise > 1 ? 100 : actionObj.expertise * 100;
+    }
 }
