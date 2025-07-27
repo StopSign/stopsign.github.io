@@ -92,7 +92,13 @@ let actionData = {
                 }
             }
 
-            data.actions.overclock.resourceToAdd = data.actions.overclock.actionPower * data.actions.overclock.upgradeMult * spellMult;
+            let actionObj = data.actions.overclock;
+
+            actionObj.progressGain = actionObj.generatorSpeed * (actionObj.efficiency / 100);
+            actionObj.actionPower = actionObj.actionPowerBase *
+                actionObj.actionPowerMult * (actionObj.efficiency/100);
+            actionObj.resourceToAdd = actionObj.actionPower *
+                actionObj.upgradeMult * spellMult;
         },
         onLevelCustom: function () {
             actionData.overclock.updateMults();
@@ -396,8 +402,12 @@ let actionData = {
             let actionObj = data.actions.makeMoney;
             let dataObj = actionData.makeMoney;
 
+            actionObj.progressGain = actionObj.generatorSpeed * (actionObj.efficiency / 100);
+            actionObj.actionPower = actionObj.actionPowerBase *
+                actionObj.actionPowerMult * (actionObj.efficiency/100);
             let resourceTaken = actionObj.resource * actionObj.tierMult();
-            actionObj.resourceToAdd = dataObj.actionPowerFunction(resourceTaken) * actionObj.actionPower * actionObj.upgradeMult;
+            actionObj.resourceToAdd = dataObj.actionPowerFunction(resourceTaken) *
+                actionObj.actionPower * actionObj.upgradeMult;
         },
         updateUpgradeMult:function() {
             let upgradeMult = 1;
@@ -417,7 +427,7 @@ let actionData = {
                 -<span style="font-weight:bold;" id="makeMoneyResourceTaken">???</span> Momentum was taken from this action, converted to<br>
                 +<span style="font-weight:bold;" id="makeMoneyResourceSent">???</span> gold, added to Spend Money.<br>
                 `},
-        extraInfo: {english:Raw.html`<br>Momentum Taken = !% of Current Momentum.<br>
+        extraInfo: {english:Raw.html`<br>Momentum Taken = 1% of Current Momentum.<br>
                         Exp & Gold gain = (Momentum Taken)^.5 * Action Power * Efficiency * Wages.`}
     },
     spendMoney: {
@@ -740,6 +750,9 @@ let actionData = {
             let actionObj = data.actions.socialize;
             let dataObj = actionData.socialize;
 
+            actionObj.progressGain = actionObj.generatorSpeed * (actionObj.efficiency / 100);
+            actionObj.actionPower = actionObj.actionPowerBase *
+                actionObj.actionPowerMult * (actionObj.efficiency/100);
             let resourceTaken = actionObj.resource * actionObj.tierMult();
             actionObj.resourceToAdd = dataObj.actionPowerFunction(resourceTaken) * actionObj.actionPower * actionObj.upgradeMult;
         },
@@ -818,8 +831,8 @@ let actionData = {
         efficiencyAtts:[["discernment", .5]],
     },
     hearAboutTheLich: {
-        tier:2, plane:0, resourceName:"fear",
-        progressMaxBase:200000, progressMaxIncrease:1e3,
+        tier:1, plane:0, resourceName:"fear",
+        progressMaxBase:4000, progressMaxIncrease:1e3,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:1,
         unlockCost:0,
@@ -830,15 +843,23 @@ let actionData = {
             return data.actions.gossipAroundCoffee.level >= 5;
         },
         updateMults: function() {
+            let actionObj = data.actions.hearAboutTheLich;
+            actionObj.progressGain = actionObj.generatorSpeed * (actionObj.efficiency / 100);
+            actionObj.actionPower = actionObj.actionPowerBase *
+                actionObj.actionPowerMult * (actionObj.efficiency/100);
             data.actions.hearAboutTheLich.resourceToAdd = actionData.hearAboutTheLich.calcFearGain();
+            data.actions.hearAboutTheLich.resourceIncrease = data.actions.hearAboutTheLich.resourceToAdd *
+                data.actions.overclock.progressGain / data.actions.overclock.progressMax;
         },
         completeFromOverclock: function() {
+            let actionObj = data.actions.hearAboutTheLich;
             if (data.actions.hearAboutTheLich.unlocked) {
+                actionObj.progressGain = actionObj.generatorSpeed * (actionObj.efficiency / 100);
+                actionObj.actionPower = actionObj.actionPowerBase *
+                    actionObj.actionPowerMult * (actionObj.efficiency/100);
                 data.actions.hearAboutTheLich.actionPower = actionData.hearAboutTheLich.calcFearGain();
                 data.actions.hearAboutTheLich.resourceToAdd = data.actions.hearAboutTheLich.actionPower;
                 data.actions.hearAboutTheLich.resource += data.actions.hearAboutTheLich.resourceToAdd;
-                data.actions.hearAboutTheLich.resourceIncrease += data.actions.hearAboutTheLich.actionPower *
-                    data.gameSettings.ticksPerSecond;
             }
         },
         calcFearGain: function() {
@@ -849,10 +870,6 @@ let actionData = {
         expAtts:[["legacy", 1]],
         efficiencyAtts:[],
         extraButton: Raw.html`
-<!--<div style="position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); padding: 20px 40px; -->
-<!--background-color:#550000; border: 2px solid #aa0000; border-radius: 5px; color: #ffdddd; font-size: 24px; -->
-<!--font-weight: bold; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8); box-shadow: 0 0 15px rgba(255, 0, 0, 0.7); cursor: pointer;">Kill the Lich!</div>-->
-
             <span class="button" id='killTheLichMenuButton2' onclick="openKTLMenu()"
                 style="display:none;padding:8px 13px;position:absolute;top:330px;left:60px;border: 2px solid #aa0000;border-radius: 5px;
                 background-color:#550000;text-shadow: 3px 3px 2px rgba(0, 0, 0, 0.8);color: #ffdddd;box-shadow:0 0 10px 6px rgba(255, 0, 0, 0.7);font-size:26px;" >
@@ -874,9 +891,11 @@ let actionData = {
         beyond what I had achieved to Get Safe, and I was ready I could bend fate in my favor to kill the lich.<br><br>
         
         This time, however, I was going to go prepared; I knew Fate could only bend so far at a time. I had just received magic,
-        and knew that all I needed was to show I had power in my spells, and they would let me join them.<br><br>
+        and knew that all I needed was to show I had the power to help, and the War for Life would let me join.<br><br>
         
-        I was sure that Overclock could handle the rest.`},
+        So, I changed the target of Overclock, from itself to a new target: Kill the Lich. I felt my thoughts collapse, no longer held up 
+        by the artificial momentum. I became focused, with only a single goal in mind: letting my ability life my legs, move my mouth, and swing my sword. 
+        For better or worse, I was along for the ride.<br><br>`},
         onLevelText:{english:"Increases Anxiety gained when Overclock's Target is switched."}
     },
 
@@ -1426,23 +1445,23 @@ actionData = {
     },
     pesterHermitForSecrets: {
         tier:1, plane:0,
-        progressMaxBase:3e20, progressMaxIncrease:1000,
+        progressMaxBase:3e20, progressMaxIncrease:500,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:1, maxLevel:3,
         unlockCost:1e21, visible:false, unlocked:false, purchased: true,
         onUnlock: function() {
-            unveilAction('travelToCrossroads')
+            unveilAction('restAtWaterfall')
         },
         onLevelCustom: function() {
-            unveilAction('restAtWaterfall')
+            unveilAction('visitShrineBehindWaterfall')
             if(data.actions.pesterHermitForSecrets.level >= 2) {
-                unveilAction('visitShrineBehindWaterfall')
+                unveilAction('travelToCrossroads')
             }
             if(data.actions.pesterHermitForSecrets.level >= 3) {
                 unveilAction('forgottenShrine')
             }
         },
-        onLevelAtts:[],
+        onLevelAtts:[["curiosity", 10000]],
         expAtts:[],
         efficiencyAtts:[],
         unlockMessage:{english:"On unlock and level, reveal a new action."}
@@ -1491,24 +1510,26 @@ actionData = {
     },
     visitShrineBehindWaterfall: {
         tier:1, plane:0,
-        progressMaxBase:6e23, progressMaxIncrease:1,
+        progressMaxBase:6e21, progressMaxIncrease:1,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1, maxLevel:1,
-        unlockCost:2e24, visible:false, unlocked:false, purchased: true,
+        unlockCost:3e22, visible:false, unlocked:false, purchased: true,
         onUnlock: function() {
         },
         onLevelCustom: function() {
         },
         onLevelAtts:[["legacy", 20]],
         expAtts:[],
-        efficiencyAtts:[]
+        efficiencyAtts:[],
+        storyText: {english: Raw.html`You pay respect to the shrine, 
+        and feel your amulet resonate with feelings around this shrine.`}
     },
     travelToCrossroads: {
         tier:1, plane:0,
         progressMaxBase:1e25, progressMaxIncrease:10,
         expToLevelBase:10, expToLevelIncrease:1,
-        efficiencyBase:.05, maxLevel:10,
-        unlockCost:1e22, visible:false, unlocked:false, purchased: true,
+        efficiencyBase:.02, maxLevel:10,
+        unlockCost:3e23, visible:false, unlocked:false, purchased: true,
         onUnlock: function() {
         },
         onLevelCustom: function() {
@@ -1676,7 +1697,7 @@ actionData = {
         progressMaxBase:1e23, progressMaxIncrease:3,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.1, maxLevel:8,
-        wage: 2e6,
+        wage: 4e6,
         unlockCost:1e22, visible:false, unlocked:false, purchased: true,
         onLevelCustom: function() {
             data.actions.messenger.wage += actionData.messenger.wage/4;
@@ -1688,7 +1709,7 @@ actionData = {
         onLevelAtts:[["adaptability", 32]],
         expAtts:[],
         efficiencyAtts:[["adaptability", .05]],
-        unlockMessage:{english:"On unlock, set job to messenger for a base wage of $2m."}
+        unlockMessage:{english:"On unlock, set job to messenger for a base wage of $4m."}
     },
     townCrier: {
         tier:1, plane:0,
@@ -1740,7 +1761,7 @@ actionData = {
 
     meditate: {
         tier:1, plane:0,
-        progressMaxBase:1e29, progressMaxIncrease:40,
+        progressMaxBase:1e30, progressMaxIncrease:40,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.001, maxLevel:1,
         unlockCost:1e22, visible:false, unlocked:false, purchased: true,
@@ -1754,7 +1775,7 @@ actionData = {
     },
     journal: {
         tier:1, plane:0,
-        progressMaxBase:1e29, progressMaxIncrease:40,
+        progressMaxBase:1e30, progressMaxIncrease:40,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.05, maxLevel:4,
         unlockCost:1e22, visible:false, unlocked:false, purchased: true,
@@ -2211,113 +2232,204 @@ actionData = {
 
     worry: {
         tier:0, plane:2, resourceName: "fear",
-        progressMaxBase:60, progressMaxIncrease:1,
-        expToLevelBase:60, expToLevelIncrease:1,
-        efficiencyBase:1, isKTL:true, purchased: true,
-        unlockCost:0, visible:true, unlocked:true, isGenerator:true, generatorSpeed:1, hasUpstream: false,
-        onLevelAtts:[],
+        progressMaxBase:1, progressMaxIncrease:1,
+        expToLevelBase:1000, expToLevelIncrease:10,
+        actionPowerBase:1, actionPowerMult:1, actionPowerMultIncrease:1,
+        efficiencyBase:1, isKTL:true, purchased: true, generatorTarget:"worry",
+        unlockCost:0, visible:true, unlocked:true, isGenerator:true, generatorSpeed:2, hasUpstream: false,
+        onCompleteCustom: function() {
+            let actionObj = data.actions.worry;
+            actionData.worry.updateMults();
+
+            addResourceTo(data.actions["resolve"], actionObj.resourceToAdd);
+            addResourceTo(data.actions["worry"], actionObj.resourceToAdd);
+
+            //Adds exp right after this function
+            actionObj.expToAddBase = actionObj.resourceToAdd;
+            actionObj.expToAdd = actionObj.expToAddBase * actionObj.expToAddMult * calcUpgradeMultToExp(actionObj);
+
+
+            views.scheduleUpdate('worryResourceSent', intToString(actionObj.resourceToAdd, 2), "textContent")
+            views.scheduleUpdate('worryResourceTaken', intToString(actionObj.resourceToAdd, 2), "textContent")
+        },
+        updateMults: function () {
+            let actionObj = data.actions.worry;
+            let dataObj = actionData.worry;
+
+            actionObj.progressGain = actionObj.generatorSpeed * (actionObj.efficiency / 100);
+            actionObj.actionPower = actionObj.actionPowerBase *
+                actionObj.actionPowerMult * (actionObj.efficiency/100);
+            let resourceTaken = actionObj.resource * actionObj.tierMult();
+            actionObj.resourceToAdd = dataObj.actionPowerFunction(resourceTaken) *
+                actionObj.actionPower * actionObj.upgradeMult;
+            data.actions.resolve.resourceIncrease = actionObj.resourceToAdd * actionObj.progressGain / actionObj.progressMax;
+        },
+        actionPowerFunction: function(resource) {
+            return resource / 10;
+        },
+        onCompleteText: {english:Raw.html`
+                +<span style="font-weight:bold;" id="worryResourceTaken">???</span> Fear to this action, and also <br>
+                +<span style="font-weight:bold;" id="worryResourceSent">???</span> Bravery, added to Resolve.<br>
+                `},
+        onLevelAtts:[["doom", 10]],
         expAtts:[],
-        efficiencyAtts:[]
+        efficiencyAtts:[["doom", -1]],
+        extraInfo: {english:Raw.html`<br>Adds equal Fear and Bravery to this action and Resolve.<br> 
+                        Amount added = 10% of Fear * Efficiency per complete.<br>`},
+    },
+    resolve: {
+        tier:0, plane:2, resourceName: "bravery",
+        progressMaxBase:10, progressMaxIncrease:2,
+        expToLevelBase:5, expToLevelIncrease:1,
+        efficiencyBase:1, isKTL:true, purchased: true,
+        unlockCost:0, visible:true, unlocked:true, hasUpstream: false,
+        onLevelAtts:[["courage", 5]],
+        expAtts:[["courage", 1]],
+        efficiencyAtts:[["doom", -1]]
     },
     overclockTargetingTheLich: {
         tier:0, plane:2, resourceName:"momentum",
-        progressMaxBase:60, progressMaxIncrease:1,
-        expToLevelBase:60, expToLevelIncrease:1,
+        progressMaxBase:5, progressMaxIncrease:1,
+        expToLevelBase:12, expToLevelIncrease:1,
         efficiencyBase:1, isKTL:true, purchased: true,
-        unlockCost:0, visible:true, unlocked:true, isGenerator:true, generatorSpeed:1, hasUpstream: false,
-        updateMults: function () {
-            data.actions.overclockTargetingTheLich.resourceToAdd = 0;
+        actionPowerBase:1, actionPowerMult:1, actionPowerMultIncrease:1, generatorTarget:"fightTheEvilForces",
+        unlockCost:0, visible:true, unlocked:true, isGenerator:true, generatorSpeed:1,
+        hasUpstream: false, hideUpstreamLine: true,
+        onCompleteCustom: function() {
+            let actionObj = data.actions.overclockTargetingTheLich;
+            actionData.overclockTargetingTheLich.updateMults();
+            let resourceTaken = actionObj.resource * actionObj.tierMult();
+
+            if (actionObj.resourceToAdd > 0) {
+                actionObj.resource -= resourceTaken;
+                addResourceTo(data.actions[actionObj.generatorTarget], actionObj.resourceToAdd);
+            }
+
+            views.scheduleUpdate('overclockTargetingTheLichResourceSent', intToString(actionObj.resourceToAdd, 2), "textContent")
+            views.scheduleUpdate('overclockTargetingTheLichResourceTaken', intToString(resourceTaken, 2), "textContent")
         },
+        updateMults: function () {
+            let actionObj = data.actions.overclockTargetingTheLich;
+            let dataObj = actionData.overclockTargetingTheLich;
+
+            actionObj.progressGain = actionObj.generatorSpeed * (actionObj.efficiency / 100);
+            actionObj.actionPower = actionObj.actionPowerBase *
+                actionObj.actionPowerMult * (actionObj.efficiency/100);
+            let resourceTaken = actionObj.resource * actionObj.tierMult();
+            actionObj.resourceToAdd = dataObj.actionPowerFunction(resourceTaken) *
+                actionObj.actionPower * actionObj.upgradeMult;
+            data.actions.resolve.resourceIncrease = actionObj.resourceToAdd * actionObj.progressGain / actionObj.progressMax;
+        },
+        actionPowerFunction: function(resource) {
+            return Math.sqrt(resource/1e24) * data.totalSpellPower * data.actions.hearAboutTheLich.level;
+        },
+        onCompleteText: {english:Raw.html`
+                -<span style="font-weight:bold;" id="overclockTargetingTheLichResourceTaken">???</span> Momentum was taken from this action, converted to <br>
+                +<span style="font-weight:bold;" id="overclockTargetingTheLichResourceSent">???</span> Fight, added to Fight The Evil Forces.<br>
+                `},
         onLevelAtts:[],
         expAtts:[],
-        efficiencyAtts:[]
+        efficiencyAtts:[],
+        extraInfo: {english:Raw.html`<br>Momentum Taken = 10% of Current Momentum.<br>
+                        Fight gain = (Momentum Taken/1e24)^.5 * Spell Power * Hear About the Lich Level.`}
     },
     fightTheEvilForces: {
         tier:0, plane:2, resourceName:"fight",
         progressMaxBase:60, progressMaxIncrease:1,
-        expToLevelBase:60, expToLevelIncrease:1,
+        expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:1, isKTL:true, purchased: true,
-        unlockCost:0, visible:true, unlocked:true, isGenerator:true, generatorSpeed:1, hasUpstream: false,
-        onLevelAtts:[],
+        actionPowerBase:1, actionPowerMult:1, actionPowerMultIncrease:1,
+        unlockCost:1, visible:true, unlocked:false, isGenerator:true, generatorSpeed:1, hasUpstream: false,
+        onLevelAtts:[["doom", 50]],
+        onUnlock: function() {
+            unveilAction('bridgeOfBone');
+            setSliderUI("fightTheEvilForces", "bridgeOfBone", 100);
+        },
         expAtts:[],
         efficiencyAtts:[]
     },
     bridgeOfBone: {
         tier:0, plane:2, resourceName:"fight",
-        progressMaxBase:1e10, progressMaxIncrease:2,
+        progressMaxBase:10, progressMaxIncrease:4,
         expToLevelBase:10, expToLevelIncrease:1,
-        efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
-        unlockCost:1e9, visible:true, unlocked:false,
+        efficiencyBase:.4, isKTL:true, purchased: true, maxLevel:25,
+        unlockCost:10, visible:false, unlocked:false,
         onUnlock: function() {
-            data.ancientCoin += 3;
+            data.ancientCoin += 5;
             data.useAmuletButtonShowing = true;
+            setSliderUI("bridgeOfBone", "harvestGhostlyField", 100);
         },
         onCompleteCustom:function() {
-            statAddAmount("legacy", 2);
+            statAddAmount("legacy", 2 * (data.actions.bridgeOfBone.level + 1));
         },
         onLevelCustom: function() {
             if(data.actions.bridgeOfBone.level >= 3) {
                 unveilAction('harvestGhostlyField');
+                setSliderUI("bridgeOfBone", "harvestGhostlyField", 100);
             }
         },
-        onLevelAtts:[],
-        expAtts:[["legacy", .1], ["legacy", .1]],
-        efficiencyAtts:[],
-        extraInfo:{english:"+2 Legacy per complete."},
-        unlockMessage:{english:"On unlock, +3 Ancient Coins."}
+        onLevelAtts:[["legacy", 2]],
+        expAtts:[["legacy", .1]],
+        efficiencyAtts:[["courage", 1], ["doom", -1]],
+        extraInfo:{english:"+2 * (level + 1) Legacy on complete."},
+        unlockMessage:{english:"On unlock, +5 Ancient Coins."}
     },
     harvestGhostlyField: {
         tier:0, plane:2, resourceName:"fight",
-        progressMaxBase:1e10, progressMaxIncrease:2,
+        progressMaxBase:1000, progressMaxIncrease:4,
         expToLevelBase:10, expToLevelIncrease:1,
-        efficiencyBase:1, isKTL:true, purchased: true, maxLevel:30,
-        unlockCost:1e15, visible:true, unlocked:false,
+        efficiencyBase:.3, isKTL:true, purchased: true, maxLevel:30,
+        unlockCost:1000, visible:false, unlocked:false,
         onUnlock: function() {
-            data.ancientCoin += 4;
+            data.ancientCoin += 8;
+            setSliderUI("harvestGhostlyField", "geyserFields", 100);
         },
         onCompleteCustom:function() {
-            statAddAmount("legacy", 1)
+            statAddAmount("legacy", 6 * (data.actions.harvestGhostlyField.level + 1));
         },
         onLevelCustom: function() {
             if(data.actions.harvestGhostlyField.level >= 3) {
                 unveilAction('geyserFields');
+                setSliderUI("harvestGhostlyField", "geyserFields", 100);
             }
         },
-        onLevelAtts:[],
-        expAtts:[["legacy", .1], ["legacy", .1]],
-        efficiencyAtts:[],
-        extraInfo:{english:"+1 Legacy per complete."},
-        unlockMessage:{english:"On unlock, +4 Ancient Coins."}
+        onLevelAtts:[["legacy", 6]],
+        expAtts:[["legacy", .1]],
+        efficiencyAtts:[["courage", 1], ["doom", -1]],
+        extraInfo:{english:"+6 * (level + 1) Legacy on complete."},
+        unlockMessage:{english:"On unlock, +8 Ancient Coins."}
     },
     geyserFields: {
         tier:0, plane:2, resourceName:"fight",
-        progressMaxBase:1e10, progressMaxIncrease:2,
+        progressMaxBase:1e6, progressMaxIncrease:4,
         expToLevelBase:10, expToLevelIncrease:1,
-        efficiencyBase:1, isKTL:true, purchased: true, maxLevel:35,
-        unlockCost:1e21, visible:true, unlocked:false,
+        efficiencyBase:.2, isKTL:true, purchased: true, maxLevel:35,
+        unlockCost:1e6, visible:false, unlocked:false,
         onUnlock: function() {
-            data.ancientCoin += 5;
+            data.ancientCoin += 13;
+            setSliderUI("geyserFields", "destroySiegeEngine", 100);
         },
         onCompleteCustom:function() {
-            data.legacy += 1;
+            statAddAmount("legacy", 20 * (data.actions.geyserFields.level + 1));
         },
         onLevelCustom: function() {
-            if(data.actions.geyserFields.level >= 3) {
-                unveilAction('destroySiegeEngine');
-            }
+            // if(data.actions.geyserFields.level >= 3) {
+            //     unveilAction('destroySiegeEngine');
+            //     setSliderUI("geyserFields", "destroySiegeEngine", 100);
+            // }
         },
-        onLevelAtts:[],
-        expAtts:[["legacy", .1], ["legacy", .1]],
-        efficiencyAtts:[],
-        extraInfo:{english:"1 Legacy per complete."},
-        unlockMessage:{english:"On unlock, +5 Ancient Coins."}
+        onLevelAtts:[["legacy", 20]],
+        expAtts:[["legacy", .1]],
+        efficiencyAtts:[["courage", 1], ["doom", -1]],
+        extraInfo:{english:"+20 * (level + 1) Legacy on complete."},
+        unlockMessage:{english:"On unlock, +13 Ancient Coins."}
     },
     destroySiegeEngine: {
         tier:0, plane:2, resourceName:"fight",
         progressMaxBase:1e10, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1, isKTL:true, purchased: true, maxLevel:40,
-        unlockCost:1e27, visible:true, unlocked:false,
+        unlockCost:1e27, visible:false, unlocked:false,
         onUnlock: function() {
             data.ancientCoin += 6;
         },
@@ -2330,7 +2442,7 @@ actionData = {
             }
         },
         onLevelAtts:[],
-        expAtts:[["legacy", .1], ["legacy", .1]],
+        expAtts:[["legacy", .1]],
         efficiencyAtts:[],
         extraInfo:{english:"1 Legacy per complete."},
         unlockMessage:{english:"On unlock, +6 Ancient Coins."}
@@ -2340,7 +2452,7 @@ actionData = {
         progressMaxBase:1e10, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1, isKTL:true, purchased: true, maxLevel:1,
-        unlockCost:1e33, visible:true, unlocked:false,
+        unlockCost:1e33, visible:false, unlocked:false,
         onUnlock: function() {
             data.ancientCoin += 7;
         },
@@ -2353,7 +2465,7 @@ actionData = {
             }
         },
         onLevelAtts:[],
-        expAtts:[["legacy", .1], ["legacy", .1]],
+        expAtts:[["legacy", .1]],
         efficiencyAtts:[],
         extraInfo:{english:"1 Legacy per complete."},
         unlockMessage:{english:"On unlock, +7 Ancient Coins."}
@@ -2363,7 +2475,7 @@ actionData = {
         progressMaxBase:1e10, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1, isKTL:true, purchased: false, maxLevel:10,
-        unlockCost:1e9, visible:true, unlocked:false,
+        unlockCost:1e9, visible:false, unlocked:false,
         onUnlock: function() {
             data.ancientCoin += 1;
         },
@@ -2383,7 +2495,7 @@ actionData = {
         progressMaxBase:1e10, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
-        unlockCost:1e9, visible:true, unlocked:false,
+        unlockCost:1e9, visible:false, unlocked:false,
         onUnlock: function() {
             data.ancientCoin += 1;
         },
@@ -2404,7 +2516,7 @@ actionData = {
         progressMaxBase:1e10, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
-        unlockCost:1e9, visible:true, unlocked:false,
+        unlockCost:1e9, visible:false, unlocked:false,
         onUnlock: function() {
             data.ancientCoin += 1;
 
@@ -2426,7 +2538,7 @@ actionData = {
         progressMaxBase:1e10, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
-        unlockCost:1e9, visible:true, unlocked:false,
+        unlockCost:1e9, visible:false, unlocked:false,
         onUnlock: function() {
             data.ancientCoin += 1;
 
@@ -2448,7 +2560,7 @@ actionData = {
         progressMaxBase:1e10, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
-        unlockCost:1e9, visible:true, unlocked:false,
+        unlockCost:1e9, visible:false, unlocked:false,
         onUnlock: function() {
             data.ancientCoin += 1;
 
@@ -2470,7 +2582,7 @@ actionData = {
         progressMaxBase:1e10, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
-        unlockCost:1e9, visible:true, unlocked:false,
+        unlockCost:1e9, visible:false, unlocked:false,
         onUnlock: function() {
             data.ancientCoin += 1;
 
@@ -2492,7 +2604,7 @@ actionData = {
         progressMaxBase:1e10, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
-        unlockCost:1e9, visible:true, unlocked:false,
+        unlockCost:1e9, visible:false, unlocked:false,
         onUnlock: function() {
             data.ancientCoin += 1;
 
@@ -2514,7 +2626,7 @@ actionData = {
         progressMaxBase:1e10, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
-        unlockCost:1e9, visible:true, unlocked:false,
+        unlockCost:1e9, visible:false, unlocked:false,
         onUnlock: function() {
             data.ancientCoin += 1;
 
@@ -2536,7 +2648,7 @@ actionData = {
         progressMaxBase:1e10, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
-        unlockCost:1e9, visible:true, unlocked:false,
+        unlockCost:1e9, visible:false, unlocked:false,
         onUnlock: function() {
             data.ancientCoin += 1;
 
@@ -2558,7 +2670,7 @@ actionData = {
         progressMaxBase:1e10, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
-        unlockCost:1e9, visible:true, unlocked:false,
+        unlockCost:1e9, visible:false, unlocked:false,
         onUnlock: function() {
             data.ancientCoin += 1;
 
@@ -2580,7 +2692,7 @@ actionData = {
         progressMaxBase:1e10, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
-        unlockCost:1e9, visible:true, unlocked:false,
+        unlockCost:1e9, visible:false, unlocked:false,
         onUnlock: function() {
             data.ancientCoin += 1;
 
@@ -2602,7 +2714,7 @@ actionData = {
         progressMaxBase:1e10, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
-        unlockCost:1e9, visible:true, unlocked:false,
+        unlockCost:1e9, visible:false, unlocked:false,
         onUnlock: function() {
             data.ancientCoin += 1;
 
@@ -2624,7 +2736,7 @@ actionData = {
         progressMaxBase:1e10, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
-        unlockCost:1e9, visible:true, unlocked:false,
+        unlockCost:1e9, visible:false, unlocked:false,
         onUnlock: function() {
             data.ancientCoin += 1;
 
@@ -2646,7 +2758,7 @@ actionData = {
         progressMaxBase:1e10, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
-        unlockCost:1e9, visible:true, unlocked:false,
+        unlockCost:1e9, visible:false, unlocked:false,
         onUnlock: function() {
             data.ancientCoin += 1;
 
@@ -2668,7 +2780,7 @@ actionData = {
         progressMaxBase:1e10, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
-        unlockCost:1e9, visible:true, unlocked:false,
+        unlockCost:1e9, visible:false, unlocked:false,
         onUnlock: function() {
             data.ancientCoin += 1;
 
@@ -2690,7 +2802,7 @@ actionData = {
         progressMaxBase:1e10, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
-        unlockCost:1e9, visible:true, unlocked:false,
+        unlockCost:1e9, visible:false, unlocked:false,
         onUnlock: function() {
             data.ancientCoin += 1;
 
@@ -2712,7 +2824,7 @@ actionData = {
         progressMaxBase:1e10, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
-        unlockCost:1e9, visible:true, unlocked:false,
+        unlockCost:1e9, visible:false, unlocked:false,
         onUnlock: function() {
             data.ancientCoin += 1;
 
@@ -2734,7 +2846,7 @@ actionData = {
         progressMaxBase:1e10, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
-        unlockCost:1e9, visible:true, unlocked:false,
+        unlockCost:1e9, visible:false, unlocked:false,
         onUnlock: function() {
             data.ancientCoin += 1;
 
@@ -2756,7 +2868,7 @@ actionData = {
         progressMaxBase:1e10, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
-        unlockCost:1e9, visible:true, unlocked:false,
+        unlockCost:1e9, visible:false, unlocked:false,
         onUnlock: function() {
             data.ancientCoin += 1;
 
@@ -2778,7 +2890,7 @@ actionData = {
         progressMaxBase:1e10, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
-        unlockCost:1e9, visible:true, unlocked:false,
+        unlockCost:1e9, visible:false, unlocked:false,
         onUnlock: function() {
             data.ancientCoin += 1;
 
@@ -2800,7 +2912,7 @@ actionData = {
         progressMaxBase:1e10, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
-        unlockCost:1e9, visible:true, unlocked:false,
+        unlockCost:1e9, visible:false, unlocked:false,
         onUnlock: function() {
             data.ancientCoin += 1;
 
@@ -2822,7 +2934,7 @@ actionData = {
         progressMaxBase:1e10, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
-        unlockCost:1e9, visible:true, unlocked:false,
+        unlockCost:1e9, visible:false, unlocked:false,
         onUnlock: function() {
             data.ancientCoin += 1;
 
@@ -2844,7 +2956,7 @@ actionData = {
         progressMaxBase:1e10, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
-        unlockCost:1e9, visible:true, unlocked:false,
+        unlockCost:1e9, visible:false, unlocked:false,
         onUnlock: function() {
             data.ancientCoin += 1;
 
@@ -2866,7 +2978,7 @@ actionData = {
         progressMaxBase:1e10, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
-        unlockCost:1e9, visible:true, unlocked:false,
+        unlockCost:1e9, visible:false, unlocked:false,
         onUnlock: function() {
             data.ancientCoin += 1;
 
@@ -2888,7 +3000,7 @@ actionData = {
         progressMaxBase:1e10, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
-        unlockCost:1e9, visible:true, unlocked:false,
+        unlockCost:1e9, visible:false, unlocked:false,
         onUnlock: function() {
             data.ancientCoin += 1;
 
@@ -2910,7 +3022,7 @@ actionData = {
         progressMaxBase:1e10, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
-        unlockCost:1e9, visible:true, unlocked:false,
+        unlockCost:1e9, visible:false, unlocked:false,
         onUnlock: function() {
             data.ancientCoin += 1;
 
@@ -2932,7 +3044,7 @@ actionData = {
         progressMaxBase:1e10, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
-        unlockCost:1e9, visible:true, unlocked:false,
+        unlockCost:1e9, visible:false, unlocked:false,
         onUnlock: function() {
             data.ancientCoin += 1;
         },
@@ -2959,7 +3071,7 @@ actionData = {
         progressMaxBase:10, progressMaxIncrease:1,
         expToLevelBase:10000000, expToLevelIncrease:1.2,
         actionPowerBase:1, actionPowerMult:1, actionPowerMultIncrease:1.05,
-        efficiencyBase:.005,
+        efficiencyBase:.008,
         unlockCost:0, visible:false, unlocked:false, purchased: true, hasDeltas: false,
         isGenerator:true, generatorTarget:"sparkMana", generatorSpeed:100,
         onCompleteCustom: function() {
@@ -2979,7 +3091,11 @@ actionData = {
             let actionObj = data.actions.echoKindle;
             let dataObj = actionData.echoKindle;
 
-            actionObj.resourceToAdd = dataObj.actionPowerFunction(actionObj.resource) * actionObj.tierMult() * actionObj.actionPower * actionObj.upgradeMult;
+            actionObj.progressGain = actionObj.generatorSpeed * (actionObj.efficiency / 100);
+            actionObj.actionPower = actionObj.actionPowerBase *
+                actionObj.actionPowerMult * (actionObj.efficiency/100);
+            actionObj.resourceToAdd = dataObj.actionPowerFunction(actionObj.resource) * actionObj.tierMult() *
+                actionObj.actionPower * actionObj.upgradeMult;
         },
         actionPowerFunction: function(resource) {
             if(resource < 1) {
@@ -3040,6 +3156,9 @@ actionData = {
         updateMults: function () {
             let actionObj = data.actions.poolMana;
 
+            actionObj.progressGain = actionObj.generatorSpeed * (actionObj.efficiency / 100);
+            actionObj.actionPower = actionObj.actionPowerBase *
+                actionObj.actionPowerMult * (actionObj.efficiency/100);
             actionObj.resourceToAdd = data.actions.sparkMana.resource * actionObj.actionPower * actionObj.upgradeMult;
         },
         onUnlock: function() {
@@ -3064,7 +3183,7 @@ actionData = {
             unveilAction("manaExperiments")
             unveilAction("prepareInternalSpells")
         },
-        onLevelAtts:[["amplification", 10], ["pulse", 1]],
+        onLevelAtts:[["amplification", 20], ["pulse", 1]],
         expAtts:[],
         efficiencyAtts:[["integration", .05]]
     },
@@ -3087,7 +3206,7 @@ actionData = {
         tier:0, plane:1, resourceName:"mana",
         progressMaxBase:10, progressMaxIncrease:3,
         expToLevelBase:3, expToLevelIncrease:1,
-        efficiencyBase:.01, maxLevel:9,
+        efficiencyBase:.02, maxLevel:9,
         unlockCost:30, visible:false, unlocked:false, purchased: true,
         onUnlock: function() {
             unveilAction("manaVisualizations")
@@ -3158,10 +3277,10 @@ actionData = {
     },
     overboost: {
         tier:0, plane:1, resourceName:"mana",
-        progressMaxBase:100000, progressMaxIncrease:1,
+        progressMaxBase:1000000, progressMaxIncrease:1,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:.2, maxLevel:1, isSpell:true, instabilityToAdd:100,
-        unlockCost:100000, visible:false, unlocked:false, purchased: true,
+        unlockCost:1000000, visible:false, unlocked:false, purchased: true,
         onUnlock: function() {
         },
         spellpower: function() {
@@ -3308,7 +3427,7 @@ actionData = {
         tier:0, plane:1, resourceName:"mana",
         progressMaxBase:10000, progressMaxIncrease:1,
         expToLevelBase:1, expToLevelIncrease:1, power:1,
-        efficiencyBase:.2, maxLevel:0, isSpell:true, instabilityToAdd:5,
+        efficiencyBase:.2, maxLevel:0, isSpell:true, instabilityToAdd:20,
         unlockCost:20000, visible:false, unlocked:false, purchased: true,
         onUnlock: function() {
             unveilAction('shelter')

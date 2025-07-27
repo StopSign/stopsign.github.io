@@ -234,9 +234,6 @@ const actionPatches = {
     gossipAroundCoffee: {
         preventReset: true
     },
-    hearAboutTheLich: {
-        preventReset: false
-    },
     pesterHermitForSecrets: {
         preventReset: true
     },
@@ -250,9 +247,12 @@ const actionPatches = {
         preventReset: true
     },
     travelToCrossroads: {
-        preventReset: false
+        preventReset: true
     },
     restAtWaterfall: {
+        preventReset: true
+    },
+    visitShrineBehindWaterfall: {
         preventReset: true
     },
 
@@ -273,6 +273,68 @@ const actionPatches = {
         preventReset: true
     },
     manaBasics: {
+        preventReset: true
+    },
+    feelYourMana: {
+        preventReset: true
+    },
+    growMagicSenses: {
+        preventReset: true
+    },
+    manaExperiments: {
+        preventReset: true
+    },
+    manaObservations: {
+        preventReset: true
+    },
+    magicResearch: {
+        preventReset: true
+    },
+    infuseTheHide: {
+        preventReset: true
+    },
+    etchTheCircle: {
+        preventReset: true
+    },
+    bindThePages: {
+        preventReset: true
+    },
+    awakenYourGrimoire: {
+        preventReset: true
+    },
+    prepareInternalSpells: {
+        preventReset: true
+    },
+    overcharge: {
+        preventReset: true
+    },
+    overboost: {
+        preventReset: true
+    },
+    prepareExternalSpells: {
+        preventReset: true
+    },
+    supportSpells: {
+        preventReset: true
+    },
+    earthMagic: {
+        preventReset: true
+    },
+
+    hearAboutTheLich: {
+        preventReset: true
+    },
+
+    overclockTargetingTheLich: {
+        preventReset: true
+    },
+    worry: {
+        preventReset: true
+    },
+    resolve: {
+        preventReset: true
+    },
+    fightTheEvilForces: {
         preventReset: true
     },
 
@@ -337,9 +399,12 @@ function load() {
     }
 
     //update all generator's multiplier data
-    Object.values(actionData).forEach(action => {
-        if (action.updateMults) action.updateMults();
-    });
+    for(let actionVar in actionData) {
+        let actionObj = actionData[actionVar];
+        if(actionObj.updateMults) {
+            actionObj.updateMults();
+        }
+    }
 
     initializeDisplay();
     setSlidersOnLoad(toLoad);
@@ -443,7 +508,7 @@ function mergeExistingOnly(data, toLoad, varName, skipList = []) {
     }
 }
 
-function updateUIFromLoad() {
+function updateUIOnLoad() {
     for (let actionVar in data.actions) {
         let actionObj = data.actions[actionVar];
         clickActionMenu(actionVar, actionObj.currentMenu, true);
@@ -464,6 +529,7 @@ function updateUIFromLoad() {
     }
     // switchToPlane(0);
 
+    
     if(data.doneAmulet && data.gameState !== "KTL") {
         views.updateVal(`openViewAmuletButton`, "", "style.display");
     }

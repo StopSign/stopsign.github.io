@@ -177,30 +177,25 @@ It continues, capturing fraction ancientCoin of your fleeting soul and sending i
 <!--    </div>-->
 <!--</div>-->
 
-<div id="killTheLichMenu" class='fullScreenGrey' style="display:none" onClick='openKTLMenu()'>
+<div id="killTheLichMenu" class='fullScreenGrey' style="display:none;font-size:16px;" onClick='openKTLMenu()'>
     <div class='centerMenuBox' onClick="stopClicks(event)">
-        <div class='menuTitle'>Kill the Lich!</div>
+        <div class='menuTitle'>Set Overclock's Target: Kill the Lich!</div>
         <div class="menuSeparator"></div>
         <div id="ktlDynamicContent" class="dynamicContent">
-            Info:<br>
-            Travel to kill the lich! Use all your momentum - no matter where it is - as your amount to get as far as you can, picking up as much legacy and as many Ancient Coins as you can!<br>
-            <div class="menuSeparator"></div>
-            Story:<br>
-            The lich is coming, and you know what you must do. As your Overclock ability grows in power,
-            so too does its ability to achieve its Target. So far, it has been set to target itself, but now you know
-            of a great evil on the horizon, and you can't sit still. With all the gathered momentum from your ability
-            churning within itself, you shift that towardsa a new target: Kill the Lich.<br><br>
-            At first, the loss of so much happening at once is overwhelming, and just as you did in the beginning: you allow
-            the ability to guide your steps and purpose while you take a back seat and observe. It moves you with purpose -
-            you travel to a hidden set of ancient ruins close by, and, after carefully disabling a number of deadly traps,
-            you gather an amulet hidden in a deep puddle, that you immediately put around your neck.<br><br>
-
-            Then, you go join the resistance trying to hold off the lich's hordes as they steadily approach. Before you know it,
-            you're equipped with army-standard and facing an elite, who roars as he stomps toward you.
+            <br>
+            Changing your overclock target will set you on a new path to get as much Ancient Coins and Legacy as you can.<br><br>
+            You will gain progress using Total Momentum, Hear About The Lich's level, and Spell Power!<br><br>
+            Brythal and Magic will be paused and unchangeable while you are at war.<br>
+            After you get as many resources as you can, there will only be the option to reset:<br>
+            <ul>
+                <li>All attributes will reset.</li>
+                <li>All Brythal actions will reset.</li>
+                <li>All Magic actions will reset except for the unlock cost.</li>
+            </ul>
         </div>
-        <input type="checkbox" id="confirmKTL"><label for="confirmKTL">Confirm (Reset requires >1.1 million total momentum)</label>
-        <button class="continueButton" onclick="initializeKTL()">Reset now with <span id="totalMomentum2"></span> total momentum
-            and <span id="totalSpellPower2"></span> spell power!</button>
+        <input type="checkbox" id="confirmKTL"><label for="confirmKTL">Confirm</label>
+        <button class="continueButton" onclick="initializeKTL()">Join the War for Life with <span id="totalMomentum2"></span> Total Momentum,
+             <span id="totalSpellPower2"></span> spell power, and Hear About The Lich level <span id="HATLLevel"></span>!</button>
     </div>
 </div>
 

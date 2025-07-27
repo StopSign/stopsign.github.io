@@ -72,6 +72,7 @@ data.currentGameState = {
     bonusTime: 0,
     totalTicks: 0,
     secondsPassed: 0,
+    KTLBonusTimer: 0,
 };
 
 
@@ -91,11 +92,14 @@ function debug() {
     if(!isDebug) {
         return;
     }
+
+    data.gameSettings.bonusSpeed = 1;
+    data.currentGameState.KTLBonusTimer = 1;
     //temp data corrections:
+    // unveilAction('visitShrineBehindWaterfall')
+    // document.getElementById('confirmKTL').checked = true;
+    // initializeKTL()
 
-
-    unveilAction('pesterHermitForSecrets')
-    adjustActionData('hearAboutTheLich', 'progressMaxIncrease', 1e3)
 
     // data.useAmuletButtonShowing = true;
     // data.doneKTL = true;
@@ -148,7 +152,9 @@ function initializeData() {
     }
     createUpgrades();
     createAndLinkNewAttribute("echoes", "legacy");
+    createAndLinkNewAttribute("echoes", "doom");
 
+    createAndLinkNewAttribute("introspection", "courage");
     createAndLinkNewAttribute("introspection", "awareness");
     createAndLinkNewAttribute("introspection", "curiosity");
     createAndLinkNewAttribute("introspection", "observation");
@@ -276,11 +282,11 @@ function initializeData() {
     create("talkWithScott", ["talkWithJohn"], -1.5, 0);
     create("talkWithJohn", [], -1, 0);
 
-    create("learnToListen", ["chatWithMerchants", "chatWithHermit"], -1, 1);
+    create("learnToListen", ["chatWithMerchants", "chatWithHermit"], -1.2, 1);
     create("chatWithMerchants", ["listenToWoes", "askAboutStitching", "complimentTheChef"], -1.5, 0);
-    create("askAboutStitching", [], -1, 0);
-    create("complimentTheChef", [], -1, -1);
-    create("listenToWoes", ["keyToTheBackroom"], -1, 1);
+    create("askAboutStitching", [], -1.2, 0);
+    create("complimentTheChef", [], -1.1, -1);
+    create("listenToWoes", ["keyToTheBackroom"], -1.1, 1);
     create("keyToTheBackroom", [], -1, 0);
 
     create("chatWithHermit", ["tellAJoke"], 0, 1);
@@ -428,12 +434,13 @@ function initializeData() {
     // create("", [], 0, 0);
 
     //KTL
-    create("worry", ["overclockTargetingTheLich"], 0, 0);
-    create("overclockTargetingTheLich", ["fightTheEvilForces"], .5, -1);
-    create("fightTheEvilForces", ["bridgeOfBone"], 1.5, 0);
-    create("bridgeOfBone", ["harvestGhostlyField"], 1, 0.2);
-    create("harvestGhostlyField", ["geyserFields"], 1, 0.4);
-    create("geyserFields", ["destroySiegeEngine"], 1, 0.6);
+    create("worry", ["resolve"], 0, 0);
+    create("resolve", ["overclockTargetingTheLich"], 1.2, -.3);
+    create("overclockTargetingTheLich", ["fightTheEvilForces"], -1, -.7);
+    create("fightTheEvilForces", ["bridgeOfBone"], 1.5, -.2);
+    create("bridgeOfBone", ["harvestGhostlyField"], 1, 0.5);
+    create("harvestGhostlyField", ["geyserFields"], 1, 0.6);
+    create("geyserFields", ["destroySiegeEngine"], 1, 0.7);
     create("destroySiegeEngine", ["destroyEasternMonolith"], 1, .8);
     create("destroyEasternMonolith", ["stopDarknessRitual"], .5, 1);
     create("stopDarknessRitual", ["protectTheSunstone"], 0, 1);

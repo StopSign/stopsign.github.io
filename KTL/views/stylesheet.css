@@ -73,22 +73,25 @@
     --upgrade-disabled-color:#808080;
 
     --momentum-color:#007BFF;
-    --momentum-color-dim: rgba(0, 123, 255, 0.5);
+    --momentum-color-dim: #0b64c3;
     --momentum-color-bg: #0b263f;
     --exp-color:#7b5fc1;
-    --exp-color-dim: rgba(123, 95, 193, 0.5);
+    --exp-color-dim: #644f99;
     --exp-color-bg: #231c36;
     --mana-color: #0c20d4;
-    --mana-color-dim: rgba(12, 32, 212, 0.5);
+    --mana-color-dim: #0f1ea3;
     --mana-color-bg: #070b39;
     --legacy-color: #db9812;
-    --legacy-color-dim: rgba(219, 152, 18, 0.5);
+    --legacy-color-dim: #a47413;
     --legacy-color-bg: #5c4003;
+    --doom-color: #781a78;
+    --doom-color-dim: #5c155c;
+    --doom-color-bg: #2e082e;
     --gold-color: #a99102;
-    --gold-color-dim: rgba(169, 145, 2, 0.5);
+    --gold-color-dim: #766607;
     --gold-color-bg: #363107;
     --conversations-color: #429977;
-    --conversations-color-dim: rgba(66, 153, 119, 0.5);
+    --conversations-color-dim: #36765e;
     --conversations-color-bg: #162d23;
     --fear-color: #d2062a;
     --fear-color-dim: #a30924;
@@ -96,11 +99,14 @@
     --fight-color: #FF6600;
     --fight-color-dim: #b34700;
     --fight-color-bg: #4d1a00;
+    --bravery-color: #b23c22;
+    --bravery-color-dim: #802e1d;
+    --bravery-color-bg: #391610;
     --spark-color: #1a9480;
     --spark-color-dim: #15675a;
     --spark-color-bg: #0b2e29;
     --arcana-color: #c620f5;
-    --arcana-color-dim: rgba(198, 32, 245, 0.5);
+    --arcana-color-dim: #a122c4;
     --arcana-color-bg: #2a0932;
 
     --wage-color: #ffdd00;
@@ -525,7 +531,7 @@ input {
     max-height: 400px; /* Adjust max height as needed */
     width: 100%;
     padding: 10px;
-    font-size:14px;
+    font-size:16px;
     text-align:left;
     overflow-y:auto;
 }

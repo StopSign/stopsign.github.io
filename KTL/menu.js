@@ -226,7 +226,7 @@ function createDataMenu() {
         What do you want to know?
     <div id="chartContainer" style="width: 80%; max-width: 800px; background-color: #2d3748; border-radius: 8px; 
         box-shadow: 0 4px 12px rgba(0,0,0,0.4); padding: 20px;">
-        <h2 style="text-align: center; margin-top: 0; color: #e2e8f0;">Recent 100 Overclock Generations</h2>
+        <h2 style="text-align: center; margin-top: 0; color: #e2e8f0;">Recent 100 Overclock Amounts</h2>
         <canvas id="resourceChart" style="width: 100%; height: 400px; border-radius: 4px;"></canvas>
         <div style="text-align: center; margin-top: 15px;">
             <button id="linearBtn" style="padding: 10px 20px; border: 1px solid #63b3ed; background-color: #63b3ed; 

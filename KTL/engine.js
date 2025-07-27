@@ -253,12 +253,23 @@ function statAddAmount(attVar, amount) {
     }
     attObj.num += amount;
     attObj.mult = 1 + attObj.num * .1; //Math.pow(1.1, attObj.num); //calc only when adding
+    let changedActions = []
     attObj.linkedActionExpAtts.forEach(function (actionVar) {
         data.actions[actionVar].calcStatMult();
+        changedActions.push(actionVar);
     })
     attObj.linkedActionEfficiencyAtts.forEach(function (actionVar) {
         data.actions[actionVar].calcAttExpertise();
+        changedActions.push(actionVar);
     })
+
+    //update the actions that had their stats changed
+    for(let actionVar of changedActions) {
+        let actionObj = actionData[actionVar];
+        if(actionObj.updateMults) {
+            actionObj.updateMults();
+        }
+    }
 }
 
 //To be used after Amulet, NOT on initialization
@@ -390,10 +401,15 @@ function unlockAction(actionObj) {
 }
 
 function upgradeUpdates() {
-    //update all generator's multiplier data
-    Object.values(actionData).forEach(action => {
-        if (action.updateMults) action.updateMults();
-    });
+    //every tick, make sure the mults are updated for visuals
+    for(let actionVar in actionData) {
+        let actionObj = actionData[actionVar];
+        if(actionObj.updateMults) {
+            actionObj.updateMults();
+        }
+    }
+
+    //passive gain
     data.actions.overclock.resource += data.upgrades.tryALittleHarder.upgradePower * 20 / data.gameSettings.ticksPerSecond;
 }
 
@@ -444,5 +460,6 @@ function adjustActionData(actionVar, key, value) {
     if(['efficiencyBase', 'efficiencyMult'].includes(key)) {
         actionObj.expertise = actionObj.efficiencyBase * actionObj.efficiencyMult;
         actionObj.efficiency = actionObj.expertise > 1 ? 100 : actionObj.expertise * 100;
+        actionObj.actionPower = actionObj.actionPowerBase * actionObj.actionPowerMult * (actionObj.efficiency/100);
     }
 }

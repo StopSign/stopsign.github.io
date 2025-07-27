@@ -143,11 +143,12 @@ function initializeToasts() {
         "lich" on someone's tongue. You need to know more about this.<br><br>
         Get Gossip Around Coffee to level 1.`);
 
-    createToast(function() { return data.actions.hearAboutTheLich.level >= 1 },
+    createToast(function() { return data.actions.hearAboutTheLich.unlocked },
         "Something Must Be Done", 0,
         Raw.html`The lich has returned, but this is what you were preparing for by targeting Overclock to itself.<br>
             Check Info under Hear About The Lich for how it increases!<br><br>
-            Get at least 1 Spell Power from External Spells to be able to sign up and join humanity's last stand!`);
+            Get at least 1 Spell Power from External Spells and at least 1 level in this action 
+            to be able to sign up and join humanity's last stand!`);
 
 
     // createToast(function() { return },

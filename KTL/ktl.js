@@ -6,32 +6,72 @@ function openKTLMenu() {
     views.updateVal("killTheLichMenu", KTLMenuOpen ? "flex" : "none", "style.display");
 }
 
+function resetKTLSpiral() {
+    for(let actionVar in data.actions) {
+        let dataObj = actionData[actionVar];
+        if (dataObj.plane !== 2) {
+            continue;
+        }
+        let actionObj = data.actions[actionVar];
+        actionSetBaseVariables(actionObj, dataObj);
+    }
+
+    for(let actionVar in data.actions) {
+        let dataObj = actionData[actionVar];
+        if (dataObj.plane !== 2) {
+            continue;
+        }
+        // let actionObj = data.actions[actionVar];
+        for (let downstreamVar of dataObj.downstreamVars) {
+            let downstreamDataObj = actionData[downstreamVar];
+            if(downstreamDataObj.hasUpstream === false) {
+                continue;
+            }
+            setSliderUI(actionVar, downstreamVar, 0);
+        }
+    }
+}
+
 function initializeKTL() {
-    if(!document.getElementById('confirmKTL').checked || (!isDebug && data.totalMomentum < 1.1e6)) {
+    if(!document.getElementById('confirmKTL').checked ||
+        !(isDebug || (data.actions.hearAboutTheLich.level >= 1 && data.totalSpellPower >= 1))) {
         return;
     }
+
+    resetKTLSpiral();
+
+    for(let actionVar in data.actions) {
+        let actionObj = data.actions[actionVar];
+        actionObj.isRunning = actionObj.plane === 2;
+    }
+
+    unveilPlane(2);
+
+    if(data.currentGameState.KTLBonusTimer > 60 * 60) {
+        data.currentGameState.bonusTime += 1000 * 60 * 10; //10 mins bonus time FO FREE / should be a 1 point AC upgrade.
+        // Can't be received faster than every hour.
+    }
+
+    views.updateVal("openViewAmuletButton", "none", "style.display")
+    if(data.doneAmulet) {
+        data.useAmuletButtonShowing = true;
+        views.updateVal("openUseAmuletButton", "", "style.display")
+    }
+
     data.focusSelected = [];
+
+    data.actions.overclockTargetingTheLich.resource = data.totalMomentum;
+    data.actions.worry.resource = data.actions.hearAboutTheLich.resource;
 
     views.updateVal("killTheLichMenu", "none", "style.display")
 
     data.gameState = "KTL";
-    for(let actionVar in data.actions) {
-        let actionObj = data.actions[actionVar];
 
-        actionObj.isRunning = actionObj.plane === 2;
-    }
 
-    data.actions.overclockTargetingTheLich.resource = data.totalMomentum;
-
-    views.updateVal("openUseAmuletButton", "", "style.display")
 
     //first time stuff
-    document.getElementById("planeButton0").style.display = "";
     document.getElementById("ancientCoinDisplay").style.display = "";
     data.doneKTL = true;
-    if(data.doneAmulet) {
-        data.useAmuletButtonShowing = true;
-    }
 }
 
 function openUseAmuletMenu(isUseable) {

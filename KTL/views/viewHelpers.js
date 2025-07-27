@@ -10,6 +10,9 @@ function getAttColor(attVar) {
     if(attVar === "legacy") {
         return "var(--legacy-color)"
     }
+    if(attVar === "doom") {
+        return "var(--doom-color)"
+    }
     const stat = data.atts[attVar];
 
     const attAddedTo = stat.linkedActionOnLevelAtts.some(actionVar =>

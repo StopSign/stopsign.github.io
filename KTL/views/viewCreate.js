@@ -25,7 +25,7 @@ function initializeDisplay() {
     revealActionAtts(data.actions.reflect);
     data.actions.overclock.downstreamRatereflect = 0;
 
-    updateUIFromLoad(); //update the elements after create
+    updateUIOnLoad(); //update the elements after create
 }
 
 function createAttDisplay(attVar) {
@@ -447,6 +447,7 @@ function generateOutsideAttDisplay(actionObj, attObj, type) {
             ? "--attribute-use-exp-bg-color"
             : "--attribute-use-eff-bg-color");
     backgroundColor = statName === "legacy" ? "--legacy-color" : backgroundColor;
+    backgroundColor = statName === "doom" ? "--doom-color" : backgroundColor;
 
     let text = type === "add"
         ? "+" + intToString(statValue, 1)
@@ -628,93 +629,88 @@ function createDownStreamSliders(actionObj, dataObj) {
 
     return theStr;
 }
-
 function attachCustomSliderListeners() {
     for (let actionVar in data.actions) {
         let dataObj = actionData[actionVar];
-        let actionObj = data.actions[actionVar]; // This is the actionObj for the current slider
+        let actionObj = data.actions[actionVar];
         if (!dataObj.downstreamVars) continue;
 
         for (let downstreamVar of dataObj.downstreamVars) {
-            // Use an IIFE to correctly scope variables for each iteration's event listeners,
-            (function(actVar, downVar) {
-                const container = document.getElementById(`${actVar}Slider_Container${downVar}`);
-                const thumb = document.getElementById(`${actVar}Thumb${downVar}`);
+            const container = document.getElementById(`${actionVar}Slider_Container${downstreamVar}`);
+            const thumb = document.getElementById(`${actionVar}Thumb${downstreamVar}`);
 
-                let downstreamObj = data.actions[downVar];
-                if(!downstreamObj.hasUpstream) {
+            let downstreamObj = data.actions[downstreamVar];
+            if (!downstreamObj.hasUpstream) {
+                continue;
+            }
+
+            container.addEventListener('mouseenter', () => {
+                thumb.style.border = (actionObj.isRunning && dataObj.plane !== 2) ? "2px solid yellow" : "2px solid red";
+            });
+
+            container.addEventListener('mouseleave', () => {
+                thumb.style.border = "";
+            });
+
+            const handleDrag = (event) => {
+                event.preventDefault();
+                const track = document.getElementById(`${actionVar}Track${downstreamVar}`);
+                if (!track) return;
+
+                const trackRect = track.getBoundingClientRect();
+                let newLeft = event.clientX - trackRect.left;
+
+                if (newLeft < 0) newLeft = 0;
+                if (newLeft > trackRect.width) newLeft = trackRect.width;
+
+                const newValue = Math.round((newLeft / trackRect.width) * 100);
+
+                if (data.actions[actionVar][`downstreamRate${downstreamVar}`] === newValue) {
                     return;
                 }
 
-                container.addEventListener('mouseenter', () => {
-                    thumb.style.border = "2px solid yellow";
-                });
+                data.actions[actionVar][`downstreamRate${downstreamVar}`] = newValue;
+                setSliderUI(actionVar, downstreamVar, newValue);
+            };
 
-                container.addEventListener('mouseleave', () => {
-                    thumb.style.border = "";
-                });
+            const stopDrag = () => {
+                document.removeEventListener('mousemove', handleDrag);
+                document.removeEventListener('mouseup', stopDrag);
+            };
 
-                const handleDrag = (event) => {
-                    event.preventDefault();
-                    const track = document.getElementById(`${actVar}Track${downVar}`);
-                    if (!track) return;
+            container.addEventListener('mousedown', (event) => {
+                if(!actionObj.isRunning || dataObj.plane === 2) {
+                    return;
+                }
+                handleDrag(event);
+                document.addEventListener('mousemove', handleDrag);
+                document.addEventListener('mouseup', stopDrag);
+            });
 
-                    const trackRect = track.getBoundingClientRect();
-                    let newLeft = event.clientX - trackRect.left;
+            const hoverTargetContainer = document.getElementById(`${actionVar}SliderContainer${downstreamVar}`);
+            const line = document.getElementById(`${actionVar}_${downstreamVar}_Line_Outer`);
+            const largeVersionContainer = document.getElementById(`${downstreamVar}LargeVersionContainer`);
+            const lockContainer = document.getElementById(`${downstreamVar}LockContainer`);
 
-                    if (newLeft < 0) newLeft = 0;
-                    if (newLeft > trackRect.width) newLeft = trackRect.width;
+            hoverTargetContainer.addEventListener('mouseenter', () => {
+                line.style.borderColor = "yellow";
+                largeVersionContainer.style.borderColor = "yellow";
+                lockContainer.style.borderColor = "yellow";
+            });
 
-                    const newValue = Math.round((newLeft / trackRect.width) * 100);
-
-                    if (data.actions[actVar][`downstreamRate${downVar}`] === newValue) {
-                        return;
-                    }
-
-                    data.actions[actVar][`downstreamRate${downVar}`] = newValue;
-                    setSliderUI(actVar, downVar, newValue);
-                };
-
-                const stopDrag = () => {
-                    document.removeEventListener('mousemove', handleDrag);
-                    document.removeEventListener('mouseup', stopDrag);
-                };
-
-                container.addEventListener('mousedown', (event) => {
-                    handleDrag(event);
-                    document.addEventListener('mousemove', handleDrag);
-                    document.addEventListener('mouseup', stopDrag);
-                });
-
-
-                const hoverTargetContainer = document.getElementById(`${actVar}SliderContainer${downVar}`);
-                const line = document.getElementById(`${actVar}_${downVar}_Line_Outer`);
-                const largeVersionContainer = document.getElementById(`${downVar}LargeVersionContainer`);
-                const lockContainer = document.getElementById(`${downVar}LockContainer`);
-
-                hoverTargetContainer.addEventListener('mouseenter', () => {
-                    line.style.borderColor = "yellow";
-                    largeVersionContainer.style.borderColor = "yellow";
-                    lockContainer.style.borderColor = "yellow";
-                });
-
-                hoverTargetContainer.addEventListener('mouseleave', () => {
-                    line.style.borderColor = "black";
-                    setBorderColor(downVar, selectedStat);
-                });
-
-
-            })(actionVar, downstreamVar, actionObj); // Pass the current actionObj to the IIFE
+            hoverTargetContainer.addEventListener('mouseleave', () => {
+                line.style.borderColor = "black";
+                setBorderColor(downstreamVar, selectedStat);
+            });
         }
     }
 }
 
 
 
-
 function highlightLine(borderId) {
     const line = document.getElementById(borderId);
-    let miniVersion = scale < .45;
+    let miniVersion = scale < .55;
     if (line) {
         if(miniVersion) {
             line.style.boxShadow = '0 0 40px 11px yellow';
@@ -870,6 +866,7 @@ function generateAmuletContent() {
 function setAllCaches() {
     queueCache("totalMomentum");
     queueCache("totalMomentum2");
+    queueCache("HATLLevel");
     queueCache("secondsPerReset");
     queueCache("openUseAmuletButton");
     queueCache("openViewAmuletButton");

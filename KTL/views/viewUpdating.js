@@ -29,6 +29,24 @@ let views = {
         }
         updateGlobals();
     },
+    updateViewOnSecond: function() {
+        showAllValidToasts();
+        drawChart();
+
+        let toShowUseAmulet = data.useAmuletButtonShowing && data.gameState === "KTL";
+        views.updateVal(`openUseAmuletButton`, toShowUseAmulet ? "" : "none", "style.display");
+
+        let toViewAmulet = data.doneAmulet && data.gameState !== "KTL";
+        views.updateVal(`ancientCoinDisplay`, data.doneKTL ? "" : "none", "style.display");
+
+        views.updateVal(`spellPowerDisplay`, data.totalSpellPower > 0 ? "" : "none", "style.display");
+
+        views.updateVal(`jobDisplay`, data.displayJob ? "" : "none", "style.display");
+
+        if(data.actions.hearAboutTheLich.level >= 1 && data.totalSpellPower > 0) {
+            views.updateVal(`killTheLichMenuButton2`, "", "style.display")
+        }
+    },
     scheduleUpdate: function(elementId, value, type) {
         view.scheduled.push({
             id:elementId,
@@ -140,7 +158,7 @@ let views = {
                 console.log(actionVar, dataObj.parentVar);
             }
             // views.updateVal(`${actionObj.parentVar}_${actionVar}_Line_Outer`, "none", "style.display");
-            views.updateVal(`${dataObj.parentVar}_${actionVar}_Line_Outer`, globalVisible||(toDisplay && parentObj.visible) ?"flex":"none", "style.display");
+            views.updateVal(`${dataObj.parentVar}_${actionVar}_Line_Outer`, (globalVisible||(toDisplay && parentObj.visible)) && !dataObj.hideUpstreamLine ?"flex":"none", "style.display");
             views.updateVal(`${dataObj.parentVar}_${actionVar}_Line_Inner`, toDisplay && parentObj.visible ?"":"none", "style.display");
         }
 
@@ -149,7 +167,7 @@ let views = {
             return false;
         }
 
-        let miniVersion = scale < .45;
+        let miniVersion = scale < .55;
         let mediumVersion = scale < .65 && !miniVersion;
         views.updateVal(`${actionVar}LargeVersionContainer`, !miniVersion?"":"none", "style.display");
         views.updateVal(`${actionVar}SmallVersionContainer`, miniVersion?"":"none", "style.display");
@@ -471,6 +489,8 @@ function updateGlobals() {
 
     if(KTLMenuOpen) { //only update if menu is open
         views.updateVal(`totalMomentum2`, totalMometum, "textContent", 1);
+        views.updateVal(`totalSpellPower2`, totalSpellPower, "textContent", 1);
+        views.updateVal(`HATLLevel`, data.actions.hearAboutTheLich.level, "textContent", 1);
     }
 
     views.updateVal(`secondsPerReset`, data.secondsPerReset, "textContent","time");
@@ -480,21 +500,6 @@ function updateGlobals() {
     views.updateVal(`ancientCoin2`, data.ancientCoin, "textContent", 1);
 }
 
-function updateViewOnSecond() {
-    showAllValidToasts();
-    drawChart();
-
-    let toShowUseAmulet = data.useAmuletButtonShowing && data.gameState === "KTL";
-    views.updateVal(`openUseAmuletButton`, toShowUseAmulet ? "" : "none", "style.display");
-
-    let toViewAmulet = data.doneAmulet && data.gameState !== "KTL";
-    views.updateVal(`openViewAmuletButton`, toViewAmulet ? "" : "none", "style.display");
-    views.updateVal(`ancientCoinDisplay`, data.doneKTL ? "" : "none", "style.display");
-
-    views.updateVal(`spellPowerDisplay`, data.totalSpellPower > 0 ? "" : "none", "style.display");
-
-    views.updateVal(`jobDisplay`, data.displayJob ? "" : "none", "style.display");
-}
 
 function hasDownstreamVisible(actionObj) {
     let dataObj = actionData[actionObj.actionVar];

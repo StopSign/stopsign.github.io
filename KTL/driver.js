@@ -63,7 +63,7 @@ function animationTick(currentTime) {
             timeSinceLastSave = 0;
             save();
         }
-        updateViewOnSecond();
+        views.updateViewOnSecond();
         lastAnimationTime = currentTime;
     }
 }
@@ -204,7 +204,7 @@ function gameTick() {
     for (let actionVar in data.actions) {
         tickGameObject(actionVar);
     }
-    calcDeltas();
+
 
     //check once more for any that need to be leveled from other's stat improvements
     for(let actionVar in data.actions) {
@@ -231,12 +231,14 @@ function gameTick() {
         }
     }
 
+    upgradeUpdates()
+    calcDeltas();
+
     // let attsPerSecond = getStatChanges();
     // for(let attVar in data.atts) {
     //     data.atts[attVar].perMinute = attsPerSecond[attVar] ? attsPerSecond[attVar]*60 : 0;
     // }
 
-    upgradeUpdates()
 }
 
 function calcDeltas() {
@@ -277,8 +279,8 @@ function secondTick() {
     if(data.gameState !== "KTL") {
         data.secondsPerReset++;
     }
+    data.currentGameState.KTLBonusTimer++;
     takeDataSnapshot(data.actions.overclock.resourceToAdd, data.secondsPerReset);
-    // takeDataSnapshot(data.totalMomentum, data.secondsPerReset);
 }
 
 //spells get to reset before actions are ready to use them
@@ -307,7 +309,8 @@ function tickGameObject(actionVar) {
         return;
     }
 
-    let momentumMaxRate = actionObj.isGenerator ? actionObj.generatorSpeed / data.gameSettings.ticksPerSecond : actionObj.resource * actionObj.tierMult() / data.gameSettings.ticksPerSecond;
+    let momentumMaxRate = actionObj.isGenerator ? actionObj.generatorSpeed / data.gameSettings.ticksPerSecond :
+        actionObj.resource * actionObj.tierMult() / data.gameSettings.ticksPerSecond;
     let isMaxLevel = actionObj.maxLevel !== undefined && actionObj.level >= actionObj.maxLevel;
     let momentumToAdd = (isMaxLevel || !actionObj.unlocked) ? 0 : momentumMaxRate;
     let resourceToAddInefficient = momentumToAdd * (actionObj.efficiency / 100);
