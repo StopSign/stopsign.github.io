@@ -1214,7 +1214,7 @@ actionData = {
         tier:1, plane:0, resourceName:"conversations",
         progressMaxBase:1000000, progressMaxIncrease:100,
         expToLevelBase:1, expToLevelIncrease:1,
-        efficiencyBase:.5, maxLevel:20,
+        efficiencyBase:.3, maxLevel:20,
         unlockCost:10, visible:false, unlocked:false, purchased: true,
         onUnlock: function() {
             unveilAction('chatWithMerchants')
@@ -2318,7 +2318,6 @@ actionData = {
             let resourceTaken = actionObj.resource * actionObj.tierMult();
             actionObj.resourceToAdd = dataObj.actionPowerFunction(resourceTaken) *
                 actionObj.actionPower * actionObj.upgradeMult;
-            data.actions.resolve.resourceIncrease = actionObj.resourceToAdd * actionObj.progressGain / actionObj.progressMax;
         },
         actionPowerFunction: function(resource) {
             return Math.sqrt(resource/1e24) * data.totalSpellPower * data.actions.hearAboutTheLich.level;
@@ -2388,10 +2387,10 @@ actionData = {
             statAddAmount("legacy", 6 * (data.actions.harvestGhostlyField.level + 1));
         },
         onLevelCustom: function() {
-            if(data.actions.harvestGhostlyField.level >= 3) {
-                unveilAction('geyserFields');
-                setSliderUI("harvestGhostlyField", "geyserFields", 100);
-            }
+            // if(data.actions.harvestGhostlyField.level >= 3) {
+            //     unveilAction('geyserFields');
+            //     setSliderUI("harvestGhostlyField", "geyserFields", 100);
+            // }
         },
         onLevelAtts:[["legacy", 6]],
         expAtts:[["legacy", .1]],

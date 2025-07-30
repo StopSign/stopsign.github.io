@@ -12,6 +12,8 @@ function createAndLinkNewAttribute(attCategory, attVar) {
 
     let attObj = data.atts[attVar];
     attObj.attVar = attVar;
+    attObj.attCategory = attCategory;
+    attObj.attUpgradeMult = 1;
     attObj.linkedActionExpAtts = [];
     attObj.linkedActionEfficiencyAtts = [];
     attObj.linkedActionOnLevelAtts = [];
@@ -21,9 +23,15 @@ function createAndLinkNewAttribute(attCategory, attVar) {
 
 function attsSetBaseVariables(attObj) {
     attObj.num = 0;
-    // attObj.perMinute = 0;
-    attObj.mult = 1;
+    attObj.attMult = 1;
     attObj.unlocked = false;
+}
+
+//happens when the number/mult changes
+function recalcAttMult(attVar) {
+    let attObj = data.atts[attVar];
+
+    attObj.attMult = 1 + attObj.num * .1 * attObj.attUpgradeMult;
 }
 
 //Vars that should be reset each KTL
@@ -145,7 +153,7 @@ function createAndLinkNewAction(actionVar, dataObj, title, downstreamVars) {
                 console.log("need to instantiate " + name);
                 return;
             }
-            let effect = ((data.atts[name].mult-1) * ratio) + 1; //10% of x2.5 -> .15
+            let effect = ((data.atts[name].attMult-1) * ratio) + 1; //10% of x2.5 -> .15
             actionObj[name+"AttExpMult"] = effect; //
             totalEffect *= effect;
         })
@@ -168,12 +176,12 @@ function createAndLinkNewAction(actionVar, dataObj, title, downstreamVars) {
                 console.log(`You need to instantiate the attribute ${name}`);
                 continue;
             }
-            let attPoints = data.atts[name].mult - 1;
+            let attPoints = data.atts[name].attMult - 1;
             let effect;
             if (ratio >= 0) {
                 effect = (attPoints * ratio) + 1;
             } else {
-                effect = Math.pow((1 - (ratio * -.1)), data.atts[name].mult-1);
+                effect = Math.pow((1 - (ratio * -.1)), data.atts[name].attMult-1);
             }
             actionObj[`${name}AttEfficiencyMult`] = effect;
             actionObj.efficiencyMult *= effect;
@@ -252,7 +260,7 @@ function statAddAmount(attVar, amount) {
         data.actions.echoKindle.resource += amount;
     }
     attObj.num += amount;
-    attObj.mult = 1 + attObj.num * .1; //Math.pow(1.1, attObj.num); //calc only when adding
+    recalcAttMult(attVar);
     let changedActions = []
     attObj.linkedActionExpAtts.forEach(function (actionVar) {
         data.actions[actionVar].calcStatMult();
@@ -337,6 +345,12 @@ function unveilAction(actionVar) {
     });
 }
 
+function unveilUpgrade(upgradeVar) {
+    let upgradeObj = data.upgrades[upgradeVar];
+    upgradeObj.visible = true;
+    views.updateVal(`card_${upgradeVar}`, "flex", "style.display");
+}
+
 function revealActionAtts(actionObj) {
     for(let onLevelAtt of actionObj.onLevelAtts) {
         revealAtt(onLevelAtt[0]);
@@ -410,11 +424,11 @@ function upgradeUpdates() {
     }
 
     //passive gain
-    data.actions.overclock.resource += data.upgrades.tryALittleHarder.upgradePower * 20 / data.gameSettings.ticksPerSecond;
+    data.actions.overclock.resource += data.upgrades.startALittleQuicker.upgradePower * 20 / data.gameSettings.ticksPerSecond;
 }
 
 function getUpgradeSliderAmount() {
-    return [0, 5, 20, 100, -1][data.upgrades.stopLettingOpportunityWait.upgradePower];
+    return [0, 50, 100][data.upgrades.stopLettingOpportunityWait.upgradePower];
 }
 
 //get current info based on upgrade information, generally global or universal stuff. Individual action stuff upgrades get put on the action.

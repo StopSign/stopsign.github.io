@@ -5,340 +5,368 @@ function clearSave() {
 
 data.saveVersion = 0;
 
-const actionPatches = {
-    overclock: {
-        preventReset: true,
-    },
-    reflect: {
-        preventReset: true,
-    },
-    distillInsight: {
-        preventReset: true,
-    },
-    harnessOverflow: {
-        preventReset: true,
-    },
-    takeNotes: {
-        preventReset: true,
-    },
-    remember: {
-        preventReset: true,
-    },
-    bodyAwareness: {
-        preventReset: true,
-    },
-    travelOnRoad: {
-        preventReset: true,
-    },
-    travelToOutpost: {
-        preventReset: true,
-    },
-    meetVillageLeaderScott: {
-        preventReset: true,
-    },
-    watchBirds: {
-        preventReset: true,
-    },
-    catchAScent: {
-        preventReset: true,
-    },
-    helpScottWithChores: {
-        preventReset: true
-    },
-    checkNoticeBoard: {
-        preventReset: true
-    },
-    browseLocalMarket: {
-        preventReset: true
-    },
-    makeMoney: {
-        preventReset: true
-    },
-    spendMoney: {
-        preventReset: true
-    },
-    buyBasicSupplies: {
-        preventReset: true
-    },
-    buyBasicClothes: {
-        preventReset: true
-    },
-    reportForTraining: {
-        preventReset: true
-    },
-    basicTrainingWithJohn: {
-        preventReset: true
-    },
-    noticeTheStrain: {
-        preventReset: true
-    },
-    clenchTheJaw: {
-        preventReset: true
-    },
-    breatheThroughIt: {
-        preventReset: true
-    },
-    ownTheWeight: {
-        preventReset: true
-    },
-    moveWithPurpose: {
-        preventReset: true
-    },
-    reportForLabor: {
-        preventReset: true
-    },
-    oddJobsLaborer: {
-        preventReset: true
-    },
-    chimneySweep: {
-        preventReset: true
-    },
-    buyMarketItems: {
-        preventReset: true
-    },
-    buyShopItems: {
-        preventReset: true
-    },
-    exploreDifficultPath: {
-        preventReset: true
-    },
-    buyTravelersClothes: {
-        preventReset: true
-    },
-    keepGoing: {
-        preventReset: true
-    },
-    eatGoldenFruit: {
-        preventReset: true
-    },
-    climbTheRocks: {
-        preventReset: true
-    },
-    spotAPath: {
-        preventReset: true
-    },
-    pleasantForest: {
-        preventReset: true
-    },
-    exploreTheForest: {
-        preventReset: true
-    },
-    travelAlongTheRiver: {
-        preventReset: true
-    },
-    gatherRiverWeeds: {
-        preventReset: true
-    },
-    hiddenPath: {
-        preventReset: true
-    },
-    meetGrumpyHermit: {
-        preventReset: true
-    },
-    annoyHermitIntoAQuest: {
-        preventReset: true
-    },
-    presentTheOffering: {
-        preventReset: true
-    },
-    handyman: {
-        preventReset: true
-    },
-    tavernHelper: {
-        preventReset: true
-    },
-    buyStreetFood: {
-        preventReset: true
-    },
-    buyMatchingClothes: {
-        preventReset: true
-    },
-    buySocialAccess: {
-        preventReset: true
-    },
-    browseStores: {
-        preventReset: true
-    },
-    socialize: {
-        preventReset: true
-    },
-    meetPeople: {
-        preventReset: true
-    },
-    talkWithScott: {
-        preventReset: true
-    },
-    talkWithJohn: {
-        preventReset: true
-    },
-    learnToListen: {
-        preventReset: true
-    },
-    chatWithHermit: {
-        preventReset: true
-    },
-    tellAJoke: {
-        preventReset: true
-    },
-    chatWithMerchants: {
-        preventReset: true
-    },
-    askAboutStitching: {
-        preventReset: true
-    },
-    complimentTheChef: {
-        preventReset: true
-    },
-    listenToWoes: {
-        preventReset: true
-    },
-    keyToTheBackroom: {
-        preventReset: true
-    },
-    joinCoffeeClub: {
-        preventReset: true
-    },
-    buyGoodFood: {
-        preventReset: true
-    },
-    buyStylishClothes: {
-        preventReset: true
-    },
-    slideTheCoin: {
-        preventReset: true
-    },
-    browseBackrooms: {
-        preventReset: true
-    },
-    talkToHermit: {
-        preventReset: true
-    },
-    buyCoffee: {
-        preventReset: true
-    },
-    learnToStayStill: {
-        preventReset: true
-    },
-    inquireAboutMagic: {
-        preventReset: true
-    },
-    feelTheResonance: {
-        preventReset: true
-    },
-    layerTheEchoes: {
-        preventReset: true
-    },
-    igniteTheSpark: {
-        preventReset: true
-    },
-    gossipAroundCoffee: {
-        preventReset: true
-    },
-    pesterHermitForSecrets: {
-        preventReset: true
-    },
-    guildReceptionist: {
-        preventReset: true
-    },
-    meditate: {
-        preventReset: true
-    },
-    journal: {
-        preventReset: true
-    },
-    travelToCrossroads: {
-        preventReset: true
-    },
-    restAtWaterfall: {
-        preventReset: true
-    },
-    visitShrineBehindWaterfall: {
-        preventReset: true
-    },
+const patches = {
+    actions:{
+        overclock: {
+            preventReset: true,
+        },
+        reflect: {
+            preventReset: true,
+        },
+        distillInsight: {
+            preventReset: true,
+        },
+        harnessOverflow: {
+            preventReset: true,
+        },
+        takeNotes: {
+            preventReset: true,
+        },
+        remember: {
+            preventReset: true,
+        },
+        bodyAwareness: {
+            preventReset: true,
+        },
+        travelOnRoad: {
+            preventReset: true,
+        },
+        travelToOutpost: {
+            preventReset: true,
+        },
+        meetVillageLeaderScott: {
+            preventReset: true,
+        },
+        watchBirds: {
+            preventReset: true,
+        },
+        catchAScent: {
+            preventReset: true,
+        },
+        helpScottWithChores: {
+            preventReset: true
+        },
+        checkNoticeBoard: {
+            preventReset: true
+        },
+        browseLocalMarket: {
+            preventReset: true
+        },
+        makeMoney: {
+            preventReset: true
+        },
+        spendMoney: {
+            preventReset: true
+        },
+        buyBasicSupplies: {
+            preventReset: true
+        },
+        buyBasicClothes: {
+            preventReset: true
+        },
+        reportForTraining: {
+            preventReset: true
+        },
+        basicTrainingWithJohn: {
+            preventReset: true
+        },
+        noticeTheStrain: {
+            preventReset: true
+        },
+        clenchTheJaw: {
+            preventReset: true
+        },
+        breatheThroughIt: {
+            preventReset: true
+        },
+        ownTheWeight: {
+            preventReset: true
+        },
+        moveWithPurpose: {
+            preventReset: true
+        },
+        reportForLabor: {
+            preventReset: true
+        },
+        oddJobsLaborer: {
+            preventReset: true
+        },
+        chimneySweep: {
+            preventReset: true
+        },
+        buyMarketItems: {
+            preventReset: true
+        },
+        buyShopItems: {
+            preventReset: true
+        },
+        exploreDifficultPath: {
+            preventReset: true
+        },
+        buyTravelersClothes: {
+            preventReset: true
+        },
+        keepGoing: {
+            preventReset: true
+        },
+        eatGoldenFruit: {
+            preventReset: true
+        },
+        climbTheRocks: {
+            preventReset: true
+        },
+        spotAPath: {
+            preventReset: true
+        },
+        pleasantForest: {
+            preventReset: true
+        },
+        exploreTheForest: {
+            preventReset: true
+        },
+        travelAlongTheRiver: {
+            preventReset: true
+        },
+        gatherRiverWeeds: {
+            preventReset: true
+        },
+        hiddenPath: {
+            preventReset: true
+        },
+        meetGrumpyHermit: {
+            preventReset: true
+        },
+        annoyHermitIntoAQuest: {
+            preventReset: true
+        },
+        presentTheOffering: {
+            preventReset: true
+        },
+        handyman: {
+            preventReset: true
+        },
+        tavernHelper: {
+            preventReset: true
+        },
+        buyStreetFood: {
+            preventReset: true
+        },
+        buyMatchingClothes: {
+            preventReset: true
+        },
+        buySocialAccess: {
+            preventReset: true
+        },
+        browseStores: {
+            preventReset: true
+        },
+        socialize: {
+            preventReset: true
+        },
+        meetPeople: {
+            preventReset: true
+        },
+        talkWithScott: {
+            preventReset: true
+        },
+        talkWithJohn: {
+            preventReset: true
+        },
+        learnToListen: {
+            preventReset: true
+        },
+        chatWithHermit: {
+            preventReset: true
+        },
+        tellAJoke: {
+            preventReset: true
+        },
+        chatWithMerchants: {
+            preventReset: true
+        },
+        askAboutStitching: {
+            preventReset: true
+        },
+        complimentTheChef: {
+            preventReset: true
+        },
+        listenToWoes: {
+            preventReset: true
+        },
+        keyToTheBackroom: {
+            preventReset: true
+        },
+        joinCoffeeClub: {
+            preventReset: true
+        },
+        buyGoodFood: {
+            preventReset: true
+        },
+        buyStylishClothes: {
+            preventReset: true
+        },
+        slideTheCoin: {
+            preventReset: true
+        },
+        browseBackrooms: {
+            preventReset: true
+        },
+        talkToHermit: {
+            preventReset: true
+        },
+        buyCoffee: {
+            preventReset: true
+        },
+        learnToStayStill: {
+            preventReset: true
+        },
+        inquireAboutMagic: {
+            preventReset: true
+        },
+        feelTheResonance: {
+            preventReset: true
+        },
+        layerTheEchoes: {
+            preventReset: true
+        },
+        igniteTheSpark: {
+            preventReset: true
+        },
+        gossipAroundCoffee: {
+            preventReset: true
+        },
+        pesterHermitForSecrets: {
+            preventReset: true
+        },
+        guildReceptionist: {
+            preventReset: true
+        },
+        meditate: {
+            preventReset: true
+        },
+        journal: {
+            preventReset: true
+        },
+        travelToCrossroads: {
+            preventReset: true
+        },
+        restAtWaterfall: {
+            preventReset: true
+        },
+        visitShrineBehindWaterfall: {
+            preventReset: true
+        },
 
 
-    echoKindle: {
-        preventReset: true
-    },
-    sparkMana: {
-        preventReset: true
-    },
-    poolMana: {
-        preventReset: true
-    },
-    expelMana: {
-        preventReset: true
-    },
-    prepareSpells: {
-        preventReset: true
-    },
-    manaBasics: {
-        preventReset: true
-    },
-    feelYourMana: {
-        preventReset: true
-    },
-    growMagicSenses: {
-        preventReset: true
-    },
-    manaExperiments: {
-        preventReset: true
-    },
-    manaObservations: {
-        preventReset: true
-    },
-    magicResearch: {
-        preventReset: true
-    },
-    infuseTheHide: {
-        preventReset: true
-    },
-    etchTheCircle: {
-        preventReset: true
-    },
-    bindThePages: {
-        preventReset: true
-    },
-    awakenYourGrimoire: {
-        preventReset: true
-    },
-    prepareInternalSpells: {
-        preventReset: true
-    },
-    overcharge: {
-        preventReset: true
-    },
-    overboost: {
-        preventReset: true
-    },
-    prepareExternalSpells: {
-        preventReset: true
-    },
-    supportSpells: {
-        preventReset: true
-    },
-    earthMagic: {
-        preventReset: true
-    },
+        echoKindle: {
+            preventReset: true
+        },
+        sparkMana: {
+            preventReset: true
+        },
+        poolMana: {
+            preventReset: true
+        },
+        expelMana: {
+            preventReset: true
+        },
+        prepareSpells: {
+            preventReset: true
+        },
+        manaBasics: {
+            preventReset: true
+        },
+        feelYourMana: {
+            preventReset: true
+        },
+        growMagicSenses: {
+            preventReset: true
+        },
+        manaExperiments: {
+            preventReset: true
+        },
+        manaObservations: {
+            preventReset: true
+        },
+        magicResearch: {
+            preventReset: true
+        },
+        infuseTheHide: {
+            preventReset: true
+        },
+        etchTheCircle: {
+            preventReset: true
+        },
+        bindThePages: {
+            preventReset: true
+        },
+        awakenYourGrimoire: {
+            preventReset: true
+        },
+        prepareInternalSpells: {
+            preventReset: true
+        },
+        overcharge: {
+            preventReset: true
+        },
+        overboost: {
+            preventReset: true
+        },
+        prepareExternalSpells: {
+            preventReset: true
+        },
+        supportSpells: {
+            preventReset: true
+        },
+        earthMagic: {
+            preventReset: true
+        },
 
-    hearAboutTheLich: {
-        preventReset: true
-    },
+        hearAboutTheLich: {
+            preventReset: true
+        },
 
-    overclockTargetingTheLich: {
-        preventReset: true
+        overclockTargetingTheLich: {
+            preventReset: true
+        },
+        worry: {
+            preventReset: true
+        },
+        resolve: {
+            preventReset: true
+        },
+        fightTheEvilForces: {
+            preventReset: true
+        },
+        bridgeOfBone: {
+            preventReset: true
+        },
     },
-    worry: {
-        preventReset: true
-    },
-    resolve: {
-        preventReset: true
-    },
-    fightTheEvilForces: {
-        preventReset: true
-    },
+    upgrades:{
+        stopLettingOpportunityWait: {
+            preventReset: true,
+        },
+        knowWhenToMoveOn: {
+            preventReset: true,
+        },
+        feelTheEchoesOfMyPast: {
+            preventReset: true,
+        },
+        rememberWhatIFocusedOn: {
+            preventReset: true,
+        },
+        knowWhatIFocusedOn: {
+            preventReset: true,
+        },
+        startALittleQuicker: {
+            preventReset: true,
+        },
+        refineMyCycle: {
+            preventReset: true,
+        },
+    }};
 
-};
+
 
 function load() {
     initializeData();
@@ -351,8 +379,6 @@ function load() {
         toLoad = JSON.parse(decode(localStorage[saveName]));
     }
 
-    // just before inquire
-
 
     if(isLoadingEnabled && localStorage[saveName] && toLoad.actions) { //has a save file
         const saveVersion = toLoad.saveVersion || 0;
@@ -360,10 +386,10 @@ function load() {
         // mergeExistingOnly(data, toLoad, "actions", ["x", "y", "realX", "realY"]); //use patch instead
         //these are in the skiplist because if, between saves, an action has changed the atts it has, the links need to be reset instead of saved.
         mergeExistingOnly(data, toLoad, "atts", ["linkedActionExpAtts", "linkedActionEfficiencyAtts", "linkedActionOnLevelAtts"]);
-        mergeExistingOnly(data, toLoad, "upgrades");
         mergeExistingOnly(data, toLoad, "options");
 
-        patchActions(data.actions, toLoad.actions, actionPatches);
+        patchActions("actions", toLoad.actions, actionData);
+        patchActions("upgrades", toLoad.upgrades, upgradeData);
 
         data.toastStates = toLoad.toastStates;
 
@@ -415,14 +441,21 @@ function load() {
     debug(); //change game after all else, for easier debugging
 }
 
-function patchActions(dataActions, toLoadActions, patchMap) {
+function patchActions(dataVar, toLoadActions, baseData) { //, dataActions, toLoadActions, patchMap) {
+    let dataActions = data[dataVar];
+    let patchMap = patches[dataVar];
     const currentKeys = Object.keys(dataActions);
     const loadedKeys = toLoadActions ? Object.keys(toLoadActions) : [];
 
     for (const key of currentKeys) {
         // If action is not in the loaded data, reset it to its base state.
         if (!(key in toLoadActions)) {
-            actionSetBaseVariables(dataActions[key], actionData[key]);
+            if(dataVar === "action") {
+                actionSetBaseVariables(dataActions[key], baseData[key]);
+            } else if(dataVar === "upgrades") {
+                upgradesSetBaseVariables(dataActions[key], baseData[key])
+            }
+
             continue;
         }
 
@@ -435,9 +468,13 @@ function patchActions(dataActions, toLoadActions, patchMap) {
             continue;
         }
 
-        const isVisible = toLoadActions[key].visible;
-        actionSetBaseVariables(dataActions[key], actionData[key]);
-        dataActions[key].visible = isVisible;
+        if(dataVar === "action") {
+            const isVisible = toLoadActions[key].visible;
+            actionSetBaseVariables(dataActions[key], baseData[key]);
+            dataActions[key].visible = isVisible;
+        } else if(dataVar === "upgrades") {
+            upgradesSetBaseVariables(dataActions[key], baseData[key])
+        }
     }
 
     for (const key of loadedKeys) {
@@ -527,7 +564,7 @@ function updateUIOnLoad() {
             }
         }
     }
-    // switchToPlane(0);
+    switchToPlane(0);
 
     
     if(data.doneAmulet && data.gameState !== "KTL") {
@@ -554,6 +591,15 @@ function updateUIOnLoad() {
     updatePreviousTipsMenu();
     reapplyAttentionSelected();
     resizeStatMenu();
+
+    for (const upgradeVar in data.upgrades) {
+        const upgrade = data.upgrades[upgradeVar];
+        views.updateVal(`card_${upgradeVar}`, upgrade.visible ? "flex" : "none", "style.display");
+    }
+
+    for(let attVar in data.atts) {
+        recalcAttMult(attVar)
+    }
 }
 
 function reapplyAttentionSelected() {

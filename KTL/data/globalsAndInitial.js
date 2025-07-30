@@ -94,7 +94,7 @@ function debug() {
     }
 
     data.gameSettings.bonusSpeed = 1;
-    data.currentGameState.KTLBonusTimer = 1;
+    data.currentGameState.KTLBonusTimer = 0;
     //temp data corrections:
     // unveilAction('visitShrineBehindWaterfall')
     // document.getElementById('confirmKTL').checked = true;
@@ -105,7 +105,7 @@ function debug() {
     // data.doneKTL = true;
     // data.doneAmulet = true;
     // data.displayJob = true;
-    // data.ancientCoin = 300;
+    data.ancientCoin = 5000;
     // buyUpgrade("buyNicerStuff", 0);
     // buyUpgrade("stopLettingOpportunityWait", 0);
     // buyUpgrade("stopLettingOpportunityWait", 1);
@@ -151,8 +151,8 @@ function initializeData() {
         document.getElementById("jobDisplay").style.display = "";
     }
     createUpgrades();
+    createAndLinkNewAttribute("doom", "doom");
     createAndLinkNewAttribute("echoes", "legacy");
-    createAndLinkNewAttribute("echoes", "doom");
 
     createAndLinkNewAttribute("introspection", "courage");
     createAndLinkNewAttribute("introspection", "awareness");

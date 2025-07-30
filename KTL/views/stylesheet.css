@@ -586,3 +586,103 @@ input {
 .planeButton3:active {
     background-color:var(--world-3-bg-tertiary);
 }
+
+
+
+/* Add this to your CSS file */
+
+/* Container for all the upgrade cards */
+.upgrade-container {
+    display: flex;
+    flex-wrap: wrap; /* Allows cards to wrap to the next line */
+    gap: 15px; /* Space between cards */
+    padding: 10px;
+}
+
+/* Individual upgrade card styling */
+.upgrade-card {
+    background-color: #2c2c3e; /* Dark background */
+    border: 2px solid #00cd41; /* Green border for available */
+    border-radius: 8px;
+    padding: 12px;
+    width: 280px; /* Fixed width for each card */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* Pushes footer to the bottom */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    font-family: sans-serif;
+    color: #e0e0e0;
+}
+
+/* Card states */
+.upgrade-card.bought {
+    border-color: #c3cd00; /* Yellow border for bought */
+    background-color: #3a3a4f;
+}
+
+.upgrade-card.locked {
+    border-color: #ff0000; /* Red border for locked */
+    opacity: 0.6;
+}
+
+/* Card content styling */
+.card-title {
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: #ffffff;
+}
+
+.card-description {
+    font-size: 14px;
+    flex-grow: 1; /* Allows description to fill available space */
+    margin-bottom: 15px;
+}
+
+.card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.cost-section {
+    display: flex;
+    align-items: baseline;
+}
+
+.cost-label {
+    font-size: 14px;
+    margin-right: 8px;
+}
+
+.cost-value {
+    font-size: 24px;
+    font-weight: bold;
+    color: #ffffff;
+}
+
+.cost-multiplier {
+    font-size: 14px;
+    color: #a0a0a0;
+    margin-left: 8px;
+}
+
+.buy-button {
+    background-color: #008c33;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 8px 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.buy-button:hover {
+    background-color: #00a83e;
+}
+
+.card-footer-info {
+    font-size: 14px;
+    color: #a0a0a0;
+}

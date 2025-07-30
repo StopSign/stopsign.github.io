@@ -50,7 +50,7 @@
 
 
     <span id="attDisplayShowButton" class="button" style="display:none;padding:5px;top:110px;left:388px;" onclick="statMenuHideButton()">Stats >></span>
-    <div id="attDisplay" style="border: 1px solid var(--border-color);padding:10px;font-size:12px;background-color:var(--overlay-color);
+    <div id="attDisplay" style="border: 1px solid var(--border-color);padding:15px;font-size:12px;background-color:var(--overlay-color);
         direction:rtl;position:relative;min-height:200px;overflow-y:auto;overflow-x:hidden;display:inline-block;
         scrollbar-gutter:stable;pointer-events:auto;">
         <span id="attDisplayUnder" style="direction:ltr;">
@@ -201,21 +201,26 @@ It continues, capturing fraction ancientCoin of your fleeting soul and sending i
 
 <div id="useAmuletMenu" class='fullScreenGrey' style="display:none" onClick='openUseAmuletMenu()'>
     <div class='centerMenuBox' onClick="stopClicks(event)">
-        <div class='menuTitle'>Use the Amulet!<br>ancientCoin available: <b><span id="ancientCoin2"></span></b></div>
+        <div class='menuTitle'>
+            Use the Amulet!<br>
+            Ancient Coins available:
+            <span id="ancientCoin2" style="font-weight:bold;"></span>
+        </div>
+        <div style="position:absolute;right:10px;top:10px;">
+            <input type="checkbox" id="showCompleteUpgrades" onclick="toggleMaxLevelCards(this.checked);" checked><label for="showCompleteUpgrades">Show Completed Upgrades</label><br>
+            <input type="checkbox" id="showAttributeUpgrades" onclick="toggleAttributeUpgrades(this.checked);" checked><label for="showAttributeUpgrades">Show Attribute Upgrades</label><br>
+            <input type="checkbox" id="showUnaffordableUpgrades" onclick="toggleUnafordableUpgrades(this.checked);" checked><label for="showUnaffordableUpgrades">Show Unaffordable</label>
+        </div>
         <div class="menuSeparator"></div>
-        <div class="menuTitle" style="font-size:12px;text-align:center;">As you lay dying, your last thoughts are recorded by the amulet:<br><span style="font-size:16px;"><b>IF ONLY I COULD JUST...</b></span></div>
+        <div class="menuTitle" style="font-size:14px;text-align:center;">As you lay dying, your last thoughts are recorded by the amulet...<br><span style="font-size:16px;font-weight:bold;">IF ONLY I COULD JUST...</span></div>
+
         <div class="menuSeparator"></div>
         <div id="amuletUpgrades" class="dynamicContent"></div>
         <div id="amuletEnabledContainer">
             <div class="menuSeparator"></div>
-            It is recommended to spend your ancientCoin before you start a new life.<br>
+            It is recommended to spend your Ancient Coins before you start a new life. They provide no benefit except to buy upgrades, and can only be spent now.<br>
             <input type="checkbox" id="amuletConfirm"><label for="amuletConfirm">Confirm</label>
             <button class="continueButton" onclick="useAmulet()">Start Again</button>
-            <div id="infoMenu" style="position:absolute;width:300px;top:150px;right:100%;display:none;background:var(--bg-secondary);border-radius:20px;border:2px solid #00cd41;padding:10px 0;">
-                <div class="menuTitle" style="margin:auto;display:block;">Info Box</div>
-                <div id="infoText">lorem ipsum or whatever</div>
-                <div class='button' id='infoTextButton' onclick='buyUpgrade(selectedUpgrade.var, selectedUpgrade.num)' style="width:40%;padding:5px;font-size:14px;margin: 5px auto auto;">Buy</div>
-            </div>
         </div>
     </div>
 </div>
@@ -257,7 +262,7 @@ It continues, capturing fraction ancientCoin of your fleeting soul and sending i
     //     initialOutput:1
     // }, x:50, y:50});
     // (function (i, s, o, g, r, a, m) {
-    //     i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function () {
+    //     i["GoogleAnalyticsObject'] = r; i[r] = i[r] || function () {
     //         (i[r].q = i[r].q || []).push(arguments)
     //     }, i[r].l = 1 * new Date(); a = s.createElement(o),
     //         m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentVarNode.insertBefore(a, m)

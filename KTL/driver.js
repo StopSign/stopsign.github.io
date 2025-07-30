@@ -297,7 +297,7 @@ function tickActionTimer(actionVar) {
 }
 
 function getInstabilityReduction() {
-    return data.atts.control.mult / 10;
+    return data.atts.control.attMult / 10;
 }
 
 
@@ -425,29 +425,4 @@ function addResourceTo(downstreamObj, amount) {
     if (downstreamObj.hasUpstream) {
         downstreamObj.resourceIncrease += amount * data.gameSettings.ticksPerSecond;
     }
-}
-
-function giveResourceTo2(actionObj, downstreamObj, amount) {
-    if(!downstreamObj) {
-        console.log(actionObj.title + " is failing to give to downstream.");
-    }
-    addResourceTo(downstreamObj, amount);
-    actionObj.resource -= amount;
-    actionObj.resourceDelta -= amount * data.gameSettings.ticksPerSecond;
-}
-function addResourceTo2(downstreamObj, amount) {
-    //gives to unlockCost of downstream action, unlocking if possible, and gives leftover to resource
-    let downstreamDataObj = actionData[downstreamObj.actionVar];
-    if(downstreamObj.unlockCost > 0) {
-        downstreamObj.unlockCost -= amount;
-        amount = 0;
-    }
-    if(!downstreamObj.unlocked && downstreamObj.unlockCost <= 0 && (!downstreamDataObj.isUnlockCustom || downstreamDataObj.isUnlockCustom())) {
-        unlockAction(downstreamObj);
-        amount = -1 * downstreamObj.unlockCost; //get the leftovers back
-        downstreamObj.unlockCost = 0;
-    }
-    downstreamObj.resource += amount;
-    downstreamObj.resourceDelta += amount * data.gameSettings.ticksPerSecond;
-    downstreamObj.resourceIncrease += amount * data.gameSettings.ticksPerSecond;
 }

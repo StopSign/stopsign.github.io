@@ -5,110 +5,327 @@ function calcUpgradeCost(upgrade, num) {
     return Math.floor(upgrade.initialCost * Math.pow(upgrade.costIncrease, num));
 }
 
-let selectedUpgrade = {var:"",num:0};
+function initializeAmuletCards() {
+    const container = document.getElementById("amuletUpgrades");
+    container.style.cssText = "display:flex;flex-wrap:wrap;gap:15px;padding:10px;";
+    let allCardsHTML = "";
 
-//num is position from the left of the upgrade
-function selectBuyUpgrade(upgradeVar, num) {
-    let upgrade = data.upgrades[upgradeVar];
+    for (const upgradeVar in data.upgrades) {
+        const upgrade = data.upgrades[upgradeVar];
+        const upgradeDataObj = upgradeData[upgradeVar];
 
-    if(selectedUpgrade.var) {
-        document.getElementById(selectedUpgrade.var + "Button" + selectedUpgrade.num).style.border = "none";
-        if(selectedUpgrade.var === upgradeVar && selectedUpgrade.num === num) { //deselect
-            document.getElementById("infoText").innerHTML = "";
-            selectedUpgrade = {var:"",num:0};
-            document.getElementById("infoMenu").style.display = "none";
-            return;
+        const numBought = upgrade.upgradesBought;
+        const remaining = upgrade.upgradesAvailable - numBought;
+        const isFullyBought = remaining === 0;
+        const nextLevelToBuy = numBought;
+
+        const cardId = `card_${upgradeVar}`;
+        const descriptionId = `description_${upgradeVar}`;
+        const costId = `cost_${upgradeVar}`;
+        const remainingId = `remaining_${upgradeVar}`;
+        const buyButtonSectionId = `buyButtonSection_${upgradeVar}`;
+        const costSectionId = `costSection_${upgradeVar}`;
+        const remainingSectionId = `remainingSection_${upgradeVar}`;
+        const maxLevelSectionId = `maxLevelSection_${upgradeVar}`;
+
+        queueCache(cardId);
+        queueCache(descriptionId);
+        queueCache(costId);
+        queueCache(remainingId);
+        queueCache(buyButtonSectionId);
+        queueCache(costSectionId);
+        queueCache(remainingSectionId);
+        queueCache(maxLevelSectionId);
+
+        const title = upgradeDataObj.title || `...${decamelize(upgradeVar)}`;
+        const description = upgradeDataObj.customInfo(nextLevelToBuy);
+        const cost = isFullyBought ? 0 : calcUpgradeCost(upgrade, nextLevelToBuy);
+
+        const cardStyle = `background-color:#2c2c3e;border:2px solid ${isFullyBought ? '#c3cd00':'#00cd41'};border-radius:8px;padding:12px;width:280px;display:${upgrade.visible ? "flex" : "none"};
+            flex-direction:column;justify-content:space-between;box-shadow:0 4px 8px rgba(0,0,0,0.2);font-family:sans-serif;color:#e0e0e0;`;
+        const buyButtonHTML = `<button style="background-color:#008c33;color:white;border:none;border-radius:5px;padding:8px 16px;font-weight:bold;cursor:pointer;" onClick="buyUpgrade('${upgradeVar}')">Buy</button>`;
+        const maxLevelHTML = `<span style="font-size:14px;color:#c3cd00;font-weight:bold;">MAX LEVEL</span>`;
+        const remainingHTML = `Remaining: <span id="${remainingId}">${remaining}</span>`;
+
+        allCardsHTML += Raw.html`
+            <div id="${cardId}" style="${cardStyle}">
+                <div>
+                    <div style="font-size:16px;font-weight:bold;margin-bottom:10px;color:#ffffff;">${title}</div>
+                    ${!upgradeDataObj.attribute?"":`<img id="${upgradeDataObj.attribute}DisplayContainer" src="img/${upgradeDataObj.attribute}.svg" alt="${upgradeDataObj.attribute}" 
+                        style="margin:1px;width:50px;height:50px;vertical-align:top;background:var(--text-bright);border:1px solid black;display:inline-block;" />`}
+                    <div id="${descriptionId}" style="display:inline-block;font-size:14px;flex-grow:1;margin-bottom:15px;${!upgradeDataObj.attribute?"":"width:70%"}">${description}</div>
+                </div>
+                <div>
+                    <div style="display:flex;justify-content:space-between;align-items:center;">
+                        <div id="${costSectionId}" style="display:flex;align-items:baseline;visibility:${isFullyBought ? 'hidden':'visible'};">
+                            <span style="font-size:14px;margin-right:8px;">cost:</span>
+                            <span id="${costId}" style="font-size:24px;font-weight:bold;color:#ffffff;">${cost} AC</span>
+                            <span style="font-size:14px;color:#a0a0a0;margin-left:8px;">(x${upgradeDataObj.costIncrease})</span>
+                        </div>
+                        <div id="${buyButtonSectionId}" style="display:${isFullyBought ? 'none' : 'block'};">${buyButtonHTML}</div>
+                        <div id="${maxLevelSectionId}" style="display:${isFullyBought ? 'block' : 'none'};">${maxLevelHTML}</div>
+                    </div>
+                    <div id="${remainingSectionId}" style="justify-content:flex-end;align-items:center;margin-top:4px;font-size:14px;color:#a0a0a0;display:${isFullyBought ? 'none' : 'flex'};">
+                        ${remainingHTML}
+                    </div>
+                </div>
+            </div>`;
+    }
+    container.innerHTML = allCardsHTML;
+}
+function buyUpgrade(upgradeVar) {
+    const upgrade = data.upgrades[upgradeVar];
+    const upgradeDataObj = upgradeData[upgradeVar];
+    const levelToBuy = upgrade.upgradesBought;
+
+    if (levelToBuy >= upgrade.upgradesAvailable) return;
+
+    const cost = calcUpgradeCost(upgrade, levelToBuy);
+    if (data.ancientCoin < cost) return;
+
+    data.ancientCoin -= cost;
+    upgrade.upgradesBought++;
+    upgrade.upgradePower++; //may be something else later
+
+    if (upgradeDataObj.onBuy) {
+        upgradeDataObj.onBuy(upgrade.upgradePower);
+    }
+
+    const newRemaining = upgrade.upgradesAvailable - upgrade.upgradesBought;
+    upgrade.isFullyBought = newRemaining === 0;
+
+    const cardId = `card_${upgradeVar}`;
+    const descriptionId = `description_${upgradeVar}`;
+    const costId = `cost_${upgradeVar}`;
+    const remainingId = `remaining_${upgradeVar}`;
+    const buyButtonSectionId = `buyButtonSection_${upgradeVar}`;
+    const costSectionId = `costSection_${upgradeVar}`;
+    const remainingSectionId = `remainingSection_${upgradeVar}`;
+    const maxLevelSectionId = `maxLevelSection_${upgradeVar}`;
+    views.updateVal(descriptionId, upgradeDataObj.customInfo(upgrade.upgradesBought), 'textContent');
+
+    if (upgrade.isFullyBought) {
+        views.updateVal(costSectionId, 'hidden', 'style.visibility');
+        views.updateVal(buyButtonSectionId, 'none', 'style.display');
+        views.updateVal(remainingSectionId, 'none', 'style.display');
+        views.updateVal(maxLevelSectionId, 'block', 'style.display');
+        views.updateVal(cardId, '#c3cd00', 'style.borderColor');
+    } else {
+        const newCost = calcUpgradeCost(upgrade, upgrade.upgradesBought);
+        views.updateVal(costId, `${newCost} AC`, 'textContent');
+        views.updateVal(remainingId, newRemaining, 'textContent');
+    }
+    updateCardAffordabilityBorders();
+}
+
+function toggleMaxLevelCards(show) {
+    const displayStyle = show ? 'flex' : 'none';
+    for (const upgradeVar in data.upgrades) {
+        const upgrade = data.upgrades[upgradeVar];
+        if (upgrade.isFullyBought) {
+            const cardId = `card_${upgradeVar}`;
+            views.updateVal(cardId, displayStyle, 'style.display');
         }
     }
-    selectedUpgrade = {var:upgradeVar,num:num};
-    document.getElementById(upgradeVar+"Button"+num).style.border = "4px solid #ffae00";
-    document.getElementById("infoText").innerHTML = createInfoText(upgradeVar, num);
-    document.getElementById("infoMenu").style.display = "inline-block";
-
-    if(data.upgrades[upgradeVar].upgradesBought.indexOf(num) !== -1) { //bought
-        document.getElementById("infoMenu").style.borderColor = "#c3cd00";
-        document.getElementById("infoTextButton").style.display = "none";
-    } else if(num === 0 || data.upgrades[upgradeVar].upgradesBought.indexOf(num-1) !== -1) { //ready
-        document.getElementById("infoMenu").style.borderColor = "#00cd41";
-        document.getElementById("infoTextButton").style.display = data.gameState !== "KTL" ? "none" : "";
-    } else { //disabled
-        document.getElementById("infoMenu").style.borderColor = "#ff0000";
-        document.getElementById("infoTextButton").style.display = "none";
+}
+function toggleAttributeUpgrades(show) {
+    const displayStyle = show ? 'flex' : 'none';
+    for (const upgradeVar in data.upgrades) {
+        const upgrade = data.upgrades[upgradeVar];
+        if (upgrade.attribute) {
+            const cardId = `card_${upgradeVar}`;
+            views.updateVal(cardId, displayStyle, 'style.display');
+        }
+    }
+}
+function toggleUnafordableUpgrades(show) {
+    const displayStyle = show ? 'flex' : 'none';
+    for (const upgradeVar in data.upgrades) {
+        const upgrade = data.upgrades[upgradeVar];
+        if (calcUpgradeCost(upgrade, upgrade.upgradesBought) > data.ancientCoin) {
+            const cardId = `card_${upgradeVar}`;
+            views.updateVal(cardId, displayStyle, 'style.display');
+        }
     }
 }
 
-function buyUpgrade(upgradeVar, num) {
-    //also deselect the upgrade
-    let upgrade = data.upgrades[upgradeVar];
-    let dataObj = actionData.upgrades[upgradeVar];
-
-    if(upgrade.upgradesBought.indexOf(num) !== -1) { //already bought
-        return;
-    }
-    //check cost
-    let cost = calcUpgradeCost(upgrade, num);
-    if (data.ancientCoin < cost) {
-        return;
-    }
-    //buy
-    data.ancientCoin -= cost;
-
-    //add to upgrades
-    if (upgrade.upgradesBought.indexOf(num) === -1) {
-        upgrade.upgradesBought.push(num);
-    }
-    upgrade.upgradePower++; //num bought per row
-    if(upgrade.upgradesBought.length === upgrade.upgradesAvailable) {
-        upgrade.isFullyBought = true; //cleared the row
-    }
-    if(selectedUpgrade.var) { // <- allow buy on load
-        selectBuyUpgrade(selectedUpgrade.var, selectedUpgrade.num); //deselect
-    }
-    if(dataObj.onBuy) {
-        dataObj.onBuy(upgrade.upgradePower);
+function updateCardAffordabilityBorders() {
+    for (const upgradeVar in data.upgrades) {
+        const upgrade = data.upgrades[upgradeVar];
+        if (!upgrade.isFullyBought) {
+            const cost = calcUpgradeCost(upgrade, upgrade.upgradesBought);
+            const canAfford = data.ancientCoin >= cost;
+            const cardId = `card_${upgradeVar}`;
+            const borderColor = canAfford ? '#00cd41' : '#ff0000';
+            views.updateVal(cardId, borderColor, 'style.borderColor');
+        }
     }
 }
 
-//no listeners allowed here
-function createInfoText(upgradeVar, num) {
-    let upgrade = data.upgrades[upgradeVar];
-    return actionData.upgrades[upgradeVar].customInfo(num) +
-        "<br><span style='font-size:14px'>Cost: <b>" + calcUpgradeCost(upgrade, num) + "</b></span>";
+//vars that you would pull from the save
+function upgradesSetBaseVariables(upgradeObj, dataObj) {
+    upgradeObj.upgradePower = dataObj.upgradePower ?? 0; //for controlling the effect of the upgrade
+    upgradeObj.initialCost = dataObj.initialCost;
+    upgradeObj.costIncrease = dataObj.costIncrease;
+    upgradeObj.upgradesAvailable = dataObj.upgradesAvailable;
+    upgradeObj.upgradesBought = dataObj.upgradesBought ?? 0;
+
+    upgradeObj.isFullyBought = !!dataObj.isFullyBought;
+    upgradeObj.visible = !!dataObj.visible;
 }
+
 
 function createUpgrades() {
-    //Loop through actionData.upgrades
+    //Loop through upgradeData
     //modify/add base variables as needed
     //add it to data.upgrades
-    for(let upgradeVar in actionData.upgrades) {
-        let dataObj = actionData.upgrades[upgradeVar];
+    for(let upgradeVar in upgradeData) {
+        let dataObj = upgradeData[upgradeVar];
         data.upgrades[upgradeVar] = {};
         let upgradeObj = data.upgrades[upgradeVar];
-        upgradeObj.upgradePower = 0; //for controlling the effect of the upgrade
-        upgradeObj.initialCost = dataObj.initialCost;
-        upgradeObj.costIncrease = dataObj.costIncrease;
-        upgradeObj.upgradesAvailable = dataObj.upgradesAvailable;
-        upgradeObj.upgradesBought = []; //e.g. bought first and fifth upgrade and it would be [0,4]. Not used atm.
-        upgradeObj.requireInOrder = dataObj.requireInOrder !== undefined ? dataObj.requireInOrder : true;
-        upgradeObj.isFullyBought = false;
-        upgradeObj.visible = !!dataObj.visible;
+        upgradeObj.attribute = !!dataObj.attribute;
+
+        upgradesSetBaseVariables(upgradeObj, dataObj);
     }
 }
 
-actionData.upgrades = {
+let upgradeData = {
+    stopLettingOpportunityWait: {
+        initialCost:2, costIncrease:3,
+        upgradesAvailable: 2,
+        visible: true,
+        customInfo: function(num) {
+            return `[Automation] When unlocking a new action, automatically sets the downstream sliders of the 
+            unlocked action to ${["50%", "100% (Currently 50%)", "100%"][num]}.`;
+        }
+    },
+    knowWhenToMoveOn: {
+        initialCost:2, costIncrease:2,
+        upgradesAvailable:1,
+        visible:true,
+        customInfo: function(num) {
+            return Raw.html`[Automation] When an action is at its final max level and has no downstream actions with sliders, it 
+                automatically sets the slider to 0%. This will apply recursively.`
+        }
+    },
+    feelTheEchoesOfMyPast: {
+        initialCost:1, costIncrease:2,
+        upgradesAvailable:9,
+        visible:true,
+        customInfo: function(num) {
+            if(num === 9) {
+                return "Keep all of your Legacy when you use the amulet."
+            }
+            return "Keep "+(num >0?"another ":"")+`+10% of your Legacy (currently at ${[1,2,3,4,5,6,7,8,9][num]}0%) when you use the Amulet`;
+        }
+    },
+    rememberWhatIFocusedOn: {
+        initialCost:5, costIncrease:2,
+        upgradesAvailable:3,
+        visible:true,
+        customInfo: function(num) {
+            if(num === 0) {
+                return Raw.html`Gain a rate of +1/hr to a Practice Mult on the flow you have Focused. The mult lasts until the amulet 
+                is used, and stacks with the Focus Mult. Maximum flow is still 10%/s. The Practice Mult will have a max of 2. `
+            }
+            if(num === 1) {
+                return Raw.html`You have a rate of +1/hr to a Practice Mult on the flow you have Focused. This mult lasts until the amulet 
+                is used, and stacks with the Focus Mult. Maximum flow is still 10%/s. The Practice Mult currently has a max of 2. Gain +1.`
+            }
+            if(num === 2) {
+                return Raw.html`You have a rate of +1/hr to a Practice Mult on the flow you have Focused. This mult lasts until the amulet 
+                is used, and stacks with the Focus Mult. Maximum flow is still 10%/s. The Practice Mult currently has a max of 3. Gain +1.`
+            }
+            return Raw.html`You have a rate of +1/hr to a Practice Mult on the flow you have Focused. This mult lasts until the amulet 
+                is used, and stacks with the Focus Mult. Maximum flow is still 10%/s. The Practice Mult currently has a max of 4.`
+        },
+        onBuy: function(num) {
+            data.focusLoopMax = 2 + num;
+            unveilUpgrade('knowWhatIFocusedOn')
+        },
+    },
+    knowWhatIFocusedOn: {
+        initialCost:8, costIncrease:2,
+        upgradesAvailable:2,
+        visible:false,
+        customInfo: function(num) {
+            return "Keep "+(["20", "50"][num])+"% of your Focus Loop Bonus when you use the Amulet";
+        }
+    },
+    startALittleQuicker: {
+        initialCost:4, costIncrease:2,
+        upgradesAvailable:2,
+        visible:true,
+        customInfo: function(num) {
+            return "Flat motivation generation increase on Overclock of <b>" +((num+1)*25)+ "</b> momentum/s.";
+        }
+    },
+
+    refineMyCycle: {
+        initialCost:5, costIncrease:4, attribute:"cycle",
+        upgradesAvailable:4, increaseRatio:.5,
+        visible:true,
+        customInfo: function(num) {
+            return `Cycle's bonus multiplier increased by ${["x1.5", "x2 (Currently x1.5)", "x2"][num]}`;
+        },
+        onBuy: function(num) {
+            data.atts.cycle.attUpgradeMult = 1 + (num * .5);
+            recalcAttMult("cycle");
+        }
+    },
+    refineMyAwareness: {
+        initialCost:5, costIncrease:4, attribute:"awareness",
+        upgradesAvailable:2,
+        visible:true,
+        customInfo: function(num) {
+            return `Awareness' bonus multiplier increased by ${["50%", "100% (Currently 50%)", "100%"][num]}`;
+        },
+        onBuy: function(num) {
+            data.atts.cycle.attUpgradeMult = 1 + (num * .5);
+            recalcAttMult("cycle");
+        }
+    },
+
+
+
+    makeMoreMoney: {
+        initialCost:6, costIncrease:2,
+        upgradesAvailable:4,
+        visible:false,
+        customInfo: function(num) {
+            return "Gold generation increased by "+(num >0?"another ":"")+"50%";
+        }
+    },
+    haveBetterConversations: {
+        initialCost:6, costIncrease:2,
+        upgradesAvailable:4,
+        visible:false,
+        customInfo: function(num) {
+            return "Conversation generation increased by "+(num >0?"another ":"")+"50%";
+        }
+    },
+    createABetterFoundation: {
+        initialCost:8, costIncrease:4,
+        upgradesAvailable:4,
+        visible:false,
+        customInfo: function(num) {
+            return "Motivation generation is increased by "+(num >0?"another ":"")+"25%";
+        }
+    },
+
     rememberWhatIDid: {
         initialCost:1, costIncrease:1,
         upgradesAvailable:1,
-        visible:true,
+        visible:false,
         customInfo: function(num) {
             return "On each action, get 2x exp as long as the action's level is lower than the highest level ever reached." +
                 " The action's highest level will be recorded on amulet use, and it will be displayed.";
         }
-    }, //1|1, 2x exp to highest
+    },
     checkWhatScottMentioned: {
         initialCost:1, costIncrease:1,
         upgradesAvailable:1,
-        visible:true,
+        visible:false,
         customInfo: function(num) {
             return Raw.html`He said something about seeing a spot of gold among the trees. 
             The birds, maybe? It might have been worth checking out.<br><br>
@@ -123,44 +340,11 @@ actionData.upgrades = {
             purchaseAction('eatGoldenFruit');
             purchaseAction('journal');
         }
-    }, //STORY|1 - shortcut path
-    stopLettingOpportunityWait: {
-        initialCost:1, costIncrease:3,
-        upgradesAvailable:4,
-        visible:true,
-        customInfo: function(num) {
-            return `When unlocking a new action, auto sets the new downstream sliders to ` +
-            `${["5%.", "20%.", "100%.", "not reset with an amulet reset, and for previously undiscovered sliders to be set at 100%."][num]}`;
-        }
-    }, //1|4|x3,  set sliders on unlock
-    tryALittleHarder: {
-        initialCost:5, costIncrease:2,
-        upgradesAvailable:5,
-        visible:true,
-        customInfo: function(num) {
-            return "Flat motivation generation increase on Overclock of <b>" +((num+1)*20)+ "</b> momentum/s.";
-        }
-    }, //5|5|x2, Flat momentum increase
-    createABetterFoundation: {
-        initialCost:5, costIncrease:4,
-        upgradesAvailable:3,
-        visible:true,
-        customInfo: function(num) {
-            return "Motivation generation is multipled by "+(num >0?"another ":"")+"x2";
-        }
-    }, //5|3|x4, Momentum multiplier
-    makeMoreMoney: {
-        initialCost:10, costIncrease:2,
-        upgradesAvailable:4,
-        visible:true,
-        customInfo: function(num) {
-            return "Gold generation increased by "+(num >0?"another ":"")+"x2";
-        }
-    }, //10|4|x2, Money x2
+    },
     stopBeingSoTense: {
         initialCost:30, costIncrease:1,
         upgradesAvailable:1,
-        visible:true,
+        visible:false,
         customInfo: function(num) {
             return "What was the point? I should have handled myself first."
         },
@@ -168,84 +352,31 @@ actionData.upgrades = {
             purchaseAction('meditate');
             purchaseAction('walkAware');
         }
-    }, //STORY|30 - meditate path
-    haveBetterConversations: {
-        initialCost:10, costIncrease:2,
-        upgradesAvailable:4,
-        visible:true,
-        customInfo: function(num) {
-            return "Conversation generation increased by "+(num >0?"another ":"")+"x2";
-        }
-    }, //10|4|x2, Conversations x2
+    },
     focusHarder: {
         initialCost:25, costIncrease:4,
         upgradesAvailable:8,
-        visible:true,
+        visible:false,
         customInfo: function(num) {
             return "Increases the Focus Mult by "+(num >0?"another ":"")+"+1 (for a total of " + (num+1+2) + ")";
         },
         onBuy: function(num) {
             data.focusMult = 2 + num;
         }
-    }, //25|8|x4, Focus mult +1
-    rememberWhatIFocusedOn: {
-        initialCost:25, costIncrease:5,
-        upgradesAvailable:3,
-        visible:true,
-        customInfo: function(num) {
-            if(num === 0) {
-                return "Gain +1/hr to a new Loop Bonus on the flow you have Focused. Stays when Focus is removed, but resets when the Amulet is used. The Loop Bonus has a max of 2.5. Maximum flow is still 10%/s."
-            }
-            return "Increases the Loop Bonus' max by "+(num >0?"another ":"")+"x2 (for a total of " + (2.5*Math.pow(2, (num+1))) + ")";
-        },
-        onBuy: function(num) {
-            data.focusLoopMax = 2.5 * Math.pow(2, data.upgrades.rememberWhatIFocusedOn) * Math.pow(2, data.upgrades.rememberWhatIFocusedOnMore);
-            if(num === data.rememberWhatIFocusedOn.upgradesAvailable) {
-                data.upgrades.rememberWhatIFocusedOnMore.visible = true;
-            }
-        }
-    }, //25|3|x5, Focus mult is sticky, but resets
-    knowWhatIFocusedOn: {
-        initialCost:50, costIncrease:10,
-        upgradesAvailable:4,
-        visible:true,
-        customInfo: function(num) { //[0, .2, .5, .9, 1][data.actions.knowWhatIFocusedOn.upgradePower]
-            return "Keep "+(["20", "50", "90", "100"][num])+"% of your Focus Loop Bonus when you use the Amulet";
-        }
-    }, //50|4|x10, Keep Focus mult on amulet
+    },
     rememberHowIGrew: {
         initialCost:50, costIncrease:1,
         upgradesAvailable:1,
-        visible:true,
+        visible:false,
         customInfo: function(num) {
             return "On each action, get 2x exp as long as the action's level is lower than the second highest level ever reached." +
                 " The action's second highest level will be recorded on amulet use, and it will be displayed.";
         }
-    }, //50|1, 2x exp to second highest
-
-
-    // return "Unlock new actions!<br>Story: My armor is broken, my sword shattered, my shield is in pieces. The army " +
-    //                 "did not expect me to fight this long, and their preparation was lacking.<br><br>I must take this into my own hands.";
-
-
-    rememberWhatIFocusedOnMore: {
-        initialCost:10000, costIncrease:5,
-        upgradesAvailable:3,
-        visible:false,
-        customInfo: function(num) {
-            if(num === 0) {
-                return "Gain +1/hr to a new Loop Bonus on the flow you have Focused. Stays when Focus is removed, but resets when the Amulet is used. The Loop Bonus has a max of 2.5. Maximum flow is still 10%/s."
-            }
-            return "Increases the Loop Bonus' max by "+(num >0?"another ":"")+"x2 (for a total of " + (2.5 * Math.pow(2, data.upgrades.rememberWhatIFocusedOn) * Math.pow(2, (num+1))) + ")";
-        },
-        onBuy: function(num) {
-            data.focusLoopMax = 2.5 * Math.pow(2, data.upgrades.rememberWhatIFocusedOn) * Math.pow(2, data.upgrades.rememberWhatIFocusedOnMore);
-        }
-    }, //10000|5|x3, Focus Mult +1
+    },
     rememberMyMastery: {
         initialCost:200, costIncrease:1,
         upgradesAvailable:1,
-        visible:true,
+        visible:false,
         customInfo: function(num) {
             return "On each action, get 2x exp as long as the action's level is lower than the third highest level ever reached." +
                 " The action's third highest level will be recorded on amulet use, and it will be displayed.";
@@ -253,9 +384,9 @@ actionData.upgrades = {
     }, //200|1, 2x exp to third highest
 
     lookCloserAtTheBoard: {
-        initialCost:11, costIncrease:3,
+        initialCost:10, costIncrease:2,
         upgradesAvailable:2,
-        visible:true,
+        visible:false,
         customInfo: function(num) {
             return "The board was stuffed with notices. Surely something else is relevant for you."
         },
@@ -289,7 +420,7 @@ actionData.upgrades = {
         upgradesAvailable:1,
         visible:false,
         customInfo: function(num) {
-            return ""
+            return "asdf"
         },
         onBuy: function(num) {
         }
@@ -299,7 +430,7 @@ actionData.upgrades = {
         upgradesAvailable:1,
         visible:false,
         customInfo: function(num) {
-            return ""
+            return "asdf"
         },
         onBuy: function(num) {
         }
@@ -309,7 +440,7 @@ actionData.upgrades = {
         upgradesAvailable:1,
         visible:false,
         customInfo: function(num) {
-            return ""
+            return "asdf"
         },
         onBuy: function(num) {
         }

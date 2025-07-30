@@ -24,9 +24,6 @@ let views = {
         views.updateActions();
         views.updateStats();
 
-        for(let upgradeVar in data.upgrades) {
-            updateUpgradeView(upgradeVar);
-        }
         updateGlobals();
     },
     updateViewOnSecond: function() {
@@ -75,8 +72,10 @@ let views = {
             return;
         }
 
+        views.updateVal(`${attVar}AttUpgradeMultContainer`, attObj.attUpgradeMult > 1?"":"none", "style.display");
+
         //Update the numbers
-        let roundedNumbers = [["num", 2], ["mult", 3]]; //["perMinute", 2],
+        let roundedNumbers = [["num", 2], ["attMult", 2], ["attUpgradeMult", 2]]; //["perMinute", 2],
 
         for(let numberObj of roundedNumbers) {
             let capName = capitalizeFirst(numberObj[0]);
@@ -172,7 +171,7 @@ let views = {
         views.updateVal(`${actionVar}LargeVersionContainer`, !miniVersion?"":"none", "style.display");
         views.updateVal(`${actionVar}SmallVersionContainer`, miniVersion?"":"none", "style.display");
         views.updateVal(`${actionVar}Container`, miniVersion ? "100px" : "" , "style.borderRadius");
-        views.updateVal(`${actionVar}SmallVersionContainer`, (1 / scale)*.8+"", "style.scale");
+        views.updateVal(`${actionVar}SmallVersionContainer`, ((scale < .11) ? 3 : (1 / scale)*.8)+"", "style.scale");
 
         views.updateVal(`${actionVar}SmallVersionTitle`, scale < .11 ? "0" : "1" , "style.opacity");
         views.updateVal(`${actionVar}Container`, miniVersion ? "100px" : "" , "style.borderRadius");
@@ -226,7 +225,7 @@ let views = {
             roundedNumbers.push(["wage", 2]);
         }
         if(actionObj.isSpell) {
-            let instaColor = `rgb(${Math.round(20+189*(actionObj.instability/100/data.atts.control.mult))}, ${Math.round(20+189*(1-(actionObj.instability/100/data.atts.control.mult)))}, 100)`;
+            let instaColor = `rgb(${Math.round(20+189*(actionObj.instability/100/data.atts.control.attMult))}, ${Math.round(20+189*(1-(actionObj.instability/100/data.atts.control.attMult)))}, 100)`;
             views.updateVal(`${actionVar}Instability`, instaColor, "style.color");
             roundedNumbers.push(["instability", 2]);
             views.updateVal(`${actionVar}InstabilityToAdd`, actionObj.instabilityToAdd/(actionObj.efficiency/100), "textContent", 2);
@@ -446,28 +445,6 @@ let views = {
     },
 }
 
-function updateUpgradeView(upgradeVar) {
-    let isShowing = view.cached[`useAmuletMenu`].style.display !== "none";
-    if(!isShowing) {
-        return;
-    }
-    let upgrade = data.upgrades[upgradeVar];
-    document.getElementById(upgradeVar+"Container").style.display = upgrade.visible ? "" : "none";
-
-    for(let i = 0; i < upgrade.upgradesAvailable; i++) {
-        if(upgrade.upgradesBought.indexOf(i) !== -1) {
-            document.getElementById(upgradeVar + "Button" + i).style.background = "var(--upgrade-bought-color)";
-            document.getElementById(upgradeVar + "Button" + i).style.color = "black";
-        } else if(i === 0 || upgrade.upgradesBought.indexOf(i-1) !== -1) { //ready to buy
-            document.getElementById(upgradeVar + "Button" + i).style.background = "var(--upgrade-color)";
-            document.getElementById(upgradeVar + "Button" + i).style.color = "black";
-        } else {
-            document.getElementById(upgradeVar + "Button" + i).style.background = "var(--upgrade-disabled-color)";
-            document.getElementById(upgradeVar + "Button" + i).style.color = "white";
-        }
-    }
-
-}
 
 function updateGlobals() {
     let totalMometum = 0;

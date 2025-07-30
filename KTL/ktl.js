@@ -50,6 +50,7 @@ function initializeKTL() {
     if(data.currentGameState.KTLBonusTimer > 60 * 60) {
         data.currentGameState.bonusTime += 1000 * 60 * 10; //10 mins bonus time FO FREE / should be a 1 point AC upgrade.
         // Can't be received faster than every hour.
+        data.currentGameState.KTLBonusTimer = 0;
     }
 
     views.updateVal("openViewAmuletButton", "none", "style.display")
@@ -79,7 +80,7 @@ function openUseAmuletMenu(isUseable) {
     document.getElementById("useAmuletMenu").style.display = isShowing ? "none" : "flex";
     document.getElementById('amuletConfirm').checked = false;
 
-    // document.getElementById("infoTextButton").style.display = isUseable ? "" : "none";
+    updateCardAffordabilityBorders();
 }
 
 function useAmulet() {
@@ -90,15 +91,19 @@ function useAmulet() {
     data.focusSelected = [];
     data.doneAmulet = true;
     views.updateVal(`useAmuletMenu`, "none", "style.display");
+    views.updateVal(`openUseAmuletButton`, "none", "style.display");
     views.updateVal(`openViewAmuletButton`, "", "style.display");
 
     //Reset all atts and bonuses
     for(let attVar in data.atts) {
         let attObj = data.atts[attVar];
-        attsSetBaseVariables(attObj);
+        if(attObj.attCategory !== "echoes") {
+            attsSetBaseVariables(attObj);
+        }
     }
+    data.atts.legacy.num *= .1 * (data.upgrades.feelTheEchoesOfMyPast.upgradePower + 1);
+    recalcAttMult("legacy");
 
-    //set overclock to the upgrade-relevant %
 
     //For each action, reset the base atts and set max level
     for(let actionVar in data.actions) {
@@ -125,12 +130,12 @@ function useAmulet() {
         actionResetToBase(actionVar);
 
         dataObj.downstreamVars.forEach(function(downstreamVar) {
-            if(data.actions[downstreamVar] && data.actions[downstreamVar].unlocked) {
+            if(data.actions[downstreamVar] && data.actions[downstreamVar].unlocked && data.actions[downstreamVar].hasUpstream) {
                 setSliderUI(actionObj.actionVar, downstreamVar, getUpgradeSliderAmount()); //reset with amulet
             }
             let currentMult = actionObj[downstreamVar + "FocusMult"];
 
-            actionObj[downstreamVar + "FocusMult"] = (currentMult - 1) * [0, .2, .5, .9, 1][data.upgrades.knowWhatIFocusedOn.upgradePower] + 1;
+            actionObj[downstreamVar + "FocusMult"] = (currentMult - 1) * [0, .2, .5][data.upgrades.knowWhatIFocusedOn.upgradePower] + 1;
         });
     }
 

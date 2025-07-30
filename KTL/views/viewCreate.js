@@ -19,7 +19,7 @@ function initializeDisplay() {
     initializeMenus();
 
     initializeToasts();
-    generateAmuletContent();
+    initializeAmuletCards();
     setAllCaches(); //happens after generation
     showAttColors("awareness");
     revealActionAtts(data.actions.reflect);
@@ -44,20 +44,21 @@ function createAttDisplay(attVar) {
             queueCache(`${attVar}AttContainer`);
             queueCache(`${attVar}Name`);
             queueCache(`${attVar}Num`);
-            queueCache(`${attVar}Mult`);
-            // queueCache(`${attVar}PerMinute`);
+            queueCache(`${attVar}AttMult`);
+            queueCache(`${attVar}AttUpgradeMult`);
+            queueCache(`${attVar}AttUpgradeMultContainer`);
             queueCache(`${attVar}DisplayContainer`);
 
             theStr += Raw.html`
                 <div id="${attVar}AttContainer" style="position:relative;cursor:pointer;white-space:nowrap;border:2px solid transparent" 
                     onclick="clickedAttName('${attVar}', false)">
                     <img id="${attVar}DisplayContainer" src="img/${attVar}.svg" alt="${attVar}" 
-                        style="margin:1px;width:30px;height:30px;vertical-align:top;background:var(--text-bright);border:1px solid black;" />
+                        style="margin:1px;width:35px;height:35px;vertical-align:top;background:var(--text-bright);border:1px solid black;" />
                     <span style="display:inline-block">
                         <div id="${attVar}Name" style="font-weight:bold;color:var(--text-primary)">${decamelize(attVar)}</div>
                         <span id="${attVar}Num" style="display:inline-block;font-weight:bold;color:var(--text-primary)">${attObj.num}</span>
-<!--                        <span style="display:inline-block">(+<span id="${attVar}PerMinute" style="font-weight:bold;color:var(&#45;&#45;text-primary)">${attObj.perMinute}</span>/m)</span>-->
-                        <span style="display:inline-block"> = x<span id="${attVar}Mult" style="font-weight:bold;color:var(--text-primary)">${attObj.mult}</span> bonus</span>
+                        <span style="display:inline-block"> = x<span id="${attVar}AttMult" style="font-weight:bold;color:var(--text-primary)">${attObj.attMult}</span> bonus</span>
+                        <div id="${attVar}AttUpgradeMultContainer">x<span id="${attVar}AttUpgradeMult" style="font-weight:bold;color:var(--text-primary)">${attObj.attUpgradeMult}</span> bonus mult</div>
                     </span>
                 </div>`;
         }
@@ -832,34 +833,6 @@ function generateLinesBetweenActions() {
         }
     }
 }
-
-function generateAmuletContent() {
-    let amuletContent = "";
-
-    for (let upgradeVar in data.upgrades) {
-        let upgrade = data.upgrades[upgradeVar];
-
-        // Start a new row for each upgrade
-        amuletContent += `<div id="${upgradeVar}Container" style="margin-bottom:10px;">`;
-        amuletContent += `<div style="width:100%;font-size:16px;margin-bottom:5px;">...${decamelize(upgradeVar)}</div>`;
-
-        // Generate buttons for available upgrades
-        for (let i = 0; i < upgrade.upgradesAvailable; i++) {
-            let id = upgradeVar+"Button"+i;
-            let cost = intToString(calcUpgradeCost(upgrade, i),1);
-            amuletContent += Raw.html`
-                <button class="upgradeButton" id="${id}" 
-                    style="background:var(--upgrade-color); color:black;font-weight:bold;" 
-                    onClick="selectBuyUpgrade('${upgradeVar}', ${i})">
-                    ${cost}
-                </button>`;
-        }
-        amuletContent += "</div>";
-    }
-
-    document.getElementById("amuletUpgrades").innerHTML = amuletContent;
-}
-
 
 
 
