@@ -1,3 +1,33 @@
+
+
+//vars that you would pull from the save
+function upgradesSetBaseVariables(upgradeObj, dataObj) {
+    upgradeObj.upgradePower = dataObj.upgradePower ?? 0; //for controlling the effect of the upgrade
+    upgradeObj.initialCost = dataObj.initialCost;
+    upgradeObj.costIncrease = dataObj.costIncrease;
+    upgradeObj.upgradesAvailable = dataObj.upgradesAvailable;
+    upgradeObj.upgradesBought = dataObj.upgradesBought ?? 0;
+    upgradeObj.increaseRatio = dataObj.increaseRatio;
+
+    upgradeObj.isFullyBought = !!dataObj.isFullyBought;
+    upgradeObj.visible = !!dataObj.visible;
+}
+
+
+function createUpgrades() {
+    //Loop through upgradeData
+    //modify/add base variables as needed
+    //add it to data.upgrades
+    for(let upgradeVar in upgradeData) {
+        let dataObj = upgradeData[upgradeVar];
+        data.upgrades[upgradeVar] = {};
+        let upgradeObj = data.upgrades[upgradeVar];
+
+        upgradesSetBaseVariables(upgradeObj, dataObj);
+    }
+}
+
+
 function calcUpgradeCost(upgrade, num) {
     if(num === 0) {
         return upgrade.initialCost;
@@ -38,7 +68,8 @@ function initializeAmuletCards() {
         queueCache(maxLevelSectionId);
 
         const title = upgradeDataObj.title || `...${decamelize(upgradeVar)}`;
-        const description = upgradeDataObj.customInfo(nextLevelToBuy);
+        let text = !upgradeDataObj.attribute ? upgradeDataObj.customInfo(upgrade.upgradesBought) :
+            attributeUpgradeInfo(upgradeDataObj.attribute, upgrade.upgradesAvailable, upgrade.upgradesBought, upgrade.increaseRatio);
         const cost = isFullyBought ? 0 : calcUpgradeCost(upgrade, nextLevelToBuy);
 
         const cardStyle = `background-color:#2c2c3e;border:2px solid ${isFullyBought ? '#c3cd00':'#00cd41'};border-radius:8px;padding:12px;width:280px;display:${upgrade.visible ? "flex" : "none"};
@@ -53,7 +84,7 @@ function initializeAmuletCards() {
                     <div style="font-size:16px;font-weight:bold;margin-bottom:10px;color:#ffffff;">${title}</div>
                     ${!upgradeDataObj.attribute?"":`<img id="${upgradeDataObj.attribute}DisplayContainer" src="img/${upgradeDataObj.attribute}.svg" alt="${upgradeDataObj.attribute}" 
                         style="margin:1px;width:50px;height:50px;vertical-align:top;background:var(--text-bright);border:1px solid black;display:inline-block;" />`}
-                    <div id="${descriptionId}" style="display:inline-block;font-size:14px;flex-grow:1;margin-bottom:15px;${!upgradeDataObj.attribute?"":"width:70%"}">${description}</div>
+                    <div id="${descriptionId}" style="display:inline-block;font-size:14px;flex-grow:1;margin-bottom:15px;${!upgradeDataObj.attribute?"":"width:70%"}">${text}</div>
                 </div>
                 <div>
                     <div style="display:flex;justify-content:space-between;align-items:center;">
@@ -90,6 +121,9 @@ function buyUpgrade(upgradeVar) {
     if (upgradeDataObj.onBuy) {
         upgradeDataObj.onBuy(upgrade.upgradePower);
     }
+    if(upgradeDataObj.attribute) {
+        attributeUpgradeOnBuy(upgradeDataObj.attribute, upgrade.upgradesBought, upgrade.increaseRatio);
+    }
 
     const newRemaining = upgrade.upgradesAvailable - upgrade.upgradesBought;
     upgrade.isFullyBought = newRemaining === 0;
@@ -102,7 +136,9 @@ function buyUpgrade(upgradeVar) {
     const costSectionId = `costSection_${upgradeVar}`;
     const remainingSectionId = `remainingSection_${upgradeVar}`;
     const maxLevelSectionId = `maxLevelSection_${upgradeVar}`;
-    views.updateVal(descriptionId, upgradeDataObj.customInfo(upgrade.upgradesBought), 'textContent');
+    let text = !upgradeDataObj.attribute ? upgradeDataObj.customInfo(upgrade.upgradesBought) :
+        attributeUpgradeInfo(upgradeDataObj.attribute, upgrade.upgradesAvailable, upgrade.upgradesBought, upgrade.increaseRatio);
+    views.updateVal(descriptionId, text, 'textContent');
 
     if (upgrade.isFullyBought) {
         views.updateVal(costSectionId, 'hidden', 'style.visibility');
@@ -116,6 +152,28 @@ function buyUpgrade(upgradeVar) {
         views.updateVal(remainingId, newRemaining, 'textContent');
     }
     updateCardAffordabilityBorders();
+}
+
+function attributeUpgradeInfo(attVar, upgradesAvailable, upgradeNum, increaseRatio) {
+    // console.log(attVar, upgradesAvailable, upgradeNum, increaseRatio);
+    const attributeName = capitalizeFirst(attVar);
+    const possessiveName = attributeName.endsWith('s')
+        ? `${attributeName}'`
+        : `${attributeName}'s`;
+
+    if (upgradeNum >= upgradesAvailable) {
+        const maxMultiplier = 1 + upgradesAvailable * increaseRatio;
+        return `The bonus multiplier to ${possessiveName}is x${maxMultiplier.toFixed(2)}`;
+    }
+
+    const currentMultiplier = 1 + upgradeNum * increaseRatio;
+    const nextMultiplier = 1 + (upgradeNum + 1) * increaseRatio;
+    return `Increase ${possessiveName} bonus multiplier to x${nextMultiplier.toFixed(2)} (Currently: x${currentMultiplier.toFixed(2)})`;
+}
+
+function attributeUpgradeOnBuy(attVar, upgradeNum, increaseRatio) {
+    data.atts[attVar].attUpgradeMult = 1 + (upgradeNum * increaseRatio);
+    recalcAttMult(attVar);
 }
 
 function toggleMaxLevelCards(show) {
@@ -159,33 +217,6 @@ function updateCardAffordabilityBorders() {
             const borderColor = canAfford ? '#00cd41' : '#ff0000';
             views.updateVal(cardId, borderColor, 'style.borderColor');
         }
-    }
-}
-
-//vars that you would pull from the save
-function upgradesSetBaseVariables(upgradeObj, dataObj) {
-    upgradeObj.upgradePower = dataObj.upgradePower ?? 0; //for controlling the effect of the upgrade
-    upgradeObj.initialCost = dataObj.initialCost;
-    upgradeObj.costIncrease = dataObj.costIncrease;
-    upgradeObj.upgradesAvailable = dataObj.upgradesAvailable;
-    upgradeObj.upgradesBought = dataObj.upgradesBought ?? 0;
-
-    upgradeObj.isFullyBought = !!dataObj.isFullyBought;
-    upgradeObj.visible = !!dataObj.visible;
-}
-
-
-function createUpgrades() {
-    //Loop through upgradeData
-    //modify/add base variables as needed
-    //add it to data.upgrades
-    for(let upgradeVar in upgradeData) {
-        let dataObj = upgradeData[upgradeVar];
-        data.upgrades[upgradeVar] = {};
-        let upgradeObj = data.upgrades[upgradeVar];
-        upgradeObj.attribute = !!dataObj.attribute;
-
-        upgradesSetBaseVariables(upgradeObj, dataObj);
     }
 }
 
@@ -261,30 +292,35 @@ let upgradeData = {
         }
     },
 
-    refineMyCycle: {
-        initialCost:5, costIncrease:4, attribute:"cycle",
-        upgradesAvailable:4, increaseRatio:.5,
-        visible:true,
-        customInfo: function(num) {
-            return `Cycle's bonus multiplier increased by ${["x1.5", "x2 (Currently x1.5)", "x2"][num]}`;
-        },
-        onBuy: function(num) {
-            data.atts.cycle.attUpgradeMult = 1 + (num * .5);
-            recalcAttMult("cycle");
-        }
-    },
-    refineMyAwareness: {
-        initialCost:5, costIncrease:4, attribute:"awareness",
-        upgradesAvailable:2,
-        visible:true,
-        customInfo: function(num) {
-            return `Awareness' bonus multiplier increased by ${["50%", "100% (Currently 50%)", "100%"][num]}`;
-        },
-        onBuy: function(num) {
-            data.atts.cycle.attUpgradeMult = 1 + (num * .5);
-            recalcAttMult("cycle");
-        }
-    },
+    refineMyCycle: { attribute:"cycle", upgradesAvailable:4, increaseRatio:.25, initialCost:5, costIncrease:4, visible:true },
+    refineMyAwareness: { attribute:"awareness", upgradesAvailable:4, increaseRatio:.5, initialCost:5, costIncrease:4, visible:true },
+    refineMyConcentration: { attribute:"concentration", upgradesAvailable:4, increaseRatio:.5, initialCost:10, costIncrease:4, visible:true },
+    refineMyEnergy: { attribute:"energy", upgradesAvailable:4, increaseRatio:.5, initialCost:10, costIncrease:4, visible:true },
+    refineMyFlow: { attribute:"flow", upgradesAvailable:4, increaseRatio:.5, initialCost:15, costIncrease:4, visible:true },
+    refineMyCoordination: { attribute:"coordination", upgradesAvailable:4, increaseRatio:.5, initialCost:15, costIncrease:4, visible:true },
+    refineMyIntegration: { attribute:"integration", upgradesAvailable:4, increaseRatio:.25, initialCost:20, costIncrease:4, visible:true },
+    refineMyAmbition: { attribute:"ambition", upgradesAvailable:4, increaseRatio:.5, initialCost:5, costIncrease:4, visible:true },
+    refineMyAdaptability: { attribute:"adaptability", upgradesAvailable:4, increaseRatio:.5, initialCost:5, costIncrease:3, visible:true },
+    refineMyCunning: { attribute:"cunning", upgradesAvailable:4, increaseRatio:.5, initialCost:10, costIncrease:3, visible:true },
+    refineMySavvy: { attribute:"savvy", upgradesAvailable:4, increaseRatio:.5, initialCost:10, costIncrease:3, visible:true },
+    refineMyConfidence: { attribute:"confidence", upgradesAvailable:4, increaseRatio:.5, initialCost:5, costIncrease:4, visible:true },
+    refineMyRecognition: { attribute:"recognition", upgradesAvailable:4, increaseRatio:.5, initialCost:5, costIncrease:4, visible:true },
+    refineMyCharm: { attribute:"charm", upgradesAvailable:4, increaseRatio:.5, initialCost:10, costIncrease:4, visible:true },
+    refineMyInfluence: { attribute:"influence", upgradesAvailable:4, increaseRatio:.5, initialCost:10, costIncrease:4, visible:true },
+    refineMyDiscernment: { attribute:"discernment", upgradesAvailable:4, increaseRatio:.5, initialCost:15, costIncrease:3, visible:true },
+    refineMyPulse: { attribute:"pulse", upgradesAvailable:8, increaseRatio:.25, initialCost:10, costIncrease:3, visible:true },
+    refineMyVision: { attribute:"vision", upgradesAvailable:8, increaseRatio:.25, initialCost:10, costIncrease:3, visible:true },
+    refineMySpark: { attribute:"spark", upgradesAvailable:8, increaseRatio:.25, initialCost:10, costIncrease:3, visible:true },
+    refineMyAmplification: { attribute:"amplification", upgradesAvailable:8, increaseRatio:.25, initialCost:15, costIncrease:3, visible:true },
+    refineMyControl: { attribute:"control", upgradesAvailable:8, increaseRatio:.25, initialCost:15, costIncrease:3, visible:true },
+    refineMyCuriosity: { attribute:"curiosity", upgradesAvailable:4, increaseRatio:.5, initialCost:5, costIncrease:3, visible:true },
+    refineMyObservation: { attribute:"observation", upgradesAvailable:4, increaseRatio:.5, initialCost:5, costIncrease:3, visible:true },
+    refineMyEndurance: { attribute:"endurance", upgradesAvailable:4, increaseRatio:.5, initialCost:5, costIncrease:3, visible:true },
+    refineMyNavigation: { attribute:"navigation", upgradesAvailable:2, increaseRatio:1, initialCost:5, costIncrease:10, visible:true },
+    refineMyMight: { attribute:"might", upgradesAvailable:4, increaseRatio:.5, initialCost:10, costIncrease:3, visible:true },
+    refineMyGeared: { attribute:"geared", upgradesAvailable:4, increaseRatio:.5, initialCost:10, costIncrease:3, visible:true },
+    refineMyCourage: { attribute:"courage", upgradesAvailable:4, increaseRatio:1, initialCost:10, costIncrease:2, visible:true },
+    refineMyWizardry: { attribute:"wizardry", upgradesAvailable:4, increaseRatio:.25, initialCost:15, costIncrease:4, visible:false },
 
 
 

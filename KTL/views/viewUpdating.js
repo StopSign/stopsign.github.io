@@ -75,7 +75,7 @@ let views = {
         views.updateVal(`${attVar}AttUpgradeMultContainer`, attObj.attUpgradeMult > 1?"":"none", "style.display");
 
         //Update the numbers
-        let roundedNumbers = [["num", 2], ["attMult", 2], ["attUpgradeMult", 2]]; //["perMinute", 2],
+        let roundedNumbers = [["num", 2], ["attMult", 2], ["attUpgradeMult", 3]]; //["perMinute", 2],
 
         for(let numberObj of roundedNumbers) {
             let capName = capitalizeFirst(numberObj[0]);

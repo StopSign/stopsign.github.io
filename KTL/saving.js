@@ -362,7 +362,7 @@ const patches = {
             preventReset: true,
         },
         refineMyCycle: {
-            preventReset: true,
+            preventReset: false,
         },
     }};
 
@@ -387,6 +387,7 @@ function load() {
         //these are in the skiplist because if, between saves, an action has changed the atts it has, the links need to be reset instead of saved.
         mergeExistingOnly(data, toLoad, "atts", ["linkedActionExpAtts", "linkedActionEfficiencyAtts", "linkedActionOnLevelAtts"]);
         mergeExistingOnly(data, toLoad, "options");
+
 
         patchActions("actions", toLoad.actions, actionData);
         patchActions("upgrades", toLoad.upgrades, upgradeData);
