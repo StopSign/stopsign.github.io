@@ -153,10 +153,6 @@ let views = {
         views.updateVal(`${actionVar}Container`, toDisplay&&isInRange?"":"none", "style.display");
         if(dataObj.parentVar) {
             let parentObj = data.actions[dataObj.parentVar];
-            if(!parentObj) {
-                console.log(actionVar, dataObj.parentVar);
-            }
-            // views.updateVal(`${actionObj.parentVar}_${actionVar}_Line_Outer`, "none", "style.display");
             views.updateVal(`${dataObj.parentVar}_${actionVar}_Line_Outer`, (globalVisible||(toDisplay && parentObj.visible)) && !dataObj.hideUpstreamLine ?"flex":"none", "style.display");
             views.updateVal(`${dataObj.parentVar}_${actionVar}_Line_Inner`, toDisplay && parentObj.visible ?"":"none", "style.display");
         }
@@ -285,13 +281,23 @@ let views = {
         //--bg-secondary-max
 
         //Menu-specific updates
-        if(actionObj.currentMenu === "atts") {
+        if(actionObj.currentMenu === "info") {
+            views.updateVal(`${actionVar}CurrentUnlockTimeContainer`, actionObj.unlockTime ? "" : "none", "style.display");
+            views.updateVal(`${actionVar}CurrentUnlockTime`, actionObj.unlockTime, "textContent", "time");
+            views.updateVal(`${actionVar}PrevUnlockTimeContainer`, actionObj.prevUnlockTime ? "" : "none", "style.display");
+            views.updateVal(`${actionVar}PrevUnlockTime`, actionObj.prevUnlockTime, "textContent", "time");
+            if(actionObj.prevUnlockTime && actionObj.unlockTime) {
+                views.updateVal(`${actionVar}DeltaUnlockTimeContainer`, "", "style.display");
+                views.updateVal(`${actionVar}DeltaUnlockTime`, Math.abs(actionObj.unlockTime - actionObj.prevUnlockTime), "textContent", "time");
+                views.updateVal(`${actionVar}DeltaUnlockTime`, actionObj.unlockTime - actionObj.prevUnlockTime < 0 ? "green" : "red", "style.color");
+            }
+
             views.updateVal(`${actionVar}HighestLevelContainer`, data.upgrades.rememberWhatIDid.isFullyBought ? "" : "none", "style.display");
             views.updateVal(`${actionVar}SecondHighestLevelContainer`, data.upgrades.rememberHowIGrew.isFullyBought ? "" : "none", "style.display");
             views.updateVal(`${actionVar}ThirdHighestLevelContainer`, data.upgrades.rememberMyMastery.isFullyBought ? "" : "none", "style.display");
-            views.updateVal(`${actionVar}PrevUnlockTimeContainer`, actionObj.prevUnlockTime ? "" : "none", "style.display");
-            views.updateVal(`${actionVar}PrevUnlockTime`, secondsToTime(actionObj.prevUnlockTime), "textContent", "time");
+        }
 
+        if(actionObj.currentMenu === "atts") {
 
             for(let expAtt of actionObj.expAtts) {
                 let attVar = expAtt[0];
@@ -326,16 +332,17 @@ let views = {
         if(actionVar === "hearAboutTheLich") {
             roundedNumbers.push(["actionPower", 2]);
         }
-
-        if(actionObj.currentMenu === "atts") {
-            roundedNumbers.push(["attReductionEffect", 3]);
-            roundedNumbers.push(["efficiencyMult", 3]);
+        if(actionObj.currentMenu === "info") {
             roundedNumbers.push(["highestLevel", 1]);
             roundedNumbers.push(["secondHighestLevel", 1]);
             roundedNumbers.push(["thirdHighestLevel", 1]);
         }
+
+        if(actionObj.currentMenu === "atts") {
+            roundedNumbers.push(["attReductionEffect", 3]);
+            roundedNumbers.push(["efficiencyMult", 3]);
+        }
         roundedNumbers.push(["totalSend", 3]);
-        roundedNumbers.push(["prevUnlockTime", 1]);
         roundedNumbers.push(["efficiencyBase", 2]);
         roundedNumbers.push(["level2", 1]);
         roundedNumbers.push(["progressMaxIncrease", 0]);

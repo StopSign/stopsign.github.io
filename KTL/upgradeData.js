@@ -235,19 +235,16 @@ let upgradeData = {
         upgradesAvailable:1,
         visible:true,
         customInfo: function(num) {
-            return Raw.html`[Automation] When an action is at its final max level and has no downstream actions with sliders, it 
-                automatically sets the slider to 0%. This will apply recursively.`
+            return Raw.html`[Automation] When an action is at its _final_ max level and has no downstream actions with sliders, it 
+                automatically set the flow rate leading to it to 0%. This will apply recursively.`
         }
     },
     feelTheEchoesOfMyPast: {
-        initialCost:1, costIncrease:2,
-        upgradesAvailable:9,
+        initialCost:3, costIncrease:10,
+        upgradesAvailable:2,
         visible:true,
         customInfo: function(num) {
-            if(num === 9) {
-                return "Keep all of your Legacy when you use the amulet."
-            }
-            return "Keep "+(num >0?"another ":"")+`+10% of your Legacy (currently at ${[1,2,3,4,5,6,7,8,9][num]}0%) when you use the Amulet`;
+            return `Keep ${["50% (Currently 10%)", "100% (Currently 50%)", "100%"][num]} of your Legacy when you use the Amulet`;
         }
     },
     rememberWhatIFocusedOn: {
@@ -275,8 +272,19 @@ let upgradeData = {
             unveilUpgrade('knowWhatIFocusedOn')
         },
     },
+    learnedOfLichSigns: {
+        initialCost:8, costIncrease:3,
+        upgradesAvailable:3,
+        visible:false,
+        customInfo: function(num) {
+            return "Increase the max level of Hear About The Lich by +1. This will allow you to get more Ancient Coins, but only if you can reach that level.";
+        },
+        onBuy: function(num) {
+            actionData.hearAboutTheLich.maxLevel = 3 + num;
+        }
+    },
     knowWhatIFocusedOn: {
-        initialCost:8, costIncrease:2,
+        initialCost:5, costIncrease:2,
         upgradesAvailable:2,
         visible:false,
         customInfo: function(num) {
@@ -427,28 +435,28 @@ let upgradeData = {
             return "The board was stuffed with notices. Surely something else is relevant for you."
         },
         onBuy: function(num) {
-            actionData.checkNoticeBoard.maxLevel++;
-            if(num === 1) {
-                purchaseAction('reportForTraining');
-                purchaseAction('basicTrainingWithJohn');
-                purchaseAction('noticeTheStrain');
-                purchaseAction('clenchTheJaw');
-                purchaseAction('breatheThroughIt');
-                purchaseAction('ownTheWeight');
-                purchaseAction('moveWithPurpose');
-                purchaseAction('standStraighter');
-                purchaseAction('keepGoing');
-                purchaseAction('climbTheRocks');
-                purchaseAction('findAShortcut');
-            } else if(num === 2) {
-                purchaseAction('buyBasicSupplies');
-                purchaseAction('chimneySweep');
-                purchaseAction('handyman');
-                purchaseAction('tavernHelper');
-                purchaseAction('guildReceptionist');
-                purchaseAction('messenger');
-                purchaseAction('storyTeller');
-            }
+            // actionData.checkNoticeBoard.maxLevel++;
+            // if(num === 1) {
+            //     purchaseAction('reportForTraining');
+            //     purchaseAction('basicTrainingWithJohn');
+            //     purchaseAction('noticeTheStrain');
+            //     purchaseAction('clenchTheJaw');
+            //     purchaseAction('breatheThroughIt');
+            //     purchaseAction('ownTheWeight');
+            //     purchaseAction('moveWithPurpose');
+            //     purchaseAction('standStraighter');
+            //     purchaseAction('keepGoing');
+            //     purchaseAction('climbTheRocks');
+            //     purchaseAction('findAShortcut');
+            // } else if(num === 2) {
+            //     purchaseAction('buyBasicSupplies');
+            //     purchaseAction('chimneySweep');
+            //     purchaseAction('handyman');
+            //     purchaseAction('tavernHelper');
+            //     purchaseAction('guildReceptionist');
+            //     purchaseAction('messenger');
+            //     purchaseAction('storyTeller');
+            // }
         }
     }, //STORY notice board level 2 (training) and level 3 (jobs)
     buyNicerStuff: {

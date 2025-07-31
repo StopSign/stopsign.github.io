@@ -55,7 +55,6 @@ function initializeKTL() {
 
     views.updateVal("openViewAmuletButton", "none", "style.display")
     if(data.doneAmulet) {
-        data.useAmuletButtonShowing = true;
         views.updateVal("openUseAmuletButton", "", "style.display")
     }
 
@@ -68,6 +67,9 @@ function initializeKTL() {
 
     data.gameState = "KTL";
 
+
+    unveilAction('worry'); //reveal the doom att
+    unveilAction('resolve'); //reveal the courage att
 
 
     //first time stuff
@@ -90,6 +92,10 @@ function useAmulet() {
     chartData = [];
     data.focusSelected = [];
     data.doneAmulet = true;
+    data.secondsPerReset = 0;
+    data.currentJob = "helpScottWithChores";
+    data.currentWage = 1;
+    data.gameState = "default";
     views.updateVal(`useAmuletMenu`, "none", "style.display");
     views.updateVal(`openUseAmuletButton`, "none", "style.display");
     views.updateVal(`openViewAmuletButton`, "", "style.display");
@@ -101,10 +107,23 @@ function useAmulet() {
             attsSetBaseVariables(attObj);
         }
     }
-    data.atts.legacy.num *= .1 * (data.upgrades.feelTheEchoesOfMyPast.upgradePower + 1);
+    data.atts.legacy.num *= [.1, .5, 1][data.upgrades.feelTheEchoesOfMyPast.upgradePower];
     recalcAttMult("legacy");
 
-
+    //clear the Containers of Atts around the Actions before it reveals one at a time based on stats and visible
+    for(let actionVar in data.actions) {
+        let dataObj = actionData[actionVar];
+        for (let attVarObj of dataObj.expAtts) {
+            views.updateVal(`${actionVar}${attVarObj[0]}OutsideContainerexp`, "none", "style.display");
+            views.updateVal(`${actionVar}${attVarObj[0]}InsideContainerexp`, "none", "style.display");
+            views.updateVal(`${actionVar}AttExpContainer`, "none", "style.display");
+        }
+        for (let attVarObj of dataObj.efficiencyAtts) {
+            views.updateVal(`${actionVar}${attVarObj[0]}OutsideContainereff`, "none", "style.display");
+            views.updateVal(`${actionVar}${attVarObj[0]}InsideContainereff`, "none", "style.display");
+            views.updateVal(`${actionVar}AttEfficiencyContainer`, "none", "style.display");
+        }
+    }
     //For each action, reset the base atts and set max level
     for(let actionVar in data.actions) {
         let actionObj = data.actions[actionVar];
@@ -126,23 +145,70 @@ function useAmulet() {
             }
         }
 
+        let propsToPreserve = ['unlocked', 'unlockCost'];
+        let originalState = {};
+
+        for (let prop of propsToPreserve) {
+            originalState[prop] = actionObj[prop];
+        }
 
         actionResetToBase(actionVar);
 
+        if (dataObj.plane === 1) {
+            for (let prop of propsToPreserve) {
+                actionObj[prop] = originalState[prop];
+            }
+        }
+
+        //happens after reset
         dataObj.downstreamVars.forEach(function(downstreamVar) {
             if(data.actions[downstreamVar] && data.actions[downstreamVar].unlocked && data.actions[downstreamVar].hasUpstream) {
                 setSliderUI(actionObj.actionVar, downstreamVar, getUpgradeSliderAmount()); //reset with amulet
             }
             let currentMult = actionObj[downstreamVar + "FocusMult"];
 
+            //focusMult does not reset other than this
             actionObj[downstreamVar + "FocusMult"] = (currentMult - 1) * [0, .2, .5][data.upgrades.knowWhatIFocusedOn.upgradePower] + 1;
         });
+
+        if(dataObj.updateMults) {
+            dataObj.updateMults();
+        }
+
     }
 
-    setSliderUI("overclock", "reflect", getUpgradeSliderAmount()); //manual reset for actions with no parents
-    data.secondsPerReset = 0;
-    data.currentJob = "Helping Scott";
+
+
+    //After the reset
+    for (let attCategory in attTree) {
+        if(attCategory === "echoes") {
+            continue;
+        }
+        views.updateVal(`${attCategory}CategoryContainer`, "none", "style.display");
+    }
+    data.actions.echoKindle.resource += data.atts.legacy.num;
+    data.actions.poolMana.generatorSpeed = 6;
+
+    showAttColors("awareness");
+    revealActionAtts(data.actions.reflect);
+    //Unveil will also show the relevant atts/att
+    unveilAction('echoKindle')
+    unveilAction('sparkMana')
+    unveilAction('poolMana')
+    unveilAction('expelMana')
+
+    //force the UI reset:
+    for(let actionVar in data.actions) {
+        let actionObj = data.actions[actionVar];
+        // let dataObj = actionData[actionVar];
+        views.updateActionUnlockedViews(actionObj)
+    }
+
     data.currentWage = 1;
-    data.gameState = "default";
-    data.useAmuletButtonShowing = false;
+    data.currentJob = "helpScottWithChores";
+    document.getElementById("jobTitle").textContent = data.actions[data.currentJob] ? data.actions[data.currentJob].title : data.currentJob;
+    document.getElementById("jobWage").textContent = intToString(data.currentWage, 2);
+
+    setSliderUI("overclock", "reflect", getUpgradeSliderAmount());
+    setSliderUI("poolMana", "expelMana", getUpgradeSliderAmount());
 }

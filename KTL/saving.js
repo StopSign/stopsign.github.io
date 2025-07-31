@@ -350,7 +350,7 @@ const patches = {
             preventReset: true,
         },
         feelTheEchoesOfMyPast: {
-            preventReset: true,
+            preventReset: false,
         },
         rememberWhatIFocusedOn: {
             preventReset: true,
@@ -402,7 +402,7 @@ function load() {
         data.ancientCoin = toLoad.ancientCoin ?? 0;
         data.useAmuletButtonShowing = !!toLoad.useAmuletButtonShowing;
         data.secondsPerReset = toLoad.secondsPerReset ?? 0;
-        data.currentJob = toLoad.currentJob ?? "Helping Scott";
+        data.currentJob = toLoad.currentJob ?? "helpScottWithChores";
         data.currentWage = toLoad.currentWage ?? 1;
         data.numberType = toLoad.numberType ?? "engineering";
         data.doneKTL = !!toLoad.doneKTL;
@@ -423,13 +423,15 @@ function load() {
 
         //new spells need to be leveled to current grimoire's level
 
+        //bought upgrades need to be applied
+        actionData.hearAboutTheLich.maxLevel = data.upgrades.learnedOfLichSigns.upgradePower;
     }
 
     //update all generator's multiplier data
     for(let actionVar in actionData) {
-        let actionObj = actionData[actionVar];
-        if(actionObj.updateMults) {
-            actionObj.updateMults();
+        let dataObj = actionData[actionVar];
+        if(dataObj.updateMults) {
+            dataObj.updateMults();
         }
     }
 

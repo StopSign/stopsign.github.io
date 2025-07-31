@@ -24,6 +24,8 @@ function initializeMenus() {
 
     addMenuTextContainer("previousTips", "Close tips to fill this screen!");
 
+    addMenuTab("changelog");
+    addMenuTextContainer("changelog", createChangelogMenu());
     addMenuTab("shop");
     addMenuTextContainer("shop", createShopMenu());
 
@@ -366,4 +368,13 @@ function addMenuOptionsTab() {
 
 function addDataTab() {
     addMenuTab("statistics");
+}
+
+function createChangelogMenu() {
+    return Raw.html`
+        <div class="menuTitle">Changelog</div>
+        <div class="menuSeparator"></div><br>
+        Version 1.0: first release<br>
+        Verstion .1: You don't know want to know
+        `;
 }

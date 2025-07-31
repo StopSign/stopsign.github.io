@@ -213,6 +213,7 @@ function gameTick() {
         checkLevelUp(actionObj, dataObj);
     }
 
+
     for (let actionVar in data.actions) {
         const actionObj = data.actions[actionVar];
         const dataObj = actionData[actionVar];
@@ -234,6 +235,31 @@ function gameTick() {
     upgradeUpdates()
     calcDeltas();
 
+
+    for(let actionVar in data.actions) {
+        let actionObj = data.actions[actionVar];
+        let dataObj = actionData[actionVar];
+        if (data.upgrades.knowWhenToMoveOn.upgradePower > 0 && actionObj.unlocked) {
+            let maxLevelToUse = dataObj.maxLevelActual !== undefined ? dataObj.maxLevelActual : actionObj.maxLevel;
+            let isActualMaxLevel = maxLevelToUse !== undefined && actionObj.level >= maxLevelToUse;
+            let isQuiet = isActualMaxLevel && actionObj.resourceDecrease === 0;
+
+            let allGood = true;
+            for (let downstreamVar of dataObj.downstreamVars) {
+                let downstreamObj = data.actions[downstreamVar];
+                if (downstreamObj.resourceDecrease !== 0) {
+                    allGood = false;
+                }
+            }
+
+            if (allGood && isQuiet && actionObj.hasUpstream) {
+                if(actionVar === "reflect") {
+                    console.log("here");
+                }
+                setSliderUI(dataObj.parentVar, actionVar, 0);
+            }
+        }
+    }
     // let attsPerSecond = getStatChanges();
     // for(let attVar in data.atts) {
     //     data.atts[attVar].perMinute = attsPerSecond[attVar] ? attsPerSecond[attVar]*60 : 0;
@@ -367,6 +393,8 @@ function tickGameObject(actionVar) {
         // Give the resource to the downstream action.
         giveResourceTo(actionObj, downstreamObj, taken);
     }
+
+
 }
 
 function calculateTaken(actionVar, downstreamVar, actionObj, mult) {

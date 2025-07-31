@@ -254,22 +254,33 @@ function generateActionDisplay(actionVar) {
     queueCache(`${actionVar}SecondHighestLevel`);
     queueCache(`${actionVar}ThirdHighestLevelContainer`);
     queueCache(`${actionVar}ThirdHighestLevel`);
+    queueCache(`${actionVar}CurrentUnlockTimeContainer`)
+    queueCache(`${actionVar}CurrentUnlockTime`);
     queueCache(`${actionVar}PrevUnlockTimeContainer`)
     queueCache(`${actionVar}PrevUnlockTime`);
+    queueCache(`${actionVar}DeltaUnlockTimeContainer`)
+    queueCache(`${actionVar}DeltaUnlockTime`);
 
     let upgradeInfoText = Raw.html`<br>
-        <span id="${actionVar}HighestLevelContainer" style="display:none">
-            Highest level (2x up to): <b><span id="${actionVar}HighestLevel"></span></b>
-        </span>
-        <span id="${actionVar}SecondHighestLevelContainer" style="display:none">
-            Second Highest level (2x up to): <b><span id="${actionVar}SecondHighestLevel"></span></b>
-        </span>
-        <span id="${actionVar}ThirdHighestLevelContainer" style="display:none">
-            Third Highest level (2x up to): <b><span id="${actionVar}ThirdHighestLevel"></span></b>
-        </span>
-        <span id="${actionVar}PrevUnlockTimeContainer" style="display:none">
-            Previous Unlock Time: <b><span id="${actionVar}PrevUnlockTime"></span></b>
-        </span>`;
+        <div id="${actionVar}HighestLevelContainer" style="display:none">
+            Highest level (2x up to): <span id="${actionVar}HighestLevel" style="font-weight:bold;"></span>
+        </div>
+        <div id="${actionVar}SecondHighestLevelContainer" style="display:none">
+            Second Highest level (2x up to): <span id="${actionVar}SecondHighestLevel" style="font-weight:bold;"></span>
+        </div>
+        <div id="${actionVar}ThirdHighestLevelContainer" style="display:none">
+            Third Highest level (2x up to): <span id="${actionVar}ThirdHighestLevel" style="font-weight:bold;"></span>
+        </div>
+        
+        <div id="${actionVar}CurrentUnlockTimeContainer" style="display:none">
+            Current Unlock Time: <span id="${actionVar}CurrentUnlockTime" style="font-weight:bold;"></span>
+        </div>
+        <div id="${actionVar}PrevUnlockTimeContainer" style="display:none">
+            Previous Unlock Time: <span id="${actionVar}PrevUnlockTime" style="font-weight:bold;"></span>
+        </div>
+        <div id="${actionVar}DeltaUnlockTimeContainer" style="display:none">
+            Delta Unlock Time: <span id="${actionVar}DeltaUnlockTime" style="font-weight:bold;"></span>
+        </div>`;
 
 
     queueCache(`${actionVar}_infoContainer`);
