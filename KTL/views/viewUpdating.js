@@ -115,12 +115,14 @@ let views = {
 
             for (let entry of list) {
                 let ratio = maxAmount > 0 ? entry.amount / maxAmount : 0;
-                if(maxAmount < 100) {
-                    ratio *= maxAmount/100; //scale first 100 smoother.
-                }
                 let actionObj = data.actions[entry.id];
+                let mod = actionObj.resourceName === "momentum" ? 100 : 1000;
+                if(maxAmount < mod) {
+                    ratio *= maxAmount/mod; //scale first 1000 smoother.
+                }
 
                 let color = getResourceColorDim(actionObj);
+
                 views.updateVal(`${entry.id}Container`,`${color} 0px 0px ${Math.floor(ratio * 100)/2}px ${Math.floor(ratio * 50)/2}px`,"style.boxShadow");
                 views.updateVal(`${entry.id}LargeVersionContainer`,`inset ${color} 0px 0px ${Math.floor(ratio * 20)/2}px ${Math.floor(ratio * 10)/2}px`,"style.boxShadow");
                 // views.updateVal(`${entry.id}SmallVersionContainer`,`inset ${getResourceColor(actionObj)} 0px 0px ${Math.min(ratio * 15)}px ${Math.min(ratio * 5)}px`,"style.boxShadow");

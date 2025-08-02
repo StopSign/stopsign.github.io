@@ -359,7 +359,7 @@ const patches = {
             preventReset: true,
         },
         startALittleQuicker: {
-            preventReset: true,
+            preventReset: false,
         },
         refineMyCycle: {
             preventReset: false,

@@ -46,6 +46,7 @@ function initializeKTL() {
     }
 
     unveilPlane(2);
+    switchToPlane(2);
 
     if(data.currentGameState.KTLBonusTimer > 60 * 60) {
         data.currentGameState.bonusTime += 1000 * 60 * 10; //10 mins bonus time FO FREE / should be a 1 point AC upgrade.
@@ -68,8 +69,11 @@ function initializeKTL() {
     data.gameState = "KTL";
 
 
-    unveilAction('worry'); //reveal the doom att
-    unveilAction('resolve'); //reveal the courage att
+
+    revealAtt("doom");
+    revealAtt("courage");
+    unveilAction('worry');
+    unveilAction('resolve');
 
 
     //first time stuff
@@ -188,6 +192,8 @@ function useAmulet() {
     }
     data.actions.echoKindle.resource += data.atts.legacy.num;
     data.actions.poolMana.generatorSpeed = 6;
+
+    switchToPlane(0)
 
     showAttColors("awareness");
     revealActionAtts(data.actions.reflect);

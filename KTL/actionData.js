@@ -203,10 +203,10 @@ let actionData = {
         efficiencyBase:.2, maxLevel:3, maxLevelActual:10,
         unlockCost:4000, visible:false, unlocked:false, purchased: true,
         onUnlock: function() {
-            data.actions.bodyAwareness.maxLevel++;
+            addMaxLevel("bodyAwareness", 1);
         },
         onLevelCustom: function() {
-            data.actions.harnessOverflow.maxLevel+=3;
+            addMaxLevel("harnessOverflow", 3);
         },
         onLevelAtts:[["concentration", 10]],
         expAtts:[["awareness", 1], ["observation", 1]], //~/50 from awareness when unlocked
@@ -221,7 +221,7 @@ let actionData = {
         efficiencyBase:.5, maxLevel:10,
         unlockCost:2000, visible:false, unlocked:false, purchased: true,
         onUnlock: function() {
-            data.actions.bodyAwareness.maxLevel+=1;
+            addMaxLevel("bodyAwareness", 1);
         },
         onLevelCustom: function() {
         },
@@ -251,7 +251,7 @@ let actionData = {
         efficiencyBase:.5, maxLevel:3,
         unlockCost:40000, visible:false, unlocked:false, purchased: true,
         onLevelCustom: function() {
-            data.actions.remember.maxLevel+=2
+            addMaxLevel("remember", 2);
             if(data.actions.meetVillageLeaderScott.level >= 1) {
                 unveilAction('watchBirds')
             }
@@ -263,7 +263,7 @@ let actionData = {
             }
         },
         onUnlock: function() {
-            data.actions.remember.maxLevel++
+            addMaxLevel("remember", 1);
         },
         onLevelAtts:[],
         expAtts:[["curiosity", 1], ["observation", 1]],
@@ -872,7 +872,7 @@ let actionData = {
         efficiencyAtts:[],
         extraButton: Raw.html`
             <span class="button" id='killTheLichMenuButton2' onclick="openKTLMenu()"
-                style="display:none;padding:8px 13px;position:absolute;top:330px;left:60px;border: 2px solid #aa0000;border-radius: 5px;
+                style="display:none;padding:8px 13px;position:absolute;top:350px;left:60px;border: 2px solid #aa0000;border-radius: 5px;
                 background-color:#550000;text-shadow: 3px 3px 2px rgba(0, 0, 0, 0.8);color: #ffdddd;box-shadow:0 0 10px 6px rgba(255, 0, 0, 0.7);font-size:26px;" >
             Kill the Lich!</span>
         `,
@@ -937,7 +937,7 @@ actionData = {
         onLevelCustom: function() {
         },
         onUnlock: function() {
-            data.actions.bodyAwareness.maxLevel+=3;
+            addMaxLevel("bodyAwareness", 3);
         },
         onLevelAtts:[["observation", 120]],
         expAtts:[["curiosity", 1], ["concentration", 1]],
@@ -1114,7 +1114,7 @@ actionData = {
         efficiencyBase:1, maxLevel:100,
         unlockCost:40e15, visible:false, unlocked:false, purchased: true,
         onUnlock: function() {
-            data.actions.meetGrumpyHermit.maxLevel++;
+            addMaxLevel("meetGrumpyHermit", 1);
         },
         onLevelCustom: function() {
         },
@@ -1129,7 +1129,7 @@ actionData = {
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.00003, maxLevel:1,
         unlockCost:100e15, visible:false, unlocked:false, purchased: true,
-        onUnlock: function() {f
+        onUnlock: function() {
             unveilAction('chatWithHermit')
             unveilAction('tellAJoke')
         },
@@ -1607,7 +1607,7 @@ actionData = {
             unveilAction('breatheThroughIt');
             unveilAction('ownTheWeight');
             unveilAction('moveWithPurpose');
-            data.actions.bodyAwareness.maxLevel+= 4;
+            addMaxLevel("bodyAwareness", 4);
         },
         onLevelAtts:[["coordination", 30]],
         expAtts:[["endurance", 1], ["might", 1], ["geared", 1]],
@@ -1781,7 +1781,7 @@ actionData = {
         efficiencyBase:.05, maxLevel:4,
         unlockCost:1e22, visible:false, unlocked:false, purchased: true,
         onLevelCustom: function() {
-            data.actions.meditate.maxLevel++;
+            addMaxLevel("meditate", 1);
         },
         onUnlock: function() {
         },
@@ -3121,8 +3121,6 @@ actionData = {
             unveilAction('poolMana');
             data.actions.poolMana.generatorSpeed = 6;
             unveilAction('expelMana')
-            unveilAction("manaBasics")
-            unveilAction("prepareSpells")
         },
         onLevelAtts:[["spark", 5]],
         expAtts:[["amplification", 1]],
@@ -3161,6 +3159,10 @@ actionData = {
             actionObj.resourceToAdd = data.actions.sparkMana.resource * actionObj.actionPower * actionObj.upgradeMult;
         },
         onUnlock: function() {
+        },
+        onLevelCustom: function() {
+            unveilAction("manaBasics")
+            unveilAction("prepareSpells")
         },
         onLevelAtts:[["pulse", 3]],
         expAtts:[["amplification", 1]],

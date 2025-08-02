@@ -234,6 +234,12 @@ function checkLevelUp(actionObj, dataObj) {
         if(dataObj.onLevelCustom) {
             dataObj.onLevelCustom();
         }
+
+        let isNowMaxLevel = actionObj.maxLevel !== undefined && actionObj.level >= actionObj.maxLevel;
+        if (isNowMaxLevel) {
+            updateSupplyChain(actionObj.actionVar);
+        }
+
         return true;
     }
     return false;
@@ -305,8 +311,6 @@ function purchaseAction(actionVar) {
     actionObj.purchased = true;
 }
 
-//situation 1: Harness Overflow is just unlocked. It should be 1% sent to Process Thoughts. AKA On unlock, set all sliders to 1%
-//situation 2: Travel to Outpost just became visible. It's parent, Overclock, should set it's newly visible slider to 1%. AKA On unveil, set parent to 1%.
 function unveilAction(actionVar) {
     let actionObj = data.actions[actionVar];
     let dataObj = actionData[actionVar];
@@ -317,38 +321,172 @@ function unveilAction(actionVar) {
         return;
     }
 
-    //If parent is not visible, add actionVar to a list instead
-    //Every time an action is unlocked, look through the downstream of the unlocked - does it match any in the list
-    //if so, unveil that one next
-
-
     actionObj.visible = true;
     revealActionAtts(actionObj);
 
-    //set all downstream actions to 1% when you unlock
-    let parent = data.actions[dataObj.parentVar];
-    // let amountToSet = data.upgrades.sliderAutoSet.amount;
-    if(!parent) {
-        if(!["echoKindle"].includes(actionVar)) {
-            console.log('Failed to access parent var ' + dataObj.parentVar + ' of action ' + actionVar + '.');
-        }
-        return;
-    }
-    if(parent.isGenerator && parent.generatorTarget === actionVar) {
-        //There won't be a downstream slider
-        return;
-    }
-    actionData[dataObj.parentVar].downstreamVars.forEach(function (downstreamVar) {
-        if(downstreamVar === actionVar && data.actions[downstreamVar].hasUpstream) {
-            setSliderUI(dataObj.parentVar, downstreamVar, getUpgradeSliderAmount()); //set parent on unveil
-        }
-    });
+    updateSupplyChain(actionVar);
+
+    // let parent = data.actions[dataObj.parentVar];
+    // if(!parent) {
+    //     if(!["echoKindle"].includes(actionVar)) {
+    //         console.log('Failed to access parent var ' + dataObj.parentVar + ' of action ' + actionVar + '.');
+    //     }
+    //     return;
+    // }
+    // if (actionObj.hasUpstream) {
+    //     propagateStartup(actionVar);
+    // }
+    // actionData[dataObj.parentVar].downstreamVars.forEach(function (downstreamVar) {
+    //     if(downstreamVar === actionVar && data.actions[downstreamVar].hasUpstream) {
+    //         setSliderUI(dataObj.parentVar, downstreamVar, getUpgradeSliderAmount()); //set parent on unveil
+    //     }
+    // });
 }
 
 function unveilUpgrade(upgradeVar) {
     let upgradeObj = data.upgrades[upgradeVar];
     upgradeObj.visible = true;
     views.updateVal(`card_${upgradeVar}`, "flex", "style.display");
+}
+
+function addMaxLevel(actionVar, amount) {
+    data.actions[actionVar].maxLevel += amount;
+    updateSupplyChain(actionVar);
+}
+
+function isNeeded(actionVar, memo = {}) {
+    if (memo[actionVar] !== undefined) {
+        return memo[actionVar];
+    }
+
+    const actionObj = data.actions[actionVar];
+    const dataObj = actionData[actionVar];
+
+    if (!actionObj || !actionObj.visible) {
+        memo[actionVar] = false;
+        return false;
+    }
+
+    const isMaxLevel = actionObj.maxLevel !== undefined && actionObj.level >= actionObj.maxLevel;
+    if (!isMaxLevel) {
+        memo[actionVar] = true;
+        return true;
+    }
+
+    if (dataObj.downstreamVars) {
+        for (const downstreamVar of dataObj.downstreamVars) {
+            if (isNeeded(downstreamVar, memo)) {
+                memo[actionVar] = true;
+                return true;
+            }
+        }
+    }
+
+    memo[actionVar] = false;
+    return false;
+}
+function updateSupplyChain(startActionVar) {
+    const memo = {};
+    let currentVar = startActionVar;
+
+    while (currentVar) {
+        const actionObj = data.actions[currentVar];
+        const dataObj = actionData[currentVar];
+
+        if (!actionObj || actionObj.hasUpstream === false || !dataObj || !dataObj.parentVar) {
+            break;
+        }
+
+        const parentVar = dataObj.parentVar;
+        const childIsNeeded = isNeeded(currentVar, memo);
+
+        let sliderValue;
+        if (childIsNeeded) {
+            sliderValue = getUpgradeSliderAmount();
+        } else {
+            if (data.upgrades.knowWhenToMoveOn.upgradePower > 0) {
+                sliderValue = 0;
+            } else {
+                sliderValue = getUpgradeSliderAmount();
+            }
+        }
+
+        setSliderUI(parentVar, currentVar, sliderValue);
+
+        currentVar = parentVar;
+    }
+}
+
+function propagateStartup(actionVar) {
+    let currentActionVar = actionVar;
+    while (currentActionVar) {
+        const currentActionObj = data.actions[currentActionVar];
+        const currentDataObj = actionData[currentActionVar];
+        if (!currentActionObj || !currentActionObj.hasUpstream || !currentDataObj.parentVar) {
+            break;
+        }
+        const parentVar = currentDataObj.parentVar;
+        const parentObj = data.actions[parentVar];
+        setSliderUI(parentVar, currentActionVar, getUpgradeSliderAmount());
+        if (parentObj.resourceIncrease > 0) {
+            break;
+        }
+        currentActionVar = parentVar;
+    }
+}
+function propagateShutdown(actionVar) {
+    if(data.upgrades.knowWhenToMoveOn.upgradePower === 0) {
+        return;
+    }
+    const initialDataObj = actionData[actionVar];
+
+    if (initialDataObj.downstreamVars) {
+        for (const downstreamVar of initialDataObj.downstreamVars) {
+            const childObj = data.actions[downstreamVar];
+
+            if (childObj && childObj.visible) {
+                const childIsMaxLevel = childObj.maxLevel !== undefined && childObj.level >= childObj.maxLevel;
+                if (!childIsMaxLevel) {
+                    return;
+                }
+            }
+        }
+    }
+
+    let currentActionVar = actionVar;
+    while (currentActionVar) {
+        const currentDataObj = actionData[currentActionVar];
+        if (!currentDataObj || !currentDataObj.parentVar) {
+            break;
+        }
+
+        const parentVar = currentDataObj.parentVar;
+        const parentObj = data.actions[parentVar];
+        const parentDataObj = actionData[parentVar];
+
+        setSliderUI(parentVar, currentActionVar, 0);
+
+        const parentIsMaxLevel = parentObj.maxLevel !== undefined && parentObj.level >= parentObj.maxLevel;
+        if (!parentIsMaxLevel) {
+            break;
+        }
+
+        let parentIsNowIdle = true;
+        if (parentDataObj.downstreamVars) {
+            for (const downstreamVar of parentDataObj.downstreamVars) {
+                if (parentObj[`downstreamRate${downstreamVar}`] > 0) {
+                    parentIsNowIdle = false;
+                    break;
+                }
+            }
+        }
+
+        if (parentIsNowIdle) {
+            currentActionVar = parentVar;
+        } else {
+            break;
+        }
+    }
 }
 
 function revealActionAtts(actionObj) {
@@ -397,11 +535,16 @@ function unlockAction(actionObj) {
         dataObj.onUnlock();
     }
 
-    dataObj.downstreamVars.forEach(function(downstreamVar) {
-        if(data.actions[downstreamVar] && data.actions[downstreamVar].unlocked && document.getElementById(actionVar + "NumInput" + downstreamVar)) {
-            setSliderUI(actionVar, downstreamVar, getUpgradeSliderAmount()); //set when unlock
-        }
-    });
+    // dataObj.downstreamVars.forEach(function(downstreamVar) {
+    //     if(data.actions[downstreamVar] && data.actions[downstreamVar].unlocked && document.getElementById(actionVar + "NumInput" + downstreamVar)) {
+    //         setSliderUI(actionVar, downstreamVar, getUpgradeSliderAmount()); //set when unlock
+    //     }
+    // });
+
+    updateSupplyChain(actionVar);
+    // if (actionObj.hasUpstream) {
+    //     propagateStartup(actionVar);
+    // }
 
     for(let onLevelObj of dataObj.onLevelAtts) {
         showAttColors(onLevelObj[0]);
@@ -462,6 +605,7 @@ function useCharge(actionVar) {
     }
 }
 
+
 //function to be used as a debug helper, running in console
 //adjustActionData('', 'progressMaxBase', 1e6)
 //adjustActionData('', 'efficiencyBase', .1)
@@ -477,3 +621,5 @@ function adjustActionData(actionVar, key, value) {
         actionObj.actionPower = actionObj.actionPowerBase * actionObj.actionPowerMult * (actionObj.efficiency/100);
     }
 }
+
+

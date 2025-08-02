@@ -236,34 +236,35 @@ function gameTick() {
     calcDeltas();
 
 
-    for(let actionVar in data.actions) {
-        let actionObj = data.actions[actionVar];
-        let dataObj = actionData[actionVar];
-        if (data.upgrades.knowWhenToMoveOn.upgradePower > 0 && actionObj.unlocked) {
-            let maxLevelToUse = dataObj.maxLevelActual !== undefined ? dataObj.maxLevelActual : actionObj.maxLevel;
-            let isActualMaxLevel = maxLevelToUse !== undefined && actionObj.level >= maxLevelToUse;
-            let isQuiet = isActualMaxLevel && actionObj.resourceDecrease === 0;
-
-            let allGood = true;
-            for (let downstreamVar of dataObj.downstreamVars) {
-                let downstreamObj = data.actions[downstreamVar];
-                if (downstreamObj.resourceDecrease !== 0) {
-                    allGood = false;
-                }
-            }
-
-            if (allGood && isQuiet && actionObj.hasUpstream) {
-                if(actionVar === "reflect") {
-                    console.log("here");
-                }
-                setSliderUI(dataObj.parentVar, actionVar, 0);
-            }
-        }
-    }
-    // let attsPerSecond = getStatChanges();
-    // for(let attVar in data.atts) {
-    //     data.atts[attVar].perMinute = attsPerSecond[attVar] ? attsPerSecond[attVar]*60 : 0;
+    //algo for determining if the slider should be set to 0 from automation
+    //if max level and resourse decrease is 0 and has no downstream with resource decreases
+    // for(let actionVar in data.actions) {
+    //     let actionObj = data.actions[actionVar];
+    //     let dataObj = actionData[actionVar];
+    //     if (data.upgrades.knowWhenToMoveOn.upgradePower > 0 && actionObj.unlocked) {
+    //         let maxLevelToUse = dataObj.maxLevelActual !== undefined ? dataObj.maxLevelActual : actionObj.maxLevel;
+    //         let isActualMaxLevel = maxLevelToUse !== undefined && actionObj.level >= maxLevelToUse;
+    //         let isQuiet = isActualMaxLevel && actionObj.resourceDecrease === 0;
+    //
+    //         let allGood = true;
+    //         let allZeroes = true;
+    //         for (let downstreamVar of dataObj.downstreamVars) {
+    //             let downstreamObj = data.actions[downstreamVar];
+    //             let downstreamRate = actionObj[`downstreamRate${downstreamVar}`];
+    //             if(downstreamRate > 0) {
+    //                 allZeroes = false;
+    //             }
+    //             if (downstreamObj.resourceDecrease !== 0) {
+    //                 allGood = false;
+    //             }
+    //         }
+    //
+    //         if (allGood && isQuiet && actionObj.hasUpstream && allZeroes) {
+    //             setSliderUI(dataObj.parentVar, actionVar, 0);
+    //         }
+    //     }
     // }
+
 
 }
 

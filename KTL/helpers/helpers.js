@@ -155,8 +155,8 @@ function intToStringRound(value) {
 }
 
 function secondsToTime(seconds) {
-    if(!seconds) {
-        seconds = 0;
+    if(!seconds || seconds < 0) {
+        seconds = "0";
     }
     seconds = Math.floor(seconds);
     const hours = Math.floor(seconds / 3600);

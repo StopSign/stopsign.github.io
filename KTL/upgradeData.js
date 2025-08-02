@@ -247,6 +247,14 @@ let upgradeData = {
             return `Keep ${["50% (Currently 10%)", "100% (Currently 50%)", "100%"][num]} of your Legacy when you use the Amulet`;
         }
     },
+    startALittleQuicker: {
+        initialCost:2, costIncrease:3,
+        upgradesAvailable:3,
+        visible:true,
+        customInfo: function(num) {
+            return Raw.html`Overclock gains a flat +${["5", "20 (currently 5)", "100 (currently 20)", 100][num]} momentum per second.`
+        }
+    },
     rememberWhatIFocusedOn: {
         initialCost:5, costIncrease:2,
         upgradesAvailable:3,
@@ -288,15 +296,7 @@ let upgradeData = {
         upgradesAvailable:2,
         visible:false,
         customInfo: function(num) {
-            return "Keep "+(["20", "50"][num])+"% of your Focus Loop Bonus when you use the Amulet";
-        }
-    },
-    startALittleQuicker: {
-        initialCost:4, costIncrease:2,
-        upgradesAvailable:2,
-        visible:true,
-        customInfo: function(num) {
-            return "Flat motivation generation increase on Overclock of <b>" +((num+1)*25)+ "</b> momentum/s.";
+            return "Keep "+(["20", "50 (currently 20%)", "50"][num])+"% of your Focus Loop Bonus when you use the Amulet";
         }
     },
 
