@@ -146,7 +146,7 @@ function generateActionDisplay(actionVar) {
     queueCache(`${actionVar}DeltasDisplayContainer`);
 
     let momentumContainer = Raw.html`
-    <div id="${actionVar}DeltasDisplayContainer" style="padding:3px 3px 0;">
+    <div id="${actionVar}DeltasDisplayContainer" style="padding:3px 3px 0;display:none;">
         <div style="font-style: italic; color: var(--text-muted);">
             <span style="display:inline-block;width:90px;text-decoration:underline">Increase</span>
             <span style="display:inline-block;width:90px;text-decoration:underline">Decrease</span>
@@ -159,22 +159,25 @@ function generateActionDisplay(actionVar) {
         </div>
     </div>`;
 
+    queueCache(`${actionVar}BalanceNeedleContainer`);
     queueCache(`${actionVar}BalanceNeedle`);
     queueCache(`${actionVar}BalanceNeedleLabel`);
 
     let balanceNeedle =
         Raw.html`
-        <div id="${actionVar}BalanceNeedleLabel" style="color:var(--text-muted)">(Increase / Decrease) Ratio:</div>
-        <div style="position:relative;width:100%;height:12px;">
-            <div style="position:absolute;top:-1px;width:100%;height:11px;border-top:1px solid;">
-                <div style="position:absolute;top:0;left:25%;width:2px;height:100%;background-color:var(--text-primary);opacity:0.6;"></div> 
-                <div style="position:absolute;top:0;left:50%;width:2px;height:100%;background-color:var(--text-primary);opacity:0.6;"></div> 
-                <div style="position:absolute;top:0;left:75%;width:2px;height:100%;background-color:var(--text-primary);opacity:0.6;"></div> 
-                <div id="${actionVar}BalanceNeedle" style="position:absolute;top:-3px;width:4px;height:16px;background-color:red;left:50%;"></div>
-                <span style="color:var(--text-extra-muted);position:absolute;left:25%;top:0;font-size:10px;transform:translateX(-100%);">x1</span>
-                <span style="color:var(--text-extra-muted);position:absolute;left:50%;top:0;font-size:10px;transform:translateX(-100%);">x2</span>
-                <span style="color:var(--text-extra-muted);position:absolute;left:75%;top:0;font-size:10px;transform:translateX(-100%);">x10</span>
-                <span style="color:var(--text-extra-muted);position:absolute;left:100%;top:0;font-size:10px;transform:translateX(-100%);">x100</span>
+        <div id="${actionVar}BalanceNeedleContainer" style="display:none;">
+            <div id="${actionVar}BalanceNeedleLabel" style="color:var(--text-muted)">(Increase / Decrease) Ratio:</div>
+            <div style="position:relative;width:100%;height:12px;">
+                <div style="position:absolute;top:-1px;width:100%;height:11px;border-top:1px solid;">
+                    <div style="position:absolute;top:0;left:25%;width:2px;height:100%;background-color:var(--text-primary);opacity:0.6;"></div> 
+                    <div style="position:absolute;top:0;left:50%;width:2px;height:100%;background-color:var(--text-primary);opacity:0.6;"></div> 
+                    <div style="position:absolute;top:0;left:75%;width:2px;height:100%;background-color:var(--text-primary);opacity:0.6;"></div> 
+                    <div id="${actionVar}BalanceNeedle" style="position:absolute;top:-3px;width:4px;height:16px;background-color:red;left:50%;"></div>
+                    <span style="color:var(--text-extra-muted);position:absolute;left:25%;top:0;font-size:10px;transform:translateX(-100%);">x1</span>
+                    <span style="color:var(--text-extra-muted);position:absolute;left:50%;top:0;font-size:10px;transform:translateX(-100%);">x2</span>
+                    <span style="color:var(--text-extra-muted);position:absolute;left:75%;top:0;font-size:10px;transform:translateX(-100%);">x10</span>
+                    <span style="color:var(--text-extra-muted);position:absolute;left:100%;top:0;font-size:10px;transform:translateX(-100%);">x100</span>
+                </div>
             </div>
         </div>`;
 
@@ -222,10 +225,19 @@ function generateActionDisplay(actionVar) {
 
     queueCache(`${actionVar}IsMaxLevel`)
 
+let maxLevelTop = (data.gameSettings.viewDeltas && data.gameSettings.viewRatio) ? "73px" :
+    (data.gameSettings.viewDeltas && !data.gameSettings.viewRatio) ? "48px" :
+        (!data.gameSettings.viewDeltas && data.gameSettings.viewRatio) ? "40px" : "12px";
+            // (!data.gameSettings.viewDeltas && !data.gameSettings.viewRatio) ? "12px";
+                // top:63px with both
+    //     top:48px with no balance needle (data.gameSettings.viewDeltas === true, data.gameSettings.viewRatio === false)
+    // top:40px with no deltas (data.gameSettings.viewDeltas === false, data.gameSettings.viewRatio === true)
+    // top:12px without both
+
     let maxLevel = Raw.html`
         <div id="${actionVar}IsMaxLevel" class="hyperVisible" 
-            style="position:absolute;display:none;top:63px;width:300px;text-align:center;color:${!actionObj.isSpell?"var(--max-level-color)":"var(--text-bright)"};font-size:22px;">
-            <b>${!actionObj.isSpell?"MAX LEVEL":"MAX CHARGES"}</b>
+            style="position:absolute;display:none;top:${maxLevelTop};width:300px;text-align:center;color:${!actionObj.isSpell?"var(--max-level-color)":"var(--text-bright)"};font-size:22px;font-weight:bold;">
+            ${!actionObj.isSpell?"MAX LEVEL":"MAX CHARGES"}
         </div>`
 
     title = title + generateOnLevelContainers(actionObj);
@@ -286,7 +298,7 @@ function generateActionDisplay(actionVar) {
     queueCache(`${actionVar}_infoContainer`);
 
     let levelInfoContainer = Raw.html`
-            <div id="${actionVar}_infoContainer" style="display:none;padding:5px;max-height:220px;overflow-y:auto;">
+            <div id="${actionVar}_infoContainer" style="display:none;padding:5px;max-height:220px;overflow-y:auto;will-change: transform;">
         Tier <b>${actionObj.tier}</b>${actionObj.isSpell ? " Spell" : actionObj.isGenerator ? " Generator" : " Action"}<br>
         Efficiency, found in the title, is Expertise Mult * Base Efficiency (x<b><span id="${actionVar}EfficiencyBase"></span></b>), capping at <b>100</b>%.<br>
         ${actionObj.isGenerator?"":(`Consume and send rate is ${actionObj.tierMult()*100}% of ${dataObj.resourceName} * efficiency.<br>`)}<br>
@@ -299,14 +311,14 @@ function generateActionDisplay(actionVar) {
     queueCache(`${actionVar}_storyContainer`);
 
     let storyContainer = Raw.html`
-        <div id="${actionVar}_storyContainer" style="display:none;padding:10px;max-height:220px;overflow-y:auto;">
+        <div id="${actionVar}_storyContainer" style="display:none;padding:10px;max-height:220px;overflow-y:auto;will-change: transform;">
             ${dataObj.storyText ? dataObj.storyText[language]:""}
         </div>`;
 
     queueCache(`${actionVar}_attsContainer`);
 
     let attsContainer = Raw.html`
-        <div id="${actionVar}_attsContainer" style="display:none;padding:5px;max-height:220px;overflow-y:auto;font-size;12px;">
+        <div id="${actionVar}_attsContainer" style="display:none;padding:5px;max-height:220px;overflow-y:auto;font-size;12px;will-change: transform;">
             ${generateActionOnLevelAtts(actionObj)}
             ${generateActionExpAtts(actionObj)}
             ${generateActionEfficiencyAtts(actionObj)}
@@ -334,17 +346,21 @@ function generateActionDisplay(actionVar) {
     queueCache(`${actionVar}_downstreamButtonContainer`);
     queueCache(`${actionVar}TotalSend`);
     queueCache(`${actionVar}ToggleDownstreamButtons`);
+    queueCache(`${actionVar}TotalDownstreamContainer`);
 
     let downstreamContainer = Raw.html`
         <div id="${actionVar}_downstreamContainer" style="padding:5px;display:none;">
             <div id="${actionVar}_downstreamButtonContainer">
                 ${createDownStreamSliders(actionObj, dataObj)}
-                <div id="${actionVar}ToggleDownstreamButtons" style="font-size:12px;">
+                <div id="${actionVar}ToggleDownstreamButtons" style="font-size:12px;display:none;">
                     <span onclick="toggleAllZero('${actionVar}')" 
                         class="buttonSimple" style="margin-right:3px;width:30px;height:30px;text-align:center;cursor:pointer;padding:0 4px;">All 0</span>
                     <span onclick="toggleAllHundred('${actionVar}')" 
                         class="buttonSimple" style="margin-right:3px;width:30px;height:30px;text-align:center;cursor:pointer;padding:0 4px;">All 100</span>
-                    <div style="color:var(--text-muted);">Total ${dataObj.resourceName} sending downstream: <b><span style="color:var(--text-primary)" id='${actionVar}TotalSend'>1</span></b>/s</div>
+                </div>
+                <div id="${actionVar}TotalDownstreamContainer" style="color:var(--text-muted);font-size:12px;display:none;">
+                    Total ${dataObj.resourceName} sending downstream: 
+                    <span style="color:var(--text-primary);font-weight:bold;" id="${actionVar}TotalSend">1</span>/s
                 </div>
             </div>
         </div>`;
@@ -782,9 +798,9 @@ function generateLinesBetweenActions() {
             }
             // Calculate the centers of each object
             const x1 = dataObj.realX + 155; // 220 / 2
-            const y1 = dataObj.realY + 60; // 200 / 2
+            const y1 = dataObj.realY + 20; // 200 / 2
             const x2 = downstreamDataObj.realX + 155; // 220 / 2
-            const y2 = downstreamDataObj.realY + 60; // 200 / 2
+            const y2 = downstreamDataObj.realY + 20; // 200 / 2
 
             let sourceBackgroundColor = getResourceColor(dataObj);
             let targetBackgroundColor = getResourceColor(downstreamDataObj);

@@ -73,7 +73,7 @@ function initializeAmuletCards() {
         const cost = isFullyBought ? 0 : calcUpgradeCost(upgrade, nextLevelToBuy);
 
         const cardStyle = `background-color:#2c2c3e;border:2px solid ${isFullyBought ? '#c3cd00':'#00cd41'};border-radius:8px;padding:12px;width:280px;display:${upgrade.visible ? "flex" : "none"};
-            flex-direction:column;justify-content:space-between;box-shadow:0 4px 8px rgba(0,0,0,0.2);font-family:sans-serif;color:#e0e0e0;`;
+            flex-direction:column;justify-content:space-between;box-shadow:0 4px 8px rgba(0,0,0,0.2);color:#e0e0e0;`;
         const buyButtonHTML = `<button style="background-color:#008c33;color:white;border:none;border-radius:5px;padding:8px 16px;font-weight:bold;cursor:pointer;" onClick="buyUpgrade('${upgradeVar}')">Buy</button>`;
         const maxLevelHTML = `<span style="font-size:14px;color:#c3cd00;font-weight:bold;">MAX LEVEL</span>`;
         const remainingHTML = `Remaining: <span id="${remainingId}">${remaining}</span>`;
@@ -235,7 +235,7 @@ let upgradeData = {
         upgradesAvailable:1,
         visible:true,
         customInfo: function(num) {
-            return Raw.html`[Automation] When an action is at its _final_ max level and has no downstream actions with sliders, it 
+            return Raw.html`[Automation] When an action is at its max level and has no downstream actions with sliders, it 
                 automatically set the flow rate leading to it to 0%. This will apply recursively.`
         }
     },
@@ -283,12 +283,12 @@ let upgradeData = {
     learnedOfLichSigns: {
         initialCost:8, costIncrease:3,
         upgradesAvailable:3,
-        visible:false,
+        visible:true,
         customInfo: function(num) {
             return "Increase the max level of Hear About The Lich by +1. This will allow you to get more Ancient Coins, but only if you can reach that level.";
         },
         onBuy: function(num) {
-            actionData.hearAboutTheLich.maxLevel = 3 + num;
+            actionData.hearAboutTheLich.maxLevel = 2 + num;
         }
     },
     knowWhatIFocusedOn: {

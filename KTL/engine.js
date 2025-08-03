@@ -314,8 +314,8 @@ function purchaseAction(actionVar) {
 function unveilAction(actionVar) {
     let actionObj = data.actions[actionVar];
     let dataObj = actionData[actionVar];
-    if(!actionObj || actionObj.visible || !actionObj.purchased) { //only change things if appropriate
-        if(!actionObj) {
+    if (!actionObj || actionObj.visible || !actionObj.purchased) {
+        if (!actionObj) {
             console.log('tried to unveil ' + actionVar + ' in error.');
         }
         return;
@@ -324,24 +324,13 @@ function unveilAction(actionVar) {
     actionObj.visible = true;
     revealActionAtts(actionObj);
 
-    updateSupplyChain(actionVar);
+    // setUpstreamSlidersToUnlockValue(actionVar); // New line
 
-    // let parent = data.actions[dataObj.parentVar];
-    // if(!parent) {
-    //     if(!["echoKindle"].includes(actionVar)) {
-    //         console.log('Failed to access parent var ' + dataObj.parentVar + ' of action ' + actionVar + '.');
-    //     }
-    //     return;
-    // }
-    // if (actionObj.hasUpstream) {
-    //     propagateStartup(actionVar);
-    // }
-    // actionData[dataObj.parentVar].downstreamVars.forEach(function (downstreamVar) {
-    //     if(downstreamVar === actionVar && data.actions[downstreamVar].hasUpstream) {
-    //         setSliderUI(dataObj.parentVar, downstreamVar, getUpgradeSliderAmount()); //set parent on unveil
-    //     }
-    // });
+    updateSupplyChain(actionVar);
 }
+
+
+
 
 function unveilUpgrade(upgradeVar) {
     let upgradeObj = data.upgrades[upgradeVar];
@@ -351,8 +340,12 @@ function unveilUpgrade(upgradeVar) {
 
 function addMaxLevel(actionVar, amount) {
     data.actions[actionVar].maxLevel += amount;
+
+    // setUpstreamSlidersToUnlockValue(actionVar); // New line
+
     updateSupplyChain(actionVar);
 }
+
 
 function isNeeded(actionVar, memo = {}) {
     if (memo[actionVar] !== undefined) {
@@ -385,6 +378,7 @@ function isNeeded(actionVar, memo = {}) {
     memo[actionVar] = false;
     return false;
 }
+
 function updateSupplyChain(startActionVar) {
     const memo = {};
     let currentVar = startActionVar;
@@ -400,94 +394,28 @@ function updateSupplyChain(startActionVar) {
         const parentVar = dataObj.parentVar;
         const childIsNeeded = isNeeded(currentVar, memo);
 
-        let sliderValue;
+        let currentSliderValue = data.actions[parentVar][`downstreamRate${currentVar}`];
+
         if (childIsNeeded) {
-            sliderValue = getUpgradeSliderAmount();
+            if (currentSliderValue === 0) {
+                setSliderUI(parentVar, currentVar, getUpgradeSliderAmount());
+            }
         } else {
             if (data.upgrades.knowWhenToMoveOn.upgradePower > 0) {
-                sliderValue = 0;
+                if (currentSliderValue !== 0) {
+                    setSliderUI(parentVar, currentVar, 0);
+                }
             } else {
-                sliderValue = getUpgradeSliderAmount();
+                if (currentSliderValue === 0) {
+                    setSliderUI(parentVar, currentVar, getUpgradeSliderAmount());
+                }
             }
         }
-
-        setSliderUI(parentVar, currentVar, sliderValue);
 
         currentVar = parentVar;
     }
 }
 
-function propagateStartup(actionVar) {
-    let currentActionVar = actionVar;
-    while (currentActionVar) {
-        const currentActionObj = data.actions[currentActionVar];
-        const currentDataObj = actionData[currentActionVar];
-        if (!currentActionObj || !currentActionObj.hasUpstream || !currentDataObj.parentVar) {
-            break;
-        }
-        const parentVar = currentDataObj.parentVar;
-        const parentObj = data.actions[parentVar];
-        setSliderUI(parentVar, currentActionVar, getUpgradeSliderAmount());
-        if (parentObj.resourceIncrease > 0) {
-            break;
-        }
-        currentActionVar = parentVar;
-    }
-}
-function propagateShutdown(actionVar) {
-    if(data.upgrades.knowWhenToMoveOn.upgradePower === 0) {
-        return;
-    }
-    const initialDataObj = actionData[actionVar];
-
-    if (initialDataObj.downstreamVars) {
-        for (const downstreamVar of initialDataObj.downstreamVars) {
-            const childObj = data.actions[downstreamVar];
-
-            if (childObj && childObj.visible) {
-                const childIsMaxLevel = childObj.maxLevel !== undefined && childObj.level >= childObj.maxLevel;
-                if (!childIsMaxLevel) {
-                    return;
-                }
-            }
-        }
-    }
-
-    let currentActionVar = actionVar;
-    while (currentActionVar) {
-        const currentDataObj = actionData[currentActionVar];
-        if (!currentDataObj || !currentDataObj.parentVar) {
-            break;
-        }
-
-        const parentVar = currentDataObj.parentVar;
-        const parentObj = data.actions[parentVar];
-        const parentDataObj = actionData[parentVar];
-
-        setSliderUI(parentVar, currentActionVar, 0);
-
-        const parentIsMaxLevel = parentObj.maxLevel !== undefined && parentObj.level >= parentObj.maxLevel;
-        if (!parentIsMaxLevel) {
-            break;
-        }
-
-        let parentIsNowIdle = true;
-        if (parentDataObj.downstreamVars) {
-            for (const downstreamVar of parentDataObj.downstreamVars) {
-                if (parentObj[`downstreamRate${downstreamVar}`] > 0) {
-                    parentIsNowIdle = false;
-                    break;
-                }
-            }
-        }
-
-        if (parentIsNowIdle) {
-            currentActionVar = parentVar;
-        } else {
-            break;
-        }
-    }
-}
 
 function revealActionAtts(actionObj) {
     for(let onLevelAtt of actionObj.onLevelAtts) {
@@ -535,16 +463,10 @@ function unlockAction(actionObj) {
         dataObj.onUnlock();
     }
 
-    // dataObj.downstreamVars.forEach(function(downstreamVar) {
-    //     if(data.actions[downstreamVar] && data.actions[downstreamVar].unlocked && document.getElementById(actionVar + "NumInput" + downstreamVar)) {
-    //         setSliderUI(actionVar, downstreamVar, getUpgradeSliderAmount()); //set when unlock
-    //     }
-    // });
 
-    updateSupplyChain(actionVar);
-    // if (actionObj.hasUpstream) {
-    //     propagateStartup(actionVar);
-    // }
+    // setUpstreamSlidersToUnlockValue(actionVar); // New line
+
+    // updateSupplyChain(actionVar);
 
     for(let onLevelObj of dataObj.onLevelAtts) {
         showAttColors(onLevelObj[0]);
@@ -604,6 +526,70 @@ function useCharge(actionVar) {
         actionObj.cooldownTimer = 0;
     }
 }
+
+const bonusCodes = {};
+function addBonusCode(code, rewardFunction, message = "") {
+    const trimmed = code.trim().replace(/^"+|"+$/g, "");
+    bonusCodes[trimmed] = { reward: rewardFunction, message };
+}
+
+function applyBonusCode() {
+    const input = document.getElementById("bonusCodeInput");
+    const message = document.getElementById("bonusCodeMessage");
+
+    let code = input.value.trim();
+    if (code.startsWith('"') && code.endsWith('"')) {
+        code = code.slice(1, -1).trim();
+    }
+
+    const bonus = bonusCodes[code];
+
+    if (!bonus) {
+        message.style.color = "red";
+        message.textContent = "Invalid code.";
+        return;
+    }
+
+    if (data.gameSettings.redeemedBonusCodes[code]) {
+        message.style.color = "red";
+        message.textContent = "Code already used.";
+        return;
+    }
+
+    bonus.reward();
+    data.gameSettings.redeemedBonusCodes[code] = true;
+
+    message.style.color = "green";
+    message.textContent = `Success! Bonus applied. ${bonus.message}`;
+}
+
+addBonusCode("link", function () {
+    data.currentGameState.bonusTime += 1000 * 60 * 60;
+}, "You received 1 hour of bonus time!");
+
+addBonusCode("gift", function () {
+    data.currentGameState.bonusTime += 1000 * 60 * 60;
+}, "Enjoy this 1-hour gift of bonus time!");
+
+addBonusCode("book", function () {
+    data.currentGameState.bonusTime += 1000 * 60 * 30;
+}, "Thanks for reading! Here’s 30 bonus minutes.");
+
+addBonusCode("sorry!", function () {
+    data.currentGameState.bonusTime += 1000 * 60 * 60 * 12;
+}, "Sorry about that! You’ve received 12 hours of bonus time.");
+
+addBonusCode("trythis1", function () {
+    data.currentGameState.bonusTime += 1000 * 60 * 60 * 24;
+}, "Does this work? You got 24 hours of bonus time.");
+
+
+addBonusCode("loopers", function () {
+    data.currentGameState.bonusTime += 1000 * 60 * 60 * 24;
+}, "Thank you for everything!");
+addBonusCode("squirrel", function () {
+    data.currentGameState.bonusTime += 1000 * 60 * 60 * 10;
+}, "Nuts!");
 
 
 //function to be used as a debug helper, running in console

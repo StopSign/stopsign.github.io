@@ -117,9 +117,9 @@ function intToString(value, amount, hideSmall) {
     value *= isNeg ? -1 : 1;
     if (value >= 10000) {
         value += .0000001; //anti floating point rounding issues
-        if(data.numberType === "engineering") {
+        if(data.gameSettings.numberType === "engineering") {
             return (isNeg ? "-" : "") + nFormatter(value, 3);
-        } else if(data.numberType === "scientific") {
+        } else if(data.gameSettings.numberType === "scientific") {
             return (isNeg?"-":"") + value.toExponential(2);
         }
     }

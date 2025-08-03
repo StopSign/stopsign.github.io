@@ -78,7 +78,7 @@ function createCheatMenu() {
 function createShopMenu() {
     return Raw.html`
         <div class="menuTitle">Shop</div>
-        <div class="menuSeparator"></div><br>TODO - Shop will be completed for full release with the following plans. 
+        <div class="menuSeparator"></div><br>Work in Progress. The shop will be completed for full release with the following plans. 
         I will keep the game ad-free and AI-art free, and the demo will be open-source on my github.<br> 
         I'm looking for feedback on the pricing for when the game lives on steam, outlined below.<br>
         Disclaimer: Game will be balanced without these upgrades.<br><br>
@@ -127,7 +127,7 @@ function createHelpForRealMenu() {
     return Raw.html`
         <div class="menuTitle">How to Provide Feedback</div>
         <div class="menuSeparator"></div><br>
-        You'll help, for real? Wow, I didn't know you were cool like that.<br>
+        You'll help me, for real? Wow, I didn't know you were cool like that.<br>
         My discord to discuss everything is here: <a href="https://discord.gg/dnKA6Xd">Stop_Sign Gaming</a>. I would really appreciate hearing about your experience, 
         and how you felt while playing! 
         You can also talk about the game in the discord with others, and share strategies.<br><br>
@@ -140,8 +140,8 @@ function createHelpMenu() {
     return Raw.html`
         <div class="menuTitle">Help</div>
         <div class="menuSeparator"></div><br>
-        <span style="font-weight: bold;font-size:34px;">#Skill issue</span><br><br>
-        Move the colors to where they haven't been yet. Repeat.
+        You'll help? Oh, you <i>want</i> help. Well, use the sliders to move resources to actions that haven't been unlocked yet. 
+        Other than that, it's just reading the numbers that are visible and figuring out which is the optimal path. I'm sure you can do it.
 `;
 }
 
@@ -260,24 +260,120 @@ function updatePreviousTipsMenu() {
     document.getElementById("previousTipsTextContainer").innerHTML = tipStr;
 }
 function createOptionsMenu() {
-    return Raw.html`<div class='menuTitle'>Options</div>
-        <div class='menuSeparator'></div>
+    return Raw.html`
+<!--<div class='menuTitle'>Options</div>-->
+<!--        <div class='menuSeparator'></div>-->
 <!--        <div id='lightModeButton' onClick='changeDarkMode()' class='button' style='padding:10px;font-size:14px;width:200px;' >-->
 <!--            Change to Light Mode</div>-->
-        <div id='numberTypeButton' onClick='changeNumberType()' class='button' style='padding:10px;font-size:14px;width:200px;' >
-            Change numbers to scientific</div><br>
-        <div style="display: flex; align-items: center; gap: 10px;">
-          FPS: <span id="sliderValue" style="font-weight: bold; min-width: 20px; text-align: left;">20</span>
-          <input type="range" id="FPSSlider" min="1" max="60" value="20" style="width: 200px;" oninput="updateSliderDisplay(this.value)">
+<!--        <div id='numberTypeButton' onClick='changeNumberType()' class='button' style='padding:10px;font-size:14px;width:200px;' >-->
+<!--            Change numbers to scientific</div><br>-->
+
+<div style="max-width:680px;width:100%;box-sizing:border-box;padding:20px;display:flex;flex-direction:column;gap:20px;">
+
+  <div class="menuTitle" style="margin:0;font-size:20px;font-weight:bold;border-bottom:1px solid #aaa;padding-bottom:10px;">Options</div>
+
+  <div style="display:flex;flex-direction:column;gap:12px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;">
+      <span style="font-size:14px;">Number Notation</span>
+      <div id="numberTypeSwitch" onclick="toggleNumberType()" style="position:relative;cursor:pointer;border:1px solid #aaa;border-radius:4px;padding:2px;width:200px;height:30px;">
+        <div style="position:absolute;left:2px;top:2px;width:calc(50% - 2px);height:calc(100% - 4px);background:#ccc;border-radius:2px;z-index:1;"></div>
+        <div style="position:relative;display:flex;z-index:2;height:100%;">
+          <span style="flex:1;text-align:center;font-size:13px;font-weight:bold;line-height:26px;color:#000;">Engineering</span>
+          <span style="flex:1;text-align:center;font-size:13px;font-weight:bold;line-height:26px;color:#000;">Scientific</span>
         </div>
-        <br><br>Auto save every 20 seconds and on pause, but if you want a button to click:<br>
-        <div class='button' style='padding:10px;font-size:14px;width:200px;' 
-        onClick='save()'>Save</div><br><br>
-        <div class='button' style='padding:10px;font-size:14px;width:200px;' 
-        onClick='exportSave()'>Export to clipboard</div><br><br>
-        <label for='exportImportSave'>Put your save here to import (import a clear save to hard reset):<br></label><input type='text' id='exportImportSave'><br>
-        <input type='checkbox' id='confirmImportCheckbox'><label for='confirmImportCheckbox'>Confirm</label>
-        <div class='button' style='padding:10px;font-size:14px;width:200px;' onClick='importSave()'>Import</div><br><br>`
+      </div>
+    </div>
+
+    <div style="display:flex;align-items:center;justify-content:space-between;">
+      <span style="font-size:14px;">Show +/-/Δ Values</span>
+      <div id="viewDeltasSwitch" onclick="toggleViewDeltas()" style="position:relative;cursor:pointer;border:1px solid #aaa;border-radius:4px;padding:2px;width:200px;height:30px;">
+        <div style="position:absolute;left:2px;top:2px;width:calc(50% - 2px);height:calc(100% - 4px);background:#ccc;border-radius:2px;z-index:1;"></div>
+        <div style="position:relative;display:flex;z-index:2;height:100%;">
+          <span style="flex:1;text-align:center;font-size:13px;font-weight:bold;line-height:26px;color:#000;">Off</span>
+          <span style="flex:1;text-align:center;font-size:13px;font-weight:bold;line-height:26px;color:#000;">On</span>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;align-items:center;justify-content:space-between;">
+      <span style="font-size:14px;">Show Increase/Decrease Ratio</span>
+      <div id="viewRatioSwitch" onclick="toggleViewRatio()" style="position:relative;cursor:pointer;border:1px solid #aaa;border-radius:4px;padding:2px;width:200px;height:30px;">
+        <div style="position:absolute;left:2px;top:2px;width:calc(50% - 2px);height:calc(100% - 4px);background:#ccc;border-radius:2px;z-index:1;"></div>
+        <div style="position:relative;display:flex;z-index:2;height:100%;">
+          <span style="flex:1;text-align:center;font-size:13px;font-weight:bold;line-height:26px;color:#000;">Off</span>
+          <span style="flex:1;text-align:center;font-size:13px;font-weight:bold;line-height:26px;color:#000;">On</span>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;align-items:center;justify-content:space-between;">
+      <span style="font-size:14px;">Show Total Downstream</span>
+      <div id="viewTotalMomentumSwitch" onclick="toggleViewTotalMomentum()" style="position:relative;cursor:pointer;border:1px solid #aaa;border-radius:4px;padding:2px;width:200px;height:30px;">
+        <div style="position:absolute;left:2px;top:2px;width:calc(50% - 2px);height:calc(100% - 4px);background:#ccc;border-radius:2px;z-index:1;"></div>
+        <div style="position:relative;display:flex;z-index:2;height:100%;">
+          <span style="flex:1;text-align:center;font-size:13px;font-weight:bold;line-height:26px;color:#000;">Off</span>
+          <span style="flex:1;text-align:center;font-size:13px;font-weight:bold;line-height:26px;color:#000;">On</span>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;align-items:center;justify-content:space-between;">
+      <span style="font-size:14px;">Show All 0 and All 100 Buttons</span>
+      <div id="viewZeroButtonsSwitch" onclick="toggleViewAll0Buttons()" style="position:relative;cursor:pointer;border:1px solid #aaa;border-radius:4px;padding:2px;width:200px;height:30px;">
+        <div style="position:absolute;left:2px;top:2px;width:calc(50% - 2px);height:calc(100% - 4px);background:#ccc;border-radius:2px;z-index:1;"></div>
+        <div style="position:relative;display:flex;z-index:2;height:100%;">
+          <span style="flex:1;text-align:center;font-size:13px;font-weight:bold;line-height:26px;color:#000;">Off</span>
+          <span style="flex:1;text-align:center;font-size:13px;font-weight:bold;line-height:26px;color:#000;">On</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:flex;align-items:center;gap:10px;">
+    <label for="FPSSlider" style="font-size:14px;">FPS: <span id="sliderValue" style="font-weight:bold;">20</span></label>
+    <input type="range" id="FPSSlider" min="1" max="60" value="20" oninput="updateSliderDisplay(this.value)" style="flex:1;cursor:pointer;">
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:10px;">
+    <p style="margin:0;font-size:13px;">Auto save every 20 seconds and on pause, but if you want a button to click:</p>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+      <button onclick="save()" style="padding:10px 16px;background:#007BFF;color:#fff;border:none;border-radius:4px;font-size:14px;cursor:pointer;">Save</button>
+      <button onclick="exportSave()" style="padding:10px 16px;background:#007BFF;color:#fff;border:none;border-radius:4px;font-size:14px;cursor:pointer;">Export to clipboard</button>
+    </div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:10px;border-top:1px solid #aaa;padding-top:20px;">
+    <label for="exportImportSave" style="font-size:13px;">Put your save here to import (import a clear save to hard reset):</label>
+    <input type="text" id="exportImportSave" style="border:1px solid #aaa;padding:8px;border-radius:4px;font-size:13px;width:100%;">
+    <div style="display:flex;align-items:center;gap:8px;">
+      <input type="checkbox" id="confirmImportCheckbox" style="width:14px;height:14px;cursor:pointer;">
+      <label for="confirmImportCheckbox" style="font-size:14px;cursor:pointer;">Confirm</label>
+    </div>
+    <button onclick="importSave()" style="padding:10px 16px;background:#007BFF;color:#fff;border:none;border-radius:4px;font-size:14px;cursor:pointer;width:160px;">Import</button>
+  </div>
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <label for="bonusCodeInput" style="font-size:13px;">Enter Bonus Code:</label>
+      <input type="text" id="bonusCodeInput" style="border:1px solid #aaa;padding:8px;border-radius:4px;font-size:13px;width:100%;">
+      <div id="bonusCodeMessage" style="font-size:13px;color:red;"></div>
+      <button onclick="applyBonusCode()" style="padding:10px 16px;background:#28a745;color:#fff;border:none;border-radius:4px;font-size:14px;cursor:pointer;width:160px;">Use Bonus Code</button>
+    </div>
+
+</div>
+
+
+<!--        <div style="display: flex; align-items: center; gap: 10px;">-->
+<!--          FPS: <span id="sliderValue" style="font-weight: bold; min-width: 20px; text-align: left;">20</span>-->
+<!--          <input type="range" id="FPSSlider" min="1" max="60" value="20" style="width: 200px;" oninput="updateSliderDisplay(this.value)">-->
+<!--        </div>-->
+<!--        <br><br>Auto save every 20 seconds and on pause, but if you want a button to click:<br>-->
+<!--        <div class='button' style='padding:10px;font-size:14px;width:200px;' -->
+<!--        onClick='save()'>Save</div><br><br>-->
+<!--        <div class='button' style='padding:10px;font-size:14px;width:200px;' -->
+<!--        onClick='exportSave()'>Export to clipboard</div><br><br>-->
+<!--        <label for='exportImportSave'>Put your save here to import (import a clear save to hard reset):<br></label><input type='text' id='exportImportSave'><br>-->
+<!--        <input type='checkbox' id='confirmImportCheckbox'><label for='confirmImportCheckbox'>Confirm</label>-->
+<!--        <div class='button' style='padding:10px;font-size:14px;width:200px;' onClick='importSave()'>Import</div><br><br>-->
+`
 }
 
 function updateSliderDisplay(currentValue) {
@@ -287,13 +383,101 @@ function updateSliderDisplay(currentValue) {
 }
 
 function changeNumberType() {
-    if(data.numberType === "engineering") {
-        data.numberType = "scientific";
-    } else if(data.numberType === "scientific") {
-        data.numberType = "engineering";
+    if(data.gameSettings.numberType === "engineering") {
+        data.gameSettings.numberType = "scientific";
+    } else if(data.gameSettings.numberType === "scientific") {
+        data.gameSettings.numberType = "engineering";
     }
 
-    document.getElementById("numberTypeButton").textContent = "Change numbers to " + (data.numberType === "engineering"?"scientific":"engineering");
+    document.getElementById("numberTypeButton").textContent = "Change numbers to " + (data.gameSettings.numberType === "engineering"?"scientific":"engineering");
+}
+
+function toggleNumberType() {
+    const el = document.getElementById('numberTypeSwitch');
+    const slider = el.firstElementChild;
+    if (data.gameSettings.numberType === 'engineering') {
+        data.gameSettings.numberType = 'scientific';
+        slider.style.left = '50%';
+    } else {
+        data.gameSettings.numberType = 'engineering';
+        slider.style.left = '0';
+    }
+}
+
+function toggleViewDeltas() {
+    const el = document.getElementById('viewDeltasSwitch');
+    const slider = el.firstElementChild;
+    data.gameSettings.viewDeltas = !data.gameSettings.viewDeltas;
+    if (data.gameSettings.viewDeltas) {
+        slider.style.left = '50%';
+    } else {
+        slider.style.left = '0';
+    }
+
+    let maxLevelTop = (data.gameSettings.viewDeltas && data.gameSettings.viewRatio) ? "73px" :
+        (data.gameSettings.viewDeltas && !data.gameSettings.viewRatio) ? "48px" :
+            (!data.gameSettings.viewDeltas && data.gameSettings.viewRatio) ? "40px" : "12px";
+
+    for(let actionVar in data.actions) {
+        views.updateVal(`${actionVar}DeltasDisplayContainer`, data.gameSettings.viewDeltas ? "" : "none", "style.display");
+        views.updateVal(`${actionVar}IsMaxLevel`, maxLevelTop, "style.top")
+    }
+}
+
+function toggleViewRatio() {
+    const el = document.getElementById('viewRatioSwitch');
+    const slider = el.firstElementChild;
+    data.gameSettings.viewRatio = !data.gameSettings.viewRatio;
+    if (data.gameSettings.viewRatio) {
+        slider.style.left = '50%';
+    } else {
+        slider.style.left = '0';
+    }
+
+    let maxLevelTop = (data.gameSettings.viewDeltas && data.gameSettings.viewRatio) ? "73px" :
+        (data.gameSettings.viewDeltas && !data.gameSettings.viewRatio) ? "48px" :
+            (!data.gameSettings.viewDeltas && data.gameSettings.viewRatio) ? "40px" : "12px";
+
+    for(let actionVar in data.actions) {
+        views.updateVal(`${actionVar}BalanceNeedleContainer`, data.gameSettings.viewRatio ? "" : "none", "style.display");
+        views.updateVal(`${actionVar}IsMaxLevel`, maxLevelTop, "style.top")
+    }
+}
+
+function toggleViewTotalMomentum() {
+    const el = document.getElementById('viewTotalMomentumSwitch');
+    const slider = el.firstElementChild;
+    data.gameSettings.viewTotalMomentum = !data.gameSettings.viewTotalMomentum;
+    if (data.gameSettings.viewTotalMomentum) {
+        slider.style.left = '50%';
+    } else {
+        slider.style.left = '0';
+    }
+    for(let actionVar in data.actions) {
+        if (data.gameSettings.viewTotalMomentum) {
+            views.updateVal(`${actionVar}TotalDownstreamContainer`, "", "style.display");
+        } else {
+            views.updateVal(`${actionVar}TotalDownstreamContainer`, "none", "style.display");
+        }
+    }
+}
+
+function toggleViewAll0Buttons() {
+    const el = document.getElementById('viewZeroButtonsSwitch');
+    const slider = el.firstElementChild;
+    data.gameSettings.viewAll0Buttons = !data.gameSettings.viewAll0Buttons;
+    if (data.gameSettings.viewAll0Buttons) {
+        slider.style.left = '50%';
+    } else {
+        slider.style.left = '0';
+    }
+    for(let actionVar in data.actions) {
+        if (data.gameSettings.viewAll0Buttons) {
+            views.updateVal(`${actionVar}ToggleDownstreamButtons`, "", "style.display");
+        } else {
+            views.updateVal(`${actionVar}ToggleDownstreamButtons`, "none", "style.display");
+        }
+    }
 }
 
 function changeDarkMode() {
@@ -322,7 +506,7 @@ let helpMenu = Raw.html`
             <div class="menuSeparator"></div>
             <div id="menuIndexContainer" style="height:750px;width:30%;background-color:var(--menu-tab-background-color);
                 display:inline-block;vertical-align:top;"></div><div id="menuTextDisplayContainer" style="height:750px;
-                width:70%;background-color:var(--menu-background-color);display:inline-block;vertical-align:top;overflow-y:auto"></div>
+                width:70%;background-color:var(--menu-background-color);display:inline-block;vertical-align:top;overflow-y:auto;will-change: transform;"></div>
         </div>
     </div>
     `;
@@ -374,7 +558,7 @@ function createChangelogMenu() {
     return Raw.html`
         <div class="menuTitle">Changelog</div>
         <div class="menuSeparator"></div><br>
-        Version 1.0: first release<br>
-        Verstion .1: You don't know want to know
+        v1.0 (current): first release to web<br>
+        v.1: very rough
         `;
 }

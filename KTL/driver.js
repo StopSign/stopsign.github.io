@@ -69,11 +69,9 @@ function animationTick(currentTime) {
 }
 let timeSinceLastSave = 0;
 
-// --- System Initialization ---
 function initTimingSystem() {
     checkOfflineProgress();
 
-    // Start the worker and pass the initial configuration.
     postMessage({
         command: 'start'
     });
@@ -81,102 +79,6 @@ function initTimingSystem() {
     // Start the main thread's rendering loop.
     requestAnimationFrame(animationTick);
 }
-/*
-let lastAnimationTime = 0;
-let animationFrameRequest = 0;
-let animationTicksEnabled = true;
-
-function recalcInterval(fps) {
-    windowFps = fps;
-    if (mainTickLoop !== undefined) {
-        clearInterval(mainTickLoop);
-    }
-    if (window.requestAnimationFrame) {
-        animationFrameRequest = requestAnimationFrame(animationTick);
-        // mainTickLoop = setInterval(tick, 1000);
-    } else {
-        mainTickLoop = setInterval(tick, 1000 / fps);
-    }
-}
-function animationTick(animationTime) {
-    if (animationTime === lastAnimationTime || !animationTicksEnabled) {
-        // double tick in the same frame, drop this one
-        return;
-    }
-    try {
-        tick();
-    } finally {
-        animationFrameRequest = requestAnimationFrame(animationTick);
-    }
-}
-
-
-
-
-
-//time-delta-based approach
-function tick() {
-    if(sudoStop) {
-        return;
-    }
-    let newTime = new Date();
-    let delta = newTime - curTime;
-    totalTime += delta;
-    gameTicksLeft += delta;
-    curTime = newTime;
-
-    if (curTime - lastSave > data.options.autosaveRate * 1000) {
-        lastSave = curTime;
-        save();
-    }
-
-    let didSomething = false; //for performance
-
-    // Main loop: only process up to a certain threshold to avoid huge catch-up
-    if (gameTicksLeft > 2000) {
-        // Dump the overflow into bonusTime
-        let overflow = gameTicksLeft;
-        gameTicksLeft = 0;
-        bonusTime += overflow;
-        // console.warn(`Too large backlog! Moved ${overflow} ms to bonusTime (now ${bonusTime} ms).`);
-    }
-
-    while (gameTicksLeft > (1000 / data.gameSettings.ticksPerSecond)) {
-        if(stop || forceStop) {
-            bonusTime += gameTicksLeft;
-            gameTicksLeft = 0;
-            if(!forceStop) {
-                views.updateView();
-            }
-            break;
-        }
-
-        //Game logic for each tick
-        ticksForSeconds++;
-        if(ticksForSeconds % data.gameSettings.ticksPerSecond === 0) {
-            secondPassed();
-        }
-        framePassed();
-        didSomething = gameTicksLeft <= 1200;
-
-        let timeSpent = (1000 / data.gameSettings.ticksPerSecond) / gameSpeed / bonusSpeed
-        gameTicksLeft -= (1000 / data.gameSettings.ticksPerSecond) / gameSpeed / bonusSpeed;
-
-        if(bonusSpeed !== 1) {
-            bonusTime += -timeSpent * (bonusSpeed - 1);
-            if(bonusTime <= 100) {
-                toggleBonusSpeed()
-            }
-        }
-    }
-    if(didSomething) {
-        views.updateView();
-    }
-}
-
-function framePassed() {
-    gameTick();
-}*/
 
 function secondPassed() {
     secondTick();
@@ -234,37 +136,6 @@ function gameTick() {
 
     upgradeUpdates()
     calcDeltas();
-
-
-    //algo for determining if the slider should be set to 0 from automation
-    //if max level and resourse decrease is 0 and has no downstream with resource decreases
-    // for(let actionVar in data.actions) {
-    //     let actionObj = data.actions[actionVar];
-    //     let dataObj = actionData[actionVar];
-    //     if (data.upgrades.knowWhenToMoveOn.upgradePower > 0 && actionObj.unlocked) {
-    //         let maxLevelToUse = dataObj.maxLevelActual !== undefined ? dataObj.maxLevelActual : actionObj.maxLevel;
-    //         let isActualMaxLevel = maxLevelToUse !== undefined && actionObj.level >= maxLevelToUse;
-    //         let isQuiet = isActualMaxLevel && actionObj.resourceDecrease === 0;
-    //
-    //         let allGood = true;
-    //         let allZeroes = true;
-    //         for (let downstreamVar of dataObj.downstreamVars) {
-    //             let downstreamObj = data.actions[downstreamVar];
-    //             let downstreamRate = actionObj[`downstreamRate${downstreamVar}`];
-    //             if(downstreamRate > 0) {
-    //                 allZeroes = false;
-    //             }
-    //             if (downstreamObj.resourceDecrease !== 0) {
-    //                 allGood = false;
-    //             }
-    //         }
-    //
-    //         if (allGood && isQuiet && actionObj.hasUpstream && allZeroes) {
-    //             setSliderUI(dataObj.parentVar, actionVar, 0);
-    //         }
-    //     }
-    // }
-
 
 }
 

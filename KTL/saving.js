@@ -350,20 +350,49 @@ const patches = {
             preventReset: true,
         },
         feelTheEchoesOfMyPast: {
-            preventReset: false,
+            preventReset: true,
+        },
+        startALittleQuicker: {
+            preventReset: true,
         },
         rememberWhatIFocusedOn: {
+            preventReset: true,
+        },
+        learnedOfLichSigns: {
             preventReset: true,
         },
         knowWhatIFocusedOn: {
             preventReset: true,
         },
-        startALittleQuicker: {
-            preventReset: false,
-        },
-        refineMyCycle: {
-            preventReset: false,
-        },
+        refineMyCycle: { preventReset: true, },
+        refineMyAwareness: { preventReset: true, },
+        refineMyConcentration: { preventReset: true, },
+        refineMyEnergy: { preventReset: true, },
+        refineMyFlow: { preventReset: true, },
+        refineMyCoordination: { preventReset: true, },
+        refineMyIntegration: { preventReset: true, },
+        refineMyAmbition: { preventReset: true, },
+        refineMyAdaptability: { preventReset: true, },
+        refineMyCunning: { preventReset: true, },
+        refineMySavvy: { preventReset: true, },
+        refineMyConfidence: { preventReset: true, },
+        refineMyRecognition: { preventReset: true, },
+        refineMyCharm: { preventReset: true, },
+        refineMyInfluence: { preventReset: true, },
+        refineMyDiscernment: { preventReset: true, },
+        refineMyPulse: { preventReset: true, },
+        refineMyVision: { preventReset: true, },
+        refineMySpark: { preventReset: true, },
+        refineMyAmplification: { preventReset: true, },
+        refineMyControl: { preventReset: true, },
+        refineMyCuriosity: { preventReset: true, },
+        refineMyObservation: { preventReset: true, },
+        refineMyEndurance: { preventReset: true, },
+        refineMyNavigation: { preventReset: true, },
+        refineMyMight: { preventReset: true, },
+        refineMyGeared: { preventReset: true, },
+        refineMyCourage: { preventReset: true, },
+        refineMyWizardry: { preventReset: true, },
     }};
 
 
@@ -373,9 +402,10 @@ function load() {
 
     let toLoad = {};
 
-    if(onLoadData) {
-        toLoad = onLoadData;
-    } else if(localStorage[saveName]) {
+    // if(onLoadData) {
+    //     toLoad = onLoadData;
+    // }
+    if(localStorage[saveName]) {
         toLoad = JSON.parse(decode(localStorage[saveName]));
     }
 
@@ -387,6 +417,7 @@ function load() {
         //these are in the skiplist because if, between saves, an action has changed the atts it has, the links need to be reset instead of saved.
         mergeExistingOnly(data, toLoad, "atts", ["linkedActionExpAtts", "linkedActionEfficiencyAtts", "linkedActionOnLevelAtts"]);
         mergeExistingOnly(data, toLoad, "options");
+        mergeExistingOnly(data, toLoad, "gameSettings");
 
 
         patchActions("actions", toLoad.actions, actionData);
@@ -404,7 +435,6 @@ function load() {
         data.secondsPerReset = toLoad.secondsPerReset ?? 0;
         data.currentJob = toLoad.currentJob ?? "helpScottWithChores";
         data.currentWage = toLoad.currentWage ?? 1;
-        data.numberType = toLoad.numberType ?? "engineering";
         data.doneKTL = !!toLoad.doneKTL;
         data.doneAmulet = !!toLoad.doneAmulet;
         data.displayJob = !!toLoad.displayJob;
@@ -416,7 +446,7 @@ function load() {
         data.gameSettings.ticksPerSecond = toLoad.ticksPerSecond ?? 20;
 
         data.currentGameState = toLoad.currentGameState;
-        data.gameSettings = toLoad.gameSettings;
+        // data.gameSettings = toLoad.gameSettings;
 
 
         //data correction
@@ -424,7 +454,7 @@ function load() {
         //new spells need to be leveled to current grimoire's level
 
         //bought upgrades need to be applied
-        actionData.hearAboutTheLich.maxLevel = data.upgrades.learnedOfLichSigns.upgradePower;
+        actionData.hearAboutTheLich.maxLevel = data.upgrades.learnedOfLichSigns.upgradePower + 2;
     }
 
     //update all generator's multiplier data
@@ -551,15 +581,27 @@ function mergeExistingOnly(data, toLoad, varName, skipList = []) {
 function updateUIOnLoad() {
     for (let actionVar in data.actions) {
         let actionObj = data.actions[actionVar];
+        actionObj.isRunning = actionObj.plane === 2;
         clickActionMenu(actionVar, actionObj.currentMenu, true);
         if (actionObj.unlocked || actionObj.visible) {
             revealActionAtts(actionObj);
+        }
+        if(data.gameSettings.viewDeltas) {
+            views.updateVal(`${actionVar}DeltasDisplayContainer`, "", "style.display");
+        }
+        if(data.gameSettings.viewRatio) {
+            views.updateVal(`${actionVar}BalanceNeedleContainer`, "", "style.display");
+        }
+        if(data.gameSettings.viewAll0Buttons) {
+            views.updateVal(`${actionVar}ToggleDownstreamButtons`, "", "style.display");
+        }
+        if(data.gameSettings.viewTotalMomentum) {
+            views.updateVal(`${actionVar}TotalDownstreamContainer`, "", "style.display");
         }
     }
     if(data.actions.inquireAboutMagic.unlocked) { //inbetween inquire and seeing ignite the spark
         revealAtt("legacy");
     }
-
     if (data.planeUnlocked[1] || data.planeUnlocked[2]) {
         for (let i = 0; i < data.planeUnlocked.length; i++) {
             if (data.planeUnlocked[i]) {

@@ -173,6 +173,7 @@ let views = {
 
         views.updateVal(`${actionVar}SmallVersionTitle`, scale < .11 ? "0" : "1" , "style.opacity");
         views.updateVal(`${actionVar}Container`, miniVersion ? "100px" : "" , "style.borderRadius");
+
         // views.updateVal(`${actionVar}SmallVersionTitle`, scale < .11 ? "none" : "" , "style.display");
 
         // if(!miniVersion) { //don't check in small

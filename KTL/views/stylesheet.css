@@ -190,7 +190,7 @@ body {
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
-    font-family: Arial, Helvetica, serif;
+    font-family: Arial, sans-serif;
     color: var(--text-primary);
     font-size: 14px;
     height: 100%;
@@ -533,7 +533,7 @@ input {
     padding: 10px;
     font-size:16px;
     text-align:left;
-    overflow-y:auto;
+    overflow-y:auto;will-change: transform;
 }
 
 .upgradeButton {
@@ -610,7 +610,6 @@ input {
     flex-direction: column;
     justify-content: space-between; /* Pushes footer to the bottom */
     box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-    font-family: sans-serif;
     color: #e0e0e0;
 }
 

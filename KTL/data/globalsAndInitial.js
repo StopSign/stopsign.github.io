@@ -22,7 +22,7 @@ let lastSave = Date.now();
 
 //Saving globals
 let isFileSystem = !!location.href.match("file");
-let saveName = "KTLsave1"; //Blank if you don't want to save, change name to force user reset
+let saveName = "KTLsave2"; //Blank if you don't want to save, change name to force user reset
 
 let forceStop = false;
 
@@ -42,7 +42,6 @@ data.useAmuletButtonShowing = false;
 data.secondsPerReset = 0;
 data.currentJob = "helpScottWithChores";
 data.currentWage = 1;
-data.numberType = "engineering"; //or scientific
 data.doneKTL = false;
 data.doneAmulet = false;
 data.focusSelected = [];
@@ -64,7 +63,13 @@ data.gameSettings = {
     stopAll: false,
     fps: 20,
     ticksPerSecond: 20,
-    ticksForSeconds:0
+    ticksForSeconds:0,
+    viewDeltas:false,
+    viewRatio:false,
+    viewAll0Buttons:false,
+    viewTotalMomentum:false,
+    numberType:"engineering",
+    redeemedBonusCodes:{}
 };
 
 // --- Dynamic Game State ---
@@ -87,7 +92,7 @@ let isLoadingEnabled = true; //SET FALSE FOR CLEARING SAVE
 
 data.upgrades = {};
 
-let isDebug = true;
+let isDebug = false;
 function debug() {
     if(!isDebug) {
         return;
@@ -95,6 +100,11 @@ function debug() {
 
     data.gameSettings.bonusSpeed = 1;
     data.currentGameState.KTLBonusTimer = 0;
+    data.ancientCoin = 5000;
+
+    gameSpeed = 1;
+    data.currentGameState.bonusTime = 1000 * 60 * 60 * 24;
+
     //temp data corrections:
     // unveilAction('visitShrineBehindWaterfall')
     // document.getElementById('confirmKTL').checked = true;
@@ -105,7 +115,6 @@ function debug() {
     // data.doneKTL = true;
     // data.doneAmulet = true;
     // data.displayJob = true;
-    data.ancientCoin = 5000;
     // buyUpgrade("buyNicerStuff", 0);
     // buyUpgrade("stopLettingOpportunityWait", 0);
     // buyUpgrade("stopLettingOpportunityWait", 1);
@@ -142,8 +151,6 @@ function debug() {
 
 
 
-    gameSpeed = 1;
-    data.currentGameState.bonusTime = 1000 * 60 * 60 * 24;
 }
 
 function initializeData() {

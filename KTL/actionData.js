@@ -159,7 +159,7 @@ let actionData = {
         tier:1, plane:0,
         progressMaxBase:1, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
-        efficiencyBase:1, maxLevel:10, maxLevelActual:40,
+        efficiencyBase:1, maxLevel:10,
         unlockCost:80, visible:false, unlocked:false, purchased: true,
         onLevelCustom: function() {
         },
@@ -183,7 +183,7 @@ let actionData = {
         tier:1, plane:0,
         progressMaxBase:2000, progressMaxIncrease:20,
         expToLevelBase:2, expToLevelIncrease:1,
-        efficiencyBase:.6, maxLevel:1, maxLevelActual:10,
+        efficiencyBase:.6, maxLevel:1,
         unlockCost:2000, visible:false, unlocked:false, purchased: true,
         onUnlock: function() {
         },
@@ -200,7 +200,7 @@ let actionData = {
         tier:1, plane:0,
         progressMaxBase:20000, progressMaxIncrease:5,
         expToLevelBase:10, expToLevelIncrease:1,
-        efficiencyBase:.2, maxLevel:3, maxLevelActual:10,
+        efficiencyBase:.2, maxLevel:3,
         unlockCost:4000, visible:false, unlocked:false, purchased: true,
         onUnlock: function() {
             addMaxLevel("bodyAwareness", 1);
@@ -835,7 +835,7 @@ let actionData = {
         tier:1, plane:0, resourceName:"fear",
         progressMaxBase:4000, progressMaxIncrease:1e3,
         expToLevelBase:1, expToLevelIncrease:1,
-        efficiencyBase:1, maxLevel:2, maxLevelActual:2,
+        efficiencyBase:1, maxLevel:2,
         unlockCost:0,
         visible:false, unlocked:false, purchased: true, hasUpstream:false,
         onLevelCustom: function() {
@@ -1060,7 +1060,7 @@ actionData = {
         tier:1, plane:0,
         progressMaxBase:4e18, progressMaxIncrease:40,
         expToLevelBase:4, expToLevelIncrease:1,
-        efficiencyBase:.0001, maxLevel:1, maxLevelActual:2,
+        efficiencyBase:.0001, maxLevel:1,
         unlockCost:2e14, visible:false, unlocked:false, purchased: true,
         onUnlock: function() {
             unveilAction('socialize');
@@ -1764,7 +1764,7 @@ actionData = {
         tier:1, plane:0,
         progressMaxBase:1e30, progressMaxIncrease:40,
         expToLevelBase:10, expToLevelIncrease:1,
-        efficiencyBase:.001, maxLevel:1, maxLevelActual:5,
+        efficiencyBase:.001, maxLevel:1,
         unlockCost:1e22, visible:false, unlocked:false, purchased: true,
         onUnlock: function() {
         },
