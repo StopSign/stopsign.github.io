@@ -22,7 +22,7 @@ let lastSave = Date.now();
 
 //Saving globals
 let isFileSystem = !!location.href.match("file");
-let saveName = "KTLsave2"; //Blank if you don't want to save, change name to force user reset
+let saveName = "KTLsave4"; //Blank if you don't want to save, change name to force user reset
 
 let forceStop = false;
 

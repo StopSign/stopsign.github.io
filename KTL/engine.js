@@ -590,6 +590,9 @@ addBonusCode("loopers", function () {
 addBonusCode("squirrel", function () {
     data.currentGameState.bonusTime += 1000 * 60 * 60 * 10;
 }, "Nuts!");
+addBonusCode("nothing", function () {
+    data.currentGameState.bonusTime += 1000 * 60 * 60 * 24;
+}, "There was nothing there - except 24 hours bonus time.");
 
 
 //function to be used as a debug helper, running in console

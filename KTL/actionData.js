@@ -2237,7 +2237,7 @@ actionData = {
         expToLevelBase:1000, expToLevelIncrease:10,
         actionPowerBase:1, actionPowerMult:1, actionPowerMultIncrease:1,
         efficiencyBase:1, isKTL:true, purchased: true, generatorTarget:"worry",
-        unlockCost:0, visible:true, unlocked:true, isGenerator:true, generatorSpeed:2, hasUpstream: false,
+        unlockCost:0, visible:false, unlocked:false, isGenerator:true, generatorSpeed:2, hasUpstream: false,
         onCompleteCustom: function() {
             let actionObj = data.actions.worry;
             actionData.worry.updateMults();
@@ -2283,7 +2283,7 @@ actionData = {
         progressMaxBase:10, progressMaxIncrease:2,
         expToLevelBase:5, expToLevelIncrease:1,
         efficiencyBase:1, isKTL:true, purchased: true,
-        unlockCost:0, visible:true, unlocked:true, hasUpstream: false,
+        unlockCost:0, visible:false, unlocked:false, hasUpstream: false,
         onLevelAtts:[["courage", 5]],
         expAtts:[["courage", 1]],
         efficiencyAtts:[["doom", -1]]
@@ -2294,7 +2294,7 @@ actionData = {
         expToLevelBase:12, expToLevelIncrease:1,
         efficiencyBase:1, isKTL:true, purchased: true,
         actionPowerBase:1, actionPowerMult:1, actionPowerMultIncrease:1, generatorTarget:"fightTheEvilForces",
-        unlockCost:0, visible:true, unlocked:true, isGenerator:true, generatorSpeed:1,
+        unlockCost:0, visible:false, unlocked:false, isGenerator:true, generatorSpeed:1,
         hasUpstream: false, hideUpstreamLine: true,
         onCompleteCustom: function() {
             let actionObj = data.actions.overclockTargetingTheLich;
@@ -2339,7 +2339,7 @@ actionData = {
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:1, isKTL:true, purchased: true,
         actionPowerBase:1, actionPowerMult:1, actionPowerMultIncrease:1,
-        unlockCost:1, visible:true, unlocked:false, isGenerator:true, generatorSpeed:1, hasUpstream: false,
+        unlockCost:1, visible:false, unlocked:false, isGenerator:true, generatorSpeed:1, hasUpstream: false,
         onLevelAtts:[["doom", 50]],
         onUnlock: function() {
             unveilAction('bridgeOfBone');

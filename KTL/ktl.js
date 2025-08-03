@@ -74,6 +74,12 @@ function initializeKTL() {
     revealAtt("courage");
     unveilAction('worry');
     unveilAction('resolve');
+    unveilAction('fightTheEvilForces');
+    unveilAction('overclockTargetingTheLich');
+    unlockAction('worry');
+    unlockAction('resolve');
+    unlockAction('fightTheEvilForces');
+    unlockAction('overclockTargetingTheLich');
 
 
     //first time stuff

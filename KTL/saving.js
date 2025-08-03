@@ -406,6 +406,7 @@ function load() {
     //     toLoad = onLoadData;
     // }
     if(localStorage[saveName]) {
+        console.log('Save found.');
         toLoad = JSON.parse(decode(localStorage[saveName]));
     }
 
@@ -581,7 +582,11 @@ function mergeExistingOnly(data, toLoad, varName, skipList = []) {
 function updateUIOnLoad() {
     for (let actionVar in data.actions) {
         let actionObj = data.actions[actionVar];
-        actionObj.isRunning = actionObj.plane === 2;
+        if(data.gameState === "KTL") {
+            actionObj.isRunning = actionObj.plane === 2;
+        } else {
+            actionObj.isRunning = actionObj.plane !== 2;
+        }
         clickActionMenu(actionVar, actionObj.currentMenu, true);
         if (actionObj.unlocked || actionObj.visible) {
             revealActionAtts(actionObj);
