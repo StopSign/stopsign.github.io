@@ -104,10 +104,10 @@ function initializeKTL() {
     unveilAction('resolve');
     unveilAction('fightTheEvilForces');
     unveilAction('overclockTargetingTheLich');
-    unlockAction('worry');
-    unlockAction('resolve');
-    unlockAction('fightTheEvilForces');
-    unlockAction('overclockTargetingTheLich');
+    unlockAction(data.actions.worry);
+    unlockAction(data.actions.resolve);
+    unlockAction(data.actions.fightTheEvilForces);
+    unlockAction(data.actions.overclockTargetingTheLich);
 
 
 
