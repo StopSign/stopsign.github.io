@@ -93,7 +93,7 @@ let isLoadingEnabled = true; //SET FALSE FOR CLEARING SAVE
 
 data.upgrades = {};
 
-let isDebug = true;
+let isDebug = false;
 function debug() {
     if(!isDebug) {
         return;
