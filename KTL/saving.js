@@ -418,7 +418,7 @@ function load() {
         //these are in the skiplist because if, between saves, an action has changed the atts it has, the links need to be reset instead of saved.
         mergeExistingOnly(data, toLoad, "atts", ["linkedActionExpAtts", "linkedActionEfficiencyAtts", "linkedActionOnLevelAtts"]);
         mergeExistingOnly(data, toLoad, "options");
-        data.options.bonusRate = 1
+        data.options.bonusRate = 3;
         mergeExistingOnly(data, toLoad, "gameSettings");
 
 

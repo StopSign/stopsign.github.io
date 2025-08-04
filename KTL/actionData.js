@@ -845,22 +845,17 @@ let actionData = {
         },
         updateMults: function() {
             let actionObj = data.actions.hearAboutTheLich;
-            actionObj.progressGain = actionObj.generatorSpeed * (actionObj.efficiency / 100);
-            actionObj.actionPower = actionObj.actionPowerBase *
-                actionObj.actionPowerMult * (actionObj.efficiency/100);
-            data.actions.hearAboutTheLich.resourceToAdd = actionData.hearAboutTheLich.calcFearGain();
-            data.actions.hearAboutTheLich.resourceIncrease = data.actions.hearAboutTheLich.resourceToAdd *
+
+            actionObj.resourceToAdd = actionData.hearAboutTheLich.calcFearGain();
+            actionObj.resourceIncrease = actionObj.resourceToAdd *
                 data.actions.overclock.progressGain / data.actions.overclock.progressMax;
         },
         completeFromOverclock: function() {
             let actionObj = data.actions.hearAboutTheLich;
-            if (data.actions.hearAboutTheLich.unlocked) {
-                actionObj.progressGain = actionObj.generatorSpeed * (actionObj.efficiency / 100);
-                actionObj.actionPower = actionObj.actionPowerBase *
-                    actionObj.actionPowerMult * (actionObj.efficiency/100);
-                data.actions.hearAboutTheLich.actionPower = actionData.hearAboutTheLich.calcFearGain();
-                data.actions.hearAboutTheLich.resourceToAdd = data.actions.hearAboutTheLich.actionPower;
-                data.actions.hearAboutTheLich.resource += data.actions.hearAboutTheLich.resourceToAdd;
+            if (actionObj.unlocked) {
+                actionObj.actionPower = actionData.hearAboutTheLich.calcFearGain();
+                actionObj.resourceToAdd = actionObj.actionPower;
+                actionObj.resource += actionObj.resourceToAdd;
             }
         },
         calcFearGain: function() {

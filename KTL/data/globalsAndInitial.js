@@ -52,7 +52,7 @@ data.focusLoopMax = 2.5;
 data.options = {};
 data.options.updateRate = 20;
 data.options.autosaveRate = 10;
-data.options.bonusRate = 1;
+data.options.bonusRate = 3;
 let chartData = []; // Stores { time: number, value: number }
 let chartScale = 'linear'; // 'linear' or 'logarithmic'
 
@@ -99,7 +99,7 @@ function debug() {
         return;
     }
 
-    data.gameSettings.bonusSpeed = 1;
+    // data.gameSettings.bonusSpeed = 1;
     data.currentGameState.KTLBonusTimer = 0;
     data.ancientCoin = 5000;
 
@@ -117,9 +117,12 @@ function debug() {
     // data.doneAmulet = true;
     // data.displayJob = true;
     // buyUpgrade("buyNicerStuff", 0);
-    // buyUpgrade("stopLettingOpportunityWait", 0);
-    // buyUpgrade("stopLettingOpportunityWait", 1);
-    // buyUpgrade("stopLettingOpportunityWait", 2);
+    buyUpgrade("stopLettingOpportunityWait");
+    buyUpgrade("stopLettingOpportunityWait");
+    buyUpgrade("knowWhenToMoveOn");
+    buyUpgrade("startALittleQuicker");
+    buyUpgrade("startALittleQuicker");
+    buyUpgrade("startALittleQuicker");
     // setSliderUI("overclock", "reflect", 100);
     // unveilAction('makeMoney');
 

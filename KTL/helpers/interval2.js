@@ -2,8 +2,6 @@
 // WEB WORKER (engine.js)
 // =================================================================
 // This script runs in the background and handles all game logic calculations.
-
-
 function loop() {
     if (timerId !== null) {
         clearTimeout(timerId);
@@ -14,14 +12,23 @@ function loop() {
 
     const tickInterval = 1000 / data.gameSettings.ticksPerSecond;
     let elapsed = now - lastTickTime;
-    let ticksToProcess = Math.floor(elapsed / tickInterval);
+    let ticksAvailable = Math.floor(elapsed / tickInterval);
     let didSomething = false;
 
-    if (ticksToProcess > 0) {
-        lastTickTime += ticksToProcess * tickInterval;
+    const maxTicksPerLoop = 10;
+    let ticksProcessed = ticksAvailable;
+
+    if (ticksAvailable > maxTicksPerLoop) {
+        ticksProcessed = maxTicksPerLoop;
+        const extraTicks = ticksAvailable - maxTicksPerLoop;
+        data.currentGameState.bonusTime += extraTicks * tickInterval;
+    }
+
+    if (ticksProcessed > 0) {
+        lastTickTime += ticksProcessed * tickInterval;
 
         const effectiveSpeed = data.gameSettings.gameSpeed * data.gameSettings.bonusSpeed;
-        const totalTicksToRun = ticksToProcess * effectiveSpeed;
+        const totalTicksToRun = ticksProcessed * effectiveSpeed;
 
         if (!data.gameSettings.stop) {
             for (let i = 0; i < totalTicksToRun; i++) {
@@ -33,22 +40,20 @@ function loop() {
                 }
             }
             if (data.gameSettings.bonusSpeed > 1) {
-                const processedElapsed = ticksToProcess * tickInterval;
+                const processedElapsed = ticksProcessed * tickInterval;
                 const bonusTimeConsumed = processedElapsed * data.gameSettings.gameSpeed * (data.gameSettings.bonusSpeed - 1);
-
                 data.currentGameState.bonusTime -= bonusTimeConsumed;
             }
         } else {
-            data.currentGameState.bonusTime += tickInterval * ticksToProcess;
+            data.currentGameState.bonusTime += tickInterval * ticksProcessed;
         }
 
-        postMessage({
-            type: 'update',
-        });
+        postMessage({ type: 'update' });
     }
 
     timerId = setTimeout(loop, 1000 / data.gameSettings.ticksPerSecond);
 }
+
 
 
 // Listen for updates from the worker
