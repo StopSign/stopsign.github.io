@@ -126,6 +126,7 @@ function generateActionDisplay(actionVar) {
     queueCache(`${actionVar}_storyMenuButton`);
     queueCache(`${actionVar}MenuButtons`);
 
+
     let menuContainer = Raw.html`
         <div id="${actionVar}MenuButtons" style="position:absolute;top:-20px;font-size:13px;left:3px;">
             ${!dataObj.parentVar?"":`<span onclick="actionTitleClicked('${dataObj.parentVar}')" 
@@ -137,7 +138,7 @@ function generateActionDisplay(actionVar) {
         <span id="${actionVar}_attsMenuButton" onclick="clickActionMenu('${actionVar}', 'atts')" class="buttonSimple" 
             style="margin-right:3px;width:30px;height:30px;text-align:center;cursor:pointer;padding:0 4px;">Stats</span>
         <span id="${actionVar}_storyMenuButton" onclick="clickActionMenu('${actionVar}', 'story')" class="buttonSimple" 
-            style="display:${dataObj.storyText?"":"none"}margin-right:3px;width:30px;height:30px;text-align:center;cursor:pointer;padding:0 4px;">Story</span>
+            style="display:${dataObj.storyText?"":"none"};margin-right:3px;width:30px;height:30px;text-align:center;cursor:pointer;padding:0 4px;">Story</span>
         </div>`;
 
     queueCache(`${actionVar}ResourceIncrease`);
@@ -862,6 +863,47 @@ function generateLinesBetweenActions() {
 }
 
 
+function renderResetLog() {
+    let rows = '';
+    let index = 1;
+    for (let resetLog in data.resetLogs) {
+        if (!data.resetLogs.hasOwnProperty(resetLog)) continue;
+        const log = data.resetLogs[resetLog];
+        rows += `
+            <tr>
+                <td style="padding:2px 4px;">${index}</td>
+                <td style="padding:2px 4px;">
+                    ${!log.stage1 ? "-" : `${log.stage1.legacyGained} / ${secondsToTime(log.stage1.secondsPerReset)}` }
+                </td>
+                <td style="padding:2px 4px;">
+                    ${!log.stage2 ? "-" : `${log.stage2.legacyGained} / ${log.stage2.ancientCoin}` }
+                </td>
+            </tr>
+        `;
+        index++;
+    }
+    return `
+        <div>
+            <div style="font-size:20px; font-weight:bold; margin:0 0 6px 0;">Recent Run Statistics (Last 5)</div>
+            <table style="width:100%; border-collapse:collapse; font-size:16px;">
+                <thead>
+                    <tr>
+                        <th style="padding:2px 4px; text-align:left;">#</th>
+                        <th style="padding:2px 4px; text-align:left;">Stage 1<br>(Legacy, Time)</th>
+                        <th style="padding:2px 4px; text-align:left;">Stage 2<br>(Legacy Gained, Ancient Coin Gained)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${rows}
+                </tbody>
+            </table>
+        </div>
+    `;
+}
+
+
+
+
 
 function setAllCaches() {
     queueCache("totalMomentum");
@@ -883,6 +925,7 @@ function setAllCaches() {
     queueCache("spellPowerDisplay");
     queueCache("jobDisplay");
     queueCache("useAmuletMenu");
+    queueCache("amuletEnabledContainer");
 
     for(let actionVar in data.actions) {
         view.cached[actionVar + "ActionPower"] = document.getElementById(actionVar + "ActionPower");

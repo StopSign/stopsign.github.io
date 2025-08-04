@@ -225,7 +225,8 @@ function createDataMenu() {
     return Raw.html`
         <div class="menuTitle">Data</div>
         <div class="menuSeparator"></div><br>
-        What do you want to know?
+        What do you want to know?<br><br>
+        <div id="resetLogContainer"></div><br>
     <div id="chartContainer" style="width: 80%; max-width: 800px; background-color: #2d3748; border-radius: 8px; 
         box-shadow: 0 4px 12px rgba(0,0,0,0.4); padding: 20px;">
         <h2 style="text-align: center; margin-top: 0; color: #e2e8f0;">Recent 100 Overclock Amounts</h2>

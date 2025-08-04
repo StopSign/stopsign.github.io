@@ -22,7 +22,7 @@ let lastSave = Date.now();
 
 //Saving globals
 let isFileSystem = !!location.href.match("file");
-let saveName = "KTLsave4"; //Blank if you don't want to save, change name to force user reset
+let saveName = "KTLsave5"; //Blank if you don't want to save, change name to force user reset
 
 let forceStop = false;
 
@@ -45,13 +45,14 @@ data.currentWage = 1;
 data.doneKTL = false;
 data.doneAmulet = false;
 data.focusSelected = [];
+data.resetLogs = [];
 data.maxFocusAllowed = 2;
 data.focusMult = 2;
 data.focusLoopMax = 2.5;
 data.options = {};
 data.options.updateRate = 20;
 data.options.autosaveRate = 10;
-data.options.bonusRate = 2;
+data.options.bonusRate = 1;
 let chartData = []; // Stores { time: number, value: number }
 let chartScale = 'linear'; // 'linear' or 'logarithmic'
 
@@ -92,7 +93,7 @@ let isLoadingEnabled = true; //SET FALSE FOR CLEARING SAVE
 
 data.upgrades = {};
 
-let isDebug = false;
+let isDebug = true;
 function debug() {
     if(!isDebug) {
         return;

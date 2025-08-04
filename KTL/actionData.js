@@ -2356,6 +2356,7 @@ actionData = {
         unlockCost:10, visible:false, unlocked:false,
         onUnlock: function() {
             data.ancientCoin += 5 * data.actions.hearAboutTheLich.level;
+            data.ancientCoinGained += 5 * data.actions.hearAboutTheLich.level;
             data.useAmuletButtonShowing = true;
             setSliderUI("bridgeOfBone", "harvestGhostlyField", 100);
         },
@@ -2382,6 +2383,7 @@ actionData = {
         unlockCost:1000, visible:false, unlocked:false,
         onUnlock: function() {
             data.ancientCoin += 8 * data.actions.hearAboutTheLich.level;
+            data.ancientCoinGained += 8 * data.actions.hearAboutTheLich.level;
             setSliderUI("harvestGhostlyField", "geyserFields", 100);
         },
         onCompleteCustom:function() {
@@ -2407,6 +2409,7 @@ actionData = {
         unlockCost:1e6, visible:false, unlocked:false,
         onUnlock: function() {
             data.ancientCoin += 13 * data.actions.hearAboutTheLich.level;
+            data.ancientCoinGained += 13 * data.actions.hearAboutTheLich.level;
             setSliderUI("geyserFields", "destroySiegeEngine", 100);
         },
         onCompleteCustom:function() {
@@ -2431,6 +2434,7 @@ actionData = {
         efficiencyBase:1, isKTL:true, purchased: true, maxLevel:40,
         unlockCost:1e27, visible:false, unlocked:false,
         onUnlock: function() {
+            data.ancientCoinGained += 21 * data.actions.hearAboutTheLich.level;
             data.ancientCoin += 21 * data.actions.hearAboutTheLich.level;
         },
         onCompleteCustom:function() {

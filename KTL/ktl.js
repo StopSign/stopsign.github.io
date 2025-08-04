@@ -32,11 +32,39 @@ function resetKTLSpiral() {
     }
 }
 
+function logKTL() {
+    data.resetLogs.push({
+        stage1: {
+            secondsPerReset: data.secondsPerReset,
+            legacyGained: data.atts.legacy.num
+        },
+        stage2: null
+    });
+    if (data.resetLogs.length > 5) data.resetLogs.shift();
+    data.ancientCoinGained = 0;
+    refreshResetLog();
+}
+
+function trackFirst() {
+    if (!localStorage.getItem('firstResetSent')) {
+        gtag('event', 'first_reset', {
+            seconds_per_reset: data.secondsPerReset
+        });
+        localStorage.setItem('firstResetSent', 'true');
+    }
+}
+
+function refreshResetLog() {
+    document.getElementById("resetLogContainer").innerHTML = renderResetLog();
+}
+
 function initializeKTL() {
     if(!document.getElementById('confirmKTL').checked ||
         !(isDebug || (data.actions.hearAboutTheLich.level >= 1 && data.totalSpellPower >= 1))) {
         return;
     }
+    trackFirst();
+    logKTL();
 
     resetKTLSpiral();
 
@@ -82,6 +110,7 @@ function initializeKTL() {
     unlockAction('overclockTargetingTheLich');
 
 
+
     //first time stuff
     document.getElementById("ancientCoinDisplay").style.display = "";
     data.doneKTL = true;
@@ -92,13 +121,36 @@ function openUseAmuletMenu(isUseable) {
     document.getElementById("useAmuletMenu").style.display = isShowing ? "none" : "flex";
     document.getElementById('amuletConfirm').checked = false;
 
+    //if not useable, hide all the buy buttons, and the bottom section w/ start again buttons
+    for (const upgradeVar in data.upgrades) {
+        const upgrade = data.upgrades[upgradeVar];
+        const upgradeDataObj = upgradeData[upgradeVar];
+
+        views.updateVal(`buyButtonSection_${upgradeVar}`, isUseable&&!upgrade.isFullyBought?"":'none', 'style.display');
+    }
+
+    views.updateVal(`amuletEnabledContainer`, isUseable?"":'none', 'style.display');
+
     updateCardAffordabilityBorders();
+}
+
+function logAmulet() {
+    const currentLog = data.resetLogs[data.resetLogs.length - 1];
+    if (currentLog) {
+        currentLog.stage2 = {
+            legacyGained: data.atts.legacy.num - currentLog.stage1.legacyGained,
+            ancientCoin: data.ancientCoinGained
+        };
+    }
+    refreshResetLog()
 }
 
 function useAmulet() {
     if(!document.getElementById('amuletConfirm').checked) {
         return;
     }
+    logAmulet();
+
     chartData = [];
     data.focusSelected = [];
     data.doneAmulet = true;
@@ -200,6 +252,8 @@ function useAmulet() {
     data.actions.poolMana.generatorSpeed = 6;
 
     switchToPlane(0)
+    data.planeUnlocked[2] = false;
+    views.updateVal(`planeButton2`, "none", "style.display");
 
     showAttColors("awareness");
     revealActionAtts(data.actions.reflect);

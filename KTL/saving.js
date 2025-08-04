@@ -418,6 +418,7 @@ function load() {
         //these are in the skiplist because if, between saves, an action has changed the atts it has, the links need to be reset instead of saved.
         mergeExistingOnly(data, toLoad, "atts", ["linkedActionExpAtts", "linkedActionEfficiencyAtts", "linkedActionOnLevelAtts"]);
         mergeExistingOnly(data, toLoad, "options");
+        data.options.bonusRate = 1
         mergeExistingOnly(data, toLoad, "gameSettings");
 
 
@@ -440,6 +441,7 @@ function load() {
         data.doneAmulet = !!toLoad.doneAmulet;
         data.displayJob = !!toLoad.displayJob;
         data.focusSelected = toLoad.focusSelected ?? [];
+        data.resetLogs = toLoad.resetLogs ?? [];
         data.planeUnlocked = toLoad.planeUnlocked ?? [true, false, false, false];
         data.maxFocusAllowed = toLoad.maxFocusAllowed ?? 3;
         data.focusMult = toLoad.focusMult ?? 2;
@@ -588,7 +590,7 @@ function updateUIOnLoad() {
             actionObj.isRunning = actionObj.plane !== 2;
         }
         clickActionMenu(actionVar, actionObj.currentMenu, true);
-        if (actionObj.unlocked || actionObj.visible) {
+        if (actionObj.visible) {
             revealActionAtts(actionObj);
         }
         if(data.gameSettings.viewDeltas) {
@@ -603,9 +605,6 @@ function updateUIOnLoad() {
         if(data.gameSettings.viewTotalMomentum) {
             views.updateVal(`${actionVar}TotalDownstreamContainer`, "", "style.display");
         }
-    }
-    if(data.actions.inquireAboutMagic.unlocked) { //inbetween inquire and seeing ignite the spark
-        revealAtt("legacy");
     }
     if (data.planeUnlocked[1] || data.planeUnlocked[2]) {
         for (let i = 0; i < data.planeUnlocked.length; i++) {
@@ -625,6 +624,7 @@ function updateUIOnLoad() {
     }
     if(data.doneKTL) {
         views.updateVal(`ancientCoinDisplay`, "", "style.display");
+        revealAtt("legacy");
     }
     if(data.displayJob) {
         document.getElementById("jobDisplay").style.display = "";

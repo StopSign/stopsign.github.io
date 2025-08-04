@@ -248,7 +248,7 @@ let upgradeData = {
         }
     },
     startALittleQuicker: {
-        initialCost:2, costIncrease:3,
+        initialCost:1, costIncrease:3,
         upgradesAvailable:3,
         visible:true,
         customInfo: function(num) {
