@@ -99,6 +99,7 @@ function debug() {
         return;
     }
 
+    document.getElementById("bonus50").style.display = "";
     // data.gameSettings.bonusSpeed = 1;
     data.currentGameState.KTLBonusTimer = 0;
     data.ancientCoin = 5000;
