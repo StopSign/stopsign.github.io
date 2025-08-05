@@ -348,12 +348,11 @@ function addMaxLevel(actionVar, amount) {
 
 
 function isNeeded(actionVar, memo = {}) {
+    if(["overcharge", "overboost", "overdrive"].includes(actionVar)) {
+        return false;
+    }
     if (memo[actionVar] !== undefined) {
         return memo[actionVar];
-    }
-
-    if(["overcharge", "overboost", "overdrive"].includes(actionVar)) {
-        return true;
     }
 
     const actionObj = data.actions[actionVar];
@@ -372,6 +371,9 @@ function isNeeded(actionVar, memo = {}) {
 
     if (dataObj.downstreamVars) {
         for (const downstreamVar of dataObj.downstreamVars) {
+            if(["overcharge", "overboost", "overdrive"].includes(actionVar)) {
+                continue;
+            }
             if (isNeeded(downstreamVar, memo)) {
                 memo[actionVar] = true;
                 return true;
@@ -384,6 +386,10 @@ function isNeeded(actionVar, memo = {}) {
 }
 
 function updateSupplyChain(startActionVar) {
+    if(["overcharge", "overboost", "overdrive"].includes(startActionVar)) {
+        return;
+    }
+
     const memo = {};
     let currentVar = startActionVar;
 
