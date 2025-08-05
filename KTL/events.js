@@ -31,8 +31,6 @@ function validateInput(fromAction, toAction) {
     }
     let value = parseInt(numInput.value);
 
-    console.log(value);
-
     if (value < 0 || value > 100 || isNaN(value)) {
         numInput.value = 0;
         alert("Please enter a number between 0 and 100.");
