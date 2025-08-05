@@ -374,6 +374,8 @@ let maxLevelTop = (data.gameSettings.viewDeltas && data.gameSettings.viewRatio) 
     queueCache(`${actionVar}SmallVersionContainer`)
     queueCache(`${actionVar}SmallVersionTitle`)
     queueCache(`${actionVar}Level2`)
+    queueCache(`${actionVar}MaxLevel2`)
+    queueCache(`${actionVar}SmallVersionLevels`)
 //transform-style: preserve-3d;
     theStr += Raw.html`
         <div id="${actionVar}Container" style="display:none;position:absolute;left:${newX};top:${newY};width:300px;" 
@@ -397,7 +399,9 @@ let maxLevelTop = (data.gameSettings.viewDeltas && data.gameSettings.viewRatio) 
                 style="display:none;text-align:center;margin:50px auto;font-size:12px;width:100px;">
                 <span id="${actionVar}SmallVersionTitle">
                     <span style="font-size:16px;font-weight:bold;">${actionObj.title}</span><br>
-                    Level <span id="${actionVar}Level2" style="font-weight:bold;"></span>
+                    <span id="${actionVar}SmallVersionLevels">
+                        Level <span id="${actionVar}Level2" style="font-weight:bold;"></span> / <span id="${actionVar}MaxLevel2" style="font-weight:bold;"></span>
+                    </span>
                 </span>
             </div>
             ${maxLevel}

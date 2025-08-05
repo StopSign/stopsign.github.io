@@ -175,8 +175,9 @@ let views = {
         views.updateVal(`${actionVar}SmallVersionTitle`, scale < .11 ? "0" : "1" , "style.opacity");
         views.updateVal(`${actionVar}Container`, miniVersion ? "100px" : "" , "style.borderRadius");
 
-        views.updateVal(`${actionVar}Level2`, isMaxLevel?"var(--max-level-color)":"var(--text-primary)", "style.color");
+        views.updateVal(`${actionVar}SmallVersionLevels`, isMaxLevel?"var(--max-level-color)":"var(--text-primary)", "style.color");
         views.updateVal(`${actionVar}Level2`, actionObj.level, "innerText", 1);
+        views.updateVal(`${actionVar}MaxLevel2`, actionObj.maxLevel, "innerText", 1);
         views.updateVal(`${actionVar}IsMaxLevel`, isMaxLevel && !miniVersion ? "":"none", "style.display");
 
         // views.updateVal(`${actionVar}SmallVersionTitle`, scale < .11 ? "none" : "" , "style.display");
