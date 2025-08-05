@@ -352,6 +352,10 @@ function isNeeded(actionVar, memo = {}) {
         return memo[actionVar];
     }
 
+    if(["overcharge", "overboost", "overdrive"].includes(actionVar)) {
+        return true;
+    }
+
     const actionObj = data.actions[actionVar];
     const dataObj = actionData[actionVar];
 

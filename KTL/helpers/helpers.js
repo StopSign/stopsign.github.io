@@ -103,6 +103,22 @@ function intToString2(value, sigFigs) {
     }
 }
 
+function formatEngineering(value) {
+    const absVal = Math.abs(value);
+    const sign   = value < 0 ? "-" : "";
+
+    if (absVal >= 1e5) {
+        const exp      = Math.floor(Math.log10(absVal) / 3) * 3; // exponent → multiple of 3
+        const mantissa = absVal / Math.pow(10, exp);             // scaled mantissa
+        const mantStr  = Number(mantissa.toFixed(2)).toString(); // round & strip trailing zeros
+        return sign + mantStr + "e" + exp;                       // e.g. 5.19e6
+    }
+
+    // Plain form for smaller numbers, still with ≤ 2 decimals
+    return sign + Number(absVal.toFixed(2)).toString();          // e.g. 41894.69
+}
+
+
 function intToString(value, amount, hideSmall) {
     let baseValue = amount ? amount : 3;
     if(value === 0) {
@@ -120,7 +136,8 @@ function intToString(value, amount, hideSmall) {
         if(data.gameSettings.numberType === "engineering") {
             return (isNeg ? "-" : "") + nFormatter(value, 3);
         } else if(data.gameSettings.numberType === "scientific") {
-            return (isNeg ? "-" : "") + Math.abs(value).toExponential(2).replace("+", "");
+            return formatEngineering(value * (isNeg ? -1 : 1));
+
         }
     }
     if (value >= 1000) { //1000 - 10000, should be 6,512 (.1) - 1 if base is > 2
