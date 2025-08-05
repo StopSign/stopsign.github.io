@@ -180,9 +180,9 @@ function toggleMaxLevelCards(show) {
     const displayStyle = show ? 'flex' : 'none';
     for (const upgradeVar in data.upgrades) {
         const upgrade = data.upgrades[upgradeVar];
-        if (upgrade.isFullyBought) {
+        if (upgrade.isFullyBought && upgrade.visible) {
             const cardId = `card_${upgradeVar}`;
-            views.updateVal(cardId, displayStyle, 'style.display');
+            views.updateVal(cardId, !upgrade.visible?"none":displayStyle, 'style.display');
         }
     }
 }
@@ -190,19 +190,20 @@ function toggleAttributeUpgrades(show) {
     const displayStyle = show ? 'flex' : 'none';
     for (const upgradeVar in data.upgrades) {
         const upgrade = data.upgrades[upgradeVar];
-        if (upgrade.attribute) {
+        const upgradeDataObj = upgradeData[upgradeVar];
+        if (upgradeDataObj.attribute) {
             const cardId = `card_${upgradeVar}`;
-            views.updateVal(cardId, displayStyle, 'style.display');
+            views.updateVal(cardId, !upgrade.visible?"none":displayStyle, 'style.display');
         }
     }
 }
-function toggleUnafordableUpgrades(show) {
+function toggleUnaffordableUpgrades(show) {
     const displayStyle = show ? 'flex' : 'none';
     for (const upgradeVar in data.upgrades) {
         const upgrade = data.upgrades[upgradeVar];
-        if (calcUpgradeCost(upgrade, upgrade.upgradesBought) > data.ancientCoin) {
+        if (calcUpgradeCost(upgrade, upgrade.upgradesBought) > data.ancientCoin ) {
             const cardId = `card_${upgradeVar}`;
-            views.updateVal(cardId, displayStyle, 'style.display');
+            views.updateVal(cardId, !upgrade.visible?"none":displayStyle, 'style.display');
         }
     }
 }

@@ -166,6 +166,7 @@ let views = {
 
         let miniVersion = scale < .55;
         let mediumVersion = scale < .65 && !miniVersion;
+        let isMaxLevel = actionObj.maxLevel !== undefined && actionObj.level >= actionObj.maxLevel;
         views.updateVal(`${actionVar}LargeVersionContainer`, !miniVersion?"":"none", "style.display");
         views.updateVal(`${actionVar}SmallVersionContainer`, miniVersion?"":"none", "style.display");
         views.updateVal(`${actionVar}Container`, miniVersion ? "100px" : "" , "style.borderRadius");
@@ -173,6 +174,10 @@ let views = {
 
         views.updateVal(`${actionVar}SmallVersionTitle`, scale < .11 ? "0" : "1" , "style.opacity");
         views.updateVal(`${actionVar}Container`, miniVersion ? "100px" : "" , "style.borderRadius");
+
+        views.updateVal(`${actionVar}Level2`, isMaxLevel?"var(--max-level-color)":"var(--text-primary)", "style.color");
+        views.updateVal(`${actionVar}Level2`, actionObj.level, "innerText", 1);
+        views.updateVal(`${actionVar}IsMaxLevel`, isMaxLevel && !miniVersion ? "":"none", "style.display");
 
         // views.updateVal(`${actionVar}SmallVersionTitle`, scale < .11 ? "none" : "" , "style.display");
 
@@ -185,8 +190,6 @@ let views = {
         //     views.updateVal(`${actionVar}MenuButtons`, mediumVersion?"none":"", "style.display");
         // }
 
-        let isMaxLevel = actionObj.maxLevel !== undefined && actionObj.level >= actionObj.maxLevel;
-        views.updateVal(`${actionVar}IsMaxLevel`, isMaxLevel && !miniVersion ? "":"none", "style.display");
 
         //go through each downstream
         for (let downstreamVar of dataObj.downstreamVars) {
@@ -270,11 +273,9 @@ let views = {
         let exp = (actionObj.exp / actionObj.expToLevel * 100);
         views.updateVal(`${actionVar}ExpBarInner`, `${(exp > 100 ? 100 : exp)}%`, "style.width");
 
-        //When Action is max level
-        let isMaxLevel = actionObj.maxLevel !== undefined && actionObj.level >= actionObj.maxLevel;
-        views.updateVal(`${actionVar}Level2`, isMaxLevel?"var(--max-level-color)":"var(--text-primary)", "style.color");
 
         //When action should be dim
+        let isMaxLevel = actionObj.maxLevel !== undefined && actionObj.level >= actionObj.maxLevel;
         let isQuiet = isMaxLevel && actionObj.resourceIncrease === 0 && actionObj.resourceDecrease === 0 && !actionObj.mouseOnThis;
         views.updateVal(`${actionVar}LargeVersionContainer`, isQuiet?".6":"1", "style.opacity");
         views.updateVal(`${actionVar}Container`, actionObj.mouseOnThis?"100":"0", "style.zIndex");
@@ -347,7 +348,6 @@ let views = {
         }
         roundedNumbers.push(["totalSend", 3]);
         roundedNumbers.push(["efficiencyBase", 2]);
-        roundedNumbers.push(["level2", 1]);
         roundedNumbers.push(["progressMaxIncrease", 0]);
         roundedNumbers.push(["expToLevelIncrease", 0]);
 

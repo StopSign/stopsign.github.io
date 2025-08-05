@@ -120,7 +120,7 @@ function intToString(value, amount, hideSmall) {
         if(data.gameSettings.numberType === "engineering") {
             return (isNeg ? "-" : "") + nFormatter(value, 3);
         } else if(data.gameSettings.numberType === "scientific") {
-            return (isNeg?"-":"") + value.toExponential(2);
+            return (isNeg ? "-" : "") + Math.abs(value).toExponential(2).replace("+", "");
         }
     }
     if (value >= 1000) { //1000 - 10000, should be 6,512 (.1) - 1 if base is > 2
@@ -138,7 +138,7 @@ function intToString(value, amount, hideSmall) {
             if(hideSmall) {
                 return parseFloat("0").toFixed(baseValue);
             }
-            return (isNeg?"-":"") + value.toExponential(3);
+            return (isNeg ? "-" : "") + Math.abs(value).toExponential(2).replace("+", "");
         }
         return (isNeg?"-":"") + parseFloat(value).toPrecision(baseValue);
     }

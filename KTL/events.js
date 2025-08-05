@@ -26,6 +26,9 @@ function setSliderUI(fromAction, toAction, newValue) {
 
 function validateInput(fromAction, toAction) {
     let numInput = document.getElementById(fromAction + "NumInput" + toAction);
+    if(numInput.innerText === "") {
+        return;
+    }
     let value = parseInt(numInput.value);
 
     if (value < 0 || value > 100 || isNaN(value)) {

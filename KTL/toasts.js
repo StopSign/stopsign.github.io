@@ -151,9 +151,10 @@ function initializeToasts() {
             to be able to sign up and join humanity's last stand!`);
 
 
-    // createToast(function() { return },
-    //     "", 0,
-    //     Raw.html``);
+    createToast(function() { return data.actions.infuseTheHide.unlocked },
+        "It's time to cast some real magic!", 0,
+        Raw.html`You have instructions from the hermit on how to create a book of power! Infuse the Hide, Edtch the Circle, Bind the Pages, and Awaken Your Grimoire!<br><br>
+                Then, once you have spell power from the new spell, you can go Fight the Lich!`);
 
     // createToast(function() { return },
     //     "", 0,

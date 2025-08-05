@@ -569,10 +569,19 @@ function createChangelogMenu() {
     return Raw.html`
         <div class="menuTitle">Changelog</div>
         <div class="menuSeparator"></div><br>
-        v1.1, 8/5 (current):<br>
+        v1.2, 8/6 (current):<br>
+        <ul>
+            <li>Removed the + in e for scientific notation</li>
+            <li>Fixed filtering upgrades</li>
+            <li>Options keep on refresh</li>
+            <li>Altered some text descriptions</li>
+            <li>Levels update while in zoomed-out mode now</li>
+            <li>You can fully delete the numbers in sliders now</li>
+        </ul><br>
+        v1.1, 8/5:<br>
         <ul>
             <li>Modified text of on-level attributes</li>
-            <li>Fixed a timing bug for mobile</li>
+            <li>Fixed a timing bug for mobile (mobile still very clunky)</li>
             <li>Added a button to hide Attributes</li>
             <li>Prevented hotkeys while the menu is open</li>
             <li>Some Generator's Exp to gain now updates fluidly.</li>

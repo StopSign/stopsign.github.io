@@ -554,6 +554,7 @@ function mergeExistingOnly2(data, toLoad, varName, skipList = []) {
         Object.assign(dataObj[key], toLoadObj[key]);
     }
 }
+
 function mergeExistingOnly(data, toLoad, varName, skipList = []) {
     const dataObj = data[varName];
     const toLoadObj = toLoad[varName];
@@ -561,27 +562,54 @@ function mergeExistingOnly(data, toLoad, varName, skipList = []) {
         return;
     }
 
-    for (const key in toLoadObj) {
-        if (Object.prototype.hasOwnProperty.call(toLoadObj, key) && Object.prototype.hasOwnProperty.call(dataObj, key)) {
-            const targetObj = dataObj[key];
-            const sourceObj = toLoadObj[key];
-
-            if (typeof targetObj !== "object" || targetObj === null || typeof sourceObj !== "object" || sourceObj === null) {
-                continue;
-            }
-
-            for (const propKey in sourceObj) {
-                if (Object.prototype.hasOwnProperty.call(sourceObj, propKey)) {
-                    if (!skipList.includes(propKey)) {
-                        targetObj[propKey] = sourceObj[propKey];
+    for (const key in dataObj) {
+        if (Object.prototype.hasOwnProperty.call(dataObj, key)) {
+            if (Object.prototype.hasOwnProperty.call(toLoadObj, key)) {
+                const targetObj = dataObj[key];
+                const sourceObj = toLoadObj[key];
+                if (typeof targetObj === "object" && targetObj !== null && typeof sourceObj === "object" && sourceObj !== null) {
+                    for (const propKey in targetObj) {
+                        if (Object.prototype.hasOwnProperty.call(targetObj, propKey)) {
+                            if (Object.prototype.hasOwnProperty.call(sourceObj, propKey)) {
+                                if (!skipList.includes(propKey)) {
+                                    targetObj[propKey] = sourceObj[propKey];
+                                }
+                            }
+                        }
                     }
+                    // Copy any props in sourceObj not already in targetObj (and not in skipList)
+                    for (const propKey in sourceObj) {
+                        if (Object.prototype.hasOwnProperty.call(sourceObj, propKey)) {
+                            if (!Object.prototype.hasOwnProperty.call(targetObj, propKey) && !skipList.includes(propKey)) {
+                                targetObj[propKey] = sourceObj[propKey];
+                            }
+                        }
+                    }
+                } else if (!skipList.includes(key)) {
+                    dataObj[key] = sourceObj;
                 }
+            }
+        }
+    }
+
+    for (const key in toLoadObj) {
+        if (Object.prototype.hasOwnProperty.call(toLoadObj, key) && !Object.prototype.hasOwnProperty.call(dataObj, key)) {
+            if (!skipList.includes(key)) {
+                dataObj[key] = toLoadObj[key];
             }
         }
     }
 }
 
+
 function updateUIOnLoad() {
+
+    document.getElementById('viewDeltasSwitch').firstElementChild.style.left = data.gameSettings.viewDeltas ? "50%" : "0";
+    document.getElementById('numberTypeSwitch').firstElementChild.style.left = data.gameSettings.numberType==="scientific" ? "50%" : "0";
+    document.getElementById('viewRatioSwitch').firstElementChild.style.left = data.gameSettings.viewRatio ? "50%" : "0";
+    document.getElementById('viewTotalMomentumSwitch').firstElementChild.style.left = data.gameSettings.viewTotalMomentum ? "50%" : "0";
+    document.getElementById('viewZeroButtonsSwitch').firstElementChild.style.left = data.gameSettings.viewAll0Buttons ? "50%" : "0";
+
     for (let actionVar in data.actions) {
         let actionObj = data.actions[actionVar];
         if(data.gameState === "KTL") {
@@ -650,6 +678,7 @@ function updateUIOnLoad() {
     for(let attVar in data.atts) {
         recalcAttMult(attVar)
     }
+
 }
 
 function reapplyAttentionSelected() {

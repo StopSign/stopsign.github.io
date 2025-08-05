@@ -20,7 +20,7 @@ function loop() {
     let ticksAvailable = Math.floor(elapsed / tickInterval);
     let didSomething = false;
 
-    const maxTicksPerLoop = 20;
+    const maxTicksPerLoop = 40;
     let ticksProcessed = Math.min(ticksAvailable, maxTicksPerLoop);
 
     if (ticksAvailable > maxTicksPerLoop) {

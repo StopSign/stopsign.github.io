@@ -136,7 +136,6 @@ function gameTick() {
 
     upgradeUpdates()
     calcDeltas();
-
 }
 
 function calcDeltas() {

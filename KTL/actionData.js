@@ -887,8 +887,7 @@ let actionData = {
         
         So, I changed the target of Overclock, from itself to a new target: Kill the Lich. I felt my thoughts collapse, no longer held up 
         by the artificial momentum. I became focused, with only a single goal in mind: letting my ability life my legs, move my mouth, and swing my sword. 
-        For better or worse, I was along for the ride.<br><br>`},
-        onLevelText:{english:"Increases Anxiety gained when Overclock's Target is switched."}
+        For better or worse, I was along for the ride.<br><br>`}
     },
 
 //--- From upgrades ---
@@ -1682,7 +1681,8 @@ actionData = {
         onLevelAtts:[["adaptability", 16]],
         expAtts:[],
         efficiencyAtts:[["adaptability", .05]],
-        unlockMessage:{english:"On unlock, set job to Guild Receptionist for a base wage of $500k."}
+        unlockMessage:{english:"On unlock, set job to Guild Receptionist for a base wage of $500k."},
+        onLevelText:{english:"Increase wage +50%."}
     },
     messenger: {
         tier:1, plane:0,
@@ -1701,7 +1701,8 @@ actionData = {
         onLevelAtts:[["adaptability", 32]],
         expAtts:[],
         efficiencyAtts:[["adaptability", .05]],
-        unlockMessage:{english:"On unlock, set job to messenger for a base wage of $4m."}
+        unlockMessage:{english:"On unlock, set job to messenger for a base wage of $4m."},
+        onLevelText:{english:"Increase wage +50%."}
     },
     townCrier: {
         tier:1, plane:0,
@@ -3230,7 +3231,6 @@ actionData = {
             unveilAction("overcharge")
             unveilAction("combatSpells")
             unveilAction("recoverSpells")
-            unveilAction("supportSpells")
         },
         onLevelAtts:[["spark", 3]],
         expAtts:[],
@@ -3380,6 +3380,7 @@ actionData = {
         unlockCost:6000, visible:false, unlocked:false, purchased: true,
         onLevelCustom: function() {
             unveilAction('prepareExternalSpells')
+            unveilAction("supportSpells")
             levelAllCharges()
         },
         onLevelAtts:[["integration", 200]],
