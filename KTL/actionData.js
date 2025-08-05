@@ -389,10 +389,6 @@ let actionData = {
                 addResourceTo(data.actions[actionObj.generatorTarget], actionObj.resourceToAdd);
             }
 
-            //Adds exp right after this function
-            actionObj.expToAddBase = actionObj.resourceToAdd;
-            actionObj.expToAdd = actionObj.expToAddBase * actionObj.expToAddMult * calcUpgradeMultToExp(actionObj);
-
             views.scheduleUpdate('makeMoneyResourceSent', intToString(actionObj.resourceToAdd, 2), "textContent")
             views.scheduleUpdate('makeMoneyResourceTaken', intToString(resourceTaken, 2), "textContent")
         },
@@ -409,6 +405,8 @@ let actionData = {
             let resourceTaken = actionObj.resource * actionObj.tierMult();
             actionObj.resourceToAdd = dataObj.actionPowerFunction(resourceTaken) *
                 actionObj.actionPower * actionObj.upgradeMult;
+            actionObj.expToAddBase = actionObj.resourceToAdd;
+            actionObj.expToAdd = actionObj.expToAddBase * actionObj.expToAddMult * calcUpgradeMultToExp(actionObj);
         },
         updateUpgradeMult:function() {
             let upgradeMult = 1;
@@ -740,10 +738,6 @@ let actionData = {
                 addResourceTo(data.actions[actionObj.generatorTarget], actionObj.resourceToAdd);
             }
 
-            //Adds exp right after this function
-            actionObj.expToAddBase = actionObj.resourceToAdd;
-            actionObj.expToAdd = actionObj.expToAddBase * actionObj.expToAddMult * calcUpgradeMultToExp(actionObj);
-
             views.scheduleUpdate('socializeResourceSent', intToString(actionObj.resourceToAdd, 2), "textContent")
             views.scheduleUpdate('socializeResourceTaken', intToString(resourceTaken, 2), "textContent")
         },
@@ -756,6 +750,8 @@ let actionData = {
                 actionObj.actionPowerMult * (actionObj.efficiency/100);
             let resourceTaken = actionObj.resource * actionObj.tierMult();
             actionObj.resourceToAdd = dataObj.actionPowerFunction(resourceTaken) * actionObj.actionPower * actionObj.upgradeMult;
+            actionObj.expToAddBase = actionObj.resourceToAdd;
+            actionObj.expToAdd = actionObj.expToAddBase * actionObj.expToAddMult * calcUpgradeMultToExp(actionObj);
         },
         onUnlock: function() {
             // unveilAction('neighborlyTies');
@@ -2240,10 +2236,6 @@ actionData = {
             addResourceTo(data.actions["resolve"], actionObj.resourceToAdd);
             addResourceTo(data.actions["worry"], actionObj.resourceToAdd);
 
-            //Adds exp right after this function
-            actionObj.expToAddBase = actionObj.resourceToAdd;
-            actionObj.expToAdd = actionObj.expToAddBase * actionObj.expToAddMult * calcUpgradeMultToExp(actionObj);
-
 
             views.scheduleUpdate('worryResourceSent', intToString(actionObj.resourceToAdd, 2), "textContent")
             views.scheduleUpdate('worryResourceTaken', intToString(actionObj.resourceToAdd, 2), "textContent")
@@ -2259,6 +2251,8 @@ actionData = {
             actionObj.resourceToAdd = dataObj.actionPowerFunction(resourceTaken) *
                 actionObj.actionPower * actionObj.upgradeMult;
             data.actions.resolve.resourceIncrease = actionObj.resourceToAdd * actionObj.progressGain / actionObj.progressMax;
+            actionObj.expToAddBase = actionObj.resourceToAdd;
+            actionObj.expToAdd = actionObj.expToAddBase * actionObj.expToAddMult * calcUpgradeMultToExp(actionObj);
         },
         actionPowerFunction: function(resource) {
             return resource / 10;
@@ -3079,10 +3073,6 @@ actionData = {
 
             addResourceTo(data.actions[actionObj.generatorTarget], actionObj.resourceToAdd);
 
-            //Adds exp right after this function
-            actionObj.expToAddBase = actionObj.resourceToAdd;
-            actionObj.expToAdd = actionObj.expToAddBase * actionObj.expToAddMult * calcUpgradeMultToExp(actionObj);
-
             views.scheduleUpdate('echoKindleResourceSent', intToString(actionObj.resourceToAdd, 2), "textContent")
         },
         updateMults: function () {
@@ -3094,6 +3084,8 @@ actionData = {
                 actionObj.actionPowerMult * (actionObj.efficiency/100);
             actionObj.resourceToAdd = dataObj.actionPowerFunction(actionObj.resource) * actionObj.tierMult() *
                 actionObj.actionPower * actionObj.upgradeMult;
+            actionObj.expToAddBase = actionObj.resourceToAdd;
+            actionObj.expToAdd = actionObj.expToAddBase * actionObj.expToAddMult * calcUpgradeMultToExp(actionObj);
         },
         actionPowerFunction: function(resource) {
             if(resource < 1) {
@@ -3141,9 +3133,6 @@ actionData = {
 
             addResourceTo(data.actions[dataObj.generatorTarget], actionObj.resourceToAdd);
 
-            actionObj.expToAddBase = actionObj.resourceToAdd;
-            actionObj.expToAdd = actionObj.expToAddBase * actionObj.expToAddMult * calcUpgradeMultToExp(actionObj);
-
             views.scheduleUpdate('poolManaResourceTaken', intToString(sparkManaObj.resource, 2), "textContent")
             views.scheduleUpdate('poolManaResourceSent', intToString(actionObj.resourceToAdd, 2), "textContent")
 
@@ -3156,6 +3145,8 @@ actionData = {
             actionObj.actionPower = actionObj.actionPowerBase *
                 actionObj.actionPowerMult * (actionObj.efficiency/100);
             actionObj.resourceToAdd = data.actions.sparkMana.resource * actionObj.actionPower * actionObj.upgradeMult;
+            actionObj.expToAddBase = actionObj.resourceToAdd;
+            actionObj.expToAdd = actionObj.expToAddBase * actionObj.expToAddMult * calcUpgradeMultToExp(actionObj);
         },
         onUnlock: function() {
         },

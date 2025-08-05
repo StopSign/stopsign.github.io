@@ -569,7 +569,15 @@ function createChangelogMenu() {
     return Raw.html`
         <div class="menuTitle">Changelog</div>
         <div class="menuSeparator"></div><br>
-        v1.0 (current): first release to web<br>
-        v.1: very rough
+        v1.1, 8/5 (current):<br>
+        <ul>
+            <li>Modified text of on-level attributes</li>
+            <li>Fixed a timing bug for mobile</li>
+            <li>Added a button to hide Attributes</li>
+            <li>Prevented hotkeys while the menu is open</li>
+            <li>Some Generator's Exp to gain now updates fluidly.</li>
+        </ul><br> 
+        v1.0, 8/5: first release to web<br>
+        v.1,  : very rough
         `;
 }

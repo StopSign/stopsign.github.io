@@ -506,9 +506,9 @@ function statMenuHideButton() {
     let attDisplay = view.cached.attDisplay;
     if(attDisplay.style.display !== "none") {
         attDisplay.style.display = "none";
-        button.style.display = "";
+        button.style.display = "inline-block";
     } else {
-        attDisplay.style.display = "block";
+        attDisplay.style.display = "inline-block";
         button.style.display = "none";
     }
 }

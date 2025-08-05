@@ -485,7 +485,7 @@ function generateOutsideAttDisplay(actionObj, attObj, type) {
     let tooltipText;
 
     if (type === "add") {
-        tooltipText = `${text} to ${capitalizeFirst(statName)}`;
+        tooltipText = `${text} to ${capitalizeFirst(statName)} per level.`;
     } else if (type === "eff") {
         tooltipText = `${text} of ${capitalizeFirst(statName)}'s bonus is multiplied to base efficiency`;
     } else if (type === "exp") {
@@ -524,7 +524,7 @@ function generateActionOnLevelAtts(actionObj) {
             +<span style="color:var(--text-primary)"><b>${attObj[1]}</b></span> to 
             <img src="img/${attVar}.svg" alt="${attVar}" 
             style="margin:1px;width:20px;height:20px;vertical-align:top;background:var(--attribute-add-bg-color)" />
-            <span style="color:var(--text-primary)"><b>${capitalizeFirst(attObj[0])}</b></span>
+            <span style="color:var(--text-primary);font-weight:bold;">${capitalizeFirst(attObj[0])}</span> per level
         </div>`;
     }
     onLevelAttsText += `</div>`

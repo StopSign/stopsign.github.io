@@ -3,23 +3,27 @@
 // =================================================================
 // This script runs in the background and handles all game logic calculations.
 function loop() {
-    if (timerId !== null) {
-        clearTimeout(timerId);
-    }
+    if (timerId !== null) clearTimeout(timerId);
 
     const now = performance.now();
     if (lastTickTime === 0) lastTickTime = now;
 
     const tickInterval = 1000 / data.gameSettings.ticksPerSecond;
+
+    const maxElapsed = 2000; // ms (2 seconds max catch-up)
     let elapsed = now - lastTickTime;
+    if (elapsed > maxElapsed) {
+        lastTickTime = now - maxElapsed;
+        elapsed = maxElapsed;
+    }
+
     let ticksAvailable = Math.floor(elapsed / tickInterval);
     let didSomething = false;
 
-    const maxTicksPerLoop = 10;
-    let ticksProcessed = ticksAvailable;
+    const maxTicksPerLoop = 20;
+    let ticksProcessed = Math.min(ticksAvailable, maxTicksPerLoop);
 
     if (ticksAvailable > maxTicksPerLoop) {
-        ticksProcessed = maxTicksPerLoop;
         const extraTicks = ticksAvailable - maxTicksPerLoop;
         data.currentGameState.bonusTime += extraTicks * tickInterval;
     }
@@ -53,6 +57,7 @@ function loop() {
 
     timerId = setTimeout(loop, 1000 / data.gameSettings.ticksPerSecond);
 }
+
 
 
 

@@ -24,20 +24,20 @@ document.addEventListener("keydown", function(e) {
     } else if(keysPressed['4']) {
         switchToPlane(3)
     }
+    let isShowing = document.getElementById("helpMenu").style.display !== "none";
 
-    if (keysPressed['q']) {
+    if (keysPressed['q'] && !isShowing) {
         setZoomNoMouse(scale - scaleStep*2)
     }
-    if (keysPressed['e']) {
+    if (keysPressed['e'] && !isShowing) {
         setZoomNoMouse(scale + scaleStep*2)
     }
 
 
-    if(keysPressed['r']) {
+    if(keysPressed['r'] && isShowing) {
         actionTitleClicked('overclock');
     }
 
-    let isShowing = document.getElementById("helpMenu").style.display !== "none";
     if(isShowing && !animationFrameId && ['w', 's', 'arrowup', 'arrowdown'].includes(key)) {
         moveMenuScroll();
     }
