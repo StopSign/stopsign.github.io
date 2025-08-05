@@ -26,13 +26,15 @@ function setSliderUI(fromAction, toAction, newValue) {
 
 function validateInput(fromAction, toAction) {
     let numInput = document.getElementById(fromAction + "NumInput" + toAction);
-    if(numInput.innerText === "") {
+    if(numInput.value === "") {
         return;
     }
     let value = parseInt(numInput.value);
 
+    console.log(value);
+
     if (value < 0 || value > 100 || isNaN(value)) {
-        numInput.value = "0";
+        numInput.value = 0;
         alert("Please enter a number between 0 and 100.");
     }
 }

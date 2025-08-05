@@ -577,6 +577,7 @@ function createChangelogMenu() {
             <li>Altered some text descriptions</li>
             <li>Levels update while in zoomed-out mode now</li>
             <li>You can fully delete the numbers in sliders now</li>
+            <li>Fixing number validation</li>
         </ul><br>
         v1.1, 8/5:<br>
         <ul>
