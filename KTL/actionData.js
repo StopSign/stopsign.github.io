@@ -114,7 +114,7 @@ let actionData = {
             ["pulse", .01]],
         efficiencyAtts: [["cycle", 1]],
         onCompleteText: {english:Raw.html`
-                +<span style="font-weight:bold;" id="overclockResourceSent">???</span> Mana was added.<br>
+                +<span style="font-weight:bold;" id="overclockResourceSent">???</span> Momentum was added.<br>
                 `},
     },
     reflect: {

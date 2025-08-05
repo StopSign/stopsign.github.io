@@ -101,13 +101,13 @@ actionData.spendMoney.storyText={english:"At this village there are not many thi
 actionData.meetVillageLeaderScott.storyText = {english:Raw.html`
 Introductions with Scott as a village leader are nothing to note - he tells me not to make trouble and that he's open to chatting about any problems. He wants to help make the community work well. He seems like a good man. Past the introductions, when I really strike up a conversation with him, he opens up. 
 
-"Did you see any birds on the road?" the softly smiling man asked about anything interesting he'd seen. I didn't think to look, and said as much. "You should! There's a particularly golden one I only got a glimpse of!" He's passionate about this, but I am not. There might still be something worthwhile in finding this "golden bird" though.
+"Did you see any birds on the road?" the softly smiling man asks me, after we got the pleasantries out of the way. I didn't think to look for the birds, and told him so. "You should have! There's a particularly golden one I only got a glimpse of!" He's passionate about this, but I am not. There might still be something worthwhile in finding this "golden bird" though.
 
 I ask if I can help out, and he gives me a job! It's just helping him out with some chores, but he pays me for it.
 
 Scott is really nice. I wish more people like him existed - my life would have gone differently. The more I chat with him, the more I remember the few soldiers I knew who were similar. It's a good connection, a good memory, and I have precious few of those. 
 
-It also reminds me of how those men died, which starts to be more than I can handle for the moment. I have to start reminding myself that this is Someowhere Safe, but ultimately I am not quite up to do the task of socialization. I'm glad I ended up here though, and for the peace it has offered me.
+It also reminds me of how those men died, which starts to be more than I can handle for the moment. I have to start reminding myself that this is somewhere safe, but ultimately I am not quite up to do the task of socialization. I'm glad I ended up here though, and for the peace it has offered me.
 `};
 //Mana
 // actionData.gatherMana.onCompleteText = {english:"+<b><span id=\"gatherManaActionPower\">1</span></b> Mana to Expel Mana<br>"};

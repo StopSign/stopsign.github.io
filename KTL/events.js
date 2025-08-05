@@ -325,6 +325,9 @@ function clickActionMenu(actionVar, menuVar, isLoad) {
     if(!menuVar) {
         return;
     }
+    if(!isLoad && (!actionObj.unlocked || !actionObj.visible)) {
+        return;
+    }
 
     if(actionObj.currentMenu && !isLoad) {
         // view.cached[actionVar + "_" + actionObj.currentMenu + "MenuButton"].style.removeProperty("background-color");
