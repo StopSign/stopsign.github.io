@@ -506,8 +506,8 @@ function createMenu() {
         onclick="stopClicks(event)"
         style="background:var(--bg-secondary);padding:20px;border-radius:6px;max-width:1200px;min-width:600px;width:90%;text-align:center;position:relative;color:var(--text-primary);border:1px solid var(--border-color);height:90vh;max-height:90vh;display:block;overflow:hidden;">
         
-        <div class="menuTitle" style="height:50px;box-sizing:border-box;">Options and Info Menu</div>
-        <div class="menuSeparator" style="height:10px;box-sizing:border-box;"></div>
+        <div class="menuTitle" style="box-sizing:border-box;">Options and Info Menu</div>
+        <div class="menuSeparator" style="box-sizing:border-box;"></div>
         
         <div style="width:100%;height:calc(100% - 60px);min-height:0;position:relative;display:block;overflow:hidden;font-size:0;">
             <div id="menuIndexContainer"

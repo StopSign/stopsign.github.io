@@ -37,7 +37,12 @@ document.addEventListener("keydown", function(e) {
         actionTitleClicked('overclock');
     }
 
-    if (!animationFrameId && ['w', 'a', 's', 'd', 'r', 'arrowleft', 'arrowup', 'arrowdown', 'arrowright'].includes(key)) {
+    let isShowing = document.getElementById("helpMenu").style.display !== "none";
+    if(isShowing && !animationFrameId && ['w', 's', 'arrowup', 'arrowdown'].includes(key)) {
+        moveMenuScroll();
+    }
+
+    if (!isShowing && !animationFrameId && ['w', 'a', 's', 'd', 'r', 'arrowleft', 'arrowup', 'arrowdown', 'arrowright'].includes(key)) {
         moveActionContainer();
     }
 });
@@ -50,6 +55,23 @@ document.addEventListener("keyup", function(e) {
         animationFrameId = null;
     }
 });
+
+function moveMenuScroll() {
+    const container = document.getElementById(`${selectedMenu}TextContainer`);
+    if (!container) return;
+
+    const movementStep = 20;
+
+    if (keysPressed['w'] || keysPressed['arrowup']) {
+        container.scrollTop -= movementStep;
+    }
+    if (keysPressed['s'] || keysPressed['arrowdown']) {
+        container.scrollTop += movementStep;
+    }
+
+    animationFrameId = requestAnimationFrame(moveMenuScroll);
+}
+
 
 function moveActionContainer() {
     let shiftMod = keysPressed['shift'] ? 3 : 1;
@@ -68,7 +90,6 @@ function moveActionContainer() {
     if(['w', 'a', 's', 'd', 'arrowleft', 'arrowup', 'arrowdown', 'arrowright'].some(key => keysPressed[key])) { //isMoving
         actionContainer.style.transform = `translate(${transformX[data.planeTabSelected]}px, ${transformY[data.planeTabSelected]}px) scale(${scale})`;
     }
-
 
 
     // forceRedraw(windowElement);
