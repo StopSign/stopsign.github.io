@@ -153,7 +153,7 @@ function initializeToasts() {
 
     createToast(function() { return data.actions.infuseTheHide.unlocked },
         "It's time to cast some real magic!", 0,
-        Raw.html`You have instructions from the hermit on how to create a book of power! Infuse the Hide, Edtch the Circle, Bind the Pages, and Awaken Your Grimoire!<br><br>
+        Raw.html`You have instructions from the hermit on how to create a book of power! Infuse the Hide, Etch the Circle, Bind the Pages, and Awaken Your Grimoire!<br><br>
                 Then, once you have spell power from the new spell, you can go Fight the Lich!`);
 
     // createToast(function() { return },
