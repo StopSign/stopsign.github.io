@@ -377,6 +377,9 @@ let maxLevelTop = (data.gameSettings.viewDeltas && data.gameSettings.viewRatio) 
     queueCache(`${actionVar}MaxLevel2`)
     queueCache(`${actionVar}SmallVersionLevels`)
 //transform-style: preserve-3d;
+
+    let maxLevelDiv = `<span style="display:${actionObj.maxLevel ? "" : "none"}">/ <span id="${actionVar}MaxLevel2" style="font-weight:bold;"></span></span>`;
+
     theStr += Raw.html`
         <div id="${actionVar}Container" style="display:none;position:absolute;left:${newX};top:${newY};width:300px;" 
             onmouseenter="mouseOnAction('${actionVar}')" onmouseleave="mouseOffAction('${actionVar}')">
@@ -400,7 +403,7 @@ let maxLevelTop = (data.gameSettings.viewDeltas && data.gameSettings.viewRatio) 
                 <span id="${actionVar}SmallVersionTitle">
                     <span style="font-size:16px;font-weight:bold;">${actionObj.title}</span><br>
                     <span id="${actionVar}SmallVersionLevels">
-                        Level <span id="${actionVar}Level2" style="font-weight:bold;"></span> / <span id="${actionVar}MaxLevel2" style="font-weight:bold;"></span>
+                        Level <span id="${actionVar}Level2" style="font-weight:bold;"></span>${maxLevelDiv}
                     </span>
                 </span>
             </div>
