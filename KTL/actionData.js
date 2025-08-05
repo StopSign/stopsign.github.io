@@ -1672,7 +1672,7 @@ actionData = {
         wage: 500000,
         unlockCost:1e20, visible:false, unlocked:false, purchased: true,
         onLevelCustom: function() {
-            data.actions.guildReceptionist.wage += actionData.guildReceptionist.wage/4;
+            data.actions.guildReceptionist.wage += actionData.guildReceptionist.wage/2;
             changeJob('guildReceptionist');
         },
         onUnlock:function() {
@@ -1692,7 +1692,7 @@ actionData = {
         wage: 4e6,
         unlockCost:1e22, visible:false, unlocked:false, purchased: true,
         onLevelCustom: function() {
-            data.actions.messenger.wage += actionData.messenger.wage/4;
+            data.actions.messenger.wage += actionData.messenger.wage/2;
             changeJob('messenger');
         },
         onUnlock:function() {
@@ -1712,7 +1712,7 @@ actionData = {
         wage: 700,
         unlockCost:1e21, visible:false, unlocked:false, purchased: true,
         onLevelCustom: function() {
-            data.actions.townCrier.wage += actionData.townCrier.wage/4;
+            data.actions.townCrier.wage += actionData.townCrier.wage/2;
             changeJob('townCrier');
             if(data.actions.townCrier.level >= 2) {
                 unveilAction('storyTeller');

@@ -141,7 +141,7 @@ function initializeToasts() {
         "What did they just say?", 0,
         Raw.html`You whirl around, fear clawing down your spine, hoping that you did not just hear the word 
         "lich" on someone's tongue. You need to know more about this.<br><br>
-        Get Gossip Around Coffee to level 1.`);
+        Get Gossip Around Coffee to level 5.`);
 
     createToast(function() { return data.actions.hearAboutTheLich.unlocked },
         "Something Must Be Done", 0,

@@ -341,6 +341,13 @@ const patches = {
         bridgeOfBone: {
             preventReset: true
         },
+        forgottenShrine: {
+            preventReset: true,
+        },
+        messenger: {
+            preventReset: true,
+        }
+
     },
     upgrades:{
         stopLettingOpportunityWait: {
