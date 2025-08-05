@@ -868,7 +868,7 @@ let actionData = {
             Kill the Lich!</span>
         `,
         unlockMessage:{english:"Unlocks when Gossip Around Coffee is level 5."},
-        extraInfo: {english:Raw.html`This action gains (Total Momentum / 1e24)^.25 * (Conversations on Gossip / 1e12)^.5 Fear 
+        extraInfo: {english:Raw.html`This action gains (Momentum)^0.25 * (Conversation)^0.5 / 1e12 Fear 
         for each Overclock complete, which is a gain of
         <span style="font-weight:bold;" id="hearAboutTheLichActionPower">0</span>`},
         storyText: {english:Raw.html`
