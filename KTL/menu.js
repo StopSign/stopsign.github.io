@@ -345,7 +345,7 @@ function createOptionsMenu() {
 
   <div style="display:flex;flex-direction:column;gap:10px;border-top:1px solid #aaa;padding-top:20px;">
     <label for="exportImportSave" style="font-size:13px;">Put your save here to import (import a clear save to hard reset):</label>
-    <input type="text" id="exportImportSave" style="border:1px solid #aaa;padding:8px;border-radius:4px;font-size:13px;width:100%;">
+    <input type="text" id="exportImportSave" style="border:1px solid #aaa;padding:8px;border-radius:4px;font-size:13px;width:100%;" oncontextmenu="event.stopPropagation(); return true;">
     <div style="display:flex;align-items:center;gap:8px;">
       <input type="checkbox" id="confirmImportCheckbox" style="width:14px;height:14px;cursor:pointer;">
       <label for="confirmImportCheckbox" style="font-size:14px;cursor:pointer;">Confirm</label>

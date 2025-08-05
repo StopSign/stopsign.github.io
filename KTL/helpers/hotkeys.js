@@ -3,6 +3,13 @@ let movementStep = 10;
 let animationFrameId;
 
 document.addEventListener("keydown", function(e) {
+    const active = document.activeElement;
+    if (active && 'id' in active) {
+        if (active.id && active.id.indexOf('NumInput') !== -1) {
+            return;
+        }
+    }
+
     let key = e.key.toLowerCase();
     keysPressed[key] = {
         code: e.keyCode || e.charCode,
