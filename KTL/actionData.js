@@ -3167,7 +3167,7 @@ actionData = {
         expAtts:[["amplification", 1]],
         efficiencyAtts:[["amplification", .01], ["pulse", .25]],
         onCompleteText: {english:Raw.html`
-                -<span style="font-weight:bold;" id="poolManaResourceTaken">???</span> Mana was taken from Spark Mana, converted to<br>
+                -<span style="font-weight:bold;" id="poolManaResourceTaken">???</span> Spark was taken from Spark Mana, converted to<br>
                 +<span style="font-weight:bold;" id="poolManaResourceSent">???</span> Mana, added to this action.<br>
                 `},
         extraInfo: {english:Raw.html`Exp & Mana gain = Action Power * Efficiency.`}
