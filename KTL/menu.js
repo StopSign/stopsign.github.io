@@ -490,7 +490,7 @@ function changeDarkMode() {
 }
 
 function addMenuTextContainer(menuVar, menuText) {
-    let menuContainer = "<div id='"+menuVar+"TextContainer' style='display:none;padding:10px;text-align:left;font-size:16px;'>" +
+    let menuContainer = "<div id='" + menuVar + "TextContainer' style='display:none;padding:10px;text-align:left;font-size:16px;height:100%;max-height:100%;overflow-y:auto;box-sizing:border-box;'>" +
         menuText +
         "</div>";
 
@@ -500,19 +500,29 @@ function addMenuTextContainer(menuVar, menuText) {
 }
 
 function createMenu() {
-let helpMenu = Raw.html`
-    <div id="helpMenu" class="fullScreenGrey" style="display:none;" onClick="clickMenuButton()">
-        <div class="centerMenuBox" onclick="stopClicks(event)">
-            <div class="menuTitle">Options and Info Menu</div>
-            <div class="menuSeparator"></div>
-            <div id="menuIndexContainer" style="height:750px;width:30%;background-color:var(--menu-tab-background-color);
-                display:inline-block;vertical-align:top;"></div><div id="menuTextDisplayContainer" style="height:750px;
-                width:70%;background-color:var(--menu-background-color);display:inline-block;vertical-align:top;overflow-y:auto;will-change: transform;"></div>
+    let helpMenu = `
+   <div id="helpMenu" class="fullScreenGrey" style="display:none;" onclick="clickMenuButton()">
+    <div class="centerMenuBox"
+        onclick="stopClicks(event)"
+        style="background:var(--bg-secondary);padding:20px;border-radius:6px;max-width:1200px;min-width:600px;width:90%;text-align:center;position:relative;color:var(--text-primary);border:1px solid var(--border-color);height:90vh;max-height:90vh;display:block;overflow:hidden;">
+        
+        <div class="menuTitle" style="height:50px;box-sizing:border-box;">Options and Info Menu</div>
+        <div class="menuSeparator" style="height:10px;box-sizing:border-box;"></div>
+        
+        <div style="width:100%;height:calc(100% - 60px);min-height:0;position:relative;display:block;overflow:hidden;font-size:0;">
+            <div id="menuIndexContainer"
+                style="display:inline-block;width:30%;background-color:var(--menu-tab-background-color);vertical-align:top;height:100%;overflow-y:auto;min-height:0;box-sizing:border-box;font-size:16px;">
+            </div>
+            <div id="menuTextDisplayContainer"
+                style="display:inline-block;width:70%;background-color:var(--menu-background-color);vertical-align:top;height:100%;min-height:0;box-sizing:border-box;overflow-y:auto;position:relative;font-size:16px;">
+            </div>
         </div>
     </div>
+</div>
     `;
     document.getElementById("helpMenuContainer").innerHTML = helpMenu;
 }
+
 
 let menuInfo = [];
 let selectedMenu = null;

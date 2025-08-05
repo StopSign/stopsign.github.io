@@ -279,6 +279,9 @@ body {
     position:relative;
     color: var(--text-primary);
     border: 1px solid var(--border-color);
+    max-height:90vh;
+    display: flex;
+    flex-direction: column;
 }
 
 .title {
