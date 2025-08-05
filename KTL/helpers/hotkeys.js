@@ -17,7 +17,8 @@ document.addEventListener("keydown", function(e) {
     };
 
     if (keysPressed['escape']) {
-        // deselect();
+        document.getElementById("helpMenu").style.display = "none";
+        closeModal()
     }
     if(keysPressed[' ']) {
         pauseGame();
