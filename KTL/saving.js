@@ -667,9 +667,8 @@ function save() {
 
 function exportSave() {
     save();
-    let encoded = encode(window.localStorage[saveName]);
     // console.log(encoded);
-    document.getElementById("exportImportSave").value = encoded;
+    document.getElementById("exportImportSave").value = window.localStorage[saveName];
     document.getElementById("exportImportSave").select();
     document.execCommand('copy');
     document.getElementById("exportImportSave").value = "";
@@ -684,6 +683,5 @@ function importSave() {
         return;
     }
     window.localStorage[saveName] = document.getElementById("exportImportSave").value;
-
-    load();
+    location.reload();
 }
