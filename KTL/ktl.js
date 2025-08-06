@@ -207,7 +207,7 @@ function useAmulet() {
             }
         }
 
-        let propsToPreserve = ['unlocked', 'unlockCost'];
+        let propsToPreserve = ['unlocked', 'unlockCost', 'currentMenu'];
         let originalState = {};
 
         for (let prop of propsToPreserve) {
