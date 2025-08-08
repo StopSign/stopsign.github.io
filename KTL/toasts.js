@@ -156,9 +156,9 @@ function initializeToasts() {
         Raw.html`You have instructions from the hermit on how to create a book of power! Infuse the Hide, Etch the Circle, Bind the Pages, and Awaken Your Grimoire!<br><br>
                 Then, once you have spell power from the new spell, you can go Fight the Lich!`);
 
-    // createToast(function() { return },
-    //     "", 0,
-    //     Raw.html``);
+    createToast(function() { return data.actions.harvestGhostlyField.unlocked },
+        "Thanks for playing!", 0,
+        Raw.html`You've encountered all the content that exists currenlty. Follow the discord for the roadmap and updates!`);
 
 
     showAllValidToasts(); //ran automatically every second. Have to manually add it when you want faster

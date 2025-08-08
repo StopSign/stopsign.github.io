@@ -585,6 +585,7 @@ function createChangelogMenu() {
             <li>Sending resources caps at 100% now, not 10%. Removed info about it. This hopefully reduces confusion with the focus bars. TBD if this is too much</li>
             <li>FPS setting will save correclty</li>
             <li>Added version in top right</li>
+            <li>Added a mesage at unlocking Ghostly Fields saying "that's all for now"</li>
         </ul><br>
         v1.2, 8/6:<br>
         <ul>
