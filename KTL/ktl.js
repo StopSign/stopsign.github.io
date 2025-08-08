@@ -91,7 +91,7 @@ function initializeKTL() {
 
     data.actions.overclockTargetingTheLich.resource = data.totalMomentum;
     data.actions.worry.resource = data.actions.hearAboutTheLich.resource;
-    data.actions.overclockTargetingTheLich.updateMults();
+    actionData.overclockTargetingTheLich.updateMults();
 
     views.updateVal("killTheLichMenu", "none", "style.display")
 
