@@ -880,7 +880,7 @@ let actionData = {
         
         I was terrified at the idea of trying to go against the lich, but I thought of how many lives had been sacrificed 
         and ruined at the altar of this monstrosity's rampage. In what felt like such a short time, Overclock had grown far 
-        beyond what I had achieved to Get Safe, and I was ready I could bend fate in my favor to kill the lich.<br><br>
+        beyond what I had achieved to Get Safe, and I was ready; I could bend fate in my favor to kill the lich.<br><br>
         
         This time, however, I was going to go prepared; I knew Fate could only bend so far at a time. I had just received magic,
         and knew that all I needed was to show I had the power to help, and the War for Life would let me join.<br><br>
@@ -1160,7 +1160,7 @@ actionData = {
         expAtts:[],
         efficiencyAtts:[],
         unlockMessage:{english:"On unlock, open Magic and +1 Legacy."},
-        onLevelText:{english:"Unlocks new actions with each level."}
+        onLevelText:{english:"Unlocks new actions with each level."},
     },
     talkWithScott: {
         tier:1, plane:0, resourceName:"conversations",
@@ -1205,7 +1205,7 @@ actionData = {
         tier:1, plane:0, resourceName:"conversations",
         progressMaxBase:1000000, progressMaxIncrease:100,
         expToLevelBase:1, expToLevelIncrease:1,
-        efficiencyBase:.3, maxLevel:20,
+        efficiencyBase:.3, maxLevel:10,
         unlockCost:10, visible:false, unlocked:false, purchased: true,
         onUnlock: function() {
             unveilAction('chatWithMerchants')
@@ -3279,7 +3279,8 @@ actionData = {
         },
         onLevelAtts:[["wizardry", 10]],
         expAtts:[["spellcraft", .1]],
-        efficiencyAtts:[["wizardry", .001]]
+        efficiencyAtts:[["wizardry", .001]],
+        extraInfo: {english:Raw.html`If an Overboost charge is available, the next Overcharge will be x10 effect.`}
     },
     overdrive: {
         tier:0, plane:1, resourceName:"mana",

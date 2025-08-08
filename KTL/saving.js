@@ -346,6 +346,9 @@ const patches = {
         },
         messenger: {
             preventReset: true,
+        },
+        harvestGhostlyField: {
+            preventReset: true,
         }
 
     },
@@ -453,7 +456,7 @@ function load() {
         data.maxFocusAllowed = toLoad.maxFocusAllowed ?? 3;
         data.focusMult = toLoad.focusMult ?? 2;
         data.focusLoopMax = toLoad.focusLoopMax ?? 2.5;
-        data.gameSettings.ticksPerSecond = toLoad.ticksPerSecond ?? 20;
+        data.lastVisit = toLoad.lastVisit ?? Date.now();
 
         data.currentGameState = toLoad.currentGameState;
         // data.gameSettings = toLoad.gameSettings;

@@ -262,27 +262,25 @@ function updatePreviousTipsMenu() {
 }
 function createOptionsMenu() {
     return Raw.html`
-<!--<div class='menuTitle'>Options</div>-->
-<!--        <div class='menuSeparator'></div>-->
-<!--        <div id='lightModeButton' onClick='changeDarkMode()' class='button' style='padding:10px;font-size:14px;width:200px;' >-->
-<!--            Change to Light Mode</div>-->
-<!--        <div id='numberTypeButton' onClick='changeNumberType()' class='button' style='padding:10px;font-size:14px;width:200px;' >-->
-<!--            Change numbers to scientific</div><br>-->
-
+    
 <div style="max-width:680px;width:100%;box-sizing:border-box;padding:20px;display:flex;flex-direction:column;gap:20px;">
 
   <div class="menuTitle" style="margin:0;font-size:20px;font-weight:bold;border-bottom:1px solid #aaa;padding-bottom:10px;">Options</div>
 
   <div style="display:flex;flex-direction:column;gap:12px;">
+
     <div style="display:flex;align-items:center;justify-content:space-between;">
       <span style="font-size:14px;">Number Notation</span>
-      <div id="numberTypeSwitch" onclick="toggleNumberType()" style="position:relative;cursor:pointer;border:1px solid #aaa;border-radius:4px;padding:2px;width:200px;height:30px;">
-        <div style="position:absolute;left:2px;top:2px;width:calc(50% - 2px);height:calc(100% - 4px);background:#ccc;border-radius:2px;z-index:1;"></div>
-        <div style="position:relative;display:flex;z-index:2;height:100%;">
-          <span style="flex:1;text-align:center;font-size:13px;font-weight:bold;line-height:26px;color:#000;">Engineering</span>
-          <span style="flex:1;text-align:center;font-size:13px;font-weight:bold;line-height:26px;color:#000;">Scientific</span>
+      
+        <div id="numberTypeSwitch" onclick="toggleNumberType()" style="position:relative;cursor:pointer;border:1px solid #aaa;border-radius:4px;padding:2px;width:300px;height:30px;">
+          <div id="ntsSlider" style="position:absolute;left:0;top:2px;width:calc(33.333% - 2px);height:calc(100% - 4px);background:#ccc;border-radius:2px;z-index:1;"></div>
+          <div style="position:relative;display:flex;z-index:2;height:100%;">
+            <span style="flex:1;text-align:center;font-size:13px;font-weight:bold;line-height:26px;color:#000;">Engineering</span>
+            <span style="flex:1;text-align:center;font-size:13px;font-weight:bold;line-height:26px;color:#000;">Scientific</span>
+            <span style="flex:1;text-align:center;font-size:13px;font-weight:bold;line-height:26px;color:#000;">Suffix</span>
+          </div>
         </div>
-      </div>
+      
     </div>
 
     <div style="display:flex;align-items:center;justify-content:space-between;">
@@ -379,26 +377,34 @@ function createOptionsMenu() {
 
 function updateSliderDisplay(currentValue) {
     // recalcInterval(currentValue);
-    data.gameSettings.ticksPerSecond = currentValue;
+    data.gameSettings.ticksPerSecond = parseInt(currentValue);
     document.getElementById('sliderValue').textContent = currentValue;
 }
 
 function changeNumberType() {
-    if(data.gameSettings.numberType === "engineering") {
+    if(data.gameSettings.numberType === "numberSuffix") {
         data.gameSettings.numberType = "scientific";
     } else if(data.gameSettings.numberType === "scientific") {
-        data.gameSettings.numberType = "engineering";
+        data.gameSettings.numberType = "numberSuffix";
     }
 
-    document.getElementById("numberTypeButton").textContent = "Change numbers to " + (data.gameSettings.numberType === "engineering"?"scientific":"engineering");
+    document.getElementById("numberTypeButton").textContent = "Change numbers to " + (data.gameSettings.numberType === "numberSuffix"?"scientific":"numberSuffix");
 }
 
 function toggleNumberType() {
     const el = document.getElementById('numberTypeSwitch');
-    const slider = el.firstElementChild;
+    const slider = document.getElementById('ntsSlider');
+
+    if (!window.data) { window.data = { gameSettings: { numberType: 'engineering' } }; }
+    if (!data.gameSettings) { data.gameSettings = { numberType: 'engineering' }; }
+    if (!data.gameSettings.numberType) { data.gameSettings.numberType = 'engineering'; }
+
     if (data.gameSettings.numberType === 'engineering') {
         data.gameSettings.numberType = 'scientific';
-        slider.style.left = '50%';
+        slider.style.left = '33.333%';
+    } else if (data.gameSettings.numberType === 'scientific') {
+        data.gameSettings.numberType = 'numberSuffix';
+        slider.style.left = '66.666%';
     } else {
         data.gameSettings.numberType = 'engineering';
         slider.style.left = '0';
@@ -569,7 +575,18 @@ function createChangelogMenu() {
     return Raw.html`
         <div class="menuTitle">Changelog</div>
         <div class="menuSeparator"></div><br>
-        v1.2, 8/6 (current):<br>
+        v1.3, 8/8 (current):<br>
+        <ul>
+            <li>When using amulet, the action menus will work immediately after</li>
+            <li>Learn to Listen max level is 10 (will apply next amulet use)</li>
+            <li>Offline time constantly saves instead of only when the page unloads</li>
+            <li>Harvest Ghostly Field now saves properly</li>
+            <li>Overclock Targeting the Lich now runs on first tick after KTL</li>
+            <li>Sending resources caps at 100% now, not 10%. Removed info about it. This hopefully reduces confusion with the focus bars. TBD if this is too much</li>
+            <li>FPS setting will save correclty</li>
+            <li>Added version in top right</li>
+        </ul><br>
+        v1.2, 8/6:<br>
         <ul>
             <li>Removed the + in e for scientific notation</li>
             <li>Fixed filtering upgrades</li>

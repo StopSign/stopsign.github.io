@@ -53,6 +53,7 @@ data.options = {};
 data.options.updateRate = 20;
 data.options.autosaveRate = 10;
 data.options.bonusRate = 3;
+data.lastVisit = Date.now();
 let chartData = []; // Stores { time: number, value: number }
 let chartScale = 'linear'; // 'linear' or 'logarithmic'
 
@@ -69,7 +70,7 @@ data.gameSettings = {
     viewRatio:false,
     viewAll0Buttons:false,
     viewTotalMomentum:false,
-    numberType:"engineering",
+    numberType:"numberSuffix",
     redeemedBonusCodes:{}
 };
 

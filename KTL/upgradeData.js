@@ -263,18 +263,18 @@ let upgradeData = {
         customInfo: function(num) {
             if(num === 0) {
                 return Raw.html`Gain a rate of +1/hr to a Practice Mult on the flow you have Focused. The mult lasts until the amulet 
-                is used, and stacks with the Focus Mult. Maximum flow is still 10%/s. The Practice Mult will have a max of 2. `
+                is used, and stacks with the Focus Mult. The Practice Mult will have a max of 2. `
             }
             if(num === 1) {
                 return Raw.html`You have a rate of +1/hr to a Practice Mult on the flow you have Focused. This mult lasts until the amulet 
-                is used, and stacks with the Focus Mult. Maximum flow is still 10%/s. The Practice Mult currently has a max of 2. Gain +1.`
+                is used, and stacks with the Focus Mult. The Practice Mult currently has a max of 2. Gain +1.`
             }
             if(num === 2) {
                 return Raw.html`You have a rate of +1/hr to a Practice Mult on the flow you have Focused. This mult lasts until the amulet 
-                is used, and stacks with the Focus Mult. Maximum flow is still 10%/s. The Practice Mult currently has a max of 3. Gain +1.`
+                is used, and stacks with the Focus Mult. The Practice Mult currently has a max of 3. Gain +1.`
             }
             return Raw.html`You have a rate of +1/hr to a Practice Mult on the flow you have Focused. This mult lasts until the amulet 
-                is used, and stacks with the Focus Mult. Maximum flow is still 10%/s. The Practice Mult currently has a max of 4.`
+                is used, and stacks with the Focus Mult. The Practice Mult currently has a max of 4.`
         },
         onBuy: function(num) {
             data.focusLoopMax = 2 + num;

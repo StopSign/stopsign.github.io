@@ -13,17 +13,13 @@ function setScreenSize() {
 
 // --- Offline Time Calculation ---
 function checkOfflineProgress() {
-    const lastVisit = localStorage.getItem('lastVisitTimestamp');
-    if (lastVisit) {
-        const offlineMilliseconds = Date.now() - parseInt(lastVisit, 10);
-        if (offlineMilliseconds > 10000) { // 10-second threshold
+    if (data.lastVisit) {
+        const offlineMilliseconds = Date.now() - parseInt(data.lastVisit, 10);
+        if (offlineMilliseconds > 5000) {
             data.currentGameState.bonusTime += offlineMilliseconds;
             console.log(`Welcome back! Gained ${(offlineMilliseconds / 1000).toFixed(1)}s of bonus time.`);
         }
     }
-    window.addEventListener('beforeunload', () => {
-        localStorage.setItem('lastVisitTimestamp', Date.now());
-    });
 }
 
 // --- Visual Rendering Loop ---
@@ -88,6 +84,7 @@ function secondPassed() {
 
 
 function gameTick() {
+    data.lastVisit = Date.now();
     data.currentGameState.totalTicks++;
     data.gameSettings.ticksForSeconds++;
 
@@ -273,8 +270,8 @@ function calculateTaken(actionVar, downstreamVar, actionObj, mult) {
 
     let totalTakenMult = actionObj.tierMult() * (actionObj.efficiency / 100) * permFocusMult *
         (isAttentionLine(actionVar, downstreamVar) ? data.focusMult : 1);
-    if (totalTakenMult > 0.1) {
-        totalTakenMult = 0.1; // Cap at 10%/s
+    if (totalTakenMult > 1) {
+        totalTakenMult = 1; // Cap at 100%/s
     }
     let toReturn = actionObj.resource / data.gameSettings.ticksPerSecond * totalTakenMult * mult;
     return toReturn < .0000001 ? 0 : toReturn;
