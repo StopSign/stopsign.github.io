@@ -569,7 +569,7 @@ let actionData = {
         },
         onLevelCustom: function() {
         },
-        onLevelAtts:[["charm", 2000], ["recognition", 200], ["influence", 120]],
+        onLevelAtts:[["charm", 2000], ["recognition", 200], ["influence", 120], ["energy", 5]],
         expAtts:[["savvy", 1]],
         efficiencyAtts:[["recognition", .001]]
     },
