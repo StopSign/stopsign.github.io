@@ -132,6 +132,7 @@ function openUseAmuletMenu(isUseable) {
 
     views.updateVal(`amuletEnabledContainer`, isUseable?"":'none', 'style.display');
 
+	refreshUpgradeVisibility();
     updateCardAffordabilityBorders();
 }
 

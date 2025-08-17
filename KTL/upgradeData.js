@@ -151,6 +151,7 @@ function buyUpgrade(upgradeVar) {
         views.updateVal(costId, `${newCost} AC`, 'textContent');
         views.updateVal(remainingId, newRemaining, 'textContent');
     }
+	refreshUpgradeVisibility();
     updateCardAffordabilityBorders();
 }
 
@@ -176,37 +177,63 @@ function attributeUpgradeOnBuy(attVar, upgradeNum, increaseRatio) {
     recalcAttMult(attVar);
 }
 
-function toggleMaxLevelCards(show) {
-    const displayStyle = show ? 'flex' : 'none';
-    for (const upgradeVar in data.upgrades) {
-        const upgrade = data.upgrades[upgradeVar];
-        if (upgrade.isFullyBought && upgrade.visible) {
-            const cardId = `card_${upgradeVar}`;
-            views.updateVal(cardId, !upgrade.visible?"none":displayStyle, 'style.display');
-        }
-    }
+function toggleMaxLevelCards(callingCheckbox) {
+	function filter(checkbox, upgrade, upgradeDataObj) {
+		const show = checkbox.checked;
+		
+		return show || !upgrade.isFullyBought;
+	}
+	
+	refreshUpgradeVisibility(callingCheckbox, filter);
 }
-function toggleAttributeUpgrades(show) {
-    const displayStyle = show ? 'flex' : 'none';
-    for (const upgradeVar in data.upgrades) {
-        const upgrade = data.upgrades[upgradeVar];
-        const upgradeDataObj = upgradeData[upgradeVar];
-        if (upgradeDataObj.attribute) {
-            const cardId = `card_${upgradeVar}`;
-            views.updateVal(cardId, !upgrade.visible?"none":displayStyle, 'style.display');
-        }
-    }
+function toggleAttributeUpgrades(callingCheckbox) {
+	function filter(checkbox, upgrade, upgradeDataObj) {
+		const show = checkbox.checked;
+		
+		return show || !upgradeDataObj.attribute;
+	}
+	
+	refreshUpgradeVisibility(callingCheckbox, filter);
 }
-function toggleUnaffordableUpgrades(show) {
-    const displayStyle = show ? 'flex' : 'none';
-    for (const upgradeVar in data.upgrades) {
-        const upgrade = data.upgrades[upgradeVar];
-        if (calcUpgradeCost(upgrade, upgrade.upgradesBought) > data.ancientCoin ) {
-            const cardId = `card_${upgradeVar}`;
-            views.updateVal(cardId, !upgrade.visible?"none":displayStyle, 'style.display');
-        }
-    }
+function toggleUnaffordableUpgrades(callingCheckbox) {
+	function filter(checkbox, upgrade, upgradeDataObj) {
+		const show = checkbox.checked;
+		
+		//All fully bought things are "affordable"
+		return show || upgrade.isFullyBought || !(calcUpgradeCost(upgrade, upgrade.upgradesBought) > data.ancientCoin);
+	}
+	
+	refreshUpgradeVisibility(callingCheckbox, filter);
 }
+var refreshUpgradeVisibility = function() {
+	//This holds all registered filters.  They're registered when the checkbox is changed the first time.
+	const visibilityFilters = new Map();
+	
+	return function(callingCheckbox, callingFilter) {
+		//Allow calling this with no arguments to rerun filters.  Eg: When buying something in the shop
+		if (callingCheckbox) {
+			//It's redundent to call this each time, but it won't harm anything
+			visibilityFilters.set(callingCheckbox, callingFilter);
+		}
+		
+		for (const upgradeVar in data.upgrades) {
+			const upgrade = data.upgrades[upgradeVar];
+			const upgradeDataObj = upgradeData[upgradeVar];
+			
+			let isShown = true;
+			
+			//Loop through all filters and only show something that all filters allow to be shown.
+			for (const [checkbox,filter] of visibilityFilters) {
+				isShown &= filter(checkbox, upgrade, upgradeDataObj);
+			}
+			
+			const displayStyle = isShown ? 'flex' : 'none';
+			
+            const cardId = `card_${upgradeVar}`;
+			views.updateVal(cardId, !upgrade.visible?"none":displayStyle, 'style.display');
+		}
+	}
+}();
 
 function updateCardAffordabilityBorders() {
     for (const upgradeVar in data.upgrades) {
