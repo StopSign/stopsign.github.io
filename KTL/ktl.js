@@ -91,6 +91,10 @@ function initializeKTL() {
 
     data.actions.overclockTargetingTheLich.resource = data.totalMomentum;
     data.actions.worry.resource = data.actions.hearAboutTheLich.resource;
+    //Don't penalize players who over-leveled Learned of Lich signs.  Convert any partial leveling of extra levels to "worry"
+    if (data.actions.hearAboutTheLich.level >= 2) {
+        data.actions.worry.resource += data.actions.hearAboutTheLich.progress
+    }
     actionData.overclockTargetingTheLich.updateMults();
 
     views.updateVal("killTheLichMenu", "none", "style.display")
