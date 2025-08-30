@@ -706,11 +706,26 @@ function save() {
 
 function exportSave() {
     save();
-    // console.log(encoded);
     document.getElementById("exportImportSave").value = window.localStorage[saveName];
     document.getElementById("exportImportSave").select();
     document.execCommand('copy');
     document.getElementById("exportImportSave").value = "";
+}
+
+function exportSaveFile() {
+    save();
+    const data = window.localStorage[saveName];
+    const blob = new Blob([data], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "KTL_Save.txt";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+
+    URL.revokeObjectURL(url);
 }
 
 function importSave() {
@@ -723,4 +738,22 @@ function importSave() {
     }
     window.localStorage[saveName] = document.getElementById("exportImportSave").value;
     location.reload();
+}
+
+function importSaveFile() {
+    const input = document.getElementById("importSaveFileInput");
+    const file = input.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const content = e.target.result.trim();
+        if (!content) {
+            clearSave();
+        } else {
+            window.localStorage[saveName] = content;
+        }
+        location.reload();
+    };
+    reader.readAsText(file);
 }

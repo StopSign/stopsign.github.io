@@ -263,115 +263,101 @@ function updatePreviousTipsMenu() {
 function createOptionsMenu() {
     return Raw.html`
     
-<div style="max-width:680px;width:100%;box-sizing:border-box;padding:20px;display:flex;flex-direction:column;gap:20px;">
+<div style="max-width:680px;width:100%;box-sizing:border-box;padding:20px;display:flex;flex-direction:column;gap:10px;">
 
-  <div class="menuTitle" style="margin:0;font-size:20px;font-weight:bold;border-bottom:1px solid #aaa;padding-bottom:10px;">Options</div>
-
-  <div style="display:flex;flex-direction:column;gap:12px;">
-
-    <div style="display:flex;align-items:center;justify-content:space-between;">
-      <span style="font-size:14px;">Number Notation</span>
-      
-        <div id="numberTypeSwitch" onclick="toggleNumberType()" style="position:relative;cursor:pointer;border:1px solid #aaa;border-radius:4px;padding:2px;width:300px;height:30px;">
-          <div id="ntsSlider" style="position:absolute;left:0;top:2px;width:calc(33.333% - 2px);height:calc(100% - 4px);background:#ccc;border-radius:2px;z-index:1;"></div>
-          <div style="position:relative;display:flex;z-index:2;height:100%;">
-            <span style="flex:1;text-align:center;font-size:13px;font-weight:bold;line-height:26px;color:#000;">Engineering</span>
-            <span style="flex:1;text-align:center;font-size:13px;font-weight:bold;line-height:26px;color:#000;">Scientific</span>
-            <span style="flex:1;text-align:center;font-size:13px;font-weight:bold;line-height:26px;color:#000;">Suffix</span>
-          </div>
+    <div class="menuTitle" style="margin:0;font-size:20px;font-weight:bold;border-bottom:1px solid #aaa;padding-bottom:10px;">Options</div>
+    <div style="display:flex;flex-direction:column;gap:12px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+            <span style="font-size:14px;">Number Notation</span>
+            
+            <div id="numberTypeSwitch" onclick="toggleNumberType()" style="position:relative;cursor:pointer;border:1px solid #aaa;border-radius:4px;padding:2px;width:300px;height:30px;">
+                <div id="ntsSlider" style="position:absolute;left:0;top:2px;width:calc(33.333% - 2px);height:calc(100% - 4px);background:#ccc;border-radius:2px;z-index:1;"></div>
+                <div style="position:relative;display:flex;z-index:2;height:100%;">
+                    <span style="flex:1;text-align:center;font-size:13px;font-weight:bold;line-height:26px;color:#000;">Engineering</span>
+                    <span style="flex:1;text-align:center;font-size:13px;font-weight:bold;line-height:26px;color:#000;">Scientific</span>
+                    <span style="flex:1;text-align:center;font-size:13px;font-weight:bold;line-height:26px;color:#000;">Suffix</span>
+                </div>
+            </div>
         </div>
-      
+    
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+            <span style="font-size:14px;">Show +/-/Δ Values</span>
+            <div id="viewDeltasSwitch" onclick="toggleViewDeltas()" style="position:relative;cursor:pointer;border:1px solid #aaa;border-radius:4px;padding:2px;width:200px;height:30px;">
+                <div style="position:absolute;left:2px;top:2px;width:calc(50% - 2px);height:calc(100% - 4px);background:#ccc;border-radius:2px;z-index:1;"></div>
+                <div style="position:relative;display:flex;z-index:2;height:100%;">
+                    <span style="flex:1;text-align:center;font-size:13px;font-weight:bold;line-height:26px;color:#000;">Off</span>
+                    <span style="flex:1;text-align:center;font-size:13px;font-weight:bold;line-height:26px;color:#000;">On</span>
+                </div>
+            </div>
+        </div>
+        
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+            <span style="font-size:14px;">Show Increase/Decrease Ratio</span>
+            <div id="viewRatioSwitch" onclick="toggleViewRatio()" style="position:relative;cursor:pointer;border:1px solid #aaa;border-radius:4px;padding:2px;width:200px;height:30px;">
+                <div style="position:absolute;left:2px;top:2px;width:calc(50% - 2px);height:calc(100% - 4px);background:#ccc;border-radius:2px;z-index:1;"></div>
+                <div style="position:relative;display:flex;z-index:2;height:100%;">
+                    <span style="flex:1;text-align:center;font-size:13px;font-weight:bold;line-height:26px;color:#000;">Off</span>
+                    <span style="flex:1;text-align:center;font-size:13px;font-weight:bold;line-height:26px;color:#000;">On</span>
+                </div>
+            </div>
+        </div>
+        
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+            <span style="font-size:14px;">Show Total Downstream</span>
+            <div id="viewTotalMomentumSwitch" onclick="toggleViewTotalMomentum()" style="position:relative;cursor:pointer;border:1px solid #aaa;border-radius:4px;padding:2px;width:200px;height:30px;">
+                <div style="position:absolute;left:2px;top:2px;width:calc(50% - 2px);height:calc(100% - 4px);background:#ccc;border-radius:2px;z-index:1;"></div>
+                <div style="position:relative;display:flex;z-index:2;height:100%;">
+                    <span style="flex:1;text-align:center;font-size:13px;font-weight:bold;line-height:26px;color:#000;">Off</span>
+                    <span style="flex:1;text-align:center;font-size:13px;font-weight:bold;line-height:26px;color:#000;">On</span>
+                </div>
+            </div>
+        </div>
+        
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+            <span style="font-size:14px;">Show All 0 and All 100 Buttons</span>
+            <div id="viewZeroButtonsSwitch" onclick="toggleViewAll0Buttons()" style="position:relative;cursor:pointer;border:1px solid #aaa;border-radius:4px;padding:2px;width:200px;height:30px;">
+                <div style="position:absolute;left:2px;top:2px;width:calc(50% - 2px);height:calc(100% - 4px);background:#ccc;border-radius:2px;z-index:1;"></div>
+                <div style="position:relative;display:flex;z-index:2;height:100%;">
+                    <span style="flex:1;text-align:center;font-size:13px;font-weight:bold;line-height:26px;color:#000;">Off</span>
+                    <span style="flex:1;text-align:center;font-size:13px;font-weight:bold;line-height:26px;color:#000;">On</span>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <div style="display:flex;align-items:center;justify-content:space-between;">
-      <span style="font-size:14px;">Show +/-/Δ Values</span>
-      <div id="viewDeltasSwitch" onclick="toggleViewDeltas()" style="position:relative;cursor:pointer;border:1px solid #aaa;border-radius:4px;padding:2px;width:200px;height:30px;">
-        <div style="position:absolute;left:2px;top:2px;width:calc(50% - 2px);height:calc(100% - 4px);background:#ccc;border-radius:2px;z-index:1;"></div>
-        <div style="position:relative;display:flex;z-index:2;height:100%;">
-          <span style="flex:1;text-align:center;font-size:13px;font-weight:bold;line-height:26px;color:#000;">Off</span>
-          <span style="flex:1;text-align:center;font-size:13px;font-weight:bold;line-height:26px;color:#000;">On</span>
-        </div>
-      </div>
+    <div class="menuSeparator"></div>
+    
+    <div style="display:flex;align-items:center;gap:10px;">
+        <label for="FPSSlider" style="font-size:14px;">FPS: <span id="sliderValue" style="font-weight:bold;">20</span></label>
+        <input type="range" id="FPSSlider" min="1" max="60" value="20" oninput="updateSliderDisplay(this.value)" style="flex:1;cursor:pointer;">
     </div>
-
-    <div style="display:flex;align-items:center;justify-content:space-between;">
-      <span style="font-size:14px;">Show Increase/Decrease Ratio</span>
-      <div id="viewRatioSwitch" onclick="toggleViewRatio()" style="position:relative;cursor:pointer;border:1px solid #aaa;border-radius:4px;padding:2px;width:200px;height:30px;">
-        <div style="position:absolute;left:2px;top:2px;width:calc(50% - 2px);height:calc(100% - 4px);background:#ccc;border-radius:2px;z-index:1;"></div>
-        <div style="position:relative;display:flex;z-index:2;height:100%;">
-          <span style="flex:1;text-align:center;font-size:13px;font-weight:bold;line-height:26px;color:#000;">Off</span>
-          <span style="flex:1;text-align:center;font-size:13px;font-weight:bold;line-height:26px;color:#000;">On</span>
-        </div>
-      </div>
-    </div>
-
-    <div style="display:flex;align-items:center;justify-content:space-between;">
-      <span style="font-size:14px;">Show Total Downstream</span>
-      <div id="viewTotalMomentumSwitch" onclick="toggleViewTotalMomentum()" style="position:relative;cursor:pointer;border:1px solid #aaa;border-radius:4px;padding:2px;width:200px;height:30px;">
-        <div style="position:absolute;left:2px;top:2px;width:calc(50% - 2px);height:calc(100% - 4px);background:#ccc;border-radius:2px;z-index:1;"></div>
-        <div style="position:relative;display:flex;z-index:2;height:100%;">
-          <span style="flex:1;text-align:center;font-size:13px;font-weight:bold;line-height:26px;color:#000;">Off</span>
-          <span style="flex:1;text-align:center;font-size:13px;font-weight:bold;line-height:26px;color:#000;">On</span>
-        </div>
-      </div>
-    </div>
-
-    <div style="display:flex;align-items:center;justify-content:space-between;">
-      <span style="font-size:14px;">Show All 0 and All 100 Buttons</span>
-      <div id="viewZeroButtonsSwitch" onclick="toggleViewAll0Buttons()" style="position:relative;cursor:pointer;border:1px solid #aaa;border-radius:4px;padding:2px;width:200px;height:30px;">
-        <div style="position:absolute;left:2px;top:2px;width:calc(50% - 2px);height:calc(100% - 4px);background:#ccc;border-radius:2px;z-index:1;"></div>
-        <div style="position:relative;display:flex;z-index:2;height:100%;">
-          <span style="flex:1;text-align:center;font-size:13px;font-weight:bold;line-height:26px;color:#000;">Off</span>
-          <span style="flex:1;text-align:center;font-size:13px;font-weight:bold;line-height:26px;color:#000;">On</span>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div style="display:flex;align-items:center;gap:10px;">
-    <label for="FPSSlider" style="font-size:14px;">FPS: <span id="sliderValue" style="font-weight:bold;">20</span></label>
-    <input type="range" id="FPSSlider" min="1" max="60" value="20" oninput="updateSliderDisplay(this.value)" style="flex:1;cursor:pointer;">
-  </div>
-
-  <div style="display:flex;flex-direction:column;gap:10px;">
     <p style="margin:0;font-size:13px;">Auto save every 20 seconds and on pause, but if you want a button to click:</p>
-    <div style="display:flex;gap:10px;flex-wrap:wrap;">
-      <button onclick="save()" style="padding:10px 16px;background:#007BFF;color:#fff;border:none;border-radius:4px;font-size:14px;cursor:pointer;">Save</button>
-      <button onclick="exportSave()" style="padding:10px 16px;background:#007BFF;color:#fff;border:none;border-radius:4px;font-size:14px;cursor:pointer;">Export to clipboard</button>
+    <button onclick="save()" style="padding:10px 16px;background:#007BFF;color:#fff;border:none;border-radius:4px;font-size:14px;cursor:pointer;width:160px;">Save</button>
+    <div style="display:flex;flex-direction:column;gap:10px;">
+        <label for="bonusCodeInput" style="font-size:13px;">Enter Bonus Code:</label>
+        <input type="text" id="bonusCodeInput" style="border:1px solid #aaa;padding:8px;border-radius:4px;font-size:13px;width:100%;">
+        <div id="bonusCodeMessage" style="font-size:13px;color:red;"></div>
+        <button onclick="applyBonusCode()" style="padding:10px 16px;background:#28a745;color:#fff;border:none;border-radius:4px;font-size:14px;cursor:pointer;width:160px;">Use Bonus Code</button>
     </div>
-  </div>
-
-  <div style="display:flex;flex-direction:column;gap:10px;border-top:1px solid #aaa;padding-top:20px;">
+    
+    <div class="menuSeparator"></div>
+    
+    <button onclick="exportSaveFile()" style="padding:10px 16px;background:#007BFF;color:#ffffff;border:none;border-radius:4px;font-size:14px;cursor:pointer;width:160px;">Export to file</button>
+    <input type="file" id="importSaveFileInput">
+    <button onclick="importSaveFile()" style="padding:10px 16px;background:#007BFF;color:#fff;border:none;border-radius:4px;font-size:14px;cursor:pointer;width:160px;">Import File</button>
+    
+    <div class="menuSeparator"></div>
+    
+    <button onclick="exportSave()" style="padding:10px 16px;background:#007BFF;color:#fff;border:none;border-radius:4px;font-size:14px;cursor:pointer;width:160px;">Export to clipboard</button>
     <label for="exportImportSave" style="font-size:13px;">Put your save here to import (import a clear save to hard reset):</label>
     <input type="text" id="exportImportSave" style="border:1px solid #aaa;padding:8px;border-radius:4px;font-size:13px;width:100%;" oncontextmenu="event.stopPropagation(); return true;">
-    <div style="display:flex;align-items:center;gap:8px;">
-      <input type="checkbox" id="confirmImportCheckbox" style="width:14px;height:14px;cursor:pointer;">
-      <label for="confirmImportCheckbox" style="font-size:14px;cursor:pointer;">Confirm</label>
+    <div>
+        <input type="checkbox" id="confirmImportCheckbox" style="width:14px;height:14px;cursor:pointer;">
+        <label for="confirmImportCheckbox" style="font-size:14px;cursor:pointer;">Confirm</label>
+        <button onclick="importSave()" style="padding:10px 16px;background:#007BFF;color:#fff;border:none;border-radius:4px;font-size:14px;cursor:pointer;width:160px;">Import</button>
     </div>
-    <button onclick="importSave()" style="padding:10px 16px;background:#007BFF;color:#fff;border:none;border-radius:4px;font-size:14px;cursor:pointer;width:160px;">Import</button>
-  </div>
-    <div style="display:flex;flex-direction:column;gap:10px;">
-      <label for="bonusCodeInput" style="font-size:13px;">Enter Bonus Code:</label>
-      <input type="text" id="bonusCodeInput" style="border:1px solid #aaa;padding:8px;border-radius:4px;font-size:13px;width:100%;">
-      <div id="bonusCodeMessage" style="font-size:13px;color:red;"></div>
-      <button onclick="applyBonusCode()" style="padding:10px 16px;background:#28a745;color:#fff;border:none;border-radius:4px;font-size:14px;cursor:pointer;width:160px;">Use Bonus Code</button>
-    </div>
-
+    
 </div>
-
-
-<!--        <div style="display: flex; align-items: center; gap: 10px;">-->
-<!--          FPS: <span id="sliderValue" style="font-weight: bold; min-width: 20px; text-align: left;">20</span>-->
-<!--          <input type="range" id="FPSSlider" min="1" max="60" value="20" style="width: 200px;" oninput="updateSliderDisplay(this.value)">-->
-<!--        </div>-->
-<!--        <br><br>Auto save every 20 seconds and on pause, but if you want a button to click:<br>-->
-<!--        <div class='button' style='padding:10px;font-size:14px;width:200px;' -->
-<!--        onClick='save()'>Save</div><br><br>-->
-<!--        <div class='button' style='padding:10px;font-size:14px;width:200px;' -->
-<!--        onClick='exportSave()'>Export to clipboard</div><br><br>-->
-<!--        <label for='exportImportSave'>Put your save here to import (import a clear save to hard reset):<br></label><input type='text' id='exportImportSave'><br>-->
-<!--        <input type='checkbox' id='confirmImportCheckbox'><label for='confirmImportCheckbox'>Confirm</label>-->
-<!--        <div class='button' style='padding:10px;font-size:14px;width:200px;' onClick='importSave()'>Import</div><br><br>-->
 `
 }
 
