@@ -97,7 +97,6 @@ const windowElement = document.getElementById('windowElement');
 const actionContainer = document.getElementById('actionContainer');
 
 
-let scale = 1;
 let scaleByPlane = [1,1,1,1];
 const scaleStep = 0.1;
 const minScale = 0.1;

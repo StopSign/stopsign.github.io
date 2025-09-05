@@ -568,11 +568,30 @@ function addDataTab() {
     addMenuTab("statistics");
 }
 
+//Also update id="currentVersion"
 function createChangelogMenu() {
     return Raw.html`
         <div class="menuTitle">Changelog</div>
         <div class="menuSeparator"></div><br>
-        v1.3, 8/8 (current):<br>
+        v1.4, 9/5 (current):<br>
+        <ul>
+            <li>Added the ability to import/export the save as a file</li>
+            <li>Rewrote/edited backstory</li>
+            <li>Rewrote/added story content to 11 actions, placeholders for the WIP</li>
+            <li>Added an icon/tooltip for easily seeing the tier and action type</li>
+            <li>Added automation tab with ability to remove individual downstream rates from changing via automation</li>
+            <li>Changed default downstream options (the slider):
+                <ul>
+                    <li>Default sliders removd, and instead show [Off, 10%, 50%, 100%] downstream options</li>
+                    <li>Added an option to switch between the button options and the full [0-100] slider</li>
+                    <li>Existing saves automatically have Advanced Sliders enabled, to preserve existing game state</li>
+                    <li>Removing advanced sliders will round numbers to the nearest option (AKA an 80% downstream slider moves to the 100% downstream option)</li>
+                </ul>
+            </li>
+            <li>Bonus Speed button loads on the correct state</li>
+            <li>Zoom in/out saves per tab</li>
+        </ul><br>
+        v1.3, 8/8:<br>
         <ul>
             <li>When using amulet, the action menus will work immediately after</li>
             <li>Learn to Listen max level is 10 (will apply next amulet use)</li>

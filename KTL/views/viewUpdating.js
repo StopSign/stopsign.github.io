@@ -153,19 +153,18 @@ let views = {
         let toDisplay = actionObj.visible || globalVisible;
         let isInRange = isActionVisible(actionVar);
         views.updateVal(`${actionVar}Container`, toDisplay&&isInRange?"":"none", "style.display");
+
         if(dataObj.parentVar) {
             let parentObj = data.actions[dataObj.parentVar];
             views.updateVal(`${dataObj.parentVar}_${actionVar}_Line_Outer`, (globalVisible||(toDisplay && parentObj.visible)) && !dataObj.hideUpstreamLine ?"flex":"none", "style.display");
             views.updateVal(`${dataObj.parentVar}_${actionVar}_Line_Inner`, toDisplay && parentObj.visible ?"":"none", "style.display");
         }
 
-        // if(!toDisplay) { // || not in screen range
-        if(!toDisplay || !isInRange) { // || not in screen range
-            return false;
+        if(!toDisplay || !isInRange) {
+            return false; //don't update other numbers
         }
 
         let miniVersion = scaleByPlane[data.planeTabSelected] < .55;
-        let mediumVersion = scaleByPlane[data.planeTabSelected] < .65 && !miniVersion;
         let isMaxLevel = actionObj.maxLevel !== undefined && actionObj.level >= actionObj.maxLevel;
         views.updateVal(`${actionVar}LargeVersionContainer`, !miniVersion?"":"none", "style.display");
         views.updateVal(`${actionVar}SmallVersionContainer`, miniVersion?"":"none", "style.display");
@@ -180,17 +179,6 @@ let views = {
         views.updateVal(`${actionVar}MaxLevel2`, actionObj.maxLevel, "innerText", 1);
         views.updateVal(`${actionVar}IsMaxLevel`, isMaxLevel && !miniVersion ? "":"none", "style.display");
 
-        // views.updateVal(`${actionVar}SmallVersionTitle`, scale < .11 ? "none" : "" , "style.display");
-
-        // if(!miniVersion) { //don't check in small
-        //     views.updateVal(`${actionVar}DeltasDisplayContainer`, mediumVersion?"none":"", "style.display");
-        //     views.updateVal(`${actionVar}BalanceNeedleLabel`, mediumVersion?"none":"", "style.display");
-        //     views.updateVal(`${actionVar}ProgressBarLabels`, mediumVersion?"none":"", "style.display");
-        //     views.updateVal(`${actionVar}ExpBarLabels`, mediumVersion?"none":"", "style.display");
-        //     views.updateVal(`${actionVar}ToggleDownstreamButtons`, mediumVersion?"none":"", "style.display");
-        //     views.updateVal(`${actionVar}MenuButtons`, mediumVersion?"none":"", "style.display");
-        // }
-
 
         //go through each downstream
         for (let downstreamVar of dataObj.downstreamVars) {
@@ -200,11 +188,6 @@ let views = {
             views.updateVal(`${actionVar}_${downstreamVar}_Line_Inner_Container`, !miniVersion ? "flex" : "none", "style.display");
             let boxShadow = !isAttentionLine(actionVar, downstreamVar)?"":(miniVersion?"0 0 40px 11px yellow":"0 0 18px 5px yellow");
             views.updateVal(`${actionVar}_${downstreamVar}_Line_Outer`, boxShadow, "style.boxShadow");
-
-            // if(!miniVersion) { //don't check in small
-            //     views.updateVal(`${actionVar}SliderLabels${downstreamVar}`, mediumVersion?"none":"", "style.display");
-            //     views.updateVal(`${actionVar}SliderDownstreamTitle${downstreamVar}`, mediumVersion?"16px":"12px", "style.fontSize");
-            // }
         }
 
         return !miniVersion;
