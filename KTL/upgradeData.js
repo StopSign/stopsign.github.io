@@ -256,6 +256,11 @@ let upgradeData = {
         customInfo: function(num) {
             return `[Automation] When unlocking a new action, automatically sets the downstream sliders of the 
             unlocked action to ${["50%", "100% (Currently 50%)", "100%"][num]}.`;
+        },
+        onBuy: function(num) {
+            for (let actionVar in data.actions) {
+                views.updateVal(`${actionVar}_automationMenuButton`, "", "style.display");
+            }
         }
     },
     knowWhenToMoveOn: {
@@ -265,6 +270,11 @@ let upgradeData = {
         customInfo: function(num) {
             return Raw.html`[Automation] When an action is at its max level and has no downstream actions with sliders, it 
                 automatically set the flow rate leading to it to 0%. This will apply recursively.`
+        },
+        onBuy: function(num) {
+            for (let actionVar in data.actions) {
+                views.updateVal(`${actionVar}_automationMenuButton`, "", "style.display");
+            }
         }
     },
     feelTheEchoesOfMyPast: {

@@ -643,6 +643,22 @@ function updateUIOnLoad() {
         if(data.gameSettings.viewTotalMomentum) {
             views.updateVal(`${actionVar}TotalDownstreamContainer`, "", "style.display");
         }
+        let automationUnlocked = data.upgrades.stopLettingOpportunityWait.upgradePower > 0
+            || data.upgrades.knowWhenToMoveOn.upgradePower > 0;
+        if(automationUnlocked) {
+            views.updateVal(`${actionVar}_automationMenuButton`, "", "style.display");
+        }
+        if(actionObj.hasUpstream) {
+            if (actionObj.automationOff) {
+                views.updateVal(`${actionVar}_checkbox`, true, "checked");
+                views.updateVal(`${actionVar}_track`, "#2196F3", "style.backgroundColor");
+                views.updateVal(`${actionVar}_knob`, "translateX(26px)", "style.transform");
+            } else {
+                views.updateVal(`${actionVar}_checkbox`, false, "checked");
+                views.updateVal(`${actionVar}_track`, "#ccc", "style.backgroundColor");
+                views.updateVal(`${actionVar}_knob`, "translateX(0px)", "style.transform");
+            }
+        }
     }
     if (data.planeUnlocked[1] || data.planeUnlocked[2]) {
         for (let i = 0; i < data.planeUnlocked.length; i++) {

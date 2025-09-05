@@ -89,7 +89,17 @@ function generateActionDisplay(actionVar) {
     queueCache(`${actionVar}Wage`);
     queueCache(`${actionVar}Instability`);
     queueCache(`${actionVar}InstabilityToAdd`);
-//background-color:var(--overlay-color);
+
+
+    let iconImgName = (actionObj.isGenerator?"gear":"lightning") + actionObj.tier;
+
+    let icon = Raw.html`
+        <span style="position:absolute;top:-43px;left:-40px;width:40px;height:40px;" class="showthat">
+            <img class="${actionObj.isGenerator?'generatorIconSvg':'actionIconSvg'}" src="img/${iconImgName}.svg" alt="${iconImgName}" style="width:100%;height:100%;" />
+            <div class="showthisUp" style="font-size:20px;width:150px">Tier ${actionObj.tier + (actionObj.isGenerator?" Generator":" Action")} </div>
+        </span>
+    `
+
     let title = Raw.html`
         <span onclick="actionTitleClicked('${actionVar}')" style="color:var(--text-primary);cursor:pointer;position:absolute;
             top:-82px;height:82px;left:0;white-space: nowrap;border-width: 0 0 0 6px;border-style:solid;
@@ -124,11 +134,11 @@ function generateActionDisplay(actionVar) {
     queueCache(`${actionVar}_infoMenuButton`);
     queueCache(`${actionVar}_attsMenuButton`);
     queueCache(`${actionVar}_storyMenuButton`);
+    queueCache(`${actionVar}_automationMenuButton`);
     queueCache(`${actionVar}MenuButtons`);
 
-
     let menuContainer = Raw.html`
-        <div id="${actionVar}MenuButtons" style="position:absolute;top:-20px;font-size:13px;left:3px;">
+        <div id="${actionVar}MenuButtons" style="position:absolute;top:-20px;font-size:13px;left:3px;width:315px;">
             ${!dataObj.parentVar?"":`<span onclick="actionTitleClicked('${dataObj.parentVar}')" 
             class="buttonSimple" style="margin-right:3px;width:30px;height:30px;text-align:center;cursor:pointer;padding:0 4px;">^</span>`}
         <span id="${actionVar}_downstreamMenuButton" onclick="clickActionMenu('${actionVar}', 'downstream')" class="buttonSimple" 
@@ -139,6 +149,8 @@ function generateActionDisplay(actionVar) {
             style="margin-right:3px;width:30px;height:30px;text-align:center;cursor:pointer;padding:0 4px;">Stats</span>
         <span id="${actionVar}_storyMenuButton" onclick="clickActionMenu('${actionVar}', 'story')" class="buttonSimple" 
             style="display:${dataObj.storyText?"":"none"};margin-right:3px;width:30px;height:30px;text-align:center;cursor:pointer;padding:0 4px;">Story</span>
+        <span id="${actionVar}_automationMenuButton" onclick="clickActionMenu('${actionVar}', 'automation')" class="buttonSimple" 
+            style="display:none;margin-right:3px;width:30px;height:30px;text-align:center;cursor:pointer;padding:0 4px;">Automation</span>
         </div>`;
 
     queueCache(`${actionVar}ResourceIncrease`);
@@ -316,6 +328,27 @@ let maxLevelTop = (data.gameSettings.viewDeltas && data.gameSettings.viewRatio) 
             ${dataObj.storyText ? dataObj.storyText[language]:""}
         </div>`;
 
+    queueCache(`${actionVar}_automationContainer`);
+    queueCache(`${actionVar}_checkbox`);
+    queueCache(`${actionVar}_track`);
+    queueCache(`${actionVar}_knob`);
+
+    let preventParentSliderText = !actionObj.hasUpstream ? "": `
+           Prevent automation from changing the upstream slider to this action: 
+           
+            <label onclick="toggleAutomation('${actionVar}')" style="position:relative;display:inline-block;width:50px;height:14px;cursor:pointer;">
+                <input id="${actionVar}_checkbox" type="checkbox" style="opacity:0;width:0;height:0;">
+                <div id="${actionVar}_track" style="position:absolute;top:0;left:0;right:0;bottom:0;background-color:#ccc;border-radius:14px;">
+                    <div id="${actionVar}_knob" style="position:absolute;height:16px;width:16px;left:4px;bottom:-1px;background-color:white;border-radius:50%;"></div>
+                </div>
+            </label>
+    `
+
+    let automationContainer = Raw.html`
+        <div id="${actionVar}_automationContainer" style="display:none;padding:10px;max-height:220px;overflow-y:auto;will-change: transform;">
+            ${preventParentSliderText}
+        </div>`;
+
     queueCache(`${actionVar}_attsContainer`);
 
     let attsContainer = Raw.html`
@@ -385,6 +418,7 @@ let maxLevelTop = (data.gameSettings.viewDeltas && data.gameSettings.viewRatio) 
             onmouseenter="mouseOnAction('${actionVar}')" onmouseleave="mouseOffAction('${actionVar}')">
             <div id="${actionVar}LargeVersionContainer" style="border:2px solid var(--border-color);
                 background-color:var(--bg-secondary);">
+                ${icon}
                 ${title}
                 ${menuContainer}
                 ${momentumContainer}
@@ -393,6 +427,7 @@ let maxLevelTop = (data.gameSettings.viewDeltas && data.gameSettings.viewRatio) 
                 ${expBar}
                 ${storyContainer}
                 ${attsContainer}
+                ${automationContainer}
                 ${levelInfoContainer}
                 ${downstreamContainer}
                 ${lockOverAll}

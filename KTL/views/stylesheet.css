@@ -184,6 +184,22 @@ body.lightMode {
     --wage-color: #ffdd00;
 }
 
+.actionIconSvg {
+    filter: invert(86%) sepia(43%) saturate(2850%) hue-rotate(359deg) brightness(103%) contrast(97%)
+drop-shadow(0 0 3px #FCEE36)
+drop-shadow(0 0 8px #FCEE36);
+}
+.generatorIconSvg {
+    filter:
+        brightness(0) /* Start by making it black to have a consistent base for color manipulation */
+        invert(1) /* Invert to white */
+        grayscale(1) /* Ensure it's pure grayscale */
+        brightness(0.8) /* Make it a bright grey */
+        contrast(1.5) /* Increase contrast for metallic feel */
+        drop-shadow(0 0 5px rgba(255, 255, 255, 0.4)); /* Add a subtle white glow */
+
+}
+
 body {
     -webkit-touch-callout: none;
     -webkit-user-select: none;

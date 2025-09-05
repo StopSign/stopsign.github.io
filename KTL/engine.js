@@ -324,8 +324,6 @@ function unveilAction(actionVar) {
     actionObj.visible = true;
     revealActionAtts(actionObj);
 
-    // setUpstreamSlidersToUnlockValue(actionVar); // New line
-
     updateSupplyChain(actionVar);
 }
 
@@ -346,51 +344,49 @@ function addMaxLevel(actionVar, amount) {
     updateSupplyChain(actionVar);
 }
 
-
-function isNeeded(actionVar, memo = {}) {
-    if(["overcharge", "overboost", "overdrive"].includes(actionVar)) {
-        return false;
-    }
-    if (memo[actionVar] !== undefined) {
-        return memo[actionVar];
+//for a given actionVar:
+//1. if already exists in the list, return that
+//2. if it doesn't exist or is not visible, return false
+//3. if it isn't max level, return true
+//4. else, if it is max level, recurse down to the children - are any of them not max level and visible? If any are, it makes all their parents yes needed
+//5. if none are needed, return false
+//6. saves in isNeededList only to prevent recalc with multiple calls via updateSupplyChain
+//7. if the action has automationOff, i'm pretty sure it shouldn't change anything here - it's still needed or not based on max level
+function isNeeded(actionVar, isNeededList = {}) {
+    if (isNeededList[actionVar] !== undefined) {
+        return isNeededList[actionVar];
     }
 
     const actionObj = data.actions[actionVar];
     const dataObj = actionData[actionVar];
 
     if (!actionObj || !actionObj.visible) {
-        memo[actionVar] = false;
+        isNeededList[actionVar] = false;
         return false;
     }
 
     const isMaxLevel = actionObj.maxLevel !== undefined && actionObj.level >= actionObj.maxLevel;
     if (!isMaxLevel) {
-        memo[actionVar] = true;
+        isNeededList[actionVar] = true;
         return true;
     }
 
     if (dataObj.downstreamVars) {
         for (const downstreamVar of dataObj.downstreamVars) {
-            if(["overcharge", "overboost", "overdrive"].includes(actionVar)) {
-                continue;
-            }
-            if (isNeeded(downstreamVar, memo)) {
-                memo[actionVar] = true;
+            if (isNeeded(downstreamVar, isNeededList)) {
+                isNeededList[actionVar] = true;
                 return true;
             }
         }
     }
 
-    memo[actionVar] = false;
+    isNeededList[actionVar] = false;
     return false;
 }
 
-function updateSupplyChain(startActionVar) {
-    if(["overcharge", "overboost", "overdrive"].includes(startActionVar)) {
-        return;
-    }
 
-    const memo = {};
+function updateSupplyChain(startActionVar) {
+    const isNeededList = {};
     let currentVar = startActionVar;
 
     while (currentVar) {
@@ -402,22 +398,28 @@ function updateSupplyChain(startActionVar) {
         }
 
         const parentVar = dataObj.parentVar;
-        const childIsNeeded = isNeeded(currentVar, memo);
+        const childIsNeeded = isNeeded(currentVar, isNeededList);
 
         let currentSliderValue = data.actions[parentVar][`downstreamRate${currentVar}`];
 
         if (childIsNeeded) {
             if (currentSliderValue === 0) {
-                setSliderUI(parentVar, currentVar, getUpgradeSliderAmount());
+                if(!actionObj.automationOff) {
+                    setSliderUI(parentVar, currentVar, getUpgradeSliderAmount());
+                }
             }
         } else {
             if (data.upgrades.knowWhenToMoveOn.upgradePower > 0) {
                 if (currentSliderValue !== 0) {
-                    setSliderUI(parentVar, currentVar, 0);
+                    if(!actionObj.automationOff) {
+                        setSliderUI(parentVar, currentVar, 0);
+                    }
                 }
             } else {
                 if (currentSliderValue === 0) {
-                    setSliderUI(parentVar, currentVar, getUpgradeSliderAmount());
+                    if(!actionObj.automationOff) {
+                        setSliderUI(parentVar, currentVar, getUpgradeSliderAmount());
+                    }
                 }
             }
         }

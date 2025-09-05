@@ -871,23 +871,23 @@ let actionData = {
         extraInfo: {english:Raw.html`This action gains (Momentum)^0.25 * (Conversation)^0.5 / 1e12 Fear 
         for each Overclock complete, which is a gain of
         <span style="font-weight:bold;" id="hearAboutTheLichActionPower">0</span>`},
-        storyText: {english:Raw.html`
-        It is my worst nightmare become reality; the lich has returned. My lost home country, Sovvgor, had only ever delayed the 
-        lich with the Emperor's Curse. All I had known, all the horror I had witnessed... was only a delay. Perhaps that situation
-        was engineered by the lich in the background, in order to get around the blockade of the Curse.<br><br>
-        
-        It mattered little. There was a lich, it was coming for all humanity, and I was prepared.<br><br>
-        
-        I was terrified at the idea of trying to go against the lich, but I thought of how many lives had been sacrificed 
-        and ruined at the altar of this monstrosity's rampage. In what felt like such a short time, Overclock had grown far 
-        beyond what I had achieved to Get Safe, and I was ready; I could bend fate in my favor to kill the lich.<br><br>
-        
-        This time, however, I was going to go prepared; I knew Fate could only bend so far at a time. I had just received magic,
-        and knew that all I needed was to show I had the power to help, and the War for Life would let me join.<br><br>
-        
-        So, I changed the target of Overclock, from itself to a new target: Kill the Lich. I felt my thoughts collapse, no longer held up 
-        by the artificial momentum. I became focused, with only a single goal in mind: letting my ability life my legs, move my mouth, and swing my sword. 
-        For better or worse, I was along for the ride.<br><br>`}
+        // storyText: {english:Raw.html`
+        // It is my worst nightmare become reality; the lich has returned. My lost home country, Sovvgor, had only ever delayed the
+        // lich with the Emperor's Curse. All I had known, all the horror I had witnessed... was only a delay. Perhaps that situation
+        // was engineered by the lich in the background, in order to get around the blockade of the Curse.<br><br>
+        //
+        // It mattered little. There was a lich, it was coming for all humanity, and I was prepared.<br><br>
+        //
+        // I was terrified at the idea of trying to go against the lich, but I thought of how many lives had been sacrificed
+        // and ruined at the altar of this monstrosity's rampage. In what felt like such a short time, Overclock had grown far
+        // beyond what I had achieved to Get Safe, and I was ready; I could bend fate in my favor to kill the lich.<br><br>
+        //
+        // This time, however, I was going to go prepared; I knew Fate could only bend so far at a time. I had just received magic,
+        // and knew that all I needed was to show I had the power to help, and the War for Life would let me join.<br><br>
+        //
+        // So, I changed the target of Overclock, from itself to a new target: Kill the Lich. I felt my thoughts collapse, no longer held up
+        // by the artificial momentum. I became focused, with only a single goal in mind: letting my ability life my legs, move my mouth, and swing my sword.
+        // For better or worse, I was along for the ride.<br><br>`}
     },
 
 //--- From upgrades ---
@@ -933,10 +933,10 @@ actionData = {
         expAtts:[["curiosity", 1], ["concentration", 1]],
         efficiencyAtts:[["navigation", 1]],
         unlockMessage:{english:"On unlock, +3 max level for Body Awareness."},
-        storyText:{english:Raw.html`While off to the side of the path, you, at Scott's suggestion, focus on what you can 
-        smell as well. Sometimes there's a certain scent on the breeze, like something sweet, hiding on the mountain.<br><br>
-        The foliage on the mountain becomes too thick to move in and find the source of the scent, 
-        but you can at least tell Scott that you shared his experience.`}
+        // storyText:{english:Raw.html`While off to the side of the path, you, at Scott's suggestion, focus on what you can
+        // smell as well. Sometimes there's a certain scent on the breeze, like something sweet, hiding on the mountain.<br><br>
+        // The foliage on the mountain becomes too thick to move in and find the source of the scent,
+        // but you can at least tell Scott that you shared his experience.`}
     },
     exploreDifficultPath: {
         tier:1, plane:0,
@@ -1351,14 +1351,14 @@ actionData = {
         onLevelAtts:[],
         expAtts:[],
         efficiencyAtts:[],
-        storyText: { english: Raw.html`
-        &nbsp;&nbsp;&nbsp;&nbsp;The first step in how to create your own magic: Stay Still. I had been trying not to do this, but with the 
-        instructions of the hermit, I found new cause to try again. I don't hide my struggle with the task, and the old man scoffs.<br><br>
-        
-        &nbsp;&nbsp;&nbsp;&nbsp;"Do this on your own time, but later you should try meditation. Write things down if you have trouble with it."<br><br>
-        
-        &nbsp;&nbsp;&nbsp;&nbsp;He was surprisingly less grumpy as he said it, and with a look at my face his scowl returned.<br><br>
-        ` }
+        // storyText: { english: Raw.html`
+        // &nbsp;&nbsp;&nbsp;&nbsp;The first step in how to create your own magic: Stay Still. I had been trying not to do this, but with the
+        // instructions of the hermit, I found new cause to try again. I don't hide my struggle with the task, and the old man scoffs.<br><br>
+        //
+        // &nbsp;&nbsp;&nbsp;&nbsp;"Do this on your own time, but later you should try meditation. Write things down if you have trouble with it."<br><br>
+        //
+        // &nbsp;&nbsp;&nbsp;&nbsp;He was surprisingly less grumpy as he said it, and with a look at my face his scowl returned.<br><br>
+        // ` }
     },
     feelTheResonance: {
         tier:1, plane:0,
@@ -1512,8 +1512,8 @@ actionData = {
         onLevelAtts:[["legacy", 20]],
         expAtts:[],
         efficiencyAtts:[],
-        storyText: {english: Raw.html`You pay respect to the shrine, 
-        and feel your amulet resonate with feelings around this shrine.`}
+        // storyText: {english: Raw.html`You pay respect to the shrine,
+        // and feel your amulet resonate with feelings around this shrine.`}
     },
     travelToCrossroads: {
         tier:1, plane:0,
@@ -3152,8 +3152,8 @@ actionData = {
         onUnlock: function() {
         },
         onLevelCustom: function() {
-            unveilAction("manaBasics")
-            unveilAction("prepareSpells")
+            unveilAction('manaBasics')
+            unveilAction('prepareSpells')
         },
         onLevelAtts:[["pulse", 3]],
         expAtts:[["amplification", 1]],
@@ -3171,9 +3171,9 @@ actionData = {
         efficiencyBase:.5, maxLevel:6,
         unlockCost:.3, visible:false, unlocked:false, purchased: true,
         onLevelCustom: function () {
-            unveilAction("magicResearch")
-            unveilAction("manaExperiments")
-            unveilAction("prepareInternalSpells")
+            unveilAction('magicResearch')
+            unveilAction('manaExperiments')
+            unveilAction('prepareInternalSpells')
         },
         onLevelAtts:[["amplification", 20], ["pulse", 1]],
         expAtts:[],
@@ -3186,9 +3186,9 @@ actionData = {
         efficiencyBase:.015, maxLevel:3,
         unlockCost:1, visible:false, unlocked:false, purchased: true,
         onLevelCustom: function () {
-            unveilAction("feelYourMana")
-            unveilAction("manaObservations")
-            unveilAction("infuseTheHide")
+            unveilAction('feelYourMana')
+            unveilAction('manaObservations')
+            unveilAction('infuseTheHide')
         },
         onLevelAtts:[["amplification", 60], ["pulse", 2]],
         expAtts:[],
@@ -3201,8 +3201,8 @@ actionData = {
         efficiencyBase:.02, maxLevel:9,
         unlockCost:30, visible:false, unlocked:false, purchased: true,
         onLevelCustom: function() {
-            unveilAction("manaVisualizations")
-            unveilAction("growMagicSenses")
+            unveilAction('manaVisualizations')
+            unveilAction('growMagicSenses')
         },
         onLevelAtts:[["amplification", 200]],
         expAtts:[],
@@ -3215,7 +3215,7 @@ actionData = {
         efficiencyBase:1, maxLevel:9,
         unlockCost:200, visible:false, unlocked:false, purchased: true,
         onLevelCustom: function() {
-            unveilAction("etchTheCircle")
+            unveilAction('etchTheCircle')
         },
         onLevelAtts:[["spark", 10], ["pulse", 5]],
         expAtts:[],
@@ -3228,9 +3228,9 @@ actionData = {
         efficiencyBase:.35, maxLevel:9,
         unlockCost:500, visible:false, unlocked:false, purchased: true,
         onLevelCustom: function() {
-            unveilAction("overcharge")
-            unveilAction("combatSpells")
-            unveilAction("recoverSpells")
+            unveilAction('overcharge')
+            unveilAction('combatSpells')
+            unveilAction('recoverSpells')
         },
         onLevelAtts:[["spark", 3]],
         expAtts:[],
@@ -3243,7 +3243,7 @@ actionData = {
         efficiencyBase:.3, maxLevel:9,
         unlockCost:500, visible:false, unlocked:false, purchased: true,
         onLevelCustom: function() {
-            unveilAction("overboost")
+            unveilAction('overboost')
         },
         onLevelAtts:[["spark", 3]],
         expAtts:[],
@@ -3256,7 +3256,7 @@ actionData = {
         efficiencyBase:.4, maxLevel:1, isSpell:true, instabilityToAdd:10,
         unlockCost:500, visible:false, unlocked:false, purchased: true,
         onLevelCustom: function() {
-            unveilAction("overdrive")
+            unveilAction('overdrive')
         },
         spellpower: function() {
             return 10;
@@ -3304,7 +3304,7 @@ actionData = {
         efficiencyBase:.01, maxLevel:3,
         unlockCost:90000, visible:false, unlocked:false, purchased: true,
         onLevelCustom: function() {
-            unveilAction("manaShaping")
+            unveilAction('manaShaping')
         },
         onLevelAtts:[["vision", 150]],
         expAtts:[],
@@ -3317,7 +3317,7 @@ actionData = {
         efficiencyBase:.01, maxLevel:9,
         unlockCost:300, visible:false, unlocked:false, purchased: true,
         onLevelCustom: function() {
-            unveilAction("listenToTheMana");
+            unveilAction('listenToTheMana');
         },
         onLevelAtts:[["amplification", 600]],
         expAtts:[],
@@ -3342,7 +3342,7 @@ actionData = {
         efficiencyBase:1, maxLevel:2,
         unlockCost:1000, visible:false, unlocked:false, purchased: true,
         onLevelCustom: function() {
-            unveilAction("bindThePages")
+            unveilAction('bindThePages')
         },
         onLevelAtts:[["vision", 5]],
         expAtts:[["amplification", .01]],
@@ -3355,7 +3355,7 @@ actionData = {
         efficiencyBase:1, maxLevel:1,
         unlockCost:1000, visible:false, unlocked:false, purchased: true,
         onLevelCustom: function() {
-            unveilAction("awakenYourGrimoire")
+            unveilAction('awakenYourGrimoire')
         },
         onLevelAtts:[["vision", 30]],
         expAtts:[["amplification", .01]],
@@ -3381,7 +3381,7 @@ actionData = {
         unlockCost:6000, visible:false, unlocked:false, purchased: true,
         onLevelCustom: function() {
             unveilAction('prepareExternalSpells')
-            unveilAction("supportSpells")
+            unveilAction('supportSpells')
             levelAllCharges()
         },
         onLevelAtts:[["integration", 200]],

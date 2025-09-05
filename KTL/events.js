@@ -322,6 +322,21 @@ function actionTitleClicked(actionVar, setAll) {
     actionContainer.style.transform = `translate(${newtransformX}px, ${newtransformY}px) scale(${scale})`;
 }
 
+function toggleAutomation(actionVar) {
+    let actionObj = data.actions[actionVar];
+    const checkbox = document.getElementById(`${actionVar}_checkbox`);
+
+    actionObj.automationOff = checkbox.checked;
+
+    if (checkbox.checked) {
+        views.updateVal(`${actionVar}_track`, "#2196F3", "style.backgroundColor");
+        views.updateVal(`${actionVar}_knob`, "translateX(26px)", "style.transform");
+    } else {
+        views.updateVal(`${actionVar}_track`, "#ccc", "style.backgroundColor");
+        views.updateVal(`${actionVar}_knob`, "translateX(0px)", "style.transform");
+    }
+}
+
 
 function clickActionMenu(actionVar, menuVar, isLoad) {
     let actionObj = data.actions[actionVar];

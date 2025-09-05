@@ -11,12 +11,12 @@ function initializeMenus() {
     createMenu(); // makes the button | menu | title
     addMenuTab("help");
     addMenuTab("helpForReal");
-    addMenuTab("story");
+    addMenuTab("backstory");
     addMenuOptionsTab(); //adjust fps, saving
     addDataTab();
     addMenuTab("previousTips");
     addMenuTextContainer("help", createHelpMenu());
-    addMenuTextContainer("story", createStoryMenu());
+    addMenuTextContainer("backstory", createStoryMenu());
     addMenuTextContainer("options", createOptionsMenu());
 
     addMenuTextContainer("statistics", createDataMenu());
@@ -148,75 +148,43 @@ function createHelpMenu() {
 function createStoryMenu() {
     return Raw.html`<div class="menuTitle">Background</div>
         <div class="menuSeparator"></div><br>
-&nbsp;&nbsp;&nbsp;&nbsp;A lich is a creature of bones, dark magic, and myth, occuring rarely in history and causing catastrophes each time. 13 years ago, the Emperor Brithan of Sovvgor had used one of his Talents to kill a lich far to the north, but not without great cost.
- Though this lich and his evil forces had been vanquished, there was a curse on the land. For hundreds of miles - which mostly included wasteland and the majority of the Empire of Sovvgor - those who had Talents could not use them. 
- Though they told us the cause, it was a bitter pill to swallow for all of the country's citizens. Talents were our magic, our connection to the idea that though the world is big, we have our place in it.<br><br>
+&nbsp;&nbsp;&nbsp;&nbsp;A lich is a creature of bones, dark magic, and myth, causing catastrophes in history each time one appears. 13 years ago, the Emperor Brithan of Sovvgor had used one of his Talents to remove such a creature, the vanquishing had not come without great cost: there was a curse laid upon the land. For hundreds of miles around the Dread Fortress far to the north, those who had Talents could not use them. These lands were mostly made of frozen wasteland, or dead cities turned into fuel for the liches ambition, but it did also encompass the majority of the Empire of Sovvgor - my home. The nobility informed us of our shared glory for bearing this burden with them, it was a bitter pill to swallow when Talents were our magic, our identity, and our proof that the Gods loved us. Talents are our connection to the idea that though the world is big, we have our place in it. With them gone... who would we be?<br><br>
 
-&nbsp;&nbsp;&nbsp;&nbsp;My ability is Overclock, and the simple description of it is "Choose a valid target; get a little more out of it". 
-I used to change Overclock's target a dozen times a day, enjoying the extra "skips" in my "steps" as it hurried me along, so-to-speak. 
-When, without warning, the curse made all abilities in the country inert and useless, my ability was locked with a Target of [Get Somewhere Safe]. 
-For a few peaceful years it was just something to grieve and adjust to. However, as Sovvgor was betrayed by our greedy neighbors Gryndall, 
-and as I was conscripted and armed and trained as a soldier, the locked target of my Description instead became my mantra and my burden. 
-It was forever locked on the one thing I desired, and this was a rather painful irony I had to overcome on my march towards certain death.<br><br>
+&nbsp;&nbsp;&nbsp;&nbsp;My Talent is Overclock, and the simple description of it is "Choose a valid target; get a little more out of it". In my youth, I used to change Overclock's target a dozen times a day, enjoying the extra "skips" in my "steps" as it hurried me along, so-to-speak. I used it to ease the daily life - doing chores and travelling, mostly. As a boy of 10 years, I had been playing a game of hide and seek with my friends when, without warning, the curse fell over us and all our Talents were locked, inert, and useless. My Overclock was locked with a Target of [Get Somewhere Safe], unable to be changed, and unable to help. For a few peaceful years our new reality was something to grieve and adjust to. We pined for what could have been, as we moved on to discover who we would become instead. However, we never got the chance; our neighbors only saw the curse as a weakness to exploit. <br><br> 
 
-&nbsp;&nbsp;&nbsp;&nbsp;Gryndal used to be our former ally, a country in the west we have known for many decades. 
-But they smelled blood in the water, and who can say they would do different? They forced a diplomatic incident that 
-demanded a response, the lords shouted a lot, and off to war us conscripts went. Originally, the hope was that we would 
-escape the curse's domain and use our Talents again, and re-equip and re-train accordingly. We had blacksmiths and enchanters! 
-The hope was that their honor would give us at least some semblance of a fair fight. How disgustingly optimistic.<br><br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sovvgor's small, long-term ally on our western border, Gryndall, started giving us unfavorable deals. They had been formerly pacified by our might, but realized they had advantages that tipped the scales; they had materials that could be further refined with Talents, and products that were made quicker and with less expertise required, and we had to buy such items at a premium. They had enchanted items and magics that were only made viable through Talents that specialized in them, and we lacked anything to balance the scales. When we ran out of gold to give, their greed only increased and their sights turned to our resources. After a forced diplomatic incident turned into a cry for war, the Emperor had no choice but to prepare an army.<br><br>
 
-&nbsp;&nbsp;&nbsp;&nbsp;The Ashmarch, is what they eventually called it, for what was left of the land. They killed all but a handful of men 
-during the journey itself, experimenting with how the various long range ablities, summons, and devils lasted into our 
-cursed land. We were defenseless, but we marched onward, for it was our only option. Many horrors were on the battlefield those three days. Too many.<br><br>
+&nbsp;&nbsp;&nbsp;&nbsp;I was conscripted, armed, and trained - clumsily - as a soldier. At first, they hardly knew what to do with us; before the curse, soldiers without a Talent for combat would be passed over, and those with relevant Talents would get training and placement accordingly. The locked target of Overclock became my mantra and my curse, forever locked on the one thing I desired - safety - and this was a rather painful irony during my training and subsequent marching. Sovvgor's mages still had their magic - albeit greatly diminished - and our army was greater in numbers than Gryndall could field... but while the town criers proclaimed an inevitable victory, the pale faces of our leaders and obvious fear in our heroes were the true heralds of our fate.<br><br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;The plan, as far as they told us conscripts, was simple: push far enough into Gryndallan territory that our Talents became active again. We were assured that Gryndall had pulled their borders back to the curse's edge, and that we would only have a single wall to get past. We were assured we had mages capable of doing the breach, that we had Talented engineers and blacksmiths and enchanters ready to create a fortress. We were told we simply had to remind the world of our Empire's strength, but that most of us would get to go home - if we followed our training. We started marching west, instilled with the delusional optimism needed to get us moving at all.<br><br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;Eventually, I learned the truth of the situation: our mages and enchanters loved magic more than they loved our country, and had moved or been bought out long ago. Worse, some Talents around magic allowed for much greater distance on their magics, or allowed for summons to have a longer leash or greater intelligence, or allowed for the sharing of mana to funnel lesser Talented mages towards the ones who were useful to the situation. Even while still far away from the edge of the curse, we started dying from explosions, clouds of death, and summoned devils that our remaining mages could not adequately defend against.<br><br> 
+
+&nbsp;&nbsp;&nbsp;&nbsp;It was eventually named the Ashmarch, for what was left of the land. Gryndall had killed all but a handful of men during the journey itself. Tens of thousands of screams and bodies I marched past, with my vision narrowing on the goal and false hope of crossing the line. We were defenseless, but we marched onward, having come too far for any other choice. Three days it lasted, and the horrors were too great for my mind to hold. The fellow soldiers I saw die, the cries I heard, the traps prepared for us, the unholy desecration of- ... No. Too many horrors. Far too many.<br><br>
 
 &nbsp;&nbsp;&nbsp;&nbsp;I try not to think about it.<br><br>
         
-&nbsp;&nbsp;&nbsp;&nbsp;The Gryndallan betrayers didn't let us reach the edge of the curse. Our Talents were never unlocked by walking out. 
-I think they only left us alive at the edge hoping to be entertained with the last of our impotent revenge. 
-They wanted us to burn out in front of them, but they rapidly lost interest when they only found injured men waiting for their turn to die. We were quickly captured.<br><br>
+&nbsp;&nbsp;&nbsp;&nbsp;The Gryndallan betrayers never let us reach the edge of the curse. Our Talents were never unlocked by our own will. I wondered why they didn't simply wipe us out entirely before we even saw the border, but when we finally did, the answer was written on their faces: disappointment and boredom. They hoped to be entertained with our remnants; they thought we would rage with fury and revenge, providing stories and glory for their Talented heroes as they made a show of killing us. Instead, they rapidly lost interest when they only found injured men waiting for their turn to die. We were quickly captured, putting up no resistance. <br><br>
 
-&nbsp;&nbsp;&nbsp;&nbsp;As the Gryndallans were deciding what to do with us, the situation suddenly changed: after 13 years of our abilities
- being frozen and inert, they suddenly sprang alive and became active! Later we would learn this was the Gryndallans who, in an incident of timing,
-  had killed our Emperor too early, but in the moment we thought it fortune smiling upon us and seized the moment. My Overclock had also sprung to life,
-   and with 13 years of buildup, fate herself bent to see my Target true. My escape was a circus of coincidences
-    and unforseen Talent interactions, but I got out - alone. My Talent, with the buildup, had become more than the skip in my steps; 
-    it was the whole step, and the knowledge of when and where to do so as well.<br><br> 
-    
-    Going with the flow of my ability, it carried me out of the fire, out of the war, out of danger, out of caution, and 
-    into Safety. Over the next few weeks, I continued the repeated miraculous luck, though the effect diminished over time.
-    From finding abandoned horses and supplies, to hearing just the right thing in a conversation, to staying in just the 
-    right spot to not be discovered while I slept. Ultimately, [Get Somewhere Safe] had gotten me... Somewhere Safe.<br><br>
+&nbsp;&nbsp;&nbsp;&nbsp;We were bound with rope, and kept within the cursed side. The Gryndallans debated on what to do with us: whether to bring us one a time across the border for staged duels to appease the egos of their gathered warriors, or whether it would be too large of a risk for, and they should kill us all without such theatrics. It was during this moment that the situation suddenly changed: after 13 years of our Talents being frozen and inert, they suddenly sprang alive and became active, all at once. Some of my fellows became unbound through their various Talents of escape, cutting, or fire, and freed most of us before it was noticed and the chaos of battle truly started.<br><br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;Later we would learn the curse broke because our Emperor had died from assassination, but at the moment we only had thoughts of survival. When I understood our Talents were active again, and I checked Overclock, something new happened to me: Overclock slammed into me with a metaphysical weight I had never experienced. Over the 13 years it had not been truly inactive, but instead building a reservoir behind a locked gate. It had become far, far more than a "a little more". My legs moved on their own, my eyes only tracked my next step, and I ducked and weaved according to whims and currents I had never felt before. Fate herself bent to see my target enacted, and my escape was a circus of coincidences, unforseen Talent ineractions, timing windows, and beginner mistakes from trained veterans that opened a gap large enough for me - and only me - to slip through.<br><br> 
+
+&nbsp;&nbsp;&nbsp;&nbsp;Going with the flow of Overclock - for I had neither the will nor the inclination to change its course - it carried me out of combat, out of war, and eventually out of danger entirely. In the few weeks that it guided my path, I continued the repeated miraculous luck even as the effect diminished steadily over time. From finding abandoned horses and supplies, to hearing just the right thing in a conversation, to staying in just the right spot to not be discovered while I slept. Ultimately, [Get Somewhere Safe] had gotten me... Somewhere Safe.<br><br>
         
-&nbsp;&nbsp;&nbsp;&nbsp;It was only when my legs stopped carrying me to the next task, and my hands stayed idle at my sides, 
-that I finally realized the only reason I was moving at all was Overclock churning through it's 13 year buildup of momentum. 
-But then - all at once - the remainder was gone. I had to find my own reasons for moving forward. At first, I stood there for hours, 
-frozen with it all, thinking of everything and nothing, before finally simply using my senses to discover what my body had done while I wasn't paying attention. <br><br>
+&nbsp;&nbsp;&nbsp;&nbsp;It was only when my legs stopped carrying me to the next task, and my hands stayed idle at my sides, and my eyes felt no supernatural twitches to look to the next goal, that I finally realized the only reason I was moving at all was Overclock was finished churning through it's 13 year buildup of momentum. But then - all at once - it was empty, and I was still. At first, I stood there for hours, frozen with it all, thinking of everything and nothing, before finally simply using my senses to discover what my body had done while I wasn't paying attention. I had to find my own reasons for moving forward.<br><br>
         
-&nbsp;&nbsp;&nbsp;&nbsp;I was Safe, and I knew it to be true - I was in a recently abandoned hunter's cabin, having caught his widow traveling 
-the other way, who said I could have it. I had the tools and supplies to let me survive on the wilderness around me as 
-long as I needed. I was not in my home in Sovvgor, nor in the betrayer Gryndal's lands, but instead the southern country Osric. 
-Osric's King had been observing the news in the north with caution, but had not interfered.<br<br>
+&nbsp;&nbsp;&nbsp;&nbsp;I was in a recently abandoned hunter's cabin, having caught his widow traveling the other way, who looked kindly upon me when I presented her with a flower that reminded her of her deceased love, and said I could have the cabin and none would bother me. In the cabin I had the tools and supplies to let me survive the surrounding wilderness as long as I needed. I was not in my home in Sovvgor, nor in the betrayer Gryndal's lands, but instead a country south of Gryndal, that I knew little of: Osric. Osric did not have a border wth Sovvgor, and so had not helped with the lich or interfered with Gryndal's claims.<br<br>
         
-&nbsp;&nbsp;&nbsp;&nbsp;I could exist here, and it would be Safe. And for a few weeks, I did just that while I settled in. But the nightmares got stronger, 
-and my paranoia was bleeding over into affecting my waking moments. In a move to give myself an option, I decided to attempt 
-to replicate the buildup of 13 years by changing Overclock's target. To some surprise, I set it successfully, and the Target of Overclock was... [Overclock].<br><br>
+&nbsp;&nbsp;&nbsp;&nbsp;I could exist here, and it would be safe - my Talent had guaranteed so. And for a few weeks, I did just that while I settled in. But the nightmares got stronger, and my paranoia was bleeding over into affecting my waking moments, and I started considering how to use the fate-bending exerted by Overclock. In a move to give myself a fallback option, I decided to attempt to replicate the buildup of 13 years. At first I was unsure how to have a "neutral" target that could be re-pointed later without needing to find a way to lock it again, but with sudden clarity I tested changing the target... to itself. The target of Overclock became: [Overclock].<br><br>
         
-&nbsp;&nbsp;&nbsp;&nbsp;At first, I put this choice out of my mind - it was only to remember it for comfort when I awoke in the night and little more. 
-This had been a choice to have a fate-bending escape option prepared, should I need it, for however the future was shaped. 
-Under the Emperor's curse, I had gotten used to daily life without it, and so it was fine - comforting, even - to keep the ability in reserve.<br><br>
+&nbsp;&nbsp;&nbsp;&nbsp;Satisfied, I put this choice out of my mind, only to open it for comfort when I awoke in the night and little more. This had been a choice to have a fate-bending escape option prepared, should I need it, for whatever else fate had for me. Under the Emperor's curse, I had gotten used to daily life without it, and so it was fine - comforting, even - to keep the ability in reserve.<br><br>
         
-&nbsp;&nbsp;&nbsp;&nbsp;As the days passed however, I eventually came to realize I was growing sharper in my focus as I went 
-about my daily chores, though I was also having increasing trouble sitting still after the day's work. 
-After a few weeks of solitude and focusing on nothing but survival and preparation for winter - blessed stagnancy -
- it became easy to point out the change: my ability was doing something. Overclock was somehow making me move, making me think. 
- It seemed the choice was still mine for which of those I could do, and it made my choice obvious; I didn't want to think, right now.<br><br>
+&nbsp;&nbsp;&nbsp;&nbsp;After a few weeks of solitude and focusing on nothing but survival and preparation for winter - blessed stagnancy and repetition - it became obvious that a type of unfamiliar pressure was building: my ability was doing something I had not expected, and it was not simply building passively. I eventually came to realize the pressure became noticeablyy less as I performed tasks that would have been valid targets for Overclock. I was completing my daily chores quicker, but also I was having increasing trouble sitting still after the day's work, and when I had more time I would start to reflect on what got me here - which caused panic and terror and guilt I was desperately trying not to consider. Overclock, when targeting itself, was somehow still making me move, making me think... the momentum was spilling over, somehow. It seemed the choice was still mine for how to relieve the pressure, and so I threw myself into more work.<br><br>
   
- I adjusted, and simply did more each day. For a while it lasted, but I was well on my second pile of firewood when I realized I had more than I reasonably could use. I let myself think about why. 
- Firewood kept stacking up because I was trying to use the forced movement coming out of my ablity, so that it didn't force me to do what I know I needed to.<br><br>
+&nbsp;&nbsp;&nbsp;&nbsp;I started doing chores I didn't need to - piling up more firewood, cleaning my clothes more often, carving wood into furniture and decorations. For a while it lasted, but I was finishing my fourth pile of firewood when I realized I had more than I reasonably could use for the entire winter, and reconsidered how what I was doing. I let myself think about why I was pushing things out. I let myself think about who I wanted to be, and I realized I would need to think about who I was. I considered changing Overclock's target to continue to avoiding the subject, but I felt instant terror at the idea that I would be without safety - the same as any other soldier in the Ashmarch.<br><br>
 
-&nbsp;&nbsp;&nbsp;&nbsp;As I finally made that connection, I also realized that it couldn't go on.<br><br>
-        
-&nbsp;&nbsp;&nbsp;&nbsp;And so, after putting it off as long as possible with as many chores and preparations done I could think of, I stopped. I sat on the floor. I breathed. I let it in.
+&nbsp;&nbsp;&nbsp;&nbsp;As I finally made that connection, I realized that the only way forward was through. And so, after putting it off as long as possible, I stopped. I sat on the floor. I breathed. I let it in, and reflected.<br><br>
 `
 }
 
