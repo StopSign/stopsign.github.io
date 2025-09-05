@@ -164,15 +164,15 @@ let views = {
             return false;
         }
 
-        let miniVersion = scale < .55;
-        let mediumVersion = scale < .65 && !miniVersion;
+        let miniVersion = scaleByPlane[data.planeTabSelected] < .55;
+        let mediumVersion = scaleByPlane[data.planeTabSelected] < .65 && !miniVersion;
         let isMaxLevel = actionObj.maxLevel !== undefined && actionObj.level >= actionObj.maxLevel;
         views.updateVal(`${actionVar}LargeVersionContainer`, !miniVersion?"":"none", "style.display");
         views.updateVal(`${actionVar}SmallVersionContainer`, miniVersion?"":"none", "style.display");
         views.updateVal(`${actionVar}Container`, miniVersion ? "100px" : "" , "style.borderRadius");
-        views.updateVal(`${actionVar}SmallVersionContainer`, ((scale < .11) ? 3 : (1 / scale)*.8)+"", "style.scale");
+        views.updateVal(`${actionVar}SmallVersionContainer`, ((scaleByPlane[data.planeTabSelected] < .11) ? 3 : (1 / scaleByPlane[data.planeTabSelected])*.8)+"", "style.scale");
 
-        views.updateVal(`${actionVar}SmallVersionTitle`, scale < .11 ? "0" : "1" , "style.opacity");
+        views.updateVal(`${actionVar}SmallVersionTitle`, scaleByPlane[data.planeTabSelected] < .11 ? "0" : "1" , "style.opacity");
         views.updateVal(`${actionVar}Container`, miniVersion ? "100px" : "" , "style.borderRadius");
 
         views.updateVal(`${actionVar}SmallVersionLevels`, isMaxLevel?"var(--max-level-color)":"var(--text-primary)", "style.color");
@@ -504,14 +504,32 @@ function isActionVisible(actionVar) {
     const currentTransformX = transformX[data.planeTabSelected];
     const currentTransformY = transformY[data.planeTabSelected];
 
-    const elementScreenX = currentTransformX + (element.realX * scale);
-    const elementScreenY = currentTransformY + (element.realY * scale);
+    const elementScreenX = currentTransformX + (element.realX * scaleByPlane[data.planeTabSelected]);
+    const elementScreenY = currentTransformY + (element.realY * scaleByPlane[data.planeTabSelected]);
 
-    const elementScreenWidth = 350 * scale;
-    const elementScreenHeight = 400 * scale;
+    const elementScreenWidth = 350 * scaleByPlane[data.planeTabSelected];
+    const elementScreenHeight = 400 * scaleByPlane[data.planeTabSelected];
 
     return elementScreenX < window.innerWidth &&
         elementScreenX + elementScreenWidth > 0 &&
         elementScreenY < window.innerHeight &&
         elementScreenY + elementScreenHeight > 0;
+}
+
+function updateSliderContainers() {
+    for(let actionVar in data.actions) {
+        let dataObj = actionData[actionVar];
+        for (let downstreamVar of dataObj.downstreamVars) {
+            if(!data.actions[downstreamVar].hasUpstream) {
+                continue;
+            }
+            if (data.gameSettings.viewAdvancedSliders) {
+                views.updateVal(`${actionVar}_${downstreamVar}_slider_container_advanced`, "inline-block", "style.display");
+                views.updateVal(`${actionVar}_${downstreamVar}_slider_container_basic`, "none", "style.display");
+            } else {
+                views.updateVal(`${actionVar}_${downstreamVar}_slider_container_advanced`, "none", "style.display");
+                views.updateVal(`${actionVar}_${downstreamVar}_slider_container_basic`, "flex", "style.display");
+            }
+        }
+    }
 }

@@ -259,7 +259,7 @@ let upgradeData = {
         },
         onBuy: function(num) {
             for (let actionVar in data.actions) {
-                views.updateVal(`${actionVar}_automationMenuButton`, "", "style.display");
+                views.updateVal(`${actionVar}_automationMenuButton`, data.actions[actionVar].hasUpstream?"":"none", "style.display");
             }
         }
     },
@@ -273,7 +273,7 @@ let upgradeData = {
         },
         onBuy: function(num) {
             for (let actionVar in data.actions) {
-                views.updateVal(`${actionVar}_automationMenuButton`, "", "style.display");
+                views.updateVal(`${actionVar}_automationMenuButton`, data.actions[actionVar].hasUpstream?"":"none", "style.display");
             }
         }
     },

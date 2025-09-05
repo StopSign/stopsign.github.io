@@ -291,6 +291,17 @@ function createOptionsMenu() {
                 </div>
             </div>
         </div>
+        
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+            <span style="font-size:14px;">Use Advanced Downstream Sliders<br>(Warning: will adjust to the nearest option when turning off)</span>
+            <div id="viewAdvancedSlidersSwitch" onclick="toggleAdvancedSliders()" style="position:relative;cursor:pointer;border:1px solid #aaa;border-radius:4px;padding:2px;width:200px;height:30px;">
+                <div style="position:absolute;left:2px;top:2px;width:calc(50% - 2px);height:calc(100% - 4px);background:#ccc;border-radius:2px;z-index:1;"></div>
+                <div style="position:relative;display:flex;z-index:2;height:100%;">
+                    <span style="flex:1;text-align:center;font-size:13px;font-weight:bold;line-height:26px;color:#000;">Off</span>
+                    <span style="flex:1;text-align:center;font-size:13px;font-weight:bold;line-height:26px;color:#000;">On</span>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="menuSeparator"></div>
@@ -439,6 +450,38 @@ function toggleViewAll0Buttons() {
             views.updateVal(`${actionVar}ToggleDownstreamButtons`, "none", "style.display");
         }
     }
+}
+
+function toggleAdvancedSliders() {
+    const el = document.getElementById('viewAdvancedSlidersSwitch');
+    const slider = el.firstElementChild;
+    data.gameSettings.viewAdvancedSliders = !data.gameSettings.viewAdvancedSliders;
+    if (data.gameSettings.viewAdvancedSliders) {
+        slider.style.left = '50%';
+    } else {
+        slider.style.left = '0';
+    }
+
+    if(!data.gameSettings.viewAdvancedSliders) { //Switch from off to on
+        for(let actionVar in data.actions) {
+            let dataObj = actionData[actionVar];
+            for (let downstreamVar of dataObj.downstreamVars) {
+                if(data.actions[downstreamVar].hasUpstream) {
+                    setSliderUI(actionVar, downstreamVar, convertToNearest(data.actions[actionVar][`downstreamRate${downstreamVar}`]));
+                }
+            }
+        }
+    }
+
+    updateSliderContainers()
+}
+
+function convertToNearest(num) {
+    const targets = [0, 10, 50, 100];
+
+    return targets.reduce((closest, current) => {
+        return (Math.abs(current - num) < Math.abs(closest - num)) ? current : closest;
+    });
 }
 
 function changeDarkMode() {

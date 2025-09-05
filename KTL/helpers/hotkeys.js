@@ -35,10 +35,10 @@ document.addEventListener("keydown", function(e) {
     let isShowing = document.getElementById("helpMenu").style.display !== "none";
 
     if (keysPressed['q'] && !isShowing) {
-        setZoomNoMouse(scale - scaleStep*2)
+        setZoomNoMouse(scaleByPlane[data.planeTabSelected] - scaleStep*2)
     }
     if (keysPressed['e'] && !isShowing) {
-        setZoomNoMouse(scale + scaleStep*2)
+        setZoomNoMouse(scaleByPlane[data.planeTabSelected] + scaleStep*2)
     }
 
 
@@ -96,7 +96,7 @@ function moveActionContainer() {
         transformX[data.planeTabSelected] -= movementStep * shiftMod;
     }
     if(['w', 'a', 's', 'd', 'arrowleft', 'arrowup', 'arrowdown', 'arrowright'].some(key => keysPressed[key])) { //isMoving
-        actionContainer.style.transform = `translate(${transformX[data.planeTabSelected]}px, ${transformY[data.planeTabSelected]}px) scale(${scale})`;
+        actionContainer.style.transform = `translate(${transformX[data.planeTabSelected]}px, ${transformY[data.planeTabSelected]}px) scale(${scaleByPlane[data.planeTabSelected]})`;
     }
 
 

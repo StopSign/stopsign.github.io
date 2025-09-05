@@ -70,6 +70,7 @@ data.gameSettings = {
     viewRatio:false,
     viewAll0Buttons:false,
     viewTotalMomentum:false,
+    viewAdvancedSliders:false,
     numberType:"numberSuffix",
     redeemedBonusCodes:{}
 };
@@ -94,7 +95,8 @@ let isLoadingEnabled = true; //SET FALSE FOR CLEARING SAVE
 
 data.upgrades = {};
 
-let isDebug = true;
+let isDebug = false;
+// let isDebug = true;
 function debug() {
     if(!isDebug) {
         return;

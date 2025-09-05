@@ -437,7 +437,6 @@ function load() {
 
         data.toastStates = toLoad.toastStates;
 
-
         //load global items that aren't lists or objects
         data.gameState = toLoad.gameState ?? "default";
         data.planeTabSelected = toLoad.planeTabSelected ?? 0;
@@ -461,8 +460,10 @@ function load() {
         data.currentGameState = toLoad.currentGameState;
         // data.gameSettings = toLoad.gameSettings;
 
-
         //data correction
+        if(toLoad.gameSettings.viewAdvancedSliders === undefined) {
+            data.gameSettings.viewAdvancedSliders = true;
+        }
 
         //new spells need to be leveled to current grimoire's level
 
@@ -537,6 +538,8 @@ function patchActions(dataVar, toLoadActions, baseData) { //, dataActions, toLoa
 }
 
 function setSlidersOnLoad(toLoad) {
+    updateSliderContainers(); //show hide according to setting
+
     for(let actionVar in data.actions) {
         let dataObj = actionData[actionVar];
         for(let downstreamVar of dataObj.downstreamVars) {
@@ -619,6 +622,10 @@ function updateUIOnLoad() {
     document.getElementById('viewRatioSwitch').firstElementChild.style.left = data.gameSettings.viewRatio ? "50%" : "0";
     document.getElementById('viewTotalMomentumSwitch').firstElementChild.style.left = data.gameSettings.viewTotalMomentum ? "50%" : "0";
     document.getElementById('viewZeroButtonsSwitch').firstElementChild.style.left = data.gameSettings.viewAll0Buttons ? "50%" : "0";
+    document.getElementById('viewAdvancedSlidersSwitch').firstElementChild.style.left = data.gameSettings.viewAdvancedSliders ? "50%" : "0";
+
+    data.options.bonusRate = 3;
+    updateBonusSpeedButton();
 
     for (let actionVar in data.actions) {
         let actionObj = data.actions[actionVar];
@@ -646,7 +653,7 @@ function updateUIOnLoad() {
         let automationUnlocked = data.upgrades.stopLettingOpportunityWait.upgradePower > 0
             || data.upgrades.knowWhenToMoveOn.upgradePower > 0;
         if(automationUnlocked) {
-            views.updateVal(`${actionVar}_automationMenuButton`, "", "style.display");
+            views.updateVal(`${actionVar}_automationMenuButton`, actionObj.hasUpstream?"":"none", "style.display");
         }
         if(actionObj.hasUpstream) {
             if (actionObj.automationOff) {
