@@ -156,6 +156,7 @@ function useAmulet() {
         return;
     }
     logAmulet();
+    clearLog();
 
     chartData = [];
     data.focusSelected = [];

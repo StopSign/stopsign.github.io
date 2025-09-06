@@ -1039,8 +1039,8 @@ function setAllCaches() {
 
 
 let idsToCache = [];
-function queueCache(id) {
-    idsToCache.push(id);
+function queueCache(...ids) {
+    idsToCache.push(...ids);
 }
 
 function clearCacheQueue() {

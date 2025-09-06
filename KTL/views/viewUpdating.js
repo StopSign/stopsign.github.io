@@ -145,19 +145,21 @@ let views = {
     updateActionVisibility: function(actionObj) {
         let actionVar = actionObj.actionVar;
         let dataObj = actionData[actionVar];
+        let parentVar = dataObj.parentVar;
 
         //if game state doesn't match, return
-        if(actionObj.plane !== data.planeTabSelected) {
+        if(dataObj.plane !== data.planeTabSelected) {
             return false;
         }
         let toDisplay = actionObj.visible || globalVisible;
         let isInRange = isActionVisible(actionVar);
         views.updateVal(`${actionVar}Container`, toDisplay&&isInRange?"":"none", "style.display");
 
-        if(dataObj.parentVar) {
-            let parentObj = data.actions[dataObj.parentVar];
-            views.updateVal(`${dataObj.parentVar}_${actionVar}_Line_Outer`, (globalVisible||(toDisplay && parentObj.visible)) && !dataObj.hideUpstreamLine ?"flex":"none", "style.display");
-            views.updateVal(`${dataObj.parentVar}_${actionVar}_Line_Inner`, toDisplay && parentObj.visible ?"":"none", "style.display");
+        if(parentVar) {
+            let parentObj = data.actions[parentVar];
+            let parentInRange = isActionVisible(parentVar);
+            views.updateVal(`${parentVar}_${actionVar}_Line_Outer`, (globalVisible||(toDisplay&&parentObj.visible&&(parentInRange||isInRange))) && !dataObj.hideUpstreamLine ?"flex":"none", "style.display");
+            views.updateVal(`${parentVar}_${actionVar}_Line_Inner`, toDisplay && parentObj.visible ?"":"none", "style.display");
         }
 
         if(!toDisplay || !isInRange) {

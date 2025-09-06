@@ -46,6 +46,7 @@ data.doneKTL = false;
 data.doneAmulet = false;
 data.focusSelected = [];
 data.resetLogs = [];
+data.currentLog = [];
 data.maxFocusAllowed = 2;
 data.focusMult = 2;
 data.focusLoopMax = 2.5;

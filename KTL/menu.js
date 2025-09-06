@@ -128,7 +128,7 @@ function createHelpForRealMenu() {
         <div class="menuTitle">How to Provide Feedback</div>
         <div class="menuSeparator"></div><br>
         You'll help me, for real? Wow, I didn't know you were cool like that.<br>
-        My discord to discuss everything is here: <a href="https://discord.gg/dnKA6Xd">Stop_Sign Gaming</a>. I would really appreciate hearing about your experience, 
+        My discord to discuss everything is here: <a href="https://discord.gg/dnKA6Xd" target="_blank">Stop_Sign Gaming</a>. I would really appreciate hearing about your experience, 
         and how you felt while playing! 
         You can also talk about the game in the discord with others, and share strategies.<br><br>
         No AI was used in the writing of the story, and no AI-art will be added to the game.<br><br>
@@ -573,7 +573,17 @@ function createChangelogMenu() {
     return Raw.html`
         <div class="menuTitle">Changelog</div>
         <div class="menuSeparator"></div><br>
-        v1.4, 9/5 (current):<br>
+        v1.4.1, 9/6 (current):<br>
+        <ul>
+            <li>Discord link opens in a new tab when clicked</li>
+            <li>Performance improvement: The connection lines also hide, like the actions, when out of screen sight</li>
+            <li>Amulet upgrades can be sorted by cost</li>
+            <li>Fixed a bug with bonus speed save/load settings</li>
+            <li>Log for new actions, with clickable names to jump to them. Log clears on amulet use</li>
+            <li>Overboost/Overdrive will default to prevent automation when first unlocked</li>
+            <li>Rearranged ancient coin info to not be hidden by the button</li>
+        </ul><br>
+        v1.4, 9/5:<br>
         <ul>
             <li>Added the ability to import/export the save as a file</li>
             <li>Rewrote/edited backstory</li>

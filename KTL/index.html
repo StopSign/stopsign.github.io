@@ -35,32 +35,46 @@
 </div>
 
 <div id="helpMenuContainer"></div>
-
 <div style="position:absolute;left:15px;top:21px;padding:0 10px;font-size:14px;color: var(--text-muted);pointer-events: none;">
-    <div id="momentumDisplay" style="font-size:14px;background-color:var(--overlay-color);">
-        Clock: <span id="secondsPerReset" style="display:inline-block;width:50px;margin-right:5px;color: var(--text-primary);font-weight:bold;"></span>
-        Total Momentum: <span id="totalMomentum" style="display:inline-block;color: var(--text-primary);width:50px;margin-right:5px;font-weight:bold;">1</span>
-        <span id="spellPowerDisplay" style="display:none"> Spell Power: <span id="totalSpellPower" style="display:inline-block;color:var(--text-primary);font-weight:bold;width:50px;margin-right:5px;"></span></span>
-        <span id="ancientCoinDisplay" style="display:none"> Ancient Coins: <span id="ancientCoin" style="display:inline-block;color:var(--text-primary);font-weight:bold;width:50px;margin-right:5px;"></span></span>
-
+    <div id="momentumDisplay" style="background-color:var(--overlay-color);">
+        Clock: <span id="secondsPerReset" style="display:inline-block;margin-right:5px;color: var(--text-primary);font-weight:bold;"></span>
+        Total Momentum: <span id="totalMomentum" style="display:inline-block;color: var(--text-primary);margin-right:5px;font-weight:bold;">1</span>
     </div>
-    <div id="jobDisplay" style="display:none;font-size:14px;top:65px;background-color:var(--overlay-color);">
+    <div style="background-color:var(--overlay-color);">
+        <span id="spellPowerDisplay" style="display:none;margin-right:10px;">
+            Spell Power: <span id="totalSpellPower" style="display:inline-block;color:var(--text-primary);font-weight:bold;"></span>
+        </span>
+        <span id="ancientCoinDisplay" style="display:none;">
+            Ancient Coins: <span id="ancientCoin" style="display:inline-block;color:var(--text-primary);font-weight:bold;"></span>
+        </span>
+    </div>
+    <div id="jobDisplay" style="display:none;top:65px;background-color:var(--overlay-color);">
         Current Job: <span id="jobTitle" style="color: var(--text-primary);font-weight:bold;">Help Scott With Chores</span>. Wage: $<b><span id="jobWage" style="color: var(--text-primary);">1</span></b>
     </div>
-
 
     <span id="attDisplayShowButton" class="button" style="display:none;padding:5px;top:110px;left:388px;pointer-events:auto;" onclick="statMenuHideButton()">Attributes >></span>
     <div id="attDisplay" style="border: 1px solid var(--border-color);padding:15px;font-size:12px;background-color:var(--overlay-color);
         direction:rtl;position:relative;min-height:200px;overflow-y:auto;overflow-x:hidden;display:inline-block;will-change: transform;
-        scrollbar-gutter:stable;pointer-events:auto;">
+        scrollbar-gutter:stable;pointer-events:auto;min-width:170px">
         <span id="attDisplayUnder" style="direction:ltr;">
-            <span id="attDisplayHideButton" class="button" style="font-size:14px;position:absolute;padding:5px 8px;top:-2px;left:150px;"
+            <span id="attDisplayHideButton" class="button" style="font-size:14px;position:absolute;padding:5px 8px;top:-3px;right:-3px;"
                   onclick="statMenuHideButton()"><<</span>
             <span style="font-size:14px;position:absolute;top:5px;left:5px;">Bonus = 10% per Stat.</span><br>
             <span class="title">Attributes</span>
         </span>
     </div>
 </div>
+
+<div id="logWrapper" style="position:fixed;top:15px;right:11px;width:clamp(200px, calc(100vw - 250px), 500px);height:100px;background-color:var(--overlay-color);
+    border: 1px solid var(--border-color);box-sizing: border-box;">
+    <span class="button" style="font-size:14px;position:absolute;padding:2px 5px;top:-3px;left:-3px;cursor:pointer;user-select:none;z-index:1;" onclick="toggleLog()">>></span>
+    <div id="logContainer" style="height:100%;overflow-y:auto;box-sizing:border-box;padding-top:20px;">
+        <div id="logMessages"></div>
+    </div>
+</div>
+
+<div id="openLogButton" class="button" style="display:none;position:fixed;top:20px;right:15px;padding:8px;cursor:pointer;user-select:none;" onclick="toggleLog()">Open Log</div>
+
 
 <span class="button" id='openUseAmuletButton' onclick="openUseAmuletMenu(true)"
       style="display:none;padding:8px 13px;top:22px;position:fixed;left:50%;transform:translateX(-50%);font-size:14px;">
@@ -71,7 +85,7 @@
     View Amulet Upgrades!
 </span>
 
-<span id="currentVersion" style="position:fixed;top:5px;right:5px;color:var(--text-muted)">v1.4</span>
+<span id="currentVersion" style="position:fixed;top:1px;right:5px;color:var(--text-muted)">v1.4.1</span>
 
 
 <div id="bonusDisplayShowButton" class="button" onclick="bonusMenuHideButton()"
@@ -209,10 +223,21 @@ It continues, capturing fraction ancientCoin of your fleeting soul and sending i
             Ancient Coins available:
             <span id="ancientCoin2" style="font-weight:bold;"></span>
         </div>
-        <div style="position:absolute;right:10px;top:10px;">
-            <input type="checkbox" id="showCompleteUpgrades" onchange="toggleMaxLevelCards(this);" checked><label for="showCompleteUpgrades">Show Completed Upgrades</label><br>
-            <input type="checkbox" id="showAttributeUpgrades" onchange="toggleAttributeUpgrades(this);" checked><label for="showAttributeUpgrades">Show Attribute Upgrades</label><br>
-            <input type="checkbox" id="showUnaffordableUpgrades" onchange="toggleUnaffordableUpgrades(this);" checked><label for="showUnaffordableUpgrades">Show Unaffordable</label>
+
+
+        <div style="position:absolute; right:10px; top:10px; display: flex; gap: 25px; font-family: sans-serif; font-size: 14px;">
+            <div>
+                <input type="checkbox" id="showCompleteUpgrades" onchange="toggleMaxLevelCards(this);" checked>
+                <label for="showCompleteUpgrades">Show Completed Upgrades</label><br>
+                <input type="checkbox" id="showAttributeUpgrades" onchange="toggleAttributeUpgrades(this);" checked>
+                <label for="showAttributeUpgrades">Show Attribute Upgrades</label>
+            </div>
+            <div>
+                <input type="checkbox" id="showUnaffordableUpgrades" onchange="toggleUnaffordableUpgrades(this);" checked>
+                <label for="showUnaffordableUpgrades">Show Unaffordable</label><br>
+                <input type="checkbox" id="sortByCost" onchange="toggleSortByCost(this);">
+                <label for="sortByCost">Sort by Cost</label>
+            </div>
         </div>
         <div class="menuSeparator"></div>
         <div class="menuTitle" style="font-size:14px;text-align:center;">As you lay dying, your last thoughts are recorded by the amulet...<br><span style="font-size:16px;font-weight:bold;">IF ONLY I COULD JUST...</span></div>

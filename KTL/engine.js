@@ -108,6 +108,7 @@ function actionSetInitialVariables(actionObj, dataObj) {
     actionObj.isKTL = !!dataObj.isKTL;
     actionObj.purchased = !!dataObj.purchased;
     actionObj.plane = dataObj.plane;
+    actionObj.automationOff = !!dataObj.automationOff;
 
     // actionObj.onUnlock = dataObj.onUnlock ? dataObj.onUnlock : function() {};
     // actionObj.onCompleteCustom = dataObj.onCompleteCustom ? dataObj.onCompleteCustom : function() {};
@@ -321,10 +322,27 @@ function unveilAction(actionVar) {
         return;
     }
 
+    let planeName = getPlaneNameFromNum(dataObj.plane);
+
+    addLogMessage(`New Action: <span style="font-weight:bold;cursor:pointer;" onclick="actionTitleClicked('${actionVar}');">${actionObj.title}</span> in ${planeName}`)
+
     actionObj.visible = true;
     revealActionAtts(actionObj);
 
     updateSupplyChain(actionVar);
+}
+
+function getPlaneNameFromNum(planeNum) {
+    switch(planeNum) {
+        case 0:
+            return "Brythal"
+        case 1:
+            return "Magic"
+        case 2:
+            return "Kill the Lich"
+        case 3:
+            return "Astral"
+    }
 }
 
 

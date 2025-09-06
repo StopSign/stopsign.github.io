@@ -428,7 +428,6 @@ function load() {
         //these are in the skiplist because if, between saves, an action has changed the atts it has, the links need to be reset instead of saved.
         mergeExistingOnly(data, toLoad, "atts", ["linkedActionExpAtts", "linkedActionEfficiencyAtts", "linkedActionOnLevelAtts"]);
         mergeExistingOnly(data, toLoad, "options");
-        data.options.bonusRate = 3;
         mergeExistingOnly(data, toLoad, "gameSettings");
 
 
@@ -456,6 +455,7 @@ function load() {
         data.focusMult = toLoad.focusMult ?? 2;
         data.focusLoopMax = toLoad.focusLoopMax ?? 2.5;
         data.lastVisit = toLoad.lastVisit ?? Date.now();
+        data.currentLog = toLoad.currentLog ?? [];
 
         data.currentGameState = toLoad.currentGameState;
         // data.gameSettings = toLoad.gameSettings;
@@ -614,8 +614,12 @@ function mergeExistingOnly(data, toLoad, varName, skipList = []) {
     }
 }
 
+function renameAction(fromLoadVar, newVar) {
+
+}
 
 function updateUIOnLoad() {
+    rebuildLog()
 
     document.getElementById('viewDeltasSwitch').firstElementChild.style.left = data.gameSettings.viewDeltas ? "50%" : "0";
     document.getElementById('numberTypeSwitch').firstElementChild.style.left = data.gameSettings.numberType==="scientific" ? "50%" : "0";
@@ -624,7 +628,10 @@ function updateUIOnLoad() {
     document.getElementById('viewZeroButtonsSwitch').firstElementChild.style.left = data.gameSettings.viewAll0Buttons ? "50%" : "0";
     document.getElementById('viewAdvancedSlidersSwitch').firstElementChild.style.left = data.gameSettings.viewAdvancedSliders ? "50%" : "0";
 
-    data.options.bonusRate = 3;
+    if(data.gameSettings.bonusSpeed > 1) {
+        data.gameSettings.bonusSpeed = 1;
+        data.options.bonusRate = 3; //set it to 3 or set the checked correctly on load
+    }
     updateBonusSpeedButton();
 
     for (let actionVar in data.actions) {

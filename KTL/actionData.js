@@ -1621,7 +1621,7 @@ actionData = {
         efficiencyBase:.15, maxLevel:2,
         unlockCost:11e7, visible:false, unlocked:false, purchased: true,
         onLevelAtts:[["endurance", 100]],
-        expAtts:[["endurance", 1], ["observation", 1], ["geared", 1]],
+        expAtts:[["observation", 1], ["endurance", 1], ["geared", 1]],
         efficiencyAtts:[["coordination", 1]]
     },
     breatheThroughIt: {
@@ -1654,7 +1654,7 @@ actionData = {
 
         },
         onLevelAtts:[["endurance", 1000], ["might", 200], ["coordination", 100]],
-        expAtts:[["observation", 1], ["might", 1], ["endurance", 1], ["geared", 1]],
+        expAtts:[["observation", 1], ["endurance", 1], ["might", 1], ["geared", 1]],
         efficiencyAtts:[["flow", 1000]]
     },
 }
@@ -3254,7 +3254,7 @@ actionData = {
         progressMaxBase:100, progressMaxIncrease:1,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:.4, maxLevel:1, isSpell:true, instabilityToAdd:10,
-        unlockCost:500, visible:false, unlocked:false, purchased: true,
+        unlockCost:500, visible:false, unlocked:false, purchased: true, automationOff:true,
         onLevelCustom: function() {
             unveilAction('overdrive')
         },
@@ -3271,7 +3271,7 @@ actionData = {
         progressMaxBase:1000000, progressMaxIncrease:1,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:.2, maxLevel:1, isSpell:true, instabilityToAdd:100,
-        unlockCost:1000000, visible:false, unlocked:false, purchased: true,
+        unlockCost:1000000, visible:false, unlocked:false, purchased: true, automationOff:true,
         onLevelCustom: function() {
         },
         spellpower: function() {
@@ -3287,7 +3287,7 @@ actionData = {
         progressMaxBase:1000, progressMaxIncrease:1,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:.1, maxLevel:1, isSpell:true, instabilityToAdd:100,
-        unlockCost:1000, visible:false, unlocked:false, purchased: false,
+        unlockCost:1000, visible:false, unlocked:false, purchased: false, automationOff:true,
         onLevelCustom: function() {
         },
         spellpower: function() {

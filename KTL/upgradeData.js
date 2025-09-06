@@ -35,21 +35,50 @@ function calcUpgradeCost(upgrade, num) {
     return Math.floor(upgrade.initialCost * Math.pow(upgrade.costIncrease, num));
 }
 
+
+function sortAmuletCards() {
+    const container = document.getElementById("amuletUpgrades");
+    const cards = Array.from(container.children);
+
+    cards.sort((a, b) => {
+        const orderA = parseFloat(a.dataset.sortOrder);
+        const orderB = parseFloat(b.dataset.sortOrder);
+        return orderA - orderB;
+    });
+
+    cards.forEach((card, index) => {
+        card.style.order = index;
+    });
+}
+function resetCardOrder() {
+    const container = document.getElementById("amuletUpgrades");
+    const cards = Array.from(container.children);
+    cards.forEach(card => {
+        card.style.order = ""; // Resetting the order lets flexbox use the default
+    });
+}
+function toggleSortByCost(checkbox) {
+    if (checkbox.checked) {
+        sortAmuletCards(); // Sorts the cards by cost
+    } else {
+        resetCardOrder(); // Reverts to the default order
+    }
+}
+
 function initializeAmuletCards() {
     const container = document.getElementById("amuletUpgrades");
     container.style.cssText = "display:flex;flex-wrap:wrap;gap:15px;padding:10px;";
-    let allCardsHTML = "";
+    container.innerHTML = "";
 
     for (const upgradeVar in data.upgrades) {
         const upgrade = data.upgrades[upgradeVar];
         const upgradeDataObj = upgradeData[upgradeVar];
-
-        const numBought = upgrade.upgradesBought;
-        const remaining = upgrade.upgradesAvailable - numBought;
-        const isFullyBought = remaining === 0;
-        const nextLevelToBuy = numBought;
-
         const cardId = `card_${upgradeVar}`;
+
+        // 1. Create the main card element and its skeleton HTML
+        const cardElement = document.createElement('div');
+        cardElement.id = cardId;
+
         const descriptionId = `description_${upgradeVar}`;
         const costId = `cost_${upgradeVar}`;
         const remainingId = `remaining_${upgradeVar}`;
@@ -57,53 +86,137 @@ function initializeAmuletCards() {
         const costSectionId = `costSection_${upgradeVar}`;
         const remainingSectionId = `remainingSection_${upgradeVar}`;
         const maxLevelSectionId = `maxLevelSection_${upgradeVar}`;
-
-        queueCache(cardId);
-        queueCache(descriptionId);
-        queueCache(costId);
-        queueCache(remainingId);
-        queueCache(buyButtonSectionId);
-        queueCache(costSectionId);
-        queueCache(remainingSectionId);
-        queueCache(maxLevelSectionId);
-
         const title = upgradeDataObj.title || `...${decamelize(upgradeVar)}`;
-        let text = !upgradeDataObj.attribute ? upgradeDataObj.customInfo(upgrade.upgradesBought) :
-            attributeUpgradeInfo(upgradeDataObj.attribute, upgrade.upgradesAvailable, upgrade.upgradesBought, upgrade.increaseRatio);
-        const cost = isFullyBought ? 0 : calcUpgradeCost(upgrade, nextLevelToBuy);
 
-        const cardStyle = `background-color:#2c2c3e;border:2px solid ${isFullyBought ? '#c3cd00':'#00cd41'};border-radius:8px;padding:12px;width:280px;display:${upgrade.visible ? "flex" : "none"};
-            flex-direction:column;justify-content:space-between;box-shadow:0 4px 8px rgba(0,0,0,0.2);color:#e0e0e0;`;
-        const buyButtonHTML = `<button style="background-color:#008c33;color:white;border:none;border-radius:5px;padding:8px 16px;font-weight:bold;cursor:pointer;" onClick="buyUpgrade('${upgradeVar}')">Buy</button>`;
-        const maxLevelHTML = `<span style="font-size:14px;color:#c3cd00;font-weight:bold;">MAX LEVEL</span>`;
-        const remainingHTML = `Remaining: <span id="${remainingId}">${remaining}</span>`;
-
-        allCardsHTML += Raw.html`
-            <div id="${cardId}" style="${cardStyle}">
-                <div>
-                    <div style="font-size:16px;font-weight:bold;margin-bottom:10px;color:#ffffff;">${title}</div>
-                    ${!upgradeDataObj.attribute?"":`<img id="${upgradeDataObj.attribute}DisplayContainer" src="img/${upgradeDataObj.attribute}.svg" alt="${upgradeDataObj.attribute}" 
-                        style="margin:1px;width:50px;height:50px;vertical-align:top;background:var(--text-bright);border:1px solid black;display:inline-block;" />`}
-                    <div id="${descriptionId}" style="display:inline-block;font-size:14px;flex-grow:1;margin-bottom:15px;${!upgradeDataObj.attribute?"":"width:70%"}">${text}</div>
+        cardElement.innerHTML = `
+            <div>
+                <div style="font-size:16px;font-weight:bold;margin-bottom:10px;color:#ffffff;">${title}</div>
+                ${!upgradeDataObj.attribute ? "" : `<img id="${upgradeDataObj.attribute}DisplayContainer" src="img/${upgradeDataObj.attribute}.svg" alt="${upgradeDataObj.attribute}" 
+                    style="margin:1px;width:50px;height:50px;vertical-align:top;background:var(--text-bright);border:1px solid black;display:inline-block;" />`}
+                <div id="${descriptionId}" style="display:inline-block;font-size:14px;flex-grow:1;margin-bottom:15px;${!upgradeDataObj.attribute?"":"width:70%"}"></div>
+            </div>
+            <div>
+                <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <div id="${costSectionId}" style="display:flex;align-items:baseline;">
+                        <span style="font-size:14px;margin-right:8px;">cost:</span>
+                        <span id="${costId}" style="font-size:24px;font-weight:bold;color:#ffffff;"></span>
+                        <span style="font-size:14px;color:#a0a0a0;margin-left:8px;">(x${upgradeDataObj.costIncrease})</span>
+                    </div>
+                    <div id="${buyButtonSectionId}">
+                        <button style="background-color:#008c33;color:white;border:none;border-radius:5px;padding:8px 16px;font-weight:bold;cursor:pointer;" onClick="buyUpgrade('${upgradeVar}')">Buy</button>
+                    </div>
+                    <div id="${maxLevelSectionId}">
+                        <span style="font-size:14px;color:#c3cd00;font-weight:bold;">MAX LEVEL</span>
+                    </div>
                 </div>
-                <div>
-                    <div style="display:flex;justify-content:space-between;align-items:center;">
-                        <div id="${costSectionId}" style="display:flex;align-items:baseline;visibility:${isFullyBought ? 'hidden':'visible'};">
-                            <span style="font-size:14px;margin-right:8px;">cost:</span>
-                            <span id="${costId}" style="font-size:24px;font-weight:bold;color:#ffffff;">${cost} AC</span>
-                            <span style="font-size:14px;color:#a0a0a0;margin-left:8px;">(x${upgradeDataObj.costIncrease})</span>
-                        </div>
-                        <div id="${buyButtonSectionId}" style="display:${isFullyBought ? 'none' : 'block'};">${buyButtonHTML}</div>
-                        <div id="${maxLevelSectionId}" style="display:${isFullyBought ? 'block' : 'none'};">${maxLevelHTML}</div>
-                    </div>
-                    <div id="${remainingSectionId}" style="justify-content:flex-end;align-items:center;margin-top:4px;font-size:14px;color:#a0a0a0;display:${isFullyBought ? 'none' : 'flex'};">
-                        ${remainingHTML}
-                    </div>
+                <div id="${remainingSectionId}" style="justify-content:flex-end;align-items:center;margin-top:4px;font-size:14px;color:#a0a0a0;">
+                    Remaining: <span id="${remainingId}"></span>
                 </div>
             </div>`;
+
+        // 2. Queue the IDs for the cache to be processed later
+        queueCache(cardId, descriptionId, costId, remainingId, buyButtonSectionId, costSectionId, remainingSectionId, maxLevelSectionId);
+
+        // 3. Set the card's initial state using DIRECT DOM manipulation
+        const numBought = upgrade.upgradesBought;
+        const remaining = upgrade.upgradesAvailable - numBought;
+        const isFullyBought = remaining === 0;
+
+        cardElement.style.backgroundColor = '#2c2c3e';
+        cardElement.style.borderRadius = '8px';
+        cardElement.style.padding = '12px';
+        cardElement.style.width = '280px';
+        cardElement.style.display = upgrade.visible ? 'flex' : 'none';
+        cardElement.style.flexDirection = 'column';
+        cardElement.style.justifyContent = 'space-between';
+        cardElement.style.boxShadow = '0 4px 8px rgba(0,0,0,0.2)';
+        cardElement.style.color = '#e0e0e0';
+
+        const cost = calcUpgradeCost(upgrade, numBought);
+        cardElement.dataset.sortOrder = isFullyBought ? Infinity : cost;
+
+        const canAfford = data.ancientCoin >= cost;
+        const borderColor = isFullyBought ? '#c3cd00' : (canAfford ? '#00cd41' : '#ff0000');
+        cardElement.style.border = `2px solid ${borderColor}`;
+
+        let text = !upgradeDataObj.attribute ? upgradeDataObj.customInfo(numBought) :
+            attributeUpgradeInfo(upgradeDataObj.attribute, upgrade.upgradesAvailable, numBought, upgrade.increaseRatio);
+        cardElement.querySelector(`#${descriptionId}`).innerHTML = text;
+
+        if (isFullyBought) {
+            cardElement.querySelector(`#${costSectionId}`).style.visibility = 'hidden';
+            cardElement.querySelector(`#${buyButtonSectionId}`).style.display = 'none';
+            cardElement.querySelector(`#${remainingSectionId}`).style.display = 'none';
+            cardElement.querySelector(`#${maxLevelSectionId}`).style.display = 'block';
+        } else {
+            cardElement.querySelector(`#${costSectionId}`).style.visibility = 'visible';
+            cardElement.querySelector(`#${buyButtonSectionId}`).style.display = 'block';
+            cardElement.querySelector(`#${remainingSectionId}`).style.display = 'flex';
+            cardElement.querySelector(`#${maxLevelSectionId}`).style.display = 'none';
+            cardElement.querySelector(`#${costId}`).textContent = `${cost} AC`;
+            cardElement.querySelector(`#${remainingId}`).textContent = remaining;
+        }
+
+        // 4. Append the fully prepared element to the container
+        container.appendChild(cardElement);
     }
-    container.innerHTML = allCardsHTML;
 }
+
+function updateAmuletCardUI(upgradeVar) {
+    const upgrade = data.upgrades[upgradeVar];
+    const upgradeDataObj = upgradeData[upgradeVar];
+
+    const numBought = upgrade.upgradesBought;
+    const remaining = upgrade.upgradesAvailable - numBought;
+    const isFullyBought = remaining === 0;
+
+    const cardId = `card_${upgradeVar}`;
+    const descriptionId = `description_${upgradeVar}`;
+    const costId = `cost_${upgradeVar}`;
+    const remainingId = `remaining_${upgradeVar}`;
+    const buyButtonSectionId = `buyButtonSection_${upgradeVar}`;
+    const costSectionId = `costSection_${upgradeVar}`;
+    const remainingSectionId = `remainingSection_${upgradeVar}`;
+    const maxLevelSectionId = `maxLevelSection_${upgradeVar}`;
+
+    const cardElement = document.getElementById(cardId);
+    if (!cardElement) return;
+
+    //redundant but costless
+    cardElement.style.backgroundColor = '#2c2c3e';
+    cardElement.style.borderRadius = '8px';
+    cardElement.style.padding = '12px';
+    cardElement.style.width = '280px';
+    cardElement.style.display = upgrade.visible ? 'flex' : 'none';
+    cardElement.style.flexDirection = 'column';
+    cardElement.style.justifyContent = 'space-between';
+    cardElement.style.boxShadow = '0 4px 8px rgba(0,0,0,0.2)';
+    cardElement.style.color = '#e0e0e0';
+
+    let text = !upgradeDataObj.attribute ? upgradeDataObj.customInfo(numBought) :
+        attributeUpgradeInfo(upgradeDataObj.attribute, upgrade.upgradesAvailable, numBought, upgrade.increaseRatio);
+    views.updateVal(descriptionId, text, 'innerHTML');
+
+    if (isFullyBought) {
+        views.updateVal(costSectionId, 'hidden', 'style.visibility');
+        views.updateVal(buyButtonSectionId, 'none', 'style.display');
+        views.updateVal(remainingSectionId, 'none', 'style.display');
+        views.updateVal(maxLevelSectionId, 'block', 'style.display');
+        views.updateVal(cardId, '#c3cd00', 'style.borderColor');
+    } else {
+        views.updateVal(costSectionId, 'visible', 'style.visibility');
+        views.updateVal(buyButtonSectionId, 'block', 'style.display');
+        views.updateVal(remainingSectionId, 'flex', 'style.display');
+        views.updateVal(maxLevelSectionId, 'none', 'style.display');
+
+        const newCost = calcUpgradeCost(upgrade, numBought);
+        views.updateVal(costId, `${newCost} AC`, 'textContent');
+        views.updateVal(remainingId, remaining, 'textContent');
+    }
+
+    updateCardAffordabilityBorders();
+}
+
 function buyUpgrade(upgradeVar) {
     const upgrade = data.upgrades[upgradeVar];
     const upgradeDataObj = upgradeData[upgradeVar];
@@ -116,7 +229,7 @@ function buyUpgrade(upgradeVar) {
 
     data.ancientCoin -= cost;
     upgrade.upgradesBought++;
-    upgrade.upgradePower++; //may be something else later
+    upgrade.upgradePower++;
 
     if (upgradeDataObj.onBuy) {
         upgradeDataObj.onBuy(upgrade.upgradePower);
@@ -125,35 +238,35 @@ function buyUpgrade(upgradeVar) {
         attributeUpgradeOnBuy(upgradeDataObj.attribute, upgrade.upgradesBought, upgrade.increaseRatio);
     }
 
-    const newRemaining = upgrade.upgradesAvailable - upgrade.upgradesBought;
-    upgrade.isFullyBought = newRemaining === 0;
+    upgrade.isFullyBought = (upgrade.upgradesAvailable - upgrade.upgradesBought) === 0;
 
-    const cardId = `card_${upgradeVar}`;
-    const descriptionId = `description_${upgradeVar}`;
-    const costId = `cost_${upgradeVar}`;
-    const remainingId = `remaining_${upgradeVar}`;
-    const buyButtonSectionId = `buyButtonSection_${upgradeVar}`;
-    const costSectionId = `costSection_${upgradeVar}`;
-    const remainingSectionId = `remainingSection_${upgradeVar}`;
-    const maxLevelSectionId = `maxLevelSection_${upgradeVar}`;
-    let text = !upgradeDataObj.attribute ? upgradeDataObj.customInfo(upgrade.upgradesBought) :
-        attributeUpgradeInfo(upgradeDataObj.attribute, upgrade.upgradesAvailable, upgrade.upgradesBought, upgrade.increaseRatio);
-    views.updateVal(descriptionId, text, 'textContent');
-
-    if (upgrade.isFullyBought) {
-        views.updateVal(costSectionId, 'hidden', 'style.visibility');
-        views.updateVal(buyButtonSectionId, 'none', 'style.display');
-        views.updateVal(remainingSectionId, 'none', 'style.display');
-        views.updateVal(maxLevelSectionId, 'block', 'style.display');
-        views.updateVal(cardId, '#c3cd00', 'style.borderColor');
-    } else {
-        const newCost = calcUpgradeCost(upgrade, upgrade.upgradesBought);
-        views.updateVal(costId, `${newCost} AC`, 'textContent');
-        views.updateVal(remainingId, newRemaining, 'textContent');
+    const cardElement = document.getElementById(`card_${upgradeVar}`);
+    if (cardElement) {
+        if (upgrade.isFullyBought) {
+            cardElement.dataset.sortOrder = Infinity;
+        } else {
+            const newCost = calcUpgradeCost(upgrade, upgrade.upgradesBought);
+            cardElement.dataset.sortOrder = newCost;
+        }
     }
-	refreshUpgradeVisibility();
-    updateCardAffordabilityBorders();
+
+    updateAmuletCardUI(upgradeVar);
+    refreshUpgradeVisibility();
+
+    // --- THIS IS THE KEY CHANGE ---
+    // Only re-sort the cards if the checkbox is checked.
+    const sortCheckbox = document.getElementById('sortByCostCheckbox');
+    if (sortCheckbox && sortCheckbox.checked) {
+        sortAmuletCards();
+    }
 }
+
+
+
+
+
+
+
 
 function attributeUpgradeInfo(attVar, upgradesAvailable, upgradeNum, increaseRatio) {
     // console.log(attVar, upgradesAvailable, upgradeNum, increaseRatio);
@@ -164,7 +277,7 @@ function attributeUpgradeInfo(attVar, upgradesAvailable, upgradeNum, increaseRat
 
     if (upgradeNum >= upgradesAvailable) {
         const maxMultiplier = 1 + upgradesAvailable * increaseRatio;
-        return `The bonus multiplier to ${possessiveName}is x${maxMultiplier.toFixed(2)}`;
+        return `The bonus multiplier to ${possessiveName} mult is x${maxMultiplier.toFixed(2)}`;
     }
 
     const currentMultiplier = 1 + upgradeNum * increaseRatio;
@@ -234,6 +347,8 @@ var refreshUpgradeVisibility = function() {
 		}
 	}
 }();
+
+
 
 function updateCardAffordabilityBorders() {
     for (const upgradeVar in data.upgrades) {

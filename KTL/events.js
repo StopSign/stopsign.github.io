@@ -81,9 +81,9 @@ window.addEventListener('resize', () => {
 
 function resizeStatMenu() {
     let bonusDisplay = view.cached[`bonusDisplay`];
-    let reduction = 200;
+    let reduction = 210;
     if(bonusDisplay.style.display !== "none") {
-        reduction += 97;
+        reduction += 70;
     }
 
     if(view.cached[`attDisplay`]) {
@@ -313,6 +313,8 @@ function forceRedraw(elem) {
 
 function actionTitleClicked(actionVar, setAll) {
     let dataObj = actionData[actionVar];
+
+    switchToPlane(dataObj.plane)
 
     let newtransformX = -((dataObj.realX + 100) * scaleByPlane[data.planeTabSelected]) + windowElement.offsetWidth / 2 ;
     let newtransformY = -((dataObj.realY + 100) * scaleByPlane[data.planeTabSelected]) + windowElement.offsetHeight / 2 - 50;
@@ -756,4 +758,50 @@ function drawChart() {
     }
     ctx.fillText(secondsToTime(minTime), padding, canvasHeight - padding + 20);
     ctx.fillText(secondsToTime(maxTime), canvasWidth - padding, canvasHeight - padding + 20);
+}
+
+function addLogMessage(text) {
+    const logContainer = document.getElementById('logContainer');
+    const logMessages = document.getElementById('logMessages');
+    const timestamp = secondsToTime(data.secondsPerReset);
+    const fullMessage = `${timestamp}: ${text}`;
+    data.currentLog.push(fullMessage);
+    const messageElement = document.createElement('div');
+    messageElement.innerHTML = fullMessage;
+    messageElement.style.padding = '2px 8px';
+    const isScrolledToBottom = logContainer.scrollTop + logContainer.clientHeight >= logContainer.scrollHeight - 10;
+    logMessages.appendChild(messageElement);
+    if(isScrolledToBottom) {
+        logContainer.scrollTop = logContainer.scrollHeight;
+    }
+}
+
+function toggleLog() {
+    const logWrapper = document.getElementById('logWrapper');
+    const openLogButton = document.getElementById('openLogButton');
+    if (logWrapper.style.display === 'none') {
+        logWrapper.style.display = 'block';
+        openLogButton.style.display = 'none';
+    } else {
+        logWrapper.style.display = 'none';
+        openLogButton.style.display = 'block';
+    }
+}
+
+function clearLog() {
+    const logMessages = document.getElementById('logMessages');
+    logMessages.replaceChildren();
+}
+
+function rebuildLog() {
+    clearLog();
+    const logContainer = document.getElementById('logContainer');
+    const logMessages = document.getElementById('logMessages');
+    for (let message of data.currentLog) {
+        const messageElement = document.createElement('div');
+        messageElement.innerHTML = message;
+        messageElement.style.padding = '2px 8px';
+        logMessages.appendChild(messageElement);
+    }
+    logContainer.scrollTop = logContainer.scrollHeight;
 }
