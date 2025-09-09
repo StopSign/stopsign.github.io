@@ -575,7 +575,7 @@ function createChangelogMenu() {
         <div class="menuSeparator"></div><br>
         v1.4.2 9/9 (current):<br>
         <ul>
-            <li>Fixed mobile drag, resized on mobile, and added a close button to the main menu</li>
+            <li>Fixed mobile drag, changed default size on mobile, prevented zoom on menus making the screen stuck, and added a close button to the main menu</li>
             <li>Fixed screen jumping issue on distant actions</li>
             <li>Kill the Lich! button under Hear About the Lich now is hidden when in the Kill the Lich game mode. It also remains visible when zoomed out.</li>
             <li>Save file has date attached</li>

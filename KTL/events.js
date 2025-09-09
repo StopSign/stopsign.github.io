@@ -92,7 +92,7 @@ function resizeStatMenu() {
 }
 
 
-
+const bodyElement = document.getElementById("theBody");
 const windowElement = document.getElementById('windowElement');
 const actionContainer = document.getElementById('actionContainer');
 
@@ -205,6 +205,12 @@ document.addEventListener('mouseup', function() {
 });
 
 
+document.body.addEventListener('touchmove', function(e) {
+    if (e.touches.length > 1) {
+        e.preventDefault();
+    }
+}, { passive: false });
+
 // Touch start
 windowElement.addEventListener('touchstart', function(e) {
     if (e.touches.length === 2) {
@@ -250,6 +256,13 @@ windowElement.addEventListener('touchmove', function(e) {
         applyTransform();
     } else if (e.touches.length === 1 && isTouchDragging) {
         e.preventDefault();
+        const touch = e.touches[0];
+
+        const deltaX = touch.clientX - originalMouseX;
+        const deltaY = touch.clientY - originalMouseY;
+
+        transformX[data.planeTabSelected] = originalTransformX + deltaX;
+        transformY[data.planeTabSelected] = originalTransformY + deltaY;
 
         applyTransform();
     }
