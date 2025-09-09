@@ -193,9 +193,8 @@ document.addEventListener('mousemove', function(e) {
     const deltaX = e.clientX - originalMouseX;
     const deltaY = e.clientY - originalMouseY;
 
-    // Clamp range to [-4000, 4000]
-    transformX[data.planeTabSelected] = Math.max(-4000, Math.min(originalTransformX + deltaX, 4000));
-    transformY[data.planeTabSelected] = Math.max(-4000, Math.min(originalTransformY + deltaY, 4000));
+    transformX[data.planeTabSelected] = originalTransformX + deltaX
+    transformY[data.planeTabSelected] = originalTransformY + deltaY
 
     // Update the position of the container
     actionContainer.style.transform = `translate(${transformX[data.planeTabSelected]}px, ${transformY[data.planeTabSelected]}px) scale(${scaleByPlane[data.planeTabSelected]})`;
@@ -252,11 +251,7 @@ windowElement.addEventListener('touchmove', function(e) {
     } else if (e.touches.length === 1 && isTouchDragging) {
         e.preventDefault();
 
-        const touch = e.touches[0];
-        const deltaX = touch.clientX - originalMouseX;
-        const deltaY = touch.clientY - originalMouseY;
-
-        applyPan(originalTransformX + deltaX, originalTransformY + deltaY);
+        applyTransform();
     }
 }, { passive: false });
 
@@ -270,21 +265,8 @@ windowElement.addEventListener('touchend', function(e) {
     }
 });
 
-// Reusable helpers
-function getDistance(t1, t2) {
-    const dx = t2.clientX - t1.clientX;
-    const dy = t2.clientY - t1.clientY;
-    return Math.sqrt(dx * dx + dy * dy);
-}
-
-function applyPan(x, y) {
-    transformX[data.planeTabSelected] = Math.max(-4000, Math.min(x, 4000));
-    transformY[data.planeTabSelected] = Math.max(-4000, Math.min(y, 4000));
-    applyTransform();
-}
-
 function applyTransform() {
-    actionContainer.style.transform = `translate(${transformX[data.planeTabSelected]}px, ${transformY[data.planeTabSelected]}px) scale(${scale})`;
+    actionContainer.style.transform = `translate(${transformX[data.planeTabSelected]}px, ${transformY[data.planeTabSelected]}px) scale(${scaleByPlane[data.planeTabSelected]})`;
 
     clearTimeout(redrawTimeout);
     // redrawTimeout = setTimeout(globalRedraw, 200);
@@ -319,8 +301,8 @@ function actionTitleClicked(actionVar, setAll) {
     let newtransformX = -((dataObj.realX + 100) * scaleByPlane[data.planeTabSelected]) + windowElement.offsetWidth / 2 ;
     let newtransformY = -((dataObj.realY + 100) * scaleByPlane[data.planeTabSelected]) + windowElement.offsetHeight / 2 - 50;
 
-    newtransformX = Math.max(-4000, Math.min(newtransformX, 4000));
-    newtransformY = Math.max(-4000, Math.min(newtransformY, 4000));
+    // newtransformX = Math.max(-4000, Math.min(newtransformX, 4000));
+    // newtransformY = Math.max(-4000, Math.min(newtransformY, 4000));
 
     if(setAll) {
         for(let plane in transformX) {
@@ -510,13 +492,13 @@ function changeJob(actionVar) {
 
 function pauseGame() {
     data.gameSettings.stop = !data.gameSettings.stop;
-    if(data.gameSettings.stop) {
-        document.title = "*PAUSED* KTL";
-    } else {
-        document.title = "KTL";
-    }
-    document.getElementById('pauseButton').textContent = data.gameSettings.stop ? "> Resume" : "|| Pause";
+    updatePauseButtonVisuals();
     save();
+}
+
+function updatePauseButtonVisuals() {
+    document.title = data.gameSettings.stop ? "*PAUSED* KTL" : "KTL";
+    document.getElementById('pauseButton').textContent = data.gameSettings.stop ? "> Resume" : "|| Pause";
 }
 
 function stopClicks(event) {

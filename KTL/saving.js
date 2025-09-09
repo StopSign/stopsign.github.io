@@ -619,10 +619,14 @@ function renameAction(fromLoadVar, newVar) {
 }
 
 function updateUIOnLoad() {
+
+    updatePauseButtonVisuals()
+
+    refreshResetLog()
     rebuildLog()
 
     document.getElementById('viewDeltasSwitch').firstElementChild.style.left = data.gameSettings.viewDeltas ? "50%" : "0";
-    document.getElementById('numberTypeSwitch').firstElementChild.style.left = data.gameSettings.numberType==="scientific" ? "50%" : "0";
+    document.getElementById('numberTypeSwitch').firstElementChild.style.left = data.gameSettings.numberType==="numberSuffix" ? "66.666%" : (data.gameSettings.numberType==="scientific" ? "33.333%" : "0");
     document.getElementById('viewRatioSwitch').firstElementChild.style.left = data.gameSettings.viewRatio ? "50%" : "0";
     document.getElementById('viewTotalMomentumSwitch').firstElementChild.style.left = data.gameSettings.viewTotalMomentum ? "50%" : "0";
     document.getElementById('viewZeroButtonsSwitch').firstElementChild.style.left = data.gameSettings.viewAll0Buttons ? "50%" : "0";
@@ -750,7 +754,21 @@ function exportSaveFile() {
 
     const a = document.createElement("a");
     a.href = url;
-    a.download = "KTL_Save.txt";
+
+    const baseName = 'KTL_Save';
+    const extension = 'txt';
+
+    const now = new Date();
+
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+    const day = String(now.getDate()).padStart(2, '0');
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const seconds = String(now.getSeconds()).padStart(2, '0');
+
+    a.download = `${baseName}_${year}-${month}-${day}_${hours}-${minutes}-${seconds}.${extension}`;
+
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);

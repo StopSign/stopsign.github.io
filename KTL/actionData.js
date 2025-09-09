@@ -870,24 +870,7 @@ let actionData = {
         unlockMessage:{english:"Unlocks when Gossip Around Coffee is level 5."},
         extraInfo: {english:Raw.html`This action gains (Momentum)^0.25 * (Conversation)^0.5 / 1e12 Fear 
         for each Overclock complete, which is a gain of
-        <span style="font-weight:bold;" id="hearAboutTheLichActionPower">0</span>`},
-        // storyText: {english:Raw.html`
-        // It is my worst nightmare become reality; the lich has returned. My lost home country, Sovvgor, had only ever delayed the
-        // lich with the Emperor's Curse. All I had known, all the horror I had witnessed... was only a delay. Perhaps that situation
-        // was engineered by the lich in the background, in order to get around the blockade of the Curse.<br><br>
-        //
-        // It mattered little. There was a lich, it was coming for all humanity, and I was prepared.<br><br>
-        //
-        // I was terrified at the idea of trying to go against the lich, but I thought of how many lives had been sacrificed
-        // and ruined at the altar of this monstrosity's rampage. In what felt like such a short time, Overclock had grown far
-        // beyond what I had achieved to Get Safe, and I was ready; I could bend fate in my favor to kill the lich.<br><br>
-        //
-        // This time, however, I was going to go prepared; I knew Fate could only bend so far at a time. I had just received magic,
-        // and knew that all I needed was to show I had the power to help, and the War for Life would let me join.<br><br>
-        //
-        // So, I changed the target of Overclock, from itself to a new target: Kill the Lich. I felt my thoughts collapse, no longer held up
-        // by the artificial momentum. I became focused, with only a single goal in mind: letting my ability life my legs, move my mouth, and swing my sword.
-        // For better or worse, I was along for the ride.<br><br>`}
+        <span style="font-weight:bold;" id="hearAboutTheLichActionPower">0</span>`}
     },
 
 //--- From upgrades ---

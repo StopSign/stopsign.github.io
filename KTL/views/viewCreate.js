@@ -432,7 +432,6 @@ let maxLevelTop = (data.gameSettings.viewDeltas && data.gameSettings.viewRatio) 
                 ${levelInfoContainer}
                 ${downstreamContainer}
                 ${lockOverAll}
-                ${dataObj.extraButton ?? ""}
             </div>
             <div id="${actionVar}SmallVersionContainer" 
                 style="display:none;text-align:center;margin:50px auto;font-size:12px;width:100px;">
@@ -443,6 +442,7 @@ let maxLevelTop = (data.gameSettings.viewDeltas && data.gameSettings.viewRatio) 
                     </span>
                 </span>
             </div>
+                ${dataObj.extraButton ?? ""}
             ${maxLevel}
         </div>`;
 

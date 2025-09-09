@@ -508,7 +508,7 @@ function createMenu() {
     <div class="centerMenuBox"
         onclick="stopClicks(event)"
         style="background:var(--bg-secondary);padding:20px;border-radius:6px;max-width:1200px;min-width:600px;width:90%;text-align:center;position:relative;color:var(--text-primary);border:1px solid var(--border-color);height:90vh;max-height:90vh;display:block;overflow:hidden;">
-        
+        <div class="button" onclick="clickMenuButton()" style="position:absolute;top:5px;right:5px;">X</div>
         <div class="menuTitle" style="box-sizing:border-box;">Options and Info Menu</div>
         <div class="menuSeparator" style="box-sizing:border-box;"></div>
         
@@ -573,7 +573,15 @@ function createChangelogMenu() {
     return Raw.html`
         <div class="menuTitle">Changelog</div>
         <div class="menuSeparator"></div><br>
-        v1.4.1, 9/6 (current):<br>
+        v1.4.2 9/9 (current):<br>
+        <ul>
+            <li>Fixed mobile drag, resized on mobile, and added a close button to the main menu</li>
+            <li>Fixed screen jumping issue on distant actions</li>
+            <li>Kill the Lich! button under Hear About the Lich now is hidden when in the Kill the Lich game mode. It also remains visible when zoomed out.</li>
+            <li>Save file has date attached</li>
+            <li>Fixed a few things on load (pause/resume button, statistics showing, number notation)</li>
+        </ul><br>
+        v1.4.1, 9/6:<br>
         <ul>
             <li>Discord link opens in a new tab when clicked</li>
             <li>Performance improvement: The connection lines also hide, like the actions, when out of screen sight</li>

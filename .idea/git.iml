@@ -49,5 +49,6 @@
     <orderEntry type="library" name="jquery-DefinitelyTyped" level="application" />
     <orderEntry type="library" name="d3.v6" level="application" />
     <orderEntry type="library" name="three" level="application" />
+    <orderEntry type="library" name="decimal.js" level="application" />
   </component>
 </module>

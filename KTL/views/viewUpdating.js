@@ -40,9 +40,8 @@ let views = {
 
         views.updateVal(`jobDisplay`, data.displayJob ? "" : "none", "style.display");
 
-        if(data.actions.hearAboutTheLich.level >= 1 && data.totalSpellPower > 0) {
-            views.updateVal(`killTheLichMenuButton2`, "", "style.display")
-        }
+        let shouldShowKTLButton = data.actions.hearAboutTheLich.level >= 1 && data.totalSpellPower > 0 && data.gameState !== "KTL";
+        views.updateVal(`killTheLichMenuButton2`, shouldShowKTLButton?"":"none", "style.display")
     },
     scheduleUpdate: function(elementId, value, type) {
         view.scheduled.push({
