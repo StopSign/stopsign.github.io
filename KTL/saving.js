@@ -752,8 +752,6 @@ function exportSave() {
 }
 
 function exportErrorFile(data) {
-
-    console.log(data);
     const blob = new Blob([data], { type: "text/plain" });
     const url = URL.createObjectURL(blob);
 
