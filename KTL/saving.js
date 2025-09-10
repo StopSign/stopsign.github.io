@@ -413,11 +413,19 @@ function load() {
     let toLoad = {};
 
     // if(onLoadData) {
-    //     toLoad = onLoadData;
+    //     try {
+    //         toLoad = JSON.parse(decode(onLoadData));
+    //     } catch(e) {
+    //         exportErrorFile(onLoadData);
+    //     }
     // }
     if(localStorage[saveName]) {
         console.log('Save found.');
-        toLoad = JSON.parse(decode(localStorage[saveName]));
+        try {
+            toLoad = JSON.parse(decode(localStorage[saveName]));
+        } catch(e) {
+            exportErrorFile(localStorage[saveName]);
+        }
     }
 
 
@@ -614,9 +622,6 @@ function mergeExistingOnly(data, toLoad, varName, skipList = []) {
     }
 }
 
-function renameAction(fromLoadVar, newVar) {
-
-}
 
 function updateUIOnLoad() {
 
@@ -746,6 +751,36 @@ function exportSave() {
     document.getElementById("exportImportSave").value = "";
 }
 
+function exportErrorFile(data) {
+
+    console.log(data);
+    const blob = new Blob([data], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+
+    const baseName = "KTL_Error_File";
+    const extension = 'txt';
+
+    const now = new Date();
+
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+    const day = String(now.getDate()).padStart(2, '0');
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const seconds = String(now.getSeconds()).padStart(2, '0');
+
+    a.download = `${baseName}_${year}-${month}-${day}_${hours}-${minutes}-${seconds}.${extension}`;
+
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+
+    URL.revokeObjectURL(url);
+}
+
 function exportSaveFile() {
     save();
     const data = window.localStorage[saveName];
@@ -755,7 +790,7 @@ function exportSaveFile() {
     const a = document.createElement("a");
     a.href = url;
 
-    const baseName = 'KTL_Save';
+    const baseName = "KTL_Save";
     const extension = 'txt';
 
     const now = new Date();
