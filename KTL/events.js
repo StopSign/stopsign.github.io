@@ -786,6 +786,7 @@ function toggleLog() {
 function clearLog() {
     const logMessages = document.getElementById('logMessages');
     logMessages.replaceChildren();
+    data.currentLog = [];
 }
 
 function rebuildLog() {
