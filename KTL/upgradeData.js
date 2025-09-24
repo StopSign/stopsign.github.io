@@ -23,6 +23,9 @@ function createUpgrades() {
         data.upgrades[upgradeVar] = {};
         let upgradeObj = data.upgrades[upgradeVar];
 
+        dataObj.creationVersion = dataObj.creationVersion ?? 0;
+        dataObj.title = dataObj.title || decamelizeWithSpace(upgradeVar);
+
         upgradesSetBaseVariables(upgradeObj, dataObj);
     }
 }
@@ -86,7 +89,7 @@ function initializeAmuletCards() {
         const costSectionId = `costSection_${upgradeVar}`;
         const remainingSectionId = `remainingSection_${upgradeVar}`;
         const maxLevelSectionId = `maxLevelSection_${upgradeVar}`;
-        const title = upgradeDataObj.title || `...${decamelize(upgradeVar)}`;
+        const title = upgradeDataObj.title;
 
         cardElement.innerHTML = `
             <div>
@@ -405,7 +408,7 @@ let upgradeData = {
         upgradesAvailable:3,
         visible:true,
         customInfo: function(num) {
-            return Raw.html`Overclock gains a flat +${["5", "20 (currently 5)", "100 (currently 20)", 100][num]} momentum per second.`
+            return Raw.html`Overclock gains a flat +${["5", "20 (currently 5)", "50 (currently 20)", 50][num]} momentum per second.`
         }
     },
     rememberWhatIFocusedOn: {
@@ -580,48 +583,247 @@ let upgradeData = {
         }
     }, //200|1, 2x exp to third highest
 
-    lookCloserAtTheBoard: {
-        initialCost:10, costIncrease:2,
-        upgradesAvailable:2,
+
+    feelTheEchoes: {
+        initialCost:10, costIncrease:1.5, creationVersion:2,
+        upgradesAvailable:3,
         visible:false,
         customInfo: function(num) {
-            return "The board was stuffed with notices. Surely something else is relevant for you."
+            switch(num) {
+                case 0:
+                case 1:
+                case 2:
+                default:
+                    return "Unlocks new actions that use Research"
+            }
         },
         onBuy: function(num) {
-            // actionData.checkNoticeBoard.maxLevel++;
-            // if(num === 1) {
-            //     purchaseAction('reportForTraining');
-            //     purchaseAction('basicTrainingWithJohn');
-            //     purchaseAction('noticeTheStrain');
-            //     purchaseAction('clenchTheJaw');
-            //     purchaseAction('breatheThroughIt');
-            //     purchaseAction('ownTheWeight');
-            //     purchaseAction('moveWithPurpose');
-            //     purchaseAction('standStraighter');
-            //     purchaseAction('keepGoing');
-            //     purchaseAction('climbTheRocks');
-            //     purchaseAction('findAShortcut');
-            // } else if(num === 2) {
-            //     purchaseAction('buyBasicSupplies');
-            //     purchaseAction('chimneySweep');
-            //     purchaseAction('handyman');
-            //     purchaseAction('tavernHelper');
-            //     purchaseAction('guildReceptionist');
-            //     purchaseAction('messenger');
-            //     purchaseAction('storyTeller');
-            // }
+            if(num === 1) {
+                purchaseAction('feelAGentleTug')
+                purchaseAction('leaveTheOpenRoad')
+                purchaseAction('findOverlook')
+                purchaseAction('discoverBurntTown')
+                purchaseAction('feelTheRage')
+                purchaseAction('repairShatteredShrine')
+            } else if(num === 2) {
+                purchaseAction('stepThroughAsh')
+                purchaseAction('graspTheTragedy')
+                purchaseAction('processEmotions')
+                purchaseAction('readTheWritten')
+                purchaseAction('siftExcess')
+            } else if(num === 3) {
+                purchaseAction('resonanceCompass')
+                purchaseAction('clearIvyWall')
+                purchaseAction('scavengeForSupplies')
+                unveilUpgrade('learnFromTheLibrary')
+            }
         }
-    }, //STORY notice board level 2 (training) and level 3 (jobs)
+    },
+    learnFromTheLibrary: {
+        initialCost:30, costIncrease:1.5, creationVersion:2,
+        upgradesAvailable:7,
+        visible:false,
+        customInfo: function(num) {
+            switch(num) {
+                case 0:
+                case 1:
+                case 2:
+                case 3:
+                default:
+                    return "Unlocks new actions that use Research"
+            }
+        },
+        onBuy: function(num) {
+            if(num === 1) {
+                purchaseAction('pryGemLoose')
+                purchaseAction('studyArchitecture')
+                purchaseAction('clearTheDust')
+                purchaseAction('comprehendDifficultTexts')
+                purchaseAction('dismantleShelves')
+                purchaseAction('studyTheLayout')
+                purchaseAction('decipherOrganization')
+                purchaseAction('mapOutTraps')
+                purchaseAction('accessForbiddenArea')
+                purchaseAction('findAFamiliarLanguage')
+                purchaseAction('studyRunicLanguages')
+                purchaseAction('collectHistoryBooks')
+                purchaseAction('readBooks')
+                purchaseAction('catalogNewBooks')
+                purchaseAction('study')
+                purchaseAction('sortBySubject')
+                purchaseAction('studyHistory')
+                purchaseAction('readOldStories')
+                purchaseAction('reviewOldMemories')
+                purchaseAction('rememberFriends')
+                purchaseAction('rememberTheWar')
+            } else if(num === 2) {
+                //TODO increase history books max level
+                purchaseAction('readOldReligiousTexts')
+                purchaseAction('readOldPoetry')
+                purchaseAction('readOldProphecies')
+                purchaseAction('readOldPoetry')
+                purchaseAction('readOldPhilosophy')
+                purchaseAction('honorTheLost')
+                purchaseAction('letGoOfGuilt')
+            } else if(num === 3) {
+                purchaseAction('searchForRelevantBooks')
+                purchaseAction('complainAboutDifficulty')
+                purchaseAction('collectMathBooks')
+                purchaseAction('studyMath')
+            } else if(num === 4) {
+                purchaseAction('collectInterestingBooks')
+                purchaseAction('studySupportSpells')
+                purchaseAction('studyEarthMagic')
+                purchaseAction('moveEarth')
+                purchaseAction('hardenEarth')
+                purchaseAction('stoneCompression')
+                purchaseAction('shapeEarth')
+                purchaseAction('shapeBricks')
+            } else if(num === 5) {
+                purchaseAction('studyPracticalMagic')
+                purchaseAction('practicalMagic')
+                purchaseAction('illuminate')
+            } else if(num === 6) {
+                purchaseAction('studyAdvancedEarthMagic')
+                purchaseAction('moveIron')
+                purchaseAction('moldBarsFromScrap')
+                purchaseAction('reinforceArmor')
+                purchaseAction('mendGearCracks')
+                purchaseAction('restoreEquipment')
+                purchaseAction('assistantMagesmith')
+            } else if(num === 7) {
+                purchaseAction('studyAdvancedPracticalMagic')
+                purchaseAction('studyPracticalMagic')
+                purchaseAction('studyPracticalMagic')
+            }
+        }
+    },
+    investMyGold: {
+        initialCost:30, costIncrease:1.5, creationVersion:2,
+        upgradesAvailable:6,
+        visible:true,
+        customInfo: function(num) {
+            switch(num) {
+                case 0:
+                    return "Unlocks new actions for converting gold into fortune"
+                case 1:
+                    return "Unlocks an action for using fortune to build fortune, and an action for attributes"
+                case 2:
+                case 3:
+                case 4:
+                case 5:
+                    return "Unlocks new actions for using fortune"
+                default:
+                    return "Unlocks new actions that use Fortune, generated from Gold"
+            }
+        },
+        onBuy: function(num) {
+            if(num === 1) {
+                unveilUpgrade('increaseInitialInvestment')
+                purchaseAction('invest');
+                purchaseAction('buildFortune');
+                purchaseAction('spendFortune');
+            } else if(num === 2) {
+                purchaseAction('reinvest')
+                purchaseAction('investInLocals')
+                purchaseAction('townCrier')
+                purchaseAction('storyTeller')
+            } else if(num === 3) {
+                purchaseAction('hostAFestival')
+                purchaseAction('fundTownImprovements')
+                purchaseAction('browsePersonalCollection')
+                unveilUpgrade('buyNicerStuff')
+            } else if(num === 4) {
+                purchaseAction('supportLocalLibrary')
+                purchaseAction('expandLibrary')
+                purchaseAction('investInSelf')
+            } else if(num === 5) {
+                purchaseAction('fundATemporaryStall')
+                purchaseAction('purchaseADeed')
+            } else if(num === 6) {
+                purchaseAction('recruitAnEngineer')
+                purchaseAction('procureStoneAndWood')
+            }
+        }
+    },
+    increaseInitialInvestment: {
+        initialCost:60, costIncrease:1.5, creationVersion:2,
+        upgradesAvailable:5,
+        visible:false,
+        customInfo: function(num) {
+            return Raw.html`Invest's base Fortune gain increases to ${["2 (currently 1)", "5 (currently 2)", "10 (currently 5)", "20 (currently 10)", "50 (currently 20)", "50"][num]}.`
+        },
+        currentValue: function() {
+            return [1, 2, 5, 10, 20, 50][data.upgrades.increaseInitialInvestment.upgradePower];
+        }
+    },
+    increaseMarketCap: {
+        initialCost:60, costIncrease:1.5, creationVersion:2,
+        upgradesAvailable:5,
+        visible:false,
+        customInfo: function(num) {
+            return Raw.html`Invest's maximum fotune gain cap increases to ${["1e15 (currently 1e10)", "1e20 (currently 1e15)", "1e25 (currently 1e20)", "1e30 (currently 1e25)", "1e30"][num]}.`
+        },
+        currentValue: function() {
+            return [1e10, 1e15, 1e20, 1e25, 1e30][data.upgrades.increaseMarketCap.upgradePower];
+        }
+    },
     buyNicerStuff: {
-        initialCost:11, costIncrease:1,
-        upgradesAvailable:1,
+        initialCost:80, costIncrease:2, creationVersion:2,
+        upgradesAvailable:3,
         visible:false,
         customInfo: function(num) {
-            return "asdf"
+            switch(num) {
+                case 0:
+                case 1:
+                case 2:
+                default:
+                    return "Unlocks new actions that use Gold"
+            }
         },
         onBuy: function(num) {
+            if(num === 1) {
+                purchaseAction('buyComfyShoes')
+            } else if(num === 2) {
+                purchaseAction('buyTravelersGear')
+            } else if(num === 3) {
+                purchaseAction('buyArtisanFood')
+            }
         }
-    }, //STORY market
+    },
+
+    fightWithAllies: {
+        initialCost:10, costIncrease:1.5, creationVersion:2,
+        upgradesAvailable:3,
+        visible:false,
+        customInfo: function(num) {
+            switch(num) {
+                case 0:
+                case 1:
+                case 2:
+                default:
+                    return "Unlocks new actions that use Research"
+            }
+        },
+        onBuy: function(num) {
+            if(num === 1) {
+                purchaseAction('learnToInquire')
+                purchaseAction('talkToTheRecruiters')
+                purchaseAction('askAboutLocalWork')
+                purchaseAction('digFoundation')
+                purchaseAction('askAboutArcaneCorps')
+                purchaseAction('getTestedForKnowledge')
+                purchaseAction('discussPlacement')
+                purchaseAction('meetTheMages')
+                purchaseAction('trainWithTeam')
+            } else if(num >= 2) {
+                actionData.trainWithTeam.maxLevel = 2 + num;
+            }
+        }
+    },
+    //... finish up to here
+    /*
+
     askScottMoreQuestions: {
         initialCost:11, costIncrease:1,
         upgradesAvailable:1,
@@ -631,7 +833,7 @@ let upgradeData = {
         },
         onBuy: function(num) {
         }
-    }, //STORY socialization
+    },
     discoverMoreOfTheWorld: {
         initialCost:11, costIncrease:1,
         upgradesAvailable:1,
@@ -641,11 +843,7 @@ let upgradeData = {
         },
         onBuy: function(num) {
         }
-    }, //STORY travel
-
-
-    //... finish up to here
-    /*
+    },
     learnHowToFight: { //unlock john socialize / instruction
         initialCost:40, costIncrease:1,
         upgradesAvailable:1,

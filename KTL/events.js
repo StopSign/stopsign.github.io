@@ -1,6 +1,6 @@
 function updateCustomThumbPosition(actionVar, downstreamVar, newValue) {
     const thumb = document.getElementById(actionVar + "Thumb" + downstreamVar);
-    const thumbPosition = (newValue / 100) * 200;
+    const thumbPosition = (newValue / 100) * 230;
     thumb.style.left = thumbPosition + 'px';
 }
 
@@ -499,7 +499,7 @@ function changeJob(actionVar) {
     }
 
     //set displayed
-    document.getElementById("jobTitle").textContent = data.actions[data.currentJob] ? data.actions[data.currentJob].title : data.currentJob;
+    document.getElementById("jobTitle").textContent = data.actions[data.currentJob] ? actionData[data.currentJob].title : data.currentJob;
     document.getElementById("jobWage").textContent = intToString(data.currentWage, 2);
 }
 

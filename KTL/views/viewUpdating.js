@@ -200,7 +200,11 @@ let views = {
         views.updateVal(`${actionVar}HighestLevelContainer2`, data.upgrades.rememberWhatIDid.isFullyBought ? "" : "none", "style.display");
         views.updateVal(`${actionVar}LockContainer`, !actionObj.unlocked?"":"none", "style.display");
 
-        let effColor = `rgb(${Math.round(20+189*(1-(actionObj.efficiency/100)))},${Math.round(20+189*(actionObj.efficiency/100))}, 100)`
+        let efficiencyToUse = actionObj.efficiency;
+        if(dataObj.backwardsEfficiency) {
+            efficiencyToUse = 100 - actionObj.efficiency;
+        }
+        let effColor = `rgb(${Math.round(20+189*(1-(efficiencyToUse/100)))},${Math.round(20+189*(efficiencyToUse/100))}, 100)`
         views.updateVal(`${actionVar}Efficiency`, effColor, "style.color");
 
         //Update the numbers
@@ -316,10 +320,10 @@ let views = {
         ];
         if(actionObj.isGenerator && actionVar !== "hearAboutTheLich") {
             roundedNumbers.push(["resourceToAdd", 2]);
-            roundedNumbers.push(["actionPowerMult", 3]);
+            roundedNumbers.push(["actionPower", 4]);
         }
         if(actionVar === "hearAboutTheLich") {
-            roundedNumbers.push(["actionPower", 2]);
+            roundedNumbers.push(["actionPower2", 2]);
         }
         if(actionObj.currentMenu === "info") {
             roundedNumbers.push(["highestLevel", 1]);
@@ -496,7 +500,7 @@ function isActionVisible(actionVar) {
 
     return elementScreenX < window.innerWidth &&
         elementScreenX + elementScreenWidth > 0 &&
-        elementScreenY < window.innerHeight &&
+        elementScreenY < (window.innerHeight+50) &&
         elementScreenY + elementScreenHeight > 0;
 }
 

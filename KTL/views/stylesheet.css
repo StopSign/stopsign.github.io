@@ -90,9 +90,18 @@
     --gold-color: #a99102;
     --gold-color-dim: #766607;
     --gold-color-bg: #363107;
+    --fortune-color: #9333ea;
+    --fortune-color-dim: #6b21a8;
+    --fortune-color-bg: #2a0c3f;
+    --research-color: #25b1cc;
+    --research-color-dim: #1e899e;
+    --research-color-bg: #0a2e36;
     --conversations-color: #429977;
     --conversations-color-dim: #36765e;
     --conversations-color-bg: #162d23;
+    --teamwork-color: #c2a68a;
+    --teamwork-color-dim: #a88a6d;
+    --teamwork-color-bg: #d4c2ab;
     --fear-color: #d2062a;
     --fear-color-dim: #a30924;
     --fear-color-bg: #40090f;

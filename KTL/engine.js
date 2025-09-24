@@ -69,7 +69,9 @@ function actionSetBaseVariables(actionObj, dataObj) {
     actionObj.expToLevelIncrease = dataObj.expToLevelIncrease;
     actionObj.actionPowerMultIncrease = dataObj.actionPowerMultIncrease ? dataObj.actionPowerMultIncrease : 1;
     actionObj.progressMaxIncrease = dataObj.progressMaxIncrease;
-    actionObj.visible = (globalVisible || dataObj.visible === null) ? true : dataObj.visible;
+    actionObj.visible = dataObj.visible === null ? true : dataObj.visible;
+
+    // actionObj.visible = (globalVisible || dataObj.visible === null) ? true : dataObj.visible;
     actionObj.unlockCost = dataObj.unlockCost;
     actionObj.unlocked = dataObj.unlocked === null ? true : dataObj.unlocked;
     actionObj.currentMenu = "downstream";
@@ -120,13 +122,11 @@ function actionSetInitialVariables(actionObj, dataObj) {
     actionObj.prevUnlockTime = null;
 }
 
-//function createAndLinkNewAction(actionVar, expToLevelIncrease, actionPowerMultIncrease, progressMaxIncrease, progressMax, expToLevel, unlockCost, title, x, y, downstreamVars, tier, dataObj) {
-function createAndLinkNewAction(actionVar, dataObj, title, downstreamVars) {
+function createAndLinkNewAction(actionVar, dataObj, downstreamVars) {
     data.actions[actionVar] = {};
 
     let actionObj = data.actions[actionVar];
     actionObj.actionVar = actionVar;
-    actionObj.title = title;
     dataObj.downstreamVars = downstreamVars ? downstreamVars : [];
 
     actionSetBaseVariables(actionObj, dataObj);
@@ -136,7 +136,6 @@ function createAndLinkNewAction(actionVar, dataObj, title, downstreamVars) {
 
     for(let downstreamVar of dataObj.downstreamVars) {
         actionObj[downstreamVar+"FocusMult"] = 1;
-        actionObj[downstreamVar+"downstreamSendRate"] = 0;
         actionObj[`downstreamRate${downstreamVar}`] = 0;
     }
 
@@ -324,7 +323,7 @@ function unveilAction(actionVar) {
 
     let planeName = getPlaneNameFromNum(dataObj.plane);
 
-    addLogMessage(`New Action: <span style="font-weight:bold;cursor:pointer;" onclick="actionTitleClicked('${actionVar}');">${actionObj.title}</span> in ${planeName}`)
+    addLogMessage(`New Action: <span style="font-weight:bold;cursor:pointer;" onclick="actionTitleClicked('${actionVar}');">${dataObj.title}</span> in ${planeName}`)
 
     actionObj.visible = true;
     revealActionAtts(actionObj);
@@ -483,7 +482,7 @@ function revealAtt(attVar) {
 
 function unlockAction(actionObj) {
     let actionVar = actionObj.actionVar;
-    if(actionObj.unlocked) {
+    if(actionObj.unlocked === true) {
         return;
     }
     actionObj.unlocked = true;
@@ -519,7 +518,7 @@ function upgradeUpdates() {
     }
 
     //passive gain
-    data.actions.overclock.resource += data.upgrades.startALittleQuicker.upgradePower * 20 / data.gameSettings.ticksPerSecond;
+    data.actions.overclock.resource += [0, 5, 20, 50][data.upgrades.startALittleQuicker.upgradePower] * 20 / data.gameSettings.ticksPerSecond;
 }
 
 function getUpgradeSliderAmount() {
@@ -530,13 +529,13 @@ function getUpgradeSliderAmount() {
 function calcUpgradeMultToExp(actionObj) {
     let upgradeMult = 1;
     if(data.upgrades.rememberWhatIDid.isFullyBought && actionObj.level < actionObj.highestLevel) {
-        upgradeMult *= 2;
+        upgradeMult += .25;
     }
     if(data.upgrades.rememberHowIGrew.isFullyBought && actionObj.level < actionObj.secondHighestLevel) {
-        upgradeMult *= 2;
+        upgradeMult += .25;
     }
     if(data.upgrades.rememberMyMastery.isFullyBought && actionObj.level < actionObj.thirdHighestLevel) {
-        upgradeMult *= 2;
+        upgradeMult += .5;
     }
     return upgradeMult;
 }

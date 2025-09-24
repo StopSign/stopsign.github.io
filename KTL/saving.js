@@ -3,434 +3,67 @@ function clearSave() {
     location.reload();
 }
 
-data.saveVersion = 0;
-
-const patches = {
-    actions:{
-        overclock: {
-            preventReset: true,
-        },
-        reflect: {
-            preventReset: true,
-        },
-        distillInsight: {
-            preventReset: true,
-        },
-        harnessOverflow: {
-            preventReset: true,
-        },
-        takeNotes: {
-            preventReset: true,
-        },
-        remember: {
-            preventReset: true,
-        },
-        bodyAwareness: {
-            preventReset: true,
-        },
-        travelOnRoad: {
-            preventReset: true,
-        },
-        travelToOutpost: {
-            preventReset: true,
-        },
-        meetVillageLeaderScott: {
-            preventReset: true,
-        },
-        watchBirds: {
-            preventReset: true,
-        },
-        catchAScent: {
-            preventReset: true,
-        },
-        helpScottWithChores: {
-            preventReset: true
-        },
-        checkNoticeBoard: {
-            preventReset: true
-        },
-        browseLocalMarket: {
-            preventReset: true
-        },
-        makeMoney: {
-            preventReset: true
-        },
-        spendMoney: {
-            preventReset: true
-        },
-        buyBasicSupplies: {
-            preventReset: true
-        },
-        buyBasicClothes: {
-            preventReset: true
-        },
-        reportForTraining: {
-            preventReset: true
-        },
-        basicTrainingWithJohn: {
-            preventReset: true
-        },
-        noticeTheStrain: {
-            preventReset: true
-        },
-        clenchTheJaw: {
-            preventReset: true
-        },
-        breatheThroughIt: {
-            preventReset: true
-        },
-        ownTheWeight: {
-            preventReset: true
-        },
-        moveWithPurpose: {
-            preventReset: true
-        },
-        reportForLabor: {
-            preventReset: true
-        },
-        oddJobsLaborer: {
-            preventReset: true
-        },
-        chimneySweep: {
-            preventReset: true
-        },
-        buyMarketItems: {
-            preventReset: true
-        },
-        buyShopItems: {
-            preventReset: true
-        },
-        exploreDifficultPath: {
-            preventReset: true
-        },
-        buyTravelersClothes: {
-            preventReset: true
-        },
-        keepGoing: {
-            preventReset: true
-        },
-        eatGoldenFruit: {
-            preventReset: true
-        },
-        climbTheRocks: {
-            preventReset: true
-        },
-        spotAPath: {
-            preventReset: true
-        },
-        pleasantForest: {
-            preventReset: true
-        },
-        exploreTheForest: {
-            preventReset: true
-        },
-        travelAlongTheRiver: {
-            preventReset: true
-        },
-        gatherRiverWeeds: {
-            preventReset: true
-        },
-        hiddenPath: {
-            preventReset: true
-        },
-        meetGrumpyHermit: {
-            preventReset: true
-        },
-        annoyHermitIntoAQuest: {
-            preventReset: true
-        },
-        presentTheOffering: {
-            preventReset: true
-        },
-        handyman: {
-            preventReset: true
-        },
-        tavernHelper: {
-            preventReset: true
-        },
-        buyStreetFood: {
-            preventReset: true
-        },
-        buyMatchingClothes: {
-            preventReset: true
-        },
-        buySocialAccess: {
-            preventReset: true
-        },
-        browseStores: {
-            preventReset: true
-        },
-        socialize: {
-            preventReset: true
-        },
-        meetPeople: {
-            preventReset: true
-        },
-        talkWithScott: {
-            preventReset: true
-        },
-        talkWithJohn: {
-            preventReset: true
-        },
-        learnToListen: {
-            preventReset: true
-        },
-        chatWithHermit: {
-            preventReset: true
-        },
-        tellAJoke: {
-            preventReset: true
-        },
-        chatWithMerchants: {
-            preventReset: true
-        },
-        askAboutStitching: {
-            preventReset: true
-        },
-        complimentTheChef: {
-            preventReset: true
-        },
-        listenToWoes: {
-            preventReset: true
-        },
-        keyToTheBackroom: {
-            preventReset: true
-        },
-        joinCoffeeClub: {
-            preventReset: true
-        },
-        buyGoodFood: {
-            preventReset: true
-        },
-        buyStylishClothes: {
-            preventReset: true
-        },
-        slideTheCoin: {
-            preventReset: true
-        },
-        browseBackrooms: {
-            preventReset: true
-        },
-        talkToHermit: {
-            preventReset: true
-        },
-        buyCoffee: {
-            preventReset: true
-        },
-        learnToStayStill: {
-            preventReset: true
-        },
-        inquireAboutMagic: {
-            preventReset: true
-        },
-        feelTheResonance: {
-            preventReset: true
-        },
-        layerTheEchoes: {
-            preventReset: true
-        },
-        igniteTheSpark: {
-            preventReset: true
-        },
-        gossipAroundCoffee: {
-            preventReset: true
-        },
-        pesterHermitForSecrets: {
-            preventReset: true
-        },
-        guildReceptionist: {
-            preventReset: true
-        },
-        meditate: {
-            preventReset: true
-        },
-        journal: {
-            preventReset: true
-        },
-        travelToCrossroads: {
-            preventReset: true
-        },
-        restAtWaterfall: {
-            preventReset: true
-        },
-        visitShrineBehindWaterfall: {
-            preventReset: true
-        },
 
 
-        echoKindle: {
-            preventReset: true
-        },
-        sparkMana: {
-            preventReset: true
-        },
-        poolMana: {
-            preventReset: true
-        },
-        expelMana: {
-            preventReset: true
-        },
-        prepareSpells: {
-            preventReset: true
-        },
-        manaBasics: {
-            preventReset: true
-        },
-        feelYourMana: {
-            preventReset: true
-        },
-        growMagicSenses: {
-            preventReset: true
-        },
-        manaExperiments: {
-            preventReset: true
-        },
-        manaObservations: {
-            preventReset: true
-        },
-        magicResearch: {
-            preventReset: true
-        },
-        infuseTheHide: {
-            preventReset: true
-        },
-        etchTheCircle: {
-            preventReset: true
-        },
-        bindThePages: {
-            preventReset: true
-        },
-        awakenYourGrimoire: {
-            preventReset: true
-        },
-        prepareInternalSpells: {
-            preventReset: true
-        },
-        overcharge: {
-            preventReset: true
-        },
-        overboost: {
-            preventReset: true
-        },
-        prepareExternalSpells: {
-            preventReset: true
-        },
-        supportSpells: {
-            preventReset: true
-        },
-        earthMagic: {
-            preventReset: true
-        },
+//TODO when using Decimal - hydrate the necessary numbers
+//TODO also, only choose the vars you want to keep, rather than keeping bad data across saves
+function loadActionFromSave(actionObj, loadObj) {
+    Object.assign(actionObj, loadObj);
+}
 
-        hearAboutTheLich: {
-            preventReset: true
-        },
+function resetActionToBase(actionVar) {
+    actionSetBaseVariables(data.actions[actionVar], actionData[actionVar]);
+}
 
-        overclockTargetingTheLich: {
-            preventReset: true
-        },
-        worry: {
-            preventReset: true
-        },
-        resolve: {
-            preventReset: true
-        },
-        fightTheEvilForces: {
-            preventReset: true
-        },
-        bridgeOfBone: {
-            preventReset: true
-        },
-        forgottenShrine: {
-            preventReset: true,
-        },
-        messenger: {
-            preventReset: true,
-        },
-        harvestGhostlyField: {
-            preventReset: true,
-        }
-
-    },
-    upgrades:{
-        stopLettingOpportunityWait: {
-            preventReset: true,
-        },
-        knowWhenToMoveOn: {
-            preventReset: true,
-        },
-        feelTheEchoesOfMyPast: {
-            preventReset: true,
-        },
-        startALittleQuicker: {
-            preventReset: true,
-        },
-        rememberWhatIFocusedOn: {
-            preventReset: true,
-        },
-        learnedOfLichSigns: {
-            preventReset: true,
-        },
-        knowWhatIFocusedOn: {
-            preventReset: true,
-        },
-        refineMyCycle: { preventReset: true, },
-        refineMyAwareness: { preventReset: true, },
-        refineMyConcentration: { preventReset: true, },
-        refineMyEnergy: { preventReset: true, },
-        refineMyFlow: { preventReset: true, },
-        refineMyCoordination: { preventReset: true, },
-        refineMyIntegration: { preventReset: true, },
-        refineMyAmbition: { preventReset: true, },
-        refineMyAdaptability: { preventReset: true, },
-        refineMyCunning: { preventReset: true, },
-        refineMySavvy: { preventReset: true, },
-        refineMyConfidence: { preventReset: true, },
-        refineMyRecognition: { preventReset: true, },
-        refineMyCharm: { preventReset: true, },
-        refineMyInfluence: { preventReset: true, },
-        refineMyDiscernment: { preventReset: true, },
-        refineMyPulse: { preventReset: true, },
-        refineMyVision: { preventReset: true, },
-        refineMySpark: { preventReset: true, },
-        refineMyAmplification: { preventReset: true, },
-        refineMyControl: { preventReset: true, },
-        refineMyCuriosity: { preventReset: true, },
-        refineMyObservation: { preventReset: true, },
-        refineMyEndurance: { preventReset: true, },
-        refineMyNavigation: { preventReset: true, },
-        refineMyMight: { preventReset: true, },
-        refineMyGeared: { preventReset: true, },
-        refineMyCourage: { preventReset: true, },
-        refineMyWizardry: { preventReset: true, },
-    }};
-
-
-
+data.saveVersion = 1;
 function load() {
     initializeData();
 
     let toLoad = {};
 
-    // if(onLoadData) {
-    //     try {
-    //         toLoad = JSON.parse(decode(onLoadData));
-    //     } catch(e) {
-    //         exportErrorFile(onLoadData);
-    //     }
-    // }
-    if(localStorage[saveName]) {
-        console.log('Save found.');
+    if(onLoadData) {
         try {
-            toLoad = JSON.parse(decode(localStorage[saveName]));
+            toLoad = JSON.parse(decode(onLoadData));
         } catch(e) {
-            exportErrorFile(localStorage[saveName]);
+            exportErrorFile(onLoadData);
         }
     }
+    // if(localStorage[saveName]) {
+    //     console.log('Save found.');
+    //     try {
+    //         toLoad = JSON.parse(decode(localStorage[saveName]));
+    //     } catch(e) {
+    //         exportErrorFile(localStorage[saveName]);
+    //     }
+    // }
 
+    // const saveVersion = toLoad && toLoad.saveVersion ?? 0;
+    const saveVersion = 1; //for debug only
 
     if(isLoadingEnabled && localStorage[saveName] && toLoad.actions) { //has a save file
-        const saveVersion = toLoad.saveVersion || 0;
+        //only go through the ones in toLoad and graft them on to existing data
+        for(let actionVar in toLoad.actions) {
+            let actionObj = data.actions[actionVar];
+            let dataObj = actionData[actionVar];
+            let loadObj = toLoad.actions[actionVar];
+            if(!dataObj || dataObj.creationVersion > saveVersion) {
+                // console.log("Skipped loading action " + actionVar + " from save.");
+                continue;
+            }
+            loadActionFromSave(actionObj, loadObj);
+        }
+
+        for(let upgradeVar in toLoad.upgrades) {
+            let actionObj = data.upgrades[upgradeVar];
+            let dataObj = upgradeData[upgradeVar];
+            let loadObj = toLoad.upgrades[upgradeVar];
+            if(!dataObj || dataObj.creationVersion > saveVersion) { //If removed or needs to refresh
+                // console.log("Skipped loading upgrade " + upgradeVar + " from save.");
+                continue;
+            }
+            loadActionFromSave(actionObj, loadObj);
+        }
+
 
         // mergeExistingOnly(data, toLoad, "actions", ["x", "y", "realX", "realY"]); //use patch instead
         //these are in the skiplist because if, between saves, an action has changed the atts it has, the links need to be reset instead of saved.
@@ -438,9 +71,6 @@ function load() {
         mergeExistingOnly(data, toLoad, "options");
         mergeExistingOnly(data, toLoad, "gameSettings");
 
-
-        patchActions("actions", toLoad.actions, actionData);
-        patchActions("upgrades", toLoad.upgrades, upgradeData);
 
         data.toastStates = toLoad.toastStates;
 
@@ -477,6 +107,7 @@ function load() {
 
         //bought upgrades need to be applied
         actionData.hearAboutTheLich.maxLevel = data.upgrades.learnedOfLichSigns.upgradePower + 2;
+        actionData.trainWithTeam.maxLevel = data.upgrades.fightWithAllies.upgradePower >= 2 ? data.upgrades.fightWithAllies.upgradePower : 1;
     }
 
     //update all generator's multiplier data
@@ -488,7 +119,7 @@ function load() {
     }
 
     initializeDisplay();
-    setSlidersOnLoad(toLoad);
+    setSlidersOnLoad(toLoad, saveVersion);
     // recalcInterval(data.options.updateRate);
     views.updateView();
 
@@ -496,56 +127,7 @@ function load() {
     debug(); //change game after all else, for easier debugging
 }
 
-function patchActions(dataVar, toLoadActions, baseData) { //, dataActions, toLoadActions, patchMap) {
-    let dataActions = data[dataVar];
-    let patchMap = patches[dataVar];
-    const currentKeys = Object.keys(dataActions);
-    const loadedKeys = toLoadActions ? Object.keys(toLoadActions) : [];
-
-    for (const key of currentKeys) {
-        // If action is not in the loaded data, reset it to its base state.
-        if (!(key in toLoadActions)) {
-            if(dataVar === "action") {
-                actionSetBaseVariables(dataActions[key], baseData[key]);
-            } else if(dataVar === "upgrades") {
-                upgradesSetBaseVariables(dataActions[key], baseData[key])
-            }
-
-            continue;
-        }
-
-        // Check the patch map to see if this action should be preserved.
-        const preventReset = patchMap[key]?.preventReset;
-
-        // If reset is prevented, merge the loaded data and continue.
-        if (preventReset) {
-            Object.assign(dataActions[key], toLoadActions[key]);
-            continue;
-        }
-
-        if(dataVar === "action") {
-            const isVisible = toLoadActions[key].visible;
-            actionSetBaseVariables(dataActions[key], baseData[key]);
-            dataActions[key].visible = isVisible;
-        } else if(dataVar === "upgrades") {
-            upgradesSetBaseVariables(dataActions[key], baseData[key])
-        }
-    }
-
-    for (const key of loadedKeys) {
-        if (!(key in dataActions)) {
-            delete toLoadActions[key];
-        }
-    }
-
-    if(globalVisible) {
-        for(let attVar in data.atts) {
-            revealAtt(attVar);
-        }
-    }
-}
-
-function setSlidersOnLoad(toLoad) {
+function setSlidersOnLoad(toLoad, saveVersion) {
     updateSliderContainers(); //show hide according to setting
 
     for(let actionVar in data.actions) {
@@ -553,27 +135,14 @@ function setSlidersOnLoad(toLoad) {
         for(let downstreamVar of dataObj.downstreamVars) {
             if (!document.getElementById(actionVar + "NumInput" + downstreamVar)
                 || !toLoad.actions || !toLoad.actions[actionVar] ||
-                toLoad.actions[actionVar]["downstreamRate" + downstreamVar] === undefined) {
+                toLoad.actions[actionVar]["downstreamRate" + downstreamVar] === undefined ||
+                dataObj.creationVersion > saveVersion) {
                 continue;
             }
             setSliderUI(actionVar, downstreamVar, toLoad.actions[actionVar]["downstreamRate" + downstreamVar]); //from save file
         }
     }
     attachCustomSliderListeners();
-}
-
-function mergeExistingOnly2(data, toLoad, varName, skipList = []) {
-    const dataObj = data[varName];
-    const toLoadObj = toLoad[varName];
-    if (typeof dataObj !== "object" || typeof toLoadObj !== "object") return;
-
-    for (let key in toLoadObj) {
-        if (!(key in dataObj)) continue;
-        console.log(key);
-        if (skipList.includes(key)) continue;
-
-        Object.assign(dataObj[key], toLoadObj[key]);
-    }
 }
 
 function mergeExistingOnly(data, toLoad, varName, skipList = []) {

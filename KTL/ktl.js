@@ -105,6 +105,7 @@ function initializeKTL() {
 
     revealAtt("doom");
     revealAtt("courage");
+    data.actions.fightTheEvilForces.unlockCost = 0;
     unveilAction('worry');
     unveilAction('resolve');
     unveilAction('fightTheEvilForces');
@@ -279,7 +280,7 @@ function useAmulet() {
 
     data.currentWage = 1;
     data.currentJob = "helpScottWithChores";
-    document.getElementById("jobTitle").textContent = data.actions[data.currentJob] ? data.actions[data.currentJob].title : data.currentJob;
+    document.getElementById("jobTitle").textContent = data.actions[data.currentJob] ? actionData[data.currentJob].title : data.currentJob;
     document.getElementById("jobWage").textContent = intToString(data.currentWage, 2);
 
     setSliderUI("overclock", "reflect", getUpgradeSliderAmount());

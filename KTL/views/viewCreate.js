@@ -104,7 +104,7 @@ function generateActionDisplay(actionVar) {
         <span onclick="actionTitleClicked('${actionVar}')" style="color:var(--text-primary);cursor:pointer;position:absolute;
             top:-82px;height:82px;left:0;white-space: nowrap;border-width: 0 0 0 6px;border-style:solid;
             border-color:${resourceColorDim};padding-left:4px;text-shadow:1px 1px 2px var(--text-dark);">
-            <span style="font-size:20px;font-weight:bold;">${actionObj.title}<br></span>
+            <span style="font-size:20px;font-weight:bold;">${dataObj.title}<br></span>
             <span style="font-size:18px;font-weight:bold;" id='${actionVar}Resource'>0</span> 
             <span style="color:${resourceColor};font-size:16px;font-weight:bold;">${capitalizeFirst(dataObj.resourceName)}</span>
             <span style="font-size:14px;color:var(--text-muted)">${actionObj.isGenerator?`(+<span id="${actionVar}ResourceToAdd" 
@@ -264,14 +264,14 @@ let maxLevelTop = (data.gameSettings.viewDeltas && data.gameSettings.viewRatio) 
             ${dataObj.onCompleteText[language]}
         </div><br>` : "";
 
-    queueCache(`${actionVar}ActionPowerMult`);
+    queueCache(`${actionVar}ActionPower`);
 
     let onLevelText = Raw.html`
         On Level up:<br>
         ${actionObj.isGenerator || actionObj.progressMaxIncrease === 1 ? "" : `x<b>${actionObj.progressMaxIncrease}</b> progress required to complete<br>`}
         ${actionObj.expToLevelIncrease === 1 ? "" : `x<b>${actionObj.expToLevelIncrease}</b> exp required to level<br>`}
         ${actionObj.actionPowerMultIncrease === 1 ?"" : `x<b>${actionObj.actionPowerMultIncrease}</b> to Action Power per level <br>`}
-        ${!actionObj.isGenerator ? "" : `(x<b><span id="${actionVar}ActionPowerMult"></b> total Action Power from level)<br>`}
+        ${!actionObj.isGenerator ? "" : `x<b><span id="${actionVar}ActionPower"></b> total Action Power<br>`}
         ${dataObj.onLevelText ? dataObj.onLevelText[language]:""}`;
 
     queueCache(`${actionVar}HighestLevelContainer`);
@@ -312,7 +312,7 @@ let maxLevelTop = (data.gameSettings.viewDeltas && data.gameSettings.viewRatio) 
     queueCache(`${actionVar}_infoContainer`);
 
     let levelInfoContainer = Raw.html`
-        <div id="${actionVar}_infoContainer" style="display:none;padding:5px;max-height:220px;overflow-y:auto;will-change: transform;">
+        <div id="${actionVar}_infoContainer" style="display:none;padding:5px;max-height:220px;overflow-y:auto;">
             Tier <b>${actionObj.tier}</b> ${actionObj.isSpell ? "Spell" : actionObj.isGenerator ? "Generator" : "Action"}<br>
             Efficiency, found in the title, is Expertise Mult * Base Efficiency (x<b><span id="${actionVar}EfficiencyBase"></span></b>), capping at <b>100</b>%.<br>
             ${actionObj.isGenerator?"":(`Consume and send rate is ${actionObj.tierMult()*100}% of ${dataObj.resourceName} * efficiency.<br>`)}<br>
@@ -325,7 +325,7 @@ let maxLevelTop = (data.gameSettings.viewDeltas && data.gameSettings.viewRatio) 
     queueCache(`${actionVar}_storyContainer`);
 
     let storyContainer = Raw.html`
-        <div id="${actionVar}_storyContainer" style="display:none;padding:10px;max-height:220px;overflow-y:auto;will-change: transform;">
+        <div id="${actionVar}_storyContainer" style="display:none;padding:10px;max-height:220px;overflow-y:auto;">
             ${dataObj.storyText ? dataObj.storyText[language]:""}
         </div>`;
 
@@ -346,14 +346,15 @@ let maxLevelTop = (data.gameSettings.viewDeltas && data.gameSettings.viewRatio) 
     `
 
     let automationContainer = Raw.html`
-        <div id="${actionVar}_automationContainer" style="display:none;padding:10px;max-height:220px;overflow-y:auto;will-change: transform;">
+        <div id="${actionVar}_automationContainer" style="display:none;padding:10px;max-height:220px;overflow-y:auto;
+        ">
             ${preventParentSliderText}
         </div>`;
 
     queueCache(`${actionVar}_attsContainer`);
 
     let attsContainer = Raw.html`
-        <div id="${actionVar}_attsContainer" style="display:none;padding:5px;max-height:220px;overflow-y:auto;font-size;12px;will-change: transform;">
+        <div id="${actionVar}_attsContainer" style="display:none;padding:5px;max-height:220px;overflow-y:auto;font-size;12px;">
             ${generateActionOnLevelAtts(actionObj)}
             ${generateActionExpAtts(actionObj)}
             ${generateActionEfficiencyAtts(actionObj)}
@@ -371,7 +372,7 @@ let maxLevelTop = (data.gameSettings.viewDeltas && data.gameSettings.viewRatio) 
             <span>
                 <div id="${actionVar}UnlockCostContainer">
                     Needs <span style="font-weight:bold;" id="${actionVar}UnlockCost">0</span> ${dataObj.resourceName}<br>
-                    sent from <b>${data.actions[dataObj.parentVar]?data.actions[dataObj.parentVar].title:"WAIT"}</b>.
+                    sent from <b>${data.actions[dataObj.parentVar]?actionData[dataObj.parentVar].title:"WAIT"}</b>.
                 </div>
                 ${dataObj.unlockMessage ? dataObj.unlockMessage[language]:""}
             </span>
@@ -415,7 +416,7 @@ let maxLevelTop = (data.gameSettings.viewDeltas && data.gameSettings.viewRatio) 
     let maxLevelDiv = `<span style="display:${actionObj.maxLevel ? "" : "none"}">/ <span id="${actionVar}MaxLevel2" style="font-weight:bold;"></span></span>`;
 
     theStr += Raw.html`
-        <div id="${actionVar}Container" style="display:none;position:absolute;left:${newX};top:${newY};width:300px;" 
+        <div id="${actionVar}Container" style="display:none;position:absolute;left:${newX};top:${newY};width:330px;" 
             onmouseenter="mouseOnAction('${actionVar}')" onmouseleave="mouseOffAction('${actionVar}')">
             <div id="${actionVar}LargeVersionContainer" style="border:2px solid var(--border-color);
                 background-color:var(--bg-secondary);">
@@ -436,7 +437,7 @@ let maxLevelTop = (data.gameSettings.viewDeltas && data.gameSettings.viewRatio) 
             <div id="${actionVar}SmallVersionContainer" 
                 style="display:none;text-align:center;margin:50px auto;font-size:12px;width:100px;">
                 <span id="${actionVar}SmallVersionTitle">
-                    <span style="font-size:16px;font-weight:bold;">${actionObj.title}</span><br>
+                    <span style="font-size:16px;font-weight:bold;">${dataObj.title}</span><br>
                     <span id="${actionVar}SmallVersionLevels">
                         Level <span id="${actionVar}Level2" style="font-weight:bold;"></span>${maxLevelDiv}
                     </span>
@@ -473,7 +474,7 @@ function generateOnLevelContainers(actionObj) {
     if(dataObj.onLevelAtts.length > 0) {
         theStr += Raw.html`
             <span style="font-size:10px;color:var(--text-primary);position:absolute;
-                top:0;left:299px;white-space: nowrap;padding-left:8px;">`
+                top:0;left:329px;white-space: nowrap;padding-left:8px;">`
         //padding-left to make it overlap by 1 pix on the main container, so it redraws on zoom correctly.
 
         for(let onLevelAtt of dataObj.onLevelAtts) {
@@ -486,7 +487,7 @@ function generateOnLevelContainers(actionObj) {
     if(dataObj.expAtts.length > 0 || dataObj.efficiencyAtts.length > 0) {
         theStr += Raw.html`
             <span style="font-size:10px;color:var(--text-primary);position:absolute;
-                top:0;right:299px;white-space: nowrap;padding-right:8px;">`
+                top:0;right:329px;white-space: nowrap;padding-right:8px;">`
 
         for(let onLevelAtt of dataObj.expAtts) {
             theStr += generateOutsideAttDisplay(actionObj, onLevelAtt, "exp");
@@ -657,7 +658,7 @@ function createDownStreamSliders(actionObj, dataObj) {
         if(!data.actions[downstreamVar] || !data.actions[downstreamVar].hasUpstream) {
             continue;
         }
-        let title = data.actions[downstreamVar] ? data.actions[downstreamVar].title : downstreamVar;
+        let title = data.actions[downstreamVar] ? actionData[downstreamVar].title : downstreamVar;
         let actionVar = actionObj.actionVar;
 
         queueCache(`${actionVar}SliderContainer${downstreamVar}`)
@@ -690,7 +691,7 @@ function createDownStreamSliders(actionObj, dataObj) {
                         style="margin-right:3px;font-size:10px;width:37px;vertical-align: top;"
                         oninput="validateInput('${actionVar}', '${downstreamVar}')" onchange="downstreamNumberChanged('${actionVar}', '${downstreamVar}')" >
                             
-                    <div id="${actionVar}_${downstreamVar}_track_container" style="display:inline-block;width:220px;height:20px; 
+                    <div id="${actionVar}_${downstreamVar}_track_container" style="display:inline-block;width:250px;height:20px; 
                         user-select:none;padding: 0 10px;box-sizing:border-box;cursor:pointer;">
                         <div id="${actionVar}Track${downstreamVar}" style="margin-top:6px;width:100%;height:5px; 
                             background:linear-gradient(to right, red 10%, #ddd 10%, #ddd 90%, green 90%);position:relative;">
@@ -724,7 +725,7 @@ function createBasicSliderHTML(actionVar, downstreamVar) {
         const elementId = `${actionVar}_${downstreamVar}_option_${option.value}`;
         const initialBgColor = option.value === 0 ? 'blue' : 'transparent';
         optionsHTML += `
-            <div id="${elementId}" style="border:2px solid ${option.color};padding:5px 15px;margin:2px;cursor:pointer;user-select:none;background-color:${initialBgColor};border-radius:5px;"
+            <div id="${elementId}" style="border:2px solid ${option.color};padding:5px 20px;margin:2px;cursor:pointer;user-select:none;background-color:${initialBgColor};border-radius:5px;"
                 onmouseover="handleSliderMouseOver('${elementId}')" onmouseout="handleSliderMouseOut('${elementId}', '${option.color}')"
                 onclick="handleSliderClick('${elementId}', '${actionVar}', '${downstreamVar}', ${option.value})">
                 ${option.label}
@@ -894,9 +895,9 @@ function generateLinesBetweenActions() {
                 continue;
             }
             // Calculate the centers of each object
-            const x1 = dataObj.realX + 155; // 220 / 2
+            const x1 = dataObj.realX + 170; // 220 / 2
             const y1 = dataObj.realY + 20; // 200 / 2
-            const x2 = downstreamDataObj.realX + 155; // 220 / 2
+            const x2 = downstreamDataObj.realX + 170; // 220 / 2
             const y2 = downstreamDataObj.realY + 20; // 200 / 2
 
             let sourceBackgroundColor = getResourceColor(dataObj);
@@ -1017,6 +1018,7 @@ function setAllCaches() {
     queueCache("attDisplay");
     queueCache("bonusDisplay");
     queueCache("killTheLichMenuButton2");
+    queueCache("hearAboutTheLichActionPower2");
     queueCache("ancientCoinDisplay");
     queueCache("spellPowerDisplay");
     queueCache("jobDisplay");

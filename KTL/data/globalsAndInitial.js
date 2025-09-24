@@ -89,15 +89,15 @@ let viewData = {}; //contains only things that are generated / not saved
 viewData.toasts = [];
 
 let language = "english";
-let globalVisible = false;
-// let globalVisible = true;
+// let globalVisible = false;
+let globalVisible = true;
 let isLoadingEnabled = true; //SET FALSE FOR CLEARING SAVE
 
 
 data.upgrades = {};
 
-let isDebug = false;
-// let isDebug = true;
+// let isDebug = false;
+let isDebug = true;
 function debug() {
     if(!isDebug) {
         return;
@@ -106,10 +106,11 @@ function debug() {
     document.getElementById("bonus50").style.display = "";
     // data.gameSettings.bonusSpeed = 1;
     data.currentGameState.KTLBonusTimer = 0;
-    data.ancientCoin = 5000;
+    data.ancientCoin = 10000;
 
     gameSpeed = 1;
-    data.currentGameState.bonusTime = 1000 * 60 * 60 * 24;
+    data.currentGameState.bonusTime = 1000 * 60 * 60 * 24 * 3;
+
 
     //temp data corrections:
     // unveilAction('visitShrineBehindWaterfall')
@@ -121,13 +122,20 @@ function debug() {
     // data.doneKTL = true;
     // data.doneAmulet = true;
     // data.displayJob = true;
-    // buyUpgrade("buyNicerStuff", 0);
-    buyUpgrade("stopLettingOpportunityWait");
-    buyUpgrade("stopLettingOpportunityWait");
-    buyUpgrade("knowWhenToMoveOn");
-    buyUpgrade("startALittleQuicker");
-    buyUpgrade("startALittleQuicker");
-    buyUpgrade("startALittleQuicker");
+
+
+    buyUpgrade("feelTheEchoes");
+    unveilAction('feelAGentleTug');
+
+    buyUpgrade("investMyGold");
+    buyUpgrade("investMyGold");
+    buyUpgrade("investMyGold");
+    unveilAction('invest');
+
+
+    buyUpgrade("increaseInitialInvestment");
+    buyUpgrade("increaseInitialInvestment");
+
     // setSliderUI("overclock", "reflect", 100);
     // unveilAction('makeMoney');
 
@@ -139,7 +147,8 @@ function debug() {
     unveilPlane(2);
     // statAddAmount("pulse", 10)
     // statAddAmount("integration", 120)
-    // statAddAmount("legacy", 10)
+    // unlockAction(data.actions['echoKindle']);
+    // statAddAmount("legacy", 385423)
 
     // unveilAction('earthMagic');
     // unveilAction('gossipAroundCoffee');
@@ -226,11 +235,10 @@ function initializeData() {
     create("overclock", ["reflect", "bodyAwareness", "travelOnRoad", "makeMoney", "socialize"], 0, 0); //generateMana
     create("reflect", ["distillInsight", "harnessOverflow", "takeNotes", "remember"], -1, -1);
     create("distillInsight", [], -1.1, .5);
-    create("harnessOverflow", [], -2, 0); //siftExcess
+    create("harnessOverflow", ["siftExcess"], -2, 0);
+    create("siftExcess", [], -1, .5);
     create("takeNotes", ["journal", "readBooks"], -1.1, -.5);
     create("bodyAwareness", ["meditate", "standStraighter"],-1, 0);
-    create("standStraighter", ["walkAware"], -1, .5);
-    create("walkAware", [], -1, .5);
     create("remember", ["processEmotions"], -.2, -1.2);
     create("travelOnRoad", ["travelToOutpost", "watchBirds"], 2, 0);
     create("travelToOutpost", ["meetVillageLeaderScott", "checkNoticeBoard", "browseLocalMarket", "pleasantForest"], 2, 0);
@@ -245,29 +253,56 @@ function initializeData() {
     create("checkNoticeBoard", ["reportForTraining", "reportForLabor"], 1.5, -1);
     create("makeMoney", ["spendMoney"], 1, -1);
     create("spendMoney", ["buyBasicSupplies", "buySocialAccess", "buyMarketItems"], 0, -1);
-    create("buyBasicSupplies", ["buyBasicClothes", "buyStreetFood"], -1, -1.1);
-    create("buyBasicClothes", ["buyTravelersClothes", "buyMatchingClothes"], -1, -1.3);
-    create("buyTravelersClothes", [], -1.2, -.2);
+    create("buyBasicSupplies", ["buyBasicClothes", "buyStreetFood"], -.2, -1.5);
+    create("buyBasicClothes", ["buyTravelersClothes", "buyMatchingClothes"], -.5, -1.5);
+    create("buyTravelersClothes", ["buyTravelersGear"], -1.2, -.2);
     create("buyMarketItems", ["buyShopItems"], 1, -1);
-    create("buyShopItems", ["invest"], 0, -1);
-    create("buyStreetFood", ["buyGoodFood"], -1, -.3);
-    create("buyGoodFood", [], -1.2, -.2);
+    create("buyShopItems", ["invest", "buyUtilityItems"], 0, -1);
+    create("buyStreetFood", ["buyGoodFood"], -1.1, -.5);
+    create("buyGoodFood", ["buyArtisanFood"], -1.2, -.2);
     create("buyMatchingClothes", ["buyStylishClothes"], -1, -1.2);
-    create("buyStylishClothes", [], -.5, -1);
+    create("buyStylishClothes", ["buyComfyShoes"], -1, -.2);
+
+    create("buyComfyShoes", [], -1, 0);
+    create("buyTravelersGear", [], -1, 0);
+    create("buyArtisanFood", [], -1, .2);
+    create("buyUtilityItems", ["buyPotions", "buyTools"], -.1, -1);
+    create("buyPotions", [], -.1, -1);
+    create("buyTools", [], -1.1, -1);
 
 
-    create("reportForLabor", ["oddJobsLaborer"], 1, 0);
+    create("buySocialAccess", ["slideTheCoin"], -1, -.1);
+    create("slideTheCoin", ["buyCoffee"], -.1, -1);
+    create("buyCoffee", [], -1, -.1);
+
+    create("reportForLabor", ["oddJobsLaborer", "digFoundation"], 1, 0);
     create("oddJobsLaborer", ["chimneySweep"], .5, -1);
 
 
     create("invest", ["buildFortune"], 1, -1);
-    create("buildFortune", ["deepInvestments", "investInLocals"], 0, -1);
-    create("deepInvestments", [], 1, -.5);
-    create("investInLocals", ["investInRoads"], 0, -1);
-    create("investInRoads", [], 0, -1);
-    create("buySocialAccess", ["slideTheCoin"], 0, -1.3);
-    create("slideTheCoin", ["buyCoffee"], -1, -1.2);
-    create("buyCoffee", [], -.6, -1)
+    create("buildFortune", ["reinvest", "spendFortune"], 1, -1);
+    create("reinvest", [], 0, 1);
+    create("spendFortune", ["investInLocals", "fundTownImprovements", "investInSelf"], 0, -1);
+
+    create("investInLocals", ["hostAFestival"], -1.5, -1);
+    create("hostAFestival", ["fundATemporaryStall"], -.5, -1);
+
+    create("fundATemporaryStall", [], 0, -1);
+    // create("fundATemporaryMarket", [], 0, -1);
+    // create("establishPermanentShoppingArea", [], 0, -1);
+    // create("bolsterMarket", [], 0, -1);
+
+    create("fundTownImprovements", ["supportLocalLibrary", "recruitAnEngineer"], 0, -1.5);
+    create("supportLocalLibrary", ["expandLibrary"], 0, -1);
+    create("expandLibrary", ["sourceRareBooks"], 0, -1);
+    create("sourceRareBooks", [], 0, -1);
+
+    create("recruitAnEngineer",["procureStoneAndWood"], -1, -1);
+    create("procureStoneAndWood",[], 0, -1);
+
+    create("investInSelf", ["makeAGenerousDonation", "purchaseADeed"], 1.5, -1);
+    create("makeAGenerousDonation", [], -.5, -1);
+    create("purchaseADeed", [], .5, -1);
 
 
 
@@ -293,20 +328,20 @@ function initializeData() {
 
     //socialize start
     create("socialize", ["meetPeople"], -1, 1);
-    create("meetPeople", ["joinCoffeeClub", "learnToListen", "talkWithScott"], 0, 1); //talkToScott, casualConversations
+    create("meetPeople", ["joinCoffeeClub", "learnToListen", "talkWithScott"], 0, 1);
 
-    create("talkWithScott", ["talkWithJohn"], -1.5, 0);
-    create("talkWithJohn", [], -1, 0);
+    create("talkWithScott", ["talkWithJohn"], -1.2, -.5);
+    create("talkWithJohn", [], -1.2, 0);
 
-    create("learnToListen", ["chatWithMerchants", "chatWithHermit"], -1.2, 1);
+    create("learnToListen", ["chatWithMerchants", "chatWithHermit", "learnToInquire"], -1.2, .5);
     create("chatWithMerchants", ["listenToWoes", "askAboutStitching", "complimentTheChef"], -1.5, 0);
     create("askAboutStitching", [], -1.2, 0);
     create("complimentTheChef", [], -1.1, -1);
     create("listenToWoes", ["keyToTheBackroom"], -1.1, 1);
     create("keyToTheBackroom", [], -1, 0);
 
-    create("chatWithHermit", ["tellAJoke"], 0, 1);
-    create("tellAJoke", [], 0, 1);
+    create("chatWithHermit", ["tellAJoke"], -1.1, 1);
+    create("tellAJoke", [], -1, 1);
 
     create("joinCoffeeClub", ["gossipAroundCoffee"], 0, 1);
     create("gossipAroundCoffee", ["hearAboutTheLich"], 1, 0);
@@ -320,8 +355,7 @@ function initializeData() {
 
     create("exploreTheForest", ["travelAlongTheRiver"], 1, .5);
     create("travelAlongTheRiver", ["gatherRiverWeeds", "restAtWaterfall"], 1, .8);
-    create("gatherRiverWeeds", ["gatherRarePlants"], 0, 1);
-    create("gatherRarePlants", [], .5, 1);
+    create("gatherRiverWeeds", [], 0, 1);
     create("restAtWaterfall", ["visitShrineBehindWaterfall"], 1.3, .5);
     create("visitShrineBehindWaterfall", [], .3, 1);
 
@@ -340,37 +374,89 @@ function initializeData() {
 
 
 //Notice Board level 3 / Jobs 1
-    create("chimneySweep", ["handyman"], 0, -1);
-    create("handyman", ["tavernHelper"], 0, -1);
-    create("tavernHelper", ["guildReceptionist"], 0, -1);
-    create("guildReceptionist", ["messenger"], 0, -1);
-    create("messenger", ["townCrier"], 0, -1);
-    create("townCrier", ["storyTeller"], 0, -1);
-    create("storyTeller", [], 0, -1);
+    create("chimneySweep", ["handyman"], .05, -1);
+    create("handyman", ["tavernHelper"], .1, -1);
+    create("tavernHelper", ["guildReceptionist"], .15, -1);
+    create("guildReceptionist", ["messenger"], .2, -1);
+    create("messenger", ["townCrier"], .25, -1);
+    create("townCrier", ["storyTeller"], .3, -1);
+    create("storyTeller", [], .35, -1);
+
+    create("digFoundation", ["stoneCompression"], 1.5, -.9);
+    create("stoneCompression", ["shapeBricks"], .07, -1);
+    create("shapeBricks", ["tidyMagesmithShop"], .13, -1);
+    create("tidyMagesmithShop", ["clearTheBasement"], .2, -1);
+    create("clearTheBasement", ["moldBarsFromScrap"], .27, -1);
+    create("moldBarsFromScrap", ["mendGearCracks"], .34, -1);
+    create("mendGearCracks", ["assistantMagesmith"], .41, -1);
+    create("assistantMagesmith", [], .48, -1);
+
 
 //Travelling onwards / hermit / dungeon
     create("meditate", [],-2, 0);
     create("journal", ["readTheWritten"], -1, -.5);
     create("readTheWritten", [], -1, -.5);
+    create("standStraighter", ["walkAware"], -1, .5);
+    create("walkAware", [], -2, 0);
 
     create("feelAGentleTug", ["leaveTheOpenRoad"], 1.5, 1);
     create("leaveTheOpenRoad", ["discoverBurntTown", "findOverlook"], 1, 1);
-    create("findOverlook", [], 1, 0);
-    create("discoverBurntTown", ["resonanceCompass"], 1, 1);
-    create("resonanceCompass", ["clearIvyWall"], 1, .5);
-    create("clearIvyWall", ["gatherOldBooks"], 1, -.1);
-    create("gatherOldBooks", [], .3, -1);
+    create("findOverlook", [], .5, 1);
+    create("discoverBurntTown", ["feelTheRage", "repairShatteredShrine", "resonanceCompass", "stepThroughAsh"], 1, 0);
+    create("feelTheRage", [], 0, 1);
+    create("repairShatteredShrine", [], 0, -1);
+    create("stepThroughAsh", ["graspTheTragedy"], 1, .5);
+    create("graspTheTragedy", [], 1, .5);
+    create("findOverlook", [], 0, 1.5);
+    create("resonanceCompass", ["clearIvyWall"], 1, -.5);
+    create("clearIvyWall", ["scavengeForSupplies"], 1, 0);
 
-    create("readBooks", ["catalogNewBooks", "sortBySubject"], -2, 0);
+
+    create("scavengeForSupplies", ["skimAHeavyTome", "pryGemLoose", "studyTheArchitecture"], 1, 0);
+    create("pryGemLoose", [], 0, 1);
+    create("studyTheArchitecture", [], 0, -1);
+    create("skimAHeavyTome", ["clearRubble", "comprehendDifficultTexts", "clearTheDust"], 1, 0);
+    create("comprehendDifficultTexts", [], 0, -1);
+    create("clearTheDust", [], 0, 1);
+    create("clearRubble", ["readFadedMarkers", "dismantleShelves", "studyTheLayout"], 1, 0);
+    create("dismantleShelves", [], 0, 1);
+    create("studyTheLayout", [], 0, -1);
+    create("readFadedMarkers", ["findAFamiliarLanguage", "decipherOrganization", "mapOutTraps"], 1, 0);
+    create("decipherOrganization", [], 0, 1);
+    create("mapOutTraps", ["accessForbiddenArea"], 0, -1);
+    create("accessForbiddenArea", [], 0, -1);
+    create("findAFamiliarLanguage", ["searchForRelevantBooks", "studyRunicLanguages", "collectHistoryBooks"], 1, 0);
+    create("studyRunicLanguages", [], 0, 1);
+    create("collectHistoryBooks", [], 0, -1);
+    create("searchForRelevantBooks", ["collectSpellBooks", "complainAboutDifficulty", "collectMathBooks"], 1, 0);
+    create("complainAboutDifficulty", [], 0, 1);
+    create("collectMathBooks", [], 0, -1);
+    create("collectSpellBooks", [], 1, 0);
+
+
+
+    create("readBooks", ["catalogNewBooks", "study"], -2, 0);
     create("catalogNewBooks", ["buildPersonalLibrary"], -1, 0);
     create("buildPersonalLibrary", [], 0, 1);
-    create("sortBySubject", ["readOldStories"], -1, -1);
+    create("study", ["sortBySubject"], -1, -1);
+    create("sortBySubject", ["studyHistory", "studyMath", "studyMagic"], -1, -1);
+
+    create("studyHistory", ["readOldStories"], 1, -.5);
     create("readOldStories", ["readOldReligiousTexts", "readWarJournals"], 0, -1);
     create("readOldReligiousTexts", ["readOldProphecies", "readOldPoetry"], -1, 0);
     create("readOldProphecies", [], -1, -1);
     create("readOldPoetry", ["readOldPhilosophy"], 0, -1);
     create("readOldPhilosophy", [], -.5, -1);
     create("readWarJournals", [], 0, -1);
+
+    create("studyMath", [], -1, .5);
+
+    create("studyMagic", ["studySupportSpells"], -1, -.5);
+    create("studySupportSpells", ["studyEarthMagic", "studyPracticalMagic"], -1, .5);
+    create("studyEarthMagic", ["studyAdvancedEarthMagic"], -1, 0);
+    create("studyAdvancedEarthMagic", [], -1, 0);
+    create("studyPracticalMagic", ["studyAdvancedPracticalMagic"], -1, 1);
+    create("studyAdvancedPracticalMagic", [], -1, 0);
 
     create("processEmotions", ["reviewOldMemories"], -1, -.5);
     create("reviewOldMemories", ["rememberTheWar", "rememberFriends"], -1, -.5);
@@ -380,6 +466,15 @@ function initializeData() {
     create("rememberFriends", [], 0, -1.5);
 
 
+
+    create("learnToInquire", ["talkToTheRecruiters"], -.1, 1);
+    create("talkToTheRecruiters", ["askAboutLocalWork", "askAboutArcaneCorps"], 1, .5);
+    create("askAboutLocalWork", [], 0, 1);
+    create("askAboutArcaneCorps", ["getTestedForKnowledge", "discussPlacement"], 1, .2);
+    create("getTestedForKnowledge", [], 0, 1);
+    create("discussPlacement", ["meetTheMages"], 1, 0);
+    create("meetTheMages", ["trainWithTeam"], .3, -1);
+    create("trainWithTeam", [], 0, -1.2);
 
 
 
@@ -413,18 +508,18 @@ function initializeData() {
     create("divination", ["identifyItem"], 1.5, -.5);
     create("identifyItem", ["detectMagic"], 0, -1);
     create("detectMagic", [], 0, -1);
-    create("practicalMagic", ["manaTransfer"], .5, -1);
-    create("manaTransfer", ["illuminate"], 0, -1);
+    create("practicalMagic", ["illuminate"], .5, -1);
     create("illuminate", ["unblemish"], 0, -1);
-    create("unblemish", [], 0, -1);
+    create("unblemish", ["manaTransfer"], 0, -1);
+    create("manaTransfer", [], 0, -1);
 
     create("recoverSpells", ["healingMagic"], 1, -.5);
     create("earthMagic", ["moveEarth"], -.5, -1);
-    create("moveEarth", ["shelter"], 0, -1);
-    create("shelter", ["reinforceArmor"], 0, -1);
-    create("reinforceArmor", ["sharpenWeapons"], 0, -1);
-    create("sharpenWeapons", ["repairEquipment"], 0, -1);
-    create("repairEquipment", ["restoreEquipment"], 0, -1);
+    create("moveEarth", ["hardenEarth"], 0, -1);
+    create("hardenEarth", ["shapeEarth"], 0, -1);
+    create("shapeEarth", ["moveIron"], 0, -1);
+    create("moveIron", ["reinforceArmor"], 0, -1);
+    create("reinforceArmor", ["restoreEquipment"], 0, -1);
     create("restoreEquipment", [], 0, -1);
 
     create("healingMagic", ["singleTargetHealing", "massHeal"], 1.5, -.5);

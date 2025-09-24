@@ -262,7 +262,6 @@ function tickGameObject(actionVar) {
         giveResourceTo(actionObj, downstreamObj, taken);
     }
 
-
 }
 
 function calculateTaken(actionVar, downstreamVar, actionObj, mult) {
@@ -294,7 +293,7 @@ function checkProgressCompletion(actionObj, dataObj) {
 
 function giveResourceTo(actionObj, downstreamObj, amount) {
     if (!downstreamObj) {
-        console.log(actionObj.title + " is failing to give to downstream.");
+        console.log(actionObj.actionVar + " is failing to give to downstream.");
         return;
     }
     // This function now correctly handles the state change for both actions.

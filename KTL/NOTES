@@ -10,7 +10,9 @@ To create a new div element:
 - views.updateVal(id, newVal, "textContent", "time")
 
 
-
+to update/force refresh an action/upgrade:
+1. increase data.saveVersion
+2. set actionData[""].creationVersion to data.saveVersion
 
 
 
