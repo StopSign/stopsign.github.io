@@ -44,6 +44,10 @@ data.currentJob = "helpScottWithChores";
 data.currentWage = 1;
 data.doneKTL = false;
 data.doneAmulet = false;
+data.ancientCoinMultKTL = 1;
+data.legacyMultKTL = 1;
+data.maxSpellPower = 0;
+data.totalSpellPower = 0;
 data.focusSelected = [];
 data.resetLogs = [];
 data.currentLog = [];
@@ -105,11 +109,11 @@ function debug() {
 
     document.getElementById("bonus50").style.display = "";
     // data.gameSettings.bonusSpeed = 1;
-    data.currentGameState.KTLBonusTimer = 0;
+    // data.currentGameState.KTLBonusTimer = 0;
     data.ancientCoin = 10000;
 
-    gameSpeed = 1;
-    data.currentGameState.bonusTime = 1000 * 60 * 60 * 24 * 3;
+    // gameSpeed = 1;
+    data.currentGameState.bonusTime = 1000 * 60 * 60 * 24 * 7;
 
 
     //temp data corrections:
@@ -124,20 +128,21 @@ function debug() {
     // data.displayJob = true;
 
 
-    buyUpgrade("feelTheEchoes");
-    unveilAction('feelAGentleTug');
+    buyUpgrade("askAboutBetterWork");
+    buyUpgrade("investMyGold");
+    buyUpgrade("investMyGold");
+    buyUpgrade("feelTheEchoesOfTheBurntTown");
+    buyUpgrade("feelTheEchoesOfTheBurntTown");
+    buyUpgrade("fightAlongsideAllies");
+    buyUpgrade("increaseInitialInvestment");
 
-    buyUpgrade("investMyGold");
-    buyUpgrade("investMyGold");
-    buyUpgrade("investMyGold");
+
     unveilAction('invest');
 
 
-    buyUpgrade("increaseInitialInvestment");
-    buyUpgrade("increaseInitialInvestment");
+    // buyUpgrade("increaseInitialInvestment");
 
     // setSliderUI("overclock", "reflect", 100);
-    // unveilAction('makeMoney');
 
     //setup system to right before HATL:
     // revealAtt("integration")
@@ -183,7 +188,7 @@ function initializeData() {
     createAndLinkNewAttribute("introspection", "awareness");
     createAndLinkNewAttribute("introspection", "curiosity");
     createAndLinkNewAttribute("introspection", "observation");
-    createAndLinkNewAttribute("introspection", "processing");
+    createAndLinkNewAttribute("introspection", "intellect");
     createAndLinkNewAttribute("introspection", "stillness");
     createAndLinkNewAttribute("introspection", "integration");
 

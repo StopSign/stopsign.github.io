@@ -142,6 +142,10 @@ function clickZoomOut() {
 windowElement.addEventListener('wheel', function(e) {
     if(mouseIsOnAction) {
         let elem = document.getElementById(`${mouseIsOnAction}_${data.actions[mouseIsOnAction].currentMenu}Container`);
+        if(!elem) {
+            console.log('error, no elem at: ' + mouseIsOnAction);
+            return;
+        }
         if(elem.scrollHeight > elem.clientHeight) { //only stop wheel if there's a reason to
             return;
         }

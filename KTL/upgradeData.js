@@ -484,7 +484,8 @@ let upgradeData = {
     refineMyMight: { attribute:"might", upgradesAvailable:4, increaseRatio:.5, initialCost:10, costIncrease:3, visible:true },
     refineMyGeared: { attribute:"geared", upgradesAvailable:4, increaseRatio:.5, initialCost:10, costIncrease:3, visible:true },
     refineMyCourage: { attribute:"courage", upgradesAvailable:4, increaseRatio:1, initialCost:10, costIncrease:2, visible:true },
-    refineMyWizardry: { attribute:"wizardry", upgradesAvailable:4, increaseRatio:.25, initialCost:15, costIncrease:4, visible:false },
+    refineMyLeverage: { attribute:"leverage", upgradesAvailable:4, increaseRatio:.5, initialCost:100, costIncrease:3, visible:false, creationVersion:2 },
+    refineMyWizardry: { attribute:"wizardry", upgradesAvailable:4, increaseRatio:.25, initialCost:100, costIncrease:4, visible:true, creationVersion:2 },
 
 
 
@@ -584,17 +585,17 @@ let upgradeData = {
     }, //200|1, 2x exp to third highest
 
 
-    feelTheEchoes: {
-        initialCost:10, costIncrease:1.5, creationVersion:2,
+    feelTheEchoesOfTheBurntTown: {
+        initialCost:20, costIncrease:2, creationVersion:2,
         upgradesAvailable:3,
-        visible:false,
+        visible:true,
         customInfo: function(num) {
             switch(num) {
                 case 0:
                 case 1:
                 case 2:
                 default:
-                    return "Unlocks new actions that use Research"
+                    return "Unlocks new actions that use Momentum"
             }
         },
         onBuy: function(num) {
@@ -620,7 +621,7 @@ let upgradeData = {
         }
     },
     learnFromTheLibrary: {
-        initialCost:30, costIncrease:1.5, creationVersion:2,
+        initialCost:100, costIncrease:2, creationVersion:2,
         upgradesAvailable:7,
         visible:false,
         customInfo: function(num) {
@@ -693,8 +694,8 @@ let upgradeData = {
                 purchaseAction('assistantMagesmith')
             } else if(num === 7) {
                 purchaseAction('studyAdvancedPracticalMagic')
-                purchaseAction('studyPracticalMagic')
-                purchaseAction('studyPracticalMagic')
+                purchaseAction('unblemish')
+                purchaseAction('manaTransfer')
             }
         }
     },
@@ -719,20 +720,22 @@ let upgradeData = {
         },
         onBuy: function(num) {
             if(num === 1) {
-                unveilUpgrade('increaseInitialInvestment')
                 purchaseAction('invest');
                 purchaseAction('buildFortune');
                 purchaseAction('spendFortune');
+                unveilUpgrade('increaseInitialInvestment')
             } else if(num === 2) {
                 purchaseAction('reinvest')
                 purchaseAction('investInLocals')
                 purchaseAction('townCrier')
                 purchaseAction('storyTeller')
+                unveilUpgrade('buyNicerStuff')
             } else if(num === 3) {
                 purchaseAction('hostAFestival')
                 purchaseAction('fundTownImprovements')
                 purchaseAction('browsePersonalCollection')
-                unveilUpgrade('buyNicerStuff')
+                unveilUpgrade('refineMyLeverage')
+                unveilUpgrade('increaseMarketCap')
             } else if(num === 4) {
                 purchaseAction('supportLocalLibrary')
                 purchaseAction('expandLibrary')
@@ -747,7 +750,7 @@ let upgradeData = {
         }
     },
     increaseInitialInvestment: {
-        initialCost:60, costIncrease:1.5, creationVersion:2,
+        initialCost:40, costIncrease:1.5, creationVersion:2,
         upgradesAvailable:5,
         visible:false,
         customInfo: function(num) {
@@ -758,18 +761,18 @@ let upgradeData = {
         }
     },
     increaseMarketCap: {
-        initialCost:60, costIncrease:1.5, creationVersion:2,
+        initialCost:100, costIncrease:1.5, creationVersion:2,
         upgradesAvailable:5,
         visible:false,
         customInfo: function(num) {
-            return Raw.html`Invest's maximum fotune gain cap increases to ${["1e15 (currently 1e10)", "1e20 (currently 1e15)", "1e25 (currently 1e20)", "1e30 (currently 1e25)", "1e30"][num]}.`
+            return Raw.html`Invest's maximum fotune gain cap increases to ${["1e7 (currently 1e5)", "1e9 (currently 1e7)", "1e11 (currently 1e9)", "1e13 (currently 1e11)", "1e15 (currently 1e13)", "1e15"][num]}.`
         },
         currentValue: function() {
-            return [1e10, 1e15, 1e20, 1e25, 1e30][data.upgrades.increaseMarketCap.upgradePower];
+            return [1e5, 1e7, 1e9, 1e11, 1e13, 1e15][data.upgrades.increaseMarketCap.upgradePower];
         }
     },
     buyNicerStuff: {
-        initialCost:80, costIncrease:2, creationVersion:2,
+        initialCost:70, costIncrease:3, creationVersion:2,
         upgradesAvailable:3,
         visible:false,
         customInfo: function(num) {
@@ -784,43 +787,66 @@ let upgradeData = {
         onBuy: function(num) {
             if(num === 1) {
                 purchaseAction('buyComfyShoes')
-            } else if(num === 2) {
                 purchaseAction('buyTravelersGear')
-            } else if(num === 3) {
+            } else if(num === 2) {
                 purchaseAction('buyArtisanFood')
+                purchaseAction('buyShopItems')
+            } else if(num === 3) {
+                purchaseAction('buyPotions')
+                purchaseAction('buyUtilityItems')
+            }
+        }
+    },
+    askAboutBetterWork: {
+        initialCost:30, costIncrease:1, creationVersion:2,
+        upgradesAvailable:1,
+        visible:false,
+        customInfo: function(num) {
+            return "Unlocks a new job, after asking for it"
+        },
+        onBuy: function(num) {
+            if(num === 1) {
+                purchaseAction('askAboutLocalWork')
+                purchaseAction('digFoundation')
             }
         }
     },
 
-    fightWithAllies: {
-        initialCost:10, costIncrease:1.5, creationVersion:2,
-        upgradesAvailable:3,
-        visible:false,
+    fightAlongsideAllies: {
+        initialCost:30, costIncrease:3, creationVersion:2,
+        upgradesAvailable:5,
+        visible:true,
         customInfo: function(num) {
-            switch(num) {
-                case 0:
-                case 1:
-                case 2:
-                default:
-                    return "Unlocks new actions that use Research"
+            if(num === 0) {
+                return "Unlocks new actions that use Conversations, and results in a better KTL reset"
             }
+            return "Increases max level of Train With Team by 1"
         },
         onBuy: function(num) {
             if(num === 1) {
                 purchaseAction('learnToInquire')
                 purchaseAction('talkToTheRecruiters')
-                purchaseAction('askAboutLocalWork')
-                purchaseAction('digFoundation')
                 purchaseAction('askAboutArcaneCorps')
                 purchaseAction('getTestedForKnowledge')
                 purchaseAction('discussPlacement')
                 purchaseAction('meetTheMages')
                 purchaseAction('trainWithTeam')
+                unveilUpgrade('askAboutBetterWork');
             } else if(num >= 2) {
                 actionData.trainWithTeam.maxLevel = 2 + num;
             }
         }
     },
+    keepMyMagicReady: {
+        initialCost:100, costIncrease:1, creationVersion:2,
+        upgradesAvailable:1,
+        visible:false,
+        customInfo: function(num) {
+            return Raw.html`The Spell Power used in KTL becomes the highest you've ever reached, instead of the current value.`;
+        }
+    },
+
+
     //... finish up to here
     /*
 

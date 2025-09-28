@@ -60,7 +60,7 @@ function refreshResetLog() {
 
 function initializeKTL() {
     if(!document.getElementById('confirmKTL').checked ||
-        !(isDebug || (data.actions.hearAboutTheLich.level >= 1 && data.totalSpellPower >= 1))) {
+        !(isDebug || (data.actions.hearAboutTheLich.level >= 1 && data.maxSpellPower >= 1))) {
         return;
     }
     trackFirst();

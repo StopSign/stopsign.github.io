@@ -310,5 +310,47 @@ const actionTextData = `
         ]]></english>
 	</repairShatteredShrine>
     
+    
+	<stepThroughAsh>
+        <english><![CDATA[
+            (WIP)
+            Inside a large building with burnt stone walls still standing, I found a floor coated in ash, untouched by the elements. This place had a raging fire inside of it, and I didn't know why. Well, that wasn't true - I knew why, I just refused to accept it; it reminded me too much of the Ashmarch, when the ash I walked through was borne from demons, the fire raining upon us... and my fellow countrymen. I stopped at the threshold and steeled myself. I banished the memories momentarily - this was not the Ashmarch. This was a different tragedy, and I had yet to identify the nature of it. With each step I walked, my emotions rose up, almost overcoming me. I had a lot to think about.
+        ]]></english>
+	</stepThroughAsh>
+	
+    
+	<graspTheTragedy>
+        <english><![CDATA[
+            (WIP)
+            I let myself see past the veil of my memory, and what I found was a kind of relief: there were no bones in this place. There were remnants of shelving, burnt paper with a uniform layout, glass, and frames - it was records and art that was destroyed in this place. This was storage, not a last refuge. It was a tragedy nonetheless, but of a kind that was foreign enough as to let my heightened feelings pass.
+        ]]></english>
+	</graspTheTragedy>
+	
+	
+	<processEmotions>
+        <english><![CDATA[
+            (WIP)
+			My emotions were in turmoil. With great concentration, I carved a path of momentum in order to handle it. 
+        ]]></english>
+	</processEmotions>
+	
+    
+	<readTheWritten>
+        <english><![CDATA[
+            (WIP)
+			It was time to do something I had been putting off for a long time: reading my own journal, and coming to terms with what had happened to me.
+        ]]></english>
+	</readTheWritten>
+	
+    
+	<siftExcess>
+        <english><![CDATA[
+            (WIP)
+			As my emotional state calmed, I found my mind clearing as well, and with it came noticing how, when I redirected the momentum back into itself, there were smaller sets of flows that I could redirect as well. With my growing ability to multitask, it was trivial to do a little more about the efficiency of the flow.
+        ]]></english>
+	</siftExcess>
+	
+	
+    
 </actionStories>
 `;

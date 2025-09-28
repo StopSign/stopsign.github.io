@@ -1011,8 +1011,8 @@ function setAllCaches() {
     queueCache("openViewAmuletButton");
     queueCache("ancientCoin");
     queueCache("ancientCoin2");
-    queueCache("totalSpellPower");
-    queueCache("totalSpellPower2");
+    queueCache("maxSpellPower");
+    queueCache("maxSpellPower2");
     queueCache("bonusTime");
     queueCache("killTheLichMenu");
     queueCache("attDisplay");

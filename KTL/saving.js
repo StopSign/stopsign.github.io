@@ -94,20 +94,25 @@ function load() {
         data.focusLoopMax = toLoad.focusLoopMax ?? 2.5;
         data.lastVisit = toLoad.lastVisit ?? Date.now();
         data.currentLog = toLoad.currentLog ?? [];
+        data.ancientCoinMultKTL = toLoad.ancientCoinMultKTL ?? 1;
+        data.legacyMultKTL = toLoad.legacyMultKTL ?? 1;
+        data.totalSpellPower = toLoad.totalSpellPower ?? 0;
+        data.maxSpellPower = toLoad.maxSpellPower ?? 0;
 
         data.currentGameState = toLoad.currentGameState;
         // data.gameSettings = toLoad.gameSettings;
 
         //data correction
-        if(toLoad.gameSettings.viewAdvancedSliders === undefined) {
+        if(toLoad.gameSettings.viewAdvancedSliders === undefined) { //defaults off on new saves
             data.gameSettings.viewAdvancedSliders = true;
         }
+        delete data.atts.processing; //changed named to Intellect, have to delete old att
 
         //new spells need to be leveled to current grimoire's level
 
         //bought upgrades need to be applied
-        actionData.hearAboutTheLich.maxLevel = data.upgrades.learnedOfLichSigns.upgradePower + 2;
-        actionData.trainWithTeam.maxLevel = data.upgrades.fightWithAllies.upgradePower >= 2 ? data.upgrades.fightWithAllies.upgradePower : 1;
+        actionData.hearAboutTheLich.maxLevel = data.upgrades.learnedOfLichSigns.upgradePower + 2 + data.actions.trainWithTeam.level;
+        actionData.trainWithTeam.maxLevel = data.upgrades.fightAlongsideAllies.upgradePower >= 2 ? data.upgrades.fightAlongsideAllies.upgradePower : 1;
     }
 
     //update all generator's multiplier data

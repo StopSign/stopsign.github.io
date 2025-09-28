@@ -263,6 +263,9 @@ function statAddAmount(attVar, amount) {
         console.log("Tried to add to a stat that doesn't exist: " + attVar);
     }
     if(attVar === "legacy") {
+        if(data.gameState === "KTL") {
+            amount *= data.legacyMultKTL;
+        }
         data.actions.echoKindle.resource += amount;
     }
     attObj.num += amount;
@@ -486,6 +489,7 @@ function unlockAction(actionObj) {
         return;
     }
     actionObj.unlocked = true;
+    actionObj.unlockCost = 0;
     actionObj.unlockTime = data.secondsPerReset; //mark when it unlocked
     let dataObj = actionData[actionVar];
     if(dataObj.onUnlock) {
@@ -556,6 +560,27 @@ function useCharge(actionVar) {
     }
 }
 
+function useActiveSpellCharges() {
+    for(let actionVar in data.actions) {
+        let actionObj = data.actions[actionVar];
+        if(actionObj.power && actionObj.level > 0) {
+            useCharge(actionVar);
+        }
+    }
+}
+
+function getActiveSpellPower() {
+    let totalSpellPower = 0;
+    for(let actionVar in data.actions) {
+        let actionObj = data.actions[actionVar];
+        if(actionObj.power) {
+            totalSpellPower += actionObj.power * actionObj.level;
+        }
+    }
+    return totalSpellPower;
+}
+
+
 const bonusCodes = {};
 function addBonusCode(code, rewardFunction, message = "") {
     const trimmed = code.trim().replace(/^"+|"+$/g, "");
@@ -622,6 +647,8 @@ addBonusCode("squirrel", function () {
 addBonusCode("nothing", function () {
     data.currentGameState.bonusTime += 1000 * 60 * 60 * 24;
 }, "There was nothing there - except 24 hours bonus time.");
+
+
 
 
 //function to be used as a debug helper, running in console

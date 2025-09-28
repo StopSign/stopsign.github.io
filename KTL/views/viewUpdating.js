@@ -36,11 +36,11 @@ let views = {
         let toViewAmulet = data.doneAmulet && data.gameState !== "KTL";
         views.updateVal(`ancientCoinDisplay`, data.doneKTL ? "" : "none", "style.display");
 
-        views.updateVal(`spellPowerDisplay`, data.totalSpellPower > 0 ? "" : "none", "style.display");
+        views.updateVal(`spellPowerDisplay`, data.maxSpellPower > 0 ? "" : "none", "style.display");
 
         views.updateVal(`jobDisplay`, data.displayJob ? "" : "none", "style.display");
 
-        let shouldShowKTLButton = data.actions.hearAboutTheLich.level >= 1 && data.totalSpellPower > 0 && data.gameState !== "KTL";
+        let shouldShowKTLButton = data.actions.hearAboutTheLich.level >= 1 && data.maxSpellPower > 0 && data.gameState !== "KTL";
         views.updateVal(`killTheLichMenuButton2`, shouldShowKTLButton?"":"none", "style.display")
     },
     scheduleUpdate: function(elementId, value, type) {
@@ -447,25 +447,28 @@ let views = {
 
 function updateGlobals() {
     let totalMometum = 0;
-    let totalSpellPower = 0;
     for(let actionVar in data.actions) {
         let actionObj = data.actions[actionVar];
         if(actionObj.resourceName === "momentum" && gameStateMatches(actionObj)) {
             totalMometum += actionObj.resource;
         }
-        if(actionObj.power) {
-            totalSpellPower += actionObj.power * actionObj.level;
-        }
     }
     data.totalMomentum = totalMometum;
-    data.totalSpellPower = totalSpellPower;
+    data.totalSpellPower = getActiveSpellPower();
+    if(data.upgrades.keepMyMagicReady.upgradePower) {
+        if(data.totalSpellPower > data.maxSpellPower) {
+            data.maxSpellPower = data.totalSpellPower;
+        }
+    } else {
+        data.maxSpellPower = data.totalSpellPower;
+    }
 
-    views.updateVal(`totalSpellPower`, totalSpellPower, "textContent", 1);
+    views.updateVal(`maxSpellPower`, data.maxSpellPower, "textContent", 1);
     views.updateVal(`totalMomentum`, totalMometum, "textContent", 1);
 
     if(KTLMenuOpen) { //only update if menu is open
         views.updateVal(`totalMomentum2`, totalMometum, "textContent", 1);
-        views.updateVal(`totalSpellPower2`, totalSpellPower, "textContent", 1);
+        views.updateVal(`maxSpellPower2`, data.maxSpellPower, "textContent", 1);
         views.updateVal(`HATLLevel`, data.actions.hearAboutTheLich.level, "textContent", 1);
     }
 
