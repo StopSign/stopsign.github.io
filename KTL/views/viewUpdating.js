@@ -219,7 +219,7 @@ let views = {
             let instaColor = `rgb(${Math.round(20+189*(actionObj.instability/100/data.atts.control.attMult))}, ${Math.round(20+189*(1-(actionObj.instability/100/data.atts.control.attMult)))}, 100)`;
             views.updateVal(`${actionVar}Instability`, instaColor, "style.color");
             roundedNumbers.push(["instability", 2]);
-            views.updateVal(`${actionVar}InstabilityToAdd`, actionObj.instabilityToAdd/(actionObj.efficiency/100), "textContent", 2);
+            views.updateVal(`${actionVar}InstabilityToAdd`, dataObj.instabilityToAdd/(actionObj.efficiency/100), "textContent", 2);
         }
 
         for(let numberObj of roundedNumbers) {

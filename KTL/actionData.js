@@ -67,8 +67,8 @@ let actionData = {
                 useCharge('overcharge');
                 if(isSpellReady('overboost')) {
                     useCharge('overboost');
-                    if(isSpellReady('overdrive')) {
-                        useCharge('overdrive');
+                    if(isSpellReady('overponder')) {
+                        useCharge('overponder');
                     }
                 }
             }
@@ -85,15 +85,16 @@ let actionData = {
                 spellMult *= actionData.overcharge.spellpower();
                 if(isSpellReady('overboost')) {
                     spellMult *= actionData.overboost.spellpower();
-                    if(isSpellReady('overdrive')) {
-                        spellMult *= actionData.overdrive.spellpower();
+                    if(isSpellReady('overponder')) {
+                        spellMult *= actionData.overponder.spellpower();
                     }
                 }
             }
 
             let actionObj = data.actions.overclock;
+            let dataObj = actionData.overclock;
 
-            actionObj.progressGain = actionObj.generatorSpeed * (actionObj.efficiency / 100);
+            actionObj.progressGain = dataObj.generatorSpeed * (actionObj.efficiency / 100);
             actionObj.actionPower = actionObj.actionPowerBase *
                 actionObj.actionPowerMult * (actionObj.efficiency/100);
             actionObj.resourceToAdd = actionObj.actionPower *
@@ -335,15 +336,15 @@ let actionData = {
     },
     browsePersonalCollection: {
         tier:1, plane:0, creationVersion:2, automationOff: true,
-        progressMaxBase:1e29, progressMaxIncrease:6,
+        progressMaxBase:1e39, progressMaxIncrease:8,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.1, maxLevel:5,
-        unlockCost:1e29, visible:false, unlocked:false, purchased: false,
+        unlockCost:5e31, visible:false, unlocked:false, purchased: false,
         onLevelCustom: function() {
         },
-        onLevelAtts:[["savvy", 2e4]],
-        expAtts:[["recognition", 1], ["influence", 1]],
-        efficiencyAtts:[["ambition", .01]]
+        onLevelAtts:[["savvy", 2e4], ["cunning", 150]],
+        expAtts:[["recognition", 1], ["influence", 1], ["leverage", 1]],
+        efficiencyAtts:[["leverage", 1]]
     },
     checkNoticeBoard: {
         tier:1, plane:0,
@@ -398,7 +399,7 @@ let actionData = {
             let actionObj = data.actions.makeMoney;
             let dataObj = actionData.makeMoney;
 
-            actionObj.progressGain = actionObj.generatorSpeed * (actionObj.efficiency / 100);
+            actionObj.progressGain = dataObj.generatorSpeed * (actionObj.efficiency / 100);
             actionObj.actionPower = actionObj.actionPowerBase *
                 actionObj.actionPowerMult * (actionObj.efficiency/100);
             let resourceTaken = actionObj.resource * actionObj.tierMult();
@@ -507,6 +508,18 @@ let actionData = {
         expAtts:[["savvy", 1]],
         efficiencyAtts:[["confidence", 1]]
     },
+    buyPointyHat: {
+        tier:2, plane:0, resourceName:"gold", automationOff: true,
+        progressMaxBase:5e30, progressMaxIncrease:10,
+        expToLevelBase:1, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:1,
+        unlockCost:2e27, visible:false, unlocked:false, purchased: true,
+        onUnlock:function() {
+        },
+        onLevelAtts:[["confidence", 10000]],
+        expAtts:[["savvy", 1]],
+        efficiencyAtts:[]
+    },
     buyStreetFood: {
         tier:2, plane:0, resourceName: "gold",
         progressMaxBase:5e15, progressMaxIncrease:10,
@@ -543,6 +556,12 @@ let actionData = {
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.1, maxLevel:10,
         unlockCost:2e18, visible:false, unlocked:false, purchased: true,
+        onLevelCustom: function() {
+            if(data.actions.buyStylishClothes.level >= 10) {
+                unveilAction('buyComfyShoes');
+                unveilAction('buyTravelersGear');
+            }
+        },
         onLevelAtts:[["recognition", 2000], ["confidence", 10], ["discernment", 10]],
         expAtts:[["savvy", 1]],
         efficiencyAtts:[["confidence", .5]]
@@ -579,21 +598,21 @@ let actionData = {
 
     buyComfyShoes: {
         tier:2, plane:0, resourceName: "gold", creationVersion:2, automationOff: true,
-        progressMaxBase:5e34, progressMaxIncrease:10,
+        progressMaxBase:5e29, progressMaxIncrease:10,
         expToLevelBase:10, expToLevelIncrease:1,
-        efficiencyBase:.01, maxLevel:10,
-        unlockCost:2e29, visible:false, unlocked:false, purchased: false,
-        onLevelAtts:[["geared", 5000]],
+        efficiencyBase:.002, maxLevel:5,
+        unlockCost:2e26, visible:false, unlocked:false, purchased: false,
+        onLevelAtts:[["energy", 5e5], ["geared", 5000]],
         expAtts:[["savvy", 1], ["leverage", 1]],
         efficiencyAtts:[["confidence", .1]]
     },
     buyTravelersGear: {
         tier:2, plane:0, resourceName: "gold", creationVersion:2, automationOff: true,
-        progressMaxBase:5e38, progressMaxIncrease:10,
+        progressMaxBase:5e35, progressMaxIncrease:10,
         expToLevelBase:10, expToLevelIncrease:1,
-        efficiencyBase:.01, maxLevel:10,
-        unlockCost:2e33, visible:false, unlocked:false, purchased: false,
-        onLevelAtts:[["geared", 25000]],
+        efficiencyBase:.001, maxLevel:5,
+        unlockCost:2e30, visible:false, unlocked:false, purchased: false,
+        onLevelAtts:[["energy", 2e6], ["geared", 25000]],
         expAtts:[["savvy", 1], ["leverage", 1]],
         efficiencyAtts:[["confidence", .1]]
     },
@@ -609,13 +628,13 @@ let actionData = {
     },
     buyUtilityItems: {
         tier:2, plane:0, resourceName: "gold", creationVersion:2, automationOff: true,
-        progressMaxBase:5e18, progressMaxIncrease:10,
+        progressMaxBase:5e37, progressMaxIncrease:10,
         expToLevelBase:10, expToLevelIncrease:1,
-        efficiencyBase:.1, maxLevel:10,
-        unlockCost:2e30, visible:false, unlocked:false, purchased: false,
-        onLevelAtts:[],
-        expAtts:[],
-        efficiencyAtts:[]
+        efficiencyBase:.001, maxLevel:5,
+        unlockCost:2e32, visible:false, unlocked:false, purchased: false,
+        onLevelAtts:[["energy", 3e6], ["navigation", 200]],
+        expAtts:[["savvy", 1], ["leverage", 1]],
+        efficiencyAtts:[["confidence", .1]]
     },
     buyPotions: {
         tier:2, plane:0, resourceName: "gold", creationVersion:2, automationOff: true,
@@ -670,7 +689,7 @@ let actionData = {
             let actionObj = data.actions.invest;
             let dataObj = actionData.invest;
 
-            actionObj.progressGain = actionObj.generatorSpeed * (actionObj.efficiency / 100);
+            actionObj.progressGain = dataObj.generatorSpeed * (actionObj.efficiency / 100);
             actionObj.actionPower = actionObj.actionPowerBase *
                 actionObj.actionPowerMult;
             let resourceTaken = actionObj.resource * actionObj.tierMult(); //gold taken
@@ -770,16 +789,16 @@ let actionData = {
                 unveilAction('storyTeller');
             }
         },
-        onLevelAtts:[["recognition", 2e4], ["adaptability", 100]],
+        onLevelAtts:[["recognition", 2e4], ["adaptability", 100], ["leverage", 10]],
         expAtts:[],
         efficiencyAtts:[]
     },
     hostAFestival: {
-        tier:2, plane:0, resourceName:"fortune", creationVersion:2, automationOff: true,
-        progressMaxBase:2500, progressMaxIncrease:10,
+        tier:3, plane:0, resourceName:"fortune", creationVersion:2, automationOff: true,
+        progressMaxBase:1e4, progressMaxIncrease:10,
         expToLevelBase:1, expToLevelIncrease:2,
-        efficiencyBase:.1, maxLevel:4,
-        unlockCost:5000, visible:false, unlocked:false, purchased: false,
+        efficiencyBase:1, maxLevel:4,
+        unlockCost:2e4, visible:false, unlocked:false, purchased: false,
         onUnlock:function() {
             unveilAction('fundATemporaryStall');
         },
@@ -788,31 +807,31 @@ let actionData = {
         efficiencyAtts:[]
     },
     fundATemporaryStall: {
-        tier:2, plane:0, resourceName:"fortune", creationVersion:2, automationOff: true,
+        tier:3, plane:0, resourceName:"fortune", creationVersion:2, automationOff: true,
         progressMaxBase:5e8, progressMaxIncrease:10,
         expToLevelBase:1, expToLevelIncrease:1,
-        efficiencyBase:.1, maxLevel:10,
+        efficiencyBase:1, maxLevel:10,
         unlockCost:5e8, visible:false, unlocked:false, purchased: false,
         onLevelAtts:[],
         expAtts:[],
         efficiencyAtts:[]
     },
     fundTownImprovements: {
-        tier:2, plane:0, resourceName:"fortune", creationVersion:2, automationOff: true,
-        progressMaxBase:5e8, progressMaxIncrease:10,
+        tier:3, plane:0, resourceName:"fortune", creationVersion:2, automationOff: true,
+        progressMaxBase:1e5, progressMaxIncrease:10,
         expToLevelBase:1, expToLevelIncrease:1,
-        efficiencyBase:.1, maxLevel:10,
-        unlockCost:5e8, visible:false, unlocked:false, purchased: false,
+        efficiencyBase:1, maxLevel:4,
+        unlockCost:2e5, visible:false, unlocked:false, purchased: false,
         onUnlock:function() {
             unveilAction('supportLocalLibrary');
         },
         onLevelCustom: function() {
-            unveilAction('')
+            unveilAction('browsePersonalCollection')
             if(data.actions.fundTownImprovements.level >= 1) {
-                unveilAction('browsePersonalCollection')
+                unveilAction('buyUtilityItems')
             }
         },
-        onLevelAtts:[["leverage", 500], ["cunning", 400], ["adaptability", 100]],
+        onLevelAtts:[["cunning", 400], ["adaptability", 100], ["leverage", 20]],
         expAtts:[],
         efficiencyAtts:[]
     },
@@ -1020,7 +1039,7 @@ let actionData = {
             let actionObj = data.actions.socialize;
             let dataObj = actionData.socialize;
 
-            actionObj.progressGain = actionObj.generatorSpeed * (actionObj.efficiency / 100);
+            actionObj.progressGain = dataObj.generatorSpeed * (actionObj.efficiency / 100);
             actionObj.actionPower = actionObj.actionPowerBase *
                 actionObj.actionPowerMult * (actionObj.efficiency/100);
             let resourceTaken = actionObj.resource * actionObj.tierMult();
@@ -1603,7 +1622,7 @@ actionData = {
     },
     learnToInquire: {
         tier:1, plane:0, resourceName:"conversations", creationVersion:2, automationOff: true,
-        progressMaxBase:3e22, progressMaxIncrease:100,
+        progressMaxBase:3e21, progressMaxIncrease:100,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.05, maxLevel:10,
         unlockCost:1e16, visible:false, unlocked:false, purchased: false,
@@ -1624,6 +1643,7 @@ actionData = {
         efficiencyBase:.05, maxLevel:2,
         unlockCost:1e16, visible:false, unlocked:false, purchased: false,
         onUnlock: function() {
+            unveilAction('buyPointyHat');
         },
         onLevelCustom: function() {
             unveilAction('askAboutLocalWork');
@@ -1650,9 +1670,9 @@ actionData = {
     },
     askAboutArcaneCorps: {
         tier:1, plane:0, resourceName:"conversations", creationVersion:2, automationOff: true,
-        progressMaxBase:1e23, progressMaxIncrease:4,
+        progressMaxBase:1e26, progressMaxIncrease:10,
         expToLevelBase:1, expToLevelIncrease:1,
-        efficiencyBase:.05, maxLevel:2,
+        efficiencyBase:.0005, maxLevel:2,
         unlockCost:2e16, visible:false, unlocked:false, purchased: false,
         onUnlock: function() {
         },
@@ -1660,15 +1680,15 @@ actionData = {
             unveilAction('getTestedForKnowledge');
         },
         onLevelAtts:[["recognition", 10000]],
-        expAtts:[["discernment", 1], ["charm", 1]],
-        efficiencyAtts:[["discernment", .05]]
+        expAtts:[["discernment", 1], ["charm", 1], ["confidence", 1]],
+        efficiencyAtts:[["discernment", .05], ["confidence", .1]]
     },
     getTestedForKnowledge: {
         tier:1, plane:0, resourceName:"conversations", creationVersion:2, automationOff: true,
         progressMaxBase:1e28, progressMaxIncrease:100,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:.01, maxLevel:1,
-        unlockCost:2e16, visible:false, unlocked:false, purchased: false,
+        unlockCost:5e16, visible:false, unlocked:false, purchased: false,
         onUnlock: function() {
         },
         onLevelCustom: function() {
@@ -1676,14 +1696,14 @@ actionData = {
         },
         onLevelAtts:[["integration", 400]],
         expAtts:[["wizardry", 1], ["pulse", 1], ["vision", 1], ["control", 1]],
-        efficiencyAtts:[["wizardry", .05]]
+        efficiencyAtts:[["wizardry", .01]]
     },
     discussPlacement: {
         tier:1, plane:0, resourceName:"conversations", creationVersion:2, automationOff: true,
-        progressMaxBase:1e20, progressMaxIncrease:10,
+        progressMaxBase:1e20, progressMaxIncrease:5,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:.1, maxLevel:4,
-        unlockCost:3e17, visible:false, unlocked:false, purchased: false,
+        unlockCost:1e18, visible:false, unlocked:false, purchased: false,
         onUnlock: function() {
         },
         onLevelCustom: function() {
@@ -1709,15 +1729,10 @@ actionData = {
         expAtts:[["confidence", 1], ["charm", 1], ["wizardry", 1]],
         efficiencyAtts:[["discernment", .05]]
     },
-    //runs on its own time
-    //when completed, any active charge spells use their spell power to become exp
-    //if unlocked, legacy gain is x10
-    //every level from there is x2
-
     trainWithTeam: {
         tier:2, plane:0, resourceName:"teamwork", creationVersion:2, automationOff: true,
-        progressMaxBase:30, progressMaxIncrease:1,
-        expToLevelBase:100000, expToLevelIncrease:1000,
+        progressMaxBase:30, progressMaxIncrease:0.8,
+        expToLevelBase:300000, expToLevelIncrease:1000,
         // actionPowerBase:1, actionPowerMult:1, actionPowerMultIncrease:1,
         efficiencyBase:.2, maxLevel:2,
         unlockCost:0, visible:false, unlocked:false, purchased: false, hasUpstream:false,
@@ -1729,22 +1744,24 @@ actionData = {
             if (actionObj.resourceToAdd > 0) {
                 addResourceTo(actionObj, actionObj.resourceToAdd);
             }
-
-            useActiveSpellCharges()
+            if(data.actions.trainWithTeam.level !== data.actions.trainWithTeam.maxLevel) {
+                useActiveSpellCharges()
+            }
 
             views.scheduleUpdate('trainWithTeamResourceTaken', intToString(actionObj.resourceToAdd, 1), "textContent")
             views.scheduleUpdate('trainWithTeamResourceSent', intToString(actionObj.expToAdd, 2), "textContent")
         },
         updateMults: function () {
             let actionObj = data.actions.trainWithTeam;
+            let dataObj = actionData.trainWithTeam;
 
-            actionObj.progressGain = actionObj.generatorSpeed * (actionObj.efficiency / 100);
+            actionObj.progressGain = dataObj.generatorSpeed * (actionObj.efficiency / 100);
             actionObj.resourceToAdd = getActiveSpellPower();
             actionObj.expToAddBase = actionObj.resourceToAdd;
             actionObj.expToAdd = actionObj.expToAddBase * actionObj.expToAddMult * calcUpgradeMultToExp(actionObj);
         },
         onLevelCustom: function() {
-            data.legacyMultKTL = data.actions.trainWithTeam.level * 3;
+            data.legacyMultKTL = 3 * data.actions.trainWithTeam.level;
             addMaxLevel('hearAboutTheLich', 1);
         },
         onUnlock: function() {
@@ -1754,7 +1771,7 @@ actionData = {
         expAtts:[["wizardry", 1]],
         efficiencyAtts:[["wizardry", .0001]],
         onLevelText:{english:"+1 to Hear About the Lich max level."},
-        unlockMessage:{english:"Unlocks when Meet The Mages is level 1. On unlock, all legacy gained in KTL is multiplied by 3, and Fight is multiplied by 5."},
+        unlockMessage:{english:"Unlocks when Meet The Mages is level 1. On unlock, all legacy gained in KTL is multiplied by 3, and Fight is multiplied by 3."},
         extraInfo: {english:Raw.html`This action, when it completes, will consume one spell charge from all spells with Spell Power.<br>Legacy gain is further multiplied by the level of this action, starting at level 2.`},
         onCompleteText: {english:Raw.html`
                 <span style="font-weight:bold;" id="trainWithTeamResourceTaken">???</span> Spell Power was used from active spells, giving <br>
@@ -1932,7 +1949,7 @@ actionData = {
     },
     travelToCrossroads: {
         tier:1, plane:0,
-        progressMaxBase:1e25, progressMaxIncrease:10,
+        progressMaxBase:1e27, progressMaxIncrease:6,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.02, maxLevel:10,
         unlockCost:3e23, visible:false, unlocked:false, purchased: true,
@@ -2362,7 +2379,7 @@ actionData = {
     },
     processEmotions: {
         tier:1, plane:0, creationVersion:2, automationOff: true,
-        progressMaxBase:1e30, progressMaxIncrease:5,
+        progressMaxBase:1e30, progressMaxIncrease:3,
         expToLevelBase:1, expToLevelIncrease:2,
         efficiencyBase:.01, maxLevel:0,
         unlockCost:1e29, visible:false, unlocked:false, purchased: false,
@@ -2371,17 +2388,17 @@ actionData = {
         onLevelCustom: function() {
             unveilAction('readTheWritten')
             unveilAction('siftExcess')
-            addMaxLevel("meditate", 1)
             addMaxLevel("readTheWritten", 1)
             addMaxLevel("siftExcess", 1)
         },
         onLevelAtts:[["concentration", 10000]],
         expAtts:[["valor", 1]],
-        efficiencyAtts:[["cycle", .5]]
+        efficiencyAtts:[["cycle", .5]],
+        onLevelText:{english:"+1 max level for Read The Written.<br>+1 max level for Sift Excess.<br>"}
     },
     readTheWritten: {
         tier:1, plane:0, creationVersion:2, automationOff: true,
-        progressMaxBase:2e41, progressMaxIncrease:10,
+        progressMaxBase:2e40, progressMaxIncrease:6,
         expToLevelBase:1, expToLevelIncrease:2,
         efficiencyBase:.01, maxLevel:0,
         unlockCost:2e29, visible:false, unlocked:false, purchased: false,
@@ -2390,27 +2407,27 @@ actionData = {
         onUnlock: function() {
         },
         onLevelAtts:[["awareness", 10000]],
-        expAtts:[["energy", 1], ["observation", 1], ["valor", 1]],
+        expAtts:[["energy", 1], ["curiosity", 1], ["valor", 1]],
         efficiencyAtts:[["cycle", .5]]
     },
     siftExcess: {
         tier:1, plane:0, creationVersion:2, automationOff: true,
-        progressMaxBase:4e40, progressMaxIncrease:10,
+        progressMaxBase:1e46, progressMaxIncrease:6,
         expToLevelBase:1, expToLevelIncrease:2,
         efficiencyBase:.01, maxLevel:0,
         unlockCost:4e29, visible:false, unlocked:false, purchased: false,
         onLevelCustom: function() {
         },
         onLevelAtts:[["flow", 200], ["cycle", 100], ["control", 20]],
-        expAtts:[["energy", 1], ["awareness", 1]],
+        expAtts:[["energy", 1], ["awareness", 1], ["observation", 1]],
         efficiencyAtts:[["cycle", .5]]
     },
     feelAGentleTug: {
         tier:1, plane:0, creationVersion:2, automationOff: true,
-        progressMaxBase:5e31, progressMaxIncrease:10,
+        progressMaxBase:5e35, progressMaxIncrease:10,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:.01, maxLevel:3,
-        unlockCost:1e27, visible:false, unlocked:false, purchased: false,
+        unlockCost:5e26, visible:false, unlocked:false, purchased: false,
         onUnlock: function() {
             unveilAction('leaveTheOpenRoad')
             addMaxLevel("journal", 1);
@@ -2419,16 +2436,16 @@ actionData = {
 
         },
         onLevelAtts:[["curiosity", 30000]],
-        expAtts:[["observation", 1]],
+        expAtts:[["observation", 1], ["concentration", 1]],
         efficiencyAtts:[["navigation", 1]],
         unlockMessage:{english:"On unlock, +1 max level for Journal."},
     },
     leaveTheOpenRoad: {
         tier:1, plane:0, creationVersion:2, automationOff: true,
-        progressMaxBase:3e34, progressMaxIncrease:10,
+        progressMaxBase:1e34, progressMaxIncrease:10,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:.01, maxLevel:3,
-        unlockCost:5e27, visible:false, unlocked:false, purchased: false,
+        unlockCost:1e27, visible:false, unlocked:false, purchased: false,
         onUnlock: function() {
             unveilAction('findOverlook')
             addMaxLevel("journal", 1);
@@ -2442,10 +2459,10 @@ actionData = {
     },
     findOverlook: {
         tier:1, plane:0, creationVersion:2, automationOff: true,
-        progressMaxBase:6e31, progressMaxIncrease:1000,
+        progressMaxBase:1e31, progressMaxIncrease:1000,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:.02, maxLevel:1,
-        unlockCost:3e28, visible:false, unlocked:false, purchased: false,
+        unlockCost:5e27, visible:false, unlocked:false, purchased: false,
         onUnlock: function() {
             addMaxLevel("journal", 1);
         },
@@ -2462,14 +2479,21 @@ actionData = {
         progressMaxBase:5e32, progressMaxIncrease:4,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:.03, maxLevel:10,
-        unlockCost:5e28, visible:false, unlocked:false, purchased: false,
+        unlockCost:2e29, visible:false, unlocked:false, purchased: false,
         onUnlock: function() {
-            unveilAction('feelTheRage')
-            unveilAction('repairShatteredShrine')
             addMaxLevel("journal", 1);
         },
         onLevelCustom: function() {
             unveilAction('stepThroughAsh');
+            if(data.actions.discoverBurntTown.level >= 2) {
+                unveilAction('resonanceCompass')
+            }
+            if(data.actions.discoverBurntTown.level >= 3) {
+                unveilAction('feelTheRage')
+            }
+            if(data.actions.discoverBurntTown.level >= 4) {
+                unveilAction('repairShatteredShrine')
+            }
         },
         onLevelAtts:[["valor", 1]],
         expAtts:[["endurance", 1]],
@@ -2478,10 +2502,10 @@ actionData = {
     },
     feelTheRage: {
         tier:1, plane:0, creationVersion:2, automationOff: true,
-        progressMaxBase:5e29, progressMaxIncrease:5,
+        progressMaxBase:2e29, progressMaxIncrease:3,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:1, maxLevel:2,
-        unlockCost:1e29, visible:false, unlocked:false, purchased: false,
+        unlockCost:2e29, visible:false, unlocked:false, purchased: false,
         onUnlock: function() {
         },
         onLevelCustom: function() {
@@ -2492,10 +2516,10 @@ actionData = {
     },
     repairShatteredShrine: {
         tier:1, plane:0, creationVersion:2, automationOff: true,
-        progressMaxBase:1e31, progressMaxIncrease:10,
+        progressMaxBase:1e30, progressMaxIncrease:3,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:1, maxLevel:2,
-        unlockCost:3e30, visible:false, unlocked:false, purchased: false,
+        unlockCost:1e30, visible:false, unlocked:false, purchased: false,
         onUnlock: function() {
         },
         onLevelCustom: function() {
@@ -2506,10 +2530,10 @@ actionData = {
     },
     stepThroughAsh: {
         tier:1, plane:0, creationVersion:2, automationOff: true,
-        progressMaxBase:1e28, progressMaxIncrease:10,
+        progressMaxBase:1e28, progressMaxIncrease:6,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.1, maxLevel:5,
-        unlockCost:1e29, visible:false, unlocked:false, purchased: false,
+        unlockCost:2e29, visible:false, unlocked:false, purchased: false,
         onUnlock: function() {
         },
         onLevelCustom: function() {
@@ -2518,64 +2542,185 @@ actionData = {
             addMaxLevel("processEmotions", 1)
         },
         onLevelAtts:[["valor", 20]],
-        expAtts:[],
-        efficiencyAtts:[]
+        expAtts:[["valor", 1]],
+        efficiencyAtts:[["awareness", .001], ["flow", .1]],
+        onLevelText:{english:"+1 max level for Process Emotions."}
     },
     graspTheTragedy: {
         tier:2, plane:0, creationVersion:2, automationOff: true,
-        progressMaxBase:1e34, progressMaxIncrease:40,
+        progressMaxBase:3e31, progressMaxIncrease:10,
         expToLevelBase:1, expToLevelIncrease:1,
-        efficiencyBase:1, maxLevel:2,
-        unlockCost:1e34, visible:false, unlocked:false, purchased: false,
+        efficiencyBase:.05, maxLevel:2,
+        unlockCost:3e30, visible:false, unlocked:false, purchased: false,
         onUnlock: function() {
         },
         onLevelCustom: function() {
         },
         onLevelAtts:[["integration", 400], ["valor", 50]],
-        expAtts:[],
-        efficiencyAtts:[]
+        expAtts:[["valor", 1]],
+        efficiencyAtts:[["valor", 1]]
     },
     resonanceCompass: {
         tier:1, plane:0, creationVersion:2, automationOff: true,
-        progressMaxBase:1e15, progressMaxIncrease:10,
+        progressMaxBase:3e28, progressMaxIncrease:10,
         expToLevelBase:10, expToLevelIncrease:1,
-        efficiencyBase:.1, maxLevel:10,
-        unlockCost:3e13, visible:false, unlocked:false, purchased: false,
+        efficiencyBase:.001, maxLevel:5,
+        unlockCost:5e29, visible:false, unlocked:false, purchased: false,
         onUnlock: function() {
         },
         onLevelCustom: function() {
+            unveilAction('clearIvyWall')
         },
-        onLevelAtts:[],
-        expAtts:[],
-        efficiencyAtts:[["curiosity", .1]]
+        onLevelAtts:[["curiosity", 7e4]],
+        expAtts:[["legacy", .001]],
+        efficiencyAtts:[["curiosity", .01]]
     },
     clearIvyWall: {
         tier:1, plane:0, creationVersion:2, automationOff: true,
-        progressMaxBase:1e15, progressMaxIncrease:10,
+        progressMaxBase:3e35, progressMaxIncrease:4,
         expToLevelBase:10, expToLevelIncrease:1,
-        efficiencyBase:.1, maxLevel:10,
-        unlockCost:3e13, visible:false, unlocked:false, purchased: false,
+        efficiencyBase:.01, maxLevel:5,
+        unlockCost:5e29, visible:false, unlocked:false, purchased: false,
+        onUnlock: function() {
+        },
+        onLevelCustom: function() {
+            unveilAction('findPulsingShard')
+            unveilAction('scavengeForSupplies')
+        },
+        onLevelAtts:[["coordination", 2000]],
+        expAtts:[["might", 1], ["endurance", 1]],
+        efficiencyAtts:[["curiosity", .0005]]
+    },
+    findPulsingShard: {
+        tier:1, plane:0, creationVersion:2, automationOff: true,
+        progressMaxBase:1e36, progressMaxIncrease:1,
+        expToLevelBase:1, expToLevelIncrease:1,
+        efficiencyBase:.01, maxLevel:1,
+        unlockCost:5e30, visible:false, unlocked:false, purchased: false,
         onUnlock: function() {
         },
         onLevelCustom: function() {
         },
-        onLevelAtts:[],
-        expAtts:[],
-        efficiencyAtts:[["curiosity", .1]]
+        onLevelAtts:[["legacy", 1000], ["pulse", 200]],
+        expAtts:[["observation", 1]],
+        efficiencyAtts:[["curiosity", .0005]]
     },
     scavengeForSupplies: {
         tier:1, plane:0, creationVersion:2, automationOff: true,
-        progressMaxBase:1e15, progressMaxIncrease:10,
+        progressMaxBase:1e39, progressMaxIncrease:4,
         expToLevelBase:10, expToLevelIncrease:1,
-        efficiencyBase:.1, maxLevel:10,
-        unlockCost:3e13, visible:false, unlocked:false, purchased: false,
+        efficiencyBase:.01, maxLevel:5,
+        unlockCost:3e30, visible:false, unlocked:false, purchased: false,
+        onUnlock: function() {
+            addMaxLevel("stepThroughAsh", 1)
+        },
+        onLevelCustom: function() {
+            unveilAction('skimAHeavyTome')
+        },
+        onLevelAtts:[["observation", 3e5], ["might", 5000]],
+        expAtts:[["coordination", 1], ["endurance", 1]],
+        efficiencyAtts:[["curiosity", .001]],
+        unlockMessage:{english:"On unlock, +1 max level for Step Through Ash."}
+    },
+    skimAHeavyTome: {
+        tier:1, plane:0, creationVersion:2, automationOff: true,
+        progressMaxBase:8e40, progressMaxIncrease:10,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:.001, maxLevel:5,
+        unlockCost:2e31, visible:false, unlocked:false, purchased: false,
+        onUnlock: function() {
+            addMaxLevel("stepThroughAsh", 1)
+        },
+        onLevelCustom: function() {
+            unveilAction('clearRubble')
+        },
+        onLevelAtts:[["discernment", 100]],
+        expAtts:[["concentration", 1], ["flow", 1], ["endurance", 1]],
+        efficiencyAtts:[["curiosity", .01]],
+        unlockMessage:{english:"On unlock, +1 max level for Step Through Ash."}
+    },
+    clearRubble: {
+        tier:1, plane:0, creationVersion:2, automationOff: true,
+        progressMaxBase:1e35, progressMaxIncrease:5,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:.002, maxLevel:10,
+        unlockCost:3e31, visible:false, unlocked:false, purchased: false,
+        onUnlock: function() {
+            addMaxLevel("stepThroughAsh", 1)
+        },
+        onLevelCustom: function() {
+            unveilAction('readFadedMarkers')
+        },
+        onLevelAtts:[["endurance", 3e4], ["coordination", 4000]],
+        expAtts:[["might", 1]],
+        efficiencyAtts:[["navigation", 1]],
+        unlockMessage:{english:"On unlock, +1 max level for Step Through Ash."}
+    },
+    readFadedMarkers: {
+        tier:1, plane:0, creationVersion:2, automationOff: true,
+        progressMaxBase:1e37, progressMaxIncrease:6,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:.002, maxLevel:5,
+        unlockCost:6e31, visible:false, unlocked:false, purchased: false,
+        onUnlock: function() {
+            addMaxLevel("stepThroughAsh", 1)
+        },
+        onLevelCustom: function() {
+            unveilAction('mapOutTraps')
+        },
+        onLevelAtts:[["concentration", 3e4], ["navigation", 200]],
+        expAtts:[["observation", 1]],
+        efficiencyAtts:[["navigation", 1]],
+        unlockMessage:{english:"On unlock, +1 max level for Step Through Ash."}
+    },
+    mapOutTraps: {
+        tier:1, plane:0, creationVersion:2, automationOff: true,
+        progressMaxBase:2e33, progressMaxIncrease:1.2,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:.002, maxLevel:10,
+        unlockCost:1e32, visible:false, unlocked:false, purchased: false,
+        onUnlock: function() {
+            addMaxLevel("stepThroughAsh", 1)
+        },
+        onLevelCustom: function() {
+            unveilAction('accessForbiddenArea')
+        },
+        onLevelAtts:[["observation", 2e5], ["flow", 100]],
+        expAtts:[["discernment", 1]],
+        efficiencyAtts:[["navigation", 1]],
+        unlockMessage:{english:"On unlock, +1 max level for Step Through Ash."}
+    },
+    accessForbiddenArea: {
+        tier:1, plane:0, creationVersion:2, automationOff: true,
+        progressMaxBase:2e36, progressMaxIncrease:1,
+        expToLevelBase:1, expToLevelIncrease:1,
+        efficiencyBase:.002, maxLevel:1,
+        unlockCost:2e32, visible:false, unlocked:false, purchased: false,
         onUnlock: function() {
         },
         onLevelCustom: function() {
+            unveilAction('collectSpellBooks')
         },
-        onLevelAtts:[],
+        onLevelAtts:[["awareness", 5e4]],
+        expAtts:[["coordination", 1]],
+        efficiencyAtts:[["navigation", 1]]
+    },
+    collectSpellBooks: {
+        tier:1, plane:0, creationVersion:2, automationOff: true,
+        progressMaxBase:1e32, progressMaxIncrease:5,
+        expToLevelBase:1, expToLevelIncrease:2,
+        efficiencyBase:.002, maxLevel:4,
+        unlockCost:3e32, visible:false, unlocked:false, purchased: false,
+        onUnlock: function() {
+        },
+        onLevelCustom: function() {
+            unveilAction('readBooks');
+            unveilAction('catalogNewBooks');
+            addMaxLevel('catalogNewBooks', 1);
+        },
+        onLevelAtts:[["wizardry", 5000], ["spellcraft", 1]],
         expAtts:[],
-        efficiencyAtts:[]
+        efficiencyAtts:[["navigation", 1]]
     },
     pryGemLoose: {
         tier:1, plane:0,
@@ -2591,21 +2736,7 @@ actionData = {
         expAtts:[],
         efficiencyAtts:[]
     },
-    studyTheArchitecture: {
-        tier:1, plane:0, creationVersion:2, automationOff: true,
-        progressMaxBase:1e15, progressMaxIncrease:10,
-        expToLevelBase:10, expToLevelIncrease:1,
-        efficiencyBase:.1, maxLevel:10,
-        unlockCost:3e13, visible:false, unlocked:false, purchased: false,
-        onUnlock: function() {
-        },
-        onLevelCustom: function() {
-        },
-        onLevelAtts:[],
-        expAtts:[],
-        efficiencyAtts:[]
-    },
-    skimAHeavyTome: {
+    examineTheArchitecture: {
         tier:1, plane:0, creationVersion:2, automationOff: true,
         progressMaxBase:1e15, progressMaxIncrease:10,
         expToLevelBase:10, expToLevelIncrease:1,
@@ -2647,20 +2778,6 @@ actionData = {
         expAtts:[],
         efficiencyAtts:[]
     },
-    clearRubble: {
-        tier:1, plane:0, creationVersion:2, automationOff: true,
-        progressMaxBase:1e15, progressMaxIncrease:10,
-        expToLevelBase:10, expToLevelIncrease:1,
-        efficiencyBase:.1, maxLevel:10,
-        unlockCost:3e13, visible:false, unlocked:false, purchased: false,
-        onUnlock: function() {
-        },
-        onLevelCustom: function() {
-        },
-        onLevelAtts:[],
-        expAtts:[],
-        efficiencyAtts:[]
-    },
     dismantleShelves: {
         tier:1, plane:0, creationVersion:2, automationOff: true,
         progressMaxBase:1e15, progressMaxIncrease:10,
@@ -2675,21 +2792,7 @@ actionData = {
         expAtts:[],
         efficiencyAtts:[]
     },
-    studyTheLayout: {
-        tier:1, plane:0, creationVersion:2, automationOff: true,
-        progressMaxBase:1e15, progressMaxIncrease:10,
-        expToLevelBase:10, expToLevelIncrease:1,
-        efficiencyBase:.1, maxLevel:10,
-        unlockCost:3e13, visible:false, unlocked:false, purchased: false,
-        onUnlock: function() {
-        },
-        onLevelCustom: function() {
-        },
-        onLevelAtts:[],
-        expAtts:[],
-        efficiencyAtts:[]
-    },
-    readFadedMarkers: {
+    markTheLayout: {
         tier:1, plane:0, creationVersion:2, automationOff: true,
         progressMaxBase:1e15, progressMaxIncrease:10,
         expToLevelBase:10, expToLevelIncrease:1,
@@ -2717,34 +2820,6 @@ actionData = {
         expAtts:[],
         efficiencyAtts:[]
     },
-    mapOutTraps: {
-        tier:1, plane:0, creationVersion:2, automationOff: true,
-        progressMaxBase:1e15, progressMaxIncrease:10,
-        expToLevelBase:10, expToLevelIncrease:1,
-        efficiencyBase:.1, maxLevel:10,
-        unlockCost:3e13, visible:false, unlocked:false, purchased: false,
-        onUnlock: function() {
-        },
-        onLevelCustom: function() {
-        },
-        onLevelAtts:[],
-        expAtts:[],
-        efficiencyAtts:[]
-    },
-    accessForbiddenArea: {
-        tier:1, plane:0, creationVersion:2, automationOff: true,
-        progressMaxBase:1e15, progressMaxIncrease:10,
-        expToLevelBase:10, expToLevelIncrease:1,
-        efficiencyBase:.1, maxLevel:10,
-        unlockCost:3e13, visible:false, unlocked:false, purchased: false,
-        onUnlock: function() {
-        },
-        onLevelCustom: function() {
-        },
-        onLevelAtts:[],
-        expAtts:[],
-        efficiencyAtts:[]
-    },
     findAFamiliarLanguage: {
         tier:1, plane:0, creationVersion:2, automationOff: true,
         progressMaxBase:1e15, progressMaxIncrease:10,
@@ -2759,7 +2834,35 @@ actionData = {
         expAtts:[],
         efficiencyAtts:[]
     },
-    studyRunicLanguages: {
+    recognizeRunicLanguages: {
+        tier:1, plane:0, creationVersion:2, automationOff: true,
+        progressMaxBase:1e15, progressMaxIncrease:10,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:.1, maxLevel:10,
+        unlockCost:3e13, visible:false, unlocked:false, purchased: false,
+        onUnlock: function() {
+        },
+        onLevelCustom: function() {
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[]
+    },
+    catalogUnknownLanguages: {
+        tier:1, plane:0, creationVersion:2, automationOff: true,
+        progressMaxBase:1e15, progressMaxIncrease:10,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:.1, maxLevel:10,
+        unlockCost:3e13, visible:false, unlocked:false, purchased: false,
+        onUnlock: function() {
+        },
+        onLevelCustom: function() {
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[]
+    },
+    collectInterestingBooks: {
         tier:1, plane:0, creationVersion:2, automationOff: true,
         progressMaxBase:1e15, progressMaxIncrease:10,
         expToLevelBase:10, expToLevelIncrease:1,
@@ -2801,6 +2904,20 @@ actionData = {
         expAtts:[],
         efficiencyAtts:[]
     },
+    browseFantasyNovels: {
+        tier:1, plane:0, creationVersion:2, automationOff: true,
+        progressMaxBase:1e15, progressMaxIncrease:10,
+        expToLevelBase:10, expToLevelIncrease:1,
+        efficiencyBase:.1, maxLevel:10,
+        unlockCost:3e13, visible:false, unlocked:false, purchased: false,
+        onUnlock: function() {
+        },
+        onLevelCustom: function() {
+        },
+        onLevelAtts:[],
+        expAtts:[],
+        efficiencyAtts:[]
+    },
     complainAboutDifficulty: {
         tier:1, plane:0, creationVersion:2, automationOff: true,
         progressMaxBase:1e15, progressMaxIncrease:10,
@@ -2829,50 +2946,47 @@ actionData = {
         expAtts:[],
         efficiencyAtts:[]
     },
-    collectSpellBooks: {
-        tier:1, plane:0, creationVersion:2, automationOff: true,
-        progressMaxBase:1e15, progressMaxIncrease:10,
-        expToLevelBase:10, expToLevelIncrease:1,
-        efficiencyBase:.1, maxLevel:10,
-        unlockCost:3e13, visible:false, unlocked:false, purchased: false,
-        onUnlock: function() {
-        },
-        onLevelCustom: function() {
-        },
-        onLevelAtts:[],
-        expAtts:[],
-        efficiencyAtts:[]
-    },
 
 
 
 
     readBooks: {
         tier:1, plane:0, creationVersion:2, automationOff: true,
-        progressMaxBase:1e15, progressMaxIncrease:10,
-        expToLevelBase:10, expToLevelIncrease:1,
-        efficiencyBase:.1, maxLevel:10,
-        unlockCost:3e13, visible:false, unlocked:false, purchased: false,
+        progressMaxBase:1e35, progressMaxIncrease:10,
+        expToLevelBase:1, expToLevelIncrease:1,
+        efficiencyBase:.1, maxLevel:1,
+        unlockCost:5e32, visible:false, unlocked:false, purchased: false,
         onUnlock: function() {
         },
         onLevelCustom: function() {
         },
-        onLevelAtts:[],
-        expAtts:[],
+        onLevelAtts:[["intellect", 5]],
+        expAtts:[["comfort", 1]],
         efficiencyAtts:[["curiosity", .1]]
     },
     catalogNewBooks: {
         tier:1, plane:0, creationVersion:2, automationOff: true,
-        progressMaxBase:1e15, progressMaxIncrease:10,
-        expToLevelBase:10, expToLevelIncrease:1,
-        efficiencyBase:.1, maxLevel:10,
-        unlockCost:3e13, visible:false, unlocked:false, purchased: false,
+        progressMaxBase:5e32, progressMaxIncrease:12,
+        expToLevelBase:1, expToLevelIncrease:1,
+        efficiencyBase:.1, maxLevel:0,
+        unlockCost:6e32, visible:false, unlocked:false, purchased: false,
         onUnlock: function() {
         },
         onLevelCustom: function() {
+            unveilAction('study')
+            unveilAction('researchBySubject')
+            if(data.actions.catalogNewBooks.level >= 2) {
+                unveilAction('studyMagic')
+            }
+            if(data.actions.catalogNewBooks.level >= 3) {
+                unveilAction('studySupportSpells')
+            }
+            if(data.actions.catalogNewBooks.level >= 4) {
+                unveilAction('studyEarthMagic')
+            }
         },
         onLevelAtts:[],
-        expAtts:[],
+        expAtts:[["comfort", 1], ["intellect", 1], ["logistics", 1]],
         efficiencyAtts:[["curiosity", .1]]
     },
     buildPersonalLibrary: {
@@ -2890,66 +3004,104 @@ actionData = {
         efficiencyAtts:[["curiosity", .1]]
     },
     study: {
-        tier:1, plane:0, creationVersion:2, automationOff: true,
-        progressMaxBase:1e15, progressMaxIncrease:10,
-        expToLevelBase:10, expToLevelIncrease:1,
-        efficiencyBase:.1, maxLevel:10,
-        unlockCost:3e13, visible:false, unlocked:false, purchased: false,
+        tier:2, plane:0, creationVersion:2, automationOff: true,
+        progressMaxBase:3e35, progressMaxIncrease:1.1,
+        expToLevelBase:1, expToLevelIncrease:1,
+        efficiencyBase:1,
+        unlockCost:1e33, visible:false, unlocked:false, purchased: false,
         onUnlock: function() {
         },
         onLevelCustom: function() {
+            let actionObj = data.actions.study;
+            actionObj.resourceToAdd = Math.pow((1+actionObj.level/10), 3);
+
+            addResourceTo(data.actions.researchBySubject, actionObj.resourceToAdd);
         },
         onLevelAtts:[],
-        expAtts:[],
-        efficiencyAtts:[["curiosity", .1]]
+        expAtts:[["integration", 1], ["intellect", 1], ["comfort", 1], ["logistics", 1]],
+        efficiencyAtts:[]
     },
-    sortBySubject: {
-        tier:1, plane:0, resourceName:"research", creationVersion:2, automationOff: true,
-        progressMaxBase:1e15, progressMaxIncrease:10,
-        expToLevelBase:10, expToLevelIncrease:1,
-        efficiencyBase:.1, maxLevel:10,
-        unlockCost:3e13, visible:false, unlocked:false, purchased: false, hasUpstream:false,
+    researchBySubject: {
+        tier:2, plane:0, resourceName:"research", creationVersion:2, automationOff: true,
+        progressMaxBase:10, progressMaxIncrease:10,
+        expToLevelBase:1, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:1,
+        unlockCost:5, visible:false, unlocked:false, purchased: false, hasUpstream:false,
         onUnlock: function() {
         },
         onLevelCustom: function() {
         },
-        onLevelAtts:[],
-        expAtts:[],
-        efficiencyAtts:[["curiosity", .1]]
-    },
-    studyMath: {
-        tier:1, plane:0, resourceName:"research", creationVersion:2, automationOff: true,
-        progressMaxBase:1e15, progressMaxIncrease:10,
-        expToLevelBase:10, expToLevelIncrease:1,
-        efficiencyBase:.1, maxLevel:10,
-        unlockCost:3e13, visible:false, unlocked:false, purchased: false,
-        onUnlock: function() {
-        },
-        onLevelCustom: function() {
-        },
-        onLevelAtts:[],
+        onLevelAtts:[["comfort", 5]],
         expAtts:[],
         efficiencyAtts:[["curiosity", .1]]
     },
     studyMagic: {
-        tier:1, plane:0, resourceName:"research", creationVersion:2, automationOff: true,
-        progressMaxBase:1e15, progressMaxIncrease:10,
-        expToLevelBase:10, expToLevelIncrease:1,
-        efficiencyBase:.1, maxLevel:10,
-        unlockCost:3e13, visible:false, unlocked:false, purchased: false,
+        tier:2, plane:0, resourceName:"research", creationVersion:2, automationOff: true,
+        progressMaxBase:20, progressMaxIncrease:3,
+        expToLevelBase:1, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:2,
+        unlockCost:10, visible:false, unlocked:false, purchased: false,
         onUnlock: function() {
         },
         onLevelCustom: function() {
         },
-        onLevelAtts:[],
+        onLevelAtts:[["spark", 20], ["spellcraft", 3], ["intellect", 1]],
         expAtts:[],
         efficiencyAtts:[]
     },
     studySupportSpells: {
-        tier:1, plane:0, resourceName:"research", creationVersion:2, automationOff: true,
+        tier:2, plane:0, resourceName:"research", creationVersion:2, automationOff: true,
+        progressMaxBase:200, progressMaxIncrease:3,
+        expToLevelBase:1, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:3,
+        unlockCost:200, visible:false, unlocked:false, purchased: false,
+        onUnlock: function() {
+        },
+        onLevelCustom: function() {
+            purchaseAction('listenToTheMana');
+            unveilAction('listenToTheMana');
+            if(data.actions.studySupportSpells.level >= 2) {
+                purchaseAction('manaVisualizations')
+                unveilAction('manaVisualizations');
+            }
+            if(data.actions.studySupportSpells.level >= 3) {
+                purchaseAction('auraControl')
+                unveilAction('auraControl');
+            }
+        },
+        onLevelAtts:[["spellcraft", 4]],
+        expAtts:[],
+        efficiencyAtts:[]
+    },
+    studyEarthMagic: {
+        tier:2, plane:0, resourceName:"research", creationVersion:2, automationOff: true,
+        progressMaxBase:1000, progressMaxIncrease:4,
+        expToLevelBase:1, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:3,
+        unlockCost:1000, visible:false, unlocked:false, purchased: false,
+        onUnlock: function() {
+        },
+        onLevelCustom: function() {
+            purchaseAction('moveEarth')
+            unveilAction('moveEarth');
+            if(data.actions.studyEarthMagic.level >= 2) {
+                purchaseAction('hardenEarth')
+                unveilAction('hardenEarth');
+            }
+            if(data.actions.studyEarthMagic.level >= 3) {
+                purchaseAction('shapeEarth')
+                unveilAction('shapeEarth');
+            }
+        },
+        onLevelAtts:[["spellcraft", 6]],
+        expAtts:[],
+        efficiencyAtts:[]
+    },
+    studyMath: {
+        tier:2, plane:0, resourceName:"research", creationVersion:2, automationOff: true,
         progressMaxBase:1e15, progressMaxIncrease:10,
-        expToLevelBase:10, expToLevelIncrease:1,
-        efficiencyBase:.1, maxLevel:10,
+        expToLevelBase:1, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:10,
         unlockCost:3e13, visible:false, unlocked:false, purchased: false,
         onUnlock: function() {
         },
@@ -2959,11 +3111,11 @@ actionData = {
         expAtts:[],
         efficiencyAtts:[]
     },
-    studyEarthMagic: {
-        tier:1, plane:0, resourceName:"research", creationVersion:2, automationOff: true,
+    studyArchitecture: {
+        tier:2, plane:0, resourceName:"research", creationVersion:2, automationOff: true,
         progressMaxBase:1e15, progressMaxIncrease:10,
-        expToLevelBase:10, expToLevelIncrease:1,
-        efficiencyBase:.1, maxLevel:10,
+        expToLevelBase:1, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:10,
         unlockCost:3e13, visible:false, unlocked:false, purchased: false,
         onUnlock: function() {
         },
@@ -2974,10 +3126,10 @@ actionData = {
         efficiencyAtts:[]
     },
     studyAdvancedEarthMagic: {
-        tier:1, plane:0, resourceName:"research", creationVersion:2, automationOff: true,
+        tier:2, plane:0, resourceName:"research", creationVersion:2, automationOff: true,
         progressMaxBase:1e15, progressMaxIncrease:10,
-        expToLevelBase:10, expToLevelIncrease:1,
-        efficiencyBase:.1, maxLevel:10,
+        expToLevelBase:1, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:10,
         unlockCost:3e13, visible:false, unlocked:false, purchased: false,
         onUnlock: function() {
         },
@@ -2988,10 +3140,10 @@ actionData = {
         efficiencyAtts:[]
     },
     studyPracticalMagic: {
-        tier:1, plane:0, resourceName:"research", creationVersion:2, automationOff: true,
+        tier:2, plane:0, resourceName:"research", creationVersion:2, automationOff: true,
         progressMaxBase:1e15, progressMaxIncrease:10,
-        expToLevelBase:10, expToLevelIncrease:1,
-        efficiencyBase:.1, maxLevel:10,
+        expToLevelBase:1, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:10,
         unlockCost:3e13, visible:false, unlocked:false, purchased: false,
         onUnlock: function() {
         },
@@ -3002,10 +3154,10 @@ actionData = {
         efficiencyAtts:[]
     },
     studyAdvancedPracticalMagic: {
-        tier:1, plane:0, resourceName:"research", creationVersion:2, automationOff: true,
+        tier:2, plane:0, resourceName:"research", creationVersion:2, automationOff: true,
         progressMaxBase:1e15, progressMaxIncrease:10,
-        expToLevelBase:10, expToLevelIncrease:1,
-        efficiencyBase:.1, maxLevel:10,
+        expToLevelBase:1, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:10,
         unlockCost:3e13, visible:false, unlocked:false, purchased: false,
         onUnlock: function() {
         },
@@ -3016,10 +3168,10 @@ actionData = {
         efficiencyAtts:[]
     },
     studyHistory: {
-        tier:1, plane:0, resourceName:"research", creationVersion:2, automationOff: true,
+        tier:2, plane:0, resourceName:"research", creationVersion:2, automationOff: true,
         progressMaxBase:1e15, progressMaxIncrease:10,
-        expToLevelBase:10, expToLevelIncrease:1,
-        efficiencyBase:.1, maxLevel:10,
+        expToLevelBase:1, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:10,
         unlockCost:3e13, visible:false, unlocked:false, purchased: false,
         onUnlock: function() {
         },
@@ -3027,13 +3179,13 @@ actionData = {
         },
         onLevelAtts:[],
         expAtts:[],
-        efficiencyAtts:[["curiosity", .1]]
+        efficiencyAtts:[]
     },
     readOldStories: {
-        tier:1, plane:0, resourceName:"research", creationVersion:2, automationOff: true,
+        tier:2, plane:0, resourceName:"research", creationVersion:2, automationOff: true,
         progressMaxBase:1e15, progressMaxIncrease:10,
-        expToLevelBase:10, expToLevelIncrease:1,
-        efficiencyBase:.1, maxLevel:10,
+        expToLevelBase:1, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:10,
         unlockCost:3e13, visible:false, unlocked:false, purchased: false,
         onUnlock: function() {
         },
@@ -3041,13 +3193,13 @@ actionData = {
         },
         onLevelAtts:[],
         expAtts:[],
-        efficiencyAtts:[["curiosity", .1]]
+        efficiencyAtts:[]
     },
     readOldReligiousTexts: {
-        tier:1, plane:0, resourceName:"research", creationVersion:2, automationOff: true,
+        tier:2, plane:0, resourceName:"research", creationVersion:2, automationOff: true,
         progressMaxBase:1e15, progressMaxIncrease:10,
-        expToLevelBase:10, expToLevelIncrease:1,
-        efficiencyBase:.1, maxLevel:10,
+        expToLevelBase:1, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:10,
         unlockCost:3e13, visible:false, unlocked:false, purchased: false,
         onUnlock: function() {
         },
@@ -3055,13 +3207,13 @@ actionData = {
         },
         onLevelAtts:[],
         expAtts:[],
-        efficiencyAtts:[["curiosity", .1]]
+        efficiencyAtts:[]
     },
     readOldProphecies: {
-        tier:1, plane:0, resourceName:"research", creationVersion:2, automationOff: true,
+        tier:2, plane:0, resourceName:"research", creationVersion:2, automationOff: true,
         progressMaxBase:1e15, progressMaxIncrease:10,
-        expToLevelBase:10, expToLevelIncrease:1,
-        efficiencyBase:.1, maxLevel:10,
+        expToLevelBase:1, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:10,
         unlockCost:3e13, visible:false, unlocked:false, purchased: false,
         onUnlock: function() {
         },
@@ -3069,13 +3221,13 @@ actionData = {
         },
         onLevelAtts:[],
         expAtts:[],
-        efficiencyAtts:[["curiosity", .1]]
+        efficiencyAtts:[]
     },
     readOldPoetry: {
-        tier:1, plane:0, resourceName:"research", creationVersion:2, automationOff: true,
+        tier:2, plane:0, resourceName:"research", creationVersion:2, automationOff: true,
         progressMaxBase:1e15, progressMaxIncrease:10,
-        expToLevelBase:10, expToLevelIncrease:1,
-        efficiencyBase:.1, maxLevel:10,
+        expToLevelBase:1, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:10,
         unlockCost:3e13, visible:false, unlocked:false, purchased: false,
         onUnlock: function() {
         },
@@ -3083,13 +3235,13 @@ actionData = {
         },
         onLevelAtts:[],
         expAtts:[],
-        efficiencyAtts:[["curiosity", .1]]
+        efficiencyAtts:[]
     },
     readOldPhilosophy: {
-        tier:1, plane:0, resourceName:"research", creationVersion:2, automationOff: true,
+        tier:2, plane:0, resourceName:"research", creationVersion:2, automationOff: true,
         progressMaxBase:1e15, progressMaxIncrease:10,
-        expToLevelBase:10, expToLevelIncrease:1,
-        efficiencyBase:.1, maxLevel:10,
+        expToLevelBase:1, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:10,
         unlockCost:3e13, visible:false, unlocked:false, purchased: false,
         onUnlock: function() {
         },
@@ -3097,13 +3249,13 @@ actionData = {
         },
         onLevelAtts:[],
         expAtts:[],
-        efficiencyAtts:[["curiosity", .1]]
+        efficiencyAtts:[]
     },
     readWarJournals: {
-        tier:1, plane:0, resourceName:"research", creationVersion:2, automationOff: true,
+        tier:2, plane:0, resourceName:"research", creationVersion:2, automationOff: true,
         progressMaxBase:1e15, progressMaxIncrease:10,
-        expToLevelBase:10, expToLevelIncrease:1,
-        efficiencyBase:.1, maxLevel:10,
+        expToLevelBase:1, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:10,
         unlockCost:3e13, visible:false, unlocked:false, purchased: false,
         onUnlock: function() {
         },
@@ -3111,7 +3263,7 @@ actionData = {
         },
         onLevelAtts:[],
         expAtts:[],
-        efficiencyAtts:[["curiosity", .1]]
+        efficiencyAtts:[]
     },
     reviewOldMemories: {
         tier:1, plane:0, creationVersion:2, automationOff: true,
@@ -3125,7 +3277,7 @@ actionData = {
         },
         onLevelAtts:[],
         expAtts:[],
-        efficiencyAtts:[["curiosity", .1]]
+        efficiencyAtts:[]
     },
     rememberTheWar: {
         tier:1, plane:0, creationVersion:2, automationOff: true,
@@ -3298,7 +3450,7 @@ actionData = {
             let actionObj = data.actions.worry;
             let dataObj = actionData.worry;
 
-            actionObj.progressGain = actionObj.generatorSpeed * (actionObj.efficiency / 100);
+            actionObj.progressGain = dataObj.generatorSpeed * (actionObj.efficiency / 100);
             actionObj.actionPower = actionObj.actionPowerBase *
                 actionObj.actionPowerMult * (actionObj.efficiency/100);
             let resourceTaken = actionObj.resource * actionObj.tierMult();
@@ -3342,7 +3494,7 @@ actionData = {
         onCompleteCustom: function() {
             let actionObj = data.actions.overclockTargetingTheLich;
             actionData.overclockTargetingTheLich.updateMults();
-            let resourceTaken = actionObj.resource;
+            let resourceTaken = actionObj.resource/10;
 
             if (actionObj.resourceToAdd > 0) {
                 actionObj.resource -= resourceTaken;
@@ -3356,14 +3508,14 @@ actionData = {
             let actionObj = data.actions.overclockTargetingTheLich;
             let dataObj = actionData.overclockTargetingTheLich;
 
-            actionObj.progressGain = actionObj.generatorSpeed;
-            let resourceTaken = actionObj.resource;
+            actionObj.progressGain = dataObj.generatorSpeed;
+            let resourceTaken = actionObj.resource/10;
             actionObj.resourceToAdd = dataObj.actionPowerFunction(resourceTaken) * actionObj.upgradeMult;
         },
         actionPowerFunction: function(resource) {
             let fightMath = Math.sqrt(resource/1e24) * data.maxSpellPower;
             if(data.actions.trainWithTeam.unlocked) {
-                fightMath *= 5;
+                fightMath *= 3;
             }
             return fightMath;
         },
@@ -3379,24 +3531,24 @@ actionData = {
     },
     fightTheEvilForces: {
         tier:0, plane:2, resourceName:"fight",
-        progressMaxBase:60, progressMaxIncrease:1,
+        progressMaxBase:10, progressMaxIncrease:1,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:1, isKTL:true, purchased: true,
         actionPowerBase:1, actionPowerMult:1, actionPowerMultIncrease:1,
         unlockCost:1, visible:false, unlocked:false, isGenerator:true, generatorSpeed:1, hasUpstream: false,
-        onLevelAtts:[["doom", 50]],
         onUnlock: function() {
             unveilAction('bridgeOfBone');
             setSliderUI("fightTheEvilForces", "bridgeOfBone", 100);
         },
+        onLevelAtts:[["doom", 10]],
         expAtts:[],
         efficiencyAtts:[]
     },
     bridgeOfBone: {
         tier:0, plane:2, resourceName:"fight",
-        progressMaxBase:10, progressMaxIncrease:4,
+        progressMaxBase:10, progressMaxIncrease:3,
         expToLevelBase:10, expToLevelIncrease:1,
-        efficiencyBase:.4, isKTL:true, purchased: true, maxLevel:25,
+        efficiencyBase:.4, isKTL:true, purchased: true, maxLevel:10,
         unlockCost:10, visible:false, unlocked:false,
         onUnlock: function() {
             data.ancientCoin += 5 * data.ancientCoinMultKTL;
@@ -3405,7 +3557,7 @@ actionData = {
             setSliderUI("bridgeOfBone", "harvestGhostlyField", 100);
         },
         onCompleteCustom:function() {
-            statAddAmount("legacy", 2 * (data.actions.bridgeOfBone.level + 1));
+            statAddAmount("legacy", 4 * (data.actions.bridgeOfBone.level/10 + 1));
         },
         onLevelCustom: function() {
             if(data.actions.bridgeOfBone.level >= 3) {
@@ -3413,17 +3565,17 @@ actionData = {
                 setSliderUI("bridgeOfBone", "harvestGhostlyField", 100);
             }
         },
-        onLevelAtts:[["legacy", 2]],
+        onLevelAtts:[["legacy", 5]],
         expAtts:[["legacy", .1]],
         efficiencyAtts:[["courage", 1], ["valor", .1], ["doom", -1]],
-        extraInfo:{english:"+2 * (level + 1) Legacy on complete."},
+        extraInfo:{english:"+4 * (1 + level/10) Legacy on complete."},
         unlockMessage:{english:"On unlock, +5 Ancient Coins. This amount is multiplied by Hear About The Lich's level."}
     },
     harvestGhostlyField: {
         tier:0, plane:2, resourceName:"fight",
         progressMaxBase:1000, progressMaxIncrease:4,
         expToLevelBase:10, expToLevelIncrease:1,
-        efficiencyBase:.3, isKTL:true, purchased: true, maxLevel:30,
+        efficiencyBase:.3, isKTL:true, purchased: true, maxLevel:12,
         unlockCost:1000, visible:false, unlocked:false,
         onUnlock: function() {
             data.ancientCoin += 8 * data.ancientCoinMultKTL;
@@ -3431,7 +3583,7 @@ actionData = {
             setSliderUI("harvestGhostlyField", "geyserFields", 100);
         },
         onCompleteCustom:function() {
-            statAddAmount("legacy", 6 * (data.actions.harvestGhostlyField.level + 1));
+            statAddAmount("legacy", 7 * (data.actions.harvestGhostlyField.level/10 + 1));
         },
         onLevelCustom: function() {
             if(data.actions.harvestGhostlyField.level >= 3) {
@@ -3439,17 +3591,17 @@ actionData = {
                 setSliderUI("harvestGhostlyField", "geyserFields", 100);
             }
         },
-        onLevelAtts:[["legacy", 6]],
+        onLevelAtts:[["legacy", 8]],
         expAtts:[["legacy", .1]],
         efficiencyAtts:[["courage", 1], ["valor", .1], ["doom", -1]],
-        extraInfo:{english:"+6 * (level + 1) Legacy on complete."},
+        extraInfo:{english:"+7 * (1 + level/10) Legacy on complete."},
         unlockMessage:{english:"On unlock, +8 Ancient Coins. This amount is multiplied by Hear About The Lich's level."}
     },
     geyserFields: {
         tier:0, plane:2, resourceName:"fight", creationVersion:2,
         progressMaxBase:1e6, progressMaxIncrease:4,
         expToLevelBase:10, expToLevelIncrease:1,
-        efficiencyBase:.2, isKTL:true, purchased: true, maxLevel:35,
+        efficiencyBase:.2, isKTL:true, purchased: true, maxLevel:14,
         unlockCost:1e4, visible:false, unlocked:false,
         onUnlock: function() {
             data.ancientCoin += 13 * data.ancientCoinMultKTL;
@@ -3457,7 +3609,7 @@ actionData = {
             setSliderUI("geyserFields", "destroySiegeEngine", 100);
         },
         onCompleteCustom:function() {
-            statAddAmount("legacy", 20 * (data.actions.geyserFields.level + 1));
+            statAddAmount("legacy", 12 * (data.actions.geyserFields.level/10 + 1));
         },
         onLevelCustom: function() {
             if(data.actions.geyserFields.level >= 3) {
@@ -3465,98 +3617,102 @@ actionData = {
                 setSliderUI("geyserFields", "destroySiegeEngine", 100);
             }
         },
-        onLevelAtts:[["legacy", 20]],
+        onLevelAtts:[["legacy", 7]],
         expAtts:[["legacy", .1]],
         efficiencyAtts:[["courage", 1], ["valor", .1], ["doom", -1]],
-        extraInfo:{english:"+20 * (level + 1) Legacy on complete."},
+        extraInfo:{english:"+12 * (1 + level/10) Legacy on complete."},
         unlockMessage:{english:"On unlock, +13 Ancient Coins. This amount is multiplied by Hear About The Lich's level."}
     },
     destroySiegeEngine: {
         tier:0, plane:2, resourceName:"fight", creationVersion:2,
-        progressMaxBase:1e9, progressMaxIncrease:2,
+        progressMaxBase:1e9, progressMaxIncrease:4,
         expToLevelBase:10, expToLevelIncrease:1,
-        efficiencyBase:.1, isKTL:true, purchased: true, maxLevel:40,
+        efficiencyBase:.1, isKTL:true, purchased: true, maxLevel:16,
         unlockCost:1e6, visible:false, unlocked:false,
         onUnlock: function() {
             data.ancientCoinGained += 21 * data.ancientCoinMultKTL;
             data.ancientCoin += 21 * data.ancientCoinMultKTL;
         },
         onCompleteCustom:function() {
-            statAddAmount("legacy", 60 * (data.actions.destroySiegeEngine.level + 1));
+            statAddAmount("legacy", 20 * (data.actions.destroySiegeEngine.level/10 + 1));
         },
         onLevelCustom: function() {
             if(data.actions.destroySiegeEngine.level >= 3) {
                 unveilAction('destroyEasternMonolith');
             }
         },
-        onLevelAtts:[["legacy", 60]],
+        onLevelAtts:[["legacy", 20]],
         expAtts:[["legacy", .1]],
         efficiencyAtts:[["courage", 1], ["valor", .1], ["doom", -1]],
-        extraInfo:{english:"+60 * (level + 1) Legacy on complete."},
+        extraInfo:{english:"+20 * (1 + level/10) Legacy on complete."},
         unlockMessage:{english:"On unlock, +21 Ancient Coins. This amount is multiplied by Hear About The Lich's level."}
     },
     destroyEasternMonolith: {
         tier:0, plane:2, resourceName:"fight", creationVersion:2,
-        progressMaxBase:1e13, progressMaxIncrease:2,
+        progressMaxBase:1e11, progressMaxIncrease:10,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:.05, isKTL:true, purchased: true, maxLevel:3,
-        unlockCost:1e9, visible:false, unlocked:false,
+        unlockCost:1e8, visible:false, unlocked:false,
         onUnlock: function() {
-            data.ancientCoinGained += 100 * data.ancientCoinMultKTL;
-            data.ancientCoin += 100 * data.ancientCoinMultKTL;
+            data.ancientCoinGained += 50 * data.ancientCoinMultKTL;
+            data.ancientCoin += 50 * data.ancientCoinMultKTL;
         },
         onCompleteCustom:function() {
         },
         onLevelCustom: function() {
-            // if(data.actions.destroyEasternMonolith.level >= 3) {
-            //     unveilAction('stopDarknessRitual');
-            // }
+            if(data.actions.destroyEasternMonolith.level >= 1) {
+                unveilAction('stopDarknessRitual');
+            }
         },
-        onLevelAtts:[["legacy", 1000]],
+        onLevelAtts:[["legacy", 2000]],
         expAtts:[["legacy", .1]],
         efficiencyAtts:[["courage", 1], ["valor", .1], ["doom", -1]],
-        unlockMessage:{english:"On unlock, +1000 Ancient Coins."}
+        unlockMessage:{english:"On unlock, +50 Ancient Coins."}
     },
     stopDarknessRitual: {
         tier:0, plane:2, resourceName:"fight",
-        progressMaxBase:1e10, progressMaxIncrease:2,
+        progressMaxBase:2e13, progressMaxIncrease:3,
         expToLevelBase:10, expToLevelIncrease:1,
-        efficiencyBase:1, isKTL:true, purchased: false, maxLevel:10,
-        unlockCost:1e9, visible:false, unlocked:false,
+        efficiencyBase:.04, isKTL:true, purchased: false, maxLevel:12,
+        unlockCost:2e9, visible:false, unlocked:false,
         onUnlock: function() {
-            data.ancientCoin += 1;
+            data.ancientCoinGained += 33 * data.ancientCoinMultKTL;
+            data.ancientCoin += 33 * data.ancientCoinMultKTL;
         },
         onCompleteCustom:function() {
-            data.legacy += 1;
+            statAddAmount("legacy", 30 * (data.actions.stopDarknessRitual.level + 1));
         },
         onLevelCustom: function() {
+            if(data.actions.protectTheSunstone.level >= 3) {
+                unveilAction('destroyEasternMonolith');
+            }
         },
-        onLevelAtts:[],
-        expAtts:[],
-        efficiencyAtts:[],
-        extraInfo:{english:"1 Legacy per complete."},
-        unlockMessage:{english:"On unlock, +1 Ancient Coins."}
+        onLevelAtts:[["legacy", 30]],
+        expAtts:[["legacy", .1]],
+        efficiencyAtts:[["courage", 1], ["valor", .1], ["doom", -1]],
+        extraInfo:{english:"+30 * (1 + level/10) Legacy on complete."},
+        unlockMessage:{english:"On unlock, +33 Ancient Coins. This amount is multiplied by Hear About The Lich's level."}
     },
     protectTheSunstone: {
         tier:0, plane:2, resourceName:"fight",
-        progressMaxBase:1e10, progressMaxIncrease:2,
+        progressMaxBase:2e16, progressMaxIncrease:3,
         expToLevelBase:10, expToLevelIncrease:1,
-        efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
-        unlockCost:1e9, visible:false, unlocked:false,
+        efficiencyBase:.03, isKTL:true, purchased: true, maxLevel:15,
+        unlockCost:2e11, visible:false, unlocked:false,
         onUnlock: function() {
-            data.ancientCoin += 1;
+            data.ancientCoinGained += 54 * data.ancientCoinMultKTL;
+            data.ancientCoin += 54 * data.ancientCoinMultKTL;
         },
         onCompleteCustom:function() {
-            data.legacy += 1;
+            statAddAmount("legacy", 50 * (data.actions.stopDarknessRitual.level + 1));
         },
         onLevelCustom: function() {
-            unveilAction('');
         },
-        onLevelAtts:[],
-        expAtts:[],
-        efficiencyAtts:[],
-        extraInfo:{english:"1 Legacy per complete."},
-        unlockMessage:{english:"On unlock, +1 Ancient Coins."}
+        onLevelAtts:[["legacy", 50]],
+        expAtts:[["legacy", .1]],
+        efficiencyAtts:[["courage", 1], ["valor", .1], ["doom", -1]],
+        extraInfo:{english:"+50 * (1 + level/10) Legacy on complete."},
+        unlockMessage:{english:"On unlock, +54 Ancient Coins. This amount is multiplied by Hear About The Lich's level."}
     },
     silenceDeathChanters: {
         tier:0, plane:2, resourceName:"fight",
@@ -4120,7 +4276,7 @@ actionData = {
         actionPowerBase:1, actionPowerMult:1, actionPowerMultIncrease:1.05,
         efficiencyBase:.008,
         unlockCost:0, visible:false, unlocked:false, purchased: true, hasDeltas: false,
-        isGenerator:true, generatorTarget:"sparkMana", generatorSpeed:100,
+        isGenerator:true, generatorTarget:"sparkMana", generatorSpeed:10,
         onCompleteCustom: function() {
             let actionObj = data.actions.echoKindle;
             actionData.echoKindle.updateMults();
@@ -4133,7 +4289,7 @@ actionData = {
             let actionObj = data.actions.echoKindle;
             let dataObj = actionData.echoKindle;
 
-            actionObj.progressGain = actionObj.generatorSpeed * (actionObj.efficiency / 100);
+            actionObj.progressGain = dataObj.generatorSpeed * (actionObj.efficiency / 100);
             actionObj.actionPower = actionObj.actionPowerBase *
                 actionObj.actionPowerMult * (actionObj.efficiency/100);
             actionObj.resourceToAdd = dataObj.actionPowerFunction(actionObj.resource) * actionObj.tierMult() *
@@ -4145,7 +4301,7 @@ actionData = {
             if(resource < 1) {
                 return 0;
             }
-            return Math.pow(resource, .5) * 1000;
+            return Math.pow(resource, .5) * 10000;
         },
         onLevelAtts:[["pulse", 5]],
         expAtts:[["vision", 1], ["integration", 1], ["pulse", 1], ["rhythm", 1]],
@@ -4153,7 +4309,7 @@ actionData = {
         onCompleteText: {english:Raw.html`
                 +<span style="font-weight:bold;" id="echoKindleResourceSent">???</span> Spark was added to Spark Mana.<br>
                 `},
-        extraInfo: {english:Raw.html`Exp & Mana gain = (Legacy)^.5 * Action Power * Efficiency * 1000.`}
+        extraInfo: {english:Raw.html`Exp & Mana gain = (Legacy)^.5 * Action Power * Efficiency * 10000.`}
     },
     sparkMana: {
         tier:0, plane:1, resourceName:"spark", title: "Spark Decay", backwardsEfficiency: true,
@@ -4164,7 +4320,7 @@ actionData = {
         onUnlock: function() {
             data.actions.poolMana.unlocked = true;
             unveilAction('poolMana');
-            data.actions.poolMana.generatorSpeed = 6;
+            actionData.poolMana.generatorSpeed = 6;
             unveilAction('expelMana')
         },
         onLevelAtts:[["spark", 5]],
@@ -4194,8 +4350,9 @@ actionData = {
         },
         updateMults: function () {
             let actionObj = data.actions.poolMana;
+            let dataObj = actionData.poolMana;
 
-            actionObj.progressGain = actionObj.generatorSpeed * (actionObj.efficiency / 100);
+            actionObj.progressGain = dataObj.generatorSpeed * (actionObj.efficiency / 100);
             actionObj.actionPower = actionObj.actionPowerBase *
                 actionObj.actionPowerMult * (actionObj.efficiency/100);
             actionObj.resourceToAdd = data.actions.sparkMana.resource * actionObj.actionPower * actionObj.upgradeMult;
@@ -4209,7 +4366,7 @@ actionData = {
             unveilAction('prepareSpells')
         },
         onLevelAtts:[["pulse", 3]],
-        expAtts:[["amplification", 1]],
+        expAtts:[["amplification", 1], ["wizardry", 1], ["control", 1], ["spellcraft", 1], ["intellect", 1]],
         efficiencyAtts:[["amplification", .01], ["pulse", .25]],
         onCompleteText: {english:Raw.html`
                 -<span style="font-weight:bold;" id="poolManaResourceTaken">???</span> Spark was taken from Spark Mana, converted to<br>
@@ -4254,8 +4411,8 @@ actionData = {
         efficiencyBase:.02, maxLevel:9,
         unlockCost:30, visible:false, unlocked:false, purchased: true,
         onLevelCustom: function() {
-            unveilAction('manaVisualizations')
             unveilAction('growMagicSenses')
+            unveilAction('manaVisualizations')
         },
         onLevelAtts:[["amplification", 200]],
         expAtts:[],
@@ -4303,52 +4460,53 @@ actionData = {
         efficiencyAtts:[["integration", .05]]
     },
     overcharge: {
-        tier:0, plane:1, resourceName:"mana",
+        tier:0, plane:1, resourceName:"mana", automationOff:true,
         progressMaxBase:100, progressMaxIncrease:1,
         expToLevelBase:1, expToLevelIncrease:1,
-        efficiencyBase:.4, maxLevel:1, isSpell:true, instabilityToAdd:10,
-        unlockCost:500, visible:false, unlocked:false, purchased: true, automationOff:true,
+        efficiencyBase:.4, maxLevel:1, isSpell:true, instabilityToAdd:5,
+        unlockCost:500, visible:false, unlocked:false, purchased: true,
         onLevelCustom: function() {
-            unveilAction('overdrive')
+            unveilAction('overponder')
         },
         spellpower: function() {
             return 10;
         },
         onLevelAtts:[["wizardry", 1]],
-        expAtts:[["spellcraft", .1]],
+        expAtts:[["spellcraft", 1]],
         efficiencyAtts:[["wizardry", .01]],
         extraInfo: {english:Raw.html`If a charge is available, Overclock has x10 action power. Uses a charge when Overclock completes.`}
     },
     overboost: {
-        tier:0, plane:1, resourceName:"mana",
-        progressMaxBase:1000000, progressMaxIncrease:1,
+        tier:0, plane:1, resourceName:"mana", automationOff:true,
+        progressMaxBase:1e6, progressMaxIncrease:1,
         expToLevelBase:1, expToLevelIncrease:1,
-        efficiencyBase:.2, maxLevel:1, isSpell:true, instabilityToAdd:100,
-        unlockCost:1000000, visible:false, unlocked:false, purchased: true, automationOff:true,
+        efficiencyBase:.2, maxLevel:1, isSpell:true, instabilityToAdd:10,
+        unlockCost:1e6, visible:false, unlocked:false, purchased: true,
         onLevelCustom: function() {
         },
         spellpower: function() {
             return 10;
         },
         onLevelAtts:[["wizardry", 10]],
-        expAtts:[["spellcraft", .1]],
+        expAtts:[["spellcraft", 1]],
         efficiencyAtts:[["wizardry", .001]],
-        extraInfo: {english:Raw.html`If a charge is available, Overclock has x10 action power, stacking with Overcharge. Uses a charge when Overclock completes.`}
+        extraInfo: {english:Raw.html`If a charge of this action and Overcharge is available, Overclock has x10 action power, stacking with Overcharge. Uses a charge when Overclock completes.`}
     },
-    overdrive: {
-        tier:0, plane:1, resourceName:"mana",
-        progressMaxBase:1000, progressMaxIncrease:1,
+    overponder: {
+        tier:0, plane:1, resourceName:"mana", creationVersion:2, automationOff:true,
+        progressMaxBase:1e11, progressMaxIncrease:1,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:.1, maxLevel:1, isSpell:true, instabilityToAdd:100,
-        unlockCost:1000, visible:false, unlocked:false, purchased: false, automationOff:true,
+        unlockCost:1e11, visible:false, unlocked:false, purchased: false,
         onLevelCustom: function() {
         },
         spellpower: function() {
             return 10;
         },
         onLevelAtts:[["wizardry", 100]],
-        expAtts:[["spellcraft", .1]],
-        efficiencyAtts:[["wizardry", .0001]]
+        expAtts:[["spellcraft", 1]],
+        efficiencyAtts:[["wizardry", .0001]],
+        extraInfo: {english:Raw.html`If a charge of this action, Overcharge, and Overboost is available, Overclock has x10 action power, stacking with Overboost and Overcharge. Uses a charge when Overclock completes.`}
     },
     manaObservations: {
         tier:0, plane:1, resourceName:"mana",
@@ -4357,7 +4515,6 @@ actionData = {
         efficiencyBase:.01, maxLevel:3,
         unlockCost:90000, visible:false, unlocked:false, purchased: true,
         onLevelCustom: function() {
-            unveilAction('manaShaping')
         },
         onLevelAtts:[["vision", 150]],
         expAtts:[],
@@ -4435,7 +4592,10 @@ actionData = {
         onLevelCustom: function() {
             unveilAction('prepareExternalSpells')
             unveilAction('supportSpells')
-            levelAllCharges()
+            addMaxLevel("overcharge", 1);
+            addMaxLevel("overboost", 1);
+            addMaxLevel("overponder", 1);
+            addMaxLevel("earthMagic", 1);
         },
         onLevelAtts:[["integration", 200]],
         expAtts:[["amplification", .01]],
@@ -4445,13 +4605,13 @@ actionData = {
         tier:0, plane:1, resourceName:"mana",
         progressMaxBase:100000, progressMaxIncrease:33,
         expToLevelBase:3, expToLevelIncrease:1,
-        efficiencyBase:.15, maxLevel:9,
+        efficiencyBase:.15, maxLevel:6,
         unlockCost:20000, visible:false, unlocked:false, purchased: true,
         onLevelCustom: function() {
             unveilAction('earthMagic')
         },
         onLevelAtts:[["vision", 100]],
-        expAtts:[],
+        expAtts:[["spellcraft", 1], ["intellect", 1]],
         efficiencyAtts:[["integration", .05]]
     },
     supportSpells: {
@@ -4464,114 +4624,171 @@ actionData = {
             unveilAction('moveEarth')
         },
         onLevelAtts:[["vision", 100]],
-        expAtts:[],
+        expAtts:[["spellcraft", 1], ["intellect", 1]],
         efficiencyAtts:[["integration", .05]]
     },
     earthMagic: {
         tier:0, plane:1, resourceName:"mana",
         progressMaxBase:10000, progressMaxIncrease:1,
-        expToLevelBase:1, expToLevelIncrease:1, power:1,
-        efficiencyBase:.2, maxLevel:0, isSpell:true, instabilityToAdd:200,
+        expToLevelBase:1, expToLevelIncrease:1,
+        efficiencyBase:.2, maxLevel:0, isSpell:true, instabilityToAdd:100, power:1,
         unlockCost:20000, visible:false, unlocked:false, purchased: false,
         onLevelCustom: function() {
+            unveilAction('hardenEarth')
         },
         onLevelAtts:[["wizardry", 20]],
-        expAtts:[["spellcraft", .1]],
+        expAtts:[["spellcraft", 1]],
         efficiencyAtts:[["wizardry", .001]]
     },
     moveEarth: {
         tier:0, plane:1, resourceName:"mana", creationVersion:2, automationOff: true,
-        progressMaxBase:1000, progressMaxIncrease:3,
-        expToLevelBase:3, expToLevelIncrease:1,
-        efficiencyBase:1, maxLevel:10,
-        unlockCost:1000, visible:false, unlocked:false, purchased: false,
+        progressMaxBase:3e9, progressMaxIncrease:1,
+        expToLevelBase:1, expToLevelIncrease:1,
+        efficiencyBase:.010, maxLevel:1, isSpell:true, instabilityToAdd:100, power:3,
+        unlockCost:1e12, visible:false, unlocked:false, purchased: false,
         onLevelCustom: function() {
-            unveilAction('hardenEarth')
+            unveilAction('shapeEarth')
         },
-        onLevelAtts:[],
-        expAtts:[],
-        efficiencyAtts:[]
+        onLevelAtts:[["wizardry", 30]],
+        expAtts:[["spellcraft", 1]],
+        efficiencyAtts:[["wizardry", .001]]
     },
     hardenEarth: {
         tier:0, plane:1, resourceName:"mana", creationVersion:2, automationOff: true,
-        progressMaxBase:1000, progressMaxIncrease:3,
-        expToLevelBase:3, expToLevelIncrease:1,
-        efficiencyBase:1, maxLevel:10,
-        unlockCost:1000, visible:false, unlocked:false, purchased: false,
+        progressMaxBase:3e11, progressMaxIncrease:1,
+        expToLevelBase:1, expToLevelIncrease:1,
+        efficiencyBase:.05, maxLevel:1, isSpell:true, instabilityToAdd:100, power:6,
+        unlockCost:3e12, visible:false, unlocked:false, purchased: false,
         onLevelCustom: function() {
-            unveilAction('shapeEarth')
+            unveilAction('moveIron')
             unveilAction('stoneCompression')
         },
-        onLevelAtts:[],
-        expAtts:[],
-        efficiencyAtts:[]
+        onLevelAtts:[["wizardry", 60]],
+        expAtts:[["spellcraft", 1]],
+        efficiencyAtts:[["wizardry", .001]]
     },
     shapeEarth: {
         tier:0, plane:1, resourceName:"mana", creationVersion:2, automationOff: true,
-        progressMaxBase:1000, progressMaxIncrease:3,
-        expToLevelBase:3, expToLevelIncrease:1,
-        efficiencyBase:1, maxLevel:10,
-        unlockCost:1000, visible:false, unlocked:false, purchased: false,
+        progressMaxBase:3e13, progressMaxIncrease:1,
+        expToLevelBase:1, expToLevelIncrease:1,
+        efficiencyBase:.03, maxLevel:1, isSpell:true, instabilityToAdd:100, power:10,
+        unlockCost:1e13, visible:false, unlocked:false, purchased: false,
         onLevelCustom: function() {
-            unveilAction('moveIron')
+            unveilAction('reinforceArmor')
             unveilAction('shapeBricks')
         },
-        onLevelAtts:[],
-        expAtts:[],
-        efficiencyAtts:[]
+        onLevelAtts:[["wizardry", 100]],
+        expAtts:[["spellcraft", 1]],
+        efficiencyAtts:[["wizardry", .001]]
     },
     moveIron: {
         tier:0, plane:1, resourceName:"mana", creationVersion:2, automationOff: true,
-        progressMaxBase:1000, progressMaxIncrease:3,
-        expToLevelBase:3, expToLevelIncrease:1,
-        efficiencyBase:1, maxLevel:10,
-        unlockCost:1000, visible:false, unlocked:false, purchased: false,
+        progressMaxBase:1000, progressMaxIncrease:1,
+        expToLevelBase:1, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:1, isSpell:true, instabilityToAdd:100, power:1,
+        unlockCost:1e15, visible:false, unlocked:false, purchased: false,
         onLevelCustom: function() {
-            unveilAction('reinforceArmor')
+            unveilAction('restoreEquipment')
             unveilAction('moldBarsFromScrap')
         },
-        onLevelAtts:[],
-        expAtts:[],
-        efficiencyAtts:[]
+        onLevelAtts:[["wizardry", 20]],
+        expAtts:[["spellcraft", 1]],
+        efficiencyAtts:[["wizardry", .001]]
     },
     reinforceArmor: {
         tier:0, plane:1, resourceName:"mana", creationVersion:2, automationOff: true,
         progressMaxBase:1000, progressMaxIncrease:3,
         expToLevelBase:3, expToLevelIncrease:1,
-        efficiencyBase:1, maxLevel:10,
+        efficiencyBase:1, maxLevel:1, isSpell:true, instabilityToAdd:100, power:1,
         unlockCost:1000, visible:false, unlocked:false, purchased: false,
         onLevelCustom: function() {
-            unveilAction('restoreEquipment')
             unveilAction('mendGearCracks')
         },
-        onLevelAtts:[],
-        expAtts:[],
-        efficiencyAtts:[]
+        onLevelAtts:[["wizardry", 20]],
+        expAtts:[["spellcraft", 1]],
+        efficiencyAtts:[["wizardry", .001]]
     },
     restoreEquipment: {
         tier:0, plane:1, resourceName:"mana", creationVersion:2, automationOff: true,
-        progressMaxBase:1000, progressMaxIncrease:3,
-        expToLevelBase:3, expToLevelIncrease:1,
-        efficiencyBase:1, maxLevel:10,
+        progressMaxBase:1000, progressMaxIncrease:1,
+        expToLevelBase:1, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:1, isSpell:true, instabilityToAdd:100, power:1,
         unlockCost:1000, visible:false, unlocked:false, purchased: false,
         onLevelCustom: function() {
             unveilAction('assistantMagesmith')
         },
-        onLevelAtts:[],
-        expAtts:[],
-        efficiencyAtts:[]
+        onLevelAtts:[["wizardry", 20]],
+        expAtts:[["spellcraft", 1]],
+        efficiencyAtts:[["wizardry", .001]]
     },
-    manaVisualizations: {
+    practicalMagic: {
         tier:0, plane:1, resourceName:"mana", creationVersion:2, automationOff: true,
-        progressMaxBase:1000, progressMaxIncrease:3,
-        expToLevelBase:3, expToLevelIncrease:1,
-        efficiencyBase:1, maxLevel:10,
+        progressMaxBase:1000, progressMaxIncrease:1,
+        expToLevelBase:1, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:1, isSpell:true, instabilityToAdd:100, power:1,
+        unlockCost:1000, visible:false, unlocked:false, purchased: false,
+        onLevelCustom: function() {
+            unveilAction('illuminate')
+        },
+        onUnlock: function() {
+        },
+        onLevelAtts:[["wizardry", 20]],
+        expAtts:[["spellcraft", 1]],
+        efficiencyAtts:[["wizardry", .001]]
+    },
+    illuminate: {
+        tier:0, plane:1, resourceName:"mana", creationVersion:2, automationOff: true,
+        progressMaxBase:1000, progressMaxIncrease:1,
+        expToLevelBase:1, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:1, isSpell:true, instabilityToAdd:100, power:1,
+        unlockCost:1000, visible:false, unlocked:false, purchased: false,
+        onLevelCustom: function() {
+            unveilAction('unblemish')
+        },
+        onLevelAtts:[["wizardry", 20]],
+        expAtts:[["spellcraft", 1]],
+        efficiencyAtts:[["wizardry", .001]]
+    },
+    unblemish: {
+        tier:0, plane:1, resourceName:"mana", creationVersion:2, automationOff: true,
+        progressMaxBase:1000, progressMaxIncrease:1,
+        expToLevelBase:1, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:1, isSpell:true, instabilityToAdd:100, power:1,
+        unlockCost:1000, visible:false, unlocked:false, purchased: false,
+        onLevelCustom: function() {
+            unveilAction('manaTransfer')
+        },
+        onUnlock: function() {
+        },
+        onLevelAtts:[["wizardry", 20]],
+        expAtts:[["spellcraft", 1]],
+        efficiencyAtts:[["wizardry", .001]]
+    },
+    manaTransfer: {
+        tier:0, plane:1, resourceName:"mana", creationVersion:2, automationOff: true,
+        progressMaxBase:1000, progressMaxIncrease:1,
+        expToLevelBase:1, expToLevelIncrease:1,
+        efficiencyBase:1, maxLevel:1, isSpell:true, instabilityToAdd:100, power:1,
         unlockCost:1000, visible:false, unlocked:false, purchased: false,
         onLevelCustom: function() {
         },
-        onLevelAtts:[],
+        onUnlock: function() {
+        },
+        onLevelAtts:[["wizardry", 20]],
+        expAtts:[["spellcraft", 1]],
+        efficiencyAtts:[["wizardry", .001]]
+    },
+    manaVisualizations: {
+        tier:0, plane:1, resourceName:"mana", creationVersion:2, automationOff: true,
+        progressMaxBase:5e11, progressMaxIncrease:6,
+        expToLevelBase:3, expToLevelIncrease:1,
+        efficiencyBase:.02, maxLevel:3,
+        unlockCost:5e11, visible:false, unlocked:false, purchased: false,
+        onLevelCustom: function() {
+        },
+        onLevelAtts:[["vision", 2000]],
         expAtts:[],
-        efficiencyAtts:[]
+        efficiencyAtts:[["integration", .05]]
     },
     manaShaping: {
         tier:0, plane:1, resourceName:"mana", creationVersion:2, automationOff: true,
@@ -4587,15 +4804,15 @@ actionData = {
     },
     listenToTheMana: {
         tier:0, plane:1, resourceName:"mana", creationVersion:2, automationOff: true,
-        progressMaxBase:1000, progressMaxIncrease:3,
+        progressMaxBase:5e9, progressMaxIncrease:9,
         expToLevelBase:3, expToLevelIncrease:1,
-        efficiencyBase:1, maxLevel:10,
-        unlockCost:1000, visible:false, unlocked:false, purchased: false,
+        efficiencyBase:.02, maxLevel:3,
+        unlockCost:5e9, visible:false, unlocked:false, purchased: false,
         onLevelCustom: function() {
         },
-        onLevelAtts:[],
+        onLevelAtts:[["amplification", 1e5]],
         expAtts:[],
-        efficiencyAtts:[]
+        efficiencyAtts:[["integration", .05]]
     },
     manaInstinct: {
         tier:0, plane:1, resourceName:"mana", creationVersion:2, automationOff: true,
@@ -4607,7 +4824,7 @@ actionData = {
         },
         onLevelAtts:[],
         expAtts:[],
-        efficiencyAtts:[]
+        efficiencyAtts:[["integration", .05]]
     },
     auraControl: {
         tier:0, plane:1, resourceName:"mana", creationVersion:2, automationOff: true,
@@ -4617,7 +4834,7 @@ actionData = {
         unlockCost:600000, visible:false, unlocked:false, purchased: false,
         onUnlock: function() {
         },
-        onLevelAtts:[["control", 10]],
+        onLevelAtts:[["control", 200]],
         expAtts:[],
         efficiencyAtts:[]
     },
@@ -4651,63 +4868,6 @@ actionData = {
         expToLevelBase:3, expToLevelIncrease:1,
         efficiencyBase:1, maxLevel:10,
         unlockCost:1000, visible:false, unlocked:false, purchased: false,
-        onUnlock: function() {
-        },
-        onLevelAtts:[],
-        expAtts:[],
-        efficiencyAtts:[]
-    },
-    practicalMagic: {
-        tier:0, plane:1, resourceName:"mana", creationVersion:2, automationOff: true,
-        progressMaxBase:1000, progressMaxIncrease:3,
-        expToLevelBase:3, expToLevelIncrease:1,
-        efficiencyBase:1, maxLevel:10,
-        unlockCost:1000, visible:false, unlocked:false, purchased: false,
-        onLevelCustom: function() {
-            unveilAction('illuminate')
-        },
-        onUnlock: function() {
-        },
-        onLevelAtts:[],
-        expAtts:[],
-        efficiencyAtts:[]
-    },
-    illuminate: {
-        tier:0, plane:1, resourceName:"mana", creationVersion:2, automationOff: true,
-        progressMaxBase:1000, progressMaxIncrease:3,
-        expToLevelBase:3, expToLevelIncrease:1,
-        efficiencyBase:1, maxLevel:10,
-        unlockCost:1000, visible:false, unlocked:false, purchased: false,
-        onLevelCustom: function() {
-            unveilAction('unblemish')
-        },
-        onLevelAtts:[],
-        expAtts:[],
-        efficiencyAtts:[]
-    },
-    unblemish: {
-        tier:0, plane:1, resourceName:"mana", creationVersion:2, automationOff: true,
-        progressMaxBase:1000, progressMaxIncrease:3,
-        expToLevelBase:3, expToLevelIncrease:1,
-        efficiencyBase:1, maxLevel:10,
-        unlockCost:1000, visible:false, unlocked:false, purchased: false,
-        onLevelCustom: function() {
-            unveilAction('manaTransfer')
-        },
-        onUnlock: function() {
-        },
-        onLevelAtts:[],
-        expAtts:[],
-        efficiencyAtts:[]
-    },
-    manaTransfer: {
-        tier:0, plane:1, resourceName:"mana", creationVersion:2, automationOff: true,
-        progressMaxBase:1000, progressMaxIncrease:3,
-        expToLevelBase:3, expToLevelIncrease:1,
-        efficiencyBase:1, maxLevel:10,
-        unlockCost:1000, visible:false, unlocked:false, purchased: false,
-        onLevelCustom: function() {
-        },
         onUnlock: function() {
         },
         onLevelAtts:[],

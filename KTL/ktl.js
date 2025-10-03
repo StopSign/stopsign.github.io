@@ -169,6 +169,8 @@ function useAmulet() {
     views.updateVal(`useAmuletMenu`, "none", "style.display");
     views.updateVal(`openUseAmuletButton`, "none", "style.display");
     views.updateVal(`openViewAmuletButton`, "", "style.display");
+    data.legacyMultKTL = 1;
+    data.ancientCoinMultKTL = 1;
 
     //Reset all atts and bonuses
     for(let attVar in data.atts) {
@@ -257,7 +259,7 @@ function useAmulet() {
         views.updateVal(`${attCategory}CategoryContainer`, "none", "style.display");
     }
     data.actions.echoKindle.resource += data.atts.legacy.num;
-    data.actions.poolMana.generatorSpeed = 6;
+    actionData.poolMana.generatorSpeed = 6;
 
     switchToPlane(0)
     data.planeUnlocked[2] = false;

@@ -191,7 +191,11 @@ function tickActionTimer(actionVar) {
 }
 
 function getInstabilityReduction() {
-    return data.atts.control.attMult / 10;
+    return Math.pow(data.atts.control.attMult, .5);
+}
+
+function calcInstabilityEffect(instability) {
+    return Math.pow(1+instability/100, 2)
 }
 
 
@@ -203,7 +207,7 @@ function tickGameObject(actionVar) {
         return;
     }
 
-    let momentumMaxRate = actionObj.isGenerator ? actionObj.generatorSpeed / data.gameSettings.ticksPerSecond :
+    let momentumMaxRate = actionObj.isGenerator ? dataObj.generatorSpeed / data.gameSettings.ticksPerSecond :
         actionObj.resource * actionObj.tierMult() / data.gameSettings.ticksPerSecond;
     let isMaxLevel = actionObj.maxLevel !== undefined && actionObj.level >= actionObj.maxLevel;
     let momentumToAdd = (isMaxLevel || !actionObj.unlocked) ? 0 : momentumMaxRate;
@@ -224,7 +228,7 @@ function tickGameObject(actionVar) {
 
     if(actionObj.instability > 0) {
         actionObj.instability -= getInstabilityReduction() / data.gameSettings.ticksPerSecond;
-        actionObj.progressMax = actionObj.progressMaxBase * actionObj.progressMaxMult * (1+actionObj.instability/100);
+        actionObj.progressMax = actionObj.progressMaxBase * actionObj.progressMaxMult * calcInstabilityEffect(actionObj.instability);
         if(actionObj.instability < 0) {
             actionObj.instability = 0;
         }

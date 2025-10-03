@@ -43,7 +43,7 @@ function actionSetBaseVariables(actionObj, dataObj) {
     actionObj.instability = 0;
     actionObj.progressMaxBase = dataObj.progressMaxBase ? dataObj.progressMaxBase : 1;
     actionObj.progressMaxMult = dataObj.progressMaxMult ? dataObj.progressMaxMult : 1;
-    actionObj.progressMax = actionObj.progressMaxBase * actionObj.progressMaxMult * (1+actionObj.instability/100);
+    actionObj.progressMax = actionObj.progressMaxBase * actionObj.progressMaxMult * calcInstabilityEffect(actionObj.instability);
     actionObj.actionPowerBase = dataObj.actionPowerBase ? dataObj.actionPowerBase : 1;
     actionObj.actionPowerMult = dataObj.actionPowerMult ? dataObj.actionPowerMult : 1;
     actionObj.level = 0;
@@ -57,7 +57,6 @@ function actionSetBaseVariables(actionObj, dataObj) {
     actionObj.expToAddBase = 1;
     actionObj.expToAddMult = 1;
     actionObj.expToAdd = actionObj.expToAddBase * actionObj.expToAddMult;
-    actionObj.generatorSpeed = dataObj.generatorSpeed ? dataObj.generatorSpeed : 0;
     actionObj.generatorTarget = dataObj.generatorTarget;
     actionObj.resource = 0;
     actionObj.resourceDelta = 0;
@@ -105,7 +104,6 @@ function actionSetInitialVariables(actionObj, dataObj) {
     actionObj.cooldownTimer = 0; //when this is higher than cooldown it is ready
     actionObj.resourceName = dataObj.resourceName ? dataObj.resourceName : "momentum";
     actionObj.tier = dataObj.tier;
-    actionObj.instabilityToAdd = dataObj.instabilityToAdd ? dataObj.instabilityToAdd : undefined;
     actionObj.hasUpstream = dataObj.hasUpstream ?? true;
     actionObj.isKTL = !!dataObj.isKTL;
     actionObj.purchased = !!dataObj.purchased;
@@ -163,7 +161,7 @@ function createAndLinkNewAction(actionVar, dataObj, downstreamVars) {
             actionObj.expToLevel = actionObj.expToLevelBase * actionObj.expToLevelMult;
         } else {
             actionObj.progressMaxMult = 1/totalEffect;
-            actionObj.progressMax = actionObj.progressMaxBase * actionObj.progressMaxMult * (1+actionObj.instability/100);
+            actionObj.progressMax = actionObj.progressMaxBase * actionObj.progressMaxMult * calcInstabilityEffect(actionObj.instability);
         }
         actionObj.actionPower = actionObj.actionPowerBase * actionObj.actionPowerMult * (actionObj.efficiency/100);
     }
@@ -215,7 +213,7 @@ function checkLevelUp(actionObj, dataObj) {
         actionObj.exp -= actionObj.expToLevel;
         actionObj.level++;
         actionObj.progressMaxBase *= actionObj.progressMaxIncrease;
-        actionObj.progressMax = actionObj.progressMaxBase * actionObj.progressMaxMult * (1+actionObj.instability/100);
+        actionObj.progressMax = actionObj.progressMaxBase * actionObj.progressMaxMult * calcInstabilityEffect(actionObj.instability);
         actionObj.expToLevelBase *= actionObj.expToLevelIncrease;
         actionObj.expToLevel = actionObj.expToLevelBase * actionObj.expToLevelMult;
         actionObj.actionPowerMult *= actionObj.actionPowerMultIncrease;
@@ -551,9 +549,10 @@ function isSpellReady(actionVar) {
 
 function useCharge(actionVar) {
     let actionObj = data.actions[actionVar];
+    let dataObj = actionData[actionVar]
 
     actionObj.level--;
-    actionObj.instability += actionObj.instabilityToAdd / (actionObj.efficiency/100);
+    actionObj.instability += dataObj.instabilityToAdd / (actionObj.efficiency/100);
 
     if(actionObj.cooldown) {
         actionObj.cooldownTimer = 0;
@@ -658,7 +657,7 @@ function adjustActionData(actionVar, key, value) {
     let actionObj = data.actions[actionVar];
     actionObj[key] = value;
     if(['progressMaxBase', 'progressMaxMult'].includes(key)) {
-        actionObj.progressMax = actionObj.progressMaxBase * actionObj.progressMaxMult * (1+actionObj.instability/100);
+        actionObj.progressMax = actionObj.progressMaxBase * actionObj.progressMaxMult * calcInstabilityEffect(actionObj.instability);
     }
     if(['efficiencyBase', 'efficiencyMult'].includes(key)) {
         actionObj.expertise = actionObj.efficiencyBase * actionObj.efficiencyMult;

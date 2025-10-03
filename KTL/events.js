@@ -612,15 +612,6 @@ function mouseOffAction(actionVar) {
     mouseIsOnAction = null;
 }
 
-function levelAllCharges() {
-    for(let actionVar in data.actions) {
-        let actionObj = data.actions[actionVar];
-        if(actionObj.instabilityToAdd) {
-            addMaxLevel(actionVar, 1);
-        }
-    }
-}
-
 
 // function takeDataSnapshot(resourceValue) {
 //     const currentTime = chartData.length > 0 ? chartData[chartData.length - 1].time + 1 : 0;

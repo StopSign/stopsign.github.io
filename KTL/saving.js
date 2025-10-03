@@ -107,6 +107,13 @@ function load() {
             data.gameSettings.viewAdvancedSliders = true;
         }
         delete data.atts.processing; //changed named to Intellect, have to delete old att
+        if(toLoad.actions.poolMana.visible) {
+            actionData.poolMana.generatorSpeed = 6;
+        }
+        if(data.saveVersion <= 1) {
+            data.actions.overboost.instability = 0;
+            data.actions.overcharge.instability = 0;
+        }
 
         //new spells need to be leveled to current grimoire's level
 

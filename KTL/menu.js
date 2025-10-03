@@ -588,7 +588,7 @@ function createChangelogMenu() {
             <li>Amulet upgrades can be sorted by cost</li>
             <li>Fixed a bug with bonus speed save/load settings</li>
             <li>Log for new actions, with clickable names to jump to them. Log clears on amulet use</li>
-            <li>Overboost/Overdrive will default to prevent automation when first unlocked</li>
+            <li>Overboost/Overponder will default to prevent automation when first unlocked</li>
             <li>Rearranged ancient coin info to not be hidden by the button</li>
         </ul><br>
         v1.4, 9/5:<br>

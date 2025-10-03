@@ -93,8 +93,8 @@ let viewData = {}; //contains only things that are generated / not saved
 viewData.toasts = [];
 
 let language = "english";
-// let globalVisible = false;
-let globalVisible = true;
+let globalVisible = false;
+// let globalVisible = true;
 let isLoadingEnabled = true; //SET FALSE FOR CLEARING SAVE
 
 
@@ -138,6 +138,14 @@ function debug() {
 
 
     unveilAction('invest');
+
+
+    buyUpgrade("buyNicerStuff");
+    buyUpgrade("investMyGold");
+    buyUpgrade("increaseInitialInvestment");
+    buyUpgrade("feelTheEchoesOfTheBurntTown");
+    buyUpgrade("learnFromTheLibrary");
+    buyUpgrade("increaseInitialInvestment");
 
 
     // buyUpgrade("increaseInitialInvestment");
@@ -188,9 +196,10 @@ function initializeData() {
     createAndLinkNewAttribute("introspection", "awareness");
     createAndLinkNewAttribute("introspection", "curiosity");
     createAndLinkNewAttribute("introspection", "observation");
-    createAndLinkNewAttribute("introspection", "intellect");
-    createAndLinkNewAttribute("introspection", "stillness");
     createAndLinkNewAttribute("introspection", "integration");
+    createAndLinkNewAttribute("introspection", "intellect");
+    createAndLinkNewAttribute("introspection", "comfort");
+    createAndLinkNewAttribute("introspection", "stillness");
 
     createAndLinkNewAttribute("magic", "concentration");
     createAndLinkNewAttribute("magic", "cycle");
@@ -199,8 +208,8 @@ function initializeData() {
     createAndLinkNewAttribute("magic", "pulse");
     createAndLinkNewAttribute("magic", "spark");
     createAndLinkNewAttribute("magic", "vision");
-    createAndLinkNewAttribute("magic", "spellcraft");
     createAndLinkNewAttribute("magic", "wizardry");
+    createAndLinkNewAttribute("magic", "spellcraft");
     createAndLinkNewAttribute("magic", "archmagery");
 
 //mettle = fight, grit, resolve, spirit
@@ -213,7 +222,6 @@ function initializeData() {
 
     createAndLinkNewAttribute("adventuring", "energy");
     createAndLinkNewAttribute("adventuring", "navigation");
-    createAndLinkNewAttribute("adventuring", "comfort");
     createAndLinkNewAttribute("adventuring", "instinct");
     createAndLinkNewAttribute("adventuring", "initiative");
     createAndLinkNewAttribute("adventuring", "logistics");
@@ -276,9 +284,10 @@ function initializeData() {
     create("buyTools", [], -1.1, -1);
 
 
-    create("buySocialAccess", ["slideTheCoin"], -1, -.1);
+    create("buySocialAccess", ["slideTheCoin", "buyPointyHat"], -1, -.1);
     create("slideTheCoin", ["buyCoffee"], -.1, -1);
     create("buyCoffee", [], -1, -.1);
+    create("buyPointyHat", [], 0, .9);
 
     create("reportForLabor", ["oddJobsLaborer", "digFoundation"], 1, 0);
     create("oddJobsLaborer", ["chimneySweep"], .5, -1);
@@ -405,46 +414,49 @@ function initializeData() {
     create("walkAware", [], -2, 0);
 
     create("feelAGentleTug", ["leaveTheOpenRoad"], 1.5, 1);
-    create("leaveTheOpenRoad", ["discoverBurntTown", "findOverlook"], 1, 1);
+    create("leaveTheOpenRoad", ["findOverlook", "discoverBurntTown"], 1, 1);
     create("findOverlook", [], .5, 1);
-    create("discoverBurntTown", ["feelTheRage", "repairShatteredShrine", "resonanceCompass", "stepThroughAsh"], 1, 0);
+    create("discoverBurntTown", ["stepThroughAsh", "feelTheRage", "resonanceCompass", "repairShatteredShrine"], 1, 0);
     create("feelTheRage", [], 0, 1);
     create("repairShatteredShrine", [], 0, -1);
     create("stepThroughAsh", ["graspTheTragedy"], 1, .5);
-    create("graspTheTragedy", [], 1, .5);
+    create("graspTheTragedy", [], 1, 1);
     create("findOverlook", [], 0, 1.5);
     create("resonanceCompass", ["clearIvyWall"], 1, -.5);
-    create("clearIvyWall", ["scavengeForSupplies"], 1, 0);
+    create("clearIvyWall", ["scavengeForSupplies", "findPulsingShard"], 1, 0);
+    create("findPulsingShard", [], 0, 1);
 
 
-    create("scavengeForSupplies", ["skimAHeavyTome", "pryGemLoose", "studyTheArchitecture"], 1, 0);
+    create("scavengeForSupplies", ["skimAHeavyTome", "pryGemLoose", "examineTheArchitecture"], 1, 0);
     create("pryGemLoose", [], 0, 1);
-    create("studyTheArchitecture", [], 0, -1);
+    create("examineTheArchitecture", [], 0, -1);
     create("skimAHeavyTome", ["clearRubble", "comprehendDifficultTexts", "clearTheDust"], 1, 0);
     create("comprehendDifficultTexts", [], 0, -1);
     create("clearTheDust", [], 0, 1);
-    create("clearRubble", ["readFadedMarkers", "dismantleShelves", "studyTheLayout"], 1, 0);
+    create("clearRubble", ["readFadedMarkers", "dismantleShelves", "markTheLayout"], 1, 0);
     create("dismantleShelves", [], 0, 1);
-    create("studyTheLayout", [], 0, -1);
+    create("markTheLayout", [], 0, -1);
     create("readFadedMarkers", ["findAFamiliarLanguage", "decipherOrganization", "mapOutTraps"], 1, 0);
     create("decipherOrganization", [], 0, 1);
     create("mapOutTraps", ["accessForbiddenArea"], 0, -1);
-    create("accessForbiddenArea", [], 0, -1);
-    create("findAFamiliarLanguage", ["searchForRelevantBooks", "studyRunicLanguages", "collectHistoryBooks"], 1, 0);
-    create("studyRunicLanguages", [], 0, 1);
-    create("collectHistoryBooks", [], 0, -1);
-    create("searchForRelevantBooks", ["collectSpellBooks", "complainAboutDifficulty", "collectMathBooks"], 1, 0);
-    create("complainAboutDifficulty", [], 0, 1);
-    create("collectMathBooks", [], 0, -1);
+    create("accessForbiddenArea", ["collectSpellBooks"], 0, -1);
     create("collectSpellBooks", [], 1, 0);
-
+    create("findAFamiliarLanguage", ["searchForRelevantBooks", "recognizeRunicLanguages", "catalogUnknownLanguages"], 1, 0);
+    create("recognizeRunicLanguages", [], 0, -1);
+    create("catalogUnknownLanguages", [], 0, 1);
+    create("searchForRelevantBooks", ["collectInterestingBooks", "complainAboutDifficulty", "browseFantasyNovels"], 1, 0);
+    create("browseFantasyNovels", [], 0, -1);
+    create("complainAboutDifficulty", [], 0, 1);
+    create("collectInterestingBooks", ["collectHistoryBooks", "collectMathBooks"], 1, 0);
+    create("collectHistoryBooks", [], 0, 1);
+    create("collectMathBooks", [], 0, -1);
 
 
     create("readBooks", ["catalogNewBooks", "study"], -2, 0);
     create("catalogNewBooks", ["buildPersonalLibrary"], -1, 0);
     create("buildPersonalLibrary", [], 0, 1);
-    create("study", ["sortBySubject"], -1, -1);
-    create("sortBySubject", ["studyHistory", "studyMath", "studyMagic"], -1, -1);
+    create("study", ["researchBySubject"], -1, -1);
+    create("researchBySubject", ["studyHistory", "studyMath", "studyMagic"], -1, -1);
 
     create("studyHistory", ["readOldStories"], 1, -.5);
     create("readOldStories", ["readOldReligiousTexts", "readWarJournals"], 0, -1);
@@ -454,7 +466,8 @@ function initializeData() {
     create("readOldPhilosophy", [], -.5, -1);
     create("readWarJournals", [], 0, -1);
 
-    create("studyMath", [], -1, .5);
+    create("studyMath", ["studyArchitecture"], -1, .5);
+    create("studyArchitecture", [], 0, 1);
 
     create("studyMagic", ["studySupportSpells"], -1, -.5);
     create("studySupportSpells", ["studyEarthMagic", "studyPracticalMagic"], -1, .5);
@@ -545,8 +558,8 @@ function initializeData() {
 
     create("prepareInternalSpells", ["overcharge"], 0, 1);
     create("overcharge", ["overboost"], 1, 0);
-    create("overboost", ["overdrive"], 0, 1);
-    create("overdrive", [], 0, 1);
+    create("overboost", ["overponder"], 0, 1);
+    create("overponder", [], 0, 1);
     // create("", [], 0, 0);
 
     //KTL

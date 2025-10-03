@@ -615,6 +615,7 @@ let upgradeData = {
             } else if(num === 3) {
                 purchaseAction('resonanceCompass')
                 purchaseAction('clearIvyWall')
+                purchaseAction('findPulsingShard')
                 purchaseAction('scavengeForSupplies')
                 unveilUpgrade('learnFromTheLibrary')
             }
@@ -622,69 +623,68 @@ let upgradeData = {
     },
     learnFromTheLibrary: {
         initialCost:100, costIncrease:2, creationVersion:2,
-        upgradesAvailable:7,
+        upgradesAvailable:5,
         visible:false,
         customInfo: function(num) {
-            switch(num) {
-                case 0:
-                case 1:
-                case 2:
-                case 3:
-                default:
-                    return "Unlocks new actions that use Research"
-            }
+            return "Unlocks new actions that use Research"
         },
         onBuy: function(num) {
             if(num === 1) {
-                purchaseAction('pryGemLoose')
-                purchaseAction('studyArchitecture')
-                purchaseAction('clearTheDust')
-                purchaseAction('comprehendDifficultTexts')
-                purchaseAction('dismantleShelves')
-                purchaseAction('studyTheLayout')
-                purchaseAction('decipherOrganization')
+                purchaseAction('skimAHeavyTome')
+                purchaseAction('clearRubble')
+                purchaseAction('readFadedMarkers')
                 purchaseAction('mapOutTraps')
                 purchaseAction('accessForbiddenArea')
-                purchaseAction('findAFamiliarLanguage')
-                purchaseAction('studyRunicLanguages')
-                purchaseAction('collectHistoryBooks')
+                purchaseAction('collectSpellBooks')
+
                 purchaseAction('readBooks')
                 purchaseAction('catalogNewBooks')
                 purchaseAction('study')
-                purchaseAction('sortBySubject')
+                purchaseAction('researchBySubject')
+
+                purchaseAction('studyMagic')
+
+                purchaseAction('studySupportSpells')
+                purchaseAction('studyEarthMagic')
+                purchaseAction('stoneCompression')
+                purchaseAction('shapeBricks')
+            } else if(num === 2) {
+                purchaseAction('findAFamiliarLanguage')
+                purchaseAction('recognizeRunicLanguages')
+                purchaseAction('catalogUnknownLanguages')
+                purchaseAction('searchForRelevantBooks')
+                purchaseAction('collectInterestingBooks')
+                purchaseAction('collectHistoryBooks')
+
                 purchaseAction('studyHistory')
                 purchaseAction('readOldStories')
                 purchaseAction('reviewOldMemories')
                 purchaseAction('rememberFriends')
                 purchaseAction('rememberTheWar')
-            } else if(num === 2) {
+
+                purchaseAction('studyPracticalMagic')
+                purchaseAction('practicalMagic')
+                purchaseAction('tidyMagesmithShop')
+                purchaseAction('illuminate')
+                purchaseAction('clearTheBasement')
+            } else if(num === 3) {
                 //TODO increase history books max level
                 purchaseAction('readOldReligiousTexts')
                 purchaseAction('readOldPoetry')
                 purchaseAction('readOldProphecies')
                 purchaseAction('readOldPoetry')
                 purchaseAction('readOldPhilosophy')
+                purchaseAction('overponder')
                 purchaseAction('honorTheLost')
                 purchaseAction('letGoOfGuilt')
-            } else if(num === 3) {
-                purchaseAction('searchForRelevantBooks')
+            } else if(num === 4) {
                 purchaseAction('complainAboutDifficulty')
+                purchaseAction('browseFantasyNovels')
                 purchaseAction('collectMathBooks')
                 purchaseAction('studyMath')
-            } else if(num === 4) {
-                purchaseAction('collectInterestingBooks')
-                purchaseAction('studySupportSpells')
-                purchaseAction('studyEarthMagic')
-                purchaseAction('moveEarth')
-                purchaseAction('hardenEarth')
-                purchaseAction('stoneCompression')
-                purchaseAction('shapeEarth')
-                purchaseAction('shapeBricks')
-            } else if(num === 5) {
-                purchaseAction('studyPracticalMagic')
-                purchaseAction('practicalMagic')
-                purchaseAction('illuminate')
-            } else if(num === 6) {
+
+                //TODO magic +control, +rhythm actions
+
                 purchaseAction('studyAdvancedEarthMagic')
                 purchaseAction('moveIron')
                 purchaseAction('moldBarsFromScrap')
@@ -692,15 +692,29 @@ let upgradeData = {
                 purchaseAction('mendGearCracks')
                 purchaseAction('restoreEquipment')
                 purchaseAction('assistantMagesmith')
-            } else if(num === 7) {
+            } else if(num === 5) {
+                //TODO increase math books max level
+                purchaseAction('pryGemLoose')
+                purchaseAction('examineTheArchitecture')
+                purchaseAction('comprehendDifficultTexts')
+                purchaseAction('clearTheDust')
+                purchaseAction('dismantleShelves')
+                purchaseAction('markTheLayout')
+                purchaseAction('decipherOrganization')
+                
                 purchaseAction('studyAdvancedPracticalMagic')
                 purchaseAction('unblemish')
                 purchaseAction('manaTransfer')
+
+                purchaseAction('buildPersonalLibrary')
+                //todo architecture/build personal library
+            } else if(num === 6) {
+            } else if(num === 7) {
             }
         }
     },
     investMyGold: {
-        initialCost:30, costIncrease:1.5, creationVersion:2,
+        initialCost:20, costIncrease:2, creationVersion:2,
         upgradesAvailable:6,
         visible:true,
         customInfo: function(num) {
@@ -734,6 +748,7 @@ let upgradeData = {
                 purchaseAction('hostAFestival')
                 purchaseAction('fundTownImprovements')
                 purchaseAction('browsePersonalCollection')
+                purchaseAction('buyUtilityItems')
                 unveilUpgrade('refineMyLeverage')
                 unveilUpgrade('increaseMarketCap')
             } else if(num === 4) {
@@ -761,7 +776,7 @@ let upgradeData = {
         }
     },
     increaseMarketCap: {
-        initialCost:100, costIncrease:1.5, creationVersion:2,
+        initialCost:200, costIncrease:1.5, creationVersion:2,
         upgradesAvailable:5,
         visible:false,
         customInfo: function(num) {
@@ -793,7 +808,6 @@ let upgradeData = {
                 purchaseAction('buyShopItems')
             } else if(num === 3) {
                 purchaseAction('buyPotions')
-                purchaseAction('buyUtilityItems')
             }
         }
     },
@@ -826,6 +840,7 @@ let upgradeData = {
             if(num === 1) {
                 purchaseAction('learnToInquire')
                 purchaseAction('talkToTheRecruiters')
+                purchaseAction('buyPointyHat')
                 purchaseAction('askAboutArcaneCorps')
                 purchaseAction('getTestedForKnowledge')
                 purchaseAction('discussPlacement')
