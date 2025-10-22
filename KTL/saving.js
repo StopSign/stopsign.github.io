@@ -107,6 +107,7 @@ function load() {
             data.gameSettings.viewAdvancedSliders = true;
         }
         delete data.atts.processing; //changed named to Intellect, have to delete old att
+        delete data.atts.stillness; //changed named to Peace, have to delete old att
         if(toLoad.actions.poolMana.visible) {
             actionData.poolMana.generatorSpeed = 6;
         }
@@ -115,11 +116,8 @@ function load() {
             data.actions.overcharge.instability = 0;
         }
 
-        //new spells need to be leveled to current grimoire's level
 
-        //bought upgrades need to be applied
-        actionData.hearAboutTheLich.maxLevel = data.upgrades.learnedOfLichSigns.upgradePower + 2 + data.actions.trainWithTeam.level;
-        actionData.trainWithTeam.maxLevel = data.upgrades.fightAlongsideAllies.upgradePower >= 2 ? data.upgrades.fightAlongsideAllies.upgradePower : 1;
+        applyUpgradeEffects()
     }
 
     //update all generator's multiplier data
@@ -137,6 +135,18 @@ function load() {
 
 
     debug(); //change game after all else, for easier debugging
+}
+
+function applyUpgradeEffects() {
+    //bought upgrades need to be applied
+    actionData.hearAboutTheLich.maxLevel = data.upgrades.learnedOfLichSigns.upgradePower + 2 + data.actions.trainWithTeam.level;
+    actionData.trainWithTeam.maxLevel = data.upgrades.trainTogetherMore.upgradePower + 2;
+    if(data.upgrades.learnFromTheLibrary.upgradePower >= 3) {
+        data.actions.collectHistoryBooks.maxLevel = 7;
+    }
+    if(data.upgrades.learnFromTheLibrary.upgradePower >= 5) {
+        data.actions.collectMathBooks.maxLevel = 5;
+    }
 }
 
 function setSlidersOnLoad(toLoad, saveVersion) {

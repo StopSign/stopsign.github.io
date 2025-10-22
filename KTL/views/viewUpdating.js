@@ -197,7 +197,6 @@ let views = {
         let actionVar = actionObj.actionVar;
         let dataObj = actionData[actionVar];
 
-        views.updateVal(`${actionVar}HighestLevelContainer2`, data.upgrades.rememberWhatIDid.isFullyBought ? "" : "none", "style.display");
         views.updateVal(`${actionVar}LockContainer`, !actionObj.unlocked?"":"none", "style.display");
 
         let efficiencyToUse = actionObj.efficiency;
@@ -238,6 +237,32 @@ let views = {
                 }
             }
         }
+
+        //if icon menu is open
+        views.updateVal(`${actionVar}HighestLevelContainer`, data.upgrades.rememberWhatIDid.isFullyBought && actionObj.highestLevel >= 0 ? "" : "none", "style.display");
+        views.updateVal(`${actionVar}SecondHighestLevelContainer`, data.upgrades.rememberHowIGrew.isFullyBought && actionObj.secondHighestLevel >= 0 ? "" : "none", "style.display");
+        views.updateVal(`${actionVar}ThirdHighestLevelContainer`, data.upgrades.rememberMyMastery.isFullyBought && actionObj.thirdHighestLevel >= 0 ? "" : "none", "style.display");
+
+        if(dataObj.hoveringIcon) {
+            views.updateVal(`${actionVar}CurrentUnlockTimeContainer`, actionObj.unlockTime ? "" : "none", "style.display");
+            views.updateVal(`${actionVar}CurrentUnlockTime`, actionObj.unlockTime, "textContent", "time");
+            views.updateVal(`${actionVar}PrevUnlockTimeContainer`, actionObj.prevUnlockTime ? "" : "none", "style.display");
+            views.updateVal(`${actionVar}PrevUnlockTime`, actionObj.prevUnlockTime, "textContent", "time");
+            if (actionObj.prevUnlockTime && actionObj.unlockTime) {
+                views.updateVal(`${actionVar}DeltaUnlockTimeContainer`, "", "style.display");
+                views.updateVal(`${actionVar}DeltaUnlockTime`, Math.abs(actionObj.unlockTime - actionObj.prevUnlockTime), "textContent", "time");
+                views.updateVal(`${actionVar}DeltaUnlockTime`, actionObj.unlockTime - actionObj.prevUnlockTime < 0 ? "green" : "red", "style.color");
+            }
+        }
+
+        //When action should be dim
+        let isMaxLevel = actionObj.maxLevel !== undefined && actionObj.level >= actionObj.maxLevel;
+        let isQuiet = isMaxLevel && actionObj.resourceIncrease === 0 && actionObj.resourceDecrease === 0 && !actionObj.mouseOnThis;
+        views.updateVal(`${actionVar}LargeVersionContainer`, isQuiet?".6":"1", "style.opacity");
+        views.updateVal(`${actionVar}Container`, actionObj.mouseOnThis?"100":"0", "style.zIndex");
+
+        views.updateVal(`${actionVar}ResourceRetrieved`, actionObj.resourceRetrieved > 0 ? "" : "none", "style.display");
+        views.updateVal(`${actionVar}ResourceRetrieved`, actionObj.resourceRetrieved > 0 ?`(-${intToString(actionObj.resourceRetrieved * data.gameSettings.ticksPerSecond, 2)})`:"", "textContent");
     },
     updateActionLockedViews: function(actionObj) {
         let actionVar = actionObj.actionVar;
@@ -249,6 +274,7 @@ let views = {
     },
     updateActionUnlockedViews: function(actionObj) {
         let actionVar = actionObj.actionVar;
+        let dataObj = actionData[actionVar];
 
         //Needle
         let needlePosition = views.helpers.calcBalanceNeedle(actionObj.resourceIncrease, actionObj.resourceDecrease);
@@ -263,31 +289,14 @@ let views = {
         views.updateVal(`${actionVar}ExpBarInner`, `${(exp > 100 ? 100 : exp)}%`, "style.width");
 
 
-        //When action should be dim
+
+
         let isMaxLevel = actionObj.maxLevel !== undefined && actionObj.level >= actionObj.maxLevel;
-        let isQuiet = isMaxLevel && actionObj.resourceIncrease === 0 && actionObj.resourceDecrease === 0 && !actionObj.mouseOnThis;
-        views.updateVal(`${actionVar}LargeVersionContainer`, isQuiet?".6":"1", "style.opacity");
-        views.updateVal(`${actionVar}Container`, actionObj.mouseOnThis?"100":"0", "style.zIndex");
-
-
         views.updateVal(`${actionVar}LargeVersionContainer`, isMaxLevel?`var(--${actionObj.resourceName}-color-bg)`:"var(--bg-secondary)", "style.backgroundColor");
         //--bg-secondary-max
 
-        //Menu-specific updates
         if(actionObj.currentMenu === "info") {
-            views.updateVal(`${actionVar}CurrentUnlockTimeContainer`, actionObj.unlockTime ? "" : "none", "style.display");
-            views.updateVal(`${actionVar}CurrentUnlockTime`, actionObj.unlockTime, "textContent", "time");
-            views.updateVal(`${actionVar}PrevUnlockTimeContainer`, actionObj.prevUnlockTime ? "" : "none", "style.display");
-            views.updateVal(`${actionVar}PrevUnlockTime`, actionObj.prevUnlockTime, "textContent", "time");
-            if(actionObj.prevUnlockTime && actionObj.unlockTime) {
-                views.updateVal(`${actionVar}DeltaUnlockTimeContainer`, "", "style.display");
-                views.updateVal(`${actionVar}DeltaUnlockTime`, Math.abs(actionObj.unlockTime - actionObj.prevUnlockTime), "textContent", "time");
-                views.updateVal(`${actionVar}DeltaUnlockTime`, actionObj.unlockTime - actionObj.prevUnlockTime < 0 ? "green" : "red", "style.color");
-            }
 
-            views.updateVal(`${actionVar}HighestLevelContainer`, data.upgrades.rememberWhatIDid.isFullyBought ? "" : "none", "style.display");
-            views.updateVal(`${actionVar}SecondHighestLevelContainer`, data.upgrades.rememberHowIGrew.isFullyBought ? "" : "none", "style.display");
-            views.updateVal(`${actionVar}ThirdHighestLevelContainer`, data.upgrades.rememberMyMastery.isFullyBought ? "" : "none", "style.display");
         }
 
         if(actionObj.currentMenu === "atts") {
@@ -314,9 +323,8 @@ let views = {
         let roundedNumbers = [
             ["progress", 2], ["progressMax", 2], ["progressGain", 2],
             ["resource", 2], ["resourceDelta", 2], ["level", 1],
-            ["exp", 2], ["expToLevel", 2], ["expToAdd2", 2],
-            ["resourceIncrease", 3], ["resourceDecrease", 3],
-            ["highestLevel2", 1]
+            ["exp", 2], ["expToLevel", 2], ["expToAdd2", 3],
+            ["resourceIncrease", 3], ["resourceDecrease", 3]
         ];
         if(actionObj.isGenerator && actionVar !== "hearAboutTheLich") {
             roundedNumbers.push(["resourceToAdd", 2]);
@@ -325,7 +333,7 @@ let views = {
         if(actionVar === "hearAboutTheLich") {
             roundedNumbers.push(["actionPower2", 2]);
         }
-        if(actionObj.currentMenu === "info") {
+        if(dataObj.hoveringIcon) {
             roundedNumbers.push(["highestLevel", 1]);
             roundedNumbers.push(["secondHighestLevel", 1]);
             roundedNumbers.push(["thirdHighestLevel", 1]);

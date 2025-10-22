@@ -485,104 +485,7 @@ let upgradeData = {
     refineMyGeared: { attribute:"geared", upgradesAvailable:4, increaseRatio:.5, initialCost:10, costIncrease:3, visible:true },
     refineMyCourage: { attribute:"courage", upgradesAvailable:4, increaseRatio:1, initialCost:10, costIncrease:2, visible:true },
     refineMyLeverage: { attribute:"leverage", upgradesAvailable:4, increaseRatio:.5, initialCost:100, costIncrease:3, visible:false, creationVersion:2 },
-    refineMyWizardry: { attribute:"wizardry", upgradesAvailable:4, increaseRatio:.25, initialCost:100, costIncrease:4, visible:true, creationVersion:2 },
-
-
-
-    makeMoreMoney: {
-        initialCost:6, costIncrease:2,
-        upgradesAvailable:4,
-        visible:false,
-        customInfo: function(num) {
-            return "Gold generation increased by "+(num >0?"another ":"")+"50%";
-        }
-    },
-    haveBetterConversations: {
-        initialCost:6, costIncrease:2,
-        upgradesAvailable:4,
-        visible:false,
-        customInfo: function(num) {
-            return "Conversation generation increased by "+(num >0?"another ":"")+"50%";
-        }
-    },
-    createABetterFoundation: {
-        initialCost:8, costIncrease:4,
-        upgradesAvailable:4,
-        visible:false,
-        customInfo: function(num) {
-            return "Motivation generation is increased by "+(num >0?"another ":"")+"25%";
-        }
-    },
-
-    rememberWhatIDid: {
-        initialCost:1, costIncrease:1,
-        upgradesAvailable:1,
-        visible:false,
-        customInfo: function(num) {
-            return "On each action, get 2x exp as long as the action's level is lower than the highest level ever reached." +
-                " The action's highest level will be recorded on amulet use, and it will be displayed.";
-        }
-    },
-    checkWhatScottMentioned: {
-        initialCost:1, costIncrease:1,
-        upgradesAvailable:1,
-        visible:false,
-        customInfo: function(num) {
-            return Raw.html`He said something about seeing a spot of gold among the trees. 
-            The birds, maybe? It might have been worth checking out.<br><br>
-            Unlocks 5 new actions.<br>
-            Recommended to start. 
-            `
-        },
-        onBuy: function(num) {
-            purchaseAction('watchBirds');
-            purchaseAction('catchAScent');
-            purchaseAction('exploreDifficultPath');
-            purchaseAction('eatGoldenFruit');
-            purchaseAction('journal');
-        }
-    },
-    stopBeingSoTense: {
-        initialCost:30, costIncrease:1,
-        upgradesAvailable:1,
-        visible:false,
-        customInfo: function(num) {
-            return "What was the point? I should have handled myself first."
-        },
-        onBuy: function(num) {
-            purchaseAction('meditate');
-            purchaseAction('walkAware');
-        }
-    },
-    focusHarder: {
-        initialCost:25, costIncrease:4,
-        upgradesAvailable:8,
-        visible:false,
-        customInfo: function(num) {
-            return "Increases the Focus Mult by "+(num >0?"another ":"")+"+1 (for a total of " + (num+1+2) + ")";
-        },
-        onBuy: function(num) {
-            data.focusMult = 2 + num;
-        }
-    },
-    rememberHowIGrew: {
-        initialCost:50, costIncrease:1,
-        upgradesAvailable:1,
-        visible:false,
-        customInfo: function(num) {
-            return "On each action, get 2x exp as long as the action's level is lower than the second highest level ever reached." +
-                " The action's second highest level will be recorded on amulet use, and it will be displayed.";
-        }
-    },
-    rememberMyMastery: {
-        initialCost:200, costIncrease:1,
-        upgradesAvailable:1,
-        visible:false,
-        customInfo: function(num) {
-            return "On each action, get 2x exp as long as the action's level is lower than the third highest level ever reached." +
-                " The action's third highest level will be recorded on amulet use, and it will be displayed.";
-        }
-    }, //200|1, 2x exp to third highest
+    refineMyWizardry: { attribute:"wizardry", upgradesAvailable:4, increaseRatio:.25, initialCost:200, costIncrease:4, visible:true, creationVersion:2 },
 
 
     feelTheEchoesOfTheBurntTown: {
@@ -604,7 +507,7 @@ let upgradeData = {
                 purchaseAction('leaveTheOpenRoad')
                 purchaseAction('findOverlook')
                 purchaseAction('discoverBurntTown')
-                purchaseAction('feelTheRage')
+                purchaseAction('feelTheDespair')
                 purchaseAction('repairShatteredShrine')
             } else if(num === 2) {
                 purchaseAction('stepThroughAsh')
@@ -622,11 +525,11 @@ let upgradeData = {
         }
     },
     learnFromTheLibrary: {
-        initialCost:100, costIncrease:2, creationVersion:2,
+        initialCost:200, costIncrease:2, creationVersion:2,
         upgradesAvailable:5,
         visible:false,
         customInfo: function(num) {
-            return "Unlocks new actions that use Research"
+            return "Unlocks new actions that use Research, and new spells"
         },
         onBuy: function(num) {
             if(num === 1) {
@@ -647,69 +550,72 @@ let upgradeData = {
                 purchaseAction('studySupportSpells')
                 purchaseAction('studyEarthMagic')
                 purchaseAction('stoneCompression')
+                purchaseAction('digFoundation')
+
                 purchaseAction('shapeBricks')
+                unveilUpgrade('keepMyMagicReady')
+                unveilUpgrade('trainTogetherMore');
             } else if(num === 2) {
                 purchaseAction('findAFamiliarLanguage')
-                purchaseAction('recognizeRunicLanguages')
-                purchaseAction('catalogUnknownLanguages')
                 purchaseAction('searchForRelevantBooks')
                 purchaseAction('collectInterestingBooks')
                 purchaseAction('collectHistoryBooks')
 
                 purchaseAction('studyHistory')
                 purchaseAction('readOldStories')
+                purchaseAction('readWarJournals')
+
                 purchaseAction('reviewOldMemories')
                 purchaseAction('rememberFriends')
                 purchaseAction('rememberTheWar')
 
                 purchaseAction('studyPracticalMagic')
-                purchaseAction('practicalMagic')
                 purchaseAction('tidyMagesmithShop')
-                purchaseAction('illuminate')
                 purchaseAction('clearTheBasement')
             } else if(num === 3) {
-                //TODO increase history books max level
+                data.actions.collectHistoryBooks.maxLevel = 7;
                 purchaseAction('readOldReligiousTexts')
                 purchaseAction('readOldPoetry')
                 purchaseAction('readOldProphecies')
-                purchaseAction('readOldPoetry')
                 purchaseAction('readOldPhilosophy')
-                purchaseAction('overponder')
                 purchaseAction('honorTheLost')
                 purchaseAction('letGoOfGuilt')
             } else if(num === 4) {
                 purchaseAction('complainAboutDifficulty')
                 purchaseAction('browseFantasyNovels')
-                purchaseAction('collectMathBooks')
-                purchaseAction('studyMath')
 
-                //TODO magic +control, +rhythm actions
+                purchaseAction('collectMathBooks')
+
+                purchaseAction('studyMath')
+                purchaseAction('studyCryptology')
+
+                purchaseAction('decipherOrganization')
+                purchaseAction('recognizeRunicLanguages')
+                purchaseAction('catalogUnknownLanguages')
 
                 purchaseAction('studyAdvancedEarthMagic')
-                purchaseAction('moveIron')
+
                 purchaseAction('moldBarsFromScrap')
-                purchaseAction('reinforceArmor')
                 purchaseAction('mendGearCracks')
-                purchaseAction('restoreEquipment')
                 purchaseAction('assistantMagesmith')
             } else if(num === 5) {
-                //TODO increase math books max level
-                purchaseAction('pryGemLoose')
-                purchaseAction('examineTheArchitecture')
-                purchaseAction('comprehendDifficultTexts')
-                purchaseAction('clearTheDust')
+                data.actions.collectMathBooks.maxLevel = 5; //each level increases catalognewbooks
+                purchaseAction('studyArchitecture')
+                purchaseAction('expandPersonalLibrary')
+
                 purchaseAction('dismantleShelves')
                 purchaseAction('markTheLayout')
-                purchaseAction('decipherOrganization')
+
+                purchaseAction('comprehendDifficultTexts')
+                purchaseAction('clearTheDust')
+
+                purchaseAction('examineTheArchitecture')
+                purchaseAction('pryGemLoose')
                 
                 purchaseAction('studyAdvancedPracticalMagic')
                 purchaseAction('unblemish')
                 purchaseAction('manaTransfer')
 
-                purchaseAction('buildPersonalLibrary')
-                //todo architecture/build personal library
-            } else if(num === 6) {
-            } else if(num === 7) {
             }
         }
     },
@@ -753,14 +659,16 @@ let upgradeData = {
                 unveilUpgrade('increaseMarketCap')
             } else if(num === 4) {
                 purchaseAction('supportLocalLibrary')
-                purchaseAction('expandLibrary')
+                purchaseAction('expandLocalLibrary')
                 purchaseAction('investInSelf')
+                unveilUpgrade('retrieveMyUnusedResources')
             } else if(num === 5) {
-                purchaseAction('fundATemporaryStall')
-                purchaseAction('purchaseADeed')
+                purchaseAction('makeAPublicDonation')
+                purchaseAction('fundASmallStall')
+                purchaseAction('purchaseALot')
             } else if(num === 6) {
-                purchaseAction('recruitAnEngineer')
-                purchaseAction('procureStoneAndWood')
+                purchaseAction('recruitACarpenter')
+                purchaseAction('procureQualityWood')
             }
         }
     },
@@ -788,16 +696,10 @@ let upgradeData = {
     },
     buyNicerStuff: {
         initialCost:70, costIncrease:3, creationVersion:2,
-        upgradesAvailable:3,
+        upgradesAvailable:4,
         visible:false,
         customInfo: function(num) {
-            switch(num) {
-                case 0:
-                case 1:
-                case 2:
-                default:
-                    return "Unlocks new actions that use Gold"
-            }
+            return "Unlocks new actions that use Gold"
         },
         onBuy: function(num) {
             if(num === 1) {
@@ -805,9 +707,30 @@ let upgradeData = {
                 purchaseAction('buyTravelersGear')
             } else if(num === 2) {
                 purchaseAction('buyArtisanFood')
-                purchaseAction('buyShopItems')
-            } else if(num === 3) {
                 purchaseAction('buyPotions')
+            } else if(num === 3) {
+                purchaseAction('buyTools')
+                purchaseAction('buyCart')
+            }
+        }
+    },
+    improveMyHouse: {
+        initialCost:400, costIncrease:3, creationVersion:2,
+        upgradesAvailable:3,
+        visible:false,
+        customInfo: function(num) {
+            return "Unlocks new actions that use Gold"
+        },
+        onBuy: function(num) {
+            if(num === 1) {
+                purchaseAction('buyFurniture')
+                purchaseAction('buyBed')
+            } else if(num === 2) {
+                purchaseAction('buyReadingChair')
+                purchaseAction('buyFireplace')
+            } else if(num === 3) {
+                purchaseAction('buyGoodFirewood')
+                purchaseAction('buySilkSheets')
             }
         }
     },
@@ -821,35 +744,39 @@ let upgradeData = {
         onBuy: function(num) {
             if(num === 1) {
                 purchaseAction('askAboutLocalWork')
-                purchaseAction('digFoundation')
+                purchaseAction('worksiteSweeper')
             }
         }
     },
 
     fightAlongsideAllies: {
-        initialCost:30, costIncrease:3, creationVersion:2,
-        upgradesAvailable:5,
+        initialCost:30, costIncrease:1, creationVersion:2,
+        upgradesAvailable:1,
         visible:true,
         customInfo: function(num) {
-            if(num === 0) {
-                return "Unlocks new actions that use Conversations, and results in a better KTL reset"
-            }
+            return "Unlocks new actions that use Conversations, and results in a better KTL reset"
+        },
+        onBuy: function(num) {
+            purchaseAction('learnToInquire')
+            purchaseAction('talkToTheRecruiters')
+            purchaseAction('buyPointyHat')
+            purchaseAction('askAboutArcaneCorps')
+            purchaseAction('getTestedForKnowledge')
+            purchaseAction('discussPlacement')
+            purchaseAction('meetTheMages')
+            purchaseAction('trainWithTeam')
+            unveilUpgrade('askAboutBetterWork');
+        }
+    },
+    trainTogetherMore: {
+        initialCost:400, costIncrease:2, creationVersion:2,
+        upgradesAvailable:3,
+        visible:false,
+        customInfo: function(num) {
             return "Increases max level of Train With Team by 1"
         },
         onBuy: function(num) {
-            if(num === 1) {
-                purchaseAction('learnToInquire')
-                purchaseAction('talkToTheRecruiters')
-                purchaseAction('buyPointyHat')
-                purchaseAction('askAboutArcaneCorps')
-                purchaseAction('getTestedForKnowledge')
-                purchaseAction('discussPlacement')
-                purchaseAction('meetTheMages')
-                purchaseAction('trainWithTeam')
-                unveilUpgrade('askAboutBetterWork');
-            } else if(num >= 2) {
-                actionData.trainWithTeam.maxLevel = 2 + num;
-            }
+            actionData.trainWithTeam.maxLevel = 2 + num;
         }
     },
     keepMyMagicReady: {
@@ -860,122 +787,144 @@ let upgradeData = {
             return Raw.html`The Spell Power used in KTL becomes the highest you've ever reached, instead of the current value.`;
         }
     },
+    retrieveMyUnusedResources: {
+        initialCost:500, costIncrease:1.5, creationVersion:2,
+        upgradesAvailable:4,
+        visible:false,
+        customInfo: function(num) {
+            return `Retrieve 10 + ${[.1, .2, .5][num]}% of current resource per second on all actions that are dimmed (max level, no resource increase or decrease). Skips Reinvest.`;
+        },
+    },
+    createABetterFoundation: {
+        initialCost:500, costIncrease:1.5, creationVersion:2,
+        upgradesAvailable:4,
+        visible:false,
+        customInfo: function(num) {
+            return "Momentum generation increased by "+(num >0?"another ":"")+"x1.1, multiplicative";
+        },
+    },
+    workHarder: {
+        initialCost:600, costIncrease:1.5, creationVersion:2,
+        upgradesAvailable:4,
+        visible:false,
+        customInfo: function(num) {
+            return "Info"
+        },
+        onBuy: function(num) {
+            return "Gold generation increased by "+(num >0?"another ":"")+"x1.5, multiplicative";
+        }
+    },
+    haveBetterConversations: {
+        initialCost:800, costIncrease:1.5, creationVersion:2,
+        upgradesAvailable:4,
+        visible:false,
+        customInfo: function(num) {
+            return "Conversation generation increased by "+(num >0?"another ":"")+"x1.25, multiplicative";
+        },
+    },
+    sparkMoreMana: {
+        initialCost:800, costIncrease:2, creationVersion:2,
+        upgradesAvailable:4,
+        visible:false,
+        customInfo: function(num) {
+            return "Mana generation increased by "+(num >0?"another ":"")+"x1.25, multiplicative";
+        },
+    },
+    studyHarder: {
+        initialCost:1000, costIncrease:1.5, creationVersion:2,
+        upgradesAvailable:4,
+        visible:false,
+        customInfo: function(num) {
+            return "Research generation increased by "+(num >0?"another ":"")+"x1.25, multiplicative";
+        },
+    },
+
+
+    rememberWhatIDid: {
+        initialCost:600, costIncrease:1, creationVersion:2,
+        upgradesAvailable:1,
+        visible:false,
+        customInfo: function(num) {
+            return "When you use the amulet, the highest levels achieved on non-KTL actions and generators are recorded. Gain +25% more exp up to the highest level reached. Note: non-generators do not carry over exp into their next level.";
+        },
+        onBuy: function(num) {
+            unveilUpgrade('rememberHowIGrew')
+        }
+    },
+    rememberHowIGrew: {
+        initialCost:2000, costIncrease:1, creationVersion:2,
+        upgradesAvailable:1,
+        visible:false,
+        customInfo: function(num) {
+            return "When you use the amulet, the second highest levels achieved on non-KTL actions and generators are recorded. Gain +25% additive more exp up to the second highest level reached. Note: non-generators do not carry over exp into their next level.";
+        },
+        onBuy: function(num) {
+            unveilUpgrade('rememberMyMastery')
+        }
+    },
+    rememberMyMastery: {
+        initialCost:6000, costIncrease:1, creationVersion:2,
+        upgradesAvailable:1,
+        visible:false,
+        customInfo: function(num) {
+            return "When you use the amulet, the third highest levels achieved on non-KTL actions and generators are recorded. Gain +50% additive more exp up to the third highest level reached. Note: non-generators do not carry over exp into their next level.";
+        }
+    },
+
+
+    stopBeingSoTense: {
+        initialCost:500, costIncrease:1, creationVersion:2,
+        upgradesAvailable:1,
+        visible:false,
+        customInfo: function(num) {
+            return "Unlock 2 actions that use momentum"
+        },
+        onBuy: function(num) {
+            purchaseAction('standStraighter'); //1e31
+            purchaseAction('walkAware'); //1e35
+        }
+    },
 
 
     //... finish up to here
     /*
 
-    askScottMoreQuestions: {
-        initialCost:11, costIncrease:1,
-        upgradesAvailable:1,
+    focusHarder: {
+        initialCost:25, costIncrease:4,
+        upgradesAvailable:8,
         visible:false,
         customInfo: function(num) {
-            return "asdf"
+            return "Increases the Focus Mult by "+(num >0?"another ":"")+"+1 (for a total of " + (num+1+2) + ")";
         },
         onBuy: function(num) {
+            data.focusMult = 2 + num;
         }
     },
     discoverMoreOfTheWorld: {
-        initialCost:11, costIncrease:1,
-        upgradesAvailable:1,
-        visible:false,
-        customInfo: function(num) {
-            return "asdf"
-        },
-        onBuy: function(num) {
-        }
     },
-    learnHowToFight: { //unlock john socialize / instruction
-        initialCost:40, costIncrease:1,
-        upgradesAvailable:1,
-        customInfo: function(num) {
-            return "TODO / doesn't work<br>Unlock new actions!<br>Story: My armor barely saved me when I was out of position. My shield disappeared " +
-                "when I lost my footing. My sword frequently gets stuck and leaves my grip. The problem is not only my equipment, but how I use it.";
-        }
+    learnHowToFight: {
     },
     getCombatExperience: {
-        initialCost:110, costIncrease:1,
-        upgradesAvailable:1,
-        customInfo: function(num) {
-            return "";
-        }
     },
     thinkAboutWhatINeed: {
-        initialCost:110, costIncrease:1,
-        upgradesAvailable:1,
-        customInfo: function(num) {
-            return "";
-        }
     },
     gainAccessToTheAcademy: {
-        initialCost:110, costIncrease:1,
-        upgradesAvailable:1,
-        customInfo: function(num) {
-            return "";
-        }
-    },
-    learnMoreFromTheLibrary: {
-        initialCost:110, costIncrease:1,
-        upgradesAvailable:1,
-        customInfo: function(num) {
-            return "";
-        }
     },
     learnMagicFromTheTowerMages: {
-        initialCost:110, costIncrease:1,
-        upgradesAvailable:1,
-        customInfo: function(num) {
-            return "";
-        }
     },
     nurtureAGoodReputation: {
-        initialCost:110, costIncrease:1,
-        upgradesAvailable:1,
-        customInfo: function(num) {
-            return "";
-        }
     },
     gatherBlackmailMaterial: {
-        initialCost:110, costIncrease:1,
-        upgradesAvailable:1,
-        customInfo: function(num) {
-            return "";
-        }
     },
     stealMagicFromTheTowerMages: {
-        initialCost:110, costIncrease:1,
-        upgradesAvailable:1,
-        customInfo: function(num) {
-            return "";
-        }
     },
     wieldMyNaturalMagic: {
-        initialCost:110, costIncrease:1,
-        upgradesAvailable:1,
-        customInfo: function(num) {
-            return "";
-        }
     },
     wieldMyMagicNaturally: {
-        initialCost:110, costIncrease:1,
-        upgradesAvailable:1,
-        customInfo: function(num) {
-            return "";
-        }
     },
     gatherArtifcatsOfPower: {
-        initialCost:110, costIncrease:1,
-        upgradesAvailable:1,
-        customInfo: function(num) {
-            return "";
-        }
     },
-    leadTheCharge: { //win
-        initialCost:110, costIncrease:1,
-        upgradesAvailable:1,
-        customInfo: function(num) {
-            return "";
-        }
+    leadTheCharge: {
     },
 */
 

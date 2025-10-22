@@ -54,9 +54,6 @@ function actionSetBaseVariables(actionObj, dataObj) {
     actionObj.expToLevelBase = dataObj.expToLevelBase ? dataObj.expToLevelBase : 1;
     actionObj.expToLevelMult = dataObj.expToLevelMult ? dataObj.expToLevelMult : 1;
     actionObj.expToLevel = actionObj.expToLevelBase * actionObj.expToLevelMult; //can be divided
-    actionObj.expToAddBase = 1;
-    actionObj.expToAddMult = 1;
-    actionObj.expToAdd = actionObj.expToAddBase * actionObj.expToAddMult;
     actionObj.generatorTarget = dataObj.generatorTarget;
     actionObj.resource = 0;
     actionObj.resourceDelta = 0;
@@ -90,6 +87,10 @@ function actionSetBaseVariables(actionObj, dataObj) {
     actionObj.wage = dataObj.wage ? dataObj.wage : undefined;
 
 
+    actionObj.expToAddBase = 1;
+    actionObj.expToAddMult = calcUpgradeMultToExp(actionObj);
+    actionObj.expToAdd = actionObj.expToAddBase * actionObj.expToAddMult;
+
     actionObj.upgradeMult = 1;
     if(dataObj.updateUpgradeMult) {
         dataObj.updateUpgradeMult();
@@ -117,6 +118,8 @@ function actionSetInitialVariables(actionObj, dataObj) {
 
     //Vars that don't really need to be initalized but I like to know they're there
     actionObj.highestLevel = -1;
+    actionObj.secondHighestLevel = -1;
+    actionObj.thirdHighestLevel = -1;
     actionObj.prevUnlockTime = null;
 }
 
@@ -210,7 +213,11 @@ function isAttentionLine(actionVar, downstreamVar) {
 function checkLevelUp(actionObj, dataObj) {
     let isMaxLevel = actionObj.maxLevel !== undefined && actionObj.level >= actionObj.maxLevel;
     if(actionObj.exp >= actionObj.expToLevel && !isMaxLevel) {
-        actionObj.exp -= actionObj.expToLevel;
+        if(actionObj.isGenerator) {
+            actionObj.exp -= actionObj.expToLevel;
+        } else {
+            actionObj.exp = 0;
+        }
         actionObj.level++;
         actionObj.progressMaxBase *= actionObj.progressMaxIncrease;
         actionObj.progressMax = actionObj.progressMaxBase * actionObj.progressMaxMult * calcInstabilityEffect(actionObj.instability);
@@ -234,7 +241,7 @@ function checkLevelUp(actionObj, dataObj) {
         }
 
         let isNowMaxLevel = actionObj.maxLevel !== undefined && actionObj.level >= actionObj.maxLevel;
-        if (isNowMaxLevel) {
+        if (isNowMaxLevel && !actionObj.automationOff) {
             updateSupplyChain(actionObj.actionVar);
         }
 
@@ -244,12 +251,13 @@ function checkLevelUp(actionObj, dataObj) {
 }
 
 function actionAddExp(actionObj) {
-    actionObj.exp += actionObj.expToAdd * calcUpgradeMultToExp(actionObj);
+    actionObj.expToAddMult = calcUpgradeMultToExp(actionObj);
+    actionObj.expToAdd = actionObj.expToAddBase * actionObj.expToAddMult;
+    actionObj.exp += actionObj.expToAdd;
     let dataObj = actionData[actionObj.actionVar];
 
-    let timesRun = 0;
-    for(let i = 0; i < 10; i++) {
-        if(!checkLevelUp(actionObj, dataObj)) {
+    for (let i = 0; i < 10; i++) {
+        if (!checkLevelUp(actionObj, dataObj)) {
             break;
         }
     }
@@ -305,11 +313,14 @@ function actionUpdateAllStatMults() {
 //prepares the action to be unlocked during hte loop next round
 function purchaseAction(actionVar) {
     let actionObj = data.actions[actionVar];
+    let dataObj = actionData[actionVar];
     if(!actionObj) {
         console.log('tried to purchase ' + actionVar + ' in error.');
         return;
     }
     actionObj.purchased = true;
+
+    addLogMessage(`Permanently unlocked action: ${dataObj.title} in ${getPlaneNameFromNum(dataObj.plane)}`)
 }
 
 function unveilAction(actionVar) {
@@ -346,12 +357,13 @@ function getPlaneNameFromNum(planeNum) {
 }
 
 
-
-
 function unveilUpgrade(upgradeVar) {
     let upgradeObj = data.upgrades[upgradeVar];
+    let upgradeDataObj = upgradeData[upgradeVar];
     upgradeObj.visible = true;
     views.updateVal(`card_${upgradeVar}`, "flex", "style.display");
+
+    addLogMessage(`New Upgrade Available: ${upgradeDataObj.title}!`)
 }
 
 function addMaxLevel(actionVar, amount) {
@@ -378,7 +390,7 @@ function isNeeded(actionVar, isNeededList = {}) {
     const actionObj = data.actions[actionVar];
     const dataObj = actionData[actionVar];
 
-    if (!actionObj || !actionObj.visible) {
+    if (!actionObj || !actionObj.visible || !actionObj.hasUpstream) {
         isNeededList[actionVar] = false;
         return false;
     }
@@ -544,7 +556,7 @@ function calcUpgradeMultToExp(actionObj) {
 
 function isSpellReady(actionVar) {
     let actionObj = data.actions[actionVar];
-    return actionObj.level > 0 && (!actionObj.cooldown || actionObj.cooldownTimer >= actionObj.cooldown);
+    return actionObj.level > 0 && !actionObj.isPaused && (!actionObj.cooldown || actionObj.cooldownTimer >= actionObj.cooldown);
 }
 
 function useCharge(actionVar) {
@@ -562,7 +574,7 @@ function useCharge(actionVar) {
 function useActiveSpellCharges() {
     for(let actionVar in data.actions) {
         let actionObj = data.actions[actionVar];
-        if(actionObj.power && actionObj.level > 0) {
+        if(actionObj.power && actionObj.level > 0 && !actionObj.isPaused) {
             useCharge(actionVar);
         }
     }
@@ -572,7 +584,7 @@ function getActiveSpellPower() {
     let totalSpellPower = 0;
     for(let actionVar in data.actions) {
         let actionObj = data.actions[actionVar];
-        if(actionObj.power) {
+        if(actionObj.power && !actionObj.isPaused) {
             totalSpellPower += actionObj.power * actionObj.level;
         }
     }

@@ -209,6 +209,9 @@ function tickGameObject(actionVar) {
 
     let momentumMaxRate = actionObj.isGenerator ? dataObj.generatorSpeed / data.gameSettings.ticksPerSecond :
         actionObj.resource * actionObj.tierMult() / data.gameSettings.ticksPerSecond;
+    if(actionObj.isGenerator && actionObj.isPaused) {
+        momentumMaxRate = 0;
+    }
     let isMaxLevel = actionObj.maxLevel !== undefined && actionObj.level >= actionObj.maxLevel;
     let momentumToAdd = (isMaxLevel || !actionObj.unlocked) ? 0 : momentumMaxRate;
     let resourceToAddInefficient = momentumToAdd * (actionObj.efficiency / 100);
@@ -266,6 +269,32 @@ function tickGameObject(actionVar) {
         giveResourceTo(actionObj, downstreamObj, taken);
     }
 
+    //Calc resource retrieval
+    let isQuiet = actionObj.unlocked && isMaxLevel && actionObj.resourceIncrease === 0 && actionObj.resourceDecrease === 0;
+    if(!isQuiet || data.upgrades.retrieveMyUnusedResources.upgradePower === 0 || data.gameState === "KTL" || actionVar === "reinvest") {
+        actionObj.resourceRetrieved = 0;
+    } else {
+        actionObj.resourceRetrieved = (actionObj.resource/1000 * [0, 1, 2, 5][data.upgrades.retrieveMyUnusedResources.upgradePower] + 10) / data.gameSettings.ticksPerSecond;
+        if(actionObj.resourceRetrieved > actionObj.resource) {
+            actionObj.resourceRetrieved = actionObj.resource;
+        }
+        let resourceParentVar = resourceHeads[actionObj.resourceName];
+        if(resourceParentVar) {
+            let parentObj = data.actions[resourceParentVar];
+            giveResourceTo(actionObj, parentObj, actionObj.resourceRetrieved);
+            //Because generators don't get resourceIncrease from giveResourceTo
+            parentObj.resourceIncrease += actionObj.resourceRetrieved * data.gameSettings.ticksPerSecond;
+        }
+    }
+}
+
+let resourceHeads = {
+    "momentum":"overclock",
+    "gold":"spendMoney",
+    "conversations":"meetPeople",
+    "research":"researchBySubject",
+    "fortune":"buildFortune",
+    "mana":"poolMana"
 }
 
 function calculateTaken(actionVar, downstreamVar, actionObj, mult) {
@@ -300,9 +329,15 @@ function giveResourceTo(actionObj, downstreamObj, amount) {
         console.log(actionObj.actionVar + " is failing to give to downstream.");
         return;
     }
+    if(amount < 0) { //NaN protection
+        amount = 0;
+    }
     // This function now correctly handles the state change for both actions.
     addResourceTo(downstreamObj, amount);
     actionObj.resource -= amount;
+    if(actionObj.resource < 0) { //NaN protection
+        actionObj.resource = 0;
+    }
 }
 
 function addResourceTo(downstreamObj, amount) {

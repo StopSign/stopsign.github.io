@@ -139,6 +139,36 @@ function clickZoomIn() {
 function clickZoomOut() {
     setZoomNoMouse(scaleByPlane[data.planeTabSelected] - scaleStep*3)
 }
+
+function centerScreen() {
+    if(data.planeTabSelected === 0) {
+        actionTitleClicked('overclock')
+    }
+    if(data.planeTabSelected === 1) {
+        actionTitleClicked('echoKindle')
+    }
+    if(data.planeTabSelected === 2) {
+        actionTitleClicked('overclockTargetingTheLich')
+    }
+}
+
+function hoveringIcon(actionVar) {
+    actionData[actionVar].hoveringIcon = true;
+}
+function stopHoveringIcon(actionVar) {
+    actionData[actionVar].hoveringIcon = false;
+}
+function pauseAction(event, actionVar) {
+    event.stopPropagation();
+    let actionObj = data.actions[actionVar];
+    actionObj.isPaused = !actionObj.isPaused;
+
+    views.updateVal(`${actionVar}PauseButton`, actionObj.isPaused?">":"||", "textContent")
+    views.updateVal(`${actionVar}PauseButton`, actionObj.isPaused?"green":"red", "style.borderColor")
+    views.updateVal(`${actionVar}Title`, actionObj.isPaused?"red":"", "style.color")
+    views.updateVal(`${actionVar}SmallVersionTitle`, actionObj.isPaused?"red":"", "style.color")
+}
+
 windowElement.addEventListener('wheel', function(e) {
     if(mouseIsOnAction) {
         let elem = document.getElementById(`${mouseIsOnAction}_${data.actions[mouseIsOnAction].currentMenu}Container`);

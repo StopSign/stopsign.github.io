@@ -110,11 +110,10 @@ function debug() {
     document.getElementById("bonus50").style.display = "";
     // data.gameSettings.bonusSpeed = 1;
     // data.currentGameState.KTLBonusTimer = 0;
-    data.ancientCoin = 10000;
+    data.ancientCoin = 100000;
 
     // gameSpeed = 1;
     data.currentGameState.bonusTime = 1000 * 60 * 60 * 24 * 7;
-
 
     //temp data corrections:
     // unveilAction('visitShrineBehindWaterfall')
@@ -128,27 +127,101 @@ function debug() {
     // data.displayJob = true;
 
 
-    buyUpgrade("askAboutBetterWork");
-    buyUpgrade("investMyGold");
-    buyUpgrade("investMyGold");
-    buyUpgrade("feelTheEchoesOfTheBurntTown");
-    buyUpgrade("feelTheEchoesOfTheBurntTown");
-    buyUpgrade("fightAlongsideAllies");
-    buyUpgrade("increaseInitialInvestment");
+    buyUpgrade("askAboutBetterWork"); //1, 30 --
+    buyUpgrade("investMyGold"); //1, 20
+    buyUpgrade("investMyGold"); //2, 40
+    buyUpgrade("feelTheEchoesOfTheBurntTown"); //1, 20
+    buyUpgrade("feelTheEchoesOfTheBurntTown"); //2, 40
+    buyUpgrade("fightAlongsideAllies"); //1, 30 --
+    buyUpgrade("increaseInitialInvestment"); //1, 40
+
+    //only if the save has skipped the unlock point
+    // unveilAction('invest');
+    // unveilAction('feelAGentleTug');
 
 
-    unveilAction('invest');
+    buyUpgrade("buyNicerStuff"); //1, 70
+    buyUpgrade("investMyGold"); //3, 80
+    buyUpgrade("increaseInitialInvestment"); //2, 60
+    buyUpgrade("increaseInitialInvestment"); //3, 90
+    buyUpgrade("feelTheEchoesOfTheBurntTown"); //3, 80 --
+    buyUpgrade("learnFromTheLibrary"); //1, 200
 
 
-    buyUpgrade("buyNicerStuff");
-    buyUpgrade("investMyGold");
-    buyUpgrade("increaseInitialInvestment");
-    buyUpgrade("feelTheEchoesOfTheBurntTown");
-    buyUpgrade("learnFromTheLibrary");
-    buyUpgrade("increaseInitialInvestment");
+    //foreach action, automation on
+    for(let actionVar in data.actions) {
+        if(["overcharge", "overboost", "prepareInternalSpells", "earthMagic", "moveEarth", "hardenEarth", "shapeEarth", "moveIron", "reinforceArmor", "restoreEquipment", "practicalMagic", "illuminate", "unblemish", "manaTransfer"].includes(actionVar)) {
+            continue;
+        }
+        let actionObj = data.actions[actionVar];
+        let dataObj = actionData[actionVar];
+        actionObj.automationOff = false;
+    }
+
+    buyUpgrade("keepMyMagicReady"); //1, 100 --
+    buyUpgrade("buyNicerStuff"); //2, 210
+    buyUpgrade("buyNicerStuff"); //3, 630 --
+    buyUpgrade("investMyGold"); //4, 160
+    buyUpgrade("investMyGold"); //5, 320
+    buyUpgrade("investMyGold"); //6, 640 --
+    buyUpgrade("increaseInitialInvestment"); //4, 135
+    buyUpgrade("increaseInitialInvestment"); //5, 202 --
+    buyUpgrade("learnFromTheLibrary"); //2, 400
+    buyUpgrade("learnFromTheLibrary"); //3, 800
+    buyUpgrade("increaseMarketCap"); //1, 200
+    buyUpgrade("increaseMarketCap"); //2, 300
+    buyUpgrade("increaseMarketCap"); //3, 450
+    buyUpgrade("increaseMarketCap"); //4, 675
+    buyUpgrade("trainTogetherMore"); //1, 400
+    buyUpgrade("stopBeingSoTense"); //1, 500 --
+    buyUpgrade("refineMyLeverage"); //1, 100
+    buyUpgrade("refineMyLeverage"); //2, 300
+    buyUpgrade("refineMyWizardry"); //1, 200
+
+    statAddAmount("legacy", 28e6)
+    purchaseAction("overponder");
+    buyUpgrade("createABetterFoundation"); //1, 500
+    buyUpgrade("createABetterFoundation"); //2, 750
+    buyUpgrade("createABetterFoundation"); //3, 1125
+    buyUpgrade("workHarder"); //1, 600
+    buyUpgrade("workHarder"); //2, 900
+    buyUpgrade("haveBetterConversations"); //1, 800
+    buyUpgrade("sparkMoreMana"); //1, 800
+    buyUpgrade("studyHarder"); //1, 1000
+    buyUpgrade("rememberWhatIDid"); //1, 600 --
+    buyUpgrade("retrieveMyUnusedResources"); //1, 500
+    buyUpgrade("retrieveMyUnusedResources"); //2, 750
+    buyUpgrade("retrieveMyUnusedResources"); //3, 1125 --
+
+    buyUpgrade("learnFromTheLibrary"); //4, 1600
+    buyUpgrade("learnFromTheLibrary"); //5, 3200 --
+    buyUpgrade("improveMyHouse"); //1, 400
+    buyUpgrade("improveMyHouse"); //2, 1200
+    buyUpgrade("improveMyHouse"); //3, 3600 --
+
+    buyUpgrade("rememberHowIGrew"); //1, 2000 --
+    buyUpgrade("rememberMyMastery"); //1, 6000 --
+    // buyUpgrade("increaseMarketCap"); //5, 1013 --
+    // buyUpgrade("trainTogetherMore"); //2, 800
+    // buyUpgrade("trainTogetherMore"); //3, 1600 --
+    // buyUpgrade("createABetterFoundation"); //4, 1688 --
+    // buyUpgrade("workHarder"); //3, 1200
+    // buyUpgrade("workHarder"); //4, 1800 --
+    // buyUpgrade("haveBetterConversations"); //2, 1200
+    // buyUpgrade("haveBetterConversations"); //3, 1800
+    // buyUpgrade("haveBetterConversations"); //4, 2700 --
+    // buyUpgrade("sparkMoreMana"); //2, 1600
+    // buyUpgrade("sparkMoreMana"); //3, 3200
+    // buyUpgrade("sparkMoreMana"); //4, 6400
+    // buyUpgrade("studyHarder"); //2, 1500
+    // buyUpgrade("studyHarder"); //3, 2250
+    // buyUpgrade("studyHarder"); //4, 3375 --
 
 
-    // buyUpgrade("increaseInitialInvestment");
+
+
+
+
 
     // setSliderUI("overclock", "reflect", 100);
 
@@ -199,7 +272,7 @@ function initializeData() {
     createAndLinkNewAttribute("introspection", "integration");
     createAndLinkNewAttribute("introspection", "intellect");
     createAndLinkNewAttribute("introspection", "comfort");
-    createAndLinkNewAttribute("introspection", "stillness");
+    createAndLinkNewAttribute("introspection", "peace");
 
     createAndLinkNewAttribute("magic", "concentration");
     createAndLinkNewAttribute("magic", "cycle");
@@ -266,9 +339,9 @@ function initializeData() {
     create("checkNoticeBoard", ["reportForTraining", "reportForLabor"], 1.5, -1);
     create("makeMoney", ["spendMoney"], 1, -1);
     create("spendMoney", ["buyBasicSupplies", "buySocialAccess", "buyMarketItems"], 0, -1);
-    create("buyBasicSupplies", ["buyBasicClothes", "buyStreetFood"], -.2, -1.5);
-    create("buyBasicClothes", ["buyTravelersClothes", "buyMatchingClothes"], -.5, -1.5);
-    create("buyTravelersClothes", ["buyTravelersGear"], -1.2, -.2);
+    create("buyBasicSupplies", ["buyBasicClothes", "buyStreetFood", "buyHouse"], -.2, -1.5);
+    create("buyBasicClothes", ["buyTravelersClothes", "buyMatchingClothes"], -1, -1.3);
+    create("buyTravelersClothes", ["buyTravelersGear"], -1, -.2);
     create("buyMarketItems", ["buyShopItems"], 1, -1);
     create("buyShopItems", ["invest", "buyUtilityItems"], 0, -1);
     create("buyStreetFood", ["buyGoodFood"], -1.1, -.5);
@@ -276,12 +349,13 @@ function initializeData() {
     create("buyMatchingClothes", ["buyStylishClothes"], -1, -1.2);
     create("buyStylishClothes", ["buyComfyShoes"], -1, -.2);
 
-    create("buyComfyShoes", [], -1, 0);
+    create("buyComfyShoes", [], -1, .1);
     create("buyTravelersGear", [], -1, 0);
     create("buyArtisanFood", [], -1, .2);
     create("buyUtilityItems", ["buyPotions", "buyTools"], -.1, -1);
-    create("buyPotions", [], -.1, -1);
-    create("buyTools", [], -1.1, -1);
+    create("buyPotions", [], .9, -1);
+    create("buyTools", ["buyCart"], -.1, -1);
+    create("buyCart", [], 1, -1);
 
 
     create("buySocialAccess", ["slideTheCoin", "buyPointyHat"], -1, -.1);
@@ -289,7 +363,7 @@ function initializeData() {
     create("buyCoffee", [], -1, -.1);
     create("buyPointyHat", [], 0, .9);
 
-    create("reportForLabor", ["oddJobsLaborer", "digFoundation"], 1, 0);
+    create("reportForLabor", ["oddJobsLaborer", "worksiteSweeper"], 1, 0);
     create("oddJobsLaborer", ["chimneySweep"], .5, -1);
 
 
@@ -299,26 +373,34 @@ function initializeData() {
     create("spendFortune", ["investInLocals", "fundTownImprovements", "investInSelf"], 0, -1);
 
     create("investInLocals", ["hostAFestival"], -1.5, -1);
-    create("hostAFestival", ["fundATemporaryStall"], -.5, -1);
+    create("hostAFestival", ["fundASmallStall"], -.5, -1);
 
-    create("fundATemporaryStall", [], 0, -1);
+    create("fundASmallStall", [], 0, -1);
     // create("fundATemporaryMarket", [], 0, -1);
     // create("establishPermanentShoppingArea", [], 0, -1);
     // create("bolsterMarket", [], 0, -1);
 
-    create("fundTownImprovements", ["supportLocalLibrary", "recruitAnEngineer"], 0, -1.5);
-    create("supportLocalLibrary", ["expandLibrary"], 0, -1);
-    create("expandLibrary", ["sourceRareBooks"], 0, -1);
+    create("fundTownImprovements", ["supportLocalLibrary", "recruitACarpenter"], 0, -1.5);
+    create("supportLocalLibrary", ["expandLocalLibrary"], 0, -1);
+    create("expandLocalLibrary", ["sourceRareBooks"], 0, -1);
     create("sourceRareBooks", [], 0, -1);
 
-    create("recruitAnEngineer",["procureStoneAndWood"], -1, -1);
-    create("procureStoneAndWood",[], 0, -1);
+    create("recruitACarpenter",["procureQualityWood"], -1, -1);
+    create("procureQualityWood",[], 0, -1);
 
-    create("investInSelf", ["makeAGenerousDonation", "purchaseADeed"], 1.5, -1);
-    create("makeAGenerousDonation", [], -.5, -1);
-    create("purchaseADeed", [], .5, -1);
+    create("investInSelf", ["makeAPublicDonation", "purchaseALot"], 1.5, -1);
+    create("makeAPublicDonation", [], -.5, -1);
+    create("purchaseALot", [], .5, -1);
 
 
+    create("buyHouse", ["buyHouseholdItems"], 0, -1.6);
+    create("buyHouseholdItems", ["buyFurniture"], -.2, -1.2);
+    create("buyFurniture", ["buyReadingChair", "buyBed"], -1, -.5);
+    create("buyReadingChair", ["buyFireplace"], -.5, -1);
+    create("buyFireplace", ["buyGoodFirewood"], -1.1, -.2);
+    create("buyGoodFirewood", [], -1.1, .1);
+    create("buyBed", ["buySilkSheets"], -1, -.2);
+    create("buySilkSheets", [], -1, 0);
 
 //--From Upgrades:--
 
@@ -396,14 +478,15 @@ function initializeData() {
     create("townCrier", ["storyTeller"], .3, -1);
     create("storyTeller", [], .35, -1);
 
-    create("digFoundation", ["stoneCompression"], 1.5, -.9);
-    create("stoneCompression", ["shapeBricks"], .07, -1);
-    create("shapeBricks", ["tidyMagesmithShop"], .13, -1);
-    create("tidyMagesmithShop", ["clearTheBasement"], .2, -1);
-    create("clearTheBasement", ["moldBarsFromScrap"], .27, -1);
-    create("moldBarsFromScrap", ["mendGearCracks"], .34, -1);
-    create("mendGearCracks", ["assistantMagesmith"], .41, -1);
-    create("assistantMagesmith", [], .48, -1);
+    create("worksiteSweeper", ["digFoundation"], 1.5, -.9);
+    create("digFoundation", ["stoneCompression"], .07, -1);
+    create("stoneCompression", ["shapeBricks"], .13, -1);
+    create("shapeBricks", ["tidyMagesmithShop"], .2, -1);
+    create("tidyMagesmithShop", ["clearTheBasement"], .27, -1);
+    create("clearTheBasement", ["moldBarsFromScrap"], .34, -1);
+    create("moldBarsFromScrap", ["mendGearCracks"], .41, -1);
+    create("mendGearCracks", ["assistantMagesmith"], .48, -1);
+    create("assistantMagesmith", [], .54, -1);
 
 
 //Travelling onwards / hermit / dungeon
@@ -416,8 +499,8 @@ function initializeData() {
     create("feelAGentleTug", ["leaveTheOpenRoad"], 1.5, 1);
     create("leaveTheOpenRoad", ["findOverlook", "discoverBurntTown"], 1, 1);
     create("findOverlook", [], .5, 1);
-    create("discoverBurntTown", ["stepThroughAsh", "feelTheRage", "resonanceCompass", "repairShatteredShrine"], 1, 0);
-    create("feelTheRage", [], 0, 1);
+    create("discoverBurntTown", ["stepThroughAsh", "resonanceCompass", "feelTheDespair", "repairShatteredShrine"], 1, 0);
+    create("feelTheDespair", [], 0, 1);
     create("repairShatteredShrine", [], 0, -1);
     create("stepThroughAsh", ["graspTheTragedy"], 1, .5);
     create("graspTheTragedy", [], 1, 1);
@@ -454,7 +537,8 @@ function initializeData() {
 
     create("readBooks", ["catalogNewBooks", "study"], -2, 0);
     create("catalogNewBooks", ["buildPersonalLibrary"], -1, 0);
-    create("buildPersonalLibrary", [], 0, 1);
+    create("buildPersonalLibrary", ["expandPersonalLibrary"], -1, .5);
+    create("expandPersonalLibrary", [], -1, .5);
     create("study", ["researchBySubject"], -1, -1);
     create("researchBySubject", ["studyHistory", "studyMath", "studyMagic"], -1, -1);
 
@@ -466,8 +550,9 @@ function initializeData() {
     create("readOldPhilosophy", [], -.5, -1);
     create("readWarJournals", [], 0, -1);
 
-    create("studyMath", ["studyArchitecture"], -1, .5);
-    create("studyArchitecture", [], 0, 1);
+    create("studyMath", ["studyCryptology", "studyArchitecture"], -1, .5);
+    create("studyCryptology", [], -.5, 1);
+    create("studyArchitecture", [], .5, 1);
 
     create("studyMagic", ["studySupportSpells"], -1, -.5);
     create("studySupportSpells", ["studyEarthMagic", "studyPracticalMagic"], -1, .5);
@@ -490,9 +575,12 @@ function initializeData() {
     create("askAboutLocalWork", [], 0, 1);
     create("askAboutArcaneCorps", ["getTestedForKnowledge", "discussPlacement"], 1, .2);
     create("getTestedForKnowledge", [], 0, 1);
-    create("discussPlacement", ["meetTheMages"], 1, 0);
+    create("discussPlacement", ["meetTheMages"], 1, -.1);
     create("meetTheMages", ["trainWithTeam"], .3, -1);
     create("trainWithTeam", [], 0, -1.2);
+
+
+
 
 
 

@@ -295,12 +295,12 @@ const actionTextData = `
 	</discoverBurntTown>
     
     
-	<feelTheRage>
+	<feelTheDespair>
         <english><![CDATA[
             (WIP)
             The town is scarred. I can see it in the way some of the standing buildings have gashes in them, in the way that doors and windows were boarded up. Whatever took this place, it was no accidental fire.
         ]]></english>
-	</feelTheRage>
+	</feelTheDespair>
     
     
 	<repairShatteredShrine>

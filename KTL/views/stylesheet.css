@@ -95,7 +95,7 @@
     --fortune-color-bg: #2a0c3f;
     --research-color: #c2a68a;
     --research-color-dim: #936a3f;
-    --research-color-bg: #8f5d13;
+    --research-color-bg: #5d3f13;
     --conversations-color: #429977;
     --conversations-color-dim: #36765e;
     --conversations-color-bg: #162d23;
@@ -197,6 +197,11 @@ body.lightMode {
     filter: invert(86%) sepia(43%) saturate(2850%) hue-rotate(359deg) brightness(103%) contrast(97%)
 drop-shadow(0 0 3px #FCEE36)
 drop-shadow(0 0 8px #FCEE36);
+}
+.spellIconSvg {
+    filter: invert(85%) sepia(13%) saturate(1145%) hue-rotate(130deg) brightness(96%) contrast(91%)
+    drop-shadow(0 0 3px #0ec3cf)
+    drop-shadow(0 0 8px #0ec3cf);
 }
 .generatorIconSvg {
     filter:
@@ -413,6 +418,9 @@ input {
     background-color: var(--accent-tertiary);
 }
 
+.mouseoverRed:hover {
+    background-color:red;
+}
 .continueButton {
     display: block;
     margin: 20px auto 0 auto;

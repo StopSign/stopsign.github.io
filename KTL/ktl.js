@@ -280,6 +280,8 @@ function useAmulet() {
         views.updateActionUnlockedViews(actionObj)
     }
 
+    applyUpgradeEffects()
+
     data.currentWage = 1;
     data.currentJob = "helpScottWithChores";
     document.getElementById("jobTitle").textContent = data.actions[data.currentJob] ? actionData[data.currentJob].title : data.currentJob;

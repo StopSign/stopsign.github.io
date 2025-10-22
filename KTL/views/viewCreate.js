@@ -78,43 +78,85 @@ function generateActionDisplay(actionVar) {
     let resourceColor = getResourceColor(actionObj);
     let resourceColorDim = getResourceColorDim(actionObj);
 
+    queueCache(`${actionVar}HighestLevelContainer`);
+    queueCache(`${actionVar}HighestLevel`);
+    queueCache(`${actionVar}SecondHighestLevelContainer`);
+    queueCache(`${actionVar}SecondHighestLevel`);
+    queueCache(`${actionVar}ThirdHighestLevelContainer`);
+    queueCache(`${actionVar}ThirdHighestLevel`);
+    queueCache(`${actionVar}CurrentUnlockTimeContainer`)
+    queueCache(`${actionVar}CurrentUnlockTime`);
+    queueCache(`${actionVar}PrevUnlockTimeContainer`)
+    queueCache(`${actionVar}PrevUnlockTime`);
+    queueCache(`${actionVar}DeltaUnlockTimeContainer`)
+    queueCache(`${actionVar}DeltaUnlockTime`);
+
+    let iconImgName = (actionObj.isGenerator?"gear":actionObj.isSpell?"spell":"lightning") + actionObj.tier;
+
+    let icon = Raw.html`
+        <span style="position:absolute;top:-43px;left:-40px;width:40px;height:40px;" class="showthat" onmouseover="hoveringIcon('${actionVar}')" onmouseleave="stopHoveringIcon('${actionVar}')">
+            <img class="${actionObj.isGenerator?'generatorIconSvg':actionObj.isSpell?"spellIconSvg":'actionIconSvg'}" src="img/${iconImgName}.svg" alt="${iconImgName}" style="width:100%;height:100%;" />
+            <div class="showthisUp" style="font-size:16px;width:350px">
+                <div style="font-size:20px;">Tier ${actionObj.tier + (actionObj.isGenerator?" Generator":actionObj.isSpell?" Spell":" Action")} 
+                </div>
+                
+                ${dataObj.iconText ? dataObj.iconText[language]+"<br>" : ""}
+                
+                <div id="${actionVar}HighestLevelContainer" style="display:none">
+                    <br>
+                    Highest level: <span id="${actionVar}HighestLevel" style="font-weight:bold;"></span>
+                </div>
+                <div id="${actionVar}SecondHighestLevelContainer" style="display:none">
+                    Second highest: <span id="${actionVar}SecondHighestLevel" style="font-weight:bold;"></span>
+                </div>
+                <div id="${actionVar}ThirdHighestLevelContainer" style="display:none">
+                    Third highest: <span id="${actionVar}ThirdHighestLevel" style="font-weight:bold;"></span>
+                </div>
+                
+                
+                <div id="${actionVar}CurrentUnlockTimeContainer" style="display:none">
+                    <br>
+                    Current Unlock Time: <span id="${actionVar}CurrentUnlockTime" style="font-weight:bold;"></span>
+                </div>
+                <div id="${actionVar}PrevUnlockTimeContainer" style="display:none">
+                    Previous Unlock Time: <span id="${actionVar}PrevUnlockTime" style="font-weight:bold;"></span>
+                </div>
+                <div id="${actionVar}DeltaUnlockTimeContainer" style="display:none">
+                    Delta Unlock Time: <span id="${actionVar}DeltaUnlockTime" style="font-weight:bold;"></span>
+                </div>
+            </div>
+        </span>
+    `
+
+    queueCache(`${actionVar}PauseButton`);
+    queueCache(`${actionVar}Title`);
     queueCache(`${actionVar}Tier`);
     queueCache(`${actionVar}Resource`);
     queueCache(`${actionVar}ResourceToAdd`);
+    queueCache(`${actionVar}ResourceRetrieved`);
     queueCache(`${actionVar}Level`);
     queueCache(`${actionVar}MaxLevel`);
-    queueCache(`${actionVar}HighestLevelContainer2`);
-    queueCache(`${actionVar}HighestLevel2`);
     queueCache(`${actionVar}Efficiency`);
     queueCache(`${actionVar}Wage`);
     queueCache(`${actionVar}Instability`);
     queueCache(`${actionVar}InstabilityToAdd`);
 
-
-    let iconImgName = (actionObj.isGenerator?"gear":"lightning") + actionObj.tier;
-
-    let icon = Raw.html`
-        <span style="position:absolute;top:-43px;left:-40px;width:40px;height:40px;" class="showthat">
-            <img class="${actionObj.isGenerator?'generatorIconSvg':'actionIconSvg'}" src="img/${iconImgName}.svg" alt="${iconImgName}" style="width:100%;height:100%;" />
-            <div class="showthisUp" style="font-size:20px;width:150px">Tier ${actionObj.tier + (actionObj.isGenerator?" Generator":" Action")} </div>
-        </span>
-    `
+    let pauseButton = `<span id="${actionVar}PauseButton" style="font-size:16px;border:2px solid red;font-weight:bold;vertical-align:top;padding:0 3px" class="mouseoverRed" onclick="pauseAction(event, '${actionVar}')">||</span>`
 
     let title = Raw.html`
         <span onclick="actionTitleClicked('${actionVar}')" style="color:var(--text-primary);cursor:pointer;position:absolute;
             top:-82px;height:82px;left:0;white-space: nowrap;border-width: 0 0 0 6px;border-style:solid;
             border-color:${resourceColorDim};padding-left:4px;text-shadow:1px 1px 2px var(--text-dark);">
-            <span style="font-size:20px;font-weight:bold;">${dataObj.title}<br></span>
-            <span style="font-size:18px;font-weight:bold;" id='${actionVar}Resource'>0</span> 
+            ${(dataObj.isSpell || dataObj.isSpellConsumer) ? pauseButton : ""}
+            <span style="font-size:20px;font-weight:bold;" id="${actionVar}Title">${dataObj.title}<br></span>
+            <span style="font-size:18px;font-weight:bold;" id="${actionVar}Resource">0</span> 
             <span style="color:${resourceColor};font-size:16px;font-weight:bold;">${capitalizeFirst(dataObj.resourceName)}</span>
+            <span style="font-size:16px;font-weight:bold" id="${actionVar}ResourceRetrieved"></span>
             <span style="font-size:14px;color:var(--text-muted)">${actionObj.isGenerator?`(+<span id="${actionVar}ResourceToAdd" 
                 style="color:var(--text-primary);font-weight:bold;">???</span>)`:""}</span><br>
             <span style="font-size:14px;position:relative;color:var(--text-muted)">
                 ${!actionObj.isSpell?"Level ":"Charges "}<span id="${actionVar}Level" style="color:var(--text-primary);font-weight:bold;">0</span>
-                ${actionObj.maxLevel !== undefined ? ` / <span id="${actionVar}MaxLevel" style="color:var(--text-primary);font-weight:bold;">0</span>` : ""}
-                <span id="${actionVar}HighestLevelContainer2"> 
-                    (<span id='${actionVar}HighestLevel2' style="color:var(--text-primary);font-weight:bold;"></span>)
-                </span> | 
+                ${actionObj.maxLevel !== undefined ? ` / <span id="${actionVar}MaxLevel" style="color:var(--text-primary);font-weight:bold;">0</span>` : ""} | 
                 <span id="${actionVar}Efficiency" style="color:var(--text-primary);font-weight:bold;"></span>% efficiency
                 ${!actionObj.wage ? "" : ` | Wage: $<span id="${actionVar}Wage" style="color:var(--wage-color);font-weight:bold;"></span>`}
                 ${!actionObj.isSpell ? "" : ` | <span id="${actionVar}Instability" style="color:var(--text-primary);font-weight:bold;">0</span>% instability
@@ -274,40 +316,6 @@ let maxLevelTop = (data.gameSettings.viewDeltas && data.gameSettings.viewRatio) 
         ${!actionObj.isGenerator ? "" : `x<b><span id="${actionVar}ActionPower"></b> total Action Power<br>`}
         ${dataObj.onLevelText ? dataObj.onLevelText[language]:""}`;
 
-    queueCache(`${actionVar}HighestLevelContainer`);
-    queueCache(`${actionVar}HighestLevel`);
-    queueCache(`${actionVar}SecondHighestLevelContainer`);
-    queueCache(`${actionVar}SecondHighestLevel`);
-    queueCache(`${actionVar}ThirdHighestLevelContainer`);
-    queueCache(`${actionVar}ThirdHighestLevel`);
-    queueCache(`${actionVar}CurrentUnlockTimeContainer`)
-    queueCache(`${actionVar}CurrentUnlockTime`);
-    queueCache(`${actionVar}PrevUnlockTimeContainer`)
-    queueCache(`${actionVar}PrevUnlockTime`);
-    queueCache(`${actionVar}DeltaUnlockTimeContainer`)
-    queueCache(`${actionVar}DeltaUnlockTime`);
-
-    let upgradeInfoText = Raw.html`<br>
-        <div id="${actionVar}HighestLevelContainer" style="display:none">
-            Highest level (2x up to): <span id="${actionVar}HighestLevel" style="font-weight:bold;"></span>
-        </div>
-        <div id="${actionVar}SecondHighestLevelContainer" style="display:none">
-            Second Highest level (2x up to): <span id="${actionVar}SecondHighestLevel" style="font-weight:bold;"></span>
-        </div>
-        <div id="${actionVar}ThirdHighestLevelContainer" style="display:none">
-            Third Highest level (2x up to): <span id="${actionVar}ThirdHighestLevel" style="font-weight:bold;"></span>
-        </div>
-        
-        <div id="${actionVar}CurrentUnlockTimeContainer" style="display:none">
-            Current Unlock Time: <span id="${actionVar}CurrentUnlockTime" style="font-weight:bold;"></span>
-        </div>
-        <div id="${actionVar}PrevUnlockTimeContainer" style="display:none">
-            Previous Unlock Time: <span id="${actionVar}PrevUnlockTime" style="font-weight:bold;"></span>
-        </div>
-        <div id="${actionVar}DeltaUnlockTimeContainer" style="display:none">
-            Delta Unlock Time: <span id="${actionVar}DeltaUnlockTime" style="font-weight:bold;"></span>
-        </div>`;
-
 
     queueCache(`${actionVar}_infoContainer`);
 
@@ -318,7 +326,6 @@ let maxLevelTop = (data.gameSettings.viewDeltas && data.gameSettings.viewRatio) 
             ${actionObj.isGenerator?"":(`Consume and send rate is ${actionObj.tierMult()*100}% of ${dataObj.resourceName} * efficiency.<br>`)}<br>
             ${onComplete}
             ${onLevelText}
-            ${upgradeInfoText}
             ${dataObj.extraInfo ? dataObj.extraInfo[language]:""}
         </div>`;
 
