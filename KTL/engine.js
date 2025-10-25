@@ -67,6 +67,9 @@ function actionSetBaseVariables(actionObj, dataObj) {
     actionObj.progressMaxIncrease = dataObj.progressMaxIncrease;
     actionObj.visible = dataObj.visible === null ? true : dataObj.visible;
 
+    actionObj.prevUnlockTime = null;
+    actionObj.level1Time = null;
+
     // actionObj.visible = (globalVisible || dataObj.visible === null) ? true : dataObj.visible;
     actionObj.unlockCost = dataObj.unlockCost;
     actionObj.unlocked = dataObj.unlocked === null ? true : dataObj.unlocked;
@@ -120,7 +123,6 @@ function actionSetInitialVariables(actionObj, dataObj) {
     actionObj.highestLevel = -1;
     actionObj.secondHighestLevel = -1;
     actionObj.thirdHighestLevel = -1;
-    actionObj.prevUnlockTime = null;
 }
 
 function createAndLinkNewAction(actionVar, dataObj, downstreamVars) {
@@ -218,6 +220,9 @@ function checkLevelUp(actionObj, dataObj) {
         } else {
             actionObj.exp = 0;
         }
+        if(!actionObj.level1Time) {
+            actionObj.level1Time = data.secondsPerReset;
+        }
         actionObj.level++;
         actionObj.progressMaxBase *= actionObj.progressMaxIncrease;
         actionObj.progressMax = actionObj.progressMaxBase * actionObj.progressMaxMult * calcInstabilityEffect(actionObj.instability);
@@ -313,14 +318,13 @@ function actionUpdateAllStatMults() {
 //prepares the action to be unlocked during hte loop next round
 function purchaseAction(actionVar) {
     let actionObj = data.actions[actionVar];
-    let dataObj = actionData[actionVar];
     if(!actionObj) {
         console.log('tried to purchase ' + actionVar + ' in error.');
         return;
     }
     actionObj.purchased = true;
 
-    addLogMessage(`Permanently unlocked action: ${dataObj.title} in ${getPlaneNameFromNum(dataObj.plane)}`)
+    addLogMessage(actionVar, "purchaseAction")
 }
 
 function unveilAction(actionVar) {

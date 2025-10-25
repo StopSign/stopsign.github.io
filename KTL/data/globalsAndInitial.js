@@ -51,6 +51,7 @@ data.totalSpellPower = 0;
 data.focusSelected = [];
 data.resetLogs = [];
 data.currentLog = [];
+data.currentPinned = [];
 data.maxFocusAllowed = 2;
 data.focusMult = 2;
 data.focusLoopMax = 2.5;

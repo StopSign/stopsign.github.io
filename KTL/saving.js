@@ -23,9 +23,13 @@ function load() {
 
     if(onLoadData) {
         try {
-            toLoad = JSON.parse(decode(onLoadData));
+            toLoad = JSON.parse(decode64(onLoadData));
         } catch(e) {
-            exportErrorFile(onLoadData);
+            try { //old save
+                toLoad = JSON.parse(decode(onLoadData));
+            } catch(e) {
+                exportErrorFile(onLoadData);
+            }
         }
     }
     // if(localStorage[saveName]) {
@@ -94,6 +98,7 @@ function load() {
         data.focusLoopMax = toLoad.focusLoopMax ?? 2.5;
         data.lastVisit = toLoad.lastVisit ?? Date.now();
         data.currentLog = toLoad.currentLog ?? [];
+        data.currentPinned = toLoad.currentPinned ?? [];
         data.ancientCoinMultKTL = toLoad.ancientCoinMultKTL ?? 1;
         data.legacyMultKTL = toLoad.legacyMultKTL ?? 1;
         data.totalSpellPower = toLoad.totalSpellPower ?? 0;
@@ -220,6 +225,7 @@ function updateUIOnLoad() {
 
     refreshResetLog()
     rebuildLog()
+    rebuildPinned()
 
     document.getElementById('viewDeltasSwitch').firstElementChild.style.left = data.gameSettings.viewDeltas ? "50%" : "0";
     document.getElementById('numberTypeSwitch').firstElementChild.style.left = data.gameSettings.numberType==="numberSuffix" ? "66.666%" : (data.gameSettings.numberType==="scientific" ? "33.333%" : "0");
@@ -331,7 +337,7 @@ function reapplyAttentionSelected() {
 }
 
 function save() {
-    window.localStorage[saveName] = encode(JSON.stringify(data));
+    window.localStorage[saveName] = encode64(JSON.stringify(data));
 }
 
 function exportSave() {

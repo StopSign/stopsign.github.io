@@ -202,6 +202,7 @@ function useAmulet() {
         let dataObj = actionData[actionVar];
         let newLevel = actionObj.level;
         actionObj.prevUnlockTime = actionObj.unlockTime;
+        actionObj.prevLevel1Time = actionObj.level1Time;
 
         if (data.upgrades.rememberWhatIDid.isFullyBought) {
             // Sort and insert the new level into the top 3 if applicable;
@@ -272,6 +273,7 @@ function useAmulet() {
     unveilAction('sparkMana')
     unveilAction('poolMana')
     unveilAction('expelMana')
+    actionTitleClicked("overclock", true);
 
     //force the UI reset:
     for(let actionVar in data.actions) {

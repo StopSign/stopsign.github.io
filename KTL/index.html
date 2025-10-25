@@ -73,16 +73,26 @@
         <div id="logMessages"></div>
     </div>
 </div>
-
 <div id="openLogButton" class="button" style="display:none;position:fixed;top:20px;right:15px;padding:8px;cursor:pointer;user-select:none;" onclick="toggleLog()">Open Log</div>
+
+<div id="pinnedWrapper" style="position:fixed;top:120px;right:11px;max-height:500px;overflow:auto;background-color:var(--overlay-color);
+    border: 1px solid var(--border-color);box-sizing: border-box;">
+    <span class="button" style="font-size:14px;position:absolute;padding:0px 1px;top:-1px;left:-2px;cursor:pointer;user-select:none;z-index:1;" onclick="togglePinned()">>></span>
+    <span style="font-size:14px;position:absolute;left:26px;user-select:none;padding:2px">Pinned</span>
+    <div id="pinnedContainer" style="height:100%;overflow-y:auto;box-sizing:border-box;padding-top:20px;">
+        <div id="pinnedActions"></div>
+    </div>
+</div>
+<div id="openPinnedButton" class="button" style="display:none;position:fixed;top:120px;right:15px;padding:8px;cursor:pointer;user-select:none;" onclick="togglePinned()">Open Pinned</div>
+
 
 
 <span class="button" id='openUseAmuletButton' onclick="openUseAmuletMenu(true)"
-      style="display:none;padding:8px 13px;top:22px;position:fixed;left:50%;transform:translateX(-50%);font-size:14px;">
+      style="display:none;padding:4px 5px;top:22px;position:fixed;left:50%;transform:translateX(-50%);font-size:14px;">
     Use the Amulet!
 </span>
 <span class="button" id='openViewAmuletButton' onclick="openUseAmuletMenu(false)"
-      style="display:none;padding:8px 13px;top:22px;position:fixed;left:50%;transform:translateX(-50%);font-size:14px;">
+      style="display:none;padding:4px 5px;bottom:63px;position:fixed;left:50%;transform:translateX(-50%);font-size:14px;">
     View Amulet Upgrades!
 </span>
 
@@ -114,7 +124,7 @@
     </div>
 
     <div style="position:relative;display:flex;flex-direction:column;align-items:center;flex-grow:1;justify-content:flex-end;">
-        <span class="button" style="padding:6px 20px;position: absolute;top:-35px;font-weight:bold;pointer-events:auto;" id='pauseButton' onclick="pauseGame()">|| Pause</span>
+        <span class="button" style="padding:4px 13px;position: absolute;top:-35px;font-weight:bold;pointer-events:auto;" id='pauseButton' onclick="pauseGame()">|| Pause</span>
 
         <div style="display:flex;justify-content:center;gap:5px;font-size:20px;width:100%;">
             <div id="planeButton0" class="hyperVisible planeButton0" onclick="switchToPlane(0)" style="max-width:200px;height:60px;pointer-events:auto;
@@ -268,6 +278,9 @@ It continues, capturing fraction ancientCoin of your fleeting soul and sending i
 <script src="views/viewUpdating.js"></script>
 <script src="saving.js"></script>
 <script src="actionData.js"></script>
+<script src="actionData2.js"></script>
+<script src="actionData3.js"></script>
+<script src="actionData4.js"></script>
 <script src="events.js"></script>
 <script src="engine.js"></script>
 <script src="helpers/hotkeys.js"></script>

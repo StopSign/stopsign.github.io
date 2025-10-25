@@ -219,6 +219,9 @@ let views = {
             views.updateVal(`${actionVar}Instability`, instaColor, "style.color");
             roundedNumbers.push(["instability", 2]);
             views.updateVal(`${actionVar}InstabilityToAdd`, dataObj.instabilityToAdd/(actionObj.efficiency/100), "textContent", 2);
+            if(actionObj.power) {
+                views.updateVal(`${actionVar}SpellPower`, actionObj.power, "textContent", 1);
+            }
         }
 
         for(let numberObj of roundedNumbers) {
@@ -244,14 +247,29 @@ let views = {
         views.updateVal(`${actionVar}ThirdHighestLevelContainer`, data.upgrades.rememberMyMastery.isFullyBought && actionObj.thirdHighestLevel >= 0 ? "" : "none", "style.display");
 
         if(dataObj.hoveringIcon) {
-            views.updateVal(`${actionVar}CurrentUnlockTimeContainer`, actionObj.unlockTime ? "" : "none", "style.display");
-            views.updateVal(`${actionVar}CurrentUnlockTime`, actionObj.unlockTime, "textContent", "time");
-            views.updateVal(`${actionVar}PrevUnlockTimeContainer`, actionObj.prevUnlockTime ? "" : "none", "style.display");
-            views.updateVal(`${actionVar}PrevUnlockTime`, actionObj.prevUnlockTime, "textContent", "time");
-            if (actionObj.prevUnlockTime && actionObj.unlockTime) {
-                views.updateVal(`${actionVar}DeltaUnlockTimeContainer`, "", "style.display");
-                views.updateVal(`${actionVar}DeltaUnlockTime`, Math.abs(actionObj.unlockTime - actionObj.prevUnlockTime), "textContent", "time");
-                views.updateVal(`${actionVar}DeltaUnlockTime`, actionObj.unlockTime - actionObj.prevUnlockTime < 0 ? "green" : "red", "style.color");
+
+            if(dataObj.plane !== 1) {
+                views.updateVal(`${actionVar}CurrentUnlockTimeContainer`, actionObj.unlockTime ? "" : "none", "style.display");
+                views.updateVal(`${actionVar}CurrentUnlockTime`, actionObj.unlockTime, "textContent", "time");
+                views.updateVal(`${actionVar}PrevUnlockTimeContainer`, actionObj.prevUnlockTime ? "" : "none", "style.display");
+                views.updateVal(`${actionVar}PrevUnlockTime`, actionObj.prevUnlockTime, "textContent", "time");
+                if (actionObj.prevUnlockTime && actionObj.unlockTime) {
+                    views.updateVal(`${actionVar}DeltaUnlockTimeContainer`, "", "style.display");
+                    views.updateVal(`${actionVar}DeltaUnlockTime`, Math.abs(actionObj.unlockTime - actionObj.prevUnlockTime), "textContent", "time");
+                    views.updateVal(`${actionVar}DeltaUnlockTime`, actionObj.unlockTime - actionObj.prevUnlockTime < 0 ? "green" : "red", "style.color");
+                }
+            }
+
+            if(dataObj.plane === 1) {
+                views.updateVal(`${actionVar}CurrentLevel1TimeContainer`, actionObj.level1Time ? "" : "none", "style.display");
+                views.updateVal(`${actionVar}CurrentLevel1Time`, actionObj.level1Time, "textContent", "time");
+                views.updateVal(`${actionVar}PrevLevel1TimeContainer`, actionObj.prevLevel1Time ? "" : "none", "style.display");
+                views.updateVal(`${actionVar}PrevLevel1Time`, actionObj.prevLevel1Time, "textContent", "time");
+                if (actionObj.prevLevel1Time && actionObj.level1Time) {
+                    views.updateVal(`${actionVar}DeltaLevel1TimeContainer`, "", "style.display");
+                    views.updateVal(`${actionVar}DeltaLevel1Time`, Math.abs(actionObj.level1Time - actionObj.prevLevel1Time), "textContent", "time");
+                    views.updateVal(`${actionVar}DeltaLevel1Time`, actionObj.level1Time - actionObj.prevLevel1Time < 0 ? "green" : "red", "style.color");
+                }
             }
         }
 
@@ -262,7 +280,7 @@ let views = {
         views.updateVal(`${actionVar}Container`, actionObj.mouseOnThis?"100":"0", "style.zIndex");
 
         views.updateVal(`${actionVar}ResourceRetrieved`, actionObj.resourceRetrieved > 0 ? "" : "none", "style.display");
-        views.updateVal(`${actionVar}ResourceRetrieved`, actionObj.resourceRetrieved > 0 ?`(-${intToString(actionObj.resourceRetrieved * data.gameSettings.ticksPerSecond, 2)})`:"", "textContent");
+        views.updateVal(`${actionVar}ResourceRetrieved`, actionObj.resourceRetrieved > 0 ?`(-${intToString(actionObj.resourceRetrieved * data.gameSettings.ticksPerSecond, 2)}/s)`:"", "textContent");
     },
     updateActionLockedViews: function(actionObj) {
         let actionVar = actionObj.actionVar;
@@ -330,7 +348,7 @@ let views = {
             roundedNumbers.push(["resourceToAdd", 2]);
             roundedNumbers.push(["actionPower", 4]);
         }
-        if(actionVar === "hearAboutTheLich") {
+        if(actionVar === "hearAboutTheLich" || actionVar === "study") {
             roundedNumbers.push(["actionPower2", 2]);
         }
         if(dataObj.hoveringIcon) {

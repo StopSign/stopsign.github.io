@@ -421,6 +421,9 @@ input {
 .mouseoverRed:hover {
     background-color:red;
 }
+.mouseoverBlue:hover {
+    background-color: var(--accent-tertiary);
+}
 .continueButton {
     display: block;
     margin: 20px auto 0 auto;

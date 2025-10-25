@@ -341,6 +341,18 @@ function numberToWords(n) {
     return capitalizeFirst(number2Words(n));
 }
 
+function encode64(theSave) {
+    return Base64.encode(theSave);
+}
+
+function decode64(encodedSave) {
+    try {
+        return Base64.decode(encodedSave);
+    } catch(e) {
+        return {};
+    }
+}
+
 function encode(theSave) {
     return Base64.encode(LZWEncode(theSave));
 }

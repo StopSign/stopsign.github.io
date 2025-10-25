@@ -41,11 +41,6 @@ document.addEventListener("keydown", function(e) {
         setZoomNoMouse(scaleByPlane[data.planeTabSelected] + scaleStep*2)
     }
 
-
-    if(keysPressed['r'] && isShowing) {
-        actionTitleClicked('overclock');
-    }
-
     if(isShowing && !animationFrameId && ['w', 's', 'arrowup', 'arrowdown'].includes(key)) {
         moveMenuScroll();
     }

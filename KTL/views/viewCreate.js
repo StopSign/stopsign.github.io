@@ -84,12 +84,20 @@ function generateActionDisplay(actionVar) {
     queueCache(`${actionVar}SecondHighestLevel`);
     queueCache(`${actionVar}ThirdHighestLevelContainer`);
     queueCache(`${actionVar}ThirdHighestLevel`);
+
     queueCache(`${actionVar}CurrentUnlockTimeContainer`)
     queueCache(`${actionVar}CurrentUnlockTime`);
     queueCache(`${actionVar}PrevUnlockTimeContainer`)
     queueCache(`${actionVar}PrevUnlockTime`);
     queueCache(`${actionVar}DeltaUnlockTimeContainer`)
     queueCache(`${actionVar}DeltaUnlockTime`);
+
+    queueCache(`${actionVar}CurrentLevel1TimeContainer`)
+    queueCache(`${actionVar}CurrentLevel1Time`);
+    queueCache(`${actionVar}PrevLevel1TimeContainer`)
+    queueCache(`${actionVar}PrevLevel1Time`);
+    queueCache(`${actionVar}DeltaLevel1TimeContainer`)
+    queueCache(`${actionVar}DeltaLevel1Time`);
 
     let iconImgName = (actionObj.isGenerator?"gear":actionObj.isSpell?"spell":"lightning") + actionObj.tier;
 
@@ -124,6 +132,18 @@ function generateActionDisplay(actionVar) {
                 <div id="${actionVar}DeltaUnlockTimeContainer" style="display:none">
                     Delta Unlock Time: <span id="${actionVar}DeltaUnlockTime" style="font-weight:bold;"></span>
                 </div>
+                
+                
+                <div id="${actionVar}CurrentLevel1TimeContainer" style="display:none">
+                    <br>
+                    Current Level 1 Time: <span id="${actionVar}CurrentLevel1Time" style="font-weight:bold;"></span>
+                </div>
+                <div id="${actionVar}PrevLevel1TimeContainer" style="display:none">
+                    Previous Level 1 Time: <span id="${actionVar}PrevLevel1Time" style="font-weight:bold;"></span>
+                </div>
+                <div id="${actionVar}DeltaLevel1TimeContainer" style="display:none">
+                    Delta Level 1 Time: <span id="${actionVar}DeltaLevel1Time" style="font-weight:bold;"></span>
+                </div>
             </div>
         </span>
     `
@@ -140,19 +160,25 @@ function generateActionDisplay(actionVar) {
     queueCache(`${actionVar}Wage`);
     queueCache(`${actionVar}Instability`);
     queueCache(`${actionVar}InstabilityToAdd`);
+    queueCache(`${actionVar}SpellPower`);
+    queueCache(`${actionVar}SpellPowerContainer`);
 
     let pauseButton = `<span id="${actionVar}PauseButton" style="font-size:16px;border:2px solid red;font-weight:bold;vertical-align:top;padding:0 3px" class="mouseoverRed" onclick="pauseAction(event, '${actionVar}')">||</span>`
+    let spellPowerContainer = `<span style="font-size:16px;"> | <span style="font-weight:bold;color:#0ec3cf" id="${actionVar}SpellPower"></span> Spell Power</span>`
+    let pinButton = `<span id="${actionVar}PinButton" style="font-size:16px;border:2px solid ${resourceColorDim};font-weight:bold;vertical-align:top;padding:0 3px" class="mouseoverBlue" onclick="addPinnedActionClick(event, '${actionVar}')">P</span>`
 
     let title = Raw.html`
         <span onclick="actionTitleClicked('${actionVar}')" style="color:var(--text-primary);cursor:pointer;position:absolute;
             top:-82px;height:82px;left:0;white-space: nowrap;border-width: 0 0 0 6px;border-style:solid;
             border-color:${resourceColorDim};padding-left:4px;text-shadow:1px 1px 2px var(--text-dark);">
+            ${pinButton}
             ${(dataObj.isSpell || dataObj.isSpellConsumer) ? pauseButton : ""}
-            <span style="font-size:20px;font-weight:bold;" id="${actionVar}Title">${dataObj.title}<br></span>
+            <span style="font-size:20px;font-weight:bold;" id="${actionVar}Title">${dataObj.title}</span>
+            ${actionObj.power>0?spellPowerContainer:""}<br>
             <span style="font-size:18px;font-weight:bold;" id="${actionVar}Resource">0</span> 
             <span style="color:${resourceColor};font-size:16px;font-weight:bold;">${capitalizeFirst(dataObj.resourceName)}</span>
             <span style="font-size:16px;font-weight:bold" id="${actionVar}ResourceRetrieved"></span>
-            <span style="font-size:14px;color:var(--text-muted)">${actionObj.isGenerator?`(+<span id="${actionVar}ResourceToAdd" 
+            <span style="font-size:14px;color:var(--text-muted)">${(actionObj.isGenerator||dataObj.showToAdd)?`(+<span id="${actionVar}ResourceToAdd" 
                 style="color:var(--text-primary);font-weight:bold;">???</span>)`:""}</span><br>
             <span style="font-size:14px;position:relative;color:var(--text-muted)">
                 ${!actionObj.isSpell?"Level ":"Charges "}<span id="${actionVar}Level" style="color:var(--text-primary);font-weight:bold;">0</span>
@@ -162,13 +188,6 @@ function generateActionDisplay(actionVar) {
                 ${!actionObj.isSpell ? "" : ` | <span id="${actionVar}Instability" style="color:var(--text-primary);font-weight:bold;">0</span>% instability
                 (+<span id="${actionVar}InstabilityToAdd" style="color:var(--text-primary);font-weight:bold;"></span>)` }
             </span>
-        </span>
-    `
-
-    let mediumTitle = Raw.html`
-        <span onclick="actionTitleClicked('${actionVar}')" style="color:var(--text-primary);cursor:pointer;position:absolute;top:-77px;height:77px;left:0;
-            white-space: nowrap;border-width: 0 0 0 3px;border-style: solid;border-color: var(--text-muted);padding-left:4px;background-color:var(--overlay-color)">
-            
         </span>
     `
 
@@ -1026,6 +1045,7 @@ function setAllCaches() {
     queueCache("bonusDisplay");
     queueCache("killTheLichMenuButton2");
     queueCache("hearAboutTheLichActionPower2");
+    queueCache("studyActionPower2");
     queueCache("ancientCoinDisplay");
     queueCache("spellPowerDisplay");
     queueCache("jobDisplay");

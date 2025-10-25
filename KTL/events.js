@@ -780,12 +780,18 @@ function drawChart() {
     ctx.fillText(secondsToTime(maxTime), canvasWidth - padding, canvasHeight - padding + 20);
 }
 
-function addLogMessage(text) {
+function addLogMessage(text, type) {
+    return;
     const logContainer = document.getElementById('logContainer');
     const logMessages = document.getElementById('logMessages');
     const timestamp = secondsToTime(data.secondsPerReset);
-    const fullMessage = `${timestamp}: ${text}`;
-    data.currentLog.push(fullMessage);
+    let logData = {
+        theVar: text,
+        type: type,
+        timestamp: timestamp
+    }
+    const fullMessage = expandLogMessage`${timestamp}: ${text}`;
+    data.currentLog.push(logData);
     const messageElement = document.createElement('div');
     messageElement.innerHTML = fullMessage;
     messageElement.style.padding = '2px 8px';
@@ -793,6 +799,13 @@ function addLogMessage(text) {
     logMessages.appendChild(messageElement);
     if(isScrolledToBottom) {
         logContainer.scrollTop = logContainer.scrollHeight;
+    }
+}
+
+function expandLogMessage(info, type) {
+    if(type === "purchaseAction") {
+        let dataObj = actionData[info];
+        return `Permanently unlocked action: ${dataObj.title} in ${getPlaneNameFromNum(dataObj.plane)}`;
     }
 }
 
@@ -825,4 +838,62 @@ function rebuildLog() {
         logMessages.appendChild(messageElement);
     }
     logContainer.scrollTop = logContainer.scrollHeight;
+}
+
+
+
+function togglePinned() {
+    const pinnedWrapper = document.getElementById('pinnedWrapper');
+    const openPinnedButton = document.getElementById('openPinnedButton');
+    if (pinnedWrapper.style.display === 'none') {
+        pinnedWrapper.style.display = 'block';
+        openPinnedButton.style.display = 'none';
+    } else {
+        pinnedWrapper.style.display = 'none';
+        openPinnedButton.style.display = 'block';
+    }
+}
+
+function rebuildPinned() {
+    let tempArray = copyArray(data.currentPinned);
+    data.currentPinned = [];
+    for(let actionVar of tempArray) {
+        addPinnedAction(actionVar);
+    }
+}
+
+function addPinnedActionClick(event, actionVar) {
+    event.stopPropagation();
+    addPinnedAction(actionVar);
+}
+
+function addPinnedAction(actionVar) {
+    let dataObj = actionData[actionVar];
+    if(data.currentPinned.indexOf(actionVar) !== -1) {
+        return;
+    }
+    data.currentPinned.push(actionVar);
+
+    const messageElement = document.createElement('div');
+    //remove button (X) removes all listeners
+    messageElement.innerHTML = `<span id="${actionVar}Pin">
+        <span style="font-weight:bold;cursor:pointer;" onclick="actionTitleClicked('${actionVar}');">${dataObj.title}</span> 
+        [${dataObj.plane+1}]
+        <span style="border:2px solid #840000;cursor:pointer;" class="mouseoverRed" onclick="removePinnedAction('${actionVar}')">X</span>
+    </span>`;
+    messageElement.style.padding = '2px 8px';
+
+    document.getElementById("pinnedActions").appendChild(messageElement);
+}
+
+function removePinnedAction(actionVar) {
+    const pinElement = document.getElementById(`${actionVar}Pin`);
+    if (pinElement) {
+        pinElement.parentElement.remove();
+    }
+
+    const index = data.currentPinned.indexOf(actionVar);
+    if (index !== -1) {
+        data.currentPinned.splice(index, 1);
+    }
 }
