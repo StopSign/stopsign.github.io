@@ -259,7 +259,9 @@ const actionTextData = `
             
             This time, however, I was going to go prepared; I knew Fate could only bend so far at a time. I had just received magic, and knew that all I needed was to show I had the power to help, and the War for Life would let me join.<br><br>
             
-            So, I changed the target of Overclock, from itself to a new target: Kill the Lich. I felt my thoughts collapse, no longer held up by the artificial momentum. I became focused, with only a single goal in mind: letting my ability life my legs, move my mouth, and swing my sword. For better or worse, I was along for the ride.
+            So, I changed the target of Overclock, from itself to a new target: Kill the Lich. I felt my expanded thoughts collapse into a single focus, no longer held up by the artificial momentum. Guided by my Talent, I fed a very particular mana arrangement into the amulet I had received from the Hermit, and it glowed for a second. Then, I joined up with the army to fight the lich's forces, far in the northern wastes.<br>
+            
+            For better or worse, I was along for the ride.
         ]]></english>
     </hearAboutTheLich>
     

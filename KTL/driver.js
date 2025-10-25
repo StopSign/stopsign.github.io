@@ -119,13 +119,14 @@ function gameTick() {
 
         for(let downstreamVar of dataObj.downstreamVars) {
             if (isAttentionLine(actionVar, downstreamVar)) {
-                const key = `${downstreamVar}FocusMult`;
-                if(data.upgrades.rememberWhatIFocusedOn.upgradePower === 0) {
+                const key = `${downstreamVar}TempFocusMult`;
+                let power = data.upgrades.learnToFocusMore.upgradePower;
+                if(power === 0) {
                     continue;
                 }
-                actionObj[key] += 1 / data.gameSettings.ticksPerSecond / 3600;
-                if(actionObj[key] > data.focusLoopMax) {
-                    actionObj[key] = data.focusLoopMax;
+                actionObj[key] += power / data.gameSettings.ticksPerSecond / 600;
+                if(actionObj[key] > power + 2) {
+                    actionObj[key] = power + 2;
                 }
             }
         }
@@ -270,15 +271,15 @@ function tickGameObject(actionVar) {
     }
 
     //Calc resource retrieval
-    let isQuiet = actionObj.unlocked && isMaxLevel && actionObj.resourceIncrease === 0 && actionObj.resourceDecrease === 0;
-    if(!isQuiet || data.upgrades.retrieveMyUnusedResources.upgradePower === 0 || data.gameState === "KTL" || actionVar === "reinvest") {
+    let resourceParentVar = resourceHeads[actionObj.resourceName];
+    let isQuiet = actionObj.unlocked && isMaxLevel && actionObj.resourceIncrease === 0 && actionObj.totalSend === 0;
+    if(!isQuiet || resourceParentVar === actionVar || data.upgrades.retrieveMyUnusedResources.upgradePower === 0 || data.gameState === "KTL" || actionVar === "reinvest") {
         actionObj.resourceRetrieved = 0;
     } else {
         actionObj.resourceRetrieved = (actionObj.resource/1000 * [0, 1, 2, 5][data.upgrades.retrieveMyUnusedResources.upgradePower] + 10) / data.gameSettings.ticksPerSecond;
         if(actionObj.resourceRetrieved > actionObj.resource) {
             actionObj.resourceRetrieved = actionObj.resource;
         }
-        let resourceParentVar = resourceHeads[actionObj.resourceName];
         if(resourceParentVar) {
             let parentObj = data.actions[resourceParentVar];
             giveResourceTo(actionObj, parentObj, actionObj.resourceRetrieved);
@@ -298,10 +299,11 @@ let resourceHeads = {
 }
 
 function calculateTaken(actionVar, downstreamVar, actionObj, mult) {
-    let permFocusMult = actionObj[downstreamVar + "FocusMult"] >= 1 ? actionObj[downstreamVar + "FocusMult"] : 1;
+    let permFocusMult = actionObj[downstreamVar + "PermFocusMult"];
+    let tempFocusMult = actionObj[downstreamVar + "TempFocusMult"];
 
-    let totalTakenMult = actionObj.tierMult() * (actionObj.efficiency / 100) * permFocusMult *
-        (isAttentionLine(actionVar, downstreamVar) ? data.focusMult : 1);
+    let totalTakenMult = actionObj.tierMult() * (actionObj.efficiency / 100) * permFocusMult * tempFocusMult *
+        (isAttentionLine(actionVar, downstreamVar) ? tempFocusMult : 1);
     if (totalTakenMult > 1) {
         totalTakenMult = 1; // Cap at 100%/s
     }

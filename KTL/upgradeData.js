@@ -366,6 +366,16 @@ function updateCardAffordabilityBorders() {
     }
 }
 
+function calcTotalSpentOnUpgrade(initialCost, costIncrease, upgradesBought) {
+    let total = 0;
+    let theCost = initialCost;
+    for(let i = 0; i < upgradesBought; i++) {
+        total += theCost
+        theCost *= costIncrease;
+    }
+    return total;
+}
+
 let upgradeData = {
     stopLettingOpportunityWait: {
         initialCost:2, costIncrease:3,
@@ -411,29 +421,40 @@ let upgradeData = {
             return Raw.html`Overclock gains a flat +${["5", "20 (currently 5)", "50 (currently 20)", 50][num]} momentum per second.`
         }
     },
-    rememberWhatIFocusedOn: {
-        initialCost:5, costIncrease:2,
-        upgradesAvailable:3,
+    learnToFocusMore: {
+        initialCost:5, costIncrease:10, creationVersion:2,
+        upgradesAvailable:2,
         visible:true,
         customInfo: function(num) {
             if(num === 0) {
-                return Raw.html`Gain a rate of +1/hr to a Practice Mult on the flow you have Focused. The mult lasts until the amulet 
-                is used, and stacks with the Focus Mult. The Practice Mult will have a max of 2. `
+                return `Increase the base focus rate (x2) over 10 minutes, to a maximum of x3. This keeps within a loop, but resets on amulet use.`
             }
             if(num === 1) {
-                return Raw.html`You have a rate of +1/hr to a Practice Mult on the flow you have Focused. This mult lasts until the amulet 
-                is used, and stacks with the Focus Mult. The Practice Mult currently has a max of 2. Gain +1.`
+                return `Increase the base focus rate (x2) over 10 minutes, to a maximum of x4 (currently x3). This keeps within a loop, but resets on amulet use.`
             }
-            if(num === 2) {
-                return Raw.html`You have a rate of +1/hr to a Practice Mult on the flow you have Focused. This mult lasts until the amulet 
-                is used, and stacks with the Focus Mult. The Practice Mult currently has a max of 3. Gain +1.`
-            }
-            return Raw.html`You have a rate of +1/hr to a Practice Mult on the flow you have Focused. This mult lasts until the amulet 
-                is used, and stacks with the Focus Mult. The Practice Mult currently has a max of 4.`
+            return `Increase the base focus rate (x2) over 10 minutes, to a maximum of x4. This keeps within a loop, but resets on amulet use.`
         },
         onBuy: function(num) {
-            data.focusLoopMax = 2 + num;
-            unveilUpgrade('knowWhatIFocusedOn')
+            unveilUpgrade('rememberWhatIFocusedOn')
+        },
+    },
+    rememberWhatIFocusedOn: {
+        initialCost:10, costIncrease:10, creationVersion: 2,
+        upgradesAvailable:3,
+        visible:false,
+        customInfo: function(num) {
+            if(num === 0) {
+                return `Gain a permanent +(Hear About The Lich's Level)^2 % to all Focused rates, when the amulet is used. This effect works even when the bar is not focused. This effect caps at a x2 mult.`
+            }
+            if(num === 1) {
+                return `You currently gain a permanent +(Hear About The Lich's Level)^2 % to all Focused rates, when the amulet is used. This effect works even when the bar is not focused. This effect will cap at a x3 mult (currently x2).`
+            }
+            if(num === 2) {
+                return `You currently gain a permanent +(Hear About The Lich's Level)^2 % to all Focused rates, when the amulet is used. This effect works even when the bar is not focused. This effect will cap at a x4 mult (currently x2).`
+            }
+            return `You currently gain a permanent +(Hear About The Lich's Level)^2 % to all Focused rates, when the amulet is used. This effect works even when the bar is not focused. This effect caps at a x4 mult.`
+        },
+        onBuy: function(num) {
         },
     },
     learnedOfLichSigns: {
@@ -445,14 +466,6 @@ let upgradeData = {
         },
         onBuy: function(num) {
             actionData.hearAboutTheLich.maxLevel = 2 + num;
-        }
-    },
-    knowWhatIFocusedOn: {
-        initialCost:5, costIncrease:2,
-        upgradesAvailable:2,
-        visible:false,
-        customInfo: function(num) {
-            return "Keep "+(["20", "50 (currently 20%)", "50"][num])+"% of your Focus Loop Bonus when you use the Amulet";
         }
     },
 
@@ -890,17 +903,6 @@ let upgradeData = {
     //... finish up to here
     /*
 
-    focusHarder: {
-        initialCost:25, costIncrease:4,
-        upgradesAvailable:8,
-        visible:false,
-        customInfo: function(num) {
-            return "Increases the Focus Mult by "+(num >0?"another ":"")+"+1 (for a total of " + (num+1+2) + ")";
-        },
-        onBuy: function(num) {
-            data.focusMult = 2 + num;
-        }
-    },
     discoverMoreOfTheWorld: {
     },
     learnHowToFight: {

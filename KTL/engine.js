@@ -67,7 +67,7 @@ function actionSetBaseVariables(actionObj, dataObj) {
     actionObj.progressMaxIncrease = dataObj.progressMaxIncrease;
     actionObj.visible = dataObj.visible === null ? true : dataObj.visible;
 
-    actionObj.prevUnlockTime = null;
+    actionObj.unlockTime = null;
     actionObj.level1Time = null;
 
     // actionObj.visible = (globalVisible || dataObj.visible === null) ? true : dataObj.visible;
@@ -138,7 +138,8 @@ function createAndLinkNewAction(actionVar, dataObj, downstreamVars) {
 
 
     for(let downstreamVar of dataObj.downstreamVars) {
-        actionObj[downstreamVar+"FocusMult"] = 1;
+        actionObj[downstreamVar+"TempFocusMult"] = 2;
+        actionObj[downstreamVar+"PermFocusMult"] = 1;
         actionObj[`downstreamRate${downstreamVar}`] = 0;
     }
 
@@ -207,9 +208,12 @@ function actionProgressRate(actionObj) {
 }
 
 function isAttentionLine(actionVar, downstreamVar) {
-    return data.focusSelected.some(
-        sel => sel.lineData.from === actionVar && sel.lineData.to === downstreamVar
-    );
+    for(let focusObj of data.focusSelected) {
+        if(focusObj.lineData.from === actionVar && focusObj.lineData.to === downstreamVar) {
+            return true;
+        }
+    }
+    return false;
 }
 
 function checkLevelUp(actionObj, dataObj) {
@@ -322,6 +326,9 @@ function purchaseAction(actionVar) {
         console.log('tried to purchase ' + actionVar + ' in error.');
         return;
     }
+    if(actionObj.purchased) {
+        return;
+    }
     actionObj.purchased = true;
 
     addLogMessage(actionVar, "purchaseAction")
@@ -337,9 +344,8 @@ function unveilAction(actionVar) {
         return;
     }
 
-    let planeName = getPlaneNameFromNum(dataObj.plane);
 
-    addLogMessage(`New Action: <span style="font-weight:bold;cursor:pointer;" onclick="actionTitleClicked('${actionVar}');">${dataObj.title}</span> in ${planeName}`)
+    addLogMessage(actionVar, "unlockAction")
 
     actionObj.visible = true;
     revealActionAtts(actionObj);
@@ -347,27 +353,16 @@ function unveilAction(actionVar) {
     updateSupplyChain(actionVar);
 }
 
-function getPlaneNameFromNum(planeNum) {
-    switch(planeNum) {
-        case 0:
-            return "Brythal"
-        case 1:
-            return "Magic"
-        case 2:
-            return "Kill the Lich"
-        case 3:
-            return "Astral"
-    }
-}
-
 
 function unveilUpgrade(upgradeVar) {
     let upgradeObj = data.upgrades[upgradeVar];
-    let upgradeDataObj = upgradeData[upgradeVar];
+    if(upgradeObj.visible) {
+        return;
+    }
     upgradeObj.visible = true;
     views.updateVal(`card_${upgradeVar}`, "flex", "style.display");
 
-    addLogMessage(`New Upgrade Available: ${upgradeDataObj.title}!`)
+    addLogMessage(upgradeVar, "purchaseUpgrade")
 }
 
 function addMaxLevel(actionVar, amount) {

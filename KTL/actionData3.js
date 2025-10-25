@@ -94,7 +94,11 @@ actionData = {
         actionPowerFunction: function(resource) {
             let fightMath = Math.sqrt(resource/1e24) * data.maxSpellPower;
             if(data.actions.trainWithTeam.unlocked) {
-                fightMath *= 3;
+                let teamworkMult = Math.sqrt(data.actions.trainWithTeam.resource/1000);
+                if(teamworkMult < 1) {
+                    teamworkMult = 1;
+                }
+                fightMath *= teamworkMult;
             }
             return fightMath;
         },
@@ -106,7 +110,7 @@ actionData = {
         expAtts:[],
         efficiencyAtts:[],
         extraInfo: {english:Raw.html`<br>Momentum Taken = 10% of current Momentum.<br>
-                        Fight gain = (Momentum Taken/1e24)^.5 * Spell Power.`},
+                        Fight gain = (Momentum Taken/1e24)^.5 * Spell Power * (Teamwork/1000)^.5.`},
         iconText: {english:Raw.html`
         Generates Fight to gain Ancient Coins and Legacy as you get closer to killing the lich.
 `}

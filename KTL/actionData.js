@@ -1472,7 +1472,7 @@ Level 3: Reveal Check Notice Board`}
             <span class="button" id='killTheLichMenuButton2' onclick="openKTLMenu()"
                 style="display:none;padding:8px 13px;position:absolute;top:350px;left:60px;border: 2px solid #aa0000;border-radius: 5px;
                 background-color:#550000;text-shadow: 3px 3px 2px rgba(0, 0, 0, 0.8);color: #ffdddd;box-shadow:0 0 10px 6px rgba(255, 0, 0, 0.7);font-size:26px;" >
-            Kill the Lich!</span>
+            Fight the Lich's Forces!</span>
         `,
         unlockMessage:{english:"Unlocks when Gossip Around Coffee is level 5."},
         extraInfo: {english:Raw.html`This action gains (Momentum)^0.25 * (Conversations on Gossip)^0.5 / 1e12 Fear 
@@ -2178,13 +2178,14 @@ Level 3: Reveal Check Notice Board`}
         },
         onUnlock: function() {
             data.legacyMultKTL = 3;
+            views.updateVal(`killTheLichMenuButton2`, "Fight the Lich's Forces, Together!");
         },
         onLevelAtts:[],
         expAtts:[["wizardry", 1], ["peace", 1], ["intellect", .1]],
         efficiencyAtts:[["wizardry", .00005]],
         onLevelText:{english:"+1 to Hear About the Lich max level."},
-        unlockMessage:{english:"Unlocks when Meet The Mages is level 1. On unlock, all legacy gained in KTL is multiplied by 3, and Fight is multiplied by 3."},
-        extraInfo: {english:Raw.html`This action, when it completes, will consume one spell charge from all spells with Spell Power.<br>Legacy gain is further multiplied by the level of this action, starting at level 2.`},
+        unlockMessage:{english:"Unlocks when Meet The Mages is level 1. On unlock, all legacy gained in KTL is multiplied by 3."},
+        extraInfo: {english:Raw.html`This action, when it completes, will consume one spell charge from all spells with Spell Power.<br>Legacy gain is x3 for unlocking, and further multiplied by the level of this action, starting at level 2.<br>Teamwork increases Fight, at a rate of (teamwork/1000)^.5`},
         onCompleteText: {english:Raw.html`
                 <span style="font-weight:bold;" id="trainWithTeamResourceTaken">???</span> Spell Power was used from active spells, giving <br>
                 +<span style="font-weight:bold;" id="trainWithTeamResourceSent">???</span> Exp to this action.<br>
@@ -2193,7 +2194,8 @@ Level 3: Reveal Check Notice Board`}
         Generates Teamwork using charged spells<br>
         On Unlock: x3 legacy gain in KTL<br>
         On Level: +1 max level for Hear About The Lich<br>
-        Multiply Legacy gain in KTL by this action's level.
+        Multiply Legacy gain in KTL by this action's level.<br>
+        High Teamwork increases Fight
 `}
     },
 //# spell power used, # exp gained

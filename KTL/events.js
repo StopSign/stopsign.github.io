@@ -781,7 +781,6 @@ function drawChart() {
 }
 
 function addLogMessage(text, type) {
-    return;
     const logContainer = document.getElementById('logContainer');
     const logMessages = document.getElementById('logMessages');
     const timestamp = secondsToTime(data.secondsPerReset);
@@ -790,7 +789,7 @@ function addLogMessage(text, type) {
         type: type,
         timestamp: timestamp
     }
-    const fullMessage = expandLogMessage`${timestamp}: ${text}`;
+    const fullMessage = expandLogMessage(logData);
     data.currentLog.push(logData);
     const messageElement = document.createElement('div');
     messageElement.innerHTML = fullMessage;
@@ -802,10 +801,35 @@ function addLogMessage(text, type) {
     }
 }
 
-function expandLogMessage(info, type) {
+function expandLogMessage(logData) {
+    let theVar = logData.theVar;
+    let type = logData.type;
+    let timestamp = logData.timestamp;
     if(type === "purchaseAction") {
-        let dataObj = actionData[info];
-        return `Permanently unlocked action: ${dataObj.title} in ${getPlaneNameFromNum(dataObj.plane)}`;
+        let dataObj = actionData[theVar];
+        return `${timestamp}: Permanently unlocked action: ${dataObj.title} in ${getPlaneNameFromNum(dataObj.plane)}`;
+    } else if(type === "unlockAction") {
+        let dataObj = actionData[theVar];
+        let planeName = getPlaneNameFromNum(dataObj.plane);
+        return `${timestamp}: New Action: <span style="font-weight:bold;cursor:pointer;" onclick="actionTitleClicked('${theVar}');">${dataObj.title}</span> in ${planeName}`
+    } else if(type === "purchaseUpgrade") {
+        let upgradeDataObj = upgradeData[theVar];
+        return `${timestamp}: New Upgrade Available: ${upgradeDataObj.title}!`;
+    } else if(type === "info") {
+        return logData.theVar;
+    }
+}
+
+function getPlaneNameFromNum(planeNum) {
+    switch(planeNum) {
+        case 0:
+            return "Brythal"
+        case 1:
+            return "Magic"
+        case 2:
+            return "Northern Wastes"
+        case 3:
+            return "Astral"
     }
 }
 
@@ -833,13 +857,12 @@ function rebuildLog() {
     const logMessages = document.getElementById('logMessages');
     for (let message of data.currentLog) {
         const messageElement = document.createElement('div');
-        messageElement.innerHTML = message;
+        messageElement.innerHTML = expandLogMessage(message);
         messageElement.style.padding = '2px 8px';
         logMessages.appendChild(messageElement);
     }
     logContainer.scrollTop = logContainer.scrollHeight;
 }
-
 
 
 function togglePinned() {

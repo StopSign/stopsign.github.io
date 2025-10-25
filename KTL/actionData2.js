@@ -798,9 +798,9 @@ actionData = {
             if(data.actions.catalogNewBooks.level >= 15) {
                 unveilAction('studyArchitecture');
             }
-            if(data.actions.catalogNewBooks.level >= 17) {
-                unveilAction('studyAdvancedPracticalMagic');
-            }
+            // if(data.actions.catalogNewBooks.level >= 17) {
+            //     unveilAction('studyAdvancedPracticalMagic');
+            // }
         },
         onLevelAtts:[["concentration", 4e4]],
         expAtts:[["curiosity", 1], ["observation", 1], ["comfort", 1], ["intellect", 1], ["logistics", 1]],
@@ -815,8 +815,7 @@ actionData = {
         Level 9: Reveal Study Math<br>
         Level 11: Reveal Study Cryptology<br>
         Level 13: Reveal Study Advanced Earth Magic<br>
-        Level 15: Reveal Study Architecture<br>
-        Level 17: Reveal Study Advanced Practical Magic
+        Level 15: Reveal Study Architecture
 `}
     },
     buildPersonalLibrary: {
@@ -995,10 +994,10 @@ actionData = {
     },
     studyMath: {
         tier:1, plane:0, resourceName:"research", creationVersion:2, automationOff: true,
-        progressMaxBase:2.5e4, progressMaxIncrease:2,
+        progressMaxBase:6e4, progressMaxIncrease:2,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:.025, maxLevel:2,
-        unlockCost:2.5e4, visible:false, unlocked:false, purchased: false,
+        unlockCost:6e4, visible:false, unlocked:false, purchased: false,
         onUnlock: function() {
         },
         onLevelCustom: function() {
@@ -1015,10 +1014,10 @@ actionData = {
     },
     studyCryptology: {
         tier:1, plane:0, resourceName:"research", creationVersion:2, automationOff: true,
-        progressMaxBase:4e4, progressMaxIncrease:1.5,
+        progressMaxBase:1e5, progressMaxIncrease:1.5,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:.025, maxLevel:0,
-        unlockCost:4e4, visible:false, unlocked:false, purchased: false,
+        unlockCost:1e5, visible:false, unlocked:false, purchased: false,
         onUnlock: function() {
         },
         onLevelCustom: function() {
@@ -1041,12 +1040,44 @@ actionData = {
         Level 5: Reveal Comprehend Difficult Texts
 `}
     },
+    studyAdvancedEarthMagic: {
+        tier:1, plane:0, resourceName:"research", creationVersion:2, automationOff: true,
+        progressMaxBase:1.5e5, progressMaxIncrease:3,
+        expToLevelBase:1, expToLevelIncrease:1,
+        efficiencyBase:.025, maxLevel:3,
+        unlockCost:1.5e5, visible:false, unlocked:false, purchased: false,
+        onUnlock: function() {
+            purchaseAction('moveIron');
+            unveilAction('moveIron');
+            if(data.actions.studyAdvancedEarthMagic.level >= 2) {
+                purchaseAction('reinforceArmor')
+                unveilAction('reinforceArmor');
+            }
+            if(data.actions.studyAdvancedEarthMagic.level >= 3) {
+                purchaseAction('restoreEquipment')
+                unveilAction('restoreEquipment');
+            }
+        },
+        onLevelCustom: function() {
+        },
+        onLevelAtts:[["spellcraft", 20]],
+        expAtts:[],
+        efficiencyAtts:[["comfort", 1]],
+        iconText: {english:Raw.html`
+        Level 1: Purchase Move Iron<br>
+        Level 1: Reveal Move Iron<br>
+        Level 2: Purchase Reinforce Armor<br>
+        Level 2: Reveal Reinforce Armor<br>
+        Level 3: Purchase Restore Equipment<br>
+        Level 3: Reveal Restore Equipment<br>
+`}
+    },
     studyArchitecture: {
         tier:1, plane:0, resourceName:"research", creationVersion:2, automationOff: true,
-        progressMaxBase:6e4, progressMaxIncrease:1.5,
+        progressMaxBase:2e5, progressMaxIncrease:1.5,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:.025, maxLevel:5,
-        unlockCost:6e4, visible:false, unlocked:false, purchased: false,
+        unlockCost:2e5, visible:false, unlocked:false, purchased: false,
         onUnlock: function() {
         },
         onLevelCustom: function() {
@@ -1079,44 +1110,12 @@ actionData = {
         Level 5: Reveal Pry Gem Loose
 `}
     },
-    studyAdvancedEarthMagic: {
-        tier:1, plane:0, resourceName:"research", creationVersion:2, automationOff: true,
-        progressMaxBase:6e4, progressMaxIncrease:3,
-        expToLevelBase:1, expToLevelIncrease:1,
-        efficiencyBase:.025, maxLevel:3,
-        unlockCost:6e4, visible:false, unlocked:false, purchased: false,
-        onUnlock: function() {
-            purchaseAction('moveIron');
-            unveilAction('moveIron');
-            if(data.actions.studyAdvancedEarthMagic.level >= 2) {
-                purchaseAction('reinforceArmor')
-                unveilAction('reinforceArmor');
-            }
-            if(data.actions.studyAdvancedEarthMagic.level >= 3) {
-                purchaseAction('restoreEquipment')
-                unveilAction('restoreEquipment');
-            }
-        },
-        onLevelCustom: function() {
-        },
-        onLevelAtts:[["spellcraft", 20]],
-        expAtts:[],
-        efficiencyAtts:[["comfort", 1]],
-        iconText: {english:Raw.html`
-        Level 1: Purchase Move Iron<br>
-        Level 1: Reveal Move Iron<br>
-        Level 2: Purchase Reinforce Armor<br>
-        Level 2: Reveal Reinforce Armor<br>
-        Level 3: Purchase Restore Equipment<br>
-        Level 3: Reveal Restore Equipment<br>
-`}
-    },
     studyAdvancedPracticalMagic: {
         tier:1, plane:0, resourceName:"research", creationVersion:2, automationOff: true,
-        progressMaxBase:10e4, progressMaxIncrease:10,
+        progressMaxBase:5e5, progressMaxIncrease:10,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:.01, maxLevel:3,
-        unlockCost:10e4, visible:false, unlocked:false, purchased: false,
+        unlockCost:5e5, visible:false, unlocked:false, purchased: false,
         onUnlock: function() {
         },
         onLevelCustom: function() {
@@ -1127,10 +1126,10 @@ actionData = {
     },
     studyHistory: {
         tier:1, plane:0, resourceName:"research", creationVersion:2, automationOff: true,
-        progressMaxBase:1e4, progressMaxIncrease:1.5,
+        progressMaxBase:2e4, progressMaxIncrease:1.5,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:.05, maxLevel:2,
-        unlockCost:1e4, visible:false, unlocked:false, purchased: false,
+        unlockCost:2e4, visible:false, unlocked:false, purchased: false,
         onUnlock: function() {
         },
         onLevelCustom: function() {
@@ -1147,10 +1146,10 @@ actionData = {
     },
     readOldStories: {
         tier:1, plane:0, resourceName:"research", creationVersion:2, automationOff: true,
-        progressMaxBase:1.2e4, progressMaxIncrease:1.5,
+        progressMaxBase:2.5e4, progressMaxIncrease:1.5,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:.05, maxLevel:2,
-        unlockCost:1.2e4, visible:false, unlocked:false, purchased: false,
+        unlockCost:2.5e4, visible:false, unlocked:false, purchased: false,
         onUnlock: function() {
         },
         onLevelCustom: function() {
@@ -1167,10 +1166,10 @@ actionData = {
     },
     readWarJournals: {
         tier:1, plane:0, resourceName:"research", creationVersion:2, automationOff: true,
-        progressMaxBase:1.5e4, progressMaxIncrease:1.5,
+        progressMaxBase:3e4, progressMaxIncrease:1.5,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:.05, maxLevel:2,
-        unlockCost:1.5e4, visible:false, unlocked:false, purchased: false,
+        unlockCost:3e4, visible:false, unlocked:false, purchased: false,
         onUnlock: function() {
         },
         onLevelCustom: function() {
@@ -1187,10 +1186,10 @@ actionData = {
     },
     readOldReligiousTexts: {
         tier:1, plane:0, resourceName:"research", creationVersion:2, automationOff: true,
-        progressMaxBase:2e4, progressMaxIncrease:1.5,
+        progressMaxBase:4e4, progressMaxIncrease:1.5,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:.03, maxLevel:2,
-        unlockCost:2e4, visible:false, unlocked:false, purchased: false,
+        unlockCost:4e4, visible:false, unlocked:false, purchased: false,
         onUnlock: function() {
         },
         onLevelCustom: function() {
@@ -1207,10 +1206,10 @@ actionData = {
     },
     readOldProphecies: {
         tier:1, plane:0, resourceName:"research", creationVersion:2, automationOff: true,
-        progressMaxBase:3e4, progressMaxIncrease:2,
+        progressMaxBase:6e4, progressMaxIncrease:2,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:.03, maxLevel:2,
-        unlockCost:3e4, visible:false, unlocked:false, purchased: false,
+        unlockCost:6e4, visible:false, unlocked:false, purchased: false,
         onUnlock: function() {
         },
         onLevelCustom: function() {
@@ -1221,10 +1220,10 @@ actionData = {
     },
     readOldPoetry: {
         tier:1, plane:0, resourceName:"research", creationVersion:2, automationOff: true,
-        progressMaxBase:2.5e4, progressMaxIncrease:1.5,
+        progressMaxBase:5e4, progressMaxIncrease:1.5,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:.03, maxLevel:3,
-        unlockCost:2.5e4, visible:false, unlocked:false, purchased: false,
+        unlockCost:5e4, visible:false, unlocked:false, purchased: false,
         onUnlock: function() {
         },
         onLevelCustom: function() {
@@ -1235,10 +1234,10 @@ actionData = {
     },
     readOldPhilosophy: {
         tier:1, plane:0, resourceName:"research", creationVersion:2, automationOff: true,
-        progressMaxBase:5e4, progressMaxIncrease:10,
+        progressMaxBase:1e5, progressMaxIncrease:10,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:.03, maxLevel:1,
-        unlockCost:5e4, visible:false, unlocked:false, purchased: false,
+        unlockCost:1e5, visible:false, unlocked:false, purchased: false,
         onUnlock: function() {
         },
         onLevelCustom: function() {

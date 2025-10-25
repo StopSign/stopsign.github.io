@@ -36,7 +36,11 @@ function logKTL() {
     data.resetLogs.push({
         stage1: {
             secondsPerReset: data.secondsPerReset,
-            legacyGained: data.atts.legacy.num
+            currentLegacy: data.atts.legacy.num,
+            resetCount: data.resetCount,
+            currentMomentum: data.totalMomentum,
+            currentFear: data.actions.hearAboutTheLich.resource,
+            currentTeamwork: data.actions.trainWithTeam.resource
         },
         stage2: null
     });
@@ -87,6 +91,17 @@ function initializeKTL() {
         views.updateVal("openUseAmuletButton", "", "style.display")
     }
 
+    for(let focusObj of data.focusSelected) {
+        unhighlightLine(focusObj.borderId);
+        let power = data.upgrades.rememberWhatIFocusedOn.upgradePower;
+        if(data.upgrades.rememberWhatIFocusedOn.upgradePower > 0) {
+            let actionObj = data.actions[focusObj.lineData.from];
+            actionObj[focusObj.lineData.to + "PermFocusMult"] += Math.pow(data.actions.hearAboutTheLich.level, 2) /100;
+            if(actionObj[focusObj.lineData.to + "PermFocusMult"] > power + 1) {
+                actionObj[focusObj.lineData.to + "PermFocusMult"] = power + 1;
+            }
+        }
+    }
     data.focusSelected = [];
 
     data.actions.overclockTargetingTheLich.resource = data.totalMomentum;
@@ -145,7 +160,7 @@ function logAmulet() {
     const currentLog = data.resetLogs[data.resetLogs.length - 1];
     if (currentLog) {
         currentLog.stage2 = {
-            legacyGained: data.atts.legacy.num - currentLog.stage1.legacyGained,
+            legacyGained: data.atts.legacy.num - currentLog.stage1.currentLegacy,
             ancientCoin: data.ancientCoinGained
         };
     }
@@ -159,7 +174,12 @@ function useAmulet() {
     logAmulet();
     clearLog();
 
+    data.resetCount++;
+
     chartData = [];
+    for(let focusObj of data.focusSelected) {
+        unhighlightLine(focusObj.borderId);
+    }
     data.focusSelected = [];
     data.doneAmulet = true;
     data.secondsPerReset = 0;
@@ -196,6 +216,8 @@ function useAmulet() {
             views.updateVal(`${actionVar}AttEfficiencyContainer`, "none", "style.display");
         }
     }
+
+
     //For each action, reset the base atts and set max level
     for(let actionVar in data.actions) {
         let actionObj = data.actions[actionVar];
@@ -238,16 +260,16 @@ function useAmulet() {
             if(data.actions[downstreamVar] && data.actions[downstreamVar].unlocked && data.actions[downstreamVar].hasUpstream) {
                 setSliderUI(actionObj.actionVar, downstreamVar, getUpgradeSliderAmount()); //reset with amulet
             }
-            let currentMult = actionObj[downstreamVar + "FocusMult"];
 
-            //focusMult does not reset other than this
-            actionObj[downstreamVar + "FocusMult"] = (currentMult - 1) * [0, .2, .5][data.upgrades.knowWhatIFocusedOn.upgradePower] + 1;
+            actionObj[downstreamVar + "TempFocusMult"] = 2;
         });
 
         if(dataObj.updateMults) {
             dataObj.updateMults();
         }
 
+        //also display pins
+        views.updateVal(`${actionVar}PinButton`, "", "style.display");
     }
 
 

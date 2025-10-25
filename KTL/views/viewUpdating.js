@@ -348,7 +348,10 @@ let views = {
             roundedNumbers.push(["resourceToAdd", 2]);
             roundedNumbers.push(["actionPower", 4]);
         }
-        if(actionVar === "hearAboutTheLich" || actionVar === "study") {
+        if(actionVar === "study") {
+            roundedNumbers.push(["resourceToAdd", 2]);
+        }
+        if(actionVar === "hearAboutTheLich") {
             roundedNumbers.push(["actionPower2", 2]);
         }
         if(dataObj.hoveringIcon) {
@@ -390,22 +393,34 @@ let views = {
             let rangeValue = data.actions[actionVar][`downstreamRate${downstreamVar}`] || 0;
 
             let mult = rangeValue/100;
-            let taken = calculateTaken(actionVar, downstreamVar, actionObj, mult);
+            let permFocusMult = actionObj[downstreamVar + "PermFocusMult"];
+            let tempFocusMult = actionObj[downstreamVar + "TempFocusMult"];
+
+            let totalTakenMult = actionObj.tierMult() * (actionObj.efficiency / 100) * permFocusMult * tempFocusMult *
+                (isAttentionLine(actionVar, downstreamVar) ? tempFocusMult : 1);
+            let maxed = false;
+            if (totalTakenMult > 1) {
+                totalTakenMult = 1; // Cap at 100%/s
+                maxed = true;
+            }
+            let toReturn = actionObj.resource / data.gameSettings.ticksPerSecond * totalTakenMult * mult;
+            let taken = toReturn < .0000001 ? 0 : toReturn;
+
             views.updateVal(`${actionVar}DownstreamSendRate${downstreamVar}`, taken * data.gameSettings.ticksPerSecond, "textContent", 4);
 
             let isAttention = isAttentionLine(actionVar, downstreamVar);
-            views.updateVal(`${actionVar}DownstreamAttentionBonus${downstreamVar}`, isAttention ? "" : "none", "style.display");
+            views.updateVal(`${actionVar}DownstreamAttentionBonusTemp${downstreamVar}`, isAttention ? "" : "none", "style.display");
             if(isAttention) {
-                views.updateVal(`${actionVar}DownstreamAttentionBonus${downstreamVar}`, `x${intToString(data.focusMult, 1)}`, "textContent");
-                views.updateVal(`${actionVar}_${downstreamVar}_Line_Inner_Top`, `x${intToString(data.focusMult, 1)}`, "textContent");
+                views.updateVal(`${actionVar}DownstreamAttentionBonusTemp${downstreamVar}`, `x${intToString(actionObj[downstreamVar + "TempFocusMult"], data.upgrades.learnToFocusMore.upgradePower?3:1)}`, "textContent");
+                views.updateVal(`${actionVar}_${downstreamVar}_Line_Inner_Top`, `x${intToString(actionObj[downstreamVar + "TempFocusMult"], data.upgrades.learnToFocusMore.upgradePower?3:1)}`, "textContent");
             }
 
-            let focusShowing = actionObj[`${downstreamVar}FocusMult`] > 1.005 && downstreamObj.resourceName === actionObj.resourceName;
-            views.updateVal(`${actionVar}DownstreamAttentionBonusLoop${downstreamVar}`, focusShowing ? "" : "none", "style.display");
+            let focusShowing = actionObj[`${downstreamVar}PermFocusMult`] > 1 && downstreamObj.hasUpstream;
+            views.updateVal(`${actionVar}DownstreamAttentionBonusPerm${downstreamVar}`, focusShowing ? "" : "none", "style.display");
             views.updateVal(`${actionVar}_${downstreamVar}_Line_Inner_Bottom`, focusShowing ? "" : "none", "style.display");
             if(focusShowing) {
-                views.updateVal(`${actionVar}DownstreamAttentionBonusLoop${downstreamVar}`, `x${intToString(actionObj[downstreamVar + "FocusMult"], 3)}`);
-                views.updateVal(`${actionVar}_${downstreamVar}_Line_Inner_Bottom`, `x${intToString(actionObj[downstreamVar + "FocusMult"], 3)}`);
+                views.updateVal(`${actionVar}DownstreamAttentionBonusPerm${downstreamVar}`, `x${intToString(actionObj[downstreamVar + "PermFocusMult"], 3)}`);
+                views.updateVal(`${actionVar}_${downstreamVar}_Line_Inner_Bottom`, `x${intToString(actionObj[downstreamVar + "PermFocusMult"], 3)}`);
             }
 
         }

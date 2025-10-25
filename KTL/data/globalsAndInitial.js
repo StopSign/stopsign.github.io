@@ -50,11 +50,10 @@ data.maxSpellPower = 0;
 data.totalSpellPower = 0;
 data.focusSelected = [];
 data.resetLogs = [];
+data.resetCount = 1;
 data.currentLog = [];
 data.currentPinned = [];
 data.maxFocusAllowed = 2;
-data.focusMult = 2;
-data.focusLoopMax = 2.5;
 data.options = {};
 data.options.updateRate = 20;
 data.options.autosaveRate = 10;
@@ -94,8 +93,8 @@ let viewData = {}; //contains only things that are generated / not saved
 viewData.toasts = [];
 
 let language = "english";
-let globalVisible = false;
-// let globalVisible = true;
+// let globalVisible = false;
+let globalVisible = true;
 let isLoadingEnabled = true; //SET FALSE FOR CLEARING SAVE
 
 
@@ -128,80 +127,80 @@ function debug() {
     // data.displayJob = true;
 
 
-    buyUpgrade("askAboutBetterWork"); //1, 30 --
-    buyUpgrade("investMyGold"); //1, 20
-    buyUpgrade("investMyGold"); //2, 40
-    buyUpgrade("feelTheEchoesOfTheBurntTown"); //1, 20
-    buyUpgrade("feelTheEchoesOfTheBurntTown"); //2, 40
-    buyUpgrade("fightAlongsideAllies"); //1, 30 --
-    buyUpgrade("increaseInitialInvestment"); //1, 40
+    // buyUpgrade("askAboutBetterWork"); //1, 30 --
+    // buyUpgrade("investMyGold"); //1, 20
+    // buyUpgrade("investMyGold"); //2, 40
+    // buyUpgrade("feelTheEchoesOfTheBurntTown"); //1, 20
+    // buyUpgrade("feelTheEchoesOfTheBurntTown"); //2, 40
+    // buyUpgrade("fightAlongsideAllies"); //1, 30 --
+    // buyUpgrade("increaseInitialInvestment"); //1, 40
 
     //only if the save has skipped the unlock point
     // unveilAction('invest');
     // unveilAction('feelAGentleTug');
 
 
-    buyUpgrade("buyNicerStuff"); //1, 70
-    buyUpgrade("investMyGold"); //3, 80
-    buyUpgrade("increaseInitialInvestment"); //2, 60
-    buyUpgrade("increaseInitialInvestment"); //3, 90
-    buyUpgrade("feelTheEchoesOfTheBurntTown"); //3, 80 --
-    buyUpgrade("learnFromTheLibrary"); //1, 200
+    // buyUpgrade("buyNicerStuff"); //1, 70
+    // buyUpgrade("investMyGold"); //3, 80
+    // buyUpgrade("increaseInitialInvestment"); //2, 60
+    // buyUpgrade("increaseInitialInvestment"); //3, 90
+    // buyUpgrade("feelTheEchoesOfTheBurntTown"); //3, 80 --
+    // buyUpgrade("learnFromTheLibrary"); //1, 200
 
 
     //foreach action, automation on
-    for(let actionVar in data.actions) {
-        if(["overcharge", "overboost", "prepareInternalSpells", "earthMagic", "moveEarth", "hardenEarth", "shapeEarth", "moveIron", "reinforceArmor", "restoreEquipment", "practicalMagic", "illuminate", "unblemish", "manaTransfer"].includes(actionVar)) {
-            continue;
-        }
-        let actionObj = data.actions[actionVar];
-        let dataObj = actionData[actionVar];
-        actionObj.automationOff = false;
-    }
+    // for(let actionVar in data.actions) {
+    //     if(["overcharge", "overboost", "prepareInternalSpells", "earthMagic", "moveEarth", "hardenEarth", "shapeEarth", "moveIron", "reinforceArmor", "restoreEquipment", "practicalMagic", "illuminate", "unblemish", "manaTransfer"].includes(actionVar)) {
+    //         continue;
+    //     }
+    //     let actionObj = data.actions[actionVar];
+    //     let dataObj = actionData[actionVar];
+    //     actionObj.automationOff = false;
+    // }
 
-    buyUpgrade("keepMyMagicReady"); //1, 100 --
-    buyUpgrade("buyNicerStuff"); //2, 210
-    buyUpgrade("buyNicerStuff"); //3, 630 --
-    buyUpgrade("investMyGold"); //4, 160
-    buyUpgrade("investMyGold"); //5, 320
-    buyUpgrade("investMyGold"); //6, 640 --
-    buyUpgrade("increaseInitialInvestment"); //4, 135
-    buyUpgrade("increaseInitialInvestment"); //5, 202 --
-    buyUpgrade("learnFromTheLibrary"); //2, 400
-    buyUpgrade("learnFromTheLibrary"); //3, 800
-    buyUpgrade("increaseMarketCap"); //1, 200
-    buyUpgrade("increaseMarketCap"); //2, 300
-    buyUpgrade("increaseMarketCap"); //3, 450
-    buyUpgrade("increaseMarketCap"); //4, 675
-    buyUpgrade("trainTogetherMore"); //1, 400
-    buyUpgrade("stopBeingSoTense"); //1, 500 --
-    buyUpgrade("refineMyLeverage"); //1, 100
-    buyUpgrade("refineMyLeverage"); //2, 300
-    buyUpgrade("refineMyWizardry"); //1, 200
-
-    statAddAmount("legacy", 28e6)
-    purchaseAction("overponder");
-    buyUpgrade("createABetterFoundation"); //1, 500
-    buyUpgrade("createABetterFoundation"); //2, 750
-    buyUpgrade("createABetterFoundation"); //3, 1125
-    buyUpgrade("workHarder"); //1, 600
-    buyUpgrade("workHarder"); //2, 900
-    buyUpgrade("haveBetterConversations"); //1, 800
-    buyUpgrade("sparkMoreMana"); //1, 800
-    buyUpgrade("studyHarder"); //1, 1000
-    buyUpgrade("rememberWhatIDid"); //1, 600 --
-    buyUpgrade("retrieveMyUnusedResources"); //1, 500
-    buyUpgrade("retrieveMyUnusedResources"); //2, 750
-    buyUpgrade("retrieveMyUnusedResources"); //3, 1125 --
-
-    buyUpgrade("learnFromTheLibrary"); //4, 1600
-    buyUpgrade("learnFromTheLibrary"); //5, 3200 --
-    buyUpgrade("improveMyHouse"); //1, 400
-    buyUpgrade("improveMyHouse"); //2, 1200
-    buyUpgrade("improveMyHouse"); //3, 3600 --
-
-    buyUpgrade("rememberHowIGrew"); //1, 2000 --
-    buyUpgrade("rememberMyMastery"); //1, 6000 --
+    // buyUpgrade("keepMyMagicReady"); //1, 100 --
+    // buyUpgrade("buyNicerStuff"); //2, 210
+    // buyUpgrade("buyNicerStuff"); //3, 630 --
+    // buyUpgrade("investMyGold"); //4, 160
+    // buyUpgrade("investMyGold"); //5, 320
+    // buyUpgrade("investMyGold"); //6, 640 --
+    // buyUpgrade("increaseInitialInvestment"); //4, 135
+    // buyUpgrade("increaseInitialInvestment"); //5, 202 --
+    // buyUpgrade("learnFromTheLibrary"); //2, 400
+    // buyUpgrade("learnFromTheLibrary"); //3, 800
+    // buyUpgrade("increaseMarketCap"); //1, 200
+    // buyUpgrade("increaseMarketCap"); //2, 300
+    // buyUpgrade("increaseMarketCap"); //3, 450
+    // buyUpgrade("increaseMarketCap"); //4, 675
+    // buyUpgrade("trainTogetherMore"); //1, 400
+    // buyUpgrade("stopBeingSoTense"); //1, 500 --
+    // buyUpgrade("refineMyLeverage"); //1, 100
+    // buyUpgrade("refineMyLeverage"); //2, 300
+    // buyUpgrade("refineMyWizardry"); //1, 200
+    //
+    // statAddAmount("legacy", 28e6)
+    // purchaseAction("overponder");
+    // buyUpgrade("createABetterFoundation"); //1, 500
+    // buyUpgrade("createABetterFoundation"); //2, 750
+    // buyUpgrade("createABetterFoundation"); //3, 1125
+    // buyUpgrade("workHarder"); //1, 600
+    // buyUpgrade("workHarder"); //2, 900
+    // buyUpgrade("haveBetterConversations"); //1, 800
+    // buyUpgrade("sparkMoreMana"); //1, 800
+    // buyUpgrade("studyHarder"); //1, 1000
+    // buyUpgrade("rememberWhatIDid"); //1, 600 --
+    // buyUpgrade("retrieveMyUnusedResources"); //1, 500
+    // buyUpgrade("retrieveMyUnusedResources"); //2, 750
+    // buyUpgrade("retrieveMyUnusedResources"); //3, 1125 --
+    //
+    // buyUpgrade("learnFromTheLibrary"); //4, 1600
+    // buyUpgrade("learnFromTheLibrary"); //5, 3200 --
+    // buyUpgrade("improveMyHouse"); //1, 400
+    // buyUpgrade("improveMyHouse"); //2, 1200
+    // buyUpgrade("improveMyHouse"); //3, 3600 --
+    //
+    // buyUpgrade("rememberHowIGrew"); //1, 2000 --
+    // buyUpgrade("rememberMyMastery"); //1, 6000 --
     // buyUpgrade("increaseMarketCap"); //5, 1013 --
     // buyUpgrade("trainTogetherMore"); //2, 800
     // buyUpgrade("trainTogetherMore"); //3, 1600 --

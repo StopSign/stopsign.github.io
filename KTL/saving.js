@@ -15,34 +15,38 @@ function resetActionToBase(actionVar) {
     actionSetBaseVariables(data.actions[actionVar], actionData[actionVar]);
 }
 
-data.saveVersion = 1;
+data.saveVersion = 2;
 function load() {
     initializeData();
 
     let toLoad = {};
-
-    if(onLoadData) {
+    // if(onLoadData) {
+    //     try {
+    //         toLoad = JSON.parse(decode64(onLoadData));
+    //     } catch(e) {
+    //         try { //old save
+    //             toLoad = JSON.parse(decode(onLoadData));
+    //         } catch(e) {
+    //             exportErrorFile(onLoadData);
+    //         }
+    //     }
+    // }
+    if(localStorage[saveName]) {
+        console.log('Save found.');
         try {
-            toLoad = JSON.parse(decode64(onLoadData));
+            toLoad = JSON.parse(decode64(localStorage[saveName]));
         } catch(e) {
             try { //old save
-                toLoad = JSON.parse(decode(onLoadData));
+                toLoad = JSON.parse(decode(localStorage[saveName]));
             } catch(e) {
-                exportErrorFile(onLoadData);
+                exportErrorFile(localStorage[saveName]);
             }
         }
     }
-    // if(localStorage[saveName]) {
-    //     console.log('Save found.');
-    //     try {
-    //         toLoad = JSON.parse(decode(localStorage[saveName]));
-    //     } catch(e) {
-    //         exportErrorFile(localStorage[saveName]);
-    //     }
-    // }
 
-    // const saveVersion = toLoad && toLoad.saveVersion ?? 0;
-    const saveVersion = 1; //for debug only
+    const saveVersionFromLoad = toLoad && toLoad.saveVersion ? toLoad.saveVersion : 0;
+    // const saveVersion = 1; //for debug only
+    let queuedLogMessages = []; //Any info that needs to be told to the user
 
     if(isLoadingEnabled && localStorage[saveName] && toLoad.actions) { //has a save file
         //only go through the ones in toLoad and graft them on to existing data
@@ -50,7 +54,7 @@ function load() {
             let actionObj = data.actions[actionVar];
             let dataObj = actionData[actionVar];
             let loadObj = toLoad.actions[actionVar];
-            if(!dataObj || dataObj.creationVersion > saveVersion) {
+            if(!dataObj || dataObj.creationVersion > saveVersionFromLoad) {
                 // console.log("Skipped loading action " + actionVar + " from save.");
                 continue;
             }
@@ -58,16 +62,20 @@ function load() {
         }
 
         for(let upgradeVar in toLoad.upgrades) {
-            let actionObj = data.upgrades[upgradeVar];
-            let dataObj = upgradeData[upgradeVar];
+            let upgradeObj = data.upgrades[upgradeVar];
+            let upgradeDataObj = upgradeData[upgradeVar];
             let loadObj = toLoad.upgrades[upgradeVar];
-            if(!dataObj || dataObj.creationVersion > saveVersion) { //If removed or needs to refresh
+            if(!upgradeDataObj || upgradeDataObj.creationVersion > saveVersionFromLoad) { //If removed or needs to refresh
+                let refundAmount= calcTotalSpentOnUpgrade(loadObj.initialCost, loadObj.costIncrease, loadObj.upgradesBought);
+                if(refundAmount > 0) {
+                    data.ancientCoin += refundAmount;
+                    queuedLogMessages.push(["Info: Refunded <b>"+refundAmount+"</b> AC for the upgrade: " + (loadObj.title || decamelizeWithSpace(upgradeVar)), "info"])
+                }
                 // console.log("Skipped loading upgrade " + upgradeVar + " from save.");
                 continue;
             }
-            loadActionFromSave(actionObj, loadObj);
+            loadActionFromSave(upgradeObj, loadObj);
         }
-
 
         // mergeExistingOnly(data, toLoad, "actions", ["x", "y", "realX", "realY"]); //use patch instead
         //these are in the skiplist because if, between saves, an action has changed the atts it has, the links need to be reset instead of saved.
@@ -93,9 +101,7 @@ function load() {
         data.focusSelected = toLoad.focusSelected ?? [];
         data.resetLogs = toLoad.resetLogs ?? [];
         data.planeUnlocked = toLoad.planeUnlocked ?? [true, false, false, false];
-        data.maxFocusAllowed = toLoad.maxFocusAllowed ?? 3;
-        data.focusMult = toLoad.focusMult ?? 2;
-        data.focusLoopMax = toLoad.focusLoopMax ?? 2.5;
+        data.maxFocusAllowed = toLoad.maxFocusAllowed ?? 2;
         data.lastVisit = toLoad.lastVisit ?? Date.now();
         data.currentLog = toLoad.currentLog ?? [];
         data.currentPinned = toLoad.currentPinned ?? [];
@@ -103,6 +109,7 @@ function load() {
         data.legacyMultKTL = toLoad.legacyMultKTL ?? 1;
         data.totalSpellPower = toLoad.totalSpellPower ?? 0;
         data.maxSpellPower = toLoad.maxSpellPower ?? 0;
+        data.resetCount = toLoad.resetCount ?? 1;
 
         data.currentGameState = toLoad.currentGameState;
         // data.gameSettings = toLoad.gameSettings;
@@ -111,16 +118,27 @@ function load() {
         if(toLoad.gameSettings.viewAdvancedSliders === undefined) { //defaults off on new saves
             data.gameSettings.viewAdvancedSliders = true;
         }
-        delete data.atts.processing; //changed named to Intellect, have to delete old att
-        delete data.atts.stillness; //changed named to Peace, have to delete old att
         if(toLoad.actions.poolMana.visible) {
             actionData.poolMana.generatorSpeed = 6;
         }
-        if(data.saveVersion <= 1) {
+        //save version specific data correction
+        if(saveVersionFromLoad <= 1) {
+            delete data.atts.processing; //changed named to Intellect, have to delete old att
+            delete data.atts.stillness; //changed named to Peace, have to delete old att
             data.actions.overboost.instability = 0;
             data.actions.overcharge.instability = 0;
-        }
+            data.currentLog = []; //clear log since the format changed
+            data.resetLogs = []; //clear log since the format changed
+            delete data.focusLoopMax;
+            delete data.focusMult;
 
+            for(let actionVar in data.actions) {
+                let dataObj = actionData[actionVar];
+                for (let downstreamVar of dataObj.downstreamVars) {
+                    delete data.actions[actionVar][`${downstreamVar}FocusMult`]
+                }
+            }
+        }
 
         applyUpgradeEffects()
     }
@@ -134,11 +152,14 @@ function load() {
     }
 
     initializeDisplay();
-    setSlidersOnLoad(toLoad, saveVersion);
+    setSlidersOnLoad(toLoad, saveVersionFromLoad);
     // recalcInterval(data.options.updateRate);
     views.updateView();
 
 
+    for(let queuedLogMessage of queuedLogMessages) {
+        addLogMessage(queuedLogMessage[0], queuedLogMessage[1]);
+    }
     debug(); //change game after all else, for easier debugging
 }
 
@@ -242,6 +263,7 @@ function updateUIOnLoad() {
 
     for (let actionVar in data.actions) {
         let actionObj = data.actions[actionVar];
+        let dataObj = actionData[actionVar];
         if(data.gameState === "KTL") {
             actionObj.isRunning = actionObj.plane === 2;
         } else {
@@ -266,7 +288,10 @@ function updateUIOnLoad() {
         let automationUnlocked = data.upgrades.stopLettingOpportunityWait.upgradePower > 0
             || data.upgrades.knowWhenToMoveOn.upgradePower > 0;
         if(automationUnlocked) {
-            views.updateVal(`${actionVar}_automationMenuButton`, actionObj.hasUpstream?"":"none", "style.display");
+            views.updateVal(`${actionVar}_automationMenuButton`, actionObj.hasUpstream && dataObj.plane !== 2?"":"none", "style.display");
+        }
+        if(data.doneAmulet) {
+            views.updateVal(`${actionVar}PinButton`, "", "style.display");
         }
         if(actionObj.hasUpstream) {
             if (actionObj.automationOff) {
@@ -287,7 +312,11 @@ function updateUIOnLoad() {
             }
         }
     }
-    switchToPlane(0);
+    if(data.gameState === "KTL") {
+        switchToPlane(2);
+    } else {
+        switchToPlane(0);
+    }
 
     
     if(data.doneAmulet && data.gameState !== "KTL") {
@@ -325,15 +354,15 @@ function updateUIOnLoad() {
         recalcAttMult(attVar)
     }
 
+    views.updateVal(`killTheLichMenuButton2`, !data.actions.trainWithTeam.unlocked ? "Fight the Lich's Forces!":"Fight the Lich's Forces, Together!");
 }
 
 function reapplyAttentionSelected() {
     if (!data.focusSelected) return;
 
-    data.focusSelected.forEach(entry => {
-        const { borderId } = entry;
-        highlightLine(borderId); // Reapply visual state
-    });
+    for(let focusObj of data.focusSelected) {
+        highlightLine(focusObj.borderId);
+    }
 }
 
 function save() {

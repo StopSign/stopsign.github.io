@@ -162,10 +162,11 @@ function generateActionDisplay(actionVar) {
     queueCache(`${actionVar}InstabilityToAdd`);
     queueCache(`${actionVar}SpellPower`);
     queueCache(`${actionVar}SpellPowerContainer`);
+    queueCache(`${actionVar}PinButton`);
 
     let pauseButton = `<span id="${actionVar}PauseButton" style="font-size:16px;border:2px solid red;font-weight:bold;vertical-align:top;padding:0 3px" class="mouseoverRed" onclick="pauseAction(event, '${actionVar}')">||</span>`
     let spellPowerContainer = `<span style="font-size:16px;"> | <span style="font-weight:bold;color:#0ec3cf" id="${actionVar}SpellPower"></span> Spell Power</span>`
-    let pinButton = `<span id="${actionVar}PinButton" style="font-size:16px;border:2px solid ${resourceColorDim};font-weight:bold;vertical-align:top;padding:0 3px" class="mouseoverBlue" onclick="addPinnedActionClick(event, '${actionVar}')">P</span>`
+    let pinButton = `<span id="${actionVar}PinButton" style="display:none;font-size:16px;border:2px solid ${resourceColorDim};font-weight:bold;vertical-align:top;padding:0 3px" class="mouseoverBlue" onclick="addPinnedActionClick(event, '${actionVar}')">P</span>`
 
     let title = Raw.html`
         <span onclick="actionTitleClicked('${actionVar}')" style="color:var(--text-primary);cursor:pointer;position:absolute;
@@ -690,8 +691,8 @@ function createDownStreamSliders(actionObj, dataObj) {
         queueCache(`${actionVar}SliderContainer${downstreamVar}`)
         queueCache(`${actionVar}SliderDownstreamTitle${downstreamVar}`)
         queueCache(`${actionVar}DownstreamSendRate${downstreamVar}`)
-        queueCache(`${actionVar}DownstreamAttentionBonusLoop${downstreamVar}`)
-        queueCache(`${actionVar}DownstreamAttentionBonus${downstreamVar}`)
+        queueCache(`${actionVar}DownstreamAttentionBonusPerm${downstreamVar}`)
+        queueCache(`${actionVar}DownstreamAttentionBonusTemp${downstreamVar}`)
         queueCache(`${actionVar}NumInput${downstreamVar}`)
         queueCache(`${actionVar}RangeInput${downstreamVar}`)
         queueCache(`${actionVar}SliderLabels${downstreamVar}`)
@@ -706,9 +707,9 @@ function createDownStreamSliders(actionObj, dataObj) {
                     onclick="actionTitleClicked('${downstreamVar}')">${title}</span>
                 <span id="${actionVar}SliderLabels${downstreamVar}">
                     (+<span id="${actionVar}DownstreamSendRate${downstreamVar}" style="font-weight:bold;">0</span>/s)
-                    <span id="${actionVar}DownstreamAttentionBonusLoop${downstreamVar}"
+                    <span id="${actionVar}DownstreamAttentionBonusPerm${downstreamVar}"
                         class="hyperVisible" style="color:mediumpurple;display:none;font-weight:bold;">x1.00</span>
-                    <span id="${actionVar}DownstreamAttentionBonus${downstreamVar}" 
+                    <span id="${actionVar}DownstreamAttentionBonusTemp${downstreamVar}" 
                         class="hyperVisible" style="color:yellow;display:none;font-weight:bold;">x2</span><br>
                 </span>
 
@@ -985,25 +986,26 @@ function generateLinesBetweenActions() {
     }
 }
 
-
 function renderResetLog() {
     let rows = '';
-    let index = 1;
+    let teamworkFound = false;
     for (let resetLog in data.resetLogs) {
-        if (!data.resetLogs.hasOwnProperty(resetLog)) continue;
+            if (!data.resetLogs.hasOwnProperty(resetLog)) continue; //only print when both stages are added
         const log = data.resetLogs[resetLog];
+        if(log.stage1.currentTeamwork > 0) {
+            teamworkFound = true;
+        }
         rows += `
             <tr>
-                <td style="padding:2px 4px;">${index}</td>
+                <td style="padding:2px 4px;">${log.stage1.resetCount}</td>
                 <td style="padding:2px 4px;">
-                    ${!log.stage1 ? "-" : `${log.stage1.legacyGained} / ${secondsToTime(log.stage1.secondsPerReset)}` }
+                    ${!log.stage1 ? "-" : `${secondsToTime(log.stage1.secondsPerReset)} | ${intToString(log.stage1.currentMomentum)} | ${intToString(log.stage1.currentFear)} | ${intToString(log.stage1.currentLegacy)}${log.stage1.currentTeamwork > 0 ?` | ${intToString(log.stage1.currentTeamwork)}`:""}`}
                 </td>
                 <td style="padding:2px 4px;">
-                    ${!log.stage2 ? "-" : `${log.stage2.legacyGained} / ${log.stage2.ancientCoin}` }
+                    ${!log.stage2 ? "-" : `${intToString(log.stage2.legacyGained)} | ${intToString(log.stage2.ancientCoin)}` }
                 </td>
             </tr>
         `;
-        index++;
     }
     return `
         <div>
@@ -1012,8 +1014,8 @@ function renderResetLog() {
                 <thead>
                     <tr>
                         <th style="padding:2px 4px; text-align:left;">#</th>
-                        <th style="padding:2px 4px; text-align:left;">Stage 1<br>(Legacy, Time)</th>
-                        <th style="padding:2px 4px; text-align:left;">Stage 2<br>(Legacy Gained, Ancient Coin Gained)</th>
+                        <th style="padding:2px 4px; text-align:left;">Stage 1<br>(Time | Momentum | Fear | Legacy${teamworkFound ?` | Teamwork`:""})</th>
+                        <th style="padding:2px 4px; text-align:left;">Stage 2<br>(Legacy Gained | Ancient Coin Gained)</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -1045,7 +1047,6 @@ function setAllCaches() {
     queueCache("bonusDisplay");
     queueCache("killTheLichMenuButton2");
     queueCache("hearAboutTheLichActionPower2");
-    queueCache("studyActionPower2");
     queueCache("ancientCoinDisplay");
     queueCache("spellPowerDisplay");
     queueCache("jobDisplay");
