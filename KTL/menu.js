@@ -573,12 +573,16 @@ function createChangelogMenu() {
     return Raw.html`
         <div class="menuTitle">Changelog</div>
         <div class="menuSeparator"></div><br>
-        v2.0.2 10/26 (current):<br>
+        v2.0.3 10/26 (current):<br>
         <ul>
             <li>Fixed a bug that paused spells didn't count towards spell power</li>
             <li>Fight the Lich's Forces button (under HATL) appears with HATL level and stays visible</li>
             <li>Reworked the Fight The Lich's Forces menu to show the error with spell power, and a message to pause actions if needed with train with team</li>
             <li>Refunded AC properly</li>
+            <li>A couple upgrade descriptions fixed</li>
+            <li>Initial study info should be correct</li>
+            <li>Spark Decay, on level, unveils the actions its supposed to show on unlock, just in case</li>
+            <li>Floating early extra jobs shouldn't be seen without the Ask About Better Work upgrade</li>
         </ul>
         v2.0 10/26:<br>
         <ul>

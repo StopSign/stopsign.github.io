@@ -22,6 +22,7 @@ function load() {
     let toLoad = {};
     // if(onLoadData) {
     //     try {
+    // console.log('Loading locally.');
     //         toLoad = JSON.parse(decode64(onLoadData));
     //     } catch(e) {
     //         try { //old save

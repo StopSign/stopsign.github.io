@@ -60,6 +60,10 @@ actionData = {
             actionData.poolMana.generatorSpeed = 6;
             unveilAction('expelMana')
         },
+        onLevelCustom: function() {
+            unveilAction('poolMana');
+            unveilAction('expelMana');
+        },
         onLevelAtts:[["spark", 5]],
         expAtts:[["amplification", 1]],
         efficiencyAtts:[["spark", -1]],
@@ -461,8 +465,10 @@ actionData = {
         efficiencyBase:.01, maxLevel:1, isSpell:true, instabilityToAdd:125, power:3,
         unlockCost:1e12, visible:false, unlocked:false, purchased: false,
         onLevelCustom: function() {
-            unveilAction('shapeEarth')
-            unveilAction('digFoundation')
+            if(data.upgrades.askAboutBetterWork.upgradePower > 0) {
+                unveilAction('shapeEarth')
+                unveilAction('digFoundation')
+            }
         },
         onLevelAtts:[["wizardry", 300]],
         expAtts:[["spellcraft", .1]],
@@ -479,8 +485,10 @@ actionData = {
         efficiencyBase:.003, maxLevel:1, isSpell:true, instabilityToAdd:150, power:6,
         unlockCost:1e13, visible:false, unlocked:false, purchased: false,
         onLevelCustom: function() {
-            unveilAction('moveIron')
-            unveilAction('stoneCompression')
+            if(data.upgrades.askAboutBetterWork.upgradePower > 0) {
+                unveilAction('moveIron')
+                unveilAction('stoneCompression')
+            }
         },
         onLevelAtts:[["wizardry", 600]],
         expAtts:[["spellcraft", .1]],
@@ -497,8 +505,10 @@ actionData = {
         efficiencyBase:.001, maxLevel:1, isSpell:true, instabilityToAdd:175, power:10,
         unlockCost:1e14, visible:false, unlocked:false, purchased: false,
         onLevelCustom: function() {
-            unveilAction('reinforceArmor')
-            unveilAction('shapeBricks')
+            if(data.upgrades.askAboutBetterWork.upgradePower > 0) {
+                unveilAction('reinforceArmor')
+                unveilAction('shapeBricks')
+            }
         },
         onLevelAtts:[["wizardry", 1000]],
         expAtts:[["spellcraft", .1]],
@@ -515,8 +525,10 @@ actionData = {
         efficiencyBase:.001, maxLevel:1, isSpell:true, instabilityToAdd:200, power:30,
         unlockCost:3e14, visible:false, unlocked:false, purchased: false,
         onLevelCustom: function() {
-            unveilAction('illuminate')
-            unveilAction('tidyMagesmithShop')
+            if(data.upgrades.askAboutBetterWork.upgradePower > 0) {
+                unveilAction('illuminate')
+                unveilAction('tidyMagesmithShop')
+            }
         },
         onUnlock: function() {
         },
@@ -535,8 +547,10 @@ actionData = {
         efficiencyBase:.0005, maxLevel:1, isSpell:true, instabilityToAdd:225, power:50,
         unlockCost:3e15, visible:false, unlocked:false, purchased: false,
         onLevelCustom: function() {
-            unveilAction('unblemish')
-            unveilAction('clearTheBasement')
+            if(data.upgrades.askAboutBetterWork.upgradePower > 0) {
+                unveilAction('unblemish')
+                unveilAction('clearTheBasement')
+            }
         },
         onLevelAtts:[["wizardry", 2500]],
         expAtts:[["spellcraft", .1]],

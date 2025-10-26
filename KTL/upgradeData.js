@@ -672,7 +672,7 @@ let upgradeData = {
         upgradesAvailable:5,
         visible:false,
         customInfo: function(num) {
-            return Raw.html`Invest's maximum fotune gain cap increases to ${["1e7 (currently 1e5)", "1e9 (currently 1e7)", "1e11 (currently 1e9)", "1e13 (currently 1e11)", "1e15 (currently 1e13)", "1e15"][num]}.`
+            return Raw.html`Invest's maximum fortune gain cap increases to ${["1e7 (currently 1e5)", "1e9 (currently 1e7)", "1e11 (currently 1e9)", "1e13 (currently 1e11)", "1e15 (currently 1e13)", "1e15"][num]}.`
         },
         currentValue: function() {
             return [1e5, 1e7, 1e9, 1e11, 1e13, 1e15][data.upgrades.increaseMarketCap.upgradePower];
@@ -792,9 +792,6 @@ let upgradeData = {
         upgradesAvailable:4,
         visible:false,
         customInfo: function(num) {
-            return "Info"
-        },
-        onBuy: function(num) {
             return "Gold generation increased by "+(num >0?"another ":"")+"x1.5, multiplicative";
         }
     },

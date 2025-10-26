@@ -853,6 +853,7 @@ actionData = {
         efficiencyBase:1,
         unlockCost:1e33, visible:false, unlocked:false, purchased: false, showToAdd:true,
         onUnlock: function() {
+            data.actions.study.resourceToAdd = 1;
         },
         onLevelCustom: function() {
             let actionObj = data.actions.study;

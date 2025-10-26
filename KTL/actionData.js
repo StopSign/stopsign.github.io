@@ -929,7 +929,7 @@ Level 3: Reveal Check Notice Board`}
             Base Rate = 1 (increased with upgrades)<br><br>
             Fortune Gain = (log10(Gold Taken) * Base Rate + Reinvested) * efficiency<br><br>
             Exp Gain = log10(Gold Taken)<br><br>
-            Fortune Gain is capped at 1e5^(Action Power)`},
+            Fortune Gain is capped at (Market Cap)^(Action Power)`},
         iconText: {english:Raw.html`
         Uses Gold and Fortune on Reinvest to produce Fortune<br>
         On Unlock: Reveal Build Fortune
