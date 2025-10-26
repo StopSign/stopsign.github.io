@@ -96,7 +96,7 @@
     View Amulet Upgrades
 </span>
 
-<span id="currentVersion" style="position:fixed;top:1px;right:5px;color:var(--text-muted)">v2.0</span>
+<span id="currentVersion" style="position:fixed;top:1px;right:5px;color:var(--text-muted)">v2.0.1</span>
 
 
 <div id="bonusDisplayShowButton" class="button" onclick="bonusMenuHideButton()"
@@ -211,19 +211,21 @@ It continues, capturing fraction ancientCoin of your fleeting soul and sending i
         <div class="menuSeparator"></div>
         <div id="ktlDynamicContent" class="dynamicContent">
             <br>
-            Changing your overclock target will set you on a new path to get as much Ancient Coins and Legacy as you can.<br><br>
-            You will gain progress using Total Momentum, Hear About The Lich's level, and Spell Power!<br><br>
+            Changing your overclock target will set you on a new path in the Northern Wastes to get as much Ancient Coins and Legacy as you can.<br><br>
+            You will gain progress using Total Momentum, Hear About The Lich's level, Spell Power, Fear, and other bonuses later!<br><br>
             Brythal and Magic will be paused and unchangeable while you are at war.<br>
-            After you get as many resources as you can, there will only be the option to reset:<br>
+            After you get as many resources as you can in the Northern Wastes, doom will overcome you, and you will have to reset using the amulet. In this reset:<br>
             <ul>
                 <li>All attributes will reset.</li>
                 <li>All Brythal actions will reset.</li>
                 <li>All Magic actions will reset except for the unlock cost.</li>
-            </ul>
+            </ul><br>
+            Doing this action requires spell power. Check that your spells have charges! You currently have: <span id="maxSpellPower2" style="font-weight:bold;"></span> spell power.
+            <span id="spellPowerErrorMessage" style="display:none;font-weight:bold;color:var(--warning-color)"><br>You must have spell power to reset. Gain charges on your spells first.</span>
+            <span id="spellPowerWarningMessage" style="display:none;font-weight:bold;color:var(--error-color)"><br>Your current spell power is what counts (until upgraded). You may want to pause Train with Team before reset</span>
         </div>
         <input type="checkbox" id="confirmKTL"><label for="confirmKTL">Confirm</label>
-        <button class="continueButton" onclick="initializeKTL()">Join the War for Life with <span id="totalMomentum2"></span> Total Momentum,
-             <span id="maxSpellPower2"></span> spell power, and Hear About The Lich level <span id="HATLLevel"></span>!</button>
+        <button class="continueButton" onclick="initializeKTL()">Join the War for Life in the Northern Wastes!</button>
     </div>
 </div>
 

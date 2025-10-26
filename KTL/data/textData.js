@@ -180,7 +180,7 @@ const actionTextData = `
     
     <catchAScent>
         <english><![CDATA[
-            The scent was elusive, and not present all days. When the wind shifted and I caught the scent, it was a sweet and enticing smell. I started paying closer attention to where in forest I was catching the smell, and after a few days I was able to roughly figure out a direction to head towards. Unfortunately, the path led me to a cliff that I could not scale. While I thought I could explore further and find a path up the cliff, at the moment this was as far as I could get.<br><br>
+            The scent was elusive, and not present all days. When the wind shifted and I caught the scent, it was a sweet and enticing smell. I started paying closer attention to where in the forest I was catching the smell, and after a few days I was able to roughly figure out a direction to head towards. Unfortunately, the path led me to a cliff that I could not scale. While I thought I could explore further and find a path up the cliff, at the moment this was as far as I could get.<br><br>
             
             Scott was still happy to hear about all the birds I found along the path.
         ]]></english>

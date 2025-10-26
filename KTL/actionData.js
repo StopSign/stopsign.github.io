@@ -2168,7 +2168,7 @@ Level 3: Reveal Check Notice Board`}
             let dataObj = actionData.trainWithTeam;
 
             actionObj.progressGain = dataObj.generatorSpeed * (actionObj.efficiency / 100);
-            actionObj.resourceToAdd = getActiveSpellPower();
+            actionObj.resourceToAdd = getActiveSpellPower(false);
             actionObj.expToAddBase = actionObj.resourceToAdd;
             actionObj.expToAdd = actionObj.expToAddBase * actionObj.expToAddMult;
         },

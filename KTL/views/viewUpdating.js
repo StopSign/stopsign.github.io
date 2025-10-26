@@ -40,7 +40,7 @@ let views = {
 
         views.updateVal(`jobDisplay`, data.displayJob ? "" : "none", "style.display");
 
-        let shouldShowKTLButton = data.actions.hearAboutTheLich.level >= 1 && data.maxSpellPower > 0 && data.gameState !== "KTL";
+        let shouldShowKTLButton = data.actions.hearAboutTheLich.level >= 1 && data.gameState !== "KTL";
         views.updateVal(`killTheLichMenuButton2`, shouldShowKTLButton?"":"none", "style.display")
     },
     scheduleUpdate: function(elementId, value, type) {
@@ -495,7 +495,7 @@ function updateGlobals() {
         }
     }
     data.totalMomentum = totalMometum;
-    data.totalSpellPower = getActiveSpellPower();
+    data.totalSpellPower = getActiveSpellPower(true);
     if(data.upgrades.keepMyMagicReady.upgradePower) {
         if(data.totalSpellPower > data.maxSpellPower) {
             data.maxSpellPower = data.totalSpellPower;
@@ -508,9 +508,10 @@ function updateGlobals() {
     views.updateVal(`totalMomentum`, totalMometum, "textContent", 1);
 
     if(KTLMenuOpen) { //only update if menu is open
-        views.updateVal(`totalMomentum2`, totalMometum, "textContent", 1);
         views.updateVal(`maxSpellPower2`, data.maxSpellPower, "textContent", 1);
-        views.updateVal(`HATLLevel`, data.actions.hearAboutTheLich.level, "textContent", 1);
+        views.updateVal(`maxSpellPower2`, data.maxSpellPower>0?"#0ec3cf":"red", "style.color");
+        views.updateVal(`spellPowerErrorMessage`, data.maxSpellPower===0?"":"none", "style.display");
+        views.updateVal(`spellPowerWarningMessage`, data.actions.trainWithTeam.unlocked?"":"none", "style.display");
     }
 
     views.updateVal(`secondsPerReset`, data.secondsPerReset, "textContent","time");

@@ -579,11 +579,11 @@ function useActiveSpellCharges() {
     }
 }
 
-function getActiveSpellPower() {
+function getActiveSpellPower(shouldCountPaused) {
     let totalSpellPower = 0;
     for(let actionVar in data.actions) {
         let actionObj = data.actions[actionVar];
-        if(actionObj.power && !actionObj.isPaused) {
+        if(actionObj.power && (shouldCountPaused || !actionObj.isPaused)) {
             totalSpellPower += actionObj.power * actionObj.level;
         }
     }

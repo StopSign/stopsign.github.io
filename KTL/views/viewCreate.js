@@ -1032,8 +1032,6 @@ function renderResetLog() {
 
 function setAllCaches() {
     queueCache("totalMomentum");
-    queueCache("totalMomentum2");
-    queueCache("HATLLevel");
     queueCache("secondsPerReset");
     queueCache("openUseAmuletButton");
     queueCache("openViewAmuletButton");
@@ -1041,6 +1039,8 @@ function setAllCaches() {
     queueCache("ancientCoin2");
     queueCache("maxSpellPower");
     queueCache("maxSpellPower2");
+    queueCache("spellPowerErrorMessage");
+    queueCache("spellPowerWarningMessage");
     queueCache("bonusTime");
     queueCache("killTheLichMenu");
     queueCache("attDisplay");
