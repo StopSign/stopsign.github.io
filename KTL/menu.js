@@ -583,7 +583,6 @@ function createChangelogMenu() {
             <li>Instability's effect is squared, and control's reduction is square rooted. Instability increase per spell charge use is lowered.</li>
             <li>Changed legacy gain formula/numbers in KTL to balance the increased gain later.</li>
             <li>Increased doom gain by ~x2</li>
-            <li>Basic sliders  options changed to 0, 5%, 20%, 50%, 100%</li>
             <li>Moved unlock time, previous unlock time, delta to the action icon (gear/lightning)</li>
             <li>Center screen button works per screen</li>
             <li>Hopefully fixed resources going to NaN sometimes (rarely, a number minus itself results in a negative number, due to rounding errors in the math)</li>
