@@ -573,7 +573,7 @@ function createChangelogMenu() {
     return Raw.html`
         <div class="menuTitle">Changelog</div>
         <div class="menuSeparator"></div><br>
-        v2.0.3 10/26 (current):<br>
+        v2.0.4 10/26 (current):<br>
         <ul>
             <li>Fixed a bug that paused spells didn't count towards spell power</li>
             <li>Fight the Lich's Forces button (under HATL) appears with HATL level and stays visible</li>
