@@ -61,6 +61,8 @@ actionData = {
             unveilAction('expelMana')
         },
         onLevelCustom: function() {
+            unlockAction(data.actions.poolMana.unlocked);
+            actionData.poolMana.generatorSpeed = 6;
             unveilAction('poolMana');
             unveilAction('expelMana');
         },
