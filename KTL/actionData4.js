@@ -55,13 +55,13 @@ actionData = {
         efficiencyBase:1,
         unlockCost:25, visible:false, unlocked:false, purchased: true, hasUpstream:false,
         onUnlock: function() {
-            unlockAction(data.actions.poolMana.unlocked);
+            unlockAction(data.actions.poolMana);
             unveilAction('poolMana');
             actionData.poolMana.generatorSpeed = 6;
             unveilAction('expelMana')
         },
         onLevelCustom: function() {
-            unlockAction(data.actions.poolMana.unlocked);
+            unlockAction(data.actions.poolMana);
             actionData.poolMana.generatorSpeed = 6;
             unveilAction('poolMana');
             unveilAction('expelMana');
