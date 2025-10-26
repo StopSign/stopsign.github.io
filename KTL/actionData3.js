@@ -270,6 +270,7 @@ actionData = {
             unveilUpgrade('createABetterFoundation')
             unveilUpgrade('workHarder')
             unveilUpgrade('haveBetterConversations')
+            unveilUpgrade('sparkMoreMana')
             unveilUpgrade('studyHarder')
         },
         onCompleteCustom:function() {
@@ -290,7 +291,7 @@ actionData = {
     },
     stopDarknessRitual: {
         tier:0, plane:2, resourceName:"fight", creationVersion:2,
-        progressMaxBase:2e13, progressMaxIncrease:3,
+        progressMaxBase:2e13, progressMaxIncrease:4,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.04, isKTL:true, purchased: true, maxLevel:12,
         unlockCost:2e9, visible:false, unlocked:false,
@@ -319,7 +320,7 @@ actionData = {
     },
     protectTheSunstone: {
         tier:0, plane:2, resourceName:"fight", creationVersion:2,
-        progressMaxBase:2e15, progressMaxIncrease:3,
+        progressMaxBase:2e15, progressMaxIncrease:4,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.03, isKTL:true, purchased: true, maxLevel:15,
         unlockCost:2e10, visible:false, unlocked:false,
@@ -331,6 +332,9 @@ actionData = {
             statAddAmount("legacy", 100 * (data.actions.protectTheSunstone.level/10 + 1));
         },
         onLevelCustom: function() {
+            if(data.actions.protectTheSunstone.level >= 3) {
+                unveilAction('silenceDeathChanters');
+            }
         },
         onLevelAtts:[["legacy", 100]],
         expAtts:[["legacy", .1]],
@@ -339,30 +343,34 @@ actionData = {
         unlockMessage:{english:"On unlock, +54 Ancient Coins. This amount is multiplied by Hear About The Lich's level."},
         iconText: {english:Raw.html`
         On Unlock: +54 base Ancient Coins<br>
-        On Complete: +100 base Legacy
+        On Complete: +100 base Legacy<br>
+        Level 3: Reveal Protect The Sunstone
 `}
     },
     silenceDeathChanters: {
         tier:0, plane:2, resourceName:"fight",
-        progressMaxBase:1e10, progressMaxIncrease:2,
+        progressMaxBase:2e17, progressMaxIncrease:4,
         expToLevelBase:10, expToLevelIncrease:1,
-        efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
-        unlockCost:1e9, visible:false, unlocked:false,
+        efficiencyBase:.02, isKTL:true, purchased: true, maxLevel:18,
+        unlockCost:2e11, visible:false, unlocked:false,
         onUnlock: function() {
-            data.ancientCoin += 1;
-
+            data.ancientCoinGained += 87 * data.ancientCoinMultKTL;
+            data.ancientCoin += 87 * data.ancientCoinMultKTL;
         },
         onCompleteCustom:function() {
-            data.legacy += 1;
+            statAddAmount("legacy", 150 * (data.actions.silenceDeathChanters.level/10 + 1));
         },
         onLevelCustom: function() {
-            unveilAction('');
         },
-        onLevelAtts:[],
-        expAtts:[],
-        efficiencyAtts:[],
-        extraInfo:{english:"1 Legacy per complete."},
-        unlockMessage:{english:"On unlock, +1 Ancient Coins."}
+        onLevelAtts:[["legacy", 150]],
+        expAtts:[["legacy", .1]],
+        efficiencyAtts:[["courage", 1], ["valor", .1], ["doom", -1]],
+        extraInfo:{english:"+150 * (1 + level/10) Legacy on complete."},
+        unlockMessage:{english:"On unlock, +87 Ancient Coins. This amount is multiplied by Hear About The Lich's level."},
+        iconText: {english:Raw.html`
+        On Unlock: +87 base Ancient Coins<br>
+        On Complete: +150 base Legacy
+`}
     },
     breakFleshBarricade: {
         tier:0, plane:2, resourceName:"fight",

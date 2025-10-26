@@ -573,7 +573,33 @@ function createChangelogMenu() {
     return Raw.html`
         <div class="menuTitle">Changelog</div>
         <div class="menuSeparator"></div><br>
-        v1.4.2 9/9 (current):<br>
+        v2.0 10/26 (current):<br>
+        <ul>
+            <li>Tons of extra actions and upgrades, greatly expanding available content</li>
+            <li>Spark Mana renamed to Spark Decay and efficiency color reversed</li>
+            <li>Fixed upgrade Start A Little Quicker to do what it says (previously was giving 10, 20, 30 per second)</li>
+            <li>Fixed first complete of Overclock Targeting The Lich not working</li>
+            <li>Actions are a little wider, for progress bar numbers</li>
+            <li>Instability's effect is squared, and control's reduction is square rooted. Instability increase per spell charge use is lowered.</li>
+            <li>Changed legacy gain formula/numbers in KTL to balance the increased gain later.</li>
+            <li>Increased doom gain by ~x2</li>
+            <li>Basic sliders  options changed to 0, 5%, 20%, 50%, 100%</li>
+            <li>Moved unlock time, previous unlock time, delta to the action icon (gear/lightning)</li>
+            <li>Center screen button works per screen</li>
+            <li>Hopefully fixed resources going to NaN sometimes (rarely, a number minus itself results in a negative number, due to rounding errors in the math)</li>
+            <li>Moved unlocks and on-level info to the icon, to be visible before and after unlocking the action</li>
+            <li>Spell Power shows on Spells</li>
+            <li>Actions in Magic record level 1 time (and show delta to previous) instead of unlock time</li>
+            <li>Switched saving algorithms to allow for more data to be saved</li>
+            <li>New actions after the pre-KTL ones, will default to automationOff, which can only be changed once they are unlocked.</li>
+            <li>Moved View Amulet Upgrades to bottom right</li>
+            <li>Added pinning actions to the side, to click to focus on. Unlocked at first amulet for now (later will be a QoL purchase)</li>
+            <li>Log also records current reset number, momentum, fear, and teamwork</li>
+            <li>Reworked focus bonus and focus bonus upgrades. There is now an in-loop and a permanent bonus, separately. Refunded the cost of the previous upgrades</li>
+            <li>Renamed Kill the Lich [3] to Northern Wastes</li>
+            <li>Renamed Kill the Lich button to Fight the Lich's Forces!</li>
+        </ul>
+        v1.4.2 9/9:<br>
         <ul>
             <li>Fixed mobile drag, changed default size on mobile, prevented zoom on menus making the screen stuck, and added a close button to the main menu</li>
             <li>Fixed screen jumping issue on distant actions</li>

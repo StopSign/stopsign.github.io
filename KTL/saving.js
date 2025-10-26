@@ -138,6 +138,7 @@ function load() {
                     delete data.actions[actionVar][`${downstreamVar}FocusMult`]
                 }
             }
+            data.toastStates[23] = "hidden";
         }
 
         applyUpgradeEffects()

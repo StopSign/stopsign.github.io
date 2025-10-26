@@ -537,6 +537,7 @@ let upgradeData = {
                 purchaseAction('shapeBricks')
                 unveilUpgrade('keepMyMagicReady')
                 unveilUpgrade('trainTogetherMore');
+                unveilUpgrade('refineMyWizardry')
             } else if(num === 2) {
                 purchaseAction('findAFamiliarLanguage')
                 purchaseAction('searchForRelevantBooks')
@@ -898,7 +899,7 @@ let upgradeData = {
     refineMyGeared: { attribute:"geared", upgradesAvailable:4, increaseRatio:.5, initialCost:10, costIncrease:3, visible:true },
     refineMyCourage: { attribute:"courage", upgradesAvailable:4, increaseRatio:1, initialCost:10, costIncrease:2, visible:true },
     refineMyLeverage: { attribute:"leverage", upgradesAvailable:4, increaseRatio:.5, initialCost:100, costIncrease:3, visible:false, creationVersion:2 },
-    refineMyWizardry: { attribute:"wizardry", upgradesAvailable:4, increaseRatio:.25, initialCost:200, costIncrease:4, visible:true, creationVersion:2 },
+    refineMyWizardry: { attribute:"wizardry", upgradesAvailable:4, increaseRatio:.25, initialCost:200, costIncrease:4, visible:false, creationVersion:2 },
 
     //... finish up to here
     /*

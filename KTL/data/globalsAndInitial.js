@@ -93,15 +93,15 @@ let viewData = {}; //contains only things that are generated / not saved
 viewData.toasts = [];
 
 let language = "english";
-// let globalVisible = false;
-let globalVisible = true;
+let globalVisible = false;
+// let globalVisible = true;
 let isLoadingEnabled = true; //SET FALSE FOR CLEARING SAVE
 
 
 data.upgrades = {};
 
-// let isDebug = false;
-let isDebug = true;
+let isDebug = false;
+// let isDebug = true;
 function debug() {
     if(!isDebug) {
         return;
