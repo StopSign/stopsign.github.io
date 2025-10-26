@@ -61,6 +61,7 @@ function load() {
             loadActionFromSave(actionObj, loadObj);
         }
 
+        let refundAmount = 0;
         for(let upgradeVar in toLoad.upgrades) {
             let upgradeObj = data.upgrades[upgradeVar];
             let upgradeDataObj = upgradeData[upgradeVar];
@@ -68,7 +69,6 @@ function load() {
             if(!upgradeDataObj || upgradeDataObj.creationVersion > saveVersionFromLoad) { //If removed or needs to refresh
                 let refundAmount= calcTotalSpentOnUpgrade(loadObj.initialCost, loadObj.costIncrease, loadObj.upgradesBought);
                 if(refundAmount > 0) {
-                    data.ancientCoin += refundAmount;
                     queuedLogMessages.push(["Info: Refunded <b>"+refundAmount+"</b> AC for the upgrade: " + (loadObj.title || decamelizeWithSpace(upgradeVar)), "info"])
                 }
                 // console.log("Skipped loading upgrade " + upgradeVar + " from save.");
@@ -91,6 +91,7 @@ function load() {
         data.planeTabSelected = toLoad.planeTabSelected ?? 0;
         data.totalMomentum = toLoad.totalMomentum ?? 0;
         data.ancientCoin = toLoad.ancientCoin ?? 0;
+        data.ancientCoin += refundAmount;
         data.useAmuletButtonShowing = !!toLoad.useAmuletButtonShowing;
         data.secondsPerReset = toLoad.secondsPerReset ?? 0;
         data.currentJob = toLoad.currentJob ?? "helpScottWithChores";

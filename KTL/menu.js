@@ -573,11 +573,12 @@ function createChangelogMenu() {
     return Raw.html`
         <div class="menuTitle">Changelog</div>
         <div class="menuSeparator"></div><br>
-        v2.0.1 10/26 (current):<br>
+        v2.0.2 10/26 (current):<br>
         <ul>
             <li>Fixed a bug that paused spells didn't count towards spell power</li>
             <li>Fight the Lich's Forces button (under HATL) appears with HATL level and stays visible</li>
             <li>Reworked the Fight The Lich's Forces menu to show the error with spell power, and a message to pause actions if needed with train with team</li>
+            <li>Refunded AC properly</li>
         </ul>
         v2.0 10/26:<br>
         <ul>
