@@ -449,7 +449,7 @@ actionData = {
         progressMaxBase:10000, progressMaxIncrease:1,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:.2, maxLevel:0, isSpell:true, instabilityToAdd:100, power:1,
-        unlockCost:20000, visible:false, unlocked:false, purchased: false,
+        unlockCost:20000, visible:false, unlocked:false, purchased: true,
         onLevelCustom: function() {
             unveilAction('hardenEarth')
         },

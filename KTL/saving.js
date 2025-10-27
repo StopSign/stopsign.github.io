@@ -20,30 +20,30 @@ function load() {
     initializeData();
 
     let toLoad = {};
-    // if(onLoadData) {
-    //     try {
-    // console.log('Loading locally.');
-    //         toLoad = JSON.parse(decode64(onLoadData));
-    //     } catch(e) {
-    //         try { //old save
-    //             toLoad = JSON.parse(decode(onLoadData));
-    //         } catch(e) {
-    //             exportErrorFile(onLoadData);
-    //         }
-    //     }
-    // }
-    if(localStorage[saveName]) {
-        console.log('Save found.');
+    if(onLoadData) {
         try {
-            toLoad = JSON.parse(decode64(localStorage[saveName]));
+    console.log('Loading locally.');
+            toLoad = JSON.parse(decode64(onLoadData));
         } catch(e) {
             try { //old save
-                toLoad = JSON.parse(decode(localStorage[saveName]));
+                toLoad = JSON.parse(decode(onLoadData));
             } catch(e) {
-                exportErrorFile(localStorage[saveName]);
+                exportErrorFile(onLoadData);
             }
         }
     }
+    // if(localStorage[saveName]) {
+    //     console.log('Save found.');
+    //     try {
+    //         toLoad = JSON.parse(decode64(localStorage[saveName]));
+    //     } catch(e) {
+    //         try { //old save
+    //             toLoad = JSON.parse(decode(localStorage[saveName]));
+    //         } catch(e) {
+    //             exportErrorFile(localStorage[saveName]);
+    //         }
+    //     }
+    // }
 
     const saveVersionFromLoad = toLoad && toLoad.saveVersion ? toLoad.saveVersion : 0;
     // const saveVersion = 1; //for debug only
@@ -141,6 +141,14 @@ function load() {
                 }
             }
             data.toastStates[23] = "hidden";
+        }
+        if(saveVersionFromLoad <= 2) {
+            if(data.actions.earthMagic.purchased === false) {
+                data.actions.earthMagic.purchased = true;
+            }
+            if(!data.actions.earthMagic.visible && data.actions.prepareExternalSpells.level > 0) {
+                data.actions.earthMagic.visible = true;
+            }
         }
 
         applyUpgradeEffects()

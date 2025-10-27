@@ -568,6 +568,7 @@ function useCharge(actionVar) {
     if(actionObj.cooldown) {
         actionObj.cooldownTimer = 0;
     }
+    updateSupplyChain(actionVar);
 }
 
 function useActiveSpellCharges() {

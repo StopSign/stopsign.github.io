@@ -573,6 +573,11 @@ function createChangelogMenu() {
     return Raw.html`
         <div class="menuTitle">Changelog</div>
         <div class="menuSeparator"></div><br>
+        v2.0.5 10/27 (current):<br>
+        <ul>
+            <li>Fixed a bug that Earth Magic was not showing up initially.</li>
+            <li>Fixed a bug that automation was not re-enabling when spells used charges</li>
+        </ul><br>
         v2.0.4 10/26 (current):<br>
         <ul>
             <li>Fixed a bug that paused spells didn't count towards spell power</li>
@@ -583,7 +588,7 @@ function createChangelogMenu() {
             <li>Initial study info should be correct</li>
             <li>Spark Decay, on level, unveils the actions its supposed to show on unlock, just in case</li>
             <li>Floating early extra jobs shouldn't be seen without the Ask About Better Work upgrade</li>
-        </ul>
+        </ul><br>
         v2.0 10/26:<br>
         <ul>
             <li>Tons of extra actions and upgrades, greatly expanding available content</li>
@@ -608,7 +613,7 @@ function createChangelogMenu() {
             <li>Reworked focus bonus and focus bonus upgrades. There is now an in-loop and a permanent bonus, separately. Refunded the cost of the previous upgrades</li>
             <li>Renamed Kill the Lich [3] to Northern Wastes</li>
             <li>Renamed Kill the Lich button to Fight the Lich's Forces!</li>
-        </ul>
+        </ul><br>
         v1.4.2 9/9:<br>
         <ul>
             <li>Fixed mobile drag, changed default size on mobile, prevented zoom on menus making the screen stuck, and added a close button to the main menu</li>

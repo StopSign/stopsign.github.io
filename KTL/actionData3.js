@@ -344,7 +344,7 @@ actionData = {
         iconText: {english:Raw.html`
         On Unlock: +54 base Ancient Coins<br>
         On Complete: +100 base Legacy<br>
-        Level 3: Reveal Protect The Sunstone
+        Level 3: Reveal Silence Death Chanters
 `}
     },
     silenceDeathChanters: {
