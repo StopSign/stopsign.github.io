@@ -20,8 +20,8 @@ function load() {
     initializeData();
 
     let toLoad = {};
-    if(onLoadData) {
-        try {
+    // if(onLoadData) {
+    //     try {
     // console.log('Loading locally.');
     //         toLoad = JSON.parse(decode64(onLoadData));
     //     } catch(e) {

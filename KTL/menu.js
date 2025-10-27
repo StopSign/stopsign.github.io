@@ -573,7 +573,7 @@ function createChangelogMenu() {
     return Raw.html`
         <div class="menuTitle">Changelog</div>
         <div class="menuSeparator"></div><br>
-        v2.0.5 10/27 (current):<br>
+        v2.0.6 10/27 (current):<br>
         <ul>
             <li>Fixed a bug that Earth Magic was not showing up initially.</li>
             <li>Fixed a bug that automation was not re-enabling when spells used charges</li>
