@@ -270,6 +270,9 @@ function actionAddExp(actionObj) {
             break;
         }
     }
+    //update exp visuals after leveling
+    actionObj.expToAddMult = calcUpgradeMultToExp(actionObj);
+    actionObj.expToAdd = actionObj.expToAddBase * actionObj.expToAddMult;
 }
 
 function statAddAmount(attVar, amount) {
@@ -540,6 +543,9 @@ function getUpgradeSliderAmount() {
 
 //get current info based on upgrade information, generally global or universal stuff. Individual action stuff upgrades get put on the action.
 function calcUpgradeMultToExp(actionObj) {
+    if(actionObj.plane === 2 || actionObj.isSpell) {
+        return 1;
+    }
     let upgradeMult = 1;
     if(data.upgrades.rememberWhatIDid.isFullyBought && actionObj.level < actionObj.highestLevel) {
         upgradeMult += .25;

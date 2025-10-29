@@ -450,7 +450,7 @@ let upgradeData = {
                 return `You currently gain a permanent +(Hear About The Lich's Level)^2 % to all Focused rates, when the amulet is used. This effect works even when the bar is not focused. This effect will cap at a x3 mult (currently x2).`
             }
             if(num === 2) {
-                return `You currently gain a permanent +(Hear About The Lich's Level)^2 % to all Focused rates, when the amulet is used. This effect works even when the bar is not focused. This effect will cap at a x4 mult (currently x2).`
+                return `You currently gain a permanent +(Hear About The Lich's Level)^2 % to all Focused rates, when the amulet is used. This effect works even when the bar is not focused. This effect will cap at a x4 mult (currently x3).`
             }
             return `You currently gain a permanent +(Hear About The Lich's Level)^2 % to all Focused rates, when the amulet is used. This effect works even when the bar is not focused. This effect caps at a x4 mult.`
         },

@@ -242,11 +242,11 @@ let views = {
         }
 
         //if icon menu is open
-        views.updateVal(`${actionVar}HighestLevelContainer`, data.upgrades.rememberWhatIDid.isFullyBought && actionObj.highestLevel >= 0 ? "" : "none", "style.display");
-        views.updateVal(`${actionVar}SecondHighestLevelContainer`, data.upgrades.rememberHowIGrew.isFullyBought && actionObj.secondHighestLevel >= 0 ? "" : "none", "style.display");
-        views.updateVal(`${actionVar}ThirdHighestLevelContainer`, data.upgrades.rememberMyMastery.isFullyBought && actionObj.thirdHighestLevel >= 0 ? "" : "none", "style.display");
-
         if(dataObj.hoveringIcon) {
+            let shouldShowLevels = dataObj.plane !== 2 && !data.isSpell;
+            views.updateVal(`${actionVar}HighestLevelContainer`, shouldShowLevels&&data.upgrades.rememberWhatIDid.isFullyBought && actionObj.highestLevel >= 0 ? "" : "none", "style.display");
+            views.updateVal(`${actionVar}SecondHighestLevelContainer`, shouldShowLevels&&data.upgrades.rememberHowIGrew.isFullyBought && actionObj.secondHighestLevel >= 0 ? "" : "none", "style.display");
+            views.updateVal(`${actionVar}ThirdHighestLevelContainer`, shouldShowLevels&&data.upgrades.rememberMyMastery.isFullyBought && actionObj.thirdHighestLevel >= 0 ? "" : "none", "style.display");
 
             if(dataObj.plane !== 1) {
                 views.updateVal(`${actionVar}CurrentUnlockTimeContainer`, actionObj.unlockTime ? "" : "none", "style.display");
@@ -331,11 +331,7 @@ let views = {
 
         }
 
-        if (actionObj.currentMenu === "downstream") {
-            views.updateActionDownstreamViews(actionObj);
-            //if downstream menu is showing, hide all 0 / all 100 buttons if no downstream visible
-            views.updateVal(`${actionVar}_downstreamButtonContainer`, hasDownstreamVisible(actionObj) ? "" : "none", "style.display");
-        }
+        views.updateActionDownstreamViews(actionObj, actionObj.currentMenu === "downstream");
 
         //Update the numbers
         let roundedNumbers = [
@@ -378,45 +374,52 @@ let views = {
         }
 
     },
-    updateActionDownstreamViews: function(actionObj) {
+    updateActionDownstreamViews: function(actionObj, downstreamSelected) {
         let actionVar = actionObj.actionVar;
         let dataObj = actionData[actionVar];
         if(!dataObj.downstreamVars) {
             return;
         }
+        if(downstreamSelected) {
+            views.updateVal(`${actionVar}_downstreamButtonContainer`, hasDownstreamVisible(actionObj) ? "" : "none", "style.display");
+        }
+
         for(let downstreamVar of dataObj.downstreamVars) {
             let downstreamObj = data.actions[downstreamVar];
-            if(!downstreamObj || !downstreamObj.hasUpstream) {
+            if (!downstreamObj || !downstreamObj.hasUpstream) {
                 return;
             }
-
-            let rangeValue = data.actions[actionVar][`downstreamRate${downstreamVar}`] || 0;
-
-            let mult = rangeValue/100;
-            let permFocusMult = actionObj[downstreamVar + "PermFocusMult"];
-            let tempFocusMult = actionObj[downstreamVar + "TempFocusMult"];
-
-            let totalTakenMult = actionObj.tierMult() * (actionObj.efficiency / 100) * permFocusMult * tempFocusMult *
-                (isAttentionLine(actionVar, downstreamVar) ? tempFocusMult : 1);
-            let maxed = false;
-            if (totalTakenMult > 1) {
-                totalTakenMult = 1; // Cap at 100%/s
-                maxed = true;
-            }
-            let toReturn = actionObj.resource / data.gameSettings.ticksPerSecond * totalTakenMult * mult;
-            let taken = toReturn < .0000001 ? 0 : toReturn;
-
-            views.updateVal(`${actionVar}DownstreamSendRate${downstreamVar}`, taken * data.gameSettings.ticksPerSecond, "textContent", 4);
-
             let isAttention = isAttentionLine(actionVar, downstreamVar);
-            views.updateVal(`${actionVar}DownstreamAttentionBonusTemp${downstreamVar}`, isAttention ? "" : "none", "style.display");
+            let focusShowing = actionObj[`${downstreamVar}PermFocusMult`] > 1 && downstreamObj.hasUpstream;
+
+            if (downstreamSelected) {
+                let rangeValue = data.actions[actionVar][`downstreamRate${downstreamVar}`] || 0;
+
+                let mult = rangeValue / 100;
+                let permFocusMult = actionObj[downstreamVar + "PermFocusMult"];
+                let tempFocusMult = actionObj[downstreamVar + "TempFocusMult"];
+
+                let totalTakenMult = actionObj.tierMult() * (actionObj.efficiency / 100) * permFocusMult * tempFocusMult *
+                    (isAttention ? tempFocusMult : 1);
+                let maxed = false;
+                if (totalTakenMult > 1) {
+                    totalTakenMult = 1; // Cap at 100%/s
+                    maxed = true;
+                }
+                let toReturn = actionObj.resource / data.gameSettings.ticksPerSecond * totalTakenMult * mult;
+                let taken = toReturn < .0000001 ? 0 : toReturn;
+
+                views.updateVal(`${actionVar}DownstreamSendRate${downstreamVar}`, taken * data.gameSettings.ticksPerSecond, "textContent", 4);
+
+                views.updateVal(`${actionVar}DownstreamAttentionBonusTemp${downstreamVar}`, isAttention ? "" : "none", "style.display");
+                views.updateVal(`${actionVar}DownstreamAttentionBonusPerm${downstreamVar}`, focusShowing ? "" : "none", "style.display");
+            }
+
             if(isAttention) {
                 views.updateVal(`${actionVar}DownstreamAttentionBonusTemp${downstreamVar}`, `x${intToString(actionObj[downstreamVar + "TempFocusMult"], data.upgrades.learnToFocusMore.upgradePower?3:1)}`, "textContent");
                 views.updateVal(`${actionVar}_${downstreamVar}_Line_Inner_Top`, `x${intToString(actionObj[downstreamVar + "TempFocusMult"], data.upgrades.learnToFocusMore.upgradePower?3:1)}`, "textContent");
             }
 
-            let focusShowing = actionObj[`${downstreamVar}PermFocusMult`] > 1 && downstreamObj.hasUpstream;
-            views.updateVal(`${actionVar}DownstreamAttentionBonusPerm${downstreamVar}`, focusShowing ? "" : "none", "style.display");
             views.updateVal(`${actionVar}_${downstreamVar}_Line_Inner_Bottom`, focusShowing ? "" : "none", "style.display");
             if(focusShowing) {
                 views.updateVal(`${actionVar}DownstreamAttentionBonusPerm${downstreamVar}`, `x${intToString(actionObj[downstreamVar + "PermFocusMult"], 3)}`);

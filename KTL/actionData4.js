@@ -405,7 +405,7 @@ actionData = {
         iconText: {english:Raw.html`
         Level 1: Reveal Prepare External Spells<br>
         Level 1: Reveal Support Spells<br>
-        Level 1: +1 max level to Overcharge, Overboost, OverPonder, and Earth Magic
+        Level 1: +1 max level to Overcharge, Overboost, OverPonder, and Dirt Magic
 `}
     },
     prepareExternalSpells: {
@@ -422,7 +422,7 @@ actionData = {
         expAtts:[["spellcraft", 10], ["intellect", 1]],
         efficiencyAtts:[["integration", .05]],
         iconText: {english:Raw.html`
-        Level 1: Reveal Earth Magic<br>
+        Level 1: Reveal Dirt Magic<br>
         Level 1: Reveal Practical Magic
 `}
     },
@@ -440,12 +440,12 @@ actionData = {
         expAtts:[["spellcraft", 1], ["intellect", 1]],
         efficiencyAtts:[["integration", .05]],
         iconText: {english:Raw.html`
-        Level 1: Reveal Move Earth<br>
+        Level 1: Reveal Move Dirt<br>
         Level 1: Reveal Illuminate
 `}
     },
     earthMagic: {
-        tier:0, plane:1, resourceName:"mana",
+        tier:0, plane:1, resourceName:"mana", title:"Dirt Magic",
         progressMaxBase:10000, progressMaxIncrease:1,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:.2, maxLevel:0, isSpell:true, instabilityToAdd:100, power:1,
@@ -457,11 +457,11 @@ actionData = {
         expAtts:[["spellcraft", .1]],
         efficiencyAtts:[["wizardry", .001]],
         iconText: {english:Raw.html`
-        Level 1: Reveal Harden Earth
+        Level 1: Reveal Harden Dirt
 `}
     },
     moveEarth: {
-        tier:0, plane:1, resourceName:"mana", creationVersion:2, automationOff: true,
+        tier:0, plane:1, resourceName:"mana", creationVersion:2, automationOff: true, title:"Move Dirt",
         progressMaxBase:3e9, progressMaxIncrease:1,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:.01, maxLevel:1, isSpell:true, instabilityToAdd:125, power:3,
@@ -476,12 +476,12 @@ actionData = {
         expAtts:[["spellcraft", .1]],
         efficiencyAtts:[["wizardry", .001]],
         iconText: {english:Raw.html`
-        Level 1: Reveal Shape Earth<br>
+        Level 1: Reveal Shape Dirt<br>
         Level 1: Reveal Dig Foundation
 `}
     },
     hardenEarth: {
-        tier:0, plane:1, resourceName:"mana", creationVersion:2, automationOff: true,
+        tier:0, plane:1, resourceName:"mana", creationVersion:2, automationOff: true, title: "Harden Dirt",
         progressMaxBase:3e11, progressMaxIncrease:1,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:.003, maxLevel:1, isSpell:true, instabilityToAdd:150, power:6,
@@ -501,7 +501,7 @@ actionData = {
 `}
     },
     shapeEarth: {
-        tier:0, plane:1, resourceName:"mana", creationVersion:2, automationOff: true,
+        tier:0, plane:1, resourceName:"mana", creationVersion:2, automationOff: true, title: "Shape Dirt",
         progressMaxBase:9e12, progressMaxIncrease:1,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:.001, maxLevel:1, isSpell:true, instabilityToAdd:175, power:10,
@@ -582,8 +582,8 @@ actionData = {
     },
     reinforceArmor: {
         tier:0, plane:1, resourceName:"mana", creationVersion:2, automationOff: true,
-        progressMaxBase:3e16, progressMaxIncrease:3,
-        expToLevelBase:3, expToLevelIncrease:1,
+        progressMaxBase:3e16, progressMaxIncrease:1,
+        expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:1, maxLevel:1, isSpell:true, instabilityToAdd:100, power:200,
         unlockCost:3e16, visible:false, unlocked:false, purchased: false,
         onLevelCustom: function() {

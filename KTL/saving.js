@@ -20,9 +20,10 @@ function load() {
     initializeData();
 
     let toLoad = {};
+
     // if(onLoadData) {
     //     try {
-    // console.log('Loading locally.');
+    //     console.log('Loading locally.');
     //         toLoad = JSON.parse(decode64(onLoadData));
     //     } catch(e) {
     //         try { //old save
@@ -32,6 +33,7 @@ function load() {
     //         }
     //     }
     // }
+
     if(localStorage[saveName]) {
         console.log('Save found.');
         try {
@@ -68,8 +70,9 @@ function load() {
             let upgradeDataObj = upgradeData[upgradeVar];
             let loadObj = toLoad.upgrades[upgradeVar];
             if(!upgradeDataObj || upgradeDataObj.creationVersion > saveVersionFromLoad) { //If removed or needs to refresh
-                let refundAmount= calcTotalSpentOnUpgrade(loadObj.initialCost, loadObj.costIncrease, loadObj.upgradesBought);
-                if(refundAmount > 0) {
+                let toRefund = calcTotalSpentOnUpgrade(loadObj.initialCost, loadObj.costIncrease, loadObj.upgradesBought);
+                if(toRefund > 0) {
+                    refundAmount += toRefund;
                     queuedLogMessages.push(["Info: Refunded <b>"+refundAmount+"</b> AC for the upgrade: " + (loadObj.title || decamelizeWithSpace(upgradeVar)), "info"])
                 }
                 // console.log("Skipped loading upgrade " + upgradeVar + " from save.");
@@ -149,6 +152,9 @@ function load() {
             if(!data.actions.earthMagic.visible && data.actions.prepareExternalSpells.level > 0) {
                 data.actions.earthMagic.visible = true;
             }
+            adjustActionData('reinforceArmor', 'progressMaxIncrease', 1);
+            adjustActionData('reinforceArmor', 'progressMaxBase', 3e16);
+            adjustActionData('reinforceArmor', 'expToLevelBase', 1);
         }
 
         applyUpgradeEffects()
@@ -176,7 +182,10 @@ function load() {
 
 function applyUpgradeEffects() {
     //bought upgrades need to be applied
-    actionData.hearAboutTheLich.maxLevel = data.upgrades.learnedOfLichSigns.upgradePower + 2 + data.actions.trainWithTeam.level;
+    actionData.hearAboutTheLich.maxLevel = data.upgrades.learnedOfLichSigns.upgradePower + 2;
+    if(data.gameState === "default") {
+        actionData.hearAboutTheLich.maxLevel = data.upgrades.learnedOfLichSigns.upgradePower + 2 + data.actions.trainWithTeam.level;
+    }
     actionData.trainWithTeam.maxLevel = data.upgrades.trainTogetherMore.upgradePower + 2;
     if(data.upgrades.learnFromTheLibrary.upgradePower >= 3) {
         data.actions.collectHistoryBooks.maxLevel = 7;

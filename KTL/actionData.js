@@ -1538,7 +1538,7 @@ Level 3: Reveal Check Notice Board`}
         efficiencyAtts:[["navigation", 1], ["geared", .01]],
         iconText: {english:Raw.html`
         Level 1: Reveal Keep Going<br>
-        Level 1: Reeval Eat Golden Fruit
+        Level 1: Reveal Eat Golden Fruit
 `}
     },
     eatGoldenFruit: {

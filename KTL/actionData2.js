@@ -810,11 +810,11 @@ actionData = {
         Level 1: Reveal Research By Subject<br>
         Level 2: Reveal Study Magic<br>
         Level 3: Reveal Study Support Spells<br>
-        Level 4: Reveal Study Earth Magic<br>
+        Level 4: Reveal Study Dirt Magic<br>
         Level 7: Reveal Study Practical Magic<br>
         Level 9: Reveal Study Math<br>
         Level 11: Reveal Study Cryptology<br>
-        Level 13: Reveal Study Advanced Earth Magic<br>
+        Level 13: Reveal Study Advanced Dirt Magic<br>
         Level 15: Reveal Study Architecture
 `}
     },
@@ -936,7 +936,7 @@ actionData = {
 `}
     },
     studyEarthMagic: {
-        tier:1, plane:0, resourceName:"research", creationVersion:2, automationOff: true,
+        tier:1, plane:0, resourceName:"research", creationVersion:2, automationOff: true, title:"Study Dirt Magic",
         progressMaxBase:2000, progressMaxIncrease:4,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:.1, maxLevel:3,
@@ -959,12 +959,12 @@ actionData = {
         expAtts:[],
         efficiencyAtts:[["comfort", 1]],
         iconText: {english:Raw.html`
-        Level 1: Purchase Move Earth<br>
-        Level 1: Reveal Move Earth<br>
-        Level 2: Purchase Harden Earth<br>
-        Level 2: Reveal Harden Earth<br>
-        Level 3: Purchase Shape Earth<br>
-        Level 3: Reveal Shape Earth
+        Level 1: Purchase Move Dirt<br>
+        Level 1: Reveal Move Dirt<br>
+        Level 2: Purchase Harden Dirt<br>
+        Level 2: Reveal Harden Dirt<br>
+        Level 3: Purchase Shape Dirt<br>
+        Level 3: Reveal Shape Dirt
 `}
     },
     studyPracticalMagic: {
@@ -1042,12 +1042,14 @@ actionData = {
 `}
     },
     studyAdvancedEarthMagic: {
-        tier:1, plane:0, resourceName:"research", creationVersion:2, automationOff: true,
+        tier:1, plane:0, resourceName:"research", creationVersion:2, automationOff: true, title:"Study Advanced Dirt Magic",
         progressMaxBase:1.5e5, progressMaxIncrease:3,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:.025, maxLevel:3,
         unlockCost:1.5e5, visible:false, unlocked:false, purchased: false,
         onUnlock: function() {
+        },
+        onLevelCustom: function() {
             purchaseAction('moveIron');
             unveilAction('moveIron');
             if(data.actions.studyAdvancedEarthMagic.level >= 2) {
@@ -1058,8 +1060,6 @@ actionData = {
                 purchaseAction('restoreEquipment')
                 unveilAction('restoreEquipment');
             }
-        },
-        onLevelCustom: function() {
         },
         onLevelAtts:[["spellcraft", 20]],
         expAtts:[],

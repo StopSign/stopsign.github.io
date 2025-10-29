@@ -238,6 +238,7 @@ function useAmulet() {
             } else if (newLevel > actionObj.thirdHighestLevel) {
                 actionObj.thirdHighestLevel = newLevel;
             }
+
         }
 
         let propsToPreserve = ['unlocked', 'unlockCost', 'currentMenu'];

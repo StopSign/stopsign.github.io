@@ -573,12 +573,23 @@ function createChangelogMenu() {
     return Raw.html`
         <div class="menuTitle">Changelog</div>
         <div class="menuSeparator"></div><br>
-        v2.0.6 10/27 (current):<br>
+        v2.0.7 10/29 (current):<br>
+        <ul>
+            <li>Actually fixed the AC refund from 1.X versions</li>
+            <li>Removed extra HATL levels gained through reloading</li>
+            <li>Renamed Earth Magic to Dirt Magic</li>
+            <li>Remember What I Did and subsequent upgrades don't apply in Northern Wastes or for Spells, and visually updates</li>
+            <li>Reinforce Armor and Restore Equipment unlock properly</li>
+            <li>Reinforce Armor won't grow in cost</li>
+            <li>Fixed some minor text issues</li>
+            <li>Focus bonus on flow lines update always (previously just when Downstream tab was selected)</li>
+        </ul><br>
+        v2.0.6 10/27:<br>
         <ul>
             <li>Fixed a bug that Earth Magic was not showing up initially.</li>
             <li>Fixed a bug that automation was not re-enabling when spells used charges</li>
         </ul><br>
-        v2.0.4 10/26 (current):<br>
+        v2.0.4 10/26:<br>
         <ul>
             <li>Fixed a bug that paused spells didn't count towards spell power</li>
             <li>Fight the Lich's Forces button (under HATL) appears with HATL level and stays visible</li>
