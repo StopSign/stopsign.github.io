@@ -357,19 +357,37 @@ let maxLevelTop = (data.gameSettings.viewDeltas && data.gameSettings.viewRatio) 
         </div>`;
 
     queueCache(`${actionVar}_automationContainer`);
+    queueCache(`${actionVar}_automationRevealContainer`);
+    queueCache(`${actionVar}_automationMaxLevelContainer`);
     queueCache(`${actionVar}_checkbox`);
     queueCache(`${actionVar}_track`);
     queueCache(`${actionVar}_knob`);
+    queueCache(`${actionVar}_checkbox2`);
+    queueCache(`${actionVar}_track2`);
+    queueCache(`${actionVar}_knob2`);
 
     let preventParentSliderText = !actionObj.hasUpstream ? "": `
-           Prevent automation from changing the upstream slider to this action: 
-           
-            <label onclick="toggleAutomation('${actionVar}')" style="position:relative;display:inline-block;width:50px;height:14px;cursor:pointer;">
-                <input id="${actionVar}_checkbox" type="checkbox" style="opacity:0;width:0;height:0;">
-                <div id="${actionVar}_track" style="position:absolute;top:0;left:0;right:0;bottom:0;background-color:#ccc;border-radius:14px;">
-                    <div id="${actionVar}_knob" style="position:absolute;height:16px;width:16px;left:4px;bottom:-1px;background-color:white;border-radius:50%;"></div>
-                </div>
-            </label>
+            <span id="${actionVar}_automationRevealContainer">
+                Enable automation to enable upstream sliders to this action when it is revealed, or when the max level increases:
+               
+                <label onclick="toggleAutomationOnReveal('${actionVar}')" style="position:relative;display:inline-block;width:50px;height:14px;cursor:pointer;">
+                    <input id="${actionVar}_checkbox" type="checkbox" style="opacity:0;width:0;height:0;" checked="true">
+                    <div id="${actionVar}_track" style="position:absolute;top:0;left:0;right:0;bottom:0;background-color:#ccc;border-radius:14px;">
+                        <div id="${actionVar}_knob" style="position:absolute;height:16px;width:16px;left:4px;bottom:-1px;background-color:white;border-radius:50%;"></div>
+                    </div>
+                </label><br>
+            </span>
+            
+            <span id="${actionVar}_automationMaxLevelContainer">
+                Enable automation to disable upstream sliders to this action when it is max level:
+               
+                <label onclick="toggleAutomationOnMaxLevel('${actionVar}')" style="position:relative;display:inline-block;width:50px;height:14px;cursor:pointer;">
+                    <input id="${actionVar}_checkbox2" type="checkbox" style="opacity:0;width:0;height:0;">
+                    <div id="${actionVar}_track2" style="position:absolute;top:0;left:0;right:0;bottom:0;background-color:#ccc;border-radius:14px;">
+                        <div id="${actionVar}_knob2" style="position:absolute;height:16px;width:16px;left:4px;bottom:-1px;background-color:white;border-radius:50%;"></div>
+                    </div>
+                </label><br>
+            </span>
     `
 
     let automationContainer = Raw.html`
@@ -438,6 +456,7 @@ let maxLevelTop = (data.gameSettings.viewDeltas && data.gameSettings.viewRatio) 
     queueCache(`${actionVar}Level2`)
     queueCache(`${actionVar}MaxLevel2`)
     queueCache(`${actionVar}SmallVersionLevels`)
+    queueCache(`${actionVar}ResourceInfoContainer`)
 //transform-style: preserve-3d;
 
     let maxLevelDiv = `<span style="display:${actionObj.maxLevel ? "" : "none"}">/ <span id="${actionVar}MaxLevel2" style="font-weight:bold;"></span></span>`;
@@ -450,10 +469,12 @@ let maxLevelTop = (data.gameSettings.viewDeltas && data.gameSettings.viewRatio) 
                 ${icon}
                 ${title}
                 ${menuContainer}
-                ${momentumContainer}
-                ${balanceNeedle}
-                ${pbar}
-                ${expBar}
+                <span id="${actionVar}ResourceInfoContainer">
+                    ${momentumContainer}
+                    ${balanceNeedle}
+                    ${pbar}
+                    ${expBar}
+                </span>
                 ${storyContainer}
                 ${attsContainer}
                 ${automationContainer}

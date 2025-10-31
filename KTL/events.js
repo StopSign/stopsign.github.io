@@ -162,7 +162,11 @@ function pauseAction(event, actionVar) {
     event.stopPropagation();
     let actionObj = data.actions[actionVar];
     actionObj.isPaused = !actionObj.isPaused;
+    updatePauseActionVisuals(actionVar)
+}
 
+function updatePauseActionVisuals(actionVar) {
+    let actionObj = data.actions[actionVar];
     views.updateVal(`${actionVar}PauseButton`, actionObj.isPaused?">":"||", "textContent")
     views.updateVal(`${actionVar}PauseButton`, actionObj.isPaused?"green":"red", "style.borderColor")
     views.updateVal(`${actionVar}Title`, actionObj.isPaused?"red":"", "style.color")
@@ -171,7 +175,11 @@ function pauseAction(event, actionVar) {
 
 windowElement.addEventListener('wheel', function(e) {
     if(mouseIsOnAction) {
-        let elem = document.getElementById(`${mouseIsOnAction}_${data.actions[mouseIsOnAction].currentMenu}Container`);
+        let actionObj = data.actions[mouseIsOnAction];
+        if(actionObj.currentMenu === "") {
+            return;
+        }
+        let elem = document.getElementById(`${mouseIsOnAction}_${actionObj.currentMenu}Container`);
         if(!elem) {
             console.log('error, no elem at: ' + mouseIsOnAction);
             return;
@@ -365,11 +373,11 @@ function actionTitleClicked(actionVar, setAll) {
     actionContainer.style.transform = `translate(${newtransformX}px, ${newtransformY}px) scale(${scaleByPlane[data.planeTabSelected]})`;
 }
 
-function toggleAutomation(actionVar) {
+function toggleAutomationOnReveal(actionVar) {
     let actionObj = data.actions[actionVar];
     const checkbox = document.getElementById(`${actionVar}_checkbox`);
 
-    actionObj.automationOff = checkbox.checked;
+    actionObj.automationOnReveal = checkbox.checked;
 
     if (checkbox.checked) {
         views.updateVal(`${actionVar}_track`, "#2196F3", "style.backgroundColor");
@@ -380,34 +388,56 @@ function toggleAutomation(actionVar) {
     }
 }
 
-
-function clickActionMenu(actionVar, menuVar, isLoad) {
+function toggleAutomationOnMaxLevel(actionVar) {
     let actionObj = data.actions[actionVar];
+    const checkbox = document.getElementById(`${actionVar}_checkbox2`);
+
+    actionObj.automationOnMax = checkbox.checked;
+
+    if (checkbox.checked) {
+        views.updateVal(`${actionVar}_track2`, "#2196F3", "style.backgroundColor");
+        views.updateVal(`${actionVar}_knob2`, "translateX(26px)", "style.transform");
+    } else {
+        views.updateVal(`${actionVar}_track2`, "#ccc", "style.backgroundColor");
+        views.updateVal(`${actionVar}_knob2`, "translateX(0px)", "style.transform");
+    }
+}
+
+
+function clickActionMenu(actionVar, menuVar) {
+    let actionObj = data.actions[actionVar];
+    let currentMenu = actionObj.currentMenu;
     if(!menuVar) {
         return;
     }
-    if(!isLoad && (!actionObj.unlocked || !actionObj.visible)) {
+
+    //allow switching between automation and downstream menu when locked, but not turning them off
+    if(menuVar === "downstream" || menuVar === "automation") {
+        if(menuVar === currentMenu && !actionObj.unlocked) {
+            return;
+        }
+    } else if(!actionObj.unlocked) {
         return;
     }
 
-    if(actionObj.currentMenu && !isLoad) {
-        // view.cached[actionVar + "_" + actionObj.currentMenu + "MenuButton"].style.removeProperty("background-color");
-
-        views.updateVal(`${actionVar}_${actionObj.currentMenu}Container`, "none", "style.display");
-        views.updateVal(`${actionVar}_${actionObj.currentMenu}MenuButton`, "", "style.backgroundColor");
+    //clear previous menu
+    if(currentMenu) {
+        views.updateVal(`${actionVar}_${currentMenu}Container`, "none", "style.display");
+        views.updateVal(`${actionVar}_${currentMenu}MenuButton`, "", "style.backgroundColor");
     }
 
-    if(actionObj.currentMenu === menuVar && !isLoad) {
-        data.actions[actionVar].currentMenu = "";
+    //if you clicked the button as-is, remove it and quit
+    if(currentMenu === menuVar) {
+        actionObj.currentMenu = "";
         return;
     }
 
+    //turn on the menu
     views.updateVal(`${actionVar}_${menuVar}Container`, "", "style.display");
     views.updateVal(`${actionVar}_${menuVar}MenuButton`, "var(--selection-color)", "style.backgroundColor");
 
-    data.actions[actionVar].currentMenu = menuVar;
+    actionObj.currentMenu = menuVar;
 }
-
 
 function clickMenuButton() {
     let isShowing = document.getElementById("helpMenu").style.display !== "none";

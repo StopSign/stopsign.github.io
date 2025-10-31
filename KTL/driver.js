@@ -246,6 +246,7 @@ function tickGameObject(actionVar) {
     }
 
     // Reset and calculate total resources sent to all downstream actions this tick.
+    //TODO calculate twice - once for the values, and once for dividing the values between available resources if needed
     actionObj.totalSend = 0;
     for (let downstreamVar of dataObj.downstreamVars) {
         let downstreamObj = data.actions[downstreamVar];
@@ -260,8 +261,8 @@ function tickGameObject(actionVar) {
             continue;
         }
 
-        let mult = data.actions[actionVar][`downstreamRate${downstreamVar}`] / 100;
-        let taken = calculateTaken(actionVar, downstreamVar, actionObj, mult);
+        let sliderSetting = data.actions[actionVar][`downstreamRate${downstreamVar}`] / 100;
+        let taken = calculateTaken(actionVar, downstreamVar, actionObj, sliderSetting);
 
         // Keep track of the total sent out per second for the final calculation.
         actionObj.totalSend += taken * data.gameSettings.ticksPerSecond;
@@ -273,7 +274,7 @@ function tickGameObject(actionVar) {
     //Calc resource retrieval
     let resourceParentVar = resourceHeads[actionObj.resourceName];
     let isQuiet = actionObj.unlocked && isMaxLevel && actionObj.resourceIncrease === 0 && actionObj.totalSend === 0;
-    if(!isQuiet || resourceParentVar === actionVar || data.upgrades.retrieveMyUnusedResources.upgradePower === 0 || data.gameState === "KTL" || actionVar === "reinvest") {
+    if(!isQuiet || resourceParentVar === actionVar || data.upgrades.retrieveMyUnusedResources.upgradePower === 0 || data.gameState === "KTL" || actionVar === "reinvest" || !actionObj.hasUpstream) {
         actionObj.resourceRetrieved = 0;
     } else {
         actionObj.resourceRetrieved = (actionObj.resource/1000 * [0, 1, 2, 5][data.upgrades.retrieveMyUnusedResources.upgradePower] + 10) / data.gameSettings.ticksPerSecond;

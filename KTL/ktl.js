@@ -191,6 +191,7 @@ function useAmulet() {
     views.updateVal(`openViewAmuletButton`, "", "style.display");
     data.legacyMultKTL = 1;
     data.ancientCoinMultKTL = 1;
+    data.chargedSpellPowers = {};
 
     //Reset all atts and bonuses
     for(let attVar in data.atts) {
@@ -241,25 +242,22 @@ function useAmulet() {
 
         }
 
-        let propsToPreserve = ['unlocked', 'unlockCost', 'currentMenu'];
         let originalState = {};
-
-        for (let prop of propsToPreserve) {
-            originalState[prop] = actionObj[prop];
-        }
+        originalState.unlocked = actionObj.unlocked;
+        originalState.unlockCost = actionObj.unlockCost;
+        originalState.currentMenu = actionObj.currentMenu;
 
         actionResetToBase(actionVar);
-
         if (dataObj.plane === 1) {
-            for (let prop of propsToPreserve) {
-                actionObj[prop] = originalState[prop];
-            }
+            actionObj.unlocked = originalState.unlocked;
+            actionObj.unlockCost = originalState.unlockCost;
         }
+        actionObj.currentMenu = originalState.currentMenu;
 
         //happens after reset
         dataObj.downstreamVars.forEach(function(downstreamVar) {
-            if(data.actions[downstreamVar] && data.actions[downstreamVar].unlocked && data.actions[downstreamVar].hasUpstream) {
-                setSliderUI(actionObj.actionVar, downstreamVar, getUpgradeSliderAmount()); //reset with amulet
+            if(data.actions[downstreamVar] && data.actions[downstreamVar].hasUpstream) {
+                setSliderUI(actionObj.actionVar, downstreamVar, 0); //reset with amulet
             }
 
             actionObj[downstreamVar + "TempFocusMult"] = 2;

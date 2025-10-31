@@ -383,11 +383,16 @@ let upgradeData = {
         visible: true,
         customInfo: function(num) {
             return `[Automation] When unlocking a new action, automatically sets the downstream sliders of the 
-            unlocked action to ${["50%", "100% (Currently 50%)", "100%"][num]}.`;
+            unlocked action to ${["50%", "100% (Currently 50%)", "100%"][num]}. This only fully works on previously unlocked actions.`;
         },
         onBuy: function(num) {
             for (let actionVar in data.actions) {
-                views.updateVal(`${actionVar}_automationMenuButton`, data.actions[actionVar].hasUpstream?"":"none", "style.display");
+                let actionObj = data.actions[actionVar];
+                if(!actionObj.hasUpstream) {
+                    continue;
+                }
+                views.updateVal(`${actionVar}_automationMenuButton`, data.actions[actionVar].hasUpstream && actionData[actionVar].plane !== 2?"":"none", "style.display");
+                views.updateVal(`${actionVar}_automationRevealContainer`, data.actions[actionVar].hasUpstream && actionData[actionVar].plane !== 2?"":"none", "style.display");
             }
         }
     },
@@ -401,7 +406,12 @@ let upgradeData = {
         },
         onBuy: function(num) {
             for (let actionVar in data.actions) {
-                views.updateVal(`${actionVar}_automationMenuButton`, data.actions[actionVar].hasUpstream?"":"none", "style.display");
+                let actionObj = data.actions[actionVar];
+                if(!actionObj.hasUpstream) {
+                    continue;
+                }
+                views.updateVal(`${actionVar}_automationMenuButton`, actionData[actionVar].plane !== 2?"":"none", "style.display");
+                views.updateVal(`${actionVar}_automationMaxLevelContainer`,  actionData[actionVar].plane !== 2?"":"none", "style.display");
             }
         }
     },
@@ -444,15 +454,15 @@ let upgradeData = {
         visible:false,
         customInfo: function(num) {
             if(num === 0) {
-                return `Gain a permanent +(Hear About The Lich's Level)^2 % to all Focused rates, when the amulet is used. This effect works even when the bar is not focused. This effect caps at a x2 mult.`
+                return `Gain a permanent +(Hear About The Lich's Level)^2 % to all Focused rates, when you enter Northern Wastes. This effect works even when the bar is not focused. This effect caps at a x2 mult.`
             }
             if(num === 1) {
-                return `You currently gain a permanent +(Hear About The Lich's Level)^2 % to all Focused rates, when the amulet is used. This effect works even when the bar is not focused. This effect will cap at a x3 mult (currently x2).`
+                return `You currently gain a permanent +(Hear About The Lich's Level)^2 % to all Focused rates, when you enter Northern Wastes. This effect works even when the bar is not focused. This effect will cap at a x3 mult (currently x2).`
             }
             if(num === 2) {
-                return `You currently gain a permanent +(Hear About The Lich's Level)^2 % to all Focused rates, when the amulet is used. This effect works even when the bar is not focused. This effect will cap at a x4 mult (currently x3).`
+                return `You currently gain a permanent +(Hear About The Lich's Level)^2 % to all Focused rates, when you enter Northern Wastes. This effect works even when the bar is not focused. This effect will cap at a x4 mult (currently x3).`
             }
-            return `You currently gain a permanent +(Hear About The Lich's Level)^2 % to all Focused rates, when the amulet is used. This effect works even when the bar is not focused. This effect caps at a x4 mult.`
+            return `You currently gain a permanent +(Hear About The Lich's Level)^2 % to all Focused rates, when you enter Northern Wastes. This effect works even when the bar is not focused. This effect caps at a x4 mult.`
         },
         onBuy: function(num) {
         },
@@ -768,12 +778,12 @@ let upgradeData = {
         upgradesAvailable:1,
         visible:false,
         customInfo: function(num) {
-            return Raw.html`The Spell Power used in KTL becomes the highest you've ever reached, instead of the current value.`;
+            return Raw.html`The Spell Power used in the Northern Wastes becomes the highest you've reached per spell, instead of the current value.`;
         }
     },
     retrieveMyUnusedResources: {
         initialCost:500, costIncrease:1.5, creationVersion:2,
-        upgradesAvailable:4,
+        upgradesAvailable:3,
         visible:false,
         customInfo: function(num) {
             return `Retrieve 10 + ${[.1, .2, .5][num]}% of current resource per second on all actions that are dimmed (max level, no resource increase or decrease). Skips Reinvest.`;

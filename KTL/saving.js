@@ -15,43 +15,49 @@ function resetActionToBase(actionVar) {
     actionSetBaseVariables(data.actions[actionVar], actionData[actionVar]);
 }
 
-data.saveVersion = 2;
+data.saveVersion = 3;
 function load() {
     initializeData();
 
     let toLoad = {};
 
-    // if(onLoadData) {
-    //     try {
-    //     console.log('Loading locally.');
-    //         toLoad = JSON.parse(decode64(onLoadData));
-    //     } catch(e) {
-    //         try { //old save
-    //             toLoad = JSON.parse(decode(onLoadData));
-    //         } catch(e) {
-    //             exportErrorFile(onLoadData);
-    //         }
-    //     }
-    // }
-
-    if(localStorage[saveName]) {
-        console.log('Save found.');
-        try {
-            toLoad = JSON.parse(decode64(localStorage[saveName]));
-        } catch(e) {
-            try { //old save
-                toLoad = JSON.parse(decode(localStorage[saveName]));
-            } catch(e) {
-                exportErrorFile(localStorage[saveName]);
+    if(loadStaticSaveFile) {
+        if(onLoadData) {
+            try {
+                console.log('Loading locally.');
+                toLoad = JSON.parse(decode64(onLoadData));
+            } catch (e) {
+                try { //old save
+                    toLoad = JSON.parse(decode(onLoadData));
+                } catch (e) {
+                    exportErrorFile(onLoadData);
+                }
+            }
+        }
+    } else {
+        if (localStorage[saveName]) {
+            console.log('Save found.');
+            try {
+                toLoad = JSON.parse(decode64(localStorage[saveName]));
+            } catch (e) {
+                try { //old save
+                    toLoad = JSON.parse(decode(localStorage[saveName]));
+                } catch (e) {
+                    exportErrorFile(localStorage[saveName]);
+                }
             }
         }
     }
+    if(!isLoadingEnabled) {
+        toLoad = {};
+    }
+
 
     const saveVersionFromLoad = toLoad && toLoad.saveVersion ? toLoad.saveVersion : 0;
     // const saveVersion = 1; //for debug only
     let queuedLogMessages = []; //Any info that needs to be told to the user
 
-    if(isLoadingEnabled && localStorage[saveName] && toLoad.actions) { //has a save file
+    if(localStorage[saveName] && toLoad.actions) {
         //only go through the ones in toLoad and graft them on to existing data
         for(let actionVar in toLoad.actions) {
             let actionObj = data.actions[actionVar];
@@ -87,7 +93,6 @@ function load() {
         mergeExistingOnly(data, toLoad, "options");
         mergeExistingOnly(data, toLoad, "gameSettings");
 
-
         data.toastStates = toLoad.toastStates;
 
         //load global items that aren't lists or objects
@@ -95,7 +100,6 @@ function load() {
         data.planeTabSelected = toLoad.planeTabSelected ?? 0;
         data.totalMomentum = toLoad.totalMomentum ?? 0;
         data.ancientCoin = toLoad.ancientCoin ?? 0;
-        data.ancientCoin += refundAmount;
         data.useAmuletButtonShowing = !!toLoad.useAmuletButtonShowing;
         data.secondsPerReset = toLoad.secondsPerReset ?? 0;
         data.currentJob = toLoad.currentJob ?? "helpScottWithChores";
@@ -112,6 +116,7 @@ function load() {
         data.currentPinned = toLoad.currentPinned ?? [];
         data.ancientCoinMultKTL = toLoad.ancientCoinMultKTL ?? 1;
         data.legacyMultKTL = toLoad.legacyMultKTL ?? 1;
+        data.chargedSpellPowers = toLoad.chargedSpellPowers ?? {};
         data.totalSpellPower = toLoad.totalSpellPower ?? 0;
         data.maxSpellPower = toLoad.maxSpellPower ?? 0;
         data.resetCount = toLoad.resetCount ?? 1;
@@ -155,8 +160,37 @@ function load() {
             adjustActionData('reinforceArmor', 'progressMaxIncrease', 1);
             adjustActionData('reinforceArmor', 'progressMaxBase', 3e16);
             adjustActionData('reinforceArmor', 'expToLevelBase', 1);
+
+            data.upgrades.retrieveMyUnusedResources.upgradesAvailable = 3;
+            if(data.upgrades.retrieveMyUnusedResources.upgradePower === 4) {
+                data.upgrades.retrieveMyUnusedResources.upgradePower = 3;
+                data.upgrades.retrieveMyUnusedResources.upgradesBought = 3;
+                refundAmount += 1687;
+            }
+
+            data.actions.moveIron.power = 100;
+            data.actions.reinforceArmor.power = 150;
+            data.actions.restoreEquipment.power = 250;
+            data.actions.unblemish.power = 400;
+            data.actions.manaTransfer.power = 600;
+
+            adjustActionData('moveIron', 'efficiencyBase', .0003);
+            adjustActionData('reinforceArmor', 'efficiencyBase', .0002);
+            adjustActionData('restoreEquipment', 'efficiencyBase', .0001);
+            adjustActionData('unblemish', 'efficiencyBase', .00008);
+            adjustActionData('manaTransfer', 'efficiencyBase', .00005);
+
+            for(let actionVar in data.actions) {
+                let actionObj = data.actions[actionVar];
+                let dataObj = actionData[actionVar];
+                if(dataObj.plane === 1 && actionObj.unlocked) {
+                    actionObj.prevUnlockTime = 5;
+                    actionObj.unlockTime = 5;
+                }
+            }
         }
 
+        data.ancientCoin += refundAmount;
         applyUpgradeEffects()
     }
 
@@ -176,6 +210,17 @@ function load() {
 
     for(let queuedLogMessage of queuedLogMessages) {
         addLogMessage(queuedLogMessage[0], queuedLogMessage[1]);
+    }
+
+    if(saveVersionFromLoad <= 2) {
+        if(data.actions.studyAdvancedEarthMagic.level >= 2) {
+            purchaseAction('reinforceArmor')
+            unveilAction('reinforceArmor');
+        }
+        if(data.actions.studyAdvancedEarthMagic.level >= 3) {
+            purchaseAction('restoreEquipment')
+            unveilAction('restoreEquipment');
+        }
     }
     debug(); //change game after all else, for easier debugging
 }
@@ -284,37 +329,42 @@ function updateUIOnLoad() {
     for (let actionVar in data.actions) {
         let actionObj = data.actions[actionVar];
         let dataObj = actionData[actionVar];
-        if(data.gameState === "KTL") {
+        if (data.gameState === "KTL") {
             actionObj.isRunning = actionObj.plane === 2;
         } else {
             actionObj.isRunning = actionObj.plane !== 2;
         }
-        clickActionMenu(actionVar, actionObj.currentMenu, true);
+        let menuFromSave = actionObj.currentMenu;
+        actionObj.currentMenu = "";
+        clickActionMenu(actionVar, menuFromSave);
         if (actionObj.visible) {
             revealActionAtts(actionObj);
         }
-        if(data.gameSettings.viewDeltas) {
+        if (data.gameSettings.viewDeltas) {
             views.updateVal(`${actionVar}DeltasDisplayContainer`, "", "style.display");
         }
-        if(data.gameSettings.viewRatio) {
+        if (data.gameSettings.viewRatio) {
             views.updateVal(`${actionVar}BalanceNeedleContainer`, "", "style.display");
         }
-        if(data.gameSettings.viewAll0Buttons) {
+        if (data.gameSettings.viewAll0Buttons) {
             views.updateVal(`${actionVar}ToggleDownstreamButtons`, "", "style.display");
         }
-        if(data.gameSettings.viewTotalMomentum) {
+        if (data.gameSettings.viewTotalMomentum) {
             views.updateVal(`${actionVar}TotalDownstreamContainer`, "", "style.display");
         }
-        let automationUnlocked = data.upgrades.stopLettingOpportunityWait.upgradePower > 0
-            || data.upgrades.knowWhenToMoveOn.upgradePower > 0;
-        if(automationUnlocked) {
-            views.updateVal(`${actionVar}_automationMenuButton`, actionObj.hasUpstream && dataObj.plane !== 2?"":"none", "style.display");
+        if (actionObj.hasUpstream) {
+            let showRevealAutomation = data.upgrades.stopLettingOpportunityWait.upgradePower > 0;
+            let showMaxLevelAutomation = data.upgrades.knowWhenToMoveOn.upgradePower > 0;
+            views.updateVal(`${actionVar}_automationMenuButton`, dataObj.plane !== 2 && (showRevealAutomation || showMaxLevelAutomation) ? "" : "none", "style.display");
+            views.updateVal(`${actionVar}_automationMaxLevelContainer`, dataObj.plane !== 2 && showRevealAutomation ? "" : "none", "style.display");
+            views.updateVal(`${actionVar}_automationRevealContainer`, dataObj.plane !== 2 && showMaxLevelAutomation ? "" : "none", "style.display");
         }
+
         if(data.doneAmulet) {
             views.updateVal(`${actionVar}PinButton`, "", "style.display");
         }
         if(actionObj.hasUpstream) {
-            if (actionObj.automationOff) {
+            if (actionObj.automationOnReveal) {
                 views.updateVal(`${actionVar}_checkbox`, true, "checked");
                 views.updateVal(`${actionVar}_track`, "#2196F3", "style.backgroundColor");
                 views.updateVal(`${actionVar}_knob`, "translateX(26px)", "style.transform");
@@ -323,6 +373,18 @@ function updateUIOnLoad() {
                 views.updateVal(`${actionVar}_track`, "#ccc", "style.backgroundColor");
                 views.updateVal(`${actionVar}_knob`, "translateX(0px)", "style.transform");
             }
+            if (actionObj.automationOnMax) {
+                views.updateVal(`${actionVar}_checkbox2`, true, "checked");
+                views.updateVal(`${actionVar}_track2`, "#2196F3", "style.backgroundColor");
+                views.updateVal(`${actionVar}_knob2`, "translateX(26px)", "style.transform");
+            } else {
+                views.updateVal(`${actionVar}_checkbox2`, false, "checked");
+                views.updateVal(`${actionVar}_track2`, "#ccc", "style.backgroundColor");
+                views.updateVal(`${actionVar}_knob2`, "translateX(0px)", "style.transform");
+            }
+        }
+        if(dataObj.isSpell || dataObj.isSpellConsumer) {
+            updatePauseActionVisuals(actionVar);
         }
     }
     if (data.planeUnlocked[1] || data.planeUnlocked[2]) {

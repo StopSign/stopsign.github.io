@@ -243,7 +243,7 @@ actionData = {
 `}
     },
     overcharge: {
-        tier:0, plane:1, resourceName:"mana", automationOff:true,
+        tier:0, plane:1, resourceName:"mana", 
         progressMaxBase:100, progressMaxIncrease:1,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:.4, maxLevel:1, isSpell:true, instabilityToAdd:5,
@@ -264,7 +264,7 @@ actionData = {
 `}
     },
     overboost: {
-        tier:0, plane:1, resourceName:"mana", automationOff:true,
+        tier:0, plane:1, resourceName:"mana", 
         progressMaxBase:1e6, progressMaxIncrease:1,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:.2, maxLevel:1, isSpell:true, instabilityToAdd:10,
@@ -283,7 +283,7 @@ actionData = {
 `}
     },
     overponder: {
-        tier:0, plane:1, resourceName:"mana", creationVersion:2, automationOff:true,
+        tier:0, plane:1, resourceName:"mana", creationVersion:2, 
         progressMaxBase:1e12, progressMaxIncrease:1,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:.01, maxLevel:1, isSpell:true, instabilityToAdd:300,
@@ -461,7 +461,7 @@ actionData = {
 `}
     },
     moveEarth: {
-        tier:0, plane:1, resourceName:"mana", creationVersion:2, automationOff: true, title:"Move Dirt",
+        tier:0, plane:1, resourceName:"mana", creationVersion:2,  title:"Move Dirt",
         progressMaxBase:3e9, progressMaxIncrease:1,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:.01, maxLevel:1, isSpell:true, instabilityToAdd:125, power:3,
@@ -481,7 +481,7 @@ actionData = {
 `}
     },
     hardenEarth: {
-        tier:0, plane:1, resourceName:"mana", creationVersion:2, automationOff: true, title: "Harden Dirt",
+        tier:0, plane:1, resourceName:"mana", creationVersion:2,  title: "Harden Dirt",
         progressMaxBase:3e11, progressMaxIncrease:1,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:.003, maxLevel:1, isSpell:true, instabilityToAdd:150, power:6,
@@ -501,7 +501,7 @@ actionData = {
 `}
     },
     shapeEarth: {
-        tier:0, plane:1, resourceName:"mana", creationVersion:2, automationOff: true, title: "Shape Dirt",
+        tier:0, plane:1, resourceName:"mana", creationVersion:2,  title: "Shape Dirt",
         progressMaxBase:9e12, progressMaxIncrease:1,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:.001, maxLevel:1, isSpell:true, instabilityToAdd:175, power:10,
@@ -521,7 +521,7 @@ actionData = {
 `}
     },
     practicalMagic: {
-        tier:0, plane:1, resourceName:"mana", creationVersion:2, automationOff: true,
+        tier:0, plane:1, resourceName:"mana", creationVersion:2, 
         progressMaxBase:3e14, progressMaxIncrease:1,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:.001, maxLevel:1, isSpell:true, instabilityToAdd:200, power:30,
@@ -543,7 +543,7 @@ actionData = {
 `}
     },
     illuminate: {
-        tier:0, plane:1, resourceName:"mana", creationVersion:2, automationOff: true,
+        tier:0, plane:1, resourceName:"mana", creationVersion:2, 
         progressMaxBase:3e15, progressMaxIncrease:1,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:.0005, maxLevel:1, isSpell:true, instabilityToAdd:225, power:50,
@@ -563,16 +563,16 @@ actionData = {
 `}
     },
     moveIron: {
-        tier:0, plane:1, resourceName:"mana", creationVersion:2, automationOff: true,
+        tier:0, plane:1, resourceName:"mana", creationVersion:2, 
         progressMaxBase:1e16, progressMaxIncrease:1,
         expToLevelBase:1, expToLevelIncrease:1,
-        efficiencyBase:1, maxLevel:1, isSpell:true, instabilityToAdd:100, power:100,
+        efficiencyBase:.0003, maxLevel:1, isSpell:true, instabilityToAdd:100, power:100,
         unlockCost:1e16, visible:false, unlocked:false, purchased: false,
         onLevelCustom: function() {
             unveilAction('restoreEquipment')
             unveilAction('moldBarsFromScrap')
         },
-        onLevelAtts:[["wizardry", 5000]],
+        onLevelAtts:[["wizardry", 4000]],
         expAtts:[["spellcraft", .1]],
         efficiencyAtts:[["wizardry", .001]],
         iconText: {english:Raw.html`
@@ -581,15 +581,15 @@ actionData = {
 `}
     },
     reinforceArmor: {
-        tier:0, plane:1, resourceName:"mana", creationVersion:2, automationOff: true,
+        tier:0, plane:1, resourceName:"mana", creationVersion:2, 
         progressMaxBase:3e16, progressMaxIncrease:1,
         expToLevelBase:1, expToLevelIncrease:1,
-        efficiencyBase:1, maxLevel:1, isSpell:true, instabilityToAdd:100, power:200,
+        efficiencyBase:.0002, maxLevel:1, isSpell:true, instabilityToAdd:100, power:150,
         unlockCost:3e16, visible:false, unlocked:false, purchased: false,
         onLevelCustom: function() {
             unveilAction('mendGearCracks')
         },
-        onLevelAtts:[["wizardry", 10000]],
+        onLevelAtts:[["wizardry", 6000]],
         expAtts:[["spellcraft", .1]],
         efficiencyAtts:[["wizardry", .001]],
         iconText: {english:Raw.html`
@@ -597,15 +597,15 @@ actionData = {
 `}
     },
     restoreEquipment: {
-        tier:0, plane:1, resourceName:"mana", creationVersion:2, automationOff: true,
+        tier:0, plane:1, resourceName:"mana", creationVersion:2, 
         progressMaxBase:1e17, progressMaxIncrease:1,
         expToLevelBase:1, expToLevelIncrease:1,
-        efficiencyBase:1, maxLevel:1, isSpell:true, instabilityToAdd:100, power:500,
+        efficiencyBase:.0001, maxLevel:1, isSpell:true, instabilityToAdd:100, power:250,
         unlockCost:1e17, visible:false, unlocked:false, purchased: false,
         onLevelCustom: function() {
             unveilAction('assistantMagesmith')
         },
-        onLevelAtts:[["wizardry", 20000]],
+        onLevelAtts:[["wizardry", 10000]],
         expAtts:[["spellcraft", .1]],
         efficiencyAtts:[["wizardry", .001]],
         iconText: {english:Raw.html`
@@ -613,17 +613,17 @@ actionData = {
 `}
     },
     unblemish: {
-        tier:0, plane:1, resourceName:"mana", creationVersion:2, automationOff: true,
+        tier:0, plane:1, resourceName:"mana", creationVersion:2, 
         progressMaxBase:3e17, progressMaxIncrease:1,
         expToLevelBase:1, expToLevelIncrease:1,
-        efficiencyBase:1, maxLevel:1, isSpell:true, instabilityToAdd:100, power:1000,
+        efficiencyBase:.00008, maxLevel:1, isSpell:true, instabilityToAdd:100, power:400,
         unlockCost:3e17, visible:false, unlocked:false, purchased: false,
         onLevelCustom: function() {
             unveilAction('manaTransfer')
         },
         onUnlock: function() {
         },
-        onLevelAtts:[["wizardry", 25000]],
+        onLevelAtts:[["wizardry", 12000]],
         expAtts:[["spellcraft", .1]],
         efficiencyAtts:[["wizardry", .001]],
         iconText: {english:Raw.html`
@@ -631,21 +631,21 @@ actionData = {
 `}
     },
     manaTransfer: {
-        tier:0, plane:1, resourceName:"mana", creationVersion:2, automationOff: true,
+        tier:0, plane:1, resourceName:"mana", creationVersion:2, 
         progressMaxBase:1e18, progressMaxIncrease:1,
         expToLevelBase:1, expToLevelIncrease:1,
-        efficiencyBase:1, maxLevel:1, isSpell:true, instabilityToAdd:100, power:1500,
+        efficiencyBase:.00005, maxLevel:1, isSpell:true, instabilityToAdd:100, power:600,
         unlockCost:1e18, visible:false, unlocked:false, purchased: false,
         onLevelCustom: function() {
         },
         onUnlock: function() {
         },
-        onLevelAtts:[["wizardry", 40000]],
+        onLevelAtts:[["wizardry", 15000]],
         expAtts:[["spellcraft", .1]],
         efficiencyAtts:[["wizardry", .001]]
     },
     manaVisualizations: {
-        tier:0, plane:1, resourceName:"mana", creationVersion:2, automationOff: true,
+        tier:0, plane:1, resourceName:"mana", creationVersion:2, 
         progressMaxBase:5e12, progressMaxIncrease:9,
         expToLevelBase:3, expToLevelIncrease:1,
         efficiencyBase:.02, maxLevel:3,
@@ -657,7 +657,7 @@ actionData = {
         efficiencyAtts:[["integration", .05]]
     },
     manaShaping: {
-        tier:0, plane:1, resourceName:"mana", creationVersion:2, automationOff: true,
+        tier:0, plane:1, resourceName:"mana", creationVersion:2, 
         progressMaxBase:1000, progressMaxIncrease:3,
         expToLevelBase:3, expToLevelIncrease:1,
         efficiencyBase:1, maxLevel:10,
@@ -669,7 +669,7 @@ actionData = {
         efficiencyAtts:[]
     },
     listenToTheMana: {
-        tier:0, plane:1, resourceName:"mana", creationVersion:2, automationOff: true,
+        tier:0, plane:1, resourceName:"mana", creationVersion:2, 
         progressMaxBase:5e11, progressMaxIncrease:9,
         expToLevelBase:3, expToLevelIncrease:1,
         efficiencyBase:.02, maxLevel:3,
@@ -681,7 +681,7 @@ actionData = {
         efficiencyAtts:[["integration", .05]]
     },
     manaInstinct: {
-        tier:0, plane:1, resourceName:"mana", creationVersion:2, automationOff: true,
+        tier:0, plane:1, resourceName:"mana", creationVersion:2, 
         progressMaxBase:1000, progressMaxIncrease:3,
         expToLevelBase:3, expToLevelIncrease:1,
         efficiencyBase:1, maxLevel:10,
@@ -693,7 +693,7 @@ actionData = {
         efficiencyAtts:[["integration", .05]]
     },
     auraControl: {
-        tier:0, plane:1, resourceName:"mana", creationVersion:2, automationOff: true,
+        tier:0, plane:1, resourceName:"mana", creationVersion:2, 
         progressMaxBase:5e12, progressMaxIncrease:9,
         expToLevelBase:3, expToLevelIncrease:1,
         efficiencyBase:.02, maxLevel:6,
@@ -705,7 +705,7 @@ actionData = {
         efficiencyAtts:[["integration", .05]]
     },
     divination: {
-        tier:0, plane:1, resourceName:"mana", creationVersion:2, automationOff: true,
+        tier:0, plane:1, resourceName:"mana", creationVersion:2, 
         progressMaxBase:1000, progressMaxIncrease:3,
         expToLevelBase:3, expToLevelIncrease:1,
         efficiencyBase:1, maxLevel:10,
@@ -717,7 +717,7 @@ actionData = {
         efficiencyAtts:[]
     },
     identifyItem: {
-        tier:0, plane:1, resourceName:"mana", creationVersion:2, automationOff: true,
+        tier:0, plane:1, resourceName:"mana", creationVersion:2, 
         progressMaxBase:1000, progressMaxIncrease:3,
         expToLevelBase:3, expToLevelIncrease:1,
         efficiencyBase:1, maxLevel:10,
@@ -729,7 +729,7 @@ actionData = {
         efficiencyAtts:[]
     },
     detectMagic: {
-        tier:0, plane:1, resourceName:"mana", creationVersion:2, automationOff: true,
+        tier:0, plane:1, resourceName:"mana", creationVersion:2, 
         progressMaxBase:1000, progressMaxIncrease:3,
         expToLevelBase:3, expToLevelIncrease:1,
         efficiencyBase:1, maxLevel:10,
@@ -741,7 +741,7 @@ actionData = {
         efficiencyAtts:[]
     },
     recoverSpells: {
-        tier:0, plane:1, resourceName:"mana", creationVersion:2, automationOff: true,
+        tier:0, plane:1, resourceName:"mana", creationVersion:2, 
         progressMaxBase:20e7, progressMaxIncrease:9,
         expToLevelBase:3, expToLevelIncrease:1,
         efficiencyBase:.1, maxLevel:9,
@@ -753,7 +753,7 @@ actionData = {
         efficiencyAtts:[["integration", .05]]
     },
     healingMagic: {
-        tier:0, plane:1, resourceName:"mana", creationVersion:2, automationOff: true,
+        tier:0, plane:1, resourceName:"mana", creationVersion:2, 
         progressMaxBase:1000, progressMaxIncrease:3,
         expToLevelBase:3, expToLevelIncrease:1,
         efficiencyBase:1, maxLevel:10,
@@ -766,7 +766,7 @@ actionData = {
     },
 
     singleTargetHealing: {
-        tier:0, plane:1, resourceName:"mana", creationVersion:2, automationOff: true,
+        tier:0, plane:1, resourceName:"mana", creationVersion:2, 
         progressMaxBase:1000, progressMaxIncrease:3,
         expToLevelBase:3, expToLevelIncrease:1,
         efficiencyBase:1, maxLevel:10,
@@ -778,7 +778,7 @@ actionData = {
         efficiencyAtts:[]
     },
     purifyPoison: {
-        tier:0, plane:1, resourceName:"mana", creationVersion:2, automationOff: true,
+        tier:0, plane:1, resourceName:"mana", creationVersion:2, 
         progressMaxBase:1000, progressMaxIncrease:3,
         expToLevelBase:3, expToLevelIncrease:1,
         efficiencyBase:1, maxLevel:10,
@@ -790,7 +790,7 @@ actionData = {
         efficiencyAtts:[]
     },
     massHeal: {
-        tier:0, plane:1, resourceName:"mana", creationVersion:2, automationOff: true,
+        tier:0, plane:1, resourceName:"mana", creationVersion:2, 
         progressMaxBase:1000, progressMaxIncrease:3,
         expToLevelBase:3, expToLevelIncrease:1,
         efficiencyBase:1, maxLevel:10,
@@ -802,7 +802,7 @@ actionData = {
         efficiencyAtts:[]
     },
     auraHealing: {
-        tier:0, plane:1, resourceName:"mana", creationVersion:2, automationOff: true,
+        tier:0, plane:1, resourceName:"mana", creationVersion:2, 
         progressMaxBase:1000, progressMaxIncrease:3,
         expToLevelBase:3, expToLevelIncrease:1,
         efficiencyBase:1, maxLevel:10,
@@ -814,7 +814,7 @@ actionData = {
         efficiencyAtts:[]
     },
     healBurst: {
-        tier:0, plane:1, resourceName:"mana", creationVersion:2, automationOff: true,
+        tier:0, plane:1, resourceName:"mana", creationVersion:2, 
         progressMaxBase:1000, progressMaxIncrease:3,
         expToLevelBase:3, expToLevelIncrease:1,
         efficiencyBase:1, maxLevel:10,
@@ -826,7 +826,7 @@ actionData = {
         efficiencyAtts:[]
     },
     combatSpells: {
-        tier:0, plane:1, resourceName:"mana", creationVersion:2, automationOff: true,
+        tier:0, plane:1, resourceName:"mana", creationVersion:2, 
         progressMaxBase:20e10, progressMaxIncrease:9,
         expToLevelBase:3, expToLevelIncrease:1,
         efficiencyBase:.05, maxLevel:9,
@@ -838,7 +838,7 @@ actionData = {
         efficiencyAtts:[["integration", .05]]
     },
     swarmSpells: {
-        tier:0, plane:1, resourceName:"mana", creationVersion:2, automationOff: true,
+        tier:0, plane:1, resourceName:"mana", creationVersion:2, 
         progressMaxBase:1000, progressMaxIncrease:3,
         expToLevelBase:3, expToLevelIncrease:1,
         efficiencyBase:1, maxLevel:10,
@@ -850,7 +850,7 @@ actionData = {
         efficiencyAtts:[]
     },
     fireball: {
-        tier:0, plane:1, resourceName:"mana", creationVersion:2, automationOff: true,
+        tier:0, plane:1, resourceName:"mana", creationVersion:2, 
         progressMaxBase:1000, progressMaxIncrease:3,
         expToLevelBase:3, expToLevelIncrease:1,
         efficiencyBase:1, maxLevel:10,
@@ -862,7 +862,7 @@ actionData = {
         efficiencyAtts:[]
     },
     wardMagic: {
-        tier:0, plane:1, resourceName:"mana", creationVersion:2, automationOff: true,
+        tier:0, plane:1, resourceName:"mana", creationVersion:2, 
         progressMaxBase:1000, progressMaxIncrease:3,
         expToLevelBase:3, expToLevelIncrease:1,
         efficiencyBase:1, maxLevel:10,
@@ -874,7 +874,7 @@ actionData = {
         efficiencyAtts:[]
     },
     ward: {
-        tier:0, plane:1, resourceName:"mana", creationVersion:2, automationOff: true,
+        tier:0, plane:1, resourceName:"mana", creationVersion:2, 
         progressMaxBase:1000, progressMaxIncrease:3,
         expToLevelBase:3, expToLevelIncrease:1,
         efficiencyBase:1, maxLevel:10,
@@ -886,7 +886,7 @@ actionData = {
         efficiencyAtts:[]
     },
     duellingSpells: {
-        tier:0, plane:1, resourceName:"mana", creationVersion:2, automationOff: true,
+        tier:0, plane:1, resourceName:"mana", creationVersion:2, 
         progressMaxBase:1000, progressMaxIncrease:3,
         expToLevelBase:3, expToLevelIncrease:1,
         efficiencyBase:1, maxLevel:10,
@@ -898,7 +898,7 @@ actionData = {
         efficiencyAtts:[]
     },
     firebolt: {
-        tier:0, plane:1, resourceName:"mana", creationVersion:2, automationOff: true,
+        tier:0, plane:1, resourceName:"mana", creationVersion:2, 
         progressMaxBase:1000, progressMaxIncrease:3,
         expToLevelBase:3, expToLevelIncrease:1,
         efficiencyBase:1, maxLevel:10,

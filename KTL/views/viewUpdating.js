@@ -197,7 +197,8 @@ let views = {
         let actionVar = actionObj.actionVar;
         let dataObj = actionData[actionVar];
 
-        views.updateVal(`${actionVar}LockContainer`, !actionObj.unlocked?"":"none", "style.display");
+        views.updateVal(`${actionVar}LockContainer`, (!actionObj.unlocked && actionObj.currentMenu!=="automation")?"":"none", "style.display");
+        views.updateVal(`${actionVar}ResourceInfoContainer`, (!actionObj.unlocked && actionObj.currentMenu==="automation")?"none":"", "style.display");
 
         let efficiencyToUse = actionObj.efficiency;
         if(dataObj.backwardsEfficiency) {
@@ -498,13 +499,11 @@ function updateGlobals() {
         }
     }
     data.totalMomentum = totalMometum;
-    data.totalSpellPower = getActiveSpellPower(true);
     if(data.upgrades.keepMyMagicReady.upgradePower) {
-        if(data.totalSpellPower > data.maxSpellPower) {
-            data.maxSpellPower = data.totalSpellPower;
-        }
+        saveMaxChargedSpellPowers();
+        data.maxSpellPower = getTotalMaxChargedSpellPower();
     } else {
-        data.maxSpellPower = data.totalSpellPower;
+        data.maxSpellPower = getActiveSpellPower(true);
     }
 
     views.updateVal(`maxSpellPower`, data.maxSpellPower, "textContent", 1);

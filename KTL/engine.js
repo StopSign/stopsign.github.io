@@ -73,7 +73,6 @@ function actionSetBaseVariables(actionObj, dataObj) {
     // actionObj.visible = (globalVisible || dataObj.visible === null) ? true : dataObj.visible;
     actionObj.unlockCost = dataObj.unlockCost;
     actionObj.unlocked = dataObj.unlocked === null ? true : dataObj.unlocked;
-    actionObj.currentMenu = "downstream";
 
     actionObj.isRunning = dataObj.plane !== 2; //for controlling whether time affects it
     actionObj.onLevelAtts = dataObj.onLevelAtts ? dataObj.onLevelAtts : [];
@@ -112,7 +111,9 @@ function actionSetInitialVariables(actionObj, dataObj) {
     actionObj.isKTL = !!dataObj.isKTL;
     actionObj.purchased = !!dataObj.purchased;
     actionObj.plane = dataObj.plane;
-    actionObj.automationOff = !!dataObj.automationOff;
+    actionObj.automationOnReveal = true;
+    actionObj.automationOnMax = true;
+    actionObj.currentMenu = "downstream";
 
     // actionObj.onUnlock = dataObj.onUnlock ? dataObj.onUnlock : function() {};
     // actionObj.onCompleteCustom = dataObj.onCompleteCustom ? dataObj.onCompleteCustom : function() {};
@@ -250,7 +251,7 @@ function checkLevelUp(actionObj, dataObj) {
         }
 
         let isNowMaxLevel = actionObj.maxLevel !== undefined && actionObj.level >= actionObj.maxLevel;
-        if (isNowMaxLevel && !actionObj.automationOff) {
+        if (isNowMaxLevel && actionObj.automationOnMax) {
             updateSupplyChain(actionObj.actionVar);
         }
 
@@ -350,10 +351,16 @@ function unveilAction(actionVar) {
 
     addLogMessage(actionVar, "unlockAction")
 
+    if(dataObj.plane === 1) { //Give magic actions an unlock time
+        actionObj.unlockTime = data.secondsPerReset;
+    }
+
     actionObj.visible = true;
     revealActionAtts(actionObj);
 
-    updateSupplyChain(actionVar);
+    if(data.actions[actionVar].automationOnReveal) {
+        updateSupplyChain(actionVar);
+    }
 }
 
 
@@ -373,7 +380,9 @@ function addMaxLevel(actionVar, amount) {
 
     // setUpstreamSlidersToUnlockValue(actionVar); // New line
 
-    updateSupplyChain(actionVar);
+    if(data.actions[actionVar].automationOnMax) {
+        updateSupplyChain(actionVar);
+    }
 }
 
 //for a given actionVar:
@@ -383,7 +392,7 @@ function addMaxLevel(actionVar, amount) {
 //4. else, if it is max level, recurse down to the children - are any of them not max level and visible? If any are, it makes all their parents yes needed
 //5. if none are needed, return false
 //6. saves in isNeededList only to prevent recalc with multiple calls via updateSupplyChain
-//7. if the action has automationOff, i'm pretty sure it shouldn't change anything here - it's still needed or not based on max level
+//7. if the action has automationOnMax, i'm pretty sure it shouldn't change anything here - it's still needed or not based on max level
 function isNeeded(actionVar, isNeededList = {}) {
     if (isNeededList[actionVar] !== undefined) {
         return isNeededList[actionVar];
@@ -421,6 +430,7 @@ function updateSupplyChain(startActionVar) {
     const isNeededList = {};
     let currentVar = startActionVar;
 
+    //recurses upwards
     while (currentVar) {
         const actionObj = data.actions[currentVar];
         const dataObj = actionData[currentVar];
@@ -430,34 +440,28 @@ function updateSupplyChain(startActionVar) {
         }
 
         const parentVar = dataObj.parentVar;
+        //recurses downwards to be true if any downstream is needed
         const childIsNeeded = isNeeded(currentVar, isNeededList);
 
         let currentSliderValue = data.actions[parentVar][`downstreamRate${currentVar}`];
 
         if (childIsNeeded) {
-            if (currentSliderValue === 0) {
-                if(!actionObj.automationOff) {
+            //if a child is needed, and slider is off, turn it on
+            if (currentSliderValue === 0 && actionObj.automationOnReveal) {
+                if(!actionObj.prevUnlockTime && currentVar === startActionVar) { //ignore the first time
+                    setSliderUI(parentVar, currentVar, 0);
+                } else {
                     setSliderUI(parentVar, currentVar, getUpgradeSliderAmount());
                 }
             }
-        } else {
-            if (data.upgrades.knowWhenToMoveOn.upgradePower > 0) {
-                if (currentSliderValue !== 0) {
-                    if(!actionObj.automationOff) {
-                        setSliderUI(parentVar, currentVar, 0);
-                    }
-                }
-            } else {
-                if (currentSliderValue === 0) {
-                    if(!actionObj.automationOff) {
-                        setSliderUI(parentVar, currentVar, getUpgradeSliderAmount());
-                    }
-                }
-            }
+        } else if (data.upgrades.knowWhenToMoveOn.upgradePower > 0 && currentSliderValue !== 0 && actionObj.automationOnMax) {
+            //if not needed, turn off
+            setSliderUI(parentVar, currentVar, 0);
         }
 
         currentVar = parentVar;
     }
+
 }
 
 
@@ -595,6 +599,28 @@ function getActiveSpellPower(shouldCountPaused) {
         }
     }
     return totalSpellPower;
+}
+
+function saveMaxChargedSpellPowers() {
+    for(let actionVar in data.actions) {
+        let actionObj = data.actions[actionVar];
+        if(actionObj.power) {
+            if(!data.chargedSpellPowers[actionVar]) {
+                data.chargedSpellPowers[actionVar] = 0;
+            }
+            if(actionObj.power * actionObj.level > data.chargedSpellPowers[actionVar]) {
+                data.chargedSpellPowers[actionVar] = actionObj.power * actionObj.level;
+            }
+        }
+    }
+}
+
+function getTotalMaxChargedSpellPower() {
+    let total = 0;
+    for(let actionVar in data.chargedSpellPowers) {
+        total += data.chargedSpellPowers[actionVar];
+    }
+    return total;
 }
 
 

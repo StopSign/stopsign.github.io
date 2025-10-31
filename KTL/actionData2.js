@@ -44,7 +44,7 @@ actionData = {
 `}
     },
     processEmotions: {
-        tier:1, plane:0, creationVersion:2, automationOff: true,
+        tier:1, plane:0, creationVersion:2, 
         progressMaxBase:1e30, progressMaxIncrease:3,
         expToLevelBase:1, expToLevelIncrease:2,
         efficiencyBase:.01, maxLevel:0,
@@ -68,7 +68,7 @@ actionData = {
 `}
     },
     readTheWritten: {
-        tier:1, plane:0, creationVersion:2, automationOff: true,
+        tier:1, plane:0, creationVersion:2, 
         progressMaxBase:2e40, progressMaxIncrease:6,
         expToLevelBase:1, expToLevelIncrease:2,
         efficiencyBase:.01, maxLevel:0,
@@ -82,7 +82,7 @@ actionData = {
         efficiencyAtts:[["cycle", .5]]
     },
     siftExcess: {
-        tier:1, plane:0, creationVersion:2, automationOff: true,
+        tier:1, plane:0, creationVersion:2, 
         progressMaxBase:1e46, progressMaxIncrease:6,
         expToLevelBase:1, expToLevelIncrease:2,
         efficiencyBase:.01, maxLevel:0,
@@ -94,7 +94,7 @@ actionData = {
         efficiencyAtts:[["cycle", .5]]
     },
     feelAGentleTug: {
-        tier:1, plane:0, creationVersion:2, automationOff: true,
+        tier:1, plane:0, creationVersion:2, 
         progressMaxBase:5e35, progressMaxIncrease:10,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:.01, maxLevel:3,
@@ -116,7 +116,7 @@ actionData = {
     `}
     },
     leaveTheOpenRoad: {
-        tier:1, plane:0, creationVersion:2, automationOff: true,
+        tier:1, plane:0, creationVersion:2, 
         progressMaxBase:1e34, progressMaxIncrease:10,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:.01, maxLevel:3,
@@ -137,7 +137,7 @@ actionData = {
 `}
     },
     findOverlook: {
-        tier:1, plane:0, creationVersion:2, automationOff: true,
+        tier:1, plane:0, creationVersion:2, 
         progressMaxBase:1e31, progressMaxIncrease:1000,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:.02, maxLevel:1,
@@ -158,7 +158,7 @@ actionData = {
     `}
     },
     discoverBurntTown: {
-        tier:1, plane:0, creationVersion:2, automationOff: true,
+        tier:1, plane:0, creationVersion:2, 
         progressMaxBase:5e32, progressMaxIncrease:4,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:.03, maxLevel:10,
@@ -191,7 +191,7 @@ actionData = {
     `}
     },
     feelTheDespair: {
-        tier:1, plane:0, creationVersion:2, automationOff: true,
+        tier:1, plane:0, creationVersion:2, 
         progressMaxBase:2e29, progressMaxIncrease:3,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:1, maxLevel:2,
@@ -205,7 +205,7 @@ actionData = {
         efficiencyAtts:[]
     },
     repairShatteredShrine: {
-        tier:1, plane:0, creationVersion:2, automationOff: true,
+        tier:1, plane:0, creationVersion:2, 
         progressMaxBase:1e30, progressMaxIncrease:3,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:1, maxLevel:2,
@@ -219,7 +219,7 @@ actionData = {
         efficiencyAtts:[]
     },
     stepThroughAsh: {
-        tier:1, plane:0, creationVersion:2, automationOff: true,
+        tier:1, plane:0, creationVersion:2, 
         progressMaxBase:1e28, progressMaxIncrease:6,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.1, maxLevel:5,
@@ -244,7 +244,7 @@ actionData = {
 `}
     },
     graspTheTragedy: {
-        tier:2, plane:0, creationVersion:2, automationOff: true,
+        tier:2, plane:0, creationVersion:2, 
         progressMaxBase:3e31, progressMaxIncrease:10,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:.05, maxLevel:2,
@@ -258,7 +258,7 @@ actionData = {
         efficiencyAtts:[["valor", 10]]
     },
     resonanceCompass: {
-        tier:1, plane:0, creationVersion:2, automationOff: true,
+        tier:1, plane:0, creationVersion:2, 
         progressMaxBase:3e28, progressMaxIncrease:10,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.001, maxLevel:5,
@@ -276,7 +276,7 @@ actionData = {
 `}
     },
     clearIvyWall: {
-        tier:1, plane:0, creationVersion:2, automationOff: true,
+        tier:1, plane:0, creationVersion:2, 
         progressMaxBase:3e35, progressMaxIncrease:4,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.01, maxLevel:5,
@@ -298,7 +298,7 @@ actionData = {
 `}
     },
     findPulsingShard: {
-        tier:1, plane:0, creationVersion:2, automationOff: true,
+        tier:1, plane:0, creationVersion:2, 
         progressMaxBase:1e36, progressMaxIncrease:1,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:.01, maxLevel:1,
@@ -312,7 +312,7 @@ actionData = {
         efficiencyAtts:[["curiosity", .0005]]
     },
     scavengeForSupplies: {
-        tier:1, plane:0, creationVersion:2, automationOff: true,
+        tier:1, plane:0, creationVersion:2, 
         progressMaxBase:1e39, progressMaxIncrease:4,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.01, maxLevel:5,
@@ -333,7 +333,7 @@ actionData = {
 `}
     },
     skimAHeavyTome: {
-        tier:1, plane:0, creationVersion:2, automationOff: true,
+        tier:1, plane:0, creationVersion:2, 
         progressMaxBase:8e41, progressMaxIncrease:10,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.001, maxLevel:5,
@@ -356,7 +356,7 @@ actionData = {
 `}
     },
     clearRubble: {
-        tier:1, plane:0, creationVersion:2, automationOff: true,
+        tier:1, plane:0, creationVersion:2, 
         progressMaxBase:2e38, progressMaxIncrease:5,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.002, maxLevel:10,
@@ -377,7 +377,7 @@ actionData = {
 `}
     },
     readFadedMarkers: {
-        tier:1, plane:0, creationVersion:2, automationOff: true,
+        tier:1, plane:0, creationVersion:2, 
         progressMaxBase:1e37, progressMaxIncrease:6,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.002, maxLevel:5,
@@ -398,7 +398,7 @@ actionData = {
 `}
     },
     mapOutTraps: {
-        tier:1, plane:0, creationVersion:2, automationOff: true,
+        tier:1, plane:0, creationVersion:2, 
         progressMaxBase:2e33, progressMaxIncrease:1.2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.002, maxLevel:10,
@@ -419,7 +419,7 @@ actionData = {
 `}
     },
     accessForbiddenArea: {
-        tier:1, plane:0, creationVersion:2, automationOff: true,
+        tier:1, plane:0, creationVersion:2, 
         progressMaxBase:2e36, progressMaxIncrease:1,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:.002, maxLevel:1,
@@ -437,7 +437,7 @@ actionData = {
 `}
     },
     collectSpellBooks: {
-        tier:1, plane:0, creationVersion:2, automationOff: true,
+        tier:1, plane:0, creationVersion:2, 
         progressMaxBase:1e32, progressMaxIncrease:5,
         expToLevelBase:1, expToLevelIncrease:2,
         efficiencyBase:.002, maxLevel:4,
@@ -461,7 +461,7 @@ actionData = {
 `}
     },
     findAFamiliarLanguage: {
-        tier:1, plane:0, creationVersion:2, automationOff: true,
+        tier:1, plane:0, creationVersion:2, 
         progressMaxBase:1e46, progressMaxIncrease:100,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.02, maxLevel:5,
@@ -479,7 +479,7 @@ actionData = {
 `}
     },
     searchForRelevantBooks: {
-        tier:1, plane:0, creationVersion:2, automationOff: true,
+        tier:1, plane:0, creationVersion:2, 
         progressMaxBase:1e44, progressMaxIncrease:10,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.02, maxLevel:5,
@@ -497,7 +497,7 @@ actionData = {
 `}
     },
     collectInterestingBooks: {
-        tier:1, plane:0, creationVersion:2, automationOff: true,
+        tier:1, plane:0, creationVersion:2, 
         progressMaxBase:1e42, progressMaxIncrease:10,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.02, maxLevel:3,
@@ -515,7 +515,7 @@ actionData = {
 `}
     },
     collectHistoryBooks: {
-        tier:1, plane:0, creationVersion:2, automationOff: true,
+        tier:1, plane:0, creationVersion:2, 
         progressMaxBase:1e42, progressMaxIncrease:10,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:.1, maxLevel:3,
@@ -566,7 +566,7 @@ actionData = {
 `}
     },
     browseFantasyNovels: {
-        tier:1, plane:0, creationVersion:2, automationOff: true,
+        tier:1, plane:0, creationVersion:2, 
         progressMaxBase:2e46, progressMaxIncrease:4,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.01, maxLevel:5,
@@ -580,7 +580,7 @@ actionData = {
         efficiencyAtts:[["navigation", .01]]
     },
     recognizeRunicLanguages: {
-        tier:1, plane:0, creationVersion:2, automationOff: true,
+        tier:1, plane:0, creationVersion:2, 
         progressMaxBase:4e41, progressMaxIncrease:10,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.01, maxLevel:5,
@@ -594,7 +594,7 @@ actionData = {
         efficiencyAtts:[["navigation", .01]]
     },
     catalogUnknownLanguages: {
-        tier:1, plane:0, creationVersion:2, automationOff: true,
+        tier:1, plane:0, creationVersion:2, 
         progressMaxBase:1e49, progressMaxIncrease:10,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.01, maxLevel:4,
@@ -608,7 +608,7 @@ actionData = {
         efficiencyAtts:[["navigation", .01]]
     },
     complainAboutDifficulty: {
-        tier:1, plane:0, creationVersion:2, automationOff: true,
+        tier:1, plane:0, creationVersion:2, 
         progressMaxBase:1e48, progressMaxIncrease:100,
         expToLevelBase:100, expToLevelIncrease:1,
         efficiencyBase:.005, maxLevel:3,
@@ -622,7 +622,7 @@ actionData = {
         efficiencyAtts:[["navigation", .01]]
     },
     decipherOrganization: {
-        tier:1, plane:0, creationVersion:2, automationOff: true,
+        tier:1, plane:0, creationVersion:2, 
         progressMaxBase:3e50, progressMaxIncrease:10,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.05, maxLevel:4,
@@ -636,7 +636,7 @@ actionData = {
         efficiencyAtts:[["navigation", .01]]
     },
     collectMathBooks: {
-        tier:1, plane:0, creationVersion:2, automationOff: true,
+        tier:1, plane:0, creationVersion:2, 
         progressMaxBase:1e47, progressMaxIncrease:10,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:.05, maxLevel:3,
@@ -662,7 +662,7 @@ actionData = {
     },
 
     clearTheDust: {
-        tier:1, plane:0, creationVersion:2, automationOff: true,
+        tier:1, plane:0, creationVersion:2, 
         progressMaxBase:1e50, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.005, maxLevel:10,
@@ -676,7 +676,7 @@ actionData = {
         efficiencyAtts:[["navigation", 1]]
     },
     markTheLayout: {
-        tier:1, plane:0, creationVersion:2, automationOff: true,
+        tier:1, plane:0, creationVersion:2, 
         progressMaxBase:3e52, progressMaxIncrease:10,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.005, maxLevel:5,
@@ -690,7 +690,7 @@ actionData = {
         efficiencyAtts:[["navigation", 1]]
     },
     dismantleShelves: {
-        tier:1, plane:0, creationVersion:2, automationOff: true,
+        tier:1, plane:0, creationVersion:2, 
         progressMaxBase:1e52, progressMaxIncrease:4,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.005, maxLevel:5,
@@ -704,7 +704,7 @@ actionData = {
         efficiencyAtts:[["navigation", 1]]
     },
     comprehendDifficultTexts: {
-        tier:1, plane:0, creationVersion:2, automationOff: true,
+        tier:1, plane:0, creationVersion:2, 
         progressMaxBase:1e53, progressMaxIncrease:4,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.005, maxLevel:5,
@@ -718,7 +718,7 @@ actionData = {
         efficiencyAtts:[["navigation", 1]]
     },
     examineTheArchitecture: {
-        tier:1, plane:0, creationVersion:2, automationOff: true,
+        tier:1, plane:0, creationVersion:2, 
         progressMaxBase:3e53, progressMaxIncrease:4,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.005, maxLevel:5,
@@ -733,7 +733,7 @@ actionData = {
     },
 
     pryGemLoose: {
-        tier:1, plane:0, creationVersion:2, automationOff: true,
+        tier:1, plane:0, creationVersion:2, 
         progressMaxBase:1e50, progressMaxIncrease:1,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:.0001, maxLevel:1,
@@ -750,7 +750,7 @@ actionData = {
 
 
     readBooks: {
-        tier:1, plane:0, creationVersion:2, automationOff: true,
+        tier:1, plane:0, creationVersion:2, 
         progressMaxBase:1e37, progressMaxIncrease:10,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:.1, maxLevel:1,
@@ -764,7 +764,7 @@ actionData = {
         efficiencyAtts:[["curiosity", .1]]
     },
     catalogNewBooks: {
-        tier:1, plane:0, creationVersion:2, automationOff: true,
+        tier:1, plane:0, creationVersion:2, 
         progressMaxBase:5e44, progressMaxIncrease:12,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:.1, maxLevel:0,
@@ -819,7 +819,7 @@ actionData = {
 `}
     },
     buildPersonalLibrary: {
-        tier:1, plane:0, creationVersion:2, automationOff: true,
+        tier:1, plane:0, creationVersion:2, 
         progressMaxBase:3e37, progressMaxIncrease:10,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.05, maxLevel:0,
@@ -833,7 +833,7 @@ actionData = {
         efficiencyAtts:[["logistics", 1]]
     },
     expandPersonalLibrary: {
-        tier:1, plane:0, creationVersion:2, automationOff: true,
+        tier:1, plane:0, creationVersion:2, 
         progressMaxBase:3e40, progressMaxIncrease:10,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.001, maxLevel:0,
@@ -847,7 +847,7 @@ actionData = {
         efficiencyAtts:[["logistics", 1]]
     },
     study: {
-        tier:2, plane:0, creationVersion:2, automationOff: true,
+        tier:2, plane:0, creationVersion:2, 
         progressMaxBase:3e35, progressMaxIncrease:1.1,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:1,
@@ -875,7 +875,7 @@ actionData = {
 `}
     },
     researchBySubject: {
-        tier:1, plane:0, resourceName:"research", creationVersion:2, automationOff: true,
+        tier:1, plane:0, resourceName:"research", creationVersion:2, 
         progressMaxBase:10, progressMaxIncrease:10,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:.1, maxLevel:1,
@@ -889,7 +889,7 @@ actionData = {
         efficiencyAtts:[["comfort", 1]]
     },
     studyMagic: {
-        tier:1, plane:0, resourceName:"research", creationVersion:2, automationOff: true,
+        tier:1, plane:0, resourceName:"research", creationVersion:2, 
         progressMaxBase:20, progressMaxIncrease:3,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:.1, maxLevel:2,
@@ -903,7 +903,7 @@ actionData = {
         efficiencyAtts:[["comfort", 1]]
     },
     studySupportSpells: {
-        tier:1, plane:0, resourceName:"research", creationVersion:2, automationOff: true,
+        tier:1, plane:0, resourceName:"research", creationVersion:2, 
         progressMaxBase:200, progressMaxIncrease:3,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:.1, maxLevel:3,
@@ -936,7 +936,7 @@ actionData = {
 `}
     },
     studyEarthMagic: {
-        tier:1, plane:0, resourceName:"research", creationVersion:2, automationOff: true, title:"Study Dirt Magic",
+        tier:1, plane:0, resourceName:"research", creationVersion:2,  title:"Study Dirt Magic",
         progressMaxBase:2000, progressMaxIncrease:4,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:.1, maxLevel:3,
@@ -968,7 +968,7 @@ actionData = {
 `}
     },
     studyPracticalMagic: {
-        tier:1, plane:0, resourceName:"research", creationVersion:2, automationOff: true,
+        tier:1, plane:0, resourceName:"research", creationVersion:2, 
         progressMaxBase:11000, progressMaxIncrease:4,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:.05, maxLevel:2,
@@ -994,7 +994,7 @@ actionData = {
 `}
     },
     studyMath: {
-        tier:1, plane:0, resourceName:"research", creationVersion:2, automationOff: true,
+        tier:1, plane:0, resourceName:"research", creationVersion:2, 
         progressMaxBase:6e4, progressMaxIncrease:2,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:.025, maxLevel:2,
@@ -1014,7 +1014,7 @@ actionData = {
 `}
     },
     studyCryptology: {
-        tier:1, plane:0, resourceName:"research", creationVersion:2, automationOff: true,
+        tier:1, plane:0, resourceName:"research", creationVersion:2, 
         progressMaxBase:1e5, progressMaxIncrease:1.5,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:.025, maxLevel:0,
@@ -1042,7 +1042,7 @@ actionData = {
 `}
     },
     studyAdvancedEarthMagic: {
-        tier:1, plane:0, resourceName:"research", creationVersion:2, automationOff: true, title:"Study Advanced Dirt Magic",
+        tier:1, plane:0, resourceName:"research", creationVersion:2,  title:"Study Advanced Dirt Magic",
         progressMaxBase:1.5e5, progressMaxIncrease:3,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:.025, maxLevel:3,
@@ -1074,7 +1074,7 @@ actionData = {
 `}
     },
     studyArchitecture: {
-        tier:1, plane:0, resourceName:"research", creationVersion:2, automationOff: true,
+        tier:1, plane:0, resourceName:"research", creationVersion:2, 
         progressMaxBase:2e5, progressMaxIncrease:1.5,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:.025, maxLevel:5,
@@ -1112,7 +1112,7 @@ actionData = {
 `}
     },
     studyAdvancedPracticalMagic: {
-        tier:1, plane:0, resourceName:"research", creationVersion:2, automationOff: true,
+        tier:1, plane:0, resourceName:"research", creationVersion:2, 
         progressMaxBase:5e5, progressMaxIncrease:10,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:.01, maxLevel:3,
@@ -1126,7 +1126,7 @@ actionData = {
         efficiencyAtts:[["comfort", 1]]
     },
     studyHistory: {
-        tier:1, plane:0, resourceName:"research", creationVersion:2, automationOff: true,
+        tier:1, plane:0, resourceName:"research", creationVersion:2, 
         progressMaxBase:2e4, progressMaxIncrease:1.5,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:.05, maxLevel:2,
@@ -1146,7 +1146,7 @@ actionData = {
 `}
     },
     readOldStories: {
-        tier:1, plane:0, resourceName:"research", creationVersion:2, automationOff: true,
+        tier:1, plane:0, resourceName:"research", creationVersion:2, 
         progressMaxBase:2.5e4, progressMaxIncrease:1.5,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:.05, maxLevel:2,
@@ -1166,7 +1166,7 @@ actionData = {
 `}
     },
     readWarJournals: {
-        tier:1, plane:0, resourceName:"research", creationVersion:2, automationOff: true,
+        tier:1, plane:0, resourceName:"research", creationVersion:2, 
         progressMaxBase:3e4, progressMaxIncrease:1.5,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:.05, maxLevel:2,
@@ -1186,7 +1186,7 @@ actionData = {
 `}
     },
     readOldReligiousTexts: {
-        tier:1, plane:0, resourceName:"research", creationVersion:2, automationOff: true,
+        tier:1, plane:0, resourceName:"research", creationVersion:2, 
         progressMaxBase:4e4, progressMaxIncrease:1.5,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:.03, maxLevel:2,
@@ -1206,7 +1206,7 @@ actionData = {
 `}
     },
     readOldProphecies: {
-        tier:1, plane:0, resourceName:"research", creationVersion:2, automationOff: true,
+        tier:1, plane:0, resourceName:"research", creationVersion:2, 
         progressMaxBase:6e4, progressMaxIncrease:2,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:.03, maxLevel:2,
@@ -1220,7 +1220,7 @@ actionData = {
         efficiencyAtts:[["comfort", 1]]
     },
     readOldPoetry: {
-        tier:1, plane:0, resourceName:"research", creationVersion:2, automationOff: true,
+        tier:1, plane:0, resourceName:"research", creationVersion:2, 
         progressMaxBase:5e4, progressMaxIncrease:1.5,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:.03, maxLevel:3,
@@ -1234,7 +1234,7 @@ actionData = {
         efficiencyAtts:[["comfort", 1]]
     },
     readOldPhilosophy: {
-        tier:1, plane:0, resourceName:"research", creationVersion:2, automationOff: true,
+        tier:1, plane:0, resourceName:"research", creationVersion:2, 
         progressMaxBase:1e5, progressMaxIncrease:10,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:.03, maxLevel:1,
@@ -1256,7 +1256,7 @@ actionData = {
 `}
     },
     reviewOldMemories: {
-        tier:1, plane:0, creationVersion:2, automationOff: true,
+        tier:1, plane:0, creationVersion:2, 
         progressMaxBase:1e38, progressMaxIncrease:10,
         expToLevelBase:1, expToLevelIncrease:2,
         efficiencyBase:.0001, maxLevel:5,
@@ -1270,7 +1270,7 @@ actionData = {
         efficiencyAtts:[["cycle", 1]]
     },
     rememberFriends: {
-        tier:1, plane:0, creationVersion:2, automationOff: true,
+        tier:1, plane:0, creationVersion:2, 
         progressMaxBase:1e41, progressMaxIncrease:10,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.0001, maxLevel:5,
@@ -1284,7 +1284,7 @@ actionData = {
         efficiencyAtts:[["cycle", 1]]
     },
     rememberTheWar: {
-        tier:1, plane:0, creationVersion:2, automationOff: true,
+        tier:1, plane:0, creationVersion:2, 
         progressMaxBase:1e42, progressMaxIncrease:10,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.0001, maxLevel:5,
@@ -1298,7 +1298,7 @@ actionData = {
         efficiencyAtts:[["cycle", 1]]
     },
     honorTheLost: {
-        tier:1, plane:0, creationVersion:2, automationOff: true,
+        tier:1, plane:0, creationVersion:2, 
         progressMaxBase:1e42, progressMaxIncrease:10,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.00005, maxLevel:5,
@@ -1312,7 +1312,7 @@ actionData = {
         efficiencyAtts:[["cycle", 1]]
     },
     letGoOfGuilt: {
-        tier:1, plane:0, creationVersion:2, automationOff: true,
+        tier:1, plane:0, creationVersion:2, 
         progressMaxBase:1e49, progressMaxIncrease:10,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.00005, maxLevel:5,
@@ -1332,7 +1332,7 @@ actionData = {
     ...actionData,
 
     absorbStarseed: {
-        tier:1, plane:3, creationVersion:2, automationOff: true,
+        tier:1, plane:3, creationVersion:2, 
         progressMaxBase:60, progressMaxIncrease:1,
         expToLevelBase:60, expToLevelIncrease:1,
         efficiencyBase:1, isKTL:true, purchased: true,

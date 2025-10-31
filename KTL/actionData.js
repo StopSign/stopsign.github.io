@@ -366,7 +366,7 @@ Level 3: Reveal Check Notice Board`}
         efficiencyAtts:[["ambition", .5]]
     },
     browsePersonalCollection: {
-        tier:1, plane:0, creationVersion:2, automationOff: true,
+        tier:1, plane:0, creationVersion:2, 
         progressMaxBase:1e41, progressMaxIncrease:8,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.1, maxLevel:5,
@@ -554,7 +554,7 @@ Level 3: Reveal Check Notice Board`}
         efficiencyAtts:[["confidence", 1]]
     },
     buyPointyHat: {
-        tier:2, plane:0, resourceName:"gold", automationOff: true,
+        tier:2, plane:0, resourceName:"gold", 
         progressMaxBase:5e30, progressMaxIncrease:10,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:1, maxLevel:1,
@@ -646,7 +646,7 @@ Level 3: Reveal Check Notice Board`}
 
 
     buyComfyShoes: {
-        tier:2, plane:0, resourceName: "gold", creationVersion:2, automationOff: true,
+        tier:2, plane:0, resourceName: "gold", creationVersion:2, 
         progressMaxBase:5e29, progressMaxIncrease:10,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.002, maxLevel:5,
@@ -656,7 +656,7 @@ Level 3: Reveal Check Notice Board`}
         efficiencyAtts:[["confidence", .1]]
     },
     buyTravelersGear: {
-        tier:2, plane:0, resourceName: "gold", creationVersion:2, automationOff: true,
+        tier:2, plane:0, resourceName: "gold", creationVersion:2, 
         progressMaxBase:5e35, progressMaxIncrease:10,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.001, maxLevel:5,
@@ -676,7 +676,7 @@ Level 3: Reveal Check Notice Board`}
 `}
     },
     buyArtisanFood: {
-        tier:2, plane:0, resourceName: "gold", creationVersion:2, automationOff: true,
+        tier:2, plane:0, resourceName: "gold", creationVersion:2, 
         progressMaxBase:5e39, progressMaxIncrease:10,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.1, maxLevel:5,
@@ -686,7 +686,7 @@ Level 3: Reveal Check Notice Board`}
         efficiencyAtts:[["leverage", .1]]
     },
     buyUtilityItems: {
-        tier:2, plane:0, resourceName: "gold", creationVersion:2, automationOff: true,
+        tier:2, plane:0, resourceName: "gold", creationVersion:2, 
         progressMaxBase:5e37, progressMaxIncrease:10,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.001, maxLevel:5,
@@ -706,7 +706,7 @@ Level 3: Reveal Check Notice Board`}
 `}
     },
     buyPotions: {
-        tier:2, plane:0, resourceName: "gold", creationVersion:2, automationOff: true,
+        tier:2, plane:0, resourceName: "gold", creationVersion:2, 
         progressMaxBase:5e39, progressMaxIncrease:10,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.1, maxLevel:5,
@@ -716,7 +716,7 @@ Level 3: Reveal Check Notice Board`}
         efficiencyAtts:[["leverage", .1]]
     },
     buyTools: {
-        tier:2, plane:0, resourceName: "gold", creationVersion:2, automationOff: true,
+        tier:2, plane:0, resourceName: "gold", creationVersion:2, 
         progressMaxBase:5e41, progressMaxIncrease:10,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.1, maxLevel:5,
@@ -734,7 +734,7 @@ Level 3: Reveal Check Notice Board`}
 `}
     },
     buyCart: {
-        tier:2, plane:0, resourceName: "gold", creationVersion:2, automationOff: true,
+        tier:2, plane:0, resourceName: "gold", creationVersion:2, 
         progressMaxBase:5e43, progressMaxIncrease:10,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.1, maxLevel:5,
@@ -744,7 +744,7 @@ Level 3: Reveal Check Notice Board`}
         efficiencyAtts:[["leverage", .1]]
     },
     buyHouse: {
-        tier:2, plane:0, resourceName: "gold", creationVersion:2, automationOff: true,
+        tier:2, plane:0, resourceName: "gold", creationVersion:2, 
         progressMaxBase:5e42, progressMaxIncrease:10,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:.1, maxLevel:1,
@@ -762,7 +762,7 @@ Level 3: Reveal Check Notice Board`}
 `}
     },
     buyHouseholdItems: {
-        tier:2, plane:0, resourceName: "gold", creationVersion:2, automationOff: true,
+        tier:2, plane:0, resourceName: "gold", creationVersion:2, 
         progressMaxBase:5e43, progressMaxIncrease:10,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.01, maxLevel:5,
@@ -778,7 +778,7 @@ Level 3: Reveal Check Notice Board`}
 `}
     },
     buyFurniture: {
-        tier:2, plane:0, resourceName: "gold", creationVersion:2, automationOff: true,
+        tier:2, plane:0, resourceName: "gold", creationVersion:2, 
         progressMaxBase:2e44, progressMaxIncrease:10,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.01, maxLevel:5,
@@ -796,7 +796,7 @@ Level 3: Reveal Check Notice Board`}
 `}
     },
     buyReadingChair: {
-        tier:2, plane:0, resourceName: "gold", creationVersion:2, automationOff: true,
+        tier:2, plane:0, resourceName: "gold", creationVersion:2, 
         progressMaxBase:5e44, progressMaxIncrease:10,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.01, maxLevel:5,
@@ -812,7 +812,7 @@ Level 3: Reveal Check Notice Board`}
 `}
     },
     buyBed: {
-        tier:2, plane:0, resourceName: "gold", creationVersion:2, automationOff: true,
+        tier:2, plane:0, resourceName: "gold", creationVersion:2, 
         progressMaxBase:2e46, progressMaxIncrease:10,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.01, maxLevel:5,
@@ -828,7 +828,7 @@ Level 3: Reveal Check Notice Board`}
 `}
     },
     buyFireplace: {
-        tier:2, plane:0, resourceName: "gold", creationVersion:2, automationOff: true,
+        tier:2, plane:0, resourceName: "gold", creationVersion:2, 
         progressMaxBase:5e46, progressMaxIncrease:10,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.01, maxLevel:5,
@@ -844,7 +844,7 @@ Level 3: Reveal Check Notice Board`}
 `}
     },
     buySilkSheets: {
-        tier:2, plane:0, resourceName: "gold", creationVersion:2, automationOff: true,
+        tier:2, plane:0, resourceName: "gold", creationVersion:2, 
         progressMaxBase:5e47, progressMaxIncrease:10,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.005, maxLevel:5,
@@ -854,7 +854,7 @@ Level 3: Reveal Check Notice Board`}
         efficiencyAtts:[["leverage", 1]]
     },
     buyGoodFirewood: {
-        tier:2, plane:0, resourceName: "gold", creationVersion:2, automationOff: true,
+        tier:2, plane:0, resourceName: "gold", creationVersion:2, 
         progressMaxBase:5e48, progressMaxIncrease:10,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.005, maxLevel:5,
@@ -865,7 +865,7 @@ Level 3: Reveal Check Notice Board`}
     },
 
     invest: {
-        tier:1, plane:0, resourceName:"gold", creationVersion:2, automationOff: true,
+        tier:1, plane:0, resourceName:"gold", creationVersion:2, 
         progressMaxBase:10, progressMaxIncrease:1,
         expToLevelBase:3e8, expToLevelIncrease:1.4,
         actionPowerBase:1, actionPowerMult:1, actionPowerMultIncrease:1,
@@ -936,7 +936,7 @@ Level 3: Reveal Check Notice Board`}
 `}
     },
     buildFortune: {
-        tier:2, plane:0, resourceName:"fortune", creationVersion:2, hasUpstream:false, automationOff: true,
+        tier:2, plane:0, resourceName:"fortune", creationVersion:2, hasUpstream:false, 
         progressMaxBase:100, progressMaxIncrease:4,
         expToLevelBase:1, expToLevelIncrease:2,
         efficiencyBase:1, maxLevel:5,
@@ -958,7 +958,7 @@ Level 3: Reveal Check Notice Board`}
 `}
     },
     reinvest: {
-        tier:3, plane:0, resourceName:"fortune", creationVersion:2, automationOff: true,
+        tier:3, plane:0, resourceName:"fortune", creationVersion:2, 
         progressMaxBase:1000, progressMaxIncrease:100,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:.01, maxLevel:10,
@@ -972,7 +972,7 @@ Level 3: Reveal Check Notice Board`}
         efficiencyAtts:[["ambition", .1]]
     },
     spendFortune: {
-        tier:2, plane:0, resourceName:"fortune", creationVersion:2, automationOff: true,
+        tier:2, plane:0, resourceName:"fortune", creationVersion:2, 
         progressMaxBase:500, progressMaxIncrease:10,
         expToLevelBase:1, expToLevelIncrease:2,
         efficiencyBase:1, maxLevel:4,
@@ -992,7 +992,7 @@ Level 3: Reveal Check Notice Board`}
 `}
     },
     investInLocals: {
-        tier:3, plane:0, resourceName:"fortune", creationVersion:2, automationOff: true,
+        tier:3, plane:0, resourceName:"fortune", creationVersion:2, 
         progressMaxBase:1500, progressMaxIncrease:10,
         expToLevelBase:1, expToLevelIncrease:2,
         efficiencyBase:1, maxLevel:4,
@@ -1017,7 +1017,7 @@ Level 3: Reveal Check Notice Board`}
 `}
     },
     hostAFestival: {
-        tier:3, plane:0, resourceName:"fortune", creationVersion:2, automationOff: true,
+        tier:3, plane:0, resourceName:"fortune", creationVersion:2, 
         progressMaxBase:1e4, progressMaxIncrease:10,
         expToLevelBase:1, expToLevelIncrease:2,
         efficiencyBase:1, maxLevel:4,
@@ -1029,7 +1029,7 @@ Level 3: Reveal Check Notice Board`}
         efficiencyAtts:[]
     },
     fundTownImprovements: {
-        tier:3, plane:0, resourceName:"fortune", creationVersion:2, automationOff: true,
+        tier:3, plane:0, resourceName:"fortune", creationVersion:2, 
         progressMaxBase:1e5, progressMaxIncrease:10,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:1, maxLevel:4,
@@ -1061,7 +1061,7 @@ Level 3: Reveal Check Notice Board`}
 `}
     },
     supportLocalLibrary: {
-        tier:3, plane:0, resourceName:"fortune", creationVersion:2, automationOff: true,
+        tier:3, plane:0, resourceName:"fortune", creationVersion:2, 
         progressMaxBase:2e7, progressMaxIncrease:10,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:1, maxLevel:4,
@@ -1074,7 +1074,7 @@ Level 3: Reveal Check Notice Board`}
         efficiencyAtts:[]
     },
     expandLocalLibrary: {
-        tier:3, plane:0, resourceName:"fortune", creationVersion:2, automationOff: true,
+        tier:3, plane:0, resourceName:"fortune", creationVersion:2, 
         progressMaxBase:2e9, progressMaxIncrease:10,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:1, maxLevel:4,
@@ -1090,7 +1090,7 @@ Level 3: Reveal Check Notice Board`}
 `}
     },
     investInSelf: {
-        tier:3, plane:0, resourceName:"fortune", creationVersion:2, automationOff: true,
+        tier:3, plane:0, resourceName:"fortune", creationVersion:2, 
         progressMaxBase:2e8, progressMaxIncrease:10,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:1, maxLevel:4,
@@ -1110,7 +1110,7 @@ Level 3: Reveal Check Notice Board`}
 `}
     },
     makeAPublicDonation: {
-        tier:3, plane:0, resourceName:"fortune", creationVersion:2, automationOff: true,
+        tier:3, plane:0, resourceName:"fortune", creationVersion:2, 
         progressMaxBase:3e8, progressMaxIncrease:10,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:1, maxLevel:4,
@@ -1122,7 +1122,7 @@ Level 3: Reveal Check Notice Board`}
         efficiencyAtts:[]
     },
     fundASmallStall: {
-        tier:3, plane:0, resourceName:"fortune", creationVersion:2, automationOff: true,
+        tier:3, plane:0, resourceName:"fortune", creationVersion:2, 
         progressMaxBase:3e11, progressMaxIncrease:10,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:1, maxLevel:4,
@@ -1132,7 +1132,7 @@ Level 3: Reveal Check Notice Board`}
         efficiencyAtts:[]
     },
     purchaseALot: {
-        tier:3, plane:0, resourceName:"fortune", creationVersion:2, automationOff: true,
+        tier:3, plane:0, resourceName:"fortune", creationVersion:2, 
         progressMaxBase:3e13, progressMaxIncrease:10,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:1, maxLevel:1,
@@ -1152,7 +1152,7 @@ Level 3: Reveal Check Notice Board`}
 `}
     },
     recruitACarpenter: {
-        tier:3, plane:0, resourceName:"fortune", creationVersion:2, automationOff: true,
+        tier:3, plane:0, resourceName:"fortune", creationVersion:2, 
         progressMaxBase:5e12, progressMaxIncrease:10,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:1, maxLevel:4,
@@ -1172,7 +1172,7 @@ Level 3: Reveal Check Notice Board`}
 `}
     },
     procureQualityWood: {
-        tier:3, plane:0, resourceName:"fortune", creationVersion:2, automationOff: true,
+        tier:3, plane:0, resourceName:"fortune", creationVersion:2, 
         progressMaxBase:3e14, progressMaxIncrease:10,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:1, maxLevel:4,
@@ -1188,7 +1188,7 @@ Level 3: Reveal Check Notice Board`}
 `}
     },
     sourceRareBooks: {
-        tier:3, plane:0, resourceName:"fortune", creationVersion:2, automationOff: true,
+        tier:3, plane:0, resourceName:"fortune", creationVersion:2, 
         progressMaxBase:5e8, progressMaxIncrease:10,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.1, maxLevel:10,
@@ -2009,7 +2009,7 @@ Level 3: Reveal Check Notice Board`}
 `}
     },
     learnToInquire: {
-        tier:1, plane:0, resourceName:"conversations", creationVersion:2, automationOff: true,
+        tier:1, plane:0, resourceName:"conversations", creationVersion:2, 
         progressMaxBase:3e21, progressMaxIncrease:100,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.05, maxLevel:10,
@@ -2028,7 +2028,7 @@ Level 3: Reveal Check Notice Board`}
 `}
     },
     talkToTheRecruiters: {
-        tier:1, plane:0, resourceName:"conversations", creationVersion:2, automationOff: true,
+        tier:1, plane:0, resourceName:"conversations", creationVersion:2, 
         progressMaxBase:1e20, progressMaxIncrease:100,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:.05, maxLevel:2,
@@ -2050,7 +2050,7 @@ Level 3: Reveal Check Notice Board`}
 `}
     },
     askAboutLocalWork: {
-        tier:1, plane:0, resourceName:"conversations", creationVersion:2, automationOff: true,
+        tier:1, plane:0, resourceName:"conversations", creationVersion:2, 
         progressMaxBase:8e20, progressMaxIncrease:100,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:.05, maxLevel:1,
@@ -2068,7 +2068,7 @@ Level 3: Reveal Check Notice Board`}
 `}
     },
     askAboutArcaneCorps: {
-        tier:1, plane:0, resourceName:"conversations", creationVersion:2, automationOff: true,
+        tier:1, plane:0, resourceName:"conversations", creationVersion:2, 
         progressMaxBase:1e26, progressMaxIncrease:10,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:.0005, maxLevel:2,
@@ -2086,7 +2086,7 @@ Level 3: Reveal Check Notice Board`}
 `}
     },
     getTestedForKnowledge: {
-        tier:1, plane:0, resourceName:"conversations", creationVersion:2, automationOff: true,
+        tier:1, plane:0, resourceName:"conversations", creationVersion:2, 
         progressMaxBase:1e28, progressMaxIncrease:100,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:.01, maxLevel:1,
@@ -2104,7 +2104,7 @@ Level 3: Reveal Check Notice Board`}
 `}
     },
     discussPlacement: {
-        tier:1, plane:0, resourceName:"conversations", creationVersion:2, automationOff: true,
+        tier:1, plane:0, resourceName:"conversations", creationVersion:2, 
         progressMaxBase:1e20, progressMaxIncrease:5,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:.1, maxLevel:4,
@@ -2122,7 +2122,7 @@ Level 3: Reveal Check Notice Board`}
 `}
     },
     meetTheMages: {
-        tier:1, plane:0, resourceName:"conversations", creationVersion:2, automationOff: true,
+        tier:1, plane:0, resourceName:"conversations", creationVersion:2, 
         progressMaxBase:2e28, progressMaxIncrease:10,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:.1, maxLevel:4,
@@ -2142,7 +2142,7 @@ Level 3: Reveal Check Notice Board`}
 `}
     },
     trainWithTeam: {
-        tier:2, plane:0, resourceName:"teamwork", creationVersion:2, automationOff: true,
+        tier:2, plane:0, resourceName:"teamwork", creationVersion:2, 
         progressMaxBase:30, progressMaxIncrease:0.8,
         expToLevelBase:300000, expToLevelIncrease:1000,
         // actionPowerBase:1, actionPowerMult:1, actionPowerMultIncrease:1,
@@ -2398,7 +2398,7 @@ actionData = {
     ...actionData,
 
     standStraighter: {
-        tier:1, plane:0, creationVersion:2, automationOff: true,
+        tier:1, plane:0, creationVersion:2, 
         progressMaxBase:1e39, progressMaxIncrease:10,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1, maxLevel:5,
@@ -2416,7 +2416,7 @@ actionData = {
 `}
     },
     walkAware: {
-        tier:1, plane:0, creationVersion:2, automationOff: true,
+        tier:1, plane:0, creationVersion:2, 
         progressMaxBase:1e43, progressMaxIncrease:10,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1, maxLevel:5,
@@ -2588,7 +2588,7 @@ actionData = {
 `}
     },
     townCrier: {
-        tier:1, plane:0, creationVersion:2, automationOff: true,
+        tier:1, plane:0, creationVersion:2, 
         progressMaxBase:1e28, progressMaxIncrease:4,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.03, maxLevel:8,
@@ -2611,7 +2611,7 @@ actionData = {
 `}
     },
     storyTeller: {
-        tier:1, plane:0, creationVersion:2, automationOff: true,
+        tier:1, plane:0, creationVersion:2, 
         progressMaxBase:1e30, progressMaxIncrease:4,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.001, maxLevel:8,
@@ -2634,7 +2634,7 @@ actionData = {
 `}
     },
     worksiteSweeper: {
-        tier:1, plane:0, creationVersion:2, automationOff: true,
+        tier:1, plane:0, creationVersion:2, 
         progressMaxBase:1e29, progressMaxIncrease:4,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.01, maxLevel:8,
@@ -2657,7 +2657,7 @@ actionData = {
 `}
     },
     digFoundation: {
-        tier:1, plane:0, creationVersion:2, automationOff: true,
+        tier:1, plane:0, creationVersion:2, 
         progressMaxBase:5e30, progressMaxIncrease:4,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.01, maxLevel:8,
@@ -2680,7 +2680,7 @@ actionData = {
 `}
     },
     stoneCompression: {
-        tier:1, plane:0, creationVersion:2, automationOff: true,
+        tier:1, plane:0, creationVersion:2, 
         progressMaxBase:1e32, progressMaxIncrease:5,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.002, maxLevel:8,
@@ -2703,7 +2703,7 @@ actionData = {
 `}
     },
     shapeBricks: {
-        tier:1, plane:0, creationVersion:2, automationOff: true,
+        tier:1, plane:0, creationVersion:2, 
         progressMaxBase:1e35, progressMaxIncrease:5,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.001, maxLevel:8,
@@ -2726,7 +2726,7 @@ actionData = {
 `}
     },
     tidyMagesmithShop: {
-        tier:1, plane:0, creationVersion:2, automationOff: true,
+        tier:1, plane:0, creationVersion:2, 
         progressMaxBase:1e38, progressMaxIncrease:4,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.0005, maxLevel:8,
@@ -2749,7 +2749,7 @@ actionData = {
 `}
     },
     clearTheBasement: {
-        tier:1, plane:0, creationVersion:2, automationOff: true,
+        tier:1, plane:0, creationVersion:2, 
         progressMaxBase:1e41, progressMaxIncrease:4,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.0004, maxLevel:8,
@@ -2772,7 +2772,7 @@ actionData = {
 `}
     },
     moldBarsFromScrap: {
-        tier:1, plane:0, creationVersion:2, automationOff: true,
+        tier:1, plane:0, creationVersion:2, 
         progressMaxBase:1e44, progressMaxIncrease:4,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.0002, maxLevel:8,
@@ -2795,7 +2795,7 @@ actionData = {
 `}
     },
     mendGearCracks: {
-        tier:1, plane:0, creationVersion:2, automationOff: true,
+        tier:1, plane:0, creationVersion:2, 
         progressMaxBase:1e47, progressMaxIncrease:4,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.0001, maxLevel:8,
@@ -2818,7 +2818,7 @@ actionData = {
 `}
     },
     assistantMagesmith: {
-        tier:1, plane:0, creationVersion:2, automationOff: true,
+        tier:1, plane:0, creationVersion:2, 
         progressMaxBase:1e50, progressMaxIncrease:4,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.00005, maxLevel:8,

@@ -205,7 +205,6 @@ actionData = {
         onUnlock: function() {
             data.ancientCoin += 13 * data.ancientCoinMultKTL;
             data.ancientCoinGained += 13 * data.ancientCoinMultKTL;
-            setSliderUI("geyserFields", "destroySiegeEngine", 100);
         },
         onCompleteCustom:function() {
             statAddAmount("legacy", 12 * (data.actions.geyserFields.level/10 + 1));
@@ -243,6 +242,7 @@ actionData = {
         onLevelCustom: function() {
             if(data.actions.destroySiegeEngine.level >= 3) {
                 unveilAction('destroyEasternMonolith');
+                setSliderUI("destroySiegeEngine", "destroyEasternMonolith", 100);
             }
         },
         onLevelAtts:[["legacy", 20]],
@@ -278,6 +278,7 @@ actionData = {
         onLevelCustom: function() {
             if(data.actions.destroyEasternMonolith.level >= 1) {
                 unveilAction('stopDarknessRitual');
+                setSliderUI("destroyEasternMonolith", "stopDarknessRitual", 100);
             }
         },
         onLevelAtts:[["legacy", 2000]],
@@ -305,6 +306,7 @@ actionData = {
         onLevelCustom: function() {
             if(data.actions.stopDarknessRitual.level >= 3) {
                 unveilAction('protectTheSunstone');
+                setSliderUI("stopDarknessRitual", "protectTheSunstone", 100);
             }
         },
         onLevelAtts:[["legacy", 60]],
@@ -334,6 +336,7 @@ actionData = {
         onLevelCustom: function() {
             if(data.actions.protectTheSunstone.level >= 3) {
                 unveilAction('silenceDeathChanters');
+                setSliderUI("protectTheSunstone", "silenceDeathChanters", 100);
             }
         },
         onLevelAtts:[["legacy", 100]],

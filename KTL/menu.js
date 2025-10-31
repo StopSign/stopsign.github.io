@@ -346,16 +346,6 @@ function updateSliderDisplay(currentValue) {
     document.getElementById('sliderValue').textContent = currentValue;
 }
 
-function changeNumberType() {
-    if(data.gameSettings.numberType === "numberSuffix") {
-        data.gameSettings.numberType = "scientific";
-    } else if(data.gameSettings.numberType === "scientific") {
-        data.gameSettings.numberType = "numberSuffix";
-    }
-
-    document.getElementById("numberTypeButton").textContent = "Change numbers to " + (data.gameSettings.numberType === "numberSuffix"?"scientific":"numberSuffix");
-}
-
 function toggleNumberType() {
     const el = document.getElementById('numberTypeSwitch');
     const slider = document.getElementById('ntsSlider');
@@ -573,7 +563,20 @@ function createChangelogMenu() {
     return Raw.html`
         <div class="menuTitle">Changelog</div>
         <div class="menuSeparator"></div><br>
-        v2.0.7 10/29 (current):<br>
+        v2.0.8 10/31 (current):<br>
+        <ul>
+            <li>Fixed an upgrade being able to be bought an extra time, breaking the game</li>
+            <li>Resource Retrieval no longer shows on most upstream actions</li>
+            <li>Automation split into two options: 1) Enable upstream on reveal 2) Disable upstream on max level</li>
+            <li>Automation's wording/value has been flipped around: The toggle being On means automation will be on/will work for that action. Actions by default start with automation On, and all actions have been set to on. This will overwrite existing settings, so you'll have to fix this for the actions you want to change.</li>
+            <li>If action has no previous unlock time, when the action is revealed the immediate parent's slider is still off, with the further upstream actions enabling to that point (requires manual only for the last step)</li>
+            <li>Automation menu can be clicked and edited while the action is still locked.</li>
+            <li>Fixed Remember What I Focused On's description to say on entering northern wastes, instead of using amulet (correcting description to behavior)</li>
+            <li>Pause visuals remember on load </li>
+            <li>Nerfed power/efficiency/wizardry of last few magic - it gained a little too much fight increase for their cost increase, and the efficiency started at 100% always</li>
+            <li>Nerfed upgrade Keep My Magic Ready to reset per amulet, but it will work with highest spell power for each spell - get everything to 1, one time for max</li>
+        </ul><br>
+        v2.0.7 10/29:<br>
         <ul>
             <li>Actually fixed the AC refund from 1.X versions</li>
             <li>Removed extra HATL levels gained through reloading</li>

@@ -48,6 +48,7 @@ data.ancientCoinMultKTL = 1;
 data.legacyMultKTL = 1;
 data.maxSpellPower = 0;
 data.totalSpellPower = 0;
+data.chargedSpellPowers = {};
 data.focusSelected = [];
 data.resetLogs = [];
 data.resetCount = 1;
@@ -93,14 +94,16 @@ let viewData = {}; //contains only things that are generated / not saved
 viewData.toasts = [];
 
 let language = "english";
-let globalVisible = false;
+let globalVisible = false; //SET FOR COMMIT
 // let globalVisible = true;
-let isLoadingEnabled = true; //SET FALSE FOR CLEARING SAVE
-
+let isLoadingEnabled = true; //SET FOR COMMIT
+// let isLoadingEnabled = false;
+let loadStaticSaveFile = false; //SET FOR COMMIT
+// let loadStaticSaveFile = true;
 
 data.upgrades = {};
 
-let isDebug = false;
+let isDebug = false; //SET FOR COMMIT
 // let isDebug = true;
 function debug() {
     if(!isDebug) {
@@ -115,6 +118,7 @@ function debug() {
     // gameSpeed = 1;
     data.currentGameState.bonusTime = 1000 * 60 * 60 * 24 * 7;
 
+
     //temp data corrections:
     // unveilAction('visitShrineBehindWaterfall')
     // document.getElementById('confirmKTL').checked = true;
@@ -126,27 +130,10 @@ function debug() {
     // data.doneAmulet = true;
     // data.displayJob = true;
 
-
-    // buyUpgrade("askAboutBetterWork"); //1, 30 --
-    // buyUpgrade("investMyGold"); //1, 20
-    // buyUpgrade("investMyGold"); //2, 40
-    // buyUpgrade("feelTheEchoesOfTheBurntTown"); //1, 20
-    // buyUpgrade("feelTheEchoesOfTheBurntTown"); //2, 40
-    // buyUpgrade("fightAlongsideAllies"); //1, 30 --
-    // buyUpgrade("increaseInitialInvestment"); //1, 40
-
     //only if the save has skipped the unlock point
     // unveilAction('invest');
     // unveilAction('feelAGentleTug');
-
-
-    // buyUpgrade("buyNicerStuff"); //1, 70
-    // buyUpgrade("investMyGold"); //3, 80
-    // buyUpgrade("increaseInitialInvestment"); //2, 60
-    // buyUpgrade("increaseInitialInvestment"); //3, 90
-    // buyUpgrade("feelTheEchoesOfTheBurntTown"); //3, 80 --
-    // buyUpgrade("learnFromTheLibrary"); //1, 200
-
+    // unveilAction('learnToInquire');
 
     //foreach action, automation on
     // for(let actionVar in data.actions) {
@@ -158,6 +145,25 @@ function debug() {
     //     actionObj.automationOff = false;
     // }
 
+    // buyUpgrade("askAboutBetterWork"); //1, 30 --
+    // buyUpgrade("investMyGold"); //1, 20
+    // buyUpgrade("investMyGold"); //2, 40
+    // buyUpgrade("feelTheEchoesOfTheBurntTown"); //1, 20
+    // buyUpgrade("feelTheEchoesOfTheBurntTown"); //2, 40
+    // buyUpgrade("fightAlongsideAllies"); //1, 30 --
+    // buyUpgrade("increaseInitialInvestment"); //1, 40
+    //
+    //
+    //
+    // buyUpgrade("buyNicerStuff"); //1, 70
+    // buyUpgrade("investMyGold"); //3, 80
+    // buyUpgrade("increaseInitialInvestment"); //2, 60
+    // buyUpgrade("increaseInitialInvestment"); //3, 90
+    // buyUpgrade("feelTheEchoesOfTheBurntTown"); //3, 80 --
+    // buyUpgrade("learnFromTheLibrary"); //1, 200
+    //
+    //
+    //
     // buyUpgrade("keepMyMagicReady"); //1, 100 --
     // buyUpgrade("buyNicerStuff"); //2, 210
     // buyUpgrade("buyNicerStuff"); //3, 630 --
