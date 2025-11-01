@@ -777,7 +777,7 @@ let upgradeData = {
         upgradesAvailable:1,
         visible:false,
         customInfo: function(num) {
-            return Raw.html`The Spell Power used in the Northern Wastes becomes the highest you've reached per spell, instead of the current value.`;
+            return Raw.html`The Spell Power used in the Northern Wastes becomes the highest you've reached per spell each loop, instead of the current value.`;
         }
     },
     retrieveMyUnusedResources: {
