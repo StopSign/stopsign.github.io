@@ -214,7 +214,7 @@ function tickGameObject(actionVar) {
         momentumMaxRate = 0;
     }
     let isMaxLevel = actionObj.maxLevel !== undefined && actionObj.level >= actionObj.maxLevel;
-    let momentumToAdd = (isMaxLevel || !actionObj.unlocked) ? 0 : momentumMaxRate;
+    let momentumToAdd = !dataObj.generatesPastMax && (isMaxLevel || !actionObj.unlocked) ? 0 : momentumMaxRate;
     let resourceToAddInefficient = momentumToAdd * (actionObj.efficiency / 100);
 
     resourceToAddInefficient = resourceToAddInefficient < .0000001 ? 0 : resourceToAddInefficient;
@@ -315,7 +315,7 @@ function calculateTaken(actionVar, downstreamVar, actionObj, mult) {
 
 function checkProgressCompletion(actionObj, dataObj) {
     let isMaxLevel = actionObj.maxLevel !== undefined && actionObj.level >= actionObj.maxLevel;
-    if(actionObj.progress >= actionObj.progressMax && !isMaxLevel) {
+    if(actionObj.progress >= actionObj.progressMax && (!isMaxLevel || dataObj.generatesPastMax)) {
         actionObj.progress -= actionObj.progressMax;
         if(dataObj.onCompleteCustom) {
             dataObj.onCompleteCustom();

@@ -4,10 +4,38 @@ function openKTLMenu() {
     document.getElementById('confirmKTL').checked = false;
     KTLMenuOpen = !KTLMenuOpen;
     views.updateVal("killTheLichMenu", KTLMenuOpen ? "flex" : "none", "style.display");
+
+    if(data.upgrades.rememberWhatIFocusedOn.upgradePower > 0) {
+        let permFocusMessage = document.getElementById("permFocusMessage");
+        let amountToAdd = Math.pow(data.actions.hearAboutTheLich.level, 2) / 100;
+        let text = `<br><br>You will be adding +${amountToAdd} permanent focus mult to the following lines:<br>`;
+        let maxPermFocus = data.upgrades.rememberWhatIFocusedOn.upgradePower + 1;
+        for (let focusObj of data.focusSelected) {
+            let fromActionObj = data.actions[focusObj.lineData.from];
+            let fromDataObj = actionData[focusObj.lineData.from];
+            let toDataObj = actionData[focusObj.lineData.to];
+            let currentPerm = fromActionObj[`${focusObj.lineData.to}PermFocusMult`];
+            let color = "";
+            if (currentPerm === maxPermFocus) { //colors are backwards
+                color = "var(--warning-color)"
+            } else if (currentPerm + amountToAdd > maxPermFocus) {
+                color = "var(--error-color)";
+            }
+            text += `<span style="color:${color}">- From ${fromDataObj.title} to ${toDataObj.title}, permanent focus bonus is ${currentPerm} / ${maxPermFocus}`
+            if (currentPerm === maxPermFocus) {
+                text += ` | Warning: This will gain no bonus`
+            } else if (currentPerm + amountToAdd > maxPermFocus) {
+                text += ` | Warning: This will max it`
+            }
+            if(currentPerm)
+            text += `</span><br>`;
+        }
+        permFocusMessage.innerHTML = text;
+    }
 }
 
 function resetKTLSpiral() {
-    for(let actionVar in data.actions) {
+    for (let actionVar in data.actions) {
         let dataObj = actionData[actionVar];
         if (dataObj.plane !== 2) {
             continue;
@@ -16,7 +44,7 @@ function resetKTLSpiral() {
         actionSetBaseVariables(actionObj, dataObj);
     }
 
-    for(let actionVar in data.actions) {
+    for (let actionVar in data.actions) {
         let dataObj = actionData[actionVar];
         if (dataObj.plane !== 2) {
             continue;
@@ -24,7 +52,7 @@ function resetKTLSpiral() {
         // let actionObj = data.actions[actionVar];
         for (let downstreamVar of dataObj.downstreamVars) {
             let downstreamDataObj = actionData[downstreamVar];
-            if(downstreamDataObj.hasUpstream === false) {
+            if (downstreamDataObj.hasUpstream === false) {
                 continue;
             }
             setSliderUI(actionVar, downstreamVar, 0);
@@ -36,6 +64,7 @@ function logKTL() {
     data.resetLogs.push({
         stage1: {
             secondsPerReset: data.secondsPerReset,
+            hatl1Time: data.actions.hearAboutTheLich.level1Time,
             currentLegacy: data.atts.legacy.num,
             resetCount: data.resetCount,
             currentMomentum: data.totalMomentum,
@@ -44,7 +73,7 @@ function logKTL() {
         },
         stage2: null
     });
-    if (data.resetLogs.length > 5) data.resetLogs.shift();
+    if (data.resetLogs.length > 10) data.resetLogs.shift();
     data.ancientCoinGained = 0;
     refreshResetLog();
 }
@@ -63,7 +92,7 @@ function refreshResetLog() {
 }
 
 function initializeKTL() {
-    if(!document.getElementById('confirmKTL').checked ||
+    if (!document.getElementById('confirmKTL').checked ||
         !(isDebug || (data.actions.hearAboutTheLich.level >= 1 && data.maxSpellPower >= 1))) {
         return;
     }
@@ -72,7 +101,7 @@ function initializeKTL() {
 
     resetKTLSpiral();
 
-    for(let actionVar in data.actions) {
+    for (let actionVar in data.actions) {
         let actionObj = data.actions[actionVar];
         actionObj.isRunning = actionObj.plane === 2;
     }
@@ -80,25 +109,25 @@ function initializeKTL() {
     unveilPlane(2);
     switchToPlane(2);
 
-    if(data.currentGameState.KTLBonusTimer > 60 * 60) {
+    if (data.currentGameState.KTLBonusTimer > 60 * 60) {
         data.currentGameState.bonusTime += 1000 * 60 * 10; //10 mins bonus time FO FREE / should be a 1 point AC upgrade.
         // Can't be received faster than every hour.
         data.currentGameState.KTLBonusTimer = 0;
     }
 
     views.updateVal("openViewAmuletButton", "none", "style.display")
-    if(data.doneAmulet) {
+    if (data.doneAmulet) {
         views.updateVal("openUseAmuletButton", "", "style.display")
     }
 
-    for(let focusObj of data.focusSelected) {
+    for (let focusObj of data.focusSelected) {
         unhighlightLine(focusObj.borderId);
-        let power = data.upgrades.rememberWhatIFocusedOn.upgradePower;
-        if(data.upgrades.rememberWhatIFocusedOn.upgradePower > 0) {
+        let power = data.upgrades.rememberWhatIFocusedOn.upgradePower + 1;
+        if (data.upgrades.rememberWhatIFocusedOn.upgradePower > 0) {
             let actionObj = data.actions[focusObj.lineData.from];
-            actionObj[focusObj.lineData.to + "PermFocusMult"] += Math.pow(data.actions.hearAboutTheLich.level, 2) /100;
-            if(actionObj[focusObj.lineData.to + "PermFocusMult"] > power + 1) {
-                actionObj[focusObj.lineData.to + "PermFocusMult"] = power + 1;
+            actionObj[focusObj.lineData.to + "PermFocusMult"] += Math.pow(data.actions.hearAboutTheLich.level, 2) / 100;
+            if (actionObj[focusObj.lineData.to + "PermFocusMult"] > power) {
+                actionObj[focusObj.lineData.to + "PermFocusMult"] = power;
             }
         }
     }
@@ -117,7 +146,6 @@ function initializeKTL() {
     data.gameState = "KTL";
 
 
-
     revealAtt("doom");
     revealAtt("courage");
     data.actions.fightTheEvilForces.unlockCost = 0;
@@ -131,7 +159,6 @@ function initializeKTL() {
     unlockAction(data.actions.overclockTargetingTheLich);
 
 
-
     //first time stuff
     document.getElementById("ancientCoinDisplay").style.display = "";
     data.doneKTL = true;
@@ -139,7 +166,7 @@ function initializeKTL() {
 
 function openUseAmuletMenu(isUseable) {
     let isShowing = document.getElementById("useAmuletMenu").style.display !== "none";
-    document.getElementById("useAmuletMenu").style.display = isShowing ? "none" : "flex";
+    document.getElementById("useAmuletMenu").style.display = isShowing ? "none" : "";
     document.getElementById('amuletConfirm').checked = false;
 
     //if not useable, hide all the buy buttons, and the bottom section w/ start again buttons
@@ -147,12 +174,14 @@ function openUseAmuletMenu(isUseable) {
         const upgrade = data.upgrades[upgradeVar];
         const upgradeDataObj = upgradeData[upgradeVar];
 
-        views.updateVal(`buyButtonSection_${upgradeVar}`, isUseable&&!upgrade.isFullyBought?"":'none', 'style.display');
+        views.updateVal(`buyButtonSection_${upgradeVar}`, isUseable && !upgrade.isFullyBought ? "" : 'none', 'style.display');
     }
 
-    views.updateVal(`amuletEnabledContainer`, isUseable?"":'none', 'style.display');
+    views.updateVal(`amuletMenuTitle`, isUseable ? "Use the Amulet!" : "View Amulet Upgrades");
 
-	refreshUpgradeVisibility();
+    views.updateVal(`amuletEnabledContainer`, isUseable ? "" : 'none', 'style.display');
+
+    refreshUpgradeVisibility();
     updateCardAffordabilityBorders();
 }
 
@@ -168,7 +197,7 @@ function logAmulet() {
 }
 
 function useAmulet() {
-    if(!document.getElementById('amuletConfirm').checked) {
+    if (!document.getElementById('amuletConfirm').checked) {
         return;
     }
     logAmulet();
@@ -177,7 +206,7 @@ function useAmulet() {
     data.resetCount++;
 
     chartData = [];
-    for(let focusObj of data.focusSelected) {
+    for (let focusObj of data.focusSelected) {
         unhighlightLine(focusObj.borderId);
     }
     data.focusSelected = [];
@@ -194,9 +223,9 @@ function useAmulet() {
     data.chargedSpellPowers = {};
 
     //Reset all atts and bonuses
-    for(let attVar in data.atts) {
+    for (let attVar in data.atts) {
         let attObj = data.atts[attVar];
-        if(attObj.attCategory !== "echoes") {
+        if (attObj.attCategory !== "echoes") {
             attsSetBaseVariables(attObj);
         }
     }
@@ -204,7 +233,7 @@ function useAmulet() {
     recalcAttMult("legacy");
 
     //clear the Containers of Atts around the Actions before it reveals one at a time based on stats and visible
-    for(let actionVar in data.actions) {
+    for (let actionVar in data.actions) {
         let dataObj = actionData[actionVar];
         for (let attVarObj of dataObj.expAtts) {
             views.updateVal(`${actionVar}${attVarObj[0]}OutsideContainerexp`, "none", "style.display");
@@ -220,7 +249,7 @@ function useAmulet() {
 
 
     //For each action, reset the base atts and set max level
-    for(let actionVar in data.actions) {
+    for (let actionVar in data.actions) {
         let actionObj = data.actions[actionVar];
         let dataObj = actionData[actionVar];
         let newLevel = actionObj.level;
@@ -255,15 +284,15 @@ function useAmulet() {
         actionObj.currentMenu = originalState.currentMenu;
 
         //happens after reset
-        dataObj.downstreamVars.forEach(function(downstreamVar) {
-            if(data.actions[downstreamVar] && data.actions[downstreamVar].hasUpstream) {
+        dataObj.downstreamVars.forEach(function (downstreamVar) {
+            if (data.actions[downstreamVar] && data.actions[downstreamVar].hasUpstream) {
                 setSliderUI(actionObj.actionVar, downstreamVar, 0); //reset with amulet
             }
 
             actionObj[downstreamVar + "TempFocusMult"] = 2;
         });
 
-        if(dataObj.updateMults) {
+        if (dataObj.updateMults) {
             dataObj.updateMults();
         }
 
@@ -272,10 +301,9 @@ function useAmulet() {
     }
 
 
-
     //After the reset
     for (let attCategory in attTree) {
-        if(attCategory === "echoes") {
+        if (attCategory === "echoes") {
             continue;
         }
         views.updateVal(`${attCategory}CategoryContainer`, "none", "style.display");
@@ -297,7 +325,7 @@ function useAmulet() {
     actionTitleClicked("overclock", true);
 
     //force the UI reset:
-    for(let actionVar in data.actions) {
+    for (let actionVar in data.actions) {
         let actionObj = data.actions[actionVar];
         // let dataObj = actionData[actionVar];
         views.updateActionUnlockedViews(actionObj)

@@ -9,7 +9,7 @@ function upgradesSetBaseVariables(upgradeObj, dataObj) {
     upgradeObj.upgradesBought = dataObj.upgradesBought ?? 0;
     upgradeObj.increaseRatio = dataObj.increaseRatio;
 
-    upgradeObj.isFullyBought = !!dataObj.isFullyBought;
+    upgradeObj.isFullyBought = false;
     upgradeObj.visible = !!dataObj.visible;
 }
 
@@ -70,7 +70,7 @@ function toggleSortByCost(checkbox) {
 
 function initializeAmuletCards() {
     const container = document.getElementById("amuletUpgrades");
-    container.style.cssText = "display:flex;flex-wrap:wrap;gap:15px;padding:10px;";
+    container.style.cssText = "display:flex;flex-wrap:wrap;gap:15px;padding:10px;max-height:50vh";
     container.innerHTML = "";
 
     for (const upgradeVar in data.upgrades) {
@@ -256,7 +256,6 @@ function buyUpgrade(upgradeVar) {
     updateAmuletCardUI(upgradeVar);
     refreshUpgradeVisibility();
 
-    // --- THIS IS THE KEY CHANGE ---
     // Only re-sort the cards if the checkbox is checked.
     const sortCheckbox = document.getElementById('sortByCostCheckbox');
     if (sortCheckbox && sortCheckbox.checked) {
@@ -690,7 +689,7 @@ let upgradeData = {
     },
     buyNicerStuff: {
         initialCost:70, costIncrease:3, creationVersion:2,
-        upgradesAvailable:4,
+        upgradesAvailable:3,
         visible:false,
         customInfo: function(num) {
             return "Unlocks new actions that use Gold"
@@ -748,7 +747,7 @@ let upgradeData = {
         upgradesAvailable:1,
         visible:true,
         customInfo: function(num) {
-            return "Unlocks new actions that use Conversations, and results in a better KTL reset"
+            return "Unlocks new actions that use Conversations, and results in a better Northern Wastes reset"
         },
         onBuy: function(num) {
             purchaseAction('learnToInquire')
@@ -836,7 +835,7 @@ let upgradeData = {
         upgradesAvailable:1,
         visible:false,
         customInfo: function(num) {
-            return "When you use the amulet, the highest levels achieved on non-KTL actions and generators are recorded. Gain +25% more exp up to the highest level reached. Note: non-generators do not carry over exp into their next level.";
+            return "When you use the amulet, the highest levels achieved on non-Northern Wastes actions and generators are recorded. Gain +25% more exp up to the highest level reached. Note: non-generators do not carry over exp into their next level.";
         },
         onBuy: function(num) {
             unveilUpgrade('rememberHowIGrew')
@@ -847,7 +846,7 @@ let upgradeData = {
         upgradesAvailable:1,
         visible:false,
         customInfo: function(num) {
-            return "When you use the amulet, the second highest levels achieved on non-KTL actions and generators are recorded. Gain +25% additive more exp up to the second highest level reached. Note: non-generators do not carry over exp into their next level.";
+            return "When you use the amulet, the second highest levels achieved on non-Northern Wastes actions and generators are recorded. Gain +25% additive more exp up to the second highest level reached. Note: non-generators do not carry over exp into their next level.";
         },
         onBuy: function(num) {
             unveilUpgrade('rememberMyMastery')
@@ -858,7 +857,7 @@ let upgradeData = {
         upgradesAvailable:1,
         visible:false,
         customInfo: function(num) {
-            return "When you use the amulet, the third highest levels achieved on non-KTL actions and generators are recorded. Gain +50% additive more exp up to the third highest level reached. Note: non-generators do not carry over exp into their next level.";
+            return "When you use the amulet, the third highest levels achieved on non-Northern Wastes actions and generators are recorded. Gain +50% additive more exp up to the third highest level reached. Note: non-generators do not carry over exp into their next level.";
         }
     },
 

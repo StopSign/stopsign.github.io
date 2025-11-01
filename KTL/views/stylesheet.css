@@ -309,7 +309,6 @@ body {
     position:relative;
     color: var(--text-primary);
     border: 1px solid var(--border-color);
-    max-height:90vh;
 }
 
 .title {

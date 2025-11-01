@@ -922,27 +922,38 @@ function addPinnedActionClick(event, actionVar) {
 
 function addPinnedAction(actionVar) {
     let dataObj = actionData[actionVar];
+    let actionObj = data.actions[actionVar];
     if(data.currentPinned.indexOf(actionVar) !== -1) {
         return;
     }
     data.currentPinned.push(actionVar);
 
+    queueCache(`${actionVar}PinnedLevels`)
+    queueCache(`${actionVar}Level3`)
+    queueCache(`${actionVar}MaxLevel3`)
+
     const messageElement = document.createElement('div');
     //remove button (X) removes all listeners
-    messageElement.innerHTML = `<span id="${actionVar}Pin">
-        <span style="font-weight:bold;cursor:pointer;" onclick="actionTitleClicked('${actionVar}');">${dataObj.title}</span> 
+    messageElement.innerHTML = `<span id="${actionVar}PinContainer">
         [${dataObj.plane+1}]
+        <span id="${actionVar}PinnedLevels">
+            <span style="font-weight:bold;cursor:pointer;" onclick="actionTitleClicked('${actionVar}');">${dataObj.title}</span> 
+            (<span id="${actionVar}Level3"></span>${actionObj.maxLevel >= 0?`/<span id="${actionVar}MaxLevel3"></span>`:""})
+        </span>
         <span style="border:2px solid #840000;cursor:pointer;" class="mouseoverRed" onclick="removePinnedAction('${actionVar}')">X</span>
     </span>`;
     messageElement.style.padding = '2px 8px';
 
     document.getElementById("pinnedActions").appendChild(messageElement);
+
+    clearCacheQueue();
 }
 
 function removePinnedAction(actionVar) {
-    const pinElement = document.getElementById(`${actionVar}Pin`);
+    const pinElement = document.getElementById(`${actionVar}PinContainer`);
     if (pinElement) {
         pinElement.parentElement.remove();
+        delete view.cached[actionVar];
     }
 
     const index = data.currentPinned.indexOf(actionVar);

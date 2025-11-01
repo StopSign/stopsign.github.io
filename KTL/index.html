@@ -96,7 +96,7 @@
     View Amulet Upgrades
 </span>
 
-<span id="currentVersion" style="position:fixed;top:1px;right:5px;color:var(--text-muted)">v2.0.8</span>
+<span id="currentVersion" style="position:fixed;top:1px;right:5px;color:var(--text-muted)">v2.0.9</span>
 
 
 <div id="bonusDisplayShowButton" class="button" onclick="bonusMenuHideButton()"
@@ -205,8 +205,8 @@ It continues, capturing fraction ancientCoin of your fleeting soul and sending i
 <!--    </div>-->
 <!--</div>-->
 
-<div id="killTheLichMenu" class='fullScreenGrey' style="display:none;font-size:16px;" onClick='openKTLMenu()'>
-    <div class='centerMenuBox' onClick="stopClicks(event)">
+<div id="killTheLichMenu" class='fullScreenGrey' style="display:none;font-size:16px;overflow-y:auto" onClick='openKTLMenu()'>
+    <div class='centerMenuBox' onClick="stopClicks(event)" style="height:90vh;overflow-y:auto;overflow-x:hidden;">
         <div class='menuTitle'>Set Overclock's Target: Kill the Lich!</div>
         <div class="menuSeparator"></div>
         <div id="ktlDynamicContent" class="dynamicContent">
@@ -223,45 +223,46 @@ It continues, capturing fraction ancientCoin of your fleeting soul and sending i
             Doing this action requires spell power. Check that your spells have charges! You currently have: <span id="maxSpellPower2" style="font-weight:bold;"></span> spell power.
             <span id="spellPowerErrorMessage" style="display:none;font-weight:bold;color:var(--warning-color)"><br>You must have spell power to reset. Gain charges on your spells first.</span>
             <span id="spellPowerWarningMessage" style="display:none;font-weight:bold;color:var(--error-color)"><br>Your current spell power is what counts (until upgraded). You may want to pause Train with Team before reset</span>
+            <span id="permFocusMessage" style=""></span>
         </div>
         <input type="checkbox" id="confirmKTL"><label for="confirmKTL">Confirm</label>
         <button class="continueButton" onclick="initializeKTL()">Join the War for Life in the Northern Wastes!</button>
     </div>
 </div>
 
-<div id="useAmuletMenu" class='fullScreenGrey' style="display:none" onClick='openUseAmuletMenu()'>
+<div id="useAmuletMenu" class='fullScreenGrey' style="display:none;" onClick='openUseAmuletMenu()'>
     <div class='centerMenuBox' onClick="stopClicks(event)">
-        <div class='menuTitle'>
-            Use the Amulet!<br>
-            Ancient Coins available:
-            <span id="ancientCoin2" style="font-weight:bold;"></span>
-        </div>
-
-
-        <div style="position:absolute; right:10px; top:10px; display: flex; gap: 25px; font-family: sans-serif; font-size: 14px;">
-            <div>
-                <input type="checkbox" id="showCompleteUpgrades" onchange="toggleMaxLevelCards(this);" checked>
-                <label for="showCompleteUpgrades">Show Completed Upgrades</label><br>
-                <input type="checkbox" id="showAttributeUpgrades" onchange="toggleAttributeUpgrades(this);" checked>
-                <label for="showAttributeUpgrades">Show Attribute Upgrades</label>
+        <div style="overflow-y:auto;height:90vh;position:relative;overflow-x:hidden;padding-right:20px;">
+            <div class='menuTitle'>
+                <div id="amuletMenuTitle">Use the Amulet!</div>
+                Ancient Coins available:
+                <span id="ancientCoin2" style="font-weight:bold;"></span>
             </div>
-            <div>
-                <input type="checkbox" id="showUnaffordableUpgrades" onchange="toggleUnaffordableUpgrades(this);" checked>
-                <label for="showUnaffordableUpgrades">Show Unaffordable</label><br>
-                <input type="checkbox" id="sortByCost" onchange="toggleSortByCost(this);">
-                <label for="sortByCost">Sort by Cost</label>
+            <div style="position:absolute; right:10px; top:10px; display: flex; gap: 25px; font-family: sans-serif; font-size: 14px;">
+                <div>
+                    <input type="checkbox" id="showCompleteUpgrades" onchange="toggleMaxLevelCards(this);" checked>
+                    <label for="showCompleteUpgrades">Show Completed Upgrades</label><br>
+                    <input type="checkbox" id="showAttributeUpgrades" onchange="toggleAttributeUpgrades(this);" checked>
+                    <label for="showAttributeUpgrades">Show Attribute Upgrades</label>
+                </div>
+                <div>
+                    <input type="checkbox" id="showUnaffordableUpgrades" onchange="toggleUnaffordableUpgrades(this);" checked>
+                    <label for="showUnaffordableUpgrades">Show Unaffordable</label><br>
+                    <input type="checkbox" id="sortByCost" onchange="toggleSortByCost(this);">
+                    <label for="sortByCost">Sort by Cost</label>
+                </div>
             </div>
-        </div>
-        <div class="menuSeparator"></div>
-        <div class="menuTitle" style="font-size:14px;text-align:center;">As you lay dying, your last thoughts are recorded by the amulet...<br><span style="font-size:16px;font-weight:bold;">IF ONLY I COULD JUST...</span></div>
-
-        <div class="menuSeparator"></div>
-        <div id="amuletUpgrades" class="dynamicContent"></div>
-        <div id="amuletEnabledContainer">
             <div class="menuSeparator"></div>
-            It is recommended to spend your Ancient Coins before you start a new life. They provide no benefit except to buy upgrades, and can only be spent now.<br>
-            <input type="checkbox" id="amuletConfirm"><label for="amuletConfirm">Confirm</label>
-            <button class="continueButton" onclick="useAmulet()">Use the amulet to start again!</button>
+            <div class="menuTitle" style="font-size:14px;text-align:center;">As you lay dying, your last thoughts are recorded by the amulet...<br><span style="font-size:16px;font-weight:bold;">IF ONLY I COULD JUST...</span></div>
+
+            <div class="menuSeparator"></div>
+            <div id="amuletUpgrades" class="dynamicContent"></div>
+            <div id="amuletEnabledContainer">
+                <div class="menuSeparator"></div>
+                It is recommended to spend your Ancient Coins before you start a new life. They provide no benefit except to buy upgrades, and can only be spent now.<br>
+                <input type="checkbox" id="amuletConfirm"><label for="amuletConfirm">Confirm</label>
+                <button class="continueButton" onclick="useAmulet()">Use the amulet to start again!</button>
+            </div>
         </div>
     </div>
 </div>
@@ -293,6 +294,7 @@ It continues, capturing fraction ancientCoin of your fleeting soul and sending i
 <script src="ktl.js"></script>
 <script src="upgradeData.js"></script>
 <script src="saveFile.js"></script>
+<script src="saveCorrections.js"></script>
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-E10C6H16MH"></script><script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}

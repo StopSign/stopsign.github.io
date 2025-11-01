@@ -328,7 +328,7 @@ function createOptionsMenu() {
     <div class="menuSeparator"></div>
     
     <button onclick="exportSave()" style="padding:10px 16px;background:#007BFF;color:#fff;border:none;border-radius:4px;font-size:14px;cursor:pointer;width:160px;">Export to clipboard</button>
-    <label for="exportImportSave" style="font-size:13px;">Put your save here to import (import a clear save to hard reset):</label>
+    <label for="exportImportSave" style="font-size:13px;">Put your save here to import. Warning: Export/import from a file is much safer, due to save file sizes. Import a clear save to hard reset:</label>
     <input type="text" id="exportImportSave" style="border:1px solid #aaa;padding:8px;border-radius:4px;font-size:13px;width:100%;" oncontextmenu="event.stopPropagation(); return true;">
     <div>
         <input type="checkbox" id="confirmImportCheckbox" style="width:14px;height:14px;cursor:pointer;">
@@ -563,7 +563,22 @@ function createChangelogMenu() {
     return Raw.html`
         <div class="menuTitle">Changelog</div>
         <div class="menuSeparator"></div><br>
-        v2.0.8 10/31 (current):<br>
+        v2.0.9 11/1 (current):<br>
+            <li>Fixed HATL levels increasing past what they should, again</li>
+            <li>Fixed shorter runs not enabling automation on next runs (manual unlock is a one-and-done-forever)</li>
+            <li>Train with Team keeps generating teamwork/using charges even when max level</li>
+            <li>Buy Nicer Stuff properly capped at 3 upgrades. Refund given</li>
+            <li>Statistic of "ancient coin gained" keeps working if you refresh while in Northern Wastes (was giving NaN)</li>
+            <li>Renamed KTL to Northern Wastes in some descriptions</li>
+            <li>Fixed upgrades with reduced levels (via bug fixes) from appearing odd in the UI</li>
+            <li>Adjusted menu heights and added scrolls (for mobile)</li>
+            <li>Increased statistics to 10 times, added time to first HATL level</li>
+            <li>Fixed a performance bug</li>
+            <li>Added levels to Pinned, and dim if the action is not revealed</li>
+            <li>Added a message before going to Northern Wastes to prevent wasting Remember What I Focused On permanent bonus</li>
+        <ul>
+        </ul><br>
+        v2.0.8 10/31:<br>
         <ul>
             <li>Fixed an upgrade being able to be bought an extra time, breaking the game</li>
             <li>Resource Retrieval no longer shows on most upstream actions</li>

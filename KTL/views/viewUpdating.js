@@ -86,6 +86,9 @@ let views = {
             let actionObj = data.actions[actionVar];
             views.updateAction(actionObj);
         }
+        for(let actionVar of data.currentPinned) {
+            views.updatePinned(actionVar);
+        }
     },
     updateActions:function() {
         views.updateAura();
@@ -127,6 +130,17 @@ let views = {
                 // views.updateVal(`${entry.id}SmallVersionContainer`,`inset ${getResourceColor(actionObj)} 0px 0px ${Math.min(ratio * 15)}px ${Math.min(ratio * 5)}px`,"style.boxShadow");
             }
         }
+    },
+    updatePinned:function(actionVar) {
+        let actionObj = data.actions[actionVar];
+        let isMaxLevel = actionObj.maxLevel !== undefined && actionObj.level >= actionObj.maxLevel;
+
+        views.updateVal(`${actionVar}Level3`, actionObj.level, "innerText", 1);
+        if(actionObj.maxLevel >= 0) {
+            views.updateVal(`${actionVar}MaxLevel3`, actionObj.maxLevel, "innerText", 1);
+        }
+        views.updateVal(`${actionVar}PinnedLevels`, isMaxLevel?"var(--max-level-color)":"var(--text-primary)", "style.color");
+        views.updateVal(`${actionVar}PinnedLevels`, actionObj.visible?"1":".6", "style.opacity");
     },
     updateAction:function(actionObj) {
         //Handle visibility
@@ -463,8 +477,8 @@ let views = {
         }
 
         const typeKey = `lastValue_${type}`;
-        // let lastVal = prevValue[typeKey] ?? null;
-        let lastVal = null;
+        let lastVal = prevValue[typeKey] ?? null;
+        // let lastVal = null;
 
         if (lastVal !== newVal) {
             if (type.includes(".")) {

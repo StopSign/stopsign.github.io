@@ -459,7 +459,7 @@ let maxLevelTop = (data.gameSettings.viewDeltas && data.gameSettings.viewRatio) 
     queueCache(`${actionVar}ResourceInfoContainer`)
 //transform-style: preserve-3d;
 
-    let maxLevelDiv = `<span style="display:${actionObj.maxLevel ? "" : "none"}">/ <span id="${actionVar}MaxLevel2" style="font-weight:bold;"></span></span>`;
+    let maxLevelDiv = `<span style="display:${actionObj.maxLevel !== undefined ? "" : "none"}"> / <span id="${actionVar}MaxLevel2" style="font-weight:bold;"></span></span>`;
 
     theStr += Raw.html`
         <div id="${actionVar}Container" style="display:none;position:absolute;left:${newX};top:${newY};width:330px;" 
@@ -1018,25 +1018,37 @@ function renderResetLog() {
         }
         rows += `
             <tr>
-                <td style="padding:2px 4px;">${log.stage1.resetCount}</td>
-                <td style="padding:2px 4px;">
-                    ${!log.stage1 ? "-" : `${secondsToTime(log.stage1.secondsPerReset)} | ${intToString(log.stage1.currentMomentum)} | ${intToString(log.stage1.currentFear)} | ${intToString(log.stage1.currentLegacy)}${log.stage1.currentTeamwork > 0 ?` | ${intToString(log.stage1.currentTeamwork)}`:""}`}
+                <td style="padding-right:15px;">${log.stage1.resetCount}</td>
+                <td style="padding-right:15px;">
+                    ${!log.stage1 ? "-" : `
+                    ${secondsToTime(log.stage1.secondsPerReset)} |
+                    ${log.stage1.hatl1Time ? secondsToTime(log.stage1.hatl1Time) : "-"} 
+                    `}
                 </td>
-                <td style="padding:2px 4px;">
+                <td style="padding-right:15px;">
+                    ${!log.stage1 ? "-" : `
+                    ${intToString(log.stage1.currentMomentum)} | 
+                    ${intToString(log.stage1.currentFear)} | 
+                    ${intToString(log.stage1.currentLegacy)}
+                    ${log.stage1.currentTeamwork > 0 ?` | ${intToString(log.stage1.currentTeamwork)}`:""}
+                    `}
+                </td>
+                <td style="">
                     ${!log.stage2 ? "-" : `${intToString(log.stage2.legacyGained)} | ${intToString(log.stage2.ancientCoin)}` }
                 </td>
             </tr>
         `;
     }
     return `
-        <div>
-            <div style="font-size:20px; font-weight:bold; margin:0 0 6px 0;">Recent Run Statistics (Last 5)</div>
-            <table style="width:100%; border-collapse:collapse; font-size:16px;">
+        <div style="overflow-x:auto">
+            <div style="font-size:20px; font-weight:bold; margin:0 0 6px 0;">Recent Run Statistics (Last 10)</div>
+            <table style="width:100%;border-collapse:collapse;font-size:16px;white-space:nowrap">
                 <thead>
                     <tr>
-                        <th style="padding:2px 4px; text-align:left;">#</th>
-                        <th style="padding:2px 4px; text-align:left;">Stage 1<br>(Time | Momentum | Fear | Legacy${teamworkFound ?` | Teamwork`:""})</th>
-                        <th style="padding:2px 4px; text-align:left;">Stage 2<br>(Legacy Gained | Ancient Coin Gained)</th>
+                        <th style="padding-right:15px; text-align:left;">#</th>
+                        <th style="padding-right:15px; text-align:left;">Times<br>(Reset | HATL 1)</th>
+                        <th style="padding-right:15px; text-align:left;">Stage 1<br>(Momentum | Fear | Legacy${teamworkFound ?` | Teamwork`:""})</th>
+                        <th style="padding-right:15px; text-align:left;">Stage 2<br>(Legacy Gained | Ancient Coin Gained)</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -1073,6 +1085,7 @@ function setAllCaches() {
     queueCache("jobDisplay");
     queueCache("useAmuletMenu");
     queueCache("amuletEnabledContainer");
+    queueCache("amuletMenuTitle");
 
     for(let actionVar in data.actions) {
         view.cached[actionVar + "ActionPower"] = document.getElementById(actionVar + "ActionPower");
@@ -1098,5 +1111,5 @@ function clearCacheQueue() {
     for(let id of idsToCache) {
         view.cached[id] = document.getElementById(id);
     }
-    idsToCache = {};
+    idsToCache = [];
 }

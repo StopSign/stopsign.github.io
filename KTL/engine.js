@@ -114,6 +114,7 @@ function actionSetInitialVariables(actionObj, dataObj) {
     actionObj.automationOnReveal = true;
     actionObj.automationOnMax = true;
     actionObj.currentMenu = "downstream";
+    actionObj.hasBeenUnlocked = false;
 
     // actionObj.onUnlock = dataObj.onUnlock ? dataObj.onUnlock : function() {};
     // actionObj.onCompleteCustom = dataObj.onCompleteCustom ? dataObj.onCompleteCustom : function() {};
@@ -448,7 +449,7 @@ function updateSupplyChain(startActionVar) {
         if (childIsNeeded) {
             //if a child is needed, and slider is off, turn it on
             if (currentSliderValue === 0 && actionObj.automationOnReveal) {
-                if(!actionObj.prevUnlockTime && currentVar === startActionVar) { //ignore the first time
+                if(!actionObj.hasBeenUnlocked && currentVar === startActionVar) { //ignore the first time
                     setSliderUI(parentVar, currentVar, 0);
                 } else {
                     setSliderUI(parentVar, currentVar, getUpgradeSliderAmount());
@@ -504,6 +505,7 @@ function unlockAction(actionObj) {
     if(actionObj.unlocked === true) {
         return;
     }
+    actionObj.hasBeenUnlocked = true;
     actionObj.unlocked = true;
     actionObj.unlockCost = 0;
     actionObj.unlockTime = data.secondsPerReset; //mark when it unlocked
