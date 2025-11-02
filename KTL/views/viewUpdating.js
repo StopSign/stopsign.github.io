@@ -290,7 +290,9 @@ let views = {
 
         //When action should be dim
         let isMaxLevel = actionObj.maxLevel !== undefined && actionObj.level >= actionObj.maxLevel;
-        let isQuiet = isMaxLevel && actionObj.resourceIncrease === 0 && actionObj.resourceDecrease === 0 && !actionObj.mouseOnThis;
+		//If resources are flowing "upstream" that counts as no resources flowing since it's not "active".
+		let isResourcesQuiet = (actionObj.resourceIncrease === 0 && actionObj.resourceDecrease === 0) || actionObj.resourceRetrieved !== 0;
+        let isQuiet = isMaxLevel && isResourcesQuiet && !actionObj.mouseOnThis;
         views.updateVal(`${actionVar}LargeVersionContainer`, isQuiet?".6":"1", "style.opacity");
         views.updateVal(`${actionVar}Container`, actionObj.mouseOnThis?"100":"0", "style.zIndex");
 
