@@ -255,8 +255,9 @@ function updateUIOnLoad() {
 
     if(data.gameSettings.bonusSpeed > 1) {
         data.gameSettings.bonusSpeed = 1;
-        data.options.bonusRate = 3; //set it to 3 or set the checked correctly on load
+         //set it to 3 or set the checked correctly on load
     }
+    data.options.bonusRate = 3;
     updateBonusSpeedButton();
 
     for (let actionVar in data.actions) {
@@ -381,6 +382,7 @@ function reapplyAttentionSelected() {
 }
 
 function save() {
+    data.lastVisit = Date.now();
     window.localStorage[saveName] = encode64(JSON.stringify(data));
 }
 

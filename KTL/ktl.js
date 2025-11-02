@@ -8,7 +8,7 @@ function openKTLMenu() {
     if(data.upgrades.rememberWhatIFocusedOn.upgradePower > 0) {
         let permFocusMessage = document.getElementById("permFocusMessage");
         let amountToAdd = Math.pow(data.actions.hearAboutTheLich.level, 2) / 100;
-        let text = `<br><br>You will be adding +${amountToAdd} permanent focus mult to the following lines:<br>`;
+        let text = `<br><br>You will be adding +${intToString(amountToAdd, 3)} permanent focus mult to the following lines:<br>`;
         let maxPermFocus = data.upgrades.rememberWhatIFocusedOn.upgradePower + 1;
         for (let focusObj of data.focusSelected) {
             let fromActionObj = data.actions[focusObj.lineData.from];
@@ -21,7 +21,7 @@ function openKTLMenu() {
             } else if (currentPerm + amountToAdd > maxPermFocus) {
                 color = "var(--error-color)";
             }
-            text += `<span style="color:${color}">- From ${fromDataObj.title} to ${toDataObj.title}, permanent focus bonus is ${currentPerm} / ${maxPermFocus}`
+            text += `<span style="color:${color}">- From ${fromDataObj.title} to ${toDataObj.title}, permanent focus bonus is ${intToString(currentPerm, 3)} / ${intToString(maxPermFocus, 3)}`
             if (currentPerm === maxPermFocus) {
                 text += ` | Warning: This will gain no bonus`
             } else if (currentPerm + amountToAdd > maxPermFocus) {
@@ -166,7 +166,7 @@ function initializeKTL() {
 
 function openUseAmuletMenu(isUseable) {
     let isShowing = document.getElementById("useAmuletMenu").style.display !== "none";
-    document.getElementById("useAmuletMenu").style.display = isShowing ? "none" : "";
+    views.updateVal(`useAmuletMenu`, isShowing ? "none" : "", "style.display");
     document.getElementById('amuletConfirm').checked = false;
 
     //if not useable, hide all the buy buttons, and the bottom section w/ start again buttons
@@ -340,4 +340,6 @@ function useAmulet() {
 
     setSliderUI("overclock", "reflect", getUpgradeSliderAmount());
     setSliderUI("poolMana", "expelMana", getUpgradeSliderAmount());
+
+    views.updateVal(`killTheLichMenuButton2`, "Fight the Lich's Forces!");
 }

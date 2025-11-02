@@ -84,7 +84,6 @@ function secondPassed() {
 
 
 function gameTick() {
-    data.lastVisit = Date.now();
     data.currentGameState.totalTicks++;
     data.gameSettings.ticksForSeconds++;
 
@@ -214,7 +213,7 @@ function tickGameObject(actionVar) {
         momentumMaxRate = 0;
     }
     let isMaxLevel = actionObj.maxLevel !== undefined && actionObj.level >= actionObj.maxLevel;
-    let momentumToAdd = !dataObj.generatesPastMax && (isMaxLevel || !actionObj.unlocked) ? 0 : momentumMaxRate;
+    let momentumToAdd = (!actionObj.unlocked || (!dataObj.generatesPastMax && isMaxLevel)) ? 0 : momentumMaxRate;
     let resourceToAddInefficient = momentumToAdd * (actionObj.efficiency / 100);
 
     resourceToAddInefficient = resourceToAddInefficient < .0000001 ? 0 : resourceToAddInefficient;
@@ -350,8 +349,8 @@ function addResourceTo(downstreamObj, amount) {
         amount = 0;
     }
     if (!downstreamObj.unlocked && downstreamObj.unlockCost <= 0 && (!downstreamDataObj.isUnlockCustom || downstreamDataObj.isUnlockCustom())) {
-        unlockAction(downstreamObj);
         amount = -1 * downstreamObj.unlockCost; // Get the leftovers back.
+        unlockAction(downstreamObj);
         downstreamObj.unlockCost = 0;
     }
 

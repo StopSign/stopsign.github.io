@@ -563,7 +563,20 @@ function createChangelogMenu() {
     return Raw.html`
         <div class="menuTitle">Changelog</div>
         <div class="menuSeparator"></div><br>
-        v2.0.9 11/1 (current):<br>
+        v2.0.10 11/2 (current):<br>
+        <ul>
+            <li>Bonus time setting refreshes correctly</li>
+            <li>Reset ", together" on amulet use (should only be added with TWT)</li>
+            <li>Amulet menu clears correctly on use</li>
+            <li>Renamed personal library to spell shack</li>
+            <li>Fixed TWT starting early</li>
+            <li>Fixed not getting leftovers on unlock</li>
+            <li>Fixed floating point math on northern wastes menu</li>
+            <li>Pausing the game should not affect offline time gain now when you come back</li>
+            <li>Increased Brythal Legacy gain (more legacy balancing to come)</li>
+        </ul><br>
+        v2.0.9 11/1:<br>
+        <ul>
             <li>Fixed HATL levels increasing past what they should, again</li>
             <li>Fixed shorter runs not enabling automation on next runs (manual unlock is a one-and-done-forever)</li>
             <li>Train with Team keeps generating teamwork/using charges even when max level</li>
@@ -576,7 +589,6 @@ function createChangelogMenu() {
             <li>Fixed a performance bug</li>
             <li>Added levels to Pinned, and dim if the action is not revealed</li>
             <li>Added a message before going to Northern Wastes to prevent wasting Remember What I Focused On permanent bonus</li>
-        <ul>
         </ul><br>
         v2.0.8 10/31:<br>
         <ul>

@@ -200,7 +200,7 @@ actionData = {
         },
         onLevelCustom: function() {
         },
-        onLevelAtts:[["legacy", 150]],
+        onLevelAtts:[["legacy", 300]],
         expAtts:[],
         efficiencyAtts:[]
     },
@@ -214,7 +214,7 @@ actionData = {
         },
         onLevelCustom: function() {
         },
-        onLevelAtts:[["legacy", 300]],
+        onLevelAtts:[["legacy", 500]],
         expAtts:[],
         efficiencyAtts:[]
     },
@@ -307,7 +307,7 @@ actionData = {
         },
         onLevelCustom: function() {
         },
-        onLevelAtts:[["legacy", 1000], ["pulse", 200]],
+        onLevelAtts:[["legacy", 3000], ["pulse", 200]],
         expAtts:[["observation", 1]],
         efficiencyAtts:[["curiosity", .0005]]
     },
@@ -742,7 +742,7 @@ actionData = {
         },
         onLevelCustom: function() {
         },
-        onLevelAtts:[["legacy", 5e5]],
+        onLevelAtts:[["legacy", 1e6]],
         expAtts:[],
         efficiencyAtts:[["might", .001]]
     },
@@ -819,7 +819,7 @@ actionData = {
 `}
     },
     buildPersonalLibrary: {
-        tier:1, plane:0, creationVersion:2, 
+        tier:1, plane:0, creationVersion:2, title: "Craft Spell Shack",
         progressMaxBase:3e37, progressMaxIncrease:10,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.05, maxLevel:0,
@@ -833,7 +833,7 @@ actionData = {
         efficiencyAtts:[["logistics", 1]]
     },
     expandPersonalLibrary: {
-        tier:1, plane:0, creationVersion:2, 
+        tier:1, plane:0, creationVersion:2, title: "Craft Sturdy Practice Den",
         progressMaxBase:3e40, progressMaxIncrease:10,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.001, maxLevel:0,
@@ -1103,8 +1103,8 @@ actionData = {
         expAtts:[],
         efficiencyAtts:[["comfort", 1]],
         iconText: {english:Raw.html`
-        On Level: +1 max level for Expand Personal Library<br>
-        Level 1: Reveal Expand Personal Library<br>
+        On Level: +1 max level for Craft Sturdy Practice Den<br>
+        Level 1: Reveal Craft Sturdy Practice Den<br>
         Level 2: Reveal Mark The Layout<br>
         Level 3: Reveal Dismantle Shelves<br>
         Level 4: Reveal Examine The Architecture<br>

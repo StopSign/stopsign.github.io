@@ -1133,7 +1133,12 @@ Level 3: Reveal Check Notice Board`
         },
         onLevelAtts: [["recognition", 5e4], ["adaptability", 400], ["leverage", 30]],
         expAtts: [],
-        efficiencyAtts: []
+        efficiencyAtts: [],
+        iconText: {
+            english: Raw.html`
+        Level 1: Reveal Expand Local Library
+`
+        }
     },
     expandLocalLibrary: {
         tier: 3, plane: 0, resourceName: "fortune", creationVersion: 2,
@@ -1235,8 +1240,8 @@ Level 3: Reveal Check Notice Board`
         efficiencyAtts: [],
         iconText: {
             english: Raw.html`
-        On Level: +1 max level to Build Personal Library<br>
-        Level 1: Reveal Build Personal Library<br>
+        On Level: +1 max level to Craft Spell Shack<br>
+        Level 1: Reveal Craft Spell Shack<br>
         Level 1: Reveal Procure Quality Wood
 `
         }
@@ -1255,7 +1260,7 @@ Level 3: Reveal Check Notice Board`
         efficiencyAtts: [],
         iconText: {
             english: Raw.html`
-        On Level: +1 max level to Build Personal Library
+        On Level: +1 max level to Craft Spell Shack
 `
         }
     },
@@ -2292,7 +2297,7 @@ Level 3: Reveal Check Notice Board`
         efficiencyAtts: [["discernment", .05]],
         iconText: {
             english: Raw.html`
-        Level 1: Reveal Train With Team
+        Level 1: Reveal Train With Team<br>
         Level 1: Unlock Train With Team
 `
         }
