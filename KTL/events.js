@@ -174,11 +174,8 @@ function updatePauseActionVisuals(actionVar) {
 }
 
 windowElement.addEventListener('wheel', function(e) {
-    if(mouseIsOnAction) {
-        let actionObj = data.actions[mouseIsOnAction];
-        if(actionObj.currentMenu === "") {
-            return;
-        }
+    let actionObj = data.actions[mouseIsOnAction];
+    if(mouseIsOnAction && actionObj.currentMenu !== "") {
         let elem = document.getElementById(`${mouseIsOnAction}_${actionObj.currentMenu}Container`);
         if(!elem) {
             console.log('error, no elem at: ' + mouseIsOnAction);
@@ -255,6 +252,10 @@ document.body.addEventListener('touchmove', function(e) {
 
 // Touch start
 windowElement.addEventListener('touchstart', function(e) {
+    if(mouseIsOnAction) {
+        data.actions[mouseIsOnAction].mouseOnThis = false;
+    }
+    mouseIsOnAction = null;
     if (e.touches.length === 2) {
         e.preventDefault();
         initialPinchDistance = getTouchDistance(e.touches[0], e.touches[1]);
@@ -297,6 +298,17 @@ windowElement.addEventListener('touchmove', function(e) {
 
         applyTransform();
     } else if (e.touches.length === 1 && isTouchDragging) {
+        let actionObj = data.actions[mouseIsOnAction];
+        if(mouseIsOnAction && actionObj.currentMenu !== "") {
+            let elem = document.getElementById(`${mouseIsOnAction}_${actionObj.currentMenu}Container`);
+            if(!elem) {
+                console.log('error, no elem at: ' + mouseIsOnAction);
+                return;
+            }
+            if(elem.scrollHeight > elem.clientHeight) { //only stop wheel if there's a reason to
+                return;
+            }
+        }
         e.preventDefault();
         const touch = e.touches[0];
 
@@ -350,8 +362,9 @@ function forceRedraw(elem) {
 
 function actionTitleClicked(actionVar, setAll) {
     let dataObj = actionData[actionVar];
-
+    data.actions[actionVar].mouseOnThis = true;
     switchToPlane(dataObj.plane)
+
 
     let newtransformX = -((dataObj.realX + 100) * scaleByPlane[data.planeTabSelected]) + windowElement.offsetWidth / 2 ;
     let newtransformY = -((dataObj.realY + 100) * scaleByPlane[data.planeTabSelected]) + windowElement.offsetHeight / 2 - 50;
@@ -403,7 +416,10 @@ function toggleAutomationOnMaxLevel(actionVar) {
     }
 }
 
-
+function clickActionMenuButton(event, actionVar, menuVar) {
+    data.actions[actionVar].mouseOnThis = true;//for mobile/touch reasons
+    clickActionMenu(actionVar, menuVar);
+}
 function clickActionMenu(actionVar, menuVar) {
     let actionObj = data.actions[actionVar];
     let currentMenu = actionObj.currentMenu;
@@ -670,6 +686,16 @@ function mouseOffAction(actionVar) {
     let actionObj = data.actions[actionVar];
     actionObj.mouseOnThis = false;
     mouseIsOnAction = null;
+}
+function mouseOnActionTouch(event, actionVar) {
+    let actionObj = data.actions[actionVar];
+    if(actionVar && actionObj.currentMenu !== "") {
+        let elem = document.getElementById(`${actionVar}_${actionObj.currentMenu}Container`);
+        if(elem.scrollHeight > elem.clientHeight) { //only stop touch if there's a reason to
+            event.stopPropagation();
+        }
+    }
+    mouseOnAction(actionVar);
 }
 
 

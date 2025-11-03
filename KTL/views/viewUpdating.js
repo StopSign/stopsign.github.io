@@ -293,7 +293,16 @@ let views = {
 		//If resources are flowing "upstream" that counts as no resources flowing since it's not "active".
 		let isResourcesQuiet = (actionObj.resourceIncrease === 0 && actionObj.resourceDecrease === 0) || actionObj.resourceRetrieved !== 0;
         let isQuiet = isMaxLevel && isResourcesQuiet && !actionObj.mouseOnThis;
-        views.updateVal(`${actionVar}LargeVersionContainer`, isQuiet?".6":"1", "style.opacity");
+        if(!isQuiet) {
+            dataObj.blinkDelay = 1;
+        } else {
+            dataObj.blinkDelay -= 1/(data.gameSettings.ticksPerSecond*3);
+            if(dataObj.blinkDelay < 0) {
+                dataObj.blinkDelay = 0;
+            }
+        }
+        let opacityRatio = 0.6 + (dataObj.blinkDelay * 0.4);
+        views.updateVal(`${actionVar}LargeVersionContainer`, opacityRatio, "style.opacity");
         views.updateVal(`${actionVar}Container`, actionObj.mouseOnThis?"100":"0", "style.zIndex");
 
         views.updateVal(`${actionVar}ResourceRetrieved`, actionObj.resourceRetrieved > 0 ? "" : "none", "style.display");
@@ -515,12 +524,6 @@ function updateGlobals() {
         }
     }
     data.totalMomentum = totalMometum;
-    if(data.upgrades.keepMyMagicReady.upgradePower) {
-        saveMaxChargedSpellPowers();
-        data.maxSpellPower = getTotalMaxChargedSpellPower();
-    } else {
-        data.maxSpellPower = getActiveSpellPower(true);
-    }
 
     views.updateVal(`maxSpellPower`, data.maxSpellPower, "textContent", 1);
     views.updateVal(`totalMomentum`, totalMometum, "textContent", 1);

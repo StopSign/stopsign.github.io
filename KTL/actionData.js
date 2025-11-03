@@ -14,6 +14,7 @@ function create(actionVar, downstreamVars, x, y) {
         dataObj.addedInVersion = 0;
     }
     dataObj.title = dataObj.title || decamelizeWithSpace(actionVar);
+    dataObj.blinkDelay = 0;
     // let title = dataObj.title || decamelizeWithSpace(actionVar); //basicLabor -> Basic Labor
     createAndLinkNewAction(actionVar, dataObj, downstreamVars);
 }

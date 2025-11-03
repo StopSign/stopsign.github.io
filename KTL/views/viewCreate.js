@@ -204,15 +204,15 @@ function generateActionDisplay(actionVar) {
         <div id="${actionVar}MenuButtons" style="position:absolute;top:-20px;font-size:13px;left:3px;width:315px;">
             ${!dataObj.parentVar?"":`<span onclick="actionTitleClicked('${dataObj.parentVar}')" 
             class="buttonSimple" style="margin-right:3px;width:30px;height:30px;text-align:center;cursor:pointer;padding:0 4px;">^</span>`}
-        <span id="${actionVar}_downstreamMenuButton" onclick="clickActionMenu('${actionVar}', 'downstream')" class="buttonSimple" 
+        <span id="${actionVar}_downstreamMenuButton" onclick="clickActionMenuButton(event, '${actionVar}', 'downstream')" class="buttonSimple" 
             style="margin-right:3px;width:30px;height:30px;text-align:center;cursor:pointer;padding:0 4px;">Downstream</span>
-        <span id="${actionVar}_infoMenuButton" onclick="clickActionMenu('${actionVar}', 'info')" class="buttonSimple" 
+        <span id="${actionVar}_infoMenuButton" onclick="clickActionMenuButton(event, '${actionVar}', 'info')" class="buttonSimple" 
             style="margin-right:3px;width:30px;height:30px;text-align:center;cursor:pointer;padding:0 4px;">Info</span>
-        <span id="${actionVar}_attsMenuButton" onclick="clickActionMenu('${actionVar}', 'atts')" class="buttonSimple" 
+        <span id="${actionVar}_attsMenuButton" onclick="clickActionMenuButton(event, '${actionVar}', 'atts')" class="buttonSimple" 
             style="margin-right:3px;width:30px;height:30px;text-align:center;cursor:pointer;padding:0 4px;">Stats</span>
-        <span id="${actionVar}_storyMenuButton" onclick="clickActionMenu('${actionVar}', 'story')" class="buttonSimple" 
+        <span id="${actionVar}_storyMenuButton" onclick="clickActionMenuButton(event, '${actionVar}', 'story')" class="buttonSimple" 
             style="display:${dataObj.storyText?"":"none"};margin-right:3px;width:30px;height:30px;text-align:center;cursor:pointer;padding:0 4px;">Story</span>
-        <span id="${actionVar}_automationMenuButton" onclick="clickActionMenu('${actionVar}', 'automation')" class="buttonSimple" 
+        <span id="${actionVar}_automationMenuButton" onclick="clickActionMenuButton(event, '${actionVar}', 'automation')" class="buttonSimple" 
             style="display:${actionObj.hasUpstream?"":"none"};margin-right:3px;width:30px;height:30px;text-align:center;cursor:pointer;padding:0 4px;">Automation</span>
         </div>`;
 
@@ -462,8 +462,9 @@ let maxLevelTop = (data.gameSettings.viewDeltas && data.gameSettings.viewRatio) 
     let maxLevelDiv = `<span style="display:${actionObj.maxLevel !== undefined ? "" : "none"}"> / <span id="${actionVar}MaxLevel2" style="font-weight:bold;"></span></span>`;
 
     theStr += Raw.html`
-        <div id="${actionVar}Container" style="display:none;position:absolute;left:${newX};top:${newY};width:330px;" 
-            onmouseenter="mouseOnAction('${actionVar}')" onmouseleave="mouseOffAction('${actionVar}')">
+        <div id="${actionVar}Container" style="display:none;position:absolute;left:${newX};top:${newY};width:330px;"
+            onmouseenter="mouseOnAction('${actionVar}')" onmouseleave="mouseOffAction('${actionVar}')"
+            ontouchstart="mouseOnActionTouch(event, '${actionVar}')" >
             <div id="${actionVar}LargeVersionContainer" style="border:2px solid var(--border-color);
                 background-color:var(--bg-secondary);">
                 ${icon}
@@ -863,12 +864,11 @@ function attachCustomSliderListeners() {
 
             const hoverTargetContainer = document.getElementById(`${actionVar}SliderContainer${downstreamVar}`);
             const line = document.getElementById(`${actionVar}_${downstreamVar}_Line_Outer`);
-            const largeVersionContainer = document.getElementById(`${downstreamVar}LargeVersionContainer`);
             const lockContainer = document.getElementById(`${downstreamVar}LockContainer`);
 
             hoverTargetContainer.addEventListener('mouseenter', () => {
                 line.style.borderColor = "yellow";
-                largeVersionContainer.style.borderColor = "yellow";
+                views.updateVal(`${downstreamVar}LargeVersionContainer`, "yellow", "style.borderColor");
                 lockContainer.style.borderColor = "yellow";
             });
 

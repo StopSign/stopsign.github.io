@@ -563,7 +563,15 @@ function createChangelogMenu() {
     return Raw.html`
         <div class="menuTitle">Changelog</div>
         <div class="menuSeparator"></div><br>
-        v2.0.10 11/2 (current):<br>
+        v2.0.11 11/3 (current):<br>
+            <li>Retrieve My Unused resources moves to parent (thanks Guri). The effect is x10 as a result</li>
+            <li>Fixed border color highlight</li>
+            <li>Excess progress on max level goes back to the action's resource (thanks Guri). </li>
+            <li>Actions dim over 3 seconds instead of instant</li>
+            <li>Action submenus (Info, Stats, Story) can be scrolled on mobile</li>
+        <ul>
+        </ul><br>
+        v2.0.10 11/2:<br>
         <ul>
             <li>Bonus time setting refreshes correctly</li>
             <li>Reset ", together" on amulet use (should only be added with TWT)</li>

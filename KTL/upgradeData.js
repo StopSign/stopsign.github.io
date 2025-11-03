@@ -785,7 +785,7 @@ let upgradeData = {
         upgradesAvailable:3,
         visible:false,
         customInfo: function(num) {
-            return `Retrieve 10 + ${[.1, .2, .5][num]}% of current resource per second on all actions that are dimmed (max level, no resource increase or decrease). Skips Reinvest.`;
+            return `Retrieve 10 + ${[1, 2, 5][num]}% of current resource per second on all actions that are dimmed (max level, no resource increase or decrease). Skips Reinvest.`;
         },
     },
     createABetterFoundation: {

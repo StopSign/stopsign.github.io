@@ -541,6 +541,13 @@ function upgradeUpdates() {
 
     //passive gain
     data.actions.overclock.resource += [0, 5, 20, 50][data.upgrades.startALittleQuicker.upgradePower] * 20 / data.gameSettings.ticksPerSecond;
+
+    if(data.upgrades.keepMyMagicReady.upgradePower) {
+        saveMaxChargedSpellPowers();
+        data.maxSpellPower = getTotalMaxChargedSpellPower();
+    } else {
+        data.maxSpellPower = getActiveSpellPower(true);
+    }
 }
 
 function getUpgradeSliderAmount() {
