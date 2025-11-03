@@ -463,8 +463,7 @@ let maxLevelTop = (data.gameSettings.viewDeltas && data.gameSettings.viewRatio) 
 
     theStr += Raw.html`
         <div id="${actionVar}Container" style="display:none;position:absolute;left:${newX};top:${newY};width:330px;"
-            onmouseenter="mouseOnAction('${actionVar}')" onmouseleave="mouseOffAction('${actionVar}')"
-            ontouchstart="mouseOnActionTouch(event, '${actionVar}')" >
+            onmouseenter="mouseOnAction('${actionVar}')" onmouseleave="mouseOffAction('${actionVar}')" >
             <div id="${actionVar}LargeVersionContainer" style="border:2px solid var(--border-color);
                 background-color:var(--bg-secondary);">
                 ${icon}
@@ -809,6 +808,11 @@ function attachCustomSliderListeners() {
         let dataObj = actionData[actionVar];
         let actionObj = data.actions[actionVar];
         if (!dataObj.downstreamVars) continue;
+
+        let actionContainer = document.getElementById(`${actionVar}LargeVersionContainer`);
+        actionContainer.addEventListener('touchstart', function(e) {
+            mouseOnActionTouch(e, actionVar)
+        })
 
         for (let downstreamVar of dataObj.downstreamVars) {
             const container = document.getElementById(`${actionVar}_${downstreamVar}_track_container`);
