@@ -271,9 +271,9 @@ function tickGameObject(actionVar) {
     }
 
     //Calc resource retrieval
-    let resourceParentVar = resourceHeads[actionObj.resourceName];
+	let resourceParentVar = actionData[actionObj.actionVar].parentVar;
     let isQuiet = actionObj.unlocked && isMaxLevel && actionObj.resourceIncrease === 0 && actionObj.totalSend === 0;
-    if(!isQuiet || resourceParentVar === actionVar || data.upgrades.retrieveMyUnusedResources.upgradePower === 0 || data.gameState === "KTL" || actionVar === "reinvest" || !actionObj.hasUpstream) {
+    if(!isQuiet || !actionObj.hasUpstream || data.upgrades.retrieveMyUnusedResources.upgradePower === 0 || resourceHeads[actionObj.resourceName] === actionVar || data.gameState === "KTL" || actionVar === "reinvest") {
         actionObj.resourceRetrieved = 0;
     } else {
         actionObj.resourceRetrieved = (actionObj.resource/1000 * [0, 1, 2, 5][data.upgrades.retrieveMyUnusedResources.upgradePower] + 10) / data.gameSettings.ticksPerSecond;
