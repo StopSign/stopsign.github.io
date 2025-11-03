@@ -313,15 +313,27 @@ function calculateTaken(actionVar, downstreamVar, actionObj, mult) {
 
 
 function checkProgressCompletion(actionObj, dataObj) {
-    let isMaxLevel = actionObj.maxLevel !== undefined && actionObj.level >= actionObj.maxLevel;
-    if(actionObj.progress >= actionObj.progressMax && (!isMaxLevel || dataObj.generatesPastMax)) {
+	function isDoneLeveling() {
+		return actionObj.maxLevel !== undefined && actionObj.level >= actionObj.maxLevel && !dataObj.generatesPastMax;
+	};
+	
+    if(actionObj.progress >= actionObj.progressMax && (!isDoneLeveling())) {
         actionObj.progress -= actionObj.progressMax;
         if(dataObj.onCompleteCustom) {
             dataObj.onCompleteCustom();
         }
         actionAddExp(actionObj);
+		
+		//If we're at max level "refund" the remaining "paid" amount.  Realistically, this mostly matters for spells like Overclock
+		//This won't retroactivly refund nodes that overleveled in a previoius version, but that'll be fixed when the amulet
+		//resets everything
+		if(isDoneLeveling()) {
+			actionObj.resource += actionObj.progress;
+			actionObj.progress = 0;
+		}
         return true;
     }
+	
     return false;
 }
 
