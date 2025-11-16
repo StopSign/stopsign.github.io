@@ -423,7 +423,7 @@ let views = {
             let focusShowing = actionObj[`${downstreamVar}PermFocusMult`] > 1 && downstreamDataObj.hasUpstream;
 
             if (isDownstreamMenuSelected) {
-                let taken = amounts[downstreamVar];
+                let taken = amounts[downstreamVar] ?? 0;
 
                 views.updateVal(`${actionVar}DownstreamSendRate${downstreamVar}`, taken * data.gameSettings.ticksPerSecond, "textContent", 4);
 

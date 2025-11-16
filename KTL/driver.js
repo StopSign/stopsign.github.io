@@ -278,6 +278,7 @@ let resourceHeads = {
 function calculateDownstreamResources(actionVar) {
     const actionObj = data.actions[actionVar];
     const dataObj = actionData[actionVar];
+    let tierMult = actionObj.tierMult();
     const calculatedRatios = {};
     let totalRatio = 0;
 
@@ -286,7 +287,7 @@ function calculateDownstreamResources(actionVar) {
         const permFocusMult = actionObj[downstreamVar + "PermFocusMult"];
         const tempFocusMult = actionObj[downstreamVar + "TempFocusMult"];
 
-        const baseRate = sliderSetting * actionObj.tierMult();
+        const baseRate = sliderSetting * tierMult;
         const effectiveRate = baseRate * permFocusMult * tempFocusMult;
 
         calculatedRatios[downstreamVar] = effectiveRate;
@@ -311,6 +312,9 @@ function calculateTaken(actionVar, shouldGive) {
     actionObj.totalSend = 0;
     let dataObj = actionData[actionVar];
     let resourceToSplit = actionObj.resource;
+    if(resourceToSplit === 0) {
+        return {};
+    }
     for (let downstreamVar of dataObj.downstreamVars) {
         let downstreamObj = data.actions[downstreamVar];
         let downstreamDataObj = actionData[downstreamVar];

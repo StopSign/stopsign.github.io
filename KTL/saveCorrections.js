@@ -85,7 +85,6 @@ function saveFileCorrection(saveVersionFromLoad) {
         if(data.upgrades.retrieveMyUnusedResources.upgradePower === 3) {
             data.upgrades.retrieveMyUnusedResources.isFullyBought = true;
         }
-
     }
     return refundAmount;
 }

@@ -563,7 +563,21 @@ function createChangelogMenu() {
     return Raw.html`
         <div class="menuTitle">Changelog</div>
         <div class="menuSeparator"></div><br>
-        v2.0.11 11/3 (current):<br>
+        v2.0.12 11/16 (current):<br>
+        <ul>
+            <li>Reworked icon text to be dynamic. This means action reveal points will be ??? until purchased, wages will adjust to your number display setting, and Northern Wastes' legacy/AC gains will be accurate.</li>
+            <li>Automation upgrades, when bought, show the correct one their text says it does.</li>
+            <li>Sliders cannot be changed in Northern Wastes</li>
+            <li>Actions will only become visible if their parents are visible</li>
+            <li>Border color change on locked slider hover fixed</li>
+            <li>Locked actions show highest levels</li>
+            <li>Unread story menus will be blue, and once clicked, story text that has been changed since you read it last will be colored yellow</li>
+            <li>Temp Focus (the yellow one) no longer applies twice</li>
+            <li>Fixed resource sending calculations</li>
+            <li>Fixed FPS slider affecting game tick rate instead of FPS</li>
+            <li>If your total send rate is higher than 100% (most noticeable on overclock, with Perm Focus Mults), it now balances correctly according to your slider's ratios, up to the max of 100%/s (or 5% per tick)</li>
+        </ul><br>
+        v2.0.11 11/3:<br>
         <ul>
             <li>Retrieve My Unused resources moves to parent (thanks Guri). The effect is x10 as a result</li>
             <li>Fixed border color highlight</li>
