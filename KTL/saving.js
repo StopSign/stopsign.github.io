@@ -15,7 +15,7 @@ function resetActionToBase(actionVar) {
     actionSetBaseVariables(data.actions[actionVar], actionData[actionVar]);
 }
 
-data.saveVersion = 3;
+data.saveVersion = 4;
 function load() {
     initializeData();
 
@@ -148,8 +148,7 @@ function load() {
     }
 
     initializeDisplay();
-    setSlidersOnLoad(toLoad, saveVersionFromLoad);
-    // recalcInterval(data.options.updateRate);
+    adjustUIAfterLoad(toLoad, saveVersionFromLoad);
     views.updateView();
 
 
@@ -173,22 +172,29 @@ function applyUpgradeEffects() {
     }
 }
 
-function setSlidersOnLoad(toLoad, saveVersion) {
+function adjustUIAfterLoad(toLoad, saveVersionFromLoad) {
     updateSliderContainers(); //show hide according to setting
 
     for(let actionVar in data.actions) {
+        let actionObj = data.actions[actionVar];
         let dataObj = actionData[actionVar];
         for(let downstreamVar of dataObj.downstreamVars) {
             if (!document.getElementById(actionVar + "NumInput" + downstreamVar)
                 || !toLoad.actions || !toLoad.actions[actionVar] ||
                 toLoad.actions[actionVar]["downstreamRate" + downstreamVar] === undefined ||
-                dataObj.creationVersion > saveVersion) {
+                dataObj.creationVersion > saveVersionFromLoad) {
                 continue;
             }
             setSliderUI(actionVar, downstreamVar, toLoad.actions[actionVar]["downstreamRate" + downstreamVar]); //from save file
         }
+
+        if(dataObj.storyVersion > actionObj.readStory) {
+            views.updateVal(`${actionVar}_storyMenuButton`, "yellow", "style.color");
+        }
     }
     attachCustomSliderListeners();
+
+
 }
 
 function mergeExistingOnly(data, toLoad, varName, skipList = []) {
@@ -272,7 +278,7 @@ function updateUIOnLoad() {
         actionObj.currentMenu = "";
         clickActionMenu(actionVar, menuFromSave);
         if (actionObj.visible) {
-            revealActionAtts(actionObj);
+            revealAttsOnAction(actionObj);
         }
         if (data.gameSettings.viewDeltas) {
             views.updateVal(`${actionVar}DeltasDisplayContainer`, "", "style.display");
@@ -286,18 +292,18 @@ function updateUIOnLoad() {
         if (data.gameSettings.viewTotalMomentum) {
             views.updateVal(`${actionVar}TotalDownstreamContainer`, "", "style.display");
         }
-        if (actionObj.hasUpstream) {
+        if (dataObj.hasUpstream) {
             let showRevealAutomation = data.upgrades.stopLettingOpportunityWait.upgradePower > 0;
             let showMaxLevelAutomation = data.upgrades.knowWhenToMoveOn.upgradePower > 0;
             views.updateVal(`${actionVar}_automationMenuButton`, dataObj.plane !== 2 && (showRevealAutomation || showMaxLevelAutomation) ? "" : "none", "style.display");
-            views.updateVal(`${actionVar}_automationMaxLevelContainer`, dataObj.plane !== 2 && showRevealAutomation ? "" : "none", "style.display");
-            views.updateVal(`${actionVar}_automationRevealContainer`, dataObj.plane !== 2 && showMaxLevelAutomation ? "" : "none", "style.display");
+            views.updateVal(`${actionVar}_automationMaxLevelContainer`, dataObj.plane !== 2 && showMaxLevelAutomation ? "" : "none", "style.display");
+            views.updateVal(`${actionVar}_automationRevealContainer`, dataObj.plane !== 2 && showRevealAutomation ? "" : "none", "style.display");
         }
 
         if(data.doneAmulet) {
             views.updateVal(`${actionVar}PinButton`, "", "style.display");
         }
-        if(actionObj.hasUpstream) {
+        if(dataObj.hasUpstream) {
             if (actionObj.automationOnReveal) {
                 views.updateVal(`${actionVar}_checkbox`, true, "checked");
                 views.updateVal(`${actionVar}_track`, "#2196F3", "style.backgroundColor");
@@ -320,6 +326,7 @@ function updateUIOnLoad() {
         if(dataObj.isSpell || dataObj.isSpellConsumer) {
             updatePauseActionVisuals(actionVar);
         }
+        views.updateVal(`${actionVar}_storyMenuButton`, actionObj.readStory!==undefined?"":"#2196F3", "style.color");
     }
     if (data.planeUnlocked[1] || data.planeUnlocked[2]) {
         for (let i = 0; i < data.planeUnlocked.length; i++) {
@@ -345,9 +352,7 @@ function updateUIOnLoad() {
         views.updateVal(`ancientCoinDisplay`, "", "style.display");
         revealAtt("legacy");
     }
-    if(data.displayJob) {
-        document.getElementById("jobDisplay").style.display = "";
-    }
+    views.updateVal(`jobDisplay`, data.displayJob ? "" : "none", "style.display");
     changeJob(data.currentJob);
 
     for(let i = 0; i < data.toastStates.length; i++) {
@@ -377,7 +382,7 @@ function reapplyAttentionSelected() {
     if (!data.focusSelected) return;
 
     for(let focusObj of data.focusSelected) {
-        highlightLine(focusObj.borderId);
+        highlightLine(focusObj.borderId, focusObj.lineData);
     }
 }
 

@@ -386,12 +386,12 @@ let upgradeData = {
         },
         onBuy: function(num) {
             for (let actionVar in data.actions) {
-                let actionObj = data.actions[actionVar];
-                if(!actionObj.hasUpstream) {
+                let dataObj = actionData[actionVar];
+                if(!dataObj.hasUpstream) {
                     continue;
                 }
-                views.updateVal(`${actionVar}_automationMenuButton`, data.actions[actionVar].hasUpstream && actionData[actionVar].plane !== 2?"":"none", "style.display");
-                views.updateVal(`${actionVar}_automationRevealContainer`, data.actions[actionVar].hasUpstream && actionData[actionVar].plane !== 2?"":"none", "style.display");
+                views.updateVal(`${actionVar}_automationMenuButton`, dataObj.hasUpstream && dataObj.plane !== 2?"":"none", "style.display");
+                views.updateVal(`${actionVar}_automationRevealContainer`, dataObj.hasUpstream && dataObj.plane !== 2?"":"none", "style.display");
             }
         }
     },
@@ -444,7 +444,7 @@ let upgradeData = {
             return `Increase the base focus rate (x2) over 10 minutes, to a maximum of x4. This keeps within a loop, but resets on amulet use.`
         },
         onBuy: function(num) {
-            unveilUpgrade('rememberWhatIFocusedOn')
+            revealUpgrade('rememberWhatIFocusedOn')
         },
     },
     rememberWhatIFocusedOn: {
@@ -511,7 +511,7 @@ let upgradeData = {
                 purchaseAction('clearIvyWall')
                 purchaseAction('findPulsingShard')
                 purchaseAction('scavengeForSupplies')
-                unveilUpgrade('learnFromTheLibrary')
+                revealUpgrade('learnFromTheLibrary')
             }
         }
     },
@@ -544,9 +544,9 @@ let upgradeData = {
                 purchaseAction('digFoundation')
 
                 purchaseAction('shapeBricks')
-                unveilUpgrade('keepMyMagicReady')
-                unveilUpgrade('trainTogetherMore');
-                unveilUpgrade('refineMyWizardry')
+                revealUpgrade('keepMyMagicReady')
+                revealUpgrade('trainTogetherMore');
+                revealUpgrade('refineMyWizardry')
             } else if(num === 2) {
                 purchaseAction('findAFamiliarLanguage')
                 purchaseAction('searchForRelevantBooks')
@@ -635,25 +635,25 @@ let upgradeData = {
                 purchaseAction('invest');
                 purchaseAction('buildFortune');
                 purchaseAction('spendFortune');
-                unveilUpgrade('increaseInitialInvestment')
+                revealUpgrade('increaseInitialInvestment')
             } else if(num === 2) {
                 purchaseAction('reinvest')
                 purchaseAction('investInLocals')
                 purchaseAction('townCrier')
                 purchaseAction('storyTeller')
-                unveilUpgrade('buyNicerStuff')
+                revealUpgrade('buyNicerStuff')
             } else if(num === 3) {
                 purchaseAction('hostAFestival')
                 purchaseAction('fundTownImprovements')
                 purchaseAction('browsePersonalCollection')
                 purchaseAction('buyUtilityItems')
-                unveilUpgrade('refineMyLeverage')
-                unveilUpgrade('increaseMarketCap')
+                revealUpgrade('refineMyLeverage')
+                revealUpgrade('increaseMarketCap')
             } else if(num === 4) {
                 purchaseAction('supportLocalLibrary')
                 purchaseAction('expandLocalLibrary')
                 purchaseAction('investInSelf')
-                unveilUpgrade('retrieveMyUnusedResources')
+                revealUpgrade('retrieveMyUnusedResources')
             } else if(num === 5) {
                 purchaseAction('makeAPublicDonation')
                 purchaseAction('fundASmallStall')
@@ -758,7 +758,7 @@ let upgradeData = {
             purchaseAction('discussPlacement')
             purchaseAction('meetTheMages')
             purchaseAction('trainWithTeam')
-            unveilUpgrade('askAboutBetterWork');
+            revealUpgrade('askAboutBetterWork');
         }
     },
     trainTogetherMore: {
@@ -838,7 +838,7 @@ let upgradeData = {
             return "When you use the amulet, the highest levels achieved on non-Northern Wastes actions and generators are recorded. Gain +25% more exp up to the highest level reached. Note: non-generators do not carry over exp into their next level.";
         },
         onBuy: function(num) {
-            unveilUpgrade('rememberHowIGrew')
+            revealUpgrade('rememberHowIGrew')
         }
     },
     rememberHowIGrew: {
@@ -849,7 +849,7 @@ let upgradeData = {
             return "When you use the amulet, the second highest levels achieved on non-Northern Wastes actions and generators are recorded. Gain +25% additive more exp up to the second highest level reached. Note: non-generators do not carry over exp into their next level.";
         },
         onBuy: function(num) {
-            unveilUpgrade('rememberMyMastery')
+            revealUpgrade('rememberMyMastery')
         }
     },
     rememberMyMastery: {

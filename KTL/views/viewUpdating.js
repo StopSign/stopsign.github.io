@@ -29,6 +29,7 @@ let views = {
     updateViewOnSecond: function() {
         showAllValidToasts();
         drawChart();
+        checkActionsToReveal();
 
         let toShowUseAmulet = data.useAmuletButtonShowing && data.gameState === "KTL";
         views.updateVal(`openUseAmuletButton`, toShowUseAmulet ? "" : "none", "style.display");
@@ -250,7 +251,7 @@ let views = {
             for (let downstreamVar of dataObj.downstreamVars) {
                 let downstreamObj = data.actions[downstreamVar];
 
-                if(downstreamObj && downstreamObj.hasUpstream) {
+                if(downstreamObj && actionData[downstreamVar].hasUpstream) {
                     views.updateVal(`${actionVar}SliderContainer${downstreamVar}`, downstreamObj.visible ? "" : "none", "style.display");
                 }
             }
@@ -259,11 +260,15 @@ let views = {
         //if icon menu is open
         if(dataObj.hoveringIcon) {
             let shouldShowLevels = dataObj.plane !== 2 && !data.isSpell;
-            views.updateVal(`${actionVar}HighestLevelContainer`, shouldShowLevels&&data.upgrades.rememberWhatIDid.isFullyBought && actionObj.highestLevel >= 0 ? "" : "none", "style.display");
-            views.updateVal(`${actionVar}SecondHighestLevelContainer`, shouldShowLevels&&data.upgrades.rememberHowIGrew.isFullyBought && actionObj.secondHighestLevel >= 0 ? "" : "none", "style.display");
-            views.updateVal(`${actionVar}ThirdHighestLevelContainer`, shouldShowLevels&&data.upgrades.rememberMyMastery.isFullyBought && actionObj.thirdHighestLevel >= 0 ? "" : "none", "style.display");
+            views.updateVal(`${actionVar}HighestLevelContainer`, shouldShowLevels && data.upgrades.rememberWhatIDid.isFullyBought && actionObj.highestLevel >= 0 ? "" : "none", "style.display");
+            views.updateVal(`${actionVar}SecondHighestLevelContainer`, shouldShowLevels && data.upgrades.rememberHowIGrew.isFullyBought && actionObj.secondHighestLevel >= 0 ? "" : "none", "style.display");
+            views.updateVal(`${actionVar}ThirdHighestLevelContainer`, shouldShowLevels && data.upgrades.rememberMyMastery.isFullyBought && actionObj.thirdHighestLevel >= 0 ? "" : "none", "style.display");
 
-            if(dataObj.plane !== 1) {
+            views.updateVal(`${actionVar}HighestLevel`, actionObj.highestLevel, "innerText", 1);
+            views.updateVal(`${actionVar}SecondHighestLevel`, actionObj.secondHighestLevel, "innerText", 1);
+            views.updateVal(`${actionVar}ThirdHighestLevel`, actionObj.thirdHighestLevel, "innerText", 1);
+
+            if (dataObj.plane !== 1) {
                 views.updateVal(`${actionVar}CurrentUnlockTimeContainer`, actionObj.unlockTime ? "" : "none", "style.display");
                 views.updateVal(`${actionVar}CurrentUnlockTime`, actionObj.unlockTime, "textContent", "time");
                 views.updateVal(`${actionVar}PrevUnlockTimeContainer`, actionObj.prevUnlockTime ? "" : "none", "style.display");
@@ -275,7 +280,7 @@ let views = {
                 }
             }
 
-            if(dataObj.plane === 1) {
+            if (dataObj.plane === 1) {
                 views.updateVal(`${actionVar}CurrentLevel1TimeContainer`, actionObj.level1Time ? "" : "none", "style.display");
                 views.updateVal(`${actionVar}CurrentLevel1Time`, actionObj.level1Time, "textContent", "time");
                 views.updateVal(`${actionVar}PrevLevel1TimeContainer`, actionObj.prevLevel1Time ? "" : "none", "style.display");
@@ -286,6 +291,7 @@ let views = {
                     views.updateVal(`${actionVar}DeltaLevel1Time`, actionObj.level1Time - actionObj.prevLevel1Time < 0 ? "green" : "red", "style.color");
                 }
             }
+
         }
 
         //When action should be dim
@@ -376,11 +382,6 @@ let views = {
         if(actionVar === "hearAboutTheLich") {
             roundedNumbers.push(["actionPower2", 2]);
         }
-        if(dataObj.hoveringIcon) {
-            roundedNumbers.push(["highestLevel", 1]);
-            roundedNumbers.push(["secondHighestLevel", 1]);
-            roundedNumbers.push(["thirdHighestLevel", 1]);
-        }
 
         if(actionObj.currentMenu === "atts") {
             roundedNumbers.push(["attReductionEffect", 3]);
@@ -400,40 +401,29 @@ let views = {
         }
 
     },
-    updateActionDownstreamViews: function(actionObj, downstreamSelected) {
+    updateActionDownstreamViews: function(actionObj, isDownstreamMenuSelected) {
         let actionVar = actionObj.actionVar;
         let dataObj = actionData[actionVar];
         if(!dataObj.downstreamVars) {
             return;
         }
-        if(downstreamSelected) {
+        if(isDownstreamMenuSelected) {
             views.updateVal(`${actionVar}_downstreamButtonContainer`, hasDownstreamVisible(actionObj) ? "" : "none", "style.display");
         }
 
+        let amounts = calculateTaken(actionVar, false);
+
         for(let downstreamVar of dataObj.downstreamVars) {
-            let downstreamObj = data.actions[downstreamVar];
-            if (!downstreamObj || !downstreamObj.hasUpstream) {
-                return;
+            let downstreamDataObj = actionData[downstreamVar];
+            if (!downstreamDataObj || !downstreamDataObj.hasUpstream) {
+                continue;
             }
+
             let isAttention = isAttentionLine(actionVar, downstreamVar);
-            let focusShowing = actionObj[`${downstreamVar}PermFocusMult`] > 1 && downstreamObj.hasUpstream;
+            let focusShowing = actionObj[`${downstreamVar}PermFocusMult`] > 1 && downstreamDataObj.hasUpstream;
 
-            if (downstreamSelected) {
-                let rangeValue = data.actions[actionVar][`downstreamRate${downstreamVar}`] || 0;
-
-                let mult = rangeValue / 100;
-                let permFocusMult = actionObj[downstreamVar + "PermFocusMult"];
-                let tempFocusMult = actionObj[downstreamVar + "TempFocusMult"];
-
-                let totalTakenMult = actionObj.tierMult() * (actionObj.efficiency / 100) * permFocusMult * tempFocusMult *
-                    (isAttention ? tempFocusMult : 1);
-                let maxed = false;
-                if (totalTakenMult > 1) {
-                    totalTakenMult = 1; // Cap at 100%/s
-                    maxed = true;
-                }
-                let toReturn = actionObj.resource / data.gameSettings.ticksPerSecond * totalTakenMult * mult;
-                let taken = toReturn < .0000001 ? 0 : toReturn;
+            if (isDownstreamMenuSelected) {
+                let taken = amounts[downstreamVar];
 
                 views.updateVal(`${actionVar}DownstreamSendRate${downstreamVar}`, taken * data.gameSettings.ticksPerSecond, "textContent", 4);
 
@@ -514,6 +504,14 @@ let views = {
     },
 }
 
+function checkActionsToReveal() {
+    let itemsToProcess = [...queuedReveals];
+    queuedReveals.clear();
+
+    for (let actionVar of itemsToProcess) {
+        revealAction(actionVar);
+    }
+}
 
 function updateGlobals() {
     let totalMometum = 0;
@@ -574,7 +572,7 @@ function updateSliderContainers() {
     for(let actionVar in data.actions) {
         let dataObj = actionData[actionVar];
         for (let downstreamVar of dataObj.downstreamVars) {
-            if(!data.actions[downstreamVar].hasUpstream) {
+            if(!actionData[downstreamVar].hasUpstream) {
                 continue;
             }
             if (data.gameSettings.viewAdvancedSliders) {

@@ -107,7 +107,6 @@ function actionSetInitialVariables(actionObj, dataObj) {
     actionObj.cooldownTimer = 0; //when this is higher than cooldown it is ready
     actionObj.resourceName = dataObj.resourceName ? dataObj.resourceName : "momentum";
     actionObj.tier = dataObj.tier;
-    actionObj.hasUpstream = dataObj.hasUpstream ?? true;
     actionObj.isKTL = !!dataObj.isKTL;
     actionObj.purchased = !!dataObj.purchased;
     actionObj.plane = dataObj.plane;
@@ -140,7 +139,7 @@ function createAndLinkNewAction(actionVar, dataObj, downstreamVars) {
 
 
     for(let downstreamVar of dataObj.downstreamVars) {
-        actionObj[downstreamVar+"TempFocusMult"] = 2;
+        actionObj[downstreamVar+"TempFocusMult"] = 1;
         actionObj[downstreamVar+"PermFocusMult"] = 1;
         actionObj[`downstreamRate${downstreamVar}`] = 0;
     }
@@ -247,6 +246,26 @@ function checkLevelUp(actionObj, dataObj) {
             }
             statAddAmount(name, amount);
         });
+
+        for(let actionTrigger of dataObj.actionTriggers) {
+            let when = actionTrigger[0];
+            let type = actionTrigger[1];
+            let info = actionTrigger[2];
+            let extra = actionTrigger[3]; //used for numbers
+
+            if(when.indexOf("level_") >= 0) {
+                let level = parseInt(when.substring("level_".length));
+                if(actionObj.level === level) {
+                    actionTriggerHelper(type, info, extra);
+                }
+            } else if(when === "level") {
+                actionTriggerHelper(type, info, extra);
+            }
+        }
+        if(dataObj.wage > 0) {
+            actionObj.wage += dataObj.wage / 2;
+            changeJob(actionObj.actionVar);
+        }
         if(dataObj.onLevelCustom) {
             dataObj.onLevelCustom();
         }
@@ -259,6 +278,33 @@ function checkLevelUp(actionObj, dataObj) {
         return true;
     }
     return false;
+}
+
+function actionTriggerHelper(type, info, extra) {
+    if(type === "reveal") {
+        revealAction(info);
+    } else if(type === "purchase") {
+        purchaseAction(info);
+    } else if(type === "unlock") {
+        unlockAction(data.actions[info]);
+    } else if(type === "addMaxLevels") {
+        addMaxLevel(info, extra)
+    } else if(type === "revealUpgrade") {
+        revealUpgrade(info)
+    } else if(type === "addLegacy") {
+        let levelMult = 1;
+        if(info) {
+            levelMult += data.actions[info].level/10;
+        }
+        statAddAmount("legacy", extra * levelMult);
+    } else if(type === "addAC") {
+        if (data.gameState === "KTL") {
+            data.ancientCoin += extra * data.ancientCoinMultKTL;
+            data.ancientCoinGained += extra * data.ancientCoinMultKTL;
+        } else {
+            data.ancientCoin += extra;
+        }
+    }
 }
 
 function actionAddExp(actionObj) {
@@ -339,16 +385,26 @@ function purchaseAction(actionVar) {
     addLogMessage(actionVar, "purchaseAction")
 }
 
-function unveilAction(actionVar) {
+
+
+let queuedReveals = new Set();
+
+function revealAction(actionVar) {
     let actionObj = data.actions[actionVar];
     let dataObj = actionData[actionVar];
-    if (!actionObj || actionObj.visible || !actionObj.purchased) {
-        if (!actionObj) {
-            console.log('tried to unveil ' + actionVar + ' in error.');
-        }
+    if(!actionObj) {
+        console.log('tried to unveil ' + actionVar + ' in error.');
+
         return;
     }
-
+    if (actionObj.visible || !actionObj.purchased) {
+        return;
+    }
+    //don't let it be visible, but check once a second if it's allowed to be visible
+    if(dataObj.hasUpstream && !data.actions[dataObj.parentVar].visible) {
+        queuedReveals.add(actionVar);
+        return;
+    }
 
     addLogMessage(actionVar, "unlockAction")
 
@@ -357,7 +413,7 @@ function unveilAction(actionVar) {
     }
 
     actionObj.visible = true;
-    revealActionAtts(actionObj);
+    revealAttsOnAction(actionObj);
 
     if(data.actions[actionVar].automationOnReveal) {
         updateSupplyChain(actionVar);
@@ -365,7 +421,7 @@ function unveilAction(actionVar) {
 }
 
 
-function unveilUpgrade(upgradeVar) {
+function revealUpgrade(upgradeVar) {
     let upgradeObj = data.upgrades[upgradeVar];
     if(upgradeObj.visible) {
         return;
@@ -402,7 +458,7 @@ function isNeeded(actionVar, isNeededList = {}) {
     const actionObj = data.actions[actionVar];
     const dataObj = actionData[actionVar];
 
-    if (!actionObj || !actionObj.visible || !actionObj.hasUpstream) {
+    if (!actionObj || !actionObj.visible || !dataObj.hasUpstream) {
         isNeededList[actionVar] = false;
         return false;
     }
@@ -436,7 +492,7 @@ function updateSupplyChain(startActionVar) {
         const actionObj = data.actions[currentVar];
         const dataObj = actionData[currentVar];
 
-        if (!actionObj || actionObj.hasUpstream === false || !dataObj || !dataObj.parentVar) {
+        if (!actionObj || dataObj.hasUpstream === false || !dataObj || !dataObj.parentVar) {
             break;
         }
 
@@ -466,7 +522,7 @@ function updateSupplyChain(startActionVar) {
 }
 
 
-function revealActionAtts(actionObj) {
+function revealAttsOnAction(actionObj) {
     for(let onLevelAtt of actionObj.onLevelAtts) {
         revealAtt(onLevelAtt[0]);
     }
@@ -510,6 +566,19 @@ function unlockAction(actionObj) {
     actionObj.unlockCost = 0;
     actionObj.unlockTime = data.secondsPerReset; //mark when it unlocked
     let dataObj = actionData[actionVar];
+
+
+    for(let actionTrigger of dataObj.actionTriggers) {
+        let when = actionTrigger[0];
+        let type = actionTrigger[1];
+        let info = actionTrigger[2];
+        let extra = actionTrigger[3]; //used for numbers
+
+        if(when === "unlock") {
+            actionTriggerHelper(type, info, extra);
+        }
+    }
+
     if(dataObj.onUnlock) {
         dataObj.onUnlock();
     }

@@ -56,8 +56,6 @@ data.currentLog = [];
 data.currentPinned = [];
 data.maxFocusAllowed = 2;
 data.options = {};
-data.options.updateRate = 20;
-data.options.autosaveRate = 10;
 data.options.bonusRate = 3;
 data.lastVisit = Date.now();
 let chartData = []; // Stores { time: number, value: number }
@@ -69,8 +67,8 @@ data.gameSettings = {
     bonusSpeed: 1,
     stop: false,
     stopAll: false,
-    fps: 20,
-    ticksPerSecond: 20,
+    fps: 10,
+    ticksPerSecond: 10,
     ticksForSeconds:0,
     viewDeltas:false,
     viewRatio:false,
@@ -120,7 +118,7 @@ function debug() {
 
 
     //temp data corrections:
-    // unveilAction('visitShrineBehindWaterfall')
+    // revealAction('visitShrineBehindWaterfall')
     // document.getElementById('confirmKTL').checked = true;
     // initializeKTL()
 
@@ -131,9 +129,9 @@ function debug() {
     // data.displayJob = true;
 
     //only if the save has skipped the unlock point
-    // unveilAction('invest');
-    // unveilAction('feelAGentleTug');
-    // unveilAction('learnToInquire');
+    // revealAction('invest');
+    // revealAction('feelAGentleTug');
+    // revealAction('learnToInquire');
 
     //foreach action, automation on
     // for(let actionVar in data.actions) {
@@ -242,9 +240,9 @@ function debug() {
     // unlockAction(data.actions['echoKindle']);
     // statAddAmount("legacy", 385423)
 
-    // unveilAction('earthMagic');
-    // unveilAction('gossipAroundCoffee');
-    // unveilAction('hearAboutTheLich');
+    // revealAction('earthMagic');
+    // revealAction('gossipAroundCoffee');
+    // revealAction('hearAboutTheLich');
 
     // data.actions.earthMagic.unlockCost = 0;
     // levelAllCharges();
@@ -264,9 +262,6 @@ function debug() {
 }
 
 function initializeData() {
-    if(globalVisible) {
-        document.getElementById("jobDisplay").style.display = "";
-    }
     createUpgrades();
     createAndLinkNewAttribute("doom", "doom");
     createAndLinkNewAttribute("echoes", "legacy");

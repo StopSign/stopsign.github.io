@@ -18,7 +18,6 @@ actionData = {
             addResourceTo(data.actions["resolve"], actionObj.resourceToAdd);
             addResourceTo(data.actions["worry"], actionObj.resourceToAdd);
 
-
             views.scheduleUpdate('worryResourceSent', intToString(actionObj.resourceToAdd, 2), "textContent")
             views.scheduleUpdate('worryResourceTaken', intToString(actionObj.resourceToAdd, 2), "textContent")
         },
@@ -48,9 +47,9 @@ actionData = {
         efficiencyAtts:[["doom", -1]],
         extraInfo: {english:Raw.html`<br>Adds equal Fear and Bravery to this action and Resolve.<br> 
                         Amount added = 10% of Fear * Efficiency per complete.<br>`},
-        iconText: {english:Raw.html`
-        Generates Bravery, to counter the rising Doom.
-`}
+        actionTriggers: [
+            ["info", "text", "Generates Bravery, to counter the rising Doom."],
+        ]
     },
     resolve: {
         tier:0, plane:2, resourceName: "bravery",
@@ -111,9 +110,9 @@ actionData = {
         efficiencyAtts:[],
         extraInfo: {english:Raw.html`<br>Momentum Taken = 10% of current Momentum.<br>
                         Fight gain = (Momentum Taken/1e24)^.5 * Spell Power * (Teamwork/1000)^.5.`},
-        iconText: {english:Raw.html`
-        Generates Fight to gain Ancient Coins and Legacy as you get closer to killing the lich.
-`}
+        actionTriggers: [
+            ["info", "text", "Generates Fight to gain Ancient Coins and Legacy as you get closer to killing the lich."],
+        ]
     },
     fightTheEvilForces: {
         tier:0, plane:2, resourceName:"fight",
@@ -123,15 +122,15 @@ actionData = {
         actionPowerBase:1, actionPowerMult:1, actionPowerMultIncrease:1,
         unlockCost:1, visible:false, unlocked:false, isGenerator:true, generatorSpeed:1, hasUpstream: false,
         onUnlock: function() {
-            unveilAction('bridgeOfBone');
             setSliderUI("fightTheEvilForces", "bridgeOfBone", 100);
         },
         onLevelAtts:[["doom", 20]],
         expAtts:[],
         efficiencyAtts:[],
-        iconText: {english:Raw.html`
-        Doom approaches.
-`}
+        actionTriggers: [
+            ["info", "text", "Doom approaches."],
+            ["unlock", "reveal", "bridgeOfBone"]
+        ]
     },
     bridgeOfBone: {
         tier:0, plane:2, resourceName:"fight",
@@ -140,30 +139,17 @@ actionData = {
         efficiencyBase:.4, isKTL:true, purchased: true, maxLevel:10,
         unlockCost:10, visible:false, unlocked:false,
         onUnlock: function() {
-            data.ancientCoin += 5 * data.ancientCoinMultKTL;
-            data.ancientCoinGained += 5 * data.ancientCoinMultKTL;
             data.useAmuletButtonShowing = true;
-            setSliderUI("bridgeOfBone", "harvestGhostlyField", 100);
         },
-        onCompleteCustom:function() {
-            statAddAmount("legacy", 4 * (data.actions.bridgeOfBone.level/10 + 1));
-        },
-        onLevelCustom: function() {
-            if(data.actions.bridgeOfBone.level >= 3) {
-                unveilAction('harvestGhostlyField');
-                setSliderUI("bridgeOfBone", "harvestGhostlyField", 100);
-            }
-        },
-        onLevelAtts:[["legacy", 5]],
+        onLevelAtts:[["legacy", 4]],
         expAtts:[["legacy", .1]],
         efficiencyAtts:[["courage", 1], ["valor", .1], ["doom", -1]],
-        extraInfo:{english:"+4 * (1 + level/10) Legacy on complete."},
-        unlockMessage:{english:"On unlock, +5 Ancient Coins. This amount is multiplied by Hear About The Lich's level."},
-        iconText: {english:Raw.html`
-        On Unlock: +5 base Ancient Coins<br>
-        On Complete: +4 base Legacy<br>
-        Level 3: Reveal Harvest Ghostly Field
-`}
+        extraInfo:{english:"+4 * (1 + level/10) * Legacy Gain on complete."},
+        actionTriggers: [
+            ["unlock", "addAC", "", 5],
+            ["complete", "addLegacy", "bridgeOfBone", 4],
+            ["level_3", "reveal", "harvestGhostlyField"]
+        ]
     },
     harvestGhostlyField: {
         tier:0, plane:2, resourceName:"fight",
@@ -171,30 +157,15 @@ actionData = {
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.3, isKTL:true, purchased: true, maxLevel:12,
         unlockCost:1000, visible:false, unlocked:false,
-        onUnlock: function() {
-            data.ancientCoin += 8 * data.ancientCoinMultKTL;
-            data.ancientCoinGained += 8 * data.ancientCoinMultKTL;
-            setSliderUI("harvestGhostlyField", "geyserFields", 100);
-        },
-        onCompleteCustom:function() {
-            statAddAmount("legacy", 7 * (data.actions.harvestGhostlyField.level/10 + 1));
-        },
-        onLevelCustom: function() {
-            if(data.actions.harvestGhostlyField.level >= 3) {
-                unveilAction('geyserFields');
-                setSliderUI("harvestGhostlyField", "geyserFields", 100);
-            }
-        },
-        onLevelAtts:[["legacy", 8]],
+        onLevelAtts:[["legacy", 7]],
         expAtts:[["legacy", .1]],
         efficiencyAtts:[["courage", 1], ["valor", .1], ["doom", -1]],
         extraInfo:{english:"+7 * (1 + level/10) Legacy on complete."},
-        unlockMessage:{english:"On unlock, +8 Ancient Coins. This amount is multiplied by Hear About The Lich's level."},
-        iconText: {english:Raw.html`
-        On Unlock: +8 base Ancient Coins<br>
-        On Complete: +7 base Legacy<br>
-        Level 3: Reveal Geyser Fields
-`}
+        actionTriggers: [
+            ["unlock", "addAC", "", 8],
+            ["complete", "addLegacy", "harvestGhostlyField", 7],
+            ["level_3", "reveal", "geyserFields"]
+        ]
     },
     geyserFields: {
         tier:0, plane:2, resourceName:"fight", creationVersion:2,
@@ -202,29 +173,15 @@ actionData = {
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.2, isKTL:true, purchased: true, maxLevel:14,
         unlockCost:1e4, visible:false, unlocked:false,
-        onUnlock: function() {
-            data.ancientCoin += 13 * data.ancientCoinMultKTL;
-            data.ancientCoinGained += 13 * data.ancientCoinMultKTL;
-        },
-        onCompleteCustom:function() {
-            statAddAmount("legacy", 12 * (data.actions.geyserFields.level/10 + 1));
-        },
-        onLevelCustom: function() {
-            if(data.actions.geyserFields.level >= 3) {
-                unveilAction('destroySiegeEngine');
-                setSliderUI("geyserFields", "destroySiegeEngine", 100);
-            }
-        },
-        onLevelAtts:[["legacy", 7]],
+        onLevelAtts:[["legacy", 12]],
         expAtts:[["legacy", .1]],
         efficiencyAtts:[["courage", 1], ["valor", .1], ["doom", -1]],
         extraInfo:{english:"+12 * (1 + level/10) Legacy on complete."},
-        unlockMessage:{english:"On unlock, +13 Ancient Coins. This amount is multiplied by Hear About The Lich's level."},
-        iconText: {english:Raw.html`
-        On Unlock: +13 base Ancient Coins<br>
-        On Complete: +12 base Legacy<br>
-        Level 3: Reveal Destroy Siege Engine
-`}
+        actionTriggers: [
+            ["unlock", "addAC", "", 13],
+            ["complete", "addLegacy", "geyserFields", 12],
+            ["level_3", "reveal", "destroySiegeEngine"]
+        ]
     },
     destroySiegeEngine: {
         tier:0, plane:2, resourceName:"fight", creationVersion:2,
@@ -232,29 +189,15 @@ actionData = {
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.1, isKTL:true, purchased: true, maxLevel:16,
         unlockCost:1e6, visible:false, unlocked:false,
-        onUnlock: function() {
-            data.ancientCoinGained += 21 * data.ancientCoinMultKTL;
-            data.ancientCoin += 21 * data.ancientCoinMultKTL;
-        },
-        onCompleteCustom:function() {
-            statAddAmount("legacy", 20 * (data.actions.destroySiegeEngine.level/10 + 1));
-        },
-        onLevelCustom: function() {
-            if(data.actions.destroySiegeEngine.level >= 3) {
-                unveilAction('destroyEasternMonolith');
-                setSliderUI("destroySiegeEngine", "destroyEasternMonolith", 100);
-            }
-        },
         onLevelAtts:[["legacy", 20]],
         expAtts:[["legacy", .1]],
         efficiencyAtts:[["courage", 1], ["valor", .1], ["doom", -1]],
         extraInfo:{english:"+20 * (1 + level/10) Legacy on complete."},
-        unlockMessage:{english:"On unlock, +21 Ancient Coins. This amount is multiplied by Hear About The Lich's level."},
-        iconText: {english:Raw.html`
-        On Unlock: +21 base Ancient Coins<br>
-        On Complete: +20 base Legacy<br>
-        Level 3: Reveal Destroy Eastern Monolith
-`}
+        actionTriggers: [
+            ["unlock", "addAC", "", 21],
+            ["complete", "addLegacy", "destroySiegeEngine", 20],
+            ["level_3", "reveal", "destroyEasternMonolith"]
+        ]
     },
     destroyEasternMonolith: {
         tier:0, plane:2, resourceName:"fight", creationVersion:2,
@@ -263,32 +206,24 @@ actionData = {
         efficiencyBase:.05, isKTL:true, purchased: true, maxLevel:3,
         unlockCost:1e8, visible:false, unlocked:false,
         onUnlock: function() {
-            data.ancientCoinGained += 50 * data.ancientCoinMultKTL;
-            data.ancientCoin += 50 * data.ancientCoinMultKTL;
-            unveilUpgrade('rememberWhatIDid')
-            unveilUpgrade('stopBeingSoTense')
-            unveilUpgrade('createABetterFoundation')
-            unveilUpgrade('workHarder')
-            unveilUpgrade('haveBetterConversations')
-            unveilUpgrade('sparkMoreMana')
-            unveilUpgrade('studyHarder')
+            revealUpgrade('rememberWhatIDid')
+            revealUpgrade('stopBeingSoTense')
+            revealUpgrade('createABetterFoundation')
+            revealUpgrade('workHarder')
+            revealUpgrade('haveBetterConversations')
+            revealUpgrade('sparkMoreMana')
+            revealUpgrade('studyHarder')
         },
-        onCompleteCustom:function() {
-        },
-        onLevelCustom: function() {
-            if(data.actions.destroyEasternMonolith.level >= 1) {
-                unveilAction('stopDarknessRitual');
-                setSliderUI("destroyEasternMonolith", "stopDarknessRitual", 100);
-            }
-        },
-        onLevelAtts:[["legacy", 2000]],
+        onLevelAtts:[["legacy", 1000]],
         expAtts:[["legacy", .1]],
         efficiencyAtts:[["courage", 1], ["valor", .1], ["doom", -1]],
-        unlockMessage:{english:"On unlock, +50 Ancient Coins. Also, unlocks new upgrades."},
-        iconText: {english:Raw.html`
-        On Unlock: +50 base Ancient Coins<br>
-        Level 1: Reveal Stop Darkness Ritual
-`}
+        extraInfo:{english:"+1000 * (1 + level/10) Legacy on complete."},
+        actionTriggers: [
+            ["info", "text", "On Unlock: Show 7 more upgrades."],
+            ["unlock", "addAC", "", 50],
+            ["complete", "addLegacy", "destroyEasternMonolith", 1000],
+            ["level_1", "reveal", "stopDarknessRitual"]
+        ]
     },
     stopDarknessRitual: {
         tier:0, plane:2, resourceName:"fight", creationVersion:2,
@@ -296,29 +231,15 @@ actionData = {
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.04, isKTL:true, purchased: true, maxLevel:12,
         unlockCost:2e9, visible:false, unlocked:false,
-        onUnlock: function() {
-            data.ancientCoinGained += 33 * data.ancientCoinMultKTL;
-            data.ancientCoin += 33 * data.ancientCoinMultKTL;
-        },
-        onCompleteCustom:function() {
-            statAddAmount("legacy", 60 * (data.actions.stopDarknessRitual.level/10 + 1));
-        },
-        onLevelCustom: function() {
-            if(data.actions.stopDarknessRitual.level >= 3) {
-                unveilAction('protectTheSunstone');
-                setSliderUI("stopDarknessRitual", "protectTheSunstone", 100);
-            }
-        },
         onLevelAtts:[["legacy", 60]],
         expAtts:[["legacy", .1]],
         efficiencyAtts:[["courage", 1], ["valor", .1], ["doom", -1]],
         extraInfo:{english:"+60 * (1 + level/10) Legacy on complete."},
-        unlockMessage:{english:"On unlock, +33 Ancient Coins. This amount is multiplied by Hear About The Lich's level."},
-        iconText: {english:Raw.html`
-        On Unlock: +33 base Ancient Coins<br>
-        On Complete: +60 base Legacy<br>
-        Level 3: Reveal Protect The Sunstone
-`}
+        actionTriggers: [
+            ["unlock", "addAC", "", 33],
+            ["complete", "addLegacy", "stopDarknessRitual", 60],
+            ["level_3", "reveal", "protectTheSunstone"]
+        ]
     },
     protectTheSunstone: {
         tier:0, plane:2, resourceName:"fight", creationVersion:2,
@@ -326,29 +247,15 @@ actionData = {
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.03, isKTL:true, purchased: true, maxLevel:15,
         unlockCost:2e10, visible:false, unlocked:false,
-        onUnlock: function() {
-            data.ancientCoinGained += 54 * data.ancientCoinMultKTL;
-            data.ancientCoin += 54 * data.ancientCoinMultKTL;
-        },
-        onCompleteCustom:function() {
-            statAddAmount("legacy", 100 * (data.actions.protectTheSunstone.level/10 + 1));
-        },
-        onLevelCustom: function() {
-            if(data.actions.protectTheSunstone.level >= 3) {
-                unveilAction('silenceDeathChanters');
-                setSliderUI("protectTheSunstone", "silenceDeathChanters", 100);
-            }
-        },
         onLevelAtts:[["legacy", 100]],
         expAtts:[["legacy", .1]],
         efficiencyAtts:[["courage", 1], ["valor", .1], ["doom", -1]],
         extraInfo:{english:"+100 * (1 + level/10) Legacy on complete."},
-        unlockMessage:{english:"On unlock, +54 Ancient Coins. This amount is multiplied by Hear About The Lich's level."},
-        iconText: {english:Raw.html`
-        On Unlock: +54 base Ancient Coins<br>
-        On Complete: +100 base Legacy<br>
-        Level 3: Reveal Silence Death Chanters
-`}
+        actionTriggers: [
+            ["unlock", "addAC", "", 54],
+            ["complete", "addLegacy", "protectTheSunstone", 100],
+            ["level_3", "reveal", "silenceDeathChanters"]
+        ]
     },
     silenceDeathChanters: {
         tier:0, plane:2, resourceName:"fight",
@@ -356,24 +263,15 @@ actionData = {
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.02, isKTL:true, purchased: true, maxLevel:18,
         unlockCost:2e11, visible:false, unlocked:false,
-        onUnlock: function() {
-            data.ancientCoinGained += 87 * data.ancientCoinMultKTL;
-            data.ancientCoin += 87 * data.ancientCoinMultKTL;
-        },
-        onCompleteCustom:function() {
-            statAddAmount("legacy", 150 * (data.actions.silenceDeathChanters.level/10 + 1));
-        },
-        onLevelCustom: function() {
-        },
         onLevelAtts:[["legacy", 150]],
         expAtts:[["legacy", .1]],
         efficiencyAtts:[["courage", 1], ["valor", .1], ["doom", -1]],
         extraInfo:{english:"+150 * (1 + level/10) Legacy on complete."},
-        unlockMessage:{english:"On unlock, +87 Ancient Coins. This amount is multiplied by Hear About The Lich's level."},
-        iconText: {english:Raw.html`
-        On Unlock: +87 base Ancient Coins<br>
-        On Complete: +150 base Legacy
-`}
+        actionTriggers: [
+            ["unlock", "addAC", "", 87],
+            ["complete", "addLegacy", "silenceDeathChanters", 150],
+            // ["level_3", "reveal", "breakFleshBarricade"]
+        ]
     },
     breakFleshBarricade: {
         tier:0, plane:2, resourceName:"fight",
@@ -389,7 +287,7 @@ actionData = {
             data.legacy += 1;
         },
         onLevelCustom: function() {
-            unveilAction('');
+            revealAction('');
         },
         onLevelAtts:[],
         expAtts:[],
@@ -411,7 +309,7 @@ actionData = {
             data.legacy += 1;
         },
         onLevelCustom: function() {
-            unveilAction('');
+            revealAction('');
         },
         onLevelAtts:[],
         expAtts:[],
@@ -433,7 +331,7 @@ actionData = {
             data.legacy += 1;
         },
         onLevelCustom: function() {
-            unveilAction('');
+            revealAction('');
         },
         onLevelAtts:[],
         expAtts:[],
@@ -455,7 +353,7 @@ actionData = {
             data.legacy += 1;
         },
         onLevelCustom: function() {
-            unveilAction('');
+            revealAction('');
         },
         onLevelAtts:[],
         expAtts:[],
@@ -477,7 +375,7 @@ actionData = {
             data.legacy += 1;
         },
         onLevelCustom: function() {
-            unveilAction('');
+            revealAction('');
         },
         onLevelAtts:[],
         expAtts:[],
@@ -499,7 +397,7 @@ actionData = {
             data.legacy += 1;
         },
         onLevelCustom: function() {
-            unveilAction('');
+            revealAction('');
         },
         onLevelAtts:[],
         expAtts:[],
@@ -521,7 +419,7 @@ actionData = {
             data.legacy += 1;
         },
         onLevelCustom: function() {
-            unveilAction('');
+            revealAction('');
         },
         onLevelAtts:[],
         expAtts:[],
@@ -543,7 +441,7 @@ actionData = {
             data.legacy += 1;
         },
         onLevelCustom: function() {
-            unveilAction('');
+            revealAction('');
         },
         onLevelAtts:[],
         expAtts:[],
@@ -565,7 +463,7 @@ actionData = {
             data.legacy += 1;
         },
         onLevelCustom: function() {
-            unveilAction('');
+            revealAction('');
         },
         onLevelAtts:[],
         expAtts:[],
@@ -587,7 +485,7 @@ actionData = {
             data.legacy += 1;
         },
         onLevelCustom: function() {
-            unveilAction('');
+            revealAction('');
         },
         onLevelAtts:[],
         expAtts:[],
@@ -609,7 +507,7 @@ actionData = {
             data.legacy += 1;
         },
         onLevelCustom: function() {
-            unveilAction('');
+            revealAction('');
         },
         onLevelAtts:[],
         expAtts:[],
@@ -631,7 +529,7 @@ actionData = {
             data.legacy += 1;
         },
         onLevelCustom: function() {
-            unveilAction('');
+            revealAction('');
         },
         onLevelAtts:[],
         expAtts:[],
@@ -653,7 +551,7 @@ actionData = {
             data.legacy += 1;
         },
         onLevelCustom: function() {
-            unveilAction('');
+            revealAction('');
         },
         onLevelAtts:[],
         expAtts:[],
@@ -675,7 +573,7 @@ actionData = {
             data.legacy += 1;
         },
         onLevelCustom: function() {
-            unveilAction('');
+            revealAction('');
         },
         onLevelAtts:[],
         expAtts:[],
@@ -697,7 +595,7 @@ actionData = {
             data.legacy += 1;
         },
         onLevelCustom: function() {
-            unveilAction('');
+            revealAction('');
         },
         onLevelAtts:[],
         expAtts:[],
@@ -719,7 +617,7 @@ actionData = {
             data.legacy += 1;
         },
         onLevelCustom: function() {
-            unveilAction('');
+            revealAction('');
         },
         onLevelAtts:[],
         expAtts:[],
@@ -741,7 +639,7 @@ actionData = {
             data.legacy += 1;
         },
         onLevelCustom: function() {
-            unveilAction('');
+            revealAction('');
         },
         onLevelAtts:[],
         expAtts:[],
@@ -763,7 +661,7 @@ actionData = {
             data.legacy += 1;
         },
         onLevelCustom: function() {
-            unveilAction('');
+            revealAction('');
         },
         onLevelAtts:[],
         expAtts:[],
@@ -785,7 +683,7 @@ actionData = {
             data.legacy += 1;
         },
         onLevelCustom: function() {
-            unveilAction('');
+            revealAction('');
         },
         onLevelAtts:[],
         expAtts:[],
@@ -807,7 +705,7 @@ actionData = {
             data.legacy += 1;
         },
         onLevelCustom: function() {
-            unveilAction('');
+            revealAction('');
         },
         onLevelAtts:[],
         expAtts:[],
@@ -829,7 +727,7 @@ actionData = {
             data.legacy += 1;
         },
         onLevelCustom: function() {
-            unveilAction('');
+            revealAction('');
         },
         onLevelAtts:[],
         expAtts:[],
@@ -851,7 +749,7 @@ actionData = {
             data.legacy += 1;
         },
         onLevelCustom: function() {
-            unveilAction('');
+            revealAction('');
         },
         onLevelAtts:[],
         expAtts:[],
@@ -873,7 +771,7 @@ actionData = {
             data.legacy += 1;
         },
         onLevelCustom: function() {
-            unveilAction('');
+            revealAction('');
         },
         onLevelAtts:[],
         expAtts:[],
@@ -894,7 +792,7 @@ actionData = {
             data.legacy += 1;
         },
         onLevelCustom: function() {
-            unveilAction('');
+            revealAction('');
         },
         onLevelAtts:[],
         expAtts:[],

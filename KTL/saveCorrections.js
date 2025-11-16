@@ -65,6 +65,12 @@ function saveFileCorrection(saveVersionFromLoad) {
             if(actionObj.unlocked || actionObj.prevUnlockTime || actionObj.unlockTime || actionObj.highestLevel > 0) {
                 actionObj.hasBeenUnlocked = true;
             }
+
+            for(let downstreamVar of dataObj.downstreamVars) {
+                if(!isAttentionLine(actionVar, downstreamVar)) {
+                    actionObj[downstreamVar + "TempFocusMult"] = 1;
+                }
+            }
         }
         data.upgrades.buyNicerStuff.upgradesAvailable = 3;
         if(data.upgrades.buyNicerStuff.upgradePower === 3) {
@@ -79,6 +85,7 @@ function saveFileCorrection(saveVersionFromLoad) {
         if(data.upgrades.retrieveMyUnusedResources.upgradePower === 3) {
             data.upgrades.retrieveMyUnusedResources.isFullyBought = true;
         }
+
     }
     return refundAmount;
 }
@@ -88,11 +95,11 @@ function saveFileCorrectionAfterLoad(saveVersionFromLoad) {
     if(saveVersionFromLoad <= 2) {
         if(data.actions.studyAdvancedEarthMagic.level >= 2) {
             purchaseAction('reinforceArmor')
-            unveilAction('reinforceArmor');
+            revealAction('reinforceArmor');
         }
         if(data.actions.studyAdvancedEarthMagic.level >= 3) {
             purchaseAction('restoreEquipment')
-            unveilAction('restoreEquipment');
+            revealAction('restoreEquipment');
         }
     }
 }

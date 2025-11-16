@@ -244,36 +244,12 @@ function tickGameObject(actionVar) {
         }
     }
 
-    // Reset and calculate total resources sent to all downstream actions this tick.
-    //TODO calculate twice - once for the values, and once for dividing the values between available resources if needed
-    actionObj.totalSend = 0;
-    for (let downstreamVar of dataObj.downstreamVars) {
-        let downstreamObj = data.actions[downstreamVar];
-        let downstreamDataObj = actionData[downstreamVar];
-
-        if (!downstreamObj || !downstreamObj.visible) continue;
-
-        if(!downstreamObj.hasUpstream) {
-            if (!downstreamObj.unlocked && downstreamObj.unlockCost <= 0 && (!downstreamDataObj.isUnlockCustom || downstreamDataObj.isUnlockCustom())) {
-                unlockAction(downstreamObj);
-            }
-            continue;
-        }
-
-        let sliderSetting = data.actions[actionVar][`downstreamRate${downstreamVar}`] / 100;
-        let taken = calculateTaken(actionVar, downstreamVar, actionObj, sliderSetting);
-
-        // Keep track of the total sent out per second for the final calculation.
-        actionObj.totalSend += taken * data.gameSettings.ticksPerSecond;
-
-        // Give the resource to the downstream action.
-        giveResourceTo(actionObj, downstreamObj, taken);
-    }
+    calculateTaken(actionVar, true);
 
     //Calc resource retrieval
 	let resourceParentVar = actionData[actionObj.actionVar].parentVar;
     let isQuiet = actionObj.unlocked && isMaxLevel && actionObj.resourceIncrease === 0 && actionObj.totalSend === 0;
-    if(!isQuiet || !actionObj.hasUpstream || data.upgrades.retrieveMyUnusedResources.upgradePower === 0 || resourceHeads[actionObj.resourceName] === actionVar || data.gameState === "KTL" || actionVar === "reinvest") {
+    if(!isQuiet || !dataObj.hasUpstream || data.upgrades.retrieveMyUnusedResources.upgradePower === 0 || resourceHeads[actionObj.resourceName] === actionVar || data.gameState === "KTL" || actionVar === "reinvest") {
         actionObj.resourceRetrieved = 0;
     } else {
         actionObj.resourceRetrieved = (actionObj.resource/100 * [0, 1, 2, 5][data.upgrades.retrieveMyUnusedResources.upgradePower] + 10) / data.gameSettings.ticksPerSecond;
@@ -298,27 +274,90 @@ let resourceHeads = {
     "mana":"poolMana"
 }
 
-function calculateTaken(actionVar, downstreamVar, actionObj, mult) {
-    let permFocusMult = actionObj[downstreamVar + "PermFocusMult"];
-    let tempFocusMult = actionObj[downstreamVar + "TempFocusMult"];
+//returns downstream ratios, including slider, tierMult, & focus mults
+function calculateDownstreamResources(actionVar) {
+    const actionObj = data.actions[actionVar];
+    const dataObj = actionData[actionVar];
+    const calculatedRatios = {};
+    let totalRatio = 0;
 
-    let totalTakenMult = actionObj.tierMult() * (actionObj.efficiency / 100) * permFocusMult * tempFocusMult *
-        (isAttentionLine(actionVar, downstreamVar) ? tempFocusMult : 1);
-    if (totalTakenMult > 1) {
-        totalTakenMult = 1; // Cap at 100%/s
+    for (let downstreamVar of dataObj.downstreamVars) {
+        const sliderSetting = data.actions[actionVar][`downstreamRate${downstreamVar}`] / 100;
+        const permFocusMult = actionObj[downstreamVar + "PermFocusMult"];
+        const tempFocusMult = actionObj[downstreamVar + "TempFocusMult"];
+
+        const baseRate = sliderSetting * actionObj.tierMult();
+        const effectiveRate = baseRate * permFocusMult * tempFocusMult;
+
+        calculatedRatios[downstreamVar] = effectiveRate;
+        totalRatio += effectiveRate;
     }
-    let toReturn = actionObj.resource / data.gameSettings.ticksPerSecond * totalTakenMult * mult;
-    return toReturn < .0000001 ? 0 : toReturn;
+
+    const finalRatios = {};
+    const normalizationFactor = Math.max(1, totalRatio);
+
+    for (let downstreamVar of dataObj.downstreamVars) {
+        finalRatios[downstreamVar] = calculatedRatios[downstreamVar] / normalizationFactor;
+    }
+
+    return finalRatios;
 }
 
+function calculateTaken(actionVar, shouldGive) {
+    let ratios = calculateDownstreamResources(actionVar);
+
+    let toReturn = {};
+    let actionObj = data.actions[actionVar];
+    actionObj.totalSend = 0;
+    let dataObj = actionData[actionVar];
+    let resourceToSplit = actionObj.resource;
+    for (let downstreamVar of dataObj.downstreamVars) {
+        let downstreamObj = data.actions[downstreamVar];
+        let downstreamDataObj = actionData[downstreamVar];
+
+        if (!downstreamObj || !downstreamObj.visible) continue;
+
+        if(!downstreamDataObj.hasUpstream) {
+            if (!downstreamObj.unlocked && downstreamObj.unlockCost <= 0) {
+                unlockAction(downstreamObj);
+            }
+            continue;
+        }
+
+        let taken = ratios[downstreamVar] * resourceToSplit / data.gameSettings.ticksPerSecond;
+        if(taken < .0000001) {
+            taken = 0;
+        }
+
+        // Keep track of the total sent out per second for the final calculation.
+        actionObj.totalSend += taken * data.gameSettings.ticksPerSecond;
+        toReturn[downstreamVar] = taken;
+
+        if(shouldGive) {
+            giveResourceTo(actionObj, downstreamObj, taken);
+        }
+    }
+    return toReturn;
+}
 
 function checkProgressCompletion(actionObj, dataObj) {
 	function isDoneLeveling() {
 		return actionObj.maxLevel !== undefined && actionObj.level >= actionObj.maxLevel && !dataObj.generatesPastMax;
-	};
+	}
 	
     if(actionObj.progress >= actionObj.progressMax && (!isDoneLeveling())) {
         actionObj.progress -= actionObj.progressMax;
+
+        for(let actionTrigger of dataObj.actionTriggers) {
+            let when = actionTrigger[0];
+            let type = actionTrigger[1];
+            let info = actionTrigger[2];
+            let extra = actionTrigger[3];
+            if(when === "complete") {
+                actionTriggerHelper(type, info, extra);
+            }
+        }
+
         if(dataObj.onCompleteCustom) {
             dataObj.onCompleteCustom();
         }
@@ -360,7 +399,7 @@ function addResourceTo(downstreamObj, amount) {
         downstreamObj.unlockCost -= amount;
         amount = 0;
     }
-    if (!downstreamObj.unlocked && downstreamObj.unlockCost <= 0 && (!downstreamDataObj.isUnlockCustom || downstreamDataObj.isUnlockCustom())) {
+    if (!downstreamObj.unlocked && downstreamObj.unlockCost <= 0) {
         amount = -1 * downstreamObj.unlockCost; // Get the leftovers back.
         unlockAction(downstreamObj);
         downstreamObj.unlockCost = 0;
@@ -370,7 +409,7 @@ function addResourceTo(downstreamObj, amount) {
     downstreamObj.resource += amount;
 
     // The visual increase rate is calculated here for actions with smooth upstream flow.
-    if (downstreamObj.hasUpstream) {
+    if (downstreamDataObj.hasUpstream) {
         downstreamObj.resourceIncrease += amount * data.gameSettings.ticksPerSecond;
     }
 }

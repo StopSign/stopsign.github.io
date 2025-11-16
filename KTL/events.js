@@ -50,6 +50,9 @@ function validateInput(fromAction, toAction) {
 }
 function downstreamNumberChanged(fromAction, toAction) {
     let newValue = document.getElementById(fromAction + "NumInput" + toAction).value;
+    if(data.gameState === "KTL") {
+        return;
+    }
     setSliderUI(fromAction, toAction, newValue); //number input changed
 }
 
@@ -57,7 +60,8 @@ function toggleAllZero(actionVar) {
     let dataObj = actionData[actionVar];
     dataObj.downstreamVars.forEach(function (toAction) {
         let downstreamObj = data.actions[toAction];
-        if(!downstreamObj || !downstreamObj.hasUpstream || !downstreamObj.visible) {
+        let downstreamDataObj = actionData[toAction];
+        if(!downstreamObj || !downstreamDataObj.hasUpstream || !downstreamObj.visible) {
             return;
         }
         setSliderUI(actionVar, toAction, 0); //0 button
@@ -67,7 +71,8 @@ function toggleAllHundred(actionVar) {
     let dataObj = actionData[actionVar];
     dataObj.downstreamVars.forEach(function (toAction) {
         let downstreamObj = data.actions[toAction];
-        if(!downstreamObj || !downstreamObj.hasUpstream || !downstreamObj.visible) {
+        let downstreamDataObj = actionData[toAction];
+        if(!downstreamObj || !downstreamDataObj.hasUpstream || !downstreamObj.visible) {
             return;
         }
         setSliderUI(actionVar, toAction, 100); //100 button
@@ -153,6 +158,7 @@ function centerScreen() {
 }
 
 function hoveringIcon(actionVar) {
+    replaceIconText(actionVar);
     actionData[actionVar].hoveringIcon = true;
 }
 function stopHoveringIcon(actionVar) {
@@ -453,6 +459,12 @@ function clickActionMenu(actionVar, menuVar) {
     views.updateVal(`${actionVar}_${menuVar}MenuButton`, "var(--selection-color)", "style.backgroundColor");
 
     actionObj.currentMenu = menuVar;
+
+    //if story is clicked, clear the color
+    if(menuVar === "story") {
+        views.updateVal(`${actionVar}_${menuVar}MenuButton`, "", "style.color");
+        actionObj.readStory = data.saveVersion;
+    }
 }
 
 function clickMenuButton() {

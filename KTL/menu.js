@@ -308,7 +308,7 @@ function createOptionsMenu() {
     
     <div style="display:flex;align-items:center;gap:10px;">
         <label for="FPSSlider" style="font-size:14px;">FPS: <span id="sliderValue" style="font-weight:bold;">20</span></label>
-        <input type="range" id="FPSSlider" min="1" max="60" value="20" oninput="updateSliderDisplay(this.value)" style="flex:1;cursor:pointer;">
+        <input type="range" id="FPSSlider" min="1" max="20" value="20" oninput="updateSliderDisplay(this.value)" style="flex:1;cursor:pointer;">
     </div>
     <p style="margin:0;font-size:13px;">Auto save every 20 seconds and on pause, but if you want a button to click:</p>
     <button onclick="save()" style="padding:10px 16px;background:#007BFF;color:#fff;border:none;border-radius:4px;font-size:14px;cursor:pointer;width:160px;">Save</button>
@@ -342,7 +342,7 @@ function createOptionsMenu() {
 
 function updateSliderDisplay(currentValue) {
     // recalcInterval(currentValue);
-    data.gameSettings.ticksPerSecond = parseInt(currentValue);
+    data.gameSettings.fps = parseInt(currentValue);
     document.getElementById('sliderValue').textContent = currentValue;
 }
 
@@ -456,7 +456,7 @@ function toggleAdvancedSliders() {
         for(let actionVar in data.actions) {
             let dataObj = actionData[actionVar];
             for (let downstreamVar of dataObj.downstreamVars) {
-                if(data.actions[downstreamVar].hasUpstream) {
+                if(actionData[downstreamVar].hasUpstream) {
                     setSliderUI(actionVar, downstreamVar, convertToNearest(data.actions[actionVar][`downstreamRate${downstreamVar}`]));
                 }
             }
@@ -564,12 +564,12 @@ function createChangelogMenu() {
         <div class="menuTitle">Changelog</div>
         <div class="menuSeparator"></div><br>
         v2.0.11 11/3 (current):<br>
+        <ul>
             <li>Retrieve My Unused resources moves to parent (thanks Guri). The effect is x10 as a result</li>
             <li>Fixed border color highlight</li>
             <li>Excess progress on max level goes back to the action's resource (thanks Guri). </li>
             <li>Actions dim over 3 seconds instead of instant</li>
             <li>Action submenus (Info, Stats, Story) can be scrolled on mobile</li>
-        <ul>
         </ul><br>
         v2.0.10 11/2:<br>
         <ul>

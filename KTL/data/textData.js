@@ -12,6 +12,7 @@ function processActionStoriesXML() {
     for (const actionNode of actionNodes) {
         const actionName = actionNode.tagName;
         const textElement = actionNode.querySelector(language);
+        const storyVersion = actionNode.querySelector("version");
 
         if (textElement) {
             if (!actionData[actionName]) {
@@ -25,6 +26,11 @@ function processActionStoriesXML() {
             }
 
             actionData[actionName].storyText.english = englishText;
+            if(!storyVersion) {
+                console.log(`Error: Forgot story version for ${actionName}`);
+                continue;
+            }
+            actionData[actionName].storyVersion = parseInt(storyVersion.textContent);
         }
     }
 }
@@ -32,6 +38,7 @@ function processActionStoriesXML() {
 const actionTextData = `
 <actionStories>
     <overclock>
+        <version>1</version>
         <english><![CDATA[
             (See Backstory in Menu -> Backstory)<br><br> 
             
@@ -50,6 +57,7 @@ const actionTextData = `
     </overclock>
     
     <reflect> 
+        <version>1</version>
         <english><![CDATA[
             I sat down and closed my eyes, and thought about who I was. I was a hidden refugee, unhunted and obscure. I was a man grown, born from parents who loved me, a village that taught me, and a country that I shared the curse's burden with. I was a soldier, who had seen far too many die without ever swinging my sword once in combat. Gods, the way the black fire consum- I shook myself.<br><br>
             
@@ -64,6 +72,7 @@ const actionTextData = `
     </reflect>
     
     <distillInsight>
+        <version>1</version>
         <english><![CDATA[
             I managed some form of abstract thoughts, watching how I was thinking. It was difficult, and required immense concentration, but as I held the concept and momentum continued to flow to it, I found the additional concentration made the "container" for Reflection smaller, more compact, more defined - I had a better target to aim for, it felt, and a better understanding of how momentum should sit inside that container.<br><br>
             
@@ -72,6 +81,7 @@ const actionTextData = `
     </distillInsight>
     
     <harnessOverflow>
+        <version>1</version>
         <english><![CDATA[
             As my awareness and concentration grew, I realized a new truth about my ability: it was spinning. My increasing awareness was able to get a feel for the nature of the movement contained with Overclock, and I found that it was not like a waterfall, but instead like a whirlpool. The momentum - from wherever Overclock pulled it from - was cycling in a shape I could not yet recognize. The effects I had been feeling - the pushes to act - were the small splashes of conceptual momentum falling outside the vortex. I had been directing the main stream, but there were plenty of splashes that didn't immediately coalesce into it.<br><br>
             
@@ -83,6 +93,7 @@ const actionTextData = `
     
     
     <takeNotes>
+        <version>1</version>
         <english><![CDATA[
             I started being overwhelmed with all the different findings. After gathering some bark and charcoal, I resumed to my internal exploration armed with the power to keep notes.<br><br>
             
@@ -96,8 +107,9 @@ const actionTextData = `
     
     
     <bodyAwareness>
+        <version>1</version>
         <english><![CDATA[
-            Momentum is the measure of an object's motion, but it also propels all things forward. I had been sitting still, but as I became afflicted with curiosity, I stood up and started moving, paying attention to my body. I had to split my focus from my mental self to my physical self, and Overclock responded accordingly, giving me a new direction - a new main stream - to direct the momentum into.<br><br>
+            Momentum is the measure of an object's motion; the act of momentum propels all things forward. I had been sitting still, but as I became afflicted with curiosity, I stood up and started moving, paying attention to my body. I had to split my focus from my mental self to my physical self, and Overclock responded accordingly, giving me a new direction - a new main stream - to direct the momentum into.<br><br>
             
             With increased awareness, I could notice more eddies and knots in the flow within Overclock, and with focus I could start to smooth them out, letting it spin with more regularity. I also noticed that as the vortex of momentum being generated grew, so too did its instability - more awareness would still grant me further insight for a while yet.<br><br>
             
@@ -107,6 +119,7 @@ const actionTextData = `
     
     
     <travelOnRoad>
+        <version>1</version>
         <english><![CDATA[
             As I set off with purpose, I felt Body Awareness respond accordingly, accepting more momentum down into its whirlpool before it felt closed off, and instead became a lazily spinning pool - I shifted the flow more towards the traveling itself, and started to find the familiar skips in my steps as I walked through the sparse forest and rolling hills on my way to the outpost.<br><br>
             
@@ -116,6 +129,7 @@ const actionTextData = `
     
     
     <travelToOutpost>
+        <version>1</version>
         <english><![CDATA[
             Being on a paved road afforded me the leniency of not needing to watch every step, and my mind felt free to wander accordingly. Using the peace of the road, I let it wander to memories I had been putting off: the Ashmarch. I slowed down at first to reflect on how I wanted to remember it, and slowed further to direct momentum to aid me in the memories, but I reached the fork in the road announcing the outpost being close by before the sun had moved much more in the sky.<br><br>
             
@@ -129,6 +143,7 @@ const actionTextData = `
     
     
     <remember>
+        <version>1</version>
         <english><![CDATA[
             The Ashmarch was a time of horrors, and even though I intended to confront the horror that I had experienced with the peace of the journey on the road, it still proved too much and nearly froze me altogether. So, I started with something I felt more comfortable with: remembering how we got there.<br><br>
             
@@ -150,6 +165,7 @@ const actionTextData = `
     
     
     <meetVillageLeaderScott>
+        <version>1</version>
         <english><![CDATA[
             The old man introduced himself as Scott, the village leader. Scott came across as a happy, untroubled man, looking at me with kind eyes. He was patient as I twiched to every noise, and thankfully avoided questions about my past. He told me not to make trouble - that this outpost was overdue to become a named village with how it had grown, but still gossiped about everything new. He also said that his self-assigned title was village leader because the paperwork from the capitol hadn't gone through to provide them an actual name just yet, but this place had grown beyond being an outpost for some time.<br><br>
             
@@ -165,6 +181,7 @@ const actionTextData = `
     
     
     <watchBirds>
+        <version>1</version>
         <english><![CDATA[
             Over the next few days I fell into a routine of journeying to the outpost, enjoying the feeling of the momentum moving with me into the other activities I was starting to physically repeat. I found the thicket with colorful birds, and though I didn't have my notes with me, I could observe what I could.<br><br>
             
@@ -179,6 +196,7 @@ const actionTextData = `
     
     
     <catchAScent>
+        <version>1</version>
         <english><![CDATA[
             The scent was elusive, and not present all days. When the wind shifted and I caught the scent, it was a sweet and enticing smell. I started paying closer attention to where in the forest I was catching the smell, and after a few days I was able to roughly figure out a direction to head towards. Unfortunately, the path led me to a cliff that I could not scale. While I thought I could explore further and find a path up the cliff, at the moment this was as far as I could get.<br><br>
             
@@ -188,6 +206,7 @@ const actionTextData = `
     
     
     <helpScottWithChores>
+        <version>1</version>
         <english><![CDATA[
             (WIP)<br>
             I was making gold again after living for months on only what I could make myself, and though it was a small amount to start, it helped me gain recognition of the village, and be recognized in turn. The chores Scott asked me for were varied, and I steadily learned who was who in the town.<br><br>
@@ -199,6 +218,7 @@ const actionTextData = `
     
     
     <makeMoney>
+        <version>1</version>
         <english><![CDATA[
             Making money was an interesting action for momentum to latch onto. It seemed to be an endless vortex, consuming momentum as I worked, albeit inefficiently compared to other actions. My ability to work increased over time, and I got more gold for the increases as a result. Feeling my pockets heavier through the efforts of my own actions gave me a sense of accomplishment - and I cannot deny that it also gave me a sense of greed. These feelings combined gave me an ambition towards making more money. With Overclock's momentum pushing me forward, I was growing into becoming the equal of many workers at once. I resolved to take jobs that paid by the task, so that I could take advantage of the increasing speed with which I did tasks.<br><br>
             
@@ -207,6 +227,7 @@ const actionTextData = `
     </makeMoney>
     
     <spendMoney>
+        <version>1</version>
         <english><![CDATA[
             (WIP)
             The market is big, but my access was limited. There seemed to be unspoken rules before a merchant would let me access their wares. For now, I could buy from small street stalls at the edge of the market. I bought iron nails to lower the rattling of wind in my cabin, and bedding and blankets to make my nights easier, and my sleep more restful. Curiously, they would not sell any of the food to me - perhaps I was simply far too poor to afford it. The economy of such a town was strangely deep, and I wondered what was happening.
@@ -214,6 +235,7 @@ const actionTextData = `
     </spendMoney>
     
     <checkNoticeBoard>
+        <version>1</version>
         <english><![CDATA[
             (WIP)
             Scott pointed me to the board, and it was full of information - too much, in fact. The notices were varied, and piles deep.
@@ -221,6 +243,7 @@ const actionTextData = `
     </checkNoticeBoard>
     
     <talkWithScott>
+        <version>1</version>
         <english><![CDATA[
             (WIP)
             "Oh wow, you actually want to know about me? Well, I've been here a long time."<br><br>
@@ -230,6 +253,7 @@ const actionTextData = `
     </talkWithScott>
     
     <learnToStayStill>
+        <version>1</version>
         <english><![CDATA[
             (WIP)
             The first step in how to create your own magic: Stay Still. I had been trying not to do this, but with the instructions of the hermit, I found new cause to try again. I don't hide my struggle with the task, and the old man scoffs.<br><br>
@@ -242,6 +266,7 @@ const actionTextData = `
     
     
     <visitShrineBehindWaterfall>
+        <version>1</version>
         <english><![CDATA[
             (WIP)
             You pay respect to the shrine, and feel your amulet resonate with feelings around this shrine.
@@ -249,6 +274,7 @@ const actionTextData = `
     </visitShrineBehindWaterfall>
     
     <hearAboutTheLich>
+        <version>1</version>
         <english><![CDATA[
             (WIP)
             It is my worst nightmare become reality; the lich has returned. My lost home country, Sovvgor, had only ever delayed the lich with the Emperor's Curse. All I had known, all the horror I had witnessed... was only a delay. Perhaps that situation was engineered by the lich in the background, in order to get around the blockade of the Curse.<br><br>
@@ -266,6 +292,7 @@ const actionTextData = `
     </hearAboutTheLich>
     
 	<feelAGentleTug>
+        <version>1</version>
         <english><![CDATA[
             (WIP)
             Familiarity with the crossroads has me noticing something changing; my amulet is falling slightly to the left as I walk, and I take it off and hold it up by the chain - it still moves gently, being pulled gently into a direction in the woods. I decide to follow its guidance.
@@ -274,6 +301,7 @@ const actionTextData = `
     
     
 	<leaveTheOpenRoad>
+        <version>1</version>
         <english><![CDATA[
             (WIP)
             I go through a bunch of forest, holding my amulet up for directions here and there. It's tough.
@@ -282,6 +310,7 @@ const actionTextData = `
     
     
 	<findOverlook>
+        <version>1</version>
         <english><![CDATA[
             (WIP)
             I see a mountain with a cliff, and I decide to climb it. At the top, I can see across vast swathes of wilderness and little else. I hold up my amulet again for the direction and look closer at the tops of the trees I can see in that way. As I'm concentrating, I can suddenly distinguish a building standing out. As I trace the outline of the building with my vision, it reveals a full town, hidden in the wilderness. Deciding to follow my amulet's lead, I take the layout of the forest to get there and prepare to go.
@@ -290,6 +319,7 @@ const actionTextData = `
     
     
 	<discoverBurntTown>
+        <version>1</version>
         <english><![CDATA[
             (WIP)
             It's a large town, clearly having undergone a very large fire some time in the past, likely a few years ago. Ivy has already consumed this place, and I wonder why I was able to get access - perhaps my amulet, as it was the that led the way.
@@ -298,6 +328,7 @@ const actionTextData = `
     
     
 	<feelTheDespair>
+        <version>1</version>
         <english><![CDATA[
             (WIP)
             The town is scarred. I can see it in the way some of the standing buildings have gashes in them, in the way that doors and windows were boarded up. Whatever took this place, it was no accidental fire.
@@ -306,6 +337,7 @@ const actionTextData = `
     
     
 	<repairShatteredShrine>
+        <version>1</version>
         <english><![CDATA[
             (WIP)
             A shrine is not just damaged, but destroyed. 
@@ -314,6 +346,7 @@ const actionTextData = `
     
     
 	<stepThroughAsh>
+        <version>1</version>
         <english><![CDATA[
             (WIP)
             Inside a large building with burnt stone walls still standing, I found a floor coated in ash, untouched by the elements. This place had a raging fire inside of it, and I didn't know why. Well, that wasn't true - I knew why, I just refused to accept it; it reminded me too much of the Ashmarch, when the ash I walked through was borne from demons, the fire raining upon us... and my fellow countrymen. I stopped at the threshold and steeled myself. I banished the memories momentarily - this was not the Ashmarch. This was a different tragedy, and I had yet to identify the nature of it. With each step I walked, my emotions rose up, almost overcoming me. I had a lot to think about.
@@ -322,6 +355,7 @@ const actionTextData = `
 	
     
 	<graspTheTragedy>
+        <version>1</version>
         <english><![CDATA[
             (WIP)
             I let myself see past the veil of my memory, and what I found was a kind of relief: there were no bones in this place. There were remnants of shelving, burnt paper with a uniform layout, glass, and frames - it was records and art that was destroyed in this place. This was storage, not a last refuge. It was a tragedy nonetheless, but of a kind that was foreign enough as to let my heightened feelings pass.
@@ -330,6 +364,7 @@ const actionTextData = `
 	
 	
 	<processEmotions>
+        <version>1</version>
         <english><![CDATA[
             (WIP)
 			My emotions were in turmoil. With great concentration, I carved a path of momentum in order to handle it. 
@@ -338,6 +373,7 @@ const actionTextData = `
 	
     
 	<readTheWritten>
+        <version>1</version>
         <english><![CDATA[
             (WIP)
 			It was time to do something I had been putting off for a long time: reading my own journal, and coming to terms with what had happened to me.
@@ -346,6 +382,7 @@ const actionTextData = `
 	
     
 	<siftExcess>
+        <version>1</version>
         <english><![CDATA[
             (WIP)
 			As my emotional state calmed, I found my mind clearing as well, and with it came noticing how, when I redirected the momentum back into itself, there were smaller sets of flows that I could redirect as well. With my growing ability to multitask, it was trivial to do a little more about the efficiency of the flow.
