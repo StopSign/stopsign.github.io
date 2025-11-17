@@ -285,7 +285,7 @@ function calculateDownstreamResources(actionVar) {
     for (let downstreamVar of dataObj.downstreamVars) {
         const sliderSetting = data.actions[actionVar][`downstreamRate${downstreamVar}`] / 100;
         const permFocusMult = actionObj[downstreamVar + "PermFocusMult"];
-        const tempFocusMult = actionObj[downstreamVar + "TempFocusMult"];
+        const tempFocusMult = (isAttentionLine(actionVar, downstreamVar) ? actionObj[downstreamVar + "TempFocusMult"] : 1);
 
         const baseRate = sliderSetting * tierMult;
         const effectiveRate = baseRate * permFocusMult * tempFocusMult;

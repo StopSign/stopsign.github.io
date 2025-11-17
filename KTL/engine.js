@@ -139,7 +139,7 @@ function createAndLinkNewAction(actionVar, dataObj, downstreamVars) {
 
 
     for(let downstreamVar of dataObj.downstreamVars) {
-        actionObj[downstreamVar+"TempFocusMult"] = 1;
+        actionObj[downstreamVar+"TempFocusMult"] = 2;
         actionObj[downstreamVar+"PermFocusMult"] = 1;
         actionObj[`downstreamRate${downstreamVar}`] = 0;
     }

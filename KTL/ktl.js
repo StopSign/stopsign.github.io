@@ -294,7 +294,7 @@ function useAmulet() {
                 setSliderUI(actionObj.actionVar, downstreamVar, 0); //reset with amulet
             }
 
-            actionObj[downstreamVar + "TempFocusMult"] = 1;
+            actionObj[downstreamVar + "TempFocusMult"] = 2;
         });
 
         if (dataObj.updateMults) {
