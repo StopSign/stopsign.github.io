@@ -199,7 +199,7 @@ let actionData = {
         efficiencyAtts: [["cycle", 1]],
         actionTriggers: [
             ["unlock", "addMaxLevels", "bodyAwareness", 1],
-            ["level_1", "addMaxLevels", "harnessOverflow", 3]
+            ["level", "addMaxLevels", "harnessOverflow", 3]
         ]
     },
     travelOnRoad: {

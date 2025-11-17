@@ -250,8 +250,8 @@ function useAmulet() {
             views.updateVal(`${actionVar}${attVarObj[0]}InsideContainereff`, "none", "style.display");
             views.updateVal(`${actionVar}AttEfficiencyContainer`, "none", "style.display");
         }
+        views.updateVal(`${actionVar}UnlockText`, generateUnlockText(actionVar), "innerHTML");
     }
-
 
     //For each action, reset the base atts and set max level
     for (let actionVar in data.actions) {

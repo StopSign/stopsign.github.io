@@ -563,7 +563,11 @@ function createChangelogMenu() {
     return Raw.html`
         <div class="menuTitle">Changelog</div>
         <div class="menuSeparator"></div><br>
-        v2.0.12 11/16 (current):<br>
+        v2.0.13 11/17 (current):<br>
+        <ul>
+            <li>Fixing icon/unlock issues</li>
+        </ul><br>
+        v2.0.12 11/16:<br>
         <ul>
             <li>Reworked icon text to be dynamic. This means action reveal points will be ??? until purchased, wages will adjust to your number display setting, and Northern Wastes' legacy/AC gains will be accurate.</li>
             <li>Automation upgrades, when bought, show the correct one their text says it does.</li>

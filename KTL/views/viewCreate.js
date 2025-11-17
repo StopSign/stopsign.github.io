@@ -865,7 +865,7 @@ function actionTriggerText(type, info, extra) {
         text += `Reveal ${data.actions[info].purchased ? actionData[info].title:"???"}`
     } else if(type === "purchase") {
         if(data.actions[info].purchased) {
-            text += "<s>Purchase ${dataObj.title}</s>"
+            text += `<s>Purchase ${actionData[info].title}</s>`
         } else {
             text += `Purchase ${actionData[info].title}`
         }

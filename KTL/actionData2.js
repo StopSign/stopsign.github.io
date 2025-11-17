@@ -772,7 +772,7 @@ actionData = {
         expAtts:[],
         efficiencyAtts:[["comfort", 1]],
         actionTriggers: [
-            ["level_2", "reveal", "rememberFriends"]
+            ["level_2", "reveal", "rememberTheWar"]
         ]
     },
     readOldReligiousTexts: {
