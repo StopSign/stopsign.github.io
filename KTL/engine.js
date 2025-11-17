@@ -578,6 +578,9 @@ function unlockAction(actionObj) {
             actionTriggerHelper(type, info, extra);
         }
     }
+    if(dataObj.wage > 0) {
+        changeJob(actionObj.actionVar);
+    }
 
     if(dataObj.onUnlock) {
         dataObj.onUnlock();

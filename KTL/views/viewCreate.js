@@ -992,8 +992,6 @@ function highlightLine(borderId, lineData) {
     line.querySelector(".line-label-top").style.opacity = "1";
 }
 function unhighlightLine(borderId, lineData) {
-    data.actions[lineData.from][lineData.to + "TempFocusMult"] = 1;
-
     const line = document.getElementById(borderId);
     line.style.boxShadow = '';
     line.querySelector(".line-label-top").style.opacity = "0";
