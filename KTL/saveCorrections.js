@@ -86,6 +86,9 @@ function saveFileCorrection(saveVersionFromLoad) {
             data.upgrades.retrieveMyUnusedResources.isFullyBought = true;
         }
     }
+    if(saveVersionFromLoad <= 4) {
+        data.actions.harnessOverflow.maxLevel = 10 + data.actions.remember.level*3;
+    }
     return refundAmount;
 }
 
