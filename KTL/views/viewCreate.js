@@ -825,7 +825,9 @@ function replaceIconText(actionVar) {
         let type = actionTrigger[1];
         let info = actionTrigger[2];
         let extra = actionTrigger[3]; //used for numbers
-
+        if(type === "purchase" && data.actions[info].purchased) {
+            continue;
+        }
 
         let text = "";
         if(when === "info") {
