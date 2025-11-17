@@ -47,10 +47,9 @@ function loop() {
         } else {
             data.currentGameState.bonusTime += tickInterval * ticksProcessed;
         }
-        postMessage({ type: 'update' });
-    } else {
-        timerId = setTimeout(runMessage, 50);
+        // postMessage({ type: 'update' });
     }
+    timerId = setTimeout(runMessage, 20);
 }
 
 function runMessage() {
