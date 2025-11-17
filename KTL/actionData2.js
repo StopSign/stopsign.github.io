@@ -229,22 +229,9 @@ actionData = {
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:.001, maxLevel:5,
         unlockCost:2e31, visible:false, unlocked:false, purchased: false,
-        onUnlock: function() {
-            addMaxLevel("stepThroughAsh", 1)
-            addMaxLevel("meditate", 1)
-        },
-        onLevelCustom: function() {
-            revealAction('clearRubble')
-        },
         onLevelAtts:[["discernment", 100]],
         expAtts:[["concentration", 1], ["flow", 1], ["endurance", 1]],
         efficiencyAtts:[["curiosity", .01]],
-        unlockMessage:{english:"On unlock, +1 max level for Step Through Ash and Meditate."},
-        iconText: {english:Raw.html`
-        On Unlock: +1 max level for Step Through Ash<br>
-        On Unlock: +1 max level for Meditate<br>
-        Level 1: Reveal Clear Rubble
-`},
         actionTriggers: [
             ["unlock", "addMaxLevels", "stepThroughAsh", 1],
             ["unlock", "addMaxLevels", "meditate", 1],

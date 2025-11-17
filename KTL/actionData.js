@@ -650,19 +650,9 @@ let actionData = {
         expToLevelBase: 10, expToLevelIncrease: 1,
         efficiencyBase: .01, maxLevel: 5,
         unlockCost: 8e37, visible: false, unlocked: false, purchased: false,
-        onLevelCustom: function () {
-            revealAction('buyReadingChair');
-            revealAction('buyBed');
-        },
         onLevelAtts: [["energy", 5e7], ["comfort", 10]],
         expAtts: [["savvy", 1], ["leverage", 1]],
         efficiencyAtts: [["leverage", 1]],
-        iconText: {
-            english: Raw.html`
-        Level 1: Reveal Buy Reading Chair<br>
-        Level 1: Reveal Buy Bed
-`
-        },
         actionTriggers: [
             ["level_1", "reveal", "buyReadingChair"],
             ["level_1", "reveal", "buyBed"],

@@ -187,19 +187,9 @@ actionData = {
         expToLevelBase:3, expToLevelIncrease:1,
         efficiencyBase:.35, maxLevel:9,
         unlockCost:500, visible:false, unlocked:false, purchased: true,
-        onLevelCustom: function() {
-            revealAction('overcharge')
-            revealAction('combatSpells')
-            revealAction('recoverSpells')
-        },
         onLevelAtts:[["spark", 3]],
         expAtts:[],
         efficiencyAtts:[["integration", .05]],
-        iconText: {english:Raw.html`
-        Level 1: Reveal Overcharge<br>
-        Level 1: Reveal Combat Spells<br>
-        Level 1: Reveal Recover Spells
-`},
         actionTriggers: [
             ["level_1", "reveal", "overcharge"],
             ["level_1", "reveal", "combatSpells"],
