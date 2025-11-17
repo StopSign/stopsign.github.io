@@ -505,8 +505,8 @@ let views = {
 }
 
 function checkActionsToReveal() {
-    let itemsToProcess = [...queuedReveals];
-    queuedReveals.clear();
+    let itemsToProcess = [...data.queuedReveals];
+    data.queuedReveals.clear();
 
     for (let actionVar of itemsToProcess) {
         revealAction(actionVar);

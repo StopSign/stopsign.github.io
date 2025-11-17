@@ -255,7 +255,7 @@ function checkLevelUp(actionObj, dataObj) {
 
             if(when.indexOf("level_") >= 0) {
                 let level = parseInt(when.substring("level_".length));
-                if(actionObj.level === level) {
+                if(actionObj.level >= level) {
                     actionTriggerHelper(type, info, extra);
                 }
             } else if(when === "level") {
@@ -387,7 +387,7 @@ function purchaseAction(actionVar) {
 
 
 
-let queuedReveals = new Set();
+
 
 function revealAction(actionVar) {
     let actionObj = data.actions[actionVar];
@@ -402,7 +402,7 @@ function revealAction(actionVar) {
     }
     //don't let it be visible, but check once a second if it's allowed to be visible
     if(dataObj.hasUpstream && !data.actions[dataObj.parentVar].visible) {
-        queuedReveals.add(actionVar);
+        data.queuedReveals.add(actionVar);
         return;
     }
 

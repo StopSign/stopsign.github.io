@@ -91,9 +91,9 @@ function refreshResetLog() {
     document.getElementById("resetLogContainer").innerHTML = renderResetLog();
 }
 
-function initializeKTL() {
-    if (!document.getElementById('confirmKTL').checked ||
-        !(isDebug || (data.actions.hearAboutTheLich.level >= 1 && data.maxSpellPower >= 1))) {
+function initializeKTL(forceReset) {
+    if (!forceReset && (!document.getElementById('confirmKTL').checked ||
+        !(isDebug || (data.actions.hearAboutTheLich.level >= 1 && data.maxSpellPower >= 1)))) {
         return;
     }
     data.gameState = "KTL";

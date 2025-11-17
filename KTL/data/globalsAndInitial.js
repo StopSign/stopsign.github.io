@@ -58,6 +58,7 @@ data.maxFocusAllowed = 2;
 data.options = {};
 data.options.bonusRate = 3;
 data.lastVisit = Date.now();
+data.queuedReveals = new Set();
 let chartData = []; // Stores { time: number, value: number }
 let chartScale = 'linear'; // 'linear' or 'logarithmic'
 
