@@ -834,6 +834,8 @@ function replaceIconText(actionVar) {
                 text += `Current wage: $${intToString(data.actions[info].wage, 2)}<br>`
             } else if(type === "text") {
                 text += info + "<br>";
+            } else if(type === "cap") {
+                text += "Market Cap: " + intToString(actionData[info][extra], 3) + "<br>"
             }
         } else if(when === "unlock") {
             text += "On Unlock: "
@@ -865,7 +867,7 @@ function actionTriggerText(type, info, extra) {
         text += `Reveal ${data.actions[info].purchased ? actionData[info].title:"???"}`
     } else if(type === "purchase") {
         if(data.actions[info].purchased) {
-            text += `<s>Purchase ${actionData[info].title}</s>`
+            // text += `<s>Purchase ${actionData[info].title}</s>`
         } else {
             text += `Purchase ${actionData[info].title}`
         }
@@ -874,7 +876,8 @@ function actionTriggerText(type, info, extra) {
     } else if(type === "addMaxLevels") {
         text += `Add <b>+${extra}</b> max level${extra > 1?"s":""} to ${data.actions[info].purchased ? actionData[info].title:"???"}`
     } else if(type === "revealUpgrade") {
-        text += `Show Upgrade: ${data.upgrades[info]}`
+        console.log()
+        text += `Show Upgrade: ${upgradeData[info].title}`
     } else if(type === "addLegacy") {
         let levelMult = 1;
         if(info) {

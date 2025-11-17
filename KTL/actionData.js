@@ -13,7 +13,7 @@ function create(actionVar, downstreamVars, x, y) {
     dataObj.actionTriggers = dataObj.actionTriggers ?? [];
     dataObj.hasUpstream = dataObj.hasUpstream ?? true;
     if(dataObj.wage > 0) {
-        dataObj.actionTriggers.unshift(["level", "text", "Increase Wage +50%"]);
+        dataObj.actionTriggers.unshift(["info", "text", "On Level: Increase Wage +50%"]);
         dataObj.actionTriggers.unshift(["info", "wage", actionVar]);
     }
     if (!dataObj.addedInVersion) {
@@ -420,7 +420,7 @@ let actionData = {
         efficiencyAtts: [["ambition", 1]]
     },
     buyTravelersClothes: {
-        tier: 2, plane: 0, resourceName: "gold",
+        tier: 2, plane: 0, resourceName: "gold", title:"Buy Traveler's Clothes",
         progressMaxBase: 5e6, progressMaxIncrease: 10,
         expToLevelBase: 10, expToLevelIncrease: 1,
         efficiencyBase: .1, maxLevel: 3,
@@ -547,7 +547,7 @@ let actionData = {
         efficiencyAtts: [["confidence", .1]]
     },
     buyTravelersGear: {
-        tier: 2, plane: 0, resourceName: "gold", creationVersion: 2,
+        tier: 2, plane: 0, resourceName: "gold", creationVersion: 2, title:"Buy Traveler's Gear",
         progressMaxBase: 5e35, progressMaxIncrease: 10,
         expToLevelBase: 10, expToLevelIncrease: 1,
         efficiencyBase: .001, maxLevel: 5,
@@ -719,7 +719,7 @@ let actionData = {
     },
 
     invest: {
-        tier: 1, plane: 0, resourceName: "gold", creationVersion: 2,
+        tier: 1, plane: 0, resourceName: "gold", creationVersion: 2, investCap: 1e5,
         progressMaxBase: 10, progressMaxIncrease: 1,
         expToLevelBase: 3e8, expToLevelIncrease: 1.4,
         actionPowerBase: 1, actionPowerMult: 1, actionPowerMultIncrease: 1,
@@ -756,8 +756,8 @@ let actionData = {
             }
             let reinvested = data.actions.reinvest.resource * (actionObj.actionPower - 1);
             actionObj.resourceToAdd = (reinvested + Math.log10(resourceTaken) * upgradeData.increaseInitialInvestment.currentValue()) * (actionObj.efficiency / 100);
-            let investCap = Math.pow(upgradeData.increaseMarketCap.currentValue(), actionObj.actionPower);
-            actionObj.resourceToAdd = actionObj.resourceToAdd > investCap ? investCap : actionObj.resourceToAdd;
+            dataObj.investCap = Math.pow(upgradeData.increaseMarketCap.currentValue(), actionObj.actionPower);
+            actionObj.resourceToAdd = actionObj.resourceToAdd > dataObj.investCap ? dataObj.investCap : actionObj.resourceToAdd;
 
             actionObj.expToAddBase = Math.log10(resourceTaken);
             actionObj.expToAdd = actionObj.expToAddBase * actionObj.expToAddMult;
@@ -787,7 +787,8 @@ let actionData = {
         },
         actionTriggers: [
             ["info", "text", "Uses Gold and Fortune on Reinvest to produce Fortune"],
-            ["unlock", "reveal", "buildFortune"]
+            ["unlock", "reveal", "buildFortune"],
+            ["info", "cap", "invest", "investCap"]
         ]
     },
     buildFortune: {
@@ -2048,7 +2049,7 @@ actionData = {
         efficiencyAtts: [["wizardry", .01]],
     },
     tidyMagesmithShop: {
-        tier: 1, plane: 0, creationVersion: 2,
+        tier: 1, plane: 0, creationVersion: 2, title:"Tidy Magesmith's Shop",
         progressMaxBase: 1e38, progressMaxIncrease: 4,
         expToLevelBase: 10, expToLevelIncrease: 1,
         efficiencyBase: .0005, maxLevel: 8,
