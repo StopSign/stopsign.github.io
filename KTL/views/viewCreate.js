@@ -833,7 +833,7 @@ function replaceIconText(actionVar) {
                 text += `Base wage: $${intToString(actionData[info].wage, 2)}<br>`
                 text += `Current wage: $${intToString(data.actions[info].wage, 2)}<br>`
             } else if(type === "text") {
-                text += info;
+                text += info + "<br>";
             }
         } else if(when === "unlock") {
             text += "On Unlock: "
