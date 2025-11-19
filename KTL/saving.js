@@ -121,6 +121,7 @@ function load() {
         data.maxSpellPower = toLoad.maxSpellPower ?? 0;
         data.resetCount = toLoad.resetCount ?? 1;
         data.ancientCoinGained = toLoad.ancientCoinGained ?? 0;
+        data.queuedReveals = toLoad.queuedReveals ?? {};
 
         data.currentGameState = toLoad.currentGameState;
         // data.gameSettings = toLoad.gameSettings;

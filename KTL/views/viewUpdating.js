@@ -505,10 +505,10 @@ let views = {
 }
 
 function checkActionsToReveal() {
-    let itemsToProcess = [...data.queuedReveals];
-    data.queuedReveals.clear();
+    let itemsToProcess = copyArray(data.queuedReveals);
+    data.queuedReveals = {};
 
-    for (let actionVar of itemsToProcess) {
+    for (let actionVar in itemsToProcess) {
         revealAction(actionVar);
     }
 }

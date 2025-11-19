@@ -104,4 +104,12 @@ function saveFileCorrectionAfterLoad(saveVersionFromLoad) {
             revealAction('restoreEquipment');
         }
     }
+    if(saveVersionFromLoad <= 4) {
+        if(data.actions.moveEarth.level >= 1) { revealAction('digFoundation') }
+        if(data.actions.hardenEarth.level >= 1) { revealAction('stoneCompression') }
+        if(data.actions.shapeEarth.level >= 1) { revealAction('shapeBricks') }
+        if(data.actions.practicalMagic.level >= 1) { revealAction('tidyMagesmithShop') }
+        if(data.actions.illuminate.level >= 1) { revealAction('clearTheBasement') }
+        if(data.actions.moveIron.level >= 1) { revealAction('moldBarsFromScrap') }
+    }
 }

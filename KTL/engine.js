@@ -402,7 +402,7 @@ function revealAction(actionVar) {
     }
     //don't let it be visible, but check once a second if it's allowed to be visible
     if(dataObj.hasUpstream && !data.actions[dataObj.parentVar].visible) {
-        data.queuedReveals.add(actionVar);
+        data.queuedReveals[actionVar] = true;
         return;
     }
 
