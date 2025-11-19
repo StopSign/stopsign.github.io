@@ -278,7 +278,7 @@ let resourceHeads = {
 function calculateDownstreamResources(actionVar) {
     const actionObj = data.actions[actionVar];
     const dataObj = actionData[actionVar];
-    let tierMult = actionObj.tierMult();
+    let tierMult = actionObj.tierMult() * (actionObj.efficiency / 100);
     const calculatedRatios = {};
     let totalRatio = 0;
 
