@@ -434,11 +434,8 @@ function toggleViewAll0Buttons() {
         slider.style.left = '0';
     }
     for(let actionVar in data.actions) {
-        if (data.gameSettings.viewAll0Buttons) {
-            views.updateVal(`${actionVar}ToggleDownstreamButtons`, "", "style.display");
-        } else {
-            views.updateVal(`${actionVar}ToggleDownstreamButtons`, "none", "style.display");
-        }
+        let dataObj = actionData[actionVar];
+        views.updateVal(`${actionVar}ToggleDownstreamButtons`, data.gameSettings.viewAll0Buttons && dataObj.plane !== 2 ? "" : "none", "style.display");
     }
 }
 
@@ -483,9 +480,10 @@ function changeDarkMode() {
 }
 
 function addMenuTextContainer(menuVar, menuText) {
-    let menuContainer = "<div id='" + menuVar + "TextContainer' style='display:none;padding:10px;text-align:left;font-size:16px;height:100%;max-height:100%;overflow-y:auto;box-sizing:border-box;'>" +
-        menuText +
-        "</div>";
+    let menuContainer = `
+        <div id='${menuVar}TextContainer' class="menuDisplay" style="display:none;">
+            ${menuText}
+        </div>`;
 
     let child = document.createElement("template");
     child.innerHTML = menuContainer;
@@ -494,24 +492,20 @@ function addMenuTextContainer(menuVar, menuText) {
 
 function createMenu() {
     let helpMenu = `
-   <div id="helpMenu" class="fullScreenGrey" style="display:none;" onclick="clickMenuButton()">
-    <div class="centerMenuBox"
-        onclick="stopClicks(event)"
-        style="background:var(--bg-secondary);padding:20px;border-radius:6px;max-width:1200px;min-width:600px;width:90%;text-align:center;position:relative;color:var(--text-primary);border:1px solid var(--border-color);height:90vh;max-height:90vh;display:block;overflow:hidden;">
-        <div class="button" onclick="clickMenuButton()" style="position:absolute;top:5px;right:5px;">X</div>
-        <div class="menuTitle" style="box-sizing:border-box;">Options and Info Menu</div>
-        <div class="menuSeparator" style="box-sizing:border-box;"></div>
-        
-        <div style="width:100%;height:calc(100% - 60px);min-height:0;position:relative;display:block;overflow:hidden;font-size:0;">
-            <div id="menuIndexContainer"
-                style="display:inline-block;width:30%;background-color:var(--menu-tab-background-color);vertical-align:top;height:100%;overflow-y:auto;min-height:0;box-sizing:border-box;font-size:16px;">
-            </div>
-            <div id="menuTextDisplayContainer"
-                style="display:inline-block;width:70%;background-color:var(--menu-background-color);vertical-align:top;height:100%;min-height:0;box-sizing:border-box;overflow-y:auto;position:relative;font-size:16px;">
+    <div id="helpMenu" class="fullScreenGrey" style="display:none;" onclick="clickMenuButton()">
+        <div class="centerMenuBox" onclick="stopClicks(event)">
+            <div class="button" onclick="clickMenuButton()" style="position:absolute;top:5px;right:5px;">X</div>
+            <div class="menuTitle" style="box-sizing:border-box;">Options and Info Menu</div>
+            <div class="menuSeparator" style="box-sizing:border-box;"></div>
+            
+            <div style="display:flex;height:calc(75vh - 100px);min-height:0;position:relative;overflow:hidden;font-size:0;">
+                <div id="menuIndexContainer" class="menuOptionContainer">
+                </div>
+                <div id="menuTextDisplayContainer" class="menuDisplayContainer">
+                </div>
             </div>
         </div>
     </div>
-</div>
     `;
     document.getElementById("helpMenuContainer").innerHTML = helpMenu;
 }
@@ -522,9 +516,7 @@ let selectedMenu = null;
 function addMenuTab(menuVar) {
     menuInfo.push(menuVar);
     let newMenu = Raw.html`
-        <div id="${menuVar}MenuTab" onclick="clickMenuTab('${menuVar}')" 
-            style="border:1px solid;width:99%;height:60px;border-radius:3px;background-color:var(--menu-tab-button-color);
-            cursor:pointer;font-size:20px;display:flex;align-items:center;justify-content:center;">
+        <div id="${menuVar}MenuTab" onclick="clickMenuTab('${menuVar}')" class="menuTab">
             ${decamelizeWithSpace(menuVar)}
         </div>`;
 
@@ -536,7 +528,7 @@ function addMenuTab(menuVar) {
 function clickMenuTab(menuVar) {
     if(selectedMenu) {
         document.getElementById(selectedMenu+"TextContainer").style.display = "none";
-        document.getElementById(selectedMenu+"MenuTab").style.background = "var(--menu-tab-button-color)";
+        document.getElementById(selectedMenu+"MenuTab").style.background = "";
         if(selectedMenu === menuVar) {
             selectedMenu = null;
             return;
@@ -544,10 +536,25 @@ function clickMenuTab(menuVar) {
     }
     selectedMenu = menuVar;
     document.getElementById(menuVar+"TextContainer").style.display = "";
-    document.getElementById(selectedMenu+"MenuTab").style.background = "#8b5cf6";
+    document.getElementById(selectedMenu+"MenuTab").style.background = "var(--menu-tab-selected-color)";
     if(selectedMenu === "statistics") {
         resizeCanvas();
     }
+}
+
+let selectedUpgradeMenu = null;
+function clickUpgradeTab(menuVar) {
+    if(selectedUpgradeMenu) {
+        document.getElementById(selectedUpgradeMenu+"UpgradeContainer").style.display = "none";
+        document.getElementById(selectedUpgradeMenu+"UpgradeTab").style.background = "";
+        if(selectedUpgradeMenu === menuVar) {
+            selectedUpgradeMenu = null;
+            return;
+        }
+    }
+    selectedUpgradeMenu = menuVar;
+    document.getElementById(menuVar+"UpgradeContainer").style.display = "";
+    document.getElementById(selectedUpgradeMenu+"UpgradeTab").style.background = "var(--menu-tab-selected-color)";
 }
 
 function addMenuOptionsTab() {

@@ -252,6 +252,7 @@ function updateUIOnLoad() {
     refreshResetLog()
     rebuildLog()
     rebuildPinned()
+    clickUpgradeTab("default");
 
     document.getElementById('viewDeltasSwitch').firstElementChild.style.left = data.gameSettings.viewDeltas ? "50%" : "0";
     document.getElementById('numberTypeSwitch').firstElementChild.style.left = data.gameSettings.numberType==="numberSuffix" ? "66.666%" : (data.gameSettings.numberType==="scientific" ? "33.333%" : "0");
@@ -259,8 +260,11 @@ function updateUIOnLoad() {
     document.getElementById('viewTotalMomentumSwitch').firstElementChild.style.left = data.gameSettings.viewTotalMomentum ? "50%" : "0";
     document.getElementById('viewZeroButtonsSwitch').firstElementChild.style.left = data.gameSettings.viewAll0Buttons ? "50%" : "0";
     document.getElementById('viewAdvancedSlidersSwitch').firstElementChild.style.left = data.gameSettings.viewAdvancedSliders ? "50%" : "0";
+    document.getElementById("showCompleteUpgrades").checked = data.gameSettings.showCompletedToggle;
+    document.getElementById("showUnaffordableUpgrades").checked = data.gameSettings.showUnaffordable;
+    document.getElementById("sortByCost").checked = data.gameSettings.sortByCost;
 
-    if(data.gameSettings.bonusSpeed > 1) {
+        if(data.gameSettings.bonusSpeed > 1) {
         data.gameSettings.bonusSpeed = 1;
          //set it to 3 or set the checked correctly on load
     }
@@ -287,7 +291,7 @@ function updateUIOnLoad() {
         if (data.gameSettings.viewRatio) {
             views.updateVal(`${actionVar}BalanceNeedleContainer`, "", "style.display");
         }
-        if (data.gameSettings.viewAll0Buttons) {
+        if (data.gameSettings.viewAll0Buttons && dataObj.plane !== 2) {
             views.updateVal(`${actionVar}ToggleDownstreamButtons`, "", "style.display");
         }
         if (data.gameSettings.viewTotalMomentum) {

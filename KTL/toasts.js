@@ -223,7 +223,7 @@ function updateToastUI(toastId) {
 function createToastModal() {
     let overlayWrapper = document.createElement("div");
     overlayWrapper.innerHTML = Raw.html`
-        <div class="fullScreenGrey" style="display:none" onclick="closeModal()">
+        <div class="fullScreenGrey" style="display:none;" onclick="closeModal()">
             <div class="centerMenuBox">
                 <div id="toastModalTitle" style="font-size:20px;font-weight:bold;text-decoration:underline">Toast Title</div>
                 <p id="toastModalMessage" style='text-align:left;font-size:16px;'>Here is a message</p>

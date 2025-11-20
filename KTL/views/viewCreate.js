@@ -790,11 +790,14 @@ function createBasicSliderHTML(actionVar, downstreamVar) {
     ];
 
     let optionsHTML = '';
+    let dataObj = actionData[downstreamVar];
+    let plane = dataObj.plane;
     for (let option of options) {
         const elementId = `${actionVar}_${downstreamVar}_option_${option.value}`;
         const initialBgColor = option.value === 0 ? 'blue' : 'transparent';
+        let opacity = (plane === 2 && option.value !== 100) ? ".5" : "1";
         optionsHTML += `
-            <div id="${elementId}" style="border:2px solid ${option.color};padding:5px 20px;margin:2px;cursor:pointer;user-select:none;background-color:${initialBgColor};border-radius:5px;"
+            <div id="${elementId}" style="opacity:${opacity};border:2px solid ${option.color};padding:5px 20px;margin:2px;cursor:pointer;user-select:none;background-color:${initialBgColor};border-radius:5px;"
                 onmouseover="handleSliderMouseOver('${elementId}')" onmouseout="handleSliderMouseOut('${elementId}', '${option.color}')"
                 onclick="handleSliderClick('${elementId}', '${actionVar}', '${downstreamVar}', ${option.value})">
                 ${option.label}

@@ -39,8 +39,7 @@ function calcUpgradeCost(upgrade, num) {
 }
 
 
-function sortAmuletCards() {
-    const container = document.getElementById("amuletUpgrades");
+function sortAmuletCards(container) {
     const cards = Array.from(container.children);
 
     cards.sort((a, b) => {
@@ -53,32 +52,34 @@ function sortAmuletCards() {
         card.style.order = index;
     });
 }
-function resetCardOrder() {
-    const container = document.getElementById("amuletUpgrades");
+function resetCardOrder(container) {
     const cards = Array.from(container.children);
     cards.forEach(card => {
-        card.style.order = ""; // Resetting the order lets flexbox use the default
+        card.style.order = "";
     });
 }
-function toggleSortByCost(checkbox) {
-    if (checkbox.checked) {
-        sortAmuletCards(); // Sorts the cards by cost
+function toggleSortByCost() {
+    data.gameSettings.sortByCost = document.getElementById("sortByCost").checked;
+    if (data.gameSettings.sortByCost) {
+        sortAmuletCards(document.getElementById("amuletUpgrades"));
+        sortAmuletCards(document.getElementById("amuletAttributeUpgrades"));
     } else {
-        resetCardOrder(); // Reverts to the default order
+        resetCardOrder(document.getElementById("amuletUpgrades"));
+        resetCardOrder(document.getElementById("amuletAttributeUpgrades"));
     }
 }
 
 function initializeAmuletCards() {
     const container = document.getElementById("amuletUpgrades");
-    container.style.cssText = "display:flex;flex-wrap:wrap;gap:15px;padding:10px;max-height:50vh";
-    container.innerHTML = "";
+    const containerAttributes = document.getElementById("amuletAttributeUpgrades");
+    containerAttributes.replaceChildren();
+    container.replaceChildren();
 
     for (const upgradeVar in data.upgrades) {
         const upgrade = data.upgrades[upgradeVar];
         const upgradeDataObj = upgradeData[upgradeVar];
         const cardId = `card_${upgradeVar}`;
 
-        // 1. Create the main card element and its skeleton HTML
         const cardElement = document.createElement('div');
         cardElement.id = cardId;
 
@@ -117,10 +118,8 @@ function initializeAmuletCards() {
                 </div>
             </div>`;
 
-        // 2. Queue the IDs for the cache to be processed later
         queueCache(cardId, descriptionId, costId, remainingId, buyButtonSectionId, costSectionId, remainingSectionId, maxLevelSectionId);
 
-        // 3. Set the card's initial state using DIRECT DOM manipulation
         const numBought = upgrade.upgradesBought;
         const remaining = upgrade.upgradesAvailable - numBought;
         const isFullyBought = remaining === 0;
@@ -160,8 +159,11 @@ function initializeAmuletCards() {
             cardElement.querySelector(`#${remainingId}`).textContent = remaining;
         }
 
-        // 4. Append the fully prepared element to the container
-        container.appendChild(cardElement);
+        if(upgradeDataObj.attribute) {
+            containerAttributes.appendChild(cardElement);
+        } else {
+            container.appendChild(cardElement);
+        }
     }
 }
 
@@ -248,30 +250,16 @@ function buyUpgrade(upgradeVar) {
         if (upgrade.isFullyBought) {
             cardElement.dataset.sortOrder = Infinity;
         } else {
-            const newCost = calcUpgradeCost(upgrade, upgrade.upgradesBought);
-            cardElement.dataset.sortOrder = newCost;
+            cardElement.dataset.sortOrder = calcUpgradeCost(upgrade, upgrade.upgradesBought);;
         }
     }
 
     updateAmuletCardUI(upgradeVar);
     refreshUpgradeVisibility();
-
-    // Only re-sort the cards if the checkbox is checked.
-    const sortCheckbox = document.getElementById('sortByCostCheckbox');
-    if (sortCheckbox && sortCheckbox.checked) {
-        sortAmuletCards();
-    }
+    sortAmuletCards();
 }
 
-
-
-
-
-
-
-
 function attributeUpgradeInfo(attVar, upgradesAvailable, upgradeNum, increaseRatio) {
-    // console.log(attVar, upgradesAvailable, upgradeNum, increaseRatio);
     const attributeName = capitalizeFirst(attVar);
     const possessiveName = attributeName.endsWith('s')
         ? `${attributeName}'`
@@ -292,65 +280,25 @@ function attributeUpgradeOnBuy(attVar, upgradeNum, increaseRatio) {
     recalcAttMult(attVar);
 }
 
-function toggleMaxLevelCards(callingCheckbox) {
-	function filter(checkbox, upgrade, upgradeDataObj) {
-		const show = checkbox.checked;
-		
-		return show || !upgrade.isFullyBought;
-	}
-	
-	refreshUpgradeVisibility(callingCheckbox, filter);
-}
-function toggleAttributeUpgrades(callingCheckbox) {
-	function filter(checkbox, upgrade, upgradeDataObj) {
-		const show = checkbox.checked;
-		
-		return show || !upgradeDataObj.attribute;
-	}
-	
-	refreshUpgradeVisibility(callingCheckbox, filter);
-}
-function toggleUnaffordableUpgrades(callingCheckbox) {
-	function filter(checkbox, upgrade, upgradeDataObj) {
-		const show = checkbox.checked;
-		
-		//All fully bought things are "affordable"
-		return show || upgrade.isFullyBought || !(calcUpgradeCost(upgrade, upgrade.upgradesBought) > data.ancientCoin);
-	}
-	
-	refreshUpgradeVisibility(callingCheckbox, filter);
-}
-var refreshUpgradeVisibility = function() {
-	//This holds all registered filters.  They're registered when the checkbox is changed the first time.
-	const visibilityFilters = new Map();
-	
-	return function(callingCheckbox, callingFilter) {
-		//Allow calling this with no arguments to rerun filters.  Eg: When buying something in the shop
-		if (callingCheckbox) {
-			//It's redundent to call this each time, but it won't harm anything
-			visibilityFilters.set(callingCheckbox, callingFilter);
-		}
-		
-		for (const upgradeVar in data.upgrades) {
-			const upgrade = data.upgrades[upgradeVar];
-			const upgradeDataObj = upgradeData[upgradeVar];
-			
-			let isShown = true;
-			
-			//Loop through all filters and only show something that all filters allow to be shown.
-			for (const [checkbox,filter] of visibilityFilters) {
-				isShown &= filter(checkbox, upgrade, upgradeDataObj);
-			}
-			
-			const displayStyle = isShown ? 'flex' : 'none';
-			
-            const cardId = `card_${upgradeVar}`;
-			views.updateVal(cardId, !upgrade.visible?"none":displayStyle, 'style.display');
-		}
-	}
-}();
+function refreshUpgradeVisibility() {
+    data.gameSettings.showCompletedToggle = document.getElementById("showCompleteUpgrades").checked;
+    data.gameSettings.showUnaffordable = document.getElementById("showUnaffordableUpgrades").checked;
 
+    for (let upgradeVar in data.upgrades) {
+        let upgrade = data.upgrades[upgradeVar];
+        let isNotMaxLevel = data.gameSettings.showCompletedToggle || !upgrade.isFullyBought;
+        let cost = calcUpgradeCost(upgrade, upgrade.upgradesBought);
+        let isAffordable = data.gameSettings.showUnaffordable || upgrade.isFullyBought || cost <= data.ancientCoin;
+        let isShown = isNotMaxLevel && isAffordable;
+        let displayStyle = 'none';
 
+        if (upgrade.visible && isShown) {
+            displayStyle = 'flex';
+        }
+
+        views.updateVal('card_' + upgradeVar, displayStyle, 'style.display');
+    }
+}
 
 function updateCardAffordabilityBorders() {
     for (const upgradeVar in data.upgrades) {

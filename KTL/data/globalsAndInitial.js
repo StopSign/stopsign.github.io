@@ -77,7 +77,10 @@ data.gameSettings = {
     viewTotalMomentum:false,
     viewAdvancedSliders:false,
     numberType:"numberSuffix",
-    redeemedBonusCodes:{}
+    redeemedBonusCodes:{},
+    showCompletedToggle:true,
+    showUnaffordable:true,
+    sortByCost:false
 };
 
 // --- Dynamic Game State ---
