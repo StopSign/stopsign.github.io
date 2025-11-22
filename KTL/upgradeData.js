@@ -256,7 +256,8 @@ function buyUpgrade(upgradeVar) {
 
     updateAmuletCardUI(upgradeVar);
     refreshUpgradeVisibility();
-    sortAmuletCards();
+    sortAmuletCards(document.getElementById("amuletUpgrades"));
+    sortAmuletCards(document.getElementById("amuletAttributeUpgrades"));
 }
 
 function attributeUpgradeInfo(attVar, upgradesAvailable, upgradeNum, increaseRatio) {
@@ -329,8 +330,8 @@ let upgradeData = {
         upgradesAvailable: 2,
         visible: true,
         customInfo: function(num) {
-            return `[Automation] When unlocking a new action, automatically sets the downstream sliders of the 
-            unlocked action to ${["50%", "100% (Currently 50%)", "100%"][num]}. This only fully works on previously unlocked actions.`;
+            return `[Automation] When unlocking a new action, automatically sets the downstream sliders to the 
+            newly unlocked action to ${["50%", "100% (Currently 50%)", "100%"][num]}. This only fully works on previously unlocked actions.`;
         },
         onBuy: function(num) {
             for (let actionVar in data.actions) {
@@ -338,8 +339,29 @@ let upgradeData = {
                 if(!dataObj.hasUpstream) {
                     continue;
                 }
+                setSliderUI(actionVar, "Automation", num*50);
                 views.updateVal(`${actionVar}_automationMenuButton`, dataObj.hasUpstream && dataObj.plane !== 2?"":"none", "style.display");
                 views.updateVal(`${actionVar}_automationRevealContainer`, dataObj.hasUpstream && dataObj.plane !== 2?"":"none", "style.display");
+            }
+            if(num === 2) {
+                revealUpgrade("limitMyDesires")
+            }
+        }
+    },
+    limitMyDesires: {
+        initialCost:100, costIncrease:1,
+        upgradesAvailable: 1,
+        visible: false,
+        customInfo: function(num) {
+            return `[Automation] Gain a slider for setting a custom amount the action enables at, instead of always 100%.`
+        },
+        onBuy: function(num) {
+            for (let actionVar in data.actions) {
+                let dataObj = actionData[actionVar];
+                if(!dataObj.hasUpstream) {
+                    continue;
+                }
+                views.updateVal(`${actionVar}SliderContainerAutomation`, dataObj.hasUpstream && dataObj.plane !== 2 ? "":"none", "style.display");
             }
         }
     },

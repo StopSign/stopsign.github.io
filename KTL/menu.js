@@ -457,6 +457,9 @@ function toggleAdvancedSliders() {
                     setSliderUI(actionVar, downstreamVar, convertToNearest(data.actions[actionVar][`downstreamRate${downstreamVar}`]));
                 }
             }
+            if(dataObj.hasUpstream) {
+                setSliderUI(actionVar, "Automation", convertToNearest(data.actions[actionVar].automationOnReveal));
+            }
         }
     }
 

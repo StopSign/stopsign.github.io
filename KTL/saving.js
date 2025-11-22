@@ -124,7 +124,6 @@ function load() {
         data.queuedReveals = toLoad.queuedReveals ?? {};
 
         data.currentGameState = toLoad.currentGameState;
-        // data.gameSettings = toLoad.gameSettings;
 
         //data correction
         if(toLoad.gameSettings.viewAdvancedSliders === undefined) { //defaults off on new saves
@@ -133,6 +132,7 @@ function load() {
         if(toLoad.actions.poolMana.visible) {
             actionData.poolMana.generatorSpeed = 6;
         }
+
 
         refundAmount += saveFileCorrection(saveVersionFromLoad)
 
@@ -192,7 +192,15 @@ function adjustUIAfterLoad(toLoad, saveVersionFromLoad) {
         if(dataObj.storyVersion > actionObj.readStory) {
             views.updateVal(`${actionVar}_storyMenuButton`, "yellow", "style.color");
         }
+
+        //correct old versions from boolean to number
+        if(dataObj.hasUpstream&& (toLoad.actions[actionVar].automationOnReveal === true || toLoad.actions[actionVar].automationOnReveal === undefined)) {
+            setSliderUI(actionVar, "Automation", data.upgrades.stopLettingOpportunityWait.upgradePower * 50);
+        } else if(actionObj.automationOnReveal === false) {
+            actionObj.automationOnReveal = 0;
+        }
     }
+
     attachCustomSliderListeners();
 
 
@@ -271,6 +279,7 @@ function updateUIOnLoad() {
     data.options.bonusRate = 3;
     updateBonusSpeedButton();
 
+
     for (let actionVar in data.actions) {
         let actionObj = data.actions[actionVar];
         let dataObj = actionData[actionVar];
@@ -309,7 +318,7 @@ function updateUIOnLoad() {
             views.updateVal(`${actionVar}PinButton`, "", "style.display");
         }
         if(dataObj.hasUpstream) {
-            if (actionObj.automationOnReveal) {
+            if (actionObj.automationOnReveal > 0) {
                 views.updateVal(`${actionVar}_checkbox`, true, "checked");
                 views.updateVal(`${actionVar}_track`, "#2196F3", "style.backgroundColor");
                 views.updateVal(`${actionVar}_knob`, "translateX(26px)", "style.transform");
@@ -332,6 +341,8 @@ function updateUIOnLoad() {
             updatePauseActionVisuals(actionVar);
         }
         views.updateVal(`${actionVar}_storyMenuButton`, actionObj.readStory!==undefined?"":"#2196F3", "style.color");
+
+
     }
     if (data.planeUnlocked[1] || data.planeUnlocked[2]) {
         for (let i = 0; i < data.planeUnlocked.length; i++) {

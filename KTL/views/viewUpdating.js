@@ -583,5 +583,16 @@ function updateSliderContainers() {
                 views.updateVal(`${actionVar}_${downstreamVar}_slider_container_basic`, "flex", "style.display");
             }
         }
+        if(!dataObj.hasUpstream) {
+            continue;
+        }
+        if (data.gameSettings.viewAdvancedSliders) {
+            views.updateVal(`${actionVar}_automation_slider_advanced`, "inline-block", "style.display");
+            views.updateVal(`${actionVar}_automation_slider_basic`, "none", "style.display");
+        } else {
+            views.updateVal(`${actionVar}_automation_slider_advanced`, "none", "style.display");
+            views.updateVal(`${actionVar}_automation_slider_basic`, "flex", "style.display");
+        }
+        views.updateVal(`${actionVar}SliderContainerAutomation`, data.upgrades.limitMyDesires.upgradePower && dataObj.hasUpstream && dataObj.plane !== 2 ? "":"none", "style.display");
     }
 }

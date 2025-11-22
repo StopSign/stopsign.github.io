@@ -88,6 +88,7 @@ function saveFileCorrection(saveVersionFromLoad) {
     }
     if(saveVersionFromLoad <= 4) {
         data.actions.harnessOverflow.maxLevel = 10 + data.actions.remember.level*3;
+
     }
     return refundAmount;
 }
@@ -111,5 +112,10 @@ function saveFileCorrectionAfterLoad(saveVersionFromLoad) {
         if(data.actions.practicalMagic.level >= 1) { revealAction('tidyMagesmithShop') }
         if(data.actions.illuminate.level >= 1) { revealAction('clearTheBasement') }
         if(data.actions.moveIron.level >= 1) { revealAction('moldBarsFromScrap') }
+
+
+        if(data.upgrades.stopLettingOpportunityWait.upgradePower === 2) {
+            revealUpgrade("limitMyDesires")
+        }
     }
 }

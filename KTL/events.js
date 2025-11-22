@@ -18,9 +18,20 @@ function setSliderUI(fromAction, toAction, newValue) {
     }
 
     document.getElementById(fromAction + "NumInput" + toAction).value = newValue;
-    document.getElementById(fromAction + "_" + toAction + "_Line_Inner").style.height = (newValue / 100 * 20) + "px";
+    if(toAction !== "Automation") {
+        document.getElementById(fromAction + "_" + toAction + "_Line_Inner").style.height = (newValue / 100 * 20) + "px";
+    }
     updateCustomThumbPosition(fromAction, toAction, newValue);
-    data.actions[fromAction]["downstreamRate" + toAction] = Math.max(0, newValue);
+
+    let actionObj = data.actions[fromAction];
+
+    if(toAction === "Automation") {
+        actionObj.automationOnReveal = newValue;
+        views.updateVal(`${fromAction}_checkbox`, newValue > 0, "checked");
+        updateAutomationSwitch(fromAction);
+    } else {
+        actionObj["downstreamRate" + toAction] = Math.max(0, newValue);
+    }
 
     const allValues = [0, 10, 50, 100];
     for (let val of allValues) {
@@ -396,8 +407,12 @@ function toggleAutomationOnReveal(actionVar) {
     let actionObj = data.actions[actionVar];
     const checkbox = document.getElementById(`${actionVar}_checkbox`);
 
-    actionObj.automationOnReveal = checkbox.checked;
+    setSliderUI(actionVar, "Automation", checkbox.checked ? 100 : 0);
+    updateAutomationSwitch(actionVar);
+}
 
+function updateAutomationSwitch(actionVar) {
+    const checkbox = document.getElementById(`${actionVar}_checkbox`);
     if (checkbox.checked) {
         views.updateVal(`${actionVar}_track`, "#2196F3", "style.backgroundColor");
         views.updateVal(`${actionVar}_knob`, "translateX(26px)", "style.transform");

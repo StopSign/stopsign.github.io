@@ -110,7 +110,7 @@ function actionSetInitialVariables(actionObj, dataObj) {
     actionObj.isKTL = !!dataObj.isKTL;
     actionObj.purchased = !!dataObj.purchased;
     actionObj.plane = dataObj.plane;
-    actionObj.automationOnReveal = true;
+    actionObj.automationOnReveal = 0;
     actionObj.automationOnMax = true;
     actionObj.currentMenu = "downstream";
     actionObj.hasBeenUnlocked = false;
@@ -415,7 +415,7 @@ function revealAction(actionVar) {
     actionObj.visible = true;
     revealAttsOnAction(actionObj);
 
-    if(data.actions[actionVar].automationOnReveal) {
+    if(data.actions[actionVar].automationOnReveal > 0) {
         updateSupplyChain(actionVar);
     }
 }
@@ -504,11 +504,11 @@ function updateSupplyChain(startActionVar) {
 
         if (childIsNeeded) {
             //if a child is needed, and slider is off, turn it on
-            if (currentSliderValue === 0 && actionObj.automationOnReveal) {
+            if (currentSliderValue === 0 && actionObj.automationOnReveal > 0) {
                 if(!actionObj.hasBeenUnlocked && currentVar === startActionVar) { //ignore the first time
                     setSliderUI(parentVar, currentVar, 0);
                 } else {
-                    setSliderUI(parentVar, currentVar, getUpgradeSliderAmount());
+                    setSliderUI(parentVar, currentVar, data.actions[currentVar].automationOnReveal);
                 }
             }
         } else if (data.upgrades.knowWhenToMoveOn.upgradePower > 0 && currentSliderValue !== 0 && actionObj.automationOnMax) {
@@ -620,10 +620,6 @@ function upgradeUpdates() {
     } else {
         data.maxSpellPower = getActiveSpellPower(true);
     }
-}
-
-function getUpgradeSliderAmount() {
-    return [0, 50, 100][data.upgrades.stopLettingOpportunityWait.upgradePower];
 }
 
 //get current info based on upgrade information, generally global or universal stuff. Individual action stuff upgrades get put on the action.

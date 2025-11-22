@@ -120,6 +120,7 @@ function debug() {
     // gameSpeed = 1;
     data.currentGameState.bonusTime = 1000 * 60 * 60 * 24 * 7;
 
+    buyUpgrade("limitMyDesires")
 
     //temp data corrections:
     // revealAction('visitShrineBehindWaterfall')

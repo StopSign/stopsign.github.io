@@ -365,19 +365,43 @@ let maxLevelTop = (data.gameSettings.viewDeltas && data.gameSettings.viewRatio) 
     queueCache(`${actionVar}_checkbox2`);
     queueCache(`${actionVar}_track2`);
     queueCache(`${actionVar}_knob2`);
+    queueCache(`${actionVar}_automation_slider_advanced`)
+    queueCache(`${actionVar}_automation_slider_basic`)
+    queueCache(`${actionVar}SliderContainerAutomation`)
 
     let preventParentSliderText = !dataObj.hasUpstream ? "": `
             <span id="${actionVar}_automationRevealContainer">
                 Enable automation to enable upstream sliders to this action when it is revealed, or when the max level increases:
-               
                 <label onclick="toggleAutomationOnReveal('${actionVar}')" style="position:relative;display:inline-block;width:50px;height:14px;cursor:pointer;">
                     <input id="${actionVar}_checkbox" type="checkbox" style="opacity:0;width:0;height:0;" checked="true">
                     <div id="${actionVar}_track" style="position:absolute;top:0;left:0;right:0;bottom:0;background-color:#ccc;border-radius:14px;">
                         <div id="${actionVar}_knob" style="position:absolute;height:16px;width:16px;left:4px;bottom:-1px;background-color:white;border-radius:50%;"></div>
                     </div>
                 </label><br>
-            </span>
-            
+    
+                <div id="${actionVar}SliderContainerAutomation" style="display:none;">
+                    <div id="${actionVar}_automation_slider_advanced">
+                        <input type="number" id="${actionVar}NumInputAutomation" value="0" min="0" max="100" 
+                            style="margin-right:3px;font-size:10px;width:37px;vertical-align: top;"
+                            oninput="validateInput('${actionVar}', 'Automation')" onchange="downstreamNumberChanged('${actionVar}', 'Automation')" >
+                                
+                        <div id="${actionVar}_Automation_track_container" style="display:inline-block;width:250px;height:20px; 
+                            user-select:none;padding: 0 10px;box-sizing:border-box;cursor:pointer;">
+                            <div id="${actionVar}TrackAutomation" style="margin-top:6px;width:100%;height:5px; 
+                                background:linear-gradient(to right, red 10%, #ddd 10%, #ddd 90%, green 90%);position:relative;">
+                                <div id="${actionVar}ThumbAutomation" style="width:10px;height:20px;background-color: 
+                                    ${resourceColor};position:absolute;top:50%;transform:translate(-50%, -50%);pointer-events:none;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="${actionVar}_automation_slider_basic" style="display:flex;">
+                        ${createBasicSliderHTML(actionVar, 'Automation')}
+                    </div>
+    
+                </span>
+            </div>
+                
             <span id="${actionVar}_automationMaxLevelContainer">
                 Enable automation to disable upstream sliders to this action when it is max level:
                
@@ -790,7 +814,7 @@ function createBasicSliderHTML(actionVar, downstreamVar) {
     ];
 
     let optionsHTML = '';
-    let dataObj = actionData[downstreamVar];
+    let dataObj = actionData[actionVar];
     let plane = dataObj.plane;
     for (let option of options) {
         const elementId = `${actionVar}_${downstreamVar}_option_${option.value}`;
@@ -798,7 +822,7 @@ function createBasicSliderHTML(actionVar, downstreamVar) {
         let opacity = (plane === 2 && option.value !== 100) ? ".5" : "1";
         optionsHTML += `
             <div id="${elementId}" style="opacity:${opacity};border:2px solid ${option.color};padding:5px 20px;margin:2px;cursor:pointer;user-select:none;background-color:${initialBgColor};border-radius:5px;"
-                onmouseover="handleSliderMouseOver('${elementId}')" onmouseout="handleSliderMouseOut('${elementId}', '${option.color}')"
+                onmouseover="handleSliderMouseOver('${actionVar}', '${downstreamVar}', '${elementId}')" onmouseout="handleSliderMouseOut('${elementId}', '${option.color}')"
                 onclick="handleSliderClick('${elementId}', '${actionVar}', '${downstreamVar}', ${option.value})">
                 ${option.label}
             </div>
@@ -807,8 +831,12 @@ function createBasicSliderHTML(actionVar, downstreamVar) {
     return `${optionsHTML}`;
 }
 
-function handleSliderMouseOver(elementId) {
-    document.getElementById(elementId).style.borderColor = data.gameState === "KTL"?"red":"yellow";
+function handleSliderMouseOver(actionVar, downstreamVar, elementId) {
+    if(downstreamVar === "Automation" && actionData[actionVar].hasUpstream) {
+        document.getElementById(elementId).style.borderColor = "yellow";
+        return;
+    }
+    document.getElementById(elementId).style.borderColor = data.gameState === "KTL" ? "red" : "yellow";
 }
 
 function handleSliderMouseOut(elementId, originalColor) {
@@ -881,7 +909,6 @@ function actionTriggerText(type, info, extra) {
     } else if(type === "addMaxLevels") {
         text += `Add <b>+${extra}</b> max level${extra > 1?"s":""} to ${data.actions[info].purchased ? actionData[info].title:"???"}`
     } else if(type === "revealUpgrade") {
-        console.log()
         text += `Show Upgrade: ${upgradeData[info].title}`
     } else if(type === "addLegacy") {
         let levelMult = 1;
@@ -898,7 +925,7 @@ function actionTriggerText(type, info, extra) {
 }
 
 function handleSliderClick(clickedId, actionVar, downstreamVar, value) {
-    if(data.gameState === "KTL") {
+    if(downstreamVar !== "Automation" && data.gameState === "KTL") {
         return;
     }
     setSliderUI(actionVar, downstreamVar, value);
@@ -916,70 +943,82 @@ function attachCustomSliderListeners() {
         })
 
         for (let downstreamVar of dataObj.downstreamVars) {
-            const container = document.getElementById(`${actionVar}_${downstreamVar}_track_container`);
-            const thumb = document.getElementById(`${actionVar}Thumb${downstreamVar}`);
-
-            if (!actionData[downstreamVar].hasUpstream) {
-                continue;
-            }
-
-            container.addEventListener('mouseenter', () => {
-                thumb.style.border = (actionObj.isRunning && dataObj.plane !== 2) ? "2px solid yellow" : "2px solid red";
-            });
-
-            container.addEventListener('mouseleave', () => {
-                thumb.style.border = "";
-            });
-
-            const handleDrag = (event) => {
-                event.preventDefault();
-                const track = document.getElementById(`${actionVar}Track${downstreamVar}`);
-                if (!track) return;
-
-                const trackRect = track.getBoundingClientRect();
-                let newLeft = event.clientX - trackRect.left;
-
-                if (newLeft < 0) newLeft = 0;
-                if (newLeft > trackRect.width) newLeft = trackRect.width;
-
-                const newValue = Math.round((newLeft / trackRect.width) * 100);
-
-                if (data.actions[actionVar][`downstreamRate${downstreamVar}`] === newValue) {
-                    return;
-                }
-
-                data.actions[actionVar][`downstreamRate${downstreamVar}`] = newValue;
-                setSliderUI(actionVar, downstreamVar, newValue);
-            };
-
-            const stopDrag = () => {
-                document.removeEventListener('mousemove', handleDrag);
-                document.removeEventListener('mouseup', stopDrag);
-            };
-
-            container.addEventListener('mousedown', (event) => {
-                if(!actionObj.isRunning || dataObj.plane === 2) {
-                    return;
-                }
-                handleDrag(event);
-                document.addEventListener('mousemove', handleDrag);
-                document.addEventListener('mouseup', stopDrag);
-            });
-
-            const hoverTargetContainer = document.getElementById(`${actionVar}SliderContainer${downstreamVar}`);
-            const line = document.getElementById(`${actionVar}_${downstreamVar}_Line_Outer`);
-
-            hoverTargetContainer.addEventListener('mouseenter', () => {
-                line.style.borderColor = "yellow";
-                views.updateVal(`${downstreamVar}LargeVersionContainer`, "yellow", "style.borderColor");
-                views.updateVal(`${downstreamVar}LockContainer`, "yellow", "style.borderColor");
-            });
-
-            hoverTargetContainer.addEventListener('mouseleave', () => {
-                line.style.borderColor = "black";
-                setBorderColor(downstreamVar, selectedStat);
-            });
+            attachCustomSliderListenersHelper(actionVar, downstreamVar);
         }
+        if(actionObj.hasUpstream) {
+            attachCustomSliderListenersHelper(actionVar, "Automation");
+        }
+    }
+}
+
+function attachCustomSliderListenersHelper(actionVar, downstreamVar) {
+    const container = document.getElementById(`${actionVar}_${downstreamVar}_track_container`);
+    const thumb = document.getElementById(`${actionVar}Thumb${downstreamVar}`);
+
+    let dataObj = actionData[actionVar];
+    let actionObj = data.actions[actionVar];
+    if ((downstreamVar === "Automation" && !dataObj.hasUpstream) ||
+        (downstreamVar !== "Automation" && !actionData[downstreamVar].hasUpstream)) {
+        return;
+    }
+
+    container.addEventListener('mouseenter', () => {
+        thumb.style.border = (actionObj.isRunning && dataObj.plane !== 2) ? "2px solid yellow" : "2px solid red";
+    });
+
+    container.addEventListener('mouseleave', () => {
+        thumb.style.border = "";
+    });
+
+    const handleDrag = (event) => {
+        event.preventDefault();
+        const track = document.getElementById(`${actionVar}Track${downstreamVar}`);
+        if (!track) return;
+
+        const trackRect = track.getBoundingClientRect();
+        let newLeft = event.clientX - trackRect.left;
+
+        if (newLeft < 0) newLeft = 0;
+        if (newLeft > trackRect.width) newLeft = trackRect.width;
+
+        const newValue = Math.round((newLeft / trackRect.width) * 100);
+
+        // if (data.actions[actionVar][`downstreamRate${downstreamVar}`] === newValue) {
+        //     return;
+        // }
+
+        // data.actions[actionVar][`downstreamRate${downstreamVar}`] = newValue;
+        setSliderUI(actionVar, downstreamVar, newValue);
+    };
+
+    const stopDrag = () => {
+        document.removeEventListener('mousemove', handleDrag);
+        document.removeEventListener('mouseup', stopDrag);
+    };
+
+    container.addEventListener('mousedown', (event) => {
+        if(!actionObj.isRunning || dataObj.plane === 2) {
+            return;
+        }
+        handleDrag(event);
+        document.addEventListener('mousemove', handleDrag);
+        document.addEventListener('mouseup', stopDrag);
+    });
+
+    const hoverTargetContainer = document.getElementById(`${actionVar}SliderContainer${downstreamVar}`);
+
+    if(downstreamVar !== "Automation") {
+        const line = document.getElementById(`${actionVar}_${downstreamVar}_Line_Outer`);
+        hoverTargetContainer.addEventListener('mouseenter', () => {
+            line.style.borderColor = "yellow";
+            views.updateVal(`${downstreamVar}LargeVersionContainer`, "yellow", "style.borderColor");
+            views.updateVal(`${downstreamVar}LockContainer`, "yellow", "style.borderColor");
+        });
+
+        hoverTargetContainer.addEventListener('mouseleave', () => {
+            line.style.borderColor = "black";
+            setBorderColor(downstreamVar, selectedStat);
+        });
     }
 }
 

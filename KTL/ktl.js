@@ -344,8 +344,8 @@ function useAmulet() {
     document.getElementById("jobTitle").textContent = data.actions[data.currentJob] ? actionData[data.currentJob].title : data.currentJob;
     document.getElementById("jobWage").textContent = intToString(data.currentWage, 2);
 
-    setSliderUI("overclock", "reflect", getUpgradeSliderAmount());
-    setSliderUI("poolMana", "expelMana", getUpgradeSliderAmount());
+    setSliderUI("overclock", "reflect", data.actions["reflect"].automationOnReveal);
+    setSliderUI("poolMana", "expelMana", data.actions["expelMana"].automationOnReveal);
 
     views.updateVal(`killTheLichMenuButton2`, "Fight the Lich's Forces!");
 }
