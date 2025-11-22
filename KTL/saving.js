@@ -194,10 +194,12 @@ function adjustUIAfterLoad(toLoad, saveVersionFromLoad) {
         }
 
         //correct old versions from boolean to number
-        if(dataObj.hasUpstream&& (toLoad.actions[actionVar].automationOnReveal === true || toLoad.actions[actionVar].automationOnReveal === undefined)) {
-            setSliderUI(actionVar, "Automation", data.upgrades.stopLettingOpportunityWait.upgradePower * 50);
-        } else if(actionObj.automationOnReveal === false) {
-            actionObj.automationOnReveal = 0;
+        if(toLoad.actions) {
+            if (dataObj.hasUpstream && (toLoad.actions[actionVar].automationOnReveal === true || toLoad.actions[actionVar].automationOnReveal === undefined)) {
+                setSliderUI(actionVar, "Automation", data.upgrades.stopLettingOpportunityWait.upgradePower * 50);
+            } else if (actionObj.automationOnReveal === false) {
+                actionObj.automationOnReveal = 0;
+            }
         }
     }
 
