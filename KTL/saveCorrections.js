@@ -115,7 +115,7 @@ function saveFileCorrectionAfterLoad(saveVersionFromLoad) {
 
 
         if(data.upgrades.stopLettingOpportunityWait.upgradePower === 2) {
-            revealUpgrade("limitMyDesires")
+            revealUpgrade("temperMyDesires")
         }
     }
 }

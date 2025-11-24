@@ -50,14 +50,14 @@ function initializeToasts() {
         <ol>
             <li>Green: Adds the attribute on level</li>
             <li>Purple: Reduces the progress required to complete if it is an action, reduces exp required to level if it is a generator</li>
-            <li>Blue: Increases efficiency. For actions, efficiency is the send and consume rate. For generators, it is the generator speed, generator amount, and send rate.</li>
+            <li>Blue: Increases speed. For actions, speed is the send and consume rate. For generators, it is the generator speed, generator amount, and send rate.</li>
         </ol>`);
     createToast(function() { return data.actions.harnessOverflow.visible; },
         "Game Math on Sending", 0,
-        Raw.html`Rate of sending = tier mult * efficiency * slider bar %.<br>
+        Raw.html`Rate of sending = tier mult * speed * slider bar %.<br>
         <ol>
             <li>Each action has a tier. Tier 0 is a default send rate of 10%, Tier 1 is 1%, Tier 2 is .1%, etc.</li>
-            <li>Actions also have an efficiency, which is improved by the blue Attributes for that action.</li>
+            <li>Actions also have an speed, which is improved by the blue Attributes for that action.</li>
             <li>Most actions will automatically convert their sending rate to exp, essentially a 100% slider bar you can't turn off.</li> 
             <li>The send rate affects how resources are moved around as well as the consumption rate (if it is not a generator).</li>
             <li>Generators do not consume resources automatically. Read their info for more.</li>
@@ -238,6 +238,7 @@ function createToastModal() {
 function openModal(toastId) {
     modalOverlayEl.style.display = 'flex';
     document.getElementById('toastModalTitle').innerHTML = viewData.toasts[toastId].title;
+    document.getElementById('toastModalMessage').replaceChildren();
     document.getElementById('toastModalMessage').innerHTML = viewData.toasts[toastId].message;
 
     if(data.toastStates[toastId] === 'active') {

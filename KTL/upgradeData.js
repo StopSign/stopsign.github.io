@@ -341,14 +341,14 @@ let upgradeData = {
                 }
                 setSliderUI(actionVar, "Automation", num*50);
                 views.updateVal(`${actionVar}_automationMenuButton`, dataObj.hasUpstream && dataObj.plane !== 2?"":"none", "style.display");
-                views.updateVal(`${actionVar}_automationRevealContainer`, dataObj.hasUpstream && dataObj.plane !== 2?"":"none", "style.display");
+                views.updateVal(`${actionVar}_automationRevealContainer`, (dataObj.keepParentAutomation || dataObj.hasUpstream) && dataObj.plane !== 2?"":"none", "style.display");
             }
             if(num === 2) {
-                revealUpgrade("limitMyDesires")
+                revealUpgrade("temperMyDesires")
             }
         }
     },
-    limitMyDesires: {
+    temperMyDesires: {
         initialCost:100, costIncrease:1,
         upgradesAvailable: 1,
         visible: false,

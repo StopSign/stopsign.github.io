@@ -277,6 +277,8 @@ let views = {
                     views.updateVal(`${actionVar}DeltaUnlockTimeContainer`, "", "style.display");
                     views.updateVal(`${actionVar}DeltaUnlockTime`, Math.abs(actionObj.unlockTime - actionObj.prevUnlockTime), "textContent", "time");
                     views.updateVal(`${actionVar}DeltaUnlockTime`, actionObj.unlockTime - actionObj.prevUnlockTime < 0 ? "green" : "red", "style.color");
+                } else {
+                    views.updateVal(`${actionVar}DeltaUnlockTimeContainer`, "none", "style.display");
                 }
             }
 
@@ -289,6 +291,8 @@ let views = {
                     views.updateVal(`${actionVar}DeltaLevel1TimeContainer`, "", "style.display");
                     views.updateVal(`${actionVar}DeltaLevel1Time`, Math.abs(actionObj.level1Time - actionObj.prevLevel1Time), "textContent", "time");
                     views.updateVal(`${actionVar}DeltaLevel1Time`, actionObj.level1Time - actionObj.prevLevel1Time < 0 ? "green" : "red", "style.color");
+                } else {
+                    views.updateVal(`${actionVar}DeltaLevel1TimeContainer`, "none", "style.display");
                 }
             }
 
@@ -593,6 +597,6 @@ function updateSliderContainers() {
             views.updateVal(`${actionVar}_automation_slider_advanced`, "none", "style.display");
             views.updateVal(`${actionVar}_automation_slider_basic`, "flex", "style.display");
         }
-        views.updateVal(`${actionVar}SliderContainerAutomation`, data.upgrades.limitMyDesires.upgradePower && dataObj.hasUpstream && dataObj.plane !== 2 ? "":"none", "style.display");
+        views.updateVal(`${actionVar}SliderContainerAutomation`, data.upgrades.temperMyDesires.upgradePower && dataObj.hasUpstream && dataObj.plane !== 2 ? "":"none", "style.display");
     }
 }

@@ -332,7 +332,7 @@ let actionData = {
         expToLevelBase: 100, expToLevelIncrease: 2,
         actionPowerBase: 1, actionPowerMult: 1, actionPowerMultIncrease: 1.1,
         efficiencyBase: .1,
-        unlockCost: 1e7, visible: false, unlocked: false, purchased: true,
+        unlockCost: 1e7, visible: false, unlocked: false, purchased: true, ignoreMaxLevelAutomation:true,
         isGenerator: true, generatorTarget: "spendMoney", generatorSpeed: 5,
         onCompleteCustom: function () {
             let actionObj = data.actions.makeMoney;
@@ -382,7 +382,7 @@ let actionData = {
         },
         extraInfo: {
             english: Raw.html`<br>Momentum Taken = 1% of current Momentum.<br>
-                        Exp & Gold gain = (Momentum Taken)^.5 * Action Power * Efficiency * Wages.`
+                        Exp & Gold gain = (Momentum Taken)^.5 * Action Power * Speed * Wages.`
         },
         actionTriggers: [
             ["info", "text", "Generates Gold using Momentum"],
@@ -394,7 +394,7 @@ let actionData = {
         progressMaxBase: .5, progressMaxIncrease: 10,
         expToLevelBase: 10, expToLevelIncrease: 1,
         efficiencyBase: .5, maxLevel: 10,
-        unlockCost: 50, visible: false, unlocked: false, purchased: true, hasUpstream: false,
+        unlockCost: 50, visible: false, unlocked: false, purchased: true, hasUpstream: false, keepParentAutomation:true,
         onLevelAtts: [["energy", 60]],
         expAtts: [["savvy", 1]],
         efficiencyAtts: [["ambition", 1]]
@@ -724,7 +724,7 @@ let actionData = {
         expToLevelBase: 3e8, expToLevelIncrease: 1.4,
         actionPowerBase: 1, actionPowerMult: 1, actionPowerMultIncrease: 1,
         efficiencyBase: .5,
-        unlockCost: 2e12, visible: false, unlocked: false, purchased: false,
+        unlockCost: 2e12, visible: false, unlocked: false, purchased: false, ignoreMaxLevelAutomation:true,
         isGenerator: true, generatorTarget: "buildFortune", generatorSpeed: 1,
         onCompleteCustom: function () {
             //stop consuming from reinvest - it's not amount on reinvest * 1.05, but it's 5% of what's on reinvest
@@ -796,7 +796,7 @@ let actionData = {
         progressMaxBase: 100, progressMaxIncrease: 4,
         expToLevelBase: 1, expToLevelIncrease: 2,
         efficiencyBase: 1, maxLevel: 5,
-        unlockCost: 200, visible: false, unlocked: false, purchased: false,
+        unlockCost: 200, visible: false, unlocked: false, purchased: false, keepParentAutomation:true,
         onLevelAtts: [["vision", 250], ["ambition", 20]],
         expAtts: [],
         efficiencyAtts: [],
@@ -1049,7 +1049,7 @@ let actionData = {
         expToLevelBase: 100, expToLevelIncrease: 1.4,
         actionPowerBase: 1, actionPowerMult: 1, actionPowerMultIncrease: 1.1,
         efficiencyBase: .05,
-        unlockCost: 1e15, visible: false, unlocked: false, purchased: true,
+        unlockCost: 1e15, visible: false, unlocked: false, purchased: true, ignoreMaxLevelAutomation:true,
         isGenerator: true, generatorTarget: "meetPeople", generatorSpeed: 5,
         onCompleteCustom: function () {
             let actionObj = data.actions.socialize;
@@ -1097,7 +1097,7 @@ let actionData = {
         },
         extraInfo: {
             english: `<br>Momentum Taken = current Momentum * Tier Mult.<br>
-                        Exp & Conversations gain = (Momentum Taken/1e12)^.5 * Action Power * Efficiency.<br>
+                        Exp & Conversations gain = (Momentum Taken/1e12)^.5 * Action Power * Speed.<br>
                         Requires 1e12 Momentum Taken to function.`
         },
         actionTriggers: [
@@ -1110,7 +1110,7 @@ let actionData = {
         progressMaxBase: 1, progressMaxIncrease: 1.5,
         expToLevelBase: 50, expToLevelIncrease: 1,
         efficiencyBase: .5, maxLevel: 50,
-        unlockCost: .5, visible: false, unlocked: false, purchased: true, hasUpstream: false,
+        unlockCost: .5, visible: false, unlocked: false, purchased: true, hasUpstream: false, keepParentAutomation:true,
         onLevelAtts: [["recognition", 30]],
         expAtts: [["charm", 1]],
         efficiencyAtts: [["confidence", .1]],
@@ -1155,7 +1155,7 @@ let actionData = {
         expToLevelBase: 1, expToLevelIncrease: 1,
         efficiencyBase: 1, maxLevel: 2,
         unlockCost: 0,
-        visible: false, unlocked: false, purchased: true, hasUpstream: false,
+        visible: false, unlocked: false, purchased: true, hasUpstream: false, keepParentAutomation:true,
         onLevelCustom: function () {
             data.ancientCoinMultKTL = data.actions.hearAboutTheLich.level;
         },

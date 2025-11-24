@@ -203,9 +203,7 @@ function adjustUIAfterLoad(toLoad, saveVersionFromLoad) {
         }
     }
 
-    attachCustomSliderListeners();
-
-
+    attachSliderListeners();
 }
 
 function mergeExistingOnly(data, toLoad, varName, skipList = []) {
@@ -308,12 +306,14 @@ function updateUIOnLoad() {
         if (data.gameSettings.viewTotalMomentum) {
             views.updateVal(`${actionVar}TotalDownstreamContainer`, "", "style.display");
         }
-        if (dataObj.hasUpstream) {
-            let showRevealAutomation = data.upgrades.stopLettingOpportunityWait.upgradePower > 0;
+        if (dataObj.hasUpstream || dataObj.keepParentAutomation) {
+            let showRevealAutomation = data.upgrades.stopLettingOpportunityWait.upgradePower > 0 && dataObj.hasUpstream;
             let showMaxLevelAutomation = data.upgrades.knowWhenToMoveOn.upgradePower > 0;
             views.updateVal(`${actionVar}_automationMenuButton`, dataObj.plane !== 2 && (showRevealAutomation || showMaxLevelAutomation) ? "" : "none", "style.display");
             views.updateVal(`${actionVar}_automationMaxLevelContainer`, dataObj.plane !== 2 && showMaxLevelAutomation ? "" : "none", "style.display");
-            views.updateVal(`${actionVar}_automationRevealContainer`, dataObj.plane !== 2 && showRevealAutomation ? "" : "none", "style.display");
+            if(dataObj.hasUpstream) {
+                views.updateVal(`${actionVar}_automationRevealContainer`, dataObj.plane !== 2 && showRevealAutomation ? "" : "none", "style.display");
+            }
         }
 
         if(data.doneAmulet) {
@@ -324,19 +324,13 @@ function updateUIOnLoad() {
                 views.updateVal(`${actionVar}_checkbox`, true, "checked");
                 views.updateVal(`${actionVar}_track`, "#2196F3", "style.backgroundColor");
                 views.updateVal(`${actionVar}_knob`, "translateX(26px)", "style.transform");
-            } else {
-                views.updateVal(`${actionVar}_checkbox`, false, "checked");
-                views.updateVal(`${actionVar}_track`, "#ccc", "style.backgroundColor");
-                views.updateVal(`${actionVar}_knob`, "translateX(0px)", "style.transform");
             }
+        }
+        if(dataObj.hasUpstream || dataObj.keepParentAutomation) {
             if (actionObj.automationOnMax) {
                 views.updateVal(`${actionVar}_checkbox2`, true, "checked");
                 views.updateVal(`${actionVar}_track2`, "#2196F3", "style.backgroundColor");
                 views.updateVal(`${actionVar}_knob2`, "translateX(26px)", "style.transform");
-            } else {
-                views.updateVal(`${actionVar}_checkbox2`, false, "checked");
-                views.updateVal(`${actionVar}_track2`, "#ccc", "style.backgroundColor");
-                views.updateVal(`${actionVar}_knob2`, "translateX(0px)", "style.transform");
             }
         }
         if(dataObj.isSpell || dataObj.isSpellConsumer) {

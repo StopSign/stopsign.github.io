@@ -112,6 +112,7 @@ function actionSetInitialVariables(actionObj, dataObj) {
     actionObj.plane = dataObj.plane;
     actionObj.automationOnReveal = 0;
     actionObj.automationOnMax = true;
+    actionObj.keepParentAutomation = !!dataObj.keepParentAutomation;
     actionObj.currentMenu = "downstream";
     actionObj.hasBeenUnlocked = false;
 
@@ -437,7 +438,7 @@ function addMaxLevel(actionVar, amount) {
 
     // setUpstreamSlidersToUnlockValue(actionVar); // New line
 
-    if(data.actions[actionVar].automationOnMax) {
+    if(data.actions[actionVar].automationOnReveal > 0) {
         updateSupplyChain(actionVar);
     }
 }
@@ -458,13 +459,14 @@ function isNeeded(actionVar, isNeededList = {}) {
     const actionObj = data.actions[actionVar];
     const dataObj = actionData[actionVar];
 
-    if (!actionObj || !actionObj.visible || !dataObj.hasUpstream) {
+
+    if (!actionObj || !actionObj.visible || (!actionObj.keepParentAutomation && !dataObj.hasUpstream)) {
         isNeededList[actionVar] = false;
         return false;
     }
 
     const isMaxLevel = actionObj.maxLevel !== undefined && actionObj.level >= actionObj.maxLevel;
-    if (!isMaxLevel) {
+    if (!isMaxLevel && (!dataObj.ignoreMaxLevelAutomation || actionObj.level === 0)) {
         isNeededList[actionVar] = true;
         return true;
     }
@@ -492,7 +494,7 @@ function updateSupplyChain(startActionVar) {
         const actionObj = data.actions[currentVar];
         const dataObj = actionData[currentVar];
 
-        if (!actionObj || dataObj.hasUpstream === false || !dataObj || !dataObj.parentVar) {
+        if (!actionObj || (!dataObj.keepParentAutomation && !dataObj.hasUpstream) || !dataObj || !dataObj.parentVar) {
             break;
         }
 

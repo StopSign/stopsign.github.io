@@ -322,9 +322,6 @@ function calculateTaken(actionVar, shouldGive) {
         if (!downstreamObj || !downstreamObj.visible) continue;
 
         if(!downstreamDataObj.hasUpstream) {
-            if (!downstreamObj.unlocked && downstreamObj.unlockCost <= 0) {
-                unlockAction(downstreamObj);
-            }
             continue;
         }
 
@@ -398,6 +395,7 @@ function giveResourceTo(actionObj, downstreamObj, amount) {
 }
 
 function addResourceTo(downstreamObj, amount) {
+
     let downstreamDataObj = actionData[downstreamObj.actionVar];
     if (downstreamObj.unlockCost > 0) {
         downstreamObj.unlockCost -= amount;

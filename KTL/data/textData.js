@@ -385,7 +385,7 @@ const actionTextData = `
         <version>1</version>
         <english><![CDATA[
             (WIP)
-			As my emotional state calmed, I found my mind clearing as well, and with it came noticing how, when I redirected the momentum back into itself, there were smaller sets of flows that I could redirect as well. With my growing ability to multitask, it was trivial to do a little more about the efficiency of the flow.
+			As my emotional state calmed, I found my mind clearing as well, and with it came noticing how, when I redirected the momentum back into itself, there were smaller sets of flows that I could redirect as well. With my growing ability to multitask, it was trivial to do a little more about the speed of the flow.
         ]]></english>
 	</siftExcess>
 	

@@ -185,7 +185,7 @@ function generateActionDisplay(actionVar) {
             <span style="font-size:14px;position:relative;color:var(--text-muted)">
                 ${!actionObj.isSpell?"Level ":"Charges "}<span id="${actionVar}Level" style="color:var(--text-primary);font-weight:bold;">0</span>
                 ${actionObj.maxLevel !== undefined ? ` / <span id="${actionVar}MaxLevel" style="color:var(--text-primary);font-weight:bold;">0</span>` : ""} | 
-                <span id="${actionVar}Efficiency" style="color:var(--text-primary);font-weight:bold;"></span>% efficiency
+                <span id="${actionVar}Efficiency" style="color:var(--text-primary);font-weight:bold;"></span>% speed
                 ${!actionObj.wage ? "" : ` | Wage: $<span id="${actionVar}Wage" style="color:var(--wage-color);font-weight:bold;"></span>`}
                 ${!actionObj.isSpell ? "" : ` | <span id="${actionVar}Instability" style="color:var(--text-primary);font-weight:bold;">0</span>% instability
                 (+<span id="${actionVar}InstabilityToAdd" style="color:var(--text-primary);font-weight:bold;"></span>)` }
@@ -342,8 +342,8 @@ let maxLevelTop = (data.gameSettings.viewDeltas && data.gameSettings.viewRatio) 
     let levelInfoContainer = Raw.html`
         <div id="${actionVar}_infoContainer" style="display:none;padding:5px;max-height:220px;overflow-y:auto;">
             Tier <b>${actionObj.tier}</b> ${actionObj.isSpell ? "Spell" : actionObj.isGenerator ? "Generator" : "Action"}<br>
-            Efficiency, found in the title, is Expertise Mult * Base Efficiency (x<b><span id="${actionVar}EfficiencyBase"></span></b>), capping at <b>100</b>%.<br>
-            ${actionObj.isGenerator?"":(`Consume and send rate is ${actionObj.tierMult()*100}% of ${dataObj.resourceName} * efficiency.<br>`)}<br>
+            Speed, found in the title, is Expertise Mult * Base Speed (x<b><span id="${actionVar}EfficiencyBase"></span></b>), capping at <b>100</b>%.<br>
+            ${actionObj.isGenerator?"":(`Consume and send rate is ${actionObj.tierMult()*100}% of ${dataObj.resourceName} * speed.<br>`)}<br>
             ${onComplete}
             ${onLevelText}
             ${dataObj.extraInfo ? dataObj.extraInfo[language]:""}
@@ -369,7 +369,9 @@ let maxLevelTop = (data.gameSettings.viewDeltas && data.gameSettings.viewRatio) 
     queueCache(`${actionVar}_automation_slider_basic`)
     queueCache(`${actionVar}SliderContainerAutomation`)
 
-    let preventParentSliderText = !dataObj.hasUpstream ? "": `
+    let preventParentSliderText = "";
+    if(dataObj.hasUpstream) {
+        preventParentSliderText += `
             <span id="${actionVar}_automationRevealContainer">
                 Enable automation to enable upstream sliders to this action when it is revealed, or when the max level increases:
                 <label onclick="toggleAutomationOnReveal('${actionVar}')" style="position:relative;display:inline-block;width:50px;height:14px;cursor:pointer;">
@@ -399,9 +401,12 @@ let maxLevelTop = (data.gameSettings.viewDeltas && data.gameSettings.viewRatio) 
                         ${createBasicSliderHTML(actionVar, 'Automation')}
                     </div>
     
-                </span>
-            </div>
-                
+                </div>
+            </span>
+        `
+    }
+    if(dataObj.hasUpstream || dataObj.keepParentAutomation) {
+        preventParentSliderText += `
             <span id="${actionVar}_automationMaxLevelContainer">
                 Enable automation to disable upstream sliders to this action when it is max level:
                
@@ -412,7 +417,9 @@ let maxLevelTop = (data.gameSettings.viewDeltas && data.gameSettings.viewRatio) 
                     </div>
                 </label><br>
             </span>
-    `
+            
+        `
+    }
 
     let automationContainer = Raw.html`
         <div id="${actionVar}_automationContainer" style="display:none;padding:10px;max-height:220px;overflow-y:auto;
@@ -606,7 +613,7 @@ function generateOutsideAttDisplay(actionObj, attObj, type) {
     if (type === "add") {
         tooltipText = `${text} to ${capitalizeFirst(statName)} per level.`;
     } else if (type === "eff") {
-        tooltipText = `${text} of ${capitalizeFirst(statName)}'s bonus is multiplied to base efficiency`;
+        tooltipText = `${text} of ${capitalizeFirst(statName)}'s bonus is multiplied to base speed`;
     } else if (type === "exp") {
         let target = actionObj.isGenerator ? "exp to level" : "progress to complete";
         tooltipText = `${text} of ${capitalizeFirst(statName)} bonus reduces ${target}`;
@@ -695,7 +702,7 @@ function generateActionEfficiencyAtts(actionObj) {
 
     queueCache(`${actionVar}AttEfficiencyContainer`);
     let expertiseModsStr =
-        `<div id="${actionVar}AttEfficiencyContainer" style="display:none;">${isFirst?"":"<br>"}<u>Stat Modifiers to Efficiency:</u><br>`;
+        `<div id="${actionVar}AttEfficiencyContainer" style="display:none;">${isFirst?"":"<br>"}<u>Stat Modifiers to Speed:</u><br>`;
 
     for(let attObj of dataObj.efficiencyAtts) {
         let attVar = attObj[0];
@@ -718,7 +725,7 @@ function generateActionEfficiencyAtts(actionObj) {
     queueCache(`${actionVar}EfficiencyMult`);
     queueCache(`${actionVar}EfficiencyBase`);
     expertiseModsStr += Raw.html`
-        <span style="color:var(--text-muted);">Total Expertise Mult = x</span><b><span id="${actionVar}EfficiencyMult"></span></b>
+        <span style="color:var(--text-muted);">Total Speed Mult = x</span><b><span id="${actionVar}EfficiencyMult"></span></b>
     </div>`;
     
     return expertiseModsStr;
@@ -931,7 +938,7 @@ function handleSliderClick(clickedId, actionVar, downstreamVar, value) {
     setSliderUI(actionVar, downstreamVar, value);
 }
 
-function attachCustomSliderListeners() {
+function attachSliderListeners() {
     for (let actionVar in data.actions) {
         let dataObj = actionData[actionVar];
         let actionObj = data.actions[actionVar];
@@ -943,15 +950,15 @@ function attachCustomSliderListeners() {
         })
 
         for (let downstreamVar of dataObj.downstreamVars) {
-            attachCustomSliderListenersHelper(actionVar, downstreamVar);
+            attachSliderListenersHelper(actionVar, downstreamVar);
         }
         if(actionObj.hasUpstream) {
-            attachCustomSliderListenersHelper(actionVar, "Automation");
+            attachSliderListenersHelper(actionVar, "Automation");
         }
     }
 }
 
-function attachCustomSliderListenersHelper(actionVar, downstreamVar) {
+function attachSliderListenersHelper(actionVar, downstreamVar) {
     const container = document.getElementById(`${actionVar}_${downstreamVar}_track_container`);
     const thumb = document.getElementById(`${actionVar}Thumb${downstreamVar}`);
 
@@ -983,11 +990,6 @@ function attachCustomSliderListenersHelper(actionVar, downstreamVar) {
 
         const newValue = Math.round((newLeft / trackRect.width) * 100);
 
-        // if (data.actions[actionVar][`downstreamRate${downstreamVar}`] === newValue) {
-        //     return;
-        // }
-
-        // data.actions[actionVar][`downstreamRate${downstreamVar}`] = newValue;
         setSliderUI(actionVar, downstreamVar, newValue);
     };
 
@@ -1005,9 +1007,24 @@ function attachCustomSliderListenersHelper(actionVar, downstreamVar) {
         document.addEventListener('mouseup', stopDrag);
     });
 
-    const hoverTargetContainer = document.getElementById(`${actionVar}SliderContainer${downstreamVar}`);
 
+    if(downstreamVar === "Automation") {
+        const hoverTargetContainer = document.getElementById(`${actionVar}_automationRevealContainer`);
+        let parentVar = dataObj.parentVar;
+        const line = document.getElementById(`${parentVar}_${actionVar}_Line_Outer`);
+        hoverTargetContainer.addEventListener('mouseenter', () => {
+            line.style.borderColor = "yellow";
+            views.updateVal(`${parentVar}LargeVersionContainer`, "yellow", "style.borderColor");
+            views.updateVal(`${parentVar}LockContainer`, "yellow", "style.borderColor");
+        });
+
+        hoverTargetContainer.addEventListener('mouseleave', () => {
+            line.style.borderColor = "black";
+            setBorderColor(parentVar, selectedStat);
+        });
+    }
     if(downstreamVar !== "Automation") {
+        const hoverTargetContainer = document.getElementById(`${actionVar}SliderContainer${downstreamVar}`);
         const line = document.getElementById(`${actionVar}_${downstreamVar}_Line_Outer`);
         hoverTargetContainer.addEventListener('mouseenter', () => {
             line.style.borderColor = "yellow";
@@ -1057,10 +1074,12 @@ function handleLineClick(borderId, lineData) {
 function getLabelOrientation(angle) {
     const norm = ((angle % 360) + 360) % 360;
 
-    if ((norm >= 60 && norm <= 120) || (norm >= 240 && norm <= 300)) {
-        return "vertical"; // counter-rotate
+    if (norm >= 60 && norm <= 120) {
+        return "vertical1";
+    } else if(norm >= 240 && norm <= 300) {
+        return "vertical2";
     } else if (norm > 120 && norm < 240) {
-        return "flipped"; // upside-down, but visually consistent
+        return "flipped";
     } else {
         return "horizontal";
     }
@@ -1092,7 +1111,7 @@ function generateLinesBetweenActions() {
             let lineId = `${actionVar}_${downstreamVar}_Line_Inner`;
 
 
-            //Rotated retangle with inner line ready to adjust width of.
+            //Rotated rectangle with inner line ready to adjust width of.
             let length = Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
             let angle = Math.atan2(y2 - y1, x2 - x1) * (180 / Math.PI);
 
@@ -1101,11 +1120,13 @@ function generateLinesBetweenActions() {
             let topY = "-12px";
             let bottomY = "12px";
             let labelWrapperTransform = "translate(-50%, -50%) ";
+            let labelDistance = "50%";
 
-            if (labelMode === "vertical") {
+            if (labelMode === "vertical1" || labelMode === "vertical2") {
                 labelWrapperTransform += `rotate(${-angle}deg)`;
                 topY = "";
                 bottomY = "";
+                labelDistance = labelMode === "vertical1" ? "60%" : "40%";
             } else if (labelMode === "flipped") {
                 labelWrapperTransform += `rotate(180deg)`;
             }
@@ -1125,7 +1146,7 @@ function generateLinesBetweenActions() {
                      onclick="${onclickText}">
                      
                     <div id="${lineId}" style="width: 100%; height: 0; background-color: ${targetBackgroundColor}; position: relative;text-align:center;">
-                        <div id="${lineId}_Container" style="display: flex;position: absolute;left: 50%;top: 50%;
+                        <div id="${lineId}_Container" style="display: flex;position: absolute;left: ${labelDistance};top: 50%;
                             transform:${labelWrapperTransform};flex-direction: column;align-items: center;pointer-events: none;">
                             <div id="${lineId}_Top" class="line-label-top hyperVisible" style="opacity:0;position:relative;color: yellow;font-size: 14px;font-weight: bold;line-height: 1;top:${topY}">
                                 x2

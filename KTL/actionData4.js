@@ -43,7 +43,7 @@ actionData = {
         onCompleteText: {english:Raw.html`
                 +<span style="font-weight:bold;" id="echoKindleResourceSent">???</span> Spark was added to Spark Mana.<br>
                 `},
-        extraInfo: {english:Raw.html`Exp & Mana gain = (Legacy)^.5 * Action Power * Efficiency * 10000.`},
+        extraInfo: {english:Raw.html`Exp & Mana gain = (Legacy)^.5 * Action Power * Speed * 10000.`},
         actionTriggers: [
             ["info", "text", "Generates Spark using Legacy"]
         ]
@@ -117,7 +117,7 @@ actionData = {
                 -<span style="font-weight:bold;" id="poolManaResourceTaken">???</span> Spark was taken from Spark Mana, converted to<br>
                 +<span style="font-weight:bold;" id="poolManaResourceSent">???</span> Mana, added to this action.<br>
                 `},
-        extraInfo: {english:Raw.html`Exp & Mana gain = Action Power * Efficiency.`},
+        extraInfo: {english:Raw.html`Exp & Mana gain = Action Power * Speed.`},
         actionTriggers: [
             ["info", "text", "Takes 100% of Spark and converts it to Mana."],
             ["level_1", "reveal", "manaBasics"],
@@ -192,8 +192,8 @@ actionData = {
         efficiencyAtts:[["integration", .05]],
         actionTriggers: [
             ["level_1", "reveal", "overcharge"],
-            ["level_1", "reveal", "combatSpells"],
-            ["level_1", "reveal", "recoverSpells"]
+            // ["level_1", "reveal", "combatSpells"],
+            // ["level_1", "reveal", "recoverSpells"]
         ]
     },
     prepareInternalSpells: {

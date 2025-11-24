@@ -46,7 +46,7 @@ actionData = {
         expAtts:[],
         efficiencyAtts:[["doom", -1]],
         extraInfo: {english:Raw.html`<br>Adds equal Fear and Bravery to this action and Resolve.<br> 
-                        Amount added = 10% of Fear * Efficiency per complete.<br>`},
+                        Amount added = 10% of Fear * Speed per complete.<br>`},
         actionTriggers: [
             ["info", "text", "Generates Bravery, to counter the rising Doom."],
         ]

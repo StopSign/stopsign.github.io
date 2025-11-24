@@ -554,7 +554,7 @@ actionData = {
         progressMaxBase:3e35, progressMaxIncrease:1.1,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:1,
-        unlockCost:1e33, visible:false, unlocked:false, purchased: false, showToAdd:true,
+        unlockCost:1e33, visible:false, unlocked:false, purchased: false, showToAdd:true, ignoreMaxLevelAutomation:true,
         onUnlock: function() {
             data.actions.study.resourceToAdd = 1;
         },
@@ -582,7 +582,7 @@ actionData = {
         progressMaxBase:10, progressMaxIncrease:10,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:.1, maxLevel:1,
-        unlockCost:5, visible:false, unlocked:false, purchased: false, hasUpstream:false,
+        unlockCost:5, visible:false, unlocked:false, purchased: false, hasUpstream:false, keepParentAutomation:true,
         onLevelAtts:[["comfort", 5]],
         expAtts:[],
         efficiencyAtts:[["comfort", 1]]
