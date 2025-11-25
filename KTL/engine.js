@@ -465,6 +465,11 @@ function isNeeded(actionVar, isNeededList = {}) {
         return false;
     }
 
+    if(!actionObj.automationOnReveal && dataObj.hasUpstream) {
+        isNeededList[actionVar] = false;
+        return false;
+    }
+
     const isMaxLevel = actionObj.maxLevel !== undefined && actionObj.level >= actionObj.maxLevel;
     if (!isMaxLevel && (!dataObj.ignoreMaxLevelAutomation || actionObj.level === 0)) {
         isNeededList[actionVar] = true;

@@ -53,7 +53,7 @@ Here, the resources on Momentum is 100 and it is a Tier 1 Action, so the maximum
         `
 <img src="img/tutorial2.png" alt="Tutorial 3" style="width:570px;height:685px;" /><br>
 
-        Within the Stats Menu, it will show the details of stat gains: The requirements to level are reduced by the cumulative bonus of all the purple stats. This image is highlighting the change in Speed.<br><br>
+        Within the Stats Menu, it will show the details of stat gains: The requirements to level are reduced by the multiplicative bonus of all the purple stats. This image is highlighting the change in Speed.<br><br>
 
 Speed on regular actions (lightning bolt icon) will increase 1) The rate resources are used by the action and 2) The rate the action can send resources downstream to the next action.<br><br>
 
@@ -82,13 +82,13 @@ You can only have one job at a time, and it will automatically be the one with t
 
 Legacy is the resource on the originator of all magic: Echo Kindle. Every time you gain legacy as an attribute, you will also gain it on Echo Kindle.<br><br>
 
-Echo Kindle generates spark onto Spark Decay, which wastes the spark by consuming it. Pool Mana takes what Spark remains when it completes and turns it into Mana - the lower speed that Spark Decay has, the more Mana will be available for spells.
+Echo Kindle generates spark onto Spark Decay, which wastes the Spark by consuming it. Pool Mana takes what Spark remains when it completes and turns it into Mana - the lower speed that Spark Decay has, the more Mana will be available for spells.
         `);
 
     createToast(function() { return data.actions.overcharge.unlocked; },
         "Spells and Instability",0,
         `
-        Overcharge and Overboost are the first spells you'll be able to repeatedly cast. They are cast automatically when Overclock completes and gains momentum, giving a x10 bonus each, and overboost is only cast when overcharge is also ready to cast, ensuring it is only used to gain x100 momentum total.<br><br>
+        Overcharge and Overboost are the first spells you'll be able to repeatedly cast. They are cast automatically when Overclock completes and gains momentum, giving a x10 bonus each, and Overboost is only cast when Overcharge is also ready to cast, ensuring it is only used to gain x100 momentum total.<br><br>
 
 When you cast a spell, it also gains instability. The Mana cost of the spell increases by the instability %. Instability is decreased by the attribute Control. It reduces by (Control's Bonus^.5)/s
         `);
