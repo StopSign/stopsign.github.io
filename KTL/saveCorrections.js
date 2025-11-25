@@ -89,6 +89,9 @@ function saveFileCorrection(saveVersionFromLoad) {
     if(saveVersionFromLoad <= 4) {
         data.actions.harnessOverflow.maxLevel = 10 + data.actions.remember.level*3;
 
+        for(let id in data.toastStates) {
+            data.toastStates[id] = 'hidden';
+        }
     }
     return refundAmount;
 }

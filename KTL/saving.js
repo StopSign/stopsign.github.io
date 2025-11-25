@@ -15,7 +15,7 @@ function resetActionToBase(actionVar) {
     actionSetBaseVariables(data.actions[actionVar], actionData[actionVar]);
 }
 
-data.saveVersion = 4;
+data.saveVersion = 5;
 function load() {
     initializeData();
 

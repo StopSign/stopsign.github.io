@@ -127,9 +127,8 @@ function createHelpForRealMenu() {
     return Raw.html`
         <div class="menuTitle">How to Provide Feedback</div>
         <div class="menuSeparator"></div><br>
-        You'll help me, for real? Wow, I didn't know you were cool like that.<br>
-        My discord to discuss everything is here: <a href="https://discord.gg/dnKA6Xd" target="_blank">Stop_Sign Gaming</a>. I would really appreciate hearing about your experience, 
-        and how you felt while playing! 
+        You'll help me, for real?<br>
+        My discord to discuss everything is here: <a href="https://discord.gg/dnKA6Xd" target="_blank">Stop_Sign Gaming</a>. I would really appreciate hearing about your suggestions and experience!
         You can also talk about the game in the discord with others, and share strategies.<br><br>
         No AI was used in the writing of the story, and no AI-art will be added to the game.<br><br>
         Thanks for playing! -Stop_Sign
@@ -139,9 +138,28 @@ function createHelpForRealMenu() {
 function createHelpMenu() {
     return Raw.html`
         <div class="menuTitle">Help</div>
-        <div class="menuSeparator"></div><br>
-        You'll help? Oh, you <i>want</i> help. Well, use the sliders to move resources to actions that haven't been unlocked yet. 
-        Other than that, it's just reading the numbers that are visible and figuring out which is the optimal path. I'm sure you can do it.
+        <div class="menuSeparator"></div>
+        <div style="font-size:20px;">How to Play</div>
+        Overclock generates the primary resource of the game - momentum. The gameplay is, to start, moving the momentum around to the actions that need it, for unlocking and leveling. When you level most actions, you get attributes that reduce the Exp required to level (the purple icons are for this) or increase the Speed at which resources flow (the blue icons are for this).<br><br>
+        Later, you will gain the ability to reset the game, and with choices of various upgrades to improve the game, incluing automation which makes moving resources automatic. The gameplay at that point is to understand the flow of the game, to know when to reset to get the most resources you want, and which upgrade is the best to get next or work towards.
+        <div class="menuSeparator"></div>
+        <div style="font-size:20px;">Controls to Move Around</div>
+        Click/right click and drag to move the game window. WASD works also, with Shift making it move x3 faster. Use the mouse scroll wheel or the [+] and [-] to zoom in and out.
+        <div class="menuSeparator"></div>
+        <div style="font-size:20px;">Attributes</div>
+         Each attribute is a 10% increase to bonus, shown in the Attributes window. There are a few colors for attributes surrounding actions.
+        <ol>
+            <li>Green: Adds the attribute on level</li>
+            <li>Purple: Reduces the progress required to complete if it is an action, reduces exp required to level if it is a generator</li>
+            <li>Blue: Increases speed. For actions, speed is the send and consume rate. For generators, it is the generator speed, generator amount, and send rate.</li>
+        </ol><br>
+        When you click on an attribute, it will highlight actions with the color of how it uses or gains the attribute, and the action will be colored white if it both uses and gains the attribute.
+        <div class="menuSeparator"></div>
+        <div style="font-size:20px;">Max Level</div>
+        Most actions have max levels, shown in their title card. When the level is at the maximum, the resource will no longer be consumed: it can send 100% of the resources without taking any. Actions that are max level without incoming or outgoing resources will also visually dim.
+        <div class="menuSeparator"></div>
+        <div style="font-size:20px;">Finding New Actions</div>
+        The icon text will tell you if something unique happens when the action unlocks, levels, or hits a level threshold. If the text shows ???, you must purchase the relevant action in the Amulet Upgrades shop. A few actions purchase conditionally purchase others. Purchasing actions is a permament effect.
 `;
 }
 
@@ -222,8 +240,9 @@ function updatePreviousTipsMenu() {
         if(data.toastStates[toastObj.id] !== 'closed') {
             continue;
         }
-        tipStr += `<span style="font-size:14px;">Tip #${toastObj.id}: ${toastObj.title}</span><br>
-            ${toastObj.message}<br><br>`;
+        tipStr += `<span style="font-size:20px;">Tip #${toastObj.id+1}: ${toastObj.title}</span><br>
+            ${toastObj.message}
+        <div class="menuSeparator"></div><br>`;
     }
 
     document.getElementById("previousTipsTextContainer").innerHTML = tipStr;
@@ -573,7 +592,22 @@ function createChangelogMenu() {
     return Raw.html`
         <div class="menuTitle">Changelog</div>
         <div class="menuSeparator"></div><br>
-        v2.0.13 11/17 (current):<br>
+        v2.1.0 11/25 (current):<br>
+        <ul>
+            <li>Reworked menu css; it works better at all screen sizes</li>
+            <li>Reworked Amulet menu to separate attribute upgrades into a different tab</li>
+            <li>Amulet sort settings save now</li>
+            <li>Made it more clear that downstream rates cannot be changed in northern wastes.</li>
+            <li>New Upgrade: Temper My Desires [100 AC]. Gain a custom slider for setting automation. The sliders are in the Automation tab under the toggle, change with advanced/basic sliders, and can be set while in Northern Wastes.</li>
+            <li>Added the automation menu for the action right after resource changes. This adds the option to let HATL disable Gossip (and above) when HATL is max level, and let Study (and above) disable when all research is done. Default is on.</li>
+            <li>Fixed an automation bug that when a max level was added, it was checking the wrong toggle.</li>
+            <li>Adjusted position of focus text on vertical connecting lines, to not be hidden by actions</li>
+            <li>Fixed Delta time showing when it shouldn't be</li>
+            <li>HATL properly unlocks only at gossip level 5</li>
+            <li>Reworked Tutorial - existing players will see the tips popup one more time</li>
+            <li>Filled out Help Menu with actual information</li>
+        </ul><br>
+        v2.0.13 11/17:<br>
         <ul>
             <li>Fixing icon/unlock issues</li>
         </ul><br>

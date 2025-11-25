@@ -113,15 +113,12 @@ function debug() {
     }
 
     document.getElementById("bonus50").style.display = "";
-    // data.gameSettings.bonusSpeed = 1;
-    // data.currentGameState.KTLBonusTimer = 0;
     data.ancientCoin = 100000;
 
     // gameSpeed = 1;
     data.currentGameState.bonusTime = 1000 * 60 * 60 * 24 * 7;
-
-    buyUpgrade("limitMyDesires")
-
+    // buyUpgrade("temperMyDesires")
+    
     //temp data corrections:
     // revealAction('visitShrineBehindWaterfall')
     // document.getElementById('confirmKTL').checked = true;
