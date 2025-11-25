@@ -194,7 +194,7 @@ function adjustUIAfterLoad(toLoad, saveVersionFromLoad) {
         }
 
         //correct old versions from boolean to number
-        if(toLoad.actions) {
+        if(toLoad.actions && toLoad.actions[actionVar]) {
             if (dataObj.hasUpstream && (toLoad.actions[actionVar].automationOnReveal === true || toLoad.actions[actionVar].automationOnReveal === undefined)) {
                 setSliderUI(actionVar, "Automation", data.upgrades.stopLettingOpportunityWait.upgradePower * 50);
             } else if (actionObj.automationOnReveal === false) {
