@@ -502,6 +502,9 @@ function updateSupplyChain(startActionVar) {
         if (!actionObj || (!dataObj.keepParentAutomation && !dataObj.hasUpstream) || !dataObj || !dataObj.parentVar) {
             break;
         }
+        if(dataObj.plane === 2) {
+            return;
+        }
 
         const parentVar = dataObj.parentVar;
         //recurses downwards to be true if any downstream is needed
@@ -525,7 +528,6 @@ function updateSupplyChain(startActionVar) {
 
         currentVar = parentVar;
     }
-
 }
 
 

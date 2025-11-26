@@ -592,7 +592,7 @@ function createChangelogMenu() {
     return Raw.html`
         <div class="menuTitle">Changelog</div>
         <div class="menuSeparator"></div><br>
-        v2.1.2 11/25 (current):<br>
+        v2.1.3 11/25 (current):<br>
         <ul>
             <li>Reworked menu css; it works better at all screen sizes</li>
             <li>Reworked Amulet menu to separate attribute upgrades into a different tab</li>
@@ -608,6 +608,7 @@ function createChangelogMenu() {
             <li>Filled out Help Menu with actual information</li>
             <li>v2.1.1 - Automation adjustment</li>
             <li>v2.1.2 - Handled an issue with old saves</li>
+            <li>v2.1.3 - Forced Northern Wastes sliders to max</li>
         </ul><br>
         v2.0.13 11/17:<br>
         <ul>

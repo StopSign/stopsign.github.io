@@ -121,4 +121,21 @@ function saveFileCorrectionAfterLoad(saveVersionFromLoad) {
             revealUpgrade("temperMyDesires")
         }
     }
+
+    if(saveVersionFromLoad <= 5) {
+        //force all KTL actions to max until I can figure it out
+        for (let actionVar in data.actions) {
+            let dataObj = actionData[actionVar];
+            if (dataObj.plane !== 2) {
+                continue;
+            }
+            for (let downstreamVar of dataObj.downstreamVars) {
+                let downstreamDataObj = actionData[downstreamVar];
+                if (downstreamDataObj.hasUpstream === false) {
+                    continue;
+                }
+                setSliderUI(actionVar, downstreamVar, 100);
+            }
+        }
+    }
 }
