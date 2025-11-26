@@ -332,7 +332,7 @@ let actionData = {
         expToLevelBase: 100, expToLevelIncrease: 2,
         actionPowerBase: 1, actionPowerMult: 1, actionPowerMultIncrease: 1.1,
         efficiencyBase: .1,
-        unlockCost: 1e7, visible: false, unlocked: false, purchased: true, ignoreMaxLevelAutomation:true,
+        unlockCost: 1e7, visible: false, unlocked: false, purchased: true,
         isGenerator: true, generatorTarget: "spendMoney", generatorSpeed: 5,
         onCompleteCustom: function () {
             let actionObj = data.actions.makeMoney;
@@ -724,7 +724,7 @@ let actionData = {
         expToLevelBase: 3e8, expToLevelIncrease: 1.4,
         actionPowerBase: 1, actionPowerMult: 1, actionPowerMultIncrease: 1,
         efficiencyBase: .5,
-        unlockCost: 2e12, visible: false, unlocked: false, purchased: false, ignoreMaxLevelAutomation:true,
+        unlockCost: 2e12, visible: false, unlocked: false, purchased: false,
         isGenerator: true, generatorTarget: "buildFortune", generatorSpeed: 1,
         onCompleteCustom: function () {
             //stop consuming from reinvest - it's not amount on reinvest * 1.05, but it's 5% of what's on reinvest
@@ -1049,7 +1049,7 @@ let actionData = {
         expToLevelBase: 100, expToLevelIncrease: 1.4,
         actionPowerBase: 1, actionPowerMult: 1, actionPowerMultIncrease: 1.1,
         efficiencyBase: .05,
-        unlockCost: 1e15, visible: false, unlocked: false, purchased: true, ignoreMaxLevelAutomation:true,
+        unlockCost: 1e15, visible: false, unlocked: false, purchased: true,
         isGenerator: true, generatorTarget: "meetPeople", generatorSpeed: 5,
         onCompleteCustom: function () {
             let actionObj = data.actions.socialize;

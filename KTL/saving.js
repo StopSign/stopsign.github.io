@@ -9,6 +9,11 @@ function clearSave() {
 //TODO also, only choose the vars you want to keep, rather than keeping bad data across saves
 function loadActionFromSave(actionObj, loadObj) {
     Object.assign(actionObj, loadObj);
+    //save corrections
+    if(loadObj.automationOnMax !== undefined) {
+        actionObj.automationCanDisable = loadObj.automationOnMax;
+    }
+    delete actionObj.automationOnMax;
 }
 
 function resetActionToBase(actionVar) {
@@ -68,6 +73,7 @@ function load() {
                 continue;
             }
             loadActionFromSave(actionObj, loadObj);
+
         }
 
         let refundAmount = 0;
@@ -132,6 +138,7 @@ function load() {
         if(toLoad.actions.poolMana.visible) {
             actionData.poolMana.generatorSpeed = 6;
         }
+
 
 
         refundAmount += saveFileCorrection(saveVersionFromLoad)
@@ -310,7 +317,9 @@ function updateUIOnLoad() {
             let showRevealAutomation = data.upgrades.stopLettingOpportunityWait.upgradePower > 0 && dataObj.hasUpstream;
             let showMaxLevelAutomation = data.upgrades.knowWhenToMoveOn.upgradePower > 0;
             views.updateVal(`${actionVar}_automationMenuButton`, dataObj.plane !== 2 && (showRevealAutomation || showMaxLevelAutomation) ? "" : "none", "style.display");
-            views.updateVal(`${actionVar}_automationMaxLevelContainer`, dataObj.plane !== 2 && showMaxLevelAutomation ? "" : "none", "style.display");
+            if(dataObj.maxLevel !== undefined) {
+                views.updateVal(`${actionVar}_automationMaxLevelContainer`, dataObj.plane !== 2 && showMaxLevelAutomation ? "" : "none", "style.display");
+            }
             if(dataObj.hasUpstream) {
                 views.updateVal(`${actionVar}_automationRevealContainer`, dataObj.plane !== 2 && showRevealAutomation ? "" : "none", "style.display");
             }
@@ -326,8 +335,8 @@ function updateUIOnLoad() {
                 views.updateVal(`${actionVar}_knob`, "translateX(26px)", "style.transform");
             }
         }
-        if(dataObj.hasUpstream || dataObj.keepParentAutomation) {
-            if (actionObj.automationOnMax) {
+        if((dataObj.hasUpstream || dataObj.keepParentAutomation) && dataObj.maxLevel !== undefined) {
+            if (actionObj.automationCanDisable) {
                 views.updateVal(`${actionVar}_checkbox2`, true, "checked");
                 views.updateVal(`${actionVar}_track2`, "#2196F3", "style.backgroundColor");
                 views.updateVal(`${actionVar}_knob2`, "translateX(26px)", "style.transform");

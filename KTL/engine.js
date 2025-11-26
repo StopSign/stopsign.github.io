@@ -111,7 +111,7 @@ function actionSetInitialVariables(actionObj, dataObj) {
     actionObj.purchased = !!dataObj.purchased;
     actionObj.plane = dataObj.plane;
     actionObj.automationOnReveal = 0;
-    actionObj.automationOnMax = true;
+    actionObj.automationCanDisable = true;
     actionObj.keepParentAutomation = !!dataObj.keepParentAutomation;
     actionObj.currentMenu = "downstream";
     actionObj.hasBeenUnlocked = false;
@@ -272,8 +272,8 @@ function checkLevelUp(actionObj, dataObj) {
         }
 
         let isNowMaxLevel = actionObj.maxLevel !== undefined && actionObj.level >= actionObj.maxLevel;
-        if (isNowMaxLevel && actionObj.automationOnMax) {
-            updateSupplyChain(actionObj.actionVar);
+        if (isNowMaxLevel) {
+            disableAutomationUpwards(actionObj.actionVar);
         }
 
         return true;
@@ -416,9 +416,7 @@ function revealAction(actionVar) {
     actionObj.visible = true;
     revealAttsOnAction(actionObj);
 
-    if(data.actions[actionVar].automationOnReveal > 0) {
-        updateSupplyChain(actionVar);
-    }
+    enableAutomationUpwards(actionVar);
 }
 
 
@@ -436,100 +434,118 @@ function revealUpgrade(upgradeVar) {
 function addMaxLevel(actionVar, amount) {
     data.actions[actionVar].maxLevel += amount;
 
-    // setUpstreamSlidersToUnlockValue(actionVar); // New line
-
-    if(data.actions[actionVar].automationOnReveal > 0) {
-        updateSupplyChain(actionVar);
+    if(data.actions[actionVar].visible) {
+        enableAutomationUpwards(actionVar);
     }
 }
 
-//for a given actionVar:
-//1. if already exists in the list, return that
-//2. if it doesn't exist or is not visible, return false
-//3. if it isn't max level, return true
-//4. else, if it is max level, recurse down to the children - are any of them not max level and visible? If any are, it makes all their parents yes needed
-//5. if none are needed, return false
-//6. saves in isNeededList only to prevent recalc with multiple calls via updateSupplyChain
-//7. if the action has automationOnMax, i'm pretty sure it shouldn't change anything here - it's still needed or not based on max level
-function isNeeded(actionVar, isNeededList = {}) {
-    if (isNeededList[actionVar] !== undefined) {
-        return isNeededList[actionVar];
+//Handling automationOnReveal behavior - thanks obliv for the algorithm
+//Triggered when action is revealed, max level increased, or level decreased (charges used)
+function enableAutomationUpwards(actionVar, isForced) {
+    if(data.upgrades.stopLettingOpportunityWait.upgradePower === 0 || actionData[actionVar].plane === 2) {
+        return;
     }
 
-    const actionObj = data.actions[actionVar];
-    const dataObj = actionData[actionVar];
-
-
-    if (!actionObj || !actionObj.visible || (!actionObj.keepParentAutomation && !dataObj.hasUpstream)) {
-        isNeededList[actionVar] = false;
-        return false;
+    //If target node’s “enable” automation slider is off, or if the node is being revealed for the very first time ever, then do nothing.
+    //This is not part of the loop. We don’t check the slider for any upstream actions.
+    if(!isForced && (data.actions[actionVar].automationOnReveal === 0 || !data.actions[actionVar].hasBeenUnlocked)) {
+        return;
     }
 
-    if(!actionObj.automationOnReveal && dataObj.hasUpstream) {
-        isNeededList[actionVar] = false;
-        return false;
-    }
+    let currentTarget = actionVar;
+    //Start of loop. If target node is a root node (Overclock, Pool Mana), then break the loop.
+    while(actionData[currentTarget].hasUpstream || actionData[currentTarget].keepParentAutomation) {
+        let actionObj = data.actions[currentTarget];
+        let dataObj = actionData[currentTarget];
 
-    const isMaxLevel = actionObj.maxLevel !== undefined && actionObj.level >= actionObj.maxLevel;
-    if (!isMaxLevel && (!dataObj.ignoreMaxLevelAutomation || actionObj.level === 0)) {
-        isNeededList[actionVar] = true;
-        return true;
-    }
+        let parentVar = dataObj.parentVar;
+        let parentObj = data.actions[parentVar];
 
-    if (dataObj.downstreamVars) {
-        for (const downstreamVar of dataObj.downstreamVars) {
-            if (isNeeded(downstreamVar, isNeededList)) {
-                isNeededList[actionVar] = true;
-                return true;
-            }
+        //If the slider from the upstream node is exactly zero, then update it to the automation default value. Use the current target node’s Temper My Desires slider if unlocked and not zero. Otherwise, it’s a fixed 50% or 100% based on amulet perks.
+        if(dataObj.hasUpstream && parentObj[`downstreamRate${currentTarget}`] === 0) {
+            setSliderUI(parentVar, currentTarget, isForced?100:actionObj.automationOnReveal)
         }
-    }
 
-    isNeededList[actionVar] = false;
-    return false;
+        //Change target node to the upstream node (where the send slider may have changed). Loop again
+        currentTarget = parentVar
+    }
 }
 
+//Handling automationCanDisable behavior - thanks obliv for the algorithm
+//Triggered when an action reaches max level.
+function disableAutomationUpwards(actionVar, isForced) {
+    if(data.upgrades.knowWhenToMoveOn.upgradePower === 0 || actionData[actionVar].plane === 2) {
+        return;
+    }
 
-function updateSupplyChain(startActionVar) {
-    const isNeededList = {};
-    let currentVar = startActionVar;
-
-    //recurses upwards
-    while (currentVar) {
-        const actionObj = data.actions[currentVar];
-        const dataObj = actionData[currentVar];
-
-        if (!actionObj || (!dataObj.keepParentAutomation && !dataObj.hasUpstream) || !dataObj || !dataObj.parentVar) {
-            break;
+    if(isForced) {
+        if(actionData[actionVar].hasUpstream) {
+            setSliderUI(actionData[actionVar].parentVar, actionVar, 0);
         }
-        if(dataObj.plane === 2) {
+        if(actionData[actionVar].hasUpstream || actionData[actionVar].keepParentAutomation) {
+            disableAutomationUpwards(actionData[actionVar].parentVar)
+        }
+    }
+
+    let currentTarget = actionVar;
+    //Start of loop. If target is a root node (Overclock, Pool Mana) then stop the loop.
+    while(actionData[currentTarget].hasUpstream || actionData[currentTarget].keepParentAutomation) {
+        let actionObj = data.actions[currentTarget];
+        let dataObj = actionData[currentTarget];
+
+        //If the automation slider to disable the target node at max level is disabled, then stop the loop.
+        if (!actionObj.automationCanDisable) {
             return;
         }
 
-        const parentVar = dataObj.parentVar;
-        //recurses downwards to be true if any downstream is needed
-        const childIsNeeded = isNeeded(currentVar, isNeededList);
-
-        let currentSliderValue = data.actions[parentVar][`downstreamRate${currentVar}`];
-
-        if (childIsNeeded) {
-            //if a child is needed, and slider is off, turn it on
-            if (currentSliderValue === 0 && actionObj.automationOnReveal > 0) {
-                if(!actionObj.hasBeenUnlocked && currentVar === startActionVar) { //ignore the first time
-                    setSliderUI(parentVar, currentVar, 0);
-                } else {
-                    setSliderUI(parentVar, currentVar, data.actions[currentVar].automationOnReveal);
-                }
-            }
-        } else if (data.upgrades.knowWhenToMoveOn.upgradePower > 0 && currentSliderValue !== 0 && actionObj.automationOnMax) {
-            //if not needed, turn off
-            setSliderUI(parentVar, currentVar, 0);
+        //If the automation slider to disable the target node at max level is disabled, then stop the loop.
+        const hasMaxLevel = actionObj.maxLevel !== undefined;
+        if (hasMaxLevel && !actionObj.automationCanDisable) {
+            return;
         }
 
-        currentVar = parentVar;
+        //If this node has a max level but has not yet reached it, then stop the loop.
+        if (hasMaxLevel && actionObj.level < actionObj.maxLevel) {
+            return;
+        }
+
+        //If the upstream send rate slider is already 0%, then stop the loop.
+        let parentVar = dataObj.parentVar;
+        if (dataObj.hasUpstream && data.actions[parentVar][`downstreamRate${currentTarget}`] === 0) {
+            return;
+        }
+
+        for (const downstreamVar of dataObj.downstreamVars) {
+            const downstreamObj = data.actions[downstreamVar];
+            if (!downstreamObj.visible) {
+                continue;
+            }
+            if (downstreamObj.keepParentAutomation) {
+                const hasMaxLevel = downstreamObj.maxLevel !== undefined;
+                // If downstream target has been prohibited from being disabled then stop the loop.
+                if (hasMaxLevel && !downstreamObj.automationCanDisable) {
+                    return;
+                }
+                // If downstream target is an action with a maximum level that isn't at level cap then stop the loop.
+                if (!isForced && hasMaxLevel && downstreamObj.level < downstreamObj.maxLevel) {
+                    return;
+                }
+            }
+            //If target has ANY enabled downstream path (slider set to a nonzero value), then stop the loop.
+            else if (actionObj[`downstreamRate${downstreamVar}`] > 0) {
+                return;
+            }
+        }
+
+        // All checks passed. Set the send rate slider from the upstream node to 0%.
+        if(dataObj.hasUpstream) {
+            setSliderUI(dataObj.parentVar, currentTarget, 0);
+        }
+
+        // Change the target node to the upstream node (the one whose downstream slider we just changed) and go to 2.
+        currentTarget = dataObj.parentVar;
     }
 }
-
 
 function revealAttsOnAction(actionObj) {
     for(let onLevelAtt of actionObj.onLevelAtts) {
@@ -595,11 +611,6 @@ function unlockAction(actionObj) {
         dataObj.onUnlock();
     }
 
-
-    // setUpstreamSlidersToUnlockValue(actionVar); // New line
-
-    // updateSupplyChain(actionVar);
-
     for(let onLevelObj of dataObj.onLevelAtts) {
         showAttColors(onLevelObj[0]);
     }
@@ -664,7 +675,7 @@ function useCharge(actionVar) {
     if(actionObj.cooldown) {
         actionObj.cooldownTimer = 0;
     }
-    updateSupplyChain(actionVar);
+    enableAutomationUpwards(actionVar);
 }
 
 function useActiveSpellCharges() {

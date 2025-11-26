@@ -426,7 +426,7 @@ function toggleAutomationOnMaxLevel(actionVar) {
     let actionObj = data.actions[actionVar];
     const checkbox = document.getElementById(`${actionVar}_checkbox2`);
 
-    actionObj.automationOnMax = checkbox.checked;
+    actionObj.automationCanDisable = checkbox.checked;
 
     if (checkbox.checked) {
         views.updateVal(`${actionVar}_track2`, "#2196F3", "style.backgroundColor");

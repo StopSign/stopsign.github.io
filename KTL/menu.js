@@ -592,7 +592,12 @@ function createChangelogMenu() {
     return Raw.html`
         <div class="menuTitle">Changelog</div>
         <div class="menuSeparator"></div><br>
-        v2.1.3 11/25 (current):<br>
+        v2.1.4 11/26 (current):<br>
+        <ul>
+            <li>Reworked automation. It should behave more along expectations now</li>
+            <li>Added a "force" button in automation to turn on and off, to avoid ever needing to edit long chains</li>
+        </ul><br>
+        v2.1.3 11/25:<br>
         <ul>
             <li>Reworked menu css; it works better at all screen sizes</li>
             <li>Reworked Amulet menu to separate attribute upgrades into a different tab</li>

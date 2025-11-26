@@ -554,7 +554,7 @@ actionData = {
         progressMaxBase:3e35, progressMaxIncrease:1.1,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:1,
-        unlockCost:1e33, visible:false, unlocked:false, purchased: false, showToAdd:true, ignoreMaxLevelAutomation:true,
+        unlockCost:1e33, visible:false, unlocked:false, purchased: false, showToAdd:true,
         onUnlock: function() {
             data.actions.study.resourceToAdd = 1;
         },

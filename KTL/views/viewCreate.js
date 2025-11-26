@@ -402,10 +402,14 @@ let maxLevelTop = (data.gameSettings.viewDeltas && data.gameSettings.viewRatio) 
                     </div>
     
                 </div>
+
+                <div class="button" onclick="enableAutomationUpwards('${actionVar}', true)">
+                     Force Enable Automation
+                </div><br>
             </span>
         `
     }
-    if(dataObj.hasUpstream || dataObj.keepParentAutomation) {
+    if((dataObj.hasUpstream || dataObj.keepParentAutomation) && dataObj.maxLevel !== undefined) {
         preventParentSliderText += `
             <span id="${actionVar}_automationMaxLevelContainer">
                 Enable automation to disable upstream sliders to this action when it is max level:
@@ -416,8 +420,11 @@ let maxLevelTop = (data.gameSettings.viewDeltas && data.gameSettings.viewRatio) 
                         <div id="${actionVar}_knob2" style="position:absolute;height:16px;width:16px;left:4px;bottom:-1px;background-color:white;border-radius:50%;"></div>
                     </div>
                 </label><br>
+                
+                <div class="button" onclick="disableAutomationUpwards('${actionVar}', true)">
+                     Force Disable Automation
+                </div>
             </span>
-            
         `
     }
 

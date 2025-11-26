@@ -375,8 +375,8 @@ let upgradeData = {
         },
         onBuy: function(num) {
             for (let actionVar in data.actions) {
-                let actionObj = data.actions[actionVar];
-                if(!actionObj.hasUpstream) {
+                let dataObj = actionData[actionVar];
+                if(!(dataObj.hasUpstream || dataObj.keepParentAutomation) && dataObj.maxLevel !== undefined) {
                     continue;
                 }
                 views.updateVal(`${actionVar}_automationMenuButton`, actionData[actionVar].plane !== 2?"":"none", "style.display");
