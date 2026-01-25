@@ -10,155 +10,112 @@ let toastIdCounter = 0; // to give each toast a unique ID
 function initializeToasts() {
     createToastModal();
 
-    createToast(function() { return false },
-        "CLOSED BETA", 0,
-        Raw.html`This game is currently in a closed beta - this means please do not share the link with people
-        as I do not want the larger audience's first impression to be this version. This is for feedback purposes, and the game may change and the saves wiped for now
-        until I start caring about save integrity. Thank you.<br><br>-Stop_Sign`);
+    return;
 
     createToast(function() { return true; },
-        "Welcome to Kill the Lich! Click Here for Info!",0,
-        Raw.html`This is Kill the Lich, an idle/waiting optimization game! These messages will serve as the tutorial, so
-        make sure to click these popups and read them for important information when you can!<br><br>
-        
-        Closed messages are still accessible at Menu -> Previous Tips.`);
-    createToast(function() { return toastIsClicked(1); },
-        "Starting the Game", 0,
-        Raw.html`You've already started!<br><br>
+        "Click here for info!",0,
+        `
+Welcome to Kill the Lich, an idle/waiting optimization game! You play by choosing the directions to send resources, all starting from the action Overclock.<br><br>
 
-        The Overclock action gets progress automatically, and when it completes it generates your first resource: Momentum. 
-        The gameplay is to change (using the sliders) the percentage of send rate of each action's resource to their downstream actions.`);
+Overclock is a Generator, which means it generates progress over time. It gains 10 momentum and 1 exp every time it completes (the blue bar), and gets x1.1 momentum generation per level (the purple bar). All of this information can be found on the action as well, in its Info tab.<br><br>
+
+For now you have one direction to send the resources: to the action Reflect. Go ahead and set the downstream send rate from Overclock to Reflect 100%.<br><br>
+
+All tips that you close can be found again in Menu -> Previously Closed Tips.`);
+
+
+
     createToast(function() { return data.actions.reflect.unlocked; },
-        "Controls to Move Around",0,
-        Raw.html`Click/right click and drag to move the game window. WASD works also. Use the mouse scroll wheel or the [+]
-        and [-] to zoom in and out.`);
+        "Identify what you're looking at",0,
+        `
+<img src="img/tut5.png" alt="Tutorial 1" style="width:800px;height:300px;" /><br>
+
+<ol>
+    <li>The resource amount on the action.</li>
+    <li>The attributes gained when the action levels up. You can click an attribute to highlight actions that create or use it.</li>
+    <li>Info Icon. Hover over it to get more info about the action behavior. Lightning bolts are regular actions, and gears are generator actions.</li>
+    <li>Menu icons. Click them for more info.</li>
+    <li>Speed. A Tier 1 Regular Action takes 1% of the current resource to consume, and multiplies it by speed. Speed can go up to 100%.</li>
+</ol><br>
+
+Math of the Example: Reflect has 10 momentum, so 1% would be +.1/s, but speed is 50%, so amount going to progress is +.050/s. Regular Actions constantly consume their resources into progress; Generators do not.`);
+
     createToast(function() { return data.actions.distillInsight.visible; },
-        "Attention Bonus", 0,
-        Raw.html`To send resources between actions faster, you can click the solid blue lines between the actions, which sets the attention bonus. For now, you can set 
-        up to 2 at a time, and they give a x2 to the send rate!`);
-    createToast(function() { return data.actions.overclock.level >= 1; },
-        "Exp and Leveling", 0,
-        Raw.html`When the progress bar is full, an action will gain 1 exp (for now) until it levels up. On level up, the stat will give:
-        <ol>
-            <li>Attributes, which are the way actions affect each other - details are in Info menu.</li>
-            <li>Increased progress/exp requirements, described by the greyed-out text in their bars.</li>
-            <li>If the Action is a generator (like Overclock), increases the action power, which is how much it generates e.g. Overclock gets x1.1 multiplicative to action power per level. Details are in Info menu.</li>
-        </ol>`);
-    createToast(function() { return toastIsClicked(5); },
-        "Attributes", 0,
-        Raw.html`Each attribute is a 10% increase to bonus, shown in the Attributes window. You can click an attribute to see which actions use it. There are 3 colors:
-        <ol>
-            <li>Green: Adds the attribute on level</li>
-            <li>Purple: Reduces the progress required to complete if it is an action, reduces exp required to level if it is a generator</li>
-            <li>Blue: Increases efficiency. For actions, efficiency is the send and consume rate. For generators, it is the generator speed, generator amount, and send rate.</li>
-        </ol>`);
-    createToast(function() { return data.actions.harnessOverflow.visible; },
-        "Game Math on Sending", 0,
-        Raw.html`Rate of sending = tier mult * efficiency * slider bar %.<br>
-        <ol>
-            <li>Each action has a tier. Tier 0 is a default send rate of 10%, Tier 1 is 1%, Tier 2 is .1%, etc.</li>
-            <li>Actions also have an efficiency, which is improved by the blue Attributes for that action.</li>
-            <li>Most actions will automatically convert their sending rate to exp, essentially a 100% slider bar you can't turn off.</li> 
-            <li>The send rate affects how resources are moved around as well as the consumption rate (if it is not a generator).</li>
-            <li>Generators do not consume resources automatically. Read their info for more.</li>
-        </ol>`);
-    createToast(function() { return data.actions.reflect.level >= 3 },
-        "Finding New Actions", 0,
-        Raw.html`New will become visible when you reach various hidden milestones, but more will be visible at once later. For now, 
-        get reflect to levels 4 and 6 to unlock two new actions!<br>
+        "Details of Sending Resources",0,
+        `
+<img src="img/tut6.png" alt="Tutorial 2" style="width:580px;height:420px;" /><br>
 
-        There will generally be an obvious goal to work towards for more unlocks.`);
-    createToast(function() { return data.actions.harnessOverflow.level >= 8 },
-        "Max Level", 0,
-        Raw.html`Some actions have max levels, first shown with "Level 0 / 10". When the level is at the max (in this case 10), 
-        momentum will no longer be consumed - this means it will send 100% of the resource onwards without taking any.`);
-    createToast(function() { return toastIsClicked(9); },
-        "Changing Colors", 0,
-        Raw.html`When an action is max level, it will get a MAX LEVEL stamp and the background color of the action will change based on its resource.<br><br>
+        You can enable extra numbers to see how resources work in more detail in Menu -> Options.<br><br>
 
-        When an action is max level and there is no incoming or outgoing of its resource, it will dim.`);
-    createToast(function() { return data.actions.travelToOutpost.unlocked },
-        "Hesitation", 0,
-        Raw.html`As you come to terms with what momentum can be for, you know that you need to do what you've 
-        been dreading: making connections in the local community. The closer you get, though, the more it reminds you of things you had put aside.<br><br>
+Here, the resources on Momentum is 100 and it is a Tier 1 Action, so the maximum rate is 1/s, but it is reduced by 50% speed to a maximum rate of 0.5/s. We can see the Total Decrease is -1.25/s, which is made of the 1) 0.5/s that Reflect is consuming for Progress, 2) 100% (of the 0.5/s rate) being sent to Distill Insight, and 3) 50% (of the 0.5/s rate) being sent to Harness Overflow.<br><br>
+        `);
 
-        Maybe it would better to process some memories first.`);
-    createToast(function() { return data.actions.remember.unlocked },
-        "Raising Max Levels", 0,
-        Raw.html`Remember has an additional on-level effect, check its Info.`);
+    createToast(function() { return data.actions.distillInsight.unlocked; },
+        "Gaining Stats",0,
+        `
+<img src="img/tutorial2.png" alt="Tutorial 3" style="width:570px;height:685px;" /><br>
+
+        Within the Stats Menu, it will show the details of stat gains: The requirements to level are reduced by the multiplicative bonus of all the purple stats. This image is highlighting the change in Speed.<br><br>
+
+Speed on regular actions (lightning bolt icon) will increase 1) The rate resources are used by the action and 2) The rate the action can send resources downstream to the next action.<br><br>
+
+Speed on generator actions (gear icon) will increase 1) The rate the action can send resources downstream to the next action. 2) The rate of progress gain over time 3) The amount of resource created by completing a progress bar.<br><br>
+
+For this image, it means a x1.1 bonus from Cycle results in a x1.21 total momentum/s - it improves it twice over.
+        `);
+    createToast(function() { return data.actions.takeNotes.visible; },
+        "Attention Bonus",0,
+        `
+        <img src="img/tut7.png" alt="Tutorial 4" style="width:690px;height:270px;" /><br>
+
+        Click the lines in-between actions to Focus them. Focus gives a x2 bonus, and you can have up to 2 Focus lines. This means that you can send more resources than you consume on an action.
+        `);
     createToast(function() { return data.actions.helpScottWithChores.unlocked; },
-        "Making Money", 0,
-        Raw.html`Scott showed you how to make money, and so the Current Job is set to Helping Scott with Chores, with a wage of $1.<br><br>
+        "Making Money",0,
+        `
+        Your first job has come: Helping Scott with Chores. You have gained a wage, visible in the top left of your screen. Wage will multiply the amount of Coins that Make Money creates (shown in Info in Make Money).<br><br>
 
-        The Make Money action is unlocked, south of Overclock. It uses a different formula to consume momentum - found in Info - so figure out what sending ratio works for you.
-        The formula needs about 250 momentum to start giving valid amounts, and then the generated value adds exp to 
-        Make Money and gold to Spend Money. From there, gold is treated the same Momentum in the way it works on Spend Money.<br<br>
-        
-        To make a lot more money, get a better job at the outpost (check notice board level 3).`);
+You can only have one job at a time, and it will automatically be the one with the highest wage.
+        `);
+    createToast(function() { return data.actions.inquireAboutMagic.unlocked; },
+        "Magic",0,
+        `
+        The Hermit has given you an amulet, and with it you have received your first legacy, and unlocked the Magic Tab. Click the tab or press the hotkey [2] to switch to it.<br><br>
 
+Legacy is the resource on the originator of all magic: Echo Kindle. Every time you gain legacy as an attribute, you will also gain it on Echo Kindle.<br><br>
 
-    createToast(function() { return data.actions.checkNoticeBoard.level >= 1},
-        "NOTICE - Market Ads", 0,
-        Raw.html`Many posters are advertising a market. Maybe you should check that out.`);
-    createToast(function() { return data.actions.checkNoticeBoard.level >= 2},
-        "NOTICE - Report for Training", 0,
-            Raw.html`ATTENTION:
-            <ul>
-                <li>Do you need LEG MUSCLES to RUN FOREVER?</li>
-                <li>Do you need HEART MUSCLES to GIVE YOU THE POWER?</li>
-                <li>Do you need BRAIN MUSCLES to remember what I tell you the first time?</li>
-            </ul>
-            
-            <br<br>Come down to JOHN'S TRAINING CENTER and I will make you STRONG.`);
+Echo Kindle generates spark onto Spark Decay, which wastes the Spark by consuming it. Pool Mana takes what Spark remains when it completes and turns it into Mana - the lower speed that Spark Decay has, the more Mana will be available for spells.
+        `);
 
-    createToast(function() { return data.actions.checkNoticeBoard.level >= 3 },
-        "NOTICE - A hidden notice", 0,
-        Raw.html`It is tucked behind the others, so you did not spot it at first. It is short, and untitled:<br><br>
+    createToast(function() { return data.actions.overcharge.unlocked; },
+        "Spells and Instability",0,
+        `
+        Overcharge and Overboost are the first spells you'll be able to repeatedly cast. They are cast automatically when Overclock completes and gains momentum, giving a x10 bonus each, and Overboost is only cast when Overcharge is also ready to cast, ensuring it is only used to gain x100 momentum total.<br><br>
 
-        "Laborer required for odd jobs. Starting wage $10. Ask Grelt."`)
+When you cast a spell, it also gains instability. The Mana cost of the spell increases by the instability %. Instability is decreased by the attribute Control. It reduces by (Control's Bonus^.5)/s
+        `);
 
-    // createToast(function() { return data.actions.basicTrainingWithJohn.unlocked },
-    //     "Training Options Hint", 0,
-    //     Raw.html`Confused with too many options of John's training? Go from top to bottom!`);
+    createToast(function() { return data.actions.hearAboutTheLich.unlocked; },
+        "Preparing for Battle",0,
+        `
+        While fighting the lich itself is far away, you can join the Fight for Life to invade the hordes in the north. This requires at least 1 spell power, which comes from unlocks within Magic.<br><br>
 
-    createToast(function() { return data.actions.reportForLabor.unlocked },
-        "You Need A Break", 0,
-        Raw.html`As soon as you step in sight of your new boss, you immediately decide that this can't be all there is. 
-        You decide to get some clothes for the occasion, and go find where that scent came from. A higher wage will let you get those things easier.<br><br>2 new Actions unlocked!`);
+In addition, when you finally Fight the Lich's Forces, you are given 10 minutes of bonus time (this has a minimum of 1 hour)
+        `);
 
-    createToast(function() { return data.actions.meetGrumpyHermit.unlocked },
-        "Rebuked by the Hermit", 0,
-        Raw.html`You were told you were hard to talk to - by a hermit! He said to gain more of a spine before he'll 
-        entertain you.<br><br>You've been putting it off, but it is time to do what you've been dreading - talk to people.<br><br>New action unlocked.`);
+    createToast(function() { return data.gameState === "KTL"; },
+        "Fighting in the Northern Wastes",0,
+        `
+        Having switched Overclock's target to a specific goal instead of itself, you have lost the abilty to modify how momentum is spent - this realm will entirely happen automatically. The goal is to go as far as you can in defeating the Lich's forces, closer and closer to the Lich itself.<br><br>
 
-    createToast(function() { return data.actions.inquireAboutMagic.unlocked },
-        "Magic", 0,
-        Raw.html`You have gained some Legacy from the amulet, and therefore unlocked Magic! Click the tab or press the hotkey [2] to switch to it.<br><br>
-        There will be many secrets to uncover in the realm of magic, but with only 1 legacy it is difficult to unlock any of them.<br>
-        You should keep asking the Hermit about magic - he knows how to really get you started.`);
+You will get Legacy and Ancient Coins depending on how far you are able to progress. Ancient Coins are used for amulet upgrades, and Legacy is added to Echo Kindle, to generate more mana in the next life.<br><br>
 
-    createToast(function() { return data.actions.gossipAroundCoffee.unlocked },
-        "What did they just say?", 0,
-        Raw.html`You whirl around, fear clawing down your spine, hoping that you did not just hear the word 
-        "lich" on someone's tongue. You need to know more about this.<br><br>
-        Get Gossip Around Coffee to level 5.`);
+When you have lost your ability to fight, or Doom has overcome your desire to fight, your Amulet becomes your only way out. It has a special ability to rewind time and let you try again, but with a caveat: only some things can be remembered. Using the gathered Ancient Coins, you are able to send a message back, letting your past self go through the same motions... but with an adjustment.
+        `);
 
-    createToast(function() { return data.actions.hearAboutTheLich.unlocked },
-        "Something Must Be Done", 0,
-        Raw.html`The lich has returned, but this is what you were preparing for by targeting Overclock to itself.<br>
-            Check Info under Hear About The Lich for how it increases!<br><br>
-            Get at least 1 Spell Power from External Spells and at least 1 level in this action 
-            to be able to sign up and join humanity's last stand!`);
-
-
-    createToast(function() { return data.actions.infuseTheHide.unlocked },
-        "It's time to cast some real magic!", 0,
-        Raw.html`You have instructions from the hermit on how to create a book of power! Infuse the Hide, Etch the Circle, Bind the Pages, and Awaken Your Grimoire!<br><br>
-                Then, once you have spell power from the new spell, you can go Fight the Lich!`);
-
-    createToast(function() { return data.actions.harvestGhostlyField.unlocked },
+    createToast(function() { return data.actions.pryGemLoose.unlocked },
         "Thanks for playing!", 0,
-        Raw.html`You've encountered all the content that exists currenlty. Follow the discord for the roadmap and updates!`);
+        Raw.html`You've encountered all the content that exists currently. Follow the discord for the roadmap and updates! -Stop_Sign`);
 
 
     showAllValidToasts(); //ran automatically every second. Have to manually add it when you want faster
@@ -199,6 +156,9 @@ function createToast(visibleFunc, title, bonusTime, message) {
 //appear and show it with the name and text of the appropriate modal click
 // Update the UI of a specific toast based on its state
 function updateToastUI(toastId) {
+    if(!viewData.toasts[toastId]) {
+        return;
+    }
     let el = viewData.toasts[toastId].element;
     let state = data.toastStates[toastId];
     switch (state) {
@@ -223,7 +183,7 @@ function updateToastUI(toastId) {
 function createToastModal() {
     let overlayWrapper = document.createElement("div");
     overlayWrapper.innerHTML = Raw.html`
-        <div class="fullScreenGrey" style="display:none" onclick="closeModal()">
+        <div class="fullScreenGrey" style="display:none;" onclick="closeModal()">
             <div class="centerMenuBox">
                 <div id="toastModalTitle" style="font-size:20px;font-weight:bold;text-decoration:underline">Toast Title</div>
                 <p id="toastModalMessage" style='text-align:left;font-size:16px;'>Here is a message</p>
@@ -238,6 +198,7 @@ function createToastModal() {
 function openModal(toastId) {
     modalOverlayEl.style.display = 'flex';
     document.getElementById('toastModalTitle').innerHTML = viewData.toasts[toastId].title;
+    document.getElementById('toastModalMessage').replaceChildren();
     document.getElementById('toastModalMessage').innerHTML = viewData.toasts[toastId].message;
 
     if(data.toastStates[toastId] === 'active') {

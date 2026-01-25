@@ -1,7 +1,3 @@
-// =================================================================
-// WEB WORKER (engine.js)
-// =================================================================
-// This script runs in the background and handles all game logic calculations.
 function loop() {
     if (timerId !== null) clearTimeout(timerId);
 
@@ -51,17 +47,18 @@ function loop() {
         } else {
             data.currentGameState.bonusTime += tickInterval * ticksProcessed;
         }
-
-        postMessage({ type: 'update' });
+        // postMessage({ type: 'update' });
     }
+    timerId = setTimeout(runMessage, 20);
+}
 
-    timerId = setTimeout(loop, 1000 / data.gameSettings.ticksPerSecond);
+function runMessage() {
+    postMessage({ type: 'update' });
+    // requestAnimationFrame(animationTick);
 }
 
 
 
-
-// Listen for updates from the worker
 onmessage = function(e) {
     const { type } = e.data;
 

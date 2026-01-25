@@ -1,6 +1,6 @@
 function updateCustomThumbPosition(actionVar, downstreamVar, newValue) {
     const thumb = document.getElementById(actionVar + "Thumb" + downstreamVar);
-    const thumbPosition = (newValue / 100) * 200;
+    const thumbPosition = (newValue / 100) * 230;
     thumb.style.left = thumbPosition + 'px';
 }
 
@@ -18,9 +18,67 @@ function setSliderUI(fromAction, toAction, newValue) {
     }
 
     document.getElementById(fromAction + "NumInput" + toAction).value = newValue;
-    document.getElementById(fromAction + "_" + toAction + "_Line_Inner").style.height = (newValue / 100 * 20) + "px";
+    if(toAction !== "Automation") {
+        document.getElementById(fromAction + "_" + toAction + "_Line_Inner").style.height = (newValue / 100 * 20) + "px";
+    }
     updateCustomThumbPosition(fromAction, toAction, newValue);
-    data.actions[fromAction]["downstreamRate" + toAction] = Math.max(0, newValue);
+
+    let actionObj = data.actions[fromAction];
+
+    if(toAction === "Automation") {
+        changeAutomationOnReveal(fromAction, newValue);
+    } else {
+        actionObj["downstreamRate" + toAction] = Math.max(0, newValue);
+    }
+
+    const allValues = [0, 10, 50, 100];
+    for (let val of allValues) {
+        const optionId = `${fromAction}_${toAction}_option_${val}`;
+        document.getElementById(optionId).style.backgroundColor = 'transparent';
+    }
+
+    const targetId = `${fromAction}_${toAction}_option_${newValue}`;
+    const targetElement = document.getElementById(targetId);
+    if (targetElement) {
+        targetElement.style.backgroundColor = getResourceColor(fromAction);
+    }
+}
+
+
+function adjustMaxLevels() {
+    data.actions.etchTheCircle.maxLevel = 1 +
+        data.actions.chargeInk.level +
+        (data.actions.locateWeakness.unlocked?1:0) +
+        (data.actions.boldenLines.unlocked?1:0) +
+        (data.actions.chargeInk.unlocked?1:0);
+    data.actions.condenseMana.maxLevel = 5 +
+        (data.actions.spinMana.unlocked?5:0);
+    data.actions.infuseTheHide.maxLevel = 1 +
+        (data.actions.boldenLines.unlocked?2:0) +
+        (data.actions.grindPigments.unlocked?2:0);
+    data.actions.castToFail.maxLevel = 0 +
+        (data.actions.overcharge.unlocked?1:0) +
+        (data.actions.overboost.unlocked?1:0) +
+        (data.actions.overponder.unlocked?1:0) +
+        (data.actions.overwork.unlocked?1:0) +
+        (data.actions.overproduce.unlocked?1:0) +
+        (data.actions.overdrive.unlocked?1:0) +
+        (data.actions.overtalk.unlocked?1:0) +
+        (data.actions.overhear.unlocked?1:0) +
+        (data.actions.overhype.unlocked?1:0) +
+        (data.actions.createMounds.unlocked?1:0) +
+        (data.actions.hardenDirt.unlocked?1:0) +
+        (data.actions.shapeDefenses.unlocked?1:0) +
+        (data.actions.mendSmallCracks.unlocked?1:0) +
+        (data.actions.restoreEquipment.unlocked?1:0) +
+        (data.actions.reinforceArmor.unlocked?1:0) +
+        (data.actions.unblemish.unlocked?1:0) +
+        (data.actions.lightHeal.unlocked?1:0) +
+        (data.actions.mendAllWounds.unlocked?1:0) +
+        (data.actions.illuminate.unlocked?1:0) +
+        (data.actions.identifyItem.unlocked?1:0) +
+        (data.actions.detectMagic.unlocked?1:0);
+
 }
 
 
@@ -38,6 +96,9 @@ function validateInput(fromAction, toAction) {
 }
 function downstreamNumberChanged(fromAction, toAction) {
     let newValue = document.getElementById(fromAction + "NumInput" + toAction).value;
+    if(data.gameState === "KTL") {
+        return;
+    }
     setSliderUI(fromAction, toAction, newValue); //number input changed
 }
 
@@ -45,7 +106,8 @@ function toggleAllZero(actionVar) {
     let dataObj = actionData[actionVar];
     dataObj.downstreamVars.forEach(function (toAction) {
         let downstreamObj = data.actions[toAction];
-        if(!downstreamObj || !downstreamObj.hasUpstream || !downstreamObj.visible) {
+        let downstreamDataObj = actionData[toAction];
+        if(!downstreamObj || !downstreamDataObj.hasUpstream || !downstreamObj.visible) {
             return;
         }
         setSliderUI(actionVar, toAction, 0); //0 button
@@ -55,7 +117,8 @@ function toggleAllHundred(actionVar) {
     let dataObj = actionData[actionVar];
     dataObj.downstreamVars.forEach(function (toAction) {
         let downstreamObj = data.actions[toAction];
-        if(!downstreamObj || !downstreamObj.hasUpstream || !downstreamObj.visible) {
+        let downstreamDataObj = actionData[toAction];
+        if(!downstreamObj || !downstreamDataObj.hasUpstream || !downstreamObj.visible) {
             return;
         }
         setSliderUI(actionVar, toAction, 100); //100 button
@@ -69,9 +132,9 @@ window.addEventListener('resize', () => {
 
 function resizeStatMenu() {
     let bonusDisplay = view.cached[`bonusDisplay`];
-    let reduction = 200;
+    let reduction = 240;
     if(bonusDisplay.style.display !== "none") {
-        reduction += 97;
+        reduction += 70;
     }
 
     if(view.cached[`attDisplay`]) {
@@ -80,12 +143,12 @@ function resizeStatMenu() {
 }
 
 
-
+const bodyElement = document.getElementById("theBody");
 const windowElement = document.getElementById('windowElement');
 const actionContainer = document.getElementById('actionContainer');
 
 
-let scale = 1;
+let scaleByPlane = [1,1,1,1];
 const scaleStep = 0.1;
 const minScale = 0.1;
 const maxScale = 2.5;
@@ -99,7 +162,7 @@ let transformX = [0,0,0,0], transformY = [0,0,0,0];
 let originalTransformX, originalTransformY;
 
 let initialPinchDistance = null;
-let lastTouchScale = 1;
+let lastTouchScale = [1, 1, 1, 1];
 let isTouchDragging = false;
 
 function setZoomNoMouse(newScale) {
@@ -107,9 +170,9 @@ function setZoomNoMouse(newScale) {
     const centerX = rect.width / 2;
     const centerY = rect.height / 2;
 
-    const prevScale = scale;
-    scale = Math.max(minScale, Math.min(maxScale, newScale));
-    const scaleFactor = scale / prevScale;
+    const prevScale = scaleByPlane[data.planeTabSelected];
+    scaleByPlane[data.planeTabSelected] = Math.max(minScale, Math.min(maxScale, newScale));
+    const scaleFactor = scaleByPlane[data.planeTabSelected] / prevScale;
 
     const dx = (centerX - transformX[data.planeTabSelected]) * (1 - scaleFactor);
     const dy = (centerY - transformY[data.planeTabSelected]) * (1 - scaleFactor);
@@ -117,19 +180,59 @@ function setZoomNoMouse(newScale) {
     transformX[data.planeTabSelected] += dx;
     transformY[data.planeTabSelected] += dy;
 
-    actionContainer.style.transform = `translate(${transformX[data.planeTabSelected]}px, ${transformY[data.planeTabSelected]}px) scale(${scale})`;
+    actionContainer.style.transform = `translate(${transformX[data.planeTabSelected]}px, ${transformY[data.planeTabSelected]}px) scale(${scaleByPlane[data.planeTabSelected]})`;
 }
 
 function clickZoomIn() {
-    setZoomNoMouse(scale + scaleStep*3)
+    setZoomNoMouse(scaleByPlane[data.planeTabSelected] + scaleStep*3)
 }
 
 function clickZoomOut() {
-    setZoomNoMouse(scale - scaleStep*3)
+    setZoomNoMouse(scaleByPlane[data.planeTabSelected] - scaleStep*3)
 }
+
+function centerScreen() {
+    if(data.planeTabSelected === 0) {
+        actionTitleClicked('overclock')
+    }
+    if(data.planeTabSelected === 1) {
+        actionTitleClicked('echoKindle')
+    }
+    if(data.planeTabSelected === 2) {
+        actionTitleClicked('overclockTargetingTheLich')
+    }
+}
+
+function hoveringIcon(actionVar) {
+    replaceIconText(actionVar);
+    actionData[actionVar].hoveringIcon = true;
+}
+function stopHoveringIcon(actionVar) {
+    actionData[actionVar].hoveringIcon = false;
+}
+function pauseAction(event, actionVar) {
+    event.stopPropagation();
+    let actionObj = data.actions[actionVar];
+    actionObj.isPaused = !actionObj.isPaused;
+    updatePauseActionVisuals(actionVar)
+}
+
+function updatePauseActionVisuals(actionVar) {
+    let actionObj = data.actions[actionVar];
+    views.updateVal(`${actionVar}PauseButton`, actionObj.isPaused?">":"||", "textContent")
+    views.updateVal(`${actionVar}PauseButton`, actionObj.isPaused?"green":"red", "style.borderColor")
+    views.updateVal(`${actionVar}Title`, actionObj.isPaused?"red":"", "style.color")
+    views.updateVal(`${actionVar}SmallVersionTitle`, actionObj.isPaused?"red":"", "style.color")
+}
+
 windowElement.addEventListener('wheel', function(e) {
-    if(mouseIsOnAction) {
-        let elem = document.getElementById(`${mouseIsOnAction}_${data.actions[mouseIsOnAction].currentMenu}Container`);
+    let actionObj = data.actions[mouseIsOnAction];
+    if(mouseIsOnAction && actionObj.currentMenu !== "") {
+        let elem = document.getElementById(`${mouseIsOnAction}_${actionObj.currentMenu}Container`);
+        if(!elem) {
+            console.log('error, no elem at: ' + mouseIsOnAction);
+            return;
+        }
         if(elem.scrollHeight > elem.clientHeight) { //only stop wheel if there's a reason to
             return;
         }
@@ -140,21 +243,21 @@ windowElement.addEventListener('wheel', function(e) {
     const mouseX = e.clientX - rect.left;
     const mouseY = e.clientY - rect.top;
 
-    const prevScale = scale;
+    const prevScale = scaleByPlane[data.planeTabSelected];
     const delta = Math.sign(e.deltaY);
 
-    scale += delta < 0 ? scaleStep : -scaleStep;
-    scale = Math.min(Math.max(minScale, scale), maxScale);
+    scaleByPlane[data.planeTabSelected] += delta < 0 ? scaleStep : -scaleStep;
+    scaleByPlane[data.planeTabSelected] = Math.min(Math.max(minScale, scaleByPlane[data.planeTabSelected]), maxScale);
 
     // Adjust translation to zoom at mouse position
-    const scaleFactor = scale / prevScale;
+    const scaleFactor = scaleByPlane[data.planeTabSelected] / prevScale;
     const dx = (mouseX - transformX[data.planeTabSelected]) * (1 - scaleFactor);
     const dy = (mouseY - transformY[data.planeTabSelected]) * (1 - scaleFactor);
 
     transformX[data.planeTabSelected] += dx;
     transformY[data.planeTabSelected] += dy;
 
-    actionContainer.style.transform = `translate(${transformX[data.planeTabSelected]}px, ${transformY[data.planeTabSelected]}px) scale(${scale})`;
+    actionContainer.style.transform = `translate(${transformX[data.planeTabSelected]}px, ${transformY[data.planeTabSelected]}px) scale(${scaleByPlane[data.planeTabSelected]})`;
 
     // clearTimeout(redrawTimeout);
     // redrawTimeout = setTimeout(globalRedraw, 200);
@@ -181,12 +284,11 @@ document.addEventListener('mousemove', function(e) {
     const deltaX = e.clientX - originalMouseX;
     const deltaY = e.clientY - originalMouseY;
 
-    // Clamp range to [-4000, 4000]
-    transformX[data.planeTabSelected] = Math.max(-4000, Math.min(originalTransformX + deltaX, 4000));
-    transformY[data.planeTabSelected] = Math.max(-4000, Math.min(originalTransformY + deltaY, 4000));
+    transformX[data.planeTabSelected] = originalTransformX + deltaX
+    transformY[data.planeTabSelected] = originalTransformY + deltaY
 
     // Update the position of the container
-    actionContainer.style.transform = `translate(${transformX[data.planeTabSelected]}px, ${transformY[data.planeTabSelected]}px) scale(${scale})`;
+    actionContainer.style.transform = `translate(${transformX[data.planeTabSelected]}px, ${transformY[data.planeTabSelected]}px) scale(${scaleByPlane[data.planeTabSelected]})`;
 });
 
 document.addEventListener('mouseup', function() {
@@ -194,12 +296,22 @@ document.addEventListener('mouseup', function() {
 });
 
 
+document.body.addEventListener('touchmove', function(e) {
+    if (e.touches.length > 1) {
+        e.preventDefault();
+    }
+}, { passive: false });
+
 // Touch start
 windowElement.addEventListener('touchstart', function(e) {
+    if(mouseIsOnAction) {
+        data.actions[mouseIsOnAction].mouseOnThis = false;
+    }
+    mouseIsOnAction = null;
     if (e.touches.length === 2) {
         e.preventDefault();
         initialPinchDistance = getTouchDistance(e.touches[0], e.touches[1]);
-        lastTouchScale = scale;
+        lastTouchScale[data.planeTabSelected] = scaleByPlane[data.planeTabSelected];
         isTouchDragging = false;
     } else if (e.touches.length === 1) {
         // Single finger drag
@@ -219,17 +331,17 @@ windowElement.addEventListener('touchmove', function(e) {
 
         const currentDistance = getTouchDistance(e.touches[0], e.touches[1]);
         const pinchScale = currentDistance / initialPinchDistance;
-        let newScale = lastTouchScale * pinchScale;
+        let newScale = lastTouchScale[data.planeTabSelected] * pinchScale;
 
         newScale = Math.min(Math.max(minScale, newScale), maxScale);
-        const prevScale = scale;
-        scale = newScale;
+        const prevScale = scaleByPlane[data.planeTabSelected];
+        scaleByPlane[data.planeTabSelected] = newScale;
 
         const rect = windowElement.getBoundingClientRect();
         const midX = (e.touches[0].clientX + e.touches[1].clientX) / 2 - rect.left;
         const midY = (e.touches[0].clientY + e.touches[1].clientY) / 2 - rect.top;
 
-        const scaleFactor = scale / prevScale;
+        const scaleFactor = scaleByPlane[data.planeTabSelected] / prevScale;
         const dx = (midX - transformX[data.planeTabSelected]) * (1 - scaleFactor);
         const dy = (midY - transformY[data.planeTabSelected]) * (1 - scaleFactor);
 
@@ -238,13 +350,27 @@ windowElement.addEventListener('touchmove', function(e) {
 
         applyTransform();
     } else if (e.touches.length === 1 && isTouchDragging) {
+        let actionObj = data.actions[mouseIsOnAction];
+        if(mouseIsOnAction && actionObj.currentMenu !== "") {
+            let elem = document.getElementById(`${mouseIsOnAction}_${actionObj.currentMenu}Container`);
+            if(!elem) {
+                console.log('error, no elem at: ' + mouseIsOnAction);
+                return;
+            }
+            if(elem.scrollHeight > elem.clientHeight) { //only stop wheel if there's a reason to
+                return;
+            }
+        }
         e.preventDefault();
-
         const touch = e.touches[0];
+
         const deltaX = touch.clientX - originalMouseX;
         const deltaY = touch.clientY - originalMouseY;
 
-        applyPan(originalTransformX + deltaX, originalTransformY + deltaY);
+        transformX[data.planeTabSelected] = originalTransformX + deltaX;
+        transformY[data.planeTabSelected] = originalTransformY + deltaY;
+
+        applyTransform();
     }
 }, { passive: false });
 
@@ -258,21 +384,8 @@ windowElement.addEventListener('touchend', function(e) {
     }
 });
 
-// Reusable helpers
-function getDistance(t1, t2) {
-    const dx = t2.clientX - t1.clientX;
-    const dy = t2.clientY - t1.clientY;
-    return Math.sqrt(dx * dx + dy * dy);
-}
-
-function applyPan(x, y) {
-    transformX[data.planeTabSelected] = Math.max(-4000, Math.min(x, 4000));
-    transformY[data.planeTabSelected] = Math.max(-4000, Math.min(y, 4000));
-    applyTransform();
-}
-
 function applyTransform() {
-    actionContainer.style.transform = `translate(${transformX[data.planeTabSelected]}px, ${transformY[data.planeTabSelected]}px) scale(${scale})`;
+    actionContainer.style.transform = `translate(${transformX[data.planeTabSelected]}px, ${transformY[data.planeTabSelected]}px) scale(${scaleByPlane[data.planeTabSelected]})`;
 
     clearTimeout(redrawTimeout);
     // redrawTimeout = setTimeout(globalRedraw, 200);
@@ -301,12 +414,15 @@ function forceRedraw(elem) {
 
 function actionTitleClicked(actionVar, setAll) {
     let dataObj = actionData[actionVar];
+    data.actions[actionVar].mouseOnThis = true;
+    switchToPlane(dataObj.plane)
 
-    let newtransformX = -((dataObj.realX + 100) * scale) + windowElement.offsetWidth / 2 ;
-    let newtransformY = -((dataObj.realY + 100) * scale) + windowElement.offsetHeight / 2 - 50;
 
-    newtransformX = Math.max(-4000, Math.min(newtransformX, 4000));
-    newtransformY = Math.max(-4000, Math.min(newtransformY, 4000));
+    let newtransformX = -((dataObj.realX + 100) * scaleByPlane[data.planeTabSelected]) + windowElement.offsetWidth / 2 ;
+    let newtransformY = -((dataObj.realY + 100) * scaleByPlane[data.planeTabSelected]) + windowElement.offsetHeight / 2 - 50;
+
+    // newtransformX = Math.max(-4000, Math.min(newtransformX, 4000));
+    // newtransformY = Math.max(-4000, Math.min(newtransformY, 4000));
 
     if(setAll) {
         for(let plane in transformX) {
@@ -319,37 +435,100 @@ function actionTitleClicked(actionVar, setAll) {
     }
 
     // Update the position of the container
-    actionContainer.style.transform = `translate(${newtransformX}px, ${newtransformY}px) scale(${scale})`;
+    actionContainer.style.transform = `translate(${newtransformX}px, ${newtransformY}px) scale(${scaleByPlane[data.planeTabSelected]})`;
 }
 
+function toggleAutomationOnReveal(actionVar) {
+    const checkbox = document.getElementById(`${actionVar}_checkbox`);
+    setSliderUI(actionVar, "Automation", checkbox.checked ? 100 : 0);
+    updateAutomationOnRevealToggle(actionVar);
+}
 
-function clickActionMenu(actionVar, menuVar, isLoad) {
+function changeAutomationOnReveal(actionVar, newValue) {
+    data.actions[actionVar].automationOnReveal = newValue;
+    views.updateVal(`${actionVar}_checkbox`, newValue > 0, "checked");
+    updateAutomationOnRevealToggle(actionVar);
+}
+
+function updateAutomationOnRevealToggle(actionVar) {
+    const checkbox = document.getElementById(`${actionVar}_checkbox`);
+    if (checkbox.checked) {
+        views.updateVal(`${actionVar}_track`, "#2196F3", "style.backgroundColor");
+        views.updateVal(`${actionVar}_knob`, "translateX(26px)", "style.transform");
+    } else {
+        views.updateVal(`${actionVar}_track`, "#ccc", "style.backgroundColor");
+        views.updateVal(`${actionVar}_knob`, "translateX(0px)", "style.transform");
+    }
+}
+
+function toggleAutomationCanDisableLevel(actionVar) {
     let actionObj = data.actions[actionVar];
+    const checkbox = document.getElementById(`${actionVar}_checkbox2`);
+    actionObj.automationCanDisable = checkbox.checked;
+    updateAutomationCanDisableToggle(actionVar);
+}
+
+function changeAutomationCanDisable(actionVar, newValue) {
+    data.actions[actionVar].automationCanDisable = newValue;
+    views.updateVal(`${actionVar}_checkbox2`, newValue, "checked");
+    updateAutomationCanDisableToggle(actionVar);
+}
+
+function updateAutomationCanDisableToggle(actionVar) {
+    const checkbox = document.getElementById(`${actionVar}_checkbox2`);
+    if (checkbox.checked) {
+        views.updateVal(`${actionVar}_track2`, "#2196F3", "style.backgroundColor");
+        views.updateVal(`${actionVar}_knob2`, "translateX(26px)", "style.transform");
+    } else {
+        views.updateVal(`${actionVar}_track2`, "#ccc", "style.backgroundColor");
+        views.updateVal(`${actionVar}_knob2`, "translateX(0px)", "style.transform");
+    }
+}
+
+function clickActionMenuButton(event, actionVar, menuVar) {
+    data.actions[actionVar].mouseOnThis = true;//for mobile/touch reasons
+    clickActionMenu(actionVar, menuVar);
+}
+function clickActionMenu(actionVar, menuVar) {
+    let actionObj = data.actions[actionVar];
+    let currentMenu = actionObj.currentMenu;
     if(!menuVar) {
         return;
     }
-    if(!isLoad && (!actionObj.unlocked || !actionObj.visible)) {
+
+    //allow switching between automation and downstream menu when locked, but not turning them off
+    if(menuVar === "downstream" || menuVar === "automation") {
+        if(menuVar === currentMenu && !actionObj.unlocked) {
+            return;
+        }
+    } else if(!actionObj.unlocked) {
         return;
     }
 
-    if(actionObj.currentMenu && !isLoad) {
-        // view.cached[actionVar + "_" + actionObj.currentMenu + "MenuButton"].style.removeProperty("background-color");
-
-        views.updateVal(`${actionVar}_${actionObj.currentMenu}Container`, "none", "style.display");
-        views.updateVal(`${actionVar}_${actionObj.currentMenu}MenuButton`, "", "style.backgroundColor");
+    //clear previous menu
+    if(currentMenu) {
+        views.updateVal(`${actionVar}_${currentMenu}Container`, "none", "style.display");
+        views.updateVal(`${actionVar}_${currentMenu}MenuButton`, "", "style.backgroundColor");
     }
 
-    if(actionObj.currentMenu === menuVar && !isLoad) {
-        data.actions[actionVar].currentMenu = "";
+    //if you clicked the button as-is, remove it and quit
+    if(currentMenu === menuVar) {
+        actionObj.currentMenu = "";
         return;
     }
 
+    //turn on the menu
     views.updateVal(`${actionVar}_${menuVar}Container`, "", "style.display");
     views.updateVal(`${actionVar}_${menuVar}MenuButton`, "var(--selection-color)", "style.backgroundColor");
 
-    data.actions[actionVar].currentMenu = menuVar;
-}
+    actionObj.currentMenu = menuVar;
 
+    //if story is clicked, clear the color
+    if(menuVar === "story") {
+        views.updateVal(`${actionVar}_${menuVar}MenuButton`, "", "style.color");
+        actionObj.readStory = data.saveVersion;
+    }
+}
 
 function clickMenuButton() {
     let isShowing = document.getElementById("helpMenu").style.display !== "none";
@@ -389,7 +568,7 @@ function clickedAttName(attVar, scrollToIt) {
 
     updateAttActionContainers();
 
-    if(!scrollToIt) {
+    if(!scrollToIt || attVar === "legacy") {
         return;
     }
     const container = view.cached[`attDisplay`];
@@ -475,19 +654,19 @@ function changeJob(actionVar) {
     }
 
     //set displayed
-    document.getElementById("jobTitle").textContent = data.actions[data.currentJob] ? data.actions[data.currentJob].title : data.currentJob;
+    document.getElementById("jobTitle").textContent = data.actions[data.currentJob] ? actionData[data.currentJob].title : data.currentJob;
     document.getElementById("jobWage").textContent = intToString(data.currentWage, 2);
 }
 
 function pauseGame() {
     data.gameSettings.stop = !data.gameSettings.stop;
-    if(data.gameSettings.stop) {
-        document.title = "*PAUSED* KTL";
-    } else {
-        document.title = "KTL";
-    }
-    document.getElementById('pauseButton').textContent = data.gameSettings.stop ? "> Resume" : "|| Pause";
+    updatePauseButtonVisuals();
     save();
+}
+
+function updatePauseButtonVisuals() {
+    document.title = data.gameSettings.stop ? "*PAUSED* KTL" : "KTL";
+    document.getElementById('pauseButton').textContent = data.gameSettings.stop ? "> Resume" : "|| Pause";
 }
 
 function stopClicks(event) {
@@ -529,13 +708,44 @@ function bonusMenuHideButton() {
     resizeStatMenu();
 }
 
+//skip [time] minutes
+function skipTime(time) {
+    let ticksToUse = time * 60 * 1000;
+    if(data.currentGameState.bonusTime < ticksToUse) {
+        return;
+    }
+
+    data.currentGameState.bonusTime -= ticksToUse;
+
+    let origPause = data.gameSettings.stop;
+    data.gameSettings.stop = false;
+    let origTickRate = data.gameSettings.ticksPerSecond;
+    data.gameSettings.ticksPerSecond = 1;
+
+    for(let i = 0; i < time * 60; i++) {
+        gameTick()
+        secondPassed();
+    }
+
+    data.gameSettings.ticksPerSecond = origTickRate;
+    data.gameSettings.stop = origPause;
+    save()
+}
+
 function toggleBonusSpeed() {
     if(data.gameSettings.bonusSpeed > 1 || data.currentGameState.bonusTime <= 1000) {
         data.gameSettings.bonusSpeed = 1;
+    } else {
+        data.gameSettings.bonusSpeed = data.options.bonusRate;
+    }
+    updateBonusSpeedButton();
+}
+
+function updateBonusSpeedButton() {
+    if(data.gameSettings.bonusSpeed === 1) {
         document.getElementById("toggleBonusSpeedButton").style.backgroundColor = "red";
         document.getElementById("toggleBonusSpeedButton").textContent = "Enable Bonus Speed";
     } else {
-        data.gameSettings.bonusSpeed = data.options.bonusRate;
         document.getElementById("toggleBonusSpeedButton").style.backgroundColor = "green";
         document.getElementById("toggleBonusSpeedButton").textContent = "Disable Bonus Speed";
     }
@@ -557,7 +767,7 @@ function switchToPlane(num) {
     data.planeTabSelected = num;
     document.getElementById(`planeContainer${data.planeTabSelected}`).style.display = '';
     document.getElementById("windowElement").style.backgroundColor = `var(--world-${data.planeTabSelected}-bg-primary)`;
-    actionContainer.style.transform = `translate(${transformX[data.planeTabSelected]}px, ${transformY[data.planeTabSelected]}px) scale(${scale})`;
+    actionContainer.style.transform = `translate(${transformX[data.planeTabSelected]}px, ${transformY[data.planeTabSelected]}px) scale(${scaleByPlane[data.planeTabSelected]})`;
 }
 
 function unveilPlane(num) {
@@ -576,14 +786,15 @@ function mouseOffAction(actionVar) {
     actionObj.mouseOnThis = false;
     mouseIsOnAction = null;
 }
-
-function levelAllCharges() {
-    for(let actionVar in data.actions) {
-        let actionObj = data.actions[actionVar];
-        if(actionObj.instabilityToAdd) {
-            addMaxLevel(actionVar, 1);
+function mouseOnActionTouch(event, actionVar) {
+    let actionObj = data.actions[actionVar];
+    if(actionVar && actionObj.currentMenu !== "") {
+        let elem = document.getElementById(`${actionVar}_${actionObj.currentMenu}Container`);
+        if(elem.scrollHeight > elem.clientHeight) { //only stop touch if there's a reason to
+            event.stopPropagation();
         }
     }
+    mouseOnAction(actionVar);
 }
 
 
@@ -722,4 +933,156 @@ function drawChart() {
     }
     ctx.fillText(secondsToTime(minTime), padding, canvasHeight - padding + 20);
     ctx.fillText(secondsToTime(maxTime), canvasWidth - padding, canvasHeight - padding + 20);
+}
+
+function addLogMessage(text, type) {
+    const logContainer = document.getElementById('logContainer');
+    const logMessages = document.getElementById('logMessages');
+    const timestamp = secondsToTime(data.secondsPerReset);
+    let logData = {
+        theVar: text,
+        type: type,
+        timestamp: timestamp
+    }
+    const fullMessage = expandLogMessage(logData);
+    data.currentLog.push(logData);
+    const messageElement = document.createElement('div');
+    messageElement.innerHTML = fullMessage;
+    messageElement.style.padding = '2px 8px';
+    const isScrolledToBottom = logContainer.scrollTop + logContainer.clientHeight >= logContainer.scrollHeight - 10;
+    logMessages.appendChild(messageElement);
+    if(isScrolledToBottom) {
+        logContainer.scrollTop = logContainer.scrollHeight;
+    }
+}
+
+function expandLogMessage(logData) {
+    let theVar = logData.theVar;
+    let type = logData.type;
+    let timestamp = logData.timestamp;
+    if(type === "purchaseAction") {
+        let dataObj = actionData[theVar];
+        return `${timestamp}: Permanently unlocked action: ${dataObj.title} in ${getPlaneNameFromNum(dataObj.plane)}`;
+    } else if(type === "unlockAction") {
+        let dataObj = actionData[theVar];
+        let planeName = getPlaneNameFromNum(dataObj.plane);
+        return `${timestamp}: New Action: <span style="font-weight:bold;cursor:pointer;" onclick="actionTitleClicked('${theVar}');">${dataObj.title}</span> in ${planeName}`
+    } else if(type === "purchaseUpgrade") {
+        let upgradeDataObj = upgradeData[theVar];
+        return `${timestamp}: New Upgrade Available: ${upgradeDataObj.title}!`;
+    } else if(type === "info") {
+        return logData.theVar;
+    }
+}
+
+function getPlaneNameFromNum(planeNum) {
+    switch(planeNum) {
+        case 0:
+            return "Brythal"
+        case 1:
+            return "Magic"
+        case 2:
+            return "Northern Wastes"
+        case 3:
+            return "Astral"
+    }
+}
+
+function toggleLog() {
+    const logWrapper = document.getElementById('logWrapper');
+    const openLogButton = document.getElementById('openLogButton');
+    if (logWrapper.style.display === 'none') {
+        logWrapper.style.display = 'block';
+        openLogButton.style.display = 'none';
+    } else {
+        logWrapper.style.display = 'none';
+        openLogButton.style.display = 'block';
+    }
+}
+
+function clearLog() {
+    const logMessages = document.getElementById('logMessages');
+    logMessages.replaceChildren();
+    data.currentLog = [];
+}
+
+function rebuildLog() {
+    clearLog();
+    const logContainer = document.getElementById('logContainer');
+    const logMessages = document.getElementById('logMessages');
+    for (let message of data.currentLog) {
+        const messageElement = document.createElement('div');
+        messageElement.innerHTML = expandLogMessage(message);
+        messageElement.style.padding = '2px 8px';
+        logMessages.appendChild(messageElement);
+    }
+    logContainer.scrollTop = logContainer.scrollHeight;
+}
+
+
+function togglePinned() {
+    const pinnedWrapper = document.getElementById('pinnedWrapper');
+    const openPinnedButton = document.getElementById('openPinnedButton');
+    if (pinnedWrapper.style.display === 'none') {
+        pinnedWrapper.style.display = 'block';
+        openPinnedButton.style.display = 'none';
+    } else {
+        pinnedWrapper.style.display = 'none';
+        openPinnedButton.style.display = 'block';
+    }
+}
+
+function rebuildPinned() {
+    let tempArray = copyArray(data.currentPinned);
+    data.currentPinned = [];
+    for(let actionVar of tempArray) {
+        addPinnedAction(actionVar);
+    }
+}
+
+function addPinnedActionClick(event, actionVar) {
+    event.stopPropagation();
+    addPinnedAction(actionVar);
+}
+
+function addPinnedAction(actionVar) {
+    let dataObj = actionData[actionVar];
+    let actionObj = data.actions[actionVar];
+    if(data.currentPinned.indexOf(actionVar) !== -1) {
+        return;
+    }
+    data.currentPinned.push(actionVar);
+
+    queueCache(`${actionVar}PinnedLevels`)
+    queueCache(`${actionVar}Level3`)
+    queueCache(`${actionVar}MaxLevel3`)
+
+    const messageElement = document.createElement('div');
+    //remove button (X) removes all listeners
+    messageElement.innerHTML = `<span id="${actionVar}PinContainer">
+        [${dataObj.plane+1}]
+        <span id="${actionVar}PinnedLevels">
+            <span style="font-weight:bold;cursor:pointer;" onclick="actionTitleClicked('${actionVar}');">${dataObj.title}</span> 
+            (<span id="${actionVar}Level3"></span>${actionObj.maxLevel >= 0?`/<span id="${actionVar}MaxLevel3"></span>`:""})
+        </span>
+        <span style="border:2px solid #840000;cursor:pointer;" class="mouseoverRed" onclick="removePinnedAction('${actionVar}')">X</span>
+    </span>`;
+    messageElement.style.padding = '2px 8px';
+
+    document.getElementById("pinnedActions").appendChild(messageElement);
+
+    clearCacheQueue();
+}
+
+function removePinnedAction(actionVar) {
+    const pinElement = document.getElementById(`${actionVar}PinContainer`);
+    if (pinElement) {
+        pinElement.parentElement.remove();
+        delete view.cached[actionVar];
+    }
+
+    const index = data.currentPinned.indexOf(actionVar);
+    if (index !== -1) {
+        data.currentPinned.splice(index, 1);
+    }
 }

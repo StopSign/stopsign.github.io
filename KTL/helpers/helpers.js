@@ -130,7 +130,7 @@ function intToString(value, amount, hideSmall) {
     }
     let isNeg = value < 0;
     value *= isNeg ? -1 : 1;
-    if (value >= 10000) {
+    if (value + .0000001 >= 10000) {
         value += .0000001; //anti floating point rounding issues
         if(data.gameSettings.numberType === "numberSuffix") {
             return (isNeg ? "-" : "") + nFormatter(value, 3);
@@ -140,7 +140,7 @@ function intToString(value, amount, hideSmall) {
             return formatEngineering(value * (isNeg ? -1 : 1));
         }
     }
-    if (value >= 1000) { //1000 - 10000, should be 6,512 (.1) - 1 if base is > 2
+    if (value + .0000001 >= 1000) { //1000 - 10000, should be 6,512 (.1) - 1 if base is > 2
         value += .0000001; //anti floating point rounding issues
         if(amount >= 2) {
             baseValue = 1;
@@ -226,7 +226,6 @@ const rx = /\.0+$|(\.[0-9]*[1-9])0+$/u;
 
 function nFormatter(num, digits) {
     for (let i = 0; i < si.length; i++) {
-        // /1.000501 to handle rounding
         if ((num) >= si[i].value / 1.000501) {
             return (num / si[i].value).toPrecision(digits).replace(rx, "$1") + si[i].symbol;
         }
@@ -339,6 +338,18 @@ function capitalizeFirst(s) {
 
 function numberToWords(n) {
     return capitalizeFirst(number2Words(n));
+}
+
+function encode64(theSave) {
+    return Base64.encode(theSave);
+}
+
+function decode64(encodedSave) {
+    try {
+        return Base64.decode(encodedSave);
+    } catch(e) {
+        return {};
+    }
 }
 
 function encode(theSave) {

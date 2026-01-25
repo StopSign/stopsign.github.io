@@ -3,471 +3,150 @@ function clearSave() {
     location.reload();
 }
 
-data.saveVersion = 0;
-
-const patches = {
-    actions:{
-        overclock: {
-            preventReset: true,
-        },
-        reflect: {
-            preventReset: true,
-        },
-        distillInsight: {
-            preventReset: true,
-        },
-        harnessOverflow: {
-            preventReset: true,
-        },
-        takeNotes: {
-            preventReset: true,
-        },
-        remember: {
-            preventReset: true,
-        },
-        bodyAwareness: {
-            preventReset: true,
-        },
-        travelOnRoad: {
-            preventReset: true,
-        },
-        travelToOutpost: {
-            preventReset: true,
-        },
-        meetVillageLeaderScott: {
-            preventReset: true,
-        },
-        watchBirds: {
-            preventReset: true,
-        },
-        catchAScent: {
-            preventReset: true,
-        },
-        helpScottWithChores: {
-            preventReset: true
-        },
-        checkNoticeBoard: {
-            preventReset: true
-        },
-        browseLocalMarket: {
-            preventReset: true
-        },
-        makeMoney: {
-            preventReset: true
-        },
-        spendMoney: {
-            preventReset: true
-        },
-        buyBasicSupplies: {
-            preventReset: true
-        },
-        buyBasicClothes: {
-            preventReset: true
-        },
-        reportForTraining: {
-            preventReset: true
-        },
-        basicTrainingWithJohn: {
-            preventReset: true
-        },
-        noticeTheStrain: {
-            preventReset: true
-        },
-        clenchTheJaw: {
-            preventReset: true
-        },
-        breatheThroughIt: {
-            preventReset: true
-        },
-        ownTheWeight: {
-            preventReset: true
-        },
-        moveWithPurpose: {
-            preventReset: true
-        },
-        reportForLabor: {
-            preventReset: true
-        },
-        oddJobsLaborer: {
-            preventReset: true
-        },
-        chimneySweep: {
-            preventReset: true
-        },
-        buyMarketItems: {
-            preventReset: true
-        },
-        buyShopItems: {
-            preventReset: true
-        },
-        exploreDifficultPath: {
-            preventReset: true
-        },
-        buyTravelersClothes: {
-            preventReset: true
-        },
-        keepGoing: {
-            preventReset: true
-        },
-        eatGoldenFruit: {
-            preventReset: true
-        },
-        climbTheRocks: {
-            preventReset: true
-        },
-        spotAPath: {
-            preventReset: true
-        },
-        pleasantForest: {
-            preventReset: true
-        },
-        exploreTheForest: {
-            preventReset: true
-        },
-        travelAlongTheRiver: {
-            preventReset: true
-        },
-        gatherRiverWeeds: {
-            preventReset: true
-        },
-        hiddenPath: {
-            preventReset: true
-        },
-        meetGrumpyHermit: {
-            preventReset: true
-        },
-        annoyHermitIntoAQuest: {
-            preventReset: true
-        },
-        presentTheOffering: {
-            preventReset: true
-        },
-        handyman: {
-            preventReset: true
-        },
-        tavernHelper: {
-            preventReset: true
-        },
-        buyStreetFood: {
-            preventReset: true
-        },
-        buyMatchingClothes: {
-            preventReset: true
-        },
-        buySocialAccess: {
-            preventReset: true
-        },
-        browseStores: {
-            preventReset: true
-        },
-        socialize: {
-            preventReset: true
-        },
-        meetPeople: {
-            preventReset: true
-        },
-        talkWithScott: {
-            preventReset: true
-        },
-        talkWithJohn: {
-            preventReset: true
-        },
-        learnToListen: {
-            preventReset: true
-        },
-        chatWithHermit: {
-            preventReset: true
-        },
-        tellAJoke: {
-            preventReset: true
-        },
-        chatWithMerchants: {
-            preventReset: true
-        },
-        askAboutStitching: {
-            preventReset: true
-        },
-        complimentTheChef: {
-            preventReset: true
-        },
-        listenToWoes: {
-            preventReset: true
-        },
-        keyToTheBackroom: {
-            preventReset: true
-        },
-        joinCoffeeClub: {
-            preventReset: true
-        },
-        buyGoodFood: {
-            preventReset: true
-        },
-        buyStylishClothes: {
-            preventReset: true
-        },
-        slideTheCoin: {
-            preventReset: true
-        },
-        browseBackrooms: {
-            preventReset: true
-        },
-        talkToHermit: {
-            preventReset: true
-        },
-        buyCoffee: {
-            preventReset: true
-        },
-        learnToStayStill: {
-            preventReset: true
-        },
-        inquireAboutMagic: {
-            preventReset: true
-        },
-        feelTheResonance: {
-            preventReset: true
-        },
-        layerTheEchoes: {
-            preventReset: true
-        },
-        igniteTheSpark: {
-            preventReset: true
-        },
-        gossipAroundCoffee: {
-            preventReset: true
-        },
-        pesterHermitForSecrets: {
-            preventReset: true
-        },
-        guildReceptionist: {
-            preventReset: true
-        },
-        meditate: {
-            preventReset: true
-        },
-        journal: {
-            preventReset: true
-        },
-        travelToCrossroads: {
-            preventReset: true
-        },
-        restAtWaterfall: {
-            preventReset: true
-        },
-        visitShrineBehindWaterfall: {
-            preventReset: true
-        },
 
 
-        echoKindle: {
-            preventReset: true
-        },
-        sparkMana: {
-            preventReset: true
-        },
-        poolMana: {
-            preventReset: true
-        },
-        expelMana: {
-            preventReset: true
-        },
-        prepareSpells: {
-            preventReset: true
-        },
-        manaBasics: {
-            preventReset: true
-        },
-        feelYourMana: {
-            preventReset: true
-        },
-        growMagicSenses: {
-            preventReset: true
-        },
-        manaExperiments: {
-            preventReset: true
-        },
-        manaObservations: {
-            preventReset: true
-        },
-        magicResearch: {
-            preventReset: true
-        },
-        infuseTheHide: {
-            preventReset: true
-        },
-        etchTheCircle: {
-            preventReset: true
-        },
-        bindThePages: {
-            preventReset: true
-        },
-        awakenYourGrimoire: {
-            preventReset: true
-        },
-        prepareInternalSpells: {
-            preventReset: true
-        },
-        overcharge: {
-            preventReset: true
-        },
-        overboost: {
-            preventReset: true
-        },
-        prepareExternalSpells: {
-            preventReset: true
-        },
-        supportSpells: {
-            preventReset: true
-        },
-        earthMagic: {
-            preventReset: true
-        },
+//TODO when using Decimal - hydrate the necessary numbers
+//TODO also, only choose the vars you want to keep, rather than keeping bad data across saves
+function loadActionFromSave(actionObj, loadObj) {
+    Object.assign(actionObj, loadObj);
+    //save corrections
+    if(loadObj.automationOnMax !== undefined) {
+        actionObj.automationCanDisable = loadObj.automationOnMax;
+    }
+    delete actionObj.automationOnMax;
+}
 
-        hearAboutTheLich: {
-            preventReset: true
-        },
-
-        overclockTargetingTheLich: {
-            preventReset: true
-        },
-        worry: {
-            preventReset: true
-        },
-        resolve: {
-            preventReset: true
-        },
-        fightTheEvilForces: {
-            preventReset: true
-        },
-        bridgeOfBone: {
-            preventReset: true
-        },
-        forgottenShrine: {
-            preventReset: true,
-        },
-        messenger: {
-            preventReset: true,
-        },
-        harvestGhostlyField: {
-            preventReset: true,
-        }
-
-    },
-    upgrades:{
-        stopLettingOpportunityWait: {
-            preventReset: true,
-        },
-        knowWhenToMoveOn: {
-            preventReset: true,
-        },
-        feelTheEchoesOfMyPast: {
-            preventReset: true,
-        },
-        startALittleQuicker: {
-            preventReset: true,
-        },
-        rememberWhatIFocusedOn: {
-            preventReset: true,
-        },
-        learnedOfLichSigns: {
-            preventReset: true,
-        },
-        knowWhatIFocusedOn: {
-            preventReset: true,
-        },
-        refineMyCycle: { preventReset: true, },
-        refineMyAwareness: { preventReset: true, },
-        refineMyConcentration: { preventReset: true, },
-        refineMyEnergy: { preventReset: true, },
-        refineMyFlow: { preventReset: true, },
-        refineMyCoordination: { preventReset: true, },
-        refineMyIntegration: { preventReset: true, },
-        refineMyAmbition: { preventReset: true, },
-        refineMyAdaptability: { preventReset: true, },
-        refineMyCunning: { preventReset: true, },
-        refineMySavvy: { preventReset: true, },
-        refineMyConfidence: { preventReset: true, },
-        refineMyRecognition: { preventReset: true, },
-        refineMyCharm: { preventReset: true, },
-        refineMyInfluence: { preventReset: true, },
-        refineMyDiscernment: { preventReset: true, },
-        refineMyPulse: { preventReset: true, },
-        refineMyVision: { preventReset: true, },
-        refineMySpark: { preventReset: true, },
-        refineMyAmplification: { preventReset: true, },
-        refineMyControl: { preventReset: true, },
-        refineMyCuriosity: { preventReset: true, },
-        refineMyObservation: { preventReset: true, },
-        refineMyEndurance: { preventReset: true, },
-        refineMyNavigation: { preventReset: true, },
-        refineMyMight: { preventReset: true, },
-        refineMyGeared: { preventReset: true, },
-        refineMyCourage: { preventReset: true, },
-        refineMyWizardry: { preventReset: true, },
-    }};
-
-
-
+data.saveVersion = 6;
 function load() {
     initializeData();
 
     let toLoad = {};
 
-    // if(onLoadData) {
-    //     toLoad = onLoadData;
-    // }
-    if(localStorage[saveName]) {
-        console.log('Save found.');
-        toLoad = JSON.parse(decode(localStorage[saveName]));
+    if(loadStaticSaveFile) {
+        if(onLoadData) {
+            try {
+                console.log('Loading locally.');
+                toLoad = JSON.parse(decode64(onLoadData));
+            } catch (e) {
+                try { //old save
+                    toLoad = JSON.parse(decode(onLoadData));
+                } catch (e) {
+                    exportErrorFile(onLoadData);
+                }
+            }
+        }
+    } else {
+        if (localStorage[saveName]) {
+            console.log('Save found.');
+            try {
+                toLoad = JSON.parse(decode64(localStorage[saveName]));
+            } catch (e) {
+                try { //old save
+                    toLoad = JSON.parse(decode(localStorage[saveName]));
+                } catch (e) {
+                    exportErrorFile(localStorage[saveName]);
+                }
+            }
+        }
+    }
+    if(!isLoadingEnabled) {
+        console.log('Save ignored.');
+        toLoad = {};
     }
 
 
-    if(isLoadingEnabled && localStorage[saveName] && toLoad.actions) { //has a save file
-        const saveVersion = toLoad.saveVersion || 0;
+    const saveVersionFromLoad = toLoad && toLoad.saveVersion ? toLoad.saveVersion : data.saveVersion;
+    // const saveVersion = 1; //for debug only
+    let queuedLogMessages = []; //Any info that needs to be told to the user
+
+    if(localStorage[saveName] && toLoad.actions) {
+        //only go through the ones in toLoad and graft them on to existing data
+        for(let actionVar in toLoad.actions) {
+            let actionObj = data.actions[actionVar];
+            let dataObj = actionData[actionVar];
+            let loadObj = toLoad.actions[actionVar];
+            if(!dataObj) {
+                continue;
+            }
+            if(dataObj.creationVersion > saveVersionFromLoad) {
+                actionObj.automationOnReveal = loadObj.automationOnReveal;
+                // console.log("Skipped loading action " + actionVar + " from save.");
+                continue;
+            }
+            loadActionFromSave(actionObj, loadObj);
+
+        }
+
+        let refundAmount = 0;
+        for(let upgradeVar in toLoad.upgrades) {
+            let upgradeObj = data.upgrades[upgradeVar];
+            let upgradeDataObj = upgradeData[upgradeVar];
+            let loadObj = toLoad.upgrades[upgradeVar];
+            if(!upgradeDataObj || upgradeDataObj.creationVersion > saveVersionFromLoad) { //If removed or needs to refresh
+                let toRefund = calcTotalSpentOnUpgrade(loadObj.initialCost, loadObj.costIncrease, loadObj.upgradesBought);
+                if(toRefund > 0) {
+                    refundAmount += toRefund;
+                    queuedLogMessages.push(["Info: Refunded <b>"+toRefund+"</b> AC for the upgrade: " + (loadObj.title || decamelizeWithSpace(upgradeVar)), "info"])
+                }
+                // console.log("Skipped loading upgrade " + upgradeVar + " from save.");
+                continue;
+            }
+            loadActionFromSave(upgradeObj, loadObj);
+        }
 
         // mergeExistingOnly(data, toLoad, "actions", ["x", "y", "realX", "realY"]); //use patch instead
         //these are in the skiplist because if, between saves, an action has changed the atts it has, the links need to be reset instead of saved.
         mergeExistingOnly(data, toLoad, "atts", ["linkedActionExpAtts", "linkedActionEfficiencyAtts", "linkedActionOnLevelAtts"]);
         mergeExistingOnly(data, toLoad, "options");
-        data.options.bonusRate = 3;
         mergeExistingOnly(data, toLoad, "gameSettings");
 
-
-        patchActions("actions", toLoad.actions, actionData);
-        patchActions("upgrades", toLoad.upgrades, upgradeData);
-
         data.toastStates = toLoad.toastStates;
-
 
         //load global items that aren't lists or objects
         data.gameState = toLoad.gameState ?? "default";
         data.planeTabSelected = toLoad.planeTabSelected ?? 0;
         data.totalMomentum = toLoad.totalMomentum ?? 0;
         data.ancientCoin = toLoad.ancientCoin ?? 0;
+        data.ancientWhisper = toLoad.ancientWhisper ?? 0;
         data.useAmuletButtonShowing = !!toLoad.useAmuletButtonShowing;
         data.secondsPerReset = toLoad.secondsPerReset ?? 0;
         data.currentJob = toLoad.currentJob ?? "helpScottWithChores";
         data.currentWage = toLoad.currentWage ?? 1;
         data.doneKTL = !!toLoad.doneKTL;
         data.doneAmulet = !!toLoad.doneAmulet;
+        data.doneLS = toLoad.doneLS ?? 0;
         data.displayJob = !!toLoad.displayJob;
         data.focusSelected = toLoad.focusSelected ?? [];
         data.resetLogs = toLoad.resetLogs ?? [];
         data.planeUnlocked = toLoad.planeUnlocked ?? [true, false, false, false];
-        data.maxFocusAllowed = toLoad.maxFocusAllowed ?? 3;
-        data.focusMult = toLoad.focusMult ?? 2;
-        data.focusLoopMax = toLoad.focusLoopMax ?? 2.5;
+        data.maxFocusAllowed = toLoad.maxFocusAllowed ?? 2;
         data.lastVisit = toLoad.lastVisit ?? Date.now();
+        data.currentLog = toLoad.currentLog ?? [];
+        data.currentPinned = toLoad.currentPinned ?? [];
+        data.ancientCoinMultKTL = toLoad.ancientCoinMultKTL ?? 1;
+        data.legacyMultKTL = toLoad.legacyMultKTL ?? 1;
+        data.resetCount = toLoad.resetCount ?? 1;
+        data.ancientCoinGained = toLoad.ancientCoinGained ?? 0;
+        data.ancientWhisperGained = toLoad.ancientWhisperGained ?? 0;
+        data.queuedReveals = toLoad.queuedReveals ?? {};
+        data.legacy = toLoad.legacy ?? 0;
+        data.lichKills = toLoad.lichKills ?? 0;
+        data.lichCoins = toLoad.lichCoins ?? 0;
+        data.highestLegacy = toLoad.highestLegacy ?? 0;
 
         data.currentGameState = toLoad.currentGameState;
-        // data.gameSettings = toLoad.gameSettings;
-
 
         //data correction
+        if(toLoad.gameSettings.viewAdvancedSliders === undefined) { //defaults off on new saves
+            data.gameSettings.viewAdvancedSliders = true;
+        }
 
-        //new spells need to be leveled to current grimoire's level
 
-        //bought upgrades need to be applied
-        actionData.hearAboutTheLich.maxLevel = data.upgrades.learnedOfLichSigns.upgradePower + 2;
+
+        refundAmount += saveFileCorrection(saveVersionFromLoad)
+
+        data.ancientCoin += refundAmount;
+        applyUpgradeEffects()
     }
 
     //update all generator's multiplier data
@@ -479,65 +158,37 @@ function load() {
     }
 
     initializeDisplay();
-    setSlidersOnLoad(toLoad);
-    // recalcInterval(data.options.updateRate);
+    adjustUIAfterLoad(toLoad, saveVersionFromLoad);
     views.updateView();
 
 
+    for(let queuedLogMessage of queuedLogMessages) {
+        addLogMessage(queuedLogMessage[0], queuedLogMessage[1]);
+    }
+    saveFileCorrectionAfterLoad(saveVersionFromLoad);
     debug(); //change game after all else, for easier debugging
 }
 
-function patchActions(dataVar, toLoadActions, baseData) { //, dataActions, toLoadActions, patchMap) {
-    let dataActions = data[dataVar];
-    let patchMap = patches[dataVar];
-    const currentKeys = Object.keys(dataActions);
-    const loadedKeys = toLoadActions ? Object.keys(toLoadActions) : [];
+function applyUpgradeEffects() {
+    //bought upgrades need to be applied
+    // data.actions.hearAboutTheLich.maxLevel = data.upgrades.learnedOfLichSigns.upgradePower + 2 + data.actions.trainWithTeam.level;
+    // data.actions.hearAboutTheLich.maxLevel = data.upgrades.learnedOfLichSigns.upgradePower + 2;
 
-    for (const key of currentKeys) {
-        // If action is not in the loaded data, reset it to its base state.
-        if (!(key in toLoadActions)) {
-            if(dataVar === "action") {
-                actionSetBaseVariables(dataActions[key], baseData[key]);
-            } else if(dataVar === "upgrades") {
-                upgradesSetBaseVariables(dataActions[key], baseData[key])
-            }
-
-            continue;
-        }
-
-        // Check the patch map to see if this action should be preserved.
-        const preventReset = patchMap[key]?.preventReset;
-
-        // If reset is prevented, merge the loaded data and continue.
-        if (preventReset) {
-            Object.assign(dataActions[key], toLoadActions[key]);
-            continue;
-        }
-
-        if(dataVar === "action") {
-            const isVisible = toLoadActions[key].visible;
-            actionSetBaseVariables(dataActions[key], baseData[key]);
-            dataActions[key].visible = isVisible;
-        } else if(dataVar === "upgrades") {
-            upgradesSetBaseVariables(dataActions[key], baseData[key])
-        }
+    // data.actions.trainWithTeam.maxLevel = data.upgrades.trainTogetherMore.upgradePower + 2;
+    if(data.upgrades.learnFromTheLibrary.upgradePower >= 3) {
+        data.actions.collectHistoryBooks.maxLevel = 7;
     }
-
-    for (const key of loadedKeys) {
-        if (!(key in dataActions)) {
-            delete toLoadActions[key];
-        }
+    if(data.upgrades.learnFromTheLibrary.upgradePower >= 5) {
+        data.actions.collectMathBooks.maxLevel = 5;
     }
-
-    if(globalVisible) {
-        for(let attVar in data.atts) {
-            revealAtt(attVar);
-        }
-    }
+    adjustMaxLevels()
 }
 
-function setSlidersOnLoad(toLoad) {
+function adjustUIAfterLoad(toLoad, saveVersionFromLoad) {
+    updateSliderContainers(); //show hide according to setting
+
     for(let actionVar in data.actions) {
+        let actionObj = data.actions[actionVar];
         let dataObj = actionData[actionVar];
         for(let downstreamVar of dataObj.downstreamVars) {
             if (!document.getElementById(actionVar + "NumInput" + downstreamVar)
@@ -547,22 +198,22 @@ function setSlidersOnLoad(toLoad) {
             }
             setSliderUI(actionVar, downstreamVar, toLoad.actions[actionVar]["downstreamRate" + downstreamVar]); //from save file
         }
+
+        if(dataObj.storyVersion > actionObj.readStory) {
+            views.updateVal(`${actionVar}_storyMenuButton`, "yellow", "style.color");
+        }
+
+        //correct old versions from boolean to number
+        if(toLoad.actions && toLoad.actions[actionVar]) {
+            if (dataObj.hasUpstream && (toLoad.actions[actionVar].automationOnReveal === true || toLoad.actions[actionVar].automationOnReveal === undefined)) {
+                setSliderUI(actionVar, "Automation", data.upgrades.stopLettingOpportunityWait.upgradePower * 50);
+            } else if (actionObj.automationOnReveal === false) {
+                actionObj.automationOnReveal = 0;
+            }
+        }
     }
-    attachCustomSliderListeners();
-}
 
-function mergeExistingOnly2(data, toLoad, varName, skipList = []) {
-    const dataObj = data[varName];
-    const toLoadObj = toLoad[varName];
-    if (typeof dataObj !== "object" || typeof toLoadObj !== "object") return;
-
-    for (let key in toLoadObj) {
-        if (!(key in dataObj)) continue;
-        console.log(key);
-        if (skipList.includes(key)) continue;
-
-        Object.assign(dataObj[key], toLoadObj[key]);
-    }
+    attachSliderListeners();
 }
 
 function mergeExistingOnly(data, toLoad, varName, skipList = []) {
@@ -614,35 +265,95 @@ function mergeExistingOnly(data, toLoad, varName, skipList = []) {
 
 function updateUIOnLoad() {
 
+    updatePauseButtonVisuals()
+
+    refreshResetLog()
+    rebuildLog()
+    rebuildPinned()
+    clickUpgradeTab("unique");
+    checkActionTriggers()
+    checkGrimoireUnlocks()
+    displayLSStuff()
+
     document.getElementById('viewDeltasSwitch').firstElementChild.style.left = data.gameSettings.viewDeltas ? "50%" : "0";
-    document.getElementById('numberTypeSwitch').firstElementChild.style.left = data.gameSettings.numberType==="scientific" ? "50%" : "0";
+    document.getElementById('numberTypeSwitch').firstElementChild.style.left = data.gameSettings.numberType==="numberSuffix" ? "66.666%" : (data.gameSettings.numberType==="scientific" ? "33.333%" : "0");
     document.getElementById('viewRatioSwitch').firstElementChild.style.left = data.gameSettings.viewRatio ? "50%" : "0";
     document.getElementById('viewTotalMomentumSwitch').firstElementChild.style.left = data.gameSettings.viewTotalMomentum ? "50%" : "0";
     document.getElementById('viewZeroButtonsSwitch').firstElementChild.style.left = data.gameSettings.viewAll0Buttons ? "50%" : "0";
+    document.getElementById('viewAdvancedSlidersSwitch').firstElementChild.style.left = data.gameSettings.viewAdvancedSliders ? "50%" : "0";
+    document.getElementById("showCompleteUpgrades").checked = data.gameSettings.showCompletedToggle;
+    document.getElementById("showUnaffordableUpgrades").checked = data.gameSettings.showUnaffordable;
+    document.getElementById("sortByCost").checked = data.gameSettings.sortByCost;
+
+        if(data.gameSettings.bonusSpeed > 1) {
+        data.gameSettings.bonusSpeed = 1;
+         //set it to 3 or set the checked correctly on load
+    }
+    data.options.bonusRate = 3;
+    updateBonusSpeedButton();
+
 
     for (let actionVar in data.actions) {
         let actionObj = data.actions[actionVar];
-        if(data.gameState === "KTL") {
-            actionObj.isRunning = actionObj.plane === 2;
+        let dataObj = actionData[actionVar];
+        if (data.gameState === "KTL") {
+            actionObj.isRunning = dataObj.plane === 2;
         } else {
-            actionObj.isRunning = actionObj.plane !== 2;
+            actionObj.isRunning = dataObj.plane !== 2;
         }
-        clickActionMenu(actionVar, actionObj.currentMenu, true);
+        let menuFromSave = actionObj.currentMenu;
+        actionObj.currentMenu = "";
+        clickActionMenu(actionVar, menuFromSave);
         if (actionObj.visible) {
-            revealActionAtts(actionObj);
+            revealAttsOnAction(actionObj);
         }
-        if(data.gameSettings.viewDeltas) {
+        if (data.gameSettings.viewDeltas) {
             views.updateVal(`${actionVar}DeltasDisplayContainer`, "", "style.display");
         }
-        if(data.gameSettings.viewRatio) {
+        if (data.gameSettings.viewRatio) {
             views.updateVal(`${actionVar}BalanceNeedleContainer`, "", "style.display");
         }
-        if(data.gameSettings.viewAll0Buttons) {
+        if (data.gameSettings.viewAll0Buttons && dataObj.plane !== 2) {
             views.updateVal(`${actionVar}ToggleDownstreamButtons`, "", "style.display");
         }
-        if(data.gameSettings.viewTotalMomentum) {
+        if (data.gameSettings.viewTotalMomentum) {
             views.updateVal(`${actionVar}TotalDownstreamContainer`, "", "style.display");
         }
+        if (dataObj.hasUpstream || dataObj.keepParentAutomation) {
+            let showRevealAutomation = data.upgrades.stopLettingOpportunityWait.upgradePower > 0 && dataObj.hasUpstream;
+            let showMaxLevelAutomation = data.upgrades.knowWhenToMoveOn.upgradePower > 0;
+            views.updateVal(`${actionVar}_automationMenuButton`, dataObj.plane !== 2 && (showRevealAutomation || showMaxLevelAutomation) ? "" : "none", "style.display");
+            if(dataObj.maxLevel !== undefined) {
+                views.updateVal(`${actionVar}_automationMaxLevelContainer`, dataObj.plane !== 2 && showMaxLevelAutomation ? "" : "none", "style.display");
+            }
+            if(dataObj.hasUpstream) {
+                views.updateVal(`${actionVar}_automationRevealContainer`, dataObj.plane !== 2 && showRevealAutomation ? "" : "none", "style.display");
+            }
+        }
+
+        if(data.doneAmulet) {
+            views.updateVal(`${actionVar}PinButton`, "", "style.display");
+        }
+        if(dataObj.hasUpstream) {
+            if (actionObj.automationOnReveal > 0) {
+                views.updateVal(`${actionVar}_checkbox`, true, "checked");
+                views.updateVal(`${actionVar}_track`, "#2196F3", "style.backgroundColor");
+                views.updateVal(`${actionVar}_knob`, "translateX(26px)", "style.transform");
+            }
+        }
+        if((dataObj.hasUpstream || dataObj.keepParentAutomation) && dataObj.maxLevel !== undefined) {
+            if (actionObj.automationCanDisable) {
+                views.updateVal(`${actionVar}_checkbox2`, true, "checked");
+                views.updateVal(`${actionVar}_track2`, "#2196F3", "style.backgroundColor");
+                views.updateVal(`${actionVar}_knob2`, "translateX(26px)", "style.transform");
+            }
+        }
+        if(dataObj.isSpell || dataObj.isSpellConsumer) {
+            updatePauseActionVisuals(actionVar);
+        }
+        views.updateVal(`${actionVar}_storyMenuButton`, actionObj.readStory!==undefined?"":"#2196F3", "style.color");
+
+
     }
     if (data.planeUnlocked[1] || data.planeUnlocked[2]) {
         for (let i = 0; i < data.planeUnlocked.length; i++) {
@@ -651,7 +362,11 @@ function updateUIOnLoad() {
             }
         }
     }
-    switchToPlane(0);
+    if(data.gameState === "KTL") {
+        switchToPlane(2);
+    } else {
+        switchToPlane(0);
+    }
 
     
     if(data.doneAmulet && data.gameState !== "KTL") {
@@ -662,11 +377,10 @@ function updateUIOnLoad() {
     }
     if(data.doneKTL) {
         views.updateVal(`ancientCoinDisplay`, "", "style.display");
-        revealAtt("legacy");
+        views.updateVal(`ancientWhisperDisplay`, "", "style.display");
+        views.updateVal(`legacyDisplay`, "", "style.display");
     }
-    if(data.displayJob) {
-        document.getElementById("jobDisplay").style.display = "";
-    }
+    views.updateVal(`jobDisplay`, data.displayJob ? "" : "none", "style.display");
     changeJob(data.currentJob);
 
     for(let i = 0; i < data.toastStates.length; i++) {
@@ -689,28 +403,87 @@ function updateUIOnLoad() {
         recalcAttMult(attVar)
     }
 
+    // views.updateVal(`killTheLichMenuButton2`, !data.actions.trainWithTeam.unlocked ? "Fight the Lich's Forces!":"Fight the Lich's Forces, Together!");
+
 }
 
 function reapplyAttentionSelected() {
     if (!data.focusSelected) return;
 
-    data.focusSelected.forEach(entry => {
-        const { borderId } = entry;
-        highlightLine(borderId); // Reapply visual state
-    });
+    for(let focusObj of data.focusSelected) {
+        highlightLine(focusObj.borderId, focusObj.lineData);
+    }
 }
 
 function save() {
-    window.localStorage[saveName] = encode(JSON.stringify(data));
+    data.lastVisit = Date.now();
+    window.localStorage[saveName] = encode64(JSON.stringify(data));
 }
 
 function exportSave() {
     save();
-    // console.log(encoded);
     document.getElementById("exportImportSave").value = window.localStorage[saveName];
     document.getElementById("exportImportSave").select();
     document.execCommand('copy');
     document.getElementById("exportImportSave").value = "";
+}
+
+function exportErrorFile(data) {
+    const blob = new Blob([data], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+
+    const baseName = "KTL_Error_File";
+    const extension = 'txt';
+
+    const now = new Date();
+
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+    const day = String(now.getDate()).padStart(2, '0');
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const seconds = String(now.getSeconds()).padStart(2, '0');
+
+    a.download = `${baseName}_${year}-${month}-${day}_${hours}-${minutes}-${seconds}.${extension}`;
+
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+
+    URL.revokeObjectURL(url);
+}
+
+function exportSaveFile() {
+    save();
+    const data = window.localStorage[saveName];
+    const blob = new Blob([data], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+
+    const baseName = "KTL_Save";
+    const extension = 'txt';
+
+    const now = new Date();
+
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+    const day = String(now.getDate()).padStart(2, '0');
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const seconds = String(now.getSeconds()).padStart(2, '0');
+
+    a.download = `${baseName}_${year}-${month}-${day}_${hours}-${minutes}-${seconds}.${extension}`;
+
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+
+    URL.revokeObjectURL(url);
 }
 
 function importSave() {
@@ -723,4 +496,22 @@ function importSave() {
     }
     window.localStorage[saveName] = document.getElementById("exportImportSave").value;
     location.reload();
+}
+
+function importSaveFile() {
+    const input = document.getElementById("importSaveFileInput");
+    const file = input.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const content = e.target.result.trim();
+        if (!content) {
+            clearSave();
+        } else {
+            window.localStorage[saveName] = content;
+        }
+        location.reload();
+    };
+    reader.readAsText(file);
 }

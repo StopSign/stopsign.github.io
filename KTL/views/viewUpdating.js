@@ -29,20 +29,22 @@ let views = {
     updateViewOnSecond: function() {
         showAllValidToasts();
         drawChart();
+        checkActionsToReveal();
 
         let toShowUseAmulet = data.useAmuletButtonShowing && data.gameState === "KTL";
         views.updateVal(`openUseAmuletButton`, toShowUseAmulet ? "" : "none", "style.display");
 
         let toViewAmulet = data.doneAmulet && data.gameState !== "KTL";
         views.updateVal(`ancientCoinDisplay`, data.doneKTL ? "" : "none", "style.display");
+        views.updateVal(`ancientWhisperDisplay`, data.doneKTL ? "" : "none", "style.display");
+        views.updateVal(`legacyDisplay`, data.legacy > 0 ? "" : "none", "style.display");
 
-        views.updateVal(`spellPowerDisplay`, data.totalSpellPower > 0 ? "" : "none", "style.display");
+        views.updateVal(`manaQuality`, actionData.awakenYourGrimoire.manaQuality() > 0 ? "" : "none", "style.display");
 
         views.updateVal(`jobDisplay`, data.displayJob ? "" : "none", "style.display");
 
-        if(data.actions.hearAboutTheLich.level >= 1 && data.totalSpellPower > 0) {
-            views.updateVal(`killTheLichMenuButton2`, "", "style.display")
-        }
+        let shouldShowKTLButton = data.actions.hearAboutTheLich.level >= 1 && data.gameState !== "KTL";
+        views.updateVal(`killTheLichMenuButton2`, shouldShowKTLButton?"":"none", "style.display")
     },
     scheduleUpdate: function(elementId, value, type) {
         view.scheduled.push({
@@ -66,16 +68,17 @@ let views = {
         let attObj = data.atts[attVar];
 
         //Handle visibility
-        let isVisible = (attObj.unlocked || globalVisible);
+        let isVisible = attVar !== "legacy" && (attObj.unlocked || globalVisible);
         views.updateVal(`${attVar}AttContainer`, isVisible?"":"none", "style.display");
         if(!isVisible) {
             return;
         }
 
-        views.updateVal(`${attVar}AttUpgradeMultContainer`, attObj.attUpgradeMult > 1?"":"none", "style.display");
+        views.updateVal(`${attVar}AttBaseContainer`, attObj.attBase !== 0 ?"":"none", "style.display");
+        views.updateVal(`${attVar}AttBase`, (attObj.attBase > 0 ? "+":"")+attObj.attBase, "textContent");
 
         //Update the numbers
-        let roundedNumbers = [["num", 2], ["attMult", 2], ["attUpgradeMult", 3]]; //["perMinute", 2],
+        let roundedNumbers = [["num", 2], ["attMult", 2]]; //["perMinute", 2],
 
         for(let numberObj of roundedNumbers) {
             let capName = capitalizeFirst(numberObj[0]);
@@ -87,6 +90,9 @@ let views = {
             let actionObj = data.actions[actionVar];
             views.updateAction(actionObj);
         }
+        for(let actionVar of data.currentPinned) {
+            views.updatePinned(actionVar);
+        }
     },
     updateActions:function() {
         views.updateAura();
@@ -96,7 +102,8 @@ let views = {
 
         for (let actionVar in data.actions) {
             let actionObj = data.actions[actionVar];
-            let resourceName = actionObj.resourceName;
+            let dataObj = actionData[actionVar];
+            let resourceName = dataObj.resourceName;
             let resourceAmount = actionObj.resource;
 
             if (!resourceAmounts[resourceName]) {
@@ -115,19 +122,31 @@ let views = {
 
             for (let entry of list) {
                 let ratio = maxAmount > 0 ? entry.amount / maxAmount : 0;
-                let actionObj = data.actions[entry.id];
-                let mod = actionObj.resourceName === "momentum" ? 100 : 1000;
+                // let actionObj = data.actions[entry.id];
+                let dataObj = actionData[entry.id]
+                let mod = dataObj.resourceName === "momentum" ? 100 : 1000;
                 if(maxAmount < mod) {
                     ratio *= maxAmount/mod; //scale first 1000 smoother.
                 }
 
-                let color = getResourceColorDim(actionObj);
+                let color = getResourceColorDim(entry.id);
 
                 views.updateVal(`${entry.id}Container`,`${color} 0px 0px ${Math.floor(ratio * 100)/2}px ${Math.floor(ratio * 50)/2}px`,"style.boxShadow");
                 views.updateVal(`${entry.id}LargeVersionContainer`,`inset ${color} 0px 0px ${Math.floor(ratio * 20)/2}px ${Math.floor(ratio * 10)/2}px`,"style.boxShadow");
                 // views.updateVal(`${entry.id}SmallVersionContainer`,`inset ${getResourceColor(actionObj)} 0px 0px ${Math.min(ratio * 15)}px ${Math.min(ratio * 5)}px`,"style.boxShadow");
             }
         }
+    },
+    updatePinned:function(actionVar) {
+        let actionObj = data.actions[actionVar];
+        let isMaxLevel = actionObj.maxLevel !== undefined && actionObj.level >= actionObj.maxLevel;
+
+        views.updateVal(`${actionVar}Level3`, actionObj.level, "innerText", 1);
+        if(actionObj.maxLevel >= 0) {
+            views.updateVal(`${actionVar}MaxLevel3`, actionObj.maxLevel, "innerText", 1);
+        }
+        views.updateVal(`${actionVar}PinnedLevels`, isMaxLevel?"var(--max-level-color)":"var(--text-primary)", "style.color");
+        views.updateVal(`${actionVar}PinnedLevels`, actionObj.visible?"1":".6", "style.opacity");
     },
     updateAction:function(actionObj) {
         //Handle visibility
@@ -145,51 +164,41 @@ let views = {
     updateActionVisibility: function(actionObj) {
         let actionVar = actionObj.actionVar;
         let dataObj = actionData[actionVar];
+        let parentVar = dataObj.parentVar;
 
         //if game state doesn't match, return
-        if(actionObj.plane !== data.planeTabSelected) {
+        if(dataObj.plane !== data.planeTabSelected) {
             return false;
         }
         let toDisplay = actionObj.visible || globalVisible;
         let isInRange = isActionVisible(actionVar);
         views.updateVal(`${actionVar}Container`, toDisplay&&isInRange?"":"none", "style.display");
-        if(dataObj.parentVar) {
-            let parentObj = data.actions[dataObj.parentVar];
-            views.updateVal(`${dataObj.parentVar}_${actionVar}_Line_Outer`, (globalVisible||(toDisplay && parentObj.visible)) && !dataObj.hideUpstreamLine ?"flex":"none", "style.display");
-            views.updateVal(`${dataObj.parentVar}_${actionVar}_Line_Inner`, toDisplay && parentObj.visible ?"":"none", "style.display");
+
+        if(parentVar) {
+            let parentObj = data.actions[parentVar];
+            let parentInRange = isActionVisible(parentVar);
+            views.updateVal(`${parentVar}_${actionVar}_Line_Outer`, (globalVisible||(toDisplay&&parentObj.visible&&(parentInRange||isInRange))) && !dataObj.hideUpstreamLine ?"flex":"none", "style.display");
+            views.updateVal(`${parentVar}_${actionVar}_Line_Inner`, toDisplay && parentObj.visible ?"":"none", "style.display");
         }
 
-        // if(!toDisplay) { // || not in screen range
-        if(!toDisplay || !isInRange) { // || not in screen range
-            return false;
+        if(!toDisplay || !isInRange) {
+            return false; //don't update other numbers
         }
 
-        let miniVersion = scale < .55;
-        let mediumVersion = scale < .65 && !miniVersion;
+        let miniVersion = scaleByPlane[data.planeTabSelected] < .55;
         let isMaxLevel = actionObj.maxLevel !== undefined && actionObj.level >= actionObj.maxLevel;
         views.updateVal(`${actionVar}LargeVersionContainer`, !miniVersion?"":"none", "style.display");
         views.updateVal(`${actionVar}SmallVersionContainer`, miniVersion?"":"none", "style.display");
         views.updateVal(`${actionVar}Container`, miniVersion ? "100px" : "" , "style.borderRadius");
-        views.updateVal(`${actionVar}SmallVersionContainer`, ((scale < .11) ? 3 : (1 / scale)*.8)+"", "style.scale");
+        views.updateVal(`${actionVar}SmallVersionContainer`, ((scaleByPlane[data.planeTabSelected] < .11) ? 3 : (1 / scaleByPlane[data.planeTabSelected])*.8)+"", "style.scale");
 
-        views.updateVal(`${actionVar}SmallVersionTitle`, scale < .11 ? "0" : "1" , "style.opacity");
+        views.updateVal(`${actionVar}SmallVersionTitle`, scaleByPlane[data.planeTabSelected] < .11 ? "0" : "1" , "style.opacity");
         views.updateVal(`${actionVar}Container`, miniVersion ? "100px" : "" , "style.borderRadius");
 
         views.updateVal(`${actionVar}SmallVersionLevels`, isMaxLevel?"var(--max-level-color)":"var(--text-primary)", "style.color");
         views.updateVal(`${actionVar}Level2`, actionObj.level, "innerText", 1);
         views.updateVal(`${actionVar}MaxLevel2`, actionObj.maxLevel, "innerText", 1);
         views.updateVal(`${actionVar}IsMaxLevel`, isMaxLevel && !miniVersion ? "":"none", "style.display");
-
-        // views.updateVal(`${actionVar}SmallVersionTitle`, scale < .11 ? "none" : "" , "style.display");
-
-        // if(!miniVersion) { //don't check in small
-        //     views.updateVal(`${actionVar}DeltasDisplayContainer`, mediumVersion?"none":"", "style.display");
-        //     views.updateVal(`${actionVar}BalanceNeedleLabel`, mediumVersion?"none":"", "style.display");
-        //     views.updateVal(`${actionVar}ProgressBarLabels`, mediumVersion?"none":"", "style.display");
-        //     views.updateVal(`${actionVar}ExpBarLabels`, mediumVersion?"none":"", "style.display");
-        //     views.updateVal(`${actionVar}ToggleDownstreamButtons`, mediumVersion?"none":"", "style.display");
-        //     views.updateVal(`${actionVar}MenuButtons`, mediumVersion?"none":"", "style.display");
-        // }
 
 
         //go through each downstream
@@ -200,11 +209,6 @@ let views = {
             views.updateVal(`${actionVar}_${downstreamVar}_Line_Inner_Container`, !miniVersion ? "flex" : "none", "style.display");
             let boxShadow = !isAttentionLine(actionVar, downstreamVar)?"":(miniVersion?"0 0 40px 11px yellow":"0 0 18px 5px yellow");
             views.updateVal(`${actionVar}_${downstreamVar}_Line_Outer`, boxShadow, "style.boxShadow");
-
-            // if(!miniVersion) { //don't check in small
-            //     views.updateVal(`${actionVar}SliderLabels${downstreamVar}`, mediumVersion?"none":"", "style.display");
-            //     views.updateVal(`${actionVar}SliderDownstreamTitle${downstreamVar}`, mediumVersion?"16px":"12px", "style.fontSize");
-            // }
         }
 
         return !miniVersion;
@@ -213,10 +217,14 @@ let views = {
         let actionVar = actionObj.actionVar;
         let dataObj = actionData[actionVar];
 
-        views.updateVal(`${actionVar}HighestLevelContainer2`, data.upgrades.rememberWhatIDid.isFullyBought ? "" : "none", "style.display");
-        views.updateVal(`${actionVar}LockContainer`, !actionObj.unlocked?"":"none", "style.display");
+        views.updateVal(`${actionVar}LockContainer`, (!actionObj.unlocked && actionObj.currentMenu!=="automation")?"":"none", "style.display");
+        views.updateVal(`${actionVar}ResourceInfoContainer`, (!actionObj.unlocked && actionObj.currentMenu==="automation")?"none":"", "style.display");
 
-        let effColor = `rgb(${Math.round(20+189*(1-(actionObj.efficiency/100)))},${Math.round(20+189*(actionObj.efficiency/100))}, 100)`
+        let efficiencyToUse = actionObj.efficiency;
+        if(dataObj.backwardsEfficiency) {
+            efficiencyToUse = 100 - actionObj.efficiency;
+        }
+        let effColor = `rgb(${Math.round(20+189*(1-(efficiencyToUse/100)))},${Math.round(20+189*(efficiencyToUse/100))}, 100)`
         views.updateVal(`${actionVar}Efficiency`, effColor, "style.color");
 
         //Update the numbers
@@ -227,11 +235,15 @@ let views = {
         if(actionObj.wage) {
             roundedNumbers.push(["wage", 2]);
         }
-        if(actionObj.isSpell) {
+        if(dataObj.isSpell) {
             let instaColor = `rgb(${Math.round(20+189*(actionObj.instability/100/data.atts.control.attMult))}, ${Math.round(20+189*(1-(actionObj.instability/100/data.atts.control.attMult)))}, 100)`;
             views.updateVal(`${actionVar}Instability`, instaColor, "style.color");
             roundedNumbers.push(["instability", 2]);
-            views.updateVal(`${actionVar}InstabilityToAdd`, actionObj.instabilityToAdd/(actionObj.efficiency/100), "textContent", 2);
+            views.updateVal(`${actionVar}InstabilityToAdd`, dataObj.instabilityToAdd/(actionObj.efficiency/100), "textContent", 2);
+            views.updateVal(`${actionVar}SpellPower`, dataObj.spellPower(), "textContent", 1);
+        }
+        if(dataObj.manaQuality) {
+            views.updateVal(`${actionVar}ManaQuality`, dataObj.manaQuality(), "textContent", 1);
         }
 
         for(let numberObj of roundedNumbers) {
@@ -245,11 +257,75 @@ let views = {
             for (let downstreamVar of dataObj.downstreamVars) {
                 let downstreamObj = data.actions[downstreamVar];
 
-                if(downstreamObj && downstreamObj.hasUpstream) {
+                if(downstreamObj && actionData[downstreamVar].hasUpstream) {
                     views.updateVal(`${actionVar}SliderContainer${downstreamVar}`, downstreamObj.visible ? "" : "none", "style.display");
                 }
             }
         }
+
+        //if icon menu is open
+        if(dataObj.hoveringIcon) {
+            let shouldShowLevels = dataObj.plane !== 2 && !data.isSpell;
+            views.updateVal(`${actionVar}HighestLevelContainer`, shouldShowLevels && data.upgrades.rememberWhatIDid.isFullyBought && actionObj.highestLevel >= 0 ? "" : "none", "style.display");
+            views.updateVal(`${actionVar}SecondHighestLevelContainer`, shouldShowLevels && data.upgrades.rememberHowIGrew.isFullyBought && actionObj.secondHighestLevel >= 0 ? "" : "none", "style.display");
+            views.updateVal(`${actionVar}ThirdHighestLevelContainer`, shouldShowLevels && data.upgrades.rememberMyMastery.isFullyBought && actionObj.thirdHighestLevel >= 0 ? "" : "none", "style.display");
+
+            views.updateVal(`${actionVar}HighestLevel`, actionObj.highestLevel, "innerText", 1);
+            views.updateVal(`${actionVar}SecondHighestLevel`, actionObj.secondHighestLevel, "innerText", 1);
+            views.updateVal(`${actionVar}ThirdHighestLevel`, actionObj.thirdHighestLevel, "innerText", 1);
+
+            if (dataObj.plane !== 1) {
+                views.updateVal(`${actionVar}CurrentUnlockTimeContainer`, actionObj.unlockTime ? "" : "none", "style.display");
+                views.updateVal(`${actionVar}CurrentUnlockTime`, actionObj.unlockTime, "textContent", "time");
+                views.updateVal(`${actionVar}PrevUnlockTimeContainer`, actionObj.prevUnlockTime ? "" : "none", "style.display");
+                views.updateVal(`${actionVar}PrevUnlockTime`, actionObj.prevUnlockTime, "textContent", "time");
+                if (actionObj.prevUnlockTime && actionObj.unlockTime) {
+                    views.updateVal(`${actionVar}DeltaUnlockTimeContainer`, "", "style.display");
+                    views.updateVal(`${actionVar}DeltaUnlockTime`, Math.abs(actionObj.unlockTime - actionObj.prevUnlockTime), "textContent", "time");
+                    views.updateVal(`${actionVar}DeltaUnlockTime`, actionObj.unlockTime - actionObj.prevUnlockTime < 0 ? "green" : "red", "style.color");
+                } else {
+                    views.updateVal(`${actionVar}DeltaUnlockTimeContainer`, "none", "style.display");
+                }
+            }
+
+            if (dataObj.plane === 1) {
+                views.updateVal(`${actionVar}CurrentLevel1TimeContainer`, actionObj.level1Time ? "" : "none", "style.display");
+                views.updateVal(`${actionVar}CurrentLevel1Time`, actionObj.level1Time, "textContent", "time");
+                views.updateVal(`${actionVar}PrevLevel1TimeContainer`, actionObj.prevLevel1Time ? "" : "none", "style.display");
+                views.updateVal(`${actionVar}PrevLevel1Time`, actionObj.prevLevel1Time, "textContent", "time");
+                if (actionObj.prevLevel1Time && actionObj.level1Time) {
+                    views.updateVal(`${actionVar}DeltaLevel1TimeContainer`, "", "style.display");
+                    views.updateVal(`${actionVar}DeltaLevel1Time`, Math.abs(actionObj.level1Time - actionObj.prevLevel1Time), "textContent", "time");
+                    views.updateVal(`${actionVar}DeltaLevel1Time`, actionObj.level1Time - actionObj.prevLevel1Time < 0 ? "green" : "red", "style.color");
+                } else {
+                    views.updateVal(`${actionVar}DeltaLevel1TimeContainer`, "none", "style.display");
+                }
+            }
+
+            views.updateVal(`${actionVar}UnlockedCountContainer`, actionObj.unlockedCount > 0 ? "" : "none", "style.display");
+            views.updateVal(`${actionVar}UnlockedCount`, actionObj.unlockedCount, "innerText", 1);
+
+        }
+
+        //When action should be dim
+        let isMaxLevel = actionObj.maxLevel !== undefined && actionObj.level >= actionObj.maxLevel;
+		//If resources are flowing "upstream" that counts as no resources flowing since it's not "active".
+		let isResourcesQuiet = (actionObj.resourceIncrease === 0 && actionObj.resourceDecrease === 0) || actionObj.resourceRetrieved !== 0;
+        let isQuiet = isMaxLevel && isResourcesQuiet && !actionObj.mouseOnThis;
+        if(!isQuiet) {
+            dataObj.blinkDelay = 1;
+        } else {
+            dataObj.blinkDelay -= 1/(data.gameSettings.ticksPerSecond*3);
+            if(dataObj.blinkDelay < 0) {
+                dataObj.blinkDelay = 0;
+            }
+        }
+        let opacityRatio = 0.6 + (dataObj.blinkDelay * 0.4);
+        views.updateVal(`${actionVar}LargeVersionContainer`, opacityRatio, "style.opacity");
+        views.updateVal(`${actionVar}Container`, actionObj.mouseOnThis?"100":"0", "style.zIndex");
+
+        views.updateVal(`${actionVar}ResourceRetrieved`, actionObj.resourceRetrieved > 0 ? "" : "none", "style.display");
+        views.updateVal(`${actionVar}ResourceRetrieved`, actionObj.resourceRetrieved > 0 ?`(-${intToString(actionObj.resourceRetrieved * data.gameSettings.ticksPerSecond, 2)}/s)`:"", "textContent");
     },
     updateActionLockedViews: function(actionObj) {
         let actionVar = actionObj.actionVar;
@@ -261,6 +337,7 @@ let views = {
     },
     updateActionUnlockedViews: function(actionObj) {
         let actionVar = actionObj.actionVar;
+        let dataObj = actionData[actionVar];
 
         //Needle
         let needlePosition = views.helpers.calcBalanceNeedle(actionObj.resourceIncrease, actionObj.resourceDecrease);
@@ -275,31 +352,14 @@ let views = {
         views.updateVal(`${actionVar}ExpBarInner`, `${(exp > 100 ? 100 : exp)}%`, "style.width");
 
 
-        //When action should be dim
+
+
         let isMaxLevel = actionObj.maxLevel !== undefined && actionObj.level >= actionObj.maxLevel;
-        let isQuiet = isMaxLevel && actionObj.resourceIncrease === 0 && actionObj.resourceDecrease === 0 && !actionObj.mouseOnThis;
-        views.updateVal(`${actionVar}LargeVersionContainer`, isQuiet?".6":"1", "style.opacity");
-        views.updateVal(`${actionVar}Container`, actionObj.mouseOnThis?"100":"0", "style.zIndex");
-
-
-        views.updateVal(`${actionVar}LargeVersionContainer`, isMaxLevel?`var(--${actionObj.resourceName}-color-bg)`:"var(--bg-secondary)", "style.backgroundColor");
+        views.updateVal(`${actionVar}LargeVersionContainer`, isMaxLevel?`var(--${dataObj.resourceName}-color-bg)`:"var(--bg-secondary)", "style.backgroundColor");
         //--bg-secondary-max
 
-        //Menu-specific updates
         if(actionObj.currentMenu === "info") {
-            views.updateVal(`${actionVar}CurrentUnlockTimeContainer`, actionObj.unlockTime ? "" : "none", "style.display");
-            views.updateVal(`${actionVar}CurrentUnlockTime`, actionObj.unlockTime, "textContent", "time");
-            views.updateVal(`${actionVar}PrevUnlockTimeContainer`, actionObj.prevUnlockTime ? "" : "none", "style.display");
-            views.updateVal(`${actionVar}PrevUnlockTime`, actionObj.prevUnlockTime, "textContent", "time");
-            if(actionObj.prevUnlockTime && actionObj.unlockTime) {
-                views.updateVal(`${actionVar}DeltaUnlockTimeContainer`, "", "style.display");
-                views.updateVal(`${actionVar}DeltaUnlockTime`, Math.abs(actionObj.unlockTime - actionObj.prevUnlockTime), "textContent", "time");
-                views.updateVal(`${actionVar}DeltaUnlockTime`, actionObj.unlockTime - actionObj.prevUnlockTime < 0 ? "green" : "red", "style.color");
-            }
 
-            views.updateVal(`${actionVar}HighestLevelContainer`, data.upgrades.rememberWhatIDid.isFullyBought ? "" : "none", "style.display");
-            views.updateVal(`${actionVar}SecondHighestLevelContainer`, data.upgrades.rememberHowIGrew.isFullyBought ? "" : "none", "style.display");
-            views.updateVal(`${actionVar}ThirdHighestLevelContainer`, data.upgrades.rememberMyMastery.isFullyBought ? "" : "none", "style.display");
         }
 
         if(actionObj.currentMenu === "atts") {
@@ -316,31 +376,24 @@ let views = {
 
         }
 
-        if (actionObj.currentMenu === "downstream") {
-            views.updateActionDownstreamViews(actionObj);
-            //if downstream menu is showing, hide all 0 / all 100 buttons if no downstream visible
-            views.updateVal(`${actionVar}_downstreamButtonContainer`, hasDownstreamVisible(actionObj) ? "" : "none", "style.display");
-        }
+        views.updateActionDownstreamViews(actionObj, actionObj.currentMenu === "downstream");
 
         //Update the numbers
         let roundedNumbers = [
             ["progress", 2], ["progressMax", 2], ["progressGain", 2],
             ["resource", 2], ["resourceDelta", 2], ["level", 1],
-            ["exp", 2], ["expToLevel", 2], ["expToAdd2", 2],
-            ["resourceIncrease", 3], ["resourceDecrease", 3],
-            ["highestLevel2", 1]
+            ["exp", 2], ["expToLevel", 2], ["expToAdd2", 3],
+            ["resourceIncrease", 3], ["resourceDecrease", 3]
         ];
-        if(actionObj.isGenerator && actionVar !== "hearAboutTheLich") {
+        if(dataObj.isGenerator && actionVar !== "hearAboutTheLich") {
             roundedNumbers.push(["resourceToAdd", 2]);
-            roundedNumbers.push(["actionPowerMult", 3]);
+            roundedNumbers.push(["actionPower", 4]);
+        }
+        if(dataObj.showToAdd) {
+            roundedNumbers.push(["resourceToAdd", 2]);
         }
         if(actionVar === "hearAboutTheLich") {
-            roundedNumbers.push(["actionPower", 2]);
-        }
-        if(actionObj.currentMenu === "info") {
-            roundedNumbers.push(["highestLevel", 1]);
-            roundedNumbers.push(["secondHighestLevel", 1]);
-            roundedNumbers.push(["thirdHighestLevel", 1]);
+            roundedNumbers.push(["actionPower2", 2]);
         }
 
         if(actionObj.currentMenu === "atts") {
@@ -349,8 +402,8 @@ let views = {
         }
         roundedNumbers.push(["totalSend", 3]);
         roundedNumbers.push(["efficiencyBase", 2]);
-        roundedNumbers.push(["progressMaxIncrease", 0]);
-        roundedNumbers.push(["expToLevelIncrease", 0]);
+        roundedNumbers.push(["progressMaxIncrease", 2]);
+        roundedNumbers.push(["expToLevelIncrease", 2]);
 
 
 
@@ -361,37 +414,45 @@ let views = {
         }
 
     },
-    updateActionDownstreamViews: function(actionObj) {
+    updateActionDownstreamViews: function(actionObj, isDownstreamMenuSelected) {
         let actionVar = actionObj.actionVar;
         let dataObj = actionData[actionVar];
         if(!dataObj.downstreamVars) {
             return;
         }
+        if(isDownstreamMenuSelected) {
+            views.updateVal(`${actionVar}_downstreamButtonContainer`, hasDownstreamVisible(actionObj) ? "" : "none", "style.display");
+        }
+
+        let amounts = calculateTaken(actionVar, false);
+
         for(let downstreamVar of dataObj.downstreamVars) {
-            let downstreamObj = data.actions[downstreamVar];
-            if(!downstreamObj || !downstreamObj.hasUpstream) {
-                return;
+            let downstreamDataObj = actionData[downstreamVar];
+            if (!downstreamDataObj || !downstreamDataObj.hasUpstream) {
+                continue;
             }
-
-            let rangeValue = data.actions[actionVar][`downstreamRate${downstreamVar}`] || 0;
-
-            let mult = rangeValue/100;
-            let taken = calculateTaken(actionVar, downstreamVar, actionObj, mult);
-            views.updateVal(`${actionVar}DownstreamSendRate${downstreamVar}`, taken * data.gameSettings.ticksPerSecond, "textContent", 4);
 
             let isAttention = isAttentionLine(actionVar, downstreamVar);
-            views.updateVal(`${actionVar}DownstreamAttentionBonus${downstreamVar}`, isAttention ? "" : "none", "style.display");
-            if(isAttention) {
-                views.updateVal(`${actionVar}DownstreamAttentionBonus${downstreamVar}`, `x${intToString(data.focusMult, 1)}`, "textContent");
-                views.updateVal(`${actionVar}_${downstreamVar}_Line_Inner_Top`, `x${intToString(data.focusMult, 1)}`, "textContent");
+            let focusShowing = actionObj[`${downstreamVar}PermFocusMult`] > 1 && downstreamDataObj.hasUpstream;
+
+            if (isDownstreamMenuSelected) {
+                let taken = amounts[downstreamVar] ?? 0;
+
+                views.updateVal(`${actionVar}DownstreamSendRate${downstreamVar}`, taken * data.gameSettings.ticksPerSecond, "textContent", 4);
+
+                views.updateVal(`${actionVar}DownstreamAttentionBonusTemp${downstreamVar}`, isAttention ? "" : "none", "style.display");
+                views.updateVal(`${actionVar}DownstreamAttentionBonusPerm${downstreamVar}`, focusShowing ? "" : "none", "style.display");
             }
 
-            let focusShowing = actionObj[`${downstreamVar}FocusMult`] > 1.005 && downstreamObj.resourceName === actionObj.resourceName;
-            views.updateVal(`${actionVar}DownstreamAttentionBonusLoop${downstreamVar}`, focusShowing ? "" : "none", "style.display");
+            if(isAttention) {
+                views.updateVal(`${actionVar}DownstreamAttentionBonusTemp${downstreamVar}`, `x${intToString(actionObj[downstreamVar + "TempFocusMult"], data.upgrades.learnToFocusMore.upgradePower?3:1)}`, "textContent");
+                views.updateVal(`${actionVar}_${downstreamVar}_Line_Inner_Top`, `x${intToString(actionObj[downstreamVar + "TempFocusMult"], data.upgrades.learnToFocusMore.upgradePower?3:1)}`, "textContent");
+            }
+
             views.updateVal(`${actionVar}_${downstreamVar}_Line_Inner_Bottom`, focusShowing ? "" : "none", "style.display");
             if(focusShowing) {
-                views.updateVal(`${actionVar}DownstreamAttentionBonusLoop${downstreamVar}`, `x${intToString(actionObj[downstreamVar + "FocusMult"], 3)}`);
-                views.updateVal(`${actionVar}_${downstreamVar}_Line_Inner_Bottom`, `x${intToString(actionObj[downstreamVar + "FocusMult"], 3)}`);
+                views.updateVal(`${actionVar}DownstreamAttentionBonusPerm${downstreamVar}`, `x${intToString(actionObj[downstreamVar + "PermFocusMult"], 3)}`);
+                views.updateVal(`${actionVar}_${downstreamVar}_Line_Inner_Bottom`, `x${intToString(actionObj[downstreamVar + "PermFocusMult"], 3)}`);
             }
 
         }
@@ -430,8 +491,8 @@ let views = {
         }
 
         const typeKey = `lastValue_${type}`;
-        // let lastVal = prevValue[typeKey] ?? null;
-        let lastVal = null;
+        let lastVal = prevValue[typeKey] ?? null;
+        // let lastVal = null;
 
         if (lastVal !== newVal) {
             if (type.includes(".")) {
@@ -456,36 +517,45 @@ let views = {
     },
 }
 
+function checkActionsToReveal() {
+    let itemsToProcess = copyArray(data.queuedReveals);
+    data.queuedReveals = {};
+
+    for (let actionVar in itemsToProcess) {
+        revealAction(actionVar);
+    }
+}
 
 function updateGlobals() {
     let totalMometum = 0;
-    let totalSpellPower = 0;
     for(let actionVar in data.actions) {
         let actionObj = data.actions[actionVar];
-        if(actionObj.resourceName === "momentum" && gameStateMatches(actionObj)) {
+        let dataObj = actionData[actionVar];
+        if(dataObj.resourceName === "momentum" && gameStateMatches(dataObj)) {
             totalMometum += actionObj.resource;
-        }
-        if(actionObj.power) {
-            totalSpellPower += actionObj.power * actionObj.level;
         }
     }
     data.totalMomentum = totalMometum;
-    data.totalSpellPower = totalSpellPower;
 
-    views.updateVal(`totalSpellPower`, totalSpellPower, "textContent", 1);
+    let manaQuality = actionData.awakenYourGrimoire.manaQuality()
+    views.updateVal(`manaQuality`, manaQuality, "textContent", 1);
     views.updateVal(`totalMomentum`, totalMometum, "textContent", 1);
 
     if(KTLMenuOpen) { //only update if menu is open
-        views.updateVal(`totalMomentum2`, totalMometum, "textContent", 1);
-        views.updateVal(`totalSpellPower2`, totalSpellPower, "textContent", 1);
-        views.updateVal(`HATLLevel`, data.actions.hearAboutTheLich.level, "textContent", 1);
+        views.updateVal(`manaQuality2`, manaQuality, "textContent", 1);
+        views.updateVal(`manaQuality2`, manaQuality>0?"#0ec3cf":"red", "style.color");
+        views.updateVal(`manaQualityErrorMessage`, manaQuality === 0?"":"none", "style.display");
     }
 
     views.updateVal(`secondsPerReset`, data.secondsPerReset, "textContent","time");
     views.updateVal(`bonusTime`, data.currentGameState.bonusTime/1000, "textContent", "time");
 
+    views.updateVal(`legacyAmount`, data.legacy, "textContent", 1);
     views.updateVal(`ancientCoin`, data.ancientCoin, "textContent", 1);
     views.updateVal(`ancientCoin2`, data.ancientCoin, "textContent", 1);
+    views.updateVal(`ancientWhisper`, data.ancientWhisper, "textContent", 1);
+    views.updateVal(`ancientWhisper2`, data.ancientWhisper, "textContent", 1);
+    views.updateVal(`lichCoins2`, data.lichCoins, "textContent", 1);
 }
 
 
@@ -504,14 +574,74 @@ function isActionVisible(actionVar) {
     const currentTransformX = transformX[data.planeTabSelected];
     const currentTransformY = transformY[data.planeTabSelected];
 
-    const elementScreenX = currentTransformX + (element.realX * scale);
-    const elementScreenY = currentTransformY + (element.realY * scale);
+    const elementScreenX = currentTransformX + (element.realX * scaleByPlane[data.planeTabSelected]);
+    const elementScreenY = currentTransformY + (element.realY * scaleByPlane[data.planeTabSelected]);
 
-    const elementScreenWidth = 350 * scale;
-    const elementScreenHeight = 400 * scale;
+    const elementScreenWidth = 350 * scaleByPlane[data.planeTabSelected];
+    const elementScreenHeight = 400 * scaleByPlane[data.planeTabSelected];
 
     return elementScreenX < window.innerWidth &&
         elementScreenX + elementScreenWidth > 0 &&
-        elementScreenY < window.innerHeight &&
+        elementScreenY < (window.innerHeight+50) &&
         elementScreenY + elementScreenHeight > 0;
+}
+
+function updateSliderContainers() {
+    for(let actionVar in data.actions) {
+        let dataObj = actionData[actionVar];
+        for (let downstreamVar of dataObj.downstreamVars) {
+            if(!actionData[downstreamVar].hasUpstream) {
+                continue;
+            }
+            if (data.gameSettings.viewAdvancedSliders) {
+                views.updateVal(`${actionVar}_${downstreamVar}_slider_container_advanced`, "inline-block", "style.display");
+                views.updateVal(`${actionVar}_${downstreamVar}_slider_container_basic`, "none", "style.display");
+            } else {
+                views.updateVal(`${actionVar}_${downstreamVar}_slider_container_advanced`, "none", "style.display");
+                views.updateVal(`${actionVar}_${downstreamVar}_slider_container_basic`, "flex", "style.display");
+            }
+        }
+        if(!dataObj.hasUpstream) {
+            continue;
+        }
+        if (data.gameSettings.viewAdvancedSliders) {
+            views.updateVal(`${actionVar}_automation_slider_advanced`, "inline-block", "style.display");
+            views.updateVal(`${actionVar}_automation_slider_basic`, "none", "style.display");
+        } else {
+            views.updateVal(`${actionVar}_automation_slider_advanced`, "none", "style.display");
+            views.updateVal(`${actionVar}_automation_slider_basic`, "flex", "style.display");
+        }
+        views.updateVal(`${actionVar}SliderContainerAutomation`, data.upgrades.temperMyDesires.upgradePower && dataObj.hasUpstream && dataObj.plane !== 2 ? "":"none", "style.display");
+    }
+}
+
+function displayLSStuff() {
+    if(!data.doneLS) {
+        return;
+    }
+
+    if(data.doneLS >= 1) {
+        revealUpgrade('rememberWhatIDid') //40
+
+        revealUpgrade('haveBetterConversations') //1200 AC
+        revealUpgrade('workHarder')
+        revealUpgrade('weaveSmallerStrands')
+        revealUpgrade('createABetterFoundation')
+        revealUpgrade('feelTheRemnants')
+        revealUpgrade('sparkMoreMana')
+        revealUpgrade('studyHarder')
+
+        revealUpgrade('learnFromTheLibrary') //200 AW
+        revealUpgrade('stopBeingSoTense') //400 AW
+    }
+    if(data.doneLS >= 2) {
+        // document.getElementById("lichUpgradeTab").style.display = "";
+        // document.getElementById("challengesUpgradeTab").style.display = "";
+        // document.getElementById("lichCoinsDisplay").style.display = "";
+        revealUpgrade("talkToMoreWizards")
+    }
+    if(data.doneLS >= 3) {
+
+    }
+
 }

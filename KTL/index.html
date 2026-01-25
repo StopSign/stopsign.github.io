@@ -8,6 +8,7 @@
     <meta http-equiv="expires" content="0" />
     <meta http-equiv="expires" content="Tue, 01 Jan 1980 1:00:00 GMT" />
     <meta http-equiv="pragma" content="no-cache" />
+    <meta name="viewport" content="width=device-width, initial-scale=.8">
 
     <title>KTL</title>
     <link rel="stylesheet" href="views/stylesheet.css">
@@ -35,43 +36,73 @@
 </div>
 
 <div id="helpMenuContainer"></div>
-
 <div style="position:absolute;left:15px;top:21px;padding:0 10px;font-size:14px;color: var(--text-muted);pointer-events: none;">
-    <div id="momentumDisplay" style="font-size:14px;background-color:var(--overlay-color);">
-        Clock: <span id="secondsPerReset" style="display:inline-block;width:50px;margin-right:5px;color: var(--text-primary);font-weight:bold;"></span>
-        Total Momentum: <span id="totalMomentum" style="display:inline-block;color: var(--text-primary);width:50px;margin-right:5px;font-weight:bold;">1</span>
-        <span id="spellPowerDisplay" style="display:none"> Spell Power: <span id="totalSpellPower" style="display:inline-block;color:var(--text-primary);font-weight:bold;width:50px;margin-right:5px;"></span></span>
-        <span id="ancientCoinDisplay" style="display:none"> Ancient Coins: <span id="ancientCoin" style="display:inline-block;color:var(--text-primary);font-weight:bold;width:50px;margin-right:5px;"></span></span>
-
+    <div id="momentumDisplay" style="background-color:var(--overlay-color);">
+        Clock: <span id="secondsPerReset" style="display:inline-block;margin-right:5px;color: var(--text-primary);font-weight:bold;"></span>
+        Total Momentum: <span id="totalMomentum" style="display:inline-block;color: var(--text-primary);margin-right:5px;font-weight:bold;">1</span>
     </div>
-    <div id="jobDisplay" style="display:none;font-size:14px;top:65px;background-color:var(--overlay-color);">
+    <div style="background-color:var(--overlay-color);">
+        <span id="legacyDisplay" style="display:none;color:var(--legacy-color)">
+            Legacy: <span id="legacyAmount" style="display:inline-block;font-weight:bold;"></span>
+        </span>
+        <span id="ancientCoinDisplay" style="display:none;">
+            Ancient Coins: <span id="ancientCoin" style="display:inline-block;color:var(--text-primary);font-weight:bold;"></span>
+        </span><br>
+        <span id="ancientWhisperDisplay" style="display:none;">
+            Ancient Whispers: <span id="ancientWhisper" style="display:inline-block;color:var(--text-primary);font-weight:bold;"></span>
+        </span>
+        <span id="manaQualityDisplay" style="display:none;margin-right:10px;">
+            Mana Quality: <span id="manaQuality" style="display:inline-block;color:var(--text-primary);font-weight:bold;"></span>
+        </span>
+    </div>
+    <div id="jobDisplay" style="display:none;top:65px;background-color:var(--overlay-color);">
         Current Job: <span id="jobTitle" style="color: var(--text-primary);font-weight:bold;">Help Scott With Chores</span>. Wage: $<b><span id="jobWage" style="color: var(--text-primary);">1</span></b>
     </div>
-
 
     <span id="attDisplayShowButton" class="button" style="display:none;padding:5px;top:110px;left:388px;pointer-events:auto;" onclick="statMenuHideButton()">Attributes >></span>
     <div id="attDisplay" style="border: 1px solid var(--border-color);padding:15px;font-size:12px;background-color:var(--overlay-color);
         direction:rtl;position:relative;min-height:200px;overflow-y:auto;overflow-x:hidden;display:inline-block;will-change: transform;
-        scrollbar-gutter:stable;pointer-events:auto;">
+        scrollbar-gutter:stable;pointer-events:auto;min-width:170px">
         <span id="attDisplayUnder" style="direction:ltr;">
-            <span id="attDisplayHideButton" class="button" style="font-size:14px;position:absolute;padding:5px 8px;top:-2px;left:150px;"
+            <span id="attDisplayHideButton" class="button" style="font-size:14px;position:absolute;padding:5px 8px;top:-3px;right:-3px;"
                   onclick="statMenuHideButton()"><<</span>
-            <span style="font-size:14px;position:absolute;top:5px;left:5px;">Bonus = 10% per Stat.</span><br>
+            <span style="font-size:14px;position:absolute;top:5px;left:5px;">+100 Attribute = x10 bonus</span><br>
             <span class="title">Attributes</span>
         </span>
     </div>
 </div>
 
+<div id="logWrapper" style="position:fixed;top:15px;right:11px;width:clamp(200px, calc(100vw - 250px), 500px);height:100px;background-color:var(--overlay-color);
+    border: 1px solid var(--border-color);box-sizing: border-box;">
+    <span class="button" style="font-size:14px;position:absolute;padding:2px 5px;top:-3px;left:-3px;cursor:pointer;user-select:none;z-index:1;" onclick="toggleLog()">>></span>
+    <div id="logContainer" style="height:100%;overflow-y:auto;box-sizing:border-box;padding-top:20px;">
+        <div id="logMessages"></div>
+    </div>
+</div>
+<div id="openLogButton" class="button" style="display:none;position:fixed;top:20px;right:15px;padding:8px;cursor:pointer;user-select:none;" onclick="toggleLog()">Open Log</div>
+
+<div id="pinnedWrapper" style="position:fixed;top:120px;right:11px;max-height:500px;overflow:auto;background-color:var(--overlay-color);
+    border: 1px solid var(--border-color);box-sizing: border-box;">
+    <span class="button" style="font-size:14px;position:absolute;padding:0px 1px;top:-1px;left:-2px;cursor:pointer;user-select:none;z-index:1;" onclick="togglePinned()">>></span>
+    <span style="font-size:14px;position:absolute;left:26px;user-select:none;padding:2px">Pinned</span>
+    <div id="pinnedContainer" style="height:100%;overflow-y:auto;box-sizing:border-box;padding-top:20px;">
+        <div id="pinnedActions"></div>
+    </div>
+</div>
+<div id="openPinnedButton" class="button" style="display:none;position:fixed;top:120px;right:15px;padding:8px;cursor:pointer;user-select:none;" onclick="togglePinned()">Open Pinned</div>
+
+
+
 <span class="button" id='openUseAmuletButton' onclick="openUseAmuletMenu(true)"
-      style="display:none;padding:8px 13px;top:22px;position:fixed;left:50%;transform:translateX(-50%);font-size:14px;">
-    Use the Amulet!
+      style="display:none;padding:4px 5px;top:22px;position:fixed;left:50%;transform:translateX(-50%);font-size:14px;">
+    Open Amulet Upgrades
 </span>
 <span class="button" id='openViewAmuletButton' onclick="openUseAmuletMenu(false)"
-      style="display:none;padding:8px 13px;top:22px;position:fixed;left:50%;transform:translateX(-50%);font-size:14px;">
-    View Amulet Upgrades!
+      style="display:none;padding:4px 5px;bottom:63px;position:fixed;right:22px;font-size:14px;">
+    View Amulet Upgrades
 </span>
 
-<span style="position:fixed;top:5px;right:5px;color:var(--text-muted)">v1.3.1</span>
+<span id="currentVersion" style="position:fixed;top:1px;right:5px;color:var(--text-muted)">v2.1.4</span>
 
 
 <div id="bonusDisplayShowButton" class="button" onclick="bonusMenuHideButton()"
@@ -82,13 +113,16 @@
 <div id="bonusDisplay" style="border: 1px solid var(--border-color);position:absolute;display:none;left:20px;bottom:55px;
     padding:10px;margin:5px;background-color:var(--overlay-color);color: var(--text-primary);width:230px">
     <span id="bonusDisplayHideButton" class="button" style="position:absolute;left:230px;top:-13px;padding:5px 8px;" onclick="bonusMenuHideButton()"><<</span>
-    <span id="toggleBonusSpeedButton" class="button" onclick="toggleBonusSpeed()" style="background-color: red">Enable Bonus Speed</span><br><br>
-    Bonus Time: <b><span id="bonusTime"></span></b><br>
-    Bonus Speed:
-    <label><input type="radio" onchange="changeBonusSpeed(3)" name="bonusSpeed" value="3x" checked> 3x</label>
-    <label><input type="radio" onchange="changeBonusSpeed(10)" name="bonusSpeed" value="10x"> 10x</label>
-    <span id="bonus50" style="display:none"><label><input type="radio" onchange="changeBonusSpeed(50)" name="bonusSpeed" value="50x"> 50x</label></span>
-    <br>
+    <div class="button" onclick="skipTime(1)" style="background-color: darkblue;">Fast Forward 1 minutes</div>
+    <div class="button" onclick="skipTime(10)" style="background-color: darkblue;">Fast Forward 10 minutes</div>
+    <div id="skipTime60" class="button" onclick="skipTime(60)" style="background-color: darkblue;display:none;">Fast Forward 60 minutes</div>
+    <div>Bonus Time: <b><span id="bonusTime"></span></b></div>
+    <div id="toggleBonusSpeedButton" class="button" onclick="toggleBonusSpeed()" style="background-color: red;width:70%">Enable Bonus Speed</div>
+    <div>Bonus Speed:
+        <label><input type="radio" onchange="changeBonusSpeed(3)" name="bonusSpeed" value="3x" checked> 3x</label>
+        <label><input type="radio" onchange="changeBonusSpeed(10)" name="bonusSpeed" value="10x"> 10x</label>
+        <span id="bonus50" style="display:none"><label><input type="radio" onchange="changeBonusSpeed(50)" name="bonusSpeed" value="50x"> 50x</label></span>
+    </div>
 </div>
 
 <div id="footerContainer" style="position:fixed;bottom:0;left:0;right:0;display:flex;justify-content:space-between;
@@ -99,7 +133,7 @@
     </div>
 
     <div style="position:relative;display:flex;flex-direction:column;align-items:center;flex-grow:1;justify-content:flex-end;">
-        <span class="button" style="padding:6px 20px;position: absolute;top:-35px;font-weight:bold;pointer-events:auto;" id='pauseButton' onclick="pauseGame()">|| Pause</span>
+        <span class="button" style="padding:4px 13px;position: absolute;top:-35px;font-weight:bold;pointer-events:auto;" id='pauseButton' onclick="pauseGame()">|| Pause</span>
 
         <div style="display:flex;justify-content:center;gap:5px;font-size:20px;width:100%;">
             <div id="planeButton0" class="hyperVisible planeButton0" onclick="switchToPlane(0)" style="max-width:200px;height:60px;pointer-events:auto;
@@ -115,19 +149,19 @@
             <div id="planeButton2" class="hyperVisible planeButton2" onclick="switchToPlane(2)" style="max-width:200px;height:60px;pointer-events:auto;
                 border-bottom:none;border-top-left-radius:10px;border-top-right-radius:10px;
                 display:none;align-items:center;justify-content:center;font-weight:bold;cursor:pointer;width:50%;">
-                Kill the Lich [3]
+                Northern Wastes [3]
             </div>
-<!--            <div id="planeButton3" class="hyperVisible planeButton3" onclick="switchToPlane(3)" style="max-width:200px;height:60px;pointer-events:auto;-->
-<!--                border-bottom:none;border-top-left-radius:10px;border-top-right-radius:10px;-->
-<!--                display:flex;align-items:center;justify-content:center;font-weight:bold;cursor:pointer;width:50%;">-->
-<!--                Astral Plane [4]-->
-<!--            </div>-->
+            <div id="planeButton3" class="hyperVisible planeButton3" onclick="switchToPlane(3)" style="max-width:200px;height:60px;pointer-events:auto;
+                border-bottom:none;border-top-left-radius:10px;border-top-right-radius:10px;
+                display:none;align-items:center;justify-content:center;font-weight:bold;cursor:pointer;width:50%;">
+                Infusion [4]
+            </div>
         </div>
     </div>
 
     <div style="margin:10px;display:flex;gap:10px;font-weight:bold;font-size:16px;pointer-events:auto;width:145px;padding:0 10px;">
         <div class="button" id="zoomInButton" onclick="clickZoomIn()" style="padding:8px 13px;">+</div>
-        <div class="button" id="centerScreenButton" onclick="actionTitleClicked('overclock');" style="padding:8px 13px;">o</div>
+        <div class="button" id="centerScreenButton" onclick="centerScreen();" style="padding:8px 13px;">o</div>
         <div class="button" id="zoomOutButton" onclick="clickZoomOut()" style="padding:8px 13px;">-</div>
     </div>
 
@@ -166,7 +200,7 @@ It continues, capturing fraction ancientCoin of your fleeting soul and sending i
 <!--    <div style='background:#fff;padding:20px;border-radius:6px;max-width:400px;width:90%;text-align:center;position:relative;'>-->
 <!--        <div id="help1">Actions and Momentum:-->
 <!--            Momentum is generated from the Overclock action, and "flows" downstream to the further actions.-->
-<!--            The primary resource of the action (momentum, mana, gold, etc.) is consumed at a specified rate per second on every action except Overclock.-->
+<!--            The primary resource of the action (momentum, mana, coins, etc.) is consumed at a specified rate per second on every action except Overclock.-->
 <!--            This consumption rate for progress cannot be stopped.-->
 <!--            You can only additionally add transferring the primary resource to a downstream action at a rate equal to your consumption rate, per downstream action.-->
 <!--            For example, if an action is consuming .1% momentum per second, it means that 50 times a second, it takes 1/50th of .1% of your momentum and adds the same amount to progress.-->
@@ -186,45 +220,163 @@ It continues, capturing fraction ancientCoin of your fleeting soul and sending i
         <div class="menuSeparator"></div>
         <div id="ktlDynamicContent" class="dynamicContent">
             <br>
-            Changing your overclock target will set you on a new path to get as much Ancient Coins and Legacy as you can.<br><br>
-            You will gain progress using Total Momentum, Hear About The Lich's level, and Spell Power!<br><br>
+            Changing your overclock target will set you on a new path in the Northern Wastes to get as much Ancient Coins and Legacy as you can.<br><br>
+            You will gain progress using Total Momentum, Hear About The Lich's level, Spell Power, Fear, and other bonuses later!<br><br>
             Brythal and Magic will be paused and unchangeable while you are at war.<br>
-            After you get as many resources as you can, there will only be the option to reset:<br>
+            After you get as many resources as you can in the Northern Wastes, doom will overcome you, and you will have to reset using the amulet. In this reset:<br>
             <ul>
                 <li>All attributes will reset.</li>
                 <li>All Brythal actions will reset.</li>
                 <li>All Magic actions will reset except for the unlock cost.</li>
-            </ul>
+            </ul><br>
+            You currently have: <span id="manaQuality2" style="font-weight:bold;"></span> mana quality.
+            <span id="manaQualityErrorMessage" style="display:none;font-weight:bold;color:var(--warning-color)"><br>Doing this action requires mana quality. Check that you have awakened your grimoire!</span>
+            <span id="permFocusMessage" style=""></span>
         </div>
         <input type="checkbox" id="confirmKTL"><label for="confirmKTL">Confirm</label>
-        <button class="continueButton" onclick="initializeKTL()">Join the War for Life with <span id="totalMomentum2"></span> Total Momentum,
-             <span id="totalSpellPower2"></span> spell power, and Hear About The Lich level <span id="HATLLevel"></span>!</button>
+        <button class="continueButton" onclick="initializeKTL(false)">Join the War for Life in the Northern Wastes!</button>
     </div>
 </div>
 
-<div id="useAmuletMenu" class='fullScreenGrey' style="display:none" onClick='openUseAmuletMenu()'>
+<div id="useAmuletMenu" class='fullScreenGrey' style="display:none;" onClick='openUseAmuletMenu()'>
     <div class='centerMenuBox' onClick="stopClicks(event)">
-        <div class='menuTitle'>
-            Use the Amulet!<br>
-            Ancient Coins available:
-            <span id="ancientCoin2" style="font-weight:bold;"></span>
+        <div class='menuTitle' style="width:100%;display:flex">
+            <div style="flex:2;display:flex;flex-wrap:wrap">
+                <div style="flex:1 0 50%;min-width:250px;">
+                    <div style="font-size:16px">
+                        Ancient Coins available:
+                        <span id="ancientCoin2" style="font-weight:bold;font-size:20px;"></span>
+                    </div>
+                    <div style="font-size:16px">
+                        Ancient Whispers available:
+                        <span id="ancientWhisper2" style="font-weight:bold;font-size:20px;"></span>
+                    </div>
+                    <div id="lichCoinsDisplay" style="font-size:16px;display:none;">
+                        Lich Coins available:
+                        <span id="lichCoins2" style="font-weight:bold;font-size:20px;"></span>
+                    </div>
+                </div>
+
+                <div style="flex:1 0 50%;min-width:250px;">
+                    <div style="font-size:20px;" id="amuletMenuTitle">Use the Amulet!</div>
+                    <div style="font-size:14px;">As you lay dying, your last thoughts are recorded by the amulet...</div>
+                    <div style="font-size:16px;font-weight:bold;">IF ONLY I COULD JUST...</div>
+                </div>
+            </div>
+            <div style="flex:1;display:flex;font-size:14px;flex-flow:column;">
+                <div>
+                    <input type="checkbox" id="showCompleteUpgrades" onchange="refreshUpgradeVisibility();" checked>
+                    <label for="showCompleteUpgrades">Show Completed Upgrades</label>
+                </div>
+                <div>
+                    <input type="checkbox" id="showUnaffordableUpgrades" onchange="refreshUpgradeVisibility();" checked>
+                    <label for="showUnaffordableUpgrades">Show Unaffordable</label>
+                </div>
+                <div>
+                    <input type="checkbox" id="sortByCost" onchange="toggleSortByCost(this);">
+                    <label for="sortByCost">Sort by Cost</label>
+                </div>
+            </div>
+
         </div>
-        <div style="position:absolute;right:10px;top:10px;">
-            <input type="checkbox" id="showCompleteUpgrades" onclick="toggleMaxLevelCards(this.checked);" checked><label for="showCompleteUpgrades">Show Completed Upgrades</label><br>
-            <input type="checkbox" id="showAttributeUpgrades" onclick="toggleAttributeUpgrades(this.checked);" checked><label for="showAttributeUpgrades">Show Attribute Upgrades</label><br>
-            <input type="checkbox" id="showUnaffordableUpgrades" onclick="toggleUnaffordableUpgrades(this.checked);" checked><label for="showUnaffordableUpgrades">Show Unaffordable</label>
-        </div>
-        <div class="menuSeparator"></div>
-        <div class="menuTitle" style="font-size:14px;text-align:center;">As you lay dying, your last thoughts are recorded by the amulet...<br><span style="font-size:16px;font-weight:bold;">IF ONLY I COULD JUST...</span></div>
 
         <div class="menuSeparator"></div>
-        <div id="amuletUpgrades" class="dynamicContent"></div>
+
+        <div style="display:flex;height:calc(80vh - 100px);min-height:200px;position:relative;overflow:hidden;font-size:0;">
+            <div class="menuOptionContainer">
+                <div id="uniqueUpgradeTab" onclick="clickUpgradeTab('unique')" class="menuTab">
+                    Unique Upgrades (AC)
+                </div>
+                <div id="attributeUpgradeTab" onclick="clickUpgradeTab('attribute')" class="menuTab">
+                    Attribute Upgrades (AC)
+                </div>
+                <div id="multUpgradeTab" onclick="clickUpgradeTab('mult')" class="menuTab">
+                    Multiplier Upgrades (AC)
+                </div>
+                <div id="actionsUpgradeTab" onclick="clickUpgradeTab('actions')" class="menuTab menuColor2">
+                    New Actions (AW)
+                </div>
+                <div id="lichUpgradeTab" onclick="clickUpgradeTab('lich')" class="menuTab menuColor3" style="display:none;">
+                    Lich Coin Upgrades (LC)
+                </div>
+                <div id="challengesUpgradeTab" onclick="clickUpgradeTab('challenges')" class="menuTab menuColor4" style="display:none;">
+                    Challenges
+                </div>
+            </div>
+
+            <div class="menuDisplayContainer">
+                <div id='uniqueUpgradeContainer' class="menuDisplay" style="display:none;">
+                    <div id="amuletUpgrades_unique" style="display:flex;flex-wrap:wrap;gap:15px;padding:10px;will-change: transform;"></div>
+                </div>
+                <div id='multUpgradeContainer' class="menuDisplay" style="display:none;">
+                    <div id="amuletUpgrades_mult" style="display:flex;flex-wrap:wrap;gap:15px;padding:10px;will-change: transform;"></div>
+                </div>
+                <div id='attributeUpgradeContainer' class="menuDisplay" style="display:none;">
+                    <div id="amuletUpgrades_attribute" style="display:flex;flex-wrap:wrap;gap:15px;padding:10px;will-change: transform;"></div>
+                </div>
+                <div id='actionsUpgradeContainer' class="menuDisplay" style="display:none;">
+                    <div id="amuletUpgrades_actions" style="display:flex;flex-wrap:wrap;gap:15px;padding:10px;will-change: transform;"></div>
+                </div>
+                <div id='lichUpgradeContainer' class="menuDisplay" style="display:none;">
+                    <div id="amuletUpgrades_lich" style="display:flex;flex-wrap:wrap;gap:15px;padding:10px;will-change: transform;"></div>
+                </div>
+                <div id='challengesUpgradeContainer' class="menuDisplay" style="display:none;">
+                    <div id="amulet_challenges" style="display:flex;flex-wrap:wrap;gap:15px;padding:10px;will-change: transform;"></div>
+                </div>
+            </div>
+        </div>
+
+
         <div id="amuletEnabledContainer">
             <div class="menuSeparator"></div>
             It is recommended to spend your Ancient Coins before you start a new life. They provide no benefit except to buy upgrades, and can only be spent now.<br>
             <input type="checkbox" id="amuletConfirm"><label for="amuletConfirm">Confirm</label>
-            <button class="continueButton" onclick="useAmulet()">Start Again</button>
+            <button class="continueButton" onclick="useAmulet()">Use the amulet to start again!</button>
         </div>
+    </div>
+</div>
+
+
+<div id="legacySeveranceMenu" class='fullScreenGrey' style="display:none;font-size:16px;" onClick='openLSMenu()'>
+    <div class='centerMenuBox' onClick="stopClicks(event)">
+        <div class='menuTitle'>Set Overclock's Target: Kill the Lich!</div>
+        <div class="menuSeparator"></div>
+        <div id="lsDynamicContent" class="dynamicContent">
+            <br>
+            (Story) The army you've been helping finally has enough to strike at the lich itself, located high in a monolith. Tearing down both the physical and magical defenses the lich has thrown in the army's way, the Legion of Hope prepares to give a final strike.<br><br>
+
+            "Enough", the Lich roars, throwing up shields with one skeletal hand and preparing a spell with the other. "I am not fated to fall here! Someone is interfering, and I will silence their echoes!" Right as its final shield cracks, the Lich waves the hand with the gathered magic forward, and consecutive blasts of powerful silvery magic sweep out, enveloping everyone in the Legion. Your amulet glows bright, and cracks spread immediately across its surface, quickly envoloping the entire piece until the whole thing breaks apart, revealing a single shining coin underneath which you quickly grasp onto. You barely have time to send a message into it before the next blast of the Lich's magic reaches you, ending your existence.<br><br>
+
+            <div class="menuSeparator"></div>
+            Your legacy has been severed. When you reset with this you will lose:
+            <ul>
+                <li>Legacy, Ancient Coins, and Ancient Whispers</li>
+                <li>All Attribute, Multiplier, and New Action Upgrades</li>
+                <li>Unlocked actions in magic</li>
+            </ul>
+
+            You will keep:
+            <ul>
+                <li>All Unique Amulet upgrades</li>
+                <li>The number of times an action has been unlocked</li>
+                <li>Permanent Focus Multiplier</li>
+            </ul>
+
+            You will gain:
+            <ul>
+                <li>x3 Legacy gain up to your highest Legacy ever</li>
+                <li>+1 Lich Coin to spend on new upgrades when you reach the Northern Wastes again</li>
+                <li>More Unique Upgrades</li>
+                <li>More Multiplier Upgrades</li>
+                <li>More New Action Upgrades - including the Library, for more spells beyond the 4th Circle</li>
+                <li>The 4th tab - Infusions - and +1 Death Energy</li>
+                <li>Access to Challenges</li>
+                <li>+1 max level to the action Kill the Lich</li>
+            </ul>
+
+        </div>
+        <input type="checkbox" id="confirmLS"><label for="confirmLS">Confirm</label>
+        <button class="continueButton" onclick="legacySeveranceReset(false)">Reset</button>
     </div>
 </div>
 
@@ -233,8 +385,7 @@ It continues, capturing fraction ancientCoin of your fleeting soul and sending i
 </body>
 
 
-
-<!-- Script outside of body to load and execute before page content is loaded -->
+<script src="https://cdn.jsdelivr.net/npm/decimal.js@10.4.3/decimal.min.js"></script>
 <script src="helpers/helpers.js"></script>
 <script src="data/globalsAndInitial.js"></script>
 <script src="driver.js"></script>
@@ -243,10 +394,12 @@ It continues, capturing fraction ancientCoin of your fleeting soul and sending i
 <script src="views/viewUpdating.js"></script>
 <script src="saving.js"></script>
 <script src="actionData.js"></script>
+<script src="actionData2.js"></script>
+<script src="actionData3.js"></script>
+<script src="actionData4.js"></script>
 <script src="events.js"></script>
 <script src="engine.js"></script>
 <script src="helpers/hotkeys.js"></script>
-<!--<script src="helpers/interval.js"></script>-->
 <script src="helpers/interval2.js"></script>
 <script src="data/textData.js"></script> <!-- must go after actionData-->
 <script src="toasts.js"></script>
@@ -254,6 +407,7 @@ It continues, capturing fraction ancientCoin of your fleeting soul and sending i
 <script src="ktl.js"></script>
 <script src="upgradeData.js"></script>
 <script src="saveFile.js"></script>
+<script src="saveCorrections.js"></script>
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-E10C6H16MH"></script><script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
