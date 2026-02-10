@@ -34,7 +34,6 @@ let views = {
         let toShowUseAmulet = data.useAmuletButtonShowing && data.gameState === "KTL";
         views.updateVal(`openUseAmuletButton`, toShowUseAmulet ? "" : "none", "style.display");
 
-        let toViewAmulet = data.doneAmulet && data.gameState !== "KTL";
         views.updateVal(`ancientCoinDisplay`, data.doneKTL ? "" : "none", "style.display");
         views.updateVal(`ancientWhisperDisplay`, data.doneKTL ? "" : "none", "style.display");
         views.updateVal(`legacyDisplay`, data.legacy > 0 ? "" : "none", "style.display");
@@ -616,12 +615,44 @@ function updateSliderContainers() {
 }
 
 function displayLSStuff() {
-    if(!data.doneLS) {
+    if(!data.lichKills) {
         return;
     }
 
-    if(data.doneLS >= 1) {
-        revealUpgrade('rememberWhatIDid') //40
+    if(data.actions.destroyEasternMonolith.level === data.actions.destroyEasternMonolith.maxLevel) {
+        document.getElementById("legacySeveranceButton").style.display = "";
+    }
+    modifyMonolithTitles()
+
+    if(data.lichKills >= 1) {
+        revealUpgrade('rememberWhatIDid') //10
+        revealUpgrade('valueMyBody') //15, 150, 1500
+        revealUpgrade('pickUpValuablePlants')
+
+
+        unveilPlane(3)
+        revealAction("reposeRebounded")
+        revealAction("turnTheWheel")
+        revealAction("dipInTheRiver")
+        revealAction("tidalBurden")
+        unlockAction(data.actions.reposeRebounded);
+        unlockAction(data.actions.turnTheWheel);
+        unlockAction(data.actions.tidalBurden);
+
+        if(data.upgrades.increaseInitialInvestment.upgradePower >= 7) {
+            revealUpgrade("findAngelInvestors")
+        }
+    }
+    if(data.lichKills >= 2) {
+        revealUpgrade('stopBeingSoTense') //200 AW
+        revealUpgrade('exploreTheLibrary') //200 AW
+        revealUpgrade('valueMyResearch')
+        //also reveals spendMyFortune at max investMyCoins
+
+        revealUpgrade("rememberHowIGrew")
+        revealUpgrade('retrieveMyUnusedResources') //500
+        revealUpgrade("startCasualChats")
+
 
         revealUpgrade('haveBetterConversations') //1200 AC
         revealUpgrade('workHarder')
@@ -630,18 +661,20 @@ function displayLSStuff() {
         revealUpgrade('feelTheRemnants')
         revealUpgrade('sparkMoreMana')
         revealUpgrade('studyHarder')
-
-        revealUpgrade('learnFromTheLibrary') //200 AW
-        revealUpgrade('stopBeingSoTense') //400 AW
     }
-    if(data.doneLS >= 2) {
-        // document.getElementById("lichUpgradeTab").style.display = "";
-        // document.getElementById("challengesUpgradeTab").style.display = "";
-        // document.getElementById("lichCoinsDisplay").style.display = "";
-        revealUpgrade("talkToMoreWizards")
-    }
-    if(data.doneLS >= 3) {
+    if(data.lichKills >= 3) {
+
+        // revealUpgrade("talkToMoreWizards") //800 AW
+        purchaseAction("stopDarknessRitual")
+        purchaseAction("protectTheSunstone")
+        purchaseAction("silenceDeathChanters")
+        purchaseAction("breakFleshBarricade")
+        purchaseAction("conquerTheGatekeepers")
+        purchaseAction("destroyWesternMonolith")
 
     }
 
+    // document.getElementById("lichUpgradeTab").style.display = "";
+    // document.getElementById("challengesUpgradeTab").style.display = "";
+    // document.getElementById("lichCoinsDisplay").style.display = "";
 }

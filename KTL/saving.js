@@ -147,6 +147,7 @@ function load() {
 
         data.ancientCoin += refundAmount;
         applyUpgradeEffects()
+        adjustMagicMaxLevels()
     }
 
     //update all generator's multiplier data
@@ -175,13 +176,12 @@ function applyUpgradeEffects() {
     // data.actions.hearAboutTheLich.maxLevel = data.upgrades.learnedOfLichSigns.upgradePower + 2;
 
     // data.actions.trainWithTeam.maxLevel = data.upgrades.trainTogetherMore.upgradePower + 2;
-    if(data.upgrades.learnFromTheLibrary.upgradePower >= 3) {
-        data.actions.collectHistoryBooks.maxLevel = 7;
-    }
-    if(data.upgrades.learnFromTheLibrary.upgradePower >= 5) {
-        data.actions.collectMathBooks.maxLevel = 5;
-    }
-    adjustMaxLevels()
+    // if(data.upgrades.exploreTheLibrary.upgradePower >= 3) {
+    //     data.actions.collectHistoryBooks.maxLevel = 7;
+    // }
+    // if(data.upgrades.exploreTheLibrary.upgradePower >= 5) {
+    //     data.actions.collectMathBooks.maxLevel = 5;
+    // }
 }
 
 function adjustUIAfterLoad(toLoad, saveVersionFromLoad) {
@@ -353,8 +353,9 @@ function updateUIOnLoad() {
         }
         views.updateVal(`${actionVar}_storyMenuButton`, actionObj.readStory!==undefined?"":"#2196F3", "style.color");
 
-
     }
+    data.actions.reposeRebounded.isRunning = true;
+
     if (data.planeUnlocked[1] || data.planeUnlocked[2]) {
         for (let i = 0; i < data.planeUnlocked.length; i++) {
             if (data.planeUnlocked[i]) {

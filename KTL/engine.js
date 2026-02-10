@@ -59,7 +59,6 @@ function actionSetBaseVariables(actionObj, dataObj) {
     actionObj.expToLevelBase = dataObj.expToLevelBase ? dataObj.expToLevelBase : 1;
     actionObj.expToLevelMult = dataObj.expToLevelMult ? dataObj.expToLevelMult : 1;
     actionObj.expToLevel = actionObj.expToLevelBase * actionObj.expToLevelMult; //can be divided
-    actionObj.generatorTarget = dataObj.generatorTarget;
     actionObj.resource = 0;
     actionObj.resourceDelta = 0;
     actionObj.resourceIncrease = 0;
@@ -80,6 +79,7 @@ function actionSetBaseVariables(actionObj, dataObj) {
     } else {
         actionObj.unlockCost = dataObj.unlockCost;
     }
+    actionObj.unlockCost *= data.lichKills >= 1 ? 2 * data.lichKills : 1;
 
     actionObj.unlocked = dataObj.unlocked === null ? true : dataObj.unlocked;
 
@@ -314,11 +314,12 @@ function actionTriggerHelper(type, info, extra) {
     } else if(type === "revealUpgrade") {
         revealUpgrade(info)
     } else if(type === "addLegacy") {
-        let levelMult = 1;
+        let legacyAmount = 1;
         if(info) {
-            levelMult += data.actions[info].level/5;
+            legacyAmount += data.actions[info].level/5;
         }
-        statAddAmount("legacy", extra * levelMult);
+        legacyAmount *= extra;
+        statAddAmount("legacy", legacyAmount);
     } else if(type === "addAC") {
         let ACAmount = extra * (data.upgrades.listenCloserToWhispers.upgradePower === 1?3:1);
         if (data.gameState === "KTL") {
@@ -328,7 +329,7 @@ function actionTriggerHelper(type, info, extra) {
             data.ancientCoin += ACAmount;
         }
     } else if(type === "addAW") {
-        let AWAmount = extra * (data.upgrades.listenCloserToWhispers.upgradePower === 1?3:1) * (1 + data.doneLS/2);
+        let AWAmount = extra * (data.upgrades.listenCloserToWhispers.upgradePower === 1?3:1) * (1 + data.lichKills/2);
         if (data.gameState === "KTL") {
             data.ancientWhisper += AWAmount * data.ancientWhisperMultKTL;
             data.ancientWhisperGained += AWAmount * data.ancientWhisperMultKTL;
@@ -338,18 +339,14 @@ function actionTriggerHelper(type, info, extra) {
     }
 }
 
-function actionAddExp(actionObj) {
-    actionObj.expToAddMult = calcUpgradeMultToExp(actionObj.actionVar);
-    actionObj.expToAdd = actionObj.expToAddBase * actionObj.expToAddMult;
-    actionObj.exp += actionObj.expToAdd;
+function actionAddExp(actionObj, exp) {
+    actionObj.exp += exp;
     let dataObj = actionData[actionObj.actionVar];
 
     for (let i = 0; i < 10 / (data.gameSettings.ticksPerSecond / 20); i++) {
         if (!checkLevelUp(actionObj, dataObj)) {
             break;
         }
-        actionObj.expToAddMult = calcUpgradeMultToExp(actionObj.actionVar);
-        actionObj.expToAdd = actionObj.expToAddBase * actionObj.expToAddMult;
     }
 }
 
@@ -408,7 +405,7 @@ function actionUpdateAllStatMults() {
     }
 }
 
-//prepares the action to be unlocked during hte loop next round
+//prepares the action to be unlocked during the loop next round
 function purchaseAction(actionVar) {
     let actionObj = data.actions[actionVar];
     if(!actionObj) {
@@ -555,6 +552,9 @@ function disableAutomationUpwards(actionVar, isForced) {
         for (const downstreamVar of dataObj.downstreamVars) {
             const downstreamObj = data.actions[downstreamVar];
             let downstreamDataObj = actionData[downstreamVar];
+            if(!downstreamObj) {
+                console.log(`error on downstream ${downstreamVar} of ${currentTarget}`)
+            }
 
             if (!downstreamObj.visible) {
                 continue;
@@ -673,7 +673,13 @@ function upgradeUpdates() {
 
     //passive gain
     if(data.upgrades.startALittleQuicker.upgradePower > 0) {
-        data.actions.overclock.resource += 40 * Math.pow(5, data.upgrades.startALittleQuicker.upgradePower-1) / data.gameSettings.ticksPerSecond
+        data.actions.overclock.resource += 50 * Math.pow(4, data.upgrades.startALittleQuicker.upgradePower-1) / data.gameSettings.ticksPerSecond
+    }
+    if(data.upgrades.pickUpValuablePlants.upgradePower > 0) {
+        addResourceTo(data.actions.spendMoney, 5 * Math.pow(4, data.upgrades.pickUpValuablePlants.upgradePower-1) / data.gameSettings.ticksPerSecond)
+    }
+    if(data.upgrades.startCasualChats.upgradePower > 0) {
+        addResourceTo(data.actions.meetPeople, Math.pow(2, data.upgrades.startCasualChats.upgradePower-1) / data.gameSettings.ticksPerSecond)
     }
 
     // if(data.upgrades.keepMyMagicReady.upgradePower) {
@@ -720,7 +726,7 @@ function useCharge(actionVar) {
         actionObj.cooldownTimer = 0;
     }
 
-    data.actions.castingExperience.resource += Math.pow(dataObj.circle + 1, 3);
+    data.actions.castingExperience.resource += Math.pow(dataObj.circle + 1, 4);
 
     enableAutomationUpwards(actionVar);
 
@@ -828,24 +834,31 @@ function checkGrimoireUnlocks() {
         revealAction("overproduce")
         revealAction("overhear")
     }
-    if(data.actions.awakenYourGrimoire.level >= 4) { //further grimoire levels come from dungeon
+    if(data.actions.awakenYourGrimoire.level >= 4) {
         revealAction("overponder")
     }
-    if(data.actions.awakenYourGrimoire.level >= 5) { //further grimoire levels come from dungeon
-        // revealAction("infusion")
+    if(data.actions.awakenYourGrimoire.level >= 5) {
+        revealAction("overdrive")
     }
-    if(data.actions.awakenYourGrimoire.level >= 6) { //further grimoire levels come from dungeon
-        revealAction("castDirtMagic")
-        revealAction("createMounds")
-        //start with the above 2, get the following some other way
-        revealAction("castIronMagic")
-        revealAction("mendSmallCracks")
-        revealAction("castRecoverMagic")
-        revealAction("unblemish")
-        revealAction("castPracticalMagic")
-        revealAction("illuminate")
+    if(data.actions.awakenYourGrimoire.level >= 6) {
+        revealAction("overhype")
     }
+    // if(data.actions.awakenYourGrimoire.level >= 7) {
+    //     revealAction("overanalyze")
+    // }
+    // if(data.actions.awakenYourGrimoire.level >= 8) {
+    //     revealAction("overpush")
+    // }
 
+    // revealAction("castDirtMagic")
+    // revealAction("createMounds")
+    // //start with the above 2, get the following some other way
+    // revealAction("castIronMagic")
+    // revealAction("mendSmallCracks")
+    // revealAction("castRecoverMagic")
+    // revealAction("unblemish")
+    // revealAction("castPracticalMagic")
+    // revealAction("illuminate")
 }
 
 

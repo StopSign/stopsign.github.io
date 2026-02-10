@@ -58,7 +58,7 @@ function createAttDisplay(attVar) {
                         <div id="${attVar}Name" style="font-weight:bold;color:var(--text-primary)">${decamelize(attVar)}</div>
                         <span id="${attVar}Num" style="display:inline-block;font-weight:bold;color:var(--text-primary)">${attObj.num}</span>
                         <span style="display:inline-block"> = x<span id="${attVar}AttMult" style="font-weight:bold;color:var(--text-primary)">${attObj.attMult}</span> bonus</span>
-                        <div id="${attVar}AttBaseContainer" style="color:darkgreen"><span id="${attVar}AttBase" style="font-weight:bold;">${attObj.attBase}</span></div>
+                        <div id="${attVar}AttBaseContainer" style="color:darkgreen">(<span id="${attVar}AttBase" style="font-weight:bold;">${attObj.attBase}</span>)</div>
                     </span>
                 </div>`;
         }
@@ -768,9 +768,16 @@ function generateUnlockText(actionVar) {
         let info = actionTrigger[2];
         let extra = actionTrigger[3]; //used for numbers
 
-        if(when === "unlock") {
-            unlockTextFound = true;
-            unlockText += actionTriggerText(type, info, extra) + "<br>"
+
+        try {
+            if (when === "unlock") {
+                unlockTextFound = true;
+                unlockText += actionTriggerText(type, info, extra) + "<br>"
+            }
+        } catch (e) {
+            console.log(e);
+            console.log("error: didn't properly handle icon data: ");
+            console.log(actionTrigger);
         }
     }
     return (unlockTextFound ? unlockText:"") + (dataObj.unlockMessage ? dataObj.unlockMessage[language]:"");
@@ -895,31 +902,32 @@ function replaceIconText(actionVar) {
         }
 
         let text = "";
-        if(when === "info") {
-            if(type === "wage") {
-                text += `Base wage: $${intToString(actionData[info].wage, 2)}<br>`
-                text += `Current wage: $${intToString(data.actions[info].wage, 2)}<br>`
-            } else if(type === "text") {
-                text += info + "<br>";
-            } else if(type === "cap") {
-                text += "Market Cap: " + intToString(actionData[info][extra], 3) + "<br>"
+        try {
+            if(when === "info") {
+                if(type === "wage") {
+                    text += `Base wage: $${intToString(actionData[info].wage, 2)}<br>`
+                    text += `Current wage: $${intToString(data.actions[info].wage, 2)}<br>`
+                } else if(type === "text") {
+                    text += info + "<br>";
+                } else if(type === "cap") {
+                    text += "Market Cap: " + intToString(actionData[info][extra], 3) + "<br>"
+                }
+            } else if(when === "unlock") {
+                text += "On Unlock: "
+                text += actionTriggerText(type, info, extra) + "<br>"
+            } else if(when.indexOf("level_") >= 0) {
+                let level = when.substring("level_".length);
+                text += `Level ${level}: `
+                text += actionTriggerText(type, info, extra) + "<br>"
+            } else if(when === "level") {
+                text += "On Level: "
+                text += actionTriggerText(type, info, extra) + "<br>"
+            } else if(when === "complete") {
+                text += "On Complete: "
+                text += actionTriggerText(type, info, extra) + "<br>"
             }
-        } else if(when === "unlock") {
-            text += "On Unlock: "
-            text += actionTriggerText(type, info, extra) + "<br>"
-        } else if(when.indexOf("level_") >= 0) {
-            let level = when.substring("level_".length);
-            text += `Level ${level}: `
-            text += actionTriggerText(type, info, extra) + "<br>"
-        } else if(when === "level") {
-            text += "On Level: "
-            text += actionTriggerText(type, info, extra) + "<br>"
-        } else if(when === "complete") {
-            text += "On Complete: "
-            text += actionTriggerText(type, info, extra) + "<br>"
-        }
-
-        if(text === "") {
+        } catch (e) {
+            console.log(e);
             console.log("error: didn't properly handle icon data: ");
             console.log(actionTrigger);
         }
@@ -947,16 +955,21 @@ function actionTriggerText(type, info, extra) {
     } else if(type === "addLegacy") {
         let levelMult = 1;
         if(info) {
-            levelMult += data.actions[info].level/10;
+            levelMult += data.actions[info].level/5;
         }
         let legacyGain = extra * levelMult * (data.gameState === "KTL" ? data.legacyMultKTL : 1);
         text += `+<b>${intToString(legacyGain, 2)}</b> Legacy`
     } else if(type === "addAC") {
-        let ancientCoinGain = extra * (data.gameState === "KTL" ? data.ancientCoinMultKTL : 1);
-        text += `+<b>${intToString(ancientCoinGain, 1)}</b> Ancient Coins`
+        let ACAmount = extra
+            * (data.upgrades.listenCloserToWhispers.upgradePower === 1?3:1)
+            * (data.gameState === "KTL" ? data.ancientCoinMultKTL : 1);
+        text += `+<b>${intToString(ACAmount, 1)}</b> Ancient Coins`
     } else if(type === "addAW") {
-        let ancientWhisperGain = extra * (data.gameState === "KTL" ? data.ancientWhisperMultKTL : 1);
-        text += `+<b>${intToString(ancientWhisperGain, 1)}</b> Ancient Whispers`
+        let AWAmount = extra
+            * (data.upgrades.listenCloserToWhispers.upgradePower === 1?3:1)
+            * (1 + data.lichKills/2)
+            * (data.gameState === "KTL" ? data.ancientWhisperMultKTL : 1);
+        text += `+<b>${intToString(AWAmount, 1)}</b> Ancient Whispers`
     }
     return text;
 }
@@ -1234,7 +1247,7 @@ function renderResetLog() {
                         <th style="padding-right:15px; text-align:left;">#</th>
                         <th style="padding-right:15px; text-align:left;">Times<br>(Reset | HATL 1)</th>
                         <th style="padding-right:15px; text-align:left;">Stage 1<br>(Momentum | Fear | Legacy${teamworkFound ?` | Teamwork`:""})</th>
-                        <th style="padding-right:15px; text-align:left;">Stage 2<br>(Legacy Gained | Ancient Coin Gained)</th>
+                        <th style="padding-right:15px; text-align:left;">Stage 2<br>(Legacy Gained | AC Gained | AW Gained)</th>
                     </tr>
                 </thead>
                 <tbody>

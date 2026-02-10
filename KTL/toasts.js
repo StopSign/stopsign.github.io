@@ -84,7 +84,7 @@ You can only have one job at a time, and it will automatically be the one with t
 
 Legacy is the resource on the originator of all magic: Echo Kindle. Every time you gain legacy as an attribute, you will also gain it on Echo Kindle.<br><br>
 
-Echo Kindle generates spark onto Spark Decay, which wastes the Spark by consuming it. Pool Mana takes what Spark remains when it completes and turns it into Mana - the lower speed that Spark Decay has, the more Mana will be available for spells.
+Echo Kindle generates charge onto Dissipation, which wastes charge by consuming it. Pool Mana takes what Charge remains when it completes and turns it into Mana - the lower speed that Dissipation has, the more Mana will be available for spells.
         `);
 
     createToast(function() { return data.actions.overcharge.unlocked; },

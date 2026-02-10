@@ -87,6 +87,7 @@ let actionData = {
             views.scheduleUpdate('overclockResourceSent', intToString(actionObj.resourceToAdd, 2), "textContent")
         },
         updateMults: function () {
+            this.updateUpgradeMult();
             let spellMult = 1;
             if (isSpellReady('overcharge')) {
                 spellMult *= actionData.overcharge.spellPower();
@@ -347,13 +348,14 @@ let actionData = {
 
             if (actionObj.resourceToAdd > 0) {
                 actionObj.resource -= resourceTaken;
-                addResourceTo(data.actions[actionObj.generatorTarget], actionObj.resourceToAdd);
+                addResourceTo(data.actions[this.generatorTarget], actionObj.resourceToAdd);
             }
 
             views.scheduleUpdate('makeMoneyResourceSent', intToString(actionObj.resourceToAdd, 2), "textContent")
             views.scheduleUpdate('makeMoneyResourceTaken', intToString(resourceTaken, 2), "textContent")
         },
         updateMults: function () {
+            this.updateUpgradeMult();
             let spellMult = 1;
             if (isSpellReady('overwork')) {
                 spellMult *= actionData.overwork.spellPower();
@@ -462,7 +464,7 @@ let actionData = {
         expToLevelBase: 10, expToLevelIncrease: 1,
         efficiencyBase: .05, maxLevel: 10,
         unlockCost: 5e10, visible: false, unlocked: false, purchased: true,
-        onLevelAtts: [["energy", 10], ["endurance", 10], ["influence", 5]],
+        onLevelAtts: [["energy", 10], ["endurance", 10]],
         expAtts: [["savvy", 1]],
         efficiencyAtts: [["ambition", 200]],
         actionTriggers: [
@@ -549,7 +551,7 @@ let actionData = {
         expToLevelBase: 10, expToLevelIncrease: 1,
         efficiencyBase: .001, maxLevel: 10,
         unlockCost: 2e23, visible: false, unlocked: false, purchased: true,
-        onLevelAtts: [["influence", 20], ["energy", 10]],
+        onLevelAtts: [["influence", 10], ["energy", 10]],
         expAtts: [["savvy", 1]],
         efficiencyAtts: [["influence", 900]]
     },
@@ -592,7 +594,7 @@ let actionData = {
         expToLevelBase: 10, expToLevelIncrease: 1,
         efficiencyBase: .0005, maxLevel: 10,
         unlockCost: 2e40, visible: false, unlocked: false, purchased: false,
-        onLevelAtts: [["ambition", 10], ["charm", 10]],
+        onLevelAtts: [["ambition", 10], ["charm", 5]],
         expAtts: [["savvy", 1]],
         efficiencyAtts: [["ambition", 500]],
         actionTriggers: [
@@ -606,7 +608,7 @@ let actionData = {
         expToLevelBase: 10, expToLevelIncrease: 1,
         efficiencyBase: .0005, maxLevel: 10,
         unlockCost: 2e46, visible: false, unlocked: false, purchased: false,
-        onLevelAtts: [["might", 10], ["wizardry", 10]],
+        onLevelAtts: [["might", 10], ["wizardry", 5]],
         expAtts: [["savvy", 1]],
         efficiencyAtts: [["ambition", 750]],
         actionTriggers: [
@@ -619,7 +621,7 @@ let actionData = {
         expToLevelBase: 10, expToLevelIncrease: 1,
         efficiencyBase: .0002, maxLevel: 10,
         unlockCost: 2e49, visible: false, unlocked: false, purchased: false,
-        onLevelAtts: [["energy", 15], ["charm", 5]],
+        onLevelAtts: [["energy", 10], ["charm", 5]],
         expAtts: [["savvy", 1]],
         efficiencyAtts: [["ambition", 1100]]
     },
@@ -629,19 +631,19 @@ let actionData = {
         expToLevelBase: 10, expToLevelIncrease: 1,
         efficiencyBase: .0002, maxLevel: 10,
         unlockCost: 2e48, visible: false, unlocked: false, purchased: false,
-        onLevelAtts: [["endurance", 20]],
+        onLevelAtts: [["endurance", 15]],
         expAtts: [["savvy", 1]],
         efficiencyAtts: [["ambition", 900]]
     },
     buyHouse: {
         tier: 2, plane: 0, resourceName: "coins", creationVersion: 6,
-        progressMaxBase: 5e42, progressMaxIncrease: 10,
+        progressMaxBase: 5e86, progressMaxIncrease: 1,
         expToLevelBase: 1, expToLevelIncrease: 1,
-        efficiencyBase: .1, maxLevel: 1,
-        unlockCost: 2e36, visible: false, unlocked: false, purchased: false,
-        onLevelAtts: [["integration", 50], ["comfort", 10]],
-        expAtts: [["savvy", 1], ["ambition", 1]],
-        efficiencyAtts: [["recognition", 1]],
+        efficiencyBase: .00001, maxLevel: 1,
+        unlockCost: 2e75, visible: false, unlocked: false, purchased: false,
+        onLevelAtts: [["integration", 30], ["comfort", 10]],
+        expAtts: [["savvy", 1]],
+        efficiencyAtts: [["ambition", 1600]],
         actionTriggers: [
             ["level_1", "reveal", "buyHouseholdItems"],
             ["level_1", "revealUpgrade", "improveMyHouse"],
@@ -649,26 +651,26 @@ let actionData = {
     },
     buyHouseholdItems: {
         tier: 2, plane: 0, resourceName: "coins", creationVersion: 6,
-        progressMaxBase: 5e43, progressMaxIncrease: 10,
+        progressMaxBase: 5e88, progressMaxIncrease: 30,
         expToLevelBase: 10, expToLevelIncrease: 1,
-        efficiencyBase: .01, maxLevel: 5,
-        unlockCost: 2e37, visible: false, unlocked: false, purchased: false,
+        efficiencyBase: .0001, maxLevel: 10,
+        unlockCost: 2e76, visible: false, unlocked: false, purchased: false,
         onLevelAtts: [["energy", 10], ["charm", 10]],
-        expAtts: [["savvy", 1], ["leverage", 1]],
-        efficiencyAtts: [["leverage", 1]],
+        expAtts: [["savvy", 1]],
+        efficiencyAtts: [["ambition", 1600]],
         actionTriggers: [
-            ["level_1", "reveal", "buyFurniture"]
+            ["level_3", "reveal", "buyFurniture"]
         ]
     },
     buyFurniture: {
         tier: 2, plane: 0, resourceName: "coins", creationVersion: 6,
-        progressMaxBase: 2e44, progressMaxIncrease: 10,
+        progressMaxBase: 2e90, progressMaxIncrease: 30,
         expToLevelBase: 10, expToLevelIncrease: 1,
-        efficiencyBase: .01, maxLevel: 5,
-        unlockCost: 8e37, visible: false, unlocked: false, purchased: false,
-        onLevelAtts: [["energy", 5e7], ["comfort", 10]],
-        expAtts: [["savvy", 1], ["leverage", 1]],
-        efficiencyAtts: [["leverage", 1]],
+        efficiencyBase: .0001, maxLevel: 10,
+        unlockCost: 2e77, visible: false, unlocked: false, purchased: false,
+        onLevelAtts: [["energy", 10], ["comfort", 2]],
+        expAtts: [["savvy", 1]],
+        efficiencyAtts: [["ambition", 1700]],
         actionTriggers: [
             ["level_1", "reveal", "buyReadingChair"],
             ["level_1", "reveal", "buyBed"],
@@ -676,62 +678,62 @@ let actionData = {
     },
     buyReadingChair: {
         tier: 2, plane: 0, resourceName: "coins", creationVersion: 6,
-        progressMaxBase: 5e44, progressMaxIncrease: 10,
+        progressMaxBase: 5e81, progressMaxIncrease: 30,
         expToLevelBase: 10, expToLevelIncrease: 1,
-        efficiencyBase: .01, maxLevel: 5,
-        unlockCost: 2e38, visible: false, unlocked: false, purchased: false,
-        onLevelAtts: [["comfort", 15], ["peace", 2]],
-        expAtts: [["savvy", 1], ["leverage", 1]],
-        efficiencyAtts: [["leverage", 1]],
+        efficiencyBase: .0001, maxLevel: 5,
+        unlockCost: 2e78, visible: false, unlocked: false, purchased: false,
+        onLevelAtts: [["comfort", 15], ["calm", 2]],
+        expAtts: [["savvy", 1]],
+        efficiencyAtts: [["ambition", 1700]],
         actionTriggers: [
             ["level_1", "reveal", "buyFireplace"]
         ]
     },
     buyBed: {
         tier: 2, plane: 0, resourceName: "coins", creationVersion: 6,
-        progressMaxBase: 2e46, progressMaxIncrease: 10,
+        progressMaxBase: 2e82, progressMaxIncrease: 30,
         expToLevelBase: 10, expToLevelIncrease: 1,
-        efficiencyBase: .01, maxLevel: 5,
-        unlockCost: 8e39, visible: false, unlocked: false, purchased: false,
+        efficiencyBase: .0001, maxLevel: 5,
+        unlockCost: 8e78, visible: false, unlocked: false, purchased: false,
         onLevelAtts: [["energy", 1e8]],
-        expAtts: [["savvy", 1], ["leverage", 1]],
-        efficiencyAtts: [["leverage", 1]],
+        expAtts: [["savvy", 1]],
+        efficiencyAtts: [["ambition", 1800]],
         actionTriggers: [
             ["level_1", "reveal", "buySilkSheets"]
         ]
     },
     buyFireplace: {
         tier: 2, plane: 0, resourceName: "coins", creationVersion: 6,
-        progressMaxBase: 5e46, progressMaxIncrease: 10,
+        progressMaxBase: 5e83, progressMaxIncrease: 30,
         expToLevelBase: 10, expToLevelIncrease: 1,
-        efficiencyBase: .01, maxLevel: 5,
-        unlockCost: 2e40, visible: false, unlocked: false, purchased: false,
-        onLevelAtts: [["comfort", 30]],
-        expAtts: [["savvy", 1], ["leverage", 1]],
-        efficiencyAtts: [["leverage", 1]],
+        efficiencyBase: .0001, maxLevel: 10,
+        unlockCost: 2e79, visible: false, unlocked: false, purchased: false,
+        onLevelAtts: [["calm", 10], ["comfort", 3]],
+        expAtts: [["savvy", 1]],
+        efficiencyAtts: [["ambition", 1800]],
         actionTriggers: [
             ["level_1", "reveal", "buyGoodFirewood"]
         ]
     },
     buySilkSheets: {
         tier: 2, plane: 0, resourceName: "coins", creationVersion: 6,
-        progressMaxBase: 5e47, progressMaxIncrease: 10,
+        progressMaxBase: 5e84, progressMaxIncrease: 30,
         expToLevelBase: 10, expToLevelIncrease: 1,
-        efficiencyBase: .005, maxLevel: 5,
-        unlockCost: 2e41, visible: false, unlocked: false, purchased: false,
-        onLevelAtts: [["energy", 1e8]],
-        expAtts: [["savvy", 1], ["leverage", 1]],
-        efficiencyAtts: [["leverage", 1]]
+        efficiencyBase: .0001, maxLevel: 10,
+        unlockCost: 2e80, visible: false, unlocked: false, purchased: false,
+        onLevelAtts: [["energy", 10]],
+        expAtts: [["savvy", 1]],
+        efficiencyAtts: [["ambition", 1850]]
     },
     buyGoodFirewood: {
         tier: 2, plane: 0, resourceName: "coins", creationVersion: 6,
-        progressMaxBase: 5e48, progressMaxIncrease: 10,
+        progressMaxBase: 5e85, progressMaxIncrease: 30,
         expToLevelBase: 10, expToLevelIncrease: 1,
-        efficiencyBase: .005, maxLevel: 5,
-        unlockCost: 2e42, visible: false, unlocked: false, purchased: false,
-        onLevelAtts: [["comfort", 40], ["peace", 10]],
-        expAtts: [["savvy", 1], ["leverage", 1]],
-        efficiencyAtts: [["leverage", 1]]
+        efficiencyBase: .0001, maxLevel: 10,
+        unlockCost: 2e81, visible: false, unlocked: false, purchased: false,
+        onLevelAtts: [["calm", 10], ["comfort", 2]],
+        expAtts: [["savvy", 1]],
+        efficiencyAtts: [["ambition", 1850]]
     },
 
     invest: {
@@ -753,7 +755,7 @@ let actionData = {
 
             if (actionObj.resourceToAdd > 0) {
                 actionObj.resource -= resourceTaken;
-                addResourceTo(data.actions[actionObj.generatorTarget], actionObj.resourceToAdd);
+                addResourceTo(data.actions[this.generatorTarget], actionObj.resourceToAdd);
             }
 
             views.scheduleUpdate('investResourceSent', intToString(actionObj.resourceToAdd, 2), "textContent")
@@ -771,7 +773,7 @@ let actionData = {
             }
             let reinvested = data.actions.reinvest.resource * (actionObj.actionPower - 1);
             actionObj.resourceToAdd = (reinvested + Math.log10(resourceTaken) * upgradeData.increaseInitialInvestment.currentValue()) * (actionObj.efficiency / 100);
-            this.investCap = Math.pow(upgradeData.increaseMarketCap.currentValue(), actionObj.actionPower);
+            this.investCap = Math.pow(upgradeData.increaseMarketCap.currentValue(), Math.pow(actionObj.actionPower, 2));
             actionObj.resourceToAdd = actionObj.resourceToAdd > this.investCap ? this.investCap : actionObj.resourceToAdd;
 
             actionObj.expToAddBase = Math.log10(resourceTaken);
@@ -782,7 +784,7 @@ let actionData = {
             actionData.invest.updateMults();
         },
         onLevelAtts: [["vision", 10], ["leverage", 10]],
-        expAtts: [["ambition", 1], ["resonance", 1]],
+        expAtts: [["ambition", 1], ["resonance", 1], ["intellect", 1]],
         efficiencyAtts: [["vision", 500]],
         onCompleteText: {
             english: Raw.html`
@@ -798,7 +800,7 @@ let actionData = {
             Base Rate = 1 (increased with upgrades)<br><br>
             Fortune Gain = (log10(Coins Taken) * Base Rate + Reinvested) * efficiency<br><br>
             Exp Gain = log10(Coins Taken)<br><br>
-            Fortune Gain is capped at (Market Cap)^(Action Power)`
+            Fortune Gain is capped at (Market Cap)^((Action Power^2))`
         },
         actionTriggers: [
             ["info", "text", "Uses Coins and Fortune on Reinvest to produce Fortune"],
@@ -836,7 +838,7 @@ let actionData = {
         expToLevelBase: 10, expToLevelIncrease: 1,
         efficiencyBase: .01, maxLevel: 10,
         unlockCost: 100, visible: false, unlocked: false, purchased: false,
-        onLevelAtts: [["energy", 10], ["confidence", 10]],
+        onLevelAtts: [["energy", 10], ["confidence", 5]],
         expAtts: [["vision", 1]],
         efficiencyAtts: [["leverage", 600]],
         actionTriggers: [
@@ -851,9 +853,9 @@ let actionData = {
         expToLevelBase: 10, expToLevelIncrease: 1,
         efficiencyBase: .01, maxLevel: 10,
         unlockCost: 3000, visible: false, unlocked: false, purchased: false,
-        onLevelAtts: [["influence", 10], ["leverage", 5]],
+        onLevelAtts: [["influence", 5], ["leverage", 5]],
         expAtts: [["vision", 1]],
-        efficiencyAtts: [["leverage", 700]],
+        efficiencyAtts: [["leverage", 650]],
         actionTriggers: [
             ["unlock", "reveal", "townCrier"],
             ["level_3", "reveal", "hostAFestival"],
@@ -862,28 +864,28 @@ let actionData = {
     },
     hostAFestival: {
         tier: 2, plane: 0, resourceName: "fortune", creationVersion: 6,
-        progressMaxBase: 1e3, progressMaxIncrease: 20,
+        progressMaxBase: 1e4, progressMaxIncrease: 20,
         expToLevelBase: 10, expToLevelIncrease: 1,
-        efficiencyBase: .01, maxLevel: 10,
+        efficiencyBase: .001, maxLevel: 10,
         unlockCost: 2e4, visible: false, unlocked: false, purchased: false,
-        onLevelAtts: [["charm", 10], ["influence", 5]],
+        onLevelAtts: [["charm", 10]],
         expAtts: [["vision", 1]],
-        efficiencyAtts: [["leverage", 800]]
+        efficiencyAtts: [["leverage", 700]]
     },
     fundTownImprovements: {
         tier: 2, plane: 0, resourceName: "fortune", creationVersion: 6,
         progressMaxBase: 1e5, progressMaxIncrease: 20,
         expToLevelBase: 10, expToLevelIncrease: 1,
-        efficiencyBase: .01, maxLevel: 10,
+        efficiencyBase: .0001, maxLevel: 10,
         unlockCost: 2e5, visible: false, unlocked: false, purchased: false,
         onLevelAtts: [["influence", 10], ["savvy", 5]],
         expAtts: [["vision", 1]],
-        efficiencyAtts: [["leverage", 900]],
+        efficiencyAtts: [["leverage", 750]],
         actionTriggers: [
-            ["unlock", "reveal", "investInSelf"],
-            ["level_1", "reveal", "supportLocalLibrary"],
             ["level_3", "reveal", "browsePersonalCollection"],
-            ["level_4", "reveal", "fundASmallStall"],
+            ["level_4", "reveal", "supportLocalLibrary"],
+            ["level_5", "reveal", "investInSelf"],
+            ["level_8", "reveal", "fundASmallStall"],
             ["level", "addMaxLevels", "buyTools", 1],
             ["level", "addMaxLevels", "buyCart", 1],
             ["level", "addMaxLevels", "buyPotions", 1],
@@ -891,24 +893,24 @@ let actionData = {
     },
     supportLocalLibrary: {
         tier: 2, plane: 0, resourceName: "fortune", creationVersion: 6,
-        progressMaxBase: 2e6, progressMaxIncrease: 20,
+        progressMaxBase: 2e9, progressMaxIncrease: 20,
         expToLevelBase: 10, expToLevelIncrease: 1,
-        efficiencyBase: .05, maxLevel: 5,
+        efficiencyBase: .0001, maxLevel: 10,
         unlockCost: 5e7, visible: false, unlocked: false, purchased: false,
-        onLevelAtts: [["influence", 20], ["savvy", 10], ["leverage", 10]],
+        onLevelAtts: [["influence", 10], ["savvy", 5], ["leverage", 5]],
         expAtts: [["vision", 1]],
-        efficiencyAtts: [["leverage", 1000]],
+        efficiencyAtts: [["leverage", 800]],
         actionTriggers: [
-            ["level_1", "reveal", "expandLocalLibrary"]
+            ["level_4", "reveal", "expandLocalLibrary"]
         ]
     },
     expandLocalLibrary: {
         tier: 2, plane: 0, resourceName: "fortune", creationVersion: 6,
-        progressMaxBase: 2e8, progressMaxIncrease: 20,
+        progressMaxBase: 2e16, progressMaxIncrease: 20,
         expToLevelBase: 10, expToLevelIncrease: 1,
-        efficiencyBase: .05, maxLevel: 5,
-        unlockCost: 5e9, visible: false, unlocked: false, purchased: false,
-        onLevelAtts: [["leverage", 10], ["logistics", 10], ["intellect", 5]],
+        efficiencyBase: .0001, maxLevel: 10,
+        unlockCost: 5e10, visible: false, unlocked: false, purchased: false,
+        onLevelAtts: [["influence", 5], ["leverage", 5], ["intellect", 2]],
         expAtts: [["vision", 1]],
         efficiencyAtts: [["leverage", 1000]],
         actionTriggers: [
@@ -917,45 +919,45 @@ let actionData = {
     },
     investInSelf: {
         tier: 2, plane: 0, resourceName: "fortune", creationVersion: 6,
-        progressMaxBase: 2e7, progressMaxIncrease: 20,
+        progressMaxBase: 2e11, progressMaxIncrease: 20,
         expToLevelBase: 10, expToLevelIncrease: 1,
-        efficiencyBase: .05, maxLevel: 5,
+        efficiencyBase: .0001, maxLevel: 10,
         unlockCost: 5e8, visible: false, unlocked: false, purchased: false,
         onLevelAtts: [["savvy", 10], ["confidence", 10]],
         expAtts: [["vision", 1]],
-        efficiencyAtts: [["leverage", 1000]],
+        efficiencyAtts: [["leverage", 850]],
         actionTriggers: [
-            ["level_1", "reveal", "makeAPublicDonation"],
-            ["level_2", "reveal", "purchaseALot"],
+            ["level_2", "reveal", "makeAPublicDonation"],
+            ["level_6", "reveal", "purchaseALot"],
         ]
     },
     makeAPublicDonation: {
         tier: 2, plane: 0, resourceName: "fortune", creationVersion: 6,
-        progressMaxBase: 3e7, progressMaxIncrease: 20,
+        progressMaxBase: 3e12, progressMaxIncrease: 20,
         expToLevelBase: 10, expToLevelIncrease: 1,
-        efficiencyBase: .05, maxLevel: 5,
-        unlockCost: 5e10, visible: false, unlocked: false, purchased: false,
-        onLevelAtts: [["influence", 20], ["charm", 10]],
+        efficiencyBase: .0001, maxLevel: 10,
+        unlockCost: 5e9, visible: false, unlocked: false, purchased: false,
+        onLevelAtts: [["influence", 10], ["charm", 5]],
         expAtts: [["vision", 1]],
-        efficiencyAtts: [["leverage", 1000]]
+        efficiencyAtts: [["leverage", 900]]
     },
     fundASmallStall: {
         tier: 2, plane: 0, resourceName: "fortune", creationVersion: 6,
-        progressMaxBase: 3e10, progressMaxIncrease: 20,
+        progressMaxBase: 3e16, progressMaxIncrease: 20,
         expToLevelBase: 10, expToLevelIncrease: 1,
-        efficiencyBase: .05, maxLevel: 5,
+        efficiencyBase: .05, maxLevel: 10,
         unlockCost: 5e11, visible: false, unlocked: false, purchased: false,
-        onLevelAtts: [["influence", 10], ["savvy", 10]],
+        onLevelAtts: [["influence", 5], ["savvy", 5]],
         expAtts: [["vision", 1]],
         efficiencyAtts: [["leverage", 1000]]
     },
     purchaseALot: {
         tier: 2, plane: 0, resourceName: "fortune", creationVersion: 6,
-        progressMaxBase: 3e12, progressMaxIncrease: 20,
+        progressMaxBase: 1e19, progressMaxIncrease: 20,
         expToLevelBase: 10, expToLevelIncrease: 1,
         efficiencyBase: .05, maxLevel: 1,
         unlockCost: 5e13, visible: false, unlocked: false, purchased: false,
-        onLevelAtts: [["ambition", 50], ["vision", 50]],
+        onLevelAtts: [["ambition", 50], ["influence", 20]],
         expAtts: [["vision", 1]],
         efficiencyAtts: [["leverage", 1000]],
         actionTriggers: [
@@ -974,8 +976,8 @@ let actionData = {
         expAtts: [["vision", 1]],
         efficiencyAtts: [["leverage", 1000]],
         actionTriggers: [
-            ["level", "addMaxLevels", "buildPersonalLibrary", 1],
-            ["level_1", "reveal", "buildPersonalLibrary"],
+            ["level", "addMaxLevels", "craftSpellShack", 1],
+            ["level_1", "reveal", "craftSpellShack"],
             ["level_1", "reveal", "procureQualityWood"]
         ]
     },
@@ -989,7 +991,7 @@ let actionData = {
         expAtts: [["vision", 1]],
         efficiencyAtts: [["leverage", 1000]],
         actionTriggers: [
-            ["level", "addMaxLevels", "buildPersonalLibrary", 1]
+            ["level", "addMaxLevels", "craftSpellShack", 1]
         ]
     },
     sourceRareBooks: {
@@ -1091,13 +1093,14 @@ let actionData = {
 
             if (actionObj.resourceToAdd > 0) {
                 actionObj.resource -= resourceTaken;
-                addResourceTo(data.actions[actionObj.generatorTarget], actionObj.resourceToAdd);
+                addResourceTo(data.actions[this.generatorTarget], actionObj.resourceToAdd);
             }
 
             views.scheduleUpdate('socializeResourceSent', intToString(actionObj.resourceToAdd, 2), "textContent")
             views.scheduleUpdate('socializeResourceTaken', intToString(resourceTaken, 2), "textContent")
         },
         updateMults: function () {
+            this.updateUpgradeMult();
             let spellMult = 1;
             if (isSpellReady('overtalk')) {
                 spellMult *= actionData.overtalk.spellPower();
@@ -1126,7 +1129,7 @@ let actionData = {
             data.actions.socialize.upgradeMult = upgradeMult;
         },
         onLevelAtts: [["confidence", 2]],
-        expAtts: [["confidence", 1], ["influence", 1]],
+        expAtts: [["confidence", 1], ["influence", 1], ["comfort", 1]],
         efficiencyAtts: [["charm", 500], ["confidence", 500]],
         actionPowerFunction: function (resource) {
             if (resource < 1e12) {
@@ -1194,10 +1197,10 @@ let actionData = {
         ]
     },
     hearAboutTheLich: {
-        tier: 1, plane: 0, resourceName: "fear", creationVersion: 6,
-        progressMaxBase: 500000, progressMaxIncrease: 1e4,
+        tier: 2, plane: 0, resourceName: "fear", creationVersion: 6,
+        progressMaxBase: 300000, progressMaxIncrease: 2e4,
         expToLevelBase: 1, expToLevelIncrease: 1,
-        efficiencyBase: .001,
+        efficiencyBase: .01,
         unlockCost: 0,
         visible: false, unlocked: false, purchased: true, hasUpstream: false, keepParentAutomation:true,
         ignoreConsume:true,
@@ -1227,8 +1230,8 @@ let actionData = {
             return Math.pow((data.totalMomentum + data.actions.overclock.resourceToAdd), .25) *
                 Math.sqrt(data.actions.gossipAroundCoffee.resource) / 1e15;
         },
-        onLevelAtts: [["integration", 25]],
-        expAtts: [["resonance", 1], ["integration", 1]],
+        onLevelAtts: [["integration", 20]],
+        expAtts: [["resonance", 1], ["integration", 1], ["calm", 1]],
         efficiencyAtts: [["resonance", 500]],
         extraButton: Raw.html`
             <span class="button" id='killTheLichMenuButton2' onclick="openKTLMenu()"
@@ -1645,11 +1648,11 @@ let actionData = {
     },
     learnToQuestion: {
         tier: 1, plane: 0, resourceName: "conversations", creationVersion: 6,
-        progressMaxBase: 3e20, progressMaxIncrease: 100,
+        progressMaxBase: 3e20, progressMaxIncrease: 10,
         expToLevelBase: 10, expToLevelIncrease: 1,
-        efficiencyBase: .001, maxLevel: 10,
+        efficiencyBase: .001, maxLevel: 20,
         unlockCost: 1e15, visible: false, unlocked: false, purchased: false,
-        onLevelAtts: [["confidence", 20], ["awareness", 5]],
+        onLevelAtts: [["confidence", 4], ["charm", 4], ["awareness", 2]],
         expAtts: [["charm", 1], ["resonance", 1]],
         efficiencyAtts: [["charm", 600]],
         actionTriggers: [
@@ -1664,7 +1667,7 @@ let actionData = {
         expToLevelBase: 10, expToLevelIncrease: 1,
         efficiencyBase: .00001, maxLevel: 20,
         unlockCost: 5e17, visible: false, unlocked: false, purchased: false,
-        onLevelAtts: [["savvy", 5], ["observation", 5]],
+        onLevelAtts: [["savvy", 2], ["observation", 2]],
         expAtts: [["charm", 1]],
         efficiencyAtts: [["influence", 1100]],
         actionTriggers: [
@@ -1677,7 +1680,7 @@ let actionData = {
         expToLevelBase: 10, expToLevelIncrease: 1,
         efficiencyBase: .00001, maxLevel: 20,
         unlockCost: 5e18, visible: false, unlocked: false, purchased: false,
-        onLevelAtts: [["leverage", 5], ["concentration", 2]],
+        onLevelAtts: [["leverage", 3], ["concentration", 1]],
         expAtts: [["charm", 1]],
         efficiencyAtts: [["influence", 1200]],
         actionTriggers: [
@@ -1689,7 +1692,7 @@ let actionData = {
         expToLevelBase: 10, expToLevelIncrease: 1,
         efficiencyBase: .00001, maxLevel: 20,
         unlockCost: 5e24, visible: false, unlocked: false, purchased: false,
-        onLevelAtts: [["savvy", 5], ["observation", 5]],
+        onLevelAtts: [["savvy", 3], ["observation", 3]],
         expAtts: [["charm", 1]],
         efficiencyAtts: [["influence", 1300]],
         actionTriggers: [
@@ -1702,7 +1705,7 @@ let actionData = {
         expToLevelBase: 10, expToLevelIncrease: 1,
         efficiencyBase: .00001, maxLevel: 20,
         unlockCost: 5e26, visible: false, unlocked: false, purchased: false,
-        onLevelAtts: [["leverage", 5], ["concentration", 3]],
+        onLevelAtts: [["leverage", 4], ["concentration", 2]],
         expAtts: [["charm", 1]],
         efficiencyAtts: [["influence", 1400]],
         actionTriggers: [
@@ -1714,7 +1717,7 @@ let actionData = {
         expToLevelBase: 10, expToLevelIncrease: 1,
         efficiencyBase: .00001, maxLevel: 20,
         unlockCost: 1e32, visible: false, unlocked: false, purchased: false,
-        onLevelAtts: [["integration", 5]],
+        onLevelAtts: [["integration", 3]],
         expAtts: [["charm", 1], ["resonance", 1]],
         efficiencyAtts: [["influence", 1500]],
         actionTriggers: [
@@ -1724,7 +1727,7 @@ let actionData = {
     },
     askAboutGoals: {
         tier: 1, plane: 0, resourceName: "conversations", creationVersion: 6,
-        progressMaxBase: 3e37, progressMaxIncrease: 4,
+        progressMaxBase: 3e37, progressMaxIncrease: 5,
         expToLevelBase: 10, expToLevelIncrease: 1,
         efficiencyBase: .00001, maxLevel: 20,
         unlockCost: 1e31, visible: false, unlocked: false, purchased: false,
@@ -1738,7 +1741,7 @@ let actionData = {
     },
     talkAboutPassions: {
         tier: 1, plane: 0, resourceName: "conversations", creationVersion: 6,
-        progressMaxBase: 3e39, progressMaxIncrease: 4,
+        progressMaxBase: 3e39, progressMaxIncrease: 6,
         expToLevelBase: 10, expToLevelIncrease: 1,
         efficiencyBase: .00001, maxLevel: 20,
         unlockCost: 1e33, visible: false, unlocked: false, purchased: false,
@@ -1750,7 +1753,7 @@ let actionData = {
     },
     talkAboutFears: {
         tier: 1, plane: 0, resourceName: "conversations", creationVersion: 6,
-        progressMaxBase: 3e40, progressMaxIncrease: 4,
+        progressMaxBase: 3e40, progressMaxIncrease: 6,
         expToLevelBase: 10, expToLevelIncrease: 1,
         efficiencyBase: .00001, maxLevel: 20,
         unlockCost: 1e34, visible: false, unlocked: false, purchased: false,
@@ -1762,7 +1765,7 @@ let actionData = {
     },
     askAboutRelationships: {
         tier: 1, plane: 0, resourceName: "conversations", creationVersion: 6,
-        progressMaxBase: 3e40, progressMaxIncrease: 4,
+        progressMaxBase: 3e40, progressMaxIncrease: 5,
         expToLevelBase: 10, expToLevelIncrease: 1,
         efficiencyBase: .00001, maxLevel: 20,
         unlockCost: 2e34, visible: false, unlocked: false, purchased: false,
@@ -1794,7 +1797,7 @@ let actionData = {
         expToLevelBase: 10, expToLevelIncrease: 1,
         efficiencyBase: .00001, maxLevel: 5,
         unlockCost: 2e39, visible: false, unlocked: false, purchased: false,
-        onLevelAtts: [["ambition", 20], ["archmagery", 20]],
+        onLevelAtts: [["ambition", 20], ["archmagery", 10]],
         expAtts: [["charm", 1]],
         efficiencyAtts: [["influence", 1800], ["archmagery", 600]],
         actionTriggers: [
@@ -1807,7 +1810,7 @@ let actionData = {
         expToLevelBase: 6, expToLevelIncrease: 1,
         efficiencyBase: .00001, maxLevel: 4,
         unlockCost: 2e41, visible: false, unlocked: false, purchased: false,
-        onLevelAtts: [["influence", 25], ["integration", 25]],
+        onLevelAtts: [["influence", 25], ["integration", 10]],
         expAtts: [["control", 1], ["amplification", 1], ["wizardry", 1], ["archmagery", 1], ["spellcraft", 1]],
         efficiencyAtts: [["influence", 1000]],
         actionTriggers: [
@@ -1816,10 +1819,10 @@ let actionData = {
     },
     joinWizardSociety: {
         tier: 1, plane: 0, resourceName: "conversations", creationVersion: 6,
-        progressMaxBase: 3e49, progressMaxIncrease: 4,
+        progressMaxBase: 3e60, progressMaxIncrease: 4,
         expToLevelBase: 10, expToLevelIncrease: 1,
         efficiencyBase: .00001, maxLevel: 20,
-        unlockCost: 2e43, visible: false, unlocked: false, purchased: false,
+        unlockCost: 2e50, visible: false, unlocked: false, purchased: false,
         onLevelAtts: [["confidence", 5], ["wizardry", 5]],
         expAtts: [["charm", 1]],
         efficiencyAtts: [["confidence", 1000]],
@@ -1852,7 +1855,6 @@ let actionData = {
         expAtts: [],
         efficiencyAtts: [["confidence", 1000]],
         actionTriggers: [
-            ["level_1", "reveal", "practiceIncantations"]
         ]
     },
     showOffSpells: {
@@ -1933,7 +1935,6 @@ let actionData = {
         expAtts: [["charm", 1]],
         efficiencyAtts: [["confidence", 1000]],
         actionTriggers: [
-            ["level_10", "reveal", "practicePronunciation"]
         ]
     },
     talkToKeeperSimeon: {
@@ -2051,7 +2052,7 @@ let actionData = {
     },
     forgottenShrine: {
         tier: 1, plane: 0, creationVersion: 6,
-        progressMaxBase: 6e31, progressMaxIncrease: 1,
+        progressMaxBase: 2e32, progressMaxIncrease: 1,
         expToLevelBase: 10, expToLevelIncrease: 1,
         efficiencyBase: .01, maxLevel: 1,
         unlockCost: 2e32, visible: false, unlocked: false, purchased: true,
@@ -2078,8 +2079,8 @@ let actionData = {
     },
     humOldTune: {
         tier: 1, plane: 0, creationVersion: 6,
-        progressMaxBase: 1e35, progressMaxIncrease: 100,
-        expToLevelBase: 1, expToLevelIncrease: 1,
+        progressMaxBase: 1e35, progressMaxIncrease: 10,
+        expToLevelBase: 1, expToLevelIncrease: 10,
         efficiencyBase: .01, maxLevel: 2,
         unlockCost: 2e34, visible: false, unlocked: false, purchased: false,
         onLevelAtts: [["legacy", 100], ["pulse", 20]],
@@ -2107,28 +2108,27 @@ actionData = {
 
     standStraighter: {
         tier: 1, plane: 0, creationVersion: 6,
-        progressMaxBase: 1e39, progressMaxIncrease: 10,
+        progressMaxBase: 1e80, progressMaxIncrease: 200,
         expToLevelBase: 10, expToLevelIncrease: 1,
-        efficiencyBase: 1, maxLevel: 5,
-        unlockCost: 1e33, visible: false, unlocked: false, purchased: false,
-        onLevelAtts: [["awareness", 10], ["coordination", 10]],
-        expAtts: [["endurance", 1], ["control", 1]],
-        efficiencyAtts: [],
+        efficiencyBase: .0001, maxLevel: 1,
+        unlockCost: 1e51, visible: false, unlocked: false, purchased: false,
+        onLevelAtts: [["awareness", 5], ["control", 5], ["impedance", -1]],
+        expAtts: [["concentration", 1], ["endurance", 1], ["confidence", 1]],
+        efficiencyAtts:[["energy", 1700]],
         actionTriggers: [
-            ["level_4", "reveal", "walkAware"]
+            ["level_8", "reveal", "walkAware"]
         ]
     },
     walkAware: {
         tier: 1, plane: 0, creationVersion: 6,
-        progressMaxBase: 1e45, progressMaxIncrease: 10,
+        progressMaxBase: 1e95, progressMaxIncrease: 20,
         expToLevelBase: 10, expToLevelIncrease: 1,
-        efficiencyBase: 1, maxLevel: 5,
-        unlockCost: 1e37, visible: false, unlocked: false, purchased: false,
-        onLevelAtts: [["awareness", 10], ["coordination", 10]],
-        expAtts: [["endurance", 1], ["control", 1]],
-        efficiencyAtts: [],
+        efficiencyBase: .0001, maxLevel: 10,
+        unlockCost: 1e61, visible: false, unlocked: false, purchased: false,
+        onLevelAtts: [["awareness", 10], ["observation", 10]],
+        expAtts: [["concentration", 1], ["endurance", 1], ["control", 1]],
+        efficiencyAtts: [["energy", 1800]],
         actionTriggers: [
-            ["level_4", "reveal", "walkAware"]
         ]
     },
     projectConfidence: {

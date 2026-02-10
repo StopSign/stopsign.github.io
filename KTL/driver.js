@@ -111,9 +111,10 @@ function gameTick() {
             if (!checkLevelUp(actionObj, dataObj)) {
                 break;
             }
-            actionObj.expToAddMult = calcUpgradeMultToExp(actionObj.actionVar);
-            actionObj.expToAdd = actionObj.expToAddBase * actionObj.expToAddMult;
         }
+        //visual in case of level
+        actionObj.expToAddMult = calcUpgradeMultToExp(actionObj.actionVar);
+        actionObj.expToAdd = actionObj.expToAddBase * actionObj.expToAddMult;
     }
 
 
@@ -146,7 +147,7 @@ function calcDeltas() {
         let generatorObj = data.actions[actionVar];
         let generatorDataObj = actionData[actionVar];
         if (generatorDataObj.isGenerator && generatorObj.resourceToAdd > 0) {
-            let targetVar = generatorObj.generatorTarget || actionVar;
+            let targetVar = generatorDataObj.generatorTarget || actionVar;
             let targetObj = data.actions[targetVar];
             if (targetObj) {
                 targetObj.resourceIncrease += generatorObj.resourceToAdd * generatorObj.progressGain / generatorObj.progressMax;
@@ -369,7 +370,13 @@ function checkProgressCompletion(actionObj, dataObj) {
         if(dataObj.onCompleteCustom) {
             dataObj.onCompleteCustom();
         }
-        actionAddExp(actionObj);
+        actionObj.expToAddMult = calcUpgradeMultToExp(actionObj.actionVar);
+        actionObj.expToAdd = actionObj.expToAddBase * actionObj.expToAddMult;
+        actionAddExp(actionObj, actionObj.expToAdd);
+
+        //visual in case of level
+        actionObj.expToAddMult = calcUpgradeMultToExp(actionObj.actionVar);
+        actionObj.expToAdd = actionObj.expToAddBase * actionObj.expToAddMult;
 		
 		//If we're at max level "refund" the remaining "paid" amount.  Realistically, this mostly matters for spells like Overclock
 		//This won't retroactivly refund nodes that overleveled in a previoius version, but that'll be fixed when the amulet

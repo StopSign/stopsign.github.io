@@ -342,41 +342,10 @@ It continues, capturing fraction ancientCoin of your fleeting soul and sending i
         <div class='menuTitle'>Set Overclock's Target: Kill the Lich!</div>
         <div class="menuSeparator"></div>
         <div id="lsDynamicContent" class="dynamicContent">
-            <br>
-            (Story) The army you've been helping finally has enough to strike at the lich itself, located high in a monolith. Tearing down both the physical and magical defenses the lich has thrown in the army's way, the Legion of Hope prepares to give a final strike.<br><br>
-
-            "Enough", the Lich roars, throwing up shields with one skeletal hand and preparing a spell with the other. "I am not fated to fall here! Someone is interfering, and I will silence their echoes!" Right as its final shield cracks, the Lich waves the hand with the gathered magic forward, and consecutive blasts of powerful silvery magic sweep out, enveloping everyone in the Legion. Your amulet glows bright, and cracks spread immediately across its surface, quickly envoloping the entire piece until the whole thing breaks apart, revealing a single shining coin underneath which you quickly grasp onto. You barely have time to send a message into it before the next blast of the Lich's magic reaches you, ending your existence.<br><br>
-
-            <div class="menuSeparator"></div>
-            Your legacy has been severed. When you reset with this you will lose:
-            <ul>
-                <li>Legacy, Ancient Coins, and Ancient Whispers</li>
-                <li>All Attribute, Multiplier, and New Action Upgrades</li>
-                <li>Unlocked actions in magic</li>
-            </ul>
-
-            You will keep:
-            <ul>
-                <li>All Unique Amulet upgrades</li>
-                <li>The number of times an action has been unlocked</li>
-                <li>Permanent Focus Multiplier</li>
-            </ul>
-
-            You will gain:
-            <ul>
-                <li>x3 Legacy gain up to your highest Legacy ever</li>
-                <li>+1 Lich Coin to spend on new upgrades when you reach the Northern Wastes again</li>
-                <li>More Unique Upgrades</li>
-                <li>More Multiplier Upgrades</li>
-                <li>More New Action Upgrades - including the Library, for more spells beyond the 4th Circle</li>
-                <li>The 4th tab - Infusions - and +1 Death Energy</li>
-                <li>Access to Challenges</li>
-                <li>+1 max level to the action Kill the Lich</li>
-            </ul>
 
         </div>
         <input type="checkbox" id="confirmLS"><label for="confirmLS">Confirm</label>
-        <button class="continueButton" onclick="legacySeveranceReset(false)">Reset</button>
+        <button class="continueButton" onclick="legacySeveranceReset(false)">Legacy Severance Reset</button>
     </div>
 </div>
 
@@ -397,8 +366,10 @@ It continues, capturing fraction ancientCoin of your fleeting soul and sending i
 <script src="actionData2.js"></script>
 <script src="actionData3.js"></script>
 <script src="actionData4.js"></script>
+<script src="actionData5.js"></script>
 <script src="events.js"></script>
 <script src="engine.js"></script>
+<script src="debugValues.js"></script>
 <script src="helpers/hotkeys.js"></script>
 <script src="helpers/interval2.js"></script>
 <script src="data/textData.js"></script> <!-- must go after actionData-->

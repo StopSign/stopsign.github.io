@@ -119,9 +119,9 @@
     --bravery-color: #b23c22;
     --bravery-color-dim: #802e1d;
     --bravery-color-bg: #391610;
-    --spark-color: #1a9480;
-    --spark-color-dim: #15675a;
-    --spark-color-bg: #0b2e29;
+    --charge-color: #cdbb22;
+    --charge-color-dim: #948718;
+    --charge-color-bg: #58500e;
     --echoes-color: #dcd0e7;
     --echoes-color-dim: #90839b;
     --echoes-color-bg: #5d5269;
@@ -137,9 +137,9 @@
     --lifeEnergy-color: #52db12;
     --lifeEnergy-color-dim: #41b10e;
     --lifeEnergy-color-bg: #32800c;
-    --decay-color: #75b811;
-    --decay-color-dim: #588a0d;
-    --decay-color-bg: #3c5e09;
+    --silt-color: #b08d57;
+    --silt-color-dim: #8c6f45;
+    --silt-color-bg: #5c492d;
     /*--exp-color: #25b1cc;*/
     /*--exp-color-dim: #1e899e;*/
     /*--exp-color-bg: #0a2e36;*/

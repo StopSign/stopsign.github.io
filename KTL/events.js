@@ -44,15 +44,38 @@ function setSliderUI(fromAction, toAction, newValue) {
     }
 }
 
+function adjustNWLevels() {
+    data.actions.destroyEasternMonolith.maxLevel = 1 + data.lichKills;
+}
 
-function adjustMaxLevels() {
+//only need to happen on amulet use, since they're saved to the action
+function adjustBrythalMaxLevels() {
+    data.actions.bodyAwareness.maxLevel = actionData.bodyAwareness.maxLevel +
+        data.upgrades.valueMyBody.upgradePower;
+    if(data.upgrades.pickUpValuablePlants.upgradePower > 0) {
+        revealAction("makeMoney")
+        revealAction("spendMoney")
+    }
+    if(data.upgrades.startCasualChats.upgradePower > 0) {
+        revealAction("socialize")
+        revealAction("meetPeople")
+    }
+    applyUpgradeEffects()
+}
+
+//because the magic actions load unlocked, they don't re-trigger adding maxing levels
+function adjustMagicMaxLevels() {
+    data.actions.spellResearch.maxLevel = actionData.spellResearch.maxLevel +
+        data.upgrades.valueMyResearch.upgradePower;
     data.actions.etchTheCircle.maxLevel = 1 +
         data.actions.chargeInk.level +
         (data.actions.locateWeakness.unlocked?1:0) +
         (data.actions.boldenLines.unlocked?1:0) +
         (data.actions.chargeInk.unlocked?1:0);
     data.actions.condenseMana.maxLevel = 5 +
-        (data.actions.spinMana.unlocked?5:0);
+        (data.actions.spinMana.unlocked?5:0)+
+        (data.actions.accelerateManaFlow.unlocked?5:0)+
+        (data.actions.loopTheCircuit.unlocked?5:0);
     data.actions.infuseTheHide.maxLevel = 1 +
         (data.actions.boldenLines.unlocked?2:0) +
         (data.actions.grindPigments.unlocked?2:0);
@@ -78,7 +101,6 @@ function adjustMaxLevels() {
         (data.actions.illuminate.unlocked?1:0) +
         (data.actions.identifyItem.unlocked?1:0) +
         (data.actions.detectMagic.unlocked?1:0);
-
 }
 
 
