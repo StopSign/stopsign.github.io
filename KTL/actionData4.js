@@ -29,6 +29,7 @@ actionData = {
                 actionObj.actionPower * actionObj.upgradeMult * (actionObj.efficiency/100);
             actionObj.expToAddBase = actionObj.resourceToAdd;
             actionObj.expToAdd = actionObj.expToAddBase * actionObj.expToAddMult;
+            data.actions[this.generatorTarget].showResourceAdded = actionObj.resourceToAdd;
         },
         actionPowerFunction: function(resource) {
             return resource;
@@ -49,7 +50,7 @@ actionData = {
         progressMaxBase:10, progressMaxIncrease:1,
         expToLevelBase:5, expToLevelIncrease:33,
         actionPowerBase:1, actionPowerMult:1, actionPowerMultIncrease:2,
-        efficiencyBase:.05,
+        efficiencyBase:.05, showResourceAdded:true,
         unlockCost:.25, visible:false, unlocked:false, purchased: true, hasUpstream:false,
         isGenerator:true, generatorTarget:"dissipation", generatorSpeed:10,
         onCompleteCustom: function() {
@@ -72,6 +73,7 @@ actionData = {
                 actionObj.actionPower * actionObj.upgradeMult * (actionObj.efficiency/100);
             actionObj.expToAddBase = actionObj.resourceToAdd;
             actionObj.expToAdd = actionObj.expToAddBase * actionObj.expToAddMult;
+            data.actions[this.generatorTarget].showResourceAdded = actionObj.resourceToAdd;
         },
         actionPowerFunction: function(resource) {
             return resource;
@@ -96,7 +98,7 @@ actionData = {
         tier:1, plane:1, resourceName:"charge", backwardsEfficiency: true, creationVersion: 6,
         progressMaxBase:100, progressMaxIncrease:4,
         expToLevelBase:1, expToLevelIncrease:1,
-        efficiencyBase:.1,
+        efficiencyBase:.1, showResourceAdded:true,
         unlockCost:2.5, visible:false, unlocked:false, purchased: true, hasUpstream:false,
         onLevelAtts:[["impedance", -1]],
         expAtts:[["resonance", 1]],
@@ -112,7 +114,7 @@ actionData = {
         progressMaxBase:10, progressMaxIncrease:1,
         expToLevelBase:2, expToLevelIncrease:4,
         actionPowerBase:1, actionPowerMult:1, actionPowerMultIncrease:1.5,
-        efficiencyBase:.15,
+        efficiencyBase:.15, showResourceAdded:true,
         unlockCost:0, visible:false, unlocked:false, purchased: true, hasUpstream:false,
         isGenerator:true, generatorTarget:"poolMana", generatorSpeed:1,
         onCompleteCustom: function() {
@@ -139,6 +141,7 @@ actionData = {
             actionObj.resourceToAdd = Math.sqrt(data.actions.dissipation.resource) * actionObj.actionPower * (actionObj.efficiency/100) * actionObj.upgradeMult;
             actionObj.expToAddBase = actionObj.resourceToAdd;
             actionObj.expToAdd = actionObj.expToAddBase * actionObj.expToAddMult;
+            data.actions[this.generatorTarget].showResourceAdded = actionObj.resourceToAdd;
         },
         updateUpgradeMult:function() {
             let upgradeMult = 1;
@@ -193,6 +196,7 @@ actionData = {
             actionObj.resourceToAdd = actionObj.actionPower * actionObj.upgradeMult * (actionObj.efficiency/100);
             actionObj.expToAddBase = Math.pow(actionObj.resource, 2) * actionData.awakenYourGrimoire.manaQuality() * (actionObj.efficiency/100);
             actionObj.expToAdd = actionObj.expToAddBase * actionObj.expToAddMult;
+            data.actions[this.generatorTarget].showResourceAdded = actionObj.resourceToAdd;
         },
         updateUpgradeMult:function() {
             let upgradeMult = 1;
@@ -785,7 +789,7 @@ actionData = {
         tier:0, plane:1, resourceName:"arcana", creationVersion: 6,
         progressMaxBase:3, progressMaxIncrease:3,
         expToLevelBase:3, expToLevelIncrease:1,
-        efficiencyBase:.01, maxLevel:3,
+        efficiencyBase:.01, maxLevel:3, showResourceAdded:true,
         unlockCost:10, visible:false, unlocked:false, purchased: true, hasUpstream:false,
         onLevelAtts:[["pulse", 10]],
         expAtts:[],

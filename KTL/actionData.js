@@ -64,7 +64,7 @@ let actionData = {
         actionPowerBase: 100, actionPowerMult: 1,
         actionPowerMultIncrease: 1.1, efficiencyBase: .1, efficiencyIdeal:40,
         unlockCost: 0, visible: true, unlocked: true, purchased: true, isGenerator: true,
-        generatorSpeed: 10, hasUpstream: false,
+        generatorSpeed: 10, hasUpstream: false, showResourceAdded:true,
         onUnlock: function () {
         },
         onCompleteCustom: function () {
@@ -102,9 +102,10 @@ let actionData = {
             let actionObj = data.actions.overclock;
             actionObj.progressGain = this.generatorSpeed * (actionObj.efficiency / 100);
             actionObj.actionPower = actionObj.actionPowerBase *
-                actionObj.actionPowerMult * (actionObj.efficiency / 100);
+                actionObj.actionPowerMult;
             actionObj.resourceToAdd = actionObj.actionPower *
-                actionObj.upgradeMult * spellMult;
+                actionObj.upgradeMult * spellMult * (actionObj.efficiency / 100);
+            actionObj.showResourceAdded = actionObj.resourceToAdd;
         },
         onLevelCustom: function () {
             actionData.overclock.updateMults();
@@ -371,12 +372,13 @@ let actionData = {
 
             actionObj.progressGain = this.generatorSpeed * (actionObj.efficiency / 100);
             actionObj.actionPower = actionObj.actionPowerBase *
-                actionObj.actionPowerMult * (actionObj.efficiency / 100);
+                actionObj.actionPowerMult;
             let resourceTaken = actionObj.resource * calcTierMult(this.tier);
             actionObj.resourceToAdd = this.actionPowerFunction(resourceTaken) *
-                actionObj.actionPower * actionObj.upgradeMult * spellMult;
+                actionObj.actionPower * actionObj.upgradeMult * spellMult * (actionObj.efficiency / 100);
             actionObj.expToAddBase = actionObj.resourceToAdd;
             actionObj.expToAdd = actionObj.expToAddBase * actionObj.expToAddMult;
+            data.actions[this.generatorTarget].showResourceAdded = actionObj.resourceToAdd;
         },
         updateUpgradeMult: function () {
             let upgradeMult = 1;
@@ -412,7 +414,7 @@ let actionData = {
         tier: 2, plane: 0, resourceName: "coins", creationVersion: 6,
         progressMaxBase: .5, progressMaxIncrease: 10,
         expToLevelBase: 10, expToLevelIncrease: 1,
-        efficiencyBase: .5, maxLevel: 10,
+        efficiencyBase: .5, maxLevel: 10, showResourceAdded:true,
         unlockCost: 50, visible: false, unlocked: false, purchased: true, hasUpstream: false, keepParentAutomation:true,
         onLevelAtts: [["energy", 15]],
         expAtts: [["savvy", 1]],
@@ -778,6 +780,7 @@ let actionData = {
 
             actionObj.expToAddBase = Math.log10(resourceTaken);
             actionObj.expToAdd = actionObj.expToAddBase * actionObj.expToAddMult;
+            data.actions[this.generatorTarget].showResourceAdded = actionObj.resourceToAdd;
         },
         onLevelCustom: function () {
             data.actions.invest.actionPowerBase = 1 + data.actions.invest.level / 1000;
@@ -812,7 +815,7 @@ let actionData = {
         tier: 2, plane: 0, resourceName: "fortune", creationVersion: 6, hasUpstream: false,
         progressMaxBase: 10, progressMaxIncrease: 4,
         expToLevelBase: 10, expToLevelIncrease: 1,
-        efficiencyBase: .1, maxLevel: 5,
+        efficiencyBase: .1, maxLevel: 5, showResourceAdded:true,
         unlockCost: 200, visible: false, unlocked: false, purchased: false, keepParentAutomation:true,
         onLevelAtts: [["ambition", 10]],
         expAtts: [["vision", 1]],
@@ -1116,11 +1119,12 @@ let actionData = {
 
             actionObj.progressGain = this.generatorSpeed * (actionObj.efficiency / 100);
             actionObj.actionPower = actionObj.actionPowerBase *
-                actionObj.actionPowerMult * (actionObj.efficiency / 100);
+                actionObj.actionPowerMult;
             let resourceTaken = actionObj.resource * calcTierMult(this.tier);
-            actionObj.resourceToAdd = this.actionPowerFunction(resourceTaken) * actionObj.actionPower * actionObj.upgradeMult * spellMult;
+            actionObj.resourceToAdd = this.actionPowerFunction(resourceTaken) * actionObj.actionPower * actionObj.upgradeMult * spellMult * (actionObj.efficiency / 100);
             actionObj.expToAddBase = actionObj.resourceToAdd;
             actionObj.expToAdd = actionObj.expToAddBase * actionObj.expToAddMult;
+            data.actions[this.generatorTarget].showResourceAdded = actionObj.resourceToAdd;
         },
         updateUpgradeMult: function () {
             let upgradeMult = 1;
@@ -1156,7 +1160,7 @@ let actionData = {
         tier: 1, plane: 0, resourceName: "conversations", creationVersion: 6,
         progressMaxBase: 1, progressMaxIncrease: 1.5,
         expToLevelBase: 20, expToLevelIncrease: 1,
-        efficiencyBase: .5, maxLevel: 50,
+        efficiencyBase: .5, maxLevel: 50, showResourceAdded:true,
         unlockCost: .5, visible: false, unlocked: false, purchased: true, hasUpstream: false, keepParentAutomation:true,
         onLevelAtts: [["influence", 2]],
         expAtts: [["charm", 1]],
@@ -1201,7 +1205,7 @@ let actionData = {
         progressMaxBase: 300000, progressMaxIncrease: 2e4,
         expToLevelBase: 1, expToLevelIncrease: 1,
         efficiencyBase: .01,
-        unlockCost: 0,
+        unlockCost: 0, showResourceAdded:true,
         visible: false, unlocked: false, purchased: true, hasUpstream: false, keepParentAutomation:true,
         ignoreConsume:true,
         onLevelCustom: function () {
@@ -1221,8 +1225,8 @@ let actionData = {
         completeFromOverclock: function () {
             let actionObj = data.actions.hearAboutTheLich;
             if (actionObj.unlocked) {
-                actionObj.actionPower = actionData.hearAboutTheLich.calcFearGain();
-                actionObj.resourceToAdd = actionObj.actionPower;
+                actionObj.resourceToAdd = actionData.hearAboutTheLich.calcFearGain();
+                actionObj.showResourceAdded = actionObj.resourceToAdd;
                 actionObj.resource += actionObj.resourceToAdd;
             }
         },

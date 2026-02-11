@@ -102,6 +102,8 @@ function generateActionDisplay(actionVar) {
     queueCache(`${actionVar}UnlockedCountContainer`)
     queueCache(`${actionVar}UnlockedCount`)
 
+    queueCache(`${actionVar}SpellCastCount`)
+
 
 
     let iconImgName = (dataObj.isGenerator?"gear":dataObj.isSpell?"spell":"lightning") + dataObj.tier;
@@ -110,7 +112,7 @@ function generateActionDisplay(actionVar) {
         <span style="position:absolute;top:-43px;left:-40px;width:40px;height:40px;" class="showthat" onmouseover="hoveringIcon('${actionVar}')" onmouseleave="stopHoveringIcon('${actionVar}')">
             <img class="${dataObj.isGenerator?'generatorIconSvg':dataObj.isSpell?"spellIconSvg":'actionIconSvg'}" src="img/${iconImgName}.svg" alt="${iconImgName}" style="width:100%;height:100%;" />
             <div class="showthisUp" style="font-size:16px;width:350px">
-                <div style="font-size:20px;">Tier ${dataObj.tier + (dataObj.isGenerator?" Generator":dataObj.isSpell?" Spell":" Action")} 
+                <div style="font-size:20px;">Tier ${dataObj.tier + (dataObj.isGenerator?" Generator":dataObj.isSpell?` Spell of the ${numToOrdinal(dataObj.circle)} Circle`:" Action")} 
                 </div>
                 <span id="${actionVar}IconText"></span>
             
@@ -151,8 +153,14 @@ function generateActionDisplay(actionVar) {
                 
                 <div id="${actionVar}UnlockedCountContainer" style="display:none">
                     <br>
-                    Times Unlocked: <span id="${actionVar}UnlockedCount" style="font-weight:bold;"></span>
+                    Unlocked #: <span id="${actionVar}UnlockedCount" style="font-weight:bold;"></span>
                 </div>
+                
+                ${!dataObj.isSpell ? "" : `
+                    <br>
+                    Cast #: <span id="${actionVar}SpellCastCount" style="font-weight:bold;"></span>
+                `}
+                
             </div>
         </span>
     `
@@ -161,7 +169,8 @@ function generateActionDisplay(actionVar) {
     queueCache(`${actionVar}Title`);
     queueCache(`${actionVar}Tier`);
     queueCache(`${actionVar}Resource`);
-    queueCache(`${actionVar}ResourceToAdd`);
+    queueCache(`${actionVar}ShowResourceAdded`);
+    queueCache(`${actionVar}ShowExpAdded`);
     queueCache(`${actionVar}ResourceRetrieved`);
     queueCache(`${actionVar}Level`);
     queueCache(`${actionVar}MaxLevel`);
@@ -191,8 +200,11 @@ function generateActionDisplay(actionVar) {
             <span style="font-size:18px;font-weight:bold;" id="${actionVar}Resource">0</span> 
             <span style="color:${resourceColor};font-size:16px;font-weight:bold;">${decamelizeWithSpace(dataObj.resourceName)}</span>
             <span style="font-size:16px;font-weight:bold" id="${actionVar}ResourceRetrieved"></span>
-            <span style="font-size:14px;color:var(--text-muted)">${(dataObj.isGenerator||dataObj.showToAdd)?`(+<span id="${actionVar}ResourceToAdd" 
-                style="color:var(--text-primary);font-weight:bold;">???</span>)`:""}</span><br>
+            ${dataObj.showExpAdded?`(<span id="${actionVar}ShowExpAdded" 
+                style="color:var(--exp-color);font-weight:bold;">???</span>)`:""}
+            ${dataObj.showResourceAdded?`(<span id="${actionVar}ShowResourceAdded" 
+                style="color:${resourceColor};font-weight:bold;">???</span>)`:""}
+            <br>
             <span style="font-size:14px;position:relative;color:var(--text-muted)">
                 ${!dataObj.isSpell?"Level ":"Charges "}<span id="${actionVar}Level" style="color:var(--text-primary);font-weight:bold;">0</span>
                 ${actionObj.maxLevel !== undefined ? ` / <span id="${actionVar}MaxLevel" style="color:var(--text-primary);font-weight:bold;">0</span>` : ""} | 
@@ -279,7 +291,7 @@ function generateActionDisplay(actionVar) {
     let pbar = Raw.html`
         <div style="width:100%;height:18px;position:relative;text-align:left;border-top:2px solid;">
             <div id="${actionVar}ProgressBarInner" style="width:30%;background-color:${resourceColor};height:100%;position:absolute;"></div>
-            <div id="${actionVar}ProgressBarLabels" style="position:absolute;top:1px;left:4px;width:97%;color:var(--text-muted)">
+            <div id="${actionVar}ProgressBarLabels" style="position:absolute;top:1px;left:4px;width:97%;color:var(--text-muted);text-shadow:1px 1px 2px var(--text-dark);">
                 <span style="color:var(--text-primary)">
                     <span id="${actionVar}Progress" style="font-weight:bold;">0</span> / 
                     <span id="${actionVar}ProgressMax" style="font-weight:bold;">1</span>
@@ -300,7 +312,7 @@ function generateActionDisplay(actionVar) {
     let expBar = Raw.html`
         <div style="width:100%;height:18px;position:relative;text-align:left;border-bottom:2px solid;">
             <div id="${actionVar}ExpBarInner" style="width:30%;background-color:var(--exp-color);height:100%;position:absolute"></div>
-            <div id="${actionVar}ExpBarLabels" style="position:absolute;top:1px;left:4px;width:97%;color:var(--text-muted)">
+            <div id="${actionVar}ExpBarLabels" style="position:absolute;top:1px;left:4px;width:97%;color:var(--text-muted);text-shadow:1px 1px 2px var(--text-dark);">
                 <span style="color:var(--text-primary)">
                     <b><span id="${actionVar}Exp">0</span></b> / 
                     <b><span id="${actionVar}ExpToLevel">1</span></b>
@@ -339,22 +351,28 @@ let maxLevelTop = (data.gameSettings.viewDeltas && data.gameSettings.viewRatio) 
 
     queueCache(`${actionVar}ActionPower`);
 
-    let onLevelText = Raw.html`
+    let onLevelText = `
         On Level up:<br>
-        ${dataObj.isGenerator || actionObj.progressMaxIncrease === 1 ? "" : `x<b>${actionObj.progressMaxIncrease}</b> progress required to complete<br>`}
+        ${dataObj.isGenerator || dataObj.progressMaxIncrease === 1 ? "" : `x<b>${dataObj.progressMaxIncrease}</b> progress required to complete<br>`}
         ${actionObj.expToLevelIncrease === 1 ? "" : `x<b>${actionObj.expToLevelIncrease}</b> exp required to level<br>`}
         ${actionObj.actionPowerMultIncrease === 1 ?"" : `x<b>${actionObj.actionPowerMultIncrease}</b> to Action Power per level <br>`}
         ${!dataObj.isGenerator ? "" : `x<b><span id="${actionVar}ActionPower"></b> total Action Power<br>`}
         ${dataObj.onLevelText ? dataObj.onLevelText[language]:""}`;
+
+    if(dataObj.progressMaxIncrease === 1 && actionObj.expToLevelIncrease === 1 && actionObj.actionPowerMultIncrease === 1 && !dataObj.onLevelText) {
+        onLevelText = ""
+    }
 
 
     queueCache(`${actionVar}_infoContainer`);
 
     let levelInfoContainer = Raw.html`
         <div id="${actionVar}_infoContainer" style="display:none;padding:5px;max-height:220px;overflow-y:auto;">
-            Tier <b>${dataObj.tier}</b> ${dataObj.isSpell ? "Spell" : dataObj.isGenerator ? "Generator" : "Action"}<br>
-            Speed, found in the title, is Expertise Mult * Base Speed (x<b><span id="${actionVar}EfficiencyBase"></span></b>), capping at <b>100</b>%.<br>
-            ${dataObj.isGenerator?"":(`Consume and send rate is ${calcTierMult(dataObj.tier)*100}% of ${dataObj.resourceName} * speed.<br>`)}<br>
+            <b>Tier ${dataObj.tier} ${dataObj.isSpell ? "Spell" : dataObj.isGenerator ? "Generator" : "Action"}</b>
+            ${dataObj.isGenerator?
+                (!actionHasDownstream(actionVar)?"":
+                    ` sends at a base rate of <b>${calcTierMult(dataObj.tier)*100}% ${dataObj.resourceName}</b>. Final output is scaled by your speed.<br>`):
+                ` consumes and sends at a base rate of <b>${calcTierMult(dataObj.tier)*100}% ${dataObj.resourceName}</b>. Final output is scaled by your speed.<br>`}<br>
             ${onComplete}
             ${onLevelText}
             ${dataObj.extraInfo ? dataObj.extraInfo[language]:""}
@@ -750,7 +768,6 @@ function generateActionEfficiencyAtts(actionObj) {
         </div>`
     }
     queueCache(`${actionVar}EfficiencyMult`);
-    queueCache(`${actionVar}EfficiencyBase`);
     expertiseModsStr += Raw.html`
         <span style="color:var(--text-muted);">Total Speed Mult = x</span><b><span id="${actionVar}EfficiencyMult"></span></b>
     </div>`;
@@ -767,7 +784,6 @@ function generateUnlockText(actionVar) {
         let type = actionTrigger[1];
         let info = actionTrigger[2];
         let extra = actionTrigger[3]; //used for numbers
-
 
         try {
             if (when === "unlock") {

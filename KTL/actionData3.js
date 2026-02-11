@@ -32,6 +32,7 @@ actionData = {
             actionObj.resourceToAdd = actionObj.actionPower * actionObj.upgradeMult * (actionObj.efficiency/100);
             actionObj.expToAddBase = actionObj.resource * (actionObj.efficiency/100);
             actionObj.expToAdd = actionObj.expToAddBase * actionObj.expToAddMult;
+            data.actions[this.generatorTarget].showResourceAdded = actionObj.resourceToAdd;
         },
         updateUpgradeMult:function() {
             let upgradeMult = 1;
@@ -56,7 +57,7 @@ actionData = {
         tier:1, plane:2, resourceName: "bravery", creationVersion: 6,
         progressMaxBase:100, progressMaxIncrease:4,
         expToLevelBase:1, expToLevelIncrease:1,
-        efficiencyBase:.2, isKTL:true, purchased: true,
+        efficiencyBase:.2, isKTL:true, purchased: true, showResourceAdded: true,
         unlockCost:0, visible:false, unlocked:false, hasUpstream: false,
         onLevelAtts:[["hope", 10]],
         expAtts:[["valor", 1]],
@@ -67,11 +68,12 @@ actionData = {
         progressMaxBase:1e29, progressMaxIncrease:2,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:.01, isKTL:true,
-        unlockCost:0, visible:false, unlocked:false, purchased: true, showToAdd:true,
+        unlockCost:0, visible:false, unlocked:false, purchased: true, showResourceAdded:true,
         hideUpstreamLine: true, hasUpstream: false,
         onUnlock: function() {
             let actionObj = data.actions.overclockTargetingTheLich;
             actionObj.resourceToAdd = Math.pow((1+(actionObj.level+1)/10), 3) * actionData.awakenYourGrimoire.manaQuality() * actionObj.upgradeMult;
+            actionObj.showResourceAdded = actionObj.resourceToAdd;
         },
         onLevelCustom: function() {
             if(data.upgrades.rememberTheVictories.upgradePower > 0) {
@@ -81,8 +83,9 @@ actionData = {
             let toAdd = Math.pow((1+actionObj.level/10), 3) * actionData.awakenYourGrimoire.manaQuality() * actionObj.upgradeMult;
 
             addResourceTo(data.actions.fightTheEvilForces, toAdd);
+            actionObj.resourceToAdd = toAdd;
+            actionObj.showResourceAdded = toAdd;
 
-            actionObj.resourceToAdd = Math.pow((1+(actionObj.level+1)/10), 3) * actionData.awakenYourGrimoire.manaQuality() * actionObj.upgradeMult;
         },
         onLevelAtts:[],
         expAtts:[["resonance", 1]],
@@ -97,11 +100,14 @@ actionData = {
         tier:0, plane:2, resourceName:"fight", creationVersion: 6,
         progressMaxBase:10, progressMaxIncrease:1,
         expToLevelBase:1, expToLevelIncrease:1,
-        efficiencyBase:1, isKTL:true, purchased: true,
+        efficiencyBase:1, isKTL:true, purchased: true, showResourceAdded:true,
         actionPowerBase:1, actionPowerMult:1, actionPowerMultIncrease:1, maxLevel:200,
         unlockCost:1, visible:false, unlocked:false, isGenerator:true, generatorSpeed:1, hasUpstream: false,
         onUnlock: function() {
             setSliderUI("fightTheEvilForces", "bridgeOfBone", 100);
+        },
+        updateMults: function() {
+            data.actions.fightTheEvilForces.showResourceAdded = 1;
         },
         onLevelAtts:[["hope", -10]],
         expAtts:[],

@@ -70,6 +70,11 @@ function actionSetBaseVariables(actionObj, dataObj) {
     actionObj.actionPowerMultIncrease = dataObj.actionPowerMultIncrease ? dataObj.actionPowerMultIncrease : 1;
     actionObj.progressMaxIncrease = dataObj.progressMaxIncrease;
     actionObj.visible = dataObj.visible === null ? true : dataObj.visible;
+    actionObj.showResourceAdded = undefined;
+    actionObj.showExpAdded = undefined;
+    if(dataObj.isSpell) {
+        actionObj.spellCastCount = 0;
+    }
 
     actionObj.unlockTime = null;
     actionObj.level1Time = null;
@@ -253,7 +258,7 @@ function checkLevelUp(actionObj, dataObj) {
         actionObj.level1Time = data.secondsPerReset;
     }
     actionObj.level++;
-    actionObj.progressMaxBase *= actionObj.progressMaxIncrease;
+    actionObj.progressMaxBase *= dataObj.progressMaxIncrease;
     actionObj.progressMax = actionObj.progressMaxBase * actionObj.progressMaxMult * calcInstabilityEffect(actionObj.instability);
     actionObj.expToLevelBase *= actionObj.expToLevelIncrease;
     actionObj.expToLevel = actionObj.expToLevelBase * actionObj.expToLevelMult;
@@ -721,6 +726,7 @@ function useCharge(actionVar) {
 
     actionObj.level--;
     actionObj.instability += dataObj.instabilityToAdd / (actionObj.efficiency/100);
+    actionObj.spellCastCount++;
 
     if(actionObj.cooldown) {
         actionObj.cooldownTimer = 0;

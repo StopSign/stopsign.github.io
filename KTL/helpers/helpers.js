@@ -171,6 +171,22 @@ function intToStringRound(value) {
     return Math.floor(value);
 }
 
+function numToOrdinal(n) {
+    const j = n % 10;
+    const k = n % 100;
+
+    if (j === 1 && k !== 11) {
+        return n + "st";
+    }
+    if (j === 2 && k !== 12) {
+        return n + "nd";
+    }
+    if (j === 3 && k !== 13) {
+        return n + "rd";
+    }
+    return n + "th";
+}
+
 function secondsToTime(seconds) {
     if(!seconds || seconds < 0) {
         seconds = "0";

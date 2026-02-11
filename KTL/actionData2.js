@@ -636,15 +636,18 @@ actionData = {
         progressMaxBase:1e66, progressMaxIncrease:1.2,
         expToLevelBase:9, expToLevelIncrease:1,
         efficiencyBase:.05,
-        unlockCost:5e66, visible:false, unlocked:false, purchased: false, showToAdd:true,
+        unlockCost:5e66, visible:false, unlocked:false, purchased: false,
         onUnlock: function() {
-            data.actions.study.resourceToAdd = 1;
+            let actionObj = data.actions.study;
+            actionObj.resourceToAdd = Math.pow((1+actionObj.level/10), 3) * actionObj.upgradeMult;
+            data.actions.researchBySubject.showResourceAdded = actionObj.resourceToAdd;
         },
         onLevelCustom: function() {
             let actionObj = data.actions.study;
             actionObj.resourceToAdd = Math.pow((1+actionObj.level/10), 3) * data.actions.study.upgradeMult;
 
             addResourceTo(data.actions.researchBySubject, actionObj.resourceToAdd);
+            data.actions.researchBySubject.showResourceAdded = actionObj.resourceToAdd;
         },
         updateUpgradeMult: function () {
             let upgradeMult = 1;
@@ -663,7 +666,7 @@ actionData = {
         tier:1, plane:0, resourceName:"research", creationVersion: 6, 
         progressMaxBase:10, progressMaxIncrease:10,
         expToLevelBase:10, expToLevelIncrease:1,
-        efficiencyBase:.1, maxLevel:1,
+        efficiencyBase:.1, maxLevel:1, showResourceAdded:true,
         unlockCost:5, visible:false, unlocked:false, purchased: false, hasUpstream:false, keepParentAutomation:true,
         onLevelAtts:[["comfort", 10]],
         expAtts:[],

@@ -251,7 +251,7 @@ let views = {
             views.updateVal(`${actionVar}${capName}`, data.actions[actionVar][`${nameNoNums}`], "textContent", numberObj[1]);
         }
 
-        //Update visibility even before unlock, because it affecst the shape of it
+        //Update visibility even before unlock, because it affects the shape of it
         if (actionObj.currentMenu === "downstream") {
             for (let downstreamVar of dataObj.downstreamVars) {
                 let downstreamObj = data.actions[downstreamVar];
@@ -304,6 +304,9 @@ let views = {
             views.updateVal(`${actionVar}UnlockedCountContainer`, actionObj.unlockedCount > 0 ? "" : "none", "style.display");
             views.updateVal(`${actionVar}UnlockedCount`, actionObj.unlockedCount, "innerText", 1);
 
+            if(dataObj.isSpell) {
+                views.updateVal(`${actionVar}SpellCastCount`, actionObj.spellCastCount, "innerText", 1);
+            }
         }
 
         //When action should be dim
@@ -362,7 +365,6 @@ let views = {
         }
 
         if(actionObj.currentMenu === "atts") {
-
             for(let expAtt of actionObj.expAtts) {
                 let attVar = expAtt[0];
                 views.updateVal(`${actionVar}_${attVar}AttExpMult`, actionObj[`${attVar}AttExpMult`], "textContent", 3);
@@ -372,7 +374,13 @@ let views = {
                 let attVar = efficiencyAtt[0];
                 views.updateVal(`${actionVar}_${attVar}AttEfficiencyMult`, actionObj[`${attVar}AttEfficiencyMult`], "textContent", 3);
             }
+        }
 
+        if(dataObj.showResourceAdded) {
+            views.updateVal(`${actionVar}ShowResourceAdded`, actionObj.showResourceAdded === undefined?"???":"+"+intToString(actionObj.showResourceAdded, 2), "textContent");
+        }
+        if(dataObj.showExpAdded) {
+            views.updateVal(`${actionVar}ShowExpAdded`, actionObj.showExpAdded === undefined?"???":"+"+intToString(actionObj.showExpAdded, 2), "textContent");
         }
 
         views.updateActionDownstreamViews(actionObj, actionObj.currentMenu === "downstream");
@@ -385,11 +393,7 @@ let views = {
             ["resourceIncrease", 3], ["resourceDecrease", 3]
         ];
         if(dataObj.isGenerator && actionVar !== "hearAboutTheLich") {
-            roundedNumbers.push(["resourceToAdd", 2]);
             roundedNumbers.push(["actionPower", 4]);
-        }
-        if(dataObj.showToAdd) {
-            roundedNumbers.push(["resourceToAdd", 2]);
         }
         if(actionVar === "hearAboutTheLich") {
             roundedNumbers.push(["actionPower2", 2]);
@@ -400,7 +404,6 @@ let views = {
             roundedNumbers.push(["efficiencyMult", 3]);
         }
         roundedNumbers.push(["totalSend", 3]);
-        roundedNumbers.push(["efficiencyBase", 2]);
         roundedNumbers.push(["progressMaxIncrease", 2]);
         roundedNumbers.push(["expToLevelIncrease", 2]);
 
@@ -583,6 +586,16 @@ function isActionVisible(actionVar) {
         elementScreenX + elementScreenWidth > 0 &&
         elementScreenY < (window.innerHeight+50) &&
         elementScreenY + elementScreenHeight > 0;
+}
+
+function actionHasDownstream(actionVar) {
+    let dataObj = actionData[actionVar];
+    for (let downstreamVar of dataObj.downstreamVars) {
+        if (actionData[downstreamVar].hasUpstream) {
+            return true;
+        }
+    }
+    return false;
 }
 
 function updateSliderContainers() {

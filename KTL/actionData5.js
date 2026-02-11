@@ -28,6 +28,7 @@ actionData = {
                 actionObj.actionPowerMult;
             actionObj.resourceToAdd = actionObj.resource *
                 actionObj.actionPower * actionObj.upgradeMult;
+            data.actions[this.generatorTarget].showExpAdded = actionObj.resourceToAdd;
         },
         onLevelAtts:[],
         expAtts:[],
@@ -48,7 +49,7 @@ actionData = {
         progressMaxBase:100, progressMaxIncrease:1,
         expToLevelBase:20, expToLevelIncrease:1.2,
         actionPowerBase:1, actionPowerMult:1, actionPowerMultIncrease:1.08,
-        efficiencyBase:.05,
+        efficiencyBase:.05, showResourceAdded:true, showExpAdded:true,
         unlockCost:0, visible:false, unlocked:false, purchased: true, hasUpstream:false,
         isGenerator:true, generatorSpeed:10,
         onCompleteCustom: function() {
@@ -69,6 +70,9 @@ actionData = {
                 actionObj.actionPowerMult;
             actionObj.resourceToAdd = actionObj.actionPower * actionObj.upgradeMult * (actionObj.efficiency / 100);
             actionObj.expToAddBase = 0;
+            actionObj.showResourceAdded = actionObj.resourceToAdd;
+            data.actions.tidalBurden.showResourceAdded = actionObj.efficiency/100;
+            data.actions.dipInTheRiver.showResourceAdded = actionObj.resource/10;
         },
         onLevelAtts:[["flow", 5]],
         expAtts:[],
@@ -91,7 +95,7 @@ actionData = {
         tier:2, plane:3, resourceName:"silt", creationVersion: 6,
         progressMaxBase:10, progressMaxIncrease:1,
         expToLevelBase:1, expToLevelIncrease:1, maxLevel: 200,
-        efficiencyBase:1,
+        efficiencyBase:1, showResourceAdded:true,
         unlockCost:0, visible:false, unlocked:false, purchased: true, hasUpstream:false,
         onLevelAtts:[["continuity", -10]],
         expAtts:[["impedance", 1]],
@@ -104,7 +108,7 @@ actionData = {
         tier:2, plane:3, resourceName:"essence", creationVersion: 6, title: "Dip in the River",
         progressMaxBase:600, progressMaxIncrease:1.05,
         expToLevelBase:6, expToLevelIncrease:1,
-        efficiencyBase:.01, maxLevel:10,
+        efficiencyBase:.01, maxLevel:10, showResourceAdded:true,
         unlockCost:5000, visible:false, unlocked:false, purchased: true, hasUpstream:false,
         onLevelAtts:[["calm", 5]],
         expAtts:[["flow", 1]],
