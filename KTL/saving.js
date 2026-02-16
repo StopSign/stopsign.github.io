@@ -211,6 +211,9 @@ function adjustUIAfterLoad(toLoad, saveVersionFromLoad) {
                 actionObj.automationOnReveal = 0;
             }
         }
+
+        rebuildCustomTriggersUI(actionVar);
+        rebuildTriggerInfo(actionVar);
     }
 
     attachSliderListeners();
@@ -281,6 +284,7 @@ function updateUIOnLoad() {
     document.getElementById('viewTotalMomentumSwitch').firstElementChild.style.left = data.gameSettings.viewTotalMomentum ? "50%" : "0";
     document.getElementById('viewZeroButtonsSwitch').firstElementChild.style.left = data.gameSettings.viewAll0Buttons ? "50%" : "0";
     document.getElementById('viewAdvancedSlidersSwitch').firstElementChild.style.left = data.gameSettings.viewAdvancedSliders ? "50%" : "0";
+    document.getElementById('viewEstimatedTimesSwitch').firstElementChild.style.left = data.gameSettings.viewEstimatedTimes ? "50%" : "0";
     document.getElementById("showCompleteUpgrades").checked = data.gameSettings.showCompletedToggle;
     document.getElementById("showUnaffordableUpgrades").checked = data.gameSettings.showUnaffordable;
     document.getElementById("sortByCost").checked = data.gameSettings.sortByCost;
@@ -352,7 +356,6 @@ function updateUIOnLoad() {
             updatePauseActionVisuals(actionVar);
         }
         views.updateVal(`${actionVar}_storyMenuButton`, actionObj.readStory!==undefined?"":"#2196F3", "style.color");
-
     }
     data.actions.reposeRebounded.isRunning = true;
 
@@ -380,6 +383,8 @@ function updateUIOnLoad() {
         views.updateVal(`ancientCoinDisplay`, "", "style.display");
         views.updateVal(`ancientWhisperDisplay`, "", "style.display");
         views.updateVal(`legacyDisplay`, "", "style.display");
+        views.updateVal(`legacyMultDisplay`, "", "style.display");
+        views.updateVal(`ancientCoinMultDisplay`, "", "style.display");
     }
     views.updateVal(`jobDisplay`, data.displayJob ? "" : "none", "style.display");
     changeJob(data.currentJob);
@@ -388,8 +393,8 @@ function updateUIOnLoad() {
         updateToastUI(i);
     }
 
-    updateSliderDisplay(data.gameSettings.ticksPerSecond);
-    document.getElementById("FPSSlider").value = data.gameSettings.ticksPerSecond;
+    // updateSliderDisplay(data.gameSettings.ticksPerSecond);
+    // document.getElementById("FPSSlider").value = data.gameSettings.ticksPerSecond;
 
     updatePreviousTipsMenu();
     reapplyAttentionSelected();

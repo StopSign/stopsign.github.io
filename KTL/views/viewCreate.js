@@ -99,6 +99,7 @@ function generateActionDisplay(actionVar) {
     queueCache(`${actionVar}DeltaLevel1TimeContainer`)
     queueCache(`${actionVar}DeltaLevel1Time`);
 
+
     queueCache(`${actionVar}UnlockedCountContainer`)
     queueCache(`${actionVar}UnlockedCount`)
 
@@ -178,6 +179,7 @@ function generateActionDisplay(actionVar) {
     queueCache(`${actionVar}Wage`);
     queueCache(`${actionVar}Instability`);
     queueCache(`${actionVar}InstabilityToAdd`);
+    queueCache(`${actionVar}InstabilityToRemove`);
     queueCache(`${actionVar}ManaQuality`);
     queueCache(`${actionVar}SpellPower`);
     queueCache(`${actionVar}PinButton`);
@@ -189,7 +191,7 @@ function generateActionDisplay(actionVar) {
 
     let title = Raw.html`
         <span onclick="actionTitleClicked('${actionVar}')" style="color:var(--text-primary);cursor:pointer;position:absolute;
-            top:-82px;height:82px;left:0;white-space: nowrap;border-width: 0 0 0 6px;border-style:solid;
+            top:-${!dataObj.isSpell?82:98}px;height:${!dataObj.isSpell?82:98}px;left:0;white-space: nowrap;border-width: 0 0 0 6px;border-style:solid;
             border-color:${resourceColorDim};padding-left:4px;text-shadow:1px 1px 2px var(--text-dark);">
             ${pinButton}
             ${(dataObj.isSpell || dataObj.isSpellConsumer) ? pauseButton : ""}
@@ -210,8 +212,9 @@ function generateActionDisplay(actionVar) {
                 ${actionObj.maxLevel !== undefined ? ` / <span id="${actionVar}MaxLevel" style="color:var(--text-primary);font-weight:bold;">0</span>` : ""} | 
                 <span id="${actionVar}Efficiency" style="color:var(--text-primary);font-weight:bold;"></span>% speed
                 ${!actionObj.wage ? "" : ` | Wage: $<span id="${actionVar}Wage" style="color:var(--wage-color);font-weight:bold;"></span>`}
-                ${!dataObj.isSpell ? "" : ` | <span id="${actionVar}Instability" style="color:var(--text-primary);font-weight:bold;">0</span>% instability
-                (+<span id="${actionVar}InstabilityToAdd" style="color:var(--text-primary);font-weight:bold;"></span>)` }
+                ${!dataObj.isSpell ? "" : ` <br><span id="${actionVar}Instability" style="color:var(--text-primary);font-weight:bold;">0</span>% instability
+                (+<span id="${actionVar}InstabilityToAdd" style="color:var(--text-primary);font-weight:bold;"></span>/use) | 
+                (-<span id="${actionVar}InstabilityToRemove" style="color:var(--text-primary);font-weight:bold;"></span>/s)` }
             </span>
         </span>
     `
@@ -308,6 +311,11 @@ function generateActionDisplay(actionVar) {
     queueCache(`${actionVar}ExpToAdd2`);
     queueCache(`${actionVar}ExpToLevelIncrease`);
     queueCache(`${actionVar}ExpBarLabels`);
+    queueCache(`${actionVar}EstimatedTimesContainer`);
+    queueCache(`${actionVar}TimeToLevelContainer`);
+    queueCache(`${actionVar}TimeToMaxContainer`)
+    queueCache(`${actionVar}TimeToLevel`);
+    queueCache(`${actionVar}TimeToMax`);
 
     let expBar = Raw.html`
         <div style="width:100%;height:18px;position:relative;text-align:left;border-bottom:2px solid;">
@@ -320,6 +328,10 @@ function generateActionDisplay(actionVar) {
                 (+<b><span style="color:var(--text-primary)" id="${actionVar}ExpToAdd2">1</span></b>/complete)
                 <span style="position:absolute;right:0">x<b><span id="${actionVar}ExpToLevelIncrease" style="color:var(--text-primary)">1</span></b>/lvl</span>
             </div>
+        </div>
+        <div id="${actionVar}EstimatedTimesContainer" style="display:flex;">
+            <div id="${actionVar}TimeToLevelContainer" style="display:flex;flex:0 0 50%">Time to Level: ~<span id="${actionVar}TimeToLevel" style="font-weight:bold">5</span></div>
+            <div id="${actionVar}TimeToMaxContainer" style="display:flex;flex:0 0 50%">Time to Max: ~<span id="${actionVar}TimeToMax" style="font-weight:bold">6</span></div>
         </div>`;
 
     queueCache(`${actionVar}IsMaxLevel`)
@@ -376,6 +388,7 @@ let maxLevelTop = (data.gameSettings.viewDeltas && data.gameSettings.viewRatio) 
             ${onComplete}
             ${onLevelText}
             ${dataObj.extraInfo ? dataObj.extraInfo[language]:""}
+            <div id="${actionVar}_triggerInfoContainer"></div>
         </div>`;
 
     queueCache(`${actionVar}_storyContainer`);
@@ -439,6 +452,9 @@ let maxLevelTop = (data.gameSettings.viewDeltas && data.gameSettings.viewRatio) 
         `
     }
     if((dataObj.hasUpstream || dataObj.keepParentAutomation) && dataObj.maxLevel !== undefined) {
+        if(dataObj.hasUpstream) {
+            preventParentSliderText += `<div class="menuSeparator"></div>`
+        }
         preventParentSliderText += `
             <span id="${actionVar}_automationMaxLevelContainer">
                 Enable automation to disable upstream sliders to this action when it is max level:
@@ -457,19 +473,27 @@ let maxLevelTop = (data.gameSettings.viewDeltas && data.gameSettings.viewRatio) 
         `
     }
 
+    let customTriggerContainer = `
+        <div class="menuSeparator"></div>
+        <div id="${actionVar}_addCustomTriggerButton" class="button" onclick="addCustomTrigger('${actionVar}')">Add Custom Trigger</div>
+        <div id="${actionVar}_customTriggerForm"></div>
+        <div id="${actionVar}_customTriggerContainer"></div>
+        `
+
     let automationContainer = Raw.html`
         <div id="${actionVar}_automationContainer" style="display:none;padding:10px;max-height:220px;overflow-y:auto;
         ">
             ${preventParentSliderText}
+            ${customTriggerContainer}
         </div>`;
 
     queueCache(`${actionVar}_attsContainer`);
 
     let attsContainer = Raw.html`
         <div id="${actionVar}_attsContainer" style="display:none;padding:5px;max-height:220px;overflow-y:auto;font-size;12px;">
-            ${generateActionOnLevelAtts(actionObj)}
-            ${generateActionExpAtts(actionObj)}
-            ${generateActionEfficiencyAtts(actionObj)}
+            ${generateActionOnLevelAtts(actionVar)}
+            ${generateActionExpAtts(actionVar)}
+            ${generateActionTimeStats(actionVar)}
         </div>`;
 
     queueCache(`${actionVar}LockContainer`);
@@ -678,8 +702,8 @@ function generateOutsideAttDisplay(actionVar, attObj, type) {
         </div>`;
 }
 
-function generateActionOnLevelAtts(actionObj) {
-    let actionVar = actionObj.actionVar;
+function generateActionOnLevelAtts(actionVar) {
+    let actionObj = data.actions[actionVar];
     let dataObj = actionData[actionVar];
     queueCache(`${actionVar}AttOnLevelContainer`);
 
@@ -703,8 +727,8 @@ function generateActionOnLevelAtts(actionObj) {
     return onLevelAttsText;
 }
 
-function generateActionExpAtts(actionObj) {
-    let actionVar = actionObj.actionVar;
+function generateActionExpAtts(actionVar) {
+    let actionObj = data.actions[actionVar];
     let dataObj = actionData[actionVar];
 
     let isFirst = dataObj.onLevelAtts.length === 0;
@@ -739,8 +763,36 @@ function generateActionExpAtts(actionObj) {
     return expAttsStr;
 }
 
-function generateActionEfficiencyAtts(actionObj) {
-    let actionVar = actionObj.actionVar;
+function generateActionTimeStats(actionVar) {
+    let actionObj = data.actions[actionVar];
+    let dataObj = actionData[actionVar];
+
+    queueCache(`${actionVar}LowestUnlockTimeContainer`);
+    queueCache(`${actionVar}LowestUnlockTime`);
+    queueCache(`${actionVar}LowestLevel1Container`);
+    queueCache(`${actionVar}LowestLevel1Time`);
+
+    let timeStats = "";
+    if(dataObj.plane === 1) {
+        timeStats += `                    
+                    <span id="${actionVar}LowestLevel1Container">
+                        <br>
+                        Lowest Level 1 Time: <span id="${actionVar}LowestLevel1Time" style="font-weight:bold;"></span>
+                    </span>`
+    } else {
+        timeStats += `       
+                    <span id="${actionVar}LowestUnlockTimeContainer">
+                        <br>
+                        Lowest Unlock Time: <span id="${actionVar}LowestUnlockTime" style="font-weight:bold;"></span>
+                    </span>`
+    }
+
+    return timeStats;
+}
+
+//This is for the old efficiency format - not used. Kept in case I want to show the math for current speed calculation
+function generateActionEfficiencyAtts(actionVar) {
+    let actionObj = data.actions[actionVar];
     let dataObj = actionData[actionVar];
 
     let isFirst = dataObj.onLevelAtts.length === 0 && dataObj.expAtts.length === 0;
@@ -1129,6 +1181,21 @@ function handleLineClick(borderId, lineData) {
         highlightLine(borderId, lineData);
     }
 }
+function handleLineRightClick(lineData) {
+    let currentValue = data.actions[lineData.from][`downstreamRate${lineData.to}`]
+    let newValue = 100;
+    if(currentValue === 100) {
+        newValue = 0;
+    } else if(currentValue === 0) {
+        newValue = 10;
+    } else if(currentValue === 10) {
+        newValue = 50;
+    } else if(currentValue === 50) {
+        newValue = 100;
+    }
+
+    setSliderUI(lineData.from, lineData.to, newValue);
+}
 
 function getLabelOrientation(angle) {
     const norm = ((angle % 360) + 360) % 360;
@@ -1190,8 +1257,9 @@ function generateLinesBetweenActions() {
                 labelWrapperTransform += `rotate(180deg)`;
             }
 
-            let onclickText = isDifferentMomentum?``:`handleLineClick('${borderId}', {from: '${actionVar}', to: '${downstreamVar}'})`;
-            let cursorStyle = isDifferentMomentum?``:`cursor:pointer`;
+            let onclickText = isDifferentMomentum || dataObj.plane === 2 ?``:`handleLineClick('${borderId}', {from: '${actionVar}', to: '${downstreamVar}'})`;
+            let rightClickText = isDifferentMomentum || dataObj.plane === 2 ?``:`handleLineRightClick({from: '${actionVar}', to: '${downstreamVar}'})`;
+            let cursorStyle = isDifferentMomentum || dataObj.plane === 2 ?``:`cursor:pointer`;
 
             queueCache(borderId);
             queueCache(lineId);
@@ -1202,7 +1270,7 @@ function generateLinesBetweenActions() {
                 <div id="${borderId}" class="line-connection" 
                      style="${cursorStyle}; display:none; align-items: center; position: absolute; width: ${length}px; height: 20px; 
                         background: ${backgroundColor}; opacity: 1; transform-origin: 0 50%; transform: rotate(${angle}deg); left:${x1}px; top:${y1}px;border-radius:20px;border:2px solid black"
-                     onclick="${onclickText}">
+                     onclick="${onclickText}" oncontextmenu="${rightClickText}">
                      
                     <div id="${lineId}" style="width: 100%; height: 0; background-color: ${targetBackgroundColor}; position: relative;text-align:center;">
                         <div id="${lineId}_Container" style="display: flex;position: absolute;left: ${labelDistance};top: 50%;
@@ -1281,11 +1349,15 @@ function renderResetLog() {
 function setAllCaches() {
     queueCache("totalMomentum");
     queueCache("secondsPerReset");
+    queueCache("NWSecondsContainer");
+    queueCache("NWSeconds");
     queueCache("openUseAmuletButton");
     queueCache("openViewAmuletButton");
     queueCache("legacyAmount");
+    queueCache("legacyMult");
     queueCache("ancientCoin");
     queueCache("ancientCoin2");
+    queueCache("ancientCoinMult");
     queueCache("ancientWhisper");
     queueCache("ancientWhisper2");
     queueCache("lichCoinsDisplay");
@@ -1294,6 +1366,8 @@ function setAllCaches() {
     queueCache("manaQuality2");
     queueCache("manaQualityErrorMessage");
     queueCache("bonusTime");
+    queueCache("convertBtn");
+    queueCache("instantBonusTime");
     queueCache("killTheLichMenu");
     queueCache("attDisplay");
     queueCache("bonusDisplay");
@@ -1304,10 +1378,14 @@ function setAllCaches() {
     queueCache("ancientWhisperDisplay");
     queueCache("manaQualityDisplay");
     queueCache("jobDisplay");
+    queueCache("ancientCoinMultDisplay");
+    queueCache("legacyMultDisplay");
     queueCache("useAmuletMenu");
     queueCache("amuletEnabledContainer");
     queueCache("amuletMenuTitle");
     queueCache("legacySeveranceMenu");
+    queueCache("highestLegacyContainer");
+    queueCache("highestLegacy");
 
     for(let actionVar in data.actions) {
         view.cached[`${actionVar}ActionPower`] = document.getElementById(`${actionVar}ActionPower`);

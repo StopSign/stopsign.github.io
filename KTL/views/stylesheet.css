@@ -812,3 +812,68 @@ input {
     font-size: 14px;
     color: #a0a0a0;
 }
+
+
+
+.trigger-form-box {
+    border: 1px solid #ccc;
+    background: var(--menu-tab-background-color);
+    padding: 10px;
+    margin: 5px 0;
+    border-radius: 4px;
+}
+
+.trigger-num-input {
+    width: 60px;
+}
+
+.trigger-form-actions {
+    margin-top: 8px;
+    display: flex;
+    align-items: center;
+}
+
+/* Saved Item Styles */
+.custom-trigger-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--menu-tab-background-color);
+    border-left: 3px solid #4CAF50;
+    margin-top: 5px;
+    padding: 6px 10px;
+    border-radius: 3px;
+    font-size: 0.9em;
+}
+
+.trigger-delete {
+    cursor: pointer;
+    color: #999;
+    font-weight: bold;
+    margin-left: 10px;
+}
+.trigger-delete:hover {
+    color: red;
+}
+
+.trigger-info-box {
+    padding: 10px;
+    margin-top: 10px;
+}
+
+.trigger-info-line {
+    margin-bottom: 4px;
+}
+
+.action-link {
+    font-weight: bold;
+    cursor: pointer;
+    /*transition: color 0.2s, background-color 0.2s;*/
+    padding: 0 2px;
+    border-radius: 3px;
+}
+
+.action-link:hover {
+    background-color: #000000;
+    text-decoration: underline;
+}

@@ -11,13 +11,13 @@ function setScreenSize() {
     screenSize = document.body.scrollHeight;
 }
 
-// --- Offline Time Calculation ---
 function checkOfflineProgress() {
     if (data.lastVisit) {
         const offlineMilliseconds = Date.now() - parseInt(data.lastVisit, 10);
         if (offlineMilliseconds > 5000) {
             data.currentGameState.bonusTime += offlineMilliseconds;
             console.log(`Welcome back! Gained ${(offlineMilliseconds / 1000).toFixed(1)}s of bonus time.`);
+            data.currentGameState.instantTimerCooldown -= offlineMilliseconds / 1000;
         }
     }
 }
@@ -25,31 +25,34 @@ function checkOfflineProgress() {
 // --- Visual Rendering Loop ---
 let lastAnimationTime = 0;
 let timeAccumulators = { view30: 0, view10: 0, view1: 0 };
+let debugDelta = Date.now();
+let timeSinceLastSave = 0;
 
 function animationTick(currentTime) {
-    requestAnimationFrame(animationTick);
-
-    if (data.gameSettings.stopAll) return;
+    if (data.gameSettings.stopAll) {
+        lastAnimationTime = currentTime;
+        return;
+    }
 
     if (lastAnimationTime === 0) lastAnimationTime = currentTime;
+
     const delta = currentTime - lastAnimationTime;
+    lastAnimationTime = currentTime;
 
     timeAccumulators.view30 += delta;
     timeAccumulators.view10 += delta;
     timeAccumulators.view1 += delta;
 
-    const interval30 = 1000 / data.gameSettings.fps;
+    const interval30 = 1000 / 20;
     if (timeAccumulators.view30 >= interval30) {
         timeAccumulators.view30 %= interval30;
         views.updateViewAtFrame();
-        lastAnimationTime = currentTime;
     }
 
-    const interval10 = data.gameSettings.fps < 10 ? interval30 : 100;
+    const interval10 = 100;
     if (timeAccumulators.view10 >= interval10) {
         timeAccumulators.view10 %= interval10;
         views.updateView();
-        lastAnimationTime = currentTime;
     }
 
     if (timeAccumulators.view1 >= 1000) {
@@ -60,10 +63,10 @@ function animationTick(currentTime) {
             save();
         }
         views.updateViewOnSecond();
-        lastAnimationTime = currentTime;
     }
+
+    requestAnimationFrame(animationTick);
 }
-let timeSinceLastSave = 0;
 
 function initTimingSystem() {
     checkOfflineProgress();
@@ -82,6 +85,25 @@ function secondPassed() {
     secondsPassed++;
 }
 
+function tickTimerCooldown() {
+    if (data.currentGameState.instantTimerCooldown > 0) {
+        data.currentGameState.instantTimerCooldown --;
+    }
+    if(data.currentGameState.instantTimerCooldown < 0) {
+        data.currentGameState.instantTimerCooldown = 0;
+    }
+    updateConvertButtonUI();
+}
+
+function updateConvertButtonUI() {
+    if (data.currentGameState.instantTimerCooldown > 0) {
+        views.updateVal(`convertBtn`, "grey", "style.backgroundColor");
+        views.updateVal(`convertBtn`, "Use in " + secondsToTime(data.currentGameState.instantTimerCooldown), "innerText");
+    } else {
+        views.updateVal(`convertBtn`, "green", "style.backgroundColor");
+        views.updateVal(`convertBtn`, "Convert 2 hours", "innerText");
+    }
+}
 
 function gameTick() {
     data.gameSettings.ticksForSeconds++;
@@ -180,8 +202,9 @@ function calcDeltas() {
 function secondTick() {
     if(data.gameState !== "KTL") {
         data.secondsPerReset++;
+    } else {
+        data.NWSeconds++;
     }
-    data.currentGameState.KTLBonusTimer++;
     takeDataSnapshot(data.actions.overclock.resourceToAdd, data.secondsPerReset);
 }
 

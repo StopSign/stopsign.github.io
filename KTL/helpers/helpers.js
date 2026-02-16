@@ -191,6 +191,9 @@ function secondsToTime(seconds) {
     if(!seconds || seconds < 0) {
         seconds = "0";
     }
+    if(seconds === Infinity || seconds > 3.5e6) {
+        return "∞"
+    }
     seconds = Math.floor(seconds);
     const hours = Math.floor(seconds / 3600);
     const remainder = seconds % 3600;

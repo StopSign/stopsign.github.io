@@ -100,8 +100,7 @@ actionData = {
         tier:0, plane:2, resourceName:"fight", creationVersion: 6,
         progressMaxBase:10, progressMaxIncrease:1,
         expToLevelBase:1, expToLevelIncrease:1,
-        efficiencyBase:1, isKTL:true, purchased: true, showResourceAdded:true,
-        actionPowerBase:1, actionPowerMult:1, actionPowerMultIncrease:1, maxLevel:200,
+        efficiencyBase:1, isKTL:true, purchased: true, showResourceAdded:true, maxLevel:200,
         unlockCost:1, visible:false, unlocked:false, isGenerator:true, generatorSpeed:1, hasUpstream: false,
         onUnlock: function() {
             setSliderUI("fightTheEvilForces", "bridgeOfBone", 100);

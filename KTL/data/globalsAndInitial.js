@@ -46,6 +46,7 @@ data.highestLegacy = 0;
 
 data.useAmuletButtonShowing = false;
 data.secondsPerReset = 0;
+data.NWSeconds = 0;
 data.currentJob = "helpScottWithChores";
 data.currentWage = 1;
 data.doneKTL = false;
@@ -81,6 +82,7 @@ data.gameSettings = {
     viewAll0Buttons:false,
     viewTotalMomentum:false,
     viewAdvancedSliders:false,
+    viewEstimatedTimes:true,
     numberType:"numberSuffix",
     redeemedBonusCodes:{},
     showCompletedToggle:true,
@@ -91,8 +93,9 @@ data.gameSettings = {
 // --- Dynamic Game State ---
 data.currentGameState = {
     bonusTime: 0,
+    instantTime: 0,
+    instantTimerCooldown:0,
     secondsPassed: 0,
-    KTLBonusTimer: 0,
 };
 
 
@@ -100,8 +103,8 @@ let viewData = {}; //contains only things that are generated / not saved
 viewData.toasts = [];
 
 let language = "english";
-// let globalVisible = false; //SET FOR COMMIT
-let globalVisible = true;
+let globalVisible = false; //SET FOR COMMIT
+// let globalVisible = true;
 // let isLoadingEnabled = true; //SET FOR COMMIT
 let isLoadingEnabled = false;
 let loadStaticSaveFile = false; //SET FOR COMMIT

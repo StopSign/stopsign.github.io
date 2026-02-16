@@ -117,6 +117,8 @@ function actionSetInitialVariables(actionObj, dataObj) {
     //initialized from data, but modified and saved after that
     actionObj.cooldown = dataObj.cooldown;
     actionObj.purchased = !!dataObj.purchased;
+    actionObj.lowestUnlockTime = undefined;
+    actionObj.lowestLevel1Time = undefined;
 
     //Initialize once ever
     actionObj.cooldownTimer = 0; //when this is higher than cooldown it is ready
@@ -254,8 +256,11 @@ function checkLevelUp(actionObj, dataObj) {
     } else {
         actionObj.exp = 0;
     }
-    if(!actionObj.level1Time) {
+    if(!actionObj.level1Time && dataObj.plane === 1) {
         actionObj.level1Time = data.secondsPerReset;
+        if(actionObj.lowestLevel1Time === undefined || actionObj.lowestLevel1Time > actionObj.level1Time) {
+            actionObj.lowestLevel1Time = actionObj.level1Time;
+        }
     }
     actionObj.level++;
     actionObj.progressMaxBase *= dataObj.progressMaxIncrease;
@@ -291,6 +296,8 @@ function checkLevelUp(actionObj, dataObj) {
             actionTriggerHelper(type, info, extra);
         }
     }
+    checkIncomingTriggers(actionObj.actionVar);
+
     if(dataObj.wage > 0) {
         actionObj.wage += dataObj.wage / 2;
         changeJob(actionObj.actionVar);
@@ -354,6 +361,171 @@ function actionAddExp(actionObj, exp) {
         }
     }
 }
+
+function resetRun() {
+    //essentially an amulet use but without gain
+    //also on amulet use needs to save the state of anything that can be perma-gained during the run:
+    //legacy&highest, infusion 2 actions, infusion unlock costs, KTL log, perma-focus
+    //then revert to this state
+
+    //Gain 1 free use every 48 hours, start with 2
+    //can't use on first reset
+
+}
+
+function calcTimeToUnlock(actionVar) {
+
+}
+
+function calcTimeToLevel(actionObj) {
+    let timeToFinishCurrentCycle = (actionObj.progressMax - actionObj.progress) / actionObj.progressGain;
+    let expAfterCurrentCycle = actionObj.exp + actionObj.expToAdd;
+    let remainingExpNeeded = Math.max(0, actionObj.expToLevel - expAfterCurrentCycle);
+    let fullCyclesNeeded = Math.ceil(remainingExpNeeded / actionObj.expToAdd);
+    let timePerFullCycle = actionObj.progressMax / actionObj.progressGain;
+    return timeToFinishCurrentCycle + (fullCyclesNeeded * timePerFullCycle);
+}
+function calcTimeToMax(actionVar) {
+    let actionObj = data.actions[actionVar];
+
+    // 1. Sanitize Milestones
+    // Filter invalid (-1), past, or out-of-bounds milestones
+    let rawMilestones = [
+        actionObj.thirdHighestLevel,
+        actionObj.secondHighestLevel,
+        actionObj.highestLevel
+    ];
+
+    let milestones = rawMilestones
+        .filter(m => m > actionObj.level && m < actionObj.maxLevel)
+        .sort((a, b) => a - b);
+
+    // Always finish at maxLevel
+    milestones.push(actionObj.maxLevel);
+    milestones = [...new Set(milestones)];
+
+    // 2. Setup Simulation Variables
+    let totalTime = 0;
+
+    let vLevel = actionObj.level;
+    let vExp = actionObj.exp;
+    let vProgress = actionObj.progress;
+    let vProgressMax = actionObj.progressMax;
+    let vExpToLevel = actionObj.expToLevel;
+
+    // 3. Loop through stages
+    for (let targetLevel of milestones) {
+        let levelsToJump = targetLevel - vLevel;
+        if (levelsToJump <= 0) continue;
+
+        let expMult = calcUpgradeMultToExp(actionVar, vLevel);
+
+        let baseExp = actionObj.expToAddBase !== undefined ? actionObj.expToAddBase : (actionObj.expToAdd / actionObj.expToAddMult);
+        let effectiveExpAdd = baseExp * expMult;
+
+        // A. Time for the VERY NEXT level (handles partial progress)
+        let t1 = getTimeForSingleLevel(
+            vProgress, vProgressMax,
+            vExp, vExpToLevel,
+            effectiveExpAdd, actionObj.progressGain,
+            actionObj.isGenerator
+        );
+        totalTime += t1;
+
+        if (!isFinite(totalTime)) return Infinity;
+
+        // B. Geometric Series for the REST of the levels in this stage
+        let remainingLevels = levelsToJump - 1;
+
+        if (remainingLevels > 0) {
+            let rp = actionObj.progressMaxIncrease;
+            let re = actionObj.expToLevelIncrease;
+            let R = rp * re;
+
+            // Scale up for the start of the series (Level + 1)
+            let nextPMax = vProgressMax * rp;
+            let nextEToL = vExpToLevel * re;
+
+            let completionsNeeded = actionObj.isGenerator
+                ? nextEToL / effectiveExpAdd
+                : Math.ceil(nextEToL / effectiveExpAdd);
+
+            let timePerBar = nextPMax / actionObj.progressGain;
+            let a = completionsNeeded * timePerBar;
+
+            let timeForSeries = 0;
+            if (R === 1) {
+                timeForSeries = a * remainingLevels;
+            } else {
+                let geometricTerm = Math.pow(R, remainingLevels);
+                if (!isFinite(geometricTerm)) return Infinity;
+                timeForSeries = a * (geometricTerm - 1) / (R - 1);
+            }
+            totalTime += timeForSeries;
+        }
+
+        // C. Update Virtual State for next stage
+        let scaleFactorP = Math.pow(actionObj.progressMaxIncrease, levelsToJump);
+        let scaleFactorE = Math.pow(actionObj.expToLevelIncrease, levelsToJump);
+
+        vProgressMax *= scaleFactorP;
+        vExpToLevel *= scaleFactorE;
+        vLevel = targetLevel;
+        vProgress = 0;
+        vExp = 0;
+    }
+
+    return totalTime;
+}
+
+function getTimeForSingleLevel(progress, pMax, exp, eToLevel, eAdd, pGain, isGenerator) {
+    let timeToFinishBar = (pMax - progress) / pGain;
+
+    let expAfterBar = exp + eAdd;
+    let expRemaining = Math.max(0, eToLevel - expAfterBar);
+
+    let barsNeeded = 0;
+    if (isGenerator) {
+        // Generators don't waste overflow exp
+        barsNeeded = expRemaining / eAdd;
+    } else {
+        // Normal actions need full completions
+        barsNeeded = Math.ceil(expRemaining / eAdd);
+    }
+
+    let timeForExtraBars = barsNeeded * (pMax / pGain);
+    return timeToFinishBar + timeForExtraBars;
+}
+
+function calcUpgradeMultToExp(actionVar, level) {
+    let actionObj = data.actions[actionVar];
+    let dataObj = actionData[actionVar];
+    if(!level) {
+        level = actionObj.level;
+    }
+    if(dataObj.plane === 2 || dataObj.isSpell) return 1;
+
+    let mult = 1;
+    // Standard checks. If highestLevel is -1, (level < -1) is false, so it works safely.
+    if(data.upgrades.rememberWhatIDid.isFullyBought && level < actionObj.highestLevel) mult += .25;
+    if(data.upgrades.rememberHowIGrew.isFullyBought && level < actionObj.secondHighestLevel) mult += .25;
+    if(data.upgrades.rememberMyMastery.isFullyBought && level < actionObj.thirdHighestLevel) mult += .5;
+    return mult;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 function addLegacy(amount) {
     let roomToHighest = Math.max(0, data.highestLegacy - data.legacy);
@@ -447,10 +619,6 @@ function revealAction(actionVar) {
     }
 
     addLogMessage(actionVar, "unlockAction")
-
-    if(dataObj.plane === 1) { //Give magic actions an unlock time
-        actionObj.unlockTime = data.secondsPerReset;
-    }
 
     actionObj.visible = true;
     revealAttsOnAction(actionObj);
@@ -609,8 +777,8 @@ function revealAtt(attVar) {
     }
     for (let actionVar of attObj.linkedActionEfficiencyAtts) {
         views.updateVal(`${actionVar}${attVar}OutsideContainereff`, "", "style.display");
-        views.updateVal(`${actionVar}${attVar}InsideContainereff`, "", "style.display");
-        views.updateVal(`${actionVar}AttEfficiencyContainer`, "", "style.display");
+        // views.updateVal(`${actionVar}${attVar}InsideContainereff`, "", "style.display");
+        // views.updateVal(`${actionVar}AttEfficiencyContainer`, "", "style.display");
     }
     for(let actionVar of attObj.linkedActionOnLevelAtts) {
         views.updateVal(`${actionVar}AttOnLevelContainer`, "", "style.display");
@@ -627,6 +795,7 @@ function revealAtt(attVar) {
 
 function unlockAction(actionObj) {
     let actionVar = actionObj.actionVar;
+    let dataObj = actionData[actionVar];
     if(actionObj.unlocked === true) {
         return;
     }
@@ -634,8 +803,15 @@ function unlockAction(actionObj) {
     actionObj.unlocked = true;
     actionObj.unlockedCount++;
     actionObj.unlockCost = 0;
-    actionObj.unlockTime = data.secondsPerReset; //mark when it unlocked
-    let dataObj = actionData[actionVar];
+    if(dataObj.plane === 2) {
+        actionObj.unlockTime = data.NWSeconds;
+    } else if(dataObj.plane !== 1) {
+        actionObj.unlockTime = data.secondsPerReset; //mark when it unlocked
+    }
+    if(actionObj.lowestUnlockTime === undefined || actionObj.lowestUnlockTime > actionObj.unlockTime) {
+        actionObj.lowestUnlockTime = actionObj.unlockTime;
+    }
+
 
 
     for(let actionTrigger of dataObj.actionTriggers) {
@@ -648,6 +824,9 @@ function unlockAction(actionObj) {
             actionTriggerHelper(type, info, extra);
         }
     }
+
+    checkIncomingTriggers(actionVar);
+
     if(dataObj.wage > 0) {
         changeJob(actionObj.actionVar);
     }
@@ -693,26 +872,6 @@ function upgradeUpdates() {
     // } else {
         // data.maxSpellPower = getActiveSpellPower(true);
     // }
-}
-
-//get current info based on upgrade information, generally global or universal stuff. Individual action stuff upgrades get put on the action.
-function calcUpgradeMultToExp(actionVar) {
-    let actionObj = data.actions[actionVar];
-    let dataObj = actionData[actionVar];
-    if(dataObj.plane === 2 || dataObj.isSpell) {
-        return 1;
-    }
-    let upgradeMult = 1;
-    if(data.upgrades.rememberWhatIDid.isFullyBought && actionObj.level < actionObj.highestLevel) {
-        upgradeMult += .25;
-    }
-    if(data.upgrades.rememberHowIGrew.isFullyBought && actionObj.level < actionObj.secondHighestLevel) {
-        upgradeMult += .25;
-    }
-    if(data.upgrades.rememberMyMastery.isFullyBought && actionObj.level < actionObj.thirdHighestLevel) {
-        upgradeMult += .5;
-    }
-    return upgradeMult;
 }
 
 function isSpellReady(actionVar) {
@@ -884,3 +1043,113 @@ function adjustActionData(actionVar, key, value) {
 }
 
 
+
+// --- 1. Initialization (Run on Game Load) ---
+function rebuildDependencyCache() {
+    // 1. Reset all cache arrays first
+    for (let key in data.actions) {
+        data.actions[key].listeningActions = [];
+    }
+
+    // 2. Build the graph
+    for (let sourceKey in data.actions) {
+        const triggers = data.actions[sourceKey].customTriggers;
+        if (triggers && triggers.length > 0) {
+            triggers.forEach(trigger => {
+                // Register the source as a listener on the target
+                registerListener(trigger.targetKey, sourceKey);
+            });
+        }
+    }
+}
+
+// --- 2. Helper: Add Listener (prevent duplicates) ---
+function registerListener(targetKey, sourceKey) {
+    const targetObj = data.actions[targetKey];
+    if (!targetObj.listeningActions) targetObj.listeningActions = [];
+
+    // Only push if not already there
+    if (!targetObj.listeningActions.includes(sourceKey)) {
+        targetObj.listeningActions.push(sourceKey);
+    }
+}
+
+// --- 3. Helper: Remove Listener (Cleanup) ---
+function unregisterListener(targetKey, sourceKey) {
+    const targetObj = data.actions[targetKey];
+    if (!targetObj || !targetObj.listeningActions) return;
+
+    // Check if the source actually has ANY remaining triggers pointing to this target
+    // We don't want to remove the listener if there is still another trigger on the same action using this target
+    const sourceObj = data.actions[sourceKey];
+    const stillHasConnection = sourceObj.customTriggers.some(t => t.targetKey === targetKey);
+
+    if (!stillHasConnection) {
+        // Remove from array
+        targetObj.listeningActions = targetObj.listeningActions.filter(key => key !== sourceKey);
+    }
+}
+
+function checkIncomingTriggers(targetActionVar) {
+    const targetObj = data.actions[targetActionVar];
+
+    if (!targetObj.listeningActions || targetObj.listeningActions.length === 0) {
+        return;
+    }
+
+    // Loop ONLY through the actions that are watching this one
+    targetObj.listeningActions.forEach(sourceKey => {
+        const sourceObj = data.actions[sourceKey];
+
+        // Loop through the source's triggers to find the match
+        sourceObj.customTriggers.forEach(trigger => {
+            if (trigger.targetKey === targetActionVar) {
+                evaluateTrigger(sourceKey, trigger, targetObj);
+            }
+        });
+    });
+}
+
+function evaluateTrigger(actionVar, trigger, targetObj) {
+    let shouldRun = false;
+
+    if (trigger.condition === 'unlocked') {
+        if (!trigger.hasFired && targetObj.unlocked) {
+            shouldRun = true;
+            trigger.hasFired = true;
+        }
+    }
+    else if (trigger.condition === 'max') {
+        if (!trigger.hasFired && targetObj.level >= targetObj.maxLevel) {
+            shouldRun = true;
+            trigger.hasFired = true;
+        }
+    }
+    else if (trigger.condition === 'specific') {
+        if (!trigger.hasFired && targetObj.level >= trigger.amount) {
+            shouldRun = true;
+            trigger.hasFired = true;
+        }
+    }
+
+    // Execute Reward
+    if (shouldRun) {
+        console.log(`Trigger Fired! ${trigger.condition}${trigger.condition==="specific"?" " +trigger.amount:""} of ${trigger.targetKey} occured. ${actionVar} adjusted to ${trigger.rewardText}`);
+
+        let actionObj = data.actions[actionVar];
+        let dataObj = actionData[actionVar];
+        let parentVar = dataObj.parentVar;
+
+        if(dataObj.hasUpstream) {
+            if(!trigger.recurse) {
+                setSliderUI(parentVar, actionVar, trigger.rewardVal);
+            } else {
+                if(trigger.rewardVal > 0) {
+                    enableAutomationUpwards(actionVar, true)
+                } else {
+                    disableAutomationUpwards(actionVar, true)
+                }
+            }
+        }
+    }
+}

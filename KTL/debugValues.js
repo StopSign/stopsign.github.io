@@ -13,7 +13,6 @@ function loadDebugValues() {
 }
 
 function debug3rdKill() {
-
     if(debugLevel >= 81) {
         data.legacy = 5e6;
         increaseLichKills();
@@ -216,6 +215,7 @@ function debugStart() {
     //to start the game easier:
     if(!isLoadingEnabled) {
         data.currentGameState.bonusTime = 1000 * 60 * 60 * 24 * 7 * 4;
+        data.currentGameState.instantTime = 1000 * 60 * 60 * 24 * 7 * 4;
         data.ancientCoin = 10;
         buyUpgrade("stopLettingOpportunityWait")
         buyUpgrade("stopLettingOpportunityWait")

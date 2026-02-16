@@ -38,25 +38,33 @@
 <div id="helpMenuContainer"></div>
 <div style="position:absolute;left:15px;top:21px;padding:0 10px;font-size:14px;color: var(--text-muted);pointer-events: none;">
     <div id="momentumDisplay" style="background-color:var(--overlay-color);">
-        Clock: <span id="secondsPerReset" style="display:inline-block;margin-right:5px;color: var(--text-primary);font-weight:bold;"></span>
-        Total Momentum: <span id="totalMomentum" style="display:inline-block;color: var(--text-primary);margin-right:5px;font-weight:bold;">1</span>
+        Clock: <span id="secondsPerReset" style="margin-right:5px;color: var(--text-primary);font-weight:bold;"></span>
+        <span id="NWSecondsContainer" style="display:none">NW Clock: <span id="NWSeconds"  style="margin-right:5px;color: var(--text-primary);font-weight:bold;"></span></span>
+        Total Momentum: <span id="totalMomentum" style="display:inline-block;color: var(--momentum-color);margin-right:5px;font-weight:bold;">1</span>
     </div>
     <div style="background-color:var(--overlay-color);">
-        <span id="legacyDisplay" style="display:none;color:var(--legacy-color)">
-            Legacy: <span id="legacyAmount" style="display:inline-block;font-weight:bold;"></span>
+        <span id="legacyDisplay" style="display:none;">
+            Legacy: <span id="legacyAmount" style="display:inline-block;font-weight:bold;color:var(--legacy-color)"></span>
         </span>
-        <span id="ancientCoinDisplay" style="display:none;">
-            Ancient Coins: <span id="ancientCoin" style="display:inline-block;color:var(--text-primary);font-weight:bold;"></span>
+        <span id="manaQualityDisplay" style="display:none;">
+            Mana Quality: <span id="manaQuality" style="display:inline-block;font-weight:bold;color:#0ec3cf"></span>
         </span><br>
+        <span id="ancientCoinDisplay" style="display:none;">
+            Ancient Coins: <span id="ancientCoin" style="display:inline-block;color:var(--text-primary);font-weight:bold;margin-right:5px;"></span>
+        </span>
         <span id="ancientWhisperDisplay" style="display:none;">
             Ancient Whispers: <span id="ancientWhisper" style="display:inline-block;color:var(--text-primary);font-weight:bold;"></span>
+        </span><br>
+        <span id="jobDisplay" style="display:none;">
+            Current Job: <span id="jobTitle" style="color: var(--text-primary);font-weight:bold;margin-right:5px;">Help Scott With Chores</span> Wage: $<span id="jobWage" style="color: var(--wage-color);font-weight:bold">1</span>
         </span>
-        <span id="manaQualityDisplay" style="display:none;margin-right:10px;">
-            Mana Quality: <span id="manaQuality" style="display:inline-block;color:var(--text-primary);font-weight:bold;"></span>
+        <span id="legacyMultDisplay" style="display:none;">
+            <br>
+            Legacy Mult: x<span id="legacyMult" style="display:inline-block;color:var(--text-primary);font-weight:bold;margin-right:5px;"></span>
         </span>
-    </div>
-    <div id="jobDisplay" style="display:none;top:65px;background-color:var(--overlay-color);">
-        Current Job: <span id="jobTitle" style="color: var(--text-primary);font-weight:bold;">Help Scott With Chores</span>. Wage: $<b><span id="jobWage" style="color: var(--text-primary);">1</span></b>
+        <span id="ancientCoinMultDisplay" style="display:none;">
+            AC Mult: x<span id="ancientCoinMult" style="display:inline-block;color:var(--text-primary);font-weight:bold;"></span>
+        </span>
     </div>
 
     <span id="attDisplayShowButton" class="button" style="display:none;padding:5px;top:110px;left:388px;pointer-events:auto;" onclick="statMenuHideButton()">Attributes >></span>
@@ -79,7 +87,7 @@
         <div id="logMessages"></div>
     </div>
 </div>
-<div id="openLogButton" class="button" style="display:none;position:fixed;top:20px;right:15px;padding:8px;cursor:pointer;user-select:none;" onclick="toggleLog()">Open Log</div>
+<div id="openLogButton" class="button" style="display:none;position:fixed;top:20px;right:15px;padding:8px;cursor:pointer;user-select:none;" onclick="toggleLog()" onmouseover="hoverLog()">Open Log</div>
 
 <div id="pinnedWrapper" style="position:fixed;top:120px;right:11px;max-height:500px;overflow:auto;background-color:var(--overlay-color);
     border: 1px solid var(--border-color);box-sizing: border-box;">
@@ -110,18 +118,31 @@
     Offline >>
 </div>
 
-<div id="bonusDisplay" style="border: 1px solid var(--border-color);position:absolute;display:block;left:20px;bottom:55px;
-    padding:10px;margin:5px;background-color:var(--overlay-color);color: var(--text-primary);width:230px">
-    <span id="bonusDisplayHideButton" class="button" style="position:absolute;left:230px;top:-13px;padding:5px 8px;" onclick="bonusMenuHideButton()"><<</span>
-    <div class="button" onclick="skipTime(1)" style="background-color: darkblue;">Fast Forward 1 minute</div>
-    <div class="button" onclick="skipTime(10)" style="background-color: darkblue;">Fast Forward 10 minutes</div>
-    <div id="skipTime60" class="button" onclick="skipTime(60)" style="background-color: darkblue;display:none;">Fast Forward 60 minutes</div>
-    <div>Bonus Time: <b><span id="bonusTime"></span></b></div>
-    <div id="toggleBonusSpeedButton" class="button" onclick="toggleBonusSpeed()" style="background-color: red;width:70%">Enable Bonus Speed</div>
-    <div>Bonus Speed:
-        <label><input type="radio" onchange="changeBonusSpeed(3)" name="bonusSpeed" value="3x" checked> 3x</label>
-        <label><input type="radio" onchange="changeBonusSpeed(10)" name="bonusSpeed" value="10x"> 10x</label>
-        <span id="bonus50" style="display:none"><label><input type="radio" onchange="changeBonusSpeed(50)" name="bonusSpeed" value="50x"> 50x</label></span>
+<div id="bonusDisplay" style="border:1px solid var(--border-color);position:absolute;display:none;
+    flex-direction:row;left:20px;bottom:55px;padding:10px;margin:5px;background-color:var(--overlay-color);color:var(--text-primary);width:auto;">
+    <div style="width:230px;margin-right:10px;display:flex;flex-direction:column;gap:5px;">
+        <span id="bonusDisplayHideButton" class="button" style="position:absolute;left:460px;top:-13px;padding:5px 8px;" onclick="bonusMenuHideButton()"><<</span>
+        <div>Bonus Time: <b><span id="bonusTime"></span></b></div>
+
+        <div id="toggleBonusSpeedButton" class="button" onclick="toggleBonusSpeed()" style="background-color: red; text-align:center;">Enable Bonus Speed</div>
+
+        <div>Bonus Speed:
+            <label><input type="radio" onchange="changeBonusSpeed(3)" name="bonusSpeed" value="3x" checked> 3x</label>
+            <label><input type="radio" onchange="changeBonusSpeed(10)" name="bonusSpeed" value="10x"> 10x</label>
+            <span id="bonus50" style="display:none"><label><input type="radio" onchange="changeBonusSpeed(50)" name="bonusSpeed" value="50x"> 50x</label></span>
+        </div>
+    </div>
+
+    <div style="width:230px; border-left:1px solid var(--border-color); padding-left:10px; display:flex; flex-direction:column; gap:5px;">
+        <div>Instant Bonus Time: <span id="instantBonusTime">0:00:00</span></div>
+        <div style="font-weight:bold; text-align:center;">Fast Forward</div>
+        <div style="display:flex; justify-content:space-between; gap:2px;">
+            <div id="skipTime1" class="button" onclick="skipTime(1)" style="background-color:darkblue;flex:1;text-align:center;font-size:12px;">1 minute</div>
+            <div id="skipTime10" class="button" onclick="skipTime(10)" style="background-color:darkblue;flex:1;text-align:center;font-size:12px;">10 minutes</div>
+            <div id="skipTime60" class="button" onclick="skipTime(60)" style="background-color:darkblue;flex:1;text-align:center;font-size:12px;display:none;">60</div>
+        </div>
+
+        <div id="convertBtn" class="button" onclick="convertBonusTime()" style="background-color: green; text-align:center;">Convert 2 hours</div>
     </div>
 </div>
 

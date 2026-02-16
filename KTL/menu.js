@@ -78,48 +78,16 @@ function createCheatMenu() {
 function createShopMenu() {
     return Raw.html`
         <div class="menuTitle">Shop</div>
-        <div class="menuSeparator"></div><br>Work in Progress. The shop will be completed for full release with the following plans. 
-        I will keep the game ad-free and AI-art free, and the demo will be open-source on my github.<br> 
-        I'm looking for feedback on the pricing for when the game lives on steam, outlined below.<br>
-        Disclaimer: Game will be balanced without these upgrades.<br><br>
-        <ul>
-            <li>$5 for 1k Soul Coins (SC)</li>
-            <li>$20 for 5k Soul Coins</li>
-        </ul>
-        There will be a "daily bonus" button for +100 soul coins (and 30m of bonus speed) every 23hr, 
-        and it upgrades to +200 in ~30 days.<br>
+        <div class="menuSeparator"></div><br>The shop will be available in the full release.
+        I will keep the game ad-free and AI-art free, and the demo will be remain open-source on my github.<br> 
+        The game will be balanced without the paid upgrades.<br>
+        Exact upgrades and pricing is a WIP.<br>
+        <div class="menuSeparator"></div>
         
-        <br>Unique Upgrades:<br>
-        <ul>
-            <li>Maximum Focus bars +1 (up to 4): 1k SC each</li>
-            <li>Focus Bars mult (up to x4): 1k SC each</li>
-            <li>Learn exact legacy/AC gained in KTL before switching Overclock targets: 500 SC</li>
-            <li>Unlock option for Bonus Speed to go x10: 100 SC</li>
-        </ul>
         
-        <br>Special Resource Bonuses:<br>
-        <ul>
-            <li>+50% permanent momentum (up to 2): 500 SC, 1k SC</li>
-            <li>+50% permanent coins (up to 2): 500 SC, 1k SC</li>
-            <li>+50% permanent conversations (up to 2): 500 SC, 1k SC</li>
-            <li>+50% permanent mana (up to 2): 500 SC, 1k SC</li>
-        </ul>
+        <span class="button" onclick="resetRun()">Reset run</span>
+        Reset the run and gain offline time equal to the run time. 
         
-        <br>Timed Resource Bonuses (repeated use adds to timer):<br>
-        <ul>
-            <li>x2 momentum for 24hr: 200 SC</li>
-            <li>x2 coins for 24hr: 200 SC</li>
-            <li>x2 conversations for 24hr: 200 SC</li>
-            <li>x2 mana for 24hr: 200 SC</li>
-            <li>x2 legacy for 24hr: 600 SC</li>
-            <li>x2 game speed for 24hr: 2000 SC</li>
-        </ul>
-
-        <br>Buy Bonus Time:<br>
-        <ul>
-            <li>1 hr for 200 SC</li>
-            <li>24hr for 2000 SC</li>
-        </ul>
 `;
 }
 
@@ -213,21 +181,24 @@ function createDataMenu() {
         <div class="menuSeparator"></div><br>
         What do you want to know?<br><br>
         <div id="resetLogContainer"></div><br>
-    <div id="chartContainer" style="width: 80%; max-width: 800px; background-color: #2d3748; border-radius: 8px; 
-        box-shadow: 0 4px 12px rgba(0,0,0,0.4); padding: 20px;">
-        <h2 style="text-align: center; margin-top: 0; color: #e2e8f0;">Recent 100 Overclock Amounts</h2>
-        <canvas id="resourceChart" style="width: 100%; height: 400px; border-radius: 4px;"></canvas>
-        <div style="text-align: center; margin-top: 15px;">
-            <button id="linearBtn" style="padding: 10px 20px; border: 1px solid #63b3ed; background-color: #63b3ed; 
-                color: #1a202c; border-radius: 5px; cursor: pointer; font-weight: bold; transition: background-color 0.2s;">
-                Linear
-            </button>
-            <button id="logBtn" style="padding: 10px 20px; border: 1px solid #4a5568; background-color: #4a5568; 
-                color: #e2e8f0; border-radius: 5px; cursor: pointer; font-weight: bold; transition: background-color 0.2s;">
-                Logarithmic
-            </button>
+        <div id="highestLegacyContainer">
+            Highest Legacy: <span id="highestLegacy" style="color:var(--legacy-color)"></span>
         </div>
-    </div>
+        <div id="chartContainer" style="width: 80%; max-width: 800px; background-color: #2d3748; border-radius: 8px; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4); padding: 20px;">
+            <h2 style="text-align: center; margin-top: 0; color: #e2e8f0;">Recent 100 Overclock Amounts</h2>
+            <canvas id="resourceChart" style="width: 100%; height: 400px; border-radius: 4px;"></canvas>
+            <div style="text-align: center; margin-top: 15px;">
+                <button id="linearBtn" style="padding: 10px 20px; border: 1px solid #63b3ed; background-color: #63b3ed; 
+                    color: #1a202c; border-radius: 5px; cursor: pointer; font-weight: bold; transition: background-color 0.2s;">
+                    Linear
+                </button>
+                <button id="logBtn" style="padding: 10px 20px; border: 1px solid #4a5568; background-color: #4a5568; 
+                    color: #e2e8f0; border-radius: 5px; cursor: pointer; font-weight: bold; transition: background-color 0.2s;">
+                    Logarithmic
+                </button>
+            </div>
+        </div>
 `
 }
 
@@ -321,14 +292,25 @@ function createOptionsMenu() {
                 </div>
             </div>
         </div>
+        
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+            <span style="font-size:14px;">Show estimated times to level</span>
+            <div id="viewEstimatedTimesSwitch" onclick="toggleEstimatedTimes()" style="position:relative;cursor:pointer;border:1px solid #aaa;border-radius:4px;padding:2px;width:200px;height:30px;">
+                <div style="position:absolute;left:2px;top:2px;width:calc(50% - 2px);height:calc(100% - 4px);background:#ccc;border-radius:2px;z-index:1;"></div>
+                <div style="position:relative;display:flex;z-index:2;height:100%;">
+                    <span style="flex:1;text-align:center;font-size:13px;font-weight:bold;line-height:26px;color:#000;">Off</span>
+                    <span style="flex:1;text-align:center;font-size:13px;font-weight:bold;line-height:26px;color:#000;">On</span>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="menuSeparator"></div>
     
-    <div style="display:flex;align-items:center;gap:10px;">
-        <label for="FPSSlider" style="font-size:14px;">FPS: <span id="sliderValue" style="font-weight:bold;">20</span></label>
-        <input type="range" id="FPSSlider" min="1" max="20" value="20" oninput="updateSliderDisplay(this.value)" style="flex:1;cursor:pointer;">
-    </div>
+<!--    <div style="display:flex;align-items:center;gap:10px;">-->
+<!--        <label for="FPSSlider" style="font-size:14px;">FPS: <span id="sliderValue" style="font-weight:bold;">20</span></label>-->
+<!--        <input type="range" id="FPSSlider" min="1" max="20" value="20" oninput="updateSliderDisplay(this.value)" style="flex:1;cursor:pointer;">-->
+<!--    </div>-->
     <p style="margin:0;font-size:13px;">Auto save every 20 seconds and on pause, but if you want a button to click:</p>
     <button onclick="save()" style="padding:10px 16px;background:#007BFF;color:#fff;border:none;border-radius:4px;font-size:14px;cursor:pointer;width:160px;">Save</button>
     <div style="display:flex;flex-direction:column;gap:10px;">
@@ -359,6 +341,7 @@ function createOptionsMenu() {
 `
 }
 
+//for fps slider, but not in use
 function updateSliderDisplay(currentValue) {
     // recalcInterval(currentValue);
     data.gameSettings.fps = parseInt(currentValue);
@@ -455,6 +438,20 @@ function toggleViewAll0Buttons() {
     for(let actionVar in data.actions) {
         let dataObj = actionData[actionVar];
         views.updateVal(`${actionVar}ToggleDownstreamButtons`, data.gameSettings.viewAll0Buttons && dataObj.plane !== 2 ? "" : "none", "style.display");
+    }
+}
+
+function toggleEstimatedTimes() {
+    const el = document.getElementById('viewEstimatedTimesSwitch');
+    const slider = el.firstElementChild;
+    data.gameSettings.viewEstimatedTimes = !data.gameSettings.viewEstimatedTimes;
+    if (data.gameSettings.viewEstimatedTimes) {
+        slider.style.left = '50%';
+    } else {
+        slider.style.left = '0';
+    }
+    for(let actionVar in data.actions) {
+        views.updateVal(`${actionVar}EstimatedTimesContainer`, data.gameSettings.viewEstimatedTimes ? "flex" : "none", "style.display");
     }
 }
 

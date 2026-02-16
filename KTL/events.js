@@ -19,7 +19,7 @@ function setSliderUI(fromAction, toAction, newValue) {
 
     document.getElementById(fromAction + "NumInput" + toAction).value = newValue;
     if(toAction !== "Automation") {
-        document.getElementById(fromAction + "_" + toAction + "_Line_Inner").style.height = (newValue / 100 * 20) + "px";
+        views.updateVal(`${fromAction}_${toAction}_Line_Inner`, (newValue / 100 * 20) + "px", "style.height");
     }
     updateCustomThumbPosition(fromAction, toAction, newValue);
 
@@ -156,7 +156,7 @@ function resizeStatMenu() {
     let bonusDisplay = view.cached[`bonusDisplay`];
     let reduction = 240;
     if(bonusDisplay.style.display !== "none") {
-        reduction += 70;
+        reduction += 90;
     }
 
     if(view.cached[`attDisplay`]) {
@@ -656,7 +656,7 @@ function updateAttActionContainers() {
         for (let attObj of dataObj.efficiencyAtts) {
             let attVar = attObj[0];
             views.updateVal(`${actionVar}${attVar}OutsideContainereff`, selectedStat && selectedStat === attVar ? "var(--text-selected-color)" : "var(--attribute-use-eff-color)", "style.borderColor");
-            views.updateVal(`${actionVar}${attVar}InsideContainereff`, selectedStat && selectedStat === attVar ? "var(--text-selected-color)" : "transparent", "style.borderColor");
+            // views.updateVal(`${actionVar}${attVar}InsideContainereff`, selectedStat && selectedStat === attVar ? "var(--text-selected-color)" : "transparent", "style.borderColor");
         }
     }
 }
@@ -724,34 +724,74 @@ function bonusMenuHideButton() {
         bonusDisplay.style.display = "none";
         button.style.display = "";
     } else {
-        bonusDisplay.style.display = "block";
+        bonusDisplay.style.display = "flex";
         button.style.display = "none";
     }
     resizeStatMenu();
 }
+let isSkipping = false;
 
 //skip [time] minutes
 function skipTime(time) {
+    if (isSkipping) return;
+
     let ticksToUse = time * 60 * 1000;
-    if(data.currentGameState.bonusTime < ticksToUse) {
+    if(data.currentGameState.instantTime < ticksToUse) {
         return;
     }
 
-    data.currentGameState.bonusTime -= ticksToUse;
+    isSkipping = true;
+    toggleSkipButtons(true);
 
-    let origPause = data.gameSettings.stop;
-    data.gameSettings.stop = false;
-    let origTickRate = data.gameSettings.ticksPerSecond;
-    data.gameSettings.ticksPerSecond = 1;
+    data.currentGameState.instantTime -= ticksToUse;
 
-    for(let i = 0; i < time * 60; i++) {
-        gameTick()
-        secondPassed();
+    setTimeout(() => {
+        let origPause = data.gameSettings.stop;
+        data.gameSettings.stop = false;
+        data.gameSettings.ticksPerSecond = 1;
+
+        for (let i = 0; i < time * 60; i++) {
+            gameTick();
+            secondPassed();
+        }
+
+        data.gameSettings.ticksPerSecond = 20;
+        data.gameSettings.stop = origPause;
+        save();
+
+        setTimeout(() => {
+            isSkipping = false;
+            toggleSkipButtons(false);
+        }, 250);
+    }, 0);
+}
+
+function toggleSkipButtons(disable) {
+    const ids = ['skipTime1', 'skipTime10', 'skipTime60'];
+    for (let id of ids) {
+        let btn = document.getElementById(id);
+        if (btn) {
+            btn.style.backgroundColor = disable ? "grey" : "darkblue";
+            btn.style.pointerEvents = disable ? "none" : "auto";
+        }
+    }
+}
+
+function convertBonusTime() {
+    let btn = document.getElementById('convertBtn');
+    if (btn.innerText.indexOf("Use in") !== -1) return;
+
+    let amountToConvert;
+    if (data.currentGameState.bonusTime >= 120 * 60 * 1000) {
+        amountToConvert = 120 * 60 * 1000;
+    } else {
+        amountToConvert = data.currentGameState.bonusTime;
     }
 
-    data.gameSettings.ticksPerSecond = origTickRate;
-    data.gameSettings.stop = origPause;
-    save()
+    data.currentGameState.bonusTime -= amountToConvert;
+    data.currentGameState.instantTime += amountToConvert;
+    data.currentGameState.instantTimerCooldown += 30 * 60;
+    updateConvertButtonUI();
 }
 
 function toggleBonusSpeed() {
@@ -976,6 +1016,12 @@ function addLogMessage(text, type) {
     if(isScrolledToBottom) {
         logContainer.scrollTop = logContainer.scrollHeight;
     }
+
+    const logWrapper = document.getElementById('logWrapper');
+    const openLogButton = document.getElementById('openLogButton');
+    if(logWrapper.style.display === 'none') {
+        openLogButton.innerHTML = `<span style="color:yellow">•</span> Open Log`
+    }
 }
 
 function expandLogMessage(logData) {
@@ -1022,10 +1068,17 @@ function toggleLog() {
     }
 }
 
+function hoverLog() {
+    const openLogButton = document.getElementById('openLogButton');
+    openLogButton.innerHTML = `Open Log`
+}
+
 function clearLog() {
     const logMessages = document.getElementById('logMessages');
     logMessages.replaceChildren();
     data.currentLog = [];
+    const openLogButton = document.getElementById('openLogButton');
+    openLogButton.innerHTML = `Open Log`
 }
 
 function rebuildLog() {

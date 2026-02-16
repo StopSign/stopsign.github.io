@@ -37,13 +37,21 @@ let views = {
         views.updateVal(`ancientCoinDisplay`, data.doneKTL ? "" : "none", "style.display");
         views.updateVal(`ancientWhisperDisplay`, data.doneKTL ? "" : "none", "style.display");
         views.updateVal(`legacyDisplay`, data.legacy > 0 ? "" : "none", "style.display");
+        views.updateVal(`highestLegacyContainer`, data.legacy > 0 ? "" : "none", "style.display");
+        views.updateVal(`highestLegacy`, data.highestLegacy, "textContent", 2);
+        views.updateVal(`legacyMult`, data.legacyMultKTL, "innerText", 2);
+        views.updateVal(`ancientCoinMult`, data.ancientCoinMultKTL, "innerText", 2);
 
-        views.updateVal(`manaQuality`, actionData.awakenYourGrimoire.manaQuality() > 0 ? "" : "none", "style.display");
+        views.updateVal(`manaQualityDisplay`, actionData.awakenYourGrimoire.manaQuality() > 0 ? "" : "none", "style.display");
 
         views.updateVal(`jobDisplay`, data.displayJob ? "" : "none", "style.display");
 
         let shouldShowKTLButton = data.actions.hearAboutTheLich.level >= 1 && data.gameState !== "KTL";
         views.updateVal(`killTheLichMenuButton2`, shouldShowKTLButton?"":"none", "style.display")
+
+        tickTimerCooldown()
+
+        views.updateVal(`highestLegacyContainer`, data.legacy > 0 ? "" : "none", "style.display");
     },
     scheduleUpdate: function(elementId, value, type) {
         view.scheduled.push({
@@ -197,7 +205,7 @@ let views = {
         views.updateVal(`${actionVar}SmallVersionLevels`, isMaxLevel?"var(--max-level-color)":"var(--text-primary)", "style.color");
         views.updateVal(`${actionVar}Level2`, actionObj.level, "innerText", 1);
         views.updateVal(`${actionVar}MaxLevel2`, actionObj.maxLevel, "innerText", 1);
-        views.updateVal(`${actionVar}IsMaxLevel`, isMaxLevel && !miniVersion ? "":"none", "style.display");
+        views.updateVal(`${actionVar}IsMaxLevel`, isMaxLevel && !miniVersion && actionObj.unlocked ? "":"none", "style.display");
 
 
         //go through each downstream
@@ -235,10 +243,11 @@ let views = {
             roundedNumbers.push(["wage", 2]);
         }
         if(dataObj.isSpell) {
-            let instaColor = `rgb(${Math.round(20+189*(actionObj.instability/100/data.atts.control.attMult))}, ${Math.round(20+189*(1-(actionObj.instability/100/data.atts.control.attMult)))}, 100)`;
+            let instaColor = `rgb(${Math.min(255, Math.round(actionObj.instability * 0.1275))}, ${Math.max(0, Math.round(255 - actionObj.instability * 0.1275))}, 100)`;
             views.updateVal(`${actionVar}Instability`, instaColor, "style.color");
             roundedNumbers.push(["instability", 2]);
             views.updateVal(`${actionVar}InstabilityToAdd`, dataObj.instabilityToAdd/(actionObj.efficiency/100), "textContent", 2);
+            views.updateVal(`${actionVar}InstabilityToRemove`, getInstabilityReduction(actionObj.instability), "textContent", 2);
             views.updateVal(`${actionVar}SpellPower`, dataObj.spellPower(), "textContent", 1);
         }
         if(dataObj.manaQuality) {
@@ -313,7 +322,7 @@ let views = {
         let isMaxLevel = actionObj.maxLevel !== undefined && actionObj.level >= actionObj.maxLevel;
 		//If resources are flowing "upstream" that counts as no resources flowing since it's not "active".
 		let isResourcesQuiet = (actionObj.resourceIncrease === 0 && actionObj.resourceDecrease === 0) || actionObj.resourceRetrieved !== 0;
-        let isQuiet = isMaxLevel && isResourcesQuiet && !actionObj.mouseOnThis;
+        let isQuiet = isMaxLevel && isResourcesQuiet && actionObj.unlocked && !actionObj.mouseOnThis;
         if(!isQuiet) {
             dataObj.blinkDelay = 1;
         } else {
@@ -354,8 +363,6 @@ let views = {
         views.updateVal(`${actionVar}ExpBarInner`, `${(exp > 100 ? 100 : exp)}%`, "style.width");
 
 
-
-
         let isMaxLevel = actionObj.maxLevel !== undefined && actionObj.level >= actionObj.maxLevel;
         views.updateVal(`${actionVar}LargeVersionContainer`, isMaxLevel?`var(--${dataObj.resourceName}-color-bg)`:"var(--bg-secondary)", "style.backgroundColor");
         //--bg-secondary-max
@@ -364,16 +371,23 @@ let views = {
 
         }
 
-        if(actionObj.currentMenu === "atts") {
+        if(actionObj.currentMenu === "atts") { //stats menu
             for(let expAtt of actionObj.expAtts) {
                 let attVar = expAtt[0];
                 views.updateVal(`${actionVar}_${attVar}AttExpMult`, actionObj[`${attVar}AttExpMult`], "textContent", 3);
             }
 
-            for(let efficiencyAtt of actionObj.efficiencyAtts) {
-                let attVar = efficiencyAtt[0];
-                views.updateVal(`${actionVar}_${attVar}AttEfficiencyMult`, actionObj[`${attVar}AttEfficiencyMult`], "textContent", 3);
+            if(dataObj.plane !== 1) {
+                views.updateVal(`${actionVar}LowestUnlockTimeContainer`, actionObj.lowestUnlockTime ? "" : "none", "style.display");
+                views.updateVal(`${actionVar}LowestUnlockTime`, actionObj.lowestUnlockTime, "textContent", "time");
+            } else if(dataObj.plane === 1) {
+                views.updateVal(`${actionVar}LowestLevel1Container`, actionObj.lowestLevel1Time ? "" : "none", "style.display");
+                views.updateVal(`${actionVar}LowestLevel1Time`, actionObj.lowestLevel1Time, "textContent", "time");
             }
+            // for(let efficiencyAtt of actionObj.efficiencyAtts) {
+            //     let attVar = efficiencyAtt[0];
+            //     views.updateVal(`${actionVar}_${attVar}AttEfficiencyMult`, actionObj[`${attVar}AttEfficiencyMult`], "textContent", 3);
+            // }
         }
 
         if(dataObj.showResourceAdded) {
@@ -381,6 +395,18 @@ let views = {
         }
         if(dataObj.showExpAdded) {
             views.updateVal(`${actionVar}ShowExpAdded`, actionObj.showExpAdded === undefined?"???":"+"+intToString(actionObj.showExpAdded, 2), "textContent");
+        }
+
+        views.updateVal(`${actionVar}TimeToLevelContainer`, actionObj.maxLevel !== actionObj.level ? "flex" : "none", "style.display")
+        views.updateVal(`${actionVar}TimeToMaxContainer`, actionObj.maxLevel && actionObj.maxLevel !== actionObj.level ? "flex" : "none", "style.display")
+
+        if(!actionObj.maxLevel || actionObj.maxLevel !== actionObj.level) {
+            let timeToLevel = calcTimeToLevel(actionObj);
+            views.updateVal(`${actionVar}TimeToLevel`, secondsToTime(timeToLevel), "textContent")
+        }
+        if(actionObj.maxLevel) {
+            let timeToMax = calcTimeToMax(actionVar);
+            views.updateVal(`${actionVar}TimeToMax`, secondsToTime(timeToMax), "textContent")
         }
 
         views.updateActionDownstreamViews(actionObj, actionObj.currentMenu === "downstream");
@@ -392,7 +418,7 @@ let views = {
             ["exp", 2], ["expToLevel", 2], ["expToAdd2", 3],
             ["resourceIncrease", 3], ["resourceDecrease", 3]
         ];
-        if(dataObj.isGenerator && actionVar !== "hearAboutTheLich") {
+        if(dataObj.actionPowerBase) { //can be a generator w/o action power
             roundedNumbers.push(["actionPower", 4]);
         }
         if(actionVar === "hearAboutTheLich") {
@@ -401,7 +427,7 @@ let views = {
 
         if(actionObj.currentMenu === "atts") {
             roundedNumbers.push(["attReductionEffect", 3]);
-            roundedNumbers.push(["efficiencyMult", 3]);
+            // roundedNumbers.push(["efficiencyMult", 3]);
         }
         roundedNumbers.push(["totalSend", 3]);
         roundedNumbers.push(["progressMaxIncrease", 2]);
@@ -489,6 +515,7 @@ let views = {
         let prevValue = view.prevValues[id];
         if (!el) {
             console.log("Element of id " + id + " does not exist.");
+            console.log(new Error().stack);
             return;
         }
 
@@ -550,7 +577,10 @@ function updateGlobals() {
     }
 
     views.updateVal(`secondsPerReset`, data.secondsPerReset, "textContent","time");
+    views.updateVal(`NWSecondsContainer`, data.gameState === "ktl"?"":"none", "style.display");
+    views.updateVal(`NWSeconds`, data.NWSeconds, "textContent","time");
     views.updateVal(`bonusTime`, data.currentGameState.bonusTime/1000, "textContent", "time");
+    views.updateVal(`instantBonusTime`, data.currentGameState.instantTime/1000, "textContent", "time");
 
     views.updateVal(`legacyAmount`, data.legacy, "textContent", 1);
     views.updateVal(`ancientCoin`, data.ancientCoin, "textContent", 1);
@@ -690,4 +720,357 @@ function displayLSStuff() {
     // document.getElementById("lichUpgradeTab").style.display = "";
     // document.getElementById("challengesUpgradeTab").style.display = "";
     // document.getElementById("lichCoinsDisplay").style.display = "";
+}
+
+
+// --- 1. Main Entry Point ---
+
+function addCustomTrigger(actionVar) {
+    // 1. Hide the "Add" button
+    const btn = document.getElementById(`${actionVar}_addCustomTriggerButton`);
+    if (btn) btn.style.display = "none";
+
+    // 2. Locate the form container
+    const formContainer = document.getElementById(`${actionVar}_customTriggerForm`);
+
+    // 3. Clear any existing junk safely and append the new form
+    formContainer.replaceChildren(buildTriggerForm(actionVar));
+}
+
+// --- 2. The Form Builder (DOM Manipulation) ---
+
+function buildTriggerForm(actionVar) {
+    const wrapper = document.createElement('div');
+    wrapper.className = "trigger-form-box";
+
+    // --- Row 1: "Set upstream to [Reward]..." ---
+    const row1 = document.createElement('div');
+    row1.style.marginBottom = "8px";
+
+    row1.append("Set upstream to ");
+
+    // Reward Select
+    const sliderOptionsSelect = document.createElement('select');
+    const rewards = [
+        { val: "0", text: "Off" },
+        { val: "10", text: "10%" },
+        { val: "50", text: "50%" },
+        { val: "100", text: "100%" }
+    ];
+    rewards.forEach(r => {
+        const opt = document.createElement('option');
+        opt.value = r.val;
+        opt.textContent = r.text;
+        sliderOptionsSelect.appendChild(opt);
+    });
+    row1.append(sliderOptionsSelect);
+
+    row1.append(" when ");
+
+    // Target Action Select (Dynamic)
+    const targetSelect = document.createElement('select');
+    // iterate over your data.actions
+    for (let key in data.actions) {
+        const opt = document.createElement('option');
+        opt.value = key;
+        opt.textContent = actionData[key].title; // Using the title as requested
+        targetSelect.appendChild(opt);
+    }
+    row1.append(targetSelect);
+
+    // --- Row 2: "...is [Condition] [Amount]" ---
+    const row2 = document.createElement('div');
+    row2.style.marginBottom = "8px";
+
+    row2.append(" is ");
+
+    // Condition Select
+    const conditionSelect = document.createElement('select');
+    const conditions = [
+        { val: "unlocked", text: "Unlocked" },
+        { val: "max", text: "Level Max" },
+        { val: "specific", text: "Level..." }
+    ];
+    conditions.forEach(c => {
+        const opt = document.createElement('option');
+        opt.value = c.val;
+        opt.textContent = c.text;
+        conditionSelect.appendChild(opt);
+    });
+    row2.append(conditionSelect);
+
+    // Amount Input (Hidden by default)
+    const amountInput = document.createElement('input');
+    amountInput.type = "number";
+    amountInput.className = "trigger-num-input"; // See CSS below
+    amountInput.placeholder = "#";
+    amountInput.min = "1";
+    amountInput.style.display = "none";
+    amountInput.style.marginLeft = "5px";
+    row2.append(amountInput);
+
+    // Toggle Amount Input Visibility
+    conditionSelect.addEventListener('change', () => {
+        if (conditionSelect.value === 'specific') {
+            amountInput.style.display = 'inline-block';
+            amountInput.focus();
+        } else {
+            amountInput.style.display = 'none';
+            amountInput.value = ''; // Reset
+        }
+    });
+
+    // --- Row 3: Recurse & Buttons ---
+    const row3 = document.createElement('div');
+    row3.className = "trigger-form-actions";
+
+    // Recurse Checkbox
+    const recurseLabel = document.createElement('label');
+    recurseLabel.textContent = "Recurse Upstream: ";
+    const recurseCheck = document.createElement('input');
+    recurseCheck.type = "checkbox";
+    recurseCheck.checked = true; // Default On
+    recurseLabel.append(recurseCheck);
+    row3.append(recurseLabel);
+
+    // Spacing
+    const spacer = document.createElement('span');
+    spacer.style.margin = "0 10px";
+    row3.append(spacer);
+
+    // Save Button
+    const saveBtn = document.createElement('button');
+    saveBtn.textContent = "Save";
+    saveBtn.onclick = () => {
+        // Validation
+        if (conditionSelect.value === 'specific' && (amountInput.value === '' || parseInt(amountInput.value) < 1)) {
+            alert("Please enter a valid positive integer level.");
+            return;
+        }
+
+        const newTrigger = {
+            rewardVal: sliderOptionsSelect.value,
+            rewardText: sliderOptionsSelect.options[sliderOptionsSelect.selectedIndex].text,
+            targetKey: targetSelect.value,
+            condition: conditionSelect.value,
+            amount: conditionSelect.value === 'specific' ? parseInt(amountInput.value) : null,
+            recurse: recurseCheck.checked
+        };
+
+        saveToData(actionVar, newTrigger);
+
+        // Close form
+        closeForm(actionVar);
+    };
+    row3.append(saveBtn);
+
+    // Cancel Button
+    const cancelBtn = document.createElement('button');
+    cancelBtn.textContent = "Cancel";
+    cancelBtn.style.marginLeft = "5px";
+    cancelBtn.onclick = () => closeForm(actionVar);
+    row3.append(cancelBtn);
+
+    wrapper.append(row1, row2, row3);
+    return wrapper;
+}
+
+// --- 3. Helper Functions ---
+
+function closeForm(actionVar) {
+    const formContainer = document.getElementById(`${actionVar}_customTriggerForm`);
+    formContainer.replaceChildren(); // Safely clears the form
+
+    const btn = document.getElementById(`${actionVar}_addCustomTriggerButton`);
+    if (btn) btn.style.display = ""; // Show the Add button again
+}
+
+function saveToData(actionVar, triggerData) {
+    let actionObj = data.actions[actionVar];
+    if (!actionObj.customTriggers) actionObj.customTriggers = [];
+
+    actionObj.customTriggers.push(triggerData);
+    registerListener(triggerData.targetKey, actionVar);
+
+    //for each action mentioned, update
+    rebuildTriggerInfo(triggerData.targetKey);
+
+    // Rebuild the UI list immediately
+    rebuildCustomTriggersUI(actionVar);
+}
+
+// --- 4. Rendering the Saved List ---
+
+function rebuildCustomTriggersUI(actionVar) {
+    const container = document.getElementById(`${actionVar}_customTriggerContainer`);
+
+    // 1. Clear existing list safely
+    container.replaceChildren();
+
+    // 2. Get data
+    let actionObj = data.actions[actionVar];
+    if (!actionObj || !actionObj.customTriggers) return;
+
+    // 3. Build UI for each
+    actionObj.customTriggers.forEach((trigger, index) => {
+        const itemDiv = document.createElement('div');
+        itemDiv.className = "custom-trigger-item"; // See CSS
+
+        // Text Content
+        const textDiv = document.createElement('div');
+        const targetTitle = actionData[trigger.targetKey].title; // Lookup title
+
+        let condText = trigger.condition === 'specific'
+            ? `level ${trigger.amount}`
+            : (trigger.condition === 'max' ? "level max" : "unlocked");
+
+        textDiv.innerHTML = `Set upstream <b>${trigger.rewardText}</b> when <span style="font-weight:bold;cursor:pointer;" onclick="actionTitleClicked('${trigger.targetKey}')">${targetTitle}</span> is <b>${condText}</b> (Recurse: ${trigger.recurse ? "On" : "Off"})`;
+
+        // Delete Button
+        const delBtn = document.createElement('div');
+        delBtn.textContent = "✖";
+        delBtn.className = "trigger-delete";
+        delBtn.onclick = () => {
+            let toRebuildVar = actionObj.customTriggers[index].targetKey
+
+            actionObj.customTriggers.splice(index, 1);
+
+            unregisterListener(toRebuildVar, actionVar);
+            rebuildTriggerInfo(toRebuildVar)
+            rebuildCustomTriggersUI(actionVar);
+        };
+
+        itemDiv.append(textDiv, delBtn);
+        container.append(itemDiv);
+    });
+}
+
+
+function rebuildTriggerInfo(actionVar) {
+    const triggerInfoContainer = document.getElementById(`${actionVar}_triggerInfoContainer`);
+    if (!triggerInfoContainer) return;
+
+    // 1. Clear container safely
+    triggerInfoContainer.replaceChildren();
+
+    // 2. Containers for the results
+    const revealSources = [];
+    const maxLevelSources = [];
+    const customTriggerSources = [];
+
+    // 3. Scan ALL actions to see if they target THIS actionVar
+    for (const sourceKey in actionData) {
+
+        // --- Check Static Triggers (actionData) ---
+        const dataObj = actionData[sourceKey];
+        if (dataObj.actionTriggers) {
+            dataObj.actionTriggers.forEach(trigger => {
+                // Format: [condition, type, target, amount]
+                // We check if trigger[2] (the target) matches our current actionVar
+                if (trigger[2] === actionVar) {
+                    const type = trigger[1];
+                    if (type === 'reveal' || type === 'unlock') {
+                        revealSources.push(sourceKey);
+                    } else if (type === 'addMaxLevels') {
+                        maxLevelSources.push(sourceKey);
+                    }
+                }
+            });
+        }
+
+        // --- Check Dynamic Triggers (data.actions) ---
+        // These are the custom triggers added by the user
+        const actionObj = data.actions[sourceKey];
+        if (actionObj && actionObj.customTriggers) {
+            actionObj.customTriggers.forEach(customTrigger => {
+                if (customTrigger.targetKey === actionVar) {
+                    // Prevent duplicates if multiple triggers exist on same action
+                    if (!customTriggerSources.includes(sourceKey)) {
+                        customTriggerSources.push(sourceKey);
+                    }
+                }
+            });
+        }
+    }
+
+    // 4. Build the UI
+    // If no triggers exist at all, we might want to hide the container or leave empty
+    if (revealSources.length === 0 && maxLevelSources.length === 0 && customTriggerSources.length === 0) {
+        return;
+    }
+
+    const infoWrapper = document.createElement('div');
+    infoWrapper.className = "trigger-info-box";
+
+    const divider = document.createElement('div');
+    divider.className = "menuSeparator"
+    infoWrapper.appendChild(divider);
+
+    const header = document.createElement('div');
+    header.textContent = "Action Trigger Info:";
+    header.style.fontWeight = "bold";
+    header.style.marginBottom = "5px";
+    infoWrapper.appendChild(header);
+
+    // Helper to create the list of links
+    const createLinkList = (sourceKeys, prefixText) => {
+        const lineDiv = document.createElement('div');
+        lineDiv.className = "trigger-info-line";
+
+        const prefix = document.createElement('span');
+        prefix.textContent = prefixText + " ";
+        lineDiv.appendChild(prefix);
+
+        sourceKeys.forEach((key, index) => {
+            const link = document.createElement('span');
+            link.className = "action-link";
+            link.textContent = actionData[key].title;
+            link.onclick = () => actionTitleClicked(key);
+
+            lineDiv.appendChild(link);
+
+            if (index < sourceKeys.length - 1) {
+                lineDiv.append(document.createTextNode(", "));
+            }
+        });
+
+        return lineDiv;
+    };
+
+    // Append sections if data exists
+    if (revealSources.length > 0) {
+        infoWrapper.appendChild(createLinkList(revealSources, "This action is revealed by"));
+    }
+
+    if (maxLevelSources.length > 0) {
+        infoWrapper.appendChild(createLinkList(maxLevelSources, "This action's max level is increased by"));
+    }
+
+    if (customTriggerSources.length > 0) {
+        // For custom triggers, the prompt requested a specific format with a list below
+        const div = document.createElement('div');
+        div.className = "trigger-info-line";
+        div.style.marginTop = "5px";
+        div.textContent = "This action is used in custom automation triggers on the following actions:";
+        infoWrapper.appendChild(div);
+
+        const list = document.createElement('ul');
+        list.style.margin = "5px 0 5px 20px";
+        list.style.padding = "0";
+
+        customTriggerSources.forEach(key => {
+            const li = document.createElement('li');
+
+            const link = document.createElement('span');
+            link.className = "action-link";
+            link.textContent = actionData[key].title;
+            link.onclick = () => actionTitleClicked(key);
+
+            li.appendChild(link);
+            list.appendChild(li);
+        });
+        infoWrapper.appendChild(list);
+    }
+
+    triggerInfoContainer.appendChild(infoWrapper);
 }
