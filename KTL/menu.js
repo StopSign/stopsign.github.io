@@ -629,7 +629,13 @@ function createChangelogMenu() {
     return Raw.html`
         <div class="menuTitle">Changelog</div>
         <div class="menuSeparator"></div><br>
-        v3.0.0 2/18 (current): <br>
+        v3.0.1 2/18 (current): <br>
+            <ol>
+                <li>Tips were not showing</li>
+                <li>The reset button was hidden on some screens</li>
+            </ol>
+        <br>
+        v3.0.0 2/18: <br>
         Big changes, too many to list. Here are the big ones:<br>
             <ol>
                 <li>All attributes are exponential: +100 attributes gives a x10 bonus. This means every action in the game has been modified.</li>

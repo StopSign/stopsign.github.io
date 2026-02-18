@@ -10,7 +10,7 @@ let toastIdCounter = 0; // to give each toast a unique ID
 function initializeToasts() {
     createToastModal();
 
-    if(debugLevel > 0) {
+    if(isDebug) {
         return
     }
 

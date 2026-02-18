@@ -715,6 +715,7 @@ function displayLSStuff() {
 
         //lots more max level increases
         //OTTL doesn't consume all of its momentum
+        //reduce progress increase on resonant echoes
     }
 
     // document.getElementById("lichUpgradeTab").style.display = "";
