@@ -197,7 +197,7 @@ actionData = {
         },
         onLevelCustom: function() {
             if(data.actions.destroyEasternMonolith.level === data.actions.destroyEasternMonolith.maxLevel) {
-                document.getElementById("legacySeveranceButton").style.display = "";
+                document.getElementById("legacySeveranceButton1").style.display = "";
             }
         },
         onLevelAtts:[["legacy", 500]],
@@ -212,17 +212,17 @@ actionData = {
             ["level_3", "reveal", "stopDarknessRitual"]
         ],
         extraButton: Raw.html`
-            <span class="button" id='legacySeveranceButton' onclick="openLSMenu()"
+            <span class="button" id='legacySeveranceButton1' onclick="openLSMenu()"
                 style="display:none;padding:8px 13px;position:absolute;left:460px;top:20px;border: 2px solid #aa0000;border-radius: 5px;
                 background-color:#550000;text-shadow: 3px 3px 2px rgba(0, 0, 0, 0.8);color: #ffdddd;box-shadow:0 0 10px 6px rgba(255, 0, 0, 0.7);font-size:26px;" >
             Legacy Severance</span>
         `,
     },
     stopDarknessRitual: {
-        tier:0, plane:2, resourceName:"fight", creationVersion: 6,
-        progressMaxBase:2e13, progressMaxIncrease:4,
-        expToLevelBase:10, expToLevelIncrease:1,
-        efficiencyBase:.1, isKTL:true, purchased: true, maxLevel:10,
+        tier:1, plane:2, resourceName:"fight", creationVersion: 6,
+        progressMaxBase:2e13, progressMaxIncrease:2,
+        expToLevelBase:5, expToLevelIncrease:1,
+        efficiencyBase:.1, isKTL:true, purchased: false, maxLevel:10,
         unlockCost:2e9, visible:false, unlocked:false,
         onLevelAtts:[["legacy", 60]],
         expAtts:[["resonance", 1]],
@@ -236,9 +236,9 @@ actionData = {
         ]
     },
     protectTheSunstone: {
-        tier:0, plane:2, resourceName:"fight", creationVersion: 6,
-        progressMaxBase:2e10, progressMaxIncrease:4,
-        expToLevelBase:10, expToLevelIncrease:1,
+        tier:1, plane:2, resourceName:"fight", creationVersion: 6,
+        progressMaxBase:2e14, progressMaxIncrease:2,
+        expToLevelBase:5, expToLevelIncrease:1,
         efficiencyBase:.1, isKTL:true, purchased: true, maxLevel:10,
         unlockCost:2e10, visible:false, unlocked:false,
         onLevelAtts:[["legacy", 100]],
@@ -253,87 +253,118 @@ actionData = {
         ]
     },
     silenceDeathChanters: {
-        tier:0, plane:2, resourceName:"fight", creationVersion: 6,
-        progressMaxBase:2e11, progressMaxIncrease:4,
-        expToLevelBase:10, expToLevelIncrease:1,
+        tier:1, plane:2, resourceName:"fight", creationVersion: 6,
+        progressMaxBase:2e16, progressMaxIncrease:2,
+        expToLevelBase:5, expToLevelIncrease:1,
         efficiencyBase:.1, isKTL:true, purchased: true, maxLevel:10,
         unlockCost:2e11, visible:false, unlocked:false,
         onLevelAtts:[["legacy", 150]],
-        expAtts:[],
+        expAtts:[["resonance", 1]],
         efficiencyAtts:[["hope", 0]],
         extraInfo:{english:"Gain Legacy = +150 * (1 + level/5) * Legacy Mult, on complete and level."},
         actionTriggers: [
             ["unlock", "addAC", "", 210],
             ["unlock", "addAW", "", 1500],
             ["complete", "addLegacy", "silenceDeathChanters", 150],
-            // ["level_3", "reveal", "breakFleshBarricade"]
+            ["level_3", "reveal", "breakFleshBarricade"]
         ]
     },
     breakFleshBarricade: {
-        tier:0, plane:2, resourceName:"fight", creationVersion: 6,
-        progressMaxBase:2e12, progressMaxIncrease:2,
-        expToLevelBase:10, expToLevelIncrease:1,
+        tier:1, plane:2, resourceName:"fight", creationVersion: 6,
+        progressMaxBase:2e17, progressMaxIncrease:2,
+        expToLevelBase:5, expToLevelIncrease:1,
         efficiencyBase:.1, isKTL:true, purchased: true, maxLevel:10,
         unlockCost:2e12, visible:false, unlocked:false,
-        onLevelAtts:[],
-        expAtts:[],
-        efficiencyAtts:[],
-        extraInfo:{english:"1 Legacy per complete."},
-        unlockMessage:{english:"On unlock, +1 Ancient Coins."}
+        onLevelAtts:[["legacy", 210]],
+        expAtts:[["resonance", 1]],
+        efficiencyAtts:[["hope", 0]],
+        extraInfo:{english:"Gain Legacy = +210 * (1 + level/5) * Legacy Mult, on complete and level."},
+        actionTriggers: [
+            ["unlock", "addAC", "", 340],
+            ["unlock", "addAW", "", 1800],
+            ["complete", "addLegacy", "silenceDeathChanters", 210],
+            ["level_3", "reveal", "conquerTheGatekeepers"]
+        ]
     },
     conquerTheGatekeepers: {
-        tier:0, plane:2, resourceName:"fight",
-        progressMaxBase:1e10, progressMaxIncrease:2,
-        expToLevelBase:10, expToLevelIncrease:1,
-        efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
-        unlockCost:1e9, visible:false, unlocked:false,
-        onLevelAtts:[],
-        expAtts:[],
-        efficiencyAtts:[],
-        extraInfo:{english:"1 Legacy per complete."},
-        unlockMessage:{english:"On unlock, +1 Ancient Coins."}
+        tier:1, plane:2, resourceName:"fight", creationVersion: 6,
+        progressMaxBase:2e18, progressMaxIncrease:2,
+        expToLevelBase:5, expToLevelIncrease:1,
+        efficiencyBase:.1, isKTL:true, purchased: true, maxLevel:10,
+        unlockCost:2e13, visible:false, unlocked:false,
+        onLevelAtts:[["legacy", 340]],
+        expAtts:[["resonance", 1]],
+        efficiencyAtts:[["hope", 0]],
+        extraInfo:{english:"Gain Legacy = +340 * (1 + level/5) * Legacy Mult, on complete and level."},
+        actionTriggers: [
+            ["unlock", "addAC", "", 550],
+            ["unlock", "addAW", "", 2200],
+            ["complete", "addLegacy", "silenceDeathChanters", 340],
+            ["level_3", "reveal", "unhookSacrificialCages"]
+        ]
     },
     unhookSacrificialCages: {
-        tier:0, plane:2, resourceName:"fight",
-        progressMaxBase:1e10, progressMaxIncrease:2,
-        expToLevelBase:10, expToLevelIncrease:1,
-        efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
-        unlockCost:1e9, visible:false, unlocked:false,
-        onLevelAtts:[],
-        expAtts:[],
-        efficiencyAtts:[],
-        extraInfo:{english:"1 Legacy per complete."},
-        unlockMessage:{english:"On unlock, +1 Ancient Coins."}
+        tier:1, plane:2, resourceName:"fight", creationVersion: 6,
+        progressMaxBase:2e19, progressMaxIncrease:2,
+        expToLevelBase:5, expToLevelIncrease:1,
+        efficiencyBase:.1, isKTL:true, purchased: true, maxLevel:10,
+        unlockCost:2e14, visible:false, unlocked:false,
+        onLevelAtts:[["legacy", 550]],
+        expAtts:[["resonance", 1]],
+        efficiencyAtts:[["hope", 0]],
+        extraInfo:{english:"Gain Legacy = +550 * (1 + level/5) * Legacy Mult, on complete and level."},
+        actionTriggers: [
+            ["unlock", "addAC", "", 890],
+            ["unlock", "addAW", "", 2600],
+            ["complete", "addLegacy", "silenceDeathChanters", 550],
+            ["level_3", "reveal", "purgeUnholyRelics"]
+        ]
     },
     purgeUnholyRelics: {
-        tier:0, plane:2, resourceName:"fight",
-        progressMaxBase:1e10, progressMaxIncrease:2,
-        expToLevelBase:10, expToLevelIncrease:1,
-        efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
-        unlockCost:1e9, visible:false, unlocked:false,
-        onLevelAtts:[],
-        expAtts:[],
-        efficiencyAtts:[],
-        extraInfo:{english:"1 Legacy per complete."},
-        unlockMessage:{english:"On unlock, +1 Ancient Coins."}
+        tier:1, plane:2, resourceName:"fight", creationVersion: 6,
+        progressMaxBase:2e20, progressMaxIncrease:2,
+        expToLevelBase:5, expToLevelIncrease:1,
+        efficiencyBase:.1, isKTL:true, purchased: true, maxLevel:10,
+        unlockCost:2e15, visible:false, unlocked:false,
+        onLevelAtts:[["legacy", 890]],
+        expAtts:[["resonance", 1]],
+        efficiencyAtts:[["hope", 0]],
+        extraInfo:{english:"Gain Legacy = +890 * (1 + level/5) * Legacy Mult, on complete and level."},
+        actionTriggers: [
+            ["unlock", "addAC", "", 1440],
+            ["unlock", "addAW", "", 3000],
+            ["complete", "addLegacy", "silenceDeathChanters", 890],
+            ["level_3", "reveal", "destroyWesternMonolith"]
+        ]
     },
     destroyWesternMonolith: {
-        tier:0, plane:2, resourceName:"fight",
-        progressMaxBase:1e10, progressMaxIncrease:2,
-        expToLevelBase:10, expToLevelIncrease:1,
-        efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
-        unlockCost:1e9, visible:false, unlocked:false,
-        onLevelAtts:[],
-        expAtts:[],
-        efficiencyAtts:[],
-        extraInfo:{english:"1 Legacy per complete."},
-        unlockMessage:{english:"On unlock, +1 Ancient Coins."}
+        tier:1, plane:2, resourceName:"fight", creationVersion: 6,
+        progressMaxBase:2e22, progressMaxIncrease:15,
+        expToLevelBase:1, expToLevelIncrease:1,
+        efficiencyBase:.1, isKTL:true, purchased: true, maxLevel:1,
+        unlockCost:2e16, visible:false, unlocked:false,
+        onLevelAtts:[["legacy", 10000]],
+        expAtts:[["resonance", 1]],
+        efficiencyAtts:[["hope", 0]],
+        extraInfo:{english:"Gain Legacy = +10000 * (1 + level/5) * Legacy Mult, on complete and level."},
+        actionTriggers: [
+            ["unlock", "addAC", "", 4000],
+            ["unlock", "addAW", "", 5000],
+            ["complete", "addLegacy", "silenceDeathChanters", 10000],
+            ["level_3", "reveal", "destroyFleshGrowths"]
+        ],
+        extraButton: Raw.html`
+            <span class="button" id='legacySeveranceButton1' onclick="openLSMenu()"
+                style="display:none;padding:8px 13px;position:absolute;left:460px;top:20px;border: 2px solid #aa0000;border-radius: 5px;
+                background-color:#550000;text-shadow: 3px 3px 2px rgba(0, 0, 0, 0.8);color: #ffdddd;box-shadow:0 0 10px 6px rgba(255, 0, 0, 0.7);font-size:26px;" >
+            Legacy Severance</span>
+        `,
     },
     destroyFleshGrowths: {
-        tier:0, plane:2, resourceName:"fight",
+        tier:0, plane:2, resourceName:"fight", creationVersion: 6,
         progressMaxBase:1e10, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
-        efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,
+        efficiencyBase:1, isKTL:true, purchased: false, maxLevel:10,
         unlockCost:1e9, visible:false, unlocked:false,
         onLevelAtts:[],
         expAtts:[],
@@ -342,7 +373,7 @@ actionData = {
         unlockMessage:{english:"On unlock, +1 Ancient Coins."}
     },
     crackCorruptedEggs: {
-        tier:0, plane:2, resourceName:"fight",
+        tier:0, plane:2, resourceName:"fight", creationVersion: 6,
         progressMaxBase:1e10, progressMaxIncrease:2,
         expToLevelBase:10, expToLevelIncrease:1,
         efficiencyBase:1, isKTL:true, purchased: true, maxLevel:10,

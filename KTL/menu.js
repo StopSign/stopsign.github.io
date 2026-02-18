@@ -85,8 +85,8 @@ function createShopMenu() {
         <div class="menuSeparator"></div>
         
         
-        <span class="button" onclick="resetRun()">Reset run</span>
-        Reset the run and gain offline time equal to the run time. 
+<!--        <span class="button" onclick="resetRun()">Reset run</span>-->
+<!--        Reset the run and gain offline time equal to the run time. -->
         
 `;
 }
@@ -96,7 +96,7 @@ function createHelpForRealMenu() {
         <div class="menuTitle">How to Provide Feedback</div>
         <div class="menuSeparator"></div><br>
         You'll help me, for real?<br>
-        My discord to discuss everything is here: <a href="https://discord.gg/dnKA6Xd" target="_blank">Stop_Sign Gaming</a>. I would really appreciate hearing about your suggestions and experience!
+        My discord to discuss everything is here: <a href="https://discord.gg/ZcGJnQWT" target="_blank">Stop_Sign Gaming</a>. I would really appreciate hearing about your suggestions and experience!
         You can also talk about the game in the discord with others, and share strategies.<br><br>
         No AI was used in the writing of the story, and no AI-art will be added to the game.<br><br>
         Thanks for playing! -Stop_Sign
@@ -115,7 +115,7 @@ function createHelpMenu() {
         Click/right click and drag to move the game window. WASD works also, with Shift making it move x3 faster. Use the mouse scroll wheel or the [+] and [-] to zoom in and out.
         <div class="menuSeparator"></div>
         <div style="font-size:20px;">Attributes</div>
-         Each attribute is a 10% increase to bonus, shown in the Attributes window. There are a few colors for attributes surrounding actions.
+         Every +100 attribute is a x10 increase to bonus, shown in the Attributes window. There are a few colors for attributes surrounding actions.
         <ol>
             <li>Green: Adds the attribute on level</li>
             <li>Purple: Reduces the progress required to complete if it is an action, reduces exp required to level if it is a generator</li>
@@ -183,6 +183,12 @@ function createDataMenu() {
         <div id="resetLogContainer"></div><br>
         <div id="highestLegacyContainer">
             Highest Legacy: <span id="highestLegacy" style="color:var(--legacy-color)"></span>
+        </div>
+        <div id="secondsPassedContainer">
+            Time Passed, total: <span id="secondsPassed"></span>
+        </div>
+        <div id="secondsThisLSContainer">
+            Time Passed, this Legacy Severance: <span id="secondsThisLS"></span>
         </div>
         <div id="chartContainer" style="width: 80%; max-width: 800px; background-color: #2d3748; border-radius: 8px; 
             box-shadow: 0 4px 12px rgba(0,0,0,0.4); padding: 20px;">
@@ -329,7 +335,7 @@ function createOptionsMenu() {
     <div class="menuSeparator"></div>
     
     <button onclick="exportSave()" style="padding:10px 16px;background:#007BFF;color:#fff;border:none;border-radius:4px;font-size:14px;cursor:pointer;width:160px;">Export to clipboard</button>
-    <label for="exportImportSave" style="font-size:13px;">Put your save here to import. Warning: Export/import from a file is much safer, due to save file sizes. Import a clear save to hard reset:</label>
+    <label for="exportImportSave" style="font-size:13px;">Put your save here to import. Warning: Export/import from a file is much safer, due to save file sizes.<br>Import a clear save to hard reset:</label>
     <input type="text" id="exportImportSave" style="border:1px solid #aaa;padding:8px;border-radius:4px;font-size:13px;width:100%;" oncontextmenu="event.stopPropagation(); return true;">
     <div>
         <input type="checkbox" id="confirmImportCheckbox" style="width:14px;height:14px;cursor:pointer;">

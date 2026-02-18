@@ -76,8 +76,8 @@ function actionSetBaseVariables(actionObj, dataObj) {
         actionObj.spellCastCount = 0;
     }
 
-    actionObj.unlockTime = null;
-    actionObj.level1Time = null;
+    actionObj.unlockTime = -1;
+    actionObj.level1Time = -1;
 
     if(data.upgrades.recognizeTheFamiliarity.upgradePower > 0) {
         actionObj.unlockCost = (1 - (actionObj.unlockedCount * .04) / (1 + actionObj.unlockedCount * .04)) * dataObj.unlockCost;
@@ -975,8 +975,8 @@ addBonusCode("squirrel", function () {
     data.currentGameState.bonusTime += 1000 * 60 * 60 * 10;
 }, "Nuts!");
 addBonusCode("nothing", function () {
-    data.currentGameState.bonusTime += 1000 * 60 * 60 * 24;
-}, "There was nothing there - except 24 hours bonus time.");
+    data.currentGameState.bonusTime += 1000 * 60 * 60;
+}, "There was nothing there - except 1 hour bonus time.");
 
 function checkGrimoireUnlocks() {
     //unlock relevant circle magic per level
@@ -1134,7 +1134,7 @@ function evaluateTrigger(actionVar, trigger, targetObj) {
 
     // Execute Reward
     if (shouldRun) {
-        console.log(`Trigger Fired! ${trigger.condition}${trigger.condition==="specific"?" " +trigger.amount:""} of ${trigger.targetKey} occured. ${actionVar} adjusted to ${trigger.rewardText}`);
+        // console.log(`Trigger Fired! ${trigger.condition}${trigger.condition==="specific"?" " +trigger.amount:""} of ${trigger.targetKey} occured. ${actionVar} adjusted to ${trigger.rewardText}`);
 
         let actionObj = data.actions[actionVar];
         let dataObj = actionData[actionVar];

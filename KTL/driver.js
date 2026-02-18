@@ -82,7 +82,8 @@ function initTimingSystem() {
 function secondPassed() {
     secondTick();
 
-    secondsPassed++;
+    data.currentGameState.secondsPassed++;
+    data.currentGameState.secondsThisLS++;
 }
 
 function tickTimerCooldown() {

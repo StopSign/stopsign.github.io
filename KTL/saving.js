@@ -9,11 +9,11 @@ function clearSave() {
 //TODO also, only choose the vars you want to keep, rather than keeping bad data across saves
 function loadActionFromSave(actionObj, loadObj) {
     Object.assign(actionObj, loadObj);
-    //save corrections
-    if(loadObj.automationOnMax !== undefined) {
-        actionObj.automationCanDisable = loadObj.automationOnMax;
-    }
-    delete actionObj.automationOnMax;
+}
+
+
+function loadUpgradeFromSave(actionObj, loadObj) {
+    Object.assign(actionObj, loadObj);
 }
 
 data.saveVersion = 6;
@@ -31,7 +31,7 @@ function load() {
                 try { //old save
                     toLoad = JSON.parse(decode(onLoadData));
                 } catch (e) {
-                    exportErrorFile(onLoadData);
+                    exportFile(onLoadData, "KTL_Error_File")
                 }
             }
         }
@@ -44,7 +44,7 @@ function load() {
                 try { //old save
                     toLoad = JSON.parse(decode(localStorage[saveName]));
                 } catch (e) {
-                    exportErrorFile(localStorage[saveName]);
+                    exportFile(localStorage[saveName], "KTL_Error_File")
                 }
             }
         }
@@ -54,12 +54,17 @@ function load() {
         toLoad = {};
     }
 
+    const saveVersionFromLoad = toLoad && toLoad.saveVersion !== undefined ? toLoad.saveVersion : data.saveVersion;
 
-    const saveVersionFromLoad = toLoad && toLoad.saveVersion ? toLoad.saveVersion : data.saveVersion;
-    // const saveVersion = 1; //for debug only
     let queuedLogMessages = []; //Any info that needs to be told to the user
 
-    if(localStorage[saveName] && toLoad.actions) {
+    if((loadStaticSaveFile || localStorage[saveName]) && saveVersionFromLoad < 6) {
+        if(!loadStaticSaveFile) {
+            exportFile(localStorage[saveName], "KTL_v2_Backup") //just in case
+        }
+        handleV2Saves(toLoad) //set aside the data you need, show welcome back message
+        document.getElementById("welcomeBackMessage").style.display = "";
+    } else if(localStorage[saveName] && toLoad.actions) {
         //only go through the ones in toLoad and graft them on to existing data
         for(let actionVar in toLoad.actions) {
             let actionObj = data.actions[actionVar];
@@ -91,7 +96,7 @@ function load() {
                 // console.log("Skipped loading upgrade " + upgradeVar + " from save.");
                 continue;
             }
-            loadActionFromSave(upgradeObj, loadObj);
+            loadUpgradeFromSave(upgradeObj, loadObj);
         }
 
         // mergeExistingOnly(data, toLoad, "actions", ["x", "y", "realX", "realY"]); //use patch instead
@@ -206,12 +211,15 @@ function adjustUIAfterLoad(toLoad, saveVersionFromLoad) {
         //correct old versions from boolean to number
         if(toLoad.actions && toLoad.actions[actionVar]) {
             if (dataObj.hasUpstream && (toLoad.actions[actionVar].automationOnReveal === true || toLoad.actions[actionVar].automationOnReveal === undefined)) {
-                setSliderUI(actionVar, "Automation", data.upgrades.stopLettingOpportunityWait.upgradePower * 50);
+                setSliderUI(actionVar, "Automation", data.upgrades.stopLettingOpportunityWait.upgradePower * 100);
             } else if (actionObj.automationOnReveal === false) {
                 actionObj.automationOnReveal = 0;
             }
         }
 
+        if(data.upgrades.shapeMyPath.upgradePower > 0) {
+            document.getElementById(`${actionVar}_addCustomTriggerButton`).style.display = "";
+        }
         rebuildCustomTriggersUI(actionVar);
         rebuildTriggerInfo(actionVar);
     }
@@ -434,15 +442,12 @@ function exportSave() {
     document.getElementById("exportImportSave").value = "";
 }
 
-function exportErrorFile(data) {
+function exportFile(data, name) {
     const blob = new Blob([data], { type: "text/plain" });
     const url = URL.createObjectURL(blob);
 
     const a = document.createElement("a");
     a.href = url;
-
-    const baseName = "KTL_Error_File";
-    const extension = 'txt';
 
     const now = new Date();
 
@@ -453,7 +458,7 @@ function exportErrorFile(data) {
     const minutes = String(now.getMinutes()).padStart(2, '0');
     const seconds = String(now.getSeconds()).padStart(2, '0');
 
-    a.download = `${baseName}_${year}-${month}-${day}_${hours}-${minutes}-${seconds}.${extension}`;
+    a.download = `${name}_${year}-${month}-${day}_${hours}-${minutes}-${seconds}.txt`;
 
     document.body.appendChild(a);
     a.click();
@@ -465,31 +470,7 @@ function exportErrorFile(data) {
 function exportSaveFile() {
     save();
     const data = window.localStorage[saveName];
-    const blob = new Blob([data], { type: "text/plain" });
-    const url = URL.createObjectURL(blob);
-
-    const a = document.createElement("a");
-    a.href = url;
-
-    const baseName = "KTL_Save";
-    const extension = 'txt';
-
-    const now = new Date();
-
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
-    const day = String(now.getDate()).padStart(2, '0');
-    const hours = String(now.getHours()).padStart(2, '0');
-    const minutes = String(now.getMinutes()).padStart(2, '0');
-    const seconds = String(now.getSeconds()).padStart(2, '0');
-
-    a.download = `${baseName}_${year}-${month}-${day}_${hours}-${minutes}-${seconds}.${extension}`;
-
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-
-    URL.revokeObjectURL(url);
+    exportFile(data, "KTL_Save")
 }
 
 function importSave() {

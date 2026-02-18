@@ -355,12 +355,12 @@ function calcTotalSpentOnUpgrade(initialCost, costIncrease, upgradesBought) {
 
 let upgradeData = {
     stopLettingOpportunityWait: {
-        initialCost:2, costIncrease:2.5, creationVersion: 6,
-        upgradesAvailable: 2, type:"unique",
+        initialCost:5, costIncrease:1, creationVersion: 6,
+        upgradesAvailable: 1, type:"unique",
         visible: true,
         customInfo: function(num) {
             return `[Automation] When unlocking a new action, automatically sets the downstream sliders to the 
-            newly unlocked action to ${["50%", "100% (Currently 50%)", "100%"][num]}. This only fully works on previously unlocked actions.`;
+            newly unlocked action to 100%. This only fully works on previously unlocked actions.`;
         },
         onBuy: function(num) {
             for (let actionVar in data.actions) {
@@ -368,7 +368,7 @@ let upgradeData = {
                 if(!dataObj.hasUpstream) {
                     continue;
                 }
-                setSliderUI(actionVar, "Automation", num*50);
+                setSliderUI(actionVar, "Automation", 100);
                 views.updateVal(`${actionVar}_automationMenuButton`, dataObj.hasUpstream && dataObj.plane !== 2?"":"none", "style.display");
                 views.updateVal(`${actionVar}_automationRevealContainer`, (dataObj.keepParentAutomation || dataObj.hasUpstream) && dataObj.plane !== 2?"":"none", "style.display");
             }
@@ -378,7 +378,7 @@ let upgradeData = {
         }
     },
     knowWhenToMoveOn: {
-        initialCost:3, costIncrease:2, creationVersion: 6,
+        initialCost:5, costIncrease:1, creationVersion: 6,
         upgradesAvailable:1, type:"unique",
         visible:true,
         customInfo: function(num) {
@@ -410,6 +410,20 @@ let upgradeData = {
                     continue;
                 }
                 views.updateVal(`${actionVar}SliderContainerAutomation`, dataObj.hasUpstream && dataObj.plane !== 2 ? "":"none", "style.display");
+            }
+        }
+    },
+    shapeMyPath: {
+        initialCost:20, costIncrease:1, creationVersion: 6,
+        upgradesAvailable: 1, type:"unique",
+        visible: false,
+        customInfo: function(num) {
+            return `[Automation] Gain the option to create custom automation triggers based on each action. The target actions that trigger these will display that they do under Info. Warning: it is possible to create useless triggers.`
+        },
+        onBuy: function(num) {
+            for (let actionVar in data.actions) {
+                let dataObj = actionData[actionVar];
+                document.getElementById(`${actionVar}_addCustomTriggerButton`).style.display = "";
             }
         }
     },

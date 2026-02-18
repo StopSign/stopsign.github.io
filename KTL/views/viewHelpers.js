@@ -10,8 +10,8 @@ function getAttColor(attVar) {
     if(attVar === "legacy") {
         return "var(--legacy-color)"
     }
-    if(attVar === "doom") {
-        return "var(--doom-color)"
+    if(attVar === "hope") {
+        return "var(--hope-color)"
     }
     const stat = data.atts[attVar];
 

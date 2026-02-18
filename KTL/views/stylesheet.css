@@ -38,6 +38,8 @@
     --menu-tab-button-color-4: #2b1212;
     --menu-tab-hover-color-4: #6b1d1d;
     --menu-tab-selected-color-4: #f87171;
+    --AC-color: #0d9488;
+    --AW-color: #65a30d;
 
 
     --world-0-bg-primary: #1e1e2e;
@@ -92,9 +94,9 @@
     --legacy-color: #db9812;
     --legacy-color-dim: #a47413;
     --legacy-color-bg: #5c4003;
-    --doom-color: #781a78;
-    --doom-color-dim: #5c155c;
-    --doom-color-bg: #2e082e;
+    --hope-color: #4A148C;
+    --hope-color-dim: #3e1175;
+    --hope-color-bg: #2a0b51;
     --coins-color: #a99102;
     --coins-color-dim: #766607;
     --coins-color-bg: #363107;

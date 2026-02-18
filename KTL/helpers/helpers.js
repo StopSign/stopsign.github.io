@@ -187,11 +187,11 @@ function numToOrdinal(n) {
     return n + "th";
 }
 
-function secondsToTime(seconds) {
+function secondsToTime(seconds, useInfinity) {
     if(!seconds || seconds < 0) {
         seconds = "0";
     }
-    if(seconds === Infinity || seconds > 3.5e6) {
+    if(useInfinity && (seconds === Infinity || seconds > 3.5e6)) {
         return "∞"
     }
     seconds = Math.floor(seconds);

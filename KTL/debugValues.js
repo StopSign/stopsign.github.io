@@ -1,8 +1,8 @@
 
-let debugLevel = 116; //to set the rough number of loops
 function loadDebugValues() {
 
     debugStart()
+
     debug1stKill()
     debug2ndKill()
     debug3rdKill()
@@ -31,8 +31,12 @@ function debug3rdKill() {
     if(debugLevel >= 115) {
         debugSecondFewLoops()
     }
-    if(debugLevel >= 116) {
+    if(debugLevel >= 125) {
         debugThirdFewLoops()
+    }
+    if(debugLevel >= 140) {
+        increaseLichKills();
+        legacySeveranceReset(true)
     }
 }
 
@@ -172,7 +176,6 @@ function debugSecondFewLoops() {
 
     buyUpgrade("increaseMarketCap")
     buyUpgrade("increaseMarketCap")
-
 }
 
 function debugThirdFewLoops() {
@@ -202,9 +205,6 @@ function debugThirdFewLoops() {
 }
 
 function debugStart() {
-
-
-
     document.getElementById("bonus50").style.display = "";
     document.getElementById("skipTime60").style.display = "";
     for(let actionVar in data.actions) {
@@ -218,7 +218,6 @@ function debugStart() {
         data.currentGameState.instantTime = 1000 * 60 * 60 * 24 * 7 * 4;
         data.ancientCoin = 10;
         buyUpgrade("stopLettingOpportunityWait")
-        buyUpgrade("stopLettingOpportunityWait")
         buyUpgrade("knowWhenToMoveOn")
         setSliderUI("overclock", "reflect", 100)
 
@@ -226,6 +225,14 @@ function debugStart() {
         toggleNumberType()
 
     }
+    data.useAmuletButtonShowing = true;
+    data.doneKTL = true;
+    data.doneAmulet = true;
+    data.displayJob = true;
+    views.updateVal(`openViewAmuletButton`, "", "style.display");
+
+    unveilPlane(0);
+    unveilPlane(1);
 
 }
 
@@ -238,16 +245,8 @@ function debug1stKill() {
     if(debugLevel >= 1) {
         statAddAmount("legacy", 25 + 9.97);
         data.ancientWhisper += 10;
-        data.useAmuletButtonShowing = true;
-        data.doneKTL = true;
-        data.doneAmulet = true;
-        data.displayJob = true;
 
         buyUpgrade("respectTheShrine")
-        views.updateVal(`openViewAmuletButton`, "", "style.display");
-
-        unveilPlane(0);
-        unveilPlane(1);
         revealAction("echoKindle")
         revealAction("resonanceFurnace")
         unlockAction(data.actions.echoKindle);

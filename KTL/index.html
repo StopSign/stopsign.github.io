@@ -50,10 +50,10 @@
             Mana Quality: <span id="manaQuality" style="display:inline-block;font-weight:bold;color:#0ec3cf"></span>
         </span><br>
         <span id="ancientCoinDisplay" style="display:none;">
-            Ancient Coins: <span id="ancientCoin" style="display:inline-block;color:var(--text-primary);font-weight:bold;margin-right:5px;"></span>
+            Ancient Coins: <span id="ancientCoin" style="display:inline-block;color:var(--AC-color);font-weight:bold;margin-right:5px;"></span>
         </span>
         <span id="ancientWhisperDisplay" style="display:none;">
-            Ancient Whispers: <span id="ancientWhisper" style="display:inline-block;color:var(--text-primary);font-weight:bold;"></span>
+            Ancient Whispers: <span id="ancientWhisper" style="display:inline-block;color:var(--AW-color);font-weight:bold;"></span>
         </span><br>
         <span id="jobDisplay" style="display:none;">
             Current Job: <span id="jobTitle" style="color: var(--text-primary);font-weight:bold;margin-right:5px;">Help Scott With Chores</span> Wage: $<span id="jobWage" style="color: var(--wage-color);font-weight:bold">1</span>
@@ -67,17 +67,17 @@
         </span>
     </div>
 
-    <span id="attDisplayShowButton" class="button" style="display:none;padding:5px;top:110px;left:388px;pointer-events:auto;" onclick="statMenuHideButton()">Attributes >></span>
+    <span id="attDisplayShowButton" class="button" style="display:none;padding:5px;pointer-events:auto;" onclick="statMenuHideButton()">Attributes >></span>
     <div id="attDisplay" style="border: 1px solid var(--border-color);padding:15px;font-size:12px;background-color:var(--overlay-color);
         direction:rtl;position:relative;min-height:200px;overflow-y:auto;overflow-x:hidden;display:inline-block;will-change: transform;
         scrollbar-gutter:stable;pointer-events:auto;min-width:170px">
         <span id="attDisplayUnder" style="direction:ltr;">
-            <span id="attDisplayHideButton" class="button" style="font-size:14px;position:absolute;padding:5px 8px;top:-3px;right:-3px;"
-                  onclick="statMenuHideButton()"><<</span>
             <span style="font-size:14px;position:absolute;top:5px;left:5px;">+100 Attribute = x10 bonus</span><br>
             <span class="title">Attributes</span>
         </span>
     </div>
+    <span id="attDisplayHideButton" class="button" style="font-size:14px;position:absolute;padding:5px 8px;top:90px;left:195px;pointer-events:auto;"
+          onclick="statMenuHideButton()"><<</span>
 </div>
 
 <div id="logWrapper" style="position:fixed;top:15px;right:11px;width:clamp(200px, calc(100vw - 250px), 500px);height:100px;background-color:var(--overlay-color);
@@ -266,11 +266,11 @@ It continues, capturing fraction ancientCoin of your fleeting soul and sending i
                 <div style="flex:1 0 50%;min-width:250px;">
                     <div style="font-size:16px">
                         Ancient Coins available:
-                        <span id="ancientCoin2" style="font-weight:bold;font-size:20px;"></span>
+                        <span id="ancientCoin2" style="font-weight:bold;font-size:20px;color:var(--AC-color)"></span>
                     </div>
                     <div style="font-size:16px">
                         Ancient Whispers available:
-                        <span id="ancientWhisper2" style="font-weight:bold;font-size:20px;"></span>
+                        <span id="ancientWhisper2" style="font-weight:bold;font-size:20px;color:var(--AW-color)"></span>
                     </div>
                     <div id="lichCoinsDisplay" style="font-size:16px;display:none;">
                         Lich Coins available:
@@ -370,7 +370,48 @@ It continues, capturing fraction ancientCoin of your fleeting soul and sending i
     </div>
 </div>
 
-<div id="toastList" style="position:absolute;bottom:65px;right:20px;"></div>
+<div id="toastList" style="position:absolute;bottom:105px;right:20px;"></div>
+
+<div id="welcomeBackMessage" class="fullScreenGrey" style="display:none">
+    <div class="centerMenuBox">
+        <div style="text-align:left">
+            Welcome back! There are some big changes in the game:
+            <ol>
+                <li>All attributes are exponential: +100 attributes gives a x10 bonus. This means every action in the game has been modified.</li>
+                <li>Every exp reduction (purple icon) is 100%</li>
+                <li>Efficiency renamed to Speed. Speed is reduced when the attribute is below a target amount (blue icon)</li>
+                <li>Many actions changed, including most of Magic and how that works. Mana Quality is used instead of Spell Power. Train with Team is removed. Expanded socialization actions. Fear is not removed from HATL as its used, HATL has no max level, and gives x1.5 AC for each HATL level, multiplicatively. Overclock Targeting the Lich in Northern Wastes is changed.</li>
+                <li>Ancient Coins is now split into AC and AW: Ancient Whispers. AW is gained on its own and is used only for unlocking new action packs.</li>
+                <li>You can convert Bonus Time to Instant Bonus Time at a rate of 2 hours every 30 minutes, which can be used immediately with 1 minute or 10 minute buttons. The calculation fidelity is less precise when using instant, which affects the game more at the start of a run.</li>
+                <li>Eastern Monument is renamed according to where you are in the playthrough. When you max its level, a new 2nd tier reset will be available. Each 2nd tier reset will be customized with extra actions and upgrades.</li>
+                <li>In general, amulet loops are significantly more curated, and there should be little to no "walls" to push through at this point.</li>
+                <li>Additional bug fixes and QoL</li>
+            </ol>
+
+            Due to these big changes, many things in your save will not apply, and so your save must be mostly reset so that you can enjoy the new version. I will not be doing such a substantial re-imagining again; all future changes will build on the game from here.<br><br>
+
+            Stats found in your save:
+            <ul>
+                <li>Offline time: <span id="v2Offline"></span></li>
+                <li>Legacy: <span id="v2Legacy" style="color:var(--legacy-color)"></span></li>
+                <li>Ancient Coins: <span id="v2AC" style="color:var(--AC-color)"></span></li>
+            </ul>
+        </div>
+        <div style="display: flex;">
+            <div style="flex: 1;text-align:left;">
+                Keep your offline time, with a minimum of 1 week (168 hr).
+                <ul>
+                    <li>You will immediately have access to custom automation triggers (for new players they need to 2nd order reset once)</li>
+                    <li>Keep what focus perm bonuses you have between actions of the same names</li>
+                    <li>Keeps highest legacy, gaining x3 legacy up to your highest</li>
+                    <li>The first 2 automation upgrades are auto-purchased</li>
+                    <li>1% of your AC (up to 500)</li>
+                </ul>
+                <div class="button" onclick="v2SaveRestart()" style="width:150px">Restart</div>
+            </div>
+        </div>
+    </div>
+</div>
 
 </body>
 

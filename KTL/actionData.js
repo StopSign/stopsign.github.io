@@ -648,7 +648,6 @@ let actionData = {
         efficiencyAtts: [["ambition", 1600]],
         actionTriggers: [
             ["level_1", "reveal", "buyHouseholdItems"],
-            ["level_1", "revealUpgrade", "improveMyHouse"],
         ]
     },
     buyHouseholdItems: {
@@ -682,7 +681,7 @@ let actionData = {
         tier: 2, plane: 0, resourceName: "coins", creationVersion: 6,
         progressMaxBase: 5e81, progressMaxIncrease: 30,
         expToLevelBase: 10, expToLevelIncrease: 1,
-        efficiencyBase: .0001, maxLevel: 5,
+        efficiencyBase: .0001, maxLevel: 10,
         unlockCost: 2e78, visible: false, unlocked: false, purchased: false,
         onLevelAtts: [["comfort", 15], ["calm", 2]],
         expAtts: [["savvy", 1]],
@@ -695,9 +694,9 @@ let actionData = {
         tier: 2, plane: 0, resourceName: "coins", creationVersion: 6,
         progressMaxBase: 2e82, progressMaxIncrease: 30,
         expToLevelBase: 10, expToLevelIncrease: 1,
-        efficiencyBase: .0001, maxLevel: 5,
+        efficiencyBase: .0001, maxLevel: 10,
         unlockCost: 8e78, visible: false, unlocked: false, purchased: false,
-        onLevelAtts: [["energy", 1e8]],
+        onLevelAtts: [["energy", 10]],
         expAtts: [["savvy", 1]],
         efficiencyAtts: [["ambition", 1800]],
         actionTriggers: [

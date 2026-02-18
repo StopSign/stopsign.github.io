@@ -10,7 +10,9 @@ let toastIdCounter = 0; // to give each toast a unique ID
 function initializeToasts() {
     createToastModal();
 
-    return;
+    if(debugLevel > 0) {
+
+    }
 
     createToast(function() { return true; },
         "Click here for info!",0,
@@ -47,28 +49,30 @@ Math of the Example: Reflect has 10 momentum, so 1% would be +.1/s, but speed is
 
         You can enable extra numbers to see how resources work in more detail in Menu -> Options.<br><br>
 
-Here, the resources on Momentum is 100 and it is a Tier 1 Action, so the maximum rate is 1/s, but it is reduced by 50% speed to a maximum rate of 0.5/s. We can see the Total Decrease is -1.25/s, which is made of the 1) 0.5/s that Reflect is consuming for Progress, 2) 100% (of the 0.5/s rate) being sent to Distill Insight, and 3) 50% (of the 0.5/s rate) being sent to Harness Overflow.<br><br>
+Here, the resources on Momentum is 100 and it is a Tier 1 Action, so the maximum rate is 1/s, but it is reduced by 50% speed to a maximum rate of 0.5/s.<br>
+We can see the Total Decrease is -1.25/s, which is made of:
+<ol>
+    <li>0.5/s that Reflect is consuming for Progress</li>
+    <li>100% (of the 0.5/s rate) being sent to Distill Insight</li>
+    <li>50% (of the 0.5/s rate) being sent to Harness Overflow</li>
+</ol>
         `);
 
     createToast(function() { return data.actions.distillInsight.unlocked; },
         "Gaining Stats",0,
         `
-<img src="img/tutorial2.png" alt="Tutorial 3" style="width:570px;height:685px;" /><br>
-
-        Within the Stats Menu, it will show the details of stat gains: The requirements to level are reduced by the multiplicative bonus of all the purple stats. This image is highlighting the change in Speed.<br><br>
+        Within the Stats Menu of each action, there is detailed information on how attributes work: The requirements to level are reduced by the multiplicative bonus of all the purple stats.<br><br>
 
 Speed on regular actions (lightning bolt icon) will increase 1) The rate resources are used by the action and 2) The rate the action can send resources downstream to the next action.<br><br>
 
-Speed on generator actions (gear icon) will increase 1) The rate the action can send resources downstream to the next action. 2) The rate of progress gain over time 3) The amount of resource created by completing a progress bar.<br><br>
-
-For this image, it means a x1.1 bonus from Cycle results in a x1.21 total momentum/s - it improves it twice over.
+Speed on generator actions (gear icon) will increase 1) The rate the action can send resources downstream to the next action. 2) The rate of progress gain over time 3) The amount of resource created by completing a progress bar.
         `);
     createToast(function() { return data.actions.takeNotes.visible; },
         "Attention Bonus",0,
         `
         <img src="img/tut7.png" alt="Tutorial 4" style="width:690px;height:270px;" /><br>
 
-        Click the lines in-between actions to Focus them. Focus gives a x2 bonus, and you can have up to 2 Focus lines. This means that you can send more resources than you consume on an action.
+        Click the lines in-between actions to Focus them. Focus gives a x2 bonus, and you can have up to 2 Focus lines. This means that you can bypass an action from consuming your resources, sending them forward instead of letting them be consumed.
         `);
     createToast(function() { return data.actions.helpScottWithChores.unlocked; },
         "Making Money",0,
@@ -82,25 +86,27 @@ You can only have one job at a time, and it will automatically be the one with t
         `
         The Hermit has given you an amulet, and with it you have received your first legacy, and unlocked the Magic Tab. Click the tab or press the hotkey [2] to switch to it.<br><br>
 
-Legacy is the resource on the originator of all magic: Echo Kindle. Every time you gain legacy as an attribute, you will also gain it on Echo Kindle.<br><br>
+Legacy is the resource on the originator of all magic: Echo Kindle. Every time you gain legacy as a resource, you will also gain it on Echo Kindle.<br><br>
 
-Echo Kindle generates charge onto Dissipation, which wastes charge by consuming it. Pool Mana takes what Charge remains when it completes and turns it into Mana - the lower speed that Dissipation has, the more Mana will be available for spells.
+Echo Kindle generates Echoes onto Resonance Furnace, which generates Charge onto Dissipation, which consumes it uselessly. Finally, Pool Mana generates Mana based on Charge.<br><br>
+
+This means that the lower speed that Dissipation has, the more Mana will be generated.<br><br>
         `);
 
     createToast(function() { return data.actions.overcharge.unlocked; },
         "Spells and Instability",0,
         `
-        Overcharge and Overboost are the first spells you'll be able to repeatedly cast. They are cast automatically when Overclock completes and gains momentum, giving a x10 bonus each, and Overboost is only cast when Overcharge is also ready to cast, ensuring it is only used to gain x100 momentum total.<br><br>
+        Overcharge and Overwork are the first spells you'll be able to repeatedly cast. They are cast automatically when their relevant resource generators (Overclock and Make Money) complete, giving a x10 bonus to Momentum/Coins generated.<br><br>
 
-When you cast a spell, it also gains instability. The Mana cost of the spell increases by the instability %. Instability is decreased by the attribute Control. It reduces by (Control's Bonus^.5)/s
+        When you cast a spell, it also gains instability. It gains more instability the lower the Spell's speed is. The Arcana cost of the spell increases by the instability %. Instability is decreased by the attribute Control and the amount of instability on the action. Instability is reduced ((Control's Bonus)^.5 * (instability/100)^.5 / 100)/s
         `);
 
     createToast(function() { return data.actions.hearAboutTheLich.unlocked; },
         "Preparing for Battle",0,
         `
-        While fighting the lich itself is far away, you can join the Fight for Life to invade the hordes in the north. This requires at least 1 spell power, which comes from unlocks within Magic.<br><br>
-
-In addition, when you finally Fight the Lich's Forces, you are given 10 minutes of bonus time (this has a minimum of 1 hour)
+        While fighting the lich itself is far away, you can join the Fight against the Lich to invade the hordes in the north. You aren't nearly as good of a fighter as some of Brythal's trained mages, but you have one major advantage to bring: Your mana. The higher you Mana Quality, and the higher your momentum, the more fight you can bring.<br><br>
+         
+        This requires at least 1 Mana Quality, which comes from actions within Magic.
         `);
 
     createToast(function() { return data.gameState === "KTL"; },
@@ -108,14 +114,14 @@ In addition, when you finally Fight the Lich's Forces, you are given 10 minutes 
         `
         Having switched Overclock's target to a specific goal instead of itself, you have lost the abilty to modify how momentum is spent - this realm will entirely happen automatically. The goal is to go as far as you can in defeating the Lich's forces, closer and closer to the Lich itself.<br><br>
 
-You will get Legacy and Ancient Coins depending on how far you are able to progress. Ancient Coins are used for amulet upgrades, and Legacy is added to Echo Kindle, to generate more mana in the next life.<br><br>
+You will get Legacy, Ancient Coins, and Ancient Whispers depending on how far you are able to progress. Ancient Coins are used for amulet upgrades, Ancient Whispers are used for unlocking new actions, and Legacy is added to Echo Kindle, to generate more mana in the next life.<br><br>
 
-When you have lost your ability to fight, or Doom has overcome your desire to fight, your Amulet becomes your only way out. It has a special ability to rewind time and let you try again, but with a caveat: only some things can be remembered. Using the gathered Ancient Coins, you are able to send a message back, letting your past self go through the same motions... but with an adjustment.
+When you have lost what fight you brought, or you have lost all Hope, your Amulet becomes your only way out. It has a special ability to rewind time and let you try again, but with a caveat: only some things can be remembered. Using the gathered Ancient Coins and Whispers, you are able to send a message back, letting your past self go through the same motions... but with an adjustment.
         `);
 
-    createToast(function() { return data.actions.pryGemLoose.unlocked },
+    createToast(function() { return data.actions.lichKills >= 3 },
         "Thanks for playing!", 0,
-        Raw.html`You've encountered all the content that exists currently. Follow the discord for the roadmap and updates! -Stop_Sign`);
+        Raw.html`You've encountered all the content that exists currently. This lich run (and future ones) will gain extra upgrades and actions in future updates, and for now does not have enough to complete it. Follow the discord for the roadmap and updates! -Stop_Sign`);
 
 
     showAllValidToasts(); //ran automatically every second. Have to manually add it when you want faster

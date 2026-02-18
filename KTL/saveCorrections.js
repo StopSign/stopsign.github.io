@@ -1,144 +1,109 @@
 function saveFileCorrection(saveVersionFromLoad) {
     let refundAmount = 0;
-    //save version specific data correction
-    if(saveVersionFromLoad <= 1) {
-        delete data.atts.processing; //changed named to Intellect, have to delete old att
-        delete data.atts.stillness; //changed named to Peace, have to delete old att
-        data.actions.overboost.instability = 0;
-        data.actions.overcharge.instability = 0;
-        data.currentLog = []; //clear log since the format changed
-        data.resetLogs = []; //clear log since the format changed
-        delete data.focusLoopMax;
-        delete data.focusMult;
+    //removed with saveVersion 6, but could still use in the future
 
-        for(let actionVar in data.actions) {
-            let dataObj = actionData[actionVar];
-            for (let downstreamVar of dataObj.downstreamVars) {
-                delete data.actions[actionVar][`${downstreamVar}FocusMult`]
-            }
-        }
-        data.toastStates[23] = "hidden";
-    }
-    if(saveVersionFromLoad <= 2) {
-        if(data.actions.earthMagic.purchased === false) {
-            data.actions.earthMagic.purchased = true;
-        }
-        if(!data.actions.earthMagic.visible && data.actions.prepareExternalSpells.level > 0) {
-            data.actions.earthMagic.visible = true;
-        }
-        adjustActionData('reinforceArmor', 'progressMaxIncrease', 1);
-        adjustActionData('reinforceArmor', 'progressMaxBase', 3e16);
-        adjustActionData('reinforceArmor', 'expToLevelBase', 1);
-
-        data.upgrades.retrieveMyUnusedResources.upgradesAvailable = 3;
-        if(data.upgrades.retrieveMyUnusedResources.upgradePower === 4) {
-            data.upgrades.retrieveMyUnusedResources.upgradePower = 3;
-            data.upgrades.retrieveMyUnusedResources.upgradesBought = 3;
-            refundAmount += 1687;
-        }
-
-        data.actions.moveIron.power = 100;
-        data.actions.reinforceArmor.power = 150;
-        data.actions.restoreEquipment.power = 250;
-        data.actions.unblemish.power = 400;
-        data.actions.manaTransfer.power = 600;
-
-        adjustActionData('moveIron', 'efficiencyBase', .0003);
-        adjustActionData('reinforceArmor', 'efficiencyBase', .0002);
-        adjustActionData('restoreEquipment', 'efficiencyBase', .0001);
-        adjustActionData('unblemish', 'efficiencyBase', .00008);
-        adjustActionData('manaTransfer', 'efficiencyBase', .00005);
-
-        for(let actionVar in data.actions) {
-            let actionObj = data.actions[actionVar];
-            let dataObj = actionData[actionVar];
-            if(dataObj.plane === 1 && actionObj.unlocked) {
-                actionObj.prevUnlockTime = 5;
-                actionObj.unlockTime = 5;
-            }
-        }
-    }
-    if(saveVersionFromLoad <= 3) {
-        for(let actionVar in data.actions) {
-            let actionObj = data.actions[actionVar];
-            let dataObj = actionData[actionVar];
-            if(actionObj.unlocked || actionObj.prevUnlockTime || actionObj.unlockTime || actionObj.highestLevel > 0) {
-                actionObj.hasBeenUnlocked = true;
-            }
-
-            for(let downstreamVar of dataObj.downstreamVars) {
-                if(!isAttentionLine(actionVar, downstreamVar)) {
-                    actionObj[downstreamVar + "TempFocusMult"] = 1;
-                }
-            }
-        }
-        data.upgrades.buyNicerStuff.upgradesAvailable = 3;
-        if(data.upgrades.buyNicerStuff.upgradePower === 3) {
-            data.upgrades.buyNicerStuff.isFullyBought = true;
-        }
-        if(data.upgrades.buyNicerStuff.upgradePower === 4) {
-            refundAmount += 1890;
-            data.upgrades.buyNicerStuff.upgradePower = 3;
-            data.upgrades.buyNicerStuff.upgradesBought = 3;
-            data.upgrades.buyNicerStuff.isFullyBought = true;
-        }
-        if(data.upgrades.retrieveMyUnusedResources.upgradePower === 3) {
-            data.upgrades.retrieveMyUnusedResources.isFullyBought = true;
-        }
-    }
-    if(saveVersionFromLoad <= 4) {
-        data.actions.distillInsight.maxLevel = 10 + data.actions.remember.level*3;
-
-        for(let id in data.toastStates) {
-            data.toastStates[id] = 'hidden';
-        }
-    }
-    if(saveVersionFromLoad <= 6) {
-        delete data.atts.courage;
-    }
     return refundAmount;
 }
 
 function saveFileCorrectionAfterLoad(saveVersionFromLoad) {
+    //removed with saveVersion 6, but could still use in the future
 
-    if(saveVersionFromLoad <= 2) {
-        if(data.actions.studyAdvancedEarthMagic.level >= 2) {
-            purchaseAction('reinforceArmor')
-            revealAction('reinforceArmor');
-        }
-        if(data.actions.studyAdvancedEarthMagic.level >= 3) {
-            purchaseAction('restoreEquipment')
-            revealAction('restoreEquipment');
+}
+
+let v2toLoad;
+function handleV2Saves(toLoad) {
+    //game cannot be played until an option is chosen
+    data.gameSettings.stop = true
+
+    data.gameSettings.viewDeltas = toLoad.gameSettings.viewDeltas ?? false;
+    data.gameSettings.viewRatio = toLoad.gameSettings.viewRatio ?? false;
+    data.gameSettings.viewAll0Buttons = toLoad.gameSettings.viewAll0Buttons ?? false;
+    data.gameSettings.viewTotalMomentum = toLoad.gameSettings.viewTotalMomentum ?? false;
+    data.gameSettings.viewAdvancedSliders = toLoad.gameSettings.viewAdvancedSliders ?? false;
+    data.gameSettings.numberType = toLoad.gameSettings.numberType ?? "numberSuffix";
+
+
+    if (toLoad.lastVisit) {
+        const offlineMilliseconds = Date.now() - parseInt(toLoad.lastVisit, 10);
+        if (offlineMilliseconds > 5000) {
+            toLoad.currentGameState.bonusTime += offlineMilliseconds;
+            console.log(`Welcome back! Gained ${(offlineMilliseconds / 1000).toFixed(1)}s of bonus time.`);
         }
     }
-    if(saveVersionFromLoad <= 4) {
-        if(data.actions.moveEarth.level >= 1) { revealAction('digFoundation') }
-        if(data.actions.hardenEarth.level >= 1) { revealAction('stoneCompression') }
-        if(data.actions.shapeEarth.level >= 1) { revealAction('shapeBricks') }
-        if(data.actions.practicalMagic.level >= 1) { revealAction('tidyMagesmithShop') }
-        if(data.actions.illuminate.level >= 1) { revealAction('clearTheBasement') }
-        if(data.actions.moveIron.level >= 1) { revealAction('moldBarsFromScrap') }
+    if(toLoad.secondsPerReset) {
+        toLoad.currentGameState.bonusTime += toLoad.secondsPerReset * 1000;
+    }
 
-
-        if(data.upgrades.stopLettingOpportunityWait.upgradePower === 2) {
-            revealUpgrade("temperMyDesires")
+    for(let actionVar in data.actions) {
+        const actionObj = data.actions[actionVar];
+        const dataObj = actionData[actionVar];
+        for(let downstreamVar of dataObj.downstreamVars) {
+            if(toLoad.actions[actionVar] && toLoad.actions[actionVar][`${downstreamVar}PermFocusMult`]) {
+                actionObj[`${downstreamVar}PermFocusMult`] = toLoad.actions[actionVar][`${downstreamVar}PermFocusMult`];
+            }
         }
     }
 
-    if(saveVersionFromLoad <= 5) {
-        //force all KTL actions to max until I can figure it out
-        for (let actionVar in data.actions) {
-            let dataObj = actionData[actionVar];
-            if (dataObj.plane !== 2) {
-                continue;
-            }
-            for (let downstreamVar of dataObj.downstreamVars) {
-                let downstreamDataObj = actionData[downstreamVar];
-                if (downstreamDataObj.hasUpstream === false) {
-                    continue;
-                }
-                setSliderUI(actionVar, downstreamVar, 100);
-            }
+    let refundAmount = 0;
+    for(let upgradeVar in toLoad.upgrades) {
+        let loadObj = toLoad.upgrades[upgradeVar];
+        refundAmount += calcTotalSpentOnUpgrade(loadObj.initialCost, loadObj.costIncrease, loadObj.upgradesBought);
+    }
+
+    document.getElementById('v2Offline').innerText = secondsToTime(toLoad.currentGameState.bonusTime/1000)
+    document.getElementById('v2Legacy').innerText = intToString(toLoad.actions.echoKindle.resource)
+    document.getElementById('v2AC').innerText = intToString(refundAmount);
+
+    //to use after the choice
+    v2toLoad = {
+        offlineTime:toLoad.currentGameState.bonusTime,
+        highestLegacy:toLoad.actions.echoKindle.resource,
+        AC:refundAmount
+    };
+}
+
+function v2SaveRestart() {
+    data.gameSettings.stop = false
+    data.highestLegacy = v2toLoad.highestLegacy
+    revealUpgrade('shapeMyPath')
+    data.currentGameState.bonusTime += Math.max(v2toLoad.offlineTime, 7 * 24 * 60 * 60 * 1000)
+
+    data.ancientCoin = 10 + Math.min(v2toLoad.AC/100, 500);
+    buyUpgrade("stopLettingOpportunityWait")
+    buyUpgrade("knowWhenToMoveOn")
+    setSliderUI("overclock", "reflect", 100)
+    data.doneAmulet = true;
+    views.updateVal(`openViewAmuletButton`, "", "style.display");
+
+    document.getElementById("welcomeBackMessage").style.display = "none";
+    setActionsToHATLUnlocked()
+}
+
+function setActionsToHATLUnlocked() {
+    let list = ["overclock", "reflect", "harnessOverflow", "distillInsight", "takeNotes", "journal",
+        "remember", "makeMoney", "bodyAwareness", "meditate", "spendMoney", "buySocialAccess", "slideTheCoin",
+        "buyCoffee", "buyBasicSupplies", "buyStreetFood", "buyGoodFood", "buyMarketItems", "buyShopItems",
+        "buyBasicClothes", "buyTravelersClothes", "buyMatchingClothes", "buyStylishClothes", "travelOnRoad",
+        "travelToOutpost", "browseLocalMarket", "browseStores", "browseBackrooms", "meetVillageLeaderScott",
+        "helpScottWithChores", "checkNoticeBoard", "reportForTraining", "basicTrainingWithJohn", "noticeTheStrain",
+        "clenchTheJaw", "breatheThroughIt", "ownTheWeight", "moveWithPurpose", "reportForLabor", "oddJobsLaborer",
+        "chimneySweep", "handyman", "tavernHelper", "guildReceptionist", "messenger", "pleasantForest", "travelToCrossroads",
+        "forgottenShrine", "watchBirds", "catchAScent", "exploreDifficultPath", "eatGoldenFruit", "keepGoing",
+        "climbTheRocks", "spotAPath", "hiddenPath", "meetGrumpyHermit", "annoyHermitIntoAQuest", "presentTheOffering",
+        "learnToStayStill", "feelTheResonance", "layerTheEchoes", "igniteTheSpark", "talkToHermit", "inquireAboutMagic",
+        "pesterHermitForSecrets", "exploreTheForest", "travelAlongTheRiver", "gatherRiverWeeds", "restAtWaterfall",
+        "visitShrineBehindWaterfall", "socialize", "meetPeople", "joinCoffeeClub", "gossipAroundCoffee",
+        "hearAboutTheLich", "talkWithScott", "talkWithJohn", "learnToListen", "chatWithMerchants",
+        "complimentTheChef", "askAboutStitching", "tellAJoke", "listenToWoes", "keyToTheBackroom",
+        "chatWithHermit", "discussMagicWithHermit", "discussLifeWithHermit", "echoKindle", "resonanceFurnace",
+        "dissipation", "poolMana", "manaExperimentation", "expelMana", "stretchManaCapacity", "tightenAura",
+        "collectDischargedMotes", "spellResearch", "bindThePages", "infuseTheHide", "awakenYourGrimoire",
+        "etchTheCircle", "threadArcana", "prepareSpells", "prepareInternalSpells", "overcharge", "overwork"];
+    for(let actionVar of list) {
+        if(!data.actions[actionVar]) {
+            console.log("error with " + actionVar)
+            continue;
         }
+        data.actions[actionVar].hasBeenUnlocked = true;
     }
 }

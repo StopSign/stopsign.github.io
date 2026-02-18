@@ -164,6 +164,7 @@ function legacySeveranceReset(forceReset) {
     data.legacy = 0;
     data.ancientCoin = 0;
     data.ancientWhisper = 0;
+    data.currentGameState.secondsThisLS = 0;
 
     //hide magic until re-unlocked
     data.planeUnlocked[1] = false;
@@ -177,8 +178,8 @@ function legacySeveranceReset(forceReset) {
     for (let actionVar in data.actions) {
         let actionObj = data.actions[actionVar];
         let dataObj = actionData[actionVar];
-        actionObj.prevUnlockTime = 0;
-        actionObj.prevLevel1Time = 0;
+        actionObj.prevUnlockTime = -1;
+        actionObj.prevLevel1Time = -1;
         actionObj.highestLevel = -1;
         actionObj.secondHighestLevel = -1;
         actionObj.thirdHighestLevel = -1;
@@ -219,6 +220,10 @@ function legacySeveranceReset(forceReset) {
 
     adjustMagicMaxLevels() //probably not needed since everything resets
     adjustBrythalMaxLevels()
+
+    for (let attCategory in attTree) {
+        views.updateVal(`${attCategory}CategoryContainer`, "none", "style.display");
+    }
 
     switchToPlane(0)
     data.planeUnlocked[2] = false;
@@ -499,6 +504,15 @@ function useAmulet() {
 }
 
 function modifyMonolithTitles() {
+    if(data.actions.destroyEasternMonolith.level === data.actions.destroyEasternMonolith.maxLevel
+        && data.lichKills <= 2) {
+        document.getElementById("legacySeveranceButton1").style.display = "";
+    }
+    if(data.actions.destroyWesternMonolith.level === data.actions.destroyWesternMonolith.maxLevel
+        && data.lichKills >= 3 && data.lichKills <= 5) {
+        document.getElementById("legacySeveranceButton2").style.display = "";
+    }
+
     if(data.lichKills === 0) {
         actionData.destroyEasternMonolith.title = "Kill the Lich"
     }
@@ -565,6 +579,7 @@ function lich0Text() {
                 <li>All Unique Amulet upgrades</li>
                 <li>The number of times an action has been unlocked</li>
                 <li>Permanent Focus Multiplier</li>
+                <li>All automation settings</li>
             </ul>
 
             You will gain:
@@ -604,6 +619,7 @@ function lich1Text() {
                 <li>All Unique Amulet upgrades</li>
                 <li>The number of times an action has been unlocked</li>
                 <li>Permanent Focus Multiplier</li>
+                <li>(New!) All automation settings and custom triggers</li>
                 <li>(New!) The exp and level of Repose Rebounded</li>
                 <li>(New!) Death Energy on Repose Rebounded</li>
             </ul>
@@ -646,11 +662,12 @@ function lich2Text() {
                 <li>All Unique Amulet upgrades</li>
                 <li>The number of times an action has been unlocked</li>
                 <li>Permanent Focus Multiplier</li>
+                <li>All automation settings and custom triggers</li>
                 <li>The exp and level of Repose Rebounded</li>
                 <li>Death Energy on Repose Rebounded</li>
             </ul>
 
-            You will gain:
+            (New!) You will gain:
             <ul>
                 <li>x3 Legacy gain up to your highest Legacy ever (${intToString(data.highestLegacy)})</li>
                 <li>Ancient Whispers +50% (bringing the total to +150%)</li>

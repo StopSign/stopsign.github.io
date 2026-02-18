@@ -3,29 +3,13 @@ let gameSpeed = 1;
 let stop = false;
 // let bonusTime = 0;
 
-let settings = {}; // Will be populated by the 'start' command.
 let timerId = null;
 let lastTickTime = 0;
-let ticksForSeconds = 0;
-let secondsPassed = 0;
 
-let View = {};
-
-let curTime = new Date();
-let gameTicksLeft = 0;
-let sudoStop = false;
-let totalTime = 0;
-//Store offline time
-let mainTickLoop;
-let lastSave = Date.now();
 
 //Saving globals
 let isFileSystem = !!location.href.match("file");
 let saveName = "KTLsave6"; //Blank if you don't want to save, change name to force user reset
-
-let forceStop = false;
-
-
 
 //Game globals - these initializations will be overriden in load
 //Needed for when load doesn't happen
@@ -96,6 +80,7 @@ data.currentGameState = {
     instantTime: 0,
     instantTimerCooldown:0,
     secondsPassed: 0,
+    secondsThisLS: 0,
 };
 
 
@@ -105,21 +90,21 @@ viewData.toasts = [];
 let language = "english";
 let globalVisible = false; //SET FOR COMMIT
 // let globalVisible = true;
-// let isLoadingEnabled = true; //SET FOR COMMIT
-let isLoadingEnabled = false;
+let isLoadingEnabled = true; //SET FOR COMMIT
+// let isLoadingEnabled = false;
 let loadStaticSaveFile = false; //SET FOR COMMIT
 // let loadStaticSaveFile = true;
 
 data.upgrades = {};
 
-// let isDebug = false; //SET FOR COMMIT
-let isDebug = true;
+let isDebug = false; //SET FOR COMMIT
+// let isDebug = true;
+let debugLevel = 46; //to set the rough number of loops
 function debug() {
     if(!isDebug) {
         return;
     }
     loadDebugValues()
-
 }
 
 function initializeData() {

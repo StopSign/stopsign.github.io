@@ -447,7 +447,7 @@ let maxLevelTop = (data.gameSettings.viewDeltas && data.gameSettings.viewRatio) 
 
                 <div class="button" onclick="enableAutomationUpwards('${actionVar}', true)">
                      Force Enable Automation
-                </div><br>
+                </div>
             </span>
         `
     }
@@ -475,7 +475,7 @@ let maxLevelTop = (data.gameSettings.viewDeltas && data.gameSettings.viewRatio) 
 
     let customTriggerContainer = `
         <div class="menuSeparator"></div>
-        <div id="${actionVar}_addCustomTriggerButton" class="button" onclick="addCustomTrigger('${actionVar}')">Add Custom Trigger</div>
+        <div id="${actionVar}_addCustomTriggerButton" style="display:none" class="button" onclick="addCustomTrigger('${actionVar}')">Add Custom Trigger</div>
         <div id="${actionVar}_customTriggerForm"></div>
         <div id="${actionVar}_customTriggerContainer"></div>
         `
@@ -663,7 +663,7 @@ function generateOutsideAttDisplay(actionVar, attObj, type) {
             ? "--attribute-use-exp-bg-color"
             : "--attribute-use-eff-bg-color");
     backgroundColor = statName === "legacy" ? "--legacy-color" : backgroundColor;
-    backgroundColor = statName === "hope" ? "--doom-color" : backgroundColor;
+    backgroundColor = statName === "hope" ? "--hope-color" : backgroundColor;
 
     let text = "";
     if(type === "add") {
@@ -739,7 +739,6 @@ function generateActionExpAtts(actionVar) {
 
     for(let attObj of dataObj.expAtts) {
         let attVar = attObj[0];
-        let ratio = attObj[1] * 100;
         if(!data.atts[attVar]) {
             console.log(`ERROR: you need to instantiate the stat: '${attVar}'`);
         }
@@ -749,7 +748,7 @@ function generateActionExpAtts(actionVar) {
         expAttsStr += Raw.html`
         <div id="${actionVar}${attVar}InsideContainerexp" style="color:var(--text-muted);cursor:pointer;display:none;border:2px solid transparent;" 
             class="backgroundWhenHover" onclick="clickedAttName('${attVar}', true)">
-            <span style="color:var(--text-primary)"><b>${ratio}</b></span>% of <img src="img/${attVar}.svg" alt="${attVar}" 
+            <span style="color:var(--text-primary)"><img src="img/${attVar}.svg" alt="${attVar}" 
             style="margin:1px;width:20px;height:20px;vertical-align:top;background:var(--attribute-use-exp-bg-color)" />
             's bonus 
             = x<b><span style="color:var(--text-primary)" id="${actionVar}_${attVar}AttExpMult">1</span></b>
@@ -1031,13 +1030,13 @@ function actionTriggerText(type, info, extra) {
         let ACAmount = extra
             * (data.upgrades.listenCloserToWhispers.upgradePower === 1?3:1)
             * (data.gameState === "KTL" ? data.ancientCoinMultKTL : 1);
-        text += `+<b>${intToString(ACAmount, 1)}</b> Ancient Coins`
+        text += `+<span style="font-weight:bold;color:var(--AC-color)">${intToString(ACAmount, 1)}</span> Ancient Coins`
     } else if(type === "addAW") {
         let AWAmount = extra
             * (data.upgrades.listenCloserToWhispers.upgradePower === 1?3:1)
             * (1 + data.lichKills/2)
             * (data.gameState === "KTL" ? data.ancientWhisperMultKTL : 1);
-        text += `+<b>${intToString(AWAmount, 1)}</b> Ancient Whispers`
+        text += `+<span style="font-weight:bold;color:var(--AW-color)">${intToString(AWAmount, 1)}</span> Ancient Whispers`
     }
     return text;
 }
@@ -1386,6 +1385,10 @@ function setAllCaches() {
     queueCache("legacySeveranceMenu");
     queueCache("highestLegacyContainer");
     queueCache("highestLegacy");
+    queueCache("secondsPassedContainer");
+    queueCache("secondsPassed");
+    queueCache("secondsThisLSContainer");
+    queueCache("secondsThisLS");
 
     for(let actionVar in data.actions) {
         view.cached[`${actionVar}ActionPower`] = document.getElementById(`${actionVar}ActionPower`);

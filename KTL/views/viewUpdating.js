@@ -37,8 +37,11 @@ let views = {
         views.updateVal(`ancientCoinDisplay`, data.doneKTL ? "" : "none", "style.display");
         views.updateVal(`ancientWhisperDisplay`, data.doneKTL ? "" : "none", "style.display");
         views.updateVal(`legacyDisplay`, data.legacy > 0 ? "" : "none", "style.display");
-        views.updateVal(`highestLegacyContainer`, data.legacy > 0 ? "" : "none", "style.display");
+        views.updateVal(`highestLegacyContainer`, data.highestLegacy > 0 ? "" : "none", "style.display");
         views.updateVal(`highestLegacy`, data.highestLegacy, "textContent", 2);
+        views.updateVal(`secondsPassed`, data.currentGameState.secondsPassed, "textContent", "time");
+        views.updateVal(`secondsThisLSContainer`, data.lichKills > 0 ? "" : "none", "style.display");
+        views.updateVal(`secondsThisLS`, data.currentGameState.secondsThisLS, "textContent", "time");
         views.updateVal(`legacyMult`, data.legacyMultKTL, "innerText", 2);
         views.updateVal(`ancientCoinMult`, data.ancientCoinMultKTL, "innerText", 2);
 
@@ -50,8 +53,6 @@ let views = {
         views.updateVal(`killTheLichMenuButton2`, shouldShowKTLButton?"":"none", "style.display")
 
         tickTimerCooldown()
-
-        views.updateVal(`highestLegacyContainer`, data.legacy > 0 ? "" : "none", "style.display");
     },
     scheduleUpdate: function(elementId, value, type) {
         view.scheduled.push({
@@ -283,11 +284,11 @@ let views = {
             views.updateVal(`${actionVar}ThirdHighestLevel`, actionObj.thirdHighestLevel, "innerText", 1);
 
             if (dataObj.plane !== 1) {
-                views.updateVal(`${actionVar}CurrentUnlockTimeContainer`, actionObj.unlockTime ? "" : "none", "style.display");
+                views.updateVal(`${actionVar}CurrentUnlockTimeContainer`, actionObj.unlockTime >= 0 ? "" : "none", "style.display");
                 views.updateVal(`${actionVar}CurrentUnlockTime`, actionObj.unlockTime, "textContent", "time");
-                views.updateVal(`${actionVar}PrevUnlockTimeContainer`, actionObj.prevUnlockTime ? "" : "none", "style.display");
+                views.updateVal(`${actionVar}PrevUnlockTimeContainer`, actionObj.prevUnlockTime >= 0 ? "" : "none", "style.display");
                 views.updateVal(`${actionVar}PrevUnlockTime`, actionObj.prevUnlockTime, "textContent", "time");
-                if (actionObj.prevUnlockTime && actionObj.unlockTime) {
+                if (actionObj.prevUnlockTime >= 0 && actionObj.unlockTime >= 0) {
                     views.updateVal(`${actionVar}DeltaUnlockTimeContainer`, "", "style.display");
                     views.updateVal(`${actionVar}DeltaUnlockTime`, Math.abs(actionObj.unlockTime - actionObj.prevUnlockTime), "textContent", "time");
                     views.updateVal(`${actionVar}DeltaUnlockTime`, actionObj.unlockTime - actionObj.prevUnlockTime < 0 ? "green" : "red", "style.color");
@@ -297,11 +298,11 @@ let views = {
             }
 
             if (dataObj.plane === 1) {
-                views.updateVal(`${actionVar}CurrentLevel1TimeContainer`, actionObj.level1Time ? "" : "none", "style.display");
+                views.updateVal(`${actionVar}CurrentLevel1TimeContainer`, actionObj.level1Time >= 0 ? "" : "none", "style.display");
                 views.updateVal(`${actionVar}CurrentLevel1Time`, actionObj.level1Time, "textContent", "time");
-                views.updateVal(`${actionVar}PrevLevel1TimeContainer`, actionObj.prevLevel1Time ? "" : "none", "style.display");
+                views.updateVal(`${actionVar}PrevLevel1TimeContainer`, actionObj.prevLevel1Time >= 0 ? "" : "none", "style.display");
                 views.updateVal(`${actionVar}PrevLevel1Time`, actionObj.prevLevel1Time, "textContent", "time");
-                if (actionObj.prevLevel1Time && actionObj.level1Time) {
+                if (actionObj.prevLevel1Time >= 0 && actionObj.level1Time >= 0) {
                     views.updateVal(`${actionVar}DeltaLevel1TimeContainer`, "", "style.display");
                     views.updateVal(`${actionVar}DeltaLevel1Time`, Math.abs(actionObj.level1Time - actionObj.prevLevel1Time), "textContent", "time");
                     views.updateVal(`${actionVar}DeltaLevel1Time`, actionObj.level1Time - actionObj.prevLevel1Time < 0 ? "green" : "red", "style.color");
@@ -402,11 +403,11 @@ let views = {
 
         if(!actionObj.maxLevel || actionObj.maxLevel !== actionObj.level) {
             let timeToLevel = calcTimeToLevel(actionObj);
-            views.updateVal(`${actionVar}TimeToLevel`, secondsToTime(timeToLevel), "textContent")
+            views.updateVal(`${actionVar}TimeToLevel`, secondsToTime(timeToLevel, true), "textContent")
         }
         if(actionObj.maxLevel) {
             let timeToMax = calcTimeToMax(actionVar);
-            views.updateVal(`${actionVar}TimeToMax`, secondsToTime(timeToMax), "textContent")
+            views.updateVal(`${actionVar}TimeToMax`, secondsToTime(timeToMax, true), "textContent")
         }
 
         views.updateActionDownstreamViews(actionObj, actionObj.currentMenu === "downstream");
@@ -658,21 +659,22 @@ function updateSliderContainers() {
 }
 
 function displayLSStuff() {
+
+    modifyMonolithTitles()
+
     if(!data.lichKills) {
         return;
     }
 
-    if(data.actions.destroyEasternMonolith.level === data.actions.destroyEasternMonolith.maxLevel) {
-        document.getElementById("legacySeveranceButton").style.display = "";
-    }
-    modifyMonolithTitles()
 
     if(data.lichKills >= 1) {
         revealUpgrade('rememberWhatIDid') //10
         revealUpgrade('valueMyBody') //15, 150, 1500
         revealUpgrade('pickUpValuablePlants')
+        revealUpgrade('shapeMyPath') //20
 
 
+        unveilPlane(0)
         unveilPlane(3)
         revealAction("reposeRebounded")
         revealAction("turnTheWheel")
@@ -706,15 +708,13 @@ function displayLSStuff() {
         revealUpgrade('studyHarder')
     }
     if(data.lichKills >= 3) {
-
         // revealUpgrade("talkToMoreWizards") //800 AW
-        purchaseAction("stopDarknessRitual")
-        purchaseAction("protectTheSunstone")
-        purchaseAction("silenceDeathChanters")
-        purchaseAction("breakFleshBarricade")
-        purchaseAction("conquerTheGatekeepers")
-        purchaseAction("destroyWesternMonolith")
+        revealUpgrade("improveMyHouse")
 
+        purchaseAction("stopDarknessRitual") //goes to western monolith
+
+        //lots more max level increases
+        //OTTL doesn't consume all of its momentum
     }
 
     // document.getElementById("lichUpgradeTab").style.display = "";
@@ -722,8 +722,6 @@ function displayLSStuff() {
     // document.getElementById("lichCoinsDisplay").style.display = "";
 }
 
-
-// --- 1. Main Entry Point ---
 
 function addCustomTrigger(actionVar) {
     // 1. Hide the "Add" button
@@ -737,13 +735,11 @@ function addCustomTrigger(actionVar) {
     formContainer.replaceChildren(buildTriggerForm(actionVar));
 }
 
-// --- 2. The Form Builder (DOM Manipulation) ---
 
 function buildTriggerForm(actionVar) {
     const wrapper = document.createElement('div');
     wrapper.className = "trigger-form-box";
 
-    // --- Row 1: "Set upstream to [Reward]..." ---
     const row1 = document.createElement('div');
     row1.style.marginBottom = "8px";
 
@@ -767,13 +763,14 @@ function buildTriggerForm(actionVar) {
 
     row1.append(" when ");
 
-    // Target Action Select (Dynamic)
     const targetSelect = document.createElement('select');
-    // iterate over your data.actions
     for (let key in data.actions) {
+        if(!data.actions[key].hasBeenUnlocked || actionData[key].plane === 2) {
+            continue;
+        }
         const opt = document.createElement('option');
         opt.value = key;
-        opt.textContent = actionData[key].title; // Using the title as requested
+        opt.textContent = actionData[key].title;
         targetSelect.appendChild(opt);
     }
     row1.append(targetSelect);
@@ -807,6 +804,9 @@ function buildTriggerForm(actionVar) {
     amountInput.min = "1";
     amountInput.style.display = "none";
     amountInput.style.marginLeft = "5px";
+    amountInput.addEventListener('keydown', (event) => {
+        event.stopPropagation();
+    });
     row2.append(amountInput);
 
     // Toggle Amount Input Visibility
