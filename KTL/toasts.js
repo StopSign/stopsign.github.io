@@ -53,8 +53,8 @@ Here, the resources on Momentum is 100 and it is a Tier 1 Action, so the maximum
 We can see the Total Decrease is -1.25/s, which is made of:
 <ol>
     <li>0.5/s that Reflect is consuming for Progress</li>
-    <li>100% (of the 0.5/s rate) being sent to Distill Insight</li>
-    <li>50% (of the 0.5/s rate) being sent to Harness Overflow</li>
+    <li>100% (of the 0.5/s rate) being sent to Harness Overflow</li>
+    <li>50% (of the 0.5/s rate) being sent to Distill Insight</li>
 </ol>
         `);
 

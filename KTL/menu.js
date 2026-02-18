@@ -629,10 +629,11 @@ function createChangelogMenu() {
     return Raw.html`
         <div class="menuTitle">Changelog</div>
         <div class="menuSeparator"></div><br>
-        v3.0.1 2/18 (current): <br>
+        v3.0.2 2/18 (current): <br>
             <ol>
-                <li>Tips were not showing</li>
-                <li>The reset button was hidden on some screens</li>
+                <li>3.0.2 Custom triggers were not resetting on amulet use</li>
+                <li>3.0.1 Tips were not showing</li>
+                <li>3.0.1 The reset button was hidden on some screens</li>
             </ol>
         <br>
         v3.0.0 2/18: <br>

@@ -707,13 +707,16 @@ function resetGamespeed() {
 
 function statMenuHideButton() {
     let button = document.getElementById("attDisplayShowButton");
+    let button2 = document.getElementById("attDisplayHideButton")
     let attDisplay = view.cached.attDisplay;
     if(attDisplay.style.display !== "none") {
         attDisplay.style.display = "none";
         button.style.display = "inline-block";
+        button2.style.display = "none"
     } else {
         attDisplay.style.display = "inline-block";
         button.style.display = "none";
+        button2.style.display = "inline-block"
     }
 }
 

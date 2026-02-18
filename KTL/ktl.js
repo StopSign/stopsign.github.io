@@ -421,6 +421,12 @@ function useAmulet() {
             actionObj[downstreamVar + "TempFocusMult"] = 2;
         });
 
+        if(actionObj.customTriggers) {
+            for (let obj of actionObj.customTriggers) {
+                obj.hasFired = false;
+            }
+        }
+
     }
 
     //Next, re-add the stats for the actions that didn't reset (infusion)

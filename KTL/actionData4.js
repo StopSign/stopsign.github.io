@@ -194,7 +194,9 @@ actionData = {
             actionObj.actionPower = actionObj.actionPowerBase *
                 actionObj.actionPowerMult;
             actionObj.resourceToAdd = actionObj.actionPower * actionObj.upgradeMult * (actionObj.efficiency/100);
-            actionObj.expToAddBase = Math.pow(actionObj.resource, 2) * actionData.awakenYourGrimoire.manaQuality() * (actionObj.efficiency/100);
+            let mqToUse = actionData.awakenYourGrimoire.manaQuality();
+            mqToUse = mqToUse > 0 ? mqToUse : 1;
+            actionObj.expToAddBase = Math.pow(actionObj.resource, 2) * mqToUse * (actionObj.efficiency/100);
             actionObj.expToAdd = actionObj.expToAddBase * actionObj.expToAddMult;
             data.actions[this.generatorTarget].showResourceAdded = actionObj.resourceToAdd;
         },
@@ -212,7 +214,7 @@ actionData = {
                 +<span style="font-weight:bold;" id="threadArcanaExpGained">???</span> Exp on this action<br>
                 +<span style="font-weight:bold;" id="threadArcanaResourceSent">???</span> Arcana is added to Prepare Spells.<br>
                 `},
-        extraInfo: {english:Raw.html`Exp gain = (10% of Mana)^2 * Speed.<br>
+        extraInfo: {english:Raw.html`Exp gain = (10% of Mana)^2 * Speed * Mana Quality.<br>
         Arcana gain = Action Power * Speed`},
         actionTriggers: [
             ["info", "text", "Takes 10% of Mana and converts it to exp. This is better with more Mana (see info)."],
