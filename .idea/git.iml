@@ -42,6 +42,7 @@
       <excludeFolder url="file://$MODULE_DIR$/quadraticExperiments" />
       <excludeFolder url="file://$MODULE_DIR$/FriendshipIdle" />
       <excludeFolder url="file://$MODULE_DIR$/enginePractice" />
+      <excludeFolder url="file://$MODULE_DIR$/KTL/notesfolder" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
@@ -49,5 +50,6 @@
     <orderEntry type="library" name="jquery-DefinitelyTyped" level="application" />
     <orderEntry type="library" name="d3.v6" level="application" />
     <orderEntry type="library" name="three" level="application" />
+    <orderEntry type="library" name="decimal.js" level="application" />
   </component>
 </module>

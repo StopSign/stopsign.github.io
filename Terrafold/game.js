@@ -93,9 +93,9 @@ function Game() {
         if(toBuy * 50 > this.land.soil) {
             toBuy = Math.floor(this.land.soil/50);
         }
-        if(toBuy <= 0) {
-            return;
-        }
+        // if(toBuy <= 0) {
+        //     return;
+        // }
         this.land.soil -= toBuy * 50;
         this.farms.addFarm(toBuy);
         view.update();
