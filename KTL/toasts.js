@@ -11,7 +11,7 @@ function initializeToasts() {
     createToastModal();
 
     if(debugLevel > 0) {
-
+        return
     }
 
     createToast(function() { return true; },

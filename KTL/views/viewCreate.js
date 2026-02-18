@@ -330,8 +330,8 @@ function generateActionDisplay(actionVar) {
             </div>
         </div>
         <div id="${actionVar}EstimatedTimesContainer" style="display:flex;">
-            <div id="${actionVar}TimeToLevelContainer" style="display:flex;flex:0 0 50%">Time to Level: ~<span id="${actionVar}TimeToLevel" style="font-weight:bold">5</span></div>
-            <div id="${actionVar}TimeToMaxContainer" style="display:flex;flex:0 0 50%">Time to Max: ~<span id="${actionVar}TimeToMax" style="font-weight:bold">6</span></div>
+            <div id="${actionVar}TimeToLevelContainer" style="display:flex;flex:0 0 50%">Level in: ~<span id="${actionVar}TimeToLevel" style="font-weight:bold">5</span></div>
+            <div id="${actionVar}TimeToMaxContainer" style="display:flex;flex:0 0 50%">Max in: ~<span id="${actionVar}TimeToMax" style="font-weight:bold">6</span></div>
         </div>`;
 
     queueCache(`${actionVar}IsMaxLevel`)

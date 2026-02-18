@@ -629,7 +629,21 @@ function createChangelogMenu() {
     return Raw.html`
         <div class="menuTitle">Changelog</div>
         <div class="menuSeparator"></div><br>
-        v2.1.4 11/26 (current):<br>
+        v3.0.0 2/18 (current): <br>
+        Big changes, too many to list. Here are the big ones:<br>
+            <ol>
+                <li>All attributes are exponential: +100 attributes gives a x10 bonus. This means every action in the game has been modified.</li>
+                <li>Every exp reduction (purple icon) is 100%</li>
+                <li>Efficiency renamed to Speed. Speed is reduced when the attribute is below a target amount (blue icon)</li>
+                <li>Many actions changed, including most of Magic and how that works. Mana Quality is used instead of Spell Power. Train with Team is removed. Expanded socialization actions. Fear is not removed from HATL as its used, HATL has no max level, and gives x1.5 AC for each HATL level, multiplicatively. Overclock Targeting the Lich in Northern Wastes is changed.</li>
+                <li>Ancient Coins is now split into AC and AW: Ancient Whispers. AW is gained on its own and is used only for unlocking new action packs.</li>
+                <li>You can convert Bonus Time to Instant Bonus Time at a rate of 2 hours every 30 minutes, which can be used immediately with 1 minute or 10 minute buttons. The calculation fidelity is less precise when using instant, which affects the game more at the start of a run.</li>
+                <li>Eastern Monument is renamed according to where you are in the playthrough. When you max its level, a new 2nd tier reset will be available. Each 2nd tier reset will be customized with extra actions and upgrades.</li>
+                <li>In general, amulet loops are significantly more curated, and there should be little to no "walls" to push through.</li>
+                <li>Additional bug fixes and QoL</li>
+            </ol>
+        <br>
+        v2.1.4 11/26:<br>
         <ul>
             <li>Reworked automation. It should behave more along expectations now</li>
             <li>Added a "force" button in automation to turn on and off, to avoid ever needing to edit long chains</li>

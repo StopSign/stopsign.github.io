@@ -595,6 +595,8 @@ function lich0Text() {
             <ul>
                 <li>All non-infusion unlock costs are x2</li>
             <ul>
+
+            It is recommended to export the save file before resetting.
 `
 }
 
@@ -639,6 +641,8 @@ function lich1Text() {
             <ul>
                 <li>All non-infusion unlock costs are increased by x2 (bringing the total to x4)</li>
             <ul>
+
+            It is recommended to export the save file before resetting.
     `
 }
 function lich2Text() {
@@ -681,5 +685,7 @@ function lich2Text() {
             <ul>
                 <li>All non-infusion unlock costs are increased by x2 (bringing the total to x6)</li>
             <ul>
+
+            It is recommended to export the save file before resetting.
     `
 }

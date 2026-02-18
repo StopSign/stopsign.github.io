@@ -99,7 +99,7 @@ data.upgrades = {};
 
 let isDebug = false; //SET FOR COMMIT
 // let isDebug = true;
-let debugLevel = 46; //to set the rough number of loops
+let debugLevel = 80; //to set the rough number of loops
 function debug() {
     if(!isDebug) {
         return;
