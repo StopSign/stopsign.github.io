@@ -414,7 +414,7 @@ let upgradeData = {
         }
     },
     shapeMyPath: {
-        initialCost:20, costIncrease:1, creationVersion: 6,
+        initialCost:10, costIncrease:1, creationVersion: 6,
         upgradesAvailable: 1, type:"unique",
         visible: false,
         customInfo: function(num) {
