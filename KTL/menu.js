@@ -629,7 +629,12 @@ function createChangelogMenu() {
     return Raw.html`
         <div class="menuTitle">Changelog</div>
         <div class="menuSeparator"></div><br>
-        v3.0.2 2/18 (current): <br>
+        v3.0.3 2/23 (current): <br>
+            <ol>
+                <li>The 3rd row of spells have their circles adjusted</li>
+                <li>Fixed a bug with deleting custom triggers</li>
+            </ol><br>
+        v3.0.2 2/18: <br>
             <ol>
                 <li>3.0.2 Custom triggers were not resetting on amulet use</li>
                 <li>3.0.1 Tips were not showing</li>

@@ -1102,11 +1102,13 @@ function checkIncomingTriggers(targetActionVar) {
         const sourceObj = data.actions[sourceKey];
 
         // Loop through the source's triggers to find the match
-        sourceObj.customTriggers.forEach(trigger => {
-            if (trigger.targetKey === targetActionVar) {
-                evaluateTrigger(sourceKey, trigger, targetObj);
-            }
-        });
+        if(sourceObj.customTriggers) {
+            sourceObj.customTriggers.forEach(trigger => {
+                if (trigger.targetKey === targetActionVar) {
+                    evaluateTrigger(sourceKey, trigger, targetObj);
+                }
+            });
+        }
     });
 }
 

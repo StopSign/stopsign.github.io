@@ -205,7 +205,6 @@ actionData = {
         efficiencyAtts:[["hope", 0]],
         extraInfo:{english:"Gain Legacy = +500 * (1 + level/5) * Legacy Mult, on level."},
         actionTriggers: [
-            ["info", "text", "On Unlock: Show 7 more upgrades."],
             ["unlock", "addAC", "", 50],
             ["unlock", "addAW", "", 480],
             ["complete", "addLegacy", "destroyEasternMonolith", 500],

@@ -932,7 +932,7 @@ actionData = {
     overponder: {
         tier:0, plane:1, resourceName:"arcana", creationVersion:7,
         progressMaxBase:1e11, progressMaxIncrease:1,
-        expToLevelBase:1, expToLevelIncrease:1, circle:7,
+        expToLevelBase:1, expToLevelIncrease:1, circle:4,
         efficiencyBase:.02, maxLevel:2, isSpell:true, instabilityToAdd:90,
         unlockCost:1e14, visible:false, unlocked:false, purchased: false, school:"internal",
         spellPower: function() {
@@ -987,7 +987,7 @@ actionData = {
     overdrive: {
         tier:0, plane:1, resourceName:"arcana", creationVersion:7,
         progressMaxBase:1e12, progressMaxIncrease:1,
-        expToLevelBase:1, expToLevelIncrease:1, circle:8,
+        expToLevelBase:1, expToLevelIncrease:1, circle:5,
         efficiencyBase:.01, maxLevel:2, isSpell:true, instabilityToAdd:150,
         unlockCost:1e12, visible:false, unlocked:false, purchased: false, school:"internal",
         spellPower: function() {
@@ -1042,7 +1042,7 @@ actionData = {
     overhype: {
         tier:0, plane:1, resourceName:"arcana", creationVersion:7,
         progressMaxBase:1e12, progressMaxIncrease:1,
-        expToLevelBase:1, expToLevelIncrease:1, circle:8,
+        expToLevelBase:1, expToLevelIncrease:1, circle:6,
         efficiencyBase:.01, maxLevel:2, isSpell:true, instabilityToAdd:200,
         unlockCost:1e12, visible:false, unlocked:false, purchased: false, school:"internal",
         spellPower: function() {
@@ -1053,7 +1053,7 @@ actionData = {
         efficiencyAtts:[["wizardry", 400]],
         extraInfo: {english:Raw.html`If a charge of this action, Overtalk, and Overhear is available, Socialize has x10 action power, stacking with Overtalk and Overhear. Uses a charge when Socialize completes.`},
         actionTriggers: [
-            ["info", "text", "Uses charges to increase Momentum (check info)"],
+            ["info", "text", "Uses charges to increase Conversations (check info)"],
             ["unlock", "addMaxLevels", "castToFail", 1],
         ]
     },
@@ -1073,8 +1073,8 @@ actionData = {
         efficiencyAtts:[["wizardry", 400]],
         extraInfo: {english:Raw.html``},
         actionTriggers: [
-            ["unlock", "addMaxLevels", "castToFail", 1],
-            // ["level_1", "reveal", "overponder"]
+            // ["unlock", "addMaxLevels", "castToFail", 1],
+            // ["level_1", "reveal", ""]
         ]
     },
     hardenDirt: {
@@ -1091,8 +1091,8 @@ actionData = {
         efficiencyAtts:[["wizardry", 400]],
         extraInfo: {english:Raw.html``},
         actionTriggers: [
-            ["unlock", "addMaxLevels", "castToFail", 1],
-            // ["level_1", "reveal", "overponder"]
+            // ["unlock", "addMaxLevels", "castToFail", 1],
+            // ["level_1", "reveal", ""]
         ]
     },
     shapeDefenses: {
@@ -1109,8 +1109,8 @@ actionData = {
         efficiencyAtts:[["wizardry", 400]],
         extraInfo: {english:Raw.html``},
         actionTriggers: [
-            ["unlock", "addMaxLevels", "castToFail", 1],
-            // ["level_1", "reveal", "overponder"]
+            // ["unlock", "addMaxLevels", "castToFail", 1],
+            // ["level_1", "reveal", ""]
         ]
     },
     mendSmallCracks: {
@@ -1127,8 +1127,8 @@ actionData = {
         efficiencyAtts:[["wizardry", 400]],
         extraInfo: {english:Raw.html``},
         actionTriggers: [
-            ["unlock", "addMaxLevels", "castToFail", 1],
-            // ["level_1", "reveal", "overponder"]
+            // ["unlock", "addMaxLevels", "castToFail", 1],
+            // ["level_1", "reveal", ""]
         ]
     },
     restoreEquipment: {
@@ -1145,8 +1145,8 @@ actionData = {
         efficiencyAtts:[["wizardry", 400]],
         extraInfo: {english:Raw.html``},
         actionTriggers: [
-            ["unlock", "addMaxLevels", "castToFail", 1],
-            // ["level_1", "reveal", "overponder"]
+            // ["unlock", "addMaxLevels", "castToFail", 1],
+            // ["level_1", "reveal", ""]
         ]
     },
     reinforceArmor: {
@@ -1163,8 +1163,8 @@ actionData = {
         efficiencyAtts:[["wizardry", 400]],
         extraInfo: {english:Raw.html``},
         actionTriggers: [
-            ["unlock", "addMaxLevels", "castToFail", 1],
-            // ["level_1", "reveal", "overponder"]
+            // ["unlock", "addMaxLevels", "castToFail", 1],
+            // ["level_1", "reveal", ""]
         ]
     },
     unblemish: {
@@ -1181,8 +1181,8 @@ actionData = {
         efficiencyAtts:[["wizardry", 400]],
         extraInfo: {english:Raw.html``},
         actionTriggers: [
-            ["unlock", "addMaxLevels", "castToFail", 1],
-            // ["level_1", "reveal", "overponder"]
+            // ["unlock", "addMaxLevels", "castToFail", 1],
+            // ["level_1", "reveal", ""]
         ]
     },
     lightHeal: {
@@ -1199,8 +1199,8 @@ actionData = {
         efficiencyAtts:[["wizardry", 400]],
         extraInfo: {english:Raw.html``},
         actionTriggers: [
-            ["unlock", "addMaxLevels", "castToFail", 1],
-            // ["level_1", "reveal", "overponder"]
+            // ["unlock", "addMaxLevels", "castToFail", 1],
+            // ["level_1", "reveal", ""]
         ]
     },
     mendAllWounds: {
@@ -1217,8 +1217,8 @@ actionData = {
         efficiencyAtts:[["wizardry", 400]],
         extraInfo: {english:Raw.html``},
         actionTriggers: [
-            ["unlock", "addMaxLevels", "castToFail", 1],
-            // ["level_1", "reveal", "overponder"]
+            // ["unlock", "addMaxLevels", "castToFail", 1],
+            // ["level_1", "reveal", ""]
         ]
     },
     illuminate: {
@@ -1235,8 +1235,7 @@ actionData = {
         efficiencyAtts:[["wizardry", 400]],
         extraInfo: {english:Raw.html``},
         actionTriggers: [
-            ["unlock", "addMaxLevels", "castToFail", 1],
-            // ["level_1", "reveal", "overponder"]
+            // ["unlock", "addMaxLevels", "castToFail", 1],
         ]
     },
     identifyItem: {
@@ -1253,8 +1252,6 @@ actionData = {
         efficiencyAtts:[["wizardry", 400]],
         extraInfo: {english:Raw.html``},
         actionTriggers: [
-            ["unlock", "addMaxLevels", "castToFail", 1],
-            // ["level_1", "reveal", "overponder"]
         ]
     },
     detectMagic: {
@@ -1271,7 +1268,7 @@ actionData = {
         efficiencyAtts:[["wizardry", 400]],
         extraInfo: {english:Raw.html``},
         actionTriggers: [
-            ["unlock", "addMaxLevels", "castToFail", 1],
+            // ["unlock", "addMaxLevels", "castToFail", 1],
             // ["level_1", "reveal", "overponder"]
         ]
     },
