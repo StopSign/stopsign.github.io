@@ -1,7 +1,13 @@
+let lastRealSecondTime = performance.now();
 function loop() {
     if (timerId !== null) clearTimeout(timerId);
 
     const now = performance.now();
+    if (now - lastRealSecondTime >= 1000) {
+        realSecondPassed();
+        lastRealSecondTime += 1000;
+    }
+
     if (lastTickTime === 0) lastTickTime = now;
 
     const tickInterval = 1000 / data.gameSettings.ticksPerSecond;
