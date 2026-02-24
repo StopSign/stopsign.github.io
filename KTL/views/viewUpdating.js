@@ -52,7 +52,6 @@ let views = {
         let shouldShowKTLButton = data.actions.hearAboutTheLich.level >= 1 && data.gameState !== "KTL";
         views.updateVal(`killTheLichMenuButton2`, shouldShowKTLButton?"":"none", "style.display")
 
-        tickTimerCooldown()
     },
     scheduleUpdate: function(elementId, value, type) {
         view.scheduled.push({
@@ -398,16 +397,16 @@ let views = {
             views.updateVal(`${actionVar}ShowExpAdded`, actionObj.showExpAdded === undefined?"???":"+"+intToString(actionObj.showExpAdded, 2), "textContent");
         }
 
-        views.updateVal(`${actionVar}TimeToLevelContainer`, actionObj.maxLevel !== actionObj.level ? "flex" : "none", "style.display")
-        views.updateVal(`${actionVar}TimeToMaxContainer`, actionObj.maxLevel && actionObj.maxLevel !== actionObj.level ? "flex" : "none", "style.display")
+        // views.updateVal(`${actionVar}TimeToLevelContainer`, actionObj.maxLevel !== actionObj.level ? "flex" : "none", "style.display")
+        views.updateVal(`${actionVar}TimeToMaxContainer`, actionObj.maxLevel ? "flex" : "none", "style.display")
 
         if(!actionObj.maxLevel || actionObj.maxLevel !== actionObj.level) {
             let timeToLevel = calcTimeToLevel(actionObj);
-            views.updateVal(`${actionVar}TimeToLevel`, secondsToTime(timeToLevel, true), "textContent")
+            views.updateVal(`${actionVar}TimeToLevel`, actionObj.maxLevel !== actionObj.level ? secondsToTime(timeToLevel, true) : "-", "textContent")
         }
         if(actionObj.maxLevel) {
             let timeToMax = calcTimeToMax(actionVar);
-            views.updateVal(`${actionVar}TimeToMax`, secondsToTime(timeToMax, true), "textContent")
+            views.updateVal(`${actionVar}TimeToMax`, actionObj.maxLevel !== actionObj.level ? secondsToTime(timeToMax, true) : "-", "textContent")
         }
 
         views.updateActionDownstreamViews(actionObj, actionObj.currentMenu === "downstream");
@@ -749,10 +748,10 @@ function buildTriggerForm(actionVar) {
     // Reward Select
     const sliderOptionsSelect = document.createElement('select');
     const rewards = [
-        { val: "0", text: "Off" },
-        { val: "10", text: "10%" },
-        { val: "50", text: "50%" },
-        { val: "100", text: "100%" }
+        { val: 0, text: "Off" },
+        { val: 10, text: "10%" },
+        { val: 50, text: "50%" },
+        { val: 100, text: "100%" }
     ];
     rewards.forEach(r => {
         const opt = document.createElement('option');
@@ -765,15 +764,24 @@ function buildTriggerForm(actionVar) {
     row1.append(" when ");
 
     const targetSelect = document.createElement('select');
-    for (let key in data.actions) {
-        if(!data.actions[key].hasBeenUnlocked || actionData[key].plane === 2) {
-            continue;
-        }
+    const sortedKeys = Object.keys(data.actions)
+        .filter(key => {
+            const action = data.actions[key];
+            return action.hasBeenUnlocked && actionData[key].plane !== 2 && action.purchased;
+        })
+        .sort((a, b) => {
+            const titleA = actionData[a].title.toLowerCase();
+            const titleB = actionData[b].title.toLowerCase();
+            return titleA.localeCompare(titleB);
+        });
+
+    sortedKeys.forEach(key => {
         const opt = document.createElement('option');
         opt.value = key;
-        opt.textContent = actionData[key].title;
+        opt.textContent = `${actionData[key].title} [${actionData[key].plane+1}]`;
         targetSelect.appendChild(opt);
-    }
+    });
+
     row1.append(targetSelect);
 
     // --- Row 2: "...is [Condition] [Amount]" ---

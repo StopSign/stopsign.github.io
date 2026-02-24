@@ -256,7 +256,7 @@ function checkLevelUp(actionObj, dataObj) {
     } else {
         actionObj.exp = 0;
     }
-    if(actionObj.level1Time < 0 && dataObj.plane === 1) {
+    if(actionObj.level1Time < 0 && (dataObj.plane === 1 || actionObj.actionVar === "hearAboutTheLich")) {
         actionObj.level1Time = data.secondsPerReset;
         if(actionObj.lowestLevel1Time === undefined || actionObj.lowestLevel1Time > actionObj.level1Time) {
             actionObj.lowestLevel1Time = actionObj.level1Time;
@@ -1148,6 +1148,7 @@ function evaluateTrigger(actionVar, trigger, targetObj) {
             } else {
                 if(trigger.rewardVal > 0) {
                     enableAutomationUpwards(actionVar, true)
+                    setSliderUI(parentVar, actionVar, trigger.rewardVal);
                 } else {
                     disableAutomationUpwards(actionVar, true)
                 }

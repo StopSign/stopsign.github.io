@@ -84,6 +84,8 @@ function secondPassed() {
 
     data.currentGameState.secondsPassed++;
     data.currentGameState.secondsThisLS++;
+
+    tickTimerCooldown()
 }
 
 function tickTimerCooldown() {

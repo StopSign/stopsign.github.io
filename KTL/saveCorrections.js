@@ -1,13 +1,15 @@
 function saveFileCorrection(saveVersionFromLoad) {
     let refundAmount = 0;
     //removed with saveVersion 6, but could still use in the future
+    if(data.upgrades.useMoreComplexSpells.upgradePower >= 2) {
+        purchaseAction("overponder")
+    }
 
     return refundAmount;
 }
 
 function saveFileCorrectionAfterLoad(saveVersionFromLoad) {
     //removed with saveVersion 6, but could still use in the future
-
 }
 
 let v2toLoad;
@@ -54,12 +56,12 @@ function handleV2Saves(toLoad) {
     document.getElementById('v2Legacy').innerText = intToString(toLoad.actions.echoKindle.resource)
     document.getElementById('v2AC').innerText = intToString(refundAmount);
 
-    //to use after the choice
     v2toLoad = {
         offlineTime:toLoad.currentGameState.bonusTime,
         highestLegacy:toLoad.actions.echoKindle.resource,
         AC:refundAmount
     };
+    
 }
 
 function v2SaveRestart() {
@@ -74,6 +76,10 @@ function v2SaveRestart() {
     setSliderUI("overclock", "reflect", 100)
     data.doneAmulet = true;
     views.updateVal(`openViewAmuletButton`, "", "style.display");
+
+    for (let actionVar in data.actions) {
+        views.updateVal(`${actionVar}PinButton`, "", "style.display");
+    }
 
     document.getElementById("welcomeBackMessage").style.display = "none";
     setActionsToHATLUnlocked()

@@ -2063,7 +2063,6 @@ let actionData = {
         expAtts: [["resonance", 1]],
         efficiencyAtts: [["navigation", 600]],
         actionTriggers: [
-            ["level_1", "reveal", "feelAGentleTug"],
             ["level_1", "reveal", "clearTheLeaves"]
         ]
     },

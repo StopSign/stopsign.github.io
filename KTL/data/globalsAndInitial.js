@@ -99,7 +99,7 @@ data.upgrades = {};
 
 let isDebug = false; //SET FOR COMMIT
 // let isDebug = true;
-let debugLevel = 80; //to set the rough number of loops
+let debugLevel = 125; //to set the rough number of loops
 function debug() {
     if(!isDebug) {
         return;
@@ -633,7 +633,7 @@ function initializeData() {
     create("turnTheWheel", ["tidalBurden", "dipInTheRiver"], .5, 1)
     create("tidalBurden", [], 1, -.5)
     create("dipInTheRiver", ["prepareInfusion"], .5, 1)
-    create("prepareInfusion", ["infuseBody", "infuseMind", "infuseImage", "infuseSenses", "infuseMagic"], 0, 1)
+    create("prepareInfusion", ["infuseBody", "infuseMind", "infuseImage", "infuseSenses", "infuseMagic"], 0, 1.2)
     create("infuseBody", [], -1.6, 0.5)
     create("infuseMind", [], -0.9, 1.3)
     create("infuseImage", [], 0, 1.6)

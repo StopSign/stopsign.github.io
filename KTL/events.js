@@ -784,10 +784,10 @@ function convertBonusTime() {
     let btn = document.getElementById('convertBtn');
     if (btn.innerText.indexOf("Use in") !== -1) return;
 
-    let amountToConvert;
+    let amountToConvert = 0;
     if (data.currentGameState.bonusTime >= 120 * 60 * 1000) {
         amountToConvert = 120 * 60 * 1000;
-    } else {
+    } else if(data.currentGameState.bonusTime > 0) {
         amountToConvert = data.currentGameState.bonusTime;
     }
 

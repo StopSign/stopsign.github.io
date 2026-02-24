@@ -211,6 +211,12 @@ function legacySeveranceReset(forceReset) {
         if (dataObj.updateMults) {
             dataObj.updateMults();
         }
+
+        if(actionObj.customTriggers) {
+            for (let obj of actionObj.customTriggers) {
+                obj.hasFired = false;
+            }
+        }
     }
 
 
@@ -513,6 +519,8 @@ function modifyMonolithTitles() {
     if(data.actions.destroyEasternMonolith.level === data.actions.destroyEasternMonolith.maxLevel
         && data.lichKills <= 2) {
         document.getElementById("legacySeveranceButton1").style.display = "";
+    } else {
+        document.getElementById("legacySeveranceButton1").style.display = "none";
     }
     if(data.actions.destroyWesternMonolith.level === data.actions.destroyWesternMonolith.maxLevel
         && data.lichKills >= 3 && data.lichKills <= 5) {

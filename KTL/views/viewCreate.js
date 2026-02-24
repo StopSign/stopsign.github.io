@@ -312,7 +312,7 @@ function generateActionDisplay(actionVar) {
     queueCache(`${actionVar}ExpToLevelIncrease`);
     queueCache(`${actionVar}ExpBarLabels`);
     queueCache(`${actionVar}EstimatedTimesContainer`);
-    queueCache(`${actionVar}TimeToLevelContainer`);
+    // queueCache(`${actionVar}TimeToLevelContainer`);
     queueCache(`${actionVar}TimeToMaxContainer`)
     queueCache(`${actionVar}TimeToLevel`);
     queueCache(`${actionVar}TimeToMax`);
@@ -1183,14 +1183,8 @@ function handleLineClick(borderId, lineData) {
 function handleLineRightClick(lineData) {
     let currentValue = data.actions[lineData.from][`downstreamRate${lineData.to}`]
     let newValue = 100;
-    if(currentValue === 100) {
+    if(currentValue > 0) {
         newValue = 0;
-    } else if(currentValue === 0) {
-        newValue = 10;
-    } else if(currentValue === 10) {
-        newValue = 50;
-    } else if(currentValue === 50) {
-        newValue = 100;
     }
 
     setSliderUI(lineData.from, lineData.to, newValue);

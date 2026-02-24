@@ -930,7 +930,7 @@ actionData = {
         ]
     },
     overponder: {
-        tier:0, plane:1, resourceName:"arcana", creationVersion:7,
+        tier:0, plane:1, resourceName:"arcana", creationVersion:6,
         progressMaxBase:1e11, progressMaxIncrease:1,
         expToLevelBase:1, expToLevelIncrease:1, circle:4,
         efficiencyBase:.02, maxLevel:2, isSpell:true, instabilityToAdd:90,
@@ -985,7 +985,7 @@ actionData = {
         ]
     },
     overdrive: {
-        tier:0, plane:1, resourceName:"arcana", creationVersion:7,
+        tier:0, plane:1, resourceName:"arcana", creationVersion:6,
         progressMaxBase:1e12, progressMaxIncrease:1,
         expToLevelBase:1, expToLevelIncrease:1, circle:5,
         efficiencyBase:.01, maxLevel:2, isSpell:true, instabilityToAdd:150,
@@ -1040,7 +1040,7 @@ actionData = {
         ]
     },
     overhype: {
-        tier:0, plane:1, resourceName:"arcana", creationVersion:7,
+        tier:0, plane:1, resourceName:"arcana", creationVersion:6,
         progressMaxBase:1e12, progressMaxIncrease:1,
         expToLevelBase:1, expToLevelIncrease:1, circle:6,
         efficiencyBase:.01, maxLevel:2, isSpell:true, instabilityToAdd:200,

@@ -629,7 +629,24 @@ function createChangelogMenu() {
     return Raw.html`
         <div class="menuTitle">Changelog</div>
         <div class="menuSeparator"></div><br>
-        v3.0.3 2/23 (current): <br>
+        v3.0.4 2/24 (current): <br>
+            <ol>
+                <li>"Level in" and "max in" don't disappear on max level, to avoid spells blinking</li>
+                <li>Instant Time conversion timer counts down correctly (when tabbed & when offline)</li>
+                <li>Slightly changed colors of mana/mana background to be more visible</li>
+                <li>HATL records level 1, for statistics</li>
+                <li>Related action text in cast to fail fixed</li>
+                <li>Fixed text on Worry</li>
+                <li>Simplified right click on focus line to be Off/100%</li>
+                <li>Can only create custom triggers on actions that are purchased</li>
+                <li>Sorted trigger list alphabetically</li>
+                <li>Raised prepare infusion a little</li>
+                <li>Custom triggers reset correctly on LS</li>
+                <li>10%/50% custom triggers work</li>
+                <li>Hiding LS button on doing LS and at destroy eastern monolith level 4</li>
+                <li>Fixed Overponder from clearing data on refresh</li>
+            </ol><br>
+        v3.0.3 2/23: <br>
             <ol>
                 <li>The 3rd row of spells have their circles adjusted</li>
                 <li>Fixed a bug with deleting custom triggers</li>
