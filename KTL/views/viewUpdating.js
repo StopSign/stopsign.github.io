@@ -533,6 +533,8 @@ let views = {
                 if(sigFigs && sigFigs !== "none") {
                     if(sigFigs === "time") {
                         el[type] = secondsToTime(newVal);
+                    } else if(sigFigs === "floor") {
+                        el[type] = Math.floor(newVal);
                     } else {
                         el[type] = intToString(newVal, sigFigs);
                     }
@@ -583,11 +585,11 @@ function updateGlobals() {
     views.updateVal(`instantBonusTime`, data.currentGameState.instantTime/1000, "textContent", "time");
 
     views.updateVal(`legacyAmount`, data.legacy, "textContent", 1);
-    views.updateVal(`ancientCoin`, data.ancientCoin, "textContent", 1);
-    views.updateVal(`ancientCoin2`, data.ancientCoin, "textContent", 1);
-    views.updateVal(`ancientWhisper`, data.ancientWhisper, "textContent", 1);
-    views.updateVal(`ancientWhisper2`, data.ancientWhisper, "textContent", 1);
-    views.updateVal(`lichCoins2`, data.lichCoins, "textContent", 1);
+    views.updateVal(`ancientCoin`, data.ancientCoin, "textContent", "floor");
+    views.updateVal(`ancientCoin2`, data.ancientCoin, "textContent", "floor");
+    views.updateVal(`ancientWhisper`, data.ancientWhisper, "textContent", "floor");
+    views.updateVal(`ancientWhisper2`, data.ancientWhisper, "textContent", "floor");
+    views.updateVal(`lichCoins2`, data.lichCoins, "textContent", "floor");
 }
 
 
@@ -724,28 +726,25 @@ function displayLSStuff() {
 
 
 function addCustomTrigger(actionVar) {
-    // 1. Hide the "Add" button
     const btn = document.getElementById(`${actionVar}_addCustomTriggerButton`);
     if (btn) btn.style.display = "none";
-
-    // 2. Locate the form container
     const formContainer = document.getElementById(`${actionVar}_customTriggerForm`);
-
-    // 3. Clear any existing junk safely and append the new form
     formContainer.replaceChildren(buildTriggerForm(actionVar));
 }
 
-
-function buildTriggerForm(actionVar) {
+function buildTriggerForm(actionVar, editIndex = null) {
     const wrapper = document.createElement('div');
     wrapper.className = "trigger-form-box";
 
+    let existingTrigger = null;
+    if (editIndex !== null) {
+        existingTrigger = data.actions[actionVar].customTriggers[editIndex];
+    }
+
     const row1 = document.createElement('div');
     row1.style.marginBottom = "8px";
-
     row1.append("Set upstream to ");
 
-    // Reward Select
     const sliderOptionsSelect = document.createElement('select');
     const rewards = [
         { val: 0, text: "Off" },
@@ -760,7 +759,6 @@ function buildTriggerForm(actionVar) {
         sliderOptionsSelect.appendChild(opt);
     });
     row1.append(sliderOptionsSelect);
-
     row1.append(" when ");
 
     const targetSelect = document.createElement('select');
@@ -784,18 +782,15 @@ function buildTriggerForm(actionVar) {
 
     row1.append(targetSelect);
 
-    // --- Row 2: "...is [Condition] [Amount]" ---
     const row2 = document.createElement('div');
     row2.style.marginBottom = "8px";
-
     row2.append(" is ");
 
-    // Condition Select
     const conditionSelect = document.createElement('select');
     const conditions = [
+        { val: "specific", text: "Level..." },
         { val: "unlocked", text: "Unlocked" },
-        { val: "max", text: "Level Max" },
-        { val: "specific", text: "Level..." }
+        { val: "max", text: "Level Max" }
     ];
     conditions.forEach(c => {
         const opt = document.createElement('option');
@@ -805,75 +800,91 @@ function buildTriggerForm(actionVar) {
     });
     row2.append(conditionSelect);
 
-    // Amount Input (Hidden by default)
     const amountInput = document.createElement('input');
     amountInput.type = "number";
-    amountInput.className = "trigger-num-input"; // See CSS below
+    amountInput.className = "trigger-num-input";
     amountInput.placeholder = "#";
     amountInput.min = "1";
-    amountInput.style.display = "none";
     amountInput.style.marginLeft = "5px";
     amountInput.addEventListener('keydown', (event) => {
         event.stopPropagation();
     });
     row2.append(amountInput);
 
-    // Toggle Amount Input Visibility
     conditionSelect.addEventListener('change', () => {
         if (conditionSelect.value === 'specific') {
             amountInput.style.display = 'inline-block';
             amountInput.focus();
         } else {
             amountInput.style.display = 'none';
-            amountInput.value = ''; // Reset
+            amountInput.value = '';
         }
     });
 
-    // --- Row 3: Recurse & Buttons ---
+    if (existingTrigger) {
+        sliderOptionsSelect.value = existingTrigger.rewardVal;
+        targetSelect.value = existingTrigger.targetKey;
+        conditionSelect.value = existingTrigger.condition;
+        if (existingTrigger.condition === 'specific') {
+            amountInput.style.display = 'inline-block';
+            amountInput.value = existingTrigger.amount;
+        }
+    }
+
     const row3 = document.createElement('div');
     row3.className = "trigger-form-actions";
 
-    // Recurse Checkbox
     const recurseLabel = document.createElement('label');
     recurseLabel.textContent = "Recurse Upstream: ";
     const recurseCheck = document.createElement('input');
     recurseCheck.type = "checkbox";
-    recurseCheck.checked = true; // Default On
+    recurseCheck.checked = existingTrigger ? existingTrigger.recurse : true;
     recurseLabel.append(recurseCheck);
     row3.append(recurseLabel);
 
-    // Spacing
     const spacer = document.createElement('span');
     spacer.style.margin = "0 10px";
     row3.append(spacer);
 
-    // Save Button
     const saveBtn = document.createElement('button');
     saveBtn.textContent = "Save";
     saveBtn.onclick = () => {
-        // Validation
         if (conditionSelect.value === 'specific' && (amountInput.value === '' || parseInt(amountInput.value) < 1)) {
             alert("Please enter a valid positive integer level.");
             return;
         }
 
+        let actionObj = data.actions[actionVar];
         const newTrigger = {
             rewardVal: sliderOptionsSelect.value,
             rewardText: sliderOptionsSelect.options[sliderOptionsSelect.selectedIndex].text,
             targetKey: targetSelect.value,
             condition: conditionSelect.value,
             amount: conditionSelect.value === 'specific' ? parseInt(amountInput.value) : null,
-            recurse: recurseCheck.checked
+            recurse: recurseCheck.checked,
+            hasFired: existingTrigger ? existingTrigger.hasFired : false,
+            order: existingTrigger ? existingTrigger.order : (actionObj.customTriggers ? actionObj.customTriggers.length : 0)
         };
 
-        saveToData(actionVar, newTrigger);
+        if (editIndex !== null) {
+            const oldTarget = actionObj.customTriggers[editIndex].targetKey;
+            actionObj.customTriggers[editIndex] = newTrigger;
 
-        // Close form
+            if (oldTarget !== newTrigger.targetKey) {
+                unregisterListener(oldTarget, actionVar);
+                registerListener(newTrigger.targetKey, actionVar);
+                rebuildTriggerInfo(oldTarget);
+            }
+            rebuildTriggerInfo(newTrigger.targetKey);
+            rebuildCustomTriggersUI(actionVar);
+        } else {
+            saveToData(actionVar, newTrigger);
+        }
+
         closeForm(actionVar);
     };
     row3.append(saveBtn);
 
-    // Cancel Button
     const cancelBtn = document.createElement('button');
     cancelBtn.textContent = "Cancel";
     cancelBtn.style.marginLeft = "5px";
@@ -884,7 +895,6 @@ function buildTriggerForm(actionVar) {
     return wrapper;
 }
 
-// --- 3. Helper Functions ---
 
 function closeForm(actionVar) {
     const formContainer = document.getElementById(`${actionVar}_customTriggerForm`);
@@ -898,36 +908,44 @@ function saveToData(actionVar, triggerData) {
     let actionObj = data.actions[actionVar];
     if (!actionObj.customTriggers) actionObj.customTriggers = [];
 
+    triggerData.order = actionObj.customTriggers.length;
+
     actionObj.customTriggers.push(triggerData);
     registerListener(triggerData.targetKey, actionVar);
 
-    //for each action mentioned, update
     rebuildTriggerInfo(triggerData.targetKey);
-
-    // Rebuild the UI list immediately
     rebuildCustomTriggersUI(actionVar);
 }
 
-// --- 4. Rendering the Saved List ---
-
+//Builds existing triggers on the action
 function rebuildCustomTriggersUI(actionVar) {
     const container = document.getElementById(`${actionVar}_customTriggerContainer`);
-
-    // 1. Clear existing list safely
     container.replaceChildren();
 
-    // 2. Get data
     let actionObj = data.actions[actionVar];
     if (!actionObj || !actionObj.customTriggers) return;
 
-    // 3. Build UI for each
-    actionObj.customTriggers.forEach((trigger, index) => {
-        const itemDiv = document.createElement('div');
-        itemDiv.className = "custom-trigger-item"; // See CSS
+    actionObj.customTriggers.sort((a, b) => a.order - b.order);
 
-        // Text Content
+    actionObj.customTriggers.forEach((trigger, index) => {
+        if (trigger.order === undefined) trigger.order = index;
+
+        const itemDiv = document.createElement('div');
+        itemDiv.className = "custom-trigger-item";
+        itemDiv.style.display = "flex";
+        itemDiv.style.justifyContent = "space-between";
+        itemDiv.style.alignItems = "center";
+
+        let stateColor = "#ffeb3b";
+        if (trigger.hasFired) {
+            stateColor = "#f44336";
+        } else if (actionObj.currentCustomNum === trigger.order) {
+            stateColor = "#4caf50";
+        }
+        itemDiv.style.borderLeft = `4px solid ${stateColor}`;
+
         const textDiv = document.createElement('div');
-        const targetTitle = actionData[trigger.targetKey].title; // Lookup title
+        const targetTitle = actionData[trigger.targetKey].title;
 
         let condText = trigger.condition === 'specific'
             ? `level ${trigger.amount}`
@@ -935,47 +953,91 @@ function rebuildCustomTriggersUI(actionVar) {
 
         textDiv.innerHTML = `Set upstream <b>${trigger.rewardText}</b> when <span style="font-weight:bold;cursor:pointer;" onclick="actionTitleClicked('${trigger.targetKey}')">${targetTitle}</span> is <b>${condText}</b> (Recurse: ${trigger.recurse ? "On" : "Off"})`;
 
-        // Delete Button
+        const controlsDiv = document.createElement('div');
+        controlsDiv.style.display = "flex";
+        controlsDiv.style.gap = "10px";
+        controlsDiv.style.marginLeft = "10px";
+
+        const editBtn = document.createElement('div');
+        editBtn.textContent = "✎";
+        editBtn.style.cursor = "pointer";
+        editBtn.title = "Edit";
+        editBtn.onclick = () => {
+            const formContainer = document.getElementById(`${actionVar}_customTriggerForm`);
+            formContainer.replaceChildren(buildTriggerForm(actionVar, index));
+            const btn = document.getElementById(`${actionVar}_addCustomTriggerButton`);
+            if (btn) btn.style.display = "none";
+        };
+        controlsDiv.appendChild(editBtn);
+
+        if (index > 0) {
+            const upBtn = document.createElement('div');
+            upBtn.textContent = "▲";
+            upBtn.style.cursor = "pointer";
+            upBtn.onclick = () => swapTriggers(actionVar, index, index - 1);
+            controlsDiv.appendChild(upBtn);
+        }
+
+        if (index < actionObj.customTriggers.length - 1) {
+            const downBtn = document.createElement('div');
+            downBtn.textContent = "▼";
+            downBtn.style.cursor = "pointer";
+            downBtn.onclick = () => swapTriggers(actionVar, index, index + 1);
+            controlsDiv.appendChild(downBtn);
+        }
+
+        // Delete
         const delBtn = document.createElement('div');
         delBtn.textContent = "✖";
         delBtn.className = "trigger-delete";
         delBtn.onclick = () => {
-            let toRebuildVar = actionObj.customTriggers[index].targetKey
+            let toRebuildVar = actionObj.customTriggers[index].targetKey;
 
             actionObj.customTriggers.splice(index, 1);
 
+            actionObj.customTriggers.forEach((t, i) => t.order = i);
+
             unregisterListener(toRebuildVar, actionVar);
-            rebuildTriggerInfo(toRebuildVar)
+            rebuildTriggerInfo(toRebuildVar);
             rebuildCustomTriggersUI(actionVar);
         };
+        controlsDiv.appendChild(delBtn);
 
-        itemDiv.append(textDiv, delBtn);
+        itemDiv.append(textDiv, controlsDiv);
         container.append(itemDiv);
     });
 }
 
+function swapTriggers(actionVar, indexA, indexB) {
+    let actionObj = data.actions[actionVar];
+    let triggers = actionObj.customTriggers;
 
+    let temp = triggers[indexA];
+    triggers[indexA] = triggers[indexB];
+    triggers[indexB] = temp;
+
+    triggers[indexA].order = indexA;
+    triggers[indexB].order = indexB;
+
+    rebuildCustomTriggersUI(actionVar);
+}
+
+//Builds the visual of the connected triggers (both from data and custom), to be put in Info of the action
 function rebuildTriggerInfo(actionVar) {
     const triggerInfoContainer = document.getElementById(`${actionVar}_triggerInfoContainer`);
     if (!triggerInfoContainer) return;
 
-    // 1. Clear container safely
     triggerInfoContainer.replaceChildren();
 
-    // 2. Containers for the results
     const revealSources = [];
     const maxLevelSources = [];
     const customTriggerSources = [];
 
-    // 3. Scan ALL actions to see if they target THIS actionVar
     for (const sourceKey in actionData) {
 
-        // --- Check Static Triggers (actionData) ---
         const dataObj = actionData[sourceKey];
         if (dataObj.actionTriggers) {
             dataObj.actionTriggers.forEach(trigger => {
-                // Format: [condition, type, target, amount]
-                // We check if trigger[2] (the target) matches our current actionVar
                 if (trigger[2] === actionVar) {
                     const type = trigger[1];
                     if (type === 'reveal' || type === 'unlock') {
@@ -987,13 +1049,10 @@ function rebuildTriggerInfo(actionVar) {
             });
         }
 
-        // --- Check Dynamic Triggers (data.actions) ---
-        // These are the custom triggers added by the user
         const actionObj = data.actions[sourceKey];
         if (actionObj && actionObj.customTriggers) {
             actionObj.customTriggers.forEach(customTrigger => {
                 if (customTrigger.targetKey === actionVar) {
-                    // Prevent duplicates if multiple triggers exist on same action
                     if (!customTriggerSources.includes(sourceKey)) {
                         customTriggerSources.push(sourceKey);
                     }
@@ -1002,8 +1061,6 @@ function rebuildTriggerInfo(actionVar) {
         }
     }
 
-    // 4. Build the UI
-    // If no triggers exist at all, we might want to hide the container or leave empty
     if (revealSources.length === 0 && maxLevelSources.length === 0 && customTriggerSources.length === 0) {
         return;
     }
@@ -1021,7 +1078,6 @@ function rebuildTriggerInfo(actionVar) {
     header.style.marginBottom = "5px";
     infoWrapper.appendChild(header);
 
-    // Helper to create the list of links
     const createLinkList = (sourceKeys, prefixText) => {
         const lineDiv = document.createElement('div');
         lineDiv.className = "trigger-info-line";
@@ -1046,7 +1102,6 @@ function rebuildTriggerInfo(actionVar) {
         return lineDiv;
     };
 
-    // Append sections if data exists
     if (revealSources.length > 0) {
         infoWrapper.appendChild(createLinkList(revealSources, "This action is revealed by"));
     }
@@ -1056,7 +1111,6 @@ function rebuildTriggerInfo(actionVar) {
     }
 
     if (customTriggerSources.length > 0) {
-        // For custom triggers, the prompt requested a specific format with a list below
         const div = document.createElement('div');
         div.className = "trigger-info-line";
         div.style.marginTop = "5px";

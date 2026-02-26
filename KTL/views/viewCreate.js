@@ -476,6 +476,7 @@ let maxLevelTop = (data.gameSettings.viewDeltas && data.gameSettings.viewRatio) 
     let customTriggerContainer = `
         <div class="menuSeparator"></div>
         <div id="${actionVar}_addCustomTriggerButton" style="display:none" class="button" onclick="addCustomTrigger('${actionVar}')">Add Custom Trigger</div>
+        <span style="font-size:12px">Custom triggers fire in order, once per loop.</span>
         <div id="${actionVar}_customTriggerForm"></div>
         <div id="${actionVar}_customTriggerContainer"></div>
         `

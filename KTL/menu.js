@@ -629,7 +629,19 @@ function createChangelogMenu() {
     return Raw.html`
         <div class="menuTitle">Changelog</div>
         <div class="menuSeparator"></div><br>
-        v3.0.5 2/24 (current): <br>
+        v3.0.6 2/26 (current): <br>
+            <ol>
+                <li>AC/AW display rounds down</li>
+                <li>Resource visuals reset after LS</li>
+                <li>NW button being visible after LS fixed</li>
+                <li>Thread arcana properly uses 10% of Mana, instead of 100%. Reduced base exp by /10 to compensate.</li>
+                <li>Invest level 40 reveals Buy House</li>
+                <li>Hotkey code reworked to allow for alternate keyboard layouts</li>
+                <li>Custom triggers can be edited</li>
+                <li>Custom triggers now fire in order, and the order can be modified</li>
+                <li>Custom triggers default to "Level..."</li>
+            </ol><br>
+        v3.0.5 2/24: <br>
             <ol>
                 <li>"Level in" and "max in" don't disappear on max level, to avoid spells blinking</li>
                 <li>Instant Time conversion timer counts down correctly (when tabbed & when offline)</li>

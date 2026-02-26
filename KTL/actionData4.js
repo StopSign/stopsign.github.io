@@ -165,7 +165,7 @@ actionData = {
     threadArcana: {
         tier:0, plane:1, resourceName:"mana", creationVersion: 6,
         progressMaxBase:5, progressMaxIncrease:1,
-        expToLevelBase:1e9, expToLevelIncrease:10,
+        expToLevelBase:1e8, expToLevelIncrease:10,
         actionPowerBase:5, actionPowerMult:1, actionPowerMultIncrease:1.5,
         efficiencyBase:.2,
         unlockCost:1e4, visible:false, unlocked:false, purchased: true,
@@ -196,7 +196,7 @@ actionData = {
             actionObj.resourceToAdd = actionObj.actionPower * actionObj.upgradeMult * (actionObj.efficiency/100);
             let mqToUse = actionData.awakenYourGrimoire.manaQuality();
             mqToUse = mqToUse > 0 ? mqToUse : 1;
-            actionObj.expToAddBase = Math.pow(actionObj.resource, 2) * mqToUse * (actionObj.efficiency/100);
+            actionObj.expToAddBase = Math.pow(actionObj.resource/10, 2) * mqToUse * (actionObj.efficiency/100);
             actionObj.expToAdd = actionObj.expToAddBase * actionObj.expToAddMult;
             data.actions[this.generatorTarget].showResourceAdded = actionObj.resourceToAdd;
         },
@@ -215,9 +215,9 @@ actionData = {
                 +<span style="font-weight:bold;" id="threadArcanaResourceSent">???</span> Arcana is added to Prepare Spells.<br>
                 `},
         extraInfo: {english:Raw.html`Exp gain = (10% of Mana)^2 * Speed * Mana Quality.<br>
-        Arcana gain = Action Power * Speed`},
+        Arcana gain = Action Power * Speed<br>Consumes 10% of Mana per tick`},
         actionTriggers: [
-            ["info", "text", "Takes 10% of Mana and converts it to exp. This is better with more Mana (see info)."],
+            ["info", "text", "Takes Mana and converts it to exp. This is better with more Mana (see info)."],
             ["info", "text", "Arcane is generated over time."]
         ]
     },

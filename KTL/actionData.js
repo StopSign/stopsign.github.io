@@ -800,14 +800,15 @@ let actionData = {
             Coins Taken = 1% of current Coins.<br>
             Reinvested = Fortune on Reinvest * (Action Power-1).<br> 
             Base Rate = 1 (increased with upgrades)<br><br>
-            Fortune Gain = (log10(Coins Taken) * Base Rate + Reinvested) * efficiency<br><br>
+            Fortune Gain = (log10(Coins Taken) * Base Rate + Reinvested) * speed<br><br>
             Exp Gain = log10(Coins Taken)<br><br>
             Fortune Gain is capped at (Market Cap)^((Action Power^2))`
         },
         actionTriggers: [
             ["info", "text", "Uses Coins and Fortune on Reinvest to produce Fortune"],
             ["unlock", "reveal", "buildFortune"],
-            ["info", "cap", "invest", "investCap"]
+            ["info", "cap", "invest", "investCap"],
+            ["level_40", "reveal", "buyHouse"],
         ]
     },
     buildFortune: {
@@ -1830,9 +1831,9 @@ let actionData = {
         expAtts: [["charm", 1]],
         efficiencyAtts: [["confidence", 1000]],
         actionTriggers: [
-            ["level_1", "reveal", "misuseATerm"],
-            ["level_4", "reveal", "showOffSpells"],
-            ["level_7", "reveal", "askAboutHistory"],
+            // ["level_1", "reveal", "misuseATerm"],
+            // ["level_4", "reveal", "showOffSpells"],
+            // ["level_7", "reveal", "askAboutHistory"],
         ]
     },
     misuseATerm: {

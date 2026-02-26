@@ -72,6 +72,7 @@ function actionSetBaseVariables(actionObj, dataObj) {
     actionObj.visible = dataObj.visible === null ? true : dataObj.visible;
     actionObj.showResourceAdded = undefined;
     actionObj.showExpAdded = undefined;
+    actionObj.currentCustomNum = 0;
     if(dataObj.isSpell) {
         actionObj.spellCastCount = 0;
     }
@@ -1044,48 +1045,38 @@ function adjustActionData(actionVar, key, value) {
 
 
 
-// --- 1. Initialization (Run on Game Load) ---
-function rebuildDependencyCache() {
-    // 1. Reset all cache arrays first
-    for (let key in data.actions) {
-        data.actions[key].listeningActions = [];
-    }
+// function rebuildDependencyCache() {
+//     for (let key in data.actions) {
+//         data.actions[key].listeningActions = [];
+//     }
+//
+//     for (let sourceKey in data.actions) {
+//         const triggers = data.actions[sourceKey].customTriggers;
+//         if (triggers && triggers.length > 0) {
+//             triggers.forEach(trigger => {
+//                 registerListener(trigger.targetKey, sourceKey);
+//             });
+//         }
+//     }
+// }
 
-    // 2. Build the graph
-    for (let sourceKey in data.actions) {
-        const triggers = data.actions[sourceKey].customTriggers;
-        if (triggers && triggers.length > 0) {
-            triggers.forEach(trigger => {
-                // Register the source as a listener on the target
-                registerListener(trigger.targetKey, sourceKey);
-            });
-        }
-    }
-}
-
-// --- 2. Helper: Add Listener (prevent duplicates) ---
 function registerListener(targetKey, sourceKey) {
     const targetObj = data.actions[targetKey];
     if (!targetObj.listeningActions) targetObj.listeningActions = [];
 
-    // Only push if not already there
     if (!targetObj.listeningActions.includes(sourceKey)) {
         targetObj.listeningActions.push(sourceKey);
     }
 }
 
-// --- 3. Helper: Remove Listener (Cleanup) ---
 function unregisterListener(targetKey, sourceKey) {
     const targetObj = data.actions[targetKey];
     if (!targetObj || !targetObj.listeningActions) return;
 
-    // Check if the source actually has ANY remaining triggers pointing to this target
-    // We don't want to remove the listener if there is still another trigger on the same action using this target
     const sourceObj = data.actions[sourceKey];
     const stillHasConnection = sourceObj.customTriggers.some(t => t.targetKey === targetKey);
 
     if (!stillHasConnection) {
-        // Remove from array
         targetObj.listeningActions = targetObj.listeningActions.filter(key => key !== sourceKey);
     }
 }
@@ -1097,61 +1088,73 @@ function checkIncomingTriggers(targetActionVar) {
         return;
     }
 
-    // Loop ONLY through the actions that are watching this one
+    // Tell each listening action to check its own trigger queue
     targetObj.listeningActions.forEach(sourceKey => {
-        const sourceObj = data.actions[sourceKey];
-
-        // Loop through the source's triggers to find the match
-        if(sourceObj.customTriggers) {
-            sourceObj.customTriggers.forEach(trigger => {
-                if (trigger.targetKey === targetActionVar) {
-                    evaluateTrigger(sourceKey, trigger, targetObj);
-                }
-            });
-        }
+        processTriggerQueue(sourceKey);
     });
 }
 
-function evaluateTrigger(actionVar, trigger, targetObj) {
-    let shouldRun = false;
+function processTriggerQueue(actionVar) {
+    let actionObj = data.actions[actionVar];
+    if (!actionObj.customTriggers || actionObj.customTriggers.length === 0) return;
 
-    if (trigger.condition === 'unlocked') {
-        if (!trigger.hasFired && targetObj.unlocked) {
-            shouldRun = true;
-            trigger.hasFired = true;
+    actionObj.customTriggers.sort((a, b) => a.order - b.order);
+
+    let firedAny = false;
+
+    while (actionObj.currentCustomNum < actionObj.customTriggers.length) {
+        let activeTrigger = actionObj.customTriggers[actionObj.currentCustomNum];
+
+        if (activeTrigger.hasFired) {
+            actionObj.currentCustomNum++;
+            firedAny = true;
+            continue;
         }
+
+        let targetObj = data.actions[activeTrigger.targetKey];
+        let conditionMet = evaluateCondition(activeTrigger, targetObj);
+
+        if (conditionMet) {
+            executeTriggerReward(actionVar, activeTrigger);
+            activeTrigger.hasFired = true;
+            actionObj.currentCustomNum++;
+            firedAny = true;
+        } else {
+            break;
+        }
+    }
+
+    if (firedAny) {
+        rebuildCustomTriggersUI(actionVar);
+    }
+}
+
+function evaluateCondition(trigger, targetObj) {
+    if (trigger.condition === 'unlocked') {
+        return targetObj.unlocked;
     }
     else if (trigger.condition === 'max') {
-        if (!trigger.hasFired && targetObj.level >= targetObj.maxLevel) {
-            shouldRun = true;
-            trigger.hasFired = true;
-        }
+        return targetObj.level >= targetObj.maxLevel;
     }
     else if (trigger.condition === 'specific') {
-        if (!trigger.hasFired && targetObj.level >= trigger.amount) {
-            shouldRun = true;
-            trigger.hasFired = true;
-        }
+        return targetObj.level >= trigger.amount;
     }
+    return false;
+}
 
-    // Execute Reward
-    if (shouldRun) {
-        // console.log(`Trigger Fired! ${trigger.condition}${trigger.condition==="specific"?" " +trigger.amount:""} of ${trigger.targetKey} occured. ${actionVar} adjusted to ${trigger.rewardText}`);
+function executeTriggerReward(actionVar, trigger) {
+    let dataObj = actionData[actionVar];
+    let parentVar = dataObj.parentVar;
 
-        let actionObj = data.actions[actionVar];
-        let dataObj = actionData[actionVar];
-        let parentVar = dataObj.parentVar;
-
-        if(dataObj.hasUpstream) {
-            if(!trigger.recurse) {
+    if (dataObj.hasUpstream) {
+        if (!trigger.recurse) {
+            setSliderUI(parentVar, actionVar, trigger.rewardVal);
+        } else {
+            if (trigger.rewardVal > 0) {
+                enableAutomationUpwards(actionVar, true);
                 setSliderUI(parentVar, actionVar, trigger.rewardVal);
             } else {
-                if(trigger.rewardVal > 0) {
-                    enableAutomationUpwards(actionVar, true)
-                    setSliderUI(parentVar, actionVar, trigger.rewardVal);
-                } else {
-                    disableAutomationUpwards(actionVar, true)
-                }
+                disableAutomationUpwards(actionVar, true);
             }
         }
     }

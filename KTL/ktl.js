@@ -217,6 +217,7 @@ function legacySeveranceReset(forceReset) {
                 obj.hasFired = false;
             }
         }
+        views.updateActionUnlockedViews(actionObj); //reset visuals before unlock
     }
 
 
@@ -233,6 +234,7 @@ function legacySeveranceReset(forceReset) {
 
     switchToPlane(0)
     data.planeUnlocked[2] = false;
+    views.updateVal(`planeButton2`, "none", "style.display");
     revealAtt("awareness");
     revealAtt("flow");
     revealAtt("continuity");
@@ -250,6 +252,8 @@ function legacySeveranceReset(forceReset) {
 
     displayLSStuff()
     actionTitleClicked('overclock')
+
+
 }
 
 function initializeKTL(forceReset) {
