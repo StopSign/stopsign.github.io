@@ -27,6 +27,10 @@ data.ancientWhisper = 0;
 data.lichKills = 0;
 data.lichCoins = 0;
 data.highestLegacy = 0;
+data.genesisPoints = 0;
+data.genesisResets = 0;
+data.fightGenerated = 0;
+
 
 data.useAmuletButtonShowing = false;
 data.secondsPerReset = 0;
@@ -35,7 +39,6 @@ data.currentJob = "helpScottWithChores";
 data.currentWage = 1;
 data.doneKTL = false;
 data.doneAmulet = false;
-data.doneLS = 0;
 data.ancientCoinMultKTL = 1;
 data.ancientWhisperMultKTL = 1;
 data.legacyMultKTL = 1;
@@ -99,7 +102,7 @@ data.upgrades = {};
 
 let isDebug = false; //SET FOR COMMIT
 // let isDebug = true;
-let debugLevel = 125; //to set the rough number of loops
+let debugLevel = 150; //to set the rough number of loops. Max: 150
 function debug() {
     if(!isDebug) {
         return;

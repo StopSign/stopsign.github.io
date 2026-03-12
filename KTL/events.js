@@ -45,7 +45,7 @@ function setSliderUI(fromAction, toAction, newValue) {
 }
 
 function adjustNWLevels() {
-    data.actions.destroyEasternMonolith.maxLevel = 1 + data.lichKills;
+    data.actions.destroyEasternMonolith.maxLevel = Math.min(3, 1 + data.lichKills);
 }
 
 //only need to happen on amulet use, since they're saved to the action
@@ -244,7 +244,7 @@ function updatePauseActionVisuals(actionVar) {
     views.updateVal(`${actionVar}PauseButton`, actionObj.isPaused?">":"||", "textContent")
     views.updateVal(`${actionVar}PauseButton`, actionObj.isPaused?"green":"red", "style.borderColor")
     views.updateVal(`${actionVar}Title`, actionObj.isPaused?"red":"", "style.color")
-    views.updateVal(`${actionVar}SmallVersionTitle`, actionObj.isPaused?"red":"", "style.color")
+    views.updateVal(`${actionVar}SmallVersionTitleContainer`, actionObj.isPaused?"red":"", "style.color")
 }
 
 windowElement.addEventListener('wheel', function(e) {

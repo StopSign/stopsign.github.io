@@ -18,7 +18,7 @@ function createAndLinkNewAttribute(attCategory, attVar) {
     attObj.linkedActionEfficiencyAtts = [];
     attObj.linkedActionOnLevelAtts = [];
     attObj.attBase = 0; //for upgrades
-    attObj.attBase2 = 0; //for challenges
+    attObj.attBase2 = 0; //for GP
 
     attsSetBaseVariables(attObj);
     attObj.unlocked = false;
@@ -63,6 +63,7 @@ function actionSetBaseVariables(actionObj, dataObj) {
     actionObj.resourceDelta = 0;
     actionObj.resourceIncrease = 0;
     actionObj.resourceDecrease = 0;
+    actionObj.resourceRetrieved = 0;
     actionObj.resourceToAdd = dataObj.generatorSpeed ? 0 : undefined;
     actionObj.resourceIncreaseFromGens = 0;
     actionObj.totalSend = 0;
@@ -80,12 +81,10 @@ function actionSetBaseVariables(actionObj, dataObj) {
     actionObj.unlockTime = -1;
     actionObj.level1Time = -1;
 
-    if(data.upgrades.recognizeTheFamiliarity.upgradePower > 0) {
-        actionObj.unlockCost = (1 - (actionObj.unlockedCount * .04) / (1 + actionObj.unlockedCount * .04)) * dataObj.unlockCost;
-    } else {
-        actionObj.unlockCost = dataObj.unlockCost;
-    }
-    actionObj.unlockCost *= data.lichKills >= 1 ? 2 * data.lichKills : 1;
+    actionObj.unlockCost = dataObj.unlockCost
+        * Math.pow(.9, data.upgrades.reducedUnlockCosts.upgradePower)
+        * (data.upgrades.recognizeTheFamiliarity.upgradePower > 0 ? (1 - (actionObj.unlockedCount * .04) / (1 + actionObj.unlockedCount * .04)) : 1)
+        * (data.lichKills >= 1 ? 2 * data.lichKills : 1);
 
     actionObj.unlocked = dataObj.unlocked === null ? true : dataObj.unlocked;
 
@@ -97,16 +96,16 @@ function actionSetBaseVariables(actionObj, dataObj) {
     actionObj.efficiencyMult = dataObj.efficiencyMult ? dataObj.efficiencyMult : 1;
     actionObj.expertise = actionObj.efficiencyBase * actionObj.efficiencyMult; //the initial and the multiplier (increases on stat add)
     actionObj.attReductionEffect = 1;
-    actionObj.efficiencyMax = dataObj.efficiencyMax ? dataObj.efficiencyMax : 200;
-    actionObj.efficiency = actionObj.expertise > dataObj.efficiencyMax  ? dataObj.efficiencyMax : actionObj.expertise * 100;
+    actionObj.efficiency = actionObj.expertise * 100;
 
-    actionObj.actionPower = actionObj.actionPowerBase * actionObj.actionPowerMult * (actionObj.efficiency/100);
+    actionObj.actionPower = actionObj.actionPowerBase * actionObj.actionPowerMult;
     actionObj.wage = dataObj.wage ? dataObj.wage : undefined;
 
 
     actionObj.expToAddBase = 1;
     actionObj.expToAddMult = calcUpgradeMultToExp(actionObj.actionVar);
-    actionObj.expToAdd = actionObj.expToAddBase * actionObj.expToAddMult;
+    actionObj.expToAdd = actionObj.expToAddBase * actionObj.expToAddMult
+        * (dataObj.isGenerator&&!dataObj.ignoreExpUpgrade?Math.pow(1.05, data.upgrades.extraGeneratorExp.upgradePower):1);
 
     actionObj.upgradeMult = 1;
     if(dataObj.updateUpgradeMult) {
@@ -191,7 +190,44 @@ function calcStatMult(actionVar) {
     actionObj.actionPower = actionObj.actionPowerBase * actionObj.actionPowerMult * (actionObj.efficiency/100);
 }
 
+//calcEfficiency calcExpertise
 function calcAttExpertise(actionVar) {
+    let actionObj = data.actions[actionVar];
+    let capLevel = data.upgrades.higherSpeedCaps.upgradePower;
+    let totalProgress = 0, totalBonus = 0, statCount = 0, zeroIdealMult = 1;
+
+    for (let [name, ideal] of actionObj.efficiencyAtts) {
+        if (!data.atts[name]) {
+            console.log(`You need to instantiate the attribute ${name}`);
+            continue;
+        }
+
+        let val = data.atts[name].num;
+
+        if (ideal === 0) {
+            zeroIdealMult *= data.atts[name].attMult;
+            continue;
+        }
+
+        totalProgress += Math.min(Math.max(val / ideal, 0), 1);
+        statCount++;
+
+        if (val > ideal && capLevel > 0) {
+            totalBonus += ((val - ideal) / ideal) * 0.1;
+        }
+    }
+
+    let progressMult = statCount > 0 ? (totalProgress / statCount) : 1;
+    let avgBonus = statCount > 0 ? (totalBonus / statCount) : 0;
+    let overcapMult = 1 + Math.min(avgBonus, capLevel * 0.1);
+
+    let rawExpertise = Math.pow(actionObj.efficiencyBase, 1 - progressMult) * zeroIdealMult * overcapMult;
+
+    actionObj.expertise = Math.min(rawExpertise, 1 + (capLevel * 0.1));
+    actionObj.efficiency = actionObj.expertise * 100;
+}
+
+function calcAttExpertiseOld(actionVar) {
     let actionObj = data.actions[actionVar];
     // let dataObj = actionData[actionVar];
 
@@ -264,7 +300,7 @@ function checkLevelUp(actionObj, dataObj) {
         }
     }
     actionObj.level++;
-    actionObj.progressMaxBase *= dataObj.progressMaxIncrease;
+    actionObj.progressMaxBase *= actionObj.progressMaxIncrease;
     actionObj.progressMax = actionObj.progressMaxBase * actionObj.progressMaxMult * calcInstabilityEffect(actionObj.instability);
     actionObj.expToLevelBase *= actionObj.expToLevelIncrease;
     actionObj.expToLevel = actionObj.expToLevelBase * actionObj.expToLevelMult;
@@ -336,16 +372,16 @@ function actionTriggerHelper(type, info, extra) {
     } else if(type === "addAC") {
         let ACAmount = extra * (data.upgrades.listenCloserToWhispers.upgradePower === 1?3:1);
         if (data.gameState === "KTL") {
-            data.ancientCoin += ACAmount * data.ancientCoinMultKTL;
-            data.ancientCoinGained += ACAmount * data.ancientCoinMultKTL;
+            data.ancientCoin += ACAmount * data.ancientCoinMultKTL * Math.pow(1.05, data.upgrades.extraAncientCoins.upgradePower);
+            data.ancientCoinGained += ACAmount * data.ancientCoinMultKTL * Math.pow(1.05, data.upgrades.extraAncientCoins.upgradePower);
         } else {
             data.ancientCoin += ACAmount;
         }
     } else if(type === "addAW") {
         let AWAmount = extra * (data.upgrades.listenCloserToWhispers.upgradePower === 1?3:1) * (1 + data.lichKills/2);
         if (data.gameState === "KTL") {
-            data.ancientWhisper += AWAmount * data.ancientWhisperMultKTL;
-            data.ancientWhisperGained += AWAmount * data.ancientWhisperMultKTL;
+            data.ancientWhisper += AWAmount * data.ancientWhisperMultKTL * Math.pow(1.1, data.upgrades.extraAncientWhispers.upgradePower);
+            data.ancientWhisperGained += AWAmount * data.ancientWhisperMultKTL * Math.pow(1.1, data.upgrades.extraAncientWhispers.upgradePower);
         } else {
             data.ancientWhisper += AWAmount;
         }
@@ -541,9 +577,13 @@ function statAddAmount(attVar, amount) {
     if(attVar === "legacy") {
         if(data.gameState === "KTL") {
             amount *= data.legacyMultKTL;
-        } else if(data.upgrades.feelTheDefeats.upgradePower > 0) {
-            amount *= data.atts.resonance.attMult;
+        } else {
+            amount *= Math.pow(1.2, data.upgrades.extraBrythalLegacy.upgradePower)
+            if(data.upgrades.feelTheDefeats.upgradePower > 0) {
+                amount *= data.atts.resonance.attMult;
+            }
         }
+        amount *= Math.pow(1.1, data.upgrades.extraLegacy.upgradePower);
         amount *= (data.upgrades.makeADeeperImpact.upgradePower===1?3:1);
         addLegacy(amount) //x3 up to prev highest
         data.actions.echoKindle.resource = data.legacy;
@@ -877,7 +917,7 @@ function upgradeUpdates() {
 
 function isSpellReady(actionVar) {
     let actionObj = data.actions[actionVar];
-    return actionObj.level > 0 && !actionObj.isPaused && (!actionObj.cooldown || actionObj.cooldownTimer >= actionObj.cooldown);
+    return !gameIsResetting && actionObj.level > 0 && !actionObj.isPaused && (!actionObj.cooldown || actionObj.cooldownTimer >= actionObj.cooldown);
 }
 
 function useCharge(actionVar) {

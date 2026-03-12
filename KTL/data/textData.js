@@ -123,7 +123,7 @@ const actionTextData = `
         <english><![CDATA[
             As I set off with purpose, I felt Body Awareness respond accordingly, accepting more momentum down into its whirlpool before it felt closed off, and instead became a lazily spinning pool - I shifted the flow more towards the traveling itself, and started to find the familiar skips in my steps as I walked through the sparse forest and rolling hills on my way to the outpost.<br><br>
             
-            As the expected whirlpool formed around traveling, I mentally labeled as being East - forward. I was still mostly looking inwards, and so I did not see much on my journey except some particularly colorful birds gathered around a denser thicket. I walked past, and found the more established road to the outpost.
+            As the expected whirlpool formed around traveling, I mentally labeled it as being East - forward. I was still mostly looking inwards, and so I did not see much on my journey except some particularly colorful birds gathered around a denser thicket. I walked past, and found the more established road to the outpost.
         ]]></english>
     </travelOnRoad>
     
@@ -153,7 +153,7 @@ const actionTextData = `
             
             In Talented combat, there were certain archetypes to fill to create versatile squads of warriors. In Talented war, these squads were gathered according to the strongest Talent into a larger specialty group, largely fitting under four groups: vanguards, scouts, rearguards, and supports. The conscripted women were steadily poached to be trained as supports and archers, and the heavier men were poached to be the close range vanguards. I was eventually ordered into a scouting group, and given flexible leather armor and a light sword.<br><br>
             
-            It was a mess from the start, and the uncertainty became fear when it sat for too long, but as we learned through bits of gossip here and there, it was not even the largest problem in our army. Sovvgor's mages, once renowned for being supported far more in their Talent's use than other countries, had grown greedy and selfish in their egos. Ever since the beginning of the curse, they had steadily been slipping away into uncursed land to continue their talents, leaving only distractions to keep Sovvgor off of their trail as long as possible. As more mages failed to report during our training, the enthusiastic speeches of victory and glory steadily were replaced with preaching the necessity of begging the Gods for a favor.<br><br>
+            It was a mess from the start, and the uncertainty became fear when it sat for too long, but as we learned through bits of gossip here and there, it was not even the largest problem in our army. Sovvgor's mages, once renowned for being supported far more in their Talent's use than other countries, had grown greedy and selfish in their egos. Ever since the beginning of the curse, they had steadily been slipping away into uncursed land to continue using their Talents, leaving only distractions to keep Sovvgor off of their trail as long as possible. As more mages failed to report during our training, the enthusiastic speeches of victory and glory steadily were replaced with preaching the necessity of begging the Gods for a favor.<br><br>
             
             The truth was kept from us common soldiers, to keep our feet moving until it was far too late. The full extent of the mage's betrayal became apparent on the second day, when we were beset by flying birds craft out of fire and explosive force - the Talent of Sovvgor's best fire mage. If they could entice even those that rode with the Emperor to defend our country from the lich... what hope we had left died that day.<br><br>
             
@@ -169,7 +169,7 @@ const actionTextData = `
         <english><![CDATA[
             The old man introduced himself as Scott, the village leader. Scott came across as a happy, untroubled man, looking at me with kind eyes. He was patient as I twiched to every noise, and thankfully avoided questions about my past. He told me not to make trouble - that this outpost was overdue to become a named village with how it had grown, but still gossiped about everything new. He also said that his self-assigned title was village leader because the paperwork from the capitol hadn't gone through to provide them an actual name just yet, but this place had grown beyond being an outpost for some time.<br><br>
             
-            Scott told me to take things at my own pace, I was thankful for the advice and said as much, and he declared that that was all for the introduction. Then he asked me about his passion - did I see any colorful birds? I told him I had seen some by a thicket, and Scott truly lit up, tripping over his own words in his excitement to talk about them. His subsequent conversation about bird classificatons and names went entirely over my head, but it culminated in him talking about his desire to find a particular bird he had only seen once.<br><br> 
+            Scott told me to take things at my own pace; I was thankful for the advice and said as much, and he declared that that was all for the introduction. Then he asked me about his passion - did I see any colorful birds? I told him I had seen some by a thicket, and Scott truly lit up, tripping over his own words in his excitement to talk about them. His subsequent conversation about bird classificatons and names went entirely over my head, but it culminated in him talking about his desire to find a particular bird he had only seen once.<br><br> 
             
             "It was golden and glowing, I tell you!" he exclaimed, hands moving animatedly. "Did you see it?"<br><br> 
             
@@ -189,7 +189,7 @@ const actionTextData = `
             
             Scott taught me about the behaviors based on colors and beak shapes that we saw. The short, thin beaks meant those birds ate insects. The long, thin, straight beaks were for chiseling. When I mentioned that I saw a particularly colorful bird with a very large, curved beak, he mentioned there might be fruit as well.<br><br>
             
-            I was trying to chase one such bird one day when I happened to catch a particular scent. It reminded me of the pies around the market that I had been steadily gaining familiarity with, and I resolve to figure out the connection.<br><br>
+            I was trying to chase one such bird one day when I happened to catch a particular scent. It reminded me of the pies around the market that I had been steadily gaining familiarity with, and I resolved to figure out the connection.<br><br>
         ]]></english>
     </watchBirds>
     

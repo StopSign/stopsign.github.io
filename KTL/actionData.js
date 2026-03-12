@@ -114,6 +114,7 @@ let actionData = {
             let upgradeMult = 1;
             upgradeMult *= Math.pow(1.25, data.upgrades.increaseMyPace.upgradePower);
             upgradeMult *= Math.pow(1.25, data.upgrades.createABetterFoundation.upgradePower);
+            upgradeMult *= Math.pow(1.1, data.upgrades.extraMomentumGeneration.upgradePower);
             upgradeMult *= (data.upgrades.enhanceOverclock.upgradePower===1?3:1);
             data.actions.overclock.upgradeMult = upgradeMult;
         },
@@ -377,7 +378,7 @@ let actionData = {
             actionObj.resourceToAdd = this.actionPowerFunction(resourceTaken) *
                 actionObj.actionPower * actionObj.upgradeMult * spellMult * (actionObj.efficiency / 100);
             actionObj.expToAddBase = actionObj.resourceToAdd;
-            actionObj.expToAdd = actionObj.expToAddBase * actionObj.expToAddMult;
+            actionObj.expToAdd = actionObj.expToAddBase * actionObj.expToAddMult * Math.pow(1.05, data.upgrades.extraGeneratorExp.upgradePower);
             data.actions[this.generatorTarget].showResourceAdded = actionObj.resourceToAdd;
         },
         updateUpgradeMult: function () {
@@ -678,8 +679,8 @@ let actionData = {
         ]
     },
     buyReadingChair: {
-        tier: 2, plane: 0, resourceName: "coins", creationVersion: 6,
-        progressMaxBase: 5e81, progressMaxIncrease: 30,
+        tier: 2, plane: 0, resourceName: "coins", creationVersion: 7,
+        progressMaxBase: 5e91, progressMaxIncrease: 30,
         expToLevelBase: 10, expToLevelIncrease: 1,
         efficiencyBase: .0001, maxLevel: 10,
         unlockCost: 2e78, visible: false, unlocked: false, purchased: false,
@@ -691,8 +692,8 @@ let actionData = {
         ]
     },
     buyBed: {
-        tier: 2, plane: 0, resourceName: "coins", creationVersion: 6,
-        progressMaxBase: 2e82, progressMaxIncrease: 30,
+        tier: 2, plane: 0, resourceName: "coins", creationVersion: 7,
+        progressMaxBase: 2e92, progressMaxIncrease: 30,
         expToLevelBase: 10, expToLevelIncrease: 1,
         efficiencyBase: .0001, maxLevel: 10,
         unlockCost: 8e78, visible: false, unlocked: false, purchased: false,
@@ -704,8 +705,8 @@ let actionData = {
         ]
     },
     buyFireplace: {
-        tier: 2, plane: 0, resourceName: "coins", creationVersion: 6,
-        progressMaxBase: 5e83, progressMaxIncrease: 30,
+        tier: 2, plane: 0, resourceName: "coins", creationVersion: 7,
+        progressMaxBase: 2e93, progressMaxIncrease: 30,
         expToLevelBase: 10, expToLevelIncrease: 1,
         efficiencyBase: .0001, maxLevel: 10,
         unlockCost: 2e79, visible: false, unlocked: false, purchased: false,
@@ -717,8 +718,8 @@ let actionData = {
         ]
     },
     buySilkSheets: {
-        tier: 2, plane: 0, resourceName: "coins", creationVersion: 6,
-        progressMaxBase: 5e84, progressMaxIncrease: 30,
+        tier: 2, plane: 0, resourceName: "coins", creationVersion: 7,
+        progressMaxBase: 2e94, progressMaxIncrease: 30,
         expToLevelBase: 10, expToLevelIncrease: 1,
         efficiencyBase: .0001, maxLevel: 10,
         unlockCost: 2e80, visible: false, unlocked: false, purchased: false,
@@ -727,8 +728,8 @@ let actionData = {
         efficiencyAtts: [["ambition", 1850]]
     },
     buyGoodFirewood: {
-        tier: 2, plane: 0, resourceName: "coins", creationVersion: 6,
-        progressMaxBase: 5e85, progressMaxIncrease: 30,
+        tier: 2, plane: 0, resourceName: "coins", creationVersion: 7,
+        progressMaxBase: 5e95, progressMaxIncrease: 30,
         expToLevelBase: 10, expToLevelIncrease: 1,
         efficiencyBase: .0001, maxLevel: 10,
         unlockCost: 2e81, visible: false, unlocked: false, purchased: false,
@@ -773,12 +774,12 @@ let actionData = {
                 resourceTaken = 1; //just to make the math not break
             }
             let reinvested = data.actions.reinvest.resource * (actionObj.actionPower - 1);
-            actionObj.resourceToAdd = (reinvested + Math.log10(resourceTaken) * upgradeData.increaseInitialInvestment.currentValue()) * (actionObj.efficiency / 100);
-            this.investCap = Math.pow(upgradeData.increaseMarketCap.currentValue(), Math.pow(actionObj.actionPower, 2));
+            actionObj.resourceToAdd = (reinvested + Math.log10(resourceTaken) * upgradeData.increaseInitialInvestment.currentValue()) * (actionObj.efficiency / 100) * Math.pow(1.1, data.upgrades.extraFortuneGeneration.upgradePower);
+            this.investCap = Math.pow(upgradeData.increaseMarketCap.currentValue(), Math.pow(actionObj.actionPower, 2)) * Math.pow(1.2, data.upgrades.extraMarketCap.upgradePower);
             actionObj.resourceToAdd = actionObj.resourceToAdd > this.investCap ? this.investCap : actionObj.resourceToAdd;
 
             actionObj.expToAddBase = Math.log10(resourceTaken);
-            actionObj.expToAdd = actionObj.expToAddBase * actionObj.expToAddMult;
+            actionObj.expToAdd = actionObj.expToAddBase * actionObj.expToAddMult * Math.pow(1.05, data.upgrades.extraGeneratorExp.upgradePower);
             data.actions[this.generatorTarget].showResourceAdded = actionObj.resourceToAdd;
         },
         onLevelCustom: function () {
@@ -917,7 +918,7 @@ let actionData = {
         expAtts: [["vision", 1]],
         efficiencyAtts: [["leverage", 1000]],
         actionTriggers: [
-            ["level_1", "reveal", "recruitACarpenter"]
+            // ["level_1", "reveal", "recruitACarpenter"]
         ]
     },
     investInSelf: {
@@ -1076,7 +1077,7 @@ let actionData = {
         progressMaxBase: 15, progressMaxIncrease: 1,
         expToLevelBase: 10000, expToLevelIncrease: 1.5,
         actionPowerBase: 1, actionPowerMult: 1, actionPowerMultIncrease: 1.1,
-        efficiencyBase: .1,
+        efficiencyBase: .15,
         unlockCost: 1e15, visible: false, unlocked: false, purchased: true,
         isGenerator: true, generatorTarget: "meetPeople", generatorSpeed: 5,
         onCompleteCustom: function () {
@@ -1123,7 +1124,7 @@ let actionData = {
             let resourceTaken = actionObj.resource * calcTierMult(this.tier);
             actionObj.resourceToAdd = this.actionPowerFunction(resourceTaken) * actionObj.actionPower * actionObj.upgradeMult * spellMult * (actionObj.efficiency / 100);
             actionObj.expToAddBase = actionObj.resourceToAdd;
-            actionObj.expToAdd = actionObj.expToAddBase * actionObj.expToAddMult;
+            actionObj.expToAdd = actionObj.expToAddBase * actionObj.expToAddMult * Math.pow(1.05, data.upgrades.extraGeneratorExp.upgradePower);
             data.actions[this.generatorTarget].showResourceAdded = actionObj.resourceToAdd;
         },
         updateUpgradeMult: function () {
@@ -1210,9 +1211,9 @@ let actionData = {
         ignoreConsume:true,
         onLevelCustom: function () {
             if(data.actions.hearAboutTheLich.level <= 1) {
-                data.ancientCoinMultKTL = 1;
+                data.ancientCoinMultKTL = Math.pow(1.05, data.upgrades.extraAncientCoins.upgradePower);
             } else {
-                data.ancientCoinMultKTL = Math.pow(1.5, (data.actions.hearAboutTheLich.level - 1));
+                data.ancientCoinMultKTL = Math.pow(1.5, (data.actions.hearAboutTheLich.level - 1)) * Math.pow(1.05, data.upgrades.extraAncientCoins.upgradePower);
             }
         },
         updateMults: function () {
@@ -1791,7 +1792,7 @@ let actionData = {
         expAtts: [["charm", 1]],
         efficiencyAtts: [["influence", 1700]],
         actionTriggers: [
-            ["level_1", "reveal", "worksiteSweeper"],
+            // ["level_1", "reveal", "worksiteSweeper"],
             ["level_4", "reveal", "buyPointyHat"],
         ]
     },

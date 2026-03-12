@@ -16,7 +16,7 @@ function loadUpgradeFromSave(actionObj, loadObj) {
     Object.assign(actionObj, loadObj);
 }
 
-data.saveVersion = 6;
+data.saveVersion = 7;
 function load() {
     initializeData();
 
@@ -88,7 +88,7 @@ function load() {
             let upgradeDataObj = upgradeData[upgradeVar];
             let loadObj = toLoad.upgrades[upgradeVar];
             if(!upgradeDataObj || upgradeDataObj.creationVersion > saveVersionFromLoad) { //If removed or needs to refresh
-                let toRefund = calcTotalSpentOnUpgrade(loadObj.initialCost, loadObj.costIncrease, loadObj.upgradesBought);
+                let toRefund = calcTotalSpentOnUpgrade(loadObj.initialCost, loadObj.costIncrease, loadObj.upgradesBought, loadObj.additiveIncrease);
                 if(toRefund > 0) {
                     refundAmount += toRefund;
                     queuedLogMessages.push(["Info: Refunded <b>"+toRefund+"</b> AC for the upgrade: " + (loadObj.title || decamelizeWithSpace(upgradeVar)), "info"])
@@ -119,7 +119,6 @@ function load() {
         data.currentWage = toLoad.currentWage ?? 1;
         data.doneKTL = !!toLoad.doneKTL;
         data.doneAmulet = !!toLoad.doneAmulet;
-        data.doneLS = toLoad.doneLS ?? 0;
         data.displayJob = !!toLoad.displayJob;
         data.focusSelected = toLoad.focusSelected ?? [];
         data.resetLogs = toLoad.resetLogs ?? [];
@@ -138,6 +137,9 @@ function load() {
         data.lichKills = toLoad.lichKills ?? 0;
         data.lichCoins = toLoad.lichCoins ?? 0;
         data.highestLegacy = toLoad.highestLegacy ?? 0;
+        data.genesisPoints = toLoad.genesisPoints ?? 0;
+        data.genesisResets = toLoad.genesisResets ?? 0;
+        data.fightGenerated = toLoad.fightGenerated ?? 0;
 
         data.currentGameState = toLoad.currentGameState;
 
@@ -187,6 +189,8 @@ function applyUpgradeEffects() {
     // if(data.upgrades.exploreTheLibrary.upgradePower >= 5) {
     //     data.actions.collectMathBooks.maxLevel = 5;
     // }
+
+    actionData.overclockTargetingTheLich.progressMaxIncrease = 2 - data.upgrades.improveOverclockToFight.upgradePower*.01;
 }
 
 function adjustUIAfterLoad(toLoad, saveVersionFromLoad) {
@@ -419,6 +423,14 @@ function updateUIOnLoad() {
 
     // views.updateVal(`killTheLichMenuButton2`, !data.actions.trainWithTeam.unlocked ? "Fight the Lich's Forces!":"Fight the Lich's Forces, Together!");
 
+    if(data.upgrades.newGamePlus.upgradePower > 0 || data.genesisResets > 0) {
+        document.getElementById("genesisUpgradeTab").style.display = "";
+    }
+    if(data.upgrades.newGamePlus.upgradePower > 0) {
+        document.getElementById("genesisResetButtonContainer").style.display = "";
+    } else {
+        document.getElementById("genesisResetButtonContainer").style.display = "none";
+    }
 }
 
 function reapplyAttentionSelected() {
@@ -467,10 +479,10 @@ function exportFile(data, name) {
     URL.revokeObjectURL(url);
 }
 
-function exportSaveFile() {
+function exportSaveFile(name="KTL_Save") {
     save();
     const data = window.localStorage[saveName];
-    exportFile(data, "KTL_Save")
+    exportFile(data, name)
 }
 
 function importSave() {

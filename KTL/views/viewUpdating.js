@@ -43,7 +43,7 @@ let views = {
         views.updateVal(`secondsThisLSContainer`, data.lichKills > 0 ? "" : "none", "style.display");
         views.updateVal(`secondsThisLS`, data.currentGameState.secondsThisLS, "textContent", "time");
         views.updateVal(`legacyMult`, data.legacyMultKTL, "innerText", 2);
-        views.updateVal(`ancientCoinMult`, data.ancientCoinMultKTL, "innerText", 2);
+        views.updateVal(`ancientCoinMult`, data.ancientCoinMultKTL * Math.pow(1.05, data.upgrades.extraAncientCoins.upgradePower), "innerText", 2);
 
         views.updateVal(`manaQualityDisplay`, actionData.awakenYourGrimoire.manaQuality() > 0 ? "" : "none", "style.display");
 
@@ -83,6 +83,9 @@ let views = {
 
         views.updateVal(`${attVar}AttBaseContainer`, attObj.attBase !== 0 ?"":"none", "style.display");
         views.updateVal(`${attVar}AttBase`, (attObj.attBase > 0 ? "+":"")+attObj.attBase, "textContent");
+
+        views.updateVal(`${attVar}AttBaseContainer2`, attObj.attBase2 !== 0 ?"":"none", "style.display");
+        views.updateVal(`${attVar}AttBase2`, (attObj.attBase2 > 0 ? "+":"")+attObj.attBase2, "textContent");
 
         //Update the numbers
         let roundedNumbers = [["num", 2], ["attMult", 2]]; //["perMinute", 2],
@@ -199,7 +202,7 @@ let views = {
         views.updateVal(`${actionVar}Container`, miniVersion ? "100px" : "" , "style.borderRadius");
         views.updateVal(`${actionVar}SmallVersionContainer`, ((scaleByPlane[data.planeTabSelected] < .11) ? 3 : (1 / scaleByPlane[data.planeTabSelected])*.8)+"", "style.scale");
 
-        views.updateVal(`${actionVar}SmallVersionTitle`, scaleByPlane[data.planeTabSelected] < .11 ? "0" : "1" , "style.opacity");
+        views.updateVal(`${actionVar}SmallVersionTitleContainer`, scaleByPlane[data.planeTabSelected] < .11 ? "0" : "1" , "style.opacity");
         views.updateVal(`${actionVar}Container`, miniVersion ? "100px" : "" , "style.borderRadius");
 
         views.updateVal(`${actionVar}SmallVersionLevels`, isMaxLevel?"var(--max-level-color)":"var(--text-primary)", "style.color");
@@ -534,7 +537,7 @@ let views = {
                     if(sigFigs === "time") {
                         el[type] = secondsToTime(newVal);
                     } else if(sigFigs === "floor") {
-                        el[type] = Math.floor(newVal);
+                        el[type] = intToStringRound(newVal);
                     } else {
                         el[type] = intToString(newVal, sigFigs);
                     }
@@ -590,6 +593,8 @@ function updateGlobals() {
     views.updateVal(`ancientWhisper`, data.ancientWhisper, "textContent", "floor");
     views.updateVal(`ancientWhisper2`, data.ancientWhisper, "textContent", "floor");
     views.updateVal(`lichCoins2`, data.lichCoins, "textContent", "floor");
+    views.updateVal(`genesisPoints`, data.genesisPoints, "textContent", "floor");
+    views.updateVal(`genesisResets`, data.genesisResets, "textContent", "floor");
 }
 
 
@@ -656,6 +661,7 @@ function updateSliderContainers() {
             views.updateVal(`${actionVar}_automation_slider_basic`, "flex", "style.display");
         }
         views.updateVal(`${actionVar}SliderContainerAutomation`, data.upgrades.temperMyDesires.upgradePower && dataObj.hasUpstream && dataObj.plane !== 2 ? "":"none", "style.display");
+        views.updateVal(`${actionVar}EstimatedTimesContainer`, data.gameSettings.viewEstimatedTimes ? "flex" : "none", "style.display");
     }
 }
 
@@ -711,8 +717,10 @@ function displayLSStuff() {
     if(data.lichKills >= 3) {
         // revealUpgrade("talkToMoreWizards") //800 AW
         revealUpgrade("improveMyHouse")
+        revealUpgrade("improveOverclockToFight")
 
         purchaseAction("stopDarknessRitual") //goes to western monolith
+        revealUpgrade("newGamePlus")
 
         //lots more max level increases
         //OTTL doesn't consume all of its momentum

@@ -31,7 +31,7 @@ actionData = {
                 actionObj.actionPowerMult;
             actionObj.resourceToAdd = actionObj.actionPower * actionObj.upgradeMult * (actionObj.efficiency/100);
             actionObj.expToAddBase = actionObj.resource * (actionObj.efficiency/100);
-            actionObj.expToAdd = actionObj.expToAddBase * actionObj.expToAddMult;
+            actionObj.expToAdd = actionObj.expToAddBase * actionObj.expToAddMult * Math.pow(1.05, data.upgrades.extraGeneratorExp.upgradePower);
             data.actions[this.generatorTarget].showResourceAdded = actionObj.resourceToAdd;
         },
         updateUpgradeMult:function() {
@@ -80,12 +80,15 @@ actionData = {
                 data.legacyMultKTL *= 1.01;
             }
             let actionObj = data.actions.overclockTargetingTheLich;
-            let toAdd = Math.pow((1+actionObj.level/10), 3) * actionData.awakenYourGrimoire.manaQuality() * actionObj.upgradeMult;
+
+            let toAdd = Math.pow((1+actionObj.level/10), 3) *
+                actionData.awakenYourGrimoire.manaQuality() * actionObj.upgradeMult
+             * Math.pow(1.2, data.upgrades.extraFightGeneration.upgradePower);
 
             addResourceTo(data.actions.fightTheEvilForces, toAdd);
             actionObj.resourceToAdd = toAdd;
             actionObj.showResourceAdded = toAdd;
-
+            data.fightGenerated += toAdd;
         },
         onLevelAtts:[],
         expAtts:[["resonance", 1]],
@@ -99,7 +102,7 @@ actionData = {
     fightTheEvilForces: {
         tier:0, plane:2, resourceName:"fight", creationVersion: 6,
         progressMaxBase:10, progressMaxIncrease:1,
-        expToLevelBase:1, expToLevelIncrease:1,
+        expToLevelBase:1, expToLevelIncrease:1, ignoreExpUpgrade:true,
         efficiencyBase:1, isKTL:true, purchased: true, showResourceAdded:true, maxLevel:200,
         unlockCost:1, visible:false, unlocked:false, isGenerator:true, generatorSpeed:1, hasUpstream: false,
         onUnlock: function() {
@@ -219,138 +222,138 @@ actionData = {
         `,
     },
     stopDarknessRitual: {
-        tier:1, plane:2, resourceName:"fight", creationVersion: 6,
-        progressMaxBase:2e13, progressMaxIncrease:2,
+        tier:1, plane:2, resourceName:"fight", creationVersion: 7,
+        progressMaxBase:2e12, progressMaxIncrease:2,
         expToLevelBase:5, expToLevelIncrease:1,
         efficiencyBase:.1, isKTL:true, purchased: false, maxLevel:10,
-        unlockCost:2e9, visible:false, unlocked:false,
-        onLevelAtts:[["legacy", 60]],
+        unlockCost:2e8, visible:false, unlocked:false,
+        onLevelAtts:[["legacy", 200]],
         expAtts:[["resonance", 1]],
         efficiencyAtts:[["hope", 0]],
-        extraInfo:{english:"Gain Legacy = +60 * (1 + level/5) * Legacy Mult, on complete and level."},
+        extraInfo:{english:"Gain Legacy = +200 * (1 + level/5) * Legacy Mult, on complete and level."},
         actionTriggers: [
             ["unlock", "addAC", "", 80],
-            ["unlock", "addAW", "", 1000],
-            ["complete", "addLegacy", "stopDarknessRitual", 60],
-            ["level_3", "reveal", "protectTheSunstone"]
+            ["unlock", "addAW", "", 4000],
+            ["complete", "addLegacy", "stopDarknessRitual", 200],
+            ["level_5", "reveal", "protectTheSunstone"]
         ]
     },
     protectTheSunstone: {
-        tier:1, plane:2, resourceName:"fight", creationVersion: 6,
+        tier:1, plane:2, resourceName:"fight", creationVersion: 7,
         progressMaxBase:2e14, progressMaxIncrease:2,
         expToLevelBase:5, expToLevelIncrease:1,
         efficiencyBase:.1, isKTL:true, purchased: true, maxLevel:10,
-        unlockCost:2e10, visible:false, unlocked:false,
-        onLevelAtts:[["legacy", 100]],
+        unlockCost:2.5e9, visible:false, unlocked:false,
+        onLevelAtts:[["legacy", 300]],
         expAtts:[["resonance", 1]],
         efficiencyAtts:[["hope", 0]],
-        extraInfo:{english:"Gain Legacy = +100 * (1 + level/5) * Legacy Mult, on complete and level."},
+        extraInfo:{english:"Gain Legacy = +300 * (1 + level/5) * Legacy Mult, on complete and level."},
         actionTriggers: [
             ["unlock", "addAC", "", 130],
-            ["unlock", "addAW", "", 1200],
-            ["complete", "addLegacy", "protectTheSunstone", 100],
+            ["unlock", "addAW", "", 100000],
+            ["complete", "addLegacy", "protectTheSunstone", 300],
             ["level_3", "reveal", "silenceDeathChanters"]
         ]
     },
     silenceDeathChanters: {
         tier:1, plane:2, resourceName:"fight", creationVersion: 6,
-        progressMaxBase:2e16, progressMaxIncrease:2,
+        progressMaxBase:2e15, progressMaxIncrease:2,
         expToLevelBase:5, expToLevelIncrease:1,
         efficiencyBase:.1, isKTL:true, purchased: true, maxLevel:10,
-        unlockCost:2e11, visible:false, unlocked:false,
-        onLevelAtts:[["legacy", 150]],
+        unlockCost:1e10, visible:false, unlocked:false,
+        onLevelAtts:[["legacy", 500]],
         expAtts:[["resonance", 1]],
         efficiencyAtts:[["hope", 0]],
-        extraInfo:{english:"Gain Legacy = +150 * (1 + level/5) * Legacy Mult, on complete and level."},
+        extraInfo:{english:"Gain Legacy = +500 * (1 + level/5) * Legacy Mult, on complete and level."},
         actionTriggers: [
             ["unlock", "addAC", "", 210],
             ["unlock", "addAW", "", 1500],
-            ["complete", "addLegacy", "silenceDeathChanters", 150],
+            ["complete", "addLegacy", "silenceDeathChanters", 500],
             ["level_3", "reveal", "breakFleshBarricade"]
         ]
     },
     breakFleshBarricade: {
         tier:1, plane:2, resourceName:"fight", creationVersion: 6,
-        progressMaxBase:2e17, progressMaxIncrease:2,
+        progressMaxBase:2e16, progressMaxIncrease:2,
         expToLevelBase:5, expToLevelIncrease:1,
         efficiencyBase:.1, isKTL:true, purchased: true, maxLevel:10,
-        unlockCost:2e12, visible:false, unlocked:false,
-        onLevelAtts:[["legacy", 210]],
+        unlockCost:3e10, visible:false, unlocked:false,
+        onLevelAtts:[["legacy", 1000]],
         expAtts:[["resonance", 1]],
         efficiencyAtts:[["hope", 0]],
-        extraInfo:{english:"Gain Legacy = +210 * (1 + level/5) * Legacy Mult, on complete and level."},
+        extraInfo:{english:"Gain Legacy = +1000 * (1 + level/5) * Legacy Mult, on complete and level."},
         actionTriggers: [
             ["unlock", "addAC", "", 340],
             ["unlock", "addAW", "", 1800],
-            ["complete", "addLegacy", "silenceDeathChanters", 210],
+            ["complete", "addLegacy", "silenceDeathChanters", 1000],
             ["level_3", "reveal", "conquerTheGatekeepers"]
         ]
     },
     conquerTheGatekeepers: {
         tier:1, plane:2, resourceName:"fight", creationVersion: 6,
-        progressMaxBase:2e18, progressMaxIncrease:2,
+        progressMaxBase:2e17, progressMaxIncrease:2,
         expToLevelBase:5, expToLevelIncrease:1,
         efficiencyBase:.1, isKTL:true, purchased: true, maxLevel:10,
-        unlockCost:2e13, visible:false, unlocked:false,
-        onLevelAtts:[["legacy", 340]],
+        unlockCost:1e11, visible:false, unlocked:false,
+        onLevelAtts:[["legacy", 2000]],
         expAtts:[["resonance", 1]],
         efficiencyAtts:[["hope", 0]],
-        extraInfo:{english:"Gain Legacy = +340 * (1 + level/5) * Legacy Mult, on complete and level."},
+        extraInfo:{english:"Gain Legacy = +2000 * (1 + level/5) * Legacy Mult, on complete and level."},
         actionTriggers: [
             ["unlock", "addAC", "", 550],
             ["unlock", "addAW", "", 2200],
-            ["complete", "addLegacy", "silenceDeathChanters", 340],
+            ["complete", "addLegacy", "silenceDeathChanters", 2000],
             ["level_3", "reveal", "unhookSacrificialCages"]
         ]
     },
     unhookSacrificialCages: {
         tier:1, plane:2, resourceName:"fight", creationVersion: 6,
-        progressMaxBase:2e19, progressMaxIncrease:2,
+        progressMaxBase:2e18, progressMaxIncrease:2,
         expToLevelBase:5, expToLevelIncrease:1,
         efficiencyBase:.1, isKTL:true, purchased: true, maxLevel:10,
-        unlockCost:2e14, visible:false, unlocked:false,
-        onLevelAtts:[["legacy", 550]],
+        unlockCost:3e11, visible:false, unlocked:false,
+        onLevelAtts:[["legacy", 4000]],
         expAtts:[["resonance", 1]],
         efficiencyAtts:[["hope", 0]],
-        extraInfo:{english:"Gain Legacy = +550 * (1 + level/5) * Legacy Mult, on complete and level."},
+        extraInfo:{english:"Gain Legacy = +4000 * (1 + level/5) * Legacy Mult, on complete and level."},
         actionTriggers: [
             ["unlock", "addAC", "", 890],
             ["unlock", "addAW", "", 2600],
-            ["complete", "addLegacy", "silenceDeathChanters", 550],
+            ["complete", "addLegacy", "silenceDeathChanters", 4000],
             ["level_3", "reveal", "purgeUnholyRelics"]
         ]
     },
     purgeUnholyRelics: {
         tier:1, plane:2, resourceName:"fight", creationVersion: 6,
-        progressMaxBase:2e20, progressMaxIncrease:2,
+        progressMaxBase:2e19, progressMaxIncrease:2,
         expToLevelBase:5, expToLevelIncrease:1,
         efficiencyBase:.1, isKTL:true, purchased: true, maxLevel:10,
-        unlockCost:2e15, visible:false, unlocked:false,
-        onLevelAtts:[["legacy", 890]],
+        unlockCost:1e12, visible:false, unlocked:false,
+        onLevelAtts:[["legacy", 8000]],
         expAtts:[["resonance", 1]],
         efficiencyAtts:[["hope", 0]],
-        extraInfo:{english:"Gain Legacy = +890 * (1 + level/5) * Legacy Mult, on complete and level."},
+        extraInfo:{english:"Gain Legacy = +8000 * (1 + level/5) * Legacy Mult, on complete and level."},
         actionTriggers: [
             ["unlock", "addAC", "", 1440],
             ["unlock", "addAW", "", 3000],
-            ["complete", "addLegacy", "silenceDeathChanters", 890],
+            ["complete", "addLegacy", "silenceDeathChanters", 8000],
             ["level_3", "reveal", "destroyWesternMonolith"]
         ]
     },
     destroyWesternMonolith: {
         tier:1, plane:2, resourceName:"fight", creationVersion: 6,
-        progressMaxBase:2e22, progressMaxIncrease:15,
+        progressMaxBase:2e20, progressMaxIncrease:15,
         expToLevelBase:1, expToLevelIncrease:1,
         efficiencyBase:.1, isKTL:true, purchased: true, maxLevel:1,
         unlockCost:2e16, visible:false, unlocked:false,
-        onLevelAtts:[["legacy", 10000]],
+        onLevelAtts:[["legacy", 20000]],
         expAtts:[["resonance", 1]],
         efficiencyAtts:[["hope", 0]],
-        extraInfo:{english:"Gain Legacy = +10000 * (1 + level/5) * Legacy Mult, on complete and level."},
+        extraInfo:{english:"Gain Legacy = +20000 * (1 + level/5) * Legacy Mult, on complete and level."},
         actionTriggers: [
             ["unlock", "addAC", "", 4000],
             ["unlock", "addAW", "", 5000],
-            ["complete", "addLegacy", "silenceDeathChanters", 10000],
+            ["complete", "addLegacy", "silenceDeathChanters", 20000],
             ["level_3", "reveal", "destroyFleshGrowths"]
         ],
         extraButton: Raw.html`

@@ -1,4 +1,5 @@
 
+let gameIsResetting = false;
 let KTLMenuOpen = false; //for the necessary UI updates to work while the menu is open
 function openKTLMenu() {
     document.getElementById('confirmKTL').checked = false;
@@ -62,25 +63,6 @@ function resetKTLSpiral() {
     adjustNWLevels()
 }
 
-function logKTL() {
-    data.resetLogs.push({
-        stage1: {
-            secondsPerReset: data.secondsPerReset,
-            hatl1Time: data.actions.hearAboutTheLich.level1Time,
-            currentLegacy: data.legacy,
-            resetCount: data.resetCount,
-            currentMomentum: data.totalMomentum,
-            currentFear: data.actions.hearAboutTheLich.resource,
-            // currentTeamwork: data.actions.trainWithTeam.resource
-        },
-        stage2: null
-    });
-    if (data.resetLogs.length > 10) data.resetLogs.shift();
-    data.ancientCoinGained = 0;
-    data.ancientWhisperGained = 0;
-    refreshResetLog();
-}
-
 function trackFirst() {
     if (!localStorage.getItem('firstResetSent')) {
         gtag('event', 'first_reset', {
@@ -90,14 +72,12 @@ function trackFirst() {
     }
 }
 
-function refreshResetLog() {
-    document.getElementById("resetLogContainer").innerHTML = renderResetLog();
-}
 
 //stuff that happens both on LS an amulet
 function resetGameToBase() {
     logAmulet();
     clearLog();
+    data.fightGenerated = 0;
 
     data.resetCount++;
     chartData = [];
@@ -113,9 +93,9 @@ function resetGameToBase() {
 
     LSMenuOpen = false;
     views.updateVal("legacySeveranceMenu", "none", "style.display");
-    data.legacyMultKTL = 1;
-    data.ancientCoinMultKTL = 1;
-    data.ancientWhisperMultKTL = 1;
+    data.legacyMultKTL = Math.pow(1.1, data.upgrades.extraLegacy.upgradePower);
+    data.ancientCoinMultKTL = Math.pow(1.05, data.upgrades.extraAncientCoins.upgradePower);
+    data.ancientWhisperMultKTL = Math.pow(1.1, data.upgrades.extraAncientWhispers.upgradePower);
 
 
     //Reset all atts and bonuses
@@ -142,10 +122,136 @@ function resetGameToBase() {
 
 }
 
+function genesisReset(forceReset) {
+    if (!forceReset && !document.getElementById('confirmNG').checked) {
+        return;
+    }
+    gameIsResetting = true;
+
+    data.currentGameState.bonusTime += 1000 * 60 * 60 * 48;
+    data.lichKills = 0;
+    data.genesisResets++;
+
+    for (let attVar in data.atts) {
+        let attObj = data.atts[attVar];
+        attObj.attBase = 0;
+    }
+
+    resetGameToBase();
+
+    data.resetCount = 1;
+    data.legacy = 0;
+    data.ancientCoin = 0;
+    data.ancientWhisper = 0;
+    data.currentGameState.secondsThisLS = 0;
+    data.highestLegacy = 0;
+
+    clearUpgradesForGenesis()
+
+    for (let actionVar in data.actions) {
+        let actionObj = data.actions[actionVar];
+        let dataObj = actionData[actionVar];
+        actionObj.prevUnlockTime = -1;
+        actionObj.prevLevel1Time = -1;
+        actionObj.highestLevel = -1;
+        actionObj.secondHighestLevel = -1;
+        actionObj.thirdHighestLevel = -1;
+        actionObj.purchased = !!dataObj.purchased;
+
+        if(actionVar === "reposeRebounded") {
+            actionObj.resource = 0;
+            continue;
+        }
+
+        let unlockedCount = actionObj.unlockedCount;
+        actionSetBaseVariables(actionObj, dataObj);
+
+        actionObj.purchased = !!dataObj.purchased;
+        actionObj.lowestUnlockTime = undefined;
+        actionObj.lowestLevel1Time = undefined;
+        actionObj.unlockedCount = unlockedCount * data.upgrades.keepUnlockedCount.upgradePower/5;
+
+        dataObj.downstreamVars.forEach(function (downstreamVar) {
+            if (data.actions[downstreamVar] && actionData[downstreamVar].hasUpstream) {
+                setSliderUI(actionObj.actionVar, downstreamVar, 0);
+            }
+            actionObj[downstreamVar + "TempFocusMult"] = 2;
+        });
+
+        if (dataObj.updateMults) {
+            dataObj.updateMults();
+        }
+        calcStatMult(actionVar)
+
+        if(actionObj.customTriggers) {
+            for (let obj of actionObj.customTriggers) {
+                obj.hasFired = false;
+            }
+        }
+        views.updateActionUnlockedViews(actionObj); //reset visuals before unlock
+        if(view.cached[`${actionVar}ResourceSent`]) {
+            views.updateVal(`${actionVar}ResourceSent`, "???", "textContent");
+        }
+        if(view.cached[`${actionVar}ExpGained`]) {
+            views.updateVal(`${actionVar}ExpGained`, "???", "textContent");
+        }
+        if(view.cached[`${actionVar}ResourceTaken`]) {
+            views.updateVal(`${actionVar}ResourceTaken`, "???", "textContent");
+        }
+    }
+
+    data.actions.reposeRebounded.resource += data.upgrades.extraDeathEnergy.upgradePower;
+
+    data.planeUnlocked[1] = false;
+    views.updateVal(`planeButton1`, "none", "style.display");
+    data.planeUnlocked[2] = false;
+    views.updateVal(`planeButton2`, "none", "style.display");
+
+    if(data.actions.reposeRebounded.resource === 0) {
+        data.planeUnlocked[3] = false;
+        views.updateVal(`planeButton3`, "none", "style.display");
+    } else {
+        revealAction("reposeRebounded")
+        revealAction("turnTheWheel")
+        revealAction("dipInTheRiver")
+        revealAction("tidalBurden")
+        unlockAction(data.actions.turnTheWheel);
+        unlockAction(data.actions.tidalBurden);
+    }
+
+    for(let upgradeVar in upgradeData) {
+        updateAmuletCardUI(upgradeVar);
+    }
+
+    for (let attCategory in attTree) {
+        views.updateVal(`${attCategory}CategoryContainer`, "none", "style.display");
+    }
+
+    switchToPlane(0)
+    revealAtt("awareness");
+    data.currentWage = 1;
+    data.currentJob = "helpScottWithChores";
+    document.getElementById("jobTitle").textContent = data.actions[data.currentJob] ? actionData[data.currentJob].title : data.currentJob;
+    document.getElementById("jobWage").textContent = intToString(data.currentWage, 2);
+
+    setSliderUI("overclock", "reflect", data.actions["reflect"].automationOnReveal);
+
+    views.updateVal(`useAmuletMenu`, "none", "style.display");
+    views.updateVal("openViewAmuletButton", "", "style.display");
+
+    displayLSStuff()
+    actionTitleClicked('overclock')
+    gameIsResetting = false;
+
+    document.getElementById("genesisResetButtonContainer").style.display = "none";
+    clickUpgradeTab('unique')
+}
+
 function legacySeveranceReset(forceReset) {
     if (!forceReset && !document.getElementById('confirmLS').checked) {
         return;
     }
+    gameIsResetting = true;
 
     if(data.actions.destroyEasternMonolith.level > data.lichKills) {
         increaseLichKills();
@@ -155,20 +261,14 @@ function legacySeveranceReset(forceReset) {
     for (let attVar in data.atts) {
         let attObj = data.atts[attVar];
         attObj.attBase = 0;
-        attObj.attBase2 = 0;
     }
 
     resetGameToBase();
 
-    data.doneLS++;
     data.legacy = 0;
     data.ancientCoin = 0;
     data.ancientWhisper = 0;
     data.currentGameState.secondsThisLS = 0;
-
-    //hide magic until re-unlocked
-    data.planeUnlocked[1] = false;
-    views.updateVal(`planeButton1`, "none", "style.display");
 
     //clears upgrades except unique
     createUpgrades(true)
@@ -180,9 +280,6 @@ function legacySeveranceReset(forceReset) {
         let dataObj = actionData[actionVar];
         actionObj.prevUnlockTime = -1;
         actionObj.prevLevel1Time = -1;
-        actionObj.highestLevel = -1;
-        actionObj.secondHighestLevel = -1;
-        actionObj.thirdHighestLevel = -1;
         actionObj.purchased = !!dataObj.purchased;
 
         if(actionVar === "reposeRebounded") {
@@ -218,7 +315,23 @@ function legacySeveranceReset(forceReset) {
             }
         }
         views.updateActionUnlockedViews(actionObj); //reset visuals before unlock
+
+        if(view.cached[`${actionVar}ResourceSent`]) {
+            views.updateVal(`${actionVar}ResourceSent`, "???", "textContent");
+        }
+        if(view.cached[`${actionVar}ExpGained`]) {
+            views.updateVal(`${actionVar}ExpGained`, "???", "textContent");
+        }
+        if(view.cached[`${actionVar}ResourceTaken`]) {
+            views.updateVal(`${actionVar}ResourceTaken`, "???", "textContent");
+        }
     }
+
+    //hide magic until re-unlocked
+    data.planeUnlocked[1] = false;
+    views.updateVal(`planeButton1`, "none", "style.display");
+    data.planeUnlocked[2] = false;
+    views.updateVal(`planeButton2`, "none", "style.display");
 
 
     for(let upgradeVar in upgradeData) {
@@ -233,8 +346,6 @@ function legacySeveranceReset(forceReset) {
     }
 
     switchToPlane(0)
-    data.planeUnlocked[2] = false;
-    views.updateVal(`planeButton2`, "none", "style.display");
     revealAtt("awareness");
     revealAtt("flow");
     revealAtt("continuity");
@@ -252,8 +363,7 @@ function legacySeveranceReset(forceReset) {
 
     displayLSStuff()
     actionTitleClicked('overclock')
-
-
+    gameIsResetting = false;
 }
 
 function initializeKTL(forceReset) {
@@ -334,13 +444,16 @@ function openUseAmuletMenu(isUseable) {
         return;
     }
     document.getElementById('amuletConfirm').checked = false;
+    document.getElementById('confirmNG').checked = false;
 
     //if not useable, hide all the buy buttons, and the bottom section w/ start again buttons
     for (const upgradeVar in data.upgrades) {
         const upgrade = data.upgrades[upgradeVar];
         const upgradeDataObj = upgradeData[upgradeVar];
 
-        views.updateVal(`buyButtonSection_${upgradeVar}`, (upgradeDataObj.type === "lich" || isUseable) && !upgrade.isFullyBought ? "" : 'none', 'style.display');
+        views.updateVal(`buyButtonSection_${upgradeVar}`,
+            (upgradeDataObj.type !== "genesis" || data.upgrades.newGamePlus.upgradePower > 0) && (upgradeDataObj.type === "lich" || isUseable) && !upgrade.isFullyBought ? "" : 'none',
+            'style.display');
     }
 
     views.updateVal(`amuletMenuTitle`, isUseable ? "Use the Amulet!" : "View Amulet Upgrades");
@@ -352,22 +465,106 @@ function openUseAmuletMenu(isUseable) {
     updateCardAffordabilityBorders();
 }
 
+
+function logKTL() {
+    data.resetLogs.push({
+        stage1: {
+            secondsPerReset: data.secondsPerReset,
+            // hatl1Time: data.actions.hearAboutTheLich.level1Time, //not in use
+            hatlLevel: data.actions.hearAboutTheLich.level,
+            mq:actionData.awakenYourGrimoire.manaQuality(),
+            valor:data.atts.valor.num,
+            resonance:data.atts.resonance.num,
+            currentLegacy: data.legacy,
+            resetCount: data.resetCount,
+            currentMomentum: data.totalMomentum,
+            // currentFear: data.actions.hearAboutTheLich.resource, //not in use
+        },
+        stage2: null
+    });
+    if (data.resetLogs.length > 10) data.resetLogs.shift();
+    data.ancientCoinGained = 0;
+    data.ancientWhisperGained = 0;
+    refreshResetLog();
+}
+
 function logAmulet() {
-    const currentLog = data.resetLogs[data.resetLogs.length - 1];
-    if (currentLog) {
-        currentLog.stage2 = {
-            legacyGained: data.legacy - currentLog.stage1.currentLegacy,
+    const resetLogs = data.resetLogs[data.resetLogs.length - 1];
+    if (resetLogs) {
+        resetLogs.stage2 = {
+            legacyGained: data.legacy - resetLogs.stage1.currentLegacy,
             ancientCoin: data.ancientCoinGained,
             ancientWhisper: data.ancientWhisperGained,
+            fightGenerated: data.fightGenerated
         };
     }
     refreshResetLog()
+}
+
+function refreshResetLog() {
+    document.getElementById("resetLogContainer").innerHTML = renderResetLog();
+}
+
+function renderResetLog() {
+    let rows = '';
+    for (let resetLog in data.resetLogs) {
+        if (!data.resetLogs.hasOwnProperty(resetLog)) continue; //only print when both stages are added
+        const log = data.resetLogs[resetLog];
+        if(!log.stage1) {
+            continue;
+        }
+        rows += `
+            <tr>
+                <td style="padding-right:15px;">
+                    ${log.stage1.resetCount} 
+                </td>
+                <td style="padding-right:15px;">
+                    ${log.stage1.secondsPerReset ? secondsToTime(log.stage1.secondsPerReset) : "-"} |
+                    ${log.stage1.currentLegacy ? intToString(log.stage1.currentLegacy, 1) : "-"}
+                </td>
+                <td style="padding-right:15px;">
+                    ${log.stage1.currentMomentum ? intToString(log.stage1.currentMomentum) : "-"} | 
+                    ${log.stage1.hatlLevel ?? "-"} | 
+                    ${log.stage1.mq ? intToString(log.stage1.mq, 1) : "-"} | 
+                    ${log.stage1.resonance ?? "-"} | 
+                    ${log.stage1.valor ?? "-"}
+                </td>
+                <td style="">
+                ${log.stage2 ? `
+                    ${log.stage2.fightGenerated ? intToString(log.stage2.fightGenerated, 1) : "-"} |
+                    ${log.stage2.legacyGained ? intToString(log.stage2.legacyGained, 1) : "-"} | 
+                    ${log.stage2.ancientCoin ? intToString(log.stage2.ancientCoin, 1) : "-"} | 
+                    ${log.stage2.ancientWhisper ? intToString(log.stage2.ancientWhisper, 1) : "-"}`
+                : ""}
+                </td>
+            </tr>
+        `;
+    }
+    return `
+        <div style="overflow-x:auto">
+            <div style="font-size:20px; font-weight:bold; margin:0 0 6px 0;">Recent Run Statistics (Last 10)</div>
+            <table style="width:100%;border-collapse:collapse;font-size:16px;white-space:nowrap">
+                <thead>
+                    <tr>
+                        <th style="padding-right:15px; text-align:left;">#</th>
+                        <th style="padding-right:15px; text-align:left;">Stats<br>(Reset | Legacy)</th>
+                        <th style="padding-right:15px; text-align:left;">Stage 1<br>(Momentum | HATL | MQ | Resonance | Valor)</th>
+                        <th style="padding-right:15px; text-align:left;">Stage 2<br>(Fight Generated | Legacy Gained |<br> AC Gained | AW Gained)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${rows}
+                </tbody>
+            </table>
+        </div>
+    `;
 }
 
 function useAmulet() {
     if (!document.getElementById('amuletConfirm').checked) {
         return;
     }
+    gameIsResetting = true;
     resetGameToBase()
 
     //For each action, reset the base atts and set max level
@@ -437,6 +634,15 @@ function useAmulet() {
             }
         }
 
+        if(view.cached[`${actionVar}ResourceSent`]) {
+            views.updateVal(`${actionVar}ResourceSent`, "???", "textContent");
+        }
+        if(view.cached[`${actionVar}ExpGained`]) {
+            views.updateVal(`${actionVar}ExpGained`, "???", "textContent");
+        }
+        if(view.cached[`${actionVar}ResourceTaken`]) {
+            views.updateVal(`${actionVar}ResourceTaken`, "???", "textContent");
+        }
     }
 
     //Next, re-add the stats for the actions that didn't reset (infusion)
@@ -491,7 +697,7 @@ function useAmulet() {
     checkGrimoireUnlocks()
     actionTitleClicked("overclock", true);
 
-    if(data.doneLS > 0) {
+    if(data.actions.reposeRebounded.resource > 0) {
         revealAtt("flow")
         revealAtt("continuity");
         revealAtt("calm");
@@ -517,6 +723,8 @@ function useAmulet() {
     views.updateVal(`killTheLichMenuButton2`, "Fight the Lich's Forces!");
     views.updateVal(`useAmuletMenu`, "none", "style.display");
     views.updateVal(`openViewAmuletButton`, "", "style.display");
+
+    gameIsResetting = false;
 }
 
 function modifyMonolithTitles() {
@@ -553,7 +761,9 @@ function modifyMonolithTitles() {
         actionData.destroyWesternMonolith.title = "Kill the Lich... Again??"
     }
     views.updateVal(`destroyEasternMonolithTitle`, actionData.destroyEasternMonolith.title)
+    views.updateVal(`destroyEasternMonolithSmallVersionTitle`, actionData.destroyEasternMonolith.title)
     views.updateVal(`destroyWesternMonolithTitle`, actionData.destroyWesternMonolith.title)
+    views.updateVal(`destroyWesternMonolithSmallVersionTitle`, actionData.destroyWesternMonolith.title)
 }
 
 function increaseLichKills() {
@@ -582,7 +792,7 @@ function lich0Text() {
     return `
         (Story) The army you've been helping finally has enough to strike at the lich itself, located high in a monolith. Tearing down both the physical and magical defenses the lich has thrown in the army's way, the Legion of Hope prepares to give a final strike.<br><br>
 
-            "Enough", the Lich roars, throwing up shields with one skeletal hand and preparing a spell with the other. "I am not fated to fall here! Someone is interfering, and I will silence their echoes!" Right as its final shield cracks, the Lich waves the hand with the gathered magic forward, and consecutive blasts of powerful silvery magic sweep out, enveloping everyone in the Legion. Your amulet glows bright, and cracks spread immediately across its surface, quickly envoloping the entire piece until the whole thing breaks apart, revealing a single shining coin underneath which you quickly grasp onto. You barely have time to send a message into it before the next blast of the Lich's magic reaches you, ending your existence.<br><br>
+            "Enough", the Lich roars, throwing up shields with one skeletal hand and preparing a spell with the other. "I am not fated to fall here! Someone is interfering, and I will silence their echoes!" Right as its final shield cracks, the Lich waves the hand with the gathered magic forward, and consecutive blasts of powerful silvery magic sweep out, enveloping everyone in the Legion. Your amulet glows bright, and cracks spread immediately across its surface, quickly enveloping the entire piece until the whole thing breaks apart, revealing a single shining coin underneath which you quickly grasp onto. You barely have time to send a message into it before the next blast of the Lich's magic reaches you, ending your existence.<br><br>
 
             <div class="menuSeparator"></div>
             Your legacy has been severed. When you reset with this you will lose:
@@ -612,9 +822,10 @@ function lich0Text() {
             Penalties:
             <ul>
                 <li>All non-infusion unlock costs are x2</li>
-            <ul>
+            </ul><br>
 
             It is recommended to export the save file before resetting.
+            <button onclick="exportSaveFile('KTL_LS_${data.lichKills}')" style="padding:10px 16px;background:#007BFF;color:#ffffff;border:none;border-radius:4px;font-size:14px;cursor:pointer;width:160px;">Export to file</button>
 `
 }
 
@@ -622,7 +833,7 @@ function lich1Text() {
     return `
             (Story) The army you've been helping finally has enough to strike at the lich itself, located high in a monolith. Tearing down both the physical and magical defenses the lich has thrown in the army's way, and then tearing through a second wave of even stronger elites, the Legion of Hope prepares to give a final strike.<br><br>
 
-            "Again? Enough!", the Lich roars, throwing up shields with one skeletal hand and preparing a spell with the other. "I am not fated to fall here, either! Someone is interfering again, and I will silence their echoes!" Right as its final shield cracks, the Lich waves the hand with the gathered magic forward, and consecutive blasts of powerful silvery magic sweep out, enveloping everyone in the Legion. Your amulet glows bright, and cracks spread immediately across its surface, quickly envoloping the entire piece until the whole thing breaks apart, revealing a single shining coin underneath which you quickly grasp onto. You barely have time to send a message into it before the next blast of the Lich's magic reaches you, ending your existence.<br><br>
+            "Again? Enough!", the Lich roars, throwing up shields with one skeletal hand and preparing a spell with the other. "I am not fated to fall here, either! Someone is interfering again, and I will silence their echoes!" Right as its final shield cracks, the Lich waves the hand with the gathered magic forward, and consecutive blasts of powerful silvery magic sweep out, enveloping everyone in the Legion. Your amulet glows bright, and cracks spread immediately across its surface, quickly enveloping the entire piece until the whole thing breaks apart, revealing a single shining coin underneath which you quickly grasp onto. You barely have time to send a message into it before the next blast of the Lich's magic reaches you, ending your existence.<br><br>
 
             <div class="menuSeparator"></div>
             Your legacy has been severed. When you reset with this you will lose:
@@ -658,16 +869,17 @@ function lich1Text() {
             (New!) Penalties:
             <ul>
                 <li>All non-infusion unlock costs are increased by x2 (bringing the total to x4)</li>
-            <ul>
+            </ul><br>
 
             It is recommended to export the save file before resetting.
+            <button onclick="exportSaveFile('KTL_LS_${data.lichKills}')" style="padding:10px 16px;background:#007BFF;color:#ffffff;border:none;border-radius:4px;font-size:14px;cursor:pointer;width:160px;">Export to file</button>
     `
 }
 function lich2Text() {
     return `
             (Story) The army you've been helping finally has enough to strike at the lich itself, located high in a monolith. Tearing down both the physical and magical defenses the lich has thrown in the army's way, and then tearing through a second wave of even stronger elites, the Legion of Hope prepares to give a final strike.<br><br>
 
-            "Again? Enough!", the Lich roars, throwing up shields with one skeletal hand and preparing a spell with the other. "I am not fated to fall here, either! Someone is interfering again, and I will silence their echoes!" Right as its final shield cracks, the Lich waves the hand with the gathered magic forward, and consecutive blasts of powerful silvery magic sweep out, enveloping everyone in the Legion. Your amulet glows bright, and cracks spread immediately across its surface, quickly envoloping the entire piece until the whole thing breaks apart, revealing a single shining coin underneath which you quickly grasp onto. You barely have time to send a message into it before the next blast of the Lich's magic reaches you, ending your existence.<br><br>
+            "Again? Enough!", the Lich roars, throwing up shields with one skeletal hand and preparing a spell with the other. "I am not fated to fall here, either! Someone is interfering again, and I will silence their echoes!" Right as its final shield cracks, the Lich waves the hand with the gathered magic forward, and consecutive blasts of powerful silvery magic sweep out, enveloping everyone in the Legion. Your amulet glows bright, and cracks spread immediately across its surface, quickly enveloping the entire piece until the whole thing breaks apart, revealing a single shining coin underneath which you quickly grasp onto. You barely have time to send a message into it before the next blast of the Lich's magic reaches you, ending your existence.<br><br>
 
             <div class="menuSeparator"></div>
             Your legacy has been severed. When you reset with this you will lose:
@@ -702,8 +914,9 @@ function lich2Text() {
             Penalties:
             <ul>
                 <li>All non-infusion unlock costs are increased by x2 (bringing the total to x6)</li>
-            <ul>
+            </ul><br>
 
             It is recommended to export the save file before resetting.
+            <button onclick="exportSaveFile('KTL_LS_${data.lichKills}')" style="padding:10px 16px;background:#007BFF;color:#ffffff;border:none;border-radius:4px;font-size:14px;cursor:pointer;width:160px;">Export to file</button>
     `
 }

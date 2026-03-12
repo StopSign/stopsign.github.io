@@ -142,7 +142,8 @@ function gameTick() {
         }
         //visual in case of level
         actionObj.expToAddMult = calcUpgradeMultToExp(actionObj.actionVar);
-        actionObj.expToAdd = actionObj.expToAddBase * actionObj.expToAddMult;
+        actionObj.expToAdd = actionObj.expToAddBase * actionObj.expToAddMult
+            * (dataObj.isGenerator&&!dataObj.ignoreExpUpgrade?Math.pow(1.05, data.upgrades.extraGeneratorExp.upgradePower):1);
     }
 
 
@@ -197,8 +198,11 @@ function calcDeltas() {
                 totalDecrease += (actionObj.resource * calcTierMult(dataObj.tier)) * actionObj.progressGain / actionObj.progressMax;
             }
         }
+        if(dataObj.ignoreConsume) {
+            totalDecrease = 0;
+        }
 
-        actionObj.resourceDecrease = totalDecrease;
+        actionObj.resourceDecrease = totalDecrease * (1-data.upgrades.reduceResourcesConsumed.upgradePower*.05);
 
         // Calculate the final net change per second for display.
         actionObj.resourceDelta = actionObj.resourceIncrease - actionObj.resourceDecrease;
@@ -243,9 +247,10 @@ function tickGameObject(actionVar) {
     if (!actionObj.isRunning) {
         return;
     }
+    let upgradeMult = Math.pow(1.1, data.upgrades.extraConsumptionRate.upgradePower)
 
     let momentumMaxRate = dataObj.isGenerator ? dataObj.generatorSpeed / data.gameSettings.ticksPerSecond :
-        actionObj.resource * calcTierMult(dataObj.tier) / data.gameSettings.ticksPerSecond;
+        (actionObj.resource * calcTierMult(dataObj.tier) * upgradeMult / data.gameSettings.ticksPerSecond);
     if(dataObj.isGenerator && actionObj.isPaused) {
         momentumMaxRate = 0;
     }
@@ -255,15 +260,13 @@ function tickGameObject(actionVar) {
 
     resourceToAddInefficient = resourceToAddInefficient < .0000001 ? 0 : resourceToAddInefficient;
 
-
-
     // Update progress and set the progressGain rate for this tick.
     actionObj.progress += resourceToAddInefficient;
     actionObj.progressGain = resourceToAddInefficient * data.gameSettings.ticksPerSecond;
 
     // For non-generators, consume the resource used to generate progress.
-    if (!dataObj.isGenerator || dataObj.ignoreConsume) {
-        actionObj.resource -= resourceToAddInefficient;
+    if (!dataObj.isGenerator && !dataObj.ignoreConsume) {
+        actionObj.resource -= resourceToAddInefficient * (1-data.upgrades.reduceResourcesConsumed.upgradePower*.05);
     }
 
     if(actionObj.instability > 0) {
@@ -323,9 +326,10 @@ function calculateDownstreamResources(actionVar) {
         const sliderSetting = data.actions[actionVar][`downstreamRate${downstreamVar}`] / 100;
         const permFocusMult = actionObj[downstreamVar + "PermFocusMult"];
         const tempFocusMult = (isAttentionLine(actionVar, downstreamVar) ? actionObj[downstreamVar + "TempFocusMult"] : 1);
+        const upgradeMult = Math.pow(1.1, data.upgrades.extraSendRate.upgradePower)
 
         const baseRate = sliderSetting * tierMult;
-        const effectiveRate = baseRate * permFocusMult * tempFocusMult;
+        const effectiveRate = baseRate * permFocusMult * tempFocusMult * upgradeMult;
 
         calculatedRatios[downstreamVar] = effectiveRate;
         totalRatio += effectiveRate;
@@ -400,12 +404,14 @@ function checkProgressCompletion(actionObj, dataObj) {
             dataObj.onCompleteCustom();
         }
         actionObj.expToAddMult = calcUpgradeMultToExp(actionObj.actionVar);
-        actionObj.expToAdd = actionObj.expToAddBase * actionObj.expToAddMult;
+        actionObj.expToAdd = actionObj.expToAddBase * actionObj.expToAddMult
+            * (dataObj.isGenerator&&!dataObj.ignoreExpUpgrade?Math.pow(1.05, data.upgrades.extraGeneratorExp.upgradePower):1);
         actionAddExp(actionObj, actionObj.expToAdd);
 
         //visual in case of level
         actionObj.expToAddMult = calcUpgradeMultToExp(actionObj.actionVar);
-        actionObj.expToAdd = actionObj.expToAddBase * actionObj.expToAddMult;
+        actionObj.expToAdd = actionObj.expToAddBase * actionObj.expToAddMult
+            * (dataObj.isGenerator&&!dataObj.ignoreExpUpgrade?Math.pow(1.05, data.upgrades.extraGeneratorExp.upgradePower):1);
 		
 		//If we're at max level "refund" the remaining "paid" amount.  Realistically, this mostly matters for spells like Overclock
 		//This won't retroactivly refund nodes that overleveled in a previoius version, but that'll be fixed when the amulet

@@ -46,7 +46,9 @@ function createAttDisplay(attVar) {
             queueCache(`${attVar}Num`);
             queueCache(`${attVar}AttMult`);
             queueCache(`${attVar}AttBase`);
+            queueCache(`${attVar}AttBase2`);
             queueCache(`${attVar}AttBaseContainer`);
+            queueCache(`${attVar}AttBaseContainer2`);
             queueCache(`${attVar}DisplayContainer`);
 
             theStr += Raw.html`
@@ -57,8 +59,9 @@ function createAttDisplay(attVar) {
                     <span style="display:inline-block">
                         <div id="${attVar}Name" style="font-weight:bold;color:var(--text-primary)">${decamelize(attVar)}</div>
                         <span id="${attVar}Num" style="display:inline-block;font-weight:bold;color:var(--text-primary)">${attObj.num}</span>
-                        <span style="display:inline-block"> = x<span id="${attVar}AttMult" style="font-weight:bold;color:var(--text-primary)">${attObj.attMult}</span> bonus</span>
-                        <div id="${attVar}AttBaseContainer" style="color:darkgreen">(<span id="${attVar}AttBase" style="font-weight:bold;">${attObj.attBase}</span>)</div>
+                        <span style="display:inline-block"> = x<span id="${attVar}AttMult" style="font-weight:bold;color:var(--text-primary)">${attObj.attMult}</span> bonus</span><br>
+                        <span id="${attVar}AttBaseContainer" style="color:#069f06">(<span id="${attVar}AttBase" style="font-weight:bold;">${attObj.attBase}</span>)</span>
+                        <span id="${attVar}AttBaseContainer2" style="color:#068b9f">(<span id="${attVar}AttBase2" style="font-weight:bold;">${attObj.attBase2}</span>)</span>
                     </span>
                 </div>`;
         }
@@ -547,6 +550,7 @@ let maxLevelTop = (data.gameSettings.viewDeltas && data.gameSettings.viewRatio) 
     queueCache(`${actionVar}Container`)
     queueCache(`${actionVar}LargeVersionContainer`)
     queueCache(`${actionVar}SmallVersionContainer`)
+    queueCache(`${actionVar}SmallVersionTitleContainer`)
     queueCache(`${actionVar}SmallVersionTitle`)
     queueCache(`${actionVar}Level2`)
     queueCache(`${actionVar}MaxLevel2`)
@@ -579,8 +583,8 @@ let maxLevelTop = (data.gameSettings.viewDeltas && data.gameSettings.viewRatio) 
             </div>
             <div id="${actionVar}SmallVersionContainer" 
                 style="display:none;text-align:center;margin:50px auto;font-size:12px;width:100px;">
-                <span id="${actionVar}SmallVersionTitle">
-                    <span style="font-size:16px;font-weight:bold;">${dataObj.title}</span><br>
+                <span id="${actionVar}SmallVersionTitleContainer">
+                    <span id="${actionVar}SmallVersionTitle" style="font-size:16px;font-weight:bold;">${dataObj.title}</span><br>
                     <span id="${actionVar}SmallVersionLevels">
                         Level <span id="${actionVar}Level2" style="font-weight:bold;"></span>${maxLevelDiv}
                     </span>
@@ -1025,18 +1029,20 @@ function actionTriggerText(type, info, extra) {
         if(info) {
             levelMult += data.actions[info].level/5;
         }
-        let legacyGain = extra * levelMult * (data.gameState === "KTL" ? data.legacyMultKTL : 1);
+        let legacyGain = extra * levelMult * (data.gameState === "KTL" ? data.legacyMultKTL : Math.pow(1.2, data.upgrades.extraBrythalLegacy.upgradePower)) * Math.pow(1.1, data.upgrades.extraLegacy.upgradePower);
         text += `+<b>${intToString(legacyGain, 2)}</b> Legacy`
     } else if(type === "addAC") {
         let ACAmount = extra
             * (data.upgrades.listenCloserToWhispers.upgradePower === 1?3:1)
-            * (data.gameState === "KTL" ? data.ancientCoinMultKTL : 1);
+            * (data.gameState === "KTL" ? data.ancientCoinMultKTL : 1)
+            * Math.pow(1.05, data.upgrades.extraAncientCoins.upgradePower);
         text += `+<span style="font-weight:bold;color:var(--AC-color)">${intToString(ACAmount, 1)}</span> Ancient Coins`
     } else if(type === "addAW") {
         let AWAmount = extra
             * (data.upgrades.listenCloserToWhispers.upgradePower === 1?3:1)
             * (1 + data.lichKills/2)
-            * (data.gameState === "KTL" ? data.ancientWhisperMultKTL : 1);
+            * (data.gameState === "KTL" ? data.ancientWhisperMultKTL : 1)
+            * Math.pow(1.1, data.upgrades.extraAncientWhispers.upgradePower);
         text += `+<span style="font-weight:bold;color:var(--AW-color)">${intToString(AWAmount, 1)}</span> Ancient Whispers`
     }
     return text;
@@ -1284,58 +1290,6 @@ function generateLinesBetweenActions() {
     }
 }
 
-function renderResetLog() {
-    let rows = '';
-    let teamworkFound = false;
-    for (let resetLog in data.resetLogs) {
-            if (!data.resetLogs.hasOwnProperty(resetLog)) continue; //only print when both stages are added
-        const log = data.resetLogs[resetLog];
-        if(log.stage1.currentTeamwork > 0) {
-            teamworkFound = true;
-        }
-        rows += `
-            <tr>
-                <td style="padding-right:15px;">${log.stage1.resetCount}</td>
-                <td style="padding-right:15px;">
-                    ${!log.stage1 ? "-" : `
-                    ${secondsToTime(log.stage1.secondsPerReset)} |
-                    ${log.stage1.hatl1Time ? secondsToTime(log.stage1.hatl1Time) : "-"} 
-                    `}
-                </td>
-                <td style="padding-right:15px;">
-                    ${!log.stage1 ? "-" : `
-                    ${intToString(log.stage1.currentMomentum)} | 
-                    ${intToString(log.stage1.currentFear)} | 
-                    ${intToString(log.stage1.currentLegacy)}
-                    ${log.stage1.currentTeamwork > 0 ?` | ${intToString(log.stage1.currentTeamwork)}`:""}
-                    `}
-                </td>
-                <td style="">
-                    ${!log.stage2 ? "-" : `${intToString(log.stage2.legacyGained)} | ${intToString(log.stage2.ancientCoin)} | ${intToString(log.stage2.ancientWhisper)}` }
-                </td>
-            </tr>
-        `;
-    }
-    return `
-        <div style="overflow-x:auto">
-            <div style="font-size:20px; font-weight:bold; margin:0 0 6px 0;">Recent Run Statistics (Last 10)</div>
-            <table style="width:100%;border-collapse:collapse;font-size:16px;white-space:nowrap">
-                <thead>
-                    <tr>
-                        <th style="padding-right:15px; text-align:left;">#</th>
-                        <th style="padding-right:15px; text-align:left;">Times<br>(Reset | HATL 1)</th>
-                        <th style="padding-right:15px; text-align:left;">Stage 1<br>(Momentum | Fear | Legacy${teamworkFound ?` | Teamwork`:""})</th>
-                        <th style="padding-right:15px; text-align:left;">Stage 2<br>(Legacy Gained | AC Gained | AW Gained)</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${rows}
-                </tbody>
-            </table>
-        </div>
-    `;
-}
-
 
 
 
@@ -1384,6 +1338,8 @@ function setAllCaches() {
     queueCache("secondsPassed");
     queueCache("secondsThisLSContainer");
     queueCache("secondsThisLS");
+    queueCache("genesisPoints");
+    queueCache("genesisResets");
 
     for(let actionVar in data.actions) {
         view.cached[`${actionVar}ActionPower`] = document.getElementById(`${actionVar}ActionPower`);

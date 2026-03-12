@@ -110,7 +110,7 @@
     View Amulet Upgrades
 </span>
 
-<span id="currentVersion" style="position:fixed;top:1px;right:5px;color:var(--text-muted)">v3.0.6</span>
+<span id="currentVersion" style="position:fixed;top:1px;right:5px;color:var(--text-muted)">v3.1.0</span>
 
 
 <div id="bonusDisplayShowButton" class="button" onclick="bonusMenuHideButton()"
@@ -323,6 +323,9 @@ It continues, capturing fraction ancientCoin of your fleeting soul and sending i
                 <div id="challengesUpgradeTab" onclick="clickUpgradeTab('challenges')" class="menuTab menuColor4" style="display:none;">
                     Challenges
                 </div>
+                <div id="genesisUpgradeTab" onclick="clickUpgradeTab('genesis')" class="menuTab menuColor3" style="display:none;">
+                    Genesis (New Game+)
+                </div>
             </div>
 
             <div class="menuDisplayContainer">
@@ -343,6 +346,22 @@ It continues, capturing fraction ancientCoin of your fleeting soul and sending i
                 </div>
                 <div id='challengesUpgradeContainer' class="menuDisplay" style="display:none;">
                     <div id="amulet_challenges" style="display:flex;flex-wrap:wrap;gap:15px;padding:10px;will-change: transform;"></div>
+                </div>
+                <div id='genesisUpgradeContainer' class="menuDisplay" style="display:none;">
+                    <div style="font-size:18px">Genesis Points: <span id="genesisPoints" style="font-weight:bold"></span></div>
+                    Spend Genesis Points on the upgrades below, then reset for a New Game+. You can only spend the points now, with the New Game+ upgrade bought, so spend all you can.<br>
+                    The New Game+ upgrade will be placed at the end of this game's currently available content. With new content, the upgrade's location, price, and Genesis Points gained will be changed. Buying New Game+ and doing a Genesis Reset will not be required for future content, and the game will not be balanced with it in mind.<br><br>
+                    <div style="font-size:18px">Genesis Resets: <span id="genesisResets" style="font-weight: bold"></span></div>
+                    Doing a Genesis Reset will reset the entire game except for the 4 [Automation] upgrades and their settings, permanent focus multipliers, and the exp/level of Repose Rebounded.<br>
+                    You will also be given 48 hours of offline time.<br>
+                    It is recommended to export your save file at this time.<br><br>
+                    <span id="genesisResetButtonContainer">
+                        <button onclick="exportSaveFile('KTL_Genesis_Save')" style="padding:10px 16px;background:#007BFF;color:#ffffff;border:none;border-radius:4px;font-size:14px;cursor:pointer;width:160px;">Export to file</button><br><br>
+                        <input type="checkbox" id="confirmNG"><label for="confirmNG">Confirm</label>
+                        <span onclick="genesisReset()" style="background-color:var(--menu-tab-hover-color-3);color:white;border:none;border-radius:5px;padding:6px 16px;font-weight:bold;cursor:pointer;">Genesis Reset</span>
+                    </span>
+                    <div class="menuSeparator"></div>
+                    <div id="amuletUpgrades_genesis" style="display:flex;flex-wrap:wrap;gap:15px;padding:10px;will-change: transform;"></div>
                 </div>
             </div>
         </div>

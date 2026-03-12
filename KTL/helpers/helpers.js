@@ -165,8 +165,16 @@ function intToString(value, amount, hideSmall) {
 
 
 function intToStringRound(value) {
+    let isNeg = value < 0;
+    value *= isNeg ? -1 : 1;
     if (value >= 10000) {
-        return nFormatter(value, 3);
+        if(data.gameSettings.numberType === "numberSuffix") {
+            return (isNeg ? "-" : "") + nFormatter(value, 3);
+        } else if(data.gameSettings.numberType === "scientific") {
+            return (isNeg ? "-" : "") + Math.abs(value).toExponential(2).replace("+", "");
+        } else if(data.gameSettings.numberType === "engineering") {
+            return formatEngineering(value * (isNeg ? -1 : 1));
+        }
     }
     return Math.floor(value);
 }

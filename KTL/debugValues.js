@@ -38,6 +38,13 @@ function debug3rdKill() {
         increaseLichKills();
         legacySeveranceReset(true)
     }
+    if(debugLevel >= 150) {
+        debugFirstFewLoops()
+        debugSecondFewLoops()
+        debugThirdFewLoops()
+        buyUpgrade("improveMyHouse")
+        buyUpgrade("shapeMyMana")
+    }
 }
 
 function debugFirstFewLoops() {
@@ -136,7 +143,7 @@ function buyUpgradesLessThan(num) {
             let upgradeDataObj = upgradeData[upgradeVar];
 
             if(upgradeDataObj.type === "unique" || upgradeDataObj.type === "attribute" || upgradeDataObj.type === "mult") {
-                let cost = calcUpgradeCost(upgradeObj, upgradeObj.upgradesBought);
+                let cost = calcUpgradeCost(upgradeVar, upgradeObj.upgradesBought);
                 if (cost <= num) {
                     buyUpgrade(upgradeVar)
                 }
@@ -151,7 +158,7 @@ function buyNewActionUpgradesLessThan(num) {
             let upgradeDataObj = upgradeData[upgradeVar];
 
             if(upgradeDataObj.type === "actions") {
-                let cost = calcUpgradeCost(upgradeObj, upgradeObj.upgradesBought);
+                let cost = calcUpgradeCost(upgradeVar, upgradeObj.upgradesBought);
                 if (cost <= num) {
                     buyUpgrade(upgradeVar)
                 }
@@ -472,7 +479,7 @@ function debug1stKill() {
         statAddAmount("legacy", 3225 + 4730);
 
         buyUpgrade("feelTheEchoesOfTheBurntTown")
-        buyUpgrade("recognizeTheFamiliarity")
+        // buyUpgrade("recognizeTheFamiliarity")
         buyUpgrade("startALittleQuicker")
     }
 
@@ -496,8 +503,8 @@ function debug1stKill() {
         buyUpgrade("chatLongerWithAllies") //90
         buyUpgrade("investMyCoins") //100
         buyUpgrade("feelTheEchoesOfTheBurntTown") //120
-        buyUpgrade("useMoreComplexSpells") //100
         buyUpgrade("improveMyGrimoire")  //160
+        buyUpgrade("useMoreComplexSpells") //100
 
 
         buyUpgrade("startALittleQuicker")
@@ -1268,10 +1275,10 @@ function debugAfterCare() {
         if(dataObj.plane !== 1 && dataObj.plane !== 3) {
             actionObj.unlockedCount = debugLevel
         }
-        if(!actionObj.unlocked) {
-            actionObj.unlockCost = (1 - (actionObj.unlockedCount * .04) / (1 + actionObj.unlockedCount * .04)) * dataObj.unlockCost;
-        }
-        actionObj.unlockCost *= data.lichKills >= 1 ? 2 * data.lichKills : 1;
+        actionObj.unlockCost = dataObj.unlockCost
+            * Math.pow(.9, data.upgrades.reducedUnlockCosts.upgradePower)
+            * (data.upgrades.recognizeTheFamiliarity.upgradePower > 0 ? (1 - (actionObj.unlockedCount * .04) / (1 + actionObj.unlockedCount * .04)) : 1)
+            * (data.lichKills >= 1 ? 2 * data.lichKills : 1);
         views.updateVal(`${actionVar}UnlockText`, generateUnlockText(actionVar), "innerHTML");
 
         if(actionVar !== "reposeRebounded" && actionVar !== "turnTheWheel" && actionVar !== "tidalBurden") {
@@ -1283,7 +1290,7 @@ function debugAfterCare() {
     for (let actionVar in data.actions) {
         const actionObj = data.actions[actionVar];
         const dataObj = actionData[actionVar];
-        if(dataObj.plane === 1) {
+        if(dataObj.plane === 2) {
             continue;
         }
 

@@ -20,7 +20,7 @@ function createUpgrades(skipUnique) {
     //add it to data.upgrades
     for(let upgradeVar in upgradeData) {
         let upgradeDataObj = upgradeData[upgradeVar];
-        if((upgradeDataObj.type === "unique" || upgradeDataObj.type === "lich") && skipUnique) {
+        if((upgradeDataObj.type === "unique" || upgradeDataObj.type === "lich" || upgradeDataObj.type === "genesis") && skipUnique) {
             continue;
         }
         data.upgrades[upgradeVar] = {};
@@ -33,14 +33,32 @@ function createUpgrades(skipUnique) {
     }
 }
 
+function clearUpgradesForGenesis() {
+    for(let upgradeVar in upgradeData) {
+        let upgradeDataObj = upgradeData[upgradeVar];
+        if(upgradeDataObj.type === "genesis" || upgradeDataObj.isAutomation) {
+            continue;
+        }
+        data.upgrades[upgradeVar] = {};
+        let upgradeObj = data.upgrades[upgradeVar];
 
-function calcUpgradeCost(upgrade, num) {
-    if(num === 0) {
-        return upgrade.initialCost;
+        upgradeDataObj.creationVersion = upgradeDataObj.creationVersion ?? 0;
+        upgradeDataObj.title = upgradeDataObj.title || decamelizeWithSpace(upgradeVar);
+
+        upgradesSetBaseVariables(upgradeObj, upgradeDataObj);
     }
-    return Math.floor(upgrade.initialCost * Math.pow(upgrade.costIncrease, num));
 }
 
+function calcUpgradeCost(upgradeVar, num) {
+    const upgradeObj = data.upgrades[upgradeVar];
+    const upgradeDataObj = upgradeData[upgradeVar];
+    if (num === 0) return upgradeObj.initialCost;
+
+    if (upgradeDataObj.additiveIncrease) {
+        return upgradeObj.initialCost + (upgradeObj.costIncrease * num);
+    }
+    return Math.floor(upgradeObj.initialCost * Math.pow(upgradeObj.costIncrease, num));
+}
 
 function sortAmuletCards(container) {
     const cards = Array.from(container.children);
@@ -69,12 +87,14 @@ function toggleSortByCost() {
         sortAmuletCards(document.getElementById("amuletUpgrades_attribute"));
         sortAmuletCards(document.getElementById("amuletUpgrades_actions"));
         sortAmuletCards(document.getElementById("amuletUpgrades_lich"));
+        sortAmuletCards(document.getElementById("amuletUpgrades_genesis"));
     } else {
         resetCardOrder(document.getElementById("amuletUpgrades_unique"));
         resetCardOrder(document.getElementById("amuletUpgrades_mult"));
         resetCardOrder(document.getElementById("amuletUpgrades_attribute"));
         resetCardOrder(document.getElementById("amuletUpgrades_actions"));
         resetCardOrder(document.getElementById("amuletUpgrades_lich"));
+        resetCardOrder(document.getElementById("amuletUpgrades_genesis"));
     }
 }
 
@@ -84,14 +104,16 @@ function initializeAmuletCards() {
     const upgradeContainerAttribute = document.getElementById("amuletUpgrades_attribute");
     const upgradeContainerActions = document.getElementById("amuletUpgrades_actions");
     const lichContainerActions = document.getElementById("amuletUpgrades_lich");
+    const genesisContainerActions = document.getElementById("amuletUpgrades_genesis")
     upgradeContainerUnique.replaceChildren();
     upgradeContainerMult.replaceChildren();
     upgradeContainerAttribute.replaceChildren();
     upgradeContainerActions.replaceChildren();
     lichContainerActions.replaceChildren();
+    genesisContainerActions.replaceChildren();
 
     for (const upgradeVar in data.upgrades) {
-        const upgrade = data.upgrades[upgradeVar];
+        const upgradeObj = data.upgrades[upgradeVar];
         const upgradeDataObj = upgradeData[upgradeVar];
         const cardId = `card_${upgradeVar}`;
 
@@ -105,74 +127,69 @@ function initializeAmuletCards() {
         const costSectionId = `costSection_${upgradeVar}`;
         const remainingSectionId = `remainingSection_${upgradeVar}`;
         const maxLevelSectionId = `maxLevelSection_${upgradeVar}`;
+        const boughtId = `bought_${upgradeVar}`
         const title = upgradeDataObj.title;
 
+        queueCache(cardId, descriptionId, costId, remainingId, buyButtonSectionId, costSectionId, remainingSectionId, maxLevelSectionId, boughtId);
+
+        const numBought = upgradeObj.upgradesBought;
+        const remaining = upgradeObj.upgradesAvailable - numBought;
+        const isFullyBought = remaining === 0;
+
+        const increaseText = upgradeDataObj.additiveIncrease ? `(+${upgradeDataObj.costIncrease})` : `(x${upgradeDataObj.costIncrease})`;
+        const costName = upgradeDataObj.type === "genesis" ? "GP" : (upgradeDataObj.type === "lich" ? "LC" : (upgradeDataObj.type === "actions" ? "AW" : "AC"));
+
         cardElement.innerHTML = `
-            <div>
-                <div style="font-size:16px;font-weight:bold;margin-bottom:10px;color:#ffffff;">${title}</div>
-                ${!upgradeDataObj.attribute ? "" : `<img id="${upgradeDataObj.attribute}DisplayContainer" src="img/${upgradeDataObj.attribute}.svg" alt="${upgradeDataObj.attribute}" 
-                    style="margin:1px;width:50px;height:50px;vertical-align:top;background:var(--text-bright);border:1px solid black;display:inline-block;" />`}
-                <div id="${descriptionId}" style="display:inline-block;font-size:14px;flex-grow:1;margin-bottom:15px;${!upgradeDataObj.attribute?"":"width:70%"}"></div>
+            <div style="display:flex; flex-direction:column; height:100%;">
+                <div style="font-size:16px; font-weight:bold; margin-bottom:10px; color:#ffffff;">${title}</div>
+                <div style="display:flex; gap:10px; margin-bottom:15px; flex-grow:1;">
+                    ${!upgradeDataObj.attribute ? "" : `<img id="${upgradeDataObj.attribute}DisplayContainer" src="img/${upgradeDataObj.attribute}.svg" alt="${upgradeDataObj.attribute}" style="width:50px; height:50px; background:var(--text-bright); border:1px solid black; flex-shrink:0;" />`}
+                    <div id="${descriptionId}" style="font-size:14px; flex-grow:1;"></div>
+                </div>
             </div>
+            
             <div>
-                <div style="display:flex;justify-content:space-between;align-items:center;">
-                    <div id="${costSectionId}" style="display:flex;align-items:baseline;">
-                        <span style="font-size:14px;margin-right:8px;">cost:</span>
-                        <span id="${costId}" style="font-size:24px;font-weight:bold;color:#ffffff;"></span>
-                        <span style="font-size:14px;color:#a0a0a0;margin-left:8px;">(x${upgradeDataObj.costIncrease})</span>
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <div id="${costSectionId}" style="display:flex; align-items:baseline; ${isFullyBought ? 'visibility:hidden' : ''}">
+                        <span style="font-size:14px; margin-right:8px;">cost:</span>
+                        <span id="${costId}" style="font-size:24px; font-weight:bold; color:#ffffff;"></span>
+                        <span style="font-size:14px; color:#a0a0a0; margin-left:8px;">${increaseText}</span>
                     </div>
-                    <div id="${buyButtonSectionId}">
-                        <button style="background-color:#008c33;color:white;border:none;border-radius:5px;padding:8px 16px;font-weight:bold;cursor:pointer;" onClick="buyUpgrade('${upgradeVar}')">Buy</button>
+                    
+                    <div id="${buyButtonSectionId}" style="display:${isFullyBought ? 'none' : 'flex'}; flex-direction:column; gap:6px;">
+                        <button style="background-color:#008c33; color:white; border:none; border-radius:5px; padding:6px 16px; font-weight:bold; cursor:pointer;" onClick="buyUpgrade('${upgradeVar}')">Buy</button>
+                        ${upgradeDataObj.sellable ? `<button style="background-color:#cc0000; color:white; border:none; border-radius:5px; padding:6px 16px; font-weight:bold; cursor:pointer;" onClick="sellUpgrade('${upgradeVar}')">Sell</button>` : ''}
                     </div>
-                    <div id="${maxLevelSectionId}">
-                        <span style="font-size:14px;color:#c3cd00;font-weight:bold;">MAX LEVEL</span>
+                    
+                    <div id="${maxLevelSectionId}" style="display:${isFullyBought ? 'block' : 'none'};">
+                        <span style="font-size:14px; color:#c3cd00; font-weight:bold;">MAX LEVEL</span>
                     </div>
                 </div>
-                <div id="${remainingSectionId}" style="justify-content:flex-end;align-items:center;margin-top:4px;font-size:14px;color:#a0a0a0;">
-                    Remaining: <span id="${remainingId}"></span>
+                
+                <div id="${remainingSectionId}" style="display:${isFullyBought ? 'none' : 'flex'}; justify-content:space-between; align-items:center; margin-top:8px; font-size:14px; color:#a0a0a0;">
+                    <span>Bought: <span id="${boughtId}">${numBought}</span></span>
+                    <span>Remaining: <span id="${remainingId}"></span></span>
                 </div>
             </div>`;
 
-        queueCache(cardId, descriptionId, costId, remainingId, buyButtonSectionId, costSectionId, remainingSectionId, maxLevelSectionId);
+        const cost = calcUpgradeCost(upgradeVar, numBought);
+        Object.assign(cardElement.style, {
+            backgroundColor: '#2c2c3e', borderRadius: '8px', padding: '12px', width: '280px',
+            display: upgradeObj.visible ? 'flex' : 'none', flexDirection: 'column',
+            justifyContent: 'space-between', boxShadow: '0 4px 8px rgba(0,0,0,0.2)', color: '#e0e0e0',
+            border: `2px solid ${isFullyBought ? '#c3cd00' : (canAffordUpgrade(upgradeDataObj.type, cost) ? '#00cd41' : '#ff0000')}`
+        });
 
-        const numBought = upgrade.upgradesBought;
-        const remaining = upgrade.upgradesAvailable - numBought;
-        const isFullyBought = remaining === 0;
+        cardElement.querySelector(`#${descriptionId}`).innerHTML = !upgradeDataObj.attribute ? upgradeDataObj.customInfo(numBought) : attributeUpgradeInfo(upgradeDataObj.attribute, numBought, upgradeDataObj.addAmount);
+        if (!isFullyBought) {
+            cardElement.querySelector(`#${costId}`).textContent = `${cost} ${costName}`;
+            cardElement.querySelector(`#${remainingId}`).textContent = remaining+"";
+        }
 
-        cardElement.style.backgroundColor = '#2c2c3e';
-        cardElement.style.borderRadius = '8px';
-        cardElement.style.padding = '12px';
-        cardElement.style.width = '280px';
-        cardElement.style.display = upgrade.visible ? 'flex' : 'none';
-        cardElement.style.flexDirection = 'column';
-        cardElement.style.justifyContent = 'space-between';
-        cardElement.style.boxShadow = '0 4px 8px rgba(0,0,0,0.2)';
-        cardElement.style.color = '#e0e0e0';
-
-        const cost = calcUpgradeCost(upgrade, numBought);
         cardElement.dataset.sortOrder = isFullyBought ? Infinity : cost;
 
         const borderColor = isFullyBought ? '#c3cd00' : (canAffordUpgrade(upgradeDataObj.type, cost) ? '#00cd41' : '#ff0000');
         cardElement.style.border = `2px solid ${borderColor}`;
-
-        let text = !upgradeDataObj.attribute ? upgradeDataObj.customInfo(numBought) :
-            attributeUpgradeInfo(upgradeDataObj.attribute, numBought, upgradeDataObj.addAmount);
-        cardElement.querySelector(`#${descriptionId}`).innerHTML = text;
-
-        if (isFullyBought) {
-            cardElement.querySelector(`#${costSectionId}`).style.visibility = 'hidden';
-            cardElement.querySelector(`#${buyButtonSectionId}`).style.display = 'none';
-            cardElement.querySelector(`#${remainingSectionId}`).style.display = 'none';
-            cardElement.querySelector(`#${maxLevelSectionId}`).style.display = 'block';
-        } else {
-            cardElement.querySelector(`#${costSectionId}`).style.visibility = 'visible';
-            cardElement.querySelector(`#${buyButtonSectionId}`).style.display = 'block';
-            cardElement.querySelector(`#${remainingSectionId}`).style.display = 'flex';
-            cardElement.querySelector(`#${maxLevelSectionId}`).style.display = 'none';
-            let costName = upgradeDataObj.type === "lich"?"LC":(upgradeDataObj.type==="actions"?"AW":"AC")
-            cardElement.querySelector(`#${costId}`).textContent = `${cost} ${costName}`;
-            cardElement.querySelector(`#${remainingId}`).textContent = remaining+"";
-        }
 
         if(upgradeDataObj.type === "unique") {
             upgradeContainerUnique.appendChild(cardElement);
@@ -184,16 +201,18 @@ function initializeAmuletCards() {
             upgradeContainerActions.appendChild(cardElement);
         } else if(upgradeDataObj.type === "lich") {
             lichContainerActions.appendChild(cardElement);
+        } else if(upgradeDataObj.type === "genesis") {
+            genesisContainerActions.appendChild(cardElement);
         }
     }
 }
 
 function updateAmuletCardUI(upgradeVar) {
-    const upgrade = data.upgrades[upgradeVar];
+    const upgradeObj = data.upgrades[upgradeVar];
     const upgradeDataObj = upgradeData[upgradeVar];
 
-    const numBought = upgrade.upgradesBought;
-    const remaining = upgrade.upgradesAvailable - numBought;
+    const numBought = upgradeObj.upgradesBought;
+    const remaining = upgradeObj.upgradesAvailable - numBought;
     const isFullyBought = remaining === 0;
 
     const cardId = `card_${upgradeVar}`;
@@ -204,6 +223,7 @@ function updateAmuletCardUI(upgradeVar) {
     const costSectionId = `costSection_${upgradeVar}`;
     const remainingSectionId = `remainingSection_${upgradeVar}`;
     const maxLevelSectionId = `maxLevelSection_${upgradeVar}`;
+    const boughtId = `bought_${upgradeVar}`
 
     const cardElement = document.getElementById(cardId);
     if (!cardElement) return;
@@ -212,7 +232,7 @@ function updateAmuletCardUI(upgradeVar) {
         attributeUpgradeInfo(upgradeDataObj.attribute, numBought, upgradeDataObj.addAmount);
     views.updateVal(descriptionId, text, 'innerHTML');
 
-    const cost = calcUpgradeCost(upgrade, numBought);
+    const cost = calcUpgradeCost(upgradeVar, numBought);
     cardElement.dataset.sortOrder = isFullyBought ? Infinity : cost;
 
     if (isFullyBought) {
@@ -227,58 +247,86 @@ function updateAmuletCardUI(upgradeVar) {
         views.updateVal(remainingSectionId, 'flex', 'style.display');
         views.updateVal(maxLevelSectionId, 'none', 'style.display');
 
-        let costText = calcUpgradeCost(upgrade, numBought) + (upgradeDataObj.type==="actions"?" AW":" AC");
+        let costText = calcUpgradeCost(upgradeVar, numBought) + (upgradeDataObj.type==="actions"?" AW":" AC");
         views.updateVal(costId, `${costText}`, 'textContent');
         views.updateVal(remainingId, remaining, 'textContent');
+        views.updateVal(boughtId, numBought, 'textContent');
     }
 
     updateCardAffordabilityBorders();
 }
 
-function buyUpgrade(upgradeVar) {
-    const upgrade = data.upgrades[upgradeVar];
-    const upgradeDataObj = upgradeData[upgradeVar];
-    const levelToBuy = upgrade.upgradesBought;
+function handleCurrency(type, amount, isDeducting) {
+    const currencyMap = { actions: 'ancientWhisper', lich: 'lichCoins', default: 'ancientCoin', genesis: 'genesisPoints' };
+    const currencyKey = currencyMap[type] || currencyMap.default;
 
-    if (levelToBuy >= upgrade.upgradesAvailable) return;
-    if(!upgrade.visible) return;
-
-    const cost = calcUpgradeCost(upgrade, levelToBuy);
-    let type = upgradeDataObj.type;
-    if(type === "actions") {
-        if (data.ancientWhisper < cost) return;
-        data.ancientWhisper -= cost;
-    } else if(type === "lich") {
-        if (data.lichCoins < cost) return;
-        data.lichCoins -= cost;
+    if (isDeducting) {
+        if (data[currencyKey] < amount) return false;
+        data[currencyKey] -= amount;
     } else {
-        if (data.ancientCoin < cost) return;
-        data.ancientCoin -= cost;
+        data[currencyKey] += amount;
     }
-    upgrade.upgradesBought++;
-    upgrade.upgradePower++;
+    return true;
+}
+
+
+
+function buyUpgrade(upgradeVar) {
+    const upgradeObj = data.upgrades[upgradeVar];
+    const upgradeDataObj = upgradeData[upgradeVar];
+    const levelToBuy = upgradeObj.upgradesBought;
+
+    if (upgradeObj.upgradesBought >= upgradeObj.upgradesAvailable || !upgradeObj.visible) return;
+
+    const cost = calcUpgradeCost(upgradeVar, levelToBuy);
+
+    if (!handleCurrency(upgradeDataObj.type, cost, true)) return;
+
+    upgradeObj.upgradesBought++;
+    upgradeObj.upgradePower++;
 
     if (upgradeDataObj.onBuy) {
-        upgradeDataObj.onBuy(upgrade.upgradePower);
+        upgradeDataObj.onBuy(upgradeObj.upgradePower);
     }
     if(upgradeDataObj.attribute) {
-        attributeUpgradeOnBuy(upgradeDataObj.attribute, upgrade.upgradesBought, upgradeDataObj.addAmount);
+        attributeUpgradeOnBuy(upgradeDataObj.attribute, upgradeObj.upgradesBought, upgradeDataObj.addAmount);
     }
 
-    upgrade.isFullyBought = (upgrade.upgradesAvailable - upgrade.upgradesBought) === 0;
+    upgradeObj.isFullyBought = (upgradeObj.upgradesAvailable - upgradeObj.upgradesBought) === 0;
 
+    finalizeTransaction(upgradeVar, upgradeObj);
+}
+
+function sellUpgrade(upgradeVar) {
+    const upgradeObj = data.upgrades[upgradeVar];
+    const obj = upgradeData[upgradeVar];
+
+    if (upgradeObj.upgradesBought <= 0 || !upgradeObj.visible || !obj.sellable) return;
+
+    const refundAmount = calcUpgradeCost(upgradeVar, upgradeObj.upgradesBought - 1);
+
+    handleCurrency(obj.type, refundAmount, false);
+
+    upgradeObj.upgradesBought--;
+    upgradeObj.upgradePower--;
+    upgradeObj.isFullyBought = false;
+
+    if (obj.onSell) {
+        obj.onSell(upgradeObj.upgradePower);
+    }
+
+    finalizeTransaction(upgradeVar, upgradeObj);
+}
+
+function finalizeTransaction(upgradeVar, upgradeObj) {
     const cardElement = document.getElementById(`card_${upgradeVar}`);
     if (cardElement) {
-        if (upgrade.isFullyBought) {
-            cardElement.dataset.sortOrder = Infinity;
-        } else {
-            cardElement.dataset.sortOrder = calcUpgradeCost(upgrade, upgrade.upgradesBought);
-        }
+        cardElement.dataset.sortOrder = upgradeObj.isFullyBought ? Infinity : calcUpgradeCost(upgradeVar, upgradeObj.upgradesBought);
     }
 
     updateAmuletCardUI(upgradeVar);
     refreshUpgradeVisibility();
-    toggleSortByCost()
+    toggleSortByCost();
 }
 
 function attributeUpgradeInfo(attVar, upgradeNum, addAmount) {
@@ -303,16 +351,16 @@ function refreshUpgradeVisibility() {
     data.gameSettings.showUnaffordable = document.getElementById("showUnaffordableUpgrades").checked;
 
     for (let upgradeVar in data.upgrades) {
-        let upgrade = data.upgrades[upgradeVar];
+        let upgradeObj = data.upgrades[upgradeVar];
         let upgradeDataObj = upgradeData[upgradeVar];
-        let isNotMaxLevel = data.gameSettings.showCompletedToggle || !upgrade.isFullyBought;
-        let cost = calcUpgradeCost(upgrade, upgrade.upgradesBought);
+        let isNotMaxLevel = data.gameSettings.showCompletedToggle || !upgradeObj.isFullyBought;
+        let cost = calcUpgradeCost(upgradeVar, upgradeObj.upgradesBought);
         let costLower = upgradeDataObj.type === "actions" ? (cost <= data.ancientWhisper) : (cost <= data.ancientCoin);
-        let isAffordable = data.gameSettings.showUnaffordable || upgrade.isFullyBought || costLower;
+        let isAffordable = data.gameSettings.showUnaffordable || upgradeObj.isFullyBought || costLower;
         let isShown = isNotMaxLevel && isAffordable;
         let displayStyle = 'none';
 
-        if (upgrade.visible && isShown) {
+        if (upgradeObj.visible && isShown) {
             displayStyle = 'flex';
         }
 
@@ -331,10 +379,10 @@ function canAffordUpgrade(type, cost) {
 
 function updateCardAffordabilityBorders() {
     for (const upgradeVar in data.upgrades) {
-        const upgrade = data.upgrades[upgradeVar];
+        const upgradeObj = data.upgrades[upgradeVar];
         const upgradeDataObj = upgradeData[upgradeVar];
-        if (!upgrade.isFullyBought) {
-            const cost = calcUpgradeCost(upgrade, upgrade.upgradesBought);
+        if (!upgradeObj.isFullyBought) {
+            const cost = calcUpgradeCost(upgradeVar, upgradeObj.upgradesBought);
 
             const cardId = `card_${upgradeVar}`;
             const borderColor = canAffordUpgrade(upgradeDataObj.type, cost) ? '#00cd41' : '#ff0000';
@@ -343,12 +391,14 @@ function updateCardAffordabilityBorders() {
     }
 }
 
-function calcTotalSpentOnUpgrade(initialCost, costIncrease, upgradesBought) {
+function calcTotalSpentOnUpgrade(initialCost, costIncrease, upgradesBought, additiveIncrease) {
     let total = 0;
-    let theCost = initialCost;
-    for(let i = 0; i < upgradesBought; i++) {
-        total += theCost
-        theCost *= costIncrease;
+    for (let i = 0; i < upgradesBought; i++) {
+        if (additiveIncrease) {
+            total += initialCost + (costIncrease * i);
+        } else {
+            total += Math.floor(initialCost * Math.pow(costIncrease, i));
+        }
     }
     return total;
 }
@@ -357,7 +407,7 @@ let upgradeData = {
     stopLettingOpportunityWait: {
         initialCost:5, costIncrease:1, creationVersion: 6,
         upgradesAvailable: 1, type:"unique",
-        visible: true,
+        visible: true, isAutomation:true,
         customInfo: function(num) {
             return `[Automation] When unlocking a new action, automatically sets the downstream sliders to the 
             newly unlocked action to 100%. This only fully works on previously unlocked actions.`;
@@ -372,17 +422,15 @@ let upgradeData = {
                 views.updateVal(`${actionVar}_automationMenuButton`, dataObj.hasUpstream && dataObj.plane !== 2?"":"none", "style.display");
                 views.updateVal(`${actionVar}_automationRevealContainer`, (dataObj.keepParentAutomation || dataObj.hasUpstream) && dataObj.plane !== 2?"":"none", "style.display");
             }
-            if(num === 2) {
-                revealUpgrade("temperMyDesires")
-            }
+            revealUpgrade("temperMyDesires")
         }
     },
     knowWhenToMoveOn: {
         initialCost:5, costIncrease:1, creationVersion: 6,
         upgradesAvailable:1, type:"unique",
-        visible:true,
+        visible:true, isAutomation:true,
         customInfo: function(num) {
-            return Raw.html`[Automation] When an action is at its max level and has no downstream actions with sliders, it 
+            return `[Automation] When an action is at its max level and has no downstream actions with sliders, it 
                 automatically set the flow rate leading to it to 0%. This will apply recursively.`
         },
         onBuy: function(num) {
@@ -399,7 +447,7 @@ let upgradeData = {
     temperMyDesires: {
         initialCost:100, costIncrease:1, creationVersion: 6,
         upgradesAvailable: 1, type:"unique",
-        visible: false,
+        visible: false, isAutomation:true,
         customInfo: function(num) {
             return `[Automation] Gain a slider for setting a custom amount the action enables at, instead of always 100%.`
         },
@@ -416,7 +464,7 @@ let upgradeData = {
     shapeMyPath: {
         initialCost:10, costIncrease:1, creationVersion: 6,
         upgradesAvailable: 1, type:"unique",
-        visible: false,
+        visible: false, isAutomation:true,
         customInfo: function(num) {
             return `[Automation] Gain the option to create custom automation triggers based on each action. The target actions that trigger these will display that they do under Info. Warning: it is possible to create useless triggers.`
         },
@@ -1086,6 +1134,17 @@ let upgradeData = {
             }
         }
     },
+    improveOverclockToFight: {
+        initialCost:5000, costIncrease:500, creationVersion: 7, additiveIncrease:true,
+        upgradesAvailable:30, type:"actions",
+        visible:false,
+        customInfo: function(num) {
+            return `Overclock Targeting the Lich's progress increase to level is -0.01 (currently x${2 - num*.01}). Applies next amulet use.`
+        },
+        onBuy: function(num) {
+            // actionData.overclockTargetingTheLich.progressMaxIncrease = 2 - num*.01;
+        }
+    },
 
 //unique upgrades
     recognizeTheFamiliarity: {
@@ -1208,8 +1267,254 @@ let upgradeData = {
 
         }
     },
+    increaseResonance: {
+        initialCost:10, costIncrease:1, creationVersion:6, additiveIncrease:true, sellable:true,
+        upgradesAvailable:999, type:"genesis",
+        visible:true,
+        customInfo: function(num) {
+            return "Resonance +1 per upgrade"
+        },
+        onBuy: function(num) {
+            data.atts["resonance"].attBase2 = num;
+        },
+        onSell: function(num) {
+            data.atts["resonance"].attBase2 = num;
+        }
+    },
+    increaseIntegration: {
+        initialCost:10, costIncrease:1, creationVersion:6, additiveIncrease:true, sellable:true,
+        upgradesAvailable:999, type:"genesis",
+        visible:true,
+        customInfo: function(num) {
+            return "Integration +1 per upgrade"
+        },
+        onBuy: function(num) {
+            data.atts["integration"].attBase2 = num;
+        },
+        onSell: function(num) {
+            data.atts["integration"].attBase2 = num;
+        }
+    },
+    increaseAmplification: {
+        initialCost:10, costIncrease:1, creationVersion:6, additiveIncrease:true, sellable:true,
+        upgradesAvailable:999, type:"genesis",
+        visible:true,
+        customInfo: function(num) {
+            return "Amplification +1 per upgrade"
+        },
+        onBuy: function(num) {
+            data.atts["amplification"].attBase2 = num;
+        },
+        onSell: function(num) {
+            data.atts["amplification"].attBase2 = num;
+        }
+    },
+    increaseArchmagery: {
+        initialCost:10, costIncrease:1, creationVersion:6, additiveIncrease:true, sellable:true,
+        upgradesAvailable:999, type:"genesis",
+        visible:true,
+        customInfo: function(num) {
+            return "Archmagery +1 per upgrade"
+        },
+        onBuy: function(num) {
+            data.atts["archmagery"].attBase2 = num;
+        },
+        onSell: function(num) {
+            data.atts["archmagery"].attBase2 = num;
+        }
+    },
+    increaseAwareness: {
+        initialCost:10, costIncrease:1, creationVersion:6, additiveIncrease:true, sellable:true,
+        upgradesAvailable:999, type:"genesis",
+        visible:true,
+        customInfo: function(num) {
+            return "Awareness +1 per upgrade"
+        },
+        onBuy: function(num) {
+            data.atts["awareness"].attBase2 = num;
+        },
+        onSell: function(num) {
+            data.atts["awareness"].attBase2 = num;
+        }
+    },
+    increaseConcentration: {
+        initialCost:10, costIncrease:1, creationVersion:6, additiveIncrease:true, sellable:true,
+        upgradesAvailable:999, type:"genesis",
+        visible:true,
+        customInfo: function(num) {
+            return "Concentration +1 per upgrade"
+        },
+        onBuy: function(num) {
+            data.atts["concentration"].attBase2 = num;
+        },
+        onSell: function(num) {
+            data.atts["concentration"].attBase2 = num;
+        }
+    },
+    decreaseImpedance: {
+        initialCost:10, costIncrease:1, creationVersion:6, additiveIncrease:true, sellable:true,
+        upgradesAvailable:999, type:"genesis",
+        visible:true,
+        customInfo: function(num) {
+            return "Impedance -1 per upgrade"
+        },
+        onBuy: function(num) {
+            data.atts["impedance"].attBase2 = num;
+        },
+        onSell: function(num) {
+            data.atts["impedance"].attBase2 = num;
+        }
+    },
+    newGamePlus: {
+        initialCost:1e6, costIncrease:1, creationVersion: 7, title:"New Game+",
+        upgradesAvailable:1, type:"actions",
+        visible:false,
+        customInfo: function(num) {
+            return "Unlock the ability to reset the game for some small bonuses. This upgrade will always be placed at the end of currently developed content, and will not be required for future content. Gain 50 Genesis Points.";
+        },
+        onBuy: function(num) {
+            data.genesisPoints += 50;
+            document.getElementById("genesisUpgradeTab").style.display = "";
+            document.getElementById("genesisResetButtonContainer").style.display = "";
+        }
+    },
+    extraDeathEnergy: {
+        initialCost:20, costIncrease:1.5, creationVersion:6, sellable:true,
+        upgradesAvailable:99, type:"genesis",
+        visible:true,
+        customInfo: function(num) {
+            return "Death Energy +1. Keeps Infusion Tab unlocked."
+        },
+        onBuy: function(num) {
+            data.actions.reposeRebounded.resource += 1;
+        },
+        onSell: function(num) {
+            data.actions.reposeRebounded.resource -= 1;
+        }
+    },
+    extraSendRate: {
+        initialCost:20, costIncrease:1.5, creationVersion:6, sellable:true,
+        upgradesAvailable:99, type:"genesis",
+        visible:true,
+        customInfo: function(num) {
+            return `Send Rate to downstream actions x1.1 (currently ${Math.pow(1.1, num)})`
+        },
+    },
+    extraConsumptionRate: {
+        initialCost:20, costIncrease:1.5, creationVersion:6, sellable:true,
+        upgradesAvailable:99, type:"genesis",
+        visible:true,
+        customInfo: function(num) {
+            return `Consumption Rate to downstream actions x1.1 (currently ${Math.pow(1.1, num)})`
+        },
+    },
+    reduceResourcesConsumed: {
+        initialCost:20, costIncrease:1.5, creationVersion:6, sellable:true,
+        upgradesAvailable:20, type:"genesis",
+        visible:true,
+        customInfo: function(num) {
+            return `Reduces the amount of resources taken away by consumption by +5% (currently takes away ${100-num*5}% of consumption). Does not apply to generators.`
+        },
+    },
+    extraMomentumGeneration: {
+        initialCost:20, costIncrease:1.5, creationVersion:6, sellable:true,
+        upgradesAvailable:99, type:"genesis",
+        visible:true,
+        customInfo: function(num) {
+            return `Momentum generated by Overclock x1.1 (currently ${Math.pow(1.1, num)})`
+        },
+    },
+    extraFortuneGeneration: {
+        initialCost:20, costIncrease:1.5, creationVersion:6, sellable:true,
+        upgradesAvailable:99, type:"genesis",
+        visible:true,
+        customInfo: function(num) {
+            return `Fortune generated by Invest x1.1 (currently ${Math.pow(1.1, num)}). Still limited by Market Cap.`
+        },
+    },
+    extraFightGeneration: {
+        initialCost:20, costIncrease:1.5, creationVersion:6, sellable:true,
+        upgradesAvailable:99, type:"genesis",
+        visible:true,
+        customInfo: function(num) {
+            return `Fight generated by Overclock Targeting the Lich x1.2 (currently ${Math.pow(1.2, num)})`
+        },
+    },
+    extraGeneratorExp: {
+        initialCost:20, costIncrease:1.5, creationVersion:6, sellable:true,
+        upgradesAvailable:99, type:"genesis",
+        visible:true,
+        customInfo: function(num) {
+            return `All generators gain x1.05 exp (currently ${Math.pow(1.05, num)}). Does not apply to Fight the Evil Forces and Repose Rebounded`
+        },
+    },
+    extraAncientCoins: {
+        initialCost:20, costIncrease:1.5, creationVersion:6, sellable:true,
+        upgradesAvailable:99, type:"genesis",
+        visible:true,
+        customInfo: function(num) {
+            return `Ancient Coin gain x1.05 (currently ${Math.pow(1.05, num)})`
+        },
+    },
+    extraAncientWhispers: {
+        initialCost:20, costIncrease:1.5, creationVersion:6, sellable:true,
+        upgradesAvailable:99, type:"genesis",
+        visible:true,
+        customInfo: function(num) {
+            return `Ancient Whispers gain x1.1 (currently ${Math.pow(1.1, num)})`
+        },
+    },
+    extraLegacy: {
+        initialCost:20, costIncrease:1.5, creationVersion:6, sellable:true,
+        upgradesAvailable:99, type:"genesis",
+        visible:true,
+        customInfo: function(num) {
+            return `All Legacy gain x1.1 (currently ${Math.pow(1.1, num)})`
+        },
+    },
+    extraBrythalLegacy: {
+        initialCost:20, costIncrease:1.5, creationVersion:6, sellable:true,
+        upgradesAvailable:99, type:"genesis",
+        visible:true,
+        customInfo: function(num) {
+            return `Brythal Legacy gain x1.2 (currently ${Math.pow(1.2, num)})`
+        },
+    },
+    extraMarketCap: {
+        initialCost:20, costIncrease:1.5, creationVersion:6, sellable:true,
+        upgradesAvailable:99, type:"genesis",
+        visible:true,
+        customInfo: function(num) {
+            return `Invest's Market Cap x1.2 (currently ${Math.pow(1.2, num)})`
+        },
+    },
+    reducedUnlockCosts: {
+        initialCost:20, costIncrease:1.5, creationVersion:6, sellable:true,
+        upgradesAvailable:99, type:"genesis",
+        visible:true,
+        customInfo: function(num) {
+            return `All unlock costs x0.9 (currently ${Math.pow(.9, num)})`
+        },
+    },
+    keepUnlockedCount: {
+        initialCost:20, costIncrease:1.5, creationVersion:6, sellable:true,
+        upgradesAvailable:5, type:"genesis",
+        visible:true,
+        customInfo: function(num) {
+            return `Keep +20% of Unlocked # on Genesis Reset (currently ${num*20}%)`
+        },
+    },
+    higherSpeedCaps: {
+        initialCost:20, costIncrease:1.5, creationVersion:6, sellable:true,
+        upgradesAvailable:5, type:"genesis",
+        visible:true,
+        customInfo: function(num) {
+            return `Gain up to +10% max speed on all actions, but each additional 10% speed requires an additional 100% attribute requirement. (currently max speed is ${100+num*10}%)`
+        },
+    },
 
 
+//
     /*
     add max level to actions:
     These should all be available as a reward for the first reset, for various costs

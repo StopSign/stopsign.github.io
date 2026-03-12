@@ -1,15 +1,29 @@
 function saveFileCorrection(saveVersionFromLoad) {
     let refundAmount = 0;
-    //removed with saveVersion 6, but could still use in the future
     if(data.upgrades.useMoreComplexSpells.upgradePower >= 2) {
         purchaseAction("overponder")
     }
+    //6 -> 7
 
     return refundAmount;
 }
 
 function saveFileCorrectionAfterLoad(saveVersionFromLoad) {
-    //removed with saveVersion 6, but could still use in the future
+    //6 -> 7
+    if(data.upgrades.stopLettingOpportunityWait.upgradePower >= 1) {
+        revealUpgrade("temperMyDesires")
+    }
+    if(data.upgrades.improveMyHouse.upgradePower >= 1) {
+        purchaseAction("buyBed");
+    }
+    if(data.upgrades.improveMyHouse.upgradePower >= 2) {
+        purchaseAction('buyReadingChair')
+        purchaseAction('buyFireplace')
+    }
+    if(data.upgrades.improveMyHouse.upgradePower >= 3) {
+        purchaseAction('buyGoodFirewood')
+        purchaseAction('buySilkSheets')
+    }
 }
 
 let v2toLoad;
