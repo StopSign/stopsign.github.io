@@ -247,7 +247,8 @@ function updateAmuletCardUI(upgradeVar) {
         views.updateVal(remainingSectionId, 'flex', 'style.display');
         views.updateVal(maxLevelSectionId, 'none', 'style.display');
 
-        let costText = calcUpgradeCost(upgradeVar, numBought) + (upgradeDataObj.type==="actions"?" AW":" AC");
+        const costName = upgradeDataObj.type === "genesis" ? "GP" : (upgradeDataObj.type === "lich" ? "LC" : (upgradeDataObj.type === "actions" ? "AW" : "AC"));
+        let costText = calcUpgradeCost(upgradeVar, numBought) + " " + costName;
         views.updateVal(costId, `${costText}`, 'textContent');
         views.updateVal(remainingId, remaining, 'textContent');
         views.updateVal(boughtId, numBought, 'textContent');
