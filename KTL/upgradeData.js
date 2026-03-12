@@ -1360,10 +1360,10 @@ let upgradeData = {
             return "Impedance -1 per upgrade"
         },
         onBuy: function(num) {
-            data.atts["impedance"].attBase2 = num;
+            data.atts["impedance"].attBase2 = -1 * num;
         },
         onSell: function(num) {
-            data.atts["impedance"].attBase2 = num;
+            data.atts["impedance"].attBase2 = -1 * num;
         }
     },
     newGamePlus: {

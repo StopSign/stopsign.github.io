@@ -629,7 +629,7 @@ function createChangelogMenu() {
     return Raw.html`
         <div class="menuTitle">Changelog</div>
         <div class="menuSeparator"></div><br>
-        v3.1.3 3/12 (current): <br>
+        v3.1.4 3/12 (current): <br>
         [Gameplay changes]:<br>
         <ol>
             <li>Capped Eastern Monolith levels at 3, after the final lich kill</li>

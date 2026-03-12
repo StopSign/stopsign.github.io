@@ -24,6 +24,9 @@ function saveFileCorrectionAfterLoad(saveVersionFromLoad) {
         purchaseAction('buyGoodFirewood')
         purchaseAction('buySilkSheets')
     }
+
+    data.atts["impedance"].attBase2 = -1 * data.upgrades.decreaseImpedance.upgradePower;
+    attsSetBaseVariables(data.atts.impedance)
 }
 
 let v2toLoad;
