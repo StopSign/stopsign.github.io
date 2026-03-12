@@ -1376,6 +1376,10 @@ let upgradeData = {
             data.genesisPoints += 50;
             document.getElementById("genesisUpgradeTab").style.display = "";
             document.getElementById("genesisResetButtonContainer").style.display = "";
+
+            for(let upgradeVar in upgradeData) { //show buy/sell buttons
+                updateAmuletCardUI(upgradeVar);
+            }
         }
     },
     extraDeathEnergy: {

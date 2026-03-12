@@ -629,7 +629,7 @@ function createChangelogMenu() {
     return Raw.html`
         <div class="menuTitle">Changelog</div>
         <div class="menuSeparator"></div><br>
-        v3.1.0 3/12 (current): <br>
+        v3.1.1 3/12 (current): <br>
         [Gameplay changes]:<br>
         <ol>
             <li>Capped Eastern Monolith levels at 3, after the final lich kill</li>
@@ -638,7 +638,7 @@ function createChangelogMenu() {
             <li>Added a new AW upgrade for endgame</li>
             <li>Changed the 2 fight actions after Destroy Eastern Monolith to reach NG+</li>
             <li>Made 4 gold actions after buy furniture harder. Their values will reset on refresh.</li>
-            <li>Redid the Speed calculation for actions with multiple speed attributes. This is a buff to</li> Turn the Wheel and a slight nerf to Socialize, with base efficiency raised from .1 to .15 on socialize to compensate (applies next amulet). Now, if you have all the stat requirements on TTW, the speed will match continuity's listed attribute bonus.
+            <li>Redid the Speed calculation for actions with multiple speed attributes. This is a buff to Turn the Wheel and a slight nerf to Socialize, with base efficiency raised from .1 to .15 on socialize to compensate (applies next amulet). Now, if you have all the stat requirements on TTW, the speed will match continuity's listed attribute bonus.</li>
         </ol><br><br>
         
         [Other changes]:<br>
@@ -653,6 +653,7 @@ function createChangelogMenu() {
             <li>Story grammar fixes</li>
             <li>Added an export to file button at the LS screen</li>
             <li>Changed the amulet loop stats recorded</li>
+            <li>3.1.1 New Game+ upgrades are buyable without closing/re-opening the menu</li>
         </ol><br>
         v3.0.6 2/26: <br>
             <ol>
