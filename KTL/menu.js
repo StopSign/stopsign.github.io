@@ -629,7 +629,7 @@ function createChangelogMenu() {
     return Raw.html`
         <div class="menuTitle">Changelog</div>
         <div class="menuSeparator"></div><br>
-        v3.1.2 3/12 (current): <br>
+        v3.1.3 3/12 (current): <br>
         [Gameplay changes]:<br>
         <ol>
             <li>Capped Eastern Monolith levels at 3, after the final lich kill</li>
@@ -655,6 +655,7 @@ function createChangelogMenu() {
             <li>Changed the amulet loop stats recorded</li>
             <li>3.1.1 New Game+ upgrades are buyable without closing/re-opening the menu</li>
             <li>3.1.2 NG+ upgrade's currency name corrected</li>
+            <li>3.1.3 NG+ reveal Infusion Attributes if you bought Death Energy</li>
         </ol><br>
         v3.0.6 2/26: <br>
             <ol>

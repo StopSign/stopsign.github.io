@@ -169,7 +169,7 @@ function genesisReset(forceReset) {
         actionObj.purchased = !!dataObj.purchased;
         actionObj.lowestUnlockTime = undefined;
         actionObj.lowestLevel1Time = undefined;
-        actionObj.unlockedCount = unlockedCount * data.upgrades.keepUnlockedCount.upgradePower/5;
+        actionObj.unlockedCount = Math.ceil(unlockedCount * data.upgrades.keepUnlockedCount.upgradePower/5);
 
         dataObj.downstreamVars.forEach(function (downstreamVar) {
             if (data.actions[downstreamVar] && actionData[downstreamVar].hasUpstream) {
@@ -217,6 +217,9 @@ function genesisReset(forceReset) {
         revealAction("tidalBurden")
         unlockAction(data.actions.turnTheWheel);
         unlockAction(data.actions.tidalBurden);
+        revealAtt("flow");
+        revealAtt("continuity");
+        revealAtt("calm");
     }
 
     for(let upgradeVar in upgradeData) {
