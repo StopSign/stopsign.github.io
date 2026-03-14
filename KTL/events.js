@@ -880,24 +880,26 @@ function takeDataSnapshot(resourceValue, currentTime) {
     if (chartData.length === 0) {
         chartData.push({
             time: currentTime,
-            value: resourceValue
+            value: resourceValue,
+            HATL: data.actions["hearAboutTheLich"].level,
+            MQ: actionData.awakenYourGrimoire.manaQuality()
         });
         return;
     }
 
     const lastStoredPoint = chartData[chartData.length - 1];
-    if (resourceValue === lastStoredPoint.value) {
-        return;
+    // if (resourceValue === lastStoredPoint.value) {
+    //     return;
+    // }
+
+    if ((currentTime - lastStoredPoint.time) > (currentTime > 21600 ? 239 : 119)) {
+        chartData.push({
+            time: currentTime,
+            value: resourceValue,
+            HATL: data.actions["hearAboutTheLich"].level,
+            MQ: actionData.awakenYourGrimoire.manaQuality()
+        });
     }
-
-    const lastValue = lastStoredPoint.value;
-    const timeBeforeChange = currentTime - 1;
-
-    if (timeBeforeChange > lastStoredPoint.time) {
-        chartData.push({ time: timeBeforeChange, value: lastValue });
-    }
-
-    chartData.push({ time: currentTime, value: resourceValue });
 
     if (chartData.length > 200) {
         chartData.splice(0, 2);
@@ -919,10 +921,11 @@ function drawChart() {
 
     const canvasWidth = canvas.clientWidth;
     const canvasHeight = canvas.clientHeight;
-    const padding = 40;
+    const padding = 50;
 
     // Clear the canvas and fill with dark background
     ctx.fillStyle = '#2d3748';
+    ctx.globalAlpha = 1;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     if (chartData.length < 2) {
@@ -936,8 +939,6 @@ function drawChart() {
     // --- Determine Data Range ---
     const minTime = chartData[0].time;
     const maxTime = chartData[chartData.length - 1].time;
-    const values = chartData.map(d => d.value);
-    const maxValue = Math.max(...values);
 
     // --- Draw Axes ---
     ctx.strokeStyle = '#4a5568'; // Subtle gray for axes
@@ -951,53 +952,122 @@ function drawChart() {
     ctx.lineTo(canvasWidth - padding, canvasHeight - padding);
     ctx.stroke();
 
+    ctx.fillStyle = '#a0aec0'; // Light gray for labels
+    ctx.font = '12px sans-serif';
+    ctx.textAlign = 'center';
     // --- Draw Data Line ---
     ctx.strokeStyle = '#63b3ed'; // Vibrant, contrasting blue for the line
     ctx.lineWidth = 3; // Thicker line
     ctx.lineJoin = 'round'; // Smoother corners
     ctx.beginPath();
 
-    for (let i = 0; i < chartData.length; i++) {
-        const dataPoint = chartData[i];
-        const x = padding + ((dataPoint.time - minTime) / (maxTime - minTime)) * (canvasWidth - 2 * padding);
-        let y;
-        if (chartScale === 'logarithmic') {
+    let lastLabelX = -1000;
+    let lastHATL = 0;
+    if (graphType === "momentum") {
+        const values = chartData.map(d => d.value);
+        const minValue = Math.min(...values);
+        const maxValue = Math.max(...values);
+        for (let i = 0; i < chartData.length; i++) {
+            const dataPoint = chartData[i];
+            const HATL = dataPoint.HATL ? dataPoint.HATL : 0;
+            const x = padding + ((dataPoint.time - minTime) / (maxTime - minTime)) * (canvasWidth - 2 * padding);
+            if ((x - lastLabelX) >= ((canvasWidth - 2 * padding) / 8)) {
+                lastLabelX = x;
+                ctx.fillStyle = '#a0aec0'; // Light gray for labels
+                ctx.font = '12px sans-serif';
+                ctx.fillText(secondsToTime(dataPoint.time), x, canvasHeight - padding + 20);
+            }
+            const logMinValue = Math.log1p(minValue);
             const logMaxValue = Math.log1p(maxValue);
-            const logValue = Math.log1p(dataPoint.value);
-            y = (canvasHeight - padding) - ((logValue / logMaxValue) * (canvasHeight - 2 * padding));
-        } else {
-            y = (canvasHeight - padding) - ((dataPoint.value / maxValue) * (canvasHeight - 2 * padding));
+            const logValue = Math.log1p(dataPoint.value) - logMinValue;
+            let y = (canvasHeight - padding) - ((logValue / (logMaxValue - logMinValue)) * (canvasHeight - 2 * padding));
+            if (isNaN(y)) y = canvasHeight - padding;
+            if (HATL > 0 && HATL > lastHATL) {
+                lastHATL = HATL;
+                ctx.fillStyle = 'red'; // Light gray for labels
+                ctx.font = '14px sans-serif bold';
+                ctx.fillText(HATL, x, y - 4);
+                if (y < (canvasHeight - padding - 10)) {
+                    ctx.fillStyle = '#a0aec0'; // Light gray for labels
+                    ctx.font = '12px sans-serif';
+                    ctx.fillText(secondsToTime(dataPoint.time), x, y + 18);
+                }
+            }
+            if (i === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
         }
-        if (isNaN(y)) y = canvasHeight - padding;
-        if (i === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
-    }
-    ctx.stroke();
-
-    // --- Draw Labels and Grid ---
-    ctx.fillStyle = '#a0aec0'; // Light gray for labels
-    ctx.font = '12px sans-serif';
-    ctx.textAlign = 'center';
-    const numYLabels = 5;
-    for (let i = 0; i <= numYLabels; i++) {
-        const yPos = padding + (i / numYLabels) * (canvasHeight - 2 * padding);
-        let labelValue;
-        if (chartScale === 'logarithmic') {
-            labelValue = Math.expm1(Math.log1p(maxValue) * (1 - (i / numYLabels)));
-        } else {
-            labelValue = maxValue * (1 - (i / numYLabels));
-        }
-        ctx.fillText(intToString(labelValue, 1), padding - 20, yPos + 4);
-
-        // Horizontal grid line
-        ctx.strokeStyle = '#4a5568'; // Subtle gray for grid
-        ctx.beginPath();
-        ctx.moveTo(padding - 5, yPos);
-        ctx.lineTo(canvasWidth - padding, yPos);
         ctx.stroke();
+
+        // --- Draw Labels and Grid ---
+        ctx.fillStyle = '#a0aec0'; // Light gray for labels
+        ctx.font = '12px sans-serif';
+        const numYLabels = 5;
+        for (let i = 0; i <= numYLabels; i++) {
+            const yPos = padding + (i / numYLabels) * (canvasHeight - 2 * padding);
+            const labelValue = Math.expm1((Math.log1p(maxValue) - Math.log1p(minValue)) * (1 - (i / numYLabels)) + Math.log1p(minValue));
+            ctx.globalAlpha = 1;
+            ctx.fillText(intToString(labelValue, 1), padding - 20, yPos + 4);
+
+            // Horizontal grid line
+            ctx.strokeStyle = '#4a5568'; // Subtle gray for grid
+            ctx.globalAlpha = 0.25;
+            ctx.beginPath();
+            ctx.moveTo(padding, yPos);
+            ctx.lineTo(canvasWidth - padding, yPos);
+            ctx.stroke();
+        }
+    } else {
+        // Magic Quality graph
+        const values = chartData.map(d => d.MQ);
+        const minValue = Math.min(...values);
+        const maxValue = Math.max(...values);
+        for (let i = 0; i < chartData.length; i++) {
+            const dataPoint = chartData[i];
+            const HATL = dataPoint.HATL ? dataPoint.HATL : 0;
+            const x = padding + ((dataPoint.time - minTime) / (maxTime - minTime)) * (canvasWidth - 2 * padding);
+            if ((x - lastLabelX) >= ((canvasWidth - 2 * padding) / 8)) {
+                lastLabelX = x;
+                ctx.fillStyle = '#a0aec0'; // Light gray for labels
+                ctx.font = '12px sans-serif';
+                ctx.fillText(secondsToTime(dataPoint.time), x, canvasHeight - padding + 20);
+            }
+            let y = (canvasHeight - padding) - ((dataPoint.MQ / maxValue) * (canvasHeight - 2 * padding));
+            if (isNaN(y)) y = canvasHeight - padding;
+            if (HATL > 0 && HATL > lastHATL) {
+                lastHATL = HATL;
+                ctx.fillStyle = 'red'; // Light gray for labels
+                ctx.font = '14px sans-serif bold';
+                ctx.fillText(HATL, x, y - 4);
+                if (y < (canvasHeight - padding - 10)) {
+                    ctx.fillStyle = '#a0aec0'; // Light gray for labels
+                    ctx.font = '12px sans-serif';
+                    ctx.fillText(secondsToTime(dataPoint.time), x, y + 18);
+                }
+            }
+            if (i === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+
+        // --- Draw Labels and Grid ---
+        ctx.fillStyle = '#a0aec0'; // Light gray for labels
+        ctx.font = '12px sans-serif';
+        const numYLabels = 5;
+        for (let i = 0; i <= numYLabels; i++) {
+            const yPos = padding + (i / numYLabels) * (canvasHeight - 2 * padding);
+            const labelValue = (maxValue - minValue) * (1 - (i / numYLabels)) + minValue;
+            ctx.globalAlpha = 1;
+            ctx.fillText(intToString(labelValue, 1), padding - 20, yPos + 4);
+
+            // Horizontal grid line
+            ctx.strokeStyle = '#4a5568'; // Subtle gray for grid
+            ctx.globalAlpha = 0.25;
+            ctx.beginPath();
+            ctx.moveTo(padding, yPos);
+            ctx.lineTo(canvasWidth - padding, yPos);
+            ctx.stroke();
+        }
     }
-    ctx.fillText(secondsToTime(minTime), padding, canvasHeight - padding + 20);
-    ctx.fillText(secondsToTime(maxTime), canvasWidth - padding, canvasHeight - padding + 20);
 }
 
 function addLogMessage(text, type) {
