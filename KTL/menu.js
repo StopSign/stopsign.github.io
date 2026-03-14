@@ -5,7 +5,7 @@
 //addMenuOptionsTab() adjust fps, saving
 //addDataTab()
 //addMenuTab("Previous Tips", <desc>) Adds a new tab that duplicates the toasts but can't
-let canvas, ctx, linearBtn, logBtn;
+let canvas, ctx, momentumBtn, magicBtn;
 
 function initializeMenus() {
     createMenu(); // makes the button | menu | title
@@ -43,24 +43,24 @@ function initializeMenus() {
 function statChartInitial() {
     canvas = document.getElementById('resourceChart');
     ctx = canvas.getContext('2d');
-    linearBtn = document.getElementById('linearBtn');
-    logBtn = document.getElementById('logBtn');
+    momentumBtn = document.getElementById('momentumBtn');
+    magicBtn = document.getElementById('magicBtn');
 
-    linearBtn.addEventListener('click', () => {
-        chartScale = 'linear';
-        linearBtn.style.backgroundColor = '#4a5568';
-        linearBtn.style.color = 'white';
-        logBtn.style.backgroundColor = '#f7fafc';
-        logBtn.style.color = '#4a5568';
+    momentumBtn.addEventListener('click', () => {
+        graphType = "momentum";
+        momentumBtn.style.backgroundColor = '#4a5568';
+        momentumBtn.style.color = 'white';
+        magicBtn.style.backgroundColor = '#f7fafc';
+        magicBtn.style.color = '#4a5568';
         drawChart();
     });
 
-    logBtn.addEventListener('click', () => {
-        chartScale = 'logarithmic';
-        logBtn.style.backgroundColor = '#4a5568';
-        logBtn.style.color = 'white';
-        linearBtn.style.backgroundColor = '#f7fafc';
-        linearBtn.style.color = '#4a5568';
+    magicBtn.addEventListener('click', () => {
+        graphType = "magic";
+        magicBtn.style.backgroundColor = '#4a5568';
+        magicBtn.style.color = 'white';
+        momentumBtn.style.backgroundColor = '#f7fafc';
+        momentumBtn.style.color = '#4a5568';
         drawChart();
     });
 }
@@ -192,16 +192,16 @@ function createDataMenu() {
         </div>
         <div id="chartContainer" style="width: 80%; max-width: 800px; background-color: #2d3748; border-radius: 8px; 
             box-shadow: 0 4px 12px rgba(0,0,0,0.4); padding: 20px;">
-            <h2 style="text-align: center; margin-top: 0; color: #e2e8f0;">Recent 100 Overclock Amounts</h2>
+            <h2 style="text-align: center; margin-top: 0; color: #e2e8f0;">Progress and HATL lvl changes</h2>
             <canvas id="resourceChart" style="width: 100%; height: 400px; border-radius: 4px;"></canvas>
             <div style="text-align: center; margin-top: 15px;">
-                <button id="linearBtn" style="padding: 10px 20px; border: 1px solid #63b3ed; background-color: #63b3ed; 
+                <button id="momentumBtn" style="padding: 10px 20px; border: 1px solid #63b3ed; background-color: #63b3ed; 
                     color: #1a202c; border-radius: 5px; cursor: pointer; font-weight: bold; transition: background-color 0.2s;">
-                    Linear
+                    Total Momentum (log)
                 </button>
-                <button id="logBtn" style="padding: 10px 20px; border: 1px solid #4a5568; background-color: #4a5568; 
+                <button id="magicBtn" style="padding: 10px 20px; border: 1px solid #4a5568; background-color: #4a5568; 
                     color: #e2e8f0; border-radius: 5px; cursor: pointer; font-weight: bold; transition: background-color 0.2s;">
-                    Logarithmic
+                    Magic Quality
                 </button>
             </div>
         </div>

@@ -52,8 +52,8 @@ data.options = {};
 data.options.bonusRate = 3;
 data.lastVisit = Date.now();
 data.queuedReveals = {}
-let chartData = []; // Stores { time: number, value: number }
-let chartScale = 'linear'; // 'linear' or 'logarithmic'
+let chartData = []; // Stores { time: number, value: number, HATL: number, MQ: number }
+let graphType = "momentum"; //"momentum" or "magic"
 
 // --- Core Settings ---
 data.gameSettings = {
