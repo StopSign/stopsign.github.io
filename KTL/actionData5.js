@@ -57,7 +57,7 @@ actionData = {
             this.updateMults();
 
             addResourceTo(actionObj, actionObj.resourceToAdd);
-            addResourceTo(data.actions.tidalBurden, (actionObj.efficiency / 100));
+            addResourceTo(data.actions.tidalBurden, (Math.min(actionObj.efficiency/100, 1)));
             addResourceTo(data.actions.dipInTheRiver, actionObj.resource / 10);
 
             views.scheduleUpdate('turnTheWheelResourceSent', intToString(actionObj.resourceToAdd, 2), "textContent")
@@ -71,7 +71,7 @@ actionData = {
             actionObj.resourceToAdd = actionObj.actionPower * actionObj.upgradeMult * (actionObj.efficiency / 100);
             actionObj.expToAddBase = 0;
             actionObj.showResourceAdded = actionObj.resourceToAdd;
-            data.actions.tidalBurden.showResourceAdded = actionObj.efficiency/100;
+            data.actions.tidalBurden.showResourceAdded = Math.min(actionObj.efficiency/100, 1);
             data.actions.dipInTheRiver.showResourceAdded = actionObj.resource/10;
         },
         onLevelAtts:[["flow", 5]],

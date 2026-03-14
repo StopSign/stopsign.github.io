@@ -201,8 +201,11 @@ function calcDeltas() {
         if(dataObj.ignoreConsume) {
             totalDecrease = 0;
         }
-
-        actionObj.resourceDecrease = totalDecrease * (1-data.upgrades.reduceResourcesConsumed.upgradePower*.05);
+        if(actionVar === "tidalBurden") {
+            actionObj.resourceDecrease = totalDecrease
+        } else {
+            actionObj.resourceDecrease = totalDecrease * (1-data.upgrades.reduceResourcesConsumed.upgradePower*.05);
+        }
 
         // Calculate the final net change per second for display.
         actionObj.resourceDelta = actionObj.resourceIncrease - actionObj.resourceDecrease;
@@ -247,7 +250,7 @@ function tickGameObject(actionVar) {
     if (!actionObj.isRunning) {
         return;
     }
-    let upgradeMult = Math.pow(1.1, data.upgrades.extraConsumptionRate.upgradePower)
+    let upgradeMult = actionVar === "tidalBurden" ? 1 : Math.pow(1.1, data.upgrades.extraConsumptionRate.upgradePower)
 
     let momentumMaxRate = dataObj.isGenerator ? dataObj.generatorSpeed / data.gameSettings.ticksPerSecond :
         (actionObj.resource * calcTierMult(dataObj.tier) * upgradeMult / data.gameSettings.ticksPerSecond);
@@ -266,7 +269,11 @@ function tickGameObject(actionVar) {
 
     // For non-generators, consume the resource used to generate progress.
     if (!dataObj.isGenerator && !dataObj.ignoreConsume) {
-        actionObj.resource -= resourceToAddInefficient * (1-data.upgrades.reduceResourcesConsumed.upgradePower*.05);
+        if(actionVar === "tidalBurden") {
+            actionObj.resource -= resourceToAddInefficient
+        } else {
+            actionObj.resource -= resourceToAddInefficient * (1-data.upgrades.reduceResourcesConsumed.upgradePower*.05);
+        }
     }
 
     if(actionObj.instability > 0) {
