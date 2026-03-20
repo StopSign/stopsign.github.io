@@ -877,6 +877,7 @@ function mouseOnActionTouch(event, actionVar) {
 // }
 
 function takeDataSnapshot(resourceValue, currentTime) {
+    if (currentTime <= 1) return;
     if (chartData.length === 0) {
         chartData.push({
             time: currentTime,
