@@ -1029,7 +1029,7 @@ function actionTriggerText(type, info, extra) {
         if(info) {
             levelMult += data.actions[info].level/5;
         }
-        let legacyGain = extra * levelMult * (data.gameState === "KTL" ? data.legacyMultKTL : Math.pow(1.2, data.upgrades.extraBrythalLegacy.upgradePower)) * Math.pow(1.1, data.upgrades.extraLegacy.upgradePower);
+        let legacyGain = extra * levelMult * (data.gameState === "KTL" ? data.legacyMultKTL : Math.pow(1.2, data.upgrades.extraBrythalLegacy.upgradePower));
         text += `+<b>${intToString(legacyGain, 2)}</b> Legacy`
     } else if(type === "addAC") {
         let ACAmount = extra

@@ -7,3 +7,10 @@ Unity/ViveTests/TV in VR/Temp/
 Unity/ViveTests/TV in VR/Assets/
 /KTL.zip
 KTL/saveFile.js
+/dist/
+/node_modules/
+/main.js
+/package.json
+/package-lock.json
+/steam_api64.dll
+/steam_appid.txt

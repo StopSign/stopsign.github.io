@@ -372,16 +372,16 @@ function actionTriggerHelper(type, info, extra) {
     } else if(type === "addAC") {
         let ACAmount = extra * (data.upgrades.listenCloserToWhispers.upgradePower === 1?3:1);
         if (data.gameState === "KTL") {
-            data.ancientCoin += ACAmount * data.ancientCoinMultKTL * Math.pow(1.05, data.upgrades.extraAncientCoins.upgradePower);
-            data.ancientCoinGained += ACAmount * data.ancientCoinMultKTL * Math.pow(1.05, data.upgrades.extraAncientCoins.upgradePower);
+            data.ancientCoin += ACAmount * data.ancientCoinMultKTL
+            data.ancientCoinGained += ACAmount * data.ancientCoinMultKTL
         } else {
             data.ancientCoin += ACAmount;
         }
     } else if(type === "addAW") {
         let AWAmount = extra * (data.upgrades.listenCloserToWhispers.upgradePower === 1?3:1) * (1 + data.lichKills/2);
         if (data.gameState === "KTL") {
-            data.ancientWhisper += AWAmount * data.ancientWhisperMultKTL * Math.pow(1.1, data.upgrades.extraAncientWhispers.upgradePower);
-            data.ancientWhisperGained += AWAmount * data.ancientWhisperMultKTL * Math.pow(1.1, data.upgrades.extraAncientWhispers.upgradePower);
+            data.ancientWhisper += AWAmount * data.ancientWhisperMultKTL;
+            data.ancientWhisperGained += AWAmount * data.ancientWhisperMultKTL;
         } else {
             data.ancientWhisper += AWAmount;
         }

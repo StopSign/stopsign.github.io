@@ -43,7 +43,7 @@ let views = {
         views.updateVal(`secondsThisLSContainer`, data.lichKills > 0 ? "" : "none", "style.display");
         views.updateVal(`secondsThisLS`, data.currentGameState.secondsThisLS, "textContent", "time");
         views.updateVal(`legacyMult`, data.legacyMultKTL, "innerText", 2);
-        views.updateVal(`ancientCoinMult`, data.ancientCoinMultKTL * Math.pow(1.05, data.upgrades.extraAncientCoins.upgradePower), "innerText", 2);
+        views.updateVal(`ancientCoinMult`, data.ancientCoinMultKTL, "innerText", 2);
 
         views.updateVal(`manaQualityDisplay`, actionData.awakenYourGrimoire.manaQuality() > 0 ? "" : "none", "style.display");
 

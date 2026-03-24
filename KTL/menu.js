@@ -629,7 +629,15 @@ function createChangelogMenu() {
     return Raw.html`
         <div class="menuTitle">Changelog</div>
         <div class="menuSeparator"></div><br>
-        v3.1.4 3/12 (current): <br>
+        v3.1.5 3/24 (current): <br>
+        [Gameplay changes]:<br>
+        <ol>
+            <li>Statistics graph has been greatly updated (thanks Disilon)</li>
+            <li>View Amulet Upgrades stops disappearing for new saves of v3</li>
+            <li>Fixed 3 genesis upgrades from applying twice (AC, AW, Legacy bonuses)</li>
+        </ol><br><br>
+        
+        v3.1.4 3/12: <br>
         [Gameplay changes]:<br>
         <ol>
             <li>Capped Eastern Monolith levels at 3, after the final lich kill</li>

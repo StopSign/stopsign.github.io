@@ -716,6 +716,7 @@ function useAmulet() {
     adjustMagicMaxLevels()
     adjustBrythalMaxLevels()
 
+    data.doneAmulet = true;
     data.currentWage = 1;
     data.currentJob = "helpScottWithChores";
     document.getElementById("jobTitle").textContent = data.actions[data.currentJob] ? actionData[data.currentJob].title : data.currentJob;
@@ -844,7 +845,6 @@ function lich1Text() {
                 <li>Legacy, Ancient Coins, and Ancient Whispers</li>
                 <li>All Attribute, Multiplier, and New Action Upgrades</li>
                 <li>Unlocked actions in Magic and Infusion</li>
-                <li>(New!) The recorded highest levels on actions</li>
                 <li>(New!) The level of Turn The Wheel</li>
             </ul>
 
@@ -856,6 +856,7 @@ function lich1Text() {
                 <li>(New!) All automation settings and custom triggers</li>
                 <li>(New!) The exp and level of Repose Rebounded</li>
                 <li>(New!) Death Energy on Repose Rebounded</li>
+                <li>(New!) The recorded highest levels on actions</li>
             </ul>
 
             (New!) You will gain:
@@ -890,7 +891,6 @@ function lich2Text() {
                 <li>Legacy, Ancient Coins, and Ancient Whispers</li>
                 <li>All Attribute, Multiplier, and New Action Upgrades</li>
                 <li>Unlocked actions in Magic and Infusion</li>
-                <li>The recorded highest levels on actions</li>
                 <li>The level of Turn The Wheel</li>
             </ul>
 
@@ -902,6 +902,7 @@ function lich2Text() {
                 <li>All automation settings and custom triggers</li>
                 <li>The exp and level of Repose Rebounded</li>
                 <li>Death Energy on Repose Rebounded</li>
+                <li>The recorded highest levels on actions</li>
             </ul>
 
             (New!) You will gain:
