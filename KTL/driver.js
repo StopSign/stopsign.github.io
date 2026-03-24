@@ -84,7 +84,7 @@ function secondPassed() {
 
     data.currentGameState.secondsPassed++;
     data.currentGameState.secondsThisLS++;
-
+    if (data.currentGameState.secondsThisGR !== undefined) data.currentGameState.secondsThisGR++;
 }
 
 function realSecondPassed() {
