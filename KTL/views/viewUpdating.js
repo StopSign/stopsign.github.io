@@ -40,7 +40,7 @@ let views = {
         views.updateVal(`highestLegacyContainer`, data.highestLegacy > 0 ? "" : "none", "style.display");
         views.updateVal(`highestLegacy`, data.highestLegacy, "textContent", 2);
         views.updateVal(`secondsPassed`, data.currentGameState.secondsPassed, "textContent", "time");
-        views.updateVal(`secondsThisGRContainer`, data.genesisResets > 0 ? "" : "none", "style.display");
+        views.updateVal(`secondsThisGRContainer`, data.currentGameState.secondsThisGR > 0 ? "" : "none", "style.display");
         views.updateVal(`secondsThisGR`, data.currentGameState.secondsThisGR, "textContent", "time");
         views.updateVal(`secondsThisLSContainer`, (data.lichKills > 0 || data.genesisResets > 0) ? "" : "none", "style.display");
         views.updateVal(`secondsThisLS`, data.currentGameState.secondsThisLS, "textContent", "time");
