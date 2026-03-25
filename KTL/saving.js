@@ -1,13 +1,13 @@
-const actionsSchema = ['actionVar','cooldown','purchased','lowestUnlockTime','lowestLevel1Time','cooldownTimer',
+const actionsSchema = ['actionVar','purchased','lowestUnlockTime','lowestLevel1Time','prevUnlockTime','prevLevel1Time',
     'automationOnReveal','automationCanDisable','currentMenu','hasBeenUnlocked','unlockedCount','highestLevel',
-    'secondHighestLevel','thirdHighestLevel','resource','progress','progressGain','instability','progressMaxBase',
+    'secondHighestLevel','thirdHighestLevel','resource','progress','progressGain','progressMaxBase',
     'progressMaxMult','progressMax','actionPowerBase','actionPowerMult','level','maxLevel','exp','expGain','power',
     'expToLevelBase','expToLevelMult','expToLevel','resourceDelta','resourceIncrease','resourceDecrease',
-    'resourceRetrieved','resourceToAdd','resourceIncreaseFromGens','totalSend','expToLevelIncrease',
+    'resourceRetrieved','resourceToAdd','resourceIncreaseFromGens','expToLevelIncrease',
     'actionPowerMultIncrease','progressMaxIncrease','visible','showResourceAdded','showExpAdded','currentCustomNum',
     'unlockTime','level1Time','unlockCost','unlocked','isRunning','onLevelAtts','efficiencyAtts','expAtts',
     'efficiencyBase','efficiencyMult','expertise','attReductionEffect','efficiency','actionPower','expToAddBase',
-    'expToAddMult','expToAdd','upgradeMult'];
+    'expToAddMult','expToAdd','upgradeMult','readStory'];
 
 function clearSave() {
     console.log("Clearing save")
@@ -59,7 +59,6 @@ function load() {
             } else {
                 console.log('Save found.');
                 try {
-                    // toLoad = JSON.parse(localStorage[saveName]);
                     toLoad = JSON.parse(decode64(localStorage[saveName]));
                 } catch (e) {
                     try { //old save
@@ -87,7 +86,7 @@ function load() {
         handleV2Saves(toLoad) //set aside the data you need, show welcome back message
         document.getElementById("welcomeBackMessage").style.display = "";
     } else if(localStorage[saveName] && toLoad.actions) {
-        toLoad.actions = saveVersionFromLoad === 7 ? toLoad.actions : reverseExtractNestedSchema(toLoad.actions, actionsSchema);
+        toLoad.actions = saveVersionFromLoad <= 7 ? toLoad.actions : reverseExtractNestedSchema(toLoad.actions, actionsSchema);
         //only go through the ones in toLoad and graft them on to existing data
         for(let actionVar in toLoad.actions) {
             let actionObj = data.actions[actionVar];
@@ -482,7 +481,7 @@ function exportSave() {
     document.getElementById("exportImportSave").value = "";
 }
 
-function exportFile(data, name) {
+function exportFile(data, name, ext = "txt") {
     const blob = new Blob([data], { type: 'application/gzip' });
     const url = URL.createObjectURL(blob);
 
@@ -498,7 +497,7 @@ function exportFile(data, name) {
     const minutes = String(now.getMinutes()).padStart(2, '0');
     const seconds = String(now.getSeconds()).padStart(2, '0');
 
-    a.download = `${name}_${year}-${month}-${day}_${hours}-${minutes}-${seconds}.save`;
+    a.download = `${name}_${year}-${month}-${day}_${hours}-${minutes}-${seconds}.${ext}`;
 
     document.body.appendChild(a);
     a.click();
@@ -510,7 +509,7 @@ function exportFile(data, name) {
 function exportSaveFile(name="KTL_Save") {
     save();
     const data = fflate.gzipSync(fflate.strToU8(window.localStorage[saveName]));
-    exportFile(data, name)
+    exportFile(data, name, "save")
 }
 
 function importSave() {
