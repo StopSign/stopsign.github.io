@@ -165,7 +165,7 @@ function load() {
 
         data.currentGameState = toLoad.currentGameState;
 
-        data.chartData = reverseExtractNestedSchema(toLoad.chartData) ?? [];
+        data.chartData = reverseExtractNestedSchema(toLoad.chartData, true) ?? [];
 
         //data correction
         if(toLoad.gameSettings.viewAdvancedSliders === undefined) { //defaults off on new saves
@@ -695,10 +695,12 @@ function extractNestedSchemaFromObject(obj, schema) {
     return { schema, object: sharedFields, exclusive: exclusiveFields };
 }
 
-function reverseExtractNestedSchema(extractedData) {
+function reverseExtractNestedSchema(extractedData, ignoreMissing) {
     // Input validation
     if (extractedData === null || extractedData === undefined) {
-        console.warn('Extracted data cannot be null or undefined');
+        if (!ignoreMissing) {
+            console.warn('Extracted data cannot be null or undefined');
+        }
         return;
     }
 
