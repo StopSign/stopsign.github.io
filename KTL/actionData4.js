@@ -215,7 +215,8 @@ actionData = {
                 +<span style="font-weight:bold;" id="threadArcanaResourceSent">???</span> Arcana is added to Prepare Spells.<br>
                 `},
         extraInfo: {english:Raw.html`Exp gain = (10% of Mana)^2 * Speed * Mana Quality.<br>
-        Arcana gain = Action Power * Speed<br>Consumes 10% of Mana per tick`},
+        Arcana gain = Action Power * Speed<br>Consumes 10% of Mana per tick<br>
+        Treats a Mana Quality value of 0 as a 1`},
         actionTriggers: [
             ["info", "text", "Takes Mana and converts it to exp. This is better with more Mana (see info)."],
             ["info", "text", "Arcane is generated over time."]
@@ -230,7 +231,7 @@ actionData = {
         unlockCost:0, visible:false, unlocked:false, purchased: true, hasUpstream:false,
         hideUpstreamLine: true,
         onLevelCustom: function () {
-            data.legacyMultKTL = Math.pow(1.04, data.actions.castingExperience.level) * Math.pow(1.1, data.upgrades.extraLegacy.upgradePower);
+            data.legacyMultKTL = Math.pow(1.04, data.actions.castingExperience.level);
         },
         onLevelAtts:[["archmagery", 2], ["spellcraft", 1], ["integration", 1]],
         expAtts:[["wizardry", 1], ["intellect", 1]],

@@ -1156,6 +1156,14 @@ let upgradeData = {
             return "Reveals the times an action has been unlocked. Permanently multiply unlock cost of all actions by (1 - (times unlocked * .04) / (1 + times unlocked * .04))";
         },
         onBuy: function(num) {
+            //because their upgrade costs get skipped
+            for (let actionVar in data.actions) {
+                let actionObj = data.actions[actionVar];
+                let dataObj = actionData[actionVar];
+                if (dataObj.plane === 1 || dataObj.plane === 3) {
+                    actionObj.unlockCost *= (1 - (actionObj.unlockedCount * .04) / (1 + actionObj.unlockedCount * .04))
+                }
+            }
         }
     },
     rememberTheVictories:{

@@ -497,6 +497,7 @@ let maxLevelTop = (data.gameSettings.viewDeltas && data.gameSettings.viewRatio) 
         <div id="${actionVar}_attsContainer" style="display:none;padding:5px;max-height:220px;overflow-y:auto;font-size;12px;">
             ${generateActionOnLevelAtts(actionVar)}
             ${generateActionExpAtts(actionVar)}
+            ${generateActionSpeedAtts(actionVar)}
             ${generateActionTimeStats(actionVar)}
         </div>`;
 
@@ -740,7 +741,7 @@ function generateActionExpAtts(actionVar) {
 
     queueCache(`${actionVar}AttExpContainer`);
     let expAttsStr =
-        `<div id="${actionVar}AttExpContainer" style="display:none;">${isFirst?"":"<br>"}<u>Stat Modifiers to ${dataObj.isGenerator?"Exp":"Progress"}:</u><br>`;
+        `<div id="${actionVar}AttExpContainer" style="display:none;">${isFirst?"":"<br>"}<u>Attribute Modifiers to ${dataObj.isGenerator?"Exp":"Progress"}:</u><br>`;
 
     for(let attObj of dataObj.expAtts) {
         let attVar = attObj[0];
@@ -765,6 +766,118 @@ function generateActionExpAtts(actionVar) {
             `<span style="color:var(--text-muted);">Total Reduction = 1 / </span><b><span id="${actionVar}AttReductionEffect">1</span></b>
         </div>`;
     return expAttsStr;
+}
+
+function generateActionSpeedAtts(actionVar) {
+    let actionObj = data.actions[actionVar];
+    let dataObj = actionData[actionVar];
+
+    let isFirst = dataObj.onLevelAtts.length === 0 && dataObj.expAtts.length === 0;
+    let overcap = data.upgrades.higherSpeedCaps.upgradePower * .1;
+
+    if(dataObj.efficiencyAtts.length === 0) {
+        return;
+    }
+
+    let hasPositiveSpeedMults = false;
+    let hasZeroSpeedMults = false;
+    for(let attObj of dataObj.efficiencyAtts) {
+        let attVar = attObj[0];
+        let goal = attObj[1];
+        if (goal === 0) {
+            hasZeroSpeedMults = true;
+        } else if(goal > 0) {
+            hasPositiveSpeedMults = true;
+        }
+    }
+
+    queueCache(`${actionVar}AttEfficiencyContainer`);
+    let strain = 1 / dataObj.efficiencyBase;
+    let expertiseModsStr =
+        `<div id="${actionVar}AttEfficiencyContainer" style="display:none;">${isFirst ? "" : "<br>"}`;
+
+    if(hasPositiveSpeedMults) {
+        expertiseModsStr += `
+            <u>Attribute Modifiers to Speed:</u><br>
+        `;
+        for (let attObj of dataObj.efficiencyAtts) {
+            let attVar = attObj[0];
+            let goal = attObj[1];
+            if (goal === 0) {
+                continue;
+            }
+            if (!data.atts[attVar]) {
+                console.log(`ERROR: you need to instantiate the stat: '${attVar}'`);
+            }
+            queueCache(`${actionVar}_${attVar}AttCurrentNum`);
+            queueCache(`${actionVar}_${attVar}AttProgressPerc`);
+            queueCache(`${actionVar}${attVar}InsideContainerSpeed1`);
+
+            expertiseModsStr += `
+        <div id="${actionVar}${attVar}InsideContainerSpeed1" style="color:var(--text-muted);cursor:pointer;display:none;border:2px solid transparent;" 
+            class="backgroundWhenHover" onclick="clickedAttName('${attVar}', true)">
+            <img src="img/${attVar}.svg" alt="${attVar}" style="margin:1px;width:20px;height:20px;vertical-align:top;background:var(--attribute-use-eff-bg-color)" />
+            <span style="color:var(--text-primary);font-weight:bold;" id="${actionVar}_${attVar}AttCurrentNum"></span> / 
+            <span style="color:var(--text-primary);font-weight:bold;">${goal}</span> = 
+            <span style="color:var(--text-primary);font-weight:bold;" id="${actionVar}_${attVar}AttProgressPerc"></span>% Progress
+            <br>
+        </div>`
+        }
+
+        queueCache(`${actionVar}AttAverageProgress`);
+        queueCache(`${actionVar}AttOvercapContainer`);
+        queueCache(`${actionVar}AttOvercap`);
+        expertiseModsStr += `
+        <span style="color:var(--text-muted);">Average Progress = </span><span id="${actionVar}AttAverageProgress" style="font-weight:bold"></span>%
+        <span style="color:var(--text-muted);" id="${actionVar}AttOvercapContainer"><br>Overcap = <span id="${actionVar}AttOvercap" style="font-weight:bold;color:var(--text-primary)"></span>%</span>
+        <br><br>`;
+    }
+
+    if(hasZeroSpeedMults) {
+        expertiseModsStr += `<u>Bonus Modifiers to Speed:</u><br>`
+        for (let attObj of dataObj.efficiencyAtts) {
+            let attVar = attObj[0];
+            let goal = attObj[1];
+            if (goal !== 0) {
+                continue;
+            }
+            if (!data.atts[attVar]) {
+                console.log(`ERROR: you need to instantiate the stat: '${attVar}'`);
+            }
+            queueCache(`${actionVar}_${attVar}AttCurrentNum`);
+            queueCache(`${actionVar}_${attVar}AttCurrentMult`);
+            queueCache(`${actionVar}${attVar}InsideContainerSpeed2`);
+
+            expertiseModsStr += `
+        <div id="${actionVar}${attVar}InsideContainerSpeed2" style="color:var(--text-muted);cursor:pointer;display:none;border:2px solid transparent;" 
+            class="backgroundWhenHover" onclick="clickedAttName('${attVar}', true)">
+            <img src="img/${attVar}.svg" alt="${attVar}" style="margin:1px;width:20px;height:20px;vertical-align:top;background:var(--attribute-use-eff-bg-color)" />
+            
+            <span style="color:var(--text-primary);font-weight:bold;" id="${actionVar}_${attVar}AttCurrentNum"></span> = 
+            x<span style="color:var(--text-primary);font-weight:bold;" id="${actionVar}_${attVar}AttCurrentMult"></span>
+            
+            <br>
+        </div>`
+        }
+
+        queueCache(`${actionVar}AttTotalBonus`);
+        expertiseModsStr += `
+        <span style="color:var(--text-muted);">Total Attribute Bonus = x</span><b><span id="${actionVar}AttTotalBonus"></span></b>
+        <br><br>`;
+    }
+
+    if(hasPositiveSpeedMults || hasZeroSpeedMults) {
+        queueCache(`${actionVar}AttOvercapContainer2`);
+
+        expertiseModsStr += `
+           <span style="color:var(--text-muted)">Strain: </span><b>${intToString(strain, 2)}</b><br>
+        Speed = (1 / Strain)${hasPositiveSpeedMults?" ^ (1 - Average Progress)":""}${hasZeroSpeedMults?" x Attribute Bonus":""}
+        <span id="${actionVar}AttOvercapContainer2"> x (1 + Overcap)</span>
+        </div>
+        `
+    }
+
+    return expertiseModsStr;
 }
 
 function generateActionTimeStats(actionVar) {
@@ -794,42 +907,6 @@ function generateActionTimeStats(actionVar) {
     return timeStats;
 }
 
-//This is for the old efficiency format - not used. Kept in case I want to show the math for current speed calculation
-function generateActionEfficiencyAtts(actionVar) {
-    let actionObj = data.actions[actionVar];
-    let dataObj = actionData[actionVar];
-
-    let isFirst = dataObj.onLevelAtts.length === 0 && dataObj.expAtts.length === 0;
-
-    queueCache(`${actionVar}AttEfficiencyContainer`);
-    let expertiseModsStr =
-        `<div id="${actionVar}AttEfficiencyContainer" style="display:none;">${isFirst?"":"<br>"}<u>Stat Modifiers to Speed:</u><br>`;
-
-    for(let attObj of dataObj.efficiencyAtts) {
-        let attVar = attObj[0];
-        let ratio = attObj[1] * 100;
-        if(!data.atts[attVar]) {
-            console.log(`ERROR: you need to instantiate the stat: '${attVar}'`);
-        }
-        queueCache(`${actionVar}_${attVar}AttEfficiencyMult`);
-        queueCache(`${actionVar}${attVar}InsideContainereff`);
-
-        expertiseModsStr += Raw.html`
-        <div id="${actionVar}${attVar}InsideContainereff" style="color:var(--text-muted);cursor:pointer;display:none;border:2px solid transparent;" 
-            class="backgroundWhenHover" onclick="clickedAttName('${attVar}', true)">
-            <span style="color:var(--text-primary)"><b>${ratio}</b></span>% of <img src="img/${attVar}.svg" alt="${attVar}" 
-            style="margin:1px;width:20px;height:20px;vertical-align:top;background:var(--attribute-use-eff-bg-color)" />
-            <span style="color:var(--text-primary)"><b>${capitalizeFirst(attVar)}</b></span>'s bonus 
-            = x<b><span style="color:var(--text-primary)" id="${actionVar}_${attVar}AttEfficiencyMult">1</span></b><br>
-        </div>`
-    }
-    queueCache(`${actionVar}EfficiencyMult`);
-    expertiseModsStr += Raw.html`
-        <span style="color:var(--text-muted);">Total Speed Mult = x</span><b><span id="${actionVar}EfficiencyMult"></span></b>
-    </div>`;
-    
-    return expertiseModsStr;
-}
 
 function generateUnlockText(actionVar) {
     let dataObj = actionData[actionVar];

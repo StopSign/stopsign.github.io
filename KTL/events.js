@@ -656,7 +656,11 @@ function updateAttActionContainers() {
         for (let attObj of dataObj.efficiencyAtts) {
             let attVar = attObj[0];
             views.updateVal(`${actionVar}${attVar}OutsideContainereff`, selectedStat && selectedStat === attVar ? "var(--text-selected-color)" : "var(--attribute-use-eff-color)", "style.borderColor");
-            // views.updateVal(`${actionVar}${attVar}InsideContainereff`, selectedStat && selectedStat === attVar ? "var(--text-selected-color)" : "transparent", "style.borderColor");
+            if(attObj[1] > 0) {
+                views.updateVal(`${actionVar}${attVar}InsideContainerSpeed1`, selectedStat && selectedStat === attVar ? "var(--text-selected-color)" : "transparent", "style.borderColor");
+            } else if(attObj[1] === 0) {
+                views.updateVal(`${actionVar}${attVar}InsideContainerSpeed2`, selectedStat && selectedStat === attVar ? "var(--text-selected-color)" : "transparent", "style.borderColor");
+            }
         }
     }
 }

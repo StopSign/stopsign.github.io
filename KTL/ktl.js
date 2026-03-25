@@ -93,7 +93,7 @@ function resetGameToBase() {
 
     LSMenuOpen = false;
     views.updateVal("legacySeveranceMenu", "none", "style.display");
-    data.legacyMultKTL = Math.pow(1.1, data.upgrades.extraLegacy.upgradePower);
+    data.legacyMultKTL = 1;
     data.ancientCoinMultKTL = Math.pow(1.05, data.upgrades.extraAncientCoins.upgradePower);
     data.ancientWhisperMultKTL = Math.pow(1.1, data.upgrades.extraAncientWhispers.upgradePower);
 
@@ -115,7 +115,11 @@ function resetGameToBase() {
         }
         for (let attVarObj of dataObj.efficiencyAtts) {
             views.updateVal(`${actionVar}${attVarObj[0]}OutsideContainereff`, "none", "style.display");
-            // views.updateVal(`${actionVar}${attVarObj[0]}InsideContainereff`, "none", "style.display");
+            if(attVarObj[1] > 0) {
+                views.updateVal(`${actionVar}${attVarObj[0]}InsideContainerSpeed1`, "none", "style.display");
+            } else if(attVarObj[1] === 0) {
+                views.updateVal(`${actionVar}${attVarObj[0]}InsideContainerSpeed2`, "none", "style.display");
+            }
         }
         views.updateVal(`${actionVar}UnlockText`, generateUnlockText(actionVar), "innerHTML");
     }
@@ -721,6 +725,7 @@ function useAmulet() {
     data.currentJob = "helpScottWithChores";
     document.getElementById("jobTitle").textContent = data.actions[data.currentJob] ? actionData[data.currentJob].title : data.currentJob;
     document.getElementById("jobWage").textContent = intToString(data.currentWage, 2);
+    document.getElementById("legacySeveranceButton1").style.display = "none";
 
     setSliderUI("overclock", "reflect", data.actions["reflect"].automationOnReveal);
 

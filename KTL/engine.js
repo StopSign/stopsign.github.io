@@ -65,7 +65,6 @@ function actionSetBaseVariables(actionObj, dataObj) {
     actionObj.resourceDecrease = 0;
     actionObj.resourceRetrieved = 0;
     actionObj.resourceToAdd = dataObj.generatorSpeed ? 0 : undefined;
-    actionObj.resourceIncreaseFromGens = 0;
     actionObj.totalSend = 0;
     actionObj.expToLevelIncrease = dataObj.expToLevelIncrease;
     actionObj.actionPowerMultIncrease = dataObj.actionPowerMultIncrease ? dataObj.actionPowerMultIncrease : 1;
@@ -191,7 +190,80 @@ function calcStatMult(actionVar) {
 }
 
 //calcEfficiency calcExpertise
-function calcAttExpertise(actionVar) {
+function calcAttExpertise(actionVar, updateView = false) {
+    let actionObj = data.actions[actionVar];
+    let capLevel = data.upgrades.higherSpeedCaps.upgradePower;
+
+    let overcapMax = capLevel * 0.1;
+    let maxIndProgress = 1 + overcapMax;
+
+    let totalProgress = 0;
+    let statCount = 0;
+    let zeroIdealMult = 1;
+
+    let hasPositive = false;
+    let hasZero = false;
+
+    for (let [name, ideal] of actionObj.efficiencyAtts) {
+        let attData = data.atts[name];
+        if (!attData) {
+            console.log(`You need to instantiate the attribute ${name}`);
+            continue;
+        }
+
+        let val = attData.num;
+
+        if (ideal === 0) {
+            zeroIdealMult *= attData.attMult;
+            hasZero = true;
+
+            if (updateView) {
+                views.updateVal(`${actionVar}_${name}AttCurrentNum`, val, "textContent", 1);
+                views.updateVal(`${actionVar}_${name}AttCurrentMult`, attData.attMult, "textContent", 2);
+            }
+        } else {
+            let ratio = Math.max(val / ideal, 0);
+            let indProgress = ratio > 1 ? 1 + ((ratio - 1) * 0.1) : ratio;
+            indProgress = Math.min(indProgress, maxIndProgress);
+
+            totalProgress += indProgress;
+            statCount++;
+            hasPositive = true;
+
+            if (updateView) {
+                views.updateVal(`${actionVar}_${name}AttCurrentNum`, val, "textContent", 1);
+                views.updateVal(`${actionVar}_${name}AttProgressPerc`, indProgress * 100, "textContent", 1);
+            }
+        }
+    }
+
+    let avgProgress = statCount > 0 ? (totalProgress / statCount) : 1;
+
+    let progressMult = Math.min(avgProgress, 1);
+    let overcapMult = Math.max(avgProgress, 1);
+
+    if (updateView) {
+        if (hasPositive) {
+            let baseDisplayStr = intToString(progressMult * 100, 1);
+            let overcapDisplayStr = avgProgress <= 1 ? "" : ` (${intToString(avgProgress * 100, 1)})`;
+
+            views.updateVal(`${actionVar}AttAverageProgress`, baseDisplayStr + overcapDisplayStr, "textContent");
+
+            let overcapDisplayRaw = Math.max(Math.min((avgProgress - 1) * 100, overcapMax * 100), 0);
+            views.updateVal(`${actionVar}AttOvercap`, overcapDisplayRaw, "textContent", 2);
+        }
+        if (hasZero) {
+            views.updateVal(`${actionVar}AttTotalBonus`, zeroIdealMult, "textContent", 2);
+        }
+    }
+
+    let rawExpertise = Math.pow(actionObj.efficiencyBase, 1 - progressMult) * zeroIdealMult * overcapMult;
+
+    actionObj.expertise = Math.min(rawExpertise, 1 + overcapMax);
+    actionObj.efficiency = actionObj.expertise * 100;
+}
+
+function calcAttExpertiseOld(actionVar) {
     let actionObj = data.actions[actionVar];
     let capLevel = data.upgrades.higherSpeedCaps.upgradePower;
     let totalProgress = 0, totalBonus = 0, statCount = 0, zeroIdealMult = 1;
@@ -224,48 +296,6 @@ function calcAttExpertise(actionVar) {
     let rawExpertise = Math.pow(actionObj.efficiencyBase, 1 - progressMult) * zeroIdealMult * overcapMult;
 
     actionObj.expertise = Math.min(rawExpertise, 1 + (capLevel * 0.1));
-    actionObj.efficiency = actionObj.expertise * 100;
-}
-
-function calcAttExpertiseOld(actionVar) {
-    let actionObj = data.actions[actionVar];
-    // let dataObj = actionData[actionVar];
-
-    let sumIdeals = 0;
-    for(let expertiseAtt of actionObj.efficiencyAtts) {
-        sumIdeals += expertiseAtt[1];
-    }
-
-    let progressMult = 1;
-    let zeroIdealPenalty = 0;
-    for(let expertiseAtt of actionObj.efficiencyAtts) {
-        let name = expertiseAtt[0];
-        let ideal = expertiseAtt[1];
-
-        if(!data.atts[name]) {
-            console.log(`You need to instantiate the attribute ${name}`);
-            continue;
-        }
-
-        let val = data.atts[name].num;
-
-        if (ideal === 0) {
-            if(val < 0) {
-                zeroIdealPenalty += Math.abs(val) / 100;
-            }
-        } else {
-            if(val > ideal) {
-                val = ideal;
-            }
-            let progress = (val - (ideal - sumIdeals)) / sumIdeals;
-            if (progress < 0) progress = 0;
-            if (progress > 1) progress = 1;
-            progressMult *= progress;
-        }
-    }
-
-    let totalExponent = (1 - progressMult) + zeroIdealPenalty;
-    actionObj.expertise = Math.pow(actionObj.efficiencyBase, totalExponent);
     actionObj.efficiency = actionObj.expertise * 100;
 }
 
@@ -818,8 +848,24 @@ function revealAtt(attVar) {
     }
     for (let actionVar of attObj.linkedActionEfficiencyAtts) {
         views.updateVal(`${actionVar}${attVar}OutsideContainereff`, "", "style.display");
-        // views.updateVal(`${actionVar}${attVar}InsideContainereff`, "", "style.display");
-        // views.updateVal(`${actionVar}AttEfficiencyContainer`, "", "style.display");
+        let dataObj = actionData[actionVar];
+        let hasPositiveSpeedMults = false;
+        for(let efficiencyAtt of dataObj.efficiencyAtts) {
+            if(efficiencyAtt[0] === attVar) {
+                if(efficiencyAtt[1] > 0) {
+                    hasPositiveSpeedMults = true;
+                    views.updateVal(`${actionVar}${attVar}InsideContainerSpeed1`, "", "style.display");
+                } else if(efficiencyAtt[1] === 0) {
+                    views.updateVal(`${actionVar}${attVar}InsideContainerSpeed2`, "", "style.display");
+                }
+                break;
+            }
+        }
+        views.updateVal(`${actionVar}AttEfficiencyContainer`, "", "style.display");
+        if(hasPositiveSpeedMults) {
+            views.updateVal(`${actionVar}AttOvercapContainer`, data.upgrades.higherSpeedCaps.upgradePower > 0 ? "" : "none", "style.display");
+            views.updateVal(`${actionVar}AttOvercapContainer2`, data.upgrades.higherSpeedCaps.upgradePower > 0 ? "" : "none", "style.display");
+        }
     }
     for(let actionVar of attObj.linkedActionOnLevelAtts) {
         views.updateVal(`${actionVar}AttOnLevelContainer`, "", "style.display");
