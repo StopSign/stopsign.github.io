@@ -7,6 +7,7 @@ function saveFileCorrection(saveVersionFromLoad) {
     if(data.resetCount >= 1) {
         data.doneAmulet = true;
     }
+    data.upgrades.rememberMyMastery.initialCost = 600;
 
     return refundAmount;
 }
