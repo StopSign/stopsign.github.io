@@ -187,6 +187,9 @@ function createDataMenu() {
         <div id="secondsPassedContainer">
             Time Passed, total: <span id="secondsPassed"></span>
         </div>
+        <div id="secondsThisGRContainer">
+            Time Passed, this Genesis Reset: <span id="secondsThisGR"></span>
+        </div>
         <div id="secondsThisLSContainer">
             Time Passed, this Legacy Severance: <span id="secondsThisLS"></span>
         </div>

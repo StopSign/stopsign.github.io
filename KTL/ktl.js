@@ -144,6 +144,7 @@ function genesisReset(forceReset) {
     data.ancientCoin = 0;
     data.ancientWhisper = 0;
     data.currentGameState.secondsThisLS = 0;
+    data.currentGameState.secondsThisGR = 0;
     data.highestLegacy = 0;
 
     clearUpgradesForGenesis()
@@ -485,7 +486,7 @@ function logKTL() {
         },
         stage2: null
     });
-    if (data.resetLogs.length > 10) data.resetLogs.shift();
+    if (data.resetLogs.length > 100) data.resetLogs.shift();
     data.ancientCoinGained = 0;
     data.ancientWhisperGained = 0;
     refreshResetLog();
@@ -545,7 +546,7 @@ function renderResetLog() {
     }
     return `
         <div style="overflow-x:auto">
-            <div style="font-size:20px; font-weight:bold; margin:0 0 6px 0;">Recent Run Statistics (Last 10)</div>
+            <div style="font-size:20px; font-weight:bold; margin:0 0 6px 0;">Recent Run Statistics (Last 100)</div>
             <table style="width:100%;border-collapse:collapse;font-size:16px;white-space:nowrap">
                 <thead>
                     <tr>
