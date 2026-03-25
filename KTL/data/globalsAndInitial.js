@@ -97,8 +97,12 @@ let isLoadingEnabled = true; //SET FOR COMMIT
 // let isLoadingEnabled = false;
 let loadStaticSaveFile = false; //SET FOR COMMIT
 // let loadStaticSaveFile = true;
+let isSteam = false; //SET FOR COMMIT
+// let isSteam = true; //SET FOR STEAM
+
 
 data.upgrades = {};
+
 
 let isDebug = false; //SET FOR COMMIT
 // let isDebug = true;

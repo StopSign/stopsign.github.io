@@ -1247,7 +1247,7 @@ let upgradeData = {
         }
     },
     rememberMyMastery: {
-        initialCost:6000, costIncrease:1, creationVersion: 6,
+        initialCost:600, costIncrease:1, creationVersion: 6,
         upgradesAvailable:1, type:"unique",
         visible:false,
         customInfo: function(num) {
