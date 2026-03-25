@@ -1,3 +1,14 @@
+const actionsSchema = ['actionVar','cooldown','purchased','lowestUnlockTime','lowestLevel1Time','cooldownTimer',
+    'automationOnReveal','automationCanDisable','currentMenu','hasBeenUnlocked','unlockedCount','highestLevel',
+    'secondHighestLevel','thirdHighestLevel','resource','progress','progressGain','instability','progressMaxBase',
+    'progressMaxMult','progressMax','actionPowerBase','actionPowerMult','level','maxLevel','exp','expGain','power',
+    'expToLevelBase','expToLevelMult','expToLevel','resourceDelta','resourceIncrease','resourceDecrease',
+    'resourceRetrieved','resourceToAdd','resourceIncreaseFromGens','totalSend','expToLevelIncrease',
+    'actionPowerMultIncrease','progressMaxIncrease','visible','showResourceAdded','showExpAdded','currentCustomNum',
+    'unlockTime','level1Time','unlockCost','unlocked','isRunning','onLevelAtts','efficiencyAtts','expAtts',
+    'efficiencyBase','efficiencyMult','expertise','attReductionEffect','efficiency','actionPower','expToAddBase',
+    'expToAddMult','expToAdd','upgradeMult'];
+
 function clearSave() {
     window.localStorage[saveName] = "";
     location.reload();
@@ -16,7 +27,7 @@ function loadUpgradeFromSave(actionObj, loadObj) {
     Object.assign(actionObj, loadObj);
 }
 
-data.saveVersion = 7;
+data.saveVersion = 8;
 function load() {
     initializeData();
 
@@ -39,6 +50,7 @@ function load() {
         if (localStorage[saveName]) {
             console.log('Save found.');
             try {
+                // toLoad = JSON.parse(localStorage[saveName]);
                 toLoad = JSON.parse(decode64(localStorage[saveName]));
             } catch (e) {
                 try { //old save
@@ -65,6 +77,7 @@ function load() {
         handleV2Saves(toLoad) //set aside the data you need, show welcome back message
         document.getElementById("welcomeBackMessage").style.display = "";
     } else if(localStorage[saveName] && toLoad.actions) {
+        toLoad.actions = saveVersionFromLoad === 7 ? toLoad.actions : reverseExtractNestedSchema(toLoad.actions, actionsSchema);
         //only go through the ones in toLoad and graft them on to existing data
         for(let actionVar in toLoad.actions) {
             let actionObj = data.actions[actionVar];
@@ -142,6 +155,8 @@ function load() {
         data.fightGenerated = toLoad.fightGenerated ?? 0;
 
         data.currentGameState = toLoad.currentGameState;
+
+        data.chartData = reverseExtractNestedSchema(toLoad.chartData) ?? [];
 
         //data correction
         if(toLoad.gameSettings.viewAdvancedSliders === undefined) { //defaults off on new saves
@@ -443,7 +458,11 @@ function reapplyAttentionSelected() {
 
 function save() {
     data.lastVisit = Date.now();
-    window.localStorage[saveName] = encode64(JSON.stringify(data));
+    let sdata = structuredClone(data);
+    sdata.chartData = extractNestedSchema(sdata.chartData);
+    sdata.actions = extractNestedSchema(sdata.actions, actionsSchema);
+    // window.localStorage[saveName] = JSON.stringify(sdata);
+    window.localStorage[saveName] = encode64(JSON.stringify(sdata));
 }
 
 function exportSave() {
@@ -513,4 +532,259 @@ function importSaveFile() {
         location.reload();
     };
     reader.readAsText(file);
+}
+
+// function extractArraySchema(objects, fields) {
+//     if (!Array.isArray(objects) || !Array.isArray(fields)) {
+//         console.log('Invalid input: objects and fields must be arrays');
+//     }
+//
+//     return objects.map(obj => {
+//         return fields.map(field => obj[field]);
+//     });
+// }
+//
+// function returnArraySchema(arrays, fields) {
+//     if (!Array.isArray(arrays) || !Array.isArray(fields)) {
+//         console.log('Invalid input: arrays and fields must be arrays');
+//     }
+//
+//     return arrays.map(arr => {
+//         if (!Array.isArray(arr)) {
+//             console.log('Each element must be an array');
+//         }
+//
+//         const obj = {};
+//         fields.forEach((field, index) => {
+//             obj[field] = arr[index];
+//         });
+//         return obj;
+//     });
+// }
+
+function extractNestedSchema(data, schema) {
+    // Input validation
+    if (data === null || data === undefined) {
+        console.warn('Input cannot be null or undefined');
+        return;
+    }
+
+    if (Array.isArray(data)) {
+        return extractNestedSchemaFromArray(data, schema);
+    } else if (typeof data === 'object') {
+        return extractNestedSchemaFromObject(data, schema);
+    } else {
+        console.warn('Input must be an object or array');
+    }
+}
+
+function extractNestedSchemaFromArray(arr, schema) {
+    // Validate input
+    if (!Array.isArray(arr)) {
+        console.warn('Expected array');
+        return;
+    }
+
+    // Auto-detect schema if not provided
+    if (!Array.isArray(schema)) {
+        const schemaSet = new Set();
+
+        arr.forEach((item, index) => {
+            if (item && typeof item === 'object') {
+                Object.keys(item).forEach(key => schemaSet.add(key));
+            } else if (item !== undefined && item !== null) {
+                console.warn(`Warning: Item at index ${index} is not an object:`, item);
+            }
+        });
+
+        schema = Array.from(schemaSet);
+    }
+
+    // Extract values
+    const extractedArray = arr.map((item, index) => {
+        if (!item || typeof item !== 'object') {
+            console.warn(`Warning: Item at index ${index} is not an object, using undefined values`);
+            return schema.map(() => undefined);
+        }
+        return schema.map(field => item[field]);
+    });
+
+    // Return with schema attached
+    return {schema, array: extractedArray};
+}
+
+function extractNestedSchemaFromObject(obj, schema) {
+    // Validate input
+    if (typeof obj !== 'object' || obj === null) {
+        console.warn('Expected object');
+        return;
+    }
+
+    const keys = Object.keys(obj);
+
+    // Handle empty object
+    if (keys.length === 0) {
+        return { schema: schema || [], object: {}, exclusive: {} };
+    }
+
+    // Initialize results
+    const sharedFields = {};
+    const exclusiveFields = {};
+
+    // Process each top-level key
+    for (const key of keys) {
+        const value = obj[key];
+
+        // Skip if not an object
+        if (!value || typeof value !== 'object' || Array.isArray(value)) {
+            console.warn(`Warning: Value for key "${key}" is not a plain object`);
+            sharedFields[key] = schema.map(() => undefined);
+            continue;
+        }
+
+        // Extract shared fields in schema order
+        const sharedArray = [];
+        const exclusiveObj = {};
+
+        for (let i = 0; i < schema.length; i++) {
+            const field = schema[i];
+            if (field in value) {
+                sharedArray[i] = value[field];
+            } else {
+                sharedArray[i] = undefined;
+            }
+        }
+        sharedFields[key] = sharedArray;
+
+        // Collect exclusive fields (not in schema)
+        for (const field of Object.keys(value)) {
+            if (!schema.includes(field)) {
+                exclusiveObj[field] = value[field];
+            }
+        }
+
+        // Only add exclusive object if it has properties
+        if (Object.keys(exclusiveObj).length > 0) {
+            exclusiveFields[key] = exclusiveObj;
+        }
+    }
+
+    return { schema, object: sharedFields, exclusive: exclusiveFields };
+}
+
+function reverseExtractNestedSchema(extractedData) {
+    // Input validation
+    if (extractedData === null || extractedData === undefined) {
+        console.warn('Extracted data cannot be null or undefined');
+        return;
+    }
+
+    // Check if it's array format (from extractNestedSchemaFromArray)
+    if (extractedData.array && Array.isArray(extractedData.array) && extractedData.schema) {
+        return reverseExtractNestedSchemaFromArray(extractedData);
+    }
+    // Check if it's object format (from extractNestedSchemaFromObject)
+    else if (extractedData.object && typeof extractedData.object === 'object' && extractedData.schema) {
+        return reverseExtractNestedSchemaFromObject(extractedData);
+    }
+    else {
+        console.warn('Invalid extracted data format. Expected {schema, array} or {schema, object}');
+    }
+}
+
+function reverseExtractNestedSchemaFromArray(extractedData) {
+    // Validate input
+    if (!extractedData || !Array.isArray(extractedData.schema) || !Array.isArray(extractedData.array)) {
+        console.warn('Invalid extracted data format. Expected {schema: array, array: array}');
+        return;
+    }
+
+    const { schema, array } = extractedData;
+
+    // Handle empty array
+    if (array.length === 0) {
+        return [];
+    }
+
+    // Reconstruct array of objects
+    return array.map((row, rowIndex) => {
+        if (!Array.isArray(row)) {
+            console.warn(`Warning: Row at index ${rowIndex} is not an array, skipping`);
+            return {};
+        }
+
+        const obj = {};
+
+        // Map each field from schema to its value
+        schema.forEach((field, fieldIndex) => {
+            if (fieldIndex < row.length) {
+                if (row[fieldIndex] !== null) { //JSON.stringify() replaces undefined with null
+                    obj[field] = row[fieldIndex];
+                }
+                // If value is undefined, skip adding the property
+            }
+        });
+
+        return obj;
+    });
+}
+
+function reverseExtractNestedSchemaFromObject(extractedData) {
+    // Validate input
+    if (!extractedData || typeof extractedData !== 'object') {
+        console.warn('Invalid extracted data');
+        return;
+    }
+
+    const { schema, object, exclusive } = extractedData;
+
+    // Validate required properties
+    if (!Array.isArray(schema)) {
+        console.warn('Schema must be an array');
+        return;
+    }
+
+    if (!object || typeof object !== 'object') {
+        console.warn('Object property must be an object');
+        return;
+    }
+
+    // Get all keys from both shared and exclusive
+    const allKeys = new Set([...Object.keys(object), ...(exclusive ? Object.keys(exclusive) : [])]);
+
+    // Handle empty case
+    if (allKeys.size === 0) {
+        return {};
+    }
+
+    // Reconstruct the original object
+    const reconstructed = {};
+
+    for (const key of allKeys) {
+        // Start with an empty object
+        const nestedObj = {};
+
+        // Add shared fields (from schema order array)
+        if (object[key] && Array.isArray(object[key])) {
+            const sharedArray = object[key];
+            for (let i = 0; i < schema.length && i < sharedArray.length; i++) {
+                const value = sharedArray[i];
+                if (value !== null) { //JSON.stringify() replaces undefined with null
+                    nestedObj[schema[i]] = value;
+                }
+            }
+        }
+
+        // Add exclusive fields
+        if (exclusive && exclusive[key] && typeof exclusive[key] === 'object') {
+            Object.assign(nestedObj, exclusive[key]);
+        }
+
+        // Only add if object has properties
+        if (Object.keys(nestedObj).length > 0) {
+            reconstructed[key] = nestedObj;
+        }
+    }
+
+    return reconstructed;
 }
