@@ -93,15 +93,15 @@ viewData.toasts = [];
 let language = "english";
 let globalVisible = false; //SET FOR COMMIT
 // let globalVisible = true;
-// let isLoadingEnabled = true; //SET FOR COMMIT
-let isLoadingEnabled = false;
+let isLoadingEnabled = true; //SET FOR COMMIT
+// let isLoadingEnabled = false;
 let loadStaticSaveFile = false; //SET FOR COMMIT
 // let loadStaticSaveFile = true;
 
 data.upgrades = {};
 
-// let isDebug = false; //SET FOR COMMIT
-let isDebug = true;
+let isDebug = false; //SET FOR COMMIT
+// let isDebug = true;
 let debugLevel = 100; //to set the rough number of loops. Max: 150
 function debug() {
     if(!isDebug) {
