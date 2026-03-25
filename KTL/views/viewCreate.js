@@ -1413,6 +1413,8 @@ function setAllCaches() {
     queueCache("highestLegacy");
     queueCache("secondsPassedContainer");
     queueCache("secondsPassed");
+    queueCache("secondsThisGRContainer");
+    queueCache("secondsThisGR");
     queueCache("secondsThisLSContainer");
     queueCache("secondsThisLS");
     queueCache("genesisPoints");
