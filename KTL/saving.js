@@ -10,6 +10,7 @@ const actionsSchema = ['actionVar','cooldown','purchased','lowestUnlockTime','lo
     'expToAddMult','expToAdd','upgradeMult'];
 
 function clearSave() {
+    console.log("Clearing save")
     window.localStorage[saveName] = "";
     location.reload();
 }
@@ -48,15 +49,24 @@ function load() {
         }
     } else {
         if (localStorage[saveName]) {
-            console.log('Save found.');
-            try {
-                // toLoad = JSON.parse(localStorage[saveName]);
-                toLoad = JSON.parse(decode64(localStorage[saveName]));
-            } catch (e) {
-                try { //old save
-                    toLoad = JSON.parse(decode(localStorage[saveName]));
+            if (localStorage[saveName].startsWith("{\"actions\":")) {
+                console.log('Save version 8+ found.');
+                try {
+                    toLoad = JSON.parse(localStorage[saveName]);
                 } catch (e) {
                     exportFile(localStorage[saveName], "KTL_Error_File")
+                }
+            } else {
+                console.log('Save found.');
+                try {
+                    // toLoad = JSON.parse(localStorage[saveName]);
+                    toLoad = JSON.parse(decode64(localStorage[saveName]));
+                } catch (e) {
+                    try { //old save
+                        toLoad = JSON.parse(decode(localStorage[saveName]));
+                    } catch (e) {
+                        exportFile(localStorage[saveName], "KTL_Error_File")
+                    }
                 }
             }
         }
@@ -461,8 +471,7 @@ function save() {
     let sdata = structuredClone(data);
     sdata.chartData = extractNestedSchema(sdata.chartData);
     sdata.actions = extractNestedSchema(sdata.actions, actionsSchema);
-    // window.localStorage[saveName] = JSON.stringify(sdata);
-    window.localStorage[saveName] = encode64(JSON.stringify(sdata));
+    window.localStorage[saveName] = JSON.stringify(sdata);
 }
 
 function exportSave() {
@@ -474,7 +483,7 @@ function exportSave() {
 }
 
 function exportFile(data, name) {
-    const blob = new Blob([data], { type: "text/plain" });
+    const blob = new Blob([data], { type: 'application/gzip' });
     const url = URL.createObjectURL(blob);
 
     const a = document.createElement("a");
@@ -489,7 +498,7 @@ function exportFile(data, name) {
     const minutes = String(now.getMinutes()).padStart(2, '0');
     const seconds = String(now.getSeconds()).padStart(2, '0');
 
-    a.download = `${name}_${year}-${month}-${day}_${hours}-${minutes}-${seconds}.txt`;
+    a.download = `${name}_${year}-${month}-${day}_${hours}-${minutes}-${seconds}.save`;
 
     document.body.appendChild(a);
     a.click();
@@ -500,7 +509,7 @@ function exportFile(data, name) {
 
 function exportSaveFile(name="KTL_Save") {
     save();
-    const data = window.localStorage[saveName];
+    const data = fflate.gzipSync(fflate.strToU8(window.localStorage[saveName]));
     exportFile(data, name)
 }
 
@@ -521,6 +530,14 @@ function importSaveFile() {
     const file = input.files[0];
     if (!file) return;
 
+    if (file.name.toLowerCase().endsWith(".save")) {
+        read_gzip(file);
+    } else {
+        read_base64(file);
+    }
+}
+
+function read_base64(file) {
     const reader = new FileReader();
     reader.onload = function(e) {
         const content = e.target.result.trim();
@@ -534,33 +551,40 @@ function importSaveFile() {
     reader.readAsText(file);
 }
 
-// function extractArraySchema(objects, fields) {
-//     if (!Array.isArray(objects) || !Array.isArray(fields)) {
-//         console.log('Invalid input: objects and fields must be arrays');
-//     }
-//
-//     return objects.map(obj => {
-//         return fields.map(field => obj[field]);
-//     });
-// }
-//
-// function returnArraySchema(arrays, fields) {
-//     if (!Array.isArray(arrays) || !Array.isArray(fields)) {
-//         console.log('Invalid input: arrays and fields must be arrays');
-//     }
-//
-//     return arrays.map(arr => {
-//         if (!Array.isArray(arr)) {
-//             console.log('Each element must be an array');
-//         }
-//
-//         const obj = {};
-//         fields.forEach((field, index) => {
-//             obj[field] = arr[index];
-//         });
-//         return obj;
-//     });
-// }
+function read_gzip(file) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const content = e.target.result;
+        const compressedData = new Uint8Array(content);
+        validateGzipData(compressedData);
+        // Decompress
+        const decompressed = fflate.gunzipSync(compressedData);
+
+        // Convert to text
+        const text = fflate.strFromU8(decompressed);
+        if (!content) {
+            clearSave();
+        } else {
+            window.localStorage[saveName] = text;
+        }
+        location.reload();
+    };
+    reader.readAsArrayBuffer(file);
+}
+
+function validateGzipData(data) {
+    // Check magic number
+    if (data.length < 2 || data[0] !== 0x1F || data[1] !== 0x8B) {
+        throw new Error('Invalid gzip header: missing magic bytes');
+    }
+
+    // Check compression method (should be 8 for DEFLATE)
+    if (data.length >= 3 && data[2] !== 8) {
+        console.warn('Unknown compression method:', data[2]);
+    }
+
+    return true;
+}
 
 function extractNestedSchema(data, schema) {
     // Input validation
