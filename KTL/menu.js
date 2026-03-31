@@ -605,7 +605,16 @@ function createChangelogMenu() {
     return Raw.html`
         <div class="menuTitle">Changelog</div>
         <div class="menuSeparator"></div><br>
-        v3.1.6 3/25 (current): <br>
+        v3.1.7 3/31 (current): <br>
+        <ol>
+            <li>Resource retrieval now works for some actions it didn't, like Cast to Fail</li>
+            <li>LS records highest levels also now</li>
+            <li>Fixed HATL Stats displaying wrong value</li>
+            <li>Fixed Find Angel Investors not working</li>
+            <li>Savefile size has been reduced by more than 10x (thanks Disilon)</li>
+        </ol><br><br>
+        
+        v3.1.6 3/25: <br>
         <ol>
             <li>Added a LS3 upgrade to record 3rd highest levels</li>
             <li>Fixed Recognize the Familiarity not reducing unlock costs on Magic and Infusion tabs</li>
