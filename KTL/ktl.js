@@ -80,7 +80,7 @@ function resetGameToBase() {
     data.fightGenerated = 0;
 
     data.resetCount++;
-    chartData = [];
+    data.chartData = [];
     for (let focusObj of data.focusSelected) {
         unhighlightLine(focusObj.borderId, focusObj.lineData);
     }
