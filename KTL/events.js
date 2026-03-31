@@ -882,8 +882,8 @@ function mouseOnActionTouch(event, actionVar) {
 
 function takeDataSnapshot(resourceValue, currentTime) {
     if (currentTime <= 1) return;
-    if (chartData.length === 0) {
-        chartData.push({
+    if (data.chartData.length === 0) {
+        data.chartData.push({
             time: currentTime,
             value: resourceValue,
             HATL: data.actions["hearAboutTheLich"].level,
@@ -892,22 +892,22 @@ function takeDataSnapshot(resourceValue, currentTime) {
         return;
     }
 
-    const lastStoredPoint = chartData[chartData.length - 1];
+    const lastStoredPoint = data.chartData[data.chartData.length - 1];
     // if (resourceValue === lastStoredPoint.value) {
     //     return;
     // }
 
     if ((currentTime - lastStoredPoint.time) > (currentTime > 21600 ? 239 : 119)) {
-        chartData.push({
+        data.chartData.push({
             time: currentTime,
-            value: resourceValue,
+            value: resourceValue.toPrecision(4),
             HATL: data.actions["hearAboutTheLich"].level,
             MQ: actionData.awakenYourGrimoire.manaQuality()
         });
     }
 
-    if (chartData.length > 200) {
-        chartData.splice(0, 2);
+    if (data.chartData.length > 200) {
+        data.chartData.splice(0, 2);
     }
 }
 
@@ -933,7 +933,7 @@ function drawChart() {
     ctx.globalAlpha = 1;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    if (chartData.length < 2) {
+    if (data.chartData.length < 2) {
         ctx.fillStyle = '#a0aec0'; // Light gray text for placeholder
         ctx.font = '16px sans-serif';
         ctx.textAlign = 'center';
@@ -942,8 +942,8 @@ function drawChart() {
     }
 
     // --- Determine Data Range ---
-    const minTime = chartData[0].time;
-    const maxTime = chartData[chartData.length - 1].time;
+    const minTime = data.chartData[0].time;
+    const maxTime = data.chartData[data.chartData.length - 1].time;
 
     // --- Draw Axes ---
     ctx.strokeStyle = '#4a5568'; // Subtle gray for axes
@@ -969,11 +969,11 @@ function drawChart() {
     let lastLabelX = -1000;
     let lastHATL = 0;
     if (graphType === "momentum") {
-        const values = chartData.map(d => d.value);
+        const values = data.chartData.map(d => d.value);
         const minValue = Math.min(...values);
         const maxValue = Math.max(...values);
-        for (let i = 0; i < chartData.length; i++) {
-            const dataPoint = chartData[i];
+        for (let i = 0; i < data.chartData.length; i++) {
+            const dataPoint = data.chartData[i];
             const HATL = dataPoint.HATL ? dataPoint.HATL : 0;
             const x = padding + ((dataPoint.time - minTime) / (maxTime - minTime)) * (canvasWidth - 2 * padding);
             if ((x - lastLabelX) >= ((canvasWidth - 2 * padding) / 8)) {
@@ -1023,11 +1023,11 @@ function drawChart() {
         }
     } else {
         // Magic Quality graph
-        const values = chartData.map(d => d.MQ);
+        const values = data.chartData.map(d => d.MQ);
         const minValue = Math.min(...values);
         const maxValue = Math.max(...values);
-        for (let i = 0; i < chartData.length; i++) {
-            const dataPoint = chartData[i];
+        for (let i = 0; i < data.chartData.length; i++) {
+            const dataPoint = data.chartData[i];
             const HATL = dataPoint.HATL ? dataPoint.HATL : 0;
             const x = padding + ((dataPoint.time - minTime) / (maxTime - minTime)) * (canvasWidth - 2 * padding);
             if ((x - lastLabelX) >= ((canvasWidth - 2 * padding) / 8)) {
