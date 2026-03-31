@@ -696,7 +696,6 @@ function extractNestedSchemaFromObject(obj, schema) {
 }
 
 function reverseExtractNestedSchema(extractedData, ignoreMissing) {
-    // Input validation
     if (extractedData === null || extractedData === undefined) {
         if (!ignoreMissing) {
             console.warn('Extracted data cannot be null or undefined');
