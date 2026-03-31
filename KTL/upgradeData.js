@@ -1215,7 +1215,7 @@ let upgradeData = {
             return Raw.html`Invest's base Fortune gain increases to ${["500 (currently 200)", "1000 (currently 500)", 1000][num]}.`
         },
         currentValue: function() {
-            return [200, 500, 1000][data.upgrades.increaseInitialInvestment.upgradePower];
+            return [200, 500, 1000][data.upgrades.findAngelInvestors.upgradePower];
         }
     },
     retrieveMyUnusedResources: {
