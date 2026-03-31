@@ -36,8 +36,6 @@ function initializeMenus() {
         document.getElementById("helpForRealMenuTab").style.display = "flex";
     });
 
-        // addMenuTab("cheat");
-    // addMenuTextContainer("cheat", createCheatMenu());
 }
 
 function statChartInitial() {
@@ -65,35 +63,6 @@ function statChartInitial() {
     });
 }
 
-function createCheatMenu() {
-    return Raw.html`
-        <div class="menuTitle"><s>Cheating</s> Developer Mode</div>
-        <div class="menuSeparator"></div><br>
-        <div class="button" style="width:150px;padding:10px;font-size:16px;" 
-            id="cheatButton" onClick="increaseGamespeed()">x2 Game Speed</div>
-        <div class="button" style="width:150px;padding:10px;font-size:16px;" 
-            onClick="resetGamespeed()">Game Speed = 1</div>`
-}
-
-function createShopMenu() {
-    return Raw.html`
-        <div class="menuTitle">Shop</div>
-        <div class="menuSeparator"></div><br>The shop will be available in the full release.
-        I will keep the game ad-free and AI-art free, and the demo will be remain open-source on my github.<br> 
-        The game will be balanced without the paid upgrades.<br>
-        Exact upgrades and pricing is a WIP.<br>
-        <div class="menuSeparator"></div>
-<!--        <span id="shopOutputMessage">Click Refresh to check for recent purchases.</span>-->
-<!--        <button onclick="window.steamAPI.buyItem(100)">Buy 1,000 Soul Coins</button>-->
-<!--        <button onclick="window.steamAPI.buyItem(101)">Buy 2,200 Soul Coins</button>-->
-<!--        <button onclick="window.steamAPI.buyItem(102)">Buy 4,800 Soul Coins</button>-->
-<!--        <button id="refresh-purchases-btn" onclick="requestManualSweep()">Refresh Purchases</button>-->
-        
-<!--        <span class="button" onclick="resetRun()">Reset run</span>-->
-<!--        Reset the run and gain offline time equal to the run time. -->
-        
-`;
-}
 
 function createHelpForRealMenu() {
     return Raw.html`

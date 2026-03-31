@@ -1294,9 +1294,9 @@ function debugAfterCare() {
             continue;
         }
 
-        for (let downstreamVar of dataObj.downstreamVars) {
-            actionObj[`${downstreamVar}PermFocusMult`] = 4;
-        }
+        // for (let downstreamVar of dataObj.downstreamVars) {
+        //     actionObj[`${downstreamVar}PermFocusMult`] = 4;
+        // }
     }
 
     for (let actionVar in data.actions) {

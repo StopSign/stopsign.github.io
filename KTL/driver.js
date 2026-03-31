@@ -130,6 +130,22 @@ function gameTick() {
         tickGameObject(actionVar);
     }
 
+    //process resource retrieval
+    for(let actionVar in data.actions) {
+        let actionObj = data.actions[actionVar];
+        let resourceParentVar = actionData[actionObj.actionVar].parentVar;
+        if(!resourceParentVar) {
+            continue;
+        }
+        let parentObj = data.actions[resourceParentVar];
+
+        giveResourceTo(actionObj, parentObj, actionObj.resourceRetrieved);
+        //Because generators don't get resourceIncrease from giveResourceTo
+        if(!parentObj.hasUpstream) {
+            parentObj.resourceIncrease += actionObj.resourceRetrieved * data.gameSettings.ticksPerSecond;
+        }
+    }
+
 
     //check once more for any that need to be leveled from other's stat improvements
     for(let actionVar in data.actions) {
@@ -293,8 +309,7 @@ function tickGameObject(actionVar) {
 
     calculateTaken(actionVar, true);
 
-    //Calc resource retrieval
-	let resourceParentVar = actionData[actionObj.actionVar].parentVar;
+    //Calc resource retrieval, to be sent after all the ticks are done to not interfere with resourceIncrease
     let isQuiet = actionObj.unlocked && isMaxLevel && actionObj.resourceIncrease === 0 && actionObj.totalSend === 0;
     if(!isQuiet || !dataObj.hasUpstream || data.upgrades.retrieveMyUnusedResources.upgradePower === 0 || resourceHeads[dataObj.resourceName] === actionVar || data.gameState === "KTL" || actionVar === "reinvest") {
         actionObj.resourceRetrieved = 0;
@@ -302,12 +317,6 @@ function tickGameObject(actionVar) {
         actionObj.resourceRetrieved = (actionObj.resource/100 * [0, 1, 2, 5][data.upgrades.retrieveMyUnusedResources.upgradePower] + 10) / data.gameSettings.ticksPerSecond;
         if(actionObj.resourceRetrieved > actionObj.resource) {
             actionObj.resourceRetrieved = actionObj.resource;
-        }
-        if(resourceParentVar) {
-            let parentObj = data.actions[resourceParentVar];
-            giveResourceTo(actionObj, parentObj, actionObj.resourceRetrieved);
-            //Because generators don't get resourceIncrease from giveResourceTo
-            parentObj.resourceIncrease += actionObj.resourceRetrieved * data.gameSettings.ticksPerSecond;
         }
     }
 }

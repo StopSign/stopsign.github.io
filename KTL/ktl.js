@@ -293,6 +293,9 @@ function legacySeveranceReset(forceReset) {
         if(actionVar === "reposeRebounded") {
             continue;
         }
+        if(actionVar !== "reposeRebounded" && actionVar !== "turnTheWheel" && actionVar !== "tidalBurden") {
+            recordHighestLevels(actionObj)
+        }
 
         let originalState = {};
         originalState.unlocked = actionObj.unlocked;
@@ -568,6 +571,22 @@ function renderResetLog() {
     `;
 }
 
+function recordHighestLevels(actionObj) {
+    let newLevel = actionObj.level;
+    if (data.upgrades.rememberWhatIDid.isFullyBought) {
+        if (newLevel > actionObj.highestLevel) {
+            actionObj.thirdHighestLevel = actionObj.secondHighestLevel;
+            actionObj.secondHighestLevel = actionObj.highestLevel;
+            actionObj.highestLevel = newLevel;
+        } else if (newLevel > actionObj.secondHighestLevel) {
+            actionObj.thirdHighestLevel = actionObj.secondHighestLevel;
+            actionObj.secondHighestLevel = newLevel;
+        } else if (newLevel > actionObj.thirdHighestLevel) {
+            actionObj.thirdHighestLevel = newLevel;
+        }
+    }
+}
+
 function useAmulet() {
     if (!document.getElementById('amuletConfirm').checked) {
         return;
@@ -582,24 +601,11 @@ function useAmulet() {
 
         views.updateVal(`${actionVar}PinButton`, "", "style.display");
 
-        let newLevel = actionObj.level;
         if(actionVar !== "reposeRebounded" && actionVar !== "turnTheWheel" && actionVar !== "tidalBurden") {
             actionObj.prevUnlockTime = actionObj.unlockTime;
             actionObj.prevLevel1Time = actionObj.level1Time;
 
-            if (data.upgrades.rememberWhatIDid.isFullyBought) {
-                // Sort and insert the new level into the top 3 if applicable;
-                if (newLevel > actionObj.highestLevel) {
-                    actionObj.thirdHighestLevel = actionObj.secondHighestLevel;
-                    actionObj.secondHighestLevel = actionObj.highestLevel;
-                    actionObj.highestLevel = newLevel;
-                } else if (newLevel > actionObj.secondHighestLevel) {
-                    actionObj.thirdHighestLevel = actionObj.secondHighestLevel;
-                    actionObj.secondHighestLevel = newLevel;
-                } else if (newLevel > actionObj.thirdHighestLevel) {
-                    actionObj.thirdHighestLevel = newLevel;
-                }
-            }
+            recordHighestLevels(actionObj)
         }
 
         if(actionVar === "turnTheWheel") {

@@ -1196,10 +1196,10 @@ let upgradeData = {
             return Raw.html`Invest's base Fortune gain increases to ${["2 (currently 1)", "5 (currently 2)", "10 (currently 5)", "20 (currently 10)", "50 (currently 20)", "100 (currently 50)", "200 (currently 100)", 200][num]}.`
         },
         currentValue: function() {
-            if(data.upgrades.increaseInitialInvestment.upgradePower <= 7) {
-                return [1, 2, 5, 10, 20, 50, 100, 200][data.upgrades.increaseInitialInvestment.upgradePower];
+            if(data.upgrades.findAngelInvestors.upgradePower > 0) {
+                return upgradeData.findAngelInvestors.currentValue();
             }
-            return upgradeData.findAngelInvestors.currentValue();
+            return [1, 2, 5, 10, 20, 50, 100, 200][data.upgrades.increaseInitialInvestment.upgradePower];
         },
         onBuy:function(num) {
             if(num === 7 && data.lichKills >= 1) {

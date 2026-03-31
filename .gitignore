@@ -10,8 +10,13 @@ KTL/saveFile.js
 /dist/
 /node_modules/
 /main.js
+/preload.js
+/itemdefs.json
 /package.json
 /package-lock.json
 /steam_api64.dll
 /steam_appid.txt
 /KTL/graphic.html
+/KTL/fonts/
+KTL/steamSecrets.js
+KTL/steamStuff.js

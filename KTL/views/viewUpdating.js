@@ -424,9 +424,6 @@ let views = {
         if(dataObj.actionPowerBase) { //can be a generator w/o action power
             roundedNumbers.push(["actionPower", 4]);
         }
-        if(actionVar === "hearAboutTheLich") {
-            roundedNumbers.push(["actionPower2", 2]);
-        }
 
         if(actionObj.currentMenu === "atts") {
             roundedNumbers.push(["attReductionEffect", 3]);

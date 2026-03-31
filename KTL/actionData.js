@@ -1220,6 +1220,7 @@ let actionData = {
             let actionObj = data.actions.hearAboutTheLich;
 
             actionObj.resourceToAdd = actionData.hearAboutTheLich.calcFearGain();
+            actionObj.actionPower = actionObj.showResourceAdded; //for visual
             actionObj.resourceIncrease = actionObj.resourceToAdd *
                 data.actions.overclock.progressGain / data.actions.overclock.progressMax;
         },
@@ -1228,6 +1229,7 @@ let actionData = {
             if (actionObj.unlocked) {
                 actionObj.resourceToAdd = actionData.hearAboutTheLich.calcFearGain();
                 actionObj.showResourceAdded = actionObj.resourceToAdd;
+                actionObj.actionPower = actionObj.showResourceAdded; //for visual
                 actionObj.resource += actionObj.resourceToAdd;
             }
         },
@@ -1247,8 +1249,7 @@ let actionData = {
         unlockMessage: {english: "Unlocks when Gossip Around Coffee is level 3."},
         extraInfo: {
             english: Raw.html`This action gains (Total Momentum)^0.25 * (Conversations on Gossip)^0.5 / 1e15 Fear 
-        for each Overclock complete, which is a gain of
-        <span style="font-weight:bold;" id="hearAboutTheLichActionPower2">0</span>. Fear is not consumed.`
+        for each Overclock complete. Fear is not consumed.`
         },
         actionTriggers: [
             ["info", "text", "Overclock additionally generates Fear on this action."],

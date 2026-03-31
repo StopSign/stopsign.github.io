@@ -1397,7 +1397,6 @@ function setAllCaches() {
     queueCache("attDisplay");
     queueCache("bonusDisplay");
     queueCache("killTheLichMenuButton2");
-    queueCache("hearAboutTheLichActionPower2");
     queueCache("legacyDisplay");
     queueCache("ancientCoinDisplay");
     queueCache("ancientWhisperDisplay");

@@ -54,6 +54,7 @@ data.lastVisit = Date.now();
 data.queuedReveals = {}
 let chartData = []; // Stores { time: number, value: number, HATL: number, MQ: number }
 let graphType = "momentum"; //"momentum" or "magic"
+let hashedKey = "test";
 
 // --- Core Settings ---
 data.gameSettings = {
@@ -98,7 +99,7 @@ let isLoadingEnabled = true; //SET FOR COMMIT
 let loadStaticSaveFile = false; //SET FOR COMMIT
 // let loadStaticSaveFile = true;
 let isSteam = false; //SET FOR COMMIT
-// let isSteam = true; //SET FOR STEAM
+// let isSteam = true; //SET FOR STEAM BUILD
 
 
 data.upgrades = {};
@@ -106,7 +107,7 @@ data.upgrades = {};
 
 let isDebug = false; //SET FOR COMMIT
 // let isDebug = true;
-let debugLevel = 100; //to set the rough number of loops. Max: 150
+let debugLevel = 150; //to set the rough number of loops. Max: 150. 1st loop: 46
 function debug() {
     if(!isDebug) {
         return;
