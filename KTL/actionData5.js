@@ -58,7 +58,7 @@ actionData = {
 
             addResourceTo(actionObj, actionObj.resourceToAdd);
             addResourceTo(data.actions.tidalBurden, (Math.min(actionObj.efficiency/100, 1)));
-            addResourceTo(data.actions.dipInTheRiver, actionObj.resource / 10);
+            addResourceTo(data.actions.dipInTheRiver, actionObj.resource / 10 * Math.pow(1.2, data.shopUpgrades.extraEssence.upgradePower));
 
             views.scheduleUpdate('turnTheWheelResourceSent', intToString(actionObj.resourceToAdd, 2), "textContent")
         },
@@ -68,11 +68,12 @@ actionData = {
             actionObj.progressGain = this.generatorSpeed * (actionObj.efficiency / 100);
             actionObj.actionPower = actionObj.actionPowerBase *
                 actionObj.actionPowerMult;
-            actionObj.resourceToAdd = actionObj.actionPower * actionObj.upgradeMult * (actionObj.efficiency / 100);
+            actionObj.resourceToAdd = actionObj.actionPower * actionObj.upgradeMult * (actionObj.efficiency / 100)
+            * Math.pow(1.2, data.shopUpgrades.extraLifeEnergy.upgradePower);
             actionObj.expToAddBase = 0;
             actionObj.showResourceAdded = actionObj.resourceToAdd;
             data.actions.tidalBurden.showResourceAdded = Math.min(actionObj.efficiency/100, 1);
-            data.actions.dipInTheRiver.showResourceAdded = actionObj.resource/10;
+            data.actions.dipInTheRiver.showResourceAdded = actionObj.resource/10 * Math.pow(1.2, data.shopUpgrades.extraEssence.upgradePower);
         },
         onLevelAtts:[["flow", 5]],
         expAtts:[],

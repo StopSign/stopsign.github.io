@@ -6,7 +6,9 @@ function loadDebugValues() {
     debug1stKill()
     debug2ndKill()
     debug3rdKill()
-
+    
+    checkShopUnlocks()
+    refreshShopUpgrades()
 
     debugAfterCare()
 

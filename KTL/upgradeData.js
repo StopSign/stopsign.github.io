@@ -543,6 +543,7 @@ let upgradeData = {
             return `You currently gain a permanent +(Hear About The Lich's Level)^2 % to all Focused rates, when you enter Northern Wastes. This effect works even when the bar is not focused. This effect caps at a x4 mult.`
         },
         onBuy: function(num) {
+            revealShopUpgrade("autoSelectPermanentFocus")
         },
     },
 
@@ -942,7 +943,7 @@ let upgradeData = {
                 case 1:
                     return "Unlocks new actions that use Coins. Needs Invest My Coins 1 for all new actions"
                 case 2:
-                    return "Unlocks new actions that use Coins. Needs Invest 1 for any new actions"
+                    return "Unlocks new actions that use Coins. Needs Invest My Coins 1 for all new actions"
                 default:
                     return "Unlocks new actions that use Coins"
             }
@@ -1079,7 +1080,7 @@ let upgradeData = {
         upgradesAvailable:2, type:"actions",
         visible:false,
         customInfo: function(num) {
-            return "Unlocks new actions that use Research, and new spells"
+            return "Unlocks new actions that use Research"
         },
         onBuy: function(num) {
             if(num === 1) {

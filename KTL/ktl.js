@@ -6,10 +6,18 @@ function openKTLMenu() {
     KTLMenuOpen = !KTLMenuOpen;
     views.updateVal("killTheLichMenu", KTLMenuOpen ? "flex" : "none", "style.display");
 
+    updatePermFocusText()
+}
+
+function updatePermFocusText() {
+    let permFocusMessage = document.getElementById("permFocusMessage");
+    let text = "";
     if(data.upgrades.rememberWhatIFocusedOn.upgradePower > 0) {
-        let permFocusMessage = document.getElementById("permFocusMessage");
         let amountToAdd = Math.pow(data.actions.hearAboutTheLich.level, 2) / 100;
-        let text = `<br><br>You will be adding +${intToString(amountToAdd, 3)} permanent focus mult to the following lines:<br>`;
+        if(data.shopUpgrades.autoSelectPermanentFocus.upgradePower === 0) {
+            text += `<br><br>`
+        }
+        text += `You will be adding +${intToString(amountToAdd, 3)} permanent focus mult to the following lines:<br>`;
         let maxPermFocus = data.upgrades.rememberWhatIFocusedOn.upgradePower + 1;
         for (let focusObj of data.focusSelected) {
             let fromActionObj = data.actions[focusObj.lineData.from];
@@ -29,10 +37,10 @@ function openKTLMenu() {
                 text += ` | Warning: This will max it`
             }
             if(currentPerm)
-            text += `</span><br>`;
+                text += `</span><br>`;
         }
-        permFocusMessage.innerHTML = text;
     }
+    permFocusMessage.innerHTML = text;
 }
 
 function resetKTLSpiral() {
@@ -94,8 +102,8 @@ function resetGameToBase() {
     LSMenuOpen = false;
     views.updateVal("legacySeveranceMenu", "none", "style.display");
     data.legacyMultKTL = 1;
-    data.ancientCoinMultKTL = Math.pow(1.05, data.upgrades.extraAncientCoins.upgradePower);
-    data.ancientWhisperMultKTL = Math.pow(1.1, data.upgrades.extraAncientWhispers.upgradePower);
+    data.ancientCoinMultKTL = Math.pow(1.05, data.upgrades.extraAncientCoins.upgradePower) * Math.pow(1.5, data.shopUpgrades.extraAncientCoins.upgradePower) * (data.shopUpgrades.currencyGainPotion.upgradePower > 0 ? 2 : 1);
+    data.ancientWhisperMultKTL = Math.pow(1.1, data.upgrades.extraAncientWhispers.upgradePower) * Math.pow(1.5, data.shopUpgrades.extraAncientWhispers.upgradePower) * (data.shopUpgrades.currencyGainPotion.upgradePower > 0 ? 2 : 1);
 
 
     //Reset all atts and bonuses
@@ -180,7 +188,7 @@ function genesisReset(forceReset) {
             if (data.actions[downstreamVar] && actionData[downstreamVar].hasUpstream) {
                 setSliderUI(actionObj.actionVar, downstreamVar, 0);
             }
-            actionObj[downstreamVar + "TempFocusMult"] = 2;
+            actionObj[downstreamVar + "TempFocusMult"] = 2  + data.shopUpgrades.moreFocusMultiplier.upgradePower;
         });
 
         if (dataObj.updateMults) {
@@ -313,7 +321,7 @@ function legacySeveranceReset(forceReset) {
             if (data.actions[downstreamVar] && actionData[downstreamVar].hasUpstream) {
                 setSliderUI(actionObj.actionVar, downstreamVar, 0);
             }
-            actionObj[downstreamVar + "TempFocusMult"] = 2;
+            actionObj[downstreamVar + "TempFocusMult"] = 2  + data.shopUpgrades.moreFocusMultiplier.upgradePower;
         });
 
         if (dataObj.updateMults) {
@@ -639,7 +647,7 @@ function useAmulet() {
                 setSliderUI(actionObj.actionVar, downstreamVar, 0); //reset with amulet
             }
 
-            actionObj[downstreamVar + "TempFocusMult"] = 2;
+            actionObj[downstreamVar + "TempFocusMult"] = 2  + data.shopUpgrades.moreFocusMultiplier.upgradePower;
         });
 
         if(actionObj.customTriggers) {
@@ -740,6 +748,7 @@ function useAmulet() {
     views.updateVal(`useAmuletMenu`, "none", "style.display");
     views.updateVal(`openViewAmuletButton`, "", "style.display");
 
+    // saveState()
     gameIsResetting = false;
 }
 

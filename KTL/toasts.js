@@ -23,7 +23,9 @@ Overclock is a Generator, which means it generates progress over time. It gains 
 
 For now you have one direction to send the resources: to the action Reflect. Go ahead and set the downstream send rate from Overclock to Reflect 100%.<br><br>
 
-All tips that you close can be found again in Menu -> Previously Closed Tips.`);
+All tips that you close can be found again in Menu -> Previously Closed Tips.<br><br>
+
+As a bonus for playing (and reading), use the bonus code "gift" in Menu -> Options for a free 24 hours of bonus time`);
 
 
 

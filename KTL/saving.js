@@ -28,7 +28,7 @@ function loadUpgradeFromSave(actionObj, loadObj) {
     Object.assign(actionObj, loadObj);
 }
 
-data.saveVersion = 8;
+data.saveVersion = 9;
 function load() {
     initializeData();
 
@@ -121,6 +121,21 @@ function load() {
             loadUpgradeFromSave(upgradeObj, loadObj);
         }
 
+        for(let shopVar in toLoad.shopUpgrades) {
+            let shopObj = data.shopUpgrades[shopVar] ?? {};
+            let shopDataObj = shopUpgrades[shopVar];
+            let loadObj = toLoad.shopUpgrades[shopVar];
+            if(!shopDataObj || shopDataObj.creationVersion > saveVersionFromLoad) { //If removed or needs to refresh
+                let toRefund = calcTotalSpentOnUpgrade(loadObj.initialCost, loadObj.costIncrease, loadObj.upgradesBought, loadObj.additiveIncrease);
+                if(toRefund > 0) {
+                    refundAmount += toRefund;
+                    queuedLogMessages.push(["Info: Refunded <b>"+toRefund+"</b> SC for the upgrade: " + (loadObj.title || decamelizeWithSpace(shopVar)), "info"])
+                }
+                continue;
+            }
+            loadUpgradeFromSave(shopObj, loadObj);
+        }
+
         // mergeExistingOnly(data, toLoad, "actions", ["x", "y", "realX", "realY"]); //use patch instead
         //these are in the skiplist because if, between saves, an action has changed the atts it has, the links need to be reset instead of saved.
         mergeExistingOnly(data, toLoad, "atts", ["linkedActionExpAtts", "linkedActionEfficiencyAtts", "linkedActionOnLevelAtts"]);
@@ -150,6 +165,7 @@ function load() {
         data.currentLog = toLoad.currentLog ?? [];
         data.currentPinned = toLoad.currentPinned ?? [];
         data.ancientCoinMultKTL = toLoad.ancientCoinMultKTL ?? 1;
+        data.ancientWhisperMultKTL = toLoad.ancientWhisperMultKTL ?? 1;
         data.legacyMultKTL = toLoad.legacyMultKTL ?? 1;
         data.resetCount = toLoad.resetCount ?? 1;
         data.ancientCoinGained = toLoad.ancientCoinGained ?? 0;
@@ -162,8 +178,13 @@ function load() {
         data.genesisPoints = toLoad.genesisPoints ?? 0;
         data.genesisResets = toLoad.genesisResets ?? 0;
         data.fightGenerated = toLoad.fightGenerated ?? 0;
+        data.soulCoins = toLoad.soulCoins ?? 0;
+        data.totalDailySoulCoins = toLoad.totalDailySoulCoins ?? 0;
+        data.totalBoughtSoulCoins = toLoad.totalBoughtSoulCoins ?? 0;
 
         data.currentGameState = toLoad.currentGameState;
+        data.currentGameState.dailyTimer = toLoad.currentGameState.dailyTimer ?? 0;
+        data.currentGameState.dailyCharges = toLoad.currentGameState.dailyCharges ?? 0;
 
         data.chartData = reverseExtractNestedSchema(toLoad.chartData, true) ?? [];
 
@@ -313,6 +334,12 @@ function updateUIOnLoad() {
     checkActionTriggers()
     checkGrimoireUnlocks()
     displayLSStuff()
+    checkShopUnlocks()
+    refreshShopUpgrades()
+    checkDailyTimer()
+    applyShopEffects()
+    data[hashedKey] = false;
+    data[hashIt(mySecret)] = true;
 
     document.getElementById('viewDeltasSwitch').firstElementChild.style.left = data.gameSettings.viewDeltas ? "50%" : "0";
     document.getElementById('numberTypeSwitch').firstElementChild.style.left = data.gameSettings.numberType==="numberSuffix" ? "66.666%" : (data.gameSettings.numberType==="scientific" ? "33.333%" : "0");
@@ -341,6 +368,7 @@ function updateUIOnLoad() {
         } else {
             actionObj.isRunning = dataObj.plane !== 2;
         }
+        actionObj.connectedLines = 0;
         let menuFromSave = actionObj.currentMenu;
         actionObj.currentMenu = "";
         clickActionMenu(actionVar, menuFromSave);

@@ -175,7 +175,8 @@ actionData = {
             this.updateMults();
 
             //takes 10% of mana, gives [10% mana^2 * mana quality] exp, generates actionPower arcana
-            let resourceTaken = actionObj.resource * calcTierMult(this.tier);
+            let consumptionReduction = Math.max(0, 1 - (data.shopUpgrades.focusBarsImproveEfficiency.upgradePower * .25 * actionObj.connectedLines));
+            let resourceTaken = actionObj.resource * calcTierMult(this.tier) * consumptionReduction;
 
             if (actionObj.resourceToAdd > 0) {
                 actionObj.resource -= resourceTaken;

@@ -144,6 +144,8 @@ function createStoryMenu() {
 &nbsp;&nbsp;&nbsp;&nbsp;I started doing chores I didn't need to - piling up more firewood, cleaning my clothes more often, carving wood into furniture and decorations. For a while it lasted, but I was finishing my fourth pile of firewood when I realized I had more than I reasonably could use for the entire winter, and reconsidered what I was doing. I let myself think about why I was pushing things out. I let myself think about who I wanted to be, and I realized I would need to think about who I was. I considered changing Overclock's target to continue avoiding the subject, but I felt instant terror at the idea that I would be without safety - the same as any other soldier in the Ashmarch.<br><br>
 
 &nbsp;&nbsp;&nbsp;&nbsp;As I finally made that connection, I realized that the only way forward was through. And so, after putting it off as long as possible, I stopped. I sat on the floor. I breathed. I let it in, and reflected.<br><br>
+
+(Use bonus code "book" for 30 minutes of bonus time!)
 `
 }
 
@@ -605,7 +607,15 @@ function createChangelogMenu() {
     return Raw.html`
         <div class="menuTitle">Changelog</div>
         <div class="menuSeparator"></div><br>
-        v3.1.7 3/31 (current): <br>
+        v3.2.0 4/10 (current): <br>
+        <ol>
+            <li>Ancient Whisper mult is saved - will come back on page refresh</li>
+            <li>Removed the "undefined" from certain action's stat pages</li>
+            <li>Perm focus gain text will clear after genesis</li>
+            <li>Prepared the game for steam, including daily bonus and shop that only appears on steam</li>
+        </ol><br><br>
+        
+        v3.1.7 3/31: <br>
         <ol>
             <li>Resource retrieval now works for some actions it didn't, like Cast to Fail</li>
             <li>LS records highest levels also now</li>

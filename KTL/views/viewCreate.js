@@ -776,7 +776,7 @@ function generateActionSpeedAtts(actionVar) {
     let overcap = data.upgrades.higherSpeedCaps.upgradePower * .1;
 
     if(dataObj.efficiencyAtts.length === 0) {
-        return;
+        return "";
     }
 
     let hasPositiveSpeedMults = false;
@@ -1112,14 +1112,18 @@ function actionTriggerText(type, info, extra) {
         let ACAmount = extra
             * (data.upgrades.listenCloserToWhispers.upgradePower === 1?3:1)
             * (data.gameState === "KTL" ? data.ancientCoinMultKTL : 1)
-            * Math.pow(1.05, data.upgrades.extraAncientCoins.upgradePower);
+            * Math.pow(1.05, data.upgrades.extraAncientCoins.upgradePower)
+            * Math.pow(1.5, data.shopUpgrades.extraAncientCoins.upgradePower)
+            * (data.shopUpgrades.currencyGainPotion.upgradePower > 0 ? 2 : 1);
         text += `+<span style="font-weight:bold;color:var(--AC-color)">${intToString(ACAmount, 1)}</span> Ancient Coins`
     } else if(type === "addAW") {
         let AWAmount = extra
             * (data.upgrades.listenCloserToWhispers.upgradePower === 1?3:1)
             * (1 + data.lichKills/2)
             * (data.gameState === "KTL" ? data.ancientWhisperMultKTL : 1)
-            * Math.pow(1.1, data.upgrades.extraAncientWhispers.upgradePower);
+            * Math.pow(1.1, data.upgrades.extraAncientWhispers.upgradePower)
+            * Math.pow(1.5, data.shopUpgrades.extraAncientWhispers.upgradePower)
+            * (data.shopUpgrades.currencyGainPotion.upgradePower > 0 ? 2 : 1);
         text += `+<span style="font-weight:bold;color:var(--AW-color)">${intToString(AWAmount, 1)}</span> Ancient Whispers`
     }
     return text;
@@ -1236,9 +1240,11 @@ function attachSliderListenersHelper(actionVar, downstreamVar) {
 
 
 function highlightLine(borderId, lineData) {
-    if(data.actions[lineData.from][lineData.to + "TempFocusMult"] < 2) { //for loading
-        data.actions[lineData.from][lineData.to + "TempFocusMult"] = 2;
+    if(data.actions[lineData.from][lineData.to + "TempFocusMult"] < (2  + data.shopUpgrades.moreFocusMultiplier.upgradePower)) { //for loading
+        data.actions[lineData.from][lineData.to + "TempFocusMult"] = 2 + data.shopUpgrades.moreFocusMultiplier.upgradePower;
     }
+    data.actions[lineData.from].connectedLines++;
+    data.actions[lineData.to].connectedLines++;
 
     const line = document.getElementById(borderId);
     line.style.boxShadow = scaleByPlane[data.planeTabSelected] < .55 ? '0 0 40px 11px yellow' : '0 0 18px 5px yellow';
@@ -1248,6 +1254,8 @@ function unhighlightLine(borderId, lineData) {
     const line = document.getElementById(borderId);
     line.style.boxShadow = '';
     line.querySelector(".line-label-top").style.opacity = "0";
+    data.actions[lineData.from].connectedLines--;
+    data.actions[lineData.to].connectedLines--;
 }
 function handleLineClick(borderId, lineData) {
     const existingIndex = data.focusSelected.findIndex(entry => entry.borderId === borderId);
@@ -1418,6 +1426,7 @@ function setAllCaches() {
     queueCache("secondsThisLS");
     queueCache("genesisPoints");
     queueCache("genesisResets");
+    queueCache("shopContainer");
 
     for(let actionVar in data.actions) {
         view.cached[`${actionVar}ActionPower`] = document.getElementById(`${actionVar}ActionPower`);

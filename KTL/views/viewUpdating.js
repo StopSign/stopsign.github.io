@@ -44,7 +44,10 @@ let views = {
         views.updateVal(`secondsThisGR`, data.currentGameState.secondsThisGR, "textContent", "time");
         views.updateVal(`secondsThisLSContainer`, (data.lichKills > 0 || data.genesisResets > 0) ? "" : "none", "style.display");
         views.updateVal(`secondsThisLS`, data.currentGameState.secondsThisLS, "textContent", "time");
-        views.updateVal(`legacyMult`, data.legacyMultKTL * Math.pow(1.1, data.upgrades.extraLegacy.upgradePower), "innerText", 2);
+        views.updateVal(`legacyMult`, data.legacyMultKTL
+            * Math.pow(1.1, data.upgrades.extraLegacy.upgradePower)
+            * Math.pow(1.5, data.shopUpgrades.extraLegacy.upgradePower)
+            * (data.shopUpgrades.currencyGainPotion.upgradePower > 0 ? 2 : 1), "innerText", 2);
         views.updateVal(`ancientCoinMult`, data.ancientCoinMultKTL, "innerText", 2);
 
         views.updateVal(`manaQualityDisplay`, actionData.awakenYourGrimoire.manaQuality() > 0 ? "" : "none", "style.display");
@@ -53,6 +56,11 @@ let views = {
 
         let shouldShowKTLButton = data.actions.hearAboutTheLich.level >= 1 && data.gameState !== "KTL";
         views.updateVal(`killTheLichMenuButton2`, shouldShowKTLButton?"":"none", "style.display")
+
+        if(isSteam) {
+            let hideShop = data[hashIt("test")] || !data[hashIt(mySecret)]
+            views.updateVal(`shopContainer`, hideShop ? "none" : "", "style.display")
+        }
 
     },
     scheduleUpdate: function(elementId, value, type) {
@@ -592,6 +600,11 @@ function updateGlobals() {
     views.updateVal(`lichCoins2`, data.lichCoins, "textContent", "floor");
     views.updateVal(`genesisPoints`, data.genesisPoints, "textContent", "floor");
     views.updateVal(`genesisResets`, data.genesisResets, "textContent", "floor");
+
+    if(isSteam) {
+        views.updateVal(`momentumGainTimer`, data.shopUpgrades.momentumGainPotion.upgradePower / 1000, "textContent", "time");
+        views.updateVal(`currencyGainTimer`, data.shopUpgrades.currencyGainPotion.upgradePower / 1000, "textContent", "time");
+    }
 }
 
 

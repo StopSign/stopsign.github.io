@@ -16,6 +16,7 @@ let saveName = "KTLsave6"; //Blank if you don't want to save, change name to for
 let data = {};
 data.actions = {};
 data.atts = {};
+
 data.toastStates = []; // array of toast objects: {id, state, element}
 data.planeUnlocked = [true, false, false, false];
 data.planeTabSelected = 0;
@@ -30,6 +31,9 @@ data.highestLegacy = 0;
 data.genesisPoints = 0;
 data.genesisResets = 0;
 data.fightGenerated = 0;
+data.soulCoins = 0;
+data.totalBoughtSoulCoins = 0;
+data.totalDailySoulCoins = 0;
 
 
 data.useAmuletButtonShowing = false;
@@ -55,6 +59,7 @@ data.queuedReveals = {}
 data.chartData = []; // Stores { time: number, value: number, HATL: number, MQ: number }
 let graphType = "momentum"; //"momentum" or "magic"
 let hashedKey = "test";
+let mySecret = "test"
 
 // --- Core Settings ---
 data.gameSettings = {
@@ -85,6 +90,8 @@ data.currentGameState = {
     instantTimerCooldown:0,
     secondsPassed: 0,
     secondsThisLS: 0,
+    dailyTimer: 0,
+    dailyCharges: 0
 };
 
 
@@ -103,6 +110,7 @@ let isSteam = false; //SET FOR COMMIT
 
 
 data.upgrades = {};
+data.shopUpgrades = {};
 
 
 let isDebug = false; //SET FOR COMMIT
@@ -117,6 +125,8 @@ function debug() {
 
 function initializeData() {
     createUpgrades(false);
+    initializeShopData();
+
     createAndLinkNewAttribute("doom", "doom");
     createAndLinkNewAttribute("synthesis", "integration");
     createAndLinkNewAttribute("synthesis", "legacy");

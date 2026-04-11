@@ -131,6 +131,8 @@ function actionSetInitialVariables(actionObj, dataObj) {
     actionObj.highestLevel = -1;
     actionObj.secondHighestLevel = -1;
     actionObj.thirdHighestLevel = -1;
+
+    actionObj.connectedLines = 0;
 }
 
 function createAndLinkNewAction(actionVar, dataObj, downstreamVars) {
@@ -144,7 +146,7 @@ function createAndLinkNewAction(actionVar, dataObj, downstreamVars) {
     actionSetBaseVariables(actionObj, dataObj);
 
     for(let downstreamVar of dataObj.downstreamVars) {
-        actionObj[downstreamVar+"TempFocusMult"] = 2;
+        actionObj[downstreamVar+"TempFocusMult"] = 2 + data.shopUpgrades.moreFocusMultiplier.upgradePower;
         actionObj[downstreamVar+"PermFocusMult"] = 1;
         actionObj[`downstreamRate${downstreamVar}`] = 0;
     }
@@ -432,11 +434,16 @@ function actionAddExp(actionObj, exp) {
 function resetRun() {
     //essentially an amulet use but without gain
     //also on amulet use needs to save the state of anything that can be perma-gained during the run:
-    //legacy&highest, infusion 2 actions, infusion unlock costs, KTL log, perma-focus
+    //legacy&highest, infusion 2 actions, infusion & magic unlock costs, KTL log, perma-focus
     //then revert to this state
 
-    //Gain 1 free use every 48 hours, start with 2
-    //can't use on first reset
+    //does a
+}
+
+function saveState() {
+    if(!data.savedState) { data.savedState = {}}
+    data.savedState.highestLegacy = data.highestLegacy;
+    data.savedState.legacy = data.legacy;
 
 }
 
@@ -614,6 +621,8 @@ function statAddAmount(attVar, amount) {
             }
         }
         amount *= Math.pow(1.1, data.upgrades.extraLegacy.upgradePower);
+        amount *= Math.pow(1.5, data.shopUpgrades.extraLegacy.upgradePower);
+        amount *= (data.shopUpgrades.currencyGainPotion.upgradePower > 0 ? 2 : 1)
         amount *= (data.upgrades.makeADeeperImpact.upgradePower===1?3:1);
         addLegacy(amount) //x3 up to prev highest
         data.actions.echoKindle.resource = data.legacy;

@@ -757,7 +757,7 @@ function skipTime(time) {
         data.gameSettings.stop = false;
         data.gameSettings.ticksPerSecond = 1;
 
-        for (let i = 0; i < time * 60; i++) {
+        for (let i = 0; i < time * 60 * (1 + data.shopUpgrades.extraGameSpeed.upgradePower*.1); i++) {
             gameTick();
             secondPassed();
         }
@@ -789,8 +789,8 @@ function convertBonusTime() {
     if (btn.innerText.indexOf("Use in") !== -1) return;
 
     let amountToConvert = 0;
-    if (data.currentGameState.bonusTime >= 120 * 60 * 1000) {
-        amountToConvert = 120 * 60 * 1000;
+    if (data.currentGameState.bonusTime >= (2 + data.shopUpgrades.extraInstantTimeConversion.upgradePower) * 60 * 60 * 1000) {
+        amountToConvert = (2 + data.shopUpgrades.extraInstantTimeConversion.upgradePower) * 60 * 60 * 1000;
     } else if(data.currentGameState.bonusTime > 0) {
         amountToConvert = data.currentGameState.bonusTime;
     }
@@ -1238,4 +1238,88 @@ function removePinnedAction(actionVar) {
     if (index !== -1) {
         data.currentPinned.splice(index, 1);
     }
+}
+
+function chooseRandomFocusLines() {
+    for (let focusObj of data.focusSelected) {
+        unhighlightLine(focusObj.borderId, focusObj.lineData);
+    }
+    data.focusSelected = [];
+
+    let options = [];
+    let maxPermFocus = data.upgrades.rememberWhatIFocusedOn.upgradePower + 1;
+    for(let actionVar in data.actions) {
+        let actionObj = data.actions[actionVar];
+        let dataObj = actionData[actionVar];
+        if(dataObj.plane === 2 || !actionObj.visible || !actionObj.purchased) {
+            continue;
+        }
+        for (let downstreamVar of dataObj.downstreamVars) {
+            let downstreamObj = data.actions[downstreamVar]
+            let downstreamDataObj = actionData[downstreamVar];
+            if(!downstreamObj.purchased || !downstreamObj.visible || !downstreamDataObj.hasUpstream) {
+                continue;
+            }
+            if(actionObj[downstreamVar+"PermFocusMult"] < maxPermFocus) {
+                options.push({from:actionVar, to:downstreamVar});
+            }
+        }
+    }
+    let selected = [];
+    for (let i = 0; i < data.maxFocusAllowed && options.length > 0; i++) {
+        let index = Math.floor(Math.random() * options.length);
+        selected.push(options.splice(index, 1)[0]);
+    }
+    for(let select of selected) {
+        let borderId = `${select.from}_${select.to}_Line_Outer`;
+        handleLineClick(borderId, select)
+    }
+    updatePermFocusText()
+}
+
+function chooseLowestFocusLines() {
+    for (let focusObj of data.focusSelected) {
+        unhighlightLine(focusObj.borderId, focusObj.lineData);
+    }
+    data.focusSelected = [];
+
+    let options = [];
+    let maxPermFocus = data.upgrades.rememberWhatIFocusedOn.upgradePower + 1;
+
+    for (let actionVar in data.actions) {
+        let actionObj = data.actions[actionVar];
+        let dataObj = actionData[actionVar];
+        if(dataObj.plane === 2 || !actionObj.visible || !actionObj.purchased) {
+            continue;
+        }
+
+        for (let downstreamVar of dataObj.downstreamVars) {
+            let downstreamObj = data.actions[downstreamVar]
+            let downstreamDataObj = actionData[downstreamVar];
+            if(!downstreamObj.purchased || !downstreamObj.visible || !downstreamDataObj.hasUpstream) {
+                continue;
+            }
+            let val = actionObj[downstreamVar + "PermFocusMult"];
+            if (val < maxPermFocus) {
+                options.push({ from: actionVar, to: downstreamVar, val: val });
+            }
+        }
+    }
+
+    let selected = [];
+    for (let i = 0; i < 4 && options.length > 0; i++) {
+        let lowestIdx = 0;
+        for (let j = 1; j < options.length; j++) {
+            if (options[j].val < options[lowestIdx].val) {
+                lowestIdx = j;
+            }
+        }
+        selected.push(options.splice(lowestIdx, 1)[0]);
+    }
+
+    for (let select of selected) {
+        let borderId = `${select.from}_${select.to}_Line_Outer`;
+        handleLineClick(borderId, select)
+    }
+    updatePermFocusText()
 }

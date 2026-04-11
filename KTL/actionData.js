@@ -104,7 +104,8 @@ let actionData = {
             actionObj.actionPower = actionObj.actionPowerBase *
                 actionObj.actionPowerMult;
             actionObj.resourceToAdd = actionObj.actionPower *
-                actionObj.upgradeMult * spellMult * (actionObj.efficiency / 100);
+                actionObj.upgradeMult * spellMult * (actionObj.efficiency / 100)
+            * (data.shopUpgrades.momentumGainPotion.upgradePower > 0 ? 2 : 1);
             actionObj.showResourceAdded = actionObj.resourceToAdd;
         },
         onLevelCustom: function () {
@@ -345,8 +346,8 @@ let actionData = {
                     }
                 }
             }
-
-            let resourceTaken = actionObj.resource * calcTierMult(this.tier)
+            let consumptionReduction = Math.max(0, 1 - (data.shopUpgrades.focusBarsImproveEfficiency.upgradePower * .25 * actionObj.connectedLines));
+            let resourceTaken = actionObj.resource * calcTierMult(this.tier) * consumptionReduction
 
             if (actionObj.resourceToAdd > 0) {
                 actionObj.resource -= resourceTaken;
@@ -750,7 +751,9 @@ let actionData = {
             //stop consuming from reinvest - it's not amount on reinvest * 1.05, but it's 5% of what's on reinvest
             let actionObj = data.actions.invest;
             actionData.invest.updateMults();
-            let resourceTaken = actionObj.resource * calcTierMult(this.tier);
+
+            let consumptionReduction = Math.max(0, 1 - (data.shopUpgrades.focusBarsImproveEfficiency.upgradePower * .25 * actionObj.connectedLines));
+            let resourceTaken = actionObj.resource * calcTierMult(this.tier) * consumptionReduction;
             if (resourceTaken <= 1) {
                 resourceTaken = 0;
             }
@@ -1093,7 +1096,8 @@ let actionData = {
                 }
             }
 
-            let resourceTaken = actionObj.resource * calcTierMult(this.tier);
+            let consumptionReduction = Math.max(0, 1 - (data.shopUpgrades.focusBarsImproveEfficiency.upgradePower * .25 * actionObj.connectedLines));
+            let resourceTaken = actionObj.resource * calcTierMult(this.tier) * consumptionReduction;
 
             if (actionObj.resourceToAdd > 0) {
                 actionObj.resource -= resourceTaken;
@@ -1211,10 +1215,13 @@ let actionData = {
         ignoreConsume:true,
         onLevelCustom: function () {
             if(data.actions.hearAboutTheLich.level <= 1) {
-                data.ancientCoinMultKTL = Math.pow(1.05, data.upgrades.extraAncientCoins.upgradePower);
+                data.ancientCoinMultKTL = 1
             } else {
-                data.ancientCoinMultKTL = Math.pow(1.5, (data.actions.hearAboutTheLich.level - 1)) * Math.pow(1.05, data.upgrades.extraAncientCoins.upgradePower);
+                data.ancientCoinMultKTL = Math.pow(1.5, (data.actions.hearAboutTheLich.level - 1));
             }
+            data.ancientCoinMultKTL *= Math.pow(1.05, data.upgrades.extraAncientCoins.upgradePower);
+            data.ancientCoinMultKTL *= Math.pow(1.5, data.shopUpgrades.extraAncientCoins.upgradePower);
+            data.ancientCoinMultKTL *= (data.shopUpgrades.currencyGainPotion.upgradePower > 0 ? 2 : 1)
         },
         updateMults: function () {
             let actionObj = data.actions.hearAboutTheLich;

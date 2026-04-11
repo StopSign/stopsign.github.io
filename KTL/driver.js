@@ -15,9 +15,10 @@ function checkOfflineProgress() {
     if (data.lastVisit) {
         const offlineMilliseconds = Date.now() - parseInt(data.lastVisit, 10);
         if (offlineMilliseconds > 5000) {
-            data.currentGameState.bonusTime += offlineMilliseconds;
+            data.currentGameState.bonusTime += offlineMilliseconds * (1 + 1000 * data.shopUpgrades.extraBonusTime.upgradePower * .25);
             console.log(`Welcome back! Gained ${(offlineMilliseconds / 1000).toFixed(1)}s of bonus time.`);
             data.currentGameState.instantTimerCooldown -= offlineMilliseconds / 1000;
+            data.currentGameState.dailyTimer -= offlineMilliseconds;
         }
     }
 }
@@ -92,6 +93,11 @@ function realSecondPassed() {
 }
 
 function tickTimerCooldown() {
+    data.currentGameState.dailyTimer -= 1000;
+    data.currentGameState.bonusTime += 1000 * data.shopUpgrades.extraBonusTime.upgradePower * .25;
+
+    checkDailyTimer()
+
     if (data.currentGameState.instantTimerCooldown > 0) {
         data.currentGameState.instantTimerCooldown --;
     }
@@ -107,7 +113,7 @@ function updateConvertButtonUI() {
         views.updateVal(`convertBtn`, "Use in " + secondsToTime(data.currentGameState.instantTimerCooldown), "innerText");
     } else {
         views.updateVal(`convertBtn`, "green", "style.backgroundColor");
-        views.updateVal(`convertBtn`, "Convert 2 hours", "innerText");
+        views.updateVal(`convertBtn`, `Convert ${2 + data.shopUpgrades.extraInstantTimeConversion.upgradePower} hours`, "innerText");
     }
 }
 
@@ -175,8 +181,8 @@ function gameTick() {
                     continue;
                 }
                 actionObj[key] += power / data.gameSettings.ticksPerSecond / 600;
-                if(actionObj[key] > power + 2) {
-                    actionObj[key] = power + 2;
+                if(actionObj[key] > power + 2 + data.shopUpgrades.moreFocusMultiplier.upgradePower) {
+                    actionObj[key] = power + 2 + data.shopUpgrades.moreFocusMultiplier.upgradePower;
                 }
             }
         }
@@ -184,6 +190,7 @@ function gameTick() {
 
     upgradeUpdates()
     calcDeltas();
+    reduceShopTimers(1000 / data.gameSettings.ticksPerSecond)
 }
 
 function calcDeltas() {
@@ -220,7 +227,8 @@ function calcDeltas() {
         if(actionVar === "tidalBurden") {
             actionObj.resourceDecrease = totalDecrease
         } else {
-            actionObj.resourceDecrease = totalDecrease * (1-data.upgrades.reduceResourcesConsumed.upgradePower*.05);
+            let consumptionReduction = Math.max(0, 1 - (data.shopUpgrades.focusBarsImproveEfficiency.upgradePower * .25 * actionObj.connectedLines));
+            actionObj.resourceDecrease = totalDecrease * (1-data.upgrades.reduceResourcesConsumed.upgradePower*.05) * consumptionReduction;
         }
 
         // Calculate the final net change per second for display.
@@ -288,7 +296,8 @@ function tickGameObject(actionVar) {
         if(actionVar === "tidalBurden") {
             actionObj.resource -= resourceToAddInefficient
         } else {
-            actionObj.resource -= resourceToAddInefficient * (1-data.upgrades.reduceResourcesConsumed.upgradePower*.05);
+            let consumptionReduction = Math.max(0, 1 - (data.shopUpgrades.focusBarsImproveEfficiency.upgradePower * .25 * actionObj.connectedLines));
+            actionObj.resource -= resourceToAddInefficient * (1-data.upgrades.reduceResourcesConsumed.upgradePower*.05) * consumptionReduction;
         }
     }
 
