@@ -608,7 +608,7 @@ let shopUpgrades = {
             data.currentGameState.bonusTime += 1000 * 60 * 60 * 24;
         }
     },
-    anotherRound: {
+    fightAgain: {
         initialCost:100, consumable: true, visible:true, costIncrease:1,
         creationVersion: 9,
         unlockText:"",
@@ -617,7 +617,7 @@ let shopUpgrades = {
         },
         onBuy: function(varName) {
             if(data.gameState !== "KTL") {
-                data.shopUpgrades.anotherRound.numConsumable++
+                data.shopUpgrades.fightAgain.numConsumable++
                 return;
             }
 
