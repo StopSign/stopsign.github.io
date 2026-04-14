@@ -679,18 +679,7 @@ function displayLSStuff() {
 
     modifyMonolithTitles()
 
-    if(!data.lichKills) {
-        return;
-    }
-
-
-    if(data.lichKills >= 1) {
-        revealUpgrade('rememberWhatIDid') //10
-        revealUpgrade('valueMyBody') //15, 150, 1500
-        revealUpgrade('pickUpValuablePlants')
-        revealUpgrade('shapeMyPath') //20
-
-
+    if(data.lichKills >= 1 || data.upgrades.extraDeathEnergy.upgradePower > 0) {
         unveilPlane(0)
         unveilPlane(3)
         revealAction("reposeRebounded")
@@ -700,6 +689,17 @@ function displayLSStuff() {
         unlockAction(data.actions.reposeRebounded);
         unlockAction(data.actions.turnTheWheel);
         unlockAction(data.actions.tidalBurden);
+    }
+
+    if(!data.lichKills) {
+        return;
+    }
+
+    if(data.lichKills >= 1) {
+        revealUpgrade('rememberWhatIDid') //10
+        revealUpgrade('valueMyBody') //15, 150, 1500
+        revealUpgrade('pickUpValuablePlants')
+        revealUpgrade('shapeMyPath') //20
 
         if(data.upgrades.increaseInitialInvestment.upgradePower >= 7) {
             revealUpgrade("findAngelInvestors")

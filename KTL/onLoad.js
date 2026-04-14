@@ -55,7 +55,6 @@ function adjustUIAfterLoad(toLoad, saveVersionFromLoad) {
 }
 
 function updateUIOnLoad() {
-
     updatePauseButtonVisuals()
 
     refreshResetLog()

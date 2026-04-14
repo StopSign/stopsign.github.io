@@ -607,13 +607,14 @@ function createChangelogMenu() {
     return Raw.html`
         <div class="menuTitle">Changelog</div>
         <div class="menuSeparator"></div><br>
-        v3.2.1 4/10 (current): <br>
+        v3.2.2 4/14 (current): <br>
         <ol>
             <li>Ancient Whisper mult is saved - will come back on page refresh</li>
             <li>Removed the "undefined" from certain action's stat pages</li>
             <li>Perm focus gain text will clear after genesis</li>
             <li>Prepared the game for steam, including daily bonus and shop that only appears on steam</li>
             <li>3.2.1 Fixed store</li>
+            <li>3.2.2 Fixed Infusion not appearing with a NG+ upgrade</li>
         </ol><br><br>
         
         v3.1.7 3/31: <br>
