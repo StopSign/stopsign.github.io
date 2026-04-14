@@ -18,7 +18,7 @@ data.actions = {};
 data.atts = {};
 
 data.toastStates = []; // array of toast objects: {id, state, element}
-data.planeUnlocked = [true, false, false, false];
+data.planeUnlocked = [true, false, false, false, false];
 data.planeTabSelected = 0;
 data.gameState = "default"; //KTL
 data.totalMomentum = 0;
@@ -99,8 +99,8 @@ let viewData = {}; //contains only things that are generated / not saved
 viewData.toasts = [];
 
 let language = "english";
-let globalVisible = false; //SET FOR COMMIT
-// let globalVisible = true;
+// let globalVisible = false; //SET FOR COMMIT
+let globalVisible = true;
 let isLoadingEnabled = true; //SET FOR COMMIT
 // let isLoadingEnabled = false;
 let loadStaticSaveFile = false; //SET FOR COMMIT
@@ -661,62 +661,6 @@ function initializeData() {
 
     // create("infuseImage", [], .5, 1.5)
 
-
-
     setParents();
     processActionStoriesXML();
-}
-
-function setParents() {
-    for(let actionVar in data.actions) {
-        let dataObj = actionData[actionVar];
-        for(let downstreamVar of dataObj.downstreamVars) {
-            let downstreamDataObj = actionData[downstreamVar];
-            if(downstreamDataObj) {
-                downstreamDataObj.parentVar = actionVar;
-            }
-        }
-    }
-}
-
-let check = 0;
-//Add all action.downstreamVars.forEach(downstreamVar variables to a list
-//Repeat until the list is empty:
-//Get the next in the list, set its realX and realY based on the parents, and add its downstream vars to the list
-function setRealCoordinates(startActionVar) {
-    // Create a queue and start with the given action variable
-    let queue = [startActionVar];
-
-    while (queue.length > 0) {
-        let currentVar = queue.shift();
-        let dataObj = actionData[currentVar];
-        let actionObj = data.actions[currentVar];
-        if(check++ > 2000) {
-            data.gameSettings.stop = 1;
-            console.log("You have an infinite loop on action creation with: " + currentVar);
-            return;
-        }
-
-        if (!dataObj) continue; // If action doesn't exist, skip it
-
-        // Determine realX and realY
-        let parentAction = actionData[dataObj.parentVar];
-        if (dataObj.parentVar && parentAction) {
-            dataObj.realX = parentAction.realX + dataObj.x;
-            dataObj.realY = parentAction.realY + dataObj.y;
-        } else {
-            // This is the top-level action
-            dataObj.realX = dataObj.x;
-            dataObj.realY = dataObj.y;
-        }
-
-        // Add downstream actions to the queue
-        if (dataObj.downstreamVars && dataObj.downstreamVars.length > 0) {
-            dataObj.downstreamVars.forEach(downstreamVar => {
-                if (actionData[downstreamVar]) {
-                    queue.push(downstreamVar);
-                }
-            });
-        }
-    }
 }

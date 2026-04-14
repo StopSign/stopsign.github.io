@@ -1,4 +1,4 @@
-
+// Context: This file extends the global 'actionData' object. Refer to 'actionData.js' for the @typedef blueprint.
 //==== plane2 ====
 actionData = {
     ...actionData,

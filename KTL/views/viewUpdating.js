@@ -1156,3 +1156,5 @@ function rebuildTriggerInfo(actionVar) {
 
     triggerInfoContainer.appendChild(infoWrapper);
 }
+
+

@@ -58,6 +58,10 @@
     --world-3-bg-secondary: #06462d;
     --world-3-bg-tertiary: #085f3f;
 
+    --world-4-bg-primary: #556060;
+    --world-4-bg-secondary: #738282;
+    --world-4-bg-tertiary: #95b1b1;
+
 
     /*--world-0-bg-primary: #1e1e2e;*/
     /*--world-0-bg-secondary: #313244;*/
@@ -715,6 +719,17 @@ input {
 .planeButton3:active {
     background-color:var(--world-3-bg-tertiary);
 }
+.planeButton4 {
+    background-color:var(--world-4-bg-primary);
+    border:2px solid var(--world-4-bg-secondary);
+}
+.planeButton4:hover {
+    background-color:var(--world-4-bg-secondary);
+}
+.planeButton4:active {
+    background-color:var(--world-4-bg-tertiary);
+}
+
 
 
 

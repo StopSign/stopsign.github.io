@@ -24,6 +24,7 @@ document.addEventListener("keydown", function(e) {
     else if (code === 'Digit2') switchToPlane(1);
     else if (code === 'Digit3') switchToPlane(2);
     else if (code === 'Digit4') switchToPlane(3);
+    else if (code === 'Digit5') switchToPlane(4);
 
     let isShowing = document.getElementById("helpMenu").style.display !== "none";
 

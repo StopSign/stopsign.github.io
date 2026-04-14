@@ -1317,5 +1317,6 @@ function debugAfterCare() {
         unveilPlane(1);
         unveilPlane(2);
         unveilPlane(3);
+        unveilPlane(4);
     }
 }
