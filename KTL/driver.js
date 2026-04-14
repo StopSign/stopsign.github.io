@@ -15,7 +15,7 @@ function checkOfflineProgress() {
     if (data.lastVisit) {
         const offlineMilliseconds = Date.now() - parseInt(data.lastVisit, 10);
         if (offlineMilliseconds > 5000) {
-            data.currentGameState.bonusTime += offlineMilliseconds * (1 + 1000 * data.shopUpgrades.extraBonusTime.upgradePower * .25);
+            data.currentGameState.bonusTime += offlineMilliseconds * (1 + data.shopUpgrades.extraBonusTime.upgradePower * .25);
             console.log(`Welcome back! Gained ${(offlineMilliseconds / 1000).toFixed(1)}s of bonus time.`);
             data.currentGameState.instantTimerCooldown -= offlineMilliseconds / 1000;
             data.currentGameState.dailyTimer -= offlineMilliseconds;

@@ -25,7 +25,7 @@ For now you have one direction to send the resources: to the action Reflect. Go 
 
 All tips that you close can be found again in Menu -> Previously Closed Tips.<br><br>
 
-As a bonus for playing (and reading), use the bonus code "gift" in Menu -> Options for a free 24 hours of bonus time`);
+As a bonus for playing (and reading), use the bonus code "gift" in Menu -> Options for a free 1 hours of bonus time`);
 
 
 

@@ -616,7 +616,7 @@ function createChangelogMenu() {
     return Raw.html`
         <div class="menuTitle">Changelog</div>
         <div class="menuSeparator"></div><br>
-        v3.2.3 4/14 (current): <br>
+        v3.2.4 4/14 (current): <br>
         <ol>
             <li>Ancient Whisper mult is saved - will come back on page refresh</li>
             <li>Removed the "undefined" from certain action's stat pages</li>
@@ -626,6 +626,8 @@ function createChangelogMenu() {
             <li>3.2.2 Fixed Infusion not appearing with a NG+ upgrade</li>
             <li>3.2.3 Fixed bonus speed button not disabling on empty</li>
             <li>3.2.3 Added an Error Log menu for steam errors</li>
+            <li>3.2.4 Fixed an offline bug with a paid upgrade</li>
+            <li>3.2.4 Corrected the description of the "gifts" bonus from 24hr to 1hr</li>
         </ol><br><br>
         
         v3.1.7 3/31: <br>
