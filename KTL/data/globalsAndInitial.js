@@ -99,8 +99,8 @@ let viewData = {}; //contains only things that are generated / not saved
 viewData.toasts = [];
 
 let language = "english";
-// let globalVisible = false; //SET FOR COMMIT
-let globalVisible = true;
+let globalVisible = false; //SET FOR COMMIT
+// let globalVisible = true;
 let isLoadingEnabled = true; //SET FOR COMMIT
 // let isLoadingEnabled = false;
 let loadStaticSaveFile = false; //SET FOR COMMIT
