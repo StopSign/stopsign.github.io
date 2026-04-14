@@ -53,6 +53,10 @@ function loop() {
                 const processedElapsed = ticksProcessed * tickInterval;
                 const bonusTimeConsumed = processedElapsed * data.gameSettings.gameSpeed * (data.gameSettings.bonusSpeed - 1);
                 data.currentGameState.bonusTime -= bonusTimeConsumed;
+                if (data.currentGameState.bonusTime <= 0) {
+                    data.currentGameState.bonusTime = 0;
+                    data.gameSettings.bonusSpeed = 1;
+                }
             }
         } else {
             data.currentGameState.bonusTime += tickInterval * ticksProcessed;

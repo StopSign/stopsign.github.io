@@ -5,6 +5,24 @@ let isSweeping = false;
 let emptySweepCount = parseInt(localStorage.getItem('emptySweepCount')) || 0;
 let penaltyLevel = parseInt(localStorage.getItem('penaltyLevel')) || 0;
 let lockoutEndTime = parseInt(localStorage.getItem('lockoutEndTime')) || 0;
+const steamErrorLogStorageKey = "steamErrorLog";
+let steamErrorLog = JSON.parse(localStorage.getItem(steamErrorLogStorageKey) || "[]");
+
+function updateSteamErrorLogContainer() {
+    const errorLogContainer = document.getElementById("errorLogContainer");
+    if (!errorLogContainer) return;
+    errorLogContainer.textContent = steamErrorLog.join("\n");
+}
+
+function addSteamErrorLog(errorMessage) {
+    const time = new Date().toLocaleString();
+    steamErrorLog.push(`[${time}] ${errorMessage}`);
+    if (steamErrorLog.length > 30) {
+        steamErrorLog = steamErrorLog.slice(-30);
+    }
+    localStorage.setItem(steamErrorLogStorageKey, JSON.stringify(steamErrorLog));
+    updateSteamErrorLogContainer();
+}
 
 function updateOutput(message) {
     document.getElementById('shopOutputMessage').innerText = message;
@@ -35,6 +53,7 @@ function requestManualSweep() {
     try {
         window.steamAPI.forceSweep();
     } catch (e) {
+        addSteamErrorLog(`requestManualSweep failed: ${e && e.message ? e.message : String(e)}`);
         updateOutput("Not in Steam");
     }
     refreshShopUpgrades()
@@ -76,6 +95,7 @@ if(window.steamAPI) {
 
         } else if (result.error) {
             console.error('Sweep Error:', result.error);
+            addSteamErrorLog(`Sweep Error: ${typeof result.error === "string" ? result.error : JSON.stringify(result.error)}`);
             updateOutput("Network error while checking Steam. Try again later.");
             setTimeout(() => {
                 btn.disabled = false;

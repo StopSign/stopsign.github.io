@@ -566,6 +566,11 @@ function checkActionsToReveal() {
 }
 
 function updateGlobals() {
+    if (data.currentGameState.bonusTime <= 1000 && data.gameSettings.bonusSpeed > 1) {
+        data.gameSettings.bonusSpeed = 1;
+    }
+    updateBonusSpeedButton();
+
     let totalMometum = 0;
     for(let actionVar in data.actions) {
         let actionObj = data.actions[actionVar];

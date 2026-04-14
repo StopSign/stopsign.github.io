@@ -36,6 +36,8 @@ function initializeMenus() {
         document.getElementById("helpForRealMenuTab").style.display = "flex";
     });
 
+    addMenuTab("errorLog");
+    addMenuTextContainer("errorLog", createErrorLogMenu());
 }
 
 function statChartInitial() {
@@ -602,12 +604,19 @@ function addDataTab() {
     addMenuTab("statistics");
 }
 
+function createErrorLogMenu() {
+    return `<div class="menuTitle">Certain errors will show here:</div>
+    <div class="menuSeparator"></div>
+    <div id="errorLogContainer"></div>
+    <br/>`
+}
+
 //Also update id="currentVersion"
 function createChangelogMenu() {
     return Raw.html`
         <div class="menuTitle">Changelog</div>
         <div class="menuSeparator"></div><br>
-        v3.2.2 4/14 (current): <br>
+        v3.2.3 4/14 (current): <br>
         <ol>
             <li>Ancient Whisper mult is saved - will come back on page refresh</li>
             <li>Removed the "undefined" from certain action's stat pages</li>
@@ -615,6 +624,8 @@ function createChangelogMenu() {
             <li>Prepared the game for steam, including daily bonus and shop that only appears on steam</li>
             <li>3.2.1 Fixed store</li>
             <li>3.2.2 Fixed Infusion not appearing with a NG+ upgrade</li>
+            <li>3.2.3 Fixed bonus speed button not disabling on empty</li>
+            <li>3.2.3 Added an Error Log menu for steam errors</li>
         </ol><br><br>
         
         v3.1.7 3/31: <br>

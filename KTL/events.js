@@ -738,11 +738,11 @@ function toggleBonusSpeed() {
 
 function updateBonusSpeedButton() {
     if(data.gameSettings.bonusSpeed === 1) {
-        document.getElementById("toggleBonusSpeedButton").style.backgroundColor = "red";
-        document.getElementById("toggleBonusSpeedButton").textContent = "Enable Bonus Speed";
+        views.updateVal("toggleBonusSpeedButton", "red", "style.backgroundColor");
+        views.updateVal("toggleBonusSpeedButton", "Enable Bonus Speed", "textContent")
     } else {
-        document.getElementById("toggleBonusSpeedButton").style.backgroundColor = "green";
-        document.getElementById("toggleBonusSpeedButton").textContent = "Disable Bonus Speed";
+        views.updateVal("toggleBonusSpeedButton", "green", "style.backgroundColor");
+        views.updateVal("toggleBonusSpeedButton", "Disable Bonus Speed", "textContent")
     }
 }
 

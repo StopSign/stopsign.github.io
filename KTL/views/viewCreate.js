@@ -1427,6 +1427,7 @@ function setAllCaches() {
     queueCache("genesisPoints");
     queueCache("genesisResets");
     queueCache("shopContainer");
+    queueCache("toggleBonusSpeedButton");
 
     for(let actionVar in data.actions) {
         view.cached[`${actionVar}ActionPower`] = document.getElementById(`${actionVar}ActionPower`);
