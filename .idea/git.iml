@@ -44,6 +44,9 @@
       <excludeFolder url="file://$MODULE_DIR$/enginePractice" />
       <excludeFolder url="file://$MODULE_DIR$/KTL/notesfolder" />
       <excludeFolder url="file://$MODULE_DIR$/KTL/fonts" />
+      <excludeFolder url="file://$MODULE_DIR$/KTL" />
+      <excludeFolder url="file://$MODULE_DIR$/battleLoops" />
+      <excludeFolder url="file://$MODULE_DIR$/logs" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

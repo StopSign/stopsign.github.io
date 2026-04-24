@@ -1,0 +1,9 @@
+You are assisting with a vanilla JavaScript idle game. Follow these strict architectural rules:
+1. NO FRAMEWORKS. Do not use React, Vue, or TypeScript. 
+2. SEPARATION OF LOOPS: `engine.js` is STRICTLY for data/math calculations per tick, under the `engine` object. `viewUpdating.js` is STRICTLY for DOM manipulation and visual updates per frame, under the `view` object. Never mix the two.
+3. DATA STORAGE: All initial game state is defined in `initialize.js`, under the `initials` object. Massive game data definitions live in `gameData.js`
+4. UI EVENTS: Click handlers and user interactions belong in `events.js`, under the `events` object
+5. HELPERS: Use `helper.js` for formatting and generic functions instead of writing new ones.
+6. SAVING: Any new global variable that tracks progress MUST be integrated into `saving.js`.
+7. Follow the existing style when appropriate. Prefer for-each loops over lambdas.
+8. Only create a css class if it will be used multiple times - otherwise use inline-styling
