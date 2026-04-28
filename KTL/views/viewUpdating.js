@@ -413,10 +413,11 @@ let views = {
 
         if(!actionObj.maxLevel || actionObj.maxLevel !== actionObj.level) {
             let timeToLevel = calcTimeToLevel(actionObj);
-            views.updateVal(`${actionVar}TimeToLevel`, actionObj.maxLevel !== actionObj.level ? secondsToTime(timeToLevel, true) : "-", "textContent")
+            views.updateVal(`${actionVar}TimeToLevel`, secondsToTime(timeToLevel, true), "textContent")
         }
         if(actionObj.maxLevel) {
             let timeToMax = calcTimeToMax(actionVar);
+            views.updateVal(`${actionVar}TimeToLevel`, "-", "textContent")
             views.updateVal(`${actionVar}TimeToMax`, actionObj.maxLevel !== actionObj.level ? secondsToTime(timeToMax, true) : "-", "textContent")
         }
 
@@ -634,9 +635,9 @@ function isActionVisible(actionVar) {
     const elementScreenWidth = 350 * scaleByPlane[data.planeTabSelected];
     const elementScreenHeight = 400 * scaleByPlane[data.planeTabSelected];
 
-    return elementScreenX < window.innerWidth &&
+    return elementScreenX < getViewportWidth() &&
         elementScreenX + elementScreenWidth > 0 &&
-        elementScreenY < (window.innerHeight+50) &&
+        elementScreenY < (getViewportHeight() + 50) &&
         elementScreenY + elementScreenHeight > 0;
 }
 

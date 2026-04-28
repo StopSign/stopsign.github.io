@@ -37,8 +37,11 @@ function loop() {
         const effectiveSpeed = data.gameSettings.gameSpeed * data.gameSettings.bonusSpeed;
         const upgradeMultiplier = 1 + (data.shopUpgrades.extraGameSpeed.upgradePower * 0.1);
         const exactTicks = (ticksProcessed * effectiveSpeed * upgradeMultiplier) + (tickResidue || 0);
-        const totalTicksToRun = Math.floor(exactTicks);
-        tickResidue = exactTicks - totalTicksToRun;
+        const requestedTicksToRun = Math.floor(exactTicks);
+        tickResidue = exactTicks - requestedTicksToRun;
+        const maxSimTicksPerLoop = data.gameSettings.bonusSpeed >= 10 ? 40 : 120;
+        const totalTicksToRun = Math.min(requestedTicksToRun, maxSimTicksPerLoop);
+        const processedRatio = requestedTicksToRun > 0 ? (totalTicksToRun / requestedTicksToRun) : 1;
 
         if (!data.gameSettings.stop) {
             for (let i = 0; i < totalTicksToRun; i++) {
@@ -51,7 +54,7 @@ function loop() {
             }
             if (data.gameSettings.bonusSpeed > 1) {
                 const processedElapsed = ticksProcessed * tickInterval;
-                const bonusTimeConsumed = processedElapsed * data.gameSettings.gameSpeed * (data.gameSettings.bonusSpeed - 1);
+                const bonusTimeConsumed = processedElapsed * data.gameSettings.gameSpeed * (data.gameSettings.bonusSpeed - 1) * processedRatio;
                 data.currentGameState.bonusTime -= bonusTimeConsumed;
                 if (data.currentGameState.bonusTime <= 0) {
                     data.currentGameState.bonusTime = 0;

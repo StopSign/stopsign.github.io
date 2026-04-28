@@ -1,6 +1,21 @@
 
 let gameIsResetting = false;
 let KTLMenuOpen = false; //for the necessary UI updates to work while the menu is open
+function recalculateKTLCurrencyMultipliers() {
+    let hearAboutTheLichMult = 1;
+    if (data.actions.hearAboutTheLich.level > 1) {
+        hearAboutTheLichMult = Math.pow(1.5, data.actions.hearAboutTheLich.level - 1);
+    }
+    const coinUpgradeMult = Math.pow(1.05, data.upgrades.extraAncientCoins.upgradePower);
+    const coinShopMult = Math.pow(1.5, data.shopUpgrades.extraAncientCoins.upgradePower);
+    const whisperUpgradeMult = Math.pow(1.1, data.upgrades.extraAncientWhispers.upgradePower);
+    const whisperShopMult = Math.pow(1.5, data.shopUpgrades.extraAncientWhispers.upgradePower);
+    const potionMult = data.shopUpgrades.currencyGainPotion.upgradePower > 0 ? 2 : 1;
+
+    data.ancientCoinMultKTL = hearAboutTheLichMult * coinUpgradeMult * coinShopMult * potionMult;
+    data.ancientWhisperMultKTL = whisperUpgradeMult * whisperShopMult * potionMult;
+}
+
 function openKTLMenu() {
     document.getElementById('confirmKTL').checked = false;
     KTLMenuOpen = !KTLMenuOpen;
@@ -102,8 +117,7 @@ function resetGameToBase() {
     LSMenuOpen = false;
     views.updateVal("legacySeveranceMenu", "none", "style.display");
     data.legacyMultKTL = 1;
-    data.ancientCoinMultKTL = Math.pow(1.05, data.upgrades.extraAncientCoins.upgradePower) * Math.pow(1.5, data.shopUpgrades.extraAncientCoins.upgradePower) * (data.shopUpgrades.currencyGainPotion.upgradePower > 0 ? 2 : 1);
-    data.ancientWhisperMultKTL = Math.pow(1.1, data.upgrades.extraAncientWhispers.upgradePower) * Math.pow(1.5, data.shopUpgrades.extraAncientWhispers.upgradePower) * (data.shopUpgrades.currencyGainPotion.upgradePower > 0 ? 2 : 1);
+    recalculateKTLCurrencyMultipliers();
 
 
     //Reset all atts and bonuses
@@ -255,6 +269,7 @@ function genesisReset(forceReset) {
     views.updateVal(`useAmuletMenu`, "none", "style.display");
     views.updateVal("openViewAmuletButton", "", "style.display");
 
+    checkShopUnlocks()
     displayLSStuff()
     actionTitleClicked('overclock')
     gameIsResetting = false;
@@ -381,6 +396,7 @@ function legacySeveranceReset(forceReset) {
     views.updateVal("openViewAmuletButton", "", "style.display")
 
     displayLSStuff()
+    checkShopUnlocks()
     actionTitleClicked('overclock')
     gameIsResetting = false;
 }
@@ -420,9 +436,12 @@ function initializeKTL(forceReset) {
         let power = data.upgrades.rememberWhatIFocusedOn.upgradePower + 1;
         if (data.upgrades.rememberWhatIFocusedOn.upgradePower > 0) {
             let actionObj = data.actions[focusObj.lineData.from];
-            actionObj[focusObj.lineData.to + "PermFocusMult"] += Math.pow(data.actions.hearAboutTheLich.level, 2) / 100;
-            if (actionObj[focusObj.lineData.to + "PermFocusMult"] > power) {
-                actionObj[focusObj.lineData.to + "PermFocusMult"] = power;
+            let permFocusMultKey = focusObj.lineData.to + "PermFocusMult";
+            if (actionObj[permFocusMultKey] < power) {
+                actionObj[permFocusMultKey] += Math.pow(data.actions.hearAboutTheLich.level, 2) / 100;
+                if (actionObj[permFocusMultKey] > power) {
+                    actionObj[permFocusMultKey] = power;
+                }
             }
         }
     }
@@ -748,6 +767,7 @@ function useAmulet() {
     views.updateVal(`useAmuletMenu`, "none", "style.display");
     views.updateVal(`openViewAmuletButton`, "", "style.display");
 
+    checkShopUnlocks()
     // saveState()
     gameIsResetting = false;
 }

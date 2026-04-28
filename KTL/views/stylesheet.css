@@ -337,7 +337,7 @@ body {
     border-radius:6px;
     max-width:1200px;
     width:90%;
-    max-height: 100vh;
+    max-height: calc(var(--app-vh, 1vh) * 100);
     overflow-y: auto;
     padding: 20px;
     box-sizing: border-box;

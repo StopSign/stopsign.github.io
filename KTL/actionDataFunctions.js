@@ -547,6 +547,27 @@ function giveResourceTo(actionObj, downstreamObj, amount) {
     if(actionObj.resource < 0) { //NaN protection
         actionObj.resource = 0;
     }
+    if(Number.isNaN(actionObj.progress)) {
+        actionObj.progress = 0;
+    }
+    if(Number.isNaN(actionObj.progressGain)) {
+        actionObj.progressGain = 0;
+    }
+    if(Number.isNaN(actionObj.resource)) {
+        actionObj.resource = 0;
+    }
+    if(Number.isNaN(actionObj.resourceDecrease)) {
+        actionObj.resourceDecrease = 0;
+    }
+    if(Number.isNaN(actionObj.resourceDelta)) {
+        actionObj.resourceDelta = 0;
+    }
+    if(Number.isNaN(actionObj.resourceIncrease)) {
+        actionObj.resourceIncrease = 0;
+    }
+    if(Number.isNaN(actionObj.totalSend)) {
+        actionObj.totalSend = 0;
+    }
 }
 
 function addResourceTo(downstreamObj, amount) {

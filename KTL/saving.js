@@ -28,8 +28,84 @@ function loadUpgradeFromSave(actionObj, loadObj) {
     Object.assign(actionObj, loadObj);
 }
 
-data.saveVersion = 9;
-function load() {
+data.saveVersion = 10;
+
+function logSteamCloudToErrorLog(prefix, detailsObj = {}) {
+    if (typeof addSteamErrorLog !== "function") {
+        return;
+    }
+    const details = Object.entries(detailsObj)
+        .filter(([, value]) => value !== undefined && value !== null && value !== "")
+        .map(([key, value]) => `${key}=${String(value)}`)
+        .join(", ");
+    addSteamErrorLog(details ? `${prefix} | ${details}` : prefix);
+}
+
+function hasSteamCloudSaveAPI() {
+    return !!(window.steamAPI &&
+        typeof window.steamAPI.saveCloud === "function" &&
+        typeof window.steamAPI.loadCloud === "function");
+}
+
+function saveToSteamCloud(saveString) {
+    if (!hasSteamCloudSaveAPI()) {
+        logSteamCloudToErrorLog("Steam Cloud save skipped: API unavailable");
+        return;
+    }
+    window.steamAPI.saveCloud(saveString)
+        .then((result) => {
+            if (!result?.success && result?.error && result.error !== "Cloud saves are disabled") {
+                console.warn("Steam Cloud save failed:", result.error);
+            }
+            if (!result?.success) {
+                logSteamCloudToErrorLog("Steam Cloud save failed", {
+                    error: result?.error || "Unknown error",
+                    appEnabled: result?.details?.appEnabled,
+                    accountEnabled: result?.details?.accountEnabled,
+                    saveLength: typeof saveString === "string" ? saveString.length : -1
+                });
+            }
+        })
+        .catch((error) => {
+            logSteamCloudToErrorLog("Steam Cloud save threw", {
+                error: error?.message || String(error)
+            });
+            console.warn("Steam Cloud save failed:", error?.message || error);
+        });
+}
+
+async function loadFromSteamCloudToLocal() {
+    if (!hasSteamCloudSaveAPI()) {
+        logSteamCloudToErrorLog("Steam Cloud load skipped: API unavailable");
+        return false;
+    }
+    try {
+        const result = await window.steamAPI.loadCloud();
+        if (result?.success && typeof result.data === "string" && result.data.length > 0) {
+            window.localStorage[saveName] = result.data;
+            console.log("Loaded save from Steam Cloud.");
+            return true;
+        }
+        logSteamCloudToErrorLog("Steam Cloud load did not apply data", {
+            success: !!result?.success,
+            error: result?.error || null,
+            dataLength: typeof result?.data === "string" ? result.data.length : 0,
+            appEnabled: result?.details?.appEnabled,
+            accountEnabled: result?.details?.accountEnabled
+        });
+        if (result?.error && result.error !== "Cloud saves are disabled" && result.error !== "File does not exist") {
+            console.warn("Steam Cloud load failed:", result.error);
+        }
+    } catch (error) {
+        logSteamCloudToErrorLog("Steam Cloud load threw", {
+            error: error?.message || String(error)
+        });
+        console.warn("Steam Cloud load failed:", error?.message || error);
+    }
+    return false;
+}
+
+async function load() {
     initializeData();
 
     let toLoad = {};
@@ -48,6 +124,7 @@ function load() {
             }
         }
     } else {
+        await loadFromSteamCloudToLocal();
         if (localStorage[saveName]) {
             if (localStorage[saveName].startsWith("{\"actions\":")) {
                 console.log('Save version 8+ found.');
@@ -276,7 +353,9 @@ function save() {
     let sdata = structuredClone(data);
     sdata.chartData = extractNestedSchema(sdata.chartData);
     sdata.actions = extractNestedSchema(sdata.actions, actionsSchema);
-    window.localStorage[saveName] = JSON.stringify(sdata);
+    const saveString = JSON.stringify(sdata);
+    window.localStorage[saveName] = saveString;
+    saveToSteamCloud(saveString);
 }
 
 function exportSave() {

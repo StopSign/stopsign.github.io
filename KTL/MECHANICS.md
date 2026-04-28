@@ -34,3 +34,18 @@ The game runs at 20 frames per second. **CRITICAL RULE: Game tick logic is stric
     * **Creation:** New HTML elements must use `queueCache("<newId>")`. The UI builder processes the cache and stores elements globally.
     * **Continuous Updates (Per Frame/Second):** Use `views.updateVal(id, newVal, type="textContent", sigFigs)`. This function references the cached element and validates if `newVal` is different from the current state before touching the DOM.
     * **Event-Triggered Updates (During Ticks):** If game logic needs to update the UI instantly, use `views.ScheduleUpdate(id, newVal, type="textContent", sigFigs)`. This queues the update to be popped and rendered safely on the next UI frame.
+
+## 5. Debug Playbook (Next Time)
+Use runtime evidence first, then fix only what logs prove.
+* Start with 3-5 concrete hypotheses (listeners, loops, scheduler bursts, DOM growth, heap growth).
+* Add minimal instrumentation (entry counts, loop duration, burst size, memory/DOM samples), then reproduce.
+* Read logs and mark each hypothesis: confirmed, rejected, or inconclusive.
+* Remove speculative/rejected changes; keep only proven fixes.
+* For slowdown under high `bonusSpeed`, inspect `helpers/interval2.js` first:
+    * Watch `totalTicksToRun` and loop duration.
+    * If burst size grows and loop time spikes, cap simulation work per loop.
+    * Scale bonus-time consumption to actual processed work (`processedRatio`) so capped loops stay consistent.
+
+## 6. Electron / Steam Packaging
+This game is built with Electron.js for Steam distribution.
+* `main.js`, `preload.js`, and `package.json` are located one folder up from this `KTL` project folder.

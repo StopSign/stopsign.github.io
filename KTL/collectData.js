@@ -220,6 +220,7 @@ function hoverLog() {
     openLogButton.innerHTML = `Open Log`
 }
 
+//run on prestige
 function clearLog() {
     const logMessages = document.getElementById('logMessages');
     logMessages.replaceChildren();
@@ -228,8 +229,9 @@ function clearLog() {
     openLogButton.innerHTML = `Open Log`
 }
 
+//run once, on load
 function rebuildLog() {
-    clearLog();
+    // clearLog();
     const logContainer = document.getElementById('logContainer');
     const logMessages = document.getElementById('logMessages');
     for (let message of data.currentLog) {

@@ -210,6 +210,15 @@ function createOptionsMenu() {
 <div style="max-width:680px;width:100%;box-sizing:border-box;padding:20px;display:flex;flex-direction:column;gap:10px;">
 
     <div class="menuTitle" style="margin:0;font-size:20px;font-weight:bold;border-bottom:1px solid #aaa;padding-bottom:10px;">Options</div>
+
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+            <span style="font-size:14px;">Change UI Scaling</span>
+            <div style="display:flex;align-items:center;gap:8px;">
+                <button onclick="changeWebZoomFactor(-0.1)" style="padding:4px 10px;background:#4a5568;color:#fff;border:none;border-radius:4px;font-size:18px;cursor:pointer;line-height:1;">-</button>
+                <span id="webZoomFactorDisplay" style="min-width:50px;text-align:center;font-size:14px;">100%</span>
+                <button onclick="changeWebZoomFactor(0.1)" style="padding:4px 10px;background:#4a5568;color:#fff;border:none;border-radius:4px;font-size:18px;cursor:pointer;line-height:1;">+</button>
+            </div>
+        </div>
     <div style="display:flex;flex-direction:column;gap:12px;">
         <div style="display:flex;align-items:center;justify-content:space-between;">
             <span style="font-size:14px;">Number Notation</span>
@@ -468,6 +477,70 @@ function toggleAdvancedSliders() {
     updateSliderContainers()
 }
 
+function clampWebZoomFactor(zoomFactor) {
+    return Math.min(2, Math.max(0.5, Math.round(zoomFactor * 10) / 10));
+}
+
+function zoomFactorToLevel(zoomFactor) {
+    return Math.log(clampWebZoomFactor(zoomFactor)) / Math.log(1.2);
+}
+
+function getElectronWebFrame() {
+    try {
+        if (typeof window.require === "function") {
+            return window.require("electron").webFrame;
+        }
+    } catch (error) {
+        // Browser builds will not have Electron available.
+    }
+    return null;
+}
+
+function getViewportZoomFactor() {
+    return clampWebZoomFactor(data?.gameSettings?.webZoomFactor ?? 1);
+}
+
+function getViewportWidth() {
+    return window.innerWidth / getViewportZoomFactor();
+}
+
+function getViewportHeight() {
+    return window.innerHeight / getViewportZoomFactor();
+}
+
+function updateZoomViewportVariables() {
+    document.documentElement.style.setProperty("--app-vh", `${getViewportHeight() / 100}px`);
+    document.documentElement.style.setProperty("--app-vw", `${getViewportWidth() / 100}px`);
+}
+
+function updateWebZoomFactorDisplay() {
+    const display = document.getElementById("webZoomFactorDisplay");
+    if (!display || !data?.gameSettings) {
+        return;
+    }
+    display.textContent = `${Math.round(clampWebZoomFactor(data.gameSettings.webZoomFactor) * 100)}%`;
+}
+
+function applyWebZoomFactor(zoomFactor) {
+    const clampedZoomFactor = clampWebZoomFactor(zoomFactor);
+    data.gameSettings.webZoomFactor = clampedZoomFactor;
+
+    const webFrame = getElectronWebFrame();
+    if (webFrame) {
+        webFrame.setZoomLevel(zoomFactorToLevel(clampedZoomFactor));
+    } else {
+        document.documentElement.style.zoom = clampedZoomFactor;
+    }
+
+    updateZoomViewportVariables();
+    updateWebZoomFactorDisplay();
+    window.dispatchEvent(new Event("resize"));
+}
+
+function changeWebZoomFactor(amount) {
+    applyWebZoomFactor((data.gameSettings.webZoomFactor ?? 1) + amount);
+}
+
 function convertToNearest(num) {
     const targets = [0, 10, 50, 100];
 
@@ -503,7 +576,7 @@ function createMenu() {
             <div class="menuTitle" style="box-sizing:border-box;">Options and Info Menu</div>
             <div class="menuSeparator" style="box-sizing:border-box;"></div>
             
-            <div style="display:flex;height:calc(75vh - 100px);min-height:0;position:relative;overflow:hidden;font-size:0;">
+            <div style="display:flex;height:calc(var(--app-vh, 1vh) * 75 - 100px);min-height:0;position:relative;overflow:hidden;font-size:0;">
                 <div id="menuIndexContainer" class="menuOptionContainer">
                 </div>
                 <div id="menuTextDisplayContainer" class="menuDisplayContainer">
@@ -616,7 +689,32 @@ function createChangelogMenu() {
     return Raw.html`
         <div class="menuTitle">Changelog</div>
         <div class="menuSeparator"></div><br>
-        v3.2.4 4/14 (current): <br>
+        v3.2.5 4/28 (current): <br>
+        
+        Gameplay:
+        <ul>
+        <li>Daily timer resets at local midnight instead of 23 hours</li>
+        <li>Going to Nothern Wastes does not lower the perm focus mult of focus bars (could happen after genesis)</li>
+        </ul>
+        Shop:
+        <ul>
+        <li>Some shop purchases now show visuals as soon as you buy it (showed up on reload before) - skip 60 minutes, and extra game speed</li> 
+        <li>Shop upgrades locked by milestone now reveal without refresh</li>
+        <li>Fixed the effects of shop upgrades Extra Ancient Coins and Extra Ancient Whispers not working properly</li>
+        </ul>
+        Other:
+        <ul>
+        <li>Added "Change UI Scaling" in Options (mimics the ctrl +/- behavior, but for the steam build)</li>
+        <li>Log messages stay on refresh</li>
+        <li>Changes to timing to prevent the game from lagging at high bonus speed</li>
+        <li>Hopefully fixed a memory leak (google analytics & electron.js don't play well)</li>
+        <li>Fixed the build process building my entire GitHub repo, now it only builds KTL (game size is much smaller)</li>
+        <li>"Level in" indicator updates at max to be "-" (was stuck at last value)</li>
+        <li>Fixed shop upgrade Focus Bars Improve Efficiency from creating a misleading Decrease amount (was visual only)</li>
+        <li>Added further NaN prevention</li>
+        </ul><br><br>
+        
+        v3.2.4 4/14: <br>
         <ol>
             <li>Ancient Whisper mult is saved - will come back on page refresh</li>
             <li>Removed the "undefined" from certain action's stat pages</li>

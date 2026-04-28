@@ -123,6 +123,7 @@ let shopUpgrades = {
             return "Show a button to use 60 minutes of instant bonus time at once. Caution: will lag for about two seconds per use.";
         },
         onBuy: function (num) {
+            applyShopEffects()
         },
         getEffectText: function (num) {
             return `60 minutes button`;
@@ -137,6 +138,7 @@ let shopUpgrades = {
             return "Increases global game speed. This affects everything in the game, effectively making the clock run faster. Bonus speed still works as a multiplier, and bonus time gain is unchanged.";
         },
         onBuy: function (num) {
+            applyShopEffects()
         },
         getEffectText: function (num) {
             return `+10%, 1${(num+1)*10}% total`;

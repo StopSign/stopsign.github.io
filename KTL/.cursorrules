@@ -6,3 +6,5 @@ You are assisting with a vanilla JavaScript idle game. Follow these strict archi
 5. HELPERS: Use `helper.js` for formatting and generic functions instead of writing new ones.
 6. HTML GENERATION: Menu UI generation happens dynamically in `menu.js`, `upgradeData.js` and `store.js`.
 7. SAVING: Any new global variable that tracks progress MUST be integrated into `saving.js`.
+
+The game is deployed both as a playable web version on github, as well as an electron.js build for steam.

@@ -81,6 +81,7 @@ function updateUIOnLoad() {
     document.getElementById("showCompleteUpgrades").checked = data.gameSettings.showCompletedToggle;
     document.getElementById("showUnaffordableUpgrades").checked = data.gameSettings.showUnaffordable;
     document.getElementById("sortByCost").checked = data.gameSettings.sortByCost;
+    applyWebZoomFactor(data.gameSettings.webZoomFactor ?? 1);
 
         if(data.gameSettings.bonusSpeed > 1) {
         data.gameSettings.bonusSpeed = 1;

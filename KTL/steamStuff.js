@@ -25,7 +25,11 @@ function addSteamErrorLog(errorMessage) {
 }
 
 function updateOutput(message) {
-    document.getElementById('shopOutputMessage').innerText = message;
+    const outputEl = document.getElementById('shopOutputMessage');
+    if (!outputEl) {
+        return;
+    }
+    outputEl.innerText = message;
 }
 
 function isUserLockedOut() {
@@ -59,7 +63,7 @@ function requestManualSweep() {
     refreshShopUpgrades()
 }
 
-if(window.steamAPI) {
+if(window.steamAPI && isSteam) {
     window.steamAPI.onPurchaseResult((result) => {
         const btn = document.getElementById('refresh-purchases-btn');
         const now = Date.now();

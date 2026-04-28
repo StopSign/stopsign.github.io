@@ -108,6 +108,7 @@ function toggleAllHundred(actionVar) {
     });
 }
 window.addEventListener('resize', () => {
+    updateZoomViewportVariables();
     resizeStatMenu();
     resizeCanvas();
     drawChart();
@@ -121,7 +122,7 @@ function resizeStatMenu() {
     }
 
     if(view.cached[`attDisplay`]) {
-        view.cached[`attDisplay`].style.maxHeight = window.innerHeight - reduction + "px";
+        view.cached[`attDisplay`].style.maxHeight = getViewportHeight() - reduction + "px";
     }
 }
 

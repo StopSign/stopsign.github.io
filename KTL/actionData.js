@@ -1160,14 +1160,7 @@ let actionData = {
         visible: false, unlocked: false, purchased: true, hasUpstream: false, keepParentAutomation:true,
         ignoreConsume:true,
         onLevelCustom: function () {
-            if(data.actions.hearAboutTheLich.level <= 1) {
-                data.ancientCoinMultKTL = 1
-            } else {
-                data.ancientCoinMultKTL = Math.pow(1.5, (data.actions.hearAboutTheLich.level - 1));
-            }
-            data.ancientCoinMultKTL *= Math.pow(1.05, data.upgrades.extraAncientCoins.upgradePower);
-            data.ancientCoinMultKTL *= Math.pow(1.5, data.shopUpgrades.extraAncientCoins.upgradePower);
-            data.ancientCoinMultKTL *= (data.shopUpgrades.currencyGainPotion.upgradePower > 0 ? 2 : 1)
+            recalculateKTLCurrencyMultipliers();
         },
         updateMults: function () {
             let actionObj = data.actions.hearAboutTheLich;

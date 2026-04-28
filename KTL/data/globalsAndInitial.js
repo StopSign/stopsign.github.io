@@ -65,6 +65,7 @@ let mySecret = "test"
 data.gameSettings = {
     gameSpeed: 1,
     bonusSpeed: 1,
+    webZoomFactor: 1,
     stop: false,
     stopAll: false,
     fps: 20,

@@ -39,7 +39,7 @@ function createShopMenu() {
 function dailyBonus() {
     if(data.currentGameState.dailyCharges > 0) {
         if(data.currentGameState.dailyCharges === (data.shopUpgrades.dailyBonusCharges.upgradePower+1)) {
-            data.currentGameState.dailyTimer = 1000 * 60 * 60 * 23;
+            data.currentGameState.dailyTimer = getMillisecondsUntilNextLocalMidnight();
         }
         data.soulCoins += 25 + data.shopUpgrades.increaseDailyBonus.upgradePower * 5;
         data.totalDailySoulCoins += 25 + data.shopUpgrades.increaseDailyBonus.upgradePower * 5;
@@ -50,15 +50,36 @@ function dailyBonus() {
     }
 }
 
+function getMillisecondsUntilNextLocalMidnight() {
+    const now = new Date();
+    const nextMidnight = new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate() + 1,
+        0,
+        0,
+        0,
+        0
+    );
+    return nextMidnight.getTime() - now.getTime();
+}
+
 //updates UI and applies charges
 function checkDailyTimer() {
     if(!isSteam) {
         return;
     }
+    const maxCharges = data.shopUpgrades.dailyBonusCharges.upgradePower + 1;
+    const oneDayMilliseconds = 1000 * 60 * 60 * 24;
+
+    if(data.currentGameState.dailyTimer === 0 && data.currentGameState.dailyCharges < maxCharges) {
+        data.currentGameState.dailyTimer = getMillisecondsUntilNextLocalMidnight();
+    }
+
     //convert to charges
-    while(data.currentGameState.dailyTimer <= 0 && data.currentGameState.dailyCharges < (data.shopUpgrades.dailyBonusCharges.upgradePower+1)) {
+    while(data.currentGameState.dailyTimer <= 0 && data.currentGameState.dailyCharges < maxCharges) {
         data.currentGameState.dailyCharges++;
-        data.currentGameState.dailyTimer += 1000 * 60 * 60 * 23;
+        data.currentGameState.dailyTimer += oneDayMilliseconds;
     }
     if(data.currentGameState.dailyTimer <= 0) { //waste extra, if charges are full
         data.currentGameState.dailyTimer = 0;
@@ -69,8 +90,8 @@ function checkDailyTimer() {
         views.updateVal('dailyBonusButton', "none", "style.display")
     }
 
-    let atMaxCharges = data.currentGameState.dailyCharges === (data.shopUpgrades.dailyBonusCharges.upgradePower + 1)
-    views.updateVal('dailyBonusMessage', `Daily Bonus: ${data.currentGameState.dailyCharges} / ${data.shopUpgrades.dailyBonusCharges.upgradePower+1}.  
+    let atMaxCharges = data.currentGameState.dailyCharges === maxCharges
+    views.updateVal('dailyBonusMessage', `Daily Bonus: ${data.currentGameState.dailyCharges} / ${maxCharges}.  
     ${!atMaxCharges ? `Next ready in ${secondsToTime(data.currentGameState.dailyTimer/1000)}. ` : `Currently at max charges.`}`, "textContent")
     views.updateVal('dailyBonusButton', `Receive ${25 + data.shopUpgrades.increaseDailyBonus.upgradePower * 5}`, "textContent")
 }
@@ -246,6 +267,7 @@ function buyShopUpgrade(shopVar) {
         if (data.soulCoins >= cost) {
             data.soulCoins -= cost;
             shopObj.numConsumable++;
+            recalculateKTLCurrencyMultipliers();
             refreshShopUpgrades();
         }
     } else {
@@ -257,6 +279,7 @@ function buyShopUpgrade(shopVar) {
             data.soulCoins -= cost;
             shopObj.upgradePower++;
             if (shopDataObj.onBuy) shopDataObj.onBuy(currentPower);
+            recalculateKTLCurrencyMultipliers();
             refreshShopUpgrades();
         }
     }
@@ -272,6 +295,7 @@ function useShopConsumable(shopVar) {
 
         if (shopDataObj.onBuy) shopDataObj.onBuy(shopVar);
 
+        recalculateKTLCurrencyMultipliers();
         refreshShopUpgrades();
     }
 }
@@ -328,9 +352,13 @@ function applyShopEffects() {
 }
 
 function reduceShopTimers(time) {
+    const hadCurrencyPotion = data.shopUpgrades.currencyGainPotion.upgradePower > 0;
     data.shopUpgrades.currencyGainPotion.upgradePower -= time
     if(data.shopUpgrades.currencyGainPotion.upgradePower < 0) {
         data.shopUpgrades.currencyGainPotion.upgradePower = 0;
+    }
+    if (hadCurrencyPotion !== (data.shopUpgrades.currencyGainPotion.upgradePower > 0)) {
+        recalculateKTLCurrencyMultipliers();
     }
     data.shopUpgrades.momentumGainPotion.upgradePower -= time
     if(data.shopUpgrades.momentumGainPotion.upgradePower < 0) {
