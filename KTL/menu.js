@@ -689,7 +689,7 @@ function createChangelogMenu() {
     return Raw.html`
         <div class="menuTitle">Changelog</div>
         <div class="menuSeparator"></div><br>
-        v3.2.5 4/28 (current): <br>
+        v3.2.6 4/28 (current): <br>
         
         Gameplay:
         <ul>

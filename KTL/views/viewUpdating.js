@@ -411,13 +411,10 @@ let views = {
         // views.updateVal(`${actionVar}TimeToLevelContainer`, actionObj.maxLevel !== actionObj.level ? "flex" : "none", "style.display")
         views.updateVal(`${actionVar}TimeToMaxContainer`, actionObj.maxLevel ? "flex" : "none", "style.display")
 
-        if(!actionObj.maxLevel || actionObj.maxLevel !== actionObj.level) {
-            let timeToLevel = calcTimeToLevel(actionObj);
-            views.updateVal(`${actionVar}TimeToLevel`, secondsToTime(timeToLevel, true), "textContent")
-        }
+        let timeToLevel = calcTimeToLevel(actionObj);
+        views.updateVal(`${actionVar}TimeToLevel`, actionObj.maxLevel !== actionObj.level ? secondsToTime(timeToLevel, true) : "-", "textContent")
         if(actionObj.maxLevel) {
             let timeToMax = calcTimeToMax(actionVar);
-            views.updateVal(`${actionVar}TimeToLevel`, "-", "textContent")
             views.updateVal(`${actionVar}TimeToMax`, actionObj.maxLevel !== actionObj.level ? secondsToTime(timeToMax, true) : "-", "textContent")
         }
 
