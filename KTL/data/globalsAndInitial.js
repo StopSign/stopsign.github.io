@@ -106,8 +106,8 @@ let isLoadingEnabled = true; //SET FOR COMMIT
 // let isLoadingEnabled = false;
 let loadStaticSaveFile = false; //SET FOR COMMIT
 // let loadStaticSaveFile = true;
-let isSteam = false; //SET FOR COMMIT
-// let isSteam = true; //SET FOR STEAM BUILD
+// let isSteam = false; //SET FOR COMMIT
+let isSteam = true; //SET FOR STEAM BUILD
 
 
 data.upgrades = {};
@@ -116,7 +116,7 @@ data.shopUpgrades = {};
 
 let isDebug = false; //SET FOR COMMIT
 // let isDebug = true;
-let debugLevel = 150; //to set the rough number of loops. Max: 150. 1st loop: 46
+let debugLevel = 0; //to set the rough number of loops. Max: 150. 1st loop: 46
 function debug() {
     if(!isDebug) {
         return;

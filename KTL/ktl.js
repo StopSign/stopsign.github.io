@@ -88,9 +88,6 @@ function resetKTLSpiral() {
 
 function trackFirst() {
     if (!localStorage.getItem('firstResetSent')) {
-        gtag('event', 'first_reset', {
-            seconds_per_reset: data.secondsPerReset
-        });
         localStorage.setItem('firstResetSent', 'true');
     }
 }
@@ -406,7 +403,6 @@ function initializeKTL(forceReset) {
         !(isDebug || (data.actions.hearAboutTheLich.level >= 1 && actionData.awakenYourGrimoire.manaQuality() >= 1)))) {
         return;
     }
-    data.gameState = "KTL";
     trackFirst();
     logKTL();
 
@@ -452,8 +448,6 @@ function initializeKTL(forceReset) {
 
     views.updateVal("killTheLichMenu", "none", "style.display")
 
-
-
     revealAtt("hope");
     data.actions.fightTheEvilForces.unlockCost = 0;
     revealAction('worry');
@@ -473,6 +467,7 @@ function initializeKTL(forceReset) {
     views.updateVal(`legacyMultDisplay`, "", "style.display");
     views.updateVal(`ancientCoinMultDisplay`, "", "style.display");
     data.doneKTL = true;
+    data.gameState = "KTL";
 }
 
 function openUseAmuletMenu(isUseable) {

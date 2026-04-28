@@ -15,6 +15,9 @@ function saveFileCorrection(saveVersionFromLoad) {
     if(data.resetCount >= 1) {
         data.doneAmulet = true;
     }
+    if(data.gameState === "KTL" && data.planeUnlocked && data.planeUnlocked[2] === false) {
+        data.gameState = "default";
+    }
     data.upgrades.rememberMyMastery.initialCost = 600;
 
     return refundAmount;

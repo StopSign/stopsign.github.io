@@ -689,7 +689,7 @@ function createChangelogMenu() {
     return Raw.html`
         <div class="menuTitle">Changelog</div>
         <div class="menuSeparator"></div><br>
-        v3.2.6 4/28 (current): <br>
+        v3.2.7 4/28 (current): <br>
         
         Gameplay:
         <ul>
@@ -712,6 +712,7 @@ function createChangelogMenu() {
         <li>"Level in" indicator updates at max to be "-" (was stuck at last value)</li>
         <li>Fixed shop upgrade Focus Bars Improve Efficiency from creating a misleading Decrease amount (was visual only)</li>
         <li>Added further NaN prevention</li>
+        <li>3.2.7 Fixed a broken game state for new steam players - fixes on load.</li>
         </ul><br><br>
         
         v3.2.4 4/14: <br>
