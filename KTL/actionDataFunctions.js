@@ -302,7 +302,7 @@ function checkLevelUp(actionObj, dataObj) {
     actionObj.actionPowerMult *= actionObj.actionPowerMultIncrease;
 
     //power = base * mult * efficiency
-    actionObj.actionPower = actionObj.actionPowerBase * actionObj.actionPowerMult * (actionObj.efficiency/100);
+    actionObj.actionPower = actionObj.actionPowerBase * actionObj.actionPowerMult;
 
     dataObj.onLevelAtts.forEach(function (attObj) {
         let name = attObj[0];
@@ -488,6 +488,15 @@ function calculateTaken(actionVar, shouldGive) {
     return toReturn;
 }
 
+/** Matches resource subtracted per unit of progress gained in tickGameObject (engine.js). Used so max-level refunds cannot mint currency when consumption is discounted. */
+function consumeMultForProgress(actionObj, dataObj) {
+    if (dataObj.isGenerator || dataObj.ignoreConsume || actionObj.actionVar === "tidalBurden") {
+        return 1;
+    }
+    let consumptionReduction = Math.max(0, 1 - (data.shopUpgrades.focusBarsImproveEfficiency.upgradePower * .25 * actionObj.connectedLines));
+    return (1 - data.upgrades.reduceResourcesConsumed.upgradePower * .05) * consumptionReduction;
+}
+
 function checkProgressCompletion(actionObj, dataObj) {
 	function isDoneLeveling() {
 		return actionObj.maxLevel !== undefined && actionObj.level >= actionObj.maxLevel && !dataObj.generatesPastMax;
@@ -523,7 +532,7 @@ function checkProgressCompletion(actionObj, dataObj) {
 		//This won't retroactivly refund nodes that overleveled in a previoius version, but that'll be fixed when the amulet
 		//resets everything
 		if(isDoneLeveling()) {
-			actionObj.resource += actionObj.progress;
+			actionObj.resource += actionObj.progress * consumeMultForProgress(actionObj, dataObj);
 			actionObj.progress = 0;
 		}
         return true;

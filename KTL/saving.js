@@ -355,7 +355,7 @@ function save() {
     sdata.actions = extractNestedSchema(sdata.actions, actionsSchema);
     const saveString = JSON.stringify(sdata);
     window.localStorage[saveName] = saveString;
-    saveToSteamCloud(saveString);
+    // saveToSteamCloud(saveString);
 }
 
 function exportSave() {

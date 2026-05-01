@@ -4,7 +4,7 @@ function loop() {
     if (timerId !== null) clearTimeout(timerId);
 
     const now = performance.now();
-    while (now - lastRealSecondTime >= 1000) {
+    if (now - lastRealSecondTime >= 1000) {
         realSecondPassed();
         lastRealSecondTime += 1000;
     }
@@ -13,7 +13,12 @@ function loop() {
 
     const tickInterval = 1000 / data.gameSettings.ticksPerSecond;
 
+    const maxElapsed = 2000; // ms (2 seconds max catch-up)
     let elapsed = now - lastTickTime;
+    if (elapsed > maxElapsed) {
+        lastTickTime = now - maxElapsed;
+        elapsed = maxElapsed;
+    }
 
     let ticksAvailable = Math.floor(elapsed / tickInterval);
     let didSomething = false;
@@ -32,15 +37,8 @@ function loop() {
         const effectiveSpeed = data.gameSettings.gameSpeed * data.gameSettings.bonusSpeed;
         const upgradeMultiplier = 1 + (data.shopUpgrades.extraGameSpeed.upgradePower * 0.1);
         const exactTicks = (ticksProcessed * effectiveSpeed * upgradeMultiplier) + (tickResidue || 0);
-        const requestedTicksToRun = Math.floor(exactTicks);
-        tickResidue = exactTicks - requestedTicksToRun;
-        // Browser background/efficiency throttling can stretch loop intervals to ~1s+.
-        // In that case, keep a much higher cap so simulation can catch up instead of
-        // appearing to run in slow motion while minimized.
-        const isThrottledLoop = elapsed >= 500;
-        const maxSimTicksPerLoop = isThrottledLoop ? 2000 : (data.gameSettings.bonusSpeed >= 10 ? 40 : 120);
-        const totalTicksToRun = Math.min(requestedTicksToRun, maxSimTicksPerLoop);
-        const processedRatio = requestedTicksToRun > 0 ? (totalTicksToRun / requestedTicksToRun) : 1;
+        const totalTicksToRun = Math.floor(exactTicks);
+        tickResidue = exactTicks - totalTicksToRun;
 
         if (!data.gameSettings.stop) {
             for (let i = 0; i < totalTicksToRun; i++) {
@@ -53,7 +51,7 @@ function loop() {
             }
             if (data.gameSettings.bonusSpeed > 1) {
                 const processedElapsed = ticksProcessed * tickInterval;
-                const bonusTimeConsumed = processedElapsed * data.gameSettings.gameSpeed * (data.gameSettings.bonusSpeed - 1) * processedRatio;
+                const bonusTimeConsumed = processedElapsed * data.gameSettings.gameSpeed * (data.gameSettings.bonusSpeed - 1);
                 data.currentGameState.bonusTime -= bonusTimeConsumed;
                 if (data.currentGameState.bonusTime <= 0) {
                     data.currentGameState.bonusTime = 0;

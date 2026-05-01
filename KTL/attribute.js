@@ -181,5 +181,5 @@ function calcStatMult(actionVar) {
         actionObj.progressMaxMult = 1/totalEffect;
         actionObj.progressMax = actionObj.progressMaxBase * actionObj.progressMaxMult * calcInstabilityEffect(actionObj.instability);
     }
-    actionObj.actionPower = actionObj.actionPowerBase * actionObj.actionPowerMult * (actionObj.efficiency/100);
+    actionObj.actionPower = actionObj.actionPowerBase * actionObj.actionPowerMult;
 }

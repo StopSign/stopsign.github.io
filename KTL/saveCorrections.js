@@ -20,6 +20,12 @@ function saveFileCorrection(saveVersionFromLoad) {
     }
     data.upgrades.rememberMyMastery.initialCost = 600;
 
+    const msPerMinute = 60 * 1000;
+    const instant = data.currentGameState.instantTime;
+    if (instant > 0 && instant % msPerMinute !== 0) {
+        data.currentGameState.instantTime = Math.ceil(instant / msPerMinute) * msPerMinute;
+    }
+
     return refundAmount;
 }
 

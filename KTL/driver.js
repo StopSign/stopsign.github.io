@@ -229,9 +229,7 @@ function calcDeltas() {
         if (actionVar === "tidalBurden") {
             actionObj.resourceDecrease = sendDecrease + consumeDecrease;
         } else {
-            let consumptionReduction = Math.max(0, 1 - (data.shopUpgrades.focusBarsImproveEfficiency.upgradePower * .25 * actionObj.connectedLines));
-            let consumeMult = (1 - data.upgrades.reduceResourcesConsumed.upgradePower * .05) * consumptionReduction;
-            actionObj.resourceDecrease = sendDecrease + (consumeDecrease * consumeMult);
+            actionObj.resourceDecrease = sendDecrease + (consumeDecrease * consumeMultForProgress(actionObj, dataObj));
         }
 
         // Calculate the final net change per second for display.

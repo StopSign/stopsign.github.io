@@ -689,7 +689,7 @@ function createChangelogMenu() {
     return Raw.html`
         <div class="menuTitle">Changelog</div>
         <div class="menuSeparator"></div><br>
-        v3.2.8 4/28 (current): <br>
+        v3.2.9 5/1 (current): <br>
         
         Gameplay:
         <ul>
@@ -714,6 +714,9 @@ function createChangelogMenu() {
         <li>Added further NaN prevention</li>
         <li>3.2.7 Fixed a broken game state for new steam players - fixes on load.</li>
         <li>3.2.8 Fixed timing when game is minimized</li>
+        <li>3.2.9 Reverted game timing back a week, as that had less issues</li>
+        <li>3.2.9 Instant Bonus Time conversion takes whole minutes (existing savefiles rounded up to the nearest minute)</li>
+        <li>3.2.9 Fixed growing arcana numbers with a specific genesis upgrade</li>
         </ul><br><br>
         
         v3.2.4 4/14: <br>

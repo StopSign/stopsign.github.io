@@ -36,8 +36,7 @@ function tickGameObject(actionVar) {
         if(actionVar === "tidalBurden") {
             actionObj.resource -= resourceToAddInefficient
         } else {
-            let consumptionReduction = Math.max(0, 1 - (data.shopUpgrades.focusBarsImproveEfficiency.upgradePower * .25 * actionObj.connectedLines));
-            actionObj.resource -= resourceToAddInefficient * (1-data.upgrades.reduceResourcesConsumed.upgradePower*.05) * consumptionReduction;
+            actionObj.resource -= resourceToAddInefficient * consumeMultForProgress(actionObj, dataObj);
         }
     }
 
@@ -195,7 +194,7 @@ function adjustActionData(actionVar, key, value) {
     }
     if(['efficiencyBase', 'efficiencyMult'].includes(key)) {
         calcAttExpertise(actionVar);
-        actionObj.actionPower = actionObj.actionPowerBase * actionObj.actionPowerMult * (actionObj.efficiency/100);
+        actionObj.actionPower = actionObj.actionPowerBase * actionObj.actionPowerMult;
     }
 }
 

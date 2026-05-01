@@ -715,12 +715,16 @@ function convertBonusTime() {
     let btn = document.getElementById('convertBtn');
     if (btn.innerText.indexOf("Use in") !== -1) return;
 
+    const msPerMinute = 60 * 1000;
     let amountToConvert = 0;
     if (data.currentGameState.bonusTime >= (2 + data.shopUpgrades.extraInstantTimeConversion.upgradePower) * 60 * 60 * 1000) {
         amountToConvert = (2 + data.shopUpgrades.extraInstantTimeConversion.upgradePower) * 60 * 60 * 1000;
     } else if(data.currentGameState.bonusTime > 0) {
         amountToConvert = data.currentGameState.bonusTime;
     }
+
+    amountToConvert = Math.floor(amountToConvert / msPerMinute) * msPerMinute;
+    if (amountToConvert <= 0) return;
 
     data.currentGameState.bonusTime -= amountToConvert;
     data.currentGameState.instantTime += amountToConvert;
