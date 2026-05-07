@@ -2,6 +2,11 @@
     --text-primary: #cdd6f4;
     --border-color: #45475a;
     --overlay-color: #0f0f17;
+    --bg-secondary: #2e303d;
+}
+
+html {
+    min-width: 690px;
 }
 
 body {
@@ -13,10 +18,35 @@ body {
 
 #mainLayout {
     display: grid;
-    grid-template-columns: 680px 1fr;
+    grid-template-columns: 690px 690px;
     gap: 10px;
     min-height: calc(100vh - 30px);
     align-items: flex-start;
+    justify-content: center;
+}
+
+@media (max-width: 1399px) {
+    #mainLayout {
+        display: block;
+        max-width: 690px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+}
+
+#compactViewTabs {
+    display: none;
+    flex-direction: row;
+    width: 100%;
+    max-width: 690px;
+    box-sizing: border-box;
+    gap: 0;
+    margin-bottom: 8px;
+}
+
+#compactViewTabs > .tab-button {
+    flex: 1 1 0;
+    box-sizing: border-box;
 }
 
 .game-column {
@@ -24,6 +54,9 @@ body {
     background: #101621;
     position: relative;
     min-height: 0;
+    width: 690px;
+    max-width: 100%;
+    box-sizing: border-box;
 }
 
 #menuColumn {
@@ -46,6 +79,10 @@ body {
     border: 1px solid var(--border-color);
     padding: 6px 8px;
     cursor: pointer;
+}
+
+.tab-button:hover {
+    background: #2d4e7a !important;
 }
 
 button {
@@ -74,11 +111,16 @@ button {
 #battlefieldWrap {
     flex: 0 0 auto;
     position: relative;
+    width: 690px;
+    max-width: 100%;
+    box-sizing: border-box;
 }
 
 #battlefield {
     position: relative;
     flex: 0 0 auto;
+    box-sizing: border-box;
+    width: 100%;
     border: 1px solid var(--border-color);
     background: linear-gradient(to bottom, #0a0f17, #161d2c);
     overflow: hidden;
@@ -98,12 +140,50 @@ button {
     width: min(200px, 90%);
 }
 
+#playerAvatarWrap {
+    position: relative;
+    width: 48px;
+    height: 48px;
+    flex-shrink: 0;
+}
+
 #playerToken {
+    position: relative;
+    z-index: 1;
     width: 48px;
     height: 48px;
     border-radius: 24px;
     background: linear-gradient(to top, #2ad15f 100%, #0f3a1d 100%);
     flex-shrink: 0;
+}
+
+#playerMovePulse {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 48px;
+    height: 48px;
+    border-radius: 24px;
+    background: rgba(180, 210, 180, 1);
+    z-index: 0;
+    display: none;
+    pointer-events: none;
+}
+
+#playerMovePulse.move-pulse-active {
+    display: block;
+    animation: playerMovePulseDown 0.6s linear infinite;
+}
+
+@keyframes playerMovePulseDown {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(18px);
+    }
 }
 
 #attackLines {
@@ -129,6 +209,13 @@ button {
     animation: attackLineFade 0.8s forwards;
 }
 
+.attack-line-fx-anim.attack-line-enemy-ranged {
+    height: 1px;
+    background: #ff9f1c;
+    box-shadow: 0 0 3px rgba(255, 159, 28, 0.85);
+    animation: attackLineFade 0.3s forwards;
+}
+
 @keyframes attackLineFade {
     from {
         opacity: 1;
@@ -140,6 +227,13 @@ button {
 
 .player-bar-block {
     width: 100%;
+}
+
+.player-bars-row {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
 }
 
 .player-bar-label {
@@ -214,6 +308,12 @@ button {
     border: 1px solid #4b1515;
     box-sizing: border-box;
     overflow: hidden;
+}
+
+.enemy-token-ranged {
+    border: 1px solid #1b3f74;
+    /* Same horizontal bbox as melee squares; apex at top mid */
+    clip-path: polygon(50% 0%, 100% 38%, 81% 100%, 19% 100%, 0% 38%);
 }
 
 .enemy-hp-layer {
@@ -338,6 +438,42 @@ button {
     margin-bottom: 8px;
 }
 
+.leveling-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 6px;
+}
+
+.leveling-kv {
+    font-size: 13px;
+}
+
+.leveling-stat-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 10px;
+    margin-bottom: 8px;
+}
+
+.leveling-stat-card {
+    border: 1px solid var(--border-color);
+    background: #121a29;
+    padding: 8px;
+}
+
+.leveling-stat-name {
+    color: #89b4fa;
+    font-size: 11px;
+}
+
+.leveling-stat-val {
+    font-weight: bold;
+    font-size: 16px;
+    margin-top: 2px;
+}
+
 .pane-subtitle {
     margin-top: 10px;
     margin-bottom: 6px;
@@ -460,74 +596,281 @@ button {
     margin-bottom: 8px;
 }
 
+.travel-card {
+    border: 1px solid var(--border-color);
+    background: #111827;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+.travel-card-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.travel-map-name {
+    font-weight: bold;
+}
+
+.travel-map-meta {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px 10px;
+    font-size: 12px;
+    margin-bottom: 8px;
+}
+
+.travel-map-stars {
+    display: flex;
+    gap: 8px;
+}
+
+.travel-map-stars .skill-star-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
 .history-row {
     margin-bottom: 6px;
 }
 
-.gear-summary {
+.base-map-wrap {
+    position: relative;
+    width: 100%;
+    min-height: 220px;
+    border: 1px solid var(--border-color);
+    background: linear-gradient(to bottom, #152339, #132032);
+    margin-bottom: 10px;
+}
+
+.base-building-label {
+    position: absolute;
+    border: none;
+    background: transparent;
+    color: #cdd6f4;
     font-size: 12px;
-    margin: 8px 0;
+    text-decoration: none;
+    padding: 2px 4px;
+}
+
+.base-building-label:hover {
     color: #89b4fa;
 }
 
-.gear-hint {
-    font-size: 10px;
-    line-height: 1.35;
-    margin-bottom: 10px;
+.base-building-label.base-building-selected {
+    color: #f9e2af;
+    text-decoration: underline;
+    font-weight: bold;
 }
 
-.gear-slot-block {
+.base-building-chapel { top: 20px; left: 5%; }
+.base-building-inn { top: 50px; left: 24%; }
+.base-building-guild { top: 76px; left: 43%; }
+.base-building-market { top: 12px; left: 46%; }
+.base-building-garden { bottom: 62px; right: 31%; }
+.base-building-workshop { top: 84px; right: 12%; }
+.base-building-mage_tower { top: 24px; right: 12%; }
+.base-building-library { bottom: 18px; left: 46%; }
+.base-building-mine-node { top: 118px; left: 24px; }
+.base-building-smith-node { top: 118px; left: 120px; }
+.base-building-lumbermill-node { bottom: 18px; left: 24px; }
+.base-building-sawmill-node { bottom: 18px; left: 120px; }
+
+.base-info-panel {
     border: 1px solid var(--border-color);
-    padding: 8px;
-    margin-bottom: 10px;
-    border-radius: 4px;
+    min-height: 120px;
+    padding: 10px;
+    background: #0c1220;
 }
 
-.gear-slot-title {
+.base-info-title {
+    font-weight: bold;
     margin-bottom: 6px;
 }
 
-.gear-variant-row {
+.base-row {
+    margin-bottom: 6px;
+}
+
+.base-resource-strip {
     display: flex;
-    gap: 6px;
-    margin-bottom: 6px;
+    gap: 8px;
     flex-wrap: wrap;
-}
-
-.gear-var-btn {
-    background: #1e2535;
-    color: var(--text-primary);
+    padding: 6px 8px;
+    margin-bottom: 8px;
     border: 1px solid var(--border-color);
-    padding: 4px 10px;
+    background: #111827;
     font-size: 11px;
-    cursor: pointer;
 }
 
-.gear-var-btn.gear-var-on {
-    border-color: #89b4fa;
-    background: #2d3f5c;
+.base-building-hire-row {
+    margin-bottom: 8px;
 }
 
-.gear-slot-meta,
-.gear-req-line {
-    font-size: 11px;
-    color: #bac2de;
-    margin: 4px 0;
+.base-hire-full {
+    width: 100%;
+    box-sizing: border-box;
 }
 
-.gear-upgrade-row {
+.base-worker-assign-row {
     display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.base-worker-cap-label {
+    flex: 1 1 140px;
+    text-align: right;
+    min-width: 0;
+    font-size: 12px;
+}
+
+.base-gap-top {
+    margin-top: 8px;
+}
+
+.base-library-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+}
+
+.base-library-row:hover {
+    background: #162238;
+}
+
+#basePanel_library .base-library-row {
+    align-items: flex-start;
+    background: #171e30;
+    border-bottom: 2px solid #101621;
+    padding: 8px;
+    margin-bottom: 0;
+}
+
+#basePanel_library .base-library-row:hover {
+    background: #222b42;
+}
+
+#basePanel_library .base-library-row:last-child {
+    margin-bottom: 8px;
+}
+
+.base-building-node {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+
+.base-building-node .base-building-label {
+    position: static;
+}
+
+
+.base-mini-progress {
+    width: 70px;
+    height: 5px;
+    border: 1px solid var(--border-color);
+    background: #1a2233;
+}
+
+.base-mini-progress-fill {
+    width: 0%;
+    height: 100%;
+    background: #a6e3a1;
+}
+
+.base-manual-cd {
+    margin-top: 4px;
+}
+
+.map-manual-btn {
+    display: none;
+    border: 1px solid var(--border-color);
+    background: #1f2b3e;
+    color: var(--text-primary);
+    font-size: 10px;
+    padding: 2px 5px;
+}
+
+.base-map-btn-inn {
+    position: absolute;
+    top: 74px;
+    left: 24%;
+}
+
+.base-skill-short {
+    font-size: 10px;
+    margin-top: 1px;
+    max-width: 330px;
+}
+
+.options-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.base-guest-row {
+    display: flex;
+    justify-content: space-between;
     align-items: center;
     gap: 8px;
     margin-top: 6px;
 }
 
-.gear-upgrade-btn {
-    font-size: 11px;
-    padding: 4px 10px;
+.base-guest-progress {
+    margin-top: 2px;
+    margin-bottom: 4px;
 }
 
-.gear-cost {
-    font-size: 11px;
-    color: #f9e2af;
+
+
+.showthat:hover .showthis {
+    display:block;
 }
+.showthis {
+    display:none;
+    position:absolute;
+    background-color: var(--bg-secondary);
+    border:1px solid var(--border-color);
+    padding:3px 5px;
+    border-radius:4px;
+    margin-top:5px;
+    z-index:999;
+    text-align:left;
+    color: var(--text-primary);
+}
+
+.skill-stars-controls {
+    display: flex;
+    gap: 6px;
+    margin-top: 6px;
+}
+
+.skill-star-btn {
+    width: 30px;
+    height: 28px;
+    border: 1px solid var(--border-color);
+    background: transparent;
+    font-size: 18px;
+    line-height: 1;
+    padding: 0;
+}
+
+.skill-star-bronze { color: #cd7f32; }
+.skill-star-silver { color: #c0c0c0; }
+.skill-star-gold { color: #ffd700; }
+.skill-star-filled { text-shadow: 0 0 4px rgba(255,255,255,0.35); }
+.star-bronze { color: #cd7f32; }
+.star-silver { color: #c0c0c0; }
+.star-gold { color: #ffd700; }

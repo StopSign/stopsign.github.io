@@ -1,9 +1,19 @@
 You are assisting with a vanilla JavaScript idle game. Follow these strict architectural rules:
-1. NO FRAMEWORKS. Do not use React, Vue, or TypeScript. 
-2. SEPARATION OF LOOPS: `engine.js` is STRICTLY for data/math calculations per tick, under the `engine` object. `viewUpdating.js` is STRICTLY for DOM manipulation and visual updates per frame, under the `view` object. Never mix the two.
-3. DATA STORAGE: All initial game state is defined in `initialize.js`, under the `initials` object. Massive game data definitions live in `gameData.js`
-4. UI EVENTS: Click handlers and user interactions belong in `events.js`, under the `events` object
-5. HELPERS: Use `helper.js` for formatting and generic functions instead of writing new ones.
-6. SAVING: Any new global variable that tracks progress MUST be integrated into `saving.js`.
-7. Follow the existing style when appropriate. Prefer for-each loops over lambdas.
-8. Only create a css class if it will be used multiple times - otherwise use inline-styling
+1. NO FRAMEWORKS. Do not use React, Vue, or TypeScript.
+2. SEPARATION OF LOOPS: `engine.js` is strictly for data/math calculations per tick under `engine`. `viewUpdating.js` is strictly for DOM/visual updates under `view`. Never mix them.
+3. DATA STORAGE: Initial game state belongs in `initialize.js` under `initials`. Large static game data belongs in `gameData.js`.
+4. UI EVENTS: Click handlers and user interactions belong in `events.js` under `events`.
+5. HELPERS: Use `helpers.js` for formatting and generic functions instead of creating new duplicates.
+6. SAVING: Any new global progress variable must be persisted through the existing save/load flow.
+7. STYLE CONSISTENCY: Follow existing project style. Prefer simple loops over lambdas when appropriate.
+8. CSS POLICY: Only create a CSS class if reused multiple times; otherwise prefer inline style updates.
+9. SAVE MIGRATION ASSUMPTION: You may assume no backward save compatibility is required unless explicitly requested.
+10. UI LIFECYCLE ORDER: Create all required UI elements in `viewCreate.js`, then load/apply save data, then update UI state in `viewUpdating.js`.
+11. CACHE SAFETY: No `view.updateVal` calls before `createView.setAllCaches()` has completed.
+12. POST-INIT FIXES: Any cached-id-dependent UI fix must run in a post-init hook (for example `createView.fixUiAfterLoad`) called from `onLoad.afterLoad` after `initializeDisplay()`.
+13. NO PER-FRAME CREATION: Never create/destroy UI elements per frame; create once on load and only update values/visibility.
+14. UPDATE API RULE: Per-frame/per-scheduled UI updates must use `view.updateVal`. Avoid `innerHTML` and element creation outside `viewCreate.js`.
+15. DISPLAY RESPONSIBILITY: If display changes due to user action, do it in `events.js`. If display changes due to data/state changes, do it in `viewUpdating.js` via `view.updateVal(..., ..., "style.display")`.
+16. SMALL VISUAL CHANGES: Prefer updating style values over adding/removing classes for simple visibility/color changes.
+17. STATS TAB MAINTENANCE: Whenever a new combat stat source is added, update the Stats tab tooltip/source breakdown in `viewUpdating.js` to keep formulas transparent.
+18. SAVEFILE MANAGEMENT: Do not add any code that fixes savefiles for the newer version. Right now there are no savefiles to fix.

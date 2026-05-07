@@ -75,6 +75,10 @@ let driver = {
                     }
                 }
             } else {
+                if (data.battle && (data.battle.state === "dead" || data.battle.state === "completed")) {
+                    const stoppedElapsed = ticksProcessed * tickInterval * effectiveSpeed;
+                    engine.runTownTick(stoppedElapsed);
+                }
                 if (!(data.battle && data.battle.state === "dead")) {
                     data.currentGameState.bonusTime += tickInterval * ticksProcessed;
                 }
@@ -135,7 +139,20 @@ let driver = {
 
     },
     realSecondPassed: function() {
-
+        const chapel = data.progress.base && data.progress.base.chapel;
+        if (!chapel || !chapel.autoRetryEnabled) {
+            return;
+        }
+        if (data.battle && data.battle.state === "dead") {
+            if (data.progress.autoRetryCountdownSec > 0) {
+                data.progress.autoRetryCountdownSec--;
+                if (data.progress.autoRetryCountdownSec <= 0) {
+                    events.tryAgain();
+                }
+            }
+        } else {
+            data.progress.autoRetryCountdownSec = 0;
+        }
     },
     skipTime: function(time) {
 

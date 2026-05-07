@@ -685,15 +685,3 @@ const Raw = {
         return String.raw(strings, ...exprs);
     },
 }
-
-function makeZone(config) {
-    return gameData.createZoneDefinition(config);
-}
-
-function makeMap(config) {
-    return gameData.createMapDefinition(config);
-}
-
-function makeSpawnDataFromMap(mapDefinition, seed) {
-    return gameData.generateEnemySpawnData(seed, mapDefinition);
-}

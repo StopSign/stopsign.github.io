@@ -10,15 +10,17 @@ let onLoad = {
         data.gameSettings = toLoad.gameSettings ?? initials.gameSettings();
         data.progress = toLoad.progress ?? initials.progress();
         data.battle = toLoad.battle ?? initials.battle();
+        initialize.ensureProgressShape();
 
         initialize.applyPlanForCurrentLevel();
         if (data.battle.state === "running" && !data.battle.runSkillTalentStart) {
             initialize.snapshotRunSkillTalent();
         }
-        initialize.applyConToPlayer(false);
+        initialize.calcPlayerStats(false);
     },
     afterLoad: function() {
         createView.initializeDisplay();
+        createView.fixUiAfterLoad();
         view.updateView();
         debug();
     }

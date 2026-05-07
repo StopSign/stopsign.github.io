@@ -1,63 +1,180 @@
 
 let engine = {
+    /** Playable band for lanes (`inset`, `laneWidth`) — uses `viewData.layout.battlefieldWidthPx` / `gameData.battle`, not DOM measurements. */
+    getBattleLaneMetrics: function() {
+        const gd = gameData.battle;
+        const bw = Math.max(1, Number(viewData.layout.battlefieldWidthPx) || gd.battlefieldWidthPx || 1);
+        let insetRaw = gd.laneHorizontalInsetPx !== undefined ? gd.laneHorizontalInsetPx : 0;
+        const maxInset = Math.floor(bw * 0.2);
+        const inset = Math.min(Math.max(0, insetRaw), maxInset);
+        const playable = Math.max(1, bw - 2 * inset);
+        const n = gd.laneCount;
+        const laneWidth = playable / n;
+        return { battleWidth: bw, playableWidth: playable, laneWidth, inset, laneCount: n };
+    },
+    runTownTick: function(elapsedMs) {
+        engine.updateManualActionCooldowns(elapsedMs);
+        engine.updateBaseProduction(elapsedMs);
+        engine.updateInnGuests(elapsedMs);
+        engine.updateLibraryResearch(elapsedMs);
+    },
     gameTick: function() {
         data.gameSettings.ticksForSeconds++;
 
+        createView.syncBattlefieldLayoutFromDom();
+
+        const tickMs = 1000 / data.gameSettings.ticksPerSecond;
+        engine.runTownTick(tickMs);
         if (data.battle.state !== "running") {
             return;
         }
+        if (engine.updateMapTransitionCountdown(tickMs)) {
+            return;
+        }
+        data.battle.elapsedMs += tickMs * engine.getBattleTimeRateMultiplier();
 
-        const tickMs = 1000 / data.gameSettings.ticksPerSecond;
-        data.battle.elapsedMs += tickMs;
-
-        engine.spawnEnemiesFromData();
+        engine.spawnZonesForTime();
         engine.updateEnemyMovement(tickMs);
         engine.updateCurrentZoneInfo();
         engine.updateFortitudeWaveTracking();
         engine.updateRecoveryEachSecond(tickMs);
         engine.updatePassiveSkillExp(tickMs);
+        engine.updateClassEffects(tickMs);
         engine.updateTargeting();
         engine.updatePlayerAttack(tickMs);
         engine.updateRangedAttack(tickMs);
         engine.updateEnemyAttacks(tickMs);
         engine.cleanupDeadEnemies();
+        engine.grantZoneWorkersIfCleared();
         engine.checkMapCompletion();
         engine.checkLossCondition();
     },
-    spawnEnemiesFromData: function() {
-        while (data.battle.enemySpawnCursor < data.battle.spawnDataQueue.length) {
-            const row = data.battle.spawnDataQueue[data.battle.enemySpawnCursor];
-            if (row.spawnTimeMs > data.battle.elapsedMs) {
-                break;
+    getRangedEnemyStopY: function(playerTopY, battleHeight) {
+        return playerTopY - (battleHeight * 0.4);
+    },
+    isLaneSpotOccupied: function(targetLane, yPx, sizePx, skipEnemyId) {
+        for (let i = 0; i < data.battle.enemies.length; i++) {
+            const e = data.battle.enemies[i];
+            if (!e.alive || e.id === skipEnemyId || e.lane !== targetLane) {
+                continue;
             }
-            const enemyId = data.battle.enemyIdCounter;
-            data.battle.enemyIdCounter++;
-            const battleWidth = viewData.layout.battlefieldWidthPx || 500;
-            const laneWidth = battleWidth / gameData.battle.laneCount;
-            const enemySize = Math.floor(laneWidth * row.sizeLaneFill);
+            if (Math.abs(e.yPx - yPx) < Math.max(sizePx, e.sizePx)) {
+                return true;
+            }
+        }
+        return false;
+    },
+    tryMeleeLaneShift: function(enemy) {
+        const centerLane = Math.floor(gameData.battle.laneCount / 2);
+        const options = [enemy.lane - 1, enemy.lane + 1];
+        options.sort(function(a, b) {
+            return Math.abs(a - centerLane) - Math.abs(b - centerLane);
+        });
+        for (let i = 0; i < options.length; i++) {
+            const lane = options[i];
+            if (lane < 0 || lane >= gameData.battle.laneCount) {
+                continue;
+            }
+            if (engine.isLaneSpotOccupied(lane, enemy.yPx, enemy.sizePx, enemy.id)) {
+                continue;
+            }
+            enemy.lane = lane;
+            enemy.blockedByRangedMs = 0;
+            return true;
+        }
+        return false;
+    },
+    spawnZonesForTime: function() {
+        const map = initialize.getCurrentMapDefinition();
+        if (!map || !map.zones) {
+            return;
+        }
+        const tierMult = mapData.getTierDifficultyMultiplier(data.battle.mapTier || 0);
+        const gd = gameData.battle;
+        for (let i = 0; i < map.zones.length; i++) {
+            if (data.battle.zoneSpawnedInCycle[i]) {
+                continue;
+            }
+            if (data.battle.elapsedMs < map.zones[i].startTimeMs) {
+                continue;
+            }
+            const z = map.zones[i];
+            const rows = mapData.createZoneSpawnRows(map, i, tierMult);
+            const laneSeedBase = (data.battle.generatedFromSeed || data.battle.seed || 1337);
+            const laneRng = gameData.seededRandomFactory((laneSeedBase + ((i + 1) * 92821)) >>> 0);
+            const lm = engine.getBattleLaneMetrics();
             const spdMult = 1 + ((data.battle.levelState && data.battle.levelState.levelSpd) || 0) * 0.1;
-            data.battle.enemies.push({
-                id: enemyId,
-                lane: row.lane,
-                spawnTimeMs: row.spawnTimeMs,
-                yPx: -enemySize,
-                prevYPx: -enemySize,
-                sizePx: enemySize,
-                hp: row.hp,
-                maxHp: row.maxHp,
-                speedPxPerSecond: row.speedPxPerSecond * spdMult,
-                attackDamage: row.attackDamage,
-                attackCooldownMs: row.attackCooldownMs,
-                attackTimerMs: row.attackTimerMs,
-                gain: row.gain,
-                inRange: false,
-                alive: true,
-                hasEnteredMeleeQueue: false
-            });
-            if (data.battle.enemySpawnCursor === 0) {
-                data.battle.enemies[data.battle.enemies.length - 1].gain = 1;
+            const travelSpd = gd.enemyTravelSpeedPxPerSecond;
+            const intervalMs = Math.max(0, z.spawnEveryMs || 0);
+            const spacingPx = rows.length > 1 && intervalMs > 0 ? (intervalMs / 1000) * travelSpd : 0;
+            for (let ri = 0; ri < rows.length; ri++) {
+                const row = rows[ri];
+                row.lane = Math.floor(laneRng() * gd.laneCount);
+                row.sizeLaneFill = gd.enemySizeLaneFill;
+                row.speedPxPerSecond = travelSpd;
+                row.attackCooldownMs = gd.enemyAttackCooldownMs;
+                row.attackTimerMs = gd.enemyAttackCooldownMs;
+                const enemyId = data.battle.enemyIdCounter;
+                data.battle.enemyIdCounter++;
+                const enemySize = Math.floor(lm.laneWidth * row.sizeLaneFill);
+                const maxHp = Math.max(1, Math.round(row.rawHp !== undefined ? row.rawHp : row.maxHp));
+                const attackDamage = Math.max(1, Math.round(row.rawDamage !== undefined ? row.rawDamage : row.attackDamage));
+                const yPx = -enemySize - ri * spacingPx;
+                data.battle.enemies.push({
+                    id: enemyId,
+                    lane: row.lane,
+                    spawnTimeMs: z.startTimeMs,
+                    zoneIndex: row.zoneIndex,
+                    enemyType: row.enemyType || "melee",
+                    yPx: yPx,
+                    prevYPx: yPx,
+                    sizePx: enemySize,
+                    hp: maxHp,
+                    maxHp: maxHp,
+                    speedPxPerSecond: row.speedPxPerSecond * spdMult,
+                    attackDamage: attackDamage,
+                    attackCooldownMs: row.attackCooldownMs,
+                    attackTimerMs: row.attackTimerMs,
+                    gain: row.gain,
+                    expBase: row.expBase !== undefined ? row.expBase : 1,
+                    inRange: false,
+                    rangedReady: false,
+                    alive: true,
+                    hasEnteredMeleeQueue: false,
+                    blockedByRangedMs: 0
+                });
             }
-            data.battle.enemySpawnCursor++;
+            data.battle.zoneSpawnedInCycle[i] = true;
+            if (!data.battle.zoneRewardGrantedInCycle) {
+                data.battle.zoneRewardGrantedInCycle = [];
+            }
+            if (data.battle.zoneRewardGrantedInCycle[i] === undefined) {
+                data.battle.zoneRewardGrantedInCycle[i] = false;
+            }
+        }
+    },
+    grantZoneWorkersIfCleared: function() {
+        const map = initialize.getCurrentMapDefinition();
+        if (!map || !data.battle.zoneRewardGrantedInCycle) return;
+        const tier = data.battle.mapTier || 0;
+        const reward = tier <= 0 ? 1 : (tier === 1 ? 2 : 3);
+        for (let i = 0; i < map.zones.length; i++) {
+            if (!data.battle.zoneSpawnedInCycle[i] || data.battle.zoneRewardGrantedInCycle[i]) continue;
+            let alive = false;
+            for (let j = 0; j < data.battle.enemies.length; j++) {
+                const e = data.battle.enemies[j];
+                if (e.alive && e.zoneIndex === i) {
+                    alive = true;
+                    break;
+                }
+            }
+            if (!alive) {
+                data.battle.zoneRewardGrantedInCycle[i] = true;
+                if (!data.progress.mapWorkersFound) data.progress.mapWorkersFound = {};
+                if (data.progress.mapWorkersFound[map.key] === undefined) data.progress.mapWorkersFound[map.key] = 0;
+                const maxWorkers = (map.zones.length || 0) * 6;
+                data.progress.mapWorkersFound[map.key] = Math.min(maxWorkers, data.progress.mapWorkersFound[map.key] + reward);
+            }
         }
     },
     updateEnemyMovement: function(tickMs) {
@@ -91,6 +208,44 @@ let engine = {
                 enemy.prevYPx = enemy.yPx;
                 const dy = (enemy.speedPxPerSecond + pushBonus) * deltaSeconds;
                 let tentativeY = enemy.yPx + dy;
+                if (enemy.enemyType === "ranged") {
+                    const wasReady = !!enemy.rangedReady;
+                    const stopY = engine.getRangedEnemyStopY(playerTopY, battleHeight);
+                    if (j === laneEnemies.length - 1) {
+                        const baseDy = enemy.speedPxPerSecond * deltaSeconds;
+                        const pushDy = pushBonus * deltaSeconds;
+                        let baseY = enemy.yPx;
+                        if (baseY < stopY) {
+                            baseY = Math.min(stopY, baseY + baseDy);
+                        }
+                        tentativeY = baseY + pushDy;
+                        if (tentativeY + enemy.sizePx >= playerTopY) {
+                            enemy.yPx = playerTopY - enemy.sizePx;
+                            enemy.inRange = true;
+                            if (!enemy.hasEnteredMeleeQueue) {
+                                enemy.hasEnteredMeleeQueue = true;
+                                data.battle.meleeQueue.push(enemy.id);
+                            }
+                        } else {
+                            enemy.yPx = tentativeY;
+                            enemy.inRange = false;
+                        }
+                        enemy.rangedReady = enemy.inRange || (enemy.yPx >= stopY);
+                        if (!wasReady && enemy.rangedReady) {
+                            enemy.attackTimerMs = enemy.attackCooldownMs * 2;
+                        }
+                    } else {
+                        const below = laneEnemies[j + 1];
+                        const maxY = below.yPx - enemy.sizePx;
+                        if (tentativeY > maxY) {
+                            tentativeY = maxY;
+                        }
+                        enemy.yPx = tentativeY;
+                        enemy.inRange = false;
+                        enemy.rangedReady = false;
+                    }
+                    continue;
+                }
                 if (j === laneEnemies.length - 1) {
                     if (tentativeY + enemy.sizePx >= playerTopY) {
                         enemy.yPx = playerTopY - enemy.sizePx;
@@ -106,19 +261,54 @@ let engine = {
                 } else {
                     const below = laneEnemies[j + 1];
                     const maxY = below.yPx - enemy.sizePx;
+                    const blockedByRanged = below.enemyType === "ranged" && !below.inRange && tentativeY > maxY;
                     if (tentativeY > maxY) {
                         tentativeY = maxY;
                     }
                     enemy.yPx = tentativeY;
                     enemy.inRange = false;
+                    if (blockedByRanged) {
+                        enemy.blockedByRangedMs = (enemy.blockedByRangedMs || 0) + tickMs;
+                        if (enemy.blockedByRangedMs >= 500) {
+                            if (!engine.tryMeleeLaneShift(enemy)) {
+                                enemy.blockedByRangedMs = 0;
+                            }
+                        }
+                    } else {
+                        enemy.blockedByRangedMs = 0;
+                    }
+                }
+            }
+        }
+        if ((data.progress.currentClassKey || "none") === "hunter" && (data.battle.classRetreatMs || 0) > 0) {
+            const spd = data.battle.levelState.levelSpd || 0;
+            const retreatRate = (gameData.battle.enemyTravelSpeedPxPerSecond + gameData.battle.idlePushBonusPxPerSecond) * (1 + (spd * 0.1));
+            const retreatDy = retreatRate * deltaSeconds;
+            for (let i = 0; i < data.battle.enemies.length; i++) {
+                const enemy = data.battle.enemies[i];
+                if (!enemy.alive) continue;
+                enemy.yPx = Math.max(-enemy.sizePx, enemy.yPx - retreatDy);
+                if (enemy.yPx + enemy.sizePx < playerTopY) {
+                    enemy.inRange = false;
+                    if (enemy.enemyType === "ranged") {
+                        enemy.rangedReady = false;
+                    }
                 }
             }
         }
     },
     updateTargeting: function() {
+        const nextQueue = [];
+        for (let i = 0; i < data.battle.meleeQueue.length; i++) {
+            const queued = engine.findEnemyById(data.battle.meleeQueue[i]);
+            if (queued && queued.alive && queued.inRange) {
+                nextQueue.push(queued.id);
+            }
+        }
+        data.battle.meleeQueue = nextQueue;
         if (data.battle.activeTargetId !== null) {
             const existingTarget = engine.findEnemyById(data.battle.activeTargetId);
-            if (existingTarget && existingTarget.alive) {
+            if (existingTarget && existingTarget.alive && existingTarget.inRange) {
                 return;
             }
             data.battle.activeTargetId = null;
@@ -134,17 +324,24 @@ let engine = {
     },
     getAlacrityCooldownReductionMs: function() {
         const s = data.progress.skills.alacrity;
-        if (!s) {
+        if (!s || !skills.isSkillUnlocked("alacrity")) {
             return 0;
         }
         const cap = s.maxLevel !== undefined ? s.maxLevel : 1000;
         return Math.min(s.level, cap);
     },
     getEffectiveMeleeCooldownMs: function() {
-        return Math.max(200, 2000 - engine.getAlacrityCooldownReductionMs());
+        return Math.max(400, 2000 - (engine.getAlacrityCooldownReductionMs() * 10));
     },
     getEffectiveRangedCooldownMs: function() {
-        return Math.max(200, 4000 - engine.getAlacrityCooldownReductionMs());
+        return Math.max(800, 4000 - (engine.getAlacrityCooldownReductionMs() * 20));
+    },
+    getUnlockedSkillLevel: function(skillKey) {
+        if (!skills.isSkillUnlocked(skillKey)) {
+            return 0;
+        }
+        const s = data.progress.skills[skillKey];
+        return s ? (s.level || 0) : 0;
     },
     getMeleeRechargeMultiplier: function() {
         const prep = data.progress.skills.preparation;
@@ -152,7 +349,12 @@ let engine = {
         if (engine.anyEnemyInMeleeRange()) {
             return 1;
         }
-        return 1 + (0.02 * prepLv);
+        let mult = 1 + (0.02 * prepLv);
+        if ((data.progress.currentClassKey || "none") === "rogue" && (data.battle.rogueFlurryMs || 0) > 0) {
+            const spd = data.battle.levelState.levelSpd || 0;
+            mult *= (1 + (spd * 0.1));
+        }
+        return mult;
     },
     syncPlayerCooldownFields: function() {
         const p = data.battle.player;
@@ -164,13 +366,20 @@ let engine = {
             return;
         }
         const map = initialize.getCurrentMapDefinition();
-        const z = gameData.getZoneForTime(map, data.battle.elapsedMs);
-        const name = z ? z.name : null;
+        if (!map || !map.zones) return;
+        let primaryName = null;
+        for (let i = 0; i < map.zones.length; i++) {
+            if (engine.getRemainingEnemiesForZone(i) <= 0) {
+                continue;
+            }
+            primaryName = map.zones[i].name;
+            break;
+        }
         const prev = data.battle.prevZoneNameForFortitude;
-        if (prev !== null && name !== null && prev !== name) {
+        if (prev !== null && primaryName !== null && prev !== primaryName) {
             engine.onSkillTrigger("fortitude", 1);
         }
-        data.battle.prevZoneNameForFortitude = name;
+        data.battle.prevZoneNameForFortitude = primaryName;
     },
     updateRecoveryEachSecond: function(tickMs) {
         if (data.battle.recoverySecondAccMs === undefined) {
@@ -179,8 +388,7 @@ let engine = {
         data.battle.recoverySecondAccMs += tickMs;
         while (data.battle.recoverySecondAccMs >= 1000) {
             data.battle.recoverySecondAccMs -= 1000;
-            const rec = data.progress.skills.recovery;
-            const recLv = rec ? rec.level : 0;
+            const recLv = engine.getUnlockedSkillLevel("recovery");
             if (recLv > 0) {
                 const p = data.battle.player;
                 p.hp = Math.min(p.maxHp, p.hp + recLv * 0.25);
@@ -203,9 +411,49 @@ let engine = {
         if (inMelee > 1) {
             engine.onSkillTrigger("adrenaline", (inMelee - 1) * sec);
         }
+        const cls = data.progress.currentClassKey || "none";
+        if (cls === "rogue") {
+            engine.addClassBarProgress("B", 100 * sec);
+        } else if (cls === "hunter") {
+            engine.addClassBarProgress("B", 50 * inMelee * sec);
+        }
+    },
+    addClassBarProgress: function(which, amount) {
+        const key = which === "A" ? "classPowerA" : "classPowerB";
+        const cur = data.battle[key] || 0;
+        if (cur >= 1000) {
+            return;
+        }
+        data.battle[key] = cur + amount;
+    },
+    consumeClassBar: function(which) {
+        const key = which === "A" ? "classPowerA" : "classPowerB";
+        if ((data.battle[key] || 0) < 1000) return false;
+        data.battle[key] -= 1000;
+        return true;
+    },
+    updateClassEffects: function(tickMs) {
+        if ((data.battle.classRetreatMs || 0) > 0) {
+            data.battle.classRetreatMs = Math.max(0, data.battle.classRetreatMs - tickMs);
+        }
+        if ((data.battle.rogueFlurryMs || 0) > 0) {
+            data.battle.rogueFlurryMs = Math.max(0, data.battle.rogueFlurryMs - tickMs);
+        }
+        if ((data.progress.currentClassKey || "none") === "rogue" && (data.battle.classPowerA || 0) >= 1000 && !data.battle.rogueDashActive) {
+            data.battle.classPowerA -= 1000;
+            data.battle.rogueDashActive = true;
+        }
+        if (data.battle.rogueDashActive && engine.anyEnemyInMeleeRange()) {
+            data.battle.rogueDashActive = false;
+        }
+        if ((data.progress.currentClassKey || "none") === "hunter" && (data.battle.classPowerB || 0) >= 1000 && (data.battle.classRetreatMs || 0) <= 0) {
+            data.battle.classPowerB -= 1000;
+            data.battle.classRetreatMs = 3000;
+        }
     },
     updatePlayerAttack: function(tickMs) {
         const p = data.battle.player;
+        const cls = data.progress.currentClassKey || "none";
         p.attackTimerMs -= tickMs * engine.getMeleeRechargeMultiplier();
         if (p.attackTimerMs > 0) {
             return;
@@ -215,14 +463,58 @@ let engine = {
             return;
         }
         const target = engine.findEnemyById(data.battle.activeTargetId);
-        if (!target || !target.alive) {
+        if (!target || !target.alive || !target.inRange) {
             p.attackTimerMs = 0;
             return;
         }
         engine.enqueueMeleeLineFx(target);
-        target.hp -= data.battle.player.attackDamage;
+        let meleeDamage = data.battle.player.attackDamage;
+        const executeLv = engine.getUnlockedSkillLevel("execute");
+        if (executeLv > 0 && target.hp <= (target.maxHp * 0.5)) {
+            meleeDamage *= 1 + (executeLv * 0.05);
+            engine.onSkillTrigger("execute", 1);
+        }
+        const sneakLv = engine.getUnlockedSkillLevel("sneak_attack");
+        const priorHits = target.timesHitByPlayer || 0;
+        if (sneakLv > 0 && priorHits === 0) {
+            meleeDamage *= 1 + (sneakLv * 0.1);
+        }
+        const exploitLv = engine.getUnlockedSkillLevel("exploit");
+        const prevTarget = data.battle.lastPlayerHitEnemyId || 0;
+        const streak = (prevTarget === target.id) ? ((data.battle.lastPlayerHitStreak || 0) + 1) : 1;
+        if (exploitLv > 0 && streak >= 2) {
+            meleeDamage += (streak - 1) * exploitLv;
+        }
+        let isPowerStrike = false;
+        if (cls === "warrior" && (data.battle.classPowerA || 0) >= 1000) {
+            data.battle.classPowerA -= 1000;
+            meleeDamage *= 2;
+            isPowerStrike = true;
+        }
+        if (cls === "rogue" && (data.battle.classPowerB || 0) >= 1000) {
+            data.battle.classPowerB -= 1000;
+            data.battle.rogueFlurryMs = 2000;
+        }
+        meleeDamage = Math.max(1, Math.round(meleeDamage));
+        target.hp -= meleeDamage;
+        data.battle.lastPlayerHitEnemyId = target.id;
+        data.battle.lastPlayerHitStreak = streak;
+        target.timesHitByPlayer = priorHits + 1;
+        if (sneakLv > 0 && priorHits === 0) {
+            engine.onSkillTrigger("sneak_attack", 1);
+        }
+        if (exploitLv > 0 && priorHits > 0) {
+            engine.onSkillTrigger("exploit", 1);
+        }
         const cd = engine.getEffectiveMeleeCooldownMs();
         p.attackTimerMs = cd + Math.min(0, p.attackTimerMs);
+        if (!isPowerStrike) {
+            if (cls === "warrior") engine.addClassBarProgress("A", 100);
+            if (cls === "hunter") engine.addClassBarProgress("A", 100);
+        } else {
+            engine.onSkillTrigger("cleave", 1);
+            engine.applyWarriorCleave(target, meleeDamage);
+        }
         engine.onSkillTrigger("finesse", 1);
         engine.onSkillTrigger("alacrity", 1);
         if (target.hp <= 0) {
@@ -235,23 +527,93 @@ let engine = {
     },
     updateCurrentZoneInfo: function() {
         const map = initialize.getCurrentMapDefinition();
-        data.battle.activeZones = gameData.getActiveZonesForTime(map, data.battle.elapsedMs);
+        const zones = [];
+        if (!map || !map.zones) {
+            data.battle.activeZones = zones;
+            return;
+        }
+        const tierMult = mapData.getTierDifficultyMultiplier(data.battle.mapTier || 0);
+        const elapsed = data.battle.elapsedMs;
+        for (let i = 0; i < map.zones.length; i++) {
+            const rem = engine.getRemainingEnemiesForZone(i);
+            if (rem <= 0) {
+                continue;
+            }
+            const z = map.zones[i];
+            const cr = mapData.computeZoneCombatAndRewards(map, i, tierMult);
+            const lastSpawnT = mapData.getZoneLastSpawnTimeMs(z);
+            zones.push({
+                index: i,
+                name: z.name,
+                remainingSpawnMs: Math.max(0, lastSpawnT - elapsed),
+                difficulty: (map.baseDifficulty || 1) * cr.ratio * tierMult,
+                remainingEnemies: rem,
+                gold: engine.goldAwardFromEnemyGain(cr.perEnemyGain),
+                exp: engine.expAwardFromEnemyExpBase(cr.expBasePerEnemy)
+            });
+        }
+        data.battle.activeZones = zones;
+    },
+    getRemainingEnemiesForZone: function(zoneIndex) {
+        let alive = 0;
+        for (let i = 0; i < data.battle.enemies.length; i++) {
+            const e = data.battle.enemies[i];
+            if (e.alive && e.zoneIndex === zoneIndex) {
+                alive++;
+            }
+        }
+        return alive;
     },
     updateEnemyAttacks: function(tickMs) {
         for (let i = 0; i < data.battle.enemies.length; i++) {
             const enemy = data.battle.enemies[i];
-            if (!enemy.alive || !enemy.inRange) {
+            const canAttack = enemy.enemyType === "ranged" ? (!!enemy.rangedReady || !!enemy.inRange) : !!enemy.inRange;
+            if (!enemy.alive || !canAttack) {
                 continue;
             }
             enemy.attackTimerMs -= tickMs;
             if (enemy.attackTimerMs <= 0) {
-                enemy.attackTimerMs += enemy.attackCooldownMs;
-                const toughLv = data.progress.skills.toughness ? data.progress.skills.toughness.level : 0;
-                const dmgMultiplier = 1 / (1 + (toughLv * 0.05));
-                data.battle.player.hp -= enemy.attackDamage * dmgMultiplier;
-                engine.onSkillTrigger("toughness", 1);
+                const enemyCd = enemy.enemyType === "ranged" ? (enemy.attackCooldownMs * 2) : enemy.attackCooldownMs;
+                enemy.attackTimerMs += enemyCd;
+                if (enemy.enemyType === "ranged") {
+                    engine.pushEnemyRangedLineFx(enemy);
+                }
+                const endLv = engine.getUnlockedSkillLevel("endurance");
+                const dmgMultiplier = 1 / (1 + (endLv * 0.05));
+                let incoming = enemy.attackDamage * dmgMultiplier;
+                const armorFlat = engine.getUnlockedSkillLevel("toughness_warrior") * 0.25;
+                incoming = Math.max(0, incoming - armorFlat);
+                if ((data.progress.currentClassKey || "none") === "warrior" && (data.battle.classPowerB || 0) >= 1000) {
+                    data.battle.classPowerB -= 1000;
+                    incoming *= 0.5;
+                    engine.onSkillTrigger("second_wind", 1);
+                    const secondWindHeal = engine.getUnlockedSkillLevel("second_wind");
+                    if (secondWindHeal > 0) {
+                        data.battle.player.hp = Math.min(data.battle.player.maxHp, data.battle.player.hp + secondWindHeal);
+                    }
+                }
+                if (incoming > 0 && (data.progress.currentClassKey || "none") === "warrior" && enemy.enemyType !== "ranged") {
+                    engine.addClassBarProgress("B", 200);
+                    const thorns = engine.getUnlockedSkillLevel("thorns");
+                    if (thorns > 0) {
+                        enemy.hp -= thorns;
+                    }
+                }
+                data.battle.player.hp -= incoming;
+                engine.onSkillTrigger("endurance", 1);
+                engine.onSkillTrigger("toughness_warrior", enemy.enemyType === "ranged" ? 0 : 1);
+                engine.onSkillTrigger("thorns", (incoming > 0 && enemy.enemyType !== "ranged") ? 1 : 0);
                 if (data.battle.player.hp < 0) {
                     data.battle.player.hp = 0;
+                }
+                if (enemy.hp <= 0) {
+                    enemy.hp = 0;
+                    enemy.alive = false;
+                    if (data.battle.activeTargetId === enemy.id) {
+                        data.battle.activeTargetId = null;
+                    }
+                    engine.removeEnemyFromMeleeQueue(enemy.id);
+                    engine.onEnemyKilled(enemy);
                 }
             }
         }
@@ -272,17 +634,16 @@ let engine = {
         if (data.battle.state !== "running") {
             return;
         }
-        const allSpawned = data.battle.enemySpawnCursor >= data.battle.spawnDataQueue.length;
+        const map = initialize.getCurrentMapDefinition();
+        const allSpawned = data.battle.zoneSpawnedInCycle && data.battle.zoneSpawnedInCycle.length
+            ? data.battle.zoneSpawnedInCycle.every(function(v) { return !!v; })
+            : false;
         const noneAlive = data.battle.enemies.length === 0;
-        if (!allSpawned || !noneAlive) {
+        const cycleDone = data.battle.elapsedMs >= mapData.getMapTotalDurationMs(map);
+        if (!allSpawned || !noneAlive || !cycleDone) {
             return;
         }
-        const runGold = Math.max(0, data.progress.gold - data.battle.runStartGold);
-        const bonus = runGold * 2;
-        data.progress.gold += bonus;
-        data.battle.completionBonusGold = bonus;
-        data.battle.state = "completed";
-        data.gameSettings.stop = true;
+        engine.beginTierTransition();
     },
     checkLossCondition: function() {
         if (data.battle.player.hp > 0) {
@@ -290,30 +651,51 @@ let engine = {
         }
         engine.saveRunHistoryIfNeeded();
         data.battle.state = "dead";
+        const chapel = data.progress.base && data.progress.base.chapel;
+        data.progress.autoRetryCountdownSec = chapel && chapel.autoRetryEnabled ? 10 : 0;
         data.gameSettings.stop = true;
     },
     onEnemyKilled: function(enemy) {
         const gain = enemy.gain || 1;
-        const wisdomLevel = data.progress.skills.wisdom ? data.progress.skills.wisdom.level : 0;
-        const greedLevel = data.progress.skills.greed ? data.progress.skills.greed.level : 0;
-        const scavLevel = data.progress.skills.scavenger ? data.progress.skills.scavenger.level : 0;
-        const expGain = gain * Math.pow(1.1, wisdomLevel);
-        const baseGoldPart = (gain * gain) + scavLevel;
-        const goldGain = baseGoldPart * Math.pow(1.05, greedLevel);
+        const expBase = enemy.expBase !== undefined ? enemy.expBase : 1;
+        const expGain = engine.expAwardFromEnemyExpBase(expBase);
+        const goldGain = engine.goldAwardFromEnemyGain(gain);
         data.progress.gold += goldGain;
         data.battle.levelState.exp += expGain;
         data.battle.enemiesKilled++;
         engine.onSkillTrigger("wisdom", 1);
         engine.onSkillTrigger("greed", 1);
         engine.onSkillTrigger("scavenger", Math.sqrt(Math.max(0, goldGain)));
+        if (data.battle.state === "running") {
+            engine.updateCurrentZoneInfo();
+        }
+        if ((data.progress.currentClassKey || "none") === "rogue") {
+            engine.addClassBarProgress("A", 300);
+        }
         engine.resolveLevelUps();
+    },
+    /** Matches `onEnemyKilled`: wisdom scales exp from zone `expBase`. */
+    expAwardFromEnemyExpBase: function(expBase) {
+        const wisdomLevel = data.progress.skills.wisdom ? data.progress.skills.wisdom.level : 0;
+        const b = expBase !== undefined ? expBase : 1;
+        return b * Math.pow(1.1, wisdomLevel);
+    },
+    /** Matches `onEnemyKilled`: scavenger flat + greedy gold multiplier over stored zone gain. */
+    goldAwardFromEnemyGain: function(storedGain) {
+        const greedLevel = data.progress.skills.greed ? data.progress.skills.greed.level : 0;
+        const scavLevel = data.progress.skills.scavenger ? data.progress.skills.scavenger.level : 0;
+        const gain = storedGain !== undefined ? storedGain : 1;
+        const baseGoldPart = gain + scavLevel;
+        return baseGoldPart * Math.pow(1.05, greedLevel);
     },
     resolveLevelUps: function() {
         while (data.battle.levelState.exp >= data.battle.levelState.expToLevel) {
             data.battle.levelState.exp -= data.battle.levelState.expToLevel;
             data.battle.levelState.level++;
-            data.battle.levelState.levelStr++;
-            data.battle.levelState.levelCon++;
+            const cls = initialize.getCurrentClassDef();
+            data.battle.levelState.levelStr += cls.perLevel.str || 0;
+            data.battle.levelState.levelCon += cls.perLevel.con || 0;
+            data.battle.levelState.levelSpd += cls.perLevel.spd || 0;
             data.battle.levelState.expToLevel = Math.floor(data.battle.levelState.expToLevel * 1.35);
             const nextLevel = data.battle.levelState.level;
             const planned = engine.getPlanEntryForLevel(nextLevel);
@@ -325,7 +707,7 @@ let engine = {
             const discLv = data.progress.skills.discipline ? data.progress.skills.discipline.level : 0;
             data.battle.levelState.unassignedPoints += discLv;
             engine.onSkillTrigger("discipline", 1);
-            initialize.applyConToPlayer(false);
+            initialize.calcPlayerStats(false);
         }
     },
     getPlanEntryForLevel: function(level) {
@@ -371,7 +753,7 @@ let engine = {
                 attribute: attributeKey
             });
         }
-        initialize.applyConToPlayer(false);
+        initialize.calcPlayerStats(false);
         return true;
     },
     anyEnemyInMeleeRange: function() {
@@ -383,11 +765,36 @@ let engine = {
         }
         return false;
     },
+    anyEnemyInPlayerRange: function() {
+        const rangedOn = !!(data.progress.rangedAttackEnabled && data.progress.base && data.progress.base.workshop && data.progress.base.workshop.bowBuilt);
+        for (let i = 0; i < data.battle.enemies.length; i++) {
+            const e = data.battle.enemies[i];
+            if (!e.alive) {
+                continue;
+            }
+            if (e.inRange) {
+                return true;
+            }
+            if (rangedOn && engine.enemyIntersectsBattlefield(e)) {
+                return true;
+            }
+        }
+        return false;
+    },
+    anyEnemyVisible: function() {
+        for (let i = 0; i < data.battle.enemies.length; i++) {
+            const e = data.battle.enemies[i];
+            if (e.alive && engine.enemyIntersectsBattlefield(e)) {
+                return true;
+            }
+        }
+        return false;
+    },
     meleeAttackReady: function() {
         return data.battle.player.attackTimerMs <= 0;
     },
     idleAutoPhase: function() {
-        return !engine.anyEnemyInMeleeRange() && engine.meleeAttackReady();
+        return !engine.anyEnemyInPlayerRange() && engine.meleeAttackReady();
     },
     countAliveEnemies: function() {
         let n = 0;
@@ -399,34 +806,134 @@ let engine = {
         return n;
     },
     getEnemyPushBonusPxPerSecond: function() {
-        if (data.progress.rangedAttackEnabled) {
-            return 0;
-        }
-        if (!engine.idleAutoPhase() || engine.countAliveEnemies() === 0) {
+        if (engine.anyEnemyInPlayerRange() || engine.countAliveEnemies() === 0) {
             return 0;
         }
         const spd = data.battle.levelState.levelSpd || 0;
         const spdMult = 1 + (spd * 0.1);
-        return gameData.battle.idlePushBonusPxPerSecond * spdMult;
+        let out = gameData.battle.idlePushBonusPxPerSecond * spdMult;
+        if ((data.progress.currentClassKey || "none") === "rogue" && data.battle.rogueDashActive) {
+            out *= 10;
+        }
+        return out;
     },
-    enemyFullyInsideBattlefield: function(enemy) {
-        const bw = viewData.layout.battlefieldWidthPx || 500;
-        const bh = viewData.layout.battlefieldHeightPx || 500;
-        const laneWidth = bw / gameData.battle.laneCount;
-        const cx = (enemy.lane + 0.5) * laneWidth;
+    getBattleTimeRateMultiplier: function() {
+        if (!engine.areActiveZonesCleared()) {
+            return 1;
+        }
+        const spd = data.battle.levelState.levelSpd || 0;
+        let out = 1 + (spd * 0.1);
+        if ((data.progress.currentClassKey || "none") === "rogue" && data.battle.rogueDashActive) {
+            out *= 10;
+        }
+        return out;
+    },
+    areActiveZonesCleared: function() {
+        const map = initialize.getCurrentMapDefinition();
+        if (!map || !map.zones) {
+            return false;
+        }
+        for (let zi = 0; zi < map.zones.length; zi++) {
+            if (engine.getRemainingEnemiesForZone(zi) <= 0) {
+                continue;
+            }
+            for (let j = 0; j < data.battle.enemies.length; j++) {
+                const e = data.battle.enemies[j];
+                if (e.alive && e.zoneIndex === zi) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    },
+    updateMapTransitionCountdown: function(tickMs) {
+        if ((data.battle.transitionCountdownMs || 0) <= 0) {
+            return false;
+        }
+        data.battle.transitionCountdownMs = Math.max(0, data.battle.transitionCountdownMs - tickMs);
+        if (data.battle.transitionCountdownMs <= 0) {
+            engine.restartMapCycle(data.battle.nextTierAfterCountdown || 0);
+        }
+        return true;
+    },
+    beginTierTransition: function() {
+        const map = initialize.getCurrentMapDefinition();
+        const mapKey = map ? map.key : data.progress.currentMapKey;
+        if (!data.progress.mapStars[mapKey]) {
+            data.progress.mapStars[mapKey] = { bronze: false, silver: false, gold: false };
+        }
+        const stars = data.progress.mapStars[mapKey];
+        const tier = data.battle.mapTier || 0;
+        if (tier === 0) {
+            if (!stars.bronze) {
+                stars.bronze = true;
+                data.progress.stars.bronze = (data.progress.stars.bronze || 0) + 1;
+            }
+            data.battle.transitionMessage = "Bronze star received! Raising difficulty...";
+            data.battle.nextTierAfterCountdown = 1;
+            data.battle.transitionCountdownMs = 5000;
+            return;
+        }
+        if (tier === 1) {
+            if (!stars.silver) {
+                stars.silver = true;
+                data.progress.stars.silver = (data.progress.stars.silver || 0) + 1;
+            }
+            data.battle.transitionMessage = "Silver star received! Raising difficulty...";
+            data.battle.nextTierAfterCountdown = 2;
+            data.battle.transitionCountdownMs = 5000;
+            return;
+        }
+        if (!stars.gold) {
+            stars.gold = true;
+            data.progress.stars.gold = (data.progress.stars.gold || 0) + 1;
+        }
+        data.battle.transitionMessage = "Gold star received! Map complete.";
+        data.battle.nextTierAfterCountdown = 0;
+        data.battle.transitionCountdownMs = 5000;
+    },
+    restartMapCycle: function(nextTier) {
+        data.battle.mapTier = nextTier || 0;
+        data.battle.elapsedMs = 0;
+        data.battle.zoneSpawnedInCycle = [];
+        data.battle.zoneRewardGrantedInCycle = [];
+        const map = initialize.getCurrentMapDefinition();
+        for (let i = 0; i < map.zones.length; i++) {
+            data.battle.zoneSpawnedInCycle.push(false);
+            data.battle.zoneRewardGrantedInCycle.push(false);
+        }
+        data.battle.activeZones = [];
+        data.battle.transitionCountdownMs = 0;
+        data.battle.transitionMessage = "";
+        data.battle.nextTierAfterCountdown = 0;
+        data.battle.enemies = [];
+        data.battle.meleeQueue = [];
+        data.battle.activeTargetId = null;
+        data.battle.player.attackTimerMs = 0;
+        data.battle.player.rangedAttackTimerMs = 0;
+        data.battle.prevZoneNameForFortitude = null;
+    },
+    /** True if the enemy token overlaps the battlefield clip rect (may be partially outside); used for draw and range checks while simulating all enemies. */
+    enemyIntersectsBattlefield: function(enemy) {
+        const lm = engine.getBattleLaneMetrics();
+        const bw = lm.battleWidth;
+        const bh = viewData.layout.battlefieldHeightPx || gameData.battle.battlefieldHeightPx || 500;
+        const cx = lm.inset + (enemy.lane + 0.5) * lm.laneWidth;
         const half = enemy.sizePx / 2;
         const left = cx - half;
         const right = cx + half;
         const top = enemy.yPx;
         const bottom = enemy.yPx + enemy.sizePx;
-        return left >= 0 && right <= bw && top >= 0 && bottom <= bh;
+        const horizOk = right > 0 && left < bw;
+        const vertOk = bottom > 0 && top < bh;
+        return horizOk && vertOk;
     },
     getRangedDamageTarget: function() {
         let best = null;
         let bestBottom = -Infinity;
         for (let i = 0; i < data.battle.enemies.length; i++) {
             const e = data.battle.enemies[i];
-            if (!e.alive || !engine.enemyFullyInsideBattlefield(e)) {
+            if (!e.alive || !engine.enemyIntersectsBattlefield(e)) {
                 continue;
             }
             const bottom = e.yPx + e.sizePx;
@@ -441,13 +948,13 @@ let engine = {
         if (!data.battle.lineFxQueue) {
             data.battle.lineFxQueue = [];
         }
-        const bw = viewData.layout.battlefieldWidthPx || 500;
+        const lm = engine.getBattleLaneMetrics();
+        const bw = lm.battleWidth;
         const bh = viewData.layout.battlefieldHeightPx || 500;
         const pt = viewData.layout.playerTopPx || (bh - 65);
-        const laneWidth = bw / gameData.battle.laneCount;
         const x1 = bw / 2;
         const y1 = pt + 24;
-        const x2 = (target.lane + 0.5) * laneWidth;
+        const x2 = lm.inset + (target.lane + 0.5) * lm.laneWidth;
         const y2 = target.yPx + (target.sizePx / 2);
         data.battle.lineFxQueue.push({
             x1: x1,
@@ -455,6 +962,29 @@ let engine = {
             x2: x2,
             y2: y2,
             kind: kind
+        });
+    },
+    pushEnemyRangedLineFx: function(attacker) {
+        if (!attacker) {
+            return;
+        }
+        if (!data.battle.lineFxQueue) {
+            data.battle.lineFxQueue = [];
+        }
+        const lm = engine.getBattleLaneMetrics();
+        const bw = lm.battleWidth;
+        const bh = viewData.layout.battlefieldHeightPx || 500;
+        const pt = viewData.layout.playerTopPx || (bh - 65);
+        const x1 = lm.inset + (attacker.lane + 0.5) * lm.laneWidth;
+        const y1 = attacker.yPx + (attacker.sizePx / 2);
+        const x2 = bw / 2;
+        const y2 = pt + 24;
+        data.battle.lineFxQueue.push({
+            x1: x1,
+            y1: y1,
+            x2: x2,
+            y2: y2,
+            kind: "enemy_ranged"
         });
     },
     enqueueMeleeLineFx: function(target) {
@@ -470,7 +1000,10 @@ let engine = {
         if (!engine.idleAutoPhase() || engine.countAliveEnemies() === 0) {
             return;
         }
-        if (!data.progress.rangedAttackEnabled) {
+        if (!(data.progress.rangedAttackEnabled && data.progress.base && data.progress.base.workshop && data.progress.base.workshop.bowBuilt)) {
+            return;
+        }
+        if ((data.progress.currentClassKey || "none") === "rogue") {
             return;
         }
         const p = data.battle.player;
@@ -483,10 +1016,62 @@ let engine = {
             p.rangedAttackTimerMs = 0;
             return;
         }
-        rt.hp -= p.rangedAttackDamage;
+        const cls = data.progress.currentClassKey || "none";
+        let rangedDamage = p.rangedAttackDamage;
+        const sneakLv = engine.getUnlockedSkillLevel("sneak_attack");
+        const priorHits = rt.timesHitByPlayer || 0;
+        if (sneakLv > 0 && priorHits === 0) {
+            rangedDamage *= 1 + (sneakLv * 0.1);
+        }
+        const exploitLv = engine.getUnlockedSkillLevel("exploit");
+        const prevTarget = data.battle.lastPlayerHitEnemyId || 0;
+        const streak = (prevTarget === rt.id) ? ((data.battle.lastPlayerHitStreak || 0) + 1) : 1;
+        if (exploitLv > 0 && streak >= 2) {
+            rangedDamage += (streak - 1) * exploitLv;
+        }
+        rangedDamage = Math.max(1, Math.round(rangedDamage));
+        rt.hp -= rangedDamage;
+        data.battle.lastPlayerHitEnemyId = rt.id;
+        data.battle.lastPlayerHitStreak = streak;
+        rt.timesHitByPlayer = priorHits + 1;
+        if (sneakLv > 0 && priorHits === 0) {
+            engine.onSkillTrigger("sneak_attack", 1);
+        }
+        if (exploitLv > 0 && priorHits > 0) {
+            engine.onSkillTrigger("exploit", 1);
+        }
+        const impactLv = engine.getUnlockedSkillLevel("impact");
+        if (impactLv > 0) {
+            const topHalf = rt.yPx < ((viewData.layout.battlefieldHeightPx || 500) * 0.5);
+            if (topHalf) {
+                engine.onSkillTrigger("impact", 1);
+            }
+            const knockbackPx = rt.speedPxPerSecond * 0.1 * impactLv;
+            rt.yPx = Math.max(-rt.sizePx, rt.yPx - knockbackPx);
+            rt.inRange = false;
+        }
+        if (cls === "hunter" && (data.battle.classPowerA || 0) >= 1000) {
+            const t2 = engine.getSecondRangedDamageTarget(rt.id);
+            if (t2) {
+                data.battle.classPowerA -= 1000;
+                t2.hp -= rangedDamage;
+                engine.enqueueRangedLineFx(t2);
+                if (t2.hp <= 0) {
+                    t2.hp = 0;
+                    t2.alive = false;
+                    if (data.battle.activeTargetId === t2.id) data.battle.activeTargetId = null;
+                    engine.removeEnemyFromMeleeQueue(t2.id);
+                    engine.onEnemyKilled(t2);
+                    engine.onSkillTrigger("longshot", 1);
+                }
+            }
+        }
         engine.enqueueRangedLineFx(rt);
         const rcd = engine.getEffectiveRangedCooldownMs();
         p.rangedAttackTimerMs = rcd + Math.min(0, p.rangedAttackTimerMs);
+        if (cls === "hunter") {
+            engine.addClassBarProgress("A", 200);
+        }
         engine.onSkillTrigger("finesse", 1);
         engine.onSkillTrigger("alacrity", 1);
         if (rt.hp <= 0) {
@@ -497,6 +1082,55 @@ let engine = {
             }
             engine.removeEnemyFromMeleeQueue(rt.id);
             engine.onEnemyKilled(rt);
+            engine.onSkillTrigger("longshot", 1);
+        }
+    },
+    applyWarriorCleave: function(primaryTarget, dealtDamage) {
+        const cleaveLv = engine.getUnlockedSkillLevel("cleave");
+        if (cleaveLv <= 0 || dealtDamage <= 0) {
+            return;
+        }
+        const splash = Math.max(1, Math.floor(dealtDamage * (cleaveLv * 0.1)));
+        const toHit = [];
+        for (let i = 0; i < data.battle.enemies.length; i++) {
+            const e = data.battle.enemies[i];
+            if (!e.alive || !e.inRange || e.id === primaryTarget.id) {
+                continue;
+            }
+            if (e.lane === primaryTarget.lane - 1 || e.lane === primaryTarget.lane + 1) {
+                toHit.push(e);
+            }
+        }
+        let behind = null;
+        let bestDelta = Infinity;
+        for (let i = 0; i < data.battle.enemies.length; i++) {
+            const e = data.battle.enemies[i];
+            if (!e.alive || e.id === primaryTarget.id || e.lane !== primaryTarget.lane) {
+                continue;
+            }
+            if (e.yPx < primaryTarget.yPx) {
+                const d = primaryTarget.yPx - e.yPx;
+                if (d < bestDelta) {
+                    bestDelta = d;
+                    behind = e;
+                }
+            }
+        }
+        if (behind) {
+            toHit.push(behind);
+        }
+        for (let i = 0; i < toHit.length; i++) {
+            const e = toHit[i];
+            e.hp -= splash;
+            if (e.hp <= 0) {
+                e.hp = 0;
+                e.alive = false;
+                if (data.battle.activeTargetId === e.id) {
+                    data.battle.activeTargetId = null;
+                }
+                engine.removeEnemyFromMeleeQueue(e.id);
+                engine.onEnemyKilled(e);
+            }
         }
     },
     removeEnemyFromMeleeQueue: function(enemyId) {
@@ -509,7 +1143,25 @@ let engine = {
         }
         data.battle.meleeQueue = next;
     },
+    getSecondRangedDamageTarget: function(excludeId) {
+        for (let i = 0; i < data.battle.enemies.length; i++) {
+            const e = data.battle.enemies[i];
+            if (!e.alive || e.id === excludeId || !engine.enemyIntersectsBattlefield(e)) continue;
+            return e;
+        }
+        return null;
+    },
     onSkillTrigger: function(skillKey, amount) {
+        if (!amount || amount <= 0) {
+            return;
+        }
+        if (!skills.isSkillUnlocked(skillKey)) {
+            return;
+        }
+        const d = skills._byKey[skillKey];
+        if (d && d.classKey && d.classKey !== (data.progress.currentClassKey || "none")) {
+            return;
+        }
         const skill = data.progress.skills[skillKey];
         if (!skill) {
             return;
@@ -519,7 +1171,7 @@ let engine = {
         }
         const gain = skills.expGainForSkillTrigger(skill, amount);
         skill.exp += gain;
-        skill.talent += gain;
+        skill.talent += gain * 0.1;
         skill.triggerCount += amount;
         while (skill.exp >= skill.expToLevel && (!skill.maxLevel || skill.level < skill.maxLevel)) {
             skill.exp -= skill.expToLevel;
@@ -536,14 +1188,16 @@ let engine = {
     onSkillLevelUp: function(skill) {
         if (skill.affectedStat === "str") {
             data.battle.levelState.skillStrBonus++;
-            initialize.applyConToPlayer(false);
+            initialize.calcPlayerStats(false);
         } else if (skill.affectedStat === "con") {
             data.battle.levelState.skillConBonus++;
-            initialize.applyConToPlayer(false);
+            initialize.calcPlayerStats(false);
         } else if (skill.key === "alacrity") {
             engine.syncPlayerCooldownFields();
         } else if (skill.key === "fortitude") {
-            initialize.applyConToPlayer(false);
+            initialize.calcPlayerStats(false);
+        } else if (skill.key === "finesse" || skill.key === "longshot") {
+            initialize.calcPlayerStats(false);
         }
     },
     saveRunHistoryIfNeeded: function() {
@@ -570,5 +1224,326 @@ let engine = {
             }
         }
         return null;
+    },
+    updateBaseProduction: function(tickMs) {
+        const base = data.progress.base;
+        if (!base) {
+            return;
+        }
+        const sec = tickMs / 1000;
+        const res = base.resources;
+
+        if ((base.mine.assignedWorkers || 0) > 0) {
+            base.mine.progress += ((base.mine.assignedWorkers || 0) / 20) * sec;
+            const madeOre = Math.floor(base.mine.progress);
+            if (madeOre > 0) {
+                base.mine.progress -= madeOre;
+                res.ironOre += madeOre;
+            }
+        }
+
+        if ((base.smith.assignedWorkers || 0) > 0 && res.ironOre > 0) {
+            base.smith.progress += ((base.smith.assignedWorkers || 0) / 20) * sec;
+            const potentialBars = Math.floor(base.smith.progress);
+            if (potentialBars > 0) {
+                const barsMade = Math.min(potentialBars, res.ironOre);
+                if (barsMade > 0) {
+                    base.smith.progress -= barsMade;
+                    res.ironOre -= barsMade;
+                    res.ironBar += barsMade;
+                }
+            }
+        }
+
+        if ((base.lumbermill.assignedWorkers || 0) > 0) {
+            base.lumbermill.progress += ((base.lumbermill.assignedWorkers || 0) / 20) * sec;
+            const madeStone = Math.floor(base.lumbermill.progress);
+            if (madeStone > 0) {
+                base.lumbermill.progress -= madeStone;
+                res.stone += madeStone;
+            }
+        }
+
+        if ((base.sawmill.assignedWorkers || 0) > 0 && res.stone > 0) {
+            base.sawmill.progress += ((base.sawmill.assignedWorkers || 0) / 20) * sec;
+            const potentialCutStone = Math.floor(base.sawmill.progress);
+            if (potentialCutStone > 0) {
+                const cutMade = Math.min(potentialCutStone, res.stone);
+                if (cutMade > 0) {
+                    base.sawmill.progress -= cutMade;
+                    res.stone -= cutMade;
+                    res.cutStone += cutMade;
+                }
+            }
+        }
+    },
+    updateInnGuests: function(tickMs) {
+        const inn = data.progress.base && data.progress.base.inn;
+        if (!inn) {
+            return;
+        }
+        const maxGuests = engine.getInnGuestCapacity();
+        if (inn.openForGuests && inn.guests.length < maxGuests) {
+            inn.nextGuestTimerMs -= tickMs;
+            while (inn.nextGuestTimerMs <= 0 && inn.guests.length < maxGuests) {
+                inn.nextGuestTimerMs += 60000;
+                inn.guests.push(engine.rollInnGuest());
+            }
+        }
+        const chatSpeed = engine.getInnChatSpeedMultiplier();
+        const nextGuests = [];
+        for (let i = 0; i < inn.guests.length; i++) {
+            const g = inn.guests[i];
+            if (g.isChatting) {
+                g.chatProgress = (g.chatProgress || 0) + ((tickMs / 10000) * chatSpeed);
+                if (g.chatProgress >= 1) {
+                    if (g.skillKey) {
+                        engine.grantTipToSkill(g.skillKey, 1);
+                        engine.onSkillTrigger("gossip", 1);
+                    }
+                    continue;
+                }
+            }
+            nextGuests.push(g);
+        }
+        inn.guests = nextGuests;
+    },
+    getInnChatSpeedMultiplier: function() {
+        const g = data.progress.skills.gossip;
+        if (!g || !skills.isSkillUnlocked("gossip")) {
+            return 1;
+        }
+        const lv = Math.min(99, g.level || 0);
+        return 1 / (1 - (lv / 100));
+    },
+    getManualActionCooldownSpeedMultiplier: function() {
+        const s = data.progress.skills.interfere;
+        if (!s || !skills.isSkillUnlocked("interfere")) {
+            return 1;
+        }
+        const lv = Math.min(99, s.level || 0);
+        return 1 / (1 - (lv / 100));
+    },
+    getManualActionRewardMultiplier: function() {
+        const s = data.progress.skills.interfere;
+        if (!s || !skills.isSkillUnlocked("interfere")) {
+            return 1;
+        }
+        return 1 + ((s.talentLevel || 0) * 0.1);
+    },
+    getInnGuestCapacity: function() {
+        const w = data.progress.base && data.progress.base.workshop;
+        const extra = w ? (w.innRoomUpgradesBought || 0) : 0;
+        return 3 + extra;
+    },
+    updateManualActionCooldowns: function(tickMs) {
+        const b = data.progress.base;
+        if (!b) {
+            return;
+        }
+        const cdMult = engine.getManualActionCooldownSpeedMultiplier();
+        const dec = tickMs * cdMult;
+        b.mine.manualCooldownMs = Math.max(0, (b.mine.manualCooldownMs || 0) - dec);
+        b.smith.manualCooldownMs = Math.max(0, (b.smith.manualCooldownMs || 0) - dec);
+        b.lumbermill.manualCooldownMs = Math.max(0, (b.lumbermill.manualCooldownMs || 0) - dec);
+        b.sawmill.manualCooldownMs = Math.max(0, (b.sawmill.manualCooldownMs || 0) - dec);
+        b.inn.advertiseCooldownMs = Math.max(0, (b.inn.advertiseCooldownMs || 0) - dec);
+    },
+    applyManualProgressBoost: function(kind) {
+        const b = data.progress.base;
+        if (!b) {
+            return false;
+        }
+        let workerCount = 0;
+        let cooldownRef = null;
+        let progressRef = null;
+        if (kind === "mine") {
+            workerCount = b.mine.assignedWorkers || 0;
+            cooldownRef = b.mine;
+            progressRef = b.mine;
+        } else if (kind === "smith") {
+            workerCount = b.smith.assignedWorkers || 0;
+            cooldownRef = b.smith;
+            progressRef = b.smith;
+        } else if (kind === "lumbermill") {
+            workerCount = b.lumbermill.assignedWorkers || 0;
+            cooldownRef = b.lumbermill;
+            progressRef = b.lumbermill;
+        } else if (kind === "sawmill") {
+            workerCount = b.sawmill.assignedWorkers || 0;
+            cooldownRef = b.sawmill;
+            progressRef = b.sawmill;
+        } else {
+            return false;
+        }
+        if ((cooldownRef.manualCooldownMs || 0) > 0) {
+            return false;
+        }
+        if (workerCount <= 0) {
+            return false;
+        }
+        const rewardMult = engine.getManualActionRewardMultiplier();
+        const addSec = 5 * workerCount * rewardMult;
+        progressRef.progress += (addSec / 20);
+        cooldownRef.manualCooldownMs = 10000;
+        engine.onSkillTrigger("interfere", 1);
+        return true;
+    },
+    getTotalAssignedWorkers: function() {
+        const b = data.progress.base;
+        if (!b) return 0;
+        return (b.mine.assignedWorkers || 0) + (b.smith.assignedWorkers || 0) + (b.lumbermill.assignedWorkers || 0) + (b.sawmill.assignedWorkers || 0) + (b.library.assignedWorkers || 0);
+    },
+    getTotalFoundWorkers: function() {
+        const mw = data.progress.mapWorkersFound || {};
+        const keys = Object.keys(mw);
+        let total = 0;
+        for (let i = 0; i < keys.length; i++) total += mw[keys[i]] || 0;
+        return total;
+    },
+    getAvailableWorkers: function() {
+        return Math.max(0, engine.getTotalFoundWorkers() - engine.getTotalAssignedWorkers());
+    },
+    tryAssignWorker: function(kind) {
+        const b = data.progress.base && data.progress.base[kind];
+        if (!b) return false;
+        if ((b.assignedWorkers || 0) >= (b.gearSets || 0)) return false;
+        if (engine.getAvailableWorkers() <= 0) return false;
+        b.assignedWorkers = (b.assignedWorkers || 0) + 1;
+        return true;
+    },
+    tryUnassignWorker: function(kind) {
+        const b = data.progress.base && data.progress.base[kind];
+        if (!b) return false;
+        if ((b.assignedWorkers || 0) <= 0) return false;
+        b.assignedWorkers--;
+        return true;
+    },
+    applyManualAdvertise: function() {
+        const inn = data.progress.base && data.progress.base.inn;
+        if (!inn || !inn.openForGuests || (inn.advertiseCooldownMs || 0) > 0) {
+            return false;
+        }
+        const rewardMult = engine.getManualActionRewardMultiplier();
+        inn.nextGuestTimerMs = Math.max(0, inn.nextGuestTimerMs - (5000 * rewardMult));
+        inn.advertiseCooldownMs = 10000;
+        engine.onSkillTrigger("interfere", 1);
+        return true;
+    },
+    grantTipToSkill: function(skillKey, baseAmount) {
+        const skill = data.progress.skills[skillKey];
+        if (!skill) {
+            return;
+        }
+        const gossip = data.progress.skills.gossip;
+        let bonus = 1;
+        if (gossip && skills.isSkillUnlocked("gossip")) {
+            bonus += (gossip.talentLevel || 0) * 0.1;
+        }
+        skill.tips = (skill.tips || 0) + (baseAmount * bonus);
+    },
+    getNextSkillResearchTargetKey: function() {
+        const lib = data.progress.base && data.progress.base.library;
+        if (!lib || !lib.skillResearch) {
+            return "";
+        }
+        const categories = ["combat", "town", "class"];
+        for (let ci = 0; ci < categories.length; ci++) {
+            const cat = categories[ci];
+            for (let i = 0; i < skills.keysInOrder.length; i++) {
+                const k = skills.keysInOrder[i];
+                const sk = data.progress.skills[k];
+                if (!sk || (sk.category || "combat") !== cat) {
+                    continue;
+                }
+                const rs = lib.skillResearch[k];
+                if (!rs || !rs.purchased || rs.researched || rs.paused) {
+                    continue;
+                }
+                return k;
+            }
+        }
+        return "";
+    },
+    updateLibraryResearch: function(tickMs) {
+        const lib = data.progress.base && data.progress.base.library;
+        if (!lib || (lib.assignedWorkers || 0) <= 0) {
+            return;
+        }
+        const targetKey = engine.getNextSkillResearchTargetKey();
+        if (!targetKey) {
+            return;
+        }
+        const rs = lib.skillResearch[targetKey];
+        if (!rs) {
+            return;
+        }
+        const rate = (lib.researchPerWorkerPerSecond || 1) * (lib.assignedWorkers || 0);
+        rs.progress = (rs.progress || 0) + (rate * (tickMs / 1000));
+        if ((rs.progress || 0) < (rs.required || 0)) {
+            return;
+        }
+        rs.progress = rs.required || rs.progress || 0;
+        rs.researched = true;
+        lib.unlockedSkills[targetKey] = true;
+        createView.createSkillElements();
+        createView.clearCacheQueue();
+    },
+    rollInnGuest: function() {
+        const baseGuests = [
+            { archetype: "Traveling Merchant", rarity: 0, skillKey: null },
+            { archetype: "Wandering Bard", rarity: 0, skillKey: null },
+            { archetype: "Quiet Pilgrim", rarity: 0, skillKey: null }
+        ];
+        const unlocked = [];
+        let rarityTotal = 0;
+        for (let i = 0; i < skills.keysInOrder.length; i++) {
+            const k = skills.keysInOrder[i];
+            if (!skills.isSkillUnlocked(k)) {
+                continue;
+            }
+            const gi = skills.getSkillGuestInfo(k);
+            if (!gi) {
+                continue;
+            }
+            const r = Math.max(1, gi.rarity || 1);
+            unlocked.push({ skillKey: k, archetype: gi.archetype, rarity: r });
+            rarityTotal += r;
+        }
+        const inn = data.progress.base.inn;
+        const roll = Math.floor(Math.random() * 100) + 1;
+        const cap = Math.min(100, rarityTotal);
+        let picked = null;
+        if (roll <= cap) {
+            const weightedRoll = Math.floor(Math.random() * Math.max(1, rarityTotal)) + 1;
+            let cursor = 0;
+            for (let i = 0; i < unlocked.length; i++) {
+                cursor += unlocked[i].rarity;
+                if (weightedRoll <= cursor) {
+                    picked = unlocked[i];
+                    break;
+                }
+            }
+        }
+        const id = inn.guestIdCounter++;
+        if (!picked) {
+            const basePick = baseGuests[Math.floor(Math.random() * baseGuests.length)];
+            return {
+                id: id,
+                archetype: basePick.archetype,
+                rarity: 0,
+                skillKey: null,
+                isChatting: false,
+                chatProgress: 0
+            };
+        }
+        return {
+            id: id,
+            archetype: picked.archetype,
+            rarity: picked.rarity,
+            skillKey: picked.skillKey,
+            isChatting: false,
+            chatProgress: 0
+        };
     }
 }

@@ -44,33 +44,85 @@
 </div>
 
 <div id="mainLayout">
+    <div id="compactViewTabs">
+        <button id="compactPane_menus" class="tab-button" onclick="events.switchCompactPane('menus')">Menus</button>
+        <button id="compactPane_battle" class="tab-button" onclick="events.switchCompactPane('battle')">Battle</button>
+    </div>
     <div id="menuColumn" class="game-column">
         <div id="menuTabs">
-            <button id="tabButton_gear" class="tab-button" onclick="events.switchTab('gear')">Gear</button>
+            <button id="tabButton_base" class="tab-button" onclick="events.switchTab('base')">Base</button>
             <button id="tabButton_leveling" class="tab-button" onclick="events.switchTab('leveling')">Leveling</button>
+            <button id="tabButton_stats" class="tab-button" onclick="events.switchTab('stats')">Stats</button>
             <button id="tabButton_skills" class="tab-button" onclick="events.switchTab('skills')">Skills</button>
             <button id="tabButton_travel" class="tab-button" onclick="events.switchTab('travel')">Travel</button>
             <button id="tabButton_history" class="tab-button" onclick="events.switchTab('history')">History</button>
+            <button id="tabButton_options" class="tab-button" onclick="events.switchTab('options')">Options</button>
         </div>
         <div id="menuContent">
-            <div id="tabPane_gear" class="tab-pane">
-                <div class="pane-title">Gear</div>
-                <div>Gold: <b><span id="goldText"></span></b></div>
-                <div id="gearSummaryLine" class="gear-summary"></div>
-                <div class="muted-text gear-hint">Each piece needs Str/Con/Spd/Soul as listed. Effectiveness = lowest (your stat ÷ required) among required stats; 0 Soul on a required piece zeros that piece. Level: requirements ×1.5, effects ×1.4 per upgrade.</div>
-                <div id="gearSlots"></div>
+            <div id="tabPane_base" class="tab-pane">
+                <div class="pane-title">Gold: <span id="baseGoldText"></span> | Workers total <span id="baseWorkersFound"></span> | available <span id="baseWorkersAssigned"></span></div>
+                <div id="baseTownMap" class="base-map-wrap">
+                    <button id="baseBuilding_chapel" class="base-building-label base-building-chapel" onclick="events.selectBaseBuilding('chapel')">Chapel</button>
+                    <div class="base-building-node base-building-smith-node">
+                        <button id="baseBuilding_smith" class="base-building-label" onclick="events.selectBaseBuilding('smith')">Smith</button>
+                        <div id="baseSmithProgressWrap" class="base-mini-progress"><div id="baseSmithProgressFill" class="base-mini-progress-fill"></div></div>
+                        <button id="mapManualBtn_smith" class="map-manual-btn" onclick="events.manualSmelt()">Smelt</button>
+                    </div>
+                    <button id="baseBuilding_inn" class="base-building-label base-building-inn" onclick="events.selectBaseBuilding('inn')">Inn</button>
+                    <button id="baseBuilding_guild" class="base-building-label base-building-guild" onclick="events.selectBaseBuilding('guild')">Guild</button>
+                    <button id="baseBuilding_market" class="base-building-label base-building-market" onclick="events.selectBaseBuilding('market')">Market</button>
+                    <button id="baseBuilding_garden" class="base-building-label base-building-garden" onclick="events.selectBaseBuilding('garden')">Garden</button>
+                    <button id="baseBuilding_workshop" class="base-building-label base-building-workshop" onclick="events.selectBaseBuilding('workshop')">Workshop</button>
+                    <button id="baseBuilding_mage_tower" class="base-building-label base-building-mage_tower" onclick="events.selectBaseBuilding('mage_tower')">Mage Tower</button>
+                    <div class="base-building-node base-building-mine-node">
+                        <button id="baseBuilding_mine" class="base-building-label" onclick="events.selectBaseBuilding('mine')">Mine</button>
+                        <div id="baseMineProgressWrap" class="base-mini-progress"><div id="baseMineProgressFill" class="base-mini-progress-fill"></div></div>
+                        <button id="mapManualBtn_mine" class="map-manual-btn" onclick="events.manualMine()">Mine</button>
+                    </div>
+                    <button id="baseBuilding_library" class="base-building-label base-building-library" onclick="events.selectBaseBuilding('library')">Library</button>
+                    <div class="base-building-node base-building-lumbermill-node">
+                        <button id="baseBuilding_lumbermill" class="base-building-label" onclick="events.selectBaseBuilding('lumbermill')">Quarry</button>
+                        <div id="baseLumbermillProgressWrap" class="base-mini-progress"><div id="baseLumbermillProgressFill" class="base-mini-progress-fill"></div></div>
+                        <button id="mapManualBtn_lumbermill" class="map-manual-btn" onclick="events.manualLumber()">Quarry</button>
+                    </div>
+                    <div class="base-building-node base-building-sawmill-node">
+                        <button id="baseBuilding_sawmill" class="base-building-label" onclick="events.selectBaseBuilding('sawmill')">Stonecutter</button>
+                        <div id="baseSawmillProgressWrap" class="base-mini-progress"><div id="baseSawmillProgressFill" class="base-mini-progress-fill"></div></div>
+                        <button id="mapManualBtn_sawmill" class="map-manual-btn" onclick="events.manualSaw()">Cut</button>
+                    </div>
+                    <button id="mapManualBtn_inn" class="map-manual-btn base-map-btn-inn" onclick="events.advertiseInn()">Advertise</button>
+                </div>
+                <div id="baseBuildingInfo" class="base-info-panel"></div>
             </div>
 
             <div id="tabPane_leveling" class="tab-pane">
                 <div class="pane-title">Leveling</div>
-                <div>Level: <span id="levelText"></span></div>
-                <div class="prog-label-row">Exp: <span id="levelExpText"></span></div>
+                <div class="muted-text">Class: <span id="currentClassText"></span> (<span id="classPerLevelText"></span>)</div>
+                <div class="leveling-header-row"><div class="leveling-kv">Level <span id="levelText"></span></div><div class="leveling-kv">Points <span id="attributePointsText"></span></div></div>
+                <div class="prog-label-row">Exp <span id="levelExpText"></span></div>
                 <div class="prog-track"><div id="levelTabExpFill" class="prog-fill prog-fill-level"></div></div>
-                <div>Attribute Points: <span id="attributePointsText"></span></div>
-                <div>Str (Damage): <span id="strText"></span></div>
-                <div>Con (HP): <span id="conText"></span></div>
-                <div>Spd (+10%/pt to push speed and enemy travel): <span id="spdText"></span></div>
-                <div>Soul (gear requirements): <span id="soulText"></span></div>
+                <div class="leveling-stat-grid">
+                    <div class="leveling-stat-card showthat">
+                        <div class="leveling-stat-name">Str</div>
+                        <div class="leveling-stat-val" id="strText"></div>
+                        <div class="showthis">+10% damage per point</div>
+                    </div>
+                    <div class="leveling-stat-card showthat">
+                        <div class="leveling-stat-name">Con</div>
+                        <div class="leveling-stat-val" id="conText"></div>
+                        <div class="showthis">+10% current and max HP per point</div>
+                    </div>
+                    <div class="leveling-stat-card showthat">
+                        <div class="leveling-stat-name">Spd</div>
+                        <div class="leveling-stat-val" id="spdText"></div>
+                        <div class="showthis">+10% push speed per point</div>
+                    </div>
+                    <div class="leveling-stat-card showthat">
+                        <div class="leveling-stat-name">Soul</div>
+                        <div class="leveling-stat-val" id="soulText"></div>
+                        <div class="showthis"></div>
+                    </div>
+                </div>
                 <div class="row-buttons row-buttons-wrap">
                     <button class="tab-button" onclick="events.assignAttribute('str')">+ Str</button>
                     <button class="tab-button" onclick="events.assignAttribute('con')">+ Con</button>
@@ -84,24 +136,39 @@
 
             <div id="tabPane_skills" class="tab-pane">
                 <div class="pane-title">Skills</div>
+                <div class="row-buttons">
+                    <button id="skillSubTab_combat" class="tab-button" onclick="events.switchSkillsTab('combat')">Combat</button>
+                    <button id="skillSubTab_town" class="tab-button" onclick="events.switchSkillsTab('town')">Town</button>
+                    <button id="skillSubTab_class" class="tab-button" onclick="events.switchSkillsTab('class')">Class</button>
+                </div>
+                <div id="combatStarsInventory" class="base-row muted-text"></div>
                 <div id="skillsList"></div>
+            </div>
+            <div id="tabPane_stats" class="tab-pane">
+                <div class="pane-title">Stats</div>
+                <div class="leveling-stat-grid">
+                    <div class="leveling-stat-card showthat"><div class="leveling-stat-name">HP</div><div class="leveling-stat-val" id="statsHpText"></div><div class="showthis" id="statsHpTip"></div></div>
+                    <div class="leveling-stat-card showthat"><div class="leveling-stat-name">Regen</div><div class="leveling-stat-val" id="statsRegenText"></div><div class="showthis" id="statsRegenTip"></div></div>
+                    <div class="leveling-stat-card showthat"><div class="leveling-stat-name">Attack</div><div class="leveling-stat-val" id="statsAttackText"></div><div class="showthis" id="statsAttackTip"></div></div>
+                    <div class="leveling-stat-card showthat"><div class="leveling-stat-name">Armor</div><div class="leveling-stat-val" id="statsArmorText"></div><div class="showthis" id="statsArmorTip"></div></div>
+                    <div class="leveling-stat-card showthat"><div class="leveling-stat-name">Melee Speed</div><div class="leveling-stat-val" id="statsMeleeText"></div><div class="showthis" id="statsMeleeTip"></div></div>
+                    <div class="leveling-stat-card showthat"><div class="leveling-stat-name">Ranged Speed</div><div class="leveling-stat-val" id="statsRangedText"></div><div class="showthis" id="statsRangedTip"></div></div>
+                </div>
             </div>
 
             <div id="tabPane_travel" class="tab-pane">
                 <div class="pane-title">Travel</div>
-                <div class="travel-row">
-                    <span>Green Plains (<span id="mapDifficulty_map_1"></span>)</span>
-                    <button id="mapButton_map_1" class="tab-button" onclick="events.changeMap('map_1')">Travel</button>
-                </div>
-                <div class="travel-row">
-                    <span>Ash Barrens (<span id="mapDifficulty_map_2"></span>)</span>
-                    <button id="mapButton_map_2" class="tab-button" onclick="events.changeMap('map_2')">Travel</button>
-                </div>
+                <div id="travelMapsList"></div>
             </div>
 
             <div id="tabPane_history" class="tab-pane">
                 <div class="pane-title">History</div>
                 <div id="historyList"></div>
+            </div>
+            <div id="tabPane_options" class="tab-pane">
+                <div class="pane-title">Options</div>
+                <label class="options-row"><input type="checkbox" id="hideMaxedUpgradesToggle" onchange="events.setHideMaxedUpgrades(this.checked)"> Hide maxed upgrades</label>
+                <label class="options-row"><input type="checkbox" id="disableCompactLayoutToggle" onchange="events.setDisableCompactLayout(this.checked)"> Always use side-by-side layout (do not switch to menus / battle tabs; scroll horizontally if needed)</label>
             </div>
         </div>
     </div>
@@ -111,14 +178,29 @@
                 <div id="waveInfo">Waves</div>
                 <div id="attackLines"></div>
                 <div id="playerStack">
-                    <div id="playerToken"></div>
-                    <div id="playerAttackBar" class="player-bar-block">
-                        <div class="player-bar-label" id="playerAttackBarLabel"></div>
-                        <div class="prog-track player-prog-track"><div id="playerAttackBarFill" class="prog-fill prog-fill-attack"></div></div>
+                    <div id="playerAvatarWrap">
+                        <div id="playerMovePulse"></div>
+                        <div id="playerToken"></div>
                     </div>
-                    <div id="playerRangedBar" class="player-bar-block">
-                        <div class="player-bar-label" id="playerRangedBarLabel"></div>
-                        <div class="prog-track player-prog-track"><div id="playerRangedBarFill" class="prog-fill prog-fill-ranged"></div></div>
+                    <div id="playerBarsRowTop" class="player-bars-row">
+                        <div id="playerAttackBar" class="player-bar-block">
+                            <div class="player-bar-label" id="playerAttackBarLabel"></div>
+                            <div class="prog-track player-prog-track"><div id="playerAttackBarFill" class="prog-fill prog-fill-attack"></div></div>
+                        </div>
+                        <div id="playerClassBarA" class="player-bar-block">
+                            <div class="player-bar-label" id="playerClassBarALabel"></div>
+                            <div class="prog-track player-prog-track"><div id="playerClassBarAFill" class="prog-fill prog-fill-skill"></div></div>
+                        </div>
+                    </div>
+                    <div id="playerBarsRowMid" class="player-bars-row">
+                        <div id="playerRangedBar" class="player-bar-block">
+                            <div class="player-bar-label" id="playerRangedBarLabel"></div>
+                            <div id="playerRangedBarTrack" class="prog-track player-prog-track"><div id="playerRangedBarFill" class="prog-fill prog-fill-ranged"></div></div>
+                        </div>
+                        <div id="playerClassBarB" class="player-bar-block">
+                            <div class="player-bar-label" id="playerClassBarBLabel"></div>
+                            <div class="prog-track player-prog-track"><div id="playerClassBarBFill" class="prog-fill prog-fill-talent"></div></div>
+                        </div>
                     </div>
                     <div id="playerLevelBar" class="player-bar-block">
                         <div class="player-bar-label" id="playerLevelBarLabel"></div>
@@ -135,8 +217,9 @@
         </div>
         <div id="battleHud">
             <div class="battle-hud-row">Player HP: <span id="playerHpText"></span></div>
-            <div class="battle-hud-row battle-hud-toggle-row">
-                <label class="ranged-toggle-label"><input type="checkbox" id="rangedAttackToggle" checked onchange="events.setRangedAttackEnabled(this.checked)"> Ranged attack enabled</label>
+            <div id="rangedAttackWrap" class="battle-hud-row battle-hud-toggle-row">
+                <label class="ranged-toggle-label"><input type="checkbox" id="rangedAttackToggle" onchange="events.setRangedAttackEnabled(this.checked)"> Ranged attack enabled</label>
+                <span id="rangedAttackLockText" class="muted-text battle-hud-hint"></span>
                 <span class="muted-text battle-hud-hint">If off: push wave when melee ready and none in melee range.</span>
             </div>
         </div>
@@ -154,6 +237,8 @@
 <script src="events.js"></script>
 <script src="engine.js"></script>
 <script src="gameData.js"></script>
+<script src="maps.js"></script>
+<script src="mapData.js"></script>
 <script src="skills.js"></script>
 <script src="helpers.js"></script>
 <script src="initialize.js"></script>
