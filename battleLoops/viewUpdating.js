@@ -34,14 +34,22 @@ let view = {
         if (!data.battle || !viewData.cached.playerHpText) {
             return;
         }
+        const isForaging = (data.battle.mode || "combat") === "foraging";
         const rd = data.battle.player.rangedAttackDamage !== undefined ? data.battle.player.rangedAttackDamage : Math.floor(data.battle.player.attackDamage * 1.5);
         const hasBow = !!(data.progress.base && data.progress.base.workshop && data.progress.base.workshop.bowBuilt);
         const recLv = (skills.isSkillUnlocked("recovery") && data.progress.skills.recovery) ? data.progress.skills.recovery.level : 0;
         const regenStr = recLv > 0 ? ` | Regen ${(recLv * 0.25).toFixed(2)}/s` : "";
-        view.updateVal("playerHpText", `${intToString(data.battle.player.hp, 3)} / ${intToString(data.battle.player.maxHp, 3)} | Melee ${intToString(data.battle.player.attackDamage, 3)}${hasBow ? ` | Ranged ${intToString(rd, 3)}` : ""}${regenStr}`);
+        if (isForaging) {
+            view.updateVal("playerHpText", `${intToString(data.battle.player.hp, 3)} / ${intToString(data.battle.player.maxHp, 3)} | Harvest ${intToString(data.battle.player.attackDamage, 3)}`);
+        } else {
+            view.updateVal("playerHpText", `${intToString(data.battle.player.hp, 3)} / ${intToString(data.battle.player.maxHp, 3)} | Melee ${intToString(data.battle.player.attackDamage, 3)}${hasBow ? ` | Ranged ${intToString(rd, 3)}` : ""}${regenStr}`);
+        }
         const hpPct = Math.max(0, Math.min(100, (data.battle.player.hp / data.battle.player.maxHp) * 100));
         view.updateVal("playerToken", `linear-gradient(to top, #2ad15f ${hpPct}%, #0f3a1d ${hpPct}%)`, "style.background");
         const runClock = (data.battle.elapsedMs || 0) / 1000;
+        const chapel = data.progress.base.chapel;
+        const growthUnlocked = chapel.growthBlessingUnlocked;
+        const plannedGrowthUnlocked = chapel.plannedGrowthBlessingUnlocked;
         let waveHtml = `<div>Time ${round1(runClock)}s</div>`;
         if ((data.battle.transitionCountdownMs || 0) > 0) {
             const sec = Math.ceil(data.battle.transitionCountdownMs / 1000);
@@ -52,7 +60,8 @@ let view = {
             const z = zones[i];
             const rm = z.remainingSpawnMs !== undefined ? z.remainingSpawnMs : 0;
             const spawnTail = rm > 25 ? ` | ${round1(rm / 1000)}s to spawn last` : "";
-            waveHtml += `<div>${z.name} | Difficulty x${round2(z.difficulty)} | gold ${round2(z.gold)} | exp ${round2(z.exp)} | ${intToStringRound(z.remainingEnemies)} left${spawnTail}</div>`;
+            const expInfo = growthUnlocked ? ` | exp ${round2(z.exp)}` : "";
+            waveHtml += `<div>${z.name} | Difficulty x${round2(z.difficulty)} | gold ${round2(z.gold)}${expInfo} | ${intToStringRound(z.remainingEnemies)} left${spawnTail}</div>`;
         }
         if (viewData.prevValues.waveInfoHtml !== waveHtml) {
             viewData.cached.waveInfo.innerHTML = waveHtml;
@@ -108,7 +117,7 @@ let view = {
         return `<div class="death-talent-title">Talent this run</div>${rows.join("")}`;
     },
     updateMenuNumbers: function() {
-        const activeTab = data.battle.currentTab || "leveling";
+        const activeTab = data.battle.currentTab || "base";
         view.updateTabButtons(activeTab);
         view.updateBasePanel();
         view.updateSkillSubTabs();
@@ -130,14 +139,26 @@ let view = {
         view.updateVal("baseGoldText", intToStringRound(data.progress.gold));
 
         const ls = data.battle.levelState;
+        const chapel = data.progress.base.chapel;
+        const growthUnlocked = chapel.growthBlessingUnlocked;
+        const plannedGrowthUnlocked = chapel.plannedGrowthBlessingUnlocked;
         const classDef = initialize.getCurrentClassDef();
         view.updateVal("currentClassText", classDef.name);
         view.updateVal("classPerLevelText", initialize.getClassPerLevelText(classDef.key));
+        view.updateVal("tabButton_leveling", growthUnlocked ? "" : "none", "style.display");
+        if (!growthUnlocked && data.battle.currentTab === "leveling") {
+            data.battle.currentTab = "base";
+            createView.showCurrentTab();
+        }
         view.updateVal("levelText", ls.level, "textContent", 1);
         view.updateVal("levelExpText", `${intToString(ls.exp, 3)} / ${intToString(ls.expToLevel, 3)}`);
         const levelPct = ls.expToLevel > 0 ? Math.max(0, Math.min(100, (ls.exp / ls.expToLevel) * 100)) : 0;
         view.updateVal("levelTabExpFill", `${levelPct}%`, "style.width");
         view.updateVal("attributePointsText", ls.unassignedPoints, "textContent", 1);
+        view.updateVal("levelingPointsWrap", plannedGrowthUnlocked ? "" : "none", "style.display");
+        view.updateVal("levelingAssignButtons", plannedGrowthUnlocked ? "" : "none", "style.display");
+        view.updateVal("attributePlanTitle", plannedGrowthUnlocked ? "" : "none", "style.display");
+        view.updateVal("attributePlanList", plannedGrowthUnlocked ? "" : "none", "style.display");
         view.updateVal("strText", ls.levelStr + ls.skillStrBonus, "textContent", 1);
         view.updateVal("conText", ls.levelCon + ls.skillConBonus, "textContent", 1);
         view.updateVal("spdText", ls.levelSpd || 0, "textContent", 1);
@@ -155,11 +176,12 @@ let view = {
             data.progress.selectedSkillsTab = "combat";
         }
         view.updateVal("skillSubTab_class", hasBoughtClass ? "" : "none", "style.display");
-        const isCombatSkillsTab = (data.progress.selectedSkillsTab || "combat") === "combat";
+        const selectedSkillsTabNow = data.progress.selectedSkillsTab || "combat";
+        const showStarInventory = selectedSkillsTabNow === "combat" || selectedSkillsTabNow === "class";
         const starPool = data.progress.stars || { bronze: 0, silver: 0, gold: 0 };
         const starLine = `<span class="star-bronze">★</span>: ${starPool.bronze || 0} | <span class="star-silver">★</span>: ${starPool.silver || 0} | <span class="star-gold">★</span>: ${starPool.gold || 0}`;
-        view.updateVal("combatStarsInventory", isCombatSkillsTab ? "" : "none", "style.display");
-        if (isCombatSkillsTab) {
+        view.updateVal("combatStarsInventory", showStarInventory ? "" : "none", "style.display");
+        if (showStarInventory) {
             view.updateVal("combatStarsInventory", starLine, "innerHTML");
         }
 
@@ -174,7 +196,7 @@ let view = {
             rangedToggle.disabled = classRangedLocked;
         }
         view.updateVal("rangedAttackLockText", classRangedLocked ? "Rogue cannot use ranged attacks." : "");
-        view.updateVal("rangedAttackWrap", hasBow ? "" : "none", "style.display");
+        view.updateVal("rangedAttackWrap", (hasBow && !isForaging) ? "" : "none", "style.display");
         const p = data.battle.player;
         const lsMult = data.battle.levelState || {};
         const forgeAtk = data.progress.base && data.progress.base.smith ? (data.progress.base.smith.attackUpgradesBought || 0) : 0;
@@ -207,13 +229,26 @@ let view = {
             const reqClass = map.requiredClassKey || "";
             const classAllowed = !reqClass || reqClass === (data.progress.currentClassKey || "none");
             view.updateVal(`travel_card_${map.key}`, classAllowed ? "" : "none", "style.display");
-            view.updateVal(`mapButton_${map.key}`, current === map.key ? "Current" : "Travel", "textContent");
+            view.updateVal(`mapButton_${map.key}`, current === map.key ? "Current" : "Clear Monsters", "textContent");
             view.updateVal(`mapButton_${map.key}`, current === map.key || !classAllowed, "disabled");
+            const clearState = engine.getMapClearState(map.key);
+            const isCountingDown = (clearState.activeMs || 0) > 0;
+            const statusText = isCountingDown
+                ? `Cleared for Harvest. Monsters respawn in ${Math.ceil(clearState.activeMs / 1000)}s`
+                : `${round1(clearState.pct || 0)}%`;
+            view.updateVal(`mapClearStatus_${map.key}`, statusText);
+            view.updateVal(`mapClearFill_${map.key}`, `${Math.max(0, Math.min(100, clearState.pct || 0))}%`, "style.width");
+            const harvestId = `mapHarvestButton_${map.key}`;
+            if (viewData.cached[harvestId]) {
+                const showHarvest = !reqClass;
+                view.updateVal(harvestId, showHarvest ? "" : "none", "style.display");
+                view.updateVal(harvestId, !engine.isMapHarvestReady(map.key), "disabled");
+            }
             view.updateVal(`mapDifficulty_${map.key}`, `x${round2(map.baseDifficulty || 1)}`);
             view.updateVal(`mapWaves_${map.key}`, (map.zones || []).length, "textContent", 1);
             view.updateVal(`mapTime_${map.key}`, `${round1((map.totalDurationMs || 0) / 1000)}s`);
             const workersFound = (data.progress.mapWorkersFound && data.progress.mapWorkersFound[map.key]) || 0;
-            const workersMax = ((map.zones || []).length * 6) || 0;
+            const workersMax = 6;
             view.updateVal(`mapWorkers_${map.key}`, `${workersFound}/${workersMax}`);
             const stars = (data.progress.mapStars && data.progress.mapStars[map.key]) || {};
             view.updateVal(`mapStar_${map.key}_bronze`, stars.bronze ? "★" : "☆");
@@ -242,34 +277,36 @@ let view = {
         }
         const minePct = Math.max(0, Math.min(100, (base.mine.progress || 0) * 100));
         const smithPct = Math.max(0, Math.min(100, (base.smith.progress || 0) * 100));
-        const lumbermillPct = Math.max(0, Math.min(100, (base.lumbermill.progress || 0) * 100));
-        const sawmillPct = Math.max(0, Math.min(100, (base.sawmill.progress || 0) * 100));
-        const mineUnlocked = (base.mine.assignedWorkers || 0) > 0;
-        const smithUnlocked = (base.smith.assignedWorkers || 0) > 0;
-        const lumbermillUnlocked = (base.lumbermill.assignedWorkers || 0) > 0;
-        const sawmillUnlocked = (base.sawmill.assignedWorkers || 0) > 0;
+        const claypitPct = Math.max(0, Math.min(100, (base.claypit.progress || 0) * 100));
+        const kilnPct = Math.max(0, Math.min(100, (base.kiln.progress || 0) * 100));
+        const mineUnlocked = (base.mine.assignedWorkers) > 0;
+        const smithUnlocked = (base.smith.assignedWorkers) > 0;
+        const claypitUnlocked = (base.claypit.assignedWorkers) > 0;
+        const kilnUnlocked = (base.kiln.assignedWorkers) > 0;
         view.updateVal("baseMineProgressFill", `${minePct}%`, "style.width");
         view.updateVal("baseSmithProgressFill", `${smithPct}%`, "style.width");
-        view.updateVal("baseLumbermillProgressFill", `${lumbermillPct}%`, "style.width");
-        view.updateVal("baseSawmillProgressFill", `${sawmillPct}%`, "style.width");
-        view.updateVal("baseMineProgressWrap", mineUnlocked ? "" : "none", "style.display");
-        view.updateVal("baseSmithProgressWrap", smithUnlocked ? "" : "none", "style.display");
-        view.updateVal("baseLumbermillProgressWrap", lumbermillUnlocked ? "" : "none", "style.display");
-        view.updateVal("baseSawmillProgressWrap", sawmillUnlocked ? "" : "none", "style.display");
-        const garden = base.garden || {};
+        view.updateVal("baseClaypitProgressFill", `${claypitPct}%`, "style.width");
+        view.updateVal("baseKilnProgressFill", `${kilnPct}%`, "style.width");
+        view.updateVal("baseMineProgressWrap", mineUnlocked ? 1 : 0, "style.opacity");
+        view.updateVal("baseSmithProgressWrap", smithUnlocked ? 1 : 0, "style.opacity");
+        view.updateVal("baseClaypitProgressWrap", claypitUnlocked ? 1 : 0, "style.opacity");
+        view.updateVal("baseKilnProgressWrap", kilnUnlocked ? 1 : 0, "style.opacity");
+        const garden = base.garden;
         view.updateVal("mapManualBtn_inn", garden.mapManualInn && !!base.inn.openForGuests ? "inline-block" : "none", "style.display");
         view.updateVal("mapManualBtn_mine", garden.mapManualMine && mineUnlocked ? "inline-block" : "none", "style.display");
         view.updateVal("mapManualBtn_smith", garden.mapManualSmith && smithUnlocked ? "inline-block" : "none", "style.display");
-        view.updateVal("mapManualBtn_lumbermill", garden.mapManualLumbermill && lumbermillUnlocked ? "inline-block" : "none", "style.display");
-        view.updateVal("mapManualBtn_sawmill", garden.mapManualSawmill && sawmillUnlocked ? "inline-block" : "none", "style.display");
+        view.updateVal("mapManualBtn_claypit", garden.mapManualClaypit && claypitUnlocked ? "inline-block" : "none", "style.display");
+        view.updateVal("mapManualBtn_kiln", garden.mapManualKiln && kilnUnlocked ? "inline-block" : "none", "style.display");
 
         const res = base.resources;
         const hideMaxed = !!(data.progress.options && data.progress.options.hideMaxedUpgrades);
         view.updateVal("base_res_ore", res.ironOre, "textContent", "floor");
+        view.updateVal("base_res_stone", res.stone, "textContent", "floor");
+        view.updateVal("base_res_logs", res.logs || 0, "textContent", "floor");
         view.updateVal("base_res_bar", res.ironBar, "textContent", "floor");
-        view.updateVal("base_res_logs", res.stone, "textContent", "floor");
-        view.updateVal("base_res_lumber", res.cutStone, "textContent", "floor");
-        view.updateVal("baseWorkersAssigned", engine.getAvailableWorkers(), "textContent", 1);
+        view.updateVal("base_res_bricks", res.bricks, "textContent", "floor");
+        view.updateVal("base_res_lumber", res.lumber || 0, "textContent", "floor");
+        view.updateVal("baseWorkersAssigned", engine.getTotalAssignedWorkers(), "textContent", 1);
         view.updateVal("baseWorkersFound", engine.getTotalFoundWorkers(), "textContent", 1);
 
         const cdPct = function(ms) {
@@ -278,12 +315,58 @@ let view = {
         };
         view.updateVal("base_chapel_desc", "The Chapel blesses your journey.");
         view.updateVal("base_chapel_upgrade_btn", base.chapel.autoRetryEnabled ? "none" : "", "style.display");
+        view.updateVal("base_chapel_growth_row", base.chapel.growthBlessingUnlocked ? "none" : "", "style.display");
+        view.updateVal("base_chapel_planned_growth_row", base.chapel.plannedGrowthBlessingUnlocked ? "none" : "", "style.display");
+        const townhall = base.townhall;
+        const unlocks = townhall.unlocks;
+        const updateUnlockRow = function(rowId, btnId, bought) {
+            view.updateVal(rowId, bought ? "none" : "", "style.display");
+            view.updateVal(btnId, !!bought, "disabled");
+        };
+        view.updateVal("base_townhall_desc", "Use civic upgrades to reveal and enable buildings.");
+        const thTab = data.progress.selectedTownHallTab || "buildings";
+        view.updateVal("townhallTab_buildings", thTab === "buildings" ? "#2d4e7a" : "#1f2b3e", "style.backgroundColor");
+        view.updateVal("townhallTab_town_upgrades", thTab === "town_upgrades" ? "#2d4e7a" : "#1f2b3e", "style.backgroundColor");
+        view.updateVal("base_townhall_buildings_wrap", thTab === "buildings" ? "" : "none", "style.display");
+        view.updateVal("base_townhall_upgrades_wrap", thTab === "town_upgrades" ? "" : "none", "style.display");
+        updateUnlockRow("base_townhall_row_clay_pit", "base_townhall_btn_clay_pit", !!unlocks.claypit);
+        updateUnlockRow("base_townhall_row_kiln", "base_townhall_btn_kiln", !!unlocks.kiln);
+        updateUnlockRow("base_townhall_row_mine", "base_townhall_btn_mine", !!unlocks.mine);
+        updateUnlockRow("base_townhall_row_smith", "base_townhall_btn_smith", !!unlocks.smith);
+        updateUnlockRow("base_townhall_row_lumbermill", "base_townhall_btn_lumbermill", !!unlocks.lumbermill);
+        updateUnlockRow("base_townhall_row_library", "base_townhall_btn_library", !!unlocks.library);
+        updateUnlockRow("base_townhall_row_garden", "base_townhall_btn_garden", !!unlocks.garden);
+        updateUnlockRow("base_townhall_row_inn", "base_townhall_btn_inn", !!unlocks.inn);
+        updateUnlockRow("base_townhall_row_workshop", "base_townhall_btn_workshop", !!unlocks.workshop);
+        updateUnlockRow("base_townhall_row_guild", "base_townhall_btn_guild", !!unlocks.guild);
+        updateUnlockRow("base_townhall_row_market", "base_townhall_btn_market", !!unlocks.market);
+        updateUnlockRow("base_townhall_row_mage_tower", "base_townhall_btn_mage_tower", !!unlocks.mage_tower);
+        const tu = townhall.townUpgrades;
+        const hireBought = tu.hireLocalBought || 0;
+        const hireMaxed = hireBought >= 2;
+        view.updateVal("base_townhall_btn_hire_local", hireMaxed ? "Bought (2/2)" : `Buy (${tu.hireLocalNextGoldCost || 5} gold)`);
+        view.updateVal("base_townhall_btn_hire_local", hireMaxed, "disabled");
+
+        const buildingVisible = function(key) {
+            if (key === "chapel" || key === "townhall") return true;
+            return !!unlocks[key];
+        };
+        for (let i = 0; i < baseBuildingKeys.length; i++) {
+            const k = baseBuildingKeys[i];
+            view.updateVal(`baseBuilding_${k}`, buildingVisible(k) ? "" : "none", "style.display");
+            view.updateVal(`basePanel_${k}`, (buildingVisible(k) && k === data.progress.selectedBaseBuilding) ? "" : "none", "style.display");
+        }
+        if (!buildingVisible(data.progress.selectedBaseBuilding)) {
+            data.progress.selectedBaseBuilding = "chapel";
+        }
         const unlocked = data.progress.unlockedClasses || {};
         const currentClass = data.progress.currentClassKey || "none";
         const pendingClass = data.progress.pendingClassKey || "";
+        const classSwitchCooldownMs = Math.max(0, data.progress.classSwitchCooldownMs || 0);
+        const classSwitchCooldownTxt = classSwitchCooldownMs > 0 ? ` | Class switch cooldown: ${Math.ceil(classSwitchCooldownMs / 1000)}s` : "";
         const guildTxt = pendingClass
-            ? `Current class: ${initialize.getClassDef(currentClass).name} | Pending switch: ${initialize.getClassDef(pendingClass).name} (applies on Try Again)`
-            : `Current class: ${initialize.getClassDef(currentClass).name}`;
+            ? `Current class: ${initialize.getClassDef(currentClass).name} | Pending switch: ${initialize.getClassDef(pendingClass).name} (applies on Try Again)${classSwitchCooldownTxt}`
+            : `Current class: ${initialize.getClassDef(currentClass).name}${classSwitchCooldownTxt}`;
         view.updateVal("base_guild_current", guildTxt);
         const classes = ["warrior", "rogue", "hunter"];
         for (let ci = 0; ci < classes.length; ci++) {
@@ -296,7 +379,7 @@ let view = {
             const isCurrent = currentClass === ck;
             const isPending = pendingClass === ck;
             view.updateVal(switchId, isPending ? "Switching..." : (isCurrent ? "Current" : "Switch"));
-            view.updateVal(switchId, !isUnlocked || isCurrent || isPending, "disabled");
+            view.updateVal(switchId, !isUnlocked || isCurrent || isPending || classSwitchCooldownMs > 0, "disabled");
         }
 
         view.updateVal("base_mine_row", `Iron Ore: ${intToStringRound(res.ironOre)}`);
@@ -304,8 +387,14 @@ let view = {
         const mineG = base.mine.gearSets || 0;
         view.updateVal("base_mine_workers_label", `Workers: ${mineA}/${mineG} gear`);
         view.updateVal("base_mine_hire_btn", `Buy mining gear (${intToStringRound(base.mine.nextGearGoldCost)} gold, ${intToStringRound(base.mine.nextGearBarsCost)} bars)`);
-        view.updateVal("base_mine_assign_btn", (base.mine.assignedWorkers || 0) >= (base.mine.gearSets || 0) || engine.getAvailableWorkers() <= 0, "disabled");
-        view.updateVal("base_mine_unassign_btn", (base.mine.assignedWorkers || 0) <= 0, "disabled");
+        const canMineAssign = (base.mine.assignedWorkers || 0) < (base.mine.gearSets || 0) && engine.getAvailableWorkers() > 0;
+        const canMineUnassign = (base.mine.assignedWorkers || 0) > 0;
+        view.updateVal("base_mine_assign_one_btn", !canMineAssign, "disabled");
+        view.updateVal("base_mine_assign_ten_btn", !canMineAssign, "disabled");
+        view.updateVal("base_mine_assign_all_btn", !canMineAssign, "disabled");
+        view.updateVal("base_mine_unassign_one_btn", !canMineUnassign, "disabled");
+        view.updateVal("base_mine_unassign_ten_btn", !canMineUnassign, "disabled");
+        view.updateVal("base_mine_unassign_all_btn", !canMineUnassign, "disabled");
         view.updateVal("base_mine_manual_btn", mineUnlocked ? "" : "none", "style.display");
         view.updateVal("base_mine_cd_wrap", mineUnlocked ? "" : "none", "style.display");
         view.updateVal("base_mine_cd_text", "none", "style.display");
@@ -318,8 +407,14 @@ let view = {
         const smG = base.smith.gearSets || 0;
         view.updateVal("base_smith_workers_label", `Workers: ${smA}/${smG} gear`);
         view.updateVal("base_smith_hire_btn", `Buy smelting gear (${intToStringRound(base.smith.nextGearGoldCost)} gold, ${intToStringRound(base.smith.nextGearBarsCost)} bars)`);
-        view.updateVal("base_smith_assign_btn", (base.smith.assignedWorkers || 0) >= (base.smith.gearSets || 0) || engine.getAvailableWorkers() <= 0, "disabled");
-        view.updateVal("base_smith_unassign_btn", (base.smith.assignedWorkers || 0) <= 0, "disabled");
+        const canSmithAssign = (base.smith.assignedWorkers || 0) < (base.smith.gearSets || 0) && engine.getAvailableWorkers() > 0;
+        const canSmithUnassign = (base.smith.assignedWorkers || 0) > 0;
+        view.updateVal("base_smith_assign_one_btn", !canSmithAssign, "disabled");
+        view.updateVal("base_smith_assign_ten_btn", !canSmithAssign, "disabled");
+        view.updateVal("base_smith_assign_all_btn", !canSmithAssign, "disabled");
+        view.updateVal("base_smith_unassign_one_btn", !canSmithUnassign, "disabled");
+        view.updateVal("base_smith_unassign_ten_btn", !canSmithUnassign, "disabled");
+        view.updateVal("base_smith_unassign_all_btn", !canSmithUnassign, "disabled");
         view.updateVal("base_smith_manual_btn", smithUnlocked ? "" : "none", "style.display");
         view.updateVal("base_smith_cd_wrap", smithUnlocked ? "" : "none", "style.display");
         view.updateVal("base_smith_cd_text", "none", "style.display");
@@ -366,14 +461,35 @@ let view = {
         const libTab = data.progress.selectedLibraryTab || "combat";
         view.updateVal("libraryTab_combat", libTab === "combat" ? "#2d4e7a" : "#1f2b3e", "style.backgroundColor");
         view.updateVal("libraryTab_town", libTab === "town" ? "#2d4e7a" : "#1f2b3e", "style.backgroundColor");
+        view.updateVal("libraryTab_foraging", libTab === "foraging" ? "#2d4e7a" : "#1f2b3e", "style.backgroundColor");
         view.updateVal("libraryTab_class", libTab === "class" ? "#2d4e7a" : "#1f2b3e", "style.backgroundColor");
         const lib = base.library || {};
         const libWorkers = lib.assignedWorkers || 0;
         const libDesks = lib.gearSets || 0;
         view.updateVal("base_library_workers_label", `Researchers: ${libWorkers}/${libDesks} desks · Queue top-down by priority`);
-        view.updateVal("base_library_desk_btn", `Buy desk (${intToStringRound(lib.nextGearGoldCost || 0)} gold, ${intToStringRound(lib.nextGearStoneCost || 0)} cut stone)`);
-        view.updateVal("base_library_assign_btn", libWorkers >= libDesks || engine.getAvailableWorkers() <= 0, "disabled");
-        view.updateVal("base_library_unassign_btn", libWorkers <= 0, "disabled");
+        view.updateVal("base_library_desk_btn", `Buy desk (${intToStringRound(lib.nextGearGoldCost || 0)} gold, ${intToStringRound(lib.nextGearStoneCost || 0)} bricks)`);
+        const canLibAssign = libWorkers < libDesks && engine.getAvailableWorkers() > 0;
+        const canLibUnassign = libWorkers > 0;
+        view.updateVal("base_library_assign_one_btn", !canLibAssign, "disabled");
+        view.updateVal("base_library_assign_ten_btn", !canLibAssign, "disabled");
+        view.updateVal("base_library_assign_all_btn", !canLibAssign, "disabled");
+        view.updateVal("base_library_unassign_one_btn", !canLibUnassign, "disabled");
+        view.updateVal("base_library_unassign_ten_btn", !canLibUnassign, "disabled");
+        view.updateVal("base_library_unassign_all_btn", !canLibUnassign, "disabled");
+        let activeResearch = null;
+        for (let i = 0; i < skills.keysInOrder.length; i++) {
+            const key = skills.keysInOrder[i];
+            const rs = lib.skillResearch && lib.skillResearch[key] ? lib.skillResearch[key] : null;
+            if (rs && rs.purchased && !rs.researched && !rs.paused) {
+                activeResearch = rs;
+                break;
+            }
+        }
+        const libPct = activeResearch && (activeResearch.required || 0) > 0
+            ? Math.max(0, Math.min(100, ((activeResearch.progress || 0) / activeResearch.required) * 100))
+            : 0;
+        view.updateVal("baseLibraryProgressFill", `${libPct}%`, "style.width");
+        view.updateVal("baseLibraryProgressWrap", activeResearch ? 1 : 0, "style.opacity");
         let shownLibraryRows = 0;
         for (let i = 0; i < skills.keysInOrder.length; i++) {
             const k = skills.keysInOrder[i];
@@ -412,39 +528,71 @@ let view = {
         }
         view.updateVal("base_library_empty", shownLibraryRows ? "none" : "", "style.display");
 
-        view.updateVal("base_lumbermill_row", `Stone: ${intToStringRound(res.stone)}`);
-        const lmA = base.lumbermill.assignedWorkers || 0;
-        const lmG = base.lumbermill.gearSets || 0;
-        view.updateVal("base_lumbermill_workers_label", `Workers: ${lmA}/${lmG} gear`);
-        view.updateVal("base_lumbermill_hire_btn", `Buy quarry gear (${intToStringRound(base.lumbermill.nextGearGoldCost)} gold, ${intToStringRound(base.lumbermill.nextGearBarsCost)} bars)`);
-        view.updateVal("base_lumbermill_assign_btn", (base.lumbermill.assignedWorkers || 0) >= (base.lumbermill.gearSets || 0) || engine.getAvailableWorkers() <= 0, "disabled");
-        view.updateVal("base_lumbermill_unassign_btn", (base.lumbermill.assignedWorkers || 0) <= 0, "disabled");
+        view.updateVal("base_claypit_row", `Clay: ${intToStringRound(res.stone)}`);
+        const lmA = base.claypit.assignedWorkers || 0;
+        const lmG = base.claypit.gearSets || 0;
+        view.updateVal("base_claypit_workers_label", `Workers: ${lmA}/${lmG} gear`);
+        view.updateVal("base_claypit_hire_btn", `Hire Digger tools (${intToStringRound(base.claypit.nextGearGoldCost)} gold, ${intToStringRound(base.claypit.nextGearBarsCost)} bars)`);
+        const canLumberAssign = (base.claypit.assignedWorkers || 0) < (base.claypit.gearSets || 0) && engine.getAvailableWorkers() > 0;
+        const canLumberUnassign = (base.claypit.assignedWorkers || 0) > 0;
+        view.updateVal("base_claypit_assign_one_btn", !canLumberAssign, "disabled");
+        view.updateVal("base_claypit_assign_ten_btn", !canLumberAssign, "disabled");
+        view.updateVal("base_claypit_assign_all_btn", !canLumberAssign, "disabled");
+        view.updateVal("base_claypit_unassign_one_btn", !canLumberUnassign, "disabled");
+        view.updateVal("base_claypit_unassign_ten_btn", !canLumberUnassign, "disabled");
+        view.updateVal("base_claypit_unassign_all_btn", !canLumberUnassign, "disabled");
+        view.updateVal("base_claypit_manual_btn", claypitUnlocked ? "" : "none", "style.display");
+        view.updateVal("base_claypit_cd_wrap", claypitUnlocked ? "" : "none", "style.display");
+        view.updateVal("base_claypit_cd_text", "none", "style.display");
+        view.updateVal("base_claypit_manual_btn", (base.claypit.manualCooldownMs || 0) > 0, "disabled");
+        view.updateVal("base_claypit_cd_fill", `${cdPct(base.claypit.manualCooldownMs)}%`, "style.width");
+
+        view.updateVal("base_kiln_row", `Clay: ${intToStringRound(res.stone)} | Bricks: ${intToStringRound(res.bricks)}`);
+        const swA = base.kiln.assignedWorkers || 0;
+        const swG = base.kiln.gearSets || 0;
+        view.updateVal("base_kiln_workers_label", `Workers: ${swA}/${swG} gear`);
+        view.updateVal("base_kiln_hire_btn", `Hire Burner tools (${intToStringRound(base.kiln.nextGearGoldCost)} gold, ${intToStringRound(base.kiln.nextGearBarsCost)} bars)`);
+        const canSawAssign = (base.kiln.assignedWorkers || 0) < (base.kiln.gearSets || 0) && engine.getAvailableWorkers() > 0;
+        const canSawUnassign = (base.kiln.assignedWorkers || 0) > 0;
+        view.updateVal("base_kiln_assign_one_btn", !canSawAssign, "disabled");
+        view.updateVal("base_kiln_assign_ten_btn", !canSawAssign, "disabled");
+        view.updateVal("base_kiln_assign_all_btn", !canSawAssign, "disabled");
+        view.updateVal("base_kiln_unassign_one_btn", !canSawUnassign, "disabled");
+        view.updateVal("base_kiln_unassign_ten_btn", !canSawUnassign, "disabled");
+        view.updateVal("base_kiln_unassign_all_btn", !canSawUnassign, "disabled");
+        view.updateVal("base_kiln_manual_btn", kilnUnlocked ? "" : "none", "style.display");
+        view.updateVal("base_kiln_cd_wrap", kilnUnlocked ? "" : "none", "style.display");
+        view.updateVal("base_kiln_cd_text", "none", "style.display");
+        view.updateVal("base_kiln_manual_btn", (base.kiln.manualCooldownMs || 0) > 0, "disabled");
+        view.updateVal("base_kiln_cd_fill", `${cdPct(base.kiln.manualCooldownMs)}%`, "style.width");
+
+        view.updateVal("base_lumbermill_row", `Logs: ${intToStringRound(res.logs || 0)} | Lumber: ${intToStringRound(res.lumber || 0)}`);
+        const wdA = base.lumbermill.assignedWorkers || 0;
+        const wdG = base.lumbermill.gearSets || 0;
+        const lumbermillUnlocked = (base.lumbermill.assignedWorkers || 0) > 0;
+        view.updateVal("base_lumbermill_workers_label", `Workers: ${wdA}/${wdG} gear`);
+        view.updateVal("base_lumbermill_hire_btn", `Buy woodworking gear (${intToStringRound(base.lumbermill.nextGearGoldCost)} gold, ${intToStringRound(base.lumbermill.nextGearBarsCost)} bars)`);
+        const canWoodAssign = wdA < wdG && engine.getAvailableWorkers() > 0;
+        const canWoodUnassign = wdA > 0;
+        view.updateVal("base_lumbermill_assign_one_btn", !canWoodAssign, "disabled");
+        view.updateVal("base_lumbermill_assign_ten_btn", !canWoodAssign, "disabled");
+        view.updateVal("base_lumbermill_assign_all_btn", !canWoodAssign, "disabled");
+        view.updateVal("base_lumbermill_unassign_one_btn", !canWoodUnassign, "disabled");
+        view.updateVal("base_lumbermill_unassign_ten_btn", !canWoodUnassign, "disabled");
+        view.updateVal("base_lumbermill_unassign_all_btn", !canWoodUnassign, "disabled");
         view.updateVal("base_lumbermill_manual_btn", lumbermillUnlocked ? "" : "none", "style.display");
         view.updateVal("base_lumbermill_cd_wrap", lumbermillUnlocked ? "" : "none", "style.display");
         view.updateVal("base_lumbermill_cd_text", "none", "style.display");
         view.updateVal("base_lumbermill_manual_btn", (base.lumbermill.manualCooldownMs || 0) > 0, "disabled");
         view.updateVal("base_lumbermill_cd_fill", `${cdPct(base.lumbermill.manualCooldownMs)}%`, "style.width");
 
-        view.updateVal("base_sawmill_row", `Stone: ${intToStringRound(res.stone)} | Cut Stone: ${intToStringRound(res.cutStone)}`);
-        const swA = base.sawmill.assignedWorkers || 0;
-        const swG = base.sawmill.gearSets || 0;
-        view.updateVal("base_sawmill_workers_label", `Workers: ${swA}/${swG} gear`);
-        view.updateVal("base_sawmill_hire_btn", `Buy cutting gear (${intToStringRound(base.sawmill.nextGearGoldCost)} gold, ${intToStringRound(base.sawmill.nextGearBarsCost)} bars)`);
-        view.updateVal("base_sawmill_assign_btn", (base.sawmill.assignedWorkers || 0) >= (base.sawmill.gearSets || 0) || engine.getAvailableWorkers() <= 0, "disabled");
-        view.updateVal("base_sawmill_unassign_btn", (base.sawmill.assignedWorkers || 0) <= 0, "disabled");
-        view.updateVal("base_sawmill_manual_btn", sawmillUnlocked ? "" : "none", "style.display");
-        view.updateVal("base_sawmill_cd_wrap", sawmillUnlocked ? "" : "none", "style.display");
-        view.updateVal("base_sawmill_cd_text", "none", "style.display");
-        view.updateVal("base_sawmill_manual_btn", (base.sawmill.manualCooldownMs || 0) > 0, "disabled");
-        view.updateVal("base_sawmill_cd_fill", `${cdPct(base.sawmill.manualCooldownMs)}%`, "style.width");
-
         const w = base.workshop;
         const roomMaxed = (w.innRoomUpgradesBought || 0) >= 7;
         view.updateVal("base_workshop_row", `Inn rooms added: ${w.innRoomUpgradesBought || 0}/7`);
-        view.updateVal("base_workshop_room_btn", `Add room to Inn (${intToStringRound(w.innRoomNextGoldCost)} gold, ${intToStringRound(w.innRoomNextLumberCost)} cut stone)`);
+        view.updateVal("base_workshop_room_btn", `Add room to Inn (${intToStringRound(w.innRoomNextGoldCost)} gold, ${intToStringRound(w.innRoomNextLumberCost)} bricks)`);
         view.updateVal("base_workshop_room_btn", roomMaxed, "disabled");
         view.updateVal("base_workshop_room_btn", hideMaxed && roomMaxed ? "none" : "", "style.display");
-        view.updateVal("base_workshop_bow_btn", w.bowBuilt ? "Bow complete" : "Make bow (200 gold, 20 cut stone)");
+        view.updateVal("base_workshop_bow_btn", w.bowBuilt ? "Bow complete" : "Make bow (200 gold, 20 bricks)");
         view.updateVal("base_workshop_bow_btn", !!w.bowBuilt, "disabled");
         view.updateVal("base_workshop_bow_btn", hideMaxed && w.bowBuilt ? "none" : "", "style.display");
 
@@ -453,8 +601,8 @@ let view = {
             { row: "base_garden_row_inn", btn: "base_garden_btn_inn", bought: !!g.mapManualInn, kind: "inn" },
             { row: "base_garden_row_mine", btn: "base_garden_btn_mine", bought: !!g.mapManualMine, kind: "mine" },
             { row: "base_garden_row_smith", btn: "base_garden_btn_smith", bought: !!g.mapManualSmith, kind: "smith" },
-            { row: "base_garden_row_lumbermill", btn: "base_garden_btn_lumbermill", bought: !!g.mapManualLumbermill, kind: "lumbermill" },
-            { row: "base_garden_row_sawmill", btn: "base_garden_btn_sawmill", bought: !!g.mapManualSawmill, kind: "sawmill" }
+            { row: "base_garden_row_claypit", btn: "base_garden_btn_claypit", bought: !!g.mapManualClaypit, kind: "claypit" },
+            { row: "base_garden_row_kiln", btn: "base_garden_btn_kiln", bought: !!g.mapManualKiln, kind: "kiln" }
         ];
         let shownGarden = 0;
         for (let i = 0; i < rows.length; i++) {
@@ -510,7 +658,13 @@ let view = {
         let html = "";
         for (let i = 0; i < runs.length; i++) {
             const run = runs[i];
-            html += `<div class="history-row">#${i + 1}: ${round1(run.survivedSeconds)}s | Gold ${intToStringRound(run.goldGained)} | ${round2(run.goldPerSecond)}/s</div>`;
+            const lvl = run.level !== undefined ? run.level : 0;
+            const kills = run.kills !== undefined ? run.kills : 0;
+            html += `<div class="history-row">#${i + 1}: Time ${round1(run.survivedSeconds)}s | Level ${lvl} | Kills ${kills} | Gold ${intToStringRound(run.goldGained)}</div>`;
+            const talents = run.talentRows || [];
+            if (talents.length > 0) {
+                html += `<div class="history-row muted-text">Talent this run: ${talents.join(" | ")}</div>`;
+            }
         }
         if (!html) {
             html = "<div class=\"muted-text\">No runs yet.</div>";
@@ -566,10 +720,12 @@ let view = {
         const tab = data.progress.selectedSkillsTab || "combat";
         view.updateVal("skillSubTab_combat", tab === "combat" ? "#2d4e7a" : "#1f2b3e", "style.backgroundColor");
         view.updateVal("skillSubTab_town", tab === "town" ? "#2d4e7a" : "#1f2b3e", "style.backgroundColor");
+        view.updateVal("skillSubTab_foraging", tab === "foraging" ? "#2d4e7a" : "#1f2b3e", "style.backgroundColor");
         view.updateVal("skillSubTab_class", tab === "class" ? "#2d4e7a" : "#1f2b3e", "style.backgroundColor");
     },
     updatePlayerBattleBars: function() {
         const p = data.battle.player;
+        const isForaging = (data.battle.mode || "combat") === "foraging";
         const ls = data.battle.levelState;
         const atkFill = viewData.cached.playerAttackBarFill;
         const atkLabel = viewData.cached.playerAttackBarLabel;
@@ -595,6 +751,13 @@ let view = {
             view.updateVal("playerAttackBarLabel", `${atkName} ${intToString(atkElapsed, 3)} / ${intToString(cd, 3)} ms`);
         }
         if (rngFill && rngLabel) {
+            if (isForaging) {
+                if (rngTrack) {
+                    rngTrack.style.display = "none";
+                }
+                rngFill.style.width = "0%";
+                view.updateVal("playerRangedBarLabel", "Foraging");
+            } else {
             if (data.battle.state !== "running") {
                 rngFill.style.width = "0%";
                 rngLabel.textContent = "\u2014";
@@ -627,13 +790,14 @@ let view = {
                     rngTrack.style.display = "none";
                 }
                 rngFill.style.width = "0%";
-                view.updateVal("playerRangedBarLabel", `Move speed +${intToString(pushPx, 3)}/s`);
+                view.updateVal("playerRangedBarLabel", `Move speed +${intToString(pushPx, 3)} ft/s`);
             } else {
                 if (rngTrack) {
                     rngTrack.style.display = "none";
                 }
                 rngFill.style.width = "0%";
                 view.updateVal("playerRangedBarLabel", "Enemy in range");
+            }
             }
             }
         }
@@ -650,6 +814,9 @@ let view = {
             movePulse.classList.toggle("move-pulse-active", movingForward && !takingDamageNow);
         }
         if (lvlFill && lvlLabel) {
+            const chapel = data.progress.base && data.progress.base.chapel;
+            const growthUnlocked = !!(chapel && chapel.growthBlessingUnlocked);
+            view.updateVal("playerLevelBar", growthUnlocked ? "" : "none", "style.display");
             const lvlPct = ls.expToLevel > 0 ? Math.max(0, Math.min(100, (ls.exp / ls.expToLevel) * 100)) : 0;
             lvlFill.style.width = `${lvlPct}%`;
             view.updateVal("playerLevelBarLabel", `Level ${intToString(ls.level, 3)} — ${intToString(ls.exp, 3)} / ${intToString(ls.expToLevel, 3)} exp`);
@@ -736,8 +903,20 @@ let view = {
             enemyEl.style.height = `${enemy.sizePx}px`;
             enemyEl.style.left = `${leftPx}px`;
             enemyEl.style.top = `${renderY}px`;
-            enemyEl.classList.toggle("enemy-token-ranged", enemy.enemyType === "ranged");
             const hpPct = Math.max(0, enemy.hp / enemy.maxHp) * 100;
+            const shapeLayer = enemyEl.querySelector(".enemy-shape-layer");
+            if (shapeLayer) {
+                const isForageUnit = enemy.enemyType === "tree" || enemy.enemyType === "bush" || enemy.enemyType === "ore_vein";
+                shapeLayer.classList.toggle("enemy-token-ranged", enemy.enemyType === "ranged");
+                if (isForageUnit) {
+                    const fill = enemy.enemyType === "tree" ? "#6f4e37" : (enemy.enemyType === "bush" ? "#3f7d3f" : "#737373");
+                    shapeLayer.style.clipPath = "none";
+                    shapeLayer.style.border = "1px solid #2d2d2d";
+                    shapeLayer.style.background = fill;
+                } else {
+                    shapeLayer.style.background = "";
+                }
+            }
             const hpLayer = enemyEl.querySelector(".enemy-hp-layer");
             if (hpLayer) {
                 if (enemy.enemyType === "ranged") {
@@ -750,12 +929,19 @@ let view = {
             const dmgLine = enemyEl.querySelector(".enemy-stat-dmg");
             const atkFill = enemyEl.querySelector(".enemy-stat-atk-fill");
             if (hpLine) {
-                hpLine.textContent = `${Math.ceil(enemy.hp)}/${enemy.maxHp}`;
+                hpLine.textContent = `HP ${Math.ceil(enemy.hp)}/${enemy.maxHp}`;
             }
             if (dmgLine) {
                 dmgLine.textContent = `Dmg ${enemy.attackDamage}`;
             }
             if (atkFill) {
+                if ((data.battle.mode || "combat") === "foraging") {
+                    atkFill.style.width = "0%";
+                    const atkWrap = enemyEl.querySelector(".enemy-stat-atk-wrap");
+                    if (atkWrap) atkWrap.style.display = "none";
+                } else {
+                    const atkWrap = enemyEl.querySelector(".enemy-stat-atk-wrap");
+                    if (atkWrap) atkWrap.style.display = "";
                 const cd = enemy.enemyType === "ranged" ? (enemy.attackCooldownMs * 2) : enemy.attackCooldownMs;
                 const canCharge = enemy.enemyType === "ranged" ? (!!enemy.rangedReady || !!enemy.inRange) : !!enemy.inRange;
                 const remain = Math.max(0, Math.min(cd, enemy.attackTimerMs || 0));
@@ -763,9 +949,11 @@ let view = {
                     ? (100 - Math.max(0, Math.min(100, (remain / cd) * 100)))
                     : 0;
                 atkFill.style.width = `${atkBarPct}%`;
+                }
             }
         }
         view.consumeLineFxQueue();
+        view.renderRangeMarkers();
         view.updatePlayerBattleBars();
 
         const activeKeys = Object.keys(viewData.activeEnemyElements);
@@ -774,6 +962,24 @@ let view = {
             if (!activeIds[enemyId]) {
                 view.releaseEnemyElement(enemyId);
             }
+        }
+    },
+    renderRangeMarkers: function() {
+        const root = viewData.cached.rangeMarkers;
+        if (!root) {
+            return;
+        }
+        const bh = viewData.layout.battlefieldHeightPx || gameData.battle.battlefieldHeightPx || 500;
+        const playerTop = viewData.layout.playerTopPx || (bh - 65);
+        let html = "";
+        let dist = 0;
+        while ((playerTop - dist) >= 0) {
+            html += `<div class="range-marker-line" style="top:${Math.round(playerTop - dist)}px;"><span class="range-marker-label">${dist} ft</span></div>`;
+            dist += 100;
+        }
+        if (viewData.prevValues.rangeMarkersHtml !== html) {
+            root.innerHTML = html;
+            viewData.prevValues.rangeMarkersHtml = html;
         }
     },
     consumeLineFxQueue: function() {
@@ -821,6 +1027,8 @@ let view = {
         } else {
             enemyEl = document.createElement("div");
             enemyEl.className = "enemy-token";
+            const shapeLayer = document.createElement("div");
+            shapeLayer.className = "enemy-shape-layer";
             const hpLayer = document.createElement("div");
             hpLayer.className = "enemy-hp-layer";
             const overlay = document.createElement("div");
@@ -837,7 +1045,8 @@ let view = {
             overlay.appendChild(hpLine);
             overlay.appendChild(dmgLine);
             overlay.appendChild(atkWrap);
-            enemyEl.appendChild(hpLayer);
+            shapeLayer.appendChild(hpLayer);
+            enemyEl.appendChild(shapeLayer);
             enemyEl.appendChild(overlay);
         }
         enemyEl.style.display = "block";

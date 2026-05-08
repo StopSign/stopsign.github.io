@@ -14,9 +14,10 @@ let saveName = "battleLoops1"; //Blank if you don't want to save, change name to
 
 let data = {};
 let language = "english";
-let baseBuildingKeys = ["chapel", "smith", "inn", "guild", "market", "garden", "workshop", "mage_tower", "mine", "library", "lumbermill", "sawmill"];
+let baseBuildingKeys = ["chapel", "townhall", "mine", "smith", "claypit", "kiln", "lumbermill", "library", "garden", "inn", "workshop", "guild", "market", "mage_tower"];
 let baseBuildingNames = {
     chapel: "Chapel",
+    townhall: "Town Hall",
     smith: "Smith",
     inn: "Inn",
     guild: "Guild",
@@ -26,13 +27,14 @@ let baseBuildingNames = {
     mage_tower: "Mage Tower",
     mine: "Mine",
     library: "Library",
-    lumbermill: "Quarry",
-    sawmill: "Stonecutter"
+    claypit: "Clay Pit",
+    kiln: "Kiln",
+    lumbermill: "Claypit"
 };
 let globalVisible = false; //SET FOR COMMIT
 // let globalVisible = true;
-// let isLoadingEnabled = true; //SET FOR COMMIT
-let isLoadingEnabled = false;
+let isLoadingEnabled = true; //SET FOR COMMIT
+// let isLoadingEnabled = false;
 let loadStaticSaveFile = false; //SET FOR COMMIT
 // let loadStaticSaveFile = true;
 let isSteam = false; //SET FOR COMMIT
@@ -58,7 +60,43 @@ let initials = {
     base: function() {
         return {
             chapel: {
-                autoRetryEnabled: false
+                autoRetryEnabled: false,
+                growthBlessingUnlocked: false,
+                plannedGrowthBlessingUnlocked: false
+            },
+            townhall: {
+                unlocks: {
+                    mine: false,
+                    smith: false,
+                    claypit: false,
+                    kiln: false,
+                    lumbermill: false,
+                    library: false,
+                    garden: false,
+                    inn: false,
+                    workshop: false,
+                    guild: false,
+                    market: false,
+                    mage_tower: false
+                },
+                upgradeCosts: {
+                    claypit: { gold: 5, bars: 0, bricks: 0, lumber: 0 },
+                    kiln: { gold: 5, bars: 0, bricks: 0, lumber: 0 },
+                    library: { gold: 20, bars: 0, bricks: 5, lumber: 0 },
+                    mine: { gold: 20, bars: 0, bricks: 5, lumber: 0 },
+                    smith: { gold: 20, bars: 0, bricks: 5, lumber: 0 },
+                    lumbermill: { gold: 200, bars: 20, bricks: 40, lumber: 0 },
+                    garden: { gold: 300, bars: 30, bricks: 30, lumber: 0 },
+                    inn: { gold: 350, bars: 35, bricks: 35, lumber: 0 },
+                    workshop: { gold: 400, bars: 40, bricks: 40, lumber: 40 },
+                    guild: { gold: 450, bars: 45, bricks: 45, lumber: 45 },
+                    market: { gold: 500, bars: 50, bricks: 50, lumber: 50 },
+                    mage_tower: { gold: 550, bars: 55, bricks: 55, lumber: 55 }
+                },
+                townUpgrades: {
+                    hireLocalBought: 0,
+                    hireLocalNextGoldCost: 5
+                }
             },
             inn: {
                 openForGuests: false,
@@ -96,7 +134,7 @@ let initials = {
                 nextGearStoneCost: 0,
                 researchPerWorkerPerSecond: 1
             },
-            lumbermill: {
+            claypit: {
                 assignedWorkers: 0,
                 gearSets: 0,
                 nextGearGoldCost: 20,
@@ -104,7 +142,15 @@ let initials = {
                 progress: 0,
                 manualCooldownMs: 0
             },
-            sawmill: {
+            kiln: {
+                assignedWorkers: 0,
+                gearSets: 0,
+                nextGearGoldCost: 20,
+                nextGearBarsCost: 0,
+                progress: 0,
+                manualCooldownMs: 0
+            },
+            lumbermill: {
                 assignedWorkers: 0,
                 gearSets: 0,
                 nextGearGoldCost: 20,
@@ -122,14 +168,16 @@ let initials = {
                 mapManualInn: false,
                 mapManualMine: false,
                 mapManualSmith: false,
-                mapManualLumbermill: false,
-                mapManualSawmill: false
+                mapManualClaypit: false,
+                mapManualKiln: false
             },
             resources: {
                 ironOre: 0,
                 ironBar: 0,
                 stone: 0,
-                cutStone: 0
+                bricks: 0,
+                logs: 0,
+                lumber: 0
             }
         };
     },
@@ -188,6 +236,7 @@ let initials = {
             selectedSkillsTab: "combat",
             selectedStatsTab: "combat",
             selectedLibraryTab: "combat",
+            selectedTownHallTab: "buildings",
             compactViewPane: "menus",
             autoRetryCountdownSec: 0,
             stars: {
@@ -203,8 +252,10 @@ let initials = {
             mapDefinitions: mapData.getDefaultMaps(),
             mapStars: {},
             mapWorkersFound: {},
+            mapClearProgress: {},
             currentClassKey: "none",
             pendingClassKey: "",
+            classSwitchCooldownMs: 0,
             unlockedClasses: { none: true },
             attributePlan: [],
             runHistory: [],
@@ -216,6 +267,7 @@ let initials = {
     battle: function() {
         return {
             elapsedMs: 0,
+            mode: "combat",
             state: "running",
             resetCount: 0,
             enemyIdCounter: 1,
@@ -226,7 +278,7 @@ let initials = {
             levelState: initials.levelState(),
             seed: 1337,
             generatedFromSeed: null,
-            currentTab: "leveling",
+            currentTab: "base",
             runStartGold: 0,
             historyLogged: false,
             enemiesKilled: 0,
@@ -247,7 +299,11 @@ let initials = {
             rogueDashActive: false,
             rogueFlurryMs: 0,
             lastPlayerHitEnemyId: 0,
-            lastPlayerHitStreak: 0
+            lastPlayerHitStreak: 0,
+            forageIndexSpawned: {},
+            forageKindSpawnCounts: {},
+            forageActiveDrainMapKey: "",
+            forageMoveAccumPx: 0
         };
     },
     enemyPool: function() {
@@ -273,7 +329,7 @@ let initialize = {
         initialize.startFreshBattle(data.progress.mapDefinitions[0].seed, data.progress.currentMapKey);
     },
     startFreshBattle: function(seed, mapKey) {
-        const preservedTab = data.battle && data.battle.currentTab ? data.battle.currentTab : "leveling";
+        const preservedTab = data.battle && data.battle.currentTab ? data.battle.currentTab : "base";
         data.battle = initials.battle();
         data.battle.enemyPool = initials.enemyPool();
         data.battle.seed = seed;
@@ -295,6 +351,11 @@ let initialize = {
         data.battle.transitionCountdownMs = 0;
         data.battle.transitionMessage = "";
         data.battle.nextTierAfterCountdown = 0;
+        data.battle.mode = "combat";
+        data.battle.forageIndexSpawned = {};
+        data.battle.forageKindSpawnCounts = {};
+        data.battle.forageActiveDrainMapKey = "";
+        data.battle.forageMoveAccumPx = 0;
         initialize.applyPlanForCurrentLevel();
         initialize.calcPlayerStats(true);
         initialize.snapshotRunSkillTalent();
@@ -380,6 +441,24 @@ let initialize = {
         data.battle.levelState.unassignedPoints = Math.max(0, maxLevelAssignable - assignedCount);
     },
     calcPlayerStats: function(fullHeal) {
+        if (data.battle && data.battle.mode === "foraging") {
+            const ls = data.battle.levelState || {};
+            const totalCon = (ls.levelCon || 0);
+            const totalStr = (ls.levelStr || 0);
+            const breathingLv = (skills.isSkillUnlocked("breathing") && data.progress.skills.breathing) ? (data.progress.skills.breathing.level || 0) : 0;
+            const maxStamina = Math.max(1, Math.ceil((20 + (breathingLv * 2)) * (1 + (totalCon / 10))));
+            data.battle.player.maxHp = maxStamina;
+            if (fullHeal) {
+                data.battle.player.hp = maxStamina;
+            } else {
+                data.battle.player.hp = Math.min(maxStamina, data.battle.player.hp);
+            }
+            data.battle.player.attackDamage = Math.max(1, Math.round(5 * (1 + (totalStr / 10))));
+            data.battle.player.rangedAttackDamage = 0;
+            data.progress.rangedAttackEnabled = false;
+            engine.syncPlayerCooldownFields();
+            return;
+        }
         const missingHp = data.battle.player.maxHp - data.battle.player.hp;
         const totalCon = data.battle.levelState.levelCon + data.battle.levelState.skillConBonus;
         const totalStr = data.battle.levelState.levelStr + data.battle.levelState.skillStrBonus;
@@ -403,7 +482,54 @@ let initialize = {
         engine.syncPlayerCooldownFields();
     },
     ensureProgressShape: function() {
-        // No save migration for now - this game is still in active build-out.
-        return;
+        if (!data.progress.mapClearProgress) {
+            data.progress.mapClearProgress = {};
+        }
+        if (!data.progress.selectedSkillsTab) {
+            data.progress.selectedSkillsTab = "combat";
+        }
+        if (!data.progress.selectedLibraryTab) {
+            data.progress.selectedLibraryTab = "combat";
+        }
+        if (!data.progress.selectedTownHallTab) {
+            data.progress.selectedTownHallTab = "buildings";
+        }
+        if (data.progress.classSwitchCooldownMs === undefined) {
+            data.progress.classSwitchCooldownMs = 0;
+        }
+        const th = data.progress.base && data.progress.base.townhall;
+        const chapel = data.progress.base && data.progress.base.chapel;
+        if (chapel) {
+            if (chapel.growthBlessingUnlocked === undefined) {
+                chapel.growthBlessingUnlocked = false;
+            }
+            if (chapel.plannedGrowthBlessingUnlocked === undefined) {
+                chapel.plannedGrowthBlessingUnlocked = false;
+            }
+        }
+        if (th) {
+            if (!th.unlocks) th.unlocks = {};
+            const unlockKeys = ["mine", "smith", "claypit", "kiln", "lumbermill", "library", "garden", "inn", "workshop", "guild", "market", "mage_tower"];
+            for (let i = 0; i < unlockKeys.length; i++) {
+                if (th.unlocks[unlockKeys[i]] === undefined) th.unlocks[unlockKeys[i]] = false;
+            }
+            if (!th.upgradeCosts) th.upgradeCosts = {};
+            const defaults = initials.base().townhall.upgradeCosts;
+            const costKeys = Object.keys(defaults);
+            for (let i = 0; i < costKeys.length; i++) {
+                const k = costKeys[i];
+                if (!th.upgradeCosts[k]) {
+                    th.upgradeCosts[k] = defaults[k];
+                } else {
+                    if (th.upgradeCosts[k].gold === undefined) th.upgradeCosts[k].gold = defaults[k].gold || 0;
+                    if (th.upgradeCosts[k].bars === undefined) th.upgradeCosts[k].bars = defaults[k].bars || 0;
+                    if (th.upgradeCosts[k].bricks === undefined) th.upgradeCosts[k].bricks = defaults[k].bricks || 0;
+                    if (th.upgradeCosts[k].lumber === undefined) th.upgradeCosts[k].lumber = defaults[k].lumber || 0;
+                }
+            }
+            if (!th.townUpgrades) {
+                th.townUpgrades = { hireLocalBought: 0, hireLocalNextGoldCost: 5 };
+            }
+        }
     }
 }

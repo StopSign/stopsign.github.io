@@ -60,9 +60,10 @@
         </div>
         <div id="menuContent">
             <div id="tabPane_base" class="tab-pane">
-                <div class="pane-title">Gold: <span id="baseGoldText"></span> | Workers total <span id="baseWorkersFound"></span> | available <span id="baseWorkersAssigned"></span></div>
+                <div class="pane-title">Gold: <span id="baseGoldText"></span> | Workers <span id="baseWorkersAssigned"></span>/<span id="baseWorkersFound"></span></div>
                 <div id="baseTownMap" class="base-map-wrap">
                     <button id="baseBuilding_chapel" class="base-building-label base-building-chapel" onclick="events.selectBaseBuilding('chapel')">Chapel</button>
+                    <button id="baseBuilding_townhall" class="base-building-label base-building-townhall" onclick="events.selectBaseBuilding('townhall')">Town Hall</button>
                     <div class="base-building-node base-building-smith-node">
                         <button id="baseBuilding_smith" class="base-building-label" onclick="events.selectBaseBuilding('smith')">Smith</button>
                         <div id="baseSmithProgressWrap" class="base-mini-progress"><div id="baseSmithProgressFill" class="base-mini-progress-fill"></div></div>
@@ -79,17 +80,21 @@
                         <div id="baseMineProgressWrap" class="base-mini-progress"><div id="baseMineProgressFill" class="base-mini-progress-fill"></div></div>
                         <button id="mapManualBtn_mine" class="map-manual-btn" onclick="events.manualMine()">Mine</button>
                     </div>
-                    <button id="baseBuilding_library" class="base-building-label base-building-library" onclick="events.selectBaseBuilding('library')">Library</button>
-                    <div class="base-building-node base-building-lumbermill-node">
-                        <button id="baseBuilding_lumbermill" class="base-building-label" onclick="events.selectBaseBuilding('lumbermill')">Quarry</button>
-                        <div id="baseLumbermillProgressWrap" class="base-mini-progress"><div id="baseLumbermillProgressFill" class="base-mini-progress-fill"></div></div>
-                        <button id="mapManualBtn_lumbermill" class="map-manual-btn" onclick="events.manualLumber()">Quarry</button>
+                    <div class="base-building-node base-building-library-node">
+                        <button id="baseBuilding_library" class="base-building-label" onclick="events.selectBaseBuilding('library')">Library</button>
+                        <div id="baseLibraryProgressWrap" class="base-mini-progress"><div id="baseLibraryProgressFill" class="base-mini-progress-fill"></div></div>
                     </div>
-                    <div class="base-building-node base-building-sawmill-node">
-                        <button id="baseBuilding_sawmill" class="base-building-label" onclick="events.selectBaseBuilding('sawmill')">Stonecutter</button>
-                        <div id="baseSawmillProgressWrap" class="base-mini-progress"><div id="baseSawmillProgressFill" class="base-mini-progress-fill"></div></div>
-                        <button id="mapManualBtn_sawmill" class="map-manual-btn" onclick="events.manualSaw()">Cut</button>
+                    <div class="base-building-node base-building-claypit-node">
+                        <button id="baseBuilding_claypit" class="base-building-label" onclick="events.selectBaseBuilding('claypit')">Clay Pit</button>
+                        <div id="baseClaypitProgressWrap" class="base-mini-progress"><div id="baseClaypitProgressFill" class="base-mini-progress-fill"></div></div>
+                        <button id="mapManualBtn_claypit" class="map-manual-btn" onclick="events.manualLumber()">Dig</button>
                     </div>
+                    <div class="base-building-node base-building-kiln-node">
+                        <button id="baseBuilding_kiln" class="base-building-label" onclick="events.selectBaseBuilding('kiln')">Kiln</button>
+                        <div id="baseKilnProgressWrap" class="base-mini-progress"><div id="baseKilnProgressFill" class="base-mini-progress-fill"></div></div>
+                        <button id="mapManualBtn_kiln" class="map-manual-btn" onclick="events.manualSaw()">Fire</button>
+                    </div>
+                    <button id="baseBuilding_lumbermill" class="base-building-label base-building-lumbermill" onclick="events.selectBaseBuilding('lumbermill')">Claypit</button>
                     <button id="mapManualBtn_inn" class="map-manual-btn base-map-btn-inn" onclick="events.advertiseInn()">Advertise</button>
                 </div>
                 <div id="baseBuildingInfo" class="base-info-panel"></div>
@@ -98,7 +103,7 @@
             <div id="tabPane_leveling" class="tab-pane">
                 <div class="pane-title">Leveling</div>
                 <div class="muted-text">Class: <span id="currentClassText"></span> (<span id="classPerLevelText"></span>)</div>
-                <div class="leveling-header-row"><div class="leveling-kv">Level <span id="levelText"></span></div><div class="leveling-kv">Points <span id="attributePointsText"></span></div></div>
+                <div class="leveling-header-row"><div class="leveling-kv">Level <span id="levelText"></span></div><div id="levelingPointsWrap" class="leveling-kv">Points <span id="attributePointsText"></span></div></div>
                 <div class="prog-label-row">Exp <span id="levelExpText"></span></div>
                 <div class="prog-track"><div id="levelTabExpFill" class="prog-fill prog-fill-level"></div></div>
                 <div class="leveling-stat-grid">
@@ -123,14 +128,14 @@
                         <div class="showthis"></div>
                     </div>
                 </div>
-                <div class="row-buttons row-buttons-wrap">
+                <div id="levelingAssignButtons" class="row-buttons row-buttons-wrap">
                     <button class="tab-button" onclick="events.assignAttribute('str')">+ Str</button>
                     <button class="tab-button" onclick="events.assignAttribute('con')">+ Con</button>
                     <button class="tab-button" onclick="events.assignAttribute('spd')">+ Spd</button>
                     <button class="tab-button" onclick="events.assignAttribute('soul')">+ Soul</button>
                     <button class="tab-button" onclick="events.clearAttributePlan()">Clear Plan</button>
                 </div>
-                <div class="pane-subtitle">Attribute Plan</div>
+                <div id="attributePlanTitle" class="pane-subtitle">Attribute Plan</div>
                 <div id="attributePlanList" class="plan-list"></div>
             </div>
 
@@ -139,6 +144,7 @@
                 <div class="row-buttons">
                     <button id="skillSubTab_combat" class="tab-button" onclick="events.switchSkillsTab('combat')">Combat</button>
                     <button id="skillSubTab_town" class="tab-button" onclick="events.switchSkillsTab('town')">Town</button>
+                    <button id="skillSubTab_foraging" class="tab-button" onclick="events.switchSkillsTab('foraging')">Foraging</button>
                     <button id="skillSubTab_class" class="tab-button" onclick="events.switchSkillsTab('class')">Class</button>
                 </div>
                 <div id="combatStarsInventory" class="base-row muted-text"></div>
@@ -176,6 +182,7 @@
         <div id="battlefieldWrap">
             <div id="battlefield">
                 <div id="waveInfo">Waves</div>
+                <div id="rangeMarkers"></div>
                 <div id="attackLines"></div>
                 <div id="playerStack">
                     <div id="playerAvatarWrap">

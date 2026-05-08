@@ -204,6 +204,62 @@ const SKILL_DEFINITION_ROWS = [
         triggerText: "Trigger: each time you press a manual town action."
     },
     {
+        key: "technique",
+        name: "Technique",
+        category: "foraging",
+        unlockCostGold: 60,
+        shortDescription: "Improve harvest hits.",
+        guestArchetype: "Old Lumberjack",
+        guestRarity: 6,
+        affectedStat: "none",
+        rewardText: function(sk) {
+            return `Reward: +${sk.level || 0} harvest damage.`;
+        },
+        triggerText: "Trigger: each harvest hit."
+    },
+    {
+        key: "quick_rest",
+        name: "Quick Rest",
+        category: "foraging",
+        unlockCostGold: 60,
+        shortDescription: "Recover stamina from successful gathering.",
+        guestArchetype: "Trail Forager",
+        guestRarity: 5,
+        affectedStat: "none",
+        rewardText: function(sk) {
+            return `Reward: +${round2((sk.level || 0) * 0.25)} stamina per gathered unit kill.`;
+        },
+        triggerText: "Trigger: each gathered unit kill."
+    },
+    {
+        key: "breathing",
+        name: "Breathing",
+        category: "foraging",
+        unlockCostGold: 60,
+        shortDescription: "Increase stamina capacity over time.",
+        guestArchetype: "Mountain Hermit",
+        guestRarity: 4,
+        affectedStat: "none",
+        rewardText: function(sk) {
+            return `Reward: +${(sk.level || 0) * 2} base stamina (max and current).`;
+        },
+        triggerText: "Trigger: each second while foraging."
+    },
+    {
+        key: "planning",
+        name: "Planning",
+        category: "foraging",
+        unlockCostGold: 60,
+        shortDescription: "Ambush preparation for first strikes.",
+        guestArchetype: "Pathfinder",
+        guestRarity: 5,
+        affectedStat: "none",
+        rewardText: function(sk) {
+            return `Reward: first hit on each unit gets +${(sk.level || 0) * 10}% damage.`;
+        },
+        triggerText: "Trigger: each 50 px moved while foraging."
+    },
+    {
         key: "toughness_warrior",
         name: "Toughness",
         category: "class",
@@ -544,7 +600,8 @@ let skills = {
         if (stars.bronze) starCount++;
         if (stars.silver) starCount++;
         if (stars.gold) starCount++;
-        const starMult = Math.pow(2, starCount);
+        // Additive star scaling per design: 0 stars x1, 1 star x2, 2 stars x4, 3 stars x6.
+        const starMult = starCount > 0 ? (starCount * 2) : 1;
         return {
             talentMult: talentMult,
             levelMult: levelMult,

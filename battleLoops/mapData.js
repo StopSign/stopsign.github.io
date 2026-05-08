@@ -3,26 +3,38 @@ mapData.getDefaultMaps = function() {
     return [
         mapData.createMap({
             key: "map_1",
-            name: "Green Plains",
+            name: "Northern Forest",
+            description: "Relatively peaceful forest trails. Very easy.",
             seed: 5556,
             baseDifficulty: 1,
             zones: [
-                mapData.createZone(3, "melee", 0, 3000, 1, 1.5, 3, 1),
-                mapData.createZone(4, "melee", 12000, 3000, 1.2, 1, 4, 1),
-                mapData.createZone(1, "ranged", 22000, 0, 1.4, 1, 10, 2),
-                mapData.createZone(5, "melee", 26000, 8000, 1.6, 0.75, 4, 1.2),
-                mapData.createZone(6, "melee", 30000, 3000, 1.8, 1.25, 4, 1.2)
+                mapData.createZone(2, "melee", 0, 250, 1, 1.8, 3, 1),
+                mapData.createZone(2, "melee", 16000, 250, 1.5, 1.5, 4, 1.2),
+                mapData.createZone(2, "melee", 32000, 250, 2, 1, 8, 1.5),
+            ],
+            forageZones: [
+                mapData.createForageZone(1, "tree", 200, 0, 10, 1, "logs", 1),
+                mapData.createForageZone(2, "tree", 300, 1, 20, 1, "logs", 1.2)
             ]
         }),
         mapData.createMap({
             key: "map_2",
-            name: "Ash Barrens",
+            name: "Eastern Forest",
+            description: "More dangerous than the north, but still manageable. Easy.",
             seed: 424242,
             baseDifficulty: 1.6,
             zones: [
-                mapData.createZone(16, "melee", 0, 10000, 1.2, 1, 24, 1),
-                mapData.createZone(22, "melee", 9000, 12000, 1.35, 1, 36, 1),
-                mapData.createZone(30, "melee", 21000, 15000, 1.55, 1, 52, 1)
+                mapData.createZone(3, "melee", 0, 200, 1, 1.5, 3, 1),
+                mapData.createZone(4, "melee", 16000, 150, 1.2, 1, 4, 1.2),
+                mapData.createZone(5, "melee", 30000, 200, 1.5, 0.75, 8, 1.5),
+                mapData.createZone(2, "melee", 36000, 500, 1.8, 1.25, 10, 1.8),
+                mapData.createZone(3, "melee", 50000, 200, 2, 1, 20, 2)
+            ],
+            forageZones: [
+                mapData.createForageZone(10, "bush", 165, 0, 5, 1, "lumber", 1),
+                mapData.createForageZone(6, "ore_vein", 185, 0, 9, 1, "ironOre", 1.3),
+                mapData.createForageZone(8, "bush", 170, 1, 6, 1, "lumber", 1.1),
+                mapData.createForageZone(5, "ore_vein", 190, 1, 11, 1, "ironOre", 1.4)
             ]
         }),
         mapData.createMap({
@@ -32,9 +44,9 @@ mapData.getDefaultMaps = function() {
             baseDifficulty: 1.4,
             requiredClassKey: "warrior",
             zones: [
-                mapData.createZone(28, "melee", 0, 12000, 0.9, 1, 22, 1),
-                mapData.createZone(34, "melee", 9000, 13000, 1.0, 1, 30, 1),
-                mapData.createZone(40, "melee", 20000, 14000, 1.1, 1, 40, 1)
+                mapData.createZone(28, "melee", 0, 780, 0.9, 1, 22, 1),
+                mapData.createZone(34, "melee", 9000, 845, 1.0, 1, 30, 1),
+                mapData.createZone(40, "melee", 20000, 910, 1.1, 1, 40, 1)
             ]
         }),
         mapData.createMap({
@@ -44,9 +56,9 @@ mapData.getDefaultMaps = function() {
             baseDifficulty: 1.45,
             requiredClassKey: "rogue",
             zones: [
-                mapData.createZone(16, "ranged", 0, 12000, 1.0, 1, 22, 1),
-                mapData.createZone(22, "ranged", 10000, 13000, 1.1, 1, 32, 1),
-                mapData.createZone(28, "ranged", 21000, 14000, 1.2, 1, 44, 1)
+                mapData.createZone(16, "ranged", 0, 780, 1.0, 1, 22, 1),
+                mapData.createZone(22, "ranged", 10000, 845, 1.1, 1, 32, 1),
+                mapData.createZone(28, "ranged", 21000, 910, 1.2, 1, 44, 1)
             ]
         }),
         mapData.createMap({
@@ -56,9 +68,9 @@ mapData.getDefaultMaps = function() {
             baseDifficulty: 2.1,
             requiredClassKey: "hunter",
             zones: [
-                mapData.createZone(4, "melee", 0, 12000, 2.2, 1, 26, 1),
-                mapData.createZone(5, "melee", 10000, 14000, 2.4, 1, 36, 1),
-                mapData.createZone(6, "melee", 23000, 15000, 2.7, 1, 52, 1)
+                mapData.createZone(4, "melee", 0, 780, 2.2, 1, 26, 1),
+                mapData.createZone(5, "melee", 10000, 910, 2.4, 1, 36, 1),
+                mapData.createZone(6, "melee", 23000, 975, 2.7, 1, 52, 1)
             ]
         })
     ];

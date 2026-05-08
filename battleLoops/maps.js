@@ -1,14 +1,14 @@
 let mapData = {
-    createZone: function(totalEnemies, enemyType, startTimeMs, spawnEveryMs, difficulty, hpDamageTradeRatio, goldPerEnemy, expBasePerEnemy) {
+    createZone: function(totalEnemies, enemyType, startTimeMs, distanceBetweenUnits, difficulty, hpDamageTradeRatio, goldPerEnemy, expBasePerEnemy) {
         const safeEnemies = Math.max(1, totalEnemies || 1);
-        const safeSpawnEveryMs = Math.max(0, spawnEveryMs || 0);
+        const safeDistanceBetweenUnits = Math.max(0, distanceBetweenUnits || 0);
         return {
             name: "",
             totalEnemies: safeEnemies,
             difficulty: difficulty || 1,
             startTimeMs: Math.max(0, startTimeMs || 0),
-            spawnEveryMs: safeSpawnEveryMs,
-            lengthMs: Math.max(0, safeSpawnEveryMs * Math.max(0, safeEnemies - 1)),
+            distanceBetweenUnits: safeDistanceBetweenUnits,
+            lengthMs: Math.max(0, safeDistanceBetweenUnits * Math.max(0, safeEnemies - 1)),
             enemyType: enemyType || "melee",
             goldPerEnemy: goldPerEnemy !== undefined ? Math.max(0, goldPerEnemy) : 1,
             hpDamageTradeRatio: hpDamageTradeRatio !== undefined ? Math.max(0.01, hpDamageTradeRatio) : 1,
@@ -17,21 +17,49 @@ let mapData = {
     },
     createMap: function(config) {
         const zones = config.zones || [];
+        const forageZones = config.forageZones || [];
         let totalDurationMs = 0;
         for (let i = 0; i < zones.length; i++) {
             const z = zones[i];
             z.name = `Wave ${i + 1}`;
             totalDurationMs = Math.max(totalDurationMs, z.startTimeMs);
         }
+        for (let i = 0; i < forageZones.length; i++) {
+            const fz = forageZones[i];
+            fz.name = fz.name || `Forage ${i + 1}`;
+        }
         return {
             key: config.key,
             name: config.name,
+            description: config.description || "",
             seed: config.seed,
             baseDifficulty: config.baseDifficulty || 1,
             requiredClassKey: config.requiredClassKey || "",
             zones: zones,
+            forageZones: forageZones,
             totalDurationMs: totalDurationMs
         };
+    },
+    createForageZone: function(totalEnemies, unitType, distanceBetweenUnits, index, baseHp, rewardAmount, rewardResource, expBasePerEnemy) {
+        return {
+            name: "",
+            totalEnemies: Math.max(1, totalEnemies || 1),
+            unitType: unitType || "tree",
+            distanceBetweenUnits: Math.max(0, distanceBetweenUnits || 0),
+            index: Math.max(0, index || 0),
+            baseHp: Math.max(1, baseHp || 10),
+            rewardAmount: Math.max(0, rewardAmount || 1),
+            rewardResource: rewardResource || "logs",
+            expBasePerEnemy: Math.max(0, expBasePerEnemy || 1)
+        };
+    },
+    getMapTotalEnemies: function(mapDefinition) {
+        const zones = mapDefinition && mapDefinition.zones ? mapDefinition.zones : [];
+        let total = 0;
+        for (let i = 0; i < zones.length; i++) {
+            total += Math.max(0, zones[i].totalEnemies || 0);
+        }
+        return Math.max(1, total);
     },
     getMapTotalDurationMs: function(mapDefinition) {
         return mapDefinition && mapDefinition.totalDurationMs ? mapDefinition.totalDurationMs : 0;
@@ -77,7 +105,7 @@ let mapData = {
             totalDifficulty,
             ratio,
             enemyType: z.enemyType || "melee",
-            spawnEveryMs: z.spawnEveryMs || 0,
+            distanceBetweenUnits: z.distanceBetweenUnits || 0,
             startTimeMs: z.startTimeMs
         };
     },
@@ -86,7 +114,9 @@ let mapData = {
         const rows = [];
         const count = Math.max(1, z.totalEnemies || 1);
         const cr = mapData.computeZoneCombatAndRewards(mapDefinition, zoneIndex, tierMultiplier);
-        const intervalMs = Math.max(0, cr.spawnEveryMs || 0);
+        const travelSpd = Math.max(1, gameData.battle.enemyTravelSpeedPxPerSecond || 1);
+        const spacingPx = Math.max(0, cr.distanceBetweenUnits || 0);
+        const intervalMs = spacingPx > 0 ? (spacingPx / travelSpd) * 1000 : 0;
         for (let i = 0; i < count; i++) {
             rows.push({
                 zoneIndex: zoneIndex,
@@ -103,7 +133,7 @@ let mapData = {
     },
     getTierDifficultyMultiplier: function(tier) {
         if (tier <= 0) return 1;
-        if (tier === 1) return 5;
-        return 25;
+        if (tier === 1) return 3;
+        return 9;
     }
 };

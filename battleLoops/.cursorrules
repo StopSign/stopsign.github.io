@@ -17,3 +17,5 @@ You are assisting with a vanilla JavaScript idle game. Follow these strict archi
 16. SMALL VISUAL CHANGES: Prefer updating style values over adding/removing classes for simple visibility/color changes.
 17. STATS TAB MAINTENANCE: Whenever a new combat stat source is added, update the Stats tab tooltip/source breakdown in `viewUpdating.js` to keep formulas transparent.
 18. SAVEFILE MANAGEMENT: Do not add any code that fixes savefiles for the newer version. Right now there are no savefiles to fix.
+19. ASSIST ME: Suggest ways to improve the code, preferring suggestions on what you just added.
+20. FAIL LOUD ON OWNED STATE: Do not add defensive null/undefined guards for core game state we create ourselves (for example `data.progress.base.chapel`, `data.battle`, `data.progress.base.resources`). Access directly and let missing state throw so bugs are visible and fixed at the source.

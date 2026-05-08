@@ -13,10 +13,18 @@ let engine = {
         return { battleWidth: bw, playableWidth: playable, laneWidth, inset, laneCount: n };
     },
     runTownTick: function(elapsedMs) {
+        engine.updateTownTimers(elapsedMs);
+        engine.updateMapClearProgressTimers(elapsedMs);
         engine.updateManualActionCooldowns(elapsedMs);
         engine.updateBaseProduction(elapsedMs);
         engine.updateInnGuests(elapsedMs);
         engine.updateLibraryResearch(elapsedMs);
+    },
+    updateTownTimers: function(elapsedMs) {
+        if (!data.progress) {
+            return;
+        }
+        data.progress.classSwitchCooldownMs = Math.max(0, (data.progress.classSwitchCooldownMs || 0) - elapsedMs);
     },
     gameTick: function() {
         data.gameSettings.ticksForSeconds++;
@@ -33,24 +41,67 @@ let engine = {
         }
         data.battle.elapsedMs += tickMs * engine.getBattleTimeRateMultiplier();
 
-        engine.spawnZonesForTime();
+        if (data.battle.mode === "foraging") {
+            engine.spawnForageZonesForTime();
+        } else {
+            engine.spawnZonesForTime();
+        }
         engine.updateEnemyMovement(tickMs);
         engine.updateCurrentZoneInfo();
-        engine.updateFortitudeWaveTracking();
-        engine.updateRecoveryEachSecond(tickMs);
-        engine.updatePassiveSkillExp(tickMs);
-        engine.updateClassEffects(tickMs);
+        if (data.battle.mode !== "foraging") {
+            engine.updateFortitudeWaveTracking();
+            engine.updateRecoveryEachSecond(tickMs);
+            engine.updatePassiveSkillExp(tickMs);
+            engine.updateClassEffects(tickMs);
+        } else {
+            engine.updateForagingPassiveSkillExp(tickMs);
+        }
         engine.updateTargeting();
         engine.updatePlayerAttack(tickMs);
-        engine.updateRangedAttack(tickMs);
-        engine.updateEnemyAttacks(tickMs);
+        if (data.battle.mode !== "foraging") {
+            engine.updateRangedAttack(tickMs);
+            engine.updateEnemyAttacks(tickMs);
+        }
         engine.cleanupDeadEnemies();
-        engine.grantZoneWorkersIfCleared();
         engine.checkMapCompletion();
         engine.checkLossCondition();
     },
+    getMapClearState: function(mapKey) {
+        if (!data.progress.mapClearProgress) {
+            data.progress.mapClearProgress = {};
+        }
+        if (!data.progress.mapClearProgress[mapKey]) {
+            data.progress.mapClearProgress[mapKey] = { pct: 0, activeMs: 0 };
+        }
+        return data.progress.mapClearProgress[mapKey];
+    },
+    addMapClearProgressForKill: function(mapKey) {
+        const state = engine.getMapClearState(mapKey);
+        state.pct = Math.min(100, state.pct + 0.5);
+        if (state.pct >= 100 && state.activeMs <= 0) {
+            state.activeMs = 120000;
+        }
+    },
+    updateMapClearProgressTimers: function(tickMs) {
+        const states = data.progress.mapClearProgress || {};
+        const keys = Object.keys(states);
+        for (let i = 0; i < keys.length; i++) {
+            const st = states[keys[i]];
+            if (!st || st.activeMs <= 0) continue;
+            st.activeMs = Math.max(0, st.activeMs - tickMs);
+            if (st.activeMs <= 0) {
+                st.pct = 0;
+            } else {
+                st.pct = Math.max(0, Math.min(100, (st.activeMs / 120000) * 100));
+            }
+        }
+    },
+    isMapHarvestReady: function(mapKey) {
+        const st = engine.getMapClearState(mapKey);
+        return (st.pct >= 100 || st.activeMs > 0) && st.activeMs > 0;
+    },
     getRangedEnemyStopY: function(playerTopY, battleHeight) {
-        return playerTopY - (battleHeight * 0.4);
+        return playerTopY - 200;
     },
     isLaneSpotOccupied: function(targetLane, yPx, sizePx, skipEnemyId) {
         for (let i = 0; i < data.battle.enemies.length; i++) {
@@ -105,12 +156,12 @@ let engine = {
             const lm = engine.getBattleLaneMetrics();
             const spdMult = 1 + ((data.battle.levelState && data.battle.levelState.levelSpd) || 0) * 0.1;
             const travelSpd = gd.enemyTravelSpeedPxPerSecond;
-            const intervalMs = Math.max(0, z.spawnEveryMs || 0);
-            const spacingPx = rows.length > 1 && intervalMs > 0 ? (intervalMs / 1000) * travelSpd : 0;
+            const spacingPx = rows.length > 1 ? Math.max(0, z.distanceBetweenUnits || 0) : 0;
             for (let ri = 0; ri < rows.length; ri++) {
                 const row = rows[ri];
                 row.lane = Math.floor(laneRng() * gd.laneCount);
-                row.sizeLaneFill = gd.enemySizeLaneFill;
+                // Combat battlefield units are 20% smaller (visual + collision footprint).
+                row.sizeLaneFill = gd.enemySizeLaneFill * 0.8;
                 row.speedPxPerSecond = travelSpd;
                 row.attackCooldownMs = gd.enemyAttackCooldownMs;
                 row.attackTimerMs = gd.enemyAttackCooldownMs;
@@ -153,35 +204,104 @@ let engine = {
             }
         }
     },
-    grantZoneWorkersIfCleared: function() {
+    spawnForageZonesForTime: function() {
         const map = initialize.getCurrentMapDefinition();
-        if (!map || !data.battle.zoneRewardGrantedInCycle) return;
-        const tier = data.battle.mapTier || 0;
-        const reward = tier <= 0 ? 1 : (tier === 1 ? 2 : 3);
-        for (let i = 0; i < map.zones.length; i++) {
-            if (!data.battle.zoneSpawnedInCycle[i] || data.battle.zoneRewardGrantedInCycle[i]) continue;
-            let alive = false;
+        const zones = map && map.forageZones ? map.forageZones : [];
+        if (!zones.length) {
+            return;
+        }
+        const gd = gameData.battle;
+        const lm = engine.getBattleLaneMetrics();
+        const grouped = {};
+        for (let i = 0; i < zones.length; i++) {
+            const idx = Math.max(0, zones[i].index || 0);
+            if (!grouped[idx]) grouped[idx] = [];
+            grouped[idx].push(zones[i]);
+        }
+        const indexes = Object.keys(grouped).map(function(v) { return parseInt(v, 10); }).sort(function(a, b) { return a - b; });
+        let nextIndex = -1;
+        for (let i = 0; i < indexes.length; i++) {
+            const idx = indexes[i];
+            if (data.battle.forageIndexSpawned[idx]) continue;
+            nextIndex = idx;
+            break;
+        }
+        if (nextIndex < 0) return;
+        let hasEarlierAlive = false;
+        for (let i = 0; i < indexes.length; i++) {
+            const idx = indexes[i];
+            if (idx >= nextIndex) break;
             for (let j = 0; j < data.battle.enemies.length; j++) {
                 const e = data.battle.enemies[j];
-                if (e.alive && e.zoneIndex === i) {
-                    alive = true;
+                if (e.alive && e.forageIndex === idx) {
+                    hasEarlierAlive = true;
                     break;
                 }
             }
-            if (!alive) {
-                data.battle.zoneRewardGrantedInCycle[i] = true;
-                if (!data.progress.mapWorkersFound) data.progress.mapWorkersFound = {};
-                if (data.progress.mapWorkersFound[map.key] === undefined) data.progress.mapWorkersFound[map.key] = 0;
-                const maxWorkers = (map.zones.length || 0) * 6;
-                data.progress.mapWorkersFound[map.key] = Math.min(maxWorkers, data.progress.mapWorkersFound[map.key] + reward);
+            if (hasEarlierAlive) break;
+        }
+        if (hasEarlierAlive) return;
+        const spawnGroup = grouped[nextIndex] || [];
+        for (let gi = 0; gi < spawnGroup.length; gi++) {
+            const z = spawnGroup[gi];
+            const spacingPx = Math.max(0, z.distanceBetweenUnits || 0);
+            for (let ri = 0; ri < Math.max(1, z.totalEnemies || 1); ri++) {
+                const kind = z.unitType || "tree";
+                const prevCount = data.battle.forageKindSpawnCounts[kind] || 0;
+                data.battle.forageKindSpawnCounts[kind] = prevCount + 1;
+                const hpScale = Math.pow(1.05, prevCount);
+                const maxHp = Math.max(1, Math.ceil((z.baseHp || 10) * hpScale));
+                const enemyId = data.battle.enemyIdCounter++;
+                const lane = (gi + ri) % gd.laneCount;
+                const enemySize = kind === "tree" ? Math.floor(lm.laneWidth * 0.35) : Math.floor(lm.laneWidth * 0.28);
+                const yPx = -enemySize - (ri * spacingPx);
+                const staminaCost = kind === "tree" ? 2 : (kind === "ore_vein" ? 3 : 1);
+                data.battle.enemies.push({
+                    id: enemyId,
+                    lane: lane,
+                    spawnTimeMs: 0,
+                    zoneIndex: nextIndex,
+                    forageIndex: nextIndex,
+                    enemyType: kind,
+                    yPx: yPx,
+                    prevYPx: yPx,
+                    sizePx: enemySize,
+                    hp: maxHp,
+                    maxHp: maxHp,
+                    speedPxPerSecond: 0,
+                    attackDamage: 0,
+                    attackCooldownMs: 0,
+                    attackTimerMs: 0,
+                    gain: z.rewardAmount || 1,
+                    rewardResource: z.rewardResource || "logs",
+                    expBase: z.expBasePerEnemy !== undefined ? z.expBasePerEnemy : 1,
+                    inRange: false,
+                    rangedReady: false,
+                    alive: true,
+                    hasEnteredMeleeQueue: false,
+                    blockedByRangedMs: 0,
+                    staminaCost: staminaCost,
+                    firstHitTaken: false
+                });
             }
         }
+        data.battle.forageIndexSpawned[nextIndex] = true;
+    },
+    grantWorkersForMapStar: function(mapKey, amount) {
+        if (!mapKey || !amount || amount <= 0) return;
+        if (!data.progress.mapWorkersFound) data.progress.mapWorkersFound = {};
+        if (data.progress.mapWorkersFound[mapKey] === undefined) data.progress.mapWorkersFound[mapKey] = 0;
+        const maxWorkers = 6;
+        data.progress.mapWorkersFound[mapKey] = Math.min(maxWorkers, data.progress.mapWorkersFound[mapKey] + amount);
     },
     updateEnemyMovement: function(tickMs) {
         const battleHeight = viewData.layout.battlefieldHeightPx || 500;
         const playerTopY = viewData.layout.playerTopPx || (battleHeight - 65);
         const deltaSeconds = tickMs / 1000;
         const pushBonus = engine.getEnemyPushBonusPxPerSecond();
+        if ((data.battle.mode || "combat") === "foraging" && pushBonus > 0) {
+            data.battle.forageMoveAccumPx = (data.battle.forageMoveAccumPx || 0) + (pushBonus * deltaSeconds);
+        }
         const laneBuckets = [];
         for (let l = 0; l < gameData.battle.laneCount; l++) {
             laneBuckets[l] = [];
@@ -418,6 +538,17 @@ let engine = {
             engine.addClassBarProgress("B", 50 * inMelee * sec);
         }
     },
+    updateForagingPassiveSkillExp: function(tickMs) {
+        const sec = tickMs / 1000;
+        engine.onSkillTrigger("breathing", sec);
+        const planningStepPx = 50;
+        const moved = data.battle.forageMoveAccumPx || 0;
+        if (moved >= planningStepPx) {
+            const triggers = Math.floor(moved / planningStepPx);
+            data.battle.forageMoveAccumPx = moved - (triggers * planningStepPx);
+            engine.onSkillTrigger("planning", triggers);
+        }
+    },
     addClassBarProgress: function(which, amount) {
         const key = which === "A" ? "classPowerA" : "classPowerB";
         const cur = data.battle[key] || 0;
@@ -468,6 +599,33 @@ let engine = {
             return;
         }
         engine.enqueueMeleeLineFx(target);
+        if ((data.battle.mode || "combat") === "foraging") {
+            const staminaCost = target.staminaCost || 1;
+            if (data.battle.player.hp <= 0 || data.battle.player.hp < staminaCost) {
+                data.battle.player.hp = 0;
+                return;
+            }
+            data.battle.player.hp = Math.max(0, data.battle.player.hp - staminaCost);
+            let harvestDamage = data.battle.player.attackDamage;
+            const techLv = skills.isSkillUnlocked("technique") && data.progress.skills.technique ? (data.progress.skills.technique.level || 0) : 0;
+            harvestDamage += techLv;
+            if (!target.firstHitTaken) {
+                const planningLv = skills.isSkillUnlocked("planning") && data.progress.skills.planning ? (data.progress.skills.planning.level || 0) : 0;
+                harvestDamage *= (1 + (planningLv * 0.1));
+                target.firstHitTaken = true;
+            }
+            target.hp -= Math.max(1, Math.round(harvestDamage));
+            p.attackTimerMs = engine.getEffectiveMeleeCooldownMs() + Math.min(0, p.attackTimerMs);
+            engine.onSkillTrigger("technique", 1);
+            if (target.hp <= 0) {
+                target.hp = 0;
+                target.alive = false;
+                data.battle.activeTargetId = null;
+                engine.removeEnemyFromMeleeQueue(target.id);
+                engine.onEnemyKilled(target);
+            }
+            return;
+        }
         let meleeDamage = data.battle.player.attackDamage;
         const executeLv = engine.getUnlockedSkillLevel("execute");
         if (executeLv > 0 && target.hp <= (target.maxHp * 0.5)) {
@@ -526,6 +684,24 @@ let engine = {
         }
     },
     updateCurrentZoneInfo: function() {
+        if ((data.battle.mode || "combat") === "foraging") {
+            const zones = [];
+            let alive = 0;
+            for (let i = 0; i < data.battle.enemies.length; i++) {
+                if (data.battle.enemies[i].alive) alive++;
+            }
+            zones.push({
+                index: 0,
+                name: "Foraging",
+                remainingSpawnMs: 0,
+                difficulty: initialize.getCurrentMapDefinition().baseDifficulty || 1,
+                remainingEnemies: alive,
+                gold: 0,
+                exp: 0
+            });
+            data.battle.activeZones = zones;
+            return;
+        }
         const map = initialize.getCurrentMapDefinition();
         const zones = [];
         if (!map || !map.zones) {
@@ -634,6 +810,15 @@ let engine = {
         if (data.battle.state !== "running") {
             return;
         }
+        if ((data.battle.mode || "combat") === "foraging") {
+            const st = engine.getMapClearState(data.progress.currentMapKey);
+            if ((st.activeMs || 0) <= 0) {
+                engine.saveRunHistoryIfNeeded();
+                data.battle.state = "completed";
+                data.gameSettings.stop = true;
+            }
+            return;
+        }
         const map = initialize.getCurrentMapDefinition();
         const allSpawned = data.battle.zoneSpawnedInCycle && data.battle.zoneSpawnedInCycle.length
             ? data.battle.zoneSpawnedInCycle.every(function(v) { return !!v; })
@@ -656,13 +841,42 @@ let engine = {
         data.gameSettings.stop = true;
     },
     onEnemyKilled: function(enemy) {
+        const chapel = data.progress.base && data.progress.base.chapel;
+        const growthUnlocked = !!(chapel && chapel.growthBlessingUnlocked);
+        if ((data.battle.mode || "combat") === "foraging") {
+            const res = data.progress.base && data.progress.base.resources;
+            if (res) {
+                const key = enemy.rewardResource || "logs";
+                const amount = Math.ceil((enemy.gain || 1) * (initialize.getCurrentMapDefinition().baseDifficulty || 1));
+                if (res[key] === undefined) {
+                    res[key] = 0;
+                }
+                res[key] += amount;
+            }
+            if (growthUnlocked) {
+                data.battle.levelState.exp += (enemy.expBase !== undefined ? enemy.expBase : 1);
+            }
+            data.battle.enemiesKilled++;
+            engine.onSkillTrigger("quick_rest", 1);
+            const qr = skills.isSkillUnlocked("quick_rest") && data.progress.skills.quick_rest ? (data.progress.skills.quick_rest.level || 0) : 0;
+            if (qr > 0) {
+                data.battle.player.hp = Math.min(data.battle.player.maxHp, data.battle.player.hp + (qr * 0.25));
+            }
+            if (growthUnlocked) {
+                engine.resolveLevelUps();
+            }
+            return;
+        }
         const gain = enemy.gain || 1;
         const expBase = enemy.expBase !== undefined ? enemy.expBase : 1;
         const expGain = engine.expAwardFromEnemyExpBase(expBase);
         const goldGain = engine.goldAwardFromEnemyGain(gain);
         data.progress.gold += goldGain;
-        data.battle.levelState.exp += expGain;
+        if (growthUnlocked) {
+            data.battle.levelState.exp += expGain;
+        }
         data.battle.enemiesKilled++;
+        engine.addMapClearProgressForKill(data.progress.currentMapKey);
         engine.onSkillTrigger("wisdom", 1);
         engine.onSkillTrigger("greed", 1);
         engine.onSkillTrigger("scavenger", Math.sqrt(Math.max(0, goldGain)));
@@ -672,7 +886,9 @@ let engine = {
         if ((data.progress.currentClassKey || "none") === "rogue") {
             engine.addClassBarProgress("A", 300);
         }
-        engine.resolveLevelUps();
+        if (growthUnlocked) {
+            engine.resolveLevelUps();
+        }
     },
     /** Matches `onEnemyKilled`: wisdom scales exp from zone `expBase`. */
     expAwardFromEnemyExpBase: function(expBase) {
@@ -689,6 +905,12 @@ let engine = {
         return baseGoldPart * Math.pow(1.05, greedLevel);
     },
     resolveLevelUps: function() {
+        const chapel = data.progress.base && data.progress.base.chapel;
+        const growthUnlocked = !!(chapel && chapel.growthBlessingUnlocked);
+        const plannedGrowthUnlocked = !!(chapel && chapel.plannedGrowthBlessingUnlocked);
+        if (!growthUnlocked) {
+            return;
+        }
         while (data.battle.levelState.exp >= data.battle.levelState.expToLevel) {
             data.battle.levelState.exp -= data.battle.levelState.expToLevel;
             data.battle.levelState.level++;
@@ -697,16 +919,18 @@ let engine = {
             data.battle.levelState.levelCon += cls.perLevel.con || 0;
             data.battle.levelState.levelSpd += cls.perLevel.spd || 0;
             data.battle.levelState.expToLevel = Math.floor(data.battle.levelState.expToLevel * 1.35);
-            const nextLevel = data.battle.levelState.level;
-            const planned = engine.getPlanEntryForLevel(nextLevel);
-            if (planned) {
-                engine.applyAttributePoint(planned.attribute, false);
-            } else {
-                data.battle.levelState.unassignedPoints++;
+            if (plannedGrowthUnlocked) {
+                const nextLevel = data.battle.levelState.level;
+                const planned = engine.getPlanEntryForLevel(nextLevel);
+                if (planned) {
+                    engine.applyAttributePoint(planned.attribute, false);
+                } else {
+                    data.battle.levelState.unassignedPoints++;
+                }
+                const discLv = data.progress.skills.discipline ? data.progress.skills.discipline.level : 0;
+                data.battle.levelState.unassignedPoints += discLv;
+                engine.onSkillTrigger("discipline", 1);
             }
-            const discLv = data.progress.skills.discipline ? data.progress.skills.discipline.level : 0;
-            data.battle.levelState.unassignedPoints += discLv;
-            engine.onSkillTrigger("discipline", 1);
             initialize.calcPlayerStats(false);
         }
     },
@@ -728,6 +952,11 @@ let engine = {
         return null;
     },
     applyAttributePoint: function(attributeKey, shouldRecordPlan) {
+        const chapel = data.progress.base && data.progress.base.chapel;
+        const plannedGrowthUnlocked = !!(chapel && chapel.plannedGrowthBlessingUnlocked);
+        if (!plannedGrowthUnlocked) {
+            return false;
+        }
         if (data.battle.levelState.unassignedPoints <= 0 && shouldRecordPlan) {
             return false;
         }
@@ -818,6 +1047,9 @@ let engine = {
         return out;
     },
     getBattleTimeRateMultiplier: function() {
+        if ((data.battle.mode || "combat") === "foraging") {
+            return 1;
+        }
         if (!engine.areActiveZonesCleared()) {
             return 1;
         }
@@ -859,6 +1091,13 @@ let engine = {
     beginTierTransition: function() {
         const map = initialize.getCurrentMapDefinition();
         const mapKey = map ? map.key : data.progress.currentMapKey;
+        const clearState = engine.getMapClearState(mapKey);
+        const addStarClearProgress = function(pct) {
+            clearState.pct = Math.min(100, (clearState.pct || 0) + pct);
+            if (clearState.pct >= 100 && (clearState.activeMs || 0) <= 0) {
+                clearState.activeMs = 120000;
+            }
+        };
         if (!data.progress.mapStars[mapKey]) {
             data.progress.mapStars[mapKey] = { bronze: false, silver: false, gold: false };
         }
@@ -868,6 +1107,8 @@ let engine = {
             if (!stars.bronze) {
                 stars.bronze = true;
                 data.progress.stars.bronze = (data.progress.stars.bronze || 0) + 1;
+                engine.grantWorkersForMapStar(mapKey, 1);
+                addStarClearProgress(10);
             }
             data.battle.transitionMessage = "Bronze star received! Raising difficulty...";
             data.battle.nextTierAfterCountdown = 1;
@@ -878,6 +1119,8 @@ let engine = {
             if (!stars.silver) {
                 stars.silver = true;
                 data.progress.stars.silver = (data.progress.stars.silver || 0) + 1;
+                engine.grantWorkersForMapStar(mapKey, 2);
+                addStarClearProgress(15);
             }
             data.battle.transitionMessage = "Silver star received! Raising difficulty...";
             data.battle.nextTierAfterCountdown = 2;
@@ -887,6 +1130,8 @@ let engine = {
         if (!stars.gold) {
             stars.gold = true;
             data.progress.stars.gold = (data.progress.stars.gold || 0) + 1;
+            engine.grantWorkersForMapStar(mapKey, 3);
+            addStarClearProgress(25);
         }
         data.battle.transitionMessage = "Gold star received! Map complete.";
         data.battle.nextTierAfterCountdown = 0;
@@ -1042,8 +1287,11 @@ let engine = {
         }
         const impactLv = engine.getUnlockedSkillLevel("impact");
         if (impactLv > 0) {
-            const topHalf = rt.yPx < ((viewData.layout.battlefieldHeightPx || 500) * 0.5);
-            if (topHalf) {
+            const battleHeight = viewData.layout.battlefieldHeightPx || 500;
+            const playerTopY = viewData.layout.playerTopPx || (battleHeight - 65);
+            const line300FtY = playerTopY - 300;
+            const enemyBottomPast300 = (rt.yPx + rt.sizePx) >= line300FtY;
+            if (enemyBottomPast300) {
                 engine.onSkillTrigger("impact", 1);
             }
             const knockbackPx = rt.speedPxPerSecond * 0.1 * impactLv;
@@ -1159,6 +1407,14 @@ let engine = {
             return;
         }
         const d = skills._byKey[skillKey];
+        const mode = data.battle.mode || "combat";
+        const cat = d && d.category ? d.category : "combat";
+        if (mode === "foraging" && cat !== "foraging") {
+            return;
+        }
+        if (mode !== "foraging" && cat === "foraging") {
+            return;
+        }
         if (d && d.classKey && d.classKey !== (data.progress.currentClassKey || "none")) {
             return;
         }
@@ -1198,6 +1454,8 @@ let engine = {
             initialize.calcPlayerStats(false);
         } else if (skill.key === "finesse" || skill.key === "longshot") {
             initialize.calcPlayerStats(false);
+        } else if (skill.key === "technique" || skill.key === "breathing") {
+            initialize.calcPlayerStats(false);
         }
     },
     saveRunHistoryIfNeeded: function() {
@@ -1207,10 +1465,28 @@ let engine = {
         const runSeconds = data.battle.elapsedMs / 1000;
         const runGold = Math.max(0, data.progress.gold - data.battle.runStartGold);
         const runGoldPerSecond = runSeconds > 0 ? runGold / runSeconds : 0;
+        const runLevel = data.battle.levelState ? (data.battle.levelState.level || 0) : 0;
+        const runKills = data.battle.enemiesKilled || 0;
+        const talentRows = [];
+        const start = data.battle.runSkillTalentStart || {};
+        const progressSkills = data.progress.skills || {};
+        const keys = Object.keys(progressSkills);
+        for (let i = 0; i < keys.length; i++) {
+            const k = keys[i];
+            const sk = progressSkills[k];
+            const t0 = start[k] !== undefined ? start[k] : 0;
+            const t1 = sk && sk.talentLevel ? sk.talentLevel : 0;
+            if (t1 > t0) {
+                talentRows.push(`${sk.name} talent ${t0}->${t1}`);
+            }
+        }
         data.progress.runHistory.unshift({
             survivedSeconds: runSeconds,
             goldGained: runGold,
-            goldPerSecond: runGoldPerSecond
+            goldPerSecond: runGoldPerSecond,
+            level: runLevel,
+            kills: runKills,
+            talentRows: talentRows
         });
         if (data.progress.runHistory.length > 10) {
             data.progress.runHistory = data.progress.runHistory.slice(0, 10);
@@ -1255,24 +1531,36 @@ let engine = {
             }
         }
 
-        if ((base.lumbermill.assignedWorkers || 0) > 0) {
-            base.lumbermill.progress += ((base.lumbermill.assignedWorkers || 0) / 20) * sec;
-            const madeStone = Math.floor(base.lumbermill.progress);
+        if ((base.claypit.assignedWorkers || 0) > 0) {
+            base.claypit.progress += ((base.claypit.assignedWorkers || 0) / 20) * sec;
+            const madeStone = Math.floor(base.claypit.progress);
             if (madeStone > 0) {
-                base.lumbermill.progress -= madeStone;
+                base.claypit.progress -= madeStone;
                 res.stone += madeStone;
             }
         }
 
-        if ((base.sawmill.assignedWorkers || 0) > 0 && res.stone > 0) {
-            base.sawmill.progress += ((base.sawmill.assignedWorkers || 0) / 20) * sec;
-            const potentialCutStone = Math.floor(base.sawmill.progress);
-            if (potentialCutStone > 0) {
-                const cutMade = Math.min(potentialCutStone, res.stone);
+        if ((base.kiln.assignedWorkers || 0) > 0 && res.stone > 0) {
+            base.kiln.progress += ((base.kiln.assignedWorkers || 0) / 20) * sec;
+            const potentialBricks = Math.floor(base.kiln.progress);
+            if (potentialBricks > 0) {
+                const cutMade = Math.min(potentialBricks, res.stone);
                 if (cutMade > 0) {
-                    base.sawmill.progress -= cutMade;
+                    base.kiln.progress -= cutMade;
                     res.stone -= cutMade;
-                    res.cutStone += cutMade;
+                    res.bricks += cutMade;
+                }
+            }
+        }
+        if ((base.lumbermill.assignedWorkers || 0) > 0 && res.logs > 0) {
+            base.lumbermill.progress += ((base.lumbermill.assignedWorkers || 0) / 20) * sec;
+            const potentialLumber = Math.floor(base.lumbermill.progress);
+            if (potentialLumber > 0) {
+                const lumberMade = Math.min(potentialLumber, res.logs);
+                if (lumberMade > 0) {
+                    base.lumbermill.progress -= lumberMade;
+                    res.logs -= lumberMade;
+                    res.lumber += lumberMade;
                 }
             }
         }
@@ -1345,8 +1633,9 @@ let engine = {
         const dec = tickMs * cdMult;
         b.mine.manualCooldownMs = Math.max(0, (b.mine.manualCooldownMs || 0) - dec);
         b.smith.manualCooldownMs = Math.max(0, (b.smith.manualCooldownMs || 0) - dec);
+        b.claypit.manualCooldownMs = Math.max(0, (b.claypit.manualCooldownMs || 0) - dec);
+        b.kiln.manualCooldownMs = Math.max(0, (b.kiln.manualCooldownMs || 0) - dec);
         b.lumbermill.manualCooldownMs = Math.max(0, (b.lumbermill.manualCooldownMs || 0) - dec);
-        b.sawmill.manualCooldownMs = Math.max(0, (b.sawmill.manualCooldownMs || 0) - dec);
         b.inn.advertiseCooldownMs = Math.max(0, (b.inn.advertiseCooldownMs || 0) - dec);
     },
     applyManualProgressBoost: function(kind) {
@@ -1365,14 +1654,18 @@ let engine = {
             workerCount = b.smith.assignedWorkers || 0;
             cooldownRef = b.smith;
             progressRef = b.smith;
+        } else if (kind === "claypit") {
+            workerCount = b.claypit.assignedWorkers || 0;
+            cooldownRef = b.claypit;
+            progressRef = b.claypit;
+        } else if (kind === "kiln") {
+            workerCount = b.kiln.assignedWorkers || 0;
+            cooldownRef = b.kiln;
+            progressRef = b.kiln;
         } else if (kind === "lumbermill") {
             workerCount = b.lumbermill.assignedWorkers || 0;
             cooldownRef = b.lumbermill;
             progressRef = b.lumbermill;
-        } else if (kind === "sawmill") {
-            workerCount = b.sawmill.assignedWorkers || 0;
-            cooldownRef = b.sawmill;
-            progressRef = b.sawmill;
         } else {
             return false;
         }
@@ -1392,7 +1685,7 @@ let engine = {
     getTotalAssignedWorkers: function() {
         const b = data.progress.base;
         if (!b) return 0;
-        return (b.mine.assignedWorkers || 0) + (b.smith.assignedWorkers || 0) + (b.lumbermill.assignedWorkers || 0) + (b.sawmill.assignedWorkers || 0) + (b.library.assignedWorkers || 0);
+        return (b.mine.assignedWorkers || 0) + (b.smith.assignedWorkers || 0) + (b.claypit.assignedWorkers || 0) + (b.kiln.assignedWorkers || 0) + (b.lumbermill.assignedWorkers || 0) + (b.library.assignedWorkers || 0);
     },
     getTotalFoundWorkers: function() {
         const mw = data.progress.mapWorkersFound || {};
@@ -1447,7 +1740,7 @@ let engine = {
         if (!lib || !lib.skillResearch) {
             return "";
         }
-        const categories = ["combat", "town", "class"];
+        const categories = ["combat", "town", "foraging", "class"];
         for (let ci = 0; ci < categories.length; ci++) {
             const cat = categories[ci];
             for (let i = 0; i < skills.keysInOrder.length; i++) {

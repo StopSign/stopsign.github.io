@@ -25,7 +25,7 @@ body {
     justify-content: center;
 }
 
-@media (max-width: 1399px) {
+@media (max-width: 1419px) {
     #mainLayout {
         display: block;
         max-width: 690px;
@@ -96,7 +96,6 @@ button {
 #menuContent {
     flex: 1 1 auto;
     min-height: 0;
-    overflow-y: auto;
     height: auto;
 }
 
@@ -305,14 +304,22 @@ button {
 
 .enemy-token {
     position: absolute;
+    box-sizing: border-box;
+    overflow: visible;
+    z-index: 20;
+}
+
+.enemy-shape-layer {
+    position: absolute;
+    inset: 0;
     border: 1px solid #4b1515;
     box-sizing: border-box;
     overflow: hidden;
+    z-index: 1;
 }
 
-.enemy-token-ranged {
+.enemy-shape-layer.enemy-token-ranged {
     border: 1px solid #1b3f74;
-    /* Same horizontal bbox as melee squares; apex at top mid */
     clip-path: polygon(50% 0%, 100% 38%, 81% 100%, 19% 100%, 0% 38%);
 }
 
@@ -330,11 +337,13 @@ button {
     justify-content: center;
     align-items: center;
     gap: 1px;
-    font-size: 14.4px;
+    font-size: 12px;
     line-height: 1.1;
     text-shadow: 0 0 2px #000, 0 0 4px #000;
     pointer-events: none;
     color: #f5f5f5;
+    white-space: nowrap;
+    z-index: 3;
 }
 
 #waveInfo {
@@ -346,6 +355,30 @@ button {
     background: rgba(10, 15, 23, 0.8);
     border: 1px solid var(--border-color);
     padding: 4px 8px;
+}
+
+#rangeMarkers {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 6;
+}
+
+.range-marker-line {
+    position: absolute;
+    left: 0;
+    right: 0;
+    border-top: 1px dashed rgba(186, 194, 222, 0.14);
+}
+
+.range-marker-label {
+    position: absolute;
+    right: 6px;
+    top: -8px;
+    font-size: 10px;
+    color: rgba(186, 194, 222, 0.55);
+    background: rgba(10, 15, 23, 0.35);
+    padding: 0 4px;
 }
 
 .enemy-stat-atk-wrap {
@@ -670,15 +703,18 @@ button {
 .base-building-chapel { top: 20px; left: 5%; }
 .base-building-inn { top: 50px; left: 24%; }
 .base-building-guild { top: 76px; left: 43%; }
-.base-building-market { top: 12px; left: 46%; }
+.base-building-townhall { top: 12px; left: 46%; }
+.base-building-market { top: 108px; left: 36%; }
 .base-building-garden { bottom: 62px; right: 31%; }
 .base-building-workshop { top: 84px; right: 12%; }
 .base-building-mage_tower { top: 24px; right: 12%; }
 .base-building-library { bottom: 18px; left: 46%; }
+.base-building-lumbermill { bottom: 58px; left: 24%; }
 .base-building-mine-node { top: 118px; left: 24px; }
 .base-building-smith-node { top: 118px; left: 120px; }
-.base-building-lumbermill-node { bottom: 18px; left: 24px; }
-.base-building-sawmill-node { bottom: 18px; left: 120px; }
+.base-building-claypit-node { bottom: 18px; left: 24px; }
+.base-building-kiln-node { bottom: 18px; left: 120px; }
+.base-building-library-node { bottom: 18px; left: 46%; }
 
 .base-info-panel {
     border: 1px solid var(--border-color);
@@ -720,15 +756,15 @@ button {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 8px;
+    gap: 4px;
     margin-bottom: 8px;
 }
 
 .base-worker-cap-label {
-    flex: 1 1 140px;
-    text-align: right;
+    text-align: center;
     min-width: 0;
     font-size: 12px;
+    margin: 0 2px;
 }
 
 .base-gap-top {

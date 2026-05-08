@@ -27,8 +27,12 @@ let events = {
         initialize.resetBattleFromSeed();
     },
     switchTab: function(tabKey) {
-        const validTabs = ["base", "leveling", "stats", "skills", "travel", "history", "options"];
-        data.battle.currentTab = validTabs.indexOf(tabKey) >= 0 ? tabKey : "leveling";
+        const validTabs = ["base", "stats", "skills", "travel", "history", "options"];
+        const chapel = data.progress.base && data.progress.base.chapel;
+        if (chapel && chapel.growthBlessingUnlocked) {
+            validTabs.splice(1, 0, "leveling");
+        }
+        data.battle.currentTab = validTabs.indexOf(tabKey) >= 0 ? tabKey : "base";
         createView.showCurrentTab();
     },
     setHideMaxedUpgrades: function(enabled) {
@@ -43,14 +47,18 @@ let events = {
         createView.updateLayoutMeasurements();
     },
     switchSkillsTab: function(tabKey) {
-        const valid = ["combat", "town", "class"];
+        const valid = ["combat", "town", "foraging", "class"];
         data.progress.selectedSkillsTab = valid.indexOf(tabKey) >= 0 ? tabKey : "combat";
         createView.createSkillElements();
         createView.clearCacheQueue();
     },
     switchLibraryTab: function(tabKey) {
-        const valid = ["combat", "town", "class"];
+        const valid = ["combat", "town", "foraging", "class"];
         data.progress.selectedLibraryTab = valid.indexOf(tabKey) >= 0 ? tabKey : "combat";
+    },
+    switchTownHallTab: function(tabKey) {
+        const valid = ["buildings", "town_upgrades"];
+        data.progress.selectedTownHallTab = valid.indexOf(tabKey) >= 0 ? tabKey : "buildings";
     },
     switchCompactPane: function(paneKey) {
         const valid = ["menus", "battle"];
@@ -66,11 +74,40 @@ let events = {
         events.showSelectedBaseBuildingPanels(buildingKey);
     },
     showSelectedBaseBuildingPanels: function(buildingKey) {
-        const keys = ["chapel", "mine", "smith", "inn", "guild", "library", "lumbermill", "sawmill", "workshop", "garden"];
+        const keys = ["chapel", "townhall", "mine", "smith", "inn", "guild", "market", "mage_tower", "library", "claypit", "kiln", "lumbermill", "workshop", "garden"];
         for (let i = 0; i < keys.length; i++) {
             const k = keys[i];
             view.updateVal(`basePanel_${k}`, k === buildingKey ? "" : "none", "style.display");
         }
+    },
+    buyTownHallUnlock: function(key) {
+        const th = data.progress.base && data.progress.base.townhall;
+        const res = data.progress.base && data.progress.base.resources;
+        if (!th || !res || !th.upgradeCosts || !th.unlocks) {
+            return;
+        }
+        if (!th.unlocks.hasOwnProperty(key) || th.unlocks[key]) return;
+        const c = th.upgradeCosts[key] || {};
+        if (data.progress.gold < (c.gold || 0) || res.ironBar < (c.bars || 0) || res.bricks < (c.bricks || 0) || res.lumber < (c.lumber || 0)) return;
+        data.progress.gold -= (c.gold || 0);
+        res.ironBar -= (c.bars || 0);
+        res.bricks -= (c.bricks || 0);
+        res.lumber -= (c.lumber || 0);
+        th.unlocks[key] = true;
+    },
+    buyTownUpgradeHireLocal: function() {
+        const th = data.progress.base && data.progress.base.townhall;
+        if (!th || !th.townUpgrades) return;
+        const tu = th.townUpgrades;
+        if ((tu.hireLocalBought || 0) >= 2) return;
+        const cost = tu.hireLocalNextGoldCost || 5;
+        if (data.progress.gold < cost) return;
+        data.progress.gold -= cost;
+        tu.hireLocalBought = (tu.hireLocalBought || 0) + 1;
+        tu.hireLocalNextGoldCost = (tu.hireLocalBought >= 2) ? 0 : 15;
+        const mapKey = data.progress.currentMapKey || "map_1";
+        if (!data.progress.mapWorkersFound) data.progress.mapWorkersFound = {};
+        data.progress.mapWorkersFound[mapKey] = (data.progress.mapWorkersFound[mapKey] || 0) + 1;
     },
     spendGoldIfPossible: function(cost) {
         if (data.progress.gold < cost) {
@@ -84,13 +121,33 @@ let events = {
         if (!base || base.chapel.autoRetryEnabled) {
             return;
         }
-        if (!events.spendGoldIfPossible(50)) {
+        if (!events.spendGoldIfPossible(10)) {
             return;
         }
         base.chapel.autoRetryEnabled = true;
         if (data.battle && data.battle.state === "dead") {
             data.progress.autoRetryCountdownSec = 10;
         }
+    },
+    buyChapelGrowthBlessing: function() {
+        const base = data.progress.base;
+        if (!base || base.chapel.growthBlessingUnlocked) {
+            return;
+        }
+        if (!events.spendGoldIfPossible(20)) {
+            return;
+        }
+        base.chapel.growthBlessingUnlocked = true;
+    },
+    buyChapelPlannedGrowthBlessing: function() {
+        const base = data.progress.base;
+        if (!base || base.chapel.plannedGrowthBlessingUnlocked) {
+            return;
+        }
+        if (!events.spendGoldIfPossible(300)) {
+            return;
+        }
+        base.chapel.plannedGrowthBlessingUnlocked = true;
     },
     buyInnOpenForGuests: function() {
         const inn = data.progress.base.inn;
@@ -160,11 +217,11 @@ let events = {
         if (w.bowBuilt) {
             return;
         }
-        if (data.progress.gold < 200 || res.cutStone < 20) {
+        if (data.progress.gold < 200 || res.bricks < 20) {
             return;
         }
         data.progress.gold -= 200;
-        res.cutStone -= 20;
+        res.bricks -= 20;
         w.bowBuilt = true;
         data.progress.rangedAttackEnabled = true;
     },
@@ -209,11 +266,11 @@ let events = {
         if (data.progress.gold < (lib.nextGearGoldCost || 0)) {
             return;
         }
-        if (res.cutStone < (lib.nextGearStoneCost || 0)) {
+        if (res.bricks < (lib.nextGearStoneCost || 0)) {
             return;
         }
         data.progress.gold -= (lib.nextGearGoldCost || 0);
-        res.cutStone -= (lib.nextGearStoneCost || 0);
+        res.bricks -= (lib.nextGearStoneCost || 0);
         lib.gearSets = (lib.gearSets || 0) + 1;
         lib.nextGearGoldCost = (lib.nextGearGoldCost || 10) + 10;
         lib.nextGearStoneCost = (lib.nextGearStoneCost || 0) + 5;
@@ -228,15 +285,20 @@ let events = {
     queueClassSwitch: function(classKey) {
         if (!data.progress.unlockedClasses[classKey]) return;
         if (data.progress.currentClassKey === classKey) return;
+        if ((data.progress.classSwitchCooldownMs || 0) > 0) return;
         data.progress.pendingClassKey = classKey;
+        data.progress.classSwitchCooldownMs = 300000;
     },
-    buyLumberjack: function() { events.buyWorkerGear("lumbermill"); },
+    buyLumberjack: function() { events.buyWorkerGear("claypit"); },
     manualLumber: function() {
-        engine.applyManualProgressBoost("lumbermill");
+        engine.applyManualProgressBoost("claypit");
     },
-    buySawmillWorker: function() { events.buyWorkerGear("sawmill"); },
+    buyKilnWorker: function() { events.buyWorkerGear("kiln"); },
     manualSaw: function() {
-        engine.applyManualProgressBoost("sawmill");
+        engine.applyManualProgressBoost("kiln");
+    },
+    manualWood: function() {
+        engine.applyManualProgressBoost("lumbermill");
     },
     buyWorkshopInnRoom: function() {
         const w = data.progress.base.workshop;
@@ -244,11 +306,11 @@ let events = {
             return;
         }
         const res = data.progress.base.resources;
-        if (data.progress.gold < w.innRoomNextGoldCost || res.cutStone < w.innRoomNextLumberCost) {
+        if (data.progress.gold < w.innRoomNextGoldCost || res.bricks < w.innRoomNextLumberCost) {
             return;
         }
         data.progress.gold -= w.innRoomNextGoldCost;
-        res.cutStone -= w.innRoomNextLumberCost;
+        res.bricks -= w.innRoomNextLumberCost;
         w.innRoomUpgradesBought++;
         w.innRoomNextGoldCost += 100;
         w.innRoomNextLumberCost += 10;
@@ -271,14 +333,44 @@ let events = {
     unassignWorker: function(kind) {
         if (!engine.tryUnassignWorker(kind)) return;
     },
+    adjustWorkers: function(kind, mode) {
+        if (!mode) return;
+        if (mode === "one_inc") {
+            engine.tryAssignWorker(kind);
+            return;
+        }
+        if (mode === "one_dec") {
+            engine.tryUnassignWorker(kind);
+            return;
+        }
+        if (mode === "ten_inc") {
+            for (let i = 0; i < 10; i++) {
+                if (!engine.tryAssignWorker(kind)) break;
+            }
+            return;
+        }
+        if (mode === "ten_dec") {
+            for (let i = 0; i < 10; i++) {
+                if (!engine.tryUnassignWorker(kind)) break;
+            }
+            return;
+        }
+        if (mode === "all_inc") {
+            while (engine.tryAssignWorker(kind)) {}
+            return;
+        }
+        if (mode === "all_dec") {
+            while (engine.tryUnassignWorker(kind)) {}
+        }
+    },
     buyGardenMapManual: function(kind) {
         const g = data.progress.base.garden;
         const map = {
             inn: "mapManualInn",
             mine: "mapManualMine",
             smith: "mapManualSmith",
-            lumbermill: "mapManualLumbermill",
-            sawmill: "mapManualSawmill"
+            claypit: "mapManualClaypit",
+            kiln: "mapManualKiln"
         };
         const key = map[kind];
         if (!key || g[key]) {
@@ -290,12 +382,20 @@ let events = {
         g[key] = true;
     },
     assignAttribute: function(attributeKey) {
+        const chapel = data.progress.base && data.progress.base.chapel;
+        if (!chapel || !chapel.plannedGrowthBlessingUnlocked) {
+            return;
+        }
         const worked = engine.applyAttributePoint(attributeKey, true);
         if (!worked) {
             return;
         }
     },
     clearAttributePlan: function() {
+        const chapel = data.progress.base && data.progress.base.chapel;
+        if (!chapel || !chapel.plannedGrowthBlessingUnlocked) {
+            return;
+        }
         data.progress.attributePlan = [];
         initialize.applyPlanForCurrentLevel();
         initialize.calcPlayerStats(false);
@@ -323,6 +423,26 @@ let events = {
         const travelSeed = Math.floor(Math.random() * 0x7fffffff) + 1;
         initialize.resetSkillRunProgress();
         initialize.startFreshBattle(travelSeed, mapKey);
+    },
+    startHarvest: function(mapKey) {
+        const defs = data.progress.mapDefinitions || [];
+        let target = null;
+        for (let i = 0; i < defs.length; i++) {
+            if (defs[i].key === mapKey) {
+                target = defs[i];
+                break;
+            }
+        }
+        if (!target || target.requiredClassKey) {
+            return;
+        }
+        if (!engine.isMapHarvestReady(mapKey)) {
+            return;
+        }
+        data.progress.currentMapKey = mapKey;
+        initialize.startFreshBattle(Math.floor(Math.random() * 0x7fffffff) + 1, mapKey);
+        data.battle.mode = "foraging";
+        initialize.calcPlayerStats(true);
     },
     setRangedAttackEnabled: function(enabled) {
         const hasBow = !!(data.progress.base && data.progress.base.workshop && data.progress.base.workshop.bowBuilt);
