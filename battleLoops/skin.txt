@@ -1,0 +1,130 @@
+# Hot Spring Skin — Find / Replace
+#
+# Scope: battleLoops — *.js, *.html, *.css
+# Settings: Match case ON · Replace all · Run in order
+#
+# =============================================================================
+# THE OVERLAP (read this first)
+# =============================================================================
+#
+# The words "slap" and "sandal" mean TWO different things in this codebase:
+#
+#   A) INTRUDER RANGE (how enemies fight)
+#      - mapData.js:  createZone(count, "scoundrel", ...)  or  createZone(..., "lecher", ...)
+#      - maps.js:     intruderType: intruderType || "scoundrel"
+#      - engine.js:   intruder.intruderType === "lecher", lecherReady, slapQueue (queue of
+#                     intruders in reach — NOT your slap)
+#      Theme: close creeps = scoundrels, distant = lechers
+#      These tags describe UNIT RANGE, not the Madame's attacks.
+#
+#   B) MADAME COMBAT (player slap / sandal throw)
+#      - sandalAttack, baseSlapDamage, slapFlatBeforeStr, getEffectiveSlapCooldownMs
+#      - UI: "Slap attack", "Sandal attack", statsSlapText
+#      - engine.js:  pushAttackLineFx(target, "slap"), __OVERKILL__BoostKind: "slap"
+#      Theme: slap (close), sandal throw (far)
+#
+# If you run global  slap → slap  or  sandal → sandal  on the whole project, you will
+# wrongly rewrite createZone(5, "scoundrel", ...) into createZone(5, "slap", ...) and merge
+# two unrelated ideas.
+#
+# FIX: Before the four root swaps, move intruder-range "slap"/"sandal" strings to
+# scoundrel/lecher (step 1). Then root swaps only hit Madame combat leftovers.
+#
+# OR: Keep literal "slap"/"sandal" in map zones only — see "Alternative" at bottom.
+#
+# Player object stays `player` in code. Madame = UI copy only.
+#
+# =============================================================================
+# STEP 1 — Intruder range only (run BEFORE root swaps; matches real code today)
+# =============================================================================
+, "scoundrel",  →  , "scoundrel",
+, "lecher",  →  , "lecher",
+intruderType || "scoundrel"  →  intruderType || "scoundrel"
+intruderType === "lecher"  →  intruderType === "lecher"
+intruder.intruderType === "lecher"  →  intruder.intruderType === "lecher"
+intruder.intruderType !== "lecher"  →  intruder.intruderType !== "lecher"
+below.intruderType === "lecher"  →  below.intruderType === "lecher"
+intruder-token-lecher  →  intruder-token-lecher
+lecher_strike  →  lecher_strike
+blockedByLecher  →  blockedByLecher
+lecherReady  →  lecherReady
+
+# =============================================================================
+# STEP 2 — Root swaps (Madame combat compounds; safe after step 1)
+# =============================================================================
+sandal  →  sandal
+Sandal  →  Sandal
+slap  →  slap
+Slap  →  Slap
+
+# Step 2 renames e.g. sandalAttack → sandalAttack, slapQueue → slapQueue,
+# baseSlapDamage → baseSlapDamage, pushAttackLineFx(..., "slap"), etc.
+# It does NOT touch createZone(..., "scoundrel", ...) from step 1.
+
+# =============================================================================
+# STEP 3 — Other roots
+# =============================================================================
+intruder  →  intruder
+Intruder  →  Intruder
+intruder  →  intruder
+Intruder  →  Intruder
+Intruders  →  Intruders
+sandal  →  sandal
+Sandal  →  Sandal
+blade  →  firmer slap
+
+overkill  →  overkill
+kill  →  oust
+overkill  →  overkill
+Kill  →  Oust
+Kills  →  Ousted
+
+# =============================================================================
+# STEP 4 — Display phrases (longest first; skip 0 matches)
+# =============================================================================
+Hot Spring Loops  →  Hot Spring Loops
+Clear the Grounds  →  Clear the Grounds
+Intruders Cleared  →  Intruders Cleared
+Intruders respawn  →  scoundrels and lechers return
+Secondary Player Stats:  →  Madame's vigil:
+Sandal attack enabled  →  Sandal throws enabled
+Sandal attack  →  Sandal throw
+Slap attack  →  Slap
+Power strike  →  Warning slap
+You Died  →  Overwhelmed
+Hunter's sandal  →  Spare sandal
+Improve the inn and craft a sandal.  →  Improve the inn and stock spare sandals.
+Send you off with a better firmer slap each time.  →  Send you off with a firmer slap each time.
+Intruder in range  →  lecher in range
+Rogue cannot use sandal attacks.  →  This attendant cannot throw sandals.
+Requires Make sandal upgrade  →  Requires spare sandals in the workshop
+
+# =============================================================================
+# ALTERNATIVE — Keep "slap" / "sandal" in mapData zone tags (no scoundrel/lecher in data)
+# =============================================================================
+# Use this ONLY if you want createZone(..., "scoundrel", ...) to stay literally "slap".
+# Skip step 1 createZone lines (, "scoundrel", and , "lecher",) but still run intruderType
+# checks in engine if you want logic renamed to scoundrel/lecher.
+#
+# Or shield zones, run root swaps, unshield:
+#   , "scoundrel",  →  , "@@MELEE_RANGE@@",
+#   , "lecher",  →  , "@@RANGED_RANGE@@",
+#   (run step 2 root swaps)
+#   , "@@MELEE_RANGE@@",  →  , "scoundrel",
+#   , "@@RANGED_RANGE@@",  →  , "lecher",
+#
+# You still must handle intruderType || "scoundrel" separately — it is not in createZone lines.
+
+# =============================================================================
+# DO NOT
+# =============================================================================
+# sneak_attack — contains "attack"
+# tree, bush, ore_vein — forage types
+
+# =============================================================================
+# VERIFY
+# =============================================================================
+# Search:  createZone(.*"slap"   — should be 0 (that was never in real code)
+# Search:  createZone(.*"slap"  — 0 if you used step 1; OK if you used Alternative
+# Search:  "slap" / "sandal"    — only in comments, Alternative shields, or skill copy you fix by hand
+# Smoke: map_1 spawns scoundrels; rogue map spawns lechers; slap + sandal bars work

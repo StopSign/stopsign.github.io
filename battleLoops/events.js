@@ -16,7 +16,7 @@ let events = {
             data.progress.currentClassKey = data.progress.pendingClassKey;
             data.progress.pendingClassKey = "";
             if (data.progress.currentClassKey === "rogue") {
-                data.progress.rangedAttackEnabled = false;
+                data.progress.sandalAttackEnabled = false;
             }
             const mapDef = initialize.getCurrentMapDefinition();
             const reqClass = mapDef && mapDef.requiredClassKey ? mapDef.requiredClassKey : "";
@@ -26,17 +26,69 @@ let events = {
         }
         initialize.resetBattleFromSeed();
     },
-    switchTab: function(tabKey) {
-        const validTabs = ["base", "stats", "skills", "travel", "history", "options"];
+    endRunNow: function() {
+        if (!data.battle || data.battle.state !== "running") {
+            return;
+        }
+        data.battle.player.hp = 0;
+        engine.checkLossCondition();
+    },
+    skillsTabUnlocked: function() {
+        const th = data.progress.base && data.progress.base.townhall;
+        return !!(th && th.unlocks && th.unlocks.library);
+    },
+    /** Foraging skills / Library foraging tab unlock with Lumber mill */
+    foragingSkillsUnlocked: function() {
+        const th = data.progress.base && data.progress.base.townhall;
+        return !!(th && th.unlocks && th.unlocks.lumbermill);
+    },
+    mainMenuTabOrder: function() {
+        const tabs = ["base", "stats", "skills", "travel", "history", "options"];
         const chapel = data.progress.base && data.progress.base.chapel;
         if (chapel && chapel.growthBlessingUnlocked) {
-            validTabs.splice(1, 0, "leveling");
+            tabs.splice(1, 0, "leveling");
         }
+        if (!events.skillsTabUnlocked()) {
+            const ix = tabs.indexOf("skills");
+            if (ix >= 0) tabs.splice(ix, 1);
+        }
+        return tabs;
+    },
+    switchTab: function(tabKey) {
+        const validTabs = events.mainMenuTabOrder();
         data.battle.currentTab = validTabs.indexOf(tabKey) >= 0 ? tabKey : "base";
         createView.showCurrentTab();
+        createView.updateLayoutMeasurements();
+    },
+    markNewBaseContent: function(buildingKey, optionalTownHallSubtab) {
+        if (!data.progress.baseContentNotify) {
+            data.progress.baseContentNotify = { building: {}, subtab: {} };
+        }
+        if (!data.progress.baseContentNotify.building) {
+            data.progress.baseContentNotify.building = {};
+        }
+        if (!data.progress.baseContentNotify.subtab) {
+            data.progress.baseContentNotify.subtab = {};
+        }
+        if (buildingKey) {
+            data.progress.baseContentNotify.building[buildingKey] = true;
+        }
+        if (optionalTownHallSubtab) {
+            data.progress.baseContentNotify.subtab["townhall_" + optionalTownHallSubtab] = true;
+        }
     },
     setHideMaxedUpgrades: function(enabled) {
         data.progress.options.hideMaxedUpgrades = !!enabled;
+        if (typeof view !== "undefined" && view.updateBasePanel) {
+            view.updateBasePanel();
+        }
+    },
+    /** Sync hide-maxed checkbox from save (call after DOM caches exist; not per-frame). */
+    syncHideMaxedToggleFromSave: function() {
+        const el = viewData.cached.hideMaxedUpgradesToggle || document.getElementById("hideMaxedUpgradesToggle");
+        if (el) {
+            el.checked = !!(data.progress.options && data.progress.options.hideMaxedUpgrades);
+        }
     },
     setDisableCompactLayout: function(enabled) {
         if (!data.progress.options) {
@@ -48,17 +100,54 @@ let events = {
     },
     switchSkillsTab: function(tabKey) {
         const valid = ["combat", "town", "foraging", "class"];
-        data.progress.selectedSkillsTab = valid.indexOf(tabKey) >= 0 ? tabKey : "combat";
-        createView.createSkillElements();
-        createView.clearCacheQueue();
+        let t = valid.indexOf(tabKey) >= 0 ? tabKey : "combat";
+        if (t === "foraging" && !events.foragingSkillsUnlocked()) {
+            t = "combat";
+        }
+        data.progress.selectedSkillsTab = t;
+        view.updateSkillsListVisibility(t);
+        // User changed sub-tab: clear selection so the right panel is hidden.
+        data.progress.selectedSkillDetailKey = "";
+        view.applySkillDetailSelectionHighlight();
+        view.updateSkillInfoPanel();
+        createView.updateLayoutMeasurements();
+    },
+    /** Skills tab: show detail in right panel; star row clicks do not select. */
+    selectSkillForDetail: function(skillKey, ev) {
+        if (ev && ev.target && ev.target.closest && ev.target.closest(".skill-stars-controls")) {
+            return;
+        }
+        if (!skills.isSkillUnlocked(skillKey)) {
+            return;
+        }
+        const tab = data.progress.selectedSkillsTab || "combat";
+        const list = skills.getSkillKeysByCategory(data.progress.skills, tab);
+        if (list.indexOf(skillKey) < 0) {
+            return;
+        }
+        // Clicking the selected skill again toggles it off.
+        if (data.progress.selectedSkillDetailKey === skillKey) {
+            data.progress.selectedSkillDetailKey = "";
+        } else {
+            data.progress.selectedSkillDetailKey = skillKey;
+        }
+        view.applySkillDetailSelectionHighlight();
+        view.updateSkillInfoPanel();
     },
     switchLibraryTab: function(tabKey) {
         const valid = ["combat", "town", "foraging", "class"];
-        data.progress.selectedLibraryTab = valid.indexOf(tabKey) >= 0 ? tabKey : "combat";
+        let t = valid.indexOf(tabKey) >= 0 ? tabKey : "combat";
+        if (t === "foraging" && !events.foragingSkillsUnlocked()) {
+            t = "combat";
+        }
+        data.progress.selectedLibraryTab = t;
     },
     switchTownHallTab: function(tabKey) {
         const valid = ["buildings", "town_upgrades"];
         data.progress.selectedTownHallTab = valid.indexOf(tabKey) >= 0 ? tabKey : "buildings";
+        if (data.progress.baseContentNotify && data.progress.baseContentNotify.subtab) {
+            delete data.progress.baseContentNotify.subtab["townhall_" + data.progress.selectedTownHallTab];
+        }
     },
     switchCompactPane: function(paneKey) {
         const valid = ["menus", "battle"];
@@ -67,97 +156,60 @@ let events = {
         createView.updateLayoutMeasurements();
     },
     selectBaseBuilding: function(buildingKey) {
-        if (baseBuildingKeys.indexOf(buildingKey) < 0) {
+        if (townData.baseBuildingOrder.indexOf(buildingKey) < 0) {
             return;
         }
         data.progress.selectedBaseBuilding = buildingKey;
+        if (data.progress.baseContentNotify && data.progress.baseContentNotify.building) {
+            delete data.progress.baseContentNotify.building[buildingKey];
+        }
         events.showSelectedBaseBuildingPanels(buildingKey);
     },
     showSelectedBaseBuildingPanels: function(buildingKey) {
-        const keys = ["chapel", "townhall", "mine", "smith", "inn", "guild", "market", "mage_tower", "library", "claypit", "kiln", "lumbermill", "workshop", "garden"];
-        for (let i = 0; i < keys.length; i++) {
-            const k = keys[i];
+        for (let i = 0; i < townData.baseBuildingOrder.length; i++) {
+            const k = townData.baseBuildingOrder[i];
             view.updateVal(`basePanel_${k}`, k === buildingKey ? "" : "none", "style.display");
         }
     },
-    buyTownHallUnlock: function(key) {
-        const th = data.progress.base && data.progress.base.townhall;
-        const res = data.progress.base && data.progress.base.resources;
-        if (!th || !res || !th.upgradeCosts || !th.unlocks) {
+    buyUpgrade: function(scopeKey, upgradeKey) {
+        if (scopeKey === "townhallUnlock") {
+            const slot = townData.townhallUnlockGetDef(upgradeKey);
+            if (!slot.canBuy()) {
+                return;
+            }
+            const cost = townData.resolveCost(slot);
+            if (!townData.canAffordCost(cost)) {
+                return;
+            }
+            townData.deductCost(cost);
+            slot.onBuy();
             return;
         }
-        if (!th.unlocks.hasOwnProperty(key) || th.unlocks[key]) return;
-        const c = th.upgradeCosts[key] || {};
-        if (data.progress.gold < (c.gold || 0) || res.ironBar < (c.bars || 0) || res.bricks < (c.bricks || 0) || res.lumber < (c.lumber || 0)) return;
-        data.progress.gold -= (c.gold || 0);
-        res.ironBar -= (c.bars || 0);
-        res.bricks -= (c.bricks || 0);
-        res.lumber -= (c.lumber || 0);
-        th.unlocks[key] = true;
-    },
-    buyTownUpgradeHireLocal: function() {
-        const th = data.progress.base && data.progress.base.townhall;
-        if (!th || !th.townUpgrades) return;
-        const tu = th.townUpgrades;
-        if ((tu.hireLocalBought || 0) >= 2) return;
-        const cost = tu.hireLocalNextGoldCost || 5;
-        if (data.progress.gold < cost) return;
-        data.progress.gold -= cost;
-        tu.hireLocalBought = (tu.hireLocalBought || 0) + 1;
-        tu.hireLocalNextGoldCost = (tu.hireLocalBought >= 2) ? 0 : 15;
-        const mapKey = data.progress.currentMapKey || "map_1";
-        if (!data.progress.mapWorkersFound) data.progress.mapWorkersFound = {};
-        data.progress.mapWorkersFound[mapKey] = (data.progress.mapWorkersFound[mapKey] || 0) + 1;
+        const bcfg = townData.buildings[scopeKey];
+        const up = bcfg.upgrades[upgradeKey];
+        if (up.canBuy && !up.canBuy()) {
+            return;
+        }
+        const cost = townData.resolveCost(up, scopeKey);
+        if (!townData.canAffordCost(cost)) {
+            return;
+        }
+        townData.deductCost(cost);
+        if (up.progressCostPurchase) {
+            townData.applyProgressCostPurchase(scopeKey);
+        } else if (up.onBuy) {
+            up.onBuy();
+        }
     },
     spendGoldIfPossible: function(cost) {
+        if (typeof isDebug !== "undefined" && isDebug) {
+            return true;
+        }
         if (data.progress.gold < cost) {
             return false;
         }
         data.progress.gold -= cost;
         return true;
-    },
-    buyChapelAutoRetry: function() {
-        const base = data.progress.base;
-        if (!base || base.chapel.autoRetryEnabled) {
-            return;
-        }
-        if (!events.spendGoldIfPossible(10)) {
-            return;
-        }
-        base.chapel.autoRetryEnabled = true;
-        if (data.battle && data.battle.state === "dead") {
-            data.progress.autoRetryCountdownSec = 10;
-        }
-    },
-    buyChapelGrowthBlessing: function() {
-        const base = data.progress.base;
-        if (!base || base.chapel.growthBlessingUnlocked) {
-            return;
-        }
-        if (!events.spendGoldIfPossible(20)) {
-            return;
-        }
-        base.chapel.growthBlessingUnlocked = true;
-    },
-    buyChapelPlannedGrowthBlessing: function() {
-        const base = data.progress.base;
-        if (!base || base.chapel.plannedGrowthBlessingUnlocked) {
-            return;
-        }
-        if (!events.spendGoldIfPossible(300)) {
-            return;
-        }
-        base.chapel.plannedGrowthBlessingUnlocked = true;
-    },
-    buyInnOpenForGuests: function() {
-        const inn = data.progress.base.inn;
-        if (inn.openForGuests) {
-            return;
-        }
-        if (!events.spendGoldIfPossible(100)) {
-            return;
-        }
-        inn.openForGuests = true;
     },
     advertiseInn: function() {
         engine.applyManualAdvertise();
@@ -175,58 +227,25 @@ let events = {
             }
         }
     },
-    buyMineMiner: function() { events.buyWorkerGear("mine"); },
+    buyMineMiner: function() {
+        events.buyUpgrade("mine", "gear");
+    },
     manualMine: function() {
         engine.applyManualProgressBoost("mine");
     },
-    buySmithSmelter: function() { events.buyWorkerGear("smith"); },
+    buySmithSmelter: function() {
+        events.buyUpgrade("smith", "gear");
+    },
     manualSmelt: function() {
         engine.applyManualProgressBoost("smith");
     },
-    buySmithAttackUpgrade: function() {
-        const smith = data.progress.base.smith;
-        const res = data.progress.base.resources;
-        if (smith.attackUpgradesBought >= 10) {
-            return;
-        }
-        const cost = smith.nextAttackUpgradeCostBars;
-        if (res.ironBar < cost) {
-            return;
-        }
-        res.ironBar -= cost;
-        smith.attackUpgradesBought++;
-        smith.nextAttackUpgradeCostBars += 20;
-        initialize.calcPlayerStats(false);
-    },
-    buySmithArmorUpgrade: function() {
-        const smith = data.progress.base.smith;
-        const res = data.progress.base.resources;
-        if (smith.armorUpgradesBought >= 6) {
-            return;
-        }
-        if (res.ironBar < 30) {
-            return;
-        }
-        res.ironBar -= 30;
-        smith.armorUpgradesBought++;
-        initialize.calcPlayerStats(false);
-    },
-    buyWorkshopBow: function() {
-        const w = data.progress.base.workshop;
-        const res = data.progress.base.resources;
-        if (w.bowBuilt) {
-            return;
-        }
-        if (data.progress.gold < 200 || res.bricks < 20) {
-            return;
-        }
-        data.progress.gold -= 200;
-        res.bricks -= 20;
-        w.bowBuilt = true;
-        data.progress.rangedAttackEnabled = true;
-    },
     buyLibrarySkill: function(skillKey) {
         if (skills.keysInOrder.indexOf(skillKey) < 0) {
+            return;
+        }
+        const dSk = skills._byKey[skillKey];
+        const cls = data.progress.currentClassKey || "none";
+        if (dSk && dSk.classKey && (cls === "none" || cls !== dSk.classKey)) {
             return;
         }
         const lib = data.progress.base.library;
@@ -243,8 +262,14 @@ let events = {
             researched: false,
             paused: false,
             progress: 0,
-            required: cost * skills.getSkillResearchCostMultiplier(skillKey)
+            required: skills.getSkillresearchRequired(skillKey)
         };
+        if (typeof isDebug !== "undefined" && isDebug) {
+            const r = lib.skillResearch[skillKey];
+            r.progress = r.required || 0;
+            r.researched = true;
+            lib.unlockedSkills[skillKey] = true;
+        }
     },
     toggleLibraryResearchPause: function(skillKey) {
         const lib = data.progress.base && data.progress.base.library;
@@ -257,31 +282,6 @@ let events = {
         }
         rs.paused = !rs.paused;
     },
-    buyLibraryDesk: function() {
-        const lib = data.progress.base && data.progress.base.library;
-        const res = data.progress.base && data.progress.base.resources;
-        if (!lib || !res) {
-            return;
-        }
-        if (data.progress.gold < (lib.nextGearGoldCost || 0)) {
-            return;
-        }
-        if (res.bricks < (lib.nextGearStoneCost || 0)) {
-            return;
-        }
-        data.progress.gold -= (lib.nextGearGoldCost || 0);
-        res.bricks -= (lib.nextGearStoneCost || 0);
-        lib.gearSets = (lib.gearSets || 0) + 1;
-        lib.nextGearGoldCost = (lib.nextGearGoldCost || 10) + 10;
-        lib.nextGearStoneCost = (lib.nextGearStoneCost || 0) + 5;
-    },
-    buyClass: function(classKey) {
-        const d = initialize.getClassDef(classKey);
-        if (!d || d.key === "none") return;
-        if (data.progress.unlockedClasses[classKey]) return;
-        if (!events.spendGoldIfPossible(d.buyCostGold || 500)) return;
-        data.progress.unlockedClasses[classKey] = true;
-    },
     queueClassSwitch: function(classKey) {
         if (!data.progress.unlockedClasses[classKey]) return;
         if (data.progress.currentClassKey === classKey) return;
@@ -289,43 +289,20 @@ let events = {
         data.progress.pendingClassKey = classKey;
         data.progress.classSwitchCooldownMs = 300000;
     },
-    buyLumberjack: function() { events.buyWorkerGear("claypit"); },
+    buyLumberjack: function() {
+        events.buyUpgrade("claypit", "gear");
+    },
     manualLumber: function() {
         engine.applyManualProgressBoost("claypit");
     },
-    buyKilnWorker: function() { events.buyWorkerGear("kiln"); },
+    buyKilnWorker: function() {
+        events.buyUpgrade("kiln", "gear");
+    },
     manualSaw: function() {
         engine.applyManualProgressBoost("kiln");
     },
     manualWood: function() {
         engine.applyManualProgressBoost("lumbermill");
-    },
-    buyWorkshopInnRoom: function() {
-        const w = data.progress.base.workshop;
-        if (!w || w.innRoomUpgradesBought >= 7) {
-            return;
-        }
-        const res = data.progress.base.resources;
-        if (data.progress.gold < w.innRoomNextGoldCost || res.bricks < w.innRoomNextLumberCost) {
-            return;
-        }
-        data.progress.gold -= w.innRoomNextGoldCost;
-        res.bricks -= w.innRoomNextLumberCost;
-        w.innRoomUpgradesBought++;
-        w.innRoomNextGoldCost += 100;
-        w.innRoomNextLumberCost += 10;
-    },
-    buyWorkerGear: function(kind) {
-        const b = data.progress.base && data.progress.base[kind];
-        const res = data.progress.base && data.progress.base.resources;
-        if (!b || !res) return;
-        if (data.progress.gold < (b.nextGearGoldCost || 0)) return;
-        if (res.ironBar < (b.nextGearBarsCost || 0)) return;
-        data.progress.gold -= (b.nextGearGoldCost || 0);
-        res.ironBar -= (b.nextGearBarsCost || 0);
-        b.gearSets = (b.gearSets || 0) + 1;
-        b.nextGearGoldCost = (b.nextGearGoldCost || 20) + 10;
-        b.nextGearBarsCost = (b.nextGearBarsCost || 0) + 2;
     },
     assignWorker: function(kind) {
         if (!engine.tryAssignWorker(kind)) return;
@@ -363,24 +340,6 @@ let events = {
             while (engine.tryUnassignWorker(kind)) {}
         }
     },
-    buyGardenMapManual: function(kind) {
-        const g = data.progress.base.garden;
-        const map = {
-            inn: "mapManualInn",
-            mine: "mapManualMine",
-            smith: "mapManualSmith",
-            claypit: "mapManualClaypit",
-            kiln: "mapManualKiln"
-        };
-        const key = map[kind];
-        if (!key || g[key]) {
-            return;
-        }
-        if (!events.spendGoldIfPossible(200)) {
-            return;
-        }
-        g[key] = true;
-    },
     assignAttribute: function(attributeKey) {
         const chapel = data.progress.base && data.progress.base.chapel;
         if (!chapel || !chapel.plannedGrowthBlessingUnlocked) {
@@ -415,6 +374,9 @@ let events = {
         if (!target) {
             return;
         }
+        if (!mapData.isMapUnlocked(target, data.progress)) {
+            return;
+        }
         const reqClass = target.requiredClassKey || "";
         if (reqClass && reqClass !== (data.progress.currentClassKey || "none")) {
             return;
@@ -423,6 +385,16 @@ let events = {
         const travelSeed = Math.floor(Math.random() * 0x7fffffff) + 1;
         initialize.resetSkillRunProgress();
         initialize.startFreshBattle(travelSeed, mapKey);
+    },
+    switchTravelSubTab: function(which) {
+        data.progress.selectedTravelSubTab = which === "challenges" ? "challenges" : "maps";
+        const cls = data.progress.currentClassKey || "none";
+        if (cls === "none") {
+            data.progress.selectedTravelSubTab = "maps";
+        }
+        if (typeof view !== "undefined" && view.updateMenuNumbers) {
+            view.updateMenuNumbers();
+        }
     },
     startHarvest: function(mapKey) {
         const defs = data.progress.mapDefinitions || [];
@@ -436,6 +408,9 @@ let events = {
         if (!target || target.requiredClassKey) {
             return;
         }
+        if (!mapData.isMapUnlocked(target, data.progress)) {
+            return;
+        }
         if (!engine.isMapHarvestReady(mapKey)) {
             return;
         }
@@ -444,21 +419,41 @@ let events = {
         data.battle.mode = "foraging";
         initialize.calcPlayerStats(true);
     },
-    setRangedAttackEnabled: function(enabled) {
-        const hasBow = !!(data.progress.base && data.progress.base.workshop && data.progress.base.workshop.bowBuilt);
-        const classLocked = (data.progress.currentClassKey || "none") === "rogue";
-        data.progress.rangedAttackEnabled = (hasBow && !classLocked) ? !!enabled : false;
-        const el = viewData.cached.rangedAttackToggle || document.getElementById("rangedAttackToggle");
-        if (el) {
-            el.checked = data.progress.rangedAttackEnabled;
-        }
-    },
-    toggleSkillWrap: function(skillKey) {
-        const wrap = document.getElementById(`skill_wrap_${skillKey}`);
-        if (!wrap) {
+    /** Smart Harvest: from 100% cleared (no countdown yet), start the 120s window and begin foraging. */
+    startHarvestCountdownAndForage: function(mapKey) {
+        const g = data.progress.base && data.progress.base.garden;
+        if (!g || !g.smartHarvestUnlocked) {
             return;
         }
-        wrap.classList.toggle("skill-block--expanded");
+        const defs = data.progress.mapDefinitions || [];
+        let target = null;
+        for (let i = 0; i < defs.length; i++) {
+            if (defs[i].key === mapKey) {
+                target = defs[i];
+                break;
+            }
+        }
+        if (!target || target.requiredClassKey) {
+            return;
+        }
+        if (!mapData.isMapUnlocked(target, data.progress)) {
+            return;
+        }
+        const st = engine.getMapClearState(mapKey);
+        if ((st.pct || 0) < 100 || (st.activeMs || 0) > 0) {
+            return;
+        }
+        st.activeMs = gameData.battle.mapHarvestRespawnDurationMs;
+        events.startHarvest(mapKey);
+    },
+    setSandalAttackEnabled: function(enabled) {
+        const hasSandal = !!(data.progress.base && data.progress.base.workshop && data.progress.base.workshop.sandalBuilt);
+        const classLocked = (data.progress.currentClassKey || "none") === "rogue";
+        data.progress.sandalAttackEnabled = (hasSandal && !classLocked) ? !!enabled : false;
+        const el = viewData.cached.sandalAttackToggle || document.getElementById("sandalAttackToggle");
+        if (el) {
+            el.checked = data.progress.sandalAttackEnabled;
+        }
     },
     toggleSkillStar: function(skillKey, starType) {
         const valid = { bronze: true, silver: true, gold: true };
@@ -477,6 +472,12 @@ let events = {
         if (currentlyAssigned) {
             sk.stars[starType] = false;
             data.progress.stars[starType] = (data.progress.stars[starType] || 0) + 1;
+            if (typeof view !== "undefined") {
+                view.updateSkillRowCompact(skillKey);
+                if (data.progress.selectedSkillDetailKey === skillKey) {
+                    view.updateSkillInfoPanel();
+                }
+            }
             return;
         }
         if ((data.progress.stars[starType] || 0) <= 0) {
@@ -484,5 +485,11 @@ let events = {
         }
         data.progress.stars[starType]--;
         sk.stars[starType] = true;
+        if (typeof view !== "undefined") {
+            view.updateSkillRowCompact(skillKey);
+            if (data.progress.selectedSkillDetailKey === skillKey) {
+                view.updateSkillInfoPanel();
+            }
+        }
     }
 }

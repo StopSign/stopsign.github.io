@@ -1,6 +1,6 @@
 
 let engine = {
-    /** Playable band for lanes (`inset`, `laneWidth`) — uses `viewData.layout.battlefieldWidthPx` / `gameData.battle`, not DOM measurements. */
+    /** Playable band for lanes (`inset`, `laneWidth`) - uses `viewData.layout.battlefieldWidthPx` / `gameData.battle`, not DOM measurements. */
     getBattleLaneMetrics: function() {
         const gd = gameData.battle;
         const bw = Math.max(1, Number(viewData.layout.battlefieldWidthPx) || gd.battlefieldWidthPx || 1);
@@ -29,8 +29,6 @@ let engine = {
     gameTick: function() {
         data.gameSettings.ticksForSeconds++;
 
-        createView.syncBattlefieldLayoutFromDom();
-
         const tickMs = 1000 / data.gameSettings.ticksPerSecond;
         engine.runTownTick(tickMs);
         if (data.battle.state !== "running") {
@@ -46,10 +44,10 @@ let engine = {
         } else {
             engine.spawnZonesForTime();
         }
-        engine.updateEnemyMovement(tickMs);
+        engine.updateIntruderMovement(tickMs);
         engine.updateCurrentZoneInfo();
         if (data.battle.mode !== "foraging") {
-            engine.updateFortitudeWaveTracking();
+            engine.updateEnduranceSkillExp(tickMs);
             engine.updateRecoveryEachSecond(tickMs);
             engine.updatePassiveSkillExp(tickMs);
             engine.updateClassEffects(tickMs);
@@ -59,8 +57,8 @@ let engine = {
         engine.updateTargeting();
         engine.updatePlayerAttack(tickMs);
         if (data.battle.mode !== "foraging") {
-            engine.updateRangedAttack(tickMs);
-            engine.updateEnemyAttacks(tickMs);
+            engine.updateSandalAttack(tickMs);
+            engine.updateIntruderAttacks(tickMs);
         }
         engine.cleanupDeadEnemies();
         engine.checkMapCompletion();
@@ -75,12 +73,24 @@ let engine = {
         }
         return data.progress.mapClearProgress[mapKey];
     },
+    gardenSmartHarvestBlocksAutoCountdown: function() {
+        const g = data.progress.base && data.progress.base.garden;
+        return !!(g && g.smartHarvestUnlocked);
+    },
+    maybeStartHarvestRespawnCountdown: function(mapKey) {
+        const state = engine.getMapClearState(mapKey);
+        if (state.pct < 100 || (state.activeMs || 0) > 0) {
+            return;
+        }
+        if (engine.gardenSmartHarvestBlocksAutoCountdown()) {
+            return;
+        }
+        state.activeMs = gameData.battle.mapHarvestRespawnDurationMs;
+    },
     addMapClearProgressForKill: function(mapKey) {
         const state = engine.getMapClearState(mapKey);
         state.pct = Math.min(100, state.pct + 0.5);
-        if (state.pct >= 100 && state.activeMs <= 0) {
-            state.activeMs = 120000;
-        }
+        engine.maybeStartHarvestRespawnCountdown(mapKey);
     },
     updateMapClearProgressTimers: function(tickMs) {
         const states = data.progress.mapClearProgress || {};
@@ -92,7 +102,7 @@ let engine = {
             if (st.activeMs <= 0) {
                 st.pct = 0;
             } else {
-                st.pct = Math.max(0, Math.min(100, (st.activeMs / 120000) * 100));
+                st.pct = Math.max(0, Math.min(100, (st.activeMs / gameData.battle.mapHarvestRespawnDurationMs) * 100));
             }
         }
     },
@@ -100,13 +110,13 @@ let engine = {
         const st = engine.getMapClearState(mapKey);
         return (st.pct >= 100 || st.activeMs > 0) && st.activeMs > 0;
     },
-    getRangedEnemyStopY: function(playerTopY, battleHeight) {
+    getSandalIntruderStopY: function(playerTopY, battleHeight) {
         return playerTopY - 200;
     },
-    isLaneSpotOccupied: function(targetLane, yPx, sizePx, skipEnemyId) {
+    isLaneSpotOccupied: function(targetLane, yPx, sizePx, skipIntruderId) {
         for (let i = 0; i < data.battle.enemies.length; i++) {
             const e = data.battle.enemies[i];
-            if (!e.alive || e.id === skipEnemyId || e.lane !== targetLane) {
+            if (!e.alive || e.id === skipIntruderId || e.lane !== targetLane) {
                 continue;
             }
             if (Math.abs(e.yPx - yPx) < Math.max(sizePx, e.sizePx)) {
@@ -115,9 +125,9 @@ let engine = {
         }
         return false;
     },
-    tryMeleeLaneShift: function(enemy) {
+    trySlapLaneShift: function(intruder) {
         const centerLane = Math.floor(gameData.battle.laneCount / 2);
-        const options = [enemy.lane - 1, enemy.lane + 1];
+        const options = [intruder.lane - 1, intruder.lane + 1];
         options.sort(function(a, b) {
             return Math.abs(a - centerLane) - Math.abs(b - centerLane);
         });
@@ -126,11 +136,11 @@ let engine = {
             if (lane < 0 || lane >= gameData.battle.laneCount) {
                 continue;
             }
-            if (engine.isLaneSpotOccupied(lane, enemy.yPx, enemy.sizePx, enemy.id)) {
+            if (engine.isLaneSpotOccupied(lane, intruder.yPx, intruder.sizePx, intruder.id)) {
                 continue;
             }
-            enemy.lane = lane;
-            enemy.blockedByRangedMs = 0;
+            intruder.lane = lane;
+            intruder.blockedByLecherMs = 0;
             return true;
         }
         return false;
@@ -155,31 +165,31 @@ let engine = {
             const laneRng = gameData.seededRandomFactory((laneSeedBase + ((i + 1) * 92821)) >>> 0);
             const lm = engine.getBattleLaneMetrics();
             const spdMult = 1 + ((data.battle.levelState && data.battle.levelState.levelSpd) || 0) * 0.1;
-            const travelSpd = gd.enemyTravelSpeedPxPerSecond;
+            const travelSpd = gd.intruderTravelSpeedPxPerSecond;
             const spacingPx = rows.length > 1 ? Math.max(0, z.distanceBetweenUnits || 0) : 0;
             for (let ri = 0; ri < rows.length; ri++) {
                 const row = rows[ri];
                 row.lane = Math.floor(laneRng() * gd.laneCount);
                 // Combat battlefield units are 20% smaller (visual + collision footprint).
-                row.sizeLaneFill = gd.enemySizeLaneFill * 0.8;
+                row.sizeLaneFill = gd.intruderSizeLaneFill * 0.8;
                 row.speedPxPerSecond = travelSpd;
-                row.attackCooldownMs = gd.enemyAttackCooldownMs;
-                row.attackTimerMs = gd.enemyAttackCooldownMs;
-                const enemyId = data.battle.enemyIdCounter;
-                data.battle.enemyIdCounter++;
-                const enemySize = Math.floor(lm.laneWidth * row.sizeLaneFill);
+                row.attackCooldownMs = gd.intruderAttackCooldownMs;
+                row.attackTimerMs = gd.intruderAttackCooldownMs;
+                const intruderId = data.battle.intruderIdCounter;
+                data.battle.intruderIdCounter++;
+                const intruderSize = Math.floor(lm.laneWidth * row.sizeLaneFill);
                 const maxHp = Math.max(1, Math.round(row.rawHp !== undefined ? row.rawHp : row.maxHp));
                 const attackDamage = Math.max(1, Math.round(row.rawDamage !== undefined ? row.rawDamage : row.attackDamage));
-                const yPx = -enemySize - ri * spacingPx;
+                const yPx = -intruderSize - ri * spacingPx;
                 data.battle.enemies.push({
-                    id: enemyId,
+                    id: intruderId,
                     lane: row.lane,
                     spawnTimeMs: z.startTimeMs,
                     zoneIndex: row.zoneIndex,
-                    enemyType: row.enemyType || "melee",
+                    intruderType: row.intruderType || "scoundrel",
                     yPx: yPx,
                     prevYPx: yPx,
-                    sizePx: enemySize,
+                    sizePx: intruderSize,
                     hp: maxHp,
                     maxHp: maxHp,
                     speedPxPerSecond: row.speedPxPerSecond * spdMult,
@@ -189,10 +199,10 @@ let engine = {
                     gain: row.gain,
                     expBase: row.expBase !== undefined ? row.expBase : 1,
                     inRange: false,
-                    rangedReady: false,
+                    lecherReady: false,
                     alive: true,
-                    hasEnteredMeleeQueue: false,
-                    blockedByRangedMs: 0
+                    hasEnteredSlapQueue: false,
+                    blockedByLecherMs: 0
                 });
             }
             data.battle.zoneSpawnedInCycle[i] = true;
@@ -251,21 +261,21 @@ let engine = {
                 data.battle.forageKindSpawnCounts[kind] = prevCount + 1;
                 const hpScale = Math.pow(1.05, prevCount);
                 const maxHp = Math.max(1, Math.ceil((z.baseHp || 10) * hpScale));
-                const enemyId = data.battle.enemyIdCounter++;
+                const intruderId = data.battle.intruderIdCounter++;
                 const lane = (gi + ri) % gd.laneCount;
-                const enemySize = kind === "tree" ? Math.floor(lm.laneWidth * 0.35) : Math.floor(lm.laneWidth * 0.28);
-                const yPx = -enemySize - (ri * spacingPx);
+                const intruderSize = kind === "tree" ? Math.floor(lm.laneWidth * 0.35) : Math.floor(lm.laneWidth * 0.28);
+                const yPx = -intruderSize - (ri * spacingPx);
                 const staminaCost = kind === "tree" ? 2 : (kind === "ore_vein" ? 3 : 1);
                 data.battle.enemies.push({
-                    id: enemyId,
+                    id: intruderId,
                     lane: lane,
                     spawnTimeMs: 0,
                     zoneIndex: nextIndex,
                     forageIndex: nextIndex,
-                    enemyType: kind,
+                    intruderType: kind,
                     yPx: yPx,
                     prevYPx: yPx,
-                    sizePx: enemySize,
+                    sizePx: intruderSize,
                     hp: maxHp,
                     maxHp: maxHp,
                     speedPxPerSecond: 0,
@@ -274,12 +284,12 @@ let engine = {
                     attackTimerMs: 0,
                     gain: z.rewardAmount || 1,
                     rewardResource: z.rewardResource || "logs",
-                    expBase: z.expBasePerEnemy !== undefined ? z.expBasePerEnemy : 1,
+                    expBase: z.expBasePerIntruder !== undefined ? z.expBasePerIntruder : 1,
                     inRange: false,
-                    rangedReady: false,
+                    lecherReady: false,
                     alive: true,
-                    hasEnteredMeleeQueue: false,
-                    blockedByRangedMs: 0,
+                    hasEnteredSlapQueue: false,
+                    blockedByLecherMs: 0,
                     staminaCost: staminaCost,
                     firstHitTaken: false
                 });
@@ -294,11 +304,11 @@ let engine = {
         const maxWorkers = 6;
         data.progress.mapWorkersFound[mapKey] = Math.min(maxWorkers, data.progress.mapWorkersFound[mapKey] + amount);
     },
-    updateEnemyMovement: function(tickMs) {
+    updateIntruderMovement: function(tickMs) {
         const battleHeight = viewData.layout.battlefieldHeightPx || 500;
         const playerTopY = viewData.layout.playerTopPx || (battleHeight - 65);
         const deltaSeconds = tickMs / 1000;
-        const pushBonus = engine.getEnemyPushBonusPxPerSecond();
+        const pushBonus = engine.getIntruderPushBonusPxPerSecond();
         if ((data.battle.mode || "combat") === "foraging" && pushBonus > 0) {
             data.battle.forageMoveAccumPx = (data.battle.forageMoveAccumPx || 0) + (pushBonus * deltaSeconds);
         }
@@ -307,9 +317,9 @@ let engine = {
             laneBuckets[l] = [];
         }
         for (let i = 0; i < data.battle.enemies.length; i++) {
-            const enemy = data.battle.enemies[i];
-            if (enemy.alive) {
-                laneBuckets[enemy.lane].push(enemy);
+            const intruder = data.battle.enemies[i];
+            if (intruder.alive) {
+                laneBuckets[intruder.lane].push(intruder);
             }
         }
         for (let lane = 0; lane < gameData.battle.laneCount; lane++) {
@@ -324,94 +334,94 @@ let engine = {
                 return a.id - b.id;
             });
             for (let j = laneEnemies.length - 1; j >= 0; j--) {
-                const enemy = laneEnemies[j];
-                enemy.prevYPx = enemy.yPx;
-                const dy = (enemy.speedPxPerSecond + pushBonus) * deltaSeconds;
-                let tentativeY = enemy.yPx + dy;
-                if (enemy.enemyType === "ranged") {
-                    const wasReady = !!enemy.rangedReady;
-                    const stopY = engine.getRangedEnemyStopY(playerTopY, battleHeight);
+                const intruder = laneEnemies[j];
+                intruder.prevYPx = intruder.yPx;
+                const dy = (intruder.speedPxPerSecond + pushBonus) * deltaSeconds;
+                let tentativeY = intruder.yPx + dy;
+                if (intruder.intruderType === "lecher") {
+                    const wasReady = !!intruder.lecherReady;
+                    const stopY = engine.getSandalIntruderStopY(playerTopY, battleHeight);
                     if (j === laneEnemies.length - 1) {
-                        const baseDy = enemy.speedPxPerSecond * deltaSeconds;
+                        const baseDy = intruder.speedPxPerSecond * deltaSeconds;
                         const pushDy = pushBonus * deltaSeconds;
-                        let baseY = enemy.yPx;
+                        let baseY = intruder.yPx;
                         if (baseY < stopY) {
                             baseY = Math.min(stopY, baseY + baseDy);
                         }
                         tentativeY = baseY + pushDy;
-                        if (tentativeY + enemy.sizePx >= playerTopY) {
-                            enemy.yPx = playerTopY - enemy.sizePx;
-                            enemy.inRange = true;
-                            if (!enemy.hasEnteredMeleeQueue) {
-                                enemy.hasEnteredMeleeQueue = true;
-                                data.battle.meleeQueue.push(enemy.id);
+                        if (tentativeY + intruder.sizePx >= playerTopY) {
+                            intruder.yPx = playerTopY - intruder.sizePx;
+                            intruder.inRange = true;
+                            if (!intruder.hasEnteredSlapQueue) {
+                                intruder.hasEnteredSlapQueue = true;
+                                data.battle.slapQueue.push(intruder.id);
                             }
                         } else {
-                            enemy.yPx = tentativeY;
-                            enemy.inRange = false;
+                            intruder.yPx = tentativeY;
+                            intruder.inRange = false;
                         }
-                        enemy.rangedReady = enemy.inRange || (enemy.yPx >= stopY);
-                        if (!wasReady && enemy.rangedReady) {
-                            enemy.attackTimerMs = enemy.attackCooldownMs * 2;
+                        intruder.lecherReady = intruder.inRange || (intruder.yPx >= stopY);
+                        if (!wasReady && intruder.lecherReady) {
+                            intruder.attackTimerMs = intruder.attackCooldownMs * 2;
                         }
                     } else {
                         const below = laneEnemies[j + 1];
-                        const maxY = below.yPx - enemy.sizePx;
+                        const maxY = below.yPx - intruder.sizePx;
                         if (tentativeY > maxY) {
                             tentativeY = maxY;
                         }
-                        enemy.yPx = tentativeY;
-                        enemy.inRange = false;
-                        enemy.rangedReady = false;
+                        intruder.yPx = tentativeY;
+                        intruder.inRange = false;
+                        intruder.lecherReady = false;
                     }
                     continue;
                 }
                 if (j === laneEnemies.length - 1) {
-                    if (tentativeY + enemy.sizePx >= playerTopY) {
-                        enemy.yPx = playerTopY - enemy.sizePx;
-                        enemy.inRange = true;
-                        if (!enemy.hasEnteredMeleeQueue) {
-                            enemy.hasEnteredMeleeQueue = true;
-                            data.battle.meleeQueue.push(enemy.id);
+                    if (tentativeY + intruder.sizePx >= playerTopY) {
+                        intruder.yPx = playerTopY - intruder.sizePx;
+                        intruder.inRange = true;
+                        if (!intruder.hasEnteredSlapQueue) {
+                            intruder.hasEnteredSlapQueue = true;
+                            data.battle.slapQueue.push(intruder.id);
                         }
                     } else {
-                        enemy.yPx = tentativeY;
-                        enemy.inRange = false;
+                        intruder.yPx = tentativeY;
+                        intruder.inRange = false;
                     }
                 } else {
                     const below = laneEnemies[j + 1];
-                    const maxY = below.yPx - enemy.sizePx;
-                    const blockedByRanged = below.enemyType === "ranged" && !below.inRange && tentativeY > maxY;
+                    const maxY = below.yPx - intruder.sizePx;
+                    const blockedByLecher = below.intruderType === "lecher" && !below.inRange && tentativeY > maxY;
                     if (tentativeY > maxY) {
                         tentativeY = maxY;
                     }
-                    enemy.yPx = tentativeY;
-                    enemy.inRange = false;
-                    if (blockedByRanged) {
-                        enemy.blockedByRangedMs = (enemy.blockedByRangedMs || 0) + tickMs;
-                        if (enemy.blockedByRangedMs >= 500) {
-                            if (!engine.tryMeleeLaneShift(enemy)) {
-                                enemy.blockedByRangedMs = 0;
+                    intruder.yPx = tentativeY;
+                    intruder.inRange = false;
+                    if (blockedByLecher) {
+                        intruder.blockedByLecherMs = (intruder.blockedByLecherMs || 0) + tickMs;
+                        if (intruder.blockedByLecherMs >= 500) {
+                            if (!engine.trySlapLaneShift(intruder)) {
+                                intruder.blockedByLecherMs = 0;
                             }
                         }
                     } else {
-                        enemy.blockedByRangedMs = 0;
+                        intruder.blockedByLecherMs = 0;
                     }
                 }
             }
         }
         if ((data.progress.currentClassKey || "none") === "hunter" && (data.battle.classRetreatMs || 0) > 0) {
             const spd = data.battle.levelState.levelSpd || 0;
-            const retreatRate = (gameData.battle.enemyTravelSpeedPxPerSecond + gameData.battle.idlePushBonusPxPerSecond) * (1 + (spd * 0.1));
+            const retreatRate = (gameData.battle.intruderTravelSpeedPxPerSecond + gameData.battle.idlePushBonusPxPerSecond) * (1 + (spd * 0.1));
             const retreatDy = retreatRate * deltaSeconds;
             for (let i = 0; i < data.battle.enemies.length; i++) {
-                const enemy = data.battle.enemies[i];
-                if (!enemy.alive) continue;
-                enemy.yPx = Math.max(-enemy.sizePx, enemy.yPx - retreatDy);
-                if (enemy.yPx + enemy.sizePx < playerTopY) {
-                    enemy.inRange = false;
-                    if (enemy.enemyType === "ranged") {
-                        enemy.rangedReady = false;
+                const intruder = data.battle.enemies[i];
+                if (!intruder.alive) continue;
+                intruder.yPx = Math.max(-intruder.sizePx, intruder.yPx - retreatDy);
+                if (intruder.yPx + intruder.sizePx < playerTopY) {
+                    intruder.inRange = false;
+                    if (intruder.intruderType === "lecher") {
+                        intruder.lecherReady = false;
                     }
                 }
             }
@@ -419,23 +429,23 @@ let engine = {
     },
     updateTargeting: function() {
         const nextQueue = [];
-        for (let i = 0; i < data.battle.meleeQueue.length; i++) {
-            const queued = engine.findEnemyById(data.battle.meleeQueue[i]);
+        for (let i = 0; i < data.battle.slapQueue.length; i++) {
+            const queued = engine.findIntruderById(data.battle.slapQueue[i]);
             if (queued && queued.alive && queued.inRange) {
                 nextQueue.push(queued.id);
             }
         }
-        data.battle.meleeQueue = nextQueue;
+        data.battle.slapQueue = nextQueue;
         if (data.battle.activeTargetId !== null) {
-            const existingTarget = engine.findEnemyById(data.battle.activeTargetId);
+            const existingTarget = engine.findIntruderById(data.battle.activeTargetId);
             if (existingTarget && existingTarget.alive && existingTarget.inRange) {
                 return;
             }
             data.battle.activeTargetId = null;
         }
-        for (let i = 0; i < data.battle.meleeQueue.length; i++) {
-            const enemyId = data.battle.meleeQueue[i];
-            const candidate = engine.findEnemyById(enemyId);
+        for (let i = 0; i < data.battle.slapQueue.length; i++) {
+            const intruderId = data.battle.slapQueue[i];
+            const candidate = engine.findIntruderById(intruderId);
             if (candidate && candidate.alive) {
                 data.battle.activeTargetId = candidate.id;
                 return;
@@ -443,18 +453,16 @@ let engine = {
         }
     },
     getAlacrityCooldownReductionMs: function() {
-        const s = data.progress.skills.alacrity;
-        if (!s || !skills.isSkillUnlocked("alacrity")) {
-            return 0;
-        }
-        const cap = s.maxLevel !== undefined ? s.maxLevel : 1000;
-        return Math.min(s.level, cap);
+        const e = skills.getSkillEffect("alacrity");
+        return e.alacrityEffectiveLevel || 0;
     },
-    getEffectiveMeleeCooldownMs: function() {
-        return Math.max(400, 2000 - (engine.getAlacrityCooldownReductionMs() * 10));
+    getEffectiveSlapCooldownMs: function() {
+        const cd = gameData.battle.cooldowns;
+        return Math.max(cd.slapFloorMs, cd.slapBaseMs - (engine.getAlacrityCooldownReductionMs() * cd.alacritySlapReductionPerLevelMs));
     },
-    getEffectiveRangedCooldownMs: function() {
-        return Math.max(800, 4000 - (engine.getAlacrityCooldownReductionMs() * 20));
+    getEffectiveSandalCooldownMs: function() {
+        const cd = gameData.battle.cooldowns;
+        return Math.max(cd.sandalFloorMs, cd.sandalBaseMs - (engine.getAlacrityCooldownReductionMs() * cd.alacritySandalReductionPerLevelMs));
     },
     getUnlockedSkillLevel: function(skillKey) {
         if (!skills.isSkillUnlocked(skillKey)) {
@@ -463,13 +471,13 @@ let engine = {
         const s = data.progress.skills[skillKey];
         return s ? (s.level || 0) : 0;
     },
-    getMeleeRechargeMultiplier: function() {
-        const prep = data.progress.skills.preparation;
-        const prepLv = prep ? prep.level : 0;
-        if (engine.anyEnemyInMeleeRange()) {
+    getSlapRechargeMultiplier: function() {
+        const pEff = skills.getSkillEffect("preparation");
+        const prepBonus = pEff.preparationIdleRechargeFraction || 0;
+        if (engine.anyIntruderInSlapRange()) {
             return 1;
         }
-        let mult = 1 + (0.02 * prepLv);
+        let mult = 1 + prepBonus;
         if ((data.progress.currentClassKey || "none") === "rogue" && (data.battle.rogueFlurryMs || 0) > 0) {
             const spd = data.battle.levelState.levelSpd || 0;
             mult *= (1 + (spd * 0.1));
@@ -478,28 +486,25 @@ let engine = {
     },
     syncPlayerCooldownFields: function() {
         const p = data.battle.player;
-        p.attackCooldownMs = engine.getEffectiveMeleeCooldownMs();
-        p.rangedAttackCooldownMs = engine.getEffectiveRangedCooldownMs();
+        p.attackCooldownMs = engine.getEffectiveSlapCooldownMs();
+        p.sandalAttackCooldownMs = engine.getEffectiveSandalCooldownMs();
     },
-    updateFortitudeWaveTracking: function() {
-        if (data.battle.state !== "running") {
+    /** Endurance skill exp: every 10s of combat time; exp = √(current HP) per trigger. */
+    updateEnduranceSkillExp: function(tickMs) {
+        if (!skills.isSkillUnlocked("endurance")) {
             return;
         }
-        const map = initialize.getCurrentMapDefinition();
-        if (!map || !map.zones) return;
-        let primaryName = null;
-        for (let i = 0; i < map.zones.length; i++) {
-            if (engine.getRemainingEnemiesForZone(i) <= 0) {
-                continue;
-            }
-            primaryName = map.zones[i].name;
-            break;
+        const dt = tickMs * engine.getBattleTimeRateMultiplier();
+        if (data.battle.enduranceExpAccMs === undefined || data.battle.enduranceExpAccMs === null) {
+            data.battle.enduranceExpAccMs = 0;
         }
-        const prev = data.battle.prevZoneNameForFortitude;
-        if (prev !== null && primaryName !== null && prev !== primaryName) {
-            engine.onSkillTrigger("fortitude", 1);
+        data.battle.enduranceExpAccMs += dt;
+        while (data.battle.enduranceExpAccMs >= 10000) {
+            data.battle.enduranceExpAccMs -= 10000;
+            const p = data.battle.player;
+            const amt = Math.sqrt(Math.max(0, p.hp || 0));
+            engine.onSkillTrigger("endurance", amt);
         }
-        data.battle.prevZoneNameForFortitude = primaryName;
     },
     updateRecoveryEachSecond: function(tickMs) {
         if (data.battle.recoverySecondAccMs === undefined) {
@@ -508,34 +513,41 @@ let engine = {
         data.battle.recoverySecondAccMs += tickMs;
         while (data.battle.recoverySecondAccMs >= 1000) {
             data.battle.recoverySecondAccMs -= 1000;
-            const recLv = engine.getUnlockedSkillLevel("recovery");
-            if (recLv > 0) {
-                const p = data.battle.player;
-                p.hp = Math.min(p.maxHp, p.hp + recLv * 0.25);
+            const p = data.battle.player;
+            const rEff = skills.getSkillEffect("recovery");
+            const regen = rEff.recoveryHpPerSec || 0;
+            if (regen > 0) {
+                p.hp = Math.min(p.maxHp, p.hp + regen);
             }
             engine.onSkillTrigger("recovery", 1);
+            if (skills.isSkillUnlocked("tenacity")) {
+                const mx = Math.max(1, p.maxHp || 1);
+                if (p.hp < mx * 0.5) {
+                    engine.onSkillTrigger("tenacity", 1);
+                }
+            }
         }
     },
     updatePassiveSkillExp: function(tickMs) {
         const sec = tickMs / 1000;
-        if (!engine.anyEnemyInMeleeRange()) {
+        if (!engine.anyIntruderInSlapRange()) {
             engine.onSkillTrigger("preparation", sec);
         }
-        let inMelee = 0;
+        let inSlap = 0;
         for (let i = 0; i < data.battle.enemies.length; i++) {
             const e = data.battle.enemies[i];
             if (e.alive && e.inRange) {
-                inMelee++;
+                inSlap++;
             }
         }
-        if (inMelee > 1) {
-            engine.onSkillTrigger("adrenaline", (inMelee - 1) * sec);
+        if (inSlap > 1) {
+            engine.onSkillTrigger("adrenaline", (inSlap - 1) * sec);
         }
         const cls = data.progress.currentClassKey || "none";
         if (cls === "rogue") {
             engine.addClassBarProgress("B", 100 * sec);
         } else if (cls === "hunter") {
-            engine.addClassBarProgress("B", 50 * inMelee * sec);
+            engine.addClassBarProgress("B", 50 * inSlap * sec);
         }
     },
     updateForagingPassiveSkillExp: function(tickMs) {
@@ -574,7 +586,7 @@ let engine = {
             data.battle.classPowerA -= 1000;
             data.battle.rogueDashActive = true;
         }
-        if (data.battle.rogueDashActive && engine.anyEnemyInMeleeRange()) {
+        if (data.battle.rogueDashActive && engine.anyIntruderInSlapRange()) {
             data.battle.rogueDashActive = false;
         }
         if ((data.progress.currentClassKey || "none") === "hunter" && (data.battle.classPowerB || 0) >= 1000 && (data.battle.classRetreatMs || 0) <= 0) {
@@ -585,7 +597,7 @@ let engine = {
     updatePlayerAttack: function(tickMs) {
         const p = data.battle.player;
         const cls = data.progress.currentClassKey || "none";
-        p.attackTimerMs -= tickMs * engine.getMeleeRechargeMultiplier();
+        p.attackTimerMs -= tickMs * engine.getSlapRechargeMultiplier();
         if (p.attackTimerMs > 0) {
             return;
         }
@@ -593,12 +605,12 @@ let engine = {
             p.attackTimerMs = 0;
             return;
         }
-        const target = engine.findEnemyById(data.battle.activeTargetId);
+        const target = engine.findIntruderById(data.battle.activeTargetId);
         if (!target || !target.alive || !target.inRange) {
             p.attackTimerMs = 0;
             return;
         }
-        engine.enqueueMeleeLineFx(target);
+        engine.enqueueSlapLineFx(target);
         if ((data.battle.mode || "combat") === "foraging") {
             const staminaCost = target.staminaCost || 1;
             if (data.battle.player.hp <= 0 || data.battle.player.hp < staminaCost) {
@@ -607,80 +619,89 @@ let engine = {
             }
             data.battle.player.hp = Math.max(0, data.battle.player.hp - staminaCost);
             let harvestDamage = data.battle.player.attackDamage;
-            const techLv = skills.isSkillUnlocked("technique") && data.progress.skills.technique ? (data.progress.skills.technique.level || 0) : 0;
-            harvestDamage += techLv;
+            const tch = skills.getSkillEffect("technique");
+            harvestDamage += tch.techniqueHarvestDamageFlat || 0;
             if (!target.firstHitTaken) {
-                const planningLv = skills.isSkillUnlocked("planning") && data.progress.skills.planning ? (data.progress.skills.planning.level || 0) : 0;
-                harvestDamage *= (1 + (planningLv * 0.1));
+                const pln = skills.getSkillEffect("planning");
+                const planFrac = pln.planningFirstHitDamageBonusFraction || 0;
+                harvestDamage *= (1 + planFrac);
                 target.firstHitTaken = true;
             }
-            target.hp -= Math.max(1, Math.round(harvestDamage));
-            p.attackTimerMs = engine.getEffectiveMeleeCooldownMs() + Math.min(0, p.attackTimerMs);
+            target.hp -= Math.max(1, roundNearestDecimals(harvestDamage, 1));
+            p.attackTimerMs = engine.getEffectiveSlapCooldownMs() + Math.min(0, p.attackTimerMs);
             engine.onSkillTrigger("technique", 1);
             if (target.hp <= 0) {
                 target.hp = 0;
                 target.alive = false;
                 data.battle.activeTargetId = null;
-                engine.removeEnemyFromMeleeQueue(target.id);
-                engine.onEnemyKilled(target);
+                engine.removeIntruderFromSlapQueue(target.id);
+                engine.onIntruderKilled(target);
             }
             return;
         }
-        let meleeDamage = data.battle.player.attackDamage;
-        const executeLv = engine.getUnlockedSkillLevel("execute");
-        if (executeLv > 0 && target.hp <= (target.maxHp * 0.5)) {
-            meleeDamage *= 1 + (executeLv * 0.05);
+        let slapDamage = data.battle.player.attackDamage;
+        const exEff = skills.getSkillEffect("execute");
+        const executeFrac = exEff.executeLowHpBonusFraction || 0;
+        if (executeFrac > 0 && target.hp <= (target.maxHp * 0.5)) {
+            slapDamage *= 1 + executeFrac;
             engine.onSkillTrigger("execute", 1);
         }
-        const sneakLv = engine.getUnlockedSkillLevel("sneak_attack");
+        const snEff = skills.getSkillEffect("sneak_attack");
+        const sneakFrac = snEff.sneakFirstHitDamageBonusFraction || 0;
         const priorHits = target.timesHitByPlayer || 0;
-        if (sneakLv > 0 && priorHits === 0) {
-            meleeDamage *= 1 + (sneakLv * 0.1);
+        if (sneakFrac > 0 && priorHits === 0) {
+            slapDamage *= 1 + sneakFrac;
         }
-        const exploitLv = engine.getUnlockedSkillLevel("exploit");
-        const prevTarget = data.battle.lastPlayerHitEnemyId || 0;
+        const xpEff = skills.getSkillEffect("exploit");
+        const exploitStep = xpEff.exploitFlatDamagePerConsecutiveStep || 0;
+        const prevTarget = data.battle.lastPlayerHitIntruderId || 0;
         const streak = (prevTarget === target.id) ? ((data.battle.lastPlayerHitStreak || 0) + 1) : 1;
-        if (exploitLv > 0 && streak >= 2) {
-            meleeDamage += (streak - 1) * exploitLv;
+        if (exploitStep > 0 && streak >= 2) {
+            slapDamage += (streak - 1) * exploitStep;
         }
         let isPowerStrike = false;
         if (cls === "warrior" && (data.battle.classPowerA || 0) >= 1000) {
             data.battle.classPowerA -= 1000;
-            meleeDamage *= 2;
+            slapDamage *= 2;
             isPowerStrike = true;
         }
         if (cls === "rogue" && (data.battle.classPowerB || 0) >= 1000) {
             data.battle.classPowerB -= 1000;
             data.battle.rogueFlurryMs = 2000;
         }
-        meleeDamage = Math.max(1, Math.round(meleeDamage));
-        target.hp -= meleeDamage;
-        data.battle.lastPlayerHitEnemyId = target.id;
+        slapDamage = Math.max(1, roundNearestDecimals(slapDamage, 1));
+        const hpBeforeSlap = target.hp;
+        target.hp -= slapDamage;
+        data.battle.lastPlayerHitIntruderId = target.id;
         data.battle.lastPlayerHitStreak = streak;
         target.timesHitByPlayer = priorHits + 1;
-        if (sneakLv > 0 && priorHits === 0) {
+        if (skills.isSkillUnlocked("overkill")) {
+            const over = Math.max(0, slapDamage - hpBeforeSlap);
+            engine.onSkillTrigger("overkill", Math.sqrt(over));
+        }
+        if (sneakFrac > 0 && priorHits === 0) {
             engine.onSkillTrigger("sneak_attack", 1);
         }
-        if (exploitLv > 0 && priorHits > 0) {
+        if (exploitStep > 0 && priorHits > 0) {
             engine.onSkillTrigger("exploit", 1);
         }
-        const cd = engine.getEffectiveMeleeCooldownMs();
+        const cd = engine.getEffectiveSlapCooldownMs();
         p.attackTimerMs = cd + Math.min(0, p.attackTimerMs);
         if (!isPowerStrike) {
             if (cls === "warrior") engine.addClassBarProgress("A", 100);
             if (cls === "hunter") engine.addClassBarProgress("A", 100);
         } else {
             engine.onSkillTrigger("cleave", 1);
-            engine.applyWarriorCleave(target, meleeDamage);
+            engine.applyWarriorCleave(target, slapDamage);
         }
-        engine.onSkillTrigger("finesse", 1);
+        engine.onSkillTrigger("force", 1);
         engine.onSkillTrigger("alacrity", 1);
         if (target.hp <= 0) {
             target.hp = 0;
             target.alive = false;
             data.battle.activeTargetId = null;
-            engine.removeEnemyFromMeleeQueue(target.id);
-            engine.onEnemyKilled(target);
+            engine.removeIntruderFromSlapQueue(target.id);
+            engine.onIntruderKilled(target, { __OVERKILL__BoostKind: "slap" });
         }
     },
     updateCurrentZoneInfo: function() {
@@ -718,14 +739,21 @@ let engine = {
             const z = map.zones[i];
             const cr = mapData.computeZoneCombatAndRewards(map, i, tierMult);
             const lastSpawnT = mapData.getZoneLastSpawnTimeMs(z);
+            let shardInfo = "";
+            if (z.skillShard && skills._byKey[z.skillShard.key]) {
+                const found = (data.battle.zoneShardRunCounts && data.battle.zoneShardRunCounts[i]) || 0;
+                const mx = z.skillShard.max || 0;
+                shardInfo = `${skills._byKey[z.skillShard.key].name} ${found}/${mx}`;
+            }
             zones.push({
                 index: i,
                 name: z.name,
                 remainingSpawnMs: Math.max(0, lastSpawnT - elapsed),
-                difficulty: (map.baseDifficulty || 1) * cr.ratio * tierMult,
+                difficulty: (map.baseDifficulty || 1) * cr.ratio * (tierMult.combat || 1),
                 remainingEnemies: rem,
-                gold: engine.goldAwardFromEnemyGain(cr.perEnemyGain),
-                exp: engine.expAwardFromEnemyExpBase(cr.expBasePerEnemy)
+                gold: engine.goldAwardFromIntruderGain(cr.perIntruderGain),
+                exp: engine.expAwardFromIntruderExpBase(cr.expBasePerIntruder),
+                shardInfo: shardInfo
             });
         }
         data.battle.activeZones = zones;
@@ -740,56 +768,59 @@ let engine = {
         }
         return alive;
     },
-    updateEnemyAttacks: function(tickMs) {
+    updateIntruderAttacks: function(tickMs) {
         for (let i = 0; i < data.battle.enemies.length; i++) {
-            const enemy = data.battle.enemies[i];
-            const canAttack = enemy.enemyType === "ranged" ? (!!enemy.rangedReady || !!enemy.inRange) : !!enemy.inRange;
-            if (!enemy.alive || !canAttack) {
+            const intruder = data.battle.enemies[i];
+            const canAttack = intruder.intruderType === "lecher" ? (!!intruder.lecherReady || !!intruder.inRange) : !!intruder.inRange;
+            if (!intruder.alive || !canAttack) {
                 continue;
             }
-            enemy.attackTimerMs -= tickMs;
-            if (enemy.attackTimerMs <= 0) {
-                const enemyCd = enemy.enemyType === "ranged" ? (enemy.attackCooldownMs * 2) : enemy.attackCooldownMs;
-                enemy.attackTimerMs += enemyCd;
-                if (enemy.enemyType === "ranged") {
-                    engine.pushEnemyRangedLineFx(enemy);
+            intruder.attackTimerMs -= tickMs;
+            if (intruder.attackTimerMs <= 0) {
+                const intruderCd = intruder.intruderType === "lecher" ? (intruder.attackCooldownMs * 2) : intruder.attackCooldownMs;
+                intruder.attackTimerMs += intruderCd;
+                if (intruder.intruderType === "lecher") {
+                    engine.pushIntruderSandalLineFx(intruder);
                 }
-                const endLv = engine.getUnlockedSkillLevel("endurance");
-                const dmgMultiplier = 1 / (1 + (endLv * 0.05));
-                let incoming = enemy.attackDamage * dmgMultiplier;
-                const armorFlat = engine.getUnlockedSkillLevel("toughness_warrior") * 0.25;
+                const endEff = skills.getSkillEffect("fortitude");
+                const dmgMultiplier = endEff.fortitudeIncomingDamageMultiplier !== undefined ? endEff.fortitudeIncomingDamageMultiplier : 1;
+                let incoming = intruder.attackDamage * dmgMultiplier;
+                const tEff = skills.getSkillEffect("toughness_warrior");
+                const armorFlat = tEff.toughnessArmorFlat || 0;
                 incoming = Math.max(0, incoming - armorFlat);
                 if ((data.progress.currentClassKey || "none") === "warrior" && (data.battle.classPowerB || 0) >= 1000) {
                     data.battle.classPowerB -= 1000;
                     incoming *= 0.5;
                     engine.onSkillTrigger("second_wind", 1);
-                    const secondWindHeal = engine.getUnlockedSkillLevel("second_wind");
+                    const swEff = skills.getSkillEffect("second_wind");
+                    const secondWindHeal = swEff.secondWindBlockHeal || 0;
                     if (secondWindHeal > 0) {
                         data.battle.player.hp = Math.min(data.battle.player.maxHp, data.battle.player.hp + secondWindHeal);
                     }
                 }
-                if (incoming > 0 && (data.progress.currentClassKey || "none") === "warrior" && enemy.enemyType !== "ranged") {
+                if (incoming > 0 && (data.progress.currentClassKey || "none") === "warrior" && intruder.intruderType !== "lecher") {
                     engine.addClassBarProgress("B", 200);
-                    const thorns = engine.getUnlockedSkillLevel("thorns");
+                    const thEff = skills.getSkillEffect("thorns");
+                    const thorns = thEff.thornsRetaliationDamage || 0;
                     if (thorns > 0) {
-                        enemy.hp -= thorns;
+                        intruder.hp -= thorns;
                     }
                 }
                 data.battle.player.hp -= incoming;
-                engine.onSkillTrigger("endurance", 1);
-                engine.onSkillTrigger("toughness_warrior", enemy.enemyType === "ranged" ? 0 : 1);
-                engine.onSkillTrigger("thorns", (incoming > 0 && enemy.enemyType !== "ranged") ? 1 : 0);
+                engine.onSkillTrigger("fortitude", 1);
+                engine.onSkillTrigger("toughness_warrior", intruder.intruderType === "lecher" ? 0 : 1);
+                engine.onSkillTrigger("thorns", (incoming > 0 && intruder.intruderType !== "lecher") ? 1 : 0);
                 if (data.battle.player.hp < 0) {
                     data.battle.player.hp = 0;
                 }
-                if (enemy.hp <= 0) {
-                    enemy.hp = 0;
-                    enemy.alive = false;
-                    if (data.battle.activeTargetId === enemy.id) {
+                if (intruder.hp <= 0) {
+                    intruder.hp = 0;
+                    intruder.alive = false;
+                    if (data.battle.activeTargetId === intruder.id) {
                         data.battle.activeTargetId = null;
                     }
-                    engine.removeEnemyFromMeleeQueue(enemy.id);
-                    engine.onEnemyKilled(enemy);
+                    engine.removeIntruderFromSlapQueue(intruder.id);
+                    engine.onIntruderKilled(intruder);
                 }
             }
         }
@@ -800,8 +831,8 @@ let engine = {
             if (data.battle.enemies[i].alive) {
                 survivors.push(data.battle.enemies[i]);
             } else {
-                data.battle.enemyPool.availableIds.push(data.battle.enemies[i].id);
-                delete data.battle.enemyPool.inUseIds[data.battle.enemies[i].id];
+                data.battle.intruderPool.availableIds.push(data.battle.enemies[i].id);
+                delete data.battle.intruderPool.inUseIds[data.battle.enemies[i].id];
             }
         }
         data.battle.enemies = survivors;
@@ -811,12 +842,6 @@ let engine = {
             return;
         }
         if ((data.battle.mode || "combat") === "foraging") {
-            const st = engine.getMapClearState(data.progress.currentMapKey);
-            if ((st.activeMs || 0) <= 0) {
-                engine.saveRunHistoryIfNeeded();
-                data.battle.state = "completed";
-                data.gameSettings.stop = true;
-            }
             return;
         }
         const map = initialize.getCurrentMapDefinition();
@@ -840,42 +865,72 @@ let engine = {
         data.progress.autoRetryCountdownSec = chapel && chapel.autoRetryEnabled ? 10 : 0;
         data.gameSettings.stop = true;
     },
-    onEnemyKilled: function(enemy) {
+    applyOverkillAttackProgressAfterKill: function(kind) {
+        if ((data.progress.currentClassKey || "none") !== "warrior") {
+            return;
+        }
+        if (!skills.isSkillUnlocked("overkill")) {
+            return;
+        }
+        const sk = data.progress.skills.overkill;
+        const lv = sk ? (sk.level || 0) : 0;
+        if (lv <= 0) {
+            return;
+        }
+        const p = data.battle.player;
+        const cd = kind === "sandal" ? engine.getEffectiveSandalCooldownMs() : engine.getEffectiveSlapCooldownMs();
+        const floorMs = kind === "sandal" ? gameData.battle.cooldowns.sandalFloorMs : gameData.battle.cooldowns.slapFloorMs;
+        const maxSkip = Math.max(0, cd - floorMs);
+        const want = 50 * lv;
+        const applied = Math.min(want, maxSkip);
+        if (applied <= 0) {
+            return;
+        }
+        if (kind === "sandal") {
+            p.sandalAttackTimerMs = Math.max(0, (p.sandalAttackTimerMs || 0) - applied);
+        } else {
+            p.attackTimerMs = Math.max(0, (p.attackTimerMs || 0) - applied);
+        }
+    },
+    onIntruderKilled: function(intruder, opts) {
         const chapel = data.progress.base && data.progress.base.chapel;
         const growthUnlocked = !!(chapel && chapel.growthBlessingUnlocked);
         if ((data.battle.mode || "combat") === "foraging") {
             const res = data.progress.base && data.progress.base.resources;
             if (res) {
-                const key = enemy.rewardResource || "logs";
-                const amount = Math.ceil((enemy.gain || 1) * (initialize.getCurrentMapDefinition().baseDifficulty || 1));
+                const key = intruder.rewardResource || "logs";
+                const amount = Math.ceil((intruder.gain || 1) * (initialize.getCurrentMapDefinition().baseDifficulty || 1));
                 if (res[key] === undefined) {
                     res[key] = 0;
                 }
                 res[key] += amount;
             }
             if (growthUnlocked) {
-                data.battle.levelState.exp += (enemy.expBase !== undefined ? enemy.expBase : 1);
+                data.battle.levelState.exp += (intruder.expBase !== undefined ? intruder.expBase : 1);
             }
             data.battle.enemiesKilled++;
             engine.onSkillTrigger("quick_rest", 1);
-            const qr = skills.isSkillUnlocked("quick_rest") && data.progress.skills.quick_rest ? (data.progress.skills.quick_rest.level || 0) : 0;
+            const qrEff = skills.getSkillEffect("quick_rest");
+            const qr = qrEff.quickRestStaminaPerGather || 0;
             if (qr > 0) {
-                data.battle.player.hp = Math.min(data.battle.player.maxHp, data.battle.player.hp + (qr * 0.25));
+                data.battle.player.hp = Math.min(data.battle.player.maxHp, data.battle.player.hp + qr);
             }
             if (growthUnlocked) {
                 engine.resolveLevelUps();
             }
             return;
         }
-        const gain = enemy.gain || 1;
-        const expBase = enemy.expBase !== undefined ? enemy.expBase : 1;
-        const expGain = engine.expAwardFromEnemyExpBase(expBase);
-        const goldGain = engine.goldAwardFromEnemyGain(gain);
+        const gain = intruder.gain || 1;
+        const expBase = intruder.expBase !== undefined ? intruder.expBase : 1;
+        const expGain = engine.expAwardFromIntruderExpBase(expBase);
+        const goldGain = engine.goldAwardFromIntruderGain(gain);
         data.progress.gold += goldGain;
+        data.battle.runGoldFromKills = (data.battle.runGoldFromKills || 0) + goldGain;
         if (growthUnlocked) {
             data.battle.levelState.exp += expGain;
         }
         data.battle.enemiesKilled++;
+        const shardDrop = engine.trySkillShardDropOnKill(intruder);
         engine.addMapClearProgressForKill(data.progress.currentMapKey);
         engine.onSkillTrigger("wisdom", 1);
         engine.onSkillTrigger("greed", 1);
@@ -883,26 +938,162 @@ let engine = {
         if (data.battle.state === "running") {
             engine.updateCurrentZoneInfo();
         }
+        if (typeof view !== "undefined" && view.spawnKillRewardFloater) {
+            const pos = engine.getKillFloaterScreenPosition(intruder);
+            const parts = [
+                `${intToStringRound(goldGain)} gold`,
+                growthUnlocked ? `+${round1(expGain)} exp` : "+0 exp"
+            ];
+            if (shardDrop) {
+                parts.push(`+${shardDrop.gain} ${shardDrop.name}`);
+            }
+            view.spawnKillRewardFloater(pos.x, pos.y, parts);
+        }
         if ((data.progress.currentClassKey || "none") === "rogue") {
             engine.addClassBarProgress("A", 300);
         }
         if (growthUnlocked) {
             engine.resolveLevelUps();
         }
+        if (opts && opts.__OVERKILL__BoostKind) {
+            engine.applyOverkillAttackProgressAfterKill(opts.__OVERKILL__BoostKind);
+        }
     },
-    /** Matches `onEnemyKilled`: wisdom scales exp from zone `expBase`. */
-    expAwardFromEnemyExpBase: function(expBase) {
-        const wisdomLevel = data.progress.skills.wisdom ? data.progress.skills.wisdom.level : 0;
+    /** Matches `onIntruderKilled`: wisdom scales exp from zone `expBase`. */
+    expAwardFromIntruderExpBase: function(expBase) {
         const b = expBase !== undefined ? expBase : 1;
-        return b * Math.pow(1.1, wisdomLevel);
+        const e = skills.getSkillEffect("wisdom");
+        const mult = e.wisdomCharacterExpMultiplier !== undefined ? e.wisdomCharacterExpMultiplier : 1;
+        return b * mult;
     },
-    /** Matches `onEnemyKilled`: scavenger flat + greedy gold multiplier over stored zone gain. */
-    goldAwardFromEnemyGain: function(storedGain) {
-        const greedLevel = data.progress.skills.greed ? data.progress.skills.greed.level : 0;
-        const scavLevel = data.progress.skills.scavenger ? data.progress.skills.scavenger.level : 0;
+    /** Matches `onIntruderKilled`: scavenger flat + greedy gold multiplier over stored zone gain. */
+    goldAwardFromIntruderGain: function(storedGain) {
         const gain = storedGain !== undefined ? storedGain : 1;
-        const baseGoldPart = gain + scavLevel;
-        return baseGoldPart * Math.pow(1.05, greedLevel);
+        const sEff = skills.getSkillEffect("scavenger");
+        const gEff = skills.getSkillEffect("greed");
+        const scavFlat = sEff.scavengerKillGoldFlatPerKill || 0;
+        const baseGoldPart = gain + scavFlat;
+        const greedMult = gEff.greedKillGoldMultiplier !== undefined ? gEff.greedKillGoldMultiplier : 1;
+        return baseGoldPart * greedMult;
+    },
+    initZoneShardRunCounts: function() {
+        const map = initialize.getCurrentMapDefinition();
+        data.battle.zoneShardRunCounts = [];
+        if (!map || !map.zones) {
+            return;
+        }
+        for (let i = 0; i < map.zones.length; i++) {
+            data.battle.zoneShardRunCounts.push(0);
+        }
+    },
+    /** Skill exp only (no talent); uses same exp multipliers as triggers including Integration. */
+    addSkillExpFromShardsOnly: function(skillKey, amount) {
+        if (!amount || amount <= 0) {
+            return;
+        }
+        if (!skills.isSkillUnlocked(skillKey)) {
+            return;
+        }
+        const d = skills._byKey[skillKey];
+        const mode = data.battle.mode || "combat";
+        const cat = d && d.category ? d.category : "combat";
+        if (mode === "foraging" && cat !== "foraging") {
+            return;
+        }
+        if (mode !== "foraging" && cat === "foraging") {
+            return;
+        }
+        if (d && d.classKey && d.classKey !== (data.progress.currentClassKey || "none")) {
+            return;
+        }
+        const skill = data.progress.skills[skillKey];
+        if (!skill) {
+            return;
+        }
+        if (skill.maxLevel !== undefined && skill.level >= skill.maxLevel) {
+            return;
+        }
+        const gainBase = skills.expGainForSkillTrigger(skill, amount);
+        const intMult = skillKey !== "integration" ? skills.getIntegrationExpMultiplierForOthers() : 1;
+        const gain = gainBase * intMult;
+        skill.exp += gain;
+        const initExp = d.initialExpToLevel !== undefined ? d.initialExpToLevel : 5;
+        while (skill.exp >= skill.expToLevel && (!skill.maxLevel || skill.level < skill.maxLevel)) {
+            skill.exp -= skill.expToLevel;
+            skill.level++;
+            skill.expToLevel = initExp * Math.pow(skill.level, 1.2);
+            engine.onSkillLevelUp(skill);
+        }
+    },
+    applySkillShardExpOnBattleStart: function() {
+        const sks = data.progress.skills;
+        if (!sks) {
+            return;
+        }
+        const keys = Object.keys(sks);
+        for (let i = 0; i < keys.length; i++) {
+            const k = keys[i];
+            const sk = sks[k];
+            const n = sk && sk.shards !== undefined ? sk.shards : 0;
+            if (n <= 0) {
+                continue;
+            }
+            engine.addSkillExpFromShardsOnly(k, n);
+            sk.shards = 0;
+        }
+    },
+    trySkillShardDropOnKill: function(intruder) {
+        if ((data.battle.mode || "combat") !== "combat" || !intruder) {
+            return null;
+        }
+        const map = initialize.getCurrentMapDefinition();
+        if (!map || !map.zones || intruder.zoneIndex === undefined || intruder.zoneIndex === null) {
+            return null;
+        }
+        const z = map.zones[intruder.zoneIndex];
+        if (!z || !z.skillShard) {
+            return null;
+        }
+        const sh = z.skillShard;
+        if (!skills._byKey[sh.key]) {
+            return null;
+        }
+        const counts = data.battle.zoneShardRunCounts;
+        const zi = intruder.zoneIndex;
+        if (!counts || zi < 0 || zi >= counts.length) {
+            return null;
+        }
+        if (counts[zi] >= (sh.max || 0)) {
+            return null;
+        }
+        const tier = data.battle.mapTier || 0;
+        const chanceMult = tier >= 2 ? 10 : (tier >= 1 ? 3 : 1);
+        const p = Math.min(0.999, (sh.chance || 0) * chanceMult);
+        if (Math.random() >= p) {
+            return null;
+        }
+        if (!skills.isSkillUnlocked(sh.key)) {
+            return null;
+        }
+        const room = (sh.max || 0) - counts[zi];
+        const gain = Math.min(sh.gain || 1, room);
+        if (gain <= 0) {
+            return null;
+        }
+        counts[zi] += gain;
+        const target = data.progress.skills[sh.key];
+        if (target) {
+            target.shards = (target.shards || 0) + gain;
+        }
+        return { gain: gain, name: skills._byKey[sh.key].name, key: sh.key };
+    },
+    getKillFloaterScreenPosition: function(intruder) {
+        const lm = engine.getBattleLaneMetrics();
+        const laneCenter = lm.inset + (intruder.lane + 0.5) * lm.laneWidth;
+        const leftPx = Math.round(laneCenter - (intruder.sizePx / 2));
+        const cx = leftPx + intruder.sizePx / 2;
+        const cy = intruder.yPx + intruder.sizePx / 2;
+        return { x: cx, y: cy };
     },
     resolveLevelUps: function() {
         const chapel = data.progress.base && data.progress.base.chapel;
@@ -911,26 +1102,29 @@ let engine = {
         if (!growthUnlocked) {
             return;
         }
-        while (data.battle.levelState.exp >= data.battle.levelState.expToLevel) {
-            data.battle.levelState.exp -= data.battle.levelState.expToLevel;
-            data.battle.levelState.level++;
+        const ls = data.battle.levelState;
+        if (ls.expToLevelBase === undefined || ls.expToLevelBase === null) {
+            ls.expToLevelBase = ls.expToLevel || gameData.battle.levelStartingExpToLevel;
+        }
+        while (ls.exp >= ls.expToLevel) {
+            ls.exp -= ls.expToLevel;
+            ls.level++;
             const cls = initialize.getCurrentClassDef();
-            data.battle.levelState.levelStr += cls.perLevel.str || 0;
-            data.battle.levelState.levelCon += cls.perLevel.con || 0;
-            data.battle.levelState.levelSpd += cls.perLevel.spd || 0;
-            data.battle.levelState.expToLevel = Math.floor(data.battle.levelState.expToLevel * 1.35);
+            ls.levelStr += cls.perLevel.str || 0;
+            ls.levelCon += cls.perLevel.con || 0;
+            ls.levelSpd += cls.perLevel.spd || 0;
+            ls.expToLevelBase *= 1.35;
+            ls.expToLevel = Math.max(1, Math.round(ls.expToLevelBase));
             if (plannedGrowthUnlocked) {
-                const nextLevel = data.battle.levelState.level;
+                const nextLevel = ls.level;
                 const planned = engine.getPlanEntryForLevel(nextLevel);
                 if (planned) {
                     engine.applyAttributePoint(planned.attribute, false);
                 } else {
-                    data.battle.levelState.unassignedPoints++;
+                    ls.unassignedPoints++;
                 }
-                const discLv = data.progress.skills.discipline ? data.progress.skills.discipline.level : 0;
-                data.battle.levelState.unassignedPoints += discLv;
-                engine.onSkillTrigger("discipline", 1);
             }
+            engine.onSkillTrigger("adaptation", 1);
             initialize.calcPlayerStats(false);
         }
     },
@@ -985,7 +1179,7 @@ let engine = {
         initialize.calcPlayerStats(false);
         return true;
     },
-    anyEnemyInMeleeRange: function() {
+    anyIntruderInSlapRange: function() {
         for (let i = 0; i < data.battle.enemies.length; i++) {
             const e = data.battle.enemies[i];
             if (e.alive && e.inRange) {
@@ -994,8 +1188,8 @@ let engine = {
         }
         return false;
     },
-    anyEnemyInPlayerRange: function() {
-        const rangedOn = !!(data.progress.rangedAttackEnabled && data.progress.base && data.progress.base.workshop && data.progress.base.workshop.bowBuilt);
+    anyIntruderInPlayerRange: function() {
+        const sandalOn = !!(data.progress.sandalAttackEnabled && data.progress.base && data.progress.base.workshop && data.progress.base.workshop.sandalBuilt);
         for (let i = 0; i < data.battle.enemies.length; i++) {
             const e = data.battle.enemies[i];
             if (!e.alive) {
@@ -1004,26 +1198,26 @@ let engine = {
             if (e.inRange) {
                 return true;
             }
-            if (rangedOn && engine.enemyIntersectsBattlefield(e)) {
+            if (sandalOn && engine.intruderIntersectsBattlefield(e)) {
                 return true;
             }
         }
         return false;
     },
-    anyEnemyVisible: function() {
+    anyIntruderVisible: function() {
         for (let i = 0; i < data.battle.enemies.length; i++) {
             const e = data.battle.enemies[i];
-            if (e.alive && engine.enemyIntersectsBattlefield(e)) {
+            if (e.alive && engine.intruderIntersectsBattlefield(e)) {
                 return true;
             }
         }
         return false;
     },
-    meleeAttackReady: function() {
+    slapAttackReady: function() {
         return data.battle.player.attackTimerMs <= 0;
     },
     idleAutoPhase: function() {
-        return !engine.anyEnemyInPlayerRange() && engine.meleeAttackReady();
+        return !engine.anyIntruderInPlayerRange() && engine.slapAttackReady();
     },
     countAliveEnemies: function() {
         let n = 0;
@@ -1034,8 +1228,8 @@ let engine = {
         }
         return n;
     },
-    getEnemyPushBonusPxPerSecond: function() {
-        if (engine.anyEnemyInPlayerRange() || engine.countAliveEnemies() === 0) {
+    getIntruderPushBonusPxPerSecond: function() {
+        if (engine.anyIntruderInPlayerRange() || engine.countAliveEnemies() === 0) {
             return 0;
         }
         const spd = data.battle.levelState.levelSpd || 0;
@@ -1094,9 +1288,7 @@ let engine = {
         const clearState = engine.getMapClearState(mapKey);
         const addStarClearProgress = function(pct) {
             clearState.pct = Math.min(100, (clearState.pct || 0) + pct);
-            if (clearState.pct >= 100 && (clearState.activeMs || 0) <= 0) {
-                clearState.activeMs = 120000;
-            }
+            engine.maybeStartHarvestRespawnCountdown(mapKey);
         };
         if (!data.progress.mapStars[mapKey]) {
             data.progress.mapStars[mapKey] = { bronze: false, silver: false, gold: false };
@@ -1152,33 +1344,34 @@ let engine = {
         data.battle.transitionMessage = "";
         data.battle.nextTierAfterCountdown = 0;
         data.battle.enemies = [];
-        data.battle.meleeQueue = [];
+        data.battle.slapQueue = [];
         data.battle.activeTargetId = null;
         data.battle.player.attackTimerMs = 0;
-        data.battle.player.rangedAttackTimerMs = 0;
-        data.battle.prevZoneNameForFortitude = null;
+        data.battle.player.sandalAttackTimerMs = 0;
+        data.battle.enduranceExpAccMs = 0;
+        engine.initZoneShardRunCounts();
     },
-    /** True if the enemy token overlaps the battlefield clip rect (may be partially outside); used for draw and range checks while simulating all enemies. */
-    enemyIntersectsBattlefield: function(enemy) {
+    /** True if the intruder token overlaps the battlefield clip rect (may be partially outside); used for draw and range checks while simulating all enemies. */
+    intruderIntersectsBattlefield: function(intruder) {
         const lm = engine.getBattleLaneMetrics();
         const bw = lm.battleWidth;
         const bh = viewData.layout.battlefieldHeightPx || gameData.battle.battlefieldHeightPx || 500;
-        const cx = lm.inset + (enemy.lane + 0.5) * lm.laneWidth;
-        const half = enemy.sizePx / 2;
+        const cx = lm.inset + (intruder.lane + 0.5) * lm.laneWidth;
+        const half = intruder.sizePx / 2;
         const left = cx - half;
         const right = cx + half;
-        const top = enemy.yPx;
-        const bottom = enemy.yPx + enemy.sizePx;
+        const top = intruder.yPx;
+        const bottom = intruder.yPx + intruder.sizePx;
         const horizOk = right > 0 && left < bw;
         const vertOk = bottom > 0 && top < bh;
         return horizOk && vertOk;
     },
-    getRangedDamageTarget: function() {
+    getSandalDamageTarget: function() {
         let best = null;
         let bestBottom = -Infinity;
         for (let i = 0; i < data.battle.enemies.length; i++) {
             const e = data.battle.enemies[i];
-            if (!e.alive || !engine.enemyIntersectsBattlefield(e)) {
+            if (!e.alive || !engine.intruderIntersectsBattlefield(e)) {
                 continue;
             }
             const bottom = e.yPx + e.sizePx;
@@ -1209,7 +1402,7 @@ let engine = {
             kind: kind
         });
     },
-    pushEnemyRangedLineFx: function(attacker) {
+    pushIntruderSandalLineFx: function(attacker) {
         if (!attacker) {
             return;
         }
@@ -1229,98 +1422,110 @@ let engine = {
             y1: y1,
             x2: x2,
             y2: y2,
-            kind: "enemy_ranged"
+            kind: "lecher_strike"
         });
     },
-    enqueueMeleeLineFx: function(target) {
-        engine.pushAttackLineFx(target, "melee");
+    enqueueSlapLineFx: function(target) {
+        engine.pushAttackLineFx(target, "slap");
     },
-    enqueueRangedLineFx: function(target) {
-        engine.pushAttackLineFx(target, "ranged");
+    enqueueSandalLineFx: function(target) {
+        engine.pushAttackLineFx(target, "sandal");
     },
-    updateRangedAttack: function(tickMs) {
+    updateSandalAttack: function(tickMs) {
         if (data.battle.state !== "running") {
             return;
         }
         if (!engine.idleAutoPhase() || engine.countAliveEnemies() === 0) {
             return;
         }
-        if (!(data.progress.rangedAttackEnabled && data.progress.base && data.progress.base.workshop && data.progress.base.workshop.bowBuilt)) {
+        if (!(data.progress.sandalAttackEnabled && data.progress.base && data.progress.base.workshop && data.progress.base.workshop.sandalBuilt)) {
             return;
         }
         if ((data.progress.currentClassKey || "none") === "rogue") {
             return;
         }
         const p = data.battle.player;
-        p.rangedAttackTimerMs -= tickMs;
-        if (p.rangedAttackTimerMs > 0) {
+        p.sandalAttackTimerMs -= tickMs;
+        if (p.sandalAttackTimerMs > 0) {
             return;
         }
-        const rt = engine.getRangedDamageTarget();
+        const rt = engine.getSandalDamageTarget();
         if (!rt) {
-            p.rangedAttackTimerMs = 0;
+            p.sandalAttackTimerMs = 0;
             return;
         }
         const cls = data.progress.currentClassKey || "none";
-        let rangedDamage = p.rangedAttackDamage;
-        const sneakLv = engine.getUnlockedSkillLevel("sneak_attack");
+        let sandalDamage = p.sandalAttackDamage;
+        const snEffR = skills.getSkillEffect("sneak_attack");
+        const sneakFracR = snEffR.sneakFirstHitDamageBonusFraction || 0;
         const priorHits = rt.timesHitByPlayer || 0;
-        if (sneakLv > 0 && priorHits === 0) {
-            rangedDamage *= 1 + (sneakLv * 0.1);
+        if (sneakFracR > 0 && priorHits === 0) {
+            sandalDamage *= 1 + sneakFracR;
         }
-        const exploitLv = engine.getUnlockedSkillLevel("exploit");
-        const prevTarget = data.battle.lastPlayerHitEnemyId || 0;
+        const xpEffR = skills.getSkillEffect("exploit");
+        const exploitStepR = xpEffR.exploitFlatDamagePerConsecutiveStep || 0;
+        const prevTarget = data.battle.lastPlayerHitIntruderId || 0;
         const streak = (prevTarget === rt.id) ? ((data.battle.lastPlayerHitStreak || 0) + 1) : 1;
-        if (exploitLv > 0 && streak >= 2) {
-            rangedDamage += (streak - 1) * exploitLv;
+        if (exploitStepR > 0 && streak >= 2) {
+            sandalDamage += (streak - 1) * exploitStepR;
         }
-        rangedDamage = Math.max(1, Math.round(rangedDamage));
-        rt.hp -= rangedDamage;
-        data.battle.lastPlayerHitEnemyId = rt.id;
+        sandalDamage = Math.max(1, roundNearestDecimals(sandalDamage, 1));
+        const hpBeforeSandal = rt.hp;
+        rt.hp -= sandalDamage;
+        data.battle.lastPlayerHitIntruderId = rt.id;
         data.battle.lastPlayerHitStreak = streak;
         rt.timesHitByPlayer = priorHits + 1;
-        if (sneakLv > 0 && priorHits === 0) {
+        if (skills.isSkillUnlocked("overkill")) {
+            const overR = Math.max(0, sandalDamage - hpBeforeSandal);
+            engine.onSkillTrigger("overkill", Math.sqrt(overR));
+        }
+        if (sneakFracR > 0 && priorHits === 0) {
             engine.onSkillTrigger("sneak_attack", 1);
         }
-        if (exploitLv > 0 && priorHits > 0) {
+        if (exploitStepR > 0 && priorHits > 0) {
             engine.onSkillTrigger("exploit", 1);
         }
-        const impactLv = engine.getUnlockedSkillLevel("impact");
-        if (impactLv > 0) {
+        const imEff = skills.getSkillEffect("impact");
+        const impactTravel = imEff.impactKnockbackTravelSeconds || 0;
+        if (impactTravel > 0) {
             const battleHeight = viewData.layout.battlefieldHeightPx || 500;
             const playerTopY = viewData.layout.playerTopPx || (battleHeight - 65);
             const line300FtY = playerTopY - 300;
-            const enemyBottomPast300 = (rt.yPx + rt.sizePx) >= line300FtY;
-            if (enemyBottomPast300) {
+            const intruderBottomPast300 = (rt.yPx + rt.sizePx) >= line300FtY;
+            if (intruderBottomPast300) {
                 engine.onSkillTrigger("impact", 1);
             }
-            const knockbackPx = rt.speedPxPerSecond * 0.1 * impactLv;
+            const knockbackPx = rt.speedPxPerSecond * impactTravel;
             rt.yPx = Math.max(-rt.sizePx, rt.yPx - knockbackPx);
             rt.inRange = false;
         }
         if (cls === "hunter" && (data.battle.classPowerA || 0) >= 1000) {
-            const t2 = engine.getSecondRangedDamageTarget(rt.id);
+            const t2 = engine.getSecondSandalDamageTarget(rt.id);
             if (t2) {
                 data.battle.classPowerA -= 1000;
-                t2.hp -= rangedDamage;
-                engine.enqueueRangedLineFx(t2);
+                const hpBeforeT2 = t2.hp;
+                t2.hp -= sandalDamage;
+                engine.enqueueSandalLineFx(t2);
                 if (t2.hp <= 0) {
+                    if (skills.isSkillUnlocked("overkill")) {
+                        engine.onSkillTrigger("overkill", Math.sqrt(Math.max(0, sandalDamage - hpBeforeT2)));
+                    }
                     t2.hp = 0;
                     t2.alive = false;
                     if (data.battle.activeTargetId === t2.id) data.battle.activeTargetId = null;
-                    engine.removeEnemyFromMeleeQueue(t2.id);
-                    engine.onEnemyKilled(t2);
+                    engine.removeIntruderFromSlapQueue(t2.id);
+                    engine.onIntruderKilled(t2, { __OVERKILL__BoostKind: "sandal" });
                     engine.onSkillTrigger("longshot", 1);
                 }
             }
         }
-        engine.enqueueRangedLineFx(rt);
-        const rcd = engine.getEffectiveRangedCooldownMs();
-        p.rangedAttackTimerMs = rcd + Math.min(0, p.rangedAttackTimerMs);
+        engine.enqueueSandalLineFx(rt);
+        const rcd = engine.getEffectiveSandalCooldownMs();
+        p.sandalAttackTimerMs = rcd + Math.min(0, p.sandalAttackTimerMs);
         if (cls === "hunter") {
             engine.addClassBarProgress("A", 200);
         }
-        engine.onSkillTrigger("finesse", 1);
+        engine.onSkillTrigger("force", 1);
         engine.onSkillTrigger("alacrity", 1);
         if (rt.hp <= 0) {
             rt.hp = 0;
@@ -1328,17 +1533,18 @@ let engine = {
             if (data.battle.activeTargetId === rt.id) {
                 data.battle.activeTargetId = null;
             }
-            engine.removeEnemyFromMeleeQueue(rt.id);
-            engine.onEnemyKilled(rt);
+            engine.removeIntruderFromSlapQueue(rt.id);
+            engine.onIntruderKilled(rt, { __OVERKILL__BoostKind: "sandal" });
             engine.onSkillTrigger("longshot", 1);
         }
     },
     applyWarriorCleave: function(primaryTarget, dealtDamage) {
-        const cleaveLv = engine.getUnlockedSkillLevel("cleave");
-        if (cleaveLv <= 0 || dealtDamage <= 0) {
+        const clEff = skills.getSkillEffect("cleave");
+        const splashFrac = clEff.cleaveSplashFraction || 0;
+        if (splashFrac <= 0 || dealtDamage <= 0) {
             return;
         }
-        const splash = Math.max(1, Math.floor(dealtDamage * (cleaveLv * 0.1)));
+        const splash = Math.max(1, Math.floor(dealtDamage * splashFrac));
         const toHit = [];
         for (let i = 0; i < data.battle.enemies.length; i++) {
             const e = data.battle.enemies[i];
@@ -1369,32 +1575,36 @@ let engine = {
         }
         for (let i = 0; i < toHit.length; i++) {
             const e = toHit[i];
+            const hpBeforeSplash = e.hp;
             e.hp -= splash;
             if (e.hp <= 0) {
+                if (skills.isSkillUnlocked("overkill")) {
+                    engine.onSkillTrigger("overkill", Math.sqrt(Math.max(0, splash - hpBeforeSplash)));
+                }
                 e.hp = 0;
                 e.alive = false;
                 if (data.battle.activeTargetId === e.id) {
                     data.battle.activeTargetId = null;
                 }
-                engine.removeEnemyFromMeleeQueue(e.id);
-                engine.onEnemyKilled(e);
+                engine.removeIntruderFromSlapQueue(e.id);
+                engine.onIntruderKilled(e, { __OVERKILL__BoostKind: "slap" });
             }
         }
     },
-    removeEnemyFromMeleeQueue: function(enemyId) {
-        const q = data.battle.meleeQueue;
+    removeIntruderFromSlapQueue: function(intruderId) {
+        const q = data.battle.slapQueue;
         const next = [];
         for (let i = 0; i < q.length; i++) {
-            if (q[i] !== enemyId) {
+            if (q[i] !== intruderId) {
                 next.push(q[i]);
             }
         }
-        data.battle.meleeQueue = next;
+        data.battle.slapQueue = next;
     },
-    getSecondRangedDamageTarget: function(excludeId) {
+    getSecondSandalDamageTarget: function(excludeId) {
         for (let i = 0; i < data.battle.enemies.length; i++) {
             const e = data.battle.enemies[i];
-            if (!e.alive || e.id === excludeId || !engine.enemyIntersectsBattlefield(e)) continue;
+            if (!e.alive || e.id === excludeId || !engine.intruderIntersectsBattlefield(e)) continue;
             return e;
         }
         return null;
@@ -1425,24 +1635,37 @@ let engine = {
         if (skill.maxLevel !== undefined && skill.level >= skill.maxLevel) {
             return;
         }
-        const gain = skills.expGainForSkillTrigger(skill, amount);
+        const gainBase = skills.expGainForSkillTrigger(skill, amount);
+        const intMult = skillKey !== "integration" ? skills.getIntegrationExpMultiplierForOthers() : 1;
+        const gain = gainBase * intMult;
         skill.exp += gain;
         skill.talent += gain * 0.1;
         skill.triggerCount += amount;
+        const initExp = d.initialExpToLevel !== undefined ? d.initialExpToLevel : 5;
+        const initTal = d.initialTalentToLevel !== undefined ? d.initialTalentToLevel : 10;
         while (skill.exp >= skill.expToLevel && (!skill.maxLevel || skill.level < skill.maxLevel)) {
             skill.exp -= skill.expToLevel;
             skill.level++;
-            skill.expToLevel = Math.ceil(skill.expToLevel * 1.2);
+            skill.expToLevel = initExp * Math.pow(skill.level, 1.2);
             engine.onSkillLevelUp(skill);
         }
         while (skill.talent >= skill.talentToLevel) {
             skill.talent -= skill.talentToLevel;
             skill.talentLevel++;
-            skill.talentToLevel = Math.ceil(skill.talentToLevel * 1.05);
+            skill.talentToLevel = skill.talentToLevel * 1.05;
         }
     },
     onSkillLevelUp: function(skill) {
-        if (skill.affectedStat === "str") {
+        const def = skills._byKey[skill.key];
+        const cat = def && def.category ? def.category : "combat";
+        if (skill.key !== "integration" && (cat === "combat" || cat === "class")) {
+            engine.onSkillTrigger("integration", 1);
+        }
+        if (skill.key === "adaptation") {
+            data.battle.levelState.skillStrBonus++;
+            data.battle.levelState.skillConBonus++;
+            initialize.calcPlayerStats(false);
+        } else if (skill.affectedStat === "str") {
             data.battle.levelState.skillStrBonus++;
             initialize.calcPlayerStats(false);
         } else if (skill.affectedStat === "con") {
@@ -1450,9 +1673,11 @@ let engine = {
             initialize.calcPlayerStats(false);
         } else if (skill.key === "alacrity") {
             engine.syncPlayerCooldownFields();
-        } else if (skill.key === "fortitude") {
+        } else if (skill.key === "endurance") {
             initialize.calcPlayerStats(false);
-        } else if (skill.key === "finesse" || skill.key === "longshot") {
+        } else if (skill.key === "tenacity") {
+            initialize.calcPlayerStats(false);
+        } else if (skill.key === "force" || skill.key === "longshot") {
             initialize.calcPlayerStats(false);
         } else if (skill.key === "technique" || skill.key === "breathing") {
             initialize.calcPlayerStats(false);
@@ -1463,7 +1688,7 @@ let engine = {
             return;
         }
         const runSeconds = data.battle.elapsedMs / 1000;
-        const runGold = Math.max(0, data.progress.gold - data.battle.runStartGold);
+        const runGold = Math.max(0, data.battle.runGoldFromKills || 0);
         const runGoldPerSecond = runSeconds > 0 ? runGold / runSeconds : 0;
         const runLevel = data.battle.levelState ? (data.battle.levelState.level || 0) : 0;
         const runKills = data.battle.enemiesKilled || 0;
@@ -1493,9 +1718,9 @@ let engine = {
         }
         data.battle.historyLogged = true;
     },
-    findEnemyById: function(enemyId) {
+    findIntruderById: function(intruderId) {
         for (let i = 0; i < data.battle.enemies.length; i++) {
-            if (data.battle.enemies[i].id === enemyId) {
+            if (data.battle.enemies[i].id === intruderId) {
                 return data.battle.enemies[i];
             }
         }
@@ -1510,47 +1735,45 @@ let engine = {
         const res = base.resources;
 
         if ((base.mine.assignedWorkers || 0) > 0) {
-            base.mine.progress += ((base.mine.assignedWorkers || 0) / 20) * sec;
-            const madeOre = Math.floor(base.mine.progress);
-            if (madeOre > 0) {
-                base.mine.progress -= madeOre;
-                res.ironOre += madeOre;
+            let wp = base.mine.workerPower || 0;
+            wp += (base.mine.assignedWorkers || 0) * sec;
+            while (wp >= 40) {
+                wp -= 40;
+                res.ironOre += 1;
             }
+            base.mine.workerPower = wp;
         }
 
         if ((base.smith.assignedWorkers || 0) > 0 && res.ironOre > 0) {
-            base.smith.progress += ((base.smith.assignedWorkers || 0) / 20) * sec;
-            const potentialBars = Math.floor(base.smith.progress);
-            if (potentialBars > 0) {
-                const barsMade = Math.min(potentialBars, res.ironOre);
-                if (barsMade > 0) {
-                    base.smith.progress -= barsMade;
-                    res.ironOre -= barsMade;
-                    res.ironBar += barsMade;
-                }
+            let wp = base.smith.workerPower || 0;
+            wp += (base.smith.assignedWorkers || 0) * sec;
+            while (wp >= 40 && res.ironOre > 0) {
+                wp -= 40;
+                res.ironOre -= 1;
+                res.ironBar += 1;
             }
+            base.smith.workerPower = wp;
         }
 
         if ((base.claypit.assignedWorkers || 0) > 0) {
-            base.claypit.progress += ((base.claypit.assignedWorkers || 0) / 20) * sec;
-            const madeStone = Math.floor(base.claypit.progress);
-            if (madeStone > 0) {
-                base.claypit.progress -= madeStone;
-                res.stone += madeStone;
+            let wp = base.claypit.workerPower || 0;
+            wp += (base.claypit.assignedWorkers || 0) * sec;
+            while (wp >= 40) {
+                wp -= 40;
+                res.stone += 1;
             }
+            base.claypit.workerPower = wp;
         }
 
         if ((base.kiln.assignedWorkers || 0) > 0 && res.stone > 0) {
-            base.kiln.progress += ((base.kiln.assignedWorkers || 0) / 20) * sec;
-            const potentialBricks = Math.floor(base.kiln.progress);
-            if (potentialBricks > 0) {
-                const cutMade = Math.min(potentialBricks, res.stone);
-                if (cutMade > 0) {
-                    base.kiln.progress -= cutMade;
-                    res.stone -= cutMade;
-                    res.bricks += cutMade;
-                }
+            let wp = base.kiln.workerPower || 0;
+            wp += (base.kiln.assignedWorkers || 0) * sec;
+            while (wp >= 40 && res.stone > 0) {
+                wp -= 40;
+                res.stone -= 1;
+                res.bricks += 1;
             }
+            base.kiln.workerPower = wp;
         }
         if ((base.lumbermill.assignedWorkers || 0) > 0 && res.logs > 0) {
             base.lumbermill.progress += ((base.lumbermill.assignedWorkers || 0) / 20) * sec;
@@ -1597,27 +1820,16 @@ let engine = {
         inn.guests = nextGuests;
     },
     getInnChatSpeedMultiplier: function() {
-        const g = data.progress.skills.gossip;
-        if (!g || !skills.isSkillUnlocked("gossip")) {
-            return 1;
-        }
-        const lv = Math.min(99, g.level || 0);
-        return 1 / (1 - (lv / 100));
+        const e = skills.getSkillEffect("gossip");
+        return e.gossipChatSpeedMult !== undefined ? e.gossipChatSpeedMult : 1;
     },
     getManualActionCooldownSpeedMultiplier: function() {
-        const s = data.progress.skills.interfere;
-        if (!s || !skills.isSkillUnlocked("interfere")) {
-            return 1;
-        }
-        const lv = Math.min(99, s.level || 0);
-        return 1 / (1 - (lv / 100));
+        const e = skills.getSkillEffect("interfere");
+        return e.interfereManualCdSpeedMult !== undefined ? e.interfereManualCdSpeedMult : 1;
     },
     getManualActionRewardMultiplier: function() {
-        const s = data.progress.skills.interfere;
-        if (!s || !skills.isSkillUnlocked("interfere")) {
-            return 1;
-        }
-        return 1 + ((s.talentLevel || 0) * 0.1);
+        const e = skills.getSkillEffect("interfere");
+        return e.interfereManualRewardMult !== undefined ? e.interfereManualRewardMult : 1;
     },
     getInnGuestCapacity: function() {
         const w = data.progress.base && data.progress.base.workshop;
@@ -1677,7 +1889,11 @@ let engine = {
         }
         const rewardMult = engine.getManualActionRewardMultiplier();
         const addSec = 5 * workerCount * rewardMult;
-        progressRef.progress += (addSec / 20);
+        if (kind === "mine" || kind === "smith" || kind === "claypit" || kind === "kiln") {
+            progressRef.workerPower = (progressRef.workerPower || 0) + 5 * workerCount * rewardMult;
+        } else {
+            progressRef.progress += (addSec / 20);
+        }
         cooldownRef.manualCooldownMs = 10000;
         engine.onSkillTrigger("interfere", 1);
         return true;
@@ -1685,13 +1901,21 @@ let engine = {
     getTotalAssignedWorkers: function() {
         const b = data.progress.base;
         if (!b) return 0;
-        return (b.mine.assignedWorkers || 0) + (b.smith.assignedWorkers || 0) + (b.claypit.assignedWorkers || 0) + (b.kiln.assignedWorkers || 0) + (b.lumbermill.assignedWorkers || 0) + (b.library.assignedWorkers || 0);
+        return b.mine.assignedWorkers +
+            b.smith.assignedWorkers +
+            b.claypit.assignedWorkers +
+            b.kiln.assignedWorkers +
+            b.lumbermill.assignedWorkers +
+            b.library.assignedWorkers;
     },
     getTotalFoundWorkers: function() {
-        const mw = data.progress.mapWorkersFound || {};
+        const mw = data.progress.mapWorkersFound;
         const keys = Object.keys(mw);
         let total = 0;
         for (let i = 0; i < keys.length; i++) total += mw[keys[i]] || 0;
+        const tu = data.progress.base && data.progress.base.townhall && data.progress.base.townhall.townUpgrades;
+        const hireLocalCount = tu ? tu.hireLocalBought || 0 : 0;
+        total += Math.min(2, Math.max(0, hireLocalCount));
         return total;
     },
     getAvailableWorkers: function() {
@@ -1728,11 +1952,9 @@ let engine = {
         if (!skill) {
             return;
         }
-        const gossip = data.progress.skills.gossip;
-        let bonus = 1;
-        if (gossip && skills.isSkillUnlocked("gossip")) {
-            bonus += (gossip.talentLevel || 0) * 0.1;
-        }
+        const gEff = skills.getSkillEffect("gossip");
+        const tipTalent = gEff.gossipTipBonusFromTalent || 0;
+        const bonus = 1 + tipTalent;
         skill.tips = (skill.tips || 0) + (baseAmount * bonus);
     },
     getNextSkillResearchTargetKey: function() {
@@ -1760,7 +1982,31 @@ let engine = {
     },
     updateLibraryResearch: function(tickMs) {
         const lib = data.progress.base && data.progress.base.library;
-        if (!lib || (lib.assignedWorkers || 0) <= 0) {
+        if (!lib || !lib.skillResearch) {
+            return;
+        }
+        if (typeof isDebug !== "undefined" && isDebug) {
+            const categories = ["combat", "town", "foraging", "class"];
+            for (let ci = 0; ci < categories.length; ci++) {
+                const cat = categories[ci];
+                for (let i = 0; i < skills.keysInOrder.length; i++) {
+                    const k = skills.keysInOrder[i];
+                    const sk = data.progress.skills[k];
+                    if (!sk || (sk.category || "combat") !== cat) {
+                        continue;
+                    }
+                    const rs = lib.skillResearch[k];
+                    if (!rs || !rs.purchased || rs.researched || rs.paused) {
+                        continue;
+                    }
+                    rs.progress = rs.required || 0;
+                    rs.researched = true;
+                    lib.unlockedSkills[k] = true;
+                }
+            }
+            return;
+        }
+        if ((lib.assignedWorkers || 0) <= 0) {
             return;
         }
         const targetKey = engine.getNextSkillResearchTargetKey();
@@ -1779,8 +2025,6 @@ let engine = {
         rs.progress = rs.required || rs.progress || 0;
         rs.researched = true;
         lib.unlockedSkills[targetKey] = true;
-        createView.createSkillElements();
-        createView.clearCacheQueue();
     },
     rollInnGuest: function() {
         const baseGuests = [
@@ -1796,10 +2040,7 @@ let engine = {
                 continue;
             }
             const gi = skills.getSkillGuestInfo(k);
-            if (!gi) {
-                continue;
-            }
-            const r = Math.max(1, gi.rarity || 1);
+            const r = Math.max(1, gi.rarity);
             unlocked.push({ skillKey: k, archetype: gi.archetype, rarity: r });
             rarityTotal += r;
         }

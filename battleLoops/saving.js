@@ -113,7 +113,6 @@ let saving = {
         reader.onload = function(e) {
             const content = e.target.result;
             const compressedData = new Uint8Array(content);
-            saving.validateGzipData(compressedData);
             // Decompress
             const decompressed = fflate.gunzipSync(compressedData);
 
@@ -127,18 +126,5 @@ let saving = {
             location.reload();
         };
         reader.readAsArrayBuffer(file);
-    },
-    validateGzipData: function(data) {
-        // Check magic number
-        if (data.length < 2 || data[0] !== 0x1F || data[1] !== 0x8B) {
-            throw new Error('Invalid gzip header: missing magic bytes');
-        }
-
-        // Check compression method (should be 8 for DEFLATE)
-        if (data.length >= 3 && data[2] !== 8) {
-            console.warn('Unknown compression method:', data[2]);
-        }
-
-        return true;
     }
 }

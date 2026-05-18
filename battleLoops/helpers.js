@@ -15,6 +15,18 @@ function round5(num) {
     return Math.floor(num * 100000 + .000000001) / 100000;
 }
 
+/** Half-up rounding to `places` decimal places; dampens float noise for combat/UI numbers. */
+function roundNearestDecimals(num, places) {
+    if (!isFinite(num)) {
+        return num;
+    }
+    const p = Math.pow(10, places);
+    const shifted = num * p;
+    const adj = shifted >= 0 ? 1e-9 : -1e-9;
+    const n = Math.round(shifted + adj) / p;
+    return Object.is(n, -0) ? 0 : n;
+}
+
 function precision2(num) {
     return Number(num.toPrecision(2));
 }

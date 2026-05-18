@@ -10,7 +10,7 @@
     <meta http-equiv="pragma" content="no-cache" />
     <meta name="viewport" content="width=device-width, initial-scale=.8">
 
-    <title>Battle Loops</title>
+    <title>Hot Spring Loops</title>
     <link rel="stylesheet" href="stylesheet.css">
 </head>
 <body id="theBody" oncontextmenu="return false;" style="padding:5px" class="medium">
@@ -67,6 +67,7 @@
                     <div class="base-building-node base-building-smith-node">
                         <button id="baseBuilding_smith" class="base-building-label" onclick="events.selectBaseBuilding('smith')">Smith</button>
                         <div id="baseSmithProgressWrap" class="base-mini-progress"><div id="baseSmithProgressFill" class="base-mini-progress-fill"></div></div>
+                        <div id="base_smith_map_prod_rate" class="base-map-prod-rate muted-text" style="display:none;"></div>
                         <button id="mapManualBtn_smith" class="map-manual-btn" onclick="events.manualSmelt()">Smelt</button>
                     </div>
                     <button id="baseBuilding_inn" class="base-building-label base-building-inn" onclick="events.selectBaseBuilding('inn')">Inn</button>
@@ -78,6 +79,7 @@
                     <div class="base-building-node base-building-mine-node">
                         <button id="baseBuilding_mine" class="base-building-label" onclick="events.selectBaseBuilding('mine')">Mine</button>
                         <div id="baseMineProgressWrap" class="base-mini-progress"><div id="baseMineProgressFill" class="base-mini-progress-fill"></div></div>
+                        <div id="base_mine_map_prod_rate" class="base-map-prod-rate muted-text" style="display:none;"></div>
                         <button id="mapManualBtn_mine" class="map-manual-btn" onclick="events.manualMine()">Mine</button>
                     </div>
                     <div class="base-building-node base-building-library-node">
@@ -87,14 +89,16 @@
                     <div class="base-building-node base-building-claypit-node">
                         <button id="baseBuilding_claypit" class="base-building-label" onclick="events.selectBaseBuilding('claypit')">Clay Pit</button>
                         <div id="baseClaypitProgressWrap" class="base-mini-progress"><div id="baseClaypitProgressFill" class="base-mini-progress-fill"></div></div>
+                        <div id="base_claypit_map_prod_rate" class="base-map-prod-rate muted-text" style="display:none;"></div>
                         <button id="mapManualBtn_claypit" class="map-manual-btn" onclick="events.manualLumber()">Dig</button>
                     </div>
                     <div class="base-building-node base-building-kiln-node">
                         <button id="baseBuilding_kiln" class="base-building-label" onclick="events.selectBaseBuilding('kiln')">Kiln</button>
                         <div id="baseKilnProgressWrap" class="base-mini-progress"><div id="baseKilnProgressFill" class="base-mini-progress-fill"></div></div>
+                        <div id="base_kiln_map_prod_rate" class="base-map-prod-rate muted-text" style="display:none;"></div>
                         <button id="mapManualBtn_kiln" class="map-manual-btn" onclick="events.manualSaw()">Fire</button>
                     </div>
-                    <button id="baseBuilding_lumbermill" class="base-building-label base-building-lumbermill" onclick="events.selectBaseBuilding('lumbermill')">Claypit</button>
+                    <button id="baseBuilding_lumbermill" class="base-building-label base-building-lumbermill" onclick="events.selectBaseBuilding('lumbermill')">Lumbermill</button>
                     <button id="mapManualBtn_inn" class="map-manual-btn base-map-btn-inn" onclick="events.advertiseInn()">Advertise</button>
                 </div>
                 <div id="baseBuildingInfo" class="base-info-panel"></div>
@@ -110,7 +114,7 @@
                     <div class="leveling-stat-card showthat">
                         <div class="leveling-stat-name">Str</div>
                         <div class="leveling-stat-val" id="strText"></div>
-                        <div class="showthis">+10% damage per point</div>
+                        <div class="showthis">+10% damage per point.<br>Damage is always rounded up.</div>
                     </div>
                     <div class="leveling-stat-card showthat">
                         <div class="leveling-stat-name">Con</div>
@@ -157,14 +161,19 @@
                     <div class="leveling-stat-card showthat"><div class="leveling-stat-name">Regen</div><div class="leveling-stat-val" id="statsRegenText"></div><div class="showthis" id="statsRegenTip"></div></div>
                     <div class="leveling-stat-card showthat"><div class="leveling-stat-name">Attack</div><div class="leveling-stat-val" id="statsAttackText"></div><div class="showthis" id="statsAttackTip"></div></div>
                     <div class="leveling-stat-card showthat"><div class="leveling-stat-name">Armor</div><div class="leveling-stat-val" id="statsArmorText"></div><div class="showthis" id="statsArmorTip"></div></div>
-                    <div class="leveling-stat-card showthat"><div class="leveling-stat-name">Melee Speed</div><div class="leveling-stat-val" id="statsMeleeText"></div><div class="showthis" id="statsMeleeTip"></div></div>
-                    <div class="leveling-stat-card showthat"><div class="leveling-stat-name">Ranged Speed</div><div class="leveling-stat-val" id="statsRangedText"></div><div class="showthis" id="statsRangedTip"></div></div>
+                    <div class="leveling-stat-card showthat"><div class="leveling-stat-name">Slap Speed</div><div class="leveling-stat-val" id="statsSlapText"></div><div class="showthis" id="statsSlapTip"></div></div>
+                    <div class="leveling-stat-card showthat"><div class="leveling-stat-name">Sandal Speed</div><div class="leveling-stat-val" id="statsSandalText"></div><div class="showthis" id="statsSandalTip"></div></div>
                 </div>
             </div>
 
             <div id="tabPane_travel" class="tab-pane">
                 <div class="pane-title">Travel</div>
-                <div id="travelMapsList"></div>
+                <div class="travel-subtabs-row">
+                    <button type="button" id="travelSubTab_maps" class="tab-button travel-subtab-btn" onclick="events.switchTravelSubTab('maps')">Maps</button>
+                    <button type="button" id="travelSubTab_challenges" class="tab-button travel-subtab-btn" onclick="events.switchTravelSubTab('challenges')">Challenges</button>
+                </div>
+                <div id="travelPane_maps" class="travel-pane-maps"></div>
+                <div id="travelPane_challenges" class="travel-pane-challenges" style="display:none"></div>
             </div>
 
             <div id="tabPane_history" class="tab-pane">
@@ -173,13 +182,15 @@
             </div>
             <div id="tabPane_options" class="tab-pane">
                 <div class="pane-title">Options</div>
+                <div class="options-row"><button type="button" id="manualSaveButton" class="tab-button" onclick="saving.save()">Save now</button></div>
                 <label class="options-row"><input type="checkbox" id="hideMaxedUpgradesToggle" onchange="events.setHideMaxedUpgrades(this.checked)"> Hide maxed upgrades</label>
-                <label class="options-row"><input type="checkbox" id="disableCompactLayoutToggle" onchange="events.setDisableCompactLayout(this.checked)"> Always use side-by-side layout (do not switch to menus / battle tabs; scroll horizontally if needed)</label>
+                <label class="options-row"><input type="checkbox" id="disableCompactLayoutToggle" onchange="events.setDisableCompactLayout(this.checked)"> Always use side-by-side layout</label>
             </div>
         </div>
     </div>
     <div id="battleColumn" class="game-column">
         <div id="battlefieldWrap">
+            <button type="button" id="battleEndRunBtn" class="battle-end-run-btn tab-button" onclick="events.endRunNow()" title="End run (set HP to 0)">End run</button>
             <div id="battlefield">
                 <div id="waveInfo">Waves</div>
                 <div id="rangeMarkers"></div>
@@ -187,7 +198,13 @@
                 <div id="playerStack">
                     <div id="playerAvatarWrap">
                         <div id="playerMovePulse"></div>
-                        <div id="playerToken"></div>
+                        <div id="playerToken">
+                            <div id="playerTokenHpLayer"></div>
+                        </div>
+                        <div id="playerTokenOverlay" class="player-token-overlay intruder-overlay">
+                            <div id="playerStatHpLine" class="intruder-stat-hp"></div>
+                            <div id="playerStatDmgLine" class="intruder-stat-dmg"></div>
+                        </div>
                     </div>
                     <div id="playerBarsRowTop" class="player-bars-row">
                         <div id="playerAttackBar" class="player-bar-block">
@@ -200,9 +217,9 @@
                         </div>
                     </div>
                     <div id="playerBarsRowMid" class="player-bars-row">
-                        <div id="playerRangedBar" class="player-bar-block">
-                            <div class="player-bar-label" id="playerRangedBarLabel"></div>
-                            <div id="playerRangedBarTrack" class="prog-track player-prog-track"><div id="playerRangedBarFill" class="prog-fill prog-fill-ranged"></div></div>
+                        <div id="playerSandalBar" class="player-bar-block">
+                            <div class="player-bar-label" id="playerSandalBarLabel"></div>
+                            <div id="playerSandalBarTrack" class="prog-track player-prog-track"><div id="playerSandalBarFill" class="prog-fill prog-fill-sandal"></div></div>
                         </div>
                         <div id="playerClassBarB" class="player-bar-block">
                             <div class="player-bar-label" id="playerClassBarBLabel"></div>
@@ -216,18 +233,18 @@
                 </div>
             </div>
             <div id="deathOverlay" style="display:none;">
-                <div id="deathTitle">You Died</div>
+                <div id="deathTitle">The clone has dispersed (no mana)</div>
                 <div id="deathSummary"></div>
                 <div id="deathTalentDetails" class="death-talent-block"></div>
                 <button id="tryAgainButton" onclick="events.tryAgain()">Try Again?</button>
             </div>
         </div>
         <div id="battleHud">
-            <div class="battle-hud-row">Player HP: <span id="playerHpText"></span></div>
-            <div id="rangedAttackWrap" class="battle-hud-row battle-hud-toggle-row">
-                <label class="ranged-toggle-label"><input type="checkbox" id="rangedAttackToggle" onchange="events.setRangedAttackEnabled(this.checked)"> Ranged attack enabled</label>
-                <span id="rangedAttackLockText" class="muted-text battle-hud-hint"></span>
-                <span class="muted-text battle-hud-hint">If off: push wave when melee ready and none in melee range.</span>
+            <div class="battle-hud-row">Secondary Player Stats: <span id="playerBattleHudSecondary"></span></div>
+            <div id="sandalAttackWrap" class="battle-hud-row battle-hud-toggle-row">
+                <label class="sandal-toggle-label"><input type="checkbox" id="sandalAttackToggle" onchange="events.setSandalAttackEnabled(this.checked)"> Sandal throws enabled</label>
+                <span id="sandalAttackLockText" class="muted-text battle-hud-hint"></span>
+                <span class="muted-text battle-hud-hint">If off: push wave when slap ready and none in slap range.</span>
             </div>
         </div>
     </div>
@@ -238,6 +255,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/decimal.js@10.4.3/decimal.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fflate@0.8.2/umd/index.js"></script>
+<script src="interval.js"></script>
 <script src="driver.js"></script>
 <script src="saving.js"></script>
 <script src="onLoad.js"></script>
@@ -248,6 +266,7 @@
 <script src="mapData.js"></script>
 <script src="skills.js"></script>
 <script src="helpers.js"></script>
+<script src="townData.js"></script>
 <script src="initialize.js"></script>
 <script src="viewCreate.js"></script>
 <script src="viewUpdating.js"></script>

@@ -115,6 +115,20 @@ button {
     box-sizing: border-box;
 }
 
+.battle-end-run-btn {
+    position: absolute;
+    top: 6px;
+    right: 8px;
+    z-index: 30;
+    font-size: 11px;
+    padding: 4px 8px;
+    opacity: 0.85;
+}
+
+.battle-end-run-btn:hover {
+    opacity: 1;
+}
+
 #battlefield {
     position: relative;
     flex: 0 0 auto;
@@ -124,6 +138,39 @@ button {
     background: linear-gradient(to bottom, #0a0f17, #161d2c);
     overflow: hidden;
     margin: 0 auto;
+}
+
+.kill-reward-floater {
+    position: absolute;
+    z-index: 35;
+    pointer-events: none;
+    transform: translateX(-50%);
+    text-align: center;
+    max-width: 160px;
+    animation: killRewardFloaterAnim 2s ease-out forwards;
+}
+
+.kill-reward-floater-line {
+    font-size: 11px;
+    line-height: 1.25;
+    color: #f5ebd8;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9);
+    white-space: nowrap;
+}
+
+@keyframes killRewardFloaterAnim {
+    0% {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+    50% {
+        opacity: 1;
+        transform: translateX(-50%) translateY(-18px);
+    }
+    100% {
+        opacity: 0;
+        transform: translateX(-50%) translateY(-28px);
+    }
 }
 
 #playerStack {
@@ -140,29 +187,59 @@ button {
 }
 
 #playerAvatarWrap {
+    --player-token-size: 58px;
+    --player-token-radius: 29px;
     position: relative;
-    width: 48px;
-    height: 48px;
+    width: var(--player-token-size);
+    height: var(--player-token-size);
+    margin-top: calc(-1 * (var(--player-token-size) - 48px));
     flex-shrink: 0;
+    overflow: visible;
 }
 
 #playerToken {
-    position: relative;
+    position: absolute;
+    left: 0;
+    top: 0;
     z-index: 1;
-    width: 48px;
-    height: 48px;
-    border-radius: 24px;
-    background: linear-gradient(to top, #2ad15f 100%, #0f3a1d 100%);
+    width: var(--player-token-size);
+    height: var(--player-token-size);
+    border-radius: var(--player-token-radius);
+    overflow: hidden;
     flex-shrink: 0;
+    background: transparent;
+}
+
+#playerTokenHpLayer {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    border-radius: inherit;
+    background: linear-gradient(to top, #2ad15f 100%, #0f3a1d 100%);
+    pointer-events: none;
+}
+
+/* Sibling of #playerToken so HP text is not clipped by the token's overflow; sits above the circle. */
+#playerTokenOverlay {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: var(--player-token-size);
+    height: var(--player-token-size);
+    z-index: 4;
+    pointer-events: none;
+    font-size: 12px;
+    gap: 0;
+    overflow: visible;
 }
 
 #playerMovePulse {
     position: absolute;
     left: 0;
     top: 0;
-    width: 48px;
-    height: 48px;
-    border-radius: 24px;
+    width: var(--player-token-size);
+    height: var(--player-token-size);
+    border-radius: var(--player-token-radius);
     background: rgba(180, 210, 180, 1);
     z-index: 0;
     display: none;
@@ -181,7 +258,7 @@ button {
     }
     to {
         opacity: 0;
-        transform: translateY(18px);
+        transform: translateY(22px);
     }
 }
 
@@ -202,13 +279,13 @@ button {
     animation: attackLineFade 0.4s forwards;
 }
 
-.attack-line-fx-anim.attack-line-ranged {
+.attack-line-fx-anim.attack-line-sandal {
     background: #89b4fa;
     box-shadow: 0 0 4px rgba(137, 180, 250, 0.85);
     animation: attackLineFade 0.8s forwards;
 }
 
-.attack-line-fx-anim.attack-line-enemy-ranged {
+.attack-line-fx-anim.attack-line-intruder-sandal {
     height: 1px;
     background: #ff9f1c;
     box-shadow: 0 0 3px rgba(255, 159, 28, 0.85);
@@ -230,7 +307,6 @@ button {
 
 .player-bars-row {
     width: 100%;
-    display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 8px;
 }
@@ -266,7 +342,7 @@ button {
     background: #89b4fa;
 }
 
-.prog-fill-ranged {
+.prog-fill-sandal {
     background: #b4befe;
 }
 
@@ -302,14 +378,14 @@ button {
     color: #a6e3a1;
 }
 
-.enemy-token {
+.intruder-token {
     position: absolute;
     box-sizing: border-box;
     overflow: visible;
     z-index: 20;
 }
 
-.enemy-shape-layer {
+.intruder-shape-layer {
     position: absolute;
     inset: 0;
     border: 1px solid #4b1515;
@@ -318,18 +394,18 @@ button {
     z-index: 1;
 }
 
-.enemy-shape-layer.enemy-token-ranged {
+.intruder-shape-layer.intruder-token-lecher {
     border: 1px solid #1b3f74;
     clip-path: polygon(50% 0%, 100% 38%, 81% 100%, 19% 100%, 0% 38%);
 }
 
-.enemy-hp-layer {
+.intruder-hp-layer {
     position: absolute;
     inset: 0;
     pointer-events: none;
 }
 
-.enemy-overlay {
+.intruder-overlay {
     position: absolute;
     inset: 0;
     display: flex;
@@ -357,6 +433,46 @@ button {
     padding: 4px 8px;
 }
 
+.wave-info-time-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.wave-info-star-inline {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    margin: 0;
+    padding: 0;
+    font-size: 18px;
+    line-height: 1;
+    font-weight: 300;
+    vertical-align: middle;
+    border: none;
+    background: transparent;
+    pointer-events: none;
+}
+
+.wave-info-time-label {
+    white-space: nowrap;
+}
+
+.travel-subtabs-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 10px;
+}
+
+.travel-subtab-btn {
+    font-size: 13px;
+}
+
 #rangeMarkers {
     position: absolute;
     inset: 0;
@@ -381,7 +497,7 @@ button {
     padding: 0 4px;
 }
 
-.enemy-stat-atk-wrap {
+.intruder-stat-atk-wrap {
     width: 72%;
     height: 4px;
     background: rgba(0, 0, 0, 0.55);
@@ -390,7 +506,7 @@ button {
     overflow: hidden;
 }
 
-.enemy-stat-atk-fill {
+.intruder-stat-atk-fill {
     height: 100%;
     width: 100%;
     background: #f9e2af;
@@ -464,6 +580,13 @@ button {
 
 .tab-pane {
     padding: 10px;
+}
+
+/* Match battlefield column height (gameData.battle.battlefieldHeightPx + 2). */
+#tabPane_skills,
+#tabPane_travel {
+    max-height: 720px;
+    overflow-y: auto;
 }
 
 .pane-title {
@@ -543,70 +666,178 @@ button {
     background: #4f3f10;
 }
 
-.ranged-toggle-label {
+.sandal-toggle-label {
     font-size: 12px;
     cursor: pointer;
     user-select: none;
 }
 
-#skillsList {
+#skillsList.skills-tab-layout {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 40% 60%;
     gap: 8px;
     align-items: start;
 }
 
-.skill-block {
-    border: 1px solid var(--border-color);
-    padding: 6px;
-    margin-bottom: 0;
-}
-
-.skill-block-head {
-    cursor: pointer;
-    user-select: none;
+.skills-list-column {
     display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 6px;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
 }
 
-.skill-head-main {
-    flex: 1 1 auto;
+.skills-list-empty {
+    width: 100%;
+    padding: 6px 0;
+}
+
+.skill-row.skill-block {
+    border: 1px solid var(--border-color);
+    border-left: 3px solid transparent;
+    padding: 4px 6px;
+    margin-bottom: 0;
+    user-select: none;
+    cursor: pointer;
+    transition: background-color 0.12s ease, border-color 0.12s ease;
+}
+
+.skill-row.skill-block:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(148, 163, 184, 0.45);
+}
+
+.skill-row.skill-row--selected {
+    border-left-color: #4f9eff;
+    background: rgba(79, 158, 255, 0.1);
+}
+
+.skill-row-head {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 6px;
+    align-items: start;
+    width: 100%;
     min-width: 0;
+}
+
+.skill-row-head-left {
+    min-width: 0;
+}
+
+.skill-row-name {
     font-size: 11px;
     font-weight: bold;
     line-height: 1.25;
+    width: 100%;
+    min-width: 0;
+    margin-bottom: 1px;
+    word-break: break-word;
 }
 
-.skill-bars-always {
+.skill-row-lvl-talent {
+    font-size: 10px;
+    font-weight: 600;
+    color: #bac2de;
+    line-height: 1.2;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.skill-row-stars-right.skill-stars-controls {
+    justify-self: end;
+    align-self: start;
+}
+
+.skill-stars-row-compact.skill-stars-controls {
+    margin: 0;
+    gap: 0;
+    flex-shrink: 0;
+}
+
+.skill-stars-row-compact .skill-panel-star-btn.skill-star-btn {
+    font-size: 25px;
+    line-height: 1;
+    padding: 0;
+    font-weight: 300;
+}
+
+.skill-row-bars {
     display: flex;
     flex-direction: column;
     gap: 4px;
-    margin: 4px 0 6px;
+    margin-top: 4px;
+    width: 100%;
+}
+
+.skill-prog-row-full.skill-prog-mini {
+    width: 100%;
+    height: 5px;
+}
+
+.skill-info-aside {
+    border: 1px solid var(--border-color);
+    background: #111827;
+    border-radius: 4px;
+    padding: 8px 10px;
+    font-size: 11px;
+    min-width: 0;
+    align-self: start;
+}
+
+.skill-info-aside-title {
+    font-weight: bold;
+    font-size: 12px;
+    margin-bottom: 6px;
+    color: #e2e8f0;
+}
+
+.skill-info-title {
+    font-weight: bold;
+    margin-bottom: 6px;
+    font-size:16px;
+}
+
+.skill-info-flavor {
+    margin-top: 2em;
+    font-style: italic;
+    color: #94a3b8;
+    line-height: 1.45;
+    white-space: normal;
+}
+
+.skill-info-prog.skill-prog-mini {
+    height: 6px;
+    margin-top: 2px;
+    margin-bottom: 6px;
+}
+
+.skill-stars-controls .skill-panel-star-btn:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.skill-stars-row-top {
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    align-items: center;
+    margin: 0 0 4px;
+}
+
+.skill-panel-star-btn.skill-star-btn {
+    font-size: 26px;
+    line-height: 1;
+    padding: 0;
+    font-weight: 300;
 }
 
 .skill-prog-mini {
-    height: 6px;
+    height: 5px;
 }
 
-.skill-expand-hint {
-    color: #6c7086;
-    font-size: 10px;
-    flex-shrink: 0;
-    transition: transform 0.15s ease;
-}
-
-.skill-block--expanded .skill-expand-hint {
-    transform: rotate(90deg);
-}
-
-.skill-block .skill-details {
-    display: none;
-}
-
-.skill-block--expanded .skill-details {
-    display: block;
+.travel-map-clear-fill.skill-prog-mini {
+    border-radius: 1px;
 }
 
 .skill-exp-row {
@@ -667,6 +898,53 @@ button {
     justify-content: center;
 }
 
+.travel-map-stars-inline {
+    display: inline-flex;
+    align-items: center;
+    gap: 0;
+    margin: 0;
+    padding: 0;
+    letter-spacing: 0;
+    vertical-align: middle;
+}
+
+.travel-map-stars-inline .skill-star-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 28px;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    border: none;
+    background: transparent;
+    font-size: 26px;
+    line-height: 1;
+    font-weight: 300;
+    vertical-align: middle;
+}
+
+.travel-map-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.travel-map-current-label {
+    display: inline-block;
+    padding: 4px 8px;
+    font-size: 12px;
+}
+
+.travel-map-shards {
+    font-size: 11px;
+    margin: 4px 0 0 0;
+    line-height: 1.35;
+}
+
 .history-row {
     margin-bottom: 6px;
 }
@@ -700,6 +978,17 @@ button {
     font-weight: bold;
 }
 
+.base-building-label.base-building-label--notify {
+    color: #e67e22 !important;
+}
+.base-building-label.base-building-selected.base-building-label--notify {
+    color: #f5a623 !important;
+}
+
+.tab-button.tab-button--notify {
+    color: #e67e22;
+}
+
 .base-building-chapel { top: 20px; left: 5%; }
 .base-building-inn { top: 50px; left: 24%; }
 .base-building-guild { top: 76px; left: 43%; }
@@ -719,6 +1008,8 @@ button {
 .base-info-panel {
     border: 1px solid var(--border-color);
     min-height: 120px;
+    max-height: none;
+    overflow-y: auto;
     padding: 10px;
     background: #0c1220;
 }
@@ -771,12 +1062,31 @@ button {
     margin-top: 8px;
 }
 
+.base-upgrade-row {
+    align-items: flex-start;
+}
+.base-upgrade-text {
+    flex: 1;
+    min-width: 0;
+}
+.base-upgrade-name {
+    font-weight: 600;
+}
+.base-upgrade-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    align-items: flex-end;
+    flex-shrink: 0;
+}
+
 .base-library-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
     gap: 8px;
     margin-bottom: 6px;
+    padding:2px;
 }
 
 .base-library-row:hover {
@@ -844,6 +1154,18 @@ button {
     left: 24%;
 }
 
+.base-map-prod-rate {
+    font-size: 10px;
+    text-align: center;
+    max-width: 72px;
+    margin: 2px auto 0;
+    line-height: 1.2;
+}
+
+.base-worker-power-row {
+    margin-top: 6px;
+}
+
 .base-skill-short {
     font-size: 10px;
     margin-top: 1px;
@@ -894,8 +1216,8 @@ button {
 }
 
 .skill-star-btn {
-    width: 30px;
-    height: 28px;
+    width: 28px;
+    height: 25px;
     border: 1px solid var(--border-color);
     background: transparent;
     font-size: 18px;

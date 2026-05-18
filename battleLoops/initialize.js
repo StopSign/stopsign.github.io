@@ -14,41 +14,18 @@ let saveName = "battleLoops1"; //Blank if you don't want to save, change name to
 
 let data = {};
 let language = "english";
-let baseBuildingKeys = ["chapel", "townhall", "mine", "smith", "claypit", "kiln", "lumbermill", "library", "garden", "inn", "workshop", "guild", "market", "mage_tower"];
-let baseBuildingNames = {
-    chapel: "Chapel",
-    townhall: "Town Hall",
-    smith: "Smith",
-    inn: "Inn",
-    guild: "Guild",
-    market: "Market",
-    garden: "Garden",
-    workshop: "Workshop",
-    mage_tower: "Mage Tower",
-    mine: "Mine",
-    library: "Library",
-    claypit: "Clay Pit",
-    kiln: "Kiln",
-    lumbermill: "Claypit"
-};
 let globalVisible = false; //SET FOR COMMIT
 // let globalVisible = true;
-let isLoadingEnabled = true; //SET FOR COMMIT
-// let isLoadingEnabled = false;
+// let isLoadingEnabled = true; //SET FOR COMMIT
+let isLoadingEnabled = false;
 let loadStaticSaveFile = false; //SET FOR COMMIT
 // let loadStaticSaveFile = true;
 let isSteam = false; //SET FOR COMMIT
 // let isSteam = true; //SET FOR STEAM BUILD
 
-let isDebug = false; //SET FOR COMMIT
-// let isDebug = true;
+// let isDebug = false; //SET FOR COMMIT
+let isDebug = true;
 let debugLevel = 0; //To start at different parts of the game
-const CLASS_DEFS = {
-    none: { key: "none", name: "None", buyCostGold: 0, perLevel: { str: 1, con: 1, spd: 0 } },
-    warrior: { key: "warrior", name: "Warrior", buyCostGold: 500, perLevel: { str: 1, con: 2, spd: 0 } },
-    rogue: { key: "rogue", name: "Rogue", buyCostGold: 500, perLevel: { str: 1, con: 1, spd: 1 } },
-    hunter: { key: "hunter", name: "Hunter", buyCostGold: 500, perLevel: { str: 2, con: 1, spd: 0 } }
-};
 function debug() {
     if(!isDebug) {
         return;
@@ -58,127 +35,26 @@ function debug() {
 
 let initials = {
     base: function() {
+        const pb = function(buildingKey) {
+            const def = townData.buildings[buildingKey] && townData.buildings[buildingKey].progressDefaults;
+            return def ? JSON.parse(JSON.stringify(def)) : {};
+        };
         return {
-            chapel: {
-                autoRetryEnabled: false,
-                growthBlessingUnlocked: false,
-                plannedGrowthBlessingUnlocked: false
-            },
+            chapel: pb("chapel"),
             townhall: {
-                unlocks: {
-                    mine: false,
-                    smith: false,
-                    claypit: false,
-                    kiln: false,
-                    lumbermill: false,
-                    library: false,
-                    garden: false,
-                    inn: false,
-                    workshop: false,
-                    guild: false,
-                    market: false,
-                    mage_tower: false
-                },
-                upgradeCosts: {
-                    claypit: { gold: 5, bars: 0, bricks: 0, lumber: 0 },
-                    kiln: { gold: 5, bars: 0, bricks: 0, lumber: 0 },
-                    library: { gold: 20, bars: 0, bricks: 5, lumber: 0 },
-                    mine: { gold: 20, bars: 0, bricks: 5, lumber: 0 },
-                    smith: { gold: 20, bars: 0, bricks: 5, lumber: 0 },
-                    lumbermill: { gold: 200, bars: 20, bricks: 40, lumber: 0 },
-                    garden: { gold: 300, bars: 30, bricks: 30, lumber: 0 },
-                    inn: { gold: 350, bars: 35, bricks: 35, lumber: 0 },
-                    workshop: { gold: 400, bars: 40, bricks: 40, lumber: 40 },
-                    guild: { gold: 450, bars: 45, bricks: 45, lumber: 45 },
-                    market: { gold: 500, bars: 50, bricks: 50, lumber: 50 },
-                    mage_tower: { gold: 550, bars: 55, bricks: 55, lumber: 55 }
-                },
-                townUpgrades: {
-                    hireLocalBought: 0,
-                    hireLocalNextGoldCost: 5
-                }
+                unlocks: Object.assign({}, townData.defaultTownhallUnlocksState),
+                townUpgrades: Object.assign({}, townData.defaultTownhallTownUpgrades)
             },
-            inn: {
-                openForGuests: false,
-                nextGuestTimerMs: 60000,
-                guests: [],
-                guestIdCounter: 1,
-                advertiseCooldownMs: 0
-            },
-            mine: {
-                assignedWorkers: 0,
-                gearSets: 0,
-                nextGearGoldCost: 20,
-                nextGearBarsCost: 0,
-                progress: 0,
-                manualCooldownMs: 0
-            },
-            smith: {
-                assignedWorkers: 0,
-                gearSets: 0,
-                nextGearGoldCost: 20,
-                nextGearBarsCost: 0,
-                progress: 0,
-                attackUpgradesBought: 0,
-                nextAttackUpgradeCostBars: 20,
-                armorUpgradesBought: 0,
-                manualCooldownMs: 0
-            },
-            library: {
-                skillUnlockCost: 30,
-                unlockedSkills: {},
-                skillResearch: {},
-                assignedWorkers: 0,
-                gearSets: 0,
-                nextGearGoldCost: 10,
-                nextGearStoneCost: 0,
-                researchPerWorkerPerSecond: 1
-            },
-            claypit: {
-                assignedWorkers: 0,
-                gearSets: 0,
-                nextGearGoldCost: 20,
-                nextGearBarsCost: 0,
-                progress: 0,
-                manualCooldownMs: 0
-            },
-            kiln: {
-                assignedWorkers: 0,
-                gearSets: 0,
-                nextGearGoldCost: 20,
-                nextGearBarsCost: 0,
-                progress: 0,
-                manualCooldownMs: 0
-            },
-            lumbermill: {
-                assignedWorkers: 0,
-                gearSets: 0,
-                nextGearGoldCost: 20,
-                nextGearBarsCost: 0,
-                progress: 0,
-                manualCooldownMs: 0
-            },
-            workshop: {
-                innRoomUpgradesBought: 0,
-                innRoomNextGoldCost: 500,
-                innRoomNextLumberCost: 50,
-                bowBuilt: false
-            },
-            garden: {
-                mapManualInn: false,
-                mapManualMine: false,
-                mapManualSmith: false,
-                mapManualClaypit: false,
-                mapManualKiln: false
-            },
-            resources: {
-                ironOre: 0,
-                ironBar: 0,
-                stone: 0,
-                bricks: 0,
-                logs: 0,
-                lumber: 0
-            }
+            claypit: pb("claypit"),
+            kiln: pb("kiln"),
+            mine: pb("mine"),
+            smith: pb("smith"),
+            library: pb("library"),
+            inn: pb("inn"),
+            lumbermill: pb("lumbermill"),
+            workshop: pb("workshop"),
+            garden: pb("garden"),
+            resources: Object.assign({}, townData.defaultBaseResources)
         };
     },
     gameSettings: function() {
@@ -206,20 +82,24 @@ let initials = {
         };
     },
     player: function() {
+        const ps = gameData.battle.playerStarting;
         return {
-            attackDamage: 5,
-            rangedAttackDamage: 7.5,
-            attackCooldownMs: 2000,
-            attackTimerMs: 0,
-            rangedAttackCooldownMs: 4000,
-            rangedAttackTimerMs: 0
+            attackDamage: ps.attackDamage,
+            sandalAttackDamage: ps.sandalAttackDamage,
+            attackCooldownMs: ps.attackCooldownMs,
+            attackTimerMs: ps.attackTimerMs,
+            sandalAttackCooldownMs: ps.sandalAttackCooldownMs,
+            sandalAttackTimerMs: ps.sandalAttackTimerMs,
+            regenPerSecond: 0
         };
     },
     levelState: function() {
+        const startExp = gameData.battle.levelStartingExpToLevel;
         return {
             level: 0,
             exp: 0,
-            expToLevel: 3,
+            expToLevelBase: startExp,
+            expToLevel: startExp,
             unassignedPoints: 0,
             levelStr: 0,
             levelCon: 0,
@@ -234,6 +114,7 @@ let initials = {
             gold: 0,
             selectedBaseBuilding: "chapel",
             selectedSkillsTab: "combat",
+            selectedSkillDetailKey: "",
             selectedStatsTab: "combat",
             selectedLibraryTab: "combat",
             selectedTownHallTab: "buildings",
@@ -248,7 +129,8 @@ let initials = {
                 hideMaxedUpgrades: true,
                 disableCompactLayout: false
             },
-            currentMapKey: "map_1",
+            currentMapKey: mapData.defaultStartingMapKey(),
+            selectedTravelSubTab: "maps",
             mapDefinitions: mapData.getDefaultMaps(),
             mapStars: {},
             mapWorkersFound: {},
@@ -260,7 +142,11 @@ let initials = {
             attributePlan: [],
             runHistory: [],
             skills: skills.getDefaultSkills(),
-            rangedAttackEnabled: false,
+            sandalAttackEnabled: false,
+            baseContentNotify: {
+                building: { chapel: true, townhall: true },
+                subtab: { townhall_buildings: true, townhall_town_upgrades: true }
+            },
             base: initials.base()
         };
     },
@@ -270,9 +156,9 @@ let initials = {
             mode: "combat",
             state: "running",
             resetCount: 0,
-            enemyIdCounter: 1,
+            intruderIdCounter: 1,
             enemies: [],
-            meleeQueue: [],
+            slapQueue: [],
             activeTargetId: null,
             player: initials.player(),
             levelState: initials.levelState(),
@@ -282,6 +168,7 @@ let initials = {
             runStartGold: 0,
             historyLogged: false,
             enemiesKilled: 0,
+            runGoldFromKills: 0,
             completionBonusGold: 0,
             mapTier: 0,
             zoneSpawnedInCycle: [],
@@ -290,7 +177,7 @@ let initials = {
             transitionMessage: "",
             nextTierAfterCountdown: 0,
             lineFxQueue: [],
-            prevZoneNameForFortitude: null,
+            enduranceExpAccMs: 0,
             runSkillTalentStart: null,
             recoverySecondAccMs: 0,
             classPowerA: 0,
@@ -298,7 +185,7 @@ let initials = {
             classRetreatMs: 0,
             rogueDashActive: false,
             rogueFlurryMs: 0,
-            lastPlayerHitEnemyId: 0,
+            lastPlayerHitIntruderId: 0,
             lastPlayerHitStreak: 0,
             forageIndexSpawned: {},
             forageKindSpawnCounts: {},
@@ -306,7 +193,7 @@ let initials = {
             forageMoveAccumPx: 0
         };
     },
-    enemyPool: function() {
+    intruderPool: function() {
         return {
             availableIds: [],
             inUseIds: {}
@@ -324,14 +211,15 @@ let initialize = {
         data.currentGameState = initials.currentGameState();
         data.progress = initials.progress();
         initialize.ensureProgressShape();
+        initialize.applySavedProgressEconomyFromTownData();
         data.battle = initials.battle();
-        data.battle.enemyPool = initials.enemyPool();
+        data.battle.intruderPool = initials.intruderPool();
         initialize.startFreshBattle(data.progress.mapDefinitions[0].seed, data.progress.currentMapKey);
     },
     startFreshBattle: function(seed, mapKey) {
         const preservedTab = data.battle && data.battle.currentTab ? data.battle.currentTab : "base";
         data.battle = initials.battle();
-        data.battle.enemyPool = initials.enemyPool();
+        data.battle.intruderPool = initials.intruderPool();
         data.battle.seed = seed;
         data.battle.generatedFromSeed = seed;
         data.battle.currentTab = preservedTab;
@@ -356,6 +244,8 @@ let initialize = {
         data.battle.forageKindSpawnCounts = {};
         data.battle.forageActiveDrainMapKey = "";
         data.battle.forageMoveAccumPx = 0;
+        engine.initZoneShardRunCounts();
+        engine.applySkillShardExpOnBattleStart();
         initialize.applyPlanForCurrentLevel();
         initialize.calcPlayerStats(true);
         initialize.snapshotRunSkillTalent();
@@ -363,7 +253,8 @@ let initialize = {
         data.gameSettings.stopAll = false;
     },
     getClassDef: function(classKey) {
-        return CLASS_DEFS[classKey] || CLASS_DEFS.none;
+        const defs = townData.guildClassDefs;
+        return (defs && defs[classKey]) || defs.none;
     },
     getCurrentClassDef: function() {
         const key = data.progress && data.progress.currentClassKey ? data.progress.currentClassKey : "none";
@@ -442,93 +333,161 @@ let initialize = {
     },
     calcPlayerStats: function(fullHeal) {
         if (data.battle && data.battle.mode === "foraging") {
+            const gc = gameData.battle.combat;
+            const div = gc.conStrStatDivisor;
             const ls = data.battle.levelState || {};
             const totalCon = (ls.levelCon || 0);
             const totalStr = (ls.levelStr || 0);
-            const breathingLv = (skills.isSkillUnlocked("breathing") && data.progress.skills.breathing) ? (data.progress.skills.breathing.level || 0) : 0;
-            const maxStamina = Math.max(1, Math.ceil((20 + (breathingLv * 2)) * (1 + (totalCon / 10))));
+            const brEff = skills.getSkillEffect("breathing");
+            const breathingBonus = brEff.breathingStaminaCapacityBonus || 0;
+            const maxStamina = Math.max(1, Math.ceil((gc.foragingBaseStaminaInner + breathingBonus) * (1 + (totalCon / div))));
             data.battle.player.maxHp = maxStamina;
             if (fullHeal) {
                 data.battle.player.hp = maxStamina;
             } else {
                 data.battle.player.hp = Math.min(maxStamina, data.battle.player.hp);
             }
-            data.battle.player.attackDamage = Math.max(1, Math.round(5 * (1 + (totalStr / 10))));
-            data.battle.player.rangedAttackDamage = 0;
-            data.progress.rangedAttackEnabled = false;
+            data.battle.player.attackDamage = Math.max(1, roundNearestDecimals(gc.foragingHarvestDamageBase * (1 + (totalStr / div)), 1));
+            data.battle.player.sandalAttackDamage = 0;
+            data.progress.sandalAttackEnabled = false;
+            data.battle.player.regenPerSecond = 0;
             engine.syncPlayerCooldownFields();
             return;
         }
+        const gc = gameData.battle.combat;
+        const div = gc.conStrStatDivisor;
         const missingHp = data.battle.player.maxHp - data.battle.player.hp;
         const totalCon = data.battle.levelState.levelCon + data.battle.levelState.skillConBonus;
         const totalStr = data.battle.levelState.levelStr + data.battle.levelState.skillStrBonus;
-        const finesseLv = data.progress.skills.finesse ? data.progress.skills.finesse.level : 0;
+        const fEff = skills.getSkillEffect("force");
+        const forceFlat = fEff.slapFlatBeforeStr || 0;
         const smithAtkBonus = data.progress.base && data.progress.base.smith ? (data.progress.base.smith.attackUpgradesBought || 0) : 0;
-        const fortLvl = data.progress.skills.fortitude ? data.progress.skills.fortitude.level : 0;
-        const armorHp = data.progress.base && data.progress.base.smith ? ((data.progress.base.smith.armorUpgradesBought || 0) * 5) : 0;
-        const baseInner = 20 + fortLvl + armorHp;
-        let maxHp = Math.max(1, Math.ceil(baseInner * (1 + totalCon / 10)));
+        const fortEff = skills.getSkillEffect("endurance");
+        const fortLvl = fortEff.enduranceBaseHpInnerBonus || 0;
+        const tenEff = skills.getSkillEffect("tenacity");
+        const tenInner = tenEff.tenacityHpInnerBonus || 0;
+        const armorHp = data.progress.base && data.progress.base.smith ? ((data.progress.base.smith.armorUpgradesBought || 0) * gc.smithArmorHpPerUpgrade) : 0;
+        const baseInner = gc.baseHpInner + fortLvl + tenInner + armorHp;
+        const conMult = 1 + totalCon / div;
+        const tenacityHpExtra = Math.ceil((2 * tenInner) * conMult);
+        let maxHp = Math.max(1, Math.ceil(baseInner * conMult) + tenacityHpExtra);
         data.battle.player.maxHp = maxHp;
         if (fullHeal) {
             data.battle.player.hp = data.battle.player.maxHp;
         } else {
             data.battle.player.hp = Math.max(1, data.battle.player.maxHp - missingHp);
         }
-        let atk = (5 + finesseLv + smithAtkBonus) * (1 + (totalStr / 10));
-        atk = Math.max(1, Math.round(atk));
+        let atk = (gc.baseSlapDamage + forceFlat + smithAtkBonus) * (1 + (totalStr / div));
+        atk = Math.max(1, roundNearestDecimals(atk, 1));
         data.battle.player.attackDamage = atk;
-        const longshotLv = (skills.isSkillUnlocked("longshot") && data.progress.skills.longshot) ? (data.progress.skills.longshot.level || 0) : 0;
-        data.battle.player.rangedAttackDamage = Math.floor(data.battle.player.attackDamage * 1.5) + longshotLv;
+        const lsEff = skills.getSkillEffect("longshot");
+        const longshotFlat = lsEff.longshotSandalFlatDamage || 0;
+        const sandalRaw = data.battle.player.attackDamage * gc.sandalDamageSlapMultiplier + longshotFlat;
+        data.battle.player.sandalAttackDamage = Math.max(1, roundNearestDecimals(sandalRaw, 1));
+        const rEff = skills.getSkillEffect("recovery");
+        data.battle.player.regenPerSecond = rEff.recoveryHpPerSec || 0;
         engine.syncPlayerCooldownFields();
     },
     ensureProgressShape: function() {
-        if (!data.progress.mapClearProgress) {
-            data.progress.mapClearProgress = {};
-        }
-        if (!data.progress.selectedSkillsTab) {
-            data.progress.selectedSkillsTab = "combat";
-        }
-        if (!data.progress.selectedLibraryTab) {
-            data.progress.selectedLibraryTab = "combat";
-        }
-        if (!data.progress.selectedTownHallTab) {
-            data.progress.selectedTownHallTab = "buildings";
-        }
-        if (data.progress.classSwitchCooldownMs === undefined) {
-            data.progress.classSwitchCooldownMs = 0;
-        }
-        const th = data.progress.base && data.progress.base.townhall;
-        const chapel = data.progress.base && data.progress.base.chapel;
-        if (chapel) {
-            if (chapel.growthBlessingUnlocked === undefined) {
-                chapel.growthBlessingUnlocked = false;
-            }
-            if (chapel.plannedGrowthBlessingUnlocked === undefined) {
-                chapel.plannedGrowthBlessingUnlocked = false;
+        const base = data.progress.base;
+        const wpk = townData.workerPowerSiteKeys;
+        for (let i = 0; i < wpk.length; i++) {
+            const k = wpk[i];
+            const s = base[k];
+            if (s.workerPower === undefined) {
+                s.workerPower = Math.min(40, (s.progress || 0) * 40);
             }
         }
-        if (th) {
-            if (!th.unlocks) th.unlocks = {};
-            const unlockKeys = ["mine", "smith", "claypit", "kiln", "lumbermill", "library", "garden", "inn", "workshop", "guild", "market", "mage_tower"];
-            for (let i = 0; i < unlockKeys.length; i++) {
-                if (th.unlocks[unlockKeys[i]] === undefined) th.unlocks[unlockKeys[i]] = false;
+        // Migrate Discipline → Adaptation; backfill new skill keys on old saves.
+        const lib = base && base.library;
+        if (lib) {
+            if (!lib.unlockedSkills) {
+                lib.unlockedSkills = {};
             }
-            if (!th.upgradeCosts) th.upgradeCosts = {};
-            const defaults = initials.base().townhall.upgradeCosts;
-            const costKeys = Object.keys(defaults);
-            for (let i = 0; i < costKeys.length; i++) {
-                const k = costKeys[i];
-                if (!th.upgradeCosts[k]) {
-                    th.upgradeCosts[k] = defaults[k];
-                } else {
-                    if (th.upgradeCosts[k].gold === undefined) th.upgradeCosts[k].gold = defaults[k].gold || 0;
-                    if (th.upgradeCosts[k].bars === undefined) th.upgradeCosts[k].bars = defaults[k].bars || 0;
-                    if (th.upgradeCosts[k].bricks === undefined) th.upgradeCosts[k].bricks = defaults[k].bricks || 0;
-                    if (th.upgradeCosts[k].lumber === undefined) th.upgradeCosts[k].lumber = defaults[k].lumber || 0;
+            const u = lib.unlockedSkills;
+            if (u.discipline && !u.adaptation) {
+                u.adaptation = true;
+                delete u.discipline;
+            }
+        }
+        const sks = data.progress.skills;
+        if (sks) {
+            if (sks.discipline && !sks.adaptation) {
+                sks.adaptation = sks.discipline;
+                sks.adaptation.key = "adaptation";
+                sks.adaptation.name = "Adaptation";
+                delete sks.discipline;
+            } else if (sks.discipline) {
+                delete sks.discipline;
+            }
+            for (let i = 0; i < skills.keysInOrder.length; i++) {
+                const k = skills.keysInOrder[i];
+                if (!sks[k]) {
+                    sks[k] = skills.createFreshSkillState(k);
                 }
             }
-            if (!th.townUpgrades) {
-                th.townUpgrades = { hireLocalBought: 0, hireLocalNextGoldCost: 5 };
+            const skKeysAll = Object.keys(sks);
+            for (let j = 0; j < skKeysAll.length; j++) {
+                const ent = sks[skKeysAll[j]];
+                if (ent && ent.shards === undefined) {
+                    ent.shards = 0;
+                }
+            }
+        }
+        if (data.progress.selectedSkillDetailKey === "discipline") {
+            data.progress.selectedSkillDetailKey = "adaptation";
+        }
+        if (data.progress.selectedTravelSubTab !== "maps" && data.progress.selectedTravelSubTab !== "challenges") {
+            data.progress.selectedTravelSubTab = "maps";
+        }
+        const clsTravel = data.progress.currentClassKey || "none";
+        if (clsTravel === "none" && data.progress.selectedTravelSubTab === "challenges") {
+            data.progress.selectedTravelSubTab = "maps";
+        }
+        const defsFix = data.progress.mapDefinitions || [];
+        let curDef = null;
+        for (let fi = 0; fi < defsFix.length; fi++) {
+            if (defsFix[fi].key === data.progress.currentMapKey) {
+                curDef = defsFix[fi];
+                break;
+            }
+        }
+        if (!curDef || !mapData.isMapUnlocked(curDef, data.progress)) {
+            for (let fj = 0; fj < defsFix.length; fj++) {
+                if (mapData.isMapUnlocked(defsFix[fj], data.progress)) {
+                    data.progress.currentMapKey = defsFix[fj].key;
+                    break;
+                }
+            }
+        }
+    },
+
+    applySavedProgressEconomyFromTownData: function() {
+        const base = data.progress.base;
+        if (!base) {
+            return;
+        }
+        const gearSites = ["mine", "smith", "claypit", "kiln", "lumbermill", "library"];
+        for (let i = 0; i < gearSites.length; i++) {
+            const k = gearSites[i];
+            const s = base[k];
+            if (!s) {
+                continue;
+            }
+            delete s.cost;
+            delete s.costIncrease;
+        }
+        if (base.smith) {
+            delete base.smith.nextAttackUpgradeCostBars;
+        }
+        if (base.workshop) {
+            delete base.workshop.innRoomNextGoldCost;
+            delete base.workshop.innRoomNextLumberCost;
+        }
+        if (base.townhall) {
+            delete base.townhall.upgradeCosts;
+            if (base.townhall.townUpgrades) {
+                delete base.townhall.townUpgrades.hireLocalNextGoldCost;
             }
         }
     }

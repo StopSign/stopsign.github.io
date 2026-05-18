@@ -19,75 +19,6 @@ let driver = {
             }
         }
     },
-    loop: function() {
-        if (timerId !== null) clearTimeout(timerId);
-
-        const now = performance.now();
-        if (now - lastRealSecondTime >= 1000) {
-            driver.realSecondPassed();
-            lastRealSecondTime += 1000;
-        }
-
-        if (lastTickTime === 0) lastTickTime = now;
-
-        const tickInterval = 1000 / data.gameSettings.ticksPerSecond;
-
-        const maxElapsed = 2000; // ms (2 seconds max catch-up)
-        let elapsed = now - lastTickTime;
-        if (elapsed > maxElapsed) {
-            lastTickTime = now - maxElapsed;
-            elapsed = maxElapsed;
-        }
-
-        let ticksAvailable = Math.floor(elapsed / tickInterval);
-
-        const maxTicksPerLoop = 40;
-        let ticksProcessed = Math.min(ticksAvailable, maxTicksPerLoop);
-
-        if (ticksAvailable > maxTicksPerLoop) {
-            const extraTicks = ticksAvailable - maxTicksPerLoop;
-            data.currentGameState.bonusTime += extraTicks * tickInterval;
-        }
-
-        if (ticksProcessed > 0) {
-            lastTickTime += ticksProcessed * tickInterval;
-
-            const effectiveSpeed = data.gameSettings.gameSpeed * data.gameSettings.bonusSpeed;
-            const exactTicks = (ticksProcessed * effectiveSpeed) + (tickResidue || 0);
-            const totalTicksToRun = Math.floor(exactTicks);
-            tickResidue = exactTicks - totalTicksToRun;
-
-            if (!data.gameSettings.stop) {
-                for (let i = 0; i < totalTicksToRun; i++) {
-                    engine.gameTick();
-                    if (data.gameSettings.ticksForSeconds >= data.gameSettings.ticksPerSecond) {
-                        data.gameSettings.ticksForSeconds = 0;
-                        driver.secondPassed();
-                    }
-                }
-                if (data.gameSettings.bonusSpeed > 1) {
-                    const processedElapsed = ticksProcessed * tickInterval;
-                    const bonusTimeConsumed = processedElapsed * data.gameSettings.gameSpeed * (data.gameSettings.bonusSpeed - 1);
-                    data.currentGameState.bonusTime -= bonusTimeConsumed;
-                    if (data.currentGameState.bonusTime <= 0) {
-                        data.currentGameState.bonusTime = 0;
-                        data.gameSettings.bonusSpeed = 1;
-                    }
-                }
-            } else {
-                if (data.battle && (data.battle.state === "dead" || data.battle.state === "completed")) {
-                    const stoppedElapsed = ticksProcessed * tickInterval * effectiveSpeed;
-                    engine.runTownTick(stoppedElapsed);
-                }
-                if (!(data.battle && data.battle.state === "dead")) {
-                    data.currentGameState.bonusTime += tickInterval * ticksProcessed;
-                }
-            }
-        }
-        const remainingForRender = now - lastTickTime;
-        data.gameSettings.renderAlpha = Math.max(0, Math.min(1, remainingForRender / tickInterval));
-        timerId = setTimeout(driver.runMessage, 20);
-    },
     runMessage: function () {
         postMessage({ type: 'update' });
     },
@@ -180,7 +111,7 @@ let driver = {
 
             data.gameSettings.ticksPerSecond = 20;
             data.gameSettings.stop = origPause;
-            save();
+            saving.save();
 
             setTimeout(() => {
                 isSkipping = false;
@@ -189,10 +120,3 @@ let driver = {
         }, 0);
     },
 }
-
-onmessage = function(e) {
-    if (data.currentGameState.bonusTime <= 0 && data.gameSettings.bonusSpeed > 1) {
-        data.gameSettings.bonusSpeed = 1;
-    }
-    driver.loop();
-};
